@@ -1,9 +1,14 @@
 # label-studio
 Heartex label studio is an open source, configurable data labeling tool
 
-> Work in progress
+> Work in progress, we will release it soon!
 
-### Star this project to get notified when we make a release
+You can try a live demo here:
+http://go.heartex.net/demo/label-studio/
+
+![](https://github.com/heartexlabs/label-studio/blob/master/preview.png)
+
+#### Star this project to get notified when we make a release
 
 # Contacts
 
