@@ -28,7 +28,7 @@ Coming Soon:
 
 - [Introduction](#introduction)
   - [Run Locally](#run-locally)
-  - [Extend & Embed](#extend-&-embed)
+  - [Extend & Embed](#extend--embed)
 - [Using Label Studio](#using-label-studio)
 - [Features](#features)
 - [Contributing](#contributing)
