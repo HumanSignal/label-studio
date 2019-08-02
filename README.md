@@ -26,15 +26,15 @@ Coming Soon:
 
 ## Table of Contents
 
-- [Getting Started](#getting-started)
+- [Introduction](#introduction)
   - [Run Locally](#run-locally)
-  - [Embedding in your application](#embedding-in-your-application)
+  - [Extend & Embed](#extend-&-embed)
 - [Using Label Studio](#using-label-studio)
 - [Features](#features)
 - [Contributing](#contributing)
 - [License](#license)
 
-## Getting Started
+## Introduction
 
 Label Studio consists of two parts. Backend is a simple flask server
 that is used to load the data and save the results. The frontend is a
@@ -45,38 +45,17 @@ labeling into your applications.
 
 ### Run Locally
 
-To run it locally we're including the compiled version of the frontend
-part and example implementation of the backend. 
+To run it locally we include the compiled version of the frontend
+part and an example implementation of the backend. 
 
 [Follow this guide to start the app](backend/README.md)
 
-### Embedding in your application
+### Extend & Embed
 
-Clone this repository and install all dependencies:
+To extend the functionality of embed the labeling inside your app, you
+need to be able to compile it from the sources. 
 
-```bash
-git clone git@github.com:heartexlabs/label-studio.git
-cd label-studio
-npm install
-```
-
-Now you can make any changes to the code or add your custom tags.
-
-#### Run a development build
-
-```bash
-npm run start
-```
-
-And open your browser at http://localhost:3000
-
-#### Run a production build
-
-```bash
-npm run build
-```
-
-Generates the compiled version of label studio. This compiled version needs to be included into your app.
+[This guide explains how to do that](docs/Embed.md)
 
 ## Using Label Studio
 
