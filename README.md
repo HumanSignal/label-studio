@@ -55,8 +55,8 @@ part and example implementation of the backend.
 Clone this repository and install all dependencies:
 
 ```bash
-git clone git@github.com:shevchenkonik/editor-readme.git
-cd editor-readme
+git clone git@github.com:heartexlabs/label-studio.git
+cd label-studio
 npm install
 ```
 
