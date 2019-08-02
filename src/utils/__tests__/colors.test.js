@@ -11,27 +11,31 @@ const randomString = {
   value: "#29ccbd",
 };
 
-it("HEX to RGBA correct work, 3 dig", () => {
-  expect(hexToRGBA(defaultHEX.short, defaultHEX.alpha)).toEqual(defaultRGBA);
+describe("Helper function hexToRGBA", () => {
+  test("3 dig", () => {
+    expect(hexToRGBA(defaultHEX.short, defaultHEX.alpha)).toEqual(defaultRGBA);
+  });
+
+  test("6 dig", () => {
+    expect(hexToRGBA(defaultHEX.long, defaultHEX.alpha)).toEqual(defaultRGBA);
+  });
 });
 
-it("HEX to RGBA correct work, 6 dig", () => {
-  expect(hexToRGBA(defaultHEX.long, defaultHEX.alpha)).toEqual(defaultRGBA);
+describe("Helper function convertToRGBA", () => {
+  test("Convert to RGBA, color", () => {
+    expect(convertToRGBA(randomString.str, defaultHEX.alpha)).toEqual(defaultRGBA);
+  });
+
+  test("Convert to RGBA, HEX", () => {
+    expect(convertToRGBA(defaultHEX.short, defaultHEX.alpha)).toEqual(defaultRGBA);
+    expect(convertToRGBA(defaultHEX.long, defaultHEX.alpha)).toEqual(defaultRGBA);
+  });
 });
 
-it("Convert color to RGBA", () => {
+it("Helper function colorToRGBA", () => {
   expect(colorToRGBA(randomString.str, defaultHEX.alpha)).toEqual(defaultRGBA);
 });
 
-it("Convert to RGBA, color", () => {
-  expect(convertToRGBA(randomString.str, defaultHEX.alpha)).toEqual(defaultRGBA);
-});
-
-it("Convert to RGBA, HEX", () => {
-  expect(convertToRGBA(defaultHEX.short, defaultHEX.alpha)).toEqual(defaultRGBA);
-  expect(convertToRGBA(defaultHEX.long, defaultHEX.alpha)).toEqual(defaultRGBA);
-});
-
-it("Convert random string to color", () => {
+it("Helper function stringToColor", () => {
   expect(stringToColor(randomString.str)).toEqual(randomString.value);
 });
