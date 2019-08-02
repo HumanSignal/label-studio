@@ -1,0 +1,4 @@
+six==1.12.0
+flask==1.1.1
+python-json-logger==0.1.11
+lxml==4.2.5

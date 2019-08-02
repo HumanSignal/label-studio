@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>{{ config['title'] }}</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta charset="utf-8"/>
+
+    <link rel="shortcut icon" href="/static/favicon.ico"/>
+    <link rel="stylesheet" href="/static/css/main.css">
+    <script src="/static/js/helpers.js"></script>
+
+    {% for css in editor_css %}
+        <link href="{{ css }}" rel="stylesheet">
+    {% endfor %}
+</head>
+
+<body>
+<div class="content">
+    <h1 class="title">{{ config['title'] }}</h1>
+    <div class="content">
+        <h2>{{ tasks.length }} Tasks and Completions</h2>
+        <a class="center-link" href="/">Go to Labeling</a>
+
+        <table>
+            <tr>
+                <th>Task ID</th>
+                <th>Finished</th>
+            </tr>
+            {% for task in tasks %}
+            <tr>
+              <td>{{ task }}</td>
+              <td>{{ task in completions }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+</body>
+</html>

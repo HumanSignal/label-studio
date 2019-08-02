@@ -1,0 +1,88 @@
+@import "~antd/dist/antd.css";
+
+@import "./variables";
+@import "./mixins";
+@import "./functions";
+
+body {
+  overflow-x: initial !important;
+  /* bugfix for ranker list movement */
+
+  .pushable {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+}
+
+.hide-dd-icon i {
+  display: none !important;
+}
+
+.drag-handle {
+  width: 18px;
+  min-width: 18px;
+  display: block;
+  cursor: row-resize;
+  height: 10px;
+  background: linear-gradient(
+    180deg,
+    #000,
+    #000 20%,
+    #fff 0,
+    #fff 40%,
+    #000 0,
+    #000 60%,
+    #fff 0,
+    #fff 80%,
+    #000 0,
+    #000
+  );
+  opacity: 0.2;
+  margin-right: 10px;
+}
+
+.noselect {
+  -webkit-touch-callout: none;
+  /* iOS Safari */
+  -webkit-user-select: none;
+  /* Safari */
+  -khtml-user-select: none;
+  /* Konqueror HTML */
+  -moz-user-select: none;
+  /* Firefox */
+  -ms-user-select: none;
+  /* Internet Explorer/Edge */
+  user-select: none;
+  /* Non-prefixed version, currently supported by Chrome and Opera */
+}
+
+.common-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.functional-buttons {
+  float: left;
+  min-width: 250px;
+  margin-left: 20px;
+  width: 250px;
+}
+
+@media only screen and (max-width: 768px) {
+  .common-container {
+    display: initial !important;
+  }
+
+  .editor-side-column {
+    margin-top: 2em;
+    font-size: 75%;
+  }
+
+  .functional-buttons {
+    float: none !important;
+    margin-left: 0 !important;
+  }
+}

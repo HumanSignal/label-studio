@@ -1,0 +1,26 @@
+[
+  {
+    "result": [
+      {
+        "id": "mDBrS_Mzlg",
+        "from_name": "chc-1",
+        "to_name": "dialog",
+        "type": "choices",
+        "value": {
+          "choices": [
+            "Bad answer"
+          ]
+        }
+      },
+      {
+        "id": "rLMBikSlus",
+        "from_name": "answer",
+        "to_name": "answer",
+        "type": "textarea",
+        "value": {
+          "text": "I don't care about what you say!"
+        }
+      }
+    ]
+  }
+]

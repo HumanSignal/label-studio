@@ -1,0 +1,49 @@
+body {
+  background: #FCFCFC;
+  font-family: Rubik, sans-serif;
+  color: #333;
+}
+
+h2 {
+    text-align: center;
+}
+
+table {
+    border: 1px solid #ccc;
+    margin: 0 auto;
+    border-collapse: collapse;
+}
+
+td, th {
+    padding: 0.4em 2em;
+    border: 1px solid #ccc;
+
+}
+
+.content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2em;
+}
+
+.title {
+  text-align: center;
+}
+
+/* Disallow selection on page for Editor Ranker */
+.noselect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.center-link {
+    display: block;
+    text-align: center;
+    margin: 2em;
+    color: rgb(24, 144, 255);
+    text-decoration: none;
+}

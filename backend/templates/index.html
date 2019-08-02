@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>{{ config['title'] }}</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta charset="utf-8"/>
+
+    <link rel="shortcut icon" href="/static/favicon.ico"/>
+    <link rel="stylesheet" href="/static/css/main.css">
+
+    <!-- Editor -->
+    {% for css in editor_css %}
+        <link href="{{ css }}" rel="stylesheet">
+    {% endfor %}
+
+    <script src="/static/js/helpers.js"></script>
+</head>
+
+<body>
+    <div class="content">
+        <h1 class="title">{{ config['title'] }}</h1>
+        <div class="editor">
+            <div id="root"></div>
+        </div>
+
+        <a class="center-link" href="/tasks">Go to Task List</a>
+    </div>
+
+    <script>
+        window.editorInterfaces = {{ config['editor']['interfaces'] | safe }};
+        window.debugEditor = "{{ config['editor']['debug'] }}" === "True";
+        window.editorAppConfig = '{{ label_config_line | safe }}';
+        window.explore = true;
+        window.expertData = {"pk": 1, "firstName": "Label",  "lastName": "Expert"};
+        window.projectID = 1;
+    </script>
+
+    <!-- Editor -->
+    {% for js in editor_js %}
+        <script src="{{ js }}"></script>
+    {% endfor %}
+</body>
+</html>

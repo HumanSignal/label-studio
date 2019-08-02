@@ -1,0 +1,7 @@
+<View>
+    <Text name="mytext" value="$text"></Text>
+    <Choices name="mytext_class" toName="mytext" choice="single">
+      <Choice value="important" alias="Important document"></Choice>
+      <Choice value="other" alias="Other"></Choice>
+    </Choices>
+</View>

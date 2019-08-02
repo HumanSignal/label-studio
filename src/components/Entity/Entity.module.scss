@@ -1,0 +1,18 @@
+.block {
+  display: flex;
+  flex-flow: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.button {
+  margin-bottom: 10px;
+}
+
+.labels {
+  margin-bottom: 10px;
+}
+
+.tag {
+  margin-left: 10px;
+}

@@ -1,0 +1,38 @@
+.skip {
+  margin-bottom: 10px;
+}
+
+.task {
+  opacity: 0.4;
+}
+
+.container {
+  margin-bottom: 10px;
+
+  & > button {
+    margin: 0 10px;
+
+    &:first-child {
+      margin-left: 0;
+    }
+  }
+
+  &:first-child {
+    margin-left: 0;
+  }
+
+  &:last-child {
+    margin-right: 0;
+  }
+}
+
+.block {
+  clear: both;
+}
+
+.wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+}

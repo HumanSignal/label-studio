@@ -1,0 +1,15 @@
+[{
+  "result": [
+    {
+      "id": "MTU4uQ52gM",
+      "from_name": "sentiment",
+      "to_name": "my_text",
+      "type": "choices",
+      "value": {
+        "choices": [
+          "Positive"
+        ]
+      }
+    }
+  ]
+}]

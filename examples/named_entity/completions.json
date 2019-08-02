@@ -1,0 +1,85 @@
+[
+  {
+    "result": [
+      {
+        "id": "RuJ2GrJyG8",
+        "from_name": "ner",
+        "to_name": "text",
+        "source": "$text",
+        "type": "labels",
+        "value": {
+          "start": 8,
+          "end": 12,
+          "text": "faith",
+          "labels": [
+            "Fact"
+          ]
+        }
+      },
+      {
+        "id": "n-EAHn0Q3y",
+        "from_name": "ner",
+        "to_name": "text",
+        "source": "$text",
+        "type": "labels",
+        "value": {
+          "start": 35,
+          "end": 46,
+          "text": "to the water",
+          "labels": [
+            "Location"
+          ]
+        }
+      },
+      {
+        "id": "1esxxDooWg",
+        "from_name": "ner",
+        "to_name": "text",
+        "source": "$text",
+        "type": "labels",
+        "value": {
+          "start": 42,
+          "end": 46,
+          "text": "water",
+          "labels": [
+            "Product"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "result": [
+      {
+        "id": "RuJ2GrJyG8",
+        "from_name": "ner",
+        "to_name": "text",
+        "source": "$text",
+        "type": "labels",
+        "value": {
+          "start": 8,
+          "end": 12,
+          "text": "faith",
+          "labels": [
+            "Fact"
+          ]
+        }
+      },
+      {
+        "id": "1esxxDooWg",
+        "from_name": "ner",
+        "to_name": "text",
+        "source": "$text",
+        "type": "labels",
+        "value": {
+          "start": 42,
+          "end": 46,
+          "text": "water",
+          "labels": [
+            "Product"
+          ]
+        }
+      }
+    ]
+  }
+]

@@ -1,0 +1,4 @@
+<View>
+  <Rectangle name="rect-1" toName="img" strokeWidth="4" strokeColor="#ff0000"></Rectangle>
+  <Image name="img" value="$image"></Image>
+</View>
