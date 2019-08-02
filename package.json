@@ -1,17 +1,17 @@
 {
-  "name": "heartex-editor",
+  "name": "label-studio",
   "version": "0.0.1",
   "private": true,
-  "description": "",
+  "description": "Label Studio is a multi-domain data labeling tool with standardized output format",
   "author": {
     "name": "Heartex",
     "url": "https://github.com/heartexlabs"
   },
-  "homepage": "https://github.com/heartexlabs",
+  "homepage": "https://github.com/heartexlabs/label-studio",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/shevchenkonik/editor-readme.git"
+    "url": "https://github.com/heartexlabs/label-studio.git"
   },
   "size-limit": [
     {
