@@ -57,6 +57,7 @@
     "local": "npm run only-build && npm run start",
     "build": "react-scripts build",
     "build-mac": "npm run only-build",
+    "test:watch": "react-scripts test",
     "test": "CI=true react-scripts test",
     "test:coverage": "npm test --coverage",
     "eject": "react-scripts eject",
