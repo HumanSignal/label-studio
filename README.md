@@ -2,7 +2,7 @@
 
 <img src="./images/logo.png" align="right" title="Heartex Editor" width="100" height="100">
 
-[![license](https://img.shields.io/github/license/nhn/tui.editor.svg)](/LICENSE) [![PRs welcome](https://img.shields.io/badge/PRs-welcome-ff69b4.svg)](https://github.com/heartexlabs/label-studio/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) [![Build Status](https://travis-ci.com/heartex-labs/label-studio.svg?token=ds22yQDmPNgvZgqrpDKv&branch=master)](https://travis-ci.com/heartexlabs/label-studio)
+![GitHub](https://img.shields.io/github/license/heartexlabs/label-studio?logo=heartex) [![Build Status](https://travis-ci.com/shevchenkonik/editor-readme.svg?token=ds22yQDmPNgvZgqrpDKv&branch=master)](https://travis-ci.com/shevchenkonik/editor-readme)
 
 Label Studio is an open-source, configurable data annotation tool. Its
 purpose is to enable you to label different types of data using the
