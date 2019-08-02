@@ -59,7 +59,7 @@
     "build-mac": "npm run only-build",
     "test:watch": "react-scripts test",
     "test": "CI=true react-scripts test",
-    "test:coverage": "npm test --coverage",
+    "test:coverage": "npm test -- --coverage",
     "eject": "react-scripts eject",
     "size": "npm run only-build && size-limit",
     "prettier": "prettier --write src/**/*.js",
