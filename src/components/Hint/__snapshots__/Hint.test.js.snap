@@ -2,8 +2,13 @@
 
 exports[`Hint Should render correctly 1`] = `
 <sup
-  className="main"
+  className="main test"
   data-copy="test"
+  style={
+    Object {
+      "background": "red",
+    }
+  }
 >
   Test
 </sup>

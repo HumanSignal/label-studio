@@ -6,7 +6,11 @@ import Hint from "./Hint";
 
 describe("Hint", () => {
   it("Should render correctly", () => {
-    const output = shallow(<Hint copy="test">Test</Hint>);
+    const output = shallow(
+      <Hint copy="test" style={{ background: "red" }} className="test">
+        Test
+      </Hint>,
+    );
     expect(shallowToJson(output)).toMatchSnapshot();
   });
 });
