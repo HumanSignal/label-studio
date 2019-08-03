@@ -3,19 +3,19 @@ import json
 
 tasks = None
 completions = None
-config = None
+c = None  # config
 
 
-def init(c):
+def init(config):
     """ Init database
 
-    :param c: config dict
+    :param config: config dict
     """
-    global config, tasks
-    config = c
+    global c, tasks
+    c = config
 
-    if not os.path.exists(c['output_path']):
-        os.mkdir(c['output_path'])
+    if not os.path.exists(c['output_dir']):
+        os.mkdir(c['output_dir'])
 
     # load at first start
     if tasks is None:
@@ -66,17 +66,16 @@ def get_tasks():
 
 
 def get_completions_ids():
-    """ List completion ids from output_path directory
+    """ List completion ids from output_dir directory
 
     :return: filenames without extensions and directories
     """
-    global completions, config
-    c = config
+    global completions, c
 
-    root_dir = c['output_path']
+    root_dir = c['output_dir']
     files = os.listdir(root_dir)
     completions = [os.path.splitext(f)[0] for f in files if f.endswith('.json')]
-    print(f'Completions found in "{c["output_path"]}"', len(completions))
+    print(f'Completions found in "{c["output_dir"]}"', len(completions))
     return sorted(completions)
 
 
@@ -86,7 +85,8 @@ def save_completion(task_id, completion):
     :param task_id: task id
     :param completion: json data from label (editor)
     """
-    global config
+    global c
 
-    filename = os.path.join(config['output_path'], task_id + '.json')
-    json.dump(json.loads(completion["result"]), open(filename, 'w'))
+    completion['task'] = get_tasks()[task_id]
+    filename = os.path.join(c['output_dir'], task_id + '.json')
+    json.dump(completion, open(filename, 'w'), indent=4, sort_keys=True)

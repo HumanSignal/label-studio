@@ -41,48 +41,30 @@ service.py local_config.json
 
 ## Options
 
-Name of your service for web
+* Name of your service for web
 ```
   "title": "Label Studio",
 ```
 
-Service system settings
+* Service system settings
 ```
   "port": 8200,
   "debug": true,
 ```
 
-Label tool (we call it Editor) section.
-* label_config - the most important key, it implements task logic and view in Label tool. 
-* build_path - this points to the directory with js, css and other media from Editor (React app).    
+* Label_config is the most important key, it implements task logic and view in Label tool.
 ```
-  "editor": {
-    "build_path": "../build/static",
-    "debug": false,
-    "interfaces": [
-      "basic",
-      "panel",
-      "submit",
-      "submit:load",
-      "side-column",
-      "submit:skip",
-      "submit:check-empty",
-      "predictions:hide"
-    ],
-    "label_config": "../examples/chatbot/config.xml"
-  },
+"label_config": "../examples/chatbot/config.xml"
 ```
  
-input_path for tasks: it can be a file or a directory. 
+* input_path for tasks: it can be a file or a directory. 
 In case of directory all tasks will be merged together.
 ```
 "input_path": "./input/tasks.json",
 ```
 
-output_dir is used to store completions (results of labeling) in json format. 
-output_dir will be created automatically.  
-
-Each task is mapped to corresponding completion json file. 
+* output_dir is used to store completions (results of labeling) in json format. 
+output_dir will be created automatically. Each task is mapped to corresponding completion json file. 
 In the end of file name we add task counter integer. 
 Example: task a.json consists of 3 tasks and there will be 3 completion files for it in output_dir: 
 ```
@@ -101,11 +83,31 @@ output/b-6.json = {"result": [...]}
 "output_dir": "./output",
 ```
 
-Show instruction to person who makes labelling
+* Show instruction to person who makes labelling
 ```
 "instruction": "Type something to label experts!",
 ```
 
+* Label tool (we call it Editor) section, 
+build_path - this points to the directory with js, css and other media from Editor (React app).    
+```
+  "editor": {
+    "build_path": "../build/static",
+    "debug": false,
+    "interfaces": [
+      "basic",
+      "panel",
+      "submit",
+      "submit:load",
+      "side-column",
+      "submit:skip",
+      "submit:check-empty",
+      "predictions:hide"
+    ],
+  },  
+```
+
+* Python logger settings 
 ```
 "logger": { ... python logger settings ...}
 }

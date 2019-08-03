@@ -3,7 +3,6 @@
   "port": 8200,
   "debug": true,
 
-  "label_config": "../examples/chatbot_analysis/config.xml",
   "editor": {
     "build_path": "../build/static",
     "debug": false,
@@ -18,9 +17,10 @@
       "predictions:hide"
     ]
   },
-    
+
+  "label_config": "../examples/chatbot_analysis/config.xml",
   "input_path": "../examples/chatbot_analysis/tasks.json",
-  "output_path": "./output",
+  "output_dir": "./output",
 
   "instruction": "Type something to label experts!",
 

@@ -3,7 +3,6 @@ import datetime
 import logging.config
 import traceback as tb
 from flask import request, jsonify, make_response
-
 import json  # it MUST be included after flask!
 
 from pythonjsonlogger import jsonlogger
@@ -90,14 +89,54 @@ def exception_treatment(f):
     return exception_f
 
 
-def config_line_stripped(c):
-    tree = etree.fromstring(c)
+def config_line_stripped(xml_config):
+    """ Remove comments, \n and \r from xml, flat xml to string
+
+    :param xml_config: xml config string
+    :return: xml config string
+    """
+    tree = etree.fromstring(xml_config)
     comments = tree.xpath('//comment()')
 
-    for c in comments:
-      p = c.getparent()
-      p.remove(c)
+    for xml_config in comments:
+        p = xml_config.getparent()
+        p.remove(xml_config)
+        xml_config = etree.tostring(tree, method='html').decode("utf-8")
 
-      c = etree.tostring(tree, method='html').decode("utf-8")
+    return xml_config.replace('\n', '').replace('\r', '')
 
-    return c.replace('\n', '').replace('\r', '')
+
+def load_config():
+    """ Combine args with json config
+
+    :param config_path: json file path
+    :return: config dict
+    """
+    def generator():
+        import argparse
+
+        parser = argparse.ArgumentParser(description='Label studio')
+        parser.add_argument('-c', '--config', dest='config_path', default='config.json',
+                            help='backend config')
+        parser.add_argument('-l', '--label-config', dest='label_config', default='',
+                            help='label config path')
+        parser.add_argument('-i', '--input-path', dest='input_path', default='',
+                            help='input path to task file or directory with tasks')
+        parser.add_argument('-o', '--output-dir', dest='output_dir', default='',
+                            help='output directory for completions')
+        parser.add_argument('-p', '--port', dest='port', default=8200, type=int,
+                            help='backend port')
+        args = parser.parse_args()
+
+        config_path = args.config_path
+
+        while True:
+            c = json.load(open(config_path))
+            c['port'] = args.port if args.port else c['port']
+            c['label_config'] = args.label_config if args.label_config else c['label_config']
+            c['input_path'] = args.input_path if args.input_path else c['input_path']
+            c['output_dir'] = args.output_dir if args.output_dir else c['output_dir']
+            yield c
+
+    for new_config in generator():
+        return new_config
