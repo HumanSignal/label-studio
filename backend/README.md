@@ -29,14 +29,14 @@ pip install -r requirements.txt
 python service.py
 ```
 
-4 Go to http://localhost:8200
+5 Go to http://localhost:8200
 
 
 # Backend Config
 
 By default service.py uses config.json. But you may call it with your own config: 
 ```
-service.py local_config.json
+python service.py -c <your_config.json>
 ``` 
 
 ## Options
@@ -52,7 +52,7 @@ service.py local_config.json
   "debug": true,
 ```
 
-* Label_config is the most important key, it implements task logic and view in Label tool.
+* Label_config is the most important key, it implements task logic and view for Label tool.
 ```
 "label_config": "../examples/chatbot/config.xml"
 ```
@@ -65,18 +65,18 @@ In case of directory all tasks will be merged together.
 
 * output_dir is used to store completions (results of labeling) in json format. 
 output_dir will be created automatically. Each task is mapped to corresponding completion json file. 
-In the end of file name we add task counter integer. 
-Example: task a.json consists of 3 tasks and there will be 3 completion files for it in output_dir: 
+In the end of file name we add task counter number. 
+Example: task a.json consists of 3 tasks and there will be 3 completion files in output_dir: 
 ```
 input/a.json = [{"text": "1"}, {"text": "2"}, {"text": "3"}]
 input/b.json = [{"text": "4"}, {"text": "5"}, {"text": "6"}]
 
-output/a-1.json = {"result": [...]}
-output/a-2.json = {"result": [...]}
-output/a-3.json = {"result": [...]}
-output/b-4.json = {"result": [...]}
-output/b-5.json = {"result": [...]}
-output/b-6.json = {"result": [...]}
+output/a-1.json = {"result": [...], "task": {...}}
+output/a-2.json = {"result": [...], "task": {...}}
+output/a-3.json = {"result": [...], "task": {...}}
+output/b-4.json = {"result": [...], "task": {...}}
+output/b-5.json = {"result": [...], "task": {...}}
+output/b-6.json = {"result": [...], "task": {...}}
 ```   
 
 ```
@@ -107,8 +107,4 @@ build_path - this points to the directory with js, css and other media from Edit
   },  
 ```
 
-* Python logger settings 
-```
-"logger": { ... python logger settings ...}
-}
-```
+* Python logger settings are concentrated in "logger" dict.   
