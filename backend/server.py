@@ -70,6 +70,7 @@ def tasks_page():
     """ Tasks and completions page: tasks.html
     """
     global c
+    c = load_config()
     label_config = open(c['label_config']).read()  # load editor config from XML
     return flask.render_template('tasks.html', config=c, label_config=label_config,
                                  tasks=sorted(db.get_tasks().keys()), completions=db.get_completions_ids())
@@ -109,16 +110,28 @@ def api_all_completion_ids():
     return make_response(jsonify(ids), 200)
 
 
-@app.route('/api/tasks/<task_id>/completions/', methods=['POST'])
+@app.route('/api/tasks/<task_id>/completions/', methods=['POST', 'DELETE'])
 @exception_treatment
-def api_save_completion(task_id):
-    """ Save completion to output_dir with the same name as task_id
+def api_completions(task_id):
+    """ Delete or save completion to output_dir with the same name as task_id
     """
-    completion = request.json
-    completion.pop('state', None)  # remove editor state
-    db.save_completion(task_id, completion)
-    log.info(msg='Completion saved', extra={'task_id': task_id, 'output': request.json})
-    return answer(201, 'ok', result=[42])
+    global c
+
+    if request.method == 'POST':
+        completion = request.json
+        completion.pop('state', None)  # remove editor state
+        db.save_completion(task_id, completion)
+        log.info(msg='Completion saved', extra={'task_id': task_id, 'output': request.json})
+        return answer(201, 'ok')
+
+    elif request.method == 'DELETE':
+        if c.get('allow_delete_completions', False):
+            db.delete_completion(task_id)
+            return answer(204, 'deleted')
+        else:
+            return answer(422, 'Completion removing is not allowed in server config')
+    else:
+        return answer(500, 'Incorrect request method')
 
 
 @app.route('/api/projects/1/expert_instruction')

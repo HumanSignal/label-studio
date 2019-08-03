@@ -90,3 +90,12 @@ def save_completion(task_id, completion):
     completion['task'] = get_tasks()[task_id]
     filename = os.path.join(c['output_dir'], task_id + '.json')
     json.dump(completion, open(filename, 'w'), indent=4, sort_keys=True)
+
+
+def delete_completion(task_id):
+    """ Delete completion from disk
+
+    :param task_id: task id
+    """
+    filename = os.path.join(c['output_dir'], task_id + '.json')
+    os.remove(filename)

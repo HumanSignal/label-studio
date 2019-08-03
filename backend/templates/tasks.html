@@ -7,7 +7,10 @@
 
     <link rel="shortcut icon" href="/static/favicon.ico"/>
     <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="/static/css/fontall.min.css">
+
     <script src="/static/js/helpers.js"></script>
+    <script src="/static/js/jquery.min.js"></script>
 
     {% for css in editor_css %}
         <link href="{{ css }}" rel="stylesheet">
@@ -24,16 +27,49 @@
         <table>
             <tr>
                 <th>Task ID</th>
-                <th>Finished</th>
+                <th>Has Completion</th>
             </tr>
             {% for task in tasks %}
             <tr>
               <td>{{ task }}</td>
-              <td>{{ task in completions }}</td>
+              <td class="text-center">
+                  {% if task in completions %}<i data-task-id="{{ task }}" class="fas fa-check remove-completion"></i>{% endif %}
+              </td>
             </tr>
             {% endfor %}
         </table>
     </div>
 </div>
+
+<script>
+    /* --- Mouse hover / out on completion --- */
+    remove_completion = $('.remove-completion');
+    remove_completion.on('mouseover', function(event){
+        $(event.target).removeClass('fa-check');
+        $(event.target).addClass('fa-trash-alt red');
+    });
+    remove_completion.on('mouseout', function(event){
+        $(event.target).removeClass('fa-trash-alt red');
+        $(event.target).addClass('fa-check');
+    });
+
+    /* --- Delete completion --- */
+    remove_completion.on('click', function(event){
+        const task_id = $(event.target).data('task-id');
+        $.ajax({
+            url: '/api/tasks/' + task_id + '/completions/',
+            type: 'DELETE',
+            // show message at error
+            error: function(result, textStatus, errorThrown) {
+                alert(result.responseText)
+            },
+            // refresh page after delete
+            success: function () {
+                window.location.reload();
+            }
+        })
+    });
+</script>
+
 </body>
 </html>
