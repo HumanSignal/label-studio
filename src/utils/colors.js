@@ -185,7 +185,7 @@ export function hexToRGBA(hex, opacity) {
  * @param {*} value
  */
 export function colorToRGBA(value, alpha) {
-  if (typeof colorNames[value.toLowerCase()] !== undefined) {
+  if (typeof value === "string" && typeof colorNames[value.toLowerCase()] !== undefined) {
     const hexColor = colorNames[value.toLowerCase()];
     return hexToRGBA(hexColor, alpha);
   }

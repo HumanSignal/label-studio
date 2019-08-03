@@ -13,29 +13,39 @@ const randomString = {
 
 describe("Helper function hexToRGBA", () => {
   test("3 dig", () => {
-    expect(hexToRGBA(defaultHEX.short, defaultHEX.alpha)).toEqual(defaultRGBA);
+    expect(hexToRGBA(defaultHEX.short, defaultHEX.alpha)).toBe(defaultRGBA);
   });
 
   test("6 dig", () => {
-    expect(hexToRGBA(defaultHEX.long, defaultHEX.alpha)).toEqual(defaultRGBA);
+    expect(hexToRGBA(defaultHEX.long, defaultHEX.alpha)).toBe(defaultRGBA);
   });
 });
 
 describe("Helper function convertToRGBA", () => {
   test("Convert to RGBA, color", () => {
-    expect(convertToRGBA(randomString.str, defaultHEX.alpha)).toEqual(defaultRGBA);
+    expect(convertToRGBA(randomString.str, defaultHEX.alpha)).toBe(defaultRGBA);
   });
 
   test("Convert to RGBA, HEX", () => {
-    expect(convertToRGBA(defaultHEX.short, defaultHEX.alpha)).toEqual(defaultRGBA);
-    expect(convertToRGBA(defaultHEX.long, defaultHEX.alpha)).toEqual(defaultRGBA);
+    expect(convertToRGBA(defaultHEX.short, defaultHEX.alpha)).toBe(defaultRGBA);
+    expect(convertToRGBA(defaultHEX.long, defaultHEX.alpha)).toBe(defaultRGBA);
   });
 });
 
-it("Helper function colorToRGBA", () => {
-  expect(colorToRGBA(randomString.str, defaultHEX.alpha)).toEqual(defaultRGBA);
+describe("Helper function colorToRGBA", () => {
+  test("Good", () => {
+    expect(colorToRGBA(randomString.str, defaultHEX.alpha)).toBe(defaultRGBA);
+  });
+
+  test("Undefind", () => {
+    expect(colorToRGBA(undefined, defaultHEX.alpha)).toBeUndefined();
+  });
+
+  test("Random string", () => {
+    expect(colorToRGBA("RANDOM", defaultHEX.alpha)).toBe("rgba(0, 0, 0, 0.1)");
+  });
 });
 
 it("Helper function stringToColor", () => {
-  expect(stringToColor(randomString.str)).toEqual(randomString.value);
+  expect(stringToColor(randomString.str)).toBe(randomString.value);
 });
