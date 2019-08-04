@@ -18,9 +18,9 @@
     ]
   },
 
-  "label_config": "../examples/chatbot_analysis/config.xml",
-  "input_path": "../examples/chatbot_analysis/",
-  "output_dir": "./output",
+  "label_config": "../examples/sentiment_analysis/config.xml",
+  "input_path": "../examples/sentiment_analysis/tasks.json",
+  "output_dir": "./output/1",
 
   "instruction": "Type something to label experts!",
   "allow_delete_completions": true,

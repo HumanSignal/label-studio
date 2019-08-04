@@ -61,8 +61,13 @@ def index():
 
     # load editor config from XML
     label_config_line = config_line_stripped(open(c['label_config']).read())
+
+    # task data: completions preview
+    # task_id, task_data = list(db.get_tasks().items())[0]
+    # task_data['completions'] = [db.get_completion(task_id)]
+    task_data = None
     return flask.render_template('index.html', config=c, label_config_line=label_config_line,
-                                 editor_css=editor_css, editor_js=editor_js)
+                                 editor_css=editor_css, editor_js=editor_js, task_data=task_data)
 
 
 @app.route('/tasks')
@@ -72,8 +77,15 @@ def tasks_page():
     global c
     c = load_config()
     label_config = open(c['label_config']).read()  # load editor config from XML
+    task_ids = db.get_tasks().keys()
+    completed_at = db.get_completed_at(task_ids)
+
+    # sort by completed time
+    task_ids = sorted([(i, completed_at[i] if i in completed_at else '9') for i in task_ids], key=lambda x: x[1])
+    task_ids = [i[0] for i in task_ids]  # take only id back
     return flask.render_template('tasks.html', config=c, label_config=label_config,
-                                 tasks=sorted(db.get_tasks().keys()), completions=db.get_completions_ids())
+                                 task_ids=task_ids, completions=db.get_completions_ids(),
+                                 completed_at=completed_at)
 
 
 @app.route('/api/projects/1/next/', methods=['GET'])

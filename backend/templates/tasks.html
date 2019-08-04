@@ -21,46 +21,43 @@
 <div class="content">
     <h1 class="title">{{ config['title'] }}</h1>
     <div class="content">
-        <h2>{{ tasks.length }} Tasks and Completions</h2>
+        <h2>Tasks and Completions</h2>
         <a class="center-link" href="/">Go to Labeling</a>
+            <div class="text-center">Total tasks in {{ config['input_path'] }}: {{ task_ids|length }}</div>
+            <div class="text-center">Total completions in {{ config['output_dir'] }}: {{ completions|length }}</div>
+        <br/>
 
         <table>
             <tr>
                 <th>Task ID</th>
-                <th>Has Completion</th>
+                <th>Completed at</th>
+                <th>Completion</th>
             </tr>
-            {% for task in tasks %}
-            <tr>
-              <td>{{ task }}</td>
-              <td class="text-center">
-                  {% if task in completions %}<i data-task-id="{{ task }}" class="fas fa-check remove-completion"></i>{% endif %}
-              </td>
-            </tr>
+            {% for id in task_ids %}
+                <tr>
+                    <td>{{ id }}</td>
+                    <td>{{ completed_at[id] }}</td>
+                    <td class="text-center">
+                        {% if id in completions %}
+                            <i data-task-id="{{ id }}" class="fas fa-eye blue show-completion"></i> &nbsp;
+                            <i data-task-id="{{ id }}" class="fas fa-trash-alt red remove-completion"></i>
+                        {% endif %}
+                    </td>
+                </tr>
             {% endfor %}
         </table>
     </div>
 </div>
 
 <script>
-    /* --- Mouse hover / out on completion --- */
-    remove_completion = $('.remove-completion');
-    remove_completion.on('mouseover', function(event){
-        $(event.target).removeClass('fa-check');
-        $(event.target).addClass('fa-trash-alt red');
-    });
-    remove_completion.on('mouseout', function(event){
-        $(event.target).removeClass('fa-trash-alt red');
-        $(event.target).addClass('fa-check');
-    });
-
     /* --- Delete completion --- */
-    remove_completion.on('click', function(event){
+    $('.remove-completion').on('click', function (event) {
         const task_id = $(event.target).data('task-id');
         $.ajax({
             url: '/api/tasks/' + task_id + '/completions/',
             type: 'DELETE',
             // show message at error
-            error: function(result, textStatus, errorThrown) {
+            error: function (result, textStatus, errorThrown) {
                 alert(result.responseText)
             },
             // refresh page after delete

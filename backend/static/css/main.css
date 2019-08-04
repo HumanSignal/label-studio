@@ -52,8 +52,16 @@ td, th {
     text-align: center;
 }
 
+.blue {
+    color: rgb(24, 144, 255);
+}
+
 .red {
-    color: red;
+    color: rgb(255, 13, 23);;
+}
+
+.show-completion {
+    cursor: pointer;
 }
 
 .remove-completion {

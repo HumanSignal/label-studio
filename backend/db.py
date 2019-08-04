@@ -1,5 +1,6 @@
 import os
 import json
+from datetime import datetime
 
 tasks = None
 completions = None
@@ -77,6 +78,30 @@ def get_completions_ids():
     completions = [os.path.splitext(f)[0] for f in files if f.endswith('.json')]
     print(f'Completions found in "{c["output_dir"]}"', len(completions))
     return sorted(completions)
+
+
+def get_completed_at(task_ids):
+    """ Get completed time for list of task ids
+
+    :param task_ids: list of task ids
+    :return: list of string with formatted datetime
+    """
+    root_dir = c['output_dir']
+    existing_completions = set(get_completions_ids())
+    ids = existing_completions.intersection(task_ids)
+    times = {i: os.path.getmtime(os.path.join(root_dir, i + '.json')) for i in ids}
+    times = {i: datetime.fromtimestamp(t).strftime('%Y-%m-%d %H:%M:%S') for i, t in times.items()}
+    return times
+
+
+def get_completion(task_id):
+    """ Get completed time for list of task ids
+
+    :param task_id: task ids
+    :return: json dict with completion
+    """
+    filename = os.path.join(c['output_dir'], task_id + '.json')
+    return json.load(open(filename)) if os.path.exists(filename) else None
 
 
 def save_completion(task_id, completion):
