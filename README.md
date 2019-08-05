@@ -10,12 +10,12 @@ most convenient interface with the standardized output format.
 
 ## Quick "I want to Label Guides:"
 
-- [Classify text for sentiment](/examples/sentiment_analysis/START.md) ([screenshot](https://user.fm/files/v2-c739eea809a0fde9c90675a2396f577e/Screen%20Shot%202019-08-01%20at%209.17.04%20PM.png))
-- [Named entities recognition](/examples/named_entity/START.md) ([screenshot](https://user.fm/files/v2-cfb599a352fe6c17d209599ce95e7e25/Screen%20Shot%202019-08-01%20at%209.48.24%20PM.png))
-- [Transcribe audio](/examples/transcribe_audio/START.md) ([screenshot](https://user.fm/files/v2-e1f1d31d32db73c07d20a96a78758623/Screen%20Shot%202019-08-01%20at%209.39.54%20PM.png))
-- [Classify audio](/examples/audio_classification/START.md) ([screenshot](https://user.fm/files/v2-70ded6823222ef7f5291482df9ce39c2/Screen%20Shot%202019-08-01%20at%209.21.12%20PM.png))
-- [Conversational modeling & chatbots](/examples/chatbot_analysis/START.md) ([screenshot](https://user.fm/files/v2-cb81c8aaa30170724ea19e3af7218fc8/Screen%20Shot%202019-08-01%20at%209.27.14%20PM.png))
-- [Image object detection](/examples/image_bbox/START.md) ([screenshot](https://user.fm/files/v2-04a15361580d038bd9392a225e2569e4/Screen%20Shot%202019-08-01%20at%2011.38.16%20PM.png))
+- [Classify text for sentiment](/examples/sentiment_analysis/START.md) ([screenshot](./images/screenshots/cts.png))
+- [Named entities recognition](/examples/named_entity/START.md) ([screenshot](./images/screenshots/ner.png))
+- [Transcribe audio](/examples/transcribe_audio/START.md) ([screenshot](./images/screenshots/audio-trans.png))
+- [Classify audio](/examples/audio_classification/START.md) ([screenshot](./images/screenshots/audio-classify.png))
+- [Conversational modeling & chatbots](/examples/chatbot_analysis/START.md) ([screenshot](./images/screenshots/chatbots.png))
+- [Image object detection](/examples/image_bbox/START.md) ([screenshot](./images/screenshots/image-object.png))
 
 Coming Soon:
 - Audio regions (screenshot)
