@@ -14,7 +14,7 @@ import Requests from "./core/Requests";
 import ProductionEnviroment from "./env/prod";
 import DevelopmentEnvironment from "./env/dev";
 
-const enviroment = DevelopmentEnvironment;
+let enviroment = DevelopmentEnvironment;
 
 if (process.env.NODE_ENV === "production") {
   enviroment = ProductionEnviroment;

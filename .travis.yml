@@ -7,4 +7,4 @@ cache:
 script:
   - npm test
   - unset CI
-  - npm run build
+  - npm run publish

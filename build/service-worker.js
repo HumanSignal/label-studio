@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/heartexlabs/label-studio/precache-manifest.9c0732c8288f2ee2c75dec9521de0b96.js"
+  "/heartexlabs/label-studio/precache-manifest.31f9c661cb79d18e37a72a8e72810ed4.js"
 );
 
 workbox.clientsClaim();

@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Hint Should render correctly 1`] = `
+<sup
+  className="main test"
+  data-copy="test"
+  style={
+    Object {
+      "background": "red",
+    }
+  }
+>
+  Test
+</sup>
+`;

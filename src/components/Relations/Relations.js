@@ -4,7 +4,7 @@ import { isValidReference } from "mobx-state-tree";
 import { Icon } from "antd";
 
 import { NodeMinimal } from "../Node";
-import styles from "./Relations.module.scss"
+import styles from "./Relations.module.scss";
 
 /**
  * Relation Component
@@ -28,9 +28,13 @@ const Relation = ({ store, rl }) => {
         }}
       >
         <div className={styles.section__blocks}>
-          <div><NodeMinimal node={rl.node1} /></div>
+          <div>
+            <NodeMinimal node={rl.node1} />
+          </div>
           <Icon type="arrow-right" />
-          <div><NodeMinimal node={rl.node2} /></div>
+          <div>
+            <NodeMinimal node={rl.node2} />
+          </div>
         </div>
       </div>
       <a
@@ -51,8 +55,6 @@ export default observer(({ store }) => {
   const completion = store.completionStore.selected;
   const { relations } = completion.relationStore;
 
-  console.log(completion.relationStore.relations)
-
   return (
     <Fragment>
       <h4>Relations ({relations.length})</h4>
@@ -62,7 +64,6 @@ export default observer(({ store }) => {
       {completion.relationStore.relations.map(rl => (
         <Relation store={completion.relationStore} rl={rl} />
       ))}
-
     </Fragment>
   );
 });

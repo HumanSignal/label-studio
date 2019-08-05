@@ -1,8 +1,6 @@
 /**
  * Parses a string of inline styles into a JavaScript object with casing for React
  *
- * TODO this is broken for such case: styleToProp('background-image: url(\'https://example.com/image.png\')')
- *
  * @see TemplateEngine via MIT Licensed https://github.com/NervJS/taro/blob/master/packages/taro-components-rn/src/utils/index.ts
  *
  * @param {string} styles
@@ -18,7 +16,11 @@ export function styleToProp(styles) {
         .split(":")[0]
         .trim()
         .replace(/-./g, c => c.substr(1).toUpperCase()),
-      style.split(":")[1].trim(),
+      style
+        .split(":")
+        .slice(1)
+        .join(":")
+        .trim(),
     ])
     .reduce(
       (styleObj, style) => ({
