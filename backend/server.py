@@ -63,13 +63,15 @@ def index():
     label_config_line = config_line_stripped(open(c['label_config']).read())
 
     # task data: completions preview
-    task_id, task_data = list(db.get_tasks().items())[0]
-    completion = db.get_completion(task_id)
-    task_data['completions'] = [] if completion is None else [completion]
-    task_data = json.dumps(task_data)
-    # task_data = None
+    task_id = None
+    task_id, task_data = 0, db.get_tasks()[0]
+    print('task id', task_id)
+
+    task_data = json.dumps(db.get_completion(0))
+
     return flask.render_template('index.html', config=c, label_config_line=label_config_line,
-                                 editor_css=editor_css, editor_js=editor_js, task_data=task_data)
+                                 editor_css=editor_css, editor_js=editor_js,
+                                 task_id=str(task_id), task_data=task_data)
 
 
 @app.route('/tasks')
