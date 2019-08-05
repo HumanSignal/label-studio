@@ -62,7 +62,12 @@ def index():
     # load editor config from XML
     label_config_line = config_line_stripped(open(c['label_config']).read())
 
-    task_data = None
+    # task data: completions preview
+    task_id, task_data = list(db.get_tasks().items())[0]
+    completion = db.get_completion(task_id)
+    task_data['completions'] = [] if completion is None else [completion]
+    task_data = json.dumps(task_data)
+    # task_data = None
     return flask.render_template('index.html', config=c, label_config_line=label_config_line,
                                  editor_css=editor_css, editor_js=editor_js, task_data=task_data)
 
