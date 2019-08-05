@@ -22,7 +22,7 @@ And open your browser at http://localhost:3000
 ## Run a production build
 
 ```bash
-npm run build
+npm run publish
 ```
 
 Generates the compiled version of label studio. This compiled version needs to be included into your app.

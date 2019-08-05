@@ -66,7 +66,8 @@
     "prettier": "prettier --write src/**/*.js",
     "prettier-styles": "prettier --write src/**/*.{css,scss}",
     "lint": "eslint --debug src/",
-    "lint:write": "eslint --debug src/ --fix"
+    "lint:write": "eslint --debug src/ --fix",
+    "publish": "GENERATE_SOURCEMAP=false npm run build"
   },
   "eslintConfig": {
     "extends": "react-app"

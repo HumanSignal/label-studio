@@ -13,7 +13,9 @@
 
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
-importScripts("/heartexlabs/label-studio/precache-manifest.16c76f2691cfd37357fee701e0033a52.js");
+importScripts(
+  "/heartexlabs/label-studio/precache-manifest.31f9c661cb79d18e37a72a8e72810ed4.js"
+);
 
 workbox.clientsClaim();
 
@@ -27,5 +29,6 @@ workbox.precaching.suppressWarnings();
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
 
 workbox.routing.registerNavigationRoute("/heartexlabs/label-studio/index.html", {
-  blacklist: [/^\/_/, /\/[^\/]+\.[^\/]+$/],
+  
+  blacklist: [/^\/_/,/\/[^\/]+\.[^\/]+$/],
 });
