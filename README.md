@@ -6,22 +6,22 @@
 
 Label Studio is an open-source, configurable data annotation tool. Its
 purpose is to enable you to label different types of data using the
-most convinient interface with the standardized output format.
+most convenient interface with the standardized output format.
 
 ## Quick "I want to Label Guides:"
 
 - [Classify text for sentiment](/examples/sentiment_analysis/START.md) ([screenshot](https://user.fm/files/v2-c739eea809a0fde9c90675a2396f577e/Screen%20Shot%202019-08-01%20at%209.17.04%20PM.png))
 - [Named entities recognition](/examples/named_entity/START.md) ([screenshot](https://user.fm/files/v2-cfb599a352fe6c17d209599ce95e7e25/Screen%20Shot%202019-08-01%20at%209.48.24%20PM.png))
-- [Transcribe Audio](/examples/transcribe_audio/START.md) ([screenshot](https://user.fm/files/v2-e1f1d31d32db73c07d20a96a78758623/Screen%20Shot%202019-08-01%20at%209.39.54%20PM.png))
-- [Classify Audio](/examples/audio_classification/START.md) ([screenshot](https://user.fm/files/v2-70ded6823222ef7f5291482df9ce39c2/Screen%20Shot%202019-08-01%20at%209.21.12%20PM.png))
-- [Chatbot Analysis](/examples/chatbot_analysis/START.md) ([screenshot](https://user.fm/files/v2-cb81c8aaa30170724ea19e3af7218fc8/Screen%20Shot%202019-08-01%20at%209.27.14%20PM.png))
+- [Transcribe audio](/examples/transcribe_audio/START.md) ([screenshot](https://user.fm/files/v2-e1f1d31d32db73c07d20a96a78758623/Screen%20Shot%202019-08-01%20at%209.39.54%20PM.png))
+- [Classify audio](/examples/audio_classification/START.md) ([screenshot](https://user.fm/files/v2-70ded6823222ef7f5291482df9ce39c2/Screen%20Shot%202019-08-01%20at%209.21.12%20PM.png))
+- [Conversational modeling & chatbots](/examples/chatbot_analysis/START.md) ([screenshot](https://user.fm/files/v2-cb81c8aaa30170724ea19e3af7218fc8/Screen%20Shot%202019-08-01%20at%209.27.14%20PM.png))
 - [Image object detection](/examples/image_bbox/START.md) ([screenshot](https://user.fm/files/v2-04a15361580d038bd9392a225e2569e4/Screen%20Shot%202019-08-01%20at%2011.38.16%20PM.png))
 
 Coming Soon:
-- Audio Regions (screenshot)
-- Image Line and Points (screenshot)
-- Image Polygons (screenshot)
-- Time Series (screenshot)
+- Audio regions (screenshot)
+- Image line and points (screenshot)
+- Image polygons (screenshot)
+- Time series (screenshot)
 - Video (screenshot)
 
 ## Table of Contents
@@ -45,10 +45,16 @@ labeling into your applications.
 
 ### Run Locally
 
-To run it locally we include the compiled version of the frontend
-part and an example implementation of the backend. 
+In order to launch server locally, launch
+```bash
+cd backend
+bash start.sh
+```
 
-[Follow this guide to start the app](backend/README.md)
+To run it locally we include the compiled version of the frontend
+part and an example implementation of the backend.
+
+[Follow this guide for advanced usage & custom configuration](backend/README.md)
 
 ### Extend & Embed
 
