@@ -3,7 +3,6 @@
   "port": 8200,
   "debug": true,
 
-  "label_config": "../examples/chatbot_analysis/config.xml",
   "editor": {
     "build_path": "../build/static",
     "debug": false,
@@ -18,11 +17,13 @@
       "predictions:hide"
     ]
   },
-    
-  "input_path": "../examples/chatbot_analysis/tasks.json",
-  "output_path": "./output",
+
+  "label_config": "../examples/sentiment_analysis/config.xml",
+  "input_path": "../examples/sentiment_analysis/tasks.json",
+  "output_dir": "./output/1",
 
   "instruction": "Type something to label experts!",
+  "allow_delete_completions": true,
 
   "logger": {
     "version": 1,

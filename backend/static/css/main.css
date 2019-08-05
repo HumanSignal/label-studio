@@ -23,7 +23,7 @@ td, th {
 .content {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 2em;
+  padding: 1em 2em;
 }
 
 .title {
@@ -46,4 +46,24 @@ td, th {
     margin: 2em;
     color: rgb(24, 144, 255);
     text-decoration: none;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.blue {
+    color: rgb(24, 144, 255);
+}
+
+.red {
+    color: rgb(255, 13, 23);;
+}
+
+.show-completion {
+    cursor: pointer;
+}
+
+.remove-completion {
+    cursor: pointer;
 }

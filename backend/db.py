@@ -1,21 +1,22 @@
 import os
 import json
+from datetime import datetime
 
 tasks = None
 completions = None
-config = None
+c = None  # config
 
 
-def init(c):
+def init(config):
     """ Init database
 
-    :param c: config dict
+    :param config: config dict
     """
-    global config, tasks
-    config = c
+    global c, tasks
+    c = config
 
-    if not os.path.exists(c['output_path']):
-        os.mkdir(c['output_path'])
+    if not os.path.exists(c['output_dir']):
+        os.mkdir(c['output_dir'])
 
     # load at first start
     if tasks is None:
@@ -66,18 +67,41 @@ def get_tasks():
 
 
 def get_completions_ids():
-    """ List completion ids from output_path directory
+    """ List completion ids from output_dir directory
 
     :return: filenames without extensions and directories
     """
-    global completions, config
-    c = config
+    global completions, c
 
-    root_dir = c['output_path']
+    root_dir = c['output_dir']
     files = os.listdir(root_dir)
     completions = [os.path.splitext(f)[0] for f in files if f.endswith('.json')]
-    print(f'Completions found in "{c["output_path"]}"', len(completions))
+    print(f'Completions found in "{c["output_dir"]}"', len(completions))
     return sorted(completions)
+
+
+def get_completed_at(task_ids):
+    """ Get completed time for list of task ids
+
+    :param task_ids: list of task ids
+    :return: list of string with formatted datetime
+    """
+    root_dir = c['output_dir']
+    existing_completions = set(get_completions_ids())
+    ids = existing_completions.intersection(task_ids)
+    times = {i: os.path.getmtime(os.path.join(root_dir, i + '.json')) for i in ids}
+    times = {i: datetime.fromtimestamp(t).strftime('%Y-%m-%d %H:%M:%S') for i, t in times.items()}
+    return times
+
+
+def get_completion(task_id):
+    """ Get completed time for list of task ids
+
+    :param task_id: task ids
+    :return: json dict with completion
+    """
+    filename = os.path.join(c['output_dir'], task_id + '.json')
+    return json.load(open(filename)) if os.path.exists(filename) else None
 
 
 def save_completion(task_id, completion):
@@ -86,7 +110,17 @@ def save_completion(task_id, completion):
     :param task_id: task id
     :param completion: json data from label (editor)
     """
-    global config
+    global c
 
-    filename = os.path.join(config['output_path'], task_id + '.json')
-    json.dump(json.loads(completion["result"]), open(filename, 'w'))
+    completion['task'] = get_tasks()[task_id]
+    filename = os.path.join(c['output_dir'], task_id + '.json')
+    json.dump(completion, open(filename, 'w'), indent=4, sort_keys=True)
+
+
+def delete_completion(task_id):
+    """ Delete completion from disk
+
+    :param task_id: task id
+    """
+    filename = os.path.join(c['output_dir'], task_id + '.json')
+    os.remove(filename)
