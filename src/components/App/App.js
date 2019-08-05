@@ -121,7 +121,7 @@ const App = inject("store")(
                 )}
 
                 <div className={"common-container"}>
-                  <Segment style={{ maxWidth: "1200px", minWidth: "70%" }}>
+                  <Segment>
                     {Tree.renderItem(root)}
                     {store.hasInterface("submit") && <Controls />}
                   </Segment>

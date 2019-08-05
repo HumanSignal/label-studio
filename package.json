@@ -1,6 +1,6 @@
 {
   "name": "label-studio",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
   "description": "Label Studio is a multi-domain data labeling tool with standardized output format",
   "author": {
@@ -21,6 +21,7 @@
   "devDependencies": {
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.14.0",
+    "enzyme-to-json": "^3.3.5",
     "eslint-plugin-prettier": "^3.1.0",
     "husky": "^3.0.1",
     "lint-staged": "^9.2.0",
@@ -55,10 +56,11 @@
     "start": "react-scripts start",
     "only-build": "react-scripts build",
     "local": "npm run only-build && npm run start",
-    "build": "react-scripts build",
+    "build": "npm run test && react-scripts build",
     "build-mac": "npm run only-build",
+    "test:watch": "react-scripts test",
     "test": "CI=true react-scripts test",
-    "test:coverage": "npm test --coverage",
+    "test:coverage": "npm test -- --coverage",
     "eject": "react-scripts eject",
     "size": "npm run only-build && size-limit",
     "prettier": "prettier --write src/**/*.js",
