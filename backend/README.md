@@ -26,7 +26,7 @@ pip install -r requirements.txt
 
 4 Run service
 ```bash
-python service.py
+python server.py
 ```
 
 5 Go to http://localhost:8200

@@ -20,7 +20,7 @@
 
   "label_config": "../examples/sentiment_analysis/config.xml",
   "input_path": "../examples/sentiment_analysis/tasks.json",
-  "output_dir": "./output/1",
+  "output_dir": "../examples/sentiment_analysis/completions",
 
   "instruction": "Type something to label experts!",
   "allow_delete_completions": true,
