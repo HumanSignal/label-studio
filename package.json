@@ -1,6 +1,6 @@
 {
   "name": "label-studio",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "private": true,
   "description": "Label Studio is a multi-domain data labeling tool with standardized output format",
   "author": {
