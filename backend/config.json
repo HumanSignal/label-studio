@@ -18,9 +18,9 @@
     ]
   },
 
-  "label_config": "../examples/sentiment_analysis/config.xml",
-  "input_path": "../examples/sentiment_analysis/tasks.json",
-  "output_dir": "../examples/sentiment_analysis/completions",
+  "label_config": "../examples/named_entity/config.xml",
+  "input_path": "../examples/named_entity/tasks.json",
+  "output_dir": "../examples/named_entity/completions",
 
   "instruction": "Type something for label experts!",
   "allow_delete_completions": true,
