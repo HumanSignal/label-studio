@@ -94,6 +94,7 @@ def get_completions_ids():
     global completions, c
 
     root_dir = c['output_dir']
+    os.mkdir(root_dir) if not os.path.exists(root_dir) else ()
     files = os.listdir(root_dir)
     completions = [int(os.path.splitext(f)[0]) for f in files if f.endswith('.json')]
     print(f'Completions found in "{c["output_dir"]}"', len(completions))
@@ -135,6 +136,7 @@ def save_completion(task_id, completion):
     task = get_tasks()[int(task_id)]
     task['completions'] = [completion]
     filename = os.path.join(c['output_dir'], str(task_id) + '.json')
+    os.mkdir(c['output_dir']) if not os.path.exists(c['output_dir']) else ()
     json.dump(task, open(filename, 'w'), indent=4, sort_keys=True)
 
 
