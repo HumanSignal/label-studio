@@ -6,7 +6,7 @@ const TaskStore = types
   .model("Task", {
     id: types.identifierNumber,
     data: types.maybeNull(types.string),
-    project: types.number,
+    project: types.maybeNull(types.number),
   })
   .views(self => ({
     get app() {
