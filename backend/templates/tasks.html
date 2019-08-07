@@ -35,12 +35,15 @@
             </tr>
             {% for id in task_ids %}
                 <tr>
-                    <td>{{ id }}</td>
+                    <td class="text-center">{{ id }}</td>
                     <td>{{ completed_at[id] }}</td>
                     <td class="text-center">
                         {% if id in completions %}
-                            <i data-task-id="{{ id }}" class="fas fa-eye blue show-completion"></i> &nbsp;
-                            <i data-task-id="{{ id }}" class="fas fa-trash-alt red remove-completion"></i>
+                            <a href="/?task_id={{ id }}" target="_blank">
+                                <i class="fas fa-eye blue show-completion"></i>
+                            </a>
+                            &nbsp;
+                            <i data-task-id="{{ id }}" class="fas fa-trash-alt red delete-completion"></i>
                         {% endif %}
                     </td>
                 </tr>
@@ -51,7 +54,7 @@
 
 <script>
     /* --- Delete completion --- */
-    $('.remove-completion').on('click', function (event) {
+    $('.delete-completion').on('click', function (event) {
         const task_id = $(event.target).data('task-id');
         $.ajax({
             url: '/api/tasks/' + task_id + '/completions/',

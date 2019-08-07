@@ -67,3 +67,7 @@ td, th {
 .remove-completion {
     cursor: pointer;
 }
+
+a {
+    text-decoration: none;
+}
