@@ -6,8 +6,6 @@ function getData() {
 
   if (window.taskData && window.taskData.data) {
     window.taskData.data = JSON.stringify(window.taskData.data);
-  } else {
-    window.taskData.data = null;
   }
 
   const data = {
