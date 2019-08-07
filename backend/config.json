@@ -12,7 +12,6 @@
       "submit",
       "submit:load",
       "side-column",
-      "submit:skip",
       "submit:check-empty",
       "predictions:hide"
     ]

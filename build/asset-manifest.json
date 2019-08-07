@@ -1,16 +1,11 @@
 {
-  "main.css": "/heartexlabs/label-studio/static/css/main.d6de408c.chunk.css",
-  "main.js": "/heartexlabs/label-studio/static/js/main.b81ddcb3.chunk.js",
-  "main.js.map": "/heartexlabs/label-studio/static/js/main.b81ddcb3.chunk.js.map",
-  "static/css/1.5abb1d56.chunk.css": "/heartexlabs/label-studio/static/css/1.5abb1d56.chunk.css",
-  "static/js/1.b6e0211b.chunk.js": "/heartexlabs/label-studio/static/js/1.b6e0211b.chunk.js",
-  "static/js/1.b6e0211b.chunk.js.map": "/heartexlabs/label-studio/static/js/1.b6e0211b.chunk.js.map",
+  "main.css": "/heartexlabs/label-studio/static/css/main.01dc9157.chunk.css",
+  "main.js": "/heartexlabs/label-studio/static/js/main.9b6a8d08.chunk.js",
+  "static/css/1.bf217907.chunk.css": "/heartexlabs/label-studio/static/css/1.bf217907.chunk.css",
+  "static/js/1.c5a9e7dd.chunk.js": "/heartexlabs/label-studio/static/js/1.c5a9e7dd.chunk.js",
   "runtime~main.js": "/heartexlabs/label-studio/static/js/runtime~main.a75000d3.js",
-  "runtime~main.js.map": "/heartexlabs/label-studio/static/js/runtime~main.a75000d3.js.map",
   "static/media/semantic.min.css": "/heartexlabs/label-studio/static/media/brand-icons.a1a749e8.svg",
-  "static/css/main.d6de408c.chunk.css.map": "/heartexlabs/label-studio/static/css/main.d6de408c.chunk.css.map",
-  "static/css/1.5abb1d56.chunk.css.map": "/heartexlabs/label-studio/static/css/1.5abb1d56.chunk.css.map",
   "index.html": "/heartexlabs/label-studio/index.html",
-  "precache-manifest.80caedd5b4668f74ccff04d8071286c1.js": "/heartexlabs/label-studio/precache-manifest.80caedd5b4668f74ccff04d8071286c1.js",
+  "precache-manifest.85abd534c95bd6c3c23f5e62960986ff.js": "/heartexlabs/label-studio/precache-manifest.85abd534c95bd6c3c23f5e62960986ff.js",
   "service-worker.js": "/heartexlabs/label-studio/service-worker.js"
 }
