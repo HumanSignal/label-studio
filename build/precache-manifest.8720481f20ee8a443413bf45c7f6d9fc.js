@@ -4,7 +4,7 @@ self.__precacheManifest = [
     url: "/heartexlabs/label-studio/static/media/icons.faff9214.woff",
   },
   {
-    revision: "5943b99c21f20da96432",
+    revision: "23c00390d160b14580fd",
     url: "/heartexlabs/label-studio/static/css/main.d28f49ad.chunk.css",
   },
   {
@@ -44,8 +44,8 @@ self.__precacheManifest = [
     url: "/heartexlabs/label-studio/static/media/icons.0ab54153.woff2",
   },
   {
-    revision: "5943b99c21f20da96432",
-    url: "/heartexlabs/label-studio/static/js/main.5943b99c.chunk.js",
+    revision: "23c00390d160b14580fd",
+    url: "/heartexlabs/label-studio/static/js/main.23c00390.chunk.js",
   },
   {
     revision: "e8c322de9658cbeb8a774b6624167c2c",
@@ -60,12 +60,12 @@ self.__precacheManifest = [
     url: "/heartexlabs/label-studio/static/media/icons.8e3c7f55.eot",
   },
   {
-    revision: "b87b9ba532ace76ae9f6edfe9f72ded2",
-    url: "/heartexlabs/label-studio/static/media/icons.b87b9ba5.ttf",
-  },
-  {
     revision: "13db00b7a34fee4d819ab7f9838cc428",
     url: "/heartexlabs/label-studio/static/media/brand-icons.13db00b7.eot",
+  },
+  {
+    revision: "b87b9ba532ace76ae9f6edfe9f72ded2",
+    url: "/heartexlabs/label-studio/static/media/icons.b87b9ba5.ttf",
   },
   {
     revision: "c5ebe0b32dc1b5cc449a76c4204d13bb",
@@ -84,7 +84,7 @@ self.__precacheManifest = [
     url: "/heartexlabs/label-studio/static/css/1.2716ee49.chunk.css",
   },
   {
-    revision: "b10db72ba5b47b6c5d4f8554bb9767ea",
+    revision: "757cd727711087f64e00ebd7e9d42a7e",
     url: "/heartexlabs/label-studio/index.html",
   },
 ];

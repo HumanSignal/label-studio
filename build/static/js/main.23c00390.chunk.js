@@ -197,19 +197,19 @@
             return _(e, "PATCH", { Accept: "application/json", "Content-Type": "application/json" }, t);
           },
         },
-        O = n(44),
-        x = n(271),
-        E = n.n(x);
+        x = n(44),
+        O = n(271),
+        E = n.n(O);
       function N() {
         return E()(10);
       }
       function j(e) {
         var t = Object(y.h)(e);
-        return Object(y.i)(e).create(Object(O.a)({}, t, { id: N() }));
+        return Object(y.i)(e).create(Object(x.a)({}, t, { id: N() }));
       }
       function C(e) {
         var t = Object(y.h)(e);
-        return Object(y.i)(e).create(Object(O.a)({}, t, { id: N() }));
+        return Object(y.i)(e).create(Object(x.a)({}, t, { id: N() }));
       }
       function T(e) {
         var t = S.getViewByModel(Object(y.i)(e).name);
@@ -694,7 +694,7 @@
                     ];
                   })
                   .reduce(function(e, t) {
-                    return Object(O.a)({}, e, Object(G.a)({}, t[0], t[1]));
+                    return Object(x.a)({}, e, Object(G.a)({}, t[0], t[1]));
                   }, {})
               : null;
           },
@@ -1263,8 +1263,8 @@
           );
         }),
         we = n(296),
-        Oe = n.n(we),
-        xe = Object(u.c)(function(e) {
+        xe = n.n(we),
+        Oe = Object(u.c)(function(e) {
           var t = e.store,
             n = e.regionStore.regions;
           return l.a.createElement(
@@ -1296,7 +1296,7 @@
                   "li",
                   {
                     key: e.id,
-                    className: Oe.a.item,
+                    className: xe.a.item,
                     onMouseOver: function() {
                       e.toggleHightlight();
                     },
@@ -1451,7 +1451,7 @@
             { title: "Entity", className: Me.a.card },
             a && l.a.createElement(Te, { store: t, completion: n }),
             !n.highlightedNode && l.a.createElement("p", null, "Nothing selected"),
-            l.a.createElement(xe, { store: t, regionStore: n.regionStore }),
+            l.a.createElement(Oe, { store: t, regionStore: n.regionStore }),
             l.a.createElement(_e, { store: t, item: n }),
           );
         });
@@ -1917,8 +1917,8 @@
         St = n.n(kt),
         _t = n(302),
         wt = n.n(_t),
-        Ot = n(303),
-        xt = n.n(Ot);
+        xt = n(303),
+        Ot = n.n(xt);
       function Et(e, t) {
         e = Number(e);
         var n = Math.floor(e / 60);
@@ -2053,7 +2053,7 @@
                   return l.a.createElement(
                     "div",
                     null,
-                    l.a.createElement("div", { id: "wave", className: xt.a.wave }),
+                    l.a.createElement("div", { id: "wave", className: Ot.a.wave }),
                     l.a.createElement("div", { id: "timeline" }),
                   );
                 },
@@ -3070,12 +3070,12 @@
           "PolygonLabelsModel",
           _n,
         ),
-        On = Object(u.c)(function(e) {
+        xn = Object(u.c)(function(e) {
           var t = e.item;
           return l.a.createElement(Bt, { item: t });
         });
-      S.addTag("polygonlabels", wn, On);
-      var xn = y.m
+      S.addTag("polygonlabels", wn, xn);
+      var On = y.m
           .model({
             id: y.m.identifier,
             pid: y.m.optional(y.m.string, N),
@@ -3224,7 +3224,7 @@
           "PolygonRegionModel",
           Rt,
           Mt,
-          xn,
+          On,
         );
       var Nn = Object(u.b)("store")(
         Object(u.c)(function(e) {
@@ -3887,7 +3887,7 @@
                   if (!r.startContainer.parentNode.dataset.hint && !r.endContainer.parentNode.dataset.hint) {
                     var i = parseInt(r.startContainer.parentNode.dataset.position),
                       l = parseInt(r.endContainer.parentNode.dataset.position),
-                      s = new Ln(i < l ? i : l, i < l ? l : i, e, Object(O.a)({}, this.props, { ranges: void 0 }));
+                      s = new Ln(i < l ? i : l, i < l ? l : i, e, Object(x.a)({}, this.props, { ranges: void 0 }));
                     this.props.onTextHighlighted(s);
                   }
                 },
@@ -4016,7 +4016,7 @@
             n = t.getSelectedString(),
             a = { background: Y.Colors.convertToRGBA(t.getSelectedColor(), 0.3) };
           return (
-            e.style && (a = Object(O.a)({}, a, { outline: e.style.outline })),
+            e.style && (a = Object(x.a)({}, a, { outline: e.style.outline })),
             l.a.createElement(
               ne,
               { className: Gn.a.state, style: a },
@@ -4056,7 +4056,7 @@
                     }),
                   );
                 }),
-              i.length || (r = Object(O.a)({}, r, { background: "rgba(0, 0, 255, 0.1)" })),
+              i.length || (r = Object(x.a)({}, r, { background: "rgba(0, 0, 255, 0.1)" })),
               l.a.createElement(
                 "span",
                 {
@@ -4424,8 +4424,8 @@
               a = { cursor: t.completionStore.selected.relationMode ? "crosshair" : "pointer" };
             return (
               n.selected
-                ? (a = Object(O.a)({}, a, { border: "1px solid red" }))
-                : n.highlighted && (a = Object(O.a)({}, a, { border: "2px solid red" })),
+                ? (a = Object(x.a)({}, a, { border: "1px solid red" }))
+                : n.highlighted && (a = Object(x.a)({}, a, { border: "2px solid red" })),
               l.a.createElement(
                 pa.a,
                 {
@@ -4550,7 +4550,7 @@
       var Sa = n(73),
         _a = n(103),
         wa = n.n(_a),
-        Oa = y.m
+        xa = y.m
           .model({
             backgroundColor: y.m.optional(y.m.string, "transparent"),
             value: y.m.maybeNull(y.m.string),
@@ -4574,7 +4574,7 @@
               },
             };
           }),
-        xa = y.m.model({
+        Oa = y.m.model({
           axis: y.m.optional(y.m.string, "y"),
           lockaxis: y.m.maybeNull(y.m.string),
           elementvalue: y.m.maybeNull(y.m.string),
@@ -4588,7 +4588,7 @@
             id: y.m.optional(y.m.identifier, N),
             type: "list",
             update: y.m.optional(y.m.number, 1),
-            regions: y.m.array(Oa),
+            regions: y.m.array(xa),
           })
           .views(function(e) {
             return {};
@@ -4599,7 +4599,7 @@
                 e.update = e.update + 1;
               },
               addRegion: function(t, n) {
-                var a = Oa.create({ value: e.elementvalue, idx: n, _value: Be(e.elementvalue, t[n]) });
+                var a = xa.create({ value: e.elementvalue, idx: n, _value: Be(e.elementvalue, t[n]) });
                 e.regions.push(a);
               },
               updateValue: function(t) {
@@ -4672,7 +4672,7 @@
           }),
         Na = y.m.compose(
           "ListModel",
-          xa,
+          Oa,
           Ea,
         ),
         ja = Object(Sa.sortableHandle)(function() {
@@ -5690,7 +5690,7 @@
                               e.markLoading(!0),
                               (t.prev = 7),
                               (i = Object(y.h)(o)),
-                              (l = JSON.stringify({ state: JSON.stringify(i), result: JSON.stringify(r) })),
+                              (l = JSON.stringify({ state: JSON.stringify(i), result: r })),
                               (t.next = 12),
                               e.post("/api/tasks/" + e.task.id + "/completions/", l)
                             );
@@ -6032,7 +6032,7 @@
           var t = po[e].task;
           return (
             (window.T = t),
-            (t = Object(O.a)({}, t, { data: JSON.stringify(po[e].data) })),
+            (t = Object(x.a)({}, t, { data: JSON.stringify(po[e].data) })),
             {
               projectID: 1,
               isLoading: !1,
@@ -6152,4 +6152,4 @@
   },
   [[323, 2, 1]],
 ]);
-//# sourceMappingURL=main.5943b99c.chunk.js.map
+//# sourceMappingURL=main.23c00390.chunk.js.map
