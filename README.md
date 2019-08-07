@@ -8,6 +8,8 @@ Label Studio is an open-source, configurable data annotation tool. Its
 purpose is to enable you to label different types of data using the
 most convenient interface with the standardized output format.
 
+![Label Studio](./images/label-studio-examples.gif)
+
 ## Quick "I want to Label Guides:"
 
 - [Classify text for sentiment](/examples/sentiment_analysis/START.md) ([screenshot](./images/screenshots/cts.png))
