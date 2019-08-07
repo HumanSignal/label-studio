@@ -1,6 +1,7 @@
+from __future__ import print_function
+
 import os
 import json
-import copy
 from datetime import datetime
 
 tasks = None
@@ -53,9 +54,9 @@ def init(config):
 
                 # unsupported task type
                 else:
-                    raise Exception(f'Unsupported task data in "{path}"')
+                    raise Exception('Unsupported task data:', path)
 
-        print(f'Tasks loaded from "{c["input_path"]}"', len(tasks))
+        print('Tasks loaded from:', c["input_path"], len(tasks))
 
 
 # Tasks #
@@ -107,7 +108,7 @@ def get_completions_ids():
     os.mkdir(root_dir) if not os.path.exists(root_dir) else ()
     files = os.listdir(root_dir)
     completions = [int(os.path.splitext(f)[0]) for f in files if f.endswith('.json')]
-    print(f'Completions found in "{c["output_dir"]}"', len(completions))
+    print('Completions found:', c["output_dir"], len(completions))
     return sorted(completions)
 
 

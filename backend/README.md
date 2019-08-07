@@ -7,7 +7,7 @@ part.
 
 ## Linux & Ubuntu guide
 
-1 Install python and virtualenv 
+1 Install python and virtualenv. We recommend to use python 3, but probably python 2 solution will work too.  
 ```
 apt install python3.6
 pip3 install virtualenv

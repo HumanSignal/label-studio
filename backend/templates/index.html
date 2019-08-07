@@ -27,14 +27,14 @@
     </div>
 
     <script>
-        window.editorInterfaces = {{ config['editor']['interfaces'] | safe }};
+        window.editorInterfaces = {{ config['editor']['interfaces'] | json | safe }};
         window.debugEditor = "{{ config['editor']['debug'] }}" === "True";
         window.editorAppConfig = '{{ label_config_line | safe }}';
         window.explore = true;
         window.expertData = {"pk": 1, "firstName": "Label",  "lastName": "Expert"};
         window.projectID = 1;
         {% if task_data != 'null' %}
-            window.taskData = {{ task_data | safe }};
+            window.taskData = {{ task_data | json | safe }};
         {% endif %}
     </script>
 
