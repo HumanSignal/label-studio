@@ -12,7 +12,6 @@
       "submit",
       "submit:load",
       "side-column",
-      "submit:skip",
       "submit:check-empty",
       "predictions:hide"
     ]
@@ -22,7 +21,7 @@
   "input_path": "../examples/sentiment_analysis/tasks.json",
   "output_dir": "../examples/sentiment_analysis/completions",
 
-  "instruction": "Type something to label experts!",
+  "instruction": "Type something for label experts!",
   "allow_delete_completions": true,
 
   "logger": {

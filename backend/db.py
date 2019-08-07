@@ -1,5 +1,6 @@
 import os
 import json
+import copy
 from datetime import datetime
 
 tasks = None
@@ -42,19 +43,22 @@ def init(config):
                 # multiple tasks in file
                 if isinstance(json_body, list):
                     for data in json_body:
-                        task_id = os.path.splitext(f)[0] + '-' + str(len(tasks))
-                        tasks[task_id] = {'id': task_id, 'path': path, 'data': data}
+                        task_id = len(tasks)
+                        tasks[task_id] = {'id': task_id, 'task_path': path, 'data': data}
 
                 # one task in file
                 elif isinstance(json_body, dict):
-                    task_id = os.path.splitext(f)[0] + '-' + str(len(tasks))
-                    tasks[task_id] = {'id': task_id, 'path': path, 'data': json_body}
+                    task_id = len(tasks)
+                    tasks[task_id] = {'id': task_id, 'task_path': path, 'data': json_body}
 
                 # unsupported task type
                 else:
                     raise Exception(f'Unsupported task data in "{path}"')
 
         print(f'Tasks loaded from "{c["input_path"]}"', len(tasks))
+
+
+# Tasks #
 
 
 def get_tasks():
@@ -66,6 +70,32 @@ def get_tasks():
     return tasks
 
 
+def get_task(task_id):
+    """ Get one task
+
+    :param task_id:
+    :return: task
+    """
+    global tasks
+    try:
+        task_id = int(task_id)
+    except ValueError:
+        return None
+    return tasks[task_id] if task_id in tasks else None
+
+
+def get_task_ids():
+    """ Get task ids only
+
+    :return: list of task ids
+    """
+    global tasks
+    return list(tasks.keys())
+
+
+# Completions #
+
+
 def get_completions_ids():
     """ List completion ids from output_dir directory
 
@@ -74,8 +104,9 @@ def get_completions_ids():
     global completions, c
 
     root_dir = c['output_dir']
+    os.mkdir(root_dir) if not os.path.exists(root_dir) else ()
     files = os.listdir(root_dir)
-    completions = [os.path.splitext(f)[0] for f in files if f.endswith('.json')]
+    completions = [int(os.path.splitext(f)[0]) for f in files if f.endswith('.json')]
     print(f'Completions found in "{c["output_dir"]}"', len(completions))
     return sorted(completions)
 
@@ -89,7 +120,7 @@ def get_completed_at(task_ids):
     root_dir = c['output_dir']
     existing_completions = set(get_completions_ids())
     ids = existing_completions.intersection(task_ids)
-    times = {i: os.path.getmtime(os.path.join(root_dir, i + '.json')) for i in ids}
+    times = {i: os.path.getmtime(os.path.join(root_dir, str(i) + '.json')) for i in ids}
     times = {i: datetime.fromtimestamp(t).strftime('%Y-%m-%d %H:%M:%S') for i, t in times.items()}
     return times
 
@@ -98,9 +129,13 @@ def get_completion(task_id):
     """ Get completed time for list of task ids
 
     :param task_id: task ids
-    :return: json dict with completion
+    :return: json dicwt with completion
     """
-    filename = os.path.join(c['output_dir'], task_id + '.json')
+    try:
+        task_id = int(task_id)  # check task_id is int (disallow to escape from output_dir)
+    except ValueError:
+        return None
+    filename = os.path.join(c['output_dir'], str(task_id) + '.json')
     return json.load(open(filename)) if os.path.exists(filename) else None
 
 
@@ -112,9 +147,11 @@ def save_completion(task_id, completion):
     """
     global c
 
-    completion['task'] = get_tasks()[task_id]
-    filename = os.path.join(c['output_dir'], task_id + '.json')
-    json.dump(completion, open(filename, 'w'), indent=4, sort_keys=True)
+    task = get_tasks()[int(task_id)]
+    task['completions'] = [completion]
+    filename = os.path.join(c['output_dir'], str(task_id) + '.json')
+    os.mkdir(c['output_dir']) if not os.path.exists(c['output_dir']) else ()
+    json.dump(task, open(filename, 'w'), indent=4, sort_keys=True)
 
 
 def delete_completion(task_id):
@@ -122,5 +159,5 @@ def delete_completion(task_id):
 
     :param task_id: task id
     """
-    filename = os.path.join(c['output_dir'], task_id + '.json')
+    filename = os.path.join(c['output_dir'], str(task_id) + '.json')
     os.remove(filename)

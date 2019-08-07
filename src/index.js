@@ -28,6 +28,9 @@ const app = AppStore.create(enviroment.getData(), {
   alert: m => console.log(m), // Noop for demo: window.alert(m)
 });
 
+/**
+ * Initialize store
+ */
 app.initializeStore(enviroment.getState());
 
 window.Htx = app;

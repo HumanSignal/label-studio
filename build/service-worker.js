@@ -13,7 +13,7 @@
 
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
-importScripts("/heartexlabs/label-studio/precache-manifest.d1503fe7b3768c4d072fcce0421307c2.js");
+importScripts("/heartexlabs/label-studio/precache-manifest.5a2746f9cbd82cb69618ebcf72c73822.js");
 
 workbox.clientsClaim();
 

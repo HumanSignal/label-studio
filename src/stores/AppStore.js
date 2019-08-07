@@ -112,7 +112,9 @@ export default types
     }
 
     const afterCreate = function() {
-      if (!self.task) self.loadTask();
+      if (!self.task) {
+        self.loadTask();
+      }
 
       Hotkey.addKey("ctrl+enter", self.sendTask);
 
@@ -168,7 +170,7 @@ export default types
       }
     }
 
-    const _loadTask = flow(function* _loadTask(url) {
+    const _loadTask = flow(function*(url) {
       try {
         const res = yield self.fetch(url);
 
@@ -265,45 +267,28 @@ export default types
       }
     });
 
+    /**
+     * Function to initilaze completion store
+     */
     function initializeStore({ completions }) {
-      // console.log(args);
-      // const { completions } = args;
-
-      // console.log(self.task);
-
-      const generatedCompletions = [];
       const { completionStore } = self;
+      let generatedCompletions = [];
 
       if (completions && completions.length) {
         for (var i = 0; i < completions.length; i++) {
-          const c = completions[i];
+          const itemOfCompletion = completions[i];
 
-          if (c.was_cancelled === true) continue;
+          /**
+           * If user skip task, we skip completion state
+           */
+          if (itemOfCompletion.was_cancelled === true) continue;
 
-          if (c.was_generated) generatedCompletions.push(c);
+          /**
+           * Add to array new completion
+           */
+          generatedCompletions.push(itemOfCompletion);
         }
       }
-
-      //         else {
-      // const comp = completionStore.addSavedCompletion(c);
-      // completionStore.selectCompletion(comp.id);
-
-      // comp.deserializeCompletion(JSON.parse(c.result));
-      // comp.reinitHistory();
-
-      // const comp = JSON.parse(c.state);
-
-      // comp.pk = c.id;
-      // comp.createdAgo = c.created_ago;
-      // comp.honeypot = c.honeypot;
-
-      // completionStore.addCompletion(comp, 'list');
-      //     }
-      // }
-
-      //     if (completionStore.completions.length)
-      //         completionStore.selectCompletion(completionStore.completions[0].id);
-      // }
 
       if (completionStore.completions.length === 0) {
         const c = self.completionStore.addInitialCompletion();

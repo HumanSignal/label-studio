@@ -10,63 +10,58 @@
     <link rel="stylesheet" href="/static/css/fontall.min.css">
 
     <script src="/static/js/helpers.js"></script>
-    <script src="/static/js/jquery.min.js"></script>
 
     {% for css in editor_css %}
-        <link href="{{ css }}" rel="stylesheet">
+      <link href="{{ css }}" rel="stylesheet">
     {% endfor %}
 </head>
 
 <body>
-<div class="content">
-    <h1 class="title">{{ config['title'] }}</h1>
-    <div class="content">
+  <div class="content">
+    <div class="wrapper">
+        <h1 class="title">{{ config['title'] }}</h1>
         <h2>Tasks and Completions</h2>
-        <a class="center-link" href="/">Go to Labeling</a>
-            <div class="text-center">Total tasks in {{ config['input_path'] }}: {{ task_ids|length }}</div>
-            <div class="text-center">Total completions in {{ config['output_dir'] }}: {{ completions|length }}</div>
+        <a class="link" href="/">Go to labeling</a>
+        <div>Total tasks. Path:<i>{{ config['input_path'] }}</i>: {{ task_ids|length }}</div>
+        <div>Total completions.Path: <i>{{ config['output_dir'] }}</i>: {{ completions|length }}</div>
         <br/>
 
         <table>
-            <tr>
-                <th>Task ID</th>
-                <th>Completed at</th>
-                <th>Completion</th>
-            </tr>
-            {% for id in task_ids %}
-                <tr>
-                    <td>{{ id }}</td>
-                    <td>{{ completed_at[id] }}</td>
-                    <td class="text-center">
-                        {% if id in completions %}
-                            <i data-task-id="{{ id }}" class="fas fa-eye blue show-completion"></i> &nbsp;
-                            <i data-task-id="{{ id }}" class="fas fa-trash-alt red remove-completion"></i>
-                        {% endif %}
-                    </td>
-                </tr>
+          <tr>
+            <th>Task ID</th>
+            <th>Completed at</th>
+            <th>Completion</th>
+          </tr>
+          {% for id in task_ids %}
+          <tr>
+            <td class="text-center">{{ id }}</td>
+            <td>{{ completed_at[id] }}</td>
+            <td class="text-center">
+              {% if id in completions %}
+                <a href="/?task_id={{ id }}" target="_blank">
+                  <i class="fas fa-eye eye show-completion"></i>
+                </a>
+                &nbsp;
+                <i data-task-id="{{ id }}" class="fas fa-trash-alt trash remove-completion"></i>
+              {% endif %}
+            </td>
+          </tr>
             {% endfor %}
         </table>
     </div>
-</div>
-
-<script>
-    /* --- Delete completion --- */
-    $('.remove-completion').on('click', function (event) {
-        const task_id = $(event.target).data('task-id');
-        $.ajax({
-            url: '/api/tasks/' + task_id + '/completions/',
-            type: 'DELETE',
-            // show message at error
-            error: function (result, textStatus, errorThrown) {
-                alert(result.responseText)
-            },
-            // refresh page after delete
-            success: function () {
-                window.location.reload();
-            }
-        })
-    });
-</script>
-
+  </div>
+  <script>
+    document.querySelectorAll(".remove-completion").forEach(function(test) {
+      test.addEventListener("click", function(event) {
+        var id = event.target.dataset.taskId;
+        var request = new XMLHttpRequest();
+        request.open("DELETE", "/api/tasks/" + id + "/completions/", true);
+        request.onload = function () {
+          window.location.reload();
+        }
+        request.send(null);
+      })
+    })
+  </script>
 </body>
 </html>
