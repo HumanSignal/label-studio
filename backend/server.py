@@ -113,6 +113,26 @@ def api_generate_next_task():
 def api_all_task_ids():
     """ Get all tasks ids
     """
+    ids = sorted(db.get_task_ids())
+    return make_response(jsonify(ids), 200)
+
+
+@app.route('/api/tasks/<task_id>', methods=['GET'])
+@exception_treatment
+def api_tasks(task_id):
+    """ Get all tasks ids
+    """
+    task_id = int(task_id)
+
+    # try to get task with completions first
+    completions_ids = db.get_completions_ids()
+    if task_id in completions_ids:
+        return make_response(jsonify(db.get_completion(task_id)), 200)
+
+    # if no completions return tasks
+    if task_id in db.get_task_ids():
+        return make_response(jsonify(db.get_task(task_id)), 200)
+
     ids = sorted(list(db.get_tasks().keys()))
     return make_response(jsonify(ids), 200)
 

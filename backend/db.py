@@ -67,6 +67,25 @@ def get_tasks():
     return tasks
 
 
+def get_task(task_id):
+    """ Get one task
+
+    :param task_id:
+    :return: task
+    """
+    global tasks
+    return tasks[int(task_id)]
+
+
+def get_task_ids():
+    """ Get task ids only
+
+    :return: list of task ids
+    """
+    global tasks
+    return list(tasks.keys())
+
+
 def get_completions_ids():
     """ List completion ids from output_dir directory
 
