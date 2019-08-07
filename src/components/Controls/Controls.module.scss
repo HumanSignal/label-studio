@@ -1,3 +1,5 @@
+@import "../../assets/styles/global.scss";
+
 .skip {
   margin-bottom: 10px;
 }
@@ -15,6 +17,11 @@
     &:first-child {
       margin-left: 0;
     }
+
+    @include respond("phone") {
+      margin-left: 0;
+      margin-bottom: 5px;
+    }
   }
 
   &:first-child {
@@ -23,6 +30,13 @@
 
   &:last-child {
     margin-right: 0;
+  }
+
+  @include respond("phone") {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-flow: column;
   }
 }
 
@@ -35,4 +49,9 @@
   justify-content: space-between;
   align-items: center;
   margin-top: 20px;
+
+  @include respond("phone") {
+    flex-flow: column;
+    align-items: flex-start;
+  }
 }

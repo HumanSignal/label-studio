@@ -3,23 +3,25 @@
 .block {
   position: relative;
   max-width: 1200px;
+  margin-right: 20px;
+  margin-bottom: 20px;
   background: #fff;
   padding: 1em 1em;
   border-radius: 0.28571429rem;
   border: 1px solid rgba(34, 36, 38, 0.15);
   margin-bottom: 1em;
 
-  @media (max-width: 1920px) {
-    width: 1200px;
-  }
+  // @media (max-width: 1920px) {
+  //   width: 1200px;
+  // }
 
-  @media (max-width: 1550px) {
-    width: 850px;
-  }
+  // @media (max-width: 1550px) {
+  //   width: 850px;
+  // }
 
-  @include respond("tablet") {
-    width: 600px;
-  }
+  // @include respond("tablet") {
+  //   width: 600px;
+  // }
 
   @include respond("phone") {
     width: 100%;
