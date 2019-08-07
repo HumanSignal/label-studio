@@ -58,6 +58,9 @@ def init(config):
         print(f'Tasks loaded from "{c["input_path"]}"', len(tasks))
 
 
+# Tasks #
+
+
 def get_tasks():
     """ Load tasks from JSON files in input_path directory
 
@@ -74,7 +77,11 @@ def get_task(task_id):
     :return: task
     """
     global tasks
-    return tasks[int(task_id)]
+    try:
+        task_id = int(task_id)
+    except ValueError:
+        return None
+    return tasks[task_id] if task_id in tasks else None
 
 
 def get_task_ids():
@@ -86,6 +93,9 @@ def get_task_ids():
     return list(tasks.keys())
 
 
+# Completions #
+
+
 def get_completions_ids():
     """ List completion ids from output_dir directory
 
@@ -94,6 +104,7 @@ def get_completions_ids():
     global completions, c
 
     root_dir = c['output_dir']
+    os.mkdir(root_dir) if not os.path.exists(root_dir) else ()
     files = os.listdir(root_dir)
     completions = [int(os.path.splitext(f)[0]) for f in files if f.endswith('.json')]
     print(f'Completions found in "{c["output_dir"]}"', len(completions))
@@ -118,8 +129,12 @@ def get_completion(task_id):
     """ Get completed time for list of task ids
 
     :param task_id: task ids
-    :return: json dict with completion
+    :return: json dicwt with completion
     """
+    try:
+        task_id = int(task_id)  # check task_id is int (disallow to escape from output_dir)
+    except ValueError:
+        return None
     filename = os.path.join(c['output_dir'], str(task_id) + '.json')
     return json.load(open(filename)) if os.path.exists(filename) else None
 
@@ -135,6 +150,7 @@ def save_completion(task_id, completion):
     task = get_tasks()[int(task_id)]
     task['completions'] = [completion]
     filename = os.path.join(c['output_dir'], str(task_id) + '.json')
+    os.mkdir(c['output_dir']) if not os.path.exists(c['output_dir']) else ()
     json.dump(task, open(filename, 'w'), indent=4, sort_keys=True)
 
 

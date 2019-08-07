@@ -62,16 +62,18 @@ def index():
     # load editor config from XML
     label_config_line = config_line_stripped(open(c['label_config']).read())
 
-    # task data: completions preview
-    task_id = None
-    task_id, task_data = 0, db.get_tasks()[0]
-    print('task id', task_id)
+    # task data: load task or task with completions if it exists
+    task_data = None
+    task_id = request.args.get('task_id', None)
 
-    task_data = json.dumps(db.get_completion(0))
+    if task_id is not None:
+        task_data = db.get_completion(task_id)
+        if task_data is None:
+            task_data = db.get_task(task_id)
 
     return flask.render_template('index.html', config=c, label_config_line=label_config_line,
                                  editor_css=editor_css, editor_js=editor_js,
-                                 task_id=str(task_id), task_data=task_data)
+                                 task_id=task_id, task_data=json.dumps(task_data))
 
 
 @app.route('/tasks')
@@ -117,24 +119,15 @@ def api_all_task_ids():
     return make_response(jsonify(ids), 200)
 
 
-@app.route('/api/tasks/<task_id>', methods=['GET'])
+@app.route('/api/tasks/<task_id>/', methods=['GET'])
 @exception_treatment
 def api_tasks(task_id):
-    """ Get all tasks ids
+    """ Get task by id
     """
-    task_id = int(task_id)
-
     # try to get task with completions first
-    completions_ids = db.get_completions_ids()
-    if task_id in completions_ids:
-        return make_response(jsonify(db.get_completion(task_id)), 200)
-
-    # if no completions return tasks
-    if task_id in db.get_task_ids():
-        return make_response(jsonify(db.get_task(task_id)), 200)
-
-    ids = sorted(list(db.get_tasks().keys()))
-    return make_response(jsonify(ids), 200)
+    task_data = db.get_completion(task_id)
+    task_data = db.get_task(task_id) if task_data is None else task_data
+    return make_response(jsonify(task_data), 200)
 
 
 @app.route('/api/projects/1/completions_ids/', methods=['GET'])

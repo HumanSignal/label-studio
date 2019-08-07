@@ -112,7 +112,9 @@ export default types
     }
 
     const afterCreate = function() {
-      if (!self.task) self.loadTask();
+      if (!self.task) {
+        self.loadTask();
+      }
 
       Hotkey.addKey("ctrl+enter", self.sendTask);
 
@@ -168,7 +170,7 @@ export default types
       }
     }
 
-    const _loadTask = flow(function* _loadTask(url) {
+    const _loadTask = flow(function*(url) {
       try {
         const res = yield self.fetch(url);
 
@@ -246,7 +248,7 @@ export default types
 
         const body = JSON.stringify({
           state: JSON.stringify(state),
-          result: JSON.stringify(res),
+          result: res,
         });
 
         yield self.post("/api/tasks/" + self.task.id + "/completions/", body);
