@@ -133,7 +133,7 @@ def save_completion(task_id, completion):
     global c
 
     task = get_tasks()[int(task_id)]
-    task['completion'] = completion
+    task['completions'] = [completion]
     filename = os.path.join(c['output_dir'], str(task_id) + '.json')
     json.dump(task, open(filename, 'w'), indent=4, sort_keys=True)
 

@@ -46,7 +46,7 @@ def iter_tokens_tags(input_dir):
     with io.open(datafile) as f:
       data = json.load(f)
     text = data['data']['text']
-    result = data['completion']['result']
+    result = data['completions'][0]['result']
     result = json.loads(result)
     # spans = data['completion']['result'][0]['value']
     spans = list(map(itemgetter('value'), result))
