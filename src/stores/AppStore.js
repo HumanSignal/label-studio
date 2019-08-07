@@ -248,7 +248,7 @@ export default types
 
         const body = JSON.stringify({
           state: JSON.stringify(state),
-          result: JSON.stringify(res),
+          result: res,
         });
 
         yield self.post("/api/tasks/" + self.task.id + "/completions/", body);
