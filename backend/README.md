@@ -46,7 +46,7 @@ python service.py -c <your_config.json>
   "title": "Label Studio",
 ```
 
-* Service system settings
+* Web server settings
 ```
   "port": 8200,
   "debug": true,
