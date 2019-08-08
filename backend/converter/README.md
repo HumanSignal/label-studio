@@ -36,6 +36,8 @@ python text_classifier/spacy_conll2003.py -i directory/with/completions -o your/
 
 ## TODO
 
+- List of libraries TBD
+
 ## Contributing
 
 We would love to get your help for creating converters to other models. Please feel free to create pull requests.
