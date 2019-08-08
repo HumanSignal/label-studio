@@ -115,9 +115,8 @@ converts any format into the JSON as a result.
 
 ### Output
 
-<details>
-<summary>Output is JSON. Overall strucutre is the following:</summary>
-<br>
+Output is JSON. Overall strucutre is the following:
+
 ```json
 {
 	"completions": [
@@ -140,7 +139,6 @@ converts any format into the JSON as a result.
 	}
 }
 ```
-</details>
 
 Completion is an object with five mandatory fields:
 
