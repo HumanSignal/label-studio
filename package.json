@@ -53,7 +53,7 @@
     "wavesurfer.js": "^3.0.0"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "npm run copy-examples && react-scripts start",
     "only-build": "react-scripts build",
     "local": "npm run only-build && npm run start",
     "build": "npm run test && react-scripts build",
@@ -67,7 +67,8 @@
     "prettier-styles": "prettier --write src/**/*.{css,scss}",
     "lint": "eslint --debug src/",
     "lint:write": "eslint --debug src/ --fix",
-    "publish": "GENERATE_SOURCEMAP=false npm run build"
+    "publish": "GENERATE_SOURCEMAP=false npm run build",
+    "copy-examples": "bash scripts/copy.sh"
   },
   "eslintConfig": {
     "extends": "react-app"
