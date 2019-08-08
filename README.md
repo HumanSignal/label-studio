@@ -86,11 +86,11 @@ text classification config:
 
 ```html
 <View>
-	<Text name="text"></Text>
-	<Choices name="choice" toName="text">
-		<Choice value="relevant"></Choice>
-		<Choice value="non relevant"></Choice>
-	</Choices>
+  <Text name="text"></Text>
+  <Choices name="choice" toName="text">
+    <Choice value="relevant"></Choice>
+    <Choice value="non relevant"></Choice>
+  </Choices>
 </View>
 ```
 
@@ -121,7 +121,7 @@ Output is JSON. Overall strucutre is the following:
 {
 	"completions": [
 		{ 
-			results: {
+			"results": {
 				"id": "yrSY-dipPI",
 				"from_name": "sentiment",
 				"to_name": "my_text",
@@ -135,7 +135,7 @@ Output is JSON. Overall strucutre is the following:
 		}
 	],
 	"data": {
-		JSON INPUT
+		
 	}
 }
 ```
