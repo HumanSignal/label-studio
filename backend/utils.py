@@ -25,7 +25,7 @@ class CustomJsonFormatter(jsonlogger.JsonFormatter):
 
 
 # read logger config
-log_config = json.load(open('config.json'))['logger']
+log_config = json.load(open('logger.json'))
 logfile = log_config['handlers']['file']['filename']
 # create log file
 os.mkdir(os.path.dirname(logfile)) if not os.path.exists(os.path.dirname(logfile)) else ()
