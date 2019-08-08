@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "formatters": {
+    "json": {
+      "class": "utils.CustomJsonFormatter"
+    }
+  },
+  "handlers": {
+    "console": {
+      "class": "logging.StreamHandler",
+      "level": "DEBUG",
+      "stream": "ext://sys.stdout"
+    },
+    "file": {
+      "class": "logging.FileHandler",
+      "level": "DEBUG",
+      "filename": "static/logs/service.log",
+      "formatter": "json"
+    }
+  },
+  "loggers": {
+    "service": {
+      "level": "DEBUG",
+      "handlers": [
+        "console",
+        "file"
+      ],
+      "propagate": false
+    }
+  },
+  "root": {
+    "level": "DEBUG",
+    "handlers": [
+      "console"
+    ]
+  }
+}

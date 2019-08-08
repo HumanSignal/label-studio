@@ -3,6 +3,13 @@
   "port": 8200,
   "debug": true,
 
+  "label_config": "../examples/sentiment_analysis/config.xml",
+  "input_path": "../examples/sentiment_analysis/tasks.json",
+  "output_dir": "../examples/sentiment_analysis/completions",
+
+  "instruction": "Type something for label experts!",
+  "allow_delete_completions": true,
+
   "editor": {
     "build_path": "../build/static",
     "debug": false,
@@ -15,50 +22,5 @@
       "submit:check-empty",
       "predictions:hide"
     ]
-  },
-
-  "label_config": "../examples/sentiment_analysis/config.xml",
-  "input_path": "../examples/sentiment_analysis/tasks.json",
-  "output_dir": "../examples/sentiment_analysis/completions",
-
-  "instruction": "Type something for label experts!",
-  "allow_delete_completions": true,
-
-  "logger": {
-    "version": 1,
-    "formatters": {
-      "json": {
-        "class": "utils.CustomJsonFormatter"
-      }
-    },
-    "handlers": {
-      "console": {
-        "class": "logging.StreamHandler",
-        "level": "DEBUG",
-        "stream": "ext://sys.stdout"
-      },
-      "file": {
-        "class": "logging.FileHandler",
-        "level": "DEBUG",
-        "filename": "static/logs/service.log",
-        "formatter": "json"
-      }
-    },
-    "loggers": {
-      "service": {
-        "level": "DEBUG",
-        "handlers": [
-          "console",
-          "file"
-        ],
-        "propagate": false
-      }
-    },
-    "root": {
-      "level": "DEBUG",
-      "handlers": [
-        "console"
-      ]
-    }
   }
 }
