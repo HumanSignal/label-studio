@@ -77,7 +77,7 @@ const HtxAudioView = observer(({ store, item }) => {
 
   return (
     <div>
-      <audio controls>
+      <audio controls style={{ width: "100%" }}>
         <source src={item._value} type="audio/mpeg" />
         Your browser does not support the audio element.
       </audio>
