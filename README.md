@@ -99,7 +99,7 @@ other. Therefore tags that are used for labeling should include a name
 attribute. And every tag has its own set of parameters. Find more info
 in the related doc:
 
-[Tags Documentation](/docs/Tags.md).
+[Tags Documentation](/docs/Tags.md)
 
 Creating your own tags is the suggested way to extend the app and
 tailor it to your specific needs.
