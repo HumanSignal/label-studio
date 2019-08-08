@@ -2,12 +2,14 @@ import os
 import datetime
 import logging.config
 import traceback as tb
+import io
 from flask import request, jsonify, make_response
 import json  # it MUST be included after flask!
 import db
 
 from pythonjsonlogger import jsonlogger
 from lxml import etree
+from xml.etree import ElementTree
 
 
 # this must be before logger setup
@@ -148,3 +150,24 @@ def load_config():
 
     for new_config in generator():
         return new_config
+
+
+class LabelConfigParser(object):
+
+    def __init__(self, filepath):
+        with io.open(filepath) as f:
+            self._config = f.read()
+
+    def get_value_for_name(self, name):
+        tag_iter = ElementTree.fromstring(self._config).iter()
+        return next((
+            tag.attrib.get('value') for tag in tag_iter
+            if tag.attrib.get('name') == name), None
+        )
+
+    def get_input_data_tags(self):
+        tag_iter = ElementTree.fromstring(self._config).iter()
+        return [
+            tag for tag in tag_iter
+            if tag.attrib.get('name') and tag.attrib.get('value', '').startswith('$')
+        ]

@@ -77,6 +77,7 @@ represented by a react view and mobx-state-tree model. Each tag has a set of par
 - Extensive UI configuration options
 - Multiple datatypes supported: images, text, audios
 - Hotkeys & History
+- Converting to formats accepted by popular machine learning apps ([check here](/backend/converter/README.md) for supported GitHub repositories)
 
 ## Contributing
 

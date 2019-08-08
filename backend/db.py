@@ -2,7 +2,10 @@ from __future__ import print_function
 
 import os
 import json
+import io
+
 from datetime import datetime
+from utils import LabelConfigParser
 
 
 tasks = None
@@ -17,6 +20,7 @@ def init(config):
     """
     global c, tasks
     c = config
+    label_config = LabelConfigParser(c['label_config'])
 
     if not os.path.exists(c['output_dir']):
         os.mkdir(c['output_dir'])
@@ -36,10 +40,9 @@ def init(config):
             files = os.listdir(root_dir)
 
         for f in files:
-
+            path = os.path.join(root_dir, f)
             # load tasks from json
             if f.endswith('.json'):
-                path = os.path.join(root_dir, f)
                 json_body = json.load(open(path))
 
                 # multiple tasks in file
@@ -56,6 +59,26 @@ def init(config):
                 # unsupported task type
                 else:
                     raise Exception('Unsupported task data:', path)
+            elif f.endswith('.txt'):
+
+                input_data_tag = label_config.get_input_data_tags()
+                if len(input_data_tag) > 1:
+                    print(f'Warning! Multiple input data tags found: '
+                          f'{",".join(tag.attrib.get("name") for tag in input_data_tag)}. Only first one is used.')
+                input_data_tag = input_data_tag[0]
+                data_key = input_data_tag.attrib.get('value').lstrip('$')
+                tasks = {}
+                with io.open(path) as fin:
+                    for i, line in enumerate(fin):
+                        tasks[i] = {
+                            'id': i,
+                            'task_path': path,
+                            'data': {
+                                data_key: line.strip()
+                            }
+                        }
+            else:
+                raise IOError(f'Unsupported file format: {os.path.splitext(f)[1]}')
 
         print('Tasks loaded from:', c["input_path"], len(tasks))
 
