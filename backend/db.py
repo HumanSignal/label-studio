@@ -4,6 +4,7 @@ import os
 import json
 from datetime import datetime
 
+
 tasks = None
 completions = None
 c = None  # config
@@ -58,6 +59,15 @@ def init(config):
 
         print('Tasks loaded from:', c["input_path"], len(tasks))
 
+
+def re_init(config):
+    """ Re-init DB from scratch
+
+    :param config: dict
+    """
+    global tasks, completions, c
+    tasks, completions, c = None, None, None
+    init(config)
 
 # Tasks #
 

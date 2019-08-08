@@ -17,9 +17,9 @@
     ]
   },
 
-  "label_config": "../examples/sentiment_analysis/config.xml",
-  "input_path": "../examples/sentiment_analysis/tasks.json",
-  "output_dir": "../examples/sentiment_analysis/completions",
+  "label_config": "../examples/image_bbox/config.xml",
+  "input_path": "../examples/image_bbox/tasks.json",
+  "output_dir": "../examples/image_bbox/completions",
 
   "instruction": "Type something for label experts!",
   "allow_delete_completions": true,

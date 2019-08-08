@@ -4,6 +4,7 @@ import logging.config
 import traceback as tb
 from flask import request, jsonify, make_response
 import json  # it MUST be included after flask!
+import db
 
 from pythonjsonlogger import jsonlogger
 from lxml import etree
@@ -129,6 +130,7 @@ def load_config():
         args = parser.parse_args()
 
         config_path = args.config_path
+        prev_config = None
 
         while True:
             c = json.load(open(config_path))
@@ -136,6 +138,12 @@ def load_config():
             c['label_config'] = args.label_config if args.label_config else c['label_config']
             c['input_path'] = args.input_path if args.input_path else c['input_path']
             c['output_dir'] = args.output_dir if args.output_dir else c['output_dir']
+
+            # re-init db
+            if prev_config != c:
+                print('Config changes detected, reloading DB')
+                db.re_init(c)
+
             yield c
 
     for new_config in generator():
