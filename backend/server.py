@@ -1,6 +1,7 @@
 #!/usr/bin/env python
+from __future__ import print_function
+
 import os
-import sys
 import flask
 import json  # it MUST be included after flask!
 import db
@@ -14,6 +15,11 @@ c = load_config()
 app = flask.Flask(__name__, static_url_path='')
 app.secret_key = 'A0Zrdqwf1AQWj12ajkhgFN]dddd/,?RfDWQQT'
 db.init(c)
+
+
+@app.template_filter('json')
+def json_filter(s):
+    return json.dumps(s)
 
 
 @app.before_first_request
@@ -73,7 +79,7 @@ def index():
 
     return flask.render_template('index.html', config=c, label_config_line=label_config_line,
                                  editor_css=editor_css, editor_js=editor_js,
-                                 task_id=task_id, task_data=json.dumps(task_data))
+                                 task_id=task_id, task_data=task_data)
 
 
 @app.route('/tasks')
@@ -104,7 +110,7 @@ def api_generate_next_task():
     for (task_id, task) in db.get_tasks().items():
         if task_id not in completions:
             log.info(msg='New task for labeling', extra=task)
-            return make_response(task, 200)
+            return make_response(jsonify(task), 200)
 
     # no tasks found
     return make_response('', 404)
