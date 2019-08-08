@@ -47,8 +47,6 @@ def iter_tokens_tags(input_dir):
       data = json.load(f)
     text = data['data']['text']
     result = data['completions'][0]['result']
-    result = json.loads(result)
-    # spans = data['completion']['result'][0]['value']
     spans = list(map(itemgetter('value'), result))
 
     tokens, tags = create_tokens_and_tags(text, spans)
