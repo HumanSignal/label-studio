@@ -31,8 +31,11 @@ Coming Soon:
 - [Introduction](#introduction)
   - [Run Locally](#run-locally)
   - [Extend & Embed](#extend--embed)
-- [Using Label Studio](#using-label-studio)
 - [Features](#features)
+- [Using Label Studio](#using-label-studio)
+- [Format](#format)
+  - [Input](#input)
+  - [Output](#output)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -60,17 +63,10 @@ part and an example implementation of the backend.
 
 ### Extend & Embed
 
-To extend the functionality of embed the labeling inside your app, you
+To extend the functionality or embed the labeling inside your app, you
 need to be able to compile it from the sources. 
 
 [This guide explains how to do that](docs/Embed.md)
-
-## Using Label Studio
-
-### Config Language 
-
-Editor configuration is based on XML-like tags. Internally tags are
-represented by a react view and mobx-state-tree model. Each tag has a set of parameters, and you can look it up in the [documentation](/docs/Tags.md).
 
 ## Features
 
@@ -79,6 +75,85 @@ represented by a react view and mobx-state-tree model. Each tag has a set of par
 - Hotkeys & History
 - Converting to formats accepted by popular machine learning apps ([check here](/backend/converter/README.md) for supported GitHub repositories)
 
+## Using Label Studio
+
+### Config Language 
+
+Editor configuration is based on XML-like tags. Internally tags are
+represented by a react view and mobx-state-tree model. Each config
+should start with a <View></View> tag. Here is an example of a simple
+text classification config:
+
+```html
+<View>
+	<Text name="text"></Text>
+	<Choices name="choice" toName="text">
+		<Choice value="relevant"></Choice>
+		<Choice value="non relevant"></Choice>
+	</Choices>
+</View>
+```
+
+Note that we use tag names to connect tags between each
+other. Therefore tags that are used for labeling should include a name
+attribute. And every tag has its own set of parameters. Find more info
+in the related doc:
+
+[Tags Documentation](/docs/Tags.md).
+
+Creating your own tags is the suggested way to extend the app and
+tailor it to your specific needs.
+
+## Format 
+
+### Input
+
+Input should be JSON formatted. All the files that you want to label
+are expected to be hosted somewhere and provided as an URL in the
+JSON. The example backend server can process other formats, but it
+converts any format into the JSON as a result.
+
+### Output
+
+<details>
+<summary>Output is JSON. Overall strucutre is the following:</summary>
+<br>
+```json
+{
+	"completions": [
+		{ 
+			results: {
+				"id": "yrSY-dipPI",
+				"from_name": "sentiment",
+				"to_name": "my_text",
+				"type": "choices",
+				"value": {
+					"choices": [
+						"Neutral"
+					]
+				}
+			}
+		}
+	],
+	"data": {
+		JSON INPUT
+	}
+}
+```
+</details>
+
+Completion is an object with five mandatory fields:
+
+- **id** unique id of the labeled region
+- **from_name** name of the tag that was used to label region
+- **to_name** name of the tag that provided the region to be labeled
+- **type** type of the labeling/tag
+- **value** tag specific value that includes the labeling result details
+
+For popular machine learning libraries there is converter code to
+transform Label Studio format in ML library format. [Learn More](/backend/converter/README.md) 
+about it.
+
 ## Contributing
 
 - [Contributing Guideline](/CONTRIBUTING.md)
@@ -86,4 +161,5 @@ represented by a react view and mobx-state-tree model. Each tag has a set of par
 
 ## License
 
-This software is licensed under the [Apache 2.0 LICENSE](/LICENSE) © [Heartex](https://www.heartex.net/).
+This software is licensed under the [Apache 2.0 LICENSE](/LICENSE) ©
+[Heartex](https://www.heartex.net/).
