@@ -14,7 +14,6 @@ from utils import exception_treatment, answer, log_config, log, config_line_stri
 c = load_config()
 app = flask.Flask(__name__, static_url_path='')
 app.secret_key = 'A0Zrdqwf1AQWj12ajkhgFN]dddd/,?RfDWQQT'
-db.init(c)
 
 
 @app.template_filter('json')

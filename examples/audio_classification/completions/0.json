@@ -1,0 +1,24 @@
+{
+    "completions": [
+        {
+            "result": [
+                {
+                    "from_name": "label",
+                    "id": "wvDEy63Wgs",
+                    "to_name": "audio",
+                    "type": "choices",
+                    "value": {
+                        "choices": [
+                            "Politics"
+                        ]
+                    }
+                }
+            ]
+        }
+    ],
+    "data": {
+        "url": "https://go.heartex.net/static/samples/game.wav"
+    },
+    "id": 0,
+    "task_path": "../examples/audio_classification/tasks.json"
+}
