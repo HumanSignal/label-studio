@@ -2,7 +2,7 @@ import React, { Fragment } from "react";
 
 import { types, getRoot } from "mobx-state-tree";
 import { observer, inject } from "mobx-react";
-import { Button, Icon } from "antd";
+import { Button, Icon, Slider, Row, Col } from "antd";
 
 import { cloneNode } from "../../core/Helpers";
 import Registry from "../../core/Registry";
@@ -13,6 +13,7 @@ import Waveform from "../../components/Waveform/Waveform";
 import ProcessAttrsMixin from "../mixins/ProcessAttrs";
 
 import { AudioRegionModel } from "./AudioRegion";
+import styles from "./AudioPlus/AudioPlus.module.scss";
 
 /**
  * AudioPlus tag plays audio and shows its wave
@@ -44,7 +45,8 @@ const Model = types
     type: "audio",
     playing: types.optional(types.boolean, false),
     regions: types.array(AudioRegionModel),
-    rangeValue: types.optional(types.string, "20"),
+    rangeValue: types.optional(types.number, 20),
+    playBackRate: types.optional(types.number, 1),
   })
   .views(self => ({
     get completion() {
@@ -83,6 +85,10 @@ const Model = types
       self.rangeValue = val;
     },
 
+    setPlaybackRate(val) {
+      self.playBackRate = val;
+    },
+
     addRegion(ws_region) {
       const find_r = self.findRegion(ws_region.start, ws_region.end);
       if (self.findRegion(ws_region.start, ws_region.end)) {
@@ -94,14 +100,14 @@ const Model = types
 
       const clonedStates = states ? states.map(s => cloneNode(s)) : null;
 
-      // const bgColor = states ? states[0].getSelectedColor() : self.selectedregionbg;
+      const bgColor = states && states[0] ? states[0].getSelectedColor() : self.selectedregionbg;
 
       const r = AudioRegionModel.create({
         id: guidGenerator(),
         start: ws_region.start,
         end: ws_region.end,
         regionbg: self.regionbg,
-        selectedregionbg: self.selectedregionbg,
+        selectedregionbg: bgColor,
         states: clonedStates,
       });
 
@@ -156,11 +162,15 @@ const HtxAudioView = observer(({ store, item }) => {
         onCreate={item.wsCreated}
         addRegion={item.addRegion}
         onLoad={item.onLoad}
+        speed={item.playBackRate}
+        haszoom={item.haszoom}
+        zoom={item.rangeValue}
       />
 
       <div style={{ display: "flex", justifyContent: "space-between", marginTop: "1em" }}>
         <Button
           type="primary"
+          className={styles.play}
           onClick={ev => {
             item._ws.playPause();
           }}
@@ -176,19 +186,6 @@ const HtxAudioView = observer(({ store, item }) => {
             </Fragment>
           )}
         </Button>
-
-        {item.haszoom === "true" && (
-          <input
-            type="range"
-            min="20"
-            max="200"
-            id="slider"
-            value={item.rangeValue}
-            onChange={ev => {
-              item.setRangeValue(ev.target.value);
-            }}
-          />
-        )}
       </div>
     </div>
   );

@@ -10,7 +10,7 @@ import { TranscribeAudio } from "../examples/transcribe_audio";
 /**
  * Choose data type
  */
-let dataType = AudioClassifiaction;
+let dataType = AudioRegions;
 
 function templateDynamicData() {
   let settings = {

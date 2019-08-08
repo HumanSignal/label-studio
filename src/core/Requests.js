@@ -6,15 +6,14 @@ const handleResponse = res => {
   }
 };
 
-const wrapperRequest = (url, method, headers, body) => {
-  return window
-    .fetch(url, {
-      method: method,
-      headers: headers,
-      credentials: "include",
-      body: body,
-    })
-    .then(response => handleResponse(response));
+const wrapperRequest = async (url, method, headers, body) => {
+  const response = await window.fetch(url, {
+    method: method,
+    headers: headers,
+    credentials: "include",
+    body: body,
+  });
+  return handleResponse(response);
 };
 
 const fetcher = url => {
