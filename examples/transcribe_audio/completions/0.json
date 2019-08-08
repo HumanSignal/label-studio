@@ -1,0 +1,22 @@
+{
+    "completions": [
+        {
+            "result": [
+                {
+                    "from_name": "answer",
+                    "id": "eGp_aIzha3",
+                    "to_name": "answer",
+                    "type": "textarea",
+                    "value": {
+                        "text": "Mario"
+                    }
+                }
+            ]
+        }
+    ],
+    "data": {
+        "url": "https://go.heartex.net/static/samples/game.wav"
+    },
+    "id": 0,
+    "task_path": "../examples/transcribe_audio/tasks.json"
+}

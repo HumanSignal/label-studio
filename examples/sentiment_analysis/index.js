@@ -1,5 +1,5 @@
 import config from "./config.xml";
 import tasks from "./tasks.json";
-import completions from "./completions/0.json";
+import completion from "./completions/0.json";
 
-export const Sentiment = { config, tasks, completions };
+export const Sentiment = { config, tasks, completion };
