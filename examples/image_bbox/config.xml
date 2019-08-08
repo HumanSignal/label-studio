@@ -1,4 +1,7 @@
 <View>
-  <Rectangle name="rect-1" toName="img" strokeWidth="4" strokeColor="#ff0000"></Rectangle>
+  <RectangleLabels name="tag" toName="img">
+    <Label value="Planet"></Label>
+    <Label value="Moonwalker" background="blue"></Label>
+  </RectangleLabels>
   <Image name="img" value="$image"></Image>
 </View>
