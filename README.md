@@ -119,24 +119,18 @@ Output is JSON. Overall strucutre is the following:
 
 ```json
 {
-	"completions": [
-		{ 
-			"results": {
-				"id": "yrSY-dipPI",
-				"from_name": "sentiment",
-				"to_name": "my_text",
-				"type": "choices",
-				"value": {
-					"choices": [
-						"Neutral"
-					]
-				}
-			}
-		}
-	],
-	"data": {
-		
-	}
+  "completions": [{ 
+    "results": {
+      "id": "yrSY-dipPI",
+      "from_name": "sentiment",
+      "to_name": "my_text",
+      "type": "choices",
+	  "value": {
+        "choices": ["Neutral"]
+      }
+    }
+  }],
+  "data": { ... task data ... }
 }
 ```
 
