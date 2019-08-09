@@ -5,8 +5,8 @@ import RegionsPlugin from "wavesurfer.js/dist/plugin/wavesurfer.regions.min.js";
 import TimelinePlugin from "wavesurfer.js/dist/plugin/wavesurfer.timeline.min.js";
 import CursorPlugin from "wavesurfer.js/dist/plugin/wavesurfer.cursor";
 import { Slider, InputNumber, Row, Col } from "antd";
-
 import a from "../../assets/audio/a.wav";
+import Utils from "../../utils";
 
 import styles from "./Waveform.module.scss";
 
@@ -137,6 +137,7 @@ export default class Waveform extends React.Component {
 
     this.state = {
       playing: false,
+      src: this.props.src,
       pos: 0,
       colors: {
         waveColor: "#97A0AF",
@@ -144,6 +145,7 @@ export default class Waveform extends React.Component {
       },
       zoom: this.props.zoom,
       speed: this.props.speed,
+      volume: this.props.volume,
     };
   }
 
@@ -157,6 +159,15 @@ export default class Waveform extends React.Component {
     });
 
     this.wavesurfer.zoom(value);
+  };
+
+  onChangeVolume = value => {
+    this.setState({
+      ...this.state,
+      volume: value,
+    });
+
+    this.wavesurfer.setVolume(value);
   };
 
   /**
@@ -185,6 +196,7 @@ export default class Waveform extends React.Component {
     this.wavesurfer = WaveSurfer.create({
       container: this.$waveform,
       waveColor: this.state.colors.waveColor,
+      backend: "MediaElement",
       progressColor: this.state.colors.progressColor,
       plugins: [
         this.regions,
@@ -207,9 +219,10 @@ export default class Waveform extends React.Component {
       ],
     });
 
-    // this.wavesurfer.load(this.props.src);
-    // console.log(this.props.src)
-    this.wavesurfer.load(a);
+    if (!Utils.Checkers.isStringEmpty) {
+      this.wavesurfer.load(this.props.src);
+    }
+
     this.wavesurfer.setPlaybackRate(this.state.speed);
 
     const self = this;
@@ -234,6 +247,7 @@ export default class Waveform extends React.Component {
     this.wavesurfer.on("region-created", reg => {
       const region = self.props.addRegion(reg);
       reg._region = region;
+      reg.color = region.selectedregionbg;
 
       reg.on("click", () => region.onClick(self.wavesurfer));
       reg.on("update-end", () => region.onUpdateEnd(self.wavesurfer));
@@ -258,9 +272,6 @@ export default class Waveform extends React.Component {
       };
     }
 
-    /**
-     *
-     */
     this.wavesurfer.on("ready", () => {
       self.props.onCreate(this.wavesurfer);
     });
@@ -309,6 +320,31 @@ export default class Waveform extends React.Component {
                 value={typeof this.state.speed === "number" ? this.state.speed : 1}
                 onChange={range => {
                   this.onChangeSpeed(range);
+                }}
+              />
+            </Col>
+          </Col>
+          <Col span={24}>
+            <Col span={12}>
+              Volume:{" "}
+              <InputNumber
+                min={0}
+                max={1}
+                value={this.state.volume}
+                step={0.1}
+                onChange={value => {
+                  this.onChangeVolume(value);
+                }}
+              />
+            </Col>
+            <Col span={24}>
+              <Slider
+                min={0}
+                max={1}
+                step={0.1}
+                value={typeof this.state.volume === "number" ? this.state.volume : 1}
+                onChange={value => {
+                  this.onChangeVolume(value);
                 }}
               />
             </Col>

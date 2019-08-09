@@ -8,6 +8,8 @@ import { guidGenerator, restoreNewsnapshot } from "../../core/Helpers";
 import { LabelsModel } from "../control/Labels";
 import { RatingModel } from "../control/Rating";
 
+import Utils from "../../utils";
+
 import { AudioPlusModel } from "./AudioPlus";
 
 const Model = types
@@ -16,22 +18,14 @@ const Model = types
     pid: types.optional(types.string, guidGenerator),
     start: types.number,
     end: types.number,
-
+    color: types.optional(types.string, "rgba(0, 0, 0, 0.1)"),
     states: types.maybeNull(types.array(types.union(LabelsModel, RatingModel))),
-    // regionbg: types.string,
-    // selectedregionbg: types.string
+    regionbg: types.optional(types.string, "rgba(0, 0, 0, 0.5)"),
+    selectedregionbg: types.optional(types.string, "rgba(0, 0, 0, 0.5)"),
   })
   .views(self => ({
     get parent() {
       return getParentOfType(self, AudioPlusModel);
-    },
-
-    get regionbg() {
-      return self.parent.regionbg;
-    },
-
-    get selectedregionbg() {
-      return self.parent.selectedregionbg;
     },
 
     get completion() {
@@ -77,14 +71,14 @@ const Model = types
 
     unselectRegion() {
       self.selected = false;
-      self._ws_region.update({ color: self.regionbg });
+      self._ws_region.update({ color: self.selectedregionbg });
       self.completion.setHighlightedNode(null);
     },
 
     selectRegion() {
       self.selected = true;
       self.completion.setHighlightedNode(self);
-      self._ws_region.update({ color: self.selectedregionbg });
+      self._ws_region.update({ color: self.selectedregionbg.replace(/[\d\.]+\)$/g, "0.8)") });
     },
 
     setHighlight(val) {
@@ -106,7 +100,7 @@ const Model = types
     onClick(wavesurfer) {
       if (!self.completion.relationMode) {
         Object.values(wavesurfer.regions.list).forEach(r => {
-          r.update({ color: self.regionbg });
+          r.update({ color: self.selectedregionbg });
         });
 
         self._ws_region.update({ color: self.selectedregionbg });

@@ -12,6 +12,8 @@ import { guidGenerator, restoreNewsnapshot } from "../../core/Helpers";
 import Waveform from "../../components/Waveform/Waveform";
 import ProcessAttrsMixin from "../mixins/ProcessAttrs";
 
+import Utils from "../../utils";
+
 import { AudioRegionModel } from "./AudioRegion";
 import styles from "./AudioPlus/AudioPlus.module.scss";
 
@@ -34,6 +36,7 @@ const TagAttrs = types.model({
   name: types.maybeNull(types.string),
   value: types.maybeNull(types.string),
   haszoom: types.optional(types.string, "true"),
+  volume: types.optional(types.number, 1),
   regionbg: types.optional(types.string, "rgba(0,0,0, 0.1)"),
   selectedregionbg: types.optional(types.string, "rgba(255,0,0,0.5)"),
   _value: types.optional(types.string, ""),
@@ -47,6 +50,7 @@ const Model = types
     regions: types.array(AudioRegionModel),
     rangeValue: types.optional(types.number, 20),
     playBackRate: types.optional(types.number, 1),
+    volume: types.optional(types.number, 1),
   })
   .views(self => ({
     get completion() {
@@ -100,7 +104,8 @@ const Model = types
 
       const clonedStates = states ? states.map(s => cloneNode(s)) : null;
 
-      const bgColor = states && states[0] ? states[0].getSelectedColor() : self.selectedregionbg;
+      const bgColor =
+        states && states[0] ? Utils.Colors.convertToRGBA(states[0].getSelectedColor(), 0.3) : self.selectedregionbg;
 
       const r = AudioRegionModel.create({
         id: guidGenerator(),
@@ -165,6 +170,7 @@ const HtxAudioView = observer(({ store, item }) => {
         speed={item.playBackRate}
         haszoom={item.haszoom}
         zoom={item.rangeValue}
+        volume={item.volume}
       />
 
       <div style={{ display: "flex", justifyContent: "space-between", marginTop: "1em" }}>
