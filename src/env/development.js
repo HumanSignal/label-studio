@@ -57,8 +57,6 @@ function templateDynamicData() {
           config: r,
         };
 
-        console.log(settings);
-
         return settings;
       });
 

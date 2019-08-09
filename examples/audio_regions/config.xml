@@ -1,7 +1,7 @@
 <View>
   <Header value="Select its topic:"></Header>
   <Labels name="label" toName="audio">
-    <Label value="Politics"></Label>
+    <Label value="Politics" background="yellow"></Label>
     <Label value="Business"></Label>
     <Label value="Education"></Label>
     <Label value="Other"></Label>

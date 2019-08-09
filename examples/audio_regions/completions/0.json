@@ -1,0 +1,41 @@
+{
+    "completions": [
+        {
+            "result": [
+                {
+                    "from_name": "label",
+                    "id": "vcFOxHkOZ9",
+                    "source": "$url",
+                    "to_name": "audio",
+                    "type": "labels",
+                    "value": {
+                        "end": 1.6009986263736264,
+                        "labels": [
+                            "Politics"
+                        ],
+                        "start": 0.8751572802197802
+                    }
+                },
+                {
+                    "from_name": "label",
+                    "id": "7FwUCgjH-s",
+                    "source": "$url",
+                    "to_name": "audio",
+                    "type": "labels",
+                    "value": {
+                        "end": 2.4471222527472527,
+                        "labels": [
+                            "Business"
+                        ],
+                        "start": 1.7129855769230768
+                    }
+                }
+            ]
+        }
+    ],
+    "data": {
+        "url": "https://go.heartex.net/static/samples/game.wav"
+    },
+    "id": 0,
+    "task_path": "../examples/audio_regions/tasks.json"
+}

@@ -31,15 +31,16 @@ import styles from "./AudioPlus/AudioPlus.module.scss";
  * @param {boolean} hasZoom speficy if audio has zoom functionality
  * @param {string} regionBG region color
  * @param {string} selectedRegionBG selected region background
+ * @param {number} volume from 0 to 1
+ * @param {number} speed from 0.5 to 3
  */
 const TagAttrs = types.model({
   name: types.maybeNull(types.string),
   value: types.maybeNull(types.string),
+  _value: types.optional(types.string, ""),
   haszoom: types.optional(types.string, "true"),
   volume: types.optional(types.number, 1),
-  regionbg: types.optional(types.string, "rgba(0,0,0, 0.1)"),
-  selectedregionbg: types.optional(types.string, "rgba(255,0,0,0.5)"),
-  _value: types.optional(types.string, ""),
+  speed: types.optional(types.number, 1),
 });
 
 const Model = types
@@ -49,8 +50,6 @@ const Model = types
     playing: types.optional(types.boolean, false),
     regions: types.array(AudioRegionModel),
     rangeValue: types.optional(types.number, 20),
-    playBackRate: types.optional(types.number, 1),
-    volume: types.optional(types.number, 1),
   })
   .views(self => ({
     get completion() {
@@ -71,6 +70,9 @@ const Model = types
       return self.regions.map(r => r.toStateJSON());
     },
 
+    /**
+     * Find region of audio
+     */
     findRegion(start, end) {
       return self.regions.find(r => r.start === start && r.end === end);
     },
@@ -79,9 +81,10 @@ const Model = types
       self.findRegion(obj.value.start, obj.value.end);
       restoreNewsnapshot(fromModel);
 
-      self._ws.addRegion({
+      self.addRegion({
         start: obj.value.start,
         end: obj.value.end,
+        labels: obj.value.labels,
       });
     },
 
@@ -95,6 +98,7 @@ const Model = types
 
     addRegion(ws_region) {
       const find_r = self.findRegion(ws_region.start, ws_region.end);
+
       if (self.findRegion(ws_region.start, ws_region.end)) {
         find_r._ws_region = ws_region;
         return find_r;
@@ -114,6 +118,7 @@ const Model = types
         regionbg: self.regionbg,
         selectedregionbg: bgColor,
         states: clonedStates,
+        labels: ws_region.labels,
       });
 
       r._ws_region = ws_region;
@@ -121,7 +126,6 @@ const Model = types
       self.regions.push(r);
       self.completion.addRegion(r);
 
-      // r.selectRegion();
       states && states.forEach(s => s.unselectAll());
 
       return r;
@@ -158,6 +162,8 @@ const AudioPlusModel = types.compose(
 );
 
 const HtxAudioView = observer(({ store, item }) => {
+  if (!item._value) return null;
+
   return (
     <div>
       <Waveform
@@ -167,7 +173,7 @@ const HtxAudioView = observer(({ store, item }) => {
         onCreate={item.wsCreated}
         addRegion={item.addRegion}
         onLoad={item.onLoad}
-        speed={item.playBackRate}
+        speed={item.speed}
         haszoom={item.haszoom}
         zoom={item.rangeValue}
         volume={item.volume}

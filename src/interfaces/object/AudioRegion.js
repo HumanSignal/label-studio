@@ -8,8 +8,6 @@ import { guidGenerator, restoreNewsnapshot } from "../../core/Helpers";
 import { LabelsModel } from "../control/Labels";
 import { RatingModel } from "../control/Rating";
 
-import Utils from "../../utils";
-
 import { AudioPlusModel } from "./AudioPlus";
 
 const Model = types
@@ -18,9 +16,9 @@ const Model = types
     pid: types.optional(types.string, guidGenerator),
     start: types.number,
     end: types.number,
-    color: types.optional(types.string, "rgba(0, 0, 0, 0.1)"),
+    color: types.optional(types.string, "rgba(0, 0, 0, 0.2)"),
     states: types.maybeNull(types.array(types.union(LabelsModel, RatingModel))),
-    regionbg: types.optional(types.string, "rgba(0, 0, 0, 0.5)"),
+    regionbg: types.optional(types.string, "rgba(0, 0, 0, 0.1)"),
     selectedregionbg: types.optional(types.string, "rgba(0, 0, 0, 0.5)"),
   })
   .views(self => ({
@@ -38,12 +36,10 @@ const Model = types
       const buildTree = obj => {
         const tree = {
           id: self.pid,
-          // type: getType(s).name,
           from_name: obj.name,
           to_name: parent.name,
           source: parent.value,
           type: "region",
-          // text: parent.text,
           value: {
             start: self.start,
             end: self.end,
@@ -69,26 +65,32 @@ const Model = types
       }
     },
 
-    unselectRegion() {
+    /**
+     * Unselect audio region
+     */
+    unselectRegion(t) {
       self.selected = false;
-      self._ws_region.update({ color: self.selectedregionbg });
       self.completion.setHighlightedNode(null);
+      // self._ws_region.update({ regionbg: self.selectedregionbg });
     },
 
+    /**
+     * Select audio region
+     */
     selectRegion() {
       self.selected = true;
       self.completion.setHighlightedNode(self);
-      self._ws_region.update({ color: self.selectedregionbg.replace(/[\d\.]+\)$/g, "0.8)") });
+      self._ws_region.update({ regionbg: self.selectedregionbg.replace(/[\d\.]+\)$/g, "0.8)") });
     },
 
     setHighlight(val) {
       self.highlighted = val;
 
       if (val) {
-        // self._ws_region.update({ color: self.selectedregionbg });
+        self._ws_region.update({ color: self.selectedregionbg.replace(/[\d\.]+\)$/g, "0.8)") });
         self._ws_region.element.style.border = "2px solid red";
       } else {
-        // self._ws_region.update({ color: self.regionbg });
+        self._ws_region.update({ color: self.regionbg });
         self._ws_region.element.style.border = "none";
       }
     },
@@ -107,7 +109,6 @@ const Model = types
       }
 
       self.onClickRegion();
-      // self.props.clickRegion(reg._range);
     },
 
     onMouseOver() {
@@ -127,17 +128,6 @@ const Model = types
     onUpdateEnd(wavesurfer) {
       self.start = self._ws_region.start;
       self.end = self._ws_region.end;
-
-      // console.log(self._ws_region.style());
-
-      // console.log(self.start);
-      // console.log(self.end);
-
-      // Object.values(wavesurfer.regions.list).forEach((r) => {
-      //     r.update({ color: self.regionbg });
-      // });
-
-      // self._ws_region.update({ color: self.selectedregionbg });
     },
   }));
 

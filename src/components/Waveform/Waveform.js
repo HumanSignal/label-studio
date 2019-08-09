@@ -5,8 +5,6 @@ import RegionsPlugin from "wavesurfer.js/dist/plugin/wavesurfer.regions.min.js";
 import TimelinePlugin from "wavesurfer.js/dist/plugin/wavesurfer.timeline.min.js";
 import CursorPlugin from "wavesurfer.js/dist/plugin/wavesurfer.cursor";
 import { Slider, InputNumber, Row, Col } from "antd";
-import a from "../../assets/audio/a.wav";
-import Utils from "../../utils";
 
 import styles from "./Waveform.module.scss";
 
@@ -219,10 +217,14 @@ export default class Waveform extends React.Component {
       ],
     });
 
-    if (!Utils.Checkers.isStringEmpty) {
-      this.wavesurfer.load(this.props.src);
-    }
+    /**
+     * Load data
+     */
+    this.wavesurfer.load(this.props.src);
 
+    /**
+     * Speed of waveform
+     */
     this.wavesurfer.setPlaybackRate(this.state.speed);
 
     const self = this;
@@ -242,7 +244,7 @@ export default class Waveform extends React.Component {
     });
 
     /**
-     *
+     * Add region to wave
      */
     this.wavesurfer.on("region-created", reg => {
       const region = self.props.addRegion(reg);
@@ -355,7 +357,7 @@ export default class Waveform extends React.Component {
                 Zoom:{" "}
                 <InputNumber
                   min={20}
-                  max={200}
+                  max={500}
                   value={this.state.zoom}
                   onChange={value => {
                     this.onChangeZoom(value);
@@ -366,7 +368,7 @@ export default class Waveform extends React.Component {
                 <Slider
                   min={20}
                   step={10}
-                  max={200}
+                  max={500}
                   value={typeof this.state.zoom === "number" ? this.state.zoom : 0}
                   onChange={value => {
                     this.onChangeZoom(value);
