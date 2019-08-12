@@ -9,9 +9,10 @@ import { LabelsModel } from "../control/Labels";
 import { RatingModel } from "../control/Rating";
 
 import { AudioPlusModel } from "./AudioPlus";
+import Utils from "../../utils";
 
 const Model = types
-  .model({
+  .model("AudioRegionModel", {
     id: types.optional(types.identifier, guidGenerator),
     pid: types.optional(types.string, guidGenerator),
     start: types.number,
@@ -31,6 +32,9 @@ const Model = types
     },
   }))
   .actions(self => ({
+    /**
+     * When you try to send completion
+     */
     toStateJSON() {
       const parent = self.parent;
       const buildTree = obj => {
@@ -66,31 +70,33 @@ const Model = types
     },
 
     /**
-     * Unselect audio region
-     */
-    unselectRegion(t) {
-      self.selected = false;
-      self.completion.setHighlightedNode(null);
-      // self._ws_region.update({ regionbg: self.selectedregionbg });
-    },
-
-    /**
      * Select audio region
      */
     selectRegion() {
       self.selected = true;
       self.completion.setHighlightedNode(self);
-      self._ws_region.update({ regionbg: self.selectedregionbg.replace(/[\d\.]+\)$/g, "0.8)") });
+      self._ws_region.update({ color: Utils.Colors.rgbaChangeAlpha(self.selectedregionbg, 0.8) });
+    },
+
+    /**
+     * Unselect audio region
+     */
+    unselectRegion() {
+      self.selected = false;
+      self.completion.setHighlightedNode(null);
+      if (self._ws_region.update) {
+        self._ws_region.update({ color: self.selectedregionbg });
+      }
     },
 
     setHighlight(val) {
       self.highlighted = val;
 
       if (val) {
-        self._ws_region.update({ color: self.selectedregionbg.replace(/[\d\.]+\)$/g, "0.8)") });
+        self._ws_region.update({ color: Utils.Colors.rgbaChangeAlpha(self.selectedregionbg, 0.8) });
         self._ws_region.element.style.border = "2px solid red";
       } else {
-        self._ws_region.update({ color: self.regionbg });
+        self._ws_region.update({ color: self.selectedregionbg });
         self._ws_region.element.style.border = "none";
       }
     },
@@ -101,11 +107,11 @@ const Model = types
 
     onClick(wavesurfer) {
       if (!self.completion.relationMode) {
-        Object.values(wavesurfer.regions.list).forEach(r => {
-          r.update({ color: self.selectedregionbg });
-        });
+        // Object.values(wavesurfer.regions.list).forEach(r => {
+        //   // r.update({ color: self.selectedregionbg });
+        // });
 
-        self._ws_region.update({ color: self.selectedregionbg });
+        self._ws_region.update({ color: Utils.Colors.rgbaChangeAlpha(self.selectedregionbg, 0.8) });
       }
 
       self.onClickRegion();

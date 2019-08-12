@@ -1,6 +1,6 @@
 import React, { Fragment } from "react";
 
-import { types, getRoot } from "mobx-state-tree";
+import { types, getRoot, getType } from "mobx-state-tree";
 import { observer, inject } from "mobx-react";
 import { Button, Icon, Slider, Row, Col } from "antd";
 
@@ -37,21 +37,26 @@ import styles from "./AudioPlus/AudioPlus.module.scss";
 const TagAttrs = types.model({
   name: types.maybeNull(types.string),
   value: types.maybeNull(types.string),
-  _value: types.optional(types.string, ""),
   haszoom: types.optional(types.string, "true"),
   volume: types.optional(types.number, 1),
   speed: types.optional(types.number, 1),
 });
 
 const Model = types
-  .model({
+  .model("AudioPlusModel", {
     id: types.identifier,
     type: "audio",
+    _value: types.optional(types.string, ""),
     playing: types.optional(types.boolean, false),
     regions: types.array(AudioRegionModel),
     rangeValue: types.optional(types.number, 20),
   })
   .views(self => ({
+    get hasStates() {
+      const states = self.states();
+      return states && states.length > 0;
+    },
+
     get completion() {
       return getRoot(self).completionStore.selected;
     },
@@ -62,7 +67,9 @@ const Model = types
 
     activeStates() {
       const states = self.states();
-      return states ? states.filter(s => s.isSelected) : null;
+      return states
+        ? states.filter(s => s.isSelected && (getType(s).name === "LabelsModel" || getType(s).name === "RatingModel"))
+        : null;
     },
   }))
   .actions(self => ({
@@ -74,18 +81,36 @@ const Model = types
      * Find region of audio
      */
     findRegion(start, end) {
-      return self.regions.find(r => r.start === start && r.end === end);
+      let findedRegion = self.regions.find(r => r.start === start && r.end === end);
+      return findedRegion;
     },
 
     fromStateJSON(obj, fromModel) {
-      self.findRegion(obj.value.start, obj.value.end);
-      restoreNewsnapshot(fromModel);
+      let r;
 
-      self.addRegion({
+      const tree = {
+        pid: obj.id,
         start: obj.value.start,
         end: obj.value.end,
-        labels: obj.value.labels,
-      });
+      };
+
+      if (obj.value.labels) {
+        self.completion.names.get(obj.from_name).fromStateJSON(obj);
+      }
+
+      const region = self.findRegion(obj.value.start, obj.value.end);
+      const m = restoreNewsnapshot(fromModel);
+
+      m.fromStateJSON(obj);
+
+      if (!region) {
+        tree.states = [m];
+        r = self.addRegion(tree);
+      } else {
+        region.states.push(m);
+      }
+
+      return r;
     },
 
     setRangeValue(val) {
@@ -97,6 +122,14 @@ const Model = types
     },
 
     addRegion(ws_region) {
+      const states = self.activeStates();
+
+      const clonedStates = states
+        ? states.map(s => {
+            return cloneNode(s);
+          })
+        : null;
+
       const find_r = self.findRegion(ws_region.start, ws_region.end);
 
       if (self.findRegion(ws_region.start, ws_region.end)) {
@@ -104,21 +137,17 @@ const Model = types
         return find_r;
       }
 
-      const states = self.activeStates();
-
-      const clonedStates = states ? states.map(s => cloneNode(s)) : null;
-
       const bgColor =
         states && states[0] ? Utils.Colors.convertToRGBA(states[0].getSelectedColor(), 0.3) : self.selectedregionbg;
 
       const r = AudioRegionModel.create({
-        id: guidGenerator(),
+        id: ws_region.id ? ws_region.id : guidGenerator(),
+        pid: ws_region.pid ? ws_region.pid : guidGenerator(),
         start: ws_region.start,
         end: ws_region.end,
         regionbg: self.regionbg,
         selectedregionbg: bgColor,
         states: clonedStates,
-        labels: ws_region.labels,
       });
 
       r._ws_region = ws_region;
@@ -207,4 +236,4 @@ const HtxAudioPlus = inject("store")(observer(HtxAudioView));
 
 Registry.addTag("audioplus", AudioPlusModel, HtxAudioPlus);
 
-export { AudioPlusModel, AudioRegionModel, HtxAudioPlus };
+export { AudioRegionModel, AudioPlusModel, HtxAudioPlus };

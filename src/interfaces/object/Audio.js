@@ -42,7 +42,6 @@ const Model = types
   .model({
     id: types.optional(types.identifier, guidGenerator),
     type: "audio",
-
     _value: types.optional(types.string, ""),
   })
   .views(self => ({
