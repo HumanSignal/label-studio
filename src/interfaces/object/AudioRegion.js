@@ -17,9 +17,7 @@ const Model = types
     pid: types.optional(types.string, guidGenerator),
     start: types.number,
     end: types.number,
-    color: types.optional(types.string, "rgba(0, 0, 0, 0.2)"),
     states: types.maybeNull(types.array(types.union(LabelsModel, RatingModel))),
-    regionbg: types.optional(types.string, "rgba(0, 0, 0, 0.1)"),
     selectedregionbg: types.optional(types.string, "rgba(0, 0, 0, 0.5)"),
   })
   .views(self => ({
@@ -99,6 +97,10 @@ const Model = types
         self._ws_region.update({ color: self.selectedregionbg });
         self._ws_region.element.style.border = "none";
       }
+    },
+
+    setNormalization(val) {
+      // console.log(val)
     },
 
     beforeDestroy() {

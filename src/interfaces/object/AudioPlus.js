@@ -92,6 +92,7 @@ const Model = types
         pid: obj.id,
         start: obj.value.start,
         end: obj.value.end,
+        normalization: obj.normalization,
       };
 
       if (obj.value.labels) {
@@ -136,6 +137,16 @@ const Model = types
         find_r._ws_region = ws_region;
         return find_r;
       }
+
+      /**
+       * TODO
+       * New function for sum some RGBA colors
+       */
+      // let sumRGBA = [];
+
+      // states[0].getSelectedNames().map(region => {
+      //   sumRGBA.push(states[0].findLabel(region).background)
+      // })
 
       const bgColor =
         states && states[0] ? Utils.Colors.convertToRGBA(states[0].getSelectedColor(), 0.3) : self.selectedregionbg;

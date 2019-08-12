@@ -4,31 +4,55 @@
             "result": [
                 {
                     "from_name": "label",
-                    "id": "vcFOxHkOZ9",
+                    "id": "mCLSGNsQJB",
                     "source": "$url",
                     "to_name": "audio",
                     "type": "labels",
                     "value": {
-                        "end": 1.6009986263736264,
+                        "end": 0.6802172883805536,
                         "labels": [
-                            "Politics"
+                            "Politics",
+                            "Business",
+                            "Education",
+                            "Other"
                         ],
-                        "start": 0.8751572802197802
+                        "start": 0.41476663925643514
                     }
                 },
                 {
                     "from_name": "label",
-                    "id": "7FwUCgjH-s",
+                    "id": "V_cGBu-tdJ",
+                    "normalization": "Test NORM",
                     "source": "$url",
                     "to_name": "audio",
                     "type": "labels",
                     "value": {
-                        "end": 2.4471222527472527,
+                        "end": 1.5263412324636814,
                         "labels": [
-                            "Business"
+                            "Business",
+                            "Education"
                         ],
-                        "start": 1.7129855769230768
+                        "start": 0.8627146096533851
                     }
+                },
+                {
+                    "from_name": "label",
+                    "id": "z1PvXezFlv",
+                    "source": "$url",
+                    "to_name": "audio",
+                    "type": "labels",
+                    "value": {
+                        "end": 1.854006877476265,
+                        "labels": [
+                            "Education"
+                        ],
+                        "start": 1.1820849218808402
+                    }
+                },
+                {
+                    "from_id": "mCLSGNsQJB",
+                    "to_id": "z1PvXezFlv",
+                    "type": "relation"
                 }
             ]
         }
