@@ -72,15 +72,35 @@ class Completions extends Component {
   render() {
     const { store } = this.props;
 
-    return (
-      <Card title="Completions" bodyStyle={{ padding: 0 }}>
-        <List divided relaxed>
-          {store.completionStore.savedCompletions.map(c => (
-            <Completion key={c.id} item={c} store={store} />
-          ))}
-        </List>
-      </Card>
-    );
+    // calculate useful completions
+    let count = 0;
+    store.completionStore.savedCompletions.map((c) => {
+        count += c.pk > 0;
+    });
+
+    // no completions
+    if (count === 0) {
+        return (
+          <Card title="Completions">
+            <List divided relaxed>
+              <p>No completions submitted yet</p>
+            </List>
+          </Card>
+        );
+    }
+
+    // show completions
+    else {
+        return (
+          <Card title="Completions" bodyStyle={{padding: 0}}>
+            <List divided relaxed>
+              {store.completionStore.savedCompletions.map(c => (
+                c.pk > 0 && <Completion key={c.id} item={c} store={store}/>
+              ))}
+            </List>
+          </Card>
+        );
+    }
   }
 }
 

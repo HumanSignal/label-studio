@@ -240,6 +240,8 @@ export default types
             c.beforeSend();
             const res = c.serializeCompletion();
 
+            console.log(c)
+
             if (self.hasInterface("submit:check-empty") && res.length === 0) {
                 alert("You need to label at least something!");
                 return;
@@ -275,12 +277,12 @@ export default types
         }
 
         /* Send (post) completion on server */
-        const sendTask = flow(function* sendTask() {
+        const sendTask = flow(function sendTask() {
             return sendToServer(false);
         });
 
         /* Rewrite (patch) completion on server */
-        const rewriteTask = flow(function* rewriteTask() {
+        const rewriteTask = flow(function rewriteTask() {
             return sendToServer(true);
         });
 

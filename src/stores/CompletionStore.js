@@ -17,7 +17,7 @@ import * as HtxObjectModel from "../interfaces/object";
 const Completion = types
   .model("Completion", {
     id: types.identifier,
-    pk: types.optional(types.integer, 1),
+    pk: types.optional(types.integer, -1),
     selected: types.optional(types.boolean, false),
 
     createdDate: types.optional(types.string, new Date().toISOString()),
@@ -279,7 +279,7 @@ export default types
      * Get only those that were saved
      */
     get savedCompletions() {
-      return self.completions.filter(c => !c.was_generated);
+      return self.completions;
     },
   }))
   .actions(self => {
@@ -303,7 +303,7 @@ export default types
     function addCompletion(node, type) {
       const c = Completion.create(node);
 
-      if (self.store.task && type == "initial")
+      if (self.store.task && type === "initial")
         c.traverseTree(node => node.updateValue && node.updateValue(self.store));
 
       self.completions.push(c);
@@ -377,7 +377,6 @@ export default types
       }
 
       let completion = self.addCompletion(node, "initial");
-
       return completion;
     }
 
