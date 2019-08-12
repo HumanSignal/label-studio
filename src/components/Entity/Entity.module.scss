@@ -1,12 +1,13 @@
 .block {
   display: flex;
-  flex-flow: column;
   justify-content: flex-start;
   align-items: flex-start;
+  flex-wrap: wrap;
 }
 
 .button {
   margin-bottom: 10px;
+  margin-right: 10px;
 }
 
 .labels {
@@ -14,5 +15,5 @@
 }
 
 .tag {
-  margin-left: 10px;
+  margin-bottom: 5px;
 }

@@ -42,7 +42,6 @@ const Model = types
   .model({
     id: types.optional(types.identifier, guidGenerator),
     type: "audio",
-
     _value: types.optional(types.string, ""),
   })
   .views(self => ({
@@ -77,7 +76,7 @@ const HtxAudioView = observer(({ store, item }) => {
 
   return (
     <div>
-      <audio controls>
+      <audio controls style={{ width: "100%" }}>
         <source src={item._value} type="audio/mpeg" />
         Your browser does not support the audio element.
       </audio>

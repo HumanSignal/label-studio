@@ -36,3 +36,6 @@ Desktop.ini
 
 # Testing
 coverage/
+
+# Examples of local env
+src/examples

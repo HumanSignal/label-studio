@@ -10,13 +10,13 @@ import styles from "./Entity.module.scss";
 
 const templateElement = element => {
   return (
-    <div key={element.id} className={styles.labels}>
-      Labels:
+    <div key={element.pid} className={styles.labels}>
+      Labels:&nbsp;
       {element.getSelectedNames().map(title => {
-        let bgColor = element.getSelectedColor() ? element.getSelectedColor() : "#000000";
+        let bgColor = element.findLabel(title).background ? element.findLabel(title).background : "#000000";
 
         return (
-          <Tag key={element.id} color={bgColor} className={styles.tag}>
+          <Tag key={element.findLabel(title).id} color={bgColor} className={styles.tag}>
             {title}
           </Tag>
         );

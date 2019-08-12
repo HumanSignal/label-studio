@@ -1,13 +1,12 @@
 {
   "name": "label-studio",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "private": true,
   "description": "Label Studio is a multi-domain data labeling tool with standardized output format",
   "author": {
     "name": "Heartex",
     "url": "https://github.com/heartexlabs"
   },
-  "homepage": "https://github.com/heartexlabs/label-studio",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -53,7 +52,7 @@
     "wavesurfer.js": "^3.0.0"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "npm run copy-examples && react-scripts start",
     "only-build": "react-scripts build",
     "local": "npm run only-build && npm run start",
     "build": "npm run test && react-scripts build",
@@ -67,7 +66,8 @@
     "prettier-styles": "prettier --write src/**/*.{css,scss}",
     "lint": "eslint --debug src/",
     "lint:write": "eslint --debug src/ --fix",
-    "publish": "GENERATE_SOURCEMAP=false npm run build"
+    "publish": "npm run copy-examples && GENERATE_SOURCEMAP=false npm run build",
+    "copy-examples": "bash scripts/copy.sh"
   },
   "eslintConfig": {
     "extends": "react-app"

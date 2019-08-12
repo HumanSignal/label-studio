@@ -9,29 +9,20 @@ import { LabelsModel } from "../control/Labels";
 import { RatingModel } from "../control/Rating";
 
 import { AudioPlusModel } from "./AudioPlus";
+import Utils from "../../utils";
 
 const Model = types
-  .model({
+  .model("AudioRegionModel", {
     id: types.optional(types.identifier, guidGenerator),
     pid: types.optional(types.string, guidGenerator),
     start: types.number,
     end: types.number,
-
     states: types.maybeNull(types.array(types.union(LabelsModel, RatingModel))),
-    // regionbg: types.string,
-    // selectedregionbg: types.string
+    selectedregionbg: types.optional(types.string, "rgba(0, 0, 0, 0.5)"),
   })
   .views(self => ({
     get parent() {
       return getParentOfType(self, AudioPlusModel);
-    },
-
-    get regionbg() {
-      return self.parent.regionbg;
-    },
-
-    get selectedregionbg() {
-      return self.parent.selectedregionbg;
     },
 
     get completion() {
@@ -39,17 +30,18 @@ const Model = types
     },
   }))
   .actions(self => ({
+    /**
+     * When you try to send completion
+     */
     toStateJSON() {
       const parent = self.parent;
       const buildTree = obj => {
         const tree = {
           id: self.pid,
-          // type: getType(s).name,
           from_name: obj.name,
           to_name: parent.name,
           source: parent.value,
           type: "region",
-          // text: parent.text,
           value: {
             start: self.start,
             end: self.end,
@@ -75,28 +67,40 @@ const Model = types
       }
     },
 
-    unselectRegion() {
-      self.selected = false;
-      self._ws_region.update({ color: self.regionbg });
-      self.completion.setHighlightedNode(null);
-    },
-
+    /**
+     * Select audio region
+     */
     selectRegion() {
       self.selected = true;
       self.completion.setHighlightedNode(self);
-      self._ws_region.update({ color: self.selectedregionbg });
+      self._ws_region.update({ color: Utils.Colors.rgbaChangeAlpha(self.selectedregionbg, 0.8) });
+    },
+
+    /**
+     * Unselect audio region
+     */
+    unselectRegion() {
+      self.selected = false;
+      self.completion.setHighlightedNode(null);
+      if (self._ws_region.update) {
+        self._ws_region.update({ color: self.selectedregionbg });
+      }
     },
 
     setHighlight(val) {
       self.highlighted = val;
 
       if (val) {
-        // self._ws_region.update({ color: self.selectedregionbg });
+        self._ws_region.update({ color: Utils.Colors.rgbaChangeAlpha(self.selectedregionbg, 0.8) });
         self._ws_region.element.style.border = "2px solid red";
       } else {
-        // self._ws_region.update({ color: self.regionbg });
+        self._ws_region.update({ color: self.selectedregionbg });
         self._ws_region.element.style.border = "none";
       }
+    },
+
+    setNormalization(val) {
+      // console.log(val)
     },
 
     beforeDestroy() {
@@ -105,15 +109,14 @@ const Model = types
 
     onClick(wavesurfer) {
       if (!self.completion.relationMode) {
-        Object.values(wavesurfer.regions.list).forEach(r => {
-          r.update({ color: self.regionbg });
-        });
+        // Object.values(wavesurfer.regions.list).forEach(r => {
+        //   // r.update({ color: self.selectedregionbg });
+        // });
 
-        self._ws_region.update({ color: self.selectedregionbg });
+        self._ws_region.update({ color: Utils.Colors.rgbaChangeAlpha(self.selectedregionbg, 0.8) });
       }
 
       self.onClickRegion();
-      // self.props.clickRegion(reg._range);
     },
 
     onMouseOver() {
@@ -133,17 +136,6 @@ const Model = types
     onUpdateEnd(wavesurfer) {
       self.start = self._ws_region.start;
       self.end = self._ws_region.end;
-
-      // console.log(self._ws_region.style());
-
-      // console.log(self.start);
-      // console.log(self.end);
-
-      // Object.values(wavesurfer.regions.list).forEach((r) => {
-      //     r.update({ color: self.regionbg });
-      // });
-
-      // self._ws_region.update({ color: self.selectedregionbg });
     },
   }));
 

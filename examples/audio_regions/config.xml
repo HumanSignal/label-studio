@@ -1,11 +1,11 @@
 <View>
-  <Header value="Listen the audio:"></Header>
-  <AudioPlus name="audio" value="$url"></AudioPlus>
   <Header value="Select its topic:"></Header>
-  <Labels name="label" toName="audio">
-    <Label value="Politics"></Label>
-    <Label value="Business"></Label>
-    <Label value="Education"></Label>
+  <Labels name="label" toName="audio" choice="multiple">
+    <Label value="Politics" background="yellow"></Label>
+    <Label value="Business" background="red"></Label>
+    <Label value="Education" background="blue"></Label>
     <Label value="Other"></Label>
   </Labels>
+  <Header value="Listen the audio:"></Header>
+  <AudioPlus name="audio" value="$url"></AudioPlus>
 </View>

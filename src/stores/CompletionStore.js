@@ -9,6 +9,7 @@ import TimeTraveller from "../core/TimeTraveller";
 import Hotkey from "../core/Hotkey";
 
 import RelationStore from "./RelationStore";
+import NormalizationStore from "./NormalizationStore";
 import RegionStore from "./RegionStore";
 import { RectangleModel } from "../interfaces/control/Rectangle";
 
@@ -40,9 +41,9 @@ const Completion = types
     }),
 
     normalizationMode: types.optional(types.boolean, false),
-    // normalizationStore: types.optional(NormalizationStore, {
-    //     normalizations: []
-    // }),
+    normalizationStore: types.optional(NormalizationStore, {
+      normalizations: [],
+    }),
 
     regionStore: types.optional(RegionStore, {
       regions: [],
@@ -125,6 +126,10 @@ const Completion = types
      */
     addRelation(reg) {
       self.relationStore.addRelation(self._relationObj, reg);
+    },
+
+    addNormalization(normalization) {
+      self.normalizationStore.addNormalization();
     },
 
     /**
@@ -287,9 +292,7 @@ export default types
       self.completions.map(c => (c.selected = false));
       const c = self.completions.find(c => c.id === id);
 
-      // [FIXME]
-      // if (self.selected && self.selected.id !== c.id)
-      //     c.history.reset();
+      // if (self.selected && self.selected.id !== c.id) c.history.reset();
 
       c.selected = true;
       self.selected = c;

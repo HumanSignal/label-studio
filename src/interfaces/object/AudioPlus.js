@@ -1,8 +1,8 @@
 import React, { Fragment } from "react";
 
-import { types, getRoot } from "mobx-state-tree";
+import { types, getRoot, getType } from "mobx-state-tree";
 import { observer, inject } from "mobx-react";
-import { Button, Icon } from "antd";
+import { Button, Icon, Slider, Row, Col } from "antd";
 
 import { cloneNode } from "../../core/Helpers";
 import Registry from "../../core/Registry";
@@ -12,7 +12,10 @@ import { guidGenerator, restoreNewsnapshot } from "../../core/Helpers";
 import Waveform from "../../components/Waveform/Waveform";
 import ProcessAttrsMixin from "../mixins/ProcessAttrs";
 
+import Utils from "../../utils";
+
 import { AudioRegionModel } from "./AudioRegion";
+import styles from "./AudioPlus/AudioPlus.module.scss";
 
 /**
  * AudioPlus tag plays audio and shows its wave
@@ -28,25 +31,32 @@ import { AudioRegionModel } from "./AudioRegion";
  * @param {boolean} hasZoom speficy if audio has zoom functionality
  * @param {string} regionBG region color
  * @param {string} selectedRegionBG selected region background
+ * @param {number} volume from 0 to 1
+ * @param {number} speed from 0.5 to 3
  */
 const TagAttrs = types.model({
   name: types.maybeNull(types.string),
   value: types.maybeNull(types.string),
   haszoom: types.optional(types.string, "true"),
-  regionbg: types.optional(types.string, "rgba(0,0,0, 0.1)"),
-  selectedregionbg: types.optional(types.string, "rgba(255,0,0,0.5)"),
-  _value: types.optional(types.string, ""),
+  volume: types.optional(types.number, 1),
+  speed: types.optional(types.number, 1),
 });
 
 const Model = types
-  .model({
+  .model("AudioPlusModel", {
     id: types.identifier,
     type: "audio",
+    _value: types.optional(types.string, ""),
     playing: types.optional(types.boolean, false),
     regions: types.array(AudioRegionModel),
-    rangeValue: types.optional(types.string, "20"),
+    rangeValue: types.optional(types.number, 20),
   })
   .views(self => ({
+    get hasStates() {
+      const states = self.states();
+      return states && states.length > 0;
+    },
+
     get completion() {
       return getRoot(self).completionStore.selected;
     },
@@ -57,7 +67,9 @@ const Model = types
 
     activeStates() {
       const states = self.states();
-      return states ? states.filter(s => s.isSelected) : null;
+      return states
+        ? states.filter(s => s.isSelected && (getType(s).name === "LabelsModel" || getType(s).name === "RatingModel"))
+        : null;
     },
   }))
   .actions(self => ({
@@ -65,43 +77,87 @@ const Model = types
       return self.regions.map(r => r.toStateJSON());
     },
 
+    /**
+     * Find region of audio
+     */
     findRegion(start, end) {
-      return self.regions.find(r => r.start === start && r.end === end);
+      let findedRegion = self.regions.find(r => r.start === start && r.end === end);
+      return findedRegion;
     },
 
     fromStateJSON(obj, fromModel) {
-      self.findRegion(obj.value.start, obj.value.end);
-      restoreNewsnapshot(fromModel);
+      let r;
 
-      self._ws.addRegion({
+      const tree = {
+        pid: obj.id,
         start: obj.value.start,
         end: obj.value.end,
-      });
+        normalization: obj.normalization,
+      };
+
+      if (obj.value.labels) {
+        self.completion.names.get(obj.from_name).fromStateJSON(obj);
+      }
+
+      const region = self.findRegion(obj.value.start, obj.value.end);
+      const m = restoreNewsnapshot(fromModel);
+
+      m.fromStateJSON(obj);
+
+      if (!region) {
+        tree.states = [m];
+        r = self.addRegion(tree);
+      } else {
+        region.states.push(m);
+      }
+
+      return r;
     },
 
     setRangeValue(val) {
       self.rangeValue = val;
     },
 
+    setPlaybackRate(val) {
+      self.playBackRate = val;
+    },
+
     addRegion(ws_region) {
+      const states = self.activeStates();
+
+      const clonedStates = states
+        ? states.map(s => {
+            return cloneNode(s);
+          })
+        : null;
+
       const find_r = self.findRegion(ws_region.start, ws_region.end);
+
       if (self.findRegion(ws_region.start, ws_region.end)) {
         find_r._ws_region = ws_region;
         return find_r;
       }
 
-      const states = self.activeStates();
+      /**
+       * TODO
+       * New function for sum some RGBA colors
+       */
+      // let sumRGBA = [];
 
-      const clonedStates = states ? states.map(s => cloneNode(s)) : null;
+      // states[0].getSelectedNames().map(region => {
+      //   sumRGBA.push(states[0].findLabel(region).background)
+      // })
 
-      // const bgColor = states ? states[0].getSelectedColor() : self.selectedregionbg;
+      const bgColor =
+        states && states[0] ? Utils.Colors.convertToRGBA(states[0].getSelectedColor(), 0.3) : self.selectedregionbg;
 
       const r = AudioRegionModel.create({
-        id: guidGenerator(),
+        id: ws_region.id ? ws_region.id : guidGenerator(),
+        pid: ws_region.pid ? ws_region.pid : guidGenerator(),
         start: ws_region.start,
         end: ws_region.end,
         regionbg: self.regionbg,
-        selectedregionbg: self.selectedregionbg,
+        selectedregionbg: bgColor,
         states: clonedStates,
       });
 
@@ -110,7 +166,6 @@ const Model = types
       self.regions.push(r);
       self.completion.addRegion(r);
 
-      // r.selectRegion();
       states && states.forEach(s => s.unselectAll());
 
       return r;
@@ -147,6 +202,8 @@ const AudioPlusModel = types.compose(
 );
 
 const HtxAudioView = observer(({ store, item }) => {
+  if (!item._value) return null;
+
   return (
     <div>
       <Waveform
@@ -156,11 +213,16 @@ const HtxAudioView = observer(({ store, item }) => {
         onCreate={item.wsCreated}
         addRegion={item.addRegion}
         onLoad={item.onLoad}
+        speed={item.speed}
+        haszoom={item.haszoom}
+        zoom={item.rangeValue}
+        volume={item.volume}
       />
 
       <div style={{ display: "flex", justifyContent: "space-between", marginTop: "1em" }}>
         <Button
           type="primary"
+          className={styles.play}
           onClick={ev => {
             item._ws.playPause();
           }}
@@ -176,19 +238,6 @@ const HtxAudioView = observer(({ store, item }) => {
             </Fragment>
           )}
         </Button>
-
-        {item.haszoom === "true" && (
-          <input
-            type="range"
-            min="20"
-            max="200"
-            id="slider"
-            value={item.rangeValue}
-            onChange={ev => {
-              item.setRangeValue(ev.target.value);
-            }}
-          />
-        )}
       </div>
     </div>
   );
@@ -198,4 +247,4 @@ const HtxAudioPlus = inject("store")(observer(HtxAudioView));
 
 Registry.addTag("audioplus", AudioPlusModel, HtxAudioPlus);
 
-export { AudioPlusModel, AudioRegionModel, HtxAudioPlus };
+export { AudioRegionModel, AudioPlusModel, HtxAudioPlus };

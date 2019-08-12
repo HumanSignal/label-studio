@@ -1,9 +1,10 @@
-import React from "react";
+import React, { Fragment } from "react";
 import ReactDOM from "react-dom";
 import WaveSurfer from "wavesurfer.js";
 import RegionsPlugin from "wavesurfer.js/dist/plugin/wavesurfer.regions.min.js";
 import TimelinePlugin from "wavesurfer.js/dist/plugin/wavesurfer.timeline.min.js";
 import CursorPlugin from "wavesurfer.js/dist/plugin/wavesurfer.cursor";
+import { Slider, InputNumber, Row, Col } from "antd";
 
 import styles from "./Waveform.module.scss";
 
@@ -134,13 +135,50 @@ export default class Waveform extends React.Component {
 
     this.state = {
       playing: false,
+      src: this.props.src,
       pos: 0,
       colors: {
         waveColor: "#97A0AF",
-        progressColor: "#36B37E",
+        progressColor: "#52c41a",
       },
+      zoom: this.props.zoom,
+      speed: this.props.speed,
+      volume: this.props.volume,
     };
   }
+
+  /**
+   * Handle to change zoom of wave
+   */
+  onChangeZoom = value => {
+    this.setState({
+      ...this.state,
+      zoom: value,
+    });
+
+    this.wavesurfer.zoom(value);
+  };
+
+  onChangeVolume = value => {
+    this.setState({
+      ...this.state,
+      volume: value,
+    });
+
+    this.wavesurfer.setVolume(value);
+  };
+
+  /**
+   * Handle to change speed of wave
+   */
+  onChangeSpeed = value => {
+    this.setState({
+      ...this.state,
+      speed: value,
+    });
+
+    this.wavesurfer.setPlaybackRate(value);
+  };
 
   componentDidMount() {
     this.$el = ReactDOM.findDOMNode(this);
@@ -155,8 +193,8 @@ export default class Waveform extends React.Component {
 
     this.wavesurfer = WaveSurfer.create({
       container: this.$waveform,
-      backend: "MediaElement",
       waveColor: this.state.colors.waveColor,
+      backend: "MediaElement",
       progressColor: this.state.colors.progressColor,
       plugins: [
         this.regions,
@@ -167,9 +205,9 @@ export default class Waveform extends React.Component {
           primaryLabelInterval: primaryLabelInterval, // number of primary time labels. (Integer or function which receives pxPerSec value and reurns value)
           secondaryLabelInterval: secondaryLabelInterval, // number of secondary time labels (Time labels between primary labels, integer or function which receives pxPerSec value and reurns value).
           primaryColor: "blue", // the color of the modulo-ten notch lines (e.g. 10sec, 20sec). The default is '#000'.
-          secondaryColor: "red", // the color of the non-modulo-ten notch lines. The default is '#c0c0c0'.
-          primaryFontColor: "blue", // the color of the non-modulo-ten time labels (e.g. 10sec, 20sec). The default is '#000'.
-          secondaryFontColor: "red",
+          secondaryColor: "blue", // the color of the non-modulo-ten notch lines. The default is '#c0c0c0'.
+          primaryFontColor: "#000", // the color of the non-modulo-ten time labels (e.g. 10sec, 20sec). The default is '#000'.
+          secondaryFontColor: "#000",
         }),
         CursorPlugin.create({
           wrapper: this.$waveform,
@@ -179,7 +217,15 @@ export default class Waveform extends React.Component {
       ],
     });
 
+    /**
+     * Load data
+     */
     this.wavesurfer.load(this.props.src);
+
+    /**
+     * Speed of waveform
+     */
+    this.wavesurfer.setPlaybackRate(this.state.speed);
 
     const self = this;
 
@@ -198,11 +244,12 @@ export default class Waveform extends React.Component {
     });
 
     /**
-     *
+     * Add region to wave
      */
     this.wavesurfer.on("region-created", reg => {
       const region = self.props.addRegion(reg);
       reg._region = region;
+      reg.color = region.selectedregionbg;
 
       reg.on("click", () => region.onClick(self.wavesurfer));
       reg.on("update-end", () => region.onUpdateEnd(self.wavesurfer));
@@ -227,9 +274,6 @@ export default class Waveform extends React.Component {
       };
     }
 
-    /**
-     *
-     */
     this.wavesurfer.on("ready", () => {
       self.props.onCreate(this.wavesurfer);
     });
@@ -254,7 +298,86 @@ export default class Waveform extends React.Component {
     return (
       <div>
         <div id="wave" className={styles.wave} />
+
         <div id="timeline" />
+
+        <Row className={styles.menu}>
+          <Col span={24}>
+            <Col span={12}>
+              Speed:{" "}
+              <InputNumber
+                min={0.5}
+                max={3}
+                value={this.state.speed}
+                onChange={value => {
+                  this.onChangeSpeed(value);
+                }}
+              />
+            </Col>
+            <Col span={24}>
+              <Slider
+                min={0.5}
+                max={3}
+                step={0.1}
+                value={typeof this.state.speed === "number" ? this.state.speed : 1}
+                onChange={range => {
+                  this.onChangeSpeed(range);
+                }}
+              />
+            </Col>
+          </Col>
+          <Col span={24}>
+            <Col span={12}>
+              Volume:{" "}
+              <InputNumber
+                min={0}
+                max={1}
+                value={this.state.volume}
+                step={0.1}
+                onChange={value => {
+                  this.onChangeVolume(value);
+                }}
+              />
+            </Col>
+            <Col span={24}>
+              <Slider
+                min={0}
+                max={1}
+                step={0.1}
+                value={typeof this.state.volume === "number" ? this.state.volume : 1}
+                onChange={value => {
+                  this.onChangeVolume(value);
+                }}
+              />
+            </Col>
+          </Col>
+          {this.props.haszoom === "true" && (
+            <Col span={24}>
+              <Col span={12}>
+                Zoom:{" "}
+                <InputNumber
+                  min={20}
+                  max={500}
+                  value={this.state.zoom}
+                  onChange={value => {
+                    this.onChangeZoom(value);
+                  }}
+                />
+              </Col>
+              <Col span={24}>
+                <Slider
+                  min={20}
+                  step={10}
+                  max={500}
+                  value={typeof this.state.zoom === "number" ? this.state.zoom : 0}
+                  onChange={value => {
+                    this.onChangeZoom(value);
+                  }}
+                />
+              </Col>
+            </Col>
+          )}
+        </Row>
       </div>
     );
   }

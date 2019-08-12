@@ -3,6 +3,7 @@ import { types, getEnv, flow, getSnapshot } from "mobx-state-tree";
 import Task from "./TaskStore";
 import CompletionStore from "./CompletionStore";
 import Hotkey from "../core/Hotkey";
+import { API_URL } from "../constants/Api";
 
 const UserStore = types.model("UserStore", {
   pk: types.integer,
@@ -85,7 +86,7 @@ export default types
     }
 
     const openDescription = flow(function* openDescription() {
-      let url = "/api/projects/" + self.projectID + "/expert_instruction";
+      let url = `${API_URL.MAIN}${API_URL.PROJECTS}/${self.projectID}${API_URL.EXPERT_INSRUCTIONS}`;
       const res = yield self.fetch(url);
 
       if (res.status === 200) {
@@ -147,8 +148,8 @@ export default types
 
     function loadTask() {
       return self.taskID
-        ? _loadTask("/api/tasks/" + self.taskID + "/")
-        : _loadTask("/api/projects/" + self.projectID + "/next");
+        ? _loadTask(`${API_URL.MAIN}${API_URL.TASKS}/${self.taskID}/`)
+        : _loadTask(`${API_URL.MAIN}${API_URL.PROJECTS}/${self.projectID}${API_URL.NEXT}`);
     }
 
     function addTask(json) {
@@ -218,7 +219,7 @@ export default types
 
       try {
         const json = yield self.post(
-          "/api/tasks/" + self.task.id + "/cancel/",
+          `${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}${API_URL.CANCEL}`,
           JSON.stringify({ data: JSON.stringify({ error: "cancelled" }) }),
         );
 
@@ -251,7 +252,7 @@ export default types
           result: res,
         });
 
-        yield self.post("/api/tasks/" + self.task.id + "/completions/", body);
+        yield self.post(`${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}${API_URL.COMPLETIONS}/`, body);
 
         if (hasInterface("submit:load")) {
           self.resetState();

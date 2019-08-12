@@ -226,3 +226,12 @@ export function stringToColor(str) {
 
   return color;
 }
+
+/**
+ * Change alpha channel of RGBA
+ * @param {string} rgba
+ * @param {number} alpha from 0 to 1
+ */
+export function rgbaChangeAlpha(rgba, alpha) {
+  return rgba.replace(/[\d\.]+\)$/g, `${alpha})`);
+}
