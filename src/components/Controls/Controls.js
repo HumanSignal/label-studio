@@ -34,7 +34,7 @@ export default inject("store")(
               Submit {submitButton}
             </Button>
 
-            {store.hasInterface("submit:rewrite") && store.completionStore.length > 0 && (
+            {store.hasInterface("submit:rewrite") && store.completionStore.completions.length > 0 && (
               <Button type="primary" icon="rollback" onClick={store.rewriteTask} className={styles.rewrite}>
                 Rewrite
               </Button>
