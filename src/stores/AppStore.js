@@ -229,12 +229,12 @@ export default types
       }
     });
 
-    const sendTask = flow(function* sendTask() {
+    /* Send completion to server as PATCH or POST */
+    function* sendToServer(patch) {
       const c = self.completionStore.selected;
-
       c.beforeSend();
-
       const res = c.serializeCompletion();
+      alert(res);
 
       if (self.hasInterface("submit:check-empty") && res.length === 0) {
         alert("You need to label at least something!");
@@ -245,13 +245,17 @@ export default types
 
       try {
         const state = getSnapshot(c);
-
         const body = JSON.stringify({
           state: JSON.stringify(state),
           result: res,
         });
 
-        yield self.post("/api/tasks/" + self.task.id + "/completions/", body);
+        if (patch) {
+          yield self.patch("/api/tasks/" + self.task.id + "/completions/" + c.id, body);
+        }
+        else {
+          yield self.post("/api/tasks/" + self.task.id + "/completions/", body);
+        }
 
         if (hasInterface("submit:load")) {
           self.resetState();
@@ -265,11 +269,19 @@ export default types
       } catch (err) {
         console.error("Failed to send task ", err);
       }
+    }
+
+    /* Send (post) completion on server */
+    const sendTask = flow(function* sendTask() {
+      return sendToServer(false);
     });
 
-    /**
-     * Function to initilaze completion store
-     */
+    /* Rewrite (patch) completion on server */
+    const rewriteTask = flow(function* rewriteTask() {
+      return sendToServer(true);
+    });
+
+    /* Function to initialize completion store */
     function initializeStore({ completions }) {
       const { completionStore } = self;
       let generatedCompletions = [];
@@ -315,6 +327,7 @@ export default types
       hasInterface,
       skipTask,
       sendTask,
+      rewriteTask,
       markLoading,
       resetState,
       openDescription,

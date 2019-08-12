@@ -4,6 +4,14 @@
   margin-bottom: 10px;
 }
 
+.rewrite {
+  background: rgb(34, 202, 71);
+  border-color: rgb(33, 202, 75) !important;
+}
+.rewrite:hover {
+  background: rgb(35, 227, 75);
+}
+
 .task {
   opacity: 0.4;
 }

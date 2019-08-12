@@ -28,7 +28,7 @@ function templateData(config) {
     debug: window.location.search.indexOf("debug=true") !== -1,
     interfaces: window.editorInterfaces
       ? window.editorInterfaces
-      : ["basic", "completions", "submit", "panel", "side-column"],
+      : ["basic", "completions", "submit", "submit:rewrite", "panel", "side-column"],
   };
 }
 
