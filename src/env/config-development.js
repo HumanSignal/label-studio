@@ -96,6 +96,32 @@ const configEnv = {
           task: 71937,
           was_generated: true,
         },
+
+        {
+          pk: 20,
+          id: 20,
+          model_version: "2019-04-10 10:52:20.591839",
+          result: [
+            {
+              id: "RuJ2GrJyG8",
+              from_name: "ner",
+              to_name: "text",
+              source: "$text",
+              type: "labels",
+              value: {
+                start: 8,
+                end: 12,
+                text: "faith",
+                labels: ["Fact"],
+              },
+            },
+          ],
+          score: 1.0,
+          created_at: "2019-04-10T10:53:28.822843Z",
+          updated_at: "2019-04-10T10:53:28.822851Z",
+          task: 71937,
+          was_generated: true,
+        },
       ],
       meta: {},
       accuracy: 0.0,
