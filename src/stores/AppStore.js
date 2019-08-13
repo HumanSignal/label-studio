@@ -113,9 +113,9 @@ export default types
     }
 
     const afterCreate = function() {
-      if (!self.task) {
+      //if (!self.task) {
         self.loadTask();
-      }
+      //}
 
       Hotkey.addKey("ctrl+enter", self.sendTask);
 
@@ -199,7 +199,7 @@ export default types
               comp.traverseTree(node => node.updateValue && node.updateValue(self));
               self.completionStore.selectCompletion(comp.id);
 
-              comp.deserializeCompletion(JSON.parse(c.result));
+              comp.deserializeCompletion(c.result);
               comp.reinitHistory();
             }
           } else {
@@ -295,17 +295,17 @@ export default types
         const c = self.completionStore.addInitialCompletion();
         self.completionStore.selectCompletion(c.id);
 
-        if (generatedCompletions.length > 0) {
-          let data = generatedCompletions[0].result;
+        //if (generatedCompletions.length > 0) {
+        //  let data = generatedCompletions[0].result;
 
-          if (typeof generatedCompletions[0].result === "string") {
-            data = JSON.parse(generatedCompletions[0].result);
-          }
+        //  if (typeof generatedCompletions[0].result === "string") {
+        //    data = JSON.parse(generatedCompletions[0].result);
+        //  }
 
-          c.deserializeCompletion(data);
+        //  c.deserializeCompletion(data);
 
-          c.reinitHistory();
-        }
+        //  c.reinitHistory();
+        //}
       }
     }
 

@@ -111,6 +111,13 @@ const Model = types
         region.states.push(m);
       }
 
+	if (self._ws) {
+            self._ws.addRegion({
+                start: r.start,
+                end: r.end
+            });
+        }
+	
       return r;
     },
 
@@ -181,12 +188,12 @@ const Model = types
     onLoad(ws) {
       self._ws = ws;
 
-      self.regions.forEach(obj => {
-        self._ws.addRegion({
-          start: obj.start,
-          end: obj.end,
-        });
-      });
+      //self.regions.forEach(obj => {
+      //  self._ws.addRegion({
+      //    start: obj.start,
+      //    end: obj.end,
+      //  });
+      //});
     },
 
     wsCreated(ws) {
