@@ -18,9 +18,9 @@ most convenient interface with the standardized output format.
 - [Classify audio](/examples/audio_classification/START.md) ([screenshot](./images/screenshots/audio-classify.png))
 - [Conversational modeling & chatbots](/examples/chatbot_analysis/START.md) ([screenshot](./images/screenshots/chatbots.png))
 - [Image object detection](/examples/image_bbox/START.md) ([screenshot](./images/screenshots/image-object.png))
+- [Audio regions](/examples/audio_regions/START.md)<sup>New</sup> ([screenshot](./images/screenshots/audio-regions.png))
 
 Coming Soon:
-- Audio regions (screenshot)
 - Image line and points (screenshot)
 - Image polygons (screenshot)
 - Time series (screenshot)
