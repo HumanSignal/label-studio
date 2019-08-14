@@ -4,6 +4,7 @@ import Task from "./TaskStore";
 import CompletionStore from "./CompletionStore";
 import Hotkey from "../core/Hotkey";
 import { API_URL } from "../constants/Api";
+import Utils from "../utils";
 
 const UserStore = types.model("UserStore", {
   pk: types.integer,
@@ -114,7 +115,7 @@ export default types
 
     const afterCreate = function() {
       //if (!self.task) {
-        self.loadTask();
+      self.loadTask();
       //}
 
       Hotkey.addKey("ctrl+enter", self.sendTask);
@@ -152,8 +153,14 @@ export default types
         : _loadTask(`${API_URL.MAIN}${API_URL.PROJECTS}/${self.projectID}${API_URL.NEXT}`);
     }
 
-    function addTask(json) {
-      self.task = Task.create(json);
+    function addTask(taskObject) {
+      if (taskObject && !Utils.Checkers.isString(taskObject.data)) {
+        taskObject = {
+          ...taskObject,
+          [taskObject.data]: JSON.stringify(taskObject.data),
+        };
+      }
+      self.task = Task.create(taskObject);
     }
 
     function resetState() {
@@ -295,17 +302,17 @@ export default types
         const c = self.completionStore.addInitialCompletion();
         self.completionStore.selectCompletion(c.id);
 
-        //if (generatedCompletions.length > 0) {
-        //  let data = generatedCompletions[0].result;
+        if (generatedCompletions.length > 0) {
+          let data = generatedCompletions[0].result;
 
-        //  if (typeof generatedCompletions[0].result === "string") {
-        //    data = JSON.parse(generatedCompletions[0].result);
-        //  }
+          if (typeof generatedCompletions[0].result === "string") {
+            data = JSON.parse(generatedCompletions[0].result);
+          }
 
-        //  c.deserializeCompletion(data);
+          c.deserializeCompletion(data);
 
-        //  c.reinitHistory();
-        //}
+          c.reinitHistory();
+        }
       }
     }
 
