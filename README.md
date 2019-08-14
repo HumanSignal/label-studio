@@ -1,12 +1,10 @@
 # Label Studio
 
-<img src="./images/logo.png" align="right" title="Heartex Editor" width="100" height="100">
+<img src="./images/logo.png" align="right" title="Label Studio by Heartex Labs" width="100" height="100">
 
 ![GitHub](https://img.shields.io/github/license/heartexlabs/label-studio?logo=heartex) [![Build Status](https://travis-ci.com/heartexlabs/label-studio.svg?branch=master)](https://travis-ci.com/heartexlabs/label-studio)
 
-Label Studio is an open-source, configurable data annotation tool. Its
-purpose is to enable you to label different types of data using the
-most convenient interface with the standardized output format.
+Label Studio is an open-source, configurable data annotation tool. Its purpose is to enable you to label different types of data using the most convenient interface with the standardized output format.
 
 ![Label Studio](./images/label-studio-examples.gif)
 
@@ -21,6 +19,7 @@ most convenient interface with the standardized output format.
 - [Audio regions](/examples/audio_regions/START.md)<sup>New</sup> ([screenshot](./images/screenshots/audio-regions.png))
 
 Coming Soon:
+
 - Image line and points (screenshot)
 - Image polygons (screenshot)
 - Time series (screenshot)
@@ -41,16 +40,12 @@ Coming Soon:
 
 ## Introduction
 
-Label Studio consists of two parts. Backend is a simple flask server
-that is used to load the data and save the results. The frontend is a
-[React](https://reactjs.org/) +
-[MST](https://github.com/mobxjs/mobx-state-tree) app that is backend
-agnostic and can be used separately, for example if you want to embed
-labeling into your applications.
+Label Studio consists of two parts. Backend is a simple flask server that is used to load the data and save the results. The frontend is a [React](https://reactjs.org/) + [MST](https://github.com/mobxjs/mobx-state-tree) app that is backend agnostic and can be used separately, for example if you want to embed labeling into your applications.
 
 ### Run Locally
 
 In order to launch server locally, launch
+
 ```bash
 cd backend
 bash start.sh
@@ -63,8 +58,7 @@ part and an example implementation of the backend.
 
 ### Extend & Embed
 
-To extend the functionality or embed the labeling inside your app, you
-need to be able to compile it from the sources. 
+To extend the functionality or embed the labeling inside your app, you need to be able to compile it from the sources.
 
 [This guide explains how to do that](docs/Embed.md)
 
@@ -77,14 +71,11 @@ need to be able to compile it from the sources.
 
 ## Using Label Studio
 
-### Config Language 
+### Config Language
 
-Editor configuration is based on XML-like tags. Internally tags are
-represented by a react view and mobx-state-tree model. Each config
-should start with a <View></View> tag. Here is an example of a simple
-text classification config:
+Editor configuration is based on XML-like tags. Internally tags are represented by a react view and mobx-state-tree model. Each config should start with a ```<View></View>``` tag. Here is an example of a simple text classification config:
 
-```html
+```xml
 <View>
   <Text name="text"></Text>
   <Choices name="choice" toName="text">
@@ -94,17 +85,13 @@ text classification config:
 </View>
 ```
 
-Note that we use tag names to connect tags between each
-other. Therefore tags that are used for labeling should include a name
-attribute. And every tag has its own set of parameters. Find more info
-in the related doc:
+Note that we use tag names to connect tags between each other. Therefore tags that are used for labeling should include a name attribute. And every tag has its own set of parameters. Find more info in the related doc:
 
 [Tags Documentation](/docs/Tags.md)
 
-Creating your own tags is the suggested way to extend the app and
-tailor it to your specific needs.
+Creating your own tags is the suggested way to extend the app and tailor it to your specific needs.
 
-## Format 
+## Format
 
 ### Input
 
@@ -119,13 +106,13 @@ Output is JSON. Overall strucutre is the following:
 
 ```json
 {
-  "completions": [{ 
-    "results": {
+  "completions": [{
+    "result": {
       "id": "yrSY-dipPI",
       "from_name": "sentiment",
       "to_name": "my_text",
       "type": "choices",
-	  "value": {
+      "value": {
         "choices": ["Neutral"]
       }
     }
@@ -142,9 +129,7 @@ Completion is an object with five mandatory fields:
 - **type** type of the labeling/tag
 - **value** tag specific value that includes the labeling result details
 
-For popular machine learning libraries there is converter code to
-transform Label Studio format in ML library format. [Learn More](/backend/converter/README.md) 
-about it.
+For popular machine learning libraries there is converter code to transform Label Studio format in ML library format. [Learn More](/backend/converter/README.md) about it.
 
 ## Contributing
 
@@ -153,5 +138,4 @@ about it.
 
 ## License
 
-This software is licensed under the [Apache 2.0 LICENSE](/LICENSE) ©
-[Heartex](https://www.heartex.net/).
+This software is licensed under the [Apache 2.0 LICENSE](/LICENSE) © [Heartex](https://www.heartex.net/).
