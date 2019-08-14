@@ -5,6 +5,7 @@ function getData() {
   // if (window.taskData) window.taskData.data = JSON.stringify(window.taskData.data);
 
   if (window.taskData && window.taskData.data) {
+    console.log(window.taskData);
     window.taskData.data = JSON.stringify(window.taskData.data);
   }
 
@@ -12,8 +13,8 @@ function getData() {
     projectID: window.projectID,
     isLoading: false,
     config: window.editorAppConfig,
-    task: window.taskData,
     taskID: window.taskID,
+    task: window.taskData,
     expert: window.expertData,
     debug: window.debugEditor,
     interfaces: window.editorInterfaces ? window.editorInterfaces : ["basic", "completions"],
