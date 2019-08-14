@@ -238,6 +238,7 @@ const Completion = types
      * Deserialize completion of models
      */
     deserializeCompletion(json) {
+      console.log(json);
       json.forEach(obj => {
         if (obj["type"] !== "relation") {
           const names = obj.to_name.split(",");

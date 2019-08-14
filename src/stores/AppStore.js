@@ -206,8 +206,6 @@ export default types
               comp.traverseTree(node => node.updateValue && node.updateValue(self));
               self.completionStore.selectCompletion(comp.id);
 
-              console.log(c.result);
-
               comp.deserializeCompletion(c.result);
               comp.reinitHistory();
             }
