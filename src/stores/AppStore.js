@@ -302,17 +302,17 @@ export default types
         const c = self.completionStore.addInitialCompletion();
         self.completionStore.selectCompletion(c.id);
 
-        if (generatedCompletions.length > 0) {
-          let data = generatedCompletions[0].result;
+        // if (generatedCompletions.length > 0) {
+        //   let data = generatedCompletions[0].result;
 
-          if (typeof generatedCompletions[0].result === "string") {
-            data = JSON.parse(generatedCompletions[0].result);
-          }
+        //   if (typeof generatedCompletions[0].result === "string") {
+        //     data = JSON.parse(generatedCompletions[0].result);
+        //   }
 
-          c.deserializeCompletion(data);
+        //   // c.deserializeCompletion(data);
 
-          c.reinitHistory();
-        }
+        //   c.reinitHistory();
+        // }
       }
     }
 
