@@ -28,9 +28,16 @@ def app_init():
 
 @app.route('/static/editor/<path:path>')
 def send_editor(path):
-    """ Static serving
+    """ Static for label tool js and css
     """
     return flask.send_from_directory(c['editor']['build_path'], path)
+
+
+@app.route('/static/media/<path:path>')
+def send_media(path):
+    """ Static for label tool js and css
+    """
+    return flask.send_from_directory(c['editor']['build_path'] + '/media', path)
 
 
 @app.route('/static/<path:path>')
