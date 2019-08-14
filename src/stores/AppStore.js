@@ -114,9 +114,9 @@ export default types
     }
 
     const afterCreate = function() {
-      if (!self.task) {
-        self.loadTask();
-      }
+      // if (!self.task) {
+      self.loadTask();
+      // }
 
       Hotkey.addKey("ctrl+enter", self.sendTask);
 

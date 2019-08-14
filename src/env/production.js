@@ -5,7 +5,6 @@ function getData() {
   // if (window.taskData) window.taskData.data = JSON.stringify(window.taskData.data);
 
   if (window.taskData && window.taskData.data) {
-    console.log(window.taskData);
     window.taskData.data = JSON.stringify(window.taskData.data);
   }
 
