@@ -44,7 +44,7 @@ function templateDynamicData() {
     debug: window.location.search.indexOf("debug=true") !== -1,
     interfaces: window.editorInterfaces
       ? window.editorInterfaces
-      : ["basic", "completions", "submit", "panel", "side-column"],
+      : ["basic", "completions", "submit", "panel", "side-column", "submit:rewrite"],
     task: {
       data: JSON.stringify(dataType.tasks[0]),
       project: 10,

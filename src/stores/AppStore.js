@@ -245,6 +245,46 @@ export default types
       }
     });
 
+    const rewriteTask = flow(function* rewriteTask() {
+      const c = self.completionStore.selected;
+
+      c.beforeSend();
+
+      const res = c.serializeCompletion();
+
+      if (self.hasInterface("submit:check-empty") && res.length === 0) {
+        alert("You need to label at least something!");
+        return;
+      }
+
+      self.markLoading(true);
+
+      try {
+        const state = getSnapshot(c);
+
+        const body = JSON.stringify({
+          state: JSON.stringify(state),
+          result: res,
+        });
+
+        console.log(c);
+
+        yield getEnv(self).patch(`${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}${API_URL.COMPLETIONS}/${c.id}`, body);
+
+        if (hasInterface("submit:load")) {
+          self.resetState();
+          return loadTask();
+        } else {
+          self.markLoading(false);
+          self.labeledSuccess = true;
+        }
+
+        delete state.history;
+      } catch (err) {
+        console.error("Failed to send task ", err);
+      }
+    });
+
     const sendTask = flow(function* sendTask() {
       const c = self.completionStore.selected;
 
@@ -333,6 +373,7 @@ export default types
       hasInterface,
       skipTask,
       sendTask,
+      rewriteTask,
       markLoading,
       resetState,
       openDescription,
