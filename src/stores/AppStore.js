@@ -146,6 +146,7 @@ export default types
     };
 
     function loadTask() {
+      console.log(self.explore && self.projectID);
       if (self.taskID) {
         return _loadTask(`${API_URL.MAIN}${API_URL.TASKS}/${self.taskID}/`);
       } else if (self.explore && self.projectID) {
