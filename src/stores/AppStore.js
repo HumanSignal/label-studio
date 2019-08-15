@@ -66,7 +66,6 @@ export default types
     isLoading: types.optional(types.boolean, false),
     noTask: types.optional(types.boolean, false),
     labeledSuccess: types.optional(types.boolean, false),
-    developmentEnv: types.maybeNull(types.boolean),
   })
   .views(self => ({
     get fetch() {
@@ -148,6 +147,24 @@ export default types
     };
 
     function loadTask() {
+      if (self.task && self.taskID) {
+        console.log("Task and taskID");
+      } else if (!self.task && !self.taskID) {
+        console.log("No task and no task ID");
+      } else if (self.task && !self.taskID) {
+        console.log("Task");
+      } else if (self.taskID && !self.task) {
+        console.log("Task ID");
+      }
+
+      if (self.explore) {
+        if (self.projectID) {
+          console.log("Explore and ProjectID");
+        } else {
+          console.log("Explore and No project ID");
+        }
+      }
+
       if (self.taskID) {
         return _loadTask(`${API_URL.MAIN}${API_URL.TASKS}/${self.taskID}/`);
       } else if (self.explore && self.projectID) {
@@ -267,8 +284,6 @@ export default types
           result: res,
         });
 
-        console.log(c);
-
         yield getEnv(self).patch(`${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}${API_URL.COMPLETIONS}/${c.id}`, body);
 
         if (hasInterface("submit:load")) {
@@ -350,7 +365,7 @@ export default types
         const c = self.completionStore.addInitialCompletion();
         self.completionStore.selectCompletion(c.id);
 
-        if (self.developmentEnv) {
+        if (self.task) {
           if (generatedCompletions.length > 0) {
             let data = generatedCompletions[0].result;
 
