@@ -45,6 +45,7 @@ export default types
     taskID: types.maybeNull(types.number),
 
     interfaces: types.array(types.string),
+    explore: types.optional(types.boolean, false),
 
     completionStore: types.optional(CompletionStore, {
       completions: [],
