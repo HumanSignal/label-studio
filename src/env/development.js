@@ -14,14 +14,33 @@ let dataType = AudioRegions;
 
 function templateDynamicData() {
   let settings = {
+    /**
+     * For development environment
+     */
+    developmentEnv: true,
+    /**
+     * Project ID
+     */
     projectID: 1,
+    /**
+     * Flag to display completion
+     */
+    viewCompletion: true,
+    /**
+     * Loading of LS
+     */
     isLoading: false,
-    taskID: 1,
+    /**
+     * Expert
+     */
     expert: {
       pk: 1,
       lastName: "Jones",
       firstName: "Oliver",
     },
+    /**
+     * Debug
+     */
     debug: window.location.search.indexOf("debug=true") !== -1,
     interfaces: window.editorInterfaces
       ? window.editorInterfaces
@@ -34,16 +53,12 @@ function templateDynamicData() {
     },
   };
 
-  if (dataType.completion) {
+  if (settings.viewCompletion && dataType.completion) {
     settings = {
       ...settings,
       task: {
         ...settings.task,
-        completions: [
-          {
-            result: dataType.completion.completions[0].result,
-          },
-        ],
+        completions: [dataType.completion.completions[0]],
       },
     };
   }

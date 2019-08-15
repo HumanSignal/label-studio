@@ -66,6 +66,7 @@ export default types
     isLoading: types.optional(types.boolean, false),
     noTask: types.optional(types.boolean, false),
     labeledSuccess: types.optional(types.boolean, false),
+    developmentEnv: types.maybeNull(types.boolean),
   })
   .views(self => ({
     get fetch() {
@@ -147,7 +148,6 @@ export default types
     };
 
     function loadTask() {
-      console.log(self.explore && self.projectID);
       if (self.taskID) {
         return _loadTask(`${API_URL.MAIN}${API_URL.TASKS}/${self.taskID}/`);
       } else if (self.explore && self.projectID) {
@@ -310,17 +310,19 @@ export default types
         const c = self.completionStore.addInitialCompletion();
         self.completionStore.selectCompletion(c.id);
 
-        // if (generatedCompletions.length > 0) {
-        //   let data = generatedCompletions[0].result;
+        if (self.developmentEnv) {
+          if (generatedCompletions.length > 0) {
+            let data = generatedCompletions[0].result;
 
-        //   if (typeof generatedCompletions[0].result === "string") {
-        //     data = JSON.parse(generatedCompletions[0].result);
-        //   }
+            if (typeof generatedCompletions[0].result === "string") {
+              data = JSON.parse(generatedCompletions[0].result);
+            }
 
-        //   // c.deserializeCompletion(data);
+            c.deserializeCompletion(data);
 
-        //   c.reinitHistory();
-        // }
+            c.reinitHistory();
+          }
+        }
       }
     }
 
