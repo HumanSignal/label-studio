@@ -21,8 +21,7 @@
       "submit:load",
       "submit:rewrite",
       "side-column",
-      "submit:check-empty",
-      "predictions:hide"
+      "submit:check-empty"
     ]
   }
 }

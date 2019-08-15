@@ -173,7 +173,7 @@ def get_completion(task_id):
     if os.path.exists(filename):
         data = json.load(open(filename))
         data['completions'][0]['id'] = task_id
-        data['completions'][0]['pk'] = task_id
+
     else:
         data = None
     return data

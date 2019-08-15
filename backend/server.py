@@ -177,7 +177,8 @@ def api_completion_rewrite(task_id, completion_id):
     global c
 
     completion = request.json
-    assert task_id == completion_id
+    assert task_id == completion_id, \
+        f'Task ID != Completion ID, {task_id} != {completion_id}'
 
     completion.pop('state', None)  # remove editor state
     db.save_completion(task_id, completion)
