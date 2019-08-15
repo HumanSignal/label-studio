@@ -114,10 +114,7 @@ export default types
     }
 
     const afterCreate = function() {
-      console.log(self.task);
-      if (!self.task) {
-        self.loadTask();
-      }
+      self.loadTask();
 
       Hotkey.addKey("ctrl+enter", self.sendTask);
 
@@ -149,9 +146,11 @@ export default types
     };
 
     function loadTask() {
-      return self.taskID
-        ? _loadTask(`${API_URL.MAIN}${API_URL.TASKS}/${self.taskID}/`)
-        : _loadTask(`${API_URL.MAIN}${API_URL.PROJECTS}/${self.projectID}${API_URL.NEXT}`);
+      if (self.taskID) {
+        return _loadTask(`${API_URL.MAIN}${API_URL.TASKS}/${self.taskID}/`);
+      } else if (self.explore && self.projectID) {
+        return _loadTask(`${API_URL.MAIN}${API_URL.PROJECTS}/${self.projectID}${API_URL.NEXT}`);
+      }
     }
 
     function addTask(taskObject) {
