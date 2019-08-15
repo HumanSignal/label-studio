@@ -40,6 +40,10 @@ function getData() {
      * Interfaces of LS
      */
     interfaces: window.editorInterfaces ? window.editorInterfaces : ["basic", "completions"],
+    /**
+     * Flag for display completions of task
+     */
+    explore: window.explore,
   };
 
   /**
@@ -50,7 +54,7 @@ function getData() {
   }
 
   /**
-   *
+   * window.explore used for display completions
    */
   if (window.explore) {
     data["interfaces"] = window.editorInterfaces ? window.editorInterfaces : ["basic", "completions"];
