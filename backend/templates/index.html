@@ -34,7 +34,8 @@
         window.expertData = {"pk": 1, "firstName": "Label",  "lastName": "Expert"};
         window.projectID = 1;
         {% if task_data != 'null' %}
-            window.taskData = {{ task_data | json | safe }};
+            // window.taskData = {{ task_data | json | safe }};
+            window.taskID = {{ task_data['id'] }};
         {% endif %}
     </script>
 

@@ -17,6 +17,7 @@
       "basic",
       "panel",
       "submit",
+      "completions",
       "submit:load",
       "side-column",
       "submit:check-empty",
