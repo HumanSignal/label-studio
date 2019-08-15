@@ -114,6 +114,7 @@ export default types
     }
 
     const afterCreate = function() {
+      console.log(self.task);
       if (!self.task) {
         self.loadTask();
       }
@@ -178,6 +179,9 @@ export default types
       }
     }
 
+    /**
+     * Load task
+     */
     const _loadTask = flow(function*(url) {
       try {
         const res = yield self.fetch(url);
@@ -221,6 +225,9 @@ export default types
       }
     });
 
+    /**
+     * Skip current task
+     */
     const skipTask = flow(function* skipTask() {
       self.markLoading(true);
 
