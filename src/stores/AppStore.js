@@ -87,8 +87,12 @@ export default types
       self.showingSettings = !self.showingSettings;
     }
 
+    /**
+     * Description of task
+     */
     const openDescription = flow(function* openDescription() {
       let url = `${API_URL.MAIN}${API_URL.PROJECTS}/${self.projectID}${API_URL.EXPERT_INSRUCTIONS}`;
+
       const res = yield self.fetch(url);
 
       if (res.status === 200) {
@@ -117,10 +121,19 @@ export default types
     const afterCreate = function() {
       self.loadTask();
 
+      /**
+       * Hotkey for submit
+       */
       Hotkey.addKey("ctrl+enter", self.sendTask);
 
+      /**
+       * Hotkey for skip
+       */
       if (self.hasInterface("submit:skip")) Hotkey.addKey("ctrl+space", self.skipTask);
 
+      /**
+       * Hotkey for delete
+       */
       Hotkey.addKey("ctrl+backspace", function() {
         const { selected } = self.completionStore;
         selected.deleteAllRegions();
@@ -146,6 +159,9 @@ export default types
       });
     };
 
+    /**
+     * Load task from API
+     */
     function loadTask() {
       if (self.taskID) {
         return _loadTask(`${API_URL.MAIN}${API_URL.TASKS}/${self.taskID}/`);
@@ -164,6 +180,9 @@ export default types
       self.task = Task.create(taskObject);
     }
 
+    /**
+     * Reset completion store
+     */
     function resetState() {
       self.completionStore = CompletionStore.create({ completions: [] });
       const c = self.completionStore.addInitialCompletion();
@@ -171,6 +190,10 @@ export default types
       self.completionStore.selectCompletion(c.id);
     }
 
+    /**
+     *
+     * @param {*} data
+     */
     function addGeneratedCompletion(data) {
       if ("completion_result" in data && !self.hasInterface("predictions:hide")) {
         const c = self.completionStore.selected;
@@ -244,81 +267,66 @@ export default types
       }
     });
 
-    const rewriteTask = flow(function* rewriteTask() {
-      const c = self.completionStore.selected;
+    /**
+     * Wrapper of completion send
+     * @param {string} requestType {patch or post}
+     */
+    const sendToServer = requestType => {
+      return flow(function*() {
+        const c = self.completionStore.selected;
 
-      c.beforeSend();
+        c.beforeSend();
 
-      const res = c.serializeCompletion();
+        const res = c.serializeCompletion();
 
-      if (self.hasInterface("submit:check-empty") && res.length === 0) {
-        alert("You need to label at least something!");
-        return;
-      }
-
-      self.markLoading(true);
-
-      try {
-        const state = getSnapshot(c);
-
-        const body = JSON.stringify({
-          state: JSON.stringify(state),
-          result: res,
-        });
-
-        yield getEnv(self).patch(`${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}${API_URL.COMPLETIONS}/${c.pk}`, body);
-
-        if (hasInterface("submit:load")) {
-          self.resetState();
-          return loadTask();
-        } else {
-          self.markLoading(false);
-          self.labeledSuccess = true;
+        if (self.hasInterface("submit:check-empty") && res.length === 0) {
+          alert("You need to label at least something!");
+          return;
         }
 
-        delete state.history;
-      } catch (err) {
-        console.error("Failed to send task ", err);
-      }
-    });
+        self.markLoading(true);
 
-    const sendTask = flow(function* sendTask() {
-      const c = self.completionStore.selected;
+        try {
+          const state = getSnapshot(c);
 
-      c.beforeSend();
+          const body = JSON.stringify({
+            state: JSON.stringify(state),
+            result: res,
+          });
 
-      const res = c.serializeCompletion();
+          if (requestType === "patch") {
+            yield getEnv(self).patch(
+              `${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}${API_URL.COMPLETIONS}/${c.pk}`,
+              body,
+            );
+          } else if (requestType === "post") {
+            yield self.post(`${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}${API_URL.COMPLETIONS}/`, body);
+          }
 
-      if (self.hasInterface("submit:check-empty") && res.length === 0) {
-        alert("You need to label at least something!");
-        return;
-      }
+          if (hasInterface("submit:load")) {
+            self.resetState();
+            return loadTask();
+          } else {
+            self.markLoading(false);
+            self.labeledSuccess = true;
+          }
 
-      self.markLoading(true);
-
-      try {
-        const state = getSnapshot(c);
-
-        const body = JSON.stringify({
-          state: JSON.stringify(state),
-          result: res,
-        });
-
-        yield self.post(`${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}${API_URL.COMPLETIONS}/`, body);
-
-        if (hasInterface("submit:load")) {
-          self.resetState();
-          return loadTask();
-        } else {
-          self.markLoading(false);
-          self.labeledSuccess = true;
+          delete state.history;
+        } catch (err) {
+          console.error("Failed to send task ", err);
         }
+      });
+    };
 
-        delete state.history;
-      } catch (err) {
-        console.error("Failed to send task ", err);
-      }
-    });
+    /**
+     * Rewrite current completion
+     */
+    const rewriteTask = sendToServer("patch");
+
+    /**
+     * Send current completion
+     */
+    const sendTask = sendToServer("post");
 
     /**
      * Function to initilaze completion store
