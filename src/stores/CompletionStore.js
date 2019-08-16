@@ -290,7 +290,7 @@ export default types
      * Get only those that were saved
      */
     get savedCompletions() {
-      return self.completions.filter(c => !c.was_generated);
+      return self.completions.filter(c => c);
     },
   }))
   .actions(self => {
@@ -312,7 +312,7 @@ export default types
     function addCompletion(node, type) {
       const c = Completion.create(node);
 
-      if (self.store.task && type == "initial")
+      if (self.store.task && type === "initial")
         c.traverseTree(node => node.updateValue && node.updateValue(self.store));
 
       self.completions.push(c);
@@ -352,7 +352,7 @@ export default types
 
       const node = {
         pk: c.id,
-        id: guidGenerator(),
+        id: c.id || guidGenerator(),
         createdAgo: c.created_ago,
         createdBy: c.created_username,
         honeypot: c.honeypot,

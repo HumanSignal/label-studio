@@ -73,6 +73,7 @@ class Completions extends Component {
     const { store } = this.props;
 
     let count = 0;
+    console.log(store.completionStore.savedCompletions)
     store.completionStore.savedCompletions.map(c => {
       count += c.pk > 0;
     });
@@ -93,7 +94,7 @@ class Completions extends Component {
         <Card title="Completions" bodyStyle={{ padding: 0 }}>
           <List divided relaxed>
             {store.completionStore.savedCompletions.map(
-              c => c.pk > 0 && <Completion key={c.id} item={c} store={store} />,
+              c => c.pk > 0 && <Completion key={c.pk} item={c} store={store} />,
             )}
           </List>
         </Card>

@@ -166,9 +166,9 @@ export default types
       }
 
       if (self.taskID) {
-        return _loadTask(`${API_URL.MAIN}${API_URL.TASKS}/${self.taskID}/`);
+        return _loadTaskFromURL(`${API_URL.MAIN}${API_URL.TASKS}/${self.taskID}/`);
       } else if (self.explore && self.projectID) {
-        return _loadTask(`${API_URL.MAIN}${API_URL.PROJECTS}/${self.projectID}${API_URL.NEXT}`);
+        return _loadTaskFromURL(`${API_URL.MAIN}${API_URL.PROJECTS}/${self.projectID}${API_URL.NEXT}`);
       }
     }
 
@@ -198,9 +198,9 @@ export default types
     }
 
     /**
-     * Load task
+     * Load task from URL
      */
-    const _loadTask = flow(function*(url) {
+    const _loadTaskFromURL = flow(function*(url) {
       try {
         const res = yield self.fetch(url);
 
@@ -365,7 +365,7 @@ export default types
         const c = self.completionStore.addInitialCompletion();
         self.completionStore.selectCompletion(c.id);
 
-        if (self.task) {
+        /*if (self.task) {
           if (generatedCompletions.length > 0) {
             let data = generatedCompletions[0].result;
 
@@ -377,8 +377,22 @@ export default types
 
             c.reinitHistory();
           }
+        }*/
+
+        for (var i = 0; i < generatedCompletions.length; i++) {
+          const c = generatedCompletions[i];
+
+          if (c.was_cancelled === true) continue;
+
+          const comp = self.completionStore.addSavedCompletion(c);
+          comp.traverseTree(node => node.updateValue && node.updateValue(self));
+          self.completionStore.selectCompletion(comp.id);
+
+          comp.deserializeCompletion(c.result);
+          comp.reinitHistory();
         }
       }
+      
     }
 
     return {
