@@ -422,7 +422,7 @@ class HtxImageView extends Component {
   };
 
   updateDimensions() {
-    this.props.item.onResizeSize(this.container.offsetWidth, this.container.offsetHeight);
+    // this.props.item.onResizeSize(this.container.offsetWidth, this.container.offsetHeight);
   }
 
   componentDidMount() {
