@@ -26,7 +26,7 @@
       </div>
     </div>
 
-    <script>
+    <!-- <script>
         window.editorInterfaces = {{ config['editor']['interfaces'] | json | safe }};
         window.debugEditor = "{{ config['editor']['debug'] }}" === "True";
         window.editorAppConfig = '{{ label_config_line | safe }}';
@@ -43,7 +43,29 @@
             window.explore = true;
             window.projectID = 1;
         {% endif %}
+    </script> -->
+
+
+
+
+        <script id="user-data" type="application/json">{"pk": 1, "firstName": "", "lastName": ""}</script>
+
+
+
+        <script>
+        window.editorInterfaces = JSON.parse('["basic","completions","side-column"]');
+        window.debugEditor = "False" === "true" ? true : false;
+        window.editorAppConfig = '<View>  <Header value="Select label:"></Header>  <Labels name="label" toName="audio">    <Label value="Politics"></Label>    <Label value="Business"></Label>    <Label value="Education"></Label>  </Labels>  <Header value="Select audio region:"></Header>  <AudioPlus name="audio" value="$url"></AudioPlus></View>';
+        //window.taskData = {"id": 1157514, "completions": [{"id": 56835, "created_username": "", "created_ago": "2 hours, 8 minutes", "state": "{}", "result": "[{\"id\":\"rDRiABeNEX\",\"type\":\"region\",\"value\":{\"end\":1.3625078984,\"start\":0.7403581731},\"source\":\"$url\",\"to_name\":\"audio\",\"from_name\":\"audio\"},{\"id\":\"1lFHuNiATe\",\"type\":\"labels\",\"value\":{\"end\":2.2003361951,\"start\":1.6694350962,\"labels\":[\"Education\"]},\"source\":\"$url\",\"to_name\":\"audio\",\"from_name\":\"label\"},{\"id\":\"YAEztRaHh5\",\"type\":\"labels\",\"value\":{\"end\":2.6897606456,\"start\":2.4948203984,\"labels\":[\"Business\"]},\"source\":\"$url\",\"to_name\":\"audio\",\"from_name\":\"label\"}]", "was_cancelled": false, "honeypot": false, "created_at": "2019-08-16T12:13:38.801204Z", "updated_at": "2019-08-16T12:13:38.801220Z", "task": 1157514, "completed_by": 53}], "data": {"url": "https://go.heartex.net/static/samples/game.wav"}, "meta": {}, "accuracy": 1.0, "created_at": "2019-08-16T12:13:28.332151Z", "updated_at": "2019-08-16T12:13:38.813448Z", "is_labeled": true, "project": 295};
+        window.taskID = 1157514;
+        window.explore = false;
+        window.projectID = 295;
+        window.expertData = JSON.parse(document.getElementById('user-data').textContent);
+
     </script>
+
+
+
 
     <!-- Editor -->
     {% for js in editor_js %}
