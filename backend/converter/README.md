@@ -13,30 +13,74 @@ Label Studio Format Converter helps you to encode labels into the format of your
 
 ## Examples
 
-### Text Classification
-
-CSV / TSV
+#### JSON
+Run
 ```bash
-python text_classifier/csv.py -i directory/with/completions -o your/output/file.tsv
+python backend/converter/cli.py --input examples/sentiment_analysis/completions/ --config examples/sentiment_analysis/config.xml --output tmp/output.json
 ```
 
-### Text Tagging
-
-##### [guillaumegenthial/tf_ner](https://github.com/guillaumegenthial/tf_ner)
-
-```bash
-python text_tagging/tf_ner.py -i directory/with/completions -o your/output/directory
+Get output file: `tmp/output.json`
+```json
+[
+  {
+    "reviewText": "Good case, Excellent value.",
+    "sentiment": "Positive"
+  },
+  {
+    "reviewText": "What a waste of money and time!",
+    "sentiment": "Negative"
+  },
+  {
+    "reviewText": "The goose neck needs a little coaxing",
+    "sentiment": "Neutral"
+  }
+]
 ```
 
-##### [Spacy CoNLL 2003](https://spacy.io/api/cli#convert)
+Use cases: TBD
 
+
+#### CSV
+Run
 ```bash
-python text_classifier/spacy_conll2003.py -i directory/with/completions -o your/output/directory
+python backend/converter/cli.py --input examples/sentiment_analysis/completions/ --config examples/sentiment_analysis/config.xml --output tmp/output.tsv --format CSV --csv-separator $'\t'
 ```
 
-## TODO
+Get output file `tmp/output.tsv`:
+```tsv
+reviewText	sentiment
+Good case, Excellent value.	Positive
+What a waste of money and time!	Negative
+The goose neck needs a little coaxing	Neutral
+```
 
-- List of libraries TBD
+Use cases: TBD
+
+#### CoNLL 2003
+
+Run
+```bash
+python backend/converter/cli.py --input examples/named_entity/completions/ --config examples/named_entity/config.xml --output tmp/output.conll --format CONLL2003
+```
+
+Get output file `tmp/output.conll`
+```text
+-DOCSTART- -X- O
+Showers -X- _ O
+continued -X- _ O
+throughout -X- _ O
+the -X- _ O
+week -X- _ O
+in -X- _ O
+the -X- _ O
+Bahia -X- _ B-Location
+cocoa -X- _ O
+zone, -X- _ O
+...
+```
+
+Use cases: TBD
+
 
 ## Contributing
 

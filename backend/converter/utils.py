@@ -64,6 +64,7 @@ def download(url, output_dir, filename=None):
 def get_image_size(image_path):
     return Image.open(image_path).size
 
+
 def get_image_size_and_channels(image_path):
     i = Image.open(image_path)
     w, h = i.size
@@ -71,34 +72,9 @@ def get_image_size_and_channels(image_path):
     return w, h, c
 
 
-def iter_tokens_tags(input_dir):
-    for datafile in glob(os.path.join(input_dir, '*.json')):
-        with io.open(datafile) as f:
-            data = json.load(f)
-        text = data['data']['text']
-        result = data['completions'][0]['result']
-        spans = list(map(itemgetter('value'), result))
-
-        tokens, tags = create_tokens_and_tags(text, spans)
-        yield tokens, tags
-
-
-def iter_text_choices(input_dir, data_key=None):
-    if not os.path.exists(input_dir):
-        raise FileNotFoundError(f'{input_dir} doesn\'t exist')
-    for datafile in glob(os.path.join(input_dir, '*.json')):
-        with io.open(datafile) as f:
-            data = json.load(f)
-        result = data['completions'][0]['result'][0]
-        input_data = data['data']
-        if len(input_data) > 1 and data_key is None:
-            raise ValueError(f'"data" field contains multiple keys, so we can\'t figure out which one is used.'
-                             f'Please specify "data_key" as argument')
-        elif len(input_data) == 1 and data_key is None:
-            text = list(input_data.values())[0]
-        else:
-            text = input_data[data_key]
-        yield text, result['value']['choices'][0]
+def ensure_dir(dir_path):
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
 
 
 def parse_config(config_string):

@@ -13,7 +13,9 @@ from collections import Mapping, defaultdict
 from operator import itemgetter
 from copy import deepcopy
 
-from utils import parse_config, create_tokens_and_tags, download, get_image_size, get_image_size_and_channels
+from utils import (
+    parse_config, create_tokens_and_tags, download, get_image_size, get_image_size_and_channels, ensure_dir
+)
 
 
 logger = logging.getLogger(__name__)
@@ -30,6 +32,16 @@ class Format(Enum):
     COCO = auto()
     VOC = auto()
 
+    def __str__(self):
+        return self.name
+
+    @classmethod
+    def from_string(cls, s):
+        try:
+            return Format[s]
+        except KeyError:
+            raise ValueError()
+
 
 class Converter(object):
 
@@ -43,20 +55,22 @@ class Converter(object):
     def _get_data_keys_and_output_tags(self, output_tags=None):
         data_keys = set()
         output_tag_names = []
-        for tag in output_tags:
-            if tag not in self._schema:
-                logger.warning(
-                    f'Specified tag "{tag}" not found in config schema: available options are {list(self._schema.keys())}')
+        if output_tags is not None:
+            for tag in output_tags:
+                if tag not in self._schema:
+                    logger.warning(
+                        f'Specified tag "{tag}" not found in config schema: '
+                        f'available options are {list(self._schema.keys())}')
         for name, info in self._schema.items():
             if output_tags is not None and name not in output_tags:
                 continue
             new_data_keys = set(map(itemgetter('value'), info['inputs']))
-            if not new_data_keys:
-                new_data_keys |= new_data_keys
+            if not data_keys:
+                data_keys |= new_data_keys
             if data_keys != new_data_keys and output_tags is None:
                 raise ValueError(
                     f'Input schema for tag {name} differs from other tags: can\'t resolve data keys ambiguity. '
-                    f'Check your input tag {json.dumps(info["input"], indent=2)}, or explicitly specify which '
+                    f'Check your input tag {json.dumps(info["inputs"], indent=2)}, or explicitly specify which '
                     f'output tag you wan\'t to save by using "output_tag" option')
             output_tag_names.append(name)
 
@@ -104,49 +118,69 @@ class Converter(object):
         }
 
     def _check_format(self, fmt):
-        if fmt not in self._supported_formats:
-            raise FormatNotSupportedError(
-                f'{fmt.name} format not supported for current config. Available options are: {self._supported_formats}')
+        pass
+        # if fmt not in self._supported_formats:
+        #     raise FormatNotSupportedError(
+        #         f'{fmt.name} format not supported for current config. Available options are: {self._supported_formats}')
 
-    def _stringify(self, v):
-        if v['type'] == 'Сhoices' and len(v['Сhoices']) == 1:
-            return v['choices'][0]
+    def _prettify(self, v):
+        if len(v) == 1:
+            v = v[0]
+            if v['type'] == 'Choices' and len(v['choices']) == 1:
+                return v['choices'][0]
+        else:
+            out = []
+            for i in v:
+                j = deepcopy(i)
+                j.pop('type')
+                out.append(j)
+            return out
 
     def convert_to_json(self, input_dir, output_file):
         self._check_format(Format.JSON)
+        ensure_dir(os.path.dirname(output_file))
         records = []
         for item in self.iter_from_dir(input_dir):
             record = deepcopy(item['input'])
             for name, value in item['output'].items():
-                record[name] = self._stringify(value) or value
+                record[name] = self._prettify(value)
             records.append(record)
         with io.open(output_file, mode='w') as fout:
-            json.dump(fout, records, indent=2)
+            json.dump(records, fout, indent=2)
 
     def convert_to_csv(self, input_dir, output_file, **kwargs):
         self._check_format(Format.CSV)
+        ensure_dir(os.path.dirname(output_file))
         records = []
         for item in self.iter_from_dir(input_dir):
             record = deepcopy(item['input'])
             for name, value in item['output'].items():
-                record[name] = self._stringify(value) or json.dumps(value)
+                pretty_value = self._prettify(value)
+                record[name] = pretty_value if isinstance(pretty_value, str) else json.dumps(pretty_value)
             records.append(record)
 
-        pd.DataFrame.from_records(records).to_csv(output_file, **kwargs)
+        pd.DataFrame.from_records(records).to_csv(output_file, index=False, **kwargs)
 
     def convert_to_conll2003(self, input_dir, output_file):
         self._check_format(Format.CONLL2003)
+        ensure_dir(os.path.dirname(output_file))
+        data_key = self._data_keys[0]
         with io.open(output_file, 'w') as fout:
-            fout.write('-DOCSTART- -X- O O\n')
+            fout.write('-DOCSTART- -X- O\n')
             for item in self.iter_from_dir(input_dir):
-                tokens, tags = create_tokens_and_tags(text=item['input'][0], spans=item['output'])
+                tokens, tags = create_tokens_and_tags(
+                    text=item['input'][data_key],
+                    spans=next(iter(item['output'].values()))
+                )
                 for token, tag in zip(tokens, tags):
                     fout.write(f'{token} -X- _ {tag}\n')
                 fout.write('\n')
 
     def convert_to_coco(self, input_dir, output_file, output_image_dir=None):
         self._check_format(Format.COCO)
-
+        ensure_dir(os.path.dirname(output_file))
+        if output_image_dir is not None:
+            ensure_dir(output_image_dir)
         images, categories, annotations = [], [], []
         category_name_to_id = {}
         for item_idx, item in enumerate(self.iter_from_dir(input_dir)):
@@ -209,6 +243,10 @@ class Converter(object):
             }, indent=2)
 
     def convert_to_voc(self, input_dir, output_dir, output_image_dir=None):
+
+        ensure_dir(output_dir)
+        if output_image_dir is not None:
+            ensure_dir(output_image_dir)
 
         def create_child_node(doc, tag, attr, parent_node):
             child_node = doc.createElement(tag)
