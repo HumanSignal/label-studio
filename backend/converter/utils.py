@@ -64,6 +64,12 @@ def download(url, output_dir, filename=None):
 def get_image_size(image_path):
     return Image.open(image_path).size
 
+def get_image_size_and_channels(image_path):
+    i = Image.open(image_path)
+    w, h = i.size
+    c = len(i.getbands())
+    return w, h, c
+
 
 def iter_tokens_tags(input_dir):
     for datafile in glob(os.path.join(input_dir, '*.json')):

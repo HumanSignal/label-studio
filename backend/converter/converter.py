@@ -3,6 +3,8 @@ import json
 import io
 import logging
 import pandas as pd
+import xml.dom
+import xml.dom.minidom
 
 from enum import Enum, auto
 from datetime import datetime
@@ -11,7 +13,7 @@ from collections import Mapping, defaultdict
 from operator import itemgetter
 from copy import deepcopy
 
-from utils import parse_config, create_tokens_and_tags, download, get_image_size
+from utils import parse_config, create_tokens_and_tags, download, get_image_size, get_image_size_and_channels
 
 
 logger = logging.getLogger(__name__)
@@ -22,9 +24,11 @@ class FormatNotSupportedError(NotImplementedError):
 
 
 class Format(Enum):
+    JSON = auto()
     CSV = auto()
     CONLL2003 = auto()
     COCO = auto()
+    VOC = auto()
 
 
 class Converter(object):
@@ -107,8 +111,17 @@ class Converter(object):
     def _stringify(self, v):
         if v['type'] == 'Сhoices' and len(v['Сhoices']) == 1:
             return v['choices'][0]
-        else:
-            return json.dumps(v)
+
+    def convert_to_json(self, input_dir, output_file):
+        self._check_format(Format.JSON)
+        records = []
+        for item in self.iter_from_dir(input_dir):
+            record = deepcopy(item['input'])
+            for name, value in item['output'].items():
+                record[name] = self._stringify(value) or value
+            records.append(record)
+        with io.open(output_file, mode='w') as fout:
+            json.dump(fout, records, indent=2)
 
     def convert_to_csv(self, input_dir, output_file, **kwargs):
         self._check_format(Format.CSV)
@@ -116,7 +129,7 @@ class Converter(object):
         for item in self.iter_from_dir(input_dir):
             record = deepcopy(item['input'])
             for name, value in item['output'].items():
-                record[name] = self._stringify(value)
+                record[name] = self._stringify(value) or json.dumps(value)
             records.append(record)
 
         pd.DataFrame.from_records(records).to_csv(output_file, **kwargs)
@@ -184,7 +197,7 @@ class Converter(object):
                 })
 
         with io.open(output_file, mode='w') as fout:
-            json.dumps({
+            json.dump(fout, {
                 'images': images,
                 'categories': categories,
                 'annotations': annotations,
@@ -193,4 +206,77 @@ class Converter(object):
                     'version': '1.0',
                     'contributor': 'Label Studio'
                 }
-            })
+            }, indent=2)
+
+    def convert_to_voc(self, input_dir, output_dir, output_image_dir=None):
+
+        def create_child_node(doc, tag, attr, parent_node):
+            child_node = doc.createElement(tag)
+            text_node = doc.createTextNode(attr)
+            child_node.appendChild(text_node)
+            parent_node.appendChild(child_node)
+
+        for item_idx, item in enumerate(self.iter_from_dir(input_dir)):
+            image_path = item['input'][0]
+            annotations_dir = os.path.join(output_dir, 'Annotations')
+            if not os.path.exists(annotations_dir):
+                os.makedirs(annotations_dir)
+            if not os.path.exists(image_path):
+                if output_image_dir is None:
+                    raise FileNotFoundError(
+                        f'We can\'t find file by path {image_path}: if it is URL, please specify "output_image_dir"'
+                        f'where downloaded images will be stored'
+                    )
+                try:
+                    image_path = download(image_path, output_image_dir)
+                except:
+                    logger.error(f'Unable to download {image_path}. The item {item} will be skipped', exc_info=True)
+                    continue
+            width, height, channels = get_image_size_and_channels(image_path)
+            image_name = os.path.splitext(os.path.basename(image_path))[0]
+            xml_filepath = os.path.join(annotations_dir, image_name + '.xml')
+
+            curr_year = datetime.now().year
+            my_dom = xml.dom.getDOMImplementation()
+            doc = my_dom.createDocument(None, 'annotation', None)
+            root_node = doc.documentElement
+            create_child_node(doc, 'folder', f'COCO{curr_year}', root_node)
+            create_child_node(doc, 'filename', image_name, root_node)
+
+            source_node = doc.createElement('source')
+            create_child_node(doc, 'database', 'LOGODection', source_node)
+            create_child_node(doc, 'annotation', f'COCO{curr_year}', source_node)
+            create_child_node(doc, 'image', 'flickr', source_node)
+            create_child_node(doc, 'flickrid', 'NULL', source_node)
+            root_node.appendChild(source_node)
+            owner_node = doc.createElement('owner')
+            create_child_node(doc, 'flickrid', 'NULL', owner_node)
+            create_child_node(doc, 'name', 'Label Studio', owner_node)
+            root_node.appendChild(owner_node)
+            size_node = doc.createElement('size')
+            create_child_node(doc, 'width', str(width), size_node)
+            create_child_node(doc, 'height', str(height), size_node)
+            create_child_node(doc, 'depth', str(channels), size_node)
+            root_node.appendChild(size_node)
+            create_child_node(doc, 'segmented', '0', root_node)
+
+            for bbox in item['output']:
+                name = bbox['rectanglelabels'][0]
+                x = int(bbox['x'] / 100 * width)
+                y = int(bbox['y'] / 100 * height)
+                w = int(bbox['width'] / 100 * width)
+                h = int(bbox['height'] / 100 * height)
+
+                object_node = doc.createElement('object')
+                create_child_node(doc, 'name', name, object_node)
+                create_child_node(doc, 'pose', 'Unspecified', object_node)
+                create_child_node(doc, 'truncated', '0', object_node)
+                create_child_node(doc, 'difficult', '0', object_node)
+                bndbox_node = doc.createElement('bndbox')
+                create_child_node(doc, 'xmin', str(x), bndbox_node)
+                create_child_node(doc, 'ymin', str(y), bndbox_node)
+                create_child_node(doc, 'xmax', str(x + w), bndbox_node)
+                create_child_node(doc, 'ymax', str(y + h), bndbox_node)
+                object_node.appendChild(bndbox_node)
+
+            doc.writexml(xml_filepath, addindent='' * 4, newl='\n', encoding='utf-8')
