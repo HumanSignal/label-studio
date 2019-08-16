@@ -147,23 +147,32 @@ export default types
     };
 
     function loadTask() {
-      if (self.task && self.taskID) {
-        console.log("Task and taskID");
-      } else if (!self.task && !self.taskID) {
-        console.log("No task and no task ID");
-      } else if (self.task && !self.taskID) {
-        console.log("Task");
-      } else if (self.taskID && !self.task) {
-        console.log("Task ID");
-      }
+      // function huy() {
+      //   self.markLoading(false);
+      //   self.noTask = true;
+      //   return;
+      // }
 
-      if (self.explore) {
-        if (self.projectID) {
-          console.log("Explore and ProjectID");
-        } else {
-          console.log("Explore and No project ID");
-        }
-      }
+      // if (self.task && self.taskID) {
+      //   console.log("Task and taskID");
+      //   huy()
+      // } else if (!self.task && !self.taskID) {
+      //   console.log("No task and no task ID");
+      //   huy()
+      // } else if (self.task && !self.taskID) {
+      //   console.log("Task");
+      // } else if (self.taskID && !self.task) {
+      //   return _loadTask(`${API_URL.MAIN}${API_URL.TASKS}/${self.taskID}/`);
+      // }
+
+      // if (self.explore) {
+      //   if (self.projectID) {
+      //     return _loadTask(`${API_URL.MAIN}${API_URL.PROJECTS}/${self.projectID}${API_URL.NEXT}`);
+      //   } else {
+      //     console.log("Explore and No project ID");
+      //     huy()
+      //   }
+      // }
 
       if (self.taskID) {
         return _loadTask(`${API_URL.MAIN}${API_URL.TASKS}/${self.taskID}/`);
@@ -284,7 +293,7 @@ export default types
           result: res,
         });
 
-        yield getEnv(self).patch(`${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}${API_URL.COMPLETIONS}/${c.id}`, body);
+        yield getEnv(self).patch(`${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}${API_URL.COMPLETIONS}/${c.pk}`, body);
 
         if (hasInterface("submit:load")) {
           self.resetState();
