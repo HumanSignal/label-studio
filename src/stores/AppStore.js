@@ -147,33 +147,6 @@ export default types
     };
 
     function loadTask() {
-      // function huy() {
-      //   self.markLoading(false);
-      //   self.noTask = true;
-      //   return;
-      // }
-
-      // if (self.task && self.taskID) {
-      //   console.log("Task and taskID");
-      //   huy()
-      // } else if (!self.task && !self.taskID) {
-      //   console.log("No task and no task ID");
-      //   huy()
-      // } else if (self.task && !self.taskID) {
-      //   console.log("Task");
-      // } else if (self.taskID && !self.task) {
-      //   return _loadTask(`${API_URL.MAIN}${API_URL.TASKS}/${self.taskID}/`);
-      // }
-
-      // if (self.explore) {
-      //   if (self.projectID) {
-      //     return _loadTask(`${API_URL.MAIN}${API_URL.PROJECTS}/${self.projectID}${API_URL.NEXT}`);
-      //   } else {
-      //     console.log("Explore and No project ID");
-      //     huy()
-      //   }
-      // }
-
       if (self.taskID) {
         return _loadTask(`${API_URL.MAIN}${API_URL.TASKS}/${self.taskID}/`);
       } else if (self.explore && self.projectID) {
