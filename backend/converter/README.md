@@ -16,11 +16,20 @@ Label Studio Format Converter helps you to encode labels into the format of your
 ## Examples
 
 #### JSON
+Running from the command line:
 ```bash
 python backend/converter/cli.py --input examples/sentiment_analysis/completions/ --config examples/sentiment_analysis/config.xml --output tmp/output.json
 ```
 
-Get output file: `tmp/output.json`
+Running from python:
+```python
+from converter import Converter
+
+c = Converter('examples/sentiment_analysis/config.xml')
+c.convert_to_json('examples/sentiment_analysis/completions/', 'tmp/output.json')
+```
+
+Getting output file: `tmp/output.json`
 ```json
 [
   {
@@ -42,11 +51,20 @@ Use cases: any tasks
 
 
 #### CSV
+Running from the command line:
 ```bash
 python backend/converter/cli.py --input examples/sentiment_analysis/completions/ --config examples/sentiment_analysis/config.xml --output tmp/output.tsv --format CSV --csv-separator $'\t'
 ```
 
-Get output file `tmp/output.tsv`:
+Running from python:
+```python
+from converter import Converter
+
+c = Converter('examples/sentiment_analysis/config.xml')
+c.convert_to_csv('examples/sentiment_analysis/completions/', 'tmp/output.tsv', sep='\t', header=True)
+```
+
+Getting output file `tmp/output.tsv`:
 ```tsv
 reviewText	sentiment
 Good case, Excellent value.	Positive
@@ -58,11 +76,20 @@ Use cases: any tasks
 
 #### CoNLL 2003
 
+Running from the command line:
 ```bash
 python backend/converter/cli.py --input examples/named_entity/completions/ --config examples/named_entity/config.xml --output tmp/output.conll --format CONLL2003
 ```
 
-Get output file `tmp/output.conll`
+Running from python:
+```python
+from converter import Converter
+
+c = Converter('examples/named_entity/config.xml')
+c.convert_to_conll2003('examples/named_entity/completions/', 'tmp/output.conll')
+```
+
+Getting output file `tmp/output.conll`
 ```text
 -DOCSTART- -X- O
 Showers -X- _ O
@@ -82,10 +109,22 @@ Use cases: text tagging
 
 
 #### COCO
+Running from the command line:
 ```bash
-python backend/converter/cli.py --input examples/image_bbox/completions/ --config examples/image_bbox/config.xml --output tmp/output.json --format COCO --image-dir tmp/image
+python backend/converter/cli.py --input examples/image_bbox/completions/ --config examples/image_bbox/config.xml --output tmp/output.json --format COCO --image-dir tmp/images
 ```
-Get output file `tmp/output.json`
+
+Running from python:
+```python
+from converter import Converter
+
+c = Converter('examples/image_bbox/config.xml')
+c.convert_to_coco('examples/image_bbox/completions/', 'tmp/output.conll', output_image_dir='tmp/images')
+```
+
+Output images could be found in `tmp/images`
+
+Getting output file `tmp/output.json`
 ```json
 {
   "images": [
@@ -149,10 +188,21 @@ Get output file `tmp/output.json`
 Use cases: image object detection
 
 #### Pascal VOC XML
+Running from the command line:
 ```bash
 python backend/converter/cli.py --input examples/image_bbox/completions/ --config examples/image_bbox/config.xml --output tmp/voc-annotations --format VOC --image-dir tmp/images
 ```
-Output images could be found in `tmp/images`
+
+Running from python:
+```python
+from converter import Converter
+
+c = Converter('examples/image_bbox/config.xml')
+c.convert_to_voc('examples/image_bbox/completions/', 'tmp/output.conll', output_image_dir='tmp/images')
+```
+
+Output images can be found in `tmp/images`
+
 Corresponding annotations could be found in `tmp/voc-annotations/*.xml`:
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
