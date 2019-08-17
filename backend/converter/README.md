@@ -2,9 +2,11 @@
 
 - [Introduction](#introduction)
 - [Examples](#examples)
-    - [Text Classification](#text-classification)
-    - [Text Tagging](#text-tagging)
-- [TODO](#todo)
+    - [JSON](#json)
+    - [CSV](#csv)
+    - [CoNLL 2003](#conll-2003)
+    - [COCO](#coco)
+    - [Pascal VOC XML](#pascal-voc-xml)
 - [Contributing](#contributing)
 
 ## Introduction
@@ -14,7 +16,6 @@ Label Studio Format Converter helps you to encode labels into the format of your
 ## Examples
 
 #### JSON
-Run
 ```bash
 python backend/converter/cli.py --input examples/sentiment_analysis/completions/ --config examples/sentiment_analysis/config.xml --output tmp/output.json
 ```
@@ -37,11 +38,10 @@ Get output file: `tmp/output.json`
 ]
 ```
 
-Use cases: TBD
+Use cases: any tasks
 
 
 #### CSV
-Run
 ```bash
 python backend/converter/cli.py --input examples/sentiment_analysis/completions/ --config examples/sentiment_analysis/config.xml --output tmp/output.tsv --format CSV --csv-separator $'\t'
 ```
@@ -54,11 +54,10 @@ What a waste of money and time!	Negative
 The goose neck needs a little coaxing	Neutral
 ```
 
-Use cases: TBD
+Use cases: any tasks
 
 #### CoNLL 2003
 
-Run
 ```bash
 python backend/converter/cli.py --input examples/named_entity/completions/ --config examples/named_entity/config.xml --output tmp/output.conll --format CONLL2003
 ```
@@ -79,7 +78,131 @@ zone, -X- _ O
 ...
 ```
 
-Use cases: TBD
+Use cases: text tagging
+
+
+#### COCO
+```bash
+python backend/converter/cli.py --input examples/image_bbox/completions/ --config examples/image_bbox/config.xml --output tmp/output.json --format COCO --image-dir tmp/image
+```
+Get output file `tmp/output.json`
+```json
+{
+  "images": [
+    {
+      "width": 800,
+      "height": 501,
+      "id": 0,
+      "file_name": "tmp/images/62a623a0d3cef27a51d3689865e7b08a"
+    }
+  ],
+  "categories": [
+    {
+      "id": 0,
+      "name": "Planet"
+    },
+    {
+      "id": 1,
+      "name": "Moonwalker"
+    }
+  ],
+  "annotations": [
+    {
+      "id": 0,
+      "image_id": 0,
+      "category_id": 0,
+      "segmentation": [],
+      "bbox": [
+        299,
+        6,
+        377,
+        260
+      ],
+      "ignore": 0,
+      "iscrowd": 0,
+      "area": 98020
+    },
+    {
+      "id": 1,
+      "image_id": 0,
+      "category_id": 1,
+      "segmentation": [],
+      "bbox": [
+        288,
+        300,
+        132,
+        90
+      ],
+      "ignore": 0,
+      "iscrowd": 0,
+      "area": 11880
+    }
+  ],
+  "info": {
+    "year": 2019,
+    "version": "1.0",
+    "contributor": "Label Studio"
+  }
+}
+```
+
+Use cases: image object detection
+
+#### Pascal VOC XML
+```bash
+python backend/converter/cli.py --input examples/image_bbox/completions/ --config examples/image_bbox/config.xml --output tmp/voc-annotations --format VOC --image-dir tmp/images
+```
+Output images could be found in `tmp/images`
+Corresponding annotations could be found in `tmp/voc-annotations/*.xml`:
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<annotation>
+<folder>tmp/images</folder>
+<filename>62a623a0d3cef27a51d3689865e7b08a</filename>
+<source>
+<database>MyDatabase</database>
+<annotation>COCO2017</annotation>
+<image>flickr</image>
+<flickrid>NULL</flickrid>
+</source>
+<owner>
+<flickrid>NULL</flickrid>
+<name>Label Studio</name>
+</owner>
+<size>
+<width>800</width>
+<height>501</height>
+<depth>3</depth>
+</size>
+<segmented>0</segmented>
+<object>
+<name>Planet</name>
+<pose>Unspecified</pose>
+<truncated>0</truncated>
+<difficult>0</difficult>
+<bndbox>
+<xmin>299</xmin>
+<ymin>6</ymin>
+<xmax>676</xmax>
+<ymax>266</ymax>
+</bndbox>
+</object>
+<object>
+<name>Moonwalker</name>
+<pose>Unspecified</pose>
+<truncated>0</truncated>
+<difficult>0</difficult>
+<bndbox>
+<xmin>288</xmin>
+<ymin>300</ymin>
+<xmax>420</xmax>
+<ymax>390</ymax>
+</bndbox>
+</object>
+</annotation>
+```
+
+Use cases: image object detection
 
 
 ## Contributing

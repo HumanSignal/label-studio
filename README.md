@@ -129,7 +129,9 @@ Completion is an object with five mandatory fields:
 - **type** type of the labeling/tag
 - **value** tag specific value that includes the labeling result details
 
-For popular machine learning libraries there is converter code to transform Label Studio format in ML library format. [Learn More](/backend/converter/README.md) about it.
+Want to use labeled data in your machine learning project, but get stuck to writing your parser? No worry, we are already
+supporting multiple format converters, already adopted by popular machine learning libraries.
+[Check it out!](/backend/converter/README.md)
 
 ## Contributing
 

@@ -183,8 +183,9 @@ class Converter(object):
             ensure_dir(output_image_dir)
         images, categories, annotations = [], [], []
         category_name_to_id = {}
+        data_key = self._data_keys[0]
         for item_idx, item in enumerate(self.iter_from_dir(input_dir)):
-            image_path = item['input'][0]
+            image_path = item['input'][data_key]
             if not os.path.exists(image_path):
                 if output_image_dir is None:
                     raise FileNotFoundError(
@@ -204,7 +205,8 @@ class Converter(object):
                 'id': image_id,
                 'file_name': image_path
             })
-            for bbox in item['output']:
+            bboxes = next(iter(item['output'].values()))
+            for bbox in bboxes:
                 category_name = bbox['rectanglelabels'][0]
                 if category_name not in category_name_to_id:
                     category_id = len(categories)
@@ -231,7 +233,7 @@ class Converter(object):
                 })
 
         with io.open(output_file, mode='w') as fout:
-            json.dump(fout, {
+            json.dump({
                 'images': images,
                 'categories': categories,
                 'annotations': annotations,
@@ -240,7 +242,7 @@ class Converter(object):
                     'version': '1.0',
                     'contributor': 'Label Studio'
                 }
-            }, indent=2)
+            }, fout, indent=2)
 
     def convert_to_voc(self, input_dir, output_dir, output_image_dir=None):
 
@@ -254,8 +256,10 @@ class Converter(object):
             child_node.appendChild(text_node)
             parent_node.appendChild(child_node)
 
+        data_key = self._data_keys[0]
+
         for item_idx, item in enumerate(self.iter_from_dir(input_dir)):
-            image_path = item['input'][0]
+            image_path = item['input'][data_key]
             annotations_dir = os.path.join(output_dir, 'Annotations')
             if not os.path.exists(annotations_dir):
                 os.makedirs(annotations_dir)
@@ -274,16 +278,15 @@ class Converter(object):
             image_name = os.path.splitext(os.path.basename(image_path))[0]
             xml_filepath = os.path.join(annotations_dir, image_name + '.xml')
 
-            curr_year = datetime.now().year
             my_dom = xml.dom.getDOMImplementation()
             doc = my_dom.createDocument(None, 'annotation', None)
             root_node = doc.documentElement
-            create_child_node(doc, 'folder', f'COCO{curr_year}', root_node)
+            create_child_node(doc, 'folder', output_image_dir, root_node)
             create_child_node(doc, 'filename', image_name, root_node)
 
             source_node = doc.createElement('source')
-            create_child_node(doc, 'database', 'LOGODection', source_node)
-            create_child_node(doc, 'annotation', f'COCO{curr_year}', source_node)
+            create_child_node(doc, 'database', 'MyDatabase', source_node)
+            create_child_node(doc, 'annotation', 'COCO2017', source_node)
             create_child_node(doc, 'image', 'flickr', source_node)
             create_child_node(doc, 'flickrid', 'NULL', source_node)
             root_node.appendChild(source_node)
@@ -298,7 +301,8 @@ class Converter(object):
             root_node.appendChild(size_node)
             create_child_node(doc, 'segmented', '0', root_node)
 
-            for bbox in item['output']:
+            bboxes = next(iter(item['output'].values()))
+            for bbox in bboxes:
                 name = bbox['rectanglelabels'][0]
                 x = int(bbox['x'] / 100 * width)
                 y = int(bbox['y'] / 100 * height)
@@ -316,5 +320,7 @@ class Converter(object):
                 create_child_node(doc, 'xmax', str(x + w), bndbox_node)
                 create_child_node(doc, 'ymax', str(y + h), bndbox_node)
                 object_node.appendChild(bndbox_node)
+                root_node.appendChild(object_node)
 
-            doc.writexml(xml_filepath, addindent='' * 4, newl='\n', encoding='utf-8')
+            with io.open(xml_filepath, mode='w') as fout:
+                doc.writexml(fout, addindent='' * 4, newl='\n', encoding='utf-8')
