@@ -99,15 +99,12 @@ async function getState() {
 function rootElement() {
   const el = document.createElement("div");
 
-  let root = document.getElementById("root");
+  let root = document.getElementById("label-studio");
 
   root.innerHTML = "";
   root.appendChild(el);
 
-  root.style.marginTop = "10px";
-  root.style.marginBottom = "10px";
-  root.style.marginLeft = "10px";
-  root.style.marginRight = "10px";
+  root.style.margin = "0 auto";
 
   return el;
 }
