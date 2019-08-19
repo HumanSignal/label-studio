@@ -40,7 +40,7 @@ const Completion = observer(({ item, store }) => {
       }}
     >
       <List.Content>
-        <List.Header as="a">ID {item.pk || item.id}</List.Header>
+        {item.pk >= 0 && <List.Header as="a">ID {item.pk || item.id}</List.Header>}
         <p></p>
         <List.Description as="a">
           Created
@@ -94,7 +94,7 @@ class Completions extends Component {
         <Card title="Completions" bodyStyle={{ padding: 0 }}>
           <List divided relaxed>
             {store.completionStore.savedCompletions.map(
-              c => c.pk > 0 && <Completion key={c.pk} item={c} store={store} />,
+              c => true && <Completion key={c.pk} item={c} store={store} />,
             )}
           </List>
         </Card>
