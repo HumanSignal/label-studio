@@ -87,7 +87,11 @@ const Model = types
 
     fromStateJSON(obj, fromModel) {
       let r;
+      let m;
 
+      /**
+       *
+       */
       const tree = {
         pid: obj.id,
         start: obj.value.start,
@@ -95,20 +99,23 @@ const Model = types
         normalization: obj.normalization,
       };
 
+      const region = self.findRegion(obj.value.start, obj.value.end);
+
       if (obj.value.labels) {
         self.completion.names.get(obj.from_name).fromStateJSON(obj);
       }
 
-      const region = self.findRegion(obj.value.start, obj.value.end);
-      const m = restoreNewsnapshot(fromModel);
+      if (fromModel) {
+        m = restoreNewsnapshot(fromModel);
 
-      m.fromStateJSON(obj);
+        m.fromStateJSON(obj);
 
-      if (!region) {
-        tree.states = [m];
-        r = self.addRegion(tree);
-      } else {
-        region.states.push(m);
+        if (!region) {
+          tree.states = [m];
+          r = self.addRegion(tree);
+        } else {
+          region.states.push(m);
+        }
       }
 
       if (self._ws) {
