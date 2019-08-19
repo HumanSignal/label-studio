@@ -73,9 +73,11 @@ class Completions extends Component {
     const { store } = this.props;
 
     let count = 0;
-    console.log(store.completionStore.savedCompletions)
+
     store.completionStore.savedCompletions.map(c => {
-      count += c.pk > 0;
+      if (c.pk > 0) {
+        count++;
+      }
     });
 
     if (count === 0) {
@@ -86,30 +88,19 @@ class Completions extends Component {
           </List>
         </Card>
       );
-    }
-
-    // show completions
-    else {
+    } else {
       return (
-        <Card title="Completions" bodyStyle={{ padding: 0 }}>
+        <Card title="Completions" bodyStyle={{ padding: 0, paddingTop: "1px" }}>
           <List divided relaxed>
-            {store.completionStore.savedCompletions.map(
-              c => true && <Completion key={c.pk} item={c} store={store} />,
-            )}
+            {store.completionStore.savedCompletions.map(c => {
+              if (c) {
+                return <Completion key={c.pk} item={c} store={store} />;
+              }
+            })}
           </List>
         </Card>
       );
     }
-
-    // return (
-    //   <Card title="Completions" bodyStyle={{ padding: 0 }}>
-    //     <List divided relaxed>
-    //       {store.completionStore.savedCompletions.map(c => (
-    //         <Completion key={c.id} item={c} store={store} />
-    //       ))}
-    //     </List>
-    //   </Card>
-    // );
   }
 }
 

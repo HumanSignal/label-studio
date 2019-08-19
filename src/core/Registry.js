@@ -32,6 +32,10 @@ class _Registry {
     return this.views[tag];
   }
 
+  /**
+   * Get model
+   * @param {*} tag
+   */
   getModelByTag(tag) {
     const model = this.models[tag];
 

@@ -1,4 +1,4 @@
-import { types, getParent, getEnv, flow, destroy, detach, getMembers } from "mobx-state-tree";
+import { types, getParent, getEnv, flow, destroy } from "mobx-state-tree";
 
 import { guidGenerator } from "../core/Helpers";
 import Types from "../core/Types";
@@ -294,6 +294,10 @@ export default types
     },
   }))
   .actions(self => {
+    /**
+     *
+     * @param {*} id
+     */
     function selectCompletion(id) {
       self.completions.map(c => (c.selected = false));
       const c = self.completions.find(c => c.id === id);
@@ -311,15 +315,18 @@ export default types
      */
     function addCompletion(node, type) {
       const c = Completion.create(node);
-
-      if (self.store.task && type === "initial")
+      if (self.store.task && type === "initial") {
         c.traverseTree(node => node.updateValue && node.updateValue(self.store));
+      }
 
       self.completions.push(c);
 
       return c;
     }
 
+    /**
+     *
+     */
     const _deleteCompletion = flow(function* _deleteCompletion(pk) {
       try {
         const json = yield getEnv(self).remove("/api/tasks/" + self.store.task.id + "/completions/" + pk + "/");
@@ -328,6 +335,10 @@ export default types
       }
     });
 
+    /**
+     * Destroy completion
+     * @param {*} completion
+     */
     function destroyCompletion(completion) {
       destroy(completion);
 
@@ -360,6 +371,7 @@ export default types
       };
 
       const completion = self.addCompletion(node, "list");
+
       return completion;
     }
 
@@ -368,9 +380,19 @@ export default types
      * @returns {object}
      */
     function addInitialCompletion() {
+      /**
+       * Convert config to model
+       */
       const completionModel = Tree.treeToModel(self.store.config);
+
+      /**
+       * Get model by type of tag
+       */
       const modelClass = Registry.getModelByTag(completionModel.type);
 
+      /**
+       * Completion model init
+       */
       let root = modelClass.create(completionModel);
 
       const node = {
@@ -385,7 +407,10 @@ export default types
         node["createdBy"] = "Admin";
       }
 
-      let completion = self.addCompletion(node, "initial");
+      /**
+       *
+       */
+      const completion = self.addCompletion(node, "initial");
 
       return completion;
     }

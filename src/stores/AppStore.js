@@ -232,7 +232,6 @@ export default types
               const comp = self.completionStore.addSavedCompletion(c);
               comp.traverseTree(node => node.updateValue && node.updateValue(self));
               self.completionStore.selectCompletion(comp.id);
-
               comp.deserializeCompletion(c.result);
               comp.reinitHistory();
             }
@@ -336,7 +335,7 @@ export default types
       let generatedCompletions = [];
 
       if (completions && completions.length) {
-        for (var i = 0; i < completions.length; i++) {
+        for (let i = 0; i < completions.length; i++) {
           const itemOfCompletion = completions[i];
 
           /**
@@ -355,34 +354,21 @@ export default types
         const c = self.completionStore.addInitialCompletion();
         self.completionStore.selectCompletion(c.id);
 
-        /*if (self.task) {
-          if (generatedCompletions.length > 0) {
-            let data = generatedCompletions[0].result;
+        if (self.task) {
+          for (let j = 0; j < generatedCompletions.length; j++) {
+            const p = generatedCompletions[j];
 
-            if (typeof generatedCompletions[0].result === "string") {
-              data = JSON.parse(generatedCompletions[0].result);
-            }
+            // let comp = self.completionStore.addSavedCompletion(c);
 
-            c.deserializeCompletion(data);
+            // comp.traverseTree(node => node.updateValue && node.updateValue(self));
 
+            // self.completionStore.selectCompletion(p.result.id);
+
+            c.deserializeCompletion(p.result);
             c.reinitHistory();
           }
-        }*/
-
-        for (var i = 0; i < generatedCompletions.length; i++) {
-          const c = generatedCompletions[i];
-
-          if (c.was_cancelled === true) continue;
-
-          const comp = self.completionStore.addSavedCompletion(c);
-          comp.traverseTree(node => node.updateValue && node.updateValue(self));
-          self.completionStore.selectCompletion(comp.id);
-
-          comp.deserializeCompletion(c.result);
-          comp.reinitHistory();
         }
       }
-      
     }
 
     return {
