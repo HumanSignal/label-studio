@@ -1,9 +1,9 @@
-# Contributing to HEARTEX Editor
+# Contributing to Label Studio
 
 First off, thanks for taking the time to contribute!
 
-## Reporting Bugs
+This part of the documentation gives you a basic overview of how to help with the development of our label studio.
 
-## First Code Contribution
+## Reporting Bugs
 
 ## Pull Requests
