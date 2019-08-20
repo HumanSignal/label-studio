@@ -75,9 +75,9 @@ class Completions extends Component {
     let count = 0;
 
     store.completionStore.savedCompletions.map(c => {
-      if (c.pk > 0) {
+      //if (c.pk > 0 || c.prediction) {
         count++;
-      }
+      //}
     });
 
     if (count === 0) {

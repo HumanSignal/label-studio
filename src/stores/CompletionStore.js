@@ -26,6 +26,7 @@ const Completion = types
     createdBy: types.optional(types.string, "Admin"),
 
     honeypot: types.optional(types.boolean, false),
+    prediction: types.optional(types.boolean, false),
 
     root: Types.allModelsTypes(),
     names: types.map(types.reference(Types.allModelsTypes())),
