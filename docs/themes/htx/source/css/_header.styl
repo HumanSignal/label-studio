@@ -1,0 +1,148 @@
+$header-height = 40px
+
+red-dot-before(leftPos = -8px)
+  content: ""
+  width: 0
+  height: 0
+  border 2px solid $red
+  border-radius 50%
+  position: absolute
+  top: calc(50% - 1px)
+  left: leftPos
+
+#header
+  background-color: #fff
+  height: $header-height
+  display: flex
+  align-items: center
+  padding: $heading-padding-vertical 20px $heading-padding-vertical 40px;
+  position: relative
+  z-index: 100
+
+body.docs
+  #header
+    position: fixed
+    width: 100%
+    top: 0
+  #nav
+    position: fixed
+
+#nav
+  list-style-type: none
+  margin: 0
+  padding: 0
+  position: absolute
+  right: 30px
+  line-height: $header-height
+  .break
+    display: none
+  li
+    display: inline-block
+    position: relative
+    margin: 0 .6em
+
+  .nav-dropdown
+    .nav-link
+      &:hover, &.current
+        border-bottom: none
+      &.current
+        &::after
+          content: ""
+          width: 0
+          height: 0
+          border-left: 5px solid $green
+          border-top: 3px solid transparent
+          border-bottom: 3px solid transparent
+          position: absolute
+          top: 50%
+          margin-top: -4px
+          left: 8px
+      &.new::before
+        red-dot-before(8px)
+
+.nav-link
+  padding-bottom: 3px
+  white-space: nowrap
+  &:hover, &.current
+    border-bottom: 3px solid $green
+  &.team
+    margin-left: 10px
+  &.new::before
+    red-dot-before()
+
+.new-label
+  position: absolute
+  top: 3px
+  left: 110%
+  background-color: $green
+  color: #fff
+  line-height: 16px
+  height: 16px
+  font-size: 9px
+  font-weight: bold
+  font-family: $code-font
+  padding: 1px 4px 0 6px
+  border-radius: 4px
+
+.search-query
+  height: 30px
+  line-height: 30px
+  box-sizing: border-box
+  padding: 0 15px 0 30px
+  border: 1px solid #e3e3e3
+  color: $dark
+  outline: none
+  border-radius: 15px
+  margin-right: 10px
+  transition: border-color .2s ease
+  background: #fff url(../images/search.png) 8px 5px no-repeat
+  background-size: 20px
+  vertical-align: middle !important
+  &:focus
+    border-color: $green
+
+#logo
+  display: inline-block
+  font-size: 1.5em
+  line-height: $header-height
+  color: $dark
+  font-family: $logo-font
+  font-weight: 500
+  display: flex
+  img
+    vertical-align: middle
+    margin-right: 6px
+    width: $header-height
+    height: $header-height
+
+#mobile-bar
+  position: fixed
+  top: 0
+  left: 0
+  width: 100%
+  height: 40px
+  background-color: #fff
+  z-index: 9
+  display: none
+  box-shadow: 0 0 2px rgba(0,0,0,.25)
+  .menu-button
+    position: absolute
+    width: 24px
+    height: 24px
+    top: 8px
+    left: 12px
+    background: url(../images/menu.png) center center no-repeat
+    background-size: 24px
+  .logo
+    position: absolute
+    width: 30px
+    height: 30px
+    background: url(../images/logo.png) center center no-repeat
+    top: 5px
+    left: 50%
+    margin-left: -15px
+    background-size: 30px
+
+@media print
+  #header
+    display: none

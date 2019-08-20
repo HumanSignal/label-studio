@@ -1,0 +1,60 @@
+<% var isIndex = page.path === 'index.html' %>
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+      <title><%- page.title ? page.title + ' — ' : '' %>Label Studio</title>
+      <meta charset="utf-8">
+      <meta name="description" content="<%- theme.site_description %>">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+
+      <meta property="og:type" content="article">
+      <meta property="og:title" content="<%- page.title ? page.title + ' — ' : '' %>Label Studio">
+      <meta property="og:description" content="<%- theme.site_description %>">
+      <meta property="og:image" content="https://<%- theme.root_domain %>/<%- url_for("/images/logo.png") %>">
+
+      <meta name="twitter:card" content="summary">
+      <meta name="twitter:title" content="<%- page.title ? page.title + ' — ' : '' %>Label Studio">
+      <meta name="twitter:description" content="<%- theme.site_description %>">
+      <meta name="twitter:image" content="https://<%- theme.root_domain %>/images/logo.png">
+
+      <meta name="msapplication-TileColor" content="#4fc08d">
+      <meta name="theme-color" content="#4fc08d">
+
+      <meta name="msapplication-config" content="browserconfig.xml">
+      <link rel="manifest" href="/manifest.json">
+
+      <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600|Roboto Mono' rel='stylesheet' type='text/css'>
+      <link href='//fonts.googleapis.com/css?family=Dosis:500&text=LabelStudio' rel='stylesheet' type='text/css'>
+
+      <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+      <!-- Place this tag in your head or just before your close body tag. -->
+      <script async defer src="https://buttons.github.io/buttons.js"></script>
+    
+    <!-- main page styles -->
+    <%- css(isIndex ? 'css/index' : 'css/page') %>
+
+    <!-- this needs to be loaded before guide's inline scripts -->
+    
+  </head>
+  <body class="<%- isIndex ? '' : 'docs' -%>">
+    <div id="mobile-bar" <%- isIndex ? 'class="top"' : '' %>>
+      <a class="menu-button"></a>
+      <a class="logo" href="/"></a>
+    </div>
+    <%- partial('partials/header') %>
+    <% if (!isIndex) { %>
+      <div id="main" class="fix-sidebar">
+          <%- body %>
+      </div>
+      <script src="<%- url_for("/js/smooth-scroll.min.js") %>"></script>
+    <% } else { %>
+      <%- body %>
+    <% } %>
+
+    <!-- main custom script for sidebars, version selects etc. -->
+    <script src="<%- url_for("/js/css.escape.js") %>"></script>
+    <script src="<%- url_for("/js/common.js") %>"></script>
+  </body>
+</html>

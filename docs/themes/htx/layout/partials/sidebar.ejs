@@ -1,0 +1,30 @@
+<div class="sidebar">
+  <div class="sidebar-inner">
+    <ul class="main-menu">
+      <%- partial('partials/main_menu', { context: 'sidebar' }) %>
+    </ul>
+    <div class="list">
+      <% if (type !== 'search') { %>
+          <!-- <h2>
+               <% titles = {
+               api: 'API',
+               examples: 'Examples',
+               guide: 'Guide',
+               cookbook: 'Cookbook<sup class="beta">beta</sup>',
+               'style-guide': 'Style Guide<sup class="beta">beta</sup>'
+               } %>
+               <%- titles[type] %>
+               <% if (['cookbook', 'style-guide'].indexOf(type) === -1) { %>
+               <select class="version-select">
+               <option value="SELF" selected>2.x</option>
+               <option value="v1">1.0</option>
+               <option value="012">0.12</option>
+               <option value="011">0.11</option>
+               </select>
+               <% } %>
+               </h2>
+          --><%- partial('partials/toc', { type: type }) %>
+      <% } %>
+    </div>
+  </div>
+</div>

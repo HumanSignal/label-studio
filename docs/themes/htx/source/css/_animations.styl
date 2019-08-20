@@ -1,0 +1,12 @@
+.rotating-clockwise
+  animation: 3s rotating-clockwise linear infinite
+
+i.rotating-clockwise
+  display: inline-block
+  animation-duration: 2s
+
+@keyframes rotating-clockwise
+  from
+    transform: rotate(0)
+  to
+    transform: rotate(360deg)
