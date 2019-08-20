@@ -103,7 +103,8 @@ const App = inject("store")(
 
         if (store.labeledSuccess) return this.renderSuccess();
 
-        if (!store.completionStore.currentCompletion) return this.renderNoCompletion();
+        if (!store.completionStore.currentCompletion && !store.hasInterface('completions'))
+            return this.renderNoCompletion();
 
         const { root } = store.completionStore.currentCompletion;
 
