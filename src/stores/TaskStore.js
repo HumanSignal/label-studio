@@ -22,14 +22,6 @@ const TaskStore = types
      */
     project: types.maybeNull(types.number),
   })
-  /**
-   * Hack for update data of task to string
-   */
-  // .preProcessSnapshot(snapshot => ({
-  //   id: snapshot.id ? snapshot.id : 1,
-  //   data: typeof snapshot.data === "object" ? snapshot.data = JSON.stringify(snapshot.data) : snapshot.data,
-  //   project: snapshot.project ? snapshot.project : 1
-  // }))
   .views(self => ({
     get app() {
       return getParent(self);

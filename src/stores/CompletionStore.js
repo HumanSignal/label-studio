@@ -70,7 +70,10 @@ const Completion = types
     reinitHistory() {
       self.history = { targetPath: "../root" };
     },
-    // send update to server
+    /**
+     * Send update to serve
+     * @param {*} state
+     */
     _updateServerState(state) {
       let appStore = getParent(self, 3);
       let url = "/api/tasks/" + appStore.task.id + "/completions/" + self.pk + "/";
@@ -143,6 +146,7 @@ const Completion = types
 
     traverseTree(cb) {
       let visitNode;
+
       visitNode = function(node) {
         cb(node);
 
@@ -315,14 +319,21 @@ export default types
      * @param {string} type
      */
     function addCompletion(node, type) {
-      const c = Completion.create(node);
+      /**
+       * Create Completion
+       */
+      const createdCompletion = Completion.create(node);
+
+      /**
+       * If completion is initial completion
+       */
       if (self.store.task && type === "initial") {
-        c.traverseTree(node => node.updateValue && node.updateValue(self.store));
+        createdCompletion.traverseTree(node => node.updateValue && node.updateValue(self.store));
       }
 
-      self.completions.push(c);
+      self.completions.push(createdCompletion);
 
-      return c;
+      return createdCompletion;
     }
 
     /**
@@ -363,7 +374,7 @@ export default types
       let root = modelClass.create(completionModel);
 
       const node = {
-        pk: c.id,
+        pk: c.pk,
         id: c.id || guidGenerator(),
         createdAgo: c.created_ago,
         createdBy: c.created_username,
@@ -401,11 +412,13 @@ export default types
         root: root,
       };
 
+      /**
+       * Expert module for initial completion
+       */
       if (self.store.expert) {
         const { expert } = self.store;
-        node["createdBy"] = expert.firstName + " " + expert.lastName;
-      } else {
-        node["createdBy"] = "Admin";
+
+        node["createdBy"] = `${expert.firstName} ${expert.lastName}`;
       }
 
       /**

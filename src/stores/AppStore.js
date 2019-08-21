@@ -1,94 +1,126 @@
 import { types, getEnv, flow, getSnapshot } from "mobx-state-tree";
 
 import Task from "./TaskStore";
+import User from "./UserStore";
+import Settings from "./SettingsStore";
 import CompletionStore from "./CompletionStore";
 import Hotkey from "../core/Hotkey";
 import { API_URL } from "../constants/Api";
 import Utils from "../utils";
 
-const UserStore = types.model("UserStore", {
-  pk: types.integer,
-  firstName: types.string,
-  lastName: types.string,
-});
-
-const SettingsModel = types
-  .model("SettingsModel", {
-    enableHotkeys: types.optional(types.boolean, true),
-    enablePanelHotkeys: types.optional(types.boolean, true),
-    enableTooltips: types.optional(types.boolean, true),
-  })
-  .actions(self => ({
-    toggleHotkeys() {
-      self.enableHotkeys = !self.enableHotkeys;
-      if (self.enableHotkeys) {
-        Hotkey.setScope("main");
-      } else {
-        Hotkey.setScope("none");
-      }
-    },
-
-    togglePanelHotkeys() {
-      self.enablePanelHotkeys = !self.enablePanelHotkeys;
-    },
-
-    toggleTooltips() {
-      self.enableTooltips = !self.enableTooltips;
-    },
-  }));
-
 export default types
   .model("AppStore", {
     config: types.string,
 
+    /**
+     * Task with data, id and project
+     */
     task: types.maybeNull(Task),
+    /**
+     * ID of task
+     */
     taskID: types.maybeNull(types.number),
 
+    /**
+     * Interfaces for configure Label Studio
+     */
     interfaces: types.array(types.string),
+    /**
+     * Flag fo labeling of tasks
+     */
     explore: types.optional(types.boolean, false),
 
+    /**
+     * Completions
+     */
     completionStore: types.optional(CompletionStore, {
       completions: [],
     }),
 
+    /**
+     * Project ID from platform
+     */
     projectID: types.integer,
 
-    expert: UserStore,
+    /**
+     * Expert of Label Studio
+     */
+    expert: User,
 
+    /**
+     * Debug for development environment
+     */
     debug: types.optional(types.boolean, true),
 
-    settings: types.optional(SettingsModel, {}),
+    /**
+     * Settings of Label Studio
+     */
+    settings: types.optional(Settings, {}),
 
+    /**
+     * Flag for settings
+     */
     showingSettings: types.optional(types.boolean, false),
+    /**
+     * Flag
+     * Description of task in Label Studio
+     */
     showingDescription: types.optional(types.boolean, false),
+    /**
+     * Data of description flag
+     */
     description: types.maybeNull(types.string),
-
+    /**
+     * Loading of Label Studio
+     */
     isLoading: types.optional(types.boolean, false),
+    /**
+     * Flag for disable task in Label Studio
+     */
     noTask: types.optional(types.boolean, false),
+    /**
+     * Finish of labeling
+     */
     labeledSuccess: types.optional(types.boolean, false),
   })
   .views(self => ({
+    /**
+     * Get fetch request
+     */
     get fetch() {
       return getEnv(self).fetch;
     },
+    /**
+     * Get alert
+     */
     get alert() {
       return getEnv(self).alert;
     },
+    /**
+     * Get pot request
+     */
     get post() {
       return getEnv(self).post;
     },
   }))
   .actions(self => {
+    /**
+     * Update description of task
+     * @param {string} text
+     */
     function setDescription(text) {
       self.description = text;
     }
 
+    /**
+     * Update settings display state
+     */
     function toggleSettings() {
       self.showingSettings = !self.showingSettings;
     }
 
     /**
-     * Description of task
+     * Request to get description of this task
      */
     const openDescription = flow(function* openDescription() {
       let url = `${API_URL.MAIN}${API_URL.PROJECTS}/${self.projectID}${API_URL.EXPERT_INSRUCTIONS}`;
@@ -100,12 +132,21 @@ export default types
           self.setDescription(text);
         });
       } else {
-        self.setDescription("No instructions for this task");
+        /**
+         * Default message if description is missing in Platform
+         */
+        self.setDescription("No instructions for this task.");
       }
 
+      /**
+       * Show description
+       */
       self.showingDescription = true;
     });
 
+    /**
+     * Close description of Label Studio
+     */
     function closeDescription() {
       self.showingDescription = false;
     }
@@ -114,10 +155,17 @@ export default types
       self.isLoading = loading;
     }
 
+    /**
+     * Check for interfaces
+     * @param {string} name
+     */
     function hasInterface(name) {
       return self.interfaces.find(i => name === i);
     }
 
+    /**
+     * Function
+     */
     const afterCreate = function() {
       self.loadTask();
 
@@ -164,14 +212,19 @@ export default types
      */
     function loadTask() {
       if (self.taskID) {
-        return _loadTaskFromURL(`${API_URL.MAIN}${API_URL.TASKS}/${self.taskID}/`);
+        return loadTaskURL(`${API_URL.MAIN}${API_URL.TASKS}/${self.taskID}/`);
       } else if (self.explore && self.projectID) {
-        return _loadTaskFromURL(`${API_URL.MAIN}${API_URL.PROJECTS}/${self.projectID}${API_URL.NEXT}`);
+        return loadTaskURL(`${API_URL.MAIN}${API_URL.PROJECTS}/${self.projectID}${API_URL.NEXT}`);
       }
     }
 
+    /**
+     *
+     * @param {*} taskObject
+     */
     function addTask(taskObject) {
       if (taskObject && !Utils.Checkers.isString(taskObject.data)) {
+        console.log(1111);
         taskObject = {
           ...taskObject,
           [taskObject.data]: JSON.stringify(taskObject.data),
@@ -205,7 +258,7 @@ export default types
     /**
      * Load task from URL
      */
-    const _loadTaskFromURL = flow(function*(url) {
+    const loadTaskURL = flow(function*(url) {
       try {
         const res = yield self.fetch(url);
 
@@ -332,8 +385,15 @@ export default types
      */
     function initializeStore({ completions }) {
       const { completionStore } = self;
+
+      /**
+       * Array of generated completions
+       */
       let generatedCompletions = [];
 
+      /**
+       * Completions in initialize
+       */
       if (completions && completions.length) {
         for (let i = 0; i < completions.length; i++) {
           const itemOfCompletion = completions[i];
@@ -352,21 +412,15 @@ export default types
 
       if (completionStore.completions.length === 0) {
         const c = self.completionStore.addInitialCompletion();
+
         self.completionStore.selectCompletion(c.id);
 
-        if (self.task) {
-          for (let j = 0; j < generatedCompletions.length; j++) {
-            const p = generatedCompletions[j];
-
-            // let comp = self.completionStore.addSavedCompletion(c);
-
-            // comp.traverseTree(node => node.updateValue && node.updateValue(self));
-
-            // self.completionStore.selectCompletion(p.result.id);
-
-            c.deserializeCompletion(p.result);
-            c.reinitHistory();
+        if (generatedCompletions.length > 0) {
+          for (let iC = 0; iC < generatedCompletions.length; iC++) {
+            c.deserializeCompletion(generatedCompletions[iC].result);
           }
+
+          c.reinitHistory();
         }
       }
     }
