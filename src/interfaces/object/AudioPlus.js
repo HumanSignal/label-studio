@@ -8,7 +8,6 @@ import { cloneNode } from "../../core/Helpers";
 import Registry from "../../core/Registry";
 import { guidGenerator, restoreNewsnapshot } from "../../core/Helpers";
 
-// import { AudioEditorMode } from './AudioEditor';
 import Waveform from "../../components/Waveform/Waveform";
 import ProcessAttrsMixin from "../mixins/ProcessAttrs";
 
@@ -37,9 +36,9 @@ import styles from "./AudioPlus/AudioPlus.module.scss";
 const TagAttrs = types.model({
   name: types.maybeNull(types.string),
   value: types.maybeNull(types.string),
-  haszoom: types.optional(types.string, "true"),
-  volume: types.optional(types.number, 1),
-  speed: types.optional(types.number, 1),
+  zoom: types.optional(types.boolean, true),
+  volume: types.optional(types.boolean, true),
+  speed: types.optional(types.boolean, true),
 });
 
 const Model = types
@@ -49,7 +48,7 @@ const Model = types
     _value: types.optional(types.string, ""),
     playing: types.optional(types.boolean, false),
     regions: types.array(AudioRegionModel),
-    rangeValue: types.optional(types.number, 20),
+    height: types.optional(types.number, 128),
   })
   .views(self => ({
     get hasStates() {
@@ -228,9 +227,10 @@ const HtxAudioView = observer(({ store, item }) => {
         addRegion={item.addRegion}
         onLoad={item.onLoad}
         speed={item.speed}
-        haszoom={item.haszoom}
-        zoom={item.rangeValue}
+        zoom={item.zoom}
         volume={item.volume}
+        regions={true}
+        height={item.height}
       />
 
       <div style={{ display: "flex", justifyContent: "space-between", marginTop: "1em" }}>
