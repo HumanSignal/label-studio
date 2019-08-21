@@ -73,7 +73,9 @@ function getData() {
  */
 function rootElement() {
   const el = document.createElement("div");
-  var root = document.getElementById("label-studio");
+
+  let root = document.getElementById("label-studio");
+
   root.innerHTML = "";
   root.appendChild(el);
 

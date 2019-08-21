@@ -10,7 +10,7 @@ import { TranscribeAudio } from "../examples/transcribe_audio";
 /**
  * Choose data type
  */
-let dataType = AudioRegions;
+let dataType = AudioClassifiaction;
 
 function templateDynamicData() {
   let settings = {
@@ -58,7 +58,7 @@ function templateDynamicData() {
       ...settings,
       task: {
         ...settings.task,
-        completions: [dataType.completion.completions[0]],
+        completions: dataType.completion.completions,
       },
     };
   }
