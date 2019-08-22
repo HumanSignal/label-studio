@@ -1,0 +1,8 @@
+<View>
+  <Labels name="reference" toName="text">
+    <Label value="subject" alias="SUB" showalias="true"></Label>
+    <Label value="object" alias="OBJ" showalias="true"></Label>
+    <Label value="verb" alias="VER" showalias="true"></Label>
+  </Labels>
+  <Text name="text" value="$text"></Text>
+</View>

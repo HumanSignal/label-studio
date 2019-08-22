@@ -1,0 +1,11 @@
+<View>
+  <Header value="Listen the audio:"></Header>
+  <Audio name="audio" value="$url"></Audio>
+  <Header value="Select its topic:"></Header>
+  <Choices name="label" toName="audio" choice="single-radio" showInline="true">
+    <Choice value="Politics"></Choice>
+    <Choice value="Business"></Choice>
+    <Choice value="Education"></Choice>
+    <Choice value="Other"></Choice>
+  </Choices>
+</View>
