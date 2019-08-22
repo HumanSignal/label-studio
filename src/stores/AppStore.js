@@ -129,12 +129,16 @@ export default types
 
       if (res.status === 200) {
         res.text().then(function(text) {
-          self.setDescription(text);
+          if (text.length) {
+            self.setDescription(text);
+          } else {
+            /**
+             * Default message if description is missing in Platform
+             */
+            self.setDescription("No instructions for this task.");
+          }
         });
       } else {
-        /**
-         * Default message if description is missing in Platform
-         */
         self.setDescription("No instructions for this task.");
       }
 
@@ -158,6 +162,7 @@ export default types
     /**
      * Check for interfaces
      * @param {string} name
+     * @returns {string | undefined}
      */
     function hasInterface(name) {
       return self.interfaces.find(i => name === i);
@@ -224,7 +229,6 @@ export default types
      */
     function addTask(taskObject) {
       if (taskObject && !Utils.Checkers.isString(taskObject.data)) {
-        console.log(1111);
         taskObject = {
           ...taskObject,
           [taskObject.data]: JSON.stringify(taskObject.data),

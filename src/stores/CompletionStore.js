@@ -374,7 +374,7 @@ export default types
       let root = modelClass.create(completionModel);
 
       const node = {
-        pk: c.pk,
+        pk: c.id,
         id: c.id || guidGenerator(),
         createdAgo: c.created_ago,
         createdBy: c.created_username,

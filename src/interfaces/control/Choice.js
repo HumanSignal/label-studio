@@ -84,7 +84,7 @@ const HtxChoice = inject("store")(
 
     if (item.isCheckbox) {
       const cStyle = Object.assign(
-        { marginRight: "1em", marginBottom: "1em", display: "flex", alignItems: "center" },
+        { marginRight: "1em", marginBottom: "0.5em", display: "flex", alignItems: "center" },
         style,
       );
 

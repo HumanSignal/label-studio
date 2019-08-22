@@ -3,25 +3,3 @@
 @import "./variables";
 @import "./mixins";
 @import "./functions";
-
-.common-container {
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
-}
-
-@media only screen and (max-width: 768px) {
-  .common-container {
-    display: initial !important;
-  }
-
-  .editor-side-column {
-    margin-top: 2em;
-    font-size: 75%;
-  }
-
-  .functional-buttons {
-    float: none !important;
-    margin-left: 0 !important;
-  }
-}
