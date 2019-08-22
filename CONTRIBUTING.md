@@ -2,13 +2,9 @@
 
 First off, thanks for taking the time to contribute!
 
-See [README](https://github.com/heartexlabs/label-studio) for more information about prerequirements and building project.
+This part of the documentation gives you a basic overview of how to help with the development of our label studio.
 
-## How to report a problem
-
-Please search before creating a new issue. Feel free to add issues related to the app.
-
-## First Code Contribution
+## Reporting Bugs
 
 ## Pull Requests
 

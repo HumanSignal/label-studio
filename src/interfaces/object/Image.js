@@ -221,6 +221,16 @@ const Model = types
       self._addShape(rect);
     },
 
+    /**
+     * Resize of image canvas
+     * @param {*} width
+     * @param {*} height
+     */
+    onResizeSize(width, height) {
+      self.stageHeight = height;
+      self.stageWidth = width;
+    },
+
     _addPoly(ev, states) {
       let poly;
       const w = 10;
@@ -364,10 +374,6 @@ class TransformerComponent extends React.Component {
         resizeEnabled={true}
         rotateEnabled={this.props.rotateEnabled}
         anchorSize={8}
-        // borderEnabled={false}
-        // borderDash={[]}
-        // anchorCornerRadius={5}
-        // enabledAnchors={['top-left', 'top-right', 'bottom-left', 'bottom-right']}
         ref={node => {
           this.transformer = node;
         }}
@@ -415,6 +421,14 @@ class HtxImageView extends Component {
     }
   };
 
+  updateDimensions() {
+    // this.props.item.onResizeSize(this.container.offsetWidth, this.container.offsetHeight);
+  }
+
+  componentDidMount() {
+    window.addEventListener("resize", this.updateDimensions.bind(this));
+  }
+
   render() {
     // const width = 750;
     const { item, store } = this.props;
@@ -433,13 +447,18 @@ class HtxImageView extends Component {
     }
 
     if (item.hasStates) {
-      divStyle["position"] = "absolute";
+      // divStyle["position"] = "absolute";
       // const rotateEnabled = (item.editor.rectcanrotate == "true") ? true : false;
       const rotateEnabled = item.controlButton().canrotate === "true" ? true : false;
 
       return (
-        <div style={{ marginBottom: "1em", marginTop: "1em" }}>
-          <div style={divStyle}>
+        <div style={{ position: "relative" }}>
+          <div
+            ref={node => {
+              this.container = node;
+            }}
+            style={divStyle}
+          >
             <img style={style} src={item._value} onLoad={item.updateIE} />
           </div>
           <Stage
@@ -451,6 +470,7 @@ class HtxImageView extends Component {
             onDblClick={this.handleDblClick}
             onClick={this.handleOnClick}
             onMouseDown={this.handleStageMouseDown}
+            style={{ position: "absolute", top: 0, left: 0 }}
           >
             <Layer>
               {item.shapes.map(s => {

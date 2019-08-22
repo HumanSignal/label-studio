@@ -1,4 +1,4 @@
-import { types, getParent, getEnv, flow, destroy, detach, getMembers } from "mobx-state-tree";
+import { types, getParent, getEnv, flow, destroy } from "mobx-state-tree";
 
 import { guidGenerator } from "../core/Helpers";
 import Types from "../core/Types";
@@ -26,6 +26,7 @@ const Completion = types
     createdBy: types.optional(types.string, "Admin"),
 
     honeypot: types.optional(types.boolean, false),
+    prediction: types.optional(types.boolean, false),
 
     root: Types.allModelsTypes(),
     names: types.map(types.reference(Types.allModelsTypes())),
@@ -69,7 +70,10 @@ const Completion = types
     reinitHistory() {
       self.history = { targetPath: "../root" };
     },
-    // send update to server
+    /**
+     * Send update to serve
+     * @param {*} state
+     */
     _updateServerState(state) {
       let appStore = getParent(self, 3);
       let url = "/api/tasks/" + appStore.task.id + "/completions/" + self.pk + "/";
@@ -142,6 +146,7 @@ const Completion = types
 
     traverseTree(cb) {
       let visitNode;
+
       visitNode = function(node) {
         cb(node);
 
@@ -238,7 +243,13 @@ const Completion = types
      * Deserialize completion of models
      */
     deserializeCompletion(json) {
-      json.forEach(obj => {
+      let objCompletion = json;
+
+      if (typeof objCompletion !== "object") {
+        objCompletion = JSON.parse(objCompletion);
+      }
+
+      objCompletion.forEach(obj => {
         if (obj["type"] !== "relation") {
           const names = obj.to_name.split(",");
           names.forEach(name => {
@@ -284,10 +295,14 @@ export default types
      * Get only those that were saved
      */
     get savedCompletions() {
-      return self.completions.filter(c => !c.was_generated);
+      return self.completions.filter(c => c);
     },
   }))
   .actions(self => {
+    /**
+     *
+     * @param {*} id
+     */
     function selectCompletion(id) {
       self.completions.map(c => (c.selected = false));
       const c = self.completions.find(c => c.id === id);
@@ -304,16 +319,26 @@ export default types
      * @param {string} type
      */
     function addCompletion(node, type) {
-      const c = Completion.create(node);
+      /**
+       * Create Completion
+       */
+      const createdCompletion = Completion.create(node);
 
-      if (self.store.task && type == "initial")
-        c.traverseTree(node => node.updateValue && node.updateValue(self.store));
+      /**
+       * If completion is initial completion
+       */
+      if (self.store.task && type === "initial") {
+        createdCompletion.traverseTree(node => node.updateValue && node.updateValue(self.store));
+      }
 
-      self.completions.push(c);
+      self.completions.push(createdCompletion);
 
-      return c;
+      return createdCompletion;
     }
 
+    /**
+     *
+     */
     const _deleteCompletion = flow(function* _deleteCompletion(pk) {
       try {
         const json = yield getEnv(self).remove("/api/tasks/" + self.store.task.id + "/completions/" + pk + "/");
@@ -322,6 +347,10 @@ export default types
       }
     });
 
+    /**
+     * Destroy completion
+     * @param {*} completion
+     */
     function destroyCompletion(completion) {
       destroy(completion);
 
@@ -346,7 +375,7 @@ export default types
 
       const node = {
         pk: c.id,
-        id: guidGenerator(),
+        id: c.id || guidGenerator(),
         createdAgo: c.created_ago,
         createdBy: c.created_username,
         honeypot: c.honeypot,
@@ -354,6 +383,7 @@ export default types
       };
 
       const completion = self.addCompletion(node, "list");
+
       return completion;
     }
 
@@ -362,9 +392,19 @@ export default types
      * @returns {object}
      */
     function addInitialCompletion() {
+      /**
+       * Convert config to model
+       */
       const completionModel = Tree.treeToModel(self.store.config);
+
+      /**
+       * Get model by type of tag
+       */
       const modelClass = Registry.getModelByTag(completionModel.type);
 
+      /**
+       * Completion model init
+       */
       let root = modelClass.create(completionModel);
 
       const node = {
@@ -372,14 +412,19 @@ export default types
         root: root,
       };
 
+      /**
+       * Expert module for initial completion
+       */
       if (self.store.expert) {
         const { expert } = self.store;
-        node["createdBy"] = expert.firstName + " " + expert.lastName;
-      } else {
-        node["createdBy"] = "Admin";
+
+        node["createdBy"] = `${expert.firstName} ${expert.lastName}`;
       }
 
-      let completion = self.addCompletion(node, "initial");
+      /**
+       *
+       */
+      const completion = self.addCompletion(node, "initial");
 
       return completion;
     }

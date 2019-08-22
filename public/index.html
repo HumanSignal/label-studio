@@ -5,6 +5,21 @@
     <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="theme-color" content="#000000">
+    <style>
+      body {
+        position: relative;
+        padding-top: 10px;
+      }
+
+      .footer {
+        text-align: center;
+        margin: 0 auto;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin-bottom: 14px;
+      }
+    </style>
     <!--
       manifest.json provides metadata used when your web app is added to the
       homescreen on Android. See https://developers.google.com/web/fundamentals/web-app-manifest/
@@ -19,15 +34,24 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-    <title>Editor of Heartex</title>
+    <title>Label Studio</title>
   </head>
   <body>
     <noscript>
       You need to enable JavaScript to run this app.
     </noscript>
-    <h1 style="text-align: center; margin-top: 20px;">Editor by <a target="_blank" href="https://heartex.net">Heartex</a></h1>
+
+    <img src="logo.png" alt="Heartex Logo" style="display: block; margin: 0 auto; width: 100px; height: 100px;" />
+
+    <h1 style="text-align: center; margin-top: 20px;">
+      Label Studio
+    </h1>
+
     <h2 style="text-align: center; margin-bottom: 20px;">Annotations for different types of data</h2>
-    <div id="root"></div>
+
+    <div id="label-studio"></div>
+
+    <footer class="footer">Made by <a target="_blank" href="https://heartex.net">Heartex</a> in San Francisco</footer>
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.

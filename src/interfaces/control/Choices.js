@@ -103,7 +103,9 @@ const HtxChoices = observer(({ item }) => {
     <div style={{ marginTop: "1em" }}>
       <Form>
         {item.showinline === "true" ? (
-          <Form.Group inline>{Tree.renderChildren(item)}</Form.Group>
+          <Form.Group inline style={{ flexWrap: "wrap" }}>
+            {Tree.renderChildren(item)}
+          </Form.Group>
         ) : (
           <Form.Group grouped>{Tree.renderChildren(item)}</Form.Group>
         )}

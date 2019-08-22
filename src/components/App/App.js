@@ -120,7 +120,7 @@ const App = inject("store")(
                   </Segment>
                 )}
 
-                <div className={"common-container"}>
+                <div className={styles.common}>
                   <Segment>
                     {Tree.renderItem(root)}
                     {store.hasInterface("submit") && <Controls />}

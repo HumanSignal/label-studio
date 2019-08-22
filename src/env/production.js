@@ -1,22 +1,49 @@
 function getData() {
   /**
-   * TODO remove, this is here because MST either takes string or a fully features typed tree
+   * TODO
+   * Remove, this is here because MST either takes string or a fully features typed tree
    */
-  // if (window.taskData) window.taskData.data = JSON.stringify(window.taskData.data);
-
   if (window.taskData && window.taskData.data) {
     window.taskData.data = JSON.stringify(window.taskData.data);
   }
 
   const data = {
+    /**
+     * Project ID
+     */
     projectID: window.projectID,
+    /**
+     * Loading of LS
+     */
     isLoading: false,
+    /**
+     * Config in XML format
+     */
     config: window.editorAppConfig,
-    task: window.taskData,
+    /**
+     * Task ID
+     */
     taskID: window.taskID,
+    /**
+     * Task data
+     */
+    task: window.taskData,
+    /**
+     * Expert
+     */
     expert: window.expertData,
+    /**
+     * Debug mode of LS
+     */
     debug: window.debugEditor,
+    /**
+     * Interfaces of LS
+     */
     interfaces: window.editorInterfaces ? window.editorInterfaces : ["basic", "completions"],
+    /**
+     * Flag for display completions of task
+     */
+    explore: window.explore,
   };
 
   /**
@@ -27,7 +54,7 @@ function getData() {
   }
 
   /**
-   * /tasks/$id/explore
+   * window.explore used for display completions
    */
   if (window.explore) {
     data["interfaces"] = window.editorInterfaces ? window.editorInterfaces : ["basic", "completions"];
@@ -40,9 +67,15 @@ function getData() {
   return data;
 }
 
+/**
+ * LS will render in this part
+ * TODO: Change #root to #L
+ */
 function rootElement() {
   const el = document.createElement("div");
-  var root = document.getElementById("root");
+
+  let root = document.getElementById("label-studio");
+
   root.innerHTML = "";
   root.appendChild(el);
 
@@ -50,7 +83,7 @@ function rootElement() {
 }
 
 /**
- * Get current state of Label Studio
+ * Get current state of LS
  */
 function getState() {
   const completions = window.taskData && window.taskData.completions ? window.taskData.completions : null;

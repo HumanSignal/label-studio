@@ -10,22 +10,41 @@ import { TranscribeAudio } from "../examples/transcribe_audio";
 /**
  * Choose data type
  */
-let dataType = AudioRegions;
+let dataType = AudioClassifiaction;
 
 function templateDynamicData() {
   let settings = {
+    /**
+     * For development environment
+     */
+    developmentEnv: true,
+    /**
+     * Project ID
+     */
     projectID: 1,
+    /**
+     * Flag to display completion
+     */
+    viewCompletion: true,
+    /**
+     * Loading of LS
+     */
     isLoading: false,
-    taskID: 1,
+    /**
+     * Expert
+     */
     expert: {
       pk: 1,
       lastName: "Jones",
       firstName: "Oliver",
     },
+    /**
+     * Debug
+     */
     debug: window.location.search.indexOf("debug=true") !== -1,
     interfaces: window.editorInterfaces
       ? window.editorInterfaces
-      : ["basic", "completions", "submit", "panel", "side-column"],
+      : ["basic", "completions", "submit", "panel", "side-column", "submit:rewrite"],
     task: {
       data: JSON.stringify(dataType.tasks[0]),
       project: 10,
@@ -34,16 +53,12 @@ function templateDynamicData() {
     },
   };
 
-  if (dataType.completion) {
+  if (settings.viewCompletion && dataType.completion) {
     settings = {
       ...settings,
       task: {
         ...settings.task,
-        completions: [
-          {
-            result: dataType.completion.completions[0].result,
-          },
-        ],
+        completions: dataType.completion.completions,
       },
     };
   }
@@ -84,15 +99,12 @@ async function getState() {
 function rootElement() {
   const el = document.createElement("div");
 
-  let root = document.getElementById("root");
+  let root = document.getElementById("label-studio");
 
   root.innerHTML = "";
   root.appendChild(el);
 
-  root.style.marginTop = "10px";
-  root.style.marginBottom = "10px";
-  root.style.marginLeft = "10px";
-  root.style.marginRight = "10px";
+  root.style.margin = "0 auto";
 
   return el;
 }

@@ -1,4 +1,5 @@
-import React from "react";
+import React, { Fragment } from "react";
+import { Button, Icon } from "antd";
 
 import { types, getRoot } from "mobx-state-tree";
 import { observer, inject } from "mobx-react";
@@ -6,6 +7,8 @@ import { observer, inject } from "mobx-react";
 import Registry from "../../core/Registry";
 import { guidGenerator } from "../../core/Helpers";
 import ProcessAttrsMixin from "../mixins/ProcessAttrs";
+
+import Waveform from "../../components/Waveform/Waveform";
 
 /**
  * Audio tag plays a simple audio file
@@ -36,6 +39,9 @@ import ProcessAttrsMixin from "../mixins/ProcessAttrs";
 const TagAttrs = types.model({
   name: types.maybeNull(types.string),
   value: types.maybeNull(types.string),
+  zoom: types.optional(types.boolean, true),
+  volume: types.optional(types.boolean, true),
+  speed: types.optional(types.boolean, true),
 });
 
 const Model = types
@@ -43,6 +49,8 @@ const Model = types
     id: types.optional(types.identifier, guidGenerator),
     type: "audio",
     _value: types.optional(types.string, ""),
+    playing: types.optional(types.boolean, false),
+    height: types.optional(types.number, 20),
   })
   .views(self => ({
     get completion() {
@@ -59,6 +67,21 @@ const Model = types
         self.completion.names.get(obj.from_name).fromStateJSON(obj);
       }
     },
+
+    /**
+     * Play and stop
+     */
+    handlePlay() {
+      self.playing = !self.playing;
+    },
+
+    onLoad(ws) {
+      self._ws = ws;
+    },
+
+    wsCreated(ws) {
+      self._ws = ws;
+    },
   }));
 
 const AudioModel = types.compose(
@@ -69,17 +92,42 @@ const AudioModel = types.compose(
 );
 
 const HtxAudioView = observer(({ store, item }) => {
-  // [NOTE] we can't let audio element load empty item._value
-  // because it's not updating it's parent automatically
-  // https://github.com/facebook/react/issues/9447
   if (!item._value) return null;
 
   return (
     <div>
-      <audio controls style={{ width: "100%" }}>
-        <source src={item._value} type="audio/mpeg" />
-        Your browser does not support the audio element.
-      </audio>
+      <Waveform
+        src={item._value}
+        onCreate={item.wsCreated}
+        onLoad={item.onLoad}
+        handlePlay={item.handlePlay}
+        speed={item.speed}
+        zoom={item.zoom}
+        volume={item.volume}
+        regions={false}
+        height={item.height}
+      />
+
+      <div style={{ display: "flex", justifyContent: "space-between", marginTop: "1em" }}>
+        <Button
+          type="primary"
+          onClick={ev => {
+            console.log(item);
+            item._ws.playPause();
+          }}
+        >
+          {item.playing && (
+            <Fragment>
+              <Icon type="pause-circle" /> Pause
+            </Fragment>
+          )}
+          {!item.playing && (
+            <Fragment>
+              <Icon type="play-circle" /> Play
+            </Fragment>
+          )}
+        </Button>
+      </div>
     </div>
   );
 });
