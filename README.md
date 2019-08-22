@@ -2,9 +2,9 @@
 
 <img src="./images/logo.png" align="right" title="Label Studio by Heartex Labs" width="100" height="100">
 
-![GitHub](https://img.shields.io/github/license/heartexlabs/label-studio?logo=heartex) [![Build Status](https://travis-ci.com/heartexlabs/label-studio.svg?branch=master)](https://travis-ci.com/heartexlabs/label-studio)
+![GitHub](https://img.shields.io/github/license/heartexlabs/label-studio?logo=heartex) [![Build Status](https://travis-ci.com/heartexlabs/label-studio.svg?branch=master)](https://travis-ci.com/heartexlabs/label-studio) [![codecov](https://codecov.io/gh/heartexlabs/label-studio/branch/master/graph/badge.svg)](https://codecov.io/gh/heartexlabs/label-studio)
 
-Label Studio is an open-source, configurable data annotation tool. Its purpose is to enable you to label different types of data using the most convenient interface with the standardized output format.
+Label Studio is an open-source, configurable data annotation tool. Its purpose is to enable you to label different types of data using the most convenient interface with a standardized output format.
 
 ![Label Studio](./images/label-studio-examples.gif)
 
@@ -40,11 +40,11 @@ Coming Soon:
 
 ## Introduction
 
-Label Studio consists of two parts. Backend is a simple flask server that is used to load the data and save the results. The frontend is a [React](https://reactjs.org/) + [MST](https://github.com/mobxjs/mobx-state-tree) app that is backend agnostic and can be used separately, for example if you want to embed labeling into your applications.
+Label Studio consists of two parts. The backend is a simple flask server that is used to load the data and save the results. The frontend is a [React](https://reactjs.org/) + [mobx-state-tree](https://github.com/mobxjs/mobx-state-tree) app that is backend agnostic and can be used separately, for example if you want to embed labeling into your applications.
 
 ### Run Locally
 
-In order to launch server locally, launch
+In order to launch the server locally, launch
 
 ```bash
 cd backend
@@ -58,7 +58,7 @@ part and an example implementation of the backend.
 
 ### Extend & Embed
 
-To extend the functionality or embed the labeling inside your app, you need to be able to compile it from the sources.
+To extend the functionality or embed the labeling inside your app, you need to be able to compile it from source.
 
 [This guide explains how to do that](docs/Embed.md)
 
@@ -73,9 +73,9 @@ To extend the functionality or embed the labeling inside your app, you need to b
 
 ### Config Language
 
-Editor configuration is based on XML-like tags. Internally tags are represented by a react view and mobx-state-tree model. Each config should start with a ```<View></View>``` tag. Here is an example of a simple text classification config:
+Editor configuration is based on XML-like tags. Internally tags are represented by a react view and mobx-state-tree model. Each config should start with a `<View></View>` tag. Here is an example of a simple text classification config:
 
-```xml
+```jsx
 <View>
   <Text name="text"></Text>
   <Choices name="choice" toName="text">
@@ -85,7 +85,7 @@ Editor configuration is based on XML-like tags. Internally tags are represented 
 </View>
 ```
 
-Note that we use tag names to connect tags between each other. Therefore tags that are used for labeling should include a name attribute. And every tag has its own set of parameters. Find more info in the related doc:
+Note that we use tag names to connect tags between each other. Therefore tags that are used for labeling should include a name attribute. And every tag has its own set of parameters. Find more info in the related guide:
 
 [Tags Documentation](/docs/Tags.md)
 
@@ -95,14 +95,11 @@ Creating your own tags is the suggested way to extend the app and tailor it to y
 
 ### Input
 
-Input should be JSON formatted. All the files that you want to label
-are expected to be hosted somewhere and provided as an URL in the
-JSON. The example backend server can process other formats, but it
-converts any format into the JSON as a result.
+Input should be JSON formatted. All the files that you want to label are expected to be hosted somewhere and provided as an URL to the JSON. The example backend server can process other formats, but it converts any format into JSON.
 
 ### Output
 
-Output is JSON. Overall strucutre is the following:
+The output is JSON. Overall structure is the following:
 
 ```json
 {

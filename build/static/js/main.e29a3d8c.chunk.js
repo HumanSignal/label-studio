@@ -1,114 +1,56 @@
 (window.webpackJsonp = window.webpackJsonp || []).push([
   [0],
   {
-    164: function(e, t, n) {
+    122: function(e, t, n) {
       e.exports = {
-        block: "Entity_block__3ckIB",
-        button: "Entity_button__W4DcF",
-        labels: "Entity_labels__1Ldoe",
-        tag: "Entity_tag__3VRfN",
+        block: "Relations_block__3ojdZ",
+        section: "Relations_section__3MAqx",
+        section__blocks: "Relations_section__blocks__26CLV",
+        delete: "Relations_delete__3qe_f",
       };
     },
-    168: function(e, t, n) {
-      e.exports = {
-        pushable: "Controls_pushable__a1HxL",
-        "hide-dd-icon": "Controls_hide-dd-icon__3MPHE",
-        "drag-handle": "Controls_drag-handle__2yyWu",
-        noselect: "Controls_noselect__1U7-5",
-        "common-container": "Controls_common-container__2x_Gk",
-        "functional-buttons": "Controls_functional-buttons__37irg",
-        "editor-side-column": "Controls_editor-side-column__-zSr5",
-        skip: "Controls_skip__1Km2f",
-        task: "Controls_task__3a2SA",
-        container: "Controls_container__2OOQz",
-        block: "Controls_block__3VbK-",
-        wrapper: "Controls_wrapper__3Yptx",
-      };
+    167: function(e, t, n) {
+      e.exports = { container: "Panel_container__1UbGz", block: "Panel_block__35uxJ" };
     },
     169: function(e, t, n) {
       e.exports = {
-        block: "Dialog_block__3oOBf",
-        block_selected: "Dialog_block_selected__2Do_t",
-        name: "Dialog_name__1MoM3",
-        tag: "Dialog_tag__3NOpX",
-        date: "Dialog_date__28pt2",
+        editor: "App_editor__ZA0wp",
+        menu: "App_menu__3cWjU",
+        content: "App_content__F7bhJ",
+        common: "App_common__2vqlZ",
       };
     },
-    177: function(e, t, n) {
-      e.exports = {
-        block: "Relations_block__3Oopf",
-        section: "Relations_section__2WXtQ",
-        section__blocks: "Relations_section__blocks__3JVyw",
-        delete: "Relations_delete__2Eyc8",
-      };
+    213: function(e, t, n) {
+      e.exports = { main: "Hint_main__2bVzl" };
     },
-    191: function(e, t, n) {
-      e.exports = {
-        pushable: "Panel_pushable__2Zm85",
-        "hide-dd-icon": "Panel_hide-dd-icon__xZoa5",
-        "drag-handle": "Panel_drag-handle__3medm",
-        noselect: "Panel_noselect__7S5yE",
-        "common-container": "Panel_common-container__2H8MV",
-        "functional-buttons": "Panel_functional-buttons__1wNCm",
-        "editor-side-column": "Panel_editor-side-column__gnNur",
-        container: "Panel_container__Qb4xi",
-        block: "Panel_block__3mBJh",
-      };
+    218: function(e, t, n) {
+      e.exports = { progress: "Waveform_progress__3BwkI", wave: "Waveform_wave__3tQFG", menu: "Waveform_menu__ToCwx" };
     },
-    203: function(e, t, n) {
-      e.exports = { main: "Hint_main__ZDhzi" };
+    279: function(e, t, n) {
+      e.exports = { buttons: "Completions_buttons__2YII_" };
     },
-    208: function(e, t, n) {
-      e.exports = { progress: "Waveform_progress__1GLjz", wave: "Waveform_wave__yPehs", menu: "Waveform_menu__3Kb8O" };
+    301: function(e, t, n) {
+      e.exports = { item: "Entities_item__215D0" };
     },
-    210: function(e, t, n) {
-      e.exports = {
-        pushable: "App_pushable__2_dds",
-        "hide-dd-icon": "App_hide-dd-icon__QwL78",
-        "drag-handle": "App_drag-handle__3_W4W",
-        noselect: "App_noselect__2aaVW",
-        "common-container": "App_common-container__qkml1",
-        "functional-buttons": "App_functional-buttons__1KMBb",
-        "editor-side-column": "App_editor-side-column__2Tmm3",
-        editor: "App_editor__l2dha",
-        menu: "App_menu__1BSd3",
-        content: "App_content__1ym7D",
-      };
+    302: function(e, t, n) {
+      e.exports = { card: "SideColumn_card__YC_BE" };
     },
-    280: function(e, t, n) {
-      e.exports = { buttons: "Completions_buttons__1Egvo" };
+    309: function(e, t, n) {
+      e.exports = { play: "AudioPlus_play__3_Ds7" };
     },
-    304: function(e, t, n) {
-      e.exports = { item: "Entities_item__3oFPp" };
-    },
-    305: function(e, t, n) {
-      e.exports = { card: "SideColumn_card__2KVRh" };
+    311: function(e, t, n) {
+      e.exports = { block: "TextHighlight_block__2-3wy" };
     },
     312: function(e, t, n) {
-      e.exports = { play: "AudioPlus_play__1hGxY" };
+      e.exports = { state: "TextRegion_state__1J2X6" };
     },
-    314: function(e, t, n) {
-      e.exports = { block: "TextHighlight_block__z4O-f" };
+    313: function(e, t, n) {
+      e.exports = { block: "Segment_block__1srue" };
     },
     315: function(e, t, n) {
-      e.exports = { state: "TextRegion_state__wi_ws" };
-    },
-    316: function(e, t, n) {
-      e.exports = {
-        pushable: "Segment_pushable__2gVkh",
-        "hide-dd-icon": "Segment_hide-dd-icon__1KuoO",
-        "drag-handle": "Segment_drag-handle__2sVHi",
-        noselect: "Segment_noselect__qWi_T",
-        "common-container": "Segment_common-container__EQ4YQ",
-        "functional-buttons": "Segment_functional-buttons__1u8fS",
-        "editor-side-column": "Segment_editor-side-column__2M4Dc",
-        block: "Segment_block__3-nF9",
-      };
-    },
-    318: function(e, t, n) {
       e.exports = n.p + "static/media/config.34f6aa9f.xml";
     },
-    319: function(e) {
+    316: function(e) {
       e.exports = [
         {
           reviewerID: "A2IBPI20UZIR0U",
@@ -1308,7 +1250,7 @@
         },
       ];
     },
-    320: function(e) {
+    317: function(e) {
       e.exports = {
         completions: [
           {
@@ -1339,16 +1281,16 @@
         task_path: "../examples/sentiment_analysis/tasks.json",
       };
     },
-    321: function(e, t, n) {
+    318: function(e, t, n) {
       e.exports = n.p + "static/media/config.c5233796.xml";
     },
-    322: function(e) {
+    319: function(e) {
       e.exports = [
         { url: "https://go.heartex.net/static/samples/game.wav" },
         { url: "https://go.heartex.net/static/samples/game.wav" },
       ];
     },
-    323: function(e) {
+    320: function(e) {
       e.exports = {
         completions: [
           {
@@ -1368,16 +1310,16 @@
         task_path: "../examples/audio_classification/tasks.json",
       };
     },
-    324: function(e, t, n) {
+    321: function(e, t, n) {
       e.exports = n.p + "static/media/config.66767299.xml";
     },
-    325: function(e) {
+    322: function(e) {
       e.exports = [
         { url: "https://go.heartex.net/static/samples/game.wav" },
         { url: "https://go.heartex.net/static/samples/game.wav" },
       ];
     },
-    326: function(e) {
+    323: function(e) {
       e.exports = {
         completions: [
           {
@@ -1420,10 +1362,10 @@
         task_path: "../examples/audio_regions/tasks.json",
       };
     },
-    327: function(e, t, n) {
+    324: function(e, t, n) {
       e.exports = n.p + "static/media/config.0e2a1e7f.xml";
     },
-    328: function(e) {
+    325: function(e) {
       e.exports = [
         {
           dialogs:
@@ -1431,7 +1373,7 @@
         },
       ];
     },
-    329: function(e) {
+    326: function(e) {
       e.exports = {
         completions: [
           {
@@ -1455,13 +1397,13 @@
         task_path: "../examples/chatbot_analysis/tasks.json",
       };
     },
-    330: function(e, t, n) {
+    327: function(e, t, n) {
       e.exports = n.p + "static/media/config.2a6054fe.xml";
     },
-    331: function(e) {
+    328: function(e) {
       e.exports = [{ image: "https://user.fm/files/v2-901310d5cb3fa90e0616ca10590bacb3/spacexmoon-800x501.jpg" }];
     },
-    332: function(e) {
+    329: function(e) {
       e.exports = {
         completions: [
           {
@@ -1504,10 +1446,10 @@
         task_path: "../examples/image_bbox/tasks.json",
       };
     },
-    333: function(e, t, n) {
+    330: function(e, t, n) {
       e.exports = n.p + "static/media/config.bb22cd0c.xml";
     },
-    334: function(e) {
+    331: function(e) {
       e.exports = [
         {
           text:
@@ -1515,7 +1457,7 @@
         },
       ];
     },
-    335: function(e) {
+    332: function(e) {
       e.exports = {
         completions: [
           {
@@ -1547,13 +1489,13 @@
         task_path: "../examples/named_entity/tasks.json",
       };
     },
-    336: function(e, t, n) {
+    333: function(e, t, n) {
       e.exports = n.p + "static/media/config.32729adf.xml";
     },
-    337: function(e) {
+    334: function(e) {
       e.exports = [{ text: "To have faith is to trust yourself to the water" }];
     },
-    338: function(e) {
+    335: function(e) {
       e.exports = {
         completions: [
           {
@@ -1574,13 +1516,13 @@
         task_path: "../examples/references/tasks.json",
       };
     },
-    339: function(e, t, n) {
+    336: function(e, t, n) {
       e.exports = n.p + "static/media/config.1890026d.xml";
     },
-    340: function(e) {
+    337: function(e) {
       e.exports = [{ url: "https://go.heartex.net/static/samples/game.wav" }];
     },
-    341: function(e) {
+    338: function(e) {
       e.exports = {
         completions: [
           {
@@ -1594,11 +1536,11 @@
         task_path: "../examples/transcribe_audio/tasks.json",
       };
     },
-    356: function(e, t, n) {
-      e.exports = n(600);
+    353: function(e, t, n) {
+      e.exports = n(595);
     },
-    364: function(e, t, n) {},
-    600: function(e, t, n) {
+    361: function(e, t, n) {},
+    595: function(e, t, n) {
       "use strict";
       n.r(t);
       var a = {};
@@ -1635,29 +1577,29 @@
         n.d(o, "rgbaChangeAlpha", function() {
           return U;
         });
-      var r = {};
-      n.r(r),
-        n.d(r, "msToHMS", function() {
+      var i = {};
+      n.r(i),
+        n.d(i, "msToHMS", function() {
           return V;
         }),
-        n.d(r, "prettyDate", function() {
+        n.d(i, "prettyDate", function() {
           return Y;
         });
-      var i = n(0),
-        l = n.n(i),
+      var r = n(0),
+        l = n.n(r),
         s = n(16),
         c = n.n(s),
         u = n(7),
-        m = (n(361), n(364), n(26)),
+        m = (n(358), n(361), n(26)),
         d = n(27),
-        h = n(30),
-        p = n(29),
-        g = n(31),
-        f = n(197),
-        v = n.n(f),
-        b = n(1),
-        y = n(623),
-        w = n(613),
+        h = n(31),
+        p = n(30),
+        f = n(32),
+        g = n(207),
+        v = n.n(g),
+        y = n(1),
+        b = n(619),
+        w = n(609),
         k = new ((function() {
           function e() {
             Object(m.a)(this, e), (this.tags = []), (this.models = {}), (this.views = {}), (this.views_models = {});
@@ -1725,26 +1667,26 @@
             return x(e, "PATCH", { Accept: "application/json", "Content-Type": "application/json" }, t);
           },
         },
-        N = n(39),
-        S = n(279),
+        N = n(36),
+        S = n(278),
         I = n.n(S);
       function E() {
         return I()(10);
       }
       function O(e) {
-        var t = Object(b.h)(e);
-        return Object(b.i)(e).create(Object(N.a)({}, t, { id: E() }));
-      }
-      function _(e) {
-        var t = Object(b.h)(e);
-        return Object(b.i)(e).create(Object(N.a)({}, t, { id: E() }));
+        var t = Object(y.h)(e);
+        return Object(y.i)(e).create(Object(N.a)({}, t, { id: E() }));
       }
       function R(e) {
-        var t = k.getViewByModel(Object(b.i)(e).name);
-        if (!t) throw new Error("No view for model:" + Object(b.i)(e).name);
+        var t = Object(y.h)(e);
+        return Object(y.i)(e).create(Object(N.a)({}, t, { id: E() }));
+      }
+      function C(e) {
+        var t = k.getViewByModel(Object(y.i)(e).name);
+        if (!t) throw new Error("No view for model:" + Object(y.i)(e).name);
         return l.a.createElement(t, { key: E(), item: e });
       }
-      var C = {
+      var _ = {
           cloneReactTree: function(e, t) {
             var n = null;
             return (n = function(e) {
@@ -1753,9 +1695,9 @@
                 l.a.Children.forEach(e, function(e) {
                   var o;
                   if (e.props) {
-                    var r = {};
-                    "function" === typeof t ? (r = t(e)) : "object" === typeof t && (r = t),
-                      (o = l.a.cloneElement(e, r, n(e.props.children)));
+                    var i = {};
+                    "function" === typeof t ? (i = t(e)) : "object" === typeof t && (i = t),
+                      (o = l.a.cloneElement(e, i, n(e.props.children)));
                   } else o = e;
                   a.push(o);
                 }),
@@ -1763,11 +1705,11 @@
               );
             })(e);
           },
-          renderItem: R,
+          renderItem: C,
           renderChildren: function(e) {
             return e && e.children && e.children.length
               ? e.children.map(function(e) {
-                  return R(e);
+                  return C(e);
                 })
               : null;
           },
@@ -1780,15 +1722,15 @@
                   a = !1,
                   o = void 0;
                 try {
-                  for (var r, i = e[Symbol.iterator](); !(n = (r = i.next()).done); n = !0) {
-                    var l = r.value;
+                  for (var i, r = e[Symbol.iterator](); !(n = (i = r.next()).done); n = !0) {
+                    var l = i.value;
                     t[l.name] = l.value;
                   }
                 } catch (s) {
                   (a = !0), (o = s);
                 } finally {
                   try {
-                    n || null == i.return || i.return();
+                    n || null == r.return || r.return();
                   } finally {
                     if (a) throw o;
                   }
@@ -1811,8 +1753,8 @@
                 if (!n) return null;
                 var a = [],
                   o = !0,
-                  r = !1,
-                  i = void 0;
+                  i = !1,
+                  r = void 0;
                 try {
                   for (var l, s = n.childNodes[Symbol.iterator](); !(o = (l = s.next()).done); o = !0) {
                     var c = l.value;
@@ -1823,12 +1765,12 @@
                     }
                   }
                 } catch (d) {
-                  (r = !0), (i = d);
+                  (i = !0), (r = d);
                 } finally {
                   try {
                     o || null == s.return || s.return();
                   } finally {
-                    if (r) throw i;
+                    if (i) throw r;
                   }
                 }
                 return 0 === a.length ? null : a;
@@ -1839,24 +1781,24 @@
           findInterface: function(e, t) {
             var n;
             return (n = function(t) {
-              if (Object(b.i)(t).name === e) return t;
+              if (Object(y.i)(t).name === e) return t;
               if (t.children) {
                 var a = !0,
                   o = !1,
-                  r = void 0;
+                  i = void 0;
                 try {
-                  for (var i, l = t.children[Symbol.iterator](); !(a = (i = l.next()).done); a = !0) {
-                    var s = i.value,
+                  for (var r, l = t.children[Symbol.iterator](); !(a = (r = l.next()).done); a = !0) {
+                    var s = r.value,
                       c = n(s);
                     if (c) return c;
                   }
                 } catch (u) {
-                  (o = !0), (r = u);
+                  (o = !0), (i = u);
                 } finally {
                   try {
                     a || null == l.return || l.return();
                   } finally {
-                    if (o) throw r;
+                    if (o) throw i;
                   }
                 }
               }
@@ -1867,10 +1809,10 @@
               a = !1,
               o = void 0;
             try {
-              for (var r, i = t[Symbol.iterator](); !(n = (r = i.next()).done); n = !0) {
-                var l = r.value;
+              for (var i, r = t[Symbol.iterator](); !(n = (i = r.next()).done); n = !0) {
+                var l = i.value;
                 try {
-                  var s = Object(b.f)(e, l);
+                  var s = Object(y.f)(e, l);
                   if (s) return s;
                 } catch (c) {}
               }
@@ -1878,7 +1820,7 @@
               (a = !0), (o = c);
             } finally {
               try {
-                n || null == i.return || i.return();
+                n || null == r.return || r.return();
               } finally {
                 if (a) throw o;
               }
@@ -1891,20 +1833,20 @@
             return (
               (n = function(e) {
                 var o = !0,
-                  r = !1,
-                  i = void 0;
+                  i = !1,
+                  r = void 0;
                 try {
                   for (var l, s = t[Symbol.iterator](); !(o = (l = s.next()).done); o = !0) {
                     var c = l.value;
-                    Object(b.i)(e).name === c && a.push(e);
+                    Object(y.i)(e).name === c && a.push(e);
                   }
-                } catch (f) {
-                  (r = !0), (i = f);
+                } catch (g) {
+                  (i = !0), (r = g);
                 } finally {
                   try {
                     o || null == s.return || s.return();
                   } finally {
-                    if (r) throw i;
+                    if (i) throw r;
                   }
                 }
                 if (e.children) {
@@ -1913,11 +1855,11 @@
                     d = void 0;
                   try {
                     for (var h, p = e.children[Symbol.iterator](); !(u = (h = p.next()).done); u = !0) {
-                      var g = h.value;
-                      n(g);
+                      var f = h.value;
+                      n(f);
                     }
-                  } catch (f) {
-                    (m = !0), (d = f);
+                  } catch (g) {
+                    (m = !0), (d = g);
                   } finally {
                     try {
                       u || null == p.return || p.return();
@@ -1935,26 +1877,26 @@
               n,
               a,
               o,
-              r = {},
-              i = e.split(";");
-            for (n = 0; n < i.length; n++)
-              (t = i[n].indexOf(":")),
-                (a = i[n].substring(0, t)),
-                (o = i[n].substring(t + 1)),
+              i = {},
+              r = e.split(";");
+            for (n = 0; n < r.length; n++)
+              (t = r[n].indexOf(":")),
+                (a = r[n].substring(0, t)),
+                (o = r[n].substring(t + 1)),
                 (a = a.replace(/ /g, "")).length < 1 ||
                   (" " === o[0] && (o = o.substring(1)),
                   " " === o[o.length - 1] && (o = o.substring(0, o.length - 1)),
-                  (r[
+                  (i[
                     a.replace(/(-.)/g, function(e) {
                       return e[1].toUpperCase();
                     })
                   ] = o));
-            return r;
+            return i;
           },
         },
-        j = n(619),
-        A = n(277),
-        D = n(615),
+        j = n(615),
+        A = n(164),
+        D = n(621),
         M = function(e) {
           return "string" === typeof e || e instanceof String;
         },
@@ -2127,9 +2069,9 @@
         var n = 0,
           a = 0,
           o = 0,
-          r = 0.3;
+          i = 0.3;
         return (
-          t && "number" === typeof parseInt(t) && (r = t),
+          t && "number" === typeof parseInt(t) && (i = t),
           e && 4 === e.length
             ? ((n = "0x" + e[1] + e[1]), (a = "0x" + e[2] + e[2]), (o = "0x" + e[3] + e[3]))
             : e && 7 === e.length && ((n = "0x" + e[1] + e[2]), (a = "0x" + e[3] + e[4]), (o = "0x" + e[5] + e[6])),
@@ -2137,7 +2079,7 @@
             .concat(+n, ", ")
             .concat(+a, ", ")
             .concat(+o, ", ")
-            .concat(r, ")")
+            .concat(i, ")")
         );
       }
       function F(e, t) {
@@ -2183,23 +2125,23 @@
             );
         }
       }
-      var X = n(178);
-      var q = {
+      var q = n(103);
+      var X = {
           Checkers: a,
           Colors: o,
-          UDate: r,
+          UDate: i,
           guidGenerator: E,
           debounce: function(e, t, n) {
             var a;
             return function() {
               var o = this,
-                r = arguments,
-                i = n && !a;
+                i = arguments,
+                r = n && !a;
               clearTimeout(a),
                 (a = setTimeout(function() {
-                  (a = null), n || e.apply(o, r);
+                  (a = null), n || e.apply(o, i);
                 }, t)),
-                i && e.apply(o, r);
+                r && e.apply(o, i);
             };
           },
           styleToProp: function(e) {
@@ -2225,13 +2167,13 @@
                     ];
                   })
                   .reduce(function(e, t) {
-                    return Object(N.a)({}, e, Object(X.a)({}, t[0], t[1]));
+                    return Object(N.a)({}, e, Object(q.a)({}, t[0], t[1]));
                   }, {})
               : null;
           },
         },
-        K = n(280),
-        Z = n.n(K),
+        Z = n(279),
+        K = n.n(Z),
         Q = Object(u.c)(function(e) {
           var t = e.item,
             n = e.store;
@@ -2246,7 +2188,7 @@
             l.a.createElement(
               j.a.Content,
               null,
-              l.a.createElement(j.a.Header, { as: "a" }, "ID ", t.pk || t.id),
+              t.pk >= 0 && l.a.createElement(j.a.Header, { as: "a" }, "ID ", t.pk || t.id),
               l.a.createElement("p", null),
               l.a.createElement(
                 j.a.Description,
@@ -2255,14 +2197,14 @@
                 l.a.createElement(
                   "i",
                   null,
-                  t.createdAgo ? " ".concat(t.createdAgo, " ago") : " ".concat(q.UDate.prettyDate(t.createdDate)),
+                  t.createdAgo ? " ".concat(t.createdAgo, " ago") : " ".concat(X.UDate.prettyDate(t.createdDate)),
                 ),
                 t.createdBy ? " by ".concat(t.createdBy) : null,
               ),
               t.selected &&
                 l.a.createElement(
                   "div",
-                  { className: Z.a.buttons },
+                  { className: K.a.buttons },
                   l.a.createElement(
                     A.a,
                     {
@@ -2304,38 +2246,54 @@
             return Object(m.a)(this, t), Object(h.a)(this, Object(p.a)(t).apply(this, arguments));
           }
           return (
-            Object(g.a)(t, e),
+            Object(f.a)(t, e),
             Object(d.a)(t, [
               {
                 key: "render",
                 value: function() {
-                  var e = this.props.store;
-                  return l.a.createElement(
-                    D.a,
-                    { title: "Completions", bodyStyle: { padding: 0 } },
-                    l.a.createElement(
-                      j.a,
-                      { divided: !0, relaxed: !0 },
-                      e.completionStore.savedCompletions.map(function(t) {
-                        return l.a.createElement(Q, { key: t.id, item: t, store: e });
-                      }),
-                    ),
+                  var e = this.props.store,
+                    t = 0;
+                  return (
+                    e.completionStore.savedCompletions.map(function(e) {
+                      (e.pk > 0 || e.prediction) && t++;
+                    }),
+                    0 === t
+                      ? l.a.createElement(
+                          D.a,
+                          { title: "Completions" },
+                          l.a.createElement(
+                            j.a,
+                            { divided: !0, relaxed: !0 },
+                            l.a.createElement("p", null, "No completions submitted yet"),
+                          ),
+                        )
+                      : l.a.createElement(
+                          D.a,
+                          { title: "Completions", bodyStyle: { padding: 0, paddingTop: "1px" } },
+                          l.a.createElement(
+                            j.a,
+                            { divided: !0, relaxed: !0 },
+                            e.completionStore.savedCompletions.map(function(t) {
+                              if (t) return l.a.createElement(Q, { key: t.pk, item: t, store: e });
+                            }),
+                          ),
+                        )
                   );
                 },
               },
             ]),
             t
           );
-        })(i.Component),
+        })(r.Component),
         ee = Object(u.c)($),
-        te = n(203),
+        te = n(213),
         ne = n.n(te),
         ae = (function(e) {
           function t() {
             return Object(m.a)(this, t), Object(h.a)(this, Object(p.a)(t).apply(this, arguments));
           }
           return (
-            Object(g.a)(t, e),
+            Object(f.a)(t, e),
             Object(d.a)(t, [
               {
                 key: "render",
@@ -2356,35 +2314,37 @@
             ]),
             t
           );
-        })(i.Component),
-        oe = n(168),
-        re = n.n(oe),
-        ie = Object(u.b)("store")(
+        })(r.Component),
+        oe = n(91),
+        ie = n.n(oe),
+        re = Object(u.b)("store")(
           Object(u.c)(function(e) {
             var t,
               n,
               a,
               o = e.store;
             return (
-              o.task && (t = l.a.createElement("h4", { className: re.a.task }, "Task ID: ", o.task.id)),
+              o.task && (t = l.a.createElement("h4", { className: ie.a.task }, "Task ID: ", o.task.id)),
               o.settings.enableHotkeys &&
                 o.settings.enableTooltips &&
                 ((n = l.a.createElement(ae, null, " [ Ctrl+Enter ]")),
                 (a = l.a.createElement(ae, null, " [ Ctrl+Space ]"))),
               l.a.createElement(
                 "div",
-                { className: re.a.block },
+                { className: ie.a.block },
                 l.a.createElement(
                   "div",
-                  { className: re.a.wrapper },
+                  { className: ie.a.wrapper },
                   l.a.createElement(
                     "div",
-                    { className: re.a.container },
+                    { className: ie.a.container },
                     o.hasInterface("submit:skip") &&
-                      l.a.createElement(A.a, { type: "ghost", onClick: o.skipTask, className: re.a.skip }, "Skip ", a),
+                      l.a.createElement(A.a, { type: "ghost", onClick: o.skipTask, className: ie.a.skip }, "Skip ", a),
+                    o.hasInterface("submit:rewrite") &&
+                      l.a.createElement(A.a, { type: "primary", icon: "rollback", onClick: o.rewriteTask }, "Update"),
                     l.a.createElement(
                       A.a,
-                      { type: "primary", icon: "check", onClick: o.sendTask, className: re.a.submit },
+                      { type: "primary", icon: "check", onClick: o.sendTask, className: ie.a.submit },
                       "Submit ",
                       n,
                     ),
@@ -2395,7 +2355,7 @@
             );
           }),
         ),
-        le = n(191),
+        le = n(167),
         se = n.n(le),
         ce = Object(u.c)(function(e) {
           var t = e.store,
@@ -2488,52 +2448,67 @@
             ),
           );
         }),
-        ue = n(618),
-        me = n(626),
-        de = Object(u.c)(function(e) {
+        ue = n(614),
+        me = n(596),
+        de = n(622),
+        he = Object(u.c)(function(e) {
           var t = e.store;
           return l.a.createElement(
             ue.a,
-            { visible: t.showingSettings, title: "Hotkeys", footer: "", onCancel: t.toggleSettings },
+            {
+              visible: t.showingSettings,
+              title: "Settings",
+              bodyStyle: { paddingTop: "0" },
+              footer: "",
+              onCancel: t.toggleSettings,
+            },
             l.a.createElement(
               me.a,
-              {
-                value: "Enable labeling hotkeys",
-                defaultChecked: t.settings.enableHotkeys,
-                onChange: function() {
-                  t.settings.toggleHotkeys();
-                },
-              },
-              "Enable labeling hotkeys",
-            ),
-            l.a.createElement("br", null),
-            l.a.createElement(
-              me.a,
-              {
-                value: "Show tooltips",
-                defaultChecked: t.settings.enableTooltips,
-                onChange: function() {
-                  t.settings.toggleTooltips();
-                },
-              },
-              "Show tooltips",
+              { defaultActiveKey: "1" },
+              l.a.createElement(
+                me.a.TabPane,
+                { tab: "Hotkeys", key: "1" },
+                l.a.createElement(
+                  de.a,
+                  {
+                    value: "Enable labeling hotkeys",
+                    defaultChecked: t.settings.enableHotkeys,
+                    onChange: function() {
+                      t.settings.toggleHotkeys();
+                    },
+                  },
+                  "Enable labeling hotkeys",
+                ),
+                l.a.createElement("br", null),
+                l.a.createElement(
+                  de.a,
+                  {
+                    value: "Show tooltips",
+                    defaultChecked: t.settings.enableTooltips,
+                    onChange: function() {
+                      t.settings.toggleTooltips();
+                    },
+                  },
+                  "Show tooltips",
+                ),
+              ),
             ),
           );
         }),
-        he = n(628),
-        pe = n(625),
-        ge = n(614),
-        fe = (function(e) {
+        pe = n(624),
+        fe = n(620),
+        ge = n(610),
+        ve = (function(e) {
           function t() {
             var e, n;
             Object(m.a)(this, t);
-            for (var a = arguments.length, o = new Array(a), r = 0; r < a; r++) o[r] = arguments[r];
+            for (var a = arguments.length, o = new Array(a), i = 0; i < a; i++) o[i] = arguments[i];
             return (
               ((n = Object(h.a)(this, (e = Object(p.a)(t)).call.apply(e, [this].concat(o)))).state = { res: null }), n
             );
           }
           return (
-            Object(g.a)(t, e),
+            Object(f.a)(t, e),
             Object(d.a)(t, [
               {
                 key: "render",
@@ -2546,9 +2521,9 @@
                     "div",
                     null,
                     l.a.createElement("br", null),
-                    l.a.createElement(he.a, null, "Debug"),
+                    l.a.createElement(pe.a, null, "Debug"),
                     l.a.createElement(
-                      pe.a,
+                      fe.a,
                       {
                         basic: !0,
                         onClick: function(t) {
@@ -2558,7 +2533,7 @@
                       "Serialize whole tree",
                     ),
                     l.a.createElement(
-                      pe.a,
+                      fe.a,
                       {
                         basic: !0,
                         onClick: function(t) {
@@ -2568,7 +2543,7 @@
                       "Seriealize results tree",
                     ),
                     l.a.createElement(
-                      pe.a,
+                      fe.a,
                       {
                         basic: !0,
                         onClick: function(e) {
@@ -2578,7 +2553,7 @@
                       "Load Serialized Results",
                     ),
                     l.a.createElement(
-                      pe.a,
+                      fe.a,
                       {
                         basic: !0,
                         onClick: function(e) {
@@ -2590,7 +2565,7 @@
                       "Load As New Completion",
                     ),
                     l.a.createElement(
-                      pe.a,
+                      fe.a,
                       {
                         basic: !0,
                         onClick: function(t) {
@@ -2600,7 +2575,7 @@
                       "Task data",
                     ),
                     l.a.createElement(
-                      pe.a,
+                      fe.a,
                       {
                         basic: !0,
                         onClick: function(e) {
@@ -2637,28 +2612,28 @@
             ]),
             t
           );
-        })(i.Component),
-        ve = (Object(u.c)(fe), n(36)),
+        })(r.Component),
+        ye = (Object(u.c)(ve), n(33)),
         be = Object(u.c)(function(e) {
           var t = e.node,
             n = function(e) {
               return (
                 e.preventDefault(),
-                Object(b.g)(t).completionStore.selected.regionStore.unselectAll(),
+                Object(y.g)(t).completionStore.selected.regionStore.unselectAll(),
                 t.selectRegion(),
                 !1
               );
             },
             a = { color: "black", textDecorationLine: "underline", textDecorationStyle: "dotted" };
-          if ("TextRegionModel" === Object(b.i)(t).name)
+          if ("TextRegionModel" === Object(y.i)(t).name)
             return l.a.createElement(
               "div",
               null,
-              l.a.createElement(ve.a, { type: "font-colors" }),
+              l.a.createElement(ye.a, { type: "font-colors" }),
               "Text \xa0",
               l.a.createElement("span", { style: { color: "#5a5a5a" } }, t.text),
             );
-          if ("AudioRegionModel" === Object(b.i)(t).name)
+          if ("AudioRegionModel" === Object(y.i)(t).name)
             return l.a.createElement(
               "p",
               null,
@@ -2672,7 +2647,7 @@
                 t.end.toFixed(2),
               ),
             );
-          if ("TextAreaRegionModel" === Object(b.i)(t).name)
+          if ("TextAreaRegionModel" === Object(y.i)(t).name)
             return l.a.createElement(
               "p",
               null,
@@ -2684,9 +2659,9 @@
                 l.a.createElement("span", { style: { color: "#5a5a5a" } }, t._value),
               ),
             );
-          if ("RectRegionModel" === Object(b.i)(t).name) {
+          if ("RectRegionModel" === Object(y.i)(t).name) {
             var o = t.width * t.scaleX,
-              r = t.height * t.scaleY;
+              i = t.height * t.scaleY;
             return l.a.createElement(
               "p",
               null,
@@ -2697,11 +2672,11 @@
                 "Rectangle \xa0",
                 o.toFixed(2),
                 " x ",
-                r.toFixed(2),
+                i.toFixed(2),
               ),
             );
           }
-          return "PolygonRegionModel" === Object(b.i)(t).name
+          return "PolygonRegionModel" === Object(y.i)(t).name
             ? l.a.createElement(
                 "p",
                 null,
@@ -2714,43 +2689,43 @@
               )
             : void 0;
         }),
-        ye = function(e) {
+        we = function(e) {
           var t = e.node;
-          return "TextRegionModel" == Object(b.i)(t).name
-            ? l.a.createElement(i.Fragment, null, l.a.createElement(ve.a, { type: "font-colors" }), " Text")
-            : "RectRegionModel" == Object(b.i)(t).name
-            ? l.a.createElement(i.Fragment, null, l.a.createElement("i", { className: "expand icon" }), "Rectangle")
-            : "AudioRegionModel" == Object(b.i)(t).name
-            ? l.a.createElement(i.Fragment, null, l.a.createElement("i", { className: "microphone icon" }), "Audio")
-            : "TextAreaRegionModel" == Object(b.i)(t).name
-            ? l.a.createElement(i.Fragment, null, l.a.createElement("i", { className: "i cursor icon" }), "Input")
-            : "PolygonRegionModel" == Object(b.i)(t).name
+          return "TextRegionModel" == Object(y.i)(t).name
+            ? l.a.createElement(r.Fragment, null, l.a.createElement(ye.a, { type: "font-colors" }), " Text")
+            : "RectRegionModel" == Object(y.i)(t).name
+            ? l.a.createElement(r.Fragment, null, l.a.createElement("i", { className: "expand icon" }), "Rectangle")
+            : "AudioRegionModel" == Object(y.i)(t).name
+            ? l.a.createElement(r.Fragment, null, l.a.createElement("i", { className: "microphone icon" }), "Audio")
+            : "TextAreaRegionModel" == Object(y.i)(t).name
+            ? l.a.createElement(r.Fragment, null, l.a.createElement("i", { className: "i cursor icon" }), "Input")
+            : "PolygonRegionModel" == Object(y.i)(t).name
             ? l.a.createElement(
-                i.Fragment,
+                r.Fragment,
                 null,
                 l.a.createElement("i", { className: "i object ungroup outline icon" }),
                 "Polygon",
               )
             : void 0;
         },
-        we = n(177),
-        ke = n.n(we),
-        xe = function(e) {
+        ke = n(122),
+        xe = n.n(ke),
+        Te = function(e) {
           var t = e.store,
             n = e.rl;
-          return Object(b.j)(function() {
+          return Object(y.j)(function() {
             return n.node1;
           }) &&
-            Object(b.j)(function() {
+            Object(y.j)(function() {
               return n.node2;
             })
             ? l.a.createElement(
                 "div",
-                { className: ke.a.block },
+                { className: xe.a.block },
                 l.a.createElement(
                   "div",
                   {
-                    className: ke.a.section,
+                    className: xe.a.section,
                     onMouseOver: function() {
                       n.toggleHighlight();
                     },
@@ -2760,42 +2735,42 @@
                   },
                   l.a.createElement(
                     "div",
-                    { className: ke.a.section__blocks },
-                    l.a.createElement("div", null, l.a.createElement(ye, { node: n.node1 })),
-                    l.a.createElement(ve.a, { type: "arrow-right" }),
-                    l.a.createElement("div", null, l.a.createElement(ye, { node: n.node2 })),
+                    { className: xe.a.section__blocks },
+                    l.a.createElement("div", null, l.a.createElement(we, { node: n.node1 })),
+                    l.a.createElement(ye.a, { type: "arrow-right" }),
+                    l.a.createElement("div", null, l.a.createElement(we, { node: n.node2 })),
                   ),
                 ),
                 l.a.createElement(
                   "a",
                   {
                     href: "#",
-                    className: ke.a.delete,
+                    className: xe.a.delete,
                     onClick: function() {
                       return t.deleteRelation(n), !1;
                     },
                   },
-                  l.a.createElement(ve.a, { type: "delete" }),
+                  l.a.createElement(ye.a, { type: "delete" }),
                 ),
               )
             : null;
         },
-        Te = Object(u.c)(function(e) {
+        Ne = Object(u.c)(function(e) {
           var t = e.store.completionStore.selected,
             n = t.relationStore.relations;
           return l.a.createElement(
-            i.Fragment,
+            r.Fragment,
             null,
             l.a.createElement("h4", null, "Relations (", n.length, ")"),
             !n.length && l.a.createElement("p", null, "No Relations added yet"),
             t.relationStore.relations.map(function(e) {
-              return l.a.createElement(xe, { store: t.relationStore, rl: e });
+              return l.a.createElement(Te, { store: t.relationStore, rl: e });
             }),
           );
         }),
-        Ne = n(304),
-        Se = n.n(Ne),
-        Ie = Object(u.c)(function(e) {
+        Se = n(301),
+        Ie = n.n(Se),
+        Ee = Object(u.c)(function(e) {
           var t = e.store,
             n = e.regionStore.regions;
           return l.a.createElement(
@@ -2827,7 +2802,7 @@
                   "li",
                   {
                     key: e.id,
-                    className: Se.a.item,
+                    className: Ie.a.item,
                     onMouseOver: function() {
                       e.toggleHightlight();
                     },
@@ -2841,53 +2816,53 @@
             ),
           );
         }),
-        Ee = n(627),
-        Oe = n(164),
-        _e = n.n(Oe),
-        Re = function(e) {
+        Oe = n(623),
+        Re = n(80),
+        Ce = n.n(Re),
+        _e = function(e) {
           var t = e.node,
             n = function(e) {
-              return "LabelsModel" === Object(b.i)(e).name ||
-                "RectangleLabelsModel" === Object(b.i)(e).name ||
-                "PolygonLabelsModel" === Object(b.i)(e).name
+              return "LabelsModel" === Object(y.i)(e).name ||
+                "RectangleLabelsModel" === Object(y.i)(e).name ||
+                "PolygonLabelsModel" === Object(y.i)(e).name
                 ? ((t = e),
                   l.a.createElement(
                     "div",
-                    { key: t.pid, className: _e.a.labels },
+                    { key: t.pid, className: Ce.a.labels },
                     "Labels:\xa0",
                     t.getSelectedNames().map(function(e) {
                       var n = t.findLabel(e).background ? t.findLabel(e).background : "#000000";
-                      return l.a.createElement(Ee.a, { key: t.findLabel(e).id, color: n, className: _e.a.tag }, e);
+                      return l.a.createElement(Oe.a, { key: t.findLabel(e).id, color: n, className: Ce.a.tag }, e);
                     }),
                   ))
-                : "RatingModel" === Object(b.i)(e).name
+                : "RatingModel" === Object(y.i)(e).name
                 ? l.a.createElement("p", null, "Rating: ", e.getSelectedString())
                 : null;
               var t;
             };
           return l.a.createElement(
-            i.Fragment,
+            r.Fragment,
             null,
             t.states.map(function(e) {
               return n(e);
             }),
           );
         },
-        Ce = Object(u.c)(function(e) {
+        je = Object(u.c)(function(e) {
           var t = e.store,
             n = e.completion,
             a = n.highlightedNode;
           return l.a.createElement(
-            i.Fragment,
+            r.Fragment,
             null,
-            l.a.createElement("p", null, l.a.createElement(ye, { node: a }), " (id: ", a.id, ")"),
+            l.a.createElement("p", null, l.a.createElement(we, { node: a }), " (id: ", a.id, ")"),
             a.normalization &&
               l.a.createElement(
                 "p",
                 null,
                 "Normalization: ",
                 a.normalization,
-                l.a.createElement(ve.a, {
+                l.a.createElement(ye.a, {
                   name: "delete",
                   style: { cursor: "pointer" },
                   onClick: function() {
@@ -2895,54 +2870,54 @@
                   },
                 }),
               ),
-            a.states && l.a.createElement(Re, { node: a }),
+            a.states && l.a.createElement(_e, { node: a }),
             l.a.createElement(
               "div",
-              { className: _e.a.block },
+              { className: Ce.a.block },
               l.a.createElement(
                 A.a,
                 {
-                  className: _e.a.button,
+                  className: Ce.a.button,
                   onClick: function() {
                     n.startRelationMode(a);
                   },
                 },
-                l.a.createElement(ve.a, { type: "link" }),
+                l.a.createElement(ye.a, { type: "link" }),
                 "Relation",
               ),
               l.a.createElement(
                 A.a,
                 {
-                  className: _e.a.button,
+                  className: Ce.a.button,
                   onClick: function() {
                     n.setNormalizationMode(!0);
                   },
                 },
-                l.a.createElement(ve.a, { type: "plus" }),
+                l.a.createElement(ye.a, { type: "plus" }),
                 "Normalization",
               ),
               l.a.createElement(
                 A.a,
                 {
-                  className: _e.a.button,
+                  className: Ce.a.button,
                   type: "dashed",
                   onClick: function() {
                     n.highlightedNode.unselectRegion();
                   },
                 },
-                l.a.createElement(ve.a, { type: "fullscreen-exit" }),
+                l.a.createElement(ye.a, { type: "fullscreen-exit" }),
                 "Unselect",
               ),
               l.a.createElement(
                 A.a,
                 {
                   type: "danger",
-                  className: _e.a.button,
+                  className: Ce.a.button,
                   onClick: function() {
                     n.highlightedNode.deleteRegion();
                   },
                 },
-                l.a.createElement(ve.a, { type: "delete" }),
+                l.a.createElement(ye.a, { type: "delete" }),
                 "Delete",
                 t.settings.enableHotkeys && t.settings.enableTooltips && l.a.createElement(ae, null, "[ Bksp ]"),
               ),
@@ -2971,23 +2946,23 @@
               ),
           );
         }),
-        je = n(305),
-        Ae = n.n(je),
-        De = Object(u.c)(function(e) {
+        Ae = n(302),
+        De = n.n(Ae),
+        Me = Object(u.c)(function(e) {
           var t = e.store,
             n = t.completionStore.selected,
             a = n.highlightedNode;
           return l.a.createElement(
             D.a,
-            { title: "Entity", className: Ae.a.card },
-            a && l.a.createElement(Ce, { store: t, completion: n }),
+            { title: "Entity", className: De.a.card },
+            a && l.a.createElement(je, { store: t, completion: n }),
             !n.highlightedNode && l.a.createElement("p", null, "Nothing selected"),
-            l.a.createElement(Ie, { store: t, regionStore: n.regionStore }),
-            l.a.createElement(Te, { store: t, item: n }),
+            l.a.createElement(Ee, { store: t, regionStore: n.regionStore }),
+            l.a.createElement(Ne, { store: t, item: n }),
           );
         });
-      function Me(e) {
-        return b.m.union({
+      function Be(e) {
+        return y.m.union({
           dispatcher: function(t) {
             if (
               e.find(function(e) {
@@ -2999,9 +2974,9 @@
           },
         });
       }
-      var Be = {
+      var He = {
           unionArray: function(e) {
-            return b.m.maybeNull(b.m.array(Me(e)));
+            return y.m.maybeNull(y.m.array(Be(e)));
           },
           allModelsTypes: function() {
             var e = [
@@ -3019,40 +2994,40 @@
                 k.modelsArr(),
               ],
               t = [].concat.apply([], e);
-            return b.m.union.apply(null, t);
+            return y.m.union.apply(null, t);
           },
-          oneOf: Me,
+          oneOf: Be,
           isType: function(e, t) {
-            var n = Object(b.i)(e),
+            var n = Object(y.i)(e),
               a = !0,
               o = !1,
-              r = void 0;
+              i = void 0;
             try {
-              for (var i, l = t[Symbol.iterator](); !(a = (i = l.next()).done); a = !0) if (n === i.value) return !0;
+              for (var r, l = t[Symbol.iterator](); !(a = (r = l.next()).done); a = !0) if (n === r.value) return !0;
             } catch (s) {
-              (o = !0), (r = s);
+              (o = !0), (i = s);
             } finally {
               try {
                 a || null == l.return || l.return();
               } finally {
-                if (o) throw r;
+                if (o) throw i;
               }
             }
             return !1;
           },
           getParentOfTypeString: function(e, t) {
-            var n = Object(b.e)(e);
+            var n = Object(y.e)(e);
             Array.isArray(t) || (t = [t]);
             for (
               var a = function() {
-                var e = Object(b.i)(n).name;
+                var e = Object(y.i)(n).name;
                 if (
                   t.find(function(t) {
                     return t === e;
                   })
                 )
                   return { v: n };
-                n = Object(b.e)(n);
+                n = Object(y.e)(n);
               };
               n;
 
@@ -3063,16 +3038,16 @@
             return null;
           },
         },
-        He = b.m.model({
-          display: b.m.optional(b.m.string, "block"),
-          backgroundcolor: b.m.optional(b.m.string, ""),
-          margin: b.m.optional(b.m.string, ""),
+        We = y.m.model({
+          display: y.m.optional(y.m.string, "block"),
+          backgroundcolor: y.m.optional(y.m.string, ""),
+          margin: y.m.optional(y.m.string, ""),
         }),
-        We = b.m.model({
-          id: b.m.identifier,
+        Pe = y.m.model({
+          id: y.m.identifier,
           type: "view",
-          style: b.m.maybeNull(b.m.string),
-          children: Be.unionArray([
+          style: y.m.maybeNull(y.m.string),
+          children: He.unionArray([
             "view",
             "header",
             "labels",
@@ -3093,23 +3068,23 @@
             "dialog",
           ]),
         }),
-        Pe = b.m.compose(
+        ze = y.m.compose(
           "ViewModel",
-          He,
           We,
+          Pe,
         ),
-        ze = Object(u.c)(function(e) {
+        Le = Object(u.c)(function(e) {
           var t = e.item,
             n = {};
           return (
             "inline" === t.display && (n = { display: "inline-block", marginRight: "15px" }),
-            t.style && (n = C.cssConverter(t.style)),
-            l.a.createElement("div", { style: n }, C.renderChildren(t))
+            t.style && (n = _.cssConverter(t.style)),
+            l.a.createElement("div", { style: n }, _.renderChildren(t))
           );
         });
-      k.addTag("view", Pe, ze);
-      var Le = n(620);
-      function Fe(e, t) {
+      k.addTag("view", ze, Le);
+      var Fe = n(613);
+      function Je(e, t) {
         return "$" === e.charAt(0)
           ? (function e(t, n, a) {
               return "string" === typeof n
@@ -3122,19 +3097,19 @@
             })(t, e.substring(1))
           : e;
       }
-      function Je(e, t) {
+      function Ge(e, t) {
         t || (t = {});
         for (
           var n,
             a,
             o = /[$](.+)/g,
-            r = /(^( )?(var|if|for|else|switch|case|break|{|}|;))(.*)?/g,
-            i = "with(obj) { var r=[];\n",
+            i = /(^( )?(var|if|for|else|switch|case|break|{|}|;))(.*)?/g,
+            r = "with(obj) { var r=[];\n",
             l = 0,
             s = function e(t, n) {
               return (
-                (i += n
-                  ? t.match(r)
+                (r += n
+                  ? t.match(i)
                     ? t + "\n"
                     : "r.push(" + t + ");\n"
                   : "" !== t
@@ -3148,33 +3123,33 @@
         )
           s(e.slice(l, a.index))(a[1], !0), (l = a.index + a[0].length);
         if (!e) return "";
-        s(e.substr(l, e.length - l)), (i = (i + 'return r.join(""); }').replace(/[\r\t\n]/g, " "));
+        s(e.substr(l, e.length - l)), (r = (r + 'return r.join(""); }').replace(/[\r\t\n]/g, " "));
         try {
-          n = new Function("obj", i).apply(t, [t]);
+          n = new Function("obj", r).apply(t, [t]);
         } catch (c) {
-          console.error("'" + c.message + "'", " in \n\nCode:\n", i, "\n");
+          console.error("'" + c.message + "'", " in \n\nCode:\n", r, "\n");
         }
         return n;
       }
-      var Ge = b.m.model().actions(function(e) {
+      var Ue = y.m.model().actions(function(e) {
           return {
             updateValue: function(t) {
-              e._value = Je(e.value, t.task.dataObj) || "";
+              e._value = Ge(e.value, t.task.dataObj) || "";
             },
           };
         }),
-        Ue = b.m.model({
+        Ve = y.m.model({
           type: "table",
-          size: b.m.optional(b.m.string, "h4"),
-          value: b.m.maybeNull(b.m.string),
-          _value: b.m.optional(b.m.string, ""),
+          size: y.m.optional(y.m.string, "h4"),
+          value: y.m.maybeNull(y.m.string),
+          _value: y.m.optional(y.m.string, ""),
         }),
-        Ve = b.m.compose(
+        Ye = y.m.compose(
           "TableModel",
+          Ve,
           Ue,
-          Ge,
         ),
-        Ye = Object(u.b)("store")(
+        qe = Object(u.b)("store")(
           Object(u.c)(function(e) {
             var t = e.store,
               n = e.item._value;
@@ -3184,24 +3159,24 @@
                 "div",
                 { style: { marginTop: "1em" } },
                 l.a.createElement(
-                  Le.a,
+                  Fe.a,
                   { basic: "very", celled: !0, collapsing: !0 },
                   l.a.createElement(
-                    Le.a.Body,
+                    Fe.a.Body,
                     null,
                     Object.keys(n).map(function(e) {
                       var t = n[e];
                       return (
                         "object" === typeof t && (t = JSON.stringify(t)),
                         l.a.createElement(
-                          Le.a.Row,
+                          Fe.a.Row,
                           null,
                           l.a.createElement(
-                            Le.a.Cell,
+                            Fe.a.Cell,
                             null,
-                            l.a.createElement(he.a, { as: "h4" }, l.a.createElement(he.a.Subheader, null, e)),
+                            l.a.createElement(pe.a, { as: "h4" }, l.a.createElement(pe.a.Subheader, null, e)),
                           ),
-                          l.a.createElement(Le.a.Cell, null, t),
+                          l.a.createElement(Fe.a.Cell, null, t),
                         )
                       );
                     }),
@@ -3211,20 +3186,20 @@
             );
           }),
         );
-      k.addTag("table", Ve, Ye);
-      var Xe = n(616),
-        qe = b.m.model({
+      k.addTag("table", Ye, qe);
+      var Xe = n(611),
+        Ze = y.m.model({
           type: "header",
-          size: b.m.optional(b.m.number, 4),
-          value: b.m.optional(b.m.string, ""),
-          underline: b.m.optional(b.m.boolean, !1),
+          size: y.m.optional(y.m.number, 4),
+          value: y.m.optional(y.m.string, ""),
+          underline: y.m.optional(y.m.boolean, !1),
         }),
-        Ke = b.m.compose(
+        Ke = y.m.compose(
           "HeaderModel",
-          qe,
-          Ge,
+          Ze,
+          Ue,
         ),
-        Ze = Object(u.c)(function(e) {
+        Qe = Object(u.c)(function(e) {
           var t = e.item;
           return l.a.createElement(
             Xe.a.Title,
@@ -3232,14 +3207,14 @@
             t.value,
           );
         });
-      k.addTag("header", Ke, Ze);
-      var Qe = b.m.model({ value: b.m.maybeNull(b.m.string), name: b.m.maybeNull(b.m.string) });
-      var $e = b.m
-          .model({ id: b.m.identifier, type: "HyperText" })
+      k.addTag("header", Ke, Qe);
+      var $e = y.m.model({ value: y.m.maybeNull(y.m.string), name: y.m.maybeNull(y.m.string) });
+      var et = y.m
+          .model({ id: y.m.identifier, type: "HyperText" })
           .views(function(e) {
             return {
               get completion() {
-                return Object(b.g)(e).completionStore.selected;
+                return Object(y.g)(e).completionStore.selected;
               },
             };
           })
@@ -3253,31 +3228,31 @@
               };
             })(e);
           }),
-        et = b.m.compose(
+        tt = y.m.compose(
           "HyperTextModel",
-          Qe,
           $e,
+          et,
         ),
-        tt = Object(u.b)("store")(
+        nt = Object(u.b)("store")(
           Object(u.c)(function(e) {
             var t = e.store,
               n = e.item;
             return t.task
-              ? l.a.createElement("div", { dangerouslySetInnerHTML: { __html: Je(n.value, t.task.dataObj) } })
+              ? l.a.createElement("div", { dangerouslySetInnerHTML: { __html: Ge(n.value, t.task.dataObj) } })
               : null;
           }),
         );
-      k.addTag("hypertext", et, tt);
-      var nt = n(602),
-        at = n(612),
-        ot = n(169),
-        rt = n.n(ot),
-        it = (function(e) {
+      k.addTag("hypertext", tt, nt);
+      var at = n(599),
+        ot = n(608),
+        it = n(92),
+        rt = n.n(it),
+        lt = (function(e) {
           function t() {
             return Object(m.a)(this, t), Object(h.a)(this, Object(p.a)(t).apply(this, arguments));
           }
           return (
-            Object(g.a)(t, e),
+            Object(f.a)(t, e),
             Object(d.a)(t, [
               {
                 key: "render",
@@ -3287,20 +3262,20 @@
                     n,
                     a = "".concat(rt.a.block);
                   return (
-                    this.props.hint && (e = l.a.createElement(Ee.a, { color: "blue" }, this.props.hint)),
+                    this.props.hint && (e = l.a.createElement(Oe.a, { color: "blue" }, this.props.hint)),
                     this.props.bg && (t = this.props.bg),
                     this.props.selected &&
                       ((a = "".concat(a, " ").concat(rt.a.block_selected)),
                       (e = l.a.createElement(
                         "div",
                         null,
-                        l.a.createElement(Ee.a, { color: "magenta" }, "Selected Message"),
+                        l.a.createElement(Oe.a, { color: "magenta" }, "Selected Message"),
                       )),
                       this.props.hint &&
                         (e = l.a.createElement(
                           "div",
                           { className: rt.a.tag },
-                          l.a.createElement(Ee.a, { color: "magenta" }, this.props.hint),
+                          l.a.createElement(Oe.a, { color: "magenta" }, this.props.hint),
                         ))),
                     this.props.date && (n = l.a.createElement("span", { className: rt.a.date }, this.props.date)),
                     l.a.createElement(
@@ -3318,20 +3293,20 @@
             t
           );
         })(l.a.Component),
-        lt = b.m.model({
-          name: b.m.string,
-          text: b.m.string,
-          selected: b.m.optional(b.m.boolean, !1),
-          date: b.m.optional(b.m.string, ""),
-          hint: b.m.optional(b.m.string, ""),
+        st = y.m.model({
+          name: y.m.string,
+          text: y.m.string,
+          selected: y.m.optional(y.m.boolean, !1),
+          date: y.m.optional(y.m.string, ""),
+          hint: y.m.optional(y.m.string, ""),
         }),
-        st = b.m.model({ value: b.m.maybeNull(b.m.string), name: b.m.maybeNull(b.m.string) });
-      var ct = b.m
-          .model({ id: b.m.optional(b.m.identifier, E), type: "Dialog", data: b.m.map(lt) })
+        ct = y.m.model({ value: y.m.maybeNull(y.m.string), name: y.m.maybeNull(y.m.string) });
+      var ut = y.m
+          .model({ id: y.m.optional(y.m.identifier, E), type: "Dialog", data: y.m.map(st) })
           .views(function(e) {
             return {
               get completion() {
-                return Object(b.g)(e).completionStore.selected;
+                return Object(y.g)(e).completionStore.selected;
               },
             };
           })
@@ -3345,16 +3320,16 @@
               };
             })(e);
           }),
-        ut = b.m.compose(
+        mt = y.m.compose(
           "DialogModel",
-          st,
           ct,
+          ut,
         ),
-        mt = Object(u.b)("store")(
+        dt = Object(u.b)("store")(
           Object(u.c)(function(e) {
             var t = e.store,
               n = e.item;
-            if (!t.task || !t.task.dataObj) return l.a.createElement(nt.a, null);
+            if (!t.task || !t.task.dataObj) return l.a.createElement(at.a, null);
             var a = [],
               o = n.value;
             return (
@@ -3363,7 +3338,7 @@
                 var n;
                 e.name && (n = J(G(e.name), 0.1)),
                   a.push(
-                    l.a.createElement(it, {
+                    l.a.createElement(lt, {
                       key: t,
                       name: e.name,
                       hint: e.hint,
@@ -3392,69 +3367,27 @@
                   },
                   a,
                 ),
-                l.a.createElement(at.a, { dashed: !0 }),
+                l.a.createElement(ot.a, { dashed: !0 }),
               )
             );
           }),
         );
-      k.addTag("dialog", ut, mt);
-      var dt = b.m.model({ name: b.m.maybeNull(b.m.string), value: b.m.maybeNull(b.m.string) }),
-        ht = b.m
-          .model({ id: b.m.optional(b.m.identifier, E), type: "audio", _value: b.m.optional(b.m.string, "") })
-          .views(function(e) {
-            return {
-              get completion() {
-                return Object(b.g)(e).completionStore.selected;
-              },
-            };
-          })
-          .actions(function(e) {
-            return {
-              fromStateJSON: function(t, n) {
-                t.value.choices && e.completion.names.get(t.from_name).fromStateJSON(t),
-                  t.value.text && e.completion.names.get(t.from_name).fromStateJSON(t);
-              },
-            };
-          }),
-        pt = b.m.compose(
-          "AudioModel",
-          dt,
-          ht,
-          Ge,
-        ),
-        gt = Object(u.c)(function(e) {
-          e.store;
-          var t = e.item;
-          return t._value
-            ? l.a.createElement(
-                "div",
-                null,
-                l.a.createElement(
-                  "audio",
-                  { controls: !0, style: { width: "100%" } },
-                  l.a.createElement("source", { src: t._value, type: "audio/mpeg" }),
-                  "Your browser does not support the audio element.",
-                ),
-              )
-            : null;
-        }),
-        ft = Object(u.b)("store")(Object(u.c)(gt));
-      k.addTag("audio", pt, ft);
-      var vt = n(307),
-        bt = n.n(vt),
-        yt = n(308),
-        wt = n.n(yt),
-        kt = n(309),
-        xt = n.n(kt),
-        Tt = n(310),
-        Nt = n.n(Tt),
-        St = n(603),
-        It = n(604),
-        Et = n(621),
-        Ot = n(617),
-        _t = n(208),
-        Rt = n.n(_t);
-      function Ct(e, t) {
+      k.addTag("dialog", mt, dt);
+      var ht = n(304),
+        pt = n.n(ht),
+        ft = n(305),
+        gt = n.n(ft),
+        vt = n(306),
+        yt = n.n(vt),
+        bt = n(307),
+        wt = n.n(bt),
+        kt = n(598),
+        xt = n(600),
+        Tt = n(616),
+        Nt = n(612),
+        St = n(218),
+        It = n.n(St);
+      function Et(e, t) {
         e = Number(e);
         var n = Math.floor(e / 60);
         e %= 60;
@@ -3464,7 +3397,7 @@
           n > 0 ? (e < 10 && (a = "0" + a), "".concat(n, ":").concat(a)) : a
         );
       }
-      function jt(e) {
+      function Ot(e) {
         return e >= 2500
           ? 0.01
           : e >= 1e3
@@ -3481,7 +3414,7 @@
           ? 15
           : 60 * Math.ceil(0.5 / e);
       }
-      function At(e) {
+      function Rt(e) {
         return e >= 2500
           ? 10
           : e >= 1e3
@@ -3498,10 +3431,10 @@
           ? 15
           : 60 * Math.ceil(0.5 / e);
       }
-      function Dt(e) {
-        return Math.floor(10 / jt(e));
+      function Ct(e) {
+        return Math.floor(10 / Ot(e));
       }
-      var Mt = (function(e) {
+      var _t = (function(e) {
           function t(e) {
             var n;
             return (
@@ -3516,66 +3449,69 @@
                 n.setState(Object(N.a)({}, n.state, { speed: e })), n.wavesurfer.setPlaybackRate(e);
               }),
               (n.state = {
-                playing: !1,
                 src: n.props.src,
                 pos: 0,
                 colors: { waveColor: "#97A0AF", progressColor: "#52c41a" },
-                zoom: n.props.zoom,
-                speed: n.props.speed,
-                volume: n.props.volume,
+                zoom: 20,
+                speed: 1,
+                volume: 1,
               }),
               n
             );
           }
           return (
-            Object(g.a)(t, e),
+            Object(f.a)(t, e),
             Object(d.a)(t, [
               {
                 key: "componentDidMount",
                 value: function() {
                   var e = this;
-                  (this.$el = c.a.findDOMNode(this)),
-                    (this.$waveform = this.$el.querySelector("#wave")),
-                    (this.regions = wt.a.create({ dragSelection: { slop: 5 } })),
-                    (this.wavesurfer = bt.a.create({
-                      container: this.$waveform,
-                      waveColor: this.state.colors.waveColor,
-                      backend: "MediaElement",
-                      progressColor: this.state.colors.progressColor,
+                  (this.$el = c.a.findDOMNode(this)), (this.$waveform = this.$el.querySelector("#wave"));
+                  var t = {
+                    container: this.$waveform,
+                    waveColor: this.state.colors.waveColor,
+                    height: this.props.height,
+                    backend: "MediaElement",
+                    progressColor: this.state.colors.progressColor,
+                  };
+                  this.props.regions &&
+                    (t = Object(N.a)({}, t, {
                       plugins: [
-                        this.regions,
-                        xt.a.create({
+                        gt.a.create({ dragSelection: { slop: 5 } }),
+                        yt.a.create({
                           container: "#timeline",
-                          formatTimeCallback: Ct,
-                          timeInterval: jt,
-                          primaryLabelInterval: At,
-                          secondaryLabelInterval: Dt,
+                          formatTimeCallback: Et,
+                          timeInterval: Ot,
+                          primaryLabelInterval: Rt,
+                          secondaryLabelInterval: Ct,
                           primaryColor: "blue",
                           secondaryColor: "blue",
                           primaryFontColor: "#000",
                           secondaryFontColor: "#000",
                         }),
-                        Nt.a.create({ wrapper: this.$waveform, showTime: !0, opacity: 1 }),
+                        wt.a.create({ wrapper: this.$waveform, showTime: !0, opacity: 1 }),
                       ],
                     })),
+                    (this.wavesurfer = pt.a.create(t)),
                     this.wavesurfer.load(this.props.src),
                     this.wavesurfer.setPlaybackRate(this.state.speed);
-                  var t = this;
-                  this.wavesurfer.on("region-mouseenter", function(e) {
-                    e._region.onMouseOver();
-                  }),
+                  var n = this;
+                  this.props.regions &&
+                    (this.wavesurfer.on("region-mouseenter", function(e) {
+                      e._region.onMouseOver();
+                    }),
                     this.wavesurfer.on("region-mouseleave", function(e) {
                       e._region.onMouseLeave();
                     }),
                     this.wavesurfer.on("region-created", function(e) {
-                      var n = t.props.addRegion(e);
-                      (e._region = n),
-                        (e.color = n.selectedregionbg),
+                      var t = n.props.addRegion(e);
+                      (e._region = t),
+                        (e.color = t.selectedregionbg),
                         e.on("click", function() {
-                          return n.onClick(t.wavesurfer);
+                          return t.onClick(n.wavesurfer);
                         }),
                         e.on("update-end", function() {
-                          return n.onUpdateEnd(t.wavesurfer);
+                          return t.onUpdateEnd(n.wavesurfer);
                         }),
                         e.on("dblclick", function(t) {
                           window.setTimeout(function() {
@@ -3583,18 +3519,18 @@
                           }, 0);
                         }),
                         e.on("out", function() {});
-                    });
-                  var n = document.querySelector("#slider");
-                  n &&
-                    (n.oninput = function() {
-                      t.wavesurfer.zoom(Number(this.value));
+                    }));
+                  var a = document.querySelector("#slider");
+                  a &&
+                    (a.oninput = function() {
+                      n.wavesurfer.zoom(Number(this.value));
                     }),
                     this.wavesurfer.on("ready", function() {
-                      t.props.onCreate(e.wavesurfer);
+                      n.props.onCreate(e.wavesurfer);
                     }),
-                    this.wavesurfer.on("pause", t.props.handlePlay),
-                    this.wavesurfer.on("play", t.props.handlePlay),
-                    this.props.onLoad(this.wavesurfer);
+                    this.wavesurfer.on("pause", n.props.handlePlay),
+                    this.wavesurfer.on("play", n.props.handlePlay),
+                    this.props.regions && this.props.onLoad(this.wavesurfer);
                 },
               },
               {
@@ -3604,84 +3540,86 @@
                   return l.a.createElement(
                     "div",
                     null,
-                    l.a.createElement("div", { id: "wave", className: Rt.a.wave }),
+                    l.a.createElement("div", { id: "wave", className: It.a.wave }),
                     l.a.createElement("div", { id: "timeline" }),
                     l.a.createElement(
-                      St.a,
-                      { className: Rt.a.menu },
-                      l.a.createElement(
-                        It.a,
-                        { span: 24 },
+                      kt.a,
+                      { className: It.a.menu },
+                      this.props.speed &&
                         l.a.createElement(
-                          It.a,
-                          { span: 12 },
-                          "Speed:",
-                          " ",
-                          l.a.createElement(Et.a, {
-                            min: 0.5,
-                            max: 3,
-                            value: this.state.speed,
-                            onChange: function(t) {
-                              e.onChangeSpeed(t);
-                            },
-                          }),
-                        ),
-                        l.a.createElement(
-                          It.a,
-                          { span: 24 },
-                          l.a.createElement(Ot.a, {
-                            min: 0.5,
-                            max: 3,
-                            step: 0.1,
-                            value: "number" === typeof this.state.speed ? this.state.speed : 1,
-                            onChange: function(t) {
-                              e.onChangeSpeed(t);
-                            },
-                          }),
-                        ),
-                      ),
-                      l.a.createElement(
-                        It.a,
-                        { span: 24 },
-                        l.a.createElement(
-                          It.a,
-                          { span: 12 },
-                          "Volume:",
-                          " ",
-                          l.a.createElement(Et.a, {
-                            min: 0,
-                            max: 1,
-                            value: this.state.volume,
-                            step: 0.1,
-                            onChange: function(t) {
-                              e.onChangeVolume(t);
-                            },
-                          }),
-                        ),
-                        l.a.createElement(
-                          It.a,
-                          { span: 24 },
-                          l.a.createElement(Ot.a, {
-                            min: 0,
-                            max: 1,
-                            step: 0.1,
-                            value: "number" === typeof this.state.volume ? this.state.volume : 1,
-                            onChange: function(t) {
-                              e.onChangeVolume(t);
-                            },
-                          }),
-                        ),
-                      ),
-                      "true" === this.props.haszoom &&
-                        l.a.createElement(
-                          It.a,
+                          xt.a,
                           { span: 24 },
                           l.a.createElement(
-                            It.a,
+                            xt.a,
+                            { span: 12 },
+                            "Speed:",
+                            " ",
+                            l.a.createElement(Tt.a, {
+                              min: 0.5,
+                              max: 3,
+                              value: this.state.speed,
+                              onChange: function(t) {
+                                e.onChangeSpeed(t);
+                              },
+                            }),
+                          ),
+                          l.a.createElement(
+                            xt.a,
+                            { span: 24 },
+                            l.a.createElement(Nt.a, {
+                              min: 0.5,
+                              max: 3,
+                              step: 0.1,
+                              value: "number" === typeof this.state.speed ? this.state.speed : 1,
+                              onChange: function(t) {
+                                e.onChangeSpeed(t);
+                              },
+                            }),
+                          ),
+                        ),
+                      this.props.volume &&
+                        l.a.createElement(
+                          xt.a,
+                          { span: 24 },
+                          l.a.createElement(
+                            xt.a,
+                            { span: 12 },
+                            "Volume:",
+                            " ",
+                            l.a.createElement(Tt.a, {
+                              min: 0,
+                              max: 1,
+                              value: this.state.volume,
+                              step: 0.1,
+                              onChange: function(t) {
+                                e.onChangeVolume(t);
+                              },
+                            }),
+                          ),
+                          l.a.createElement(
+                            xt.a,
+                            { span: 24 },
+                            l.a.createElement(Nt.a, {
+                              min: 0,
+                              max: 1,
+                              step: 0.1,
+                              value: "number" === typeof this.state.volume ? this.state.volume : 1,
+                              onChange: function(t) {
+                                e.onChangeVolume(t);
+                              },
+                            }),
+                          ),
+                        ),
+                      this.props.zoom &&
+                        l.a.createElement(
+                          xt.a,
+                          { span: 24 },
+                          l.a.createElement(
+                            xt.a,
                             { span: 12 },
                             "Zoom:",
                             " ",
-                            l.a.createElement(Et.a, {
+                            l.a.createElement(Tt.a, {
                               min: 20,
                               max: 500,
                               value: this.state.zoom,
@@ -3691,9 +3629,9 @@
                             }),
                           ),
                           l.a.createElement(
-                            It.a,
+                            xt.a,
                             { span: 24 },
-                            l.a.createElement(Ot.a, {
+                            l.a.createElement(Nt.a, {
                               min: 20,
                               step: 10,
                               max: 500,
@@ -3712,8 +3650,93 @@
             t
           );
         })(l.a.Component),
-        Bt = b.m
-          .model({ selected: b.m.optional(b.m.boolean, !1), highlighted: b.m.optional(b.m.boolean, !1) })
+        jt = y.m.model({
+          name: y.m.maybeNull(y.m.string),
+          value: y.m.maybeNull(y.m.string),
+          zoom: y.m.optional(y.m.boolean, !0),
+          volume: y.m.optional(y.m.boolean, !0),
+          speed: y.m.optional(y.m.boolean, !0),
+        }),
+        At = y.m
+          .model({
+            id: y.m.optional(y.m.identifier, E),
+            type: "audio",
+            _value: y.m.optional(y.m.string, ""),
+            playing: y.m.optional(y.m.boolean, !1),
+            height: y.m.optional(y.m.number, 20),
+          })
+          .views(function(e) {
+            return {
+              get completion() {
+                return Object(y.g)(e).completionStore.selected;
+              },
+            };
+          })
+          .actions(function(e) {
+            return {
+              fromStateJSON: function(t, n) {
+                t.value.choices && e.completion.names.get(t.from_name).fromStateJSON(t),
+                  t.value.text && e.completion.names.get(t.from_name).fromStateJSON(t);
+              },
+              handlePlay: function() {
+                e.playing = !e.playing;
+              },
+              onLoad: function(t) {
+                e._ws = t;
+              },
+              wsCreated: function(t) {
+                e._ws = t;
+              },
+            };
+          }),
+        Dt = y.m.compose(
+          "AudioModel",
+          jt,
+          At,
+          Ue,
+        ),
+        Mt = Object(u.c)(function(e) {
+          e.store;
+          var t = e.item;
+          return t._value
+            ? l.a.createElement(
+                "div",
+                null,
+                l.a.createElement(_t, {
+                  src: t._value,
+                  onCreate: t.wsCreated,
+                  onLoad: t.onLoad,
+                  handlePlay: t.handlePlay,
+                  speed: t.speed,
+                  zoom: t.zoom,
+                  volume: t.volume,
+                  regions: !1,
+                  height: t.height,
+                }),
+                l.a.createElement(
+                  "div",
+                  { style: { display: "flex", justifyContent: "space-between", marginTop: "1em" } },
+                  l.a.createElement(
+                    A.a,
+                    {
+                      type: "primary",
+                      onClick: function(e) {
+                        console.log(t), t._ws.playPause();
+                      },
+                    },
+                    t.playing &&
+                      l.a.createElement(r.Fragment, null, l.a.createElement(ye.a, { type: "pause-circle" }), " Pause"),
+                    !t.playing &&
+                      l.a.createElement(r.Fragment, null, l.a.createElement(ye.a, { type: "play-circle" }), " Play"),
+                  ),
+                ),
+              )
+            : null;
+        }),
+        Bt = Object(u.b)("store")(Object(u.c)(Mt));
+      k.addTag("audio", Dt, Bt);
+      var Ht = y.m
+          .model({ selected: y.m.optional(y.m.boolean, !1), highlighted: y.m.optional(y.m.boolean, !1) })
           .actions(function(e) {
             return {
               selectRegion: function() {
@@ -3745,8 +3768,8 @@
               },
             };
           }),
-        Ht = b.m
-          .model({ normInput: b.m.maybeNull(b.m.string), normalization: b.m.maybeNull(b.m.string) })
+        Wt = y.m
+          .model({ normInput: y.m.maybeNull(y.m.string), normalization: y.m.maybeNull(y.m.string) })
           .actions(function(e) {
             return {
               setNormalization: function(t) {
@@ -3760,24 +3783,24 @@
               },
             };
           }),
-        Wt = b.m.model({
-          value: b.m.maybeNull(b.m.string),
-          selected: b.m.optional(b.m.boolean, !1),
-          alias: b.m.maybeNull(b.m.string),
-          hotkey: b.m.maybeNull(b.m.string),
-          showalias: b.m.optional(b.m.string, "false"),
-          aliasstyle: b.m.optional(b.m.string, "opacity: 0.6"),
-          size: b.m.optional(b.m.string, "medium"),
-          background: b.m.optional(b.m.string, "#36B37E"),
-          selectedcolor: b.m.optional(b.m.string, "white"),
+        Pt = y.m.model({
+          value: y.m.maybeNull(y.m.string),
+          selected: y.m.optional(y.m.boolean, !1),
+          alias: y.m.maybeNull(y.m.string),
+          hotkey: y.m.maybeNull(y.m.string),
+          showalias: y.m.optional(y.m.string, "false"),
+          aliasstyle: y.m.optional(y.m.string, "opacity: 0.6"),
+          size: y.m.optional(y.m.string, "medium"),
+          background: y.m.optional(y.m.string, "#36B37E"),
+          selectedcolor: y.m.optional(y.m.string, "white"),
         }),
-        Pt = b.m
-          .model({ id: b.m.optional(b.m.identifier, E), type: "label", _value: b.m.optional(b.m.string, "") })
+        zt = y.m
+          .model({ id: y.m.optional(y.m.identifier, E), type: "label", _value: y.m.optional(y.m.string, "") })
           .actions(function(e) {
             return {
               toggleSelected: function() {
                 var t = e.selected,
-                  n = Be.getParentOfTypeString(e, ["LabelsModel", "RectangleLabelsModel", "PolygonLabelsModel"]);
+                  n = He.getParentOfTypeString(e, ["LabelsModel", "RectangleLabelsModel", "PolygonLabelsModel"]);
                 n.shouldBeUnselected && n.unselectAll(),
                   (n.shouldBeUnselected && !0 === t) || (e.selected = !e.selected);
               },
@@ -3789,13 +3812,13 @@
               },
             };
           }),
-        zt = b.m.compose(
+        Lt = y.m.compose(
           "LabelModel",
-          Wt,
           Pt,
-          Ge,
+          zt,
+          Ue,
         ),
-        Lt = Object(u.b)("store")(
+        Ft = Object(u.b)("store")(
           Object(u.c)(function(e) {
             var t = e.item,
               n = e.store,
@@ -3806,7 +3829,7 @@
                 margin: "5px",
               };
             return l.a.createElement(
-              Ee.a,
+              Oe.a,
               {
                 onClick: function(e) {
                   return t.toggleSelected(), !1;
@@ -3817,7 +3840,7 @@
               t._value,
               "true" === t.showalias &&
                 t.alias &&
-                l.a.createElement("span", { style: q.styleToProp(t.aliasstyle) }, "\xa0", t.alias),
+                l.a.createElement("span", { style: X.styleToProp(t.aliasstyle) }, "\xa0", t.alias),
               n.settings.enableTooltips &&
                 n.settings.enableHotkeys &&
                 t.hotkey &&
@@ -3825,8 +3848,8 @@
             );
           }),
         );
-      k.addTag("label", zt, Lt);
-      var Ft = b.m
+      k.addTag("label", Lt, Ft);
+      var Jt = y.m
           .model()
           .views(function(e) {
             return {
@@ -3862,18 +3885,18 @@
               },
             };
           }),
-        Jt = b.m.model({
-          name: b.m.maybeNull(b.m.string),
-          toname: b.m.maybeNull(b.m.string),
-          choice: b.m.optional(b.m.enumeration(["single", "multiple"]), "single"),
-          selectionstyle: b.m.maybeNull(b.m.optional(b.m.string, "basic", "border", "bottom")),
+        Gt = y.m.model({
+          name: y.m.maybeNull(y.m.string),
+          toname: y.m.maybeNull(y.m.string),
+          choice: y.m.optional(y.m.enumeration(["single", "multiple"]), "single"),
+          selectionstyle: y.m.maybeNull(y.m.optional(y.m.string, "basic", "border", "bottom")),
         }),
-        Gt = b.m
+        Ut = y.m
           .model({
-            id: b.m.optional(b.m.identifier, E),
-            pid: b.m.optional(b.m.string, E),
+            id: y.m.optional(y.m.identifier, E),
+            pid: y.m.optional(y.m.string, E),
             type: "labels",
-            children: Be.unionArray(["labels", "label", "choice"]),
+            children: He.unionArray(["labels", "label", "choice"]),
           })
           .views(function(e) {
             return {
@@ -3906,13 +3929,13 @@
               },
             };
           }),
-        Ut = b.m.compose(
+        Vt = y.m.compose(
           "LabelsModel",
-          Jt,
           Gt,
-          Ft,
+          Ut,
+          Jt,
         ),
-        Vt = Object(u.c)(function(e) {
+        Yt = Object(u.c)(function(e) {
           var t = e.item;
           return l.a.createElement(
             "div",
@@ -3926,25 +3949,25 @@
                 flexFlow: "wrap",
               },
             },
-            C.renderChildren(t),
+            _.renderChildren(t),
           );
         });
-      k.addTag("labels", Ut, Vt);
-      var Yt = n(629),
-        Xt = b.m.model({
-          name: b.m.maybeNull(b.m.string),
-          toname: b.m.maybeNull(b.m.string),
-          maxrating: b.m.optional(b.m.string, "5"),
-          icon: b.m.optional(b.m.string, "star"),
-          size: b.m.optional(b.m.string, "large"),
-          hotkey: b.m.maybeNull(b.m.string),
+      k.addTag("labels", Vt, Yt);
+      var qt = n(625),
+        Xt = y.m.model({
+          name: y.m.maybeNull(y.m.string),
+          toname: y.m.maybeNull(y.m.string),
+          maxrating: y.m.optional(y.m.string, "5"),
+          icon: y.m.optional(y.m.string, "star"),
+          size: y.m.optional(y.m.string, "large"),
+          hotkey: y.m.maybeNull(y.m.string),
         }),
-        qt = b.m
+        Zt = y.m
           .model({
-            id: b.m.optional(b.m.identifier, E),
-            pid: b.m.optional(b.m.string, E),
+            id: y.m.optional(y.m.identifier, E),
+            pid: y.m.optional(y.m.string, E),
             type: "rating",
-            rating: b.m.maybeNull(b.m.number),
+            rating: y.m.maybeNull(y.m.number),
           })
           .views(function(e) {
             return {
@@ -3986,19 +4009,19 @@
               },
             };
           }),
-        Kt = b.m.compose(
+        Kt = y.m.compose(
           "RatingModel",
           Xt,
-          qt,
+          Zt,
         ),
-        Zt = Object(u.b)("store")(
+        Qt = Object(u.b)("store")(
           Object(u.c)(function(e) {
             var t = e.item,
               n = e.store;
             return l.a.createElement(
               "div",
               null,
-              l.a.createElement(Yt.a, {
+              l.a.createElement(qt.a, {
                 icon: "star",
                 size: t.size,
                 defaultRating: 0,
@@ -4014,23 +4037,23 @@
             );
           }),
         );
-      k.addTag("rating", Kt, Zt);
-      var Qt = b.m
+      k.addTag("rating", Kt, Qt);
+      var $t = y.m
           .model("AudioRegionModel", {
-            id: b.m.optional(b.m.identifier, E),
-            pid: b.m.optional(b.m.string, E),
-            start: b.m.number,
-            end: b.m.number,
-            states: b.m.maybeNull(b.m.array(b.m.union(Ut, Kt))),
-            selectedregionbg: b.m.optional(b.m.string, "rgba(0, 0, 0, 0.5)"),
+            id: y.m.optional(y.m.identifier, E),
+            pid: y.m.optional(y.m.string, E),
+            start: y.m.number,
+            end: y.m.number,
+            states: y.m.maybeNull(y.m.array(y.m.union(Vt, Kt))),
+            selectedregionbg: y.m.optional(y.m.string, "rgba(0, 0, 0, 0.5)"),
           })
           .views(function(e) {
             return {
               get parent() {
-                return Object(b.f)(e, on);
+                return Object(y.f)(e, rn);
               },
               get completion() {
-                return Object(b.g)(e).completionStore.selected;
+                return Object(y.g)(e).completionStore.selected;
               },
             };
           })
@@ -4059,7 +4082,7 @@
               selectRegion: function() {
                 (e.selected = !0),
                   e.completion.setHighlightedNode(e),
-                  e._ws_region.update({ color: q.Colors.rgbaChangeAlpha(e.selectedregionbg, 0.8) });
+                  e._ws_region.update({ color: X.Colors.rgbaChangeAlpha(e.selectedregionbg, 0.8) });
               },
               unselectRegion: function() {
                 (e.selected = !1),
@@ -4069,7 +4092,7 @@
               setHighlight: function(t) {
                 (e.highlighted = t),
                   t
-                    ? (e._ws_region.update({ color: q.Colors.rgbaChangeAlpha(e.selectedregionbg, 0.8) }),
+                    ? (e._ws_region.update({ color: X.Colors.rgbaChangeAlpha(e.selectedregionbg, 0.8) }),
                       (e._ws_region.element.style.border = "2px solid red"))
                     : (e._ws_region.update({ color: e.selectedregionbg }),
                       (e._ws_region.element.style.border = "none"));
@@ -4080,7 +4103,7 @@
               },
               onClick: function(t) {
                 e.completion.relationMode ||
-                  e._ws_region.update({ color: q.Colors.rgbaChangeAlpha(e.selectedregionbg, 0.8) }),
+                  e._ws_region.update({ color: X.Colors.rgbaChangeAlpha(e.selectedregionbg, 0.8) }),
                   e.onClickRegion();
               },
               onMouseOver: function() {
@@ -4094,29 +4117,29 @@
               },
             };
           }),
-        $t = b.m.compose(
+        en = y.m.compose(
           "AudioRegionModel",
-          Bt,
           Ht,
-          Qt,
+          Wt,
+          $t,
         ),
-        en = n(312),
-        tn = n.n(en),
-        nn = b.m.model({
-          name: b.m.maybeNull(b.m.string),
-          value: b.m.maybeNull(b.m.string),
-          haszoom: b.m.optional(b.m.string, "true"),
-          volume: b.m.optional(b.m.number, 1),
-          speed: b.m.optional(b.m.number, 1),
+        tn = n(309),
+        nn = n.n(tn),
+        an = y.m.model({
+          name: y.m.maybeNull(y.m.string),
+          value: y.m.maybeNull(y.m.string),
+          zoom: y.m.optional(y.m.boolean, !0),
+          volume: y.m.optional(y.m.boolean, !0),
+          speed: y.m.optional(y.m.boolean, !0),
         }),
-        an = b.m
+        on = y.m
           .model("AudioPlusModel", {
-            id: b.m.identifier,
+            id: y.m.identifier,
             type: "audio",
-            _value: b.m.optional(b.m.string, ""),
-            playing: b.m.optional(b.m.boolean, !1),
-            regions: b.m.array($t),
-            rangeValue: b.m.optional(b.m.number, 20),
+            _value: y.m.optional(y.m.string, ""),
+            playing: y.m.optional(y.m.boolean, !1),
+            regions: y.m.array(en),
+            height: y.m.optional(y.m.number, 128),
           })
           .views(function(e) {
             return {
@@ -4125,7 +4148,7 @@
                 return t && t.length > 0;
               },
               get completion() {
-                return Object(b.g)(e).completionStore.selected;
+                return Object(y.g)(e).completionStore.selected;
               },
               states: function() {
                 return e.completion.toNames.get(e.name);
@@ -4135,7 +4158,7 @@
                 return t
                   ? t.filter(function(e) {
                       return (
-                        e.isSelected && ("LabelsModel" === Object(b.i)(e).name || "RatingModel" === Object(b.i)(e).name)
+                        e.isSelected && ("LabelsModel" === Object(y.i)(e).name || "RatingModel" === Object(y.i)(e).name)
                       );
                     })
                   : null;
@@ -4156,11 +4179,15 @@
               },
               fromStateJSON: function(t, n) {
                 var a,
-                  o = { pid: t.id, start: t.value.start, end: t.value.end, normalization: t.normalization };
-                t.value.labels && e.completion.names.get(t.from_name).fromStateJSON(t);
-                var r = e.findRegion(t.value.start, t.value.end),
-                  i = _(n);
-                return i.fromStateJSON(t), r ? r.states.push(i) : ((o.states = [i]), (a = e.addRegion(o))), a;
+                  o,
+                  i = { pid: t.id, start: t.value.start, end: t.value.end, normalization: t.normalization },
+                  r = e.findRegion(t.value.start, t.value.end);
+                return (
+                  t.value.labels && e.completion.names.get(t.from_name).fromStateJSON(t),
+                  n && ((o = R(n)).fromStateJSON(t), r ? r.states.push(o) : ((i.states = [o]), (a = e.addRegion(i)))),
+                  e._ws && e._ws.addRegion({ start: a.start, end: a.end }),
+                  a
+                );
               },
               setRangeValue: function(t) {
                 e.rangeValue = t;
@@ -4177,25 +4204,25 @@
                     : null,
                   o = e.findRegion(t.start, t.end);
                 if (e.findRegion(t.start, t.end)) return (o._ws_region = t), o;
-                var r = n && n[0] ? q.Colors.convertToRGBA(n[0].getSelectedColor(), 0.3) : e.selectedregionbg,
-                  i = $t.create({
+                var i = n && n[0] ? X.Colors.convertToRGBA(n[0].getSelectedColor(), 0.3) : e.selectedregionbg,
+                  r = en.create({
                     id: t.id ? t.id : E(),
                     pid: t.pid ? t.pid : E(),
                     start: t.start,
                     end: t.end,
                     regionbg: e.regionbg,
-                    selectedregionbg: r,
+                    selectedregionbg: i,
                     states: a,
                   });
                 return (
-                  (i._ws_region = t),
-                  e.regions.push(i),
-                  e.completion.addRegion(i),
+                  (r._ws_region = t),
+                  e.regions.push(r),
+                  e.completion.addRegion(r),
                   n &&
                     n.forEach(function(e) {
                       return e.unselectAll();
                     }),
-                  i
+                  r
                 );
               },
               handlePlay: function() {
@@ -4212,20 +4239,20 @@
               },
             };
           }),
-        on = b.m.compose(
+        rn = y.m.compose(
           "AudioPlusModel",
-          nn,
           an,
-          Ge,
+          on,
+          Ue,
         ),
-        rn = Object(u.c)(function(e) {
+        ln = Object(u.c)(function(e) {
           e.store;
           var t = e.item;
           return t._value
             ? l.a.createElement(
                 "div",
                 null,
-                l.a.createElement(Mt, {
+                l.a.createElement(_t, {
                   src: t._value,
                   selectRegion: t.selectRegion,
                   handlePlay: t.handlePlay,
@@ -4233,9 +4260,10 @@
                   addRegion: t.addRegion,
                   onLoad: t.onLoad,
                   speed: t.speed,
-                  haszoom: t.haszoom,
-                  zoom: t.rangeValue,
+                  zoom: t.zoom,
                   volume: t.volume,
+                  regions: !0,
+                  height: t.height,
                 }),
                 l.a.createElement(
                   "div",
@@ -4244,36 +4272,36 @@
                     A.a,
                     {
                       type: "primary",
-                      className: tn.a.play,
+                      className: nn.a.play,
                       onClick: function(e) {
                         t._ws.playPause();
                       },
                     },
                     t.playing &&
-                      l.a.createElement(i.Fragment, null, l.a.createElement(ve.a, { type: "pause-circle" }), " Pause"),
+                      l.a.createElement(r.Fragment, null, l.a.createElement(ye.a, { type: "pause-circle" }), " Pause"),
                     !t.playing &&
-                      l.a.createElement(i.Fragment, null, l.a.createElement(ve.a, { type: "play-circle" }), " Play"),
+                      l.a.createElement(r.Fragment, null, l.a.createElement(ye.a, { type: "play-circle" }), " Play"),
                   ),
                 ),
               )
             : null;
         }),
-        ln = Object(u.b)("store")(Object(u.c)(rn));
-      k.addTag("audioplus", on, ln);
-      var sn = n(85),
-        cn =
-          (n(102),
-          b.m.model({
-            name: b.m.maybeNull(b.m.string),
-            toname: b.m.maybeNull(b.m.string),
-            opacity: b.m.optional(b.m.string, "0.6"),
-            fillcolor: b.m.maybeNull(b.m.string),
-            strokewidth: b.m.optional(b.m.string, "1"),
-            strokecolor: b.m.optional(b.m.string, "#f48a42"),
-            canrotate: b.m.optional(b.m.string, "true"),
+        sn = Object(u.b)("store")(Object(u.c)(ln));
+      k.addTag("audioplus", rn, sn);
+      var cn = n(57),
+        un =
+          (n(118),
+          y.m.model({
+            name: y.m.maybeNull(y.m.string),
+            toname: y.m.maybeNull(y.m.string),
+            opacity: y.m.optional(y.m.string, "0.6"),
+            fillcolor: y.m.maybeNull(y.m.string),
+            strokewidth: y.m.optional(y.m.string, "1"),
+            strokecolor: y.m.optional(y.m.string, "#f48a42"),
+            canrotate: y.m.optional(y.m.string, "true"),
           })),
-        un = b.m
-          .model({ id: b.m.identifier, type: "rectangle" })
+        mn = y.m
+          .model({ id: y.m.identifier, type: "rectangle" })
           .views(function(e) {
             return {
               get hasStates() {
@@ -4281,28 +4309,28 @@
                 return t && t.length > 0;
               },
               get completion() {
-                return Object(b.g)(e).completionStore.selected;
+                return Object(y.g)(e).completionStore.selected;
               },
             };
           })
           .actions(function(e) {
             return { fromStateJSON: function(e) {} };
           }),
-        mn = b.m.compose(
+        dn = y.m.compose(
           "RectangleModel",
-          cn,
           un,
+          mn,
         );
-      k.addTag("rectangle", mn, function() {
+      k.addTag("rectangle", dn, function() {
         return null;
       });
-      var dn = b.m.model({ name: b.m.maybeNull(b.m.string), toname: b.m.maybeNull(b.m.string) }),
-        hn = b.m
+      var hn = y.m.model({ name: y.m.maybeNull(y.m.string), toname: y.m.maybeNull(y.m.string) }),
+        pn = y.m
           .model("RectangleLabelsModel", {
-            id: b.m.optional(b.m.identifier, E),
-            pid: b.m.optional(b.m.string, E),
+            id: y.m.optional(y.m.identifier, E),
+            pid: y.m.optional(y.m.string, E),
             type: "rectanglelabels",
-            children: Be.unionArray(["labels", "label", "choice"]),
+            children: He.unionArray(["labels", "label", "choice"]),
           })
           .actions(function(e) {
             return {
@@ -4317,52 +4345,52 @@
               },
             };
           }),
-        pn = b.m.compose(
-          Ut,
-          mn,
+        fn = y.m.compose(
+          Vt,
           dn,
           hn,
-          Ft,
-        ),
-        gn = b.m.compose(
-          "RectangleLabelsModel",
           pn,
+          Jt,
         ),
-        fn = Object(u.c)(function(e) {
+        gn = y.m.compose(
+          "RectangleLabelsModel",
+          fn,
+        ),
+        vn = Object(u.c)(function(e) {
           var t = e.item;
-          return l.a.createElement(Vt, { item: t });
+          return l.a.createElement(Yt, { item: t });
         });
-      k.addTag("rectanglelabels", gn, fn);
-      var vn = b.m
+      k.addTag("rectanglelabels", gn, vn);
+      var yn = y.m
           .model({
-            id: b.m.identifier,
-            pid: b.m.optional(b.m.string, E),
+            id: y.m.identifier,
+            pid: y.m.optional(y.m.string, E),
             type: "rectangleregion",
-            x: b.m.number,
-            y: b.m.number,
-            width: b.m.number,
-            height: b.m.number,
-            scaleX: b.m.optional(b.m.number, 1),
-            scaleY: b.m.optional(b.m.number, 1),
-            rotation: b.m.optional(b.m.number, 0),
-            opacity: b.m.number,
-            strokewidth: b.m.number,
-            fillcolor: b.m.maybeNull(b.m.string),
-            strokecolor: b.m.string,
-            states: b.m.maybeNull(b.m.array(b.m.union(Ut, Kt, gn))),
-            wp: b.m.maybeNull(b.m.number),
-            hp: b.m.maybeNull(b.m.number),
-            sw: b.m.maybeNull(b.m.number),
-            sh: b.m.maybeNull(b.m.number),
-            coordstype: b.m.optional(b.m.enumeration(["px", "perc"]), "px"),
+            x: y.m.number,
+            y: y.m.number,
+            width: y.m.number,
+            height: y.m.number,
+            scaleX: y.m.optional(y.m.number, 1),
+            scaleY: y.m.optional(y.m.number, 1),
+            rotation: y.m.optional(y.m.number, 0),
+            opacity: y.m.number,
+            strokewidth: y.m.number,
+            fillcolor: y.m.maybeNull(y.m.string),
+            strokecolor: y.m.string,
+            states: y.m.maybeNull(y.m.array(y.m.union(Vt, Kt, gn))),
+            wp: y.m.maybeNull(y.m.number),
+            hp: y.m.maybeNull(y.m.number),
+            sw: y.m.maybeNull(y.m.number),
+            sh: y.m.maybeNull(y.m.number),
+            coordstype: y.m.optional(y.m.enumeration(["px", "perc"]), "px"),
           })
           .views(function(e) {
             return {
               get parent() {
-                return Object(b.f)(e, Hn);
+                return Object(y.f)(e, Wn);
               },
               get completion() {
-                return Object(b.g)(e).completionStore.selected;
+                return Object(y.g)(e).completionStore.selected;
               },
             };
           })
@@ -4374,15 +4402,15 @@
               coordsInside: function(t, n) {
                 var a = e.x,
                   o = e.y,
-                  r = e.width * (e.scaleX || 1),
-                  i = e.height * (e.scaleY || 1);
-                return t > a && t < a + r && n > o && n < o + i;
+                  i = e.width * (e.scaleX || 1),
+                  r = e.height * (e.scaleY || 1);
+                return t > a && t < a + i && n > o && n < o + r;
               },
               selectRegion: function() {
                 (e.selected = !0), e.completion.setHighlightedNode(e), e.parent.setSelected(e.id);
               },
-              setPosition: function(t, n, a, o, r) {
-                (e.x = t), (e.y = n), (e.width = a), (e.height = o), (e.rotation = r);
+              setPosition: function(t, n, a, o, i) {
+                (e.x = t), (e.y = n), (e.width = a), (e.height = o), (e.rotation = i);
               },
               setScale: function(t, n) {
                 (e.scaleX = t), (e.scaleY = n);
@@ -4434,13 +4462,13 @@
               },
             };
           }),
-        bn = b.m.compose(
+        bn = y.m.compose(
           "RectRegionModel",
-          Bt,
           Ht,
-          vn,
+          Wt,
+          yn,
         ),
-        yn = Object(u.b)("store")(
+        wn = Object(u.b)("store")(
           Object(u.c)(function(e) {
             var t = e.store,
               n = e.item,
@@ -4453,7 +4481,7 @@
                 n.hp || (n.parent.stageHeight, n.parent.naturalHeight),
                 n.x),
               o = n.y,
-              r = n.width,
+              i = n.width,
               s = n.height,
               c = {};
             return (
@@ -4465,15 +4493,15 @@
               (c.shadowBlur = 0),
               n.highlighted && (c.stroke = "#ff0000"),
               l.a.createElement(
-                i.Fragment,
+                r.Fragment,
                 null,
                 l.a.createElement(
-                  sn.Rect,
+                  cn.Rect,
                   Object.assign(
                     {
                       x: a,
                       y: o,
-                      width: r,
+                      width: i,
                       height: s,
                       scaleX: n.scaleX,
                       scaleY: n.scaleY,
@@ -4534,22 +4562,22 @@
             );
           }),
         );
-      k.addTag("rectangleregion", bn, yn);
-      n(343);
-      var wn = n(313),
-        kn = b.m
+      k.addTag("rectangleregion", bn, wn);
+      n(340);
+      var kn = n(310),
+        xn = y.m
           .model({
-            init_x: b.m.optional(b.m.number, 0),
-            init_y: b.m.optional(b.m.number, 0),
-            x: b.m.number,
-            y: b.m.number,
-            style: b.m.string,
-            size: b.m.string,
+            init_x: y.m.optional(y.m.number, 0),
+            init_y: y.m.optional(y.m.number, 0),
+            x: y.m.number,
+            y: y.m.number,
+            style: y.m.string,
+            size: y.m.string,
           })
           .views(function(e) {
             return {
               get parent() {
-                return Object(b.e)(e, 2);
+                return Object(y.e)(e, 2);
               },
             };
           })
@@ -4585,12 +4613,12 @@
               },
             };
           }),
-        xn = Object(u.c)(function(e) {
+        Tn = Object(u.c)(function(e) {
           var t = e.item,
             n = e.index,
             a = { small: 1, medium: 2, large: 3 },
             o = { small: 4, medium: 8, large: 12 }[t.size],
-            r =
+            i =
               0 === n
                 ? {
                     hitStrokeWidth: 12,
@@ -4598,7 +4626,7 @@
                     onMouseOut: t.handleMouseOutStartPoint,
                   }
                 : null,
-            i =
+            r =
               (t.parent.mouseOverStartPoint,
               {
                 onDragStart: function(e) {},
@@ -4615,7 +4643,7 @@
               });
           return "circle" == t.style
             ? l.a.createElement(
-                sn.Circle,
+                cn.Circle,
                 Object.assign(
                   {
                     key: n,
@@ -4626,13 +4654,13 @@
                     stroke: "black",
                     strokeWidth: a[t.size],
                   },
-                  i,
                   r,
+                  i,
                   { draggable: !0 },
                 ),
               )
             : l.a.createElement(
-                sn.Rect,
+                cn.Rect,
                 Object.assign(
                   {
                     key: n,
@@ -4645,24 +4673,24 @@
                     strokeWidth: a[t.size],
                     dragOnTop: !1,
                   },
-                  i,
                   r,
+                  i,
                   { draggable: !0 },
                 ),
               );
         }),
-        Tn = b.m.model({
-          name: b.m.maybeNull(b.m.string),
-          toname: b.m.maybeNull(b.m.string),
-          opacity: b.m.optional(b.m.string, "0.6"),
-          fillcolor: b.m.maybeNull(b.m.string),
-          strokewidth: b.m.optional(b.m.string, "1"),
-          strokecolor: b.m.optional(b.m.string, "#f48a42"),
-          pointsize: b.m.optional(b.m.string, "medium"),
-          pointstyle: b.m.optional(b.m.string, "rectangle"),
+        Nn = y.m.model({
+          name: y.m.maybeNull(y.m.string),
+          toname: y.m.maybeNull(y.m.string),
+          opacity: y.m.optional(y.m.string, "0.6"),
+          fillcolor: y.m.maybeNull(y.m.string),
+          strokewidth: y.m.optional(y.m.string, "1"),
+          strokecolor: y.m.optional(y.m.string, "#f48a42"),
+          pointsize: y.m.optional(y.m.string, "medium"),
+          pointstyle: y.m.optional(y.m.string, "rectangle"),
         }),
-        Nn = b.m
-          .model({ id: b.m.identifier, type: "polygon", _value: b.m.optional(b.m.string, "") })
+        Sn = y.m
+          .model({ id: y.m.identifier, type: "polygon", _value: y.m.optional(y.m.string, "") })
           .views(function(e) {
             return {
               get hasStates() {
@@ -4670,7 +4698,7 @@
                 return t && t.length > 0;
               },
               get completion() {
-                return Object(b.g)(e).completionStore.selected;
+                return Object(y.g)(e).completionStore.selected;
               },
               states: function() {
                 return e.completion.toNames.get(e.name);
@@ -4688,25 +4716,25 @@
           .actions(function(e) {
             return {};
           }),
-        Sn = b.m.compose(
+        In = y.m.compose(
           "PolygonModel",
-          Tn,
           Nn,
+          Sn,
         ),
-        In = Object(u.b)("store")(
+        En = Object(u.b)("store")(
           Object(u.c)(function(e) {
             e.store, e.item;
             return null;
           }),
         );
-      k.addTag("polygon", Sn, In);
-      var En = b.m.model({ name: b.m.maybeNull(b.m.string), toname: b.m.maybeNull(b.m.string) }),
-        On = b.m
+      k.addTag("polygon", In, En);
+      var On = y.m.model({ name: y.m.maybeNull(y.m.string), toname: y.m.maybeNull(y.m.string) }),
+        Rn = y.m
           .model("PolygonLabelsModel", {
-            id: b.m.optional(b.m.identifier, E),
-            pid: b.m.optional(b.m.string, E),
+            id: y.m.optional(y.m.identifier, E),
+            pid: y.m.optional(y.m.string, E),
             type: "polygonlabels",
-            children: Be.unionArray(["labels", "label", "choice"]),
+            children: He.unionArray(["labels", "label", "choice"]),
           })
           .actions(function(e) {
             return {
@@ -4721,48 +4749,48 @@
               },
             };
           }),
-        _n = b.m.compose(
-          Ut,
-          Sn,
-          En,
+        Cn = y.m.compose(
+          Vt,
+          In,
           On,
-          Ft,
+          Rn,
+          Jt,
         ),
-        Rn = b.m.compose(
+        _n = y.m.compose(
           "PolygonLabelsModel",
-          _n,
+          Cn,
         ),
-        Cn = Object(u.c)(function(e) {
+        jn = Object(u.c)(function(e) {
           var t = e.item;
-          return l.a.createElement(Vt, { item: t });
+          return l.a.createElement(Yt, { item: t });
         });
-      k.addTag("polygonlabels", Rn, Cn);
-      var jn = b.m
+      k.addTag("polygonlabels", _n, jn);
+      var An = y.m
           .model({
-            id: b.m.identifier,
-            pid: b.m.optional(b.m.string, E),
+            id: y.m.identifier,
+            pid: y.m.optional(y.m.string, E),
             type: "polygonregion",
-            opacity: b.m.number,
-            fillcolor: b.m.maybeNull(b.m.string),
-            strokewidth: b.m.number,
-            strokecolor: b.m.string,
-            pointsize: b.m.string,
-            pointstyle: b.m.string,
-            closed: b.m.optional(b.m.boolean, !1),
-            points: b.m.array(kn, []),
-            states: b.m.maybeNull(b.m.array(b.m.union(Ut, Kt, Rn))),
-            mouseOverStartPoint: b.m.optional(b.m.boolean, !1),
-            fromName: b.m.maybeNull(b.m.string),
-            wp: b.m.maybeNull(b.m.number),
-            hp: b.m.maybeNull(b.m.number),
+            opacity: y.m.number,
+            fillcolor: y.m.maybeNull(y.m.string),
+            strokewidth: y.m.number,
+            strokecolor: y.m.string,
+            pointsize: y.m.string,
+            pointstyle: y.m.string,
+            closed: y.m.optional(y.m.boolean, !1),
+            points: y.m.array(xn, []),
+            states: y.m.maybeNull(y.m.array(y.m.union(Vt, Kt, _n))),
+            mouseOverStartPoint: y.m.optional(y.m.boolean, !1),
+            fromName: y.m.maybeNull(y.m.string),
+            wp: y.m.maybeNull(y.m.number),
+            hp: y.m.maybeNull(y.m.number),
           })
           .views(function(e) {
             return {
               get parent() {
-                return Object(b.f)(e, Hn);
+                return Object(y.f)(e, Wn);
               },
               get completion() {
-                return Object(b.g)(e).completionStore.selected;
+                return Object(y.g)(e).completionStore.selected;
               },
               get isCW() {},
               linePoints: function() {
@@ -4794,18 +4822,18 @@
                   o = t.reduce(function(e, t) {
                     return e.y < t.y ? e : t;
                   }),
-                  r = t.reduce(function(e, t) {
+                  i = t.reduce(function(e, t) {
                     return e.y > t.y ? e : t;
                   });
-                return { x: n.x, y: o.y, width: a.x - n.x, height: r.y - o.y };
+                return { x: n.x, y: o.y, width: a.x - n.x, height: i.y - o.y };
               },
               coordsInside: function(t, n) {
-                for (var a = !1, o = e.points, r = 0, i = o.length - 1; r < o.length; i = r++) {
-                  var l = o[r][0],
-                    s = o[r][1],
-                    c = o[i][0],
-                    u = o[i][1];
-                  s > n != u > n && t < ((c - l) * (n - s)) / (u - s) + l && (Object(wn.a)("inside"), (a = !a));
+                for (var a = !1, o = e.points, i = 0, r = o.length - 1; i < o.length; r = i++) {
+                  var l = o[i][0],
+                    s = o[i][1],
+                    c = o[r][0],
+                    u = o[r][1];
+                  s > n != u > n && t < ((c - l) * (n - s)) / (u - s) + l && (Object(kn.a)("inside"), (a = !a));
                 }
                 return a;
               },
@@ -4826,8 +4854,8 @@
                 if (e.points.length < 2) return !1;
                 var a = e.points[0],
                   o = t,
-                  r = n;
-                return (a.x - o) * (a.x - o) + (a.y - r) * (r - r) < 50;
+                  i = n;
+                return (a.x - o) * (a.x - o) + (a.y - i) * (i - i) < 50;
               },
               unselectRegion: function() {
                 (e.selected = !1), e.parent.setSelected(void 0), e.completion.setHighlightedNode(null);
@@ -4835,8 +4863,8 @@
               selectRegion: function() {
                 (e.selected = !0), e.completion.setHighlightedNode(e), e.parent.setSelected(e.id);
               },
-              setPosition: function(t, n, a, o, r) {
-                (e.x = t), (e.y = n), (e.width = a), (e.height = o), (e.rotation = r);
+              setPosition: function(t, n, a, o, i) {
+                (e.x = t), (e.y = n), (e.width = a), (e.height = o), (e.rotation = i);
               },
               setScale: function(t, n) {
                 (e.scaleX = t), (e.scaleY = n);
@@ -4855,11 +4883,11 @@
                   n = t.naturalWidth,
                   a = t.naturalHeight,
                   o = t.stageWidth,
-                  r = t.stageHeight,
-                  i = (100 * o) / n,
-                  l = (100 * r) / a,
+                  i = t.stageHeight,
+                  r = (100 * o) / n,
+                  l = (100 * i) / a,
                   s = e.points.map(function(e) {
-                    return [(100 * ((100 * e.x) / i)) / n, (100 * ((100 * e.y) / l)) / a];
+                    return [(100 * ((100 * e.x) / r)) / n, (100 * ((100 * e.y) / l)) / a];
                   }),
                   c = e.parent,
                   u = function(t) {
@@ -4882,13 +4910,13 @@
               },
             };
           }),
-        An = b.m.compose(
+        Dn = y.m.compose(
           "PolygonRegionModel",
-          Bt,
           Ht,
-          jn,
+          Wt,
+          An,
         );
-      var Dn = Object(u.b)("store")(
+      var Mn = Object(u.b)("store")(
         Object(u.c)(function(e) {
           var t = e.store,
             n = e.item,
@@ -4911,11 +4939,11 @@
             (a.strokeWidth = n.strokewidth),
             n.highlighted && (a.stroke = "red"),
             l.a.createElement(
-              i.Fragment,
+              r.Fragment,
               null,
               n.mouseOverStartPoint,
               l.a.createElement(
-                sn.Line,
+                cn.Line,
                 Object.assign(
                   {
                     points: n.linePoints(),
@@ -4932,10 +4960,10 @@
                       var t = e.x,
                         a = e.y,
                         o = n.parent.stageWidth - this.getAttr("width"),
-                        r = n.parent.stageHeight - this.getAttr("height");
+                        i = n.parent.stageHeight - this.getAttr("height");
                       return (
                         t > o && (t = o),
-                        a > r && (a = r),
+                        a > i && (a = i),
                         n.points.forEach(function(e) {
                           e.movePoint(t, a);
                         }),
@@ -4975,37 +5003,37 @@
               ),
               !n.closed &&
                 n.points.map(function(e, t) {
-                  return l.a.createElement(xn, { item: e, index: t });
+                  return l.a.createElement(Tn, { item: e, index: t });
                 }),
               n.closed &&
                 n.selected &&
                 n.points.map(function(e, t) {
-                  return l.a.createElement(xn, { item: e, index: t });
+                  return l.a.createElement(Tn, { item: e, index: t });
                 }),
             )
           );
         }),
       );
-      k.addTag("polygonregion", An, Dn);
-      var Mn = b.m.model({
-          name: b.m.maybeNull(b.m.string),
-          value: b.m.maybeNull(b.m.string),
-          resize: b.m.maybeNull(b.m.string),
-          width: b.m.optional(b.m.string, "100%"),
-          maxwidth: b.m.optional(b.m.string, "750px"),
+      k.addTag("polygonregion", Dn, Mn);
+      var Bn = y.m.model({
+          name: y.m.maybeNull(y.m.string),
+          value: y.m.maybeNull(y.m.string),
+          resize: y.m.maybeNull(y.m.string),
+          width: y.m.optional(y.m.string, "100%"),
+          maxwidth: y.m.optional(y.m.string, "750px"),
         }),
-        Bn = b.m
+        Hn = y.m
           .model({
-            id: b.m.identifier,
+            id: y.m.identifier,
             type: "image",
-            _value: b.m.optional(b.m.string, ""),
-            stageWidth: b.m.optional(b.m.integer, 1),
-            stageHeight: b.m.optional(b.m.integer, 1),
-            naturalWidth: b.m.optional(b.m.integer, 1),
-            naturalHeight: b.m.optional(b.m.integer, 1),
-            selectedShape: b.m.safeReference(b.m.union(bn, An)),
-            activePolygon: b.m.maybeNull(b.m.safeReference(An)),
-            shapes: b.m.array(b.m.union(bn, An), []),
+            _value: y.m.optional(y.m.string, ""),
+            stageWidth: y.m.optional(y.m.integer, 1),
+            stageHeight: y.m.optional(y.m.integer, 1),
+            naturalWidth: y.m.optional(y.m.integer, 1),
+            naturalHeight: y.m.optional(y.m.integer, 1),
+            selectedShape: y.m.safeReference(y.m.union(bn, Dn)),
+            activePolygon: y.m.maybeNull(y.m.safeReference(Dn)),
+            shapes: y.m.array(y.m.union(bn, Dn), []),
           })
           .views(function(e) {
             return {
@@ -5014,7 +5042,7 @@
                 return t && t.length > 0;
               },
               get completion() {
-                return Object(b.g)(e).completionStore.selected;
+                return Object(y.g)(e).completionStore.selected;
               },
               states: function() {
                 return e.completion.toNames.get(e.name);
@@ -5024,7 +5052,7 @@
               },
               controlButtonType: function() {
                 var t = e.controlButton();
-                return Object(b.i)(t).name;
+                return Object(y.i)(t).name;
               },
             };
           })
@@ -5037,22 +5065,22 @@
                 var n = t.target,
                   a = n.width,
                   o = n.height,
-                  r = n.naturalWidth,
-                  i = n.naturalHeight;
+                  i = n.naturalWidth,
+                  r = n.naturalHeight;
                 e.hasStates &&
-                  ((e.naturalWidth = r),
-                  (e.naturalHeight = i),
+                  ((e.naturalWidth = i),
+                  (e.naturalHeight = r),
                   (e.stageWidth = a),
                   (e.stageHeight = o),
                   e.shapes.forEach(function(e) {
-                    return e.updateImageSize(a / r, o / i, a, o);
+                    return e.updateImageSize(a / i, o / r, a, o);
                   }));
               },
               _setStageRef: function(t) {
                 e._stageRef = t;
               },
               _deleteSelectedShape: function() {
-                e.selectedShape && Object(b.b)(e.selectedShape);
+                e.selectedShape && Object(y.b)(e.selectedShape);
               },
               setSelected: function(t) {
                 e.selectedShape = t;
@@ -5085,21 +5113,21 @@
                         });
                   }
                 else if ("RectangleLabelsModel" === e.controlButtonType()) {
-                  var r = e.completion.toNames.get(e.name),
-                    i = r
-                      ? r.filter(function(e) {
+                  var i = e.completion.toNames.get(e.name),
+                    r = i
+                      ? i.filter(function(e) {
                           return !0 === e.isSelected;
                         })
                       : null,
-                    l = i
-                      ? i.map(function(e) {
+                    l = r
+                      ? r.map(function(e) {
                           return O(e);
                         })
                       : null;
                   if (0 === l.length) return;
                   e._addRect(t, l),
-                    i &&
-                      i.forEach(function(e) {
+                    r &&
+                      r.forEach(function(e) {
                         return e.unselectAll();
                       });
                 }
@@ -5109,10 +5137,10 @@
                 n && n.length && (a = n[0].getSelectedColor());
                 e.stageWidth, e.naturalWidth, e.stageHeight, e.naturalHeight;
                 var o = t.evt.offsetX,
-                  r = t.evt.offsetY;
-                e.__addRect(Math.floor(o - 50), Math.floor(r - 50), 100, 100, a, n);
+                  i = t.evt.offsetY;
+                e.__addRect(Math.floor(o - 50), Math.floor(i - 50), 100, 100, a, n);
               },
-              __addRect: function(t, n, a, o, r, i, l) {
+              __addRect: function(t, n, a, o, i, r, l) {
                 var s = e.controlButton(),
                   c = bn.create({
                     id: E(),
@@ -5123,11 +5151,14 @@
                     opacity: parseFloat(s.opacity),
                     fillcolor: s.fillcolor,
                     strokewidth: parseInt(s.strokewidth),
-                    strokecolor: r,
-                    states: i,
+                    strokecolor: i,
+                    states: r,
                     coordstype: l,
                   });
                 e._addShape(c);
+              },
+              onResizeSize: function(t, n) {
+                (e.stageHeight = n), (e.stageWidth = t);
               },
               _addPoly: function(t, n) {
                 var a,
@@ -5136,19 +5167,19 @@
                 else if (!1 === e.completion.dragMode) {
                   if (e.activePolygon) a = e.activePolygon;
                   else {
-                    var r = e.controlButton();
-                    (a = An.create({
+                    var i = e.controlButton();
+                    (a = Dn.create({
                       id: E(),
                       x: t.evt.offsetX - 5,
                       y: t.evt.offsetY - 5,
                       width: o,
                       height: o,
-                      opacity: parseFloat(r.opacity),
-                      fillcolor: r.fillcolor,
-                      strokewidth: parseInt(r.strokewidth),
-                      strokecolor: r.strokecolor,
-                      pointsize: r.pointsize,
-                      pointstyle: r.pointstyle,
+                      opacity: parseFloat(i.opacity),
+                      fillcolor: i.fillcolor,
+                      strokewidth: parseInt(i.strokewidth),
+                      strokecolor: i.strokecolor,
+                      pointsize: i.pointsize,
+                      pointstyle: i.pointstyle,
                       states: n,
                     })),
                       e.setActivePolygon(a),
@@ -5172,26 +5203,26 @@
                   t.value.choices && e.completion.names.get(t.from_name).fromStateJSON(t),
                   t.value.rectanglelabels)
                 ) {
-                  var o = _(n);
+                  var o = R(n);
                   o.fromStateJSON(t),
                     e.__addRect(t.value.x, t.value.y, t.value.width, t.value.height, o.getSelectedColor(), [o], "perc");
                 }
-                t.value.shape && (t.from_name !== t.to_name && ((a = _(n).fromStateJSON(t)), e.shapes.push(a)));
+                t.value.shape && (t.from_name !== t.to_name && ((a = R(n).fromStateJSON(t)), e.shapes.push(a)));
               },
             };
           }),
-        Hn = b.m.compose(
+        Wn = y.m.compose(
           "ImageModel",
-          Mn,
           Bn,
-          Ge,
+          Hn,
+          Ue,
         ),
-        Wn = (function(e) {
+        Pn = (function(e) {
           function t() {
             return Object(m.a)(this, t), Object(h.a)(this, Object(p.a)(t).apply(this, arguments));
           }
           return (
-            Object(g.a)(t, e),
+            Object(f.a)(t, e),
             Object(d.a)(t, [
               {
                 key: "componentDidMount",
@@ -5221,7 +5252,7 @@
                 key: "render",
                 value: function() {
                   var e = this;
-                  return l.a.createElement(sn.Transformer, {
+                  return l.a.createElement(cn.Transformer, {
                     resizeEnabled: !0,
                     rotateEnabled: this.props.rotateEnabled,
                     anchorSize: 8,
@@ -5235,11 +5266,11 @@
             t
           );
         })(l.a.Component),
-        Pn = (function(e) {
+        zn = (function(e) {
           function t() {
             var e, n;
             Object(m.a)(this, t);
-            for (var a = arguments.length, o = new Array(a), r = 0; r < a; r++) o[r] = arguments[r];
+            for (var a = arguments.length, o = new Array(a), i = 0; i < a; i++) o[i] = arguments[i];
             return (
               ((n = Object(h.a)(this, (e = Object(p.a)(t)).call.apply(e, [this].concat(o)))).handleDblClick = function(
                 e,
@@ -5254,56 +5285,69 @@
             );
           }
           return (
-            Object(g.a)(t, e),
+            Object(f.a)(t, e),
             Object(d.a)(t, [
+              { key: "updateDimensions", value: function() {} },
+              {
+                key: "componentDidMount",
+                value: function() {
+                  window.addEventListener("resize", this.updateDimensions.bind(this));
+                },
+              },
               {
                 key: "render",
                 value: function() {
-                  var e = this.props,
-                    t = e.item;
-                  if (!e.store.task) return null;
-                  var n = {},
-                    a = { width: t.width, maxWidth: t.maxwidth };
-                  if ((t.resize && (a.transform = "scale(" + t.resize + ", " + t.resize + ")"), t.hasStates)) {
-                    n.position = "absolute";
-                    var o = "true" === t.controlButton().canrotate;
+                  var e = this,
+                    t = this.props,
+                    n = t.item;
+                  if (!t.store.task) return null;
+                  var a = {},
+                    o = { width: n.width, maxWidth: n.maxwidth };
+                  if ((n.resize && (o.transform = "scale(" + n.resize + ", " + n.resize + ")"), n.hasStates)) {
+                    var i = "true" === n.controlButton().canrotate;
                     return l.a.createElement(
                       "div",
-                      { style: { marginBottom: "1em", marginTop: "1em" } },
+                      { style: { position: "relative" } },
                       l.a.createElement(
                         "div",
-                        { style: n },
-                        l.a.createElement("img", { style: a, src: t._value, onLoad: t.updateIE }),
+                        {
+                          ref: function(t) {
+                            e.container = t;
+                          },
+                          style: a,
+                        },
+                        l.a.createElement("img", { style: o, src: n._value, onLoad: n.updateIE }),
                       ),
                       l.a.createElement(
-                        sn.Stage,
+                        cn.Stage,
                         {
                           ref: function(e) {
-                            t._setStageRef(e);
+                            n._setStageRef(e);
                           },
-                          width: t.stageWidth,
-                          height: t.stageHeight,
+                          width: n.stageWidth,
+                          height: n.stageHeight,
                           onDblClick: this.handleDblClick,
                           onClick: this.handleOnClick,
                           onMouseDown: this.handleStageMouseDown,
+                          style: { position: "absolute", top: 0, left: 0 },
                         },
                         l.a.createElement(
-                          sn.Layer,
+                          cn.Layer,
                           null,
-                          t.shapes.map(function(e) {
-                            return C.renderItem(e);
+                          n.shapes.map(function(e) {
+                            return _.renderItem(e);
                           }),
-                          l.a.createElement(Wn, { rotateEnabled: o, selectedShapeName: this.props.item.selectedShape }),
+                          l.a.createElement(Pn, { rotateEnabled: i, selectedShapeName: this.props.item.selectedShape }),
                         ),
                       ),
                     );
                   }
                   return (
-                    (n.marginTop = "1em"),
+                    (a.marginTop = "1em"),
                     l.a.createElement(
                       "div",
-                      { style: n },
-                      l.a.createElement("img", { style: a, src: t._value, onLoad: t.updateIE }),
+                      { style: a },
+                      l.a.createElement("img", { style: o, src: n._value, onLoad: n.updateIE }),
                     )
                   );
                 },
@@ -5311,22 +5355,22 @@
             ]),
             t
           );
-        })(i.Component),
-        zn = Object(u.b)("store")(Object(u.c)(Pn));
-      k.addTag("image", Hn, zn);
-      var Ln = n(194),
-        Fn = n(209),
-        Jn = n.n(Fn),
-        Gn = function e(t, n, a) {
+        })(r.Component),
+        Ln = Object(u.b)("store")(Object(u.c)(zn));
+      k.addTag("image", Wn, Ln);
+      var Fn = n(171),
+        Jn = n(219),
+        Gn = n.n(Jn),
+        Un = function e(t, n, a) {
           var o = arguments.length > 3 && void 0 !== arguments[3] ? arguments[3] : {};
           Object(m.a)(this, e), (this.start = t), (this.end = n), (this.text = a), (this.data = o);
         },
-        Un = (function(e) {
+        Vn = (function(e) {
           function t() {
             return Object(m.a)(this, t), Object(h.a)(this, Object(p.a)(t).apply(this, arguments));
           }
           return (
-            Object(g.a)(t, e),
+            Object(f.a)(t, e),
             Object(d.a)(t, [
               {
                 key: "render",
@@ -5346,15 +5390,15 @@
             ]),
             t
           );
-        })(i.Component),
-        Vn = Object(u.b)("store")(
+        })(r.Component),
+        Yn = Object(u.b)("store")(
           Object(u.c)(function(e) {
             var t,
               n = e.store,
               a = e.range,
               o = e.id,
-              r = e.highlightStyle,
-              i = e.style,
+              i = e.highlightStyle,
+              r = e.style,
               s = e.charIndex,
               c = e.children,
               u = e.overlap,
@@ -5373,7 +5417,7 @@
                   "data-position": s,
                   key: d(a),
                   style: (function(e) {
-                    return e ? r : i;
+                    return e ? i : r;
                   })(a),
                 },
                 c,
@@ -5382,7 +5426,7 @@
               u.length &&
               (a.states &&
                 a.states.map(function(e) {
-                  t = q.Colors.convertToRGBA(e.getSelectedColor(), 0.3);
+                  t = X.Colors.convertToRGBA(e.getSelectedColor(), 0.3);
                 }),
               n.completionStore.selected.regionStore.regions.map(function(e) {
                 e.selected &&
@@ -5393,7 +5437,7 @@
               }),
               (h = u.reduceRight(function(e, n) {
                 return l.a.createElement(
-                  Un,
+                  Vn,
                   { style: { background: t, padding: "2px 0" }, position: s, overlap: n, keyNode: d(a) },
                   e,
                 );
@@ -5401,10 +5445,10 @@
             return h;
           }),
         ),
-        Yn = function(e) {
+        qn = function(e) {
           var t = { wordWrap: "break-word" };
           return l.a.createElement(
-            Vn,
+            Yn,
             {
               id: e.id,
               highlightStyle: Object.assign({}, t, e.highlightStyle),
@@ -5422,20 +5466,20 @@
         },
         Xn = function(e) {
           return l.a.createElement(
-            Vn,
+            Yn,
             { id: e.id, highlightStyle: e.highlightStyle, charIndex: e.charIndex, range: e.range, overlap: e.overlap },
             "".concat(e.text[e.charIndex]).concat(e.text[e.charIndex + 1]),
           );
         },
-        qn = n(314),
-        Kn = n.n(qn),
-        Zn = (function(e) {
+        Zn = n(311),
+        Kn = n.n(Zn),
+        Qn = (function(e) {
           function t() {
             var e;
             return Object(m.a)(this, t), ((e = Object(h.a)(this, Object(p.a)(t).call(this))).dismissMouseUp = 0), e;
           }
           return (
-            Object(g.a)(t, e),
+            Object(f.a)(t, e),
             Object(d.a)(t, [
               {
                 key: "getRange",
@@ -5462,10 +5506,10 @@
                   return (
                     this.props.ranges &&
                       this.props.ranges.map(function(t) {
-                        return e >= t.start && e <= t.end ? (o = [].concat(Object(Ln.a)(o), [t.id])) : o;
+                        return e >= t.start && e <= t.end ? (o = [].concat(Object(Fn.a)(o), [t.id])) : o;
                       }),
                     l.a.createElement(
-                      Vn,
+                      Yn,
                       {
                         id: this.props.id,
                         overlap: o,
@@ -5486,7 +5530,7 @@
                   return (
                     this.props.ranges &&
                       this.props.ranges.map(function(t) {
-                        return e >= t.start && e <= t.end ? (n = [].concat(Object(Ln.a)(n), [t.id])) : n;
+                        return e >= t.start && e <= t.end ? (n = [].concat(Object(Fn.a)(n), [t.id])) : n;
                       }),
                     l.a.createElement(Xn, {
                       text: this.props.text,
@@ -5507,9 +5551,9 @@
                   return (
                     this.props.ranges &&
                       this.props.ranges.map(function(t) {
-                        return e >= t.start && e <= t.end ? (a = [].concat(Object(Ln.a)(a), [t.id])) : a;
+                        return e >= t.start && e <= t.end ? (a = [].concat(Object(Fn.a)(a), [t.id])) : a;
                       }),
-                    l.a.createElement(Yn, {
+                    l.a.createElement(qn, {
                       url: n,
                       id: this.props.id,
                       overlap: a,
@@ -5545,11 +5589,11 @@
                       "Control" !== document.selection.type &&
                       (e = document.selection.createRange().text);
                   if (!e || !e.length) return !1;
-                  var r = window.getSelection().getRangeAt(0);
-                  if (!r.startContainer.parentNode.dataset.hint && !r.endContainer.parentNode.dataset.hint) {
-                    var i = parseInt(r.startContainer.parentNode.dataset.position),
-                      l = parseInt(r.endContainer.parentNode.dataset.position),
-                      s = new Gn(i < l ? i : l, i < l ? l : i, e, Object(N.a)({}, this.props, { ranges: void 0 }));
+                  var i = window.getSelection().getRangeAt(0);
+                  if (!i.startContainer.parentNode.dataset.hint && !i.endContainer.parentNode.dataset.hint) {
+                    var r = parseInt(i.startContainer.parentNode.dataset.position),
+                      l = parseInt(i.endContainer.parentNode.dataset.position),
+                      s = new Un(r < l ? r : l, r < l ? l : r, e, Object(N.a)({}, this.props, { ranges: void 0 }));
                     this.props.onTextHighlighted(s);
                   }
                 },
@@ -5580,19 +5624,19 @@
                 value: function() {
                   for (var e, t = [], n = 0; n < this.props.text.length; n++) {
                     var a = this.getRange(n),
-                      o = q.Checkers.getUrl(n, this.props.text),
-                      r = Jn()().test(this.props.text[n] + this.props.text[n + 1]),
-                      i = this.getNode(n, a, this.props.text, o, r);
-                    if ((o.length ? (n += o.length - 1) : r && n++, a)) {
+                      o = X.Checkers.getUrl(n, this.props.text),
+                      i = Gn()().test(this.props.text[n] + this.props.text[n + 1]),
+                      r = this.getNode(n, a, this.props.text, o, i);
+                    if ((o.length ? (n += o.length - 1) : i && n++, a)) {
                       e = a;
-                      for (var l = [i], s = n + 1; s < parseInt(a.end) + 1; s++) {
-                        Jn()().test("".concat(this.props.text[s]).concat(this.props.text[s + 1]))
+                      for (var l = [r], s = n + 1; s < parseInt(a.end) + 1; s++) {
+                        Gn()().test("".concat(this.props.text[s]).concat(this.props.text[s + 1]))
                           ? (l.push(this.getEmojiNode(s, a)), s++)
                           : l.push(this.getLetterNode(s, a)),
                           (n = s);
                       }
                       t.push(this.rangeRenderer(l, a, n, this.onMouseOverHighlightedWord.bind(this)));
-                    } else t.push(i);
+                    } else t.push(r);
                   }
                   return e && this.onMouseOverHighlightedWord(e, !0), t;
                 },
@@ -5618,27 +5662,27 @@
             ]),
             t
           );
-        })(i.Component),
-        Qn = Object(u.c)(Zn),
-        $n = n(315),
-        ea = n.n($n),
-        ta = b.m
+        })(r.Component),
+        $n = Object(u.c)(Qn),
+        ea = n(312),
+        ta = n.n(ea),
+        na = y.m
           .model("TextRegionModel", {
-            id: b.m.optional(b.m.identifier, E),
-            pid: b.m.optional(b.m.string, E),
+            id: y.m.optional(y.m.identifier, E),
+            pid: y.m.optional(y.m.string, E),
             type: "textrange",
-            start: b.m.integer,
-            end: b.m.integer,
-            text: b.m.string,
-            states: b.m.maybeNull(b.m.array(b.m.union(Ut, Kt))),
+            start: y.m.integer,
+            end: y.m.integer,
+            text: y.m.string,
+            states: y.m.maybeNull(y.m.array(y.m.union(Vt, Kt))),
           })
           .views(function(e) {
             return {
               get parent() {
-                return Object(b.f)(e, la);
+                return Object(y.f)(e, sa);
               },
               get completion() {
-                return Object(b.g)(e).completionStore.selected;
+                return Object(y.g)(e).completionStore.selected;
               },
             };
           })
@@ -5667,26 +5711,26 @@
               },
             };
           }),
-        na = b.m.compose(
+        aa = y.m.compose(
           "TextRegionModel",
-          Bt,
           Ht,
-          ta,
+          Wt,
+          na,
         ),
-        aa = function(e) {
+        oa = function(e) {
           var t = e.state,
             n = t.getSelectedString(),
-            a = { background: q.Colors.convertToRGBA(t.getSelectedColor(), 0.3) };
+            a = { background: X.Colors.convertToRGBA(t.getSelectedColor(), 0.3) };
           return (
             e.style && (a = Object(N.a)({}, a, { outline: e.style.outline })),
             l.a.createElement(
               ae,
-              { className: ea.a.state, style: a },
+              { className: ta.a.state, style: a },
               l.a.createElement("span", { "data-hint": !0 }, "\xa0[", n, "]"),
             )
           );
         },
-        oa = Object(u.b)("store")(
+        ia = Object(u.b)("store")(
           Object(u.c)(function(e) {
             var t = e.store,
               n = (e.item, e.letterGroup),
@@ -5696,19 +5740,19 @@
               (o = a.states.map(function(e) {
                 return e.getSelectedColor();
               })),
-              0 !== o.length && (o = q.Colors.convertToRGBA(o[0], 0.3));
-            var r = {
+              0 !== o.length && (o = X.Colors.convertToRGBA(o[0], 0.3));
+            var i = {
                 padding: "2px 0px",
                 position: "relative",
                 borderRadius: "2px",
                 cursor: t.completionStore.selected.relationMode ? "crosshair" : "pointer",
               },
-              i = [];
+              r = [];
             return (
               (a.states && a.states.length) > 0 &&
                 a.states.map(function(e) {
-                  i.push(
-                    l.a.createElement(aa, {
+                  r.push(
+                    l.a.createElement(oa, {
                       key: a.id,
                       state: e,
                       bg: o,
@@ -5718,11 +5762,11 @@
                     }),
                   );
                 }),
-              i.length || (r = Object(N.a)({}, r, { background: "rgba(0, 0, 255, 0.1)" })),
+              r.length || (i = Object(N.a)({}, i, { background: "rgba(0, 0, 255, 0.1)" })),
               l.a.createElement(
                 "span",
                 {
-                  style: r,
+                  style: i,
                   onClick: a.onClickRegion,
                   onMouseOver: function() {
                     t.completionStore.selected.relationMode && a.setHighlight(!0);
@@ -5732,26 +5776,26 @@
                   },
                 },
                 n,
-                i,
+                r,
               )
             );
           }),
         );
-      k.addTag("textrange", na, oa);
-      var ra = b.m.model("TextModel", {
-          name: b.m.maybeNull(b.m.string),
-          value: b.m.maybeNull(b.m.string),
-          selelectwithoutlabel: b.m.optional(b.m.string, "false"),
-          hidden: b.m.optional(b.m.enumeration(["true", "false"]), "false"),
-          adjustselection: b.m.optional(b.m.string, "true"),
-          selectionenabled: b.m.optional(b.m.string, "true"),
+      k.addTag("textrange", aa, ia);
+      var ra = y.m.model("TextModel", {
+          name: y.m.maybeNull(y.m.string),
+          value: y.m.maybeNull(y.m.string),
+          selelectwithoutlabel: y.m.optional(y.m.string, "false"),
+          hidden: y.m.optional(y.m.enumeration(["true", "false"]), "false"),
+          adjustselection: y.m.optional(y.m.string, "true"),
+          selectionenabled: y.m.optional(y.m.string, "true"),
         }),
-        ia = b.m
+        la = y.m
           .model("TextModel", {
-            id: b.m.optional(b.m.identifier, E),
+            id: y.m.optional(y.m.identifier, E),
             type: "text",
-            regions: b.m.array(na),
-            _value: b.m.optional(b.m.string, ""),
+            regions: y.m.array(aa),
+            _value: y.m.optional(y.m.string, ""),
           })
           .views(function(e) {
             return {
@@ -5760,7 +5804,7 @@
                 return t && t.length > 0;
               },
               get completion() {
-                return Object(b.g)(e).completionStore.selected;
+                return Object(y.g)(e).completionStore.selected;
               },
               states: function() {
                 return e.completion.toNames.get(e.name);
@@ -5770,7 +5814,7 @@
                 return t
                   ? t.filter(function(e) {
                       return (
-                        e.isSelected && ("LabelsModel" === Object(b.i)(e).name || "RatingModel" === Object(b.i)(e).name)
+                        e.isSelected && ("LabelsModel" === Object(y.i)(e).name || "RatingModel" === Object(y.i)(e).name)
                       );
                     })
                   : null;
@@ -5786,10 +5830,10 @@
                 });
               },
               updateValue: function(t) {
-                e._value = Je(e.value, t.task.dataObj);
+                e._value = Ge(e.value, t.task.dataObj);
               },
               _addRegion: function(t) {
-                var n = na.create(t);
+                var n = aa.create(t);
                 return e.regions.push(n), e.completion.addRegion(n), n;
               },
               addRegion: function(t) {
@@ -5826,9 +5870,9 @@
                 if ("choices" !== n.type) {
                   if (t.from_name === t.to_name) a = e._addRegion(o);
                   else {
-                    var r = e.findRegion(t.value.start, t.value.end),
-                      i = _(n);
-                    i.fromStateJSON(t), r ? r.states.push(i) : ((o.states = [i]), (a = e._addRegion(o)));
+                    var i = e.findRegion(t.value.start, t.value.end),
+                      r = R(n);
+                    r.fromStateJSON(t), i ? i.states.push(r) : ((o.states = [r]), (a = e._addRegion(o)));
                   }
                   return a;
                 }
@@ -5836,22 +5880,22 @@
               },
             };
           }),
-        la = b.m.compose(
+        sa = y.m.compose(
           "TextModel",
           ra,
-          ia,
+          la,
         ),
-        sa = (function(e) {
+        ca = (function(e) {
           function t() {
             return Object(m.a)(this, t), Object(h.a)(this, Object(p.a)(t).apply(this, arguments));
           }
           return (
-            Object(g.a)(t, e),
+            Object(f.a)(t, e),
             Object(d.a)(t, [
               {
                 key: "renderRegion",
                 value: function(e, t, n, a) {
-                  return l.a.createElement(oa, {
+                  return l.a.createElement(ia, {
                     key: t.id,
                     store: this.props.store,
                     item: this.props.item,
@@ -5873,7 +5917,7 @@
                     l.a.createElement(
                       "div",
                       { style: t },
-                      l.a.createElement(Qn, {
+                      l.a.createElement($n, {
                         id: e.id,
                         key: e.id,
                         text: e._value,
@@ -5892,37 +5936,37 @@
             ]),
             t
           );
-        })(i.Component),
-        ca = Object(u.b)("store")(Object(u.c)(sa));
-      k.addTag("text", la, ca);
-      var ua = n(611),
-        ma = n(624),
-        da =
+        })(r.Component),
+        ua = Object(u.b)("store")(Object(u.c)(ca));
+      k.addTag("text", sa, ua);
+      var ma = n(607),
+        da = n(618),
+        ha =
           (l.a.Component,
-          b.m.model({
-            selected: b.m.optional(b.m.boolean, !1),
-            alias: b.m.maybeNull(b.m.string),
-            value: b.m.maybeNull(b.m.string),
-            hotkey: b.m.maybeNull(b.m.string),
-            style: b.m.maybeNull(b.m.string),
+          y.m.model({
+            selected: y.m.optional(y.m.boolean, !1),
+            alias: y.m.maybeNull(y.m.string),
+            value: y.m.maybeNull(y.m.string),
+            hotkey: y.m.maybeNull(y.m.string),
+            style: y.m.maybeNull(y.m.string),
           })),
-        ha = b.m
-          .model({ type: "choice", _value: b.m.optional(b.m.string, "") })
+        pa = y.m
+          .model({ type: "choice", _value: y.m.optional(y.m.string, "") })
           .views(function(e) {
             return {
               get isCheckbox() {
-                var t = Object(b.f)(e, ba).choice;
+                var t = Object(y.f)(e, ba).choice;
                 return "multiple" === t || "single" === t;
               },
               get name() {
-                return Object(b.f)(e, ba).name;
+                return Object(y.f)(e, ba).name;
               },
             };
           })
           .actions(function(e) {
             return {
               toggleSelected: function() {
-                var t = Object(b.f)(e, ba);
+                var t = Object(y.f)(e, ba);
                 t.shouldBeUnselected && t.unselectAll(), e.markSelected(!e.selected);
               },
               markSelected: function(t) {
@@ -5933,23 +5977,26 @@
               },
             };
           }),
-        pa = b.m.compose(
+        fa = y.m.compose(
           "ChoiceModel",
-          da,
           ha,
-          Ge,
+          pa,
+          Ue,
         ),
         ga = Object(u.b)("store")(
           Object(u.c)(function(e) {
             var t = e.item,
               n = e.store,
               a = {};
-            if ((t.style && (a = C.cssConverter(t.style)), t.isCheckbox)) {
-              var o = Object.assign({ marginRight: "1em", display: "flex", alignItems: "center" }, a);
+            if ((t.style && (a = _.cssConverter(t.style)), t.isCheckbox)) {
+              var o = Object.assign(
+                { marginRight: "1em", marginBottom: "0.5em", display: "flex", alignItems: "center" },
+                a,
+              );
               return l.a.createElement(
                 "div",
                 { style: o },
-                l.a.createElement(ua.a, {
+                l.a.createElement(ma.a, {
                   name: t._value,
                   label: t._value,
                   onChange: function(e) {
@@ -5963,7 +6010,7 @@
                   l.a.createElement(ae, null, "[", t.hotkey, "]"),
               );
             }
-            var r = l.a.createElement(
+            var i = l.a.createElement(
               "label",
               null,
               t._value,
@@ -5976,7 +6023,7 @@
               "div",
               { style: a },
               l.a.createElement(ge.a.Radio, {
-                label: r,
+                label: i,
                 value: t._value,
                 style: { display: "inline-block" },
                 checked: t.selected,
@@ -5987,19 +6034,19 @@
             );
           }),
         );
-      k.addTag("choice", pa, ga);
-      var fa = b.m.model({
-          name: b.m.string,
-          toname: b.m.maybeNull(b.m.string),
-          showinline: b.m.optional(b.m.string, "false"),
-          choice: b.m.optional(b.m.enumeration(["single", "single-radio", "multiple"]), "single"),
+      k.addTag("choice", fa, ga);
+      var va = y.m.model({
+          name: y.m.string,
+          toname: y.m.maybeNull(y.m.string),
+          showinline: y.m.optional(y.m.string, "false"),
+          choice: y.m.optional(y.m.enumeration(["single", "single-radio", "multiple"]), "single"),
         }),
-        va = b.m
+        ya = y.m
           .model({
-            id: b.m.optional(b.m.identifier, E),
-            pid: b.m.optional(b.m.string, E),
+            id: y.m.optional(y.m.identifier, E),
+            pid: y.m.optional(y.m.string, E),
             type: "choices",
-            children: Be.unionArray(["choice"]),
+            children: He.unionArray(["choice"]),
           })
           .views(function(e) {
             return {
@@ -6007,7 +6054,7 @@
                 return "single" === e.choice || "single-radio" === e.choice;
               },
               get completion() {
-                return Object(b.g)(e).completionStore.selected;
+                return Object(y.g)(e).completionStore.selected;
               },
               states: function() {
                 return e.completion.toNames.get(e.name);
@@ -6034,13 +6081,13 @@
               },
             };
           }),
-        ba = b.m.compose(
+        ba = y.m.compose(
           "ChoicesModel",
-          fa,
           va,
-          Ft,
+          ya,
+          Jt,
         ),
-        ya = Object(u.c)(function(e) {
+        wa = Object(u.c)(function(e) {
           var t = e.item;
           return l.a.createElement(
             "div",
@@ -6049,47 +6096,47 @@
               ge.a,
               null,
               "true" === t.showinline
-                ? l.a.createElement(ge.a.Group, { inline: !0 }, C.renderChildren(t))
-                : l.a.createElement(ge.a.Group, { grouped: !0 }, C.renderChildren(t)),
+                ? l.a.createElement(ge.a.Group, { inline: !0, style: { flexWrap: "wrap" } }, _.renderChildren(t))
+                : l.a.createElement(ge.a.Group, { grouped: !0 }, _.renderChildren(t)),
             ),
           );
         });
-      k.addTag("choices", ba, ya);
-      var wa = n(622),
-        ka = b.m
+      k.addTag("choices", ba, wa);
+      var ka = n(617),
+        xa = y.m
           .model("TextAreaRegionModel", {
-            id: b.m.optional(b.m.identifier, E),
-            pid: b.m.optional(b.m.string, E),
+            id: y.m.optional(y.m.identifier, E),
+            pid: y.m.optional(y.m.string, E),
             type: "textarearegion",
-            _value: b.m.string,
+            _value: y.m.string,
           })
           .views(function(e) {
             return {
               get parent() {
-                return Object(b.f)(e, Ia);
+                return Object(y.f)(e, Ea);
               },
               get completion() {
-                return Object(b.g)(e).completionStore.selected;
+                return Object(y.g)(e).completionStore.selected;
               },
             };
           }),
-        xa = b.m.compose(
+        Ta = y.m.compose(
           "TextAreaRegionModel",
-          Bt,
           Ht,
-          ka,
+          Wt,
+          xa,
         ),
-        Ta = Object(u.b)("store")(
+        Na = Object(u.b)("store")(
           Object(u.c)(function(e) {
             var t = e.store,
               n = e.item,
-              a = { cursor: t.completionStore.selected.relationMode ? "crosshair" : "pointer" };
+              a = { cursor: t.completionStore.selected.relationMode ? "crosshair" : "pointer", display: "block" };
             return (
               n.selected
                 ? (a = Object(N.a)({}, a, { border: "1px solid red" }))
                 : n.highlighted && (a = Object(N.a)({}, a, { border: "2px solid red" })),
               l.a.createElement(
-                wa.a,
+                ka.a,
                 {
                   className: "warning",
                   style: a,
@@ -6106,22 +6153,22 @@
             );
           }),
         );
-      k.addTag("textarearegion", xa, Ta);
-      var Na = b.m.model({
-          allowSubmit: b.m.optional(b.m.string, "true"),
-          label: b.m.optional(b.m.string, ""),
-          name: b.m.maybeNull(b.m.string),
-          toname: b.m.maybeNull(b.m.string),
-          value: b.m.maybeNull(b.m.string),
-          placeholder: b.m.maybeNull(b.m.string),
-          maxsubmissions: b.m.maybeNull(b.m.string),
+      k.addTag("textarearegion", Ta, Na);
+      var Sa = y.m.model({
+          allowSubmit: y.m.optional(y.m.string, "true"),
+          label: y.m.optional(y.m.string, ""),
+          name: y.m.maybeNull(y.m.string),
+          toname: y.m.maybeNull(y.m.string),
+          value: y.m.maybeNull(y.m.string),
+          placeholder: y.m.maybeNull(y.m.string),
+          maxsubmissions: y.m.maybeNull(y.m.string),
         }),
-        Sa = b.m
+        Ia = y.m
           .model({
-            id: b.m.optional(b.m.identifier, E),
+            id: y.m.optional(y.m.identifier, E),
             type: "textarea",
-            regions: b.m.array(xa),
-            _value: b.m.optional(b.m.string, ""),
+            regions: y.m.array(Ta),
+            _value: y.m.optional(y.m.string, ""),
           })
           .views(function(e) {
             return {
@@ -6129,7 +6176,7 @@
                 return e.regions.length;
               },
               get completion() {
-                return Object(b.g)(e).completionStore.selected;
+                return Object(y.g)(e).completionStore.selected;
               },
               get showSubmit() {
                 if (e.maxsubmissions) {
@@ -6146,14 +6193,14 @@
                 e._value = t;
               },
               addText: function(t, n) {
-                var a = xa.create({ pid: n, _value: t });
+                var a = Ta.create({ pid: n, _value: t });
                 return e.regions.push(a), e.completion.addRegion(a), a;
               },
               beforeSend: function() {
                 e._value && e._value.length && e.addText(e._value);
               },
               deleteText: function(e) {
-                Object(b.b)(e);
+                Object(y.b)(e);
               },
               toStateJSON: function() {
                 var t = e.toname || e.name;
@@ -6168,13 +6215,13 @@
               },
             };
           }),
-        Ia = b.m.compose(
+        Ea = y.m.compose(
           "TextAreaModel",
-          Na,
           Sa,
-          Ge,
+          Ia,
+          Ue,
         ),
-        Ea = Object(u.c)(function(e) {
+        Oa = Object(u.c)(function(e) {
           var t = e.item;
           return l.a.createElement(
             "div",
@@ -6184,7 +6231,7 @@
                 "div",
                 { style: { marginTop: "1em", marginBottom: "1em" } },
                 t.regions.map(function(e) {
-                  return l.a.createElement(Ta, { item: e });
+                  return l.a.createElement(Na, { item: e });
                 }),
               ),
             t.showSubmit &&
@@ -6208,17 +6255,17 @@
               ),
           );
         });
-      k.addTag("textarea", Ia, Ea);
-      var Oa = n(162),
-        _a = n(173),
-        Ra = n.n(_a),
-        Ca = b.m
+      k.addTag("textarea", Ea, Oa);
+      var Ra = n(78),
+        Ca = n(108),
+        _a = n.n(Ca),
+        ja = y.m
           .model({
-            backgroundColor: b.m.optional(b.m.string, "transparent"),
-            value: b.m.maybeNull(b.m.string),
-            _value: b.m.maybeNull(b.m.string),
-            selected: b.m.optional(b.m.boolean, !1),
-            idx: b.m.number,
+            backgroundColor: y.m.optional(y.m.string, "transparent"),
+            value: y.m.maybeNull(y.m.string),
+            _value: y.m.maybeNull(y.m.string),
+            selected: y.m.optional(y.m.boolean, !1),
+            idx: y.m.number,
           })
           .views(function(e) {
             return {};
@@ -6236,21 +6283,21 @@
               },
             };
           }),
-        ja = b.m.model({
-          axis: b.m.optional(b.m.string, "y"),
-          lockaxis: b.m.maybeNull(b.m.string),
-          elementvalue: b.m.maybeNull(b.m.string),
-          elementtag: b.m.optional(b.m.string, "Text"),
-          sortedhighlightcolor: b.m.maybeNull(b.m.string),
-          name: b.m.maybeNull(b.m.string),
-          value: b.m.maybeNull(b.m.string),
+        Aa = y.m.model({
+          axis: y.m.optional(y.m.string, "y"),
+          lockaxis: y.m.maybeNull(y.m.string),
+          elementvalue: y.m.maybeNull(y.m.string),
+          elementtag: y.m.optional(y.m.string, "Text"),
+          sortedhighlightcolor: y.m.maybeNull(y.m.string),
+          name: y.m.maybeNull(y.m.string),
+          value: y.m.maybeNull(y.m.string),
         }),
-        Aa = b.m
+        Da = y.m
           .model({
-            id: b.m.optional(b.m.identifier, E),
+            id: y.m.optional(y.m.identifier, E),
             type: "list",
-            update: b.m.optional(b.m.number, 1),
-            regions: b.m.array(Ca),
+            update: y.m.optional(y.m.number, 1),
+            regions: y.m.array(ja),
           })
           .views(function(e) {
             return {};
@@ -6261,11 +6308,11 @@
                 e.update = e.update + 1;
               },
               addRegion: function(t, n) {
-                var a = Ca.create({ value: e.elementvalue, idx: n, _value: Fe(e.elementvalue, t[n]) });
+                var a = ja.create({ value: e.elementvalue, idx: n, _value: Je(e.elementvalue, t[n]) });
                 e.regions.push(a);
               },
               updateValue: function(t) {
-                var n = Fe(e.value, t.task.dataObj);
+                var n = Je(e.value, t.task.dataObj);
                 (e.regions = []),
                   n.forEach(function(t, a) {
                     return e.addRegion(n, a);
@@ -6282,8 +6329,8 @@
                 n !== a &&
                   (e.sortedhighlightcolor && e.regions[n].setBG(e.sortedhighlightcolor),
                   e.regions[n].setSelected(!0),
-                  e._value && (e._value = Ra()(e._value, n, a)),
-                  (e.regions = Ra()(e.regions, n, a)),
+                  e._value && (e._value = _a()(e._value, n, a)),
+                  (e.regions = _a()(e.regions, n, a)),
                   e.setUpdate());
               },
               toStateJSON: function() {
@@ -6310,16 +6357,16 @@
               fromStateJSON: function(t, n) {
                 var a = [],
                   o = [],
-                  r = {};
+                  i = {};
                 t.value.weights.forEach(function(e, t) {
-                  r[e] ? r[e].push(t) : (r[e] = [t]);
+                  i[e] ? i[e].push(t) : (i[e] = [t]);
                 }),
-                  Object.keys(r)
+                  Object.keys(i)
                     .sort(function(e, t) {
                       return t - e;
                     })
                     .forEach(function(t) {
-                      r[t].forEach(function(t) {
+                      i[t].forEach(function(t) {
                         o.push(e.regions[t]), a.push(e._value[t]);
                       });
                     }),
@@ -6332,26 +6379,26 @@
               },
             };
           }),
-        Da = b.m.compose(
+        Ma = y.m.compose(
           "ListModel",
-          ja,
           Aa,
+          Da,
         ),
-        Ma = Object(Oa.sortableHandle)(function() {
+        Ba = Object(Ra.sortableHandle)(function() {
           return l.a.createElement("div", { className: "drag-handle" });
         });
-      function Ba() {
+      function Ha() {
         try {
           return "undefined" !== typeof window.orientation || -1 !== navigator.userAgent.indexOf("IEMobile");
         } catch (e) {
           return !1;
         }
       }
-      var Ha = Object(Oa.SortableElement)(function(e) {
+      var Wa = Object(Ra.SortableElement)(function(e) {
           var t,
             n = e.item,
             a = e.value;
-          Ba && (t = "noselect");
+          Ha && (t = "noselect");
           var o = {
             text: function(e) {
               return l.a.createElement("span", { className: t }, e._value);
@@ -6382,18 +6429,18 @@
                 );
               },
             },
-            l.a.createElement(Ma, null),
+            l.a.createElement(Ba, null),
             o[n.elementtag.toLowerCase()](a),
           );
         }),
-        Wa = Object(Oa.SortableContainer)(function(e) {
+        Pa = Object(Ra.SortableContainer)(function(e) {
           var t = e.item,
             n = e.items;
           return l.a.createElement(
             j.a,
             { celled: !0 },
             n.map(function(e, n) {
-              return l.a.createElement(Ha, {
+              return l.a.createElement(Wa, {
                 key: "item-".concat(n),
                 index: n,
                 value: e,
@@ -6404,31 +6451,31 @@
             }),
           );
         }),
-        Pa = Object(u.c)(function(e) {
+        za = Object(u.c)(function(e) {
           e.store;
           var t = e.item,
             n = {};
           return (
-            Ba() ? (n.pressDelay = 100) : (n.distance = 7),
+            Ha() ? (n.pressDelay = 100) : (n.distance = 7),
             l.a.createElement(
               "div",
               null,
               l.a.createElement(
-                Wa,
+                Pa,
                 Object.assign({ update: t.update, item: t, items: t.regions, onSortEnd: t.moveItems }, n),
               ),
             )
           );
         }),
-        za = Object(u.b)("store")(Object(u.c)(Pa));
-      k.addTag("list", Da, za);
-      var La = b.m
+        La = Object(u.b)("store")(Object(u.c)(za));
+      k.addTag("list", Ma, La);
+      var Fa = y.m
           .model({
-            backgroundColor: b.m.optional(b.m.string, "transparent"),
-            value: b.m.maybeNull(b.m.string),
-            _value: b.m.maybeNull(b.m.string),
-            selected: b.m.optional(b.m.boolean, !1),
-            idx: b.m.number,
+            backgroundColor: y.m.optional(y.m.string, "transparent"),
+            value: y.m.maybeNull(y.m.string),
+            _value: y.m.maybeNull(y.m.string),
+            selected: y.m.optional(y.m.boolean, !1),
+            idx: y.m.number,
           })
           .views(function(e) {
             return {};
@@ -6446,22 +6493,22 @@
               },
             };
           }),
-        Fa = b.m.model({
-          axis: b.m.optional(b.m.string, "y"),
-          lockaxis: b.m.maybeNull(b.m.string),
-          elementtag: b.m.optional(b.m.string, "Text"),
-          ranked: b.m.optional(b.m.string, "true"),
-          sortable: b.m.optional(b.m.string, "true"),
-          sortedhighlightcolor: b.m.maybeNull(b.m.string),
-          name: b.m.maybeNull(b.m.string),
-          value: b.m.maybeNull(b.m.string),
+        Ja = y.m.model({
+          axis: y.m.optional(y.m.string, "y"),
+          lockaxis: y.m.maybeNull(y.m.string),
+          elementtag: y.m.optional(y.m.string, "Text"),
+          ranked: y.m.optional(y.m.string, "true"),
+          sortable: y.m.optional(y.m.string, "true"),
+          sortedhighlightcolor: y.m.maybeNull(y.m.string),
+          name: y.m.maybeNull(y.m.string),
+          value: y.m.maybeNull(y.m.string),
         }),
-        Ja = b.m
+        Ga = y.m
           .model({
-            id: b.m.optional(b.m.identifier, E),
+            id: y.m.optional(y.m.identifier, E),
             type: "ranker",
-            update: b.m.optional(b.m.number, 1),
-            regions: b.m.array(La),
+            update: y.m.optional(y.m.number, 1),
+            regions: y.m.array(Fa),
           })
           .views(function(e) {
             return {};
@@ -6472,7 +6519,7 @@
                 e.update = e.update + 1;
               },
               _addRegion: function(t, n) {
-                var a = La.create({ value: t, idx: n, _value: t });
+                var a = Fa.create({ value: t, idx: n, _value: t });
                 e.regions.push(a);
               },
               moveItems: function(t) {
@@ -6481,8 +6528,8 @@
                 n != a &&
                   (e.sortedhighlightcolor && e.regions[n].setBG(e.sortedhighlightcolor),
                   e.regions[n].setSelected(!0),
-                  e._value && (e._value = Ra()(e._value, n, a)),
-                  (e.regions = Ra()(e.regions, n, a)),
+                  e._value && (e._value = _a()(e._value, n, a)),
+                  (e.regions = _a()(e.regions, n, a)),
                   e.setUpdate());
               },
               toStateJSON: function() {
@@ -6507,26 +6554,26 @@
               },
             };
           }),
-        Ga = b.m.compose(
+        Ua = y.m.compose(
           "RankerModel",
-          Fa,
           Ja,
+          Ga,
         ),
-        Ua = Object(Oa.sortableHandle)(function() {
+        Va = Object(Ra.sortableHandle)(function() {
           return l.a.createElement("div", { className: "drag-handle" });
         });
-      function Va() {
+      function Ya() {
         try {
           return "undefined" !== typeof window.orientation || -1 !== navigator.userAgent.indexOf("IEMobile");
         } catch (e) {
           return !1;
         }
       }
-      var Ya = Object(Oa.SortableElement)(function(e) {
+      var qa = Object(Ra.SortableElement)(function(e) {
           var t,
             n = e.item,
             a = e.value;
-          Va && (t = "noselect");
+          Ya && (t = "noselect");
           var o = {
             text: function(e) {
               return l.a.createElement("span", { className: t }, e._value);
@@ -6557,18 +6604,18 @@
                 );
               },
             },
-            l.a.createElement(Ua, null),
+            l.a.createElement(Va, null),
             o[n.elementtag.toLowerCase()](a),
           );
         }),
-        Xa = Object(Oa.SortableContainer)(function(e) {
+        Xa = Object(Ra.SortableContainer)(function(e) {
           var t = e.item,
             n = e.items;
           return l.a.createElement(
             j.a,
             { celled: !0 },
             n.map(function(e, n) {
-              return l.a.createElement(Ya, {
+              return l.a.createElement(qa, {
                 key: "item-".concat(n),
                 index: n,
                 value: e,
@@ -6579,12 +6626,12 @@
             }),
           );
         }),
-        qa = Object(u.c)(function(e) {
+        Za = Object(u.c)(function(e) {
           e.store;
           var t = e.item,
             n = {};
           return (
-            Va() ? (n.pressDelay = 100) : (n.distance = 7),
+            Ya() ? (n.pressDelay = 100) : (n.distance = 7),
             l.a.createElement(
               "div",
               null,
@@ -6595,57 +6642,57 @@
             )
           );
         }),
-        Ka = Object(u.b)("store")(Object(u.c)(qa));
-      k.addTag("ranker", Ga, Ka);
-      var Za = n(316),
-        Qa = n.n(Za),
-        $a = (function(e) {
+        Ka = Object(u.b)("store")(Object(u.c)(Za));
+      k.addTag("ranker", Ua, Ka);
+      var Qa = n(313),
+        $a = n.n(Qa),
+        eo = (function(e) {
           function t() {
             return Object(m.a)(this, t), Object(h.a)(this, Object(p.a)(t).apply(this, arguments));
           }
           return (
-            Object(g.a)(t, e),
+            Object(f.a)(t, e),
             Object(d.a)(t, [
               {
                 key: "render",
                 value: function() {
-                  return l.a.createElement("div", { className: Qa.a.block }, this.props.children);
+                  return l.a.createElement("div", { className: $a.a.block }, this.props.children);
                 },
               },
             ]),
             t
           );
         })(l.a.Component),
-        eo = n(210),
-        to = n.n(eo),
-        no = Object(u.b)("store")(
+        to = n(169),
+        no = n.n(to),
+        ao = Object(u.b)("store")(
           Object(u.c)(
             (function(e) {
               function t() {
                 return Object(m.a)(this, t), Object(h.a)(this, Object(p.a)(t).apply(this, arguments));
               }
               return (
-                Object(g.a)(t, e),
+                Object(f.a)(t, e),
                 Object(d.a)(t, [
                   {
                     key: "renderSuccess",
                     value: function() {
                       this.props.store;
-                      return l.a.createElement(y.a, { status: "success", title: "Done!" });
+                      return l.a.createElement(b.a, { status: "success", title: "Done!" });
                     },
                   },
                   {
                     key: "renderNoCompletion",
                     value: function() {
                       this.props.store;
-                      return l.a.createElement(y.a, { status: "success", title: "No more completions" });
+                      return l.a.createElement(b.a, { status: "success", title: "No more completions" });
                     },
                   },
                   {
                     key: "renderNothingToLabel",
                     value: function() {
                       this.props.store;
-                      return l.a.createElement(y.a, {
+                      return l.a.createElement(b.a, {
                         status: "success",
                         title: "No more data available for labeling",
                       });
@@ -6654,7 +6701,7 @@
                   {
                     key: "renderLoader",
                     value: function() {
-                      return l.a.createElement(y.a, { icon: l.a.createElement(w.a, { size: "large" }) });
+                      return l.a.createElement(b.a, { icon: l.a.createElement(w.a, { size: "large" }) });
                     },
                   },
                   {
@@ -6668,8 +6715,8 @@
                       var t = e.completionStore.currentCompletion.root;
                       return l.a.createElement(
                         "div",
-                        { className: to.a.editor },
-                        l.a.createElement(de, { store: e }),
+                        { className: no.a.editor },
+                        l.a.createElement(he, { store: e }),
                         l.a.createElement(
                           u.a,
                           { store: e },
@@ -6679,24 +6726,24 @@
                             e.hasInterface("panel") && l.a.createElement(ce, { store: e }),
                             e.showingDescription &&
                               l.a.createElement(
-                                $a,
+                                eo,
                                 null,
                                 l.a.createElement("div", { dangerouslySetInnerHTML: { __html: e.description } }),
                               ),
                             l.a.createElement(
                               "div",
-                              { className: "common-container" },
+                              { className: no.a.common },
                               l.a.createElement(
-                                $a,
+                                eo,
                                 null,
-                                C.renderItem(t),
-                                e.hasInterface("submit") && l.a.createElement(ie, null),
+                                _.renderItem(t),
+                                e.hasInterface("submit") && l.a.createElement(re, null),
                               ),
                               l.a.createElement(
                                 "div",
-                                { className: to.a.menu },
+                                { className: no.a.menu },
                                 e.hasInterface("completions") && l.a.createElement(ee, { store: e }),
-                                e.hasInterface("side-column") && l.a.createElement(De, { store: e }),
+                                e.hasInterface("side-column") && l.a.createElement(Me, { store: e }),
                               ),
                             ),
                           ),
@@ -6707,7 +6754,7 @@
                 ]),
                 t
               );
-            })(i.Component),
+            })(r.Component),
           ),
         );
       Boolean(
@@ -6715,33 +6762,82 @@
           "[::1]" === window.location.hostname ||
           window.location.hostname.match(/^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/),
       );
-      var ao = n(159),
-        oo = n.n(ao),
-        ro = b.m
+      var oo = n(49),
+        io = n.n(oo),
+        ro = y.m
           .model("Task", {
-            id: b.m.identifierNumber,
-            data: b.m.maybeNull(b.m.string),
-            project: b.m.maybeNull(b.m.number),
+            id: y.m.identifierNumber,
+            data: y.m.maybeNull(y.m.string),
+            project: y.m.maybeNull(y.m.number),
           })
           .views(function(e) {
             return {
               get app() {
-                return Object(b.e)(e);
+                return Object(y.e)(e);
               },
               get dataObj() {
-                return q.Checkers.isStringJSON(e.data) ? JSON.parse(e.data) : null;
+                return X.Checkers.isStringJSON(e.data)
+                  ? JSON.parse(e.data)
+                  : "object" === typeof e.data
+                  ? e.data
+                  : null;
               },
             };
           }),
-        io =
+        lo = y.m.model("UserStore", { pk: y.m.integer, firstName: y.m.string, lastName: y.m.string }),
+        so = n(170),
+        co = n.n(so),
+        uo = {};
+      var mo = {
+          addKey: function(e, t) {
+            uo[e] || ((uo[e] = !0), co()(e, "main", t));
+          },
+          unbindAll: function() {
+            for (var e = 0, t = Object.keys(uo); e < t.length; e++) {
+              var n = t[e];
+              co.a.unbind(n);
+            }
+            uo = {};
+          },
+          makeComb: function() {
+            for (var e = "1234567890qwertasdfgzxcvbyuiophjklnm".split(""), t = 0; t <= e.length; t++) {
+              var n = void 0;
+              if (((n = e[t]), !uo.hasOwnProperty(n))) return n;
+            }
+            return null;
+          },
+          setScope: function(e) {
+            co.a.setScope(e);
+          },
+        },
+        ho = y.m
+          .model("SettingsModel", {
+            enableHotkeys: y.m.optional(y.m.boolean, !0),
+            enablePanelHotkeys: y.m.optional(y.m.boolean, !0),
+            enableTooltips: y.m.optional(y.m.boolean, !0),
+          })
+          .actions(function(e) {
+            return {
+              toggleHotkeys: function() {
+                (e.enableHotkeys = !e.enableHotkeys), e.enableHotkeys ? mo.setScope("main") : mo.setScope("none");
+              },
+              togglePanelHotkeys: function() {
+                e.enablePanelHotkeys = !e.enablePanelHotkeys;
+              },
+              toggleTooltips: function() {
+                e.enableTooltips = !e.enableTooltips;
+              },
+            };
+          }),
+        po =
           (n(11),
-          b.m
+          y.m
             .model("TimeTraveller", {
-              history: b.m.array(b.m.frozen()),
+              history: y.m.array(y.m.frozen()),
               undoIdx: -1,
               targetPath: "",
               createdIdx: 1,
-              isFrozen: b.m.optional(b.m.boolean, !1),
+              isFrozen: y.m.optional(y.m.boolean, !1),
               frozenIdx: -1,
             })
             .views(function(e) {
@@ -6769,14 +6865,14 @@
                 },
                 afterCreate: function() {
                   var a = this;
-                  if (!(t = e.targetPath ? Object(b.l)(e, e.targetPath) : Object(b.d)(e).targetStore))
+                  if (!(t = e.targetPath ? Object(y.l)(e, e.targetPath) : Object(y.d)(e).targetStore))
                     throw new Error(
                       "Failed to find target store for TimeTraveller. Please provide `targetPath`  property, or a `targetStore` in the environment",
                     );
-                  (n = Object(b.k)(t, function(e) {
+                  (n = Object(y.k)(t, function(e) {
                     return a.addUndoState(e);
                   })),
-                    0 === e.history.length && this.addUndoState(Object(b.h)(t)),
+                    0 === e.history.length && this.addUndoState(Object(y.h)(t)),
                     (e.createdIdx = e.undoIdx);
                 },
                 beforeDestroy: function() {
@@ -6784,48 +6880,23 @@
                 },
                 undo: function() {
                   (e.isFrozen && e.frozenIdx <= e.undoIdx) ||
-                    (e.undoIdx--, (a = !0), Object(b.a)(t, e.history[e.undoIdx]));
+                    (e.undoIdx--, (a = !0), Object(y.a)(t, e.history[e.undoIdx]));
                 },
                 redo: function() {
-                  e.undoIdx++, (a = !0), Object(b.a)(t, e.history[e.undoIdx]);
+                  e.undoIdx++, (a = !0), Object(y.a)(t, e.history[e.undoIdx]);
                 },
                 set: function(n) {
-                  (e.undoIdx = n), (a = !0), Object(b.a)(t, e.history[e.undoIdx]);
+                  (e.undoIdx = n), (a = !0), Object(y.a)(t, e.history[e.undoIdx]);
                 },
                 reset: function() {
-                  (e.undoIdx = e.createdIdx), (a = !0), Object(b.a)(t, e.history[e.undoIdx]);
+                  (e.undoIdx = e.createdIdx), (a = !0), Object(y.a)(t, e.history[e.undoIdx]);
                 },
               };
             })),
-        lo = n(193),
-        so = n.n(lo),
-        co = {};
-      var uo = {
-          addKey: function(e, t) {
-            co[e] || ((co[e] = !0), so()(e, "main", t));
-          },
-          unbindAll: function() {
-            for (var e = 0, t = Object.keys(co); e < t.length; e++) {
-              var n = t[e];
-              so.a.unbind(n);
-            }
-            co = {};
-          },
-          makeComb: function() {
-            for (var e = "1234567890qwertasdfgzxcvbyuiophjklnm".split(""), t = 0; t <= e.length; t++) {
-              var n = void 0;
-              if (((n = e[t]), !co.hasOwnProperty(n))) return n;
-            }
-            return null;
-          },
-          setScope: function(e) {
-            so.a.setScope(e);
-          },
-        },
-        mo = b.m
+        fo = y.m
           .model("Relation", {
-            node1: b.m.reference(b.m.union(na, bn, $t, xa, An)),
-            node2: b.m.reference(b.m.union(na, bn, $t, xa, An)),
+            node1: y.m.reference(y.m.union(aa, bn, en, Ta, Dn)),
+            node2: y.m.reference(y.m.union(aa, bn, en, Ta, Dn)),
           })
           .actions(function(e) {
             return {
@@ -6836,7 +6907,7 @@
               },
             };
           }),
-        ho = b.m.model("RelationStore", { relations: b.m.array(mo) }).actions(function(e) {
+        go = y.m.model("RelationStore", { relations: y.m.array(fo) }).actions(function(e) {
           return {
             findRelations: function(t, n) {
               return n
@@ -6852,12 +6923,12 @@
             },
             addRelation: function(t, n) {
               if (!e.nodesRelated(t, n)) {
-                var a = mo.create({ node1: t, node2: n });
+                var a = fo.create({ node1: t, node2: n });
                 return e.relations.push(a), a;
               }
             },
             deleteRelation: function(e) {
-              Object(b.b)(e);
+              Object(y.b)(e);
             },
             deleteNodeRelation: function(t) {
               var n = e.findRelations(t);
@@ -6873,10 +6944,10 @@
             },
           };
         }),
-        po = b.m
+        vo = y.m
           .model("Normalization", {
-            node1: b.m.union(b.m.reference(na), b.m.reference(bn), b.m.reference($t)),
-            node2: b.m.union(b.m.reference(na), b.m.reference(bn), b.m.reference($t)),
+            node1: y.m.union(y.m.reference(aa), y.m.reference(bn), y.m.reference(en)),
+            node2: y.m.union(y.m.reference(aa), y.m.reference(bn), y.m.reference(en)),
           })
           .actions(function(e) {
             return {
@@ -6887,7 +6958,7 @@
               },
             };
           }),
-        go = b.m.model("NormalizationStore", { normalizations: b.m.array(po) }).actions(function(e) {
+        yo = y.m.model("NormalizationStore", { normalizations: y.m.array(vo) }).actions(function(e) {
           return {
             findNormalization: function(t, n) {
               return n
@@ -6900,12 +6971,12 @@
             },
             addNormalization: function(t, n) {
               if (!e.findNormalization(t, n)) {
-                var a = po.create({ node1: t, node2: n });
+                var a = vo.create({ node1: t, node2: n });
                 return e.normalizations.unshift(a), a;
               }
             },
             deleteNormalization: function(e) {
-              Object(b.b)(e);
+              Object(y.b)(e);
             },
             deleteNodeNormalization: function(t) {
               var n = e.findNormalization(t);
@@ -6913,8 +6984,8 @@
             },
           };
         }),
-        fo = b.m
-          .model("RegionStore", { regions: b.m.array(b.m.safeReference(b.m.union(na, bn, An, $t, xa))) })
+        bo = y.m
+          .model("RegionStore", { regions: y.m.array(y.m.safeReference(y.m.union(aa, bn, Dn, en, Ta))) })
           .actions(function(e) {
             return {
               addRegion: function(t) {
@@ -6932,7 +7003,7 @@
                 e.regions.forEach(function(e) {
                   return e.unselectRegion();
                 }),
-                  Object(b.e)(e).setHighlightedNode(null);
+                  Object(y.e)(e).setHighlightedNode(null);
               },
               unhighlightAll: function() {
                 e.regions.forEach(function(e) {
@@ -6941,40 +7012,41 @@
               },
             };
           }),
-        vo = b.m
+        wo = y.m
           .model("Completion", {
-            id: b.m.identifier,
-            pk: b.m.optional(b.m.integer, 1),
-            selected: b.m.optional(b.m.boolean, !1),
-            createdDate: b.m.optional(b.m.string, new Date().toISOString()),
-            createdAgo: b.m.maybeNull(b.m.string),
-            createdBy: b.m.optional(b.m.string, "Admin"),
-            honeypot: b.m.optional(b.m.boolean, !1),
-            root: Be.allModelsTypes(),
-            names: b.m.map(b.m.reference(Be.allModelsTypes())),
-            toNames: b.m.map(b.m.array(b.m.reference(Be.allModelsTypes()))),
-            history: b.m.optional(io, { targetPath: "../root" }),
-            dragMode: b.m.optional(b.m.boolean, !1),
-            relationMode: b.m.optional(b.m.boolean, !1),
-            relationStore: b.m.optional(ho, { relations: [] }),
-            normalizationMode: b.m.optional(b.m.boolean, !1),
-            normalizationStore: b.m.optional(go, { normalizations: [] }),
-            regionStore: b.m.optional(fo, { regions: [] }),
-            highlightedNode: b.m.maybeNull(
-              b.m.union(
-                b.m.safeReference(na),
-                b.m.safeReference(bn),
-                b.m.safeReference($t),
-                b.m.safeReference(xa),
-                b.m.safeReference(An),
-                b.m.safeReference(mn),
+            id: y.m.identifier,
+            pk: y.m.optional(y.m.integer, 1),
+            selected: y.m.optional(y.m.boolean, !1),
+            createdDate: y.m.optional(y.m.string, new Date().toISOString()),
+            createdAgo: y.m.maybeNull(y.m.string),
+            createdBy: y.m.optional(y.m.string, "Admin"),
+            honeypot: y.m.optional(y.m.boolean, !1),
+            prediction: y.m.optional(y.m.boolean, !1),
+            root: He.allModelsTypes(),
+            names: y.m.map(y.m.reference(He.allModelsTypes())),
+            toNames: y.m.map(y.m.array(y.m.reference(He.allModelsTypes()))),
+            history: y.m.optional(po, { targetPath: "../root" }),
+            dragMode: y.m.optional(y.m.boolean, !1),
+            relationMode: y.m.optional(y.m.boolean, !1),
+            relationStore: y.m.optional(go, { relations: [] }),
+            normalizationMode: y.m.optional(y.m.boolean, !1),
+            normalizationStore: y.m.optional(yo, { normalizations: [] }),
+            regionStore: y.m.optional(bo, { regions: [] }),
+            highlightedNode: y.m.maybeNull(
+              y.m.union(
+                y.m.safeReference(aa),
+                y.m.safeReference(bn),
+                y.m.safeReference(en),
+                y.m.safeReference(Ta),
+                y.m.safeReference(Dn),
+                y.m.safeReference(dn),
               ),
             ),
           })
           .views(function(e) {
             return {
               get store() {
-                return Object(b.e)(e, 2);
+                return Object(y.e)(e, 2);
               },
             };
           })
@@ -6984,8 +7056,8 @@
                 e.history = { targetPath: "../root" };
               },
               _updateServerState: function(t) {
-                var n = "/api/tasks/" + Object(b.e)(e, 3).task.id + "/completions/" + e.pk + "/";
-                Object(b.d)(e).patch(n, JSON.stringify(t));
+                var n = "/api/tasks/" + Object(y.e)(e, 3).task.id + "/completions/" + e.pk + "/";
+                Object(y.d)(e).patch(n, JSON.stringify(t));
               },
               setHoneypot: function() {
                 (e.honeypot = !0), e._updateServerState({ honeypot: e.honeypot });
@@ -7042,7 +7114,7 @@
                   e.regionStore.unselectAll();
               },
               deleteRegion: function(e) {
-                Object(b.b)(e);
+                Object(y.b)(e);
               },
               afterCreate: function() {
                 e.traverseTree(function(t) {
@@ -7051,18 +7123,18 @@
                     n ? n.push(t.id) : e.toNames.set(t.toname, [t.id]);
                   }
                 }),
-                  uo.unbindAll(),
+                  mo.unbindAll(),
                   e.traverseTree(function(e) {
-                    e && e.onHotKey && e.hotkey && uo.addKey(e.hotkey, e.onHotKey);
+                    e && e.onHotKey && e.hotkey && mo.addKey(e.hotkey, e.onHotKey);
                   }),
                   e.traverseTree(function(e) {
                     if (e && e.onHotKey && !e.hotkey) {
-                      var t = uo.makeComb();
+                      var t = mo.makeComb();
                       if (!t) return;
-                      (e.hotkey = t), uo.addKey(e.hotkey, e.onHotKey);
+                      (e.hotkey = t), mo.addKey(e.hotkey, e.onHotKey);
                     }
                   }),
-                  uo.setScope("main");
+                  mo.setScope("main");
               },
               serializeCompletion: function() {
                 var t = [];
@@ -7081,25 +7153,27 @@
                 })(t);
               },
               deserializeCompletion: function(t) {
-                t.forEach(function(t) {
-                  "relation" !== t.type
-                    ? t.to_name.split(",").forEach(function(n) {
-                        var a = e.names.get(n);
-                        if (!a) throw new Error("No model found for " + t.to_name);
-                        var o = e.names.get(t.from_name);
-                        if (!o) throw new Error("No model found for " + t.from_name);
-                        a.fromStateJSON(t, o);
-                      })
-                    : e.relationStore.deserializeRelation(
-                        e.regionStore.findRegion(t.from_id),
-                        e.regionStore.findRegion(t.to_id),
-                      );
-                });
+                var n = t;
+                "object" !== typeof n && (n = JSON.parse(n)),
+                  n.forEach(function(t) {
+                    "relation" !== t.type
+                      ? t.to_name.split(",").forEach(function(n) {
+                          var a = e.names.get(n);
+                          if (!a) throw new Error("No model found for " + t.to_name);
+                          var o = e.names.get(t.from_name);
+                          if (!o) throw new Error("No model found for " + t.from_name);
+                          a.fromStateJSON(t, o);
+                        })
+                      : e.relationStore.deserializeRelation(
+                          e.regionStore.findRegion(t.from_id),
+                          e.regionStore.findRegion(t.to_id),
+                        );
+                  });
               },
             };
           }),
-        bo = b.m
-          .model("CompletionStore", { completions: b.m.array(vo), selected: b.m.maybeNull(b.m.reference(vo)) })
+        ko = y.m
+          .model("CompletionStore", { completions: y.m.array(wo), selected: y.m.maybeNull(y.m.reference(wo)) })
           .views(function(e) {
             return {
               get currentCompletion() {
@@ -7111,19 +7185,19 @@
                 );
               },
               get store() {
-                return Object(b.e)(e);
+                return Object(y.e)(e);
               },
               get savedCompletions() {
                 return e.completions.filter(function(e) {
-                  return !e.was_generated;
+                  return e;
                 });
               },
             };
           })
           .actions(function(e) {
-            var t = Object(b.c)(
-              oo.a.mark(function t(n) {
-                return oo.a.wrap(
+            var t = Object(y.c)(
+              io.a.mark(function t(n) {
+                return io.a.wrap(
                   function(t) {
                     for (;;)
                       switch ((t.prev = t.next)) {
@@ -7131,7 +7205,7 @@
                           return (
                             (t.prev = 0),
                             (t.next = 3),
-                            Object(b.d)(e).remove("/api/tasks/" + e.store.task.id + "/completions/" + n + "/")
+                            Object(y.d)(e).remove("/api/tasks/" + e.store.task.id + "/completions/" + n + "/")
                           );
                         case 3:
                           t.sent, (t.next = 9);
@@ -7150,7 +7224,7 @@
               }),
             );
             function n(t) {
-              Object(b.b)(t), (e.selected = null), e.completions.length > 0 && e.selectCompletion(e.completions[0].id);
+              Object(y.b)(t), (e.selected = null), e.completions.length > 0 && e.selectCompletion(e.completions[0].id);
             }
             return {
               selectCompletion: function(t) {
@@ -7163,10 +7237,10 @@
                 (n.selected = !0), (e.selected = n);
               },
               addCompletion: function(t, n) {
-                var a = vo.create(t);
+                var a = wo.create(t);
                 return (
                   e.store.task &&
-                    "initial" == n &&
+                    "initial" === n &&
                     a.traverseTree(function(t) {
                       return t.updateValue && t.updateValue(e.store);
                     }),
@@ -7179,21 +7253,21 @@
               },
               destroyCompletion: n,
               addInitialCompletion: function() {
-                var t = C.treeToModel(e.store.config),
+                var t = _.treeToModel(e.store.config),
                   n = k.getModelByTag(t.type).create(t),
                   a = { id: E(), root: n };
                 if (e.store.expert) {
                   var o = e.store.expert;
-                  a.createdBy = o.firstName + " " + o.lastName;
-                } else a.createdBy = "Admin";
+                  a.createdBy = "".concat(o.firstName, " ").concat(o.lastName);
+                }
                 return e.addCompletion(a, "initial");
               },
               addSavedCompletion: function(t) {
-                var n = C.treeToModel(e.store.config),
+                var n = _.treeToModel(e.store.config),
                   a = k.getModelByTag(n.type).create(n),
                   o = {
                     pk: t.id,
-                    id: E(),
+                    id: t.id || E(),
                     createdAgo: t.created_ago,
                     createdBy: t.created_username,
                     honeypot: t.honeypot,
@@ -7203,7 +7277,7 @@
               },
             };
           }),
-        yo = {
+        xo = {
           MAIN: "/api",
           TASKS: "/tasks",
           COMPLETIONS: "/completions",
@@ -7212,80 +7286,61 @@
           NEXT: "/next",
           EXPERT_INSRUCTIONS: "/expert_instruction",
         },
-        wo = b.m.model("UserStore", { pk: b.m.integer, firstName: b.m.string, lastName: b.m.string }),
-        ko = b.m
-          .model("SettingsModel", {
-            enableHotkeys: b.m.optional(b.m.boolean, !0),
-            enablePanelHotkeys: b.m.optional(b.m.boolean, !0),
-            enableTooltips: b.m.optional(b.m.boolean, !0),
-          })
-          .actions(function(e) {
-            return {
-              toggleHotkeys: function() {
-                (e.enableHotkeys = !e.enableHotkeys), e.enableHotkeys ? uo.setScope("main") : uo.setScope("none");
-              },
-              togglePanelHotkeys: function() {
-                e.enablePanelHotkeys = !e.enablePanelHotkeys;
-              },
-              toggleTooltips: function() {
-                e.enableTooltips = !e.enableTooltips;
-              },
-            };
-          }),
-        xo = b.m
+        To = y.m
           .model("AppStore", {
-            config: b.m.string,
-            task: b.m.maybeNull(ro),
-            taskID: b.m.maybeNull(b.m.number),
-            interfaces: b.m.array(b.m.string),
-            completionStore: b.m.optional(bo, { completions: [] }),
-            projectID: b.m.integer,
-            expert: wo,
-            debug: b.m.optional(b.m.boolean, !0),
-            settings: b.m.optional(ko, {}),
-            showingSettings: b.m.optional(b.m.boolean, !1),
-            showingDescription: b.m.optional(b.m.boolean, !1),
-            description: b.m.maybeNull(b.m.string),
-            isLoading: b.m.optional(b.m.boolean, !1),
-            noTask: b.m.optional(b.m.boolean, !1),
-            labeledSuccess: b.m.optional(b.m.boolean, !1),
+            config: y.m.string,
+            task: y.m.maybeNull(ro),
+            taskID: y.m.maybeNull(y.m.number),
+            interfaces: y.m.array(y.m.string),
+            explore: y.m.optional(y.m.boolean, !1),
+            completionStore: y.m.optional(ko, { completions: [] }),
+            projectID: y.m.integer,
+            expert: lo,
+            debug: y.m.optional(y.m.boolean, !0),
+            settings: y.m.optional(ho, {}),
+            showingSettings: y.m.optional(y.m.boolean, !1),
+            showingDescription: y.m.optional(y.m.boolean, !1),
+            description: y.m.maybeNull(y.m.string),
+            isLoading: y.m.optional(y.m.boolean, !1),
+            noTask: y.m.optional(y.m.boolean, !1),
+            labeledSuccess: y.m.optional(y.m.boolean, !1),
           })
           .views(function(e) {
             return {
               get fetch() {
-                return Object(b.d)(e).fetch;
+                return Object(y.d)(e).fetch;
               },
               get alert() {
-                return Object(b.d)(e).alert;
+                return Object(y.d)(e).alert;
               },
               get post() {
-                return Object(b.d)(e).post;
+                return Object(y.d)(e).post;
               },
             };
           })
           .actions(function(e) {
-            var t = Object(b.c)(
-              oo.a.mark(function t() {
+            var t = Object(y.c)(
+              io.a.mark(function t() {
                 var n, a;
-                return oo.a.wrap(function(t) {
+                return io.a.wrap(function(t) {
                   for (;;)
                     switch ((t.prev = t.next)) {
                       case 0:
                         return (
                           (n = ""
-                            .concat(yo.MAIN)
-                            .concat(yo.PROJECTS, "/")
+                            .concat(xo.MAIN)
+                            .concat(xo.PROJECTS, "/")
                             .concat(e.projectID)
-                            .concat(yo.EXPERT_INSRUCTIONS)),
+                            .concat(xo.EXPERT_INSRUCTIONS)),
                           (t.next = 3),
                           e.fetch(n)
                         );
                       case 3:
                         200 === (a = t.sent).status
                           ? a.text().then(function(t) {
-                              e.setDescription(t);
+                              t.length ? e.setDescription(t) : e.setDescription("No instructions for this task.");
                             })
-                          : e.setDescription("No instructions for this task"),
+                          : e.setDescription("No instructions for this task."),
                           (e.showingDescription = !0);
                       case 6:
                       case "end":
@@ -7303,22 +7358,24 @@
               return e.taskID
                 ? o(
                     ""
-                      .concat(yo.MAIN)
-                      .concat(yo.TASKS, "/")
+                      .concat(xo.MAIN)
+                      .concat(xo.TASKS, "/")
                       .concat(e.taskID, "/"),
                   )
-                : o(
+                : e.explore && e.projectID
+                ? o(
                     ""
-                      .concat(yo.MAIN)
-                      .concat(yo.PROJECTS, "/")
+                      .concat(xo.MAIN)
+                      .concat(xo.PROJECTS, "/")
                       .concat(e.projectID)
-                      .concat(yo.NEXT),
-                  );
+                      .concat(xo.NEXT),
+                  )
+                : void 0;
             }
-            var o = Object(b.c)(
-                oo.a.mark(function t(n) {
+            var o = Object(y.c)(
+                io.a.mark(function t(n) {
                   var a;
-                  return oo.a.wrap(
+                  return io.a.wrap(
                     function(t) {
                       for (;;)
                         switch ((t.prev = t.next)) {
@@ -7347,7 +7404,7 @@
                                       return t.updateValue && t.updateValue(e);
                                     }),
                                       e.completionStore.selectCompletion(o.id),
-                                      o.deserializeCompletion(JSON.parse(a.result)),
+                                      o.deserializeCompletion(a.result),
                                       o.reinitHistory();
                                   }
                                 }
@@ -7373,9 +7430,9 @@
                   );
                 }),
               ),
-              r = Object(b.c)(
-                oo.a.mark(function t() {
-                  return oo.a.wrap(
+              i = Object(y.c)(
+                io.a.mark(function t() {
+                  return io.a.wrap(
                     function(t) {
                       for (;;)
                         switch ((t.prev = t.next)) {
@@ -7386,10 +7443,10 @@
                               (t.next = 4),
                               e.post(
                                 ""
-                                  .concat(yo.MAIN)
-                                  .concat(yo.TASKS, "/")
+                                  .concat(xo.MAIN)
+                                  .concat(xo.TASKS, "/")
                                   .concat(e.task.id)
-                                  .concat(yo.CANCEL),
+                                  .concat(xo.CANCEL),
                                 JSON.stringify({ data: JSON.stringify({ error: "cancelled" }) }),
                               )
                             );
@@ -7408,96 +7465,129 @@
                   );
                 }),
               ),
-              i = Object(b.c)(
-                oo.a.mark(function t() {
-                  var o, r, i, l;
-                  return oo.a.wrap(
-                    function(t) {
-                      for (;;)
-                        switch ((t.prev = t.next)) {
-                          case 0:
-                            if (
-                              ((o = e.completionStore.selected).beforeSend(),
-                              (r = o.serializeCompletion()),
-                              !e.hasInterface("submit:check-empty") || 0 !== r.length)
-                            ) {
-                              t.next = 6;
+              r = function(t) {
+                return Object(y.c)(
+                  io.a.mark(function o() {
+                    var i, r, l, s;
+                    return io.a.wrap(
+                      function(o) {
+                        for (;;)
+                          switch ((o.prev = o.next)) {
+                            case 0:
+                              if (
+                                ((i = e.completionStore.selected).beforeSend(),
+                                (r = i.serializeCompletion()),
+                                !e.hasInterface("submit:check-empty") || 0 !== r.length)
+                              ) {
+                                o.next = 6;
+                                break;
+                              }
+                              return alert("You need to label at least something!"), o.abrupt("return");
+                            case 6:
+                              if (
+                                (e.markLoading(!0),
+                                (o.prev = 7),
+                                (l = Object(y.h)(i)),
+                                (s = JSON.stringify({ state: JSON.stringify(l), result: r })),
+                                "patch" !== t)
+                              ) {
+                                o.next = 15;
+                                break;
+                              }
+                              return (
+                                (o.next = 13),
+                                Object(y.d)(e).patch(
+                                  ""
+                                    .concat(xo.MAIN)
+                                    .concat(xo.TASKS, "/")
+                                    .concat(e.task.id)
+                                    .concat(xo.COMPLETIONS, "/")
+                                    .concat(i.pk),
+                                  s,
+                                )
+                              );
+                            case 13:
+                              o.next = 18;
                               break;
-                            }
-                            return alert("You need to label at least something!"), t.abrupt("return");
-                          case 6:
-                            return (
-                              e.markLoading(!0),
-                              (t.prev = 7),
-                              (i = Object(b.h)(o)),
-                              (l = JSON.stringify({ state: JSON.stringify(i), result: r })),
-                              (t.next = 12),
-                              e.post(
-                                ""
-                                  .concat(yo.MAIN)
-                                  .concat(yo.TASKS, "/")
-                                  .concat(e.task.id)
-                                  .concat(yo.COMPLETIONS, "/"),
-                                l,
-                              )
-                            );
-                          case 12:
-                            if (!n("submit:load")) {
-                              t.next = 17;
+                            case 15:
+                              if ("post" !== t) {
+                                o.next = 18;
+                                break;
+                              }
+                              return (
+                                (o.next = 18),
+                                e.post(
+                                  ""
+                                    .concat(xo.MAIN)
+                                    .concat(xo.TASKS, "/")
+                                    .concat(e.task.id)
+                                    .concat(xo.COMPLETIONS, "/"),
+                                  s,
+                                )
+                              );
+                            case 18:
+                              if (!n("submit:load")) {
+                                o.next = 23;
+                                break;
+                              }
+                              return e.resetState(), o.abrupt("return", a());
+                            case 23:
+                              e.markLoading(!1), (e.labeledSuccess = !0);
+                            case 25:
+                              delete l.history, (o.next = 31);
                               break;
-                            }
-                            return e.resetState(), t.abrupt("return", a());
-                          case 17:
-                            e.markLoading(!1), (e.labeledSuccess = !0);
-                          case 19:
-                            delete i.history, (t.next = 25);
-                            break;
-                          case 22:
-                            (t.prev = 22), (t.t0 = t.catch(7)), console.error("Failed to send task ", t.t0);
-                          case 25:
-                          case "end":
-                            return t.stop();
-                        }
-                    },
-                    t,
-                    null,
-                    [[7, 22]],
-                  );
-                }),
-              );
+                            case 28:
+                              (o.prev = 28), (o.t0 = o.catch(7)), console.error("Failed to send task ", o.t0);
+                            case 31:
+                            case "end":
+                              return o.stop();
+                          }
+                      },
+                      o,
+                      null,
+                      [[7, 28]],
+                    );
+                  }),
+                );
+              },
+              l = r("patch");
             return {
               afterCreate: function() {
-                e.task || e.loadTask(),
-                  uo.addKey("ctrl+enter", e.sendTask),
-                  e.hasInterface("submit:skip") && uo.addKey("ctrl+space", e.skipTask),
-                  uo.addKey("ctrl+backspace", function() {
+                e.loadTask(),
+                  mo.addKey("ctrl+enter", e.sendTask),
+                  e.hasInterface("submit:skip") && mo.addKey("ctrl+space", e.skipTask),
+                  mo.addKey("ctrl+backspace", function() {
                     e.completionStore.selected.deleteAllRegions();
                   }),
-                  uo.addKey("ctrl+z", function() {
+                  mo.addKey("ctrl+z", function() {
                     var t = e.completionStore.selected.history;
                     t && t.canUndo && t.undo();
                   }),
-                  uo.addKey("escape", function() {
+                  mo.addKey("escape", function() {
                     var t = e.completionStore.selected;
                     t && t.relationMode && t.stopRelationMode();
                   }),
-                  uo.addKey("backspace", function() {
+                  mo.addKey("backspace", function() {
                     var t = e.completionStore.selected;
                     t && t.highlightedNode && t.highlightedNode.deleteRegion();
                   });
               },
               loadTask: a,
               addTask: function(t) {
-                e.task = ro.create(t);
+                t &&
+                  !X.Checkers.isString(t.data) &&
+                  (t = Object(N.a)({}, t, Object(q.a)({}, t.data, JSON.stringify(t.data)))),
+                  (e.task = ro.create(t));
               },
               hasInterface: n,
-              skipTask: r,
-              sendTask: i,
+              skipTask: i,
+              sendTask: r("post"),
+              rewriteTask: l,
               markLoading: function(t) {
                 e.isLoading = t;
               },
               resetState: function() {
-                e.completionStore = bo.create({ completions: [] });
+                e.completionStore = ko.create({ completions: [] });
                 var t = e.completionStore.addInitialCompletion();
                 e.completionStore.selectCompletion(t.id);
               },
@@ -7516,17 +7606,15 @@
                   a = e.completionStore,
                   o = [];
                 if (n && n.length)
-                  for (var r = 0; r < n.length; r++) {
-                    var i = n[r];
-                    !0 !== i.was_cancelled && o.push(i);
+                  for (var i = 0; i < n.length; i++) {
+                    var r = n[i];
+                    !0 !== r.was_cancelled && o.push(r);
                   }
                 if (0 === a.completions.length) {
                   var l = e.completionStore.addInitialCompletion();
                   if ((e.completionStore.selectCompletion(l.id), o.length > 0)) {
-                    var s = o[0].result;
-                    "string" === typeof o[0].result && (s = JSON.parse(o[0].result)),
-                      l.deserializeCompletion(s),
-                      l.reinitHistory();
+                    for (var s = 0; s < o.length; s++) l.deserializeCompletion(o[s].result);
+                    l.reinitHistory();
                   }
                 }
               },
@@ -7538,18 +7626,19 @@
               },
             };
           });
-      var To = {
+      var No = {
           getData: function() {
             window.taskData && window.taskData.data && (window.taskData.data = JSON.stringify(window.taskData.data));
             var e = {
               projectID: window.projectID,
               isLoading: !1,
               config: window.editorAppConfig,
-              task: window.taskData,
               taskID: window.taskID,
+              task: window.taskData,
               expert: window.expertData,
               debug: window.debugEditor,
               interfaces: window.editorInterfaces ? window.editorInterfaces : ["basic", "completions"],
+              explore: window.explore,
             };
             return (
               window.preRender && (e.task = window.taskData),
@@ -7566,50 +7655,50 @@
           },
           rootElement: function() {
             var e = document.createElement("div"),
-              t = document.getElementById("root");
+              t = document.getElementById("label-studio");
             return (t.innerHTML = ""), t.appendChild(e), e;
           },
         },
-        No = n(317),
-        So = n(318),
-        Io = n.n(So),
-        Eo = (n(319), n(320), Io.a, n(321)),
-        Oo = n.n(Eo),
-        _o = (n(322), n(323), Oo.a, n(324)),
-        Ro = n.n(_o),
-        Co = n(325),
-        jo = n(326),
-        Ao = { config: Ro.a, tasks: Co, completion: jo },
-        Do = n(327),
-        Mo = n.n(Do),
-        Bo = (n(328), n(329), Mo.a, n(330)),
-        Ho = n.n(Bo),
-        Wo = (n(331), n(332), Ho.a, n(333)),
-        Po = n.n(Wo),
-        zo = (n(334), n(335), Po.a, n(336)),
-        Lo = n.n(zo),
-        Fo = (n(337), n(338), Lo.a, n(339)),
-        Jo = n.n(Fo),
-        Go = (n(340), n(341), Jo.a, Ao);
-      function Uo() {
+        So = n(314),
+        Io = n(315),
+        Eo = n.n(Io),
+        Oo = (n(316), n(317), Eo.a, n(318)),
+        Ro = n.n(Oo),
+        Co = n(319),
+        _o = n(320),
+        jo = { config: Ro.a, tasks: Co, completion: _o },
+        Ao = n(321),
+        Do = n.n(Ao),
+        Mo = (n(322), n(323), Do.a, n(324)),
+        Bo = n.n(Mo),
+        Ho = (n(325), n(326), Bo.a, n(327)),
+        Wo = n.n(Ho),
+        Po = (n(328), n(329), Wo.a, n(330)),
+        zo = n.n(Po),
+        Lo = (n(331), n(332), zo.a, n(333)),
+        Fo = n.n(Lo),
+        Jo = (n(334), n(335), Fo.a, n(336)),
+        Go = n.n(Jo),
+        Uo = (n(337), n(338), Go.a, jo);
+      function Vo() {
         return (function() {
           var e = {
+            developmentEnv: !0,
             projectID: 1,
+            viewCompletion: !0,
             isLoading: !1,
-            taskID: 1,
             expert: { pk: 1, lastName: "Jones", firstName: "Oliver" },
             debug: -1 !== window.location.search.indexOf("debug=true"),
             interfaces: window.editorInterfaces
               ? window.editorInterfaces
-              : ["basic", "completions", "submit", "panel", "side-column"],
-            task: { data: JSON.stringify(Go.tasks[0]), project: 10, id: 100, completions: [] },
+              : ["basic", "completions", "submit", "panel", "side-column", "submit:rewrite"],
+            task: { data: JSON.stringify(Uo.tasks[0]), project: 10, id: 100, completions: [] },
           };
           return (
-            Go.completion &&
-              (e = Object(N.a)({}, e, {
-                task: Object(N.a)({}, e.task, { completions: [{ result: Go.completion.completions[0].result }] }),
-              })),
-            fetch(Go.config)
+            e.viewCompletion &&
+              Uo.completion &&
+              (e = Object(N.a)({}, e, { task: Object(N.a)({}, e.task, { completions: Uo.completion.completions }) })),
+            fetch(Uo.config)
               .then(function(e) {
                 return e.text();
               })
@@ -7619,15 +7708,15 @@
           );
         })();
       }
-      function Vo() {
-        return (Vo = Object(No.a)(
-          oo.a.mark(function e() {
+      function Yo() {
+        return (Yo = Object(So.a)(
+          io.a.mark(function e() {
             var t, n;
-            return oo.a.wrap(function(e) {
+            return io.a.wrap(function(e) {
               for (;;)
                 switch ((e.prev = e.next)) {
                   case 0:
-                    return (e.next = 2), Uo();
+                    return (e.next = 2), Vo();
                   case 2:
                     return (
                       (t = e.sent),
@@ -7642,27 +7731,19 @@
           }),
         )).apply(this, arguments);
       }
-      var Yo = {
+      var qo = {
         getState: function() {
-          return Vo.apply(this, arguments);
+          return Yo.apply(this, arguments);
         },
-        getData: Uo,
+        getData: Vo,
         rootElement: function() {
           var e = document.createElement("div"),
-            t = document.getElementById("root");
-          return (
-            (t.innerHTML = ""),
-            t.appendChild(e),
-            (t.style.marginTop = "10px"),
-            (t.style.marginBottom = "10px"),
-            (t.style.marginLeft = "10px"),
-            (t.style.marginRight = "10px"),
-            e
-          );
+            t = document.getElementById("label-studio");
+          return (t.innerHTML = ""), t.appendChild(e), (t.style.margin = "0 auto"), e;
         },
       };
-      Yo = To;
-      var Xo = xo.create(Yo.getData(), {
+      qo = No;
+      var Xo = To.create(qo.getData(), {
         fetch: T.fetcher,
         patch: T.patch,
         post: T.poster,
@@ -7671,14 +7752,41 @@
           return console.log(e);
         },
       });
-      Xo.initializeStore(Yo.getState()),
+      Xo.initializeStore(qo.getState()),
         (window.Htx = Xo),
-        c.a.render(l.a.createElement(u.a, { store: Xo }, l.a.createElement(no, null)), Yo.rootElement()),
+        c.a.render(l.a.createElement(u.a, { store: Xo }, l.a.createElement(ao, null)), qo.rootElement()),
         "serviceWorker" in navigator &&
           navigator.serviceWorker.ready.then(function(e) {
             e.unregister();
           });
     },
+    80: function(e, t, n) {
+      e.exports = {
+        block: "Entity_block__2XspI",
+        button: "Entity_button__bWlfa",
+        labels: "Entity_labels__tjrgz",
+        tag: "Entity_tag__35G8T",
+      };
+    },
+    91: function(e, t, n) {
+      e.exports = {
+        skip: "Controls_skip__10Js5",
+        task: "Controls_task__15i-O",
+        container: "Controls_container__3DhBP",
+        block: "Controls_block__1OeQq",
+        wrapper: "Controls_wrapper__GzSbP",
+        rewrite: "Controls_rewrite__3zE7C",
+      };
+    },
+    92: function(e, t, n) {
+      e.exports = {
+        block: "Dialog_block__1YBml",
+        block_selected: "Dialog_block_selected__3zZ50",
+        name: "Dialog_name__3tjId",
+        tag: "Dialog_tag__1SHCG",
+        date: "Dialog_date__1mcxh",
+      };
+    },
   },
-  [[356, 2, 1]],
+  [[353, 2, 1]],
 ]);

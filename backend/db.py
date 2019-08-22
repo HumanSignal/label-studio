@@ -170,7 +170,13 @@ def get_completion(task_id):
     except ValueError:
         return None
     filename = os.path.join(c['output_dir'], str(task_id) + '.json')
-    return json.load(open(filename)) if os.path.exists(filename) else None
+    if os.path.exists(filename):
+        data = json.load(open(filename))
+        data['completions'][0]['id'] = task_id
+
+    else:
+        data = None
+    return data
 
 
 def save_completion(task_id, completion):

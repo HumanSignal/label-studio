@@ -29,6 +29,11 @@ export default inject("store")(
                 Skip {skipButton}
               </Button>
             )}
+            {store.hasInterface("submit:rewrite") && (
+              <Button type="primary" icon="rollback" onClick={store.rewriteTask}>
+                Update
+              </Button>
+            )}
             <Button type="primary" icon="check" onClick={store.sendTask} className={styles.submit}>
               Submit {submitButton}
             </Button>

@@ -134,16 +134,15 @@ export default class Waveform extends React.Component {
     super(props);
 
     this.state = {
-      playing: false,
       src: this.props.src,
       pos: 0,
       colors: {
         waveColor: "#97A0AF",
         progressColor: "#52c41a",
       },
-      zoom: this.props.zoom,
-      speed: this.props.speed,
-      volume: this.props.volume,
+      zoom: 20,
+      speed: 1,
+      volume: 1,
     };
   }
 
@@ -185,37 +184,44 @@ export default class Waveform extends React.Component {
 
     this.$waveform = this.$el.querySelector("#wave");
 
-    this.regions = RegionsPlugin.create({
-      dragSelection: {
-        slop: 5, // slop
-      },
-    });
-
-    this.wavesurfer = WaveSurfer.create({
+    let wavesurferConfigure = {
       container: this.$waveform,
       waveColor: this.state.colors.waveColor,
+      height: this.props.height,
       backend: "MediaElement",
       progressColor: this.state.colors.progressColor,
-      plugins: [
-        this.regions,
-        TimelinePlugin.create({
-          container: "#timeline", // the element in which to place the timeline, or a CSS selector to find it
-          formatTimeCallback: formatTimeCallback, // custom time format callback. (Function which receives number of seconds and returns formatted string)
-          timeInterval: timeInterval, // number of intervals that records consists of. Usually it is equal to the duration in minutes. (Integer or function which receives pxPerSec value and returns value)
-          primaryLabelInterval: primaryLabelInterval, // number of primary time labels. (Integer or function which receives pxPerSec value and reurns value)
-          secondaryLabelInterval: secondaryLabelInterval, // number of secondary time labels (Time labels between primary labels, integer or function which receives pxPerSec value and reurns value).
-          primaryColor: "blue", // the color of the modulo-ten notch lines (e.g. 10sec, 20sec). The default is '#000'.
-          secondaryColor: "blue", // the color of the non-modulo-ten notch lines. The default is '#c0c0c0'.
-          primaryFontColor: "#000", // the color of the non-modulo-ten time labels (e.g. 10sec, 20sec). The default is '#000'.
-          secondaryFontColor: "#000",
-        }),
-        CursorPlugin.create({
-          wrapper: this.$waveform,
-          showTime: true,
-          opacity: 1,
-        }),
-      ],
-    });
+    };
+
+    if (this.props.regions) {
+      wavesurferConfigure = {
+        ...wavesurferConfigure,
+        plugins: [
+          RegionsPlugin.create({
+            dragSelection: {
+              slop: 5, // slop
+            },
+          }),
+          TimelinePlugin.create({
+            container: "#timeline", // the element in which to place the timeline, or a CSS selector to find it
+            formatTimeCallback: formatTimeCallback, // custom time format callback. (Function which receives number of seconds and returns formatted string)
+            timeInterval: timeInterval, // number of intervals that records consists of. Usually it is equal to the duration in minutes. (Integer or function which receives pxPerSec value and returns value)
+            primaryLabelInterval: primaryLabelInterval, // number of primary time labels. (Integer or function which receives pxPerSec value and reurns value)
+            secondaryLabelInterval: secondaryLabelInterval, // number of secondary time labels (Time labels between primary labels, integer or function which receives pxPerSec value and reurns value).
+            primaryColor: "blue", // the color of the modulo-ten notch lines (e.g. 10sec, 20sec). The default is '#000'.
+            secondaryColor: "blue", // the color of the non-modulo-ten notch lines. The default is '#c0c0c0'.
+            primaryFontColor: "#000", // the color of the non-modulo-ten time labels (e.g. 10sec, 20sec). The default is '#000'.
+            secondaryFontColor: "#000",
+          }),
+          CursorPlugin.create({
+            wrapper: this.$waveform,
+            showTime: true,
+            opacity: 1,
+          }),
+        ],
+      };
+    }
+
+    this.wavesurfer = WaveSurfer.create(wavesurferConfigure);
 
     /**
      * Load data
@@ -229,39 +235,41 @@ export default class Waveform extends React.Component {
 
     const self = this;
 
-    /**
-     * Mouse enter on region
-     */
-    this.wavesurfer.on("region-mouseenter", reg => {
-      reg._region.onMouseOver();
-    });
-
-    /**
-     * Mouse leave on region
-     */
-    this.wavesurfer.on("region-mouseleave", reg => {
-      reg._region.onMouseLeave();
-    });
-
-    /**
-     * Add region to wave
-     */
-    this.wavesurfer.on("region-created", reg => {
-      const region = self.props.addRegion(reg);
-      reg._region = region;
-      reg.color = region.selectedregionbg;
-
-      reg.on("click", () => region.onClick(self.wavesurfer));
-      reg.on("update-end", () => region.onUpdateEnd(self.wavesurfer));
-
-      reg.on("dblclick", e => {
-        window.setTimeout(function() {
-          reg.play();
-        }, 0);
+    if (this.props.regions) {
+      /**
+       * Mouse enter on region
+       */
+      this.wavesurfer.on("region-mouseenter", reg => {
+        reg._region.onMouseOver();
       });
 
-      reg.on("out", () => {});
-    });
+      /**
+       * Mouse leave on region
+       */
+      this.wavesurfer.on("region-mouseleave", reg => {
+        reg._region.onMouseLeave();
+      });
+
+      /**
+       * Add region to wave
+       */
+      this.wavesurfer.on("region-created", reg => {
+        const region = self.props.addRegion(reg);
+        reg._region = region;
+        reg.color = region.selectedregionbg;
+
+        reg.on("click", () => region.onClick(self.wavesurfer));
+        reg.on("update-end", () => region.onUpdateEnd(self.wavesurfer));
+
+        reg.on("dblclick", e => {
+          window.setTimeout(function() {
+            reg.play();
+          }, 0);
+        });
+
+        reg.on("out", () => {});
+      });
+    }
 
     /**
      * Handler of slider
@@ -288,10 +296,9 @@ export default class Waveform extends React.Component {
      */
     this.wavesurfer.on("play", self.props.handlePlay);
 
-    /**
-     *
-     */
-    this.props.onLoad(this.wavesurfer);
+    if (this.props.regions) {
+      this.props.onLoad(this.wavesurfer);
+    }
   }
 
   render() {
@@ -302,56 +309,60 @@ export default class Waveform extends React.Component {
         <div id="timeline" />
 
         <Row className={styles.menu}>
-          <Col span={24}>
-            <Col span={12}>
-              Speed:{" "}
-              <InputNumber
-                min={0.5}
-                max={3}
-                value={this.state.speed}
-                onChange={value => {
-                  this.onChangeSpeed(value);
-                }}
-              />
-            </Col>
+          {this.props.speed && (
             <Col span={24}>
-              <Slider
-                min={0.5}
-                max={3}
-                step={0.1}
-                value={typeof this.state.speed === "number" ? this.state.speed : 1}
-                onChange={range => {
-                  this.onChangeSpeed(range);
-                }}
-              />
+              <Col span={12}>
+                Speed:{" "}
+                <InputNumber
+                  min={0.5}
+                  max={3}
+                  value={this.state.speed}
+                  onChange={value => {
+                    this.onChangeSpeed(value);
+                  }}
+                />
+              </Col>
+              <Col span={24}>
+                <Slider
+                  min={0.5}
+                  max={3}
+                  step={0.1}
+                  value={typeof this.state.speed === "number" ? this.state.speed : 1}
+                  onChange={range => {
+                    this.onChangeSpeed(range);
+                  }}
+                />
+              </Col>
             </Col>
-          </Col>
-          <Col span={24}>
-            <Col span={12}>
-              Volume:{" "}
-              <InputNumber
-                min={0}
-                max={1}
-                value={this.state.volume}
-                step={0.1}
-                onChange={value => {
-                  this.onChangeVolume(value);
-                }}
-              />
-            </Col>
+          )}
+          {this.props.volume && (
             <Col span={24}>
-              <Slider
-                min={0}
-                max={1}
-                step={0.1}
-                value={typeof this.state.volume === "number" ? this.state.volume : 1}
-                onChange={value => {
-                  this.onChangeVolume(value);
-                }}
-              />
+              <Col span={12}>
+                Volume:{" "}
+                <InputNumber
+                  min={0}
+                  max={1}
+                  value={this.state.volume}
+                  step={0.1}
+                  onChange={value => {
+                    this.onChangeVolume(value);
+                  }}
+                />
+              </Col>
+              <Col span={24}>
+                <Slider
+                  min={0}
+                  max={1}
+                  step={0.1}
+                  value={typeof this.state.volume === "number" ? this.state.volume : 1}
+                  onChange={value => {
+                    this.onChangeVolume(value);
+                  }}
+                />
+              </Col>
             </Col>
-          </Col>
-          {this.props.haszoom === "true" && (
+          )}
+          {this.props.zoom && (
             <Col span={24}>
               <Col span={12}>
                 Zoom:{" "}

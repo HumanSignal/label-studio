@@ -39,3 +39,6 @@ coverage/
 
 # Examples of local env
 src/examples
+
+# XML configs
+build/static/media/config.*.xml

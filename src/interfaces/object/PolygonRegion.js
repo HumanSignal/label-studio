@@ -214,23 +214,6 @@ const Model = types
         return [res_w, res_h];
       });
 
-      // 1024 - 100
-      // 750 - x
-
-      // x = (750 * 100) / 1024
-      // x = 75
-
-      // 300 - 75
-      // y - 100
-
-      // y = (100 * 300) / 75
-      // y = 500
-
-      // 1024 - 100
-      // 500 - z
-
-      // z = (y * 100) / 1024
-
       const parent = self.parent;
       const buildTree = obj => {
         const tree = {

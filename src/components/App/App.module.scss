@@ -39,3 +39,15 @@
     border: 0;
   }
 }
+
+.common {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+@media only screen and (max-width: 768px) {
+  .common {
+    display: initial !important;
+  }
+}

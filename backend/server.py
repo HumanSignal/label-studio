@@ -154,7 +154,7 @@ def api_all_completion_ids():
 @app.route('/api/tasks/<task_id>/completions/', methods=['POST', 'DELETE'])
 @exception_treatment
 def api_completions(task_id):
-    """ Delete or save completion to output_dir with the same name as task_id
+    """ Delete or save new completion to output_dir with the same name as task_id
     """
     global c
 
@@ -173,6 +173,24 @@ def api_completions(task_id):
             return answer(422, 'Completion removing is not allowed in server config')
     else:
         return answer(500, 'Incorrect request method')
+
+
+@app.route('/api/tasks/<task_id>/completions/<completion_id>', methods=['PATCH'])
+@exception_treatment
+def api_completion_rewrite(task_id, completion_id):
+    """ Rewrite existing completion with patch.
+        This is technical api call for editor testing only. It's used for Rewrite button in editor.
+    """
+    global c
+
+    completion = request.json
+    assert task_id == completion_id, \
+        f'Task ID != Completion ID, {task_id} != {completion_id}'
+
+    completion.pop('state', None)  # remove editor state
+    db.save_completion(task_id, completion)
+    log.info(msg='Completion saved', extra={'task_id': task_id, 'output': request.json})
+    return answer(201, 'ok')
 
 
 @app.route('/api/projects/1/expert_instruction')

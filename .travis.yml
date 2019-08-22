@@ -1,9 +1,18 @@
 language: node_js
+
+branches:
+  only:
+    - master
+    - /^release\/.+$/
+    - /^major\/.+$/
+
 node_js:
   - node
+
 cache:
   directories:
     - node_modules
+
 script:
   - npm test
   - unset CI

@@ -55,3 +55,13 @@
     align-items: flex-start;
   }
 }
+
+.rewrite {
+  background: #73d13d;
+  border-color: #73d13d;
+
+  &:hover {
+    background: #95de64;
+    border-color: #95de64;
+  }
+}

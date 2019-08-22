@@ -43,6 +43,7 @@ const TextAreaRegionModel = types.compose(
 const HtxTextAreaRegionView = ({ store, item }) => {
   let markStyle = {
     cursor: store.completionStore.selected.relationMode ? "crosshair" : "pointer",
+    display: "block",
   };
 
   if (item.selected) {

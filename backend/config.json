@@ -7,7 +7,7 @@
   "input_path": "../examples/audio_regions/tasks.json",
   "output_dir": "../examples/audio_regions/completions",
 
-  "instruction": "Type something for label experts!",
+  "instruction": "Type some <b>hypertext</b> for label experts!",
   "allow_delete_completions": true,
 
   "editor": {
@@ -17,10 +17,11 @@
       "basic",
       "panel",
       "submit",
+      "completions",
       "submit:load",
+      "submit:rewrite",
       "side-column",
-      "submit:check-empty",
-      "predictions:hide"
+      "submit:check-empty"
     ]
   }
 }
