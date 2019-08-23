@@ -50,7 +50,7 @@ In order to launch the server locally, launch
 ```bash
 cd backend
 bash start.sh
-```d
+```
 
 To run it locally we include the compiled version of the frontend
 part and an example implementation of the backend.
@@ -60,7 +60,7 @@ part and an example implementation of the backend.
 ### Run with Docker
 ```bash
 docker run -p 8200:8200 -t -i amaigmbh/label-studio -c config.json -l ../examples/chatbot_analysis/config.xml -i ../examples/chatbot_analysis/tasks.json -o output
-```d
+```
 
 or mount a folder with your custom configuration files
 ```bash
