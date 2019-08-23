@@ -1,9 +1,9 @@
 import TaskStore from "../TaskStore";
 
-test("Task Store is good result", () => {
+test("Task Store with string", () => {
   const initialState = {
     id: 1,
-    data: '{"url":"https://heartex.net"}',
+    data: '{"url": "https://heartex.net"}',
     project: 100,
   };
 
@@ -12,14 +12,26 @@ test("Task Store is good result", () => {
   expect(taskStore.dataObj).toEqual({ url: "https://heartex.net" });
 });
 
-test("Task Store is bad", () => {
-  const initialState = {
-    id: 1,
-    data: "Not JSON",
-    project: 100,
-  };
+// test("Task Store JSON", () => {
+//   const initialState = {
+//     id: 1,
+//     data: {url: "https://heartex.net"},
+//     project: 100,
+//   };
 
-  const taskStore = TaskStore.create(initialState);
+//   const taskStore = TaskStore.create(initialState);
 
-  expect(taskStore.dataObj).toEqual(null);
-})
+//   expect(taskStore.dataObj).toEqual({ url: "https://heartex.net" });
+// })
+
+// test("Task Store bad value", () => {
+//   const initialState = {
+//     id: 1,
+//     data: "Not JSON",
+//     project: 100,
+//   };
+
+//   const taskStore = TaskStore.create(initialState);
+
+//   expect(taskStore.dataObj).toEqual(null);
+// })

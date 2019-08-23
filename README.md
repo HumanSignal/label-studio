@@ -2,7 +2,7 @@
 
 <img src="./images/logo.png" align="right" title="Label Studio by Heartex Labs" width="100" height="100">
 
-![GitHub](https://img.shields.io/github/license/heartexlabs/label-studio?logo=heartex) [![Build Status](https://travis-ci.com/heartexlabs/label-studio.svg?branch=master)](https://travis-ci.com/heartexlabs/label-studio)
+![GitHub](https://img.shields.io/github/license/heartexlabs/label-studio?logo=heartex) [![Build Status](https://travis-ci.com/heartexlabs/label-studio.svg?branch=master)](https://travis-ci.com/heartexlabs/label-studio) [![codecov](https://codecov.io/gh/heartexlabs/label-studio/branch/master/graph/badge.svg)](https://codecov.io/gh/heartexlabs/label-studio)
 
 Label Studio is an open-source, configurable data annotation tool. Its purpose is to enable you to label different types of data using the most convenient interface with a standardized output format.
 
@@ -137,7 +137,9 @@ Completion is an object with five mandatory fields:
 - **type** type of the labeling/tag
 - **value** tag specific value that includes the labeling result details
 
-For popular machine learning libraries there is converter code available to transform from the Label Studio format to other ML libraries’ formats. [Learn More](/backend/converter/README.md) about it.
+Want to use labeled data in your machine learning project, but get stuck to writing your parser? No worry, we are already
+supporting multiple format converters, already adopted by popular machine learning libraries.
+[Check it out!](/backend/converter/README.md)
 
 ## Contributing
 

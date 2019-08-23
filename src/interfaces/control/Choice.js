@@ -10,7 +10,7 @@ import Tree from "../../core/Tree";
 
 import ProcessAttrsMixin from "../mixins/ProcessAttrs";
 import Hint from "../../components/Hint/Hint";
-import ChoiceComponent from '../../components/Choice/Choice';
+import ChoiceComponent from "../../components/Choice/Choice";
 
 /**
  * Choice tag represents a single choice
@@ -83,7 +83,10 @@ const HtxChoice = inject("store")(
     if (item.style) style = Tree.cssConverter(item.style);
 
     if (item.isCheckbox) {
-      const cStyle = Object.assign({ marginRight: "1em", display: "flex", alignItems: "center" }, style);
+      const cStyle = Object.assign(
+        { marginRight: "1em", marginBottom: "0.5em", display: "flex", alignItems: "center" },
+        style,
+      );
 
       return (
         <div style={cStyle}>

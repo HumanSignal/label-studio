@@ -40,7 +40,7 @@ const Completion = observer(({ item, store }) => {
       }}
     >
       <List.Content>
-        <List.Header as="a">ID {item.pk || item.id}</List.Header>
+        {item.pk >= 0 && <List.Header as="a">ID {item.pk || item.id}</List.Header>}
         <p></p>
         <List.Description as="a">
           Created
@@ -72,15 +72,35 @@ class Completions extends Component {
   render() {
     const { store } = this.props;
 
-    return (
-      <Card title="Completions" bodyStyle={{ padding: 0 }}>
-        <List divided relaxed>
-          {store.completionStore.savedCompletions.map(c => (
-            <Completion key={c.id} item={c} store={store} />
-          ))}
-        </List>
-      </Card>
-    );
+    let count = 0;
+
+    store.completionStore.savedCompletions.map(c => {
+      if (c.pk > 0 || c.prediction) {
+        count++;
+      }
+    });
+
+    if (count === 0) {
+      return (
+        <Card title="Completions">
+          <List divided relaxed>
+            <p>No completions submitted yet</p>
+          </List>
+        </Card>
+      );
+    } else {
+      return (
+        <Card title="Completions" bodyStyle={{ padding: 0, paddingTop: "1px" }}>
+          <List divided relaxed>
+            {store.completionStore.savedCompletions.map(c => {
+              if (c) {
+                return <Completion key={c.pk} item={c} store={store} />;
+              }
+            })}
+          </List>
+        </Card>
+      );
+    }
   }
 }
 
