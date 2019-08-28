@@ -10,7 +10,7 @@ import { TranscribeAudio } from "../examples/transcribe_audio";
 /**
  * Choose data type
  */
-let dataType = AudioClassifiaction;
+let dataType = Sentiment;
 
 function templateDynamicData() {
   let settings = {
@@ -44,12 +44,23 @@ function templateDynamicData() {
     debug: window.location.search.indexOf("debug=true") !== -1,
     interfaces: window.editorInterfaces
       ? window.editorInterfaces
-      : ["basic", "completions", "submit", "panel", "side-column", "submit:rewrite"],
+      : [
+          "controls",
+          "predictions",
+          "completions",
+          "completions:menu",
+          "predictions:menu",
+          "panel",
+          "side-column",
+          "update",
+          "check-empty",
+        ],
     task: {
       data: JSON.stringify(dataType.tasks[0]),
       project: 10,
       id: 100,
       completions: [],
+      predictions: [],
     },
   };
 
@@ -59,6 +70,7 @@ function templateDynamicData() {
       task: {
         ...settings.task,
         completions: dataType.completion.completions,
+        predictions: dataType.completion.predictions,
       },
     };
   }
@@ -87,9 +99,18 @@ function getData() {
  */
 async function getState() {
   const resp = await getData();
+  /**
+   * Completions
+   */
   const resultCompletions = resp.task.completions ? resp.task.completions : null;
+  /**
+   * Predictions for Platform
+   */
+  const resultPredictions = resp.task.predictions ? resp.task.predictions : null;
+
   return {
     completions: resultCompletions,
+    predictions: resultPredictions,
   };
 }
 
