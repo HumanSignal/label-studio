@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { observer } from "mobx-react";
 import { List } from "semantic-ui-react";
-import { Card, Button } from "antd";
+import { Card, Button, Icon, Tooltip } from "antd";
 
 import Utils from "../../utils";
 import styles from "./Completions.module.scss";
@@ -34,14 +34,16 @@ const Completion = observer(({ item, store }) => {
 
   return (
     <List.Item
-      style={{ backgroundColor: item.selected ? "#f8f8f9" : "white", padding: "1em" }}
+      className={item.selected ? `${styles.completion} ${styles.completion_selected}` : styles.completion}
       onClick={ev => {
         !item.selected && store.completionStore.selectCompletion(item.id);
       }}
     >
       <List.Content>
-        {item.pk >= 0 && <List.Header as="a">ID {item.pk || item.id}</List.Header>}
-        <p></p>
+        <List.Header as="a" style={{ marginBottom: "1em" }}>
+          ID {item.id || item.pk}
+        </List.Header>
+
         <List.Description as="a">
           Created
           <i>{item.createdAgo ? ` ${item.createdAgo} ago` : ` ${Utils.UDate.prettyDate(item.createdDate)}`}</i>
@@ -50,15 +52,17 @@ const Completion = observer(({ item, store }) => {
 
         {item.selected && (
           <div className={styles.buttons}>
-            <Button
-              type="danger"
-              onClick={ev => {
-                ev.preventDefault();
-                item.store.deleteCompletion(item);
-              }}
-            >
-              Delete
-            </Button>
+            <Tooltip placement="topLeft" title="Delete selected completion">
+              <Button
+                type="danger"
+                onClick={ev => {
+                  ev.preventDefault();
+                  item.store.deleteCompletion(item);
+                }}
+              >
+                Delete
+              </Button>
+            </Tooltip>
 
             {item.honeypot ? removeHoney() : setHoney()}
           </div>
@@ -72,35 +76,36 @@ class Completions extends Component {
   render() {
     const { store } = this.props;
 
-    let count = 0;
+    let content = [];
+    let title = (
+      <div className={styles.title}>
+        <h3>Completions</h3>
+        <Tooltip placement="topLeft" title="Add new completion">
+          <Button
+            onClick={ev => {
+              ev.preventDefault();
+              store.completionStore.addUserCompletion();
+            }}
+          >
+            <Icon type="plus" />
+          </Button>
+        </Tooltip>
+      </div>
+    );
 
     store.completionStore.savedCompletions.map(c => {
-      if (c.pk > 0 || c.prediction) {
-        count++;
+      if (c) {
+        content.push(<Completion key={c.pk} item={c} store={store} />);
       }
     });
 
-    if (count === 0) {
-      return (
-        <Card title="Completions">
-          <List divided relaxed>
-            <p>No completions submitted yet</p>
-          </List>
-        </Card>
-      );
-    } else {
-      return (
-        <Card title="Completions" bodyStyle={{ padding: 0, paddingTop: "1px" }}>
-          <List divided relaxed>
-            {store.completionStore.savedCompletions.map(c => {
-              if (c) {
-                return <Completion key={c.pk} item={c} store={store} />;
-              }
-            })}
-          </List>
-        </Card>
-      );
-    }
+    return (
+      <Card title={title} bodyStyle={{ padding: "0", paddingTop: "1px" }}>
+        <List divided relaxed>
+          {store.completionStore.savedCompletions ? content : <p>No completions submitted yet</p>}
+        </List>
+      </Card>
+    );
   }
 }
 
