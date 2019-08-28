@@ -4,17 +4,37 @@
             "result": [
                 {
                     "from_name": "sentiment",
-                    "id": "yrSY-dipPI",
+                    "id": "22insK_GwB",
                     "to_name": "my_text",
                     "type": "choices",
                     "value": {
                         "choices": [
-                            "Positive"
+                            "Negative"
                         ]
                     }
                 }
             ]
         }
+    ],
+    "predictions": [
+      {
+        "id": "414214",
+        "model_version": "1565972706",
+        "created_ago": "1 week, 3 days",
+        "result": [
+            {
+                "from_name": "sentiment",
+                "id": "123123",
+                "to_name": "my_text",
+                "type": "choices",
+                "value": {
+                    "choices": [
+                        "Negative"
+                    ]
+                }
+            }
+        ]
+    }
     ],
     "data": {
         "asin": "1384719342",
@@ -23,7 +43,7 @@
             0
         ],
         "overall": 5,
-        "reviewText": "Good case, Excellent value.",
+        "reviewText": "Not much to write about here, but it does exactly what it's supposed to. filters out the pop sounds. now my recordings are much more crisp. it is one of the lowest prices pop filters on amazon so might as well buy it, they honestly work the same despite their pricing,",
         "reviewTime": "02 28, 2014",
         "reviewerID": "A2IBPI20UZIR0U",
         "reviewerName": "cassandra tu \"Yeah, well, that's just like, u...",
