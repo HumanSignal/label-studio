@@ -47,7 +47,7 @@ class Predictions extends Component {
           ) : (
             <List.Item>
               <List.Description>
-                <p style={{ padding: "1em" }}>No predictions</p>
+                <div style={{ padding: "1em 24px" }}>No predictions</div>
               </List.Description>
             </List.Item>
           )}
