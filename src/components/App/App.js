@@ -89,19 +89,20 @@ const App = inject("store")(
         const { store } = self.props;
         let root;
 
+        if (store.completionStore.currentCompletion) {
+          root = store.completionStore.currentCompletion.root;
+        } else if (store.completionStore.currentPrediction) {
+          root = store.completionStore.currentPrediction.root;
+        }
+
         if (store.isLoading) return self.renderLoader();
 
         if (store.noTask) return self.renderNothingToLabel();
 
         if (store.labeledSuccess) return self.renderSuccess();
 
-        if (!store.completionStore.currentCompletion && !store.completionStore.currentPrediction)
+        if (!store.completionStore.currentCompletion && !store.completionStore.currentPrediction) {
           return self.renderNoCompletion();
-
-        if (store.completionStore.currentCompletion) {
-          root = store.completionStore.currentCompletion.root;
-        } else if (store.completionStore.currentPrediction) {
-          root = store.completionStore.currentPrediction.root;
         }
 
         return (
@@ -124,9 +125,9 @@ const App = inject("store")(
                   </Segment>
 
                   <div className={styles.menu}>
-                    {store.hasInterface("predictions:menu") && <Predictions store={store} />}
-
                     {store.hasInterface("completions:menu") && <Completions store={store} />}
+
+                    {store.hasInterface("predictions:menu") && <Predictions store={store} />}
 
                     {store.hasInterface("side-column") && <SideColumn store={store} />}
                   </div>

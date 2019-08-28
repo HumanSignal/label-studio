@@ -16,7 +16,7 @@ export default inject("store")(
       submit: "",
     };
 
-    const { userGenerate, update } = store.completionStore.selected;
+    const { userGenerate, update, sentUserGenerate } = store.completionStore.selected;
     const { enableHotkeys, enableTooltips } = store.settings;
 
     /**
@@ -52,7 +52,7 @@ export default inject("store")(
         );
       }
 
-      if ((userGenerate && !update) || (store.explore && !userGenerate && store.hasInterface("submit"))) {
+      if ((userGenerate && !sentUserGenerate) || (store.explore && !userGenerate && store.hasInterface("submit"))) {
         submitButton = (
           <Button type="primary" icon="check" onClick={store.sendTask} className={styles.submit}>
             Submit {buttons.submit}
@@ -60,7 +60,7 @@ export default inject("store")(
         );
       }
 
-      if ((userGenerate && update) || (!userGenerate && store.hasInterface("update"))) {
+      if ((userGenerate && sentUserGenerate) || (!userGenerate && store.hasInterface("update"))) {
         updateButton = (
           <Button type="primary" icon="rollback" onClick={store.updateTask}>
             Update {buttons.update}

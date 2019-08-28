@@ -32,13 +32,12 @@ class Predictions extends Component {
 
     let content = [];
 
-    console.log(store.completionStore.predictions.length);
-
-    store.completionStore.predictions.map(predict => {
-      if (predict) {
-        content.push(<Prediction key={predict.pk} item={predict} store={store} />);
-      }
-    });
+    store.completionStore.predictions &&
+      store.completionStore.predictions.map(predict => {
+        if (predict) {
+          content.push(<Prediction key={predict.pk} item={predict} store={store} />);
+        }
+      });
 
     return (
       <Card title="Predictions" bodyStyle={{ padding: "0" }}>
@@ -48,7 +47,7 @@ class Predictions extends Component {
           ) : (
             <List.Item>
               <List.Description>
-                <p>No predictions</p>
+                <p style={{ padding: "1em" }}>No predictions</p>
               </List.Description>
             </List.Item>
           )}

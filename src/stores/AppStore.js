@@ -382,10 +382,14 @@ export default types
             return loadTask();
           } else {
             self.markLoading(false);
-            self.labeledSuccess = true;
+            self.completionStore.selected.sendUserGenerate();
+
+            if (self.explore && self.projectID) {
+              self.labeledSuccess = true;
+            }
           }
 
-          delete state.history;
+          // delete state.history;
         } catch (err) {
           console.error("Failed to send task ", err);
         }

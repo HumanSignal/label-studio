@@ -89,6 +89,10 @@ const Completion = types
       self._updateServerState({ honeypot: self.honeypot });
     },
 
+    sendUserGenerate() {
+      self.sentUserGenerate = true;
+    },
+
     setDragMode(val) {
       self.dragMode = val;
     },
@@ -362,7 +366,7 @@ export default types
         createdCompletion.traverseTree(node => node.updateValue && node.updateValue(self.store));
       }
 
-      self.completions.push(createdCompletion);
+      self.completions.unshift(createdCompletion);
 
       return createdCompletion;
     }
@@ -386,7 +390,7 @@ export default types
     }
 
     /**
-     *
+     * Send request to server for delete completion
      */
     const _deleteCompletion = flow(function* _deleteCompletion(pk) {
       try {
@@ -401,10 +405,18 @@ export default types
      * @param {*} completion
      */
     function destroyCompletion(completion) {
+      /**
+       * MST destroy completion
+       */
       destroy(completion);
 
       self.selected = null;
-      if (self.completions.length > 0) self.selectCompletion(self.completions[0].id);
+      /**
+       * Select other completion
+       */
+      if (self.completions.length > 0) {
+        self.selectCompletion(self.completions[0].id);
+      }
     }
 
     function deleteCompletion(completion) {
@@ -533,6 +545,8 @@ export default types
        *
        */
       const completion = self.addCompletion(node, "initial");
+
+      self.selectCompletion(node.id);
 
       return completion;
     }

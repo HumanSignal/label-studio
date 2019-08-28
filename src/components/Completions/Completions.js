@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { observer } from "mobx-react";
 import { List } from "semantic-ui-react";
-import { Card, Button, Icon, Tooltip } from "antd";
+import { Card, Button, Icon, Tooltip, Badge } from "antd";
 
 import Utils from "../../utils";
 import styles from "./Completions.module.scss";
@@ -32,6 +32,18 @@ const Completion = observer(({ item, store }) => {
     </Button>
   );
 
+  let badge = <Badge status="default" />;
+
+  console.log(item.sentUserGenerate);
+
+  if (item.userGenerate) {
+    badge = <Badge status="processing" />;
+  }
+
+  if (item.userGenerate && item.sentUserGenerate) {
+    badge = <Badge status="success" />;
+  }
+
   return (
     <List.Item
       className={item.selected ? `${styles.completion} ${styles.completion_selected}` : styles.completion}
@@ -41,6 +53,7 @@ const Completion = observer(({ item, store }) => {
     >
       <List.Content>
         <List.Header as="a" style={{ marginBottom: "1em" }}>
+          {badge}
           ID {item.id || item.pk}
         </List.Header>
 
