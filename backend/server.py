@@ -5,6 +5,7 @@ import os
 import flask
 import json  # it MUST be included after flask!
 import db
+import random
 
 from flask import request, jsonify, make_response, Response
 from utils import exception_treatment, log_config, log, config_line_stripped, load_config
@@ -163,7 +164,7 @@ def api_completions(task_id):
         completion.pop('state', None)  # remove editor state
         db.save_completion(task_id, completion)
         log.info(msg='Completion saved', extra={'task_id': task_id, 'output': request.json})
-        return make_response(json.dumps({'id': task_id}), 201)
+        return make_response(json.dumps({'id': random.randint(0, 1000)}), 201)
 
     elif request.method == 'DELETE':
         if c.get('allow_delete_completions', False):
@@ -177,7 +178,7 @@ def api_completions(task_id):
 
 @app.route('/api/tasks/<task_id>/completions/<completion_id>', methods=['PATCH'])
 @exception_treatment
-def api_completion_rewrite(task_id, completion_id):
+def api_completion_update(task_id, completion_id):
     """ Rewrite existing completion with patch.
         This is technical api call for editor testing only. It's used for Rewrite button in editor.
     """
