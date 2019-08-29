@@ -12,16 +12,17 @@ import RelationStore from "./RelationStore";
 import NormalizationStore from "./NormalizationStore";
 import RegionStore from "./RegionStore";
 import { RectangleModel } from "../interfaces/control/Rectangle";
+import Utils from "../utils";
 
 import * as HtxObjectModel from "../interfaces/object";
 
 const Completion = types
   .model("Completion", {
     id: types.identifier,
-    pk: types.optional(types.string, guidGenerator),
+    pk: types.optional(types.string, guidGenerator(5)),
     selected: types.optional(types.boolean, false),
 
-    createdDate: types.optional(types.string, new Date().toISOString()),
+    createdDate: types.optional(types.string, Utils.UDate.currentISODate()),
     createdAgo: types.maybeNull(types.string),
     createdBy: types.optional(types.string, "Admin"),
 
@@ -436,7 +437,7 @@ export default types
 
       const node = {
         pk: c.id,
-        id: c.id || guidGenerator(),
+        id: c.id || guidGenerator(5),
         createdAgo: c.created_ago,
         createdBy: c.created_username,
         honeypot: c.honeypot,
@@ -489,7 +490,7 @@ export default types
       let root = modelClass.create(completionModel);
 
       const node = {
-        id: guidGenerator(),
+        id: guidGenerator(5),
         root: root,
       };
 
@@ -527,7 +528,7 @@ export default types
       let root = modelClass.create(completionModel);
 
       const node = {
-        id: guidGenerator(),
+        id: guidGenerator(5),
         root: root,
         userGenerate: true,
       };
