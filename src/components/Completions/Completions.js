@@ -49,9 +49,9 @@ const Completion = observer(({ item, store }) => {
     completionID = "New Completion";
   } else {
     if (item.pk) {
-      completionID = item.pk;
+      completionID = `ID ${item.pk}`;
     } else if (item.id) {
-      completionID = item.id;
+      completionID = `ID ${item.id}`;
     }
   }
 
@@ -79,7 +79,6 @@ const Completion = observer(({ item, store }) => {
       <List.Content>
         <List.Header as="a" style={{ marginBottom: "1em" }}>
           {badge}
-          {!item.userGenerate && "ID "}
           {completionID}
         </List.Header>
 
