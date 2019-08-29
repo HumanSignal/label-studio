@@ -3,16 +3,20 @@
   {
     122: function(e, t, n) {
       e.exports = {
+        container: "Panel_container__1UbGz",
+        block: "Panel_block__35uxJ",
+        block__controls: "Panel_block__controls__386dF",
+      };
+    },
+    123: function(e, t, n) {
+      e.exports = {
         block: "Relations_block__3ojdZ",
         section: "Relations_section__3MAqx",
         section__blocks: "Relations_section__blocks__26CLV",
         delete: "Relations_delete__3qe_f",
       };
     },
-    167: function(e, t, n) {
-      e.exports = { container: "Panel_container__1UbGz", block: "Panel_block__35uxJ" };
-    },
-    169: function(e, t, n) {
+    171: function(e, t, n) {
       e.exports = {
         editor: "App_editor__ZA0wp",
         menu: "App_menu__3cWjU",
@@ -20,37 +24,32 @@
         common: "App_common__2vqlZ",
       };
     },
-    213: function(e, t, n) {
+    217: function(e, t, n) {
       e.exports = { main: "Hint_main__2bVzl" };
     },
-    218: function(e, t, n) {
+    221: function(e, t, n) {
       e.exports = { progress: "Waveform_progress__3BwkI", wave: "Waveform_wave__3tQFG", menu: "Waveform_menu__ToCwx" };
     },
-    279: function(e, t, n) {
-      e.exports = { buttons: "Completions_buttons__2YII_" };
-    },
-    301: function(e, t, n) {
-      e.exports = { item: "Entities_item__215D0" };
-    },
-    302: function(e, t, n) {
-      e.exports = { card: "SideColumn_card__YC_BE" };
-    },
-    309: function(e, t, n) {
-      e.exports = { play: "AudioPlus_play__3_Ds7" };
-    },
-    311: function(e, t, n) {
-      e.exports = { block: "TextHighlight_block__2-3wy" };
-    },
-    312: function(e, t, n) {
-      e.exports = { state: "TextRegion_state__1J2X6" };
-    },
-    313: function(e, t, n) {
+    290: function(e, t, n) {
       e.exports = { block: "Segment_block__1srue" };
     },
-    315: function(e, t, n) {
+    303: function(e, t, n) {
+      e.exports = { item: "Entities_item__215D0" };
+    },
+    304: function(e, t, n) {},
+    311: function(e, t, n) {
+      e.exports = { play: "AudioPlus_play__3_Ds7" };
+    },
+    313: function(e, t, n) {
+      e.exports = { block: "TextHighlight_block__2-3wy" };
+    },
+    314: function(e, t, n) {
+      e.exports = { state: "TextRegion_state__1J2X6" };
+    },
+    316: function(e, t, n) {
       e.exports = n.p + "static/media/config.34f6aa9f.xml";
     },
-    316: function(e) {
+    317: function(e) {
       e.exports = [
         {
           reviewerID: "A2IBPI20UZIR0U",
@@ -1250,17 +1249,33 @@
         },
       ];
     },
-    317: function(e) {
+    318: function(e) {
       e.exports = {
         completions: [
           {
             result: [
               {
                 from_name: "sentiment",
-                id: "yrSY-dipPI",
+                id: "22insK_GwB",
                 to_name: "my_text",
                 type: "choices",
-                value: { choices: ["Neutral"] },
+                value: { choices: ["Negative"] },
+              },
+            ],
+          },
+        ],
+        predictions: [
+          {
+            id: "414214",
+            model_version: "1565972706",
+            created_ago: "1 week, 3 days",
+            result: [
+              {
+                from_name: "sentiment",
+                id: "123123",
+                to_name: "my_text",
+                type: "choices",
+                value: { choices: ["Negative"] },
               },
             ],
           },
@@ -1281,16 +1296,16 @@
         task_path: "../examples/sentiment_analysis/tasks.json",
       };
     },
-    318: function(e, t, n) {
+    319: function(e, t, n) {
       e.exports = n.p + "static/media/config.c5233796.xml";
     },
-    319: function(e) {
+    320: function(e) {
       e.exports = [
         { url: "https://go.heartex.net/static/samples/game.wav" },
         { url: "https://go.heartex.net/static/samples/game.wav" },
       ];
     },
-    320: function(e) {
+    321: function(e) {
       e.exports = {
         completions: [
           {
@@ -1310,16 +1325,16 @@
         task_path: "../examples/audio_classification/tasks.json",
       };
     },
-    321: function(e, t, n) {
+    322: function(e, t, n) {
       e.exports = n.p + "static/media/config.66767299.xml";
     },
-    322: function(e) {
+    323: function(e) {
       e.exports = [
         { url: "https://go.heartex.net/static/samples/game.wav" },
         { url: "https://go.heartex.net/static/samples/game.wav" },
       ];
     },
-    323: function(e) {
+    324: function(e) {
       e.exports = {
         completions: [
           {
@@ -1362,10 +1377,10 @@
         task_path: "../examples/audio_regions/tasks.json",
       };
     },
-    324: function(e, t, n) {
+    325: function(e, t, n) {
       e.exports = n.p + "static/media/config.0e2a1e7f.xml";
     },
-    325: function(e) {
+    326: function(e) {
       e.exports = [
         {
           dialogs:
@@ -1373,7 +1388,7 @@
         },
       ];
     },
-    326: function(e) {
+    327: function(e) {
       e.exports = {
         completions: [
           {
@@ -1397,13 +1412,13 @@
         task_path: "../examples/chatbot_analysis/tasks.json",
       };
     },
-    327: function(e, t, n) {
+    328: function(e, t, n) {
       e.exports = n.p + "static/media/config.2a6054fe.xml";
     },
-    328: function(e) {
+    329: function(e) {
       e.exports = [{ image: "https://user.fm/files/v2-901310d5cb3fa90e0616ca10590bacb3/spacexmoon-800x501.jpg" }];
     },
-    329: function(e) {
+    330: function(e) {
       e.exports = {
         completions: [
           {
@@ -1446,10 +1461,10 @@
         task_path: "../examples/image_bbox/tasks.json",
       };
     },
-    330: function(e, t, n) {
+    331: function(e, t, n) {
       e.exports = n.p + "static/media/config.bb22cd0c.xml";
     },
-    331: function(e) {
+    332: function(e) {
       e.exports = [
         {
           text:
@@ -1457,7 +1472,7 @@
         },
       ];
     },
-    332: function(e) {
+    333: function(e) {
       e.exports = {
         completions: [
           {
@@ -1489,13 +1504,13 @@
         task_path: "../examples/named_entity/tasks.json",
       };
     },
-    333: function(e, t, n) {
+    334: function(e, t, n) {
       e.exports = n.p + "static/media/config.32729adf.xml";
     },
-    334: function(e) {
+    335: function(e) {
       e.exports = [{ text: "To have faith is to trust yourself to the water" }];
     },
-    335: function(e) {
+    336: function(e) {
       e.exports = {
         completions: [
           {
@@ -1516,13 +1531,13 @@
         task_path: "../examples/references/tasks.json",
       };
     },
-    336: function(e, t, n) {
+    337: function(e, t, n) {
       e.exports = n.p + "static/media/config.1890026d.xml";
     },
-    337: function(e) {
+    338: function(e) {
       e.exports = [{ url: "https://go.heartex.net/static/samples/game.wav" }];
     },
-    338: function(e) {
+    339: function(e) {
       e.exports = {
         completions: [
           {
@@ -1536,70 +1551,73 @@
         task_path: "../examples/transcribe_audio/tasks.json",
       };
     },
-    353: function(e, t, n) {
-      e.exports = n(595);
+    354: function(e, t, n) {
+      e.exports = n(596);
     },
-    361: function(e, t, n) {},
-    595: function(e, t, n) {
+    362: function(e, t, n) {},
+    596: function(e, t, n) {
       "use strict";
       n.r(t);
       var a = {};
       n.r(a),
         n.d(a, "isString", function() {
-          return M;
-        }),
-        n.d(a, "isStringEmpty", function() {
-          return B;
-        }),
-        n.d(a, "isStringJSON", function() {
           return H;
         }),
-        n.d(a, "getUrl", function() {
+        n.d(a, "isStringEmpty", function() {
+          return z;
+        }),
+        n.d(a, "isStringJSON", function() {
           return W;
         }),
+        n.d(a, "getUrl", function() {
+          return L;
+        }),
         n.d(a, "toTimeString", function() {
-          return P;
+          return F;
         });
       var o = {};
       n.r(o),
         n.d(o, "hexToRGBA", function() {
-          return L;
-        }),
-        n.d(o, "colorToRGBA", function() {
-          return F;
-        }),
-        n.d(o, "convertToRGBA", function() {
-          return J;
-        }),
-        n.d(o, "stringToColor", function() {
           return G;
         }),
-        n.d(o, "rgbaChangeAlpha", function() {
+        n.d(o, "colorToRGBA", function() {
           return U;
-        });
-      var i = {};
-      n.r(i),
-        n.d(i, "msToHMS", function() {
+        }),
+        n.d(o, "convertToRGBA", function() {
           return V;
         }),
-        n.d(i, "prettyDate", function() {
+        n.d(o, "stringToColor", function() {
           return Y;
+        }),
+        n.d(o, "rgbaChangeAlpha", function() {
+          return q;
         });
-      var r = n(0),
-        l = n.n(r),
-        s = n(16),
+      var r = {};
+      n.r(r),
+        n.d(r, "msToHMS", function() {
+          return X;
+        }),
+        n.d(r, "prettyDate", function() {
+          return K;
+        }),
+        n.d(r, "currentISODate", function() {
+          return Z;
+        });
+      var i = n(0),
+        l = n.n(i),
+        s = n(17),
         c = n.n(s),
         u = n(7),
-        m = (n(358), n(361), n(26)),
+        m = (n(359), n(362), n(26)),
         d = n(27),
-        h = n(31),
-        p = n(30),
-        f = n(32),
-        g = n(207),
+        h = n(30),
+        p = n(29),
+        f = n(31),
+        g = n(209),
         v = n.n(g),
         y = n(1),
-        b = n(619),
-        w = n(609),
+        b = n(620),
+        w = n(610),
         k = new ((function() {
           function e() {
             Object(m.a)(this, e), (this.tags = []), (this.models = {}), (this.views = {}), (this.views_models = {});
@@ -1667,19 +1685,20 @@
             return x(e, "PATCH", { Accept: "application/json", "Content-Type": "application/json" }, t);
           },
         },
-        N = n(36),
-        S = n(278),
-        I = n.n(S);
-      function E() {
-        return I()(10);
+        S = n(36),
+        N = n(212),
+        I = n.n(N);
+      function E(e) {
+        var t = I()(10);
+        return e && (t = I()(e)), t;
       }
       function O(e) {
         var t = Object(y.h)(e);
-        return Object(y.i)(e).create(Object(N.a)({}, t, { id: E() }));
+        return Object(y.i)(e).create(Object(S.a)({}, t, { id: E() }));
       }
       function R(e) {
         var t = Object(y.h)(e);
-        return Object(y.i)(e).create(Object(N.a)({}, t, { id: E() }));
+        return Object(y.i)(e).create(Object(S.a)({}, t, { id: E() }));
       }
       function C(e) {
         var t = k.getViewByModel(Object(y.i)(e).name);
@@ -1695,9 +1714,9 @@
                 l.a.Children.forEach(e, function(e) {
                   var o;
                   if (e.props) {
-                    var i = {};
-                    "function" === typeof t ? (i = t(e)) : "object" === typeof t && (i = t),
-                      (o = l.a.cloneElement(e, i, n(e.props.children)));
+                    var r = {};
+                    "function" === typeof t ? (r = t(e)) : "object" === typeof t && (r = t),
+                      (o = l.a.cloneElement(e, r, n(e.props.children)));
                   } else o = e;
                   a.push(o);
                 }),
@@ -1722,15 +1741,15 @@
                   a = !1,
                   o = void 0;
                 try {
-                  for (var i, r = e[Symbol.iterator](); !(n = (i = r.next()).done); n = !0) {
-                    var l = i.value;
+                  for (var r, i = e[Symbol.iterator](); !(n = (r = i.next()).done); n = !0) {
+                    var l = r.value;
                     t[l.name] = l.value;
                   }
                 } catch (s) {
                   (a = !0), (o = s);
                 } finally {
                   try {
-                    n || null == r.return || r.return();
+                    n || null == i.return || i.return();
                   } finally {
                     if (a) throw o;
                   }
@@ -1753,8 +1772,8 @@
                 if (!n) return null;
                 var a = [],
                   o = !0,
-                  i = !1,
-                  r = void 0;
+                  r = !1,
+                  i = void 0;
                 try {
                   for (var l, s = n.childNodes[Symbol.iterator](); !(o = (l = s.next()).done); o = !0) {
                     var c = l.value;
@@ -1765,12 +1784,12 @@
                     }
                   }
                 } catch (d) {
-                  (i = !0), (r = d);
+                  (r = !0), (i = d);
                 } finally {
                   try {
                     o || null == s.return || s.return();
                   } finally {
-                    if (i) throw r;
+                    if (r) throw i;
                   }
                 }
                 return 0 === a.length ? null : a;
@@ -1785,20 +1804,20 @@
               if (t.children) {
                 var a = !0,
                   o = !1,
-                  i = void 0;
+                  r = void 0;
                 try {
-                  for (var r, l = t.children[Symbol.iterator](); !(a = (r = l.next()).done); a = !0) {
-                    var s = r.value,
+                  for (var i, l = t.children[Symbol.iterator](); !(a = (i = l.next()).done); a = !0) {
+                    var s = i.value,
                       c = n(s);
                     if (c) return c;
                   }
                 } catch (u) {
-                  (o = !0), (i = u);
+                  (o = !0), (r = u);
                 } finally {
                   try {
                     a || null == l.return || l.return();
                   } finally {
-                    if (o) throw i;
+                    if (o) throw r;
                   }
                 }
               }
@@ -1809,8 +1828,8 @@
               a = !1,
               o = void 0;
             try {
-              for (var i, r = t[Symbol.iterator](); !(n = (i = r.next()).done); n = !0) {
-                var l = i.value;
+              for (var r, i = t[Symbol.iterator](); !(n = (r = i.next()).done); n = !0) {
+                var l = r.value;
                 try {
                   var s = Object(y.f)(e, l);
                   if (s) return s;
@@ -1820,7 +1839,7 @@
               (a = !0), (o = c);
             } finally {
               try {
-                n || null == r.return || r.return();
+                n || null == i.return || i.return();
               } finally {
                 if (a) throw o;
               }
@@ -1833,20 +1852,20 @@
             return (
               (n = function(e) {
                 var o = !0,
-                  i = !1,
-                  r = void 0;
+                  r = !1,
+                  i = void 0;
                 try {
                   for (var l, s = t[Symbol.iterator](); !(o = (l = s.next()).done); o = !0) {
                     var c = l.value;
                     Object(y.i)(e).name === c && a.push(e);
                   }
                 } catch (g) {
-                  (i = !0), (r = g);
+                  (r = !0), (i = g);
                 } finally {
                   try {
                     o || null == s.return || s.return();
                   } finally {
-                    if (i) throw r;
+                    if (r) throw i;
                   }
                 }
                 if (e.children) {
@@ -1877,34 +1896,37 @@
               n,
               a,
               o,
-              i = {},
-              r = e.split(";");
-            for (n = 0; n < r.length; n++)
-              (t = r[n].indexOf(":")),
-                (a = r[n].substring(0, t)),
-                (o = r[n].substring(t + 1)),
+              r = {},
+              i = e.split(";");
+            for (n = 0; n < i.length; n++)
+              (t = i[n].indexOf(":")),
+                (a = i[n].substring(0, t)),
+                (o = i[n].substring(t + 1)),
                 (a = a.replace(/ /g, "")).length < 1 ||
                   (" " === o[0] && (o = o.substring(1)),
                   " " === o[o.length - 1] && (o = o.substring(0, o.length - 1)),
-                  (i[
+                  (r[
                     a.replace(/(-.)/g, function(e) {
                       return e[1].toUpperCase();
                     })
                   ] = o));
-            return i;
+            return r;
           },
         },
-        j = n(615),
-        A = n(164),
-        D = n(621),
-        M = function(e) {
+        j = n(616),
+        A = n(167),
+        D = n(625),
+        M = n(166),
+        B = n(35),
+        P = n(622),
+        H = function(e) {
           return "string" === typeof e || e instanceof String;
         },
-        B = function(e) {
-          return !!M(e) && 0 === e.length;
+        z = function(e) {
+          return !!H(e) && 0 === e.length;
         },
-        H = function(e) {
-          if (M(e)) {
+        W = function(e) {
+          if (H(e)) {
             try {
               JSON.parse(e);
             } catch (t) {
@@ -1914,15 +1936,15 @@
           }
           return !1;
         };
-      function W(e, t) {
+      function L(e, t) {
         var n = t.slice(e),
           a = /^(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})/g.exec(n);
         return a && a.length ? a[1] : "";
       }
-      function P(e) {
+      function F(e) {
         if ("number" === typeof e) return new Date(e).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0];
       }
-      var z = {
+      var J = {
         aliceblue: "#f0f8ff",
         antiquewhite: "#faebd7",
         aqua: "#00ffff",
@@ -2065,13 +2087,13 @@
         yellow: "#ffff00",
         yellowgreen: "#9acd32",
       };
-      function L(e, t) {
+      function G(e, t) {
         var n = 0,
           a = 0,
           o = 0,
-          i = 0.3;
+          r = 0.3;
         return (
-          t && "number" === typeof parseInt(t) && (i = t),
+          t && "number" === typeof parseInt(t) && (r = t),
           e && 4 === e.length
             ? ((n = "0x" + e[1] + e[1]), (a = "0x" + e[2] + e[2]), (o = "0x" + e[3] + e[3]))
             : e && 7 === e.length && ((n = "0x" + e[1] + e[2]), (a = "0x" + e[3] + e[4]), (o = "0x" + e[5] + e[6])),
@@ -2079,31 +2101,31 @@
             .concat(+n, ", ")
             .concat(+a, ", ")
             .concat(+o, ", ")
-            .concat(i, ")")
+            .concat(r, ")")
         );
       }
-      function F(e, t) {
-        return "string" === typeof e && void 0 !== typeof z[e.toLowerCase()] ? L(z[e.toLowerCase()], t) : e;
+      function U(e, t) {
+        return "string" === typeof e && void 0 !== typeof J[e.toLowerCase()] ? G(J[e.toLowerCase()], t) : e;
       }
-      function J(e, t) {
-        return "#" === e.charAt(0) ? L(e, t) : F(e, t);
+      function V(e, t) {
+        return "#" === e.charAt(0) ? G(e, t) : U(e, t);
       }
-      function G(e) {
+      function Y(e) {
         for (var t = 0, n = 0; n < e.length; n++) t = e.charCodeAt(n) + ((t << 5) - t);
         for (var a = "#", o = 0; o < 3; o++) {
           a += ("00" + ((t >> (8 * o)) & 255).toString(16)).substr(-2);
         }
         return a;
       }
-      function U(e, t) {
+      function q(e, t) {
         return e.replace(/[\d\.]+\)$/g, "".concat(t, ")"));
       }
-      function V(e) {
+      function X(e) {
         var t = e / 1e3,
           n = parseInt(t / 3600);
         return (t %= 3600), n + ":" + parseInt(t / 60) + ":" + (t = Math.floor(t));
       }
-      function Y(e) {
+      function K(e) {
         if (
           "string" === typeof e ||
           /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d+([+-][0-2]\d:[0-5]\d|Z)/.test(e)
@@ -2125,23 +2147,27 @@
             );
         }
       }
-      var q = n(103);
-      var X = {
+      function Z() {
+        var e = 6e4 * new Date().getTimezoneOffset();
+        return new Date(Date.now() - e).toISOString().slice(0, -1);
+      }
+      var Q = n(104);
+      var $ = {
           Checkers: a,
           Colors: o,
-          UDate: i,
+          UDate: r,
           guidGenerator: E,
           debounce: function(e, t, n) {
             var a;
             return function() {
               var o = this,
-                i = arguments,
-                r = n && !a;
+                r = arguments,
+                i = n && !a;
               clearTimeout(a),
                 (a = setTimeout(function() {
-                  (a = null), n || e.apply(o, i);
+                  (a = null), n || e.apply(o, r);
                 }, t)),
-                r && e.apply(o, i);
+                i && e.apply(o, r);
             };
           },
           styleToProp: function(e) {
@@ -2167,127 +2193,96 @@
                     ];
                   })
                   .reduce(function(e, t) {
-                    return Object(N.a)({}, e, Object(q.a)({}, t[0], t[1]));
+                    return Object(S.a)({}, e, Object(Q.a)({}, t[0], t[1]));
                   }, {})
               : null;
           },
         },
-        Z = n(279),
-        K = n.n(Z),
-        Q = Object(u.c)(function(e) {
-          var t = e.item,
-            n = e.store;
-          return l.a.createElement(
-            j.a.Item,
-            {
-              style: { backgroundColor: t.selected ? "#f8f8f9" : "white", padding: "1em" },
-              onClick: function(e) {
-                !t.selected && n.completionStore.selectCompletion(t.id);
-              },
-            },
-            l.a.createElement(
-              j.a.Content,
-              null,
-              t.pk >= 0 && l.a.createElement(j.a.Header, { as: "a" }, "ID ", t.pk || t.id),
-              l.a.createElement("p", null),
-              l.a.createElement(
-                j.a.Description,
-                { as: "a" },
-                "Created",
-                l.a.createElement(
-                  "i",
-                  null,
-                  t.createdAgo ? " ".concat(t.createdAgo, " ago") : " ".concat(X.UDate.prettyDate(t.createdDate)),
-                ),
-                t.createdBy ? " by ".concat(t.createdBy) : null,
-              ),
-              t.selected &&
-                l.a.createElement(
-                  "div",
-                  { className: K.a.buttons },
-                  l.a.createElement(
-                    A.a,
-                    {
-                      type: "danger",
-                      onClick: function(e) {
-                        e.preventDefault(), t.store.deleteCompletion(t);
-                      },
-                    },
-                    "Delete",
-                  ),
-                  t.honeypot
-                    ? l.a.createElement(
-                        A.a,
-                        {
-                          type: "primary",
-                          onClick: function(e) {
-                            e.preventDefault(), t.removeHoneypot();
-                          },
-                        },
-                        "Honeypot",
-                      )
-                    : l.a.createElement(
-                        A.a,
-                        {
-                          type: "primary",
-                          ghost: !0,
-                          onClick: function(e) {
-                            e.preventDefault(), t.setHoneypot();
-                          },
-                        },
-                        "Honeypot",
-                      ),
-                ),
-            ),
-          );
-        }),
-        $ = (function(e) {
-          function t() {
-            return Object(m.a)(this, t), Object(h.a)(this, Object(p.a)(t).apply(this, arguments));
-          }
+        ee = n(65),
+        te = n.n(ee),
+        ne = Object(u.c)(function(e) {
+          var t,
+            n = e.item,
+            a = e.store,
+            o = l.a.createElement(D.a, { status: "default" });
           return (
-            Object(f.a)(t, e),
-            Object(d.a)(t, [
+            n.userGenerate && !n.sentUserGenerate
+              ? (t = "New Completion")
+              : n.pk
+              ? (t = "ID ".concat(n.pk))
+              : n.id && (t = "ID ".concat(n.id)),
+            n.userGenerate && (o = l.a.createElement(D.a, { status: "processing" })),
+            n.userGenerate && n.sentUserGenerate && (o = l.a.createElement(D.a, { status: "success" })),
+            l.a.createElement(
+              j.a.Item,
               {
-                key: "render",
-                value: function() {
-                  var e = this.props.store,
-                    t = 0;
-                  return (
-                    e.completionStore.savedCompletions.map(function(e) {
-                      (e.pk > 0 || e.prediction) && t++;
-                    }),
-                    0 === t
-                      ? l.a.createElement(
-                          D.a,
-                          { title: "Completions" },
-                          l.a.createElement(
-                            j.a,
-                            { divided: !0, relaxed: !0 },
-                            l.a.createElement("p", null, "No completions submitted yet"),
-                          ),
-                        )
-                      : l.a.createElement(
-                          D.a,
-                          { title: "Completions", bodyStyle: { padding: 0, paddingTop: "1px" } },
-                          l.a.createElement(
-                            j.a,
-                            { divided: !0, relaxed: !0 },
-                            e.completionStore.savedCompletions.map(function(t) {
-                              if (t) return l.a.createElement(Q, { key: t.pk, item: t, store: e });
-                            }),
-                          ),
-                        )
-                  );
+                className: n.selected
+                  ? "".concat(te.a.completion, " ").concat(te.a.completion_selected)
+                  : te.a.completion,
+                onClick: function(e) {
+                  !n.selected && a.completionStore.selectCompletion(n.id);
                 },
               },
-            ]),
-            t
+              l.a.createElement(
+                j.a.Content,
+                null,
+                l.a.createElement(j.a.Header, { as: "a", style: { marginBottom: "1em" } }, o, t),
+                l.a.createElement(
+                  j.a.Description,
+                  { as: "a" },
+                  "Created",
+                  l.a.createElement(
+                    "i",
+                    null,
+                    n.createdAgo ? " ".concat(n.createdAgo, " ago") : " ".concat($.UDate.prettyDate(n.createdDate)),
+                  ),
+                  n.createdBy ? " by ".concat(n.createdBy) : null,
+                ),
+                n.selected &&
+                  l.a.createElement(
+                    "div",
+                    { className: te.a.buttons },
+                    l.a.createElement(
+                      M.a,
+                      { placement: "topLeft", title: "Delete selected completion" },
+                      l.a.createElement(
+                        A.a,
+                        {
+                          type: "danger",
+                          onClick: function(e) {
+                            e.preventDefault(), n.store.deleteCompletion(n);
+                          },
+                        },
+                        "Delete",
+                      ),
+                    ),
+                    n.honeypot
+                      ? l.a.createElement(
+                          A.a,
+                          {
+                            type: "primary",
+                            onClick: function(e) {
+                              e.preventDefault(), n.removeHoneypot();
+                            },
+                          },
+                          "Honeypot",
+                        )
+                      : l.a.createElement(
+                          A.a,
+                          {
+                            type: "primary",
+                            ghost: !0,
+                            onClick: function(e) {
+                              e.preventDefault(), n.setHoneypot();
+                            },
+                          },
+                          "Honeypot",
+                        ),
+                  ),
+              ),
+            )
           );
-        })(r.Component),
-        ee = Object(u.c)($),
-        te = n(213),
-        ne = n.n(te),
+        }),
         ae = (function(e) {
           function t() {
             return Object(m.a)(this, t), Object(h.a)(this, Object(p.a)(t).apply(this, arguments));
@@ -2298,11 +2293,144 @@
               {
                 key: "render",
                 value: function() {
+                  var e = this.props.store,
+                    t = [],
+                    n = l.a.createElement(
+                      "div",
+                      { className: te.a.title },
+                      l.a.createElement("h3", null, "Completions"),
+                      l.a.createElement(
+                        M.a,
+                        { placement: "topLeft", title: "Add new completion" },
+                        l.a.createElement(
+                          A.a,
+                          {
+                            onClick: function(t) {
+                              t.preventDefault(), e.completionStore.addUserCompletion();
+                            },
+                          },
+                          l.a.createElement(B.a, { type: "plus" }),
+                        ),
+                      ),
+                    );
+                  return (
+                    e.completionStore.savedCompletions.map(function(n) {
+                      n && t.push(l.a.createElement(ne, { key: n.pk, item: n, store: e }));
+                    }),
+                    l.a.createElement(
+                      P.a,
+                      { title: n, bodyStyle: { padding: "0", paddingTop: "1px" } },
+                      l.a.createElement(
+                        j.a,
+                        { divided: !0, relaxed: !0 },
+                        e.completionStore.savedCompletions
+                          ? t
+                          : l.a.createElement("p", null, "No completions submitted yet"),
+                      ),
+                    )
+                  );
+                },
+              },
+            ]),
+            t
+          );
+        })(i.Component),
+        oe = Object(u.c)(ae),
+        re = Object(u.c)(function(e) {
+          var t = e.item,
+            n = e.store;
+          return l.a.createElement(
+            j.a.Item,
+            {
+              className: t.selected
+                ? "".concat(te.a.completion, " ").concat(te.a.completion_selected)
+                : te.a.completion,
+              onClick: function(e) {
+                !t.selected && n.completionStore.selectPrediction(t.id);
+              },
+            },
+            l.a.createElement(
+              j.a.Content,
+              null,
+              l.a.createElement(
+                j.a.Header,
+                { as: "a", style: { marginBottom: "1em" } },
+                t.createdBy ? "Model (v. ".concat(t.createdBy, ")") : null,
+              ),
+              l.a.createElement(
+                j.a.Description,
+                { as: "a", style: { marginBottom: "1em" } },
+                "Created",
+                l.a.createElement(
+                  "i",
+                  null,
+                  t.createdAgo ? " ".concat(t.createdAgo, " ago") : " ".concat($.UDate.prettyDate(t.createdDate)),
+                ),
+              ),
+            ),
+          );
+        }),
+        ie = (function(e) {
+          function t() {
+            return Object(m.a)(this, t), Object(h.a)(this, Object(p.a)(t).apply(this, arguments));
+          }
+          return (
+            Object(f.a)(t, e),
+            Object(d.a)(t, [
+              {
+                key: "render",
+                value: function() {
+                  var e = this.props.store,
+                    t = [];
+                  return (
+                    e.completionStore.predictions &&
+                      e.completionStore.predictions.map(function(n) {
+                        n && t.push(l.a.createElement(re, { key: n.pk, item: n, store: e }));
+                      }),
+                    l.a.createElement(
+                      P.a,
+                      { title: "Predictions", bodyStyle: { padding: "0" } },
+                      l.a.createElement(
+                        j.a,
+                        null,
+                        e.completionStore.predictions && e.completionStore.predictions.length
+                          ? t
+                          : l.a.createElement(
+                              j.a.Item,
+                              null,
+                              l.a.createElement(
+                                j.a.Description,
+                                null,
+                                l.a.createElement("div", { style: { padding: "1em 24px" } }, "No predictions"),
+                              ),
+                            ),
+                      ),
+                    )
+                  );
+                },
+              },
+            ]),
+            t
+          );
+        })(i.Component),
+        le = Object(u.c)(ie),
+        se = n(217),
+        ce = n.n(se),
+        ue = (function(e) {
+          function t() {
+            return Object(m.a)(this, t), Object(h.a)(this, Object(p.a)(t).apply(this, arguments));
+          }
+          return (
+            Object(f.a)(t, e),
+            Object(d.a)(t, [
+              {
+                key: "render",
+                value: function() {
                   var e,
-                    t = "".concat(ne.a.main);
+                    t = "".concat(ce.a.main);
                   return (
                     this.props.style && (e = this.props.style),
-                    this.props.className && (t = "".concat(ne.a.main, " ").concat(this.props.className)),
+                    this.props.className && (t = "".concat(ce.a.main, " ").concat(this.props.className)),
                     l.a.createElement(
                       "sup",
                       { "data-copy": this.props.copy, className: t, style: e },
@@ -2314,58 +2442,94 @@
             ]),
             t
           );
-        })(r.Component),
-        oe = n(91),
-        ie = n.n(oe),
-        re = Object(u.b)("store")(
+        })(i.Component),
+        me = n(92),
+        de = n.n(me),
+        he = Object(u.b)("store")(
           Object(u.c)(function(e) {
             var t,
               n,
               a,
-              o = e.store;
-            return (
-              o.task && (t = l.a.createElement("h4", { className: ie.a.task }, "Task ID: ", o.task.id)),
-              o.settings.enableHotkeys &&
-                o.settings.enableTooltips &&
-                ((n = l.a.createElement(ae, null, " [ Ctrl+Enter ]")),
-                (a = l.a.createElement(ae, null, " [ Ctrl+Space ]"))),
+              o,
+              r = e.store,
+              i = { skip: "", update: "", submit: "" },
+              s = r.completionStore.selected,
+              c = s.userGenerate,
+              u = (s.update, s.sentUserGenerate),
+              m = r.settings,
+              d = m.enableHotkeys,
+              h = m.enableTooltips;
+            r.task && (t = l.a.createElement("h4", { className: de.a.task }, "Task ID: ", r.task.id)),
+              d &&
+                h &&
+                ((i.submit = l.a.createElement(ue, null, " [ Ctrl+Enter ]")),
+                (i.skip = l.a.createElement(ue, null, " [ Ctrl+Space ]")),
+                (i.update = l.a.createElement(ue, null, " [ Alt+Enter] "))),
+              r.completionStore.predictSelect ||
+                (r.hasInterface("skip") &&
+                  (n = l.a.createElement(
+                    A.a,
+                    { type: "ghost", onClick: r.skipTask, className: de.a.skip },
+                    "Skip ",
+                    i.skip,
+                  )),
+                ((c && !u) || (r.explore && !c && r.hasInterface("submit"))) &&
+                  (o = l.a.createElement(
+                    A.a,
+                    { type: "primary", icon: "check", onClick: r.sendTask, className: de.a.submit },
+                    "Submit ",
+                    i.submit,
+                  )),
+                ((c && u) || (!c && r.hasInterface("update"))) &&
+                  (a = l.a.createElement(
+                    A.a,
+                    { type: "primary", icon: "rollback", onClick: r.updateTask },
+                    "Update ",
+                    i.update,
+                  )));
+            var p = l.a.createElement(
+              "div",
+              { className: de.a.block },
               l.a.createElement(
                 "div",
-                { className: ie.a.block },
-                l.a.createElement(
-                  "div",
-                  { className: ie.a.wrapper },
-                  l.a.createElement(
-                    "div",
-                    { className: ie.a.container },
-                    o.hasInterface("submit:skip") &&
-                      l.a.createElement(A.a, { type: "ghost", onClick: o.skipTask, className: ie.a.skip }, "Skip ", a),
-                    o.hasInterface("submit:rewrite") &&
-                      l.a.createElement(A.a, { type: "primary", icon: "rollback", onClick: o.rewriteTask }, "Update"),
-                    l.a.createElement(
-                      A.a,
-                      { type: "primary", icon: "check", onClick: o.sendTask, className: ie.a.submit },
-                      "Submit ",
-                      n,
-                    ),
-                  ),
-                  t,
-                ),
-              )
+                { className: de.a.wrapper },
+                l.a.createElement("div", { className: de.a.container }, n, a, o),
+                t,
+              ),
             );
+            return !r.completionStore.predictSelect && p;
           }),
         ),
-        le = n(167),
-        se = n.n(le),
-        ce = Object(u.c)(function(e) {
+        pe = n(122),
+        fe = n.n(pe),
+        ge = n(290),
+        ve = n.n(ge),
+        ye = (function(e) {
+          function t() {
+            return Object(m.a)(this, t), Object(h.a)(this, Object(p.a)(t).apply(this, arguments));
+          }
+          return (
+            Object(f.a)(t, e),
+            Object(d.a)(t, [
+              {
+                key: "render",
+                value: function() {
+                  return l.a.createElement("div", { className: ve.a.block }, this.props.children);
+                },
+              },
+            ]),
+            t
+          );
+        })(l.a.Component),
+        be = Object(u.c)(function(e) {
           var t = e.store,
             n = t.completionStore.selected.history;
           return l.a.createElement(
             "div",
-            { className: se.a.container },
+            { className: fe.a.container },
             l.a.createElement(
               "div",
-              { className: se.a.block },
+              { className: "".concat(fe.a.block, " ").concat(fe.a.block__controls) },
               l.a.createElement(
                 A.a,
                 {
@@ -2376,7 +2540,7 @@
                   },
                 },
                 "Undo",
-                t.settings.enableHotkeys && t.settings.enableTooltips && l.a.createElement(ae, null, "[ Ctrl+z ]"),
+                t.settings.enableHotkeys && t.settings.enableTooltips && l.a.createElement(ue, null, "[ Ctrl+z ]"),
               ),
               l.a.createElement(
                 A.a,
@@ -2415,7 +2579,7 @@
             ),
             l.a.createElement(
               "div",
-              { className: se.a.block },
+              { className: fe.a.block },
               t.showingDescription &&
                 l.a.createElement(
                   A.a,
@@ -2448,13 +2612,13 @@
             ),
           );
         }),
-        ue = n(614),
-        me = n(596),
-        de = n(622),
-        he = Object(u.c)(function(e) {
+        we = n(614),
+        ke = n(597),
+        xe = n(623),
+        Te = Object(u.c)(function(e) {
           var t = e.store;
           return l.a.createElement(
-            ue.a,
+            we.a,
             {
               visible: t.showingSettings,
               title: "Settings",
@@ -2463,13 +2627,13 @@
               onCancel: t.toggleSettings,
             },
             l.a.createElement(
-              me.a,
+              ke.a,
               { defaultActiveKey: "1" },
               l.a.createElement(
-                me.a.TabPane,
+                ke.a.TabPane,
                 { tab: "Hotkeys", key: "1" },
                 l.a.createElement(
-                  de.a,
+                  xe.a,
                   {
                     value: "Enable labeling hotkeys",
                     defaultChecked: t.settings.enableHotkeys,
@@ -2481,7 +2645,7 @@
                 ),
                 l.a.createElement("br", null),
                 l.a.createElement(
-                  de.a,
+                  xe.a,
                   {
                     value: "Show tooltips",
                     defaultChecked: t.settings.enableTooltips,
@@ -2495,14 +2659,14 @@
             ),
           );
         }),
-        pe = n(624),
-        fe = n(620),
-        ge = n(610),
-        ve = (function(e) {
+        Se = n(624),
+        Ne = n(621),
+        Ie = n(611),
+        Ee = (function(e) {
           function t() {
             var e, n;
             Object(m.a)(this, t);
-            for (var a = arguments.length, o = new Array(a), i = 0; i < a; i++) o[i] = arguments[i];
+            for (var a = arguments.length, o = new Array(a), r = 0; r < a; r++) o[r] = arguments[r];
             return (
               ((n = Object(h.a)(this, (e = Object(p.a)(t)).call.apply(e, [this].concat(o)))).state = { res: null }), n
             );
@@ -2521,9 +2685,9 @@
                     "div",
                     null,
                     l.a.createElement("br", null),
-                    l.a.createElement(pe.a, null, "Debug"),
+                    l.a.createElement(Se.a, null, "Debug"),
                     l.a.createElement(
-                      fe.a,
+                      Ne.a,
                       {
                         basic: !0,
                         onClick: function(t) {
@@ -2533,7 +2697,7 @@
                       "Serialize whole tree",
                     ),
                     l.a.createElement(
-                      fe.a,
+                      Ne.a,
                       {
                         basic: !0,
                         onClick: function(t) {
@@ -2543,7 +2707,7 @@
                       "Seriealize results tree",
                     ),
                     l.a.createElement(
-                      fe.a,
+                      Ne.a,
                       {
                         basic: !0,
                         onClick: function(e) {
@@ -2553,7 +2717,7 @@
                       "Load Serialized Results",
                     ),
                     l.a.createElement(
-                      fe.a,
+                      Ne.a,
                       {
                         basic: !0,
                         onClick: function(e) {
@@ -2565,7 +2729,7 @@
                       "Load As New Completion",
                     ),
                     l.a.createElement(
-                      fe.a,
+                      Ne.a,
                       {
                         basic: !0,
                         onClick: function(t) {
@@ -2575,7 +2739,7 @@
                       "Task data",
                     ),
                     l.a.createElement(
-                      fe.a,
+                      Ne.a,
                       {
                         basic: !0,
                         onClick: function(e) {
@@ -2596,9 +2760,9 @@
                     l.a.createElement("br", null),
                     l.a.createElement("br", null),
                     l.a.createElement(
-                      ge.a,
+                      Ie.a,
                       null,
-                      l.a.createElement(ge.a.TextArea, {
+                      l.a.createElement(Ie.a.TextArea, {
                         value: this.state.res,
                         className: "is-search",
                         onChange: function(t) {
@@ -2612,9 +2776,9 @@
             ]),
             t
           );
-        })(r.Component),
-        ye = (Object(u.c)(ve), n(33)),
-        be = Object(u.c)(function(e) {
+        })(i.Component),
+        Oe = Object(u.c)(Ee),
+        Re = Object(u.c)(function(e) {
           var t = e.node,
             n = function(e) {
               return (
@@ -2629,7 +2793,7 @@
             return l.a.createElement(
               "div",
               null,
-              l.a.createElement(ye.a, { type: "font-colors" }),
+              l.a.createElement(B.a, { type: "font-colors" }),
               "Text \xa0",
               l.a.createElement("span", { style: { color: "#5a5a5a" } }, t.text),
             );
@@ -2661,7 +2825,7 @@
             );
           if ("RectRegionModel" === Object(y.i)(t).name) {
             var o = t.width * t.scaleX,
-              i = t.height * t.scaleY;
+              r = t.height * t.scaleY;
             return l.a.createElement(
               "p",
               null,
@@ -2672,7 +2836,7 @@
                 "Rectangle \xa0",
                 o.toFixed(2),
                 " x ",
-                i.toFixed(2),
+                r.toFixed(2),
               ),
             );
           }
@@ -2689,28 +2853,28 @@
               )
             : void 0;
         }),
-        we = function(e) {
+        Ce = function(e) {
           var t = e.node;
           return "TextRegionModel" == Object(y.i)(t).name
-            ? l.a.createElement(r.Fragment, null, l.a.createElement(ye.a, { type: "font-colors" }), " Text")
+            ? l.a.createElement(i.Fragment, null, l.a.createElement(B.a, { type: "font-colors" }), " Text")
             : "RectRegionModel" == Object(y.i)(t).name
-            ? l.a.createElement(r.Fragment, null, l.a.createElement("i", { className: "expand icon" }), "Rectangle")
+            ? l.a.createElement(i.Fragment, null, l.a.createElement("i", { className: "expand icon" }), "Rectangle")
             : "AudioRegionModel" == Object(y.i)(t).name
-            ? l.a.createElement(r.Fragment, null, l.a.createElement("i", { className: "microphone icon" }), "Audio")
+            ? l.a.createElement(i.Fragment, null, l.a.createElement("i", { className: "microphone icon" }), "Audio")
             : "TextAreaRegionModel" == Object(y.i)(t).name
-            ? l.a.createElement(r.Fragment, null, l.a.createElement("i", { className: "i cursor icon" }), "Input")
+            ? l.a.createElement(i.Fragment, null, l.a.createElement("i", { className: "i cursor icon" }), "Input")
             : "PolygonRegionModel" == Object(y.i)(t).name
             ? l.a.createElement(
-                r.Fragment,
+                i.Fragment,
                 null,
                 l.a.createElement("i", { className: "i object ungroup outline icon" }),
                 "Polygon",
               )
             : void 0;
         },
-        ke = n(122),
-        xe = n.n(ke),
-        Te = function(e) {
+        _e = n(123),
+        je = n.n(_e),
+        Ae = function(e) {
           var t = e.store,
             n = e.rl;
           return Object(y.j)(function() {
@@ -2721,11 +2885,11 @@
             })
             ? l.a.createElement(
                 "div",
-                { className: xe.a.block },
+                { className: je.a.block },
                 l.a.createElement(
                   "div",
                   {
-                    className: xe.a.section,
+                    className: je.a.section,
                     onMouseOver: function() {
                       n.toggleHighlight();
                     },
@@ -2735,42 +2899,42 @@
                   },
                   l.a.createElement(
                     "div",
-                    { className: xe.a.section__blocks },
-                    l.a.createElement("div", null, l.a.createElement(we, { node: n.node1 })),
-                    l.a.createElement(ye.a, { type: "arrow-right" }),
-                    l.a.createElement("div", null, l.a.createElement(we, { node: n.node2 })),
+                    { className: je.a.section__blocks },
+                    l.a.createElement("div", null, l.a.createElement(Ce, { node: n.node1 })),
+                    l.a.createElement(B.a, { type: "arrow-right" }),
+                    l.a.createElement("div", null, l.a.createElement(Ce, { node: n.node2 })),
                   ),
                 ),
                 l.a.createElement(
                   "a",
                   {
                     href: "#",
-                    className: xe.a.delete,
+                    className: je.a.delete,
                     onClick: function() {
                       return t.deleteRelation(n), !1;
                     },
                   },
-                  l.a.createElement(ye.a, { type: "delete" }),
+                  l.a.createElement(B.a, { type: "delete" }),
                 ),
               )
             : null;
         },
-        Ne = Object(u.c)(function(e) {
+        De = Object(u.c)(function(e) {
           var t = e.store.completionStore.selected,
             n = t.relationStore.relations;
           return l.a.createElement(
-            r.Fragment,
+            i.Fragment,
             null,
             l.a.createElement("h4", null, "Relations (", n.length, ")"),
             !n.length && l.a.createElement("p", null, "No Relations added yet"),
             t.relationStore.relations.map(function(e) {
-              return l.a.createElement(Te, { store: t.relationStore, rl: e });
+              return l.a.createElement(Ae, { store: t.relationStore, rl: e });
             }),
           );
         }),
-        Se = n(301),
-        Ie = n.n(Se),
-        Ee = Object(u.c)(function(e) {
+        Me = n(303),
+        Be = n.n(Me),
+        Pe = Object(u.c)(function(e) {
           var t = e.store,
             n = e.regionStore.regions;
           return l.a.createElement(
@@ -2791,7 +2955,7 @@
                 n.length > 0 &&
                   t.settings.enableHotkeys &&
                   t.settings.enableTooltips &&
-                  l.a.createElement(ae, null, "[ Ctrl+bksp ]"),
+                  l.a.createElement(ue, null, "[ Ctrl+bksp ]"),
               ),
             !n.length && l.a.createElement("p", null, "No Entitied added yet"),
             l.a.createElement(
@@ -2802,7 +2966,7 @@
                   "li",
                   {
                     key: e.id,
-                    className: Ie.a.item,
+                    className: Be.a.item,
                     onMouseOver: function() {
                       e.toggleHightlight();
                     },
@@ -2810,16 +2974,16 @@
                       e.toggleHightlight();
                     },
                   },
-                  l.a.createElement(be, { node: e }),
+                  l.a.createElement(Re, { node: e }),
                 );
               }),
             ),
           );
         }),
-        Oe = n(623),
-        Re = n(80),
-        Ce = n.n(Re),
-        _e = function(e) {
+        He = n(627),
+        ze = n(82),
+        We = n.n(ze),
+        Le = function(e) {
           var t = e.node,
             n = function(e) {
               return "LabelsModel" === Object(y.i)(e).name ||
@@ -2828,11 +2992,11 @@
                 ? ((t = e),
                   l.a.createElement(
                     "div",
-                    { key: t.pid, className: Ce.a.labels },
+                    { key: t.pid, className: We.a.labels },
                     "Labels:\xa0",
                     t.getSelectedNames().map(function(e) {
                       var n = t.findLabel(e).background ? t.findLabel(e).background : "#000000";
-                      return l.a.createElement(Oe.a, { key: t.findLabel(e).id, color: n, className: Ce.a.tag }, e);
+                      return l.a.createElement(He.a, { key: t.findLabel(e).id, color: n, className: We.a.tag }, e);
                     }),
                   ))
                 : "RatingModel" === Object(y.i)(e).name
@@ -2841,28 +3005,28 @@
               var t;
             };
           return l.a.createElement(
-            r.Fragment,
+            i.Fragment,
             null,
             t.states.map(function(e) {
               return n(e);
             }),
           );
         },
-        je = Object(u.c)(function(e) {
+        Fe = Object(u.c)(function(e) {
           var t = e.store,
             n = e.completion,
             a = n.highlightedNode;
           return l.a.createElement(
-            r.Fragment,
+            i.Fragment,
             null,
-            l.a.createElement("p", null, l.a.createElement(we, { node: a }), " (id: ", a.id, ")"),
+            l.a.createElement("p", null, l.a.createElement(Ce, { node: a }), " (id: ", a.id, ")"),
             a.normalization &&
               l.a.createElement(
                 "p",
                 null,
                 "Normalization: ",
                 a.normalization,
-                l.a.createElement(ye.a, {
+                l.a.createElement(B.a, {
                   name: "delete",
                   style: { cursor: "pointer" },
                   onClick: function() {
@@ -2870,56 +3034,56 @@
                   },
                 }),
               ),
-            a.states && l.a.createElement(_e, { node: a }),
+            a.states && l.a.createElement(Le, { node: a }),
             l.a.createElement(
               "div",
-              { className: Ce.a.block },
+              { className: We.a.block },
               l.a.createElement(
                 A.a,
                 {
-                  className: Ce.a.button,
+                  className: We.a.button,
                   onClick: function() {
                     n.startRelationMode(a);
                   },
                 },
-                l.a.createElement(ye.a, { type: "link" }),
+                l.a.createElement(B.a, { type: "link" }),
                 "Relation",
               ),
               l.a.createElement(
                 A.a,
                 {
-                  className: Ce.a.button,
+                  className: We.a.button,
                   onClick: function() {
                     n.setNormalizationMode(!0);
                   },
                 },
-                l.a.createElement(ye.a, { type: "plus" }),
+                l.a.createElement(B.a, { type: "plus" }),
                 "Normalization",
               ),
               l.a.createElement(
                 A.a,
                 {
-                  className: Ce.a.button,
+                  className: We.a.button,
                   type: "dashed",
                   onClick: function() {
                     n.highlightedNode.unselectRegion();
                   },
                 },
-                l.a.createElement(ye.a, { type: "fullscreen-exit" }),
+                l.a.createElement(B.a, { type: "fullscreen-exit" }),
                 "Unselect",
               ),
               l.a.createElement(
                 A.a,
                 {
                   type: "danger",
-                  className: Ce.a.button,
+                  className: We.a.button,
                   onClick: function() {
                     n.highlightedNode.deleteRegion();
                   },
                 },
-                l.a.createElement(ye.a, { type: "delete" }),
+                l.a.createElement(B.a, { type: "delete" }),
                 "Delete",
-                t.settings.enableHotkeys && t.settings.enableTooltips && l.a.createElement(ae, null, "[ Bksp ]"),
+                t.settings.enableHotkeys && t.settings.enableTooltips && l.a.createElement(ue, null, "[ Bksp ]"),
               ),
             ),
             n.normalizationMode &&
@@ -2927,7 +3091,7 @@
                 "div",
                 null,
                 l.a.createElement(
-                  ge.a,
+                  Ie.a,
                   {
                     style: { marginTop: "0.5em" },
                     onSubmit: function(e) {
@@ -2935,7 +3099,7 @@
                       return a.setNormalization(a.normInput), n.setNormalizationMode(!1), e.preventDefault(), !1;
                     },
                   },
-                  l.a.createElement(ge.a.Input, {
+                  l.a.createElement(Ie.a.Input, {
                     onChange: function(e) {
                       var t = e.target.value;
                       a.setNormInput(t);
@@ -2946,22 +3110,22 @@
               ),
           );
         }),
-        Ae = n(302),
-        De = n.n(Ae),
-        Me = Object(u.c)(function(e) {
+        Je = n(304),
+        Ge = n.n(Je),
+        Ue = Object(u.c)(function(e) {
           var t = e.store,
             n = t.completionStore.selected,
             a = n.highlightedNode;
           return l.a.createElement(
-            D.a,
-            { title: "Entity", className: De.a.card },
-            a && l.a.createElement(je, { store: t, completion: n }),
+            P.a,
+            { title: "Entity", className: Ge.a.card },
+            a && l.a.createElement(Fe, { store: t, completion: n }),
             !n.highlightedNode && l.a.createElement("p", null, "Nothing selected"),
-            l.a.createElement(Ee, { store: t, regionStore: n.regionStore }),
-            l.a.createElement(Ne, { store: t, item: n }),
+            l.a.createElement(Pe, { store: t, regionStore: n.regionStore }),
+            l.a.createElement(De, { store: t, item: n }),
           );
         });
-      function Be(e) {
+      function Ve(e) {
         return y.m.union({
           dispatcher: function(t) {
             if (
@@ -2974,9 +3138,9 @@
           },
         });
       }
-      var He = {
+      var Ye = {
           unionArray: function(e) {
-            return y.m.maybeNull(y.m.array(Be(e)));
+            return y.m.maybeNull(y.m.array(Ve(e)));
           },
           allModelsTypes: function() {
             var e = [
@@ -2996,21 +3160,21 @@
               t = [].concat.apply([], e);
             return y.m.union.apply(null, t);
           },
-          oneOf: Be,
+          oneOf: Ve,
           isType: function(e, t) {
             var n = Object(y.i)(e),
               a = !0,
               o = !1,
-              i = void 0;
+              r = void 0;
             try {
-              for (var r, l = t[Symbol.iterator](); !(a = (r = l.next()).done); a = !0) if (n === r.value) return !0;
+              for (var i, l = t[Symbol.iterator](); !(a = (i = l.next()).done); a = !0) if (n === i.value) return !0;
             } catch (s) {
-              (o = !0), (i = s);
+              (o = !0), (r = s);
             } finally {
               try {
                 a || null == l.return || l.return();
               } finally {
-                if (o) throw i;
+                if (o) throw r;
               }
             }
             return !1;
@@ -3038,16 +3202,16 @@
             return null;
           },
         },
-        We = y.m.model({
+        qe = y.m.model({
           display: y.m.optional(y.m.string, "block"),
           backgroundcolor: y.m.optional(y.m.string, ""),
           margin: y.m.optional(y.m.string, ""),
         }),
-        Pe = y.m.model({
+        Xe = y.m.model({
           id: y.m.identifier,
           type: "view",
           style: y.m.maybeNull(y.m.string),
-          children: He.unionArray([
+          children: Ye.unionArray([
             "view",
             "header",
             "labels",
@@ -3068,12 +3232,12 @@
             "dialog",
           ]),
         }),
-        ze = y.m.compose(
+        Ke = y.m.compose(
           "ViewModel",
-          We,
-          Pe,
+          qe,
+          Xe,
         ),
-        Le = Object(u.c)(function(e) {
+        Ze = Object(u.c)(function(e) {
           var t = e.item,
             n = {};
           return (
@@ -3082,9 +3246,9 @@
             l.a.createElement("div", { style: n }, _.renderChildren(t))
           );
         });
-      k.addTag("view", ze, Le);
-      var Fe = n(613);
-      function Je(e, t) {
+      k.addTag("view", Ke, Ze);
+      var Qe = n(615);
+      function $e(e, t) {
         return "$" === e.charAt(0)
           ? (function e(t, n, a) {
               return "string" === typeof n
@@ -3097,19 +3261,19 @@
             })(t, e.substring(1))
           : e;
       }
-      function Ge(e, t) {
+      function et(e, t) {
         t || (t = {});
         for (
           var n,
             a,
             o = /[$](.+)/g,
-            i = /(^( )?(var|if|for|else|switch|case|break|{|}|;))(.*)?/g,
-            r = "with(obj) { var r=[];\n",
+            r = /(^( )?(var|if|for|else|switch|case|break|{|}|;))(.*)?/g,
+            i = "with(obj) { var r=[];\n",
             l = 0,
             s = function e(t, n) {
               return (
-                (r += n
-                  ? t.match(i)
+                (i += n
+                  ? t.match(r)
                     ? t + "\n"
                     : "r.push(" + t + ");\n"
                   : "" !== t
@@ -3123,33 +3287,33 @@
         )
           s(e.slice(l, a.index))(a[1], !0), (l = a.index + a[0].length);
         if (!e) return "";
-        s(e.substr(l, e.length - l)), (r = (r + 'return r.join(""); }').replace(/[\r\t\n]/g, " "));
+        s(e.substr(l, e.length - l)), (i = (i + 'return r.join(""); }').replace(/[\r\t\n]/g, " "));
         try {
-          n = new Function("obj", r).apply(t, [t]);
+          n = new Function("obj", i).apply(t, [t]);
         } catch (c) {
-          console.error("'" + c.message + "'", " in \n\nCode:\n", r, "\n");
+          console.error("'" + c.message + "'", " in \n\nCode:\n", i, "\n");
         }
         return n;
       }
-      var Ue = y.m.model().actions(function(e) {
+      var tt = y.m.model().actions(function(e) {
           return {
             updateValue: function(t) {
-              e._value = Ge(e.value, t.task.dataObj) || "";
+              e._value = et(e.value, t.task.dataObj) || "";
             },
           };
         }),
-        Ve = y.m.model({
+        nt = y.m.model({
           type: "table",
           size: y.m.optional(y.m.string, "h4"),
           value: y.m.maybeNull(y.m.string),
           _value: y.m.optional(y.m.string, ""),
         }),
-        Ye = y.m.compose(
+        at = y.m.compose(
           "TableModel",
-          Ve,
-          Ue,
+          nt,
+          tt,
         ),
-        qe = Object(u.b)("store")(
+        ot = Object(u.b)("store")(
           Object(u.c)(function(e) {
             var t = e.store,
               n = e.item._value;
@@ -3159,24 +3323,24 @@
                 "div",
                 { style: { marginTop: "1em" } },
                 l.a.createElement(
-                  Fe.a,
+                  Qe.a,
                   { basic: "very", celled: !0, collapsing: !0 },
                   l.a.createElement(
-                    Fe.a.Body,
+                    Qe.a.Body,
                     null,
                     Object.keys(n).map(function(e) {
                       var t = n[e];
                       return (
                         "object" === typeof t && (t = JSON.stringify(t)),
                         l.a.createElement(
-                          Fe.a.Row,
+                          Qe.a.Row,
                           null,
                           l.a.createElement(
-                            Fe.a.Cell,
+                            Qe.a.Cell,
                             null,
-                            l.a.createElement(pe.a, { as: "h4" }, l.a.createElement(pe.a.Subheader, null, e)),
+                            l.a.createElement(Se.a, { as: "h4" }, l.a.createElement(Se.a.Subheader, null, e)),
                           ),
-                          l.a.createElement(Fe.a.Cell, null, t),
+                          l.a.createElement(Qe.a.Cell, null, t),
                         )
                       );
                     }),
@@ -3186,30 +3350,30 @@
             );
           }),
         );
-      k.addTag("table", Ye, qe);
-      var Xe = n(611),
-        Ze = y.m.model({
+      k.addTag("table", at, ot);
+      var rt = n(612),
+        it = y.m.model({
           type: "header",
           size: y.m.optional(y.m.number, 4),
           value: y.m.optional(y.m.string, ""),
           underline: y.m.optional(y.m.boolean, !1),
         }),
-        Ke = y.m.compose(
+        lt = y.m.compose(
           "HeaderModel",
-          Ze,
-          Ue,
+          it,
+          tt,
         ),
-        Qe = Object(u.c)(function(e) {
+        st = Object(u.c)(function(e) {
           var t = e.item;
           return l.a.createElement(
-            Xe.a.Title,
+            rt.a.Title,
             { underline: t.underline, level: t.size, style: { margin: "10px 0" } },
             t.value,
           );
         });
-      k.addTag("header", Ke, Qe);
-      var $e = y.m.model({ value: y.m.maybeNull(y.m.string), name: y.m.maybeNull(y.m.string) });
-      var et = y.m
+      k.addTag("header", lt, st);
+      var ct = y.m.model({ value: y.m.maybeNull(y.m.string), name: y.m.maybeNull(y.m.string) });
+      var ut = y.m
           .model({ id: y.m.identifier, type: "HyperText" })
           .views(function(e) {
             return {
@@ -3228,26 +3392,26 @@
               };
             })(e);
           }),
-        tt = y.m.compose(
+        mt = y.m.compose(
           "HyperTextModel",
-          $e,
-          et,
+          ct,
+          ut,
         ),
-        nt = Object(u.b)("store")(
+        dt = Object(u.b)("store")(
           Object(u.c)(function(e) {
             var t = e.store,
               n = e.item;
             return t.task
-              ? l.a.createElement("div", { dangerouslySetInnerHTML: { __html: Ge(n.value, t.task.dataObj) } })
+              ? l.a.createElement("div", { dangerouslySetInnerHTML: { __html: et(n.value, t.task.dataObj) } })
               : null;
           }),
         );
-      k.addTag("hypertext", tt, nt);
-      var at = n(599),
-        ot = n(608),
-        it = n(92),
-        rt = n.n(it),
-        lt = (function(e) {
+      k.addTag("hypertext", mt, dt);
+      var ht = n(599),
+        pt = n(609),
+        ft = n(93),
+        gt = n.n(ft),
+        vt = (function(e) {
           function t() {
             return Object(m.a)(this, t), Object(h.a)(this, Object(p.a)(t).apply(this, arguments));
           }
@@ -3260,29 +3424,29 @@
                   var e,
                     t,
                     n,
-                    a = "".concat(rt.a.block);
+                    a = "".concat(gt.a.block);
                   return (
-                    this.props.hint && (e = l.a.createElement(Oe.a, { color: "blue" }, this.props.hint)),
+                    this.props.hint && (e = l.a.createElement(He.a, { color: "blue" }, this.props.hint)),
                     this.props.bg && (t = this.props.bg),
                     this.props.selected &&
-                      ((a = "".concat(a, " ").concat(rt.a.block_selected)),
+                      ((a = "".concat(a, " ").concat(gt.a.block_selected)),
                       (e = l.a.createElement(
                         "div",
                         null,
-                        l.a.createElement(Oe.a, { color: "magenta" }, "Selected Message"),
+                        l.a.createElement(He.a, { color: "magenta" }, "Selected Message"),
                       )),
                       this.props.hint &&
                         (e = l.a.createElement(
                           "div",
-                          { className: rt.a.tag },
-                          l.a.createElement(Oe.a, { color: "magenta" }, this.props.hint),
+                          { className: gt.a.tag },
+                          l.a.createElement(He.a, { color: "magenta" }, this.props.hint),
                         ))),
-                    this.props.date && (n = l.a.createElement("span", { className: rt.a.date }, this.props.date)),
+                    this.props.date && (n = l.a.createElement("span", { className: gt.a.date }, this.props.date)),
                     l.a.createElement(
                       "div",
                       { className: a, style: { background: t, width: "max-content", maxWidth: "100%" } },
-                      l.a.createElement("span", { className: rt.a.name }, this.props.name, ":\xa0"),
-                      l.a.createElement("p", { className: rt.a.text }, this.props.text),
+                      l.a.createElement("span", { className: gt.a.name }, this.props.name, ":\xa0"),
+                      l.a.createElement("p", { className: gt.a.text }, this.props.text),
                       n,
                       e,
                     )
@@ -3293,16 +3457,16 @@
             t
           );
         })(l.a.Component),
-        st = y.m.model({
+        yt = y.m.model({
           name: y.m.string,
           text: y.m.string,
           selected: y.m.optional(y.m.boolean, !1),
           date: y.m.optional(y.m.string, ""),
           hint: y.m.optional(y.m.string, ""),
         }),
-        ct = y.m.model({ value: y.m.maybeNull(y.m.string), name: y.m.maybeNull(y.m.string) });
-      var ut = y.m
-          .model({ id: y.m.optional(y.m.identifier, E), type: "Dialog", data: y.m.map(st) })
+        bt = y.m.model({ value: y.m.maybeNull(y.m.string), name: y.m.maybeNull(y.m.string) });
+      var wt = y.m
+          .model({ id: y.m.optional(y.m.identifier, E), type: "Dialog", data: y.m.map(yt) })
           .views(function(e) {
             return {
               get completion() {
@@ -3320,25 +3484,25 @@
               };
             })(e);
           }),
-        mt = y.m.compose(
+        kt = y.m.compose(
           "DialogModel",
-          ct,
-          ut,
+          bt,
+          wt,
         ),
-        dt = Object(u.b)("store")(
+        xt = Object(u.b)("store")(
           Object(u.c)(function(e) {
             var t = e.store,
               n = e.item;
-            if (!t.task || !t.task.dataObj) return l.a.createElement(at.a, null);
+            if (!t.task || !t.task.dataObj) return l.a.createElement(ht.a, null);
             var a = [],
               o = n.value;
             return (
               "$" === o.charAt(0) && (o = o.substr(1)),
               t.task.dataObj[o].forEach(function(e, t) {
                 var n;
-                e.name && (n = J(G(e.name), 0.1)),
+                e.name && (n = V(Y(e.name), 0.1)),
                   a.push(
-                    l.a.createElement(lt, {
+                    l.a.createElement(vt, {
                       key: t,
                       name: e.name,
                       hint: e.hint,
@@ -3367,27 +3531,27 @@
                   },
                   a,
                 ),
-                l.a.createElement(ot.a, { dashed: !0 }),
+                l.a.createElement(pt.a, { dashed: !0 }),
               )
             );
           }),
         );
-      k.addTag("dialog", mt, dt);
-      var ht = n(304),
-        pt = n.n(ht),
-        ft = n(305),
-        gt = n.n(ft),
-        vt = n(306),
-        yt = n.n(vt),
-        bt = n(307),
-        wt = n.n(bt),
-        kt = n(598),
-        xt = n(600),
-        Tt = n(616),
-        Nt = n(612),
-        St = n(218),
-        It = n.n(St);
-      function Et(e, t) {
+      k.addTag("dialog", kt, xt);
+      var Tt = n(306),
+        St = n.n(Tt),
+        Nt = n(307),
+        It = n.n(Nt),
+        Et = n(308),
+        Ot = n.n(Et),
+        Rt = n(309),
+        Ct = n.n(Rt),
+        _t = n(600),
+        jt = n(601),
+        At = n(617),
+        Dt = n(613),
+        Mt = n(221),
+        Bt = n.n(Mt);
+      function Pt(e, t) {
         e = Number(e);
         var n = Math.floor(e / 60);
         e %= 60;
@@ -3397,7 +3561,7 @@
           n > 0 ? (e < 10 && (a = "0" + a), "".concat(n, ":").concat(a)) : a
         );
       }
-      function Ot(e) {
+      function Ht(e) {
         return e >= 2500
           ? 0.01
           : e >= 1e3
@@ -3414,7 +3578,7 @@
           ? 15
           : 60 * Math.ceil(0.5 / e);
       }
-      function Rt(e) {
+      function zt(e) {
         return e >= 2500
           ? 10
           : e >= 1e3
@@ -3431,22 +3595,22 @@
           ? 15
           : 60 * Math.ceil(0.5 / e);
       }
-      function Ct(e) {
-        return Math.floor(10 / Ot(e));
+      function Wt(e) {
+        return Math.floor(10 / Ht(e));
       }
-      var _t = (function(e) {
+      var Lt = (function(e) {
           function t(e) {
             var n;
             return (
               Object(m.a)(this, t),
               ((n = Object(h.a)(this, Object(p.a)(t).call(this, e))).onChangeZoom = function(e) {
-                n.setState(Object(N.a)({}, n.state, { zoom: e })), n.wavesurfer.zoom(e);
+                n.setState(Object(S.a)({}, n.state, { zoom: e })), n.wavesurfer.zoom(e);
               }),
               (n.onChangeVolume = function(e) {
-                n.setState(Object(N.a)({}, n.state, { volume: e })), n.wavesurfer.setVolume(e);
+                n.setState(Object(S.a)({}, n.state, { volume: e })), n.wavesurfer.setVolume(e);
               }),
               (n.onChangeSpeed = function(e) {
-                n.setState(Object(N.a)({}, n.state, { speed: e })), n.wavesurfer.setPlaybackRate(e);
+                n.setState(Object(S.a)({}, n.state, { speed: e })), n.wavesurfer.setPlaybackRate(e);
               }),
               (n.state = {
                 src: n.props.src,
@@ -3475,24 +3639,24 @@
                     progressColor: this.state.colors.progressColor,
                   };
                   this.props.regions &&
-                    (t = Object(N.a)({}, t, {
+                    (t = Object(S.a)({}, t, {
                       plugins: [
-                        gt.a.create({ dragSelection: { slop: 5 } }),
-                        yt.a.create({
+                        It.a.create({ dragSelection: { slop: 5 } }),
+                        Ot.a.create({
                           container: "#timeline",
-                          formatTimeCallback: Et,
-                          timeInterval: Ot,
-                          primaryLabelInterval: Rt,
-                          secondaryLabelInterval: Ct,
+                          formatTimeCallback: Pt,
+                          timeInterval: Ht,
+                          primaryLabelInterval: zt,
+                          secondaryLabelInterval: Wt,
                           primaryColor: "blue",
                           secondaryColor: "blue",
                           primaryFontColor: "#000",
                           secondaryFontColor: "#000",
                         }),
-                        wt.a.create({ wrapper: this.$waveform, showTime: !0, opacity: 1 }),
+                        Ct.a.create({ wrapper: this.$waveform, showTime: !0, opacity: 1 }),
                       ],
                     })),
-                    (this.wavesurfer = pt.a.create(t)),
+                    (this.wavesurfer = St.a.create(t)),
                     this.wavesurfer.load(this.props.src),
                     this.wavesurfer.setPlaybackRate(this.state.speed);
                   var n = this;
@@ -3540,21 +3704,21 @@
                   return l.a.createElement(
                     "div",
                     null,
-                    l.a.createElement("div", { id: "wave", className: It.a.wave }),
+                    l.a.createElement("div", { id: "wave", className: Bt.a.wave }),
                     l.a.createElement("div", { id: "timeline" }),
                     l.a.createElement(
-                      kt.a,
-                      { className: It.a.menu },
+                      _t.a,
+                      { className: Bt.a.menu },
                       this.props.speed &&
                         l.a.createElement(
-                          xt.a,
+                          jt.a,
                           { span: 24 },
                           l.a.createElement(
-                            xt.a,
+                            jt.a,
                             { span: 12 },
                             "Speed:",
                             " ",
-                            l.a.createElement(Tt.a, {
+                            l.a.createElement(At.a, {
                               min: 0.5,
                               max: 3,
                               value: this.state.speed,
@@ -3564,9 +3728,9 @@
                             }),
                           ),
                           l.a.createElement(
-                            xt.a,
+                            jt.a,
                             { span: 24 },
-                            l.a.createElement(Nt.a, {
+                            l.a.createElement(Dt.a, {
                               min: 0.5,
                               max: 3,
                               step: 0.1,
@@ -3579,14 +3743,14 @@
                         ),
                       this.props.volume &&
                         l.a.createElement(
-                          xt.a,
+                          jt.a,
                           { span: 24 },
                           l.a.createElement(
-                            xt.a,
+                            jt.a,
                             { span: 12 },
                             "Volume:",
                             " ",
-                            l.a.createElement(Tt.a, {
+                            l.a.createElement(At.a, {
                               min: 0,
                               max: 1,
                               value: this.state.volume,
@@ -3597,9 +3761,9 @@
                             }),
                           ),
                           l.a.createElement(
-                            xt.a,
+                            jt.a,
                             { span: 24 },
-                            l.a.createElement(Nt.a, {
+                            l.a.createElement(Dt.a, {
                               min: 0,
                               max: 1,
                               step: 0.1,
@@ -3612,14 +3776,14 @@
                         ),
                       this.props.zoom &&
                         l.a.createElement(
-                          xt.a,
+                          jt.a,
                           { span: 24 },
                           l.a.createElement(
-                            xt.a,
+                            jt.a,
                             { span: 12 },
                             "Zoom:",
                             " ",
-                            l.a.createElement(Tt.a, {
+                            l.a.createElement(At.a, {
                               min: 20,
                               max: 500,
                               value: this.state.zoom,
@@ -3629,9 +3793,9 @@
                             }),
                           ),
                           l.a.createElement(
-                            xt.a,
+                            jt.a,
                             { span: 24 },
-                            l.a.createElement(Nt.a, {
+                            l.a.createElement(Dt.a, {
                               min: 20,
                               step: 10,
                               max: 500,
@@ -3650,14 +3814,14 @@
             t
           );
         })(l.a.Component),
-        jt = y.m.model({
+        Ft = y.m.model({
           name: y.m.maybeNull(y.m.string),
           value: y.m.maybeNull(y.m.string),
           zoom: y.m.optional(y.m.boolean, !0),
           volume: y.m.optional(y.m.boolean, !0),
           speed: y.m.optional(y.m.boolean, !0),
         }),
-        At = y.m
+        Jt = y.m
           .model({
             id: y.m.optional(y.m.identifier, E),
             type: "audio",
@@ -3689,20 +3853,20 @@
               },
             };
           }),
-        Dt = y.m.compose(
+        Gt = y.m.compose(
           "AudioModel",
-          jt,
-          At,
-          Ue,
+          Ft,
+          Jt,
+          tt,
         ),
-        Mt = Object(u.c)(function(e) {
+        Ut = Object(u.c)(function(e) {
           e.store;
           var t = e.item;
           return t._value
             ? l.a.createElement(
                 "div",
                 null,
-                l.a.createElement(_t, {
+                l.a.createElement(Lt, {
                   src: t._value,
                   onCreate: t.wsCreated,
                   onLoad: t.onLoad,
@@ -3725,17 +3889,17 @@
                       },
                     },
                     t.playing &&
-                      l.a.createElement(r.Fragment, null, l.a.createElement(ye.a, { type: "pause-circle" }), " Pause"),
+                      l.a.createElement(i.Fragment, null, l.a.createElement(B.a, { type: "pause-circle" }), " Pause"),
                     !t.playing &&
-                      l.a.createElement(r.Fragment, null, l.a.createElement(ye.a, { type: "play-circle" }), " Play"),
+                      l.a.createElement(i.Fragment, null, l.a.createElement(B.a, { type: "play-circle" }), " Play"),
                   ),
                 ),
               )
             : null;
         }),
-        Bt = Object(u.b)("store")(Object(u.c)(Mt));
-      k.addTag("audio", Dt, Bt);
-      var Ht = y.m
+        Vt = Object(u.b)("store")(Object(u.c)(Ut));
+      k.addTag("audio", Gt, Vt);
+      var Yt = y.m
           .model({ selected: y.m.optional(y.m.boolean, !1), highlighted: y.m.optional(y.m.boolean, !1) })
           .actions(function(e) {
             return {
@@ -3768,7 +3932,7 @@
               },
             };
           }),
-        Wt = y.m
+        qt = y.m
           .model({ normInput: y.m.maybeNull(y.m.string), normalization: y.m.maybeNull(y.m.string) })
           .actions(function(e) {
             return {
@@ -3783,7 +3947,7 @@
               },
             };
           }),
-        Pt = y.m.model({
+        Xt = y.m.model({
           value: y.m.maybeNull(y.m.string),
           selected: y.m.optional(y.m.boolean, !1),
           alias: y.m.maybeNull(y.m.string),
@@ -3794,13 +3958,13 @@
           background: y.m.optional(y.m.string, "#36B37E"),
           selectedcolor: y.m.optional(y.m.string, "white"),
         }),
-        zt = y.m
+        Kt = y.m
           .model({ id: y.m.optional(y.m.identifier, E), type: "label", _value: y.m.optional(y.m.string, "") })
           .actions(function(e) {
             return {
               toggleSelected: function() {
                 var t = e.selected,
-                  n = He.getParentOfTypeString(e, ["LabelsModel", "RectangleLabelsModel", "PolygonLabelsModel"]);
+                  n = Ye.getParentOfTypeString(e, ["LabelsModel", "RectangleLabelsModel", "PolygonLabelsModel"]);
                 n.shouldBeUnselected && n.unselectAll(),
                   (n.shouldBeUnselected && !0 === t) || (e.selected = !e.selected);
               },
@@ -3812,13 +3976,13 @@
               },
             };
           }),
-        Lt = y.m.compose(
+        Zt = y.m.compose(
           "LabelModel",
-          Pt,
-          zt,
-          Ue,
+          Xt,
+          Kt,
+          tt,
         ),
-        Ft = Object(u.b)("store")(
+        Qt = Object(u.b)("store")(
           Object(u.c)(function(e) {
             var t = e.item,
               n = e.store,
@@ -3829,7 +3993,7 @@
                 margin: "5px",
               };
             return l.a.createElement(
-              Oe.a,
+              He.a,
               {
                 onClick: function(e) {
                   return t.toggleSelected(), !1;
@@ -3840,16 +4004,16 @@
               t._value,
               "true" === t.showalias &&
                 t.alias &&
-                l.a.createElement("span", { style: X.styleToProp(t.aliasstyle) }, "\xa0", t.alias),
+                l.a.createElement("span", { style: $.styleToProp(t.aliasstyle) }, "\xa0", t.alias),
               n.settings.enableTooltips &&
                 n.settings.enableHotkeys &&
                 t.hotkey &&
-                l.a.createElement(ae, null, "[", t.hotkey, "]"),
+                l.a.createElement(ue, null, "[", t.hotkey, "]"),
             );
           }),
         );
-      k.addTag("label", Lt, Ft);
-      var Jt = y.m
+      k.addTag("label", Zt, Qt);
+      var $t = y.m
           .model()
           .views(function(e) {
             return {
@@ -3885,18 +4049,18 @@
               },
             };
           }),
-        Gt = y.m.model({
+        en = y.m.model({
           name: y.m.maybeNull(y.m.string),
           toname: y.m.maybeNull(y.m.string),
           choice: y.m.optional(y.m.enumeration(["single", "multiple"]), "single"),
           selectionstyle: y.m.maybeNull(y.m.optional(y.m.string, "basic", "border", "bottom")),
         }),
-        Ut = y.m
+        tn = y.m
           .model({
             id: y.m.optional(y.m.identifier, E),
             pid: y.m.optional(y.m.string, E),
             type: "labels",
-            children: He.unionArray(["labels", "label", "choice"]),
+            children: Ye.unionArray(["labels", "label", "choice"]),
           })
           .views(function(e) {
             return {
@@ -3929,13 +4093,13 @@
               },
             };
           }),
-        Vt = y.m.compose(
+        nn = y.m.compose(
           "LabelsModel",
-          Gt,
-          Ut,
-          Jt,
+          en,
+          tn,
+          $t,
         ),
-        Yt = Object(u.c)(function(e) {
+        an = Object(u.c)(function(e) {
           var t = e.item;
           return l.a.createElement(
             "div",
@@ -3952,9 +4116,9 @@
             _.renderChildren(t),
           );
         });
-      k.addTag("labels", Vt, Yt);
-      var qt = n(625),
-        Xt = y.m.model({
+      k.addTag("labels", nn, an);
+      var on = n(626),
+        rn = y.m.model({
           name: y.m.maybeNull(y.m.string),
           toname: y.m.maybeNull(y.m.string),
           maxrating: y.m.optional(y.m.string, "5"),
@@ -3962,7 +4126,7 @@
           size: y.m.optional(y.m.string, "large"),
           hotkey: y.m.maybeNull(y.m.string),
         }),
-        Zt = y.m
+        ln = y.m
           .model({
             id: y.m.optional(y.m.identifier, E),
             pid: y.m.optional(y.m.string, E),
@@ -4009,19 +4173,19 @@
               },
             };
           }),
-        Kt = y.m.compose(
+        sn = y.m.compose(
           "RatingModel",
-          Xt,
-          Zt,
+          rn,
+          ln,
         ),
-        Qt = Object(u.b)("store")(
+        cn = Object(u.b)("store")(
           Object(u.c)(function(e) {
             var t = e.item,
               n = e.store;
             return l.a.createElement(
               "div",
               null,
-              l.a.createElement(qt.a, {
+              l.a.createElement(on.a, {
                 icon: "star",
                 size: t.size,
                 defaultRating: 0,
@@ -4037,20 +4201,20 @@
             );
           }),
         );
-      k.addTag("rating", Kt, Qt);
-      var $t = y.m
+      k.addTag("rating", sn, cn);
+      var un = y.m
           .model("AudioRegionModel", {
             id: y.m.optional(y.m.identifier, E),
             pid: y.m.optional(y.m.string, E),
             start: y.m.number,
             end: y.m.number,
-            states: y.m.maybeNull(y.m.array(y.m.union(Vt, Kt))),
+            states: y.m.maybeNull(y.m.array(y.m.union(nn, sn))),
             selectedregionbg: y.m.optional(y.m.string, "rgba(0, 0, 0, 0.5)"),
           })
           .views(function(e) {
             return {
               get parent() {
-                return Object(y.f)(e, rn);
+                return Object(y.f)(e, gn);
               },
               get completion() {
                 return Object(y.g)(e).completionStore.selected;
@@ -4082,7 +4246,7 @@
               selectRegion: function() {
                 (e.selected = !0),
                   e.completion.setHighlightedNode(e),
-                  e._ws_region.update({ color: X.Colors.rgbaChangeAlpha(e.selectedregionbg, 0.8) });
+                  e._ws_region.update({ color: $.Colors.rgbaChangeAlpha(e.selectedregionbg, 0.8) });
               },
               unselectRegion: function() {
                 (e.selected = !1),
@@ -4092,7 +4256,7 @@
               setHighlight: function(t) {
                 (e.highlighted = t),
                   t
-                    ? (e._ws_region.update({ color: X.Colors.rgbaChangeAlpha(e.selectedregionbg, 0.8) }),
+                    ? (e._ws_region.update({ color: $.Colors.rgbaChangeAlpha(e.selectedregionbg, 0.8) }),
                       (e._ws_region.element.style.border = "2px solid red"))
                     : (e._ws_region.update({ color: e.selectedregionbg }),
                       (e._ws_region.element.style.border = "none"));
@@ -4103,7 +4267,7 @@
               },
               onClick: function(t) {
                 e.completion.relationMode ||
-                  e._ws_region.update({ color: X.Colors.rgbaChangeAlpha(e.selectedregionbg, 0.8) }),
+                  e._ws_region.update({ color: $.Colors.rgbaChangeAlpha(e.selectedregionbg, 0.8) }),
                   e.onClickRegion();
               },
               onMouseOver: function() {
@@ -4117,28 +4281,28 @@
               },
             };
           }),
-        en = y.m.compose(
+        mn = y.m.compose(
           "AudioRegionModel",
-          Ht,
-          Wt,
-          $t,
+          Yt,
+          qt,
+          un,
         ),
-        tn = n(309),
-        nn = n.n(tn),
-        an = y.m.model({
+        dn = n(311),
+        hn = n.n(dn),
+        pn = y.m.model({
           name: y.m.maybeNull(y.m.string),
           value: y.m.maybeNull(y.m.string),
           zoom: y.m.optional(y.m.boolean, !0),
           volume: y.m.optional(y.m.boolean, !0),
           speed: y.m.optional(y.m.boolean, !0),
         }),
-        on = y.m
+        fn = y.m
           .model("AudioPlusModel", {
             id: y.m.identifier,
             type: "audio",
             _value: y.m.optional(y.m.string, ""),
             playing: y.m.optional(y.m.boolean, !1),
-            regions: y.m.array(en),
+            regions: y.m.array(mn),
             height: y.m.optional(y.m.number, 128),
           })
           .views(function(e) {
@@ -4180,11 +4344,11 @@
               fromStateJSON: function(t, n) {
                 var a,
                   o,
-                  i = { pid: t.id, start: t.value.start, end: t.value.end, normalization: t.normalization },
-                  r = e.findRegion(t.value.start, t.value.end);
+                  r = { pid: t.id, start: t.value.start, end: t.value.end, normalization: t.normalization },
+                  i = e.findRegion(t.value.start, t.value.end);
                 return (
                   t.value.labels && e.completion.names.get(t.from_name).fromStateJSON(t),
-                  n && ((o = R(n)).fromStateJSON(t), r ? r.states.push(o) : ((i.states = [o]), (a = e.addRegion(i)))),
+                  n && ((o = R(n)).fromStateJSON(t), i ? i.states.push(o) : ((r.states = [o]), (a = e.addRegion(r)))),
                   e._ws && e._ws.addRegion({ start: a.start, end: a.end }),
                   a
                 );
@@ -4204,25 +4368,25 @@
                     : null,
                   o = e.findRegion(t.start, t.end);
                 if (e.findRegion(t.start, t.end)) return (o._ws_region = t), o;
-                var i = n && n[0] ? X.Colors.convertToRGBA(n[0].getSelectedColor(), 0.3) : e.selectedregionbg,
-                  r = en.create({
+                var r = n && n[0] ? $.Colors.convertToRGBA(n[0].getSelectedColor(), 0.3) : e.selectedregionbg,
+                  i = mn.create({
                     id: t.id ? t.id : E(),
                     pid: t.pid ? t.pid : E(),
                     start: t.start,
                     end: t.end,
                     regionbg: e.regionbg,
-                    selectedregionbg: i,
+                    selectedregionbg: r,
                     states: a,
                   });
                 return (
-                  (r._ws_region = t),
-                  e.regions.push(r),
-                  e.completion.addRegion(r),
+                  (i._ws_region = t),
+                  e.regions.push(i),
+                  e.completion.addRegion(i),
                   n &&
                     n.forEach(function(e) {
                       return e.unselectAll();
                     }),
-                  r
+                  i
                 );
               },
               handlePlay: function() {
@@ -4239,20 +4403,20 @@
               },
             };
           }),
-        rn = y.m.compose(
+        gn = y.m.compose(
           "AudioPlusModel",
-          an,
-          on,
-          Ue,
+          pn,
+          fn,
+          tt,
         ),
-        ln = Object(u.c)(function(e) {
+        vn = Object(u.c)(function(e) {
           e.store;
           var t = e.item;
           return t._value
             ? l.a.createElement(
                 "div",
                 null,
-                l.a.createElement(_t, {
+                l.a.createElement(Lt, {
                   src: t._value,
                   selectRegion: t.selectRegion,
                   handlePlay: t.handlePlay,
@@ -4272,25 +4436,25 @@
                     A.a,
                     {
                       type: "primary",
-                      className: nn.a.play,
+                      className: hn.a.play,
                       onClick: function(e) {
                         t._ws.playPause();
                       },
                     },
                     t.playing &&
-                      l.a.createElement(r.Fragment, null, l.a.createElement(ye.a, { type: "pause-circle" }), " Pause"),
+                      l.a.createElement(i.Fragment, null, l.a.createElement(B.a, { type: "pause-circle" }), " Pause"),
                     !t.playing &&
-                      l.a.createElement(r.Fragment, null, l.a.createElement(ye.a, { type: "play-circle" }), " Play"),
+                      l.a.createElement(i.Fragment, null, l.a.createElement(B.a, { type: "play-circle" }), " Play"),
                   ),
                 ),
               )
             : null;
         }),
-        sn = Object(u.b)("store")(Object(u.c)(ln));
-      k.addTag("audioplus", rn, sn);
-      var cn = n(57),
-        un =
-          (n(118),
+        yn = Object(u.b)("store")(Object(u.c)(vn));
+      k.addTag("audioplus", gn, yn);
+      var bn = n(57),
+        wn =
+          (n(119),
           y.m.model({
             name: y.m.maybeNull(y.m.string),
             toname: y.m.maybeNull(y.m.string),
@@ -4300,7 +4464,7 @@
             strokecolor: y.m.optional(y.m.string, "#f48a42"),
             canrotate: y.m.optional(y.m.string, "true"),
           })),
-        mn = y.m
+        kn = y.m
           .model({ id: y.m.identifier, type: "rectangle" })
           .views(function(e) {
             return {
@@ -4316,21 +4480,21 @@
           .actions(function(e) {
             return { fromStateJSON: function(e) {} };
           }),
-        dn = y.m.compose(
+        xn = y.m.compose(
           "RectangleModel",
-          un,
-          mn,
+          wn,
+          kn,
         );
-      k.addTag("rectangle", dn, function() {
+      k.addTag("rectangle", xn, function() {
         return null;
       });
-      var hn = y.m.model({ name: y.m.maybeNull(y.m.string), toname: y.m.maybeNull(y.m.string) }),
-        pn = y.m
+      var Tn = y.m.model({ name: y.m.maybeNull(y.m.string), toname: y.m.maybeNull(y.m.string) }),
+        Sn = y.m
           .model("RectangleLabelsModel", {
             id: y.m.optional(y.m.identifier, E),
             pid: y.m.optional(y.m.string, E),
             type: "rectanglelabels",
-            children: He.unionArray(["labels", "label", "choice"]),
+            children: Ye.unionArray(["labels", "label", "choice"]),
           })
           .actions(function(e) {
             return {
@@ -4345,23 +4509,23 @@
               },
             };
           }),
-        fn = y.m.compose(
-          Vt,
-          dn,
-          hn,
-          pn,
-          Jt,
+        Nn = y.m.compose(
+          nn,
+          xn,
+          Tn,
+          Sn,
+          $t,
         ),
-        gn = y.m.compose(
+        In = y.m.compose(
           "RectangleLabelsModel",
-          fn,
+          Nn,
         ),
-        vn = Object(u.c)(function(e) {
+        En = Object(u.c)(function(e) {
           var t = e.item;
-          return l.a.createElement(Yt, { item: t });
+          return l.a.createElement(an, { item: t });
         });
-      k.addTag("rectanglelabels", gn, vn);
-      var yn = y.m
+      k.addTag("rectanglelabels", In, En);
+      var On = y.m
           .model({
             id: y.m.identifier,
             pid: y.m.optional(y.m.string, E),
@@ -4377,7 +4541,7 @@
             strokewidth: y.m.number,
             fillcolor: y.m.maybeNull(y.m.string),
             strokecolor: y.m.string,
-            states: y.m.maybeNull(y.m.array(y.m.union(Vt, Kt, gn))),
+            states: y.m.maybeNull(y.m.array(y.m.union(nn, sn, In))),
             wp: y.m.maybeNull(y.m.number),
             hp: y.m.maybeNull(y.m.number),
             sw: y.m.maybeNull(y.m.number),
@@ -4387,7 +4551,7 @@
           .views(function(e) {
             return {
               get parent() {
-                return Object(y.f)(e, Wn);
+                return Object(y.f)(e, qn);
               },
               get completion() {
                 return Object(y.g)(e).completionStore.selected;
@@ -4402,15 +4566,15 @@
               coordsInside: function(t, n) {
                 var a = e.x,
                   o = e.y,
-                  i = e.width * (e.scaleX || 1),
-                  r = e.height * (e.scaleY || 1);
-                return t > a && t < a + i && n > o && n < o + r;
+                  r = e.width * (e.scaleX || 1),
+                  i = e.height * (e.scaleY || 1);
+                return t > a && t < a + r && n > o && n < o + i;
               },
               selectRegion: function() {
                 (e.selected = !0), e.completion.setHighlightedNode(e), e.parent.setSelected(e.id);
               },
-              setPosition: function(t, n, a, o, i) {
-                (e.x = t), (e.y = n), (e.width = a), (e.height = o), (e.rotation = i);
+              setPosition: function(t, n, a, o, r) {
+                (e.x = t), (e.y = n), (e.width = a), (e.height = o), (e.rotation = r);
               },
               setScale: function(t, n) {
                 (e.scaleX = t), (e.scaleY = n);
@@ -4462,13 +4626,13 @@
               },
             };
           }),
-        bn = y.m.compose(
+        Rn = y.m.compose(
           "RectRegionModel",
-          Ht,
-          Wt,
-          yn,
+          Yt,
+          qt,
+          On,
         ),
-        wn = Object(u.b)("store")(
+        Cn = Object(u.b)("store")(
           Object(u.c)(function(e) {
             var t = e.store,
               n = e.item,
@@ -4481,7 +4645,7 @@
                 n.hp || (n.parent.stageHeight, n.parent.naturalHeight),
                 n.x),
               o = n.y,
-              i = n.width,
+              r = n.width,
               s = n.height,
               c = {};
             return (
@@ -4493,15 +4657,15 @@
               (c.shadowBlur = 0),
               n.highlighted && (c.stroke = "#ff0000"),
               l.a.createElement(
-                r.Fragment,
+                i.Fragment,
                 null,
                 l.a.createElement(
-                  cn.Rect,
+                  bn.Rect,
                   Object.assign(
                     {
                       x: a,
                       y: o,
-                      width: i,
+                      width: r,
                       height: s,
                       scaleX: n.scaleX,
                       scaleY: n.scaleY,
@@ -4562,10 +4726,10 @@
             );
           }),
         );
-      k.addTag("rectangleregion", bn, wn);
-      n(340);
-      var kn = n(310),
-        xn = y.m
+      k.addTag("rectangleregion", Rn, Cn);
+      n(341);
+      var _n = n(312),
+        jn = y.m
           .model({
             init_x: y.m.optional(y.m.number, 0),
             init_y: y.m.optional(y.m.number, 0),
@@ -4613,12 +4777,12 @@
               },
             };
           }),
-        Tn = Object(u.c)(function(e) {
+        An = Object(u.c)(function(e) {
           var t = e.item,
             n = e.index,
             a = { small: 1, medium: 2, large: 3 },
             o = { small: 4, medium: 8, large: 12 }[t.size],
-            i =
+            r =
               0 === n
                 ? {
                     hitStrokeWidth: 12,
@@ -4626,7 +4790,7 @@
                     onMouseOut: t.handleMouseOutStartPoint,
                   }
                 : null,
-            r =
+            i =
               (t.parent.mouseOverStartPoint,
               {
                 onDragStart: function(e) {},
@@ -4643,7 +4807,7 @@
               });
           return "circle" == t.style
             ? l.a.createElement(
-                cn.Circle,
+                bn.Circle,
                 Object.assign(
                   {
                     key: n,
@@ -4654,13 +4818,13 @@
                     stroke: "black",
                     strokeWidth: a[t.size],
                   },
-                  r,
                   i,
+                  r,
                   { draggable: !0 },
                 ),
               )
             : l.a.createElement(
-                cn.Rect,
+                bn.Rect,
                 Object.assign(
                   {
                     key: n,
@@ -4673,13 +4837,13 @@
                     strokeWidth: a[t.size],
                     dragOnTop: !1,
                   },
-                  r,
                   i,
+                  r,
                   { draggable: !0 },
                 ),
               );
         }),
-        Nn = y.m.model({
+        Dn = y.m.model({
           name: y.m.maybeNull(y.m.string),
           toname: y.m.maybeNull(y.m.string),
           opacity: y.m.optional(y.m.string, "0.6"),
@@ -4689,7 +4853,7 @@
           pointsize: y.m.optional(y.m.string, "medium"),
           pointstyle: y.m.optional(y.m.string, "rectangle"),
         }),
-        Sn = y.m
+        Mn = y.m
           .model({ id: y.m.identifier, type: "polygon", _value: y.m.optional(y.m.string, "") })
           .views(function(e) {
             return {
@@ -4716,25 +4880,25 @@
           .actions(function(e) {
             return {};
           }),
-        In = y.m.compose(
+        Bn = y.m.compose(
           "PolygonModel",
-          Nn,
-          Sn,
+          Dn,
+          Mn,
         ),
-        En = Object(u.b)("store")(
+        Pn = Object(u.b)("store")(
           Object(u.c)(function(e) {
             e.store, e.item;
             return null;
           }),
         );
-      k.addTag("polygon", In, En);
-      var On = y.m.model({ name: y.m.maybeNull(y.m.string), toname: y.m.maybeNull(y.m.string) }),
-        Rn = y.m
+      k.addTag("polygon", Bn, Pn);
+      var Hn = y.m.model({ name: y.m.maybeNull(y.m.string), toname: y.m.maybeNull(y.m.string) }),
+        zn = y.m
           .model("PolygonLabelsModel", {
             id: y.m.optional(y.m.identifier, E),
             pid: y.m.optional(y.m.string, E),
             type: "polygonlabels",
-            children: He.unionArray(["labels", "label", "choice"]),
+            children: Ye.unionArray(["labels", "label", "choice"]),
           })
           .actions(function(e) {
             return {
@@ -4749,23 +4913,23 @@
               },
             };
           }),
-        Cn = y.m.compose(
-          Vt,
-          In,
-          On,
-          Rn,
-          Jt,
+        Wn = y.m.compose(
+          nn,
+          Bn,
+          Hn,
+          zn,
+          $t,
         ),
-        _n = y.m.compose(
+        Ln = y.m.compose(
           "PolygonLabelsModel",
-          Cn,
+          Wn,
         ),
-        jn = Object(u.c)(function(e) {
+        Fn = Object(u.c)(function(e) {
           var t = e.item;
-          return l.a.createElement(Yt, { item: t });
+          return l.a.createElement(an, { item: t });
         });
-      k.addTag("polygonlabels", _n, jn);
-      var An = y.m
+      k.addTag("polygonlabels", Ln, Fn);
+      var Jn = y.m
           .model({
             id: y.m.identifier,
             pid: y.m.optional(y.m.string, E),
@@ -4777,8 +4941,8 @@
             pointsize: y.m.string,
             pointstyle: y.m.string,
             closed: y.m.optional(y.m.boolean, !1),
-            points: y.m.array(xn, []),
-            states: y.m.maybeNull(y.m.array(y.m.union(Vt, Kt, _n))),
+            points: y.m.array(jn, []),
+            states: y.m.maybeNull(y.m.array(y.m.union(nn, sn, Ln))),
             mouseOverStartPoint: y.m.optional(y.m.boolean, !1),
             fromName: y.m.maybeNull(y.m.string),
             wp: y.m.maybeNull(y.m.number),
@@ -4787,7 +4951,7 @@
           .views(function(e) {
             return {
               get parent() {
-                return Object(y.f)(e, Wn);
+                return Object(y.f)(e, qn);
               },
               get completion() {
                 return Object(y.g)(e).completionStore.selected;
@@ -4822,18 +4986,18 @@
                   o = t.reduce(function(e, t) {
                     return e.y < t.y ? e : t;
                   }),
-                  i = t.reduce(function(e, t) {
+                  r = t.reduce(function(e, t) {
                     return e.y > t.y ? e : t;
                   });
-                return { x: n.x, y: o.y, width: a.x - n.x, height: i.y - o.y };
+                return { x: n.x, y: o.y, width: a.x - n.x, height: r.y - o.y };
               },
               coordsInside: function(t, n) {
-                for (var a = !1, o = e.points, i = 0, r = o.length - 1; i < o.length; r = i++) {
-                  var l = o[i][0],
-                    s = o[i][1],
-                    c = o[r][0],
-                    u = o[r][1];
-                  s > n != u > n && t < ((c - l) * (n - s)) / (u - s) + l && (Object(kn.a)("inside"), (a = !a));
+                for (var a = !1, o = e.points, r = 0, i = o.length - 1; r < o.length; i = r++) {
+                  var l = o[r][0],
+                    s = o[r][1],
+                    c = o[i][0],
+                    u = o[i][1];
+                  s > n != u > n && t < ((c - l) * (n - s)) / (u - s) + l && (Object(_n.a)("inside"), (a = !a));
                 }
                 return a;
               },
@@ -4854,8 +5018,8 @@
                 if (e.points.length < 2) return !1;
                 var a = e.points[0],
                   o = t,
-                  i = n;
-                return (a.x - o) * (a.x - o) + (a.y - i) * (i - i) < 50;
+                  r = n;
+                return (a.x - o) * (a.x - o) + (a.y - r) * (r - r) < 50;
               },
               unselectRegion: function() {
                 (e.selected = !1), e.parent.setSelected(void 0), e.completion.setHighlightedNode(null);
@@ -4863,8 +5027,8 @@
               selectRegion: function() {
                 (e.selected = !0), e.completion.setHighlightedNode(e), e.parent.setSelected(e.id);
               },
-              setPosition: function(t, n, a, o, i) {
-                (e.x = t), (e.y = n), (e.width = a), (e.height = o), (e.rotation = i);
+              setPosition: function(t, n, a, o, r) {
+                (e.x = t), (e.y = n), (e.width = a), (e.height = o), (e.rotation = r);
               },
               setScale: function(t, n) {
                 (e.scaleX = t), (e.scaleY = n);
@@ -4883,11 +5047,11 @@
                   n = t.naturalWidth,
                   a = t.naturalHeight,
                   o = t.stageWidth,
-                  i = t.stageHeight,
-                  r = (100 * o) / n,
-                  l = (100 * i) / a,
+                  r = t.stageHeight,
+                  i = (100 * o) / n,
+                  l = (100 * r) / a,
                   s = e.points.map(function(e) {
-                    return [(100 * ((100 * e.x) / r)) / n, (100 * ((100 * e.y) / l)) / a];
+                    return [(100 * ((100 * e.x) / i)) / n, (100 * ((100 * e.y) / l)) / a];
                   }),
                   c = e.parent,
                   u = function(t) {
@@ -4910,13 +5074,13 @@
               },
             };
           }),
-        Dn = y.m.compose(
+        Gn = y.m.compose(
           "PolygonRegionModel",
-          Ht,
-          Wt,
-          An,
+          Yt,
+          qt,
+          Jn,
         );
-      var Mn = Object(u.b)("store")(
+      var Un = Object(u.b)("store")(
         Object(u.c)(function(e) {
           var t = e.store,
             n = e.item,
@@ -4939,11 +5103,11 @@
             (a.strokeWidth = n.strokewidth),
             n.highlighted && (a.stroke = "red"),
             l.a.createElement(
-              r.Fragment,
+              i.Fragment,
               null,
               n.mouseOverStartPoint,
               l.a.createElement(
-                cn.Line,
+                bn.Line,
                 Object.assign(
                   {
                     points: n.linePoints(),
@@ -4960,10 +5124,10 @@
                       var t = e.x,
                         a = e.y,
                         o = n.parent.stageWidth - this.getAttr("width"),
-                        i = n.parent.stageHeight - this.getAttr("height");
+                        r = n.parent.stageHeight - this.getAttr("height");
                       return (
                         t > o && (t = o),
-                        a > i && (a = i),
+                        a > r && (a = r),
                         n.points.forEach(function(e) {
                           e.movePoint(t, a);
                         }),
@@ -5003,26 +5167,26 @@
               ),
               !n.closed &&
                 n.points.map(function(e, t) {
-                  return l.a.createElement(Tn, { item: e, index: t });
+                  return l.a.createElement(An, { item: e, index: t });
                 }),
               n.closed &&
                 n.selected &&
                 n.points.map(function(e, t) {
-                  return l.a.createElement(Tn, { item: e, index: t });
+                  return l.a.createElement(An, { item: e, index: t });
                 }),
             )
           );
         }),
       );
-      k.addTag("polygonregion", Dn, Mn);
-      var Bn = y.m.model({
+      k.addTag("polygonregion", Gn, Un);
+      var Vn = y.m.model({
           name: y.m.maybeNull(y.m.string),
           value: y.m.maybeNull(y.m.string),
           resize: y.m.maybeNull(y.m.string),
           width: y.m.optional(y.m.string, "100%"),
           maxwidth: y.m.optional(y.m.string, "750px"),
         }),
-        Hn = y.m
+        Yn = y.m
           .model({
             id: y.m.identifier,
             type: "image",
@@ -5031,9 +5195,9 @@
             stageHeight: y.m.optional(y.m.integer, 1),
             naturalWidth: y.m.optional(y.m.integer, 1),
             naturalHeight: y.m.optional(y.m.integer, 1),
-            selectedShape: y.m.safeReference(y.m.union(bn, Dn)),
-            activePolygon: y.m.maybeNull(y.m.safeReference(Dn)),
-            shapes: y.m.array(y.m.union(bn, Dn), []),
+            selectedShape: y.m.safeReference(y.m.union(Rn, Gn)),
+            activePolygon: y.m.maybeNull(y.m.safeReference(Gn)),
+            shapes: y.m.array(y.m.union(Rn, Gn), []),
           })
           .views(function(e) {
             return {
@@ -5065,15 +5229,15 @@
                 var n = t.target,
                   a = n.width,
                   o = n.height,
-                  i = n.naturalWidth,
-                  r = n.naturalHeight;
+                  r = n.naturalWidth,
+                  i = n.naturalHeight;
                 e.hasStates &&
-                  ((e.naturalWidth = i),
-                  (e.naturalHeight = r),
+                  ((e.naturalWidth = r),
+                  (e.naturalHeight = i),
                   (e.stageWidth = a),
                   (e.stageHeight = o),
                   e.shapes.forEach(function(e) {
-                    return e.updateImageSize(a / i, o / r, a, o);
+                    return e.updateImageSize(a / r, o / i, a, o);
                   }));
               },
               _setStageRef: function(t) {
@@ -5113,21 +5277,21 @@
                         });
                   }
                 else if ("RectangleLabelsModel" === e.controlButtonType()) {
-                  var i = e.completion.toNames.get(e.name),
-                    r = i
-                      ? i.filter(function(e) {
+                  var r = e.completion.toNames.get(e.name),
+                    i = r
+                      ? r.filter(function(e) {
                           return !0 === e.isSelected;
                         })
                       : null,
-                    l = r
-                      ? r.map(function(e) {
+                    l = i
+                      ? i.map(function(e) {
                           return O(e);
                         })
                       : null;
                   if (0 === l.length) return;
                   e._addRect(t, l),
-                    r &&
-                      r.forEach(function(e) {
+                    i &&
+                      i.forEach(function(e) {
                         return e.unselectAll();
                       });
                 }
@@ -5137,12 +5301,12 @@
                 n && n.length && (a = n[0].getSelectedColor());
                 e.stageWidth, e.naturalWidth, e.stageHeight, e.naturalHeight;
                 var o = t.evt.offsetX,
-                  i = t.evt.offsetY;
-                e.__addRect(Math.floor(o - 50), Math.floor(i - 50), 100, 100, a, n);
+                  r = t.evt.offsetY;
+                e.__addRect(Math.floor(o - 50), Math.floor(r - 50), 100, 100, a, n);
               },
-              __addRect: function(t, n, a, o, i, r, l) {
+              __addRect: function(t, n, a, o, r, i, l) {
                 var s = e.controlButton(),
-                  c = bn.create({
+                  c = Rn.create({
                     id: E(),
                     x: t,
                     y: n,
@@ -5151,8 +5315,8 @@
                     opacity: parseFloat(s.opacity),
                     fillcolor: s.fillcolor,
                     strokewidth: parseInt(s.strokewidth),
-                    strokecolor: i,
-                    states: r,
+                    strokecolor: r,
+                    states: i,
                     coordstype: l,
                   });
                 e._addShape(c);
@@ -5167,19 +5331,19 @@
                 else if (!1 === e.completion.dragMode) {
                   if (e.activePolygon) a = e.activePolygon;
                   else {
-                    var i = e.controlButton();
-                    (a = Dn.create({
+                    var r = e.controlButton();
+                    (a = Gn.create({
                       id: E(),
                       x: t.evt.offsetX - 5,
                       y: t.evt.offsetY - 5,
                       width: o,
                       height: o,
-                      opacity: parseFloat(i.opacity),
-                      fillcolor: i.fillcolor,
-                      strokewidth: parseInt(i.strokewidth),
-                      strokecolor: i.strokecolor,
-                      pointsize: i.pointsize,
-                      pointstyle: i.pointstyle,
+                      opacity: parseFloat(r.opacity),
+                      fillcolor: r.fillcolor,
+                      strokewidth: parseInt(r.strokewidth),
+                      strokecolor: r.strokecolor,
+                      pointsize: r.pointsize,
+                      pointstyle: r.pointstyle,
                       states: n,
                     })),
                       e.setActivePolygon(a),
@@ -5211,13 +5375,13 @@
               },
             };
           }),
-        Wn = y.m.compose(
+        qn = y.m.compose(
           "ImageModel",
-          Bn,
-          Hn,
-          Ue,
+          Vn,
+          Yn,
+          tt,
         ),
-        Pn = (function(e) {
+        Xn = (function(e) {
           function t() {
             return Object(m.a)(this, t), Object(h.a)(this, Object(p.a)(t).apply(this, arguments));
           }
@@ -5252,7 +5416,7 @@
                 key: "render",
                 value: function() {
                   var e = this;
-                  return l.a.createElement(cn.Transformer, {
+                  return l.a.createElement(bn.Transformer, {
                     resizeEnabled: !0,
                     rotateEnabled: this.props.rotateEnabled,
                     anchorSize: 8,
@@ -5266,11 +5430,11 @@
             t
           );
         })(l.a.Component),
-        zn = (function(e) {
+        Kn = (function(e) {
           function t() {
             var e, n;
             Object(m.a)(this, t);
-            for (var a = arguments.length, o = new Array(a), i = 0; i < a; i++) o[i] = arguments[i];
+            for (var a = arguments.length, o = new Array(a), r = 0; r < a; r++) o[r] = arguments[r];
             return (
               ((n = Object(h.a)(this, (e = Object(p.a)(t)).call.apply(e, [this].concat(o)))).handleDblClick = function(
                 e,
@@ -5304,7 +5468,7 @@
                   var a = {},
                     o = { width: n.width, maxWidth: n.maxwidth };
                   if ((n.resize && (o.transform = "scale(" + n.resize + ", " + n.resize + ")"), n.hasStates)) {
-                    var i = "true" === n.controlButton().canrotate;
+                    var r = "true" === n.controlButton().canrotate;
                     return l.a.createElement(
                       "div",
                       { style: { position: "relative" } },
@@ -5319,7 +5483,7 @@
                         l.a.createElement("img", { style: o, src: n._value, onLoad: n.updateIE }),
                       ),
                       l.a.createElement(
-                        cn.Stage,
+                        bn.Stage,
                         {
                           ref: function(e) {
                             n._setStageRef(e);
@@ -5332,12 +5496,12 @@
                           style: { position: "absolute", top: 0, left: 0 },
                         },
                         l.a.createElement(
-                          cn.Layer,
+                          bn.Layer,
                           null,
                           n.shapes.map(function(e) {
                             return _.renderItem(e);
                           }),
-                          l.a.createElement(Pn, { rotateEnabled: i, selectedShapeName: this.props.item.selectedShape }),
+                          l.a.createElement(Xn, { rotateEnabled: r, selectedShapeName: this.props.item.selectedShape }),
                         ),
                       ),
                     );
@@ -5355,17 +5519,17 @@
             ]),
             t
           );
-        })(r.Component),
-        Ln = Object(u.b)("store")(Object(u.c)(zn));
-      k.addTag("image", Wn, Ln);
-      var Fn = n(171),
-        Jn = n(219),
-        Gn = n.n(Jn),
-        Un = function e(t, n, a) {
+        })(i.Component),
+        Zn = Object(u.b)("store")(Object(u.c)(Kn));
+      k.addTag("image", qn, Zn);
+      var Qn = n(173),
+        $n = n(222),
+        ea = n.n($n),
+        ta = function e(t, n, a) {
           var o = arguments.length > 3 && void 0 !== arguments[3] ? arguments[3] : {};
           Object(m.a)(this, e), (this.start = t), (this.end = n), (this.text = a), (this.data = o);
         },
-        Vn = (function(e) {
+        na = (function(e) {
           function t() {
             return Object(m.a)(this, t), Object(h.a)(this, Object(p.a)(t).apply(this, arguments));
           }
@@ -5390,15 +5554,15 @@
             ]),
             t
           );
-        })(r.Component),
-        Yn = Object(u.b)("store")(
+        })(i.Component),
+        aa = Object(u.b)("store")(
           Object(u.c)(function(e) {
             var t,
               n = e.store,
               a = e.range,
               o = e.id,
-              i = e.highlightStyle,
-              r = e.style,
+              r = e.highlightStyle,
+              i = e.style,
               s = e.charIndex,
               c = e.children,
               u = e.overlap,
@@ -5417,7 +5581,7 @@
                   "data-position": s,
                   key: d(a),
                   style: (function(e) {
-                    return e ? i : r;
+                    return e ? r : i;
                   })(a),
                 },
                 c,
@@ -5426,7 +5590,7 @@
               u.length &&
               (a.states &&
                 a.states.map(function(e) {
-                  t = X.Colors.convertToRGBA(e.getSelectedColor(), 0.3);
+                  t = $.Colors.convertToRGBA(e.getSelectedColor(), 0.3);
                 }),
               n.completionStore.selected.regionStore.regions.map(function(e) {
                 e.selected &&
@@ -5437,7 +5601,7 @@
               }),
               (h = u.reduceRight(function(e, n) {
                 return l.a.createElement(
-                  Vn,
+                  na,
                   { style: { background: t, padding: "2px 0" }, position: s, overlap: n, keyNode: d(a) },
                   e,
                 );
@@ -5445,10 +5609,10 @@
             return h;
           }),
         ),
-        qn = function(e) {
+        oa = function(e) {
           var t = { wordWrap: "break-word" };
           return l.a.createElement(
-            Yn,
+            aa,
             {
               id: e.id,
               highlightStyle: Object.assign({}, t, e.highlightStyle),
@@ -5464,16 +5628,16 @@
             ),
           );
         },
-        Xn = function(e) {
+        ra = function(e) {
           return l.a.createElement(
-            Yn,
+            aa,
             { id: e.id, highlightStyle: e.highlightStyle, charIndex: e.charIndex, range: e.range, overlap: e.overlap },
             "".concat(e.text[e.charIndex]).concat(e.text[e.charIndex + 1]),
           );
         },
-        Zn = n(311),
-        Kn = n.n(Zn),
-        Qn = (function(e) {
+        ia = n(313),
+        la = n.n(ia),
+        sa = (function(e) {
           function t() {
             var e;
             return Object(m.a)(this, t), ((e = Object(h.a)(this, Object(p.a)(t).call(this))).dismissMouseUp = 0), e;
@@ -5506,10 +5670,10 @@
                   return (
                     this.props.ranges &&
                       this.props.ranges.map(function(t) {
-                        return e >= t.start && e <= t.end ? (o = [].concat(Object(Fn.a)(o), [t.id])) : o;
+                        return e >= t.start && e <= t.end ? (o = [].concat(Object(Qn.a)(o), [t.id])) : o;
                       }),
                     l.a.createElement(
-                      Yn,
+                      aa,
                       {
                         id: this.props.id,
                         overlap: o,
@@ -5530,9 +5694,9 @@
                   return (
                     this.props.ranges &&
                       this.props.ranges.map(function(t) {
-                        return e >= t.start && e <= t.end ? (n = [].concat(Object(Fn.a)(n), [t.id])) : n;
+                        return e >= t.start && e <= t.end ? (n = [].concat(Object(Qn.a)(n), [t.id])) : n;
                       }),
-                    l.a.createElement(Xn, {
+                    l.a.createElement(ra, {
                       text: this.props.text,
                       id: this.props.id,
                       overlap: n,
@@ -5551,9 +5715,9 @@
                   return (
                     this.props.ranges &&
                       this.props.ranges.map(function(t) {
-                        return e >= t.start && e <= t.end ? (a = [].concat(Object(Fn.a)(a), [t.id])) : a;
+                        return e >= t.start && e <= t.end ? (a = [].concat(Object(Qn.a)(a), [t.id])) : a;
                       }),
-                    l.a.createElement(qn, {
+                    l.a.createElement(oa, {
                       url: n,
                       id: this.props.id,
                       overlap: a,
@@ -5589,11 +5753,11 @@
                       "Control" !== document.selection.type &&
                       (e = document.selection.createRange().text);
                   if (!e || !e.length) return !1;
-                  var i = window.getSelection().getRangeAt(0);
-                  if (!i.startContainer.parentNode.dataset.hint && !i.endContainer.parentNode.dataset.hint) {
-                    var r = parseInt(i.startContainer.parentNode.dataset.position),
-                      l = parseInt(i.endContainer.parentNode.dataset.position),
-                      s = new Un(r < l ? r : l, r < l ? l : r, e, Object(N.a)({}, this.props, { ranges: void 0 }));
+                  var r = window.getSelection().getRangeAt(0);
+                  if (!r.startContainer.parentNode.dataset.hint && !r.endContainer.parentNode.dataset.hint) {
+                    var i = parseInt(r.startContainer.parentNode.dataset.position),
+                      l = parseInt(r.endContainer.parentNode.dataset.position),
+                      s = new ta(i < l ? i : l, i < l ? l : i, e, Object(S.a)({}, this.props, { ranges: void 0 }));
                     this.props.onTextHighlighted(s);
                   }
                 },
@@ -5624,19 +5788,19 @@
                 value: function() {
                   for (var e, t = [], n = 0; n < this.props.text.length; n++) {
                     var a = this.getRange(n),
-                      o = X.Checkers.getUrl(n, this.props.text),
-                      i = Gn()().test(this.props.text[n] + this.props.text[n + 1]),
-                      r = this.getNode(n, a, this.props.text, o, i);
-                    if ((o.length ? (n += o.length - 1) : i && n++, a)) {
+                      o = $.Checkers.getUrl(n, this.props.text),
+                      r = ea()().test(this.props.text[n] + this.props.text[n + 1]),
+                      i = this.getNode(n, a, this.props.text, o, r);
+                    if ((o.length ? (n += o.length - 1) : r && n++, a)) {
                       e = a;
-                      for (var l = [r], s = n + 1; s < parseInt(a.end) + 1; s++) {
-                        Gn()().test("".concat(this.props.text[s]).concat(this.props.text[s + 1]))
+                      for (var l = [i], s = n + 1; s < parseInt(a.end) + 1; s++) {
+                        ea()().test("".concat(this.props.text[s]).concat(this.props.text[s + 1]))
                           ? (l.push(this.getEmojiNode(s, a)), s++)
                           : l.push(this.getLetterNode(s, a)),
                           (n = s);
                       }
                       t.push(this.rangeRenderer(l, a, n, this.onMouseOverHighlightedWord.bind(this)));
-                    } else t.push(r);
+                    } else t.push(i);
                   }
                   return e && this.onMouseOverHighlightedWord(e, !0), t;
                 },
@@ -5648,7 +5812,7 @@
                   return l.a.createElement(
                     "div",
                     {
-                      className: Kn.a.block,
+                      className: la.a.block,
                       style: this.props.style,
                       onMouseUp: this.onMouseUp.bind(this),
                       onMouseDown: this.onMouseDown.bind(this),
@@ -5662,11 +5826,11 @@
             ]),
             t
           );
-        })(r.Component),
-        $n = Object(u.c)(Qn),
-        ea = n(312),
-        ta = n.n(ea),
-        na = y.m
+        })(i.Component),
+        ca = Object(u.c)(sa),
+        ua = n(314),
+        ma = n.n(ua),
+        da = y.m
           .model("TextRegionModel", {
             id: y.m.optional(y.m.identifier, E),
             pid: y.m.optional(y.m.string, E),
@@ -5674,12 +5838,12 @@
             start: y.m.integer,
             end: y.m.integer,
             text: y.m.string,
-            states: y.m.maybeNull(y.m.array(y.m.union(Vt, Kt))),
+            states: y.m.maybeNull(y.m.array(y.m.union(nn, sn))),
           })
           .views(function(e) {
             return {
               get parent() {
-                return Object(y.f)(e, sa);
+                return Object(y.f)(e, ya);
               },
               get completion() {
                 return Object(y.g)(e).completionStore.selected;
@@ -5711,26 +5875,26 @@
               },
             };
           }),
-        aa = y.m.compose(
+        ha = y.m.compose(
           "TextRegionModel",
-          Ht,
-          Wt,
-          na,
+          Yt,
+          qt,
+          da,
         ),
-        oa = function(e) {
+        pa = function(e) {
           var t = e.state,
             n = t.getSelectedString(),
-            a = { background: X.Colors.convertToRGBA(t.getSelectedColor(), 0.3) };
+            a = { background: $.Colors.convertToRGBA(t.getSelectedColor(), 0.3) };
           return (
-            e.style && (a = Object(N.a)({}, a, { outline: e.style.outline })),
+            e.style && (a = Object(S.a)({}, a, { outline: e.style.outline })),
             l.a.createElement(
-              ae,
-              { className: ta.a.state, style: a },
+              ue,
+              { className: ma.a.state, style: a },
               l.a.createElement("span", { "data-hint": !0 }, "\xa0[", n, "]"),
             )
           );
         },
-        ia = Object(u.b)("store")(
+        fa = Object(u.b)("store")(
           Object(u.c)(function(e) {
             var t = e.store,
               n = (e.item, e.letterGroup),
@@ -5740,19 +5904,19 @@
               (o = a.states.map(function(e) {
                 return e.getSelectedColor();
               })),
-              0 !== o.length && (o = X.Colors.convertToRGBA(o[0], 0.3));
-            var i = {
+              0 !== o.length && (o = $.Colors.convertToRGBA(o[0], 0.3));
+            var r = {
                 padding: "2px 0px",
                 position: "relative",
                 borderRadius: "2px",
                 cursor: t.completionStore.selected.relationMode ? "crosshair" : "pointer",
               },
-              r = [];
+              i = [];
             return (
               (a.states && a.states.length) > 0 &&
                 a.states.map(function(e) {
-                  r.push(
-                    l.a.createElement(oa, {
+                  i.push(
+                    l.a.createElement(pa, {
                       key: a.id,
                       state: e,
                       bg: o,
@@ -5762,11 +5926,11 @@
                     }),
                   );
                 }),
-              r.length || (i = Object(N.a)({}, i, { background: "rgba(0, 0, 255, 0.1)" })),
+              i.length || (r = Object(S.a)({}, r, { background: "rgba(0, 0, 255, 0.1)" })),
               l.a.createElement(
                 "span",
                 {
-                  style: i,
+                  style: r,
                   onClick: a.onClickRegion,
                   onMouseOver: function() {
                     t.completionStore.selected.relationMode && a.setHighlight(!0);
@@ -5776,13 +5940,13 @@
                   },
                 },
                 n,
-                r,
+                i,
               )
             );
           }),
         );
-      k.addTag("textrange", aa, ia);
-      var ra = y.m.model("TextModel", {
+      k.addTag("textrange", ha, fa);
+      var ga = y.m.model("TextModel", {
           name: y.m.maybeNull(y.m.string),
           value: y.m.maybeNull(y.m.string),
           selelectwithoutlabel: y.m.optional(y.m.string, "false"),
@@ -5790,11 +5954,11 @@
           adjustselection: y.m.optional(y.m.string, "true"),
           selectionenabled: y.m.optional(y.m.string, "true"),
         }),
-        la = y.m
+        va = y.m
           .model("TextModel", {
             id: y.m.optional(y.m.identifier, E),
             type: "text",
-            regions: y.m.array(aa),
+            regions: y.m.array(ha),
             _value: y.m.optional(y.m.string, ""),
           })
           .views(function(e) {
@@ -5830,10 +5994,10 @@
                 });
               },
               updateValue: function(t) {
-                e._value = Ge(e.value, t.task.dataObj);
+                e._value = et(e.value, t.task.dataObj);
               },
               _addRegion: function(t) {
-                var n = aa.create(t);
+                var n = ha.create(t);
                 return e.regions.push(n), e.completion.addRegion(n), n;
               },
               addRegion: function(t) {
@@ -5870,9 +6034,9 @@
                 if ("choices" !== n.type) {
                   if (t.from_name === t.to_name) a = e._addRegion(o);
                   else {
-                    var i = e.findRegion(t.value.start, t.value.end),
-                      r = R(n);
-                    r.fromStateJSON(t), i ? i.states.push(r) : ((o.states = [r]), (a = e._addRegion(o)));
+                    var r = e.findRegion(t.value.start, t.value.end),
+                      i = R(n);
+                    i.fromStateJSON(t), r ? r.states.push(i) : ((o.states = [i]), (a = e._addRegion(o)));
                   }
                   return a;
                 }
@@ -5880,12 +6044,12 @@
               },
             };
           }),
-        sa = y.m.compose(
+        ya = y.m.compose(
           "TextModel",
-          ra,
-          la,
+          ga,
+          va,
         ),
-        ca = (function(e) {
+        ba = (function(e) {
           function t() {
             return Object(m.a)(this, t), Object(h.a)(this, Object(p.a)(t).apply(this, arguments));
           }
@@ -5895,7 +6059,7 @@
               {
                 key: "renderRegion",
                 value: function(e, t, n, a) {
-                  return l.a.createElement(ia, {
+                  return l.a.createElement(fa, {
                     key: t.id,
                     store: this.props.store,
                     item: this.props.item,
@@ -5917,7 +6081,7 @@
                     l.a.createElement(
                       "div",
                       { style: t },
-                      l.a.createElement($n, {
+                      l.a.createElement(ca, {
                         id: e.id,
                         key: e.id,
                         text: e._value,
@@ -5936,12 +6100,12 @@
             ]),
             t
           );
-        })(r.Component),
-        ua = Object(u.b)("store")(Object(u.c)(ca));
-      k.addTag("text", sa, ua);
-      var ma = n(607),
-        da = n(618),
-        ha =
+        })(i.Component),
+        wa = Object(u.b)("store")(Object(u.c)(ba));
+      k.addTag("text", ya, wa);
+      var ka = n(608),
+        xa = n(619),
+        Ta =
           (l.a.Component,
           y.m.model({
             selected: y.m.optional(y.m.boolean, !1),
@@ -5950,23 +6114,23 @@
             hotkey: y.m.maybeNull(y.m.string),
             style: y.m.maybeNull(y.m.string),
           })),
-        pa = y.m
+        Sa = y.m
           .model({ type: "choice", _value: y.m.optional(y.m.string, "") })
           .views(function(e) {
             return {
               get isCheckbox() {
-                var t = Object(y.f)(e, ba).choice;
+                var t = Object(y.f)(e, Ra).choice;
                 return "multiple" === t || "single" === t;
               },
               get name() {
-                return Object(y.f)(e, ba).name;
+                return Object(y.f)(e, Ra).name;
               },
             };
           })
           .actions(function(e) {
             return {
               toggleSelected: function() {
-                var t = Object(y.f)(e, ba);
+                var t = Object(y.f)(e, Ra);
                 t.shouldBeUnselected && t.unselectAll(), e.markSelected(!e.selected);
               },
               markSelected: function(t) {
@@ -5977,13 +6141,13 @@
               },
             };
           }),
-        fa = y.m.compose(
+        Na = y.m.compose(
           "ChoiceModel",
-          ha,
-          pa,
-          Ue,
+          Ta,
+          Sa,
+          tt,
         ),
-        ga = Object(u.b)("store")(
+        Ia = Object(u.b)("store")(
           Object(u.c)(function(e) {
             var t = e.item,
               n = e.store,
@@ -5996,7 +6160,7 @@
               return l.a.createElement(
                 "div",
                 { style: o },
-                l.a.createElement(ma.a, {
+                l.a.createElement(ka.a, {
                   name: t._value,
                   label: t._value,
                   onChange: function(e) {
@@ -6007,23 +6171,23 @@
                 n.settings.enableTooltips &&
                   n.settings.enableHotkeys &&
                   t.hotkey &&
-                  l.a.createElement(ae, null, "[", t.hotkey, "]"),
+                  l.a.createElement(ue, null, "[", t.hotkey, "]"),
               );
             }
-            var i = l.a.createElement(
+            var r = l.a.createElement(
               "label",
               null,
               t._value,
               n.settings.enableTooltips &&
                 n.settings.enableHotkeys &&
                 t.hotkey &&
-                l.a.createElement(ae, null, "[", t.hotkey, "]"),
+                l.a.createElement(ue, null, "[", t.hotkey, "]"),
             );
             return l.a.createElement(
               "div",
               { style: a },
-              l.a.createElement(ge.a.Radio, {
-                label: i,
+              l.a.createElement(Ie.a.Radio, {
+                label: r,
                 value: t._value,
                 style: { display: "inline-block" },
                 checked: t.selected,
@@ -6034,19 +6198,19 @@
             );
           }),
         );
-      k.addTag("choice", fa, ga);
-      var va = y.m.model({
+      k.addTag("choice", Na, Ia);
+      var Ea = y.m.model({
           name: y.m.string,
           toname: y.m.maybeNull(y.m.string),
           showinline: y.m.optional(y.m.string, "false"),
           choice: y.m.optional(y.m.enumeration(["single", "single-radio", "multiple"]), "single"),
         }),
-        ya = y.m
+        Oa = y.m
           .model({
             id: y.m.optional(y.m.identifier, E),
             pid: y.m.optional(y.m.string, E),
             type: "choices",
-            children: He.unionArray(["choice"]),
+            children: Ye.unionArray(["choice"]),
           })
           .views(function(e) {
             return {
@@ -6081,29 +6245,29 @@
               },
             };
           }),
-        ba = y.m.compose(
+        Ra = y.m.compose(
           "ChoicesModel",
-          va,
-          ya,
-          Jt,
+          Ea,
+          Oa,
+          $t,
         ),
-        wa = Object(u.c)(function(e) {
+        Ca = Object(u.c)(function(e) {
           var t = e.item;
           return l.a.createElement(
             "div",
             { style: { marginTop: "1em" } },
             l.a.createElement(
-              ge.a,
+              Ie.a,
               null,
               "true" === t.showinline
-                ? l.a.createElement(ge.a.Group, { inline: !0, style: { flexWrap: "wrap" } }, _.renderChildren(t))
-                : l.a.createElement(ge.a.Group, { grouped: !0 }, _.renderChildren(t)),
+                ? l.a.createElement(Ie.a.Group, { inline: !0, style: { flexWrap: "wrap" } }, _.renderChildren(t))
+                : l.a.createElement(Ie.a.Group, { grouped: !0 }, _.renderChildren(t)),
             ),
           );
         });
-      k.addTag("choices", ba, wa);
-      var ka = n(617),
-        xa = y.m
+      k.addTag("choices", Ra, Ca);
+      var _a = n(618),
+        ja = y.m
           .model("TextAreaRegionModel", {
             id: y.m.optional(y.m.identifier, E),
             pid: y.m.optional(y.m.string, E),
@@ -6113,30 +6277,30 @@
           .views(function(e) {
             return {
               get parent() {
-                return Object(y.f)(e, Ea);
+                return Object(y.f)(e, Pa);
               },
               get completion() {
                 return Object(y.g)(e).completionStore.selected;
               },
             };
           }),
-        Ta = y.m.compose(
+        Aa = y.m.compose(
           "TextAreaRegionModel",
-          Ht,
-          Wt,
-          xa,
+          Yt,
+          qt,
+          ja,
         ),
-        Na = Object(u.b)("store")(
+        Da = Object(u.b)("store")(
           Object(u.c)(function(e) {
             var t = e.store,
               n = e.item,
               a = { cursor: t.completionStore.selected.relationMode ? "crosshair" : "pointer", display: "block" };
             return (
               n.selected
-                ? (a = Object(N.a)({}, a, { border: "1px solid red" }))
-                : n.highlighted && (a = Object(N.a)({}, a, { border: "2px solid red" })),
+                ? (a = Object(S.a)({}, a, { border: "1px solid red" }))
+                : n.highlighted && (a = Object(S.a)({}, a, { border: "2px solid red" })),
               l.a.createElement(
-                ka.a,
+                _a.a,
                 {
                   className: "warning",
                   style: a,
@@ -6153,8 +6317,8 @@
             );
           }),
         );
-      k.addTag("textarearegion", Ta, Na);
-      var Sa = y.m.model({
+      k.addTag("textarearegion", Aa, Da);
+      var Ma = y.m.model({
           allowSubmit: y.m.optional(y.m.string, "true"),
           label: y.m.optional(y.m.string, ""),
           name: y.m.maybeNull(y.m.string),
@@ -6163,11 +6327,11 @@
           placeholder: y.m.maybeNull(y.m.string),
           maxsubmissions: y.m.maybeNull(y.m.string),
         }),
-        Ia = y.m
+        Ba = y.m
           .model({
             id: y.m.optional(y.m.identifier, E),
             type: "textarea",
-            regions: y.m.array(Ta),
+            regions: y.m.array(Aa),
             _value: y.m.optional(y.m.string, ""),
           })
           .views(function(e) {
@@ -6193,7 +6357,7 @@
                 e._value = t;
               },
               addText: function(t, n) {
-                var a = Ta.create({ pid: n, _value: t });
+                var a = Aa.create({ pid: n, _value: t });
                 return e.regions.push(a), e.completion.addRegion(a), a;
               },
               beforeSend: function() {
@@ -6215,13 +6379,13 @@
               },
             };
           }),
-        Ea = y.m.compose(
+        Pa = y.m.compose(
           "TextAreaModel",
-          Sa,
-          Ia,
-          Ue,
+          Ma,
+          Ba,
+          tt,
         ),
-        Oa = Object(u.c)(function(e) {
+        Ha = Object(u.c)(function(e) {
           var t = e.item;
           return l.a.createElement(
             "div",
@@ -6231,18 +6395,18 @@
                 "div",
                 { style: { marginTop: "1em", marginBottom: "1em" } },
                 t.regions.map(function(e) {
-                  return l.a.createElement(Na, { item: e });
+                  return l.a.createElement(Da, { item: e });
                 }),
               ),
             t.showSubmit &&
               l.a.createElement(
-                ge.a,
+                Ie.a,
                 {
                   onSubmit: function(e) {
                     return "true" === t.allowSubmit && (t.addText(t._value), t.setValue("")), e.preventDefault(), !1;
                   },
                 },
-                l.a.createElement(ge.a.Input, {
+                l.a.createElement(Ie.a.Input, {
                   value: t._value,
                   className: "is-search",
                   label: t.label,
@@ -6255,11 +6419,11 @@
               ),
           );
         });
-      k.addTag("textarea", Ea, Oa);
-      var Ra = n(78),
-        Ca = n(108),
-        _a = n.n(Ca),
-        ja = y.m
+      k.addTag("textarea", Pa, Ha);
+      var za = n(80),
+        Wa = n(109),
+        La = n.n(Wa),
+        Fa = y.m
           .model({
             backgroundColor: y.m.optional(y.m.string, "transparent"),
             value: y.m.maybeNull(y.m.string),
@@ -6283,7 +6447,7 @@
               },
             };
           }),
-        Aa = y.m.model({
+        Ja = y.m.model({
           axis: y.m.optional(y.m.string, "y"),
           lockaxis: y.m.maybeNull(y.m.string),
           elementvalue: y.m.maybeNull(y.m.string),
@@ -6292,12 +6456,12 @@
           name: y.m.maybeNull(y.m.string),
           value: y.m.maybeNull(y.m.string),
         }),
-        Da = y.m
+        Ga = y.m
           .model({
             id: y.m.optional(y.m.identifier, E),
             type: "list",
             update: y.m.optional(y.m.number, 1),
-            regions: y.m.array(ja),
+            regions: y.m.array(Fa),
           })
           .views(function(e) {
             return {};
@@ -6308,11 +6472,11 @@
                 e.update = e.update + 1;
               },
               addRegion: function(t, n) {
-                var a = ja.create({ value: e.elementvalue, idx: n, _value: Je(e.elementvalue, t[n]) });
+                var a = Fa.create({ value: e.elementvalue, idx: n, _value: $e(e.elementvalue, t[n]) });
                 e.regions.push(a);
               },
               updateValue: function(t) {
-                var n = Je(e.value, t.task.dataObj);
+                var n = $e(e.value, t.task.dataObj);
                 (e.regions = []),
                   n.forEach(function(t, a) {
                     return e.addRegion(n, a);
@@ -6329,8 +6493,8 @@
                 n !== a &&
                   (e.sortedhighlightcolor && e.regions[n].setBG(e.sortedhighlightcolor),
                   e.regions[n].setSelected(!0),
-                  e._value && (e._value = _a()(e._value, n, a)),
-                  (e.regions = _a()(e.regions, n, a)),
+                  e._value && (e._value = La()(e._value, n, a)),
+                  (e.regions = La()(e.regions, n, a)),
                   e.setUpdate());
               },
               toStateJSON: function() {
@@ -6357,16 +6521,16 @@
               fromStateJSON: function(t, n) {
                 var a = [],
                   o = [],
-                  i = {};
+                  r = {};
                 t.value.weights.forEach(function(e, t) {
-                  i[e] ? i[e].push(t) : (i[e] = [t]);
+                  r[e] ? r[e].push(t) : (r[e] = [t]);
                 }),
-                  Object.keys(i)
+                  Object.keys(r)
                     .sort(function(e, t) {
                       return t - e;
                     })
                     .forEach(function(t) {
-                      i[t].forEach(function(t) {
+                      r[t].forEach(function(t) {
                         o.push(e.regions[t]), a.push(e._value[t]);
                       });
                     }),
@@ -6379,26 +6543,26 @@
               },
             };
           }),
-        Ma = y.m.compose(
+        Ua = y.m.compose(
           "ListModel",
-          Aa,
-          Da,
+          Ja,
+          Ga,
         ),
-        Ba = Object(Ra.sortableHandle)(function() {
+        Va = Object(za.sortableHandle)(function() {
           return l.a.createElement("div", { className: "drag-handle" });
         });
-      function Ha() {
+      function Ya() {
         try {
           return "undefined" !== typeof window.orientation || -1 !== navigator.userAgent.indexOf("IEMobile");
         } catch (e) {
           return !1;
         }
       }
-      var Wa = Object(Ra.SortableElement)(function(e) {
+      var qa = Object(za.SortableElement)(function(e) {
           var t,
             n = e.item,
             a = e.value;
-          Ha && (t = "noselect");
+          Ya && (t = "noselect");
           var o = {
             text: function(e) {
               return l.a.createElement("span", { className: t }, e._value);
@@ -6429,18 +6593,18 @@
                 );
               },
             },
-            l.a.createElement(Ba, null),
+            l.a.createElement(Va, null),
             o[n.elementtag.toLowerCase()](a),
           );
         }),
-        Pa = Object(Ra.SortableContainer)(function(e) {
+        Xa = Object(za.SortableContainer)(function(e) {
           var t = e.item,
             n = e.items;
           return l.a.createElement(
             j.a,
             { celled: !0 },
             n.map(function(e, n) {
-              return l.a.createElement(Wa, {
+              return l.a.createElement(qa, {
                 key: "item-".concat(n),
                 index: n,
                 value: e,
@@ -6451,25 +6615,25 @@
             }),
           );
         }),
-        za = Object(u.c)(function(e) {
+        Ka = Object(u.c)(function(e) {
           e.store;
           var t = e.item,
             n = {};
           return (
-            Ha() ? (n.pressDelay = 100) : (n.distance = 7),
+            Ya() ? (n.pressDelay = 100) : (n.distance = 7),
             l.a.createElement(
               "div",
               null,
               l.a.createElement(
-                Pa,
+                Xa,
                 Object.assign({ update: t.update, item: t, items: t.regions, onSortEnd: t.moveItems }, n),
               ),
             )
           );
         }),
-        La = Object(u.b)("store")(Object(u.c)(za));
-      k.addTag("list", Ma, La);
-      var Fa = y.m
+        Za = Object(u.b)("store")(Object(u.c)(Ka));
+      k.addTag("list", Ua, Za);
+      var Qa = y.m
           .model({
             backgroundColor: y.m.optional(y.m.string, "transparent"),
             value: y.m.maybeNull(y.m.string),
@@ -6493,7 +6657,7 @@
               },
             };
           }),
-        Ja = y.m.model({
+        $a = y.m.model({
           axis: y.m.optional(y.m.string, "y"),
           lockaxis: y.m.maybeNull(y.m.string),
           elementtag: y.m.optional(y.m.string, "Text"),
@@ -6503,12 +6667,12 @@
           name: y.m.maybeNull(y.m.string),
           value: y.m.maybeNull(y.m.string),
         }),
-        Ga = y.m
+        eo = y.m
           .model({
             id: y.m.optional(y.m.identifier, E),
             type: "ranker",
             update: y.m.optional(y.m.number, 1),
-            regions: y.m.array(Fa),
+            regions: y.m.array(Qa),
           })
           .views(function(e) {
             return {};
@@ -6519,7 +6683,7 @@
                 e.update = e.update + 1;
               },
               _addRegion: function(t, n) {
-                var a = Fa.create({ value: t, idx: n, _value: t });
+                var a = Qa.create({ value: t, idx: n, _value: t });
                 e.regions.push(a);
               },
               moveItems: function(t) {
@@ -6528,8 +6692,8 @@
                 n != a &&
                   (e.sortedhighlightcolor && e.regions[n].setBG(e.sortedhighlightcolor),
                   e.regions[n].setSelected(!0),
-                  e._value && (e._value = _a()(e._value, n, a)),
-                  (e.regions = _a()(e.regions, n, a)),
+                  e._value && (e._value = La()(e._value, n, a)),
+                  (e.regions = La()(e.regions, n, a)),
                   e.setUpdate());
               },
               toStateJSON: function() {
@@ -6554,26 +6718,26 @@
               },
             };
           }),
-        Ua = y.m.compose(
+        to = y.m.compose(
           "RankerModel",
-          Ja,
-          Ga,
+          $a,
+          eo,
         ),
-        Va = Object(Ra.sortableHandle)(function() {
+        no = Object(za.sortableHandle)(function() {
           return l.a.createElement("div", { className: "drag-handle" });
         });
-      function Ya() {
+      function ao() {
         try {
           return "undefined" !== typeof window.orientation || -1 !== navigator.userAgent.indexOf("IEMobile");
         } catch (e) {
           return !1;
         }
       }
-      var qa = Object(Ra.SortableElement)(function(e) {
+      var oo = Object(za.SortableElement)(function(e) {
           var t,
             n = e.item,
             a = e.value;
-          Ya && (t = "noselect");
+          ao && (t = "noselect");
           var o = {
             text: function(e) {
               return l.a.createElement("span", { className: t }, e._value);
@@ -6604,18 +6768,18 @@
                 );
               },
             },
-            l.a.createElement(Va, null),
+            l.a.createElement(no, null),
             o[n.elementtag.toLowerCase()](a),
           );
         }),
-        Xa = Object(Ra.SortableContainer)(function(e) {
+        ro = Object(za.SortableContainer)(function(e) {
           var t = e.item,
             n = e.items;
           return l.a.createElement(
             j.a,
             { celled: !0 },
             n.map(function(e, n) {
-              return l.a.createElement(qa, {
+              return l.a.createElement(oo, {
                 key: "item-".concat(n),
                 index: n,
                 value: e,
@@ -6626,46 +6790,27 @@
             }),
           );
         }),
-        Za = Object(u.c)(function(e) {
+        io = Object(u.c)(function(e) {
           e.store;
           var t = e.item,
             n = {};
           return (
-            Ya() ? (n.pressDelay = 100) : (n.distance = 7),
+            ao() ? (n.pressDelay = 100) : (n.distance = 7),
             l.a.createElement(
               "div",
               null,
               l.a.createElement(
-                Xa,
+                ro,
                 Object.assign({ update: t.update, item: t, items: t.regions, onSortEnd: t.moveItems }, n),
               ),
             )
           );
         }),
-        Ka = Object(u.b)("store")(Object(u.c)(Za));
-      k.addTag("ranker", Ua, Ka);
-      var Qa = n(313),
-        $a = n.n(Qa),
-        eo = (function(e) {
-          function t() {
-            return Object(m.a)(this, t), Object(h.a)(this, Object(p.a)(t).apply(this, arguments));
-          }
-          return (
-            Object(f.a)(t, e),
-            Object(d.a)(t, [
-              {
-                key: "render",
-                value: function() {
-                  return l.a.createElement("div", { className: $a.a.block }, this.props.children);
-                },
-              },
-            ]),
-            t
-          );
-        })(l.a.Component),
-        to = n(169),
-        no = n.n(to),
-        ao = Object(u.b)("store")(
+        lo = Object(u.b)("store")(Object(u.c)(io));
+      k.addTag("ranker", to, lo);
+      var so = n(171),
+        co = n.n(so),
+        uo = Object(u.b)("store")(
           Object(u.c)(
             (function(e) {
               function t() {
@@ -6677,21 +6822,18 @@
                   {
                     key: "renderSuccess",
                     value: function() {
-                      this.props.store;
                       return l.a.createElement(b.a, { status: "success", title: "Done!" });
                     },
                   },
                   {
                     key: "renderNoCompletion",
                     value: function() {
-                      this.props.store;
                       return l.a.createElement(b.a, { status: "success", title: "No more completions" });
                     },
                   },
                   {
                     key: "renderNothingToLabel",
                     value: function() {
-                      this.props.store;
                       return l.a.createElement(b.a, {
                         status: "success",
                         title: "No more data available for labeling",
@@ -6707,54 +6849,65 @@
                   {
                     key: "render",
                     value: function() {
-                      var e = this.props.store;
-                      if (e.isLoading) return this.renderLoader();
-                      if (e.noTask) return this.renderNothingToLabel();
-                      if (e.labeledSuccess) return this.renderSuccess();
-                      if (!e.completionStore.currentCompletion) return this.renderNoCompletion();
-                      var t = e.completionStore.currentCompletion.root;
-                      return l.a.createElement(
-                        "div",
-                        { className: no.a.editor },
-                        l.a.createElement(he, { store: e }),
-                        l.a.createElement(
-                          u.a,
-                          { store: e },
-                          l.a.createElement(
-                            "div",
-                            null,
-                            e.hasInterface("panel") && l.a.createElement(ce, { store: e }),
-                            e.showingDescription &&
-                              l.a.createElement(
-                                eo,
-                                null,
-                                l.a.createElement("div", { dangerouslySetInnerHTML: { __html: e.description } }),
-                              ),
-                            l.a.createElement(
+                      var e,
+                        t = this.props.store;
+                      return (
+                        t.completionStore.currentCompletion
+                          ? (e = t.completionStore.currentCompletion.root)
+                          : t.completionStore.currentPrediction && (e = t.completionStore.currentPrediction.root),
+                        t.isLoading
+                          ? this.renderLoader()
+                          : t.noTask
+                          ? this.renderNothingToLabel()
+                          : t.labeledSuccess
+                          ? this.renderSuccess()
+                          : t.completionStore.currentCompletion || t.completionStore.currentPrediction
+                          ? l.a.createElement(
                               "div",
-                              { className: no.a.common },
+                              { className: co.a.editor },
+                              l.a.createElement(Te, { store: t }),
                               l.a.createElement(
-                                eo,
-                                null,
-                                _.renderItem(t),
-                                e.hasInterface("submit") && l.a.createElement(re, null),
+                                u.a,
+                                { store: t },
+                                l.a.createElement(
+                                  "div",
+                                  null,
+                                  t.hasInterface("panel") && l.a.createElement(be, { store: t }),
+                                  t.showingDescription &&
+                                    l.a.createElement(
+                                      ye,
+                                      null,
+                                      l.a.createElement("div", { dangerouslySetInnerHTML: { __html: t.description } }),
+                                    ),
+                                  l.a.createElement(
+                                    "div",
+                                    { className: co.a.common },
+                                    l.a.createElement(
+                                      ye,
+                                      null,
+                                      _.renderItem(e),
+                                      t.hasInterface("controls") && l.a.createElement(he, null),
+                                    ),
+                                    l.a.createElement(
+                                      "div",
+                                      { className: co.a.menu },
+                                      t.hasInterface("completions:menu") && l.a.createElement(oe, { store: t }),
+                                      t.hasInterface("predictions:menu") && l.a.createElement(le, { store: t }),
+                                      t.hasInterface("side-column") && l.a.createElement(Ue, { store: t }),
+                                    ),
+                                  ),
+                                ),
                               ),
-                              l.a.createElement(
-                                "div",
-                                { className: no.a.menu },
-                                e.hasInterface("completions") && l.a.createElement(ee, { store: e }),
-                                e.hasInterface("side-column") && l.a.createElement(Me, { store: e }),
-                              ),
-                            ),
-                          ),
-                        ),
+                              t.hasInterface("debug") && l.a.createElement(Oe, { store: t }),
+                            )
+                          : this.renderNoCompletion()
                       );
                     },
                   },
                 ]),
                 t
               );
-            })(r.Component),
+            })(i.Component),
           ),
         );
       Boolean(
@@ -6762,9 +6915,9 @@
           "[::1]" === window.location.hostname ||
           window.location.hostname.match(/^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/),
       );
-      var oo = n(49),
-        io = n.n(oo),
-        ro = y.m
+      var mo = n(49),
+        ho = n.n(mo),
+        po = y.m
           .model("Task", {
             id: y.m.identifierNumber,
             data: y.m.maybeNull(y.m.string),
@@ -6776,7 +6929,7 @@
                 return Object(y.e)(e);
               },
               get dataObj() {
-                return X.Checkers.isStringJSON(e.data)
+                return $.Checkers.isStringJSON(e.data)
                   ? JSON.parse(e.data)
                   : "object" === typeof e.data
                   ? e.data
@@ -6784,33 +6937,33 @@
               },
             };
           }),
-        lo = y.m.model("UserStore", { pk: y.m.integer, firstName: y.m.string, lastName: y.m.string }),
-        so = n(170),
-        co = n.n(so),
-        uo = {};
-      var mo = {
+        fo = y.m.model("UserStore", { pk: y.m.integer, firstName: y.m.string, lastName: y.m.string }),
+        go = n(172),
+        vo = n.n(go),
+        yo = {};
+      var bo = {
           addKey: function(e, t) {
-            uo[e] || ((uo[e] = !0), co()(e, "main", t));
+            yo[e] || ((yo[e] = !0), vo()(e, "main", t));
           },
           unbindAll: function() {
-            for (var e = 0, t = Object.keys(uo); e < t.length; e++) {
+            for (var e = 0, t = Object.keys(yo); e < t.length; e++) {
               var n = t[e];
-              co.a.unbind(n);
+              vo.a.unbind(n);
             }
-            uo = {};
+            yo = {};
           },
           makeComb: function() {
             for (var e = "1234567890qwertasdfgzxcvbyuiophjklnm".split(""), t = 0; t <= e.length; t++) {
               var n = void 0;
-              if (((n = e[t]), !uo.hasOwnProperty(n))) return n;
+              if (((n = e[t]), !yo.hasOwnProperty(n))) return n;
             }
             return null;
           },
           setScope: function(e) {
-            co.a.setScope(e);
+            vo.a.setScope(e);
           },
         },
-        ho = y.m
+        wo = y.m
           .model("SettingsModel", {
             enableHotkeys: y.m.optional(y.m.boolean, !0),
             enablePanelHotkeys: y.m.optional(y.m.boolean, !0),
@@ -6819,7 +6972,7 @@
           .actions(function(e) {
             return {
               toggleHotkeys: function() {
-                (e.enableHotkeys = !e.enableHotkeys), e.enableHotkeys ? mo.setScope("main") : mo.setScope("none");
+                (e.enableHotkeys = !e.enableHotkeys), e.enableHotkeys ? bo.setScope("main") : bo.setScope("none");
               },
               togglePanelHotkeys: function() {
                 e.enablePanelHotkeys = !e.enablePanelHotkeys;
@@ -6829,7 +6982,7 @@
               },
             };
           }),
-        po =
+        ko =
           (n(11),
           y.m
             .model("TimeTraveller", {
@@ -6889,14 +7042,14 @@
                   (e.undoIdx = n), (a = !0), Object(y.a)(t, e.history[e.undoIdx]);
                 },
                 reset: function() {
-                  (e.undoIdx = e.createdIdx), (a = !0), Object(y.a)(t, e.history[e.undoIdx]);
+                  (e.undoIdx = 1), (a = !0), Object(y.a)(t, e.history[e.undoIdx]);
                 },
               };
             })),
-        fo = y.m
+        xo = y.m
           .model("Relation", {
-            node1: y.m.reference(y.m.union(aa, bn, en, Ta, Dn)),
-            node2: y.m.reference(y.m.union(aa, bn, en, Ta, Dn)),
+            node1: y.m.reference(y.m.union(ha, Rn, mn, Aa, Gn)),
+            node2: y.m.reference(y.m.union(ha, Rn, mn, Aa, Gn)),
           })
           .actions(function(e) {
             return {
@@ -6907,7 +7060,7 @@
               },
             };
           }),
-        go = y.m.model("RelationStore", { relations: y.m.array(fo) }).actions(function(e) {
+        To = y.m.model("RelationStore", { relations: y.m.array(xo) }).actions(function(e) {
           return {
             findRelations: function(t, n) {
               return n
@@ -6923,7 +7076,7 @@
             },
             addRelation: function(t, n) {
               if (!e.nodesRelated(t, n)) {
-                var a = fo.create({ node1: t, node2: n });
+                var a = xo.create({ node1: t, node2: n });
                 return e.relations.push(a), a;
               }
             },
@@ -6944,10 +7097,10 @@
             },
           };
         }),
-        vo = y.m
+        So = y.m
           .model("Normalization", {
-            node1: y.m.union(y.m.reference(aa), y.m.reference(bn), y.m.reference(en)),
-            node2: y.m.union(y.m.reference(aa), y.m.reference(bn), y.m.reference(en)),
+            node1: y.m.union(y.m.reference(ha), y.m.reference(Rn), y.m.reference(mn)),
+            node2: y.m.union(y.m.reference(ha), y.m.reference(Rn), y.m.reference(mn)),
           })
           .actions(function(e) {
             return {
@@ -6958,7 +7111,7 @@
               },
             };
           }),
-        yo = y.m.model("NormalizationStore", { normalizations: y.m.array(vo) }).actions(function(e) {
+        No = y.m.model("NormalizationStore", { normalizations: y.m.array(So) }).actions(function(e) {
           return {
             findNormalization: function(t, n) {
               return n
@@ -6971,7 +7124,7 @@
             },
             addNormalization: function(t, n) {
               if (!e.findNormalization(t, n)) {
-                var a = vo.create({ node1: t, node2: n });
+                var a = So.create({ node1: t, node2: n });
                 return e.normalizations.unshift(a), a;
               }
             },
@@ -6984,8 +7137,8 @@
             },
           };
         }),
-        bo = y.m
-          .model("RegionStore", { regions: y.m.array(y.m.safeReference(y.m.union(aa, bn, Dn, en, Ta))) })
+        Io = y.m
+          .model("RegionStore", { regions: y.m.array(y.m.safeReference(y.m.union(ha, Rn, Gn, mn, Aa))) })
           .actions(function(e) {
             return {
               addRegion: function(t) {
@@ -7012,34 +7165,36 @@
               },
             };
           }),
-        wo = y.m
+        Eo = y.m
           .model("Completion", {
             id: y.m.identifier,
-            pk: y.m.optional(y.m.integer, 1),
+            pk: y.m.optional(y.m.string, E(5)),
             selected: y.m.optional(y.m.boolean, !1),
-            createdDate: y.m.optional(y.m.string, new Date().toISOString()),
+            createdDate: y.m.optional(y.m.string, $.UDate.currentISODate()),
             createdAgo: y.m.maybeNull(y.m.string),
             createdBy: y.m.optional(y.m.string, "Admin"),
+            userGenerate: y.m.optional(y.m.boolean, !0),
+            update: y.m.optional(y.m.boolean, !1),
+            sentUserGenerate: y.m.optional(y.m.boolean, !1),
             honeypot: y.m.optional(y.m.boolean, !1),
-            prediction: y.m.optional(y.m.boolean, !1),
-            root: He.allModelsTypes(),
-            names: y.m.map(y.m.reference(He.allModelsTypes())),
-            toNames: y.m.map(y.m.array(y.m.reference(He.allModelsTypes()))),
-            history: y.m.optional(po, { targetPath: "../root" }),
+            root: Ye.allModelsTypes(),
+            names: y.m.map(y.m.reference(Ye.allModelsTypes())),
+            toNames: y.m.map(y.m.array(y.m.reference(Ye.allModelsTypes()))),
+            history: y.m.optional(ko, { targetPath: "../root" }),
             dragMode: y.m.optional(y.m.boolean, !1),
             relationMode: y.m.optional(y.m.boolean, !1),
-            relationStore: y.m.optional(go, { relations: [] }),
+            relationStore: y.m.optional(To, { relations: [] }),
             normalizationMode: y.m.optional(y.m.boolean, !1),
-            normalizationStore: y.m.optional(yo, { normalizations: [] }),
-            regionStore: y.m.optional(bo, { regions: [] }),
+            normalizationStore: y.m.optional(No, { normalizations: [] }),
+            regionStore: y.m.optional(Io, { regions: [] }),
             highlightedNode: y.m.maybeNull(
               y.m.union(
-                y.m.safeReference(aa),
-                y.m.safeReference(bn),
-                y.m.safeReference(en),
-                y.m.safeReference(Ta),
-                y.m.safeReference(Dn),
-                y.m.safeReference(dn),
+                y.m.safeReference(ha),
+                y.m.safeReference(Rn),
+                y.m.safeReference(mn),
+                y.m.safeReference(Aa),
+                y.m.safeReference(Gn),
+                y.m.safeReference(xn),
               ),
             ),
           })
@@ -7062,8 +7217,14 @@
               setHoneypot: function() {
                 (e.honeypot = !0), e._updateServerState({ honeypot: e.honeypot });
               },
+              sendUserGenerate: function() {
+                e.sentUserGenerate = !0;
+              },
               setDragMode: function(t) {
                 e.dragMode = t;
+              },
+              updatePersonalKey: function(t) {
+                e.pk = t;
               },
               setNormalizationMode: function(t) {
                 e.normalizationMode = t;
@@ -7123,18 +7284,18 @@
                     n ? n.push(t.id) : e.toNames.set(t.toname, [t.id]);
                   }
                 }),
-                  mo.unbindAll(),
+                  bo.unbindAll(),
                   e.traverseTree(function(e) {
-                    e && e.onHotKey && e.hotkey && mo.addKey(e.hotkey, e.onHotKey);
+                    e && e.onHotKey && e.hotkey && bo.addKey(e.hotkey, e.onHotKey);
                   }),
                   e.traverseTree(function(e) {
                     if (e && e.onHotKey && !e.hotkey) {
-                      var t = mo.makeComb();
+                      var t = bo.makeComb();
                       if (!t) return;
-                      (e.hotkey = t), mo.addKey(e.hotkey, e.onHotKey);
+                      (e.hotkey = t), bo.addKey(e.hotkey, e.onHotKey);
                     }
                   }),
-                  mo.setScope("main");
+                  bo.setScope("main");
               },
               serializeCompletion: function() {
                 var t = [];
@@ -7172,14 +7333,27 @@
               },
             };
           }),
-        ko = y.m
-          .model("CompletionStore", { completions: y.m.array(wo), selected: y.m.maybeNull(y.m.reference(wo)) })
+        Oo = y.m
+          .model("CompletionStore", {
+            completions: y.m.array(Eo),
+            selected: y.m.maybeNull(y.m.reference(Eo)),
+            predictions: y.m.maybeNull(y.m.array(Eo)),
+            predictSelect: y.m.optional(y.m.boolean, !1),
+          })
           .views(function(e) {
             return {
               get currentCompletion() {
                 return (
                   e.selected &&
                   e.completions.find(function(t) {
+                    return t.id === e.selected.id;
+                  })
+                );
+              },
+              get currentPrediction() {
+                return (
+                  e.selected &&
+                  e.predictions.find(function(t) {
                     return t.id === e.selected.id;
                   })
                 );
@@ -7196,8 +7370,8 @@
           })
           .actions(function(e) {
             var t = Object(y.c)(
-              io.a.mark(function t(n) {
-                return io.a.wrap(
+              ho.a.mark(function t(n) {
+                return ho.a.wrap(
                   function(t) {
                     for (;;)
                       switch ((t.prev = t.next)) {
@@ -7230,21 +7404,37 @@
               selectCompletion: function(t) {
                 e.completions.map(function(e) {
                   return (e.selected = !1);
-                });
+                }),
+                  e.predictions &&
+                    e.predictions.map(function(e) {
+                      return (e.selected = !1);
+                    });
                 var n = e.completions.find(function(e) {
                   return e.id === t;
                 });
-                (n.selected = !0), (e.selected = n);
+                (e.predictSelect = !1), (n.selected = !0), (e.selected = n);
+              },
+              selectPrediction: function(t) {
+                e.predictions.map(function(e) {
+                  return (e.selected = !1);
+                }),
+                  e.completions.map(function(e) {
+                    return (e.selected = !1);
+                  });
+                var n = e.predictions.find(function(e) {
+                  return e.id === t;
+                });
+                (e.predictSelect = !0), (n.selected = !0), (e.selected = n);
               },
               addCompletion: function(t, n) {
-                var a = wo.create(t);
+                var a = Eo.create(t);
                 return (
                   e.store.task &&
                     "initial" === n &&
                     a.traverseTree(function(t) {
                       return t.updateValue && t.updateValue(e.store);
                     }),
-                  e.completions.push(a),
+                  e.completions.unshift(a),
                   a
                 );
               },
@@ -7255,7 +7445,7 @@
               addInitialCompletion: function() {
                 var t = _.treeToModel(e.store.config),
                   n = k.getModelByTag(t.type).create(t),
-                  a = { id: E(), root: n };
+                  a = { id: E(5), root: n };
                 if (e.store.expert) {
                   var o = e.store.expert;
                   a.createdBy = "".concat(o.firstName, " ").concat(o.lastName);
@@ -7266,38 +7456,245 @@
                 var n = _.treeToModel(e.store.config),
                   a = k.getModelByTag(n.type).create(n),
                   o = {
+                    id: t.id || E(5),
                     pk: t.id,
-                    id: t.id || E(),
                     createdAgo: t.created_ago,
                     createdBy: t.created_username,
                     honeypot: t.honeypot,
                     root: a,
+                    userGenerate: !1,
                   };
                 return e.addCompletion(o, "list");
               },
+              addUserCompletion: function() {
+                var t = _.treeToModel(e.store.config),
+                  n = k.getModelByTag(t.type).create(t),
+                  a = { id: E(5), root: n, userGenerate: !0 };
+                if (e.store.expert) {
+                  var o = e.store.expert;
+                  a.createdBy = "".concat(o.firstName, " ").concat(o.lastName);
+                }
+                var r = e.addCompletion(a, "initial");
+                return e.selectCompletion(a.id), r;
+              },
+              addPrediction: function(t) {
+                var n = _.treeToModel(e.store.config),
+                  a = k.getModelByTag(n.type).create(n),
+                  o = { id: t.id || E(), pk: t.id, createdAgo: t.created_ago, createdBy: t.model_version, root: a };
+                return e.addPredictionItem(o, "list");
+              },
+              addPredictionItem: function(t, n) {
+                var a = Eo.create(t);
+                return (
+                  e.store.task &&
+                    "initial" === n &&
+                    a.traverseTree(function(t) {
+                      return t.updateValue && t.updateValue(e.store);
+                    }),
+                  e.predictions.push(a),
+                  a
+                );
+              },
             };
           }),
-        xo = {
-          MAIN: "/api",
-          TASKS: "/tasks",
-          COMPLETIONS: "/completions",
-          CANCEL: "/cancel",
-          PROJECTS: "/projects",
-          NEXT: "/next",
-          EXPERT_INSRUCTIONS: "/expert_instruction",
-        },
-        To = y.m
+        Ro = y.m
+          .model("Prediction", {
+            id: y.m.identifier,
+            selected: y.m.optional(y.m.boolean, !1),
+            createdDate: y.m.optional(y.m.string, new Date().toISOString()),
+            createdAgo: y.m.maybeNull(y.m.string),
+            model: y.m.optional(y.m.string, "Model"),
+            root: Ye.allModelsTypes(),
+            names: y.m.map(y.m.reference(Ye.allModelsTypes())),
+            toNames: y.m.map(y.m.array(y.m.reference(Ye.allModelsTypes()))),
+            history: y.m.optional(ko, { targetPath: "../root" }),
+            dragMode: y.m.optional(y.m.boolean, !1),
+            relationMode: y.m.optional(y.m.boolean, !1),
+            relationStore: y.m.optional(To, { relations: [] }),
+            normalizationMode: y.m.optional(y.m.boolean, !1),
+            normalizationStore: y.m.optional(No, { normalizations: [] }),
+            regionStore: y.m.optional(Io, { regions: [] }),
+            highlightedNode: y.m.maybeNull(
+              y.m.union(
+                y.m.safeReference(ha),
+                y.m.safeReference(Rn),
+                y.m.safeReference(mn),
+                y.m.safeReference(Aa),
+                y.m.safeReference(Gn),
+                y.m.safeReference(xn),
+              ),
+            ),
+          })
+          .views(function(e) {
+            return {
+              get store() {
+                return Object(y.e)(e, 2);
+              },
+            };
+          })
+          .actions(function(e) {
+            return {
+              reinitHistory: function() {
+                e.history = { targetPath: "../root" };
+              },
+              setDragMode: function(t) {
+                e.dragMode = t;
+              },
+              setNormalizationMode: function(t) {
+                e.normalizationMode = t;
+              },
+              setHighlightedNode: function(t) {
+                e.highlightedNode = t;
+              },
+              startRelationMode: function(t) {
+                (e._relationObj = t), (e.relationMode = !0);
+              },
+              stopRelationMode: function() {
+                (e._relationObj = null), (e.relationMode = !1), e.regionStore.unhighlightAll();
+              },
+              unselectPrediction: function() {
+                e.selected = !1;
+              },
+              addRegion: function(t) {
+                e.regionStore.unselectAll(),
+                  e.regionStore.addRegion(t),
+                  e.relationMode && (e.addRelation(t), e.stopRelationMode());
+              },
+              addRelation: function(t) {
+                e.relationStore.addRelation(e._relationObj, t);
+              },
+              addNormalization: function(t) {
+                e.normalizationStore.addNormalization();
+              },
+              removeHoneypot: function() {
+                (e.honeypot = !1), e._updateServerState({ honeypot: e.honeypot });
+              },
+              traverseTree: function(t) {
+                var n;
+                (n = function(e) {
+                  t(e),
+                    e.children &&
+                      e.children.forEach(function(e) {
+                        return n(e);
+                      });
+                })(e.root);
+              },
+              beforeSend: function() {
+                e.traverseTree(function(e) {
+                  e && e.beforeSend && e.beforeSend();
+                }),
+                  e.stopRelationMode(),
+                  e.regionStore.unselectAll();
+              },
+              deleteRegion: function(e) {
+                Object(y.b)(e);
+              },
+              deserializePrediction: function(t) {
+                t.forEach(function(t) {
+                  "relation" !== t.type
+                    ? t.to_name.split(",").forEach(function(n) {
+                        var a = e.store.store.completionStore.selected.names.get(n);
+                        if (!a) throw new Error("No model found for " + t.to_name);
+                        var o = e.store.store.completionStore.selected.names.get(t.from_name);
+                        if (!o) throw new Error("No model found for " + t.from_name);
+                        a.fromStateJSON(t, o);
+                      })
+                    : e.relationStore.deserializeRelation(
+                        e.regionStore.findRegion(t.from_id),
+                        e.regionStore.findRegion(t.to_id),
+                      );
+                });
+              },
+            };
+          }),
+        Co =
+          (y.m
+            .model("PredictionStore", { predictions: y.m.array(Ro), selected: y.m.maybeNull(y.m.reference(Ro)) })
+            .views(function(e) {
+              return {
+                get currentPrediction() {
+                  return (
+                    e.selected &&
+                    e.predictions.find(function(t) {
+                      return t.id === e.selected.id;
+                    })
+                  );
+                },
+                get store() {
+                  return Object(y.e)(e);
+                },
+                get savedPredictions() {
+                  return e.predictions.filter(function(e) {
+                    return e;
+                  });
+                },
+              };
+            })
+            .actions(function(e) {
+              return {
+                selectPrediction: function(t) {
+                  e.store.completionStore.selected && e.store.completionStore.selected.unselectCompletion(),
+                    e.predictions.map(function(e) {
+                      return (e.selected = !1);
+                    });
+                  var n = e.predictions.find(function(e) {
+                    return e.id === t;
+                  });
+                  (n.selected = !0), (e.selected = n);
+                },
+                addPredictionItem: function(t, n) {
+                  var a = Ro.create(t);
+                  return (
+                    e.store.task &&
+                      "initial" === n &&
+                      a.traverseTree(function(t) {
+                        return t.updateValue && t.updateValue(e.store);
+                      }),
+                    e.predictions.push(a),
+                    a
+                  );
+                },
+                addPrediction: function(t) {
+                  var n = _.treeToModel(e.store.config),
+                    a = k.getModelByTag(n.type).create(n),
+                    o = { pk: t.id, id: t.id || E(), createdAgo: t.created_ago, model: t.model_version, root: a },
+                    r = e.addPredictionItem(o, "list");
+                  return console.log(r), r;
+                },
+                addInitialPrediction: function() {
+                  var t = _.treeToModel(e.store.config),
+                    n = k.getModelByTag(t.type).create(t),
+                    a = { id: E(), root: n };
+                  return e.addPrediction(a, "initial");
+                },
+                destroyPrediction: function(t) {
+                  Object(y.b)(t),
+                    (e.selected = null),
+                    e.predictions.length > 0 && e.selectPrediction(e.predictions[0].id);
+                },
+              };
+            }),
+          {
+            MAIN: "/api",
+            TASKS: "/tasks",
+            COMPLETIONS: "/completions",
+            CANCEL: "/cancel",
+            PROJECTS: "/projects",
+            NEXT: "/next",
+            EXPERT_INSRUCTIONS: "/expert_instruction",
+          }),
+        _o = y.m
           .model("AppStore", {
             config: y.m.string,
-            task: y.m.maybeNull(ro),
+            task: y.m.maybeNull(po),
             taskID: y.m.maybeNull(y.m.number),
             interfaces: y.m.array(y.m.string),
             explore: y.m.optional(y.m.boolean, !1),
-            completionStore: y.m.optional(ko, { completions: [] }),
+            completionStore: y.m.optional(Oo, { completions: [], predictions: [] }),
             projectID: y.m.integer,
-            expert: lo,
+            expert: fo,
             debug: y.m.optional(y.m.boolean, !0),
-            settings: y.m.optional(ho, {}),
+            settings: y.m.optional(wo, {}),
             showingSettings: y.m.optional(y.m.boolean, !1),
             showingDescription: y.m.optional(y.m.boolean, !1),
             description: y.m.maybeNull(y.m.string),
@@ -7320,18 +7717,18 @@
           })
           .actions(function(e) {
             var t = Object(y.c)(
-              io.a.mark(function t() {
+              ho.a.mark(function t() {
                 var n, a;
-                return io.a.wrap(function(t) {
+                return ho.a.wrap(function(t) {
                   for (;;)
                     switch ((t.prev = t.next)) {
                       case 0:
                         return (
                           (n = ""
-                            .concat(xo.MAIN)
-                            .concat(xo.PROJECTS, "/")
+                            .concat(Co.MAIN)
+                            .concat(Co.PROJECTS, "/")
                             .concat(e.projectID)
-                            .concat(xo.EXPERT_INSRUCTIONS)),
+                            .concat(Co.EXPERT_INSRUCTIONS)),
                           (t.next = 3),
                           e.fetch(n)
                         );
@@ -7358,24 +7755,24 @@
               return e.taskID
                 ? o(
                     ""
-                      .concat(xo.MAIN)
-                      .concat(xo.TASKS, "/")
+                      .concat(Co.MAIN)
+                      .concat(Co.TASKS, "/")
                       .concat(e.taskID, "/"),
                   )
                 : e.explore && e.projectID
                 ? o(
                     ""
-                      .concat(xo.MAIN)
-                      .concat(xo.PROJECTS, "/")
+                      .concat(Co.MAIN)
+                      .concat(Co.PROJECTS, "/")
                       .concat(e.projectID)
-                      .concat(xo.NEXT),
+                      .concat(Co.NEXT),
                   )
                 : void 0;
             }
             var o = Object(y.c)(
-                io.a.mark(function t(n) {
+                ho.a.mark(function t(n) {
                   var a;
-                  return io.a.wrap(
+                  return ho.a.wrap(
                     function(t) {
                       for (;;)
                         switch ((t.prev = t.next)) {
@@ -7412,8 +7809,22 @@
                                 e.completionStore.selected &&
                                   e.completionStore.selected.traverseTree(function(t) {
                                     return t.updateValue && t.updateValue(e);
+                                  });
+                              if (
+                                e.hasInterface("predictions") &&
+                                t.predictions &&
+                                t.predictions &&
+                                t.predictions.length
+                              )
+                                for (var r = 0; r < t.predictions.length; r++) {
+                                  var i = e.completionStore.addPrediction(t.predictions[r]);
+                                  i.traverseTree(function(t) {
+                                    return t.updateValue && t.updateValue(e);
                                   }),
-                                  e.addGeneratedCompletion(t);
+                                    e.completionStore.selectPrediction(i.id),
+                                    i.deserializeCompletion(t.predictions[r].result),
+                                    i.reinitHistory();
+                                }
                             }),
                               (t.next = 14);
                             break;
@@ -7430,9 +7841,9 @@
                   );
                 }),
               ),
-              i = Object(y.c)(
-                io.a.mark(function t() {
-                  return io.a.wrap(
+              r = Object(y.c)(
+                ho.a.mark(function t() {
+                  return ho.a.wrap(
                     function(t) {
                       for (;;)
                         switch ((t.prev = t.next)) {
@@ -7443,10 +7854,10 @@
                               (t.next = 4),
                               e.post(
                                 ""
-                                  .concat(xo.MAIN)
-                                  .concat(xo.TASKS, "/")
+                                  .concat(Co.MAIN)
+                                  .concat(Co.TASKS, "/")
                                   .concat(e.task.id)
-                                  .concat(xo.CANCEL),
+                                  .concat(Co.CANCEL),
                                 JSON.stringify({ data: JSON.stringify({ error: "cancelled" }) }),
                               )
                             );
@@ -7465,19 +7876,19 @@
                   );
                 }),
               ),
-              r = function(t) {
+              i = function(t) {
                 return Object(y.c)(
-                  io.a.mark(function o() {
-                    var i, r, l, s;
-                    return io.a.wrap(
+                  ho.a.mark(function o() {
+                    var r, i, l, s, c, u;
+                    return ho.a.wrap(
                       function(o) {
                         for (;;)
                           switch ((o.prev = o.next)) {
                             case 0:
                               if (
-                                ((i = e.completionStore.selected).beforeSend(),
-                                (r = i.serializeCompletion()),
-                                !e.hasInterface("submit:check-empty") || 0 !== r.length)
+                                ((r = e.completionStore.selected).beforeSend(),
+                                (i = r.serializeCompletion()),
+                                !e.hasInterface("check-empty") || 0 !== i.length)
                               ) {
                                 o.next = 6;
                                 break;
@@ -7487,8 +7898,8 @@
                               if (
                                 (e.markLoading(!0),
                                 (o.prev = 7),
-                                (l = Object(y.h)(i)),
-                                (s = JSON.stringify({ state: JSON.stringify(l), result: r })),
+                                (l = Object(y.h)(r)),
+                                (s = JSON.stringify({ state: JSON.stringify(l), result: i })),
                                 "patch" !== t)
                               ) {
                                 o.next = 15;
@@ -7498,76 +7909,83 @@
                                 (o.next = 13),
                                 Object(y.d)(e).patch(
                                   ""
-                                    .concat(xo.MAIN)
-                                    .concat(xo.TASKS, "/")
+                                    .concat(Co.MAIN)
+                                    .concat(Co.TASKS, "/")
                                     .concat(e.task.id)
-                                    .concat(xo.COMPLETIONS, "/")
-                                    .concat(i.pk),
+                                    .concat(Co.COMPLETIONS, "/")
+                                    .concat(r.pk),
                                   s,
                                 )
                               );
                             case 13:
-                              o.next = 18;
+                              o.next = 23;
                               break;
                             case 15:
                               if ("post" !== t) {
-                                o.next = 18;
+                                o.next = 23;
                                 break;
                               }
                               return (
                                 (o.next = 18),
                                 e.post(
                                   ""
-                                    .concat(xo.MAIN)
-                                    .concat(xo.TASKS, "/")
+                                    .concat(Co.MAIN)
+                                    .concat(Co.TASKS, "/")
                                     .concat(e.task.id)
-                                    .concat(xo.COMPLETIONS, "/"),
+                                    .concat(Co.COMPLETIONS, "/"),
                                   s,
                                 )
                               );
                             case 18:
-                              if (!n("submit:load")) {
-                                o.next = 23;
+                              return (c = o.sent), (o.next = 21), c.json();
+                            case 21:
+                              (u = o.sent), e.completionStore.selected.updatePersonalKey(u.id.toString());
+                            case 23:
+                              if (!n("load")) {
+                                o.next = 28;
                                 break;
                               }
                               return e.resetState(), o.abrupt("return", a());
-                            case 23:
-                              e.markLoading(!1), (e.labeledSuccess = !0);
-                            case 25:
-                              delete l.history, (o.next = 31);
-                              break;
                             case 28:
-                              (o.prev = 28), (o.t0 = o.catch(7)), console.error("Failed to send task ", o.t0);
+                              e.markLoading(!1),
+                                e.completionStore.selected.sendUserGenerate(),
+                                e.explore && e.projectID && (e.labeledSuccess = !0);
                             case 31:
+                              o.next = 36;
+                              break;
+                            case 33:
+                              (o.prev = 33), (o.t0 = o.catch(7)), console.error("Failed to send task ", o.t0);
+                            case 36:
                             case "end":
                               return o.stop();
                           }
                       },
                       o,
                       null,
-                      [[7, 28]],
+                      [[7, 33]],
                     );
                   }),
                 );
               },
-              l = r("patch");
+              l = i("patch");
             return {
               afterCreate: function() {
                 e.loadTask(),
-                  mo.addKey("ctrl+enter", e.sendTask),
-                  e.hasInterface("submit:skip") && mo.addKey("ctrl+space", e.skipTask),
-                  mo.addKey("ctrl+backspace", function() {
+                  bo.addKey("ctrl+enter", e.sendTask),
+                  e.hasInterface("skip") && bo.addKey("ctrl+space", e.skipTask),
+                  e.hasInterface("update") && bo.addKey("alt+enter", e.updateTask),
+                  bo.addKey("ctrl+backspace", function() {
                     e.completionStore.selected.deleteAllRegions();
                   }),
-                  mo.addKey("ctrl+z", function() {
+                  bo.addKey("ctrl+z", function() {
                     var t = e.completionStore.selected.history;
                     t && t.canUndo && t.undo();
                   }),
-                  mo.addKey("escape", function() {
+                  bo.addKey("escape", function() {
                     var t = e.completionStore.selected;
                     t && t.relationMode && t.stopRelationMode();
                   }),
-                  mo.addKey("backspace", function() {
+                  bo.addKey("backspace", function() {
                     var t = e.completionStore.selected;
                     t && t.highlightedNode && t.highlightedNode.deleteRegion();
                   });
@@ -7575,19 +7993,19 @@
               loadTask: a,
               addTask: function(t) {
                 t &&
-                  !X.Checkers.isString(t.data) &&
-                  (t = Object(N.a)({}, t, Object(q.a)({}, t.data, JSON.stringify(t.data)))),
-                  (e.task = ro.create(t));
+                  !$.Checkers.isString(t.data) &&
+                  (t = Object(S.a)({}, t, Object(Q.a)({}, t.data, JSON.stringify(t.data)))),
+                  (e.task = po.create(t));
               },
               hasInterface: n,
-              skipTask: i,
-              sendTask: r("post"),
-              rewriteTask: l,
+              skipTask: r,
+              sendTask: i("post"),
+              updateTask: l,
               markLoading: function(t) {
                 e.isLoading = t;
               },
               resetState: function() {
-                e.completionStore = ko.create({ completions: [] });
+                e.completionStore = Oo.create({ completions: [] });
                 var t = e.completionStore.addInitialCompletion();
                 e.completionStore.selectCompletion(t.id);
               },
@@ -7603,30 +8021,52 @@
               },
               initializeStore: function(t) {
                 var n = t.completions,
-                  a = e.completionStore,
+                  a = t.predictions,
                   o = [];
+                if (a && a.length)
+                  for (var r = 0; r < a.length; r++) {
+                    var i = e.completionStore.addPrediction(a[r]);
+                    i.traverseTree(function(t) {
+                      return t.updateValue && t.updateValue(e);
+                    }),
+                      e.completionStore.selectPrediction(i.id),
+                      i.deserializeCompletion(a[r].result),
+                      i.reinitHistory();
+                  }
                 if (n && n.length)
-                  for (var i = 0; i < n.length; i++) {
-                    var r = n[i];
-                    !0 !== r.was_cancelled && o.push(r);
+                  for (var l = 0; l < n.length; l++) {
+                    var s = n[l];
+                    !0 !== s.was_cancelled && o.push(s);
                   }
-                if (0 === a.completions.length) {
-                  var l = e.completionStore.addInitialCompletion();
-                  if ((e.completionStore.selectCompletion(l.id), o.length > 0)) {
-                    for (var s = 0; s < o.length; s++) l.deserializeCompletion(o[s].result);
-                    l.reinitHistory();
+                if (n && 0 !== n.length)
+                  for (var c = 0; c < o.length; c++) {
+                    var u = e.completionStore.addSavedCompletion(o[c]);
+                    u.traverseTree(function(t) {
+                      return t.updateValue && t.updateValue(e);
+                    }),
+                      e.completionStore.selectCompletion(u.id),
+                      u.deserializeCompletion(o[c].result),
+                      u.reinitHistory();
                   }
-                }
-              },
-              addGeneratedCompletion: function(t) {
-                if ("completion_result" in t && !e.hasInterface("predictions:hide")) {
-                  var n = e.completionStore.selected;
-                  n.deserializeCompletion(t.completion_result), n.reinitHistory();
+                else {
+                  var m = e.completionStore.addInitialCompletion();
+                  if ((e.completionStore.selectCompletion(m.id), o.length > 0)) {
+                    e.completionStore.destroyCompletion(e.completionStore.selected);
+                    for (var d = 0; d < o.length; d++) {
+                      var h = e.completionStore.addSavedCompletion(o[d]);
+                      h.traverseTree(function(t) {
+                        return t.updateValue && t.updateValue(e);
+                      }),
+                        e.completionStore.selectCompletion(h.id),
+                        h.deserializeCompletion(o[d].result),
+                        h.reinitHistory();
+                    }
+                  }
                 }
               },
             };
           });
-      var No = {
+      var jo = {
           getData: function() {
             window.taskData && window.taskData.data && (window.taskData.data = JSON.stringify(window.taskData.data));
             var e = {
@@ -7643,15 +8083,16 @@
             return (
               window.preRender && (e.task = window.taskData),
               window.explore
-                ? (e.interfaces = window.editorInterfaces ? window.editorInterfaces : ["basic", "completions"])
-                : (e.interfaces = window.editorInterfaces
-                    ? window.editorInterfaces
-                    : ["basic", "submit", "submit:skip", "submit:submit"]),
+                ? (e.interfaces = window.editorInterfaces ? window.editorInterfaces : ["completions"])
+                : (e.interfaces = window.editorInterfaces ? window.editorInterfaces : ["submit", "submit:skip"]),
               e
             );
           },
           getState: function() {
-            return { completions: window.taskData && window.taskData.completions ? window.taskData.completions : null };
+            return {
+              completions: window.taskData && window.taskData.completions ? window.taskData.completions : null,
+              predictions: window.taskData && window.taskData.predictions ? window.taskData.predictions : null,
+            };
           },
           rootElement: function() {
             var e = document.createElement("div"),
@@ -7659,28 +8100,28 @@
             return (t.innerHTML = ""), t.appendChild(e), e;
           },
         },
-        So = n(314),
-        Io = n(315),
-        Eo = n.n(Io),
-        Oo = (n(316), n(317), Eo.a, n(318)),
-        Ro = n.n(Oo),
-        Co = n(319),
-        _o = n(320),
-        jo = { config: Ro.a, tasks: Co, completion: _o },
-        Ao = n(321),
-        Do = n.n(Ao),
-        Mo = (n(322), n(323), Do.a, n(324)),
-        Bo = n.n(Mo),
-        Ho = (n(325), n(326), Bo.a, n(327)),
-        Wo = n.n(Ho),
-        Po = (n(328), n(329), Wo.a, n(330)),
-        zo = n.n(Po),
-        Lo = (n(331), n(332), zo.a, n(333)),
+        Ao = n(315),
+        Do = n(316),
+        Mo = n.n(Do),
+        Bo = n(317),
+        Po = n(318),
+        Ho = { config: Mo.a, tasks: Bo, completion: Po },
+        zo = n(319),
+        Wo = n.n(zo),
+        Lo = (n(320), n(321), Wo.a, n(322)),
         Fo = n.n(Lo),
-        Jo = (n(334), n(335), Fo.a, n(336)),
+        Jo = (n(323), n(324), Fo.a, n(325)),
         Go = n.n(Jo),
-        Uo = (n(337), n(338), Go.a, jo);
-      function Vo() {
+        Uo = (n(326), n(327), Go.a, n(328)),
+        Vo = n.n(Uo),
+        Yo = (n(329), n(330), Vo.a, n(331)),
+        qo = n.n(Yo),
+        Xo = (n(332), n(333), qo.a, n(334)),
+        Ko = n.n(Xo),
+        Zo = (n(335), n(336), Ko.a, n(337)),
+        Qo = n.n(Zo),
+        $o = (n(338), n(339), Qo.a, Ho);
+      function er() {
         return (function() {
           var e = {
             developmentEnv: !0,
@@ -7691,39 +8132,55 @@
             debug: -1 !== window.location.search.indexOf("debug=true"),
             interfaces: window.editorInterfaces
               ? window.editorInterfaces
-              : ["basic", "completions", "submit", "panel", "side-column", "submit:rewrite"],
-            task: { data: JSON.stringify(Uo.tasks[0]), project: 10, id: 100, completions: [] },
+              : [
+                  "controls",
+                  "predictions",
+                  "completions",
+                  "completions:menu",
+                  "predictions:menu",
+                  "panel",
+                  "side-column",
+                  "update",
+                  "check-empty",
+                ],
+            task: { data: JSON.stringify($o.tasks[0]), project: 10, id: 100, completions: [], predictions: [] },
           };
           return (
             e.viewCompletion &&
-              Uo.completion &&
-              (e = Object(N.a)({}, e, { task: Object(N.a)({}, e.task, { completions: Uo.completion.completions }) })),
-            fetch(Uo.config)
+              $o.completion &&
+              (e = Object(S.a)({}, e, {
+                task: Object(S.a)({}, e.task, {
+                  completions: $o.completion.completions,
+                  predictions: $o.completion.predictions,
+                }),
+              })),
+            fetch($o.config)
               .then(function(e) {
                 return e.text();
               })
               .then(function(t) {
-                return (e = Object(N.a)({}, e, { config: t }));
+                return (e = Object(S.a)({}, e, { config: t }));
               })
           );
         })();
       }
-      function Yo() {
-        return (Yo = Object(So.a)(
-          io.a.mark(function e() {
-            var t, n;
-            return io.a.wrap(function(e) {
+      function tr() {
+        return (tr = Object(Ao.a)(
+          ho.a.mark(function e() {
+            var t, n, a;
+            return ho.a.wrap(function(e) {
               for (;;)
                 switch ((e.prev = e.next)) {
                   case 0:
-                    return (e.next = 2), Vo();
+                    return (e.next = 2), er();
                   case 2:
                     return (
                       (t = e.sent),
                       (n = t.task.completions ? t.task.completions : null),
-                      e.abrupt("return", { completions: n })
+                      (a = t.task.predictions ? t.task.predictions : null),
+                      e.abrupt("return", { completions: n, predictions: a })
                     );
-                  case 5:
+                  case 6:
                   case "end":
                     return e.stop();
                 }
@@ -7731,19 +8188,19 @@
           }),
         )).apply(this, arguments);
       }
-      var qo = {
+      var nr = {
         getState: function() {
-          return Yo.apply(this, arguments);
+          return tr.apply(this, arguments);
         },
-        getData: Vo,
+        getData: er,
         rootElement: function() {
           var e = document.createElement("div"),
             t = document.getElementById("label-studio");
           return (t.innerHTML = ""), t.appendChild(e), (t.style.margin = "0 auto"), e;
         },
       };
-      qo = No;
-      var Xo = To.create(qo.getData(), {
+      nr = jo;
+      var ar = _o.create(nr.getData(), {
         fetch: T.fetcher,
         patch: T.patch,
         post: T.poster,
@@ -7752,15 +8209,23 @@
           return console.log(e);
         },
       });
-      Xo.initializeStore(qo.getState()),
-        (window.Htx = Xo),
-        c.a.render(l.a.createElement(u.a, { store: Xo }, l.a.createElement(ao, null)), qo.rootElement()),
+      ar.initializeStore(nr.getState()),
+        (window.Htx = ar),
+        c.a.render(l.a.createElement(u.a, { store: ar }, l.a.createElement(uo, null)), nr.rootElement()),
         "serviceWorker" in navigator &&
           navigator.serviceWorker.ready.then(function(e) {
             e.unregister();
           });
     },
-    80: function(e, t, n) {
+    65: function(e, t, n) {
+      e.exports = {
+        buttons: "Completions_buttons__2YII_",
+        completion: "Completions_completion__oF0zk",
+        completion_selected: "Completions_completion_selected__yEozY",
+        title: "Completions_title__mo6gq",
+      };
+    },
+    82: function(e, t, n) {
       e.exports = {
         block: "Entity_block__2XspI",
         button: "Entity_button__bWlfa",
@@ -7768,7 +8233,7 @@
         tag: "Entity_tag__35G8T",
       };
     },
-    91: function(e, t, n) {
+    92: function(e, t, n) {
       e.exports = {
         skip: "Controls_skip__10Js5",
         task: "Controls_task__15i-O",
@@ -7778,7 +8243,7 @@
         rewrite: "Controls_rewrite__3zE7C",
       };
     },
-    92: function(e, t, n) {
+    93: function(e, t, n) {
       e.exports = {
         block: "Dialog_block__1YBml",
         block_selected: "Dialog_block_selected__3zZ50",
@@ -7788,5 +8253,5 @@
       };
     },
   },
-  [[353, 2, 1]],
+  [[354, 2, 1]],
 ]);
