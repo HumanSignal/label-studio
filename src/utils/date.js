@@ -48,3 +48,13 @@ export function prettyDate(time) {
     day_diff + " days ago"
   );
 }
+
+/**
+ * Helper function to get current timezone
+ */
+export function currentISODate() {
+  let tzOffest = new Date().getTimezoneOffset() * 60000;
+  let localISOTime = new Date(Date.now() - tzOffest).toISOString().slice(0, -1);
+
+  return localISOTime;
+}
