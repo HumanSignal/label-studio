@@ -32,14 +32,39 @@ const Completion = observer(({ item, store }) => {
     </Button>
   );
 
+  /**
+   * Default badge for saved completions
+   */
   let badge = <Badge status="default" />;
 
-  console.log(item.sentUserGenerate);
+  /**
+   *
+   */
+  let completionID;
 
+  /**
+   * Title of card
+   */
+  if (item.userGenerate && !item.sentUserGenerate) {
+    completionID = "New Completion";
+  } else {
+    if (item.pk) {
+      completionID = item.pk;
+    } else if (item.id) {
+      completionID = item.id;
+    }
+  }
+
+  /**
+   * Badge for processing of user generate completion
+   */
   if (item.userGenerate) {
     badge = <Badge status="processing" />;
   }
 
+  /**
+   * Badge for complete of user generate completion
+   */
   if (item.userGenerate && item.sentUserGenerate) {
     badge = <Badge status="success" />;
   }
@@ -54,7 +79,8 @@ const Completion = observer(({ item, store }) => {
       <List.Content>
         <List.Header as="a" style={{ marginBottom: "1em" }}>
           {badge}
-          ID {item.id || item.pk}
+          {!item.userGenerate && "ID "}
+          {completionID}
         </List.Header>
 
         <List.Description as="a">

@@ -98,6 +98,10 @@ const Completion = types
       self.dragMode = val;
     },
 
+    updatePersonalKey(value) {
+      self.pk = value;
+    },
+
     setNormalizationMode(val) {
       self.normalizationMode = val;
     },
@@ -436,8 +440,8 @@ export default types
       let root = modelClass.create(completionModel);
 
       const node = {
-        pk: c.id,
         id: c.id || guidGenerator(5),
+        pk: c.id,
         createdAgo: c.created_ago,
         createdBy: c.created_username,
         honeypot: c.honeypot,
@@ -457,8 +461,8 @@ export default types
       let root = modelClass.create(predictionModel);
 
       const node = {
-        pk: prediction.id,
         id: prediction.id || guidGenerator(),
+        pk: prediction.id,
         createdAgo: prediction.created_ago,
         createdBy: prediction.model_version,
         root: root,

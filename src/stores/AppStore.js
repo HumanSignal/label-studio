@@ -194,12 +194,12 @@ export default types
       /**
        * Hotkey for skip task
        */
-      if (self.hasInterface("submit:skip")) Hotkey.addKey("ctrl+space", self.skipTask);
+      if (self.hasInterface("skip")) Hotkey.addKey("ctrl+space", self.skipTask);
 
       /**
        * Hotkey for update completion
        */
-      if (self.hasInterface("submit:update")) Hotkey.addKey("alt+enter", self.updateTask);
+      if (self.hasInterface("update")) Hotkey.addKey("alt+enter", self.updateTask);
 
       /**
        * Hotkey for delete
@@ -374,7 +374,13 @@ export default types
               body,
             );
           } else if (requestType === "post") {
-            yield self.post(`${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}${API_URL.COMPLETIONS}/`, body);
+            const responseCompletion = yield self.post(
+              `${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}${API_URL.COMPLETIONS}/`,
+              body,
+            );
+
+            const data = yield responseCompletion.json();
+            self.completionStore.selected.updatePersonalKey(data.id.toString());
           }
 
           if (hasInterface("load")) {
