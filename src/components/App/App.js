@@ -19,11 +19,13 @@ import Tree from "../../core/Tree";
  * Components
  */
 import Completions from "../Completions/Completions";
+import Predictions from "../Predictions/Predictions";
 import Controls from "../Controls/Controls";
 import Panel from "../Panel/Panel";
 import Settings from "../Settings/Settings";
 import Debug from "../Debug";
 import SideColumn from "../SideColumn/SideColumn";
+import Segment from "../Segment/Segment";
 
 /**
  * Visual
@@ -56,11 +58,6 @@ import { ListModel } from "../../interfaces/control/List";
 import { RankerModel } from "../../interfaces/control/Ranker";
 
 /**
- * Components
- */
-import Segment from "../Segment/Segment";
-
-/**
  * Styles
  */
 import styles from "./App.module.scss";
@@ -72,20 +69,14 @@ const App = inject("store")(
   observer(
     class App extends Component {
       renderSuccess() {
-        const { store } = this.props;
-
         return <Result status="success" title="Done!" />;
       }
 
       renderNoCompletion() {
-        const { store } = this.props;
-
         return <Result status="success" title="No more completions" />;
       }
 
       renderNothingToLabel() {
-        const { store } = this.props;
-
         return <Result status="success" title="No more data available for labeling" />;
       }
 
@@ -95,17 +86,24 @@ const App = inject("store")(
 
       render() {
         const self = this;
-        const { store } = this.props;
+        const { store } = self.props;
+        let root;
 
-        if (store.isLoading) return this.renderLoader();
+        if (store.completionStore.currentCompletion) {
+          root = store.completionStore.currentCompletion.root;
+        } else if (store.completionStore.currentPrediction) {
+          root = store.completionStore.currentPrediction.root;
+        }
 
-        if (store.noTask) return this.renderNothingToLabel();
+        if (store.isLoading) return self.renderLoader();
 
-        if (store.labeledSuccess) return this.renderSuccess();
+        if (store.noTask) return self.renderNothingToLabel();
 
-        if (!store.completionStore.currentCompletion) return this.renderNoCompletion();
+        if (store.labeledSuccess) return self.renderSuccess();
 
-        const { root } = store.completionStore.currentCompletion;
+        if (!store.completionStore.currentCompletion && !store.completionStore.currentPrediction) {
+          return self.renderNoCompletion();
+        }
 
         return (
           <div className={styles.editor}>
@@ -123,17 +121,20 @@ const App = inject("store")(
                 <div className={styles.common}>
                   <Segment>
                     {Tree.renderItem(root)}
-                    {store.hasInterface("submit") && <Controls />}
+                    {store.hasInterface("controls") && <Controls />}
                   </Segment>
 
                   <div className={styles.menu}>
-                    {store.hasInterface("completions") && <Completions store={store} />}
+                    {store.hasInterface("completions:menu") && <Completions store={store} />}
+
+                    {store.hasInterface("predictions:menu") && <Predictions store={store} />}
 
                     {store.hasInterface("side-column") && <SideColumn store={store} />}
                   </div>
                 </div>
               </div>
             </Provider>
+            {store.hasInterface("debug") && <Debug store={store} />}
           </div>
         );
       }

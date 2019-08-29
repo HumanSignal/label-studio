@@ -3,9 +3,9 @@
   "port": 8200,
   "debug": true,
 
-  "label_config": "../examples/audio_regions/config.xml",
-  "input_path": "../examples/audio_regions/tasks.json",
-  "output_dir": "../examples/audio_regions/completions",
+  "label_config": "../examples/sentiment_analysis/config.xml",
+  "input_path": "../examples/sentiment_analysis/tasks.json",
+  "output_dir": "../examples/sentiment_analysis/completions",
 
   "instruction": "Type some <b>hypertext</b> for label experts!",
   "allow_delete_completions": true,
@@ -17,11 +17,13 @@
       "basic",
       "panel",
       "submit",
+      "controls",
+      "predictions",
+      "predictions:menu",
       "completions",
-      "submit:load",
-      "submit:rewrite",
-      "side-column",
-      "submit:check-empty"
+      "completions:menu",
+      "update",
+      "side-column"
     ]
   }
 }

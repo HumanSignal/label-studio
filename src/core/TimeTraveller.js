@@ -83,7 +83,7 @@ const TimeTraveller = types
         applySnapshot(targetStore, self.history[self.undoIdx]);
       },
       reset() {
-        self.undoIdx = self.createdIdx;
+        self.undoIdx = 1;
         skipNextUndoState = true;
         applySnapshot(targetStore, self.history[self.undoIdx]);
       },

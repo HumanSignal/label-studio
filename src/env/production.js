@@ -57,11 +57,9 @@ function getData() {
    * window.explore used for display completions
    */
   if (window.explore) {
-    data["interfaces"] = window.editorInterfaces ? window.editorInterfaces : ["basic", "completions"];
+    data["interfaces"] = window.editorInterfaces ? window.editorInterfaces : ["completions"];
   } else {
-    data["interfaces"] = window.editorInterfaces
-      ? window.editorInterfaces
-      : ["basic", "submit", "submit:skip", "submit:submit"];
+    data["interfaces"] = window.editorInterfaces ? window.editorInterfaces : ["submit", "submit:skip"];
   }
 
   return data;
@@ -87,9 +85,11 @@ function rootElement() {
  */
 function getState() {
   const completions = window.taskData && window.taskData.completions ? window.taskData.completions : null;
+  const predictions = window.taskData && window.taskData.predictions ? window.taskData.predictions : null;
 
   return {
     completions: completions,
+    predictions: predictions,
   };
 }
 

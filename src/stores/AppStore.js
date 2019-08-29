@@ -4,12 +4,16 @@ import Task from "./TaskStore";
 import User from "./UserStore";
 import Settings from "./SettingsStore";
 import CompletionStore from "./CompletionStore";
+import PredictionStore from "./PredictionStore";
 import Hotkey from "../core/Hotkey";
 import { API_URL } from "../constants/Api";
 import Utils from "../utils";
 
 export default types
   .model("AppStore", {
+    /**
+     *
+     */
     config: types.string,
 
     /**
@@ -31,11 +35,19 @@ export default types
     explore: types.optional(types.boolean, false),
 
     /**
-     * Completions
+     * Completions Store
      */
     completionStore: types.optional(CompletionStore, {
       completions: [],
+      predictions: [],
     }),
+
+    /**
+     * Predictions Store
+     */
+    // predictionStore: types.optional(PredictionStore, {
+    //   predictions: [],
+    // }),
 
     /**
      * Project ID from platform
@@ -180,9 +192,14 @@ export default types
       Hotkey.addKey("ctrl+enter", self.sendTask);
 
       /**
-       * Hotkey for skip
+       * Hotkey for skip task
        */
-      if (self.hasInterface("submit:skip")) Hotkey.addKey("ctrl+space", self.skipTask);
+      if (self.hasInterface("skip")) Hotkey.addKey("ctrl+space", self.skipTask);
+
+      /**
+       * Hotkey for update completion
+       */
+      if (self.hasInterface("update")) Hotkey.addKey("alt+enter", self.updateTask);
 
       /**
        * Hotkey for delete
@@ -217,9 +234,9 @@ export default types
      */
     function loadTask() {
       if (self.taskID) {
-        return loadTaskURL(`${API_URL.MAIN}${API_URL.TASKS}/${self.taskID}/`);
+        return loadTaskAPI(`${API_URL.MAIN}${API_URL.TASKS}/${self.taskID}/`);
       } else if (self.explore && self.projectID) {
-        return loadTaskURL(`${API_URL.MAIN}${API_URL.PROJECTS}/${self.projectID}${API_URL.NEXT}`);
+        return loadTaskAPI(`${API_URL.MAIN}${API_URL.PROJECTS}/${self.projectID}${API_URL.NEXT}`);
       }
     }
 
@@ -248,21 +265,9 @@ export default types
     }
 
     /**
-     *
-     * @param {*} data
+     * Load task from API
      */
-    function addGeneratedCompletion(data) {
-      if ("completion_result" in data && !self.hasInterface("predictions:hide")) {
-        const c = self.completionStore.selected;
-        c.deserializeCompletion(data["completion_result"]);
-        c.reinitHistory();
-      }
-    }
-
-    /**
-     * Load task from URL
-     */
-    const loadTaskURL = flow(function*(url) {
+    const loadTaskAPI = flow(function*(url) {
       try {
         const res = yield self.fetch(url);
 
@@ -296,7 +301,19 @@ export default types
             if (self.completionStore.selected)
               self.completionStore.selected.traverseTree(node => node.updateValue && node.updateValue(self));
 
-            self.addGeneratedCompletion(r);
+            // self.addGeneratedCompletion(r);
+          }
+
+          if (self.hasInterface("predictions") && r.predictions) {
+            if (r.predictions && r.predictions.length) {
+              for (let i = 0; i < r.predictions.length; i++) {
+                const pred = self.completionStore.addPrediction(r.predictions[i]);
+                pred.traverseTree(node => node.updateValue && node.updateValue(self));
+                self.completionStore.selectPrediction(pred.id);
+                pred.deserializeCompletion(r.predictions[i].result);
+                pred.reinitHistory();
+              }
+            }
           }
         });
       } catch (err) {
@@ -317,6 +334,7 @@ export default types
         );
 
         self.resetState();
+
         return loadTask();
       } catch (err) {
         console.error("Failed to skip task ", err);
@@ -335,7 +353,7 @@ export default types
 
         const res = c.serializeCompletion();
 
-        if (self.hasInterface("submit:check-empty") && res.length === 0) {
+        if (self.hasInterface("check-empty") && res.length === 0) {
           alert("You need to label at least something!");
           return;
         }
@@ -356,18 +374,28 @@ export default types
               body,
             );
           } else if (requestType === "post") {
-            yield self.post(`${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}${API_URL.COMPLETIONS}/`, body);
+            const responseCompletion = yield self.post(
+              `${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}${API_URL.COMPLETIONS}/`,
+              body,
+            );
+
+            const data = yield responseCompletion.json();
+            self.completionStore.selected.updatePersonalKey(data.id.toString());
           }
 
-          if (hasInterface("submit:load")) {
+          if (hasInterface("load")) {
             self.resetState();
             return loadTask();
           } else {
             self.markLoading(false);
-            self.labeledSuccess = true;
+            self.completionStore.selected.sendUserGenerate();
+
+            if (self.explore && self.projectID) {
+              self.labeledSuccess = true;
+            }
           }
 
-          delete state.history;
+          // delete state.history;
         } catch (err) {
           console.error("Failed to send task ", err);
         }
@@ -375,9 +403,9 @@ export default types
     };
 
     /**
-     * Rewrite current completion
+     * Update current completion
      */
-    const rewriteTask = sendToServer("patch");
+    const updateTask = sendToServer("patch");
 
     /**
      * Send current completion
@@ -387,13 +415,22 @@ export default types
     /**
      * Function to initilaze completion store
      */
-    function initializeStore({ completions }) {
-      const { completionStore } = self;
-
+    function initializeStore({ completions, predictions }) {
       /**
        * Array of generated completions
        */
       let generatedCompletions = [];
+
+      if (predictions && predictions.length) {
+        for (let i = 0; i < predictions.length; i++) {
+          const pred = self.completionStore.addPrediction(predictions[i]);
+          pred.traverseTree(node => node.updateValue && node.updateValue(self));
+          self.completionStore.selectPrediction(pred.id);
+
+          pred.deserializeCompletion(predictions[i].result);
+          pred.reinitHistory();
+        }
+      }
 
       /**
        * Completions in initialize
@@ -414,17 +451,30 @@ export default types
         }
       }
 
-      if (completionStore.completions.length === 0) {
+      if (!completions || completions.length === 0) {
         const c = self.completionStore.addInitialCompletion();
-
         self.completionStore.selectCompletion(c.id);
 
         if (generatedCompletions.length > 0) {
-          for (let iC = 0; iC < generatedCompletions.length; iC++) {
-            c.deserializeCompletion(generatedCompletions[iC].result);
-          }
+          self.completionStore.destroyCompletion(self.completionStore.selected);
 
-          c.reinitHistory();
+          for (let iC = 0; iC < generatedCompletions.length; iC++) {
+            const comp = self.completionStore.addSavedCompletion(generatedCompletions[iC]);
+            comp.traverseTree(node => node.updateValue && node.updateValue(self));
+            self.completionStore.selectCompletion(comp.id);
+
+            comp.deserializeCompletion(generatedCompletions[iC].result);
+            comp.reinitHistory();
+          }
+        }
+      } else {
+        for (let iC = 0; iC < generatedCompletions.length; iC++) {
+          const comp = self.completionStore.addSavedCompletion(generatedCompletions[iC]);
+          comp.traverseTree(node => node.updateValue && node.updateValue(self));
+          self.completionStore.selectCompletion(comp.id);
+
+          comp.deserializeCompletion(generatedCompletions[iC].result);
+          comp.reinitHistory();
         }
       }
     }
@@ -436,7 +486,7 @@ export default types
       hasInterface,
       skipTask,
       sendTask,
-      rewriteTask,
+      updateTask,
       markLoading,
       resetState,
       openDescription,
@@ -444,6 +494,5 @@ export default types
       setDescription,
       toggleSettings,
       initializeStore,
-      addGeneratedCompletion,
     };
   });

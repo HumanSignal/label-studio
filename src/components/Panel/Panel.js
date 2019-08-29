@@ -4,6 +4,7 @@ import { Button, Icon } from "antd";
 
 import styles from "./Panel.module.scss";
 import Hint from "../Hint/Hint";
+import Segment from "../Segment/Segment";
 
 /**
  * Panel component with buttons:
@@ -18,7 +19,7 @@ export default observer(({ store }) => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.block}>
+      <div className={`${styles.block} ${styles.block__controls}`}>
         <Button
           type="ghost"
           icon="undo"

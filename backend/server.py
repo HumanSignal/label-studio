@@ -5,9 +5,10 @@ import os
 import flask
 import json  # it MUST be included after flask!
 import db
+import random
 
 from flask import request, jsonify, make_response, Response
-from utils import exception_treatment, answer, log_config, log, config_line_stripped, load_config
+from utils import exception_treatment, log_config, log, config_line_stripped, load_config
 
 
 # init
@@ -163,21 +164,21 @@ def api_completions(task_id):
         completion.pop('state', None)  # remove editor state
         db.save_completion(task_id, completion)
         log.info(msg='Completion saved', extra={'task_id': task_id, 'output': request.json})
-        return answer(201, 'ok')
+        return make_response(json.dumps({'id': random.randint(0, 1000)}), 201)
 
     elif request.method == 'DELETE':
         if c.get('allow_delete_completions', False):
             db.delete_completion(task_id)
-            return answer(204, 'deleted')
+            return make_response('deleted', 204)
         else:
-            return answer(422, 'Completion removing is not allowed in server config')
+            return make_response('Completion removing is not allowed in server config', 422)
     else:
-        return answer(500, 'Incorrect request method')
+        return make_response('Incorrect request method', 500)
 
 
 @app.route('/api/tasks/<task_id>/completions/<completion_id>', methods=['PATCH'])
 @exception_treatment
-def api_completion_rewrite(task_id, completion_id):
+def api_completion_update(task_id, completion_id):
     """ Rewrite existing completion with patch.
         This is technical api call for editor testing only. It's used for Rewrite button in editor.
     """
@@ -185,12 +186,12 @@ def api_completion_rewrite(task_id, completion_id):
 
     completion = request.json
     assert task_id == completion_id, \
-        f'Task ID != Completion ID, {task_id} != {completion_id}'
+        'Task ID != Completion ID'
 
     completion.pop('state', None)  # remove editor state
     db.save_completion(task_id, completion)
     log.info(msg='Completion saved', extra={'task_id': task_id, 'output': request.json})
-    return answer(201, 'ok')
+    return make_response('ok', 201)
 
 
 @app.route('/api/projects/1/expert_instruction')

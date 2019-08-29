@@ -12,21 +12,25 @@ import RelationStore from "./RelationStore";
 import NormalizationStore from "./NormalizationStore";
 import RegionStore from "./RegionStore";
 import { RectangleModel } from "../interfaces/control/Rectangle";
+import Utils from "../utils";
 
 import * as HtxObjectModel from "../interfaces/object";
 
 const Completion = types
   .model("Completion", {
     id: types.identifier,
-    pk: types.optional(types.integer, 1),
+    pk: types.optional(types.string, guidGenerator(5)),
     selected: types.optional(types.boolean, false),
 
-    createdDate: types.optional(types.string, new Date().toISOString()),
+    createdDate: types.optional(types.string, Utils.UDate.currentISODate()),
     createdAgo: types.maybeNull(types.string),
     createdBy: types.optional(types.string, "Admin"),
 
+    userGenerate: types.optional(types.boolean, true),
+    update: types.optional(types.boolean, false),
+    sentUserGenerate: types.optional(types.boolean, false),
+
     honeypot: types.optional(types.boolean, false),
-    prediction: types.optional(types.boolean, false),
 
     root: Types.allModelsTypes(),
     names: types.map(types.reference(Types.allModelsTypes())),
@@ -86,8 +90,16 @@ const Completion = types
       self._updateServerState({ honeypot: self.honeypot });
     },
 
+    sendUserGenerate() {
+      self.sentUserGenerate = true;
+    },
+
     setDragMode(val) {
       self.dragMode = val;
+    },
+
+    updatePersonalKey(value) {
+      self.pk = value;
     },
 
     setNormalizationMode(val) {
@@ -275,6 +287,8 @@ export default types
   .model("CompletionStore", {
     completions: types.array(Completion),
     selected: types.maybeNull(types.reference(Completion)),
+    predictions: types.maybeNull(types.array(Completion)),
+    predictSelect: types.optional(types.boolean, false),
   })
   .views(self => ({
     /**
@@ -282,6 +296,10 @@ export default types
      */
     get currentCompletion() {
       return self.selected && self.completions.find(c => c.id === self.selected.id);
+    },
+
+    get currentPrediction() {
+      return self.selected && self.predictions.find(c => c.id === self.selected.id);
     },
 
     /**
@@ -299,13 +317,35 @@ export default types
     },
   }))
   .actions(self => {
+    function selectedPredict() {
+      self.predictSelect = true;
+    }
+
+    function unSelectedPredict() {
+      self.predictSelect = false;
+    }
+
     /**
-     *
+     * Select completion
      * @param {*} id
      */
     function selectCompletion(id) {
       self.completions.map(c => (c.selected = false));
+      if (self.predictions) self.predictions.map(c => (c.selected = false));
       const c = self.completions.find(c => c.id === id);
+      unSelectedPredict();
+
+      // if (self.selected && self.selected.id !== c.id) c.history.reset();
+
+      c.selected = true;
+      self.selected = c;
+    }
+
+    function selectPrediction(id) {
+      self.predictions.map(c => (c.selected = false));
+      self.completions.map(c => (c.selected = false));
+      const c = self.predictions.find(c => c.id === id);
+      selectedPredict();
 
       // if (self.selected && self.selected.id !== c.id) c.history.reset();
 
@@ -331,13 +371,31 @@ export default types
         createdCompletion.traverseTree(node => node.updateValue && node.updateValue(self.store));
       }
 
-      self.completions.push(createdCompletion);
+      self.completions.unshift(createdCompletion);
 
       return createdCompletion;
     }
 
+    function addPredictionItem(node, type) {
+      /**
+       * Create Completion
+       */
+      const createdPrediction = Completion.create(node);
+
+      /**
+       * If completion is initial completion
+       */
+      if (self.store.task && type === "initial") {
+        createdPrediction.traverseTree(node => node.updateValue && node.updateValue(self.store));
+      }
+
+      self.predictions.push(createdPrediction);
+
+      return createdPrediction;
+    }
+
     /**
-     *
+     * Send request to server for delete completion
      */
     const _deleteCompletion = flow(function* _deleteCompletion(pk) {
       try {
@@ -352,10 +410,18 @@ export default types
      * @param {*} completion
      */
     function destroyCompletion(completion) {
+      /**
+       * MST destroy completion
+       */
       destroy(completion);
 
       self.selected = null;
-      if (self.completions.length > 0) self.selectCompletion(self.completions[0].id);
+      /**
+       * Select other completion
+       */
+      if (self.completions.length > 0) {
+        self.selectCompletion(self.completions[0].id);
+      }
     }
 
     function deleteCompletion(completion) {
@@ -374,17 +440,37 @@ export default types
       let root = modelClass.create(completionModel);
 
       const node = {
+        id: c.id || guidGenerator(5),
         pk: c.id,
-        id: c.id || guidGenerator(),
         createdAgo: c.created_ago,
         createdBy: c.created_username,
         honeypot: c.honeypot,
         root: root,
+        userGenerate: false,
       };
 
       const completion = self.addCompletion(node, "list");
 
       return completion;
+    }
+
+    function addPrediction(prediction) {
+      const predictionModel = Tree.treeToModel(self.store.config);
+      const modelClass = Registry.getModelByTag(predictionModel.type);
+
+      let root = modelClass.create(predictionModel);
+
+      const node = {
+        id: prediction.id || guidGenerator(),
+        pk: prediction.id,
+        createdAgo: prediction.created_ago,
+        createdBy: prediction.model_version,
+        root: root,
+      };
+
+      const returnPredict = self.addPredictionItem(node, "list");
+
+      return returnPredict;
     }
 
     /**
@@ -408,7 +494,7 @@ export default types
       let root = modelClass.create(completionModel);
 
       const node = {
-        id: guidGenerator(),
+        id: guidGenerator(5),
         root: root,
       };
 
@@ -429,12 +515,57 @@ export default types
       return completion;
     }
 
+    function addUserCompletion() {
+      /**
+       * Convert config to model
+       */
+      const completionModel = Tree.treeToModel(self.store.config);
+
+      /**
+       * Get model by type of tag
+       */
+      const modelClass = Registry.getModelByTag(completionModel.type);
+
+      /**
+       * Completion model init
+       */
+      let root = modelClass.create(completionModel);
+
+      const node = {
+        id: guidGenerator(5),
+        root: root,
+        userGenerate: true,
+      };
+
+      /**
+       * Expert module for initial completion
+       */
+      if (self.store.expert) {
+        const { expert } = self.store;
+
+        node["createdBy"] = `${expert.firstName} ${expert.lastName}`;
+      }
+
+      /**
+       *
+       */
+      const completion = self.addCompletion(node, "initial");
+
+      self.selectCompletion(node.id);
+
+      return completion;
+    }
+
     return {
       selectCompletion,
+      selectPrediction,
       addCompletion,
       deleteCompletion,
       destroyCompletion,
       addInitialCompletion,
       addSavedCompletion,
+      addUserCompletion,
+      addPrediction,
+      addPredictionItem,
     };
   });
