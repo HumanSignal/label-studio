@@ -163,7 +163,7 @@ def api_completions(task_id):
         completion.pop('state', None)  # remove editor state
         db.save_completion(task_id, completion)
         log.info(msg='Completion saved', extra={'task_id': task_id, 'output': request.json})
-        return answer(201, 'ok')
+        return answer(201, json.dumps({'id': task_id}))
 
     elif request.method == 'DELETE':
         if c.get('allow_delete_completions', False):
@@ -185,7 +185,7 @@ def api_completion_rewrite(task_id, completion_id):
 
     completion = request.json
     assert task_id == completion_id, \
-        f'Task ID != Completion ID, {task_id} != {completion_id}'
+        'Task ID != Completion ID'
 
     completion.pop('state', None)  # remove editor state
     db.save_completion(task_id, completion)

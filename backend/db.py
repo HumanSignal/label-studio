@@ -192,7 +192,7 @@ def save_completion(task_id, completion):
     filename = os.path.join(c['output_dir'], str(task_id) + '.json')
     os.mkdir(c['output_dir']) if not os.path.exists(c['output_dir']) else ()
     json.dump(task, open(filename, 'w'), indent=4, sort_keys=True)
-
+    return task_id  # in simple case completion id == task id
 
 def delete_completion(task_id):
     """ Delete completion from disk
