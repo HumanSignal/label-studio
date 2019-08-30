@@ -370,7 +370,7 @@ export default types
 
           if (requestType === "patch") {
             yield getEnv(self).patch(
-              `${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}${API_URL.COMPLETIONS}/${c.pk}`,
+              `${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}${API_URL.COMPLETIONS}/${c.pk}/`,
               body,
             );
           } else if (requestType === "post") {

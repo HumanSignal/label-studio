@@ -59,7 +59,7 @@ function getData() {
   if (window.explore) {
     data["interfaces"] = window.editorInterfaces ? window.editorInterfaces : ["completions"];
   } else {
-    data["interfaces"] = window.editorInterfaces ? window.editorInterfaces : ["submit", "submit:skip"];
+    data["interfaces"] = window.editorInterfaces ? window.editorInterfaces : ["submit", "skip"];
   }
 
   return data;
