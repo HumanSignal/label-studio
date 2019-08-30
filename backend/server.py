@@ -5,7 +5,6 @@ import os
 import flask
 import json  # it MUST be included after flask!
 import db
-import random
 
 from flask import request, jsonify, make_response, Response
 from utils import exception_treatment, log_config, log, config_line_stripped, load_config
@@ -162,11 +161,23 @@ def api_completions(task_id):
     if request.method == 'POST':
         completion = request.json
         completion.pop('state', None)  # remove editor state
-        db.save_completion(task_id, completion)
+        completion_id = db.save_completion(task_id, completion)
         log.info(msg='Completion saved', extra={'task_id': task_id, 'output': request.json})
-        return make_response(json.dumps({'id': random.randint(0, 1000)}), 201)
+        return make_response(json.dumps({'id': completion_id}), 201)
 
-    elif request.method == 'DELETE':
+    else:
+        return make_response('Incorrect request method', 500)
+
+
+@app.route('/api/tasks/<task_id>/completions/<completion_id>/', methods=['DELETE'])
+@exception_treatment
+def api_completion_by_id(task_id, completion_id):
+    """ Delete or save new completion to output_dir with the same name as task_id.
+        completion_id with different IDs is not supported in this backend
+    """
+    global c
+
+    if request.method == 'DELETE':
         if c.get('allow_delete_completions', False):
             db.delete_completion(task_id)
             return make_response('deleted', 204)

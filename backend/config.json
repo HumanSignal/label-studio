@@ -12,18 +12,6 @@
 
   "editor": {
     "build_path": "../build/static",
-    "debug": false,
-    "interfaces": [
-      "basic",
-      "panel",
-      "submit",
-      "controls",
-      "predictions",
-      "predictions:menu",
-      "completions",
-      "completions:menu",
-      "update",
-      "side-column"
-    ]
+    "debug": false
   }
 }

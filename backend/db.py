@@ -1,8 +1,9 @@
 from __future__ import print_function
 
+import io
 import os
 import json
-import io
+import random
 
 from datetime import datetime
 from utils import LabelConfigParser
@@ -48,30 +49,32 @@ def init(config):
                 # multiple tasks in file
                 if isinstance(json_body, list):
                     for data in json_body:
-                        task_id = len(tasks)
+                        task_id = len(tasks) + 1
                         tasks[task_id] = {'id': task_id, 'task_path': path, 'data': data}
 
                 # one task in file
                 elif isinstance(json_body, dict):
-                    task_id = len(tasks)
+                    task_id = len(tasks) + 1
                     tasks[task_id] = {'id': task_id, 'task_path': path, 'data': json_body}
 
                 # unsupported task type
                 else:
                     raise Exception('Unsupported task data:', path)
-            elif f.endswith('.txt'):
 
+            # load tasks from txt: line by line, task by task
+            elif f.endswith('.txt'):
                 input_data_tag = label_config.get_input_data_tags()
                 if len(input_data_tag) > 1:
                     print(f'Warning! Multiple input data tags found: '
                           f'{",".join(tag.attrib.get("name") for tag in input_data_tag)}. Only first one is used.')
+
                 input_data_tag = input_data_tag[0]
                 data_key = input_data_tag.attrib.get('value').lstrip('$')
                 tasks = {}
                 with io.open(path) as fin:
                     for i, line in enumerate(fin):
                         tasks[i] = {
-                            'id': i,
+                            'id': i + 1,
                             'task_path': path,
                             'data': {
                                 data_key: line.strip()
@@ -187,12 +190,15 @@ def save_completion(task_id, completion):
     """
     global c
 
-    task = get_tasks()[int(task_id)]
+    task_id = int(task_id)
+    task = get_tasks()[task_id]
+    completion['id'] = task_id
     task['completions'] = [completion]
     filename = os.path.join(c['output_dir'], str(task_id) + '.json')
     os.mkdir(c['output_dir']) if not os.path.exists(c['output_dir']) else ()
     json.dump(task, open(filename, 'w'), indent=4, sort_keys=True)
-    return task_id  # in simple case completion id == task id
+    return task_id * 10000 + random.randint(0, 1000)  # in simple case completion id == task id
+
 
 def delete_completion(task_id):
     """ Delete completion from disk
