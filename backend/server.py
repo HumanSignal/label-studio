@@ -79,7 +79,7 @@ def index():
     task_id = request.args.get('task_id', None)
 
     if task_id is not None:
-        task_data = db.get_completion(task_id)
+        task_data = db.get_completions(task_id)
         if task_data is None:
             task_data = db.get_task(task_id)
 
@@ -137,7 +137,7 @@ def api_tasks(task_id):
     """ Get task by id
     """
     # try to get task with completions first
-    task_data = db.get_completion(task_id)
+    task_data = db.get_completions(task_id)
     task_data = db.get_task(task_id) if task_data is None else task_data
     return make_response(jsonify(task_data), 200)
 
@@ -187,19 +187,17 @@ def api_completion_by_id(task_id, completion_id):
         return make_response('Incorrect request method', 500)
 
 
-@app.route('/api/tasks/<task_id>/completions/<completion_id>', methods=['PATCH'])
+@app.route('/api/tasks/<task_id>/completions/<completion_id>/', methods=['PATCH'])
 @exception_treatment
 def api_completion_update(task_id, completion_id):
     """ Rewrite existing completion with patch.
         This is technical api call for editor testing only. It's used for Rewrite button in editor.
     """
     global c
-
     completion = request.json
-    assert task_id == completion_id, \
-        'Task ID != Completion ID'
 
     completion.pop('state', None)  # remove editor state
+    completion['id'] = int(completion_id)
     db.save_completion(task_id, completion)
     log.info(msg='Completion saved', extra={'task_id': task_id, 'output': request.json})
     return make_response('ok', 201)
