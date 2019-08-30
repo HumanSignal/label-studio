@@ -87,11 +87,15 @@ build_path - this points to the directory with js, css and other media from Edit
       "basic",
       "panel",
       "submit",
-      "submit:load",
+      "load",
       "side-column",
-      "submit:skip",
-      "submit:check-empty",
-      "predictions:hide"
+      "skip",
+      "controls",
+      "check-empty",
+      "predictions",
+      "predictions:menu",
+      "completions",
+      "completions:menu"
     ],
   },  
 ```
