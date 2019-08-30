@@ -27,18 +27,43 @@
     </div>
 
     <script>
-        window.editorInterfaces = {{ config['editor']['interfaces'] | json | safe }};
         window.debugEditor = "{{ config['editor']['debug'] }}" === "True";
         window.editorAppConfig = '{{ label_config_line | safe }}';
         window.expertData = {"pk": 1, "firstName": "Label", "lastName": "Expert"};
 
         {% if task_data %}
+            // interface for completions view mode
+            window.editorInterfaces = [
+                "basic",
+                "panel",  // undo, redo, reset panel
+                "controls",  // all control buttons: skip, submit, update
+                "submit",  // submit button on controls
+                "update",  // update button  on controls
+                "predictions", // show predictions from task.predictions = [{...}, {...}]
+                "predictions:menu", // right menu with prediction items
+                "completions",  // show completions
+                "completions:menu", // right menu with completion items
+                "side-column" // entity
+            ];
+
             // load by task data injected into html
             window.taskData = {{ task_data | json | safe }};
 
             // another way is to load task by id using API
             // window.taskID = {{ task_data['id'] }};
         {% else %}
+            // interface for labeling mode
+            window.editorInterfaces = [
+                "basic",
+                "load",  // load next task
+                "panel",  // undo, redo, reset panel
+                "controls",  // all control buttons: skip, submit, update
+                "submit",  // submit button on controls
+                "predictions", // show predictions from task.predictions = [{...}, {...}]
+                "completions",  // show completions
+                "side-column" // entity
+            ];
+
             // load next task for labeling on start
             window.explore = true;
             window.projectID = 1;
