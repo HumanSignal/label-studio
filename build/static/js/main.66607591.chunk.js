@@ -2465,7 +2465,7 @@
                 ((i.submit = l.a.createElement(ue, null, " [ Ctrl+Enter ]")),
                 (i.skip = l.a.createElement(ue, null, " [ Ctrl+Space ]")),
                 (i.update = l.a.createElement(ue, null, " [ Alt+Enter] "))),
-              r.completionStore.predictSelect ||
+              (r.completionStore.predictSelect && !r.explore) ||
                 (r.hasInterface("skip") &&
                   (n = l.a.createElement(
                     A.a,
@@ -2497,7 +2497,7 @@
                 t,
               ),
             );
-            return !r.completionStore.predictSelect && p;
+            return (!r.completionStore.predictSelect || r.explore) && p;
           }),
         ),
         pe = n(122),
@@ -7337,7 +7337,7 @@
           .model("CompletionStore", {
             completions: y.m.array(Eo),
             selected: y.m.maybeNull(y.m.reference(Eo)),
-            predictions: y.m.maybeNull(y.m.array(Eo)),
+            predictions: y.m.array(Eo),
             predictSelect: y.m.optional(y.m.boolean, !1),
           })
           .views(function(e) {
@@ -7491,7 +7491,7 @@
                     a.traverseTree(function(t) {
                       return t.updateValue && t.updateValue(e.store);
                     }),
-                  e.predictions.push(a),
+                  e.predictions.unshift(a),
                   a
                 );
               },
@@ -7913,7 +7913,7 @@
                                     .concat(Co.TASKS, "/")
                                     .concat(e.task.id)
                                     .concat(Co.COMPLETIONS, "/")
-                                    .concat(r.pk),
+                                    .concat(r.pk, "/"),
                                   s,
                                 )
                               );
@@ -8084,7 +8084,7 @@
               window.preRender && (e.task = window.taskData),
               window.explore
                 ? (e.interfaces = window.editorInterfaces ? window.editorInterfaces : ["completions"])
-                : (e.interfaces = window.editorInterfaces ? window.editorInterfaces : ["submit", "submit:skip"]),
+                : (e.interfaces = window.editorInterfaces ? window.editorInterfaces : ["submit", "skip"]),
               e
             );
           },

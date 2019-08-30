@@ -4,7 +4,7 @@ self.__precacheManifest = [
     url: "/static/media/outline-icons.701ae6ab.eot",
   },
   {
-    revision: "ff3e03a8b6adb765c2f5",
+    revision: "666075917d5855beffca",
     url: "/static/css/main.0b2a0c81.chunk.css",
   },
   {
@@ -52,16 +52,16 @@ self.__precacheManifest = [
     url: "/static/media/config.1890026d.xml",
   },
   {
-    revision: "ef60a4f6c25ef7f39f2d25a748dbecfe",
-    url: "/static/media/outline-icons.ef60a4f6.woff",
-  },
-  {
     revision: "cd6c777f1945164224dee082abaea03a",
     url: "/static/media/outline-icons.cd6c777f.woff2",
   },
   {
-    revision: "ff3e03a8b6adb765c2f5",
-    url: "/static/js/main.ff3e03a8.chunk.js",
+    revision: "ef60a4f6c25ef7f39f2d25a748dbecfe",
+    url: "/static/media/outline-icons.ef60a4f6.woff",
+  },
+  {
+    revision: "666075917d5855beffca",
+    url: "/static/js/main.66607591.chunk.js",
   },
   {
     revision: "ad97afd3337e8cda302d10ff5a4026b8",
@@ -116,7 +116,7 @@ self.__precacheManifest = [
     url: "/static/css/1.e848df71.chunk.css",
   },
   {
-    revision: "34f7e4511638051397b005fc40d3d7c3",
+    revision: "f795bff7b6d95e034e1fbbbdf22612f6",
     url: "/index.html",
   },
 ];
