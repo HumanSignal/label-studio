@@ -43,7 +43,7 @@ export default inject("store")(
     /**
      * Check for Predict Menu
      */
-    if (!store.completionStore.predictSelect) {
+    if (!store.completionStore.predictSelect || store.explore) {
       if (store.hasInterface("skip")) {
         skipButton = (
           <Button type="ghost" onClick={store.skipTask} className={styles.skip}>
@@ -82,6 +82,6 @@ export default inject("store")(
       </div>
     );
 
-    return !store.completionStore.predictSelect && content;
+    return (!store.completionStore.predictSelect || store.explore) && content;
   }),
 );
