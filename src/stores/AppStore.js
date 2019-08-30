@@ -236,7 +236,7 @@ export default types
       if (self.taskID) {
         return loadTaskAPI(`${API_URL.MAIN}${API_URL.TASKS}/${self.taskID}/`);
       } else if (self.explore && self.projectID) {
-        return loadTaskAPI(`${API_URL.MAIN}${API_URL.PROJECTS}/${self.projectID}${API_URL.NEXT}`);
+        return loadTaskAPI(`${API_URL.MAIN}${API_URL.PROJECTS}/${self.projectID}${API_URL.NEXT}/`);
       }
     }
 
