@@ -287,7 +287,7 @@ export default types
   .model("CompletionStore", {
     completions: types.array(Completion),
     selected: types.maybeNull(types.reference(Completion)),
-    predictions: types.maybeNull(types.array(Completion)),
+    predictions: types.array(Completion),
     predictSelect: types.optional(types.boolean, false),
   })
   .views(self => ({
@@ -389,7 +389,7 @@ export default types
         createdPrediction.traverseTree(node => node.updateValue && node.updateValue(self.store));
       }
 
-      self.predictions.push(createdPrediction);
+      self.predictions.unshift(createdPrediction);
 
       return createdPrediction;
     }
