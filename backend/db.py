@@ -162,7 +162,7 @@ def get_completed_at(task_ids):
     return times
 
 
-def get_completion(task_id):
+def get_completions(task_id):
     """ Get completed time for list of task ids
 
     :param task_id: task ids
@@ -175,7 +175,6 @@ def get_completion(task_id):
     filename = os.path.join(c['output_dir'], str(task_id) + '.json')
     if os.path.exists(filename):
         data = json.load(open(filename))
-        data['completions'][0]['id'] = task_id
 
     else:
         data = None
@@ -191,13 +190,30 @@ def save_completion(task_id, completion):
     global c
 
     task_id = int(task_id)
-    task = get_tasks()[task_id]
-    completion['id'] = task_id
-    task['completions'] = [completion]
+    task = get_completions(task_id)
+
+    # init completions if it's empty
+    if 'completions' not in task:
+        task['completions'] = []
+
+    # update old completion
+    updated = False
+    if 'id' in completion:
+        for i, item in enumerate(task['completions']):
+            if item['id'] == completion['id']:
+                task['completions'][i] = completion
+                updated = True
+
+    # write new completion
+    if not updated:
+        completion['id'] = task_id * 1000 + len(task['completions']) + 1
+        task['completions'].append(completion)
+
+    # write task + completions to file
     filename = os.path.join(c['output_dir'], str(task_id) + '.json')
     os.mkdir(c['output_dir']) if not os.path.exists(c['output_dir']) else ()
     json.dump(task, open(filename, 'w'), indent=4, sort_keys=True)
-    return task_id * 10000 + random.randint(0, 1000)  # in simple case completion id == task id
+    return completion['id']
 
 
 def delete_completion(task_id):
