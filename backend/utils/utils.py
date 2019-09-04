@@ -6,6 +6,7 @@ import io
 from flask import request, jsonify, make_response
 import json  # it MUST be included after flask!
 import db
+import inspect
 
 from pythonjsonlogger import jsonlogger
 from lxml import etree
@@ -171,3 +172,8 @@ class LabelConfigParser(object):
             tag for tag in tag_iter
             if tag.attrib.get('name') and tag.attrib.get('value', '').startswith('$')
         ]
+
+
+def get_current_function_name():
+    frame = inspect.currentframe()
+    return inspect.getframeinfo(frame).function

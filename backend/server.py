@@ -7,13 +7,17 @@ import json  # it MUST be included after flask!
 import db
 
 from flask import request, jsonify, make_response, Response
-from misc.utils import exception_treatment, log_config, log, config_line_stripped, load_config
+from utils.utils import (
+    exception_treatment, log_config, log, config_line_stripped, load_config, get_current_function_name
+)
+from utils.analytics import AnalyticsAPI
 
 
 # init
 c = load_config()
 app = flask.Flask(__name__, static_url_path='')
 app.secret_key = 'A0Zrdqwf1AQWj12ajkhgFN]dddd/,?RfDWQQT'
+analytics = AnalyticsAPI()
 
 
 @app.template_filter('json')
@@ -83,6 +87,7 @@ def index():
         if task_data is None:
             task_data = db.get_task(task_id)
 
+    analytics.send(call=get_current_function_name())
     return flask.render_template('index.html', config=c, label_config_line=label_config_line,
                                  editor_css=editor_css, editor_js=editor_js,
                                  task_id=task_id, task_data=task_data)
@@ -101,6 +106,7 @@ def tasks_page():
     # sort by completed time
     task_ids = sorted([(i, completed_at[i] if i in completed_at else '9') for i in task_ids], key=lambda x: x[1])
     task_ids = [i[0] for i in task_ids]  # take only id back
+    analytics.send(call=get_current_function_name())
     return flask.render_template('tasks.html', config=c, label_config=label_config,
                                  task_ids=task_ids, completions=db.get_completions_ids(),
                                  completed_at=completed_at)
@@ -116,9 +122,11 @@ def api_generate_next_task():
     for (task_id, task) in db.get_tasks().items():
         if task_id not in completions:
             log.info(msg='New task for labeling', extra=task)
+            analytics.send(call=get_current_function_name())
             return make_response(jsonify(task), 200)
 
     # no tasks found
+    analytics.send(call=get_current_function_name(), error=404)
     return make_response('', 404)
 
 
@@ -128,6 +136,7 @@ def api_all_task_ids():
     """ Get all tasks ids
     """
     ids = sorted(db.get_task_ids())
+    analytics.send(call=get_current_function_name())
     return make_response(jsonify(ids), 200)
 
 
@@ -139,6 +148,7 @@ def api_tasks(task_id):
     # try to get task with completions first
     task_data = db.get_completions(task_id)
     task_data = db.get_task(task_id) if task_data is None else task_data
+    analytics.send(call=get_current_function_name())
     return make_response(jsonify(task_data), 200)
 
 
@@ -148,6 +158,7 @@ def api_all_completion_ids():
     """ Get all completion ids
     """
     ids = db.get_completions_ids()
+    analytics.send(call=get_current_function_name())
     return make_response(jsonify(ids), 200)
 
 
@@ -163,9 +174,11 @@ def api_completions(task_id):
         completion.pop('state', None)  # remove editor state
         completion_id = db.save_completion(task_id, completion)
         log.info(msg='Completion saved', extra={'task_id': task_id, 'output': request.json})
+        analytics.send(call=get_current_function_name())
         return make_response(json.dumps({'id': completion_id}), 201)
 
     else:
+        analytics.send(call=get_current_function_name(), error=500)
         return make_response('Incorrect request method', 500)
 
 
@@ -180,10 +193,13 @@ def api_completion_by_id(task_id, completion_id):
     if request.method == 'DELETE':
         if c.get('allow_delete_completions', False):
             db.delete_completion(task_id)
+            analytics.send(call=get_current_function_name())
             return make_response('deleted', 204)
         else:
+            analytics.send(call=get_current_function_name(), error=422)
             return make_response('Completion removing is not allowed in server config', 422)
     else:
+        analytics.send(call=get_current_function_name(), error=500)
         return make_response('Incorrect request method', 500)
 
 
@@ -200,12 +216,14 @@ def api_completion_update(task_id, completion_id):
     completion['id'] = int(completion_id)
     db.save_completion(task_id, completion)
     log.info(msg='Completion saved', extra={'task_id': task_id, 'output': request.json})
+    analytics.send(call=get_current_function_name())
     return make_response('ok', 201)
 
 
 @app.route('/api/projects/1/expert_instruction')
 @exception_treatment
 def api_instruction():
+    analytics.send(call=get_current_function_name())
     return make_response(c['instruction'], 200)
 
 
