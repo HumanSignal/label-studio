@@ -13,6 +13,7 @@ version = '12345'
 
 ANALYTICS_URL = 'http://ml.heartex.net/19191/'
 
+
 class BaseHTTPAPI(object):
     MAX_RETRIES = 2
     HEADERS = {
@@ -65,8 +66,15 @@ class AnalyticsAPI(BaseHTTPAPI):
     def __init__(self, url=ANALYTICS_URL, **kwargs):
         super(AnalyticsAPI, self).__init__(url, **kwargs)
         self._general_info = {}
+        self._dont_send = False
 
     def send(self, **kwargs):
+        if self._dont_send:
+            logger.debug('Analytics turned off - we don\'t send anything')
+            return
         data = deepcopy(self._general_info)
         data.update(kwargs)
         self.post(json=data)
+
+    def dont_send(self):
+        self._dont_send = True

@@ -228,4 +228,6 @@ def api_instruction():
 
 
 if __name__ == "__main__":
+    if c.get('dont_follow_me'):
+        analytics.dont_send()
     app.run(host='0.0.0.0', port=c['port'], debug=c['debug'])
