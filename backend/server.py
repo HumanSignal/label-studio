@@ -87,7 +87,7 @@ def index():
         if task_data is None:
             task_data = db.get_task(task_id)
 
-    analytics.send(call=get_current_function_name())
+    analytics.send(call=get_current_function_name(), config=label_config_line)
     return flask.render_template('index.html', config=c, label_config_line=label_config_line,
                                  editor_css=editor_css, editor_js=editor_js,
                                  task_id=task_id, task_data=task_data)
