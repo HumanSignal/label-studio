@@ -7,7 +7,7 @@ import json  # it MUST be included after flask!
 import db
 
 from flask import request, jsonify, make_response, Response
-from utils import exception_treatment, log_config, log, config_line_stripped, load_config
+from misc.utils import exception_treatment, log_config, log, config_line_stripped, load_config
 
 
 # init
