@@ -9,7 +9,7 @@ import utils.db as db
 from inspect import currentframe, getframeinfo
 from flask import request, jsonify, make_response, Response
 from utils.misc import (
-    exception_treatment, log_config, log, config_line_stripped, load_config, get_current_function_name
+    exception_treatment, log_config, log, config_line_stripped, load_config
 )
 from utils.analytics import Analytics
 
