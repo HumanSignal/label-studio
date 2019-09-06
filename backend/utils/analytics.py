@@ -1,80 +1,65 @@
 import logging
-import json
-import requests
 import os
+import io
 
-from requests.adapters import HTTPAdapter
+from mixpanel import Mixpanel, MixpanelException
 from copy import deepcopy
-# from .version import get_git_version
+from operator import itemgetter
+from uuid import uuid4
+from .misc import get_config_dir, get_app_version
+from converter.utils import parse_config
 
 logger = logging.getLogger(__name__)
 
-version = '12345'
-
-ANALYTICS_URL = 'http://ml.heartex.net/19191/'
+mp = Mixpanel('6f34142fe30f5ad6a63f43e585dda585')
 
 
-class BaseHTTPAPI(object):
-    MAX_RETRIES = 2
-    HEADERS = {
-        'User-Agent': 'heartex/' + version,
-    }
-    CONNECTION_TIMEOUT = 1.0  # seconds
-    TIMEOUT = 100.0  # seconds
+class Analytics(object):
 
-    def __init__(self, url, timeout=None, connection_timeout=None, max_retries=None, headers=None, **kwargs):
-        self._url = url
-        self._timeout = timeout or self.TIMEOUT
-        self._connection_timeout = connection_timeout or self.CONNECTION_TIMEOUT
-        self._headers = headers or {}
-        self._max_retries = max_retries or self.MAX_RETRIES
-        self._sessions = {self._session_key(): self.create_session()}
+    def __init__(self, label_config_line, dont_track_me=False):
+        self._label_config_line = label_config_line
+        self._dont_track_me = dont_track_me
+        self._user_id = self._get_user_id()
+        self._version = get_app_version()
+        self._label_types = self._get_label_types()
 
-    def create_session(self):
-        session = requests.Session()
-        session.headers.update(self.HEADERS)
-        session.headers.update(self._headers)
-        session.mount('http://', HTTPAdapter(max_retries=self._max_retries))
-        session.mount('https://', HTTPAdapter(max_retries=self._max_retries))
-        return session
-
-    def _session_key(self):
-        return os.getpid()
-
-    @property
-    def http_session(self):
-        key = self._session_key()
-        if key in self._sessions:
-            return self._sessions[key]
+    @classmethod
+    def _get_user_id(cls):
+        user_id_file = os.path.join(get_config_dir(), 'user_id')
+        if not os.path.exists(user_id_file):
+            user_id = str(uuid4())
+            with io.open(user_id_file, mode='w') as fout:
+                fout.write(user_id)
+            try:
+                mp.people_set(user_id, {'$user_id': user_id})
+            except MixpanelException as exc:
+                logger.error(f'Can\'t send user profile analytics. Reason: {exc}', exc_info=True)
+            logger.debug(f'Your user ID {user_id} is saved to {user_id_file}')
         else:
-            session = self.create_session()
-            self._sessions[key] = session
-            return session
+            with io.open(user_id_file) as f:
+                user_id = f.read()
+            logger.debug(f'Your user ID {user_id} is loaded from {user_id_file}')
+        return user_id
 
-    def post(self, *args, **kwargs):
-        try:
-            kwargs['timeout'] = self._connection_timeout, self._timeout
-            logger.debug(f'Send request with {args} and {kwargs}')
-            response = self.http_session.request('POST', url=self._url, *args, **kwargs)
-            response.raise_for_status()
-        except requests.exceptions.RequestException as e:
-            logger.error(f'Can\'t send request from {self.__class__.__name__}', exc_info=True)
+    def _get_label_types(self):
+        info = parse_config(self._label_config_line)
+        label_types = []
+        for tag_info in info.values():
+            label_types.append({tag_info['type']: list(map(itemgetter('type'), tag_info['inputs']))})
+        return label_types
 
+    def update_info(self, label_config_line, stop_track_me=False):
+        if label_config_line != self._label_config_line:
+            self._label_types = self._get_label_types()
+        self._dont_track_me = stop_track_me
 
-class AnalyticsAPI(BaseHTTPAPI):
-
-    def __init__(self, url=ANALYTICS_URL, **kwargs):
-        super(AnalyticsAPI, self).__init__(url, **kwargs)
-        self._general_info = {}
-        self._dont_send = False
-
-    def send(self, **kwargs):
-        if self._dont_send:
-            logger.debug('Analytics turned off - we don\'t send anything')
+    def send(self, event_name, **kwargs):
+        if self._dont_track_me:
             return
-        data = deepcopy(self._general_info)
-        data.update(kwargs)
-        self.post(json=data)
-
-    def dont_send(self):
-        self._dont_send = True
+        data = deepcopy(kwargs)
+        data['version'] = self._version
+        data['label_types'] = self._label_types
+        try:
+            mp.track(self._user_id, f'LS:{event_name}', data)
+        except MixpanelException as exc:
+            logger.error(f'Can\'t track {event_name}. Reason: {exc}', exc_info=True)

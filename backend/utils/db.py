@@ -3,10 +3,8 @@ from __future__ import print_function
 import io
 import os
 import json
-import random
 
 from datetime import datetime
-from utils import LabelConfigParser
 
 
 tasks = None
@@ -15,6 +13,7 @@ c = None  # config
 
 
 def init(config):
+    from .misc import LabelConfigParser
     """ Init database
 
     :param config: config dict

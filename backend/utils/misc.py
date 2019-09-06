@@ -5,12 +5,13 @@ import traceback as tb
 import io
 from flask import request, jsonify, make_response
 import json  # it MUST be included after flask!
-import db
 import inspect
 
+from appdirs import user_config_dir
 from pythonjsonlogger import jsonlogger
 from lxml import etree
 from xml.etree import ElementTree
+from .db import re_init
 
 
 # this must be before logger setup
@@ -29,13 +30,13 @@ class CustomJsonFormatter(jsonlogger.JsonFormatter):
 
 # read logger config
 log_config = json.load(open('logger.json'))
-logfile = log_config['handlers']['file']['filename']
-# create log file
-os.mkdir(os.path.dirname(logfile)) if not os.path.exists(os.path.dirname(logfile)) else ()
-open(logfile, 'w') if not os.path.exists(logfile) else ()
+file_handler = logging.FileHandler('static/logs/service.log')
+file_handler.setLevel(logging.DEBUG)
+file_handler.setFormatter(CustomJsonFormatter())
 # set logger config
 logging.config.dictConfig(log_config)
 log = logging.getLogger('service')
+log.addHandler(file_handler)
 
 
 # make an answer to client
@@ -145,7 +146,7 @@ def load_config():
             # re-init db
             if prev_config != c:
                 print('Config changes detected, reloading DB')
-                db.re_init(c)
+                re_init(c)
 
             yield c
 
@@ -174,6 +175,15 @@ class LabelConfigParser(object):
         ]
 
 
-def get_current_function_name():
-    frame = inspect.currentframe()
-    return inspect.getframeinfo(frame).function
+def get_config_dir():
+    config_dir = user_config_dir(appname='label-studio')
+    if not os.path.exists(config_dir):
+        os.makedirs(config_dir)
+    return config_dir
+
+
+def get_app_version():
+    package_file = os.path.join(os.path.dirname(__file__), '..', '..', 'package.json')
+    with io.open(package_file) as f:
+        info = json.load(f)
+        return info.get('version')
