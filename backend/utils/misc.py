@@ -30,7 +30,11 @@ class CustomJsonFormatter(jsonlogger.JsonFormatter):
 
 # read logger config
 log_config = json.load(open('logger.json'))
-file_handler = logging.FileHandler('static/logs/service.log')
+logfile = 'static/logs/service.log'
+# create log file
+os.mkdir(os.path.dirname(logfile)) if not os.path.exists(os.path.dirname(logfile)) else ()
+open(logfile, 'w') if not os.path.exists(logfile) else ()
+file_handler = logging.FileHandler(logfile)
 file_handler.setLevel(logging.DEBUG)
 file_handler.setFormatter(CustomJsonFormatter())
 # set logger config
