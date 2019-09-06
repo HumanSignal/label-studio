@@ -19,19 +19,23 @@ class Analytics(object):
     def __init__(self, label_config_line, dont_track_me=False):
         self._label_config_line = label_config_line
         self._dont_track_me = dont_track_me
-        self._user_id = self._get_user_id()
+
         self._version = get_app_version()
+        self._user_id = self._get_user_id()
         self._label_types = self._get_label_types()
 
-    @classmethod
-    def _get_user_id(cls):
+    def _get_user_id(self):
         user_id_file = os.path.join(get_config_dir(), 'user_id')
         if not os.path.exists(user_id_file):
             user_id = str(uuid4())
             with io.open(user_id_file, mode='w') as fout:
                 fout.write(user_id)
             try:
-                mp.people_set(user_id, {'$user_id': user_id})
+                mp.people_set(user_id, {
+                    '$name': user_id,
+                    'app': 'label-studio',
+                    'version': self._version
+                })
             except MixpanelException as exc:
                 logger.error(f'Can\'t send user profile analytics. Reason: {exc}', exc_info=True)
             logger.debug(f'Your user ID {user_id} is saved to {user_id_file}')
