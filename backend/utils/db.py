@@ -165,16 +165,17 @@ def get_completions(task_id):
     """ Get completed time for list of task ids
 
     :param task_id: task ids
-    :return: json dicwt with completion
+    :return: json dict with completion
     """
     try:
         task_id = int(task_id)  # check task_id is int (disallow to escape from output_dir)
     except ValueError:
         return None
+
     filename = os.path.join(c['output_dir'], str(task_id) + '.json')
+
     if os.path.exists(filename):
         data = json.load(open(filename))
-
     else:
         data = None
     return data
@@ -190,6 +191,10 @@ def save_completion(task_id, completion):
 
     task_id = int(task_id)
     task = get_completions(task_id)
+
+    # load task if there is no task+completion
+    if task is None:
+        task = get_task(task_id)
 
     # init completions if it's empty
     if 'completions' not in task:
