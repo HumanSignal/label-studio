@@ -137,6 +137,7 @@ def load_config():
                             help='backend port')
         args = parser.parse_args()
 
+        print('Working dir', os.getcwd())
         config_path = args.config_path
         prev_config = None
 
@@ -147,9 +148,9 @@ def load_config():
             c['input_path'] = args.input_path if args.input_path else c['input_path']
             c['output_dir'] = args.output_dir if args.output_dir else c['output_dir']
 
-            c['label_config'] = os.path.join(config_path, c['label_config'])
-            c['input_path'] = os.path.join(config_path, c['input_path'])
-            c['output_dir'] = os.path.join(config_path, c['output_dir'])
+            c['label_config'] = os.path.join(os.path.dirname(config_path), c['label_config'])
+            c['input_path'] = os.path.join(os.path.dirname(config_path), c['input_path'])
+            c['output_dir'] = os.path.join(os.path.dirname(config_path), c['output_dir'])
 
             # re-init db
             if prev_config != c:
