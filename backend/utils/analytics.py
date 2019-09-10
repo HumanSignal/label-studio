@@ -16,9 +16,9 @@ mp = Mixpanel('6f34142fe30f5ad6a63f43e585dda585')
 
 class Analytics(object):
 
-    def __init__(self, label_config_line, dont_track_me=False):
+    def __init__(self, label_config_line, collect_analytics=True):
         self._label_config_line = label_config_line
-        self._dont_track_me = dont_track_me
+        self._collect_analytics = collect_analytics
 
         self._version = get_app_version()
         self._user_id = self._get_user_id()
@@ -52,13 +52,13 @@ class Analytics(object):
             label_types.append({tag_info['type']: list(map(itemgetter('type'), tag_info['inputs']))})
         return label_types
 
-    def update_info(self, label_config_line, stop_track_me=False):
+    def update_info(self, label_config_line, collect_analytics=True):
         if label_config_line != self._label_config_line:
             self._label_types = self._get_label_types()
-        self._dont_track_me = stop_track_me
+        self._collect_analytics = collect_analytics
 
     def send(self, event_name, **kwargs):
-        if self._dont_track_me:
+        if self._collect_analytics:
             return
         data = deepcopy(kwargs)
         data['version'] = self._version

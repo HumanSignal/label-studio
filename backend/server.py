@@ -33,9 +33,9 @@ def reload_config():
     c = load_config()
     label_config_line = config_line_stripped(open(c['label_config']).read())
     if analytics is None:
-        analytics = Analytics(label_config_line, c.get('dont_track_me'))
+        analytics = Analytics(label_config_line, c.get('collect_analytics', True))
     else:
-        analytics.update_info(label_config_line, c.get('dont_track_me'))
+        analytics.update_info(label_config_line, c.get('collect_analytics', True))
 
 
 @app.template_filter('json')
