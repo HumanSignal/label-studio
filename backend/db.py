@@ -193,8 +193,8 @@ def save_completion(task_id, completion):
     task = get_completions(task_id)
 
     # init completions if it's empty
-    if 'completions' not in task:
-        task['completions'] = []
+    if not task or 'completions' not in task:
+        task = {'completions': []}
 
     # update old completion
     updated = False
