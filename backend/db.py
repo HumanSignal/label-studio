@@ -189,12 +189,13 @@ def save_completion(task_id, completion):
     """
     global c
 
-    task_id = int(task_id)
+    # try to get completions with task first
     task = get_completions(task_id)
 
-    # init completions if it's empty
-    if not task or 'completions' not in task:
-        task = {'completions': []}
+    # init task if completions with task not exists
+    if not task:
+        task = get_task(task_id)
+        task['completions'] = []
 
     # update old completion
     updated = False
@@ -206,7 +207,7 @@ def save_completion(task_id, completion):
 
     # write new completion
     if not updated:
-        completion['id'] = task_id * 1000 + len(task['completions']) + 1
+        completion['id'] = task['id'] * 1000 + len(task['completions']) + 1
         task['completions'].append(completion)
 
     # write task + completions to file
