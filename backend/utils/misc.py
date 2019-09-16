@@ -5,11 +5,13 @@ import traceback as tb
 import io
 from flask import request, jsonify, make_response
 import json  # it MUST be included after flask!
-import db
+import inspect
 
+from appdirs import user_config_dir
 from pythonjsonlogger import jsonlogger
 from lxml import etree
 from xml.etree import ElementTree
+from .db import re_init
 
 
 # this must be before logger setup
@@ -28,13 +30,17 @@ class CustomJsonFormatter(jsonlogger.JsonFormatter):
 
 # read logger config
 log_config = json.load(open('logger.json'))
-logfile = log_config['handlers']['file']['filename']
+logfile = 'static/logs/service.log'
 # create log file
 os.mkdir(os.path.dirname(logfile)) if not os.path.exists(os.path.dirname(logfile)) else ()
 open(logfile, 'w') if not os.path.exists(logfile) else ()
+file_handler = logging.FileHandler(logfile)
+file_handler.setLevel(logging.DEBUG)
+file_handler.setFormatter(CustomJsonFormatter())
 # set logger config
 logging.config.dictConfig(log_config)
 log = logging.getLogger('service')
+log.addHandler(file_handler)
 
 
 # make an answer to client
@@ -131,6 +137,7 @@ def load_config():
                             help='backend port')
         args = parser.parse_args()
 
+        print('Working dir', os.getcwd())
         config_path = args.config_path
         prev_config = None
 
@@ -141,10 +148,14 @@ def load_config():
             c['input_path'] = args.input_path if args.input_path else c['input_path']
             c['output_dir'] = args.output_dir if args.output_dir else c['output_dir']
 
+            c['label_config'] = os.path.join(os.path.dirname(config_path), c['label_config'])
+            c['input_path'] = os.path.join(os.path.dirname(config_path), c['input_path'])
+            c['output_dir'] = os.path.join(os.path.dirname(config_path), c['output_dir'])
+
             # re-init db
             if prev_config != c:
                 print('Config changes detected, reloading DB')
-                db.re_init(c)
+                re_init(c)
 
             yield c
 
@@ -171,3 +182,17 @@ class LabelConfigParser(object):
             tag for tag in tag_iter
             if tag.attrib.get('name') and tag.attrib.get('value', '').startswith('$')
         ]
+
+
+def get_config_dir():
+    config_dir = user_config_dir(appname='label-studio')
+    if not os.path.exists(config_dir):
+        os.makedirs(config_dir)
+    return config_dir
+
+
+def get_app_version():
+    package_file = os.path.join(os.path.dirname(__file__), '..', '..', 'package.json')
+    with io.open(package_file) as f:
+        info = json.load(f)
+        return info.get('version')

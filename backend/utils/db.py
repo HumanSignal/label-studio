@@ -3,10 +3,8 @@ from __future__ import print_function
 import io
 import os
 import json
-import random
 
 from datetime import datetime
-from utils import LabelConfigParser
 
 
 tasks = None
@@ -15,6 +13,7 @@ c = None  # config
 
 
 def init(config):
+    from .misc import LabelConfigParser
     """ Init database
 
     :param config: config dict
@@ -166,16 +165,17 @@ def get_completions(task_id):
     """ Get completed time for list of task ids
 
     :param task_id: task ids
-    :return: json dicwt with completion
+    :return: json dict with completion
     """
     try:
         task_id = int(task_id)  # check task_id is int (disallow to escape from output_dir)
     except ValueError:
         return None
+
     filename = os.path.join(c['output_dir'], str(task_id) + '.json')
+
     if os.path.exists(filename):
         data = json.load(open(filename))
-
     else:
         data = None
     return data

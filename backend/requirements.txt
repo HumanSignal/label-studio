@@ -3,3 +3,7 @@ flask==1.1.1
 python-json-logger==0.1.11
 lxml==4.2.5
 spacy==2.1.7
+appdirs==1.4.3
+mixpanel==4.4.0
+pandas==0.25.0
+Pillow==6.1.0
