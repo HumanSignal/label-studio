@@ -11,7 +11,7 @@ from converter.utils import parse_config
 
 logger = logging.getLogger(__name__)
 
-mp = Mixpanel('6f34142fe30f5ad6a63f43e585dda585')
+mp = Mixpanel('269cd4e25e97cc15bdca5b401e429892')
 
 
 class Analytics(object):
