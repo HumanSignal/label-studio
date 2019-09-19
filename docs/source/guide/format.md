@@ -10,7 +10,7 @@ Input should be JSON formatted. All the files that you want to label are expecte
 
 ## Output
 
-Output is JSON. Overall strucutre is the following:
+The output is JSON. The overall structure is the following:
 
 ```json
 {
@@ -20,7 +20,7 @@ Output is JSON. Overall strucutre is the following:
       "from_name": "sentiment",
       "to_name": "my_text",
       "type": "choices",
-	  "value": {
+      "value": {
         "choices": ["Neutral"]
       }
     }
@@ -29,7 +29,7 @@ Output is JSON. Overall strucutre is the following:
 }
 ```
 
-Completion is an object with five mandatory fields:
+A completion is an object with five mandatory fields:
 
 - **id** unique id of the labeled region
 - **from_name** name of the tag that was used to label region
@@ -37,5 +37,4 @@ Completion is an object with five mandatory fields:
 - **type** type of the labeling/tag
 - **value** tag specific value that includes the labeling result details
 
-For popular machine learning libraries there is converter code to transform Label Studio format in ML library format. [Learn More](/backend/converter/README.md)  about it.
-
+For popular machine learning libraries, there is converter code to transform Label Studio format in ML library format. [Learn More](/backend/converter/README.md)  about it.

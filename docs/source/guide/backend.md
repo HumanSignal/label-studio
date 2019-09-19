@@ -10,7 +10,7 @@ This is an example of the backend that can be used with the React frontend part.
 
 ## Linux & Ubuntu guide
 
-1. Install python and virtualenv. We recommend to use python 3.6, but probably python 2 solution will work too.  
+1. Install python and virtualenv. We recommend to use python 3.6, but probably python2 solution will work too.  
 
 ```bash
 apt install python3.6
@@ -41,7 +41,7 @@ python server.py
 
 ## Backend Config
 
-By default service.py uses config.json. But you may call it with your own config: 
+By default service.py uses config.json. But you may call it with your config: 
 
 ```bash
 python service.py -c <your_config.json>
@@ -55,13 +55,13 @@ python service.py -c <your_config.json>
 "label_config": "../examples/chatbot/config.xml"
 ```
  
-**input_path** for tasks: it can be a file or a directory. In case of directory it reads all the files and creates a list of tasks that are merged together.
+**input_path** for tasks: it can be a file or a directory. In the case of the directory, it reads all the files and creates a list of tasks.
 
 ```json
 "input_path": "./input/tasks.json"
 ```
 
-**output_dir** is used to store completions (labeling results) in json format. output_dir will be created automatically. Each task is mapped to corresponding completion json file.
+**output_dir** is used to store completions (labeling results) in JSON format. output_dir will be created automatically. Each task is mapped to a corresponding completion JSON file.
 
 ```json
 "output_dir": "./output"
@@ -89,7 +89,7 @@ output/5.json = {"completions": [{"result": [...]}], "task": {"text": "5"}}  # b
 
 ## Label tool options
 
-**build_path** points to the directory with js, css and other media from Editor (React app).
+**build_path** points to the directory with JS, CSS and other media from Editor (React app).
 
 ```json
   "editor": {

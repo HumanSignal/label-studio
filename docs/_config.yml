@@ -13,8 +13,8 @@ timezone:
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: https://heartexlabs.github.io/label-studio/
-root: /guide
+url: https://heartexlabs.github.io/label-studio.github.io/
+root: /label-studio.github.io/
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 
@@ -79,5 +79,5 @@ theme: htx
 ## Docs: http://hexo.io/docs/deployment.html
 deploy:
   type: git
-  repo: git@github.com:heartexlabs/heartexlabs.github.io.git
+  repo: git@github.com:heartexlabs/label-studio.github.io.git
   branch: master

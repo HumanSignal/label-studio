@@ -28,9 +28,9 @@ the **name** parameter in the object element. For example:
 </View>
 ```
 
-Note that in the case above Labels tags is used to label Text
+Note that in the case above, Label tags are used to label Text
 tag. There could be multiple control, and object tags in the same
-configuration and names are used to connect them.
+configuration, and names are used to connect them.
 
 Here is an example of two-column labeling interface with multiple
 control and object elements:
