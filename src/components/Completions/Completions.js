@@ -15,7 +15,7 @@ const Completion = observer(({ item, store }) => {
         item.removeHoneypot();
       }}
     >
-      Honeypot
+      Ground Truth
     </Button>
   );
 
@@ -28,7 +28,7 @@ const Completion = observer(({ item, store }) => {
         item.setHoneypot();
       }}
     >
-      Honeypot
+      Ground Truth
     </Button>
   );
 
@@ -131,7 +131,7 @@ class Completions extends Component {
       </div>
     );
 
-    store.completionStore.savedCompletions.map(c => {
+    store.completionStore.savedCompletions.forEach(c => {
       if (c) {
         content.push(<Completion key={c.pk} item={c} store={store} />);
       }
