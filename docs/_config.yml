@@ -4,17 +4,17 @@
 
 # Site
 title: Label Studio
-subtitle:
-description:
-keywords: 
+subtitle: 
+description: Label Studio is a multi-type data labeling and annotation tool with standardized output format
+keywords: computer-vision, deep-learning, image-annotation, annotation-tool, annotation, labeling, labeling-tool, image-labeling, image-labelling-tool, boundingbox, image-classification, annotations, imagenet, semantic-segmentation, dataset, datasets, label-studio, label-region, data-labeling, text-annotation
 author: Heartex
 language: en
 timezone:
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: https://github.com/heartexlabs/label-studio
-root: /
+url: https://heartexlabs.github.io/label-studio/
+root: /guide
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 
@@ -76,6 +76,8 @@ pagination_dir: page
 theme: htx
 
 # Deployment
-## Docs: https://hexo.io/docs/deployment.html
+## Docs: http://hexo.io/docs/deployment.html
 deploy:
-  type:
+  type: git
+  repo: git@github.com:heartexlabs/heartexlabs.github.io.git
+  branch: master
