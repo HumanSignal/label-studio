@@ -1,0 +1,23 @@
+<ul class="menu-root">
+  <% ['api', 'style-guide'].indexOf(type) === -1 && site.pages.find({type: type}).sort('order').each(function (p) { %>
+    <% var fileName = p.path.replace(/^.+?\/([\w-]+)\.html/, '$1') %>
+    <% if (type === 'guide') { %>
+      
+      <% if (fileName === 'audio') { %>
+          <li><h4>Objects</h4></li>
+      <% } %>
+
+      <% if (fileName === 'choices') { %>
+          <li><h4>Controls</h4></li>
+      <% } %>
+
+      <% if (fileName === 'header') { %>
+          <li><h4>Visual</h4></li>
+      <% } %>
+
+    <% } %>
+    <li>
+      <a href="<%- url_for(p.path) %>" class="sidebar-link<%- page.title === p.title ? ' current' : '' %><%- p.is_new ? ' new' : '' %>"><%- p.title %></a>
+    </li>
+  <% }) %>  
+</ul>

@@ -1,0 +1,12 @@
+{
+  "background_color": "#ffffff",
+  "description": "Data labeling and annotation tool",
+  "display": "standalone",
+  "icons": [
+  ],
+  "lang": "en-US",
+  "name": "Label Studio",
+  "short_name": "label studio",
+  "start_url": "./menu",
+  "theme_color": "#4fc08d"
+}

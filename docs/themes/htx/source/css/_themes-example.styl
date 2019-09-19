@@ -1,0 +1,65 @@
+$media-width = 1300px
+$item-margin-bottom = 10px
+$item-box-shadow = 0 2rem 1.5rem -1.5rem rgba(33,37,41,.15), 0 0 1.5rem 0.5rem rgba(33,37,41,.05)
+$item-box-shadow-hover = 0 2.25rem 1.5rem -1.5rem rgba(33,37,41,.2),0 0 1.5rem .5rem rgba(33,37,41,.05);
+
+.themes-grid
+  display: flex
+  flex-wrap: wrap
+  justify-content space-between
+  .item-preview
+    width: 290px
+    margin-bottom 25px
+  .item-preview-img
+    transition: .15s box-shadow,.15s transform
+    border-radius: .5rem
+    box-shadow $item-box-shadow
+    overflow: hidden
+    display block
+    &:hover
+      transform: translateY(-0.25rem)
+      box-shadow: $item-box-shadow-hover
+  img
+    max-width: 100%
+    height: auto
+    border-radius: .5rem
+    vertical-align: middle
+    border-style: none
+  .item-preview-title-container
+    display flex
+    justify-content space-between
+    align-items center
+  h3.item-preview-title
+    margin-top: .7rem
+    margin-bottom: 0
+    &.free::after
+      content: "FREE";
+      display: inline-block
+      font-size: 10px
+      font-weight: 600
+      color: #fff
+      background-color: $green
+      line-height: 14px
+      padding: 0 4px
+      border-radius: 3px
+      margin-left: 5px
+      vertical-align: middle
+      position: relative
+      top: -1px
+  .item-preview-price
+    margin-top: .7rem
+  .item-preview-description
+    font-size: .9rem
+  .see-more-container
+    display: flex
+    justify-content center
+    width: 100%
+    .see-more-link
+      color: $green
+
+@media screen and (max-width: $media-width)
+  .themes-grid
+    justify-content center
+    .item-preview
+      justify-content center
+      width: 380px
