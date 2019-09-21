@@ -139,5 +139,5 @@ supporting multiple format converters, already adopted by popular machine learni
 
 This software is licensed under the [Apache 2.0 LICENSE](/LICENSE) © [Heartex](https://www.heartex.net/).
 
-<img src="./images/opossum_looking.svg" align="right" title="Hey everyone!" height="140">
+<img src="./images/opossum_looking.svg" title="Hey everyone!" height="140">
 
