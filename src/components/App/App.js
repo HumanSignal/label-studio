@@ -52,6 +52,7 @@ import { PolygonModel } from "../../interfaces/control/Polygon";
 import { RectangleLabelsModel } from "../../interfaces/control/RectangleLabels";
 import { PolygonLabelsModel } from "../../interfaces/control/PolygonLabels";
 import { ChoicesModel } from "../../interfaces/control/Choices";
+import { ChoiceCloudModel } from "../../interfaces/control/ChoiceCloud";
 import { TextAreaModel } from "../../interfaces/control/TextArea";
 import { RatingModel } from "../../interfaces/control/Rating";
 import { ListModel } from "../../interfaces/control/List";

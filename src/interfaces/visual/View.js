@@ -41,6 +41,7 @@ const Model = types.model({
     "labels",
     "textarea",
     "choices",
+    "choicecloud",
     "rating",
     "ranker",
     "rectangle",
