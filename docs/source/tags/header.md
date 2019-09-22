@@ -1,6 +1,6 @@
 ---
 title: Header
-type: guide
+type: tags
 order: 501
 ---
 

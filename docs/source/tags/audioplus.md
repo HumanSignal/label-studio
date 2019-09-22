@@ -1,6 +1,6 @@
 ---
 title: AudioPlus
-type: guide
+type: tags
 order: 302
 ---
 

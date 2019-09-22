@@ -1,6 +1,6 @@
 ---
 title: Polygon
-type: guide
+type: tags
 order: 405
 ---
 

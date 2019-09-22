@@ -40,17 +40,17 @@
   </head>
   <body class="<%- isIndex ? '' : 'docs' -%>">
     <div id="mobile-bar" <%- isIndex ? 'class="top"' : '' %>>
-      <a class="menu-button"></a>
-      <a class="logo" href="/"></a>
+        <a class="menu-button"></a>
+        <a class="logo" href="/"></a>
     </div>
-    <%- partial('partials/header') %>
+    <% if (!isIndex) { %> <%- partial('partials/header') %> <% } %>
     <% if (!isIndex) { %>
-      <div id="main" class="fix-sidebar">
-          <%- body %>
-      </div>
-      <script src="<%- url_for("/js/smooth-scroll.min.js") %>"></script>
+        <div id="main" class="fix-sidebar">
+            <%- body %>
+        </div>
+        <script src="<%- url_for("/js/smooth-scroll.min.js") %>"></script>
     <% } else { %>
-      <%- body %>
+        <%- partial('partials/index') %>
     <% } %>
 
     <!-- main custom script for sidebars, version selects etc. -->

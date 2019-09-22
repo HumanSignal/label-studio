@@ -1,6 +1,6 @@
 ---
 title: Rating
-type: guide
+type: tags
 order: 409
 ---
 

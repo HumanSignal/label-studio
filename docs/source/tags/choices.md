@@ -1,6 +1,6 @@
 ---
 title: Choices
-type: guide
+type: tags
 order: 401
 ---
 

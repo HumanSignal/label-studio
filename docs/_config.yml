@@ -11,10 +11,12 @@ author: Heartex
 language: en
 timezone:
 
+google_analytics: UA-129877673-4
+
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: https://heartexlabs.github.io/label-studio.github.io/
-root: /label-studio.github.io/
+url: https://labelstud.io/
+root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 
@@ -43,7 +45,18 @@ highlight:
   line_number: false
   tab_replace:
   hljs: true
-  
+
+# Markdown
+## https://github.com/chjj/marked
+markdown:
+  gfm: true
+  pedantic: false
+  sanitize: false
+  tables: true
+  breaks: true
+  smartLists: true
+  smartypants: true
+
 # Home page setting
 # path: Root path for your blogs index page. (default = '')
 # per_page: Posts displayed per page. (0 = disable pagination)
@@ -79,5 +92,5 @@ theme: htx
 ## Docs: http://hexo.io/docs/deployment.html
 deploy:
   type: git
-  repo: git@github.com:heartexlabs/label-studio.github.io.git
+  repo: git@github.com:heartexlabs/heartexlabs.github.io.git
   branch: master

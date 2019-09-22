@@ -1,6 +1,6 @@
 ---
 title: Table
-type: guide
+type: tags
 order: 503
 ---
 

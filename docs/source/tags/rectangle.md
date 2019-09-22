@@ -1,6 +1,6 @@
 ---
 title: Rectangle
-type: guide
+type: tags
 order: 407
 ---
 
