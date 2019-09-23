@@ -14,6 +14,7 @@ import ProcessAttrsMixin from "../mixins/ProcessAttrs";
 import Utils from "../../utils";
 
 import { AudioRegionModel } from "./AudioRegion";
+import AudioControls from "./Audio/Controls";
 import styles from "./AudioPlus/AudioPlus.module.scss";
 
 /**
@@ -30,8 +31,9 @@ import styles from "./AudioPlus/AudioPlus.module.scss";
  * @param {boolean} hasZoom speficy if audio has zoom functionality
  * @param {string} regionBG region color
  * @param {string} selectedRegionBG selected region background
- * @param {number} volume from 0 to 1
- * @param {number} speed from 0.5 to 3
+ * @param {boolean} volume from 0 to 1
+ * @param {boolean} speed from 0.5 to 3
+ * @param {boolean} zoom
  */
 const TagAttrs = types.model({
   name: types.maybeNull(types.string),
@@ -39,6 +41,7 @@ const TagAttrs = types.model({
   zoom: types.optional(types.boolean, true),
   volume: types.optional(types.boolean, true),
   speed: types.optional(types.boolean, true),
+  regs: types.optional(types.boolean, true),
 });
 
 const Model = types
@@ -151,16 +154,6 @@ const Model = types
         return find_r;
       }
 
-      /**
-       * TODO
-       * New function for sum some RGBA colors
-       */
-      // let sumRGBA = [];
-
-      // states[0].getSelectedNames().map(region => {
-      //   sumRGBA.push(states[0].findLabel(region).background)
-      // })
-
       const bgColor =
         states && states[0] ? Utils.Colors.convertToRGBA(states[0].getSelectedColor(), 0.3) : self.selectedregionbg;
 
@@ -229,30 +222,11 @@ const HtxAudioView = observer(({ store, item }) => {
         speed={item.speed}
         zoom={item.zoom}
         volume={item.volume}
-        regions={true}
+        regions={item.regs}
         height={item.height}
       />
 
-      <div style={{ display: "flex", justifyContent: "space-between", marginTop: "1em" }}>
-        <Button
-          type="primary"
-          className={styles.play}
-          onClick={ev => {
-            item._ws.playPause();
-          }}
-        >
-          {item.playing && (
-            <Fragment>
-              <Icon type="pause-circle" /> Pause
-            </Fragment>
-          )}
-          {!item.playing && (
-            <Fragment>
-              <Icon type="play-circle" /> Play
-            </Fragment>
-          )}
-        </Button>
-      </div>
+      <AudioControls item={item} />
     </div>
   );
 });
