@@ -9,6 +9,8 @@ import Tree from "../../core/Tree";
 import Types from "../../core/Types";
 
 import { ChoiceModel } from "./Choice";
+import { HtxLabels, LabelsModel } from "./Labels";
+import { RectangleModel } from "./Rectangle";
 import SelectedModelMixin from "../mixins/SelectedModel";
 
 import { Form } from "semantic-ui-react";
@@ -33,7 +35,7 @@ import { Form } from "semantic-ui-react";
 const TagAttrs = types.model({
   name: types.string,
   toname: types.maybeNull(types.string),
-  showinline: types.optional(types.string, "false"),
+  showinline: types.optional(types.boolean, false),
   choice: types.optional(types.enumeration(["single", "single-radio", "multiple"]), "single"),
 });
 
@@ -42,7 +44,7 @@ const Model = types
     id: types.optional(types.identifier, guidGenerator),
     pid: types.optional(types.string, guidGenerator),
     type: "choices",
-    children: Types.unionArray(["choice"]),
+    children: Types.unionArray(["choice", "choices", "labels", "label"]),
   })
   .views(self => ({
     get shouldBeUnselected() {
@@ -91,18 +93,24 @@ const Model = types
     },
   }));
 
-const ChoicesModel = types.compose(
-  "ChoicesModel",
+const Composition = types.compose(
+  LabelsModel,
+  RectangleModel,
   TagAttrs,
   Model,
   SelectedModelMixin,
+);
+
+const ChoicesModel = types.compose(
+  "ChoicesModel",
+  Composition,
 );
 
 const HtxChoices = observer(({ item }) => {
   return (
     <div style={{ marginTop: "1em" }}>
       <Form>
-        {item.showinline === "true" ? (
+        {item.showinline ? (
           <Form.Group inline style={{ flexWrap: "wrap" }}>
             {Tree.renderChildren(item)}
           </Form.Group>

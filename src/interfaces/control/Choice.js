@@ -10,22 +10,20 @@ import Tree from "../../core/Tree";
 
 import ProcessAttrsMixin from "../mixins/ProcessAttrs";
 import Hint from "../../components/Hint/Hint";
-import ChoiceComponent from "../../components/Choice/Choice";
 
 /**
  * Choice tag represents a single choice
  * @example
  * <View>
  *   <Choices name="gender" toName="txt-1" choice="single">
- *     <Choice alias="M" value="Male"></Choice>
- *     <Choice alias="F" value="Female"></Choice>
+ *     <Choice value="Male"></Choice>
+ *     <Choice value="Female"></Choice>
  *   </Choices>
  *   <Text name="txt-1" value="John went to see Marry"></Text>
  * </View>
  * @name Choice
  * @param {string} value label value
  * @param {boolean=} selected If this label should be preselected
- * @param {string=} alias label alias
  * @param {string=} hotkey hokey
  */
 const TagAttrs = types.model({
@@ -123,19 +121,6 @@ const HtxChoice = inject("store")(
         </div>
       );
     }
-    // return (
-    //   <ChoiceComponent
-    //     name={item._value}
-    //     onChange={ev => {
-    //       item.toggleSelected();
-    //     }}
-    //     hint={store.settings.enableTooltips && store.settings.enableHotkeys && item.hotkey && `${item.hotkey}`}
-    //     value={item._value}
-    //     checked={item.selected}
-    //   >
-    //     {item._value}
-    //   </ChoiceComponent>
-    // );
   }),
 );
 
