@@ -57,12 +57,10 @@ const Model = types
     },
 
     toStateJSON() {
-      const names = self.getSelectedNames();
-
-      if (names) {
-        self.unselectAll();
-      }
-
+      // const names = self.getSelectedNames();
+      // if (names) {
+      //   self.unselectAll();
+      // }
       // if (names && names.length) {
       //   return {
       //     id: self.pid,
