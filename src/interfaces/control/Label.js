@@ -36,7 +36,7 @@ const TagAttrs = types.model({
   selected: types.optional(types.boolean, false),
   alias: types.maybeNull(types.string),
   hotkey: types.maybeNull(types.string),
-  showalias: types.optional(types.string, "false"),
+  showalias: types.optional(types.boolean, false),
   aliasstyle: types.optional(types.string, "opacity: 0.6"),
   size: types.optional(types.string, "medium"),
   background: types.optional(types.string, "#36B37E"),
@@ -97,7 +97,7 @@ const HtxLabelView = inject("store")(
         size={item.size}
       >
         {item._value}
-        {item.showalias === "true" && item.alias && (
+        {item.showalias === true && item.alias && (
           <span style={Utils.styleToProp(item.aliasstyle)}>&nbsp;{item.alias}</span>
         )}
         {store.settings.enableTooltips && store.settings.enableHotkeys && item.hotkey && <Hint>[{item.hotkey}]</Hint>}
