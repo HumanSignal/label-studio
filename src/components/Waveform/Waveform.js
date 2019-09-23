@@ -308,7 +308,7 @@ export default class Waveform extends React.Component {
 
         <div id="timeline" />
 
-        <Row className={styles.menu}>
+        <Row className={this.props.volume || this.props.speed || this.props.zoom ? styles.menu : ""}>
           {this.props.speed && (
             <Col span={24}>
               <Col span={12}>
