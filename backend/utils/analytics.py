@@ -30,14 +30,15 @@ class Analytics(object):
             user_id = str(uuid4())
             with io.open(user_id_file, mode='w') as fout:
                 fout.write(user_id)
-            try:
-                mp.people_set(user_id, {
-                    '$name': user_id,
-                    'app': 'label-studio',
-                    'version': self._version
-                })
-            except MixpanelException as exc:
-                logger.error(f'Can\'t send user profile analytics. Reason: {exc}', exc_info=True)
+            if self._collect_analytics:
+                try:
+                    mp.people_set(user_id, {
+                        '$name': user_id,
+                        'app': 'label-studio',
+                        'version': self._version
+                    })
+                except MixpanelException as exc:
+                    logger.error(f'Can\'t send user profile analytics. Reason: {exc}', exc_info=True)
             logger.debug(f'Your user ID {user_id} is saved to {user_id_file}')
         else:
             with io.open(user_id_file) as f:
@@ -58,7 +59,7 @@ class Analytics(object):
         self._collect_analytics = collect_analytics
 
     def send(self, event_name, **kwargs):
-        if self._collect_analytics:
+        if not self._collect_analytics:
             return
         data = deepcopy(kwargs)
         data['version'] = self._version

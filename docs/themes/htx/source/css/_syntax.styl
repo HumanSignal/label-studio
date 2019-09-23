@@ -1,0 +1,117 @@
+pre
+  border-radius: $radius
+  position: relative
+
+pre code
+  overflow-x: auto
+  color: #525252
+  white-space: pre
+  padding: 1.2em 1.4em
+  font-size: .85rem
+  line-height: 1.6rem
+  display: block
+
+  .hljs
+    &-tag,
+    &-tag &-title,
+    &-change,
+    &-winutils,
+    &-flow,
+    &-tex &-special
+      color: #2973b7
+
+    &-symbol,
+    &-symbol &-string,
+    &-value,
+    &-regexp
+    &-string,
+    &-subst,
+    &-haskell &-type,
+    &-preprocessor,
+    &-ruby &-class &-parent,
+    &-built_in,
+    &-sql &-aggregate,
+    &-django &-template_tag,
+    &-django &-variable,
+    &-smalltalk &-class,
+    &-javadoc,
+    &-django &-filter &-argument,
+    &-smalltalk &-localvars,
+    &-smalltalk &-array,
+    &-attr_selector,
+    &-pseudo,
+    &-addition,
+    &-stream,
+    &-envvar,
+    &-apache &-tag,
+    &-apache &-cbracket,
+    &-tex &-command,
+    &-prompt
+      color: $green
+
+    &-function &-keyword,
+    &-constant
+      color: #0092db
+
+    &-keyword,
+    &-attribute
+      color: #d63200
+
+    &-number,
+    &-literal
+      color: #a32eff
+
+    &-class &-title
+      color: white
+
+    &-title
+      color: #a6e22e
+
+    &-tag &-value,
+    &-comment,
+    &-java &-annotation,
+    &-python &-decorator,
+    &-template_comment,
+    &-pi,
+    &-doctype,
+    &-deletion,
+    &-shebang,
+    &-apache &-sqbracket,
+    &-tex &-formula
+      color: #707070
+
+    &-coffeescript &-javascript,
+    &-javascript &-xml,
+    &-tex &-formula,
+    &-xml &-javascript,
+    &-xml &-vbscript,
+    &-xml &-css,
+    &-xml &-cdata
+      opacity: 0.5
+
+  &.hljs
+    &.html, &.js, &.bash, &.css
+      &::before
+        font-family: $body-font
+        position: absolute
+        top: 0
+        right: 0
+        color: #ccc
+        text-align: right
+        font-size: .9em
+        padding: 5px 10px 0
+        line-height: 15px
+        height: 15px
+        font-weight: 600
+
+    &.html::before
+      content: "HTML"
+
+    &.js::before
+      content: "JS"
+
+    &.bash::before
+      content: "Shell"
+
+    &.css::before
+      content: "CSS"
