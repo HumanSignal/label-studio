@@ -40,7 +40,7 @@ const Model = types
     id: types.optional(types.identifier, guidGenerator),
     pid: types.optional(types.string, guidGenerator),
     type: "labels",
-    children: Types.unionArray(["labels", "label", "choice"]),
+    children: Types.unionArray(["labels", "label", "choices", "choice"]),
   })
   .views(self => ({
     get shouldBeUnselected() {
@@ -105,7 +105,6 @@ const HtxLabels = observer(({ item }) => {
         flexFlow: "wrap",
       }}
     >
-      
       {Tree.renderChildren(item)}
     </div>
   );

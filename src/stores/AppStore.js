@@ -380,7 +380,9 @@ export default types
             );
 
             const data = yield responseCompletion.json();
-            self.completionStore.selected.updatePersonalKey(data.id.toString());
+            if (data && data.id) {
+              self.completionStore.selected.updatePersonalKey(data.id.toString());
+            }
           }
 
           if (hasInterface("load")) {

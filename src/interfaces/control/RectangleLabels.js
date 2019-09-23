@@ -44,7 +44,36 @@ const Model = types
     type: "rectanglelabels",
     children: Types.unionArray(["labels", "label", "choice"]),
   })
+  .views(self => ({
+    get shouldBeUnselected() {
+      return self.choice === "single";
+    },
+  }))
   .actions(self => ({
+    getSelectedColor() {
+      // return first selected label color
+      const sel = self.children.find(c => c.selected === true);
+      return sel && sel.background;
+    },
+
+    toStateJSON() {
+      // const names = self.getSelectedNames();
+      // if (names) {
+      //   self.unselectAll();
+      // }
+      // if (names && names.length) {
+      //   return {
+      //     id: self.pid,
+      //     from_name: self.name,
+      //     to_name: self.name,
+      //     type: self.type,
+      //     value: {
+      //       labels: names,
+      //     },
+      //   };
+      // }
+    },
+
     fromStateJSON(obj, fromModel) {
       self.unselectAll();
 
@@ -76,6 +105,20 @@ const RectangleLabelsModel = types.compose(
 
 const HtxRectangleLabels = observer(({ item }) => {
   return <HtxLabels item={item} />;
+  return (
+    <div
+      style={{
+        marginTop: "1em",
+        marginBottom: "1em",
+        display: "flex",
+        justifyContent: "flex-start",
+        alignItems: "center",
+        flexFlow: "wrap",
+      }}
+    >
+      {Tree.renderChildren(item)}
+    </div>
+  );
 });
 
 Registry.addTag("rectanglelabels", RectangleLabelsModel, HtxRectangleLabels);

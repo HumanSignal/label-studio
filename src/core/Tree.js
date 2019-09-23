@@ -164,9 +164,31 @@ function treeToModel(html) {
   function buildData(node) {
     const data = attrsToProps(node.attrs);
 
+    /**
+     * Generation id of node
+     */
     data["id"] = guidGenerator();
+
+    /**
+     * Build type name
+     */
     data["type"] = node.nodeName;
 
+    /**
+     * Convert node of Tree to boolean value
+     * Input: XML Configuration
+     * Output: Node Tree
+     * Exception: attr "value"
+     */
+    Object.keys(data).forEach(function(item) {
+      if (item !== "value" && (this[item] === "true" || this[item] === "false")) {
+        data[item] = JSON.parse(this[item]);
+      }
+    }, data);
+
+    /**
+     * Convert to image type
+     */
     if (data["type"] === "img") data["type"] = "image";
 
     return data;

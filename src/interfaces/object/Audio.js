@@ -5,8 +5,9 @@ import { types, getRoot } from "mobx-state-tree";
 import { observer, inject } from "mobx-react";
 
 import Registry from "../../core/Registry";
-import { guidGenerator } from "../../core/Helpers";
-import ProcessAttrsMixin from "../mixins/ProcessAttrs";
+import { AudioHOCModel } from "./AudioHOC";
+
+import AudioControls from "./Audio/Controls";
 
 import Waveform from "../../components/Waveform/Waveform";
 
@@ -36,59 +37,25 @@ import Waveform from "../../components/Waveform/Waveform";
  * @param {string} value of the element
  * @param {string} hotkey hotkey used to play/pause audio
  */
-const TagAttrs = types.model({
-  name: types.maybeNull(types.string),
-  value: types.maybeNull(types.string),
-  zoom: types.optional(types.boolean, true),
-  volume: types.optional(types.boolean, true),
-  speed: types.optional(types.boolean, true),
-});
+const Model = AudioHOCModel.named("AudioModel").actions(self => ({
+  fromStateJSON(obj, fromModel) {
+    if (obj.value.choices) {
+      self.completion.names.get(obj.from_name).fromStateJSON(obj);
+    }
 
-const Model = types
-  .model({
-    id: types.optional(types.identifier, guidGenerator),
-    type: "audio",
-    _value: types.optional(types.string, ""),
-    playing: types.optional(types.boolean, false),
-    height: types.optional(types.number, 20),
-  })
-  .views(self => ({
-    get completion() {
-      return getRoot(self).completionStore.selected;
-    },
-  }))
-  .actions(self => ({
-    fromStateJSON(obj, fromModel) {
-      if (obj.value.choices) {
-        self.completion.names.get(obj.from_name).fromStateJSON(obj);
-      }
+    if (obj.value.text) {
+      self.completion.names.get(obj.from_name).fromStateJSON(obj);
+    }
+  },
 
-      if (obj.value.text) {
-        self.completion.names.get(obj.from_name).fromStateJSON(obj);
-      }
-    },
-
-    /**
-     * Play and stop
-     */
-    handlePlay() {
-      self.playing = !self.playing;
-    },
-
-    onLoad(ws) {
-      self._ws = ws;
-    },
-
-    wsCreated(ws) {
-      self._ws = ws;
-    },
-  }));
+  onLoad(ws) {
+    self._ws = ws;
+  },
+}));
 
 const AudioModel = types.compose(
   "AudioModel",
-  TagAttrs,
   Model,
-  ProcessAttrsMixin,
 );
 
 const HtxAudioView = observer(({ store, item }) => {
@@ -108,26 +75,7 @@ const HtxAudioView = observer(({ store, item }) => {
         height={item.height}
       />
 
-      <div style={{ display: "flex", justifyContent: "space-between", marginTop: "1em" }}>
-        <Button
-          type="primary"
-          onClick={ev => {
-            console.log(item);
-            item._ws.playPause();
-          }}
-        >
-          {item.playing && (
-            <Fragment>
-              <Icon type="pause-circle" /> Pause
-            </Fragment>
-          )}
-          {!item.playing && (
-            <Fragment>
-              <Icon type="play-circle" /> Play
-            </Fragment>
-          )}
-        </Button>
-      </div>
+      <AudioControls item={item} />
     </div>
   );
 });

@@ -1,5 +1,5 @@
 import { Sentiment } from "../examples/sentiment_analysis";
-import { AudioClassifiaction } from "../examples/audio_classification";
+import { AudioClassification } from "../examples/audio_classification";
 import { AudioRegions } from "../examples/audio_regions";
 import { ChatbotAnalysis } from "../examples/chatbot_analysis";
 import { ImageBbox } from "../examples/image_bbox";

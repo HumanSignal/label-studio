@@ -240,7 +240,7 @@ const Completion = types
       });
 
       const relations = self.relationStore.serializeCompletion();
-      arr.push(relations);
+      if (relations) arr.push(relations);
 
       const flatten = arr => {
         return arr.reduce(function(flat, toFlatten) {

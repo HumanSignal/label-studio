@@ -8,8 +8,6 @@ import { Shape, Label, Stage, Layer, Rect, Text, Transformer } from "react-konva
 
 import { guidGenerator, restoreNewsnapshot } from "../../core/Helpers";
 
-import { Dropdown, Input } from "semantic-ui-react";
-
 import Registry from "../../core/Registry";
 
 import { LabelsModel } from "../control/Labels";
@@ -41,7 +39,7 @@ const Model = types
     strokewidth: types.number,
 
     fillcolor: types.maybeNull(types.string),
-    strokecolor: types.string,
+    strokecolor: types.optional(types.string, "blue"),
 
     states: types.maybeNull(types.array(types.union(LabelsModel, RatingModel, RectangleLabelsModel))),
 
@@ -129,12 +127,20 @@ const Model = types
 
     toStateJSON() {
       const parent = self.parent;
-      const from = parent.states()[0];
+      let fromEl = parent.states()[0];
+
+      if (parent.states().length > 1) {
+        parent.states().forEach(state => {
+          if (state.type === "rectanglelabels") {
+            fromEl = state;
+          }
+        });
+      }
 
       const buildTree = obj => {
         const tree = {
           id: self.id,
-          from_name: from.name,
+          from_name: fromEl.name,
           to_name: parent.name,
           source: parent.value,
           type: "rectangle",
