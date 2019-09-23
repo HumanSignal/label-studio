@@ -66,25 +66,22 @@ const Model = types
 
     controlButton() {
       const names = self.completion.toNames.get(self.name);
-      return names[0];
+
+      let r = names[0];
+
+      names.forEach(item => {
+        if (item.type === "rectanglelabels") {
+          r = item;
+        }
+      });
+
+      return r;
     },
 
     controlButtonType() {
       const name = self.controlButton();
       return getType(name).name;
     },
-
-    // get editor() {
-    //     try {
-    //         return getParentOfType(self, ImageEditorModel);
-    //     } catch (err) {
-    //         return null;
-    //     }
-    // },
-
-    // get isInsideEditor() {
-    //     return (self.editor !== null);
-    // }
   }))
   .actions(self => ({
     setActivePolygon(poly) {
@@ -126,7 +123,6 @@ const Model = types
     },
 
     onImageClick(ev) {
-      // console.log(self.controlButton());
       if (self.controlButtonType() === "RectangleModel") {
         self._addRect(ev);
       } else if (self.controlButtonType() === "PolygonModel") {
@@ -153,9 +149,19 @@ const Model = types
         // don't allow to add RectangleLabel when there is no label selected
         if (clonedStates.length === 0) return;
 
-        self._addRect(ev, clonedStates);
+        clonedStates.forEach(item => {
+          if (item.type !== "choices" && item.isSelected) {
+            self._addRect(ev, item);
+          }
+        });
 
-        activeStates && activeStates.forEach(s => s.unselectAll());
+        activeStates &&
+          activeStates.forEach(s => {
+            console.log(s);
+            if (s.type !== "choices") {
+              s.unselectAll();
+            }
+          });
       }
     },
 
@@ -176,15 +182,14 @@ const Model = types
       const sw = 100;
       const sh = 100;
       // const name = guidGenerator();
-
       let stroke = self.controlButton().rectstrokecolor;
       // let stroke = self.editor.rectstrokecolor;
       // const states = self.states;
       // TODO you may need to filter this states, check Text.js
-      if (states && states.length) {
+      if (states) {
         // console.log(states[0].toJSON());
         // console.log(states);
-        stroke = states[0].getSelectedColor();
+        stroke = states.getSelectedColor();
       }
 
       const wp = self.stageWidth / self.naturalWidth;
@@ -198,6 +203,13 @@ const Model = types
 
     __addRect(x, y, sw, sh, stroke, states, coordstype) {
       const c = self.controlButton();
+
+      let localStates = states;
+
+      if (!states.length) {
+        localStates = [states];
+      }
+
       const rect = RectRegionModel.create({
         id: guidGenerator(),
 
@@ -213,7 +225,7 @@ const Model = types
         strokewidth: parseInt(c.strokewidth),
         strokecolor: stroke,
 
-        states: states,
+        states: localStates,
 
         coordstype: coordstype,
       });
@@ -280,22 +292,32 @@ const Model = types
     },
 
     toStateJSON() {
-      return self.shapes.map(r => r.toStateJSON());
+      let t = self.shapes.map(r => r.toStateJSON());
+      return t;
     },
 
     fromStateJSON(obj, fromModel) {
       const params = ["choices", "shape", "rectanglelabels"];
 
+      /**
+       * Check correct controls for image object
+       */
       params.forEach(item => {
         if (!item in obj.value) {
           throw new Error("Not valid param");
         }
       });
 
+      /**
+       * Choices
+       */
       if (obj.value.choices) {
         self.completion.names.get(obj.from_name).fromStateJSON(obj);
       }
 
+      /**
+       * Rectangle labels
+       */
       if (obj.value.rectanglelabels) {
         const states = restoreNewsnapshot(fromModel);
 
@@ -312,6 +334,9 @@ const Model = types
         );
       }
 
+      /**
+       * Shapes
+       */
       if (obj.value.shape) {
         let modifySnap;
         let shapeModel;
