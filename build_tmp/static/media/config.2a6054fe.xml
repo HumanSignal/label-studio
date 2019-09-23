@@ -1,7 +1,0 @@
-<View>
-  <Image name="img" value="$image"></Image>
-  <RectangleLabels name="tag" toName="img">
-    <Label value="Planet"></Label>
-    <Label value="Moonwalker" background="blue"></Label>
-  </RectangleLabels>
-</View>
