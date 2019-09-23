@@ -1,14 +1,14 @@
 (window.webpackJsonp = window.webpackJsonp || []).push([
   [0],
   {
-    122: function(e, t, n) {
+    123: function(e, t, n) {
       e.exports = {
         container: "Panel_container__1UbGz",
         block: "Panel_block__35uxJ",
         block__controls: "Panel_block__controls__386dF",
       };
     },
-    123: function(e, t, n) {
+    124: function(e, t, n) {
       e.exports = {
         block: "Relations_block__3ojdZ",
         section: "Relations_section__3MAqx",
@@ -16,7 +16,7 @@
         delete: "Relations_delete__3qe_f",
       };
     },
-    171: function(e, t, n) {
+    159: function(e, t, n) {
       e.exports = {
         editor: "App_editor__ZA0wp",
         menu: "App_menu__3cWjU",
@@ -24,10 +24,10 @@
         common: "App_common__2vqlZ",
       };
     },
-    217: function(e, t, n) {
+    207: function(e, t, n) {
       e.exports = { main: "Hint_main__2bVzl" };
     },
-    221: function(e, t, n) {
+    211: function(e, t, n) {
       e.exports = { progress: "Waveform_progress__3BwkI", wave: "Waveform_wave__3tQFG", menu: "Waveform_menu__ToCwx" };
     },
     290: function(e, t, n) {
@@ -37,19 +37,16 @@
       e.exports = { item: "Entities_item__215D0" };
     },
     304: function(e, t, n) {},
-    311: function(e, t, n) {
-      e.exports = { play: "AudioPlus_play__3_Ds7" };
-    },
-    313: function(e, t, n) {
+    312: function(e, t, n) {
       e.exports = { block: "TextHighlight_block__2-3wy" };
     },
-    314: function(e, t, n) {
+    313: function(e, t, n) {
       e.exports = { state: "TextRegion_state__1J2X6" };
     },
-    316: function(e, t, n) {
+    315: function(e, t, n) {
       e.exports = n.p + "static/media/config.34f6aa9f.xml";
     },
-    317: function(e) {
+    316: function(e) {
       e.exports = [
         {
           reviewerID: "A2IBPI20UZIR0U",
@@ -1249,7 +1246,7 @@
         },
       ];
     },
-    318: function(e) {
+    317: function(e) {
       e.exports = {
         completions: [
           {
@@ -1296,16 +1293,16 @@
         task_path: "../examples/sentiment_analysis/tasks.json",
       };
     },
-    319: function(e, t, n) {
+    318: function(e, t, n) {
       e.exports = n.p + "static/media/config.c5233796.xml";
     },
-    320: function(e) {
+    319: function(e) {
       e.exports = [
         { url: "https://go.heartex.net/static/samples/game.wav" },
         { url: "https://go.heartex.net/static/samples/game.wav" },
       ];
     },
-    321: function(e) {
+    320: function(e) {
       e.exports = {
         completions: [
           {
@@ -1325,16 +1322,16 @@
         task_path: "../examples/audio_classification/tasks.json",
       };
     },
-    322: function(e, t, n) {
+    321: function(e, t, n) {
       e.exports = n.p + "static/media/config.66767299.xml";
     },
-    323: function(e) {
+    322: function(e) {
       e.exports = [
         { url: "https://go.heartex.net/static/samples/game.wav" },
         { url: "https://go.heartex.net/static/samples/game.wav" },
       ];
     },
-    324: function(e) {
+    323: function(e) {
       e.exports = {
         completions: [
           {
@@ -1377,10 +1374,10 @@
         task_path: "../examples/audio_regions/tasks.json",
       };
     },
-    325: function(e, t, n) {
+    324: function(e, t, n) {
       e.exports = n.p + "static/media/config.0e2a1e7f.xml";
     },
-    326: function(e) {
+    325: function(e) {
       e.exports = [
         {
           dialogs:
@@ -1388,7 +1385,7 @@
         },
       ];
     },
-    327: function(e) {
+    326: function(e) {
       e.exports = {
         completions: [
           {
@@ -1412,13 +1409,13 @@
         task_path: "../examples/chatbot_analysis/tasks.json",
       };
     },
-    328: function(e, t, n) {
+    327: function(e, t, n) {
       e.exports = n.p + "static/media/config.2a6054fe.xml";
     },
-    329: function(e) {
+    328: function(e) {
       e.exports = [{ image: "https://user.fm/files/v2-901310d5cb3fa90e0616ca10590bacb3/spacexmoon-800x501.jpg" }];
     },
-    330: function(e) {
+    329: function(e) {
       e.exports = {
         completions: [
           {
@@ -1461,10 +1458,10 @@
         task_path: "../examples/image_bbox/tasks.json",
       };
     },
-    331: function(e, t, n) {
+    330: function(e, t, n) {
       e.exports = n.p + "static/media/config.bb22cd0c.xml";
     },
-    332: function(e) {
+    331: function(e) {
       e.exports = [
         {
           text:
@@ -1472,7 +1469,7 @@
         },
       ];
     },
-    333: function(e) {
+    332: function(e) {
       e.exports = {
         completions: [
           {
@@ -1504,13 +1501,13 @@
         task_path: "../examples/named_entity/tasks.json",
       };
     },
-    334: function(e, t, n) {
+    333: function(e, t, n) {
       e.exports = n.p + "static/media/config.32729adf.xml";
     },
-    335: function(e) {
+    334: function(e) {
       e.exports = [{ text: "To have faith is to trust yourself to the water" }];
     },
-    336: function(e) {
+    335: function(e) {
       e.exports = {
         completions: [
           {
@@ -1531,13 +1528,13 @@
         task_path: "../examples/references/tasks.json",
       };
     },
-    337: function(e, t, n) {
+    336: function(e, t, n) {
       e.exports = n.p + "static/media/config.1890026d.xml";
     },
-    338: function(e) {
+    337: function(e) {
       e.exports = [{ url: "https://go.heartex.net/static/samples/game.wav" }];
     },
-    339: function(e) {
+    338: function(e) {
       e.exports = {
         completions: [
           {
@@ -1551,10 +1548,13 @@
         task_path: "../examples/transcribe_audio/tasks.json",
       };
     },
-    354: function(e, t, n) {
+    353: function(e, t, n) {
       e.exports = n(596);
     },
-    362: function(e, t, n) {},
+    361: function(e, t, n) {},
+    579: function(e, t, n) {
+      e.exports = { play: "AudioPlus_play__3_Ds7" };
+    },
     596: function(e, t, n) {
       "use strict";
       n.r(t);
@@ -1605,15 +1605,15 @@
         });
       var i = n(0),
         l = n.n(i),
-        s = n(17),
+        s = n(14),
         c = n.n(s),
         u = n(7),
-        m = (n(359), n(362), n(26)),
-        d = n(27),
-        h = n(30),
-        p = n(29),
-        f = n(31),
-        g = n(209),
+        m = (n(358), n(361), n(25)),
+        d = n(26),
+        h = n(29),
+        p = n(28),
+        f = n(30),
+        g = n(199),
         v = n.n(g),
         y = n(1),
         b = n(620),
@@ -1686,7 +1686,7 @@
           },
         },
         S = n(36),
-        N = n(212),
+        N = n(202),
         I = n.n(N);
       function E(e) {
         var t = I()(10);
@@ -1756,7 +1756,15 @@
                 }
                 return t;
               })(e.attrs);
-              return (t.id = E()), (t.type = e.nodeName), "img" === t.type && (t.type = "image"), t;
+              return (
+                (t.id = E()),
+                (t.type = e.nodeName),
+                Object.keys(t).forEach(function(e) {
+                  "value" === e || ("true" !== this[e] && "false" !== this[e]) || (t[e] = JSON.parse(this[e]));
+                }, t),
+                "img" === t.type && (t.type = "image"),
+                t
+              );
             }
             var n = (function(e) {
                 for (var t = e.split("/>"), n = "", a = 0; a < t.length - 1; a++) {
@@ -1914,10 +1922,10 @@
           },
         },
         j = n(616),
-        A = n(167),
-        D = n(625),
-        M = n(166),
-        B = n(35),
+        A = n(279),
+        D = n(624),
+        M = n(278),
+        B = n(34),
         P = n(622),
         H = function(e) {
           return "string" === typeof e || e instanceof String;
@@ -2151,7 +2159,7 @@
         var e = 6e4 * new Date().getTimezoneOffset();
         return new Date(Date.now() - e).toISOString().slice(0, -1);
       }
-      var Q = n(104);
+      var Q = n(105);
       var $ = {
           Checkers: a,
           Colors: o,
@@ -2265,7 +2273,7 @@
                               e.preventDefault(), n.removeHoneypot();
                             },
                           },
-                          "Honeypot",
+                          "Ground Truth",
                         )
                       : l.a.createElement(
                           A.a,
@@ -2276,7 +2284,7 @@
                               e.preventDefault(), n.setHoneypot();
                             },
                           },
-                          "Honeypot",
+                          "Ground Truth",
                         ),
                   ),
               ),
@@ -2314,7 +2322,7 @@
                       ),
                     );
                   return (
-                    e.completionStore.savedCompletions.map(function(n) {
+                    e.completionStore.savedCompletions.forEach(function(n) {
                       n && t.push(l.a.createElement(ne, { key: n.pk, item: n, store: e }));
                     }),
                     l.a.createElement(
@@ -2414,7 +2422,7 @@
           );
         })(i.Component),
         le = Object(u.c)(ie),
-        se = n(217),
+        se = n(207),
         ce = n.n(se),
         ue = (function(e) {
           function t() {
@@ -2443,7 +2451,7 @@
             t
           );
         })(i.Component),
-        me = n(92),
+        me = n(93),
         de = n.n(me),
         he = Object(u.b)("store")(
           Object(u.c)(function(e) {
@@ -2500,7 +2508,7 @@
             return (!r.completionStore.predictSelect || r.explore) && p;
           }),
         ),
-        pe = n(122),
+        pe = n(123),
         fe = n.n(pe),
         ge = n(290),
         ve = n.n(ge),
@@ -2612,9 +2620,9 @@
             ),
           );
         }),
-        we = n(614),
+        we = n(615),
         ke = n(597),
-        xe = n(623),
+        xe = n(617),
         Te = Object(u.c)(function(e) {
           var t = e.store;
           return l.a.createElement(
@@ -2659,7 +2667,7 @@
             ),
           );
         }),
-        Se = n(624),
+        Se = n(623),
         Ne = n(621),
         Ie = n(611),
         Ee = (function(e) {
@@ -2872,7 +2880,7 @@
               )
             : void 0;
         },
-        _e = n(123),
+        _e = n(124),
         je = n.n(_e),
         Ae = function(e) {
           var t = e.store,
@@ -2980,7 +2988,7 @@
             ),
           );
         }),
-        He = n(627),
+        He = n(626),
         ze = n(82),
         We = n.n(ze),
         Le = function(e) {
@@ -3247,7 +3255,7 @@
           );
         });
       k.addTag("view", Ke, Ze);
-      var Qe = n(615);
+      var Qe = n(614);
       function $e(e, t) {
         return "$" === e.charAt(0)
           ? (function e(t, n, a) {
@@ -3409,7 +3417,7 @@
       k.addTag("hypertext", mt, dt);
       var ht = n(599),
         pt = n(609),
-        ft = n(93),
+        ft = n(94),
         gt = n.n(ft),
         vt = (function(e) {
           function t() {
@@ -3537,21 +3545,81 @@
           }),
         );
       k.addTag("dialog", kt, xt);
-      var Tt = n(306),
-        St = n.n(Tt),
-        Nt = n(307),
-        It = n.n(Nt),
-        Et = n(308),
-        Ot = n.n(Et),
-        Rt = n(309),
-        Ct = n.n(Rt),
-        _t = n(600),
-        jt = n(601),
-        At = n(617),
-        Dt = n(613),
-        Mt = n(221),
-        Bt = n.n(Mt);
-      function Pt(e, t) {
+      var Tt = y.m.model({
+          name: y.m.maybeNull(y.m.string),
+          value: y.m.maybeNull(y.m.string),
+          zoom: y.m.optional(y.m.boolean, !0),
+          volume: y.m.optional(y.m.boolean, !0),
+          speed: y.m.optional(y.m.boolean, !0),
+        }),
+        St = y.m
+          .model({
+            id: y.m.optional(y.m.identifier, E),
+            type: "audio",
+            _value: y.m.optional(y.m.string, ""),
+            playing: y.m.optional(y.m.boolean, !1),
+            height: y.m.optional(y.m.number, 20),
+          })
+          .views(function(e) {
+            return {
+              get completion() {
+                return Object(y.g)(e).completionStore.selected;
+              },
+            };
+          })
+          .actions(function(e) {
+            return {
+              wsCreated: function(t) {
+                e._ws = t;
+              },
+              handlePlay: function() {
+                e.playing = !e.playing;
+              },
+            };
+          }),
+        Nt = y.m.compose(
+          "AudioHOCModel",
+          Tt,
+          St,
+          tt,
+        ),
+        It = Object(u.c)(function(e) {
+          var t = e.item;
+          e.store;
+          return l.a.createElement(
+            "div",
+            { style: { display: "flex", justifyContent: "space-between", marginTop: "1em" } },
+            l.a.createElement(
+              A.a,
+              {
+                type: "primary",
+                onClick: function(e) {
+                  t._ws.playPause();
+                },
+              },
+              t.playing &&
+                l.a.createElement(i.Fragment, null, l.a.createElement(B.a, { type: "pause-circle" }), " Pause"),
+              !t.playing &&
+                l.a.createElement(i.Fragment, null, l.a.createElement(B.a, { type: "play-circle" }), " Play"),
+            ),
+          );
+        }),
+        Et = Object(u.c)(It),
+        Ot = n(306),
+        Rt = n.n(Ot),
+        Ct = n(307),
+        _t = n.n(Ct),
+        jt = n(308),
+        At = n.n(jt),
+        Dt = n(309),
+        Mt = n.n(Dt),
+        Bt = n(600),
+        Pt = n(601),
+        Ht = n(618),
+        zt = n(613),
+        Wt = n(211),
+        Lt = n.n(Wt);
+      function Ft(e, t) {
         e = Number(e);
         var n = Math.floor(e / 60);
         e %= 60;
@@ -3561,7 +3629,7 @@
           n > 0 ? (e < 10 && (a = "0" + a), "".concat(n, ":").concat(a)) : a
         );
       }
-      function Ht(e) {
+      function Jt(e) {
         return e >= 2500
           ? 0.01
           : e >= 1e3
@@ -3578,7 +3646,7 @@
           ? 15
           : 60 * Math.ceil(0.5 / e);
       }
-      function zt(e) {
+      function Gt(e) {
         return e >= 2500
           ? 10
           : e >= 1e3
@@ -3595,10 +3663,10 @@
           ? 15
           : 60 * Math.ceil(0.5 / e);
       }
-      function Wt(e) {
-        return Math.floor(10 / Ht(e));
+      function Ut(e) {
+        return Math.floor(10 / Jt(e));
       }
-      var Lt = (function(e) {
+      var Vt = (function(e) {
           function t(e) {
             var n;
             return (
@@ -3641,22 +3709,22 @@
                   this.props.regions &&
                     (t = Object(S.a)({}, t, {
                       plugins: [
-                        It.a.create({ dragSelection: { slop: 5 } }),
-                        Ot.a.create({
+                        _t.a.create({ dragSelection: { slop: 5 } }),
+                        At.a.create({
                           container: "#timeline",
-                          formatTimeCallback: Pt,
-                          timeInterval: Ht,
-                          primaryLabelInterval: zt,
-                          secondaryLabelInterval: Wt,
+                          formatTimeCallback: Ft,
+                          timeInterval: Jt,
+                          primaryLabelInterval: Gt,
+                          secondaryLabelInterval: Ut,
                           primaryColor: "blue",
                           secondaryColor: "blue",
                           primaryFontColor: "#000",
                           secondaryFontColor: "#000",
                         }),
-                        Ct.a.create({ wrapper: this.$waveform, showTime: !0, opacity: 1 }),
+                        Mt.a.create({ wrapper: this.$waveform, showTime: !0, opacity: 1 }),
                       ],
                     })),
-                    (this.wavesurfer = St.a.create(t)),
+                    (this.wavesurfer = Rt.a.create(t)),
                     this.wavesurfer.load(this.props.src),
                     this.wavesurfer.setPlaybackRate(this.state.speed);
                   var n = this;
@@ -3704,21 +3772,21 @@
                   return l.a.createElement(
                     "div",
                     null,
-                    l.a.createElement("div", { id: "wave", className: Bt.a.wave }),
+                    l.a.createElement("div", { id: "wave", className: Lt.a.wave }),
                     l.a.createElement("div", { id: "timeline" }),
                     l.a.createElement(
-                      _t.a,
-                      { className: Bt.a.menu },
+                      Bt.a,
+                      { className: Lt.a.menu },
                       this.props.speed &&
                         l.a.createElement(
-                          jt.a,
+                          Pt.a,
                           { span: 24 },
                           l.a.createElement(
-                            jt.a,
+                            Pt.a,
                             { span: 12 },
                             "Speed:",
                             " ",
-                            l.a.createElement(At.a, {
+                            l.a.createElement(Ht.a, {
                               min: 0.5,
                               max: 3,
                               value: this.state.speed,
@@ -3728,9 +3796,9 @@
                             }),
                           ),
                           l.a.createElement(
-                            jt.a,
+                            Pt.a,
                             { span: 24 },
-                            l.a.createElement(Dt.a, {
+                            l.a.createElement(zt.a, {
                               min: 0.5,
                               max: 3,
                               step: 0.1,
@@ -3743,14 +3811,14 @@
                         ),
                       this.props.volume &&
                         l.a.createElement(
-                          jt.a,
+                          Pt.a,
                           { span: 24 },
                           l.a.createElement(
-                            jt.a,
+                            Pt.a,
                             { span: 12 },
                             "Volume:",
                             " ",
-                            l.a.createElement(At.a, {
+                            l.a.createElement(Ht.a, {
                               min: 0,
                               max: 1,
                               value: this.state.volume,
@@ -3761,9 +3829,9 @@
                             }),
                           ),
                           l.a.createElement(
-                            jt.a,
+                            Pt.a,
                             { span: 24 },
-                            l.a.createElement(Dt.a, {
+                            l.a.createElement(zt.a, {
                               min: 0,
                               max: 1,
                               step: 0.1,
@@ -3776,14 +3844,14 @@
                         ),
                       this.props.zoom &&
                         l.a.createElement(
-                          jt.a,
+                          Pt.a,
                           { span: 24 },
                           l.a.createElement(
-                            jt.a,
+                            Pt.a,
                             { span: 12 },
                             "Zoom:",
                             " ",
-                            l.a.createElement(At.a, {
+                            l.a.createElement(Ht.a, {
                               min: 20,
                               max: 500,
                               value: this.state.zoom,
@@ -3793,9 +3861,9 @@
                             }),
                           ),
                           l.a.createElement(
-                            jt.a,
+                            Pt.a,
                             { span: 24 },
-                            l.a.createElement(Dt.a, {
+                            l.a.createElement(zt.a, {
                               min: 20,
                               step: 10,
                               max: 500,
@@ -3814,59 +3882,29 @@
             t
           );
         })(l.a.Component),
-        Ft = y.m.model({
-          name: y.m.maybeNull(y.m.string),
-          value: y.m.maybeNull(y.m.string),
-          zoom: y.m.optional(y.m.boolean, !0),
-          volume: y.m.optional(y.m.boolean, !0),
-          speed: y.m.optional(y.m.boolean, !0),
+        Yt = Nt.named("AudioModel").actions(function(e) {
+          return {
+            fromStateJSON: function(t, n) {
+              t.value.choices && e.completion.names.get(t.from_name).fromStateJSON(t),
+                t.value.text && e.completion.names.get(t.from_name).fromStateJSON(t);
+            },
+            onLoad: function(t) {
+              e._ws = t;
+            },
+          };
         }),
-        Jt = y.m
-          .model({
-            id: y.m.optional(y.m.identifier, E),
-            type: "audio",
-            _value: y.m.optional(y.m.string, ""),
-            playing: y.m.optional(y.m.boolean, !1),
-            height: y.m.optional(y.m.number, 20),
-          })
-          .views(function(e) {
-            return {
-              get completion() {
-                return Object(y.g)(e).completionStore.selected;
-              },
-            };
-          })
-          .actions(function(e) {
-            return {
-              fromStateJSON: function(t, n) {
-                t.value.choices && e.completion.names.get(t.from_name).fromStateJSON(t),
-                  t.value.text && e.completion.names.get(t.from_name).fromStateJSON(t);
-              },
-              handlePlay: function() {
-                e.playing = !e.playing;
-              },
-              onLoad: function(t) {
-                e._ws = t;
-              },
-              wsCreated: function(t) {
-                e._ws = t;
-              },
-            };
-          }),
-        Gt = y.m.compose(
+        qt = y.m.compose(
           "AudioModel",
-          Ft,
-          Jt,
-          tt,
+          Yt,
         ),
-        Ut = Object(u.c)(function(e) {
+        Xt = Object(u.c)(function(e) {
           e.store;
           var t = e.item;
           return t._value
             ? l.a.createElement(
                 "div",
                 null,
-                l.a.createElement(Lt, {
+                l.a.createElement(Vt, {
                   src: t._value,
                   onCreate: t.wsCreated,
                   onLoad: t.onLoad,
@@ -3877,29 +3915,13 @@
                   regions: !1,
                   height: t.height,
                 }),
-                l.a.createElement(
-                  "div",
-                  { style: { display: "flex", justifyContent: "space-between", marginTop: "1em" } },
-                  l.a.createElement(
-                    A.a,
-                    {
-                      type: "primary",
-                      onClick: function(e) {
-                        console.log(t), t._ws.playPause();
-                      },
-                    },
-                    t.playing &&
-                      l.a.createElement(i.Fragment, null, l.a.createElement(B.a, { type: "pause-circle" }), " Pause"),
-                    !t.playing &&
-                      l.a.createElement(i.Fragment, null, l.a.createElement(B.a, { type: "play-circle" }), " Play"),
-                  ),
-                ),
+                l.a.createElement(Et, { item: t }),
               )
             : null;
         }),
-        Vt = Object(u.b)("store")(Object(u.c)(Ut));
-      k.addTag("audio", Gt, Vt);
-      var Yt = y.m
+        Kt = Object(u.b)("store")(Object(u.c)(Xt));
+      k.addTag("audio", qt, Kt);
+      var Zt = y.m
           .model({ selected: y.m.optional(y.m.boolean, !1), highlighted: y.m.optional(y.m.boolean, !1) })
           .actions(function(e) {
             return {
@@ -3932,7 +3954,7 @@
               },
             };
           }),
-        qt = y.m
+        Qt = y.m
           .model({ normInput: y.m.maybeNull(y.m.string), normalization: y.m.maybeNull(y.m.string) })
           .actions(function(e) {
             return {
@@ -3947,18 +3969,18 @@
               },
             };
           }),
-        Xt = y.m.model({
+        $t = y.m.model({
           value: y.m.maybeNull(y.m.string),
           selected: y.m.optional(y.m.boolean, !1),
           alias: y.m.maybeNull(y.m.string),
           hotkey: y.m.maybeNull(y.m.string),
-          showalias: y.m.optional(y.m.string, "false"),
+          showalias: y.m.optional(y.m.boolean, !1),
           aliasstyle: y.m.optional(y.m.string, "opacity: 0.6"),
           size: y.m.optional(y.m.string, "medium"),
           background: y.m.optional(y.m.string, "#36B37E"),
           selectedcolor: y.m.optional(y.m.string, "white"),
         }),
-        Kt = y.m
+        en = y.m
           .model({ id: y.m.optional(y.m.identifier, E), type: "label", _value: y.m.optional(y.m.string, "") })
           .actions(function(e) {
             return {
@@ -3976,13 +3998,13 @@
               },
             };
           }),
-        Zt = y.m.compose(
+        tn = y.m.compose(
           "LabelModel",
-          Xt,
-          Kt,
+          $t,
+          en,
           tt,
         ),
-        Qt = Object(u.b)("store")(
+        nn = Object(u.b)("store")(
           Object(u.c)(function(e) {
             var t = e.item,
               n = e.store,
@@ -4002,7 +4024,7 @@
                 size: t.size,
               },
               t._value,
-              "true" === t.showalias &&
+              !0 === t.showalias &&
                 t.alias &&
                 l.a.createElement("span", { style: $.styleToProp(t.aliasstyle) }, "\xa0", t.alias),
               n.settings.enableTooltips &&
@@ -4012,8 +4034,8 @@
             );
           }),
         );
-      k.addTag("label", Zt, Qt);
-      var $t = y.m
+      k.addTag("label", tn, nn);
+      var an = y.m
           .model()
           .views(function(e) {
             return {
@@ -4049,18 +4071,18 @@
               },
             };
           }),
-        en = y.m.model({
+        on = y.m.model({
           name: y.m.maybeNull(y.m.string),
           toname: y.m.maybeNull(y.m.string),
           choice: y.m.optional(y.m.enumeration(["single", "multiple"]), "single"),
           selectionstyle: y.m.maybeNull(y.m.optional(y.m.string, "basic", "border", "bottom")),
         }),
-        tn = y.m
+        rn = y.m
           .model({
             id: y.m.optional(y.m.identifier, E),
             pid: y.m.optional(y.m.string, E),
             type: "labels",
-            children: Ye.unionArray(["labels", "label", "choice"]),
+            children: Ye.unionArray(["labels", "label", "choices", "choice"]),
           })
           .views(function(e) {
             return {
@@ -4093,13 +4115,13 @@
               },
             };
           }),
-        nn = y.m.compose(
+        ln = y.m.compose(
           "LabelsModel",
-          en,
-          tn,
-          $t,
+          on,
+          rn,
+          an,
         ),
-        an = Object(u.c)(function(e) {
+        sn = Object(u.c)(function(e) {
           var t = e.item;
           return l.a.createElement(
             "div",
@@ -4116,9 +4138,9 @@
             _.renderChildren(t),
           );
         });
-      k.addTag("labels", nn, an);
-      var on = n(626),
-        rn = y.m.model({
+      k.addTag("labels", ln, sn);
+      var cn = n(625),
+        un = y.m.model({
           name: y.m.maybeNull(y.m.string),
           toname: y.m.maybeNull(y.m.string),
           maxrating: y.m.optional(y.m.string, "5"),
@@ -4126,7 +4148,7 @@
           size: y.m.optional(y.m.string, "large"),
           hotkey: y.m.maybeNull(y.m.string),
         }),
-        ln = y.m
+        mn = y.m
           .model({
             id: y.m.optional(y.m.identifier, E),
             pid: y.m.optional(y.m.string, E),
@@ -4173,19 +4195,19 @@
               },
             };
           }),
-        sn = y.m.compose(
+        dn = y.m.compose(
           "RatingModel",
-          rn,
-          ln,
+          un,
+          mn,
         ),
-        cn = Object(u.b)("store")(
+        hn = Object(u.b)("store")(
           Object(u.c)(function(e) {
             var t = e.item,
               n = e.store;
             return l.a.createElement(
               "div",
               null,
-              l.a.createElement(on.a, {
+              l.a.createElement(cn.a, {
                 icon: "star",
                 size: t.size,
                 defaultRating: 0,
@@ -4201,20 +4223,20 @@
             );
           }),
         );
-      k.addTag("rating", sn, cn);
-      var un = y.m
+      k.addTag("rating", dn, hn);
+      var pn = y.m
           .model("AudioRegionModel", {
             id: y.m.optional(y.m.identifier, E),
             pid: y.m.optional(y.m.string, E),
             start: y.m.number,
             end: y.m.number,
-            states: y.m.maybeNull(y.m.array(y.m.union(nn, sn))),
+            states: y.m.maybeNull(y.m.array(y.m.union(ln, dn))),
             selectedregionbg: y.m.optional(y.m.string, "rgba(0, 0, 0, 0.5)"),
           })
           .views(function(e) {
             return {
               get parent() {
-                return Object(y.f)(e, gn);
+                return Object(y.f)(e, yn);
               },
               get completion() {
                 return Object(y.g)(e).completionStore.selected;
@@ -4281,28 +4303,29 @@
               },
             };
           }),
-        mn = y.m.compose(
+        fn = y.m.compose(
           "AudioRegionModel",
-          Yt,
-          qt,
-          un,
+          Zt,
+          Qt,
+          pn,
         ),
-        dn = n(311),
-        hn = n.n(dn),
-        pn = y.m.model({
-          name: y.m.maybeNull(y.m.string),
-          value: y.m.maybeNull(y.m.string),
-          zoom: y.m.optional(y.m.boolean, !0),
-          volume: y.m.optional(y.m.boolean, !0),
-          speed: y.m.optional(y.m.boolean, !0),
-        }),
-        fn = y.m
+        gn =
+          (n(579),
+          y.m.model({
+            name: y.m.maybeNull(y.m.string),
+            value: y.m.maybeNull(y.m.string),
+            zoom: y.m.optional(y.m.boolean, !0),
+            volume: y.m.optional(y.m.boolean, !0),
+            speed: y.m.optional(y.m.boolean, !0),
+            regs: y.m.optional(y.m.boolean, !0),
+          })),
+        vn = y.m
           .model("AudioPlusModel", {
             id: y.m.identifier,
             type: "audio",
             _value: y.m.optional(y.m.string, ""),
             playing: y.m.optional(y.m.boolean, !1),
-            regions: y.m.array(mn),
+            regions: y.m.array(fn),
             height: y.m.optional(y.m.number, 128),
           })
           .views(function(e) {
@@ -4369,7 +4392,7 @@
                   o = e.findRegion(t.start, t.end);
                 if (e.findRegion(t.start, t.end)) return (o._ws_region = t), o;
                 var r = n && n[0] ? $.Colors.convertToRGBA(n[0].getSelectedColor(), 0.3) : e.selectedregionbg,
-                  i = mn.create({
+                  i = fn.create({
                     id: t.id ? t.id : E(),
                     pid: t.pid ? t.pid : E(),
                     start: t.start,
@@ -4403,20 +4426,20 @@
               },
             };
           }),
-        gn = y.m.compose(
+        yn = y.m.compose(
           "AudioPlusModel",
-          pn,
-          fn,
+          gn,
+          vn,
           tt,
         ),
-        vn = Object(u.c)(function(e) {
+        bn = Object(u.c)(function(e) {
           e.store;
           var t = e.item;
           return t._value
             ? l.a.createElement(
                 "div",
                 null,
-                l.a.createElement(Lt, {
+                l.a.createElement(Vt, {
                   src: t._value,
                   selectRegion: t.selectRegion,
                   handlePlay: t.handlePlay,
@@ -4426,35 +4449,18 @@
                   speed: t.speed,
                   zoom: t.zoom,
                   volume: t.volume,
-                  regions: !0,
+                  regions: t.regs,
                   height: t.height,
                 }),
-                l.a.createElement(
-                  "div",
-                  { style: { display: "flex", justifyContent: "space-between", marginTop: "1em" } },
-                  l.a.createElement(
-                    A.a,
-                    {
-                      type: "primary",
-                      className: hn.a.play,
-                      onClick: function(e) {
-                        t._ws.playPause();
-                      },
-                    },
-                    t.playing &&
-                      l.a.createElement(i.Fragment, null, l.a.createElement(B.a, { type: "pause-circle" }), " Pause"),
-                    !t.playing &&
-                      l.a.createElement(i.Fragment, null, l.a.createElement(B.a, { type: "play-circle" }), " Play"),
-                  ),
-                ),
+                l.a.createElement(Et, { item: t }),
               )
             : null;
         }),
-        yn = Object(u.b)("store")(Object(u.c)(vn));
-      k.addTag("audioplus", gn, yn);
-      var bn = n(57),
-        wn =
-          (n(119),
+        wn = Object(u.b)("store")(Object(u.c)(bn));
+      k.addTag("audioplus", yn, wn);
+      var kn = n(57),
+        xn =
+          (n(120),
           y.m.model({
             name: y.m.maybeNull(y.m.string),
             toname: y.m.maybeNull(y.m.string),
@@ -4464,7 +4470,7 @@
             strokecolor: y.m.optional(y.m.string, "#f48a42"),
             canrotate: y.m.optional(y.m.string, "true"),
           })),
-        kn = y.m
+        Tn = y.m
           .model({ id: y.m.identifier, type: "rectangle" })
           .views(function(e) {
             return {
@@ -4480,24 +4486,38 @@
           .actions(function(e) {
             return { fromStateJSON: function(e) {} };
           }),
-        xn = y.m.compose(
+        Sn = y.m.compose(
           "RectangleModel",
-          wn,
-          kn,
+          xn,
+          Tn,
         );
-      k.addTag("rectangle", xn, function() {
+      k.addTag("rectangle", Sn, function() {
         return null;
       });
-      var Tn = y.m.model({ name: y.m.maybeNull(y.m.string), toname: y.m.maybeNull(y.m.string) }),
-        Sn = y.m
+      var Nn = y.m.model({ name: y.m.maybeNull(y.m.string), toname: y.m.maybeNull(y.m.string) }),
+        In = y.m
           .model("RectangleLabelsModel", {
             id: y.m.optional(y.m.identifier, E),
             pid: y.m.optional(y.m.string, E),
             type: "rectanglelabels",
             children: Ye.unionArray(["labels", "label", "choice"]),
           })
+          .views(function(e) {
+            return {
+              get shouldBeUnselected() {
+                return "single" === e.choice;
+              },
+            };
+          })
           .actions(function(e) {
             return {
+              getSelectedColor: function() {
+                var t = e.children.find(function(e) {
+                  return !0 === e.selected;
+                });
+                return t && t.background;
+              },
+              toStateJSON: function() {},
               fromStateJSON: function(t, n) {
                 if ((e.unselectAll(), !t.value.rectanglelabels)) throw new Error("No labels param");
                 t.id && (e.pid = t.id),
@@ -4509,23 +4529,23 @@
               },
             };
           }),
-        Nn = y.m.compose(
-          nn,
-          xn,
-          Tn,
+        En = y.m.compose(
+          ln,
           Sn,
-          $t,
-        ),
-        In = y.m.compose(
-          "RectangleLabelsModel",
           Nn,
+          In,
+          an,
         ),
-        En = Object(u.c)(function(e) {
+        On = y.m.compose(
+          "RectangleLabelsModel",
+          En,
+        ),
+        Rn = Object(u.c)(function(e) {
           var t = e.item;
-          return l.a.createElement(an, { item: t });
+          return l.a.createElement(sn, { item: t });
         });
-      k.addTag("rectanglelabels", In, En);
-      var On = y.m
+      k.addTag("rectanglelabels", On, Rn);
+      var Cn = y.m
           .model({
             id: y.m.identifier,
             pid: y.m.optional(y.m.string, E),
@@ -4540,8 +4560,8 @@
             opacity: y.m.number,
             strokewidth: y.m.number,
             fillcolor: y.m.maybeNull(y.m.string),
-            strokecolor: y.m.string,
-            states: y.m.maybeNull(y.m.array(y.m.union(nn, sn, In))),
+            strokecolor: y.m.optional(y.m.string, "blue"),
+            states: y.m.maybeNull(y.m.array(y.m.union(ln, dn, On))),
             wp: y.m.maybeNull(y.m.number),
             hp: y.m.maybeNull(y.m.number),
             sw: y.m.maybeNull(y.m.number),
@@ -4551,7 +4571,7 @@
           .views(function(e) {
             return {
               get parent() {
-                return Object(y.f)(e, qn);
+                return Object(y.f)(e, Kn);
               },
               get completion() {
                 return Object(y.g)(e).completionStore.selected;
@@ -4599,24 +4619,28 @@
               },
               toStateJSON: function() {
                 var t = e.parent,
-                  n = t.states()[0],
-                  a = function(a) {
-                    var o = {
-                      id: e.id,
-                      from_name: n.name,
-                      to_name: t.name,
-                      source: t.value,
-                      type: "rectangle",
-                      value: {
-                        x: (100 * e.x) / e.parent.stageWidth,
-                        y: (100 * e.y) / e.parent.stageHeight,
-                        width: (e.width * (e.scaleX || 1) * 100) / e.parent.stageWidth,
-                        height: (e.height * (e.scaleY || 1) * 100) / e.parent.stageHeight,
-                        rotation: e.rotation,
-                      },
-                    };
-                    return e.normalization && (o.normalization = e.normalization), o;
+                  n = t.states()[0];
+                t.states().length > 1 &&
+                  t.states().forEach(function(e) {
+                    "rectanglelabels" === e.type && (n = e);
+                  });
+                var a = function(a) {
+                  var o = {
+                    id: e.id,
+                    from_name: n.name,
+                    to_name: t.name,
+                    source: t.value,
+                    type: "rectangle",
+                    value: {
+                      x: (100 * e.x) / e.parent.stageWidth,
+                      y: (100 * e.y) / e.parent.stageHeight,
+                      width: (e.width * (e.scaleX || 1) * 100) / e.parent.stageWidth,
+                      height: (e.height * (e.scaleY || 1) * 100) / e.parent.stageHeight,
+                      rotation: e.rotation,
+                    },
                   };
+                  return e.normalization && (o.normalization = e.normalization), o;
+                };
                 return e.states && e.states.length
                   ? e.states.map(function(e) {
                       var t = a();
@@ -4626,13 +4650,13 @@
               },
             };
           }),
-        Rn = y.m.compose(
+        _n = y.m.compose(
           "RectRegionModel",
-          Yt,
-          qt,
-          On,
+          Zt,
+          Qt,
+          Cn,
         ),
-        Cn = Object(u.b)("store")(
+        jn = Object(u.b)("store")(
           Object(u.c)(function(e) {
             var t = e.store,
               n = e.item,
@@ -4660,7 +4684,7 @@
                 i.Fragment,
                 null,
                 l.a.createElement(
-                  bn.Rect,
+                  kn.Rect,
                   Object.assign(
                     {
                       x: a,
@@ -4726,10 +4750,10 @@
             );
           }),
         );
-      k.addTag("rectangleregion", Rn, Cn);
-      n(341);
-      var _n = n(312),
-        jn = y.m
+      k.addTag("rectangleregion", _n, jn);
+      n(340);
+      var An = n(311),
+        Dn = y.m
           .model({
             init_x: y.m.optional(y.m.number, 0),
             init_y: y.m.optional(y.m.number, 0),
@@ -4777,7 +4801,7 @@
               },
             };
           }),
-        An = Object(u.c)(function(e) {
+        Mn = Object(u.c)(function(e) {
           var t = e.item,
             n = e.index,
             a = { small: 1, medium: 2, large: 3 },
@@ -4807,7 +4831,7 @@
               });
           return "circle" == t.style
             ? l.a.createElement(
-                bn.Circle,
+                kn.Circle,
                 Object.assign(
                   {
                     key: n,
@@ -4824,7 +4848,7 @@
                 ),
               )
             : l.a.createElement(
-                bn.Rect,
+                kn.Rect,
                 Object.assign(
                   {
                     key: n,
@@ -4843,7 +4867,7 @@
                 ),
               );
         }),
-        Dn = y.m.model({
+        Bn = y.m.model({
           name: y.m.maybeNull(y.m.string),
           toname: y.m.maybeNull(y.m.string),
           opacity: y.m.optional(y.m.string, "0.6"),
@@ -4853,7 +4877,7 @@
           pointsize: y.m.optional(y.m.string, "medium"),
           pointstyle: y.m.optional(y.m.string, "rectangle"),
         }),
-        Mn = y.m
+        Pn = y.m
           .model({ id: y.m.identifier, type: "polygon", _value: y.m.optional(y.m.string, "") })
           .views(function(e) {
             return {
@@ -4880,20 +4904,20 @@
           .actions(function(e) {
             return {};
           }),
-        Bn = y.m.compose(
+        Hn = y.m.compose(
           "PolygonModel",
-          Dn,
-          Mn,
+          Bn,
+          Pn,
         ),
-        Pn = Object(u.b)("store")(
+        zn = Object(u.b)("store")(
           Object(u.c)(function(e) {
             e.store, e.item;
             return null;
           }),
         );
-      k.addTag("polygon", Bn, Pn);
-      var Hn = y.m.model({ name: y.m.maybeNull(y.m.string), toname: y.m.maybeNull(y.m.string) }),
-        zn = y.m
+      k.addTag("polygon", Hn, zn);
+      var Wn = y.m.model({ name: y.m.maybeNull(y.m.string), toname: y.m.maybeNull(y.m.string) }),
+        Ln = y.m
           .model("PolygonLabelsModel", {
             id: y.m.optional(y.m.identifier, E),
             pid: y.m.optional(y.m.string, E),
@@ -4913,23 +4937,23 @@
               },
             };
           }),
-        Wn = y.m.compose(
-          nn,
-          Bn,
+        Fn = y.m.compose(
+          ln,
           Hn,
-          zn,
-          $t,
-        ),
-        Ln = y.m.compose(
-          "PolygonLabelsModel",
           Wn,
+          Ln,
+          an,
         ),
-        Fn = Object(u.c)(function(e) {
+        Jn = y.m.compose(
+          "PolygonLabelsModel",
+          Fn,
+        ),
+        Gn = Object(u.c)(function(e) {
           var t = e.item;
-          return l.a.createElement(an, { item: t });
+          return l.a.createElement(sn, { item: t });
         });
-      k.addTag("polygonlabels", Ln, Fn);
-      var Jn = y.m
+      k.addTag("polygonlabels", Jn, Gn);
+      var Un = y.m
           .model({
             id: y.m.identifier,
             pid: y.m.optional(y.m.string, E),
@@ -4941,8 +4965,8 @@
             pointsize: y.m.string,
             pointstyle: y.m.string,
             closed: y.m.optional(y.m.boolean, !1),
-            points: y.m.array(jn, []),
-            states: y.m.maybeNull(y.m.array(y.m.union(nn, sn, Ln))),
+            points: y.m.array(Dn, []),
+            states: y.m.maybeNull(y.m.array(y.m.union(ln, dn, Jn))),
             mouseOverStartPoint: y.m.optional(y.m.boolean, !1),
             fromName: y.m.maybeNull(y.m.string),
             wp: y.m.maybeNull(y.m.number),
@@ -4951,7 +4975,7 @@
           .views(function(e) {
             return {
               get parent() {
-                return Object(y.f)(e, qn);
+                return Object(y.f)(e, Kn);
               },
               get completion() {
                 return Object(y.g)(e).completionStore.selected;
@@ -4997,7 +5021,7 @@
                     s = o[r][1],
                     c = o[i][0],
                     u = o[i][1];
-                  s > n != u > n && t < ((c - l) * (n - s)) / (u - s) + l && (Object(_n.a)("inside"), (a = !a));
+                  s > n != u > n && t < ((c - l) * (n - s)) / (u - s) + l && (Object(An.a)("inside"), (a = !a));
                 }
                 return a;
               },
@@ -5074,13 +5098,13 @@
               },
             };
           }),
-        Gn = y.m.compose(
+        Vn = y.m.compose(
           "PolygonRegionModel",
-          Yt,
-          qt,
-          Jn,
+          Zt,
+          Qt,
+          Un,
         );
-      var Un = Object(u.b)("store")(
+      var Yn = Object(u.b)("store")(
         Object(u.c)(function(e) {
           var t = e.store,
             n = e.item,
@@ -5107,7 +5131,7 @@
               null,
               n.mouseOverStartPoint,
               l.a.createElement(
-                bn.Line,
+                kn.Line,
                 Object.assign(
                   {
                     points: n.linePoints(),
@@ -5167,26 +5191,26 @@
               ),
               !n.closed &&
                 n.points.map(function(e, t) {
-                  return l.a.createElement(An, { item: e, index: t });
+                  return l.a.createElement(Mn, { item: e, index: t });
                 }),
               n.closed &&
                 n.selected &&
                 n.points.map(function(e, t) {
-                  return l.a.createElement(An, { item: e, index: t });
+                  return l.a.createElement(Mn, { item: e, index: t });
                 }),
             )
           );
         }),
       );
-      k.addTag("polygonregion", Gn, Un);
-      var Vn = y.m.model({
+      k.addTag("polygonregion", Vn, Yn);
+      var qn = y.m.model({
           name: y.m.maybeNull(y.m.string),
           value: y.m.maybeNull(y.m.string),
           resize: y.m.maybeNull(y.m.string),
           width: y.m.optional(y.m.string, "100%"),
           maxwidth: y.m.optional(y.m.string, "750px"),
         }),
-        Yn = y.m
+        Xn = y.m
           .model({
             id: y.m.identifier,
             type: "image",
@@ -5195,9 +5219,9 @@
             stageHeight: y.m.optional(y.m.integer, 1),
             naturalWidth: y.m.optional(y.m.integer, 1),
             naturalHeight: y.m.optional(y.m.integer, 1),
-            selectedShape: y.m.safeReference(y.m.union(Rn, Gn)),
-            activePolygon: y.m.maybeNull(y.m.safeReference(Gn)),
-            shapes: y.m.array(y.m.union(Rn, Gn), []),
+            selectedShape: y.m.safeReference(y.m.union(_n, Vn)),
+            activePolygon: y.m.maybeNull(y.m.safeReference(Vn)),
+            shapes: y.m.array(y.m.union(_n, Vn), []),
           })
           .views(function(e) {
             return {
@@ -5212,7 +5236,14 @@
                 return e.completion.toNames.get(e.name);
               },
               controlButton: function() {
-                return e.completion.toNames.get(e.name)[0];
+                var t = e.completion.toNames.get(e.name),
+                  n = t[0];
+                return (
+                  t.forEach(function(e) {
+                    "rectanglelabels" === e.type && (n = e);
+                  }),
+                  n
+                );
               },
               controlButtonType: function() {
                 var t = e.controlButton();
@@ -5289,16 +5320,18 @@
                         })
                       : null;
                   if (0 === l.length) return;
-                  e._addRect(t, l),
+                  l.forEach(function(n) {
+                    "choices" !== n.type && n.isSelected && e._addRect(t, n);
+                  }),
                     i &&
                       i.forEach(function(e) {
-                        return e.unselectAll();
+                        console.log(e), "choices" !== e.type && e.unselectAll();
                       });
                 }
               },
               _addRect: function(t, n) {
                 var a = e.controlButton().rectstrokecolor;
-                n && n.length && (a = n[0].getSelectedColor());
+                n && (a = n.getSelectedColor());
                 e.stageWidth, e.naturalWidth, e.stageHeight, e.naturalHeight;
                 var o = t.evt.offsetX,
                   r = t.evt.offsetY;
@@ -5306,20 +5339,22 @@
               },
               __addRect: function(t, n, a, o, r, i, l) {
                 var s = e.controlButton(),
-                  c = Rn.create({
-                    id: E(),
-                    x: t,
-                    y: n,
-                    width: a,
-                    height: o,
-                    opacity: parseFloat(s.opacity),
-                    fillcolor: s.fillcolor,
-                    strokewidth: parseInt(s.strokewidth),
-                    strokecolor: r,
-                    states: i,
-                    coordstype: l,
-                  });
-                e._addShape(c);
+                  c = i;
+                i.length || (c = [i]);
+                var u = _n.create({
+                  id: E(),
+                  x: t,
+                  y: n,
+                  width: a,
+                  height: o,
+                  opacity: parseFloat(s.opacity),
+                  fillcolor: s.fillcolor,
+                  strokewidth: parseInt(s.strokewidth),
+                  strokecolor: r,
+                  states: c,
+                  coordstype: l,
+                });
+                e._addShape(u);
               },
               onResizeSize: function(t, n) {
                 (e.stageHeight = n), (e.stageWidth = t);
@@ -5332,7 +5367,7 @@
                   if (e.activePolygon) a = e.activePolygon;
                   else {
                     var r = e.controlButton();
-                    (a = Gn.create({
+                    (a = Vn.create({
                       id: E(),
                       x: t.evt.offsetX - 5,
                       y: t.evt.offsetY - 5,
@@ -5375,13 +5410,13 @@
               },
             };
           }),
-        qn = y.m.compose(
+        Kn = y.m.compose(
           "ImageModel",
-          Vn,
-          Yn,
+          qn,
+          Xn,
           tt,
         ),
-        Xn = (function(e) {
+        Zn = (function(e) {
           function t() {
             return Object(m.a)(this, t), Object(h.a)(this, Object(p.a)(t).apply(this, arguments));
           }
@@ -5416,7 +5451,7 @@
                 key: "render",
                 value: function() {
                   var e = this;
-                  return l.a.createElement(bn.Transformer, {
+                  return l.a.createElement(kn.Transformer, {
                     resizeEnabled: !0,
                     rotateEnabled: this.props.rotateEnabled,
                     anchorSize: 8,
@@ -5430,7 +5465,7 @@
             t
           );
         })(l.a.Component),
-        Kn = (function(e) {
+        Qn = (function(e) {
           function t() {
             var e, n;
             Object(m.a)(this, t);
@@ -5483,7 +5518,7 @@
                         l.a.createElement("img", { style: o, src: n._value, onLoad: n.updateIE }),
                       ),
                       l.a.createElement(
-                        bn.Stage,
+                        kn.Stage,
                         {
                           ref: function(e) {
                             n._setStageRef(e);
@@ -5496,12 +5531,12 @@
                           style: { position: "absolute", top: 0, left: 0 },
                         },
                         l.a.createElement(
-                          bn.Layer,
+                          kn.Layer,
                           null,
                           n.shapes.map(function(e) {
                             return _.renderItem(e);
                           }),
-                          l.a.createElement(Xn, { rotateEnabled: r, selectedShapeName: this.props.item.selectedShape }),
+                          l.a.createElement(Zn, { rotateEnabled: r, selectedShapeName: this.props.item.selectedShape }),
                         ),
                       ),
                     );
@@ -5520,16 +5555,16 @@
             t
           );
         })(i.Component),
-        Zn = Object(u.b)("store")(Object(u.c)(Kn));
-      k.addTag("image", qn, Zn);
-      var Qn = n(173),
-        $n = n(222),
-        ea = n.n($n),
-        ta = function e(t, n, a) {
+        $n = Object(u.b)("store")(Object(u.c)(Qn));
+      k.addTag("image", Kn, $n);
+      var ea = n(161),
+        ta = n(212),
+        na = n.n(ta),
+        aa = function e(t, n, a) {
           var o = arguments.length > 3 && void 0 !== arguments[3] ? arguments[3] : {};
           Object(m.a)(this, e), (this.start = t), (this.end = n), (this.text = a), (this.data = o);
         },
-        na = (function(e) {
+        oa = (function(e) {
           function t() {
             return Object(m.a)(this, t), Object(h.a)(this, Object(p.a)(t).apply(this, arguments));
           }
@@ -5555,7 +5590,7 @@
             t
           );
         })(i.Component),
-        aa = Object(u.b)("store")(
+        ra = Object(u.b)("store")(
           Object(u.c)(function(e) {
             var t,
               n = e.store,
@@ -5601,7 +5636,7 @@
               }),
               (h = u.reduceRight(function(e, n) {
                 return l.a.createElement(
-                  na,
+                  oa,
                   { style: { background: t, padding: "2px 0" }, position: s, overlap: n, keyNode: d(a) },
                   e,
                 );
@@ -5609,10 +5644,10 @@
             return h;
           }),
         ),
-        oa = function(e) {
+        ia = function(e) {
           var t = { wordWrap: "break-word" };
           return l.a.createElement(
-            aa,
+            ra,
             {
               id: e.id,
               highlightStyle: Object.assign({}, t, e.highlightStyle),
@@ -5628,16 +5663,16 @@
             ),
           );
         },
-        ra = function(e) {
+        la = function(e) {
           return l.a.createElement(
-            aa,
+            ra,
             { id: e.id, highlightStyle: e.highlightStyle, charIndex: e.charIndex, range: e.range, overlap: e.overlap },
             "".concat(e.text[e.charIndex]).concat(e.text[e.charIndex + 1]),
           );
         },
-        ia = n(313),
-        la = n.n(ia),
-        sa = (function(e) {
+        sa = n(312),
+        ca = n.n(sa),
+        ua = (function(e) {
           function t() {
             var e;
             return Object(m.a)(this, t), ((e = Object(h.a)(this, Object(p.a)(t).call(this))).dismissMouseUp = 0), e;
@@ -5670,10 +5705,10 @@
                   return (
                     this.props.ranges &&
                       this.props.ranges.map(function(t) {
-                        return e >= t.start && e <= t.end ? (o = [].concat(Object(Qn.a)(o), [t.id])) : o;
+                        return e >= t.start && e <= t.end ? (o = [].concat(Object(ea.a)(o), [t.id])) : o;
                       }),
                     l.a.createElement(
-                      aa,
+                      ra,
                       {
                         id: this.props.id,
                         overlap: o,
@@ -5694,9 +5729,9 @@
                   return (
                     this.props.ranges &&
                       this.props.ranges.map(function(t) {
-                        return e >= t.start && e <= t.end ? (n = [].concat(Object(Qn.a)(n), [t.id])) : n;
+                        return e >= t.start && e <= t.end ? (n = [].concat(Object(ea.a)(n), [t.id])) : n;
                       }),
-                    l.a.createElement(ra, {
+                    l.a.createElement(la, {
                       text: this.props.text,
                       id: this.props.id,
                       overlap: n,
@@ -5715,9 +5750,9 @@
                   return (
                     this.props.ranges &&
                       this.props.ranges.map(function(t) {
-                        return e >= t.start && e <= t.end ? (a = [].concat(Object(Qn.a)(a), [t.id])) : a;
+                        return e >= t.start && e <= t.end ? (a = [].concat(Object(ea.a)(a), [t.id])) : a;
                       }),
-                    l.a.createElement(oa, {
+                    l.a.createElement(ia, {
                       url: n,
                       id: this.props.id,
                       overlap: a,
@@ -5757,7 +5792,7 @@
                   if (!r.startContainer.parentNode.dataset.hint && !r.endContainer.parentNode.dataset.hint) {
                     var i = parseInt(r.startContainer.parentNode.dataset.position),
                       l = parseInt(r.endContainer.parentNode.dataset.position),
-                      s = new ta(i < l ? i : l, i < l ? l : i, e, Object(S.a)({}, this.props, { ranges: void 0 }));
+                      s = new aa(i < l ? i : l, i < l ? l : i, e, Object(S.a)({}, this.props, { ranges: void 0 }));
                     this.props.onTextHighlighted(s);
                   }
                 },
@@ -5789,12 +5824,12 @@
                   for (var e, t = [], n = 0; n < this.props.text.length; n++) {
                     var a = this.getRange(n),
                       o = $.Checkers.getUrl(n, this.props.text),
-                      r = ea()().test(this.props.text[n] + this.props.text[n + 1]),
+                      r = na()().test(this.props.text[n] + this.props.text[n + 1]),
                       i = this.getNode(n, a, this.props.text, o, r);
                     if ((o.length ? (n += o.length - 1) : r && n++, a)) {
                       e = a;
                       for (var l = [i], s = n + 1; s < parseInt(a.end) + 1; s++) {
-                        ea()().test("".concat(this.props.text[s]).concat(this.props.text[s + 1]))
+                        na()().test("".concat(this.props.text[s]).concat(this.props.text[s + 1]))
                           ? (l.push(this.getEmojiNode(s, a)), s++)
                           : l.push(this.getLetterNode(s, a)),
                           (n = s);
@@ -5812,7 +5847,7 @@
                   return l.a.createElement(
                     "div",
                     {
-                      className: la.a.block,
+                      className: ca.a.block,
                       style: this.props.style,
                       onMouseUp: this.onMouseUp.bind(this),
                       onMouseDown: this.onMouseDown.bind(this),
@@ -5827,10 +5862,10 @@
             t
           );
         })(i.Component),
-        ca = Object(u.c)(sa),
-        ua = n(314),
-        ma = n.n(ua),
-        da = y.m
+        ma = Object(u.c)(ua),
+        da = n(313),
+        ha = n.n(da),
+        pa = y.m
           .model("TextRegionModel", {
             id: y.m.optional(y.m.identifier, E),
             pid: y.m.optional(y.m.string, E),
@@ -5838,12 +5873,12 @@
             start: y.m.integer,
             end: y.m.integer,
             text: y.m.string,
-            states: y.m.maybeNull(y.m.array(y.m.union(nn, sn))),
+            states: y.m.maybeNull(y.m.array(y.m.union(ln, dn))),
           })
           .views(function(e) {
             return {
               get parent() {
-                return Object(y.f)(e, ya);
+                return Object(y.f)(e, wa);
               },
               get completion() {
                 return Object(y.g)(e).completionStore.selected;
@@ -5875,13 +5910,13 @@
               },
             };
           }),
-        ha = y.m.compose(
+        fa = y.m.compose(
           "TextRegionModel",
-          Yt,
-          qt,
-          da,
+          Zt,
+          Qt,
+          pa,
         ),
-        pa = function(e) {
+        ga = function(e) {
           var t = e.state,
             n = t.getSelectedString(),
             a = { background: $.Colors.convertToRGBA(t.getSelectedColor(), 0.3) };
@@ -5889,12 +5924,12 @@
             e.style && (a = Object(S.a)({}, a, { outline: e.style.outline })),
             l.a.createElement(
               ue,
-              { className: ma.a.state, style: a },
+              { className: ha.a.state, style: a },
               l.a.createElement("span", { "data-hint": !0 }, "\xa0[", n, "]"),
             )
           );
         },
-        fa = Object(u.b)("store")(
+        va = Object(u.b)("store")(
           Object(u.c)(function(e) {
             var t = e.store,
               n = (e.item, e.letterGroup),
@@ -5916,7 +5951,7 @@
               (a.states && a.states.length) > 0 &&
                 a.states.map(function(e) {
                   i.push(
-                    l.a.createElement(pa, {
+                    l.a.createElement(ga, {
                       key: a.id,
                       state: e,
                       bg: o,
@@ -5945,8 +5980,8 @@
             );
           }),
         );
-      k.addTag("textrange", ha, fa);
-      var ga = y.m.model("TextModel", {
+      k.addTag("textrange", fa, va);
+      var ya = y.m.model("TextModel", {
           name: y.m.maybeNull(y.m.string),
           value: y.m.maybeNull(y.m.string),
           selelectwithoutlabel: y.m.optional(y.m.string, "false"),
@@ -5954,11 +5989,11 @@
           adjustselection: y.m.optional(y.m.string, "true"),
           selectionenabled: y.m.optional(y.m.string, "true"),
         }),
-        va = y.m
+        ba = y.m
           .model("TextModel", {
             id: y.m.optional(y.m.identifier, E),
             type: "text",
-            regions: y.m.array(ha),
+            regions: y.m.array(fa),
             _value: y.m.optional(y.m.string, ""),
           })
           .views(function(e) {
@@ -5997,7 +6032,7 @@
                 e._value = et(e.value, t.task.dataObj);
               },
               _addRegion: function(t) {
-                var n = ha.create(t);
+                var n = fa.create(t);
                 return e.regions.push(n), e.completion.addRegion(n), n;
               },
               addRegion: function(t) {
@@ -6044,12 +6079,12 @@
               },
             };
           }),
-        ya = y.m.compose(
+        wa = y.m.compose(
           "TextModel",
-          ga,
-          va,
+          ya,
+          ba,
         ),
-        ba = (function(e) {
+        ka = (function(e) {
           function t() {
             return Object(m.a)(this, t), Object(h.a)(this, Object(p.a)(t).apply(this, arguments));
           }
@@ -6059,7 +6094,7 @@
               {
                 key: "renderRegion",
                 value: function(e, t, n, a) {
-                  return l.a.createElement(fa, {
+                  return l.a.createElement(va, {
                     key: t.id,
                     store: this.props.store,
                     item: this.props.item,
@@ -6081,7 +6116,7 @@
                     l.a.createElement(
                       "div",
                       { style: t },
-                      l.a.createElement(ca, {
+                      l.a.createElement(ma, {
                         id: e.id,
                         key: e.id,
                         text: e._value,
@@ -6101,36 +6136,33 @@
             t
           );
         })(i.Component),
-        wa = Object(u.b)("store")(Object(u.c)(ba));
-      k.addTag("text", ya, wa);
-      var ka = n(608),
-        xa = n(619),
-        Ta =
-          (l.a.Component,
-          y.m.model({
-            selected: y.m.optional(y.m.boolean, !1),
-            alias: y.m.maybeNull(y.m.string),
-            value: y.m.maybeNull(y.m.string),
-            hotkey: y.m.maybeNull(y.m.string),
-            style: y.m.maybeNull(y.m.string),
-          })),
-        Sa = y.m
+        xa = Object(u.b)("store")(Object(u.c)(ka));
+      k.addTag("text", wa, xa);
+      var Ta = n(608),
+        Sa = y.m.model({
+          selected: y.m.optional(y.m.boolean, !1),
+          alias: y.m.maybeNull(y.m.string),
+          value: y.m.maybeNull(y.m.string),
+          hotkey: y.m.maybeNull(y.m.string),
+          style: y.m.maybeNull(y.m.string),
+        }),
+        Na = y.m
           .model({ type: "choice", _value: y.m.optional(y.m.string, "") })
           .views(function(e) {
             return {
               get isCheckbox() {
-                var t = Object(y.f)(e, Ra).choice;
+                var t = Object(y.f)(e, _a).choice;
                 return "multiple" === t || "single" === t;
               },
               get name() {
-                return Object(y.f)(e, Ra).name;
+                return Object(y.f)(e, _a).name;
               },
             };
           })
           .actions(function(e) {
             return {
               toggleSelected: function() {
-                var t = Object(y.f)(e, Ra);
+                var t = Object(y.f)(e, _a);
                 t.shouldBeUnselected && t.unselectAll(), e.markSelected(!e.selected);
               },
               markSelected: function(t) {
@@ -6141,13 +6173,13 @@
               },
             };
           }),
-        Na = y.m.compose(
+        Ia = y.m.compose(
           "ChoiceModel",
-          Ta,
           Sa,
+          Na,
           tt,
         ),
-        Ia = Object(u.b)("store")(
+        Ea = Object(u.b)("store")(
           Object(u.c)(function(e) {
             var t = e.item,
               n = e.store,
@@ -6160,7 +6192,7 @@
               return l.a.createElement(
                 "div",
                 { style: o },
-                l.a.createElement(ka.a, {
+                l.a.createElement(Ta.a, {
                   name: t._value,
                   label: t._value,
                   onChange: function(e) {
@@ -6198,19 +6230,19 @@
             );
           }),
         );
-      k.addTag("choice", Na, Ia);
-      var Ea = y.m.model({
+      k.addTag("choice", Ia, Ea);
+      var Oa = y.m.model({
           name: y.m.string,
           toname: y.m.maybeNull(y.m.string),
-          showinline: y.m.optional(y.m.string, "false"),
+          showinline: y.m.optional(y.m.boolean, !1),
           choice: y.m.optional(y.m.enumeration(["single", "single-radio", "multiple"]), "single"),
         }),
-        Oa = y.m
+        Ra = y.m
           .model({
             id: y.m.optional(y.m.identifier, E),
             pid: y.m.optional(y.m.string, E),
             type: "choices",
-            children: Ye.unionArray(["choice"]),
+            children: Ye.unionArray(["choice", "choices", "labels", "label"]),
           })
           .views(function(e) {
             return {
@@ -6245,13 +6277,18 @@
               },
             };
           }),
-        Ra = y.m.compose(
-          "ChoicesModel",
-          Ea,
+        Ca = y.m.compose(
+          ln,
+          Sn,
           Oa,
-          $t,
+          Ra,
+          an,
         ),
-        Ca = Object(u.c)(function(e) {
+        _a = y.m.compose(
+          "ChoicesModel",
+          Ca,
+        ),
+        ja = Object(u.c)(function(e) {
           var t = e.item;
           return l.a.createElement(
             "div",
@@ -6259,15 +6296,15 @@
             l.a.createElement(
               Ie.a,
               null,
-              "true" === t.showinline
+              t.showinline
                 ? l.a.createElement(Ie.a.Group, { inline: !0, style: { flexWrap: "wrap" } }, _.renderChildren(t))
                 : l.a.createElement(Ie.a.Group, { grouped: !0 }, _.renderChildren(t)),
             ),
           );
         });
-      k.addTag("choices", Ra, Ca);
-      var _a = n(618),
-        ja = y.m
+      k.addTag("choices", _a, ja);
+      var Aa = n(619),
+        Da = y.m
           .model("TextAreaRegionModel", {
             id: y.m.optional(y.m.identifier, E),
             pid: y.m.optional(y.m.string, E),
@@ -6277,20 +6314,20 @@
           .views(function(e) {
             return {
               get parent() {
-                return Object(y.f)(e, Pa);
+                return Object(y.f)(e, za);
               },
               get completion() {
                 return Object(y.g)(e).completionStore.selected;
               },
             };
           }),
-        Aa = y.m.compose(
+        Ma = y.m.compose(
           "TextAreaRegionModel",
-          Yt,
-          qt,
-          ja,
+          Zt,
+          Qt,
+          Da,
         ),
-        Da = Object(u.b)("store")(
+        Ba = Object(u.b)("store")(
           Object(u.c)(function(e) {
             var t = e.store,
               n = e.item,
@@ -6300,7 +6337,7 @@
                 ? (a = Object(S.a)({}, a, { border: "1px solid red" }))
                 : n.highlighted && (a = Object(S.a)({}, a, { border: "2px solid red" })),
               l.a.createElement(
-                _a.a,
+                Aa.a,
                 {
                   className: "warning",
                   style: a,
@@ -6317,8 +6354,8 @@
             );
           }),
         );
-      k.addTag("textarearegion", Aa, Da);
-      var Ma = y.m.model({
+      k.addTag("textarearegion", Ma, Ba);
+      var Pa = y.m.model({
           allowSubmit: y.m.optional(y.m.string, "true"),
           label: y.m.optional(y.m.string, ""),
           name: y.m.maybeNull(y.m.string),
@@ -6327,11 +6364,11 @@
           placeholder: y.m.maybeNull(y.m.string),
           maxsubmissions: y.m.maybeNull(y.m.string),
         }),
-        Ba = y.m
+        Ha = y.m
           .model({
             id: y.m.optional(y.m.identifier, E),
             type: "textarea",
-            regions: y.m.array(Aa),
+            regions: y.m.array(Ma),
             _value: y.m.optional(y.m.string, ""),
           })
           .views(function(e) {
@@ -6357,7 +6394,7 @@
                 e._value = t;
               },
               addText: function(t, n) {
-                var a = Aa.create({ pid: n, _value: t });
+                var a = Ma.create({ pid: n, _value: t });
                 return e.regions.push(a), e.completion.addRegion(a), a;
               },
               beforeSend: function() {
@@ -6379,13 +6416,13 @@
               },
             };
           }),
-        Pa = y.m.compose(
+        za = y.m.compose(
           "TextAreaModel",
-          Ma,
-          Ba,
+          Pa,
+          Ha,
           tt,
         ),
-        Ha = Object(u.c)(function(e) {
+        Wa = Object(u.c)(function(e) {
           var t = e.item;
           return l.a.createElement(
             "div",
@@ -6395,7 +6432,7 @@
                 "div",
                 { style: { marginTop: "1em", marginBottom: "1em" } },
                 t.regions.map(function(e) {
-                  return l.a.createElement(Da, { item: e });
+                  return l.a.createElement(Ba, { item: e });
                 }),
               ),
             t.showSubmit &&
@@ -6419,11 +6456,11 @@
               ),
           );
         });
-      k.addTag("textarea", Pa, Ha);
-      var za = n(80),
-        Wa = n(109),
-        La = n.n(Wa),
-        Fa = y.m
+      k.addTag("textarea", za, Wa);
+      var La = n(80),
+        Fa = n(110),
+        Ja = n.n(Fa),
+        Ga = y.m
           .model({
             backgroundColor: y.m.optional(y.m.string, "transparent"),
             value: y.m.maybeNull(y.m.string),
@@ -6447,7 +6484,7 @@
               },
             };
           }),
-        Ja = y.m.model({
+        Ua = y.m.model({
           axis: y.m.optional(y.m.string, "y"),
           lockaxis: y.m.maybeNull(y.m.string),
           elementvalue: y.m.maybeNull(y.m.string),
@@ -6456,12 +6493,12 @@
           name: y.m.maybeNull(y.m.string),
           value: y.m.maybeNull(y.m.string),
         }),
-        Ga = y.m
+        Va = y.m
           .model({
             id: y.m.optional(y.m.identifier, E),
             type: "list",
             update: y.m.optional(y.m.number, 1),
-            regions: y.m.array(Fa),
+            regions: y.m.array(Ga),
           })
           .views(function(e) {
             return {};
@@ -6472,7 +6509,7 @@
                 e.update = e.update + 1;
               },
               addRegion: function(t, n) {
-                var a = Fa.create({ value: e.elementvalue, idx: n, _value: $e(e.elementvalue, t[n]) });
+                var a = Ga.create({ value: e.elementvalue, idx: n, _value: $e(e.elementvalue, t[n]) });
                 e.regions.push(a);
               },
               updateValue: function(t) {
@@ -6493,8 +6530,8 @@
                 n !== a &&
                   (e.sortedhighlightcolor && e.regions[n].setBG(e.sortedhighlightcolor),
                   e.regions[n].setSelected(!0),
-                  e._value && (e._value = La()(e._value, n, a)),
-                  (e.regions = La()(e.regions, n, a)),
+                  e._value && (e._value = Ja()(e._value, n, a)),
+                  (e.regions = Ja()(e.regions, n, a)),
                   e.setUpdate());
               },
               toStateJSON: function() {
@@ -6543,26 +6580,26 @@
               },
             };
           }),
-        Ua = y.m.compose(
+        Ya = y.m.compose(
           "ListModel",
-          Ja,
-          Ga,
+          Ua,
+          Va,
         ),
-        Va = Object(za.sortableHandle)(function() {
+        qa = Object(La.c)(function() {
           return l.a.createElement("div", { className: "drag-handle" });
         });
-      function Ya() {
+      function Xa() {
         try {
           return "undefined" !== typeof window.orientation || -1 !== navigator.userAgent.indexOf("IEMobile");
         } catch (e) {
           return !1;
         }
       }
-      var qa = Object(za.SortableElement)(function(e) {
+      var Ka = Object(La.b)(function(e) {
           var t,
             n = e.item,
             a = e.value;
-          Ya && (t = "noselect");
+          Xa && (t = "noselect");
           var o = {
             text: function(e) {
               return l.a.createElement("span", { className: t }, e._value);
@@ -6593,18 +6630,18 @@
                 );
               },
             },
-            l.a.createElement(Va, null),
+            l.a.createElement(qa, null),
             o[n.elementtag.toLowerCase()](a),
           );
         }),
-        Xa = Object(za.SortableContainer)(function(e) {
+        Za = Object(La.a)(function(e) {
           var t = e.item,
             n = e.items;
           return l.a.createElement(
             j.a,
             { celled: !0 },
             n.map(function(e, n) {
-              return l.a.createElement(qa, {
+              return l.a.createElement(Ka, {
                 key: "item-".concat(n),
                 index: n,
                 value: e,
@@ -6615,25 +6652,25 @@
             }),
           );
         }),
-        Ka = Object(u.c)(function(e) {
+        Qa = Object(u.c)(function(e) {
           e.store;
           var t = e.item,
             n = {};
           return (
-            Ya() ? (n.pressDelay = 100) : (n.distance = 7),
+            Xa() ? (n.pressDelay = 100) : (n.distance = 7),
             l.a.createElement(
               "div",
               null,
               l.a.createElement(
-                Xa,
+                Za,
                 Object.assign({ update: t.update, item: t, items: t.regions, onSortEnd: t.moveItems }, n),
               ),
             )
           );
         }),
-        Za = Object(u.b)("store")(Object(u.c)(Ka));
-      k.addTag("list", Ua, Za);
-      var Qa = y.m
+        $a = Object(u.b)("store")(Object(u.c)(Qa));
+      k.addTag("list", Ya, $a);
+      var eo = y.m
           .model({
             backgroundColor: y.m.optional(y.m.string, "transparent"),
             value: y.m.maybeNull(y.m.string),
@@ -6657,7 +6694,7 @@
               },
             };
           }),
-        $a = y.m.model({
+        to = y.m.model({
           axis: y.m.optional(y.m.string, "y"),
           lockaxis: y.m.maybeNull(y.m.string),
           elementtag: y.m.optional(y.m.string, "Text"),
@@ -6667,12 +6704,12 @@
           name: y.m.maybeNull(y.m.string),
           value: y.m.maybeNull(y.m.string),
         }),
-        eo = y.m
+        no = y.m
           .model({
             id: y.m.optional(y.m.identifier, E),
             type: "ranker",
             update: y.m.optional(y.m.number, 1),
-            regions: y.m.array(Qa),
+            regions: y.m.array(eo),
           })
           .views(function(e) {
             return {};
@@ -6683,7 +6720,7 @@
                 e.update = e.update + 1;
               },
               _addRegion: function(t, n) {
-                var a = Qa.create({ value: t, idx: n, _value: t });
+                var a = eo.create({ value: t, idx: n, _value: t });
                 e.regions.push(a);
               },
               moveItems: function(t) {
@@ -6692,8 +6729,8 @@
                 n != a &&
                   (e.sortedhighlightcolor && e.regions[n].setBG(e.sortedhighlightcolor),
                   e.regions[n].setSelected(!0),
-                  e._value && (e._value = La()(e._value, n, a)),
-                  (e.regions = La()(e.regions, n, a)),
+                  e._value && (e._value = Ja()(e._value, n, a)),
+                  (e.regions = Ja()(e.regions, n, a)),
                   e.setUpdate());
               },
               toStateJSON: function() {
@@ -6718,26 +6755,26 @@
               },
             };
           }),
-        to = y.m.compose(
+        ao = y.m.compose(
           "RankerModel",
-          $a,
-          eo,
+          to,
+          no,
         ),
-        no = Object(za.sortableHandle)(function() {
+        oo = Object(La.c)(function() {
           return l.a.createElement("div", { className: "drag-handle" });
         });
-      function ao() {
+      function ro() {
         try {
           return "undefined" !== typeof window.orientation || -1 !== navigator.userAgent.indexOf("IEMobile");
         } catch (e) {
           return !1;
         }
       }
-      var oo = Object(za.SortableElement)(function(e) {
+      var io = Object(La.b)(function(e) {
           var t,
             n = e.item,
             a = e.value;
-          ao && (t = "noselect");
+          ro && (t = "noselect");
           var o = {
             text: function(e) {
               return l.a.createElement("span", { className: t }, e._value);
@@ -6768,18 +6805,18 @@
                 );
               },
             },
-            l.a.createElement(no, null),
+            l.a.createElement(oo, null),
             o[n.elementtag.toLowerCase()](a),
           );
         }),
-        ro = Object(za.SortableContainer)(function(e) {
+        lo = Object(La.a)(function(e) {
           var t = e.item,
             n = e.items;
           return l.a.createElement(
             j.a,
             { celled: !0 },
             n.map(function(e, n) {
-              return l.a.createElement(oo, {
+              return l.a.createElement(io, {
                 key: "item-".concat(n),
                 index: n,
                 value: e,
@@ -6790,27 +6827,27 @@
             }),
           );
         }),
-        io = Object(u.c)(function(e) {
+        so = Object(u.c)(function(e) {
           e.store;
           var t = e.item,
             n = {};
           return (
-            ao() ? (n.pressDelay = 100) : (n.distance = 7),
+            ro() ? (n.pressDelay = 100) : (n.distance = 7),
             l.a.createElement(
               "div",
               null,
               l.a.createElement(
-                ro,
+                lo,
                 Object.assign({ update: t.update, item: t, items: t.regions, onSortEnd: t.moveItems }, n),
               ),
             )
           );
         }),
-        lo = Object(u.b)("store")(Object(u.c)(io));
-      k.addTag("ranker", to, lo);
-      var so = n(171),
-        co = n.n(so),
-        uo = Object(u.b)("store")(
+        co = Object(u.b)("store")(Object(u.c)(so));
+      k.addTag("ranker", ao, co);
+      var uo = n(159),
+        mo = n.n(uo),
+        ho = Object(u.b)("store")(
           Object(u.c)(
             (function(e) {
               function t() {
@@ -6864,7 +6901,7 @@
                           : t.completionStore.currentCompletion || t.completionStore.currentPrediction
                           ? l.a.createElement(
                               "div",
-                              { className: co.a.editor },
+                              { className: mo.a.editor },
                               l.a.createElement(Te, { store: t }),
                               l.a.createElement(
                                 u.a,
@@ -6881,7 +6918,7 @@
                                     ),
                                   l.a.createElement(
                                     "div",
-                                    { className: co.a.common },
+                                    { className: mo.a.common },
                                     l.a.createElement(
                                       ye,
                                       null,
@@ -6890,7 +6927,7 @@
                                     ),
                                     l.a.createElement(
                                       "div",
-                                      { className: co.a.menu },
+                                      { className: mo.a.menu },
                                       t.hasInterface("completions:menu") && l.a.createElement(oe, { store: t }),
                                       t.hasInterface("predictions:menu") && l.a.createElement(le, { store: t }),
                                       t.hasInterface("side-column") && l.a.createElement(Ue, { store: t }),
@@ -6915,9 +6952,9 @@
           "[::1]" === window.location.hostname ||
           window.location.hostname.match(/^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/),
       );
-      var mo = n(49),
-        ho = n.n(mo),
-        po = y.m
+      var po = n(45),
+        fo = n.n(po),
+        go = y.m
           .model("Task", {
             id: y.m.identifierNumber,
             data: y.m.maybeNull(y.m.string),
@@ -6937,33 +6974,33 @@
               },
             };
           }),
-        fo = y.m.model("UserStore", { pk: y.m.integer, firstName: y.m.string, lastName: y.m.string }),
-        go = n(172),
-        vo = n.n(go),
-        yo = {};
-      var bo = {
+        vo = y.m.model("UserStore", { pk: y.m.integer, firstName: y.m.string, lastName: y.m.string }),
+        yo = n(160),
+        bo = n.n(yo),
+        wo = {};
+      var ko = {
           addKey: function(e, t) {
-            yo[e] || ((yo[e] = !0), vo()(e, "main", t));
+            wo[e] || ((wo[e] = !0), bo()(e, "main", t));
           },
           unbindAll: function() {
-            for (var e = 0, t = Object.keys(yo); e < t.length; e++) {
+            for (var e = 0, t = Object.keys(wo); e < t.length; e++) {
               var n = t[e];
-              vo.a.unbind(n);
+              bo.a.unbind(n);
             }
-            yo = {};
+            wo = {};
           },
           makeComb: function() {
             for (var e = "1234567890qwertasdfgzxcvbyuiophjklnm".split(""), t = 0; t <= e.length; t++) {
               var n = void 0;
-              if (((n = e[t]), !yo.hasOwnProperty(n))) return n;
+              if (((n = e[t]), !wo.hasOwnProperty(n))) return n;
             }
             return null;
           },
           setScope: function(e) {
-            vo.a.setScope(e);
+            bo.a.setScope(e);
           },
         },
-        wo = y.m
+        xo = y.m
           .model("SettingsModel", {
             enableHotkeys: y.m.optional(y.m.boolean, !0),
             enablePanelHotkeys: y.m.optional(y.m.boolean, !0),
@@ -6972,7 +7009,7 @@
           .actions(function(e) {
             return {
               toggleHotkeys: function() {
-                (e.enableHotkeys = !e.enableHotkeys), e.enableHotkeys ? bo.setScope("main") : bo.setScope("none");
+                (e.enableHotkeys = !e.enableHotkeys), e.enableHotkeys ? ko.setScope("main") : ko.setScope("none");
               },
               togglePanelHotkeys: function() {
                 e.enablePanelHotkeys = !e.enablePanelHotkeys;
@@ -6982,8 +7019,8 @@
               },
             };
           }),
-        ko =
-          (n(11),
+        To =
+          (n(39),
           y.m
             .model("TimeTraveller", {
               history: y.m.array(y.m.frozen()),
@@ -7046,10 +7083,10 @@
                 },
               };
             })),
-        xo = y.m
+        So = y.m
           .model("Relation", {
-            node1: y.m.reference(y.m.union(ha, Rn, mn, Aa, Gn)),
-            node2: y.m.reference(y.m.union(ha, Rn, mn, Aa, Gn)),
+            node1: y.m.reference(y.m.union(fa, _n, fn, Ma, Vn)),
+            node2: y.m.reference(y.m.union(fa, _n, fn, Ma, Vn)),
           })
           .actions(function(e) {
             return {
@@ -7060,7 +7097,7 @@
               },
             };
           }),
-        To = y.m.model("RelationStore", { relations: y.m.array(xo) }).actions(function(e) {
+        No = y.m.model("RelationStore", { relations: y.m.array(So) }).actions(function(e) {
           return {
             findRelations: function(t, n) {
               return n
@@ -7076,7 +7113,7 @@
             },
             addRelation: function(t, n) {
               if (!e.nodesRelated(t, n)) {
-                var a = xo.create({ node1: t, node2: n });
+                var a = So.create({ node1: t, node2: n });
                 return e.relations.push(a), a;
               }
             },
@@ -7097,10 +7134,10 @@
             },
           };
         }),
-        So = y.m
+        Io = y.m
           .model("Normalization", {
-            node1: y.m.union(y.m.reference(ha), y.m.reference(Rn), y.m.reference(mn)),
-            node2: y.m.union(y.m.reference(ha), y.m.reference(Rn), y.m.reference(mn)),
+            node1: y.m.union(y.m.reference(fa), y.m.reference(_n), y.m.reference(fn)),
+            node2: y.m.union(y.m.reference(fa), y.m.reference(_n), y.m.reference(fn)),
           })
           .actions(function(e) {
             return {
@@ -7111,7 +7148,7 @@
               },
             };
           }),
-        No = y.m.model("NormalizationStore", { normalizations: y.m.array(So) }).actions(function(e) {
+        Eo = y.m.model("NormalizationStore", { normalizations: y.m.array(Io) }).actions(function(e) {
           return {
             findNormalization: function(t, n) {
               return n
@@ -7124,7 +7161,7 @@
             },
             addNormalization: function(t, n) {
               if (!e.findNormalization(t, n)) {
-                var a = So.create({ node1: t, node2: n });
+                var a = Io.create({ node1: t, node2: n });
                 return e.normalizations.unshift(a), a;
               }
             },
@@ -7137,8 +7174,8 @@
             },
           };
         }),
-        Io = y.m
-          .model("RegionStore", { regions: y.m.array(y.m.safeReference(y.m.union(ha, Rn, Gn, mn, Aa))) })
+        Oo = y.m
+          .model("RegionStore", { regions: y.m.array(y.m.safeReference(y.m.union(fa, _n, Vn, fn, Ma))) })
           .actions(function(e) {
             return {
               addRegion: function(t) {
@@ -7165,7 +7202,7 @@
               },
             };
           }),
-        Eo = y.m
+        Ro = y.m
           .model("Completion", {
             id: y.m.identifier,
             pk: y.m.optional(y.m.string, E(5)),
@@ -7180,21 +7217,21 @@
             root: Ye.allModelsTypes(),
             names: y.m.map(y.m.reference(Ye.allModelsTypes())),
             toNames: y.m.map(y.m.array(y.m.reference(Ye.allModelsTypes()))),
-            history: y.m.optional(ko, { targetPath: "../root" }),
+            history: y.m.optional(To, { targetPath: "../root" }),
             dragMode: y.m.optional(y.m.boolean, !1),
             relationMode: y.m.optional(y.m.boolean, !1),
-            relationStore: y.m.optional(To, { relations: [] }),
+            relationStore: y.m.optional(No, { relations: [] }),
             normalizationMode: y.m.optional(y.m.boolean, !1),
-            normalizationStore: y.m.optional(No, { normalizations: [] }),
-            regionStore: y.m.optional(Io, { regions: [] }),
+            normalizationStore: y.m.optional(Eo, { normalizations: [] }),
+            regionStore: y.m.optional(Oo, { regions: [] }),
             highlightedNode: y.m.maybeNull(
               y.m.union(
-                y.m.safeReference(ha),
-                y.m.safeReference(Rn),
-                y.m.safeReference(mn),
-                y.m.safeReference(Aa),
-                y.m.safeReference(Gn),
-                y.m.safeReference(xn),
+                y.m.safeReference(fa),
+                y.m.safeReference(_n),
+                y.m.safeReference(fn),
+                y.m.safeReference(Ma),
+                y.m.safeReference(Vn),
+                y.m.safeReference(Sn),
               ),
             ),
           })
@@ -7284,18 +7321,18 @@
                     n ? n.push(t.id) : e.toNames.set(t.toname, [t.id]);
                   }
                 }),
-                  bo.unbindAll(),
+                  ko.unbindAll(),
                   e.traverseTree(function(e) {
-                    e && e.onHotKey && e.hotkey && bo.addKey(e.hotkey, e.onHotKey);
+                    e && e.onHotKey && e.hotkey && ko.addKey(e.hotkey, e.onHotKey);
                   }),
                   e.traverseTree(function(e) {
                     if (e && e.onHotKey && !e.hotkey) {
-                      var t = bo.makeComb();
+                      var t = ko.makeComb();
                       if (!t) return;
-                      (e.hotkey = t), bo.addKey(e.hotkey, e.onHotKey);
+                      (e.hotkey = t), ko.addKey(e.hotkey, e.onHotKey);
                     }
                   }),
-                  bo.setScope("main");
+                  ko.setScope("main");
               },
               serializeCompletion: function() {
                 var t = [];
@@ -7306,7 +7343,7 @@
                   }
                 });
                 var n = e.relationStore.serializeCompletion();
-                t.push(n);
+                n && t.push(n);
                 return (function e(t) {
                   return t.reduce(function(t, n) {
                     return t.concat(Array.isArray(n) ? e(n) : n);
@@ -7333,11 +7370,11 @@
               },
             };
           }),
-        Oo = y.m
+        Co = y.m
           .model("CompletionStore", {
-            completions: y.m.array(Eo),
-            selected: y.m.maybeNull(y.m.reference(Eo)),
-            predictions: y.m.array(Eo),
+            completions: y.m.array(Ro),
+            selected: y.m.maybeNull(y.m.reference(Ro)),
+            predictions: y.m.array(Ro),
             predictSelect: y.m.optional(y.m.boolean, !1),
           })
           .views(function(e) {
@@ -7370,8 +7407,8 @@
           })
           .actions(function(e) {
             var t = Object(y.c)(
-              ho.a.mark(function t(n) {
-                return ho.a.wrap(
+              fo.a.mark(function t(n) {
+                return fo.a.wrap(
                   function(t) {
                     for (;;)
                       switch ((t.prev = t.next)) {
@@ -7427,7 +7464,7 @@
                 (e.predictSelect = !0), (n.selected = !0), (e.selected = n);
               },
               addCompletion: function(t, n) {
-                var a = Eo.create(t);
+                var a = Ro.create(t);
                 return (
                   e.store.task &&
                     "initial" === n &&
@@ -7484,7 +7521,7 @@
                 return e.addPredictionItem(o, "list");
               },
               addPredictionItem: function(t, n) {
-                var a = Eo.create(t);
+                var a = Ro.create(t);
                 return (
                   e.store.task &&
                     "initial" === n &&
@@ -7497,7 +7534,7 @@
               },
             };
           }),
-        Ro = y.m
+        _o = y.m
           .model("Prediction", {
             id: y.m.identifier,
             selected: y.m.optional(y.m.boolean, !1),
@@ -7507,21 +7544,21 @@
             root: Ye.allModelsTypes(),
             names: y.m.map(y.m.reference(Ye.allModelsTypes())),
             toNames: y.m.map(y.m.array(y.m.reference(Ye.allModelsTypes()))),
-            history: y.m.optional(ko, { targetPath: "../root" }),
+            history: y.m.optional(To, { targetPath: "../root" }),
             dragMode: y.m.optional(y.m.boolean, !1),
             relationMode: y.m.optional(y.m.boolean, !1),
-            relationStore: y.m.optional(To, { relations: [] }),
+            relationStore: y.m.optional(No, { relations: [] }),
             normalizationMode: y.m.optional(y.m.boolean, !1),
-            normalizationStore: y.m.optional(No, { normalizations: [] }),
-            regionStore: y.m.optional(Io, { regions: [] }),
+            normalizationStore: y.m.optional(Eo, { normalizations: [] }),
+            regionStore: y.m.optional(Oo, { regions: [] }),
             highlightedNode: y.m.maybeNull(
               y.m.union(
-                y.m.safeReference(ha),
-                y.m.safeReference(Rn),
-                y.m.safeReference(mn),
-                y.m.safeReference(Aa),
-                y.m.safeReference(Gn),
-                y.m.safeReference(xn),
+                y.m.safeReference(fa),
+                y.m.safeReference(_n),
+                y.m.safeReference(fn),
+                y.m.safeReference(Ma),
+                y.m.safeReference(Vn),
+                y.m.safeReference(Sn),
               ),
             ),
           })
@@ -7607,9 +7644,9 @@
               },
             };
           }),
-        Co =
+        jo =
           (y.m
-            .model("PredictionStore", { predictions: y.m.array(Ro), selected: y.m.maybeNull(y.m.reference(Ro)) })
+            .model("PredictionStore", { predictions: y.m.array(_o), selected: y.m.maybeNull(y.m.reference(_o)) })
             .views(function(e) {
               return {
                 get currentPrediction() {
@@ -7643,7 +7680,7 @@
                   (n.selected = !0), (e.selected = n);
                 },
                 addPredictionItem: function(t, n) {
-                  var a = Ro.create(t);
+                  var a = _o.create(t);
                   return (
                     e.store.task &&
                       "initial" === n &&
@@ -7683,18 +7720,18 @@
             NEXT: "/next",
             EXPERT_INSRUCTIONS: "/expert_instruction",
           }),
-        _o = y.m
+        Ao = y.m
           .model("AppStore", {
             config: y.m.string,
-            task: y.m.maybeNull(po),
+            task: y.m.maybeNull(go),
             taskID: y.m.maybeNull(y.m.number),
             interfaces: y.m.array(y.m.string),
             explore: y.m.optional(y.m.boolean, !1),
-            completionStore: y.m.optional(Oo, { completions: [], predictions: [] }),
+            completionStore: y.m.optional(Co, { completions: [], predictions: [] }),
             projectID: y.m.integer,
-            expert: fo,
+            expert: vo,
             debug: y.m.optional(y.m.boolean, !0),
-            settings: y.m.optional(wo, {}),
+            settings: y.m.optional(xo, {}),
             showingSettings: y.m.optional(y.m.boolean, !1),
             showingDescription: y.m.optional(y.m.boolean, !1),
             description: y.m.maybeNull(y.m.string),
@@ -7717,18 +7754,18 @@
           })
           .actions(function(e) {
             var t = Object(y.c)(
-              ho.a.mark(function t() {
+              fo.a.mark(function t() {
                 var n, a;
-                return ho.a.wrap(function(t) {
+                return fo.a.wrap(function(t) {
                   for (;;)
                     switch ((t.prev = t.next)) {
                       case 0:
                         return (
                           (n = ""
-                            .concat(Co.MAIN)
-                            .concat(Co.PROJECTS, "/")
+                            .concat(jo.MAIN)
+                            .concat(jo.PROJECTS, "/")
                             .concat(e.projectID)
-                            .concat(Co.EXPERT_INSRUCTIONS)),
+                            .concat(jo.EXPERT_INSRUCTIONS)),
                           (t.next = 3),
                           e.fetch(n)
                         );
@@ -7755,24 +7792,24 @@
               return e.taskID
                 ? o(
                     ""
-                      .concat(Co.MAIN)
-                      .concat(Co.TASKS, "/")
+                      .concat(jo.MAIN)
+                      .concat(jo.TASKS, "/")
                       .concat(e.taskID, "/"),
                   )
                 : e.explore && e.projectID
                 ? o(
                     ""
-                      .concat(Co.MAIN)
-                      .concat(Co.PROJECTS, "/")
+                      .concat(jo.MAIN)
+                      .concat(jo.PROJECTS, "/")
                       .concat(e.projectID)
-                      .concat(Co.NEXT),
+                      .concat(jo.NEXT),
                   )
                 : void 0;
             }
             var o = Object(y.c)(
-                ho.a.mark(function t(n) {
+                fo.a.mark(function t(n) {
                   var a;
-                  return ho.a.wrap(
+                  return fo.a.wrap(
                     function(t) {
                       for (;;)
                         switch ((t.prev = t.next)) {
@@ -7842,8 +7879,8 @@
                 }),
               ),
               r = Object(y.c)(
-                ho.a.mark(function t() {
-                  return ho.a.wrap(
+                fo.a.mark(function t() {
+                  return fo.a.wrap(
                     function(t) {
                       for (;;)
                         switch ((t.prev = t.next)) {
@@ -7854,10 +7891,10 @@
                               (t.next = 4),
                               e.post(
                                 ""
-                                  .concat(Co.MAIN)
-                                  .concat(Co.TASKS, "/")
+                                  .concat(jo.MAIN)
+                                  .concat(jo.TASKS, "/")
                                   .concat(e.task.id)
-                                  .concat(Co.CANCEL),
+                                  .concat(jo.CANCEL),
                                 JSON.stringify({ data: JSON.stringify({ error: "cancelled" }) }),
                               )
                             );
@@ -7878,9 +7915,9 @@
               ),
               i = function(t) {
                 return Object(y.c)(
-                  ho.a.mark(function o() {
+                  fo.a.mark(function o() {
                     var r, i, l, s, c, u;
-                    return ho.a.wrap(
+                    return fo.a.wrap(
                       function(o) {
                         for (;;)
                           switch ((o.prev = o.next)) {
@@ -7909,10 +7946,10 @@
                                 (o.next = 13),
                                 Object(y.d)(e).patch(
                                   ""
-                                    .concat(Co.MAIN)
-                                    .concat(Co.TASKS, "/")
+                                    .concat(jo.MAIN)
+                                    .concat(jo.TASKS, "/")
                                     .concat(e.task.id)
-                                    .concat(Co.COMPLETIONS, "/")
+                                    .concat(jo.COMPLETIONS, "/")
                                     .concat(r.pk, "/"),
                                   s,
                                 )
@@ -7929,17 +7966,17 @@
                                 (o.next = 18),
                                 e.post(
                                   ""
-                                    .concat(Co.MAIN)
-                                    .concat(Co.TASKS, "/")
+                                    .concat(jo.MAIN)
+                                    .concat(jo.TASKS, "/")
                                     .concat(e.task.id)
-                                    .concat(Co.COMPLETIONS, "/"),
+                                    .concat(jo.COMPLETIONS, "/"),
                                   s,
                                 )
                               );
                             case 18:
                               return (c = o.sent), (o.next = 21), c.json();
                             case 21:
-                              (u = o.sent), e.completionStore.selected.updatePersonalKey(u.id.toString());
+                              (u = o.sent) && u.id && e.completionStore.selected.updatePersonalKey(u.id.toString());
                             case 23:
                               if (!n("load")) {
                                 o.next = 28;
@@ -7971,21 +8008,21 @@
             return {
               afterCreate: function() {
                 e.loadTask(),
-                  bo.addKey("ctrl+enter", e.sendTask),
-                  e.hasInterface("skip") && bo.addKey("ctrl+space", e.skipTask),
-                  e.hasInterface("update") && bo.addKey("alt+enter", e.updateTask),
-                  bo.addKey("ctrl+backspace", function() {
+                  ko.addKey("ctrl+enter", e.sendTask),
+                  e.hasInterface("skip") && ko.addKey("ctrl+space", e.skipTask),
+                  e.hasInterface("update") && ko.addKey("alt+enter", e.updateTask),
+                  ko.addKey("ctrl+backspace", function() {
                     e.completionStore.selected.deleteAllRegions();
                   }),
-                  bo.addKey("ctrl+z", function() {
+                  ko.addKey("ctrl+z", function() {
                     var t = e.completionStore.selected.history;
                     t && t.canUndo && t.undo();
                   }),
-                  bo.addKey("escape", function() {
+                  ko.addKey("escape", function() {
                     var t = e.completionStore.selected;
                     t && t.relationMode && t.stopRelationMode();
                   }),
-                  bo.addKey("backspace", function() {
+                  ko.addKey("backspace", function() {
                     var t = e.completionStore.selected;
                     t && t.highlightedNode && t.highlightedNode.deleteRegion();
                   });
@@ -7995,7 +8032,7 @@
                 t &&
                   !$.Checkers.isString(t.data) &&
                   (t = Object(S.a)({}, t, Object(Q.a)({}, t.data, JSON.stringify(t.data)))),
-                  (e.task = po.create(t));
+                  (e.task = go.create(t));
               },
               hasInterface: n,
               skipTask: r,
@@ -8005,7 +8042,7 @@
                 e.isLoading = t;
               },
               resetState: function() {
-                e.completionStore = Oo.create({ completions: [] });
+                e.completionStore = Co.create({ completions: [] });
                 var t = e.completionStore.addInitialCompletion();
                 e.completionStore.selectCompletion(t.id);
               },
@@ -8066,7 +8103,7 @@
               },
             };
           });
-      var jo = {
+      var Do = {
           getData: function() {
             window.taskData && window.taskData.data && (window.taskData.data = JSON.stringify(window.taskData.data));
             var e = {
@@ -8100,28 +8137,28 @@
             return (t.innerHTML = ""), t.appendChild(e), e;
           },
         },
-        Ao = n(315),
-        Do = n(316),
-        Mo = n.n(Do),
-        Bo = n(317),
-        Po = n(318),
-        Ho = { config: Mo.a, tasks: Bo, completion: Po },
-        zo = n(319),
-        Wo = n.n(zo),
-        Lo = (n(320), n(321), Wo.a, n(322)),
+        Mo = n(314),
+        Bo = n(315),
+        Po = n.n(Bo),
+        Ho = n(316),
+        zo = n(317),
+        Wo = { config: Po.a, tasks: Ho, completion: zo },
+        Lo = n(318),
         Fo = n.n(Lo),
-        Jo = (n(323), n(324), Fo.a, n(325)),
+        Jo = (n(319), n(320), Fo.a, n(321)),
         Go = n.n(Jo),
-        Uo = (n(326), n(327), Go.a, n(328)),
+        Uo = (n(322), n(323), Go.a, n(324)),
         Vo = n.n(Uo),
-        Yo = (n(329), n(330), Vo.a, n(331)),
+        Yo = (n(325), n(326), Vo.a, n(327)),
         qo = n.n(Yo),
-        Xo = (n(332), n(333), qo.a, n(334)),
+        Xo = (n(328), n(329), qo.a, n(330)),
         Ko = n.n(Xo),
-        Zo = (n(335), n(336), Ko.a, n(337)),
+        Zo = (n(331), n(332), Ko.a, n(333)),
         Qo = n.n(Zo),
-        $o = (n(338), n(339), Qo.a, Ho);
-      function er() {
+        $o = (n(334), n(335), Qo.a, n(336)),
+        er = n.n($o),
+        tr = (n(337), n(338), er.a, Wo);
+      function nr() {
         return (function() {
           var e = {
             developmentEnv: !0,
@@ -8143,18 +8180,18 @@
                   "update",
                   "check-empty",
                 ],
-            task: { data: JSON.stringify($o.tasks[0]), project: 10, id: 100, completions: [], predictions: [] },
+            task: { data: JSON.stringify(tr.tasks[0]), project: 10, id: 100, completions: [], predictions: [] },
           };
           return (
             e.viewCompletion &&
-              $o.completion &&
+              tr.completion &&
               (e = Object(S.a)({}, e, {
                 task: Object(S.a)({}, e.task, {
-                  completions: $o.completion.completions,
-                  predictions: $o.completion.predictions,
+                  completions: tr.completion.completions,
+                  predictions: tr.completion.predictions,
                 }),
               })),
-            fetch($o.config)
+            fetch(tr.config)
               .then(function(e) {
                 return e.text();
               })
@@ -8164,15 +8201,15 @@
           );
         })();
       }
-      function tr() {
-        return (tr = Object(Ao.a)(
-          ho.a.mark(function e() {
+      function ar() {
+        return (ar = Object(Mo.a)(
+          fo.a.mark(function e() {
             var t, n, a;
-            return ho.a.wrap(function(e) {
+            return fo.a.wrap(function(e) {
               for (;;)
                 switch ((e.prev = e.next)) {
                   case 0:
-                    return (e.next = 2), er();
+                    return (e.next = 2), nr();
                   case 2:
                     return (
                       (t = e.sent),
@@ -8188,19 +8225,19 @@
           }),
         )).apply(this, arguments);
       }
-      var nr = {
+      var or = {
         getState: function() {
-          return tr.apply(this, arguments);
+          return ar.apply(this, arguments);
         },
-        getData: er,
+        getData: nr,
         rootElement: function() {
           var e = document.createElement("div"),
             t = document.getElementById("label-studio");
           return (t.innerHTML = ""), t.appendChild(e), (t.style.margin = "0 auto"), e;
         },
       };
-      nr = jo;
-      var ar = _o.create(nr.getData(), {
+      or = Do;
+      var rr = Ao.create(or.getData(), {
         fetch: T.fetcher,
         patch: T.patch,
         post: T.poster,
@@ -8209,9 +8246,9 @@
           return console.log(e);
         },
       });
-      ar.initializeStore(nr.getState()),
-        (window.Htx = ar),
-        c.a.render(l.a.createElement(u.a, { store: ar }, l.a.createElement(uo, null)), nr.rootElement()),
+      rr.initializeStore(or.getState()),
+        (window.Htx = rr),
+        c.a.render(l.a.createElement(u.a, { store: rr }, l.a.createElement(ho, null)), or.rootElement()),
         "serviceWorker" in navigator &&
           navigator.serviceWorker.ready.then(function(e) {
             e.unregister();
@@ -8233,7 +8270,7 @@
         tag: "Entity_tag__35G8T",
       };
     },
-    92: function(e, t, n) {
+    93: function(e, t, n) {
       e.exports = {
         skip: "Controls_skip__10Js5",
         task: "Controls_task__15i-O",
@@ -8243,7 +8280,7 @@
         rewrite: "Controls_rewrite__3zE7C",
       };
     },
-    93: function(e, t, n) {
+    94: function(e, t, n) {
       e.exports = {
         block: "Dialog_block__1YBml",
         block_selected: "Dialog_block_selected__3zZ50",
@@ -8253,5 +8290,5 @@
       };
     },
   },
-  [[354, 2, 1]],
+  [[353, 2, 1]],
 ]);
