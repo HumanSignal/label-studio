@@ -56,22 +56,15 @@ const Model = types
       return sel && sel.background;
     },
 
-    toStateJSON() {
-      // const names = self.getSelectedNames();
-      // if (names) {
-      //   self.unselectAll();
-      // }
-      // if (names && names.length) {
-      //   return {
-      //     id: self.pid,
-      //     from_name: self.name,
-      //     to_name: self.name,
-      //     type: self.type,
-      //     value: {
-      //       labels: names,
-      //     },
-      //   };
-      // }
+    /**
+     * Usage check of selected labels before send completion to server
+     */
+    beforeSend() {
+      const names = self.getSelectedNames();
+
+      if (names) {
+        self.unselectAll();
+      }
     },
 
     fromStateJSON(obj, fromModel) {

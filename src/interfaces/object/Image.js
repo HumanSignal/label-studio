@@ -472,9 +472,7 @@ class HtxImageView extends Component {
     }
 
     if (item.hasStates) {
-      // divStyle["position"] = "absolute";
-      // const rotateEnabled = (item.editor.rectcanrotate == "true") ? true : false;
-      const rotateEnabled = item.controlButton().canrotate === "true" ? true : false;
+      const rotateEnabled = item.controlButton().canrotate;
 
       return (
         <div style={{ position: "relative" }}>

@@ -36,7 +36,7 @@ const TagAttrs = types.model({
   strokewidth: types.optional(types.string, "1"),
   strokecolor: types.optional(types.string, "#f48a42"),
 
-  canrotate: types.optional(types.string, "true"),
+  canrotate: types.optional(types.boolean, true),
 });
 
 const Model = types
