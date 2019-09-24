@@ -36972,7 +36972,7 @@
       var a = {};
       (t.presetPalettes = a),
         Object.keys(o).forEach(function(e) {
-          (a[e] = i.default(o[e])), (a[e].primary = a[e][6]);
+          (a[e] = i.default(o[e])), (a[e].primary = a[e][5]);
         });
       var c = a.red;
       t.red = c;

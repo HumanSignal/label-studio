@@ -1578,7 +1578,7 @@
       var o = {};
       n.r(o),
         n.d(o, "hexToRGBA", function() {
-          return G;
+          return J;
         }),
         n.d(o, "colorToRGBA", function() {
           return U;
@@ -1952,7 +1952,7 @@
       function F(e) {
         if ("number" === typeof e) return new Date(e).toUTCString().match(/(\d\d:\d\d:\d\d)/)[0];
       }
-      var J = {
+      var G = {
         aliceblue: "#f0f8ff",
         antiquewhite: "#faebd7",
         aqua: "#00ffff",
@@ -2095,7 +2095,7 @@
         yellow: "#ffff00",
         yellowgreen: "#9acd32",
       };
-      function G(e, t) {
+      function J(e, t) {
         var n = 0,
           a = 0,
           o = 0,
@@ -2113,10 +2113,10 @@
         );
       }
       function U(e, t) {
-        return "string" === typeof e && void 0 !== typeof J[e.toLowerCase()] ? G(J[e.toLowerCase()], t) : e;
+        return "string" === typeof e && void 0 !== typeof G[e.toLowerCase()] ? J(G[e.toLowerCase()], t) : e;
       }
       function V(e, t) {
-        return "#" === e.charAt(0) ? G(e, t) : U(e, t);
+        return "#" === e.charAt(0) ? J(e, t) : U(e, t);
       }
       function Y(e) {
         for (var t = 0, n = 0; n < e.length; n++) t = e.charCodeAt(n) + ((t << 5) - t);
@@ -3118,15 +3118,15 @@
               ),
           );
         }),
-        Je = n(304),
-        Ge = n.n(Je),
+        Ge = n(304),
+        Je = n.n(Ge),
         Ue = Object(u.c)(function(e) {
           var t = e.store,
             n = t.completionStore.selected,
             a = n.highlightedNode;
           return l.a.createElement(
             P.a,
-            { title: "Entity", className: Ge.a.card },
+            { title: "Entity", className: Je.a.card },
             a && l.a.createElement(Fe, { store: t, completion: n }),
             !n.highlightedNode && l.a.createElement("p", null, "Nothing selected"),
             l.a.createElement(Pe, { store: t, regionStore: n.regionStore }),
@@ -3629,7 +3629,7 @@
           n > 0 ? (e < 10 && (a = "0" + a), "".concat(n, ":").concat(a)) : a
         );
       }
-      function Jt(e) {
+      function Gt(e) {
         return e >= 2500
           ? 0.01
           : e >= 1e3
@@ -3646,7 +3646,7 @@
           ? 15
           : 60 * Math.ceil(0.5 / e);
       }
-      function Gt(e) {
+      function Jt(e) {
         return e >= 2500
           ? 10
           : e >= 1e3
@@ -3664,7 +3664,7 @@
           : 60 * Math.ceil(0.5 / e);
       }
       function Ut(e) {
-        return Math.floor(10 / Jt(e));
+        return Math.floor(10 / Gt(e));
       }
       var Vt = (function(e) {
           function t(e) {
@@ -3713,8 +3713,8 @@
                         At.a.create({
                           container: "#timeline",
                           formatTimeCallback: Ft,
-                          timeInterval: Jt,
-                          primaryLabelInterval: Gt,
+                          timeInterval: Gt,
+                          primaryLabelInterval: Jt,
                           secondaryLabelInterval: Ut,
                           primaryColor: "blue",
                           secondaryColor: "blue",
@@ -4468,7 +4468,7 @@
             fillcolor: y.m.maybeNull(y.m.string),
             strokewidth: y.m.optional(y.m.string, "1"),
             strokecolor: y.m.optional(y.m.string, "#f48a42"),
-            canrotate: y.m.optional(y.m.string, "true"),
+            canrotate: y.m.optional(y.m.boolean, !0),
           })),
         Tn = y.m
           .model({ id: y.m.identifier, type: "rectangle" })
@@ -4517,7 +4517,9 @@
                 });
                 return t && t.background;
               },
-              toStateJSON: function() {},
+              beforeSend: function() {
+                e.getSelectedNames() && e.unselectAll();
+              },
               fromStateJSON: function(t, n) {
                 if ((e.unselectAll(), !t.value.rectanglelabels)) throw new Error("No labels param");
                 t.id && (e.pid = t.id),
@@ -4944,15 +4946,15 @@
           Ln,
           an,
         ),
-        Jn = y.m.compose(
+        Gn = y.m.compose(
           "PolygonLabelsModel",
           Fn,
         ),
-        Gn = Object(u.c)(function(e) {
+        Jn = Object(u.c)(function(e) {
           var t = e.item;
           return l.a.createElement(sn, { item: t });
         });
-      k.addTag("polygonlabels", Jn, Gn);
+      k.addTag("polygonlabels", Gn, Jn);
       var Un = y.m
           .model({
             id: y.m.identifier,
@@ -4966,7 +4968,7 @@
             pointstyle: y.m.string,
             closed: y.m.optional(y.m.boolean, !1),
             points: y.m.array(Dn, []),
-            states: y.m.maybeNull(y.m.array(y.m.union(ln, dn, Jn))),
+            states: y.m.maybeNull(y.m.array(y.m.union(ln, dn, Gn))),
             mouseOverStartPoint: y.m.optional(y.m.boolean, !1),
             fromName: y.m.maybeNull(y.m.string),
             wp: y.m.maybeNull(y.m.number),
@@ -5503,7 +5505,7 @@
                   var a = {},
                     o = { width: n.width, maxWidth: n.maxwidth };
                   if ((n.resize && (o.transform = "scale(" + n.resize + ", " + n.resize + ")"), n.hasStates)) {
-                    var r = "true" === n.controlButton().canrotate;
+                    var r = n.controlButton().canrotate;
                     return l.a.createElement(
                       "div",
                       { style: { position: "relative" } },
@@ -6459,8 +6461,8 @@
       k.addTag("textarea", za, Wa);
       var La = n(80),
         Fa = n(110),
-        Ja = n.n(Fa),
-        Ga = y.m
+        Ga = n.n(Fa),
+        Ja = y.m
           .model({
             backgroundColor: y.m.optional(y.m.string, "transparent"),
             value: y.m.maybeNull(y.m.string),
@@ -6498,7 +6500,7 @@
             id: y.m.optional(y.m.identifier, E),
             type: "list",
             update: y.m.optional(y.m.number, 1),
-            regions: y.m.array(Ga),
+            regions: y.m.array(Ja),
           })
           .views(function(e) {
             return {};
@@ -6509,7 +6511,7 @@
                 e.update = e.update + 1;
               },
               addRegion: function(t, n) {
-                var a = Ga.create({ value: e.elementvalue, idx: n, _value: $e(e.elementvalue, t[n]) });
+                var a = Ja.create({ value: e.elementvalue, idx: n, _value: $e(e.elementvalue, t[n]) });
                 e.regions.push(a);
               },
               updateValue: function(t) {
@@ -6530,8 +6532,8 @@
                 n !== a &&
                   (e.sortedhighlightcolor && e.regions[n].setBG(e.sortedhighlightcolor),
                   e.regions[n].setSelected(!0),
-                  e._value && (e._value = Ja()(e._value, n, a)),
-                  (e.regions = Ja()(e.regions, n, a)),
+                  e._value && (e._value = Ga()(e._value, n, a)),
+                  (e.regions = Ga()(e.regions, n, a)),
                   e.setUpdate());
               },
               toStateJSON: function() {
@@ -6729,8 +6731,8 @@
                 n != a &&
                   (e.sortedhighlightcolor && e.regions[n].setBG(e.sortedhighlightcolor),
                   e.regions[n].setSelected(!0),
-                  e._value && (e._value = Ja()(e._value, n, a)),
-                  (e.regions = Ja()(e.regions, n, a)),
+                  e._value && (e._value = Ga()(e._value, n, a)),
+                  (e.regions = Ga()(e.regions, n, a)),
                   e.setUpdate());
               },
               toStateJSON: function() {
@@ -8145,9 +8147,9 @@
         Wo = { config: Po.a, tasks: Ho, completion: zo },
         Lo = n(318),
         Fo = n.n(Lo),
-        Jo = (n(319), n(320), Fo.a, n(321)),
-        Go = n.n(Jo),
-        Uo = (n(322), n(323), Go.a, n(324)),
+        Go = (n(319), n(320), Fo.a, n(321)),
+        Jo = n.n(Go),
+        Uo = (n(322), n(323), Jo.a, n(324)),
         Vo = n.n(Uo),
         Yo = (n(325), n(326), Vo.a, n(327)),
         qo = n.n(Yo),
