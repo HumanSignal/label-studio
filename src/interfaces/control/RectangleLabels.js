@@ -15,6 +15,7 @@ import { RectangleModel } from "./Rectangle";
 
 /**
  * RectangleLabels tag creates labeled rectangles
+ * Used only for Image
  * @example
  * <View>
  *   <RectangleLabels name="labels" toName="image">
