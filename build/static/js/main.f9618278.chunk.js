@@ -5986,10 +5986,10 @@
       var ya = y.m.model("TextModel", {
           name: y.m.maybeNull(y.m.string),
           value: y.m.maybeNull(y.m.string),
-          selelectwithoutlabel: y.m.optional(y.m.string, "false"),
+          selelectwithoutlabel: y.m.optional(y.m.boolean, !1),
           hidden: y.m.optional(y.m.enumeration(["true", "false"]), "false"),
-          adjustselection: y.m.optional(y.m.string, "true"),
-          selectionenabled: y.m.optional(y.m.string, "true"),
+          adjustselection: y.m.optional(y.m.boolean, !0),
+          selectionenabled: y.m.optional(y.m.boolean, !0),
         }),
         ba = y.m
           .model("TextModel", {
@@ -6044,7 +6044,7 @@
                         return O(e);
                       })
                     : null;
-                if ("false" === e.selelectwithoutlabel && !a.length) return null;
+                if (!e.selelectwithoutlabel && !a.length) return null;
                 var o = e._addRegion({ start: t.start, end: t.end, text: t.text, states: a });
                 return (
                   n &&
@@ -6122,7 +6122,7 @@
                         id: e.id,
                         key: e.id,
                         text: e._value,
-                        enabled: "true" === e.selectionenabled,
+                        enabled: e.selectionenabled,
                         ranges: e.regions,
                         adjustSelection: e.adjustselection,
                         rangeRenderer: this.renderRegion.bind(this),
@@ -6358,7 +6358,7 @@
         );
       k.addTag("textarearegion", Ma, Ba);
       var Pa = y.m.model({
-          allowSubmit: y.m.optional(y.m.string, "true"),
+          allowSubmit: y.m.optional(y.m.boolean, !0),
           label: y.m.optional(y.m.string, ""),
           name: y.m.maybeNull(y.m.string),
           toname: y.m.maybeNull(y.m.string),
@@ -6442,7 +6442,7 @@
                 Ie.a,
                 {
                   onSubmit: function(e) {
-                    return "true" === t.allowSubmit && (t.addText(t._value), t.setValue("")), e.preventDefault(), !1;
+                    return t.allowSubmit && (t.addText(t._value), t.setValue("")), e.preventDefault(), !1;
                   },
                 },
                 l.a.createElement(Ie.a.Input, {
@@ -6700,8 +6700,8 @@
           axis: y.m.optional(y.m.string, "y"),
           lockaxis: y.m.maybeNull(y.m.string),
           elementtag: y.m.optional(y.m.string, "Text"),
-          ranked: y.m.optional(y.m.string, "true"),
-          sortable: y.m.optional(y.m.string, "true"),
+          ranked: y.m.optional(y.m.boolean, !0),
+          sortable: y.m.optional(y.m.boolean, !0),
           sortedhighlightcolor: y.m.maybeNull(y.m.string),
           name: y.m.maybeNull(y.m.string),
           value: y.m.maybeNull(y.m.string),
