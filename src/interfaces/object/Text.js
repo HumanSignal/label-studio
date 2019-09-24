@@ -133,6 +133,11 @@ const Model = types
     fromStateJSON(obj, fromModel) {
       let r;
 
+      if (fromModel.type === "textarea" || fromModel.type === "choices") {
+        self.completion.names.get(obj.from_name).fromStateJSON(obj);
+        return;
+      }
+
       const tree = {
         pid: obj.id,
         start: obj.value.start,
@@ -140,11 +145,6 @@ const Model = types
         text: obj.value.text,
         normalization: obj.normalization,
       };
-
-      if (fromModel.type === "choices") {
-        self.completion.names.get(obj.from_name).fromStateJSON(obj);
-        return;
-      }
 
       if (obj.from_name === obj.to_name) {
         r = self._addRegion(tree);
