@@ -2,7 +2,7 @@ import React, { Component, Fragment } from "react";
 import { observer, inject } from "mobx-react";
 import { Button, Typography } from "antd";
 
-import { Node, NodeMinimal } from "../Node";
+import { Node, NodeMinimal } from "../Node/Node";
 import Hint from "../Hint/Hint";
 import styles from "./Entities.module.scss";
 

@@ -4,7 +4,7 @@ import { getType } from "mobx-state-tree";
 import { Input, Form } from "semantic-ui-react";
 import { Icon, Button, Tag } from "antd";
 
-import { Node, NodeMinimal } from "../Node";
+import { Node, NodeMinimal } from "../Node/Node";
 import Hint from "../Hint/Hint";
 import styles from "./Entity.module.scss";
 

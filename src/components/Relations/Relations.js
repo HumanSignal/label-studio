@@ -3,7 +3,7 @@ import { observer } from "mobx-react";
 import { isValidReference } from "mobx-state-tree";
 import { Icon } from "antd";
 
-import { NodeMinimal } from "../Node";
+import { NodeMinimal } from "../Node/Node";
 import styles from "./Relations.module.scss";
 
 /**
