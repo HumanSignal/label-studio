@@ -1,7 +1,7 @@
 
-# Image object detection 
+# Image Polygons
 
-![Image object detection](https://user.fm/files/v2-04a15361580d038bd9392a225e2569e4/Screen%20Shot%202019-08-01%20at%2011.38.16%20PM.png "Image BBox")
+![Image Polygons]("Image Polygons")
 
 # Install
 
@@ -25,8 +25,8 @@ pip install -r requirements.txt
 
 # Start
 
-Image bounding box labeling
+Image Polygons
 
 ```bash
-python server.py -c config.json -l ../examples/image_bbox/config.xml -i ../examples/image_bbox/tasks.json -o output
+python server.py -c config.json -l ../examples/image_polygons/config.xml -i ../examples/image_polygons/tasks.json -o output
 ```
