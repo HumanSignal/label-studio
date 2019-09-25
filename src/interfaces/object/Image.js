@@ -40,10 +40,10 @@ const TagAttrs = types.model({
   resize: types.maybeNull(types.string),
   width: types.optional(types.string, "100%"),
   maxwidth: types.optional(types.string, "750px"),
-  zoom: types.optional(types.string, "false"),
-  negativezoom: types.optional(types.string, "false"),
+  zoom: types.optional(types.boolean, false),
+  negativezoom: types.optional(types.boolean, false),
   zoomby: types.optional(types.string, "1.1"),
-  showmousepos: types.optional(types.string, "false"),
+  showmousepos: types.optional(types.boolean, false),
 });
 
 const Model = types
@@ -552,7 +552,7 @@ class HtxImageView extends Component {
 
     const newScale = e.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
 
-    if (item.negativezoom != "true" && newScale <= 1) {
+    if (item.negativezoom !== true && newScale <= 1) {
       item.setZoom(1, 0, 0);
       stage.scale({ x: 1, y: 1 });
       stage.position({ x: 0, y: 0 });
@@ -626,8 +626,8 @@ class HtxImageView extends Component {
             onDblClick={this.handleDblClick}
             onClick={this.handleOnClick}
             onMouseDown={this.handleStageMouseDown}
-            onMouseMove={item.showmousepos === "true" ? this.handleMouseMove : () => {}}
-            onWheel={item.zoom === "true" ? this.handleZoom : () => {}}
+            onMouseMove={item.showmousepos === true ? this.handleMouseMove : () => {}}
+            onWheel={item.zoom === true ? this.handleZoom : () => {}}
           >
             <Layer>
               {item.shapes.map(s => {
@@ -637,7 +637,7 @@ class HtxImageView extends Component {
             </Layer>
           </Stage>
           <div>
-            {item.showmousepos === "true" && (
+            {item.showmousepos === true && (
               <p>
                 {item.cursorPositionX} : {item.cursorPositionY}
               </p>
