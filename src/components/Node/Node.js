@@ -40,7 +40,7 @@ const Node = observer(({ node }) => {
       <p>
         <a href="" onClick={click} className={styles.node}>
           <i className="i cursor icon" />
-          Input &nbsp;<span style={{ color: "#5a5a5a" }}>{node._value}</span>
+          Input <span style={{ color: "#5a5a5a" }}>{node._value}</span>
         </a>
       </p>
     );
@@ -53,7 +53,7 @@ const Node = observer(({ node }) => {
       <p>
         <a href="" onClick={click} className={styles.node}>
           <i className="expand icon" />
-          Rectangle &nbsp;{w.toFixed(2)} x {y.toFixed(2)}
+          Rectangle {w.toFixed(2)} x {y.toFixed(2)}
         </a>
       </p>
     );

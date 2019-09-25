@@ -1,8 +1,9 @@
 .item {
   color: get-color(error);
+  font-size: 14px;
 
   &:hover {
     cursor: pointer;
-    color: red;
+    color: #f5222d;
   }
 }
