@@ -170,7 +170,7 @@ const Model = types
           callWithStates(ev, (_, clonedStates) => {
             clonedStates.forEach(item => {
               if (item.type !== "choices" && item.isSelected) {
-                self._addRectEv(ev, item);
+                self._addRectEv(ev, [item]);
               }
             });
           });
