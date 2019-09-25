@@ -153,35 +153,35 @@ const Model = types
       };
 
       const dispmap = {
-        RectangleModel: ev => self._addRect(ev),
-        PolygonModel: ev => self._addPoly(ev),
-        KeyPointModel: ev => self._addKeyPoint(ev),
+        RectangleModel: ev => self._addRectEv(ev),
+        PolygonModel: ev => self._addPolyEv(ev),
+        KeyPointModel: ev => self._addKeyPointEv(ev),
 
         RectangleLabelsModel: ev => {
           callWithStates(ev, (_, clonedStates) => {
             clonedStates.forEach(item => {
               if (item.type !== "choices" && item.isSelected) {
-                self._addRect(ev, item);
+                self._addRectEv(ev, item);
               }
             });
           });
         },
         PolygonLabelsModel: ev => {
           if (self.activePolygon && !self.activePolygon.closed) {
-            self._addPoly(ev);
+            self._addPolyEv(ev);
           } else {
-            callWithStates(ev, self._addPoly);
+            callWithStates(ev, self._addPolyEv);
           }
         },
         KeyPointLabelsModel: ev => {
-          callWithStates(ev, self._addKeyPoint);
+          callWithStates(ev, self._addKeyPointEv);
         },
       };
 
       return dispmap[self.controlButtonType()](ev);
     },
 
-    _addKeyPoint(ev, states) {
+    _addKeyPointEv(ev, states) {
       const wp = self.stageWidth / self.naturalWidth;
       const hp = self.stageHeight / self.naturalHeight;
 
@@ -197,20 +197,26 @@ const Model = types
         fillcolor = states[0].getSelectedColor();
       }
 
+      self._addKeyPoint(x, y, c.strokewidth, fillcolor, states);
+    },
+
+    _addKeyPoint(x, y, width, fillcolor, states, coordstype) {
+      const c = self.controlButton();
       const kp = KeyPointRegionModel.create({
         id: guidGenerator(),
         x: x,
         y: y,
-        width: parseInt(c.strokewidth),
+        width: parseFloat(width),
         opacity: parseFloat(c.opacity),
         fillcolor: fillcolor,
         states: states,
+        coordstype: coordstype,
       });
 
       self._addShape(kp);
     },
 
-    _addRect(ev, states) {
+    _addRectEv(ev, states) {
       const iw = 200;
       const ih = 200;
 
@@ -236,10 +242,10 @@ const Model = types
       const wx = ev.evt.offsetX;
       const wy = ev.evt.offsetY;
 
-      self.__addRect(Math.floor(wx - sw / 2), Math.floor(wy - sh / 2), sw, sh, stroke, states);
+      self._addRect(Math.floor(wx - sw / 2), Math.floor(wy - sh / 2), sw, sh, stroke, states);
     },
 
-    __addRect(x, y, sw, sh, stroke, states, coordstype) {
+    _addRect(x, y, sw, sh, stroke, states, coordstype) {
       // x = (x - self.zoomPosX) / self.zoomScale;
       // y = (y - self.zoomPosY) / self.zoomScale;
 
@@ -267,9 +273,7 @@ const Model = types
       self._addShape(rect);
     },
 
-    _addPoly(ev, states) {
-      let poly;
-
+    _addPolyEv(ev, states) {
       const w = 10;
       const isValid = isValidReference(() => self.activePolygon);
 
@@ -281,48 +285,54 @@ const Model = types
         const x = (ev.evt.offsetX - w / 2 - self.zoomPosX) / self.zoomScale;
         const y = (ev.evt.offsetY - w / 2 - self.zoomPosY) / self.zoomScale;
 
-        if (self.activePolygon) {
-          poly = self.activePolygon;
-        } else {
-          const c = self.controlButton();
-          let stroke = self.controlButton().strokecolor;
-          // let stroke = self.editor.rectstrokecolor;
-          // const states = self.states;
-          // TODO you may need to filter this states, check Text.js
-          if (states && states.length) {
-            stroke = states[0].getSelectedColor();
-          }
-
-          poly = PolygonRegionModel.create({
-            id: guidGenerator(),
-            x: x,
-            y: y,
-            width: w,
-            height: w,
-
-            opacity: parseFloat(c.opacity),
-            fillcolor: c.fillcolor,
-
-            strokewidth: parseInt(c.strokewidth),
-            strokecolor: stroke,
-
-            pointsize: c.pointsize,
-            pointstyle: c.pointstyle,
-
-            states: states,
-          });
-
-          self.setActivePolygon(poly);
-
-          self.shapes.push(poly);
-          self.completion.addRegion(poly);
+        let stroke = self.controlButton().strokecolor;
+        if (states && states.length) {
+          stroke = states[0].getSelectedColor();
         }
 
-        poly.addPoint(x, y);
+        self._addPoly(x, y, w, stroke, states);
 
         const stage = self._stageRef;
         stage.container().style.cursor = "default";
       }
+    },
+
+    _addPoly(x, y, width, stroke, states, coordstype) {
+      let poly = self.activePolygon;
+
+      if (!poly) {
+        const c = self.controlButton();
+
+        poly = PolygonRegionModel.create({
+          id: guidGenerator(),
+          x: x,
+          y: y,
+          width: width,
+          height: width,
+
+          opacity: parseFloat(c.opacity),
+          fillcolor: c.fillcolor,
+
+          strokewidth: parseInt(c.strokewidth),
+          strokecolor: stroke,
+
+          pointsize: c.pointsize,
+          pointstyle: c.pointstyle,
+
+          states: states,
+
+          coordstype: coordstype,
+        });
+
+        self.setActivePolygon(poly);
+
+        self.shapes.push(poly);
+        self.completion.addRegion(poly);
+      }
+
+      poly.addPoint(x, y);
+
+      return poly;
     },
 
     /**
@@ -342,6 +352,9 @@ const Model = types
     fromStateJSON(obj, fromModel) {
       const params = ["choices", "shape", "rectanglelabels"];
 
+      console.log("fromStateJSON");
+      console.log(obj);
+
       params.forEach(item => {
         if (!item in obj.value) {
           throw new Error("Not valid param");
@@ -357,7 +370,7 @@ const Model = types
 
         states.fromStateJSON(obj);
 
-        self.__addRect(
+        self._addRect(
           obj.value.x,
           obj.value.y,
           obj.value.width,
@@ -366,6 +379,33 @@ const Model = types
           [states],
           "perc",
         );
+      }
+
+      if (obj.value.keypointlabels) {
+        const states = restoreNewsnapshot(fromModel);
+
+        states.fromStateJSON(obj);
+        self._addKeyPoint(obj.value.x, obj.value.y, obj.value.width, states.getSelectedColor(), [states], "perc");
+      }
+
+      if (obj.value.polygonlabels) {
+        const states = restoreNewsnapshot(fromModel);
+
+        states.fromStateJSON(obj);
+        const poly = self._addPoly(
+          obj.value.points[0][0],
+          obj.value.points[0][1],
+          10,
+          states.getSelectedColor(),
+          [states],
+          "perc",
+        );
+
+        for (var i = 1; i < obj.value.points.length; i++) {
+          console.log(obj.value.points[i]);
+
+          poly.addPoint(obj.value.points[i][0], obj.value.points[i][1]);
+        }
       }
 
       if (obj.value.shape) {

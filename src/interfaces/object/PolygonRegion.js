@@ -46,6 +46,8 @@ const Model = types
 
     mouseOverStartPoint: types.optional(types.boolean, false),
 
+    coordstype: types.optional(types.enumeration(["px", "perc"]), "px"),
+
     fromName: types.maybeNull(types.string),
 
     wp: types.maybeNull(types.number),
@@ -228,9 +230,18 @@ const Model = types
       self.fill = color;
     },
 
-    updateImageSize(wp, hp) {
+    updateImageSize(wp, hp, sw, sh) {
       self.wp = wp;
       self.hp = hp;
+
+      if (self.coordstype == "perc") {
+        self.points.map(p => {
+          const x = (sw * p.x) / 100;
+          const y = (sh * p.y) / 100;
+          self.coordstype = "px";
+          p._movePoint(x, y);
+        });
+      }
     },
 
     toStateJSON() {

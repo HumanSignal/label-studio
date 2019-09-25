@@ -12,7 +12,7 @@ import { TranscribeAudio } from "../examples/transcribe_audio";
 /**
  * Choose labeling scheme
  */
-let dataType = ImageKeyPoint;
+let dataType = Sentiment;
 
 function templateDynamicData() {
   let settings = {

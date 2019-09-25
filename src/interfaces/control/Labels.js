@@ -55,36 +55,9 @@ const Model = types
       return sel && sel.background;
     },
 
-    toStateJSON() {
-      const names = self.getSelectedNames();
+    toStateJSON() {},
 
-      if (names && names.length) {
-        return {
-          id: self.pid,
-          from_name: self.name,
-          to_name: self.name,
-          type: self.type,
-          value: {
-            labels: names,
-          },
-        };
-      }
-    },
-
-    fromStateJSON(obj, fromModel) {
-      self.unselectAll();
-
-      if (!obj.value.labels) throw new Error("No labels param");
-
-      if (obj.id) self.pid = obj.id;
-
-      obj.value.labels.forEach(l => {
-        const label = self.findLabel(l);
-        if (!label) throw new Error("No label " + obj.value.label);
-
-        label.markSelected(true);
-      });
-    },
+    fromStateJSON(obj, fromModel) {},
   }));
 
 const LabelsModel = types.compose(
