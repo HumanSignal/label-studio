@@ -220,8 +220,6 @@ const Model = types
       const iw = 200;
       const ih = 200;
 
-      // console.log(states.toJSON());
-
       // based on image width and height we can place rect somewhere
       // in the center
       const sw = 100;
@@ -352,9 +350,6 @@ const Model = types
     fromStateJSON(obj, fromModel) {
       const params = ["choices", "shape", "rectanglelabels"];
 
-      console.log("fromStateJSON");
-      console.log(obj);
-
       params.forEach(item => {
         if (!item in obj.value) {
           throw new Error("Not valid param");
@@ -402,8 +397,6 @@ const Model = types
         );
 
         for (var i = 1; i < obj.value.points.length; i++) {
-          console.log(obj.value.points[i]);
-
           poly.addPoint(obj.value.points[i][0], obj.value.points[i][1]);
         }
       }

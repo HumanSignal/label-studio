@@ -41,7 +41,7 @@ const Model = types
     pid: types.optional(types.string, guidGenerator),
     type: "labels",
     showinline: types.optional(types.string, "true"),
-    children: Types.unionArray(["labels", "label", "choice", "header"]),
+    children: Types.unionArray(["labels", "label", "choice"]),
   })
   .views(self => ({
     get shouldBeUnselected() {
