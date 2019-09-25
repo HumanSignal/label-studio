@@ -40,7 +40,7 @@ const Model = types
     id: types.optional(types.identifier, guidGenerator),
     pid: types.optional(types.string, guidGenerator),
     type: "labels",
-    showinline: types.optional(types.string, "true"),
+    showinline: types.optional(types.boolean, true),
     children: Types.unionArray(["labels", "label", "choices", "choice"]),
   })
   .views(self => ({
@@ -54,10 +54,45 @@ const Model = types
       const sel = self.children.find(c => c.selected === true);
       return sel && sel.background;
     },
+    /**
+     * Usage check of selected labels before send completion to server
+     */
+    beforeSend() {
+      const names = self.getSelectedNames();
 
-    toStateJSON() {},
+      if (names && self.type === "labels") {
+        self.unselectAll();
+      }
+    },
+    toStateJSON() {
+      const names = self.getSelectedNames();
+      if (names && names.length) {
+        return {
+          id: self.pid,
+          from_name: self.name,
+          to_name: self.name,
+          type: self.type,
+          value: {
+            labels: names,
+          },
+        };
+      }
+    },
 
-    fromStateJSON(obj, fromModel) {},
+    fromStateJSON(obj, fromModel) {
+      self.unselectAll();
+
+      if (!obj.value.labels) throw new Error("No labels param");
+
+      if (obj.id) self.pid = obj.id;
+
+      obj.value.labels.forEach(l => {
+        const label = self.findLabel(l);
+        if (!label) throw new Error("No label " + obj.value.label);
+
+        label.markSelected(true);
+      });
+    },
   }));
 
 const LabelsModel = types.compose(

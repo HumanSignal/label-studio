@@ -63,7 +63,7 @@ const Model = types
     beforeSend() {
       const names = self.getSelectedNames();
 
-      if (names) {
+      if (names && self.type === "rectanglelabels") {
         self.unselectAll();
       }
     },
