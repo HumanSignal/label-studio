@@ -52,6 +52,8 @@ const Model = types
     sh: types.maybeNull(types.number),
 
     coordstype: types.optional(types.enumeration(["px", "perc"]), "px"),
+
+    supportsTransform: true,
   })
   .views(self => ({
     get parent() {

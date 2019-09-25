@@ -22,14 +22,14 @@ const TagAttrs = types.model("TextModel", {
   name: types.maybeNull(types.string),
   // text: types.maybeNull(types.optional(types.string, "Please set \"value\" attribute of Text")),
   value: types.maybeNull(types.string),
-  selelectwithoutlabel: types.optional(types.string, "false"),
+  selelectwithoutlabel: types.optional(types.boolean, false),
 
   hidden: types.optional(types.enumeration(["true", "false"]), "false"),
   /**
    * If we allow selecting parts of words of we select whole word only
    */
-  adjustselection: types.optional(types.string, "true"),
-  selectionenabled: types.optional(types.string, "true"),
+  adjustselection: types.optional(types.boolean, true),
+  selectionenabled: types.optional(types.boolean, true),
 });
 
 const Model = types
@@ -100,7 +100,7 @@ const Model = types
        * Selelect without label
        * Default: false
        */
-      if (self.selelectwithoutlabel === "false" && !clonedStates.length) return null;
+      if (!self.selelectwithoutlabel && !clonedStates.length) return null;
 
       const r = self._addRegion({
         start: range.start,
@@ -133,6 +133,11 @@ const Model = types
     fromStateJSON(obj, fromModel) {
       let r;
 
+      if (fromModel.type === "textarea" || fromModel.type === "choices") {
+        self.completion.names.get(obj.from_name).fromStateJSON(obj);
+        return;
+      }
+
       const tree = {
         pid: obj.id,
         start: obj.value.start,
@@ -140,11 +145,6 @@ const Model = types
         text: obj.value.text,
         normalization: obj.normalization,
       };
-
-      if (fromModel.type === "choices") {
-        self.completion.names.get(obj.from_name).fromStateJSON(obj);
-        return;
-      }
 
       if (obj.from_name === obj.to_name) {
         r = self._addRegion(tree);
@@ -202,7 +202,7 @@ class HtxTextView extends Component {
           id={item.id}
           key={item.id}
           text={item._value}
-          enabled={item.selectionenabled === "true" ? true : false}
+          enabled={item.selectionenabled}
           ranges={item.regions}
           adjustSelection={item.adjustselection}
           rangeRenderer={self.renderRegion.bind(this)}

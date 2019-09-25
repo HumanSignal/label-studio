@@ -40,6 +40,7 @@ const Model = types
     id: types.optional(types.identifier, guidGenerator),
     pid: types.optional(types.string, guidGenerator),
     type: "labels",
+    showinline: types.optional(types.boolean, true),
     children: Types.unionArray(["labels", "label", "choices", "choice"]),
   })
   .views(self => ({
@@ -53,10 +54,18 @@ const Model = types
       const sel = self.children.find(c => c.selected === true);
       return sel && sel.background;
     },
-
-    toStateJSON() {
+    /**
+     * Usage check of selected labels before send completion to server
+     */
+    beforeSend() {
       const names = self.getSelectedNames();
 
+      if (names && self.type === "labels") {
+        self.unselectAll();
+      }
+    },
+    toStateJSON() {
+      const names = self.getSelectedNames();
       if (names && names.length) {
         return {
           id: self.pid,
@@ -94,20 +103,22 @@ const LabelsModel = types.compose(
 );
 
 const HtxLabels = observer(({ item }) => {
-  return (
-    <div
-      style={{
-        marginTop: "1em",
-        marginBottom: "1em",
-        display: "flex",
-        justifyContent: "flex-start",
-        alignItems: "center",
-        flexFlow: "wrap",
-      }}
-    >
-      {Tree.renderChildren(item)}
-    </div>
-  );
+  const style = {
+    marginTop: "1em",
+    marginBottom: "1em",
+    display: "flex",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    flexFlow: "wrap",
+  };
+
+  if (item.showinline == "false") {
+    style["flexDirection"] = "column";
+    style["alignItems"] = "flex-start";
+    style["marginTop"] = "0";
+  }
+
+  return <div style={style}>{Tree.renderChildren(item)}</div>;
 });
 
 Registry.addTag("labels", LabelsModel, HtxLabels);

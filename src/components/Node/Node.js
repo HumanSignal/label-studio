@@ -3,6 +3,8 @@ import { observer, inject } from "mobx-react";
 import { getType, getRoot } from "mobx-state-tree";
 import { Icon } from "antd";
 
+import styles from "./Node.module.scss";
+
 const Node = observer(({ node }) => {
   const click = ev => {
     ev.preventDefault();
@@ -10,12 +12,6 @@ const Node = observer(({ node }) => {
     node.selectRegion();
 
     return false;
-  };
-
-  const style = {
-    color: "black",
-    textDecorationLine: "underline",
-    textDecorationStyle: "dotted",
   };
 
   if (getType(node).name === "TextRegionModel") {
@@ -31,9 +27,9 @@ const Node = observer(({ node }) => {
   if (getType(node).name === "AudioRegionModel") {
     return (
       <p>
-        <a href="" onClick={click} style={style}>
+        <a href="" onClick={click} className={styles.node}>
           <i className="microphone icon" />
-          Audio &nbsp;{node.start.toFixed(2)} - {node.end.toFixed(2)}
+          Audio {node.start.toFixed(2)} - {node.end.toFixed(2)}
         </a>
       </p>
     );
@@ -42,9 +38,9 @@ const Node = observer(({ node }) => {
   if (getType(node).name === "TextAreaRegionModel") {
     return (
       <p>
-        <a href="" onClick={click} style={style}>
+        <a href="" onClick={click} className={styles.node}>
           <i className="i cursor icon" />
-          Input &nbsp;<span style={{ color: "#5a5a5a" }}>{node._value}</span>
+          Input <span style={{ color: "#5a5a5a" }}>{node._value}</span>
         </a>
       </p>
     );
@@ -55,9 +51,9 @@ const Node = observer(({ node }) => {
     const y = node.height * node.scaleY;
     return (
       <p>
-        <a href="" onClick={click} style={style}>
+        <a href="" onClick={click} className={styles.node}>
           <i className="expand icon" />
-          Rectangle &nbsp;{w.toFixed(2)} x {y.toFixed(2)}
+          Rectangle {w.toFixed(2)} x {y.toFixed(2)}
         </a>
       </p>
     );
@@ -66,9 +62,20 @@ const Node = observer(({ node }) => {
   if (getType(node).name === "PolygonRegionModel") {
     return (
       <p>
-        <a href="" onClick={click} style={style}>
+        <a href="" onClick={click} className={styles.node}>
           <i className="i object ungroup outline icon" />
           Polygon
+        </a>
+      </p>
+    );
+  }
+
+  if (getType(node).name === "KeyPointRegionModel") {
+    return (
+      <p>
+        <a href="" onClick={click} className={styles.node}>
+          <i className="i object bullseye icon" />
+          KeyPoint
         </a>
       </p>
     );
@@ -76,7 +83,7 @@ const Node = observer(({ node }) => {
 });
 
 const NodeMinimal = ({ node }) => {
-  if (getType(node).name == "TextRegionModel") {
+  if (getType(node).name === "TextRegionModel") {
     return (
       <Fragment>
         <Icon type="font-colors" /> Text
@@ -84,7 +91,7 @@ const NodeMinimal = ({ node }) => {
     );
   }
 
-  if (getType(node).name == "RectRegionModel") {
+  if (getType(node).name === "RectRegionModel") {
     return (
       <Fragment>
         <i className="expand icon" />
@@ -93,7 +100,7 @@ const NodeMinimal = ({ node }) => {
     );
   }
 
-  if (getType(node).name == "AudioRegionModel") {
+  if (getType(node).name === "AudioRegionModel") {
     return (
       <Fragment>
         <i className="microphone icon" />
@@ -102,7 +109,7 @@ const NodeMinimal = ({ node }) => {
     );
   }
 
-  if (getType(node).name == "TextAreaRegionModel") {
+  if (getType(node).name === "TextAreaRegionModel") {
     return (
       <Fragment>
         <i className="i cursor icon" />
@@ -111,11 +118,20 @@ const NodeMinimal = ({ node }) => {
     );
   }
 
-  if (getType(node).name == "PolygonRegionModel") {
+  if (getType(node).name === "PolygonRegionModel") {
     return (
       <Fragment>
         <i className="i object ungroup outline icon" />
         Polygon
+      </Fragment>
+    );
+  }
+
+  if (getType(node).name === "KeyPointRegionModel") {
+    return (
+      <Fragment>
+        <i className="i object bullseye icon" />
+        KeyPoint
       </Fragment>
     );
   }

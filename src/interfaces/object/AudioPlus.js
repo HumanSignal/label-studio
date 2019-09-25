@@ -91,6 +91,16 @@ const Model = types
       let r;
       let m;
 
+      if (obj.value.choices) {
+        self.completion.names.get(obj.from_name).fromStateJSON(obj);
+
+        return;
+      }
+
+      if (obj.value.labels) {
+        self.completion.names.get(obj.from_name).fromStateJSON(obj);
+      }
+
       /**
        *
        */
@@ -102,10 +112,6 @@ const Model = types
       };
 
       const region = self.findRegion(obj.value.start, obj.value.end);
-
-      if (obj.value.labels) {
-        self.completion.names.get(obj.from_name).fromStateJSON(obj);
-      }
 
       if (fromModel) {
         m = restoreNewsnapshot(fromModel);

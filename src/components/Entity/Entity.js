@@ -4,7 +4,7 @@ import { getType } from "mobx-state-tree";
 import { Input, Form } from "semantic-ui-react";
 import { Icon, Button, Tag } from "antd";
 
-import { Node, NodeMinimal } from "../Node";
+import { Node, NodeMinimal } from "../Node/Node";
 import Hint from "../Hint/Hint";
 import styles from "./Entity.module.scss";
 
@@ -30,7 +30,8 @@ const RenderStates = ({ node }) => {
     if (
       getType(s).name === "LabelsModel" ||
       getType(s).name === "RectangleLabelsModel" ||
-      getType(s).name === "PolygonLabelsModel"
+      getType(s).name === "PolygonLabelsModel" ||
+      getType(s).name === "KeyPointLabelsModel"
     ) {
       return templateElement(s);
     } else if (getType(s).name === "RatingModel") {

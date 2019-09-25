@@ -4,17 +4,18 @@ import React, { Component } from "react";
 import { types } from "mobx-state-tree";
 
 import Types from "../../core/Types";
-import Tree from "../../core/Tree";
 import Registry from "../../core/Registry";
 
 import { guidGenerator } from "../../core/Helpers";
 import SelectedModelMixin from "../mixins/SelectedModel";
+import InfoModal from "../../components/Infomodal/Infomodal";
 
 import { HtxLabels, LabelsModel } from "./Labels";
 import { RectangleModel } from "./Rectangle";
 
 /**
  * RectangleLabels tag creates labeled rectangles
+ * Used only for Image
  * @example
  * <View>
  *   <RectangleLabels name="labels" toName="image">
@@ -56,35 +57,37 @@ const Model = types
       return sel && sel.background;
     },
 
-    toStateJSON() {
-      // const names = self.getSelectedNames();
-      // if (names) {
-      //   self.unselectAll();
-      // }
-      // if (names && names.length) {
-      //   return {
-      //     id: self.pid,
-      //     from_name: self.name,
-      //     to_name: self.name,
-      //     type: self.type,
-      //     value: {
-      //       labels: names,
-      //     },
-      //   };
-      // }
+    /**
+     * Usage check of selected labels before send completion to server
+     */
+    beforeSend() {
+      const names = self.getSelectedNames();
+
+      if (names && self.type === "rectanglelabels") {
+        self.unselectAll();
+      }
     },
 
     fromStateJSON(obj, fromModel) {
       self.unselectAll();
 
-      if (!obj.value.rectanglelabels) throw new Error("No labels param");
+      if (!obj.value.rectanglelabels) {
+        InfoModal.error("Error with labels.");
+        return;
+      }
 
       if (obj.id) self.pid = obj.id;
 
-      obj.value.rectanglelabels.forEach(l => {
-        const label = self.findLabel(l);
+      /**
+       * Found correct label from config
+       */
+      obj.value.rectanglelabels.forEach(inLabel => {
+        const label = self.findLabel(inLabel);
 
-        if (!label) throw new Error("No label " + obj.value.label);
+        if (!label) {
+          InfoModal.error("Error with labels. Not found: " + obj.value.rectanglelabels);
+          return;
+        }
 
         label.markSelected(true);
       });
@@ -105,20 +108,20 @@ const RectangleLabelsModel = types.compose(
 
 const HtxRectangleLabels = observer(({ item }) => {
   return <HtxLabels item={item} />;
-  return (
-    <div
-      style={{
-        marginTop: "1em",
-        marginBottom: "1em",
-        display: "flex",
-        justifyContent: "flex-start",
-        alignItems: "center",
-        flexFlow: "wrap",
-      }}
-    >
-      {Tree.renderChildren(item)}
-    </div>
-  );
+  // return (
+  //   <div
+  //     style={{
+  //       marginTop: "1em",
+  //       marginBottom: "1em",
+  //       display: "flex",
+  //       justifyContent: "flex-start",
+  //       alignItems: "center",
+  //       flexFlow: "wrap",
+  //     }}
+  //   >
+  //     {Tree.renderChildren(item)}
+  //   </div>
+  // );
 });
 
 Registry.addTag("rectanglelabels", RectangleLabelsModel, HtxRectangleLabels);

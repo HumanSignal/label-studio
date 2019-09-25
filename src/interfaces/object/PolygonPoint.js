@@ -26,6 +26,8 @@ const PolygonPoint = types
     x: types.number,
     y: types.number,
 
+    index: types.number,
+
     style: types.string,
     size: types.string,
     // isMouseOverStartPoint: types.optional(types.boolean, false),
@@ -62,8 +64,10 @@ const PolygonPoint = types
 
       const t = ev.target;
 
-      t.setX(t.x() - t.width() / 2);
-      t.setY(t.y() - t.height() / 2);
+      if (self.style == "rectangle") {
+        t.setX(t.x() - t.width() / 2);
+        t.setY(t.y() - t.height() / 2);
+      }
 
       const scaleMap = {
         small: 3,
@@ -84,15 +88,18 @@ const PolygonPoint = types
       const stage = self.parent.parent._stageRef;
       stage.container().style.cursor = "default";
 
-      t.setX(t.x() + t.width() / 2);
-      t.setY(t.y() + t.height() / 2);
+      if (self.style == "rectangle") {
+        t.setX(t.x() + t.width() / 2);
+        t.setY(t.y() + t.height() / 2);
+      }
+
       t.scale({ x: 1, y: 1 });
 
       self.parent.setMouseOverStartPoint(false);
     },
   }));
 
-const PolygonPointView = observer(({ item, index }) => {
+const PolygonPointView = observer(({ item, name }) => {
   const sizes = {
     small: 4,
     medium: 8,
@@ -108,7 +115,7 @@ const PolygonPointView = observer(({ item, index }) => {
   const w = sizes[item.size];
 
   const startPointAttr =
-    index === 0
+    item.index === 0
       ? {
           hitStrokeWidth: 12,
           onMouseOver: item.handleMouseOverStartPoint,
@@ -155,13 +162,20 @@ const PolygonPointView = observer(({ item, index }) => {
   if (item.style == "circle") {
     return (
       <Circle
-        key={index}
-        x={item.x - w / 2}
-        y={item.y - w / 2}
+        key={name}
+        name={name}
+        x={item.x}
+        y={item.y}
         radius={w}
         fill="white"
         stroke="black"
         strokeWidth={stroke[item.size]}
+        dragOnTop={false}
+        onClick={ev => {
+          if (item.parent.mouseOverStartPoint) {
+            item.parent.closePoly();
+          }
+        }}
         {...dragOpts}
         {...startPointAttr}
         draggable
@@ -170,7 +184,8 @@ const PolygonPointView = observer(({ item, index }) => {
   } else {
     return (
       <Rect
-        key={index}
+        name={name}
+        key={name}
         x={item.x - w / 2}
         y={item.y - w / 2}
         width={w}
