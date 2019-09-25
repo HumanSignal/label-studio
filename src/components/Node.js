@@ -73,6 +73,17 @@ const Node = observer(({ node }) => {
       </p>
     );
   }
+
+  if (getType(node).name === "KeyPointRegionModel") {
+    return (
+      <p>
+        <a href="" onClick={click} style={style}>
+          <i className="i object bullseye icon" />
+          KeyPoint
+        </a>
+      </p>
+    );
+  }
 });
 
 const NodeMinimal = ({ node }) => {
@@ -116,6 +127,15 @@ const NodeMinimal = ({ node }) => {
       <Fragment>
         <i className="i object ungroup outline icon" />
         Polygon
+      </Fragment>
+    );
+  }
+
+  if (getType(node).name == "KeyPointRegionModel") {
+    return (
+      <Fragment>
+        <i className="i object bullseye icon" />
+        KeyPoint
       </Fragment>
     );
   }

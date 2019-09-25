@@ -48,6 +48,8 @@ import { TextModel } from "../../interfaces/object/Text";
  * Control
  */
 import { RectangleModel } from "../../interfaces/control/Rectangle";
+import { KeyPointModel } from "../../interfaces/control/KeyPoint";
+import { KeyPointLabelsModel } from "../../interfaces/control/KeyPointLabels";
 import { PolygonModel } from "../../interfaces/control/Polygon";
 import { RectangleLabelsModel } from "../../interfaces/control/RectangleLabels";
 import { PolygonLabelsModel } from "../../interfaces/control/PolygonLabels";

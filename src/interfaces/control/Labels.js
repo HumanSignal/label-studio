@@ -40,7 +40,8 @@ const Model = types
     id: types.optional(types.identifier, guidGenerator),
     pid: types.optional(types.string, guidGenerator),
     type: "labels",
-    children: Types.unionArray(["labels", "label", "choice"]),
+    showinline: types.optional(types.string, "true"),
+    children: Types.unionArray(["labels", "label", "choice", "header"]),
   })
   .views(self => ({
     get shouldBeUnselected() {
@@ -94,21 +95,22 @@ const LabelsModel = types.compose(
 );
 
 const HtxLabels = observer(({ item }) => {
-  return (
-    <div
-      style={{
-        marginTop: "1em",
-        marginBottom: "1em",
-        display: "flex",
-        justifyContent: "flex-start",
-        alignItems: "center",
-        flexFlow: "wrap",
-      }}
-    >
-      
-      {Tree.renderChildren(item)}
-    </div>
-  );
+  const style = {
+    marginTop: "1em",
+    marginBottom: "1em",
+    display: "flex",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    flexFlow: "wrap",
+  };
+
+  if (item.showinline == "false") {
+    style["flexDirection"] = "column";
+    style["alignItems"] = "flex-start";
+    style["marginTop"] = "0";
+  }
+
+  return <div style={style}>{Tree.renderChildren(item)}</div>;
 });
 
 Registry.addTag("labels", LabelsModel, HtxLabels);

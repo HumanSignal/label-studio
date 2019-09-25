@@ -1,16 +1,19 @@
 import { types, getParent } from "mobx-state-tree";
 
-import { TextRegionModel } from "../interfaces/object/TextRegion";
-import { RectRegionModel } from "../interfaces/object/RectRegion";
-import { PolygonRegionModel } from "../interfaces/object/PolygonRegion";
-import { AudioRegionModel } from "../interfaces/object/AudioRegion";
-import { TextAreaRegionModel } from "../interfaces/object/TextAreaRegion";
+import * as HtxObjectModel from "../interfaces/object";
 
 export default types
   .model("RegionStore", {
     regions: types.array(
       types.safeReference(
-        types.union(TextRegionModel, RectRegionModel, PolygonRegionModel, AudioRegionModel, TextAreaRegionModel),
+        types.union(
+          HtxObjectModel.TextRegionModel,
+          HtxObjectModel.RectRegionModel,
+          HtxObjectModel.PolygonRegionModel,
+          HtxObjectModel.AudioRegionModel,
+          HtxObjectModel.TextAreaRegionModel,
+          HtxObjectModel.KeyPointRegionModel,
+        ),
       ),
     ),
   })

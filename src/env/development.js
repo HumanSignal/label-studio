@@ -3,14 +3,16 @@ import { AudioClassifiaction } from "../examples/audio_classification";
 import { AudioRegions } from "../examples/audio_regions";
 import { ChatbotAnalysis } from "../examples/chatbot_analysis";
 import { ImageBbox } from "../examples/image_bbox";
+import { ImagePolygons } from "../examples/image_polygons";
+import { ImageKeyPoint } from "../examples/image_keypoints";
 import { NamedEntity } from "../examples/named_entity";
 import { References } from "../examples/references";
 import { TranscribeAudio } from "../examples/transcribe_audio";
 
 /**
- * Choose data type
+ * Choose labeling scheme
  */
-let dataType = Sentiment;
+let dataType = ImageKeyPoint;
 
 function templateDynamicData() {
   let settings = {
