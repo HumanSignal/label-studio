@@ -9,6 +9,7 @@ import Registry from "../../core/Registry";
 
 import { guidGenerator } from "../../core/Helpers";
 import SelectedModelMixin from "../mixins/SelectedModel";
+import InfoModal from "../../components/Infomodal/Infomodal";
 
 import { HtxLabels, LabelsModel } from "./Labels";
 import { RectangleModel } from "./Rectangle";
@@ -71,14 +72,23 @@ const Model = types
     fromStateJSON(obj, fromModel) {
       self.unselectAll();
 
-      if (!obj.value.rectanglelabels) throw new Error("No labels param");
+      if (!obj.value.rectanglelabels) {
+        InfoModal.error("Error with labels.");
+        return;
+      }
 
       if (obj.id) self.pid = obj.id;
 
-      obj.value.rectanglelabels.forEach(l => {
-        const label = self.findLabel(l);
+      /**
+       * Found correct label from config
+       */
+      obj.value.rectanglelabels.forEach(inLabel => {
+        const label = self.findLabel(inLabel);
 
-        if (!label) throw new Error("No label " + obj.value.label);
+        if (!label) {
+          InfoModal.error("Error with labels. Not found: " + obj.value.rectanglelabels);
+          return;
+        }
 
         label.markSelected(true);
       });

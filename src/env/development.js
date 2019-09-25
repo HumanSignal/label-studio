@@ -3,6 +3,7 @@ import { AudioClassification } from "../examples/audio_classification";
 import { AudioRegions } from "../examples/audio_regions";
 import { ChatbotAnalysis } from "../examples/chatbot_analysis";
 import { ImageBbox } from "../examples/image_bbox";
+import { ImageMultilabel } from "../examples/image_multilabel";
 import { NamedEntity } from "../examples/named_entity";
 import { References } from "../examples/references";
 import { TranscribeAudio } from "../examples/transcribe_audio";
