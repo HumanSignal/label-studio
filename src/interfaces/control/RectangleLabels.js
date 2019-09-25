@@ -108,20 +108,20 @@ const RectangleLabelsModel = types.compose(
 
 const HtxRectangleLabels = observer(({ item }) => {
   return <HtxLabels item={item} />;
-  return (
-    <div
-      style={{
-        marginTop: "1em",
-        marginBottom: "1em",
-        display: "flex",
-        justifyContent: "flex-start",
-        alignItems: "center",
-        flexFlow: "wrap",
-      }}
-    >
-      {Tree.renderChildren(item)}
-    </div>
-  );
+  // return (
+  //   <div
+  //     style={{
+  //       marginTop: "1em",
+  //       marginBottom: "1em",
+  //       display: "flex",
+  //       justifyContent: "flex-start",
+  //       alignItems: "center",
+  //       flexFlow: "wrap",
+  //     }}
+  //   >
+  //     {Tree.renderChildren(item)}
+  //   </div>
+  // );
 });
 
 Registry.addTag("rectanglelabels", RectangleLabelsModel, HtxRectangleLabels);
