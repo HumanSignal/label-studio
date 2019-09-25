@@ -1,8 +1,7 @@
 <View>
-  <Labels name="reference" toName="text">
-    <Label value="subject" alias="SUB" showalias="true"></Label>
-    <Label value="object" alias="OBJ" showalias="true"></Label>
-    <Label value="verb" alias="VER" showalias="true"></Label>
-  </Labels>
   <Text name="text" value="$text"></Text>
+  <Choices name="validation-label" choice="single-radio" toName="text">
+    <Choice value="Missing words" alias="missing-words"></Choice>
+    <Choice value="Valid" alias="valid"></Choice>
+  </Choices>
 </View>

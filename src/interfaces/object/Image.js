@@ -83,7 +83,16 @@ const Model = types
 
     controlButton() {
       const names = self.completion.toNames.get(self.name);
-      return names[0];
+
+      let r = names[0];
+
+      names.forEach(item => {
+        if (item.type === "rectanglelabels") {
+          r = item;
+        }
+      });
+
+      return r;
     },
 
     controlButtonType() {
@@ -248,6 +257,13 @@ const Model = types
       // y = (y - self.zoomPosY) / self.zoomScale;
 
       const c = self.controlButton();
+
+      let localStates = states;
+
+      if (!states.length) {
+        localStates = [states];
+      }
+
       const rect = RectRegionModel.create({
         id: guidGenerator(),
 
@@ -263,7 +279,7 @@ const Model = types
         strokewidth: parseInt(c.strokewidth),
         strokecolor: stroke,
 
-        states: states,
+        states: localStates,
 
         coordstype: coordstype,
       });
@@ -344,22 +360,32 @@ const Model = types
     },
 
     toStateJSON() {
-      return self.shapes.map(r => r.toStateJSON());
+      let t = self.shapes.map(r => r.toStateJSON());
+      return t;
     },
 
     fromStateJSON(obj, fromModel) {
       const params = ["choices", "shape", "rectanglelabels"];
 
+      /**
+       * Check correct controls for image object
+       */
       params.forEach(item => {
         if (!item in obj.value) {
           throw new Error("Not valid param");
         }
       });
 
+      /**
+       * Choices
+       */
       if (obj.value.choices) {
         self.completion.names.get(obj.from_name).fromStateJSON(obj);
       }
 
+      /**
+       * Rectangle labels
+       */
       if (obj.value.rectanglelabels) {
         const states = restoreNewsnapshot(fromModel);
 
@@ -401,6 +427,9 @@ const Model = types
         }
       }
 
+      /**
+       * Shapes
+       */
       if (obj.value.shape) {
         let modifySnap;
         let shapeModel;
@@ -605,7 +634,7 @@ class HtxImageView extends Component {
                 return Tree.renderItem(s);
               })}
               <TransformerComponent
-                rotateEnabled={item.controlButton().canrotate === "true"}
+                rotateEnabled={item.controlButton().canrotate}
                 selectedShapeName={item.selectedShape}
               />
             </Layer>

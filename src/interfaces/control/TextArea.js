@@ -27,7 +27,7 @@ import ProcessAttrsMixin from "../mixins/ProcessAttrs";
  * @param {string=} maxSubmissions maximum number of submissions
  */
 const TagAttrs = types.model({
-  allowSubmit: types.optional(types.string, "true"),
+  allowSubmit: types.optional(types.boolean, true),
   label: types.optional(types.string, ""),
   name: types.maybeNull(types.string),
   toname: types.maybeNull(types.string),
@@ -133,7 +133,7 @@ const HtxTextArea = observer(({ item }) => {
       {item.showSubmit && (
         <Form
           onSubmit={ev => {
-            if (item.allowSubmit === "true") {
+            if (item.allowSubmit) {
               item.addText(item._value);
               item.setValue("");
             }

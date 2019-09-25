@@ -1,0 +1,31 @@
+{
+    "completions": [
+        {
+            "id": 1001,
+            "result": [
+                {
+                    "from_name": "tag",
+                    "id": "tNP6xh95nz",
+                    "source": "$image",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "value": {
+                        "height": 10.672358591248665,
+                        "rectanglelabels": [
+                            "Planet"
+                        ],
+                        "rotation": 0,
+                        "width": 13.333333333333334,
+                        "x": 50.4,
+                        "y": 5.869797225186766
+                    }
+                }
+            ]
+        }
+    ],
+    "data": {
+        "image": "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg"
+    },
+    "id": 1,
+    "task_path": "../examples/image_bbox/tasks.json"
+}

@@ -52,8 +52,8 @@ const TagAttrs = types.model({
 
   // elementvalue: types.maybeNull(types.string),
   elementtag: types.optional(types.string, "Text"),
-  ranked: types.optional(types.string, "true"),
-  sortable: types.optional(types.string, "true"),
+  ranked: types.optional(types.boolean, true),
+  sortable: types.optional(types.boolean, true),
 
   sortedhighlightcolor: types.maybeNull(types.string),
 
