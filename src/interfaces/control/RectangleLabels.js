@@ -4,7 +4,6 @@ import React, { Component } from "react";
 import { types } from "mobx-state-tree";
 
 import Types from "../../core/Types";
-import Tree from "../../core/Tree";
 import Registry from "../../core/Registry";
 
 import { guidGenerator } from "../../core/Helpers";

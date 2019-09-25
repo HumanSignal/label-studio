@@ -1,0 +1,43 @@
+{
+   "completions": [
+      {
+         "result": [
+            {
+               "id":"hqudA4A3U4",
+               "from_name":"tag",
+               "to_name":"img",
+               "source":"$image",
+               "type":"keypointlabels",
+               "value":{
+                  "x":49.6,
+                  "y":52.340425531914896,
+                  "width":0.6666666666666666,
+                  "keypointlabels":[
+                     "Hello"
+                  ]
+               }
+            },
+            {
+               "id":"Rz9oHDXIwG",
+               "from_name":"tag",
+               "to_name":"img",
+               "source":"$image",
+               "type":"keypointlabels",
+               "value":{
+                  "x":47.733333333333334,
+                  "y":52.765957446808514,
+                  "width":0.6666666666666666,
+                  "keypointlabels":[
+                     "World"
+                  ]
+               }
+            }
+         ]
+      }
+   ],
+   "data":{
+      "image":"https://user.fm/files/v2-901310d5cb3fa90e0616ca10590bacb3/spacexmoon-800x501.jpg"
+   },
+   "id":0,
+   "task_path":"../examples/image_keypoints/tasks.json"
+}

@@ -4,14 +4,14 @@ import { observer, inject } from "mobx-react";
 import { types, getParentOfType, getRoot } from "mobx-state-tree";
 
 import Konva from "konva";
-import { Shape, Label, Stage, Layer, Rect, Text, Transformer } from "react-konva";
+import { Shape, Label, Stage, Layer, Circle, Text } from "react-konva";
 
 import { guidGenerator, restoreNewsnapshot } from "../../core/Helpers";
 
 import Registry from "../../core/Registry";
 
 import { LabelsModel } from "../control/Labels";
-import { RectangleLabelsModel } from "../control/RectangleLabels";
+import { KeyPointLabelsModel } from "../control/KeyPointLabels";
 
 import { RatingModel } from "../control/Rating";
 import { ImageModel } from "../object/Image";
@@ -23,37 +23,21 @@ const Model = types
     id: types.identifier,
     pid: types.optional(types.string, guidGenerator),
 
-    type: "rectangleregion",
+    type: "keypointregion",
 
     x: types.number,
     y: types.number,
     width: types.number,
-    height: types.number,
-
-    scaleX: types.optional(types.number, 1),
-    scaleY: types.optional(types.number, 1),
-
-    rotation: types.optional(types.number, 0),
 
     opacity: types.number,
-    strokewidth: types.number,
-
     fillcolor: types.maybeNull(types.string),
-    strokecolor: types.optional(types.string, "blue"),
 
-    states: types.maybeNull(types.array(types.union(LabelsModel, RatingModel, RectangleLabelsModel))),
-
-    // fromName: types.maybeNull(types.string),
-
-    wp: types.maybeNull(types.number),
-    hp: types.maybeNull(types.number),
+    states: types.maybeNull(types.array(types.union(LabelsModel, RatingModel, KeyPointLabelsModel))),
 
     sw: types.maybeNull(types.number),
     sh: types.maybeNull(types.number),
 
     coordstype: types.optional(types.enumeration(["px", "perc"]), "px"),
-
-    supportsTransform: true,
   })
   .views(self => ({
     get parent() {
@@ -71,36 +55,15 @@ const Model = types
       self.completion.setHighlightedNode(null);
     },
 
-    coordsInside(x, y) {
-      // check if x and y are inside the rectangle
-      const rx = self.x;
-      const ry = self.y;
-      const rw = self.width * (self.scaleX || 1);
-      const rh = self.height * (self.scaleY || 1);
-
-      if (x > rx && x < rx + rw && y > ry && y < ry + rh) return true;
-
-      return false;
-    },
-
     selectRegion() {
       self.selected = true;
       self.completion.setHighlightedNode(self);
       self.parent.setSelected(self.id);
     },
 
-    setPosition(x, y, width, height, rotation) {
+    setPosition(x, y) {
       self.x = x;
       self.y = y;
-      self.width = width;
-      self.height = height;
-
-      self.rotation = rotation;
-    },
-
-    setScale(x, y) {
-      self.scaleX = x;
-      self.scaleY = y;
     },
 
     addState(state) {
@@ -112,8 +75,8 @@ const Model = types
     },
 
     updateImageSize(wp, hp, sw, sh) {
-      self.wp = wp;
-      self.hp = hp;
+      // self.wp = wp;
+      // self.hp = hp;
 
       self.sw = sw;
       self.sh = sh;
@@ -122,36 +85,25 @@ const Model = types
         self.x = (sw * self.x) / 100;
         self.y = (sh * self.y) / 100;
         self.width = (sw * self.width) / 100;
-        self.height = (sh * self.height) / 100;
         self.coordstype = "px";
       }
     },
 
     toStateJSON() {
       const parent = self.parent;
-      let fromEl = parent.states()[0];
-
-      if (parent.states().length > 1) {
-        parent.states().forEach(state => {
-          if (state.type === "rectanglelabels") {
-            fromEl = state;
-          }
-        });
-      }
+      const from = parent.states()[0];
 
       const buildTree = obj => {
         const tree = {
           id: self.id,
-          from_name: fromEl.name,
+          from_name: from.name,
           to_name: parent.name,
           source: parent.value,
-          type: "rectangle",
+          type: "keypoint",
           value: {
             x: (self.x * 100) / self.parent.stageWidth,
             y: (self.y * 100) / self.parent.stageHeight,
-            width: (self.width * (self.scaleX || 1) * 100) / self.parent.stageWidth, //  * (self.scaleX || 1)
-            height: (self.height * (self.scaleY || 1) * 100) / self.parent.stageHeight,
-            rotation: self.rotation,
+            width: (self.width * 100) / self.parent.stageWidth, //  * (self.scaleX || 1)
           },
         };
 
@@ -175,14 +127,14 @@ const Model = types
     },
   }));
 
-const RectRegionModel = types.compose(
-  "RectRegionModel",
+const KeyPointRegionModel = types.compose(
+  "KeyPointRegionModel",
   RegionsMixin,
   NormalizationMixin,
   Model,
 );
 
-const HtxRectangleView = ({ store, item }) => {
+const HtxKeyPointView = ({ store, item }) => {
   const self = this;
   const { name, wwidth, wheight, onChangedPosition } = item;
 
@@ -192,7 +144,6 @@ const HtxRectangleView = ({ store, item }) => {
   const x = item.x;
   const y = item.y;
   const w = item.width;
-  const h = item.height;
 
   const props = {};
 
@@ -213,43 +164,14 @@ const HtxRectangleView = ({ store, item }) => {
 
   return (
     <Fragment>
-      <Rect
+      <Circle
         x={x}
         y={y}
-        width={w}
-        height={h}
-        scaleX={item.scaleX}
-        scaleY={item.scaleY}
+        radius={item.width}
         name={item.id}
-        onTransformEnd={e => {
-          const t = e.target;
-
-          const wp = item.wp || item.parent.stageWidth / item.parent.naturalWidth;
-          const hp = item.hp || item.parent.stageHeight / item.parent.naturalHeight;
-
-          item.setPosition(
-            t.getAttr("x"),
-            t.getAttr("y"),
-            t.getAttr("width"),
-            t.getAttr("height"),
-            t.getAttr("rotation"),
-          );
-          item.setScale(t.getAttr("scaleX"), t.getAttr("scaleY"));
-        }}
         onDragEnd={e => {
           const t = e.target;
-
-          const wp = item.wp || item.parent.stageWidth / item.parent.naturalWidth;
-          const hp = item.hp || item.parent.stageHeight / item.parent.naturalHeight;
-
-          item.setPosition(
-            t.getAttr("x"),
-            t.getAttr("y"),
-            t.getAttr("width"),
-            t.getAttr("height"),
-            t.getAttr("rotation"),
-          );
-          item.setScale(t.getAttr("scaleX"), t.getAttr("scaleY"));
+          item.setPosition(t.getAttr("x"), t.getAttr("y"));
         }}
         dragBoundFunc={function(pos) {
           let { x, y } = pos;
@@ -297,8 +219,8 @@ const HtxRectangleView = ({ store, item }) => {
   );
 };
 
-const HtxRectangle = inject("store")(observer(HtxRectangleView));
+const HtxKeyPoint = inject("store")(observer(HtxKeyPointView));
 
-Registry.addTag("rectangleregion", RectRegionModel, HtxRectangle);
+Registry.addTag("keypointregion", KeyPointRegionModel, HtxKeyPoint);
 
-export { RectRegionModel, HtxRectangle };
+export { KeyPointRegionModel, HtxKeyPoint };

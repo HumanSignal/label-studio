@@ -4,7 +4,7 @@ import { observer, inject } from "mobx-react";
 import { types, getParentOfType, getRoot, getParent } from "mobx-state-tree";
 
 import Konva from "konva";
-import { Shape, Label, Stage, Layer, Rect, Text, Transformer, Group, Line } from "react-konva";
+import { Circle, Shape, Label, Stage, Layer, Rect, Text, Transformer, Group, Line } from "react-konva";
 
 import { guidGenerator, restoreNewsnapshot } from "../../core/Helpers";
 
@@ -45,6 +45,8 @@ const Model = types
     states: types.maybeNull(types.array(types.union(LabelsModel, RatingModel, PolygonLabelsModel))),
 
     mouseOverStartPoint: types.optional(types.boolean, false),
+
+    coordstype: types.optional(types.enumeration(["px", "perc"]), "px"),
 
     fromName: types.maybeNull(types.string),
 
@@ -113,6 +115,41 @@ const Model = types
       return inside;
     },
 
+    handleMouseMove({ e, flattenedPoints }) {
+      const { offsetX: a, offsetY: b } = e.evt;
+      const point = getAnchorPoint({ flattenedPoints, a, b });
+
+      let x = point[0];
+      let y = point[1];
+
+      if (self.parent.zoomScale != 1) {
+        x = x * self.parent.zoomScale;
+        y = y * self.parent.zoomScale;
+      }
+
+      const group = e.currentTarget;
+      const layer = e.currentTarget.getLayer();
+
+      moveHoverAnchor({ point: [x, y], group, layer });
+    },
+
+    handleMouseLeave({ e }) {
+      removeHoverAnchor({ layer: e.currentTarget.getLayer() });
+    },
+
+    handleLineClick({ e, flattenedPoints, insertIdx }) {
+      e.cancelBubble = true;
+
+      if (!self.closed) return;
+
+      removeHoverAnchor({ layer: e.currentTarget.getLayer() });
+
+      const { offsetX: a, offsetY: b } = e.evt;
+      const point = getAnchorPoint({ flattenedPoints, a, b });
+
+      self.insertPoint(insertIdx, point[0], point[1]);
+    },
+
     addPoint(x, y) {
       if (self.closed) return;
 
@@ -129,12 +166,13 @@ const Model = types
     },
 
     insertPoint(insertIdx, x, y) {
-      const p = { x: x, y: y, size: self.pointsize, style: self.pointstyle };
+      const p = { x: x, y: y, size: self.pointsize, style: self.pointstyle, index: self.points.length };
       self.points.splice(insertIdx, 0, p);
     },
 
     _addPoint(x, y) {
-      self.points.push({ x: x, y: y, size: self.pointsize, style: self.pointstyle });
+      const index = self.points.length;
+      self.points.push({ x: x, y: y, size: self.pointsize, style: self.pointstyle, index: index });
     },
 
     closePoly() {
@@ -192,13 +230,21 @@ const Model = types
       self.fill = color;
     },
 
-    updateImageSize(wp, hp) {
+    updateImageSize(wp, hp, sw, sh) {
       self.wp = wp;
       self.hp = hp;
+
+      if (self.coordstype == "perc") {
+        self.points.map(p => {
+          const x = (sw * p.x) / 100;
+          const y = (sh * p.y) / 100;
+          self.coordstype = "px";
+          p._movePoint(x, y);
+        });
+      }
     },
 
     toStateJSON() {
-      // console.log(self.parent.naturalWidth);
       const { naturalWidth, naturalHeight, stageWidth, stageHeight } = self.parent;
 
       const perc_w = (stageWidth * 100) / naturalWidth;
@@ -272,6 +318,51 @@ function getFlattenedPoints(points) {
   }, []);
 }
 
+function getRectPoints(x, y, width, height) {
+  const points = [[x, y], [x, y + height], [x + width, y + height], [x + width, y]];
+  return points;
+}
+
+function getMinDist({ points, point, idx }) {
+  return points.reduce(function(minDist, p, i) {
+    if (i === idx) return minDist;
+    const dist = Math.sqrt(Math.pow(point[0] - p[0], 2) + Math.pow(point[1] - p[1], 2));
+    return dist < minDist ? dist : minDist;
+  }, Infinity);
+}
+
+function getHoverAnchor({ layer }) {
+  return layer.findOne(".hoverAnchor");
+}
+
+function createHoverAnchor({ point, group, layer }) {
+  const hoverAnchor = new window.Konva.Circle({
+    name: "hoverAnchor",
+    x: point[0],
+    y: point[1],
+    stroke: "#666",
+    fill: "#ddd",
+    strokeWidth: 2,
+    radius: 5,
+  });
+
+  group.add(hoverAnchor);
+  layer.draw();
+  return hoverAnchor;
+}
+
+function moveHoverAnchor({ point, group, layer }) {
+  const hoverAnchor = getHoverAnchor({ layer }) || createHoverAnchor({ point, group, layer });
+  hoverAnchor.to({ x: point[0], y: point[1], duration: 0 });
+}
+
+function removeHoverAnchor({ layer }) {
+  const hoverAnchor = getHoverAnchor({ layer });
+  if (!hoverAnchor) return;
+  hoverAnchor.destroy();
+  layer.draw();
+}
+
 const HtxPolygonView = ({ store, item }) => {
   const self = this;
   const { name, wwidth, wheight, onChangedPosition } = item;
@@ -301,94 +392,173 @@ const HtxPolygonView = ({ store, item }) => {
     props["stroke"] = "red";
   }
 
-  return (
-    <Fragment>
-      {item.mouseOverStartPoint}
-
-      <Line
-        points={item.linePoints()}
-        fill={item.fill}
-        opacity={item.opacity}
-        closed={item.closed}
-        redraw={item.update}
-        stroke={item.stroke}
-        strokeWidth={parseInt(item.strokewidth)}
-        onDragStart={e => {
-          item.completion.setDragMode(true);
-        }}
-        dragBoundFunc={function(pos) {
-          let { x, y } = pos;
-          /* if (x < 0) x = 0; */
-          /* if (y < 0) y = 0; */
-
-          const r = item.parent.stageWidth - this.getAttr("width");
-          const b = item.parent.stageHeight - this.getAttr("height");
-
-          /* const r = wwidth - this.getAttr('width'); */
-          /* const b = wheight - this.getAttr('height'); */
-
-          if (x > r) x = r;
-          if (y > b) y = b;
-
-          item.points.forEach(p => {
-            p.movePoint(x, y);
-          });
-
-          return {
-            x: 0,
-            y: 0,
-          };
-        }}
-        onDragEnd={e => {
-          item.completion.setDragMode(false);
-
-          if (!item.closed) item.closePoly();
-
-          item.parent.setActivePolygon(null);
-
-          item.points.forEach(p => {
-            p.afterCreate();
-          });
-        }}
-        onMouseOver={e => {
-          const stage = item.parent._stageRef;
-
-          if (store.completionStore.selected.relationMode) {
-            item.setHighlight(true);
-            stage.container().style.cursor = "crosshair";
-          } else {
-            stage.container().style.cursor = "pointer";
-          }
-        }}
-        onMouseOut={e => {
-          const stage = item.parent._stageRef;
-          stage.container().style.cursor = "default";
-
-          if (store.completionStore.selected.relationMode) {
-            item.setHighlight(false);
-          }
-        }}
-        onClick={e => {
-          e.cancelBubble = true;
-
+  function renderLine({ points, idx1, idx2 }) {
+    const name = `border_${idx1}_${idx2}`;
+    const insertIdx = idx1 + 1; // idx1 + 1 or idx2
+    const flattenedPoints = getFlattenedPoints([points[idx1], points[idx2]]);
+    return (
+      <Group
+        key={name}
+        name={name}
+        onClick={e => item.handleLineClick({ e, flattenedPoints, insertIdx })}
+        onMouseMove={e => {
           if (!item.closed) return;
 
-          const stage = item.parent._stageRef;
-
-          if (store.completionStore.selected.relationMode) {
-            stage.container().style.cursor = "default";
-          }
-
-          item.setHighlight(false);
-          item.onClickRegion();
+          item.handleMouseMove({ e, flattenedPoints });
         }}
-        {...props}
-        draggable
-      />
+        onMouseLeave={e => item.handleMouseLeave({ e })}
+      >
+        <Line
+          points={flattenedPoints}
+          stroke={item.strokecolor}
+          opacity={item.opacity}
+          strokeWidth={item.strokewidth}
+        />
+      </Group>
+    );
+  }
 
-      {!item.closed && item.points.map((p, index) => <PolygonPointView item={p} index={index} />)}
-      {item.closed && item.selected && item.points.map((p, index) => <PolygonPointView item={p} index={index} />)}
-    </Fragment>
+  function renderLines(points) {
+    const name = "borders";
+    return (
+      <Group key={name} name={name}>
+        {points.map((p, idx) => {
+          const idx1 = idx;
+          const idx2 = idx === points.length - 1 ? 0 : idx + 1;
+          return renderLine({ points, idx1, idx2 });
+        })}
+      </Group>
+    );
+  }
+
+  function renderPoly(points) {
+    const name = "poly";
+    return (
+      <Group key={name} name={name}>
+        <Line points={getFlattenedPoints(points)} fill={item.strokecolor} closed={true} opacity={0.2} />
+      </Group>
+    );
+  }
+
+  function renderCircle({ points, idx }) {
+    const name = `anchor_${points.length}_${idx}`;
+    const point = points[idx];
+
+    if (!item.closed || (item.closed && item.selected)) {
+      return <PolygonPointView item={point} name={name} />;
+    }
+
+    // return (
+    //   <Circle
+    //     key={name}
+    //     name={name}
+    //     x={point.x}
+    //     y={point.y}
+    //     fill='white'
+    //     stroke='black'
+    //     strokeWidth={1}
+    //     radius={4}
+    //     draggable={true}
+    //     dragOnTop={false}
+    //     {...startPointAttr}
+
+    //     onDragMove={e => {
+    //         points[idx]._movePoint(e.target.attrs.x, e.target.attrs.y);
+    //     }}
+    //         />
+
+    //     //handleDragMove({ e, idx })}
+    // );
+  }
+
+  function renderCircles(points) {
+    const name = "anchors";
+    return (
+      <Group key={name} name={name}>
+        {points.map((p, idx) => renderCircle({ points, idx }))}
+      </Group>
+    );
+  }
+
+  return (
+    <Group
+      onDragStart={e => {
+        item.completion.setDragMode(true);
+      }}
+      dragBoundFunc={function(pos) {
+        let { x, y } = pos;
+        /* if (x < 0) x = 0; */
+        /* if (y < 0) y = 0; */
+
+        const r = item.parent.stageWidth - this.getAttr("width");
+        const b = item.parent.stageHeight - this.getAttr("height");
+
+        /* const r = wwidth - this.getAttr('width'); */
+        /* const b = wheight - this.getAttr('height'); */
+
+        if (x > r) x = r;
+        if (y > b) y = b;
+
+        item.points.forEach(p => {
+          p.movePoint(x, y);
+        });
+
+        return {
+          x: 0,
+          y: 0,
+        };
+      }}
+      onDragEnd={e => {
+        item.completion.setDragMode(false);
+
+        if (!item.closed) item.closePoly();
+
+        item.parent.setActivePolygon(null);
+
+        item.points.forEach(p => {
+          p.afterCreate();
+        });
+      }}
+      onMouseOver={e => {
+        const stage = item.parent._stageRef;
+
+        if (store.completionStore.selected.relationMode) {
+          item.setHighlight(true);
+          stage.container().style.cursor = "crosshair";
+        } else {
+          stage.container().style.cursor = "pointer";
+        }
+      }}
+      onMouseOut={e => {
+        const stage = item.parent._stageRef;
+        stage.container().style.cursor = "default";
+
+        if (store.completionStore.selected.relationMode) {
+          item.setHighlight(false);
+        }
+      }}
+      onClick={e => {
+        e.cancelBubble = true;
+
+        if (!item.closed) return;
+
+        const stage = item.parent._stageRef;
+
+        if (store.completionStore.selected.relationMode) {
+          stage.container().style.cursor = "default";
+        }
+
+        item.setHighlight(false);
+        item.onClickRegion();
+      }}
+      draggable
+    >
+      {item.mouseOverStartPoint}
+
+      {renderPoly(item.points)}
+      {renderLines(item.points)}
+      {renderCircles(item.points)}
+    </Group>
   );
 };
 

@@ -53,7 +53,12 @@ const Model = types
     toggleSelected() {
       const sel = self.selected;
 
-      const labels = Types.getParentOfTypeString(self, ["LabelsModel", "RectangleLabelsModel", "PolygonLabelsModel"]);
+      const labels = Types.getParentOfTypeString(self, [
+        "LabelsModel",
+        "RectangleLabelsModel",
+        "PolygonLabelsModel",
+        "KeyPointLabelsModel",
+      ]);
       labels.shouldBeUnselected && labels.unselectAll();
 
       if (labels.shouldBeUnselected && sel === true) {

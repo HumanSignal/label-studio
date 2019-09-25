@@ -3,19 +3,29 @@ import { types, getParent, getEnv, flow, destroy, getMembers } from "mobx-state-
 import { guidGenerator } from "../core/Helpers";
 import Types from "../core/Types";
 
-import { TextRegionModel } from "../interfaces/object/TextRegion";
-import { RectRegionModel } from "../interfaces/object/RectRegion";
-import { AudioRegionModel } from "../interfaces/object/AudioRegion";
-import { TextAreaRegionModel } from "../interfaces/object/TextAreaRegion";
-import { PolygonRegionModel } from "../interfaces/object/PolygonRegion";
+import * as HtxObjectModel from "../interfaces/object";
 
 const Relation = types
   .model("Relation", {
     node1: types.reference(
-      types.union(TextRegionModel, RectRegionModel, AudioRegionModel, TextAreaRegionModel, PolygonRegionModel),
+      types.union(
+        HtxObjectModel.TextRegionModel,
+        HtxObjectModel.RectRegionModel,
+        HtxObjectModel.PolygonRegionModel,
+        HtxObjectModel.AudioRegionModel,
+        HtxObjectModel.TextAreaRegionModel,
+        HtxObjectModel.KeyPointRegionModel,
+      ),
     ),
     node2: types.reference(
-      types.union(TextRegionModel, RectRegionModel, AudioRegionModel, TextAreaRegionModel, PolygonRegionModel),
+      types.union(
+        HtxObjectModel.TextRegionModel,
+        HtxObjectModel.RectRegionModel,
+        HtxObjectModel.PolygonRegionModel,
+        HtxObjectModel.AudioRegionModel,
+        HtxObjectModel.TextAreaRegionModel,
+        HtxObjectModel.KeyPointRegionModel,
+      ),
     ),
   })
   .actions(self => ({
