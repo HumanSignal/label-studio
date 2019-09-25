@@ -633,10 +633,7 @@ class HtxImageView extends Component {
               {item.shapes.map(s => {
                 return Tree.renderItem(s);
               })}
-              <TransformerComponent
-                rotateEnabled={item.controlButton().canrotate}
-                selectedShapeName={item.selectedShape}
-              />
+              <TransformerComponent rotateEnabled={item.controlButton().canrotate} selectedShape={item.selectedShape} />
             </Layer>
           </Stage>
           <div>
