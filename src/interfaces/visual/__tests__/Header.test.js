@@ -15,6 +15,5 @@ test("Header basic test", () => {
   const view = render(<HtxHeader item={confStore} />);
   const text = view.text();
 
-  console.log(text);
   expect(text).toBe("header text");
 });
