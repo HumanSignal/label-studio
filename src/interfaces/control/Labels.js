@@ -9,8 +9,7 @@ import Types from "../../core/Types";
 import { LabelModel } from "./Label"; // eslint-disable-line no-unused-vars
 import { guidGenerator } from "../../core/Helpers";
 import SelectedModelMixin from "../mixins/SelectedModel";
-import InfoModal from "../../components/Infomodal/Infomodal";
-import ControlHOC from "../mixins/Control";
+import LabelMixin from "../mixins/LabelMixin";
 
 /**
  * Labels tag, create a group of labels
@@ -50,7 +49,7 @@ const ModelAttrs = types.model({
   children: Types.unionArray(["labels", "label", "choice"]),
 });
 
-const Model = ControlHOC.props({ _type: "labels" })
+const Model = LabelMixin.props({ _type: "labels" })
   .views(self => ({
     get shouldBeUnselected() {
       return self.choice === "single";

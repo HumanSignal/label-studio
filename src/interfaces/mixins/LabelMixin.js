@@ -1,4 +1,4 @@
-import { types, getSnapshot } from "mobx-state-tree";
+import { types } from "mobx-state-tree";
 
 import InfoModal from "../../components/Infomodal/Infomodal";
 
@@ -25,21 +25,24 @@ const ControlHOC = types.model("ControlHOC").actions(self => ({
   fromStateJSON(obj, fromModel) {
     self.unselectAll();
 
-    if (!obj.value.labels) {
+    const objectType = obj.value[self._type];
+
+    if (!objectType) {
       InfoModal.error(`Error with ${self._type}.`);
       return;
     }
 
     if (obj.id) self.pid = obj.id;
 
-    obj.value.labels.forEach(l => {
-      const label = self.findLabel(l);
-      if (!label) {
-        InfoModal.error(`Error with ${self._type}. Not found: ` + obj.value.labels);
+    objectType.forEach(obj => {
+      const findedObj = self.findLabel(obj);
+
+      if (!findedObj) {
+        InfoModal.error(`Error with ${self._type}. Not found: ` + objectType);
         return;
       }
 
-      label.markSelected(true);
+      findedObj.markSelected(true);
     });
   },
 }));
