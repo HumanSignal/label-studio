@@ -18,6 +18,7 @@ import ProcessAttrsMixin from "../mixins/ProcessAttrs";
 const Model = types.model({
   type: "header",
   size: types.optional(types.number, 4),
+  _value: types.optional(types.string, ""),
   value: types.optional(types.string, ""),
   underline: types.optional(types.boolean, false),
 });
@@ -31,7 +32,7 @@ const HeaderModel = types.compose(
 const HtxHeader = observer(({ item }) => {
   return (
     <Typography.Title underline={item.underline} level={item.size} style={{ margin: "10px 0" }}>
-      {item.value}
+      {item._value}
     </Typography.Title>
   );
 });

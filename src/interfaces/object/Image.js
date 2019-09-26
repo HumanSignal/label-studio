@@ -120,14 +120,12 @@ const Model = types
     updateIE(ev) {
       const { width, height, naturalWidth, naturalHeight } = ev.target;
 
-      if (self.hasStates) {
-        self.naturalWidth = naturalWidth;
-        self.naturalHeight = naturalHeight;
-        self.stageWidth = width;
-        self.stageHeight = height;
+      self.naturalWidth = naturalWidth;
+      self.naturalHeight = naturalHeight;
+      self.stageWidth = width;
+      self.stageHeight = height;
 
-        self.shapes.forEach(s => s.updateImageSize(width / naturalWidth, height / naturalHeight, width, height));
-      }
+      self.shapes.forEach(s => s.updateImageSize(width / naturalWidth, height / naturalHeight, width, height));
     },
 
     _setStageRef(ref) {
@@ -170,7 +168,7 @@ const Model = types
           callWithStates(ev, (_, clonedStates) => {
             clonedStates.forEach(item => {
               if (item.type !== "choices" && item.isSelected) {
-                self._addRectEv(ev, item);
+                self._addRectEv(ev, [item]);
               }
             });
           });

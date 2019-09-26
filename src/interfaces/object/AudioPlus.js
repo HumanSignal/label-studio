@@ -115,8 +115,7 @@ const Model = types
 
       if (fromModel) {
         m = restoreNewsnapshot(fromModel);
-
-        m.fromStateJSON(obj);
+        // m.fromStateJSON(obj);
 
         if (!region) {
           tree.states = [m];
