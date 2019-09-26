@@ -101,6 +101,7 @@ const Composition = types.compose(
   Model,
   SelectedModelMixin,
 );
+
 const RectangleLabelsModel = types.compose(
   "RectangleLabelsModel",
   Composition,
