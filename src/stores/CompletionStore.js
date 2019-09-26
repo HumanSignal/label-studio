@@ -212,10 +212,13 @@ const Completion = types
 
       // [TODO] we need to traverse this two times, fix
       self.traverseTree(node => {
-        if (node && node.onHotKey && node.hotkey) Hotkey.addKey(node.hotkey, node.onHotKey);
-      });
+        if (node && node.onHotKey && node.hotkey) {
+          Hotkey.addKey(node.hotkey, node.onHotKey);
+        }
 
-      self.traverseTree(node => {
+        /**
+         * Hotkey for controls
+         */
         if (node && node.onHotKey && !node.hotkey) {
           const comb = Hotkey.makeComb();
 
