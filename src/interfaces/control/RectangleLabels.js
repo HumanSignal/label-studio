@@ -8,10 +8,9 @@ import Registry from "../../core/Registry";
 
 import { guidGenerator } from "../../core/Helpers";
 import SelectedModelMixin from "../mixins/SelectedModel";
-import InfoModal from "../../components/Infomodal/Infomodal";
-
 import { HtxLabels, LabelsModel } from "./Labels";
 import { RectangleModel } from "./Rectangle";
+import LabelMixin from "../mixins/LabelMixin";
 
 /**
  * RectangleLabels tag creates labeled rectangles
@@ -38,69 +37,28 @@ const TagAttrs = types.model({
   toname: types.maybeNull(types.string),
 });
 
-const Model = types
-  .model("RectangleLabelsModel", {
-    id: types.optional(types.identifier, guidGenerator),
-    pid: types.optional(types.string, guidGenerator),
-    type: "rectanglelabels",
-    children: Types.unionArray(["labels", "label", "choice"]),
-  })
-  .views(self => ({
-    get shouldBeUnselected() {
-      return self.choice === "single";
-    },
-  }))
-  .actions(self => ({
-    getSelectedColor() {
-      // return first selected label color
-      const sel = self.children.find(c => c.selected === true);
-      return sel && sel.background;
-    },
+const ModelAttrs = types.model("RectangleLabelsModel", {
+  id: types.optional(types.identifier, guidGenerator),
+  pid: types.optional(types.string, guidGenerator),
+  type: "rectanglelabels",
+  children: Types.unionArray(["labels", "label", "choice"]),
+});
 
-    /**
-     * Usage check of selected labels before send completion to server
-     */
-    beforeSend() {
-      const names = self.getSelectedNames();
-
-      if (names && self.type === "rectanglelabels") {
-        self.unselectAll();
-      }
-    },
-
-    fromStateJSON(obj, fromModel) {
-      self.unselectAll();
-
-      if (!obj.value.rectanglelabels) {
-        InfoModal.error("Error with labels.");
-        return;
-      }
-
-      if (obj.id) self.pid = obj.id;
-
-      /**
-       * Found correct label from config
-       */
-      obj.value.rectanglelabels.forEach(inLabel => {
-        const label = self.findLabel(inLabel);
-
-        if (!label) {
-          InfoModal.error("Error with labels. Not found: " + obj.value.rectanglelabels);
-          return;
-        }
-
-        label.markSelected(true);
-      });
-    },
-  }));
+const Model = LabelMixin.props({ _type: "rectanglelabels" }).views(self => ({
+  get shouldBeUnselected() {
+    return self.choice === "single";
+  },
+}));
 
 const Composition = types.compose(
   LabelsModel,
+  ModelAttrs,
   RectangleModel,
   TagAttrs,
   Model,
   SelectedModelMixin,
 );
+
 const RectangleLabelsModel = types.compose(
   "RectangleLabelsModel",
   Composition,
@@ -108,20 +66,6 @@ const RectangleLabelsModel = types.compose(
 
 const HtxRectangleLabels = observer(({ item }) => {
   return <HtxLabels item={item} />;
-  // return (
-  //   <div
-  //     style={{
-  //       marginTop: "1em",
-  //       marginBottom: "1em",
-  //       display: "flex",
-  //       justifyContent: "flex-start",
-  //       alignItems: "center",
-  //       flexFlow: "wrap",
-  //     }}
-  //   >
-  //     {Tree.renderChildren(item)}
-  //   </div>
-  // );
 });
 
 Registry.addTag("rectanglelabels", RectangleLabelsModel, HtxRectangleLabels);

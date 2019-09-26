@@ -9,6 +9,7 @@ import Types from "../../core/Types";
 import { LabelModel } from "./Label"; // eslint-disable-line no-unused-vars
 import { guidGenerator } from "../../core/Helpers";
 import SelectedModelMixin from "../mixins/SelectedModel";
+import LabelMixin from "../mixins/LabelMixin";
 
 /**
  * Labels tag, create a group of labels
@@ -35,35 +36,26 @@ const TagAttrs = types.model({
   selectionstyle: types.maybeNull(types.optional(types.string, "basic", "border", "bottom")),
 });
 
-const Model = types
-  .model({
-    id: types.optional(types.identifier, guidGenerator),
-    pid: types.optional(types.string, guidGenerator),
-    type: "labels",
-    showinline: types.optional(types.boolean, true),
-    children: Types.unionArray(["labels", "label", "choices", "choice"]),
-  })
+/**
+ * @param {boolean} showinline
+ * @param {identifier} id
+ * @param {string} pid
+ */
+const ModelAttrs = types.model({
+  id: types.optional(types.identifier, guidGenerator),
+  pid: types.optional(types.string, guidGenerator),
+  type: "labels",
+  showinline: types.optional(types.boolean, true),
+  children: Types.unionArray(["labels", "label", "choice"]),
+});
+
+const Model = LabelMixin.props({ _type: "labels" })
   .views(self => ({
     get shouldBeUnselected() {
       return self.choice === "single";
     },
   }))
   .actions(self => ({
-    getSelectedColor() {
-      // return first selected label color
-      const sel = self.children.find(c => c.selected === true);
-      return sel && sel.background;
-    },
-    /**
-     * Usage check of selected labels before send completion to server
-     */
-    beforeSend() {
-      const names = self.getSelectedNames();
-
-      if (names && self.type === "labels") {
-        self.unselectAll();
-      }
-    },
     toStateJSON() {
       const names = self.getSelectedNames();
       if (names && names.length) {
@@ -78,25 +70,11 @@ const Model = types
         };
       }
     },
-
-    fromStateJSON(obj, fromModel) {
-      self.unselectAll();
-
-      if (!obj.value.labels) throw new Error("No labels param");
-
-      if (obj.id) self.pid = obj.id;
-
-      obj.value.labels.forEach(l => {
-        const label = self.findLabel(l);
-        if (!label) throw new Error("No label " + obj.value.label);
-
-        label.markSelected(true);
-      });
-    },
   }));
 
 const LabelsModel = types.compose(
   "LabelsModel",
+  ModelAttrs,
   TagAttrs,
   Model,
   SelectedModelMixin,
@@ -112,7 +90,7 @@ const HtxLabels = observer(({ item }) => {
     flexFlow: "wrap",
   };
 
-  if (item.showinline == "false") {
+  if (!item.showinline) {
     style["flexDirection"] = "column";
     style["alignItems"] = "flex-start";
     style["marginTop"] = "0";

@@ -120,14 +120,14 @@ const Model = types
     updateIE(ev) {
       const { width, height, naturalWidth, naturalHeight } = ev.target;
 
-      if (self.hasStates) {
-        self.naturalWidth = naturalWidth;
-        self.naturalHeight = naturalHeight;
-        self.stageWidth = width;
-        self.stageHeight = height;
+      // if (self.hasStates) {
+      self.naturalWidth = naturalWidth;
+      self.naturalHeight = naturalHeight;
+      self.stageWidth = width;
+      self.stageHeight = height;
 
-        self.shapes.forEach(s => s.updateImageSize(width / naturalWidth, height / naturalHeight, width, height));
-      }
+      self.shapes.forEach(s => s.updateImageSize(width / naturalWidth, height / naturalHeight, width, height));
+      //}
     },
 
     _setStageRef(ref) {

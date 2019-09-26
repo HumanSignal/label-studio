@@ -7,7 +7,7 @@ Enzyme.configure({ adapter: new Adapter() });
 
 test("Header basic test", () => {
   const confStore = {
-    value: "header text",
+    _value: "header text",
     underline: true,
     size: 1,
   };
