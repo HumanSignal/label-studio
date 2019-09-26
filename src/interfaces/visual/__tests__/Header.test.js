@@ -7,7 +7,7 @@ Enzyme.configure({ adapter: new Adapter() });
 
 test("Header basic test", () => {
   const confStore = {
-    value: "header text",
+    _value: "header text",
     underline: true,
     size: 1,
   };
@@ -15,5 +15,6 @@ test("Header basic test", () => {
   const view = render(<HtxHeader item={confStore} />);
   const text = view.text();
 
+  console.log(text);
   expect(text).toBe("header text");
 });
