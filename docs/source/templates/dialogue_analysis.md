@@ -1,7 +1,7 @@
 ---
-title: Chatbot Analysis
+title: Dialogue Analysis
 type: templates
-order: 201
+order: 204
 ---
 
 Analyze the chat dialog, classify it and provide your own answer

@@ -1,7 +1,7 @@
 ---
 title: Image Object Detection
 type: templates
-order: 201
+order: 205
 ---
 
 Image bounding box labeling
