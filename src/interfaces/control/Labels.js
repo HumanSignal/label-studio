@@ -56,21 +56,6 @@ const Model = LabelMixin.props({ _type: "labels" })
     },
   }))
   .actions(self => ({
-    getSelectedColor() {
-      // return first selected label color
-      const sel = self.children.find(c => c.selected === true);
-      return sel && sel.background;
-    },
-    /**
-     * Usage check of selected labels before send completion to server
-     */
-    beforeSend() {
-      const names = self.getSelectedNames();
-
-      if (names && self.type === "labels") {
-        self.unselectAll();
-      }
-    },
     toStateJSON() {
       const names = self.getSelectedNames();
       if (names && names.length) {
