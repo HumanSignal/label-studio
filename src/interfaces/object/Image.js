@@ -197,31 +197,20 @@ const Model = types
 
     updateDraw({ x, y }) {
       const shape = self.activeShape;
-
       const { x1, y1, x2, y2 } = reverseCoords({ x: shape._start_x, y: shape._start_y }, { x: x, y: y });
-
       shape.setPosition(x1, y1, x2 - x1, y2 - y1);
-
-      //         // update rubber rect position
-      // posNow = {x: posIn.x, y: posIn.y};
-      // var posRect = reverse(posStart,posNow);
-      // r2.x(posRect.x1);
-      // r2.y(posRect.y1);
-      // r2.width(posRect.x2 - posRect.x1);
-      // r2.height(posRect.y2 - posRect.y1);
-      // r2.visible(true);
-
-      // s1.draw(); // redraw any changes.
     },
 
     lookupStates(ev, fun) {
       const states = self.completion.toNames.get(self.name);
       const activeStates = states ? states.filter(c => c.isSelected == true) : null;
-      const clonedStates = activeStates ? activeStates.map(s => cloneNode(s)) : null;
+      const clonedStates = activeStates
+        ? activeStates.map(s => s.type !== "choices" && cloneNode(s)).filter(s => s)
+        : null;
 
       if (clonedStates.length !== 0) {
         fun(ev, clonedStates);
-        activeStates && activeStates.forEach(s => s.type !== "choices" && s.unselectAll());
+        activeStates && activeStates.forEach(s => s.unselectAll());
       }
     },
 
