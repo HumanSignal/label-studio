@@ -8,8 +8,6 @@ import Registry from "../../core/Registry";
 
 import { guidGenerator } from "../../core/Helpers";
 import SelectedModelMixin from "../mixins/SelectedModel";
-import InfoModal from "../../components/Infomodal/Infomodal";
-
 import { HtxLabels, LabelsModel } from "./Labels";
 import { RectangleModel } from "./Rectangle";
 import LabelMixin from "../mixins/LabelMixin";
