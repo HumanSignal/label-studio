@@ -27,6 +27,10 @@ const Model = types
 
     x: types.number,
     y: types.number,
+
+    _start_x: types.optional(types.number, 0),
+    _start_y: types.optional(types.number, 0),
+
     width: types.number,
     height: types.number,
 
@@ -65,6 +69,11 @@ const Model = types
     },
   }))
   .actions(self => ({
+    afterCreate() {
+      self._start_x = self.x;
+      self._start_y = self.y;
+    },
+
     unselectRegion() {
       self.selected = false;
       self.parent.setSelected(undefined);

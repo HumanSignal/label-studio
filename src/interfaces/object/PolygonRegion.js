@@ -152,16 +152,6 @@ const Model = types
 
     addPoint(x, y) {
       if (self.closed) return;
-
-      if (self.mouseOverStartPoint) {
-        self.closePoly();
-        return;
-      }
-      // if (self.canClose(x, y)) {
-      //     self.closePoly();
-      //     return;
-      // }
-
       self._addPoint(x, y);
     },
 
@@ -412,6 +402,7 @@ const HtxPolygonView = ({ store, item }) => {
           points={flattenedPoints}
           stroke={item.strokecolor}
           opacity={item.opacity}
+          lineJoin="bevel"
           strokeWidth={item.strokewidth}
         />
       </Group>
@@ -435,7 +426,13 @@ const HtxPolygonView = ({ store, item }) => {
     const name = "poly";
     return (
       <Group key={name} name={name}>
-        <Line points={getFlattenedPoints(points)} fill={item.strokecolor} closed={true} opacity={0.2} />
+        <Line
+          lineJoin="bevel"
+          points={getFlattenedPoints(points)}
+          fill={item.strokecolor}
+          closed={true}
+          opacity={0.2}
+        />
       </Group>
     );
   }
@@ -485,16 +482,12 @@ const HtxPolygonView = ({ store, item }) => {
       onDragStart={e => {
         item.completion.setDragMode(true);
       }}
-      dragBoundFunc={function(pos) {
+      dragBoundFunc={function(pos, ev) {
         let { x, y } = pos;
         /* if (x < 0) x = 0; */
         /* if (y < 0) y = 0; */
-
         const r = item.parent.stageWidth - this.getAttr("width");
         const b = item.parent.stageHeight - this.getAttr("height");
-
-        /* const r = wwidth - this.getAttr('width'); */
-        /* const b = wheight - this.getAttr('height'); */
 
         if (x > r) x = r;
         if (y > b) y = b;
@@ -503,10 +496,7 @@ const HtxPolygonView = ({ store, item }) => {
           p.movePoint(x, y);
         });
 
-        return {
-          x: 0,
-          y: 0,
-        };
+        return { x: 0, y: 0 };
       }}
       onDragEnd={e => {
         item.completion.setDragMode(false);
