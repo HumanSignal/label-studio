@@ -354,34 +354,6 @@ function removeHoverAnchor({ layer }) {
 }
 
 const HtxPolygonView = ({ store, item }) => {
-  const self = this;
-  const { name, wwidth, wheight, onChangedPosition } = item;
-
-  let opacity = 0.5;
-
-  const wp = item.wp || item.parent.stageWidth / item.parent.naturalWidth;
-  const hp = item.hp || item.parent.stageHeight / item.parent.naturalHeight;
-
-  const x = item.x;
-  const y = item.y;
-  const w = item.width;
-  const h = item.height;
-
-  const props = {};
-
-  props["opacity"] = item.opacity;
-
-  if (item.fillcolor) {
-    props["fill"] = item.fillcolor;
-  }
-
-  props["stroke"] = item.strokecolor;
-  props["strokeWidth"] = item.strokewidth;
-
-  if (item.highlighted) {
-    props["stroke"] = "red";
-  }
-
   function renderLine({ points, idx1, idx2 }) {
     const name = `border_${idx1}_${idx2}`;
     const insertIdx = idx1 + 1; // idx1 + 1 or idx2
@@ -444,28 +416,6 @@ const HtxPolygonView = ({ store, item }) => {
     if (!item.closed || (item.closed && item.selected)) {
       return <PolygonPointView item={point} name={name} />;
     }
-
-    // return (
-    //   <Circle
-    //     key={name}
-    //     name={name}
-    //     x={point.x}
-    //     y={point.y}
-    //     fill='white'
-    //     stroke='black'
-    //     strokeWidth={1}
-    //     radius={4}
-    //     draggable={true}
-    //     dragOnTop={false}
-    //     {...startPointAttr}
-
-    //     onDragMove={e => {
-    //         points[idx]._movePoint(e.target.attrs.x, e.target.attrs.y);
-    //     }}
-    //         />
-
-    //     //handleDragMove({ e, idx })}
-    // );
   }
 
   function renderCircles(points) {
