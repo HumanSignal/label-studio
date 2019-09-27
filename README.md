@@ -29,6 +29,7 @@ Coming Soon:
 
 - [Introduction](#introduction)
   - [Run Locally](#run-locally)
+  - [Run with Docker](#run-with-docker)
   - [Extend & Embed](#extend--embed)
 - [Features](#features)
 - [Using Label Studio](#using-label-studio)
@@ -55,6 +56,16 @@ To run it locally we include the compiled version of the frontend
 part and an example implementation of the backend.
 
 [Follow this guide for advanced usage & custom configuration](backend/README.md)
+
+### Run with Docker
+```bash
+docker run -p 8200:8200 -t -i amaigmbh/label-studio -c config.json -l ../examples/chatbot_analysis/config.xml -i ../examples/chatbot_analysis/tasks.json -o output
+```
+
+or mount a folder with your custom configuration files
+```bash
+docker run -p 8200:8200 -t -i -v C:\docker\custom:/app/examples/audio_regions amaigmbh/label-studio
+```
 
 ### Extend & Embed
 
