@@ -423,6 +423,8 @@ const Model = types
         for (var i = 1; i < obj.value.points.length; i++) {
           poly.addPoint(obj.value.points[i][0], obj.value.points[i][1]);
         }
+
+        poly.closePoly();
       }
 
       /**
