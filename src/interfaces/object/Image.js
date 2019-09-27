@@ -329,7 +329,7 @@ const Model = types
         height: sh,
 
         opacity: parseFloat(c.opacity),
-        fillcolor: c.fillcolor,
+        fillcolor: c.fillcolor ? c.fillcolor : stroke,
 
         strokewidth: parseInt(c.strokewidth),
         strokecolor: stroke,
