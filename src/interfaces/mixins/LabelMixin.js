@@ -5,7 +5,7 @@ import InfoModal from "../../components/Infomodal/Infomodal";
 /**
  * Wrapper of Control item
  */
-const ControlHOC = types.model("ControlHOC").actions(self => ({
+const LabelMixin = types.model("LabelMixin").actions(self => ({
   getSelectedColor() {
     // return first selected label color
     const sel = self.children.find(c => c.selected === true);
@@ -47,4 +47,4 @@ const ControlHOC = types.model("ControlHOC").actions(self => ({
   },
 }));
 
-export default ControlHOC;
+export default LabelMixin;

@@ -56,6 +56,10 @@ const PolygonPoint = types
       self.y = y;
     },
 
+    closeStartPoint(ev) {
+      if (self.parent.mouseOverStartPoint) self.parent.closePoly();
+    },
+
     handleMouseOverStartPoint(ev) {
       const stage = self.parent.parent._stageRef;
       stage.container().style.cursor = "crosshair";
@@ -120,6 +124,7 @@ const PolygonPointView = observer(({ item, name }) => {
           hitStrokeWidth: 12,
           onMouseOver: item.handleMouseOverStartPoint,
           onMouseOut: item.handleMouseOutStartPoint,
+          onClick: item.closeStartPoint,
         }
       : null;
 
@@ -132,16 +137,6 @@ const PolygonPointView = observer(({ item, name }) => {
 
     onDragMove: e => {
       item._movePoint(e.target.attrs.x, e.target.attrs.y);
-
-      /* const points = this.state.points; */
-      /* const index = e.target.index - 1; */
-      /* console.log(event.target); */
-      /* const pos = [event.target.attrs.x, event.target.attrs.y]; */
-      /* console.log("move", event); */
-      /* console.log(pos); */
-      /* this.setState({ */
-      /*     points: [...points.slice(0, index), pos, ...points.slice(index + 1)] */
-      /* }); */
     },
 
     onDragEnd: e => {
@@ -200,41 +195,6 @@ const PolygonPointView = observer(({ item, name }) => {
       />
     );
   }
-  // <Rect width={w}
-  //       height={w}
-  //       x={item.x - w/2}
-  //       y={item.y - w/2}
-  //       fill="black"
-
-  //       onClick={(ev) => {
-  //           item.parent.closePoly();
-
-  //           ev.cancelBubble = true;
-  //           ev.evt.stopPropagation();
-  //       }}
-
-  //       dragBoundFunc={function(pos) {
-  //           let { x, y } = pos;
-  //           if (x < 0) x = 0;
-  //           if (y < 0) y = 0;
-
-  //           // /* const r = wwidth - this.getAttr('width'); */
-  //           // /* const b = wheight - this.getAttr('height'); */
-
-  //           item._movePoint(x, y);
-  //           // if (x > r) x = r;
-  //           // if (y > b) y = b;
-  //           // item.redrawParent();
-
-  //         return {
-  //             x: x,
-  //             y: y,
-  //         };
-
-  //       }}
-
-  //  draggable
-  // />
 });
 
 export { PolygonPoint, PolygonPointView };
