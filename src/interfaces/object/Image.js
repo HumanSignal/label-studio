@@ -217,7 +217,9 @@ const Model = types
     lookupStates(ev, fun) {
       const states = self.completion.toNames.get(self.name);
       const activeStates = states ? states.filter(c => c.isSelected == true) : null;
-      const clonedStates = activeStates ? activeStates.map(s => cloneNode(s)) : null;
+      const clonedStates = activeStates
+        ? activeStates.map(s => s.type !== "choices" && cloneNode(s)).filter(s => s)
+        : null;
 
       if (clonedStates.length !== 0) {
         fun(ev, clonedStates);
@@ -226,10 +228,30 @@ const Model = types
     },
 
     onImageClick(ev) {
+      const callWithStates = function(ev, fun) {
+        const states = self.completion.toNames.get(self.name);
+        const activeStates = states ? states.filter(c => c.isSelected == true) : null;
+        const clonedStates = activeStates ? activeStates.map(s => cloneNode(s)) : null;
+
+        if (clonedStates.length !== 0) {
+          fun(ev, clonedStates);
+          activeStates && activeStates.forEach(s => s.type !== "choices" && s.unselectAll());
+        }
+      };
+
       const dispmap = {
+        RectangleModel: ev => self._addRectEv(ev),
+        RectangleLabelsModel: ev => {
+          callWithStates(ev, (_, clonedStates) => {
+            clonedStates.forEach(item => {
+              if (item.type !== "choices" && item.isSelected) {
+                self._addRectEv(ev, [item]);
+              }
+            });
+          });
+        },
         PolygonModel: ev => self._addPolyEv(ev),
         KeyPointModel: ev => self._addKeyPointEv(ev),
-
         PolygonLabelsModel: ev => {
           if (self.activePolygon && !self.activePolygon.closed) {
             self._addPolyEv(ev);
@@ -315,7 +337,7 @@ const Model = types
 
       let localStates = states;
 
-      if (states && !states.length) {
+      if (!states.length) {
         localStates = [states];
       }
 
@@ -339,9 +361,7 @@ const Model = types
         coordstype: coordstype,
       });
 
-      if (noadd !== true) {
-        self._addShape(rect);
-      }
+      self._addShape(rect);
 
       return rect;
     },
@@ -646,7 +666,7 @@ class HtxImageView extends Component {
       const x = (e.evt.offsetX - item.zoomPosX) / item.zoomScale;
       const y = (e.evt.offsetY - item.zoomPosY) / item.zoomScale;
 
-      item.startDraw({ x: x, y: y });
+      // item.startDraw({ x: x, y: y });
       return;
     }
 
