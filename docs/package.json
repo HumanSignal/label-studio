@@ -1,6 +1,10 @@
 {
-  "name": "hexo-site",
-  "version": "0.0.0",
+  "name": "label-studio-documentation",
+  "version": "0.0.1",
+  "author": {
+    "name": "Heartex Labs",
+    "url": "https://github.com/heartexlabs"
+  },
   "private": true,
   "hexo": {
     "version": "3.9.0"

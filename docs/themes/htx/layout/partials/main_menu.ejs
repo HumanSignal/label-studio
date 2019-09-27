@@ -2,19 +2,19 @@
 <% if (page.type === "guide") { %>
 <span style="margin-right: 1em;">Guide</span>
 <% } else { %>
-<a style="margin-right: 1em; text-decoration: underline;" href="<%- url_for("/guide") %>">Guide</a>
+<a style="margin-right: 1em;" href="<%- url_for("/guide") %>">Guide</a>
 <% } %>
 
 <% if (page.type === "tags") { %>
 <span style="margin-right: 1em;">Tags</span>
 <% } else { %>
-<a style="margin-right: 1em; text-decoration: underline;" href="<%- url_for("/tags") %>">Tags</a>
+<a style="margin-right: 1em;" href="<%- url_for("/tags") %>">Tags</a>
 <% } %>
 
 <% if (page.type === "templates") { %>
 <span style="margin-right: 1em;">Templates</span>
 <% } else { %>
-<a style="margin-right: 1em; text-decoration: underline;" href="<%- url_for("/templates") %>">Templates</a>
+<a style="margin-right: 1em;" href="<%- url_for("/templates") %>">Templates</a>
 <% } %>
 
 <!-- Place this tag where you want the button to render. -->
