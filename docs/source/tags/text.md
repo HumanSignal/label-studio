@@ -1,6 +1,6 @@
 ---
 title: Text
-type: guide
+type: tags
 order: 304
 ---
 

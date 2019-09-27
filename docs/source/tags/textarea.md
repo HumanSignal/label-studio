@@ -1,6 +1,6 @@
 ---
 title: TextArea
-type: guide
+type: tags
 order: 409
 ---
 

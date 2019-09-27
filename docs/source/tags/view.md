@@ -1,6 +1,6 @@
 ---
 title: View
-type: guide
+type: tags
 order: 508
 ---
 

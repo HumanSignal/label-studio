@@ -5,6 +5,9 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta charset="utf-8"/>
 
+    <link href="//fonts.googleapis.com/css?family=Dosis:500&amp;text=LabelStudio" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="/static/css/reset.css">
+    
     <link rel="shortcut icon" href="/static/favicon.ico"/>
     <link rel="stylesheet" href="/static/css/main.css">
     <link rel="stylesheet" href="/static/css/fontall.min.css">
@@ -14,13 +17,30 @@
         <link href="{{ css }}" rel="stylesheet">
     {% endfor %}
 
-    <script src="/static/js/helpers.js"></script>
+        <script src="/static/js/helpers.js"></script>
+
+        <style>
+    
+        </style>
+        
 </head>
 
 <body>
-    <div class="content">
-      <h1 class="title">{{ config['title'] }}</h1>
-      <a class="link" href="/tasks">Go to Task List</a><br/>
+    
+  <div id="header">
+    <a id="logo" href="/">
+      <img src="/static/images/ls_logo.png" alt="label studio logo" height="40">
+      <span style="font-size: 1.4em;">{{ config['title'] }}</span>
+    </a>
+    <ul id="nav">
+      <a class="link" href="/tasks">Tasks and Completions</a>
+      <span class="delim">|</span>
+      <a href="https://labelstud.io/guide/" style="">Guide</a>
+      <a href="https://github.com/heartexlabs/label-studio"><img src="/static/images/github.svg" height="22" /></a>
+    </ul>
+  </div>
+  
+  <div class="content">
       <div class="editor">
         <div id="label-studio"></div>
       </div>

@@ -1,6 +1,6 @@
 ---
 title: RectangleLabels
-type: guide
+type: tags
 order: 408
 ---
 

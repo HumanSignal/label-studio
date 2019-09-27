@@ -1,6 +1,6 @@
 ---
 title: Labels
-type: guide
+type: tags
 order: 403
 ---
 

@@ -1,6 +1,6 @@
 ---
 title: PolygonLabels
-type: guide
+type: tags
 order: 406
 ---
 

@@ -10,6 +10,11 @@ table {
   border-collapse: collapse;
 }
 
+h2 {
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
 td,
 th {
   padding: 0.4em 2em;
@@ -17,12 +22,13 @@ th {
 }
 
 .content {
-  max-width: 1400px;
-  padding: 1em 2em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .wrapper {
-  margin: 0 auto;
+  max-width: 1400px;
   text-align: center;
 }
 
@@ -66,4 +72,96 @@ th {
 
 a {
   text-decoration: none;
+}
+
+#header {
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  padding: 10px 20px 10px 40px;
+  position: relative;
+  z-index: 100;
+  box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 3px 0px;
+  margin-bottom: 3em;
+}
+
+#logo {
+  display: inline-block;
+  font-size: 1.5em;
+  line-height: 40px;
+  color: #273849;
+  font-family: "Dosis", "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 500;
+  display: flex;
+}
+
+#logo img {
+  vertical-align: middle;
+  margin-right: 6px;
+  width: 40px;
+  height: 40px;
+}
+
+#nav {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  right: 30px;
+  line-height: 40px;
+  display: flex;
+  align-items: center;
+}
+
+#nav a {
+  text-decoration: underline;
+  color: #304455;
+  font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
+  margin-right: 1em;
+  font-size: 14px;
+}
+
+.btn {
+  line-height: 1.5;
+  position: relative;
+  display: inline-block;
+  font-weight: 400;
+  white-space: nowrap;
+  text-align: center;
+  background-image: none;
+  border: 1px solid transparent;
+  -webkit-box-shadow: 0 2px 0 rgba(0, 0, 0, 0.015);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.015);
+  cursor: pointer;
+  -webkit-transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+  transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -ms-touch-action: manipulation;
+  touch-action: manipulation;
+
+  padding: 10px 25px;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 4px;
+  color: rgba(0, 0, 0, 0.65);
+  background-color: #fff;
+  border-color: #d9d9d9;
+
+  color: #fff;
+  background-color: #1890ff;
+  border-color: #1890ff;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.12);
+  -webkit-box-shadow: 0 2px 0 rgba(0, 0, 0, 0.045);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.045);
+  margin-right: 10px;
+  padding-top: 7px;
+}
+
+.delim {
+  color: #89ac00;
+  margin-right: 1em;
+  font-weight: bold;
 }

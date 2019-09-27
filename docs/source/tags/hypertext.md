@@ -1,6 +1,6 @@
 ---
 title: HyperText
-type: guide
+type: tags
 order: 502
 ---
 

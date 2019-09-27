@@ -1,6 +1,6 @@
 ---
 title: Image
-type: guide
+type: tags
 order: 303
 ---
 
