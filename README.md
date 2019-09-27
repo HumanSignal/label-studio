@@ -59,12 +59,7 @@ part and an example implementation of the backend.
 
 ### Run with Docker
 ```bash
-docker run -p 8200:8200 -t -i amaigmbh/label-studio -c config.json -l ../examples/chatbot_analysis/config.xml -i ../examples/chatbot_analysis/tasks.json -o output
-```
-
-or mount a folder with your custom configuration files
-```bash
-docker run -p 8200:8200 -t -i -v C:\docker\custom:/app/examples/audio_regions amaigmbh/label-studio
+docker run -p 8200:8200 -t -i heartexlabs/label-studio -c config.json -l ../examples/chatbot_analysis/config.xml -i ../examples/chatbot_analysis/tasks.json -o output
 ```
 
 ### Extend & Embed
