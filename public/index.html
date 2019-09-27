@@ -4,87 +4,15 @@
     <meta charset="utf-8" />
     <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico" />
     <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600|Roboto Mono' rel='stylesheet' type='text/css' />
-    <link href='//fonts.googleapis.com/css?family=Dosis:500&text=LabelStudio' rel='stylesheet' type='text/css' / >
-    <!-- Place this tag in your head or just before your close body tag. -->
-    <script async defer src="https://buttons.github.io/buttons.js"></script>
-
+    <link href='//fonts.googleapis.com/css?family=Dosis:500&text=LabelStudio' rel='stylesheet' type='text/css' />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="theme-color" content="#000000">
-    <style>
-    body {
-    position: relative;
-    padding-top: 10px;
-}
-
-.footer {
-    text-align: center;
-    margin: 0 auto;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    margin-bottom: 14px;
-    margin-top: 14px;
-}
-
-#header {
-    background-color: #fff;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    padding: 10px 20px 10px 40px;
-    z-index: 100;
-    box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 3px;
-    width: 100%;
-    margin-bottom: 60px;
-}
-
-#header a {
-
-    color: #304455 !important;
-}
-
-#logo img {
-    vertical-align: middle;
-    margin-right: 6px;
-    width: 40px;
-    height: 40px;
-}
-
-#logo {
-    display: inline-block;
-    font-size: 1.5em;
-    line-height: 40px;
-    color: #273849;
-    font-family: "Dosis", "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
-    font-weight: 500;
-    display: flex;
-}
-
-#nav {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    position: absolute;
-    right: 30px;
-    line-height: 40px;
-}
-
-#nav .break {
-    display: none;
-}
-
-#nav li {
-    display: inline-block;
-    position: relative;
-    margin: 0 0.6em;
-}
-
-    </style>
     <!--
       manifest.json provides metadata used when your web app is added to the
       homescreen on Android. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json">
+    <link rel="stylesheet" href="%PUBLIC_URL%/styles/main.css">
     <!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.
@@ -103,7 +31,7 @@
 
     <div id="header">
       <a id="logo" href="/">
-        <img src="ls_logo.png" alt="label studio logo">
+        <img src="./images/ls_logo.png" alt="label studio logo">
         <span style="font-size: 1.2em;">Label Studio</span>
       </a>
       <ul id="nav" style="display: flex; align-items: center">
@@ -117,7 +45,9 @@
 
     <footer class="footer">Made by <a target="_blank" href="https://heartex.net">Heartex</a> in San Francisco
       <br/><br/>
-      <img src="3nowhite.svg" height="80" />
+      <img src="./images/3nowhite.svg" height="80" />
     </footer>
+    <!-- Place this tag in your head or just before your close body tag. -->
+    <script async defer src="https://buttons.github.io/buttons.js"></script>
   </body>
 </html>
