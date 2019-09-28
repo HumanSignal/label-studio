@@ -204,7 +204,7 @@
       preview.onclick = function(ev) {
         ev.preventDefault();
 
-        var url = "https://stage-05.heartex.net/demo/render-editor?full_editor=t&config=" + encodeURI(config);
+        var url = "http://stage-05.heartex.net/demo/render-editor?full_editor=t&config=" + encodeURI(config);
         newwindow = window.open(url, "Preview");
         if (window.focus) {
           newwindow.focus();
