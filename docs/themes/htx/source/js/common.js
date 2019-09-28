@@ -198,12 +198,12 @@
    */
   function initPreviewButtons() {
     var code = document.querySelectorAll(".html").forEach(code => {
-      var config = code.textContent.replace(/(\r\n|\n|\r)/gm, "<br>");
       var preview = createButton("Open Preview", "lnk");
 
       preview.onclick = function(ev) {
         ev.preventDefault();
 
+        var config = code.textContent.replace(/(\r\n|\n|\r)/gm, "");
         var url = "http://stage-05.heartex.net/demo/render-editor?full_editor=t&config=" + encodeURI(config);
         newwindow = window.open(url, "Preview");
         if (window.focus) {
@@ -217,6 +217,8 @@
       pg.onclick = function(ev) {
         ev.preventDefault();
 
+        // [TODO] check why newline can't be loaded by Hexo
+        var config = code.textContent.replace(/(\r\n|\n|\r)/gm, "<br>");
         var url = "/playground/?config=" + encodeURI(config);
         newwindow = window.open(url, "Playground");
         if (window.focus) {
