@@ -204,7 +204,7 @@
         ev.preventDefault();
 
         var config = code.textContent.replace(/(\r\n|\n|\r)/gm, "");
-        var url = "http://stage-05.heartex.net/demo/render-editor?full_editor=t&config=" + encodeURI(config);
+        var url = "https://go.heartex.net/demo/render-editor?full_editor=t&config=" + encodeURI(config);
         newwindow = window.open(url, "Preview");
         if (window.focus) {
           newwindow.focus();

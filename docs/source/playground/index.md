@@ -11,10 +11,11 @@ order: 201
 
 {% raw %}
 
-<style>
+<style scoped>
  .content {
      max-width: none !important;
      padding-right: 50px;
+     margin-left: 0px !important;
  }
 
  .validation {
@@ -41,42 +42,100 @@ order: 201
      padding: 5px;
      overflow: auto;
  }
+ 
+.editor-row {
+    display: flex; 
+    margin-bottom: 1em; 
+    width: 100%;
+}
+
+ .data-row {
+    display: flex;
+ }
+ 
+.preview-col {
+    width: 60%; 
+    flex: 1; 
+    background: rgb(252,252,252);
+ }
+
+ .editor-area {
+ border: 1px solid #f48a4259;
+ }
+ 
+ .config-col {
+    color: rgba(0,0,0,.6); 
+    background: rgb(252,252,252); 
+    margin-right: 2em; 
+    width: 400px; 
+    
+ }
+
+ .input-col {
+ width: 49%;
+ margin-right: 2%;
+ }
+
+ .output-col {
+    width: 49%;
+ }
+ 
+@media screen and (max-width: 900px) {
+.editor-row {
+    flex-direction: column;
+ }
+
+ .data-row {
+    flex-direction: column;
+ }
+
+.preview-col {
+    width: 100%;
+}
+
+.config-col {
+    widht: 100%;
+ }
+ 
+ .input-col, .output-col { width: 100%; }
+ 
+}
+ 
 </style>
 
 <div>
-    <div style="display: flex; width: 100%; background: rgb(252,252,252);">
-        <div style="width: 49%; margin-right: 2%;"><h3>Config</h3></div>
-        <div style="width: 49%;"><h3>Preview</h3></div>
+  <div class="editor-row">
+    <div class="config-col">
+      <h3>Config</h3>
+      <div class="editor-area">
+      <!-- Textarea -->
+      <textarea name="label_config" cols="40" rows="10" class="project-form htx-html-editor"
+                id="id_label_config"></textarea>
+      <div class="validation"></div>
+      </div>
     </div>
-    <div style="display: flex; margin-bottom: 1em; width: 100%">
-        <div style="color: rgba(0,0,0,.6); background: rgb(252,252,252); padding-right: 2em; width: 400px;">
-            <!-- Textarea -->
-            
-            <textarea name="label_config" cols="40" rows="10" class="project-form htx-html-editor"
-                      id="id_label_config"></textarea>
-            <div class="validation"></div>
-        </div>
-        <div style="width: 60%; flex: 1; background: rgb(252,252,252)">
-            
-            <div id="editor-wrap"></div>
-            <pre class="preview" id="preload-editor">...</pre>
-        </div>
+    <div class="preview-col">
+      <h3>Preview</h3>
+      <div id="editor-wrap"></div>
+      <pre class="preview" id="preload-editor">...</pre>
     </div>
-    <!--  & Preview in two cols -->
-    <div style="display: flex;">
-        <div style="width: 49%; margin-right: 2%">
-            <h3>Input Preview</h3>
-            <div>
-                <pre class="preview" id="upload-data-example">...</pre>
-            </div>
-        </div>
-        <div style="width: 49%;">
-            <h3>Output Preview</h3>
-            <div class="ui positive message">
-                <pre class="preview" id="data-results">...</pre>
-            </div>
-        </div>
+  </div>
+</div>
+<!--  & Preview in two cols -->
+<div class="data-row">
+  <div class="input-col">
+    <h3>Input Preview</h3>
+    <div>
+      <pre class="preview" id="upload-data-example">...</pre>
     </div>
+  </div>
+  <div class="output-col">
+    <h3>Output Preview</h3>
+    <div class="ui positive message">
+      <pre class="preview" id="data-results">...</pre>
+    </div>
+  </div>
+</div>
 </div>
 
 <script>
@@ -106,7 +165,7 @@ order: 201
          }
      }, 500);
 
-     var host = "http://stage-05.heartex.net";
+     var host = "https://go.heartex.net";
      var url_string = window.location.href
      var url = new URL(url_string);
      

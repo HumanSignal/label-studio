@@ -67,14 +67,7 @@
  }
 
  .border-card {
-     width: 350px;
-     display: flex;
-     flex-direction: column;
-     border: 3px solid rgba(74,144,226,0.2);
-     background-color: #fff;
-     color: #000;
-     padding: 20px;
-     margin: 0 20px;
+     
  }
 
  .light-blue {
@@ -87,6 +80,50 @@
      padding-top: 110px;
  }
 
+ .quickstart-row {
+ display: flex;
+ justify-content: center;
+ padding-top: 100px;
+ padding-bottom: 100px;
+ }
+
+ .cards {
+    width: 1170px; display: flex; padding-bottom: 100px;
+ }
+
+ .card {
+ width: 33%;
+ padding: 1em;
+ width: 350px;
+     display: flex;
+     flex-direction: column;
+     border: 3px solid rgba(74,144,226,0.2);
+     background-color: #fff;
+     color: #000;
+     padding: 20px;
+     margin: 0 20px;
+ }
+ 
+ @media screen and (max-width: 900px) {
+
+ .cards {
+ flex-direction: column;
+ }
+
+ .card {
+ width: 90%;
+ margin-bottom: 2em;
+ }
+ 
+ .quickstart-row {
+ flex-direction: column;
+ }
+
+ .images-carousel {
+ margin: 0 auto;
+ }
+ }
+ 
  .footer a, .footer h2 {
  color: white;
 
@@ -129,11 +166,12 @@
             </div>
           </div>
         </section>
-        <section class="row row-spacing mobile-padding vertical-align" style="display: flex; justify-content: center; padding-top: 100px; padding-bottom: 100px;">
-          <div class="col-sm-5 mobile-margin hidden-xs">
+        
+        <section class="quickstart-row" style="">
+          <div class="images-carousel">
             <img src="/images/screens/screely-1569182764991.png" width="600" />
           </div>
-          <div class="col-sm-6" style="margin-left: 2em;">
+          <div style="margin-left: 2em; margin-right: 2em;">
             <h1>Quickstart</h1>
 
             <div class="code-block">
@@ -146,17 +184,17 @@
         </section>
         <section class="light-blue" style="display: flex; justify-content: center;">
           
-          <div style="width: 1170px; display: flex; padding-bottom: 100px;">
-            <div style="width: 33%; padding: 1em;" class="border-card">
+          <div style="cards">
+            <div class="card">
               <h3>Configurable</h3>
               <p>Using HTML-like tags, you can quickly configure the UI for your particular needs. It's not just an image or text. It can be a pairwise comparison, multi-type classification, and beyond. Label Studio is a swiss army knife of data labeling and annotation.</p>
               <a href="<%- url_for("/guide/configuration.html") %>" class="underline">Learn More</a>
             </div>
-            <div style="width: 33%; padding: 1em;" class="border-card">
+            <div class="card">
               <h3>Multiple data types</h3>
               <p>Label Studio is type agnostic. The overall goal is to be able to process all data types. Right now it supports <a href="<%- url_for("/tags/audio.html") %>" class="underline">Audio</a>, <a href="<%- url_for("/tags/text.html") %>" class="underline">Text</a>, and <a href="<%- url_for("/tags/image.html") %>" class="underline">Images</a>. <br/><br/>Each interface can include a mix of the types with different workflows.</p>
             </div>
-            <div style="width: 33%; padding: 1em;" class="border-card">
+            <div class="card">
               <h3>Embeddable and Extendable</h3>
               <p>Label Studio includes a powerful embedding feature that enables you to embed entire UI in your pipeline. You can extend core functionality with new visual constructs and customize it for different use cases.</p>
             </div>
