@@ -6,7 +6,7 @@ order: 208
 
 Listen to an audio file and transcribe its content in natural language
 
-![Transcribe an Audio](https://user.fm/files/v2-e1f1d31d32db73c07d20a96a78758623/Screen%20Shot%202019-08-01%20at%209.39.54%20PM.png "Transcribe an Audio")
+<img src="/images/screens/audio_transcription.png" class="img-template-example" title="Transcribe an Audio" />
 
 ## Run
 

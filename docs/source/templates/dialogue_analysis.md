@@ -6,12 +6,12 @@ order: 204
 
 Analyze the chat dialog, classify it and provide your own answer
 
-![Chatbot Analysis](https://user.fm/files/v2-cb81c8aaa30170724ea19e3af7218fc8/Screen%20Shot%202019-08-01%20at%209.27.14%20PM.png "Chatbot Analysis")
+<img src="/images/screens/dialogue_analysis.png" class="img-template-example" title="Dialogue Analysis" />
 
 ## Run
 
 ```bash
-python server.py -c config.json -l ../examples/chatbot_analysis/config.xml -i ../examples/chatbot_analysis/tasks.json -o output
+python server.py -c config.json -l ../examples/dialogue_analysis/config.xml -i ../examples/dialogue_analysis/tasks.json -o output
 ```
 
 ## Config 

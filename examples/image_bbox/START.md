@@ -1,7 +1,7 @@
 
 # Image object detection 
 
-![Image object detection](https://user.fm/files/v2-04a15361580d038bd9392a225e2569e4/Screen%20Shot%202019-08-01%20at%2011.38.16%20PM.png "Image BBox")
+![Image Object Detection](/images/screenshots/image_bbox.png "Image Object Detection")
 
 # Install
 

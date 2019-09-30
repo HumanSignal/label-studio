@@ -6,7 +6,7 @@ order: 206
 
 Named entity recognition for a piece of text
 
-![Named Entity Recognition](https://user.fm/files/v2-cfb599a352fe6c17d209599ce95e7e25/Screen%20Shot%202019-08-01%20at%209.48.24%20PM.png "Named Entity Recognition")
+<img src="/images/screens/named_entity.png" class="img-template-example" title="Named Entity Recognition" />
 
 ## Run
 

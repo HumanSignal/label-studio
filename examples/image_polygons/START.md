@@ -1,7 +1,7 @@
 
 # Image Polygons
 
-![Image Polygons]("Image Polygons")
+![Image Polygons](/images/screenshots/image_polygons.png "Image Polygons")
 
 # Install
 

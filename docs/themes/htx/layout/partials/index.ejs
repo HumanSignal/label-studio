@@ -97,7 +97,8 @@
  }
 
  .img-car {
- width: 600px;
+ width: 740px;
+ filter: drop-shadow(0 0 10px #999);
  }
  
  .subscribe {
@@ -113,9 +114,26 @@
  .tagline {
  display: flex;
  }
+
+ .images-carousel {
+ margin-right: 2em;
+ }
+
+ .quickstart {
+   margin-left: 4em;
+   margin-right: 2em;
+ }
  
  @media screen and (max-width: 900px) {
 
+ .header-ul { padding-left: 0px; }
+ 
+ .quickstart {
+
+ margin-left: 2em;
+ }
+ 
+ 
  .tagline-text {
    text-align: center;
  }
@@ -125,7 +143,9 @@
  }
  
  .img-car {
- width: 100%;
+ width: 90%;
+ margin-left: 2em;
+
  }
  
  .subscribe {
@@ -168,6 +188,124 @@
  
 </style>
 
+<style>
+  img {
+  max-width: 100%;
+  vertical-align: middle;
+}
+
+.trigger {
+  display: none;
+}
+
+.slider {
+  position: relative;
+  height: 392px;
+  width: 760px;
+  margin-left: 2em;
+  }
+
+  .slider-wrapper {
+  position: relative;
+}
+
+.slide {
+  width: 100%;
+  overflow: hidden;
+  position: absolute;
+  height: 100%;
+  left: 0;
+  top: 0;
+  z-index: 5000;
+  opacity: 0;
+  transition: opacity .5s ease-in-out;
+  filter: drop-shadow(0 0 10px #999);
+  border-radius: 5px;
+}
+
+.slide-img {
+  height: 100%;
+  object-fit: fill;
+  display: block;
+  margin: 0 auto;
+  filter: drop-shadow(0 0 10px #999);
+}
+
+.slide-figure {
+  height: 100%;
+  position: relative;
+  margin: 0;
+}
+
+.slide-caption {
+  position: absolute;
+  bottom: 0%;
+  width: 100%;
+  color: white;
+  text-align: center;
+  background: rgba(0,0,0,0.4);
+}
+
+.trigger:checked + .slide {
+  z-index: 6000;
+  opacity: 1;
+}
+
+.slider-nav {
+  width: 100%;
+  text-align: center;
+  margin: 1rem 0;
+  padding: 0px;
+}
+
+.slider-nav__item {
+  display: inline-block;
+}
+
+.slider-nav__label {
+  font-size: 13px;
+  background-color: #333;
+  display: block;
+  height: 1.5em;
+  line-height: 2em;
+  width: 1.5em;
+  text-align: center;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  transition: background-color .25s, color .25s ease-in-out;
+}
+
+.slider-nav__label:hover,
+.slider-nav__label:active,
+.slider-nav__label:focus {
+  background-color: gray;
+  color: black;
+  }
+
+
+ @media screen and (max-width: 900px) {
+  .slider {
+  width: 90%;
+  margin-left: 2em;
+  margin-right: 2em;
+  height: 250px;
+  }
+
+  .slide-img {
+  width: 100%;
+  height: auto;
+  }
+  
+  .slider-wrapper {
+  width: 100%;
+  
+
+    }
+  }
+
+</style>
+
 <div id="header" style="box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 3px 0px;">
     <a id="logo" href="<%- url_for("/") %>">
         <img src="<%- url_for("/images/ls_logo.png") %>" alt="label studio logo" />
@@ -193,7 +331,7 @@
                     <h1 style="font-size: 2em;">Open-source<br/>data labeling, annotation<br/> and exploration tool<br/></h1>
                   </div>
                 </div>
-                <ul style="list-style-type: none;">
+                <ul style="list-style-type: none;" class="header-ul">
                   <li>— Simplicity built-in, no overcomplicated UIs</li>
                   <li>— Mobile-Friendly, adaptable for any device</li>
                   <li>— Visually configurable from top to the bottom</li>
@@ -207,11 +345,41 @@
           </div>
         </section>
         
-        <section class="quickstart-row" style="">
-          <div class="images-carousel">
-            <img src="/images/screens/screely-1569182764991.png" class="img-car" />
+        <section class="quickstart-row">
+
+          <div class="slider-wrapper">
+            <div class="slider">
+              <input type="radio" name="slider" class="trigger" id="one" checked="checked" />
+              <div class="slide">
+                <figure class="slide-figure">
+                  <img class="slide-img" src="/images/screens/audio_regions.png" />
+                  <figcaption class="slide-caption"><p>Audio Regions</p></figcaption>
+                </figure><!-- .slide-figure -->
+              </div><!-- .slide -->
+              <input type="radio" name="slider" class="trigger" id="two" />
+              <div class="slide">
+                <figure class="slide-figure">
+                  <img class="slide-img" src="/images/screens/audio_transcription.png" />
+                  <figcaption class="slide-caption"><p>Audio Transcription</p></figcaption>
+                </figure><!-- .slide-figure -->
+              </div><!-- .slide -->
+              <input type="radio" name="slider" class="trigger" id="three" />
+              <div class="slide">
+                <figure class="slide-figure">
+                  <img class="slide-img" src="/images/screens/dialogue_analysis.png" />
+                  <figcaption class="slide-caption"><p>Dialogue Analysis</p></figcaption>
+                </figure><!-- .slide-figure -->
+              </div><!-- .slide -->
+            </div><!-- .slider -->
+            <ul class="slider-nav">
+              <li class="slider-nav__item"><label class="slider-nav__label" for="one"> </label></li>
+              <li class="slider-nav__item"><label class="slider-nav__label" for="two"> </label></li>
+              <li class="slider-nav__item"><label class="slider-nav__label" for="three"> </label></li>
+            </ul><!-- .slider-nav -->
           </div>
-          <div style="margin-left: 2em; margin-right: 2em;">
+          
+          
+          <div class="quickstart">
             <h1>Quickstart</h1>
 
             <div class="code-block">
