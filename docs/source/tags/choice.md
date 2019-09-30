@@ -4,8 +4,6 @@ type: tags
 order: 402
 ---
 
-## Choice
-
 Choice tag represents a single choice
 
 ### Parameters

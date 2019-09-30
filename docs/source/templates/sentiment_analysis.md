@@ -6,7 +6,7 @@ order: 207
 
 Classify sentiment of reviews for musical instruments found on Amazon
 
-![Sentiment Analysis UI](https://user.fm/files/v2-c739eea809a0fde9c90675a2396f577e/Screen%20Shot%202019-08-01%20at%209.17.04%20PM.png "Sentiment Analysis UI")
+<img src="/images/screens/text_classification.png" class="img-template-example" title="Sentiment Analysis" />
 
 ## Run
 

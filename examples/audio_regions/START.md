@@ -1,7 +1,7 @@
 
 # Audio Regions
 
-![Audio Regions](../../images/screenshots/audio-regions.png "Audio Regions")
+![Audio Regions](/images/screenshots/audio_regions.png "Audio Regions")
 
 > For audio regions to work when you have remote URLs, you need to configure CORS to be wide-open
 

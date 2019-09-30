@@ -1,7 +1,7 @@
 
 # Named Entity Recognition
 
-![Named Entity Recognition](https://user.fm/files/v2-cfb599a352fe6c17d209599ce95e7e25/Screen%20Shot%202019-08-01%20at%209.48.24%20PM.png "Named Entity Recognition")
+![Named Entity Recognition](/images/screenshots/named_entity.png "Named Entity Recognition")
 
 # Install
 

@@ -10,7 +10,7 @@ import Tree from "../../core/Tree";
 import Types from "../../core/Types";
 
 /**
- * Rating tag
+ * Rating adds rating selection
  * @example
  * <View>
  *   <Text name="txt" value="$text"></Text>

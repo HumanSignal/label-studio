@@ -37,6 +37,13 @@
     <!-- main page styles -->
     <%- css(isIndex ? 'css/index' : 'css/page') %>
 
+    <% if (page.type === "playground") { %>
+      <%- css('css/codemirror') %>
+      <script src="<%- url_for("/js/jquery.min.js") %>"></script>      
+      <script src="<%- url_for("/js/codemirror.js") %>"></script>
+      <script src="<%- url_for("/js/xml.js") %>"></script>      
+    <% } %>
+
     <!-- this needs to be loaded before guide's inline scripts -->
     
   </head>
@@ -55,7 +62,6 @@
         <%- partial('partials/index') %>
     <% } %>
 
-    <!-- main custom script for sidebars, version selects etc. -->
     <script src="<%- url_for("/js/css.escape.js") %>"></script>
     <script src="<%- url_for("/js/common.js") %>"></script>
     <%- partial('partials/google_analytics') %>

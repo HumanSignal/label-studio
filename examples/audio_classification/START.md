@@ -1,7 +1,7 @@
 
 # Audio Classification
 
-![Audio Classification](https://user.fm/files/v2-70ded6823222ef7f5291482df9ce39c2/Screen%20Shot%202019-08-01%20at%209.21.12%20PM.png "Audio Classification")
+![Audio Classification](/images/screenshots/audio_classification.png "Audio Classification")
 
 # Install
 

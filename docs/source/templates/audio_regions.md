@@ -6,7 +6,7 @@ order: 203
 
 Listen to the audio file and classify
 
-![Audio Regions](https://github.com/heartexlabs/label-studio/blob/master/images/screenshots/audio-regions.png?raw=true "Audio Regions")
+<img src="/images/screens/audio_regions.png" class="img-template-example" title="Audio Regions" />
 
 <p class="tip">For audio regions to work when you have remote URLs, you need to configure CORS to be wide-open</p>
 

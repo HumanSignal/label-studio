@@ -1,13 +1,3 @@
-<div id="header" style="box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 3px 0px;">
-    <a id="logo" href="<%- url_for("/") %>">
-        <img src="<%- url_for("/images/ls_logo.png") %>" alt="label studio logo" />
-        <span>Label Studio</span>
-    </a>
-    <ul id="nav" style="display: flex; align-items: center">
-        <%- partial('partials/main_menu', { context: 'nav' }) %>
-    </ul>
-</div>
-
 <style>
  .btn {
      line-height: 1.5;
@@ -67,14 +57,7 @@
  }
 
  .border-card {
-     width: 350px;
-     display: flex;
-     flex-direction: column;
-     border: 3px solid rgba(74,144,226,0.2);
-     background-color: #fff;
-     color: #000;
-     padding: 20px;
-     margin: 0 20px;
+     
  }
 
  .light-blue {
@@ -87,6 +70,109 @@
      padding-top: 110px;
  }
 
+ .quickstart-row {
+ display: flex;
+ justify-content: center;
+ padding-top: 100px;
+ padding-bottom: 100px;
+ }
+
+ .cards {
+ width: 1170px;
+ display: flex;
+ padding-bottom: 100px;
+ }
+
+ .card {
+ width: 33%;
+ padding: 1em;
+ width: 350px;
+     display: flex;
+     flex-direction: column;
+     border: 3px solid rgba(74,144,226,0.2);
+     background-color: #fff;
+     color: #000;
+     padding: 20px;
+     margin: 0 20px;
+ }
+
+ .img-car {
+ width: 740px;
+ filter: drop-shadow(0 0 10px #999);
+ }
+ 
+ .subscribe {
+ width: 600px;
+ text-align: center;
+ display: flex;
+ justify-content: center;
+ height: 400px;
+ align-items: center;
+ margin: 0 auto;
+ }
+
+ .tagline {
+ display: flex;
+ }
+
+ .images-carousel {
+ margin-right: 2em;
+ }
+
+ .quickstart {
+   margin-left: 4em;
+   margin-right: 2em;
+ }
+ 
+ @media screen and (max-width: 900px) {
+
+ .header-ul { padding-left: 0px; }
+ 
+ .quickstart {
+
+ margin-left: 2em;
+ }
+ 
+ 
+ .tagline-text {
+   text-align: center;
+ }
+ 
+ .tagline {
+ flex-direction: column;
+ }
+ 
+ .img-car {
+ width: 90%;
+ margin-left: 2em;
+
+ }
+ 
+ .subscribe {
+ width: auto;
+ margin-left: 2em;
+ margin-right: 2em;
+ }
+
+ 
+ .cards {
+ flex-direction: column;
+ }
+
+ .card {
+ margin-bottom: 2em;
+ }
+ 
+ .quickstart-row {
+ flex-direction: column;
+ padding-top: 60px;
+ }
+
+ .images-carousel {
+ margin: 0 auto;
+ }
+ }
+ 
  .footer a, .footer h2 {
  color: white;
 
@@ -102,21 +188,150 @@
  
 </style>
 
+<style>
+  img {
+  max-width: 100%;
+  vertical-align: middle;
+}
+
+.trigger {
+  display: none;
+}
+
+.slider {
+  position: relative;
+  height: 392px;
+  width: 760px;
+  margin-left: 2em;
+  }
+
+  .slider-wrapper {
+  position: relative;
+}
+
+.slide {
+  width: 100%;
+  overflow: hidden;
+  position: absolute;
+  height: 100%;
+  left: 0;
+  top: 0;
+  z-index: 5000;
+  opacity: 0;
+  transition: opacity .5s ease-in-out;
+  filter: drop-shadow(0 0 10px #999);
+  border-radius: 5px;
+}
+
+.slide-img {
+  height: 100%;
+  object-fit: fill;
+  display: block;
+  margin: 0 auto;
+  filter: drop-shadow(0 0 10px #999);
+}
+
+.slide-figure {
+  height: 100%;
+  position: relative;
+  margin: 0;
+}
+
+.slide-caption {
+  position: absolute;
+  bottom: 0%;
+  width: 100%;
+  color: white;
+  text-align: center;
+  background: rgba(0,0,0,0.4);
+}
+
+.trigger:checked + .slide {
+  z-index: 6000;
+  opacity: 1;
+}
+
+.slider-nav {
+  width: 100%;
+  text-align: center;
+  margin: 1rem 0;
+  padding: 0px;
+}
+
+.slider-nav__item {
+  display: inline-block;
+}
+
+.slider-nav__label {
+  font-size: 13px;
+  background-color: #333;
+  display: block;
+  height: 1.5em;
+  line-height: 2em;
+  width: 1.5em;
+  text-align: center;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  transition: background-color .25s, color .25s ease-in-out;
+}
+
+.slider-nav__label:hover,
+.slider-nav__label:active,
+.slider-nav__label:focus {
+  background-color: gray;
+  color: black;
+  }
+
+
+ @media screen and (max-width: 900px) {
+  .slider {
+  width: 90%;
+  margin-left: 2em;
+  margin-right: 2em;
+  height: 250px;
+  }
+
+  .slide-img {
+  width: 100%;
+  height: auto;
+  }
+  
+  .slider-wrapper {
+  width: 100%;
+  
+
+    }
+  }
+
+</style>
+
+<div id="header" style="box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 3px 0px;">
+    <a id="logo" href="<%- url_for("/") %>">
+        <img src="<%- url_for("/images/ls_logo.png") %>" alt="label studio logo" />
+        <span>Label Studio</span>
+    </a>
+    <ul id="nav" style="display: flex; align-items: center">
+        <%- partial('partials/main_menu', { context: 'nav' }) %>
+    </ul>
+</div>
+
 <body>
-  <div>
+  <div class="fix-sidebar">
+    <%- partial('partials/sidebar', { type: page.type === 'menu' ? 'guide' : page.type, index: page.index }) %>
     <div>
       <div id="bodybag">
         <section style="background-color: #fffaff;">
           <div style="position: relative; padding-top: 100px; padding-bottom: 100px;">
             <div style="display: flex; justify-content: center;">
               <div style="display: flex; flex-direction: column; align-items: center;">
-                <div style="display: flex;">
+                <div class="tagline">
                   <img src="<%- url_for("/images/opossum/heartex_icon_opossum_green.svg") %>" alt="label studio logo" height="180" />
-                  <div>
+                  <div class="tagline-text">
                     <h1 style="font-size: 2em;">Open-source<br/>data labeling, annotation<br/> and exploration tool<br/></h1>
                   </div>
                 </div>
-                <ul style="list-style-type: none;">
+                <ul style="list-style-type: none;" class="header-ul">
                   <li>— Simplicity built-in, no overcomplicated UIs</li>
                   <li>— Mobile-Friendly, adaptable for any device</li>
                   <li>— Visually configurable from top to the bottom</li>
@@ -129,13 +344,58 @@
             </div>
           </div>
         </section>
-        <section class="row row-spacing mobile-padding vertical-align" style="display: flex; justify-content: center; padding-top: 100px; padding-bottom: 100px;">
-          <div class="col-sm-5 mobile-margin hidden-xs">
-            <img src="/images/screens/screely-1569182764991.png" width="600" />
-          </div>
-          <div class="col-sm-6" style="margin-left: 2em;">
-            <h1>Quickstart</h1>
+        
+        <section class="quickstart-row">
 
+          <div class="slider-wrapper">
+            <div class="slider">
+              <input type="radio" name="slider" class="trigger" id="one" checked="checked" />
+              <div class="slide">
+                <figure class="slide-figure">
+                  <img class="slide-img" src="/images/screens/image_bbox.png" />
+                  <figcaption class="slide-caption"><p>Image Bounding Box</p></figcaption>
+                </figure>
+              </div>
+              <input type="radio" name="slider" class="trigger" id="two" />
+              <div class="slide">
+                <figure class="slide-figure">
+                  <img class="slide-img" src="/images/screens/audio_transcription.png" />
+                  <figcaption class="slide-caption"><p>Audio Transcription</p></figcaption>
+                </figure>
+              </div>
+              <input type="radio" name="slider" class="trigger" id="three" />
+              <div class="slide">
+                <figure class="slide-figure">
+                  <img class="slide-img" src="/images/screens/dialogue_analysis.png" />
+                  <figcaption class="slide-caption"><p>Dialogue Analysis</p></figcaption>
+                </figure>
+              </div>
+              <input type="radio" name="slider" class="trigger" id="four" />
+              <div class="slide">
+                <figure class="slide-figure">
+                  <img class="slide-img" src="/images/screens/audio_regions.png" />
+                  <figcaption class="slide-caption"><p>Audio Regions</p></figcaption>
+                </figure>
+              </div>
+              <input type="radio" name="slider" class="trigger" id="five" />
+              <div class="slide">
+                <figure class="slide-figure">
+                  <img class="slide-img" src="/images/screens/named_entity.png" />
+                  <figcaption class="slide-caption"><p>Named Entity Recognition</p></figcaption>
+                </figure>
+              </div>
+            </div>
+            <ul class="slider-nav">
+              <li class="slider-nav__item"><label class="slider-nav__label" for="one"> </label></li>
+              <li class="slider-nav__item"><label class="slider-nav__label" for="two"> </label></li>
+              <li class="slider-nav__item"><label class="slider-nav__label" for="three"> </label></li>
+              <li class="slider-nav__item"><label class="slider-nav__label" for="four"> </label></li>
+              <li class="slider-nav__item"><label class="slider-nav__label" for="five"> </label></li>
+            </ul>
+          </div>
+          
+          <div class="quickstart">
+            <h1>Quickstart</h1>
             <div class="code-block">
               <p># Clone the repository<br>git clone https://github.com/heartexlabs/label-studio.git</p>
               <p># Lunch the development server<br>cd label-studio/backend<br/>bash start.sh</p>
@@ -144,31 +404,30 @@
             <a href="<%- url_for("/templates/index.html") %>" class="btn" target="_blank">Templates</a>
           </div>
         </section>
-        <section class="light-blue" style="display: flex; justify-content: center;">
-          
-          <div style="width: 1170px; display: flex; padding-bottom: 100px;">
-            <div style="width: 33%; padding: 1em;" class="border-card">
+        <section class="light-blue" style="display: flex; justify-content: center;">          
+          <div class="cards">
+            <div class="card">
               <h3>Configurable</h3>
               <p>Using HTML-like tags, you can quickly configure the UI for your particular needs. It's not just an image or text. It can be a pairwise comparison, multi-type classification, and beyond. Label Studio is a swiss army knife of data labeling and annotation.</p>
               <a href="<%- url_for("/guide/configuration.html") %>" class="underline">Learn More</a>
             </div>
-            <div style="width: 33%; padding: 1em;" class="border-card">
+            <div class="card">
               <h3>Multiple data types</h3>
               <p>Label Studio is type agnostic. The overall goal is to be able to process all data types. Right now it supports <a href="<%- url_for("/tags/audio.html") %>" class="underline">Audio</a>, <a href="<%- url_for("/tags/text.html") %>" class="underline">Text</a>, and <a href="<%- url_for("/tags/image.html") %>" class="underline">Images</a>. <br/><br/>Each interface can include a mix of the types with different workflows.</p>
             </div>
-            <div style="width: 33%; padding: 1em;" class="border-card">
+            <div class="card">
               <h3>Embeddable and Extendable</h3>
               <p>Label Studio includes a powerful embedding feature that enables you to embed entire UI in your pipeline. You can extend core functionality with new visual constructs and customize it for different use cases.</p>
             </div>
           </div>                    
         </section>
 
-        <section style="display: flex; justify-content: center; height: 400px; align-items: center;">
+        <section class="subscribe">
           
           <div style="text-align: center;">
             <img src="<%- url_for("/images/paper-plane.svg") %>" alt="label studio logo" height="64" />
             <h3>Subscribe for the updates</h3>
-            <div style="width: 600px; text-align: center;">
+            <div >
               <p>We send a periodic newsletter announcing new features as well as some ML-related papers, label techniques that are innovative and funny stories.</p>
             </div>
             <!-- Begin Mailchimp Signup Form -->
@@ -256,5 +515,6 @@
         </section>
       </div>
     </div>
-  </div>    
+  </div>
 </body>
+

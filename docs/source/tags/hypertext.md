@@ -4,9 +4,7 @@ type: tags
 order: 502
 ---
 
-## HyperText
-
-HyperText element. Render html inside
+HyperText element. Render html inside the element
 
 ### Parameters
 
@@ -17,6 +15,6 @@ HyperText element. Render html inside
 
 ```html
 <View>
- <HyperText value="<p>Hey</p>"></HyperText>
+  <HyperText value="<p>Hey</p>"></HyperText>
 <View>
 ```

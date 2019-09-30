@@ -11,9 +11,9 @@ import ProcessAttrsMixin from "../mixins/ProcessAttrs";
  * @example
  * <Header name="text-1" value="$text"></Header>
  * @name Header
- * @param {string} size Size of header
+ * @param {number} [size=4] Size of header
  * @param {string} value Text of header
- * @param {boolean} underline Underline of header
+ * @param {boolean} [underline=false] Underline of header
  */
 const Model = types.model({
   type: "header",

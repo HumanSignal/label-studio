@@ -4,9 +4,6 @@ type: tags
 order: 405
 ---
 
-## Polygon
-
-Polygon tag
 Polygon is used to add polygons to an image
 
 ### Parameters

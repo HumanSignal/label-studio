@@ -28,12 +28,9 @@ import styles from "./AudioPlus/AudioPlus.module.scss";
  * @name AudioPlus
  * @param {string} name of the element
  * @param {string} value of the element
- * @param {boolean} hasZoom speficy if audio has zoom functionality
- * @param {string} regionBG region color
- * @param {string} selectedRegionBG selected region background
- * @param {boolean} volume from 0 to 1
- * @param {boolean} speed from 0.5 to 3
- * @param {boolean} zoom
+ * @param {boolean=} [volume=true] show the volume slider (from 0 to 1)
+ * @param {boolean} [speed=true] show the speed slider (from 0.5 to 3)
+ * @param {boolean} [zoom=true] show the zoom slider
  */
 const TagAttrs = types.model({
   name: types.maybeNull(types.string),

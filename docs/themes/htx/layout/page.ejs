@@ -19,7 +19,7 @@
   <% if (page.title.trim()) { %>
     <h1><%- page.title %><%- page.type === 'examples' ? ' Example' : '' %></h1>
   <% } %>  
-  <%- page.content %>  
+  <%- page.content %>
   <% if (page.type === 'guide') { %>
     <div class="guide-links">
       <% const lastPage = site.pages.find({ type: page.type, order: { $lt: page.order }}).sort({ order: -1 }).first(); %>

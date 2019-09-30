@@ -1,9 +1,14 @@
 (function() {
-  initMobileMenu();
-  initVideoModal();
-  initNewNavLinks();
-  initSubHeaders();
+  var sidebar = document.querySelector(".sidebar");
+  if (sidebar) {
+    initMobileMenu();
+    initVideoModal();
+    initNewNavLinks();
+    initSubHeaders();
+  }
+
   initLocationHashFuzzyMatching();
+  initPreviewButtons();
 
   function parseRawHash(hash) {
     // Remove leading hash
@@ -186,6 +191,72 @@
         isOpen = false;
       }
     });
+  }
+
+  /**
+   * Preview
+   */
+  function initPreviewButtons() {
+    var code = document.querySelectorAll(".html").forEach(code => {
+      var preview = createButton("Open Preview", "lnk");
+
+      preview.onclick = function(ev) {
+        ev.preventDefault();
+
+        var config = code.textContent.replace(/(\r\n|\n|\r)/gm, "");
+        var url = "https://go.heartex.net/demo/render-editor?full_editor=t&config=" + encodeURI(config);
+        newwindow = window.open(url, "Preview");
+        if (window.focus) {
+          newwindow.focus();
+        }
+
+        return false;
+      };
+
+      var pg = createButton("Lunch in Playground", "lnk");
+      pg.onclick = function(ev) {
+        ev.preventDefault();
+
+        // [TODO] check why newline can't be loaded by Hexo
+        var config = code.textContent.replace(/(\r\n|\n|\r)/gm, "<br>");
+        var url = "/playground/?config=" + encodeURI(config);
+        newwindow = window.open(url, "Playground");
+        if (window.focus) {
+          newwindow.focus();
+        }
+
+        return false;
+      };
+
+      var div = document.createElement("div");
+      div.style = "text-align: right";
+      div.appendChild(preview);
+      div.appendChild(pg);
+
+      code.parentNode.insertAdjacentElement("afterend", div);
+    });
+  }
+
+  function createButton(title, clsName) {
+    var a = document.createElement("a");
+    a.appendChild(document.createTextNode(title));
+    a.title = title;
+    a.className = clsName;
+    a.href = "";
+
+    return a;
+  }
+
+  function showPreview(el, config, url) {
+    config = config.replace(/(\r\n|\n|\r)/gm, "");
+    var url = "https://go.heartex.net/demo/render-editor?full_editor=t&config=" + encodeURI(config);
+    var windowName = "Preview";
+
+    newwindow = window.open(url, windowName);
+    if (window.focus) {
+      newwindow.focus();
+    }
+    return false;
   }
 
   /**

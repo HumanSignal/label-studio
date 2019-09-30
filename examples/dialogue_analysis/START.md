@@ -1,7 +1,7 @@
 
-# Chatbot Analysis
+# Dialogue Analysis
 
-![Chatbot Analysis](https://user.fm/files/v2-cb81c8aaa30170724ea19e3af7218fc8/Screen%20Shot%202019-08-01%20at%209.27.14%20PM.png "Chatbot Analysis")
+![Dialogue Analysis](/images/screenshots/chatbot_analysis.png "Dialogue Analysis")
 
 # Install
 
