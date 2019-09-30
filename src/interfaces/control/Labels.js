@@ -25,6 +25,7 @@ import LabelMixin from "../mixins/LabelMixin";
  * @param {string} name name of the element
  * @param {string} toName name of the element that you want to label
  * @param {single|multiple=} [choice=single] configure if you can select just one or multiple labels
+ * @param {boolean} showInline show items in the same visual line
  */
 const TagAttrs = types.model({
   name: types.maybeNull(types.string),
@@ -32,6 +33,7 @@ const TagAttrs = types.model({
 
   choice: types.optional(types.enumeration(["single", "multiple"]), "single"),
 
+  showinline: types.optional(types.boolean, true),
   // TODO make enum
   selectionstyle: types.maybeNull(types.optional(types.string, "basic", "border", "bottom")),
 });
@@ -45,7 +47,6 @@ const ModelAttrs = types.model({
   id: types.optional(types.identifier, guidGenerator),
   pid: types.optional(types.string, guidGenerator),
   type: "labels",
-  showinline: types.optional(types.boolean, true),
   children: Types.unionArray(["labels", "label", "choice"]),
 });
 

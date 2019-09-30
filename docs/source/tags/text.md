@@ -1,11 +1,8 @@
 ---
 title: Text
-type: guide
+type: tags
 order: 304
 ---
-
-
-## Text
 
 Text tag shows a text that can be labeled
 
@@ -18,5 +15,7 @@ Text tag shows a text that can be labeled
 ### Examples
 
 ```html
-<Text name="text-1" value="$text"></Text>
+<View>
+  <Text name="text-1" value="$text"></Text>
+</View>
 ```

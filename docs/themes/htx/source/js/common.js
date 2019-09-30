@@ -1,122 +1,14 @@
 (function() {
-  initHashLevelRedirects();
-  initMobileMenu();
-  initVideoModal();
-  initNewNavLinks();
-  if (PAGE_TYPE) {
-    initVersionSelect();
-    initApiSpecLinks();
+  var sidebar = document.querySelector(".sidebar");
+  if (sidebar) {
+    initMobileMenu();
+    initVideoModal();
+    initNewNavLinks();
     initSubHeaders();
-    initLocationHashFuzzyMatching();
   }
 
-  // Most redirects should be specified in Hexo's
-  // _config.yml. However, it can't handle hash-level
-  // redirects, such as:
-  //
-  // /foo#hello -> /bar#hello
-  //
-  // For these cases where a section on one page has
-  // moved to a perhaps differently-named section on
-  // another page, we need this.
-  function initHashLevelRedirects() {
-    checkForHashRedirect(/list\.html$/, {
-      key: "/v2/guide/list.html#Maintaining-State",
-    });
-    checkForHashRedirect(/components\.html$/, {
-      "What-are-Components": "/v2/guide/components.html",
-      "Using-Components": "/v2/guide/components-registration.html",
-      "Global-Registration": "/v2/guide/components-registration.html#Global-Registration",
-      "Local-Registration": "/v2/guide/components-registration.html#Local-Registration",
-      "Composing-Components": "/v2/guide/components.html#Organizing-Components",
-      Props: "/v2/guide/components.html#Passing-Data-to-Child-Components-with-Props",
-      "Passing-Data-with-Props": "/v2/guide/components.html#Passing-Data-to-Child-Components-with-Props",
-      "camelCase-vs-kebab-case": "/v2/guide/components-props.html#Prop-Casing-camelCase-vs-kebab-case",
-      "Dynamic-Props": "/v2/guide/components-props.html#Static-and-Dynamic-Props",
-      "Literal-vs-Dynamic": "/v2/guide/components-props.html#Static-and-Dynamic-Props",
-      "One-Way-Data-Flow": "/v2/guide/components-props.html#One-Way-Data-Flow",
-      "Prop-Validation": "/v2/guide/components-props.html#Prop-Validation",
-      "Non-Prop-Attributes": "/v2/guide/components-props.html#Non-Prop-Attributes",
-      "Replacing-Merging-with-Existing-Attributes":
-        "/v2/guide/components-props.html#Replacing-Merging-with-Existing-Attributes",
-      "Custom-Events": "/v2/guide/components.html#Listening-to-Child-Components-Events",
-      "Using-v-on-with-Custom-Events": "/v2/guide/components.html#Listening-to-Child-Components-Events",
-      "Binding-Native-Events-to-Components":
-        "/v2/guide/components-custom-events.html#Binding-Native-Events-to-Components",
-      "sync-Modifier": "/v2/guide/components-custom-events.html#sync-Modifier",
-      "Form-Input-Components-using-Custom-Events":
-        "/v2/guide/components-custom-events.html#Binding-Native-Events-to-Components",
-      "Customizing-Component-v-model": "/v2/guide/components-custom-events.html#Customizing-Component-v-model",
-      "Non-Parent-Child-Communication": "/v2/guide/state-management.html",
-      "Compilation-Scope": "/v2/guide/components-slots.html#Compilation-Scope",
-      "Single-Slot": "/v2/guide/components-slots.html#Slot-Content",
-      "Named-Slots": "/v2/guide/components-slots.html#Named-Slots",
-      "Scoped-Slots": "/v2/guide/components-slots.html#Scoped-Slots",
-      "Dynamic-Components": "/v2/guide/components.html#Dynamic-Components",
-      "keep-alive": "/v2/guide/components-dynamic-async.html#keep-alive-with-Dynamic-Components",
-      Misc: "/v2/guide/components-edge-cases.html",
-      "Authoring-Reusable-Components": "/v2/guide/components.html#Organizing-Components",
-      "Child-Component-Refs":
-        "/v2/guide/components-edge-cases.html#Accessing-Child-Component-Instances-amp-Child-Elements",
-      "Async-Components": "/v2/guide/components-dynamic-async.html#Async-Components",
-      "Advanced-Async-Components": "/v2/guide/components-dynamic-async.html#Handling-Loading-State",
-      "Component-Naming-Conventions": "/v2/guide/components-registration.html#Component-Names",
-      "Recursive-Components": "/v2/guide/components-edge-cases.html#Recursive-Components",
-      "Circular-References-Between-Components":
-        "/v2/guide/components-edge-cases.html#Circular-References-Between-Components",
-      "Inline-Templates": "/v2/guide/components-edge-cases.html#Inline-Templates",
-      "X-Templates": "/v2/guide/components-edge-cases.html#X-Templates",
-      "Cheap-Static-Components-with-v-once": "/v2/guide/components-edge-cases.html#Cheap-Static-Components-with-v-once",
-    });
-    function checkForHashRedirect(pageRegex, redirects) {
-      // Abort if the current page doesn't match the page regex
-      if (!pageRegex.test(window.location.pathname)) return;
-
-      var redirectPath = redirects[window.location.hash.slice(1)];
-      if (redirectPath) {
-        window.location.href = window.location.origin + redirectPath;
-      }
-    }
-  }
-
-  function initApiSpecLinks() {
-    var apiContent = document.querySelector(".content.api");
-    if (apiContent) {
-      var apiTitles = [].slice.call(apiContent.querySelectorAll("h3"));
-      apiTitles.forEach(function(titleNode) {
-        var methodMatch = titleNode.textContent.match(/^([^(]+)\(/);
-        if (methodMatch) {
-          var idWithoutArguments = slugize(methodMatch[1]);
-          titleNode.setAttribute("id", idWithoutArguments);
-          titleNode.querySelector("a").setAttribute("href", "#" + idWithoutArguments);
-        }
-
-        var ulNode = titleNode.parentNode.nextSibling;
-        if (ulNode.tagName !== "UL") {
-          ulNode = ulNode.nextSibling;
-          if (!ulNode) return;
-        }
-        if (ulNode.tagName === "UL") {
-          var specNode = document.createElement("li");
-          var specLink = createSourceSearchPath(titleNode.textContent);
-          specNode.innerHTML = '<a href="' + specLink + '" target="_blank">Source</a>';
-          ulNode.appendChild(specNode);
-        }
-      });
-    }
-
-    function createSourceSearchPath(query) {
-      query = query
-        .replace(/\([^\)]*?\)/g, "")
-        .replace(/(Vue\.)(\w+)/g, '$1$2" OR "$2')
-        .replace(/vm\./g, "Vue.prototype.");
-      return (
-        "https://github.com/search?utf8=%E2%9C%93&q=repo%3Avuejs%2Fvue+extension%3Ajs+" +
-        encodeURIComponent('"' + query + '"') +
-        "&type=Code"
-      );
-    }
-  }
+  initLocationHashFuzzyMatching();
+  initPreviewButtons();
 
   function parseRawHash(hash) {
     // Remove leading hash
@@ -302,19 +194,69 @@
   }
 
   /**
-   * Doc version select
+   * Preview
    */
+  function initPreviewButtons() {
+    var code = document.querySelectorAll(".html").forEach(code => {
+      var preview = createButton("Open Preview", "lnk");
 
-  function initVersionSelect() {
-    // version select
-    var versionSelect = document.querySelector(".version-select");
-    versionSelect &&
-      versionSelect.addEventListener("change", function(e) {
-        var version = e.target.value;
-        var section = window.location.pathname.match(/\/v\d\/(\w+?)\//)[1];
-        if (version === "SELF") return;
-        window.location.assign("https://" + version + (version && ".") + "vuejs.org/" + section + "/");
-      });
+      preview.onclick = function(ev) {
+        ev.preventDefault();
+
+        var config = code.textContent.replace(/(\r\n|\n|\r)/gm, "");
+        var url = "https://go.heartex.net/demo/render-editor?full_editor=t&config=" + encodeURI(config);
+        newwindow = window.open(url, "Preview");
+        if (window.focus) {
+          newwindow.focus();
+        }
+
+        return false;
+      };
+
+      var pg = createButton("Lunch in Playground", "lnk");
+      pg.onclick = function(ev) {
+        ev.preventDefault();
+
+        // [TODO] check why newline can't be loaded by Hexo
+        var config = code.textContent.replace(/(\r\n|\n|\r)/gm, "<br>");
+        var url = "/playground/?config=" + encodeURI(config);
+        newwindow = window.open(url, "Playground");
+        if (window.focus) {
+          newwindow.focus();
+        }
+
+        return false;
+      };
+
+      var div = document.createElement("div");
+      div.style = "text-align: right";
+      div.appendChild(preview);
+      div.appendChild(pg);
+
+      code.parentNode.insertAdjacentElement("afterend", div);
+    });
+  }
+
+  function createButton(title, clsName) {
+    var a = document.createElement("a");
+    a.appendChild(document.createTextNode(title));
+    a.title = title;
+    a.className = clsName;
+    a.href = "";
+
+    return a;
+  }
+
+  function showPreview(el, config, url) {
+    config = config.replace(/(\r\n|\n|\r)/gm, "");
+    var url = "https://go.heartex.net/demo/render-editor?full_editor=t&config=" + encodeURI(config);
+    var windowName = "Preview";
+
+    newwindow = window.open(url, windowName);
+    if (window.focus) {
+      newwindow.focus();
+    }
+    return false;
   }
 
   /**

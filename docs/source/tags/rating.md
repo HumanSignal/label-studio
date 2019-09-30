@@ -1,12 +1,10 @@
 ---
 title: Rating
-type: guide
+type: tags
 order: 409
 ---
 
-## Rating
-
-Rating tag
+Rating adds rating selection
 
 ### Parameters
 

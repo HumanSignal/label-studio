@@ -1,22 +1,23 @@
 ---
-title: Configuration
+title: UI Configuration
 type: guide
 order: 200
 ---
 
 ## Tags
 
-Editor configuration is based on XML-like tags. Tags can be divided
-into three categories:
+Editor configuration is based on XML-like tags. Tags can be divided into three categories:
 
 - Visual tags used for visual only elements
 (non-interactive), examples: **View**, **Header**. 
 - Control tags used to label the objects, examples: **Labels**, **Choices**, **Rating**, **TextArea**. 
 - Object tags used to show elements that can be labeled: **Image**, **Text**, **Audio**, **AudioPlus**.
 
-The **name** attribute is mandatory for all control and object tags. Also,
-each control tag should have **toName** attribute that should match
-the **name** parameter in the object element. For example:
+<a class="button" href="/tags/">Explore Tags</a>
+
+## Connecting elements
+
+The **name** attribute is mandatory for all control and object tags. Also, each control tag should have **toName** attribute that should match the **name** parameter in the object element. For example:
 
 ```html
 <View>
@@ -28,12 +29,11 @@ the **name** parameter in the object element. For example:
 </View>
 ```
 
-Note that in the case above, Label tags are used to label Text
-tag. There could be multiple control, and object tags in the same
-configuration, and names are used to connect them.
+Note that in the case above, Label tags are used to label Text tag. There could be multiple control, and object tags in the same configuration, and names are used to connect them.
 
-Here is an example of two-column labeling interface with multiple
-control and object elements:
+## Styles
+
+Here is an example of two-column labeling interface with multiple control and object elements:
 
 ```html
 <View style="display: flex;">

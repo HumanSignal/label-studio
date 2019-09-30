@@ -4,17 +4,19 @@
 
 # Site
 title: Label Studio
-subtitle: 
+subtitle: Data labeling, annotation and exploration tool
 description: Label Studio is a multi-type data labeling and annotation tool with standardized output format
 keywords: computer-vision, deep-learning, image-annotation, annotation-tool, annotation, labeling, labeling-tool, image-labeling, image-labelling-tool, boundingbox, image-classification, annotations, imagenet, semantic-segmentation, dataset, datasets, label-studio, label-region, data-labeling, text-annotation
 author: Heartex
 language: en
 timezone:
 
+google_analytics: UA-129877673-4
+
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: https://heartexlabs.github.io/label-studio.github.io/
-root: /label-studio.github.io/
+url: https://labelstud.io/
+root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 
@@ -27,6 +29,7 @@ category_dir: categories
 code_dir: downloads/code
 i18n_dir: :lang
 skip_render:
+favicon: images/favicon.ico
 
 # Writing
 new_post_name: :title.md # File name of new posts
@@ -43,7 +46,18 @@ highlight:
   line_number: false
   tab_replace:
   hljs: true
-  
+
+# Markdown
+## https://github.com/chjj/marked
+markdown:
+  gfm: true
+  pedantic: false
+  sanitize: false
+  tables: true
+  breaks: true
+  smartLists: true
+  smartypants: true
+
 # Home page setting
 # path: Root path for your blogs index page. (default = '')
 # per_page: Posts displayed per page. (0 = disable pagination)
@@ -79,5 +93,5 @@ theme: htx
 ## Docs: http://hexo.io/docs/deployment.html
 deploy:
   type: git
-  repo: git@github.com:heartexlabs/label-studio.github.io.git
+  repo: git@github.com:heartexlabs/heartexlabs.github.io.git
   branch: master

@@ -1,9 +1,9 @@
 <div id="header">
   <a id="logo" href="<%- url_for("/") %>">
     <img src="<%- url_for("/images/ls_logo.png") %>" alt="label studio logo" />
-    <span>Label Studio</span>
+    <span style="font-size: 1.2em;">Label Studio</span>
   </a>
-  <ul id="nav">
+  <ul id="nav" style="display: flex; align-items: center">
     <%- partial('partials/main_menu', { context: 'nav' }) %>
   </ul>
 </div>

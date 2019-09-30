@@ -1,10 +1,8 @@
 ---
 title: Labels
-type: guide
+type: tags
 order: 403
 ---
-
-## Labels
 
 Labels tag, create a group of labels
 
@@ -13,6 +11,7 @@ Labels tag, create a group of labels
 -   `name` **[string]** name of the element
 -   `toName` **[string]** name of the element that you want to label
 -   `choice` **(single | multiple)** configure if you can select just one or multiple labels (optional, default `single`)
+-   `showInline` **[boolean]** show items in the same visual line (optional, default `false`)
 
 ### Examples
 

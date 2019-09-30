@@ -1,12 +1,9 @@
 ---
 title: Rectangle
-type: guide
+type: tags
 order: 407
 ---
 
-## Rectangle
-
-Rectangle tag
 Rectangle is used to add rectangle (BBox) to an image
 
 ### Parameters
@@ -15,7 +12,7 @@ Rectangle is used to add rectangle (BBox) to an image
 -   `toname` **[string]** name of the image to label
 -   `opacity` **float** opacity of rectangle (optional, default `0.6`)
 -   `fillColor` **[string]?** rectangle fill color, default is transparent
--   `strokeColor` **[string]?** stroke color
+-   `strokeColor` **[string]** stroke color (optional, default `#f48a42`)
 -   `strokeWidth` **[number]** width of the stroke (optional, default `1`)
 -   `canRotate` **[boolean]** show or hide rotation handle (optional, default `true`)
 

@@ -17,6 +17,7 @@ import { RatingModel } from "../control/Rating";
 import { ImageModel } from "../object/Image";
 import RegionsMixin from "../mixins/Regions";
 import NormalizationMixin from "../mixins/Normalization";
+import Utils from "../../utils";
 
 const Model = types
   .model({
@@ -27,6 +28,10 @@ const Model = types
 
     x: types.number,
     y: types.number,
+
+    _start_x: types.optional(types.number, 0),
+    _start_y: types.optional(types.number, 0),
+
     width: types.number,
     height: types.number,
 
@@ -36,14 +41,14 @@ const Model = types
     rotation: types.optional(types.number, 0),
 
     opacity: types.number,
+
+    fill: types.optional(types.boolean, true),
+    fillcolor: types.optional(types.string, "blue"),
+
+    strokecolor: types.optional(types.string, "blue"),
     strokewidth: types.number,
 
-    fillcolor: types.maybeNull(types.string),
-    strokecolor: types.optional(types.string, "blue"),
-
     states: types.maybeNull(types.array(types.union(LabelsModel, RatingModel, RectangleLabelsModel))),
-
-    // fromName: types.maybeNull(types.string),
 
     wp: types.maybeNull(types.number),
     hp: types.maybeNull(types.number),
@@ -65,6 +70,11 @@ const Model = types
     },
   }))
   .actions(self => ({
+    afterCreate() {
+      self._start_x = self.x;
+      self._start_y = self.y;
+    },
+
     unselectRegion() {
       self.selected = false;
       self.parent.setSelected(undefined);
@@ -183,49 +193,24 @@ const RectRegionModel = types.compose(
 );
 
 const HtxRectangleView = ({ store, item }) => {
-  const self = this;
-  const { name, wwidth, wheight, onChangedPosition } = item;
-
-  const wp = item.wp || item.parent.stageWidth / item.parent.naturalWidth;
-  const hp = item.hp || item.parent.stageHeight / item.parent.naturalHeight;
-
-  const x = item.x;
-  const y = item.y;
-  const w = item.width;
-  const h = item.height;
-
-  const props = {};
-
-  props["opacity"] = item.opacity;
-
-  if (item.fillcolor) {
-    props["fill"] = item.fillcolor;
-  }
-
-  props["stroke"] = item.strokecolor;
-  props["strokeWidth"] = item.strokewidth;
-  props["strokeScaleEnabled"] = false;
-  props["shadowBlur"] = 0;
-
-  if (item.highlighted) {
-    props["stroke"] = "#ff0000";
-  }
-
   return (
     <Fragment>
       <Rect
-        x={x}
-        y={y}
-        width={w}
-        height={h}
+        x={item.x}
+        y={item.y}
+        width={item.width}
+        height={item.height}
+        fill={item.fill ? Utils.Colors.convertToRGBA(item.fillcolor, 0.4) : null}
+        stroke={item.strokecolor}
+        strokeWidth={item.strokewidth}
+        strokeScaleEnabled={false}
+        shadowBlur={0}
         scaleX={item.scaleX}
         scaleY={item.scaleY}
+        opacity={item.opacity}
         name={item.id}
         onTransformEnd={e => {
           const t = e.target;
-
-          const wp = item.wp || item.parent.stageWidth / item.parent.naturalWidth;
-          const hp = item.hp || item.parent.stageHeight / item.parent.naturalHeight;
 
           item.setPosition(
             t.getAttr("x"),
@@ -238,9 +223,6 @@ const HtxRectangleView = ({ store, item }) => {
         }}
         onDragEnd={e => {
           const t = e.target;
-
-          const wp = item.wp || item.parent.stageWidth / item.parent.naturalWidth;
-          const hp = item.hp || item.parent.stageHeight / item.parent.naturalHeight;
 
           item.setPosition(
             t.getAttr("x"),
@@ -290,7 +272,6 @@ const HtxRectangleView = ({ store, item }) => {
           item.setHighlight(false);
           item.onClickRegion();
         }}
-        {...props}
         draggable
       />
     </Fragment>

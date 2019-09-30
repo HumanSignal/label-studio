@@ -1,10 +1,8 @@
 ---
 title: RectangleLabels
-type: guide
+type: tags
 order: 408
 ---
-
-## RectangleLabels
 
 RectangleLabels tag creates labeled rectangles
 
@@ -17,6 +15,8 @@ RectangleLabels tag creates labeled rectangles
 -   `strokeColor` **[string]?** stroke color
 -   `strokeWidth` **[number]** width of stroke (optional, default `1`)
 -   `canRotate` **[boolean]** show or hide rotation handle (optional, default `true`)
+-   `choice` **(single | multiple)** configure if you can select just one or multiple labels (optional, default `single`)
+-   `showInline` **[boolean]** show labels in the same visual line (optional, default `false`)
 
 ### Examples
 

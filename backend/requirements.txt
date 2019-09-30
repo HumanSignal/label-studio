@@ -5,5 +5,5 @@ lxml==4.2.5
 spacy==2.1.7
 appdirs==1.4.3
 mixpanel==4.4.0
-pandas==0.25.0
+pandas==0.24.0
 Pillow==6.1.0

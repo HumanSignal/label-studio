@@ -1,10 +1,8 @@
 ---
 title: PolygonLabels
-type: guide
+type: tags
 order: 406
 ---
-
-## PolygonLabels
 
 PolygonLabels tag, create labeled polygons
 
@@ -18,6 +16,8 @@ PolygonLabels tag, create labeled polygons
 -   `strokeWidth` **[number]** width of stroke (optional, default `1`)
 -   `pointSize` **(small | medium | large)** size of polygon handle points (optional, default `medium`)
 -   `pointStyle` **(rectangle | circle)** style of points (optional, default `rectangle`)
+-   `choice` **(single | multiple)** configure if you can select just one or multiple labels (optional, default `single`)
+-   `showInline` **[boolean]** show labels in the same visual line (optional, default `false`)
 
 ### Examples
 

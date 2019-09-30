@@ -4,9 +4,7 @@ type: guide
 order: 106
 ---
 
-## Getting Started
-
-This is an example of the backend that can be used with the React frontend part. By default, the backend uses label tool scripts from ../build.
+This is an example of the backend that can be used with the React frontend part. By default, the backend uses label tool scripts found in `build` path.
 
 ## Linux & Ubuntu guide
 

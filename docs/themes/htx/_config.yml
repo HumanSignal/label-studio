@@ -1,3 +1,3 @@
-site_description: Label Studio - label and annotate datasets
-google_analytics: 
-root_domain: https://github.com/heartexlabs/label-studio
+site_description: Label Studio - Data labeling, annotation and exploration tool
+google_analytics: UA-129877673-4
+root_domain: labelstud.io

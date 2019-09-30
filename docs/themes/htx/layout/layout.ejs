@@ -11,12 +11,12 @@
       <meta property="og:type" content="article">
       <meta property="og:title" content="<%- page.title ? page.title + ' — ' : '' %>Label Studio">
       <meta property="og:description" content="<%- theme.site_description %>">
-      <meta property="og:image" content="https://<%- theme.root_domain %>/<%- url_for("/images/logo.png") %>">
+      <meta property="og:image" content="https://<%- theme.root_domain %>/images/opossum/heartex_icon_opossum_green@2x.png">
 
       <meta name="twitter:card" content="summary">
       <meta name="twitter:title" content="<%- page.title ? page.title + ' — ' : '' %>Label Studio">
       <meta name="twitter:description" content="<%- theme.site_description %>">
-      <meta name="twitter:image" content="https://<%- theme.root_domain %>/images/logo.png">
+      <meta name="twitter:image" content="https://<%- theme.root_domain %>/images/opossum/heartex_icon_opossum_green@2x.png">
 
       <meta name="msapplication-TileColor" content="#4fc08d">
       <meta name="theme-color" content="#4fc08d">
@@ -24,6 +24,8 @@
       <meta name="msapplication-config" content="browserconfig.xml">
       <link rel="manifest" href="/manifest.json">
 
+      <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico"/>
+      
       <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600|Roboto Mono' rel='stylesheet' type='text/css'>
       <link href='//fonts.googleapis.com/css?family=Dosis:500&text=LabelStudio' rel='stylesheet' type='text/css'>
 
@@ -35,26 +37,33 @@
     <!-- main page styles -->
     <%- css(isIndex ? 'css/index' : 'css/page') %>
 
+    <% if (page.type === "playground") { %>
+      <%- css('css/codemirror') %>
+      <script src="<%- url_for("/js/jquery.min.js") %>"></script>      
+      <script src="<%- url_for("/js/codemirror.js") %>"></script>
+      <script src="<%- url_for("/js/xml.js") %>"></script>      
+    <% } %>
+
     <!-- this needs to be loaded before guide's inline scripts -->
     
   </head>
   <body class="<%- isIndex ? '' : 'docs' -%>">
     <div id="mobile-bar" <%- isIndex ? 'class="top"' : '' %>>
-      <a class="menu-button"></a>
-      <a class="logo" href="/"></a>
+        <a class="menu-button"></a>
+        <a class="logo" href="/"></a>
     </div>
-    <%- partial('partials/header') %>
+    <% if (!isIndex) { %> <%- partial('partials/header') %> <% } %>
     <% if (!isIndex) { %>
-      <div id="main" class="fix-sidebar">
-          <%- body %>
-      </div>
-      <script src="<%- url_for("/js/smooth-scroll.min.js") %>"></script>
+        <div id="main" class="fix-sidebar">
+            <%- body %>
+        </div>
+        <script src="<%- url_for("/js/smooth-scroll.min.js") %>"></script>
     <% } else { %>
-      <%- body %>
+        <%- partial('partials/index') %>
     <% } %>
 
-    <!-- main custom script for sidebars, version selects etc. -->
     <script src="<%- url_for("/js/css.escape.js") %>"></script>
     <script src="<%- url_for("/js/common.js") %>"></script>
-  </body>
+    <%- partial('partials/google_analytics') %>
+  </body>  
 </html>

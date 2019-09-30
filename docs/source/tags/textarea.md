@@ -1,10 +1,8 @@
 ---
 title: TextArea
-type: guide
+type: tags
 order: 409
 ---
-
-## TextArea
 
 TextArea tag shows the textarea for user input
 

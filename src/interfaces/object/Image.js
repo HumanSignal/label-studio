@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import { observer, inject, Provider } from "mobx-react";
-import { types, getType, getParentOfType, destroy, getRoot, isValidReference } from "mobx-state-tree";
+import { detach, types, getType, getParentOfType, destroy, getRoot, isValidReference } from "mobx-state-tree";
 
-import { Stage, Layer, Rect, Text, Image, Transformer } from "react-konva";
+import { Stage, Layer, Rect, Text, Group, Line, Image, Transformer } from "react-konva";
 import { Icon } from "antd";
 
 import Registry from "../../core/Registry";
@@ -32,6 +32,9 @@ import ProcessAttrsMixin from "../mixins/ProcessAttrs";
  * @param {boolean=} zoom enable zooming an image by the mouse wheel
  * @param {boolean=} negativeZoom enable zooming out an image
  * @param {float=} [zoomBy=1.1] scale factor
+ * @param {boolean=} [grid=false] show grid
+ * @param {number=} [gridSize=30] size of the grid
+ * @param {string=} [gridColor="#EEEEF4"] color of the grid, opacity is 0.15
  * @param {boolean=} showMousePos show mouse position coordinates under an image
  */
 const TagAttrs = types.model({
@@ -40,6 +43,12 @@ const TagAttrs = types.model({
   resize: types.maybeNull(types.string),
   width: types.optional(types.string, "100%"),
   maxwidth: types.optional(types.string, "750px"),
+
+  // rulers: types.optional(types.boolean, true),
+  grid: types.optional(types.boolean, false),
+  gridSize: types.optional(types.number, 30),
+  gridColor: types.optional(types.string, "#EEEEF4"),
+
   zoom: types.optional(types.boolean, false),
   negativezoom: types.optional(types.boolean, false),
   zoomby: types.optional(types.string, "1.1"),
@@ -51,6 +60,7 @@ const Model = types
     id: types.identifier,
     type: "image",
     _value: types.optional(types.string, ""),
+    sizeUpdated: types.optional(types.boolean, false),
     stageWidth: types.optional(types.integer, 1),
     stageHeight: types.optional(types.integer, 1),
     naturalWidth: types.optional(types.integer, 1),
@@ -63,8 +73,19 @@ const Model = types
     cursorPositionX: types.optional(types.number, 0),
     cursorPositionY: types.optional(types.number, 0),
 
+    mode: types.optional(types.enumeration(["drawing", "viewing"]), "viewing"),
+
+    posStartX: types.optional(types.number, 0),
+    posStartY: types.optional(types.number, 0),
+
+    posNowX: types.optional(types.number, 0),
+    posNowY: types.optional(types.number, 0),
+
     selectedShape: types.safeReference(types.union(RectRegionModel, PolygonRegionModel, KeyPointRegionModel)),
     activePolygon: types.maybeNull(types.safeReference(PolygonRegionModel)),
+
+    activeShape: types.maybeNull(RectRegionModel),
+
     shapes: types.array(types.union(RectRegionModel, PolygonRegionModel, KeyPointRegionModel), []),
   })
   .views(self => ({
@@ -95,7 +116,7 @@ const Model = types
       return r;
     },
 
-    controlButtonType() {
+    get controlButtonType() {
       const name = self.controlButton();
       return getType(name).name;
     },
@@ -117,17 +138,20 @@ const Model = types
       self.zoomPosY = y;
     },
 
+    setMode(mode) {
+      self.mode = mode;
+    },
+
     updateIE(ev) {
       const { width, height, naturalWidth, naturalHeight } = ev.target;
 
-      // if (self.hasStates) {
       self.naturalWidth = naturalWidth;
       self.naturalHeight = naturalHeight;
       self.stageWidth = width;
       self.stageHeight = height;
+      self.sizeUpdated = true;
 
       self.shapes.forEach(s => s.updateImageSize(width / naturalWidth, height / naturalHeight, width, height));
-      //}
     },
 
     _setStageRef(ref) {
@@ -142,6 +166,10 @@ const Model = types
       self.selectedShape = shape;
     },
 
+    detachActiveShape(shape) {
+      return detach(self.activeShape);
+    },
+
     _addShape(shape) {
       self.shapes.push(shape);
       self.completion.addRegion(shape);
@@ -149,45 +177,79 @@ const Model = types
       shape.selectRegion();
     },
 
+    startDraw({ x, y }) {
+      let rect;
+      let stroke = self.controlButton().strokecolor;
+
+      if (self.controlButtonType == "RectangleModel") {
+        self.setMode("drawing");
+        rect = self._addRect(x, y, 1, 1, stroke, null, "px", true);
+      } else if (self.controlButtonType == "RectangleLabelsModel") {
+        self.lookupStates(null, (_, states) => {
+          if (states && states.length) {
+            stroke = states[0].getSelectedColor();
+          }
+
+          self.setMode("drawing");
+          rect = self._addRect(x, y, 1, 1, stroke, states, "px", true);
+        });
+      }
+
+      self.activeShape = rect;
+    },
+
+    updateDraw({ x, y }) {
+      const shape = self.activeShape;
+
+      const { x1, y1, x2, y2 } = reverseCoords({ x: shape._start_x, y: shape._start_y }, { x: x, y: y });
+
+      shape.setPosition(x1, y1, x2 - x1, y2 - y1);
+
+      //         // update rubber rect position
+      // posNow = {x: posIn.x, y: posIn.y};
+      // var posRect = reverse(posStart,posNow);
+      // r2.x(posRect.x1);
+      // r2.y(posRect.y1);
+      // r2.width(posRect.x2 - posRect.x1);
+      // r2.height(posRect.y2 - posRect.y1);
+      // r2.visible(true);
+
+      // s1.draw(); // redraw any changes.
+    },
+
+    lookupStates(ev, fun) {
+      const states = self.completion.toNames.get(self.name);
+      const activeStates = states ? states.filter(c => c.isSelected == true) : null;
+      const clonedStates = activeStates ? activeStates.map(s => cloneNode(s)) : null;
+
+      if (clonedStates.length !== 0) {
+        fun(ev, clonedStates);
+        activeStates && activeStates.forEach(s => s.type !== "choices" && s.unselectAll());
+      }
+    },
+
     onImageClick(ev) {
-      const callWithStates = function(ev, fun) {
-        const states = self.completion.toNames.get(self.name);
-        const activeStates = states ? states.filter(c => c.isSelected == true) : null;
-        const clonedStates = activeStates ? activeStates.map(s => cloneNode(s)) : null;
-
-        if (clonedStates.length !== 0) {
-          fun(ev, clonedStates);
-          activeStates && activeStates.forEach(s => s.type !== "choices" && s.unselectAll());
-        }
-      };
-
       const dispmap = {
         RectangleModel: ev => self._addRectEv(ev),
         PolygonModel: ev => self._addPolyEv(ev),
         KeyPointModel: ev => self._addKeyPointEv(ev),
 
-        RectangleLabelsModel: ev => {
-          callWithStates(ev, (_, clonedStates) => {
-            clonedStates.forEach(item => {
-              if (item.type !== "choices" && item.isSelected) {
-                self._addRectEv(ev, [item]);
-              }
-            });
-          });
-        },
         PolygonLabelsModel: ev => {
           if (self.activePolygon && !self.activePolygon.closed) {
             self._addPolyEv(ev);
           } else {
-            callWithStates(ev, self._addPolyEv);
+            self.lookupStates(ev, self._addPolyEv);
           }
         },
         KeyPointLabelsModel: ev => {
-          callWithStates(ev, self._addKeyPointEv);
+          self.lookupStates(ev, self._addKeyPointEv);
+        },
+        RectangleLabelsModel: ev => {
+          self.lookupStates(ev, self._addRectEv);
         },
       };
 
-      return dispmap[self.controlButtonType()](ev);
+      if (dispmap[self.controlButtonType]) return dispmap[self.controlButtonType](ev);
     },
 
     _addKeyPointEv(ev, states) {
@@ -252,7 +314,7 @@ const Model = types
       self._addRect(Math.floor(wx - sw / 2), Math.floor(wy - sh / 2), sw, sh, stroke, states);
     },
 
-    _addRect(x, y, sw, sh, stroke, states, coordstype) {
+    _addRect(x, y, sw, sh, stroke, states, coordstype, noadd) {
       // x = (x - self.zoomPosX) / self.zoomScale;
       // y = (y - self.zoomPosY) / self.zoomScale;
 
@@ -260,7 +322,7 @@ const Model = types
 
       let localStates = states;
 
-      if (!states.length) {
+      if (states && !states.length) {
         localStates = [states];
       }
 
@@ -274,7 +336,7 @@ const Model = types
         height: sh,
 
         opacity: parseFloat(c.opacity),
-        fillcolor: c.fillcolor,
+        fillcolor: c.fillcolor ? c.fillcolor : stroke,
 
         strokewidth: parseInt(c.strokewidth),
         strokecolor: stroke,
@@ -284,7 +346,11 @@ const Model = types
         coordstype: coordstype,
       });
 
-      self._addShape(rect);
+      if (noadd !== true) {
+        self._addShape(rect);
+      }
+
+      return rect;
     },
 
     _addPolyEv(ev, states) {
@@ -296,8 +362,8 @@ const Model = types
       }
 
       if (self.completion.dragMode === false) {
-        const x = (ev.evt.offsetX - w / 2 - self.zoomPosX) / self.zoomScale;
-        const y = (ev.evt.offsetY - w / 2 - self.zoomPosY) / self.zoomScale;
+        const x = (ev.evt.offsetX - self.zoomPosX) / self.zoomScale;
+        const y = (ev.evt.offsetY - self.zoomPosY) / self.zoomScale;
 
         let stroke = self.controlButton().strokecolor;
         if (states && states.length) {
@@ -425,6 +491,8 @@ const Model = types
         for (var i = 1; i < obj.value.points.length; i++) {
           poly.addPoint(obj.value.points[i][0], obj.value.points[i][1]);
         }
+
+        poly.closePoly();
       }
 
       /**
@@ -449,6 +517,25 @@ const ImageModel = types.compose(
   Model,
   ProcessAttrsMixin,
 );
+
+function reverseCoords(r1, r2) {
+  var r1x = r1.x,
+    r1y = r1.y,
+    r2x = r2.x,
+    r2y = r2.y,
+    d;
+  if (r1x > r2x) {
+    d = Math.abs(r1x - r2x);
+    r1x = r2x;
+    r2x = r1x + d;
+  }
+  if (r1y > r2y) {
+    d = Math.abs(r1y - r2y);
+    r1y = r2y;
+    r2y = r1y + d;
+  }
+  return { x1: r1x, y1: r1y, x2: r2x, y2: r2y }; // return the corrected rect.
+}
 
 class TransformerComponent extends React.Component {
   componentDidMount() {
@@ -502,6 +589,20 @@ class TransformerComponent extends React.Component {
   }
 }
 
+const createGrid = (width, height, nodeSize) => {
+  return [...Array(width)]
+    .map((_, col) =>
+      [...Array(height)].map((_, row) => ({
+        col,
+        row,
+        x: col * nodeSize,
+        y: row * nodeSize,
+        fill: "#fff",
+      })),
+    )
+    .reduce((p, c) => [...p, ...c]);
+};
+
 class HtxImageView extends Component {
   handleDblClick = ev => {
     // const item = this.props.item;
@@ -516,16 +617,46 @@ class HtxImageView extends Component {
     return item.onImageClick(ev);
   };
 
+  handleMouseUp = e => {
+    const { item } = this.props;
+    if (item.mode == "drawing") {
+      item.setMode("viewing");
+      const as = item.detachActiveShape();
+      if (as.width > 3 && as.height > 3) item._addShape(as);
+    }
+  };
+
   handleMouseMove = e => {
     const { item } = this.props;
-    // const stage = e.target.getStage();
+    if (item.mode == "drawing") {
+      const x = (e.evt.offsetX - item.zoomPosX) / item.zoomScale;
+      const y = (e.evt.offsetY - item.zoomPosY) / item.zoomScale;
+
+      item.updateDraw({ x: x, y: y });
+    }
+
     item.setPointerPosition({ x: e.evt.offsetX, y: e.evt.offsetY });
   };
 
   handleMouseOver = e => {};
 
   handleStageMouseDown = e => {
-    if (e.target === e.target.getStage()) {
+    const { item } = this.props;
+
+    if (item.controlButtonType === "PolygonLabelsModel") {
+      return;
+    }
+
+    if (e.target === e.target.getStage() || (e.target.parent && e.target.parent.attrs.name == "ruler")) {
+      // draw rect
+
+      const x = (e.evt.offsetX - item.zoomPosX) / item.zoomScale;
+      const y = (e.evt.offsetY - item.zoomPosY) / item.zoomScale;
+
+      if (item.controlButtonType !== "RectangleLabelsModel") {
+        item.startDraw({ x: x, y: y });
+      }
+
       return;
     }
 
@@ -534,6 +665,8 @@ class HtxImageView extends Component {
     if (clickedOnTransformer) {
       return;
     }
+
+    return true;
   };
 
   handleZoom = e => {
@@ -571,6 +704,67 @@ class HtxImageView extends Component {
     stage.position(newPos);
     stage.batchDraw();
   };
+
+  renderGrid() {
+    const { item } = this.props;
+    const grid = createGrid(
+      Math.ceil(item.stageWidth / item.gridSize),
+      Math.ceil(item.stageHeight / item.gridSize),
+      item.gridSize,
+    );
+
+    return (
+      <Layer opacity={0.15} name="ruler">
+        {Object.values(grid).map((n, i) => (
+          <Rect
+            key={i}
+            x={n.x}
+            y={n.y}
+            width={item.gridSize}
+            height={item.gridSize}
+            stroke={item.gridColor}
+            strokeWidth={1}
+          />
+        ))}
+      </Layer>
+    );
+  }
+
+  renderRulers() {
+    const { item, store } = this.props;
+    const width = 1;
+    const color = "white";
+
+    return (
+      <Group
+        name="ruler"
+        onClick={ev => {
+          ev.cancelBubble = false;
+        }}
+      >
+        <Line
+          x={0}
+          y={item.cursorPositionY}
+          points={[0, 0, item.stageWidth, 0]}
+          strokeWidth={width}
+          stroke={color}
+          tension={0}
+          dash={[4, 4]}
+          closed
+        />
+        <Line
+          x={item.cursorPositionX}
+          y={0}
+          points={[0, 0, 0, item.stageHeight]}
+          strokeWidth={width}
+          stroke={color}
+          tension={0}
+          dash={[1.5]}
+          closed
+        />
+      </Group>
+    );
+  }
 
   updateDimensions() {
     // this.props.item.onResizeSize(this.container.offsetWidth, this.container.offsetHeight);
@@ -626,23 +820,20 @@ class HtxImageView extends Component {
             onDblClick={this.handleDblClick}
             onClick={this.handleOnClick}
             onMouseDown={this.handleStageMouseDown}
-            onMouseMove={item.showmousepos === true ? this.handleMouseMove : () => {}}
+            onMouseMove={this.handleMouseMove}
+            onMouseUp={this.handleMouseUp}
             onWheel={item.zoom === true ? this.handleZoom : () => {}}
           >
+            {item.grid && item.sizeUpdated && this.renderGrid()}
             <Layer>
               {item.shapes.map(s => {
                 return Tree.renderItem(s);
               })}
+              {item.activeShape && Tree.renderItem(item.activeShape)}
+
               <TransformerComponent rotateEnabled={item.controlButton().canrotate} selectedShape={item.selectedShape} />
             </Layer>
           </Stage>
-          <div>
-            {item.showmousepos === true && (
-              <p>
-                {item.cursorPositionX} : {item.cursorPositionY}
-              </p>
-            )}
-          </div>
         </div>
       );
     } else {

@@ -22,7 +22,7 @@ import { RectRegionModel } from "../object/RectRegion";
  * @param {string} toname name of the image to label
  * @param {float=} [opacity=0.6] opacity of rectangle
  * @param {string=} fillColor rectangle fill color, default is transparent
- * @param {string=} strokeColor stroke color
+ * @param {string=} [strokeColor=#f48a42] stroke color
  * @param {number=} [strokeWidth=1] width of the stroke
  * @param {boolean=} [canRotate=true] show or hide rotation handle
  */

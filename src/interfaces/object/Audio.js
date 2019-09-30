@@ -37,6 +37,15 @@ import Waveform from "../../components/Waveform/Waveform";
  * @param {string} value of the element
  * @param {string} hotkey hotkey used to play/pause audio
  */
+
+const TagAttrs = types.model({
+  name: types.maybeNull(types.string),
+  value: types.maybeNull(types.string),
+  zoom: types.optional(types.boolean, false),
+  volume: types.optional(types.boolean, false),
+  speed: types.optional(types.boolean, false),
+});
+
 const Model = AudioHOCModel.named("AudioModel").actions(self => ({
   fromStateJSON(obj, fromModel) {
     if (obj.value.choices) {
@@ -56,6 +65,7 @@ const Model = AudioHOCModel.named("AudioModel").actions(self => ({
 const AudioModel = types.compose(
   "AudioModel",
   Model,
+  TagAttrs,
 );
 
 const HtxAudioView = observer(({ store, item }) => {

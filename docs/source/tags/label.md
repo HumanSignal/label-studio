@@ -1,6 +1,6 @@
 ---
 title: Label
-type: guide
+type: tags
 order: 404
 ---
 

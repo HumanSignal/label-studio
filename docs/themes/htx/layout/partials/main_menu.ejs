@@ -1,2 +1,29 @@
+
+<% if (page.type === "guide") { %>
+<span style="margin-right: 1em;">Guide</span>
+<% } else { %>
+<a style="margin-right: 1em;" href="<%- url_for("/guide") %>">Guide</a>
+<% } %>
+
+<% if (page.type === "tags") { %>
+<span style="margin-right: 1em;">Tags</span>
+<% } else { %>
+<a style="margin-right: 1em;" href="<%- url_for("/tags") %>">Tags</a>
+<% } %>
+
+<% if (page.type === "templates") { %>
+<span style="margin-right: 1em;">Templates</span>
+<% } else { %>
+<a style="margin-right: 1em;" href="<%- url_for("/templates") %>">Templates</a>
+<% } %>
+
+<% if (page.type === "playground") { %>
+<span style="margin-right: 1em;">Playground</span>
+<% } else { %>
+<a style="margin-right: 1em;" href="<%- url_for("/playground") %>">Playground</a>
+<% } %>
+
 <!-- Place this tag where you want the button to render. -->
 <a class="github-button" href="https://github.com/heartexlabs/label-studio" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star heartexlabs/label-studio on GitHub">Star</a>
+
+

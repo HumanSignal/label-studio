@@ -1,6 +1,6 @@
 ---
 title: Audio
-type: guide
+type: tags
 order: 301
 ---
 
