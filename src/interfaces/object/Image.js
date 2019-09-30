@@ -227,6 +227,7 @@ const Model = types
 
     onImageClick(ev) {
       const dispmap = {
+        RectangleModel: ev => self._addRectEv(ev),
         PolygonModel: ev => self._addPolyEv(ev),
         KeyPointModel: ev => self._addKeyPointEv(ev),
 
@@ -239,6 +240,9 @@ const Model = types
         },
         KeyPointLabelsModel: ev => {
           self.lookupStates(ev, self._addKeyPointEv);
+        },
+        RectangleLabelsModel: ev => {
+          self.lookupStates(ev, self._addRectEv);
         },
       };
 
@@ -646,7 +650,10 @@ class HtxImageView extends Component {
       const x = (e.evt.offsetX - item.zoomPosX) / item.zoomScale;
       const y = (e.evt.offsetY - item.zoomPosY) / item.zoomScale;
 
-      item.startDraw({ x: x, y: y });
+      if (item.controlButtonType !== "RectangleLabelsModel") {
+        item.startDraw({ x: x, y: y });
+      }
+
       return;
     }
 
