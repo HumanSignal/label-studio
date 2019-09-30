@@ -22,12 +22,10 @@ import Types from "../../core/Types";
  * </View>
  * @name View
  * @param {block|inline} display
- * @param {hexColor} backgroundColor background color
  * @param {style} style css style string
  */
 const TagAttrs = types.model({
   display: types.optional(types.string, "block"),
-  backgroundcolor: types.optional(types.string, ""),
   margin: types.optional(types.string, ""),
 });
 

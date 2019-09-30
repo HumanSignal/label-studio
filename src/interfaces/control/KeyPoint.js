@@ -20,8 +20,8 @@ import { KeyPointRegionModel } from "../object/KeyPointRegion";
  * @name KeyPoint
  * @param {string} name name of the element
  * @param {string} toname name of the image to label
- * @param {float=} [opacity=0.6] opacity of keypoint
- * @param {string=} fillColor keypoint fill color, default is transparent
+ * @param {float=} [opacity=0.9] opacity of keypoint
+ * @param {string=} [fillColor=#8bad00] keypoint fill color
  * @param {number=} [strokeWidth=1] width of the stroke
  */
 const TagAttrs = types.model({

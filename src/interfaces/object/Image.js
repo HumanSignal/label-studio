@@ -32,6 +32,9 @@ import ProcessAttrsMixin from "../mixins/ProcessAttrs";
  * @param {boolean=} zoom enable zooming an image by the mouse wheel
  * @param {boolean=} negativeZoom enable zooming out an image
  * @param {float=} [zoomBy=1.1] scale factor
+ * @param {boolean=} [grid=false] show grid
+ * @param {number=} [gridSize=30] size of the grid
+ * @param {string=} [gridColor="#EEEEF4"] color of the grid, opacity is 0.15
  * @param {boolean=} showMousePos show mouse position coordinates under an image
  */
 const TagAttrs = types.model({
@@ -40,13 +43,13 @@ const TagAttrs = types.model({
   resize: types.maybeNull(types.string),
   width: types.optional(types.string, "100%"),
   maxwidth: types.optional(types.string, "750px"),
-  zoom: types.optional(types.boolean, false),
 
+  // rulers: types.optional(types.boolean, true),
   grid: types.optional(types.boolean, false),
   gridSize: types.optional(types.number, 30),
   gridColor: types.optional(types.string, "#EEEEF4"),
-  // rulers: types.optional(types.boolean, true),
 
+  zoom: types.optional(types.boolean, false),
   negativezoom: types.optional(types.boolean, false),
   zoomby: types.optional(types.string, "1.1"),
   showmousepos: types.optional(types.boolean, false),

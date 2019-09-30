@@ -14,7 +14,7 @@ import { KeyPointModel } from "./KeyPoint";
 
 /**
  * KeyPointLabels tag
- * KeyPointLabels add labeled keypoints
+ * KeyPointLabels tag creates labeled keypoints
  * @example
  * <View>
  *   <KeyPointLabels name="kp-1" toName="img-1">
@@ -26,7 +26,7 @@ import { KeyPointModel } from "./KeyPoint";
  * @name KeyPointLabels
  * @param {string} name name of the element
  * @param {string} toname name of the image to label
- * @param {float=} [opacity=0.6] opacity of keypoint
+ * @param {float=} [opacity=0.9] opacity of keypoint
  * @param {string=} fillColor keypoint fill color, default is transparent
  * @param {number=} [strokeWidth=1] width of the stroke
  */
