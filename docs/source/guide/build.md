@@ -32,13 +32,11 @@ npm run publish
 
 Generates the compiled version of label studio. This compiled version needs to be included in your app.
 
-## Extend
-
-```
-TBD
-```
-
 ## Embed
+
+The easiest way to embed Label Studio into your application is to re-use the initialization code from `backend/templates/index.html`. 
+
+## Extend
 
 ```
 TBD
