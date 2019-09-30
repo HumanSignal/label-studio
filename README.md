@@ -4,6 +4,8 @@
 
 Label Studio is an open-source, configurable data annotation tool. Its purpose is to enable you to label different types of data using the most convenient interface with a standardized output format.
 
+<br/><br/>
+
 ![GitHub](https://img.shields.io/github/license/heartexlabs/label-studio?logo=heartex) 
 [![Build Status](https://travis-ci.com/heartexlabs/label-studio.svg?branch=master)](https://travis-ci.com/heartexlabs/label-studio) 
 [![codecov](https://codecov.io/gh/heartexlabs/label-studio/branch/master/graph/badge.svg)](https://codecov.io/gh/heartexlabs/label-studio) 
