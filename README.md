@@ -1,14 +1,14 @@
 <p align="center"><a href="https://labelstud.io/" title="Label Studio by Heartex Labs"><img src="./images/heartex_icon_opossum_green.svg" title="Label Studio by Heartex Labs" height="160"></a></p>
 
+<h2 align="center">Label Studio</h2>
+
+Label Studio is an open-source, configurable data annotation tool. Its purpose is to enable you to label different types of data using the most convenient interface with a standardized output format.
+
 ![GitHub](https://img.shields.io/github/license/heartexlabs/label-studio?logo=heartex) 
 [![Build Status](https://travis-ci.com/heartexlabs/label-studio.svg?branch=master)](https://travis-ci.com/heartexlabs/label-studio) 
 [![codecov](https://codecov.io/gh/heartexlabs/label-studio/branch/master/graph/badge.svg)](https://codecov.io/gh/heartexlabs/label-studio) 
 ![GitHub release](https://img.shields.io/github/v/release/heartexlabs/label-studio?include_prereleases) 
 [![Gitter](https://badges.gitter.im/label-studio/community.svg)](https://gitter.im/label-studio/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
-
-<h2 align="center">Label Studio</h2>
-
-Label Studio is an open-source, configurable data annotation tool. Its purpose is to enable you to label different types of data using the most convenient interface with a standardized output format.
 
 ![Label Studio](./images/label-studio-examples.gif)
 
