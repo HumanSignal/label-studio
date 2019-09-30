@@ -1,10 +1,10 @@
 ---
 title: Backend
 type: guide
-order: 106
+order: 103
 ---
 
-This is an example of the backend that can be used with the React frontend part. By default, the backend uses label tool scripts found in `build` path.
+This is an example of the backend that can be used with the React frontend part. By default, the backend uses the build found in `build` path.
 
 ## Linux & Ubuntu guide
 
@@ -37,7 +37,7 @@ python server.py
 5. Go to http://localhost:8200
 
 
-## Backend Config
+## Config file
 
 By default service.py uses config.json. But you may call it with your config: 
 
@@ -45,19 +45,25 @@ By default service.py uses config.json. But you may call it with your config:
 python service.py -c <your_config.json>
 ```
 
-### Options
+## Options
+
+### label_config 
 
 **label_config** configures UI for the Label tool.
 
 ```json
 "label_config": "../examples/chatbot/config.xml"
 ```
- 
+
+### input_path
+
 **input_path** for tasks: it can be a file or a directory. In the case of the directory, it reads all the files and creates a list of tasks.
 
 ```json
 "input_path": "./input/tasks.json"
 ```
+
+### output_dir
 
 **output_dir** is used to store completions (labeling results) in JSON format. output_dir will be created automatically. Each task is mapped to a corresponding completion JSON file.
 
@@ -79,15 +85,17 @@ output/4.json = {"completions": [{"result": [...]}], "task": {"text": "4"}}  # b
 output/5.json = {"completions": [{"result": [...]}], "task": {"text": "5"}}  # b.json
 ```
 
+### instruction
+
 **instruction** Shows the instruction to a person who makes labeling
 
 ```json
 "instruction": "Type something to label experts!"
 ```
 
-## Label tool options
+### build_path
 
-**build_path** points to the directory with JS, CSS and other media from Editor (React app).
+**build_path** points to the directory with JS, CSS and other media from the app
 
 ```json
   "editor": {
@@ -106,11 +114,15 @@ output/5.json = {"completions": [{"result": [...]}], "task": {"text": "5"}}  # b
   }
 ```
 
+### title
+
 **title** name of your service for the web
 
 ```json
   "title": "Label Studio",
 ```
+
+### port and debug
 
 **port** and **debug** are web server settings
 

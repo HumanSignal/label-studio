@@ -4,9 +4,7 @@ type: guide
 order: 200
 ---
 
-## Tags
-
-Editor configuration is based on XML-like tags. Tags can be divided into three categories:
+UI configuration is based on XML-like tags, which internally are mapped into the associated React classes. Tags can be divided into three categories:
 
 - Visual tags used for visual only elements
 (non-interactive), examples: **View**, **Header**. 
@@ -14,42 +12,3 @@ Editor configuration is based on XML-like tags. Tags can be divided into three c
 - Object tags used to show elements that can be labeled: **Image**, **Text**, **Audio**, **AudioPlus**.
 
 <a class="button" href="/tags/">Explore Tags</a>
-
-## Connecting elements
-
-The **name** attribute is mandatory for all control and object tags. Also, each control tag should have **toName** attribute that should match the **name** parameter in the object element. For example:
-
-```html
-<View>
-  <Labels name="lbl" toName="txt">
-    <Label value="Label 1"></Label>
-    <Label value="Label 2"></Label>
-  </Labels>
-  <Text name="txt" value="$value"></Text>
-</View>
-```
-
-Note that in the case above, Label tags are used to label Text tag. There could be multiple control, and object tags in the same configuration, and names are used to connect them.
-
-## Styles
-
-Here is an example of two-column labeling interface with multiple control and object elements:
-
-```html
-<View style="display: flex;">
- <View style="flex: 50%">
-  <Header value="Choose:"></Header>
-  <Text name="txt-1" value="$value"></Text>
-  <Choices name="chc" toName="txt-1">
-    <Choice value="Choice 1"></Choice>
-    <Choice value="Choice 2"></Choice>
-  </Choices>
- </View> 
- <View style="flex: 50%; margin-left: 1em">
-  <Header value="Enter your question and rate text:"></Header>
-  <Text name="txt-2" value="$value"></Text>
-  <Rating name="rating" toName="txt-2"></Rating>
-  <TextArea name="question" ></TextArea>
- </View>
-</View>
-```

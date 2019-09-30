@@ -4,11 +4,9 @@ type: guide
 order: 104
 ---
 
-Label Studio Format Converter helps you to encode labels into the format of your favorite machine learning library.
+Label Studio Format Converter helps you to encode labels into the format of your favorite machine learning library. It takes the resulting completions as input and produces encodes that into a specified format.
 
-## Examples
-
-#### JSON
+### JSON
 
 Running from the command line:
 ```bash
@@ -44,7 +42,8 @@ Getting output file: `tmp/output.json`
 Use cases: any tasks
 
 
-#### CSV
+### CSV
+
 Running from the command line:
 ```bash
 python backend/converter/cli.py --input examples/sentiment_analysis/completions/ --config examples/sentiment_analysis/config.xml --output tmp/output.tsv --format CSV --csv-separator $'\t'
@@ -68,7 +67,7 @@ The goose neck needs a little coaxing	Neutral
 
 Use cases: any tasks
 
-#### CoNLL 2003
+### CoNLL 2003
 
 Running from the command line:
 ```bash
@@ -102,7 +101,7 @@ zone, -X- _ O
 Use cases: text tagging
 
 
-#### COCO
+### COCO
 Running from the command line:
 ```bash
 python backend/converter/cli.py --input examples/image_bbox/completions/ --config examples/image_bbox/config.xml --output tmp/output.json --format COCO --image-dir tmp/images
@@ -181,7 +180,8 @@ Getting the output file `tmp/output.json`
 
 Use cases: image object detection
 
-#### Pascal VOC XML
+### Pascal VOC XML
+
 Running from the command line:
 ```bash
 python backend/converter/cli.py --input examples/image_bbox/completions/ --config examples/image_bbox/config.xml --output tmp/voc-annotations --format VOC --image-dir tmp/images
