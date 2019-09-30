@@ -1,1 +1,1 @@
-cp -rf ./examples/ ./src/examples
+cp -R ./examples/ ./src/examples
