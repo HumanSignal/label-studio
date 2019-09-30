@@ -109,9 +109,21 @@
  align-items: center;
  margin: 0 auto;
  }
+
+ .tagline {
+ display: flex;
+ }
  
  @media screen and (max-width: 900px) {
 
+ .tagline-text {
+   text-align: center;
+ }
+ 
+ .tagline {
+ flex-direction: column;
+ }
+ 
  .img-car {
  width: 100%;
  }
@@ -175,9 +187,9 @@
           <div style="position: relative; padding-top: 100px; padding-bottom: 100px;">
             <div style="display: flex; justify-content: center;">
               <div style="display: flex; flex-direction: column; align-items: center;">
-                <div style="display: flex;">
+                <div class="tagline">
                   <img src="<%- url_for("/images/opossum/heartex_icon_opossum_green.svg") %>" alt="label studio logo" height="180" />
-                  <div>
+                  <div class="tagline-text">
                     <h1 style="font-size: 2em;">Open-source<br/>data labeling, annotation<br/> and exploration tool<br/></h1>
                   </div>
                 </div>
