@@ -24,123 +24,27 @@ Label Studio is an open-source, configurable data annotation tool. Its purpose i
 
 Coming Soon:
 
-- Image line and points (screenshot)
-- Image polygons (screenshot)
-- Time series (screenshot)
-- Video (screenshot)
+- Image keypoints (screenshot)
+- Image polygons
+- Time series
+- Video
 
-## Table of Contents
+## Documentation
 
-- [Introduction](#introduction)
-  - [Run Locally](#run-locally)
-  - [Run with Docker](#run-with-docker)
-  - [Extend & Embed](#extend--embed)
-- [Features](#features)
-- [Using Label Studio](#using-label-studio)
-- [Format](#format)
-  - [Input](#input)
-  - [Output](#output)
-- [Contributing](#contributing)
-- [License](#license)
+Visit the website: [labelstud.io](https://labelstud.io).
 
-## Introduction
+## Changelog
 
-Label Studio consists of two parts. The backend is a simple flask server that is used to load the data and save the results. The frontend is a [React](https://reactjs.org/) + [mobx-state-tree](https://github.com/mobxjs/mobx-state-tree) app that is backend agnostic and can be used separately, for example if you want to embed labeling into your applications.
+Detailed changes for each release are documented in the [release notes](https://github.com/heartexlabs/label-studio/releases).
 
-### Run Locally
+## Stay In Touch
 
-In order to launch the server locally, launch
-
-```bash
-cd backend
-bash start.sh
-```
-
-To run it locally we include the compiled version of the frontend
-part and an example implementation of the backend.
-
-[Follow this guide for advanced usage & custom configuration](backend/README.md)
-
-### Run with Docker
-```bash
-docker run -p 8200:8200 -t -i heartexlabs/label-studio -c config.json -l ../examples/chatbot_analysis/config.xml -i ../examples/chatbot_analysis/tasks.json -o output
-```
-
-### Extend & Embed
-
-To extend the functionality or embed the labeling inside your app, you need to be able to compile it from source.
-
-[This guide explains how to do that](docs/Embed.md)
-
-## Features
-
-- Extensive UI configuration options
-- Multiple datatypes supported: images, text, audios
-- Hotkeys & History
-- Converting to formats accepted by popular machine learning apps ([check here](/backend/converter/README.md) for supported GitHub repositories)
-
-## Using Label Studio
-
-### Config Language
-
-Editor configuration is based on XML-like tags. Internally tags are represented by a react view and mobx-state-tree model. Each config should start with a `<View></View>` tag. Here is an example of a simple text classification config:
-
-```jsx
-<View>
-  <Text name="text"></Text>
-  <Choices name="choice" toName="text">
-    <Choice value="relevant"></Choice>
-    <Choice value="non relevant"></Choice>
-  </Choices>
-</View>
-```
-
-Note that we use tag names to connect tags between each other. Therefore tags that are used for labeling should include a name attribute. And every tag has its own set of parameters. Find more info in the related guide:
-
-[Tags Documentation](/docs/Tags.md)
-
-Creating your own tags is the suggested way to extend the app and tailor it to your specific needs.
-
-## Format
-
-### Input
-
-Input should be JSON formatted. All the files that you want to label are expected to be hosted somewhere and provided as an URL to the JSON. The example backend server can process other formats, but it converts any format into JSON.
-
-### Output
-
-The output is JSON. Overall structure is the following:
-
-```json
-{
-  "completions": [{
-    "result": {
-      "id": "yrSY-dipPI",
-      "from_name": "sentiment",
-      "to_name": "my_text",
-      "type": "choices",
-      "value": {
-        "choices": ["Neutral"]
-      }
-    }
-  }],
-  "data": { "here are your task fields": "" }
-}
-```
-
-Completion is an object with five mandatory fields:
-
-- **id** unique id of the labeled region
-- **from_name** name of the tag that was used to label region
-- **to_name** name of the tag that provided the region to be labeled
-- **type** type of the labeling/tag
-- **value** tag specific value that includes the labeling result details
-
-Want to use labeled data in your machine learning project, but get stuck to writing your parser? No worry, we are already
-supporting multiple format converters, already adopted by popular machine learning libraries.
-[Check it out!](/backend/converter/README.md)
+- [Twitter](https://twitter.com/heartexlabs)
+- [Email](mailto:hi@heartex.net)
 
 ## Contributing
+
+Please make sure to read the
 
 - [Contributing Guideline](/CONTRIBUTING.md)
 - [Code Of Conduct](/CODE_OF_CONDUCT.md)
