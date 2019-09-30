@@ -14,13 +14,13 @@ Label Studio is an open-source, configurable data annotation tool. Its purpose i
 
 ## Quick "I want to Label Guides:"
 
-- [Classify text for sentiment](/examples/sentiment_analysis/START.md) ([screenshot](./images/screenshots/cts.png))
-- [Named entities recognition](/examples/named_entity/START.md) ([screenshot](./images/screenshots/ner.png))
-- [Transcribe audio](/examples/transcribe_audio/START.md) ([screenshot](./images/screenshots/audio-trans.png))
-- [Classify audio](/examples/audio_classification/START.md) ([screenshot](./images/screenshots/audio-classify.png))
-- [Conversational modeling & chatbots](/examples/chatbot_analysis/START.md) ([screenshot](./images/screenshots/chatbots.png))
-- [Image object detection](/examples/image_bbox/START.md) ([screenshot](./images/screenshots/image-object.png))
-- [Audio regions](/examples/audio_regions/START.md)<sup>New</sup> ([screenshot](./images/screenshots/audio-regions.png))
+- [Classify text for sentiment](https://labelstud.io/templates/sentiment_analysis.html)
+- [Named entities recognition](https://labelstud.io/templates/named_entity.html)
+- [Transcribe audio](https://labelstud.io/templates/transcribe_audio.html)
+- [Classify audio](https://labelstud.io/templates/audio_classification.html) 
+- [Conversational modeling & chatbots](https://labelstud.io/templates/dialogue_analysis.html)
+- [Image object detection](https://labelstud.io/templates/image_bbox.html) 
+- [Audio regions](https://labelstud.io/templates/audio_regions.html)<sup>New</sup>
 
 Coming Soon:
 
