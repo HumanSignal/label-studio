@@ -364,7 +364,7 @@ export default types
           const state = getSnapshot(c);
 
           const body = JSON.stringify({
-            state: JSON.stringify(state),
+            // state: JSON.stringify(state),
             result: res,
           });
 
