@@ -204,22 +204,15 @@ const Model = types
       const { x1, y1, x2, y2 } = reverseCoords({ x: shape._start_x, y: shape._start_y }, { x: x, y: y });
 
       shape.setPosition(x1, y1, x2 - x1, y2 - y1);
-
-      //         // update rubber rect position
-      // posNow = {x: posIn.x, y: posIn.y};
-      // var posRect = reverse(posStart,posNow);
-      // r2.x(posRect.x1);
-      // r2.y(posRect.y1);
-      // r2.width(posRect.x2 - posRect.x1);
-      // r2.height(posRect.y2 - posRect.y1);
-      // r2.visible(true);
-
-      // s1.draw(); // redraw any changes.
     },
 
     lookupStates(ev, fun) {
       const states = self.completion.toNames.get(self.name);
-      const activeStates = states ? states.filter(c => c.isSelected == true) : null;
+      const activeStates = states
+        ? states
+            .filter(c => c.isSelected == true)
+            .filter(c => c.type == "rectanglelabels" || c.type == "keypointlabels" || c.type == "polygonlabels")
+        : null;
       const clonedStates = activeStates ? activeStates.map(s => cloneNode(s)) : null;
 
       if (clonedStates.length !== 0) {
@@ -230,7 +223,7 @@ const Model = types
 
     onImageClick(ev) {
       const dispmap = {
-        RectangleModel: ev => self._addRectEv(ev),
+        // RectangleModel: ev => self._addRectEv(ev),
         PolygonModel: ev => self._addPolyEv(ev),
         KeyPointModel: ev => self._addKeyPointEv(ev),
 
@@ -244,9 +237,9 @@ const Model = types
         KeyPointLabelsModel: ev => {
           self.lookupStates(ev, self._addKeyPointEv);
         },
-        RectangleLabelsModel: ev => {
-          self.lookupStates(ev, self._addRectEv);
-        },
+        // RectangleLabelsModel: ev => {
+        //   self.lookupStates(ev, self._addRectEv);
+        // },
       };
 
       if (dispmap[self.controlButtonType]) return dispmap[self.controlButtonType](ev);
@@ -311,7 +304,7 @@ const Model = types
       const wx = ev.evt.offsetX;
       const wy = ev.evt.offsetY;
 
-      self._addRect(Math.floor(wx - sw / 2), Math.floor(wy - sh / 2), sw, sh, stroke, states);
+      return self._addRect(Math.floor(wx - sw / 2), Math.floor(wy - sh / 2), sw, sh, stroke, states);
     },
 
     _addRect(x, y, sw, sh, stroke, states, coordstype, noadd) {
@@ -653,9 +646,7 @@ class HtxImageView extends Component {
       const x = (e.evt.offsetX - item.zoomPosX) / item.zoomScale;
       const y = (e.evt.offsetY - item.zoomPosY) / item.zoomScale;
 
-      if (item.controlButtonType !== "RectangleLabelsModel") {
-        item.startDraw({ x: x, y: y });
-      }
+      item.startDraw({ x: x, y: y });
 
       return;
     }
