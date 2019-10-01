@@ -40,8 +40,11 @@ body.docs
     display: inline-block
     position: relative
     margin: 0 .6em
+  span
+    font-weight: bold;
   a
-    text-decoration: underline;
+    &:hover, &.current
+      border-bottom: 2px solid $green
   .nav-dropdown
     .nav-link
       &:hover, &.current
