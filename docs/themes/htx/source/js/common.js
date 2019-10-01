@@ -213,7 +213,7 @@
         return false;
       };
 
-      var pg = createButton("Lunch in Playground", "lnk");
+      var pg = createButton("Launch in Playground", "lnk");
       pg.onclick = function(ev) {
         ev.preventDefault();
 
