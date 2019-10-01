@@ -4,11 +4,7 @@ self.__precacheManifest = [
     "url": "/static/media/outline-icons.ef60a4f6.woff"
   },
   {
-<<<<<<< HEAD:build/precache-manifest.6c812c82ce193dda89c7105385e2049f.js
-    "revision": "b6b6d9e3d6711d40e25a",
-=======
     "revision": "a2c27cc1714ad81ad6ae",
->>>>>>> master:build/precache-manifest.5da957b4f41a252eb324f07e803b7caf.js
     "url": "/static/css/main.f5b8907f.chunk.css"
   },
   {
