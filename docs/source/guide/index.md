@@ -21,7 +21,7 @@ cd backend
 bash start.sh
 ```
 
-To run it locally we include the compiled version of the frontend part and an example implementation of the backend.
+To run it locally we include the compiled version of the frontend part and an example implementation of the backend. That bash script initializes python environment, installs dependencies and starts an example python server.
 
 ## Ready for More?
 

@@ -1,7 +1,7 @@
 ---
 title: Build
 type: guide
-order: 105
+order: 102
 ---
 
 Clone the repository and install all dependencies:

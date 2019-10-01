@@ -1,12 +1,16 @@
 ---
 title: Format
 type: guide
-order: 102
+order: 104
 ---
+
+This section talks about the format Label Studio expects the data to be in, and the output of the resulting annotations.
 
 ## Input
 
-Input should be JSON formatted. All the files that you want to label are expected to be hosted somewhere and provided as an URL in the JSON. The example backend server can process other formats, but it converts any format into the JSON as a result.
+Input should be JSON formatted. All the files that you want to label are expected to be hosted somewhere and provided as an URL in the JSON. The example backend server can process other formats, like CSV, but internally it converts any format into the JSON representation.
+
+For an example, take a look at any of the `tasks.json` files in the `examples/` sub-directories.
 
 ## Output
 
@@ -37,4 +41,4 @@ A completion is an object with five mandatory fields:
 - **type** type of the labeling/tag
 - **value** tag specific value that includes the labeling result details
 
-For popular machine learning libraries, there is converter code to transform Label Studio format in ML library format. [Learn More](/backend/converter/README.md)  about it.
+For popular machine learning libraries, there is a converter code to transform Label Studio format into ML library format. [Learn More](/guide/converters.html)  about it.
