@@ -22,7 +22,7 @@ keymaster.filter = function(event) {
 function addKey(key, func, scope) {
   if (_hotkeys_map[key]) return;
   if (!scope) scope = "__main__";
-  console.log(scope);
+
   _hotkeys_map[key] = true;
   keymaster(key, scope, func);
 }
