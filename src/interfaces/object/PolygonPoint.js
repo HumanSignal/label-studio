@@ -5,6 +5,7 @@ import { types, getParentOfType, getRoot, getParent } from "mobx-state-tree";
 
 import Konva from "konva";
 import { Shape, Label, Stage, Layer, Rect, Text, Transformer, Line, Circle } from "react-konva";
+import { blue } from "@ant-design/colors";
 
 import { guidGenerator, restoreNewsnapshot } from "../../core/Helpers";
 
@@ -56,6 +57,10 @@ const PolygonPoint = types
       self.y = y;
     },
 
+    /**
+     * Close polygon
+     * @param {*} ev
+     */
     closeStartPoint(ev) {
       if (self.parent.mouseOverStartPoint) self.parent.closePoly();
     },
@@ -66,11 +71,11 @@ const PolygonPoint = types
 
       if (self.parent.closed || self.parent.points.length < 3) return;
 
-      const t = ev.target;
+      const startPoint = ev.target;
 
-      if (self.style == "rectangle") {
-        t.setX(t.x() - t.width() / 2);
-        t.setY(t.y() - t.height() / 2);
+      if (self.style === "rectangle") {
+        startPoint.setX(startPoint.x() - startPoint.width() / 2);
+        startPoint.setY(startPoint.y() - startPoint.height() / 2);
       }
 
       const scaleMap = {
@@ -81,7 +86,7 @@ const PolygonPoint = types
 
       const scale = scaleMap[self.size];
 
-      t.scale({ x: scale, y: scale });
+      startPoint.scale({ x: scale, y: scale });
 
       self.parent.setMouseOverStartPoint(true);
     },
@@ -92,7 +97,7 @@ const PolygonPoint = types
       const stage = self.parent.parent._stageRef;
       stage.container().style.cursor = "default";
 
-      if (self.style == "rectangle") {
+      if (self.style === "rectangle") {
         t.setX(t.x() + t.width() / 2);
         t.setY(t.y() + t.height() / 2);
       }
@@ -122,25 +127,16 @@ const PolygonPointView = observer(({ item, name }) => {
     item.index === 0
       ? {
           hitStrokeWidth: 12,
+          fill: blue.primary,
           onMouseOver: item.handleMouseOverStartPoint,
           onMouseOut: item.handleMouseOutStartPoint,
           onClick: item.closeStartPoint,
         }
       : null;
 
-  const isOver = item.parent.mouseOverStartPoint;
-
   const dragOpts = {
-    onDragStart: e => {
-      //handleDragStartPoint
-    },
-
     onDragMove: e => {
       item._movePoint(e.target.attrs.x, e.target.attrs.y);
-    },
-
-    onDragEnd: e => {
-      // handleDragEndPoint
     },
 
     onMouseOver: e => {
@@ -154,7 +150,7 @@ const PolygonPointView = observer(({ item, name }) => {
     },
   };
 
-  if (item.style == "circle") {
+  if (item.style === "circle") {
     return (
       <Circle
         key={name}

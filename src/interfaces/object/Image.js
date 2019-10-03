@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { observer, inject, Provider } from "mobx-react";
 import { detach, types, getType, getParentOfType, destroy, getRoot, isValidReference } from "mobx-state-tree";
 
-import { Stage, Layer, Rect, Text, Group, Line, Image, Transformer } from "react-konva";
+import { Stage, Layer, Rect, Text, Group, Line, Image } from "react-konva";
 import { Icon } from "antd";
 
 import Registry from "../../core/Registry";
@@ -13,6 +13,9 @@ import { RectRegionModel } from "./RectRegion";
 import { PolygonRegionModel } from "./PolygonRegion";
 import { KeyPointRegionModel } from "./KeyPointRegion";
 import ProcessAttrsMixin from "../mixins/ProcessAttrs";
+
+import ImageTransformer from "../../components/ImageTransformer/ImageTransformer";
+import ImageControls from "../../components/ImageControls/ImageControls";
 
 /**
  * Image tag shows an image on the page
@@ -36,6 +39,7 @@ import ProcessAttrsMixin from "../mixins/ProcessAttrs";
  * @param {number=} [gridSize=30] size of the grid
  * @param {string=} [gridColor="#EEEEF4"] color of the grid, opacity is 0.15
  * @param {boolean=} showMousePos show mouse position coordinates under an image
+ * @param {boolean} brightness brightness of the image
  */
 const TagAttrs = types.model({
   name: types.maybeNull(types.string),
@@ -52,6 +56,9 @@ const TagAttrs = types.model({
   zoom: types.optional(types.boolean, false),
   negativezoom: types.optional(types.boolean, false),
   zoomby: types.optional(types.string, "1.1"),
+
+  brightness: types.optional(types.boolean, false),
+
   showmousepos: types.optional(types.boolean, false),
 });
 
@@ -69,6 +76,8 @@ const Model = types
     zoomScale: types.optional(types.number, 1),
     zoomPosX: types.maybeNull(types.number),
     zoomPosY: types.maybeNull(types.number),
+
+    brightnessGrade: types.optional(types.number, 100),
 
     cursorPositionX: types.optional(types.number, 0),
     cursorPositionY: types.optional(types.number, 0),
@@ -530,58 +539,6 @@ function reverseCoords(r1, r2) {
   return { x1: r1x, y1: r1y, x2: r2x, y2: r2y }; // return the corrected rect.
 }
 
-class TransformerComponent extends React.Component {
-  componentDidMount() {
-    this.checkNode();
-  }
-
-  componentDidUpdate() {
-    this.checkNode();
-  }
-
-  checkNode() {
-    // here we need to manually attach or detach Transformer node
-    const stage = this.transformer.getStage();
-    const { selectedShape } = this.props;
-
-    if (!selectedShape) {
-      this.transformer.detach();
-      this.transformer.getLayer().batchDraw();
-      return;
-    }
-
-    if (!selectedShape.supportsTransform) return;
-
-    const selectedNode = stage.findOne("." + selectedShape.id);
-    // do nothing if selected node is already attached
-    if (selectedNode === this.transformer.node()) {
-      return;
-    }
-
-    if (selectedNode) {
-      // attach to another node
-      this.transformer.attachTo(selectedNode);
-    } else {
-      // remove transformer
-      this.transformer.detach();
-    }
-    this.transformer.getLayer().batchDraw();
-  }
-
-  render() {
-    return (
-      <Transformer
-        resizeEnabled={true}
-        rotateEnabled={this.props.rotateEnabled}
-        anchorSize={8}
-        ref={node => {
-          this.transformer = node;
-        }}
-      />
-    );
-  }
-}
-
 const createGrid = (width, height, nodeSize) => {
   return [...Array(width)]
     .map((_, col) =>
@@ -597,13 +554,15 @@ const createGrid = (width, height, nodeSize) => {
 };
 
 class HtxImageView extends Component {
-  handleDblClick = ev => {
-    // const item = this.props.item;
-    // const poly = item.activePolygon;
-    // if (poly)
-    //     poly.closePoly();
-    // item.setActivePolygon(null);
-  };
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      brightness: 100,
+    };
+
+    this.updateBrightness = this.updateBrightness.bind(this);
+  }
 
   handleOnClick = ev => {
     const { item } = this.props;
@@ -621,7 +580,7 @@ class HtxImageView extends Component {
 
   handleMouseMove = e => {
     const { item } = this.props;
-    if (item.mode == "drawing") {
+    if (item.mode === "drawing") {
       const x = (e.evt.offsetX - item.zoomPosX) / item.zoomScale;
       const y = (e.evt.offsetY - item.zoomPosY) / item.zoomScale;
 
@@ -660,21 +619,55 @@ class HtxImageView extends Component {
     return true;
   };
 
+  updateBrightness(range) {
+    this.setState({ brightness: range });
+  }
+
+  /**
+   * Handle to zoom
+   */
   handleZoom = e => {
     const { item } = this.props;
-
-    e.evt.preventDefault();
 
     const stage = item._stageRef;
     const scaleBy = parseFloat(item.zoomby);
     const oldScale = stage.scaleX();
 
-    const mousePointTo = {
-      x: stage.getPointerPosition().x / oldScale - stage.x() / oldScale,
-      y: stage.getPointerPosition().y / oldScale - stage.y() / oldScale,
-    };
+    let mousePointTo;
+    let newScale;
+    let pos;
+    let newPos;
 
-    const newScale = e.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
+    if (e.evt) {
+      mousePointTo = {
+        x: stage.getPointerPosition().x / oldScale - stage.x() / oldScale,
+        y: stage.getPointerPosition().y / oldScale - stage.y() / oldScale,
+      };
+
+      newScale = e.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
+
+      newPos = {
+        x: -(mousePointTo.x - stage.getPointerPosition().x / newScale) * newScale,
+        y: -(mousePointTo.y - stage.getPointerPosition().y / newScale) * newScale,
+      };
+    } else {
+      pos = {
+        x: stage.width() / 2,
+        y: stage.height() / 2,
+      };
+
+      mousePointTo = {
+        x: pos.x / oldScale - stage.x() / oldScale,
+        y: pos.y / oldScale - stage.y() / oldScale,
+      };
+
+      newScale = Math.max(0.05, oldScale * e);
+
+      newPos = {
+        x: -(mousePointTo.x - pos.x / newScale) * newScale,
+        y: -(mousePointTo.y - pos.y / newScale) * newScale,
+      };
+    }
 
     if (item.negativezoom !== true && newScale <= 1) {
       item.setZoom(1, 0, 0);
@@ -685,11 +678,6 @@ class HtxImageView extends Component {
     }
 
     stage.scale({ x: newScale, y: newScale });
-
-    const newPos = {
-      x: -(mousePointTo.x - stage.getPointerPosition().x / newScale) * newScale,
-      y: -(mousePointTo.y - stage.getPointerPosition().y / newScale) * newScale,
-    };
 
     item.setZoom(newScale, newPos.x, newPos.y);
     stage.position(newPos);
@@ -722,7 +710,7 @@ class HtxImageView extends Component {
   }
 
   renderRulers() {
-    const { item, store } = this.props;
+    const { item } = this.props;
     const width = 1;
     const color = "white";
 
@@ -780,6 +768,7 @@ class HtxImageView extends Component {
       // width: item.width,
       maxWidth: item.maxwidth,
       transformOrigin: "left top",
+      filter: `brightness(${this.state.brightness}%)`,
     };
 
     if (item.zoomScale != 1) {
@@ -790,20 +779,27 @@ class HtxImageView extends Component {
 
     if (item.hasStates) {
       return (
-        <div style={{ position: "relative" }}>
+        <div
+          style={{
+            position: "relative",
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+          }}
+        >
           <div
             ref={node => {
               this.container = node;
             }}
             style={divStyle}
           >
-            <img style={imgStyle} src={item._value} onLoad={item.updateIE} onClick={this.handleOnClick} />
+            <img style={imgStyle} src={item._value} onLoad={item.updateIE} onClick={this.handleOnClick} alt="LS" />
           </div>
           <Stage
             ref={ref => {
               item._setStageRef(ref);
             }}
-            style={{ position: "absolute", top: 0, left: 0 }}
+            style={{ position: "absolute", top: 0, left: 0, brightness: "150%" }}
             width={item.stageWidth}
             height={item.stageHeight}
             scaleX={item.scale}
@@ -822,9 +818,10 @@ class HtxImageView extends Component {
               })}
               {item.activeShape && Tree.renderItem(item.activeShape)}
 
-              <TransformerComponent rotateEnabled={item.controlButton().canrotate} selectedShape={item.selectedShape} />
+              <ImageTransformer rotateEnabled={item.controlButton().canrotate} selectedShape={item.selectedShape} />
             </Layer>
           </Stage>
+          <ImageControls item={item} handleZoom={this.handleZoom} handleBrightness={this.updateBrightness} />
         </div>
       );
     } else {
