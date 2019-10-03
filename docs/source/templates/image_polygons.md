@@ -7,7 +7,7 @@ is_new: t
 
 Image polygons labeling
 
-<img src="/images/screens/image_polygons.png" class="img-template-example" title="Images Bbounding box" />
+<img src="/images/screens/image_polygons.png" class="img-template-example" title="Images Polygons" />
 
 ## Run
 

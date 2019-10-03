@@ -7,7 +7,7 @@ is_new: t
 
 Key Points labeling for the images
 
-<img src="/images/screens/image_keypoints.png" class="img-template-example" title="Images Bbounding box" />
+<img src="/images/screens/image_keypoints.png" class="img-template-example" title="Images Key Points" />
 
 ## Run
 
