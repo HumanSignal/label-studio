@@ -1,7 +1,7 @@
 
 # Image KeyPoints
 
-![Image KeyPoints]("Image KeyPoints")
+![Image KeyPoints](/images/screenshots/image_keypoints.png "Image KeyPoints")
 
 # Install
 
