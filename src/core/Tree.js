@@ -1,6 +1,6 @@
 import React from "react";
 import { getType, getParentOfType } from "mobx-state-tree";
-import parse5 from "parse5";
+import { parseString } from "xml2js";
 
 import Registry from "./Registry";
 import { guidGenerator } from "./Helpers";
@@ -89,13 +89,16 @@ function attrsToProps(attrs) {
 
   if (!attrs) return props;
 
-  for (let attr of attrs) {
-    props[attr.name] = attr.value;
+  for (let item of Object.keys(attrs)) {
+    /**
+     * Convert node of Tree to boolean value
+     */
+    if (item !== "value" && (attrs[item] === "true" || attrs[item] === "false")) {
+      props[item.toLowerCase()] = JSON.parse(attrs[item]);
+    } else {
+      props[item.toLowerCase()] = attrs[item];
+    }
   }
-
-  // if (props["style"]) {
-  //     props["style"] = cssConverter(props["style"]);
-  // }
 
   return props;
 }
@@ -137,12 +140,12 @@ function treeToModel(html) {
    * @param {object} node
    */
   function addNode(node) {
-    if (!node) return null;
+    if (!node.$$) return null;
 
     const res = [];
 
-    for (let chld of node.childNodes) {
-      if (chld.nodeName !== "#text") {
+    for (let chld of node.$$) {
+      if (chld["#name"] !== "__text__") {
         const data = buildData(chld);
         const children = addNode(chld);
 
@@ -162,7 +165,7 @@ function treeToModel(html) {
    * Generate obj with main data
    */
   function buildData(node) {
-    const data = attrsToProps(node.attrs);
+    const data = attrsToProps(node.$);
 
     /**
      * Generation id of node
@@ -172,33 +175,32 @@ function treeToModel(html) {
     /**
      * Build type name
      */
-    data["type"] = node.nodeName;
-
-    /**
-     * Convert node of Tree to boolean value
-     * Input: XML Configuration
-     * Output: Node Tree
-     * Exception: attr "value"
-     */
-    Object.keys(data).forEach(function(item) {
-      if (item !== "value" && (this[item] === "true" || this[item] === "false")) {
-        data[item] = JSON.parse(this[item]);
-      }
-    }, data);
-
-    /**
-     * Convert to image type
-     */
-    if (data["type"] === "img") data["type"] = "image";
+    data["type"] = node["#name"].toLowerCase();
 
     return data;
   }
 
   const htmlWithotBreaks = removeAllBreaks(html);
   const htmlSelfClosingTags = editSelfClosingTags(htmlWithotBreaks);
-  const document = parse5.parseFragment(htmlSelfClosingTags);
-  const root = buildData(document.childNodes[0]);
-  root.children = addNode(document.childNodes[0]);
+  let document;
+
+  // it's actually a sync function, but there is no sync interface
+  // because of some backwards compat
+  parseString(
+    htmlSelfClosingTags,
+    {
+      explicitChildren: true,
+      preserveChildrenOrder: true,
+      charsAsChildren: true,
+    },
+    function(err, result) {
+      document = result;
+    },
+  );
+
+  const root = buildData(Object.values(document)[0]);
+  root.children = addNode(Object.values(document)[0]);
+
   return root;
 }
 

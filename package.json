@@ -49,7 +49,8 @@
     "semantic-ui-css": "^2.4.1",
     "semantic-ui-react": "^0.84.0",
     "svg.js": "^2.7.0",
-    "wavesurfer.js": "^3.0.0"
+    "wavesurfer.js": "^3.0.0",
+    "xml2js": "^0.4.22"
   },
   "scripts": {
     "start": "npm run copy-examples && react-scripts start",

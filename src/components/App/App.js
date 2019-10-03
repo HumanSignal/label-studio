@@ -54,10 +54,12 @@ import { PolygonModel } from "../../interfaces/control/Polygon";
 import { RectangleLabelsModel } from "../../interfaces/control/RectangleLabels";
 import { PolygonLabelsModel } from "../../interfaces/control/PolygonLabels";
 import { ChoicesModel } from "../../interfaces/control/Choices";
-import { TextAreaModel } from "../../interfaces/control/TextArea";
+
 import { RatingModel } from "../../interfaces/control/Rating";
 import { ListModel } from "../../interfaces/control/List";
 import { RankerModel } from "../../interfaces/control/Ranker";
+import { ShortcutModel } from "../../interfaces/control/Shortcut";
+import { TextAreaModel } from "../../interfaces/control/TextArea";
 
 /**
  * Styles
