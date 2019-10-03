@@ -24,7 +24,9 @@ Label Studio is an open-source, configurable data annotation tool. Its purpose i
 - [Classify audio](https://labelstud.io/templates/audio_classification.html) 
 - [Conversational modeling & chatbots](https://labelstud.io/templates/dialogue_analysis.html)
 - [Image object detection](https://labelstud.io/templates/image_bbox.html) 
-- [Audio regions](https://labelstud.io/templates/audio_regions.html)<sup>New</sup>
+- [Audio regions](https://labelstud.io/templates/audio_regions.html)
+- [Image KeyPoints](https://labelstud.io/templates/image_keypoints.html)<sup>New</sup>
+- [Image Polygons](https://labelstud.io/templates/image_polygons.html)<sup>New</sup>
 
 Coming Soon:
 

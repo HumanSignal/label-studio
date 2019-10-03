@@ -2,6 +2,7 @@
 title: Image Polygons
 type: templates
 order: 205
+is_new: t
 ---
 
 Image polygons labeling
