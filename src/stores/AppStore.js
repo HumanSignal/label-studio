@@ -365,6 +365,7 @@ export default types
 
           const body = JSON.stringify({
             // state: JSON.stringify(state),
+            createdDuration: (new Date() - c.loadedDate) / 1000,
             result: res,
           });
 
