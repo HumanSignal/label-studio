@@ -2,7 +2,6 @@
  * Libraries
  */
 import React, { Component } from "react";
-import parse5 from "parse5";
 import { observer, inject, Provider } from "mobx-react";
 import { types, getSnapshot } from "mobx-state-tree";
 import { Result, Spin } from "antd";
