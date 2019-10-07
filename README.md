@@ -30,8 +30,6 @@ Label Studio is an open-source, configurable data annotation tool. Its purpose i
 
 Coming Soon:
 
-- Image keypoints (screenshot)
-- Image polygons
 - Time series
 - Video
 
