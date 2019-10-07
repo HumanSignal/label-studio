@@ -190,10 +190,10 @@ const Model = types
       let rect;
       let stroke = self.controlButton().strokecolor;
 
-      if (self.controlButtonType == "RectangleModel") {
+      if (self.controlButtonType === "RectangleModel") {
         self.setMode("drawing");
         rect = self._addRect(x, y, 1, 1, stroke, null, "px", true);
-      } else if (self.controlButtonType == "RectangleLabelsModel") {
+      } else if (self.controlButtonType === "RectangleLabelsModel") {
         self.lookupStates(null, (_, states) => {
           if (states && states.length) {
             stroke = states[0].getSelectedColor();
@@ -212,15 +212,15 @@ const Model = types
 
       const { x1, y1, x2, y2 } = reverseCoords({ x: shape._start_x, y: shape._start_y }, { x: x, y: y });
 
-      shape.setPosition(x1, y1, x2 - x1, y2 - y1);
+      shape.setPosition(x1, y1, x2 - x1, y2 - y1, shape.rotation);
     },
 
     lookupStates(ev, fun) {
       const states = self.completion.toNames.get(self.name);
       const activeStates = states
         ? states
-            .filter(c => c.isSelected == true)
-            .filter(c => c.type == "rectanglelabels" || c.type == "keypointlabels" || c.type == "polygonlabels")
+            .filter(c => c.isSelected)
+            .filter(c => c.type === "rectanglelabels" || c.type === "keypointlabels" || c.type === "polygonlabels")
         : null;
       const clonedStates = activeStates ? activeStates.map(s => cloneNode(s)) : null;
 
@@ -232,7 +232,6 @@ const Model = types
 
     onImageClick(ev) {
       const dispmap = {
-        // RectangleModel: ev => self._addRectEv(ev),
         PolygonModel: ev => self._addPolyEv(ev),
         KeyPointModel: ev => self._addKeyPointEv(ev),
 
@@ -246,9 +245,6 @@ const Model = types
         KeyPointLabelsModel: ev => {
           self.lookupStates(ev, self._addKeyPointEv);
         },
-        // RectangleLabelsModel: ev => {
-        //   self.lookupStates(ev, self._addRectEv);
-        // },
       };
 
       if (dispmap[self.controlButtonType]) return dispmap[self.controlButtonType](ev);
@@ -520,23 +516,33 @@ const ImageModel = types.compose(
   ProcessAttrsMixin,
 );
 
+/**
+ * Reverse coordinates if user drags left and up
+ * @param {*} r1
+ * @param {*} r2
+ */
 function reverseCoords(r1, r2) {
   var r1x = r1.x,
     r1y = r1.y,
     r2x = r2.x,
     r2y = r2.y,
     d;
+
   if (r1x > r2x) {
     d = Math.abs(r1x - r2x);
     r1x = r2x;
     r2x = r1x + d;
   }
+
   if (r1y > r2y) {
     d = Math.abs(r1y - r2y);
     r1y = r2y;
     r2y = r1y + d;
   }
-  return { x1: r1x, y1: r1y, x2: r2x, y2: r2y }; // return the corrected rect.
+  /**
+   * Return the corrected rect
+   */
+  return { x1: r1x, y1: r1y, x2: r2x, y2: r2y };
 }
 
 const createGrid = (width, height, nodeSize) => {
@@ -571,7 +577,7 @@ class HtxImageView extends Component {
 
   handleMouseUp = e => {
     const { item } = this.props;
-    if (item.mode == "drawing") {
+    if (item.mode === "drawing") {
       item.setMode("viewing");
       const as = item.detachActiveShape();
       if (as.width > 3 && as.height > 3) item._addShape(as);
@@ -595,11 +601,23 @@ class HtxImageView extends Component {
   handleStageMouseDown = e => {
     const { item } = this.props;
 
+    // if (e.target.getLayer()) {
+    //   let heightOfCanvas = e.target.getLayer().hitCanvas.height;
+    //   let widthOfCanvas = e.target.getLayer().hitCanvas.width;
+
+    //   let a = e.target.getLayer().children.filter(node => node.nodeType === "Shape");
+
+    //   let widthObj = a.attrs.width;
+    //   let heightObj = a.attrs.height;
+    //   let topLeft = a.attrs.x;
+
+    // }
+
     if (item.controlButtonType === "PolygonLabelsModel") {
       return;
     }
 
-    if (e.target === e.target.getStage() || (e.target.parent && e.target.parent.attrs.name == "ruler")) {
+    if (e.target === e.target.getStage() || (e.target.parent && e.target.parent.attrs.name === "ruler")) {
       // draw rect
 
       const x = (e.evt.offsetX - item.zoomPosX) / item.zoomScale;
@@ -771,7 +789,7 @@ class HtxImageView extends Component {
       filter: `brightness(${this.state.brightness}%)`,
     };
 
-    if (item.zoomScale != 1) {
+    if (item.zoomScale !== 1) {
       let { zoomPosX, zoomPosY } = item;
       const translate = "translate(" + zoomPosX + "px," + zoomPosY + "px) ";
       imgStyle["transform"] = translate + "scale(" + item.resize + ", " + item.resize + ")";
@@ -821,7 +839,9 @@ class HtxImageView extends Component {
               <ImageTransformer rotateEnabled={item.controlButton().canrotate} selectedShape={item.selectedShape} />
             </Layer>
           </Stage>
-          <ImageControls item={item} handleZoom={this.handleZoom} handleBrightness={this.updateBrightness} />
+          {item.zoom || item.brightness ? (
+            <ImageControls item={item} handleZoom={this.handleZoom} handleBrightness={this.updateBrightness} />
+          ) : null}
         </div>
       );
     } else {
