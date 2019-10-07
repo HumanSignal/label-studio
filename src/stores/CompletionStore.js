@@ -25,8 +25,9 @@ const Completion = types
     createdDate: types.optional(types.string, Utils.UDate.currentISODate()),
     createdAgo: types.maybeNull(types.string),
     createdBy: types.optional(types.string, "Admin"),
-    createdDuration: types.maybeNull(types.number),
+
     loadedDate: types.maybeNull(types.Date),
+    leadTime: types.maybeNull(types.number),
 
     userGenerate: types.optional(types.boolean, true),
     update: types.optional(types.boolean, false),
@@ -455,7 +456,7 @@ export default types
         pk: c.id,
         createdAgo: c.created_ago,
         createdBy: c.created_username,
-        createdDuration: c.created_duration,
+        leadTime: c.created_duration,
         honeypot: c.honeypot,
         root: root,
         userGenerate: false,
