@@ -1,4 +1,4 @@
-<div style="text-align: center;"><a href="https://labelstud.io/" title="Label Studio by Heartex Labs"><img src="./images/heartex_icon_opossum_green.svg" title="Label Studio by Heartex Labs" height="160"></a></div>
+<div align="center"><a href="https://labelstud.io/" title="Label Studio by Heartex Labs"><img src="./images/heartex_icon_opossum_green.svg" title="Label Studio by Heartex Labs" height="160"></a></div>
 
 <h2 align="center">Label Studio</h2>
 
