@@ -26,6 +26,9 @@ const Completion = types
     createdAgo: types.maybeNull(types.string),
     createdBy: types.optional(types.string, "Admin"),
 
+    loadedDate: types.maybeNull(types.Date),
+    leadTime: types.maybeNull(types.number),
+
     userGenerate: types.optional(types.boolean, true),
     update: types.optional(types.boolean, false),
     sentUserGenerate: types.optional(types.boolean, false),
@@ -194,6 +197,11 @@ const Completion = types
     },
 
     afterCreate() {
+      //
+      if (self.userGenerate && !self.sentUserGenerate) {
+        self.loadedDate = new Date();
+      }
+
       self.traverseTree(node => {
         // create mapping from name to Model (by ref)
         if (node && node.name && node.id) self.names.set(node.name, node.id);
@@ -448,6 +456,7 @@ export default types
         pk: c.id,
         createdAgo: c.created_ago,
         createdBy: c.created_username,
+        leadTime: c.created_duration,
         honeypot: c.honeypot,
         root: root,
         userGenerate: false,
