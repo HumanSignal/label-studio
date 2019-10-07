@@ -14,7 +14,7 @@ import { TranscribeAudio } from "../examples/transcribe_audio";
 /**
  * Choose labeling scheme
  */
-let dataType = ImageBbox;
+let dataType = Sentiment;
 
 function templateDynamicData() {
   let settings = {
@@ -113,8 +113,8 @@ async function getState() {
   const resultPredictions = resp.task.predictions ? resp.task.predictions : null;
 
   return {
-    // completions: resultCompletions,
-    // predictions: resultPredictions,
+    completions: resultCompletions,
+    predictions: resultPredictions,
   };
 }
 
