@@ -192,7 +192,7 @@ const Model = types
 
       if (self.controlButtonType === "RectangleModel") {
         self.setMode("drawing");
-        rect = self._addRect(x, y, 1, 1, stroke, null, "px", true);
+        rect = self._addRect({ x: x, y: y, sh: 1, sw: 1, stroke: stroke, states: null, coordstype: "px", noadd: true });
       } else if (self.controlButtonType === "RectangleLabelsModel") {
         self.lookupStates(null, (_, states) => {
           if (states && states.length) {
@@ -200,7 +200,16 @@ const Model = types
           }
 
           self.setMode("drawing");
-          rect = self._addRect(x, y, 1, 1, stroke, states, "px", true);
+          rect = self._addRect({
+            x: x,
+            y: y,
+            sh: 1,
+            sw: 1,
+            stroke: stroke,
+            states: states,
+            coordstype: "px",
+            noadd: true,
+          });
         });
       }
 
@@ -309,13 +318,17 @@ const Model = types
       const wx = ev.evt.offsetX;
       const wy = ev.evt.offsetY;
 
-      return self._addRect(Math.floor(wx - sw / 2), Math.floor(wy - sh / 2), sw, sh, stroke, states);
+      return self._addRect({
+        x: Math.floor(wx - sw / 2),
+        y: Math.floor(wy - sh / 2),
+        sw: sw,
+        sh: sh,
+        stroke: stroke,
+        states: states,
+      });
     },
 
-    _addRect(x, y, sw, sh, stroke, states, coordstype, noadd) {
-      // x = (x - self.zoomPosX) / self.zoomScale;
-      // y = (y - self.zoomPosY) / self.zoomScale;
-
+    _addRect({ x, y, sw, sh, stroke, states, coordstype, noadd, rotation }) {
       const c = self.controlButton();
 
       let localStates = states;
@@ -340,6 +353,8 @@ const Model = types
         strokecolor: stroke,
 
         states: localStates,
+
+        rotation: rotation,
 
         coordstype: coordstype,
       });
@@ -455,15 +470,16 @@ const Model = types
 
         states.fromStateJSON(obj);
 
-        self._addRect(
-          obj.value.x,
-          obj.value.y,
-          obj.value.width,
-          obj.value.height,
-          states.getSelectedColor(),
-          [states],
-          "perc",
-        );
+        self._addRect({
+          x: obj.value.x,
+          y: obj.value.y,
+          sw: obj.value.width,
+          sh: obj.value.height,
+          stroke: states.getSelectedColor(),
+          states: [states],
+          coordstype: "perc",
+          rotation: obj.value.rotation,
+        });
       }
 
       if (obj.value.keypointlabels) {
