@@ -51,7 +51,6 @@ export default observer(
       return (
         <div className={styles.block}>
           {this.props.item.brightness ? brightnessControl : null}
-          <Divider className={styles.divider} />
           {this.props.item.zoom ? zoomControls : null}
         </div>
       );
