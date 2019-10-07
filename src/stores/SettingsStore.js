@@ -24,9 +24,9 @@ const SettingsModel = types
     toggleHotkeys() {
       self.enableHotkeys = !self.enableHotkeys;
       if (self.enableHotkeys) {
-        Hotkey.setScope("main");
+        Hotkey.setScope("__main__");
       } else {
-        Hotkey.setScope("none");
+        Hotkey.setScope("__none__");
       }
     },
 

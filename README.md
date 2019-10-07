@@ -1,18 +1,12 @@
-<p align="center"><a href="https://labelstud.io/" title="Label Studio by Heartex Labs"><img src="./images/heartex_icon_opossum_green.svg" title="Label Studio by Heartex Labs" height="160"></a></p>
+<div align="center"><a href="https://labelstud.io/" title="Label Studio by Heartex Labs"><img src="./images/heartex_icon_opossum_green.svg" title="Label Studio by Heartex Labs" height="160"></a></div>
 
 <h2 align="center">Label Studio</h2>
 
-Label Studio is an open-source, configurable data annotation tool. Its purpose is to enable you to label different types of data using the most convenient interface with a standardized output format.
+Label Studio is an open-source, configurable data annotation tool.
 
-<br/>
+Its purpose is to enable you to label different types of data using the most convenient interface with a standardized output format.
 
-![GitHub](https://img.shields.io/github/license/heartexlabs/label-studio?logo=heartex) 
-[![Build Status](https://travis-ci.com/heartexlabs/label-studio.svg?branch=master)](https://travis-ci.com/heartexlabs/label-studio) 
-[![codecov](https://codecov.io/gh/heartexlabs/label-studio/branch/master/graph/badge.svg)](https://codecov.io/gh/heartexlabs/label-studio) 
-![GitHub release](https://img.shields.io/github/v/release/heartexlabs/label-studio?include_prereleases) 
-[![Gitter](https://badges.gitter.im/label-studio/community.svg)](https://gitter.im/label-studio/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
-
-<br/>
+![GitHub](https://img.shields.io/github/license/heartexlabs/label-studio?logo=heartex) [![Build Status](https://travis-ci.com/heartexlabs/label-studio.svg?branch=master)](https://travis-ci.com/heartexlabs/label-studio) [![codecov](https://codecov.io/gh/heartexlabs/label-studio/branch/master/graph/badge.svg)](https://codecov.io/gh/heartexlabs/label-studio) ![GitHub release](https://img.shields.io/github/v/release/heartexlabs/label-studio?include_prereleases) [![Gitter](https://badges.gitter.im/label-studio/community.svg)](https://gitter.im/label-studio/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 ![Label Studio](./images/label-studio-examples.gif)
 
@@ -24,12 +18,12 @@ Label Studio is an open-source, configurable data annotation tool. Its purpose i
 - [Classify audio](https://labelstud.io/templates/audio_classification.html) 
 - [Conversational modeling & chatbots](https://labelstud.io/templates/dialogue_analysis.html)
 - [Image object detection](https://labelstud.io/templates/image_bbox.html) 
-- [Audio regions](https://labelstud.io/templates/audio_regions.html)<sup>New</sup>
+- [Audio regions](https://labelstud.io/templates/audio_regions.html)
+- [Image KeyPoints](https://labelstud.io/templates/image_keypoints.html)<sup>New</sup>
+- [Image Polygons](https://labelstud.io/templates/image_polygons.html)<sup>New</sup>
 
 Coming Soon:
 
-- Image keypoints (screenshot)
-- Image polygons
 - Time series
 - Video
 

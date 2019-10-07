@@ -1,7 +1,7 @@
 import React, { createRef, Component, Fragment } from "react";
 
 import { observer, inject } from "mobx-react";
-import { types, getParentOfType, getRoot } from "mobx-state-tree";
+import { types, getParentOfType, getParent, getRoot } from "mobx-state-tree";
 
 import Konva from "konva";
 import { Shape, Label, Stage, Layer, Rect, Text, Transformer } from "react-konva";
@@ -99,13 +99,29 @@ const Model = types
       self.parent.setSelected(self.id);
     },
 
+    getCurrentCoordinates(x, y, width, height) {
+      // console.log(self.width * (self.scaleX || 1));
+    },
+
+    /**
+     * Boundg Box set position on canvas
+     * @param {number} x
+     * @param {number} y
+     * @param {number} width
+     * @param {number} height
+     * @param {number} rotation
+     */
     setPosition(x, y, width, height, rotation) {
       self.x = x;
       self.y = y;
       self.width = width;
       self.height = height;
 
-      self.rotation = rotation;
+      if (rotation < 0) {
+        self.rotation = (rotation % 360) + 360;
+      } else {
+        self.rotation = rotation % 360;
+      }
     },
 
     setScale(x, y) {
@@ -208,6 +224,7 @@ const HtxRectangleView = ({ store, item }) => {
         scaleX={item.scaleX}
         scaleY={item.scaleY}
         opacity={item.opacity}
+        rotation={item.rotation}
         name={item.id}
         onTransformEnd={e => {
           const t = e.target;
@@ -233,11 +250,47 @@ const HtxRectangleView = ({ store, item }) => {
           );
           item.setScale(t.getAttr("scaleX"), t.getAttr("scaleY"));
         }}
-        dragBoundFunc={function(pos) {
+        dragBoundFunc={(pos, e) => {
           let { x, y } = pos;
 
-          if (x < 0) x = 0;
-          if (y < 0) y = 0;
+          item.getCurrentCoordinates(x, y, item.width, 1);
+
+          let { stageHeight, stageWidth } = getParent(getParent(item));
+
+          // let rightTop = x + item.width * (item.scaleX || 1);
+          // let rightBottom = y + item.height * (item.scaleY || 1);
+
+          // let leftTop = {
+          //   x: x,
+          //   y: y
+          // };
+
+          // let leftBottom = {
+          //   x: x,
+          //   y: y + item.height
+          // };
+
+          // let rightTop = {
+          //   x: x + item.width,
+          //   y: y
+          // };
+
+          // let rightBottom = {
+          //   x: x + item.width,
+          //   y: y + item.height
+          // };
+
+          if (x <= 0) {
+            x = 0;
+          } else if (x >= stageWidth) {
+            x = stageWidth;
+          }
+
+          if (y < 0) {
+            y = 0;
+          } else if (y >= stageHeight) {
+            y = stageHeight;
+          }
 
           return {
             x: x,

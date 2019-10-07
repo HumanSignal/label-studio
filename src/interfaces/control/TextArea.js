@@ -2,15 +2,22 @@ import React, { Component } from "react";
 
 import { observer, inject, Provider } from "mobx-react";
 import { types, destroy, getEnv, flow, getParentOfType, getRoot } from "mobx-state-tree";
-import { Form, Message } from "semantic-ui-react";
+
+import { Form, Input, Button } from "antd";
 
 import { renderChildren } from "../../core/Tree";
 import { guidGenerator } from "../../core/Helpers";
 
 import { HtxTextAreaRegion, TextAreaRegionModel } from "../object/TextAreaRegion";
+import { ShortcutModel } from "../control/Shortcut";
 
 import Registry from "../../core/Registry";
 import ProcessAttrsMixin from "../mixins/ProcessAttrs";
+
+import Tree from "../../core/Tree";
+import Types from "../../core/Types";
+
+const { TextArea } = Input;
 
 /**
  * TextArea tag shows the textarea for user input
@@ -32,6 +39,8 @@ const TagAttrs = types.model({
   name: types.maybeNull(types.string),
   toname: types.maybeNull(types.string),
   value: types.maybeNull(types.string),
+  rows: types.optional(types.string, "1"),
+  showsubmitbutton: types.optional(types.boolean, false),
   placeholder: types.maybeNull(types.string),
   maxsubmissions: types.maybeNull(types.string),
 });
@@ -43,6 +52,7 @@ const Model = types
     regions: types.array(TextAreaRegionModel),
 
     _value: types.optional(types.string, ""),
+    children: Types.unionArray(["shortcut"]),
   })
   .views(self => ({
     get submissionsNum() {
@@ -89,6 +99,10 @@ const Model = types
       destroy(text);
     },
 
+    onShortcut(value) {
+      self.setValue(self._value + value);
+    },
+
     toStateJSON() {
       const toname = self.toname || self.name;
 
@@ -120,15 +134,24 @@ const TextAreaModel = types.compose(
 );
 
 const HtxTextArea = observer(({ item }) => {
+  const rows = parseInt(item.rows);
+
+  const props = {
+    name: item.name,
+    value: item._value,
+    rows: item.rows,
+    className: "is-search",
+    label: item.label,
+    placeholder: item.placeholder,
+    onChange: ev => {
+      const { value } = ev.target;
+      item.setValue(value);
+    },
+  };
+
   return (
     <div>
-      {item.regions.length > 0 && (
-        <div style={{ marginTop: "1em", marginBottom: "1em" }}>
-          {item.regions.map(t => (
-            <HtxTextAreaRegion item={t} />
-          ))}
-        </div>
-      )}
+      {Tree.renderChildren(item)}
 
       {item.showSubmit && (
         <Form
@@ -142,17 +165,25 @@ const HtxTextArea = observer(({ item }) => {
             return false;
           }}
         >
-          <Form.Input
-            value={item._value}
-            className="is-search"
-            label={item.label}
-            placeholder={item.placeholder}
-            onChange={ev => {
-              const { value } = ev.target;
-              item.setValue(value);
-            }}
-          />
+          <Form.Item>
+            {rows == 1 ? <Input {...props} /> : <TextArea {...props} />}
+            {(rows != 1 || item.showSubmitButton) && (
+              <Form.Item>
+                <Button type="primary" htmlType="submit">
+                  Add
+                </Button>
+              </Form.Item>
+            )}
+          </Form.Item>
         </Form>
+      )}
+
+      {item.regions.length > 0 && (
+        <div style={{ marginBottom: "1em" }}>
+          {item.regions.map(t => (
+            <HtxTextAreaRegion item={t} />
+          ))}
+        </div>
       )}
     </div>
   );

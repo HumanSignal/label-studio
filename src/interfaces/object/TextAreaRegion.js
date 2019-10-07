@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 import { observer, inject, Provider } from "mobx-react";
 import { types, getParentOfType, getRoot } from "mobx-state-tree";
-import { Message, Icon, Popup, Button, Dropdown, Input } from "semantic-ui-react";
+import { Message } from "semantic-ui-react";
 
 import Types from "../../core/Types";
 

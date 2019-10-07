@@ -37,7 +37,7 @@ const Model = types.model({
     "view",
     "header",
     "labels",
-    "textarea",
+
     "choices",
     "rating",
     "ranker",
@@ -54,6 +54,7 @@ const Model = types.model({
     "audioplus",
     "list",
     "dialog",
+    "textarea",
   ]),
 });
 

@@ -22,6 +22,8 @@ import { PolygonLabelsModel } from "../control/PolygonLabels";
 import RegionsMixin from "../mixins/Regions";
 import NormalizationMixin from "../mixins/Normalization";
 
+import { green } from "@ant-design/colors";
+
 const Model = types
   .model({
     id: types.identifier,
@@ -61,63 +63,15 @@ const Model = types
     get completion() {
       return getRoot(self).completionStore.selected;
     },
-
-    get isCW() {},
-
-    linePoints() {
-      const p = self.points.map(p => [p["x"], p["y"]]);
-
-      const flatten = arr => {
-        return arr.reduce(function(flat, toFlatten) {
-          return flat.concat(Array.isArray(toFlatten) ? flatten(toFlatten) : toFlatten);
-        }, []);
-      };
-
-      return flatten(p);
-    },
   }))
   .actions(self => ({
     setMouseOverStartPoint(val) {
       self.mouseOverStartPoint = val;
     },
 
-    findPolyOutline() {
-      const { points } = self;
-      const left = points.reduce((acc, loc) => (acc.x < loc.x ? acc : loc));
-      const right = points.reduce((acc, loc) => (acc.x > loc.x ? acc : loc));
-
-      const top = points.reduce((acc, loc) => (acc.y < loc.y ? acc : loc));
-      const bottom = points.reduce((acc, loc) => (acc.y > loc.y ? acc : loc));
-
-      return {
-        x: left.x,
-        y: top.y,
-        width: right.x - left.x,
-        height: bottom.y - top.y,
-      };
-    },
-
-    coordsInside(x, y) {
-      const inside = false;
-      const vs = self.points;
-
-      for (var i = 0, j = vs.length - 1; i < vs.length; j = i++) {
-        var xi = vs[i][0],
-          yi = vs[i][1];
-        var xj = vs[j][0],
-          yj = vs[j][1];
-
-        var intersect = yi > y != yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
-
-        if (intersect) inside = !inside;
-      }
-
-      return inside;
-    },
-
     handleMouseMove({ e, flattenedPoints }) {
-      const { offsetX: a, offsetY: b } = e.evt;
-      const point = getAnchorPoint({ flattenedPoints, a, b });
+      const { offsetX: cursorX, offsetY: cursorY } = e.evt;
+      const point = getAnchorPoint({ flattenedPoints, cursorX, cursorY });
 
       let x = point[0];
       let y = point[1];
@@ -144,8 +98,8 @@ const Model = types
 
       removeHoverAnchor({ layer: e.currentTarget.getLayer() });
 
-      const { offsetX: a, offsetY: b } = e.evt;
-      const point = getAnchorPoint({ flattenedPoints, a, b });
+      const { offsetX: cursorX, offsetY: cursorY } = e.evt;
+      const point = getAnchorPoint({ flattenedPoints, cursorX, cursorY });
 
       self.insertPoint(insertIdx, point[0], point[1]);
     },
@@ -290,14 +244,25 @@ const PolygonRegionModel = types.compose(
   Model,
 );
 
-function getAnchorPoint({ flattenedPoints, a, b }) {
-  const [x1, y1, x2, y2] = flattenedPoints;
+/**
+ * Get coordinates of anchor point
+ * @param {array} flattenedPoints
+ * @param {number} cursorX coordinates of cursor X
+ * @param {number} cursorY coordinates of cursor Y
+ */
+function getAnchorPoint({ flattenedPoints, cursorX, cursorY }) {
+  const [point1X, point1Y, point2X, point2Y] = flattenedPoints;
   const y =
-    ((x2 - x1) * (x2 * y1 - x1 * y2) + (x2 - x1) * (y2 - y1) * a + (y2 - y1) * (y2 - y1) * b) /
-    ((y2 - y1) * (y2 - y1) + (x2 - x1) * (x2 - x1));
+    ((point2X - point1X) * (point2X * point1Y - point1X * point2Y) +
+      (point2X - point1X) * (point2Y - point1Y) * cursorX +
+      (point2Y - point1Y) * (point2Y - point1Y) * cursorY) /
+    ((point2Y - point1Y) * (point2Y - point1Y) + (point2X - point1X) * (point2X - point1X));
   const x =
-    a -
-    ((y2 - y1) * (x2 * y1 - x1 * y2 + a * (y2 - y1) - b * (x2 - x1))) / ((y2 - y1) * (y2 - y1) + (x2 - x1) * (x2 - x1));
+    cursorX -
+    ((point2Y - point1Y) *
+      (point2X * point1Y - point1X * point2Y + cursorX * (point2Y - point1Y) - cursorY * (point2X - point1X))) /
+      ((point2Y - point1Y) * (point2Y - point1Y) + (point2X - point1X) * (point2X - point1X));
+
   return [x, y];
 }
 
@@ -308,30 +273,20 @@ function getFlattenedPoints(points) {
   }, []);
 }
 
-function getRectPoints(x, y, width, height) {
-  const points = [[x, y], [x, y + height], [x + width, y + height], [x + width, y]];
-  return points;
-}
-
-function getMinDist({ points, point, idx }) {
-  return points.reduce(function(minDist, p, i) {
-    if (i === idx) return minDist;
-    const dist = Math.sqrt(Math.pow(point[0] - p[0], 2) + Math.pow(point[1] - p[1], 2));
-    return dist < minDist ? dist : minDist;
-  }, Infinity);
-}
-
 function getHoverAnchor({ layer }) {
   return layer.findOne(".hoverAnchor");
 }
 
+/**
+ * Create new anchor for current polygon
+ */
 function createHoverAnchor({ point, group, layer }) {
-  const hoverAnchor = new window.Konva.Circle({
+  const hoverAnchor = new Konva.Circle({
     name: "hoverAnchor",
     x: point[0],
     y: point[1],
-    stroke: "#666",
-    fill: "#ddd",
+    stroke: green.primary,
+    fill: green[0],
     strokeWidth: 2,
     radius: 5,
   });
@@ -354,6 +309,9 @@ function removeHoverAnchor({ layer }) {
 }
 
 const HtxPolygonView = ({ store, item }) => {
+  /**
+   * Render line between 2 points
+   */
   function renderLine({ points, idx1, idx2 }) {
     const name = `border_${idx1}_${idx2}`;
     const insertIdx = idx1 + 1; // idx1 + 1 or idx2

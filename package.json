@@ -1,6 +1,6 @@
 {
   "name": "label-studio",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "private": true,
   "description": "Label Studio is a multi-domain data labeling tool with standardized output format",
   "author": {
@@ -33,23 +33,23 @@
     "array-move": "^1.0.0",
     "emoji-regex": "^7.0.3",
     "keymaster": "^1.6.2",
-    "konva": "^2.5.1",
+    "konva": "^4.0.13",
     "mobx": "^5.8.0",
     "mobx-react": "^5.4.3",
     "mobx-state-tree": "^3.10.0",
     "nanoid": "^2.0.3",
     "node-sass": "^4.12.0",
-    "parse5": "^5.1.0",
-    "react": "^16.6.3",
-    "react-dom": "^16.7.0",
-    "react-konva": "^16.6.31",
+    "react": "^16.10.2",
+    "react-dom": "^16.10.2",
+    "react-konva": "^16.10.1-0",
     "react-rating": "^1.6.2",
     "react-scripts": "2.1.1",
     "react-sortable-hoc": "^1.8.2",
     "semantic-ui-css": "^2.4.1",
     "semantic-ui-react": "^0.84.0",
     "svg.js": "^2.7.0",
-    "wavesurfer.js": "^3.0.0"
+    "wavesurfer.js": "^3.0.0",
+    "xml2js": "^0.4.22"
   },
   "scripts": {
     "start": "npm run copy-examples && react-scripts start",
@@ -74,8 +74,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged",
-      "pre-push": "npm test"
+      "pre-commit": "lint-staged && npm run test"
     }
   },
   "lint-staged": {

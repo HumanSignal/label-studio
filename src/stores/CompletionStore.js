@@ -26,6 +26,9 @@ const Completion = types
     createdAgo: types.maybeNull(types.string),
     createdBy: types.optional(types.string, "Admin"),
 
+    loadedDate: types.optional(types.Date, new Date()),
+    leadTime: types.maybeNull(types.number),
+
     userGenerate: types.optional(types.boolean, true),
     update: types.optional(types.boolean, false),
     sentUserGenerate: types.optional(types.boolean, false),
@@ -194,6 +197,11 @@ const Completion = types
     },
 
     afterCreate() {
+      //
+      if (self.userGenerate && !self.sentUserGenerate) {
+        self.loadedDate = new Date();
+      }
+
       self.traverseTree(node => {
         // create mapping from name to Model (by ref)
         if (node && node.name && node.id) self.names.set(node.name, node.id);
@@ -213,7 +221,7 @@ const Completion = types
       // [TODO] we need to traverse this two times, fix
       self.traverseTree(node => {
         if (node && node.onHotKey && node.hotkey) {
-          Hotkey.addKey(node.hotkey, node.onHotKey);
+          Hotkey.addKey(node.hotkey, node.onHotKey, node.hotkeyScope);
         }
 
         /**
@@ -229,7 +237,7 @@ const Completion = types
         }
       });
 
-      Hotkey.setScope("main");
+      Hotkey.setScope("__main__");
     },
 
     serializeCompletion() {
@@ -448,6 +456,7 @@ export default types
         pk: c.id,
         createdAgo: c.created_ago,
         createdBy: c.created_username,
+        leadTime: c.leadTime,
         honeypot: c.honeypot,
         root: root,
         userGenerate: false,
