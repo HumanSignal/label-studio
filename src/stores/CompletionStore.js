@@ -213,7 +213,7 @@ const Completion = types
       // [TODO] we need to traverse this two times, fix
       self.traverseTree(node => {
         if (node && node.onHotKey && node.hotkey) {
-          Hotkey.addKey(node.hotkey, node.onHotKey);
+          Hotkey.addKey(node.hotkey, node.onHotKey, node.hotkeyScope);
         }
 
         /**
@@ -229,7 +229,7 @@ const Completion = types
         }
       });
 
-      Hotkey.setScope("main");
+      Hotkey.setScope("__main__");
     },
 
     serializeCompletion() {
