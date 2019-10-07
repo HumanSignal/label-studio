@@ -4,6 +4,7 @@ import { AudioRegions } from "../examples/audio_regions";
 import { DialogueAnalysis } from "../examples/dialogue_analysis";
 import { ImageBbox } from "../examples/image_bbox";
 import { ImagePolygons } from "../examples/image_polygons";
+import { ImageRegions } from "../examples/image_regions";
 import { ImageKeyPoint } from "../examples/image_keypoints";
 import { ImageMultilabel } from "../examples/image_multilabel";
 import { NamedEntity } from "../examples/named_entity";
