@@ -189,11 +189,19 @@ class TextHighlight extends Component {
     /**
      * Start position of selected item
      */
-    const startContainerPosition = parseInt(range.startContainer.parentNode.dataset.position);
+    let startContainerPosition = parseInt(range.startContainer.parentNode.dataset.position);
     /**
      * End position of selected item
      */
-    const endContainerPosition = parseInt(range.endContainer.parentNode.dataset.position);
+    let endContainerPosition = parseInt(range.endContainer.parentNode.dataset.position);
+
+    if (!range.startContainer.parentNode.dataset.position) {
+      startContainerPosition = parseInt(range.startContainer.dataset.position);
+    }
+
+    if (!range.endContainer.parentNode.dataset.position) {
+      endContainerPosition = parseInt(range.endContainer.dataset.position);
+    }
 
     let startHL = startContainerPosition < endContainerPosition ? startContainerPosition : endContainerPosition;
     let endHL = startContainerPosition < endContainerPosition ? endContainerPosition : startContainerPosition;
@@ -212,7 +220,6 @@ class TextHighlight extends Component {
    */
   onMouseUp(event) {
     this.mouseEvent.bind(this)();
-
   }
 
   onMouseDown(event) {
