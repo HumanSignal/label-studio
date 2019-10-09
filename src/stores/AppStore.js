@@ -1,10 +1,10 @@
 import { types, getEnv, flow, getSnapshot } from "mobx-state-tree";
 
 import Task from "./TaskStore";
+import Project from "./ProjectStore";
 import User from "./UserStore";
 import Settings from "./SettingsStore";
 import CompletionStore from "./CompletionStore";
-import PredictionStore from "./PredictionStore";
 import Hotkey from "../core/Hotkey";
 import { API_URL } from "../constants/Api";
 import Utils from "../utils";
@@ -12,7 +12,7 @@ import Utils from "../utils";
 export default types
   .model("AppStore", {
     /**
-     *
+     * XML config
      */
     config: types.string,
 
@@ -20,10 +20,8 @@ export default types
      * Task with data, id and project
      */
     task: types.maybeNull(Task),
-    /**
-     * ID of task
-     */
-    taskID: types.maybeNull(types.number),
+
+    project: types.maybeNull(Project),
 
     /**
      * Interfaces for configure Label Studio
@@ -41,18 +39,6 @@ export default types
       completions: [],
       predictions: [],
     }),
-
-    /**
-     * Predictions Store
-     */
-    // predictionStore: types.optional(PredictionStore, {
-    //   predictions: [],
-    // }),
-
-    /**
-     * Project ID from platform
-     */
-    projectID: types.integer,
 
     /**
      * Expert of Label Studio
@@ -135,7 +121,7 @@ export default types
      * Request to get description of this task
      */
     const openDescription = flow(function* openDescription() {
-      let url = `${API_URL.MAIN}${API_URL.PROJECTS}/${self.projectID}${API_URL.EXPERT_INSRUCTIONS}`;
+      let url = `${API_URL.MAIN}${API_URL.PROJECTS}/${self.project.id}${API_URL.EXPERT_INSRUCTIONS}`;
 
       const res = yield self.fetch(url);
 
@@ -233,10 +219,12 @@ export default types
      * Load task from API
      */
     function loadTask() {
-      if (self.taskID) {
-        return loadTaskAPI(`${API_URL.MAIN}${API_URL.TASKS}/${self.taskID}/`);
-      } else if (self.explore && self.projectID) {
-        return loadTaskAPI(`${API_URL.MAIN}${API_URL.PROJECTS}/${self.projectID}${API_URL.NEXT}`);
+      if (self.task && self.explore) {
+        if (self.task.id) {
+          return loadTaskAPI(`${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}/`);
+        }
+      } else if (self.explore && self.project.id) {
+        return loadTaskAPI(`${API_URL.MAIN}${API_URL.PROJECTS}/${self.project.id}${API_URL.NEXT}`);
       }
     }
 
@@ -392,7 +380,7 @@ export default types
             self.markLoading(false);
             self.completionStore.selected.sendUserGenerate();
 
-            if (self.explore && self.projectID) {
+            if (self.explore && self.project.id) {
               self.labeledSuccess = true;
             }
           }

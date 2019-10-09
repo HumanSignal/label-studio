@@ -19,32 +19,10 @@ let enviroment = DevelopmentEnvironment;
 if (process.env.NODE_ENV === "production") {
   enviroment = ProductionEnviroment;
 
-  const app = AppStore.create(enviroment.getData(), {
-    fetch: Requests.fetcher,
-    patch: Requests.patch,
-    post: Requests.poster,
-    remove: Requests.remover,
-    alert: m => console.log(m), // Noop for demo: window.alert(m)
-  });
+  window.LabelStudio = (element, options) => {
+    let params = options;
 
-  /**
-   * Initialize store
-   */
-  app.initializeStore(enviroment.getState());
-
-  window.Htx = app;
-
-  ReactDOM.render(
-    <Provider store={app}>
-      <App />
-    </Provider>,
-    enviroment.rootElement(),
-  );
-} else {
-  enviroment = DevelopmentEnvironment;
-
-  enviroment.getData().then(resp => {
-    const app = AppStore.create(resp, {
+    const app = AppStore.create(params, {
       fetch: Requests.fetcher,
       patch: Requests.patch,
       post: Requests.poster,
@@ -55,19 +33,64 @@ if (process.env.NODE_ENV === "production") {
     /**
      * Initialize store
      */
-    enviroment.getState().then(state => {
-      app.initializeStore(state);
-    });
-
-    window.Htx = app;
+    app.initializeStore({ completions: params.completions, predictions: params.predictions });
 
     ReactDOM.render(
       <Provider store={app}>
         <App />
       </Provider>,
-      enviroment.rootElement(),
+      enviroment.rootElement(element),
     );
-  });
+  };
+} else {
+  enviroment = DevelopmentEnvironment;
+
+  window.LabelStudio = (element, options) => {
+    let params = options;
+
+    if (!options.config) {
+      enviroment.getExample().then(result => {
+        params = {
+          ...params,
+          ...result,
+        };
+
+        let app = AppStore.create(params, {
+          fetch: Requests.fetcher,
+          patch: Requests.patch,
+          post: Requests.poster,
+          remove: Requests.remover,
+          alert: m => console.log(m), // Noop for demo: window.alert(m)
+        });
+
+        app.initializeStore({ completions: [params.completion] });
+
+        ReactDOM.render(
+          <Provider store={app}>
+            <App />
+          </Provider>,
+          enviroment.rootElement(element),
+        );
+      });
+    } else {
+      let app = AppStore.create(params, {
+        fetch: Requests.fetcher,
+        patch: Requests.patch,
+        post: Requests.poster,
+        remove: Requests.remover,
+        alert: m => console.log(m), // Noop for demo: window.alert(m)
+      });
+
+      app.initializeStore({ completions: params.completions, predictions: params.predictions });
+
+      ReactDOM.render(
+        <Provider store={app}>
+          <App />
+        </Provider>,
+        enviroment.rootElement(element),
+      );
+    }
+  };
 }
 
 // If you want your app to work offline and load faster, you can change
