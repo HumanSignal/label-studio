@@ -4,6 +4,8 @@ type: guide
 order: 102
 ---
 
+## Development usage
+
 Clone the repository and install all dependencies:
 
 ```bash
@@ -24,6 +26,12 @@ And open your browser at http://localhost:3000
 
 A good introduction point is to study `src/env/development.js`. That file defines a labeling config for the studio as well as creates the environment.
 
+To change the configuration of the project you need to assign the value to the variable `data`:
+
+```javascript
+const data = Sentiment;
+```
+
 ## Run a production build
 
 ```bash
@@ -34,7 +42,7 @@ Generates the compiled version of label studio. This compiled version needs to b
 
 ## Embed
 
-The easiest way to embed Label Studio into your application is to re-use the initialization code from `backend/templates/index.html`. 
+The easiest way to embed Label Studio into your application is to re-use the initialization code from `backend/templates/index.html`.
 
 ## Extend
 
