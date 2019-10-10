@@ -19,28 +19,23 @@
 </head>
 
 <body>
-  <div id="header">
-    <a id="logo" href="/">
-      <img src="/static/images/ls_logo.png" alt="label studio logo" height="40">
-      <span style="font-size: 1.2em;">{{ config['title'] }}</span>
-    </a>
+  {% include 'header.html' %}
 
-    <ul id="nav">
-      <a href="https://labelstud.io/guide/" style="">Guide</a>
-      <a href="https://github.com/heartexlabs/label-studio"><img src="/static/images/github.svg" height="22" /></a>
-    </ul>
-  </div>
-  
   <div class="content">
     <div class="wrapper">
-      <h2>Tasks and Completions</h2>
-      <br/>
-      <a class="btn" href="/">Start Labeling</a>
-      <br/><br/>
-      <div>Total tasks: <i>{{ config['input_path'] }}</i> with {{ task_ids|length }} items</div>
-      <div>Total completions: <i>{{ config['output_dir'] }}</i> with {{ completions|length }} items</div>
-      <br/>
 
+      <!-- Statistics -->
+      <div class="segment">
+        Total tasks: {{ task_ids|length }} items<br/>
+          <i class="small">{{ config['input_path'] }}</i>
+        <br/><br/>
+        Total completions: {{ completions|length }} items<br>
+          <i class="small">{{ config['output_dir'] }}</i>
+      </div>
+
+      <br/><br/><br/>
+
+      <!-- Table -->
       <table>
         <tr>
           <th>Task ID</th>
@@ -64,7 +59,15 @@
         {% endfor %}
       </table>
     </div>
+
+      <!-- Start labeling button -->
+      <br/>
+      <a class="btn" href="/">Start Labeling</a>
+      <br/><br/>
+
   </div>
+
+
   <script>
     document.querySelectorAll(".remove-completion").forEach(function(test) {
         test.addEventListener("click", function(event) {
