@@ -6,11 +6,9 @@ import { types, getParentOfType, destroy, getRoot, getParent } from "mobx-state-
 import { observer, inject, Provider } from "mobx-react";
 import { SortableContainer, SortableElement, sortableHandle } from "react-sortable-hoc";
 import arrayMove from "array-move";
-import { List } from "semantic-ui-react";
+import { List } from "antd";
 
 import { guidGenerator } from "../../core/Helpers";
-import { runTemplate, variableNotation } from "../../core/Template";
-import ProcessAttrsMixin from "../mixins/ProcessAttrs";
 
 const RankerItemModel = types
   .model({

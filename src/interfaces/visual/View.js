@@ -37,7 +37,7 @@ const Model = types.model({
     "view",
     "header",
     "labels",
-
+    "table",
     "choices",
     "rating",
     "ranker",

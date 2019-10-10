@@ -2,7 +2,6 @@ import React, { Component } from "react";
 
 import { observer, inject } from "mobx-react";
 import { types, getParentOfType, getRoot } from "mobx-state-tree";
-import { Button, Icon } from "semantic-ui-react";
 
 import Registry from "../../core/Registry";
 import { isHtx, cloneNode } from "../../core/Helpers";

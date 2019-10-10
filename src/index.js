@@ -2,7 +2,6 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { Provider } from "mobx-react";
 
-import "semantic-ui-css/semantic.min.css";
 import "./assets/styles/global.scss";
 
 import App from "./components/App/App";
