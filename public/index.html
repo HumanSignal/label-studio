@@ -41,8 +41,6 @@
 
     <div id="label-studio"></div>
 
-    <div id="test"></div>
-
     <footer class="footer">Made by <a target="_blank" href="https://heartex.net">Heartex</a> in San Francisco
       <br/><br/>
       <img src="./images/3nowhite.svg" height="80" />
@@ -50,7 +48,7 @@
 
     <script>
       setTimeout(() => {
-        window.LabelStudio("label-studio", {
+        var ls = new LabelStudio("label-studio", {
           // config: `<View>
           //           <Labels name="ner" toName="text">
           //             <Label value="Person"></Label>
