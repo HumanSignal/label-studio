@@ -41,7 +41,7 @@
             new LabelStudio("label-studio", {
                 config: '{{ label_config_line | safe }}',
                 expert: {"pk": 1, "firstName": "Label", "lastName": "Expert"},
-                isLoading: false,
+                project: { id: 1 },
                 interfaces: [
                     "basic",
                     "panel",  // undo, redo, reset panel
@@ -55,11 +55,9 @@
                     "side-column" // entity
                 ],
                 task: {
-                    // load: true,
                     id: {{ task_data["id"] }},
                     data: {{ task_data["data"] | json | safe }},
                     completions: {{ task_data["completions"] | json | safe }},
-                    // completions: [],
                     // predictions: [],  // the same as completions but will be displayed in predictions section
                 }
             });
@@ -68,8 +66,7 @@
             new LabelStudio("label-studio", {
                 config: '{{ label_config_line | safe }}',
                 expert: {"pk": 1, "firstName": "Label", "lastName": "Expert"},
-                isLoading: false,
-                explore: true,
+                explore: true, // label stream mode (task by task)
                 project: { id: 1 },
                 interfaces: [
                     "basic",
