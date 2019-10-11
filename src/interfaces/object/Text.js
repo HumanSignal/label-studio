@@ -8,6 +8,7 @@ import { guidGenerator, restoreNewsnapshot } from "../../core/Helpers";
 import TextHighlight from "../../components/TextHighlight/TextHighlight";
 import { runTemplate } from "../../core/Template";
 import { TextRegionModel, HtxTextRegion } from "./TextRegion";
+import InfoModal from "../../components/Infomodal/Infomodal";
 
 /**
  * Text tag shows a text that can be labeled
@@ -135,6 +136,14 @@ const Model = types
 
       if (fromModel.type === "textarea" || fromModel.type === "choices") {
         self.completion.names.get(obj.from_name).fromStateJSON(obj);
+        return;
+      }
+
+      /**
+       *
+       */
+      if (!obj.value.end || !obj.value.start) {
+        InfoModal.error(`Error with incorrect end or start of text: ${obj.value.text}.`);
         return;
       }
 
