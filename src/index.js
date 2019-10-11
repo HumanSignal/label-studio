@@ -21,6 +21,10 @@ if (process.env.NODE_ENV === "production") {
   window.LabelStudio = (element, options) => {
     let params = options;
 
+    if (params && params.task) {
+      params.task = enviroment.getData(params.task);
+    }
+
     const app = AppStore.create(params, {
       fetch: Requests.fetcher,
       patch: Requests.patch,
@@ -32,7 +36,7 @@ if (process.env.NODE_ENV === "production") {
     /**
      * Initialize store
      */
-    app.initializeStore({ completions: params.completions, predictions: params.predictions });
+    app.initializeStore(enviroment.getState(params.task));
 
     ReactDOM.render(
       <Provider store={app}>

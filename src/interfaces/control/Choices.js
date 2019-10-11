@@ -107,7 +107,6 @@ const ChoicesModel = types.compose(
 );
 
 const HtxChoices = observer(({ item }) => {
-  console.log(item.showinline);
   return (
     <div style={{ marginTop: "1em", marginBottom: "1em" }}>
       {item.showinline ? (

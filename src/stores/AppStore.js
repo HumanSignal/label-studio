@@ -219,11 +219,9 @@ export default types
      * Load task from API
      */
     function loadTask() {
-      if (self.task && self.explore) {
-        if (self.task.id) {
-          return loadTaskAPI(`${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}/`);
-        }
-      } else if (self.explore && self.project.id) {
+      if (self.task && self.task.load && self.task.id) {
+        return loadTaskAPI(`${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}/`);
+      } else if (self.explore && self.project && self.project.id) {
         return loadTaskAPI(`${API_URL.MAIN}${API_URL.PROJECTS}/${self.project.id}${API_URL.NEXT}`);
       }
     }

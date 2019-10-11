@@ -306,8 +306,6 @@ export default types
 
       const prediction = self.addPredictionItem(node, "list");
 
-      console.log(prediction);
-
       return prediction;
     }
 
