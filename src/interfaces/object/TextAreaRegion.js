@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 import { observer, inject, Provider } from "mobx-react";
 import { types, getParentOfType, getRoot } from "mobx-state-tree";
-import { Message } from "semantic-ui-react";
+import { Alert } from "antd";
 
 import Types from "../../core/Types";
 
@@ -44,6 +44,7 @@ const HtxTextAreaRegionView = ({ store, item }) => {
   let markStyle = {
     cursor: store.completionStore.selected.relationMode ? "crosshair" : "pointer",
     display: "block",
+    marginBottom: "0.5em",
   };
 
   if (item.selected) {
@@ -59,8 +60,9 @@ const HtxTextAreaRegionView = ({ store, item }) => {
   }
 
   return (
-    <Message
-      className="warning"
+    <Alert
+      type="success"
+      message={item._value}
       style={markStyle}
       onClick={item.onClickRegion}
       onMouseOver={() => {
@@ -74,9 +76,7 @@ const HtxTextAreaRegionView = ({ store, item }) => {
           item.setHighlight(false);
         }
       }}
-    >
-      <p>{item._value}</p>
-    </Message>
+    />
   );
 };
 

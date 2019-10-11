@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { observer } from "mobx-react";
-import { Card } from "antd";
-import { List } from "semantic-ui-react";
+import { Card, List } from "antd";
 import Utils from "../../utils";
 import styles from "../Completions/Completions.module.scss";
 
@@ -13,15 +12,9 @@ const Prediction = observer(({ item, store }) => {
         !item.selected && store.completionStore.selectPrediction(item.id);
       }}
     >
-      <List.Content>
-        <List.Header as="a" style={{ marginBottom: "1em" }}>
-          {item.createdBy ? `Model (v. ${item.createdBy})` : null}
-        </List.Header>
-        <List.Description as="a" style={{ marginBottom: "1em" }}>
-          Created
-          <i>{item.createdAgo ? ` ${item.createdAgo} ago` : ` ${Utils.UDate.prettyDate(item.createdDate)}`}</i>
-        </List.Description>
-      </List.Content>
+      <div className={styles.title}>{item.createdBy ? `Model (v. ${item.createdBy})` : null}</div>
+      Created
+      <i>{item.createdAgo ? ` ${item.createdAgo} ago` : ` ${Utils.UDate.prettyDate(item.createdDate)}`}</i>
     </List.Item>
   );
 });
@@ -46,9 +39,7 @@ class Predictions extends Component {
             content
           ) : (
             <List.Item>
-              <List.Description>
-                <div style={{ padding: "1em 24px" }}>No predictions</div>
-              </List.Description>
+              <div style={{ padding: "0 12px" }}>No predictions</div>
             </List.Item>
           )}
         </List>

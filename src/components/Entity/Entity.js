@@ -1,8 +1,7 @@
 import React, { Fragment } from "react";
 import { observer, inject } from "mobx-react";
 import { getType } from "mobx-state-tree";
-import { Input, Form } from "semantic-ui-react";
-import { Icon, Button, Tag } from "antd";
+import { Form, Input, Icon, Button, Tag } from "antd";
 
 import { Node, NodeMinimal } from "../Node/Node";
 import Hint from "../Hint/Hint";
@@ -113,27 +112,41 @@ export default observer(({ store, completion }) => {
       </div>
 
       {completion.normalizationMode && (
-        <div>
-          <Form
-            style={{ marginTop: "0.5em" }}
-            onSubmit={ev => {
+        <Form
+          style={{ marginTop: "0.5em", marginBottom: "0.5em" }}
+          onSubmit={ev => {
+            const { value } = ev.target;
+            node.setNormalization(node.normInput);
+            completion.setNormalizationMode(false);
+
+            ev.preventDefault();
+            return false;
+          }}
+        >
+          <Input
+            onChange={ev => {
               const { value } = ev.target;
-              node.setNormalization(node.normInput);
+              node.setNormInput(value);
+            }}
+            style={{ marginBottom: "0.5em" }}
+            placeholder="Add Normalization"
+          />
+          <Button type="primary" htmlType="submit" style={{ marginRight: "0.5em" }}>
+            Add
+          </Button>
+          <Button
+            type="danger"
+            htmlType="reset"
+            onClick={ev => {
               completion.setNormalizationMode(false);
 
               ev.preventDefault();
               return false;
             }}
           >
-            <Form.Input
-              onChange={ev => {
-                const { value } = ev.target;
-                node.setNormInput(value);
-              }}
-              placeholder="Add Normalization"
-            />
-          </Form>
-        </div>
+            Cancel
+          </Button>
+        </Form>
       )}
     </Fragment>
   );

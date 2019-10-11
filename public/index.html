@@ -47,5 +47,75 @@
       <br/><br/>
       <img src="./images/3nowhite.svg" height="80" />
     </footer>
+
+    <script>
+      setTimeout(() => {
+        var ls = new LabelStudio("label-studio", {
+          // config: `<View>
+          //           <Labels name="ner" toName="text">
+          //             <Label value="Person"></Label>
+          //             <Label value="Organization"></Label>
+          //             <Label value="Fact"></Label>
+          //             <Label value="Money"></Label>
+          //             <Label value="Date"></Label>
+          //             <Label value="Time"></Label>
+          //             <Label value="Ordinal"></Label>
+          //             <Label value="Percent"></Label>
+          //             <Label value="Product"></Label>
+          //             <Label value="Language"></Label>
+          //             <Label value="Location"></Label>
+          //           </Labels>
+          //           <Text name="text" value="$text"></Text>
+          //         </View>`,
+
+          expert: {
+            pk: 1,
+            firstName: "Oliver",
+            lastName: "Jones"
+          },
+
+          isLoading: false,
+
+          interfaces: [
+            "controls",
+            "predictions",
+            "completions",
+            "completions:menu",
+            "predictions:menu",
+            "panel",
+            "side-column",
+            "update",
+            "check-empty",
+          ],
+
+          completions: [
+          {
+            "result": [
+                {
+                    "from_name": "ner",
+                    "id": "beFiQTT1cU",
+                    "source": "$text",
+                    "to_name": "text",
+                    "type": "labels",
+                    "value": {
+                        "end": 5,
+                        "labels": [
+                            "Date"
+                        ],
+                        "start": 0,
+                        "text": "Shower"
+                    }
+                }
+            ]
+        }
+          ],
+          predictions: [],
+
+          task: {
+            data: '{"text": "Showers continued throughou"}'
+          }
+        });
+      }, 2000);
+    </script>
   </body>
 </html>

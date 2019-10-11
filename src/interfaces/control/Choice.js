@@ -2,7 +2,8 @@ import React, { Component } from "react";
 
 import { observer, inject } from "mobx-react";
 import { types, getParentOfType } from "mobx-state-tree";
-import { Checkbox, Form } from "semantic-ui-react";
+
+import { Checkbox, Radio, Form } from "antd";
 
 import { ChoicesModel } from "./Choices";
 import Registry from "../../core/Registry";
@@ -13,6 +14,7 @@ import Hint from "../../components/Hint/Hint";
 
 /**
  * Choice tag represents a single choice
+ *
  * @example
  * <View>
  *   <Choices name="gender" toName="txt-1" choice="single">
@@ -22,9 +24,9 @@ import Hint from "../../components/Hint/Hint";
  *   <Text name="txt-1" value="John went to see Marry"></Text>
  * </View>
  * @name Choice
- * @param {string} value label value
- * @param {boolean=} selected If this label should be preselected
- * @param {string=} hotkey hokey
+ * @param {string} value lLbel value
+ * @param {boolean} selected If this label should be preselected
+ * @param {string} hotkey HotKey
  */
 const TagAttrs = types.model({
   selected: types.optional(types.boolean, false),
@@ -40,6 +42,12 @@ const Model = types
     _value: types.optional(types.string, ""),
   })
   .views(self => ({
+    get typeOfChoice() {
+      const choice = getParentOfType(self, ChoicesModel).choice;
+
+      return choice;
+    },
+
     get isCheckbox() {
       const choice = getParentOfType(self, ChoicesModel).choice;
       return choice === "multiple" || choice === "single";
@@ -81,23 +89,23 @@ const HtxChoice = inject("store")(
     if (item.style) style = Tree.cssConverter(item.style);
 
     if (item.isCheckbox) {
-      const cStyle = Object.assign(
-        { marginRight: "1em", marginBottom: "0.5em", display: "flex", alignItems: "center" },
-        style,
-      );
+      const cStyle = Object.assign({ display: "flex", alignItems: "center", marginBottom: 0 }, style);
 
       return (
-        <div style={cStyle}>
+        <Form.Item style={cStyle}>
           <Checkbox
             name={item._value}
-            label={item._value}
             onChange={ev => {
               item.toggleSelected();
             }}
             checked={item.selected}
-          />
-          {store.settings.enableTooltips && store.settings.enableHotkeys && item.hotkey && <Hint>[{item.hotkey}]</Hint>}
-        </div>
+          >
+            {item._value}
+            {store.settings.enableTooltips && store.settings.enableHotkeys && item.hotkey && (
+              <Hint>[{item.hotkey}]</Hint>
+            )}
+          </Checkbox>
+        </Form.Item>
       );
     } else {
       const label = (
@@ -109,15 +117,16 @@ const HtxChoice = inject("store")(
 
       return (
         <div style={style}>
-          <Form.Radio
-            label={label}
+          <Radio
             value={item._value}
-            style={{ display: "inline-block" }}
+            style={{ display: "inline-block", marginBottom: "0.5em" }}
             checked={item.selected}
             onChange={ev => {
               item.toggleSelected();
             }}
-          />
+          >
+            {label}
+          </Radio>
         </div>
       );
     }

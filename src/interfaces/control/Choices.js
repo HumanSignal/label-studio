@@ -13,7 +13,7 @@ import { HtxLabels, LabelsModel } from "./Labels";
 import { RectangleModel } from "./Rectangle";
 import SelectedModelMixin from "../mixins/SelectedModel";
 
-import { Form } from "semantic-ui-react";
+import { Form, Checkbox } from "antd";
 
 /**
  * Choices tag, create a group of choices, radio, or checkboxes. Shall
@@ -108,16 +108,14 @@ const ChoicesModel = types.compose(
 
 const HtxChoices = observer(({ item }) => {
   return (
-    <div style={{ marginTop: "1em" }}>
-      <Form>
-        {item.showinline ? (
-          <Form.Group inline style={{ flexWrap: "wrap" }}>
-            {Tree.renderChildren(item)}
-          </Form.Group>
-        ) : (
-          <Form.Group grouped>{Tree.renderChildren(item)}</Form.Group>
-        )}
-      </Form>
+    <div style={{ marginTop: "1em", marginBottom: "1em" }}>
+      {item.showinline ? (
+        <Form layout="horizontal" style={{ display: "flex" }}>
+          {Tree.renderChildren(item)}
+        </Form>
+      ) : (
+        <Form layout="vertical">{Tree.renderChildren(item)}</Form>
+      )}
     </div>
   );
 });

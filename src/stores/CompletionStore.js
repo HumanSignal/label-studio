@@ -379,7 +379,7 @@ export default types
       /**
        * If completion is initial completion
        */
-      if (self.store.task && type === "initial") {
+      if (self.store.task && self.store.task.data && type === "initial") {
         createdCompletion.traverseTree(node => node.updateValue && node.updateValue(self.store));
       }
 

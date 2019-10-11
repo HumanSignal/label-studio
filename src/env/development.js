@@ -11,119 +11,42 @@ import { References } from "../examples/references";
 import { TranscribeAudio } from "../examples/transcribe_audio";
 
 /**
- * Choose labeling scheme
+ * Custom Data
  */
-let dataType = Sentiment;
+const data = Sentiment;
 
-function templateDynamicData() {
-  let settings = {
-    /**
-     * For development environment
-     */
-    developmentEnv: true,
-    /**
-     * Project ID
-     */
-    projectID: 1,
-    /**
-     * Flag to display completion
-     */
-    viewCompletion: true,
-    /**
-     * Loading of LS
-     */
-    isLoading: false,
-    /**
-     * Expert
-     */
-    expert: {
-      pk: 1,
-      lastName: "Jones",
-      firstName: "Oliver",
-    },
-    /**
-     * Debug
-     */
-    debug: window.location.search.indexOf("debug=true") !== -1,
-    interfaces: window.editorInterfaces
-      ? window.editorInterfaces
-      : [
-          "controls",
-          "predictions",
-          "completions",
-          "completions:menu",
-          "predictions:menu",
-          "panel",
-          "side-column",
-          "update",
-          "check-empty",
-        ],
-    task: {
-      data: JSON.stringify(dataType.tasks[0]),
-      project: 10,
-      id: 100,
-      completions: [],
-      predictions: [],
-    },
-  };
-
-  if (settings.viewCompletion && dataType.completion) {
-    settings = {
-      ...settings,
-      task: {
-        ...settings.task,
-        completions: dataType.completion.completions,
-        predictions: dataType.completion.predictions,
-      },
-    };
-  }
-
-  let reqXML = () =>
-    fetch(dataType.config)
-      .then(resp => resp.text())
-      .then(r => {
-        settings = {
-          ...settings,
-          config: r,
-        };
-
-        return settings;
-      });
-
-  return reqXML();
-}
-
-function getData() {
-  return templateDynamicData();
+/**
+ * Get current config
+ * @param {string} pathToConfig
+ */
+async function getConfig(pathToConfig) {
+  const response = await fetch(pathToConfig);
+  const config = await response.text();
+  return config;
 }
 
 /**
- * Get completions for task
+ * Get custom config
  */
-async function getState() {
-  const resp = await getData();
-  /**
-   * Completions
-   */
-  const resultCompletions = resp.task.completions ? resp.task.completions : null;
-  /**
-   * Predictions for Platform
-   */
-  const resultPredictions = resp.task.predictions ? resp.task.predictions : null;
+async function getExample() {
+  let datatype = data;
 
-  return {
-    completions: resultCompletions,
-    predictions: resultPredictions,
+  let config = await getConfig(datatype.config);
+  let task = {
+    data: JSON.stringify(datatype.tasks[0]),
   };
+  let completion = datatype.completion.completions[0];
+
+  return { config, task, completion };
 }
 
 /**
- * Function to return Root element
+ * Function to return App element
  */
-function rootElement() {
+function rootElement(element) {
   const el = document.createElement("div");
 
-  let root = document.getElementById("label-studio");
+  let root = document.getElementById(element);
 
   root.innerHTML = "";
   root.appendChild(el);
@@ -133,4 +56,4 @@ function rootElement() {
   return el;
 }
 
-export default { getState, getData, rootElement };
+export default { rootElement, getExample };

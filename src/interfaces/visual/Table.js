@@ -2,7 +2,8 @@ import React from "react";
 import { types } from "mobx-state-tree";
 import { observer, inject } from "mobx-react";
 
-import { Table, Header } from "semantic-ui-react";
+import { Table } from "antd";
+
 import Registry from "../../core/Registry";
 import ProcessAttrsMixin from "../mixins/ProcessAttrs";
 
@@ -15,7 +16,6 @@ import ProcessAttrsMixin from "../mixins/ProcessAttrs";
  */
 const Model = types.model({
   type: "table",
-  size: types.optional(types.string, "h4"),
   value: types.maybeNull(types.string),
   _value: types.optional(types.string, ""),
 });
@@ -29,33 +29,23 @@ const TableModel = types.compose(
 const HtxTable = inject("store")(
   observer(({ store, item }) => {
     let value = item._value;
+
     if (!value) {
       if (store.task) value = store.task.dataObj;
     }
 
-    return (
-      <div style={{ marginTop: "1em" }}>
-        <Table basic="very" celled collapsing>
-          <Table.Body>
-            {Object.keys(value).map(k => {
-              let v = value[k];
-              if (typeof v === "object") v = JSON.stringify(v);
+    let dataSource = [];
+    let columns = [{ title: "Type", dataIndex: "type" }, { title: "Value", dataIndex: "value" }];
 
-              return (
-                <Table.Row>
-                  <Table.Cell>
-                    <Header as="h4">
-                      <Header.Subheader>{k}</Header.Subheader>
-                    </Header>
-                  </Table.Cell>
-                  <Table.Cell>{v}</Table.Cell>
-                </Table.Row>
-              );
-            })}
-          </Table.Body>
-        </Table>
-      </div>
-    );
+    Object.keys(value).map(k => {
+      let val = value[k];
+
+      if (typeof val === "object") val = JSON.stringify(val);
+
+      dataSource.push({ type: k, value: val });
+    });
+
+    return <Table dataSource={dataSource} columns={columns} />;
   }),
 );
 
