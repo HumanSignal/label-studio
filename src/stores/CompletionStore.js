@@ -456,7 +456,7 @@ export default types
         pk: c.id,
         createdAgo: c.created_ago,
         createdBy: c.created_username,
-        leadTime: c.leadTime,
+        leadTime: c.lead_time,
         honeypot: c.honeypot,
         root: root,
         userGenerate: false,
