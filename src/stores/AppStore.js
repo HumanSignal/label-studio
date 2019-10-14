@@ -350,7 +350,7 @@ export default types
           const state = getSnapshot(c);
 
           const body = JSON.stringify({
-            leadTime: (new Date() - c.loadedDate) / 1000,
+            lead_time: (new Date() - c.loadedDate) / 1000,
             result: res,
           });
 
