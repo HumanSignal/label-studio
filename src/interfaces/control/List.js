@@ -5,7 +5,7 @@ import { types } from "mobx-state-tree";
 import { observer, inject } from "mobx-react";
 import { SortableContainer, SortableElement, sortableHandle } from "react-sortable-hoc";
 import arrayMove from "array-move";
-import { List } from "semantic-ui-react";
+import { List } from "antd";
 
 import { guidGenerator } from "../../core/Helpers";
 import { variableNotation } from "../../core/Template";

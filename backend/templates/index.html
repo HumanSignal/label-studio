@@ -2,97 +2,85 @@
 <html lang="en">
 <head>
     <title>{{ config['title'] }}</title>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta charset="utf-8"/>
 
     <link href="//fonts.googleapis.com/css?family=Dosis:500&amp;text=LabelStudio" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="/static/css/reset.css">
-    
+
     <link rel="shortcut icon" href="/static/favicon.ico"/>
     <link rel="stylesheet" href="/static/css/main.css">
     <link rel="stylesheet" href="/static/css/fontall.min.css">
 
-    <!-- Editor -->
+    <!-- Editor CSS -->
     {% for css in editor_css %}
         <link href="{{ css }}" rel="stylesheet">
     {% endfor %}
 
-        <script src="/static/js/helpers.js"></script>
-
-        <style>
-    
-        </style>
-        
-</head>
-
-<body>
-    
-  <div id="header">
-    <a id="logo" href="/">
-      <img src="/static/images/ls_logo.png" alt="label studio logo" height="40">
-      <span style="font-size: 1.4em;">{{ config['title'] }}</span>
-    </a>
-    <ul id="nav">
-      <a class="link" href="/tasks">Tasks and Completions</a>
-      <span class="delim">|</span>
-      <a href="https://labelstud.io/guide/" style="">Guide</a>
-      <a href="https://github.com/heartexlabs/label-studio"><img src="/static/images/github.svg" height="22" /></a>
-    </ul>
-  </div>
-  
-  <div class="content">
-      <div class="editor">
-        <div id="label-studio"></div>
-      </div>
-    </div>
-
-    <script>
-        window.debugEditor = "{{ config['editor']['debug'] }}" === "True";
-        window.editorAppConfig = '{{ label_config_line | safe }}';
-        window.expertData = {"pk": 1, "firstName": "Label", "lastName": "Expert"};
-
-        {% if task_data %}
-            // interface for completions view mode
-            window.editorInterfaces = [
-                "basic",
-                "panel",  // undo, redo, reset panel
-                "controls",  // all control buttons: skip, submit, update
-                "submit",  // submit button on controls
-                "update",  // update button  on controls
-                "predictions", // show predictions from task.predictions = [{...}, {...}]
-                "predictions:menu", // right menu with prediction items
-                "completions",  // show completions
-                "completions:menu", // right menu with completion items
-                "side-column" // entity
-            ];
-
-            // load by task data injected into html
-            window.taskData = {{ task_data | json | safe }};
-
-            // another way is to load task by id using API
-            // window.taskID = {{ task_data['id'] }};
-        {% else %}
-            // interface for labeling mode
-            window.editorInterfaces = [
-                "basic",
-                "load",  // load next task
-                "panel",  // undo, redo, reset panel
-                "controls",  // all control buttons: skip, submit, update
-                "submit",  // submit button on controls
-                "predictions", // show predictions from task.predictions = [{...}, {...}]
-                "completions",  // show completions
-                "side-column" // entity
-            ];
-
-            // load next task for labeling on start
-            window.explore = true;
-            window.projectID = 1;
-        {% endif %}
-    </script>
-
-    <!-- Editor -->
+    <!-- Editor JS -->
     {% for js in editor_js %}
         <script src="{{ js }}"></script>
     {% endfor %}
+
+    <script src="/static/js/helpers.js"></script>
+</head>
+
+<body>
+
+{% include 'header.html' %}
+
+<!-- Editor -->
+<div class="content">
+    <div id="label-studio"></div>
+</div>
+
+<script>
+    window.onload = function () {
+        {% if task_data %}
+            // Show specified task with completions
+            new LabelStudio("label-studio", {
+                config: '{{ label_config_line | safe }}',
+                expert: {"pk": 1, "firstName": "Label", "lastName": "Expert"},
+                project: { id: 1 },
+                interfaces: [
+                    "basic",
+                    "panel",  // undo, redo, reset panel
+                    "controls",  // all control buttons: skip, submit, update
+                    "submit",  // submit button on controls
+                    "update",  // update button  on controls
+                    "predictions", // show predictions from task.predictions = [{...}, {...}]
+                    "predictions:menu", // right menu with prediction items
+                    "completions",  // show completions
+                    "completions:menu", // right menu with completion items
+                    "side-column" // entity
+                ],
+                task: {
+                    id: {{ task_data["id"] }},
+                    data: {{ task_data["data"] | json | safe }},
+                    completions: {{ task_data["completions"] | json | safe }},
+                    // predictions: [],  // the same as completions but will be displayed in predictions section
+                }
+            });
+        {% else %}
+            // Label stream mode
+            new LabelStudio("label-studio", {
+                config: '{{ label_config_line | safe }}',
+                expert: {"pk": 1, "firstName": "Label", "lastName": "Expert"},
+                explore: true, // label stream mode (task by task)
+                project: { id: 1 },
+                interfaces: [
+                    "basic",
+                    "load",  // load next task
+                    "panel",  // undo, redo, reset panel
+                    "controls",  // all control buttons: skip, submit, update
+                    "submit",  // submit button on controls
+                    "predictions", // show predictions from task.predictions = [{...}, {...}]
+                    "completions",  // show completions
+                    "side-column" // entity
+                ]
+            });
+        {% endif %}
+    }
+</script>
 </body>
 </html>

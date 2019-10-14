@@ -8,8 +8,6 @@ import { Circle, Shape, Label, Stage, Layer, Rect, Text, Transformer, Group, Lin
 
 import { guidGenerator, restoreNewsnapshot } from "../../core/Helpers";
 
-import { Dropdown, Input } from "semantic-ui-react";
-
 import Registry from "../../core/Registry";
 
 import { LabelsModel } from "../control/Labels";

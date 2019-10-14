@@ -1,6 +1,6 @@
 {
   "name": "label-studio",
-  "version": "0.1.6",
+  "version": "0.2.0",
   "private": true,
   "description": "Label Studio is a multi-domain data labeling tool with standardized output format",
   "author": {
@@ -26,6 +26,7 @@
     "lint-staged": "^9.2.0",
     "prettier": "^1.18.2",
     "react-test-renderer": "^16.8.6",
+    "rewire": "^4.0.1",
     "size-limit": "^1.3.7"
   },
   "dependencies": {
@@ -45,8 +46,6 @@
     "react-rating": "^1.6.2",
     "react-scripts": "2.1.1",
     "react-sortable-hoc": "^1.8.2",
-    "semantic-ui-css": "^2.4.1",
-    "semantic-ui-react": "^0.84.0",
     "svg.js": "^2.7.0",
     "wavesurfer.js": "^3.0.0",
     "xml2js": "^0.4.22"
@@ -67,7 +66,8 @@
     "lint": "eslint --debug src/",
     "lint:write": "eslint --debug src/ --fix",
     "publish": "GENERATE_SOURCEMAP=false npm run build",
-    "copy-examples": "bash scripts/copy.sh"
+    "copy-examples": "bash scripts/copy.sh",
+    "build-bundle": "npm run copy-examples && npm run test && node scripts/build-without-split.js"
   },
   "eslintConfig": {
     "extends": "react-app"

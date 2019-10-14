@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { observer } from "mobx-react";
-import { List } from "semantic-ui-react";
-import { Card, Button, Icon, Tooltip, Badge } from "antd";
+import { Card, Button, Icon, Tooltip, Badge, List } from "antd";
 
 import Utils from "../../utils";
 import styles from "./Completions.module.scss";
@@ -46,12 +45,12 @@ const Completion = observer(({ item, store }) => {
    * Title of card
    */
   if (item.userGenerate && !item.sentUserGenerate) {
-    completionID = "New Completion";
+    completionID = <span className={styles.title}>New completion</span>;
   } else {
     if (item.pk) {
-      completionID = `ID ${item.pk}`;
+      completionID = <span className={styles.title}>ID {item.pk}</span>;
     } else if (item.id) {
-      completionID = `ID ${item.id}`;
+      completionID = <span className={styles.title}>ID {item.id}</span>;
     }
   }
 
@@ -76,36 +75,30 @@ const Completion = observer(({ item, store }) => {
         !item.selected && store.completionStore.selectCompletion(item.id);
       }}
     >
-      <List.Content>
-        <List.Header as="a" style={{ marginBottom: "1em" }}>
-          {badge}
-          {completionID}
-        </List.Header>
+      <div className={styles.title}>
+        {badge}
+        {completionID}
+      </div>
+      Created
+      <i>{item.createdAgo ? ` ${item.createdAgo} ago` : ` ${Utils.UDate.prettyDate(item.createdDate)}`}</i>
+      {item.createdBy ? ` by ${item.createdBy}` : null}
+      {item.selected && (
+        <div className={styles.buttons}>
+          <Tooltip placement="topLeft" title="Delete selected completion">
+            <Button
+              type="danger"
+              onClick={ev => {
+                ev.preventDefault();
+                item.store.deleteCompletion(item);
+              }}
+            >
+              Delete
+            </Button>
+          </Tooltip>
 
-        <List.Description as="a">
-          Created
-          <i>{item.createdAgo ? ` ${item.createdAgo} ago` : ` ${Utils.UDate.prettyDate(item.createdDate)}`}</i>
-          {item.createdBy ? ` by ${item.createdBy}` : null}
-        </List.Description>
-
-        {item.selected && (
-          <div className={styles.buttons}>
-            <Tooltip placement="topLeft" title="Delete selected completion">
-              <Button
-                type="danger"
-                onClick={ev => {
-                  ev.preventDefault();
-                  item.store.deleteCompletion(item);
-                }}
-              >
-                Delete
-              </Button>
-            </Tooltip>
-
-            {item.honeypot ? removeHoney() : setHoney()}
-          </div>
-        )}
-      </List.Content>
+          {item.honeypot ? removeHoney() : setHoney()}
+        </div>
+      )}
     </List.Item>
   );
 });
@@ -133,15 +126,13 @@ class Completions extends Component {
 
     store.completionStore.savedCompletions.forEach(c => {
       if (c) {
-        content.push(<Completion key={c.pk} item={c} store={store} />);
+        content.push(<Completion key={c.id} item={c} store={store} />);
       }
     });
 
     return (
       <Card title={title} bodyStyle={{ padding: "0", paddingTop: "1px" }}>
-        <List divided relaxed>
-          {store.completionStore.savedCompletions ? content : <p>No completions submitted yet</p>}
-        </List>
+        <List>{store.completionStore.savedCompletions ? content : <p>No completions submitted yet</p>}</List>
       </Card>
     );
   }

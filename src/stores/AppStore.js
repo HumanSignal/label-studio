@@ -1,18 +1,20 @@
 import { types, getEnv, flow, getSnapshot } from "mobx-state-tree";
 
 import Task from "./TaskStore";
+import Project from "./ProjectStore";
 import User from "./UserStore";
 import Settings from "./SettingsStore";
 import CompletionStore from "./CompletionStore";
-import PredictionStore from "./PredictionStore";
 import Hotkey from "../core/Hotkey";
 import { API_URL } from "../constants/Api";
 import Utils from "../utils";
 
+import InfoModal from "../components/Infomodal/Infomodal";
+
 export default types
   .model("AppStore", {
     /**
-     *
+     * XML config
      */
     config: types.string,
 
@@ -20,10 +22,8 @@ export default types
      * Task with data, id and project
      */
     task: types.maybeNull(Task),
-    /**
-     * ID of task
-     */
-    taskID: types.maybeNull(types.number),
+
+    project: types.maybeNull(Project),
 
     /**
      * Interfaces for configure Label Studio
@@ -41,18 +41,6 @@ export default types
       completions: [],
       predictions: [],
     }),
-
-    /**
-     * Predictions Store
-     */
-    // predictionStore: types.optional(PredictionStore, {
-    //   predictions: [],
-    // }),
-
-    /**
-     * Project ID from platform
-     */
-    projectID: types.integer,
 
     /**
      * Expert of Label Studio
@@ -135,7 +123,7 @@ export default types
      * Request to get description of this task
      */
     const openDescription = flow(function* openDescription() {
-      let url = `${API_URL.MAIN}${API_URL.PROJECTS}/${self.projectID}${API_URL.EXPERT_INSRUCTIONS}`;
+      let url = `${API_URL.MAIN}${API_URL.PROJECTS}/${self.project.id}${API_URL.EXPERT_INSRUCTIONS}`;
 
       const res = yield self.fetch(url);
 
@@ -233,10 +221,10 @@ export default types
      * Load task from API
      */
     function loadTask() {
-      if (self.taskID) {
-        return loadTaskAPI(`${API_URL.MAIN}${API_URL.TASKS}/${self.taskID}/`);
-      } else if (self.explore && self.projectID) {
-        return loadTaskAPI(`${API_URL.MAIN}${API_URL.PROJECTS}/${self.projectID}${API_URL.NEXT}`);
+      if (self.task && self.task.load && self.task.id) {
+        return loadTaskAPI(`${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}/`);
+      } else if (self.explore && self.project && self.project.id) {
+        return loadTaskAPI(`${API_URL.MAIN}${API_URL.PROJECTS}/${self.project.id}${API_URL.NEXT}`);
       }
     }
 
@@ -343,7 +331,7 @@ export default types
 
     /**
      * Wrapper of completion send
-     * @param {string} requestType {patch or post}
+     * @param {string} requestType
      */
     const sendToServer = requestType => {
       return flow(function*() {
@@ -351,29 +339,33 @@ export default types
 
         c.beforeSend();
 
-        const res = c.serializeCompletion();
+        const savedCompletions = c.serializeCompletion();
 
-        if (self.hasInterface("check-empty") && res.length === 0) {
-          alert("You need to label at least something!");
+        /**
+         * Check for pending completions
+         */
+        if (self.hasInterface("check-empty") && savedCompletions.length === 0) {
+          InfoModal.warning("You need to label at least something!");
           return;
         }
 
+        /**
+         * Loading will be true
+         */
         self.markLoading(true);
 
         try {
-          const state = getSnapshot(c);
-
           const body = JSON.stringify({
-            leadTime: (new Date() - c.loadedDate) / 1000,
-            result: res,
+            lead_time: (new Date() - c.loadedDate) / 1000, // task execution time
+            result: savedCompletions, // array with completions
           });
 
-          if (requestType === "patch") {
+          if (requestType === "update_result") {
             yield getEnv(self).patch(
               `${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}${API_URL.COMPLETIONS}/${c.pk}/`,
               body,
             );
-          } else if (requestType === "post") {
+          } else if (requestType === "post_result") {
             const responseCompletion = yield self.post(
               `${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}${API_URL.COMPLETIONS}/`,
               body,
@@ -392,7 +384,7 @@ export default types
             self.markLoading(false);
             self.completionStore.selected.sendUserGenerate();
 
-            if (self.explore && self.projectID) {
+            if (self.explore && self.project.id) {
               self.labeledSuccess = true;
             }
           }
@@ -407,12 +399,12 @@ export default types
     /**
      * Update current completion
      */
-    const updateTask = sendToServer("patch");
+    const updateTask = sendToServer("update_result");
 
     /**
      * Send current completion
      */
-    const sendTask = sendToServer("post");
+    const sendTask = sendToServer("post_result");
 
     /**
      * Function to initilaze completion store

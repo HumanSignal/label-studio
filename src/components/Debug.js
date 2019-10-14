@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Form, Button, Header } from "semantic-ui-react";
+import { Form, Button } from "antd";
 
 import { observer } from "mobx-react";
 
@@ -14,7 +14,7 @@ class DebugComponent extends Component {
     return (
       <div>
         <br />
-        <Header>Debug</Header>
+        <h2>Debug</h2>
 
         <Button
           basic

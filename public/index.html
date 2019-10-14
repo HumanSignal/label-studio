@@ -37,7 +37,7 @@
       <ul id="nav" style="display: flex; align-items: center">
         <a style="margin-right: 1em; text-decoration: underline;" href="https://labelstud.io/guide">Guide</a>
         <a class="github-button" href="https://github.com/heartexlabs/label-studio"
-           data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star heartexlabs/label-studio on GitHub">Star</a>
+           data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star heartexlabs/label-studio on GitHub"><img src="./images/GitHub-Mark-64px.png" height="25" /></a>
       </ul>
     </div>
 
@@ -47,7 +47,57 @@
       <br/><br/>
       <img src="./images/3nowhite.svg" height="80" />
     </footer>
-    <!-- Place this tag in your head or just before your close body tag. -->
-    <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+    <script>
+      setTimeout(() => {
+        var ls = new LabelStudio("label-studio", {
+          config: `<View>
+                    <Labels name="ner" toName="text">
+                      <Label value="Person"></Label>
+                      <Label value="Organization"></Label>
+                      <Label value="Fact"></Label>
+                      <Label value="Money"></Label>
+                      <Label value="Date"></Label>
+                      <Label value="Time"></Label>
+                      <Label value="Ordinal"></Label>
+                      <Label value="Percent"></Label>
+                      <Label value="Product"></Label>
+                      <Label value="Language"></Label>
+                      <Label value="Location"></Label>
+                    </Labels>
+                    <Text name="text" value="$text"></Text>
+                  </View>`,
+
+          expert: {
+            pk: 1,
+            firstName: "Oliver",
+            lastName: "Jones"
+          },
+
+          isLoading: false,
+
+          project: { id: 1 },
+
+          interfaces: [
+            "controls",
+            "predictions",
+            "completions",
+            "completions:menu",
+            "predictions:menu",
+            "panel",
+            "side-column",
+            "update",
+            "check-empty",
+          ],
+
+          completions: [],
+          predictions: [],
+
+          task: {
+            data: '{"text": "Showers continued throughou"}'
+          }
+        });
+      }, 2000);
+    </script>
   </body>
 </html>

@@ -379,7 +379,7 @@ export default types
       /**
        * If completion is initial completion
        */
-      if (self.store.task && type === "initial") {
+      if (self.store.task && self.store.task.data && type === "initial") {
         createdCompletion.traverseTree(node => node.updateValue && node.updateValue(self.store));
       }
 
@@ -456,7 +456,7 @@ export default types
         pk: c.id,
         createdAgo: c.created_ago,
         createdBy: c.created_username,
-        leadTime: c.leadTime,
+        leadTime: c.lead_time,
         honeypot: c.honeypot,
         root: root,
         userGenerate: false,

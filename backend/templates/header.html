@@ -1,0 +1,20 @@
+<!-- Header -->
+<div id="header">
+    <a id="logo" href="/">
+        <img src="/static/images/ls_logo.png" alt="label studio logo" class="img-logo">
+        <span class="img-text">{{ config['title'] }}</span>
+    </a>
+    <ul id="nav">
+        <a href="/" class="{% if url_for(request.endpoint) == '/' %}active{%endif%}">
+            Labeling</a>
+        <span class="delim">|</span>
+
+        <a href="/tasks" class="{% if url_for(request.endpoint) == '/tasks' %}active{%endif%}">Tasks and Completions</a>
+        <span class="delim">|</span>
+
+        <a href="https://labelstud.io/guide/" target="_blank">Guide</a>
+        <span class="delim">|</span>
+
+        <a href="https://github.com/heartexlabs/label-studio" target="_blank"><img src="/static/images/github.svg" height="22"/></a>
+    </ul>
+</div>

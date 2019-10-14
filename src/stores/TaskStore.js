@@ -7,20 +7,13 @@ import Utilities from "../utils";
  */
 const TaskStore = types
   .model("Task", {
-    /**
-     * Id of task
-     */
-    id: types.identifierNumber,
+    id: types.maybeNull(types.number),
+    load: types.optional(types.boolean, false),
     /**
      * Data of task, may contain an object but in App Store will be transformed into string
      * MST doesn't support processing of dynamic objects with unkown keys value
      */
     data: types.maybeNull(types.string),
-    // data: types.maybeNull(TaskData),
-    /**
-     * Id of project
-     */
-    project: types.maybeNull(types.number),
   })
   .views(self => ({
     get app() {
