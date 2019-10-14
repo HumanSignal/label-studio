@@ -51,22 +51,22 @@
     <script>
       setTimeout(() => {
         var ls = new LabelStudio("label-studio", {
-          // config: `<View>
-          //           <Labels name="ner" toName="text">
-          //             <Label value="Person"></Label>
-          //             <Label value="Organization"></Label>
-          //             <Label value="Fact"></Label>
-          //             <Label value="Money"></Label>
-          //             <Label value="Date"></Label>
-          //             <Label value="Time"></Label>
-          //             <Label value="Ordinal"></Label>
-          //             <Label value="Percent"></Label>
-          //             <Label value="Product"></Label>
-          //             <Label value="Language"></Label>
-          //             <Label value="Location"></Label>
-          //           </Labels>
-          //           <Text name="text" value="$text"></Text>
-          //         </View>`,
+          config: `<View>
+                    <Labels name="ner" toName="text">
+                      <Label value="Person"></Label>
+                      <Label value="Organization"></Label>
+                      <Label value="Fact"></Label>
+                      <Label value="Money"></Label>
+                      <Label value="Date"></Label>
+                      <Label value="Time"></Label>
+                      <Label value="Ordinal"></Label>
+                      <Label value="Percent"></Label>
+                      <Label value="Product"></Label>
+                      <Label value="Language"></Label>
+                      <Label value="Location"></Label>
+                    </Labels>
+                    <Text name="text" value="$text"></Text>
+                  </View>`,
 
           expert: {
             pk: 1,
@@ -75,6 +75,8 @@
           },
 
           isLoading: false,
+
+          project: { id: 1 },
 
           interfaces: [
             "controls",
@@ -88,27 +90,7 @@
             "check-empty",
           ],
 
-          completions: [
-          {
-            "result": [
-                {
-                    "from_name": "ner",
-                    "id": "beFiQTT1cU",
-                    "source": "$text",
-                    "to_name": "text",
-                    "type": "labels",
-                    "value": {
-                        "end": 5,
-                        "labels": [
-                            "Date"
-                        ],
-                        "start": 0,
-                        "text": "Shower"
-                    }
-                }
-            ]
-        }
-          ],
+          completions: [],
           predictions: [],
 
           task: {

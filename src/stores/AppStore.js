@@ -9,6 +9,8 @@ import Hotkey from "../core/Hotkey";
 import { API_URL } from "../constants/Api";
 import Utils from "../utils";
 
+import InfoModal from "../components/Infomodal/Infomodal";
+
 export default types
   .model("AppStore", {
     /**
@@ -329,7 +331,7 @@ export default types
 
     /**
      * Wrapper of completion send
-     * @param {string} requestType {patch or post}
+     * @param {string} requestType
      */
     const sendToServer = requestType => {
       return flow(function*() {
@@ -337,29 +339,33 @@ export default types
 
         c.beforeSend();
 
-        const res = c.serializeCompletion();
+        const savedCompletions = c.serializeCompletion();
 
-        if (self.hasInterface("check-empty") && res.length === 0) {
-          alert("You need to label at least something!");
+        /**
+         * Check for pending completions
+         */
+        if (self.hasInterface("check-empty") && savedCompletions.length === 0) {
+          InfoModal.warning("You need to label at least something!");
           return;
         }
 
+        /**
+         * Loading will be true
+         */
         self.markLoading(true);
 
         try {
-          const state = getSnapshot(c);
-
           const body = JSON.stringify({
-            lead_time: (new Date() - c.loadedDate) / 1000,
-            result: res,
+            lead_time: (new Date() - c.loadedDate) / 1000, // task execution time
+            result: savedCompletions, // array with completions
           });
 
-          if (requestType === "patch") {
+          if (requestType === "update_result") {
             yield getEnv(self).patch(
               `${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}${API_URL.COMPLETIONS}/${c.pk}/`,
               body,
             );
-          } else if (requestType === "post") {
+          } else if (requestType === "post_result") {
             const responseCompletion = yield self.post(
               `${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}${API_URL.COMPLETIONS}/`,
               body,
@@ -393,12 +399,12 @@ export default types
     /**
      * Update current completion
      */
-    const updateTask = sendToServer("patch");
+    const updateTask = sendToServer("update_result");
 
     /**
      * Send current completion
      */
-    const sendTask = sendToServer("post");
+    const sendTask = sendToServer("post_result");
 
     /**
      * Function to initilaze completion store
