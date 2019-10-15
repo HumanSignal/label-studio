@@ -73,3 +73,64 @@ Take a look at the [Label Studio]("https://labelstud.io") website for more docum
 <!-- Theme included stylesheets -->
 <link href="" rel="stylesheet">
 ```
+
+## Options
+
+To configure Label Studio, pass in an options object:
+
+```javascript
+var options = {
+  config: `<View>
+  <Image name="img" value="$image"></Image>
+  <PolygonLabels name="tag" toName="img">
+    <Label value="Hello"></Label>
+    <Label value="World"></Label>  
+  </PolygonLabels>
+</View>`,
+  interfaces: [
+    "controls",
+    "completions",
+    "completions:menu",
+    "panel",
+    "side-column",
+    "update",
+    "check-empty",
+  ],
+  task: {
+    completions: [],
+    predictions: [],
+    id: 1,
+    data: {
+      image: "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg"
+    }
+  }
+};
+
+var editor = new LabelStudio("#editor", options);
+```
+
+## The following keys are recognized
+
+### config
+
+Default: `null`
+Type data: `string`
+
+XML configuration of task. Whitelist of formats to allow in the editor.
+
+### interfaces
+
+Default: `null`
+Type data: `array`
+
+Collection of modules to include and respective options.
+
+### task
+
+### expert
+
+### project
+
+### isLoading
+
+### explore
