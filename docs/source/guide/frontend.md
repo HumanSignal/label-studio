@@ -70,10 +70,10 @@ Take a look at the [Label Studio]("https://labelstud.io") website for more docum
 
 ```xhtml
 <!-- Main Label Studio library -->
-<script src=""></script>
+<script src="https://unpkg.com/label-studio@0.2.1/build/static/js/main.0000e798.js"></script>
 
 <!-- Theme included stylesheets -->
-<link href="" rel="stylesheet">
+<link href="https://unpkg.com/label-studio@0.2.1/build/static/css/main.05fec320.css" rel="stylesheet">
 ```
 
 ## The following keys are recognized
