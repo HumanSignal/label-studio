@@ -1,6 +1,6 @@
 {
   "name": "label-studio",
-  "version": "0.2.1",
+  "version": "0.2.1-1",
   "description": "Label Studio is a multi-domain data labeling tool with standardized output format",
   "author": {
     "name": "Heartex Labs",
