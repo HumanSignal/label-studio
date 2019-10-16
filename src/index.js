@@ -89,6 +89,10 @@ if (process.env.NODE_ENV === "production") {
         patch: Requests.patch,
         post: Requests.poster,
         remove: Requests.remover,
+        submit: function() {},
+        update: function() {},
+        delete: function() {},
+        skip: function() {},
         alert: m => console.log(m), // Noop for demo: window.alert(m)
       });
 

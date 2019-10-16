@@ -94,6 +94,14 @@ Type data: `array`
 
 Collection of modules to include and respective options.
 
+### description
+
+Default: `No description`
+
+Type data: `string`
+
+Description of the current task.
+
 ### task
 
 Task data

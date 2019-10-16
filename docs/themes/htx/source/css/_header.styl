@@ -1,4 +1,4 @@
-$header-height = 40px
+$header-height = 2em
 
 red-dot-before(leftPos = -8px)
   content: ""
@@ -13,27 +13,32 @@ red-dot-before(leftPos = -8px)
 #header
   background-color: #fff
   height: $header-height
-  display: flex
-  align-items: center
   padding: $heading-padding-vertical 20px $heading-padding-vertical 40px;
   position: relative
   z-index: 100
+  display: flex
+  align-items: center
+  justify-content: space-between
 
 body.docs
   #header
     position: fixed
     width: 100%
     top: 0
+    display: flex
+    align-items: center
+    justify-content: space-between
   #nav
-    position: fixed
+    margin-right: 80px
 
 #nav
   list-style-type: none
   margin: 0
   padding: 0
-  position: absolute
-  right: 30px
-  line-height: $header-height
+
+  a, span
+    line-height: 1.8em
+
   .break
     display: none
   li
@@ -43,8 +48,10 @@ body.docs
   span
     font-weight: bold;
   a
+    border-bottom: 2px solid #fff
     &:hover, &.current
       border-bottom: 2px solid $green
+      transition: 200ms;
   .nav-dropdown
     .nav-link
       &:hover, &.current

@@ -87,8 +87,14 @@
       width: 200px
       margin-bottom: 10px
     .main-menu
-      display: block
+      display: flex
+      flex-flow: column
+      align-items: flex-start
+      justify-content: flex-start
+      a
+        margin-bottom: 1em
     &.open
+      z-index: 9999
       -webkit-transform: translate(0, 0)
       transform: translate(0, 0)
 
