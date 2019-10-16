@@ -1,5 +1,5 @@
 <div align="center">
-    <a href="https://labelstud.io/" title="Label Studio by Heartex Labs"><img src="./images/heartex_icon_opossum_green.svg" title="Label Studio by Heartex Labs" height="160"></a>
+    <a href="https://labelstud.io/" title="Label Studio by Heartex Labs"><img src="https://github.com/heartexlabs/label-studio/blob/master/images/heartex_icon_opossum_green@2x.png?raw=true" title="Label Studio by Heartex Labs" height="140" width="140"></a>
     <br/>
     <h1><a href="https://labelstud.io">Label Studio</a></h1>
     <p>Label Studio is an open-source, configurable data annotation tool.</p>
@@ -8,7 +8,7 @@
 
 ![GitHub](https://img.shields.io/github/license/heartexlabs/label-studio?logo=heartex) [![Build Status](https://travis-ci.com/heartexlabs/label-studio.svg?branch=master)](https://travis-ci.com/heartexlabs/label-studio) [![codecov](https://codecov.io/gh/heartexlabs/label-studio/branch/master/graph/badge.svg)](https://codecov.io/gh/heartexlabs/label-studio) ![GitHub release](https://img.shields.io/github/v/release/heartexlabs/label-studio?include_prereleases) [![Gitter](https://badges.gitter.im/label-studio/community.svg)](https://gitter.im/label-studio/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
-![Label Studio](./images/label-studio-examples.gif)
+![Label Studio](https://raw.githubusercontent.com/heartexlabs/label-studio/master/images/label-studio-examples.gif)
 
 ## Features ✨
 
@@ -75,7 +75,6 @@ Please make sure to read the
 This software is licensed under the [Apache 2.0 LICENSE](/LICENSE) © [Heartex](https://www.heartex.net/).
 
 <div align="center">
-    <a href="https://labelstud.io/"><img src="./images/opossum_looking.svg" title="Hey everyone!" height="140"></a>
-    <br>
+    <a href="https://labelstud.io/"><img src="https://github.com/heartexlabs/label-studio/blob/master/images/opossum_looking.png?raw=true" title="Hey everyone!" height="140" width="140"></a>
     <h3>Happy Labeling!</h3>
 </div>
