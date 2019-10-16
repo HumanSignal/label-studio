@@ -1,7 +1,6 @@
 {
   "name": "label-studio",
   "version": "0.2.1",
-  "private": true,
   "description": "Label Studio is a multi-domain data labeling tool with standardized output format",
   "author": {
     "name": "Heartex Labs",
@@ -65,7 +64,7 @@
     "prettier-styles": "prettier --write src/**/*.{css,scss}",
     "lint": "eslint --debug src/",
     "lint:write": "eslint --debug src/ --fix",
-    "publish": "GENERATE_SOURCEMAP=false npm run build",
+    "build-notsourcemap": "GENERATE_SOURCEMAP=false npm run build",
     "copy-examples": "bash scripts/copy.sh",
     "build-bundle": "npm run copy-examples && npm run test && node scripts/build-without-split.js"
   },
