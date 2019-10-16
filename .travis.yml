@@ -16,4 +16,4 @@ cache:
 script:
   - npm test
   - unset CI
-  - npm run publish
+  - npm run build-bundle
