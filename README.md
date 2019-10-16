@@ -1,16 +1,24 @@
-<div align="center"><a href="https://labelstud.io/" title="Label Studio by Heartex Labs"><img src="./images/heartex_icon_opossum_green.svg" title="Label Studio by Heartex Labs" height="160"></a></div>
-
-<h2 align="center">Label Studio</h2>
-
-Label Studio is an open-source, configurable data annotation tool.
-
-Its purpose is to enable you to label different types of data using the most convenient interface with a standardized output format.
+<div align="center">
+    <a href="https://labelstud.io/" title="Label Studio by Heartex Labs"><img src="./images/heartex_icon_opossum_green.svg" title="Label Studio by Heartex Labs" height="160"></a>
+    <br/>
+    <h1><a href="https://labelstud.io">Label Studio</a></h1>
+    <p>Label Studio is an open-source, configurable data annotation tool.</p>
+    <p>Its purpose is to help you label different types of data using a simple interface with a standardized output format. It's mobile-friendly and fast.</p>
+</div>
 
 ![GitHub](https://img.shields.io/github/license/heartexlabs/label-studio?logo=heartex) [![Build Status](https://travis-ci.com/heartexlabs/label-studio.svg?branch=master)](https://travis-ci.com/heartexlabs/label-studio) [![codecov](https://codecov.io/gh/heartexlabs/label-studio/branch/master/graph/badge.svg)](https://codecov.io/gh/heartexlabs/label-studio) ![GitHub release](https://img.shields.io/github/v/release/heartexlabs/label-studio?include_prereleases) [![Gitter](https://badges.gitter.im/label-studio/community.svg)](https://gitter.im/label-studio/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 ![Label Studio](./images/label-studio-examples.gif)
 
-## Quick "I want to Label Guides:"
+## Features ✨
+
+**Simple**: Crafted with minimal UI design. A simple design is the best design.
+
+**Configurable**: Using high-level jsx tags config, you can fully customize the interface for your data.
+
+**Embeddable**: It's an NPM package too. You can include it into your projects.
+
+## Quick Labeling Guides
 
 - [Classify text for sentiment](https://labelstud.io/templates/sentiment_analysis.html)
 - [Named entities recognition](https://labelstud.io/templates/named_entity.html)
@@ -30,6 +38,21 @@ Coming Soon:
 ## Documentation
 
 Visit the website: [labelstud.io](https://labelstud.io).
+
+## Usage
+
+### Frontend package
+
+Check [documentation](https://labelstud.io/guide/frontend.html) about frontend integration.
+
+### Backend and frontend
+
+Check [documentation](https://labelstud.io/guide/backend.html) about backend + frontend integration.
+
+### Docker
+```sh
+docker run -p 8200:8200 -t -i heartexlabs/label-studio -c config.json -l ../examples/chatbot_analysis/config.xml -i ../examples/chatbot_analysis/tasks.json -o output
+```
 
 ## Changelog
 
@@ -51,5 +74,8 @@ Please make sure to read the
 
 This software is licensed under the [Apache 2.0 LICENSE](/LICENSE) © [Heartex](https://www.heartex.net/).
 
-<img src="./images/opossum_looking.svg" title="Hey everyone!" height="140">
-
+<div align="center">
+    <a href="https://labelstud.io/"><img src="./images/opossum_looking.svg" title="Hey everyone!" height="140"></a>
+    <br>
+    <h3>Happy Labeling!</h3>
+</div>
