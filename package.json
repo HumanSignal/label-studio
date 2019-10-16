@@ -1,6 +1,6 @@
 {
   "name": "label-studio",
-  "version": "0.2.1-2",
+  "version": "0.2.1-3",
   "description": "Label Studio is a multi-domain data labeling tool with standardized output format",
   "homepage": "https://labelstud.io",
   "author": {
@@ -27,9 +27,7 @@
     "prettier": "^1.18.2",
     "react-test-renderer": "^16.8.6",
     "rewire": "^4.0.1",
-    "size-limit": "^1.3.7"
-  },
-  "dependencies": {
+    "size-limit": "^1.3.7",
     "antd": "^3.20.1",
     "array-move": "^1.0.0",
     "emoji-regex": "^7.0.3",
@@ -99,5 +97,17 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "keywords": [
+    "image-annotation",
+    "annotation-tool",
+    "annotation",
+    "labeling",
+    "labeling-tool",
+    "image-labeling",
+    "image-classification",
+    "semantic-segmentation",
+    "data-labeling",
+    "text-annotation"
+  ]
 }
