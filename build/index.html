@@ -4,26 +4,12 @@
                     <Labels name="ner" toName="text">
                       <Label value="Person"></Label>
                       <Label value="Organization"></Label>
-                      <Label value="Fact"></Label>
-                      <Label value="Money"></Label>
-                      <Label value="Date"></Label>
-                      <Label value="Time"></Label>
-                      <Label value="Ordinal"></Label>
-                      <Label value="Percent"></Label>
-                      <Label value="Product"></Label>
-                      <Label value="Language"></Label>
                       <Label value="Location"></Label>
                     </Labels>
                     <Text name="text" value="$text"></Text>
                   </View>`,
 
-          expert: {
-            pk: 1,
-            firstName: "Oliver",
-            lastName: "Jones"
-          },
-
-          isLoading: false,
+          expert: {},
 
           project: { id: 1 },
 
@@ -39,11 +25,12 @@
             "check-empty",
           ],
 
-          completions: [],
-          predictions: [],
-
           task: {
-            data: '{"text": "Showers continued throughou"}'
+            completions: [],
+            predictions: [],
+            data: {
+              text: "Showers continued throughou"
+            },
           }
         });
-      }, 2000);</script><script src="/static/js/main.d617b4ba.js"></script></body></html>
+      }, 2000);</script><script src="/static/js/main.0000e798.js"></script></body></html>

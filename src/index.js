@@ -76,6 +76,14 @@ if (process.env.NODE_ENV === "production") {
         );
       });
     } else {
+      params = {
+        ...params,
+        task: {
+          ...params.task,
+          data: JSON.stringify(params.task.data),
+        },
+      };
+
       let app = AppStore.create(params, {
         fetch: Requests.fetcher,
         patch: Requests.patch,
@@ -84,7 +92,7 @@ if (process.env.NODE_ENV === "production") {
         alert: m => console.log(m), // Noop for demo: window.alert(m)
       });
 
-      app.initializeStore({ completions: params.completions, predictions: params.predictions });
+      app.initializeStore({ completions: params.task.completions, predictions: params.task.predictions });
 
       ReactDOM.render(
         <Provider store={app}>

@@ -8,7 +8,7 @@ order: 105
 
 Instantiate a new Label Studio object with a selector for the div that should become the editor.
 
-```html
+```xhtml
 <!-- Include Label Studio stylesheet -->
 <link href="" rel="stylesheet">
 
@@ -21,39 +21,39 @@ Instantiate a new Label Studio object with a selector for the div that should be
 <!-- Initialize Label Studio -->
 <script>
   var labelStudio = new LabelStudio('#editor', {
-    config: "", // XML config
-
-    expert: {
-      pk: 1, // Personal Key
-      firstName: "", // First name
-      lastName: "" // Last name
-    },
-
-    isLoading: false, // Loading of Label Studio
-
-    project: {
-      id: 1
-    },
+    config: `
+      <View>
+        <Image name="img" value="$image"></Image>
+        <RectangleLabels name="tag" toName="img">
+          <Label value="Hello"></Label>
+          <Label value="World"></Label>  
+        </RectangleLabels>
+      </View>
+    `,
 
     interfaces: [
       "controls",
-      "predictions",
       "completions",
       "completions:menu",
-      "predictions:menu",
       "panel",
       "side-column",
       "update",
       "check-empty",
     ],
 
-    explore: true,
+    expert: {
+      pk: 1,
+      firstName: "James",
+      lastName: "Dean"
+    },
 
     task: {
-      id: "",
-      data: "",
       completions: [],
-      predictions: []
+      predictions: [],
+      id: 1,
+      data: {
+        image: "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg"
+      }
     }
   });
 </script>
@@ -68,47 +68,12 @@ Take a look at the [Label Studio]("https://labelstud.io") website for more docum
 
 ## CDN
 
-```html
+```xhtml
 <!-- Main Label Studio library -->
 <script src=""></script>
 
 <!-- Theme included stylesheets -->
 <link href="" rel="stylesheet">
-```
-
-## Options
-
-To configure Label Studio, pass in an options object:
-
-```javascript
-var options = {
-  config: `<View>
-  <Image name="img" value="$image"></Image>
-  <PolygonLabels name="tag" toName="img">
-    <Label value="Hello"></Label>
-    <Label value="World"></Label>  
-  </PolygonLabels>
-</View>`,
-  interfaces: [
-    "controls",
-    "completions",
-    "completions:menu",
-    "panel",
-    "side-column",
-    "update",
-    "check-empty",
-  ],
-  task: {
-    completions: [],
-    predictions: [],
-    id: 1,
-    data: {
-      image: "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg"
-    }
-  }
-};
-
-var editor = new LabelStudio("#editor", options);
 ```
 
 ## The following keys are recognized
@@ -153,15 +118,16 @@ Type data: `object`
 #### data
 
 #### completions
+
 Type data: `array`
 
 Array of completions. See [Completions Documentation](https://labelstud.io/guide/format.html#Input) for more information.
 
 #### predictions
+
 Type data: `array`
 
 Array of predictions. Every object as completion. See [Completions Documentation](https://labelstud.io/guide/format.html#Input) for more information.
-
 
 ### expert
 
@@ -178,15 +144,19 @@ Type data: `object`
 ```
 
 #### id
+
 Type data: `number`
 
 #### firstName
+
 Type data: `string`
 
 #### lastName
+
 Type data: `string`
 
 ### project
+
 Default: `null`
 
 Type data: `object`
@@ -198,13 +168,21 @@ Type data: `object`
 ```
 
 #### id
+
+Default: `null`
+
 Type data: `number`
 
 ### isLoading
+
+Default: `false`
+
 Type data: `boolean`
 
 ### explore
+
 Type data: `boolean`
+
 Default: `false`
 
 Flag fo labeling of tasks, if the flag is true then after submitting the next task will be called. 

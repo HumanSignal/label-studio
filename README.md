@@ -10,7 +10,7 @@
 
 ![Label Studio](./images/label-studio-examples.gif)
 
-### Features ✨
+## Features ✨
 
 **Simple**: Crafted with minimal UI design. A simple design is the best design.
 
@@ -18,7 +18,7 @@
 
 **Embeddable**: It's an NPM package too. You can include it into your projects.
 
-### Quick Labeling Guides
+## Quick Labeling Guides
 
 - [Classify text for sentiment](https://labelstud.io/templates/sentiment_analysis.html)
 - [Named entities recognition](https://labelstud.io/templates/named_entity.html)
@@ -35,27 +35,42 @@ Coming Soon:
 - Time series
 - Video
 
-### Documentation
+## Documentation
 
 Visit the website: [labelstud.io](https://labelstud.io).
 
-### Changelog
+## Usage
+
+### Frontend package
+
+Check [documentation](https://labelstud.io/guide/frontend.html) about frontend integration.
+
+### Backend and frontend
+
+Check [documentation](https://labelstud.io/guide/backend.html) about backend + frontend integration.
+
+### Docker
+```sh
+docker run -p 8200:8200 -t -i heartexlabs/label-studio -c config.json -l ../examples/chatbot_analysis/config.xml -i ../examples/chatbot_analysis/tasks.json -o output
+```
+
+## Changelog
 
 Detailed changes for each release are documented in the [release notes](https://github.com/heartexlabs/label-studio/releases).
 
-### Stay In Touch
+## Stay In Touch
 
 - [Twitter](https://twitter.com/heartexlabs)
 - [Email](mailto:hi@heartex.net)
 
-### Contributing
+## Contributing
 
 Please make sure to read the
 
 - [Contributing Guideline](/CONTRIBUTING.md)
 - [Code Of Conduct](/CODE_OF_CONDUCT.md)
 
-### License
+## License
 
 This software is licensed under the [Apache 2.0 LICENSE](/LICENSE) © [Heartex](https://www.heartex.net/).
 
