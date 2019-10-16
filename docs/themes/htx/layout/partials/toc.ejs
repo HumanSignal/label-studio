@@ -2,7 +2,7 @@
   <% site.pages.find({ type: type }).sort('order').each(function (p) { %>
     <% var fileName = p.path.replace(/^.+?\/([\w-]+)\.html/, '$1') %>
       <% if (type === 'tags') { %>
-      
+
       <% if (fileName === 'audio') { %>
           <!-- <div style="margin-top: 20px; margin-right: 40px; background: url(<%- url_for("/images/wave.png") %>) repeat-x; opacity: 0.4; background-size: 20px; height: 20px;"></div> -->
           <li><h4>Objects</h4></li>
@@ -30,8 +30,4 @@
       <a href="<%- url_for(p.path) %>" class="sidebar-link<%- page.title === p.title ? ' current' : '' %><%- p.is_new ? ' new' : '' %>"><%- p.title %></a>
     </li>
     <% }) %>
-
-  <li style="position: absolute; bottom: 20px;">
-    <img src="<%- url_for("/images/opossum/other/5.svg") %>" alt="label studio logo" height="120" />
-  </li>
 </ul>
