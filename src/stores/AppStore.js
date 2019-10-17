@@ -57,6 +57,8 @@ export default types
      */
     settings: types.optional(Settings, {}),
 
+    apiCalls: types.optional(types.boolean, true),
+
     /**
      * Flag for settings
      */
@@ -279,19 +281,25 @@ export default types
      * Skip current task
      */
     const skipTask = flow(function* skipTask() {
-      self.markLoading(true);
+      getEnv(self).skipTask();
 
-      try {
-        const json = yield self.post(
-          `${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}${API_URL.CANCEL}`,
-          JSON.stringify({ data: JSON.stringify({ error: "cancelled" }) }),
-        );
+      if (getEnv(self).apiCalls) {
+        self.markLoading(true);
 
-        self.resetState();
+        try {
+          const json = yield self.post(
+            `${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}${API_URL.CANCEL}`,
+            JSON.stringify({ data: JSON.stringify({ error: "cancelled" }) }),
+          );
 
-        return loadTask();
-      } catch (err) {
-        console.error("Failed to skip task ", err);
+          self.resetState();
+
+          return loadTask();
+        } catch (err) {
+          console.error("Failed to skip task ", err);
+        }
+      } else {
+        InfoModal.warning("This mode without API calls.");
       }
     });
 
@@ -327,19 +335,27 @@ export default types
           });
 
           if (requestType === "update_result") {
-            yield getEnv(self).patch(
-              `${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}${API_URL.COMPLETIONS}/${c.pk}/`,
-              body,
-            );
-          } else if (requestType === "post_result") {
-            const responseCompletion = yield self.post(
-              `${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}${API_URL.COMPLETIONS}/`,
-              body,
-            );
+            getEnv(self).updateCompletion(JSON.parse(body));
 
-            const data = yield responseCompletion.json();
-            if (data && data.id) {
-              self.completionStore.selected.updatePersonalKey(data.id.toString());
+            if (self.apiCalls) {
+              yield getEnv(self).patch(
+                `${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}${API_URL.COMPLETIONS}/${c.pk}/`,
+                body,
+              );
+            }
+          } else if (requestType === "post_result") {
+            getEnv(self).submitCompletion(JSON.parse(body));
+
+            if (self.apiCalls) {
+              const responseCompletion = yield self.post(
+                `${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}${API_URL.COMPLETIONS}/`,
+                body,
+              );
+
+              const data = yield responseCompletion.json();
+              if (data && data.id) {
+                self.completionStore.selected.updatePersonalKey(data.id.toString());
+              }
             }
           }
 
