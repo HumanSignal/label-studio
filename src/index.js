@@ -40,6 +40,7 @@ if (process.env.NODE_ENV === "production") {
       </Provider>,
       enviroment.rootElement(element),
     );
+    return app;
   };
 } else {
   enviroment = DevelopmentEnvironment;
@@ -84,6 +85,7 @@ if (process.env.NODE_ENV === "production") {
         </Provider>,
         enviroment.rootElement(element),
       );
+      return app;
     }
   };
 }
