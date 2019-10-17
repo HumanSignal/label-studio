@@ -8,7 +8,6 @@ import App from "./components/App/App";
 import * as serviceWorker from "./serviceWorker";
 
 import AppStore from "./stores/AppStore";
-import Requests from "./core/Requests";
 
 import ProductionEnviroment from "./env/production";
 import DevelopmentEnvironment from "./env/development";
@@ -25,13 +24,10 @@ if (process.env.NODE_ENV === "production") {
       params.task = enviroment.getData(params.task);
     }
 
-    const app = AppStore.create(params, {
-      fetch: Requests.fetcher,
-      patch: Requests.patch,
-      post: Requests.poster,
-      remove: Requests.remover,
-      alert: m => console.log(m), // Noop for demo: window.alert(m)
-    });
+    /**
+     * Configure Application
+     */
+    const app = AppStore.create(params, enviroment.configureApplication(params));
 
     /**
      * Initialize store
@@ -58,13 +54,7 @@ if (process.env.NODE_ENV === "production") {
           ...result,
         };
 
-        let app = AppStore.create(params, {
-          fetch: Requests.fetcher,
-          patch: Requests.patch,
-          post: Requests.poster,
-          remove: Requests.remover,
-          alert: m => console.log(m), // Noop for demo: window.alert(m)
-        });
+        let app = AppStore.create(params, enviroment.configureApplication(params));
 
         app.initializeStore({ completions: [params.completion] });
 
@@ -84,13 +74,7 @@ if (process.env.NODE_ENV === "production") {
         },
       };
 
-      let app = AppStore.create(params, {
-        fetch: Requests.fetcher,
-        patch: Requests.patch,
-        post: Requests.poster,
-        remove: Requests.remover,
-        alert: m => console.log(m), // Noop for demo: window.alert(m)
-      });
+      let app = AppStore.create(params, enviroment.configureApplication(params));
 
       app.initializeStore({ completions: params.task.completions, predictions: params.task.predictions });
 

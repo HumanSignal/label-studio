@@ -10,6 +10,10 @@
   overflow-y: auto
   -webkit-overflow-scrolling: touch
   -ms-overflow-style: none
+  display: flex
+  flex-flow: column
+  align-items: center
+  justify-content: space-between
   h2
     margin-top: .2em
   ul
@@ -83,8 +87,14 @@
       width: 200px
       margin-bottom: 10px
     .main-menu
-      display: block
+      display: flex
+      flex-flow: column
+      align-items: flex-start
+      justify-content: flex-start
+      a
+        margin-bottom: 1em
     &.open
+      z-index: 9999
       -webkit-transform: translate(0, 0)
       transform: translate(0, 0)
 

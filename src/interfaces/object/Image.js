@@ -379,21 +379,23 @@ const Model = types
         const y = (ev.evt.offsetY - self.zoomPosY) / self.zoomScale;
 
         let stroke = self.controlButton().strokecolor;
+
         if (states && states.length) {
           stroke = states[0].getSelectedColor();
         }
 
-        self._addPoly(x, y, w, stroke, states);
+        self._addPoly({ x: x, y: y, width: w, stroke: stroke, states: states, coordstype: "perc", stateFlag: false });
 
         const stage = self._stageRef;
+
         stage.container().style.cursor = "default";
       }
     },
 
-    _addPoly(x, y, width, stroke, states, coordstype) {
+    _addPoly({ x, y, width, stroke, states, coordstype, stateFlag }) {
       let poly = self.activePolygon;
 
-      if (!poly) {
+      if (stateFlag || !self.activePolygon) {
         const c = self.controlButton();
 
         poly = PolygonRegionModel.create({
@@ -493,14 +495,16 @@ const Model = types
         const states = restoreNewsnapshot(fromModel);
 
         states.fromStateJSON(obj);
-        const poly = self._addPoly(
-          obj.value.points[0][0],
-          obj.value.points[0][1],
-          10,
-          states.getSelectedColor(),
-          [states],
-          "perc",
-        );
+
+        const poly = self._addPoly({
+          x: obj.value.points[0][0],
+          y: obj.value.points[0][1],
+          width: 10,
+          stroke: states.getSelectedColor(),
+          states: [states],
+          coordstype: "perc",
+          stateFlag: true,
+        });
 
         for (var i = 1; i < obj.value.points.length; i++) {
           poly.addPoint(obj.value.points[i][0], obj.value.points[i][1]);

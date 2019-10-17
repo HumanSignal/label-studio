@@ -10,6 +10,9 @@ import { NamedEntity } from "../examples/named_entity";
 import { References } from "../examples/references";
 import { TranscribeAudio } from "../examples/transcribe_audio";
 
+import External from "../core/External";
+import Requests from "../core/Requests";
+
 /**
  * Custom Data
  */
@@ -56,4 +59,26 @@ function rootElement(element) {
   return el;
 }
 
-export default { rootElement, getExample };
+/**
+ * Function to configure application with callbacks
+ * @param {object} params
+ */
+function configureApplication(params) {
+  const options = {
+    fetch: Requests.fetcher,
+    patch: Requests.patch,
+    post: Requests.poster,
+    remove: Requests.remover,
+    submitCompletion: params.submitCompletion ? params.submitCompletion : External.submitCompletion,
+    updateCompletion: params.updateCompletion ? params.updateCompletion : External.updateCompletion,
+    deleteCompletion: params.deleteCompletion ? params.deleteCompletion : External.deleteCompletion,
+    skipTask: params.skipTask ? params.skipTask : External.skipTask,
+    onTaskLoad: params.onTaskLoad ? params.onTaskLoad : External.onTaskLoad,
+    onLabelStudioLoad: params.onLabelStudioLoad ? params.onLabelStudioLoad : External.onLabelStudioLoad,
+    alert: m => console.log(m), // Noop for demo: window.alert(m)
+  };
+
+  return options;
+}
+
+export default { rootElement, getExample, configureApplication };

@@ -68,7 +68,7 @@ export default observer(({ store }) => {
           <Button
             type="primary"
             onClick={ev => {
-              store.closeDescription();
+              store.toggleDescription();
             }}
           >
             Hide Instructions
@@ -78,7 +78,7 @@ export default observer(({ store }) => {
           <Button
             type="primary"
             onClick={ev => {
-              store.openDescription();
+              store.toggleDescription();
             }}
           >
             Show Instructions

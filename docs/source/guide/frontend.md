@@ -10,13 +10,13 @@ Instantiate a new Label Studio object with a selector for the div that should be
 
 ```xhtml
 <!-- Include Label Studio stylesheet -->
-<link href="" rel="stylesheet">
+<link href="https://unpkg.com/label-studio@0.2.1/build/static/css/main.05fec320.css" rel="stylesheet">
 
 <!-- Create the Label Studio container -->
 <div id="editor"></div>
 
 <!-- Include the Label Studio library -->
-<script src=""></script>
+<script src="https://unpkg.com/label-studio@0.2.1/build/static/js/main.0000e798.js"></script>
 
 <!-- Initialize Label Studio -->
 <script>
@@ -76,7 +76,9 @@ Take a look at the [Label Studio]("https://labelstud.io") website for more docum
 <link href="https://unpkg.com/label-studio@0.2.1/build/static/css/main.05fec320.css" rel="stylesheet">
 ```
 
-## The following keys are recognized
+## Options
+
+The following keys are recognized
 
 ### config
 
@@ -93,6 +95,22 @@ Default: `null`
 Type data: `array`
 
 Collection of modules to include and respective options.
+
+### description
+
+Default: `No description`
+
+Type data: `string`
+
+Description of the current task.
+
+### apiCalls
+
+Default: `true`
+
+Type data: `boolean`
+
+Whether to instantiate the Label Studio to API Calls mode.
 
 ### task
 
@@ -186,3 +204,48 @@ Type data: `boolean`
 Default: `false`
 
 Flag fo labeling of tasks, if the flag is true then after submitting the next task will be called. 
+
+
+## Callbacks
+
+### submitCompletion
+
+Type data: `function`
+
+Called when a button `submit` is pressed. `result` is value of current completion.
+
+#### Example
+
+```javascript
+submitCompletion: function(result) {
+  console.log(result)
+}
+```
+
+### updateCompletion
+
+Type data: `function`
+
+Called when a button `update` is pressed. `result` is value of current completion.
+
+#### Example
+
+```javascript
+updateCompletion: function(result) {
+  console.log(result)
+}
+```
+
+### deleteCompletion
+
+Type data: `function`
+
+Callback will be called when a button `delete` is pressed. `completion` is value of current completion.
+
+#### Example
+
+```javascript
+updateCompletion: function(completion) {
+  console.log(completion)
+}
+```

@@ -11,7 +11,7 @@ npm install
 ### Starting Development server
 
 ```shell
-hexo serve
+npm run server
 ```
 
 Starts a local server. By default, this is at http://localhost:4000/.
@@ -19,7 +19,7 @@ Starts a local server. By default, this is at http://localhost:4000/.
 ### Deploying Documentation
 
 ```shell
-hexo generate && hexo clean && hexo deploy
+npm run publish
 ```
 
 ## Hexo Official Documentation 

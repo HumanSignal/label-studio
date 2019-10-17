@@ -57,6 +57,8 @@ export default types
      */
     settings: types.optional(Settings, {}),
 
+    apiCalls: types.optional(types.boolean, true),
+
     /**
      * Flag for settings
      */
@@ -69,7 +71,7 @@ export default types
     /**
      * Data of description flag
      */
-    description: types.maybeNull(types.string),
+    description: types.optional(types.string, "No description"),
     /**
      * Loading of Label Studio
      */
@@ -105,14 +107,6 @@ export default types
   }))
   .actions(self => {
     /**
-     * Update description of task
-     * @param {string} text
-     */
-    function setDescription(text) {
-      self.description = text;
-    }
-
-    /**
      * Update settings display state
      */
     function toggleSettings() {
@@ -120,41 +114,15 @@ export default types
     }
 
     /**
-     * Request to get description of this task
+     * Update description display state
      */
-    const openDescription = flow(function* openDescription() {
-      let url = `${API_URL.MAIN}${API_URL.PROJECTS}/${self.project.id}${API_URL.EXPERT_INSRUCTIONS}`;
-
-      const res = yield self.fetch(url);
-
-      if (res.status === 200) {
-        res.text().then(function(text) {
-          if (text.length) {
-            self.setDescription(text);
-          } else {
-            /**
-             * Default message if description is missing in Platform
-             */
-            self.setDescription("No instructions for this task.");
-          }
-        });
-      } else {
-        self.setDescription("No instructions for this task.");
-      }
-
-      /**
-       * Show description
-       */
-      self.showingDescription = true;
-    });
-
-    /**
-     * Close description of Label Studio
-     */
-    function closeDescription() {
-      self.showingDescription = false;
+    function toggleDescription() {
+      self.showingDescription = !self.showingDescription;
     }
 
+    /**
+     * Function of loading
+     */
     function markLoading(loading) {
       self.isLoading = loading;
     }
@@ -313,19 +281,25 @@ export default types
      * Skip current task
      */
     const skipTask = flow(function* skipTask() {
-      self.markLoading(true);
+      getEnv(self).skipTask();
 
-      try {
-        const json = yield self.post(
-          `${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}${API_URL.CANCEL}`,
-          JSON.stringify({ data: JSON.stringify({ error: "cancelled" }) }),
-        );
+      if (getEnv(self).apiCalls) {
+        self.markLoading(true);
 
-        self.resetState();
+        try {
+          const json = yield self.post(
+            `${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}${API_URL.CANCEL}`,
+            JSON.stringify({ data: JSON.stringify({ error: "cancelled" }) }),
+          );
 
-        return loadTask();
-      } catch (err) {
-        console.error("Failed to skip task ", err);
+          self.resetState();
+
+          return loadTask();
+        } catch (err) {
+          console.error("Failed to skip task ", err);
+        }
+      } else {
+        InfoModal.warning("This mode without API calls.");
       }
     });
 
@@ -361,19 +335,27 @@ export default types
           });
 
           if (requestType === "update_result") {
-            yield getEnv(self).patch(
-              `${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}${API_URL.COMPLETIONS}/${c.pk}/`,
-              body,
-            );
-          } else if (requestType === "post_result") {
-            const responseCompletion = yield self.post(
-              `${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}${API_URL.COMPLETIONS}/`,
-              body,
-            );
+            getEnv(self).updateCompletion(JSON.parse(body));
 
-            const data = yield responseCompletion.json();
-            if (data && data.id) {
-              self.completionStore.selected.updatePersonalKey(data.id.toString());
+            if (self.apiCalls) {
+              yield getEnv(self).patch(
+                `${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}${API_URL.COMPLETIONS}/${c.pk}/`,
+                body,
+              );
+            }
+          } else if (requestType === "post_result") {
+            getEnv(self).submitCompletion(JSON.parse(body));
+
+            if (self.apiCalls) {
+              const responseCompletion = yield self.post(
+                `${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}${API_URL.COMPLETIONS}/`,
+                body,
+              );
+
+              const data = yield responseCompletion.json();
+              if (data && data.id) {
+                self.completionStore.selected.updatePersonalKey(data.id.toString());
+              }
             }
           }
 
@@ -483,10 +465,8 @@ export default types
       updateTask,
       markLoading,
       resetState,
-      openDescription,
-      closeDescription,
-      setDescription,
       toggleSettings,
+      toggleDescription,
       initializeStore,
     };
   });
