@@ -123,6 +123,7 @@ Type data: `object`
 ```json
 {
   id: 1,
+  load: false,
   data: {
     text: "Labeling text..."
   },
@@ -132,6 +133,18 @@ Type data: `object`
 ```
 
 #### id
+
+Type data: `integer`
+
+Default: `null`
+
+#### load
+
+Type data: `boolean`
+
+Default: `false`
+
+The flag is necessary to support the loading of API data.
 
 #### data
 
