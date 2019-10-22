@@ -49,7 +49,7 @@
     "xml2js": "^0.4.22"
   },
   "scripts": {
-    "start": "npm run copy-examples && react-scripts start",
+    "start": "npm run copy-examples && HTTPS=true react-scripts start",
     "only-build": "npm run copy-examples && react-scripts build",
     "local": "npm run only-build && npm run start",
     "build": "npm run copy-examples && npm run test && react-scripts build",
