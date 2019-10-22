@@ -92,6 +92,9 @@ export default types
     get fetch() {
       return getEnv(self).fetch;
     },
+    get fetchAuth() {
+      return getEnv(self).fetchAuth;
+    },
     /**
      * Get alert
      */
