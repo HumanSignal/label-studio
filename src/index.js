@@ -42,6 +42,7 @@ if (process.env.NODE_ENV === "production") {
     );
 
     window.Htx = app;
+    return app;
   };
 } else {
   enviroment = DevelopmentEnvironment;
