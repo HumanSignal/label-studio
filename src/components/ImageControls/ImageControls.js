@@ -20,7 +20,7 @@ export default observer(
             tipFormatter={null}
             style={{ height: 50 }}
             onChange={value => {
-              this.props.handleBrightness(value);
+              this.props.updateBrightness(value);
             }}
           />
         </Fragment>

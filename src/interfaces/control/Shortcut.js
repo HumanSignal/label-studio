@@ -4,9 +4,7 @@ import { types, getParent } from "mobx-state-tree";
 import { Tag } from "antd";
 
 import { guidGenerator } from "../../core/Helpers";
-import Utils from "../../utils";
 import Registry from "../../core/Registry";
-import Types from "../../core/Types";
 import ProcessAttrsMixin from "../mixins/ProcessAttrs";
 import Hint from "../../components/Hint/Hint";
 

@@ -21,6 +21,13 @@ const fetcher = url => {
   return wrapperRequest(url, "GET", { Accept: "application/json" });
 };
 
+const fetcherAuth = (url, data) => {
+  return wrapperRequest(url, "GET", {
+    Accept: "application/json",
+    Authorization: "Basic " + btoa(data.username + ":" + data.password),
+  });
+};
+
 const poster = (url, body) => {
   return wrapperRequest(url, "POST", { Accept: "application/json", "Content-Type": "application/json" }, body);
 };
@@ -48,4 +55,4 @@ const remover = (url, body) => {
   );
 };
 
-export default { fetcher, poster, remover, patch };
+export default { fetcher, fetcherAuth, poster, remover, patch };

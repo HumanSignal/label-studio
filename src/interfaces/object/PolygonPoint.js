@@ -1,21 +1,11 @@
-import React, { createRef, Component, Fragment } from "react";
+import React from "react";
 
-import { observer, inject } from "mobx-react";
-import { types, getParentOfType, getRoot, getParent } from "mobx-state-tree";
+import { observer } from "mobx-react";
+import { types, getParent } from "mobx-state-tree";
 
 import Konva from "konva";
-import { Shape, Label, Stage, Layer, Rect, Text, Transformer, Line, Circle } from "react-konva";
+import { Rect, Circle } from "react-konva";
 import { blue } from "@ant-design/colors";
-
-import { guidGenerator, restoreNewsnapshot } from "../../core/Helpers";
-
-import Registry from "../../core/Registry";
-
-import { LabelsModel } from "../control/Labels";
-import { RatingModel } from "../control/Rating";
-import { ImageModel } from "../object/Image";
-import RegionsMixin from "../mixins/Regions";
-import NormalizationMixin from "../mixins/Normalization";
 
 const PolygonPoint = types
   .model({
@@ -37,11 +27,19 @@ const PolygonPoint = types
     },
   }))
   .actions(self => ({
+    /**
+     * Triggered after create model
+     */
     afterCreate() {
       self.init_x = self.x;
       self.init_y = self.y;
     },
 
+    /**
+     * External function for Polygon Parent
+     * @param {number} x
+     * @param {number} y
+     */
     movePoint(x, y) {
       self.x = self.init_x + x;
       self.y = self.init_y + y;
@@ -60,13 +58,19 @@ const PolygonPoint = types
      * @param {*} ev
      */
     closeStartPoint(ev) {
-      if (self.parent.mouseOverStartPoint) self.parent.closePoly();
+      if (self.parent.mouseOverStartPoint) {
+        self.parent.closePoly();
+      }
     },
 
     handleMouseOverStartPoint(ev) {
-      const stage = self.parent.parent._stageRef;
+      const stage = self.parent.parent.stageRef;
+
       stage.container().style.cursor = "crosshair";
 
+      /**
+       * Check if polygon > 2 points and closed point
+       */
       if (self.parent.closed || self.parent.points.length < 3) return;
 
       const startPoint = ev.target;
@@ -77,9 +81,9 @@ const PolygonPoint = types
       }
 
       const scaleMap = {
-        small: 3,
+        small: 1,
         medium: 2,
-        large: 2,
+        large: 3,
       };
 
       const scale = scaleMap[self.size];
@@ -92,7 +96,7 @@ const PolygonPoint = types
     handleMouseOutStartPoint(ev) {
       const t = ev.target;
 
-      const stage = self.parent.parent._stageRef;
+      const stage = self.parent.parent.stageRef;
       stage.container().style.cursor = "default";
 
       if (self.style === "rectangle") {
@@ -138,12 +142,12 @@ const PolygonPointView = observer(({ item, name }) => {
     },
 
     onMouseOver: e => {
-      const stage = item.parent.parent._stageRef;
+      const stage = item.parent.parent.stageRef;
       stage.container().style.cursor = "crosshair";
     },
 
     onMouseOut: e => {
-      const stage = item.parent.parent._stageRef;
+      const stage = item.parent.parent.stageRef;
       stage.container().style.cursor = "default";
     },
   };

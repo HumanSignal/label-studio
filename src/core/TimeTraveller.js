@@ -1,5 +1,4 @@
 import { types, resolvePath, getEnv, onSnapshot, getSnapshot, applySnapshot } from "mobx-state-tree";
-import { IObservableArray } from "mobx";
 
 const TimeTraveller = types
   .model("TimeTraveller", {
@@ -40,10 +39,12 @@ const TimeTraveller = types
           skipNextUndoState = false;
           return;
         }
+
         self.history.splice(self.undoIdx + 1);
         self.history.push(ss);
         self.undoIdx = self.history.length - 1;
       },
+
       afterCreate() {
         targetStore = self.targetPath ? resolvePath(self, self.targetPath) : getEnv(self).targetStore;
 
@@ -62,9 +63,11 @@ const TimeTraveller = types
 
         self.createdIdx = self.undoIdx;
       },
+
       beforeDestroy() {
         snapshotDisposer();
       },
+
       undo() {
         if (self.isFrozen && self.frozenIdx <= self.undoIdx) return;
 
@@ -72,16 +75,19 @@ const TimeTraveller = types
         skipNextUndoState = true;
         applySnapshot(targetStore, self.history[self.undoIdx]);
       },
+
       redo() {
         self.undoIdx++;
         skipNextUndoState = true;
         applySnapshot(targetStore, self.history[self.undoIdx]);
       },
+
       set(idx) {
         self.undoIdx = idx;
         skipNextUndoState = true;
         applySnapshot(targetStore, self.history[self.undoIdx]);
       },
+
       reset() {
         self.undoIdx = 1;
         skipNextUndoState = true;
