@@ -94,7 +94,37 @@ Default: `null`
 
 Type data: `array`
 
-Collection of modules to include and respective options.
+Collection of modules to include and respective options:
+
+```javascript
+[
+  "controls",
+  "side-column",
+  "panel",
+  "submit",
+  "skip",
+  "update,
+  "check-empty",
+  "completions",
+  "completions:menu",
+  "predictions",
+  "predictions:menu",
+  "load"
+]
+```
+
+- `controls` - enable panel with controls (submit, update, skip)
+- `side-column` - enable panel with entities
+- `panel` - navigation panel of current task with buttons: undo, redo and reset
+- `submit` - show button of submit or update current completion
+- `skip` - show button of skip current task
+- `update` - show button of update current task after submitting
+- `check-empty` - enable validation of submit empty task
+- `completions` - enable support completions
+- `completions:menu` - show completions menu
+- `predictions` - enable support predictions
+- `predictions:menu` - show predictions menu
+- `load` - enable loading next task after submit current task
 
 ### description
 
