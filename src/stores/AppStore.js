@@ -71,7 +71,7 @@ export default types
     /**
      * Data of description flag
      */
-    description: types.optional(types.string, "No description"),
+    description: types.maybeNull(types.string),
     /**
      * Loading of Label Studio
      */

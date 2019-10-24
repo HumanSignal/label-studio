@@ -63,7 +63,7 @@ export default observer(({ store }) => {
       </div>
 
       <div className={styles.block}>
-        {store.showingDescription && (
+        {store.description && store.showingDescription && (
           <Button
             type="primary"
             onClick={ev => {
@@ -73,7 +73,7 @@ export default observer(({ store }) => {
             Hide Instructions
           </Button>
         )}
-        {!store.showingDescription && (
+        {store.description && !store.showingDescription && (
           <Button
             type="primary"
             onClick={ev => {
