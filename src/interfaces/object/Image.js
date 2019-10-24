@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { observer, inject, Provider } from "mobx-react";
-import { detach, types, getType, getParentOfType, destroy, getRoot, isValidReference } from "mobx-state-tree";
+import { detach, types, flow, getType, getParentOfType, destroy, getRoot, isValidReference } from "mobx-state-tree";
 
 import Registry from "../../core/Registry";
 import { guidGenerator, cloneNode, restoreNewsnapshot } from "../../core/Helpers";
@@ -169,11 +169,35 @@ const Model = types
 
     get controlButtonType() {
       const name = self.controlButton();
-      console.log(getType(name).name);
       return getType(name).name;
     },
   }))
   .actions(self => ({
+    /**
+     * Request to HTTP Basic Auth
+     */
+    getSecureResource(store) {
+      const requestToResource = flow(function*() {
+        try {
+          const req = yield store.fetchAuth(self._value, {
+            username: store.task.auth.username,
+            password: store.task.auth.password,
+          });
+
+          return req;
+        } catch (err) {
+          console.log(err);
+        }
+      });
+
+      return requestToResource()
+        .then(response => {
+          return response.blob();
+        })
+        .then(data => {
+          return URL.createObjectURL(data);
+        });
+    },
     /**
      * Set active Polygon
      */
@@ -528,8 +552,6 @@ const Model = types
         self.shapes.push(newPolygon);
         self.completion.addRegion(newPolygon);
       }
-
-      console.log(12345);
 
       newPolygon.addPoint(x, y);
 

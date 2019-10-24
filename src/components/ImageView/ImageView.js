@@ -262,7 +262,7 @@ export default observer(
         imgStyle["transform"] = translate + "scale(" + item.resize + ", " + item.resize + ")";
       }
 
-      if (item.hasStates) {
+      if (item.hasStates && item._value.length > 0) {
         return (
           <div
             style={{

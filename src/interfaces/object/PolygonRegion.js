@@ -370,7 +370,7 @@ const HtxPolygonView = ({ store, item }) => {
     const point = points[idx];
 
     if (!item.closed || (item.closed && item.selected)) {
-      return <PolygonPointView item={point} name={name} />;
+      return <PolygonPointView item={point} name={name} key={name} />;
     }
   }
 
@@ -385,6 +385,7 @@ const HtxPolygonView = ({ store, item }) => {
 
   return (
     <Group
+      key={item.id ? item.id : guidGenerator(5)}
       onDragStart={e => {
         item.completion.setDragMode(true);
       }}
