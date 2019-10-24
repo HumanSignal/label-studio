@@ -50,8 +50,11 @@ const Model = types
     _value: types.optional(types.string, ""),
   })
   .actions(self => ({
+    /**
+     * Select label
+     */
     toggleSelected() {
-      const sel = self.selected;
+      const selectedLabel = self.selected;
 
       const labels = Types.getParentOfTypeString(self, [
         "LabelsModel",
@@ -59,10 +62,12 @@ const Model = types
         "PolygonLabelsModel",
         "KeyPointLabelsModel",
       ]);
+
+      labels.finishCurrentObject();
+
       labels.shouldBeUnselected && labels.unselectAll();
 
-      if (labels.shouldBeUnselected && sel === true) {
-      } else {
+      if (labels.shouldBeUnselected && !selectedLabel) {
         self.selected = !self.selected;
       }
     },

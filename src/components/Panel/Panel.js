@@ -1,10 +1,9 @@
-import React, { Component } from "react";
-import { observer, inject } from "mobx-react";
-import { Button, Icon } from "antd";
+import React from "react";
+import { observer } from "mobx-react";
+import { Button } from "antd";
 
 import styles from "./Panel.module.scss";
 import Hint from "../Hint/Hint";
-import Segment from "../Segment/Segment";
 
 /**
  * Panel component with buttons:
@@ -64,7 +63,7 @@ export default observer(({ store }) => {
       </div>
 
       <div className={styles.block}>
-        {store.showingDescription && (
+        {store.description && store.showingDescription && (
           <Button
             type="primary"
             onClick={ev => {
@@ -74,7 +73,7 @@ export default observer(({ store }) => {
             Hide Instructions
           </Button>
         )}
-        {!store.showingDescription && (
+        {store.description && !store.showingDescription && (
           <Button
             type="primary"
             onClick={ev => {

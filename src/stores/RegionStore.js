@@ -1,4 +1,4 @@
-import { types, getParent } from "mobx-state-tree";
+import { types, getParent, destroy } from "mobx-state-tree";
 
 import * as HtxObjectModel from "../interfaces/object";
 

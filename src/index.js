@@ -40,6 +40,9 @@ if (process.env.NODE_ENV === "production") {
       </Provider>,
       enviroment.rootElement(element),
     );
+
+    window.Htx = app;
+    return app;
   };
 } else {
   enviroment = DevelopmentEnvironment;

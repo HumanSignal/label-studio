@@ -1,21 +1,17 @@
 import React, { Component } from "react";
 import { observer, inject, Provider } from "mobx-react";
-import { detach, types, getType, getParentOfType, destroy, getRoot, isValidReference } from "mobx-state-tree";
-
-import { Stage, Layer, Rect, Text, Group, Line, Image } from "react-konva";
-import { Icon } from "antd";
+import { detach, types, flow, getType, getParentOfType, destroy, getRoot, isValidReference } from "mobx-state-tree";
 
 import Registry from "../../core/Registry";
 import { guidGenerator, cloneNode, restoreNewsnapshot } from "../../core/Helpers";
-import Tree from "../../core/Tree";
 
 import { RectRegionModel } from "./RectRegion";
 import { PolygonRegionModel } from "./PolygonRegion";
 import { KeyPointRegionModel } from "./KeyPointRegion";
 import ProcessAttrsMixin from "../mixins/ProcessAttrs";
+import Infomodal from "../../components/Infomodal/Infomodal";
 
-import ImageTransformer from "../../components/ImageTransformer/ImageTransformer";
-import ImageControls from "../../components/ImageControls/ImageControls";
+import ImageView from "../../components/ImageView/ImageView";
 
 /**
  * Image tag shows an image on the page
@@ -62,6 +58,43 @@ const TagAttrs = types.model({
   showmousepos: types.optional(types.boolean, false),
 });
 
+const IMAGE_CONSTANTS = {
+  rectangleModel: "RectangleModel",
+  rectangleLabelsModel: "RectangleLabelsModel",
+  rectanglelabels: "rectanglelabels",
+  keypointlabels: "keypointlabels",
+  polygonlabels: "polygonlabels",
+};
+
+/**
+ * Reverse coordinates if user drags left and up
+ * @param {*} r1
+ * @param {*} r2
+ */
+function reverseCoordinates(r1, r2) {
+  let r1X = r1.x,
+    r1Y = r1.y,
+    r2X = r2.x,
+    r2Y = r2.y,
+    d;
+
+  if (r1X > r2X) {
+    d = Math.abs(r1X - r2X);
+    r1X = r2X;
+    r2X = r1X + d;
+  }
+
+  if (r1Y > r2Y) {
+    d = Math.abs(r1Y - r2Y);
+    r1Y = r2Y;
+    r2Y = r1Y + d;
+  }
+  /**
+   * Return the corrected rect
+   */
+  return { x1: r1X, y1: r1Y, x2: r2X, y2: r2Y };
+}
+
 const Model = types
   .model({
     id: types.identifier,
@@ -98,31 +131,40 @@ const Model = types
     shapes: types.array(types.union(RectRegionModel, PolygonRegionModel, KeyPointRegionModel), []),
   })
   .views(self => ({
+    /**
+     * @return {boolean}
+     */
     get hasStates() {
       const states = self.states();
       return states && states.length > 0;
     },
 
+    /**
+     * @return {object}
+     */
     get completion() {
       return getRoot(self).completionStore.selected;
     },
 
+    /**
+     * @return {object}
+     */
     states() {
       return self.completion.toNames.get(self.name);
     },
 
     controlButton() {
-      const names = self.completion.toNames.get(self.name);
+      const names = self.states();
 
-      let r = names[0];
+      let returnedControl = names[0];
 
       names.forEach(item => {
-        if (item.type === "rectanglelabels") {
-          r = item;
+        if (item.type === IMAGE_CONSTANTS.rectanglelabels) {
+          returnedControl = item;
         }
       });
 
-      return r;
+      return returnedControl;
     },
 
     get controlButtonType() {
@@ -131,15 +173,57 @@ const Model = types
     },
   }))
   .actions(self => ({
+    /**
+     * Request to HTTP Basic Auth
+     */
+    getSecureResource(store) {
+      const requestToResource = flow(function*() {
+        try {
+          const req = yield store.fetchAuth(self._value, {
+            username: store.task.auth.username,
+            password: store.task.auth.password,
+          });
+
+          return req;
+        } catch (err) {
+          console.log(err);
+        }
+      });
+
+      return requestToResource()
+        .then(response => {
+          return response.blob();
+        })
+        .then(data => {
+          return URL.createObjectURL(data);
+        });
+    },
+    /**
+     * Set active Polygon
+     */
     setActivePolygon(poly) {
       self.activePolygon = poly;
     },
 
+    /**
+     * Update brightnessGrade of Image
+     * @param {number} value
+     */
+    setBrightnessGrade(value) {
+      self.brightnessGrade = value;
+    },
+
+    /**
+     * Set pointer of X and Y
+     */
     setPointerPosition({ x, y }) {
       self.cursorPositionX = x;
       self.cursorPositionY = y;
     },
 
+    /**
+     * Set zoom
+     */
     setZoom(scale, x, y) {
       self.resize = scale + "";
       self.zoomScale = scale;
@@ -147,6 +231,10 @@ const Model = types
       self.zoomPosY = y;
     },
 
+    /**
+     * Set mode of Image (drawing and viewing)
+     * @param {string} mode
+     */
     setMode(mode) {
       self.mode = mode;
     },
@@ -163,11 +251,11 @@ const Model = types
       self.shapes.forEach(s => s.updateImageSize(width / naturalWidth, height / naturalHeight, width, height));
     },
 
-    _setStageRef(ref) {
-      self._stageRef = ref;
+    setStageRef(ref) {
+      self.stageRef = ref;
     },
 
-    _deleteSelectedShape() {
+    deleteSelectedShape() {
       if (self.selectedShape) destroy(self.selectedShape);
     },
 
@@ -179,7 +267,7 @@ const Model = types
       return detach(self.activeShape);
     },
 
-    _addShape(shape) {
+    addShape(shape) {
       self.shapes.push(shape);
       self.completion.addRegion(shape);
       self.setSelected(shape.id);
@@ -190,10 +278,10 @@ const Model = types
       let rect;
       let stroke = self.controlButton().strokecolor;
 
-      if (self.controlButtonType === "RectangleModel") {
+      if (self.controlButtonType === IMAGE_CONSTANTS.rectangleModel) {
         self.setMode("drawing");
         rect = self._addRect({ x: x, y: y, sh: 1, sw: 1, stroke: stroke, states: null, coordstype: "px", noadd: true });
-      } else if (self.controlButtonType === "RectangleLabelsModel") {
+      } else if (self.controlButtonType === IMAGE_CONSTANTS.rectangleLabelsModel) {
         self.lookupStates(null, (_, states) => {
           if (states && states.length) {
             stroke = states[0].getSelectedColor();
@@ -219,18 +307,36 @@ const Model = types
     updateDraw({ x, y }) {
       const shape = self.activeShape;
 
-      const { x1, y1, x2, y2 } = reverseCoords({ x: shape._start_x, y: shape._start_y }, { x: x, y: y });
+      const { x1, y1, x2, y2 } = reverseCoordinates({ x: shape._start_x, y: shape._start_y }, { x: x, y: y });
 
       shape.setPosition(x1, y1, x2 - x1, y2 - y1, shape.rotation);
     },
 
+    /**
+     * Lookup states
+     * @param {event} ev
+     * @param {function} fun
+     */
     lookupStates(ev, fun) {
+      /**
+       * Array of states
+       */
       const states = self.completion.toNames.get(self.name);
+
+      /**
+       * Find active states
+       */
       const activeStates = states
         ? states
             .filter(c => c.isSelected)
-            .filter(c => c.type === "rectanglelabels" || c.type === "keypointlabels" || c.type === "polygonlabels")
+            .filter(
+              c =>
+                c.type === IMAGE_CONSTANTS.rectanglelabels ||
+                c.type === IMAGE_CONSTANTS.keypointlabels ||
+                c.type === IMAGE_CONSTANTS.polygonlabels,
+            )
         : null;
+
       const clonedStates = activeStates ? activeStates.map(s => cloneNode(s)) : null;
 
       if (clonedStates.length !== 0) {
@@ -241,14 +347,14 @@ const Model = types
 
     onImageClick(ev) {
       const dispmap = {
-        PolygonModel: ev => self._addPolyEv(ev),
+        PolygonModel: ev => self.addPolyEv(ev),
         KeyPointModel: ev => self._addKeyPointEv(ev),
 
         PolygonLabelsModel: ev => {
           if (self.activePolygon && !self.activePolygon.closed) {
-            self._addPolyEv(ev);
+            self.addPolyEv(ev);
           } else {
-            self.lookupStates(ev, self._addPolyEv);
+            self.lookupStates(ev, self.addPolyEv);
           }
         },
         KeyPointLabelsModel: ev => {
@@ -256,7 +362,9 @@ const Model = types
         },
       };
 
-      if (dispmap[self.controlButtonType]) return dispmap[self.controlButtonType](ev);
+      if (dispmap[self.controlButtonType]) {
+        return dispmap[self.controlButtonType](ev);
+      }
     },
 
     _addKeyPointEv(ev, states) {
@@ -291,7 +399,7 @@ const Model = types
         coordstype: coordstype,
       });
 
-      self._addShape(kp);
+      self.addShape(kp);
     },
 
     _addRectEv(ev, states) {
@@ -360,13 +468,13 @@ const Model = types
       });
 
       if (noadd !== true) {
-        self._addShape(rect);
+        self.addShape(rect);
       }
 
       return rect;
     },
 
-    _addPolyEv(ev, states) {
+    addPolyEv(ev, states) {
       const w = 10;
       const isValid = isValidReference(() => self.activePolygon);
 
@@ -386,29 +494,49 @@ const Model = types
 
         self._addPoly({ x: x, y: y, width: w, stroke: stroke, states: states, coordstype: "perc", stateFlag: false });
 
-        const stage = self._stageRef;
+        const stage = self.stageRef;
 
         stage.container().style.cursor = "default";
       }
     },
 
-    _addPoly({ x, y, width, stroke, states, coordstype, stateFlag }) {
-      let poly = self.activePolygon;
+    addPolygonObject({ x, y, width, stroke, states, coordstype, stateFlag }) {
+      let activePolygon = self.activePolygon;
+
+      return activePolygon;
+    },
+
+    /**
+     * Add new polygon object
+     * @param {number} x
+     * @param {number} y
+     * @param {number} width Width of Polygon line
+     * @param {string} stroke Color of stroke
+     * @param {array} states
+     * @param {string} coordstype
+     * @param {boolean} stateFlag
+     * @param {string} id
+     */
+    _addPoly({ x, y, width, stroke, states, coordstype, stateFlag, id }) {
+      let newPolygon = self.activePolygon;
 
       if (stateFlag || !self.activePolygon) {
         const c = self.controlButton();
+        const polygonID = id ? id : guidGenerator();
+        const polygonOpacity = parseFloat(c.opacity);
+        const polygonStrokeWidth = parseInt(c.strokewidth);
 
-        poly = PolygonRegionModel.create({
-          id: guidGenerator(),
+        newPolygon = PolygonRegionModel.create({
+          id: polygonID,
           x: x,
           y: y,
           width: width,
           height: width,
 
-          opacity: parseFloat(c.opacity),
+          opacity: polygonOpacity,
           fillcolor: c.fillcolor,
 
-          strokewidth: parseInt(c.strokewidth),
+          strokewidth: polygonStrokeWidth,
           strokecolor: stroke,
 
           pointsize: c.pointsize,
@@ -419,15 +547,15 @@ const Model = types
           coordstype: coordstype,
         });
 
-        self.setActivePolygon(poly);
+        self.setActivePolygon(newPolygon);
 
-        self.shapes.push(poly);
-        self.completion.addRegion(poly);
+        self.shapes.push(newPolygon);
+        self.completion.addRegion(newPolygon);
       }
 
-      poly.addPoint(x, y);
+      newPolygon.addPoint(x, y);
 
-      return poly;
+      return newPolygon;
     },
 
     /**
@@ -453,7 +581,8 @@ const Model = types
        */
       params.forEach(item => {
         if (!item in obj.value) {
-          throw new Error("Not valid param");
+          Infomodal.error("Not valid control for Image");
+          return;
         }
       });
 
@@ -497,6 +626,7 @@ const Model = types
         states.fromStateJSON(obj);
 
         const poly = self._addPoly({
+          id: obj.id,
           x: obj.value.points[0][0],
           y: obj.value.points[0][1],
           width: 10,
@@ -536,346 +666,7 @@ const ImageModel = types.compose(
   ProcessAttrsMixin,
 );
 
-/**
- * Reverse coordinates if user drags left and up
- * @param {*} r1
- * @param {*} r2
- */
-function reverseCoords(r1, r2) {
-  var r1x = r1.x,
-    r1y = r1.y,
-    r2x = r2.x,
-    r2y = r2.y,
-    d;
-
-  if (r1x > r2x) {
-    d = Math.abs(r1x - r2x);
-    r1x = r2x;
-    r2x = r1x + d;
-  }
-
-  if (r1y > r2y) {
-    d = Math.abs(r1y - r2y);
-    r1y = r2y;
-    r2y = r1y + d;
-  }
-  /**
-   * Return the corrected rect
-   */
-  return { x1: r1x, y1: r1y, x2: r2x, y2: r2y };
-}
-
-const createGrid = (width, height, nodeSize) => {
-  return [...Array(width)]
-    .map((_, col) =>
-      [...Array(height)].map((_, row) => ({
-        col,
-        row,
-        x: col * nodeSize,
-        y: row * nodeSize,
-        fill: "#fff",
-      })),
-    )
-    .reduce((p, c) => [...p, ...c]);
-};
-
-class HtxImageView extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      brightness: 100,
-    };
-
-    this.updateBrightness = this.updateBrightness.bind(this);
-  }
-
-  handleOnClick = ev => {
-    const { item } = this.props;
-    return item.onImageClick(ev);
-  };
-
-  handleMouseUp = e => {
-    const { item } = this.props;
-    if (item.mode === "drawing") {
-      item.setMode("viewing");
-      const as = item.detachActiveShape();
-      if (as.width > 3 && as.height > 3) item._addShape(as);
-    }
-  };
-
-  handleMouseMove = e => {
-    const { item } = this.props;
-    if (item.mode === "drawing") {
-      const x = (e.evt.offsetX - item.zoomPosX) / item.zoomScale;
-      const y = (e.evt.offsetY - item.zoomPosY) / item.zoomScale;
-
-      item.updateDraw({ x: x, y: y });
-    }
-
-    item.setPointerPosition({ x: e.evt.offsetX, y: e.evt.offsetY });
-  };
-
-  handleMouseOver = e => {};
-
-  handleStageMouseDown = e => {
-    const { item } = this.props;
-
-    // if (e.target.getLayer()) {
-    //   let heightOfCanvas = e.target.getLayer().hitCanvas.height;
-    //   let widthOfCanvas = e.target.getLayer().hitCanvas.width;
-
-    //   let a = e.target.getLayer().children.filter(node => node.nodeType === "Shape");
-
-    //   let widthObj = a.attrs.width;
-    //   let heightObj = a.attrs.height;
-    //   let topLeft = a.attrs.x;
-
-    // }
-
-    if (item.controlButtonType === "PolygonLabelsModel") {
-      return;
-    }
-
-    if (e.target === e.target.getStage() || (e.target.parent && e.target.parent.attrs.name === "ruler")) {
-      // draw rect
-
-      const x = (e.evt.offsetX - item.zoomPosX) / item.zoomScale;
-      const y = (e.evt.offsetY - item.zoomPosY) / item.zoomScale;
-
-      item.startDraw({ x: x, y: y });
-
-      return;
-    }
-
-    // clicked on transformer - do nothing
-    const clickedOnTransformer = e.target.getParent().className === "Transformer";
-    if (clickedOnTransformer) {
-      return;
-    }
-
-    return true;
-  };
-
-  updateBrightness(range) {
-    this.setState({ brightness: range });
-  }
-
-  /**
-   * Handle to zoom
-   */
-  handleZoom = e => {
-    const { item } = this.props;
-
-    const stage = item._stageRef;
-    const scaleBy = parseFloat(item.zoomby);
-    const oldScale = stage.scaleX();
-
-    let mousePointTo;
-    let newScale;
-    let pos;
-    let newPos;
-
-    if (e.evt) {
-      mousePointTo = {
-        x: stage.getPointerPosition().x / oldScale - stage.x() / oldScale,
-        y: stage.getPointerPosition().y / oldScale - stage.y() / oldScale,
-      };
-
-      newScale = e.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
-
-      newPos = {
-        x: -(mousePointTo.x - stage.getPointerPosition().x / newScale) * newScale,
-        y: -(mousePointTo.y - stage.getPointerPosition().y / newScale) * newScale,
-      };
-    } else {
-      pos = {
-        x: stage.width() / 2,
-        y: stage.height() / 2,
-      };
-
-      mousePointTo = {
-        x: pos.x / oldScale - stage.x() / oldScale,
-        y: pos.y / oldScale - stage.y() / oldScale,
-      };
-
-      newScale = Math.max(0.05, oldScale * e);
-
-      newPos = {
-        x: -(mousePointTo.x - pos.x / newScale) * newScale,
-        y: -(mousePointTo.y - pos.y / newScale) * newScale,
-      };
-    }
-
-    if (item.negativezoom !== true && newScale <= 1) {
-      item.setZoom(1, 0, 0);
-      stage.scale({ x: 1, y: 1 });
-      stage.position({ x: 0, y: 0 });
-      stage.batchDraw();
-      return;
-    }
-
-    stage.scale({ x: newScale, y: newScale });
-
-    item.setZoom(newScale, newPos.x, newPos.y);
-    stage.position(newPos);
-    stage.batchDraw();
-  };
-
-  renderGrid() {
-    const { item } = this.props;
-    const grid = createGrid(
-      Math.ceil(item.stageWidth / item.gridSize),
-      Math.ceil(item.stageHeight / item.gridSize),
-      item.gridSize,
-    );
-
-    return (
-      <Layer opacity={0.15} name="ruler">
-        {Object.values(grid).map((n, i) => (
-          <Rect
-            key={i}
-            x={n.x}
-            y={n.y}
-            width={item.gridSize}
-            height={item.gridSize}
-            stroke={item.gridColor}
-            strokeWidth={1}
-          />
-        ))}
-      </Layer>
-    );
-  }
-
-  renderRulers() {
-    const { item } = this.props;
-    const width = 1;
-    const color = "white";
-
-    return (
-      <Group
-        name="ruler"
-        onClick={ev => {
-          ev.cancelBubble = false;
-        }}
-      >
-        <Line
-          x={0}
-          y={item.cursorPositionY}
-          points={[0, 0, item.stageWidth, 0]}
-          strokeWidth={width}
-          stroke={color}
-          tension={0}
-          dash={[4, 4]}
-          closed
-        />
-        <Line
-          x={item.cursorPositionX}
-          y={0}
-          points={[0, 0, 0, item.stageHeight]}
-          strokeWidth={width}
-          stroke={color}
-          tension={0}
-          dash={[1.5]}
-          closed
-        />
-      </Group>
-    );
-  }
-
-  updateDimensions() {
-    // this.props.item.onResizeSize(this.container.offsetWidth, this.container.offsetHeight);
-  }
-
-  componentDidMount() {
-    window.addEventListener("resize", this.updateDimensions.bind(this));
-  }
-
-  render() {
-    const { item, store } = this.props;
-
-    // TODO fix me
-    if (!store.task) return null;
-
-    const divStyle = {
-      overflow: "hidden",
-      width: item.stageWidth + "px",
-    };
-
-    const imgStyle = {
-      // width: item.width,
-      maxWidth: item.maxwidth,
-      transformOrigin: "left top",
-      filter: `brightness(${this.state.brightness}%)`,
-    };
-
-    if (item.zoomScale !== 1) {
-      let { zoomPosX, zoomPosY } = item;
-      const translate = "translate(" + zoomPosX + "px," + zoomPosY + "px) ";
-      imgStyle["transform"] = translate + "scale(" + item.resize + ", " + item.resize + ")";
-    }
-
-    if (item.hasStates) {
-      return (
-        <div
-          style={{
-            position: "relative",
-            display: "flex",
-            alignItems: "flex-start",
-            justifyContent: "space-between",
-          }}
-        >
-          <div
-            ref={node => {
-              this.container = node;
-            }}
-            style={divStyle}
-          >
-            <img style={imgStyle} src={item._value} onLoad={item.updateIE} onClick={this.handleOnClick} alt="LS" />
-          </div>
-          <Stage
-            ref={ref => {
-              item._setStageRef(ref);
-            }}
-            style={{ position: "absolute", top: 0, left: 0, brightness: "150%" }}
-            width={item.stageWidth}
-            height={item.stageHeight}
-            scaleX={item.scale}
-            scaleY={item.scale}
-            onDblClick={this.handleDblClick}
-            onClick={this.handleOnClick}
-            onMouseDown={this.handleStageMouseDown}
-            onMouseMove={this.handleMouseMove}
-            onMouseUp={this.handleMouseUp}
-            onWheel={item.zoom === true ? this.handleZoom : () => {}}
-          >
-            {item.grid && item.sizeUpdated && this.renderGrid()}
-            <Layer>
-              {item.shapes.map(s => {
-                return Tree.renderItem(s);
-              })}
-              {item.activeShape && Tree.renderItem(item.activeShape)}
-
-              <ImageTransformer rotateEnabled={item.controlButton().canrotate} selectedShape={item.selectedShape} />
-            </Layer>
-          </Stage>
-          {item.zoom || item.brightness ? (
-            <ImageControls item={item} handleZoom={this.handleZoom} handleBrightness={this.updateBrightness} />
-          ) : null}
-        </div>
-      );
-    } else {
-      divStyle["marginTop"] = "1em";
-      return (
-        <div style={divStyle}>
-          <img style={imgStyle} src={item._value} onLoad={item.updateIE} />
-        </div>
-      );
-    }
-  }
-}
-
-const HtxImage = inject("store")(observer(HtxImageView));
+const HtxImage = inject("store")(observer(ImageView));
 
 Registry.addTag("image", ImageModel, HtxImage);
 

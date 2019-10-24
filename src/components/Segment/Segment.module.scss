@@ -2,8 +2,7 @@
 
 .block {
   position: relative;
-  max-width: 1280px;
-  width: 940px;
+  width: 100%;
   margin-right: 20px;
   margin-bottom: 20px;
   background: #fff;
@@ -26,5 +25,6 @@
 
   @include respond("phone") {
     width: 100%;
+    margin-right: 0;
   }
 }

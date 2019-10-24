@@ -176,7 +176,7 @@ const Model = types
       self.wp = wp;
       self.hp = hp;
 
-      if (self.coordstype == "perc") {
+      if (self.coordstype === "perc") {
         self.points.map(p => {
           const x = (sw * p.x) / 100;
           const y = (sh * p.y) / 100;
@@ -370,7 +370,7 @@ const HtxPolygonView = ({ store, item }) => {
     const point = points[idx];
 
     if (!item.closed || (item.closed && item.selected)) {
-      return <PolygonPointView item={point} name={name} />;
+      return <PolygonPointView item={point} name={name} key={name} />;
     }
   }
 
@@ -385,10 +385,11 @@ const HtxPolygonView = ({ store, item }) => {
 
   return (
     <Group
+      key={item.id ? item.id : guidGenerator(5)}
       onDragStart={e => {
         item.completion.setDragMode(true);
       }}
-      dragBoundFunc={function(pos, ev) {
+      dragBoundFunc={function(pos) {
         let { x, y } = pos;
         /* if (x < 0) x = 0; */
         /* if (y < 0) y = 0; */
@@ -416,7 +417,7 @@ const HtxPolygonView = ({ store, item }) => {
         });
       }}
       onMouseOver={e => {
-        const stage = item.parent._stageRef;
+        const stage = item.parent.stageRef;
 
         if (store.completionStore.selected.relationMode) {
           item.setHighlight(true);
@@ -426,7 +427,7 @@ const HtxPolygonView = ({ store, item }) => {
         }
       }}
       onMouseOut={e => {
-        const stage = item.parent._stageRef;
+        const stage = item.parent.stageRef;
         stage.container().style.cursor = "default";
 
         if (store.completionStore.selected.relationMode) {
@@ -438,7 +439,7 @@ const HtxPolygonView = ({ store, item }) => {
 
         if (!item.closed) return;
 
-        const stage = item.parent._stageRef;
+        const stage = item.parent.stageRef;
 
         if (store.completionStore.selected.relationMode) {
           stage.container().style.cursor = "default";

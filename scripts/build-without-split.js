@@ -8,4 +8,7 @@ config.optimization.splitChunks = {
   },
 };
 
+/**
+ * Disable chunks in production build
+ */
 config.optimization.runtimeChunk = false;

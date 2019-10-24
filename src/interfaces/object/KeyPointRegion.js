@@ -185,7 +185,7 @@ const HtxKeyPointView = ({ store, item }) => {
           };
         }}
         onMouseOver={e => {
-          const stage = item.parent._stageRef;
+          const stage = item.parent.stageRef;
 
           if (store.completionStore.selected.relationMode) {
             item.setHighlight(true);
@@ -195,7 +195,7 @@ const HtxKeyPointView = ({ store, item }) => {
           }
         }}
         onMouseOut={e => {
-          const stage = item.parent._stageRef;
+          const stage = item.parent.stageRef;
           stage.container().style.cursor = "default";
 
           if (store.completionStore.selected.relationMode) {
@@ -203,7 +203,7 @@ const HtxKeyPointView = ({ store, item }) => {
           }
         }}
         onClick={e => {
-          const stage = item.parent._stageRef;
+          const stage = item.parent.stageRef;
 
           if (store.completionStore.selected.relationMode) {
             stage.container().style.cursor = "default";

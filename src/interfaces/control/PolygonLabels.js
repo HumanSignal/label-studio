@@ -1,10 +1,9 @@
 import { observer } from "mobx-react";
-import React, { Component } from "react";
+import React from "react";
 
 import { types } from "mobx-state-tree";
 
 import Types from "../../core/Types";
-import Tree from "../../core/Tree";
 import Registry from "../../core/Registry";
 
 import { guidGenerator } from "../../core/Helpers";
@@ -12,6 +11,7 @@ import SelectedModelMixin from "../mixins/SelectedModel";
 
 import { HtxLabels, LabelsModel } from "./Labels";
 import { PolygonModel } from "./Polygon";
+import LabelMixin from "../mixins/LabelMixin";
 
 /**
  * PolygonLabels tag, create labeled polygons
@@ -38,37 +38,24 @@ const TagAttrs = types.model({
   toname: types.maybeNull(types.string),
 });
 
-const Model = types
-  .model("PolygonLabelsModel", {
-    id: types.optional(types.identifier, guidGenerator),
-    pid: types.optional(types.string, guidGenerator),
-    type: "polygonlabels",
-    children: Types.unionArray(["labels", "label", "choice"]),
-  })
-  .actions(self => ({
-    fromStateJSON(obj, fromModel) {
-      self.unselectAll();
+const ModelAttrs = types.model("PolygonLabelsModel", {
+  id: types.optional(types.identifier, guidGenerator),
+  pid: types.optional(types.string, guidGenerator),
+  type: "polygonlabels",
+  children: Types.unionArray(["labels", "label", "choice"]),
+});
 
-      if (!obj.value.polygonlabels) throw new Error("No labels param");
-
-      if (obj.id) self.pid = obj.id;
-
-      obj.value.polygonlabels.forEach(l => {
-        const label = self.findLabel(l);
-        if (!label) throw new Error("No label " + obj.value.label);
-
-        label.markSelected(true);
-      });
-    },
-  }));
+const Model = LabelMixin.props({ _type: "polygonlabels" });
 
 const Composition = types.compose(
   LabelsModel,
+  ModelAttrs,
   PolygonModel,
   TagAttrs,
   Model,
   SelectedModelMixin,
 );
+
 const PolygonLabelsModel = types.compose(
   "PolygonLabelsModel",
   Composition,

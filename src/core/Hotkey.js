@@ -3,11 +3,10 @@ import keymaster from "keymaster";
 let _hotkeys_map = {};
 
 keymaster.filter = function(event) {
-  if (keymaster.getScope() == "__none__") return;
+  if (keymaster.getScope() === "__none__") return;
 
   const tag = (event.target || event.srcElement).tagName;
   const name = (event.target || event.srcElement).name;
-  const curscope = keymaster.scope;
 
   keymaster.setScope(/^(INPUT|TEXTAREA|SELECT)$/.test(tag) ? name : "__main__");
 

@@ -1,6 +1,15 @@
 import { types, getParent } from "mobx-state-tree";
 
 import Utilities from "../utils";
+/**
+ * Model for HTTP Basic Authorization
+ */
+const AuthStore = types.model({
+  enable: types.optional(types.boolean, false),
+  username: types.string,
+  password: types.string,
+  to: types.string,
+});
 
 /**
  * Task Store
@@ -9,6 +18,7 @@ const TaskStore = types
   .model("Task", {
     id: types.maybeNull(types.number),
     load: types.optional(types.boolean, false),
+    auth: types.maybeNull(AuthStore),
     /**
      * Data of task, may contain an object but in App Store will be transformed into string
      * MST doesn't support processing of dynamic objects with unkown keys value

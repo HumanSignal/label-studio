@@ -94,7 +94,37 @@ Default: `null`
 
 Type data: `array`
 
-Collection of modules to include and respective options.
+Collection of modules to include and respective options:
+
+```javascript
+[
+  "controls",
+  "side-column",
+  "panel",
+  "submit",
+  "skip",
+  "update,
+  "check-empty",
+  "completions",
+  "completions:menu",
+  "predictions",
+  "predictions:menu",
+  "load"
+]
+```
+
+- `controls` - enable panel with controls (submit, update, skip)
+- `side-column` - enable panel with entities
+- `panel` - navigation panel of current task with buttons: undo, redo and reset
+- `submit` - show button of submit or update current completion
+- `skip` - show button of skip current task
+- `update` - show button of update current task after submitting
+- `check-empty` - enable validation of submit empty task
+- `completions` - enable support completions
+- `completions:menu` - show completions menu
+- `predictions` - enable support predictions
+- `predictions:menu` - show predictions menu
+- `load` - enable loading next task after submit current task
 
 ### description
 
@@ -123,6 +153,13 @@ Type data: `object`
 ```json
 {
   id: 1,
+  load: false,
+  auth: {
+    enable: true,
+    to: "text",
+    username: "user",
+    password: "pass"
+  },
   data: {
     text: "Labeling text..."
   },
@@ -132,6 +169,50 @@ Type data: `object`
 ```
 
 #### id
+
+Type data: `integer`
+
+Default: `null`
+
+#### auth
+
+Type data: `object`
+
+Default: `null`
+
+The object is necessary to support data from servers with HTTP basic authentication.
+
+##### enable
+
+Type data: `boolean`
+
+Default: `false`
+
+##### to
+
+Type data: `string`
+
+Default: ` `
+
+##### username
+
+Type data: `string`
+
+Default: ` `
+
+##### password
+
+Type data: `string`
+
+Default: ` `
+
+#### load
+
+Type data: `boolean`
+
+Default: `false`
+
+The flag is necessary to support the loading of API data.
 
 #### data
 
@@ -247,5 +328,33 @@ Called when a button `delete` is pressed. `result` is value of current completio
 ```javascript
 deleteCompletion: function(result) {
   console.log(result)
+}
+```
+
+## Custom data
+
+If you want to use Label Studio with data from server with [HTTP basic authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication), then you need to configure Headers on the server:
+
+```shell
+Access-Control-Allow-Origin: '*';
+Access-Control-Allow-Credentials: true;
+Access-Control-Allow-Methods: 'GET, POST, OPTIONS';
+Access-Control-Allow-Headers: 'Cache-Control, Pragma, Origin, Authorization, Content-Type, X-Requested-With';
+Access-Control-Expose-Headers: 'Content-Length,Content-Range';
+```
+
+And configure LS:
+
+```javascript
+task: {
+  auth: {
+    enable: true,
+    to: 'image',
+    username: 'user',
+    password: 'pass',
+  },
+  data: {
+    image: 'https://example.com/custom_data_with_http_auth.jpg'
+  }
 }
 ```

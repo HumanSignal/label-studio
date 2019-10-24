@@ -16,7 +16,7 @@ import Requests from "../core/Requests";
 /**
  * Custom Data
  */
-const data = Sentiment;
+const data = ImagePolygons;
 
 /**
  * Get current config
@@ -66,6 +66,7 @@ function rootElement(element) {
 function configureApplication(params) {
   const options = {
     fetch: Requests.fetcher,
+    fetchAuth: Requests.fetcherAuth,
     patch: Requests.patch,
     post: Requests.poster,
     remove: Requests.remover,
