@@ -1,10 +1,12 @@
 import { types, getParent } from "mobx-state-tree";
 
 import Utilities from "../utils";
-
+/**
+ * Model for HTTP Basic Authorization
+ */
 const AuthStore = types.model({
   enable: types.optional(types.boolean, false),
-  login: types.string,
+  username: types.string,
   password: types.string,
   to: types.string,
 });
