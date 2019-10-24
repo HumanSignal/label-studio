@@ -21,11 +21,17 @@ const fetcher = url => {
   return wrapperRequest(url, "GET", { Accept: "application/json" });
 };
 
-const fetcherAuth = (url, data) => {
-  return wrapperRequest(url, "GET", {
-    Accept: "application/json",
-    Authorization: "Basic " + btoa(data.username + ":" + data.password),
+const fetcherAuth = async (url, data) => {
+  const response = await window.fetch(url, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      Authorization: "Basic " + btoa(data.username + ":" + data.password),
+    },
+    credentials: "same-origin",
   });
+  return handleResponse(response);
 };
 
 const poster = (url, body) => {
