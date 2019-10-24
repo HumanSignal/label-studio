@@ -154,6 +154,12 @@ Type data: `object`
 {
   id: 1,
   load: false,
+  auth: {
+    enable: true,
+    to: "text",
+    username: "user",
+    password: "pass"
+  },
   data: {
     text: "Labeling text..."
   },
@@ -167,6 +173,38 @@ Type data: `object`
 Type data: `integer`
 
 Default: `null`
+
+#### auth
+
+Type data: `object`
+
+Default: `null`
+
+The object is necessary to support data from servers with HTTP basic authentication.
+
+##### enable
+
+Type data: `boolean`
+
+Default: `false`
+
+##### to
+
+Type data: `string`
+
+Default: ` `
+
+##### username
+
+Type data: `string`
+
+Default: ` `
+
+##### password
+
+Type data: `string`
+
+Default: ` `
 
 #### load
 
@@ -290,5 +328,33 @@ Callback will be called when a button `delete` is pressed. `completion` is value
 ```javascript
 updateCompletion: function(completion) {
   console.log(completion)
+}
+```
+
+## Custom data
+
+If you want to use Label Studio with data from server with [HTTP basic authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication), then you need to configure Headers on the server:
+
+```shell
+Access-Control-Allow-Origin: '*';
+Access-Control-Allow-Credentials: true;
+Access-Control-Allow-Methods: 'GET, POST, OPTIONS';
+Access-Control-Allow-Headers: 'Cache-Control, Pragma, Origin, Authorization, Content-Type, X-Requested-With';
+Access-Control-Expose-Headers: 'Content-Length,Content-Range';
+```
+
+And configure LS:
+
+```javascript
+task: {
+  auth: {
+    enable: true,
+    to: 'image',
+    username: 'user',
+    password: 'pass',
+  },
+  data: {
+    image: 'https://example.com/custom_data_with_http_auth.jpg'
+  }
 }
 ```
