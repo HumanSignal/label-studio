@@ -10,13 +10,13 @@ Instantiate a new Label Studio object with a selector for the div that should be
 
 ```xhtml
 <!-- Include Label Studio stylesheet -->
-<link href="https://unpkg.com/label-studio@0.2.1/build/static/css/main.05fec320.css" rel="stylesheet">
+<link href="https://unpkg.com/label-studio@0.2.1-3/build/static/css/main.05fec320.css" rel="stylesheet">
 
 <!-- Create the Label Studio container -->
 <div id="editor"></div>
 
 <!-- Include the Label Studio library -->
-<script src="https://unpkg.com/label-studio@0.2.1/build/static/js/main.0000e798.js"></script>
+<script src="https://unpkg.com/label-studio@0.2.1-3/build/static/js/main.c684fef9.js"></script>
 
 <!-- Initialize Label Studio -->
 <script>
