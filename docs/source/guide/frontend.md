@@ -10,17 +10,17 @@ Instantiate a new Label Studio object with a selector for the div that should be
 
 ```xhtml
 <!-- Include Label Studio stylesheet -->
-<link href="https://unpkg.com/label-studio@0.2.1/build/static/css/main.05fec320.css" rel="stylesheet">
+<link href="https://unpkg.com/label-studio@0.2.1-3/build/static/css/main.05fec320.css" rel="stylesheet">
 
 <!-- Create the Label Studio container -->
 <div id="editor"></div>
 
 <!-- Include the Label Studio library -->
-<script src="https://unpkg.com/label-studio@0.2.1/build/static/js/main.0000e798.js"></script>
+<script src="https://unpkg.com/label-studio@0.2.1-3/build/static/js/main.c684fef9.js"></script>
 
 <!-- Initialize Label Studio -->
 <script>
-  var labelStudio = new LabelStudio('#editor', {
+  var labelStudio = new LabelStudio('editor', {
     config: `
       <View>
         <Image name="img" value="$image"></Image>
@@ -110,7 +110,7 @@ Default: `true`
 
 Type data: `boolean`
 
-Whether to instantiate the Label Studio to API Calls mode.
+Whether to instantiate the Label Studio to API Calls mode with the backend. If `false`, submissions can be triggered via the callbacks.
 
 ### task
 
@@ -155,13 +155,13 @@ Type data: `object`
 
 ```json
 {
-  id: 1,
+  pk: 1,
   firstName: "Stanley",
   lastName: "Kubrick"
 }
 ```
 
-#### id
+#### pk
 
 Type data: `number`
 
@@ -203,7 +203,7 @@ Type data: `boolean`
 
 Default: `false`
 
-Flag fo labeling of tasks, if the flag is true then after submitting the next task will be called. 
+Flag fo labeling of tasks, if the flag is true then after submitting the next task will be called from the backend. 
 
 
 ## Callbacks
@@ -240,12 +240,12 @@ updateCompletion: function(result) {
 
 Type data: `function`
 
-Callback will be called when a button `delete` is pressed. `completion` is value of current completion.
+Called when a button `delete` is pressed. `result` is value of current completion.
 
 #### Example
 
 ```javascript
-updateCompletion: function(completion) {
-  console.log(completion)
+deleteCompletion: function(result) {
+  console.log(result)
 }
 ```
