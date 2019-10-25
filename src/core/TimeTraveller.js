@@ -69,7 +69,7 @@ const TimeTraveller = types
       },
 
       undo() {
-        if (self.isFrozen && self.frozenIdx <= self.undoIdx) return;
+        if (self.isFrozen && self.frozenIdx < self.undoIdx) return;
 
         self.undoIdx--;
         skipNextUndoState = true;

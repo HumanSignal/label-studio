@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { observer } from "mobx-react";
+import { getParent } from "mobx-state-tree";
 import { Stage, Layer, Rect, Group, Line } from "react-konva";
 
 import Tree from "../../core/Tree";
@@ -42,6 +43,7 @@ export default observer(
      */
     handleMouseUp = e => {
       const { item } = this.props;
+      // getParent(item, 4)[0].history.freeze();
 
       if (item.mode === "drawing") {
         /**
@@ -57,6 +59,7 @@ export default observer(
 
     handleMouseMove = e => {
       const { item } = this.props;
+      getParent(item, 4)[0].history.freeze();
       if (item.mode === "drawing") {
         const x = (e.evt.offsetX - item.zoomPosX) / item.zoomScale;
         const y = (e.evt.offsetY - item.zoomPosY) / item.zoomScale;
@@ -71,6 +74,7 @@ export default observer(
 
     handleStageMouseDown = e => {
       const { item } = this.props;
+      // getParent(item, 4)[0].history.freeze();
 
       if (item.controlButtonType === "PolygonLabelsModel") {
         return;
@@ -110,6 +114,7 @@ export default observer(
      */
     handleZoom = e => {
       const { item } = this.props;
+      getParent(item, 4)[0].history.freeze();
 
       const stage = item.stageRef;
       const scaleBy = parseFloat(item.zoomby);
