@@ -198,12 +198,6 @@ const Model = types
           return URL.createObjectURL(data);
         });
     },
-    /**
-     * Set active Polygon
-     */
-    setActivePolygon(poly) {
-      self.activePolygon = poly;
-    },
 
     /**
      * Update brightnessGrade of Image
@@ -253,6 +247,21 @@ const Model = types
 
     setStageRef(ref) {
       self.stageRef = ref;
+    },
+
+    /**
+     * Set active Polygon
+     */
+    setActivePolygon(poly) {
+      self.activePolygon = poly;
+    },
+
+    detachActivePolygon() {
+      return detach(self.activePolygon);
+    },
+
+    deleteActivePolygon() {
+      if (self.activePolygon) destroy(self.activePolygon);
     },
 
     deleteSelectedShape() {
@@ -574,7 +583,7 @@ const Model = types
     },
 
     fromStateJSON(obj, fromModel) {
-      const params = ["choices", "shape", "rectanglelabels"];
+      const params = ["choices", "shape", "rectanglelabels", "polygonlabels"];
 
       /**
        * Check correct controls for image object

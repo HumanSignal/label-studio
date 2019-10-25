@@ -51,8 +51,6 @@ export default observer(
 
         const as = item.detachActiveShape();
 
-        console.log(as);
-
         if (as.width > 3 && as.height > 3) item.addShape(as);
       }
     };

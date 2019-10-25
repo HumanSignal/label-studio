@@ -1,7 +1,7 @@
 import React, { createRef, Component, Fragment } from "react";
 
 import { observer, inject } from "mobx-react";
-import { types, getParentOfType, getRoot, getParent } from "mobx-state-tree";
+import { types, getParentOfType, getRoot, destroy, detach, getParent } from "mobx-state-tree";
 
 import Konva from "konva";
 import { Circle, Shape, Label, Stage, Layer, Rect, Text, Transformer, Group, Line } from "react-konva";
@@ -138,6 +138,23 @@ const Model = types
       }
     },
 
+    beforeDestroy() {
+      if (self.parent.activePolygon && self.parent.activePolygon.id === self.id) {
+        self.points.forEach(point => {
+          destroy(point);
+        });
+        self.parent.activePolygon.points.forEach(point => {
+          destroy(point);
+        });
+        // destroy(self.parent.activePolygon);
+        // console.log(self.parent);
+        // self.parent.detachActivePolygon();
+        // self.parent.deleteActivePolygon();
+        self.parent.deleteSelectedShape(self);
+        self.parent.activePolygon = self.parent.shapes.length ? self.parent.shapes[0] : null;
+      }
+    },
+
     unselectRegion() {
       self.selected = false;
       self.parent.setSelected(undefined);
@@ -176,7 +193,7 @@ const Model = types
       self.wp = wp;
       self.hp = hp;
 
-      if (self.coordstype === "perc") {
+      if (!self.completion.sentUserGenerate && self.coordstype === "perc") {
         self.points.map(p => {
           const x = (sw * p.x) / 100;
           const y = (sh * p.y) / 100;
