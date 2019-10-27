@@ -140,18 +140,9 @@ const Model = types
 
     beforeDestroy() {
       if (self.parent.activePolygon && self.parent.activePolygon.id === self.id) {
-        self.points.forEach(point => {
-          destroy(point);
-        });
-        self.parent.activePolygon.points.forEach(point => {
-          destroy(point);
-        });
-        // destroy(self.parent.activePolygon);
-        // console.log(self.parent);
-        // self.parent.detachActivePolygon();
-        // self.parent.deleteActivePolygon();
-        self.parent.deleteSelectedShape(self);
-        self.parent.activePolygon = self.parent.shapes.length ? self.parent.shapes[0] : null;
+        self.parent.setActivePolygon(null);
+        self.parent.deleteSelectedShape();
+        destroy(self.points);
       }
     },
 

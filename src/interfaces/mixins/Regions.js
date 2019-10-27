@@ -48,6 +48,7 @@ const RegionsMixin = types
       self.completion.relationStore.deleteNodeRelation(self);
 
       self.completion.regionStore.deleteRegion(self);
+
       self.completion.deleteRegion(self);
     },
 
