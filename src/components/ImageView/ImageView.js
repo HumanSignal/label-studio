@@ -113,7 +113,24 @@ export default observer(
      * Handle to zoom
      */
     handleZoom = e => {
+      /**
+       * Disable if user doesn't use ctrl
+       */
+      if (e.evt && !e.evt.ctrlKey) {
+        return;
+      } else if (e.evt && e.evt.ctrlKey) {
+        /**
+         * Disable scrolling page
+         */
+        e.evt.preventDefault();
+      }
+
       const { item } = this.props;
+
+      /**
+       * Freeze Time Traveller
+       * TODO: currently work with [0] completion
+       */
       getParent(item, 4)[0].history.freeze();
 
       const stage = item.stageRef;
@@ -297,7 +314,7 @@ export default observer(
               onMouseDown={this.handleStageMouseDown}
               onMouseMove={this.handleMouseMove}
               onMouseUp={this.handleMouseUp}
-              onWheel={item.zoom === true ? this.handleZoom : () => {}}
+              onWheel={item.zoom ? this.handleZoom : () => {}}
             >
               {item.grid && item.sizeUpdated && this.renderGrid()}
               <Layer>
