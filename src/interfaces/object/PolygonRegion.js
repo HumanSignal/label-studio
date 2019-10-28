@@ -4,7 +4,7 @@ import { observer, inject } from "mobx-react";
 import { types, getParentOfType, getRoot, destroy, detach, getParent } from "mobx-state-tree";
 
 import Konva from "konva";
-import { Circle, Shape, Label, Stage, Layer, Rect, Text, Transformer, Group, Line } from "react-konva";
+import { Group, Line } from "react-konva";
 
 import { guidGenerator, restoreNewsnapshot } from "../../core/Helpers";
 

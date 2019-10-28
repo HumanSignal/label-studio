@@ -5,7 +5,6 @@ import { types, getParent } from "mobx-state-tree";
 
 import Konva from "konva";
 import { Rect, Circle } from "react-konva";
-import { blue } from "@ant-design/colors";
 
 const PolygonPoint = types
   .model({
@@ -19,7 +18,7 @@ const PolygonPoint = types
 
     style: types.string,
     size: types.string,
-    // isMouseOverStartPoint: types.optional(types.boolean, false),
+    isMouseOverStartPoint: types.optional(types.boolean, false),
   })
   .views(self => ({
     get parent() {
@@ -81,9 +80,9 @@ const PolygonPoint = types
       }
 
       const scaleMap = {
-        small: 1,
-        medium: 2,
-        large: 3,
+        small: 2,
+        medium: 3,
+        large: 4,
       };
 
       const scale = scaleMap[self.size];
@@ -129,7 +128,7 @@ const PolygonPointView = observer(({ item, name }) => {
     item.index === 0
       ? {
           hitStrokeWidth: 12,
-          fill: blue.primary,
+          fill: item.parent.strokecolor ? item.parent.strokecolor : item.primary,
           onMouseOver: item.handleMouseOverStartPoint,
           onMouseOut: item.handleMouseOutStartPoint,
           onClick: item.closeStartPoint,

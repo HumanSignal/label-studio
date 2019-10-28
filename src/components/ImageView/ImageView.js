@@ -318,8 +318,8 @@ export default observer(
             >
               {item.grid && item.sizeUpdated && this.renderGrid()}
               <Layer>
-                {item.shapes.map(s => {
-                  return Tree.renderItem(s);
+                {item.shapes.map(shape => {
+                  return Tree.renderItem(shape);
                 })}
                 {item.activeShape && Tree.renderItem(item.activeShape)}
 

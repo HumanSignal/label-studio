@@ -1,10 +1,14 @@
 import { types, resolvePath, getEnv, onSnapshot, getSnapshot, applySnapshot } from "mobx-state-tree";
 
+/**
+ * Time Traveller
+ */
 const TimeTraveller = types
   .model("TimeTraveller", {
     history: types.array(types.frozen()),
     undoIdx: -1,
     targetPath: "",
+    skipNextUndoState: types.optional(types.boolean, false),
 
     createdIdx: 1,
 
@@ -24,19 +28,18 @@ const TimeTraveller = types
   .actions(self => {
     let targetStore;
     let snapshotDisposer;
-    let skipNextUndoState = false;
 
     return {
       freeze() {
         self.isFrozen = true;
-        skipNextUndoState = true;
+        self.skipNextUndoState = true;
         self.frozenIdx = self.undoIdx;
       },
 
       addUndoState(ss) {
-        if (skipNextUndoState) {
+        if (self.skipNextUndoState) {
           // skip recording if this state was caused by undo / redo
-          skipNextUndoState = false;
+          self.skipNextUndoState = false;
           return;
         }
 
@@ -58,7 +61,7 @@ const TimeTraveller = types
         snapshotDisposer = onSnapshot(targetStore, snapshot => this.addUndoState(snapshot));
         // record an initial state if no known
         if (self.history.length === 0) {
-          this.addUndoState(getSnapshot(targetStore));
+          self.addUndoState(getSnapshot(targetStore));
         }
 
         self.createdIdx = self.undoIdx;
@@ -71,27 +74,21 @@ const TimeTraveller = types
       undo() {
         if (self.isFrozen && self.frozenIdx < self.undoIdx) return;
 
-        self.undoIdx--;
-        skipNextUndoState = true;
-        applySnapshot(targetStore, self.history[self.undoIdx]);
+        self.set(self.undoIdx--);
       },
 
       redo() {
-        self.undoIdx++;
-        skipNextUndoState = true;
-        applySnapshot(targetStore, self.history[self.undoIdx]);
+        self.set(self.undoIdx++);
       },
 
       set(idx) {
         self.undoIdx = idx;
-        skipNextUndoState = true;
-        applySnapshot(targetStore, self.history[self.undoIdx]);
+        self.skipNextUndoState = true;
+        applySnapshot(targetStore, self.history[idx]);
       },
 
       reset() {
-        self.undoIdx = 1;
-        skipNextUndoState = true;
-        applySnapshot(targetStore, self.history[self.undoIdx]);
+        self.set(self.createdIdx);
       },
     };
   });
