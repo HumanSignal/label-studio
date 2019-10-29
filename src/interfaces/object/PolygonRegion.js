@@ -1,10 +1,10 @@
 import React, { createRef, Component, Fragment } from "react";
 
 import { observer, inject } from "mobx-react";
-import { types, getParentOfType, getRoot, getParent } from "mobx-state-tree";
+import { types, getParentOfType, getRoot, destroy, detach, getParent } from "mobx-state-tree";
 
 import Konva from "konva";
-import { Circle, Shape, Label, Stage, Layer, Rect, Text, Transformer, Group, Line } from "react-konva";
+import { Group, Line } from "react-konva";
 
 import { guidGenerator, restoreNewsnapshot } from "../../core/Helpers";
 
@@ -138,6 +138,13 @@ const Model = types
       }
     },
 
+    destroyRegion() {
+      self.parent.setActivePolygon(null);
+      self.parent.deleteSelectedShape();
+      detach(self.points);
+      destroy(self.points);
+    },
+
     unselectRegion() {
       self.selected = false;
       self.parent.setSelected(undefined);
@@ -176,7 +183,7 @@ const Model = types
       self.wp = wp;
       self.hp = hp;
 
-      if (self.coordstype === "perc") {
+      if (!self.completion.sentUserGenerate && self.coordstype === "perc") {
         self.points.map(p => {
           const x = (sw * p.x) / 100;
           const y = (sh * p.y) / 100;
@@ -452,9 +459,9 @@ const HtxPolygonView = ({ store, item }) => {
     >
       {item.mouseOverStartPoint}
 
-      {renderPoly(item.points)}
-      {renderLines(item.points)}
-      {renderCircles(item.points)}
+      {item.points ? renderPoly(item.points) : null}
+      {item.points ? renderLines(item.points) : null}
+      {item.points ? renderCircles(item.points) : null}
     </Group>
   );
 };

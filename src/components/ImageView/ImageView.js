@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { observer } from "mobx-react";
+import { getParent } from "mobx-state-tree";
 import { Stage, Layer, Rect, Group, Line } from "react-konva";
 
 import Tree from "../../core/Tree";
@@ -42,6 +43,7 @@ export default observer(
      */
     handleMouseUp = e => {
       const { item } = this.props;
+      // getParent(item, 4)[0].history.freeze();
 
       if (item.mode === "drawing") {
         /**
@@ -51,14 +53,13 @@ export default observer(
 
         const as = item.detachActiveShape();
 
-        console.log(as);
-
         if (as.width > 3 && as.height > 3) item.addShape(as);
       }
     };
 
     handleMouseMove = e => {
       const { item } = this.props;
+      getParent(item, 4)[0].history.freeze();
       if (item.mode === "drawing") {
         const x = (e.evt.offsetX - item.zoomPosX) / item.zoomScale;
         const y = (e.evt.offsetY - item.zoomPosY) / item.zoomScale;
@@ -73,6 +74,7 @@ export default observer(
 
     handleStageMouseDown = e => {
       const { item } = this.props;
+      getParent(item, 4)[0].history.freeze();
 
       if (item.controlButtonType === "PolygonLabelsModel") {
         return;
@@ -111,7 +113,25 @@ export default observer(
      * Handle to zoom
      */
     handleZoom = e => {
+      /**
+       * Disable if user doesn't use ctrl
+       */
+      if (e.evt && !e.evt.ctrlKey) {
+        return;
+      } else if (e.evt && e.evt.ctrlKey) {
+        /**
+         * Disable scrolling page
+         */
+        e.evt.preventDefault();
+      }
+
       const { item } = this.props;
+
+      /**
+       * Freeze Time Traveller
+       * TODO: currently work with [0] completion
+       */
+      getParent(item, 4)[0].history.freeze();
 
       const stage = item.stageRef;
       const scaleBy = parseFloat(item.zoomby);
@@ -294,12 +314,12 @@ export default observer(
               onMouseDown={this.handleStageMouseDown}
               onMouseMove={this.handleMouseMove}
               onMouseUp={this.handleMouseUp}
-              onWheel={item.zoom === true ? this.handleZoom : () => {}}
+              onWheel={item.zoom ? this.handleZoom : () => {}}
             >
               {item.grid && item.sizeUpdated && this.renderGrid()}
               <Layer>
-                {item.shapes.map(s => {
-                  return Tree.renderItem(s);
+                {item.shapes.map(shape => {
+                  return Tree.renderItem(shape);
                 })}
                 {item.activeShape && Tree.renderItem(item.activeShape)}
 

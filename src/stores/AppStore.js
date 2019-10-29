@@ -373,8 +373,6 @@ export default types
               self.labeledSuccess = true;
             }
           }
-
-          // delete state.history;
         } catch (err) {
           console.error("Failed to send task ", err);
         }

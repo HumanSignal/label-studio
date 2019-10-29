@@ -1,6 +1,16 @@
 import React, { Component } from "react";
 import { observer, inject, Provider } from "mobx-react";
-import { detach, types, flow, getType, getParentOfType, destroy, getRoot, isValidReference } from "mobx-state-tree";
+import {
+  detach,
+  types,
+  flow,
+  getParent,
+  getType,
+  getParentOfType,
+  destroy,
+  getRoot,
+  isValidReference,
+} from "mobx-state-tree";
 
 import Registry from "../../core/Registry";
 import { guidGenerator, cloneNode, restoreNewsnapshot } from "../../core/Helpers";
@@ -198,12 +208,6 @@ const Model = types
           return URL.createObjectURL(data);
         });
     },
-    /**
-     * Set active Polygon
-     */
-    setActivePolygon(poly) {
-      self.activePolygon = poly;
-    },
 
     /**
      * Update brightnessGrade of Image
@@ -255,6 +259,21 @@ const Model = types
       self.stageRef = ref;
     },
 
+    /**
+     * Set active Polygon
+     */
+    setActivePolygon(poly) {
+      self.activePolygon = poly;
+    },
+
+    detachActivePolygon() {
+      return detach(self.activePolygon);
+    },
+
+    deleteActivePolygon() {
+      if (self.activePolygon) destroy(self.activePolygon);
+    },
+
     deleteSelectedShape() {
       if (self.selectedShape) destroy(self.selectedShape);
     },
@@ -274,9 +293,15 @@ const Model = types
       shape.selectRegion();
     },
 
+    removeShape(shape) {
+      destroy(shape);
+    },
+
     startDraw({ x, y }) {
       let rect;
       let stroke = self.controlButton().strokecolor;
+      getParent(self, 3).history.freeze();
+      console.log(getParent(self, 3).history);
 
       if (self.controlButtonType === IMAGE_CONSTANTS.rectangleModel) {
         self.setMode("drawing");
@@ -574,7 +599,7 @@ const Model = types
     },
 
     fromStateJSON(obj, fromModel) {
-      const params = ["choices", "shape", "rectanglelabels"];
+      const params = ["choices", "shape", "rectanglelabels", "polygonlabels"];
 
       /**
        * Check correct controls for image object

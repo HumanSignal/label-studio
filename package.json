@@ -1,6 +1,6 @@
 {
   "name": "label-studio",
-  "version": "0.2.1-4",
+  "version": "0.2.1-5",
   "description": "Label Studio is a multi-domain data labeling tool with standardized output format",
   "homepage": "https://labelstud.io",
   "author": {
@@ -35,7 +35,7 @@
     "konva": "^4.0.13",
     "mobx": "^5.8.0",
     "mobx-react": "^5.4.3",
-    "mobx-state-tree": "^3.10.0",
+    "mobx-state-tree": "^3.14.1",
     "nanoid": "^2.0.3",
     "node-sass": "^4.12.0",
     "react": "^16.10.2",

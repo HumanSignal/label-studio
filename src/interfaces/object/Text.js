@@ -140,9 +140,9 @@ const Model = types
       }
 
       /**
-       *
+       * Check for correct position of region
        */
-      if (!obj.value.end || !obj.value.start) {
+      if (obj.value.end < 0 || obj.value.start < 0 || (isNaN(obj.value.start) || isNaN(obj.value.end))) {
         InfoModal.error(`Error with incorrect end or start of text: ${obj.value.text}.`);
         return;
       }

@@ -13,6 +13,7 @@ const RegionsMixin = types
 
     unselectRegion() {
       const completion = self.completion;
+
       if (completion.relationMode) {
         completion.stopRelationMode();
       }
@@ -38,10 +39,17 @@ const RegionsMixin = types
       }
     },
 
+    /**
+     * Remove region
+     */
     deleteRegion() {
       self.unselectRegion();
 
       self.completion.relationStore.deleteNodeRelation(self);
+
+      if (self.type === "polygonregion") {
+        self.destroyRegion();
+      }
 
       self.completion.regionStore.deleteRegion(self);
 
