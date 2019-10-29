@@ -36,16 +36,19 @@ const TimeTraveller = types
         self.frozenIdx = self.undoIdx;
       },
 
-      addUndoState(ss) {
+      addUndoState(recorder) {
         if (self.skipNextUndoState) {
-          // skip recording if this state was caused by undo / redo
+          /**
+           * Skip recording if this state was caused by undo / redo
+           */
           self.skipNextUndoState = false;
+
           return;
         }
 
-        self.history.splice(self.undoIdx + 1);
-        self.history.push(ss);
-        self.undoIdx = self.history.length - 1;
+        self.history.splice(self.undoIdx);
+        self.history.push(recorder);
+        self.undoIdx = self.history.length;
       },
 
       afterCreate() {
@@ -74,11 +77,15 @@ const TimeTraveller = types
       undo() {
         if (self.isFrozen && self.frozenIdx < self.undoIdx) return;
 
-        self.set(self.undoIdx--);
+        let newIdx = self.undoIdx - 1;
+
+        self.set(newIdx);
       },
 
       redo() {
-        self.set(self.undoIdx++);
+        let newIdx = self.undoIdx + 1;
+
+        self.set(newIdx);
       },
 
       set(idx) {
