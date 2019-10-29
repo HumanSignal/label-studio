@@ -218,6 +218,7 @@ export default types
      */
     function resetState() {
       self.completionStore = CompletionStore.create({ completions: [] });
+
       const c = self.completionStore.addInitialCompletion();
 
       self.completionStore.selectCompletion(c.id);
@@ -228,32 +229,40 @@ export default types
      */
     const loadTaskAPI = flow(function*(url) {
       try {
-        const res = yield self.fetch(url);
+        const loadedTask = yield self.fetch(url);
 
-        if (res instanceof Response && res.status === 404) {
+        if (loadedTask instanceof Response && loadedTask.status === 404) {
           self.markLoading(false);
           self.noTask = true;
           return;
         }
 
-        res.json().then(function(r) {
-          r.data = JSON.stringify(r.data);
+        loadedTask.json().then(response => {
+          /**
+           * Convert received data to string for MST support
+           */
+          response.data = JSON.stringify(response.data);
 
-          self.addTask(r);
-          self.markLoading(false);
+          /**
+           * Add new data from received task
+           */
+          self.addTask(response);
 
-          if (self.hasInterface("completions") && r.completions) {
+          /**
+           * Completions
+           */
+          if (self.hasInterface("completions") && response.completions) {
             self.completionStore.destroyCompletion(self.completionStore.selected);
 
-            for (var i = 0; i < r.completions.length; i++) {
-              const c = r.completions[i];
+            for (var i = 0; i < response.completions.length; i++) {
+              const completion = response.completions[i];
 
-              if (c.was_cancelled === true) continue;
+              if (completion.was_cancelled === true) continue;
 
-              const comp = self.completionStore.addSavedCompletion(c);
+              const comp = self.completionStore.addSavedCompletion(completion);
               comp.traverseTree(node => node.updateValue && node.updateValue(self));
               self.completionStore.selectCompletion(comp.id);
-              comp.deserializeCompletion(c.result);
+              comp.deserializeCompletion(completion.result);
               comp.reinitHistory();
             }
           } else {
@@ -263,17 +272,21 @@ export default types
             // self.addGeneratedCompletion(r);
           }
 
-          if (self.hasInterface("predictions") && r.predictions) {
-            if (r.predictions && r.predictions.length) {
-              for (let i = 0; i < r.predictions.length; i++) {
-                const pred = self.completionStore.addPrediction(r.predictions[i]);
-                pred.traverseTree(node => node.updateValue && node.updateValue(self));
-                self.completionStore.selectPrediction(pred.id);
-                pred.deserializeCompletion(r.predictions[i].result);
-                pred.reinitHistory();
+          if (self.hasInterface("predictions") && response.predictions) {
+            if (response.predictions && response.predictions.length) {
+              for (let i = 0; i < response.predictions.length; i++) {
+                const prediction = self.completionStore.addPrediction(response.predictions[i]);
+                prediction.traverseTree(node => node.updateValue && node.updateValue(self));
+                self.completionStore.selectPrediction(prediction.id);
+                prediction.deserializeCompletion(response.predictions[i].result);
+                prediction.reinitHistory();
               }
             }
           }
+          /**
+           * Loader disabled
+           */
+          self.markLoading(false);
         });
       } catch (err) {
         console.error("Failed to load next task ", err);

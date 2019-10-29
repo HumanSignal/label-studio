@@ -63,8 +63,12 @@ const Model = types
     },
   }))
   .actions(self => ({
-    setMouseOverStartPoint(val) {
-      self.mouseOverStartPoint = val;
+    /**
+     * Handler for mouse on start point of Polygon
+     * @param {boolean} val
+     */
+    setMouseOverStartPoint(value) {
+      self.mouseOverStartPoint = value;
     },
 
     handleMouseMove({ e, flattenedPoints }) {
