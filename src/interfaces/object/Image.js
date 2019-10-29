@@ -1,6 +1,16 @@
 import React, { Component } from "react";
 import { observer, inject, Provider } from "mobx-react";
-import { detach, types, flow, getType, getParentOfType, destroy, getRoot, isValidReference } from "mobx-state-tree";
+import {
+  detach,
+  types,
+  flow,
+  getParent,
+  getType,
+  getParentOfType,
+  destroy,
+  getRoot,
+  isValidReference,
+} from "mobx-state-tree";
 
 import Registry from "../../core/Registry";
 import { guidGenerator, cloneNode, restoreNewsnapshot } from "../../core/Helpers";
@@ -283,9 +293,15 @@ const Model = types
       shape.selectRegion();
     },
 
+    removeShape(shape) {
+      destroy(shape);
+    },
+
     startDraw({ x, y }) {
       let rect;
       let stroke = self.controlButton().strokecolor;
+      getParent(self, 3).history.freeze();
+      console.log(getParent(self, 3).history);
 
       if (self.controlButtonType === IMAGE_CONSTANTS.rectangleModel) {
         self.setMode("drawing");

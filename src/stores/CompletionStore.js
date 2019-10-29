@@ -1,4 +1,4 @@
-import { types, getParent, getEnv, flow, destroy } from "mobx-state-tree";
+import { types, getParent, getEnv, flow, destroy, detach } from "mobx-state-tree";
 
 import { guidGenerator } from "../core/Helpers";
 import Types from "../core/Types";
@@ -193,6 +193,11 @@ const Completion = types
      * @param {*} region
      */
     deleteRegion(region) {
+      if (region.type === "polygonregion") {
+        detach(region);
+        return;
+      }
+
       destroy(region);
     },
 

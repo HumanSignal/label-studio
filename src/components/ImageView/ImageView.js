@@ -74,7 +74,7 @@ export default observer(
 
     handleStageMouseDown = e => {
       const { item } = this.props;
-      // getParent(item, 4)[0].history.freeze();
+      getParent(item, 4)[0].history.freeze();
 
       if (item.controlButtonType === "PolygonLabelsModel") {
         return;

@@ -138,12 +138,11 @@ const Model = types
       }
     },
 
-    beforeDestroy() {
-      if (self.parent.activePolygon && self.parent.activePolygon.id === self.id) {
-        self.parent.setActivePolygon(null);
-        self.parent.deleteSelectedShape();
-        destroy(self.points);
-      }
+    destroyRegion() {
+      self.parent.setActivePolygon(null);
+      self.parent.deleteSelectedShape();
+      detach(self.points);
+      destroy(self.points);
     },
 
     unselectRegion() {
@@ -460,9 +459,9 @@ const HtxPolygonView = ({ store, item }) => {
     >
       {item.mouseOverStartPoint}
 
-      {renderPoly(item.points)}
-      {renderLines(item.points)}
-      {renderCircles(item.points)}
+      {item.points ? renderPoly(item.points) : null}
+      {item.points ? renderLines(item.points) : null}
+      {item.points ? renderCircles(item.points) : null}
     </Group>
   );
 };
