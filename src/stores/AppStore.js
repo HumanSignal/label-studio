@@ -286,7 +286,7 @@ export default types
     const skipTask = flow(function* skipTask() {
       getEnv(self).skipTask();
 
-      if (getEnv(self).apiCalls) {
+      if (self.apiCalls) {
         self.markLoading(true);
 
         try {
