@@ -65,15 +65,44 @@ const Model = types
 
       labels.finishCurrentObject();
 
-      labels.shouldBeUnselected && labels.unselectAll();
+      /**
+       * Multiple
+       */
+      if (!labels.shouldBeUnselected) {
+        self.markSelected(!self.selected);
+      }
 
-      if (labels.shouldBeUnselected && !selectedLabel) {
-        self.selected = !self.selected;
+      /**
+       * Single
+       */
+      if (labels.shouldBeUnselected) {
+        /**
+         * Current not selected
+         */
+        if (!selectedLabel) {
+          /**
+           * Unselect all labels
+           */
+          labels.unselectAll();
+          /**
+           * Select current label
+           */
+          self.markSelected(!self.selected);
+        } else {
+          /**
+           * Unselect all labels
+           */
+          labels.unselectAll();
+        }
       }
     },
 
-    markSelected(val) {
-      self.selected = val;
+    /**
+     *
+     * @param {boolean} value
+     */
+    markSelected(value) {
+      self.selected = value;
     },
 
     onHotKey() {
@@ -90,7 +119,7 @@ const LabelModel = types.compose(
 
 const HtxLabelView = inject("store")(
   observer(({ item, store }) => {
-    const bg = {
+    const labelStyle = {
       backgroundColor: item.selected ? item.background : "#e8e8e8",
       color: item.selected ? item.selectedcolor : "#333333",
       cursor: "pointer",
@@ -103,7 +132,7 @@ const HtxLabelView = inject("store")(
           item.toggleSelected();
           return false;
         }}
-        style={bg}
+        style={labelStyle}
         size={item.size}
       >
         {item._value}
