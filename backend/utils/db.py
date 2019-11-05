@@ -202,7 +202,7 @@ def save_completion(task_id, completion):
     if 'id' in completion:
         for i, item in enumerate(task['completions']):
             if item['id'] == completion['id']:
-                task['completions'][i] = completion
+                task['completions'][i].update(completion)
                 updated = True
 
     # write new completion
