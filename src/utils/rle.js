@@ -42,5 +42,28 @@ export function RLEencode(arr) {
  * @param {array} arr
  */
 export function RLEdecode(arr) {
-  return arr;
+  var finishedArray = [],
+    isRip,
+    isRun,
+    ripCount,
+    runCount;
+  for (var i = 0; i < arr.length; i++) {
+    isRip = arr[i] < 0;
+    isRun = arr[i] > 0;
+    if (isRip) {
+      ripCount = Math.abs(arr[i]);
+      i += 1;
+
+      finishedArray = finishedArray.concat(arr.slice(i, i + ripCount));
+      i += ripCount - 1;
+    }
+    if (isRun) {
+      runCount = arr[i];
+      i += 1;
+      for (var j = 0; j < runCount; j++) {
+        finishedArray.push(arr[i]);
+      }
+    }
+  }
+  return finishedArray;
 }
