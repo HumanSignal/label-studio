@@ -1,0 +1,12 @@
+{
+    "completions": [
+        {
+            "result": []
+        }
+    ],
+    "data": {
+        "image": "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg"
+    },
+    "id": 1,
+    "task_path": "../examples/image_segmentation/tasks.json"
+}
