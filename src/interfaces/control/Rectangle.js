@@ -9,8 +9,8 @@ import { guidGenerator } from "../../core/Helpers";
 import { RectRegionModel } from "../object/RectRegion";
 
 /**
- * Rectangle tag
- * Rectangle is used to add rectangle (BBox) to an image
+ * Rectangle
+ * Rectangle is used to add rectangle (Bounding Box) to an image
  * @example
  * <View>
  *   <Rectangle name="rect-1" toName="img-1"></Rectangle>
@@ -32,8 +32,8 @@ const TagAttrs = types.model({
   opacity: types.optional(types.string, "0.6"),
   fillcolor: types.maybeNull(types.string),
 
-  strokewidth: types.optional(types.string, "1"),
-  strokecolor: types.optional(types.string, "#f48a42"),
+  strokeWidth: types.optional(types.number, 1),
+  strokeColor: types.optional(types.string, "#f48a42"),
 
   canrotate: types.optional(types.boolean, true),
 });
@@ -51,13 +51,6 @@ const Model = types
 
     get completion() {
       return getRoot(self).completionStore.selected;
-    },
-  }))
-  .actions(self => ({
-    fromStateJSON(obj) {
-      // const rect = self._createRect();
-      // rect.setPosition(obj.value.x, obj.value.y, obj.value.width, obj.value.height, obj.value.rotation);
-      // return rect;
     },
   }));
 

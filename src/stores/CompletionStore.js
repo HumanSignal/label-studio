@@ -32,6 +32,7 @@ const Completion = types
     userGenerate: types.optional(types.boolean, true),
     update: types.optional(types.boolean, false),
     sentUserGenerate: types.optional(types.boolean, false),
+    localUpdate: types.optional(types.boolean, false),
 
     honeypot: types.optional(types.boolean, false),
 
@@ -96,6 +97,10 @@ const Completion = types
 
     sendUserGenerate() {
       self.sentUserGenerate = true;
+    },
+
+    setLocalUpdate(value) {
+      self.localUpdate = value;
     },
 
     setDragMode(val) {
@@ -496,87 +501,67 @@ export default types
       return returnPredict;
     }
 
+    function generateCompletion(options) {
+      /**
+       * Convert config to model
+       */
+      const completionModel = Tree.treeToModel(self.store.config);
+
+      /**
+       * Get model by type of tag
+       */
+      const modelClass = Registry.getModelByTag(completionModel.type);
+
+      /**
+       * Completion model init
+       */
+      let root = modelClass.create(completionModel);
+
+      let node = {
+        id: guidGenerator(5),
+        root: root,
+      };
+
+      if (options && options.userGenerate) {
+        node = {
+          ...node,
+          userGenerate: options.userGenerate,
+        };
+      }
+
+      /**
+       * Expert module for initial completion
+       */
+      if (self.store.expert) {
+        const { expert } = self.store;
+
+        node["createdBy"] = `${expert.firstName} ${expert.lastName}`;
+      }
+
+      /**
+       *
+       */
+      const completion = self.addCompletion(node, "initial");
+
+      if (options && options.userGenerate) {
+        self.selectCompletion(node.id);
+      }
+
+      console.log(completion);
+
+      return completion;
+    }
+
     /**
      * Initial Completion
      * @returns {object}
      */
     function addInitialCompletion() {
-      /**
-       * Convert config to model
-       */
-      const completionModel = Tree.treeToModel(self.store.config);
-
-      /**
-       * Get model by type of tag
-       */
-      const modelClass = Registry.getModelByTag(completionModel.type);
-
-      /**
-       * Completion model init
-       */
-      let root = modelClass.create(completionModel);
-
-      const node = {
-        id: guidGenerator(5),
-        root: root,
-      };
-
-      /**
-       * Expert module for initial completion
-       */
-      if (self.store.expert) {
-        const { expert } = self.store;
-
-        node["createdBy"] = `${expert.firstName} ${expert.lastName}`;
-      }
-
-      /**
-       *
-       */
-      const completion = self.addCompletion(node, "initial");
-
-      return completion;
+      return self.generateCompletion();
     }
 
     function addUserCompletion() {
-      /**
-       * Convert config to model
-       */
-      const completionModel = Tree.treeToModel(self.store.config);
-
-      /**
-       * Get model by type of tag
-       */
-      const modelClass = Registry.getModelByTag(completionModel.type);
-
-      /**
-       * Completion model init
-       */
-      let root = modelClass.create(completionModel);
-
-      const node = {
-        id: guidGenerator(5),
-        root: root,
-        userGenerate: true,
-      };
-
-      /**
-       * Expert module for initial completion
-       */
-      if (self.store.expert) {
-        const { expert } = self.store;
-
-        node["createdBy"] = `${expert.firstName} ${expert.lastName}`;
-      }
-
-      /**
-       *
-       */
-      const completion = self.addCompletion(node, "initial");
-
-      self.selectCompletion(node.id);
-
-      return completion;
+      return self.generateCompletion({ userGenerate: true });
     }
 
     return {
@@ -590,5 +575,6 @@ export default types
       addUserCompletion,
       addPrediction,
       addPredictionItem,
+      generateCompletion,
     };
   });
