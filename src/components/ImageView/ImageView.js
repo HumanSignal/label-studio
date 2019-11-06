@@ -55,14 +55,30 @@ export default observer(
       }
     };
 
+    /**
+     * Handler for mouse move
+     */
     handleMouseMove = e => {
       const { item } = this.props;
+      /**
+       * Freeze this event
+       */
       item.freezeHistory();
+
+      /**
+       *
+       */
       if (item.mode === "drawing") {
         const x = (e.evt.offsetX - item.zoomingPositionX) / item.zoomScale;
         const y = (e.evt.offsetY - item.zoomingPositionY) / item.zoomScale;
 
         item.updateDraw({ x: x, y: y });
+      } else if (item.mode === "brush") {
+        console.log("brush mode");
+        item.stageRef.globalCompositeOperation = "source-over";
+      } else if (item.mode === "eraser") {
+        console.log("eraser mode");
+        item.stageRef.globalCompositeOperation = "destination-out";
       }
 
       item.setPointerPosition({ x: e.evt.offsetX, y: e.evt.offsetY });
@@ -74,9 +90,15 @@ export default observer(
       item.freezeHistory();
     };
 
+    /**
+     * Handler for mouse down
+     */
     handleStageMouseDown = e => {
       const { item } = this.props;
+
       item.freezeHistory();
+
+      let lastPointerPosition = item.stageRef.getPointerPosition();
 
       if (item.controlButtonType === "PolygonLabelsModel") {
         return;
@@ -278,6 +300,7 @@ export default observer(
             </div>
             <Stage
               ref={ref => {
+                console.log(item.naturalWidth);
                 item.setStageRef(ref);
               }}
               style={{ position: "absolute", top: 0, left: 0, brightness: "150%" }}

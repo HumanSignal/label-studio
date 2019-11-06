@@ -1,16 +1,6 @@
 import React, { Component } from "react";
 import { observer, inject, Provider } from "mobx-react";
-import {
-  detach,
-  types,
-  flow,
-  getParent,
-  getType,
-  getParentOfType,
-  destroy,
-  getRoot,
-  isValidReference,
-} from "mobx-state-tree";
+import { detach, types, flow, getParent, getType, destroy, getRoot, isValidReference } from "mobx-state-tree";
 
 import Registry from "../../core/Registry";
 import { guidGenerator, cloneNode, restoreNewsnapshot } from "../../core/Helpers";
@@ -18,6 +8,7 @@ import { guidGenerator, cloneNode, restoreNewsnapshot } from "../../core/Helpers
 import { RectRegionModel } from "./RectRegion";
 import { PolygonRegionModel } from "./PolygonRegion";
 import { KeyPointRegionModel } from "./KeyPointRegion";
+import { BrushRegionModel } from "./BrushRegion";
 import ProcessAttrsMixin from "../mixins/ProcessAttrs";
 import Infomodal from "../../components/Infomodal/Infomodal";
 
@@ -71,9 +62,11 @@ const TagAttrs = types.model({
 const IMAGE_CONSTANTS = {
   rectangleModel: "RectangleModel",
   rectangleLabelsModel: "RectangleLabelsModel",
+  brushLabelsModel: "BrushLabelsModel",
   rectanglelabels: "rectanglelabels",
   keypointlabels: "keypointlabels",
   polygonlabels: "polygonlabels",
+  brushlabels: "brushlabels",
 };
 
 /**
@@ -154,8 +147,10 @@ const Model = types
 
     /**
      * Mode
+     * brush for Image Segmentation
+     * eraser for Image Segmentation
      */
-    mode: types.optional(types.enumeration(["drawing", "viewing"]), "viewing"),
+    mode: types.optional(types.enumeration(["drawing", "viewing", "brush", "eraser"]), "viewing"),
 
     selectedShape: types.safeReference(types.union(RectRegionModel, PolygonRegionModel, KeyPointRegionModel)),
     activePolygon: types.maybeNull(types.safeReference(PolygonRegionModel)),
@@ -354,6 +349,8 @@ const Model = types
             noadd: true,
           });
         });
+      } else if (self.controlButtonType === IMAGE_CONSTANTS.brushLabelsModel) {
+        self.setMode("brush");
       }
 
       self.activeShape = rect;
@@ -390,7 +387,8 @@ const Model = types
               c =>
                 c.type === IMAGE_CONSTANTS.rectanglelabels ||
                 c.type === IMAGE_CONSTANTS.keypointlabels ||
-                c.type === IMAGE_CONSTANTS.polygonlabels,
+                c.type === IMAGE_CONSTANTS.polygonlabels ||
+                c.type === IMAGE_CONSTANTS.brushlabels,
             )
         : null;
 
@@ -406,6 +404,7 @@ const Model = types
       const dispmap = {
         PolygonModel: ev => self.addPolyEv(ev),
         KeyPointModel: ev => self._addKeyPointEv(ev),
+        BrushModel: ev => self.addBrushEv(ev),
 
         PolygonLabelsModel: ev => {
           if (self.activePolygon && !self.activePolygon.closed) {
@@ -418,11 +417,18 @@ const Model = types
         KeyPointLabelsModel: ev => {
           self.lookupStates(ev, self._addKeyPointEv);
         },
+        BrushLabelsModel: ev => {
+          self.lookupStates(ev, self.addBrushEv);
+        },
       };
 
       if (dispmap[self.controlButtonType]) {
         return dispmap[self.controlButtonType](ev);
       }
+    },
+
+    addBrushEv() {
+      console.log(12);
     },
 
     _addKeyPointEv(ev, states) {
