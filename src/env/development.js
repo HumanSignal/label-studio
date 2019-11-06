@@ -3,6 +3,7 @@ import { AudioClassification } from "../examples/audio_classification";
 import { AudioRegions } from "../examples/audio_regions";
 import { DialogueAnalysis } from "../examples/dialogue_analysis";
 import { ImageBbox } from "../examples/image_bbox";
+import { ImageSegmentation } from "../examples/image_segmentation";
 import { ImagePolygons } from "../examples/image_polygons";
 import { ImageKeyPoint } from "../examples/image_keypoints";
 import { ImageMultilabel } from "../examples/image_multilabel";
@@ -16,7 +17,7 @@ import Requests from "../core/Requests";
 /**
  * Custom Data
  */
-const data = ImagePolygons;
+const data = ImageSegmentation;
 
 /**
  * Get current config

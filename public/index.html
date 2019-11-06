@@ -41,7 +41,7 @@
       </ul>
     </div>
 
-    <div id="label-studio"></div>
+    <div id="label-studio" style="width: 1440px;"></div>
 
     <footer class="footer">Made by <a target="_blank" href="https://heartex.net">Heartex</a> in San Francisco
       <br/><br/>
@@ -51,15 +51,6 @@
     <script>
       setTimeout(() => {
         var ls = new LabelStudio("label-studio", {
-          config: `
-            <View>
-              <Image name="img" value="$image"></Image>
-              <RectangleLabels name="tag" toName="img">
-                <Label value="Hello"></Label>
-                <Label value="World"></Label>
-              </RectangleLabels>
-            </View>
-          `,
 
           description: "Description",
 
