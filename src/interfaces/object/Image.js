@@ -50,7 +50,7 @@ import ImageView from "../../components/ImageView/ImageView";
 const TagAttrs = types.model({
   name: types.maybeNull(types.string),
   value: types.maybeNull(types.string),
-  resize: types.maybeNull(types.string),
+  resize: types.maybeNull(types.number),
   width: types.optional(types.string, "100%"),
   maxwidth: types.optional(types.string, "750px"),
 
@@ -110,28 +110,52 @@ const Model = types
     id: types.identifier,
     type: "image",
     _value: types.optional(types.string, ""),
+
     sizeUpdated: types.optional(types.boolean, false),
-    stageWidth: types.optional(types.integer, 1),
-    stageHeight: types.optional(types.integer, 1),
+
+    /**
+     * Natural sizes of Image
+     * Constants
+     */
     naturalWidth: types.optional(types.integer, 1),
     naturalHeight: types.optional(types.integer, 1),
 
-    zoomScale: types.optional(types.number, 1),
-    zoomPosX: types.maybeNull(types.number),
-    zoomPosY: types.maybeNull(types.number),
+    /**
+     * Initial width and height of the image
+     */
+    initialWidth: types.optional(types.integer, 1),
+    initialHeight: types.optional(types.integer, 1),
 
+    stageWidth: types.optional(types.integer, 1),
+    stageHeight: types.optional(types.integer, 1),
+
+    /**
+     * Zoom Scale
+     */
+    zoomScale: types.optional(types.number, 1),
+
+    /**
+     * Coordinates of left top corner
+     * Default: { x: 0, y: 0 }
+     */
+    zoomingPositionX: types.maybeNull(types.number),
+    zoomingPositionY: types.maybeNull(types.number),
+
+    /**
+     * Brightness of Canvas
+     */
     brightnessGrade: types.optional(types.number, 100),
 
+    /**
+     * Cursor coordinates
+     */
     cursorPositionX: types.optional(types.number, 0),
     cursorPositionY: types.optional(types.number, 0),
 
+    /**
+     * Mode
+     */
     mode: types.optional(types.enumeration(["drawing", "viewing"]), "viewing"),
-
-    posStartX: types.optional(types.number, 0),
-    posStartY: types.optional(types.number, 0),
-
-    posNowX: types.optional(types.number, 0),
-    posNowY: types.optional(types.number, 0),
 
     selectedShape: types.safeReference(types.union(RectRegionModel, PolygonRegionModel, KeyPointRegionModel)),
     activePolygon: types.maybeNull(types.safeReference(PolygonRegionModel)),
@@ -183,6 +207,9 @@ const Model = types
     },
   }))
   .actions(self => ({
+    freezeHistory() {
+      getParent(self, 3).history.freeze();
+    },
     /**
      * Request to HTTP Basic Auth
      */
@@ -221,6 +248,7 @@ const Model = types
      * Set pointer of X and Y
      */
     setPointerPosition({ x, y }) {
+      self.freezeHistory();
       self.cursorPositionX = x;
       self.cursorPositionY = y;
     },
@@ -229,10 +257,10 @@ const Model = types
      * Set zoom
      */
     setZoom(scale, x, y) {
-      self.resize = scale + "";
+      self.resize = scale;
       self.zoomScale = scale;
-      self.zoomPosX = x;
-      self.zoomPosY = y;
+      self.zoomingPositionX = x;
+      self.zoomingPositionY = y;
     },
 
     /**
@@ -244,7 +272,7 @@ const Model = types
     },
 
     updateIE(ev) {
-      const { width, height, naturalWidth, naturalHeight } = ev.target;
+      const { width, height, naturalWidth, naturalHeight, userResize } = ev.target;
 
       self.naturalWidth = naturalWidth;
       self.naturalHeight = naturalHeight;
@@ -252,11 +280,15 @@ const Model = types
       self.stageHeight = height;
       self.sizeUpdated = true;
 
-      self.shapes.forEach(s => s.updateImageSize(width / naturalWidth, height / naturalHeight, width, height));
+      self.shapes.forEach(shape => {
+        shape.updateImageSize(width / naturalWidth, height / naturalHeight, width, height, userResize);
+      });
     },
 
     setStageRef(ref) {
       self.stageRef = ref;
+      self.initialWidth = ref && ref.attrs && ref.attrs.width ? ref.attrs.width : 1;
+      self.initialHeight = ref && ref.attrs && ref.attrs.height ? ref.attrs.height : 1;
     },
 
     /**
@@ -300,8 +332,6 @@ const Model = types
     startDraw({ x, y }) {
       let rect;
       let stroke = self.controlButton().strokecolor;
-      getParent(self, 3).history.freeze();
-      console.log(getParent(self, 3).history);
 
       if (self.controlButtonType === IMAGE_CONSTANTS.rectangleModel) {
         self.setMode("drawing");
@@ -331,6 +361,7 @@ const Model = types
 
     updateDraw({ x, y }) {
       const shape = self.activeShape;
+      self.freezeHistory();
 
       const { x1, y1, x2, y2 } = reverseCoordinates({ x: shape._start_x, y: shape._start_y }, { x: x, y: y });
 
@@ -347,6 +378,7 @@ const Model = types
        * Array of states
        */
       const states = self.completion.toNames.get(self.name);
+      self.freezeHistory();
 
       /**
        * Find active states
@@ -379,6 +411,7 @@ const Model = types
           if (self.activePolygon && !self.activePolygon.closed) {
             self.addPolyEv(ev);
           } else {
+            self.completion.setLocalUpdate(true);
             self.lookupStates(ev, self.addPolyEv);
           }
         },
@@ -393,13 +426,8 @@ const Model = types
     },
 
     _addKeyPointEv(ev, states) {
-      const wp = self.stageWidth / self.naturalWidth;
-      const hp = self.stageHeight / self.naturalHeight;
-
-      const { zoomPosX, zoomPosY } = self;
-
-      const x = (ev.evt.offsetX - self.zoomPosX) / self.zoomScale;
-      const y = (ev.evt.offsetY - self.zoomPosY) / self.zoomScale;
+      const x = (ev.evt.offsetX - self.zoomingPositionX) / self.zoomScale;
+      const y = (ev.evt.offsetY - self.zoomingPositionY) / self.zoomScale;
 
       const c = self.controlButton();
 
@@ -482,8 +510,8 @@ const Model = types
         opacity: parseFloat(c.opacity),
         fillcolor: c.fillcolor ? c.fillcolor : stroke,
 
-        strokewidth: parseInt(c.strokewidth),
-        strokecolor: stroke,
+        strokeWidth: c.strokeWidth,
+        strokeColor: stroke,
 
         states: localStates,
 
@@ -500,6 +528,7 @@ const Model = types
     },
 
     addPolyEv(ev, states) {
+      self.freezeHistory();
       const w = 10;
       const isValid = isValidReference(() => self.activePolygon);
 
@@ -508,8 +537,8 @@ const Model = types
       }
 
       if (self.completion.dragMode === false) {
-        const x = (ev.evt.offsetX - self.zoomPosX) / self.zoomScale;
-        const y = (ev.evt.offsetY - self.zoomPosY) / self.zoomScale;
+        const x = (ev.evt.offsetX - self.zoomingPositionX) / self.zoomScale;
+        const y = (ev.evt.offsetY - self.zoomingPositionY) / self.zoomScale;
 
         let stroke = self.controlButton().strokecolor;
 
@@ -526,6 +555,7 @@ const Model = types
     },
 
     addPolygonObject({ x, y, width, stroke, states, coordstype, stateFlag }) {
+      self.freezeHistory();
       let activePolygon = self.activePolygon;
 
       return activePolygon;
@@ -544,6 +574,7 @@ const Model = types
      */
     _addPoly({ x, y, width, stroke, states, coordstype, stateFlag, id }) {
       let newPolygon = self.activePolygon;
+      self.freezeHistory();
 
       if (stateFlag || !self.activePolygon) {
         const c = self.controlButton();
@@ -588,9 +619,12 @@ const Model = types
      * @param {*} width
      * @param {*} height
      */
-    onResizeSize(width, height) {
+    onResizeSize(width, height, userResize) {
       self.stageHeight = height;
       self.stageWidth = width;
+      self.updateIE({
+        target: { width: width, height: height, naturalWidth: 1, naturalHeight: 1, userResize: userResize },
+      });
     },
 
     toStateJSON() {

@@ -43,6 +43,7 @@ export default class TransformerComponent extends Component {
     return (
       <Transformer
         resizeEnabled={true}
+        keepRatio={false}
         rotateEnabled={this.props.rotateEnabled}
         boundBoxFunc={(oldBox, newBox) => {
           newBox.width = Math.max(30, newBox.width);

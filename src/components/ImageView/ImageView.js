@@ -1,34 +1,20 @@
 import React, { Component } from "react";
 import { observer } from "mobx-react";
-import { getParent } from "mobx-state-tree";
+import { getParent, getEnv } from "mobx-state-tree";
 import { Stage, Layer, Rect, Group, Line } from "react-konva";
 
 import Tree from "../../core/Tree";
 import ImageTransformer from "../ImageTransformer/ImageTransformer";
 import ImageControls from "../ImageControls/ImageControls";
-
-/**
- * Create grid for Image Canvas
- * @param {number} width
- * @param {number} height
- * @param {number} nodeSize
- */
-const createGrid = (width, height, nodeSize) => {
-  return [...Array(width)]
-    .map((_, col) =>
-      [...Array(height)].map((_, row) => ({
-        col,
-        row,
-        x: col * nodeSize,
-        y: row * nodeSize,
-        fill: "#fff",
-      })),
-    )
-    .reduce((p, c) => [...p, ...c]);
-};
+import ImageGrid from "../ImageGrid/ImageGrid";
 
 export default observer(
   class ImageView extends Component {
+    constructor(props) {
+      super(props);
+
+      this.updateDimensions = this.updateDimensions.bind(this);
+    }
     /**
      * Handler of click on Image
      */
@@ -43,7 +29,8 @@ export default observer(
      */
     handleMouseUp = e => {
       const { item } = this.props;
-      // getParent(item, 4)[0].history.freeze();
+
+      item.freezeHistory();
 
       if (item.mode === "drawing") {
         /**
@@ -51,18 +38,29 @@ export default observer(
          */
         item.setMode("viewing");
 
-        const as = item.detachActiveShape();
+        /**
+         * Constants of min size of bounding box
+         */
+        const minSize = { width: 3, height: 3 };
 
-        if (as.width > 3 && as.height > 3) item.addShape(as);
+        /**
+         * Current shape
+         */
+        const currentShape = item.detachActiveShape();
+
+        /**
+         * Check for minimal size of boundng box
+         */
+        if (currentShape.width > minSize.width && currentShape.height > minSize.height) item.addShape(currentShape);
       }
     };
 
     handleMouseMove = e => {
       const { item } = this.props;
-      getParent(item, 4)[0].history.freeze();
+      item.freezeHistory();
       if (item.mode === "drawing") {
-        const x = (e.evt.offsetX - item.zoomPosX) / item.zoomScale;
-        const y = (e.evt.offsetY - item.zoomPosY) / item.zoomScale;
+        const x = (e.evt.offsetX - item.zoomingPositionX) / item.zoomScale;
+        const y = (e.evt.offsetY - item.zoomingPositionY) / item.zoomScale;
 
         item.updateDraw({ x: x, y: y });
       }
@@ -70,11 +68,15 @@ export default observer(
       item.setPointerPosition({ x: e.evt.offsetX, y: e.evt.offsetY });
     };
 
-    handleMouseOver = e => {};
+    handleMouseOver = e => {
+      const { item } = this.props;
+
+      item.freezeHistory();
+    };
 
     handleStageMouseDown = e => {
       const { item } = this.props;
-      getParent(item, 4)[0].history.freeze();
+      item.freezeHistory();
 
       if (item.controlButtonType === "PolygonLabelsModel") {
         return;
@@ -83,8 +85,8 @@ export default observer(
       if (e.target === e.target.getStage() || (e.target.parent && e.target.parent.attrs.name === "ruler")) {
         // draw rect
 
-        const x = (e.evt.offsetX - item.zoomPosX) / item.zoomScale;
-        const y = (e.evt.offsetY - item.zoomPosY) / item.zoomScale;
+        const x = (e.evt.offsetX - item.zoomingPositionX) / item.zoomScale;
+        const y = (e.evt.offsetY - item.zoomingPositionY) / item.zoomScale;
 
         item.startDraw({ x: x, y: y });
 
@@ -105,6 +107,7 @@ export default observer(
      */
     updateBrightness = range => {
       const { item } = this.props;
+      item.freezeHistory();
 
       item.setBrightnessGrade(range);
     };
@@ -126,12 +129,7 @@ export default observer(
       }
 
       const { item } = this.props;
-
-      /**
-       * Freeze Time Traveller
-       * TODO: currently work with [0] completion
-       */
-      getParent(item, 4)[0].history.freeze();
+      item.freezeHistory();
 
       const stage = item.stageRef;
       const scaleBy = parseFloat(item.zoomby);
@@ -188,32 +186,6 @@ export default observer(
       stage.batchDraw();
     };
 
-    renderGrid() {
-      const { item } = this.props;
-
-      const grid = createGrid(
-        Math.ceil(item.stageWidth / item.gridSize),
-        Math.ceil(item.stageHeight / item.gridSize),
-        item.gridSize,
-      );
-
-      return (
-        <Layer opacity={0.15} name="ruler">
-          {Object.values(grid).map((n, i) => (
-            <Rect
-              key={i}
-              x={n.x}
-              y={n.y}
-              width={item.gridSize}
-              height={item.gridSize}
-              stroke={item.gridColor}
-              strokeWidth={1}
-            />
-          ))}
-        </Layer>
-      );
-    }
-
     renderRulers() {
       const { item } = this.props;
       const width = 1;
@@ -251,11 +223,15 @@ export default observer(
     }
 
     updateDimensions() {
-      this.props.item.onResizeSize(this.container.offsetWidth, this.container.offsetHeight);
+      this.props.item.onResizeSize(this.container.offsetWidth, this.container.offsetHeight, true);
     }
 
     componentDidMount() {
-      window.addEventListener("resize", this.updateDimensions.bind(this));
+      window.addEventListener("resize", this.updateDimensions);
+    }
+
+    componentWillUnmount() {
+      window.removeEventListener("resize", this.updateDimensions);
     }
 
     render() {
@@ -277,8 +253,8 @@ export default observer(
       };
 
       if (item.zoomScale !== 1) {
-        let { zoomPosX, zoomPosY } = item;
-        const translate = "translate(" + zoomPosX + "px," + zoomPosY + "px) ";
+        let { zoomingPositionX, zoomingPositionY } = item;
+        const translate = "translate(" + zoomingPositionX + "px," + zoomingPositionY + "px) ";
         imgStyle["transform"] = translate + "scale(" + item.resize + ", " + item.resize + ")";
       }
 
@@ -316,7 +292,7 @@ export default observer(
               onMouseUp={this.handleMouseUp}
               onWheel={item.zoom ? this.handleZoom : () => {}}
             >
-              {item.grid && item.sizeUpdated && this.renderGrid()}
+              {item.grid && item.sizeUpdated && <ImageGrid item={item} />}
               <Layer>
                 {item.shapes.map(shape => {
                   return Tree.renderItem(shape);

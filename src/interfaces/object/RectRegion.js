@@ -19,6 +19,10 @@ import RegionsMixin from "../mixins/Regions";
 import NormalizationMixin from "../mixins/Normalization";
 import Utils from "../../utils";
 
+/**
+ * Rectangle object for Bounding Box
+ *
+ */
 const Model = types
   .model({
     id: types.identifier,
@@ -28,6 +32,12 @@ const Model = types
 
     x: types.number,
     y: types.number,
+
+    relativeX: types.optional(types.number, 0),
+    relativeY: types.optional(types.number, 0),
+
+    relativeWidth: types.optional(types.number, 0),
+    relativeHeight: types.optional(types.number, 0),
 
     _start_x: types.optional(types.number, 0),
     _start_y: types.optional(types.number, 0),
@@ -45,8 +55,8 @@ const Model = types
     fill: types.optional(types.boolean, true),
     fillcolor: types.optional(types.string, "blue"),
 
-    strokecolor: types.optional(types.string, "blue"),
-    strokewidth: types.number,
+    strokeColor: types.optional(types.string, "blue"),
+    strokeWidth: types.optional(types.number, 1),
 
     states: types.maybeNull(types.array(types.union(LabelsModel, RatingModel, RectangleLabelsModel))),
 
@@ -73,6 +83,13 @@ const Model = types
     afterCreate() {
       self._start_x = self.x;
       self._start_y = self.y;
+
+      if (self.coordstype === "perc") {
+        self.relativeX = self.x;
+        self.relativeY = self.y;
+        self.relativeWidth = self.width;
+        self.relativeHeight = self.height;
+      }
     },
 
     unselectRegion() {
@@ -117,6 +134,12 @@ const Model = types
       self.width = width;
       self.height = height;
 
+      self.relativeX = (x / self.parent.stageWidth) * 100;
+      self.relativeY = (y / self.parent.stageHeight) * 100;
+
+      self.relativeWidth = (width / self.parent.stageWidth) * 100;
+      self.relativeHeight = (height / self.parent.stageHeight) * 100;
+
       if (rotation < 0) {
         self.rotation = (rotation % 360) + 360;
       } else {
@@ -144,7 +167,12 @@ const Model = types
       self.sw = sw;
       self.sh = sh;
 
-      if (self.coordstype == "perc") {
+      if (self.coordstype === "px") {
+        self.x = (sw * self.relativeX) / 100;
+        self.y = (sh * self.relativeY) / 100;
+        self.width = (sw * self.relativeWidth) / 100;
+        self.height = (sh * self.relativeHeight) / 100;
+      } else if (self.coordstype === "perc") {
         self.x = (sw * self.x) / 100;
         self.y = (sh * self.y) / 100;
         self.width = (sw * self.width) / 100;
@@ -153,6 +181,9 @@ const Model = types
       }
     },
 
+    /**
+     * Format for sending to server
+     */
     toStateJSON() {
       const parent = self.parent;
       let fromEl = parent.states()[0];
@@ -217,8 +248,8 @@ const HtxRectangleView = ({ store, item }) => {
         width={item.width}
         height={item.height}
         fill={item.fill ? Utils.Colors.convertToRGBA(item.fillcolor, 0.4) : null}
-        stroke={item.strokecolor}
-        strokeWidth={item.strokewidth}
+        stroke={item.strokeColor}
+        strokeWidth={item.strokeWidth}
         strokeScaleEnabled={false}
         shadowBlur={0}
         scaleX={item.scaleX}
@@ -255,30 +286,7 @@ const HtxRectangleView = ({ store, item }) => {
 
           item.getCurrentCoordinates(x, y, item.width, 1);
 
-          let { stageHeight, stageWidth } = getParent(getParent(item));
-
-          // let rightTop = x + item.width * (item.scaleX || 1);
-          // let rightBottom = y + item.height * (item.scaleY || 1);
-
-          // let leftTop = {
-          //   x: x,
-          //   y: y
-          // };
-
-          // let leftBottom = {
-          //   x: x,
-          //   y: y + item.height
-          // };
-
-          // let rightTop = {
-          //   x: x + item.width,
-          //   y: y
-          // };
-
-          // let rightBottom = {
-          //   x: x + item.width,
-          //   y: y + item.height
-          // };
+          let { stageHeight, stageWidth } = getParent(item, 2);
 
           if (x <= 0) {
             x = 0;
