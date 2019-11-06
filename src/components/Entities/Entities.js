@@ -32,7 +32,7 @@ export default observer(({ store, regionStore }) => {
       <h4>Entities ({regions.length})</h4>
       {regions.length > 0 && buttonRemove()}
       {!regions.length && <p>No Entitied added yet</p>}
-      <ul>
+      <ul className={styles.list}>
         {regions.map(region => (
           <li
             key={region.id}
