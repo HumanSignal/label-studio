@@ -6,6 +6,8 @@
     <p>Its purpose is to help you label different types of data using a simple interface with a standardized output format. It's mobile-friendly and fast.</p>
 </div>
 
+[Website](https://labelstud.io/) • [Docs](https://labelstud.io/docs) • [Slack](https://docs.google.com/forms/d/e/1FAIpQLSdLHZx5EeT1J350JPwnY2xLanfmvplJi6VZk65C2R4XSsRBHg/viewform?usp=sf_link) • [Twitter](https://twitter.com/heartexlabs)
+
 ![GitHub](https://img.shields.io/github/license/heartexlabs/label-studio?logo=heartex) [![Build Status](https://travis-ci.com/heartexlabs/label-studio.svg?branch=master)](https://travis-ci.com/heartexlabs/label-studio) [![codecov](https://codecov.io/gh/heartexlabs/label-studio/branch/master/graph/badge.svg)](https://codecov.io/gh/heartexlabs/label-studio) ![GitHub release](https://img.shields.io/github/v/release/heartexlabs/label-studio?include_prereleases) [![Gitter](https://badges.gitter.im/label-studio/community.svg)](https://gitter.im/label-studio/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 ![Label Studio](https://raw.githubusercontent.com/heartexlabs/label-studio/master/images/label-studio-examples.gif)
@@ -35,13 +37,13 @@ Coming Soon:
 - Time series
 - Video
 
-## Documentation
-
-Visit the website: [labelstud.io](https://labelstud.io).
-
 ## Usage
 
 ### Frontend package
+
+```sh
+npm install label-studio
+```
 
 Check [documentation](https://labelstud.io/guide/frontend.html) about frontend integration.
 
@@ -60,6 +62,7 @@ Detailed changes for each release are documented in the [release notes](https://
 
 ## Stay In Touch
 
+- [Slack](https://docs.google.com/forms/d/e/1FAIpQLSdLHZx5EeT1J350JPwnY2xLanfmvplJi6VZk65C2R4XSsRBHg/viewform?usp=sf_link)
 - [Twitter](https://twitter.com/heartexlabs)
 - [Email](mailto:hi@heartex.net)
 
