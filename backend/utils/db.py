@@ -3,13 +3,27 @@ from __future__ import print_function
 import io
 import os
 import json
+import urllib
+import logging
 
 from datetime import datetime
 
+logger = logging.getLogger(__name__)
 
 tasks = None
 completions = None
 c = None  # config
+
+
+def _get_single_input_value(label_config):
+    input_data_tag = label_config.get_input_data_tags()
+    if len(input_data_tag) > 1:
+        print(f'Warning! Multiple input data tags found: '
+              f'{",".join(tag.attrib.get("name") for tag in input_data_tag)}. Only first one is used.')
+
+    input_data_tag = input_data_tag[0]
+    data_key = input_data_tag.attrib.get('value').lstrip('$')
+    return data_key
 
 
 def init(config):
@@ -25,6 +39,9 @@ def init(config):
     if not os.path.exists(c['output_dir']):
         os.mkdir(c['output_dir'])
 
+    task_id = 0
+    data_key = None
+
     # load at first start
     if tasks is None:
         tasks = {}
@@ -37,7 +54,7 @@ def init(config):
         # directory
         else:
             root_dir = c['input_path']
-            files = os.listdir(root_dir)
+            files = (os.path.join(root, f) for root, _, files in os.walk(root_dir) for f in files)
 
         for f in files:
             path = os.path.join(root_dir, f)
@@ -62,13 +79,8 @@ def init(config):
 
             # load tasks from txt: line by line, task by task
             elif f.endswith('.txt'):
-                input_data_tag = label_config.get_input_data_tags()
-                if len(input_data_tag) > 1:
-                    print(f'Warning! Multiple input data tags found: '
-                          f'{",".join(tag.attrib.get("name") for tag in input_data_tag)}. Only first one is used.')
-
-                input_data_tag = input_data_tag[0]
-                data_key = input_data_tag.attrib.get('value').lstrip('$')
+                if data_key is None:
+                    data_key = _get_single_input_value(label_config)
                 tasks = {}
                 with io.open(path) as fin:
                     for i, line in enumerate(fin):
@@ -79,10 +91,25 @@ def init(config):
                                 data_key: line.strip()
                             }
                         }
-            else:
-                raise IOError(f'Unsupported file format: {os.path.splitext(f)[1]}')
 
-        print('Tasks loaded from:', c["input_path"], len(tasks))
+            # load tasks from images in directory
+            elif f.lower().endswith(('.png', '.jpg', '.jpeg', '.tiff', '.bmp', '.gif')):
+                filename = os.path.basename(f)
+                params = urllib.parse.urlencode({'d': os.path.dirname(f)})
+                image_url_path = urllib.parse.quote(f'images/{filename}')
+                image_local_url = f'{image_url_path}?{params}'
+                if data_key is None:
+                    data_key = _get_single_input_value(label_config)
+                tasks[task_id] = {
+                    'id': task_id,
+                    'task_path': f,
+                    'data': {data_key: image_local_url}
+                }
+                task_id += 1
+            else:
+                logger.warning(f'Unrecognized file format for file {f}')
+
+        print(f'{len(tasks)} tasks loaded from: {c["input_path"]}')
 
 
 def re_init(config):
