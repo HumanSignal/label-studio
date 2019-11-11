@@ -15,15 +15,53 @@ completions = None
 c = None  # config
 
 
-def _get_single_input_value(label_config):
-    input_data_tag = label_config.get_input_data_tags()
-    if len(input_data_tag) > 1:
-        print(f'Warning! Multiple input data tags found: '
-              f'{",".join(tag.attrib.get("name") for tag in input_data_tag)}. Only first one is used.')
+_allowed_extensions = {
+    'Text': ('.txt',),
+    'Image': ('.png', '.jpg', '.jpeg', '.tiff', '.bmp', '.gif'),
+    'Audio': ('.wav', '.aiff', '.mp3', '.au', '.flac')
+}
 
-    input_data_tag = input_data_tag[0]
+
+def _get_single_input_value(input_data_tags):
+    if len(input_data_tags) > 1:
+        print(f'Warning! Multiple input data tags found: '
+              f'{",".join(tag.attrib.get("name") for tag in input_data_tags)}. Only first one is used.')
+    input_data_tag = input_data_tags[0]
     data_key = input_data_tag.attrib.get('value').lstrip('$')
     return data_key
+
+
+def _create_task_with_local_uri(filepath, data_key, task_id):
+    filename = os.path.basename(filepath)
+    params = urllib.parse.urlencode({'d': os.path.dirname(filepath)})
+    image_url_path = urllib.parse.quote(f'data/{filename}')
+    image_local_url = f'{image_url_path}?{params}'
+    return {
+        'id': task_id,
+        'task_path': filepath,
+        'data': {data_key: image_local_url}
+    }
+
+
+def is_text_annotation(input_data_tags, filepath):
+    return (
+        len(input_data_tags) == 1 and input_data_tags[0].tag == 'Text'
+        and filepath.endswith(_allowed_extensions['Text'])
+    )
+
+
+def is_image_annotation(input_data_tags, filepath):
+    return (
+        len(input_data_tags) == 1 and input_data_tags[0].tag == 'Image'
+        and filepath.lower().endswith(_allowed_extensions['Image'])
+    )
+
+
+def is_audio_annotation(input_data_tags, filepath):
+    return (
+        len(input_data_tags) == 1 and input_data_tags[0].tag in ('Audio', 'AudioPlus')
+        and filepath.lower().endswith(_allowed_extensions['Audio'])
+    )
 
 
 def init(config):
@@ -41,6 +79,8 @@ def init(config):
 
     task_id = 0
     data_key = None
+
+    input_data_tags = label_config.get_input_data_tags()
 
     # load at first start
     if tasks is None:
@@ -78,37 +118,28 @@ def init(config):
                     raise Exception('Unsupported task data:', path)
 
             # load tasks from txt: line by line, task by task
-            elif f.endswith('.txt'):
+            elif is_text_annotation(input_data_tags, f):
                 if data_key is None:
-                    data_key = _get_single_input_value(label_config)
+                    data_key = _get_single_input_value(input_data_tags)
                 tasks = {}
                 with io.open(path) as fin:
                     for i, line in enumerate(fin):
-                        tasks[i] = {
-                            'id': i + 1,
-                            'task_path': path,
-                            'data': {
-                                data_key: line.strip()
-                            }
-                        }
+                        tasks[i] = {'id': i + 1, 'task_path': path, 'data': {data_key: line.strip()}}
 
-            # load tasks from images in directory
-            elif f.lower().endswith(('.png', '.jpg', '.jpeg', '.tiff', '.bmp', '.gif')):
-                filename = os.path.basename(f)
-                params = urllib.parse.urlencode({'d': os.path.dirname(f)})
-                image_url_path = urllib.parse.quote(f'images/{filename}')
-                image_local_url = f'{image_url_path}?{params}'
+            # load tasks from files: creating URI to local resources
+            elif is_image_annotation(input_data_tags, f) or is_audio_annotation(input_data_tags, f):
                 if data_key is None:
-                    data_key = _get_single_input_value(label_config)
-                tasks[task_id] = {
-                    'id': task_id,
-                    'task_path': f,
-                    'data': {data_key: image_local_url}
-                }
+                    data_key = _get_single_input_value(input_data_tags)
+                tasks[task_id] = _create_task_with_local_uri(f, data_key, task_id)
                 task_id += 1
             else:
                 logger.warning(f'Unrecognized file format for file {f}')
 
+        if len(tasks) == 0:
+            input_data_types = '\n'.join(f'"{t.tag}"' for t in input_data_tags)
+            raise ValueError(
+                f'We didn\'t find any tasks that match specified data types:\n{input_data_types}\n'
+                f'Please check input arguments and try again.')
         print(f'{len(tasks)} tasks loaded from: {c["input_path"]}')
 
 
