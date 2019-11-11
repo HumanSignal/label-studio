@@ -243,6 +243,12 @@ def api_instruction():
     return make_response(c['instruction'], 200)
 
 
+@app.route('/data/<path:filename>')
+def get_image_file(filename):
+    directory = request.args.get('d')
+    return flask.send_from_directory(directory, filename, as_attachment=True)
+
+
 if __name__ == "__main__":
     reload_config()
     app.run(host='0.0.0.0', port=c['port'], debug=c['debug'])

@@ -3,13 +3,65 @@ from __future__ import print_function
 import io
 import os
 import json
+import urllib
+import logging
 
 from datetime import datetime
 
+logger = logging.getLogger(__name__)
 
 tasks = None
 completions = None
 c = None  # config
+
+
+_allowed_extensions = {
+    'Text': ('.txt',),
+    'Image': ('.png', '.jpg', '.jpeg', '.tiff', '.bmp', '.gif'),
+    'Audio': ('.wav', '.aiff', '.mp3', '.au', '.flac')
+}
+
+
+def _get_single_input_value(input_data_tags):
+    if len(input_data_tags) > 1:
+        print(f'Warning! Multiple input data tags found: '
+              f'{",".join(tag.attrib.get("name") for tag in input_data_tags)}. Only first one is used.')
+    input_data_tag = input_data_tags[0]
+    data_key = input_data_tag.attrib.get('value').lstrip('$')
+    return data_key
+
+
+def _create_task_with_local_uri(filepath, data_key, task_id):
+    filename = os.path.basename(filepath)
+    params = urllib.parse.urlencode({'d': os.path.dirname(filepath)})
+    image_url_path = urllib.parse.quote(f'data/{filename}')
+    image_local_url = f'{image_url_path}?{params}'
+    return {
+        'id': task_id,
+        'task_path': filepath,
+        'data': {data_key: image_local_url}
+    }
+
+
+def is_text_annotation(input_data_tags, filepath):
+    return (
+        len(input_data_tags) == 1 and input_data_tags[0].tag == 'Text'
+        and filepath.endswith(_allowed_extensions['Text'])
+    )
+
+
+def is_image_annotation(input_data_tags, filepath):
+    return (
+        len(input_data_tags) == 1 and input_data_tags[0].tag == 'Image'
+        and filepath.lower().endswith(_allowed_extensions['Image'])
+    )
+
+
+def is_audio_annotation(input_data_tags, filepath):
+    return (
+        len(input_data_tags) == 1 and input_data_tags[0].tag in ('Audio', 'AudioPlus')
+        and filepath.lower().endswith(_allowed_extensions['Audio'])
+    )
 
 
 def init(config):
@@ -25,6 +77,11 @@ def init(config):
     if not os.path.exists(c['output_dir']):
         os.mkdir(c['output_dir'])
 
+    task_id = 0
+    data_key = None
+
+    input_data_tags = label_config.get_input_data_tags()
+
     # load at first start
     if tasks is None:
         tasks = {}
@@ -37,7 +94,7 @@ def init(config):
         # directory
         else:
             root_dir = c['input_path']
-            files = os.listdir(root_dir)
+            files = (os.path.join(root, f) for root, _, files in os.walk(root_dir) for f in files)
 
         for f in files:
             path = os.path.join(root_dir, f)
@@ -61,28 +118,29 @@ def init(config):
                     raise Exception('Unsupported task data:', path)
 
             # load tasks from txt: line by line, task by task
-            elif f.endswith('.txt'):
-                input_data_tag = label_config.get_input_data_tags()
-                if len(input_data_tag) > 1:
-                    print(f'Warning! Multiple input data tags found: '
-                          f'{",".join(tag.attrib.get("name") for tag in input_data_tag)}. Only first one is used.')
-
-                input_data_tag = input_data_tag[0]
-                data_key = input_data_tag.attrib.get('value').lstrip('$')
+            elif is_text_annotation(input_data_tags, f):
+                if data_key is None:
+                    data_key = _get_single_input_value(input_data_tags)
                 tasks = {}
                 with io.open(path) as fin:
                     for i, line in enumerate(fin):
-                        tasks[i] = {
-                            'id': i + 1,
-                            'task_path': path,
-                            'data': {
-                                data_key: line.strip()
-                            }
-                        }
-            else:
-                raise IOError(f'Unsupported file format: {os.path.splitext(f)[1]}')
+                        tasks[i] = {'id': i + 1, 'task_path': path, 'data': {data_key: line.strip()}}
 
-        print('Tasks loaded from:', c["input_path"], len(tasks))
+            # load tasks from files: creating URI to local resources
+            elif is_image_annotation(input_data_tags, f) or is_audio_annotation(input_data_tags, f):
+                if data_key is None:
+                    data_key = _get_single_input_value(input_data_tags)
+                tasks[task_id] = _create_task_with_local_uri(f, data_key, task_id)
+                task_id += 1
+            else:
+                logger.warning(f'Unrecognized file format for file {f}')
+
+        if len(tasks) == 0:
+            input_data_types = '\n'.join(f'"{t.tag}"' for t in input_data_tags)
+            raise ValueError(
+                f'We didn\'t find any tasks that match specified data types:\n{input_data_types}\n'
+                f'Please check input arguments and try again.')
+        print(f'{len(tasks)} tasks loaded from: {c["input_path"]}')
 
 
 def re_init(config):
