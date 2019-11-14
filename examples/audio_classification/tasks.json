@@ -4,6 +4,7 @@
     "predictions": [
         {
             "model_version": "model 1",
+            "created_ago": "2 weeks, 6 days",
             "result": [
                 {
                     "from_name": "label",
