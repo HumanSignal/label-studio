@@ -1,6 +1,24 @@
 [
   {
-    "url": "https://go.heartex.net/static/samples/game.wav"
+    "url": "https://go.heartex.net/static/samples/game.wav",
+    "predictions": [
+        {
+            "model_version": "model 1",
+            "result": [
+                {
+                    "from_name": "label",
+                    "id": "wvDEy63Wgs",
+                    "to_name": "audio",
+                    "type": "choices",
+                    "value": {
+                        "choices": [
+                            "Politics"
+                        ]
+                    }
+                }
+            ]
+        }
+    ]
   },
 
   {

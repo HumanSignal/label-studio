@@ -3,5 +3,51 @@
 }, {
   "image": "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/history-in-hd-e5eDHbmHprg-unsplash.jpg"
 }, {
-  "image": "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/soroush-karimi-crjPrExvShc-unsplash.jpg"
+  "image": "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/soroush-karimi-crjPrExvShc-unsplash.jpg",
+  "predictions": [
+        {
+            "model_version": "model 1",
+            "result": [
+                {
+                    "from_name": "tag",
+                    "id": "t5sp3TyXPo",
+                    "source": "$image",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "value": {
+                        "height": 11.612284069097889,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ],
+                        "rotation": 0,
+                        "width": 39.6,
+                        "x": 13.2,
+                        "y": 34.702495201535505
+                    }
+                }
+            ]
+        },
+          {
+            "model_version": "model 2",
+            "result": [
+                {
+                    "from_name": "tag",
+                    "id": "t5sp3TyXPo",
+                    "source": "$image",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "value": {
+                        "height": 33.612284069097889,
+                        "rectanglelabels": [
+                            "Moonwalker"
+                        ],
+                        "rotation": 0,
+                        "width": 39.6,
+                        "x": 13.2,
+                        "y": 54.702495201535505
+                    }
+                }
+            ]
+        }
+    ]
 }]
