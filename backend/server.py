@@ -99,7 +99,7 @@ def index():
     task_id = request.args.get('task_id', None)
 
     if task_id is not None:
-        task_data = db.get_completions(task_id)
+        task_data = db.get_task_with_completions(task_id)
         if task_data is None:
             task_data = db.get_task(task_id)
 
@@ -162,7 +162,7 @@ def api_tasks(task_id):
     """ Get task by id
     """
     # try to get task with completions first
-    task_data = db.get_completions(task_id)
+    task_data = db.get_task_with_completions(task_id)
     task_data = db.get_task(task_id) if task_data is None else task_data
     analytics.send(getframeinfo(currentframe()).function)
     return make_response(jsonify(task_data), 200)

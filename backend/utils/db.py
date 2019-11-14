@@ -32,6 +32,8 @@ def _get_single_input_value(input_data_tags):
 
 
 def _create_task_with_local_uri(filepath, data_key, task_id):
+    """ Convert filepath to task with flask serving URL
+    """
     filename = os.path.basename(filepath)
     params = urllib.parse.urlencode({'d': os.path.dirname(filepath)})
     image_url_path = urllib.parse.quote(f'data/{filename}')
@@ -62,6 +64,36 @@ def is_audio_annotation(input_data_tags, filepath):
         len(input_data_tags) == 1 and input_data_tags[0].tag in ('Audio', 'AudioPlus')
         and filepath.lower().endswith(_allowed_extensions['Audio'])
     )
+
+
+def tasks_from_json_file(path, tasks):
+    """ Prepare tasks from json
+
+    :param path: path to json with list or dict
+    :param tasks: main db instance of tasks
+    :return: new task id
+    """
+    def push_task(data):
+        task_id = len(tasks) + 1
+        tasks[task_id] = {'id': task_id, 'task_path': path, 'data': data}
+        if 'predictions' in data:
+            tasks[task_id]['predictions'] = data['predictions']
+            tasks[task_id]['data'].pop('predictions', None)
+
+    with open(path) as f:
+        json_body = json.load(f)
+
+        # multiple tasks in file
+        if isinstance(json_body, list):
+            [push_task(data) for data in json_body]
+
+        # one task in file
+        elif isinstance(json_body, dict):
+            push_task(json_body)
+
+        # unsupported task type
+        else:
+            raise Exception('Unsupported task data:', path)
 
 
 def init(config):
@@ -96,42 +128,28 @@ def init(config):
             root_dir = c['input_path']
             files = (os.path.join(root, f) for root, _, files in os.walk(root_dir) for f in files)
 
+        # walk over all the files
         for f in files:
             path = os.path.join(root_dir, f)
             # load tasks from json
             if f.endswith('.json'):
-                json_body = json.load(open(path))
-
-                # multiple tasks in file
-                if isinstance(json_body, list):
-                    for data in json_body:
-                        task_id = len(tasks) + 1
-                        tasks[task_id] = {'id': task_id, 'task_path': path, 'data': data}
-
-                # one task in file
-                elif isinstance(json_body, dict):
-                    task_id = len(tasks) + 1
-                    tasks[task_id] = {'id': task_id, 'task_path': path, 'data': json_body}
-
-                # unsupported task type
-                else:
-                    raise Exception('Unsupported task data:', path)
+                tasks_from_json_file(path, tasks)
 
             # load tasks from txt: line by line, task by task
             elif is_text_annotation(input_data_tags, f):
                 if data_key is None:
                     data_key = _get_single_input_value(input_data_tags)
-                tasks = {}
                 with io.open(path) as fin:
-                    for i, line in enumerate(fin):
-                        tasks[i] = {'id': i + 1, 'task_path': path, 'data': {data_key: line.strip()}}
+                    for line in fin:
+                        task_id = len(tasks) + 1
+                        tasks[task_id] = {'id': task_id, 'task_path': path, 'data': {data_key: line.strip()}}
 
             # load tasks from files: creating URI to local resources
             elif is_image_annotation(input_data_tags, f) or is_audio_annotation(input_data_tags, f):
                 if data_key is None:
                     data_key = _get_single_input_value(input_data_tags)
+                task_id = len(tasks) + 1
                 tasks[task_id] = _create_task_with_local_uri(f, data_key, task_id)
-                task_id += 1
             else:
                 logger.warning(f'Unrecognized file format for file {f}')
 
@@ -219,8 +237,8 @@ def get_completed_at(task_ids):
     return times
 
 
-def get_completions(task_id):
-    """ Get completed time for list of task ids
+def get_task_with_completions(task_id):
+    """ Get task with completions
 
     :param task_id: task ids
     :return: json dict with completion
@@ -234,6 +252,8 @@ def get_completions(task_id):
 
     if os.path.exists(filename):
         data = json.load(open(filename))
+        # tasks can hold the newest version of predictions, so task it from tasks
+        data['predictions'] = tasks[task_id].get('predictions', [])
     else:
         data = None
     return data
@@ -248,7 +268,7 @@ def save_completion(task_id, completion):
     global c
 
     # try to get completions with task first
-    task = get_completions(task_id)
+    task = get_task_with_completions(task_id)
 
     # init task if completions with task not exists
     if not task:
