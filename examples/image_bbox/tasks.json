@@ -1,12 +1,9 @@
 [{
-  "image": "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg"
-}, {
-  "image": "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/history-in-hd-e5eDHbmHprg-unsplash.jpg"
-}, {
-  "image": "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/soroush-karimi-crjPrExvShc-unsplash.jpg",
-  "predictions": [
+  "image": "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg",
+    "predictions": [
         {
             "model_version": "model 1",
+            "created_ago": "3 hours",
             "result": [
                 {
                     "from_name": "tag",
@@ -29,6 +26,7 @@
         },
           {
             "model_version": "model 2",
+            "created_ago": "4 hours",
             "result": [
                 {
                     "from_name": "tag",
@@ -50,4 +48,8 @@
             ]
         }
     ]
+}, {
+  "image": "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/history-in-hd-e5eDHbmHprg-unsplash.jpg"
+}, {
+  "image": "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/soroush-karimi-crjPrExvShc-unsplash.jpg"
 }]
