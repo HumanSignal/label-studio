@@ -77,9 +77,58 @@ if (process.env.NODE_ENV === "production") {
         },
       };
 
+      params['interfaces'].push('predictions:menu');
+      params['interfaces'].push('predictions');
       let app = AppStore.create(params, enviroment.configureApplication(params));
-
-      app.initializeStore({ completions: params.task.completions, predictions: params.task.predictions });
+      const p = [
+        {
+            "model_version": "model 1",
+            "created_ago": "3 hours",
+            "result": [
+                {
+                    "from_name": "tag",
+                    "id": "t5sp3TyXPo",
+                    "source": "$image",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "value": {
+                        "height": 11.612284069097889,
+                        "rectanglelabels": [
+                            "Hello"
+                        ],
+                        "rotation": 0,
+                        "width": 39.6,
+                        "x": 13.2,
+                        "y": 34.702495201535505
+                    }
+                }
+            ]
+        },
+          {
+            "model_version": "model 2",
+            "created_ago": "4 hours",
+            "result": [
+                {
+                    "from_name": "tag",
+                    "id": "t5sp3TyXPo",
+                    "source": "$image",
+                    "to_name": "img",
+                    "type": "rectanglelabels",
+                    "value": {
+                        "height": 33.612284069097889,
+                        "rectanglelabels": [
+                            "Hello"
+                        ],
+                        "rotation": 0,
+                        "width": 39.6,
+                        "x": 13.2,
+                        "y": 54.702495201535505
+                    }
+                }
+            ]
+        }
+    ]
+      app.initializeStore({ completions: params.task.completions, predictions: p });
 
       ReactDOM.render(
         <Provider store={app}>

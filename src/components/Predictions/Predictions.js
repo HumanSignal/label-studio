@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { observer } from "mobx-react";
-import { Card, List } from "antd";
+import { Button, Card, Icon, List, Tooltip } from "antd";
 import Utils from "../../utils";
 import styles from "../Completions/Completions.module.scss";
 
@@ -12,9 +12,22 @@ const Prediction = observer(({ item, store }) => {
         !item.selected && store.completionStore.selectPrediction(item.id);
       }}
     >
-      <div className={styles.title}>{item.createdBy ? `Model (v. ${item.createdBy})` : null}</div>
+      <div className={styles.title}>{item.createdBy ? `Model (${item.createdBy})` : null}</div>
       Created
       <i>{item.createdAgo ? ` ${item.createdAgo} ago` : ` ${Utils.UDate.prettyDate(item.createdDate)}`}</i>
+      {item.selected && (
+        <Tooltip placement="topLeft" title="Add new completion based on this prediction">
+          <Button
+            style={{ marginLeft: "8em" }}
+            onClick={ev => {
+              ev.preventDefault();
+              store.completionStore.addCompletionFromPrediction();
+            }}
+          >
+            <Icon type="copy" />
+          </Button>
+        </Tooltip>
+      )}
     </List.Item>
   );
 });

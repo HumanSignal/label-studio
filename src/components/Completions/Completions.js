@@ -14,7 +14,7 @@ const Completion = observer(({ item, store }) => {
         item.removeHoneypot();
       }}
     >
-      Ground Truth
+      <Icon type="star" />
     </Button>
   );
 
@@ -27,7 +27,7 @@ const Completion = observer(({ item, store }) => {
         item.setHoneypot();
       }}
     >
-      Ground Truth
+      <Icon type="star" />
     </Button>
   );
 
@@ -84,6 +84,8 @@ const Completion = observer(({ item, store }) => {
       {item.createdBy ? ` by ${item.createdBy}` : null}
       {item.selected && (
         <div className={styles.buttons}>
+          {item.honeypot ? removeHoney() : setHoney()}
+
           <Tooltip placement="topLeft" title="Delete selected completion">
             <Button
               type="danger"
@@ -92,11 +94,9 @@ const Completion = observer(({ item, store }) => {
                 item.store.deleteCompletion(item);
               }}
             >
-              Delete
+              <Icon type="delete" />
             </Button>
           </Tooltip>
-
-          {item.honeypot ? removeHoney() : setHoney()}
         </div>
       )}
     </List.Item>
@@ -113,6 +113,8 @@ class Completions extends Component {
         <h3>Completions</h3>
         <Tooltip placement="topLeft" title="Add new completion">
           <Button
+            style={{ marginLeft: "8em" }}
+            shape={"circle"}
             onClick={ev => {
               ev.preventDefault();
               store.completionStore.addUserCompletion();

@@ -534,20 +534,17 @@ export default types
        */
       if (self.store.expert) {
         const { expert } = self.store;
-
         node["createdBy"] = `${expert.firstName} ${expert.lastName}`;
       }
 
       /**
        *
        */
-      const completion = self.addCompletion(node, "initial");
+      let completion = self.addCompletion(node, "initial");
 
-      if (options && options.userGenerate) {
+      if (options && (options.userGenerate)) {
         self.selectCompletion(node.id);
       }
-
-      console.log(completion);
 
       return completion;
     }
@@ -564,10 +561,15 @@ export default types
       return self.generateCompletion({ userGenerate: true });
     }
 
+    function addCompletionFromPrediction() {
+      return self.generateCompletion({ prediction: true });
+    }
+
     return {
       selectCompletion,
       selectPrediction,
       addCompletion,
+      addCompletionFromPrediction,
       deleteCompletion,
       destroyCompletion,
       addInitialCompletion,
