@@ -13,6 +13,7 @@ export default types
           HtxObjectModel.AudioRegionModel,
           HtxObjectModel.TextAreaRegionModel,
           HtxObjectModel.KeyPointRegionModel,
+          HtxObjectModel.BrushRegionModel,
         ),
       ),
     ),

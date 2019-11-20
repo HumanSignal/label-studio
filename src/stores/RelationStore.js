@@ -5,6 +5,9 @@ import Types from "../core/Types";
 
 import * as HtxObjectModel from "../interfaces/object";
 
+/**
+ * Relation between two different nodes
+ */
 const Relation = types
   .model("Relation", {
     node1: types.reference(
@@ -15,6 +18,7 @@ const Relation = types
         HtxObjectModel.AudioRegionModel,
         HtxObjectModel.TextAreaRegionModel,
         HtxObjectModel.KeyPointRegionModel,
+        HtxObjectModel.BrushRegionModel,
       ),
     ),
     node2: types.reference(
@@ -25,12 +29,13 @@ const Relation = types
         HtxObjectModel.AudioRegionModel,
         HtxObjectModel.TextAreaRegionModel,
         HtxObjectModel.KeyPointRegionModel,
+        HtxObjectModel.BrushRegionModel,
       ),
     ),
   })
   .actions(self => ({
     toggleHighlight() {
-      if (self.node1 == self.node2) {
+      if (self.node1 === self.node2) {
         self.node1.toggleHightlight();
       } else {
         self.node1.toggleHightlight();
@@ -47,12 +52,12 @@ export default types
     findRelations(node1, node2) {
       if (!node2) {
         return self.relations.filter(rl => {
-          return rl.node1.id == node1.id || rl.node2.id == node1.id;
+          return rl.node1.id === node1.id || rl.node2.id === node1.id;
         });
       }
 
       return self.relations.filter(rl => {
-        return rl.node1.id == node1.id && rl.node2.id == node2.id;
+        return rl.node1.id === node1.id && rl.node2.id === node2.id;
       });
     },
 

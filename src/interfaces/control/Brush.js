@@ -11,11 +11,7 @@ import { BrushRegionModel } from "../object/BrushRegion";
 const TagAttrs = types.model({
   name: types.maybeNull(types.string),
   toname: types.maybeNull(types.string),
-
-  opacity: types.optional(types.string, "0.9"),
-  fillcolor: types.optional(types.string, "#8bad00"),
-
-  strokewidth: types.optional(types.string, "1"),
+  strokeWidth: types.optional(types.number, 15),
 });
 
 const Model = types
@@ -32,9 +28,6 @@ const Model = types
     get completion() {
       return getRoot(self).completionStore.selected;
     },
-  }))
-  .actions(self => ({
-    fromStateJSON(obj) {},
   }));
 
 const BrushModel = types.compose(

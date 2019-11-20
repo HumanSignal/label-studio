@@ -25,6 +25,21 @@ export default observer(
           />
         </Fragment>
       );
+      let gridSizeControl = (
+        <Fragment>
+          <Slider
+            defaultValue={this.props.item.gridSize}
+            max={65}
+            min={20}
+            vertical
+            tipFormatter={null}
+            style={{ height: 50 }}
+            onChange={value => {
+              this.props.updateGridSize(value);
+            }}
+          />
+        </Fragment>
+      );
       /**
        * Control for zoom
        */
@@ -48,10 +63,36 @@ export default observer(
           ></Button>
         </Fragment>
       );
+      let brushControls = (
+        <Fragment>
+          <Button
+            shape="circle"
+            type={this.props.item.brushControl === "brush" ? "primary" : "default"}
+            className={styles.button}
+            onClick={() => {
+              this.props.updateBrushControl("brush");
+            }}
+          >
+            <Icon type={"highlight"} />
+          </Button>
+          <Button
+            shape="circle"
+            type={this.props.item.brushControl === "eraser" ? "primary" : "default"}
+            className={styles.button}
+            onClick={() => {
+              this.props.updateBrushControl("eraser");
+            }}
+          >
+            <Icon type={"scissor"} />
+          </Button>
+        </Fragment>
+      );
       return (
         <div className={styles.block}>
           {this.props.item.brightness ? brightnessControl : null}
           {this.props.item.zoom ? zoomControls : null}
+          {this.props.item.grid ? gridSizeControl : null}
+          {this.props.item.controlButton().type === "brushlabels" ? brushControls : null}
         </div>
       );
     }

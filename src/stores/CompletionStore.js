@@ -12,6 +12,7 @@ import RelationStore from "./RelationStore";
 import NormalizationStore from "./NormalizationStore";
 import RegionStore from "./RegionStore";
 import { RectangleModel } from "../interfaces/control/Rectangle";
+import { BrushModel } from "../interfaces/control/Brush";
 import Utils from "../utils";
 
 import * as HtxObjectModel from "../interfaces/object";
@@ -66,7 +67,9 @@ const Completion = types
         types.safeReference(HtxObjectModel.TextAreaRegionModel),
         types.safeReference(HtxObjectModel.PolygonRegionModel),
         types.safeReference(HtxObjectModel.KeyPointRegionModel),
+        types.safeReference(HtxObjectModel.BrushRegionModel),
         types.safeReference(RectangleModel),
+        types.safeReference(BrushModel),
       ),
     ),
   })
@@ -546,8 +549,6 @@ export default types
       if (options && options.userGenerate) {
         self.selectCompletion(node.id);
       }
-
-      console.log(completion);
 
       return completion;
     }

@@ -1,8 +1,8 @@
-import React, { Component, Fragment } from "react";
-import { observer, inject } from "mobx-react";
-import { Button, Typography } from "antd";
+import React from "react";
+import { observer } from "mobx-react";
+import { Button } from "antd";
 
-import { Node, NodeMinimal } from "../Node/Node";
+import { Node } from "../Node/Node";
 import Hint from "../Hint/Hint";
 import styles from "./Entities.module.scss";
 

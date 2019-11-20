@@ -3,67 +3,36 @@
  * @param {array} arr
  */
 export function RLEencode(arr) {
-  let finishedArray = [];
-  let rip = [];
-  let runCount = 0;
+  var encoding = [];
+  var prev, count, i;
 
-  for (let i = 1, lastValue = arr[0]; i <= arr.length; i++) {
-    if (arr[i] !== lastValue) {
-      if (runCount !== 0) {
-        finishedArray.push(runCount + 1, lastValue);
-      } else {
-        rip.push(lastValue);
-      }
-
-      runCount = 0;
-    }
-
-    if (arr[i] === lastValue || i === arr.length) {
-      if (rip.length !== 0) {
-        if (rip.length) {
-          finishedArray.push(-rip.length);
-          finishedArray = finishedArray.concat(rip);
-        }
-
-        rip = [];
-      }
-
-      runCount++;
-    }
-
-    lastValue = arr[i];
+  for (count = 1, prev = arr[0], i = 1; i < arr.length; i++) {
+    if (arr[i] !== prev) {
+      encoding.push(count, prev);
+      count = 1;
+      prev = arr[i];
+    } else count++;
   }
 
-  return finishedArray;
+  encoding.push(count, prev);
+
+  return encoding;
 }
 
 /**
  * Run Length Decode
  * @param {array} arr
  */
-export function RLEdecode(arr) {
-  var finishedArray = [],
-    isRip,
-    isRun,
-    ripCount,
-    runCount;
-  for (var i = 0; i < arr.length; i++) {
-    isRip = arr[i] < 0;
-    isRun = arr[i] > 0;
-    if (isRip) {
-      ripCount = Math.abs(arr[i]);
-      i += 1;
+export function RLEdecode(encoded) {
+  let uncompressed = [];
+  let test = [];
 
-      finishedArray = finishedArray.concat(arr.slice(i, i + ripCount));
-      i += ripCount - 1;
+  encoded.forEach((el, ind) => {
+    if (ind % 2 === 0) {
+      uncompressed.push(Array.from(new Array(1 + el).join(encoded[ind + 1])));
     }
-    if (isRun) {
-      runCount = arr[i];
-      i += 1;
-      for (var j = 0; j < runCount; j++) {
-        finishedArray.push(arr[i]);
-      }
-    }
-  }
-  return finishedArray;
+  });
+
+  uncompressed.flat(2).forEach(el => test.push(parseInt(el)));
+  return test;
 }

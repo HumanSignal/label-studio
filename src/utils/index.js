@@ -5,5 +5,6 @@ import { guidGenerator } from "./unique";
 import { debounce } from "./debounce";
 import { styleToProp } from "./styles";
 import * as RLe from "./rle";
+import * as Image from "./image";
 
-export default { Checkers, Colors, UDate, guidGenerator, debounce, styleToProp, RLe };
+export default { Image, Checkers, Colors, UDate, guidGenerator, debounce, styleToProp, RLe };

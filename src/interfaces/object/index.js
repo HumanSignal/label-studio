@@ -2,6 +2,7 @@ import { TextRegionModel } from "./TextRegion";
 import { RectRegionModel } from "./RectRegion";
 import { PolygonRegionModel } from "./PolygonRegion";
 import { KeyPointRegionModel } from "./KeyPointRegion";
+import { BrushRegionModel } from "./BrushRegion";
 import { PolygonPoint } from "./PolygonPoint";
 import { AudioRegionModel } from "./AudioRegion";
 import { TextAreaRegionModel } from "./TextAreaRegion";
@@ -16,4 +17,5 @@ export {
   ImageModel,
   KeyPointRegionModel,
   PolygonPoint,
+  BrushRegionModel,
 };

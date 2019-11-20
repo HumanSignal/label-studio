@@ -7,6 +7,9 @@ import Tree from "../../core/Tree";
 import ImageTransformer from "../ImageTransformer/ImageTransformer";
 import ImageControls from "../ImageControls/ImageControls";
 import ImageGrid from "../ImageGrid/ImageGrid";
+import { encode } from "@thi.ng/rle-pack";
+
+import Utils from "../../utils";
 
 export default observer(
   class ImageView extends Component {
@@ -22,6 +25,51 @@ export default observer(
       const { item } = this.props;
 
       return item.onImageClick(ev);
+    };
+
+    /**
+     * Handler for mouse down
+     */
+    handleStageMouseDown = e => {
+      const { item } = this.props;
+      item.freezeHistory();
+
+      /**
+       * Disable polygon event handler
+       */
+      if (item.controlButtonType === "PolygonLabelsModel") {
+        return;
+      }
+
+      /**
+       * Brush event handler
+       */
+      if (item.controlButtonType === "BrushLabelsModel") {
+        const { x, y } = e.target.getStage().getPointerPosition();
+
+        item.startDraw({ x: Math.floor(x), y: Math.floor(y) });
+
+        return;
+      }
+
+      if (e.target === e.target.getStage() || (e.target.parent && e.target.parent.attrs.name === "ruler")) {
+        // draw rect
+
+        const x = (e.evt.offsetX - item.zoomingPositionX) / item.zoomScale;
+        const y = (e.evt.offsetY - item.zoomingPositionY) / item.zoomScale;
+
+        item.startDraw({ x: x, y: y });
+
+        return;
+      }
+
+      const clickedOnTransformer = e.target.getParent().className === "Transformer";
+
+      if (clickedOnTransformer) {
+        return;
+      }
+
+      return true;
     };
 
     /**
@@ -52,6 +100,13 @@ export default observer(
          * Check for minimal size of boundng box
          */
         if (currentShape.width > minSize.width && currentShape.height > minSize.height) item.addShape(currentShape);
+      } else if (item.mode === "brush") {
+        item.setMode("viewing");
+
+        const currentShape = item.detachActiveShape();
+        item.addShape(currentShape);
+      } else if (item.mode === "eraser") {
+        item.setMode("viewing");
       }
     };
 
@@ -74,11 +129,11 @@ export default observer(
 
         item.updateDraw({ x: x, y: y });
       } else if (item.mode === "brush") {
-        console.log("brush mode");
-        item.stageRef.globalCompositeOperation = "source-over";
+        const { x, y } = e.target.getStage().getPointerPosition();
+        item.addPoints({ x: Math.floor(x), y: Math.floor(y) });
       } else if (item.mode === "eraser") {
-        console.log("eraser mode");
-        item.stageRef.globalCompositeOperation = "destination-out";
+        const { x, y } = e.target.getStage().getPointerPosition();
+        item.addEraserPoints({ x: Math.floor(x), y: Math.floor(y) });
       }
 
       item.setPointerPosition({ x: e.evt.offsetX, y: e.evt.offsetY });
@@ -91,40 +146,6 @@ export default observer(
     };
 
     /**
-     * Handler for mouse down
-     */
-    handleStageMouseDown = e => {
-      const { item } = this.props;
-
-      item.freezeHistory();
-
-      let lastPointerPosition = item.stageRef.getPointerPosition();
-
-      if (item.controlButtonType === "PolygonLabelsModel") {
-        return;
-      }
-
-      if (e.target === e.target.getStage() || (e.target.parent && e.target.parent.attrs.name === "ruler")) {
-        // draw rect
-
-        const x = (e.evt.offsetX - item.zoomingPositionX) / item.zoomScale;
-        const y = (e.evt.offsetY - item.zoomingPositionY) / item.zoomScale;
-
-        item.startDraw({ x: x, y: y });
-
-        return;
-      }
-
-      // clicked on transformer - do nothing
-      const clickedOnTransformer = e.target.getParent().className === "Transformer";
-      if (clickedOnTransformer) {
-        return;
-      }
-
-      return true;
-    };
-
-    /**
      * Update brightness of Image
      */
     updateBrightness = range => {
@@ -132,6 +153,15 @@ export default observer(
       item.freezeHistory();
 
       item.setBrightnessGrade(range);
+    };
+
+    updateBrushControl = arg => this.props.item.updateBrushControl(arg);
+
+    updateGridSize = range => {
+      const { item } = this.props;
+      item.freezeHistory();
+
+      item.setGridSize(range);
     };
 
     /**
@@ -300,7 +330,6 @@ export default observer(
             </div>
             <Stage
               ref={ref => {
-                console.log(item.naturalWidth);
                 item.setStageRef(ref);
               }}
               style={{ position: "absolute", top: 0, left: 0, brightness: "150%" }}
@@ -316,18 +345,35 @@ export default observer(
               onWheel={item.zoom ? this.handleZoom : () => {}}
             >
               {item.grid && item.sizeUpdated && <ImageGrid item={item} />}
+              {item.shapes.map(shape => {
+                let brushShape;
+                if (shape.type === "brushregion") {
+                  brushShape = (
+                    <Layer name="brushLayer" id={shape.id}>
+                      {Tree.renderItem(shape)}
+                    </Layer>
+                  );
+                }
+                return brushShape;
+              })}
               <Layer>
                 {item.shapes.map(shape => {
-                  return Tree.renderItem(shape);
+                  if (shape.type !== "brushregion") {
+                    return Tree.renderItem(shape);
+                  }
                 })}
                 {item.activeShape && Tree.renderItem(item.activeShape)}
 
                 <ImageTransformer rotateEnabled={item.controlButton().canrotate} selectedShape={item.selectedShape} />
               </Layer>
             </Stage>
-            {item.zoom || item.brightness ? (
-              <ImageControls item={item} handleZoom={this.handleZoom} updateBrightness={this.updateBrightness} />
-            ) : null}
+            <ImageControls
+              item={item}
+              handleZoom={this.handleZoom}
+              updateBrightness={this.updateBrightness}
+              updateGridSize={this.updateGridSize}
+              updateBrushControl={this.updateBrushControl}
+            />
           </div>
         );
       } else {
