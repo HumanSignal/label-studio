@@ -91,7 +91,7 @@ class MLBackend(object):
             if response.is_error:
                 logger.error(f'Can\'t make predictions: ML backend returns error: {response.error_message}')
             else:
-                return response.response['results'][0]
+                return response.response['results']
 
     def update_model(self, task, completion):
         if self._api_exists():
