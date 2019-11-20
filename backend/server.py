@@ -65,6 +65,7 @@ class Project(object):
 @attr.s
 class MLBackend(object):
     api = attr.ib()
+    model_name = attr.ib(default=None)
     model_version = attr.ib(default=None)
     train_job = attr.ib(default=None)
 
@@ -90,7 +91,7 @@ class MLBackend(object):
             if response.is_error:
                 logger.error(f'Can\'t make predictions: ML backend returns error: {response.error_message}')
             else:
-                return response['results'][0]
+                return response.response['results'][0]
 
     def update_model(self, task, completion):
         if self._api_exists():
@@ -132,7 +133,7 @@ def reload_config():
     if ml_backend is None:
         ml_backend_params = c.get('ml_backend', {})
         ml_api = MLApi(ml_backend_params.get('url'))
-        ml_backend = MLBackend(ml_api)
+        ml_backend = MLBackend(api=ml_api, model_name=ml_backend_params.get('model_name'))
     if project is None:
         project = Project(label_config=label_config_line)
         project.connect(ml_backend)

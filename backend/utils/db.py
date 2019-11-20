@@ -39,8 +39,8 @@ def _create_task_with_local_uri(filepath, data_key, task_id):
     global c
     filename = os.path.basename(filepath)
     params = urllib.parse.urlencode({'d': os.path.dirname(filepath)})
-    base_url = f'https://localhost:{c.get("port")}/'
-    image_url_path = base_url + urllib.parse.quote(f'/data/{filename}')
+    base_url = f'http://localhost:{c.get("port")}/'
+    image_url_path = base_url + urllib.parse.quote(f'data/{filename}')
     image_local_url = f'{image_url_path}?{params}'
     return {
         'id': task_id,
@@ -79,6 +79,8 @@ def tasks_from_json_file(path, tasks):
     """
     def push_task(data):
         task_id = len(tasks) + 1
+        if 'data' in data:
+            data = data['data']
         tasks[task_id] = {'id': task_id, 'task_path': path, 'data': data}
         if 'predictions' in data:
             tasks[task_id]['predictions'] = data['predictions']

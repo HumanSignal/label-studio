@@ -136,8 +136,7 @@ class MLApi(BaseHTTPAPI):
         return MLApiResult(url, request, response, headers, status_code=status_code)
 
     def _create_project_uid(self, project):
-        time_id = int(project.created_at.timestamp())
-        return f'{project.id}.{time_id}'
+        return f'{project.id}.{project.ml_backend.model_name}'
 
     def update(self, task, results, project, retrain=True):
 
