@@ -5,8 +5,10 @@ import os
 import json
 import urllib
 import logging
+import random
 
 from datetime import datetime
+from collections import OrderedDict
 
 logger = logging.getLogger(__name__)
 
@@ -34,9 +36,11 @@ def _get_single_input_value(input_data_tags):
 def _create_task_with_local_uri(filepath, data_key, task_id):
     """ Convert filepath to task with flask serving URL
     """
+    global c
     filename = os.path.basename(filepath)
     params = urllib.parse.urlencode({'d': os.path.dirname(filepath)})
-    image_url_path = urllib.parse.quote(f'data/{filename}')
+    base_url = f'https://localhost:{c.get("port")}/'
+    image_url_path = base_url + urllib.parse.quote(f'/data/{filename}')
     image_local_url = f'{image_url_path}?{params}'
     return {
         'id': task_id,
@@ -116,7 +120,7 @@ def init(config):
 
     # load at first start
     if tasks is None:
-        tasks = {}
+        tasks = OrderedDict()
 
         # file
         if os.path.isfile(c['input_path']):
@@ -180,6 +184,19 @@ def get_tasks():
     """
     global tasks
     return tasks
+
+
+def iter_tasks():
+    global tasks, c
+    sampling = c.get('sampling', 'sequential')
+    if sampling == 'sequential':
+        return tasks.items()
+    elif sampling == 'uniform':
+        keys = list(tasks.keys())
+        random.shuffle(keys)
+        return ((k, tasks[k]) for k in keys)
+    else:
+        raise NotImplementedError(f'Unknown sampling method {sampling}.')
 
 
 def get_task(task_id):

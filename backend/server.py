@@ -5,13 +5,21 @@ import os
 import flask
 import json  # it MUST be included after flask!
 import utils.db as db
+import attr
+import logging
 
+from copy import deepcopy
+from datetime import datetime
 from inspect import currentframe, getframeinfo
 from flask import request, jsonify, make_response, Response
 from utils.misc import (
     exception_treatment, log_config, log, config_line_stripped, load_config
 )
 from utils.analytics import Analytics
+from ml_api import MLApi
+
+
+logger = logging.getLogger(__name__)
 
 
 app = flask.Flask(__name__, static_url_path='')
@@ -25,17 +33,109 @@ label_config_line = None
 # analytics
 analytics = None
 
+# ML backend
+ml_backend = None
+
+project = None
+
+
+_DEFAULT_PROJECT = 1
+
+
+@attr.s
+class Project(object):
+    id = attr.ib(default=_DEFAULT_PROJECT)
+    created_at = attr.ib(factory=lambda: datetime.now())
+    schema = attr.ib(default='')
+    label_config = attr.ib(default='')
+    task_data_login = attr.ib(default='')
+    task_data_password = attr.ib(default='')
+    ml_backend = attr.ib(default=None)
+
+    def connect(self, ml_backend):
+        self.ml_backend = ml_backend
+        self.schema = ml_backend.get_schema(self.label_config)
+
+    @property
+    def train_job(self):
+        if self.ml_backend is not None:
+            return self.ml_backend.train_job
+
+
+@attr.s
+class MLBackend(object):
+    api = attr.ib()
+    model_version = attr.ib(default=None)
+    train_job = attr.ib(default=None)
+
+    def train_job_is_running(self):
+        if self._api_exists():
+            response = self.api.get_train_job_status(project.train_job)
+            if response.is_error:
+                logger.error(f'Can\'t fetch train job status: ML backend returns error: {response.error_message}')
+            else:
+                return response.response['job_status'] in ('queued', 'started')
+        return False
+
+    def _api_exists(self):
+        if self.api is None or not self.api.is_ok():
+            logger.debug(f'Can\'t make predictions because ML backend was not specified: '
+                         f'add "ml_backend" option with URL in your config file')
+            return False
+        return True
+
+    def make_predictions(self, task):
+        if self._api_exists():
+            response = self.api.predict([task], self.model_version, project)
+            if response.is_error:
+                logger.error(f'Can\'t make predictions: ML backend returns error: {response.error_message}')
+            else:
+                return response['results'][0]
+
+    def update_model(self, task, completion):
+        if self._api_exists():
+            results = completion['result']
+            retrain = not self.train_job_is_running()
+            response = self.api.update(task, results, project, retrain)
+            if response.is_error:
+                logger.error(f'Can\'t update model: ML backend returns error: {response.error_message}')
+            else:
+                maybe_job = response.response.get('job')
+                ml_backend.train_job = maybe_job
+
+    def get_schema(self, label_config):
+        if self._api_exists():
+            response = self.api.validate(project.label_config)
+            if response.is_error:
+                logger.error(f'Can\'t infer schema for label config {label_config}. '
+                             f'ML backend returns error: {response.error_message}')
+            else:
+                schema = response.response
+                if len(schema) > 1:
+                    logger.warning(f'ML backend returns multiple schemas for label config {label_config}: {schema}'
+                                   f'We currently support only one schema, so 0th schema is used.')
+                return schema[0]
+
 
 def reload_config():
     global c
     global label_config_line
     global analytics
+    global ml_backend
+    global project
     c = load_config()
     label_config_line = config_line_stripped(open(c['label_config']).read())
     if analytics is None:
         analytics = Analytics(label_config_line, c.get('collect_analytics', True))
     else:
         analytics.update_info(label_config_line, c.get('collect_analytics', True))
+    if ml_backend is None:
+        ml_backend_params = c.get('ml_backend', {})
+        ml_api = MLApi(ml_backend_params.get('url'))
+        ml_backend = MLBackend(ml_api)
+    if project is None:
+        project = Project(label_config=label_config_line)
+        project.connect(ml_backend)
 
 
 @app.template_filter('json')
@@ -128,17 +228,21 @@ def tasks_page():
                                  completed_at=completed_at)
 
 
-@app.route('/api/projects/1/next/', methods=['GET'])
+@app.route(f'/api/projects/{_DEFAULT_PROJECT}/next/', methods=['GET'])
 @exception_treatment
 def api_generate_next_task():
     """ Generate next task to label
     """
     # try to find task is not presented in completions
     completions = db.get_completions_ids()
-    for (task_id, task) in db.get_tasks().items():
+    for task_id, task in db.iter_tasks():
         if task_id not in completions:
             log.info(msg='New task for labeling', extra=task)
             analytics.send(getframeinfo(currentframe()).function)
+            predictions = ml_backend.make_predictions(task)
+            if predictions is not None:
+                task = deepcopy(task)
+                task['predictions'] = predictions
             return make_response(jsonify(task), 200)
 
     # no tasks found
@@ -146,7 +250,7 @@ def api_generate_next_task():
     return make_response('', 404)
 
 
-@app.route('/api/projects/1/task_ids/', methods=['GET'])
+@app.route(f'/api/projects/{_DEFAULT_PROJECT}/task_ids/', methods=['GET'])
 @exception_treatment
 def api_all_task_ids():
     """ Get all tasks ids
@@ -168,7 +272,7 @@ def api_tasks(task_id):
     return make_response(jsonify(task_data), 200)
 
 
-@app.route('/api/projects/1/completions_ids/', methods=['GET'])
+@app.route(f'/api/projects/{_DEFAULT_PROJECT}/completions_ids/', methods=['GET'])
 @exception_treatment
 def api_all_completion_ids():
     """ Get all completion ids
@@ -190,6 +294,7 @@ def api_completions(task_id):
         completion.pop('state', None)  # remove editor state
         completion_id = db.save_completion(task_id, completion)
         log.info(msg='Completion saved', extra={'task_id': task_id, 'output': request.json})
+        ml_backend.update_model(db.get_task(task_id), completion)
         analytics.send(getframeinfo(currentframe()).function)
         return make_response(json.dumps({'id': completion_id}), 201)
 
