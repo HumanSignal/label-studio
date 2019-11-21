@@ -342,11 +342,20 @@ def api_completion_update(task_id, completion_id):
     return make_response('ok', 201)
 
 
-@app.route('/api/projects/1/expert_instruction')
+@app.route(f'/api/projects/{_DEFAULT_PROJECT}/expert_instruction')
 @exception_treatment
 def api_instruction():
     analytics.send(getframeinfo(currentframe()).function)
     return make_response(c['instruction'], 200)
+
+
+@app.route('/predict', methods=['POST'])
+@exception_treatment
+def api_predict():
+    task = request.json
+    predictions = project.ml_backend.make_predictions({'data': task})
+    analytics.send(getframeinfo(currentframe()).function)
+    return make_response(jsonify(predictions), 200)
 
 
 @app.route('/data/<path:filename>')
