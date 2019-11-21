@@ -7,3 +7,4 @@ appdirs==1.4.3
 mixpanel==4.4.0
 pandas==0.24.0
 Pillow==6.2.0
+attrs==19.1.0

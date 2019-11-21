@@ -542,7 +542,7 @@ export default types
        */
       let completion = self.addCompletion(node, "initial");
 
-      if (options && (options.userGenerate)) {
+      if (options && options.userGenerate) {
         self.selectCompletion(node.id);
       }
 
