@@ -355,6 +355,7 @@ export default types
       self.completions.map(c => (c.selected = false));
       if (self.predictions) self.predictions.map(c => (c.selected = false));
       const c = self.completions.find(c => c.id === id);
+
       unSelectedPredict();
 
       // if (self.selected && self.selected.id !== c.id) c.history.reset();
@@ -562,7 +563,12 @@ export default types
     }
 
     function addCompletionFromPrediction() {
-      return self.generateCompletion({ prediction: true });
+      const selectedData = self.selected.serializeCompletion();
+
+      const c = self.generateCompletion();
+      c.deserializeCompletion(selectedData);
+
+      return c;
     }
 
     return {

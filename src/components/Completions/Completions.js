@@ -70,6 +70,7 @@ const Completion = observer(({ item, store }) => {
 
   return (
     <List.Item
+      key={item.id}
       className={item.selected ? `${styles.completion} ${styles.completion_selected}` : styles.completion}
       onClick={ev => {
         !item.selected && store.completionStore.selectCompletion(item.id);
@@ -109,11 +110,10 @@ class Completions extends Component {
 
     let content = [];
     let title = (
-      <div className={styles.title}>
+      <div className={styles.title + " " + styles.titlespace}>
         <h3>Completions</h3>
-        <Tooltip placement="topLeft" title="Add new completion">
+        <Tooltip placement="topLeft" title="Add a new completion">
           <Button
-            style={{ marginLeft: "8em" }}
             shape={"circle"}
             onClick={ev => {
               ev.preventDefault();
