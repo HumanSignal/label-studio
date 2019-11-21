@@ -7,8 +7,6 @@ import Tree from "../../core/Tree";
 import ImageTransformer from "../ImageTransformer/ImageTransformer";
 import ImageControls from "../ImageControls/ImageControls";
 import ImageGrid from "../ImageGrid/ImageGrid";
-import { encode } from "@thi.ng/rle-pack";
-
 import Utils from "../../utils";
 
 export default observer(

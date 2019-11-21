@@ -10,8 +10,6 @@ import { guidGenerator } from "../../core/Helpers";
 
 import Registry from "../../core/Registry";
 
-import { encode } from "@thi.ng/rle-pack";
-
 import { LabelsModel } from "../control/Labels";
 import { BrushLabelsModel } from "../control/BrushLabels";
 
