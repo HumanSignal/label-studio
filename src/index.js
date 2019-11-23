@@ -60,7 +60,7 @@ if (process.env.NODE_ENV === "production") {
         let app = AppStore.create(params, enviroment.configureApplication(params));
 
         app.initializeStore({ completions: [params.completion] });
-
+        window.Htx = app;
         ReactDOM.render(
           <Provider store={app}>
             <App />
@@ -87,6 +87,8 @@ if (process.env.NODE_ENV === "production") {
         </Provider>,
         enviroment.rootElement(element),
       );
+
+      return app;
     }
   };
 }

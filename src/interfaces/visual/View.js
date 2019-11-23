@@ -55,14 +55,11 @@ const Model = types.model({
     "list",
     "dialog",
     "textarea",
+    "html",
   ]),
 });
 
-const ViewModel = types.compose(
-  "ViewModel",
-  TagAttrs,
-  Model,
-);
+const ViewModel = types.compose("ViewModel", TagAttrs, Model);
 
 const HtxView = observer(({ item }) => {
   let style = {};

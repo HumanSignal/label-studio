@@ -15,6 +15,7 @@ const Relation = types
         HtxObjectModel.AudioRegionModel,
         HtxObjectModel.TextAreaRegionModel,
         HtxObjectModel.KeyPointRegionModel,
+        HtxObjectModel.HTMLRegionModel,
       ),
     ),
     node2: types.reference(
@@ -25,6 +26,7 @@ const Relation = types
         HtxObjectModel.AudioRegionModel,
         HtxObjectModel.TextAreaRegionModel,
         HtxObjectModel.KeyPointRegionModel,
+        HtxObjectModel.HTMLRegionModel,
       ),
     ),
   })

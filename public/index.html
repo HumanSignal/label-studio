@@ -21,7 +21,7 @@
       Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
-    -->
+      -->
     <title>Label Studio</title>
   </head>
   <body>
@@ -47,19 +47,10 @@
       <br/><br/>
       <img src="./images/3nowhite.svg" height="80" />
     </footer>
-
+    
     <script>
       setTimeout(() => {
-        var ls = new LabelStudio("label-studio", {
-          config: `
-            <View>
-              <Image name="img" value="$image"></Image>
-              <RectangleLabels name="tag" toName="img">
-                <Label value="Hello"></Label>
-                <Label value="World"></Label>
-              </RectangleLabels>
-            </View>
-          `,
+        ls = new LabelStudio("label-studio", {
 
           description: "Description",
 
@@ -88,6 +79,8 @@
             }
           }
         });
+
+        
       }, 2000);
     </script>
   </body>
