@@ -20,8 +20,6 @@ import { highlightRange, splitBoundaries } from "../../utils/html";
 import { HTMLRegionModel } from "./HTMLRegion";
 import Utils from "../../utils";
 
-// console.log(allxpath);
-
 const TagAttrs = types.model("HTMLModel", {
   name: types.maybeNull(types.string),
   // text: types.maybeNull(types.optional(types.string, "Please set \"value\" attribute of Text")),
@@ -95,8 +93,6 @@ const Model = types
     },
 
     addRange(range) {
-      console.log("addRange");
-
       const states = self.activeStates();
       const clonedStates = states
         ? states.map(s => {
@@ -107,7 +103,6 @@ const Model = types
       if (!self.selelectwithoutlabel && !clonedStates.length) return null;
 
       const r = self._addRange({ ...range, states: clonedStates });
-      console.log(r);
 
       states &&
         states.forEach(s => {

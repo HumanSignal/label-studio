@@ -129,18 +129,16 @@ function normalizeBoundaries(range) {
 
 function highlightRange(normedRange, cssClass, cssStyle, onClick) {
   if (typeof cssClass === "undefined" || cssClass === null) {
-    cssClass = "annotator-hl";
+    cssClass = "htx-annotation";
   }
 
   // normalizeBoundaries(normedRange._range);
-  // console.log(normedRange._range);
 
   // const normedRange = htxRange._range;
   const allNodes = getNodesInRange(normedRange._range);
   const textNodes = allNodes.filter(n => isTextNode(n));
 
   // let textNodes = filterNode(getNodesInRange(normedRange._range), isTextNode);
-  // console.log(textNodes);
 
   var white = /^\s*$/;
 
@@ -158,9 +156,6 @@ function highlightRange(normedRange, cssClass, cssStyle, onClick) {
 
       hl.addEventListener("click", function() {
         normedRange.onClickRegion();
-        // onClick();
-        // console.log("CLIIICK");
-        // htxRange.select();
       });
 
       hl.addEventListener("mouseover", function() {
