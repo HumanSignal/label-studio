@@ -34,7 +34,7 @@ export default types
     /**
      * Configure the functionality
      */
-    behavior: types.array(types.string),
+    supports: types.array(types.string),
 
     /**
      * Flag for labeling of tasks
@@ -150,8 +150,8 @@ export default types
       return self.interfaces.find(i => name === i);
     }
 
-    function behaves(name) {
-      return self.behavior.find(i => name === i);
+    function hasSupport(name) {
+      return self.supports.find(i => name === i);
     }
 
     /**
@@ -272,7 +272,7 @@ export default types
           /**
            * Completions
            */
-          if (self.behaves("completions:load") && response.completions) {
+          if (self.hasSupport("completions") && response.completions) {
             self.completionStore.destroyCompletion(self.completionStore.selected);
 
             for (var i = 0; i < response.completions.length; i++) {
@@ -293,7 +293,7 @@ export default types
             // self.addGeneratedCompletion(r);
           }
 
-          if (self.behaves("predictions:load") && response.predictions) {
+          if (self.hasSupport("predictions") && response.predictions) {
             if (response.predictions && response.predictions.length) {
               for (let i = 0; i < response.predictions.length; i++) {
                 const prediction = self.completionStore.addPrediction(response.predictions[i]);
@@ -355,7 +355,7 @@ export default types
         /**
          * Check for pending completions
          */
-        if (self.behaves("check-empty") && savedCompletions.length === 0) {
+        if (self.hasSupport("check-empty") && savedCompletions.length === 0) {
           InfoModal.warning("You need to label at least something!");
           return;
         }
@@ -396,7 +396,7 @@ export default types
             }
           }
 
-          if (self.behaves("next")) {
+          if (self.hasSupport("next:load")) {
             self.resetState();
             return loadTask();
           } else {
