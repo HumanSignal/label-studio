@@ -1,7 +1,7 @@
 
-# Named Entity Recognition
+# HTML Document Annotation
 
-![Named Entity Recognition](/images/screenshots/named_entity.png "Named Entity Recognition")
+![HTML Document Annotation](/images/screenshots/named_entity.png "HTML Document Annotation")
 
 # Install
 
@@ -25,8 +25,8 @@ pip install -r requirements.txt
 
 # Start
 
-Named entity recognition for a piece of text
+Named entity recognition for a piece of html markup
 
 ```bash
-python server.py -c config.json -l ../examples/named_entity/config.xml -i ../examples/named_entity/tasks.json -o output
+python server.py -c config.json -l ../examples/html_document/config.xml -i ../examples/html_document/tasks.json -o output
 ```

@@ -20,13 +20,19 @@ import { highlightRange, splitBoundaries } from "../../utils/html";
 import { HTMLRegionModel } from "./HTMLRegion";
 import Utils from "../../utils";
 
+/**
+ * HTML tag shows an HTML markup that can be labeled
+ * @example
+ * <HTML name="text-1" value="$text"></HTML>
+ * @name HTML
+ * @param {string} name of the element
+ * @param {string} value of the element
+ */
 const TagAttrs = types.model("HTMLModel", {
   name: types.maybeNull(types.string),
   // text: types.maybeNull(types.optional(types.string, "Please set \"value\" attribute of Text")),
   value: types.maybeNull(types.string),
-  selelectwithoutlabel: types.optional(types.boolean, false),
 
-  hidden: types.optional(types.enumeration(["true", "false"]), "false"),
   /**
    * If we allow selecting parts of words of we select whole word only
    */
@@ -94,13 +100,13 @@ const Model = types
 
     addRange(range) {
       const states = self.activeStates();
+      if (states.length == 0) return;
+
       const clonedStates = states
         ? states.map(s => {
             return cloneNode(s);
           })
         : null;
-
-      if (!self.selelectwithoutlabel && !clonedStates.length) return null;
 
       const r = self._addRange({ ...range, states: clonedStates });
 
