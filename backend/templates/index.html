@@ -48,11 +48,13 @@
                     "controls",  // all control buttons: skip, submit, update
                     "submit",  // submit button on controls
                     "update",  // update button  on controls
-                    "predictions", // show predictions from task.predictions = [{...}, {...}]
                     "predictions:menu", // right menu with prediction items
-                    "completions",  // show completions
                     "completions:menu", // right menu with completion items
                     "side-column" // entity
+                ],
+                supports: [
+                    "predictions", // show predictions from task.predictions = [{...}, {...}]
+                    "completions", // load completions                    
                 ],
                 task: {
                     id: {{ task_data["id"] }},
@@ -70,13 +72,16 @@
                 project: { id: 1 },
                 interfaces: [
                     "basic",
-                    "load",  // load next task
                     "panel",  // undo, redo, reset panel
                     "controls",  // all control buttons: skip, submit, update
-                    "submit",  // submit button on controls
+                    "submit",  // submit button on controls                    
+                    "side-column" // entity
+                ],
+
+                supports: [
+                    "next:load",
                     "predictions", // show predictions from task.predictions = [{...}, {...}]
                     "completions",  // show completions
-                    "side-column" // entity
                 ]
             });
         {% endif %}
