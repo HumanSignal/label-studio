@@ -495,6 +495,7 @@ export default types
       loadTask,
       addTask,
       hasInterface,
+      hasSupport,
       skipTask,
       sendTask,
       updateTask,
