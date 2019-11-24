@@ -273,7 +273,12 @@ export default types
            * Completions
            */
           if (self.hasSupport("completions") && response.completions) {
-            self.completionStore.destroyCompletion(self.completionStore.selected);
+            if (response.completions.length == 0 && self.hasSupport("sdk")) {
+              if (self.completionStore.selected)
+                self.completionStore.selected.traverseTree(node => node.updateValue && node.updateValue(self));
+            } else {
+              self.completionStore.destroyCompletion(self.completionStore.selected);
+            }
 
             for (var i = 0; i < response.completions.length; i++) {
               const completion = response.completions[i];
