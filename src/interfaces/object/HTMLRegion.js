@@ -19,6 +19,8 @@ import InfoModal from "../../components/Infomodal/Infomodal";
 import { LabelsModel } from "../control/Labels";
 import { HTMLModel } from "./HTML";
 
+import { normalizeBoundaries } from "../../utils/html";
+
 import Utils from "../../utils";
 
 // import styles from "./HTMLRegion/HTMLRegion.module.scss";
@@ -88,7 +90,6 @@ const Model = types
      * Select audio region
      */
     selectRegion() {
-      console.log("selectRegion");
       self.selected = true;
       self.completion.setHighlightedNode(self);
       self._spans.forEach(span => {
@@ -120,13 +121,17 @@ const Model = types
     },
 
     beforeDestroy() {
+      var norm = [];
       if (self._spans) {
         self._spans.forEach(span => {
           while (span.firstChild) span.parentNode.insertBefore(span.firstChild, span);
 
+          norm.push(span.parentNode);
           span.parentNode.removeChild(span);
         });
       }
+
+      norm.forEach(n => n.normalize());
     },
   }));
 

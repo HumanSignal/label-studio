@@ -145,7 +145,7 @@ function highlightRange(normedRange, cssClass, cssStyle, onClick) {
   var nodes = textNodes; // normedRange.textNodes(),
 
   let nlen = nodes.length;
-  if (nlen > 1) nlen = nlen - 1;
+  if (nlen > 1 && nodes[nodes.length - 1].nodeValue.length !== normedRange.endOffset) nlen = nlen - 1;
 
   const results = [];
   for (var i = 0, len = nlen; i < len; i++) {
@@ -176,14 +176,14 @@ function splitBoundaries(range) {
   let { startContainer, startOffset, endContainer, endOffset } = range;
 
   if (isTextNode(endContainer)) {
-    if (0 < endOffset && endOffset < endContainer.length) {
+    if (endOffset > 0 && endOffset < endContainer.length) {
       endContainer = splitText(endContainer, endOffset);
       range.setEnd(endContainer, 0);
     }
   }
 
   if (isTextNode(startContainer)) {
-    if (0 < startOffset && startOffset < startContainer.length) {
+    if (startOffset > 0 && startOffset < startContainer.length) {
       if (startContainer === endContainer) {
         startContainer = splitText(startContainer, startOffset);
         range.setEnd(startContainer, endOffset - startOffset);
@@ -195,4 +195,4 @@ function splitBoundaries(range) {
   }
 }
 
-export { highlightRange, splitBoundaries };
+export { highlightRange, splitBoundaries, normalizeBoundaries };

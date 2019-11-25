@@ -202,8 +202,8 @@ class HTMLPieceView extends Component {
 
       try {
         var normedRange = xpath.fromRange(r, self.myRef.current);
-
         splitBoundaries(r);
+
         normedRange._range = r;
 
         // If the new range falls fully outside our this.element, we should
