@@ -252,8 +252,6 @@ class HTMLPieceView extends Component {
     const root = this.myRef.current;
 
     this.props.item.regions.forEach(function(r) {
-      if (r._spans) return;
-
       const range = xpath.toRange(r.start, r.startOffset, r.end, r.endOffset, root);
 
       splitBoundaries(range);
