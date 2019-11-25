@@ -46,6 +46,7 @@ const Model = types
     type: "html",
     regions: types.array(HTMLRegionModel),
     _value: types.optional(types.string, ""),
+    _update: types.optional(types.number, 1),
   })
   .views(self => ({
     get hasStates() {
@@ -69,6 +70,10 @@ const Model = types
     },
   }))
   .actions(self => ({
+    needsUpdate() {
+      self._update = self._update + 1;
+    },
+
     findRegion(start, startOffset, end, endOffset) {
       const immutableRange = self.regions.find(r => {
         return r.start === start && r.end === end && r.startOffset === startOffset && r.endOffset === endOffset;
@@ -153,12 +158,27 @@ const Model = types
       states.fromStateJSON(obj);
 
       self._addRange(tree);
+
+      self.needsUpdate();
     },
   }));
 
 const HTMLModel = types.compose("HTMLModel", RegionsMixin, TagAttrs, Model);
 
 class HtxHTMLView extends Component {
+  render() {
+    const self = this;
+    const { item, store } = this.props;
+
+    if (!item._value) return null;
+
+    // if (! store.task.dataObj) return null;
+
+    return <HtxHTMLPieceView store={store} item={item} />;
+  }
+}
+
+class HTMLPieceView extends Component {
   constructor(props) {
     super(props);
     this.myRef = React.createRef();
@@ -204,10 +224,36 @@ class HtxHTMLView extends Component {
     return ranges;
   }
 
-  componentDidMount() {
+  onMouseUp(ev) {
+    var selectedRanges = this.captureDocumentSelection();
+
+    const states = this.props.item.activeStates();
+    if (states.length === 0) return;
+
+    if (selectedRanges.length === 0) {
+      return;
+    }
+
+    const htxRange = this.props.item.addRange(selectedRanges[0]);
+
+    let labelColor = htxRange.states.map(s => {
+      return s.getSelectedColor();
+    });
+
+    if (labelColor.length !== 0) {
+      labelColor = Utils.Colors.convertToRGBA(labelColor[0], 0.3);
+    }
+
+    const spans = highlightRange(htxRange, "htx-highlight", { backgroundColor: labelColor });
+    htxRange._spans = spans;
+  }
+
+  _handleUpdate() {
     const root = this.myRef.current;
 
     this.props.item.regions.forEach(function(r) {
+      if (r._spans) return;
+
       const range = xpath.toRange(r.start, r.startOffset, r.end, r.endOffset, root);
 
       splitBoundaries(range);
@@ -234,28 +280,12 @@ class HtxHTMLView extends Component {
     });
   }
 
-  onMouseUp(ev) {
-    var selectedRanges = this.captureDocumentSelection();
+  componentDidUpdate() {
+    this._handleUpdate();
+  }
 
-    const states = this.props.item.activeStates();
-    if (states.length === 0) return;
-
-    if (selectedRanges.length === 0) {
-      return;
-    }
-
-    const htxRange = this.props.item.addRange(selectedRanges[0]);
-
-    let labelColor = htxRange.states.map(s => {
-      return s.getSelectedColor();
-    });
-
-    if (labelColor.length !== 0) {
-      labelColor = Utils.Colors.convertToRGBA(labelColor[0], 0.3);
-    }
-
-    const spans = highlightRange(htxRange, "htx-highlight", { backgroundColor: labelColor });
-    htxRange._spans = spans;
+  componentDidMount() {
+    this._handleUpdate();
   }
 
   render() {
@@ -265,6 +295,7 @@ class HtxHTMLView extends Component {
     return (
       <div
         ref={this.myRef}
+        data-update={item._update}
         onMouseUp={this.onMouseUp.bind(this)}
         dangerouslySetInnerHTML={{ __html: runTemplate(item.value, store.task.dataObj) }}
       />
@@ -273,6 +304,7 @@ class HtxHTMLView extends Component {
 }
 
 const HtxHTML = inject("store")(observer(HtxHTMLView));
+const HtxHTMLPieceView = inject("store")(observer(HTMLPieceView));
 
 Registry.addTag("html", HTMLModel, HtxHTML);
 
