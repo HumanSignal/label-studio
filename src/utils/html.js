@@ -145,7 +145,7 @@ function highlightRange(normedRange, cssClass, cssStyle, onClick) {
   var nodes = textNodes; // normedRange.textNodes(),
 
   let nlen = nodes.length;
-  if (nlen > 1 && nodes[nodes.length - 1].nodeValue.length !== normedRange.endOffset) nlen = nlen - 1;
+  if (nlen > 1 && nodes[nodes.length - 1].length !== normedRange._range.endOffset) nlen = nlen - 1;
 
   const results = [];
   for (var i = 0, len = nlen; i < len; i++) {
