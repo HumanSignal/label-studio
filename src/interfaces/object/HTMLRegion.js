@@ -97,9 +97,10 @@ const Model = types
     },
 
     _updateSpansOpacity(opacity) {
-      self._spans.forEach(span => {
-        span.style.backgroundColor = Utils.Colors.rgbaChangeAlpha(span.style.backgroundColor, opacity);
-      });
+      self._spans &&
+        self._spans.forEach(span => {
+          span.style.backgroundColor = Utils.Colors.rgbaChangeAlpha(span.style.backgroundColor, opacity);
+        });
     },
 
     /**
