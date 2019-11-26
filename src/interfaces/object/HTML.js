@@ -252,22 +252,24 @@ class HTMLPieceView extends Component {
     const root = this.myRef.current;
 
     this.props.item.regions.forEach(function(r) {
-      const range = xpath.toRange(r.start, r.startOffset, r.end, r.endOffset, root);
+      try {
+        const range = xpath.toRange(r.start, r.startOffset, r.end, r.endOffset, root);
 
-      splitBoundaries(range);
+        splitBoundaries(range);
 
-      r._range = range;
+        r._range = range;
 
-      let labelColor = r.states.map(s => {
-        return s.getSelectedColor();
-      });
+        let labelColor = r.states.map(s => {
+          return s.getSelectedColor();
+        });
 
-      if (labelColor.length !== 0) {
-        labelColor = Utils.Colors.convertToRGBA(labelColor[0], 0.3);
-      }
+        if (labelColor.length !== 0) {
+          labelColor = Utils.Colors.convertToRGBA(labelColor[0], 0.3);
+        }
 
-      const spans = highlightRange(r, "htx-highlight", { backgroundColor: labelColor });
-      r._spans = spans;
+        const spans = highlightRange(r, "htx-highlight", { backgroundColor: labelColor });
+        r._spans = spans;
+      } catch (err) {}
     });
 
     Array.from(this.myRef.current.getElementsByTagName("a")).forEach(a => {
