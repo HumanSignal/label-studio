@@ -1,5 +1,5 @@
 [
-  {
+  { "data": {
     "url": "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/audio/barradeen-emotional.mp3",
     "predictions": [
       {
@@ -21,8 +21,9 @@
       }
     ]
 
-  },
-  {
+  }},
+    { "data": {
     "url": "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/audio/barradeen-emotional.mp3"
+  }
   }
 ]

@@ -565,7 +565,7 @@ export default types
     function addCompletionFromPrediction() {
       const selectedData = self.selected.serializeCompletion();
 
-      const c = self.generateCompletion();
+      const c = self.generateCompletion({ userGenerate: true });
       c.deserializeCompletion(selectedData);
 
       return c;

@@ -50,6 +50,7 @@ if (process.env.NODE_ENV === "production") {
   window.LabelStudio = (element, options) => {
     let params = options;
 
+    // this is a way to initialize one of the examples from the src/examples section
     if (!options.config) {
       enviroment.getExample().then(result => {
         params = {
@@ -59,7 +60,7 @@ if (process.env.NODE_ENV === "production") {
 
         let app = AppStore.create(params, enviroment.configureApplication(params));
 
-        app.initializeStore({ completions: [params.completion] });
+        app.initializeStore({ completions: [params.completion], predictions: params.predictions });
 
         ReactDOM.render(
           <Provider store={app}>
@@ -69,6 +70,7 @@ if (process.env.NODE_ENV === "production") {
         );
       });
     } else {
+      // this is static initialization from the index.html file
       params = {
         ...params,
         task: {
@@ -77,54 +79,9 @@ if (process.env.NODE_ENV === "production") {
         },
       };
 
-      params["interfaces"].push("predictions:menu");
-      params["interfaces"].push("predictions");
       let app = AppStore.create(params, enviroment.configureApplication(params));
-      const p = [
-        {
-          model_version: "model 1",
-          created_ago: "3 hours",
-          result: [
-            {
-              from_name: "tag",
-              id: "t5sp3TyXPx",
-              source: "$image",
-              to_name: "img",
-              type: "rectanglelabels",
-              value: {
-                height: 11.612284069097889,
-                rectanglelabels: ["Hello"],
-                rotation: 0,
-                width: 39.6,
-                x: 13.2,
-                y: 34.702495201535505,
-              },
-            },
-          ],
-        },
-        {
-          model_version: "model 2",
-          created_ago: "4 hours",
-          result: [
-            {
-              from_name: "tag",
-              id: "t5sp3TyXPz",
-              source: "$image",
-              to_name: "img",
-              type: "rectanglelabels",
-              value: {
-                height: 33.612284069097889,
-                rectanglelabels: ["Hello"],
-                rotation: 0,
-                width: 39.6,
-                x: 13.2,
-                y: 54.702495201535505,
-              },
-            },
-          ],
-        },
-      ];
-      app.initializeStore({ completions: params.task.completions, predictions: p });
+
+      app.initializeStore({ completions: params.task.completions, predictions: params.task.predictions });
 
       ReactDOM.render(
         <Provider store={app}>
