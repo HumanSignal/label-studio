@@ -2,7 +2,7 @@
     "completions": [
         {
             "result": [
-                {"id":"F15ehnJevB","from_name":"ner","to_name":"text","source":"$text","type":"labels","value":{"startOffset":1,"endOffset":2,"start":"/div[1]/h1[1]/span[1]/text()[1]","end":"/div[1]/p[1]/text()[1]","labels":["Organization"]}}
+                {"id":"F15ehnJevB","from_name":"ner","to_name":"text","source":"$text","type":"labels","value":{"startOffset":1,"endOffset":2,"text": "how are you","start":"/div[1]/h1[1]/span[1]/text()[1]","end":"/div[1]/p[1]/text()[1]","labels":["Organization"]}}
             ]
         }
     ],

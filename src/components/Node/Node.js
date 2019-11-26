@@ -29,7 +29,7 @@ const Node = observer(({ node }) => {
       <div onClick={click}>
         <Icon type="font-colors" />
         HTML &nbsp;
-        <span style={{ color: "#5a5a5a" }}> </span>
+        <span style={{ color: "#5a5a5a" }}>{node.text}</span>
       </div>
     );
   }

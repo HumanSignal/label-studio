@@ -127,18 +127,13 @@ function normalizeBoundaries(range) {
   range.setEnd(end, end.length);
 }
 
-function highlightRange(normedRange, cssClass, cssStyle, onClick) {
+function highlightRange(normedRange, cssClass, cssStyle, labels) {
   if (typeof cssClass === "undefined" || cssClass === null) {
     cssClass = "htx-annotation";
   }
 
-  // normalizeBoundaries(normedRange._range);
-
-  // const normedRange = htxRange._range;
   const allNodes = getNodesInRange(normedRange._range);
   const textNodes = allNodes.filter(n => isTextNode(n));
-
-  // let textNodes = filterNode(getNodesInRange(normedRange._range), isTextNode);
 
   var white = /^\s*$/;
 
@@ -168,6 +163,17 @@ function highlightRange(normedRange, cssClass, cssStyle, onClick) {
       results.push(hl);
     }
   }
+
+  // if (labels && labels.length !== 0) {
+  //     var dateSpan = document.createElement('sup');
+  //     dateSpan.style.userSelect="none";
+  //     dateSpan.style.fontSize="12px";
+
+  //     dateSpan.innerHTML = "[" + labels.join(" ") + "]";
+
+  //     var lastSpan = results[results.length - 1];
+  //     lastSpan.appendChild(dateSpan);
+  // }
 
   return results;
 }

@@ -91,7 +91,7 @@ const Model = types
         endOffset: p.endOffset,
         start: p.start,
         end: p.end,
-        text: "",
+        text: p.text,
         states: p.states,
       });
 
@@ -137,7 +137,7 @@ const Model = types
      * @param {*} fromModel
      */
     fromStateJSON(obj, fromModel) {
-      const { start, startOffset, end, endOffset } = obj.value;
+      const { start, startOffset, end, endOffset, text } = obj.value;
 
       if (fromModel.type === "textarea" || fromModel.type === "choices") {
         self.completion.names.get(obj.from_name).fromStateJSON(obj);
@@ -151,6 +151,7 @@ const Model = types
         endOffset: endOffset,
         start: start,
         end: end,
+        text: text,
         normalization: obj.normalization,
         states: [states],
       };
@@ -205,6 +206,7 @@ class HTMLPieceView extends Component {
         splitBoundaries(r);
 
         normedRange._range = r;
+        normedRange.text = selection.toString();
 
         // If the new range falls fully outside our this.element, we should
         // add it back to the document but not return it from this method.
@@ -244,7 +246,12 @@ class HTMLPieceView extends Component {
       labelColor = Utils.Colors.convertToRGBA(labelColor[0], 0.3);
     }
 
-    const spans = highlightRange(htxRange, "htx-highlight", { backgroundColor: labelColor });
+    const spans = highlightRange(
+      htxRange,
+      "htx-highlight",
+      { backgroundColor: labelColor },
+      htxRange.states.map(s => s.getSelectedNames()),
+    );
     htxRange._spans = spans;
   }
 
@@ -267,9 +274,16 @@ class HTMLPieceView extends Component {
           labelColor = Utils.Colors.convertToRGBA(labelColor[0], 0.3);
         }
 
-        const spans = highlightRange(r, "htx-highlight", { backgroundColor: labelColor });
+        const spans = highlightRange(
+          r,
+          "htx-highlight",
+          { backgroundColor: labelColor },
+          r.states.map(s => s.getSelectedNames()),
+        );
         r._spans = spans;
-      } catch (err) {}
+      } catch (err) {
+        console.log(r);
+      }
     });
 
     Array.from(this.myRef.current.getElementsByTagName("a")).forEach(a => {
