@@ -355,6 +355,7 @@ export default types
       self.completions.map(c => (c.selected = false));
       if (self.predictions) self.predictions.map(c => (c.selected = false));
       const c = self.completions.find(c => c.id === id);
+
       unSelectedPredict();
 
       // if (self.selected && self.selected.id !== c.id) c.history.reset();
@@ -542,7 +543,7 @@ export default types
        */
       let completion = self.addCompletion(node, "initial");
 
-      if (options && (options.userGenerate)) {
+      if (options && options.userGenerate) {
         self.selectCompletion(node.id);
       }
 
@@ -562,7 +563,12 @@ export default types
     }
 
     function addCompletionFromPrediction() {
-      return self.generateCompletion({ prediction: true });
+      const selectedData = self.selected.serializeCompletion();
+
+      const c = self.generateCompletion({ userGenerate: true });
+      c.deserializeCompletion(selectedData);
+
+      return c;
     }
 
     return {

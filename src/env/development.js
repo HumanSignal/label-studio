@@ -16,7 +16,7 @@ import Requests from "../core/Requests";
 /**
  * Custom Data
  */
-const data = ImagePolygons;
+const data = Sentiment;
 
 /**
  * Get current config
@@ -36,11 +36,12 @@ async function getExample() {
 
   let config = await getConfig(datatype.config);
   let task = {
-    data: JSON.stringify(datatype.tasks[0]),
+    data: JSON.stringify(datatype.tasks[0].data),
   };
   let completion = datatype.completion.completions[0];
+  let predictions = datatype.tasks[0].predictions;
 
-  return { config, task, completion };
+  return { config, task, completion, predictions };
 }
 
 /**

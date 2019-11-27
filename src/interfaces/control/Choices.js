@@ -86,6 +86,7 @@ const Model = types
 
       obj.value.choices.forEach(l => {
         const choice = self.findLabel(l);
+
         if (!choice) throw new Error("No label " + l);
 
         choice.markSelected(true);
@@ -93,18 +94,9 @@ const Model = types
     },
   }));
 
-const Composition = types.compose(
-  LabelsModel,
-  RectangleModel,
-  TagAttrs,
-  Model,
-  SelectedModelMixin,
-);
+const Composition = types.compose(LabelsModel, RectangleModel, TagAttrs, Model, SelectedModelMixin);
 
-const ChoicesModel = types.compose(
-  "ChoicesModel",
-  Composition,
-);
+const ChoicesModel = types.compose("ChoicesModel", Composition);
 
 const HtxChoices = observer(({ item }) => {
   return (
