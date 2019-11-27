@@ -282,7 +282,7 @@ def api_predict():
         analytics.send(getframeinfo(currentframe()).function)
         return make_response(jsonify(predictions), 200)
     else:
-        analytics.send(getframeinfo(currentframe()).function)
+        analytics.send(getframeinfo(currentframe()).function, error=400)
         return make_response(jsonify("No ML backend"), 400)
 
 
