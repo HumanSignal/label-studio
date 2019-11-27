@@ -22,17 +22,14 @@ logger = logging.getLogger(__name__)
 app = flask.Flask(__name__, static_url_path='')
 app.secret_key = 'A0Zrdqwf1AQWj12ajkhgFN]dddd/,?RfDWQQT'
 
-
 # init
 c = None
 # load editor config from XML
 label_config_line = None
 # analytics
 analytics = None
-
 # machine learning backend
 ml_backend = None
-
 # project object with lazy initialization
 project = None
 
@@ -49,13 +46,15 @@ def reload_config():
         analytics = Analytics(label_config_line, c.get('collect_analytics', True))
     else:
         analytics.update_info(label_config_line, c.get('collect_analytics', True))
+    # configure project
+    if project is None:
+        project = Project(label_config=label_config_line)
+    # configure machine learning backend
     if ml_backend is None:
         ml_backend_params = c.get('ml_backend')
         if ml_backend_params:
             ml_backend = MLBackend.from_params(ml_backend_params)
-    if project is None:
-        project = Project(label_config=label_config_line)
-        project.connect(ml_backend)
+            project.connect(ml_backend)
 
 
 @app.template_filter('json')
