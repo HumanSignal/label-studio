@@ -158,12 +158,10 @@ def api_generate_next_task():
         if task_id not in completions:
             log.info(msg='New task for labeling', extra=task)
             analytics.send(getframeinfo(currentframe()).function)
-            # try to use ml backend first
-            predictions = ml_backend.make_predictions(task, project) if ml_backend else None
-            if predictions is not None:
+            # try to use ml backend for predictions
+            if ml_backend:
                 task = deepcopy(task)
-                # use predictions from task file
-                task['predictions'] = predictions
+                task['predictions'] = ml_backend.make_predictions(task, project)
             return make_response(jsonify(task), 200)
 
     # no tasks found
@@ -284,6 +282,7 @@ def api_predict():
         analytics.send(getframeinfo(currentframe()).function)
         return make_response(jsonify(predictions), 200)
     else:
+        analytics.send(getframeinfo(currentframe()).function)
         return make_response(jsonify("No ML backend"), 400)
 
 
