@@ -300,7 +300,6 @@ def save_completion(task_id, completion):
     updated = False
     if 'id' in completion:
         for i, item in enumerate(task['completions']):
-            print(item, '\n\n\n', completion)
             if item['id'] == completion['id']:
                 task['completions'][i].update(completion)
                 updated = True

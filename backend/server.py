@@ -158,9 +158,11 @@ def api_generate_next_task():
         if task_id not in completions:
             log.info(msg='New task for labeling', extra=task)
             analytics.send(getframeinfo(currentframe()).function)
-            predictions = ml_backend.make_predictions(task, project)
+            # try to use ml backend first
+            predictions = ml_backend.make_predictions(task, project) if ml_backend else None
             if predictions is not None:
                 task = deepcopy(task)
+                # use predictions from task file
                 task['predictions'] = predictions
             return make_response(jsonify(task), 200)
 
@@ -213,7 +215,9 @@ def api_completions(task_id):
         completion.pop('state', None)  # remove editor state
         completion_id = db.save_completion(task_id, completion)
         log.info(msg='Completion saved', extra={'task_id': task_id, 'output': request.json})
-        ml_backend.update_model(db.get_task(task_id), completion, project)
+        # try to train model with new completions
+        if ml_backend:
+            ml_backend.update_model(db.get_task(task_id), completion, project)
         analytics.send(getframeinfo(currentframe()).function)
         return make_response(json.dumps({'id': completion_id}), 201)
 
@@ -263,6 +267,8 @@ def api_completion_update(task_id, completion_id):
 @app.route(f'/api/projects/{DEFAULT_PROJECT_ID}/expert_instruction')
 @exception_treatment
 def api_instruction():
+    """ Instruction for annotators
+    """
     analytics.send(getframeinfo(currentframe()).function)
     return make_response(c['instruction'], 200)
 
@@ -270,14 +276,21 @@ def api_instruction():
 @app.route('/predict', methods=['POST'])
 @exception_treatment
 def api_predict():
+    """ Make ML prediction using ml_backend
+    """
     task = request.json
-    predictions = project.ml_backend.make_predictions({'data': task}, project)
-    analytics.send(getframeinfo(currentframe()).function)
-    return make_response(jsonify(predictions), 200)
+    if project.ml_backend:
+        predictions = project.ml_backend.make_predictions({'data': task}, project)
+        analytics.send(getframeinfo(currentframe()).function)
+        return make_response(jsonify(predictions), 200)
+    else:
+        return make_response(jsonify("No ML backend"), 400)
 
 
 @app.route('/data/<path:filename>')
-def get_image_file(filename):
+def get_data_file(filename):
+    """ External resource serving
+    """
     directory = request.args.get('d')
     return flask.send_from_directory(directory, filename, as_attachment=True)
 
