@@ -71,7 +71,7 @@ There is a quick example tutorial how to do that with simple image classificatio
 1. Clone pyheartex, and start serving:
     ```bash
     git clone https://github.com/heartexlabs/pyheartex.git
-    cd examples/docker
+    cd pyheartex/examples/docker
     docker-compose up -d
     ```
 2. Specify running server in your label config:
