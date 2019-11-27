@@ -110,6 +110,10 @@ Please make sure to read the
 - [Contributing Guideline](/CONTRIBUTING.md)
 - [Code Of Conduct](/CODE_OF_CONDUCT.md)
 
+## Label Studio for Teams, Startups, and Enterprises
+
+Label Studio for Teams is our enterprise edition (cloud & on-prem), that includes a data manager, high-quality baseline models, active learning, collaborators support, and more. Please visit the [website](https://www.heartex.ai/) to learn more.
+
 ## License
 
 This software is licensed under the [Apache 2.0 LICENSE](/LICENSE) © [Heartex](https://www.heartex.net/).
