@@ -157,14 +157,14 @@ class MLApi(BaseHTTPAPI):
             response = self.post(url=url, json=request, *args, **kwargs)
             response.raise_for_status()
         except requests.exceptions.RequestException as e:
-            logger.warning(f'Error getting response from {url}. ', exc_info=True)
+            logger.debug(f'Error getting response from {url}. ', exc_info=True)
             status_code = response.status_code if response is not None else 0
             return MLApiResult(url, request, {'error': str(e)}, headers, 'error', status_code=status_code)
         status_code = response.status_code
         try:
             response = response.json()
         except ValueError as e:
-            logger.warning(f'Error parsing JSON response from {url}. Response: {response.content}', exc_info=True)
+            logger.debug(f'Error parsing JSON response from {url}. Response: {response.content}', exc_info=True)
             return MLApiResult(
                 url, request, {'error': str(e), 'response': response.content}, headers, 'error',
                 status_code=status_code
@@ -277,10 +277,11 @@ class MLBackend(object):
         return MLBackend(api=ml_api, model_name=params['model_name'])
 
     def train_job_is_running(self, project):
-        if self._api_exists():
+        if self._api_exists() and project.train_job is not None:
             response = self.api.get_train_job_status(project.train_job)
             if response.is_error:
-                logger.error(f'Can\'t fetch train job status: ML backend returns error: {response.error_message}')
+                logger.error(f'Can\'t fetch train job status for job {project.train_job}: '
+                             f'ML backend returns error: {response.error_message}')
             else:
                 return response.response['job_status'] in ('queued', 'started')
         return False
@@ -296,7 +297,10 @@ class MLBackend(object):
         if self._api_exists():
             response = self.api.predict([task], self.model_version, project)
             if response.is_error:
-                logger.error(f'Can\'t make predictions: ML backend returns error: {response.error_message}')
+                if response.status_code == 404:
+                    logger.info(f'Can\'t make predictions: model is not found (probably not trained yet)')
+                else:
+                    logger.error(f'Can\'t make predictions: ML backend returns error: {response.error_message}')
             else:
                 return response.response['results']
 
@@ -309,7 +313,9 @@ class MLBackend(object):
                 logger.error(f'Can\'t update model: ML backend returns error: {response.error_message}')
             else:
                 maybe_job = response.response.get('job')
-                self.train_job = maybe_job
+                if maybe_job:
+                    self.train_job = maybe_job
+                    logger.debug(f'Project {project} successfully updated train job {self.train_job}')
 
     def get_schema(self, label_config, project):
         if self._api_exists():
