@@ -1,7 +1,7 @@
 ---
 title: Converters
 type: guide
-order: 104
+order: 1050
 ---
 
 Label Studio Format Converter helps you to encode labels into the format of your favorite machine learning library. It takes the resulting completions as input and produces encodes that into a specified format.

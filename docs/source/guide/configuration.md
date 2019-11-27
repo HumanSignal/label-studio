@@ -1,7 +1,7 @@
 ---
-title: UI Configuration
+title: Interface
 type: guide
-order: 200
+order: 1060
 ---
 
 UI configuration is based on XML-like tags, which internally are mapped into the associated React classes. Tags can be divided into three categories:

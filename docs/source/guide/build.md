@@ -1,7 +1,7 @@
 ---
 title: Build
 type: guide
-order: 102
+order: 1005
 ---
 
 ## Development usage
@@ -32,20 +32,11 @@ To change the configuration of the project you need to assign the value to the v
 const data = Sentiment;
 ```
 
-## Run a production build
+## Create a production build
 
 ```bash
-npm run publish
+npm run build-bundle
 ```
 
 Generates the compiled version of label studio. This compiled version needs to be included in your app.
 
-## Embed
-
-The easiest way to embed Label Studio into your application is to re-use the initialization code from `backend/templates/index.html`.
-
-## Extend
-
-```
-TBD
-```
