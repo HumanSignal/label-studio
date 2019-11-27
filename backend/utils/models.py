@@ -1,14 +1,46 @@
+import urllib
 import logging
 import os
 import requests
-import urllib
 import attr
 import json
 
-from collections import defaultdict
+from datetime import datetime
 from requests.adapters import HTTPAdapter
 
+DEFAULT_PROJECT_ID = 1
+
+
 logger = logging.getLogger(__name__)
+
+
+@attr.s
+class Project(object):
+    """
+    Project object holds general labeling project settings
+    """
+    # project ID
+    id = attr.ib(default=DEFAULT_PROJECT_ID)
+    # project creation time
+    created_at = attr.ib(factory=lambda: datetime.now())
+    # Input source / output tags schema exposed for connected ML backend
+    schema = attr.ib(default='')
+    # label config
+    label_config = attr.ib(default='')
+    # credentials for restricted data access
+    task_data_login = attr.ib(default='')
+    task_data_password = attr.ib(default='')
+    # connected machine learning backend
+    ml_backend = attr.ib(default=None)
+
+    def connect(self, ml_backend):
+        self.ml_backend = ml_backend
+        self.schema = ml_backend.get_schema(self.label_config, self)
+
+    @property
+    def train_job(self):
+        if self.ml_backend is not None:
+            return self.ml_backend.train_job
 
 
 class BaseHTTPAPI(object):
@@ -65,6 +97,9 @@ class BaseHTTPAPI(object):
 
 @attr.s
 class MLApiResult(object):
+    """
+    Response returned form ML API
+    """
     url = attr.ib(default='')
     request = attr.ib(default='')
     response = attr.ib(default=attr.Factory(dict))
@@ -83,6 +118,9 @@ class MLApiResult(object):
 
 @attr.s
 class MLApiScheme(object):
+    """
+    Input source / output tags schema exposed for connected ML backend
+    """
     tag_name = attr.ib()
     tag_type = attr.ib()
     source_name = attr.ib()
@@ -139,6 +177,14 @@ class MLApi(BaseHTTPAPI):
         return f'{project.id}.{project.ml_backend.model_name}'
 
     def update(self, task, results, project, retrain=True):
+        """
+        Upload new task results and update model when necessary
+        :param task:
+        :param results:
+        :param project:
+        :param retrain:
+        :return:
+        """
 
         request = {
             'id': task['id'],
@@ -156,6 +202,13 @@ class MLApi(BaseHTTPAPI):
         return self._post('update', request)
 
     def predict(self, tasks, model_version, project):
+        """
+        Predict batch of tasks for the given project and model version
+        :param tasks:
+        :param model_version:
+        :param project:
+        :return:
+        """
         request = {
             'tasks': tasks,
             'model_version': model_version,
@@ -169,16 +222,104 @@ class MLApi(BaseHTTPAPI):
         return self._post('predict', request, verbose=False)
 
     def validate(self, config):
+        """
+        Validate if current ML backend accept config, and return exposed schema
+        :param config:
+        :return:
+        """
         return self._post('validate', request={'config': config}, timeout=self._validate_request_timeout)
 
     def setup(self, project):
+        """
+        Setup ML backend for a given project
+        :param project:
+        :return:
+        """
         return self._post('setup', request={
             'project': self._create_project_uid(project),
             'schema': project.ml_backend_active_connection.schema
         })
 
     def delete(self, project):
+        """
+        Delete all resources from existing ML backend
+        :param project:
+        :return:
+        """
         return self._post('delete', request={'project': self._create_project_uid(project)})
 
     def get_train_job_status(self, train_job):
+        """
+        Get current train job status
+        :param train_job:
+        :return:
+        """
         return self._post('job_status', request={'job': train_job})
+
+
+@attr.s
+class MLBackend(object):
+    """
+    Machine learning backend settings
+    """
+    # connected ML API object
+    api = attr.ib()
+    # model name
+    model_name = attr.ib(default=None)
+    # model version
+    model_version = attr.ib(default=None)
+    # train job running on ML backend
+    train_job = attr.ib(default=None)
+
+    @classmethod
+    def from_params(cls, params):
+        ml_api = MLApi(params['url'])
+        return MLBackend(api=ml_api, model_name=params['model_name'])
+
+    def train_job_is_running(self, project):
+        if self._api_exists():
+            response = self.api.get_train_job_status(project.train_job)
+            if response.is_error:
+                logger.error(f'Can\'t fetch train job status: ML backend returns error: {response.error_message}')
+            else:
+                return response.response['job_status'] in ('queued', 'started')
+        return False
+
+    def _api_exists(self):
+        if self.api is None or not self.api.is_ok():
+            logger.debug(f'Can\'t make predictions because ML backend was not specified: '
+                         f'add "ml_backend" option with URL in your config file')
+            return False
+        return True
+
+    def make_predictions(self, task, project):
+        if self._api_exists():
+            response = self.api.predict([task], self.model_version, project)
+            if response.is_error:
+                logger.error(f'Can\'t make predictions: ML backend returns error: {response.error_message}')
+            else:
+                return response.response['results']
+
+    def update_model(self, task, completion, project):
+        if self._api_exists():
+            results = completion['result']
+            retrain = not self.train_job_is_running(project)
+            response = self.api.update(task, results, project, retrain)
+            if response.is_error:
+                logger.error(f'Can\'t update model: ML backend returns error: {response.error_message}')
+            else:
+                maybe_job = response.response.get('job')
+                self.train_job = maybe_job
+
+    def get_schema(self, label_config, project):
+        if self._api_exists():
+            response = self.api.validate(project.label_config)
+            if response.is_error:
+                logger.error(f'Can\'t infer schema for label config {label_config}. '
+                             f'ML backend returns error: {response.error_message}')
+            else:
+                schema = response.response
+                if len(schema) > 1:
+                    logger.warning(f'ML backend returns multiple schemas for label config {label_config}: {schema}'
+                                   f'We currently support only one schema, so 0th schema is used.')
+                return schema[0]
