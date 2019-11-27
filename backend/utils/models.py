@@ -35,7 +35,7 @@ class Project(object):
 
     def connect(self, ml_backend):
         self.ml_backend = ml_backend
-        self.schema = ml_backend.get_schema(self.label_config)
+        self.schema = ml_backend.get_schema(self.label_config, self)
 
     @property
     def train_job(self):
