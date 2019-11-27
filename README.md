@@ -71,7 +71,7 @@ There is a quick example tutorial how to do that with simple image classificatio
 1. Clone pyheartex, and start serving:
     ```bash
     git clone https://github.com/heartexlabs/pyheartex.git
-    cd examples/docker
+    cd pyheartex/examples/docker
     docker-compose up -d
     ```
 2. Specify running server in your label config:
@@ -109,6 +109,10 @@ Please make sure to read the
 
 - [Contributing Guideline](/CONTRIBUTING.md)
 - [Code Of Conduct](/CODE_OF_CONDUCT.md)
+
+## Label Studio for Teams, Startups, and Enterprises
+
+Label Studio for Teams is our enterprise edition (cloud & on-prem), that includes a data manager, high-quality baseline models, active learning, collaborators support, and more. Please visit the [website](https://www.heartex.ai/) to learn more.
 
 ## License
 
