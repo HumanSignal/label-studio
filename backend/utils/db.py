@@ -77,14 +77,16 @@ def tasks_from_json_file(path, tasks):
     :param tasks: main db instance of tasks
     :return: new task id
     """
-    def push_task(data):
+    def push_task(root):
         task_id = len(tasks) + 1
-        if 'data' in data:
-            data = data['data']
+        if 'data' in root:
+            data = root['data']
         tasks[task_id] = {'id': task_id, 'task_path': path, 'data': data}
         if 'predictions' in data:
             tasks[task_id]['predictions'] = data['predictions']
             tasks[task_id]['data'].pop('predictions', None)
+        if 'predictions' in root:
+            tasks[task_id]['predictions'] = root['predictions']
 
     with open(path) as f:
         json_body = json.load(f)
@@ -298,6 +300,7 @@ def save_completion(task_id, completion):
     updated = False
     if 'id' in completion:
         for i, item in enumerate(task['completions']):
+            print(item, '\n\n\n', completion)
             if item['id'] == completion['id']:
                 task['completions'][i].update(completion)
                 updated = True

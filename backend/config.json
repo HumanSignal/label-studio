@@ -15,7 +15,7 @@
     "debug": false
   },
 
-  "ml_backend": {
+  "!ml_backend": {
     "url": "http://localhost:9090",
     "model_name": "my_super_model"
   },
