@@ -1,7 +1,7 @@
 ---
 title: Format
 type: guide
-order: 104
+order: 1040
 ---
 
 This section talks about the format Label Studio expects the data to be in, and the output of the resulting annotations.
