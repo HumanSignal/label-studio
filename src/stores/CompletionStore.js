@@ -66,7 +66,7 @@ const Completion = types
         types.safeReference(HtxObjectModel.TextAreaRegionModel),
         types.safeReference(HtxObjectModel.PolygonRegionModel),
         types.safeReference(HtxObjectModel.KeyPointRegionModel),
-        types.safeReference(HtxObjectModel.HTMLRegionModel),
+        types.safeReference(HtxObjectModel.HyperTextRegionModel),
         types.safeReference(RectangleModel),
       ),
     ),

@@ -6,7 +6,7 @@ import { PolygonPoint } from "./PolygonPoint";
 import { AudioRegionModel } from "./AudioRegion";
 import { TextAreaRegionModel } from "./TextAreaRegion";
 import { ImageModel } from "./Image";
-import { HTMLRegionModel } from "./HTMLRegion";
+import { HyperTextRegionModel } from "./HyperTextRegion";
 
 export {
   AudioRegionModel,
@@ -17,5 +17,5 @@ export {
   ImageModel,
   KeyPointRegionModel,
   PolygonPoint,
-  HTMLRegionModel,
+  HyperTextRegionModel,
 };

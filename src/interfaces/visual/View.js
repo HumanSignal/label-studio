@@ -55,7 +55,6 @@ const Model = types.model({
     "list",
     "dialog",
     "textarea",
-    "html",
   ]),
 });
 

@@ -3,5 +3,5 @@
     <Label value="Person"></Label>
     <Label value="Organization"></Label>
   </Labels>
-  <HTML name="text" value="$text"></HTML>
+  <HyperText name="text" value="$text"></HyperText>
 </View>

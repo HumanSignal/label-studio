@@ -32,7 +32,6 @@ import Segment from "../Segment/Segment";
 import { ViewModel } from "../../interfaces/visual/View";
 import { TableModel } from "../../interfaces/visual/Table";
 import { HeaderModel } from "../../interfaces/visual/Header";
-import { HyperTextModel } from "../../interfaces/visual/HyperText";
 import { DialogModel } from "../../interfaces/visual/Dialog";
 
 /**
@@ -42,7 +41,7 @@ import { AudioModel } from "../../interfaces/object/Audio";
 import { AudioPlusModel } from "../../interfaces/object/AudioPlus";
 import { ImageModel } from "../../interfaces/object/Image";
 import { TextModel } from "../../interfaces/object/Text";
-import { HTMLModel } from "../../interfaces/object/HTML";
+import { HyperTextModel } from "../../interfaces/object/HyperText";
 
 /**
  * Control

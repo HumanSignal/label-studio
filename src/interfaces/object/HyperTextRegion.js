@@ -17,19 +17,17 @@ import { runTemplate } from "../../core/Template";
 
 import InfoModal from "../../components/Infomodal/Infomodal";
 import { LabelsModel } from "../control/Labels";
-import { HTMLModel } from "./HTML";
+import { HyperTextModel } from "./HyperText";
 
 import { normalizeBoundaries } from "../../utils/html";
 
 import Utils from "../../utils";
 
-// import styles from "./HTMLRegion/HTMLRegion.module.scss";
-
 const Model = types
-  .model("HTMLRegionModel", {
+  .model("HyperTextRegionModel", {
     id: types.optional(types.identifier, guidGenerator),
     pid: types.optional(types.string, guidGenerator),
-    type: "htmlregion",
+    type: "hypertextregion",
     startOffset: types.integer,
     start: types.string,
     endOffset: types.integer,
@@ -39,7 +37,7 @@ const Model = types
   })
   .views(self => ({
     get parent() {
-      return getParentOfType(self, HTMLModel);
+      return getParentOfType(self, HyperTextModel);
     },
 
     get completion() {
@@ -135,6 +133,6 @@ const Model = types
     },
   }));
 
-const HTMLRegionModel = types.compose("HTMLRegionModel", RegionsMixin, NormalizationMixin, Model);
+const HyperTextRegionModel = types.compose("HyperTextRegionModel", RegionsMixin, NormalizationMixin, Model);
 
-export { HTMLRegionModel };
+export { HyperTextRegionModel };

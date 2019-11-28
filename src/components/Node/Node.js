@@ -24,7 +24,7 @@ const Node = observer(({ node }) => {
     );
   }
 
-  if (getType(node).name === "HTMLRegionModel") {
+  if (getType(node).name === "HyperTextRegionModel") {
     return (
       <div onClick={click}>
         <Icon type="font-colors" />
@@ -128,7 +128,7 @@ const NodeMinimal = ({ node }) => {
     );
   }
 
-  if (getType(node).name === "HTMLRegionModel") {
+  if (getType(node).name === "HyperTextRegionModel") {
     return (
       <Fragment>
         <Icon type="font-colors" /> HTML

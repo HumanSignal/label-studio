@@ -17,18 +17,18 @@ import { LabelsModel } from "../control/Labels";
 
 import { highlightRange, splitBoundaries } from "../../utils/html";
 
-import { HTMLRegionModel } from "./HTMLRegion";
+import { HyperTextRegionModel } from "./HyperTextRegion";
 import Utils from "../../utils";
 
 /**
- * HTML tag shows an HTML markup that can be labeled
+ * HyperText tag shows an HyperText markup that can be labeled
  * @example
- * <HTML name="text-1" value="$text"></HTML>
- * @name HTML
+ * <HyperText name="text-1" value="$text"></HyperText>
+ * @name HyperText
  * @param {string} name of the element
  * @param {string} value of the element
  */
-const TagAttrs = types.model("HTMLModel", {
+const TagAttrs = types.model("HyperTextModel", {
   name: types.maybeNull(types.string),
   // text: types.maybeNull(types.optional(types.string, "Please set \"value\" attribute of Text")),
   value: types.maybeNull(types.string),
@@ -41,10 +41,10 @@ const TagAttrs = types.model("HTMLModel", {
 });
 
 const Model = types
-  .model("HTMLModel", {
+  .model("HyperTextModel", {
     id: types.optional(types.identifier, guidGenerator),
-    type: "html",
-    regions: types.array(HTMLRegionModel),
+    type: "hypertext",
+    regions: types.array(HyperTextRegionModel),
     _value: types.optional(types.string, ""),
     _update: types.optional(types.number, 1),
   })
@@ -86,7 +86,7 @@ const Model = types
     },
 
     _addRange(p) {
-      const r = HTMLRegionModel.create({
+      const r = HyperTextRegionModel.create({
         startOffset: p.startOffset,
         endOffset: p.endOffset,
         start: p.start,
@@ -164,9 +164,9 @@ const Model = types
     },
   }));
 
-const HTMLModel = types.compose("HTMLModel", RegionsMixin, TagAttrs, Model);
+const HyperTextModel = types.compose("HyperTextModel", RegionsMixin, TagAttrs, Model);
 
-class HtxHTMLView extends Component {
+class HtxHyperTextView extends Component {
   render() {
     const self = this;
     const { item, store } = this.props;
@@ -175,11 +175,11 @@ class HtxHTMLView extends Component {
 
     // if (! store.task.dataObj) return null;
 
-    return <HtxHTMLPieceView store={store} item={item} />;
+    return <HtxHyperTextPieceView store={store} item={item} />;
   }
 }
 
-class HTMLPieceView extends Component {
+class HyperTextPieceView extends Component {
   constructor(props) {
     super(props);
     this.myRef = React.createRef();
@@ -317,9 +317,9 @@ class HTMLPieceView extends Component {
   }
 }
 
-const HtxHTML = inject("store")(observer(HtxHTMLView));
-const HtxHTMLPieceView = inject("store")(observer(HTMLPieceView));
+const HtxHyperText = inject("store")(observer(HtxHyperTextView));
+const HtxHyperTextPieceView = inject("store")(observer(HyperTextPieceView));
 
-Registry.addTag("html", HTMLModel, HtxHTML);
+Registry.addTag("hypertext", HyperTextModel, HtxHyperText);
 
-export { HTMLModel, HtxHTML };
+export { HyperTextModel, HtxHyperText };
