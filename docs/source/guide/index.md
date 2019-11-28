@@ -15,7 +15,7 @@ Label Studio consists of two parts. Backend is a simple flask server that is use
 
 ## Run
 
-To launch server locally, do
+To launch the backend server locally, do
 ```bash
 cd backend
 bash start.sh

@@ -1,20 +1,44 @@
 import React, { Component } from "react";
 import { observer } from "mobx-react";
-import { Card, List } from "antd";
+import { Button, Card, Icon, List, Tooltip } from "antd";
 import Utils from "../../utils";
 import styles from "../Completions/Completions.module.scss";
 
 const Prediction = observer(({ item, store }) => {
   return (
     <List.Item
+      key={item.id}
       className={item.selected ? `${styles.completion} ${styles.completion_selected}` : styles.completion}
       onClick={ev => {
         !item.selected && store.completionStore.selectPrediction(item.id);
       }}
     >
-      <div className={styles.title}>{item.createdBy ? `Model (v. ${item.createdBy})` : null}</div>
-      Created
-      <i>{item.createdAgo ? ` ${item.createdAgo} ago` : ` ${Utils.UDate.prettyDate(item.createdDate)}`}</i>
+      <div className={styles.itembtns}>
+        <div>
+          <div className={styles.title}>{item.createdBy ? `Model (${item.createdBy})` : null}</div>
+          Created
+          <i>{item.createdAgo ? ` ${item.createdAgo} ago` : ` ${Utils.UDate.prettyDate(item.createdDate)}`}</i>
+        </div>
+        <div>
+          {item.selected && (
+            <Tooltip placement="topLeft" title="Add a new completion based on this prediction">
+              <Button
+                onClick={ev => {
+                  ev.preventDefault();
+                  const c = store.completionStore.addCompletionFromPrediction();
+
+                  // this is here because otherwise React doesn't re-render the change in the tree
+                  window.setTimeout(function() {
+                    store.completionStore.selectCompletion(c.id);
+                  }, 100);
+                }}
+              >
+                <Icon type="copy" />
+              </Button>
+            </Tooltip>
+          )}
+        </div>
+      </div>
     </List.Item>
   );
 });

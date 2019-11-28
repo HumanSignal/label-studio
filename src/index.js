@@ -50,6 +50,7 @@ if (process.env.NODE_ENV === "production") {
   window.LabelStudio = (element, options) => {
     let params = options;
 
+    // this is a way to initialize one of the examples from the src/examples section
     if (!options.config) {
       enviroment.getExample().then(result => {
         params = {
@@ -59,8 +60,9 @@ if (process.env.NODE_ENV === "production") {
 
         let app = AppStore.create(params, enviroment.configureApplication(params));
 
-        app.initializeStore({ completions: [params.completion] });
+        app.initializeStore({ completions: [params.completion], predictions: params.predictions });
         window.Htx = app;
+
         ReactDOM.render(
           <Provider store={app}>
             <App />
@@ -69,6 +71,7 @@ if (process.env.NODE_ENV === "production") {
         );
       });
     } else {
+      // this is static initialization from the index.html file
       params = {
         ...params,
         task: {

@@ -50,14 +50,14 @@
     
     <script>
       setTimeout(() => {
-        ls = new LabelStudio("label-studio", {
+        window.ls = new LabelStudio("label-studio", {
 
           description: "Description",
 
           interfaces: [
             "controls",
             "completions:menu",
-            "completions:add-new",
+              "completions:add-new",            
             "completions:delete",              
             "predictions:menu",
             "panel",
@@ -66,7 +66,7 @@
             "check-empty",
           ],
 
-          // supports: [ "completions" ],
+            supports: [ "completions", "predictions" ],
             
           expert: {
             pk: 1,

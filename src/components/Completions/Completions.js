@@ -14,7 +14,7 @@ const Completion = observer(({ item, store }) => {
         item.removeHoneypot();
       }}
     >
-      Ground Truth
+      <Icon type="star" />
     </Button>
   );
 
@@ -27,7 +27,7 @@ const Completion = observer(({ item, store }) => {
         item.setHoneypot();
       }}
     >
-      Ground Truth
+      <Icon type="star" />
     </Button>
   );
 
@@ -71,6 +71,7 @@ const Completion = observer(({ item, store }) => {
   const btnsView = () => {
     return (
       <div className={styles.buttons}>
+        {store.hasInterface("completions:set-groundtruth") && (item.honeypot ? removeHoney() : setHoney())}
         {store.hasInterface("completions:delete") && (
           <Tooltip placement="topLeft" title="Delete selected completion">
             <Button
@@ -80,17 +81,17 @@ const Completion = observer(({ item, store }) => {
                 item.store.deleteCompletion(item);
               }}
             >
-              Delete
+              <Icon type="delete" />
             </Button>
           </Tooltip>
         )}
-        {store.hasInterface("completions:set-groundtruth") && (item.honeypot ? removeHoney() : setHoney())}
       </div>
     );
   };
 
   return (
     <List.Item
+      key={item.id}
       className={item.selected ? `${styles.completion} ${styles.completion_selected}` : styles.completion}
       onClick={ev => {
         !item.selected && store.completionStore.selectCompletion(item.id);
@@ -114,11 +115,13 @@ class Completions extends Component {
 
     let content = [];
     let title = (
-      <div className={styles.title}>
+      <div className={styles.title + " " + styles.titlespace}>
         <h3>Completions</h3>
+
         {store.hasInterface("completions:add-new") && (
           <Tooltip placement="topLeft" title="Add new completion">
             <Button
+              shape={"circle"}
               onClick={ev => {
                 ev.preventDefault();
                 store.completionStore.addUserCompletion();
