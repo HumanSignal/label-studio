@@ -148,10 +148,6 @@ def load_config():
             c['input_path'] = args.input_path if args.input_path else c['input_path']
             c['output_dir'] = args.output_dir if args.output_dir else c['output_dir']
 
-            c['label_config'] = os.path.join(os.path.dirname(config_path), c['label_config'])
-            c['input_path'] = os.path.join(os.path.dirname(config_path), c['input_path'])
-            c['output_dir'] = os.path.join(os.path.dirname(config_path), c['output_dir'])
-
             # re-init db
             if prev_config != c:
                 print('Config changes detected, reloading DB')
@@ -189,6 +185,13 @@ def get_config_dir():
     if not os.path.exists(config_dir):
         os.makedirs(config_dir)
     return config_dir
+
+
+def get_data_dir():
+    data_dir = user_config_dir(appname='label-studio')
+    if not os.path.exists(data_dir):
+        os.makedirs(data_dir)
+    return data_dir
 
 
 def get_app_version():

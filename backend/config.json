@@ -13,5 +13,11 @@
   "editor": {
     "build_path": "../build/static",
     "debug": false
-  }
+  },
+
+  "!ml_backend": {
+    "url": "http://localhost:9090",
+    "model_name": "my_super_model"
+  },
+  "sampling": "uniform"
 }

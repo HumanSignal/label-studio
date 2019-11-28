@@ -14,7 +14,7 @@ const Completion = observer(({ item, store }) => {
         item.removeHoneypot();
       }}
     >
-      Ground Truth
+      <Icon type="star" />
     </Button>
   );
 
@@ -27,7 +27,7 @@ const Completion = observer(({ item, store }) => {
         item.setHoneypot();
       }}
     >
-      Ground Truth
+      <Icon type="star" />
     </Button>
   );
 
@@ -70,6 +70,7 @@ const Completion = observer(({ item, store }) => {
 
   return (
     <List.Item
+      key={item.id}
       className={item.selected ? `${styles.completion} ${styles.completion_selected}` : styles.completion}
       onClick={ev => {
         !item.selected && store.completionStore.selectCompletion(item.id);
@@ -84,6 +85,8 @@ const Completion = observer(({ item, store }) => {
       {item.createdBy ? ` by ${item.createdBy}` : null}
       {item.selected && (
         <div className={styles.buttons}>
+          {item.honeypot ? removeHoney() : setHoney()}
+
           <Tooltip placement="topLeft" title="Delete selected completion">
             <Button
               type="danger"
@@ -92,11 +95,9 @@ const Completion = observer(({ item, store }) => {
                 item.store.deleteCompletion(item);
               }}
             >
-              Delete
+              <Icon type="delete" />
             </Button>
           </Tooltip>
-
-          {item.honeypot ? removeHoney() : setHoney()}
         </div>
       )}
     </List.Item>
@@ -109,10 +110,11 @@ class Completions extends Component {
 
     let content = [];
     let title = (
-      <div className={styles.title}>
+      <div className={styles.title + " " + styles.titlespace}>
         <h3>Completions</h3>
-        <Tooltip placement="topLeft" title="Add new completion">
+        <Tooltip placement="topLeft" title="Add a new completion">
           <Button
+            shape={"circle"}
             onClick={ev => {
               ev.preventDefault();
               store.completionStore.addUserCompletion();

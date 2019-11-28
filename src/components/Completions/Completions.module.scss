@@ -16,7 +16,6 @@
 
 .title {
   display: flex;
-  justify-content: flex-start;
   align-items: center;
   color: #1890ff;
   font-weight: bold;
@@ -25,4 +24,14 @@
     margin: 0;
     margin-right: 1em;
   }
+}
+
+.titlespace {
+  justify-content: space-between;
+}
+
+.itembtns {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
 }
