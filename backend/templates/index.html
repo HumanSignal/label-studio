@@ -54,12 +54,8 @@
                     "completions:menu", // right menu with completion items
                     "side-column" // entity
                 ],
-                task: {
-                    id: {{ task_data["id"] }},
-                    data: {{ task_data["data"] | json | safe }},
-                    completions: {{ task_data["completions"] | json | safe }},
-                    // predictions: [],  // the same as completions but will be displayed in predictions section
-                }
+                task: {{ task_data | json | safe }}
+
             });
         {% else %}
             // Label stream mode
@@ -70,11 +66,12 @@
                 project: { id: 1 },
                 interfaces: [
                     "basic",
-                    "load",  // load next task
+                    "load",  // load next task automatically (label stream mode)
                     "panel",  // undo, redo, reset panel
                     "controls",  // all control buttons: skip, submit, update
                     "submit",  // submit button on controls
                     "predictions", // show predictions from task.predictions = [{...}, {...}]
+                    "predictions:menu", // right menu with prediction items
                     "completions",  // show completions
                     "side-column" // entity
                 ]

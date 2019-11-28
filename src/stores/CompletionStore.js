@@ -355,6 +355,7 @@ export default types
       self.completions.map(c => (c.selected = false));
       if (self.predictions) self.predictions.map(c => (c.selected = false));
       const c = self.completions.find(c => c.id === id);
+
       unSelectedPredict();
 
       // if (self.selected && self.selected.id !== c.id) c.history.reset();
@@ -534,20 +535,17 @@ export default types
        */
       if (self.store.expert) {
         const { expert } = self.store;
-
         node["createdBy"] = `${expert.firstName} ${expert.lastName}`;
       }
 
       /**
        *
        */
-      const completion = self.addCompletion(node, "initial");
+      let completion = self.addCompletion(node, "initial");
 
       if (options && options.userGenerate) {
         self.selectCompletion(node.id);
       }
-
-      console.log(completion);
 
       return completion;
     }
@@ -564,10 +562,20 @@ export default types
       return self.generateCompletion({ userGenerate: true });
     }
 
+    function addCompletionFromPrediction() {
+      const selectedData = self.selected.serializeCompletion();
+
+      const c = self.generateCompletion({ userGenerate: true });
+      c.deserializeCompletion(selectedData);
+
+      return c;
+    }
+
     return {
       selectCompletion,
       selectPrediction,
       addCompletion,
+      addCompletionFromPrediction,
       deleteCompletion,
       destroyCompletion,
       addInitialCompletion,

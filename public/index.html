@@ -51,16 +51,6 @@
     <script>
       setTimeout(() => {
         var ls = new LabelStudio("label-studio", {
-          config: `
-            <View>
-              <Image name="img" value="$image"></Image>
-              <RectangleLabels name="tag" toName="img">
-                <Label value="Hello"></Label>
-                <Label value="World"></Label>
-              </RectangleLabels>
-            </View>
-          `,
-
           description: "Description",
 
           interfaces: [
@@ -71,6 +61,8 @@
             "side-column",
             "update",
             "check-empty",
+            "predictions",
+            "predictions:menu"
           ],
 
           expert: {

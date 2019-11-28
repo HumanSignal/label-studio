@@ -1,10 +1,16 @@
 {
   "version": 1,
+  "formatters": {
+    "standard": {
+      "format": "[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s"
+    }
+  },
   "handlers": {
     "console": {
       "class": "logging.StreamHandler",
       "level": "DEBUG",
-      "stream": "ext://sys.stdout"
+      "stream": "ext://sys.stdout",
+      "formatter": "standard"
     }
   },
   "loggers": {
@@ -17,7 +23,7 @@
     }
   },
   "root": {
-    "level": "DEBUG",
+    "level": "ERROR",
     "handlers": [
       "console"
     ]

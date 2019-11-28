@@ -75,12 +75,7 @@ const Model = types
     },
   }));
 
-const ChoiceModel = types.compose(
-  "ChoiceModel",
-  TagAttrs,
-  Model,
-  ProcessAttrsMixin,
-);
+const ChoiceModel = types.compose("ChoiceModel", TagAttrs, Model, ProcessAttrsMixin);
 
 const HtxChoice = inject("store")(
   observer(({ item, store }) => {

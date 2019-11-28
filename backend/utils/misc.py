@@ -191,6 +191,13 @@ def get_config_dir():
     return config_dir
 
 
+def get_data_dir():
+    data_dir = user_config_dir(appname='label-studio')
+    if not os.path.exists(data_dir):
+        os.makedirs(data_dir)
+    return data_dir
+
+
 def get_app_version():
     package_file = os.path.join(os.path.dirname(__file__), '..', '..', 'package.json')
     with io.open(package_file) as f:
