@@ -4,9 +4,11 @@ import os
 import requests
 import attr
 import json
+import io
 
 from datetime import datetime
 from requests.adapters import HTTPAdapter
+from utils.misc import get_data_dir
 
 DEFAULT_PROJECT_ID = 1
 
@@ -147,11 +149,10 @@ class MLApi(BaseHTTPAPI):
             url += '/'
         return urllib.parse.urljoin(url, url_suffix)
 
-    def _post(self, url_suffix, request, verbose=True, *args, **kwargs):
+    def _post(self, url_suffix, request, *args, **kwargs):
         url = self._get_url(url_suffix)
         headers = dict(self.http.headers)
-        if verbose:
-            logger.info(f'Request to {url}: {json.dumps(request, indent=2)}')
+        logger.debug(f'Request to {url}: {json.dumps(request, indent=2)}')
         response = None
         try:
             response = self.post(url=url, json=request, *args, **kwargs)
@@ -169,8 +170,7 @@ class MLApi(BaseHTTPAPI):
                 url, request, {'error': str(e), 'response': response.content}, headers, 'error',
                 status_code=status_code
             )
-        if verbose:
-            logger.info(f'Response from {url}: {json.dumps(response, indent=2)}')
+        logger.debug(f'Response from {url}: {json.dumps(response, indent=2)}')
         return MLApiResult(url, request, response, headers, status_code=status_code)
 
     def _create_project_uid(self, project):
@@ -219,7 +219,7 @@ class MLApi(BaseHTTPAPI):
                 'password': project.task_data_password
             }
         }
-        return self._post('predict', request, verbose=False)
+        return self._post('predict', request)
 
     def validate(self, config):
         """
@@ -271,10 +271,45 @@ class MLBackend(object):
     # train job running on ML backend
     train_job = attr.ib(default=None)
 
+    _TRAIN_JOBS_FILE = os.path.join(get_data_dir(), 'train_jobs.json')
+
+    def restore_train_job(self):
+        """
+        Restore train job for the given model name
+        :return:
+        """
+        if not os.path.exists(self._TRAIN_JOBS_FILE):
+            logger.warning(f'Can\'t restore train job because {self._TRAIN_JOBS_FILE} not found')
+            return
+        with io.open(self._TRAIN_JOBS_FILE) as f:
+            train_jobs = json.load(f)
+            if self.model_name not in train_jobs:
+                logger.warning(
+                    f'Can\'t restore train job because {self.model_name} key not found in {self._TRAIN_JOBS_FILE}')
+            else:
+                train_job = train_jobs[self.model_name]
+                logger.debug(
+                    f'Train job {train_job} for model name {self.model_name} restored from {self._TRAIN_JOBS_FILE}')
+
+    def save_train_job(self):
+        """
+        Save current train job
+        :return:
+        """
+        train_jobs = {}
+        if os.path.exists(self._TRAIN_JOBS_FILE):
+            with io.open(self._TRAIN_JOBS_FILE) as f:
+                train_jobs = json.load(f)
+        train_jobs[self.model_name] = self.train_job
+        with io.open(self._TRAIN_JOBS_FILE, mode='w') as f:
+            json.dump(train_jobs, f, indent=2)
+
     @classmethod
     def from_params(cls, params):
         ml_api = MLApi(params['url'])
-        return MLBackend(api=ml_api, model_name=params['model_name'])
+        m = MLBackend(api=ml_api, model_name=params['model_name'])
+        m.restore_train_job()
+        return m
 
     def train_job_is_running(self, project):
         if self._api_exists() and project.train_job is not None:
@@ -315,6 +350,7 @@ class MLBackend(object):
                 maybe_job = response.response.get('job')
                 if maybe_job:
                     self.train_job = maybe_job
+                    self.save_train_job()
                     logger.debug(f'Project {project} successfully updated train job {self.train_job}')
 
     def get_schema(self, label_config, project):
