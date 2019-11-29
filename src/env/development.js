@@ -16,7 +16,7 @@ import Requests from "../core/Requests";
 /**
  * Custom Data
  */
-const data = Sentiment;
+const data = ImageBbox;
 
 /**
  * Get current config
