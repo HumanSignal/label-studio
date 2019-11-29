@@ -84,6 +84,8 @@ export default types
      * Finish of labeling
      */
     labeledSuccess: types.optional(types.boolean, false),
+
+    buffer: types.maybeNull(types.string),
   })
   .views(self => ({
     /**
@@ -114,6 +116,10 @@ export default types
      */
     function toggleSettings() {
       self.showingSettings = !self.showingSettings;
+    }
+
+    function setBuffer(buffer) {
+      self.buffer = buffer;
     }
 
     /**
@@ -171,6 +177,21 @@ export default types
       Hotkey.addKey("ctrl+z", function() {
         const { history } = self.completionStore.selected;
         history && history.canUndo && history.undo();
+      });
+
+      Hotkey.addKey("ctrl+c", function() {
+        const { selected } = self.completionStore;
+        if (selected.highlightedNode && selected.highlightedNode.copyToBuffer)
+          self.setBuffer(selected.highlightedNode.copyToBuffer());
+      });
+
+      Hotkey.addKey("ctrl+v", function() {
+        const { selected } = self.completionStore;
+        console.log(self.buffer);
+        if (selected && self.buffer) {
+          console.log(self.buffer);
+          selected._deserializeRegion(JSON.parse(self.buffer));
+        }
       });
 
       Hotkey.addKey("escape", function() {
@@ -471,6 +492,7 @@ export default types
 
     return {
       afterCreate,
+      setBuffer,
       loadTask,
       addTask,
       hasInterface,

@@ -718,12 +718,7 @@ const Model = types
     },
   }));
 
-const ImageModel = types.compose(
-  "ImageModel",
-  TagAttrs,
-  Model,
-  ProcessAttrsMixin,
-);
+const ImageModel = types.compose("ImageModel", TagAttrs, Model, ProcessAttrsMixin);
 
 const HtxImage = inject("store")(observer(ImageView));
 

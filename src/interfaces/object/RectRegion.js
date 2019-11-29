@@ -181,6 +181,11 @@ const Model = types
       }
     },
 
+    copyToBuffer() {
+      const res = self.toStateJSON();
+      return Array.isArray(res) ? JSON.stringify(res[0]) : JSON.stringify(res);
+    },
+
     /**
      * Format for sending to server
      */
@@ -232,12 +237,7 @@ const Model = types
     },
   }));
 
-const RectRegionModel = types.compose(
-  "RectRegionModel",
-  RegionsMixin,
-  NormalizationMixin,
-  Model,
-);
+const RectRegionModel = types.compose("RectRegionModel", RegionsMixin, NormalizationMixin, Model);
 
 const HtxRectangleView = ({ store, item }) => {
   return (

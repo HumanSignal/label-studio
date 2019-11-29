@@ -273,6 +273,19 @@ const Completion = types
       return flatten(arr);
     },
 
+    _deserializeRegion(obj) {
+      const names = obj.to_name.split(",");
+      names.forEach(name => {
+        const toModel = self.names.get(name);
+        if (!toModel) throw new Error("No model found for " + obj.to_name);
+
+        const fromModel = self.names.get(obj.from_name);
+        if (!fromModel) throw new Error("No model found for " + obj.from_name);
+
+        toModel.fromStateJSON(obj, fromModel);
+      });
+    },
+
     /**
      * Deserialize completion of models
      */
@@ -285,16 +298,7 @@ const Completion = types
 
       objCompletion.forEach(obj => {
         if (obj["type"] !== "relation") {
-          const names = obj.to_name.split(",");
-          names.forEach(name => {
-            const toModel = self.names.get(name);
-            if (!toModel) throw new Error("No model found for " + obj.to_name);
-
-            const fromModel = self.names.get(obj.from_name);
-            if (!fromModel) throw new Error("No model found for " + obj.from_name);
-
-            toModel.fromStateJSON(obj, fromModel);
-          });
+          self._deserializeRegion(obj);
         } else {
           self.relationStore.deserializeRelation(
             self.regionStore.findRegion(obj.from_id),
