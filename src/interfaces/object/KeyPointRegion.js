@@ -127,12 +127,7 @@ const Model = types
     },
   }));
 
-const KeyPointRegionModel = types.compose(
-  "KeyPointRegionModel",
-  RegionsMixin,
-  NormalizationMixin,
-  Model,
-);
+const KeyPointRegionModel = types.compose("KeyPointRegionModel", RegionsMixin, NormalizationMixin, Model);
 
 const HtxKeyPointView = ({ store, item }) => {
   const self = this;
@@ -205,6 +200,8 @@ const HtxKeyPointView = ({ store, item }) => {
         onClick={e => {
           const stage = item.parent.stageRef;
 
+          if (!item.completion.edittable) return;
+
           if (store.completionStore.selected.relationMode) {
             stage.container().style.cursor = "default";
           }
@@ -213,7 +210,7 @@ const HtxKeyPointView = ({ store, item }) => {
           item.onClickRegion();
         }}
         {...props}
-        draggable
+        draggable={item.completion.edittable}
       />
     </Fragment>
   );

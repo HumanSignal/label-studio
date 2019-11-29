@@ -44,6 +44,8 @@ const Completion = types
 
     dragMode: types.optional(types.boolean, false),
 
+    edittable: types.optional(types.boolean, true),
+
     relationMode: types.optional(types.boolean, false),
     relationStore: types.optional(RelationStore, {
       relations: [],
@@ -93,6 +95,10 @@ const Completion = types
     setHoneypot() {
       self.honeypot = true;
       self._updateServerState({ honeypot: self.honeypot });
+    },
+
+    setEdittable(val) {
+      self.edittable = val;
     },
 
     sendUserGenerate() {
@@ -403,6 +409,7 @@ export default types
       /**
        * Create Completion
        */
+      node.edittable = false;
       const createdPrediction = Completion.create(node);
 
       /**

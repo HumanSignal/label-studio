@@ -246,12 +246,7 @@ const Model = types
     },
   }));
 
-const PolygonRegionModel = types.compose(
-  "PolygonRegionModel",
-  RegionsMixin,
-  NormalizationMixin,
-  Model,
-);
+const PolygonRegionModel = types.compose("PolygonRegionModel", RegionsMixin, NormalizationMixin, Model);
 
 /**
  * Get coordinates of anchor point
@@ -448,6 +443,8 @@ const HtxPolygonView = ({ store, item }) => {
       onClick={e => {
         e.cancelBubble = true;
 
+        if (!item.completion.edittable) return;
+
         if (!item.closed) return;
 
         const stage = item.parent.stageRef;
@@ -459,7 +456,7 @@ const HtxPolygonView = ({ store, item }) => {
         item.setHighlight(false);
         item.onClickRegion();
       }}
-      draggable
+      draggable={item.completion.edittable}
     >
       {item.mouseOverStartPoint}
 

@@ -279,6 +279,7 @@ export default types
                 prediction.traverseTree(node => node.updateValue && node.updateValue(self));
                 self.completionStore.selectPrediction(prediction.id);
                 prediction.deserializeCompletion(response.predictions[i].result);
+                if (prediction.highlightedNode) prediction.highlightedNode.unselectRegion();
                 prediction.reinitHistory();
               }
             }
@@ -418,6 +419,7 @@ export default types
           self.completionStore.selectPrediction(pred.id);
 
           pred.deserializeCompletion(predictions[i].result);
+          if (pred.highlightedNode) pred.highlightedNode.unselectRegion();
           pred.reinitHistory();
         }
       }

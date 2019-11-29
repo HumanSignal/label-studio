@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 
 import { observer, inject } from "mobx-react";
-import { types, getParentOfType } from "mobx-state-tree";
+import { types, getParentOfType, getRoot } from "mobx-state-tree";
 
 import { Checkbox, Radio, Form } from "antd";
 
@@ -56,6 +56,10 @@ const Model = types
     get name() {
       return getParentOfType(self, ChoicesModel).name;
     },
+
+    get completion() {
+      return getRoot(self).completionStore.selected;
+    },
   }))
   .actions(self => ({
     toggleSelected() {
@@ -91,6 +95,8 @@ const HtxChoice = inject("store")(
           <Checkbox
             name={item._value}
             onChange={ev => {
+              if (!item.completion.edittable) return;
+
               item.toggleSelected();
             }}
             checked={item.selected}
@@ -117,6 +123,8 @@ const HtxChoice = inject("store")(
             style={{ display: "inline-block", marginBottom: "0.5em" }}
             checked={item.selected}
             onChange={ev => {
+              if (!item.completion.edittable) return;
+
               item.toggleSelected();
             }}
           >

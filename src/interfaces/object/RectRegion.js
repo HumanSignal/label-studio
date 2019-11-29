@@ -17,6 +17,7 @@ import { RatingModel } from "../control/Rating";
 import { ImageModel } from "../object/Image";
 import RegionsMixin from "../mixins/Regions";
 import NormalizationMixin from "../mixins/Normalization";
+import DisabledMixin from "../mixins/Normalization";
 import Utils from "../../utils";
 
 /**
@@ -232,12 +233,7 @@ const Model = types
     },
   }));
 
-const RectRegionModel = types.compose(
-  "RectRegionModel",
-  RegionsMixin,
-  NormalizationMixin,
-  Model,
-);
+const RectRegionModel = types.compose("RectRegionModel", RegionsMixin, NormalizationMixin, DisabledMixin, Model);
 
 const HtxRectangleView = ({ store, item }) => {
   return (
@@ -325,6 +321,7 @@ const HtxRectangleView = ({ store, item }) => {
         }}
         onClick={e => {
           const stage = item.parent.stageRef;
+          if (!item.completion.edittable) return;
 
           if (store.completionStore.selected.relationMode) {
             stage.container().style.cursor = "default";
@@ -333,7 +330,7 @@ const HtxRectangleView = ({ store, item }) => {
           item.setHighlight(false);
           item.onClickRegion();
         }}
-        draggable
+        draggable={item.completion.edittable}
       />
     </Fragment>
   );

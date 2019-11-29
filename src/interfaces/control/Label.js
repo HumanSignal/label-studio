@@ -1,6 +1,6 @@
 import React from "react";
 import { observer, inject } from "mobx-react";
-import { types } from "mobx-state-tree";
+import { getRoot, types } from "mobx-state-tree";
 import { Tag } from "antd";
 
 import { guidGenerator } from "../../core/Helpers";
@@ -49,6 +49,11 @@ const Model = types
     type: "label",
     _value: types.optional(types.string, ""),
   })
+  .views(self => ({
+    get completion() {
+      return getRoot(self).completionStore.selected;
+    },
+  }))
   .actions(self => ({
     /**
      * Select label
@@ -110,12 +115,7 @@ const Model = types
     },
   }));
 
-const LabelModel = types.compose(
-  "LabelModel",
-  TagAttrs,
-  Model,
-  ProcessAttrsMixin,
-);
+const LabelModel = types.compose("LabelModel", TagAttrs, Model, ProcessAttrsMixin);
 
 const HtxLabelView = inject("store")(
   observer(({ item, store }) => {
@@ -129,6 +129,8 @@ const HtxLabelView = inject("store")(
     return (
       <Tag
         onClick={ev => {
+          if (!item.completion.edittable) return;
+
           item.toggleSelected();
           return false;
         }}
