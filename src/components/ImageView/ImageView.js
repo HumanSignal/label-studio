@@ -9,6 +9,8 @@ import ImageControls from "../ImageControls/ImageControls";
 import ImageGrid from "../ImageGrid/ImageGrid";
 import Utils from "../../utils";
 
+import styles from "./ImageView.module.scss";
+
 export default observer(
   class ImageView extends Component {
     constructor(props) {
@@ -30,8 +32,21 @@ export default observer(
      */
     handleStageMouseDown = e => {
       const { item } = this.props;
-      item.freezeHistory();
 
+      // item.freezeHistory();
+
+      console.log("handleStageMouseDown");
+      const p = e.target.getParent();
+
+      if (p && p.className === "Transformer") {
+        return;
+      }
+
+      if (e.target === e.target.getStage() || (e.target.parent && e.target.parent.attrs.name === "ruler")) {
+        return item.onMouseDown(e);
+      }
+
+      return true;
       /**
        * Disable polygon event handler
        */
@@ -61,11 +76,11 @@ export default observer(
         return;
       }
 
-      const clickedOnTransformer = e.target.getParent().className === "Transformer";
+      // const clickedOnTransformer = e.target.getParent().className === "Transformer";
 
-      if (clickedOnTransformer) {
-        return;
-      }
+      // if (clickedOnTransformer) {
+      //   return;
+      // }
 
       return true;
     };
@@ -77,6 +92,8 @@ export default observer(
       const { item } = this.props;
 
       item.freezeHistory();
+
+      return item.onMouseUp(e);
 
       if (item.mode === "drawing") {
         /**
@@ -118,6 +135,8 @@ export default observer(
        */
       item.freezeHistory();
 
+      return item.onMouseMove(e);
+
       /**
        *
        */
@@ -155,6 +174,8 @@ export default observer(
 
     updateBrushControl = arg => this.props.item.updateBrushControl(arg);
 
+    updateBrushStrokeWidth = arg => this.props.item.updateBrushStrokeWidth(arg);
+
     updateGridSize = range => {
       const { item } = this.props;
       item.freezeHistory();
@@ -165,76 +186,76 @@ export default observer(
     /**
      * Handle to zoom
      */
-    handleZoom = e => {
-      /**
-       * Disable if user doesn't use ctrl
-       */
-      if (e.evt && !e.evt.ctrlKey) {
-        return;
-      } else if (e.evt && e.evt.ctrlKey) {
-        /**
-         * Disable scrolling page
-         */
-        e.evt.preventDefault();
-      }
+    // handleZoom = e => {
+    //   /**
+    //    * Disable if user doesn't use ctrl
+    //    */
+    //   if (e.evt && !e.evt.ctrlKey) {
+    //     return;
+    //   } else if (e.evt && e.evt.ctrlKey) {
+    //     /**
+    //      * Disable scrolling page
+    //      */
+    //     e.evt.preventDefault();
+    //   }
 
-      const { item } = this.props;
-      item.freezeHistory();
+    //   const { item } = this.props;
+    //   item.freezeHistory();
 
-      const stage = item.stageRef;
-      const scaleBy = parseFloat(item.zoomby);
-      const oldScale = stage.scaleX();
+    //   const stage = item.stageRef;
+    //   const scaleBy = parseFloat(item.zoomby);
+    //   const oldScale = stage.scaleX();
 
-      let mousePointTo;
-      let newScale;
-      let pos;
-      let newPos;
+    //   let mousePointTo;
+    //   let newScale;
+    //   let pos;
+    //   let newPos;
 
-      if (e.evt) {
-        mousePointTo = {
-          x: stage.getPointerPosition().x / oldScale - stage.x() / oldScale,
-          y: stage.getPointerPosition().y / oldScale - stage.y() / oldScale,
-        };
+    //   if (e.evt) {
+    //     mousePointTo = {
+    //       x: stage.getPointerPosition().x / oldScale - stage.x() / oldScale,
+    //       y: stage.getPointerPosition().y / oldScale - stage.y() / oldScale,
+    //     };
 
-        newScale = e.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
+    //     newScale = e.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
 
-        newPos = {
-          x: -(mousePointTo.x - stage.getPointerPosition().x / newScale) * newScale,
-          y: -(mousePointTo.y - stage.getPointerPosition().y / newScale) * newScale,
-        };
-      } else {
-        pos = {
-          x: stage.width() / 2,
-          y: stage.height() / 2,
-        };
+    //     newPos = {
+    //       x: -(mousePointTo.x - stage.getPointerPosition().x / newScale) * newScale,
+    //       y: -(mousePointTo.y - stage.getPointerPosition().y / newScale) * newScale,
+    //     };
+    //   } else {
+    //     pos = {
+    //       x: stage.width() / 2,
+    //       y: stage.height() / 2,
+    //     };
 
-        mousePointTo = {
-          x: pos.x / oldScale - stage.x() / oldScale,
-          y: pos.y / oldScale - stage.y() / oldScale,
-        };
+    //     mousePointTo = {
+    //       x: pos.x / oldScale - stage.x() / oldScale,
+    //       y: pos.y / oldScale - stage.y() / oldScale,
+    //     };
 
-        newScale = Math.max(0.05, oldScale * e);
+    //     newScale = Math.max(0.05, oldScale * e);
 
-        newPos = {
-          x: -(mousePointTo.x - pos.x / newScale) * newScale,
-          y: -(mousePointTo.y - pos.y / newScale) * newScale,
-        };
-      }
+    //     newPos = {
+    //       x: -(mousePointTo.x - pos.x / newScale) * newScale,
+    //       y: -(mousePointTo.y - pos.y / newScale) * newScale,
+    //     };
+    //   }
 
-      if (item.negativezoom !== true && newScale <= 1) {
-        item.setZoom(1, 0, 0);
-        stage.scale({ x: 1, y: 1 });
-        stage.position({ x: 0, y: 0 });
-        stage.batchDraw();
-        return;
-      }
+    //   if (item.negativezoom !== true && newScale <= 1) {
+    //     item.setZoom(1, 0, 0);
+    //     stage.scale({ x: 1, y: 1 });
+    //     stage.position({ x: 0, y: 0 });
+    //     stage.batchDraw();
+    //     return;
+    //   }
 
-      stage.scale({ x: newScale, y: newScale });
+    //   stage.scale({ x: newScale, y: newScale });
 
-      item.setZoom(newScale, newPos.x, newPos.y);
-      stage.position(newPos);
-      stage.batchDraw();
-    };
+    //   item.setZoom(newScale, newPos.x, newPos.y);
+    //   stage.position(newPos);
+    //   stage.batchDraw();
+    // };
 
     renderRulers() {
       const { item } = this.props;
@@ -286,6 +307,9 @@ export default observer(
 
     render() {
       const { item, store } = this.props;
+
+      // console.log("ImageView render");
+      // console.log(item.tools);
 
       // TODO fix me
       if (!store.task) return null;
@@ -340,7 +364,7 @@ export default observer(
               onMouseDown={this.handleStageMouseDown}
               onMouseMove={this.handleMouseMove}
               onMouseUp={this.handleMouseUp}
-              onWheel={item.zoom ? this.handleZoom : () => {}}
+              // onWheel={item.zoom ? this.handleZoom : () => {}}
             >
               {item.grid && item.sizeUpdated && <ImageGrid item={item} />}
               {item.shapes.map(shape => {
@@ -365,13 +389,13 @@ export default observer(
                 <ImageTransformer rotateEnabled={item.controlButton().canrotate} selectedShape={item.selectedShape} />
               </Layer>
             </Stage>
-            <ImageControls
-              item={item}
-              handleZoom={this.handleZoom}
-              updateBrightness={this.updateBrightness}
-              updateGridSize={this.updateGridSize}
-              updateBrushControl={this.updateBrushControl}
-            />
+
+            <div className={styles.block}>
+              {item
+                .getToolsManager()
+                .allTools()
+                .map(t => t.viewClass)}
+            </div>
           </div>
         );
       } else {
@@ -385,3 +409,12 @@ export default observer(
     }
   },
 );
+
+// <ImageControls
+//   item={item}
+//   handleZoom={this.handleZoom}
+//   updateBrightness={this.updateBrightness}
+//   updateGridSize={this.updateGridSize}
+//   updateBrushControl={this.updateBrushControl}
+//   updateBrushStrokeWidth={this.updateBrushStrokeWidth}
+// />

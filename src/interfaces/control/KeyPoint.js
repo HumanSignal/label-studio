@@ -8,6 +8,12 @@ import { isHtx, cloneNode } from "../../core/Helpers";
 import { guidGenerator } from "../../core/Helpers";
 import { KeyPointRegionModel } from "../object/KeyPointRegion";
 
+import Types from "../../core/Types";
+
+import * as Tools from "../tools";
+
+// import
+
 /**
  * KeyPoint tag
  * KeyPoint is used to add a keypoint to an image
@@ -23,6 +29,7 @@ import { KeyPointRegionModel } from "../object/KeyPointRegion";
  * @param {string=} [fillColor=#8bad00] keypoint fill color
  * @param {number=} [strokeWidth=1] width of the stroke
  */
+
 const TagAttrs = types.model({
   name: types.maybeNull(types.string),
   toname: types.maybeNull(types.string),
@@ -37,6 +44,8 @@ const Model = types
   .model({
     id: types.identifier,
     type: "keypoint",
+
+    // tools: types.array(BaseTool)
   })
   .views(self => ({
     get hasStates() {
@@ -45,18 +54,25 @@ const Model = types
     },
 
     get completion() {
-      return getRoot(self).completionStore.selected;
+      return Types.getParentOfTypeString(self, "Completion");
     },
   }))
   .actions(self => ({
     fromStateJSON(obj) {},
+
+    getTools() {
+      return Object.values(self.tools);
+    },
+
+    afterCreate() {
+      const kp = Tools.KeyPoint.create();
+      kp._control = self;
+
+      self.tools = { keypoint: kp };
+    },
   }));
 
-const KeyPointModel = types.compose(
-  "KeyPointModel",
-  TagAttrs,
-  Model,
-);
+const KeyPointModel = types.compose("KeyPointModel", TagAttrs, Model);
 
 const HtxView = () => {
   return null;

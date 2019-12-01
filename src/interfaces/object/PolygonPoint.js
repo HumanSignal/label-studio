@@ -45,6 +45,11 @@ const PolygonPoint = types
     },
 
     _movePoint(x, y) {
+      // if (y)
+      //     return;
+
+      //    x = self.parent.parent.stageWidth;
+
       self.init_x = x;
       self.init_y = y;
 
@@ -137,7 +142,14 @@ const PolygonPointView = observer(({ item, name }) => {
 
   const dragOpts = {
     onDragMove: e => {
-      item._movePoint(e.target.attrs.x, e.target.attrs.y);
+      let { x, y } = e.target.attrs;
+
+      if (x < 0) x = 0;
+      if (y < 0) y = 0;
+      if (x > item.parent.parent.stageWidth) x = item.parent.parent.stageWidth;
+      if (y > item.parent.parent.stageHeight) y = item.parent.parent.stageHeight;
+
+      item._movePoint(x, y);
     },
 
     onMouseOver: e => {

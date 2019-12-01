@@ -17,7 +17,7 @@ import Requests from "../core/Requests";
 /**
  * Custom Data
  */
-const data = ImageSegmentation;
+const data = ImageKeyPoint;
 
 /**
  * Get current config

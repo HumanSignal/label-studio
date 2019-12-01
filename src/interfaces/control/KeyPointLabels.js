@@ -53,9 +53,9 @@ const Model = types
       return states && states.length > 0;
     },
 
-    get completion() {
-      return getRoot(self).completionStore.selected;
-    },
+    // get completion() {
+    //   return getRoot(self).completionStore.selected;
+    // },
   }))
   .actions(self => ({
     fromStateJSON(obj, fromModel) {
@@ -75,18 +75,9 @@ const Model = types
     },
   }));
 
-const Composition = types.compose(
-  LabelsModel,
-  KeyPointModel,
-  TagAttrs,
-  Model,
-  SelectedModelMixin,
-);
+const Composition = types.compose(LabelsModel, KeyPointModel, TagAttrs, Model, SelectedModelMixin);
 
-const KeyPointLabelsModel = types.compose(
-  "KeyPointLabelsModel",
-  Composition,
-);
+const KeyPointLabelsModel = types.compose("KeyPointLabelsModel", Composition);
 
 const HtxKeyPointLabels = observer(({ item }) => {
   return <HtxLabels item={item} />;

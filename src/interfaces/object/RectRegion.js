@@ -232,12 +232,7 @@ const Model = types
     },
   }));
 
-const RectRegionModel = types.compose(
-  "RectRegionModel",
-  RegionsMixin,
-  NormalizationMixin,
-  Model,
-);
+const RectRegionModel = types.compose("RectRegionModel", RegionsMixin, NormalizationMixin, Model);
 
 const HtxRectangleView = ({ store, item }) => {
   return (
@@ -290,14 +285,14 @@ const HtxRectangleView = ({ store, item }) => {
 
           if (x <= 0) {
             x = 0;
-          } else if (x >= stageWidth) {
-            x = stageWidth;
+          } else if (x + item.width >= stageWidth) {
+            x = stageWidth - item.width;
           }
 
           if (y < 0) {
             y = 0;
-          } else if (y >= stageHeight) {
-            y = stageHeight;
+          } else if (y + item.height >= stageHeight) {
+            y = stageHeight - item.height;
           }
 
           return {

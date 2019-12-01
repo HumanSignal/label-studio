@@ -1,20 +1,31 @@
 import { types, getType, getParent } from "mobx-state-tree";
 import Registry from "./Registry";
 
-function unionArray(arr) {
-  return types.maybeNull(types.array(oneOf(arr)));
+function _mixedArray(fn) {
+  return function(arr) {
+    return types.maybeNull(types.array(fn(arr)));
+  };
 }
 
-function oneOf(arr) {
-  return types.union({
-    dispatcher: sn => {
-      if (arr.find(val => sn.type === val)) {
-        return Registry.getModelByTag(sn.type);
-      } else {
-        throw Error("Not expecting tag: " + sn.type);
-      }
-    },
-  });
+function _oneOf(lookup, err) {
+  return function(arr) {
+    return types.union({
+      dispatcher: sn => {
+        if (arr.find(val => sn.type === val)) {
+          return lookup(sn.type);
+        } else {
+          throw Error(err + sn.type);
+        }
+      },
+    });
+  };
+}
+
+const oneOfTags = _oneOf(Registry.getModelByTag, "Not expecting tag: ");
+const tagsArray = _mixedArray(oneOfTags);
+
+function unionArray(arr) {
+  return types.maybeNull(types.array(oneOfTags(arr)));
 }
 
 function allModelsTypes() {
@@ -60,4 +71,7 @@ function getParentOfTypeString(node, str) {
   return null;
 }
 
-export default { unionArray, allModelsTypes, oneOf, isType, getParentOfTypeString };
+const oneOfTools = _oneOf(Registry.getTool, "Not expecting tool: ");
+const toolsArray = _mixedArray(oneOfTools);
+
+export default { unionArray, allModelsTypes, isType, getParentOfTypeString, tagsArray, toolsArray };

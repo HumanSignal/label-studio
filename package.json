@@ -109,5 +109,8 @@
     "semantic-segmentation",
     "data-labeling",
     "text-annotation"
-  ]
+  ],
+  "dependencies": {
+    "magic-wand-js": "^1.0.0"
+  }
 }

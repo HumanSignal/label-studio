@@ -94,6 +94,8 @@ const Model = types
     },
 
     handleLineClick({ e, flattenedPoints, insertIdx }) {
+      console.log("handleLineClick");
+
       e.cancelBubble = true;
 
       if (!self.closed) return;
@@ -143,8 +145,6 @@ const Model = types
     },
 
     destroyRegion() {
-      self.parent.setActivePolygon(null);
-      self.parent.deleteSelectedShape();
       detach(self.points);
       destroy(self.points);
     },
@@ -246,12 +246,7 @@ const Model = types
     },
   }));
 
-const PolygonRegionModel = types.compose(
-  "PolygonRegionModel",
-  RegionsMixin,
-  NormalizationMixin,
-  Model,
-);
+const PolygonRegionModel = types.compose("PolygonRegionModel", RegionsMixin, NormalizationMixin, Model);
 
 /**
  * Get coordinates of anchor point
@@ -402,13 +397,19 @@ const HtxPolygonView = ({ store, item }) => {
       }}
       dragBoundFunc={function(pos) {
         let { x, y } = pos;
-        /* if (x < 0) x = 0; */
-        /* if (y < 0) y = 0; */
+
         const r = item.parent.stageWidth - this.getAttr("width");
         const b = item.parent.stageHeight - this.getAttr("height");
 
         if (x > r) x = r;
         if (y > b) y = b;
+
+        item.points.forEach(p => {
+          if (x + p.init_x <= 0) x = x - (p.init_x + x);
+          if (y + p.init_y <= 0) y = y - (p.init_y + y);
+          if (x + p.init_x >= r) x = r - p.init_x;
+          if (y + p.init_y >= b) y = b - p.init_y;
+        });
 
         item.points.forEach(p => {
           p.movePoint(x, y);
@@ -421,7 +422,7 @@ const HtxPolygonView = ({ store, item }) => {
 
         if (!item.closed) item.closePoly();
 
-        item.parent.setActivePolygon(null);
+        // item.parent.setActivePolygon(null);
 
         item.points.forEach(p => {
           p.afterCreate();

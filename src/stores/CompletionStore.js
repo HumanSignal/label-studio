@@ -209,14 +209,32 @@ const Completion = types
       destroy(region);
     },
 
+    afterAttach() {
+      console.log("afterAttach Completion Start");
+
+      // Copy tools from control tags into object tools manager
+      self.traverseTree(node => {
+        if (node && node.getToolsManager) {
+          const tools = node.getToolsManager();
+          const states = self.toNames.get(node.name);
+
+          states && states.forEach(s => tools.addToolsFromControl(s));
+        }
+      });
+
+      console.log("afterAttach Completion End");
+    },
+
     afterCreate() {
       //
+      // debugger;
+      console.log("afterCreate Completion STart");
       if (self.userGenerate && !self.sentUserGenerate) {
         self.loadedDate = new Date();
       }
 
+      // initialize toName bindings
       self.traverseTree(node => {
-        // create mapping from name to Model (by ref)
         if (node && node.name && node.id) self.names.set(node.name, node.id);
 
         if (node && node.toname && node.id) {
@@ -232,6 +250,7 @@ const Completion = types
       Hotkey.unbindAll();
 
       // [TODO] we need to traverse this two times, fix
+      // Hotkeys setup
       self.traverseTree(node => {
         if (node && node.onHotKey && node.hotkey) {
           Hotkey.addKey(node.hotkey, node.onHotKey, node.hotkeyScope);
@@ -251,6 +270,7 @@ const Completion = types
       });
 
       Hotkey.setScope("__main__");
+      console.log("afterCreate Completion End");
     },
 
     serializeCompletion() {
@@ -465,11 +485,13 @@ export default types
      * @param {*} c
      */
     function addSavedCompletion(c) {
+      console.log("addSavedCompletion:1");
       const completionModel = Tree.treeToModel(self.store.config);
+      console.log("addSavedCompletion:2");
       const modelClass = Registry.getModelByTag(completionModel.type);
-
+      console.log("addSavedCompletion:3");
       let root = modelClass.create(completionModel);
-
+      console.log("addSavedCompletion:4");
       const node = {
         id: c.id || guidGenerator(5),
         pk: c.id,
@@ -482,7 +504,7 @@ export default types
       };
 
       const completion = self.addCompletion(node, "list");
-
+      console.log("addSavedCompletion:5");
       return completion;
     }
 
