@@ -47,34 +47,34 @@ export default observer(
       }
 
       return true;
-      /**
-       * Disable polygon event handler
-       */
-      if (item.controlButtonType === "PolygonLabelsModel") {
-        return;
-      }
+      // /**
+      //  * Disable polygon event handler
+      //  */
+      // if (item.controlButtonType === "PolygonLabelsModel") {
+      //   return;
+      // }
 
-      /**
-       * Brush event handler
-       */
-      if (item.controlButtonType === "BrushLabelsModel") {
-        const { x, y } = e.target.getStage().getPointerPosition();
+      // /**
+      //  * Brush event handler
+      //  */
+      // if (item.controlButtonType === "BrushLabelsModel") {
+      //   const { x, y } = e.target.getStage().getPointerPosition();
 
-        item.startDraw({ x: Math.floor(x), y: Math.floor(y) });
+      //   item.startDraw({ x: Math.floor(x), y: Math.floor(y) });
 
-        return;
-      }
+      //   return;
+      // }
 
-      if (e.target === e.target.getStage() || (e.target.parent && e.target.parent.attrs.name === "ruler")) {
-        // draw rect
+      // if (e.target === e.target.getStage() || (e.target.parent && e.target.parent.attrs.name === "ruler")) {
+      //   // draw rect
 
-        const x = (e.evt.offsetX - item.zoomingPositionX) / item.zoomScale;
-        const y = (e.evt.offsetY - item.zoomingPositionY) / item.zoomScale;
+      //   const x = (e.evt.offsetX - item.zoomingPositionX) / item.zoomScale;
+      //   const y = (e.evt.offsetY - item.zoomingPositionY) / item.zoomScale;
 
-        item.startDraw({ x: x, y: y });
+      //   item.startDraw({ x: x, y: y });
 
-        return;
-      }
+      //   return;
+      // }
 
       // const clickedOnTransformer = e.target.getParent().className === "Transformer";
 
@@ -95,34 +95,34 @@ export default observer(
 
       return item.onMouseUp(e);
 
-      if (item.mode === "drawing") {
-        /**
-         * Set mode of Image for "view"
-         */
-        item.setMode("viewing");
+      // if (item.mode === "drawing") {
+      //   /**
+      //    * Set mode of Image for "view"
+      //    */
+      //   item.setMode("viewing");
 
-        /**
-         * Constants of min size of bounding box
-         */
-        const minSize = { width: 3, height: 3 };
+      //   /**
+      //    * Constants of min size of bounding box
+      //    */
+      //   const minSize = { width: 3, height: 3 };
 
-        /**
-         * Current shape
-         */
-        const currentShape = item.detachActiveShape();
+      //   /**
+      //    * Current shape
+      //    */
+      //   const currentShape = item.detachActiveShape();
 
-        /**
-         * Check for minimal size of boundng box
-         */
-        if (currentShape.width > minSize.width && currentShape.height > minSize.height) item.addShape(currentShape);
-      } else if (item.mode === "brush") {
-        item.setMode("viewing");
+      //   /**
+      //    * Check for minimal size of boundng box
+      //    */
+      //   if (currentShape.width > minSize.width && currentShape.height > minSize.height) item.addShape(currentShape);
+      // } else if (item.mode === "brush") {
+      //   item.setMode("viewing");
 
-        const currentShape = item.detachActiveShape();
-        item.addShape(currentShape);
-      } else if (item.mode === "eraser") {
-        item.setMode("viewing");
-      }
+      //   const currentShape = item.detachActiveShape();
+      //   item.addShape(currentShape);
+      // } else if (item.mode === "eraser") {
+      //   item.setMode("viewing");
+      // }
     };
 
     /**
@@ -137,29 +137,29 @@ export default observer(
 
       return item.onMouseMove(e);
 
-      /**
-       *
-       */
-      if (item.mode === "drawing") {
-        const x = (e.evt.offsetX - item.zoomingPositionX) / item.zoomScale;
-        const y = (e.evt.offsetY - item.zoomingPositionY) / item.zoomScale;
+      // /**
+      //  *
+      //  */
+      // if (item.mode === "drawing") {
+      //   const x = (e.evt.offsetX - item.zoomingPositionX) / item.zoomScale;
+      //   const y = (e.evt.offsetY - item.zoomingPositionY) / item.zoomScale;
 
-        item.updateDraw({ x: x, y: y });
-      } else if (item.mode === "brush") {
-        const { x, y } = e.target.getStage().getPointerPosition();
-        item.addPoints({ x: Math.floor(x), y: Math.floor(y) });
-      } else if (item.mode === "eraser") {
-        const { x, y } = e.target.getStage().getPointerPosition();
-        item.addEraserPoints({ x: Math.floor(x), y: Math.floor(y) });
-      }
+      //   item.updateDraw({ x: x, y: y });
+      // } else if (item.mode === "brush") {
+      //   const { x, y } = e.target.getStage().getPointerPosition();
+      //   item.addPoints({ x: Math.floor(x), y: Math.floor(y) });
+      // } else if (item.mode === "eraser") {
+      //   const { x, y } = e.target.getStage().getPointerPosition();
+      //   item.addEraserPoints({ x: Math.floor(x), y: Math.floor(y) });
+      // }
 
-      item.setPointerPosition({ x: e.evt.offsetX, y: e.evt.offsetY });
+      // item.setPointerPosition({ x: e.evt.offsetX, y: e.evt.offsetY });
     };
 
     handleMouseOver = e => {
       const { item } = this.props;
 
-      item.freezeHistory();
+      // item.freezeHistory();
     };
 
     /**

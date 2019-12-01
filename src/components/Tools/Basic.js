@@ -9,7 +9,13 @@ export default observer(
     render() {
       return (
         <Tooltip title={this.props.tooltip} placement="left">
-          <Button shape="circle" icon={this.props.icon} className={styles.button} onClick={this.props.onClick}></Button>
+          <Button
+            shape="circle"
+            type={this.props.selected ? "primary" : "default"}
+            icon={this.props.icon}
+            className={styles.button}
+            onClick={this.props.onClick}
+          ></Button>
         </Tooltip>
       );
     }

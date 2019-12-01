@@ -8,6 +8,8 @@ import { isHtx, cloneNode } from "../../core/Helpers";
 import { guidGenerator } from "../../core/Helpers";
 import { BrushRegionModel } from "../object/BrushRegion";
 
+import * as Tools from "../tools";
+
 const TagAttrs = types.model({
   name: types.maybeNull(types.string),
   toname: types.maybeNull(types.string),
@@ -28,13 +30,27 @@ const Model = types
     get completion() {
       return getRoot(self).completionStore.selected;
     },
+  }))
+  .actions(self => ({
+    getTools() {
+      return Object.values(self.tools);
+    },
+
+    afterCreate() {
+      const brush = Tools.Brush.create();
+      const erase = Tools.Erase.create();
+
+      brush._control = self;
+      erase._control = self;
+
+      self.tools = {
+        brush: brush,
+        erase: erase,
+      };
+    },
   }));
 
-const BrushModel = types.compose(
-  "BrushModel",
-  TagAttrs,
-  Model,
-);
+const BrushModel = types.compose("BrushModel", TagAttrs, Model);
 
 const HtxView = () => {
   return null;

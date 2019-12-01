@@ -39,7 +39,7 @@ const Model = types
     /**
      * Higher values will result in a more curvy line. A value of 0 will result in no interpolation.
      */
-    tension: types.optional(types.number, 0.5),
+    tension: types.optional(types.number, 1.0),
     /**
      * Stroke color
      */
@@ -94,7 +94,8 @@ const Model = types
 
     addPoints(x, y, mode) {
       if (mode) self.mode = "eraser";
-      self.points = [...self.points, x, y];
+      self.points.push(x);
+      self.points.push(y);
     },
 
     addEraserPoints(x, y) {
@@ -164,12 +165,7 @@ const Model = types
     },
   }));
 
-const BrushRegionModel = types.compose(
-  "BrushRegionModel",
-  RegionsMixin,
-  NormalizationMixin,
-  Model,
-);
+const BrushRegionModel = types.compose("BrushRegionModel", RegionsMixin, NormalizationMixin, Model);
 
 const HtxBrushView = ({ store, item }) => {
   let currentPoints = [];
@@ -201,10 +197,12 @@ const HtxBrushView = ({ store, item }) => {
         points={currentPoints}
         scaleX={item.scaleX}
         scaleY={item.scaleY}
-        tension={item.tension}
         stroke={item.strokeColor}
         opacity={item.mode === "brush" ? item.opacity : 1}
         globalCompositeOperation={brushMode}
+        tension={item.tension}
+        lineJoin={"round"}
+        lineCap="round"
         {...highlight}
         onMouseOver={e => {
           const stage = item.parent.stageRef;
@@ -241,6 +239,8 @@ const HtxBrushView = ({ store, item }) => {
         scaleX={item.scaleX}
         scaleY={item.scaleY}
         tension={item.tension}
+        lineJoin={"round"}
+        lineCap="round"
         stroke={item.strokeColor}
         opacity={1}
         globalCompositeOperation={"destination-out"}
