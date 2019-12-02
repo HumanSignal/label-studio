@@ -127,12 +127,7 @@ const Model = types
     },
   }));
 
-const KeyPointRegionModel = types.compose(
-  "KeyPointRegionModel",
-  RegionsMixin,
-  NormalizationMixin,
-  Model,
-);
+const KeyPointRegionModel = types.compose("KeyPointRegionModel", RegionsMixin, NormalizationMixin, Model);
 
 const HtxKeyPointView = ({ store, item }) => {
   const self = this;
@@ -174,10 +169,16 @@ const HtxKeyPointView = ({ store, item }) => {
           item.setPosition(t.getAttr("x"), t.getAttr("y"));
         }}
         dragBoundFunc={function(pos) {
+          const r = item.parent.stageWidth;
+          const b = item.parent.stageHeight;
+
           let { x, y } = pos;
 
           if (x < 0) x = 0;
           if (y < 0) y = 0;
+
+          if (x > r) x = r;
+          if (y > b) y = b;
 
           return {
             x: x,
