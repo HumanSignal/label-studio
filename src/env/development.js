@@ -18,7 +18,7 @@ import Messages from "../utils/messages";
 /**
  * Custom Data
  */
-const data = ImageBbox;
+const data = NamedEntity;
 
 /**
  * Get current config

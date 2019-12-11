@@ -108,6 +108,8 @@ const Model = types
     },
 
     onClick(wavesurfer) {
+      if (!self.completion.edittable) return;
+
       if (!self.completion.relationMode) {
         // Object.values(wavesurfer.regions.list).forEach(r => {
         //   // r.update({ color: self.selectedregionbg });
@@ -139,11 +141,6 @@ const Model = types
     },
   }));
 
-const AudioRegionModel = types.compose(
-  "AudioRegionModel",
-  RegionsMixin,
-  NormalizationMixin,
-  Model,
-);
+const AudioRegionModel = types.compose("AudioRegionModel", RegionsMixin, NormalizationMixin, Model);
 
 export { AudioRegionModel };

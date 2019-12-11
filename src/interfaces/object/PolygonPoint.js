@@ -1,7 +1,7 @@
 import React from "react";
 
 import { observer } from "mobx-react";
-import { types, getParent } from "mobx-state-tree";
+import { types, getParent, getRoot } from "mobx-state-tree";
 
 import Konva from "konva";
 import { Rect, Circle } from "react-konva";
@@ -23,6 +23,10 @@ const PolygonPoint = types
   .views(self => ({
     get parent() {
       return getParent(self, 2);
+    },
+
+    get completion() {
+      return getRoot(self).completionStore.selected;
     },
   }))
   .actions(self => ({
@@ -57,6 +61,8 @@ const PolygonPoint = types
      * @param {*} ev
      */
     closeStartPoint(ev) {
+      if (!self.completion.edittable) return;
+
       if (self.parent.mouseOverStartPoint) {
         self.parent.closePoly();
       }
@@ -177,7 +183,7 @@ const PolygonPointView = observer(({ item, name }) => {
         }}
         {...dragOpts}
         {...startPointAttr}
-        draggable
+        draggable={item.completion.edittable}
       />
     );
   } else {
@@ -195,7 +201,7 @@ const PolygonPointView = observer(({ item, name }) => {
         dragOnTop={false}
         {...dragOpts}
         {...startPointAttr}
-        draggable
+        draggable={item.completion.edittable}
       />
     );
   }
