@@ -58,11 +58,7 @@ const Model = types.model({
   ]),
 });
 
-const ViewModel = types.compose(
-  "ViewModel",
-  TagAttrs,
-  Model,
-);
+const ViewModel = types.compose("ViewModel", TagAttrs, Model);
 
 const HtxView = observer(({ item }) => {
   let style = {};

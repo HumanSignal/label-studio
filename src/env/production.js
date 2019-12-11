@@ -1,5 +1,6 @@
 import External from "../core/External";
 import Requests from "../core/Requests";
+import Messages from "../utils/messages";
 
 function getData(task) {
   let mstTask = task;
@@ -44,17 +45,18 @@ function rootElement(element) {
  */
 function configureApplication(params) {
   const options = {
-    fetch: Requests.fetcher,
-    patch: Requests.patch,
-    post: Requests.poster,
-    remove: Requests.remover,
-    submitCompletion: params.submitCompletion ? params.submitCompletion : External.submitCompletion,
-    updateCompletion: params.updateCompletion ? params.updateCompletion : External.updateCompletion,
-    deleteCompletion: params.deleteCompletion ? params.deleteCompletion : External.deleteCompletion,
-    skipTask: params.skipTask ? params.skipTask : External.skipTask,
-    onTaskLoad: params.onTaskLoad ? params.onTaskLoad : External.onTaskLoad,
-    onLabelStudioLoad: params.onLabelStudioLoad ? params.onLabelStudioLoad : External.onLabelStudioLoad,
+    fetch: params.fetch || Requests.fetcher,
+    patch: params.patch || Requests.patch,
+    post: params.post || Requests.poster,
+    remove: params.remove || Requests.remover,
+    submitCompletion: params.submitCompletion || External.submitCompletion,
+    updateCompletion: params.updateCompletion || External.updateCompletion,
+    deleteCompletion: params.deleteCompletion || External.deleteCompletion,
+    skipTask: params.skipTask || External.skipTask,
+    onTaskLoad: params.onTaskLoad || External.onTaskLoad,
+    onLabelStudioLoad: params.onLabelStudioLoad || External.onLabelStudioLoad,
     alert: m => console.log(m), // Noop for demo: window.alert(m)
+    messages: { ...Messages, ...params.messages },
   };
 
   return options;

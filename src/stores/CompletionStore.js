@@ -66,6 +66,7 @@ const Completion = types
         types.safeReference(HtxObjectModel.TextAreaRegionModel),
         types.safeReference(HtxObjectModel.PolygonRegionModel),
         types.safeReference(HtxObjectModel.KeyPointRegionModel),
+        types.safeReference(HtxObjectModel.HyperTextRegionModel),
         types.safeReference(RectangleModel),
       ),
     ),
@@ -95,7 +96,7 @@ const Completion = types
       self._updateServerState({ honeypot: self.honeypot });
     },
 
-    sendUserGenerate() {
+    setUserGenerate() {
       self.sentUserGenerate = true;
     },
 
@@ -348,6 +349,8 @@ export default types
     selected: types.maybeNull(types.reference(Completion)),
     predictions: types.array(Completion),
     predictSelect: types.optional(types.boolean, false),
+    viewingAllCompletions: types.optional(types.boolean, false),
+    viewingAllPredictions: types.optional(types.boolean, false),
   })
   .views(self => ({
     /**
@@ -384,6 +387,37 @@ export default types
       self.predictSelect = false;
     }
 
+    function unSelectViewingAll() {
+      self.viewingAllCompletions = false;
+      self.viewingAllPredictions = false;
+    }
+
+    function _toggleViewingAll() {
+      if (self.viewingAllCompletions || self.viewingAllPredictions) {
+        unSelectedPredict();
+        self.completions.map(c => (c.selected = false));
+        self.predictions.map(c => (c.selected = false));
+      } else {
+        selectCompletion(self.completions[0].id);
+      }
+    }
+
+    function toggleViewingAllPredictions() {
+      self.viewingAllPredictions = !self.viewingAllPredictions;
+
+      if (self.viewingAllPredictions) self.viewingAllCompletions = false;
+
+      _toggleViewingAll();
+    }
+
+    function toggleViewingAllCompletions() {
+      self.viewingAllCompletions = !self.viewingAllCompletions;
+
+      if (self.viewingAllCompletions) self.viewingAllPredictions = false;
+
+      _toggleViewingAll();
+    }
+
     /**
      * Select completion
      * @param {*} id
@@ -394,7 +428,7 @@ export default types
       const c = self.completions.find(c => c.id === id);
 
       unSelectedPredict();
-
+      unSelectViewingAll();
       // if (self.selected && self.selected.id !== c.id) c.history.reset();
 
       c.selected = true;
@@ -406,7 +440,7 @@ export default types
       self.completions.map(c => (c.selected = false));
       const c = self.predictions.find(c => c.id === id);
       selectedPredict();
-
+      unSelectViewingAll();
       // if (self.selected && self.selected.id !== c.id) c.history.reset();
 
       c.selected = true;
@@ -611,6 +645,9 @@ export default types
     return {
       selectCompletion,
       selectPrediction,
+
+      toggleViewingAllCompletions,
+      toggleViewingAllPredictions,
       addCompletion,
       addCompletionFromPrediction,
       deleteCompletion,

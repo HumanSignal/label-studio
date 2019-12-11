@@ -112,6 +112,7 @@ def init(config):
     """
     global c, tasks
     c = config
+    
     label_config = LabelConfigParser(c['label_config'])
 
     if not os.path.exists(c['output_dir']):

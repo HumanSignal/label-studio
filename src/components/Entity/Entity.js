@@ -1,7 +1,7 @@
 import React, { Fragment } from "react";
 import { observer, inject } from "mobx-react";
 import { getType } from "mobx-state-tree";
-import { Form, Input, Icon, Button, Tag } from "antd";
+import { Form, Input, Icon, Button, Tag, Tooltip } from "antd";
 
 import { Node, NodeMinimal } from "../Node/Node";
 import Hint from "../Hint/Hint";
@@ -67,48 +67,53 @@ export default observer(({ store, completion }) => {
       {node.states && <RenderStates node={node} />}
 
       <div className={styles.block}>
-        <Button
-          className={styles.button}
-          onClick={() => {
-            completion.startRelationMode(node);
-          }}
-        >
-          <Icon type="link" />
-          Relation
-        </Button>
+        <Tooltip placement="topLeft" title="Create Relation">
+          <Button
+            className={styles.button}
+            onClick={() => {
+              completion.startRelationMode(node);
+            }}
+          >
+            <Icon type="link" />
+          </Button>
+        </Tooltip>
 
-        <Button
-          className={styles.button}
-          onClick={() => {
-            completion.setNormalizationMode(true);
-          }}
-        >
-          <Icon type="plus" />
-          Normalization
-        </Button>
+        <Tooltip placement="topLeft" title="Create Normalization">
+          <Button
+            className={styles.button}
+            onClick={() => {
+              completion.setNormalizationMode(true);
+            }}
+          >
+            <Icon type="plus" />
+          </Button>
+        </Tooltip>
 
-        <Button
-          className={styles.button}
-          type="dashed"
-          onClick={() => {
-            completion.highlightedNode.unselectRegion();
-          }}
-        >
-          <Icon type="fullscreen-exit" />
-          Unselect
-        </Button>
+        <Tooltip placement="topLeft" title="Unselect">
+          <Button
+            className={styles.button}
+            type="dashed"
+            onClick={() => {
+              completion.highlightedNode.unselectRegion();
+            }}
+          >
+            <Icon type="fullscreen-exit" />
+          </Button>
+        </Tooltip>
 
-        <Button
-          type="danger"
-          className={styles.button}
-          onClick={() => {
-            completion.highlightedNode.deleteRegion();
-          }}
-        >
-          <Icon type="delete" />
-          Delete
-          {store.settings.enableHotkeys && store.settings.enableTooltips && <Hint>[ Bksp ]</Hint>}
-        </Button>
+        <Tooltip placement="topLeft" title="Delete Entity">
+          <Button
+            type="danger"
+            className={styles.button}
+            onClick={() => {
+              completion.highlightedNode.deleteRegion();
+            }}
+          >
+            <Icon type="delete" />
+
+            {store.settings.enableHotkeys && store.settings.enableTooltips && <Hint>[ Bksp ]</Hint>}
+          </Button>
+        </Tooltip>
       </div>
 
       {completion.normalizationMode && (

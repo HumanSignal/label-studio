@@ -1,6 +1,12 @@
 body {
   position: relative;
-  padding-top: 10px;
+  margin: 0;
+  padding: 0;
+}
+
+#label-studio {
+  margin-left: 20px;
+  margin-right: 20px;
 }
 
 .footer {
@@ -18,7 +24,7 @@ body {
   height: 60px;
   display: flex;
   align-items: center;
-  padding: 10px 20px 10px 40px;
+  padding: 0px 20px 0px 40px;
   z-index: 100;
   box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 3px;
   width: 100%;
@@ -27,6 +33,8 @@ body {
 
 #header a {
   color: #304455 !important;
+  text-decoration: none;
+  font-size: 1.4em;
 }
 
 #logo img {
@@ -53,6 +61,8 @@ body {
   position: absolute;
   right: 30px;
   line-height: 40px;
+  display: flex;
+  align-items: center;
 }
 
 #nav .break {
@@ -63,4 +73,13 @@ body {
   display: inline-block;
   position: relative;
   margin: 0 0.6em;
+}
+
+#nav li a {
+  font-size: 1em;
+}
+
+#ls-container {
+  margin-left: 3em;
+  margin-right: 3em;
 }

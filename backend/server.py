@@ -41,6 +41,7 @@ def reload_config():
     global ml_backend
     global project
     c = load_config()
+    
     label_config_line = config_line_stripped(open(c['label_config']).read())
     if analytics is None:
         analytics = Analytics(label_config_line, c.get('collect_analytics', True))
@@ -118,9 +119,10 @@ def index():
     task_id = request.args.get('task_id', None)
 
     if task_id is not None:
-        task_data = db.get_task_with_completions(task_id)
-        if task_data is None:
-            task_data = db.get_task(task_id)
+        task_data = db.get_task_with_completions(task_id) or db.get_task(task_id)
+        if ml_backend:
+            task_data = deepcopy(task_data)
+            task_data['predictions'] = ml_backend.make_predictions(task_data, project)
 
     analytics.send(getframeinfo(currentframe()).function)
     return flask.render_template('index.html', config=c, label_config_line=label_config_line,

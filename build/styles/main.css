@@ -1,6 +1,10 @@
 body {
   position: relative;
-  padding-top: 10px;
+}
+
+#label-studio {
+  margin-left: 20px;
+  margin-right: 20px;
 }
 
 .footer {

@@ -9,14 +9,16 @@ import { ImageMultilabel } from "../examples/image_multilabel";
 import { NamedEntity } from "../examples/named_entity";
 import { References } from "../examples/references";
 import { TranscribeAudio } from "../examples/transcribe_audio";
+import { HTMLDocument } from "../examples/html_document";
 
 import External from "../core/External";
 import Requests from "../core/Requests";
+import Messages from "../utils/messages";
 
 /**
  * Custom Data
  */
-const data = AudioClassification;
+const data = ImageBbox;
 
 /**
  * Get current config
@@ -78,6 +80,7 @@ function configureApplication(params) {
     onTaskLoad: params.onTaskLoad ? params.onTaskLoad : External.onTaskLoad,
     onLabelStudioLoad: params.onLabelStudioLoad ? params.onLabelStudioLoad : External.onLabelStudioLoad,
     alert: m => console.log(m), // Noop for demo: window.alert(m)
+    messages: { ...Messages, ...params.messages },
   };
 
   return options;

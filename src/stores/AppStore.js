@@ -8,6 +8,7 @@ import CompletionStore from "./CompletionStore";
 import Hotkey from "../core/Hotkey";
 import { API_URL } from "../constants/Api";
 import Utils from "../utils";
+import Message from "../utils/messages";
 
 import InfoModal from "../components/Infomodal/Infomodal";
 
@@ -26,11 +27,17 @@ export default types
     project: types.maybeNull(Project),
 
     /**
-     * Interfaces for configure Label Studio
+     * Configure the visual UI shown to the user
      */
     interfaces: types.array(types.string),
+
     /**
-     * Flag fo labeling of tasks
+     * Configure the functionality
+     */
+    supports: types.array(types.string),
+
+    /**
+     * Flag for labeling of tasks
      */
     explore: types.optional(types.boolean, false),
 
@@ -80,6 +87,10 @@ export default types
      * Flag for disable task in Label Studio
      */
     noTask: types.optional(types.boolean, false),
+    /**
+     * Flag for no access to specific task
+     */
+    noAccess: types.optional(types.boolean, false),
     /**
      * Finish of labeling
      */
@@ -137,6 +148,10 @@ export default types
      */
     function hasInterface(name) {
       return self.interfaces.find(i => name === i);
+    }
+
+    function hasSupport(name) {
+      return self.supports.find(i => name === i);
     }
 
     /**
@@ -237,6 +252,12 @@ export default types
           return;
         }
 
+        if (loadedTask instanceof Response && loadedTask.status === 403) {
+          self.markLoading(false);
+          self.noAccess = true;
+          return;
+        }
+
         loadedTask.json().then(response => {
           /**
            * Convert received data to string for MST support
@@ -249,10 +270,30 @@ export default types
           self.addTask(response);
 
           /**
+           * Load Predictions
+           */
+          if (self.hasSupport("predictions") && response.predictions) {
+            if (response.predictions && response.predictions.length) {
+              for (let i = 0; i < response.predictions.length; i++) {
+                const prediction = self.completionStore.addPrediction(response.predictions[i]);
+                prediction.traverseTree(node => node.updateValue && node.updateValue(self));
+                self.completionStore.selectPrediction(prediction.id);
+                prediction.deserializeCompletion(response.predictions[i].result);
+                prediction.reinitHistory();
+              }
+            }
+          }
+
+          /**
            * Completions
            */
-          if (self.hasInterface("completions") && response.completions) {
-            self.completionStore.destroyCompletion(self.completionStore.selected);
+          if (self.hasSupport("completions") && response.completions) {
+            if (response.completions.length == 0 && self.hasSupport("sdk")) {
+              if (self.completionStore.selected)
+                self.completionStore.selected.traverseTree(node => node.updateValue && node.updateValue(self));
+            } else {
+              self.completionStore.destroyCompletion(self.completionStore.selected);
+            }
 
             for (var i = 0; i < response.completions.length; i++) {
               const completion = response.completions[i];
@@ -272,17 +313,6 @@ export default types
             // self.addGeneratedCompletion(r);
           }
 
-          if (self.hasInterface("predictions") && response.predictions) {
-            if (response.predictions && response.predictions.length) {
-              for (let i = 0; i < response.predictions.length; i++) {
-                const prediction = self.completionStore.addPrediction(response.predictions[i]);
-                prediction.traverseTree(node => node.updateValue && node.updateValue(self));
-                self.completionStore.selectPrediction(prediction.id);
-                prediction.deserializeCompletion(response.predictions[i].result);
-                prediction.reinitHistory();
-              }
-            }
-          }
           /**
            * Loader disabled
            */
@@ -334,7 +364,7 @@ export default types
         /**
          * Check for pending completions
          */
-        if (self.hasInterface("check-empty") && savedCompletions.length === 0) {
+        if (self.hasSupport("check-empty") && savedCompletions.length === 0) {
           InfoModal.warning("You need to label at least something!");
           return;
         }
@@ -375,12 +405,12 @@ export default types
             }
           }
 
-          if (hasInterface("load")) {
+          if (self.hasSupport("next:load")) {
             self.resetState();
             return loadTask();
           } else {
             self.markLoading(false);
-            self.completionStore.selected.sendUserGenerate();
+            self.completionStore.selected.setUserGenerate();
 
             if (self.explore && self.project.id) {
               self.labeledSuccess = true;
@@ -474,6 +504,7 @@ export default types
       loadTask,
       addTask,
       hasInterface,
+      hasSupport,
       skipTask,
       sendTask,
       updateTask,
