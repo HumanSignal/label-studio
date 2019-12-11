@@ -77,6 +77,10 @@ const Completion = types
     get store() {
       return getParent(self, 2);
     },
+
+    get list() {
+      return getParent(self);
+    },
   }))
   .actions(self => ({
     reinitHistory() {
@@ -213,26 +217,7 @@ const Completion = types
       destroy(region);
     },
 
-    afterCreate() {
-      //
-      if (self.userGenerate && !self.sentUserGenerate) {
-        self.loadedDate = new Date();
-      }
-
-      self.traverseTree(node => {
-        // create mapping from name to Model (by ref)
-        if (node && node.name && node.id) self.names.set(node.name, node.id);
-
-        if (node && node.toname && node.id) {
-          const val = self.toNames.get(node.toname);
-          if (val) {
-            val.push(node.id);
-          } else {
-            self.toNames.set(node.toname, [node.id]);
-          }
-        }
-      });
-
+    setupHotKeys() {
       Hotkey.unbindAll();
 
       let audiosNum = 0;
@@ -292,6 +277,27 @@ const Completion = types
       // };
 
       Hotkey.setScope("__main__");
+    },
+
+    afterCreate() {
+      //
+      if (self.userGenerate && !self.sentUserGenerate) {
+        self.loadedDate = new Date();
+      }
+
+      self.traverseTree(node => {
+        // create mapping from name to Model (by ref)
+        if (node && node.name && node.id) self.names.set(node.name, node.id);
+
+        if (node && node.toname && node.id) {
+          const val = self.toNames.get(node.toname);
+          if (val) {
+            val.push(node.id);
+          } else {
+            self.toNames.set(node.toname, [node.id]);
+          }
+        }
+      });
     },
 
     serializeCompletion() {
@@ -439,6 +445,8 @@ export default types
 
       c.selected = true;
       self.selected = c;
+
+      c.setupHotKeys();
     }
 
     function selectPrediction(id) {
