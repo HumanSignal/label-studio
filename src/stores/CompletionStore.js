@@ -230,7 +230,8 @@ const Completion = types
 
       let audiosNum = 0;
       let audioNode = null;
-      let comb = "space";
+      let mod = "shift+space";
+      let comb = mod;
 
       // [TODO] we need to traverse this two times, fix
       self.traverseTree(node => {
@@ -242,10 +243,8 @@ const Completion = types
       self.traverseTree(node => {
         // add Space hotkey for playbacks of audio
         if (node && !node.hotkey && node.type == "audio") {
-          if (audiosNum > 0) comb = comb + "+" + (audiosNum + 1);
+          if (audiosNum > 0) comb = mod + "+" + (audiosNum + 1);
           else audioNode = node;
-
-          console.log(comb);
 
           node.hotkey = comb;
           Hotkey.addKey(comb, node.onHotKey);
@@ -269,20 +268,21 @@ const Completion = types
       });
 
       if (audioNode && audiosNum > 1) {
-        audioNode.hotkey = "shift+1";
+        audioNode.hotkey = mod + "+1";
         Hotkey.addKey(audioNode.hotkey, audioNode.onHotKey);
-        Hotkey.removeKey("shift");
+        Hotkey.removeKey(mod);
       }
 
       // prevent spacebar from scrolling
-      document.onkeypress = function(e) {
-        e = e || window.event;
-        var charCode = e.keyCode || e.which;
-        if (charCode === 32) {
-          e.preventDefault();
-          return false;
-        }
-      };
+      // document.onkeypress = function(e) {
+      //     e = e || window.event;
+
+      //   var charCode = e.keyCode || e.which;
+      //   if (charCode === 32) {
+      //     e.preventDefault();
+      //     return false;
+      //   }
+      // };
 
       Hotkey.setScope("__main__");
     },
