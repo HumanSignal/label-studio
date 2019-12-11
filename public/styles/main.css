@@ -4,6 +4,11 @@ body {
   padding: 0;
 }
 
+#label-studio {
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
 .footer {
   text-align: center;
   margin: 0 auto;

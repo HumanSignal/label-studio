@@ -48,14 +48,33 @@
                     "controls",  // all control buttons: skip, submit, update
                     "submit",  // submit button on controls
                     "update",  // update button  on controls
+<<<<<<< HEAD
+                    "predictions:menu", // right menu with prediction items
+=======
                     "predictions", // show predictions from task.predictions = [{...}, {...}]
                     "predictions:menu",
                     "completions",  // show completions
+>>>>>>> master
                     "completions:menu", // right menu with completion items
+                    "completions:add-new",
+                    "completions:delete",
                     "side-column" // entity
                 ],
+<<<<<<< HEAD
+                supports: [
+                    "predictions", // show predictions from task.predictions = [{...}, {...}]
+                    "completions", // load completions                    
+                ],
+                task: {
+                    id: {{ task_data["id"] }},
+                    data: {{ task_data["data"] | json | safe }},
+                    completions: {{ task_data["completions"] | json | safe }},
+                    // predictions: [],  // the same as completions but will be displayed in predictions section
+                }
+=======
                 task: {{ task_data | json | safe }}
 
+>>>>>>> master
             });
         {% else %}
             // Label stream mode
@@ -66,13 +85,20 @@
                 project: { id: 1 },
                 interfaces: [
                     "basic",
+<<<<<<< HEAD
+=======
                     "load",  // load next task automatically (label stream mode)
+>>>>>>> master
                     "panel",  // undo, redo, reset panel
                     "controls",  // all control buttons: skip, submit, update
-                    "submit",  // submit button on controls
+                    "submit",  // submit button on controls                    
+                    "side-column" // entity
+                ],
+
+                supports: [
+                    "next:load",
                     "predictions", // show predictions from task.predictions = [{...}, {...}]
                     "completions",  // show completions
-                    "side-column" // entity
                 ]
             });
         {% endif %}

@@ -66,6 +66,7 @@ const Completion = types
         types.safeReference(HtxObjectModel.TextAreaRegionModel),
         types.safeReference(HtxObjectModel.PolygonRegionModel),
         types.safeReference(HtxObjectModel.KeyPointRegionModel),
+        types.safeReference(HtxObjectModel.HyperTextRegionModel),
         types.safeReference(RectangleModel),
       ),
     ),
@@ -95,7 +96,7 @@ const Completion = types
       self._updateServerState({ honeypot: self.honeypot });
     },
 
-    sendUserGenerate() {
+    setUserGenerate() {
       self.sentUserGenerate = true;
     },
 

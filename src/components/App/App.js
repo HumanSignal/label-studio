@@ -3,7 +3,7 @@
  */
 import React, { Component } from "react";
 import { observer, inject, Provider } from "mobx-react";
-import { types, getSnapshot } from "mobx-state-tree";
+import { types, getSnapshot, getEnv } from "mobx-state-tree";
 import { Result, Spin } from "antd";
 
 /**
@@ -32,7 +32,6 @@ import Segment from "../Segment/Segment";
 import { ViewModel } from "../../interfaces/visual/View";
 import { TableModel } from "../../interfaces/visual/Table";
 import { HeaderModel } from "../../interfaces/visual/Header";
-import { HyperTextModel } from "../../interfaces/visual/HyperText";
 import { DialogModel } from "../../interfaces/visual/Dialog";
 
 /**
@@ -42,6 +41,7 @@ import { AudioModel } from "../../interfaces/object/Audio";
 import { AudioPlusModel } from "../../interfaces/object/AudioPlus";
 import { ImageModel } from "../../interfaces/object/Image";
 import { TextModel } from "../../interfaces/object/Text";
+import { HyperTextModel } from "../../interfaces/object/HyperText";
 
 /**
  * Control
@@ -72,15 +72,19 @@ const App = inject("store")(
   observer(
     class App extends Component {
       renderSuccess() {
-        return <Result status="success" title="Done!" />;
+        return <Result status="success" title={getEnv(this.props.store).messages.DONE} />;
       }
 
       renderNoCompletion() {
-        return <Result status="success" title="No more completions" />;
+        return <Result status="success" title={getEnv(this.props.store).messages.NO_COMP_LEFT} />;
       }
 
       renderNothingToLabel() {
-        return <Result status="success" title="No more data available for labeling" />;
+        return <Result status="success" title={getEnv(this.props.store).messages.NO_NEXT_TASK} />;
+      }
+
+      renderNoAccess() {
+        return <Result status="warning" title={getEnv(this.props.store).messages.NO_ACCESS} />;
       }
 
       renderLoader() {
@@ -126,6 +130,8 @@ const App = inject("store")(
         if (store.isLoading) return self.renderLoader();
 
         if (store.noTask) return self.renderNothingToLabel();
+
+        if (store.noAccess) return self.renderNoAccess();
 
         if (store.labeledSuccess) return self.renderSuccess();
 

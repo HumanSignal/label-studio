@@ -246,12 +246,7 @@ const Model = types
     },
   }));
 
-const PolygonRegionModel = types.compose(
-  "PolygonRegionModel",
-  RegionsMixin,
-  NormalizationMixin,
-  Model,
-);
+const PolygonRegionModel = types.compose("PolygonRegionModel", RegionsMixin, NormalizationMixin, Model);
 
 /**
  * Get coordinates of anchor point
@@ -409,6 +404,13 @@ const HtxPolygonView = ({ store, item }) => {
 
         if (x > r) x = r;
         if (y > b) y = b;
+
+        item.points.forEach(p => {
+          if (x + p.init_x <= 0) x = x - (p.init_x + x);
+          if (y + p.init_y <= 0) y = y - (p.init_y + y);
+          if (x + p.init_x >= r) x = r - p.init_x;
+          if (y + p.init_y >= b) y = b - p.init_y;
+        });
 
         item.points.forEach(p => {
           p.movePoint(x, y);
