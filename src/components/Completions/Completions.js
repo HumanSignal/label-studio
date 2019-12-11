@@ -119,18 +119,19 @@ class Completions extends Component {
         <div style={{ display: "flex", alignItems: "center" }}>
           <h3>Completions</h3>
 
-        {store.hasInterface("completions:add-new") && (<Tooltip placement="topLeft" title="Add a new completion">
-            <Button
-              shape={"circle"}
-              onClick={ev => {
-                ev.preventDefault();
-                store.completionStore.addUserCompletion();
-              }}
-            >
-              <Icon type="plus" />
-            </Button>
-          </Tooltip>
-
+          {store.hasInterface("completions:add-new") && (
+            <Tooltip placement="topLeft" title="Add a new completion">
+              <Button
+                shape={"circle"}
+                onClick={ev => {
+                  ev.preventDefault();
+                  store.completionStore.addUserCompletion();
+                }}
+              >
+                <Icon type="plus" />
+              </Button>
+            </Tooltip>
+          )}
         </div>
 
         <Tooltip placement="topLeft" title="View all completions">
