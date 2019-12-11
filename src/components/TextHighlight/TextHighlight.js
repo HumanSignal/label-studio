@@ -196,10 +196,14 @@ class TextHighlight extends Component {
     let endContainerPosition = parseInt(range.endContainer.parentNode.dataset.position);
 
     if (!range.startContainer.parentNode.dataset.position) {
+      if (!range.startContainer.dataset) return;
+
       startContainerPosition = parseInt(range.startContainer.dataset.position);
     }
 
     if (!range.endContainer.parentNode.dataset.position) {
+      if (!range.endContainer.dataset) return;
+
       endContainerPosition = parseInt(range.endContainer.dataset.position);
     }
 

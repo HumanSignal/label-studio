@@ -68,6 +68,27 @@ const Completion = observer(({ item, store }) => {
     badge = <Badge status="success" />;
   }
 
+  const btnsView = () => {
+    return (
+      <div className={styles.buttons}>
+        {store.hasInterface("completions:set-groundtruth") && (item.honeypot ? removeHoney() : setHoney())}
+        {store.hasInterface("completions:delete") && (
+          <Tooltip placement="topLeft" title="Delete selected completion">
+            <Button
+              type="danger"
+              onClick={ev => {
+                ev.preventDefault();
+                item.store.deleteCompletion(item);
+              }}
+            >
+              <Icon type="delete" />
+            </Button>
+          </Tooltip>
+        )}
+      </div>
+    );
+  };
+
   return (
     <List.Item
       key={item.id}
@@ -83,23 +104,7 @@ const Completion = observer(({ item, store }) => {
       Created
       <i>{item.createdAgo ? ` ${item.createdAgo} ago` : ` ${Utils.UDate.prettyDate(item.createdDate)}`}</i>
       {item.createdBy ? ` by ${item.createdBy}` : null}
-      {item.selected && (
-        <div className={styles.buttons}>
-          {item.honeypot ? removeHoney() : setHoney()}
-
-          <Tooltip placement="topLeft" title="Delete selected completion">
-            <Button
-              type="danger"
-              onClick={ev => {
-                ev.preventDefault();
-                item.store.deleteCompletion(item);
-              }}
-            >
-              <Icon type="delete" />
-            </Button>
-          </Tooltip>
-        </div>
-      )}
+      {item.selected && btnsView()}
     </List.Item>
   );
 });
@@ -112,17 +117,20 @@ class Completions extends Component {
     let title = (
       <div className={styles.title + " " + styles.titlespace}>
         <h3>Completions</h3>
-        <Tooltip placement="topLeft" title="Add a new completion">
-          <Button
-            shape={"circle"}
-            onClick={ev => {
-              ev.preventDefault();
-              store.completionStore.addUserCompletion();
-            }}
-          >
-            <Icon type="plus" />
-          </Button>
-        </Tooltip>
+
+        {store.hasInterface("completions:add-new") && (
+          <Tooltip placement="topLeft" title="Add new completion">
+            <Button
+              shape={"circle"}
+              onClick={ev => {
+                ev.preventDefault();
+                store.completionStore.addUserCompletion();
+              }}
+            >
+              <Icon type="plus" />
+            </Button>
+          </Tooltip>
+        )}
       </div>
     );
 

@@ -1,0 +1,7 @@
+<View>
+  <Labels name="ner" toName="text">
+    <Label value="Person"></Label>
+    <Label value="Organization"></Label>
+  </Labels>
+  <HyperText name="text" value="$text"></HyperText>
+</View>

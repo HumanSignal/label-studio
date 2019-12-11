@@ -12,6 +12,7 @@ const LabelMixin = types.model("LabelMixin").actions(self => ({
   getSelectedColor() {
     // return first selected label color
     const sel = self.children.find(c => c.selected === true);
+
     return sel && sel.background;
   },
 
