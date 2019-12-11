@@ -26,6 +26,10 @@ function addKey(key, func, scope) {
   keymaster(key, scope, func);
 }
 
+function removeKey(key) {
+  keymaster.unbind(key);
+}
+
 /**
  * Unbund all hotkeys
  */
@@ -62,4 +66,4 @@ function makeComb() {
   return null;
 }
 
-export default { addKey, unbindAll, makeComb, setScope };
+export default { removeKey, addKey, unbindAll, makeComb, setScope };

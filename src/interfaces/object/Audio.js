@@ -44,6 +44,7 @@ const TagAttrs = types.model({
   zoom: types.optional(types.boolean, false),
   volume: types.optional(types.boolean, false),
   speed: types.optional(types.boolean, false),
+  hotkey: types.maybeNull(types.string),
 });
 
 const Model = AudioHOCModel.named("AudioModel").actions(self => ({
@@ -57,16 +58,16 @@ const Model = AudioHOCModel.named("AudioModel").actions(self => ({
     }
   },
 
+  onHotKey() {
+    return self._ws.playPause();
+  },
+
   onLoad(ws) {
     self._ws = ws;
   },
 }));
 
-const AudioModel = types.compose(
-  "AudioModel",
-  Model,
-  TagAttrs,
-);
+const AudioModel = types.compose("AudioModel", Model, TagAttrs);
 
 const HtxAudioView = observer(({ store, item }) => {
   if (!item._value) return null;
@@ -85,7 +86,7 @@ const HtxAudioView = observer(({ store, item }) => {
         height={item.height}
       />
 
-      <AudioControls item={item} />
+      <AudioControls item={item} store={store} />
     </div>
   );
 });

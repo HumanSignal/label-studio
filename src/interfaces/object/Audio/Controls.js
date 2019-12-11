@@ -1,6 +1,7 @@
 import React, { Fragment, Component } from "react";
 import { observer } from "mobx-react";
 import { Button, Icon } from "antd";
+import Hint from "../../../components/Hint/Hint";
 
 const AudioControls = observer(({ item, store }) => {
   return (
@@ -14,11 +15,17 @@ const AudioControls = observer(({ item, store }) => {
         {item.playing && (
           <Fragment>
             <Icon type="pause-circle" /> Pause
+            {store.settings.enableTooltips && store.settings.enableHotkeys && item.hotkey && (
+              <Hint>[{item.hotkey}]</Hint>
+            )}
           </Fragment>
         )}
         {!item.playing && (
           <Fragment>
             <Icon type="play-circle" /> Play
+            {store.settings.enableTooltips && store.settings.enableHotkeys && item.hotkey && (
+              <Hint>[{item.hotkey}]</Hint>
+            )}
           </Fragment>
         )}
       </Button>
