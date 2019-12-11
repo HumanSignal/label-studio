@@ -68,6 +68,7 @@ const Completion = types
         types.safeReference(HtxObjectModel.TextAreaRegionModel),
         types.safeReference(HtxObjectModel.PolygonRegionModel),
         types.safeReference(HtxObjectModel.KeyPointRegionModel),
+        types.safeReference(HtxObjectModel.HyperTextRegionModel),
         types.safeReference(RectangleModel),
       ),
     ),
@@ -234,12 +235,32 @@ const Completion = types
 
       Hotkey.unbindAll();
 
+      let audiosNum = 0;
+      let audioNode = null;
+      let mod = "shift+space";
+      let comb = mod;
+
       // [TODO] we need to traverse this two times, fix
       self.traverseTree(node => {
         if (node && node.onHotKey && node.hotkey) {
           Hotkey.addKey(node.hotkey, node.onHotKey, node.hotkeyScope);
         }
+      });
 
+      self.traverseTree(node => {
+        // add Space hotkey for playbacks of audio
+        if (node && !node.hotkey && node.type == "audio") {
+          if (audiosNum > 0) comb = mod + "+" + (audiosNum + 1);
+          else audioNode = node;
+
+          node.hotkey = comb;
+          Hotkey.addKey(comb, node.onHotKey);
+
+          audiosNum++;
+        }
+      });
+
+      self.traverseTree(node => {
         /**
          * Hotkey for controls
          */
@@ -252,6 +273,23 @@ const Completion = types
           Hotkey.addKey(node.hotkey, node.onHotKey);
         }
       });
+
+      if (audioNode && audiosNum > 1) {
+        audioNode.hotkey = mod + "+1";
+        Hotkey.addKey(audioNode.hotkey, audioNode.onHotKey);
+        Hotkey.removeKey(mod);
+      }
+
+      // prevent spacebar from scrolling
+      // document.onkeypress = function(e) {
+      //     e = e || window.event;
+
+      //   var charCode = e.keyCode || e.which;
+      //   if (charCode === 32) {
+      //     e.preventDefault();
+      //     return false;
+      //   }
+      // };
 
       Hotkey.setScope("__main__");
     },
@@ -317,6 +355,8 @@ export default types
     selected: types.maybeNull(types.reference(Completion)),
     predictions: types.array(Completion),
     predictSelect: types.optional(types.boolean, false),
+    viewingAllCompletions: types.optional(types.boolean, false),
+    viewingAllPredictions: types.optional(types.boolean, false),
   })
   .views(self => ({
     /**
@@ -353,6 +393,37 @@ export default types
       self.predictSelect = false;
     }
 
+    function unSelectViewingAll() {
+      self.viewingAllCompletions = false;
+      self.viewingAllPredictions = false;
+    }
+
+    function _toggleViewingAll() {
+      if (self.viewingAllCompletions || self.viewingAllPredictions) {
+        unSelectedPredict();
+        self.completions.map(c => (c.selected = false));
+        self.predictions.map(c => (c.selected = false));
+      } else {
+        selectCompletion(self.completions[0].id);
+      }
+    }
+
+    function toggleViewingAllPredictions() {
+      self.viewingAllPredictions = !self.viewingAllPredictions;
+
+      if (self.viewingAllPredictions) self.viewingAllCompletions = false;
+
+      _toggleViewingAll();
+    }
+
+    function toggleViewingAllCompletions() {
+      self.viewingAllCompletions = !self.viewingAllCompletions;
+
+      if (self.viewingAllCompletions) self.viewingAllPredictions = false;
+
+      _toggleViewingAll();
+    }
+
     /**
      * Select completion
      * @param {*} id
@@ -363,7 +434,7 @@ export default types
       const c = self.completions.find(c => c.id === id);
 
       unSelectedPredict();
-
+      unSelectViewingAll();
       // if (self.selected && self.selected.id !== c.id) c.history.reset();
 
       c.selected = true;
@@ -375,7 +446,7 @@ export default types
       self.completions.map(c => (c.selected = false));
       const c = self.predictions.find(c => c.id === id);
       selectedPredict();
-
+      unSelectViewingAll();
       // if (self.selected && self.selected.id !== c.id) c.history.reset();
 
       c.selected = true;
@@ -581,6 +652,9 @@ export default types
     return {
       selectCompletion,
       selectPrediction,
+
+      toggleViewingAllCompletions,
+      toggleViewingAllPredictions,
       addCompletion,
       addCompletionFromPrediction,
       deleteCompletion,

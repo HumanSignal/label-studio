@@ -2,11 +2,13 @@ import React from "react";
 import { observer, inject } from "mobx-react";
 import { getRoot, types } from "mobx-state-tree";
 import { Tag } from "antd";
+import ColorScheme from "pleasejs";
 
 import { guidGenerator } from "../../core/Helpers";
 import Utils from "../../utils";
 import Registry from "../../core/Registry";
 import Types from "../../core/Types";
+import { runTemplate } from "../../core/Template";
 import ProcessAttrsMixin from "../mixins/ProcessAttrs";
 import Hint from "../../components/Hint/Hint";
 
@@ -39,7 +41,7 @@ const TagAttrs = types.model({
   showalias: types.optional(types.boolean, false),
   aliasstyle: types.optional(types.string, "opacity: 0.6"),
   size: types.optional(types.string, "medium"),
-  background: types.optional(types.string, "#36B37E"),
+  background: types.maybeNull(types.string),
   selectedcolor: types.optional(types.string, "white"),
 });
 
@@ -113,14 +115,21 @@ const Model = types
     onHotKey() {
       return self.toggleSelected();
     },
+
+    updateValue(store) {
+      self._value = runTemplate(self.value, store.task.dataObj) || "";
+
+      if (!self.background) self.background = ColorScheme.make_color({ seed: self._value })[0];
+    },
   }));
 
 const LabelModel = types.compose("LabelModel", TagAttrs, Model, ProcessAttrsMixin);
 
 const HtxLabelView = inject("store")(
   observer(({ item, store }) => {
+    const bg = item.background;
     const labelStyle = {
-      backgroundColor: item.selected ? item.background : "#e8e8e8",
+      backgroundColor: item.selected ? bg : "#e8e8e8",
       color: item.selected ? item.selectedcolor : "#333333",
       cursor: "pointer",
       margin: "5px",

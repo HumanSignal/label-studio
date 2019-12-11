@@ -31,6 +31,7 @@ import styles from "./AudioPlus/AudioPlus.module.scss";
  * @param {boolean=} [volume=true] show the volume slider (from 0 to 1)
  * @param {boolean} [speed=true] show the speed slider (from 0.5 to 3)
  * @param {boolean} [zoom=true] show the zoom slider
+ * @param {string} hotkey hotkey used to play/pause audio
  */
 const TagAttrs = types.model({
   name: types.maybeNull(types.string),
@@ -39,6 +40,7 @@ const TagAttrs = types.model({
   volume: types.optional(types.boolean, true),
   speed: types.optional(types.boolean, true),
   regs: types.optional(types.boolean, true),
+  hotkey: types.maybeNull(types.string),
 });
 
 const Model = types
@@ -74,6 +76,10 @@ const Model = types
   .actions(self => ({
     toStateJSON() {
       return self.regions.map(r => r.toStateJSON());
+    },
+
+    onHotKey() {
+      return self._ws.playPause();
     },
 
     /**
@@ -202,12 +208,7 @@ const Model = types
     },
   }));
 
-const AudioPlusModel = types.compose(
-  "AudioPlusModel",
-  TagAttrs,
-  Model,
-  ProcessAttrsMixin,
-);
+const AudioPlusModel = types.compose("AudioPlusModel", TagAttrs, Model, ProcessAttrsMixin);
 
 const HtxAudioView = observer(({ store, item }) => {
   if (!item._value) return null;
@@ -228,7 +229,7 @@ const HtxAudioView = observer(({ store, item }) => {
         height={item.height}
       />
 
-      <AudioControls item={item} />
+      <AudioControls item={item} store={store} />
     </div>
   );
 });

@@ -21,7 +21,7 @@
       Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
-    -->
+      -->
     <title>Label Studio</title>
   </head>
   <body>
@@ -34,37 +34,53 @@
         <img src="./images/ls_logo.png" alt="label studio logo">
         <span style="font-size: 1.2em;">Label Studio</span>
       </a>
-      <ul id="nav" style="display: flex; align-items: center">
-        <a style="margin-right: 1em; text-decoration: underline;" href="https://labelstud.io/guide">Guide</a>
-        <a class="github-button" href="https://github.com/heartexlabs/label-studio"
-           data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star heartexlabs/label-studio on GitHub"><img src="./images/GitHub-Mark-64px.png" height="25" /></a>
+      <ul id="nav">
+        <li><a style="margin-right: 1em; text-decoration: underline;" href="https://labelstud.io/guide">Guide</a></li>
+        <li><a class="github-button" href="https://github.com/heartexlabs/label-studio"
+           data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star heartexlabs/label-studio on GitHub"><img src="./images/GitHub-Mark-64px.png" height="25" /></a></li>
       </ul>
     </div>
 
-    <div id="label-studio"></div>
-
+    <div id="ls-container">
+      <div id="label-studio"></div>
+    </div>
+    
     <footer class="footer">Made by <a target="_blank" href="https://heartex.net">Heartex</a> in San Francisco
       <br/><br/>
       <img src="./images/3nowhite.svg" height="80" />
     </footer>
 
     <script>
-      setTimeout(() => {
+      (function (d, o) {
+          d.domReady = function (n, a) {
+              o.addEventListener && o.addEventListener("DOMContentLoaded", function e(t) {
+                  o.removeEventListener("DOMContentLoaded", e), n.call(a || d, t)
+              }) || o.attachEvent && o.attachEvent("onreadystatechange", function e(t) {
+                  "complete" === o.readyState && (o.detachEvent("onreadystatechange", e), n.call(a || d, t))
+              })
+          }
+      })(window, document);
+    </script>
+    <script>
+      domReady(function () {
         var ls = new LabelStudio("label-studio", {
+
           description: "Description",
 
           interfaces: [
             "controls",
-            "completions",
             "completions:menu",
+              "completions:add-new",            
+            "completions:delete",              
+            "predictions:menu",
             "panel",
             "side-column",
             "update",
             "check-empty",
-            "predictions",
-            "predictions:menu"
           ],
 
+            supports: [ "completions", "predictions" ],
+            
           expert: {
             pk: 1,
             firstName: "James",
@@ -80,7 +96,8 @@
             }
           }
         });
-      }, 2000);
+
+      });
     </script>
   </body>
 </html>
