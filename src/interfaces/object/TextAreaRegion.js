@@ -33,12 +33,7 @@ const Model = types
     },
   }));
 
-const TextAreaRegionModel = types.compose(
-  "TextAreaRegionModel",
-  RegionsMixin,
-  NormalizationMixin,
-  Model,
-);
+const TextAreaRegionModel = types.compose("TextAreaRegionModel", RegionsMixin, NormalizationMixin, Model);
 
 const HtxTextAreaRegionView = ({ store, item }) => {
   let markStyle = {
@@ -60,10 +55,7 @@ const HtxTextAreaRegionView = ({ store, item }) => {
   }
 
   return (
-    <Alert
-      type="success"
-      message={item._value}
-      style={markStyle}
+    <div
       onClick={item.onClickRegion}
       onMouseOver={() => {
         if (store.completionStore.selected.relationMode) {
@@ -76,7 +68,9 @@ const HtxTextAreaRegionView = ({ store, item }) => {
           item.setHighlight(false);
         }
       }}
-    />
+    >
+      <Alert type="success" message={item._value} style={markStyle} />
+    </div>
   );
 };
 
