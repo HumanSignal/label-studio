@@ -18,8 +18,7 @@ import Messages from "../utils/messages";
 /**
  * Custom Data
  */
-
-const data = HTMLDocument;
+const data = ImageBbox;
 
 /**
  * Get current config

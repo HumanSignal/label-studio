@@ -116,10 +116,10 @@ class Completions extends Component {
     let content = [];
     let title = (
       <div className={styles.title + " " + styles.titlespace}>
-        <h3>Completions</h3>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <h3>Completions</h3>
 
-        {store.hasInterface("completions:add-new") && (
-          <Tooltip placement="topLeft" title="Add new completion">
+        {store.hasInterface("completions:add-new") && (<Tooltip placement="topLeft" title="Add a new completion">
             <Button
               shape={"circle"}
               onClick={ev => {
@@ -130,7 +130,21 @@ class Completions extends Component {
               <Icon type="plus" />
             </Button>
           </Tooltip>
-        )}
+
+        </div>
+
+        <Tooltip placement="topLeft" title="View all completions">
+          <Button
+            shape={"circle"}
+            type={store.completionStore.viewingAllCompletions ? "primary" : ""}
+            onClick={ev => {
+              ev.preventDefault();
+              store.completionStore.toggleViewingAllCompletions();
+            }}
+          >
+            <Icon type="windows" />
+          </Button>
+        </Tooltip>
       </div>
     );
 

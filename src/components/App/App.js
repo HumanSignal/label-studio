@@ -91,15 +91,40 @@ const App = inject("store")(
         return <Result icon={<Spin size="large" />} />;
       }
 
+      _renderAll(obj) {
+        const { store } = this.props;
+
+        if (obj.length == 1) return <Segment>{Tree.renderItem(obj[0].root)}</Segment>;
+
+        return (
+          <div className="renderall">
+            {obj.map(c => (
+              <div className="fade">
+                <Segment>{Tree.renderItem(c.root)}</Segment>
+              </div>
+            ))}
+          </div>
+        );
+      }
+
+      renderAllCompletions() {
+        return this._renderAll(this.props.store.completionStore.completions);
+      }
+
+      renderAllPredictions() {
+        return this._renderAll(this.props.store.completionStore.predictions);
+      }
+
       render() {
         const self = this;
         const { store } = self.props;
+        const cs = store.completionStore;
         let root;
 
-        if (store.completionStore.currentCompletion) {
-          root = store.completionStore.currentCompletion.root;
-        } else if (store.completionStore.currentPrediction) {
-          root = store.completionStore.currentPrediction.root;
+        if (cs.currentCompletion) {
+          root = cs.currentCompletion.root;
+        } else if (cs.currentPrediction) {
+          root = cs.currentPrediction.root;
         }
 
         if (store.isLoading) return self.renderLoader();
@@ -110,7 +135,7 @@ const App = inject("store")(
 
         if (store.labeledSuccess) return self.renderSuccess();
 
-        if (!store.completionStore.currentCompletion && !store.completionStore.currentPrediction) {
+        if (!cs.currentCompletion && !cs.currentPrediction) {
           return self.renderNoCompletion();
         }
 
@@ -128,10 +153,14 @@ const App = inject("store")(
                 )}
 
                 <div className={styles.common}>
-                  <Segment>
-                    {Tree.renderItem(root)}
-                    {store.hasInterface("controls") && <Controls />}
-                  </Segment>
+                  {!cs.viewingAllCompletions && !cs.viewingAllPredictions && (
+                    <Segment>
+                      {Tree.renderItem(root)}
+                      {store.hasInterface("controls") && <Controls />}
+                    </Segment>
+                  )}
+                  {cs.viewingAllCompletions && this.renderAllCompletions()}
+                  {cs.viewingAllPredictions && this.renderAllPredictions()}
 
                   <div className={styles.menu}>
                     {store.hasInterface("completions:menu") && <Completions store={store} />}
