@@ -147,11 +147,11 @@ export default types
      * @returns {string | undefined}
      */
     function hasInterface(name) {
-      return self.interfaces.find(i => name === i);
+      return self.interfaces.find(i => name === i) !== undefined;
     }
 
     function hasSupport(name) {
-      return self.supports.find(i => name === i);
+      return self.supports.find(i => name === i) !== undefined;
     }
 
     /**
@@ -279,6 +279,7 @@ export default types
                 prediction.traverseTree(node => node.updateValue && node.updateValue(self));
                 self.completionStore.selectPrediction(prediction.id);
                 prediction.deserializeCompletion(response.predictions[i].result);
+                if (prediction.highlightedNode) prediction.highlightedNode.unselectRegion();
                 prediction.reinitHistory();
               }
             }
@@ -313,18 +314,6 @@ export default types
             // self.addGeneratedCompletion(r);
           }
 
-          if (self.hasInterface("predictions") && response.predictions) {
-            if (response.predictions && response.predictions.length) {
-              for (let i = 0; i < response.predictions.length; i++) {
-                const prediction = self.completionStore.addPrediction(response.predictions[i]);
-                prediction.traverseTree(node => node.updateValue && node.updateValue(self));
-                self.completionStore.selectPrediction(prediction.id);
-                prediction.deserializeCompletion(response.predictions[i].result);
-                if (prediction.highlightedNode) prediction.highlightedNode.unselectRegion();
-                prediction.reinitHistory();
-              }
-            }
-          }
           /**
            * Loader disabled
            */
