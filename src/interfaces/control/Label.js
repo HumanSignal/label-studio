@@ -41,7 +41,7 @@ const TagAttrs = types.model({
   showalias: types.optional(types.boolean, false),
   aliasstyle: types.optional(types.string, "opacity: 0.6"),
   size: types.optional(types.string, "medium"),
-  background: types.maybeNull(types.string),
+  background: types.optional(types.string, "#36B37E"),
   selectedcolor: types.optional(types.string, "white"),
 });
 

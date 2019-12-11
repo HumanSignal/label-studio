@@ -18,7 +18,7 @@ import Messages from "../utils/messages";
 /**
  * Custom Data
  */
-const data = NamedEntity;
+const data = AudioRegions;
 
 /**
  * Get current config
