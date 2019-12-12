@@ -270,22 +270,6 @@ export default types
           self.addTask(response);
 
           /**
-           * Load Predictions
-           */
-          if (self.hasSupport("predictions") && response.predictions) {
-            if (response.predictions && response.predictions.length) {
-              for (let i = 0; i < response.predictions.length; i++) {
-                const prediction = self.completionStore.addPrediction(response.predictions[i]);
-                prediction.traverseTree(node => node.updateValue && node.updateValue(self));
-                self.completionStore.selectPrediction(prediction.id);
-                prediction.deserializeCompletion(response.predictions[i].result);
-                if (prediction.highlightedNode) prediction.highlightedNode.unselectRegion();
-                prediction.reinitHistory();
-              }
-            }
-          }
-
-          /**
            * Completions
            */
           if (self.hasSupport("completions") && response.completions) {
@@ -312,6 +296,22 @@ export default types
               self.completionStore.selected.traverseTree(node => node.updateValue && node.updateValue(self));
 
             // self.addGeneratedCompletion(r);
+          }
+
+          /**
+           * Load Predictions
+           */
+          if (self.hasSupport("predictions") && response.predictions) {
+            if (response.predictions && response.predictions.length) {
+              for (let i = 0; i < response.predictions.length; i++) {
+                const prediction = self.completionStore.addPrediction(response.predictions[i]);
+                prediction.traverseTree(node => node.updateValue && node.updateValue(self));
+                self.completionStore.selectPrediction(prediction.id);
+                prediction.deserializeCompletion(response.predictions[i].result);
+                if (prediction.highlightedNode) prediction.highlightedNode.unselectRegion();
+                prediction.reinitHistory();
+              }
+            }
           }
 
           /**
