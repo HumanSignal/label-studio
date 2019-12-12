@@ -534,7 +534,7 @@ export default types
     }
 
     function deleteCompletion(completion) {
-      getEnv(self).deleteCompletion(completion);
+      getEnv(self).onDeleteCompletion(completion);
 
       if (getParent(self).apiCalls) {
         _deleteCompletion(completion.pk);

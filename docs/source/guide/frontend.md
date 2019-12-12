@@ -330,7 +330,7 @@ Flag fo labeling of tasks, if the flag is true then after submitting the next ta
 
 ## Callbacks
 
-### submitCompletion
+### onSubmitCompletion
 
 Type data: `function`
 
@@ -339,12 +339,12 @@ Called when a button `submit` is pressed. `result` is value of current completio
 #### Example
 
 ```javascript
-submitCompletion: function(result) {
+onSubmitCompletion: function(result) {
   console.log(result)
 }
 ```
 
-### updateCompletion
+### onUpdateCompletion
 
 Type data: `function`
 
@@ -358,7 +358,7 @@ updateCompletion: function(result) {
 }
 ```
 
-### deleteCompletion
+### onDeleteCompletion
 
 Type data: `function`
 
@@ -368,6 +368,76 @@ Called when a button `delete` is pressed. `result` is value of current completio
 
 ```javascript
 deleteCompletion: function(result) {
+  console.log(result)
+}
+```
+
+### onEntityCreate
+
+Type data: `function`
+
+Called when a new region gets labeled, for example a new bbox is created. `region` is the object that got created
+
+#### Example
+
+```javascript
+onEntityCreate: function(region) {
+  console.log(region)
+}
+```
+
+### onEntityDelete
+
+Type data: `function`
+
+Called when an existing region got deleted. `region` is the object itself.
+
+#### Example
+
+```javascript
+onEntityDelete: function(region) {
+  console.log(region)
+}
+```
+
+### onSkipTask
+
+Type data: `function`
+
+Called when a button `skip` is pressed. `result` is value of current completion.
+
+#### Example
+
+```javascript
+onSkipTask: function(result) {
+  console.log(result)
+}
+```
+
+### onTaskLoad
+
+Type data: `function`
+
+Called when a task gets loaded. `result` is the value of the task
+
+#### Example
+
+```javascript
+onTaskLoad: function(result) {
+  console.log(result)
+}
+```
+
+### onLabelStudioLoad
+
+Type data: `function`
+
+Called when label studio has fully loaded and is ready, `result` is the label studio instance
+
+#### Example
+
+```javascript
+onLabelStudioLoad: function(result) {
   console.log(result)
 }
 ```

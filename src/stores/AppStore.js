@@ -328,7 +328,7 @@ export default types
      * Skip current task
      */
     const skipTask = flow(function* skipTask() {
-      getEnv(self).skipTask();
+      getEnv(self).onSkipTask();
 
       if (self.apiCalls) {
         self.markLoading(true);
@@ -382,7 +382,7 @@ export default types
           });
 
           if (requestType === "update_result") {
-            getEnv(self).updateCompletion(JSON.parse(body));
+            getEnv(self).onUpdateCompletion(JSON.parse(body));
 
             if (self.apiCalls) {
               yield getEnv(self).patch(
@@ -391,7 +391,7 @@ export default types
               );
             }
           } else if (requestType === "post_result") {
-            getEnv(self).submitCompletion(JSON.parse(body));
+            getEnv(self).onSubmitCompletion(JSON.parse(body));
 
             if (self.apiCalls) {
               const responseCompletion = yield self.post(

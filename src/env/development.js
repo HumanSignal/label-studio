@@ -73,14 +73,16 @@ function configureApplication(params) {
     patch: Requests.patch,
     post: Requests.poster,
     remove: Requests.remover,
-    submitCompletion: params.submitCompletion ? params.submitCompletion : External.submitCompletion,
-    updateCompletion: params.updateCompletion ? params.updateCompletion : External.updateCompletion,
-    deleteCompletion: params.deleteCompletion ? params.deleteCompletion : External.deleteCompletion,
-    skipTask: params.skipTask ? params.skipTask : External.skipTask,
-    onTaskLoad: params.onTaskLoad ? params.onTaskLoad : External.onTaskLoad,
-    onLabelStudioLoad: params.onLabelStudioLoad ? params.onLabelStudioLoad : External.onLabelStudioLoad,
     alert: m => console.log(m), // Noop for demo: window.alert(m)
     messages: { ...Messages, ...params.messages },
+    onSubmitCompletion: params.onSubmitCompletion ? params.onSubmitCompletion : External.onSubmitCompletion,
+    onUpdateCompletion: params.onUpdateCompletion ? params.onUpdateCompletion : External.onUpdateCompletion,
+    onDeleteCompletion: params.onDeleteCompletion ? params.onDeleteCompletion : External.onDeleteCompletion,
+    onSkipTask: params.onSkipTask ? params.onSkipTask : External.onSkipTask,
+    onTaskLoad: params.onTaskLoad ? params.onTaskLoad : External.onTaskLoad,
+    onLabelStudioLoad: params.onLabelStudioLoad ? params.onLabelStudioLoad : External.onLabelStudioLoad,
+    onEntityCreate: params.onEntityCreate || External.onEntityCreate,
+    onEntityDelete: params.onEntityDelete || External.onEntityDelete,
   };
 
   return options;

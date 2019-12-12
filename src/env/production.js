@@ -45,18 +45,25 @@ function rootElement(element) {
  */
 function configureApplication(params) {
   const options = {
+    // communication with the server
     fetch: params.fetch || Requests.fetcher,
     patch: params.patch || Requests.patch,
     post: params.post || Requests.poster,
     remove: params.remove || Requests.remover,
-    submitCompletion: params.submitCompletion || External.submitCompletion,
-    updateCompletion: params.updateCompletion || External.updateCompletion,
-    deleteCompletion: params.deleteCompletion || External.deleteCompletion,
-    skipTask: params.skipTask || External.skipTask,
-    onTaskLoad: params.onTaskLoad || External.onTaskLoad,
-    onLabelStudioLoad: params.onLabelStudioLoad || External.onLabelStudioLoad,
+
+    // communication with the user
     alert: m => console.log(m), // Noop for demo: window.alert(m)
     messages: { ...Messages, ...params.messages },
+
+    // callbacks and event handlers
+    onSubmitCompletion: params.onSubmitCompletion ? params.onSubmitCompletion : External.onSubmitCompletion,
+    onUpdateCompletion: params.onUpdateCompletion ? params.onUpdateCompletion : External.onUpdateCompletion,
+    onDeleteCompletion: params.onDeleteCompletion ? params.onDeleteCompletion : External.onDeleteCompletion,
+    onSkipTask: params.onSkipTask ? params.onSkipTask : External.onSkipTask,
+    onTaskLoad: params.onTaskLoad || External.onTaskLoad,
+    onLabelStudioLoad: params.onLabelStudioLoad || External.onLabelStudioLoad,
+    onEntityCreate: params.onEntityCreate || External.onEntityCreate,
+    onEntityDelete: params.onEntityDelete || External.onEntityDelete,
   };
 
   return options;

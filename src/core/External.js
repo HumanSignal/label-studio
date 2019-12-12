@@ -1,22 +1,22 @@
 /**
  * Callback on submit completion
  */
-function submitCompletion() {}
+function onSubmitCompletion() {}
 
 /**
  * Callback on update completion
  */
-function updateCompletion() {}
+function onUpdateCompletion() {}
 
 /**
  * Callback on delete completion
  */
-function deleteCompletion() {}
+function onDeleteCompletion() {}
 
 /**
  * Callback on skip task
  */
-function skipTask() {}
+function onSkipTask() {}
 
 /**
  * Callback on task load
@@ -28,4 +28,23 @@ function onTaskLoad() {}
  */
 function onLabelStudioLoad() {}
 
-export default { submitCompletion, updateCompletion, deleteCompletion, skipTask, onTaskLoad, onLabelStudioLoad };
+/**
+ * Callback when labeled region gets created
+ */
+function onEntityCreate() {}
+
+/**
+ * Callback when labeled region gets deleted
+ */
+function onEntityDelete() {}
+
+export default {
+  onSubmitCompletion,
+  onUpdateCompletion,
+  onDeleteCompletion,
+  onSkipTask,
+  onTaskLoad,
+  onLabelStudioLoad,
+  onEntityCreate,
+  onEntityDelete,
+};
