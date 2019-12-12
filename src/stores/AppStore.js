@@ -320,6 +320,8 @@ export default types
            * Loader disabled
            */
           self.markLoading(false);
+
+          getEnv(self).onTaskLoad(self.task);
         });
       } catch (err) {
         console.error("Failed to load next task ", err);
