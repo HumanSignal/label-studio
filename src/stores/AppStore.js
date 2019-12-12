@@ -201,6 +201,8 @@ export default types
           c.highlightedNode.deleteRegion();
         }
       });
+
+      getEnv(self).onLabelStudioLoad(self);
     };
 
     /**
