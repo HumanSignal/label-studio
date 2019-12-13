@@ -75,7 +75,7 @@ class Predictions extends Component {
     );
 
     return (
-      <Card title={title} bodyStyle={{ padding: "0" }}>
+      <Card title={title} size="small" bodyStyle={{ padding: "0" }}>
         <List>
           {store.completionStore.predictions && store.completionStore.predictions.length ? (
             content
