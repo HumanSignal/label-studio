@@ -90,8 +90,9 @@ const Completion = observer(({ item, store }) => {
               placement="bottomLeft"
               title={"Please confirm you want to delete this completion"}
               onConfirm={confirm}
-              okText="Yes"
-              cancelText="No"
+              okText="Delete"
+              okType="danger"
+              cancelText="Cancel"
             >
               <Button size="small" type="danger">
                 <Icon type="delete" />
