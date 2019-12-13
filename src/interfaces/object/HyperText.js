@@ -27,6 +27,7 @@ import Utils from "../../utils";
  * @name HyperText
  * @param {string} name of the element
  * @param {string} value of the element
+ * @param {string} [encoding=string|base64] provide the html as an escaped string or base64 encoded string
  */
 const TagAttrs = types.model("HyperTextModel", {
   name: types.maybeNull(types.string),
@@ -38,6 +39,8 @@ const TagAttrs = types.model("HyperTextModel", {
    */
   adjustselection: types.optional(types.boolean, true),
   selectionenabled: types.optional(types.boolean, true),
+
+  encoding: types.optional(types.string, "string"),
 });
 
 const Model = types
@@ -306,12 +309,16 @@ class HyperTextPieceView extends Component {
     const self = this;
     const { item, store } = this.props;
 
+    let val = runTemplate(item.value, store.task.dataObj);
+    if (item.encoding == "base64") val = atob(val);
+
     return (
       <div
         ref={this.myRef}
         data-update={item._update}
+        style={{ overflow: "auto" }}
         onMouseUp={this.onMouseUp.bind(this)}
-        dangerouslySetInnerHTML={{ __html: runTemplate(item.value, store.task.dataObj) }}
+        dangerouslySetInnerHTML={{ __html: val }}
       />
     );
   }
