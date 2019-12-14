@@ -2,6 +2,7 @@ import { Sentiment } from "../examples/sentiment_analysis";
 import { AudioClassification } from "../examples/audio_classification";
 import { AudioRegions } from "../examples/audio_regions";
 import { DialogueAnalysis } from "../examples/dialogue_analysis";
+import { Pairwise } from "../examples/pairwise";
 import { ImageBbox } from "../examples/image_bbox";
 import { ImagePolygons } from "../examples/image_polygons";
 import { ImageKeyPoint } from "../examples/image_keypoints";
@@ -18,7 +19,7 @@ import Messages from "../utils/messages";
 /**
  * Custom Data
  */
-const data = AudioRegions;
+const data = Pairwise;
 
 /**
  * Get current config

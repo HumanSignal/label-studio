@@ -1,0 +1,6 @@
+<View>
+  <Pairwise name="pw">
+    <Text name="txt-1" value="$text1" />
+    <Text name="txt-2" value="$text2" />
+  </Pairwise>  
+</View>
