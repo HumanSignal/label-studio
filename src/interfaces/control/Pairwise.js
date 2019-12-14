@@ -1,8 +1,9 @@
 import React from "react";
-import { types, getEnv, flow, getParentOfType } from "mobx-state-tree";
+import { types, getEnv, getRoot, flow, getParentOfType } from "mobx-state-tree";
 import { observer, Provider } from "mobx-react";
 
 import Tree from "../../core/Tree";
+import { runTemplate } from "../../core/Template";
 
 import Registry from "../../core/Registry";
 import Types from "../../core/Types";
@@ -21,6 +22,8 @@ import Types from "../../core/Types";
 const TagAttrs = types.model({
   name: types.string,
   style: types.maybeNull(types.string),
+  leftclass: types.optional(types.string, "left"),
+  rightclass: types.optional(types.string, "right"),
   selectedstyle: types.maybeNull(types.string),
 });
 
@@ -55,13 +58,18 @@ const Model = types
     },
 
     toStateJSON() {
+      const store = getRoot(self);
+      let choice = self.selected === "left" ? self.leftclass : self.selected === "right" ? self.rightclass : null;
+      if (choice !== null) choice = [runTemplate(choice, store.task.dataObj)];
+
       return {
         id: self.pid,
         from_name: self.name,
         to_name: self.name,
-        type: self.type,
+        type: "choices",
         value: {
           selected: self.selected,
+          choices: choice,
         },
       };
     },
