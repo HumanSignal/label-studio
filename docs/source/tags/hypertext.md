@@ -10,6 +10,7 @@ HyperText tag shows an HTML markup that can be labeled
 
 -   `name` **[string]** of the element
 -   `value` **[string]** of the element
+-   `encoding` ["string"|"base64"] provide the html as an escaped string or base64 encoded string
 
 ### Examples
 
