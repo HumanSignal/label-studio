@@ -16,7 +16,7 @@ import Registry from "../../core/Registry";
 import { guidGenerator, cloneNode, restoreNewsnapshot } from "../../core/Helpers";
 
 import { RectRegionModel } from "./RectRegion";
-import { PolygonRegionModel } from "./PolygonRegion";
+import { PolygonRegionModel } from "./PolygonRegion/PolygonRegion";
 import { KeyPointRegionModel } from "./KeyPointRegion";
 import ProcessAttrsMixin from "../mixins/ProcessAttrs";
 import Infomodal from "../../components/Infomodal/Infomodal";
@@ -257,6 +257,7 @@ const Model = types
      * Set zoom
      */
     setZoom(scale, x, y) {
+      console.log(x);
       self.resize = scale;
       self.zoomScale = scale;
       self.zoomingPositionX = x;

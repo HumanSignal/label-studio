@@ -9,6 +9,7 @@ const RegionsMixin = types
     selectRegion() {
       self.selected = true;
       self.completion.setHighlightedNode(self);
+      self.parent.setSelected(self.id);
     },
 
     unselectRegion() {
@@ -20,6 +21,7 @@ const RegionsMixin = types
 
       self.selected = false;
       self.completion.setHighlightedNode(null);
+      self.parent.setSelected(undefined);
     },
 
     onClickRegion() {

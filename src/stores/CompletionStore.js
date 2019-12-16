@@ -103,8 +103,12 @@ const Completion = types
       self.localUpdate = value;
     },
 
-    setDragMode(val) {
-      self.dragMode = val;
+    /**
+     * Set draggable mode
+     * @param {boolean} val
+     */
+    setDragMode(value) {
+      self.dragMode = value;
     },
 
     updatePersonalKey(value) {

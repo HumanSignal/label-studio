@@ -4,18 +4,28 @@ import { observer } from "mobx-react";
 import { types, getParent } from "mobx-state-tree";
 
 import Konva from "konva";
-import { Rect, Circle } from "react-konva";
+import { Circle } from "react-konva";
 
 const PolygonPoint = types
   .model({
-    init_x: types.optional(types.number, 0),
-    init_y: types.optional(types.number, 0),
+    /**
+     * Initial coordinates of Point
+     */
+    initialX: types.optional(types.number, 0),
+    initialY: types.optional(types.number, 0),
 
     x: types.number,
     y: types.number,
 
+    /**
+     * Index of point
+     * First point is 0 `zero` index
+     */
     index: types.number,
 
+    /**
+     *
+     */
     style: types.string,
     size: types.string,
     isMouseOverStartPoint: types.optional(types.boolean, false),
@@ -30,8 +40,13 @@ const PolygonPoint = types
      * Triggered after create model
      */
     afterCreate() {
-      self.init_x = self.x;
-      self.init_y = self.y;
+      self.initialX = self.x;
+      self.initialY = self.y;
+    },
+
+    dragEnd() {
+      self.initialX = self.x;
+      self.initialY = self.y;
     },
 
     /**
@@ -40,13 +55,13 @@ const PolygonPoint = types
      * @param {number} y
      */
     movePoint(x, y) {
-      self.x = self.init_x + x;
-      self.y = self.init_y + y;
+      self.x = self.initialX + x;
+      self.y = self.initialY + y;
     },
 
     _movePoint(x, y) {
-      self.init_x = x;
-      self.init_y = y;
+      self.initialX = x;
+      self.initialY = y;
 
       self.x = x;
       self.y = y;
@@ -158,47 +173,27 @@ const PolygonPointView = observer(({ item, name }) => {
     },
   };
 
-  if (item.style === "circle") {
-    return (
-      <Circle
-        key={name}
-        name={name}
-        x={item.x}
-        y={item.y}
-        radius={w}
-        fill="white"
-        stroke="black"
-        strokeWidth={stroke[item.size]}
-        dragOnTop={false}
-        onClick={ev => {
-          if (item.parent.mouseOverStartPoint) {
-            item.parent.closePoly();
-          }
-        }}
-        {...dragOpts}
-        {...startPointAttr}
-        draggable
-      />
-    );
-  } else {
-    return (
-      <Rect
-        name={name}
-        key={name}
-        x={item.x - w / 2}
-        y={item.y - w / 2}
-        width={w}
-        height={w}
-        fill="white"
-        stroke="black"
-        strokeWidth={stroke[item.size]}
-        dragOnTop={false}
-        {...dragOpts}
-        {...startPointAttr}
-        draggable
-      />
-    );
-  }
+  return (
+    <Circle
+      key={name}
+      name={name}
+      x={item.x}
+      y={item.y}
+      radius={w}
+      fill="white"
+      stroke="black"
+      strokeWidth={stroke[item.size]}
+      dragOnTop={false}
+      onClick={ev => {
+        if (item.parent.mouseOverStartPoint) {
+          item.parent.closePoly();
+        }
+      }}
+      {...dragOpts}
+      {...startPointAttr}
+      draggable
+    />
+  );
 });
 
 export { PolygonPoint, PolygonPointView };

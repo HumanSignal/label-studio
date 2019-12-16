@@ -1,6 +1,6 @@
 import { TextRegionModel } from "./TextRegion";
 import { RectRegionModel } from "./RectRegion";
-import { PolygonRegionModel } from "./PolygonRegion";
+import { PolygonRegionModel } from "./PolygonRegion/PolygonRegion";
 import { KeyPointRegionModel } from "./KeyPointRegion";
 import { PolygonPoint } from "./PolygonPoint";
 import { AudioRegionModel } from "./AudioRegion";
