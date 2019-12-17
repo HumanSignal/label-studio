@@ -33,7 +33,7 @@ import Messages from "../utils/messages";
 /**
  * Custom Data
  */
-const data = NamedEntity;
+const data = HTMLDocument;
 
 /**
  * Get current config
