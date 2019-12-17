@@ -4,13 +4,20 @@
 import React, { Component } from "react";
 import { observer, inject, Provider } from "mobx-react";
 import { types, getSnapshot } from "mobx-state-tree";
+
+/**
+ * UI Components
+ */
 import { Result, Spin } from "antd";
 
 /**
  * Core
  */
+// eslint-disable-next-line
 import Registry from "../../core/Registry";
+// eslint-disable-next-line
 import Requests from "../../core/Requests";
+// eslint-disable-next-line
 import { guidGenerator } from "../../core/Helpers";
 import Tree from "../../core/Tree";
 
@@ -29,35 +36,56 @@ import Segment from "../Segment/Segment";
 /**
  * Visual
  */
+// eslint-disable-next-line
 import { ViewModel } from "../../interfaces/visual/View";
+// eslint-disable-next-line
 import { TableModel } from "../../interfaces/visual/Table";
+// eslint-disable-next-line
 import { HeaderModel } from "../../interfaces/visual/Header";
+// eslint-disable-next-line
 import { HyperTextModel } from "../../interfaces/visual/HyperText";
+// eslint-disable-next-line
 import { DialogModel } from "../../interfaces/visual/Dialog";
 
 /**
  * Object
  */
+// eslint-disable-next-line
 import { AudioModel } from "../../interfaces/object/Audio";
+// eslint-disable-next-line
 import { AudioPlusModel } from "../../interfaces/object/AudioPlus";
+// eslint-disable-next-line
 import { ImageModel } from "../../interfaces/object/Image";
+// eslint-disable-next-line
 import { TextModel } from "../../interfaces/object/Text";
 
 /**
  * Control
  */
+// eslint-disable-next-line
 import { RectangleModel } from "../../interfaces/control/Rectangle";
+// eslint-disable-next-line
 import { KeyPointModel } from "../../interfaces/control/KeyPoint";
+// eslint-disable-next-line
 import { KeyPointLabelsModel } from "../../interfaces/control/KeyPointLabels";
+// eslint-disable-next-line
 import { PolygonModel } from "../../interfaces/control/Polygon";
+// eslint-disable-next-line
 import { RectangleLabelsModel } from "../../interfaces/control/RectangleLabels";
+// eslint-disable-next-line
 import { PolygonLabelsModel } from "../../interfaces/control/PolygonLabels";
+// eslint-disable-next-line
 import { ChoicesModel } from "../../interfaces/control/Choices";
 
+// eslint-disable-next-line
 import { RatingModel } from "../../interfaces/control/Rating";
+// eslint-disable-next-line
 import { ListModel } from "../../interfaces/control/List";
+// eslint-disable-next-line
 import { RankerModel } from "../../interfaces/control/Ranker";
+// eslint-disable-next-line
 import { ShortcutModel } from "../../interfaces/control/Shortcut";
+// eslint-disable-next-line
 import { TextAreaModel } from "../../interfaces/control/TextArea";
 
 /**
