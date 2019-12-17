@@ -11,16 +11,19 @@ import Types from "../../core/Types";
 /**
  * Pairwise element. Compare two different objects, works with any label studio object
  * @example
- * <Pairwise name="pairwise">
+ * <Pairwise name="pairwise" leftClass="text1" rightClass="text2">
  *   <Text name="txt-1" value="Text 1" />
  *   <Text name="txt-2" value="Text 2" />
  * </Pairwise>
  * @name Pairwise
- * @param {style} style css style string
- * @param {selectedStyle} style of the selected object
+ * @param {string} style css style string
+ * @param {string} selectedStyle style of the selected object
+ * @params {string} leftClass class name of the left object
+ * @params {string} rightClass class name of the right object
  */
 const TagAttrs = types.model({
   name: types.string,
+  // toname: types.maybeNull(types.string),
   style: types.maybeNull(types.string),
   leftclass: types.optional(types.string, "left"),
   rightclass: types.optional(types.string, "right"),
@@ -35,8 +38,6 @@ const Model = types
       "view",
       "header",
       "table",
-      "choices",
-      "rating",
       "text",
       "audio",
       "image",
@@ -44,7 +45,6 @@ const Model = types
       "audioplus",
       "list",
       "dialog",
-      "textarea",
     ]),
     selected: types.maybeNull(types.enumeration(["left", "right", "none"])),
   })
@@ -66,10 +66,10 @@ const Model = types
         id: self.pid,
         from_name: self.name,
         to_name: self.name,
-        type: "choices",
+        type: "pairwise",
         value: {
           selected: self.selected,
-          choices: choice,
+          pairwise: choice,
         },
       };
     },
