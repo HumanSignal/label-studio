@@ -319,7 +319,7 @@ export default types
            * Make first completion selected
            */
           if (self.completionStore.completions.length > 0)
-            self.completionStore.selectCompletion(self.completionStore.completions[0]);
+            self.completionStore.selectCompletion(self.completionStore.completions[0].id);
 
           /**
            * Loader disabled
