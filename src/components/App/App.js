@@ -53,6 +53,7 @@ import { PolygonModel } from "../../interfaces/control/Polygon";
 import { RectangleLabelsModel } from "../../interfaces/control/RectangleLabels";
 import { PolygonLabelsModel } from "../../interfaces/control/PolygonLabels";
 import { ChoicesModel } from "../../interfaces/control/Choices";
+import { PairwiseModel } from "../../interfaces/control/Pairwise";
 
 import { RatingModel } from "../../interfaces/control/Rating";
 import { ListModel } from "../../interfaces/control/List";
