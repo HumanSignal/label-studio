@@ -12,6 +12,8 @@ import { runTemplate } from "../../core/Template";
 import ProcessAttrsMixin from "../mixins/ProcessAttrs";
 import Hint from "../../components/Hint/Hint";
 
+const DEFAULT_BACKGROUND = "#36B37E";
+
 /**
  * Label tag represents a single label
  * @example
@@ -41,7 +43,7 @@ const TagAttrs = types.model({
   showalias: types.optional(types.boolean, false),
   aliasstyle: types.optional(types.string, "opacity: 0.6"),
   size: types.optional(types.string, "medium"),
-  background: types.optional(types.string, "#36B37E"),
+  background: types.optional(types.string, DEFAULT_BACKGROUND),
   selectedcolor: types.optional(types.string, "white"),
 });
 
@@ -119,7 +121,7 @@ const Model = types
     updateValue(store) {
       self._value = runTemplate(self.value, store.task.dataObj) || "";
 
-      if (!self.background) self.background = ColorScheme.make_color({ seed: self._value })[0];
+      if (self.background == DEFAULT_BACKGROUND) self.background = ColorScheme.make_color({ seed: self._value })[0];
     },
   }));
 

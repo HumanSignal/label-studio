@@ -33,7 +33,7 @@ import Messages from "../utils/messages";
 /**
  * Custom Data
  */
-const data = HTMLDocument;
+const data = NamedEntity;
 
 /**
  * Get current config
@@ -72,7 +72,7 @@ function rootElement(element) {
   root.innerHTML = "";
   root.appendChild(el);
 
-  root.style.width = "1240px";
+  root.style.width = "auto";
 
   return el;
 }
