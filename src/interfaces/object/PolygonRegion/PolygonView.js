@@ -14,9 +14,9 @@ const HtxPolygonView = ({ store, item }) => {
    * Render line between 2 points
    */
   function renderLine({ points, idx1, idx2 }) {
-    const name = `border_${idx1}_${idx2}`;
-    const insertIdx = idx1 + 1; // idx1 + 1 or idx2
-    const flattenedPoints = Utils.Obj.getFlattenedCoordinates([points[idx1], points[idx2]]);
+    let name = `border_${idx1}_${idx2}`;
+    let insertIdx = idx1 + 1; // idx1 + 1 or idx2
+    let flattenedPoints = Utils.Obj.getFlattenedCoordinates([points[idx1], points[idx2]]);
     return (
       <Group
         key={name}
@@ -34,27 +34,54 @@ const HtxPolygonView = ({ store, item }) => {
           stroke={item.strokecolor}
           opacity={item.opacity}
           lineJoin="bevel"
+          lineCap="round"
           strokeWidth={item.strokewidth}
         />
       </Group>
     );
   }
 
+  /**
+   *
+   * @param {*} points
+   */
   function renderLines(points) {
-    const name = "borders";
+    let name = "borders";
+    /**
+     * Amount of Points into current Polygon
+     */
+    let amount = points.length;
+
+    /**
+     * Return all lines in current Polygon
+     * One line is Konva.Line between 2 points
+     */
+    let lines = points.map((point, idx) => {
+      /**
+       * First point
+       */
+      let idx1 = idx;
+      /**
+       * Second point
+       */
+      let idx2 = idx === amount - 1 ? 0 : idx + 1;
+      return renderLine({ points, idx1, idx2 });
+    });
+
     return (
       <Group key={name} name={name}>
-        {points.map((p, idx) => {
-          const idx1 = idx;
-          const idx2 = idx === points.length - 1 ? 0 : idx + 1;
-          return renderLine({ points, idx1, idx2 });
-        })}
+        {lines}
       </Group>
     );
   }
 
-  function renderPoly(points) {
-    const name = "poly";
+  /**
+   * Render Polygon object
+   * @param {*} points
+   */
+  function renderPolygon(points) {
+    let name = "polygon";
+
     return (
       <Group key={name} name={name}>
         <Line
@@ -68,9 +95,11 @@ const HtxPolygonView = ({ store, item }) => {
     );
   }
 
-  function renderCircle({ points, idx }) {
-    const name = `anchor_${points.length}_${idx}`;
-    const point = points[idx];
+  /**
+   * Render circle
+   */
+  function renderCircle(point) {
+    const name = `anchor_${point.parent.points.length}_${point.index}`;
 
     if (!item.closed || (item.closed && item.selected)) {
       return <PolygonPointView item={point} name={name} key={name} />;
@@ -79,9 +108,10 @@ const HtxPolygonView = ({ store, item }) => {
 
   function renderCircles(points) {
     const name = "anchors";
+
     return (
       <Group key={name} name={name}>
-        {points.map((p, idx) => renderCircle({ points, idx }))}
+        {points.map(point => renderCircle(point))}
       </Group>
     );
   }
@@ -93,18 +123,20 @@ const HtxPolygonView = ({ store, item }) => {
       dragBoundFunc={function(pos) {
         let { x, y } = pos;
 
-        const r = item.parent.stageWidth;
+        let width = item.parent.stageWidth;
+        let height = item.parent.stageHeight;
 
-        const b = item.parent.stageHeight;
-
-        if (x > r) x = r;
-        if (y > b) y = b;
+        /**
+         * If X or Y bigger then width or height
+         */
+        if (x > width) x = width;
+        if (y > height) y = height;
 
         item.points.forEach(point => {
           if (x + point.initialX <= 0) x = x - (point.initialX + x);
           if (y + point.initialY <= 0) y = y - (point.initialY + y);
-          if (x + point.initialX >= r) x = r - point.initialX;
-          if (y + point.initialY >= b) y = b - point.initialY;
+          if (x + point.initialX >= width) x = width - point.initialX;
+          if (y + point.initialY >= height) y = height - point.initialY;
         });
 
         item.points.forEach(point => {
@@ -163,7 +195,7 @@ const HtxPolygonView = ({ store, item }) => {
       draggable
     >
       {item.mouseOverStartPoint}
-      {item.points ? renderPoly(item.points) : null}
+      {item.points ? renderPolygon(item.points) : null}
       {item.points ? renderLines(item.points) : null}
       {item.points ? renderCircles(item.points) : null}
     </Group>

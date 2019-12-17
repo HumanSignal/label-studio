@@ -1,7 +1,10 @@
 import React from "react";
 import { PropTypes } from "prop-types";
-import { Radio } from "antd";
 
+/**
+ * UI Components
+ */
+import { Radio } from "antd";
 import Hint from "../Hint/Hint";
 
 /**

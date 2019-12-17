@@ -113,6 +113,11 @@ export default observer(
     };
 
     /**
+     * Get mouse position on Canvas
+     */
+    getMousePosition = stage => [stage.getPointerPosition().x, stage.getPointerPosition().y];
+
+    /**
      * Handle to zoom
      */
     handleZoom = e => {
@@ -142,15 +147,15 @@ export default observer(
 
       if (e.evt) {
         mousePointTo = {
-          x: stage.getPointerPosition().x / oldScale - stage.x() / oldScale,
-          y: stage.getPointerPosition().y / oldScale - stage.y() / oldScale,
+          x: this.getMousePosition(stage)[0] / oldScale - stage.x() / oldScale,
+          y: this.getMousePosition(stage)[1] / oldScale - stage.y() / oldScale,
         };
 
         newScale = e.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
 
         newPos = {
-          x: -(mousePointTo.x - stage.getPointerPosition().x / newScale) * newScale,
-          y: -(mousePointTo.y - stage.getPointerPosition().y / newScale) * newScale,
+          x: -(mousePointTo.x - this.getMousePosition(stage)[0] / newScale) * newScale,
+          y: -(mousePointTo.y - this.getMousePosition(stage)[1] / newScale) * newScale,
         };
       } else {
         pos = {

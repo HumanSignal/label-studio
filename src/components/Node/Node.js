@@ -1,17 +1,20 @@
 import React, { Component, Fragment } from "react";
 import { observer, inject } from "mobx-react";
-import { getType, getRoot } from "mobx-state-tree";
-import { Icon } from "antd";
+import { getType, getRoot, getSnapshot } from "mobx-state-tree";
+import { Icon, Tag } from "antd";
 
 import styles from "./Node.module.scss";
 
 const Node = observer(({ node }) => {
-  const click = ev => {
-    ev.preventDefault();
-    getRoot(node).completionStore.selected.regionStore.unselectAll();
-    node.selectRegion();
+  const clickHandler = event => {
+    event.preventDefault();
 
-    return false;
+    if (!node.selected) {
+      getRoot(node).completionStore.selected.regionStore.unselectAll();
+      node.selectRegion();
+    } else {
+      getRoot(node).completionStore.selected.regionStore.unselectAll();
+    }
   };
 
   if (getType(node).name === "TextRegionModel") {
@@ -27,7 +30,7 @@ const Node = observer(({ node }) => {
   if (getType(node).name === "AudioRegionModel") {
     return (
       <p>
-        <a href="" onClick={click} className={styles.node}>
+        <a href="" onClick={clickHandler} className={styles.node}>
           <i className="microphone icon" />
           Audio {node.start.toFixed(2)} - {node.end.toFixed(2)}
         </a>
@@ -38,7 +41,7 @@ const Node = observer(({ node }) => {
   if (getType(node).name === "TextAreaRegionModel") {
     return (
       <p>
-        <a href="" onClick={click} className={styles.node}>
+        <a href="" onClick={clickHandler} className={styles.node}>
           <i className="i cursor icon" />
           Input <span style={{ color: "#5a5a5a" }}>{node._value}</span>
         </a>
@@ -51,7 +54,7 @@ const Node = observer(({ node }) => {
     const y = node.height * node.scaleY;
     return (
       <p>
-        <a href="" onClick={click} className={styles.node}>
+        <a href="" onClick={clickHandler} className={styles.node}>
           <i className="expand icon" />
           Rectangle {w.toFixed(2)} x {y.toFixed(2)}
         </a>
@@ -60,20 +63,23 @@ const Node = observer(({ node }) => {
   }
 
   if (getType(node).name === "PolygonRegionModel") {
+    let labels = [];
+
+    node.states.forEach(item => {
+      labels.push(<Tag>{item.getSelectedNames()}</Tag>);
+    });
+
     return (
-      <p>
-        <a href="" onClick={click} className={styles.node}>
-          <i className="i object ungroup outline icon" />
-          Polygon
-        </a>
-      </p>
+      <span onClick={clickHandler} className={styles.node}>
+        Polygon {labels}
+      </span>
     );
   }
 
   if (getType(node).name === "KeyPointRegionModel") {
     return (
       <p>
-        <a href="" onClick={click} className={styles.node}>
+        <a href="" onClick={clickHandler} className={styles.node}>
           <i className="i object bullseye icon" />
           KeyPoint
         </a>

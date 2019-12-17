@@ -257,7 +257,6 @@ const Model = types
      * Set zoom
      */
     setZoom(scale, x, y) {
-      console.log(x);
       self.resize = scale;
       self.zoomScale = scale;
       self.zoomingPositionX = x;

@@ -3,6 +3,7 @@ import React from "react";
 import { observer } from "mobx-react";
 import { types, getParent } from "mobx-state-tree";
 
+// eslint-disable-next-line
 import Konva from "konva";
 import { Circle } from "react-konva";
 
