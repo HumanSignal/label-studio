@@ -459,6 +459,8 @@ export default types
 
       c.selected = true;
       self.selected = c;
+
+      c.setupHotKeys();
     }
 
     /**
