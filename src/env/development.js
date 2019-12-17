@@ -26,6 +26,11 @@ import { ImageMultilabel } from "../examples/image_multilabel";
  */
 import { HTMLDocument } from "../examples/html_document";
 
+/**
+ * Different
+ */
+import { Pairwise } from "../examples/pairwise";
+
 import External from "../core/External";
 import Requests from "../core/Requests";
 import Messages from "../utils/messages";
