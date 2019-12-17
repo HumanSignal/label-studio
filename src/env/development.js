@@ -1,14 +1,29 @@
+/**
+ * Text
+ */
 import { Sentiment } from "../examples/sentiment_analysis";
+import { NamedEntity } from "../examples/named_entity";
+import { References } from "../examples/references";
+import { DialogueAnalysis } from "../examples/dialogue_analysis";
+
+/**
+ * Audio
+ */
 import { AudioClassification } from "../examples/audio_classification";
 import { AudioRegions } from "../examples/audio_regions";
-import { DialogueAnalysis } from "../examples/dialogue_analysis";
+import { TranscribeAudio } from "../examples/transcribe_audio";
+
+/**
+ * Image
+ */
 import { ImageBbox } from "../examples/image_bbox";
 import { ImagePolygons } from "../examples/image_polygons";
 import { ImageKeyPoint } from "../examples/image_keypoints";
 import { ImageMultilabel } from "../examples/image_multilabel";
-import { NamedEntity } from "../examples/named_entity";
-import { References } from "../examples/references";
-import { TranscribeAudio } from "../examples/transcribe_audio";
+
+/**
+ * HTML
+ */
 import { HTMLDocument } from "../examples/html_document";
 
 import External from "../core/External";
@@ -18,7 +33,7 @@ import Messages from "../utils/messages";
 /**
  * Custom Data
  */
-const data = AudioRegions;
+const data = HTMLDocument;
 
 /**
  * Get current config
@@ -57,7 +72,7 @@ function rootElement(element) {
   root.innerHTML = "";
   root.appendChild(el);
 
-  root.style.margin = "0 auto";
+  root.style.width = "1240px";
 
   return el;
 }
