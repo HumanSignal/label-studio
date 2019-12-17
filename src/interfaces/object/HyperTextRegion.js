@@ -55,8 +55,7 @@ const Model = types
           from_name: obj.name,
           to_name: parent.name,
           source: parent.value,
-          type: "htmlregion",
-          // text: parent.text,
+          type: "htmllabels",
           value: {
             startOffset: self.startOffset,
             endOffset: self.endOffset,
@@ -73,9 +72,9 @@ const Model = types
       if (self.states && self.states.length) {
         return self.states.map(s => {
           const tree = buildTree(s);
-          // in case of labels it's gonna be, labels: ["label1", "label2"]
-          tree["value"][s.type] = s.getSelectedNames();
-          tree["type"] = s.type;
+          // in case of labels it's gonna be, htmllabels: ["label1", "label2"]
+          tree["value"]["html" + s.type] = s.getSelectedNames();
+          tree["type"] = "html" + s.type;
 
           return tree;
         });

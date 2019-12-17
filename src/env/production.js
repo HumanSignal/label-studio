@@ -44,6 +44,11 @@ function rootElement(element) {
  * @param {object} params
  */
 function configureApplication(params) {
+  // callbacks for back compatibility
+  const osCB = params.submitCompletion || params.onSubmitCompletion;
+  const ouCB = params.updateCompletion || params.onUpdateCompletion;
+  const odCB = params.deleteCompletion || params.onDeleteCompletion;
+
   const options = {
     // communication with the server
     fetch: params.fetch || Requests.fetcher,
@@ -56,9 +61,9 @@ function configureApplication(params) {
     messages: { ...Messages, ...params.messages },
 
     // callbacks and event handlers
-    onSubmitCompletion: params.onSubmitCompletion ? params.onSubmitCompletion : External.onSubmitCompletion,
-    onUpdateCompletion: params.onUpdateCompletion ? params.onUpdateCompletion : External.onUpdateCompletion,
-    onDeleteCompletion: params.onDeleteCompletion ? params.onDeleteCompletion : External.onDeleteCompletion,
+    onSubmitCompletion: params.onSubmitCompletion ? osCB : External.onSubmitCompletion,
+    onUpdateCompletion: params.onUpdateCompletion ? ouCB : External.onUpdateCompletion,
+    onDeleteCompletion: params.onDeleteCompletion ? odCB : External.onDeleteCompletion,
     onSkipTask: params.onSkipTask ? params.onSkipTask : External.onSkipTask,
     onTaskLoad: params.onTaskLoad || External.onTaskLoad,
     onLabelStudioLoad: params.onLabelStudioLoad || External.onLabelStudioLoad,

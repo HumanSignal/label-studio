@@ -56,30 +56,9 @@ const Model = LabelMixin.props({ _type: "labels" })
       return self.choice === "single";
     },
   }))
-  .actions(self => ({
-    toStateJSON() {
-      const names = self.getSelectedNames();
-      if (names && names.length) {
-        return {
-          id: self.pid,
-          from_name: self.name,
-          to_name: self.name,
-          type: self.type,
-          value: {
-            labels: names,
-          },
-        };
-      }
-    },
-  }));
+  .actions(self => ({}));
 
-const LabelsModel = types.compose(
-  "LabelsModel",
-  ModelAttrs,
-  TagAttrs,
-  Model,
-  SelectedModelMixin,
-);
+const LabelsModel = types.compose("LabelsModel", ModelAttrs, TagAttrs, Model, SelectedModelMixin);
 
 const HtxLabels = observer(({ item }) => {
   const style = {

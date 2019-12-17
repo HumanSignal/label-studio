@@ -303,16 +303,15 @@ export default types
           /**
            * Load Predictions
            */
-          if (self.hasSupport("predictions") && response.predictions) {
-            if (response.predictions && response.predictions.length) {
-              for (let i = 0; i < response.predictions.length; i++) {
-                const prediction = self.completionStore.addPrediction(response.predictions[i]);
-                prediction.traverseTree(node => node.updateValue && node.updateValue(self));
-                self.completionStore.selectPrediction(prediction.id);
-                prediction.deserializeCompletion(response.predictions[i].result);
-                if (prediction.highlightedNode) prediction.highlightedNode.unselectRegion();
-                prediction.reinitHistory();
-              }
+          if (self.hasSupport("predictions") && response.predictions && response.predictions.length) {
+            for (let i = 0; i < response.predictions.length; i++) {
+              const prediction = self.completionStore.addPrediction(response.predictions[i]);
+              prediction.traverseTree(node => node.updateValue && node.updateValue(self));
+              prediciton.setEdittable(true); // TODO remove this after redoing the completions / prediciton workflow
+              self.completionStore.selectPrediction(prediction.id);
+              prediction.deserializeCompletion(response.predictions[i].result);
+              if (prediction.highlightedNode) prediction.highlightedNode.unselectRegion();
+              prediction.reinitHistory();
             }
           }
 

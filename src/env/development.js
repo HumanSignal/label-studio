@@ -38,7 +38,7 @@ import Messages from "../utils/messages";
 /**
  * Custom Data
  */
-const data = Pairwise;
+const data = HTMLDocument;
 
 /**
  * Get current config
