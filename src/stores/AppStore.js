@@ -307,7 +307,7 @@ export default types
             for (let i = 0; i < response.predictions.length; i++) {
               const prediction = self.completionStore.addPrediction(response.predictions[i]);
               prediction.traverseTree(node => node.updateValue && node.updateValue(self));
-              prediction.setEdittable(true); // TODO remove this after redoing the completions / prediciton workflow
+              if (!self.hasInterface("predictions:menu")) prediction.setEdittable(true); // TODO remove this after redoing the completions / prediciton workflow
               self.completionStore.selectPrediction(prediction.id);
               prediction.deserializeCompletion(response.predictions[i].result);
               if (prediction.highlightedNode) prediction.highlightedNode.unselectRegion();

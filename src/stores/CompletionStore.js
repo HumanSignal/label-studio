@@ -445,7 +445,7 @@ export default types
       unSelectedPredict();
       unSelectViewingAll();
       // if (self.selected && self.selected.id !== c.id) c.history.reset();
-      // c.edittable = true;
+      c.edittable = true;
 
       c.selected = true;
       self.selected = c;
