@@ -3,7 +3,7 @@
  */
 import React, { Component } from "react";
 import { observer, inject, Provider } from "mobx-react";
-import { types, getSnapshot } from "mobx-state-tree";
+import { types, getSnapshot, getEnv } from "mobx-state-tree";
 import { Result, Spin } from "antd";
 
 /**
@@ -32,7 +32,6 @@ import Segment from "../Segment/Segment";
 import { ViewModel } from "../../interfaces/visual/View";
 import { TableModel } from "../../interfaces/visual/Table";
 import { HeaderModel } from "../../interfaces/visual/Header";
-import { HyperTextModel } from "../../interfaces/visual/HyperText";
 import { DialogModel } from "../../interfaces/visual/Dialog";
 
 /**
@@ -42,6 +41,7 @@ import { AudioModel } from "../../interfaces/object/Audio";
 import { AudioPlusModel } from "../../interfaces/object/AudioPlus";
 import { ImageModel } from "../../interfaces/object/Image";
 import { TextModel } from "../../interfaces/object/Text";
+import { HyperTextModel } from "../../interfaces/object/HyperText";
 
 /**
  * Control
@@ -53,6 +53,7 @@ import { PolygonModel } from "../../interfaces/control/Polygon";
 import { RectangleLabelsModel } from "../../interfaces/control/RectangleLabels";
 import { PolygonLabelsModel } from "../../interfaces/control/PolygonLabels";
 import { ChoicesModel } from "../../interfaces/control/Choices";
+import { PairwiseModel } from "../../interfaces/control/Pairwise";
 
 import { RatingModel } from "../../interfaces/control/Rating";
 import { ListModel } from "../../interfaces/control/List";
@@ -72,39 +73,70 @@ const App = inject("store")(
   observer(
     class App extends Component {
       renderSuccess() {
-        return <Result status="success" title="Done!" />;
+        return <Result status="success" title={getEnv(this.props.store).messages.DONE} />;
       }
 
       renderNoCompletion() {
-        return <Result status="success" title="No more completions" />;
+        return <Result status="success" title={getEnv(this.props.store).messages.NO_COMP_LEFT} />;
       }
 
       renderNothingToLabel() {
-        return <Result status="success" title="No more data available for labeling" />;
+        return <Result status="success" title={getEnv(this.props.store).messages.NO_NEXT_TASK} />;
+      }
+
+      renderNoAccess() {
+        return <Result status="warning" title={getEnv(this.props.store).messages.NO_ACCESS} />;
       }
 
       renderLoader() {
         return <Result icon={<Spin size="large" />} />;
       }
 
+      _renderAll(obj) {
+        const { store } = this.props;
+
+        if (obj.length == 1) return <Segment>{Tree.renderItem(obj[0].root)}</Segment>;
+
+        return (
+          <div className="renderall">
+            {obj.map(c => (
+              <div className="fade">
+                <Segment>{Tree.renderItem(c.root)}</Segment>
+              </div>
+            ))}
+          </div>
+        );
+      }
+
+      renderAllCompletions() {
+        return this._renderAll(this.props.store.completionStore.completions);
+      }
+
+      renderAllPredictions() {
+        return this._renderAll(this.props.store.completionStore.predictions);
+      }
+
       render() {
         const self = this;
         const { store } = self.props;
+        const cs = store.completionStore;
         let root;
 
-        if (store.completionStore.currentCompletion) {
-          root = store.completionStore.currentCompletion.root;
-        } else if (store.completionStore.currentPrediction) {
-          root = store.completionStore.currentPrediction.root;
+        if (cs.currentCompletion) {
+          root = cs.currentCompletion.root;
+        } else if (cs.currentPrediction) {
+          root = cs.currentPrediction.root;
         }
 
         if (store.isLoading) return self.renderLoader();
 
         if (store.noTask) return self.renderNothingToLabel();
 
+        if (store.noAccess) return self.renderNoAccess();
+
         if (store.labeledSuccess) return self.renderSuccess();
 
-        if (!store.completionStore.currentCompletion && !store.completionStore.currentPrediction) {
+        if (!cs.currentCompletion && !cs.currentPrediction) {
           return self.renderNoCompletion();
         }
 
@@ -122,10 +154,14 @@ const App = inject("store")(
                 )}
 
                 <div className={styles.common}>
-                  <Segment>
-                    {Tree.renderItem(root)}
-                    {store.hasInterface("controls") && <Controls />}
-                  </Segment>
+                  {!cs.viewingAllCompletions && !cs.viewingAllPredictions && (
+                    <Segment>
+                      {Tree.renderItem(root)}
+                      {store.hasInterface("controls") && <Controls />}
+                    </Segment>
+                  )}
+                  {cs.viewingAllCompletions && this.renderAllCompletions()}
+                  {cs.viewingAllPredictions && this.renderAllPredictions()}
 
                   <div className={styles.menu}>
                     {store.hasInterface("completions:menu") && <Completions store={store} />}

@@ -16,9 +16,19 @@ const Node = observer(({ node }) => {
 
   if (getType(node).name === "TextRegionModel") {
     return (
-      <div>
+      <div onClick={click}>
         <Icon type="font-colors" />
         Text &nbsp;
+        <span style={{ color: "#5a5a5a" }}>{node.text}</span>
+      </div>
+    );
+  }
+
+  if (getType(node).name === "HyperTextRegionModel") {
+    return (
+      <div onClick={click}>
+        <Icon type="font-colors" />
+        HTML &nbsp;
         <span style={{ color: "#5a5a5a" }}>{node.text}</span>
       </div>
     );
@@ -114,6 +124,14 @@ const NodeMinimal = ({ node }) => {
       <Fragment>
         <i className="i cursor icon" />
         Input
+      </Fragment>
+    );
+  }
+
+  if (getType(node).name === "HyperTextRegionModel") {
+    return (
+      <Fragment>
+        <Icon type="font-colors" /> HTML
       </Fragment>
     );
   }

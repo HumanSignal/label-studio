@@ -1,14 +1,18 @@
 import React from "react";
 import { observer, inject } from "mobx-react";
-import { types } from "mobx-state-tree";
+import { getRoot, types } from "mobx-state-tree";
 import { Tag } from "antd";
+import ColorScheme from "pleasejs";
 
 import { guidGenerator } from "../../core/Helpers";
 import Utils from "../../utils";
 import Registry from "../../core/Registry";
 import Types from "../../core/Types";
+import { runTemplate } from "../../core/Template";
 import ProcessAttrsMixin from "../mixins/ProcessAttrs";
 import Hint from "../../components/Hint/Hint";
+
+const DEFAULT_BACKGROUND = "#36B37E";
 
 /**
  * Label tag represents a single label
@@ -39,7 +43,7 @@ const TagAttrs = types.model({
   showalias: types.optional(types.boolean, false),
   aliasstyle: types.optional(types.string, "opacity: 0.6"),
   size: types.optional(types.string, "medium"),
-  background: types.optional(types.string, "#36B37E"),
+  background: types.optional(types.string, DEFAULT_BACKGROUND),
   selectedcolor: types.optional(types.string, "white"),
 });
 
@@ -49,6 +53,11 @@ const Model = types
     type: "label",
     _value: types.optional(types.string, ""),
   })
+  .views(self => ({
+    get completion() {
+      return getRoot(self).completionStore.selected;
+    },
+  }))
   .actions(self => ({
     /**
      * Select label
@@ -108,19 +117,28 @@ const Model = types
     onHotKey() {
       return self.toggleSelected();
     },
+
+    _updateBackgroundColor(val) {
+      if (self.background == DEFAULT_BACKGROUND) self.background = ColorScheme.make_color({ seed: val })[0];
+    },
+
+    afterCreate() {
+      self._updateBackgroundColor(self._value || self.value);
+    },
+
+    updateValue(store) {
+      self._value = runTemplate(self.value, store.task.dataObj) || "";
+      self._updateBackgroundColor(self._value);
+    },
   }));
 
-const LabelModel = types.compose(
-  "LabelModel",
-  TagAttrs,
-  Model,
-  ProcessAttrsMixin,
-);
+const LabelModel = types.compose("LabelModel", TagAttrs, Model, ProcessAttrsMixin);
 
 const HtxLabelView = inject("store")(
   observer(({ item, store }) => {
+    const bg = item.background;
     const labelStyle = {
-      backgroundColor: item.selected ? item.background : "#e8e8e8",
+      backgroundColor: item.selected ? bg : "#e8e8e8",
       color: item.selected ? item.selectedcolor : "#333333",
       cursor: "pointer",
       margin: "5px",
@@ -129,6 +147,8 @@ const HtxLabelView = inject("store")(
     return (
       <Tag
         onClick={ev => {
+          if (!item.completion.edittable) return;
+
           item.toggleSelected();
           return false;
         }}

@@ -34,7 +34,7 @@ const Model = types
     },
   }))
   .actions(self => ({
-    highlightStates() {},
+    // highlightStates() {},
 
     /**
      *
@@ -76,12 +76,7 @@ const Model = types
     },
   }));
 
-const TextRegionModel = types.compose(
-  "TextRegionModel",
-  RegionsMixin,
-  NormalizationMixin,
-  Model,
-);
+const TextRegionModel = types.compose("TextRegionModel", RegionsMixin, NormalizationMixin, Model);
 
 /**
  * Region state hint

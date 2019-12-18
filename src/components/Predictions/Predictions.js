@@ -56,8 +56,26 @@ class Predictions extends Component {
         }
       });
 
+    let title = (
+      <div className={styles.title + " " + styles.titlespace}>
+        <h3>Predictions</h3>
+        <Tooltip placement="topLeft" title="View all predictions">
+          <Button
+            shape={"circle"}
+            type={store.completionStore.viewingAllPredictions ? "primary" : ""}
+            onClick={ev => {
+              ev.preventDefault();
+              store.completionStore.toggleViewingAllPredictions();
+            }}
+          >
+            <Icon type="windows" />
+          </Button>
+        </Tooltip>
+      </div>
+    );
+
     return (
-      <Card title="Predictions" bodyStyle={{ padding: "0" }}>
+      <Card title={title} size="small" bodyStyle={{ padding: "0" }}>
         <List>
           {store.completionStore.predictions && store.completionStore.predictions.length ? (
             content

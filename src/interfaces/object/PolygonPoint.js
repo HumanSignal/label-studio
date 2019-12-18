@@ -1,13 +1,16 @@
 import React from "react";
 
 import { observer } from "mobx-react";
-import { types, getParent } from "mobx-state-tree";
+import { types, getParent, getRoot } from "mobx-state-tree";
 
 import Konva from "konva";
 import { Rect, Circle } from "react-konva";
 
 const PolygonPoint = types
   .model({
+    relativeX: types.optional(types.number, 0),
+    relativeY: types.optional(types.number, 0),
+
     init_x: types.optional(types.number, 0),
     init_y: types.optional(types.number, 0),
 
@@ -24,6 +27,10 @@ const PolygonPoint = types
     get parent() {
       return getParent(self, 2);
     },
+
+    get completion() {
+      return getRoot(self).completionStore.selected;
+    },
   }))
   .actions(self => ({
     /**
@@ -32,6 +39,14 @@ const PolygonPoint = types
     afterCreate() {
       self.init_x = self.x;
       self.init_y = self.y;
+
+      if (self.parent.coordstype === "perc") {
+        self.relativeX = self.x;
+        self.relativeY = self.y;
+      } else {
+        self.relativeX = (self.x / self.parent.parent.stageWidth) * 100;
+        self.relativeY = (self.y / self.parent.parent.stageHeight) * 100;
+      }
     },
 
     /**
@@ -48,6 +63,9 @@ const PolygonPoint = types
       self.init_x = x;
       self.init_y = y;
 
+      self.relativeX = (x / self.parent.parent.stageWidth) * 100;
+      self.relativeY = (y / self.parent.parent.stageHeight) * 100;
+
       self.x = x;
       self.y = y;
     },
@@ -57,6 +75,8 @@ const PolygonPoint = types
      * @param {*} ev
      */
     closeStartPoint(ev) {
+      if (!self.completion.edittable) return;
+
       if (self.parent.mouseOverStartPoint) {
         self.parent.closePoly();
       }
@@ -177,7 +197,7 @@ const PolygonPointView = observer(({ item, name }) => {
         }}
         {...dragOpts}
         {...startPointAttr}
-        draggable
+        draggable={item.completion.edittable}
       />
     );
   } else {
@@ -195,7 +215,7 @@ const PolygonPointView = observer(({ item, name }) => {
         dragOnTop={false}
         {...dragOpts}
         {...startPointAttr}
-        draggable
+        draggable={item.completion.edittable}
       />
     );
   }

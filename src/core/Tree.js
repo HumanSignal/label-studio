@@ -47,6 +47,8 @@ function cloneReactTree(items, attrs) {
  * @returns {object}
  */
 function cssConverter(style) {
+  if (!style) return null;
+
   let result = {},
     attributes = style.split(";"),
     firstIndexOfColon,

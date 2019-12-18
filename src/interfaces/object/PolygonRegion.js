@@ -187,6 +187,15 @@ const Model = types
       self.wp = wp;
       self.hp = hp;
 
+      if (self.coordstype === "px") {
+        self.points.map(p => {
+          const x = (sw * p.relativeX) / 100;
+          const y = (sh * p.relativeY) / 100;
+
+          p._movePoint(x, y);
+        });
+      }
+
       if (!self.completion.sentUserGenerate && self.coordstype === "perc") {
         self.points.map(p => {
           const x = (sw * p.x) / 100;
@@ -450,6 +459,8 @@ const HtxPolygonView = ({ store, item }) => {
       onClick={e => {
         e.cancelBubble = true;
 
+        if (!item.completion.edittable) return;
+
         if (!item.closed) return;
 
         const stage = item.parent.stageRef;
@@ -461,7 +472,7 @@ const HtxPolygonView = ({ store, item }) => {
         item.setHighlight(false);
         item.onClickRegion();
       }}
-      draggable
+      draggable={item.completion.edittable}
     >
       {item.mouseOverStartPoint}
 

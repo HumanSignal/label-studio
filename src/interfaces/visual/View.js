@@ -26,13 +26,12 @@ import Types from "../../core/Types";
  */
 const TagAttrs = types.model({
   display: types.optional(types.string, "block"),
-  margin: types.optional(types.string, ""),
+  style: types.maybeNull(types.string),
 });
 
 const Model = types.model({
   id: types.identifier,
   type: "view",
-  style: types.maybeNull(types.string),
   children: Types.unionArray([
     "view",
     "header",
@@ -55,14 +54,11 @@ const Model = types.model({
     "list",
     "dialog",
     "textarea",
+    "pairwise",
   ]),
 });
 
-const ViewModel = types.compose(
-  "ViewModel",
-  TagAttrs,
-  Model,
-);
+const ViewModel = types.compose("ViewModel", TagAttrs, Model);
 
 const HtxView = observer(({ item }) => {
   let style = {};

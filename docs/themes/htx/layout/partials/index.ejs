@@ -38,6 +38,11 @@
      padding-top: 7px;
  }
 
+.btn-slack {
+           background-color: #3f0e40;
+           border-color: #8b538c;
+}
+
  .underline {
    text-decoration: underline;
  }
@@ -337,7 +342,10 @@
                   <li>— Visually configurable from top to the bottom</li>
                 </ul>
                 <div style="display: flex; flex-direction: rows; margin-top: 1em;">
-                  <div><a href="<%- url_for("guide/") %>" class="btn">Get Started</a></div>
+                  <div>
+                  <a href="<%- url_for("guide/") %>" class="btn">Get Started</a>
+                  <a href="https://docs.google.com/forms/d/e/1FAIpQLSdLHZx5EeT1J350JPwnY2xLanfmvplJi6VZk65C2R4XSsRBHg/viewform?usp=sf_link" class="btn btn-slack"><img src="<%- url_for("/images/slack.png") %>" height="18" style="margin-right: 8px;"  />Join Slack</a>
+                  </div>
                   <!-- <div><a href="" class="btn">Watch video</a></div> -->
                 </div>
               </div>                            
@@ -413,44 +421,21 @@
             </div>
             <div class="card">
               <h3>Multiple data types</h3>
-              <p>Label Studio is type agnostic. The overall goal is to be able to process all data types. Right now it supports <a href="<%- url_for("/tags/audio.html") %>" class="underline">Audio</a>, <a href="<%- url_for("/tags/text.html") %>" class="underline">Text</a>, and <a href="<%- url_for("/tags/image.html") %>" class="underline">Images</a>. <br/><br/>Each interface can include a mix of the types with different workflows.</p>
+              <p>Label Studio is type agnostic. The overall goal is to be able to process all data types. Right now it supports <a href="<%- url_for("/tags/audio.html") %>" class="underline">Audio</a>, <a href="<%- url_for("/tags/text.html") %>" class="underline">Text</a>, <a href="<%- url_for("/tags/image.html") %>" class="underline">Images</a>, and <a href="<%- url_for("/tags/hypertext.html") %>" class="underline">HTML</a>. <br/><br/>Each interface can include a mix of the types with different workflows.</p>
             </div>
             <div class="card">
               <h3>Embeddable and Extendable</h3>
               <p>Label Studio includes a powerful embedding feature that enables you to embed entire UI in your pipeline. You can extend core functionality with new visual constructs and customize it for different use cases.</p>
+              <a href="<%- url_for("/guide/frontend.html") %>" class="underline">Learn More</a>
             </div>
           </div>                    
         </section>
 
         <section class="subscribe">
-          
-          <div style="text-align: center;">
-            <img src="<%- url_for("/images/paper-plane.svg") %>" alt="label studio logo" height="64" />
-            <h3>Subscribe for the updates</h3>
-            <div >
-              <p>We send a periodic newsletter announcing new features as well as some ML-related papers, label techniques that are innovative and funny stories.</p>
-            </div>
-            <!-- Begin Mailchimp Signup Form -->
-            <link href="//cdn-images.mailchimp.com/embedcode/horizontal-slim-10_7.css" rel="stylesheet" type="text/css">
-            <style type="text/css">
-	      #mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; width:100%;}
-	      /* Add your own Mailchimp form style overrides in your site stylesheet or in this style block.
-	      We recommend moving this block and the preceding CSS link to the HEAD of your HTML file. */
-            </style>
-            <div id="mc_embed_signup">
-              <form action="https://heartex.us20.list-manage.com/subscribe/post?u=0263d537fcf344b28250e4990&amp;id=bf8673757e" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
-                <div id="mc_embed_signup_scroll">
-	          
-	          <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email address" required style="height: 40px;">
-                  <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
-                  <div style="position: absolute; left: -5000px;" aria-hidden="true"><input type="text" name="b_0263d537fcf344b28250e4990_bf8673757e" tabindex="-1" value=""></div>
-                  <div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="btn"></div>
-                </div>
-              </form>
-            </div>
 
-            <!--End mc_embed_signup-->
-          </div>
+        <iframe width="640" height="320" src="https://labelstudio.substack.com/embed" frameborder="0" scrolling="no"></iframe>
+
+          
         </section>
         
         <section style="background-color: #1f104d; display: flex; justify-content: center; color: white; align-items: center; padding-top: 100px; padding-bottom: 100px; display: none;">
