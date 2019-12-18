@@ -8,6 +8,9 @@ import { Rect, Circle } from "react-konva";
 
 const PolygonPoint = types
   .model({
+    relativeX: types.optional(types.number, 0),
+    relativeY: types.optional(types.number, 0),
+
     init_x: types.optional(types.number, 0),
     init_y: types.optional(types.number, 0),
 
@@ -36,6 +39,14 @@ const PolygonPoint = types
     afterCreate() {
       self.init_x = self.x;
       self.init_y = self.y;
+
+      if (self.parent.coordstype === "perc") {
+        self.relativeX = self.x;
+        self.relativeY = self.y;
+      } else {
+        self.relativeX = (self.x / self.parent.parent.stageWidth) * 100;
+        self.relativeY = (self.y / self.parent.parent.stageHeight) * 100;
+      }
     },
 
     /**
@@ -51,6 +62,9 @@ const PolygonPoint = types
     _movePoint(x, y) {
       self.init_x = x;
       self.init_y = y;
+
+      self.relativeX = (x / self.parent.parent.stageWidth) * 100;
+      self.relativeY = (y / self.parent.parent.stageHeight) * 100;
 
       self.x = x;
       self.y = y;

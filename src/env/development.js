@@ -38,7 +38,7 @@ import Messages from "../utils/messages";
 /**
  * Custom Data
  */
-const data = HTMLDocument;
+const data = Sentiment;
 
 /**
  * Get current config

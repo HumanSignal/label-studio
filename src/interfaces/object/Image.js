@@ -546,7 +546,7 @@ const Model = types
           stroke = states[0].getSelectedColor();
         }
 
-        self._addPoly({ x: x, y: y, width: w, stroke: stroke, states: states, coordstype: "perc", stateFlag: false });
+        self._addPoly({ x: x, y: y, width: w, stroke: stroke, states: states, coordstype: "px", stateFlag: false });
 
         const stage = self.stageRef;
 
@@ -718,12 +718,7 @@ const Model = types
     },
   }));
 
-const ImageModel = types.compose(
-  "ImageModel",
-  TagAttrs,
-  Model,
-  ProcessAttrsMixin,
-);
+const ImageModel = types.compose("ImageModel", TagAttrs, Model, ProcessAttrsMixin);
 
 const HtxImage = inject("store")(observer(ImageView));
 

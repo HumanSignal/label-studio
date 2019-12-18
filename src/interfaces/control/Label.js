@@ -118,10 +118,17 @@ const Model = types
       return self.toggleSelected();
     },
 
+    _updateBackgroundColor(val) {
+      if (self.background == DEFAULT_BACKGROUND) self.background = ColorScheme.make_color({ seed: val })[0];
+    },
+
+    afterCreate() {
+      self._updateBackgroundColor(self._value || self.value);
+    },
+
     updateValue(store) {
       self._value = runTemplate(self.value, store.task.dataObj) || "";
-
-      if (self.background == DEFAULT_BACKGROUND) self.background = ColorScheme.make_color({ seed: self._value })[0];
+      self._updateBackgroundColor(self._value);
     },
   }));
 
