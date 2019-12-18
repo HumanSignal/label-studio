@@ -420,7 +420,7 @@ export default types
             return loadTask();
           } else {
             self.markLoading(false);
-            self.completionStore.selected.setUserGenerate();
+            self.completionStore.selected.sendUserGenerate();
 
             if (self.explore && self.project.id) {
               self.labeledSuccess = true;
