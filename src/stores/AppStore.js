@@ -307,7 +307,7 @@ export default types
             for (let i = 0; i < response.predictions.length; i++) {
               const prediction = self.completionStore.addPrediction(response.predictions[i]);
               prediction.traverseTree(node => node.updateValue && node.updateValue(self));
-              prediction.setEdittable(true); // TODO remove this after redoing the completions / prediciton workflow
+              if (!self.hasInterface("predictions:menu")) prediction.setEdittable(true); // TODO remove this after redoing the completions / prediciton workflow
               self.completionStore.selectPrediction(prediction.id);
               prediction.deserializeCompletion(response.predictions[i].result);
               if (prediction.highlightedNode) prediction.highlightedNode.unselectRegion();
@@ -318,7 +318,7 @@ export default types
           /**
            * Make first completion selected
            */
-          if (self.completionStore.completions.length > 0)
+          if (self.hasSupport("completions") && self.completionStore.completions.length > 0)
             self.completionStore.selectCompletion(self.completionStore.completions[0].id);
 
           /**
@@ -420,7 +420,7 @@ export default types
             return loadTask();
           } else {
             self.markLoading(false);
-            self.completionStore.selected.setUserGenerate();
+            self.completionStore.selected.sendUserGenerate();
 
             if (self.explore && self.project.id) {
               self.labeledSuccess = true;

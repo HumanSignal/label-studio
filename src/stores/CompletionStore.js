@@ -425,7 +425,10 @@ export default types
     function toggleViewingAllCompletions() {
       self.viewingAllCompletions = !self.viewingAllCompletions;
 
-      if (self.viewingAllCompletions) self.viewingAllPredictions = false;
+      if (self.viewingAllCompletions) {
+        self.viewingAllPredictions = false;
+        self.completions.map(c => (c.edittable = false));
+      }
 
       _toggleViewingAll();
     }
@@ -442,6 +445,7 @@ export default types
       unSelectedPredict();
       unSelectViewingAll();
       // if (self.selected && self.selected.id !== c.id) c.history.reset();
+      c.edittable = true;
 
       c.selected = true;
       self.selected = c;
