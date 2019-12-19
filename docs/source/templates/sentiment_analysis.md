@@ -11,7 +11,7 @@ Classify sentiment of reviews for musical instruments found on Amazon
 ## Run
 
 ```bash
-python server.py -c config.json -l ../examples/sentiment_analysis/config.xml -i ../examples/sentiment_analysis/tasks.json -o output
+python server.py -c config.json -l ../examples/sentiment_analysis/config.xml -i ../examples/sentiment_analysis/tasks.json -o output_sentiment
 ```
 
 ## Config 

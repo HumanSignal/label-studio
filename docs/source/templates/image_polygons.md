@@ -2,7 +2,6 @@
 title: Image Polygons
 type: templates
 order: 205
-is_new: t
 ---
 
 Image polygons labeling
@@ -12,7 +11,7 @@ Image polygons labeling
 ## Run
 
 ```bash
-python server.py -c config.json -l ../examples/image_polygons/config.xml -i ../examples/image_polygons/tasks.json -o output
+python server.py -c config.json -l ../examples/image_polygons/config.xml -i ../examples/image_polygons/tasks.json -o output_polygons
 ```
 
 ## Config 
