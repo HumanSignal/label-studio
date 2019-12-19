@@ -1,7 +1,7 @@
 
 # HTML Document Annotation
 
-![HTML Document Annotation](/images/screenshots/named_entity.png "HTML Document Annotation")
+![HTML Document Annotation](/images/screenshots/html_document.png "HTML Document Annotation")
 
 # Install
 
