@@ -29,8 +29,9 @@
 - [Conversational modeling & chatbots](https://labelstud.io/templates/dialogue_analysis.html)
 - [Image object detection](https://labelstud.io/templates/image_bbox.html) 
 - [Audio regions](https://labelstud.io/templates/audio_regions.html)
-- [Image KeyPoints](https://labelstud.io/templates/image_keypoints.html)<sup>New</sup>
-- [Image Polygons](https://labelstud.io/templates/image_polygons.html)<sup>New</sup>
+- [Image KeyPoints](https://labelstud.io/templates/image_keypoints.html)
+- [Image Polygons](https://labelstud.io/templates/image_polygons.html)
+- [HTML Documents](https://labelstud.io/templates/html_document.html)<sup>New</sup>
 
 Coming Soon:
 

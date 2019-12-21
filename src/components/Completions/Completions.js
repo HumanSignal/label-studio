@@ -1,34 +1,40 @@
 import React, { Component } from "react";
 import { observer } from "mobx-react";
-import { Card, Button, Icon, Tooltip, Badge, List } from "antd";
+import { Card, Button, Icon, Tooltip, Badge, List, Popconfirm } from "antd";
 
 import Utils from "../../utils";
 import styles from "./Completions.module.scss";
 
 const Completion = observer(({ item, store }) => {
   let removeHoney = () => (
-    <Button
-      type="primary"
-      onClick={ev => {
-        ev.preventDefault();
-        item.removeHoneypot();
-      }}
-    >
-      <Icon type="star" />
-    </Button>
+    <Tooltip placement="topLeft" title="Unset this result as a ground truth">
+      <Button
+        size="small"
+        type="primary"
+        onClick={ev => {
+          ev.preventDefault();
+          item.removeHoneypot();
+        }}
+      >
+        <Icon type="star" />
+      </Button>
+    </Tooltip>
   );
 
   let setHoney = () => (
-    <Button
-      type="primary"
-      ghost={true}
-      onClick={ev => {
-        ev.preventDefault();
-        item.setHoneypot();
-      }}
-    >
-      <Icon type="star" />
-    </Button>
+    <Tooltip placement="topLeft" title="Set this result as a ground truth">
+      <Button
+        size="small"
+        type="primary"
+        ghost={true}
+        onClick={ev => {
+          ev.preventDefault();
+          item.setHoneypot();
+        }}
+      >
+        <Icon type="star" />
+      </Button>
+    </Tooltip>
   );
 
   /**
@@ -68,6 +74,36 @@ const Completion = observer(({ item, store }) => {
     badge = <Badge status="success" />;
   }
 
+  const btnsView = () => {
+    const confirm = () => {
+      // ev.preventDefault();
+      item.store.deleteCompletion(item);
+    };
+
+    return (
+      <div className={styles.buttons}>
+        {true && (item.honeypot ? removeHoney() : setHoney())}
+        &nbsp;
+        {store.hasInterface("completions:delete") && (
+          <Tooltip placement="topLeft" title="Delete selected completion">
+            <Popconfirm
+              placement="bottomLeft"
+              title={"Please confirm you want to delete this completion"}
+              onConfirm={confirm}
+              okText="Delete"
+              okType="danger"
+              cancelText="Cancel"
+            >
+              <Button size="small" type="danger">
+                <Icon type="delete" />
+              </Button>
+            </Popconfirm>
+          </Tooltip>
+        )}
+      </div>
+    );
+  };
+
   return (
     <List.Item
       key={item.id}
@@ -76,30 +112,18 @@ const Completion = observer(({ item, store }) => {
         !item.selected && store.completionStore.selectCompletion(item.id);
       }}
     >
-      <div className={styles.title}>
-        {badge}
-        {completionID}
-      </div>
-      Created
-      <i>{item.createdAgo ? ` ${item.createdAgo} ago` : ` ${Utils.UDate.prettyDate(item.createdDate)}`}</i>
-      {item.createdBy ? ` by ${item.createdBy}` : null}
-      {item.selected && (
-        <div className={styles.buttons}>
-          {item.honeypot ? removeHoney() : setHoney()}
-
-          <Tooltip placement="topLeft" title="Delete selected completion">
-            <Button
-              type="danger"
-              onClick={ev => {
-                ev.preventDefault();
-                item.store.deleteCompletion(item);
-              }}
-            >
-              <Icon type="delete" />
-            </Button>
-          </Tooltip>
+      <div className={styles.completioncard}>
+        <div>
+          <div className={styles.title}>
+            {badge}
+            {completionID}
+          </div>
+          Created
+          <i>{item.createdAgo ? ` ${item.createdAgo} ago` : ` ${Utils.UDate.prettyDate(item.createdDate)}`}</i>
+          {item.createdBy ? ` by ${item.createdBy}` : null}
         </div>
-      )}
+        {item.selected && btnsView()}
+      </div>
     </List.Item>
   );
 });
@@ -111,18 +135,38 @@ class Completions extends Component {
     let content = [];
     let title = (
       <div className={styles.title + " " + styles.titlespace}>
-        <h3>Completions</h3>
-        <Tooltip placement="topLeft" title="Add a new completion">
-          <Button
-            shape={"circle"}
-            onClick={ev => {
-              ev.preventDefault();
-              store.completionStore.addUserCompletion();
-            }}
-          >
-            <Icon type="plus" />
-          </Button>
-        </Tooltip>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <h3>Completions</h3>
+        </div>
+
+        <div>
+          {store.hasInterface("completions:add-new") && (
+            <Tooltip placement="topLeft" title="Add a new completion">
+              <Button
+                shape={"circle"}
+                onClick={ev => {
+                  ev.preventDefault();
+                  store.completionStore.addUserCompletion();
+                }}
+              >
+                <Icon type="plus" />
+              </Button>
+            </Tooltip>
+          )}
+          &nbsp;&nbsp;
+          <Tooltip placement="topLeft" title="View all completions">
+            <Button
+              shape={"circle"}
+              type={store.completionStore.viewingAllCompletions ? "primary" : ""}
+              onClick={ev => {
+                ev.preventDefault();
+                store.completionStore.toggleViewingAllCompletions();
+              }}
+            >
+              <Icon type="windows" />
+            </Button>
+          </Tooltip>
+        </div>
       </div>
     );
 
@@ -133,7 +177,7 @@ class Completions extends Component {
     });
 
     return (
-      <Card title={title} bodyStyle={{ padding: "0", paddingTop: "1px" }}>
+      <Card title={title} size="small" bodyStyle={{ padding: "0", paddingTop: "1px" }}>
         <List>{store.completionStore.savedCompletions ? content : <p>No completions submitted yet</p>}</List>
       </Card>
     );

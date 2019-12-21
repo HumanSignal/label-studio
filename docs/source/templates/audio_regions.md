@@ -13,7 +13,7 @@ Listen to the audio file and classify
 ## Run
 
 ```bash
-python server.py -c config.json -l ../examples/audio_regions/config.xml -i ../examples/audio_regions/tasks.json -o output
+python server.py -c config.json -l ../examples/audio_regions/config.xml -i ../examples/audio_regions/tasks.json -o output_audio_regions
 ```
 
 ## Config 

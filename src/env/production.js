@@ -1,5 +1,6 @@
 import External from "../core/External";
 import Requests from "../core/Requests";
+import Messages from "../utils/messages";
 
 function getData(task) {
   let mstTask = task;
@@ -43,18 +44,31 @@ function rootElement(element) {
  * @param {object} params
  */
 function configureApplication(params) {
+  // callbacks for back compatibility
+  const osCB = params.submitCompletion || params.onSubmitCompletion;
+  const ouCB = params.updateCompletion || params.onUpdateCompletion;
+  const odCB = params.deleteCompletion || params.onDeleteCompletion;
+
   const options = {
-    fetch: Requests.fetcher,
-    patch: Requests.patch,
-    post: Requests.poster,
-    remove: Requests.remover,
-    submitCompletion: params.submitCompletion ? params.submitCompletion : External.submitCompletion,
-    updateCompletion: params.updateCompletion ? params.updateCompletion : External.updateCompletion,
-    deleteCompletion: params.deleteCompletion ? params.deleteCompletion : External.deleteCompletion,
-    skipTask: params.skipTask ? params.skipTask : External.skipTask,
-    onTaskLoad: params.onTaskLoad ? params.onTaskLoad : External.onTaskLoad,
-    onLabelStudioLoad: params.onLabelStudioLoad ? params.onLabelStudioLoad : External.onLabelStudioLoad,
+    // communication with the server
+    fetch: params.fetch || Requests.fetcher,
+    patch: params.patch || Requests.patch,
+    post: params.post || Requests.poster,
+    remove: params.remove || Requests.remover,
+
+    // communication with the user
     alert: m => console.log(m), // Noop for demo: window.alert(m)
+    messages: { ...Messages, ...params.messages },
+
+    // callbacks and event handlers
+    onSubmitCompletion: params.onSubmitCompletion ? osCB : External.onSubmitCompletion,
+    onUpdateCompletion: params.onUpdateCompletion ? ouCB : External.onUpdateCompletion,
+    onDeleteCompletion: params.onDeleteCompletion ? odCB : External.onDeleteCompletion,
+    onSkipTask: params.onSkipTask ? params.onSkipTask : External.onSkipTask,
+    onTaskLoad: params.onTaskLoad || External.onTaskLoad,
+    onLabelStudioLoad: params.onLabelStudioLoad || External.onLabelStudioLoad,
+    onEntityCreate: params.onEntityCreate || External.onEntityCreate,
+    onEntityDelete: params.onEntityDelete || External.onEntityDelete,
   };
 
   return options;

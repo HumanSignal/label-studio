@@ -1,18 +1,40 @@
+/**
+ * Text
+ */
 import { Sentiment } from "../examples/sentiment_analysis";
+import { NamedEntity } from "../examples/named_entity";
+import { References } from "../examples/references";
+import { DialogueAnalysis } from "../examples/dialogue_analysis";
+
+/**
+ * Audio
+ */
 import { AudioClassification } from "../examples/audio_classification";
 import { AudioRegions } from "../examples/audio_regions";
-import { DialogueAnalysis } from "../examples/dialogue_analysis";
+import { TranscribeAudio } from "../examples/transcribe_audio";
+
+/**
+ * Image
+ */
 import { ImageBbox } from "../examples/image_bbox";
 import { ImageSegmentation } from "../examples/image_segmentation";
 import { ImagePolygons } from "../examples/image_polygons";
 import { ImageKeyPoint } from "../examples/image_keypoints";
 import { ImageMultilabel } from "../examples/image_multilabel";
-import { NamedEntity } from "../examples/named_entity";
-import { References } from "../examples/references";
-import { TranscribeAudio } from "../examples/transcribe_audio";
+
+/**
+ * HTML
+ */
+import { HTMLDocument } from "../examples/html_document";
+
+/**
+ * Different
+ */
+import { Pairwise } from "../examples/pairwise";
 
 import External from "../core/External";
 import Requests from "../core/Requests";
+import Messages from "../utils/messages";
 
 /**
  * Custom Data
@@ -56,7 +78,7 @@ function rootElement(element) {
   root.innerHTML = "";
   root.appendChild(el);
 
-  root.style.margin = "0 auto";
+  root.style.width = "auto";
 
   return el;
 }
@@ -72,13 +94,16 @@ function configureApplication(params) {
     patch: Requests.patch,
     post: Requests.poster,
     remove: Requests.remover,
-    submitCompletion: params.submitCompletion ? params.submitCompletion : External.submitCompletion,
-    updateCompletion: params.updateCompletion ? params.updateCompletion : External.updateCompletion,
-    deleteCompletion: params.deleteCompletion ? params.deleteCompletion : External.deleteCompletion,
-    skipTask: params.skipTask ? params.skipTask : External.skipTask,
+    alert: m => console.log(m), // Noop for demo: window.alert(m)
+    messages: { ...Messages, ...params.messages },
+    onSubmitCompletion: params.onSubmitCompletion ? params.onSubmitCompletion : External.onSubmitCompletion,
+    onUpdateCompletion: params.onUpdateCompletion ? params.onUpdateCompletion : External.onUpdateCompletion,
+    onDeleteCompletion: params.onDeleteCompletion ? params.onDeleteCompletion : External.onDeleteCompletion,
+    onSkipTask: params.onSkipTask ? params.onSkipTask : External.onSkipTask,
     onTaskLoad: params.onTaskLoad ? params.onTaskLoad : External.onTaskLoad,
     onLabelStudioLoad: params.onLabelStudioLoad ? params.onLabelStudioLoad : External.onLabelStudioLoad,
-    alert: m => console.log(m), // Noop for demo: window.alert(m)
+    onEntityCreate: params.onEntityCreate || External.onEntityCreate,
+    onEntityDelete: params.onEntityDelete || External.onEntityDelete,
   };
 
   return options;

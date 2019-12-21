@@ -19,6 +19,7 @@ const Relation = types
         HtxObjectModel.TextAreaRegionModel,
         HtxObjectModel.KeyPointRegionModel,
         HtxObjectModel.BrushRegionModel,
+        HtxObjectModel.HyperTextRegionModel,
       ),
     ),
     node2: types.reference(
@@ -30,6 +31,7 @@ const Relation = types
         HtxObjectModel.TextAreaRegionModel,
         HtxObjectModel.KeyPointRegionModel,
         HtxObjectModel.BrushRegionModel,
+        HtxObjectModel.HyperTextRegionModel,
       ),
     ),
   })

@@ -45,6 +45,8 @@ const Completion = types
 
     dragMode: types.optional(types.boolean, false),
 
+    edittable: types.optional(types.boolean, true),
+
     relationMode: types.optional(types.boolean, false),
     relationStore: types.optional(RelationStore, {
       relations: [],
@@ -68,6 +70,7 @@ const Completion = types
         types.safeReference(HtxObjectModel.PolygonRegionModel),
         types.safeReference(HtxObjectModel.KeyPointRegionModel),
         types.safeReference(HtxObjectModel.BrushRegionModel),
+        types.safeReference(HtxObjectModel.HyperTextRegionModel),
         types.safeReference(RectangleModel),
         types.safeReference(BrushModel),
       ),
@@ -76,6 +79,10 @@ const Completion = types
   .views(self => ({
     get store() {
       return getParent(self, 2);
+    },
+
+    get list() {
+      return getParent(self);
     },
   }))
   .actions(self => ({
@@ -96,6 +103,10 @@ const Completion = types
     setHoneypot() {
       self.honeypot = true;
       self._updateServerState({ honeypot: self.honeypot });
+    },
+
+    setEdittable(val) {
+      self.edittable = val;
     },
 
     sendUserGenerate() {
@@ -246,8 +257,15 @@ const Completion = types
           }
         }
       });
+    },
 
+    setupHotKeys() {
       Hotkey.unbindAll();
+
+      let audiosNum = 0;
+      let audioNode = null;
+      let mod = "shift+space";
+      let comb = mod;
 
       // [TODO] we need to traverse this two times, fix
       // Hotkeys setup
@@ -255,7 +273,22 @@ const Completion = types
         if (node && node.onHotKey && node.hotkey) {
           Hotkey.addKey(node.hotkey, node.onHotKey, node.hotkeyScope);
         }
+      });
 
+      self.traverseTree(node => {
+        // add Space hotkey for playbacks of audio
+        if (node && !node.hotkey && node.type == "audio") {
+          if (audiosNum > 0) comb = mod + "+" + (audiosNum + 1);
+          else audioNode = node;
+
+          node.hotkey = comb;
+          Hotkey.addKey(comb, node.onHotKey);
+
+          audiosNum++;
+        }
+      });
+
+      self.traverseTree(node => {
         /**
          * Hotkey for controls
          */
@@ -269,8 +302,46 @@ const Completion = types
         }
       });
 
+      if (audioNode && audiosNum > 1) {
+        audioNode.hotkey = mod + "+1";
+        Hotkey.addKey(audioNode.hotkey, audioNode.onHotKey);
+        Hotkey.removeKey(mod);
+      }
+
+      // prevent spacebar from scrolling
+      // document.onkeypress = function(e) {
+      //     e = e || window.event;
+
+      //   var charCode = e.keyCode || e.which;
+      //   if (charCode === 32) {
+      //     e.preventDefault();
+      //     return false;
+      //   }
+      // };
+
       Hotkey.setScope("__main__");
       console.log("afterCreate Completion End");
+    },
+
+    afterCreate() {
+      //
+      if (self.userGenerate && !self.sentUserGenerate) {
+        self.loadedDate = new Date();
+      }
+
+      self.traverseTree(node => {
+        // create mapping from name to Model (by ref)
+        if (node && node.name && node.id) self.names.set(node.name, node.id);
+
+        if (node && node.toname && node.id) {
+          const val = self.toNames.get(node.toname);
+          if (val) {
+            val.push(node.id);
+          } else {
+            self.toNames.set(node.toname, [node.id]);
+          }
+        }
+      });
     },
 
     serializeCompletion() {
@@ -334,6 +405,8 @@ export default types
     selected: types.maybeNull(types.reference(Completion)),
     predictions: types.array(Completion),
     predictSelect: types.optional(types.boolean, false),
+    viewingAllCompletions: types.optional(types.boolean, false),
+    viewingAllPredictions: types.optional(types.boolean, false),
   })
   .views(self => ({
     /**
@@ -370,6 +443,40 @@ export default types
       self.predictSelect = false;
     }
 
+    function unSelectViewingAll() {
+      self.viewingAllCompletions = false;
+      self.viewingAllPredictions = false;
+    }
+
+    function _toggleViewingAll() {
+      if (self.viewingAllCompletions || self.viewingAllPredictions) {
+        unSelectedPredict();
+        self.completions.map(c => (c.selected = false));
+        self.predictions.map(c => (c.selected = false));
+      } else {
+        selectCompletion(self.completions[0].id);
+      }
+    }
+
+    function toggleViewingAllPredictions() {
+      self.viewingAllPredictions = !self.viewingAllPredictions;
+
+      if (self.viewingAllPredictions) self.viewingAllCompletions = false;
+
+      _toggleViewingAll();
+    }
+
+    function toggleViewingAllCompletions() {
+      self.viewingAllCompletions = !self.viewingAllCompletions;
+
+      if (self.viewingAllCompletions) {
+        self.viewingAllPredictions = false;
+        self.completions.map(c => (c.edittable = false));
+      }
+
+      _toggleViewingAll();
+    }
+
     /**
      * Select completion
      * @param {*} id
@@ -380,11 +487,14 @@ export default types
       const c = self.completions.find(c => c.id === id);
 
       unSelectedPredict();
-
+      unSelectViewingAll();
       // if (self.selected && self.selected.id !== c.id) c.history.reset();
+      c.edittable = true;
 
       c.selected = true;
       self.selected = c;
+
+      c.setupHotKeys();
     }
 
     function selectPrediction(id) {
@@ -392,11 +502,13 @@ export default types
       self.completions.map(c => (c.selected = false));
       const c = self.predictions.find(c => c.id === id);
       selectedPredict();
-
+      unSelectViewingAll();
       // if (self.selected && self.selected.id !== c.id) c.history.reset();
 
       c.selected = true;
       self.selected = c;
+
+      c.setupHotKeys();
     }
 
     /**
@@ -426,6 +538,7 @@ export default types
       /**
        * Create Completion
        */
+      node.edittable = false;
       const createdPrediction = Completion.create(node);
 
       /**
@@ -471,7 +584,7 @@ export default types
     }
 
     function deleteCompletion(completion) {
-      getEnv(self).deleteCompletion(completion);
+      getEnv(self).onDeleteCompletion(completion);
 
       if (getParent(self).apiCalls) {
         _deleteCompletion(completion.pk);
@@ -599,6 +712,9 @@ export default types
     return {
       selectCompletion,
       selectPrediction,
+
+      toggleViewingAllCompletions,
+      toggleViewingAllPredictions,
       addCompletion,
       addCompletionFromPrediction,
       deleteCompletion,

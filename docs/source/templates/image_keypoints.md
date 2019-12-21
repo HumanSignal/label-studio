@@ -2,7 +2,6 @@
 title: Image Key Points
 type: templates
 order: 205
-is_new: t
 ---
 
 Key Points labeling for the images
@@ -12,7 +11,7 @@ Key Points labeling for the images
 ## Run
 
 ```bash
-python server.py -c config.json -l ../examples/image_keypoints/config.xml -i ../examples/image_keypoints/tasks.json -o output
+python server.py -c config.json -l ../examples/image_keypoints/config.xml -i ../examples/image_keypoints/tasks.json -o output_keypoints
 ```
 
 ## Config 

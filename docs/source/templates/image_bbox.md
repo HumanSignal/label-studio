@@ -11,7 +11,7 @@ Image bounding box labeling
 ## Run
 
 ```bash
-python server.py -c config.json -l ../examples/image_bbox/config.xml -i ../examples/image_bbox/tasks.json -o output
+python server.py -c config.json -l ../examples/image_bbox/config.xml -i ../examples/image_bbox/tasks.json -o output_bbox
 ```
 
 ## Config 

@@ -31,23 +31,25 @@ export default observer(({ store, regionStore }) => {
     <div>
       <h4>Entities ({regions.length})</h4>
       {regions.length > 0 && buttonRemove()}
-      {!regions.length && <p>No Entitied added yet</p>}
-      <ul className={styles.list}>
-        {regions.map(region => (
-          <li
-            key={region.id}
-            className={styles.item}
-            onMouseOver={() => {
-              region.toggleHightlight();
-            }}
-            onMouseOut={() => {
-              region.toggleHightlight();
-            }}
-          >
-            <Node node={region} />
-          </li>
-        ))}
-      </ul>
+      {!regions.length && <p>No Entities added yet</p>}
+      {regions.length > 0 && (
+        <ul className={styles.list}>
+          {regions.map(region => (
+            <li
+              key={region.id}
+              className={styles.item}
+              onMouseOver={() => {
+                region.toggleHightlight();
+              }}
+              onMouseOut={() => {
+                region.toggleHightlight();
+              }}
+            >
+              <Node node={region} />
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 });

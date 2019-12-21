@@ -1,1 +1,1 @@
-cp -R ./examples/ ./src/
+cp -r examples/* src/examples/

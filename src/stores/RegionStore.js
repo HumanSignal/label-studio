@@ -1,4 +1,4 @@
-import { types, getParent, destroy } from "mobx-state-tree";
+import { types, getParent, getEnv, destroy } from "mobx-state-tree";
 
 import * as HtxObjectModel from "../interfaces/object";
 
@@ -14,6 +14,7 @@ export default types
           HtxObjectModel.TextAreaRegionModel,
           HtxObjectModel.KeyPointRegionModel,
           HtxObjectModel.BrushRegionModel,
+          HtxObjectModel.HyperTextRegionModel,
         ),
       ),
     ),
@@ -21,6 +22,7 @@ export default types
   .actions(self => ({
     addRegion(region) {
       self.regions.push(region);
+      getEnv(self).onEntityCreate(region);
     },
 
     findRegion(pid) {
@@ -39,6 +41,8 @@ export default types
           arr.splice(i, 1);
         }
       }
+
+      getEnv(self).onEntityDelete(region);
     },
 
     unselectAll() {

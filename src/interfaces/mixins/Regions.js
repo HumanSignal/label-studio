@@ -24,6 +24,7 @@ const RegionsMixin = types
 
     onClickRegion() {
       const completion = self.completion;
+      if (!completion.edittable) return;
 
       if (completion.relationMode) {
         completion.addRelation(self);

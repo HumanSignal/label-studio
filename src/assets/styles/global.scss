@@ -3,3 +3,31 @@
 @import "./variables";
 @import "./mixins";
 @import "./functions";
+
+.renderall {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.renderall > div {
+  width: 49%;
+  margin-right: 1%;
+}
+
+.fade {
+  opacity: 1;
+  animation-name: fadeInOpacity;
+  animation-iteration-count: 1;
+  animation-timing-function: ease-in;
+  animation-duration: 1s;
+}
+
+@keyframes fadeInOpacity {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}

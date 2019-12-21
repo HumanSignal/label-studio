@@ -17,13 +17,12 @@ import InfoModal from "../../components/Infomodal/Infomodal";
  * @name Text
  * @param {string} name of the element
  * @param {string} value of the element
- * @param {boolean} selelectWithoutLabel controls if text can be selected without any labels selected
+ * @param {boolean} selectWithoutLabel controls if text can be selected without any labels selected
  */
 const TagAttrs = types.model("TextModel", {
   name: types.maybeNull(types.string),
-  // text: types.maybeNull(types.optional(types.string, "Please set \"value\" attribute of Text")),
   value: types.maybeNull(types.string),
-  selelectwithoutlabel: types.optional(types.boolean, false),
+  selectwithoutlabel: types.optional(types.boolean, false),
 
   hidden: types.optional(types.enumeration(["true", "false"]), "false"),
   /**
@@ -142,7 +141,7 @@ const Model = types
       /**
        * Check for correct position of region
        */
-      if (obj.value.end < 0 || obj.value.start < 0 || (isNaN(obj.value.start) || isNaN(obj.value.end))) {
+      if (obj.value.end < 0 || obj.value.start < 0 || isNaN(obj.value.start) || isNaN(obj.value.end)) {
         InfoModal.error(`Error with incorrect end or start of text: ${obj.value.text}.`);
         return;
       }
@@ -176,11 +175,7 @@ const Model = types
     },
   }));
 
-const TextModel = types.compose(
-  "TextModel",
-  TagAttrs,
-  Model,
-);
+const TextModel = types.compose("TextModel", TagAttrs, Model);
 
 class HtxTextView extends Component {
   renderRegion(letterGroup, range, textCharIndex, onMouseOverHighlightedWord) {

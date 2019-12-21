@@ -5,6 +5,12 @@
   align-items: center;
 }
 
+.completioncard {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
 .completion {
   padding: 1em !important;
   cursor: pointer;
@@ -22,7 +28,6 @@
 
   h3 {
     margin: 0;
-    margin-right: 1em;
   }
 }
 
