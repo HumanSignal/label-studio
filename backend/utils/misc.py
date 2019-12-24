@@ -135,7 +135,12 @@ def load_config():
                             help='output directory for completions')
         parser.add_argument('-p', '--port', dest='port', default=8200, type=int,
                             help='backend port')
+        parser.add_argument('-v', '--verbose', action='store_true',
+                            help='increase output verbosity')
+
         args = parser.parse_args()
+        if args.verbose:
+            logging.basicConfig(level=logging.DEBUG)
 
         print('Working dir', os.getcwd())
         config_path = args.config_path
