@@ -11,7 +11,7 @@
   "allow_delete_completions": true,
 
   "editor": {
-    "build_path": "../build/static",
+    "build_path": "static/editor",
     "debug": false
   },
 

@@ -15,6 +15,7 @@ from utils.misc import (
 )
 from utils.analytics import Analytics
 from utils.models import DEFAULT_PROJECT_ID, Project, MLBackend
+from utils.prompts import LabelStudioConfigPrompt
 
 logger = logging.getLogger(__name__)
 
@@ -34,14 +35,20 @@ ml_backend = None
 project = None
 
 
-def reload_config():
+def reload_config(prompt_inputs=False):
     global c
     global label_config_line
     global analytics
     global ml_backend
     global project
     c = load_config()
-    
+
+    if prompt_inputs:
+        iprompt = LabelStudioConfigPrompt(c)
+        c['input_data'] = iprompt.ask_input_path()
+        c['output_dir'] = iprompt.ask_output_dir()
+        c['label_config'] = iprompt.ask_label_config()
+
     label_config_line = config_line_stripped(open(c['label_config']).read())
     if analytics is None:
         analytics = Analytics(label_config_line, c.get('collect_analytics', True))
@@ -296,6 +303,19 @@ def get_data_file(filename):
     return flask.send_from_directory(directory, filename, as_attachment=True)
 
 
-if __name__ == "__main__":
-    reload_config()
+def main():
     app.run(host='0.0.0.0', port=c['port'], debug=c['debug'])
+
+
+def main_open_browser():
+    import threading, webbrowser
+
+    reload_config(prompt_inputs=True)
+    port = c['port']
+    browser_url = f'http://127.0.0.1:{port}'
+    threading.Timer(1.25, lambda: webbrowser.open(browser_url)).start()
+    app.run(host='0.0.0.0', port=c['port'], debug=c['debug'])
+
+
+if __name__ == "__main__":
+    main()
