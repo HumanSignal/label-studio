@@ -233,7 +233,6 @@ const Model = types
     },
   }));
 
-
 const RectRegionModel = types.compose("RectRegionModel", RegionsMixin, NormalizationMixin, DisabledMixin, Model);
 
 const HtxRectangleView = ({ store, item }) => {

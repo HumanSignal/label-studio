@@ -60,6 +60,11 @@ const PolygonPoint = types
     },
 
     _movePoint(x, y) {
+      // if (y)
+      //     return;
+
+      //    x = self.parent.parent.stageWidth;
+
       self.init_x = x;
       self.init_y = y;
 

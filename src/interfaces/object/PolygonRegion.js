@@ -94,6 +94,8 @@ const Model = types
     },
 
     handleLineClick({ e, flattenedPoints, insertIdx }) {
+      console.log("handleLineClick");
+
       e.cancelBubble = true;
 
       if (!self.closed) return;
@@ -143,8 +145,6 @@ const Model = types
     },
 
     destroyRegion() {
-      self.parent.setActivePolygon(null);
-      self.parent.deleteSelectedShape();
       detach(self.points);
       destroy(self.points);
     },
@@ -406,8 +406,7 @@ const HtxPolygonView = ({ store, item }) => {
       }}
       dragBoundFunc={function(pos) {
         let { x, y } = pos;
-        /* if (x < 0) x = 0; */
-        /* if (y < 0) y = 0; */
+
         const r = item.parent.stageWidth - this.getAttr("width");
         const b = item.parent.stageHeight - this.getAttr("height");
 
@@ -432,7 +431,7 @@ const HtxPolygonView = ({ store, item }) => {
 
         if (!item.closed) item.closePoly();
 
-        item.parent.setActivePolygon(null);
+        // item.parent.setActivePolygon(null);
 
         item.points.forEach(p => {
           p.afterCreate();

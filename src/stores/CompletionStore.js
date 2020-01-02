@@ -12,6 +12,7 @@ import RelationStore from "./RelationStore";
 import NormalizationStore from "./NormalizationStore";
 import RegionStore from "./RegionStore";
 import { RectangleModel } from "../interfaces/control/Rectangle";
+import { BrushModel } from "../interfaces/control/Brush";
 import Utils from "../utils";
 
 import * as HtxObjectModel from "../interfaces/object";
@@ -70,8 +71,10 @@ const Completion = types
         types.safeReference(HtxObjectModel.TextAreaRegionModel),
         types.safeReference(HtxObjectModel.PolygonRegionModel),
         types.safeReference(HtxObjectModel.KeyPointRegionModel),
+        types.safeReference(HtxObjectModel.BrushRegionModel),
         types.safeReference(HtxObjectModel.HyperTextRegionModel),
         types.safeReference(RectangleModel),
+        types.safeReference(BrushModel),
       ),
     ),
   })
@@ -197,6 +200,45 @@ const Completion = types
       destroy(region);
     },
 
+    afterAttach() {
+      console.log("afterAttach Completion Start");
+
+      // Copy tools from control tags into object tools manager
+      self.traverseTree(node => {
+        if (node && node.getToolsManager) {
+          const tools = node.getToolsManager();
+          const states = self.toNames.get(node.name);
+
+          states && states.forEach(s => tools.addToolsFromControl(s));
+        }
+      });
+
+      console.log("afterAttach Completion End");
+    },
+
+    afterCreate() {
+      //
+      // debugger;
+      console.log("afterCreate Completion STart");
+      if (self.userGenerate && !self.sentUserGenerate) {
+        self.loadedDate = new Date();
+      }
+
+      // initialize toName bindings
+      self.traverseTree(node => {
+        if (node && node.name && node.id) self.names.set(node.name, node.id);
+
+        if (node && node.toname && node.id) {
+          const val = self.toNames.get(node.toname);
+          if (val) {
+            val.push(node.id);
+          } else {
+            self.toNames.set(node.toname, [node.id]);
+          }
+        }
+      });
+    },
+
     setupHotKeys() {
       Hotkey.unbindAll();
 
@@ -206,6 +248,7 @@ const Completion = types
       let comb = mod;
 
       // [TODO] we need to traverse this two times, fix
+      // Hotkeys setup
       self.traverseTree(node => {
         if (node && node.onHotKey && node.hotkey) {
           Hotkey.addKey(node.hotkey, node.onHotKey, node.hotkeyScope);
@@ -257,6 +300,7 @@ const Completion = types
       // };
 
       Hotkey.setScope("__main__");
+      console.log("afterCreate Completion End");
     },
 
     afterAttach() {

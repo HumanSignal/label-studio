@@ -17,6 +17,7 @@ import { TranscribeAudio } from "../examples/transcribe_audio";
  * Image
  */
 import { ImageBbox } from "../examples/image_bbox";
+import { ImageSegmentation } from "../examples/image_segmentation";
 import { ImagePolygons } from "../examples/image_polygons";
 import { ImageKeyPoint } from "../examples/image_keypoints";
 import { ImageMultilabel } from "../examples/image_multilabel";

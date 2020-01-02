@@ -1,27 +1,29 @@
 import React, { Component } from "react";
 import { observer, inject, Provider } from "mobx-react";
-import {
-  detach,
-  types,
-  flow,
-  getParent,
-  getType,
-  getParentOfType,
-  destroy,
-  getRoot,
-  isValidReference,
-} from "mobx-state-tree";
+import { detach, types, flow, getParent, getType, destroy, getRoot, isValidReference } from "mobx-state-tree";
 
 import Registry from "../../core/Registry";
 import { guidGenerator, cloneNode, restoreNewsnapshot } from "../../core/Helpers";
 
+import ProcessAttrsMixin from "../mixins/ProcessAttrs";
+import Infomodal from "../../components/Infomodal/Infomodal";
+import Utils from "../../utils";
+
+// import { calcBorder } from "../../utils/floodfill";
+
+import ImageView from "../../components/ImageView/ImageView";
+
 import { RectRegionModel } from "./RectRegion";
 import { PolygonRegionModel } from "./PolygonRegion";
 import { KeyPointRegionModel } from "./KeyPointRegion";
-import ProcessAttrsMixin from "../mixins/ProcessAttrs";
-import Infomodal from "../../components/Infomodal/Infomodal";
+import { BrushRegionModel } from "./BrushRegion";
 
-import ImageView from "../../components/ImageView/ImageView";
+import * as Tools from "../tools";
+import Types from "../../core/Types";
+
+import ToolsManager from "../tools/Manager";
+
+// import Tools from "../control/ImageTools";
 
 /**
  * Image tag shows an image on the page
@@ -71,9 +73,12 @@ const TagAttrs = types.model({
 const IMAGE_CONSTANTS = {
   rectangleModel: "RectangleModel",
   rectangleLabelsModel: "RectangleLabelsModel",
+  brushLabelsModel: "BrushLabelsModel",
   rectanglelabels: "rectanglelabels",
   keypointlabels: "keypointlabels",
   polygonlabels: "polygonlabels",
+  brushlabels: "brushlabels",
+  brushModel: "BrushModel",
 };
 
 /**
@@ -110,6 +115,8 @@ const Model = types
     id: types.identifier,
     type: "image",
     _value: types.optional(types.string, ""),
+
+    // tools: types.array(BaseTool),
 
     sizeUpdated: types.optional(types.boolean, false),
 
@@ -152,17 +159,25 @@ const Model = types
     cursorPositionX: types.optional(types.number, 0),
     cursorPositionY: types.optional(types.number, 0),
 
+    brushControl: types.optional(types.string, "brush"),
+
+    brushStrokeWidth: types.optional(types.number, 15),
+
     /**
      * Mode
+     * brush for Image Segmentation
+     * eraser for Image Segmentation
      */
-    mode: types.optional(types.enumeration(["drawing", "viewing"]), "viewing"),
+    mode: types.optional(types.enumeration(["drawing", "viewing", "brush", "eraser"]), "viewing"),
 
-    selectedShape: types.safeReference(types.union(RectRegionModel, PolygonRegionModel, KeyPointRegionModel)),
-    activePolygon: types.maybeNull(types.safeReference(PolygonRegionModel)),
+    // selectedShape: types.safeReference(
+    //   types.union(BrushRegionModel, RectRegionModel, PolygonRegionModel, KeyPointRegionModel),
+    // ),
+    // activePolygon: types.maybeNull(types.safeReference(PolygonRegionModel)),
 
-    activeShape: types.maybeNull(RectRegionModel),
+    // activeShape: types.maybeNull(types.union(RectRegionModel, BrushRegionModel)),
 
-    shapes: types.array(types.union(RectRegionModel, PolygonRegionModel, KeyPointRegionModel), []),
+    shapes: types.array(types.union(BrushRegionModel, RectRegionModel, PolygonRegionModel, KeyPointRegionModel), []),
   })
   .views(self => ({
     /**
@@ -176,7 +191,8 @@ const Model = types
     /**
      * @return {object}
      */
-    get completion() {
+    completion() {
+      // return Types.getParentOfTypeString(self, "Completion");
       return getRoot(self).completionStore.selected;
     },
 
@@ -184,7 +200,7 @@ const Model = types
      * @return {object}
      */
     states() {
-      return self.completion.toNames.get(self.name);
+      return self.completion().toNames.get(self.name);
     },
 
     controlButton() {
@@ -193,7 +209,7 @@ const Model = types
       let returnedControl = names[0];
 
       names.forEach(item => {
-        if (item.type === IMAGE_CONSTANTS.rectanglelabels) {
+        if (item.type === IMAGE_CONSTANTS.rectanglelabels || item.type === IMAGE_CONSTANTS.brushlabels) {
           returnedControl = item;
         }
       });
@@ -206,6 +222,54 @@ const Model = types
       return getType(name).name;
     },
   }))
+  .actions(self => {
+    // tools
+    const tools = {};
+    const toolsManager = new ToolsManager({ obj: self });
+
+    function afterCreate() {
+      // console.log(self.id);
+      // console.log(getType(self));
+
+      toolsManager.addTool("zoom", Tools.Zoom.create({}, { manager: toolsManager }));
+
+      // tools["zoom"] = Tools.Zoom.create({ image: self.id });
+      // tools["zoom"]._image = self;
+
+      // console.log(getRoot(self));
+      // const st = self.states();
+
+      // self.states().forEach(item => {
+      // const tools = item.getTools();
+      // if (tools)
+      //     tools.forEach(t => t._image = self);
+      // });
+    }
+
+    function getTools() {
+      return Object.values(tools);
+    }
+
+    function getToolsManager() {
+      return toolsManager;
+    }
+
+    function beforeDestroy() {
+      tools = null;
+    }
+
+    function afterAttach() {
+      // console.log("afterAttach Image");
+      // console.log(self.completion().toNames);
+      // console.log(self.states());
+      // self.states() && self.states().forEach(item => {
+      //     console.log("TOOOL:");
+      //     console.log(item.getTools().get("keypoint"));
+      // });
+    }
+
+    return { afterCreate, beforeDestroy, getTools, afterAttach, getToolsManager };
+  })
   .actions(self => ({
     freezeHistory() {
       getParent(self, 3).history.freeze();
@@ -242,6 +306,18 @@ const Model = types
      */
     setBrightnessGrade(value) {
       self.brightnessGrade = value;
+    },
+
+    updateBrushControl(arg) {
+      self.brushControl = arg;
+    },
+
+    updateBrushStrokeWidth(arg) {
+      self.brushStrokeWidth = arg;
+    },
+
+    setGridSize(value) {
+      self.gridSize = value;
     },
 
     /**
@@ -294,21 +370,21 @@ const Model = types
     /**
      * Set active Polygon
      */
-    setActivePolygon(poly) {
-      self.activePolygon = poly;
-    },
+    // setActivePolygon(poly) {
+    //   self.activePolygon = poly;
+    // },
 
-    detachActivePolygon() {
-      return detach(self.activePolygon);
-    },
+    // detachActivePolygon() {
+    //   return detach(self.activePolygon);
+    // },
 
-    deleteActivePolygon() {
-      if (self.activePolygon) destroy(self.activePolygon);
-    },
+    // deleteActivePolygon() {
+    //   if (self.activePolygon) destroy(self.activePolygon);
+    // },
 
-    deleteSelectedShape() {
-      if (self.selectedShape) destroy(self.selectedShape);
-    },
+    // deleteSelectedShape() {
+    //   if (self.selectedShape) destroy(self.selectedShape);
+    // },
 
     setSelected(shape) {
       self.selectedShape = shape;
@@ -320,9 +396,18 @@ const Model = types
 
     addShape(shape) {
       self.shapes.push(shape);
-      self.completion.addRegion(shape);
-      self.setSelected(shape.id);
-      shape.selectRegion();
+
+      // console.log("SHAPE ADDED");
+      // debugger;
+
+      // console.log(self.completion);
+      // consoel.log(self.completion.addRegion);
+
+      if (!(shape.mode === "eraser" && shape.type === "brushregion")) {
+        self.completion().addRegion(shape);
+        self.setSelected(shape.id);
+        shape.selectRegion();
+      }
     },
 
     removeShape(shape) {
@@ -331,7 +416,10 @@ const Model = types
 
     startDraw({ x, y }) {
       let rect;
-      let stroke = self.controlButton().strokecolor;
+
+      console.log(self.brushStrokeWidth);
+
+      let stroke = self.brushStrokeWidth; //controlButton().strokecolor;
 
       if (self.controlButtonType === IMAGE_CONSTANTS.rectangleModel) {
         self.setMode("drawing");
@@ -354,6 +442,49 @@ const Model = types
             noadd: true,
           });
         });
+      } else if (self.controlButtonType === IMAGE_CONSTANTS.brushModel) {
+        self.setMode("brush");
+
+        rect = self._addBrush({
+          points: [x, y],
+          stroke: stroke,
+          states: null,
+          coordstype: "px",
+          noadd: true,
+        });
+      } else if (self.controlButtonType === IMAGE_CONSTANTS.brushLabelsModel) {
+        if (self.brushControl === "eraser") {
+          self.setMode(self.brushControl);
+          // self.selectedShape.addPoints(x, y, true);
+          rect = self._addBrush({
+            x: x,
+            y: y,
+            stroke: stroke,
+            coordstype: "px",
+            noadd: true,
+            mode: self.brushControl,
+          });
+
+          return;
+        }
+
+        self.lookupStates(null, (_, states) => {
+          if (states && states.length) {
+            stroke = states[0].getSelectedColor();
+          }
+
+          self.setMode(self.brushControl);
+
+          rect = self._addBrush({
+            x: x,
+            y: y,
+            stroke: stroke,
+            states: states,
+            coordstype: "px",
+            noadd: true,
+            mode: self.brushControl,
+          });
+        });
       }
 
       self.activeShape = rect;
@@ -368,198 +499,279 @@ const Model = types
       shape.setPosition(x1, y1, x2 - x1, y2 - y1, shape.rotation);
     },
 
+    addPoints({ x, y }) {
+      const shape = self.activeShape;
+      self.freezeHistory();
+
+      shape.addPoints(x, y);
+    },
+
+    addEraserPoints({ x, y }) {
+      const shape = self.selectedShape;
+      self.freezeHistory();
+
+      shape.addEraserPoints(x, y);
+    },
+
     /**
      * Lookup states
      * @param {event} ev
      * @param {function} fun
      */
-    lookupStates(ev, fun) {
-      /**
-       * Array of states
-       */
-      const states = self.completion.toNames.get(self.name);
-      self.freezeHistory();
+    // lookupStates(ev, fun) {
+    //   /**
+    //    * Array of states
+    //    */
+    //   const states = self.completion.toNames.get(self.name);
+    //   self.freezeHistory();
 
-      /**
-       * Find active states
-       */
-      const activeStates = states
-        ? states
-            .filter(c => c.isSelected)
-            .filter(
-              c =>
-                c.type === IMAGE_CONSTANTS.rectanglelabels ||
-                c.type === IMAGE_CONSTANTS.keypointlabels ||
-                c.type === IMAGE_CONSTANTS.polygonlabels,
-            )
-        : null;
+    //   /**
+    //    * Find active states
+    //    */
+    //   const activeStates = states
+    //     ? states
+    //         .filter(c => c.isSelected)
+    //         .filter(
+    //           c =>
+    //             c.type === IMAGE_CONSTANTS.rectanglelabels ||
+    //             c.type === IMAGE_CONSTANTS.keypointlabels ||
+    //             c.type === IMAGE_CONSTANTS.polygonlabels ||
+    //             c.type === IMAGE_CONSTANTS.brushlabels,
+    //         )
+    //     : null;
 
-      const clonedStates = activeStates ? activeStates.map(s => cloneNode(s)) : null;
+    //   const clonedStates = activeStates ? activeStates.map(s => cloneNode(s)) : null;
 
-      if (clonedStates.length !== 0) {
-        fun(ev, clonedStates);
-        activeStates && activeStates.forEach(s => s.type !== "choices" && s.unselectAll());
-      }
-    },
+    //   if (clonedStates.length !== 0) {
+    //     fun(ev, clonedStates);
+    //     activeStates && activeStates.forEach(s => s.type !== "choices" && s.unselectAll());
+    //   }
+    // },
 
-    onImageClick(ev) {
-      const dispmap = {
-        PolygonModel: ev => self.addPolyEv(ev),
-        KeyPointModel: ev => self._addKeyPointEv(ev),
-
-        PolygonLabelsModel: ev => {
-          if (self.activePolygon && !self.activePolygon.closed) {
-            self.addPolyEv(ev);
-          } else {
-            self.completion.setLocalUpdate(true);
-            self.lookupStates(ev, self.addPolyEv);
-          }
-        },
-        KeyPointLabelsModel: ev => {
-          self.lookupStates(ev, self._addKeyPointEv);
-        },
-      };
-
-      if (dispmap[self.controlButtonType]) {
-        return dispmap[self.controlButtonType](ev);
-      }
-    },
-
-    _addKeyPointEv(ev, states) {
+    _zoomAdjustCoords(ev) {
       const x = (ev.evt.offsetX - self.zoomingPositionX) / self.zoomScale;
       const y = (ev.evt.offsetY - self.zoomingPositionY) / self.zoomScale;
 
-      const c = self.controlButton();
-
-      let fillcolor = c.fillcolor;
-      if (states && states.length) {
-        fillcolor = states[0].getSelectedColor();
-      }
-
-      self._addKeyPoint(x, y, c.strokewidth, fillcolor, states);
+      return { x: x, y: y };
     },
 
-    _addKeyPoint(x, y, width, fillcolor, states, coordstype) {
-      const c = self.controlButton();
-      const kp = KeyPointRegionModel.create({
-        id: guidGenerator(),
-        x: x,
-        y: y,
-        width: parseFloat(width),
-        opacity: parseFloat(c.opacity),
-        fillcolor: fillcolor,
-        states: states,
-        coordstype: coordstype,
-      });
+    onImageClick(ev) {
+      const x = (ev.evt.offsetX - self.zoomingPositionX) / self.zoomScale;
+      const y = (ev.evt.offsetY - self.zoomingPositionY) / self.zoomScale;
 
-      self.addShape(kp);
+      // console.log("omImageClick");
+      self.getToolsManager().event("click", ev, x, y);
+
+      // self.states().forEach(s => Object.values(s.tools).forEach(t => t.event("click", ev, self)));
+
+      // if (ImageTools.hasTool(self.controlButtonType))
+      //     ImageTools.imageEvent("click", ev, self);
     },
 
-    _addRectEv(ev, states) {
-      const iw = 200;
-      const ih = 200;
+    onMouseDown(ev) {
+      const x = (ev.evt.offsetX - self.zoomingPositionX) / self.zoomScale;
+      const y = (ev.evt.offsetY - self.zoomingPositionY) / self.zoomScale;
 
-      // based on image width and height we can place rect somewhere
-      // in the center
-      const sw = 100;
-      const sh = 100;
-      // const name = guidGenerator();
-
-      let stroke = self.controlButton().strokecolor;
-      // let stroke = self.editor.rectstrokecolor;
-      // const states = self.states;
-      // TODO you may need to filter this states, check Text.js
-      if (states && states.length) {
-        stroke = states[0].getSelectedColor();
-      }
-
-      const wp = self.stageWidth / self.naturalWidth;
-      const hp = self.stageHeight / self.naturalHeight;
-
-      const wx = ev.evt.offsetX;
-      const wy = ev.evt.offsetY;
-
-      return self._addRect({
-        x: Math.floor(wx - sw / 2),
-        y: Math.floor(wy - sh / 2),
-        sw: sw,
-        sh: sh,
-        stroke: stroke,
-        states: states,
-      });
+      self.getToolsManager().event("mousedown", ev, x, y);
     },
 
-    _addRect({ x, y, sw, sh, stroke, states, coordstype, noadd, rotation }) {
-      const c = self.controlButton();
+    onMouseMove(ev) {
+      const x = (ev.evt.offsetX - self.zoomingPositionX) / self.zoomScale;
+      const y = (ev.evt.offsetY - self.zoomingPositionY) / self.zoomScale;
 
-      let localStates = states;
-
-      if (states && !states.length) {
-        localStates = [states];
-      }
-
-      const rect = RectRegionModel.create({
-        id: guidGenerator(),
-
-        x: x,
-        y: y,
-
-        width: sw,
-        height: sh,
-
-        opacity: parseFloat(c.opacity),
-        fillcolor: c.fillcolor ? c.fillcolor : stroke,
-
-        strokeWidth: c.strokeWidth,
-        strokeColor: stroke,
-
-        states: localStates,
-
-        rotation: rotation,
-
-        coordstype: coordstype,
-      });
-
-      if (noadd !== true) {
-        self.addShape(rect);
-      }
-
-      return rect;
+      self.getToolsManager().event("mousemove", ev, x, y);
     },
 
-    addPolyEv(ev, states) {
-      self.freezeHistory();
-      const w = 10;
-      const isValid = isValidReference(() => self.activePolygon);
-
-      if (!isValid || (self.activePolygon && self.activePolygon.closed)) {
-        self.setActivePolygon(null);
-      }
-
-      if (self.completion.dragMode === false) {
-        const x = (ev.evt.offsetX - self.zoomingPositionX) / self.zoomScale;
-        const y = (ev.evt.offsetY - self.zoomingPositionY) / self.zoomScale;
-
-        let stroke = self.controlButton().strokecolor;
-
-        if (states && states.length) {
-          stroke = states[0].getSelectedColor();
-        }
-
-        self._addPoly({ x: x, y: y, width: w, stroke: stroke, states: states, coordstype: "px", stateFlag: false });
-
-        const stage = self.stageRef;
-
-        stage.container().style.cursor = "default";
-      }
+    onMouseUp(ev) {
+      self.getToolsManager().event("mouseup", ev);
     },
 
-    addPolygonObject({ x, y, width, stroke, states, coordstype, stateFlag }) {
-      self.freezeHistory();
-      let activePolygon = self.activePolygon;
+    // onImageClick(ev) {
+    //   const dispmap = {
+    //     PolygonModel: ev => self.addPolyEv(ev),
+    //     KeyPointModel: ev => self._addKeyPointEv(ev),
 
-      return activePolygon;
-    },
+    //     PolygonLabelsModel: ev => {
+    //       if (self.activePolygon && !self.activePolygon.closed) {
+    //         self.addPolyEv(ev);
+    //       } else {
+    //         self.completion.setLocalUpdate(true);
+    //         self.lookupStates(ev, self.addPolyEv);
+    //       }
+    //     },
+    //     KeyPointLabelsModel: ev => {
+    //       self.lookupStates(ev, self._addKeyPointEv);
+    //     },
+    //   };
+
+    //   if (dispmap[self.controlButtonType]) {
+    //     return dispmap[self.controlButtonType](ev);
+    //   }
+    // },
+
+    // _addKeyPointEv(ev, states) {
+    //   const x = (ev.evt.offsetX - self.zoomingPositionX) / self.zoomScale;
+    //   const y = (ev.evt.offsetY - self.zoomingPositionY) / self.zoomScale;
+
+    //   const c = self.controlButton();
+
+    //   let fillcolor = c.fillcolor;
+    //   if (states && states.length) {
+    //     fillcolor = states[0].getSelectedColor();
+    //   }
+
+    //   self._addKeyPoint(x, y, c.strokewidth, fillcolor, states);
+    // },
+
+    // _addKeyPoint(x, y, width, fillcolor, states, coordstype) {
+    //   const c = self.controlButton();
+    //   const kp = KeyPointRegionModel.create({
+    //     id: guidGenerator(),
+    //     x: x,
+    //     y: y,
+    //     width: parseFloat(width),
+    //     opacity: parseFloat(c.opacity),
+    //     fillcolor: fillcolor,
+    //     states: states,
+    //     coordstype: coordstype,
+    //   });
+
+    //   self.addShape(kp);
+    // },
+
+    // _addRectEv(ev, states) {
+    //   const iw = 200;
+    //   const ih = 200;
+
+    //   // based on image width and height we can place rect somewhere
+    //   // in the center
+    //   const sw = 100;
+    //   const sh = 100;
+    //   // const name = guidGenerator();
+
+    //   let stroke = self.controlButton().strokecolor;
+    //   // let stroke = self.editor.rectstrokecolor;
+    //   // const states = self.states;
+    //   // TODO you may need to filter this states, check Text.js
+    //   if (states && states.length) {
+    //     stroke = states[0].getSelectedColor();
+    //   }
+
+    //   const wp = self.stageWidth / self.naturalWidth;
+    //   const hp = self.stageHeight / self.naturalHeight;
+
+    //   const wx = ev.evt.offsetX;
+    //   const wy = ev.evt.offsetY;
+
+    //   return self._addRect({
+    //     x: Math.floor(wx - sw / 2),
+    //     y: Math.floor(wy - sh / 2),
+    //     sw: sw,
+    //     sh: sh,
+    //     stroke: stroke,
+    //     states: states,
+    //   });
+    // },
+
+    // _addRect({ x, y, sw, sh, stroke, states, coordstype, noadd, rotation }) {
+    //   const c = self.controlButton();
+
+    //   let localStates = states;
+
+    //   if (states && !states.length) {
+    //     localStates = [states];
+    //   }
+
+    //   const rect = RectRegionModel.create({
+    //     id: guidGenerator(),
+
+    //     x: x,
+    //     y: y,
+
+    //     width: sw,
+    //     height: sh,
+
+    //     opacity: parseFloat(c.opacity),
+    //     fillcolor: c.fillcolor ? c.fillcolor : stroke,
+
+    //     strokeWidth: c.strokeWidth,
+    //     strokeColor: stroke,
+
+    //     states: localStates,
+
+    //     rotation: rotation,
+
+    //     coordstype: coordstype,
+    //   });
+
+    //   if (noadd !== true) {
+    //     self.addShape(rect);
+    //   }
+
+    //   return rect;
+    // },
+
+    // _addBrush({ x, y, stroke, states, coordstype, noadd, mode, points, eraserpoints, rotation }) {
+    //   const c = self.controlButton();
+
+    //   let localStates = states;
+
+    //   if (states && !states.length) {
+    //     localStates = [states];
+    //   }
+
+    //   const rect = BrushRegionModel.create({
+    //     id: guidGenerator(),
+
+    //     start_x: x,
+    //     start_y: y,
+
+    //     strokeWidth: c.strokeWidth,
+    //     strokeColor: stroke,
+
+    //     states: localStates,
+
+    //     points: points,
+    //     eraserpoints: eraserpoints,
+
+    //     coordstype: coordstype,
+
+    //     mode: mode,
+    //   });
+
+    //   if (noadd !== true) {
+    //     self.addShape(rect);
+    //   }
+
+    //   return rect;
+    // },
+
+    // addPolyEv(ev, states) {
+    //   self.freezeHistory();
+    //   const w = 10;
+    //   const isValid = isValidReference(() => self.activePolygon);
+
+    //   if (!isValid || (self.activePolygon && self.activePolygon.closed)) {
+    //     self.setActivePolygon(null);
+    //   }
+
+    //   if (self.completion.dragMode === false) {
+    //     const x = (ev.evt.offsetX - self.zoomingPositionX) / self.zoomScale;
+    //     const y = (ev.evt.offsetY - self.zoomingPositionY) / self.zoomScale;
+
+    //     let stroke = self.controlButton().strokecolor;
+
+    //     if (states && states.length) {
+    //       stroke = states[0].getSelectedColor();
+    //     }
+
+    //     self._addPoly({ x: x, y: y, width: w, stroke: stroke, states: states, coordstype: "perc", stateFlag: false });
+
+    //     const stage = self.stageRef;
+
+    //     stage.container().style.cursor = "default";
+    //   }
+    // },
 
     /**
      * Add new polygon object
@@ -572,47 +784,47 @@ const Model = types
      * @param {boolean} stateFlag
      * @param {string} id
      */
-    _addPoly({ x, y, width, stroke, states, coordstype, stateFlag, id }) {
-      let newPolygon = self.activePolygon;
-      self.freezeHistory();
+    // _addPoly({ x, y, width, stroke, states, coordstype, stateFlag, id }) {
+    //   let newPolygon = self.activePolygon;
+    //   self.freezeHistory();
 
-      if (stateFlag || !self.activePolygon) {
-        const c = self.controlButton();
-        const polygonID = id ? id : guidGenerator();
-        const polygonOpacity = parseFloat(c.opacity);
-        const polygonStrokeWidth = parseInt(c.strokewidth);
+    //   if (stateFlag || !self.activePolygon) {
+    //     const c = self.controlButton();
+    //     const polygonID = id ? id : guidGenerator();
+    //     const polygonOpacity = parseFloat(c.opacity);
+    //     const polygonStrokeWidth = parseInt(c.strokewidth);
 
-        newPolygon = PolygonRegionModel.create({
-          id: polygonID,
-          x: x,
-          y: y,
-          width: width,
-          height: width,
+    //     newPolygon = PolygonRegionModel.create({
+    //       id: polygonID,
+    //       x: x,
+    //       y: y,
+    //       width: width,
+    //       height: width,
 
-          opacity: polygonOpacity,
-          fillcolor: c.fillcolor,
+    //       opacity: polygonOpacity,
+    //       fillcolor: c.fillcolor,
 
-          strokewidth: polygonStrokeWidth,
-          strokecolor: stroke,
+    //       strokewidth: polygonStrokeWidth,
+    //       strokecolor: stroke,
 
-          pointsize: c.pointsize,
-          pointstyle: c.pointstyle,
+    //       pointsize: c.pointsize,
+    //       pointstyle: c.pointstyle,
 
-          states: states,
+    //       states: states,
 
-          coordstype: coordstype,
-        });
+    //       coordstype: coordstype,
+    //     });
 
-        self.setActivePolygon(newPolygon);
+    //     self.setActivePolygon(newPolygon);
 
-        self.shapes.push(newPolygon);
-        self.completion.addRegion(newPolygon);
-      }
+    //     self.shapes.push(newPolygon);
+    //     self.completion.addRegion(newPolygon);
+    //   }
 
-      newPolygon.addPoint(x, y);
+    //   newPolygon.addPoint(x, y);
 
-      return newPolygon;
-    },
+    //   return newPolygon;
+    // },
 
     /**
      * Resize of image canvas
@@ -632,89 +844,93 @@ const Model = types
       return t;
     },
 
+    /**
+     * Transform JSON data (completions and predictions) to format
+     */
+
     fromStateJSON(obj, fromModel) {
-      const params = ["choices", "shape", "rectanglelabels", "polygonlabels"];
-
-      /**
-       * Check correct controls for image object
-       */
-      params.forEach(item => {
-        if (!item in obj.value) {
-          Infomodal.error("Not valid control for Image");
-          return;
-        }
-      });
-
-      /**
-       * Choices
-       */
-      if (obj.value.choices) {
-        self.completion.names.get(obj.from_name).fromStateJSON(obj);
-      }
-
-      /**
-       * Rectangle labels
-       */
-      if (obj.value.rectanglelabels) {
-        const states = restoreNewsnapshot(fromModel);
-
-        states.fromStateJSON(obj);
-
-        self._addRect({
-          x: obj.value.x,
-          y: obj.value.y,
-          sw: obj.value.width,
-          sh: obj.value.height,
-          stroke: states.getSelectedColor(),
-          states: [states],
-          coordstype: "perc",
-          rotation: obj.value.rotation,
-        });
-      }
-
-      if (obj.value.keypointlabels) {
-        const states = restoreNewsnapshot(fromModel);
-
-        states.fromStateJSON(obj);
-        self._addKeyPoint(obj.value.x, obj.value.y, obj.value.width, states.getSelectedColor(), [states], "perc");
-      }
-
-      if (obj.value.polygonlabels) {
-        const states = restoreNewsnapshot(fromModel);
-
-        states.fromStateJSON(obj);
-
-        const poly = self._addPoly({
-          id: obj.id,
-          x: obj.value.points[0][0],
-          y: obj.value.points[0][1],
-          width: 10,
-          stroke: states.getSelectedColor(),
-          states: [states],
-          coordstype: "perc",
-          stateFlag: true,
-        });
-
-        for (var i = 1; i < obj.value.points.length; i++) {
-          poly.addPoint(obj.value.points[i][0], obj.value.points[i][1]);
-        }
-
-        poly.closePoly();
-      }
-
-      /**
-       * Shapes
-       */
-      if (obj.value.shape) {
-        let modifySnap;
-        let shapeModel;
-
-        if (obj.from_name !== obj.to_name) {
-          modifySnap = restoreNewsnapshot(fromModel);
-          shapeModel = modifySnap.fromStateJSON(obj);
-          self.shapes.push(shapeModel);
-        }
-      }
+      // const params = ["choices", "shape", "rectanglelabels", "polygonlabels", "brushlabels"];
+      // /**
+      //  * Check correct controls for image object
+      //  */
+      // params.forEach(item => {
+      //   if (!item in obj.value) {
+      //     Infomodal.error("Not valid control for Image");
+      //     return;
+      //   }
+      // });
+      // /**
+      //  * Choices
+      //  */
+      // if (obj.value.choices) {
+      //   self.completion.names.get(obj.from_name).fromStateJSON(obj);
+      // }
+      // /**
+      //  * Rectangle labels
+      //  */
+      // if (obj.value.rectanglelabels) {
+      //   const states = restoreNewsnapshot(fromModel);
+      //   states.fromStateJSON(obj);
+      //   self._addRect({
+      //     x: obj.value.x,
+      //     y: obj.value.y,
+      //     sw: obj.value.width,
+      //     sh: obj.value.height,
+      //     stroke: states.getSelectedColor(),
+      //     states: [states],
+      //     coordstype: "perc",
+      //     rotation: obj.value.rotation,
+      //   });
+      // }
+      // if (obj.value.keypointlabels) {
+      //   const states = restoreNewsnapshot(fromModel);
+      //     states.fromStateJSON(obj);
+      //     // ImageTools.getTool("keypoints").create();
+      //   self._addKeyPoint(obj.value.x, obj.value.y, obj.value.width, states.getSelectedColor(), [states], "perc");
+      // }
+      // if (obj.value.polygonlabels) {
+      //   const states = restoreNewsnapshot(fromModel);
+      //   states.fromStateJSON(obj);
+      //   const poly = self._addPoly({
+      //     id: obj.id,
+      //     x: obj.value.points[0][0],
+      //     y: obj.value.points[0][1],
+      //     width: 10,
+      //     stroke: states.getSelectedColor(),
+      //     states: [states],
+      //     coordstype: "perc",
+      //     stateFlag: true,
+      //   });
+      //   for (var i = 1; i < obj.value.points.length; i++) {
+      //     poly.addPoint(obj.value.points[i][0], obj.value.points[i][1]);
+      //   }
+      //   poly.closePoly();
+      // }
+      // if (obj.value.brushlabels) {
+      //   const states = restoreNewsnapshot(fromModel);
+      //   states.fromStateJSON(obj);
+      //   self._addBrush({
+      //     x: obj.value.points[0],
+      //     y: obj.value.points[1],
+      //     stroke: states.getSelectedColor(),
+      //     states: states,
+      //     coordstype: "px",
+      //     noadd: false,
+      //     points: obj.value.points,
+      //     eraserpoints: obj.value.eraserpoints,
+      //   });
+      // }
+      // /**
+      //  * Shapes
+      //  */
+      // if (obj.value.shape) {
+      //   let modifySnap;
+      //   let shapeModel;
+      //   if (obj.from_name !== obj.to_name) {
+      //     modifySnap = restoreNewsnapshot(fromModel);
+      //     shapeModel = modifySnap.fromStateJSON(obj);
+      //     self.shapes.push(shapeModel);
+      //   }
     },
   }));
 

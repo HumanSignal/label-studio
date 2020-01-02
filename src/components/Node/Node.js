@@ -37,10 +37,10 @@ const Node = observer(({ node }) => {
   if (getType(node).name === "AudioRegionModel") {
     return (
       <p>
-        <a href="" onClick={click} className={styles.node}>
+        <span onClick={click} className={styles.node}>
           <i className="microphone icon" />
           Audio {node.start.toFixed(2)} - {node.end.toFixed(2)}
-        </a>
+        </span>
       </p>
     );
   }
@@ -48,10 +48,10 @@ const Node = observer(({ node }) => {
   if (getType(node).name === "TextAreaRegionModel") {
     return (
       <p>
-        <a href="" onClick={click} className={styles.node}>
+        <span onClick={click} className={styles.node}>
           <i className="i cursor icon" />
           Input <span style={{ color: "#5a5a5a" }}>{node._value}</span>
-        </a>
+        </span>
       </p>
     );
   }
@@ -61,10 +61,10 @@ const Node = observer(({ node }) => {
     const y = node.height * node.scaleY;
     return (
       <p>
-        <a href="" onClick={click} className={styles.node}>
+        <span onClick={click} className={styles.node}>
           <i className="expand icon" />
           Rectangle {w.toFixed(2)} x {y.toFixed(2)}
-        </a>
+        </span>
       </p>
     );
   }
@@ -72,10 +72,10 @@ const Node = observer(({ node }) => {
   if (getType(node).name === "PolygonRegionModel") {
     return (
       <p>
-        <a href="" onClick={click} className={styles.node}>
+        <span onClick={click} className={styles.node}>
           <i className="i object ungroup outline icon" />
           Polygon
-        </a>
+        </span>
       </p>
     );
   }
@@ -83,10 +83,21 @@ const Node = observer(({ node }) => {
   if (getType(node).name === "KeyPointRegionModel") {
     return (
       <p>
-        <a href="" onClick={click} className={styles.node}>
+        <span onClick={click} className={styles.node}>
           <i className="i object bullseye icon" />
           KeyPoint
-        </a>
+        </span>
+      </p>
+    );
+  }
+
+  if (getType(node).name === "BrushRegionModel") {
+    return (
+      <p>
+        <Icon type="highlight" />
+        <span onClick={click} className={styles.node}>
+          &nbsp; Brush
+        </span>
       </p>
     );
   }
@@ -150,6 +161,15 @@ const NodeMinimal = ({ node }) => {
       <Fragment>
         <i className="i object bullseye icon" />
         KeyPoint
+      </Fragment>
+    );
+  }
+
+  if (getType(node).name === "BrushRegionModel") {
+    return (
+      <Fragment>
+        <Icon type="highlight" />
+        &nbsp; Brush
       </Fragment>
     );
   }

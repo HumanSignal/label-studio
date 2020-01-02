@@ -8,6 +8,8 @@ import { isHtx, cloneNode } from "../../core/Helpers";
 import { guidGenerator } from "../../core/Helpers";
 import { PolygonRegionModel } from "../object/PolygonRegion";
 
+import * as Tools from "../tools";
+
 /**
  * Polygon tag
  * Polygon is used to add polygons to an image
@@ -33,11 +35,11 @@ const TagAttrs = types.model({
   opacity: types.optional(types.string, "0.6"),
   fillcolor: types.maybeNull(types.string),
 
-  strokewidth: types.optional(types.string, "1"),
+  strokewidth: types.optional(types.string, "4"),
   strokecolor: types.optional(types.string, "#f48a42"),
 
-  pointsize: types.optional(types.string, "medium"),
-  pointstyle: types.optional(types.string, "rectangle"),
+  pointsize: types.optional(types.string, "small"),
+  pointstyle: types.optional(types.string, "circle"),
 });
 
 const Model = types
@@ -67,13 +69,20 @@ const Model = types
       return states ? states.filter(c => c.isSelected === true) : null;
     },
   }))
-  .actions(self => ({}));
+  .actions(self => ({
+    getTools() {
+      return Object.values(self.tools);
+    },
 
-const PolygonModel = types.compose(
-  "PolygonModel",
-  TagAttrs,
-  Model,
-);
+    afterCreate() {
+      const poly = Tools.Polygon.create();
+      poly._control = self;
+
+      self.tools = { poly: poly };
+    },
+  }));
+
+const PolygonModel = types.compose("PolygonModel", TagAttrs, Model);
 
 const HtxView = inject("store")(
   observer(({ store, item }) => {

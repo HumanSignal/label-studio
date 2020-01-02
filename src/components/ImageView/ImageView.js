@@ -7,6 +7,9 @@ import Tree from "../../core/Tree";
 import ImageTransformer from "../ImageTransformer/ImageTransformer";
 import ImageControls from "../ImageControls/ImageControls";
 import ImageGrid from "../ImageGrid/ImageGrid";
+import Utils from "../../utils";
+
+import styles from "./ImageView.module.scss";
 
 export default observer(
   class ImageView extends Component {
@@ -25,6 +28,64 @@ export default observer(
     };
 
     /**
+     * Handler for mouse down
+     */
+    handleStageMouseDown = e => {
+      const { item } = this.props;
+
+      // item.freezeHistory();
+
+      console.log("handleStageMouseDown");
+      const p = e.target.getParent();
+
+      if (p && p.className === "Transformer") {
+        return;
+      }
+
+      if (e.target === e.target.getStage() || (e.target.parent && e.target.parent.attrs.name === "ruler")) {
+        return item.onMouseDown(e);
+      }
+
+      return true;
+      // /**
+      //  * Disable polygon event handler
+      //  */
+      // if (item.controlButtonType === "PolygonLabelsModel") {
+      //   return;
+      // }
+
+      // /**
+      //  * Brush event handler
+      //  */
+      // if (item.controlButtonType === "BrushLabelsModel") {
+      //   const { x, y } = e.target.getStage().getPointerPosition();
+
+      //   item.startDraw({ x: Math.floor(x), y: Math.floor(y) });
+
+      //   return;
+      // }
+
+      // if (e.target === e.target.getStage() || (e.target.parent && e.target.parent.attrs.name === "ruler")) {
+      //   // draw rect
+
+      //   const x = (e.evt.offsetX - item.zoomingPositionX) / item.zoomScale;
+      //   const y = (e.evt.offsetY - item.zoomingPositionY) / item.zoomScale;
+
+      //   item.startDraw({ x: x, y: y });
+
+      //   return;
+      // }
+
+      // const clickedOnTransformer = e.target.getParent().className === "Transformer";
+
+      // if (clickedOnTransformer) {
+      //   return;
+      // }
+
+      return true;
+    };
+
+    /**
      * Handler of mouse up
      */
     handleMouseUp = e => {
@@ -32,74 +93,73 @@ export default observer(
 
       item.freezeHistory();
 
-      if (item.mode === "drawing") {
-        /**
-         * Set mode of Image for "view"
-         */
-        item.setMode("viewing");
+      return item.onMouseUp(e);
 
-        /**
-         * Constants of min size of bounding box
-         */
-        const minSize = { width: 3, height: 3 };
+      // if (item.mode === "drawing") {
+      //   /**
+      //    * Set mode of Image for "view"
+      //    */
+      //   item.setMode("viewing");
 
-        /**
-         * Current shape
-         */
-        const currentShape = item.detachActiveShape();
+      //   /**
+      //    * Constants of min size of bounding box
+      //    */
+      //   const minSize = { width: 3, height: 3 };
 
-        /**
-         * Check for minimal size of boundng box
-         */
-        if (currentShape.width > minSize.width && currentShape.height > minSize.height) item.addShape(currentShape);
-      }
+      //   /**
+      //    * Current shape
+      //    */
+      //   const currentShape = item.detachActiveShape();
+
+      //   /**
+      //    * Check for minimal size of boundng box
+      //    */
+      //   if (currentShape.width > minSize.width && currentShape.height > minSize.height) item.addShape(currentShape);
+      // } else if (item.mode === "brush") {
+      //   item.setMode("viewing");
+
+      //   const currentShape = item.detachActiveShape();
+      //   item.addShape(currentShape);
+      // } else if (item.mode === "eraser") {
+      //   item.setMode("viewing");
+      // }
     };
 
+    /**
+     * Handler for mouse move
+     */
     handleMouseMove = e => {
       const { item } = this.props;
+      /**
+       * Freeze this event
+       */
       item.freezeHistory();
-      if (item.mode === "drawing") {
-        const x = (e.evt.offsetX - item.zoomingPositionX) / item.zoomScale;
-        const y = (e.evt.offsetY - item.zoomingPositionY) / item.zoomScale;
 
-        item.updateDraw({ x: x, y: y });
-      }
+      return item.onMouseMove(e);
 
-      item.setPointerPosition({ x: e.evt.offsetX, y: e.evt.offsetY });
+      // /**
+      //  *
+      //  */
+      // if (item.mode === "drawing") {
+      //   const x = (e.evt.offsetX - item.zoomingPositionX) / item.zoomScale;
+      //   const y = (e.evt.offsetY - item.zoomingPositionY) / item.zoomScale;
+
+      //   item.updateDraw({ x: x, y: y });
+      // } else if (item.mode === "brush") {
+      //   const { x, y } = e.target.getStage().getPointerPosition();
+      //   item.addPoints({ x: Math.floor(x), y: Math.floor(y) });
+      // } else if (item.mode === "eraser") {
+      //   const { x, y } = e.target.getStage().getPointerPosition();
+      //   item.addEraserPoints({ x: Math.floor(x), y: Math.floor(y) });
+      // }
+
+      // item.setPointerPosition({ x: e.evt.offsetX, y: e.evt.offsetY });
     };
 
     handleMouseOver = e => {
       const { item } = this.props;
 
-      item.freezeHistory();
-    };
-
-    handleStageMouseDown = e => {
-      const { item } = this.props;
-      item.freezeHistory();
-
-      if (item.controlButtonType === "PolygonLabelsModel") {
-        return;
-      }
-
-      if (e.target === e.target.getStage() || (e.target.parent && e.target.parent.attrs.name === "ruler")) {
-        // draw rect
-
-        const x = (e.evt.offsetX - item.zoomingPositionX) / item.zoomScale;
-        const y = (e.evt.offsetY - item.zoomingPositionY) / item.zoomScale;
-
-        item.startDraw({ x: x, y: y });
-
-        return;
-      }
-
-      // clicked on transformer - do nothing
-      const clickedOnTransformer = e.target.getParent().className === "Transformer";
-      if (clickedOnTransformer) {
-        return;
-      }
-
-      return true;
+      // item.freezeHistory();
     };
 
     /**
@@ -112,79 +172,90 @@ export default observer(
       item.setBrightnessGrade(range);
     };
 
-    /**
-     * Handle to zoom
-     */
-    handleZoom = e => {
-      /**
-       * Disable if user doesn't use ctrl
-       */
-      if (e.evt && !e.evt.ctrlKey) {
-        return;
-      } else if (e.evt && e.evt.ctrlKey) {
-        /**
-         * Disable scrolling page
-         */
-        e.evt.preventDefault();
-      }
+    updateBrushControl = arg => this.props.item.updateBrushControl(arg);
 
+    updateBrushStrokeWidth = arg => this.props.item.updateBrushStrokeWidth(arg);
+
+    updateGridSize = range => {
       const { item } = this.props;
       item.freezeHistory();
 
-      const stage = item.stageRef;
-      const scaleBy = parseFloat(item.zoomby);
-      const oldScale = stage.scaleX();
-
-      let mousePointTo;
-      let newScale;
-      let pos;
-      let newPos;
-
-      if (e.evt) {
-        mousePointTo = {
-          x: stage.getPointerPosition().x / oldScale - stage.x() / oldScale,
-          y: stage.getPointerPosition().y / oldScale - stage.y() / oldScale,
-        };
-
-        newScale = e.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
-
-        newPos = {
-          x: -(mousePointTo.x - stage.getPointerPosition().x / newScale) * newScale,
-          y: -(mousePointTo.y - stage.getPointerPosition().y / newScale) * newScale,
-        };
-      } else {
-        pos = {
-          x: stage.width() / 2,
-          y: stage.height() / 2,
-        };
-
-        mousePointTo = {
-          x: pos.x / oldScale - stage.x() / oldScale,
-          y: pos.y / oldScale - stage.y() / oldScale,
-        };
-
-        newScale = Math.max(0.05, oldScale * e);
-
-        newPos = {
-          x: -(mousePointTo.x - pos.x / newScale) * newScale,
-          y: -(mousePointTo.y - pos.y / newScale) * newScale,
-        };
-      }
-
-      if (item.negativezoom !== true && newScale <= 1) {
-        item.setZoom(1, 0, 0);
-        stage.scale({ x: 1, y: 1 });
-        stage.position({ x: 0, y: 0 });
-        stage.batchDraw();
-        return;
-      }
-
-      stage.scale({ x: newScale, y: newScale });
-
-      item.setZoom(newScale, newPos.x, newPos.y);
-      stage.position(newPos);
-      stage.batchDraw();
+      item.setGridSize(range);
     };
+
+    /**
+     * Handle to zoom
+     */
+    // handleZoom = e => {
+    //   /**
+    //    * Disable if user doesn't use ctrl
+    //    */
+    //   if (e.evt && !e.evt.ctrlKey) {
+    //     return;
+    //   } else if (e.evt && e.evt.ctrlKey) {
+    //     /**
+    //      * Disable scrolling page
+    //      */
+    //     e.evt.preventDefault();
+    //   }
+
+    //   const { item } = this.props;
+    //   item.freezeHistory();
+
+    //   const stage = item.stageRef;
+    //   const scaleBy = parseFloat(item.zoomby);
+    //   const oldScale = stage.scaleX();
+
+    //   let mousePointTo;
+    //   let newScale;
+    //   let pos;
+    //   let newPos;
+
+    //   if (e.evt) {
+    //     mousePointTo = {
+    //       x: stage.getPointerPosition().x / oldScale - stage.x() / oldScale,
+    //       y: stage.getPointerPosition().y / oldScale - stage.y() / oldScale,
+    //     };
+
+    //     newScale = e.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
+
+    //     newPos = {
+    //       x: -(mousePointTo.x - stage.getPointerPosition().x / newScale) * newScale,
+    //       y: -(mousePointTo.y - stage.getPointerPosition().y / newScale) * newScale,
+    //     };
+    //   } else {
+    //     pos = {
+    //       x: stage.width() / 2,
+    //       y: stage.height() / 2,
+    //     };
+
+    //     mousePointTo = {
+    //       x: pos.x / oldScale - stage.x() / oldScale,
+    //       y: pos.y / oldScale - stage.y() / oldScale,
+    //     };
+
+    //     newScale = Math.max(0.05, oldScale * e);
+
+    //     newPos = {
+    //       x: -(mousePointTo.x - pos.x / newScale) * newScale,
+    //       y: -(mousePointTo.y - pos.y / newScale) * newScale,
+    //     };
+    //   }
+
+    //   if (item.negativezoom !== true && newScale <= 1) {
+    //     item.setZoom(1, 0, 0);
+    //     stage.scale({ x: 1, y: 1 });
+    //     stage.position({ x: 0, y: 0 });
+    //     stage.batchDraw();
+    //     return;
+    //   }
+
+    //   stage.scale({ x: newScale, y: newScale });
+
+    //   item.setZoom(newScale, newPos.x, newPos.y);
+    //   stage.position(newPos);
+    //   stage.batchDraw();
+    // };
 
     renderRulers() {
       const { item } = this.props;
@@ -236,6 +307,9 @@ export default observer(
 
     render() {
       const { item, store } = this.props;
+
+      // console.log("ImageView render");
+      // console.log(item.tools);
 
       // TODO fix me
       if (!store.task) return null;
@@ -290,21 +364,38 @@ export default observer(
               onMouseDown={this.handleStageMouseDown}
               onMouseMove={this.handleMouseMove}
               onMouseUp={this.handleMouseUp}
-              onWheel={item.zoom ? this.handleZoom : () => {}}
+              // onWheel={item.zoom ? this.handleZoom : () => {}}
             >
               {item.grid && item.sizeUpdated && <ImageGrid item={item} />}
+              {item.shapes.map(shape => {
+                let brushShape;
+                if (shape.type === "brushregion") {
+                  brushShape = (
+                    <Layer name="brushLayer" id={shape.id}>
+                      {Tree.renderItem(shape)}
+                    </Layer>
+                  );
+                }
+                return brushShape;
+              })}
               <Layer>
                 {item.shapes.map(shape => {
-                  return Tree.renderItem(shape);
+                  if (shape.type !== "brushregion") {
+                    return Tree.renderItem(shape);
+                  }
                 })}
                 {item.activeShape && Tree.renderItem(item.activeShape)}
 
                 <ImageTransformer rotateEnabled={item.controlButton().canrotate} selectedShape={item.selectedShape} />
               </Layer>
             </Stage>
-            {item.zoom || item.brightness ? (
-              <ImageControls item={item} handleZoom={this.handleZoom} updateBrightness={this.updateBrightness} />
-            ) : null}
+
+            <div className={styles.block}>
+              {item
+                .getToolsManager()
+                .allTools()
+                .map(t => t.viewClass)}
+            </div>
           </div>
         );
       } else {
@@ -318,3 +409,12 @@ export default observer(
     }
   },
 );
+
+// <ImageControls
+//   item={item}
+//   handleZoom={this.handleZoom}
+//   updateBrightness={this.updateBrightness}
+//   updateGridSize={this.updateGridSize}
+//   updateBrushControl={this.updateBrushControl}
+//   updateBrushStrokeWidth={this.updateBrushStrokeWidth}
+// />

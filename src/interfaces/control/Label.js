@@ -70,6 +70,7 @@ const Model = types
         "RectangleLabelsModel",
         "PolygonLabelsModel",
         "KeyPointLabelsModel",
+        "BrushLabelsModel",
       ]);
 
       labels.finishCurrentObject();

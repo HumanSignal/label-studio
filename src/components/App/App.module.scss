@@ -4,10 +4,6 @@
   min-width: 320px;
   margin: 0 auto;
 
-  @media screen and (max-width: 1400px) {
-    max-width: 1000px;
-  }
-
   @include respond("phone") {
     width: 300px;
     min-width: 300px;
