@@ -21,10 +21,10 @@ class LabelStudioConfigPrompt(object):
         return answer
 
     def ask_input_path(self):
-        return self._ask_path('input_path', 'Type your input data path with tasks')
+        return self._ask_path('input_path', 'Type your input data path with tasks:')
 
     def ask_output_dir(self):
-        return self._ask_path('output_dir', 'Type your output directory path with completions')
+        return self._ask_path('output_dir', 'Type your output directory path with completions:')
 
     def ask_label_config(self):
-        return self._ask_path('label_config', 'Type your XML-formatted label config path')
+        return self._ask_path('label_config', 'Type your XML-formatted label config path:')
