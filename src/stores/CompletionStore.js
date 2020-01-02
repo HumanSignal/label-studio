@@ -207,9 +207,9 @@ const Completion = types
       console.log("afterAttach Completion Start");
 
       self.traverseTree(node => {
-        // Copy tools from control tags into object tools manager
         if (node.updateValue) node.updateValue(self.store);
 
+        // Copy tools from control tags into object tools manager
         if (node && node.getToolsManager) {
           const tools = node.getToolsManager();
           const states = self.toNames.get(node.name);

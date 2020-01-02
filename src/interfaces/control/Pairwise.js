@@ -23,7 +23,7 @@ import Types from "../../core/Types";
  */
 const TagAttrs = types.model({
   name: types.string,
-  // toname: types.maybeNull(types.string),
+  toname: types.maybeNull(types.string),
   style: types.maybeNull(types.string),
   leftclass: types.optional(types.string, "left"),
   rightclass: types.optional(types.string, "right"),
