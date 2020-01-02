@@ -1,4 +1,4 @@
-import { types, getParent, getEnv, flow, destroy, detach } from "mobx-state-tree";
+import { types, getParent, getEnv, getRoot, flow, destroy, detach } from "mobx-state-tree";
 
 import { guidGenerator } from "../core/Helpers";
 import Types from "../core/Types";
@@ -20,7 +20,9 @@ const Completion = types
   .model("Completion", {
     id: types.identifier,
     pk: types.optional(types.string, guidGenerator(5)),
+
     selected: types.optional(types.boolean, false),
+    type: types.enumeration(["completion", "prediction"]),
 
     createdDate: types.optional(types.string, Utils.UDate.currentISODate()),
     createdAgo: types.maybeNull(types.string),
@@ -75,35 +77,21 @@ const Completion = types
   })
   .views(self => ({
     get store() {
-      return getParent(self, 2);
+      return getRoot(self);
     },
 
     get list() {
-      return getParent(self);
+      return getParent(self, 2);
     },
   }))
   .actions(self => ({
     reinitHistory() {
       self.history = { targetPath: "../root" };
     },
-    /**
-     * Send update to serve
-     * @param {*} state
-     */
-    _updateServerState(state) {
-      let appStore = getParent(self, 3);
-      let url = "/api/tasks/" + appStore.task.id + "/completions/" + self.pk + "/";
 
-      getEnv(self).patch(url, JSON.stringify(state));
-    },
-
-    setHoneypot() {
-      self.honeypot = true;
-      self._updateServerState({ honeypot: self.honeypot });
-    },
-
-    setEdittable(val) {
-      self.edittable = val;
+    setGroundTruth(value) {
+      self.honeypot = value;
+      getEnv(self).onGroundTruth(self.store, self, value);
     },
 
     sendUserGenerate() {
@@ -166,14 +154,6 @@ const Completion = types
 
     addNormalization(normalization) {
       self.normalizationStore.addNormalization();
-    },
-
-    /**
-     * Remove honeypot
-     */
-    removeHoneypot() {
-      self.honeypot = false;
-      self._updateServerState({ honeypot: self.honeypot });
     },
 
     traverseTree(cb) {
@@ -279,6 +259,10 @@ const Completion = types
       Hotkey.setScope("__main__");
     },
 
+    afterAttach() {
+      self.traverseTree(node => node.updateValue && node.updateValue(self.store));
+    },
+
     afterCreate() {
       //
       if (self.userGenerate && !self.sentUserGenerate) {
@@ -357,58 +341,28 @@ const Completion = types
 
 export default types
   .model("CompletionStore", {
-    completions: types.array(Completion),
     selected: types.maybeNull(types.reference(Completion)),
+
+    completions: types.array(Completion),
     predictions: types.array(Completion),
-    predictSelect: types.optional(types.boolean, false),
+
     viewingAllCompletions: types.optional(types.boolean, false),
     viewingAllPredictions: types.optional(types.boolean, false),
   })
   .views(self => ({
-    /**
-     * Get current completion
-     */
-    get currentCompletion() {
-      return self.selected && self.completions.find(c => c.id === self.selected.id);
-    },
-
-    get currentPrediction() {
-      return self.selected && self.predictions.find(c => c.id === self.selected.id);
-    },
-
-    /**
-     * Get parent
-     */
     get store() {
-      return getParent(self);
-    },
-
-    /**
-     * Get only those that were saved
-     */
-    get savedCompletions() {
-      return self.completions.filter(c => c);
+      return getRoot(self);
     },
   }))
   .actions(self => {
-    function selectedPredict() {
-      self.predictSelect = true;
-    }
-
-    function unSelectedPredict() {
-      self.predictSelect = false;
-    }
-
-    function unSelectViewingAll() {
-      self.viewingAllCompletions = false;
-      self.viewingAllPredictions = false;
-    }
-
     function _toggleViewingAll() {
       if (self.viewingAllCompletions || self.viewingAllPredictions) {
-        unSelectedPredict();
-        self.completions.map(c => (c.selected = false));
-        self.predictions.map(c => (c.selected = false));
+        self.completions.forEach(c => {
+          c.selected = false;
+          c.highlightedNode && c.highlightedNode.unselectRegion();
+        });
+
+        self.predictions.forEach(c => (c.selected = false));
       } else {
         selectCompletion(self.completions[0].id);
       }
@@ -427,10 +381,27 @@ export default types
 
       if (self.viewingAllCompletions) {
         self.viewingAllPredictions = false;
-        self.completions.map(c => (c.edittable = false));
+        self.completions.forEach(c => (c.edittable = false));
       }
 
       _toggleViewingAll();
+    }
+
+    function unselectViewingAll() {
+      self.viewingAllCompletions = false;
+      self.viewingAllPredictions = false;
+    }
+
+    function selectItem(id, list) {
+      unselectViewingAll();
+
+      if (self.selected) self.selected.selected = false;
+
+      const c = list.find(c => c.id === id);
+      c.selected = true;
+      self.selected = c;
+
+      return c;
     }
 
     /**
@@ -438,93 +409,21 @@ export default types
      * @param {*} id
      */
     function selectCompletion(id) {
-      self.completions.map(c => (c.selected = false));
-      if (self.predictions) self.predictions.map(c => (c.selected = false));
-      const c = self.completions.find(c => c.id === id);
+      const c = selectItem(id, self.completions);
 
-      unSelectedPredict();
-      unSelectViewingAll();
-      // if (self.selected && self.selected.id !== c.id) c.history.reset();
       c.edittable = true;
-
-      c.selected = true;
-      self.selected = c;
-
       c.setupHotKeys();
+
+      return c;
     }
 
     function selectPrediction(id) {
-      self.predictions.map(c => (c.selected = false));
-      self.completions.map(c => (c.selected = false));
-      const c = self.predictions.find(c => c.id === id);
-      selectedPredict();
-      unSelectViewingAll();
-      // if (self.selected && self.selected.id !== c.id) c.history.reset();
-
-      c.selected = true;
-      self.selected = c;
-
-      c.setupHotKeys();
+      return selectItem(id, self.predictions);
     }
 
-    /**
-     * Adding new completion
-     * @param {object} node
-     * @param {string} type
-     */
-    function addCompletion(node, type) {
-      /**
-       * Create Completion
-       */
-      const createdCompletion = Completion.create(node);
+    function deleteCompletion(completion) {
+      getEnv(self).onDeleteCompletion(self.store, completion);
 
-      /**
-       * If completion is initial completion
-       */
-      if (self.store.task && self.store.task.data && type === "initial") {
-        createdCompletion.traverseTree(node => node.updateValue && node.updateValue(self.store));
-      }
-
-      self.completions.unshift(createdCompletion);
-
-      return createdCompletion;
-    }
-
-    function addPredictionItem(node, type) {
-      /**
-       * Create Completion
-       */
-      node.edittable = false;
-      const createdPrediction = Completion.create(node);
-
-      /**
-       * If completion is initial completion
-       */
-      if (self.store.task && type === "initial") {
-        createdPrediction.traverseTree(node => node.updateValue && node.updateValue(self.store));
-      }
-
-      self.predictions.unshift(createdPrediction);
-
-      return createdPrediction;
-    }
-
-    /**
-     * Send request to server for delete completion
-     */
-    const _deleteCompletion = flow(function* _deleteCompletion(pk) {
-      try {
-        const json = yield getEnv(self).remove("/api/tasks/" + self.store.task.id + "/completions/" + pk + "/");
-      } catch (err) {
-        console.error("Failed to skip task ", err);
-      }
-    });
-
-    /**
-     * Destroy completion
-     * @param {*} completion
-     */
-    function destroyCompletion(completion) {
       /**
        * MST destroy completion
        */
@@ -539,145 +438,73 @@ export default types
       }
     }
 
-    function deleteCompletion(completion) {
-      getEnv(self).onDeleteCompletion(completion);
+    function addItem(options) {
+      const { user, config } = self.store;
 
-      if (getParent(self).apiCalls) {
-        _deleteCompletion(completion.pk);
-      }
-
-      destroyCompletion(completion);
-    }
-
-    /**
-     *
-     * @param {*} c
-     */
-    function addSavedCompletion(c) {
-      const completionModel = Tree.treeToModel(self.store.config);
+      // convert config to mst model
+      const completionModel = Tree.treeToModel(config);
       const modelClass = Registry.getModelByTag(completionModel.type);
 
+      //
       let root = modelClass.create(completionModel);
 
-      const node = {
-        id: c.id || guidGenerator(5),
-        pk: c.id,
-        createdAgo: c.created_ago,
-        createdBy: c.created_username,
-        leadTime: c.lead_time,
-        honeypot: c.honeypot,
-        root: root,
-        userGenerate: false,
-      };
+      const id = options["id"];
+      delete options["id"];
 
-      const completion = self.addCompletion(node, "list");
-
-      return completion;
-    }
-
-    function addPrediction(prediction) {
-      const predictionModel = Tree.treeToModel(self.store.config);
-      const modelClass = Registry.getModelByTag(predictionModel.type);
-
-      let root = modelClass.create(predictionModel);
-
-      const node = {
-        id: prediction.id || guidGenerator(),
-        pk: prediction.id,
-        createdAgo: prediction.created_ago,
-        createdBy: prediction.model_version,
-        root: root,
-      };
-
-      const returnPredict = self.addPredictionItem(node, "list");
-
-      return returnPredict;
-    }
-
-    function generateCompletion(options) {
-      /**
-       * Convert config to model
-       */
-      const completionModel = Tree.treeToModel(self.store.config);
-
-      /**
-       * Get model by type of tag
-       */
-      const modelClass = Registry.getModelByTag(completionModel.type);
-
-      /**
-       * Completion model init
-       */
-      let root = modelClass.create(completionModel);
-
+      //
       let node = {
-        id: guidGenerator(5),
+        id: id || guidGenerator(5),
         root: root,
+
+        createdBy: user && user.displayName,
+        userGenerate: false,
+
+        ...options,
       };
 
-      if (options && options.userGenerate) {
-        node = {
-          ...node,
-          userGenerate: options.userGenerate,
-        };
-      }
-
-      /**
-       * Expert module for initial completion
-       */
-      if (self.store.expert) {
-        const { expert } = self.store;
-        node["createdBy"] = `${expert.firstName} ${expert.lastName}`;
-      }
-
-      /**
-       *
-       */
-      let completion = self.addCompletion(node, "initial");
-
-      if (options && options.userGenerate) {
-        self.selectCompletion(node.id);
-      }
-
-      return completion;
+      //
+      return Completion.create(node);
     }
 
-    /**
-     * Initial Completion
-     * @returns {object}
-     */
-    function addInitialCompletion() {
-      return self.generateCompletion();
+    function addPrediction(options = {}) {
+      options.edittable = false;
+      options.type = "prediction";
+
+      const item = addItem(options);
+      self.predictions.unshift(item);
+
+      return item;
     }
 
-    function addUserCompletion() {
-      return self.generateCompletion({ userGenerate: true });
+    function addCompletion(options = {}) {
+      options.type = "completion";
+
+      const item = addItem(options);
+      self.completions.unshift(item);
+
+      return item;
     }
 
-    function addCompletionFromPrediction() {
-      const selectedData = self.selected.serializeCompletion();
+    function addCompletionFromPrediction(prediction) {
+      const c = self.addCompletion({ userGenerate: true });
 
-      const c = self.generateCompletion({ userGenerate: true });
+      const selectedData = prediction.serializeCompletion();
       c.deserializeCompletion(selectedData);
 
       return c;
     }
 
     return {
+      toggleViewingAllCompletions,
+      toggleViewingAllPredictions,
+
+      addPrediction,
+      addCompletion,
+      addCompletionFromPrediction,
+
       selectCompletion,
       selectPrediction,
 
-      toggleViewingAllCompletions,
-      toggleViewingAllPredictions,
-      addCompletion,
-      addCompletionFromPrediction,
       deleteCompletion,
-      destroyCompletion,
-      addInitialCompletion,
-      addSavedCompletion,
-      addUserCompletion,
-      addPrediction,
-      addPredictionItem,
-      generateCompletion,
     };
   });

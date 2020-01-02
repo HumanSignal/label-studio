@@ -32,13 +32,12 @@ import { HTMLDocument } from "../examples/html_document";
 import { Pairwise } from "../examples/pairwise";
 
 import External from "../core/External";
-import Requests from "../core/Requests";
 import Messages from "../utils/messages";
 
 /**
  * Custom Data
  */
-const data = Sentiment;
+const data = ImageBbox;
 
 /**
  * Get current config
@@ -88,11 +87,10 @@ function rootElement(element) {
  */
 function configureApplication(params) {
   const options = {
-    fetch: Requests.fetcher,
-    fetchAuth: Requests.fetcherAuth,
-    patch: Requests.patch,
-    post: Requests.poster,
-    remove: Requests.remover,
+    // fetch: Requests.fetcher,
+    // patch: Requests.patch,
+    // post: Requests.poster,
+    // remove: Requests.remover,
     alert: m => console.log(m), // Noop for demo: window.alert(m)
     messages: { ...Messages, ...params.messages },
     onSubmitCompletion: params.onSubmitCompletion ? params.onSubmitCompletion : External.onSubmitCompletion,
