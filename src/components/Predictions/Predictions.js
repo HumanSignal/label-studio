@@ -25,12 +25,16 @@ const Prediction = observer(({ item, store }) => {
               <Button
                 onClick={ev => {
                   ev.preventDefault();
-                  const c = store.completionStore.addCompletionFromPrediction();
+
+                  const p = store.completionStore.selected;
+                  const c = store.completionStore.addCompletionFromPrediction(p);
+
+                  // store.completionStore.selectCompletion(c.id);
 
                   // this is here because otherwise React doesn't re-render the change in the tree
                   window.setTimeout(function() {
                     store.completionStore.selectCompletion(c.id);
-                  }, 100);
+                  }, 50);
                 }}
               >
                 <Icon type="copy" />
