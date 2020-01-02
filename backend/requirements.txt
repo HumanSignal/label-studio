@@ -30,3 +30,4 @@ tqdm==4.40.2
 urllib3==1.25.7
 wasabi==0.4.2
 Werkzeug==0.16.0
+orjson==2.1.3

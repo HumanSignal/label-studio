@@ -3,6 +3,7 @@ from __future__ import print_function
 import io
 import os
 import json
+import orjson
 import urllib
 import logging
 import random
@@ -81,6 +82,8 @@ def tasks_from_json_file(path, tasks):
         task_id = len(tasks) + 1
         if 'data' in root:
             data = root['data']
+        else:
+            data = root
         tasks[task_id] = {'id': task_id, 'task_path': path, 'data': data}
         if 'predictions' in data:
             tasks[task_id]['predictions'] = data['predictions']
@@ -88,8 +91,9 @@ def tasks_from_json_file(path, tasks):
         if 'predictions' in root:
             tasks[task_id]['predictions'] = root['predictions']
 
+    logger.debug(f'Reading tasks from JSON file {path}')
     with open(path) as f:
-        json_body = json.load(f)
+        json_body = orjson.loads(f.read())
 
         # multiple tasks in file
         if isinstance(json_body, list):
