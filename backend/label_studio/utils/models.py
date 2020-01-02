@@ -8,7 +8,7 @@ import io
 
 from datetime import datetime
 from requests.adapters import HTTPAdapter
-from utils.misc import get_data_dir
+from label_studio.utils.misc import get_data_dir
 
 DEFAULT_PROJECT_ID = 1
 

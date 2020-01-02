@@ -4,18 +4,19 @@ from __future__ import print_function
 import os
 import flask
 import json  # it MUST be included after flask!
-import utils.db as db
+import label_studio.utils.db as db
 import logging
 
 from copy import deepcopy
 from inspect import currentframe, getframeinfo
 from flask import request, jsonify, make_response, Response
-from utils.misc import (
+from label_studio.utils.misc import (
     exception_treatment, log_config, log, config_line_stripped, load_config
 )
-from utils.analytics import Analytics
-from utils.models import DEFAULT_PROJECT_ID, Project, MLBackend
-from utils.prompts import LabelStudioConfigPrompt
+from label_studio.utils.analytics import Analytics
+from label_studio.utils.models import DEFAULT_PROJECT_ID, Project, MLBackend
+from label_studio.utils.prompts import LabelStudioConfigPrompt
+from label_studio.utils.io import find_file, find_dir
 
 logger = logging.getLogger(__name__)
 
@@ -41,13 +42,19 @@ def reload_config(prompt_inputs=False):
     global analytics
     global ml_backend
     global project
-    c = load_config()
 
+    # Read config from config.json & input arguments (dont initialize any inner DBs)
+    c = load_config(re_init_db=False)
+
+    # If specified, prompt user in console about specific inputs
     if prompt_inputs:
         iprompt = LabelStudioConfigPrompt(c)
         c['input_data'] = iprompt.ask_input_path()
         c['output_dir'] = iprompt.ask_output_dir()
         c['label_config'] = iprompt.ask_label_config()
+
+    # Initialize DBs
+    db.re_init(c)
 
     label_config_line = config_line_stripped(open(c['label_config']).read())
     if analytics is None:
@@ -115,11 +122,10 @@ def index():
     reload_config()
 
     # find editor files to include in html
-    editor_dir = c['editor']['build_path']
-    editor_js_dir = os.path.join(editor_dir, 'js')
-    editor_js = ['/static/editor/js/' + f for f in os.listdir(editor_js_dir) if f.endswith('.js')]
-    editor_css_dir = os.path.join(editor_dir, 'css')
-    editor_css = ['/static/editor/css/' + f for f in os.listdir(editor_css_dir) if f.endswith('.css')]
+    editor_js_dir = find_dir('static/editor/js')
+    editor_css_dir = find_dir('static/editor/css')
+    editor_js = [f'/static/editor/js/{f}' for f in os.listdir(editor_js_dir) if f.endswith('.js')]
+    editor_css = [f'/static/editor/css/{f}' for f in os.listdir(editor_css_dir) if f.endswith('.css')]
 
     # task data: load task or task with completions if it exists
     task_data = None

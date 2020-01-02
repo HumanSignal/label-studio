@@ -6,8 +6,7 @@ from mixpanel import Mixpanel, MixpanelException
 from copy import deepcopy
 from operator import itemgetter
 from uuid import uuid4
-from .misc import get_config_dir, get_app_version
-from converter.utils import parse_config
+from .misc import get_config_dir, get_app_version, parse_config
 
 logger = logging.getLogger(__name__)
 

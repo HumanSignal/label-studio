@@ -6,12 +6,14 @@ import io
 from flask import request, jsonify, make_response
 import json  # it MUST be included after flask!
 import inspect
+import pkg_resources
 
 from appdirs import user_config_dir
 from pythonjsonlogger import jsonlogger
 from lxml import etree
 from xml.etree import ElementTree
 from .db import re_init
+from label_studio.utils.io import find_file
 
 
 # this must be before logger setup
@@ -29,10 +31,13 @@ class CustomJsonFormatter(jsonlogger.JsonFormatter):
 
 
 # read logger config
-log_config = json.load(open('logger.json'))
-logfile = 'static/logs/service.log'
+with open(find_file('logger.json')) as f:
+    log_config = json.load(f)
+logfile = find_file('static/logs/service.log')
+
 # create log file
-os.mkdir(os.path.dirname(logfile)) if not os.path.exists(os.path.dirname(logfile)) else ()
+os.makedirs(os.path.dirname(logfile), exist_ok=True)
+
 open(logfile, 'w') if not os.path.exists(logfile) else ()
 file_handler = logging.FileHandler(logfile)
 file_handler.setLevel(logging.DEBUG)
@@ -115,17 +120,17 @@ def config_line_stripped(xml_config):
     return xml_config.replace('\n', '').replace('\r', '')
 
 
-def load_config():
+def load_config(re_init_db=True):
     """ Combine args with json config
 
-    :param config_path: json file path
     :return: config dict
     """
     def generator():
         import argparse
 
         parser = argparse.ArgumentParser(description='Label studio')
-        parser.add_argument('-c', '--config', dest='config_path', default='config.json',
+        parser.add_argument('-c', '--config', dest='config_path',
+                            default=os.path.join(os.path.dirname(__file__), '..', 'config.json'),
                             help='backend config')
         parser.add_argument('-l', '--label-config', dest='label_config', default='',
                             help='label config path')
@@ -149,7 +154,7 @@ def load_config():
             c['output_dir'] = args.output_dir if args.output_dir else c['output_dir']
 
             # re-init db
-            if prev_config != c:
+            if prev_config != c and re_init_db:
                 print('Config changes detected, reloading DB')
                 re_init(c)
 
@@ -195,7 +200,32 @@ def get_data_dir():
 
 
 def get_app_version():
-    package_file = os.path.join(os.path.dirname(__file__), '..', '..', 'package.json')
-    with io.open(package_file) as f:
-        info = json.load(f)
-        return info.get('version')
+    return pkg_resources.get_distribution('label-studio').version
+
+
+def parse_config(config_string):
+
+    def _is_input_tag(tag):
+        return tag.attrib.get('name') and tag.attrib.get('value', '').startswith('$')
+
+    def _is_output_tag(tag):
+        return tag.attrib.get('name') and tag.attrib.get('toName')
+
+    xml_tree = ElementTree.fromstring(config_string)
+
+    inputs, outputs = {}, {}
+    for tag in xml_tree.iter():
+        if _is_input_tag(tag):
+            inputs[tag.attrib['name']] = {'type': tag.tag, 'value': tag.attrib['value'].lstrip('$')}
+        elif _is_output_tag(tag):
+            outputs[tag.attrib['name']] = {'type': tag.tag, 'to_name': tag.attrib['toName'].split(',')}
+
+    for output_tag, tag_info in outputs.items():
+        tag_info['inputs'] = []
+        for input_tag_name in tag_info['to_name']:
+            if input_tag_name not in inputs:
+                raise KeyError(f'to_name={input_tag_name} is specified for output tag name={output_tag}, '
+                               f'but we can\'t find it among input tags')
+            tag_info['inputs'].append(inputs[input_tag_name])
+
+    return outputs
