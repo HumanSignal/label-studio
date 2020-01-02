@@ -10,7 +10,7 @@ import { Result, Spin } from "antd";
  * Core
  */
 import Registry from "../../core/Registry";
-import Requests from "../../core/Requests";
+// import Requests from "../../core/Requests";
 import { guidGenerator } from "../../core/Helpers";
 import Tree from "../../core/Tree";
 
@@ -122,13 +122,7 @@ const App = inject("store")(
         const self = this;
         const { store } = self.props;
         const cs = store.completionStore;
-        let root;
-
-        if (cs.currentCompletion) {
-          root = cs.currentCompletion.root;
-        } else if (cs.currentPrediction) {
-          root = cs.currentPrediction.root;
-        }
+        const root = cs.selected && cs.selected.root;
 
         if (store.isLoading) return self.renderLoader();
 
@@ -138,9 +132,7 @@ const App = inject("store")(
 
         if (store.labeledSuccess) return self.renderSuccess();
 
-        if (!cs.currentCompletion && !cs.currentPrediction) {
-          return self.renderNoCompletion();
-        }
+        if (!root) return self.renderNoCompletion();
 
         return (
           <div className={styles.editor}>
@@ -159,7 +151,7 @@ const App = inject("store")(
                   {!cs.viewingAllCompletions && !cs.viewingAllPredictions && (
                     <Segment>
                       {Tree.renderItem(root)}
-                      {store.hasInterface("controls") && <Controls />}
+                      {store.hasInterface("controls") && <Controls item={cs.selected} />}
                     </Segment>
                   )}
                   {cs.viewingAllCompletions && this.renderAllCompletions()}
@@ -167,10 +159,10 @@ const App = inject("store")(
 
                   <div className={styles.menu}>
                     {store.hasInterface("completions:menu") && <Completions store={store} />}
-
                     {store.hasInterface("predictions:menu") && <Predictions store={store} />}
-
-                    {store.hasInterface("side-column") && <SideColumn store={store} />}
+                    {store.hasInterface("side-column") && !cs.viewingAllCompletions && !cs.viewingAllPredictions && (
+                      <SideColumn store={store} />
+                    )}
                   </div>
                 </div>
               </div>

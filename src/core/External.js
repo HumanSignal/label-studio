@@ -38,6 +38,11 @@ function onEntityCreate() {}
  */
 function onEntityDelete() {}
 
+/**
+ * Callback when ground truth button gets pressed
+ */
+function onGroundTruth() {}
+
 export default {
   onSubmitCompletion,
   onUpdateCompletion,
@@ -47,4 +52,5 @@ export default {
   onLabelStudioLoad,
   onEntityCreate,
   onEntityDelete,
+  onGroundTruth,
 };
