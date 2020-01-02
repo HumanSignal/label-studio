@@ -31,6 +31,21 @@ const Model = types
     get completion() {
       return getRoot(self).completionStore.selected;
     },
+  }))
+  .actions(self => ({
+    toStateJSON() {
+      const toname = self.parent.toname || self.parent.name;
+
+      return {
+        id: self.pid,
+        from_name: self.parent.name,
+        to_name: toname,
+        type: self.parent.type,
+        value: {
+          text: self._value,
+        },
+      };
+    },
   }));
 
 const TextAreaRegionModel = types.compose("TextAreaRegionModel", RegionsMixin, NormalizationMixin, Model);

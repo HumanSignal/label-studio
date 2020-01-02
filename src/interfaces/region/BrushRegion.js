@@ -4,7 +4,7 @@ import { observer, inject } from "mobx-react";
 import { types, getParentOfType, getParent, getRoot } from "mobx-state-tree";
 
 import Konva from "konva";
-import { Line } from "react-konva";
+import { Line, Group } from "react-konva";
 
 import { guidGenerator } from "../../core/Helpers";
 
@@ -19,6 +19,22 @@ import RegionsMixin from "../mixins/Regions";
 import NormalizationMixin from "../mixins/Normalization";
 import Utils from "../../utils";
 
+const Points = types
+  .model("Points", {
+    id: types.identifier,
+    type: types.optional(types.enumeration(["add", "eraser"]), "add"),
+    points: types.array(types.number),
+  })
+  .actions(self => ({
+    setType(type) {
+      self.type = type;
+    },
+
+    addPoints(points) {
+      self.points = [...self.points, ...points];
+    },
+  }));
+
 /**
  * Rectangle object for Bounding Box
  *
@@ -29,9 +45,6 @@ const Model = types
     pid: types.optional(types.string, guidGenerator),
 
     type: "brushregion",
-
-    start_x: types.optional(types.number, 1),
-    start_y: types.optional(types.number, 1),
 
     states: types.maybeNull(types.array(types.union(LabelsModel, RatingModel, BrushLabelsModel))),
 
@@ -63,8 +76,13 @@ const Model = types
     /**
      * Points array of brush
      */
-    points: types.array(types.number),
-    eraserpoints: types.array(types.number),
+
+    points: types.array(Points),
+    current: types.maybeNull(types.reference(Points)),
+
+    // points: types.array(types.array(types.number)),
+    // eraserpoints: types.array(types.array(types.number)),
+
     mode: types.optional(types.string, "brush"),
   })
   .views(self => ({
@@ -77,9 +95,24 @@ const Model = types
     },
   }))
   .actions(self => ({
-    afterCreate() {
-      // self.points = [self.start_x, self.start_y];
+    addPoints({ type }) {
+      console.log(type);
+      const p = Points.create({ id: guidGenerator(), type: type });
+      self.points.push(p);
+      self.current = p;
+
+      // console.log("addPoints");
+
+      return p;
     },
+
+    addPointsCurrent(x, y) {
+      // console.log("addPointsCurrent");
+      self.current.addPoints([x, y]);
+    },
+
+    afterAttach() {},
+
     unselectRegion() {
       self.selected = false;
       self.parent.setSelected(undefined);
@@ -92,15 +125,15 @@ const Model = types
       self.parent.setSelected(self.id);
     },
 
-    addPoints(x, y, mode) {
-      if (mode) self.mode = "eraser";
-      self.points.push(x);
-      self.points.push(y);
-    },
+    // addPoints(x, y, mode) {
+    //   if (mode) self.mode = "eraser";
+    //   self.points.push(x);
+    //   self.points.push(y);
+    // },
 
-    addEraserPoints(x, y) {
-      self.eraserpoints = [...self.eraserpoints, x, y];
-    },
+    // addEraserPoints(x, y) {
+    //   self.eraserpoints = [...self.eraserpoints, x, y];
+    // },
 
     setScale(x, y) {
       self.scaleX = x;
@@ -167,20 +200,20 @@ const Model = types
 
 const BrushRegionModel = types.compose("BrushRegionModel", RegionsMixin, NormalizationMixin, Model);
 
-const HtxBrushView = ({ store, item }) => {
+const HtxBrushLayer = observer(({ store, item, points }) => {
   let currentPoints = [];
-  let currentEraserPoints = [];
-
-  item.points.forEach(point => {
+  points.points.forEach(point => {
     currentPoints.push(point);
   });
 
-  item.eraserpoints.forEach(point => {
-    currentEraserPoints.push(point);
-  });
+  return points.type == "add" ? (
+    <HtxBrushAddLine item={item} points={currentPoints} />
+  ) : (
+    <HtxBrushEraserLine item={item} points={currentPoints} />
+  );
+});
 
-  let brushMode = item.mode === "brush" ? "source-over" : "destination-out";
-
+const HtxBrushAddLine = observer(({ store, item, points }) => {
   let highlightOptions = {
     shadowColor: "red",
     shadowBlur: 5,
@@ -188,22 +221,44 @@ const HtxBrushView = ({ store, item }) => {
     shadowOpacity: 1,
   };
 
-  let highlight = item.highlighted || item.selected ? highlightOptions : null;
+  let highlight = item.selected ? highlightOptions : null;
+  //        {...highlight}
 
   return (
+    <Line
+      strokeWidth={item.strokeWidth}
+      points={points}
+      stroke={item.strokeColor}
+      opacity={item.mode === "brush" ? item.opacity : 1}
+      globalCompositeOperation={"source-over"}
+      tension={item.tension}
+      lineJoin={"round"}
+      lineCap="round"
+    />
+  );
+});
+
+const HtxBrushEraserLine = ({ store, item, points }) => {
+  return (
+    <Line
+      strokeWidth={item.strokeWidth}
+      points={points}
+      tension={item.tension}
+      lineJoin={"round"}
+      lineCap="round"
+      stroke={item.strokeColor}
+      opacity={1}
+      globalCompositeOperation={"destination-out"}
+    />
+  );
+};
+
+const HtxBrushView = ({ store, item }) => {
+  return (
     <Fragment>
-      <Line
-        strokeWidth={item.strokeWidth}
-        points={currentPoints}
+      <Group
         scaleX={item.scaleX}
         scaleY={item.scaleY}
-        stroke={item.strokeColor}
-        opacity={item.mode === "brush" ? item.opacity : 1}
-        globalCompositeOperation={brushMode}
-        tension={item.tension}
-        lineJoin={"round"}
-        lineCap="round"
-        {...highlight}
         onMouseOver={e => {
           const stage = item.parent.stageRef;
 
@@ -232,19 +287,11 @@ const HtxBrushView = ({ store, item }) => {
           item.setHighlight(false);
           item.onClickRegion();
         }}
-      />
-      <Line
-        strokeWidth={item.strokeWidth}
-        points={currentEraserPoints}
-        scaleX={item.scaleX}
-        scaleY={item.scaleY}
-        tension={item.tension}
-        lineJoin={"round"}
-        lineCap="round"
-        stroke={item.strokeColor}
-        opacity={1}
-        globalCompositeOperation={"destination-out"}
-      />
+      >
+        {item.points.map(p => (
+          <HtxBrushLayer store={store} item={item} points={p} />
+        ))}
+      </Group>
     </Fragment>
   );
 };

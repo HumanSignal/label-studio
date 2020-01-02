@@ -13,7 +13,7 @@ import ProcessAttrsMixin from "../mixins/ProcessAttrs";
 
 import Utils from "../../utils";
 
-import { AudioRegionModel } from "./AudioRegion";
+import { AudioRegionModel } from "../region/AudioRegion";
 import AudioControls from "./Audio/Controls";
 import styles from "./AudioPlus/AudioPlus.module.scss";
 

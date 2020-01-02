@@ -8,7 +8,7 @@ import { Form, Input, Button } from "antd";
 import { renderChildren } from "../../core/Tree";
 import { guidGenerator } from "../../core/Helpers";
 
-import { HtxTextAreaRegion, TextAreaRegionModel } from "../object/TextAreaRegion";
+import { HtxTextAreaRegion, TextAreaRegionModel } from "../region/TextAreaRegion";
 import { ShortcutModel } from "../control/Shortcut";
 
 import Registry from "../../core/Registry";
@@ -104,21 +104,7 @@ const Model = types
     },
 
     toStateJSON() {
-      const toname = self.toname || self.name;
-
-      return [
-        self.regions.map(r => {
-          return {
-            id: r.pid,
-            from_name: self.name,
-            to_name: toname,
-            type: self.type,
-            value: {
-              text: r._value,
-            },
-          };
-        }),
-      ];
+      return self.regions.map(r => r.toStateJSON());
     },
 
     fromStateJSON(obj, fromModel) {
@@ -126,12 +112,7 @@ const Model = types
     },
   }));
 
-const TextAreaModel = types.compose(
-  "TextAreaModel",
-  TagAttrs,
-  Model,
-  ProcessAttrsMixin,
-);
+const TextAreaModel = types.compose("TextAreaModel", TagAttrs, Model, ProcessAttrsMixin);
 
 const HtxTextArea = observer(({ item }) => {
   const rows = parseInt(item.rows);

@@ -8,7 +8,7 @@ import { guidGenerator, restoreNewsnapshot } from "../../core/Helpers";
 import { LabelsModel } from "../control/Labels";
 import { RatingModel } from "../control/Rating";
 
-import { AudioPlusModel } from "./AudioPlus";
+import { AudioPlusModel } from "../object/AudioPlus";
 import Utils from "../../utils";
 
 const Model = types

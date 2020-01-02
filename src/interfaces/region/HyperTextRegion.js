@@ -17,7 +17,7 @@ import { runTemplate } from "../../core/Template";
 
 import InfoModal from "../../components/Infomodal/Infomodal";
 import { LabelsModel } from "../control/Labels";
-import { HyperTextModel } from "./HyperText";
+import { HyperTextModel } from "../object/HyperText";
 
 import { normalizeBoundaries } from "../../utils/html";
 

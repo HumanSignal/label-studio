@@ -17,7 +17,7 @@ import { LabelsModel } from "../control/Labels";
 
 import { highlightRange, splitBoundaries } from "../../utils/html";
 
-import { HyperTextRegionModel } from "./HyperTextRegion";
+import { HyperTextRegionModel } from "../region/HyperTextRegion";
 import Utils from "../../utils";
 
 /**

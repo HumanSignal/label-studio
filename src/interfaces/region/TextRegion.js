@@ -6,7 +6,7 @@ import { LabelsModel } from "../control/Labels";
 import { RatingModel } from "../control/Rating";
 import Registry from "../../core/Registry";
 import { guidGenerator } from "../../core/Helpers";
-import { TextModel } from "./Text";
+import { TextModel } from "../object/Text";
 import RegionsMixin from "../mixins/Regions";
 import NormalizationMixin from "../mixins/Normalization";
 import Hint from "../../components/Hint/Hint";

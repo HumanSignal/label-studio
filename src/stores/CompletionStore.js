@@ -11,8 +11,11 @@ import Hotkey from "../core/Hotkey";
 import RelationStore from "./RelationStore";
 import NormalizationStore from "./NormalizationStore";
 import RegionStore from "./RegionStore";
-import { RectangleModel } from "../interfaces/control/Rectangle";
-import { BrushModel } from "../interfaces/control/Brush";
+
+// import { RectangleModel } from "../interfaces/control/Rectangle";
+// import { BrushModel } from "../interfaces/control/Brush";
+import { AllRegionsType } from "../interfaces/region";
+
 import Utils from "../utils";
 
 import * as HtxObjectModel from "../interfaces/object";
@@ -63,20 +66,20 @@ const Completion = types
       regions: [],
     }),
 
-    highlightedNode: types.maybeNull(
-      types.union(
-        types.safeReference(HtxObjectModel.TextRegionModel),
-        types.safeReference(HtxObjectModel.RectRegionModel),
-        types.safeReference(HtxObjectModel.AudioRegionModel),
-        types.safeReference(HtxObjectModel.TextAreaRegionModel),
-        types.safeReference(HtxObjectModel.PolygonRegionModel),
-        types.safeReference(HtxObjectModel.KeyPointRegionModel),
-        types.safeReference(HtxObjectModel.BrushRegionModel),
-        types.safeReference(HtxObjectModel.HyperTextRegionModel),
-        types.safeReference(RectangleModel),
-        types.safeReference(BrushModel),
-      ),
-    ),
+    highlightedNode: types.maybeNull(types.safeReference(AllRegionsType)),
+    //   types.union(
+    //     types.safeReference(HtxObjectModel.TextRegionModel),
+    //     types.safeReference(HtxObjectModel.RectRegionModel),
+    //     types.safeReference(HtxObjectModel.AudioRegionModel),
+    //     types.safeReference(HtxObjectModel.TextAreaRegionModel),
+    //     types.safeReference(HtxObjectModel.PolygonRegionModel),
+    //     types.safeReference(HtxObjectModel.KeyPointRegionModel),
+    //     types.safeReference(HtxObjectModel.BrushRegionModel),
+    //     types.safeReference(HtxObjectModel.HyperTextRegionModel),
+    //     types.safeReference(RectangleModel),
+    //     types.safeReference(BrushModel),
+    //   ),
+    // ),
   })
   .views(self => ({
     get store() {
@@ -203,8 +206,10 @@ const Completion = types
     afterAttach() {
       console.log("afterAttach Completion Start");
 
-      // Copy tools from control tags into object tools manager
       self.traverseTree(node => {
+        // Copy tools from control tags into object tools manager
+        if (node.updateValue) node.updateValue(self.store);
+
         if (node && node.getToolsManager) {
           const tools = node.getToolsManager();
           const states = self.toNames.get(node.name);
@@ -301,31 +306,6 @@ const Completion = types
 
       Hotkey.setScope("__main__");
       console.log("afterCreate Completion End");
-    },
-
-    afterAttach() {
-      self.traverseTree(node => node.updateValue && node.updateValue(self.store));
-    },
-
-    afterCreate() {
-      //
-      if (self.userGenerate && !self.sentUserGenerate) {
-        self.loadedDate = new Date();
-      }
-
-      self.traverseTree(node => {
-        // create mapping from name to Model (by ref)
-        if (node && node.name && node.id) self.names.set(node.name, node.id);
-
-        if (node && node.toname && node.id) {
-          const val = self.toNames.get(node.toname);
-          if (val) {
-            val.push(node.id);
-          } else {
-            self.toNames.set(node.toname, [node.id]);
-          }
-        }
-      });
     },
 
     serializeCompletion() {

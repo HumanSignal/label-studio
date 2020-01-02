@@ -3,22 +3,16 @@ import { types, getParent, getEnv, flow, destroy, getMembers } from "mobx-state-
 import { guidGenerator } from "../core/Helpers";
 import Types from "../core/Types";
 
-import { TextRegionModel } from "../interfaces/object/TextRegion";
-import { RectRegionModel } from "../interfaces/object/RectRegion";
-import { AudioRegionModel } from "../interfaces/object/AudioRegion";
+import { AllRegionsType } from "../interfaces/region";
+
+// import { TextRegionModel, RectRegionModel } from "../interfaces/object/TextRegion";
+// import { RectRegionModel } from "../interfaces/object/RectRegion";
+// import { AudioRegionModel } from "../interfaces/object/AudioRegion";
 
 const Normalization = types
   .model("Normalization", {
-    node1: types.union(
-      types.reference(TextRegionModel),
-      types.reference(RectRegionModel),
-      types.reference(AudioRegionModel),
-    ),
-    node2: types.union(
-      types.reference(TextRegionModel),
-      types.reference(RectRegionModel),
-      types.reference(AudioRegionModel),
-    ),
+    node1: types.reference(AllRegionsType),
+    node2: types.reference(AllRegionsType),
   })
   .actions(self => ({
     toggleHighlight() {

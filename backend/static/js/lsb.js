@@ -90,7 +90,7 @@ const loadNext = function(ls) {
   var url = `${API_URL.MAIN}${API_URL.PROJECTS}/1${API_URL.NEXT}`;
 
   try {
-    const req = self.fetch(url);
+    const req = Requests.fetcher(url);
 
     req.then(function(loadedTask) {
       if (loadedTask instanceof Response && loadedTask.status === 404) {

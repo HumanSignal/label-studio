@@ -38,7 +38,7 @@ import Messages from "../utils/messages";
 /**
  * Custom Data
  */
-const data = ImageBbox;
+const data = ImagePolygons;
 
 /**
  * Get current config

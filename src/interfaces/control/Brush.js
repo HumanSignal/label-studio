@@ -6,7 +6,7 @@ import { types, getParentOfType, getRoot } from "mobx-state-tree";
 import Registry from "../../core/Registry";
 import { isHtx, cloneNode } from "../../core/Helpers";
 import { guidGenerator } from "../../core/Helpers";
-import { BrushRegionModel } from "../object/BrushRegion";
+import { BrushRegionModel } from "../region/BrushRegion";
 
 import * as Tools from "../tools";
 

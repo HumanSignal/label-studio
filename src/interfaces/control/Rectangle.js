@@ -6,7 +6,7 @@ import { types, getParentOfType, getRoot } from "mobx-state-tree";
 import Registry from "../../core/Registry";
 import { isHtx, cloneNode } from "../../core/Helpers";
 import { guidGenerator } from "../../core/Helpers";
-import { RectRegionModel } from "../object/RectRegion";
+import { RectRegionModel } from "../region/RectRegion";
 
 import * as Tools from "../tools";
 
@@ -61,6 +61,7 @@ const Model = types
     },
 
     afterCreate() {
+      console.log("afterCreate");
       const rect = Tools.Rect.create({ activeShape: null });
       rect._control = self;
 

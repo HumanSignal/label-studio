@@ -7,7 +7,7 @@ import Registry from "../../core/Registry";
 import { guidGenerator, restoreNewsnapshot } from "../../core/Helpers";
 import TextHighlight from "../../components/TextHighlight/TextHighlight";
 import { runTemplate } from "../../core/Template";
-import { TextRegionModel, HtxTextRegion } from "./TextRegion";
+import { TextRegionModel, HtxTextRegion } from "../region/TextRegion";
 import InfoModal from "../../components/Infomodal/Infomodal";
 
 /**
@@ -121,8 +121,7 @@ const Model = types
      * Return JSON
      */
     toStateJSON() {
-      const objectsToReturn = self.regions.map(r => r.toStateJSON());
-      return objectsToReturn;
+      return self.regions.map(r => r.toStateJSON());
     },
 
     /**

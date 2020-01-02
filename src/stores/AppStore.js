@@ -238,7 +238,6 @@ export default types
     function initializeStore({ completions, predictions }) {
       const _init = (addFun, selectFun) => {
         return item => {
-          console.log(item);
           const obj = self.completionStore[addFun](item);
 
           self.completionStore[selectFun](obj.id);

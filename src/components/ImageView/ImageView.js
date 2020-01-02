@@ -34,8 +34,6 @@ export default observer(
       const { item } = this.props;
 
       // item.freezeHistory();
-
-      console.log("handleStageMouseDown");
       const p = e.target.getParent();
 
       if (p && p.className === "Transformer") {
@@ -186,76 +184,76 @@ export default observer(
     /**
      * Handle to zoom
      */
-    // handleZoom = e => {
-    //   /**
-    //    * Disable if user doesn't use ctrl
-    //    */
-    //   if (e.evt && !e.evt.ctrlKey) {
-    //     return;
-    //   } else if (e.evt && e.evt.ctrlKey) {
-    //     /**
-    //      * Disable scrolling page
-    //      */
-    //     e.evt.preventDefault();
-    //   }
+    handleZoom = e => {
+      /**
+       * Disable if user doesn't use ctrl
+       */
+      if (e.evt && !e.evt.ctrlKey) {
+        return;
+      } else if (e.evt && e.evt.ctrlKey) {
+        /**
+         * Disable scrolling page
+         */
+        e.evt.preventDefault();
+      }
 
-    //   const { item } = this.props;
-    //   item.freezeHistory();
+      const { item } = this.props;
+      item.freezeHistory();
 
-    //   const stage = item.stageRef;
-    //   const scaleBy = parseFloat(item.zoomby);
-    //   const oldScale = stage.scaleX();
+      const stage = item.stageRef;
+      const scaleBy = parseFloat(item.zoomby);
+      const oldScale = stage.scaleX();
 
-    //   let mousePointTo;
-    //   let newScale;
-    //   let pos;
-    //   let newPos;
+      let mousePointTo;
+      let newScale;
+      let pos;
+      let newPos;
 
-    //   if (e.evt) {
-    //     mousePointTo = {
-    //       x: stage.getPointerPosition().x / oldScale - stage.x() / oldScale,
-    //       y: stage.getPointerPosition().y / oldScale - stage.y() / oldScale,
-    //     };
+      if (e.evt) {
+        mousePointTo = {
+          x: stage.getPointerPosition().x / oldScale - stage.x() / oldScale,
+          y: stage.getPointerPosition().y / oldScale - stage.y() / oldScale,
+        };
 
-    //     newScale = e.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
+        newScale = e.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
 
-    //     newPos = {
-    //       x: -(mousePointTo.x - stage.getPointerPosition().x / newScale) * newScale,
-    //       y: -(mousePointTo.y - stage.getPointerPosition().y / newScale) * newScale,
-    //     };
-    //   } else {
-    //     pos = {
-    //       x: stage.width() / 2,
-    //       y: stage.height() / 2,
-    //     };
+        newPos = {
+          x: -(mousePointTo.x - stage.getPointerPosition().x / newScale) * newScale,
+          y: -(mousePointTo.y - stage.getPointerPosition().y / newScale) * newScale,
+        };
+      } else {
+        pos = {
+          x: stage.width() / 2,
+          y: stage.height() / 2,
+        };
 
-    //     mousePointTo = {
-    //       x: pos.x / oldScale - stage.x() / oldScale,
-    //       y: pos.y / oldScale - stage.y() / oldScale,
-    //     };
+        mousePointTo = {
+          x: pos.x / oldScale - stage.x() / oldScale,
+          y: pos.y / oldScale - stage.y() / oldScale,
+        };
 
-    //     newScale = Math.max(0.05, oldScale * e);
+        newScale = Math.max(0.05, oldScale * e);
 
-    //     newPos = {
-    //       x: -(mousePointTo.x - pos.x / newScale) * newScale,
-    //       y: -(mousePointTo.y - pos.y / newScale) * newScale,
-    //     };
-    //   }
+        newPos = {
+          x: -(mousePointTo.x - pos.x / newScale) * newScale,
+          y: -(mousePointTo.y - pos.y / newScale) * newScale,
+        };
+      }
 
-    //   if (item.negativezoom !== true && newScale <= 1) {
-    //     item.setZoom(1, 0, 0);
-    //     stage.scale({ x: 1, y: 1 });
-    //     stage.position({ x: 0, y: 0 });
-    //     stage.batchDraw();
-    //     return;
-    //   }
+      if (item.negativezoom !== true && newScale <= 1) {
+        item.setZoom(1, 0, 0);
+        stage.scale({ x: 1, y: 1 });
+        stage.position({ x: 0, y: 0 });
+        stage.batchDraw();
+        return;
+      }
 
-    //   stage.scale({ x: newScale, y: newScale });
+      stage.scale({ x: newScale, y: newScale });
 
-    //   item.setZoom(newScale, newPos.x, newPos.y);
-    //   stage.position(newPos);
-    //   stage.batchDraw();
-    // };
+      item.setZoom(newScale, newPos.x, newPos.y);
+      stage.position(newPos);
+      stage.batchDraw();
+    };
 
     renderRulers() {
       const { item } = this.props;
@@ -364,7 +362,7 @@ export default observer(
               onMouseDown={this.handleStageMouseDown}
               onMouseMove={this.handleMouseMove}
               onMouseUp={this.handleMouseUp}
-              // onWheel={item.zoom ? this.handleZoom : () => {}}
+              onWheel={item.zoom ? this.handleZoom : () => {}}
             >
               {item.grid && item.sizeUpdated && <ImageGrid item={item} />}
               {item.shapes.map(shape => {
@@ -394,7 +392,7 @@ export default observer(
               {item
                 .getToolsManager()
                 .allTools()
-                .map(t => t.viewClass)}
+                .map(tool => tool.viewClass)}
             </div>
           </div>
         );

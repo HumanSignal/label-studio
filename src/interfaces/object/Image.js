@@ -13,10 +13,10 @@ import Utils from "../../utils";
 
 import ImageView from "../../components/ImageView/ImageView";
 
-import { RectRegionModel } from "./RectRegion";
-import { PolygonRegionModel } from "./PolygonRegion";
-import { KeyPointRegionModel } from "./KeyPointRegion";
-import { BrushRegionModel } from "./BrushRegion";
+import { RectRegionModel } from "../region/RectRegion";
+import { PolygonRegionModel } from "../region/PolygonRegion";
+import { KeyPointRegionModel } from "../region/KeyPointRegion";
+import { BrushRegionModel } from "../region/BrushRegion";
 
 import * as Tools from "../tools";
 import Types from "../../core/Types";
@@ -222,6 +222,8 @@ const Model = types
       return getType(name).name;
     },
   }))
+
+  // actions for the tools
   .actions(self => {
     // tools
     const tools = {};
@@ -270,6 +272,7 @@ const Model = types
 
     return { afterCreate, beforeDestroy, getTools, afterAttach, getToolsManager };
   })
+
   .actions(self => ({
     freezeHistory() {
       getParent(self, 3).history.freeze();
@@ -414,90 +417,90 @@ const Model = types
       destroy(shape);
     },
 
-    startDraw({ x, y }) {
-      let rect;
+    // startDraw({ x, y }) {
+    //   let rect;
 
-      console.log(self.brushStrokeWidth);
+    //   console.log(self.brushStrokeWidth);
 
-      let stroke = self.brushStrokeWidth; //controlButton().strokecolor;
+    //   let stroke = self.brushStrokeWidth; //controlButton().strokecolor;
 
-      if (self.controlButtonType === IMAGE_CONSTANTS.rectangleModel) {
-        self.setMode("drawing");
-        rect = self._addRect({ x: x, y: y, sh: 1, sw: 1, stroke: stroke, states: null, coordstype: "px", noadd: true });
-      } else if (self.controlButtonType === IMAGE_CONSTANTS.rectangleLabelsModel) {
-        self.lookupStates(null, (_, states) => {
-          if (states && states.length) {
-            stroke = states[0].getSelectedColor();
-          }
+    //   if (self.controlButtonType === IMAGE_CONSTANTS.rectangleModel) {
+    //     self.setMode("drawing");
+    //     rect = self._addRect({ x: x, y: y, sh: 1, sw: 1, stroke: stroke, states: null, coordstype: "px", noadd: true });
+    //   } else if (self.controlButtonType === IMAGE_CONSTANTS.rectangleLabelsModel) {
+    //     self.lookupStates(null, (_, states) => {
+    //       if (states && states.length) {
+    //         stroke = states[0].getSelectedColor();
+    //       }
 
-          self.setMode("drawing");
-          rect = self._addRect({
-            x: x,
-            y: y,
-            sh: 1,
-            sw: 1,
-            stroke: stroke,
-            states: states,
-            coordstype: "px",
-            noadd: true,
-          });
-        });
-      } else if (self.controlButtonType === IMAGE_CONSTANTS.brushModel) {
-        self.setMode("brush");
+    //       self.setMode("drawing");
+    //       rect = self._addRect({
+    //         x: x,
+    //         y: y,
+    //         sh: 1,
+    //         sw: 1,
+    //         stroke: stroke,
+    //         states: states,
+    //         coordstype: "px",
+    //         noadd: true,
+    //       });
+    //     });
+    //   } else if (self.controlButtonType === IMAGE_CONSTANTS.brushModel) {
+    //     self.setMode("brush");
 
-        rect = self._addBrush({
-          points: [x, y],
-          stroke: stroke,
-          states: null,
-          coordstype: "px",
-          noadd: true,
-        });
-      } else if (self.controlButtonType === IMAGE_CONSTANTS.brushLabelsModel) {
-        if (self.brushControl === "eraser") {
-          self.setMode(self.brushControl);
-          // self.selectedShape.addPoints(x, y, true);
-          rect = self._addBrush({
-            x: x,
-            y: y,
-            stroke: stroke,
-            coordstype: "px",
-            noadd: true,
-            mode: self.brushControl,
-          });
+    //     rect = self._addBrush({
+    //       points: [x, y],
+    //       stroke: stroke,
+    //       states: null,
+    //       coordstype: "px",
+    //       noadd: true,
+    //     });
+    //   } else if (self.controlButtonType === IMAGE_CONSTANTS.brushLabelsModel) {
+    //     if (self.brushControl === "eraser") {
+    //       self.setMode(self.brushControl);
+    //       // self.selectedShape.addPoints(x, y, true);
+    //       rect = self._addBrush({
+    //         x: x,
+    //         y: y,
+    //         stroke: stroke,
+    //         coordstype: "px",
+    //         noadd: true,
+    //         mode: self.brushControl,
+    //       });
 
-          return;
-        }
+    //       return;
+    //     }
 
-        self.lookupStates(null, (_, states) => {
-          if (states && states.length) {
-            stroke = states[0].getSelectedColor();
-          }
+    //     self.lookupStates(null, (_, states) => {
+    //       if (states && states.length) {
+    //         stroke = states[0].getSelectedColor();
+    //       }
 
-          self.setMode(self.brushControl);
+    //       self.setMode(self.brushControl);
 
-          rect = self._addBrush({
-            x: x,
-            y: y,
-            stroke: stroke,
-            states: states,
-            coordstype: "px",
-            noadd: true,
-            mode: self.brushControl,
-          });
-        });
-      }
+    //       rect = self._addBrush({
+    //         x: x,
+    //         y: y,
+    //         stroke: stroke,
+    //         states: states,
+    //         coordstype: "px",
+    //         noadd: true,
+    //         mode: self.brushControl,
+    //       });
+    //     });
+    //   }
 
-      self.activeShape = rect;
-    },
+    //   self.activeShape = rect;
+    // },
 
-    updateDraw({ x, y }) {
-      const shape = self.activeShape;
-      self.freezeHistory();
+    // updateDraw({ x, y }) {
+    //   const shape = self.activeShape;
+    //   self.freezeHistory();
 
-      const { x1, y1, x2, y2 } = reverseCoordinates({ x: shape._start_x, y: shape._start_y }, { x: x, y: y });
+    //   const { x1, y1, x2, y2 } = reverseCoordinates({ x: shape._start_x, y: shape._start_y }, { x: x, y: y });
 
-      shape.setPosition(x1, y1, x2 - x1, y2 - y1, shape.rotation);
-    },
+    //   shape.setPosition(x1, y1, x2 - x1, y2 - y1, shape.rotation);
+    // },
 
     addPoints({ x, y }) {
       const shape = self.activeShape;
@@ -571,6 +574,8 @@ const Model = types
     onMouseDown(ev) {
       const x = (ev.evt.offsetX - self.zoomingPositionX) / self.zoomScale;
       const y = (ev.evt.offsetY - self.zoomingPositionY) / self.zoomScale;
+
+      console.log(self.getToolsManager());
 
       self.getToolsManager().event("mousedown", ev, x, y);
     },
@@ -847,7 +852,6 @@ const Model = types
     /**
      * Transform JSON data (completions and predictions) to format
      */
-
     fromStateJSON(obj, fromModel) {
       // const params = ["choices", "shape", "rectanglelabels", "polygonlabels", "brushlabels"];
       // /**

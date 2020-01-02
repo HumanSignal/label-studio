@@ -3,37 +3,15 @@ import { types, getParent, getEnv, flow, destroy, getMembers } from "mobx-state-
 import { guidGenerator } from "../core/Helpers";
 import Types from "../core/Types";
 
-import * as HtxObjectModel from "../interfaces/object";
+import { AllRegionsType } from "../interfaces/region";
 
 /**
  * Relation between two different nodes
  */
 const Relation = types
   .model("Relation", {
-    node1: types.reference(
-      types.union(
-        HtxObjectModel.TextRegionModel,
-        HtxObjectModel.RectRegionModel,
-        HtxObjectModel.PolygonRegionModel,
-        HtxObjectModel.AudioRegionModel,
-        HtxObjectModel.TextAreaRegionModel,
-        HtxObjectModel.KeyPointRegionModel,
-        HtxObjectModel.BrushRegionModel,
-        HtxObjectModel.HyperTextRegionModel,
-      ),
-    ),
-    node2: types.reference(
-      types.union(
-        HtxObjectModel.TextRegionModel,
-        HtxObjectModel.RectRegionModel,
-        HtxObjectModel.PolygonRegionModel,
-        HtxObjectModel.AudioRegionModel,
-        HtxObjectModel.TextAreaRegionModel,
-        HtxObjectModel.KeyPointRegionModel,
-        HtxObjectModel.BrushRegionModel,
-        HtxObjectModel.HyperTextRegionModel,
-      ),
-    ),
+    node1: types.reference(AllRegionsType),
+    node2: types.reference(AllRegionsType),
   })
   .actions(self => ({
     toggleHighlight() {

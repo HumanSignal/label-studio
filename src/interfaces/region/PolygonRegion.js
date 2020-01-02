@@ -94,11 +94,9 @@ const Model = types
     },
 
     handleLineClick({ e, flattenedPoints, insertIdx }) {
-      console.log("handleLineClick");
-
       e.cancelBubble = true;
 
-      if (!self.closed) return;
+      if (!self.closed || !self.selected) return;
 
       removeHoverAnchor({ layer: e.currentTarget.getLayer() });
 
@@ -335,7 +333,7 @@ const HtxPolygonView = ({ store, item }) => {
         name={name}
         onClick={e => item.handleLineClick({ e, flattenedPoints, insertIdx })}
         onMouseMove={e => {
-          if (!item.closed) return;
+          if (!item.closed || !item.selected) return;
 
           item.handleMouseMove({ e, flattenedPoints });
         }}

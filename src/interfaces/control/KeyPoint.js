@@ -6,7 +6,7 @@ import { types, getParentOfType, getRoot } from "mobx-state-tree";
 import Registry from "../../core/Registry";
 import { isHtx, cloneNode } from "../../core/Helpers";
 import { guidGenerator } from "../../core/Helpers";
-import { KeyPointRegionModel } from "../object/KeyPointRegion";
+import { KeyPointRegionModel } from "../region/KeyPointRegion";
 
 import Types from "../../core/Types";
 
