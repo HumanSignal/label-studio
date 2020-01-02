@@ -500,11 +500,12 @@ export default types
         id: id || guidGenerator(5),
         root: root,
 
-        createdBy: user && user.displayName,
         userGenerate: false,
 
         ...options,
       };
+
+      if (user) node["createdBy"] = user.displayName;
 
       //
       return Completion.create(node);
