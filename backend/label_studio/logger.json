@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "formatters": {
+    "standard": {
+      "format": "[%(asctime)s] [%(name)s] [%(levelname)s] %(message)s"
+    }
+  },
+  "handlers": {
+    "console": {
+      "class": "logging.StreamHandler",
+      "level": "DEBUG",
+      "stream": "ext://sys.stdout",
+      "formatter": "standard"
+    }
+  },
+  "loggers": {
+    "service": {
+      "level": "DEBUG",
+      "handlers": [
+        "console"
+      ],
+      "propagate": false
+    }
+  },
+  "root": {
+    "level": "ERROR",
+    "handlers": [
+      "console"
+    ]
+  }
+}

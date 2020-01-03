@@ -69,7 +69,8 @@
     "lint:write": "eslint --debug src/ --fix",
     "build-notsourcemap": "GENERATE_SOURCEMAP=false npm run build",
     "copy-examples": "bash scripts/copy.sh",
-    "build-bundle": "npm run copy-examples && npm run test && node scripts/build-without-split.js"
+    "copy-built-scripts": "bash scripts/copy-built-scripts.sh",
+    "build-bundle": "npm run copy-examples && npm run test && node scripts/build-without-split.js && npm run copy-built-scripts"
   },
   "eslintConfig": {
     "extends": "react-app"
