@@ -1,15 +1,12 @@
-import { types, getParentOfType, destroy, getRoot } from "mobx-state-tree";
+import { types, getParentOfType, getRoot } from "mobx-state-tree";
 
-import RegionsMixin from "../mixins/Regions";
 import NormalizationMixin from "../mixins/Normalization";
-
-import { guidGenerator, restoreNewsnapshot } from "../../core/Helpers";
-
+import RegionsMixin from "../mixins/Regions";
+import Utils from "../../utils";
+import { AudioPlusModel } from "../object/AudioPlus";
 import { LabelsModel } from "../control/Labels";
 import { RatingModel } from "../control/Rating";
-
-import { AudioPlusModel } from "../object/AudioPlus";
-import Utils from "../../utils";
+import { guidGenerator } from "../../core/Helpers";
 
 const Model = types
   .model("AudioRegionModel", {

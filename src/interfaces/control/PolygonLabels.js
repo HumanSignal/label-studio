@@ -1,17 +1,14 @@
-import { observer } from "mobx-react";
 import React from "react";
-
+import { observer } from "mobx-react";
 import { types } from "mobx-state-tree";
 
-import Types from "../../core/Types";
+import LabelMixin from "../mixins/LabelMixin";
 import Registry from "../../core/Registry";
-
-import { guidGenerator } from "../../core/Helpers";
 import SelectedModelMixin from "../mixins/SelectedModel";
-
+import Types from "../../core/Types";
 import { HtxLabels, LabelsModel } from "./Labels";
 import { PolygonModel } from "./Polygon";
-import LabelMixin from "../mixins/LabelMixin";
+import { guidGenerator } from "../../core/Helpers";
 
 /**
  * PolygonLabels tag, create labeled polygons
@@ -47,19 +44,9 @@ const ModelAttrs = types.model("PolygonLabelsModel", {
 
 const Model = LabelMixin.props({ _type: "polygonlabels" });
 
-const Composition = types.compose(
-  LabelsModel,
-  ModelAttrs,
-  PolygonModel,
-  TagAttrs,
-  Model,
-  SelectedModelMixin,
-);
+const Composition = types.compose(LabelsModel, ModelAttrs, PolygonModel, TagAttrs, Model, SelectedModelMixin);
 
-const PolygonLabelsModel = types.compose(
-  "PolygonLabelsModel",
-  Composition,
-);
+const PolygonLabelsModel = types.compose("PolygonLabelsModel", Composition);
 
 const HtxPolygonLabels = observer(({ item }) => {
   return <HtxLabels item={item} />;

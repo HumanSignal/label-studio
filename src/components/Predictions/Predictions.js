@@ -1,6 +1,7 @@
 import React, { Component } from "react";
-import { observer } from "mobx-react";
 import { Button, Card, Icon, List, Tooltip } from "antd";
+import { observer } from "mobx-react";
+
 import Utils from "../../utils";
 import styles from "../Completions/Completions.module.scss";
 
@@ -26,15 +27,14 @@ const Prediction = observer(({ item, store }) => {
                 onClick={ev => {
                   ev.preventDefault();
 
-                  const p = store.completionStore.selected;
-                  const c = store.completionStore.addCompletionFromPrediction(p);
-
-                  // store.completionStore.selectCompletion(c.id);
+                  const cs = store.completionStore;
+                  const p = cs.selected;
+                  const c = cs.addCompletionFromPrediction(p);
 
                   // this is here because otherwise React doesn't re-render the change in the tree
                   window.setTimeout(function() {
                     store.completionStore.selectCompletion(c.id);
-                  }, 50);
+                  }, 200);
                 }}
               >
                 <Icon type="copy" />
@@ -50,15 +50,7 @@ const Prediction = observer(({ item, store }) => {
 class Predictions extends Component {
   render() {
     const { store } = this.props;
-
-    let content = [];
-
-    store.completionStore.predictions &&
-      store.completionStore.predictions.map(predict => {
-        if (predict) {
-          content.push(<Prediction key={predict.pk} item={predict} store={store} />);
-        }
-      });
+    const { predictions } = store.completionStore;
 
     let title = (
       <div className={styles.title + " " + styles.titlespace}>
@@ -83,8 +75,8 @@ class Predictions extends Component {
     return (
       <Card title={title} size="small" bodyStyle={{ padding: "0" }}>
         <List>
-          {store.completionStore.predictions && store.completionStore.predictions.length ? (
-            content
+          {predictions && predictions.length ? (
+            predictions.map(p => <Prediction key={p.pk} item={p} store={store} />)
           ) : (
             <List.Item>
               <div style={{ padding: "0 12px" }}>No predictions</div>

@@ -1,17 +1,13 @@
-import React, { createRef, Component, Fragment } from "react";
-import PropTypes from "prop-types";
-
-import { observer, inject, Provider } from "mobx-react";
+import React from "react";
+import { observer, inject } from "mobx-react";
 import { types, getParentOfType, getRoot } from "mobx-state-tree";
 import { Alert } from "antd";
 
-import Types from "../../core/Types";
-
-import Registry from "../../core/Registry";
-import { guidGenerator, restoreNewsnapshot } from "../../core/Helpers";
-import { TextAreaModel } from "../control/TextArea";
-import RegionsMixin from "../mixins/Regions";
 import NormalizationMixin from "../mixins/Normalization";
+import RegionsMixin from "../mixins/Regions";
+import Registry from "../../core/Registry";
+import { TextAreaModel } from "../control/TextArea";
+import { guidGenerator } from "../../core/Helpers";
 
 const Model = types
   .model("TextAreaRegionModel", {

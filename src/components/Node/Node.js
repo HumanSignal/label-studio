@@ -1,7 +1,7 @@
-import React, { Component, Fragment } from "react";
-import { observer, inject } from "mobx-react";
-import { getType, getRoot } from "mobx-state-tree";
+import React, { Fragment } from "react";
 import { Icon } from "antd";
+import { getType, getRoot } from "mobx-state-tree";
+import { observer } from "mobx-react";
 
 import styles from "./Node.module.scss";
 

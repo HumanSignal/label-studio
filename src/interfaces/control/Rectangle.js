@@ -1,14 +1,7 @@
-import React, { Component } from "react";
-
-import { observer, inject } from "mobx-react";
-import { types, getParentOfType, getRoot } from "mobx-state-tree";
-
-import Registry from "../../core/Registry";
-import { isHtx, cloneNode } from "../../core/Helpers";
-import { guidGenerator } from "../../core/Helpers";
-import { RectRegionModel } from "../region/RectRegion";
+import { types, getRoot } from "mobx-state-tree";
 
 import * as Tools from "../tools";
+import Registry from "../../core/Registry";
 
 /**
  * Rectangle

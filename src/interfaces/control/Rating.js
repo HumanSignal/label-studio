@@ -1,11 +1,10 @@
-import React, { Component } from "react";
+import React from "react";
 import { Rate, Icon } from "antd";
-
 import { observer, inject } from "mobx-react";
 import { types } from "mobx-state-tree";
 
-import { guidGenerator } from "../../core/Helpers";
 import Registry from "../../core/Registry";
+import { guidGenerator } from "../../core/Helpers";
 
 /**
  * Rating adds rating selection
@@ -103,11 +102,7 @@ const Model = types
     },
   }));
 
-const RatingModel = types.compose(
-  "RatingModel",
-  TagAttrs,
-  Model,
-);
+const RatingModel = types.compose("RatingModel", TagAttrs, Model);
 
 const HtxRating = inject("store")(
   observer(({ item, store }) => {

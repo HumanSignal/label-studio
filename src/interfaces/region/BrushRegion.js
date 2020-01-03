@@ -1,23 +1,16 @@
-import React, { createRef, Component, Fragment } from "react";
-
-import { observer, inject } from "mobx-react";
-import { types, getParentOfType, getParent, getRoot } from "mobx-state-tree";
-
-import Konva from "konva";
+import React, { Fragment } from "react";
 import { Line, Group } from "react-konva";
+import { observer, inject } from "mobx-react";
+import { types, getParentOfType, getRoot } from "mobx-state-tree";
 
-import { guidGenerator } from "../../core/Helpers";
-
-import Registry from "../../core/Registry";
-
-import { LabelsModel } from "../control/Labels";
-import { BrushLabelsModel } from "../control/BrushLabels";
-
-import { RatingModel } from "../control/Rating";
-import { ImageModel } from "../object/Image";
-import RegionsMixin from "../mixins/Regions";
 import NormalizationMixin from "../mixins/Normalization";
-import Utils from "../../utils";
+import RegionsMixin from "../mixins/Regions";
+import Registry from "../../core/Registry";
+import { BrushLabelsModel } from "../control/BrushLabels";
+import { ImageModel } from "../object/Image";
+import { LabelsModel } from "../control/Labels";
+import { RatingModel } from "../control/Rating";
+import { guidGenerator } from "../../core/Helpers";
 
 const Points = types
   .model("Points", {
@@ -206,7 +199,7 @@ const HtxBrushLayer = observer(({ store, item, points }) => {
     currentPoints.push(point);
   });
 
-  return points.type == "add" ? (
+  return points.type === "add" ? (
     <HtxBrushAddLine item={item} points={currentPoints} />
   ) : (
     <HtxBrushEraserLine item={item} points={currentPoints} />

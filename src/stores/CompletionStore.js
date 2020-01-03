@@ -1,24 +1,16 @@
-import { types, getParent, getEnv, getRoot, flow, destroy, detach } from "mobx-state-tree";
+import { types, getParent, getEnv, getRoot, destroy, detach } from "mobx-state-tree";
 
-import { guidGenerator } from "../core/Helpers";
-import Types from "../core/Types";
-
-import Registry from "../core/Registry";
-import Tree from "../core/Tree";
-import TimeTraveller from "../core/TimeTraveller";
 import Hotkey from "../core/Hotkey";
-
-import RelationStore from "./RelationStore";
 import NormalizationStore from "./NormalizationStore";
 import RegionStore from "./RegionStore";
-
-// import { RectangleModel } from "../interfaces/control/Rectangle";
-// import { BrushModel } from "../interfaces/control/Brush";
-import { AllRegionsType } from "../interfaces/region";
-
+import Registry from "../core/Registry";
+import RelationStore from "./RelationStore";
+import TimeTraveller from "../core/TimeTraveller";
+import Tree from "../core/Tree";
+import Types from "../core/Types";
 import Utils from "../utils";
-
-import * as HtxObjectModel from "../interfaces/object";
+import { AllRegionsType } from "../interfaces/region";
+import { guidGenerator } from "../core/Helpers";
 
 const Completion = types
   .model("Completion", {
@@ -35,6 +27,7 @@ const Completion = types
     loadedDate: types.optional(types.Date, new Date()),
     leadTime: types.maybeNull(types.number),
 
+    //
     userGenerate: types.optional(types.boolean, true),
     update: types.optional(types.boolean, false),
     sentUserGenerate: types.optional(types.boolean, false),
@@ -67,19 +60,6 @@ const Completion = types
     }),
 
     highlightedNode: types.maybeNull(types.safeReference(AllRegionsType)),
-    //   types.union(
-    //     types.safeReference(HtxObjectModel.TextRegionModel),
-    //     types.safeReference(HtxObjectModel.RectRegionModel),
-    //     types.safeReference(HtxObjectModel.AudioRegionModel),
-    //     types.safeReference(HtxObjectModel.TextAreaRegionModel),
-    //     types.safeReference(HtxObjectModel.PolygonRegionModel),
-    //     types.safeReference(HtxObjectModel.KeyPointRegionModel),
-    //     types.safeReference(HtxObjectModel.BrushRegionModel),
-    //     types.safeReference(HtxObjectModel.HyperTextRegionModel),
-    //     types.safeReference(RectangleModel),
-    //     types.safeReference(BrushModel),
-    //   ),
-    // ),
   })
   .views(self => ({
     get store() {
@@ -262,7 +242,7 @@ const Completion = types
 
       self.traverseTree(node => {
         // add Space hotkey for playbacks of audio
-        if (node && !node.hotkey && node.type == "audio") {
+        if (node && !node.hotkey && node.type === "audio") {
           if (audiosNum > 0) comb = mod + "+" + (audiosNum + 1);
           else audioNode = node;
 
@@ -379,7 +359,7 @@ export default types
     },
   }))
   .actions(self => {
-    function _toggleViewingAll() {
+    function toggleViewingAll() {
       if (self.viewingAllCompletions || self.viewingAllPredictions) {
         self.completions.forEach(c => {
           c.selected = false;
@@ -397,7 +377,7 @@ export default types
 
       if (self.viewingAllPredictions) self.viewingAllCompletions = false;
 
-      _toggleViewingAll();
+      toggleViewingAll();
     }
 
     function toggleViewingAllCompletions() {
@@ -408,7 +388,7 @@ export default types
         self.completions.forEach(c => (c.edittable = false));
       }
 
-      _toggleViewingAll();
+      toggleViewingAll();
     }
 
     function unselectViewingAll() {
@@ -513,8 +493,7 @@ export default types
     function addCompletionFromPrediction(prediction) {
       const c = self.addCompletion({ userGenerate: true });
 
-      const selectedData = prediction.serializeCompletion();
-      c.deserializeCompletion(selectedData);
+      c.deserializeCompletion(prediction.serializeCompletion());
 
       return c;
     }

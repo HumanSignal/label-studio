@@ -1,10 +1,7 @@
 import React from "react";
-
+import { Rect, Circle } from "react-konva";
 import { observer } from "mobx-react";
 import { types, getParent, getRoot } from "mobx-state-tree";
-
-import Konva from "konva";
-import { Rect, Circle } from "react-konva";
 
 const PolygonPoint = types
   .model({

@@ -1,14 +1,10 @@
 import React, { Component } from "react";
+import { Stage, Layer, Group, Line } from "react-konva";
 import { observer } from "mobx-react";
-import { getParent, getEnv } from "mobx-state-tree";
-import { Stage, Layer, Rect, Group, Line } from "react-konva";
 
-import Tree from "../../core/Tree";
-import ImageTransformer from "../ImageTransformer/ImageTransformer";
-import ImageControls from "../ImageControls/ImageControls";
 import ImageGrid from "../ImageGrid/ImageGrid";
-import Utils from "../../utils";
-
+import ImageTransformer from "../ImageTransformer/ImageTransformer";
+import Tree from "../../core/Tree";
 import styles from "./ImageView.module.scss";
 
 export default observer(
@@ -80,7 +76,7 @@ export default observer(
       //   return;
       // }
 
-      return true;
+      // return true;
     };
 
     /**
@@ -152,12 +148,6 @@ export default observer(
       // }
 
       // item.setPointerPosition({ x: e.evt.offsetX, y: e.evt.offsetY });
-    };
-
-    handleMouseOver = e => {
-      const { item } = this.props;
-
-      // item.freezeHistory();
     };
 
     /**
@@ -310,7 +300,7 @@ export default observer(
       // console.log(item.tools);
 
       // TODO fix me
-      if (!store.task) return null;
+      if (!store.task || !item._value) return null;
 
       const divStyle = {
         overflow: "hidden",
@@ -330,80 +320,67 @@ export default observer(
         imgStyle["transform"] = translate + "scale(" + item.resize + ", " + item.resize + ")";
       }
 
-      if (item.hasStates && item._value.length > 0) {
-        return (
+      return (
+        <div
+          style={{
+            position: "relative",
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+          }}
+        >
           <div
-            style={{
-              position: "relative",
-              display: "flex",
-              alignItems: "flex-start",
-              justifyContent: "space-between",
+            ref={node => {
+              this.container = node;
             }}
+            style={divStyle}
           >
-            <div
-              ref={node => {
-                this.container = node;
-              }}
-              style={divStyle}
-            >
-              <img style={imgStyle} src={item._value} onLoad={item.updateIE} onClick={this.handleOnClick} alt="LS" />
-            </div>
-            <Stage
-              ref={ref => {
-                item.setStageRef(ref);
-              }}
-              style={{ position: "absolute", top: 0, left: 0, brightness: "150%" }}
-              width={item.stageWidth}
-              height={item.stageHeight}
-              scaleX={item.scale}
-              scaleY={item.scale}
-              onDblClick={this.handleDblClick}
-              onClick={this.handleOnClick}
-              onMouseDown={this.handleStageMouseDown}
-              onMouseMove={this.handleMouseMove}
-              onMouseUp={this.handleMouseUp}
-              onWheel={item.zoom ? this.handleZoom : () => {}}
-            >
-              {item.grid && item.sizeUpdated && <ImageGrid item={item} />}
-              {item.shapes.map(shape => {
-                let brushShape;
-                if (shape.type === "brushregion") {
-                  brushShape = (
-                    <Layer name="brushLayer" id={shape.id}>
-                      {Tree.renderItem(shape)}
-                    </Layer>
-                  );
-                }
-                return brushShape;
-              })}
-              <Layer>
-                {item.shapes.map(shape => {
-                  if (shape.type !== "brushregion") {
-                    return Tree.renderItem(shape);
-                  }
-                })}
-                {item.activeShape && Tree.renderItem(item.activeShape)}
-
-                <ImageTransformer rotateEnabled={item.controlButton().canrotate} selectedShape={item.selectedShape} />
-              </Layer>
-            </Stage>
-
-            <div className={styles.block}>
-              {item
-                .getToolsManager()
-                .allTools()
-                .map(tool => tool.viewClass)}
-            </div>
+            <img style={imgStyle} src={item._value} onLoad={item.updateIE} onClick={this.handleOnClick} alt="LS" />
           </div>
-        );
-      } else {
-        divStyle["marginTop"] = "1em";
-        return (
-          <div style={divStyle}>
-            <img style={imgStyle} src={item._value} onLoad={item.updateIE} />
+          <Stage
+            ref={ref => {
+              item.setStageRef(ref);
+            }}
+            style={{ position: "absolute", top: 0, left: 0, brightness: "150%" }}
+            width={item.stageWidth}
+            height={item.stageHeight}
+            scaleX={item.scale}
+            scaleY={item.scale}
+            onDblClick={this.handleDblClick}
+            onClick={this.handleOnClick}
+            onMouseDown={this.handleStageMouseDown}
+            onMouseMove={this.handleMouseMove}
+            onMouseUp={this.handleMouseUp}
+            onWheel={item.zoom ? this.handleZoom : () => {}}
+          >
+            {item.grid && item.sizeUpdated && <ImageGrid item={item} />}
+            {item.shapes.map(shape => {
+              let brushShape;
+              if (shape.type === "brushregion") {
+                brushShape = (
+                  <Layer name="brushLayer" id={shape.id}>
+                    {Tree.renderItem(shape)}
+                  </Layer>
+                );
+              }
+              return brushShape;
+            })}
+            <Layer>
+              {item.shapes.filter(s => s.type !== "brushregion").map(s => Tree.renderItem(s))}
+              {item.activeShape && Tree.renderItem(item.activeShape)}
+
+              <ImageTransformer rotateEnabled={item.controlButton().canrotate} selectedShape={item.selectedShape} />
+            </Layer>
+          </Stage>
+
+          <div className={styles.block}>
+            {item
+              .getToolsManager()
+              .allTools()
+              .map(tool => tool.viewClass)}
           </div>
-        );
-      }
+        </div>
+      );
     }
   },
 );

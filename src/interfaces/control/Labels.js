@@ -1,15 +1,14 @@
-import { observer } from "mobx-react";
 import React from "react";
+import { observer } from "mobx-react";
 import { types } from "mobx-state-tree";
 
-import Tree from "../../core/Tree";
+import LabelMixin from "../mixins/LabelMixin";
 import Registry from "../../core/Registry";
+import SelectedModelMixin from "../mixins/SelectedModel";
+import Tree from "../../core/Tree";
 import Types from "../../core/Types";
-
 import { LabelModel } from "./Label"; // eslint-disable-line no-unused-vars
 import { guidGenerator } from "../../core/Helpers";
-import SelectedModelMixin from "../mixins/SelectedModel";
-import LabelMixin from "../mixins/LabelMixin";
 
 /**
  * Labels tag, create a group of labels

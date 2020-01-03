@@ -44,13 +44,13 @@ function onEntityDelete() {}
 function onGroundTruth() {}
 
 export default {
-  onSubmitCompletion,
-  onUpdateCompletion,
   onDeleteCompletion,
-  onSkipTask,
-  onTaskLoad,
-  onLabelStudioLoad,
   onEntityCreate,
   onEntityDelete,
   onGroundTruth,
+  onLabelStudioLoad,
+  onSkipTask,
+  onSubmitCompletion,
+  onTaskLoad,
+  onUpdateCompletion,
 };

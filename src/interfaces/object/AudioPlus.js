@@ -1,21 +1,16 @@
-import React, { Fragment } from "react";
-
-import { types, getRoot, getType } from "mobx-state-tree";
+import React from "react";
 import { observer, inject } from "mobx-react";
-import { Button, Icon, Slider, Row, Col } from "antd";
+import { types, getRoot, getType } from "mobx-state-tree";
 
-import { cloneNode } from "../../core/Helpers";
-import Registry from "../../core/Registry";
-import { guidGenerator, restoreNewsnapshot } from "../../core/Helpers";
-
-import Waveform from "../../components/Waveform/Waveform";
-import ProcessAttrsMixin from "../mixins/ProcessAttrs";
-
-import Utils from "../../utils";
-
-import { AudioRegionModel } from "../region/AudioRegion";
 import AudioControls from "./Audio/Controls";
+import ProcessAttrsMixin from "../mixins/ProcessAttrs";
+import Registry from "../../core/Registry";
+import Utils from "../../utils";
+import Waveform from "../../components/Waveform/Waveform";
 import styles from "./AudioPlus/AudioPlus.module.scss";
+import { AudioRegionModel } from "../region/AudioRegion";
+import { cloneNode } from "../../core/Helpers";
+import { guidGenerator, restoreNewsnapshot } from "../../core/Helpers";
 
 /**
  * AudioPlus tag plays audio and shows its wave

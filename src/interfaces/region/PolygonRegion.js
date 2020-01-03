@@ -1,26 +1,19 @@
-import React, { createRef, Component, Fragment } from "react";
-
-import { observer, inject } from "mobx-react";
-import { types, getParentOfType, getRoot, destroy, detach, getParent } from "mobx-state-tree";
-
 import Konva from "konva";
+import React from "react";
 import { Group, Line } from "react-konva";
+import { observer, inject } from "mobx-react";
+import { types, getParentOfType, getRoot, destroy, detach } from "mobx-state-tree";
 
-import { guidGenerator, restoreNewsnapshot } from "../../core/Helpers";
-
-import Registry from "../../core/Registry";
-
-import { LabelsModel } from "../control/Labels";
-import { RatingModel } from "../control/Rating";
-import { ImageModel } from "../object/Image";
-import { PolygonPoint, PolygonPointView } from "./PolygonPoint";
-
-import { PolygonLabelsModel } from "../control/PolygonLabels";
-
-import RegionsMixin from "../mixins/Regions";
 import NormalizationMixin from "../mixins/Normalization";
-
+import RegionsMixin from "../mixins/Regions";
+import Registry from "../../core/Registry";
+import { ImageModel } from "../object/Image";
+import { LabelsModel } from "../control/Labels";
+import { PolygonLabelsModel } from "../control/PolygonLabels";
+import { PolygonPoint, PolygonPointView } from "./PolygonPoint";
+import { RatingModel } from "../control/Rating";
 import { green } from "@ant-design/colors";
+import { guidGenerator } from "../../core/Helpers";
 
 const Model = types
   .model({
@@ -78,7 +71,7 @@ const Model = types
       let x = point[0];
       let y = point[1];
 
-      if (self.parent.zoomScale != 1) {
+      if (self.parent.zoomScale !== 1) {
         x = x * self.parent.zoomScale;
         y = y * self.parent.zoomScale;
       }
@@ -186,7 +179,7 @@ const Model = types
       self.hp = hp;
 
       if (self.coordstype === "px") {
-        self.points.map(p => {
+        self.points.forEach(p => {
           const x = (sw * p.relativeX) / 100;
           const y = (sh * p.relativeY) / 100;
 
@@ -195,7 +188,7 @@ const Model = types
       }
 
       if (!self.completion.sentUserGenerate && self.coordstype === "perc") {
-        self.points.map(p => {
+        self.points.forEach(p => {
           const x = (sw * p.x) / 100;
           const y = (sh * p.y) / 100;
           self.coordstype = "px";

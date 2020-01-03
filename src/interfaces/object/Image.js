@@ -1,29 +1,15 @@
-import React, { Component } from "react";
-import { observer, inject, Provider } from "mobx-react";
-import { detach, types, flow, getParent, getType, destroy, getRoot, isValidReference } from "mobx-state-tree";
-
-import Registry from "../../core/Registry";
-import { guidGenerator, cloneNode, restoreNewsnapshot } from "../../core/Helpers";
-
-import ProcessAttrsMixin from "../mixins/ProcessAttrs";
-import Infomodal from "../../components/Infomodal/Infomodal";
-import Utils from "../../utils";
-
-// import { calcBorder } from "../../utils/floodfill";
-
-import ImageView from "../../components/ImageView/ImageView";
-
-import { RectRegionModel } from "../region/RectRegion";
-import { PolygonRegionModel } from "../region/PolygonRegion";
-import { KeyPointRegionModel } from "../region/KeyPointRegion";
-import { BrushRegionModel } from "../region/BrushRegion";
+import { detach, types, flow, getParent, getType, destroy, getRoot } from "mobx-state-tree";
+import { observer, inject } from "mobx-react";
 
 import * as Tools from "../tools";
-import Types from "../../core/Types";
-
+import ImageView from "../../components/ImageView/ImageView";
+import ProcessAttrsMixin from "../mixins/ProcessAttrs";
+import Registry from "../../core/Registry";
 import ToolsManager from "../tools/Manager";
-
-// import Tools from "../control/ImageTools";
+import { BrushRegionModel } from "../region/BrushRegion";
+import { KeyPointRegionModel } from "../region/KeyPointRegion";
+import { PolygonRegionModel } from "../region/PolygonRegion";
+import { RectRegionModel } from "../region/RectRegion";
 
 /**
  * Image tag shows an image on the page
@@ -80,35 +66,6 @@ const IMAGE_CONSTANTS = {
   brushlabels: "brushlabels",
   brushModel: "BrushModel",
 };
-
-/**
- * Reverse coordinates if user drags left and up
- * @param {*} r1
- * @param {*} r2
- */
-function reverseCoordinates(r1, r2) {
-  let r1X = r1.x,
-    r1Y = r1.y,
-    r2X = r2.x,
-    r2Y = r2.y,
-    d;
-
-  if (r1X > r2X) {
-    d = Math.abs(r1X - r2X);
-    r1X = r2X;
-    r2X = r1X + d;
-  }
-
-  if (r1Y > r2Y) {
-    d = Math.abs(r1Y - r2Y);
-    r1Y = r2Y;
-    r2Y = r1Y + d;
-  }
-  /**
-   * Return the corrected rect
-   */
-  return { x1: r1X, y1: r1Y, x2: r2X, y2: r2Y };
-}
 
 const Model = types
   .model({
@@ -226,7 +183,7 @@ const Model = types
   // actions for the tools
   .actions(self => {
     // tools
-    const tools = {};
+    let tools = {};
     const toolsManager = new ToolsManager({ obj: self });
 
     function afterCreate() {
@@ -485,7 +442,10 @@ const Model = types
      */
     fromStateJSON(obj, fromModel) {
       if (obj.value.choices) {
-        self.completion.names.get(obj.from_name).fromStateJSON(obj);
+        self
+          .completion()
+          .names.get(obj.from_name)
+          .fromStateJSON(obj);
       }
 
       self

@@ -17,7 +17,7 @@ const SelectedModelMixin = types
     },
 
     unselectAll() {
-      self.children.map(c => c.markSelected(false));
+      self.children.map(c => c.setSelected(false));
     },
 
     getSelectedNames() {

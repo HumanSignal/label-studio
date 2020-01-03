@@ -1,10 +1,10 @@
-import React, { Component } from "react";
+import React from "react";
 import { Card } from "antd";
 import { observer } from "mobx-react";
 
-import Relations from "../Relations/Relations";
 import Entities from "../Entities/Entities";
 import Entity from "../Entity/Entity";
+import Relations from "../Relations/Relations";
 import styles from "./SideColumn.module.scss";
 
 /**

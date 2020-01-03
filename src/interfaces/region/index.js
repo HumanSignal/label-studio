@@ -4,6 +4,7 @@ import { types } from "mobx-state-tree";
 // export { default as KeyPoint } from "./KeyPoint";
 
 import { AudioRegionModel } from "./AudioRegion";
+import { BrushRegionModel, HtxBrush } from "./BrushRegion";
 import { HyperTextRegionModel } from "./HyperTextRegion";
 import { KeyPointRegionModel, HtxKeyPoint } from "./KeyPointRegion";
 import { PolygonPoint, PolygonPointView } from "./PolygonPoint";
@@ -11,35 +12,34 @@ import { PolygonRegionModel, HtxPolygon } from "./PolygonRegion";
 import { RectRegionModel, HtxRectangle } from "./RectRegion";
 import { TextAreaRegionModel, HtxTextAreaRegion } from "./TextAreaRegion";
 import { TextRegionModel, HtxTextRegion } from "./TextRegion";
-import { BrushRegionModel, HtxBrush } from "./BrushRegion";
 
 const AllRegionsType = types.union(
-  TextRegionModel,
-  RectRegionModel,
-  PolygonRegionModel,
   AudioRegionModel,
-  TextAreaRegionModel,
-  KeyPointRegionModel,
   BrushRegionModel,
   HyperTextRegionModel,
+  KeyPointRegionModel,
+  PolygonRegionModel,
+  RectRegionModel,
+  TextAreaRegionModel,
+  TextRegionModel,
 );
 
 export {
   AllRegionsType,
   AudioRegionModel,
+  BrushRegionModel,
+  HtxBrush,
+  HtxKeyPoint,
+  HtxPolygon,
+  HtxRectangle,
+  HtxTextAreaRegion,
+  HtxTextRegion,
   HyperTextRegionModel,
   KeyPointRegionModel,
-  HtxKeyPoint,
   PolygonPoint,
   PolygonPointView,
   PolygonRegionModel,
-  HtxPolygon,
   RectRegionModel,
-  HtxRectangle,
   TextAreaRegionModel,
-  HtxTextAreaRegion,
   TextRegionModel,
-  HtxTextRegion,
-  BrushRegionModel,
-  HtxBrush,
 };

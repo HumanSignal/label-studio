@@ -1,21 +1,15 @@
-import React, { Component } from "react";
-
-import { observer, inject, Provider } from "mobx-react";
-import { types, destroy, getEnv, flow, getParentOfType, getRoot } from "mobx-state-tree";
-
+import React from "react";
 import { Form, Input, Button } from "antd";
+import { observer } from "mobx-react";
+import { types, destroy, getRoot } from "mobx-state-tree";
 
-import { renderChildren } from "../../core/Tree";
-import { guidGenerator } from "../../core/Helpers";
-
-import { HtxTextAreaRegion, TextAreaRegionModel } from "../region/TextAreaRegion";
-import { ShortcutModel } from "../control/Shortcut";
-
-import Registry from "../../core/Registry";
 import ProcessAttrsMixin from "../mixins/ProcessAttrs";
-
+import Registry from "../../core/Registry";
 import Tree from "../../core/Tree";
 import Types from "../../core/Types";
+import { HtxTextAreaRegion, TextAreaRegionModel } from "../region/TextAreaRegion";
+import { ShortcutModel } from "../control/Shortcut";
+import { guidGenerator } from "../../core/Helpers";
 
 const { TextArea } = Input;
 
@@ -130,6 +124,8 @@ const HtxTextArea = observer(({ item }) => {
     },
   };
 
+  if (!item.completion.edittable) props["disabled"] = true;
+
   return (
     <div>
       {Tree.renderChildren(item)}
@@ -147,7 +143,7 @@ const HtxTextArea = observer(({ item }) => {
           }}
         >
           <Form.Item>
-            {rows == 1 ? <Input {...props} /> : <TextArea {...props} />}
+            {rows === 1 ? <Input {...props} /> : <TextArea {...props} />}
             {(rows != 1 || item.showSubmitButton) && (
               <Form.Item>
                 <Button type="primary" htmlType="submit">

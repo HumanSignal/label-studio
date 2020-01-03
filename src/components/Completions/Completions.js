@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import { observer } from "mobx-react";
 import { Card, Button, Icon, Tooltip, Badge, List, Popconfirm } from "antd";
+import { observer } from "mobx-react";
 
 import Utils from "../../utils";
 import styles from "./Completions.module.scss";

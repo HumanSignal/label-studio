@@ -1,16 +1,13 @@
-import React, { Component } from "react";
-
+import React from "react";
+import { Checkbox, Radio, Form } from "antd";
 import { observer, inject } from "mobx-react";
 import { types, getParentOfType, getRoot } from "mobx-state-tree";
 
-import { Checkbox, Radio, Form } from "antd";
-
-import { ChoicesModel } from "./Choices";
+import Hint from "../../components/Hint/Hint";
+import ProcessAttrsMixin from "../mixins/ProcessAttrs";
 import Registry from "../../core/Registry";
 import Tree from "../../core/Tree";
-
-import ProcessAttrsMixin from "../mixins/ProcessAttrs";
-import Hint from "../../components/Hint/Hint";
+import { ChoicesModel } from "./Choices";
 
 /**
  * Choice tag represents a single choice
@@ -67,10 +64,10 @@ const Model = types
 
       choice.shouldBeUnselected && choice.unselectAll();
 
-      self.markSelected(!self.selected);
+      self.setSelected(!self.selected);
     },
 
-    markSelected(val) {
+    setSelected(val) {
       self.selected = val;
     },
 

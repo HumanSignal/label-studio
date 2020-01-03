@@ -1,10 +1,13 @@
+import External from "../core/External";
+import Messages from "../utils/messages";
+
 /**
  * Text
  */
-import { Sentiment } from "../examples/sentiment_analysis";
+import { DialogueAnalysis } from "../examples/dialogue_analysis";
 import { NamedEntity } from "../examples/named_entity";
 import { References } from "../examples/references";
-import { DialogueAnalysis } from "../examples/dialogue_analysis";
+import { Sentiment } from "../examples/sentiment_analysis";
 
 /**
  * Audio
@@ -17,10 +20,10 @@ import { TranscribeAudio } from "../examples/transcribe_audio";
  * Image
  */
 import { ImageBbox } from "../examples/image_bbox";
-import { ImageSegmentation } from "../examples/image_segmentation";
-import { ImagePolygons } from "../examples/image_polygons";
 import { ImageKeyPoint } from "../examples/image_keypoints";
 import { ImageMultilabel } from "../examples/image_multilabel";
+import { ImagePolygons } from "../examples/image_polygons";
+import { ImageSegmentation } from "../examples/image_segmentation";
 
 /**
  * HTML
@@ -32,13 +35,10 @@ import { HTMLDocument } from "../examples/html_document";
  */
 import { Pairwise } from "../examples/pairwise";
 
-import External from "../core/External";
-import Messages from "../utils/messages";
-
 /**
  * Custom Data
  */
-const data = ImageBbox;
+const data = Sentiment;
 
 /**
  * Get current config
@@ -102,6 +102,7 @@ function configureApplication(params) {
     onLabelStudioLoad: params.onLabelStudioLoad ? params.onLabelStudioLoad : External.onLabelStudioLoad,
     onEntityCreate: params.onEntityCreate || External.onEntityCreate,
     onEntityDelete: params.onEntityDelete || External.onEntityDelete,
+    onGroundTruth: params.onGroundTruth || External.onGroundTruth,
   };
 
   return options;

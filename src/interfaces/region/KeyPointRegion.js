@@ -1,22 +1,16 @@
-import React, { createRef, Component, Fragment } from "react";
-
+import React, { Fragment } from "react";
+import { Circle } from "react-konva";
 import { observer, inject } from "mobx-react";
 import { types, getParentOfType, getRoot } from "mobx-state-tree";
 
-import Konva from "konva";
-import { Shape, Label, Stage, Layer, Circle, Text } from "react-konva";
-
-import { guidGenerator, restoreNewsnapshot } from "../../core/Helpers";
-
-import Registry from "../../core/Registry";
-
-import { LabelsModel } from "../control/Labels";
-import { KeyPointLabelsModel } from "../control/KeyPointLabels";
-
-import { RatingModel } from "../control/Rating";
-import { ImageModel } from "../object/Image";
-import RegionsMixin from "../mixins/Regions";
 import NormalizationMixin from "../mixins/Normalization";
+import RegionsMixin from "../mixins/Regions";
+import Registry from "../../core/Registry";
+import { ImageModel } from "../object/Image";
+import { KeyPointLabelsModel } from "../control/KeyPointLabels";
+import { LabelsModel } from "../control/Labels";
+import { RatingModel } from "../control/Rating";
+import { guidGenerator } from "../../core/Helpers";
 
 const Model = types
   .model({
@@ -27,6 +21,10 @@ const Model = types
 
     x: types.number,
     y: types.number,
+
+    relativeX: types.optional(types.number, 0),
+    relativeY: types.optional(types.number, 0),
+
     width: types.number,
 
     opacity: types.number,
@@ -74,6 +72,13 @@ const Model = types
       self.fill = color;
     },
 
+    afterCreate() {
+      if (self.coordstype === "perc") {
+        self.relativeX = self.x;
+        self.relativeY = self.y;
+      }
+    },
+
     updateImageSize(wp, hp, sw, sh) {
       // self.wp = wp;
       // self.hp = hp;
@@ -81,7 +86,12 @@ const Model = types
       self.sw = sw;
       self.sh = sh;
 
-      if (self.coordstype == "perc") {
+      if (self.coordstype === "px") {
+        self.x = (sw * self.relativeX) / 100;
+        self.y = (sh * self.relativeY) / 100;
+      }
+
+      if (self.coordstype === "perc") {
         self.x = (sw * self.x) / 100;
         self.y = (sh * self.y) / 100;
         self.width = (sw * self.width) / 100;
@@ -130,15 +140,8 @@ const Model = types
 const KeyPointRegionModel = types.compose("KeyPointRegionModel", RegionsMixin, NormalizationMixin, Model);
 
 const HtxKeyPointView = ({ store, item }) => {
-  const self = this;
-  const { name, wwidth, wheight, onChangedPosition } = item;
-
-  const wp = item.wp || item.parent.stageWidth / item.parent.naturalWidth;
-  const hp = item.hp || item.parent.stageHeight / item.parent.naturalHeight;
-
   const x = item.x;
   const y = item.y;
-  const w = item.width;
 
   const props = {};
 

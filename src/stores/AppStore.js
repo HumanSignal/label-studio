@@ -1,16 +1,14 @@
-import { types, getEnv, flow, getSnapshot } from "mobx-state-tree";
+import { types, getEnv } from "mobx-state-tree";
 
-import Task from "./TaskStore";
-import Project from "./ProjectStore";
-import User from "./UserStore";
-import Settings from "./SettingsStore";
 import CompletionStore from "./CompletionStore";
 import Hotkey from "../core/Hotkey";
-import { API_URL } from "../constants/Api";
-import Utils from "../utils";
-import Message from "../utils/messages";
-
 import InfoModal from "../components/Infomodal/Infomodal";
+import Message from "../utils/messages";
+import Project from "./ProjectStore";
+import Settings from "./SettingsStore";
+import Task from "./TaskStore";
+import User from "./UserStore";
+import Utils from "../utils";
 
 export default types
   .model("AppStore", {

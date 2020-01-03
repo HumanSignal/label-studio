@@ -1,16 +1,16 @@
-import React from "react";
-import { observer, inject } from "mobx-react";
-import { getRoot, types } from "mobx-state-tree";
-import { Tag } from "antd";
 import ColorScheme from "pleasejs";
+import React from "react";
+import { Tag } from "antd";
+import { getRoot, types } from "mobx-state-tree";
+import { observer, inject } from "mobx-react";
 
-import { guidGenerator } from "../../core/Helpers";
-import Utils from "../../utils";
+import Hint from "../../components/Hint/Hint";
+import ProcessAttrsMixin from "../mixins/ProcessAttrs";
 import Registry from "../../core/Registry";
 import Types from "../../core/Types";
+import Utils from "../../utils";
+import { guidGenerator } from "../../core/Helpers";
 import { runTemplate } from "../../core/Template";
-import ProcessAttrsMixin from "../mixins/ProcessAttrs";
-import Hint from "../../components/Hint/Hint";
 
 const DEFAULT_BACKGROUND = "#36B37E";
 
@@ -79,7 +79,7 @@ const Model = types
        * Multiple
        */
       if (!labels.shouldBeUnselected) {
-        self.markSelected(!self.selected);
+        self.setSelected(!self.selected);
       }
 
       /**
@@ -97,7 +97,7 @@ const Model = types
           /**
            * Select current label
            */
-          self.markSelected(!self.selected);
+          self.setSelected(!self.selected);
         } else {
           /**
            * Unselect all labels
@@ -111,7 +111,7 @@ const Model = types
      *
      * @param {boolean} value
      */
-    markSelected(value) {
+    setSelected(value) {
       self.selected = value;
     },
 
@@ -120,7 +120,7 @@ const Model = types
     },
 
     _updateBackgroundColor(val) {
-      if (self.background == DEFAULT_BACKGROUND) self.background = ColorScheme.make_color({ seed: val })[0];
+      if (self.background === DEFAULT_BACKGROUND) self.background = ColorScheme.make_color({ seed: val })[0];
     },
 
     afterCreate() {

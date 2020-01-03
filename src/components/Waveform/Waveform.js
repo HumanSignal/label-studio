@@ -1,12 +1,11 @@
-import React, { Fragment } from "react";
+import CursorPlugin from "wavesurfer.js/dist/plugin/wavesurfer.cursor";
+import React from "react";
 import ReactDOM from "react-dom";
-import WaveSurfer from "wavesurfer.js";
 import RegionsPlugin from "wavesurfer.js/dist/plugin/wavesurfer.regions.min.js";
 import TimelinePlugin from "wavesurfer.js/dist/plugin/wavesurfer.timeline.min.js";
-import CursorPlugin from "wavesurfer.js/dist/plugin/wavesurfer.cursor";
-import { Slider, InputNumber, Row, Col } from "antd";
-
+import WaveSurfer from "wavesurfer.js";
 import styles from "./Waveform.module.scss";
+import { Slider, InputNumber, Row, Col } from "antd";
 
 /**
  * Use formatTimeCallback to style the notch labels as you wish, such

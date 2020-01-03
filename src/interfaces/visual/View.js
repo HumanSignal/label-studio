@@ -1,10 +1,9 @@
 import React from "react";
-import { types, getEnv, flow, getParentOfType } from "mobx-state-tree";
-import { observer, Provider } from "mobx-react";
-
-import Tree from "../../core/Tree";
+import { observer } from "mobx-react";
+import { types } from "mobx-state-tree";
 
 import Registry from "../../core/Registry";
+import Tree from "../../core/Tree";
 import Types from "../../core/Types";
 
 /**
@@ -48,6 +47,7 @@ const Model = types.model({
     "polygonlabels",
     "keypointlabels",
     "brushlabels",
+    "hypertextlabels",
     "text",
     "audio",
     "image",

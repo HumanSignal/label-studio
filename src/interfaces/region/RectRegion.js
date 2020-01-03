@@ -1,24 +1,18 @@
-import React, { createRef, Component, Fragment } from "react";
-
+import React, { Fragment } from "react";
+import { Rect } from "react-konva";
 import { observer, inject } from "mobx-react";
 import { types, getParentOfType, getParent, getRoot } from "mobx-state-tree";
 
-import Konva from "konva";
-import { Shape, Label, Stage, Layer, Rect, Text, Transformer } from "react-konva";
-
-import { guidGenerator, restoreNewsnapshot } from "../../core/Helpers";
-
-import Registry from "../../core/Registry";
-
-import { LabelsModel } from "../control/Labels";
-import { RectangleLabelsModel } from "../control/RectangleLabels";
-
-import { RatingModel } from "../control/Rating";
-import { ImageModel } from "../object/Image";
-import RegionsMixin from "../mixins/Regions";
-import NormalizationMixin from "../mixins/Normalization";
 import DisabledMixin from "../mixins/Normalization";
+import NormalizationMixin from "../mixins/Normalization";
+import RegionsMixin from "../mixins/Regions";
+import Registry from "../../core/Registry";
 import Utils from "../../utils";
+import { ImageModel } from "../object/Image";
+import { LabelsModel } from "../control/Labels";
+import { RatingModel } from "../control/Rating";
+import { RectangleLabelsModel } from "../control/RectangleLabels";
+import { guidGenerator } from "../../core/Helpers";
 
 /**
  * Rectangle object for Bounding Box

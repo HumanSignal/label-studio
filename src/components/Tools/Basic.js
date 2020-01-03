@@ -1,5 +1,5 @@
-import React, { Component, Fragment } from "react";
-import { Button, Divider, Icon, Slider, Tooltip } from "antd";
+import React, { Component } from "react";
+import { Button, Tooltip } from "antd";
 import { observer } from "mobx-react";
 
 import styles from "./Styles.module.scss";

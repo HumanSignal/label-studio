@@ -1,6 +1,6 @@
 import React from "react";
-import { observer, inject } from "mobx-react";
 import { Button } from "antd";
+import { observer, inject } from "mobx-react";
 
 import Hint from "../Hint/Hint";
 import styles from "./Controls.module.scss";
@@ -16,7 +16,7 @@ export default inject("store")(
       submit: "",
     };
 
-    const { userGenerate, update, sentUserGenerate } = item;
+    const { userGenerate, sentUserGenerate } = item;
     const { enableHotkeys, enableTooltips } = store.settings;
 
     /**
@@ -82,6 +82,6 @@ export default inject("store")(
       </div>
     );
 
-    return (item.type == "completion" || store.explore) && content;
+    return (item.type === "completion" || store.explore) && content;
   }),
 );

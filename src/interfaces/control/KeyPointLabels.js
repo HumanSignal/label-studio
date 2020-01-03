@@ -1,16 +1,13 @@
-import React, { Component } from "react";
-
+import React from "react";
 import { observer } from "mobx-react";
-import { types, getRoot } from "mobx-state-tree";
+import { types } from "mobx-state-tree";
 
-import Types from "../../core/Types";
 import Registry from "../../core/Registry";
-
-import { guidGenerator } from "../../core/Helpers";
 import SelectedModelMixin from "../mixins/SelectedModel";
-
+import Types from "../../core/Types";
 import { HtxLabels, LabelsModel } from "./Labels";
 import { KeyPointModel } from "./KeyPoint";
+import { guidGenerator } from "../../core/Helpers";
 
 /**
  * KeyPointLabels tag
@@ -51,27 +48,6 @@ const Model = types
     get hasStates() {
       const states = self.states();
       return states && states.length > 0;
-    },
-
-    // get completion() {
-    //   return getRoot(self).completionStore.selected;
-    // },
-  }))
-  .actions(self => ({
-    fromStateJSON(obj, fromModel) {
-      self.unselectAll();
-
-      if (!obj.value.keypointlabels) throw new Error("No labels param");
-
-      if (obj.id) self.pid = obj.id;
-
-      obj.value.keypointlabels.forEach(l => {
-        const label = self.findLabel(l);
-
-        if (!label) throw new Error("No label " + obj.value.label);
-
-        label.markSelected(true);
-      });
     },
   }));
 

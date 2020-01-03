@@ -1,17 +1,14 @@
-import { observer } from "mobx-react";
 import React, { Component } from "react";
-
+import { observer } from "mobx-react";
 import { types } from "mobx-state-tree";
 
-import Types from "../../core/Types";
-import Tree from "../../core/Tree";
 import Registry from "../../core/Registry";
-
-import { guidGenerator } from "../../core/Helpers";
 import SelectedModelMixin from "../mixins/SelectedModel";
-
+import Tree from "../../core/Tree";
+import Types from "../../core/Types";
 import { HtxLabels, LabelsModel } from "./Labels";
 import { PolygonModel } from "./Polygon";
+import { guidGenerator } from "../../core/Helpers";
 
 /**
  * ImageRegionsLabels tag, create labeled polygons
@@ -57,22 +54,13 @@ const Model = types
         const label = self.findLabel(l);
         if (!label) throw new Error("No label " + obj.value.label);
 
-        label.markSelected(true);
+        label.setSelected(true);
       });
     },
   }));
 
-const Composition = types.compose(
-  LabelsModel,
-  PolygonModel,
-  TagAttrs,
-  Model,
-  SelectedModelMixin,
-);
-const ImageRegionsLabelsModel = types.compose(
-  "ImageRegionsLabelsModel",
-  Composition,
-);
+const Composition = types.compose(LabelsModel, PolygonModel, TagAttrs, Model, SelectedModelMixin);
+const ImageRegionsLabelsModel = types.compose("ImageRegionsLabelsModel", Composition);
 
 const HtxImageRegionsLabels = observer(({ item }) => {
   return <HtxLabels item={item} />;

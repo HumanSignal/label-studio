@@ -2,66 +2,33 @@
  * Libraries
  */
 import React, { Component } from "react";
-import { observer, inject, Provider } from "mobx-react";
-import { types, getSnapshot, getEnv } from "mobx-state-tree";
 import { Result, Spin } from "antd";
+import { getEnv } from "mobx-state-tree";
+import { observer, inject, Provider } from "mobx-react";
 
 /**
  * Core
  */
-import Registry from "../../core/Registry";
-// import Requests from "../../core/Requests";
-import { guidGenerator } from "../../core/Helpers";
 import Tree from "../../core/Tree";
 
 /**
  * Components
  */
 import Completions from "../Completions/Completions";
-import Predictions from "../Predictions/Predictions";
 import Controls from "../Controls/Controls";
-import Panel from "../Panel/Panel";
-import Settings from "../Settings/Settings";
 import Debug from "../Debug";
-import SideColumn from "../SideColumn/SideColumn";
+import Panel from "../Panel/Panel";
+import Predictions from "../Predictions/Predictions";
 import Segment from "../Segment/Segment";
+import Settings from "../Settings/Settings";
+import SideColumn from "../SideColumn/SideColumn";
 
 /**
- * Visual
+ * Tags
  */
-import { ViewModel } from "../../interfaces/visual/View";
-import { TableModel } from "../../interfaces/visual/Table";
-import { HeaderModel } from "../../interfaces/visual/Header";
-import { DialogModel } from "../../interfaces/visual/Dialog";
-
-/**
- * Object
- */
-import { AudioModel } from "../../interfaces/object/Audio";
-import { AudioPlusModel } from "../../interfaces/object/AudioPlus";
-import { ImageModel } from "../../interfaces/object/Image";
-import { TextModel } from "../../interfaces/object/Text";
-import { HyperTextModel } from "../../interfaces/object/HyperText";
-
-/**
- * Control
- */
-import { RectangleModel } from "../../interfaces/control/Rectangle";
-import { KeyPointModel } from "../../interfaces/control/KeyPoint";
-import { KeyPointLabelsModel } from "../../interfaces/control/KeyPointLabels";
-import { PolygonModel } from "../../interfaces/control/Polygon";
-import { RectangleLabelsModel } from "../../interfaces/control/RectangleLabels";
-import { PolygonLabelsModel } from "../../interfaces/control/PolygonLabels";
-import { BrushLabelsModel } from "../../interfaces/control/BrushLabels";
-import { BrushModel } from "../../interfaces/control/Brush";
-import { ChoicesModel } from "../../interfaces/control/Choices";
-import { PairwiseModel } from "../../interfaces/control/Pairwise";
-
-import { RatingModel } from "../../interfaces/control/Rating";
-import { ListModel } from "../../interfaces/control/List";
-import { RankerModel } from "../../interfaces/control/Ranker";
-import { ShortcutModel } from "../../interfaces/control/Shortcut";
-import { TextAreaModel } from "../../interfaces/control/TextArea";
+import * as ControlTags from "../../interfaces/control";
+import * as ObjectTags from "../../interfaces/object";
+import * as VisualTags from "../../interfaces/visual";
 
 /**
  * Styles
@@ -95,15 +62,13 @@ const App = inject("store")(
       }
 
       _renderAll(obj) {
-        const { store } = this.props;
-
-        if (obj.length == 1) return <Segment>{Tree.renderItem(obj[0].root)}</Segment>;
+        if (obj.length === 1) return <Segment>{[Tree.renderItem(obj[0].root)]}</Segment>;
 
         return (
           <div className="renderall">
             {obj.map(c => (
               <div className="fade">
-                <Segment>{Tree.renderItem(c.root)}</Segment>
+                <Segment>{[Tree.renderItem(c.root)]}</Segment>
               </div>
             ))}
           </div>

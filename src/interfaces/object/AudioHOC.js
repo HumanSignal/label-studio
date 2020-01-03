@@ -1,11 +1,7 @@
-import React, { Fragment } from "react";
-import { Button, Icon } from "antd";
-
 import { types, getRoot } from "mobx-state-tree";
-import { observer, inject } from "mobx-react";
 
-import { guidGenerator } from "../../core/Helpers";
 import ProcessAttrsMixin from "../mixins/ProcessAttrs";
+import { guidGenerator } from "../../core/Helpers";
 
 const TagAttrs = types.model({
   name: types.maybeNull(types.string),
@@ -41,11 +37,6 @@ const Model = types
     },
   }));
 
-const AudioHOCModel = types.compose(
-  "AudioHOCModel",
-  TagAttrs,
-  Model,
-  ProcessAttrsMixin,
-);
+const AudioHOCModel = types.compose("AudioHOCModel", TagAttrs, Model, ProcessAttrsMixin);
 
 export { AudioHOCModel };

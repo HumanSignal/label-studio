@@ -1,12 +1,11 @@
 import React from "react";
-import { types, getEnv, getRoot, flow, getParentOfType } from "mobx-state-tree";
-import { observer, Provider } from "mobx-react";
-
-import Tree from "../../core/Tree";
-import { runTemplate } from "../../core/Template";
+import { observer } from "mobx-react";
+import { types, getRoot } from "mobx-state-tree";
 
 import Registry from "../../core/Registry";
+import Tree from "../../core/Tree";
 import Types from "../../core/Types";
+import { runTemplate } from "../../core/Template";
 
 /**
  * Pairwise element. Compare two different objects, works with any label studio object
@@ -50,11 +49,11 @@ const Model = types
   })
   .actions(self => ({
     selectLeft() {
-      self.selected == "left" ? (self.selected = "none") : (self.selected = "left");
+      self.selected === "left" ? (self.selected = "none") : (self.selected = "left");
     },
 
     selectRight() {
-      self.selected == "right" ? (self.selected = "none") : (self.selected = "right");
+      self.selected === "right" ? (self.selected = "none") : (self.selected = "right");
     },
 
     toStateJSON() {
@@ -98,9 +97,9 @@ const HtxPairwise = observer(({ item }) => {
     }
   };
 
-  if (item.selected == "left") addSelection(styleLeft);
+  if (item.selected === "left") addSelection(styleLeft);
 
-  if (item.selected == "right") addSelection(styleRight);
+  if (item.selected === "right") addSelection(styleRight);
 
   const style = Tree.cssConverter(item.style) || { display: "flex" };
 

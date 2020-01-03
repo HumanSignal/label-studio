@@ -1,27 +1,11 @@
-import React, { Component } from "react";
-import { observer, inject } from "mobx-react";
-import { types, getType, getRoot, getParentOfType } from "mobx-state-tree";
+import { types, getRoot, getParentOfType } from "mobx-state-tree";
 
-import insertAfter from "insert-after";
-
-import { cloneNode } from "../../core/Helpers";
-import Registry from "../../core/Registry";
-import { guidGenerator, restoreNewsnapshot } from "../../core/Helpers";
-
-import * as xpath from "xpath-range";
-
-import RegionsMixin from "../mixins/Regions";
 import NormalizationMixin from "../mixins/Normalization";
-
-import { runTemplate } from "../../core/Template";
-
-import InfoModal from "../../components/Infomodal/Infomodal";
-import { LabelsModel } from "../control/Labels";
-import { HyperTextModel } from "../object/HyperText";
-
-import { normalizeBoundaries } from "../../utils/html";
-
+import RegionsMixin from "../mixins/Regions";
 import Utils from "../../utils";
+import { HyperTextLabelsModel } from "../control/HyperTextLabels";
+import { HyperTextModel } from "../object/HyperText";
+import { guidGenerator } from "../../core/Helpers";
 
 const Model = types
   .model("HyperTextRegionModel", {
@@ -33,7 +17,7 @@ const Model = types
     endOffset: types.integer,
     end: types.string,
     text: types.string,
-    states: types.maybeNull(types.array(types.union(LabelsModel))),
+    states: types.maybeNull(types.array(types.union(HyperTextLabelsModel))),
   })
   .views(self => ({
     get parent() {
@@ -61,6 +45,7 @@ const Model = types
             endOffset: self.endOffset,
             start: self.start,
             end: self.end,
+            text: self.text,
           },
         };
 
@@ -83,9 +68,6 @@ const Model = types
       }
     },
 
-    /**
-     * Select audio region
-     */
     selectRegion() {
       self.selected = true;
       self.completion.setHighlightedNode(self);

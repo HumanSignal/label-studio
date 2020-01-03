@@ -2,13 +2,13 @@ import React, { Component } from "react";
 import { observer, inject } from "mobx-react";
 import { types, getType, getRoot } from "mobx-state-tree";
 
-import { cloneNode } from "../../core/Helpers";
-import Registry from "../../core/Registry";
-import { guidGenerator, restoreNewsnapshot } from "../../core/Helpers";
-import TextHighlight from "../../components/TextHighlight/TextHighlight";
-import { runTemplate } from "../../core/Template";
-import { TextRegionModel, HtxTextRegion } from "../region/TextRegion";
 import InfoModal from "../../components/Infomodal/Infomodal";
+import Registry from "../../core/Registry";
+import TextHighlight from "../../components/TextHighlight/TextHighlight";
+import { TextRegionModel, HtxTextRegion } from "../region/TextRegion";
+import { cloneNode } from "../../core/Helpers";
+import { guidGenerator, restoreNewsnapshot } from "../../core/Helpers";
+import { runTemplate } from "../../core/Template";
 
 /**
  * Text tag shows a text that can be labeled

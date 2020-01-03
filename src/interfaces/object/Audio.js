@@ -1,15 +1,11 @@
-import React, { Fragment } from "react";
-import { Button, Icon } from "antd";
-
-import { types, getRoot } from "mobx-state-tree";
+import React from "react";
 import { observer, inject } from "mobx-react";
-
-import Registry from "../../core/Registry";
-import { AudioHOCModel } from "./AudioHOC";
+import { types } from "mobx-state-tree";
 
 import AudioControls from "./Audio/Controls";
-
+import Registry from "../../core/Registry";
 import Waveform from "../../components/Waveform/Waveform";
+import { AudioHOCModel } from "./AudioHOC";
 
 /**
  * Audio tag plays a simple audio file

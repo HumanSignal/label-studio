@@ -1,4 +1,4 @@
-import { types, getParent, getEnv, destroy } from "mobx-state-tree";
+import { types, getParent, getEnv } from "mobx-state-tree";
 
 import { AllRegionsType } from "../interfaces/region";
 

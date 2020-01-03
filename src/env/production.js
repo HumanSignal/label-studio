@@ -1,5 +1,4 @@
 import External from "../core/External";
-// import Requests from "../core/Requests";
 import Messages from "../utils/messages";
 
 function getData(task) {

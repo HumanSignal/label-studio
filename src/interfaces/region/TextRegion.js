@@ -2,17 +2,16 @@ import React from "react";
 import { observer, inject } from "mobx-react";
 import { types, getParentOfType, getRoot } from "mobx-state-tree";
 
+import Hint from "../../components/Hint/Hint";
+import NormalizationMixin from "../mixins/Normalization";
+import RegionsMixin from "../mixins/Regions";
+import Registry from "../../core/Registry";
+import Utils from "../../utils";
+import styles from "./TextRegion/TextRegion.module.scss";
 import { LabelsModel } from "../control/Labels";
 import { RatingModel } from "../control/Rating";
-import Registry from "../../core/Registry";
-import { guidGenerator } from "../../core/Helpers";
 import { TextModel } from "../object/Text";
-import RegionsMixin from "../mixins/Regions";
-import NormalizationMixin from "../mixins/Normalization";
-import Hint from "../../components/Hint/Hint";
-import Utils from "../../utils";
-
-import styles from "./TextRegion/TextRegion.module.scss";
+import { guidGenerator } from "../../core/Helpers";
 
 const Model = types
   .model("TextRegionModel", {
@@ -130,22 +129,16 @@ const HtxTextRegionView = ({ store, item, letterGroup, range, textCharIndex, onM
     cursor: store.completionStore.selected.relationMode ? "crosshair" : "pointer",
   };
 
-  let regionStates = [];
-
-  if ((range.states && range.states.length) > 0) {
-    range.states.map(state => {
-      regionStates.push(
-        <RegionState
-          key={range.id}
-          state={state}
-          bg={labelColor}
-          hover={store.completionStore.selected.relationMode ? true : false}
-          selected={range.selected}
-          style={range.highlighted ? { outline: "2px solid red" } : null}
-        />,
-      );
-    });
-  }
+  let regionStates = range.states.map(state => (
+    <RegionState
+      key={range.id}
+      state={state}
+      bg={labelColor}
+      hover={store.completionStore.selected.relationMode ? true : false}
+      selected={range.selected}
+      style={range.highlighted ? { outline: "2px solid red" } : null}
+    />
+  ));
 
   /**
    * Without label

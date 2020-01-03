@@ -1,14 +1,7 @@
-import React, { Component } from "react";
-
-import { observer, inject } from "mobx-react";
-import { types, getParentOfType, getRoot } from "mobx-state-tree";
-
-import Registry from "../../core/Registry";
-import { isHtx, cloneNode } from "../../core/Helpers";
-import { guidGenerator } from "../../core/Helpers";
-import { BrushRegionModel } from "../region/BrushRegion";
+import { types, getRoot } from "mobx-state-tree";
 
 import * as Tools from "../tools";
+import Registry from "../../core/Registry";
 
 const TagAttrs = types.model({
   name: types.maybeNull(types.string),
