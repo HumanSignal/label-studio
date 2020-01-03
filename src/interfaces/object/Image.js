@@ -234,13 +234,6 @@ const Model = types
     freezeHistory() {
       getParent(self, 3).history.freeze();
     },
-    /**
-     * Update brightnessGrade of Image
-     * @param {number} value
-     */
-    setBrightnessGrade(value) {
-      self.brightnessGrade = value;
-    },
 
     updateBrushControl(arg) {
       self.brushControl = arg;
@@ -248,6 +241,14 @@ const Model = types
 
     updateBrushStrokeWidth(arg) {
       self.brushStrokeWidth = arg;
+    },
+
+    /**
+     * Update brightnessGrade of Image
+     * @param {number} value
+     */
+    setBrightnessGrade(value) {
+      self.brightnessGrade = value;
     },
 
     setGridSize(value) {
@@ -281,7 +282,21 @@ const Model = types
       self.mode = mode;
     },
 
-    updateIE(ev) {
+    setImageRef(ref) {
+      self.imageRef = ref;
+    },
+
+    setStageRef(ref) {
+      self.stageRef = ref;
+      self.initialWidth = ref && ref.attrs && ref.attrs.width ? ref.attrs.width : 1;
+      self.initialHeight = ref && ref.attrs && ref.attrs.height ? ref.attrs.height : 1;
+    },
+
+    setSelected(shape) {
+      self.selectedShape = shape;
+    },
+
+    updateImageSize(ev) {
       const { width, height, naturalWidth, naturalHeight, userResize } = ev.target;
 
       self.naturalWidth = naturalWidth;
@@ -295,39 +310,6 @@ const Model = types
       });
     },
 
-    setStageRef(ref) {
-      self.stageRef = ref;
-      self.initialWidth = ref && ref.attrs && ref.attrs.width ? ref.attrs.width : 1;
-      self.initialHeight = ref && ref.attrs && ref.attrs.height ? ref.attrs.height : 1;
-    },
-
-    /**
-     * Set active Polygon
-     */
-    // setActivePolygon(poly) {
-    //   self.activePolygon = poly;
-    // },
-
-    // detachActivePolygon() {
-    //   return detach(self.activePolygon);
-    // },
-
-    // deleteActivePolygon() {
-    //   if (self.activePolygon) destroy(self.activePolygon);
-    // },
-
-    // deleteSelectedShape() {
-    //   if (self.selectedShape) destroy(self.selectedShape);
-    // },
-
-    setSelected(shape) {
-      self.selectedShape = shape;
-    },
-
-    detachActiveShape(shape) {
-      return detach(self.activeShape);
-    },
-
     addShape(shape) {
       self.shapes.push(shape);
 
@@ -336,62 +318,11 @@ const Model = types
       shape.selectRegion();
     },
 
-    removeShape(shape) {
-      destroy(shape);
-    },
-
-    addPoints({ x, y }) {
-      const shape = self.activeShape;
-      self.freezeHistory();
-
-      shape.addPoints(x, y);
-    },
-
-    addEraserPoints({ x, y }) {
-      const shape = self.selectedShape;
-      self.freezeHistory();
-
-      shape.addEraserPoints(x, y);
-    },
-
-    _zoomAdjustCoords(ev) {
+    getEvCoords(ev) {
       const x = (ev.evt.offsetX - self.zoomingPositionX) / self.zoomScale;
       const y = (ev.evt.offsetY - self.zoomingPositionY) / self.zoomScale;
 
-      return { x: x, y: y };
-    },
-
-    onImageClick(ev) {
-      const x = (ev.evt.offsetX - self.zoomingPositionX) / self.zoomScale;
-      const y = (ev.evt.offsetY - self.zoomingPositionY) / self.zoomScale;
-
-      // console.log("omImageClick");
-      self.getToolsManager().event("click", ev, x, y);
-
-      // self.states().forEach(s => Object.values(s.tools).forEach(t => t.event("click", ev, self)));
-
-      // if (ImageTools.hasTool(self.controlButtonType))
-      //     ImageTools.imageEvent("click", ev, self);
-    },
-
-    onMouseDown(ev) {
-      const x = (ev.evt.offsetX - self.zoomingPositionX) / self.zoomScale;
-      const y = (ev.evt.offsetY - self.zoomingPositionY) / self.zoomScale;
-
-      console.log(self.getToolsManager());
-
-      self.getToolsManager().event("mousedown", ev, x, y);
-    },
-
-    onMouseMove(ev) {
-      const x = (ev.evt.offsetX - self.zoomingPositionX) / self.zoomScale;
-      const y = (ev.evt.offsetY - self.zoomingPositionY) / self.zoomScale;
-
-      self.getToolsManager().event("mousemove", ev, x, y);
-    },
-
-    onMouseUp(ev) {
-      self.getToolsManager().event("mouseup", ev);
+      return [x, y];
     },
 
     /**
@@ -399,12 +330,31 @@ const Model = types
      * @param {*} width
      * @param {*} height
      */
-    onResizeSize(width, height, userResize) {
+    onResize(width, height, userResize) {
       self.stageHeight = height;
       self.stageWidth = width;
-      self.updateIE({
+      self.updateImageSize({
         target: { width: width, height: height, naturalWidth: 1, naturalHeight: 1, userResize: userResize },
       });
+    },
+
+    onImageClick(ev) {
+      const coords = self.getEvCoords(ev);
+      self.getToolsManager().event("click", ev, ...coords);
+    },
+
+    onMouseDown(ev) {
+      const coords = self.getEvCoords(ev);
+      self.getToolsManager().event("mousedown", ev, ...coords);
+    },
+
+    onMouseMove(ev) {
+      const coords = self.getEvCoords(ev);
+      self.getToolsManager().event("mousemove", ev, ...coords);
+    },
+
+    onMouseUp(ev) {
+      self.getToolsManager().event("mouseup", ev);
     },
 
     toStateJSON() {

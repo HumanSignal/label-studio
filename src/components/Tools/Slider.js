@@ -10,12 +10,12 @@ export default observer(
       return (
         <Fragment>
           <Slider
-            defaultValue={15}
-            max={50}
+            defaultValue={this.props.default || 15}
+            max={this.props.max || 50}
             min={0}
             vertical
             tipFormatter={null}
-            style={{ height: 100 }}
+            style={{ height: this.props.height || 100 }}
             onChange={this.props.onChange}
           />
           <Tooltip title={this.props.title} placement="left">

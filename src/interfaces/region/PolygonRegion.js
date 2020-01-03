@@ -4,6 +4,7 @@ import { Group, Line } from "react-konva";
 import { observer, inject } from "mobx-react";
 import { types, getParentOfType, getRoot, destroy, detach } from "mobx-state-tree";
 
+import Hotkey from "../../core/Hotkey";
 import NormalizationMixin from "../mixins/Normalization";
 import RegionsMixin from "../mixins/Regions";
 import Registry from "../../core/Registry";
@@ -39,6 +40,8 @@ const Model = types
 
     mouseOverStartPoint: types.optional(types.boolean, false),
 
+    selectedPoint: types.maybeNull(types.safeReference(PolygonPoint)),
+
     coordstype: types.optional(types.enumeration(["px", "perc"]), "px"),
 
     fromName: types.maybeNull(types.string),
@@ -62,6 +65,15 @@ const Model = types
      */
     setMouseOverStartPoint(value) {
       self.mouseOverStartPoint = value;
+    },
+
+    setSelectedPoint(point) {
+      if (self.selectedPoint) {
+        self.selectedPoint.selected = false;
+      }
+
+      point.selected = true;
+      self.selectedPoint = point;
     },
 
     handleMouseMove({ e, flattenedPoints }) {
@@ -105,13 +117,27 @@ const Model = types
     },
 
     insertPoint(insertIdx, x, y) {
-      const p = { x: x, y: y, size: self.pointsize, style: self.pointstyle, index: self.points.length };
+      const p = {
+        id: guidGenerator(),
+        x: x,
+        y: y,
+        size: self.pointsize,
+        style: self.pointstyle,
+        index: self.points.length,
+      };
       self.points.splice(insertIdx, 0, p);
     },
 
     _addPoint(x, y) {
       const index = self.points.length;
-      self.points.push({ x: x, y: y, size: self.pointsize, style: self.pointstyle, index: index });
+      self.points.push({
+        id: guidGenerator(),
+        x: x,
+        y: y,
+        size: self.pointsize,
+        style: self.pointstyle,
+        index: index,
+      });
     },
 
     closePoly() {
@@ -141,6 +167,10 @@ const Model = types
     },
 
     unselectRegion() {
+      if (self.selectedPoint) {
+        self.selectedPoint.selected = false;
+      }
+
       self.selected = false;
       self.parent.setSelected(undefined);
       self.completion.setHighlightedNode(null);

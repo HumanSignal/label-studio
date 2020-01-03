@@ -82,6 +82,8 @@ const Model = types
       obj.value.choices.forEach(l => {
         const choice = self.findLabel(l);
 
+        window.A = choice;
+
         if (!choice) throw new Error("No label " + l);
 
         choice.setSelected(true);

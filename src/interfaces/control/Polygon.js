@@ -70,9 +70,15 @@ const Model = types
 
     afterCreate() {
       const poly = Tools.Polygon.create();
-      poly._control = self;
+      const floodFill = Tools.FloodFill.create();
 
-      self.tools = { poly: poly };
+      poly._control = self;
+      floodFill._control = self;
+
+      self.tools = {
+        poly: poly,
+        floodfill: floodFill,
+      };
     },
   }));
 

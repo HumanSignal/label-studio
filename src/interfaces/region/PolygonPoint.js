@@ -3,8 +3,12 @@ import { Rect, Circle } from "react-konva";
 import { observer } from "mobx-react";
 import { types, getParent, getRoot } from "mobx-state-tree";
 
+import { guidGenerator } from "../../core/Helpers";
+
 const PolygonPoint = types
-  .model({
+  .model("PolygonPoint", {
+    id: types.identifier,
+
     relativeX: types.optional(types.number, 0),
     relativeY: types.optional(types.number, 0),
 
@@ -16,9 +20,10 @@ const PolygonPoint = types
 
     index: types.number,
 
+    selected: types.optional(types.boolean, false),
+
     style: types.string,
     size: types.string,
-    isMouseOverStartPoint: types.optional(types.boolean, false),
   })
   .views(self => ({
     get parent() {
@@ -180,6 +185,8 @@ const PolygonPointView = observer(({ item, name }) => {
     },
   };
 
+  const fill = item.selected ? "green" : "white";
+
   if (item.style === "circle") {
     return (
       <Circle
@@ -188,13 +195,17 @@ const PolygonPointView = observer(({ item, name }) => {
         x={item.x}
         y={item.y}
         radius={w}
-        fill="white"
+        fill={fill}
         stroke="black"
         strokeWidth={stroke[item.size]}
         dragOnTop={false}
         onClick={ev => {
           if (item.parent.mouseOverStartPoint) {
             item.parent.closePoly();
+          } else {
+            // ev.evt.preventDefault();
+            // ev.cancelBubble = true;
+            item.parent.setSelectedPoint(item);
           }
         }}
         {...dragOpts}
@@ -211,7 +222,7 @@ const PolygonPointView = observer(({ item, name }) => {
         y={item.y - w / 2}
         width={w}
         height={w}
-        fill="white"
+        fill={fill}
         stroke="black"
         strokeWidth={stroke[item.size]}
         dragOnTop={false}

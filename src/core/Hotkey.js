@@ -22,9 +22,15 @@ function addKey(key, func, scope) {
   if (_hotkeys_map[key]) return;
   if (!scope) scope = "__main__";
 
-  _hotkeys_map[key] = true;
+  _hotkeys_map[key] = func;
   keymaster(key, scope, func);
 }
+
+/**
+ * Given a key temp overwrites the function, the overwrite is removed
+ * after the returning function is called
+ */
+function overwriteKey(key, func) {}
 
 function removeKey(key) {
   keymaster.unbind(key);

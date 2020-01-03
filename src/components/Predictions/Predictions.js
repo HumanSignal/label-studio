@@ -34,7 +34,7 @@ const Prediction = observer(({ item, store }) => {
                   // this is here because otherwise React doesn't re-render the change in the tree
                   window.setTimeout(function() {
                     store.completionStore.selectCompletion(c.id);
-                  }, 200);
+                  }, 50);
                 }}
               >
                 <Icon type="copy" />

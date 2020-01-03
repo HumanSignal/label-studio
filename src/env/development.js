@@ -38,7 +38,7 @@ import { Pairwise } from "../examples/pairwise";
 /**
  * Custom Data
  */
-const data = ImageSegmentation;
+const data = ImagePolygons;
 
 /**
  * Get current config

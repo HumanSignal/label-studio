@@ -487,6 +487,7 @@ export default types
     function addCompletionFromPrediction(prediction) {
       const c = self.addCompletion({ userGenerate: true });
 
+      selectCompletion(c.id);
       c.deserializeCompletion(prediction.serializeCompletion());
 
       return c;

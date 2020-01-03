@@ -7,5 +7,6 @@ import { KeyPoint } from "./KeyPoint";
 import { Polygon } from "./Polygon";
 import { Rect } from "./Rect";
 import { Zoom } from "./Zoom";
+import { FloodFill } from "./FloodFill";
 
-export { Brush, Erase, KeyPoint, Polygon, Rect, Zoom };
+export { Brush, Erase, KeyPoint, Polygon, Rect, Zoom, FloodFill };

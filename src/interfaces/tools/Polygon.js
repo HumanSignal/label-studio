@@ -57,10 +57,6 @@ const _Tool = types
 
         newPolygon = PolygonRegionModel.create({
           id: polygonID,
-          x: x,
-          y: y,
-          width: width,
-          height: width,
 
           opacity: polygonOpacity,
           fillcolor: c.fillcolor,

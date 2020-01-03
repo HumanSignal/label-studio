@@ -12,7 +12,7 @@ export default observer(
     constructor(props) {
       super(props);
 
-      this.updateDimensions = this.updateDimensions.bind(this);
+      this.onResize = this.onResize.bind(this);
     }
     /**
      * Handler of click on Image
@@ -281,16 +281,16 @@ export default observer(
       );
     }
 
-    updateDimensions() {
-      this.props.item.onResizeSize(this.container.offsetWidth, this.container.offsetHeight, true);
+    onResize() {
+      this.props.item.onResize(this.container.offsetWidth, this.container.offsetHeight, true);
     }
 
     componentDidMount() {
-      window.addEventListener("resize", this.updateDimensions);
+      window.addEventListener("resize", this.onResize);
     }
 
     componentWillUnmount() {
-      window.removeEventListener("resize", this.updateDimensions);
+      window.removeEventListener("resize", this.onResize);
     }
 
     render() {
@@ -335,7 +335,16 @@ export default observer(
             }}
             style={divStyle}
           >
-            <img style={imgStyle} src={item._value} onLoad={item.updateIE} onClick={this.handleOnClick} alt="LS" />
+            <img
+              ref={ref => {
+                item.setImageRef(ref);
+              }}
+              style={imgStyle}
+              src={item._value}
+              onLoad={item.updateImageSize}
+              onClick={this.handleOnClick}
+              alt="LS"
+            />
           </div>
           <Stage
             ref={ref => {

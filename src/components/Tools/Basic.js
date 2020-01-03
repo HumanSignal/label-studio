@@ -12,6 +12,7 @@ export default observer(
           <Button
             shape="circle"
             type={this.props.selected ? "primary" : "default"}
+            disabled={this.props.disabled ? true : false}
             icon={this.props.icon}
             className={styles.button}
             onClick={this.props.onClick}
