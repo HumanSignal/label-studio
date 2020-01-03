@@ -54,7 +54,6 @@ const Model = types
     },
 
     afterCreate() {
-      console.log("afterCreate");
       const rect = Tools.Rect.create({ activeShape: null });
       rect._control = self;
 

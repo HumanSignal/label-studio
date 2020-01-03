@@ -131,8 +131,6 @@ export default types
      * Function
      */
     function afterCreate() {
-      console.log("after create");
-
       /**
        * Hotkey for submit
        */

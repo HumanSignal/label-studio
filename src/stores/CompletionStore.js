@@ -184,8 +184,6 @@ const Completion = types
     },
 
     afterAttach() {
-      console.log("afterAttach Completion Start");
-
       self.traverseTree(node => {
         if (node.updateValue) node.updateValue(self.store);
 
@@ -197,14 +195,11 @@ const Completion = types
           states && states.forEach(s => tools.addToolsFromControl(s));
         }
       });
-
-      console.log("afterAttach Completion End");
     },
 
     afterCreate() {
       //
       // debugger;
-      console.log("afterCreate Completion STart");
       if (self.userGenerate && !self.sentUserGenerate) {
         self.loadedDate = new Date();
       }
@@ -285,7 +280,6 @@ const Completion = types
       // };
 
       Hotkey.setScope("__main__");
-      console.log("afterCreate Completion End");
     },
 
     serializeCompletion() {

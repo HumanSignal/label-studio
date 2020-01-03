@@ -31,8 +31,6 @@ function reverseCoordinates(r1, r2) {
   return { x1: r1X, y1: r1Y, x2: r2X, y2: r2Y };
 }
 
-// console.log(RectRegionModel);
-
 const _Tool = types
   .model({
     default: true,
@@ -42,8 +40,6 @@ const _Tool = types
   .actions(self => ({
     fromStateJSON(obj, fromModel) {
       if ("rectanglelabels" in obj.value) {
-        console.log("yoy");
-
         const states = restoreNewsnapshot(fromModel);
         states.fromStateJSON(obj);
 

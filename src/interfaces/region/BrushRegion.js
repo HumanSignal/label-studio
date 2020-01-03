@@ -89,7 +89,6 @@ const Model = types
   }))
   .actions(self => ({
     addPoints({ type }) {
-      console.log(type);
       const p = Points.create({ id: guidGenerator(), type: type });
       self.points.push(p);
       self.current = p;

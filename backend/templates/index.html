@@ -36,8 +36,9 @@
 </div>
 
 <script>
-    window.onload = function () {        
-        window.LSBI = LSB("label-studio", '{{ label_config_line | safe }}', {{ task_data | json | safe }});
+  window.onload = function () {
+      var task = {{ task_data | json | safe }};      
+        window.LSBI = LSB("label-studio", '{{ label_config_line | safe }}', task);
     }
 </script>
 </body>
