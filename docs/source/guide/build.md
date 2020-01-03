@@ -1,5 +1,5 @@
 ---
-title: Build
+title: Build frontend
 type: guide
 order: 1005
 ---
