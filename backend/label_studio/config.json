@@ -3,9 +3,9 @@
   "port": 8200,
   "debug": false,
 
-  "label_config": "label-studio/examples/image_bbox/config.xml",
-  "input_path": "label-studio/examples/image_bbox/tasks.json",
-  "output_dir": "label-studio/examples/image_bbox/completions",
+  "label_config": "../examples/image_bbox/config.xml",
+  "input_path": "../examples/image_bbox/tasks.json",
+  "output_dir": "../examples/image_bbox/completions",
 
   "instruction": "Type some <b>hypertext</b> for label experts!",
   "allow_delete_completions": true,
