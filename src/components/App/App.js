@@ -26,8 +26,8 @@ import SideColumn from "../SideColumn/SideColumn";
 /**
  * Tags
  */
-import * as ControlTags from "../../interfaces/control";
 import * as ObjectTags from "../../interfaces/object";
+import * as ControlTags from "../../interfaces/control";
 import * as VisualTags from "../../interfaces/visual";
 
 /**

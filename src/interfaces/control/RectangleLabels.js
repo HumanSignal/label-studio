@@ -7,6 +7,7 @@ import Registry from "../../core/Registry";
 import SelectedModelMixin from "../mixins/SelectedModel";
 import Types from "../../core/Types";
 import { HtxLabels, LabelsModel } from "./Labels";
+import { RectangleModel } from "./Rectangle";
 import { guidGenerator } from "../../core/Helpers";
 
 /**
@@ -47,7 +48,7 @@ const Model = LabelMixin.props({ _type: "rectanglelabels" }).views(self => ({
   },
 }));
 
-const Composition = types.compose(LabelsModel, ModelAttrs, TagAttrs, Model, SelectedModelMixin);
+const Composition = types.compose(LabelsModel, ModelAttrs, RectangleModel, TagAttrs, Model, SelectedModelMixin);
 
 const RectangleLabelsModel = types.compose("RectangleLabelsModel", Composition);
 

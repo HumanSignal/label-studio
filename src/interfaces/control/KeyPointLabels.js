@@ -2,6 +2,7 @@ import React from "react";
 import { observer } from "mobx-react";
 import { types } from "mobx-state-tree";
 
+import LabelMixin from "../mixins/LabelMixin";
 import Registry from "../../core/Registry";
 import SelectedModelMixin from "../mixins/SelectedModel";
 import Types from "../../core/Types";
@@ -37,7 +38,7 @@ const TagAttrs = types.model({
   strokewidth: types.optional(types.string, "1"),
 });
 
-const Model = types
+const ModelAttrs = types
   .model("KeyPointLabelesModel", {
     id: types.identifier,
     pid: types.optional(types.string, guidGenerator),
@@ -51,7 +52,13 @@ const Model = types
     },
   }));
 
-const Composition = types.compose(LabelsModel, KeyPointModel, TagAttrs, Model, SelectedModelMixin);
+const Model = LabelMixin.props({ _type: "keypointlabels" }).views(self => ({
+  get shouldBeUnselected() {
+    return self.choice === "single";
+  },
+}));
+
+const Composition = types.compose(LabelsModel, ModelAttrs, KeyPointModel, TagAttrs, Model, SelectedModelMixin);
 
 const KeyPointLabelsModel = types.compose("KeyPointLabelsModel", Composition);
 

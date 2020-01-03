@@ -9,14 +9,6 @@ const ProcessAttrsMixin = types.model().actions(self => ({
 
   updateValue(store) {
     self._value = runTemplate(self.value, store.task.dataObj) || "";
-
-    if (store.task.auth && store.task.auth.enable && self.value.substr(1) === store.task.auth.to) {
-      let secureResource = self.getSecureResource(store, runTemplate(self.value, store.task.dataObj));
-
-      secureResource.then(response => {
-        self.updateLocalValue(response);
-      });
-    }
   },
 }));
 

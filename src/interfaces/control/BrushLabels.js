@@ -6,6 +6,7 @@ import LabelMixin from "../mixins/LabelMixin";
 import Registry from "../../core/Registry";
 import SelectedModelMixin from "../mixins/SelectedModel";
 import Types from "../../core/Types";
+import { BrushModel } from "./Brush";
 import { HtxLabels, LabelsModel } from "./Labels";
 import { guidGenerator } from "../../core/Helpers";
 
@@ -27,9 +28,15 @@ const Model = LabelMixin.props({ _type: "brushlabels" }).views(self => ({
   },
 }));
 
-const Composition = types.compose(LabelsModel, ModelAttrs, TagAttrs, Model, SelectedModelMixin);
-
-const BrushLabelsModel = types.compose("BrushLabelsModel", Composition);
+const BrushLabelsModel = types.compose(
+  "BrushLabelsModel",
+  LabelsModel,
+  ModelAttrs,
+  BrushModel,
+  TagAttrs,
+  Model,
+  SelectedModelMixin,
+);
 
 const HtxBrushLabels = observer(({ item }) => {
   return <HtxLabels item={item} />;

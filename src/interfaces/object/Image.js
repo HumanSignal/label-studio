@@ -235,32 +235,6 @@ const Model = types
       getParent(self, 3).history.freeze();
     },
     /**
-     * Request to HTTP Basic Auth
-     */
-    getSecureResource(store) {
-      const requestToResource = flow(function*() {
-        try {
-          const req = yield store.fetchAuth(self._value, {
-            username: store.task.auth.username,
-            password: store.task.auth.password,
-          });
-
-          return req;
-        } catch (err) {
-          console.log(err);
-        }
-      });
-
-      return requestToResource()
-        .then(response => {
-          return response.blob();
-        })
-        .then(data => {
-          return URL.createObjectURL(data);
-        });
-    },
-
-    /**
      * Update brightnessGrade of Image
      * @param {number} value
      */

@@ -38,7 +38,7 @@ import { Pairwise } from "../examples/pairwise";
 /**
  * Custom Data
  */
-const data = Sentiment;
+const data = ImageSegmentation;
 
 /**
  * Get current config

@@ -1,21 +1,23 @@
-import { BrushLabelsModel } from "../../interfaces/control/BrushLabels";
-import { BrushModel } from "../../interfaces/control/Brush";
-import { ChoicesModel } from "../../interfaces/control/Choices";
-import { HyperTextLabelsModel } from "../../interfaces/control/HyperTextLabels";
-import { KeyPointLabelsModel } from "../../interfaces/control/KeyPointLabels";
-import { KeyPointModel } from "../../interfaces/control/KeyPoint";
-import { ListModel } from "../../interfaces/control/List";
-import { PairwiseModel } from "../../interfaces/control/Pairwise";
-import { PolygonLabelsModel } from "../../interfaces/control/PolygonLabels";
-import { PolygonModel } from "../../interfaces/control/Polygon";
-import { RankerModel } from "../../interfaces/control/Ranker";
-import { RatingModel } from "../../interfaces/control/Rating";
-import { RectangleLabelsModel } from "../../interfaces/control/RectangleLabels";
-import { RectangleModel } from "../../interfaces/control/Rectangle";
-import { ShortcutModel } from "../../interfaces/control/Shortcut";
-import { TextAreaModel } from "../../interfaces/control/TextArea";
+import { BrushLabelsModel } from "./BrushLabels";
+import { BrushModel } from "./Brush";
+import { ChoicesModel } from "./Choices";
+import { HyperTextLabelsModel } from "./HyperTextLabels";
+import { KeyPointLabelsModel } from "./KeyPointLabels";
+import { KeyPointModel } from "./KeyPoint";
+import { LabelsModel } from "./Labels";
+import { ListModel } from "./List";
+import { PairwiseModel } from "./Pairwise";
+import { PolygonLabelsModel } from "./PolygonLabels";
+import { PolygonModel } from "./Polygon";
+import { RankerModel } from "./Ranker";
+import { RatingModel } from "./Rating";
+import { RectangleLabelsModel } from "./RectangleLabels";
+import { RectangleModel } from "./Rectangle";
+import { ShortcutModel } from "./Shortcut";
+import { TextAreaModel } from "./TextArea";
 
 export {
+  LabelsModel,
   BrushLabelsModel,
   BrushModel,
   ChoicesModel,
