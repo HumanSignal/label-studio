@@ -12,6 +12,10 @@
 
 ![Label Studio](https://raw.githubusercontent.com/heartexlabs/label-studio/master/images/label-studio-examples.gif)
 
+
+[![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run)
+
+
 ## Features ✨
 
 **Simple**: Crafted with minimal UI design. A simple design is the best design.
