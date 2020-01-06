@@ -76,6 +76,7 @@ const Model = types
     },
 
     getLeftRight() {
+      if (!self.toname);
       const names = self.toname.split(",");
 
       if (names.length != 2)

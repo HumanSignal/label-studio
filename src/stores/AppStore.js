@@ -212,7 +212,7 @@ export default types
     }
 
     function skipTask() {
-      getEnv(self).onSkipTask();
+      getEnv(self).onSkipTask(self);
     }
 
     /**
