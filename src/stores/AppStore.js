@@ -200,9 +200,8 @@ export default types
       const c = self.completionStore.selected;
       c.beforeSend();
 
-      const res = getEnv(self).onSubmitCompletion(self, c);
-
-      if (res !== false) c.sendUserGenerate();
+      c.sendUserGenerate();
+      getEnv(self).onSubmitCompletion(self, c);
     }
 
     function updateCompletion() {

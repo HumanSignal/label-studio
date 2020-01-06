@@ -460,7 +460,7 @@ export default types
         ...options,
       };
 
-      if (user) node["createdBy"] = user.displayName;
+      if (user && !("createdBy" in node)) node["createdBy"] = user.displayName;
 
       //
       return Completion.create(node);
