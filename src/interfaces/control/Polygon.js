@@ -77,7 +77,7 @@ const Model = types
 
       self.tools = {
         poly: poly,
-        floodfill: floodFill,
+        // floodfill: floodFill,
       };
     },
   }));
