@@ -71,6 +71,7 @@ const Model = types
         "PolygonLabelsModel",
         "KeyPointLabelsModel",
         "BrushLabelsModel",
+        "HyperTextLabelsModel",
       ]);
 
       labels.finishCurrentObject();
@@ -90,18 +91,9 @@ const Model = types
          * Current not selected
          */
         if (!selectedLabel) {
-          /**
-           * Unselect all labels
-           */
           labels.unselectAll();
-          /**
-           * Select current label
-           */
           self.setSelected(!self.selected);
         } else {
-          /**
-           * Unselect all labels
-           */
           labels.unselectAll();
         }
       }

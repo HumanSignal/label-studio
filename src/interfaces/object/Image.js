@@ -3,6 +3,7 @@ import { observer, inject } from "mobx-react";
 
 import * as Tools from "../tools";
 import ImageView from "../../components/ImageView/ImageView";
+import ObjectBase from "./Base";
 import ProcessAttrsMixin from "../mixins/ProcessAttrs";
 import Registry from "../../core/Registry";
 import ToolsManager from "../tools/Manager";
@@ -379,7 +380,7 @@ const Model = types
     },
   }));
 
-const ImageModel = types.compose("ImageModel", TagAttrs, Model, ProcessAttrsMixin);
+const ImageModel = types.compose("ImageModel", TagAttrs, Model, ProcessAttrsMixin, ObjectBase);
 
 const HtxImage = inject("store")(observer(ImageView));
 

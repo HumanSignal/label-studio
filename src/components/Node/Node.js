@@ -5,58 +5,42 @@ import { observer } from "mobx-react";
 
 import styles from "./Node.module.scss";
 
-const Node = observer(({ node }) => {
-  const click = ev => {
-    ev.preventDefault();
-    getRoot(node).completionStore.selected.regionStore.unselectAll();
-    node.selectRegion();
+const NodeViews = {
+  TextRegionModel: (node, click) => (
+    <div onClick={click}>
+      <Icon type="font-colors" />
+      Text &nbsp;
+      <span style={{ color: "#5a5a5a" }}>{node.text}</span>
+    </div>
+  ),
 
-    return false;
-  };
+  HyperTextRegionModel: (node, click) => (
+    <div onClick={click}>
+      <Icon type="font-colors" />
+      HTML &nbsp;
+      <span style={{ color: "#5a5a5a" }}>{node.text}</span>
+    </div>
+  ),
 
-  if (getType(node).name === "TextRegionModel") {
-    return (
-      <div onClick={click}>
-        <Icon type="font-colors" />
-        Text &nbsp;
-        <span style={{ color: "#5a5a5a" }}>{node.text}</span>
-      </div>
-    );
-  }
+  AudioRegionModel: (node, click) => (
+    <p>
+      <span onClick={click} className={styles.node}>
+        <i className="microphone icon" />
+        Audio {node.start.toFixed(2)} - {node.end.toFixed(2)}
+      </span>
+    </p>
+  ),
 
-  if (getType(node).name === "HyperTextRegionModel") {
-    return (
-      <div onClick={click}>
-        <Icon type="font-colors" />
-        HTML &nbsp;
-        <span style={{ color: "#5a5a5a" }}>{node.text}</span>
-      </div>
-    );
-  }
+  TextAreaRegionModel: (node, click) => (
+    <p>
+      <span onClick={click} className={styles.node}>
+        <i className="i cursor icon" />
+        Input <span style={{ color: "#5a5a5a" }}>{node._value}</span>
+      </span>
+    </p>
+  ),
 
-  if (getType(node).name === "AudioRegionModel") {
-    return (
-      <p>
-        <span onClick={click} className={styles.node}>
-          <i className="microphone icon" />
-          Audio {node.start.toFixed(2)} - {node.end.toFixed(2)}
-        </span>
-      </p>
-    );
-  }
-
-  if (getType(node).name === "TextAreaRegionModel") {
-    return (
-      <p>
-        <span onClick={click} className={styles.node}>
-          <i className="i cursor icon" />
-          Input <span style={{ color: "#5a5a5a" }}>{node._value}</span>
-        </span>
-      </p>
-    );
-  }
-
-  if (getType(node).name === "RectRegionModel") {
+  RectRegionModel: (node, click) => {
     const w = node.width * node.scaleX;
     const y = node.height * node.scaleY;
     return (
@@ -67,40 +51,49 @@ const Node = observer(({ node }) => {
         </span>
       </p>
     );
-  }
+  },
 
-  if (getType(node).name === "PolygonRegionModel") {
-    return (
-      <p>
-        <span onClick={click} className={styles.node}>
-          <i className="i object ungroup outline icon" />
-          Polygon
-        </span>
-      </p>
-    );
-  }
+  PolygonRegionModel: (node, click) => (
+    <p>
+      <span onClick={click} className={styles.node}>
+        <i className="i object ungroup outline icon" />
+        Polygon
+      </span>
+    </p>
+  ),
 
-  if (getType(node).name === "KeyPointRegionModel") {
-    return (
-      <p>
-        <span onClick={click} className={styles.node}>
-          <i className="i object bullseye icon" />
-          KeyPoint
-        </span>
-      </p>
-    );
-  }
+  KeyPointRegionModel: (node, click) => (
+    <p>
+      <span onClick={click} className={styles.node}>
+        <i className="i object bullseye icon" />
+        KeyPoint
+      </span>
+    </p>
+  ),
 
-  if (getType(node).name === "BrushRegionModel") {
-    return (
-      <p>
-        <Icon type="highlight" />
-        <span onClick={click} className={styles.node}>
-          &nbsp; Brush
-        </span>
-      </p>
-    );
-  }
+  BrushRegionModel: (node, click) => (
+    <p>
+      <Icon type="highlight" />
+      <span onClick={click} className={styles.node}>
+        &nbsp; Brush
+      </span>
+    </p>
+  ),
+};
+
+const Node = observer(({ node }) => {
+  const click = ev => {
+    ev.preventDefault();
+    getRoot(node).completionStore.selected.regionStore.unselectAll();
+    node.selectRegion();
+
+    return false;
+  };
+
+  const name = getType(node).name;
+  if (!(name in NodeViews)) console.error(`No ${name} in NodeView`);
+
+  return NodeViews[name](node, click);
 });
 
 const NodeMinimal = ({ node }) => {

@@ -3,6 +3,8 @@ import { observer, inject } from "mobx-react";
 import { types, getRoot, getType } from "mobx-state-tree";
 
 import AudioControls from "./Audio/Controls";
+import ObjectTag from "../../components/Tags/Object";
+import ObjectBase from "./Base";
 import ProcessAttrsMixin from "../mixins/ProcessAttrs";
 import Registry from "../../core/Registry";
 import Utils from "../../utils";
@@ -203,13 +205,13 @@ const Model = types
     },
   }));
 
-const AudioPlusModel = types.compose("AudioPlusModel", TagAttrs, Model, ProcessAttrsMixin);
+const AudioPlusModel = types.compose("AudioPlusModel", TagAttrs, Model, ProcessAttrsMixin, ObjectBase);
 
 const HtxAudioView = observer(({ store, item }) => {
   if (!item._value) return null;
 
   return (
-    <div>
+    <ObjectTag item={item}>
       <Waveform
         src={item._value}
         selectRegion={item.selectRegion}
@@ -225,7 +227,7 @@ const HtxAudioView = observer(({ store, item }) => {
       />
 
       <AudioControls item={item} store={store} />
-    </div>
+    </ObjectTag>
   );
 });
 

@@ -4,41 +4,41 @@ import Messages from "../utils/messages";
 /**
  * Text
  */
-import { DialogueAnalysis } from "../examples/dialogue_analysis";
-import { NamedEntity } from "../examples/named_entity";
-import { References } from "../examples/references";
-import { Sentiment } from "../examples/sentiment_analysis";
+import { DialogueAnalysis } from "../examples/dialogue_analysis"; // eslint-disable-line no-unused-vars
+import { NamedEntity } from "../examples/named_entity"; // eslint-disable-line no-unused-vars
+import { References } from "../examples/references"; // eslint-disable-line no-unused-vars
+import { Sentiment } from "../examples/sentiment_analysis"; // eslint-disable-line no-unused-vars
 
 /**
  * Audio
  */
-import { AudioClassification } from "../examples/audio_classification";
-import { AudioRegions } from "../examples/audio_regions";
-import { TranscribeAudio } from "../examples/transcribe_audio";
+import { AudioClassification } from "../examples/audio_classification"; // eslint-disable-line no-unused-vars
+import { AudioRegions } from "../examples/audio_regions"; // eslint-disable-line no-unused-vars
+import { TranscribeAudio } from "../examples/transcribe_audio"; // eslint-disable-line no-unused-vars
 
 /**
  * Image
  */
-import { ImageBbox } from "../examples/image_bbox";
-import { ImageKeyPoint } from "../examples/image_keypoints";
-import { ImageMultilabel } from "../examples/image_multilabel";
-import { ImagePolygons } from "../examples/image_polygons";
-import { ImageSegmentation } from "../examples/image_segmentation";
+import { ImageBbox } from "../examples/image_bbox"; // eslint-disable-line no-unused-vars
+import { ImageKeyPoint } from "../examples/image_keypoints"; // eslint-disable-line no-unused-vars
+import { ImageMultilabel } from "../examples/image_multilabel"; // eslint-disable-line no-unused-vars
+import { ImagePolygons } from "../examples/image_polygons"; // eslint-disable-line no-unused-vars
+import { ImageSegmentation } from "../examples/image_segmentation"; // eslint-disable-line no-unused-vars
 
 /**
  * HTML
  */
-import { HTMLDocument } from "../examples/html_document";
+import { HTMLDocument } from "../examples/html_document"; // eslint-disable-line no-unused-vars
 
 /**
  * Different
  */
-import { Pairwise } from "../examples/pairwise";
+import { Pairwise } from "../examples/pairwise"; // eslint-disable-line no-unused-vars
 
 /**
  * Custom Data
  */
-const data = ImagePolygons;
+const data = HTMLDocument;
 
 /**
  * Get current config
@@ -88,10 +88,6 @@ function rootElement(element) {
  */
 function configureApplication(params) {
   const options = {
-    // fetch: Requests.fetcher,
-    // patch: Requests.patch,
-    // post: Requests.poster,
-    // remove: Requests.remover,
     alert: m => console.log(m), // Noop for demo: window.alert(m)
     messages: { ...Messages, ...params.messages },
     onSubmitCompletion: params.onSubmitCompletion ? params.onSubmitCompletion : External.onSubmitCompletion,

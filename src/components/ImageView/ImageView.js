@@ -4,6 +4,7 @@ import { observer } from "mobx-react";
 
 import ImageGrid from "../ImageGrid/ImageGrid";
 import ImageTransformer from "../ImageTransformer/ImageTransformer";
+import ObjectTag from "../../components/Tags/Object";
 import Tree from "../../core/Tree";
 import styles from "./ImageView.module.scss";
 
@@ -321,7 +322,8 @@ export default observer(
       }
 
       return (
-        <div
+        <ObjectTag
+          item={item}
           style={{
             position: "relative",
             display: "flex",
@@ -388,7 +390,7 @@ export default observer(
               .allTools()
               .map(tool => tool.viewClass)}
           </div>
-        </div>
+        </ObjectTag>
       );
     }
   },

@@ -57,9 +57,8 @@ const Model = types
       if (self.states && self.states.length) {
         return self.states.map(s => {
           const tree = buildTree(s);
-          // in case of labels it's gonna be, htmllabels: ["label1", "label2"]
-          tree["value"]["html" + s.type] = s.getSelectedNames();
-          tree["type"] = "html" + s.type;
+
+          tree["value"]["htmllabels"] = s.getSelectedNames();
 
           return tree;
         });

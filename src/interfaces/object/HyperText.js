@@ -3,6 +3,8 @@ import React, { Component } from "react";
 import { observer, inject } from "mobx-react";
 import { types, getType, getRoot } from "mobx-state-tree";
 
+import ObjectBase from "./Base";
+import ObjectTag from "../../components/Tags/Object";
 import RegionsMixin from "../mixins/Regions";
 import Registry from "../../core/Registry";
 import Utils from "../../utils";
@@ -23,14 +25,7 @@ import { runTemplate } from "../../core/Template";
  */
 const TagAttrs = types.model("HyperTextModel", {
   name: types.maybeNull(types.string),
-  // text: types.maybeNull(types.optional(types.string, "Please set \"value\" attribute of Text")),
   value: types.maybeNull(types.string),
-
-  /**
-   * If we allow selecting parts of words of we select whole word only
-   */
-  adjustselection: types.optional(types.boolean, true),
-  selectionenabled: types.optional(types.boolean, true),
 
   encoding: types.optional(types.string, "string"),
 });
@@ -60,7 +55,9 @@ const Model = types
     activeStates() {
       const states = self.states();
       return states
-        ? states.filter(s => s.isSelected && (getType(s).name === "LabelsModel" || getType(s).name === "RatingModel"))
+        ? states.filter(
+            s => s.isSelected && (getType(s).name === "HyperTextLabelsModel" || getType(s).name === "RatingModel"),
+          )
         : null;
     },
   }))
@@ -159,7 +156,7 @@ const Model = types
     },
   }));
 
-const HyperTextModel = types.compose("HyperTextModel", RegionsMixin, TagAttrs, Model);
+const HyperTextModel = types.compose("HyperTextModel", RegionsMixin, TagAttrs, Model, ObjectBase);
 
 class HtxHyperTextView extends Component {
   render() {
@@ -298,13 +295,15 @@ class HyperTextPieceView extends Component {
     if (item.encoding === "base64") val = atob(val);
 
     return (
-      <div
-        ref={this.myRef}
-        data-update={item._update}
-        style={{ overflow: "auto" }}
-        onMouseUp={this.onMouseUp.bind(this)}
-        dangerouslySetInnerHTML={{ __html: val }}
-      />
+      <ObjectTag item={item}>
+        <div
+          ref={this.myRef}
+          data-update={item._update}
+          style={{ overflow: "auto" }}
+          onMouseUp={this.onMouseUp.bind(this)}
+          dangerouslySetInnerHTML={{ __html: val }}
+        />
+      </ObjectTag>
     );
   }
 }

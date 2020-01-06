@@ -3,6 +3,8 @@ import { observer, inject } from "mobx-react";
 import { types, getType, getRoot } from "mobx-state-tree";
 
 import InfoModal from "../../components/Infomodal/Infomodal";
+import ObjectBase from "./Base";
+import ObjectTag from "../../components/Tags/Object";
 import Registry from "../../core/Registry";
 import TextHighlight from "../../components/TextHighlight/TextHighlight";
 import { TextRegionModel, HtxTextRegion } from "../region/TextRegion";
@@ -94,7 +96,7 @@ const Model = types
         ? states.map(s => {
             return cloneNode(s);
           })
-        : null;
+        : [];
 
       /**
        * Selelect without label
@@ -174,7 +176,7 @@ const Model = types
     },
   }));
 
-const TextModel = types.compose("TextModel", TagAttrs, Model);
+const TextModel = types.compose("TextModel", TagAttrs, Model, ObjectBase);
 
 class HtxTextView extends Component {
   renderRegion(letterGroup, range, textCharIndex, onMouseOverHighlightedWord) {
@@ -200,7 +202,7 @@ class HtxTextView extends Component {
     if (item.hidden === "true") style["display"] = "none";
 
     return (
-      <div style={style}>
+      <ObjectTag style={style} item={item}>
         <TextHighlight
           id={item.id}
           key={item.id}
@@ -213,7 +215,7 @@ class HtxTextView extends Component {
             item.addRegion(range);
           }}
         />
-      </div>
+      </ObjectTag>
     );
   }
 }

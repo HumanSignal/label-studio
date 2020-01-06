@@ -144,6 +144,7 @@ function treeToModel(html) {
   function addNode(node) {
     if (!node.$$) return null;
 
+    let text = null;
     const res = [];
 
     for (let chld of node.$$) {
@@ -157,10 +158,12 @@ function treeToModel(html) {
         }
 
         res.push(data);
+      } else {
+        text = chld._;
       }
     }
 
-    return res.length === 0 ? null : res;
+    return res.length === 0 ? text : res;
   }
 
   /**

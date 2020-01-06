@@ -30,6 +30,11 @@
   }
 }
 
+.menu:empty {
+  width: 0;
+  min-width: auto;
+}
+
 .content {
   border: 1px solid #e8e8e8;
   padding: 10px 20px;

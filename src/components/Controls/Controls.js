@@ -46,7 +46,7 @@ export default inject("store")(
     if (!store.completionStore.predictSelect || store.explore) {
       if (store.hasInterface("skip")) {
         skipButton = (
-          <Button type="ghost" onClick={store.skipTask} className={styles.skip}>
+          <Button type="ghost" onClick={store.skipTask} className={styles.skip + " skip-btn"}>
             Skip {buttons.skip}
           </Button>
         );
@@ -54,7 +54,12 @@ export default inject("store")(
 
       if ((userGenerate && !sentUserGenerate) || (store.explore && !userGenerate && store.hasInterface("submit"))) {
         submitButton = (
-          <Button type="primary" icon="check" onClick={store.submitCompletion} className={styles.submit}>
+          <Button
+            type="primary"
+            icon="check"
+            onClick={store.submitCompletion}
+            className={styles.submit + " submit-btn"}
+          >
             Submit {buttons.submit}
           </Button>
         );
@@ -62,7 +67,7 @@ export default inject("store")(
 
       if ((userGenerate && sentUserGenerate) || (!userGenerate && store.hasInterface("update"))) {
         updateButton = (
-          <Button type="primary" icon="rollback" onClick={store.updateCompletion}>
+          <Button type="primary" icon="rollback" onClick={store.updateCompletion} className="update-btn">
             Update {buttons.update}
           </Button>
         );

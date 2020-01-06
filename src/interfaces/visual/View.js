@@ -22,8 +22,10 @@ import Types from "../../core/Types";
  * @name View
  * @param {block|inline} display
  * @param {style} style css style string
+ * @param {className} class name of the css style to apply
  */
 const TagAttrs = types.model({
+  classname: types.optional(types.string, ""),
   display: types.optional(types.string, "block"),
   style: types.maybeNull(types.string),
 });
@@ -57,6 +59,7 @@ const Model = types.model({
     "dialog",
     "textarea",
     "pairwise",
+    "style",
   ]),
 });
 
@@ -73,7 +76,11 @@ const HtxView = observer(({ item }) => {
     style = Tree.cssConverter(item.style);
   }
 
-  return <div style={style}>{Tree.renderChildren(item)}</div>;
+  return (
+    <div className={item.classname} style={style}>
+      {Tree.renderChildren(item)}
+    </div>
+  );
 });
 
 Registry.addTag("view", ViewModel, HtxView);

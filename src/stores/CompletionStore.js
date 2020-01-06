@@ -186,6 +186,7 @@ const Completion = types
     afterAttach() {
       self.traverseTree(node => {
         if (node.updateValue) node.updateValue(self.store);
+        if (node.completionAttached) node.completionAttached();
 
         // Copy tools from control tags into object tools manager
         if (node && node.getToolsManager) {

@@ -100,7 +100,7 @@ const App = inject("store")(
         if (!root) return self.renderNoCompletion();
 
         return (
-          <div className={styles.editor}>
+          <div className={styles.editor + " editor"}>
             <Settings store={store} />
             <Provider store={store}>
               <div>
@@ -112,9 +112,9 @@ const App = inject("store")(
                   </Segment>
                 )}
 
-                <div className={styles.common}>
+                <div className={styles.common + " common"}>
                   {!cs.viewingAllCompletions && !cs.viewingAllPredictions && (
-                    <Segment>
+                    <Segment className="segment">
                       {Tree.renderItem(root)}
                       {store.hasInterface("controls") && <Controls item={cs.selected} />}
                     </Segment>
@@ -122,7 +122,7 @@ const App = inject("store")(
                   {cs.viewingAllCompletions && this.renderAllCompletions()}
                   {cs.viewingAllPredictions && this.renderAllPredictions()}
 
-                  <div className={styles.menu}>
+                  <div className={styles.menu + " menu"}>
                     {store.hasInterface("completions:menu") && <Completions store={store} />}
                     {store.hasInterface("predictions:menu") && <Predictions store={store} />}
                     {store.hasInterface("side-column") && !cs.viewingAllCompletions && !cs.viewingAllPredictions && (

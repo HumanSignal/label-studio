@@ -17,7 +17,7 @@ export default observer(({ store }) => {
   const { history } = store.completionStore.selected;
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container + " panel"}>
       <div className={`${styles.block} ${styles.block__controls}`}>
         <Button
           type="ghost"
