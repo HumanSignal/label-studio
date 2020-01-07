@@ -9,4 +9,4 @@ RUN pip install -r backend/requirements.txt
 COPY . /app
 EXPOSE ${PORT:-8200}
 WORKDIR /app/backend
-ENTRYPOINT ["python", "server.py"]
+CMD ["/app/scripts/run-demo.sh", "image_bbox"]
