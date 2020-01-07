@@ -8,6 +8,10 @@
   padding: 0.5em;
 }
 
+.block:empty {
+  display: none;
+}
+
 .divider {
   margin: 12px 0;
 }
