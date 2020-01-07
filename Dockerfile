@@ -7,6 +7,6 @@ COPY backend/requirements.txt /app/backend/
 RUN pip install -r backend/requirements.txt
 
 COPY . /app
-EXPOSE 8200
+EXPOSE ${PORT:-8200}
 WORKDIR /app/backend
 ENTRYPOINT ["python", "server.py"]
