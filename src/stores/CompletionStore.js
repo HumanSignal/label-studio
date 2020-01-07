@@ -499,7 +499,7 @@ export default types
         if ("id" in r) r["id"] = guidGenerator();
       });
 
-      c.deserializeCompletion(prediction.serializeCompletion());
+      c.deserializeCompletion(s);
 
       return c;
     }
