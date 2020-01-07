@@ -149,6 +149,17 @@ def tasks_page():
                                  completed_at=completed_at)
 
 
+@app.route('/import')
+def import_page():
+    """ Tasks and completions page: tasks.html
+    """
+    global c, project
+    reload_config()
+
+    analytics.send(getframeinfo(currentframe()).function)
+    return flask.render_template('import.html', config=c, project=project)
+
+
 @app.route(f'/api/projects/{DEFAULT_PROJECT_ID}/next/', methods=['GET'])
 @exception_treatment
 def api_generate_next_task():

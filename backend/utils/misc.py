@@ -5,13 +5,24 @@ import traceback as tb
 import io
 from flask import request, jsonify, make_response
 import json  # it MUST be included after flask!
-import inspect
 
 from appdirs import user_config_dir
 from pythonjsonlogger import jsonlogger
 from lxml import etree
 from xml.etree import ElementTree
 from .db import re_init
+
+
+# exception for import tasks or config validation
+class ValidationError(Exception):
+    pass
+
+
+# settings from django analogue
+class Settings:
+    TASKS_MAX_NUMBER = 250000
+    TASKS_MAX_FILE_SIZE = 200 * 1024 * 1024
+    UPLOAD_DATA_UNDEFINED_NAME = '$undefined$'
 
 
 # this must be before logger setup

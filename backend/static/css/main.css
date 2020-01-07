@@ -26,10 +26,8 @@ th {
     border: 1px solid #ccc;
 }
 
-.content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.container {
+    min-width: 500px;
 }
 
 .wrapper {
@@ -88,6 +86,7 @@ a {
     z-index: 100;
     box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 3px 0px;
     margin-bottom: 3em;
+    min-width: 500px;
 }
 
 #logo {

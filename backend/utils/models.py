@@ -1,11 +1,12 @@
+import io
+import os
+import attr
 import urllib
 import logging
-import os
 import requests
-import attr
-import json
-import io
+import ujson as json
 
+from lxml import etree
 from datetime import datetime
 from requests.adapters import HTTPAdapter
 from utils.misc import get_data_dir
@@ -34,6 +35,11 @@ class Project(object):
     task_data_password = attr.ib(default='')
     # connected machine learning backend
     ml_backend = attr.ib(default=None)
+    # import settings
+    max_tasks_file_size = attr.ib(default=250)
+
+    def __attrs_post_init__(self):
+        self.data_types = self.extract_data_types(self.label_config)
 
     def connect(self, ml_backend):
         self.ml_backend = ml_backend
@@ -43,6 +49,29 @@ class Project(object):
     def train_job(self):
         if self.ml_backend is not None:
             return self.ml_backend.train_job
+
+    def data_types_json(self):
+        return json.dumps(self.data_types)
+
+    @classmethod
+    def extract_data_types(cls, label_config):
+        # load config
+        parser = etree.XMLParser()
+        xml = etree.fromstring(label_config, parser)
+        if xml is None:
+            raise etree.XMLSchemaParseError('Project config is empty or incorrect')
+
+        # take all tags with values attribute and fit them to tag types
+        data_type = {}
+        parent = xml.findall('.//*[@value]')
+        for match in parent:
+            name = match.get('value')
+            if len(name) > 1 and name[0] == '$':
+                name = name[1:]
+                data_type[name] = match.tag
+
+        return data_type
+
 
 
 class BaseHTTPAPI(object):
