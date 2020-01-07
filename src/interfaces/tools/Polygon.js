@@ -85,6 +85,15 @@ const _Tool = types
       if (self.control.type === "polygonlabels") if (!self.control.isSelected && self.getActivePolygon === null) return;
 
       const { states, strokecolor } = self.statesAndParams;
+
+      // if there is a polygon in process of creation right now, but
+      // the user has clicked on the labels without first finishing
+      // it, we close it automatically and create a new one with new
+      // labels
+      if (states.length && self.getActivePolygon) {
+        self.getActivePolygon.closePoly();
+      }
+
       self.createRegion({
         x: x,
         y: y,
