@@ -77,11 +77,11 @@ const Model = types
         self.relativeX = self.x;
         self.relativeY = self.y;
       }
-        
-        if (self.coordstype === "px") {
-            self.relativeX = (self.x / self.parent.stageWidth) * 100;
-            self.relativeY = (self.y / self.parent.stageHeight) * 100;
-        }
+
+      if (self.coordstype === "px") {
+        self.relativeX = (self.x / self.parent.stageWidth) * 100;
+        self.relativeY = (self.y / self.parent.stageHeight) * 100;
+      }
     },
 
     updateImageSize(wp, hp, sw, sh) {
