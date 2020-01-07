@@ -55,6 +55,7 @@ const _Tool = types
         width: self.control.strokewidth,
         fillcolor: fillcolor,
         states: states,
+        coordstype: "px",
       });
 
       self.control.unselectAll();
