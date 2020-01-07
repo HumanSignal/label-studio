@@ -233,7 +233,7 @@ const Model = types
 
   .actions(self => ({
     freezeHistory() {
-      getParent(self, 3).history.freeze();
+      //self.completion.history.freeze();
     },
 
     updateBrushControl(arg) {
@@ -376,7 +376,7 @@ const Model = types
       self
         .getToolsManager()
         .allTools()
-        .forEach(t => t.fromStateJSON(obj, fromModel));
+        .forEach(t => t.fromStateJSON && t.fromStateJSON(obj, fromModel));
     },
   }));
 

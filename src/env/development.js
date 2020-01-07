@@ -38,7 +38,7 @@ import { Pairwise } from "../examples/pairwise"; // eslint-disable-line no-unuse
 /**
  * Custom Data
  */
-const data = HTMLDocument;
+const data = ImageBbox;
 
 /**
  * Get current config

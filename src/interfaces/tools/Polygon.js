@@ -15,6 +15,7 @@ const _Tool = types
       const poly = self.getActiveShape;
 
       if (poly && poly.closed) return null;
+      if (poly === undefined) return null;
 
       return poly;
     },
@@ -81,6 +82,8 @@ const _Tool = types
     },
 
     clickEv(ev, [x, y]) {
+      if (self.control.type === "polygonlabels") if (!self.control.isSelected && self.getActivePolygon === null) return;
+
       const { states, strokecolor } = self.statesAndParams;
       self.createRegion({
         x: x,
@@ -96,7 +99,7 @@ const _Tool = types
     },
   }));
 
-const Polygon = types.compose(ToolMixin, _Tool, BaseTool);
+const Polygon = types.compose(ToolMixin, BaseTool, _Tool);
 
 export { Polygon };
 

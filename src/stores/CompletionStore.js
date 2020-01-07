@@ -358,10 +358,14 @@ export default types
       if (self.viewingAllCompletions || self.viewingAllPredictions) {
         self.completions.forEach(c => {
           c.selected = false;
-          c.highlightedNode && c.highlightedNode.unselectRegion();
+          c.edittable = false;
+          c.regionStore.unselectAll();
         });
 
-        self.predictions.forEach(c => (c.selected = false));
+        self.predictions.forEach(c => {
+          c.selected = false;
+          c.regionStore.unselectAll();
+        });
       } else {
         selectCompletion(self.completions[0].id);
       }
@@ -378,10 +382,7 @@ export default types
     function toggleViewingAllCompletions() {
       self.viewingAllCompletions = !self.viewingAllCompletions;
 
-      if (self.viewingAllCompletions) {
-        self.viewingAllPredictions = false;
-        self.completions.forEach(c => (c.edittable = false));
-      }
+      if (self.viewingAllCompletions) self.viewingAllPredictions = false;
 
       toggleViewingAll();
     }

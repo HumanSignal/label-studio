@@ -111,10 +111,6 @@ const Model = types
       self.parent.setSelected(self.id);
     },
 
-    getCurrentCoordinates(x, y, width, height) {
-      // console.log(self.width * (self.scaleX || 1));
-    },
-
     /**
      * Boundg Box set position on canvas
      * @param {number} x
@@ -253,11 +249,13 @@ const HtxRectangleView = ({ store, item }) => {
           item.setPosition(
             t.getAttr("x"),
             t.getAttr("y"),
-            t.getAttr("width"),
-            t.getAttr("height"),
+            t.getAttr("width") * t.getAttr("scaleX"),
+            t.getAttr("height") * t.getAttr("scaleY"),
             t.getAttr("rotation"),
           );
-          item.setScale(t.getAttr("scaleX"), t.getAttr("scaleY"));
+
+          t.setAttr("scaleX", 1);
+          t.setAttr("scaleY", 1);
         }}
         onDragEnd={e => {
           const t = e.target;
@@ -273,9 +271,6 @@ const HtxRectangleView = ({ store, item }) => {
         }}
         dragBoundFunc={(pos, e) => {
           let { x, y } = pos;
-
-          item.getCurrentCoordinates(x, y, item.width, 1);
-
           let { stageHeight, stageWidth } = getParent(item, 2);
 
           if (x <= 0) {

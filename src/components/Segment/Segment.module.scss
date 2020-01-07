@@ -11,18 +11,6 @@
   border: 1px solid rgba(34, 36, 38, 0.15);
   margin-bottom: 1em;
 
-  @media screen and (max-width: 1600px) {
-    max-width: 900px;
-  }
-
-  @media screen and (max-width: 1400px) {
-    max-width: 800px;
-  }
-
-  @media screen and (max-width: 1280px) {
-    max-width: 750px;
-  }
-
   @include respond("phone") {
     width: 100%;
     margin-right: 0;

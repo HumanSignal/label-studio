@@ -77,16 +77,9 @@ const Model = types
     },
 
     handleMouseMove({ e, flattenedPoints }) {
-      const { offsetX: cursorX, offsetY: cursorY } = e.evt;
-      const point = getAnchorPoint({ flattenedPoints, cursorX, cursorY });
+      let { offsetX: cursorX, offsetY: cursorY } = e.evt;
 
-      let x = point[0];
-      let y = point[1];
-
-      if (self.parent.zoomScale !== 1) {
-        x = x * self.parent.zoomScale;
-        y = y * self.parent.zoomScale;
-      }
+      const [x, y] = getAnchorPoint({ flattenedPoints, cursorX, cursorY });
 
       const group = e.currentTarget;
       const layer = e.currentTarget.getLayer();
@@ -171,24 +164,19 @@ const Model = types
         self.selectedPoint.selected = false;
       }
 
+      // self.points.forEach(p => p.computeOffset());
+
       self.selected = false;
       self.parent.setSelected(undefined);
       self.completion.setHighlightedNode(null);
     },
 
     selectRegion() {
+      // self.points.forEach(p => p.computeOffset());
+
       self.selected = true;
       self.completion.setHighlightedNode(self);
       self.parent.setSelected(self.id);
-    },
-
-    setPosition(x, y, width, height, rotation) {
-      self.x = x;
-      self.y = y;
-      self.width = width;
-      self.height = height;
-
-      self.rotation = rotation;
     },
 
     setScale(x, y) {
@@ -202,6 +190,10 @@ const Model = types
 
     setFill(color) {
       self.fill = color;
+    },
+
+    updateOffset() {
+      self.points.map(p => p.computeOffset());
     },
 
     updateImageSize(wp, hp, sw, sh) {
@@ -301,7 +293,7 @@ function getAnchorPoint({ flattenedPoints, cursorX, cursorY }) {
 }
 
 function getFlattenedPoints(points) {
-  const p = points.map(p => [p["x"], p["y"]]);
+  const p = points.map(p => [p.x, p.y]);
   return p.reduce(function(flattenedPoints, point) {
     return flattenedPoints.concat(point);
   }, []);
@@ -419,44 +411,54 @@ const HtxPolygonView = ({ store, item }) => {
     );
   }
 
+  function minMax(items) {
+    return items.reduce((acc, val) => {
+      acc[0] = acc[0] === undefined || val < acc[0] ? val : acc[0];
+      acc[1] = acc[1] === undefined || val > acc[1] ? val : acc[1];
+      return acc;
+    }, []);
+  }
+
+  let minX = 0,
+    maxX = 0,
+    minY = 0,
+    maxY = 0;
+
   return (
     <Group
       key={item.id ? item.id : guidGenerator(5)}
       onDragStart={e => {
         item.completion.setDragMode(true);
+
+        var arrX = item.points.map(p => p.x);
+        var arrY = item.points.map(p => p.y);
+
+        [minX, maxX] = minMax(arrX);
+        [minY, maxY] = minMax(arrY);
       }}
       dragBoundFunc={function(pos) {
         let { x, y } = pos;
 
-        const r = item.parent.stageWidth - this.getAttr("width");
-        const b = item.parent.stageHeight - this.getAttr("height");
+        const sw = item.parent.stageWidth;
+        const sh = item.parent.stageHeight;
 
-        if (x > r) x = r;
-        if (y > b) y = b;
+        if (minY + y < 0) y = -1 * minY;
+        if (minX + x < 0) x = -1 * minX;
+        if (maxY + y > sh) y = sh - maxY;
+        if (maxX + x > sw) x = sw - maxX;
 
-        item.points.forEach(p => {
-          if (x + p.init_x <= 0) x = x - (p.init_x + x);
-          if (y + p.init_y <= 0) y = y - (p.init_y + y);
-          if (x + p.init_x >= r) x = r - p.init_x;
-          if (y + p.init_y >= b) y = b - p.init_y;
-        });
-
-        item.points.forEach(p => {
-          p.movePoint(x, y);
-        });
-
-        return { x: 0, y: 0 };
+        return { x: x, y: y };
       }}
       onDragEnd={e => {
-        item.completion.setDragMode(false);
+        const t = e.target;
 
+        item.completion.setDragMode(false);
         if (!item.closed) item.closePoly();
 
-        // item.parent.setActivePolygon(null);
+        item.points.forEach(p => p.movePoint(t.getAttr("x"), t.getAttr("y")));
 
-        item.points.forEach(p => {
-          p.afterCreate();
-        });
+        t.setAttr("x", 0);
+        t.setAttr("y", 0);
       }}
       onMouseOver={e => {
         const stage = item.parent.stageRef;
@@ -492,7 +494,7 @@ const HtxPolygonView = ({ store, item }) => {
         item.setHighlight(false);
         item.onClickRegion();
       }}
-      draggable={item.completion.edittable}
+      draggable={item.completion.edittable && item.parent.zoomScale === 1}
     >
       {item.mouseOverStartPoint}
 

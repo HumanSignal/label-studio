@@ -56,17 +56,18 @@ const PolygonPoint = types
      * @param {number} x
      * @param {number} y
      */
-    movePoint(x, y) {
-      self.x = self.init_x + x;
-      self.y = self.init_y + y;
+
+    movePoint(offsetX, offsetY) {
+      self.init_x = self.init_x + offsetX;
+      self.init_y = self.init_y + offsetY;
+      self.x = self.x + offsetX;
+      self.y = self.y + offsetY;
+
+      self.relativeX = (self.x / self.parent.parent.stageWidth) * 100;
+      self.relativeY = (self.y / self.parent.parent.stageHeight) * 100;
     },
 
     _movePoint(x, y) {
-      // if (y)
-      //     return;
-
-      //    x = self.parent.parent.stageWidth;
-
       self.init_x = x;
       self.init_y = y;
 
@@ -172,6 +173,10 @@ const PolygonPointView = observer(({ item, name }) => {
       if (y > item.parent.parent.stageHeight) y = item.parent.parent.stageHeight;
 
       item._movePoint(x, y);
+    },
+
+    onDragEnd: e => {
+      e.cancelBubble = true;
     },
 
     onMouseOver: e => {

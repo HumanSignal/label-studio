@@ -14,7 +14,7 @@ It automatically start serving label studio, prompts you about configuration par
 
 ## Linux & Ubuntu guide
 
-1 Install python and virtualenv. We recommend to use python 3.6, but probably python 2 solution will work too.  
+1 Install python and virtualenv. We recommend to use python 3.6, but probably python 2 solution will work too.
 ```
 apt install python3.6
 pip3 install virtualenv

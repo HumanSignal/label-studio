@@ -297,9 +297,6 @@ export default observer(
     render() {
       const { item, store } = this.props;
 
-      // console.log("ImageView render");
-      // console.log(item.tools);
-
       // TODO fix me
       if (!store.task || !item._value) return null;
 

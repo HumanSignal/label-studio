@@ -120,6 +120,6 @@ const _Tool = types
     },
   }));
 
-const Brush = types.compose(ToolMixin, _Tool, BaseTool);
+const Brush = types.compose(ToolMixin, BaseTool, _Tool);
 
 export { Brush };
