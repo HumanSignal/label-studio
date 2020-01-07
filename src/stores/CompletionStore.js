@@ -316,6 +316,8 @@ const Completion = types
         objCompletion = JSON.parse(objCompletion);
       }
 
+      self._initialCompletionObj = objCompletion;
+
       objCompletion.forEach(obj => {
         if (obj["type"] !== "relation") {
           const names = obj.to_name.split(",");
@@ -418,7 +420,10 @@ export default types
     }
 
     function selectPrediction(id) {
-      return selectItem(id, self.predictions);
+      const p = selectItem(id, self.predictions);
+      p.regionStore.unselectAll();
+
+      return p;
     }
 
     function deleteCompletion(completion) {
@@ -488,10 +493,8 @@ export default types
 
     function addCompletionFromPrediction(prediction) {
       const c = self.addCompletion({ userGenerate: true });
+      const s = prediction._initialCompletionObj;
 
-      selectCompletion(c.id);
-
-      const s = prediction.serializeCompletion();
       // we need to iterate here and rename all ids, as those might
       // clash with the one in the prediction if used as a reference
       // somewhere
@@ -499,6 +502,7 @@ export default types
         if ("id" in r) r["id"] = guidGenerator();
       });
 
+      selectCompletion(c.id);
       c.deserializeCompletion(s);
 
       return c;
