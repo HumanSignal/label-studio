@@ -72,11 +72,16 @@ const Model = types
       self.fill = color;
     },
 
-    afterCreate() {
+    afterAttach() {
       if (self.coordstype === "perc") {
         self.relativeX = self.x;
         self.relativeY = self.y;
       }
+        
+        if (self.coordstype === "px") {
+            self.relativeX = (self.x / self.parent.stageWidth) * 100;
+            self.relativeY = (self.y / self.parent.stageHeight) * 100;
+        }
     },
 
     updateImageSize(wp, hp, sw, sh) {
@@ -91,7 +96,7 @@ const Model = types
         self.y = (sh * self.relativeY) / 100;
       }
 
-      if (self.coordstype === "perc") {
+      if (!self.completion.sentUserGenerate && self.coordstype === "perc") {
         self.x = (sw * self.x) / 100;
         self.y = (sh * self.y) / 100;
         self.width = (sw * self.width) / 100;
