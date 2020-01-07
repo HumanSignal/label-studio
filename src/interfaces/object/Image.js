@@ -163,6 +163,7 @@ const Model = types
 
     controlButton() {
       const names = self.states();
+      if (!names || names.length === 0) return;
 
       let returnedControl = names[0];
 
@@ -190,15 +191,11 @@ const Model = types
     function afterCreate() {
       // console.log(self.id);
       // console.log(getType(self));
-
-      toolsManager.addTool("zoom", Tools.Zoom.create({}, { manager: toolsManager }));
-
+      // toolsManager.addTool("zoom", Tools.Zoom.create({}, { manager: toolsManager }));
       // tools["zoom"] = Tools.Zoom.create({ image: self.id });
       // tools["zoom"]._image = self;
-
       // console.log(getRoot(self));
       // const st = self.states();
-
       // self.states().forEach(item => {
       // const tools = item.getTools();
       // if (tools)

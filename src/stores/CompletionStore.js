@@ -490,6 +490,15 @@ export default types
       const c = self.addCompletion({ userGenerate: true });
 
       selectCompletion(c.id);
+
+      const s = prediction.serializeCompletion();
+      // we need to iterate here and rename all ids, as those might
+      // clash with the one in the prediction if used as a reference
+      // somewhere
+      s.forEach(r => {
+        if ("id" in r) r["id"] = guidGenerator();
+      });
+
       c.deserializeCompletion(prediction.serializeCompletion());
 
       return c;

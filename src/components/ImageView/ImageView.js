@@ -300,6 +300,8 @@ export default observer(
       // TODO fix me
       if (!store.task || !item._value) return null;
 
+      const cb = item.controlButton();
+
       const divStyle = {
         overflow: "hidden",
         // width: item.stageWidth + "px",
@@ -377,7 +379,7 @@ export default observer(
               {item.shapes.filter(s => s.type !== "brushregion").map(s => Tree.renderItem(s))}
               {item.activeShape && Tree.renderItem(item.activeShape)}
 
-              <ImageTransformer rotateEnabled={item.controlButton().canrotate} selectedShape={item.selectedShape} />
+              <ImageTransformer rotateEnabled={cb && cb.canrotate} selectedShape={item.selectedShape} />
             </Layer>
           </Stage>
 
