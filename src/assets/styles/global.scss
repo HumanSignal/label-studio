@@ -4,18 +4,18 @@
 @import "./mixins";
 @import "./functions";
 
-.renderall {
+.ls-renderall {
   display: flex;
   flex-wrap: wrap;
   width: 100%;
 }
 
-.renderall > div {
+.ls-renderall > div {
   width: 49%;
   margin-right: 1%;
 }
 
-.fade {
+.ls-fade {
   opacity: 1;
   animation-name: fadeInOpacity;
   animation-iteration-count: 1;

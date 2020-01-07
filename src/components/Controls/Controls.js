@@ -24,7 +24,7 @@ export default inject("store")(
      */
     let taskInformation;
     if (store.task) {
-      taskInformation = <h4 className={styles.task}>Task ID: {store.task.id}</h4>;
+      taskInformation = <h4 className={styles.task + " ls-task-info"}>Task ID: {store.task.id}</h4>;
     }
 
     /**
@@ -46,7 +46,7 @@ export default inject("store")(
     if (!store.completionStore.predictSelect || store.explore) {
       if (store.hasInterface("skip")) {
         skipButton = (
-          <Button type="ghost" onClick={store.skipTask} className={styles.skip + " skip-btn"}>
+          <Button type="ghost" onClick={store.skipTask} className={styles.skip + " ls-skip-btn"}>
             Skip {buttons.skip}
           </Button>
         );
@@ -58,7 +58,7 @@ export default inject("store")(
             type="primary"
             icon="check"
             onClick={store.submitCompletion}
-            className={styles.submit + " submit-btn"}
+            className={styles.submit + " ls-submit-btn"}
           >
             Submit {buttons.submit}
           </Button>
@@ -67,7 +67,7 @@ export default inject("store")(
 
       if ((userGenerate && sentUserGenerate) || (!userGenerate && store.hasInterface("update"))) {
         updateButton = (
-          <Button type="primary" icon="rollback" onClick={store.updateCompletion} className="update-btn">
+          <Button type="primary" icon="rollback" onClick={store.updateCompletion} className="ls-update-btn">
             Update {buttons.update}
           </Button>
         );

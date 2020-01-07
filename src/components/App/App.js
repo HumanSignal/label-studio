@@ -65,9 +65,9 @@ const App = inject("store")(
         if (obj.length === 1) return <Segment>{[Tree.renderItem(obj[0].root)]}</Segment>;
 
         return (
-          <div className="renderall">
+          <div className="ls-renderall">
             {obj.map(c => (
-              <div className="fade">
+              <div className="ls-fade">
                 <Segment>{[Tree.renderItem(c.root)]}</Segment>
               </div>
             ))}
@@ -100,7 +100,7 @@ const App = inject("store")(
         if (!root) return self.renderNoCompletion();
 
         return (
-          <div className={styles.editor + " editor"}>
+          <div className={styles.editor + " ls-editor"}>
             <Settings store={store} />
             <Provider store={store}>
               <div>
@@ -112,9 +112,9 @@ const App = inject("store")(
                   </Segment>
                 )}
 
-                <div className={styles.common + " common"}>
+                <div className={styles.common + " ls-common"}>
                   {!cs.viewingAllCompletions && !cs.viewingAllPredictions && (
-                    <Segment className="segment">
+                    <Segment className="ls-segment">
                       {Tree.renderItem(root)}
                       {store.hasInterface("controls") && <Controls item={cs.selected} />}
                     </Segment>
@@ -122,7 +122,7 @@ const App = inject("store")(
                   {cs.viewingAllCompletions && this.renderAllCompletions()}
                   {cs.viewingAllPredictions && this.renderAllPredictions()}
 
-                  <div className={styles.menu + " menu"}>
+                  <div className={styles.menu + " ls-menu"}>
                     {store.hasInterface("completions:menu") && <Completions store={store} />}
                     {store.hasInterface("predictions:menu") && <Predictions store={store} />}
                     {store.hasInterface("side-column") && !cs.viewingAllCompletions && !cs.viewingAllPredictions && (
