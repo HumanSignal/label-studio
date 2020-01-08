@@ -67,7 +67,7 @@ class CustomJsonFormatter(jsonlogger.JsonFormatter):
 # read logger config
 with open(find_file('logger.json')) as f:
     log_config = json.load(f)
-logfile = find_file('static/logs/service.log')
+logfile = os.path.join(os.path.dirname(__file__), '..', 'static', 'logs', 'service.log')
 
 # create log file
 os.makedirs(os.path.dirname(logfile), exist_ok=True)
