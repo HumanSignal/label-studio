@@ -1,6 +1,6 @@
 import logging
 import ujson as json
-from utils.misc import ValidationError
+from .exceptions import ValidationError
 
 
 class SkipField(Exception):

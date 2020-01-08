@@ -7,7 +7,6 @@ import time
 import flask
 import logging
 import hashlib
-import label_studio.utils.db as db
 import pandas as pd
 import ujson as json  # it MUST be included after flask!
 
@@ -17,6 +16,7 @@ from inspect import currentframe, getframeinfo
 from flask import request, jsonify, make_response, Response, Response as HttpResponse
 from flask_api import status
 
+import label_studio.utils.db as db
 from label_studio.utils.functions import generate_sample_task
 from label_studio.utils.analytics import Analytics
 from label_studio.utils.models import DEFAULT_PROJECT_ID, Project, MLBackend
@@ -24,12 +24,12 @@ from label_studio.utils.prompts import LabelStudioConfigPrompt
 from label_studio.utils.io import find_file, find_dir
 from label_studio.utils import uploader
 from label_studio.utils.validation import TaskValidator
+from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.misc import (
-    exception_treatment, log_config, log, config_line_stripped, load_config, ValidationError
+    exception_treatment, log_config, log, config_line_stripped, load_config
 )
 
 logger = logging.getLogger(__name__)
-
 
 app = flask.Flask(__name__, static_url_path='')
 app.secret_key = 'A0Zrdqwf1AQWj12ajkhgFN]dddd/,?RfDWQQT'
@@ -289,7 +289,7 @@ def api_import():
         json.dump(tasks, f, ensure_ascii=False, indent=4)
 
     # load new tasks
-    reload_config()
+    db.re_init(c)
 
     duration = time.time() - start
     return make_response(jsonify({

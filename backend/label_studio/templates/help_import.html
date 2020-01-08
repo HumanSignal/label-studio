@@ -67,6 +67,7 @@
         {% endautoescape %}
         $.post({url: url, data: sample, contentType: 'application/json'})
           .fail(function (e) {
+            alert('Error: see more in browser console');
             console.log(e)
           })
           .done(function () {

@@ -11,7 +11,8 @@ import ujson as json
 import pandas as pd
 
 from os.path import join
-from .misc import ValidationError, Settings
+from .exceptions import ValidationError
+from .misc import Settings
 from urllib.request import urlopen
 
 settings = Settings
