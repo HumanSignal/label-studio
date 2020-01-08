@@ -32,7 +32,6 @@ th {
 
 .wrapper {
     max-width: 1400px;
-    text-align: center;
 }
 
 /* Disallow selection on page for Editor Ranker */
@@ -280,6 +279,8 @@ a {
 
 /* Import Finish */
 
+/* semantic ui pretty */
+
 .ui .button {
     font-weight: 400 !important;
 }
@@ -294,3 +295,15 @@ a {
 .ui .button:hover {
     transition: 0.3s;
 }
+.ui h3 {
+    font-weight: 400;
+}
+
+.ui .message {
+    background: none !important;
+    box-shadow: 0 0 0 1px rgba(34,36,38,.15) !important;
+}
+.ui .message .content {
+    margin-top: 0.7em;
+}
+/* semantic ui pretty finish */

@@ -166,6 +166,17 @@ def import_page():
     return flask.render_template('import.html', config=c, project=project)
 
 
+@app.route('/label-config')
+def label_config_page():
+    """ Setup label config
+    """
+    global c, project
+    reload_config()
+
+    analytics.send(getframeinfo(currentframe()).function)
+    return flask.render_template('label_config.html', config=c, project=project)
+
+
 @app.route('/api/import-example')
 def api_import_example():
     """ Task examples for import

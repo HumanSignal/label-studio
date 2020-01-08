@@ -37,6 +37,9 @@
     <span class="img-text">{{ config['title'] }}</span>
   </a>
   <ul id="nav">
+    <a href="/label-config" class="{% if url_for(request.endpoint) == '/label-config' %}active{% endif %}">Config</a>
+    <span class="delim">|</span>
+
     <a href="/import" class="{% if url_for(request.endpoint) == '/import' %}active{% endif %}">Import</a>
     <span class="delim">|</span>
 
