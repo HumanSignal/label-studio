@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "antd";
+import { Button, Popconfirm } from "antd";
 import { observer } from "mobx-react";
 
 import Hint from "../Hint/Hint";
@@ -8,29 +8,36 @@ import { Node } from "../Node/Node";
 
 export default observer(({ store, regionStore }) => {
   const { regions } = regionStore;
+  const c = store.completionStore.selected;
 
-  let buttonRemove = () => {
+  const buttonRemove = () => {
+    const confirm = () => {
+      c.deleteAllRegions();
+    };
+
     return (
-      <Button
-        type="link"
-        style={{ paddingLeft: 0 }}
-        onClick={ev => {
-          store.completionStore.selected.deleteAllRegions();
-          ev.preventDefault();
-        }}
+      <Popconfirm
+        placement="bottomLeft"
+        title={"Please confirm you want to delete all labeled regions"}
+        onConfirm={confirm}
+        okText="Delete"
+        okType="danger"
+        cancelText="Cancel"
       >
-        Remove all
-        {regions.length > 0 && store.settings.enableHotkeys && store.settings.enableTooltips && (
-          <Hint>[ Ctrl+bksp ]</Hint>
-        )}
-      </Button>
+        <Button type="link" style={{ paddingLeft: 0 }}>
+          Remove all
+          {regions.length > 0 && store.settings.enableHotkeys && store.settings.enableTooltips && (
+            <Hint>[ Ctrl+bksp ]</Hint>
+          )}
+        </Button>
+      </Popconfirm>
     );
   };
 
   return (
     <div>
       <h4>Entities ({regions.length})</h4>
-      {regions.length > 0 && buttonRemove()}
+      {regions.length > 0 && c.edittable === true && buttonRemove()}
       {!regions.length && <p>No Entities added yet</p>}
       {regions.length > 0 && (
         <ul className={styles.list}>
@@ -39,9 +46,12 @@ export default observer(({ store, regionStore }) => {
               key={region.id}
               className={styles.item}
               onMouseOver={() => {
+                // region.setHighlight(true);
+
                 region.toggleHightlight();
               }}
               onMouseOut={() => {
+                // region.setHighlight(false);
                 region.toggleHightlight();
               }}
             >

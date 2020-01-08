@@ -38,7 +38,7 @@ import { Pairwise } from "../examples/pairwise"; // eslint-disable-line no-unuse
 /**
  * Custom Data
  */
-const data = ImageBbox;
+const data = ImagePolygons;
 
 /**
  * Get current config

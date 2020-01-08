@@ -9,7 +9,7 @@ import TimeTraveller from "../core/TimeTraveller";
 import Tree from "../core/Tree";
 import Types from "../core/Types";
 import Utils from "../utils";
-import { AllRegionsType } from "../interfaces/region";
+import { AllRegionsType } from "../regions";
 import { guidGenerator } from "../core/Helpers";
 
 const Completion = types

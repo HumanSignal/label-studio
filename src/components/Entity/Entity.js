@@ -67,56 +67,57 @@ export default observer(({ store, completion }) => {
       )}
       {node.states && <RenderStates node={node} />}
 
-      <div className={styles.block}>
-        <Tooltip placement="topLeft" title="Create Relation">
-          <Button
-            className={styles.button}
-            onClick={() => {
-              completion.startRelationMode(node);
-            }}
-          >
-            <Icon type="link" />
-          </Button>
-        </Tooltip>
+      {node.completion.edittable == true && (
+        <div className={styles.block + " ls-entity-buttons"}>
+          <Tooltip placement="topLeft" title="Create Relation">
+            <Button
+              className={styles.button}
+              onClick={() => {
+                completion.startRelationMode(node);
+              }}
+            >
+              <Icon type="link" />
+            </Button>
+          </Tooltip>
 
-        <Tooltip placement="topLeft" title="Create Normalization">
-          <Button
-            className={styles.button}
-            onClick={() => {
-              completion.setNormalizationMode(true);
-            }}
-          >
-            <Icon type="plus" />
-          </Button>
-        </Tooltip>
+          <Tooltip placement="topLeft" title="Create Normalization">
+            <Button
+              className={styles.button}
+              onClick={() => {
+                completion.setNormalizationMode(true);
+              }}
+            >
+              <Icon type="plus" />
+            </Button>
+          </Tooltip>
 
-        <Tooltip placement="topLeft" title="Unselect">
-          <Button
-            className={styles.button}
-            type="dashed"
-            onClick={() => {
-              completion.highlightedNode.unselectRegion();
-            }}
-          >
-            <Icon type="fullscreen-exit" />
-          </Button>
-        </Tooltip>
+          <Tooltip placement="topLeft" title="Unselect">
+            <Button
+              className={styles.button}
+              type="dashed"
+              onClick={() => {
+                completion.highlightedNode.unselectRegion();
+              }}
+            >
+              <Icon type="fullscreen-exit" />
+            </Button>
+          </Tooltip>
 
-        <Tooltip placement="topLeft" title="Delete Entity">
-          <Button
-            type="danger"
-            className={styles.button}
-            onClick={() => {
-              completion.highlightedNode.deleteRegion();
-            }}
-          >
-            <Icon type="delete" />
+          <Tooltip placement="topLeft" title="Delete Entity">
+            <Button
+              type="danger"
+              className={styles.button}
+              onClick={() => {
+                completion.highlightedNode.deleteRegion();
+              }}
+            >
+              <Icon type="delete" />
 
-            {store.settings.enableHotkeys && store.settings.enableTooltips && <Hint>[ Bksp ]</Hint>}
-          </Button>
-        </Tooltip>
-      </div>
-
+              {store.settings.enableHotkeys && store.settings.enableTooltips && <Hint>[ Bksp ]</Hint>}
+            </Button>
+          </Tooltip>
+        </div>
+      )}
       {completion.normalizationMode && (
         <Form
           style={{ marginTop: "0.5em", marginBottom: "0.5em" }}

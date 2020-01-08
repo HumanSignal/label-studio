@@ -127,6 +127,10 @@ export default types
       return self.interfaces.find(i => name === i) !== undefined;
     }
 
+    function addInterface(name) {
+      return self.interfaces.push(name);
+    }
+
     /**
      * Function
      */
@@ -251,8 +255,9 @@ export default types
     }
 
     return {
-      hasInterface,
       setFlags,
+      addInterface,
+      hasInterface,
 
       afterCreate,
       assignTask,

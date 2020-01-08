@@ -1,6 +1,6 @@
 import { types, getParent, getEnv } from "mobx-state-tree";
 
-import { AllRegionsType } from "../interfaces/region";
+import { AllRegionsType } from "../regions";
 
 export default types
   .model("RegionStore", {

@@ -1,6 +1,6 @@
 import { types, destroy } from "mobx-state-tree";
 
-import { AllRegionsType } from "../interfaces/region";
+import { AllRegionsType } from "../regions";
 
 /**
  * Relation between two different nodes
