@@ -1,13 +1,20 @@
 # Backend
 
 ## Getting Started
+Install label studio:
+```bash
+pip install label-studio
+```
 
-This is an example of the backend that can be used with the React frontend
-part. By default, the backend uses label tool scripts from ../build.  
+Run:
+```bash
+label-studio
+```
+It automatically start serving label studio, prompts you about configuration parameters and opens `http://localhost:8200` in a default browser.
 
 ## Linux & Ubuntu guide
 
-1 Install python and virtualenv. We recommend to use python 3.6, but probably python 2 solution will work too.  
+1 Install python and virtualenv. We recommend to use python 3.6, but probably python 2 solution will work too.
 ```
 apt install python3.6
 pip3 install virtualenv

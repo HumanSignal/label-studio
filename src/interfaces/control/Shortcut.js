@@ -1,12 +1,12 @@
 import React from "react";
+import { Tag } from "antd";
 import { observer, inject } from "mobx-react";
 import { types, getParent } from "mobx-state-tree";
-import { Tag } from "antd";
 
-import { guidGenerator } from "../../core/Helpers";
-import Registry from "../../core/Registry";
-import ProcessAttrsMixin from "../mixins/ProcessAttrs";
 import Hint from "../../components/Hint/Hint";
+import ProcessAttrsMixin from "../mixins/ProcessAttrs";
+import Registry from "../../core/Registry";
+import { guidGenerator } from "../../core/Helpers";
 
 /**
  * Shortcut tag can be used to define a shortcut, which adds a predefined object
@@ -51,12 +51,7 @@ const Model = types
     },
   }));
 
-const ShortcutModel = types.compose(
-  "ShortcutModel",
-  TagAttrs,
-  Model,
-  ProcessAttrsMixin,
-);
+const ShortcutModel = types.compose("ShortcutModel", TagAttrs, Model, ProcessAttrsMixin);
 
 const HtxShortcutView = inject("store")(
   observer(({ item, store }) => {

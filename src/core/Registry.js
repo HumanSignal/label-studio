@@ -6,7 +6,10 @@ class _Registry {
     this.tags = [];
     this.models = {};
     this.views = {};
+
     this.views_models = {};
+
+    this.tools = {};
   }
 
   addTag(tag, model, view) {
@@ -32,6 +35,20 @@ class _Registry {
     return this.views[tag];
   }
 
+  getTool(name) {
+    const model = this.tools[name];
+    if (!model) {
+      const models = Object.keys(this.tools);
+      throw new Error("No model registered for tool: " + name + "\nAvailable models:\n\t" + models.join("\n\t"));
+    }
+
+    return model;
+  }
+
+  addTool(name, model) {
+    this.tools[name] = model;
+  }
+
   /**
    * Get model
    * @param {*} tag
@@ -49,5 +66,8 @@ class _Registry {
 }
 
 const Registry = new _Registry();
+
+Registry.getTool = Registry.getTool.bind(Registry);
+Registry.getModelByTag = Registry.getModelByTag.bind(Registry);
 
 export default Registry;

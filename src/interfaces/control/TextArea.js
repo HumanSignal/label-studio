@@ -1,21 +1,15 @@
-import React, { Component } from "react";
-
-import { observer, inject, Provider } from "mobx-react";
-import { types, destroy, getEnv, flow, getParentOfType, getRoot } from "mobx-state-tree";
-
+import React from "react";
 import { Form, Input, Button } from "antd";
+import { observer } from "mobx-react";
+import { types, destroy, getRoot } from "mobx-state-tree";
 
-import { renderChildren } from "../../core/Tree";
-import { guidGenerator } from "../../core/Helpers";
-
-import { HtxTextAreaRegion, TextAreaRegionModel } from "../object/TextAreaRegion";
-import { ShortcutModel } from "../control/Shortcut";
-
-import Registry from "../../core/Registry";
 import ProcessAttrsMixin from "../mixins/ProcessAttrs";
-
+import Registry from "../../core/Registry";
 import Tree from "../../core/Tree";
 import Types from "../../core/Types";
+import { HtxTextAreaRegion, TextAreaRegionModel } from "../region/TextAreaRegion";
+import { ShortcutModel } from "../control/Shortcut";
+import { guidGenerator } from "../../core/Helpers";
 
 const { TextArea } = Input;
 
@@ -104,21 +98,7 @@ const Model = types
     },
 
     toStateJSON() {
-      const toname = self.toname || self.name;
-
-      return [
-        self.regions.map(r => {
-          return {
-            id: r.pid,
-            from_name: self.name,
-            to_name: toname,
-            type: self.type,
-            value: {
-              text: r._value,
-            },
-          };
-        }),
-      ];
+      return self.regions.map(r => r.toStateJSON());
     },
 
     fromStateJSON(obj, fromModel) {
@@ -126,12 +106,7 @@ const Model = types
     },
   }));
 
-const TextAreaModel = types.compose(
-  "TextAreaModel",
-  TagAttrs,
-  Model,
-  ProcessAttrsMixin,
-);
+const TextAreaModel = types.compose("TextAreaModel", TagAttrs, Model, ProcessAttrsMixin);
 
 const HtxTextArea = observer(({ item }) => {
   const rows = parseInt(item.rows);
@@ -148,6 +123,8 @@ const HtxTextArea = observer(({ item }) => {
       item.setValue(value);
     },
   };
+
+  if (!item.completion.edittable) props["disabled"] = true;
 
   return (
     <div>
@@ -166,7 +143,7 @@ const HtxTextArea = observer(({ item }) => {
           }}
         >
           <Form.Item>
-            {rows == 1 ? <Input {...props} /> : <TextArea {...props} />}
+            {rows === 1 ? <Input {...props} /> : <TextArea {...props} />}
             {(rows != 1 || item.showSubmitButton) && (
               <Form.Item>
                 <Button type="primary" htmlType="submit">

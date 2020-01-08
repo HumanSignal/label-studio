@@ -1,11 +1,10 @@
 import React from "react";
-import { types } from "mobx-state-tree";
-import { observer, inject } from "mobx-react";
-
 import { Table } from "antd";
+import { observer, inject } from "mobx-react";
+import { types } from "mobx-state-tree";
 
-import Registry from "../../core/Registry";
 import ProcessAttrsMixin from "../mixins/ProcessAttrs";
+import Registry from "../../core/Registry";
 
 /**
  * Table tag, show object keys and values in a table
@@ -20,11 +19,7 @@ const Model = types.model({
   _value: types.optional(types.string, ""),
 });
 
-const TableModel = types.compose(
-  "TableModel",
-  Model,
-  ProcessAttrsMixin,
-);
+const TableModel = types.compose("TableModel", Model, ProcessAttrsMixin);
 
 const HtxTable = inject("store")(
   observer(({ store, item }) => {
@@ -34,15 +29,16 @@ const HtxTable = inject("store")(
       if (store.task) value = store.task.dataObj;
     }
 
-    let dataSource = [];
-    let columns = [{ title: "Type", dataIndex: "type" }, { title: "Value", dataIndex: "value" }];
-
-    Object.keys(value).map(k => {
+    const columns = [
+      { title: "Type", dataIndex: "type" },
+      { title: "Value", dataIndex: "value" },
+    ];
+    const dataSource = Object.keys(value).map(k => {
       let val = value[k];
 
       if (typeof val === "object") val = JSON.stringify(val);
 
-      dataSource.push({ type: k, value: val });
+      return { type: k, value: val };
     });
 
     return <Table dataSource={dataSource} columns={columns} />;

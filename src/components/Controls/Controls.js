@@ -1,12 +1,12 @@
 import React from "react";
-import { observer, inject } from "mobx-react";
 import { Button } from "antd";
+import { observer, inject } from "mobx-react";
 
 import Hint from "../Hint/Hint";
 import styles from "./Controls.module.scss";
 
 export default inject("store")(
-  observer(({ store }) => {
+  observer(({ item, store }) => {
     /**
      * Buttons of Controls
      */
@@ -16,7 +16,7 @@ export default inject("store")(
       submit: "",
     };
 
-    const { userGenerate, update, sentUserGenerate } = store.completionStore.selected;
+    const { userGenerate, sentUserGenerate } = item;
     const { enableHotkeys, enableTooltips } = store.settings;
 
     /**
@@ -24,7 +24,7 @@ export default inject("store")(
      */
     let taskInformation;
     if (store.task) {
-      taskInformation = <h4 className={styles.task}>Task ID: {store.task.id}</h4>;
+      taskInformation = <h4 className={styles.task + " ls-task-info"}>Task ID: {store.task.id}</h4>;
     }
 
     /**
@@ -46,7 +46,7 @@ export default inject("store")(
     if (!store.completionStore.predictSelect || store.explore) {
       if (store.hasInterface("skip")) {
         skipButton = (
-          <Button type="ghost" onClick={store.skipTask} className={styles.skip}>
+          <Button type="ghost" onClick={store.skipTask} className={styles.skip + " ls-skip-btn"}>
             Skip {buttons.skip}
           </Button>
         );
@@ -54,7 +54,12 @@ export default inject("store")(
 
       if ((userGenerate && !sentUserGenerate) || (store.explore && !userGenerate && store.hasInterface("submit"))) {
         submitButton = (
-          <Button type="primary" icon="check" onClick={store.sendTask} className={styles.submit}>
+          <Button
+            type="primary"
+            icon="check"
+            onClick={store.submitCompletion}
+            className={styles.submit + " ls-submit-btn"}
+          >
             Submit {buttons.submit}
           </Button>
         );
@@ -62,7 +67,7 @@ export default inject("store")(
 
       if ((userGenerate && sentUserGenerate) || (!userGenerate && store.hasInterface("update"))) {
         updateButton = (
-          <Button type="primary" icon="rollback" onClick={store.updateTask}>
+          <Button type="primary" icon="rollback" onClick={store.updateCompletion} className="ls-update-btn">
             Update {buttons.update}
           </Button>
         );
@@ -82,6 +87,6 @@ export default inject("store")(
       </div>
     );
 
-    return (!store.completionStore.predictSelect || store.explore) && content;
+    return (item.type === "completion" || store.explore) && content;
   }),
 );

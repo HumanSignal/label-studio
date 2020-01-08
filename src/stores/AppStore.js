@@ -1,16 +1,14 @@
-import { types, getEnv, flow, getSnapshot } from "mobx-state-tree";
+import { types, getEnv } from "mobx-state-tree";
 
-import Task from "./TaskStore";
-import Project from "./ProjectStore";
-import User from "./UserStore";
-import Settings from "./SettingsStore";
 import CompletionStore from "./CompletionStore";
 import Hotkey from "../core/Hotkey";
-import { API_URL } from "../constants/Api";
-import Utils from "../utils";
-import Message from "../utils/messages";
-
 import InfoModal from "../components/Infomodal/Infomodal";
+import Message from "../utils/messages";
+import Project from "./ProjectStore";
+import Settings from "./SettingsStore";
+import Task from "./TaskStore";
+import User from "./UserStore";
+import Utils from "../utils";
 
 export default types
   .model("AppStore", {
@@ -32,11 +30,6 @@ export default types
     interfaces: types.array(types.string),
 
     /**
-     * Configure the functionality
-     */
-    supports: types.array(types.string),
-
-    /**
      * Flag for labeling of tasks
      */
     explore: types.optional(types.boolean, false),
@@ -50,9 +43,9 @@ export default types
     }),
 
     /**
-     * Expert of Label Studio
+     * User of Label Studio
      */
-    expert: User,
+    user: types.maybeNull(User),
 
     /**
      * Debug for development environment
@@ -64,7 +57,11 @@ export default types
      */
     settings: types.optional(Settings, {}),
 
-    apiCalls: types.optional(types.boolean, true),
+    /**
+     * Data of description flag
+     */
+    description: types.maybeNull(types.string),
+    // apiCalls: types.optional(types.boolean, true),
 
     /**
      * Flag for settings
@@ -75,10 +72,6 @@ export default types
      * Description of task in Label Studio
      */
     showingDescription: types.optional(types.boolean, false),
-    /**
-     * Data of description flag
-     */
-    description: types.maybeNull(types.string),
     /**
      * Loading of Label Studio
      */
@@ -98,25 +91,10 @@ export default types
   })
   .views(self => ({
     /**
-     * Get fetch request
-     */
-    get fetch() {
-      return getEnv(self).fetch;
-    },
-    get fetchAuth() {
-      return getEnv(self).fetchAuth;
-    },
-    /**
      * Get alert
      */
     get alert() {
       return getEnv(self).alert;
-    },
-    /**
-     * Get pot request
-     */
-    get post() {
-      return getEnv(self).post;
     },
   }))
   .actions(self => {
@@ -134,11 +112,10 @@ export default types
       self.showingDescription = !self.showingDescription;
     }
 
-    /**
-     * Function of loading
-     */
-    function markLoading(loading) {
-      self.isLoading = loading;
+    function setFlags(flags) {
+      const names = ["showingSettings", "showingDescription", "isLoading", "noTask", "noAccess", "labeledSuccess"];
+
+      for (let n of names) if (n in flags) self[n] = flags[n];
     }
 
     /**
@@ -150,20 +127,14 @@ export default types
       return self.interfaces.find(i => name === i) !== undefined;
     }
 
-    function hasSupport(name) {
-      return self.supports.find(i => name === i) !== undefined;
-    }
-
     /**
      * Function
      */
-    const afterCreate = function() {
-      self.loadTask();
-
+    function afterCreate() {
       /**
        * Hotkey for submit
        */
-      Hotkey.addKey("ctrl+enter", self.sendTask);
+      Hotkey.addKey("ctrl+enter", self.submitCompletion);
 
       /**
        * Hotkey for skip task
@@ -173,7 +144,7 @@ export default types
       /**
        * Hotkey for update completion
        */
-      if (self.hasInterface("update")) Hotkey.addKey("alt+enter", self.updateTask);
+      if (self.hasInterface("update")) Hotkey.addKey("alt+enter", self.updateCompletion);
 
       /**
        * Hotkey for delete
@@ -203,24 +174,13 @@ export default types
       });
 
       getEnv(self).onLabelStudioLoad(self);
-    };
-
-    /**
-     * Load task from API
-     */
-    function loadTask() {
-      if (self.task && self.task.load && self.task.id) {
-        return loadTaskAPI(`${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}/`);
-      } else if (self.explore && self.project && self.project.id) {
-        return loadTaskAPI(`${API_URL.MAIN}${API_URL.PROJECTS}/${self.project.id}${API_URL.NEXT}`);
-      }
     }
 
     /**
      *
      * @param {*} taskObject
      */
-    function addTask(taskObject) {
+    function assignTask(taskObject) {
       if (taskObject && !Utils.Checkers.isString(taskObject.data)) {
         taskObject = {
           ...taskObject,
@@ -230,299 +190,80 @@ export default types
       self.task = Task.create(taskObject);
     }
 
+    function showModal(message, type = "warning") {
+      InfoModal[type](message);
+
+      // InfoModal.warning("You need to label at least something!");
+    }
+
+    function submitCompletion() {
+      const c = self.completionStore.selected;
+      c.beforeSend();
+
+      c.sendUserGenerate();
+      getEnv(self).onSubmitCompletion(self, c);
+    }
+
+    function updateCompletion() {
+      const c = self.completionStore.selected;
+      c.beforeSend();
+
+      getEnv(self).onUpdateCompletion(self, c);
+    }
+
+    function skipTask() {
+      getEnv(self).onSkipTask(self);
+    }
+
     /**
      * Reset completion store
      */
     function resetState() {
       self.completionStore = CompletionStore.create({ completions: [] });
 
-      const c = self.completionStore.addInitialCompletion();
+      // const c = self.completionStore.addInitialCompletion();
 
-      self.completionStore.selectCompletion(c.id);
+      // self.completionStore.selectCompletion(c.id);
     }
-
-    /**
-     * Load task from API
-     */
-    const loadTaskAPI = flow(function*(url) {
-      try {
-        const loadedTask = yield self.fetch(url);
-
-        if (loadedTask instanceof Response && loadedTask.status === 404) {
-          self.markLoading(false);
-          self.noTask = true;
-          return;
-        }
-
-        if (loadedTask instanceof Response && loadedTask.status === 403) {
-          self.markLoading(false);
-          self.noAccess = true;
-          return;
-        }
-
-        loadedTask.json().then(response => {
-          /**
-           * Convert received data to string for MST support
-           */
-          response.data = JSON.stringify(response.data);
-
-          /**
-           * Add new data from received task
-           */
-          self.addTask(response);
-
-          /**
-           * Completions
-           */
-          if (self.hasSupport("completions") && response.completions) {
-            if (response.completions.length == 0 && self.hasSupport("sdk")) {
-              if (self.completionStore.selected)
-                self.completionStore.selected.traverseTree(node => node.updateValue && node.updateValue(self));
-            } else {
-              self.completionStore.destroyCompletion(self.completionStore.selected);
-            }
-
-            for (var i = 0; i < response.completions.length; i++) {
-              const completion = response.completions[i];
-
-              if (completion.was_cancelled === true) continue;
-
-              const comp = self.completionStore.addSavedCompletion(completion);
-              comp.traverseTree(node => node.updateValue && node.updateValue(self));
-              self.completionStore.selectCompletion(comp.id);
-              comp.deserializeCompletion(completion.result);
-              comp.reinitHistory();
-            }
-          } else {
-            if (self.completionStore.selected)
-              self.completionStore.selected.traverseTree(node => node.updateValue && node.updateValue(self));
-
-            // self.addGeneratedCompletion(r);
-          }
-
-          /**
-           * Load Predictions
-           */
-          if (self.hasSupport("predictions") && response.predictions && response.predictions.length) {
-            for (let i = 0; i < response.predictions.length; i++) {
-              const prediction = self.completionStore.addPrediction(response.predictions[i]);
-              prediction.traverseTree(node => node.updateValue && node.updateValue(self));
-              if (!self.hasInterface("predictions:menu")) prediction.setEdittable(true); // TODO remove this after redoing the completions / prediciton workflow
-              self.completionStore.selectPrediction(prediction.id);
-              prediction.deserializeCompletion(response.predictions[i].result);
-              if (prediction.highlightedNode) prediction.highlightedNode.unselectRegion();
-              prediction.reinitHistory();
-            }
-          }
-
-          /**
-           * Make first completion selected
-           */
-          if (self.hasSupport("completions") && self.completionStore.completions.length > 0)
-            self.completionStore.selectCompletion(self.completionStore.completions[0].id);
-
-          /**
-           * Loader disabled
-           */
-          self.markLoading(false);
-
-          getEnv(self).onTaskLoad(self.task);
-        });
-      } catch (err) {
-        console.error("Failed to load next task ", err);
-      }
-    });
-
-    /**
-     * Skip current task
-     */
-    const skipTask = flow(function* skipTask() {
-      getEnv(self).onSkipTask();
-
-      if (self.apiCalls) {
-        self.markLoading(true);
-
-        try {
-          const json = yield self.post(
-            `${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}${API_URL.CANCEL}`,
-            JSON.stringify({ data: JSON.stringify({ error: "cancelled" }) }),
-          );
-
-          self.resetState();
-
-          return loadTask();
-        } catch (err) {
-          console.error("Failed to skip task ", err);
-        }
-      } else {
-        InfoModal.warning("This mode without API calls.");
-      }
-    });
-
-    /**
-     * Wrapper of completion send
-     * @param {string} requestType
-     */
-    const sendToServer = requestType => {
-      return flow(function*() {
-        const c = self.completionStore.selected;
-
-        c.beforeSend();
-
-        const savedCompletions = c.serializeCompletion();
-
-        /**
-         * Check for pending completions
-         */
-        if (self.hasSupport("check-empty") && savedCompletions.length === 0) {
-          InfoModal.warning("You need to label at least something!");
-          return;
-        }
-
-        /**
-         * Loading will be true
-         */
-        self.markLoading(true);
-
-        try {
-          const body = JSON.stringify({
-            lead_time: (new Date() - c.loadedDate) / 1000, // task execution time
-            result: savedCompletions, // array with completions
-          });
-
-          if (requestType === "update_result") {
-            getEnv(self).onUpdateCompletion(JSON.parse(body));
-
-            if (self.apiCalls) {
-              yield getEnv(self).patch(
-                `${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}${API_URL.COMPLETIONS}/${c.pk}/`,
-                body,
-              );
-            }
-          } else if (requestType === "post_result") {
-            getEnv(self).onSubmitCompletion(JSON.parse(body));
-
-            if (self.apiCalls) {
-              const responseCompletion = yield self.post(
-                `${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}${API_URL.COMPLETIONS}/`,
-                body,
-              );
-
-              const data = yield responseCompletion.json();
-              if (data && data.id) {
-                self.completionStore.selected.updatePersonalKey(data.id.toString());
-              }
-            }
-          }
-
-          if (self.hasSupport("next:load")) {
-            self.resetState();
-            return loadTask();
-          } else {
-            self.markLoading(false);
-            self.completionStore.selected.sendUserGenerate();
-
-            if (self.explore && self.project.id) {
-              self.labeledSuccess = true;
-            }
-          }
-        } catch (err) {
-          console.error("Failed to send task ", err);
-        }
-      });
-    };
-
-    /**
-     * Update current completion
-     */
-    const updateTask = sendToServer("update_result");
-
-    /**
-     * Send current completion
-     */
-    const sendTask = sendToServer("post_result");
 
     /**
      * Function to initilaze completion store
+     * Given completions and predictions
      */
     function initializeStore({ completions, predictions }) {
-      /**
-       * Array of generated completions
-       */
-      let generatedCompletions = [];
+      const _init = (addFun, selectFun) => {
+        return item => {
+          const obj = self.completionStore[addFun](item);
 
-      if (predictions && predictions.length) {
-        for (let i = 0; i < predictions.length; i++) {
-          const pred = self.completionStore.addPrediction(predictions[i]);
-          pred.traverseTree(node => node.updateValue && node.updateValue(self));
-          self.completionStore.selectPrediction(pred.id);
+          self.completionStore[selectFun](obj.id);
+          obj.deserializeCompletion(item.result);
+          obj.reinitHistory();
 
-          pred.deserializeCompletion(predictions[i].result);
-          if (pred.highlightedNode) pred.highlightedNode.unselectRegion();
-          pred.reinitHistory();
-        }
-      }
+          return obj;
+        };
+      };
 
-      /**
-       * Completions in initialize
-       */
-      if (completions && completions.length) {
-        for (let i = 0; i < completions.length; i++) {
-          const itemOfCompletion = completions[i];
+      const addPred = _init("addPrediction", "selectPrediction");
+      const addComp = _init("addCompletion", "selectCompletion");
 
-          /**
-           * If user skip task, we skip completion state
-           */
-          if (itemOfCompletion.was_cancelled === true) continue;
-
-          /**
-           * Add to array new completion
-           */
-          generatedCompletions.push(itemOfCompletion);
-        }
-      }
-
-      if (!completions || completions.length === 0) {
-        const c = self.completionStore.addInitialCompletion();
-        self.completionStore.selectCompletion(c.id);
-
-        if (generatedCompletions.length > 0) {
-          self.completionStore.destroyCompletion(self.completionStore.selected);
-
-          for (let iC = 0; iC < generatedCompletions.length; iC++) {
-            const comp = self.completionStore.addSavedCompletion(generatedCompletions[iC]);
-            comp.traverseTree(node => node.updateValue && node.updateValue(self));
-            self.completionStore.selectCompletion(comp.id);
-
-            comp.deserializeCompletion(generatedCompletions[iC].result);
-            comp.reinitHistory();
-          }
-        }
-      } else {
-        for (let iC = 0; iC < generatedCompletions.length; iC++) {
-          const comp = self.completionStore.addSavedCompletion(generatedCompletions[iC]);
-          comp.traverseTree(node => node.updateValue && node.updateValue(self));
-          self.completionStore.selectCompletion(comp.id);
-
-          comp.deserializeCompletion(generatedCompletions[iC].result);
-          comp.reinitHistory();
-        }
-      }
+      predictions && predictions.forEach(p => addPred(p));
+      completions && completions.forEach(c => addComp(c));
     }
 
     return {
-      afterCreate,
-      loadTask,
-      addTask,
       hasInterface,
-      hasSupport,
-      skipTask,
-      sendTask,
-      updateTask,
-      markLoading,
+      setFlags,
+
+      afterCreate,
+      assignTask,
       resetState,
+      initializeStore,
+
+      skipTask,
+      submitCompletion,
+      updateCompletion,
+
       toggleSettings,
       toggleDescription,
-      initializeStore,
     };
   });

@@ -1,19 +1,14 @@
-import React, { Component } from "react";
-
+import React from "react";
+import { Form } from "antd";
 import { observer } from "mobx-react";
 import { types, getRoot } from "mobx-state-tree";
 
-import { guidGenerator } from "../../core/Helpers";
 import Registry from "../../core/Registry";
+import SelectedModelMixin from "../mixins/SelectedModel";
 import Tree from "../../core/Tree";
 import Types from "../../core/Types";
-
-import { ChoiceModel } from "./Choice";
-import { HtxLabels, LabelsModel } from "./Labels";
-import { RectangleModel } from "./Rectangle";
-import SelectedModelMixin from "../mixins/SelectedModel";
-
-import { Form, Checkbox } from "antd";
+import { ChoiceModel } from "./Choice"; // eslint-disable-line no-unused-vars
+import { guidGenerator } from "../../core/Helpers";
 
 /**
  * Choices tag, create a group of choices, radio, or checkboxes. Shall
@@ -87,16 +82,16 @@ const Model = types
       obj.value.choices.forEach(l => {
         const choice = self.findLabel(l);
 
+        window.A = choice;
+
         if (!choice) throw new Error("No label " + l);
 
-        choice.markSelected(true);
+        choice.setSelected(true);
       });
     },
   }));
 
-const Composition = types.compose(LabelsModel, RectangleModel, TagAttrs, Model, SelectedModelMixin);
-
-const ChoicesModel = types.compose("ChoicesModel", Composition);
+const ChoicesModel = types.compose("ChoicesModel", Model, TagAttrs, SelectedModelMixin);
 
 const HtxChoices = observer(({ item }) => {
   return (

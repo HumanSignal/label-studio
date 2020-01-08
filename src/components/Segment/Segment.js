@@ -8,7 +8,10 @@ import styles from "./Segment.module.scss";
  */
 export default class Segment extends React.Component {
   render() {
-    return <div className={styles.block}>{this.props.children}</div>;
+    let cn = styles.block;
+    if (this.props.className) cn = cn + " " + this.props.className;
+
+    return <div className={cn}>{this.props.children}</div>;
   }
 }
 

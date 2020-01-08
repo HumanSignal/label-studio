@@ -1,12 +1,8 @@
-import React, { Component } from "react";
-
 import { observer, inject } from "mobx-react";
-import { types, getParentOfType, getRoot } from "mobx-state-tree";
+import { types, getRoot } from "mobx-state-tree";
 
+import * as Tools from "../tools";
 import Registry from "../../core/Registry";
-import { isHtx, cloneNode } from "../../core/Helpers";
-import { guidGenerator } from "../../core/Helpers";
-import { PolygonRegionModel } from "../object/PolygonRegion";
 
 /**
  * Polygon tag
@@ -33,11 +29,11 @@ const TagAttrs = types.model({
   opacity: types.optional(types.string, "0.6"),
   fillcolor: types.maybeNull(types.string),
 
-  strokewidth: types.optional(types.string, "1"),
+  strokewidth: types.optional(types.string, "4"),
   strokecolor: types.optional(types.string, "#f48a42"),
 
-  pointsize: types.optional(types.string, "medium"),
-  pointstyle: types.optional(types.string, "rectangle"),
+  pointsize: types.optional(types.string, "small"),
+  pointstyle: types.optional(types.string, "circle"),
 });
 
 const Model = types
@@ -67,13 +63,26 @@ const Model = types
       return states ? states.filter(c => c.isSelected === true) : null;
     },
   }))
-  .actions(self => ({}));
+  .actions(self => ({
+    getTools() {
+      return Object.values(self.tools);
+    },
 
-const PolygonModel = types.compose(
-  "PolygonModel",
-  TagAttrs,
-  Model,
-);
+    afterCreate() {
+      const poly = Tools.Polygon.create();
+      const floodFill = Tools.FloodFill.create();
+
+      poly._control = self;
+      floodFill._control = self;
+
+      self.tools = {
+        poly: poly,
+        // floodfill: floodFill,
+      };
+    },
+  }));
+
+const PolygonModel = types.compose("PolygonModel", TagAttrs, Model);
 
 const HtxView = inject("store")(
   observer(({ store, item }) => {

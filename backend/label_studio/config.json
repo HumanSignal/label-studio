@@ -1,0 +1,23 @@
+{
+  "title": "Label Studio",
+  "port": 8200,
+  "debug": false,
+
+  "label_config": "label-studio/examples/image_bbox/config.xml",
+  "input_path": "label-studio/examples/image_bbox",
+  "output_dir": "label-studio/examples/image_bbox/completions",
+
+  "instruction": "Type some <b>hypertext</b> for label experts!",
+  "allow_delete_completions": true,
+
+  "editor": {
+    "build_path": "static/editor",
+    "debug": false
+  },
+
+  "!ml_backend": {
+    "url": "http://localhost:9090",
+    "model_name": "my_super_model"
+  },
+  "sampling": "uniform"
+}

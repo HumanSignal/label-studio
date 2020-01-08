@@ -1,6 +1,7 @@
-import React, { Fragment, Component } from "react";
-import { observer } from "mobx-react";
+import React, { Fragment } from "react";
 import { Button, Icon } from "antd";
+import { observer } from "mobx-react";
+
 import Hint from "../../../components/Hint/Hint";
 
 const AudioControls = observer(({ item, store }) => {

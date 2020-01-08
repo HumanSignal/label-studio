@@ -38,13 +38,19 @@ function onEntityCreate() {}
  */
 function onEntityDelete() {}
 
+/**
+ * Callback when ground truth button gets pressed
+ */
+function onGroundTruth() {}
+
 export default {
-  onSubmitCompletion,
-  onUpdateCompletion,
   onDeleteCompletion,
-  onSkipTask,
-  onTaskLoad,
-  onLabelStudioLoad,
   onEntityCreate,
   onEntityDelete,
+  onGroundTruth,
+  onLabelStudioLoad,
+  onSkipTask,
+  onSubmitCompletion,
+  onTaskLoad,
+  onUpdateCompletion,
 };

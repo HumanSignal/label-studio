@@ -1,10 +1,10 @@
 import React, { Fragment } from "react";
-import { observer } from "mobx-react";
-import { isValidReference } from "mobx-state-tree";
 import { Icon } from "antd";
+import { isValidReference } from "mobx-state-tree";
+import { observer } from "mobx-react";
 
-import { NodeMinimal } from "../Node/Node";
 import styles from "./Relations.module.scss";
+import { NodeMinimal } from "../Node/Node";
 
 /**
  * Relation Component
@@ -37,8 +37,7 @@ const Relation = ({ store, rl }) => {
           </div>
         </div>
       </div>
-      <a
-        href="#"
+      <button
         className={styles.delete}
         onClick={() => {
           store.deleteRelation(rl);
@@ -46,7 +45,7 @@ const Relation = ({ store, rl }) => {
         }}
       >
         <Icon type="delete" />
-      </a>
+      </button>
     </div>
   );
 };

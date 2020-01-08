@@ -20,7 +20,7 @@ const LabelMixin = types.model("LabelMixin").actions(self => ({
    * Close current polygon if user clicked on another Label
    */
   finishCurrentObject() {
-    getParent(self).find(obj => {
+    getParent(self).forEach(obj => {
       if (obj.activePolygon) {
         obj.activePolygon.closePoly();
       }
@@ -58,7 +58,7 @@ const LabelMixin = types.model("LabelMixin").actions(self => ({
         return;
       }
 
-      findedObj.markSelected(true);
+      findedObj.setSelected(true);
     });
   },
 }));
