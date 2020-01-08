@@ -1,0 +1,7 @@
+<View>
+  <Text name="text" value="$text"></Text>
+  <Choices name="validation-label" choice="single-radio" toName="text">
+    <Choice value="Missing words" alias="missing-words"></Choice>
+    <Choice value="Valid" alias="valid"></Choice>
+  </Choices>
+</View>

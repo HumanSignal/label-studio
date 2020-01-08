@@ -82,25 +82,20 @@ def app_init():
     pass
 
 
-@app.route('/static/editor/<path:path>')
-def send_editor(path):
-    """ Static for label tool js and css
-    """
-    return flask.send_from_directory(c['editor']['build_path'], path)
-
-
 @app.route('/static/media/<path:path>')
 def send_media(path):
     """ Static for label tool js and css
     """
-    return flask.send_from_directory(c['editor']['build_path'] + '/media', path)
+    media_dir = find_dir('static/media')
+    return flask.send_from_directory(media_dir, path)
 
 
 @app.route('/static/<path:path>')
 def send_static(path):
     """ Static serving
     """
-    return flask.send_from_directory('static', path)
+    static_dir = find_dir('static')
+    return flask.send_from_directory(static_dir, path)
 
 
 @app.route('/logs')
