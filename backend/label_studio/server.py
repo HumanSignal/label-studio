@@ -184,7 +184,7 @@ def import_page():
     return flask.render_template('import.html', config=c, project=project)
 
 
-@app.route('/api/render-label-studio')
+@app.route('/api/render-label-studio', methods=['GET', 'POST'])
 def api_render_label_studio():
     """ Label studio frontend rendering for iframe
     """
@@ -220,7 +220,7 @@ def api_render_label_studio():
     config_line = Project.config_line_stipped(config)
     response = {
         'full_editor': full_editor == "t",
-        'config': config_line,
+        'label_config_line': config_line,
         'task_ser': example_task_data
     }
     response.update(find_editor_files())

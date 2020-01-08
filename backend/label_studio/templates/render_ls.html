@@ -1,5 +1,14 @@
-{% include 'header.html' %}
+<!-- Editor CSS -->
+{% for css in editor_css %}
+  <link href="{{ css }}" rel="stylesheet">
+{% endfor %}
 
+<!-- Editor JS -->
+{% for js in editor_js %}
+  <script src="{{ js }}"></script>
+{% endfor %}
+
+<script src="/static/js/jquery.min.js"></script>
 <script src="/static/js/lsb.js"></script>
 
 <!-- Editor -->
@@ -9,35 +18,10 @@
   </div>
 </div>
 
-{% autoescape off %}
-
-{{ task_ser|json_script:"task-data" }}
-
 <script>
-$(function() {
-    // New Label Studio instance with integrated task data
-
-    var Htx = new HeartexSDK({
-        elid: "label-studio",
-        config: '{{ config }}',
-        user: {"pk": 1, "firstName": "Awesome", "lastName": "User"},
-        project: 1,
-        interfaces: [
-        {% if full_editor %}
-            "basic",
-            "panel",  // undo, redo, reset panel
-            "side-column"  // entity
-        {% else %}
-            "basic"
-        {% endif %}
-        ],
-    });
-
-    Htx.showTask(JSON.parse(document.getElementById('task-data').textContent), { addInitial: true });
-});
+  window.onload = function () {
+    let task = {{ task_ser | json | safe }};
+    window.LSBI = LSB("label-studio", '{{ label_config_line | safe }}', task);
+    window.LSBI.completionStore.addCompletion({ userGenerate: true })
+  };
 </script>
-
-{% endautoescape %}
-
-</body>
-</html>
