@@ -310,6 +310,7 @@ def get_data_file(filename):
 
 
 def main():
+    reload_config()
     app.run(host='0.0.0.0', port=c['port'], debug=c['debug'])
 
 
