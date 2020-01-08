@@ -4,12 +4,20 @@
   <div class="wrapper">
 
     <!-- Statistics -->
-    <div class="segment">
-      Total tasks: {{ task_ids|length }} items<br/>
-        <i class="small">{{ config['input_path'] }}</i>
-      <br/><br/>
-      Total completions: {{ completions|length }} items<br>
-        <i class="small">{{ config['output_dir'] }}</i>
+    <div class="ui one column center aligned page grid">
+      <div class="ui statistics">
+        <div class="statistic">
+          <span class="value">{{ task_ids|length }}</span>
+          <span class="label">Total tasks</span>
+          <i class="small">{{ config['input_path'] }}</i>
+        </div>
+
+        <div class="statistic">
+          <span class="value">{{ completions|length }}</span>
+          <span class="label">Total completions</span>
+          <i class="small">{{ config['output_dir'] }}</i>
+        </div>
+      </div>
     </div>
 
     <br/><br/>

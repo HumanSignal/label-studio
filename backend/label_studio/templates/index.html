@@ -1,45 +1,17 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <title>{{ config['title'] }}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta charset="utf-8"/>
-
-    <link href="//fonts.googleapis.com/css?family=Dosis:500&amp;text=LabelStudio" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="/static/css/reset.css">
-
-    <link rel="shortcut icon" href="/static/favicon.ico"/>
-    <link rel="stylesheet" href="/static/css/main.css">
-    <link rel="stylesheet" href="/static/css/fontall.min.css">
-
-    <!-- Editor CSS -->
-    {% for css in editor_css %}
-        <link href="{{ css }}" rel="stylesheet">
-    {% endfor %}
-
-    <!-- Editor JS -->
-    {% for js in editor_js %}
-        <script src="{{ js }}"></script>
-    {% endfor %}
-
-        <script src="/static/js/helpers.js"></script>
-        <script src="/static/js/lsb.js"></script>
-</head>
-
-<body>
-
 {% include 'header.html' %}
 
+<script src="/static/js/lsb.js"></script>
+
 <!-- Editor -->
-<div class="content">
+<div class="ui content">
     <div id="label-studio"></div>
 </div>
 
 <script>
   window.onload = function () {
-      var task = {{ task_data | json | safe }};      
-        window.LSBI = LSB("label-studio", '{{ label_config_line | safe }}', task);
-    }
+    var task = {{ task_data | json | safe }};
+    window.LSBI = LSB("label-studio", '{{ label_config_line | safe }}', task);
+  }
 </script>
 </body>
 </html>
