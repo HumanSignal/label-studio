@@ -20,8 +20,23 @@
 
 <script>
   window.onload = function () {
-    let task = {{ task_ser | json | safe }};
-    window.LSBI = LSB("label-studio", '{{ label_config_line | safe }}', task);
-    window.LSBI.completionStore.addCompletion({ userGenerate: true })
+      var task = {{ task_ser | json | safe }};
+
+      var LS = new LabelStudio("label-studio", {
+          config: '{{ label_config_line | safe }}',
+          user: { pk: 1, firstName: "Awesome", lastName: "User" },
+
+          task: _convertTask(task),
+
+          interfaces: [
+              "basic",
+              "side-column"
+          ],
+
+          onLabelStudioLoad: function (LS) {
+              var c = LS.completionStore.addCompletion({ userGenerate: true });
+              LS.completionStore.selectCompletion(c.id);
+          }
+      });
   };
 </script>
