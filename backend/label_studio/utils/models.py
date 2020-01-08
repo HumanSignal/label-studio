@@ -1,15 +1,20 @@
 import io
 import os
+import re
 import attr
 import urllib
 import logging
+import xmljson
 import requests
+import jsonschema
 import ujson as json
 
 from lxml import etree
 from datetime import datetime
 from requests.adapters import HTTPAdapter
 from label_studio.utils.misc import get_data_dir
+from label_studio.utils.exceptions import ValidationError
+from label_studio.utils.functions import _LABEL_CONFIG_SCHEMA_DATA
 
 DEFAULT_PROJECT_ID = 1
 logger = logging.getLogger(__name__)
@@ -109,6 +114,53 @@ class Project(object):
 
         return supported
 
+    @classmethod
+    def parse_config_to_json(cls, config_string):
+        parser = etree.XMLParser(recover=False)
+        xml = etree.fromstring(config_string, parser)
+        if xml is None:
+            raise etree.XMLSchemaParseError('xml is empty or incorrect')
+        config = xmljson.badgerfish.data(xml)
+        return config
+
+    @classmethod
+    def validate_label_config(cls, config_string):
+        # xml and schema
+        try:
+            config = cls.parse_config_to_json(config_string)
+            jsonschema.validate(config, _LABEL_CONFIG_SCHEMA_DATA)
+        except (etree.XMLSyntaxError, etree.XMLSchemaParseError, ValueError) as exc:
+            raise ValidationError(str(exc))
+        except jsonschema.exceptions.ValidationError as exc:
+            error_message = exc.context[-1].message if len(exc.context) else exc.message
+            error_message = 'Validation failed on {}: {}'.format('/'.join(exc.path), error_message.replace('@', ''))
+            raise ValidationError(error_message)
+
+        # unique names in config # FIXME: 'name =' (with spaces) won't work
+        all_names = re.findall(r'name="([^"]*)"', config_string)
+        if len(set(all_names)) != len(all_names):
+            raise ValidationError('Label config contains non-unique names')
+
+        # toName points to existent name
+        names = set(all_names)
+        toNames = re.findall(r'toName="([^"]*)"', config_string)
+        for toName in toNames:
+            if toName not in names:
+                raise ValidationError(f'toName="{toName}" not found in names: {sorted(names)}')
+
+    @classmethod
+    def config_line_stipped(cls, c):
+        tree = etree.fromstring(c)
+        comments = tree.xpath('//comment()')
+
+        for c in comments:
+            p = c.getparent()
+            if p is not None:
+                p.remove(c)
+            c = etree.tostring(tree, method='html').decode("utf-8")
+
+        return c.replace('\n', '').replace('\r', '')
+
 
 class BaseHTTPAPI(object):
     MAX_RETRIES = 2
@@ -147,8 +199,8 @@ class BaseHTTPAPI(object):
             self._sessions[key] = session
             return session
 
-    def _prepare_kwargs(self, kwargs):
-        #kwargs['timeout'] = self._connection_timeout, self._timeout
+    @staticmethod
+    def _prepare_kwargs(kwargs):
         kwargs['timeout'] = kwargs.get('timeout', None)
 
     def request(self, method, *args, **kwargs):
@@ -238,7 +290,8 @@ class MLApi(BaseHTTPAPI):
         logger.debug(f'Response from {url}: {json.dumps(response, indent=2)}')
         return MLApiResult(url, request, response, headers, status_code=status_code)
 
-    def _create_project_uid(self, project):
+    @staticmethod
+    def _create_project_uid(project):
         return f'{project.id}.{project.ml_backend.model_name}'
 
     def update(self, task, results, project, retrain=True):

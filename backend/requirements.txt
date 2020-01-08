@@ -32,3 +32,4 @@ rarfile>=3.1
 ujson>=1.35
 flask_api>=2.0
 pandas>=0.24.0
+jsonschema>=3.2.0

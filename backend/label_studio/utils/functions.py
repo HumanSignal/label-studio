@@ -3,7 +3,13 @@ import os
 import ujson as json
 from lxml import etree
 
+# examples for import tasks
 _DATA_EXAMPLES = None
+
+# label config validation schema
+_LABEL_CONFIG_SCHEMA = os.path.join(os.path.dirname(__file__), 'schema', 'label_config_schema.json')
+with open(_LABEL_CONFIG_SCHEMA) as f:
+    _LABEL_CONFIG_SCHEMA_DATA = json.load(f)
 
 
 def data_examples(mode):

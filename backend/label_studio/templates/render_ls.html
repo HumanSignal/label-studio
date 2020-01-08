@@ -1,0 +1,43 @@
+{% include 'header.html' %}
+
+<script src="/static/js/lsb.js"></script>
+
+<!-- Editor -->
+<div class="ui content">
+  <div id="label-studio">
+    <div class="ui loader active inline centered"></div>
+  </div>
+</div>
+
+{% autoescape off %}
+
+{{ task_ser|json_script:"task-data" }}
+
+<script>
+$(function() {
+    // New Label Studio instance with integrated task data
+
+    var Htx = new HeartexSDK({
+        elid: "label-studio",
+        config: '{{ config }}',
+        user: {"pk": 1, "firstName": "Awesome", "lastName": "User"},
+        project: 1,
+        interfaces: [
+        {% if full_editor %}
+            "basic",
+            "panel",  // undo, redo, reset panel
+            "side-column"  // entity
+        {% else %}
+            "basic"
+        {% endif %}
+        ],
+    });
+
+    Htx.showTask(JSON.parse(document.getElementById('task-data').textContent), { addInitial: true });
+});
+</script>
+
+{% endautoescape %}
+
+</body>
+</html>

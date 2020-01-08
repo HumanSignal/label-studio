@@ -10,6 +10,7 @@ import hashlib
 import pandas as pd
 import ujson as json  # it MUST be included after flask!
 
+from urllib.parse import unquote
 from datetime import datetime
 from copy import deepcopy
 from inspect import currentframe, getframeinfo
@@ -21,10 +22,11 @@ from label_studio.utils.functions import generate_sample_task
 from label_studio.utils.analytics import Analytics
 from label_studio.utils.models import DEFAULT_PROJECT_ID, Project, MLBackend
 from label_studio.utils.prompts import LabelStudioConfigPrompt
-from label_studio.utils.io import find_file, find_dir
+from label_studio.utils.io import find_file, find_dir, find_editor_files
 from label_studio.utils import uploader
 from label_studio.utils.validation import TaskValidator
 from label_studio.utils.exceptions import ValidationError
+from label_studio.utils.functions import generate_sample_task_without_check, data_examples
 from label_studio.utils.misc import (
     exception_treatment, log_config, log, config_line_stripped, load_config
 )
@@ -117,20 +119,14 @@ def send_log():
 
 
 @app.route('/')
-def index():
-    """ Main page: index.html
+def labeling():
+    """ Label studio frontend: task labeling
     """
     global c
     global label_config_line
 
     # reload config at each page reload (for fast changing of config/input_path/output_path)
     reload_config()
-
-    # find editor files to include in html
-    editor_js_dir = find_dir('static/editor/js')
-    editor_css_dir = find_dir('static/editor/css')
-    editor_js = [f'/static/editor/js/{f}' for f in os.listdir(editor_js_dir) if f.endswith('.js')]
-    editor_css = [f'/static/editor/css/{f}' for f in os.listdir(editor_css_dir) if f.endswith('.css')]
 
     # task data: load task or task with completions if it exists
     task_data = None
@@ -143,9 +139,8 @@ def index():
             task_data['predictions'] = ml_backend.make_predictions(task_data, project)
 
     analytics.send(getframeinfo(currentframe()).function)
-    return flask.render_template('index.html', config=c, label_config_line=label_config_line,
-                                 editor_css=editor_css, editor_js=editor_js,
-                                 task_id=task_id, task_data=task_data)
+    return flask.render_template('labeling.html', config=c, label_config_line=label_config_line,
+                                 task_id=task_id, task_data=task_data, **find_editor_files())
 
 
 @app.route('/tasks')
@@ -167,17 +162,6 @@ def tasks_page():
                                  completed_at=completed_at)
 
 
-@app.route('/import')
-def import_page():
-    """ Tasks and completions page: tasks.html
-    """
-    global c, project
-    reload_config()
-
-    analytics.send(getframeinfo(currentframe()).function)
-    return flask.render_template('import.html', config=c, project=project)
-
-
 @app.route('/label-config')
 def label_config_page():
     """ Setup label config
@@ -189,16 +173,105 @@ def label_config_page():
     return flask.render_template('label_config.html', config=c, project=project)
 
 
-@app.route('/api/import-example')
-def api_import_example():
-    """ Task examples for import
+@app.route('/import')
+def import_page():
+    """ Tasks and completions page: tasks.html
     """
     global c, project
     reload_config()
 
-    """ Generate upload data example for project
+    analytics.send(getframeinfo(currentframe()).function)
+    return flask.render_template('import.html', config=c, project=project)
+
+
+@app.route('/api/render-label-studio')
+def api_render_label_studio():
+    """ Label studio frontend rendering for iframe
     """
+    global c
+    global label_config_line
+
+    # reload config at each page reload (for fast changing of config/input_path/output_path)
+    reload_config()
+
+    # get args
+    full_editor = request.args.get('full_editor', False)
+    config = request.args.get('config', request.form.get('config', ''))
+    config = unquote(config)
+    if not config:
+        return make_response('No config in POST', status.HTTP_417_EXPECTATION_FAILED)
+
+    # prepare example
+    examples = data_examples(mode='editor_preview')
+    task_data = {
+        data_key: examples.get(data_type, '')
+        for data_key, data_type in Project.extract_data_types(config).items()
+    }
+    example_task_data = {
+        'id': 1764,
+        'data': task_data,
+        'project': 1,
+        'accuracy': 0,
+        'created_at': '2019-02-06T14:06:26.001197Z',
+        'updated_at': '2019-02-06T14:06:26.001252Z'
+    }
+
+    # prepare context for html
+    config_line = Project.config_line_stipped(config)
+    response = {
+        'full_editor': full_editor == "t",
+        'config': config_line,
+        'task_ser': example_task_data
+    }
+    response.update(find_editor_files())
+    analytics.send(getframeinfo(currentframe()).function)
+    return flask.render_template('render_ls.html', **response)
+
+
+@app.route('/api/validate-config', methods=['POST'])
+def api_validate_config():
+    """ Validate label config via tags schema
+    """
+    global project
+    if 'label_config' not in request.form:
+        return make_response('No label_config in POST', status.HTTP_417_EXPECTATION_FAILED)
+
+    try:
+        project.validate_label_config(request.form['label_config'])
+    except ValidationError as e:
+        return make_response(jsonify({'label_config': e.msg_to_list()}), status.HTTP_400_BAD_REQUEST)
+
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@app.route('/api/import-example', methods=['GET', 'POST'])
+def api_import_example():
+    """ Generate upload data example by config only
+    """
+    # django compatibility
     request.GET = request.args
+    request.POST = request.form
+
+    config = request.GET.get('label_config', '')
+    if not config:
+        config = request.POST.get('label_config', '')
+    try:
+        Project.validate_label_config(config)
+        output = generate_sample_task_without_check(config, mode='editor_preview')
+    except (ValueError, ValidationError, lxml.etree.Error):
+        response = HttpResponse('error while example generating', status=status.HTTP_400_BAD_REQUEST)
+    else:
+        response = HttpResponse(json.dumps(output))
+    return response
+
+
+@app.route('/api/import-example-file')
+def api_import_example_file():
+    """ Task examples for import
+    """
+    global c, project
+    reload_config()
+    request.GET = request.args  # django compatibility
 
     q = request.GET.get('q', 'json')
     filename = 'sample-' + datetime.now().strftime('%Y-%m-%d-%H-%M')
