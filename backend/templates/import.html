@@ -2,72 +2,69 @@
 
 <!-- Import Data Dialog with Wait for Add more data -->
 
-<div class="ui container">
+<div class="ui container" id="import-tasks">
 
-<!-- Dimmer and loader -->
-<!--suppress CheckTagEmptyBody -->
-<div class="ui page dimmer">
-  <div class="ui large text loader">Importing in progress ...</div>
-</div>
+  <!-- Dimmer and loader -->
+  <div class="ui page dimmer">
+    <div class="ui large text loader">Importing in progress ...</div>
+  </div>
 
-<!-- Input file form -->
-<div class="ui form">
-  <input id="file-input" type="file" name="file" multiple onchange="send_data(event)" style="display: none"/>
+  <!-- Input file form -->
+  <div class="ui form">
+    <input id="file-input" type="file" name="file" multiple onchange="send_data(event)" style="display: none"/>
 
-  <div class="ui content">
-    <div id="holder">
-      <div class="text">
-        <i class="ui icon huge upload"></i>
-        <p>Drag and drop your files here or click for import</p>
+    <div class="ui content">
+      <div id="holder">
+        <div class="text">
+          <i class="ui icon huge upload"></i>
+          <p>Drag and drop your files here or click for import</p>
+        </div>
       </div>
     </div>
+
+  </div>
+  <br>
+
+  <!-- URL: Use iframe and form to enable autocomplete for URL input -->
+  <iframe name="my_iframe" src="about:blank" hidden></iframe>
+  <form target="my_iframe" action="about:blank" method="get">
+
+    <div class="ui form">
+      <label for="url-input" class="description">Or paste a file URL or task in JSON format here</label><br/>
+      <input style="height: 36px; width:85%" id="url-input" type="text" name="url" autofocus autocomplete="on"/>
+      <div style="display: inline-block !important; width: 14%; min-width: 100px" class="ui positive button icon"
+           id="url-button" onclick="send_data(event, $('#url-input').val())">Import
+      </div>
+    </div>
+
+  </form>
+
+  <!-- Help message -->
+  <div class="ui divider hidden"></div>
+  <div class="ui" style="display: block !important;">
+    {% include "help_import.html" %}
   </div>
 
-</div>
-<br>
 
-<!-- URL: Use iframe and form to enable autocomplete for URL input -->
-<iframe name="my_iframe" src="about:blank" hidden></iframe>
-<form target="my_iframe" action="about:blank" method="get">
-
-  <div class="ui form">
-    <label for="url-input" class="description">Or paste a file URL or task in JSON format here</label><br/>
-    <input style="width:85%" id="url-input" type="text" name="url" autofocus autocomplete="on"/>
-    <div style="display: inline-block !important; width: 14%; min-width: 100px" class="ui positive button icon"
-         id="url-button" onclick="send_data(event, $('#url-input').val())">Import
+  <!-- Dialog: Add more data WAIT  -->
+  <div class="ui modal" id="upload-dialog">
+    <!--suppress CheckTagEmptyBody -->
+    <i class="close icon"></i>
+    <div class="header red">
+      Import status
+    </div>
+    <div class="content">
+      <div class="description" id="upload-dialog-msg"></div>
+    </div>
+    <div class="actions">
+      <!-- Done button -->
+      <button class="ui icon button" id="upload-done-button"
+              hidden onclick="location.reload()" autofocus>Done
+      </button>
     </div>
   </div>
 
-</form>
-
-<!-- Help message -->
-<div class="ui divider hidden"></div>
-<div class="ui" style="display: block !important;">
-  {% include "help_import.html" %}
-</div>
-
-
-
-<!-- Dialog: Add more data WAIT  -->
-<div class="ui modal" id="upload-dialog">
-  <!--suppress CheckTagEmptyBody -->
-  <i class="close icon"></i>
-  <div class="header red">
-    Import status
-  </div>
-  <div class="content">
-    <div class="description" id="upload-dialog-msg"></div>
-  </div>
-  <div class="actions">
-    <!-- Done button -->
-    <button class="ui icon button" id="upload-done-button"
-            hidden onclick="location.reload()" autofocus>Done
-    </button>
-  </div>
-</div>
-
-
-</div>
+</div> <!-- container -->
 
 <script>
 
@@ -193,25 +190,27 @@
           '<br/>Duration: ' + answer['duration'].toFixed(2) + ' sec';
         stop_wait(msg, true);
 
-      }).fail(answer => {
-      let msg = "Error: can't upload/process file on server side. Reasons:<br><br>";
+      })
+      .fail(answer => {
+        let msg = "Error: can't upload/process file on server side. Reasons:<br><br>";
 
-      if (answer.responseJSON != null) {
-        let rows = answer.responseJSON;
-        for (let i in rows) {
-          const escaped = $('<div>').text(rows[i]).html();
-          const split = escaped.split('::');
-          msg += '<div class="upload-row-error">' +
-            '<div class=desc>' + split[0] + '</div>' +
-            (split.length > 1 ? '<div class=code>' + split[1] + '</div>' : '') +
-            '</div><br/>\n';
+        if (answer.responseJSON != null) {
+          let rows = answer.responseJSON;
+          for (let i in rows) {
+            const escaped = $('<div>').text(rows[i]).html();
+            const split = escaped.split('::');
+            msg += '<div class="upload-row-error">' +
+              '<div class=desc>' + split[0] + '</div>' +
+              (split.length > 1 ? '<div class=code>' + split[1] + '</div>' : '') +
+              '</div><br/>\n';
+          }
+        } else {
+          msg += 'Critical error, see console for more description';
+          console.log(answer);
         }
-      } else {
-        msg += answer.responseText;
-      }
 
-      stop_wait(msg, false);
-    });
+        stop_wait(msg, false);
+      });
   }
 
   $(function () {

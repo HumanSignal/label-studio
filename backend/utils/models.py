@@ -12,8 +12,6 @@ from requests.adapters import HTTPAdapter
 from utils.misc import get_data_dir
 
 DEFAULT_PROJECT_ID = 1
-
-
 logger = logging.getLogger(__name__)
 
 
@@ -50,6 +48,7 @@ class Project(object):
         if self.ml_backend is not None:
             return self.ml_backend.train_job
 
+    @property
     def data_types_json(self):
         return json.dumps(self.data_types)
 
@@ -72,6 +71,43 @@ class Project(object):
 
         return data_type
 
+    @property
+    def generate_sample_task_str(self):
+        from .functions import generate_sample_task
+        return json.dumps(generate_sample_task(self))
+
+    @property
+    def generate_sample_task_escape(self):
+        from .functions import generate_sample_task
+        task = json.dumps(generate_sample_task(self))
+        return task.replace("'", "\\'")
+
+    @property
+    def supported_formats(self):
+        """ Returns supported input formats for project (json / csv)
+
+        :param project: project with label config
+        :return: list of supported file types
+        """
+        # load config
+        parser = etree.XMLParser()
+        xml = etree.fromstring(self.label_config, parser)
+        if xml is None:
+            raise etree.XMLSchemaParseError('Project config is empty or incorrect')
+
+        supported = {'json', 'csv', 'tsv'}
+
+        if len(self.data_types.keys()) == 1:
+            supported.add('txt')
+
+        # if any of Lists are presented there is only json allowed
+        lists = xml.findall('.//List')  # take all tags with value attribute
+        if lists:
+            supported.remove('csv')
+            supported.remove('tsv')
+            supported.remove('txt')
+
+        return supported
 
 
 class BaseHTTPAPI(object):

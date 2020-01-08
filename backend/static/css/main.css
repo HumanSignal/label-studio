@@ -205,3 +205,92 @@ a {
         padding: 5px 3px 5px 5px;
     }
 }
+
+
+/* Import */
+
+
+.upload-row-error {
+    margin-top: 0.5%;
+}
+
+.upload-row-error .code {
+    display: block;
+    font-size: 85%;
+}
+
+.upload-row-error * {
+    display: inline-block;
+}
+
+.help-button, .settings-button {
+    padding: 0.80571429em 0.7em 0.80571429em !important;
+}
+
+#holder {
+    display: table;
+    border: 1px dashed #a2a2a2;
+    border-radius: 8px;
+    width: 100%;
+    height: 150px;
+    transition: border 0.4s, color 0.4s;
+    cursor: pointer;
+}
+
+#holder.hover, #holder:hover {
+    border-color: rgb(24, 144, 255);
+}
+
+#holder .text {
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+    color: gray;
+    transition: color 0.4s;
+}
+
+#holder .text i {
+    opacity: 0.35;
+    margin-bottom: 0.1em;
+    transition: color 0.4s, opacity 0.4s;
+}
+
+#holder.hover .text {
+    color: #1f7834;
+}
+
+#holder.hover .text i {
+    color: #1F7834;
+    opacity: 1;
+}
+
+#import-tasks ul {
+    list-style: disc;
+    margin: 1em 0 0 2em;
+}
+
+.top-margin-none {
+    margin-top: 0 !important;
+}
+
+.message a.no-go {
+    text-decoration: none;
+    border-bottom: 1px dashed #5994cb;
+}
+
+/* Import Finish */
+
+.ui .button {
+    font-weight: 400 !important;
+}
+.ui .button.positive {
+    background: rgb(24, 144, 255) !important;
+    color: #fff !important;
+    border-color: rgb(24, 144, 255) !important;
+}
+.ui .button {
+    transition: 0.3s;
+}
+.ui .button:hover {
+    transition: 0.3s;
+}

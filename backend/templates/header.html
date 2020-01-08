@@ -37,8 +37,10 @@
     <span class="img-text">{{ config['title'] }}</span>
   </a>
   <ul id="nav">
-    <a href="/" class="{% if url_for(request.endpoint) == '/' %}active{% endif %}">
-      Labeling</a>
+    <a href="/import" class="{% if url_for(request.endpoint) == '/import' %}active{% endif %}">Import</a>
+    <span class="delim">|</span>
+
+    <a href="/" class="{% if url_for(request.endpoint) == '/' %}active{% endif %}">Labeling</a>
     <span class="delim">|</span>
 
     <a href="/tasks" class="{% if url_for(request.endpoint) == '/tasks' %}active{% endif %}">Tasks and Completions</a>

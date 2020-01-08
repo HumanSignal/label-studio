@@ -4,7 +4,7 @@
   "debug": true,
 
   "label_config": "../examples/image_bbox/config.xml",
-  "input_path": "../examples/image_bbox/tasks.json",
+  "input_path": "../examples/image_bbox",
   "output_dir": "../examples/image_bbox/completions",
 
   "instruction": "Type some <b>hypertext</b> for label experts!",
