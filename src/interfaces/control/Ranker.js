@@ -1,13 +1,11 @@
-import React, { Component } from "react";
-import PropTypes from "prop-types";
-
-import Registry from "../../core/Registry";
-import { types, getParentOfType, destroy, getRoot, getParent } from "mobx-state-tree";
-import { observer, inject, Provider } from "mobx-react";
-import { SortableContainer, SortableElement, sortableHandle } from "react-sortable-hoc";
+import React from "react";
 import arrayMove from "array-move";
 import { List } from "antd";
+import { SortableContainer, SortableElement, sortableHandle } from "react-sortable-hoc";
+import { observer, inject } from "mobx-react";
+import { types } from "mobx-state-tree";
 
+import Registry from "../../core/Registry";
 import { guidGenerator } from "../../core/Helpers";
 
 const RankerItemModel = types
@@ -85,7 +83,7 @@ const Model = types
     },
 
     moveItems({ oldIndex, newIndex }) {
-      if (oldIndex == newIndex) return;
+      if (oldIndex === newIndex) return;
 
       if (self.sortedhighlightcolor) {
         self.regions[oldIndex].setBG(self.sortedhighlightcolor);
@@ -120,11 +118,7 @@ const Model = types
     },
   }));
 
-const RankerModel = types.compose(
-  "RankerModel",
-  TagAttrs,
-  Model,
-);
+const RankerModel = types.compose("RankerModel", TagAttrs, Model);
 
 const DragHandle = sortableHandle(() => <div className="drag-handle"></div>);
 
@@ -144,7 +138,7 @@ const SortableText = SortableElement(({ item, value }) => {
 
   const map = {
     text: v => <span className={classNames}>{v._value}</span>,
-    image: v => <img src={v._value} />,
+    image: v => <img src={v._value} alt="" />,
     audio: v => <audio src={v._value} />,
   };
 

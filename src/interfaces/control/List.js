@@ -1,12 +1,11 @@
 import React from "react";
-
-import Registry from "../../core/Registry";
-import { types } from "mobx-state-tree";
-import { observer, inject } from "mobx-react";
-import { SortableContainer, SortableElement, sortableHandle } from "react-sortable-hoc";
 import arrayMove from "array-move";
 import { List } from "antd";
+import { SortableContainer, SortableElement, sortableHandle } from "react-sortable-hoc";
+import { observer, inject } from "mobx-react";
+import { types } from "mobx-state-tree";
 
+import Registry from "../../core/Registry";
 import { guidGenerator } from "../../core/Helpers";
 import { variableNotation } from "../../core/Template";
 
@@ -182,11 +181,7 @@ const Model = types
     },
   }));
 
-const ListModel = types.compose(
-  "ListModel",
-  TagAttrs,
-  Model,
-);
+const ListModel = types.compose("ListModel", TagAttrs, Model);
 
 const DragHandle = sortableHandle(() => <div className="drag-handle"></div>);
 
@@ -206,7 +201,7 @@ const SortableText = SortableElement(({ item, value }) => {
 
   const map = {
     text: v => <span className={classNames}>{v._value}</span>,
-    image: v => <img src={v._value} alt="image" />,
+    image: v => <img src={v._value} alt="" />,
     audio: v => <audio src={v._value} />,
   };
 

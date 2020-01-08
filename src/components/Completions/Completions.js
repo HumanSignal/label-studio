@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import { observer } from "mobx-react";
 import { Card, Button, Icon, Tooltip, Badge, List, Popconfirm } from "antd";
+import { observer } from "mobx-react";
 
 import Utils from "../../utils";
 import styles from "./Completions.module.scss";
@@ -13,7 +13,7 @@ const Completion = observer(({ item, store }) => {
         type="primary"
         onClick={ev => {
           ev.preventDefault();
-          item.removeHoneypot();
+          item.setGroundTruth(false);
         }}
       >
         <Icon type="star" />
@@ -29,7 +29,7 @@ const Completion = observer(({ item, store }) => {
         ghost={true}
         onClick={ev => {
           ev.preventDefault();
-          item.setHoneypot();
+          item.setGroundTruth(true);
         }}
       >
         <Icon type="star" />
@@ -77,7 +77,8 @@ const Completion = observer(({ item, store }) => {
   const btnsView = () => {
     const confirm = () => {
       // ev.preventDefault();
-      item.store.deleteCompletion(item);
+      // debugger;
+      item.list.deleteCompletion(item);
     };
 
     return (
@@ -132,7 +133,6 @@ class Completions extends Component {
   render() {
     const { store } = this.props;
 
-    let content = [];
     let title = (
       <div className={styles.title + " " + styles.titlespace}>
         <div style={{ display: "flex", alignItems: "center" }}>
@@ -146,7 +146,9 @@ class Completions extends Component {
                 shape={"circle"}
                 onClick={ev => {
                   ev.preventDefault();
-                  store.completionStore.addUserCompletion();
+                  const c = store.completionStore.addCompletion({ userGenerate: true });
+                  store.completionStore.selectCompletion(c.id);
+                  // c.list.selectCompletion(c);
                 }}
               >
                 <Icon type="plus" />
@@ -170,15 +172,11 @@ class Completions extends Component {
       </div>
     );
 
-    store.completionStore.savedCompletions.forEach(c => {
-      if (c) {
-        content.push(<Completion key={c.id} item={c} store={store} />);
-      }
-    });
+    const content = store.completionStore.completions.map(c => <Completion key={c.id} item={c} store={store} />);
 
     return (
       <Card title={title} size="small" bodyStyle={{ padding: "0", paddingTop: "1px" }}>
-        <List>{store.completionStore.savedCompletions ? content : <p>No completions submitted yet</p>}</List>
+        <List>{store.completionStore.completions ? content : <p>No completions submitted yet</p>}</List>
       </Card>
     );
   }

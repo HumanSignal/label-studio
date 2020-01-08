@@ -1,5 +1,4 @@
 import External from "../core/External";
-import Requests from "../core/Requests";
 import Messages from "../utils/messages";
 
 function getData(task) {
@@ -51,10 +50,10 @@ function configureApplication(params) {
 
   const options = {
     // communication with the server
-    fetch: params.fetch || Requests.fetcher,
-    patch: params.patch || Requests.patch,
-    post: params.post || Requests.poster,
-    remove: params.remove || Requests.remover,
+    // fetch: params.fetch || Requests.fetcher,
+    // patch: params.patch || Requests.patch,
+    // post: params.post || Requests.poster,
+    // remove: params.remove || Requests.remover,
 
     // communication with the user
     alert: m => console.log(m), // Noop for demo: window.alert(m)
@@ -69,6 +68,7 @@ function configureApplication(params) {
     onLabelStudioLoad: params.onLabelStudioLoad || External.onLabelStudioLoad,
     onEntityCreate: params.onEntityCreate || External.onEntityCreate,
     onEntityDelete: params.onEntityDelete || External.onEntityDelete,
+    onGroundTruth: params.onGroundTruth || External.onGroundTruth,
   };
 
   return options;

@@ -1,22 +1,10 @@
-import { types, getParent, getEnv, destroy } from "mobx-state-tree";
+import { types, getParent, getEnv } from "mobx-state-tree";
 
-import * as HtxObjectModel from "../interfaces/object";
+import { AllRegionsType } from "../interfaces/region";
 
 export default types
   .model("RegionStore", {
-    regions: types.array(
-      types.safeReference(
-        types.union(
-          HtxObjectModel.TextRegionModel,
-          HtxObjectModel.RectRegionModel,
-          HtxObjectModel.PolygonRegionModel,
-          HtxObjectModel.AudioRegionModel,
-          HtxObjectModel.TextAreaRegionModel,
-          HtxObjectModel.KeyPointRegionModel,
-          HtxObjectModel.HyperTextRegionModel,
-        ),
-      ),
-    ),
+    regions: types.array(types.safeReference(AllRegionsType)),
   })
   .actions(self => ({
     addRegion(region) {

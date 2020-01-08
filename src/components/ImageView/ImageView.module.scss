@@ -1,0 +1,21 @@
+.block {
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  border: 1px solid rgba(34, 36, 38, 0.15);
+  border-radius: 0.28571429rem;
+  width: fit-content;
+  padding: 0.5em;
+}
+
+.block:empty {
+  display: none;
+}
+
+.divider {
+  margin: 12px 0;
+}
+
+.button {
+  margin: 0.3rem 0;
+}

@@ -3,14 +3,11 @@ import ReactDOM from "react-dom";
 import { Provider } from "mobx-react";
 
 import "./assets/styles/global.scss";
-
-import App from "./components/App/App";
 import * as serviceWorker from "./serviceWorker";
-
+import App from "./components/App/App";
 import AppStore from "./stores/AppStore";
-
-import ProductionEnviroment from "./env/production";
 import DevelopmentEnvironment from "./env/development";
+import ProductionEnviroment from "./env/production";
 
 let enviroment = DevelopmentEnvironment;
 

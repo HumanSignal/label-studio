@@ -1,12 +1,7 @@
-import React, { Component } from "react";
+import { types, getRoot } from "mobx-state-tree";
 
-import { observer, inject } from "mobx-react";
-import { types, getParentOfType, getRoot } from "mobx-state-tree";
-
+import * as Tools from "../tools";
 import Registry from "../../core/Registry";
-import { isHtx, cloneNode } from "../../core/Helpers";
-import { guidGenerator } from "../../core/Helpers";
-import { RectRegionModel } from "../object/RectRegion";
 
 /**
  * Rectangle
@@ -52,13 +47,21 @@ const Model = types
     get completion() {
       return getRoot(self).completionStore.selected;
     },
+  }))
+  .actions(self => ({
+    getTools() {
+      return Object.values(self.tools);
+    },
+
+    afterCreate() {
+      const rect = Tools.Rect.create({ activeShape: null });
+      rect._control = self;
+
+      self.tools = { rect: rect };
+    },
   }));
 
-const RectangleModel = types.compose(
-  "RectangleModel",
-  TagAttrs,
-  Model,
-);
+const RectangleModel = types.compose("RectangleModel", TagAttrs, Model);
 
 const HtxView = () => {
   return null;

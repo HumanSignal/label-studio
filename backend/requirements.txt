@@ -14,8 +14,6 @@ MarkupSafe==1.1.1
 mixpanel==4.4.0
 murmurhash==1.0.2
 numpy==1.17.4
-pandas==0.24.0
-Pillow==6.2.0
 plac==0.9.6
 preshed==2.0.1
 python-dateutil==2.8.1
@@ -23,10 +21,11 @@ python-json-logger==0.1.11
 pytz==2019.3
 requests==2.22.0
 six==1.12.0
-spacy==2.1.7
 srsly==0.2.0
-thinc==7.0.8
 tqdm==4.40.2
 urllib3==1.25.7
 wasabi==0.4.2
 Werkzeug==0.16.0
+orjson==2.1.3
+PyInquirer==1.0.3
+

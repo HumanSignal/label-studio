@@ -1,26 +1,24 @@
-import { types, getParent, getEnv, flow, destroy, detach } from "mobx-state-tree";
+import { types, getParent, getEnv, getRoot, destroy, detach } from "mobx-state-tree";
 
-import { guidGenerator } from "../core/Helpers";
-import Types from "../core/Types";
-
-import Registry from "../core/Registry";
-import Tree from "../core/Tree";
-import TimeTraveller from "../core/TimeTraveller";
 import Hotkey from "../core/Hotkey";
-
-import RelationStore from "./RelationStore";
 import NormalizationStore from "./NormalizationStore";
 import RegionStore from "./RegionStore";
-import { RectangleModel } from "../interfaces/control/Rectangle";
+import Registry from "../core/Registry";
+import RelationStore from "./RelationStore";
+import TimeTraveller from "../core/TimeTraveller";
+import Tree from "../core/Tree";
+import Types from "../core/Types";
 import Utils from "../utils";
-
-import * as HtxObjectModel from "../interfaces/object";
+import { AllRegionsType } from "../interfaces/region";
+import { guidGenerator } from "../core/Helpers";
 
 const Completion = types
   .model("Completion", {
     id: types.identifier,
     pk: types.optional(types.string, guidGenerator(5)),
+
     selected: types.optional(types.boolean, false),
+    type: types.enumeration(["completion", "prediction"]),
 
     createdDate: types.optional(types.string, Utils.UDate.currentISODate()),
     createdAgo: types.maybeNull(types.string),
@@ -29,6 +27,7 @@ const Completion = types
     loadedDate: types.optional(types.Date, new Date()),
     leadTime: types.maybeNull(types.number),
 
+    //
     userGenerate: types.optional(types.boolean, true),
     update: types.optional(types.boolean, false),
     sentUserGenerate: types.optional(types.boolean, false),
@@ -60,50 +59,25 @@ const Completion = types
       regions: [],
     }),
 
-    highlightedNode: types.maybeNull(
-      types.union(
-        types.safeReference(HtxObjectModel.TextRegionModel),
-        types.safeReference(HtxObjectModel.RectRegionModel),
-        types.safeReference(HtxObjectModel.AudioRegionModel),
-        types.safeReference(HtxObjectModel.TextAreaRegionModel),
-        types.safeReference(HtxObjectModel.PolygonRegionModel),
-        types.safeReference(HtxObjectModel.KeyPointRegionModel),
-        types.safeReference(HtxObjectModel.HyperTextRegionModel),
-        types.safeReference(RectangleModel),
-      ),
-    ),
+    highlightedNode: types.maybeNull(types.safeReference(AllRegionsType)),
   })
   .views(self => ({
     get store() {
-      return getParent(self, 2);
+      return getRoot(self);
     },
 
     get list() {
-      return getParent(self);
+      return getParent(self, 2);
     },
   }))
   .actions(self => ({
     reinitHistory() {
       self.history = { targetPath: "../root" };
     },
-    /**
-     * Send update to serve
-     * @param {*} state
-     */
-    _updateServerState(state) {
-      let appStore = getParent(self, 3);
-      let url = "/api/tasks/" + appStore.task.id + "/completions/" + self.pk + "/";
 
-      getEnv(self).patch(url, JSON.stringify(state));
-    },
-
-    setHoneypot() {
-      self.honeypot = true;
-      self._updateServerState({ honeypot: self.honeypot });
-    },
-
-    setEdittable(val) {
-      self.edittable = val;
+    setGroundTruth(value) {
+      self.honeypot = value;
+      getEnv(self).onGroundTruth(self.store, self, value);
     },
 
     sendUserGenerate() {
@@ -168,14 +142,6 @@ const Completion = types
       self.normalizationStore.addNormalization();
     },
 
-    /**
-     * Remove honeypot
-     */
-    removeHoneypot() {
-      self.honeypot = false;
-      self._updateServerState({ honeypot: self.honeypot });
-    },
-
     traverseTree(cb) {
       let visitNode;
 
@@ -217,6 +183,43 @@ const Completion = types
       destroy(region);
     },
 
+    afterAttach() {
+      self.traverseTree(node => {
+        if (node.updateValue) node.updateValue(self.store);
+        if (node.completionAttached) node.completionAttached();
+
+        // Copy tools from control tags into object tools manager
+        if (node && node.getToolsManager) {
+          const tools = node.getToolsManager();
+          const states = self.toNames.get(node.name);
+
+          states && states.forEach(s => tools.addToolsFromControl(s));
+        }
+      });
+    },
+
+    afterCreate() {
+      //
+      // debugger;
+      if (self.userGenerate && !self.sentUserGenerate) {
+        self.loadedDate = new Date();
+      }
+
+      // initialize toName bindings
+      self.traverseTree(node => {
+        if (node && node.name && node.id) self.names.set(node.name, node.id);
+
+        if (node && node.toname && node.id) {
+          const val = self.toNames.get(node.toname);
+          if (val) {
+            val.push(node.id);
+          } else {
+            self.toNames.set(node.toname, [node.id]);
+          }
+        }
+      });
+    },
+
     setupHotKeys() {
       Hotkey.unbindAll();
 
@@ -226,6 +229,7 @@ const Completion = types
       let comb = mod;
 
       // [TODO] we need to traverse this two times, fix
+      // Hotkeys setup
       self.traverseTree(node => {
         if (node && node.onHotKey && node.hotkey) {
           Hotkey.addKey(node.hotkey, node.onHotKey, node.hotkeyScope);
@@ -234,7 +238,7 @@ const Completion = types
 
       self.traverseTree(node => {
         // add Space hotkey for playbacks of audio
-        if (node && !node.hotkey && node.type == "audio") {
+        if (node && !node.hotkey && node.type === "audio") {
           if (audiosNum > 0) comb = mod + "+" + (audiosNum + 1);
           else audioNode = node;
 
@@ -279,27 +283,6 @@ const Completion = types
       Hotkey.setScope("__main__");
     },
 
-    afterCreate() {
-      //
-      if (self.userGenerate && !self.sentUserGenerate) {
-        self.loadedDate = new Date();
-      }
-
-      self.traverseTree(node => {
-        // create mapping from name to Model (by ref)
-        if (node && node.name && node.id) self.names.set(node.name, node.id);
-
-        if (node && node.toname && node.id) {
-          const val = self.toNames.get(node.toname);
-          if (val) {
-            val.push(node.id);
-          } else {
-            self.toNames.set(node.toname, [node.id]);
-          }
-        }
-      });
-    },
-
     serializeCompletion() {
       const arr = [];
 
@@ -333,6 +316,8 @@ const Completion = types
         objCompletion = JSON.parse(objCompletion);
       }
 
+      self._initialCompletionObj = objCompletion;
+
       objCompletion.forEach(obj => {
         if (obj["type"] !== "relation") {
           const names = obj.to_name.split(",");
@@ -357,58 +342,32 @@ const Completion = types
 
 export default types
   .model("CompletionStore", {
-    completions: types.array(Completion),
     selected: types.maybeNull(types.reference(Completion)),
+
+    completions: types.array(Completion),
     predictions: types.array(Completion),
-    predictSelect: types.optional(types.boolean, false),
+
     viewingAllCompletions: types.optional(types.boolean, false),
     viewingAllPredictions: types.optional(types.boolean, false),
   })
   .views(self => ({
-    /**
-     * Get current completion
-     */
-    get currentCompletion() {
-      return self.selected && self.completions.find(c => c.id === self.selected.id);
-    },
-
-    get currentPrediction() {
-      return self.selected && self.predictions.find(c => c.id === self.selected.id);
-    },
-
-    /**
-     * Get parent
-     */
     get store() {
-      return getParent(self);
-    },
-
-    /**
-     * Get only those that were saved
-     */
-    get savedCompletions() {
-      return self.completions.filter(c => c);
+      return getRoot(self);
     },
   }))
   .actions(self => {
-    function selectedPredict() {
-      self.predictSelect = true;
-    }
-
-    function unSelectedPredict() {
-      self.predictSelect = false;
-    }
-
-    function unSelectViewingAll() {
-      self.viewingAllCompletions = false;
-      self.viewingAllPredictions = false;
-    }
-
-    function _toggleViewingAll() {
+    function toggleViewingAll() {
       if (self.viewingAllCompletions || self.viewingAllPredictions) {
-        unSelectedPredict();
-        self.completions.map(c => (c.selected = false));
-        self.predictions.map(c => (c.selected = false));
+        self.completions.forEach(c => {
+          c.selected = false;
+          c.edittable = false;
+          c.regionStore.unselectAll();
+        });
+
+        self.predictions.forEach(c => {
+          c.selected = false;
+          c.regionStore.unselectAll();
+        });
       } else {
         selectCompletion(self.completions[0].id);
       }
@@ -419,18 +378,32 @@ export default types
 
       if (self.viewingAllPredictions) self.viewingAllCompletions = false;
 
-      _toggleViewingAll();
+      toggleViewingAll();
     }
 
     function toggleViewingAllCompletions() {
       self.viewingAllCompletions = !self.viewingAllCompletions;
 
-      if (self.viewingAllCompletions) {
-        self.viewingAllPredictions = false;
-        self.completions.map(c => (c.edittable = false));
-      }
+      if (self.viewingAllCompletions) self.viewingAllPredictions = false;
 
-      _toggleViewingAll();
+      toggleViewingAll();
+    }
+
+    function unselectViewingAll() {
+      self.viewingAllCompletions = false;
+      self.viewingAllPredictions = false;
+    }
+
+    function selectItem(id, list) {
+      unselectViewingAll();
+
+      if (self.selected) self.selected.selected = false;
+
+      const c = list.find(c => c.id === id);
+      c.selected = true;
+      self.selected = c;
+
+      return c;
     }
 
     /**
@@ -438,93 +411,24 @@ export default types
      * @param {*} id
      */
     function selectCompletion(id) {
-      self.completions.map(c => (c.selected = false));
-      if (self.predictions) self.predictions.map(c => (c.selected = false));
-      const c = self.completions.find(c => c.id === id);
+      const c = selectItem(id, self.completions);
 
-      unSelectedPredict();
-      unSelectViewingAll();
-      // if (self.selected && self.selected.id !== c.id) c.history.reset();
       c.edittable = true;
-
-      c.selected = true;
-      self.selected = c;
-
       c.setupHotKeys();
+
+      return c;
     }
 
     function selectPrediction(id) {
-      self.predictions.map(c => (c.selected = false));
-      self.completions.map(c => (c.selected = false));
-      const c = self.predictions.find(c => c.id === id);
-      selectedPredict();
-      unSelectViewingAll();
-      // if (self.selected && self.selected.id !== c.id) c.history.reset();
+      const p = selectItem(id, self.predictions);
+      p.regionStore.unselectAll();
 
-      c.selected = true;
-      self.selected = c;
-
-      c.setupHotKeys();
+      return p;
     }
 
-    /**
-     * Adding new completion
-     * @param {object} node
-     * @param {string} type
-     */
-    function addCompletion(node, type) {
-      /**
-       * Create Completion
-       */
-      const createdCompletion = Completion.create(node);
+    function deleteCompletion(completion) {
+      getEnv(self).onDeleteCompletion(self.store, completion);
 
-      /**
-       * If completion is initial completion
-       */
-      if (self.store.task && self.store.task.data && type === "initial") {
-        createdCompletion.traverseTree(node => node.updateValue && node.updateValue(self.store));
-      }
-
-      self.completions.unshift(createdCompletion);
-
-      return createdCompletion;
-    }
-
-    function addPredictionItem(node, type) {
-      /**
-       * Create Completion
-       */
-      node.edittable = false;
-      const createdPrediction = Completion.create(node);
-
-      /**
-       * If completion is initial completion
-       */
-      if (self.store.task && type === "initial") {
-        createdPrediction.traverseTree(node => node.updateValue && node.updateValue(self.store));
-      }
-
-      self.predictions.unshift(createdPrediction);
-
-      return createdPrediction;
-    }
-
-    /**
-     * Send request to server for delete completion
-     */
-    const _deleteCompletion = flow(function* _deleteCompletion(pk) {
-      try {
-        const json = yield getEnv(self).remove("/api/tasks/" + self.store.task.id + "/completions/" + pk + "/");
-      } catch (err) {
-        console.error("Failed to skip task ", err);
-      }
-    });
-
-    /**
-     * Destroy completion
-     * @param {*} completion
-     */
-    function destroyCompletion(completion) {
       /**
        * MST destroy completion
        */
@@ -539,145 +443,82 @@ export default types
       }
     }
 
-    function deleteCompletion(completion) {
-      getEnv(self).onDeleteCompletion(completion);
+    function addItem(options) {
+      const { user, config } = self.store;
 
-      if (getParent(self).apiCalls) {
-        _deleteCompletion(completion.pk);
-      }
-
-      destroyCompletion(completion);
-    }
-
-    /**
-     *
-     * @param {*} c
-     */
-    function addSavedCompletion(c) {
-      const completionModel = Tree.treeToModel(self.store.config);
+      // convert config to mst model
+      const completionModel = Tree.treeToModel(config);
       const modelClass = Registry.getModelByTag(completionModel.type);
 
+      //
       let root = modelClass.create(completionModel);
 
-      const node = {
-        id: c.id || guidGenerator(5),
-        pk: c.id,
-        createdAgo: c.created_ago,
-        createdBy: c.created_username,
-        leadTime: c.lead_time,
-        honeypot: c.honeypot,
-        root: root,
-        userGenerate: false,
-      };
+      const id = options["id"];
+      delete options["id"];
 
-      const completion = self.addCompletion(node, "list");
-
-      return completion;
-    }
-
-    function addPrediction(prediction) {
-      const predictionModel = Tree.treeToModel(self.store.config);
-      const modelClass = Registry.getModelByTag(predictionModel.type);
-
-      let root = modelClass.create(predictionModel);
-
-      const node = {
-        id: prediction.id || guidGenerator(),
-        pk: prediction.id,
-        createdAgo: prediction.created_ago,
-        createdBy: prediction.model_version,
-        root: root,
-      };
-
-      const returnPredict = self.addPredictionItem(node, "list");
-
-      return returnPredict;
-    }
-
-    function generateCompletion(options) {
-      /**
-       * Convert config to model
-       */
-      const completionModel = Tree.treeToModel(self.store.config);
-
-      /**
-       * Get model by type of tag
-       */
-      const modelClass = Registry.getModelByTag(completionModel.type);
-
-      /**
-       * Completion model init
-       */
-      let root = modelClass.create(completionModel);
-
+      //
       let node = {
-        id: guidGenerator(5),
+        id: id || guidGenerator(5),
         root: root,
+
+        userGenerate: false,
+
+        ...options,
       };
 
-      if (options && options.userGenerate) {
-        node = {
-          ...node,
-          userGenerate: options.userGenerate,
-        };
-      }
+      if (user && !("createdBy" in node)) node["createdBy"] = user.displayName;
 
-      /**
-       * Expert module for initial completion
-       */
-      if (self.store.expert) {
-        const { expert } = self.store;
-        node["createdBy"] = `${expert.firstName} ${expert.lastName}`;
-      }
-
-      /**
-       *
-       */
-      let completion = self.addCompletion(node, "initial");
-
-      if (options && options.userGenerate) {
-        self.selectCompletion(node.id);
-      }
-
-      return completion;
+      //
+      return Completion.create(node);
     }
 
-    /**
-     * Initial Completion
-     * @returns {object}
-     */
-    function addInitialCompletion() {
-      return self.generateCompletion();
+    function addPrediction(options = {}) {
+      options.edittable = false;
+      options.type = "prediction";
+
+      const item = addItem(options);
+      self.predictions.unshift(item);
+
+      return item;
     }
 
-    function addUserCompletion() {
-      return self.generateCompletion({ userGenerate: true });
+    function addCompletion(options = {}) {
+      options.type = "completion";
+
+      const item = addItem(options);
+      self.completions.unshift(item);
+
+      return item;
     }
 
-    function addCompletionFromPrediction() {
-      const selectedData = self.selected.serializeCompletion();
+    function addCompletionFromPrediction(prediction) {
+      const c = self.addCompletion({ userGenerate: true });
+      const s = prediction._initialCompletionObj;
 
-      const c = self.generateCompletion({ userGenerate: true });
-      c.deserializeCompletion(selectedData);
+      // we need to iterate here and rename all ids, as those might
+      // clash with the one in the prediction if used as a reference
+      // somewhere
+      s.forEach(r => {
+        if ("id" in r) r["id"] = guidGenerator();
+      });
+
+      selectCompletion(c.id);
+      c.deserializeCompletion(s);
 
       return c;
     }
 
     return {
+      toggleViewingAllCompletions,
+      toggleViewingAllPredictions,
+
+      addPrediction,
+      addCompletion,
+      addCompletionFromPrediction,
+
       selectCompletion,
       selectPrediction,
 
-      toggleViewingAllCompletions,
-      toggleViewingAllPredictions,
-      addCompletion,
-      addCompletionFromPrediction,
       deleteCompletion,
-      destroyCompletion,
-      addInitialCompletion,
-      addSavedCompletion,
-      addUserCompletion,
-      addPrediction,
-      addPredictionItem,
-      generateCompletion,
     };
   });

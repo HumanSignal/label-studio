@@ -2,13 +2,15 @@ import React, { Component } from "react";
 import { observer, inject } from "mobx-react";
 import { types, getType, getRoot } from "mobx-state-tree";
 
-import { cloneNode } from "../../core/Helpers";
-import Registry from "../../core/Registry";
-import { guidGenerator, restoreNewsnapshot } from "../../core/Helpers";
-import TextHighlight from "../../components/TextHighlight/TextHighlight";
-import { runTemplate } from "../../core/Template";
-import { TextRegionModel, HtxTextRegion } from "./TextRegion";
 import InfoModal from "../../components/Infomodal/Infomodal";
+import ObjectBase from "./Base";
+import ObjectTag from "../../components/Tags/Object";
+import Registry from "../../core/Registry";
+import TextHighlight from "../../components/TextHighlight/TextHighlight";
+import { TextRegionModel, HtxTextRegion } from "../region/TextRegion";
+import { cloneNode } from "../../core/Helpers";
+import { guidGenerator, restoreNewsnapshot } from "../../core/Helpers";
+import { runTemplate } from "../../core/Template";
 
 /**
  * Text tag shows a text that can be labeled
@@ -94,7 +96,7 @@ const Model = types
         ? states.map(s => {
             return cloneNode(s);
           })
-        : null;
+        : [];
 
       /**
        * Selelect without label
@@ -121,8 +123,7 @@ const Model = types
      * Return JSON
      */
     toStateJSON() {
-      const objectsToReturn = self.regions.map(r => r.toStateJSON());
-      return objectsToReturn;
+      return self.regions.map(r => r.toStateJSON());
     },
 
     /**
@@ -175,7 +176,7 @@ const Model = types
     },
   }));
 
-const TextModel = types.compose("TextModel", TagAttrs, Model);
+const TextModel = types.compose("TextModel", TagAttrs, Model, ObjectBase);
 
 class HtxTextView extends Component {
   renderRegion(letterGroup, range, textCharIndex, onMouseOverHighlightedWord) {
@@ -201,7 +202,7 @@ class HtxTextView extends Component {
     if (item.hidden === "true") style["display"] = "none";
 
     return (
-      <div style={style}>
+      <ObjectTag style={style} item={item}>
         <TextHighlight
           id={item.id}
           key={item.id}
@@ -214,7 +215,7 @@ class HtxTextView extends Component {
             item.addRegion(range);
           }}
         />
-      </div>
+      </ObjectTag>
     );
   }
 }

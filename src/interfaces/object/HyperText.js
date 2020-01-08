@@ -1,24 +1,18 @@
+import * as xpath from "xpath-range";
 import React, { Component } from "react";
 import { observer, inject } from "mobx-react";
-import { types, getType, getRoot, getParentOfType } from "mobx-state-tree";
+import { types, getType, getRoot } from "mobx-state-tree";
 
-import { cloneNode } from "../../core/Helpers";
-import Registry from "../../core/Registry";
-import { guidGenerator, restoreNewsnapshot } from "../../core/Helpers";
-
-import * as xpath from "xpath-range";
-
+import ObjectBase from "./Base";
+import ObjectTag from "../../components/Tags/Object";
 import RegionsMixin from "../mixins/Regions";
-
-import { runTemplate } from "../../core/Template";
-
-import InfoModal from "../../components/Infomodal/Infomodal";
-import { LabelsModel } from "../control/Labels";
-
-import { highlightRange, splitBoundaries } from "../../utils/html";
-
-import { HyperTextRegionModel } from "./HyperTextRegion";
+import Registry from "../../core/Registry";
 import Utils from "../../utils";
+import { HyperTextRegionModel } from "../region/HyperTextRegion";
+import { cloneNode } from "../../core/Helpers";
+import { guidGenerator, restoreNewsnapshot } from "../../core/Helpers";
+import { highlightRange, splitBoundaries } from "../../utils/html";
+import { runTemplate } from "../../core/Template";
 
 /**
  * HyperText tag shows an HyperText markup that can be labeled
@@ -31,14 +25,7 @@ import Utils from "../../utils";
  */
 const TagAttrs = types.model("HyperTextModel", {
   name: types.maybeNull(types.string),
-  // text: types.maybeNull(types.optional(types.string, "Please set \"value\" attribute of Text")),
   value: types.maybeNull(types.string),
-
-  /**
-   * If we allow selecting parts of words of we select whole word only
-   */
-  adjustselection: types.optional(types.boolean, true),
-  selectionenabled: types.optional(types.boolean, true),
 
   encoding: types.optional(types.string, "string"),
 });
@@ -68,7 +55,9 @@ const Model = types
     activeStates() {
       const states = self.states();
       return states
-        ? states.filter(s => s.isSelected && (getType(s).name === "LabelsModel" || getType(s).name === "RatingModel"))
+        ? states.filter(
+            s => s.isSelected && (getType(s).name === "HyperTextLabelsModel" || getType(s).name === "RatingModel"),
+          )
         : null;
     },
   }))
@@ -88,7 +77,7 @@ const Model = types
       self._value = runTemplate(self.value, store.task.dataObj);
     },
 
-    _addRange(p) {
+    createRegion(p) {
       const r = HyperTextRegionModel.create({
         startOffset: p.startOffset,
         endOffset: p.endOffset,
@@ -106,9 +95,9 @@ const Model = types
       return r;
     },
 
-    addRange(range) {
+    addRegion(range) {
       const states = self.activeStates();
-      if (states.length == 0) return;
+      if (states.length === 0) return;
 
       const clonedStates = states
         ? states.map(s => {
@@ -116,7 +105,7 @@ const Model = types
           })
         : null;
 
-      const r = self._addRange({ ...range, states: clonedStates });
+      const r = self.createRegion({ ...range, states: clonedStates });
 
       states &&
         states.forEach(s => {
@@ -161,22 +150,19 @@ const Model = types
 
       states.fromStateJSON(obj);
 
-      self._addRange(tree);
+      self.createRegion(tree);
 
       self.needsUpdate();
     },
   }));
 
-const HyperTextModel = types.compose("HyperTextModel", RegionsMixin, TagAttrs, Model);
+const HyperTextModel = types.compose("HyperTextModel", RegionsMixin, TagAttrs, Model, ObjectBase);
 
 class HtxHyperTextView extends Component {
   render() {
-    const self = this;
     const { item, store } = this.props;
 
     if (!item._value) return null;
-
-    // if (! store.task.dataObj) return null;
 
     return <HtxHyperTextPieceView store={store} item={item} />;
   }
@@ -190,16 +176,12 @@ class HyperTextPieceView extends Component {
 
   captureDocumentSelection() {
     var i,
-      len,
+      self = this,
       ranges = [],
       rangesToIgnore = [],
       selection = window.getSelection();
 
-    var self = this;
-
-    if (selection.isCollapsed) {
-      return [];
-    }
+    if (selection.isCollapsed) return [];
 
     for (i = 0; i < selection.rangeCount; i++) {
       var r = selection.getRangeAt(i);
@@ -239,7 +221,7 @@ class HyperTextPieceView extends Component {
       return;
     }
 
-    const htxRange = this.props.item.addRange(selectedRanges[0]);
+    const htxRange = this.props.item.addRegion(selectedRanges[0]);
 
     let labelColor = htxRange.states.map(s => {
       return s.getSelectedColor();
@@ -260,8 +242,9 @@ class HyperTextPieceView extends Component {
 
   _handleUpdate() {
     const root = this.myRef.current;
+    const { item } = this.props;
 
-    this.props.item.regions.forEach(function(r) {
+    item.regions.forEach(function(r) {
       try {
         const range = xpath.toRange(r.start, r.startOffset, r.end, r.endOffset, root);
 
@@ -306,20 +289,21 @@ class HyperTextPieceView extends Component {
   }
 
   render() {
-    const self = this;
     const { item, store } = this.props;
 
     let val = runTemplate(item.value, store.task.dataObj);
-    if (item.encoding == "base64") val = atob(val);
+    if (item.encoding === "base64") val = atob(val);
 
     return (
-      <div
-        ref={this.myRef}
-        data-update={item._update}
-        style={{ overflow: "auto" }}
-        onMouseUp={this.onMouseUp.bind(this)}
-        dangerouslySetInnerHTML={{ __html: val }}
-      />
+      <ObjectTag item={item}>
+        <div
+          ref={this.myRef}
+          data-update={item._update}
+          style={{ overflow: "auto" }}
+          onMouseUp={this.onMouseUp.bind(this)}
+          dangerouslySetInnerHTML={{ __html: val }}
+        />
+      </ObjectTag>
     );
   }
 }

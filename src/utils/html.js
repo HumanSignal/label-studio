@@ -48,14 +48,14 @@ function getNodesInRange(range) {
   // walk parent nodes from start to common ancestor
   for (node = start.parentNode; node; node = node.parentNode) {
     nodes.push(node);
-    if (node == commonAncestor) break;
+    if (node === commonAncestor) break;
   }
   nodes.reverse();
 
   // walk children and siblings from start until end is found
   for (node = start; node; node = getNextNode(node)) {
     nodes.push(node);
-    if (node == end) break;
+    if (node === end) break;
   }
 
   return nodes;
@@ -101,7 +101,7 @@ function normalizeBoundaries(range) {
   function isTextNodeInRange(node) {
     if (!isTextNode(node)) return false;
     if (node === startContainer && startOffset > 0) return false;
-    if (node === endContainer && endOffset == 0) return false;
+    if (node === endContainer && endOffset === 0) return false;
     return true;
   }
 

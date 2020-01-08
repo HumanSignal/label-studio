@@ -1,19 +1,19 @@
 import React, { Component } from "react";
+import { Stage, Layer, Group, Line } from "react-konva";
 import { observer } from "mobx-react";
-import { getParent, getEnv } from "mobx-state-tree";
-import { Stage, Layer, Rect, Group, Line } from "react-konva";
 
-import Tree from "../../core/Tree";
-import ImageTransformer from "../ImageTransformer/ImageTransformer";
-import ImageControls from "../ImageControls/ImageControls";
 import ImageGrid from "../ImageGrid/ImageGrid";
+import ImageTransformer from "../ImageTransformer/ImageTransformer";
+import ObjectTag from "../../components/Tags/Object";
+import Tree from "../../core/Tree";
+import styles from "./ImageView.module.scss";
 
 export default observer(
   class ImageView extends Component {
     constructor(props) {
       super(props);
 
-      this.updateDimensions = this.updateDimensions.bind(this);
+      this.onResize = this.onResize.bind(this);
     }
     /**
      * Handler of click on Image
@@ -25,6 +25,62 @@ export default observer(
     };
 
     /**
+     * Handler for mouse down
+     */
+    handleStageMouseDown = e => {
+      const { item } = this.props;
+
+      // item.freezeHistory();
+      const p = e.target.getParent();
+
+      if (p && p.className === "Transformer") {
+        return;
+      }
+
+      if (e.target === e.target.getStage() || (e.target.parent && e.target.parent.attrs.name === "ruler")) {
+        return item.onMouseDown(e);
+      }
+
+      return true;
+      // /**
+      //  * Disable polygon event handler
+      //  */
+      // if (item.controlButtonType === "PolygonLabelsModel") {
+      //   return;
+      // }
+
+      // /**
+      //  * Brush event handler
+      //  */
+      // if (item.controlButtonType === "BrushLabelsModel") {
+      //   const { x, y } = e.target.getStage().getPointerPosition();
+
+      //   item.startDraw({ x: Math.floor(x), y: Math.floor(y) });
+
+      //   return;
+      // }
+
+      // if (e.target === e.target.getStage() || (e.target.parent && e.target.parent.attrs.name === "ruler")) {
+      //   // draw rect
+
+      //   const x = (e.evt.offsetX - item.zoomingPositionX) / item.zoomScale;
+      //   const y = (e.evt.offsetY - item.zoomingPositionY) / item.zoomScale;
+
+      //   item.startDraw({ x: x, y: y });
+
+      //   return;
+      // }
+
+      // const clickedOnTransformer = e.target.getParent().className === "Transformer";
+
+      // if (clickedOnTransformer) {
+      //   return;
+      // }
+
+      // return true;
+    };
+
+    /**
      * Handler of mouse up
      */
     handleMouseUp = e => {
@@ -32,74 +88,67 @@ export default observer(
 
       item.freezeHistory();
 
-      if (item.mode === "drawing") {
-        /**
-         * Set mode of Image for "view"
-         */
-        item.setMode("viewing");
+      return item.onMouseUp(e);
 
-        /**
-         * Constants of min size of bounding box
-         */
-        const minSize = { width: 3, height: 3 };
+      // if (item.mode === "drawing") {
+      //   /**
+      //    * Set mode of Image for "view"
+      //    */
+      //   item.setMode("viewing");
 
-        /**
-         * Current shape
-         */
-        const currentShape = item.detachActiveShape();
+      //   /**
+      //    * Constants of min size of bounding box
+      //    */
+      //   const minSize = { width: 3, height: 3 };
 
-        /**
-         * Check for minimal size of boundng box
-         */
-        if (currentShape.width > minSize.width && currentShape.height > minSize.height) item.addShape(currentShape);
-      }
+      //   /**
+      //    * Current shape
+      //    */
+      //   const currentShape = item.detachActiveShape();
+
+      //   /**
+      //    * Check for minimal size of boundng box
+      //    */
+      //   if (currentShape.width > minSize.width && currentShape.height > minSize.height) item.addShape(currentShape);
+      // } else if (item.mode === "brush") {
+      //   item.setMode("viewing");
+
+      //   const currentShape = item.detachActiveShape();
+      //   item.addShape(currentShape);
+      // } else if (item.mode === "eraser") {
+      //   item.setMode("viewing");
+      // }
     };
 
+    /**
+     * Handler for mouse move
+     */
     handleMouseMove = e => {
       const { item } = this.props;
-      item.freezeHistory();
-      if (item.mode === "drawing") {
-        const x = (e.evt.offsetX - item.zoomingPositionX) / item.zoomScale;
-        const y = (e.evt.offsetY - item.zoomingPositionY) / item.zoomScale;
-
-        item.updateDraw({ x: x, y: y });
-      }
-
-      item.setPointerPosition({ x: e.evt.offsetX, y: e.evt.offsetY });
-    };
-
-    handleMouseOver = e => {
-      const { item } = this.props;
-
-      item.freezeHistory();
-    };
-
-    handleStageMouseDown = e => {
-      const { item } = this.props;
+      /**
+       * Freeze this event
+       */
       item.freezeHistory();
 
-      if (item.controlButtonType === "PolygonLabelsModel") {
-        return;
-      }
+      return item.onMouseMove(e);
 
-      if (e.target === e.target.getStage() || (e.target.parent && e.target.parent.attrs.name === "ruler")) {
-        // draw rect
+      // /**
+      //  *
+      //  */
+      // if (item.mode === "drawing") {
+      //   const x = (e.evt.offsetX - item.zoomingPositionX) / item.zoomScale;
+      //   const y = (e.evt.offsetY - item.zoomingPositionY) / item.zoomScale;
 
-        const x = (e.evt.offsetX - item.zoomingPositionX) / item.zoomScale;
-        const y = (e.evt.offsetY - item.zoomingPositionY) / item.zoomScale;
+      //   item.updateDraw({ x: x, y: y });
+      // } else if (item.mode === "brush") {
+      //   const { x, y } = e.target.getStage().getPointerPosition();
+      //   item.addPoints({ x: Math.floor(x), y: Math.floor(y) });
+      // } else if (item.mode === "eraser") {
+      //   const { x, y } = e.target.getStage().getPointerPosition();
+      //   item.addEraserPoints({ x: Math.floor(x), y: Math.floor(y) });
+      // }
 
-        item.startDraw({ x: x, y: y });
-
-        return;
-      }
-
-      // clicked on transformer - do nothing
-      const clickedOnTransformer = e.target.getParent().className === "Transformer";
-      if (clickedOnTransformer) {
-        return;
-      }
-
-      return true;
+      // item.setPointerPosition({ x: e.evt.offsetX, y: e.evt.offsetY });
     };
 
     /**
@@ -110,6 +159,17 @@ export default observer(
       item.freezeHistory();
 
       item.setBrightnessGrade(range);
+    };
+
+    updateBrushControl = arg => this.props.item.updateBrushControl(arg);
+
+    updateBrushStrokeWidth = arg => this.props.item.updateBrushStrokeWidth(arg);
+
+    updateGridSize = range => {
+      const { item } = this.props;
+      item.freezeHistory();
+
+      item.setGridSize(range);
     };
 
     /**
@@ -222,23 +282,25 @@ export default observer(
       );
     }
 
-    updateDimensions() {
-      this.props.item.onResizeSize(this.container.offsetWidth, this.container.offsetHeight, true);
+    onResize() {
+      this.props.item.onResize(this.container.offsetWidth, this.container.offsetHeight, true);
     }
 
     componentDidMount() {
-      window.addEventListener("resize", this.updateDimensions);
+      window.addEventListener("resize", this.onResize);
     }
 
     componentWillUnmount() {
-      window.removeEventListener("resize", this.updateDimensions);
+      window.removeEventListener("resize", this.onResize);
     }
 
     render() {
       const { item, store } = this.props;
 
       // TODO fix me
-      if (!store.task) return null;
+      if (!store.task || !item._value) return null;
+
+      const cb = item.controlButton();
 
       const divStyle = {
         overflow: "hidden",
@@ -258,63 +320,86 @@ export default observer(
         imgStyle["transform"] = translate + "scale(" + item.resize + ", " + item.resize + ")";
       }
 
-      if (item.hasStates && item._value.length > 0) {
-        return (
+      return (
+        <ObjectTag
+          item={item}
+          style={{
+            position: "relative",
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+          }}
+        >
           <div
-            style={{
-              position: "relative",
-              display: "flex",
-              alignItems: "flex-start",
-              justifyContent: "space-between",
+            ref={node => {
+              this.container = node;
             }}
+            style={divStyle}
           >
-            <div
-              ref={node => {
-                this.container = node;
-              }}
-              style={divStyle}
-            >
-              <img style={imgStyle} src={item._value} onLoad={item.updateIE} onClick={this.handleOnClick} alt="LS" />
-            </div>
-            <Stage
+            <img
               ref={ref => {
-                item.setStageRef(ref);
+                item.setImageRef(ref);
               }}
-              style={{ position: "absolute", top: 0, left: 0, brightness: "150%" }}
-              width={item.stageWidth}
-              height={item.stageHeight}
-              scaleX={item.scale}
-              scaleY={item.scale}
-              onDblClick={this.handleDblClick}
+              style={imgStyle}
+              src={item._value}
+              onLoad={item.updateImageSize}
               onClick={this.handleOnClick}
-              onMouseDown={this.handleStageMouseDown}
-              onMouseMove={this.handleMouseMove}
-              onMouseUp={this.handleMouseUp}
-              onWheel={item.zoom ? this.handleZoom : () => {}}
-            >
-              {item.grid && item.sizeUpdated && <ImageGrid item={item} />}
-              <Layer>
-                {item.shapes.map(shape => {
-                  return Tree.renderItem(shape);
-                })}
-                {item.activeShape && Tree.renderItem(item.activeShape)}
+              alt="LS"
+            />
+          </div>
+          <Stage
+            ref={ref => {
+              item.setStageRef(ref);
+            }}
+            style={{ position: "absolute", top: 0, left: 0, brightness: "150%" }}
+            width={item.stageWidth}
+            height={item.stageHeight}
+            scaleX={item.scale}
+            scaleY={item.scale}
+            onDblClick={this.handleDblClick}
+            onClick={this.handleOnClick}
+            onMouseDown={this.handleStageMouseDown}
+            onMouseMove={this.handleMouseMove}
+            onMouseUp={this.handleMouseUp}
+            onWheel={item.zoom ? this.handleZoom : () => {}}
+          >
+            {item.grid && item.sizeUpdated && <ImageGrid item={item} />}
+            {item.shapes.map(shape => {
+              let brushShape;
+              if (shape.type === "brushregion") {
+                brushShape = (
+                  <Layer name="brushLayer" id={shape.id}>
+                    {Tree.renderItem(shape)}
+                  </Layer>
+                );
+              }
+              return brushShape;
+            })}
+            <Layer>
+              {item.shapes.filter(s => s.type !== "brushregion").map(s => Tree.renderItem(s))}
+              {item.activeShape && Tree.renderItem(item.activeShape)}
 
-                <ImageTransformer rotateEnabled={item.controlButton().canrotate} selectedShape={item.selectedShape} />
-              </Layer>
-            </Stage>
-            {item.zoom || item.brightness ? (
-              <ImageControls item={item} handleZoom={this.handleZoom} updateBrightness={this.updateBrightness} />
-            ) : null}
+              <ImageTransformer rotateEnabled={cb && cb.canrotate} selectedShape={item.selectedShape} />
+            </Layer>
+          </Stage>
+
+          <div className={styles.block}>
+            {item
+              .getToolsManager()
+              .allTools()
+              .map(tool => tool.viewClass)}
           </div>
-        );
-      } else {
-        divStyle["marginTop"] = "1em";
-        return (
-          <div style={divStyle}>
-            <img style={imgStyle} src={item._value} onLoad={item.updateIE} />
-          </div>
-        );
-      }
+        </ObjectTag>
+      );
     }
   },
 );
+
+// <ImageControls
+//   item={item}
+//   handleZoom={this.handleZoom}
+//   updateBrightness={this.updateBrightness}
+//   updateGridSize={this.updateGridSize}
+//   updateBrushControl={this.updateBrushControl}
+//   updateBrushStrokeWidth={this.updateBrushStrokeWidth}
+// />

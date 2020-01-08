@@ -1,9 +1,9 @@
 import React, { Fragment } from "react";
-import { observer, inject } from "mobx-react";
+import { observer } from "mobx-react";
 import { getType } from "mobx-state-tree";
 import { Form, Input, Icon, Button, Tag, Tooltip } from "antd";
 
-import { Node, NodeMinimal } from "../Node/Node";
+import { NodeMinimal } from "../Node/Node";
 import Hint from "../Hint/Hint";
 import styles from "./Entity.module.scss";
 
@@ -30,7 +30,8 @@ const RenderStates = ({ node }) => {
       getType(s).name === "LabelsModel" ||
       getType(s).name === "RectangleLabelsModel" ||
       getType(s).name === "PolygonLabelsModel" ||
-      getType(s).name === "KeyPointLabelsModel"
+      getType(s).name === "KeyPointLabelsModel" ||
+      getType(s).name === "BrushLabelsModel"
     ) {
       return templateElement(s);
     } else if (getType(s).name === "RatingModel") {
@@ -120,7 +121,6 @@ export default observer(({ store, completion }) => {
         <Form
           style={{ marginTop: "0.5em", marginBottom: "0.5em" }}
           onSubmit={ev => {
-            const { value } = ev.target;
             node.setNormalization(node.normInput);
             completion.setNormalizationMode(false);
 

@@ -1,10 +1,10 @@
-import React, { Component, Fragment } from "react";
-import { observer, inject } from "mobx-react";
-import { Button, Typography } from "antd";
+import React from "react";
+import { Button } from "antd";
+import { observer } from "mobx-react";
 
-import { Node, NodeMinimal } from "../Node/Node";
 import Hint from "../Hint/Hint";
 import styles from "./Entities.module.scss";
+import { Node } from "../Node/Node";
 
 export default observer(({ store, regionStore }) => {
   const { regions } = regionStore;

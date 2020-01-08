@@ -1,7 +1,8 @@
 import React from "react";
 import { observer, inject } from "mobx-react";
-import Utils from "../../utils";
+
 import TextNode from "../TextNode/TextNode";
+import Utils from "../../utils";
 
 const HtxTextNodeView = ({ store, range, id, highlightStyle, style, charIndex, children, overlap }) => {
   const getStyle = range => (range ? highlightStyle : style);
@@ -19,14 +20,14 @@ const HtxTextNodeView = ({ store, range, id, highlightStyle, style, charIndex, c
     let bg;
 
     if (range.states) {
-      range.states.map(i => {
+      range.states.forEach(i => {
         bg = Utils.Colors.convertToRGBA(i.getSelectedColor(), 0.3);
       });
     }
 
-    store.completionStore.selected.regionStore.regions.map(i => {
+    store.completionStore.selected.regionStore.regions.forEach(i => {
       if (i.selected) {
-        overlap.map(overlapItem => {
+        overlap.forEach(overlapItem => {
           if (overlapItem === i.id) {
             bg = "#ff4d4f";
           }

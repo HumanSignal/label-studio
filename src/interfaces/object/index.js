@@ -1,21 +1,7 @@
-import { TextRegionModel } from "./TextRegion";
-import { RectRegionModel } from "./RectRegion";
-import { PolygonRegionModel } from "./PolygonRegion";
-import { KeyPointRegionModel } from "./KeyPointRegion";
-import { PolygonPoint } from "./PolygonPoint";
-import { AudioRegionModel } from "./AudioRegion";
-import { TextAreaRegionModel } from "./TextAreaRegion";
-import { ImageModel } from "./Image";
-import { HyperTextRegionModel } from "./HyperTextRegion";
+import { AudioModel } from "../../interfaces/object/Audio";
+import { AudioPlusModel } from "../../interfaces/object/AudioPlus";
+import { HyperTextModel } from "../../interfaces/object/HyperText";
+import { ImageModel } from "../../interfaces/object/Image";
+import { TextModel } from "../../interfaces/object/Text";
 
-export {
-  AudioRegionModel,
-  TextRegionModel,
-  RectRegionModel,
-  PolygonRegionModel,
-  TextAreaRegionModel,
-  ImageModel,
-  KeyPointRegionModel,
-  PolygonPoint,
-  HyperTextRegionModel,
-};
+export { AudioModel, AudioPlusModel, HyperTextModel, ImageModel, TextModel };

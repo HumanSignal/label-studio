@@ -1,15 +1,13 @@
-import React, { Fragment } from "react";
-import { Button, Icon } from "antd";
-
-import { types, getRoot } from "mobx-state-tree";
+import React from "react";
 import { observer, inject } from "mobx-react";
-
-import Registry from "../../core/Registry";
-import { AudioHOCModel } from "./AudioHOC";
+import { types } from "mobx-state-tree";
 
 import AudioControls from "./Audio/Controls";
-
+import ObjectBase from "./Base";
+import ObjectTag from "../../components/Tags/Object";
+import Registry from "../../core/Registry";
 import Waveform from "../../components/Waveform/Waveform";
+import { AudioHOCModel } from "./AudioHOC";
 
 /**
  * Audio tag plays a simple audio file
@@ -67,13 +65,13 @@ const Model = AudioHOCModel.named("AudioModel").actions(self => ({
   },
 }));
 
-const AudioModel = types.compose("AudioModel", Model, TagAttrs);
+const AudioModel = types.compose("AudioModel", Model, TagAttrs, ObjectBase);
 
 const HtxAudioView = observer(({ store, item }) => {
   if (!item._value) return null;
 
   return (
-    <div>
+    <ObjectTag item={item}>
       <Waveform
         src={item._value}
         onCreate={item.wsCreated}
@@ -87,7 +85,7 @@ const HtxAudioView = observer(({ store, item }) => {
       />
 
       <AudioControls item={item} store={store} />
-    </div>
+    </ObjectTag>
   );
 });
 
