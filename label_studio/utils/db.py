@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 tasks = None
 completions = None
 c = None  # config
-derived_input_schema = None
+derived_input_schema = []
 derived_output_schema = {
     'from_name_to_name_type': set(),
     'labels': defaultdict(set)
@@ -174,7 +174,6 @@ def init(config):
         num_tasks_loaded = len(tasks)
 
         if num_tasks_loaded > 0:
-            derived_input_schema = []
             for tag in input_data_tags:
                 derived_input_schema.append({
                     'type': tag.tag,
