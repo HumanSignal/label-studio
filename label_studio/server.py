@@ -62,6 +62,8 @@ def reload_config(prompt_inputs=False, force=False):
 
     # Read config from config.json & input arguments (dont initialize any inner DBs)
     c = load_config(re_init_db=False)
+    if not c:
+        return False
 
     # If specified, prompt user in console about specific inputs
     if prompt_inputs:
@@ -88,6 +90,8 @@ def reload_config(prompt_inputs=False, force=False):
         if ml_backend_params:
             ml_backend = MLBackend.from_params(ml_backend_params)
             project.connect(ml_backend)
+
+    return True
 
 
 @app.template_filter('json')
@@ -570,11 +574,12 @@ def main():
 def main_open_browser():
     import threading, webbrowser
 
-    reload_config()
-    port = c['port']
-    browser_url = f'http://127.0.0.1:{port}'
-    threading.Timer(1.25, lambda: webbrowser.open(browser_url)).start()
-    app.run(host='0.0.0.0', port=c['port'], debug=False)
+    if reload_config():
+        port = c['port']
+        browser_url = f'http://127.0.0.1:{port}'
+        print(f'Start browser at URL: {browser_url}')
+        threading.Timer(1.25, lambda: webbrowser.open(browser_url)).start()
+        app.run(host='0.0.0.0', port=c['port'], debug=False)
 
 
 if __name__ == "__main__":
