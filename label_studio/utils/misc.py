@@ -140,15 +140,15 @@ def config_comments_free(xml_config):
     return xml_config
 
 
-def label_studio_init(output_dir, label_config):
+def label_studio_init(output_dir, template=None):
     os.makedirs(output_dir, exist_ok=True)
     default_config_file = os.path.join(output_dir, 'config.json')
     default_label_config_file = os.path.join(output_dir, 'config.xml')
     default_output_dir = os.path.join(output_dir, 'completions')
     default_input_path = os.path.join(output_dir, 'tasks.json')
 
-    if label_config:
-        label_config_path = os.path.join(find_dir('examples'), label_config, 'config.xml')
+    if template:
+        label_config_path = os.path.join(find_dir('examples'), template, 'config.xml')
         copy2(label_config_path, default_label_config_file)
 
     default_config = {
@@ -233,8 +233,8 @@ def load_config(re_init_db=True):
             'project_name',
             help='Path to directory where project state will be initialized')
         parser_init.add_argument(
-            '--config', dest='label_config', choices=available_templates,
-            help='Specify label config from predefined templates'
+            '--template', dest='template', choices=available_templates,
+            help='Choose from predefined project templates'
         )
 
         # start subcommand parser
@@ -265,7 +265,7 @@ def load_config(re_init_db=True):
 
         args = parser.parse_args()
         if args.command == 'init':
-            label_studio_init(args.project_name, args.label_config)
+            label_studio_init(args.project_name, args.template)
             return
         else:
             print('Working dir', os.getcwd())
