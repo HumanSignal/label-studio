@@ -2,24 +2,41 @@
 from __future__ import print_function
 
 import os
+import lxml
+import time
 import flask
-import json  # it MUST be included after flask!
-import label_studio.utils.db as db
 import logging
+import hashlib
+import pandas as pd
+import tarfile
+try:
+    import ujson as json
+except:
+    import json
 
+from urllib.parse import unquote
+from datetime import datetime
 from copy import deepcopy
 from inspect import currentframe, getframeinfo
-from flask import request, jsonify, make_response, Response
-from label_studio.utils.misc import (
-    exception_treatment, log_config, log, config_line_stripped, load_config
-)
+from flask import request, jsonify, make_response, Response, Response as HttpResponse, send_file
+from flask_api import status
+
+import label_studio.utils.db as db
+from label_studio.utils.functions import generate_sample_task
 from label_studio.utils.analytics import Analytics
 from label_studio.utils.models import DEFAULT_PROJECT_ID, Project, MLBackend
 from label_studio.utils.prompts import LabelStudioConfigPrompt
-from label_studio.utils.io import find_file, find_dir
+from label_studio.utils.io import find_file, find_dir, find_editor_files, get_temp_file
+from label_studio.utils import uploader
+from label_studio.utils.validation import TaskValidator
+from label_studio.utils.exceptions import ValidationError
+from label_studio.utils.functions import generate_sample_task_without_check, data_examples
+from label_studio.utils.misc import (
+    exception_treatment, log_config, log, load_config, config_line_stripped, config_comments_free,
+    get_config_templates
+)
 
 logger = logging.getLogger(__name__)
-
 
 app = flask.Flask(__name__, static_url_path='')
 app.secret_key = 'A0Zrdqwf1AQWj12ajkhgFN]dddd/,?RfDWQQT'
@@ -36,7 +53,7 @@ ml_backend = None
 project = None
 
 
-def reload_config(prompt_inputs=False):
+def reload_config(prompt_inputs=False, force=False):
     global c
     global label_config_line
     global analytics
@@ -56,16 +73,17 @@ def reload_config(prompt_inputs=False):
     # Initialize DBs
     db.re_init(c)
 
-    label_config_line = config_line_stripped(open(c['label_config']).read())
+    label_config_full = config_comments_free(open(c['label_config']).read())
+    label_config_line = config_line_stripped(label_config_full)
     if analytics is None:
         analytics = Analytics(label_config_line, c.get('collect_analytics', True))
     else:
         analytics.update_info(label_config_line, c.get('collect_analytics', True))
     # configure project
-    if project is None:
-        project = Project(label_config=label_config_line)
+    if project is None or force:
+        project = Project(label_config=label_config_line, label_config_full=label_config_full)
     # configure machine learning backend
-    if ml_backend is None:
+    if ml_backend is None or force:
         ml_backend_params = c.get('ml_backend')
         if ml_backend_params:
             ml_backend = MLBackend.from_params(ml_backend_params)
@@ -82,25 +100,20 @@ def app_init():
     pass
 
 
-@app.route('/static/editor/<path:path>')
-def send_editor(path):
-    """ Static for label tool js and css
-    """
-    return flask.send_from_directory(c['editor']['build_path'], path)
-
-
 @app.route('/static/media/<path:path>')
 def send_media(path):
     """ Static for label tool js and css
     """
-    return flask.send_from_directory(c['editor']['build_path'] + '/media', path)
+    media_dir = find_dir('static/media')
+    return flask.send_from_directory(media_dir, path)
 
 
 @app.route('/static/<path:path>')
 def send_static(path):
     """ Static serving
     """
-    return flask.send_from_directory('static', path)
+    static_dir = find_dir('static')
+    return flask.send_from_directory(static_dir, path)
 
 
 @app.route('/logs')
@@ -112,20 +125,14 @@ def send_log():
 
 
 @app.route('/')
-def index():
-    """ Main page: index.html
+def labeling():
+    """ Label studio frontend: task labeling
     """
     global c
     global label_config_line
 
     # reload config at each page reload (for fast changing of config/input_path/output_path)
     reload_config()
-
-    # find editor files to include in html
-    editor_js_dir = find_dir('static/editor/js')
-    editor_css_dir = find_dir('static/editor/css')
-    editor_js = [f'/static/editor/js/{f}' for f in os.listdir(editor_js_dir) if f.endswith('.js')]
-    editor_css = [f'/static/editor/css/{f}' for f in os.listdir(editor_css_dir) if f.endswith('.css')]
 
     # task data: load task or task with completions if it exists
     task_data = None
@@ -138,9 +145,8 @@ def index():
             task_data['predictions'] = ml_backend.make_predictions(task_data, project)
 
     analytics.send(getframeinfo(currentframe()).function)
-    return flask.render_template('index.html', config=c, label_config_line=label_config_line,
-                                 editor_css=editor_css, editor_js=editor_js,
-                                 task_id=task_id, task_data=task_data)
+    return flask.render_template('labeling.html', config=c, label_config_line=label_config_line,
+                                 task_id=task_id, task_data=task_data, **find_editor_files())
 
 
 @app.route('/tasks')
@@ -160,6 +166,253 @@ def tasks_page():
     return flask.render_template('tasks.html', config=c, label_config=label_config,
                                  task_ids=task_ids, completions=db.get_completions_ids(),
                                  completed_at=completed_at)
+
+
+@app.route('/settings')
+def label_config_page():
+    """ Setup label config
+    """
+    global c, project
+    reload_config()
+
+    templates = get_config_templates(c['templates_dir'])
+    analytics.send(getframeinfo(currentframe()).function)
+    return flask.render_template('settings.html', config=c, project=project, templates=templates)
+
+
+@app.route('/import')
+def import_page():
+    """ Tasks and completions page: tasks.html
+    """
+    global c, project
+    reload_config()
+
+    analytics.send(getframeinfo(currentframe()).function)
+    return flask.render_template('import.html', config=c, project=project)
+
+
+@app.route('/api/render-label-studio', methods=['GET', 'POST'])
+def api_render_label_studio():
+    """ Label studio frontend rendering for iframe
+    """
+    global c
+    global label_config_line
+
+    # reload config at each page reload (for fast changing of config/input_path/output_path)
+    reload_config()
+
+    # get args
+    full_editor = request.args.get('full_editor', False)
+    config = request.args.get('config', request.form.get('config', ''))
+    config = unquote(config)
+    if not config:
+        return make_response('No config in POST', status.HTTP_417_EXPECTATION_FAILED)
+
+    # prepare example
+    examples = data_examples(mode='editor_preview')
+    task_data = {
+        data_key: examples.get(data_type, '')
+        for data_key, data_type in Project.extract_data_types(config).items()
+    }
+    example_task_data = {
+        'id': 1764,
+        'data': task_data,
+        'project': DEFAULT_PROJECT_ID,
+        'created_at': '2019-02-06T14:06:42.000420Z',
+        'updated_at': '2019-02-06T14:06:42.000420Z'
+    }
+
+    # prepare context for html
+    config_line = config_line_stripped(config)
+    response = {
+        'label_config_line': config_line,
+        'task_ser': example_task_data
+    }
+    response.update(find_editor_files())
+    analytics.send(getframeinfo(currentframe()).function)
+    return flask.render_template('render_ls.html', **response)
+
+
+@app.route('/api/validate-config', methods=['POST'])
+def api_validate_config():
+    """ Validate label config via tags schema
+    """
+    global project
+    if 'label_config' not in request.form:
+        return make_response('No label_config in POST', status.HTTP_417_EXPECTATION_FAILED)
+
+    try:
+        project.validate_label_config(request.form['label_config'])
+    except ValidationError as e:
+        return make_response(jsonify({'label_config': e.msg_to_list()}), status.HTTP_400_BAD_REQUEST)
+
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@app.route('/api/save-config', methods=['POST'])
+def api_save_config():
+    """ Save label config
+    """
+    global c, project
+    if 'label_config' not in request.form:
+        return make_response('No label_config in POST', status.HTTP_417_EXPECTATION_FAILED)
+
+    # check config before save
+    label_config = request.form['label_config']
+    try:
+        project.validate_label_config(label_config)
+    except ValidationError as e:
+        return make_response(jsonify({'label_config': e.msg_to_list()}), status.HTTP_400_BAD_REQUEST)
+
+    # save xml label config to file
+    path = c['label_config']
+    open(path, 'w').write(label_config)
+    logger.info(f'Label config saved to: {path}')
+
+    reload_config(force=True)
+    analytics.send(getframeinfo(currentframe()).function)
+    return Response(status=status.HTTP_201_CREATED)
+
+
+@app.route('/api/import-example', methods=['GET', 'POST'])
+def api_import_example():
+    """ Generate upload data example by config only
+    """
+    # django compatibility
+    request.GET = request.args
+    request.POST = request.form
+
+    config = request.GET.get('label_config', '')
+    if not config:
+        config = request.POST.get('label_config', '')
+    try:
+        Project.validate_label_config(config)
+        output = generate_sample_task_without_check(config, mode='editor_preview')
+    except (ValueError, ValidationError, lxml.etree.Error):
+        response = HttpResponse('error while example generating', status=status.HTTP_400_BAD_REQUEST)
+    else:
+        response = HttpResponse(json.dumps(output))
+    return response
+
+
+@app.route('/api/import-example-file')
+def api_import_example_file():
+    """ Task examples for import
+    """
+    global c, project
+    reload_config()
+    request.GET = request.args  # django compatibility
+
+    q = request.GET.get('q', 'json')
+    filename = 'sample-' + datetime.now().strftime('%Y-%m-%d-%H-%M')
+    try:
+        task = generate_sample_task(project)
+    except (ValueError, ValidationError, lxml.etree.Error):
+        return HttpResponse('error while example generating', status=status.HTTP_400_BAD_REQUEST)
+
+    tasks = [task, task]
+
+    if q == 'json':
+        filename += '.json'
+        output = json.dumps(tasks)
+
+    elif q == 'csv':
+        filename += '.csv'
+        output = pd.read_json(json.dumps(tasks), orient='records').to_csv(index=False)
+
+    elif q == 'tsv':
+        filename += '.tsv'
+        output = pd.read_json(json.dumps(tasks), orient='records').to_csv(index=False, sep='\t')
+
+    elif q == 'txt':
+        if len(project.data_types.keys()) > 1:
+            raise ValueError('TXT is unsupported for projects with multiple sources in config')
+
+        filename += '.txt'
+        output = ''
+        for t in tasks:
+            output += list(t.values())[0] + '\n'
+
+    else:
+        raise ValueError('Incorrect format ("q") in request')
+
+    if request.GET.get('raw', '0') == '1':
+        return HttpResponse(output)
+
+    response = HttpResponse(output)
+    response.headers['Content-Disposition'] = 'attachment; filename=%s' % filename
+    response.headers['filename'] = filename
+
+    analytics.send(getframeinfo(currentframe()).function)
+    return response
+
+
+@app.route('/api/import', methods=['POST'])
+def api_import():
+    global project, c
+
+    # make django compatibility for uploader module
+    class DjangoRequest:
+        POST = request.form
+        GET = request.args
+        FILES = request.files
+        data = request.json if request.json else request.form
+        content_type = request.content_type
+
+    start = time.time()
+    # get tasks from request
+    parsed_data = uploader.load_tasks(DjangoRequest())
+    # validate tasks
+    validator = TaskValidator(project)
+    try:
+        new_tasks = validator.to_internal_value(parsed_data)
+    except ValidationError as e:
+        return make_response(jsonify(e.msg_to_list()), status.HTTP_400_BAD_REQUEST)
+
+    # save task file to input dir
+    if os.path.isdir(c['input_path']):
+        # tasks are in directory, write a new file with tasks
+        task_dir = c['input_path']
+        now = datetime.now()
+        data = json.dumps(new_tasks, ensure_ascii=False)
+        md5 = hashlib.md5(json.dumps(data).encode('utf-8')).hexdigest()
+        name = 'import-' + now.strftime('%Y-%m-%d-%H-%M') + f'-{md5[0:8]}'
+        path = os.path.join(task_dir, name + '.json')
+        tasks = new_tasks
+    else:
+        # tasks are all in one file, append it
+        path = c['input_path']
+        old_tasks = json.load(open(path))
+        assert isinstance(old_tasks, list), 'Tasks from input_path must be list'
+        tasks = old_tasks + new_tasks
+        logger.error(f"It's recommended to use directory as input_path: "
+                     f"{c['input_path']} -> {os.path.dirname(c['input_path'])}")
+
+    with open(path, 'w') as f:
+        json.dump(tasks, f, ensure_ascii=False, indent=4)
+
+    # load new tasks
+    db.re_init(c)
+
+    duration = time.time() - start
+    return make_response(jsonify({
+        'task_count': len(new_tasks),
+        'completion_count': validator.completion_count,
+        'prediction_count': validator.prediction_count,
+        'duration': duration
+    }), status.HTTP_201_CREATED)
+
+
+@app.route('/api/export', methods=['GET'])
+def api_export():
+    global c
+
+    output_dir = c['output_dir']
+    with get_temp_file() as temp_file:
+        archive_name = temp_file + '.tar.gz'
+        with tarfile.open(archive_name, mode='w:gz') as archive:
+            archive.add(output_dir, recursive=True)
+        return send_file(archive_name)
 
 
 @app.route(f'/api/projects/{DEFAULT_PROJECT_ID}/next/', methods=['GET'])
@@ -310,17 +563,18 @@ def get_data_file(filename):
 
 
 def main():
+    reload_config()
     app.run(host='0.0.0.0', port=c['port'], debug=c['debug'])
 
 
 def main_open_browser():
     import threading, webbrowser
 
-    reload_config(prompt_inputs=True)
+    reload_config()
     port = c['port']
     browser_url = f'http://127.0.0.1:{port}'
     threading.Timer(1.25, lambda: webbrowser.open(browser_url)).start()
-    app.run(host='0.0.0.0', port=c['port'], debug=c['debug'])
+    app.run(host='0.0.0.0', port=c['port'], debug=False)
 
 
 if __name__ == "__main__":

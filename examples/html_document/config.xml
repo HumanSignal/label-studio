@@ -1,3 +1,4 @@
+<!-- {"title": "HTML tagging", "category": "html"} -->
 <View>
   <HyperTextLabels name="ner" toName="text">
     <Label value="Person"></Label>

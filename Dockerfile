@@ -6,7 +6,11 @@ WORKDIR /app
 COPY backend/requirements.txt /app/backend/
 RUN pip install -r backend/requirements.txt
 
+
+ENV PORT="8200"
+
 COPY . /app
-EXPOSE 8200
+EXPOSE ${PORT}
 WORKDIR /app/backend
-ENTRYPOINT ["python", "server.py"]
+RUN pip install -e .
+CMD ["/app/scripts/run-demo.sh", "image_bbox"]

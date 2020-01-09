@@ -1,3 +1,4 @@
+<!-- {"title": "Text references", "category": "text"} -->
 <View>
   <Text name="text" value="$text"></Text>
   <Choices name="validation-label" choice="single-radio" toName="text">

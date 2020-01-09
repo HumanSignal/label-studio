@@ -80,10 +80,7 @@ def tasks_from_json_file(path, tasks):
     """
     def push_task(root):
         task_id = len(tasks) + 1
-        if 'data' in root:
-            data = root['data']
-        else:
-            data = root
+        data = root['data'] if 'data' in root else root
         tasks[task_id] = {'id': task_id, 'task_path': path, 'data': data}
         if 'predictions' in data:
             tasks[task_id]['predictions'] = data['predictions']
@@ -134,16 +131,19 @@ def init(config):
         # file
         if os.path.isfile(c['input_path']):
             files = [os.path.basename(c['input_path'])]
-            root_dir = os.path.dirname(c['input_path'])
+            root_dir = os.path.normpath(os.path.dirname(c['input_path']))
 
         # directory
         else:
-            root_dir = c['input_path']
-            files = (os.path.join(root, f) for root, _, files in os.walk(root_dir) for f in files)
+            root_dir = os.path.normpath(c['input_path'])
+            files = [os.path.join(root, f) for root, _, files in os.walk(root_dir) for f in files \
+                     if 'completion' not in f and 'completion' not in root]
 
         # walk over all the files
         for f in files:
-            path = os.path.join(root_dir, f)
+            norm_f = os.path.normpath(f)
+            path = os.path.join(root_dir, norm_f) if not norm_f.startswith(root_dir) else f
+
             # load tasks from json
             if f.endswith('.json'):
                 tasks_from_json_file(path, tasks)

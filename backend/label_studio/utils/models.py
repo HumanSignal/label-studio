@@ -1,18 +1,25 @@
+import io
+import os
+import re
+import attr
 import urllib
 import logging
-import os
+import xmljson
 import requests
-import attr
-import json
-import io
+import jsonschema
+try:
+    import ujson as json
+except:
+    import json
 
+from lxml import etree
 from datetime import datetime
 from requests.adapters import HTTPAdapter
-from label_studio.utils.misc import get_data_dir
+from label_studio.utils.misc import get_data_dir, config_line_stripped
+from label_studio.utils.exceptions import ValidationError
+from label_studio.utils.functions import _LABEL_CONFIG_SCHEMA_DATA
 
 DEFAULT_PROJECT_ID = 1
-
-
 logger = logging.getLogger(__name__)
 
 
@@ -27,13 +34,22 @@ class Project(object):
     created_at = attr.ib(factory=lambda: datetime.now())
     # Input source / output tags schema exposed for connected ML backend
     schema = attr.ib(default='')
-    # label config
+    # label config line stripped
     label_config = attr.ib(default='')
+    # label config full with line breaks
+    label_config_full = attr.ib(default='')
     # credentials for restricted data access
     task_data_login = attr.ib(default='')
     task_data_password = attr.ib(default='')
     # connected machine learning backend
     ml_backend = attr.ib(default=None)
+    # import settings
+    max_tasks_file_size = attr.ib(default=250)
+
+    def __attrs_post_init__(self):
+        """ Init analogue for attr class
+        """
+        self.data_types = self.extract_data_types(self.label_config)
 
     def connect(self, ml_backend):
         self.ml_backend = ml_backend
@@ -43,6 +59,102 @@ class Project(object):
     def train_job(self):
         if self.ml_backend is not None:
             return self.ml_backend.train_job
+
+    @property
+    def data_types_json(self):
+        return json.dumps(self.data_types)
+
+    @classmethod
+    def extract_data_types(cls, label_config):
+        # load config
+        parser = etree.XMLParser()
+        xml = etree.fromstring(label_config, parser)
+        if xml is None:
+            raise etree.XMLSchemaParseError('Project config is empty or incorrect')
+
+        # take all tags with values attribute and fit them to tag types
+        data_type = {}
+        parent = xml.findall('.//*[@value]')
+        for match in parent:
+            name = match.get('value')
+            if len(name) > 1 and name[0] == '$':
+                name = name[1:]
+                data_type[name] = match.tag
+
+        return data_type
+
+    @property
+    def generate_sample_task_str(self):
+        from .functions import generate_sample_task
+        return json.dumps(generate_sample_task(self))
+
+    @property
+    def generate_sample_task_escape(self):
+        from .functions import generate_sample_task
+        task = json.dumps(generate_sample_task(self))
+        return task.replace("'", "\\'")
+
+    @property
+    def supported_formats(self):
+        """ Returns supported input formats for project (json / csv)
+
+        :param project: project with label config
+        :return: list of supported file types
+        """
+        # load config
+        parser = etree.XMLParser()
+        xml = etree.fromstring(self.label_config, parser)
+        if xml is None:
+            raise etree.XMLSchemaParseError('Project config is empty or incorrect')
+
+        supported = {'json', 'csv', 'tsv'}
+
+        if len(self.data_types.keys()) == 1:
+            supported.add('txt')
+
+        # if any of Lists are presented there is only json allowed
+        lists = xml.findall('.//List')  # take all tags with value attribute
+        if lists:
+            supported.remove('csv')
+            supported.remove('tsv')
+            supported.remove('txt')
+
+        return supported
+
+    @classmethod
+    def parse_config_to_json(cls, config_string):
+        parser = etree.XMLParser(recover=False)
+        xml = etree.fromstring(config_string, parser)
+        if xml is None:
+            raise etree.XMLSchemaParseError('xml is empty or incorrect')
+        config = xmljson.badgerfish.data(xml)
+        return config
+
+    @classmethod
+    def validate_label_config(cls, config_string):
+        # xml and schema
+        try:
+            config = cls.parse_config_to_json(config_string)
+            jsonschema.validate(config, _LABEL_CONFIG_SCHEMA_DATA)
+        except (etree.XMLSyntaxError, etree.XMLSchemaParseError, ValueError) as exc:
+            raise ValidationError(str(exc))
+        except jsonschema.exceptions.ValidationError as exc:
+            error_message = exc.context[-1].message if len(exc.context) else exc.message
+            error_message = 'Validation failed on {}: {}'.format('/'.join(exc.path), error_message.replace('@', ''))
+            raise ValidationError(error_message)
+
+        # unique names in config # FIXME: 'name =' (with spaces) won't work
+        all_names = re.findall(r'name="([^"]*)"', config_string)
+        if len(set(all_names)) != len(all_names):
+            raise ValidationError('Label config contains non-unique names')
+
+        # toName points to existent name
+        names = set(all_names)
+        toNames = re.findall(r'toName="([^"]*)"', config_string)
+        for toName_ in toNames:
+            for toName in toName_.split(','):
+                if toName not in names:
+                    raise ValidationError(f'toName="{toName}" not found in names: {sorted(names)}')
 
 
 class BaseHTTPAPI(object):
@@ -82,8 +194,8 @@ class BaseHTTPAPI(object):
             self._sessions[key] = session
             return session
 
-    def _prepare_kwargs(self, kwargs):
-        #kwargs['timeout'] = self._connection_timeout, self._timeout
+    @staticmethod
+    def _prepare_kwargs(kwargs):
         kwargs['timeout'] = kwargs.get('timeout', None)
 
     def request(self, method, *args, **kwargs):
@@ -173,7 +285,8 @@ class MLApi(BaseHTTPAPI):
         logger.debug(f'Response from {url}: {json.dumps(response, indent=2)}')
         return MLApiResult(url, request, response, headers, status_code=status_code)
 
-    def _create_project_uid(self, project):
+    @staticmethod
+    def _create_project_uid(project):
         return f'{project.id}.{project.ml_backend.model_name}'
 
     def update(self, task, results, project, retrain=True):

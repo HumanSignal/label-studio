@@ -1,3 +1,4 @@
+<!-- {"title": "Named enitity recognition", "category": "text"} -->
 <View>
   <Labels name="ner" toName="text">
     <Label value="Person"></Label>

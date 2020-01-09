@@ -1,3 +1,4 @@
+<!-- {"title": "Audio segmentation", "category": "audio"} -->
 <View>
   <Header value="Select regions:"></Header>
   <Labels name="label" toName="audio" choice="multiple">

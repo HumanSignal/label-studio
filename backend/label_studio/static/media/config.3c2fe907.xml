@@ -1,0 +1,17 @@
+<View>
+  <Header value="Select regions:"></Header>
+  <Labels name="label" toName="audio" choice="multiple">
+    <Label value="Beat" background="yellow"></Label>
+    <Label value="Voice" background="red"></Label>
+    <Label value="Guitar" background="blue"></Label>
+    <Label value="Other"></Label>
+  </Labels>
+  <Header value="Select genre:"></Header>
+  <Choices name="choice" toName="audio" choice="multiple">
+    <Choice value="Lo-Fi" />
+    <Choice value="Rock" />
+    <Choice value="Pop" />
+  </Choices>
+  <Header value="Listen the audio:"></Header>
+  <AudioPlus name="audio" value="$url"></AudioPlus>
+</View>
