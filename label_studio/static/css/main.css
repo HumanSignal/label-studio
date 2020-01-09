@@ -175,8 +175,10 @@ a {
 /* editor width */
 #label-studio {
     width: 100%;
+    max-width: 1440px;
     padding-left: 1em;
     padding-right: 1em;
+    margin: 0 auto;
 }
 
 #label-studio div[class^="App_editor"],
