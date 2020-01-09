@@ -9,13 +9,18 @@ import logging
 import random
 
 from datetime import datetime
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 
 logger = logging.getLogger(__name__)
 
 tasks = None
 completions = None
 c = None  # config
+derived_input_schema = None
+derived_output_schema = {
+    'from_name_to_name_type': set(),
+    'labels': defaultdict(set)
+}
 
 
 _allowed_extensions = {
@@ -111,7 +116,7 @@ def init(config):
 
     :param config: config dict
     """
-    global c, tasks
+    global c, tasks, derived_input_schema, derived_output_schema
     c = config
     
     label_config = LabelConfigParser(c['label_config'])
@@ -166,11 +171,22 @@ def init(config):
             else:
                 logger.warning(f'Unrecognized file format for file {f}')
 
-        if len(tasks) == 0:
+        num_tasks_loaded = len(tasks)
+
+        if num_tasks_loaded == 0:
             input_data_types = '\n'.join(f'"{t.tag}"' for t in input_data_tags)
             raise ValueError(
                 f'We didn\'t find any tasks that match specified data types:\n{input_data_types}\n'
                 f'Please check input arguments and try again.')
+
+        if num_tasks_loaded > 0:
+            derived_input_schema = []
+            for tag in input_data_tags:
+                derived_input_schema.append({
+                    'tag': tag.tag,
+                    'value': tag.attrib['value'].lstrip('$')
+                })
+
         print(f'{len(tasks)} tasks loaded from: {c["input_path"]}')
 
 
@@ -285,6 +301,19 @@ def get_task_with_completions(task_id):
     return data
 
 
+def _update_derived_output_schema(completion):
+    global derived_output_schema
+
+    if not len(completion):
+        return
+
+    for result in completion[0]['result']:
+        derived_output_schema['from_name_to_name_type'].add(
+            result['from_name'], result['to_name'], result['type']
+        )
+        derived_output_schema['labels']['from_name'].add(tuple(result['value'][result['type']]))
+
+
 def save_completion(task_id, completion):
     """ Save completion
 
@@ -313,6 +342,8 @@ def save_completion(task_id, completion):
     if not updated:
         completion['id'] = task['id'] * 1000 + len(task['completions']) + 1
         task['completions'].append(completion)
+
+    _update_derived_output_schema(completion)
 
     # write task + completions to file
     filename = os.path.join(c['output_dir'], str(task_id) + '.json')

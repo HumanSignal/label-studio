@@ -8,6 +8,7 @@ import json  # it MUST be included after flask!
 import inspect
 import pkg_resources
 
+from collections import defaultdict
 from appdirs import user_config_dir
 from pythonjsonlogger import jsonlogger
 from lxml import etree, objectify
@@ -236,12 +237,15 @@ def parse_config(config_string):
 
     xml_tree = ElementTree.fromstring(config_string)
 
-    inputs, outputs = {}, {}
+    inputs, outputs, labels = {}, {}, defaultdict(set)
     for tag in xml_tree.iter():
         if _is_input_tag(tag):
             inputs[tag.attrib['name']] = {'type': tag.tag, 'value': tag.attrib['value'].lstrip('$')}
         elif _is_output_tag(tag):
             outputs[tag.attrib['name']] = {'type': tag.tag, 'to_name': tag.attrib['toName'].split(',')}
+        parent_name = tag.get_parent().name
+        if parent_name in outputs:
+            labels[parent_name].add(tag.attrib['value'])
 
     for output_tag, tag_info in outputs.items():
         tag_info['inputs'] = []
@@ -250,6 +254,7 @@ def parse_config(config_string):
                 raise KeyError(f'to_name={input_tag_name} is specified for output tag name={output_tag}, '
                                f'but we can\'t find it among input tags')
             tag_info['inputs'].append(inputs[input_tag_name])
+        tag_info['labels'] = list(labels[output_tag])
 
     return outputs
 

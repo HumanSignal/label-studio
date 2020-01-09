@@ -12,10 +12,13 @@ try:
 except:
     import json
 
+import label_studio.utils.db as db
+
+from operator import itemgetter
 from lxml import etree
 from datetime import datetime
 from requests.adapters import HTTPAdapter
-from label_studio.utils.misc import get_data_dir, config_line_stripped
+from label_studio.utils.misc import get_data_dir, parse_config
 from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.functions import _LABEL_CONFIG_SCHEMA_DATA
 
@@ -45,6 +48,10 @@ class Project(object):
     ml_backend = attr.ib(default=None)
     # import settings
     max_tasks_file_size = attr.ib(default=250)
+
+    @property
+    def tasks(self):
+        return db.tasks
 
     def __attrs_post_init__(self):
         """ Init analogue for attr class
@@ -131,6 +138,68 @@ class Project(object):
         return config
 
     @classmethod
+    def validate_label_config_on_derived_input_schema(cls, config_string_or_parsed_config):
+        """
+        Validate label config on input schemas (tasks types and data keys) derived from imported tasks
+        :param config_string_or_parsed_config: label config string or parsed config object
+        :return: True if config match already imported tasks
+        """
+        input_schema = db.derived_input_schema
+        config = config_string_or_parsed_config
+        if isinstance(config, str):
+            config = parse_config(config)
+        input_types, input_values = set(), set()
+        for i in map(itemgetter('inputs'), config.values()):
+            input_types.add(i['type'])
+            input_values.add(i['value'])
+        for item in input_schema:
+            if item['type'] not in input_types:
+                raise ValidationError(
+                    f'You\'ve already imported tasks of type {item["type"]}, '
+                    f'but this type is not found among input types exposed by label config: {list(input_types)}')
+            if item['value'] not in input_values:
+                raise ValidationError(
+                    f'You\'ve already imported tasks with keys "{item["type"]}", '
+                    f'but this key is not found among input tag attribute "value" exposed by label config:'
+                    f' {list(input_values)}')
+
+    @classmethod
+    def validate_label_config_on_derived_output_schema(cls, config_string_or_parsed_config):
+        """
+        Validate label config on output schema (from_names, to_names and labeling types) derived from completions
+        :param config_string_or_parsed_config: label config string or parsed config object
+        :return: True if config match already created completions
+        """
+        output_schema = db.derived_output_schema
+        config = config_string_or_parsed_config
+        if isinstance(config, str):
+            config = parse_config(config)
+
+        completion_tuples = set()
+        for from_name, to in config.items():
+            completion_tuples.add((from_name, to['to_name'], to['type']))
+
+        for from_name, to_name, type in output_schema['from_name_to_name_type']:
+            if (from_name, to_name, type) not in completion_tuples:
+                raise ValidationError(
+                    f'You\'ve already completed some tasks, but some of them couldn\'t be loaded with this config: '
+                    f'name={from_name}, toName={to_name}, type={type} are expected'
+                )
+        for from_name, expected_label_set in output_schema['labels'].items():
+            if from_name not in config:
+                raise ValidationError(
+                    f'You\'ve already completed some tasks, but some of them couldn\'t be loaded with this config: '
+                    f'name={from_name} is expected'
+                )
+            found_labels = set(config[from_name]['labels'])
+            extra_labels = list(found_labels - expected_label_set)
+            if extra_labels:
+                raise ValidationError(
+                    f'You\'ve already completed some tasks, but some of them couldn\'t be loaded with this config: '
+                    f'there are labels already created for tag with name={from_name}:\n{extra_labels}'
+                )
+
+    @classmethod
     def validate_label_config(cls, config_string):
         # xml and schema
         try:
@@ -155,6 +224,10 @@ class Project(object):
             for toName in toName_.split(','):
                 if toName not in names:
                     raise ValidationError(f'toName="{toName}" not found in names: {sorted(names)}')
+
+        parsed_config = parse_config(config_string)
+        cls.validate_label_config_on_derived_input_schema(parsed_config)
+        cls.validate_label_config_on_derived_output_schema(parsed_config)
 
 
 class BaseHTTPAPI(object):
