@@ -212,20 +212,25 @@ def load_config(re_init_db=True):
     :return: config dict
     """
     def generator():
+        import sys
         import argparse
+
+        # if no arguments passed make 'server.py start default'
+        if len(sys.argv) == 1:
+            sys.argv += ['start', 'default']
 
         parser = argparse.ArgumentParser(description='Label studio')
 
         subparsers = parser.add_subparsers(dest='command', help='Available commands')
 
-        # init subcommand parser
+        # init sub-command parser
 
         parser_init = subparsers.add_parser('init', help='Initialize Label Studio')
         parser_init.add_argument(
             'project_name',
             help='Path to directory where project state will be initialized')
 
-        # start subcommand parser
+        # start sub-command parser
 
         parser_start = subparsers.add_parser('start', help='Start Label Studio server')
         parser_start.add_argument(

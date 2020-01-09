@@ -196,13 +196,24 @@ def label_config_page():
 
 @app.route('/import')
 def import_page():
-    """ Tasks and completions page: tasks.html
+    """ Import tasks from JSON, CSV, ZIP and more
     """
     global c, project
     reload_config()
 
     analytics.send(getframeinfo(currentframe()).function)
     return flask.render_template('import.html', config=c, project=project)
+
+
+@app.route('/export')
+def export_page():
+    """ Export completions as JSON or using converters
+    """
+    global c, project
+    reload_config()
+
+    analytics.send(getframeinfo(currentframe()).function)
+    return flask.render_template('export.html', config=c, project=project)
 
 
 @app.route('/api/render-label-studio', methods=['GET', 'POST'])
@@ -582,13 +593,14 @@ def main():
 
 
 def main_open_browser():
-    import threading, webbrowser
+    import threading
+    import webbrowser
 
     if reload_config():
         port = c['port']
-        browser_url = f'http://127.0.0.1:{port}'
+        browser_url = f'http://127.0.0.1:{port}/welcome'
         print(f'Start browser at URL: {browser_url}')
-        threading.Timer(1.25, lambda: webbrowser.open(browser_url)).start()
+        threading.Timer(2.5, lambda: webbrowser.open(browser_url)).start()
         app.run(host='0.0.0.0', port=c['port'], debug=False)
 
 

@@ -319,6 +319,10 @@ div[class*="App_editor"] {
   margin-left: -1em;
 }
 
+.ui .label.basic {
+    color: #999 !important;
+}
+
 /* semantic ui pretty finish */
 
 /* label config */
