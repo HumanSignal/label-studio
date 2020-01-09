@@ -183,9 +183,10 @@ def init(config):
         # for all already completed tasks we update derived output schema for further label config validation
         for task_id in get_task_ids():
             task_with_completions = get_task_with_completions(task_id)
-            completions = task_with_completions['completions'] or []
-            for completion in completions:
-                _update_derived_output_schema(completion)
+            if task_with_completions and 'completions' in task_with_completions:
+                completions = task_with_completions['completions']
+                for completion in completions:
+                    _update_derived_output_schema(completion)
 
         print(f'{len(tasks)} tasks loaded from: {c["input_path"]}')
 
