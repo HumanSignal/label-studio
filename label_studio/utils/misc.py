@@ -201,8 +201,10 @@ def label_studio_init(output_dir):
     else:
         print(f'{default_output_dir} output directory already exists.')
 
+    print('')
     print(f'Label Studio has been successfully initialized. Check project states in {output_dir}')
-
+    print(f'Start the server: label-studio start {output_dir}')
+    
 
 def load_config(re_init_db=True):
     """ Combine args with json config
