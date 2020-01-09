@@ -149,7 +149,7 @@ def labeling():
                                  task_id=task_id, task_data=task_data, **find_editor_files())
 
 
-@app.route('/tasks')
+@app.route('/data')
 def tasks_page():
     """ Tasks and completions page: tasks.html
     """
@@ -163,7 +163,7 @@ def tasks_page():
     task_ids = sorted([(i, completed_at[i] if i in completed_at else '9') for i in task_ids], key=lambda x: x[1])
     task_ids = [i[0] for i in task_ids]  # take only id back
     analytics.send(getframeinfo(currentframe()).function)
-    return flask.render_template('tasks.html', config=c, label_config=label_config,
+    return flask.render_template('data.html', config=c, label_config=label_config,
                                  task_ids=task_ids, completions=db.get_completions_ids(),
                                  completed_at=completed_at)
 

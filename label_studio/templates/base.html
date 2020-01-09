@@ -8,7 +8,7 @@
   <link href="//fonts.googleapis.com/css?family=Dosis:500&amp;text=LabelStudio" rel="stylesheet" type="text/css">
   <link rel="shortcut icon" href="/static/favicon.ico"/>
   <link rel="stylesheet" href="/static/css/reset.css">
-  <link rel="stylesheet" href="/static/css/main.css">
+  <link rel="stylesheet" href="/static/css/main.css?v2">
   <link rel="stylesheet" href="/static/css/fontall.min.css">
   <link rel="stylesheet" href="/static/semantic/semantic.min.css">
 
@@ -40,7 +40,7 @@
     <a href="/" class="{% if url_for(request.endpoint) == '/' %}active{% endif %}">Labeling</a>
     <span class="delim">|</span>
 
-    <a href="/tasks" class="{% if url_for(request.endpoint) == '/tasks' %}active{% endif %}">Data</a>
+    <a href="/data" class="{% if url_for(request.endpoint) == '/data' %}active{% endif %}">Data</a>
     <span class="delim">|</span>
 
     <a href="/import" class="{% if url_for(request.endpoint) == '/import' %}active{% endif %}">Import</a>
@@ -63,3 +63,10 @@
 
   </ul>
 </div>
+
+{% block body %}
+  <div>Heidi is an Opossum!</div>
+{% endblock %}
+
+</body>
+</html>
