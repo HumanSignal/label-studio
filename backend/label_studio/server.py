@@ -567,7 +567,7 @@ def main():
 def main_open_browser():
     import threading, webbrowser
 
-    reload_config(prompt_inputs=True)
+    reload_config()
     port = c['port']
     browser_url = f'http://127.0.0.1:{port}'
     threading.Timer(1.25, lambda: webbrowser.open(browser_url)).start()
