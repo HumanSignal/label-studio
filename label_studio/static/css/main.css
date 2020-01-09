@@ -175,8 +175,10 @@ a {
 /* editor width */
 #label-studio {
     width: 100%;
+    max-width: 1440px;
     padding-left: 1em;
     padding-right: 1em;
+    margin: 0 auto;
 }
 
 #label-studio div[class^="App_editor"],
@@ -261,11 +263,6 @@ div[class*="App_editor"] {
     opacity: 1;
 }
 
-#import-tasks ul {
-    list-style: disc;
-    margin: 1em 0 0 2em;
-}
-
 .top-margin-none {
     margin-top: 0 !important;
 }
@@ -308,6 +305,21 @@ div[class*="App_editor"] {
 
 .ui .message .content {
     margin-top: 0.7em;
+}
+
+ul, ol {
+    list-style: none !important;
+    margin: 1em 0 0 2em;
+}
+
+.ui li::before {
+
+  content: "\2022";
+  color: rgba(0,0,0,0.4) !important;
+  font-weight: normal;
+  display: inline-block;
+  width: 1em;
+  margin-left: -1em;
 }
 
 /* semantic ui pretty finish */

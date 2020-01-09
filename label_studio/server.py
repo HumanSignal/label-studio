@@ -62,6 +62,8 @@ def reload_config(prompt_inputs=False, force=False):
 
     # Read config from config.json & input arguments (dont initialize any inner DBs)
     c = load_config(re_init_db=False)
+    if not c:
+        return False
 
     # If specified, prompt user in console about specific inputs
     if prompt_inputs:
@@ -88,6 +90,8 @@ def reload_config(prompt_inputs=False, force=False):
         if ml_backend_params:
             ml_backend = MLBackend.from_params(ml_backend_params)
             project.connect(ml_backend)
+
+    return True
 
 
 @app.template_filter('json')
@@ -149,7 +153,7 @@ def labeling():
                                  task_id=task_id, task_data=task_data, **find_editor_files())
 
 
-@app.route('/tasks')
+@app.route('/data')
 def tasks_page():
     """ Tasks and completions page: tasks.html
     """
@@ -163,7 +167,7 @@ def tasks_page():
     task_ids = sorted([(i, completed_at[i] if i in completed_at else '9') for i in task_ids], key=lambda x: x[1])
     task_ids = [i[0] for i in task_ids]  # take only id back
     analytics.send(getframeinfo(currentframe()).function)
-    return flask.render_template('tasks.html', config=c, label_config=label_config,
+    return flask.render_template('data.html', config=c, label_config=label_config,
                                  task_ids=task_ids, completions=db.get_completions_ids(),
                                  completed_at=completed_at)
 
@@ -570,11 +574,12 @@ def main():
 def main_open_browser():
     import threading, webbrowser
 
-    reload_config()
-    port = c['port']
-    browser_url = f'http://127.0.0.1:{port}'
-    threading.Timer(1.25, lambda: webbrowser.open(browser_url)).start()
-    app.run(host='0.0.0.0', port=c['port'], debug=False)
+    if reload_config():
+        port = c['port']
+        browser_url = f'http://127.0.0.1:{port}'
+        print(f'Start browser at URL: {browser_url}')
+        threading.Timer(1.25, lambda: webbrowser.open(browser_url)).start()
+        app.run(host='0.0.0.0', port=c['port'], debug=False)
 
 
 if __name__ == "__main__":

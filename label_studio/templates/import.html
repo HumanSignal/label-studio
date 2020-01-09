@@ -1,4 +1,5 @@
-{% include 'header.html' %}
+{% extends 'base.html' %}
+{% block body %}
 
 <!-- Import Data Dialog with Wait for Add more data -->
 
@@ -42,7 +43,7 @@
   <!-- Help message -->
   <div class="ui divider hidden"></div>
   <div class="ui" style="display: block !important;">
-    {% include "help_import.html" %}
+    {% include "import_help.html" %}
   </div>
 
 
@@ -218,5 +219,4 @@
   });
 </script>
 
-</body>
-</html>
+{% endblock %}

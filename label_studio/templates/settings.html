@@ -1,4 +1,5 @@
-{% include 'header.html' %}
+{% extends 'base.html' %}
+{% block body %}
 
 <link rel="stylesheet" href="static/css/codemirror.css">
 <style>
@@ -29,30 +30,7 @@
   <div class="ui wrapper">
     <form action="/api/save-config" method="post" class="ui form">
 
-      <!-- Help message about tags-->
-      <div class="ui message">
-        <i class="close icon"></i>
-        <div class="header">Configuration Help</div>
-        <div class="content">
-          Labeling interface is based on html-like tags, read more about what we support in our
-          <a href="https://labelstud.io/tags" target="_blank">documentation</a>. You can fully customize the appeareance and the workflow. You can fully customize the appearance and workflow. Tags values can use variables that start with "$" sign, and those correspond to the fields in imported JSON or CSV file.
-          <br>Try predefined configs:
-
-          <div class="ui grid stackable" style="margin: 0.7em auto;">
-            {% for category in templates %}
-              <div class="four wide column">
-                {% for t in templates[category] %}
-                  <div class="ui item"><a class="use-template no-go" href="#" data-value="{{ t.pk }}">{{ t.title }}</a>
-                  </div>
-                {% endfor %}
-              </div>
-            {% endfor %}
-          </div>
-
-        </div>
-      </div>
-
-      <br/>
+      {% include 'settings_help.html' %}
 
       <!-- Textarea & Preview in two cols -->
       <div class="ui two column grid zero-margin step2 stackable">
@@ -380,5 +358,4 @@
   });
 </script>
 
-</body>
-</html>
+{% endblock %}

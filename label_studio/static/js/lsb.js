@@ -1,7 +1,7 @@
 /*
  * Label Studio Backend - interlayer code that connects example server
  * implmenetation with the frontend part. At the moment it's based on
- * callbacks
+ * callbacks.
  */
 
 const API_URL = {
@@ -256,6 +256,11 @@ const LSB = function(elid, config, task) {
       if (!task) {
         ls.setFlags({ isLoading: true });
         loadNext(ls);
+      } else {
+          if (ls.completionStore.completions.length === 0) {
+              var c = ls.completionStore.addCompletion({ userGenerate: true });
+              ls.completionStore.selectCompletion(c.id);
+          }
       }
     },
   });

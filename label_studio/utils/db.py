@@ -173,12 +173,6 @@ def init(config):
 
         num_tasks_loaded = len(tasks)
 
-        if num_tasks_loaded == 0:
-            input_data_types = '\n'.join(f'"{t.tag}"' for t in input_data_tags)
-            raise ValueError(
-                f'We didn\'t find any tasks that match specified data types:\n{input_data_types}\n'
-                f'Please check input arguments and try again.')
-
         if num_tasks_loaded > 0:
             derived_input_schema = []
             for tag in input_data_tags:

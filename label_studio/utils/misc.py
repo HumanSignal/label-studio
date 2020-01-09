@@ -139,6 +139,74 @@ def config_comments_free(xml_config):
     return xml_config
 
 
+def label_studio_init(output_dir):
+    os.makedirs(output_dir, exist_ok=True)
+    default_config_file = os.path.join(output_dir, 'config.json')
+    default_label_config_file = os.path.join(output_dir, 'config.xml')
+    default_output_dir = os.path.join(output_dir, 'completions')
+    default_input_path = os.path.join(output_dir, 'tasks.json')
+
+    default_config = {
+        'title': 'Label Studio',
+        'port': 8200,
+        'debug': False,
+
+        'label_config': default_label_config_file,
+        'input_path': default_input_path,
+        'output_dir': default_output_dir,
+
+        'instruction': 'Type some <b>hypertext</b> for label experts!',
+        'allow_delete_completions': True,
+        'templates_dir': 'examples',
+
+        'editor': {
+            'debug': False
+        },
+
+        '!ml_backend': {
+            'url': 'http://localhost:9090',
+            'model_name': 'my_super_model'
+        },
+        'sampling': 'uniform'
+    }
+
+    # create input_path (tasks.json)
+    if not os.path.exists(default_input_path):
+        with io.open(default_input_path, mode='w') as fout:
+            json.dump([], fout, indent=2)
+        print(f'{default_input_path} input path has been created.')
+    else:
+        print(f'{default_input_path} input path already exists.')
+
+    # create config file (config.json)
+    if not os.path.exists(default_config_file):
+        with io.open(default_config_file, mode='w') as fout:
+            json.dump(default_config, fout, indent=2)
+        print(f'{default_config_file} config file has been created.')
+    else:
+        print(f'{default_config_file} config file already exists.')
+
+    # create label config (config.xml)
+    if not os.path.exists(default_label_config_file):
+        default_label_config = '<View></View>'
+        with io.open(default_label_config_file, mode='w') as fout:
+            fout.write(default_label_config)
+        print(f'{default_label_config_file} label config file has been created.')
+    else:
+        print(f'{default_label_config_file} label config file already exists.')
+
+    # create output dir (completions)
+    if not os.path.exists(default_output_dir):
+        os.makedirs(default_output_dir)
+        print(f'{default_output_dir} output directory has been created.')
+    else:
+        print(f'{default_output_dir} output directory already exists.')
+
+    print('')
+    print(f'Label Studio has been successfully initialized. Check project states in {output_dir}')
+    print(f'Start the server: label-studio start {output_dir}')
+    
+
 def load_config(re_init_db=True):
     """ Combine args with json config
 
@@ -148,41 +216,66 @@ def load_config(re_init_db=True):
         import argparse
 
         parser = argparse.ArgumentParser(description='Label studio')
-        parser.add_argument('-c', '--config', dest='config_path',
-                            default=os.path.join(os.path.dirname(__file__), '..', 'config.json'),
-                            help='backend config')
-        parser.add_argument('-l', '--label-config', dest='label_config', default='',
-                            help='label config path')
-        parser.add_argument('-i', '--input-path', dest='input_path', default='',
-                            help='input path to task file or directory with tasks')
-        parser.add_argument('-o', '--output-dir', dest='output_dir', default='',
-                            help='output directory for completions')
-        parser.add_argument('-p', '--port', dest='port', default=8200, type=int,
-                            help='backend port')
-        parser.add_argument('-v', '--verbose', action='store_true',
-                            help='increase output verbosity')
+
+        subparsers = parser.add_subparsers(dest='command', help='Available commands')
+
+        # init subcommand parser
+
+        parser_init = subparsers.add_parser('init', help='Initialize Label Studio')
+        parser_init.add_argument(
+            'project_name',
+            help='Path to directory where project state will be initialized')
+
+        # start subcommand parser
+
+        parser_start = subparsers.add_parser('start', help='Start Label Studio server')
+        parser_start.add_argument(
+            'project_name',
+            help='Path to directory where project state has been initialized'
+        )
+        parser_start.add_argument(
+            '-c', '--config', dest='config_path', default=os.path.join(os.path.dirname(__file__), '..', 'config.json'),
+            help='backend config')
+        parser_start.add_argument(
+            '-l', '--label-config', dest='label_config', default='',
+            help='label config path')
+        parser_start.add_argument(
+            '-i', '--input-path', dest='input_path', default='',
+            help='input path to task file or directory with tasks')
+        parser_start.add_argument(
+            '-o', '--output-dir', dest='output_dir', default='',
+            help='output directory for completions')
+        parser_start.add_argument(
+            '-p', '--port', dest='port', default=8200, type=int,
+            help='backend port')
+        parser_start.add_argument(
+            '-v', '--verbose', action='store_true',
+            help='increase output verbosity')
 
         args = parser.parse_args()
-        if args.verbose:
-            logging.basicConfig(level=logging.DEBUG)
+        if args.command == 'init':
+            label_studio_init(args.project_name)
+            return
+        else:
+            print('Working dir', os.getcwd())
+            config_path = os.path.join(args.project_name, 'config.json')
+            if not os.path.exists(config_path):
+                config_path = args.config_path
+            prev_config = None
 
-        print('Working dir', os.getcwd())
-        config_path = args.config_path
-        prev_config = None
+            while True:
+                c = json.load(open(config_path))
+                c['port'] = args.port if args.port else c['port']
+                c['label_config'] = args.label_config if args.label_config else c['label_config']
+                c['input_path'] = args.input_path if args.input_path else c['input_path']
+                c['output_dir'] = args.output_dir if args.output_dir else c['output_dir']
 
-        while True:
-            c = json.load(open(config_path))
-            c['port'] = args.port if args.port else c['port']
-            c['label_config'] = args.label_config if args.label_config else c['label_config']
-            c['input_path'] = args.input_path if args.input_path else c['input_path']
-            c['output_dir'] = args.output_dir if args.output_dir else c['output_dir']
+                # re-init db
+                if prev_config != c and re_init_db:
+                    print('Config changes detected, reloading DB')
+                    re_init(c)
 
-            # re-init db
-            if prev_config != c and re_init_db:
-                print('Config changes detected, reloading DB')
-                re_init(c)
-
-            yield c
+                yield c
 
     for new_config in generator():
         return new_config

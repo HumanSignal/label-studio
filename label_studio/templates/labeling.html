@@ -1,9 +1,10 @@
-{% include 'header.html' %}
+{% extends 'base.html' %}
+{% block body %}
 
 <script src="/static/js/lsb.js"></script>
 
 <!-- Editor -->
-<div class="ui content">
+<div class="content">
   <div id="label-studio">
     <div class="ui loader active inline centered"></div>
   </div>
@@ -16,5 +17,4 @@
   }
 </script>
 
-</body>
-</html>
+{% endblock %}

@@ -1,7 +1,7 @@
 ---
 title: Image Polygons
 type: templates
-order: 205
+order: 208
 ---
 
 Image polygons labeling
