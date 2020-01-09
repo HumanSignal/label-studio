@@ -1,8 +1,20 @@
 <ul class="menu-root">
   <% site.pages.find({ type: type }).sort('order').each(function (p) { %>
     <% var fileName = p.path.replace(/^.+?\/([\w-]+)\.html/, '$1') %>
+
+<% if (type === 'guide') { %>
+      <% if (fileName === 'config') { %>
+          <li><h4>Server</h4></li>
+      <% } %>
+
+      <% if (fileName === 'build') { %>
+          <li><h4>Frontend</h4></li>
+      <% } %>
+<% } %>
+
       <% if (type === 'tags') { %>
 
+      
       <% if (fileName === 'audio') { %>
           <!-- <div style="margin-top: 20px; margin-right: 40px; background: url(<%- url_for("/images/wave.png") %>) repeat-x; opacity: 0.4; background-size: 20px; height: 20px;"></div> -->
           <li><h4>Objects</h4></li>

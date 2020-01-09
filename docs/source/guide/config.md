@@ -4,13 +4,11 @@ type: guide
 order: 505
 ---
 
-## Input data
+## Import data
 
-Input data stream could be specified:
+You can import the data directly through the web interfaces available [http://127.0.0.1:8200/import](here) or alternatively by directly specifying the paths in your project folder. Edit server configuration file under [`"input_path"` option](config.md#input_path)
 
-- in console when prompted while running `label-studio` app
-- as input argument for server script `python server.py -i input_path`
-- in server configuration file under [`"input_path"` option](config.md#input_path)
+Supported file formats are:
 
 ### JSON file
 
@@ -74,13 +72,9 @@ Each file is used to create one task.
 
 Supported formats are `.wav, .aiff, .mp3, .au, .flac`
    
-## Output data
+## Export data
 
-The output data is stored in _completions_ - JSON formatted files, one per each completed task saved in directory specified by one of the following option:
-
-- in console when prompted while running `label-studio` app
-- as input argument for server script `python server.py -o output_dir`
-- in server configuration file under [`"output_dir"` option](config.md#output_dir)
+The output data is stored in _completions_ - JSON formatted files, one per each completed task saved in project directory in `completions` folder or in the [`"output_dir"` option](config.md#output_dir)
 
 The example structure of _completion_ is the following:
 
@@ -221,23 +215,10 @@ Machine learning predictions (aka _prelabeling results_)
 
 Path to local file from where current task was taken
 
-
-## Label config
-
-UI configuration is based on XML-like tags, which internally are mapped into the associated React classes. Tags can be divided into three categories:
-
-- Visual tags used for visual only elements
-(non-interactive), examples: **View**, **Header**. 
-- Control tags used to label the objects, examples: **Labels**, **Choices**, **Rating**, **TextArea**. 
-- Object tags used to show elements that can be labeled: **Image**, **Text**, **Audio**, **AudioPlus**.
-
-<a class="button" href="/tags/">Explore Tags</a>
-
-
 ## Server config
 
-Whether you start Label Studio via `label-studio` executable or `server.py` script, it reads server configuration settings from _config.json_ file.
-You can modify this file, or right your own and start Label Studio with
+Whether you start Label Studio via `label-studio` executable or `server.py` script directly, it reads server configuration settings from _config.json_ file located inside the project directory.
+You can modify this file, or create your own and pass it to Label Studio.
 
 ```bash
 python server.py -c your_config.json
