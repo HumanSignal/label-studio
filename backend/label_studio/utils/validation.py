@@ -1,6 +1,9 @@
 import logging
-try import ujson as json except import json
 from .exceptions import ValidationError
+try:
+    import ujson as json
+except:
+    import json
 
 
 class SkipField(Exception):

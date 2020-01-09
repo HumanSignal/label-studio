@@ -1,7 +1,10 @@
 # big chunks of code
 import os
-try import ujson as json except import json
 from lxml import etree
+try:
+    import ujson as json
+except:
+    import json
 
 # examples for import tasks
 _DATA_EXAMPLES = None

@@ -7,8 +7,11 @@ import zipfile
 import rarfile
 import logging
 import tempfile
-try import ujson as json except import json
 import pandas as pd
+try:
+    import ujson as json
+except:
+    import json
 
 from os.path import join
 from .exceptions import ValidationError
