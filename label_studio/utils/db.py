@@ -183,9 +183,16 @@ def init(config):
             derived_input_schema = []
             for tag in input_data_tags:
                 derived_input_schema.append({
-                    'tag': tag.tag,
+                    'type': tag.tag,
                     'value': tag.attrib['value'].lstrip('$')
                 })
+
+        # for all already completed tasks we update derived output schema for further label config validation
+        for task_id in get_task_ids():
+            task_with_completions = get_task_with_completions(task_id)
+            completions = task_with_completions['completions']
+            for completion in completions:
+                _update_derived_output_schema(completion)
 
         print(f'{len(tasks)} tasks loaded from: {c["input_path"]}')
 
@@ -302,16 +309,20 @@ def get_task_with_completions(task_id):
 
 
 def _update_derived_output_schema(completion):
+    """
+    Given completion, output schema is updated. Output schema consists of unique tuples (from_name, to_name, type)
+    and list of unique labels derived from existed completions
+    :param completion:
+    :return:
+    """
     global derived_output_schema
 
-    if not len(completion):
-        return
-
-    for result in completion[0]['result']:
-        derived_output_schema['from_name_to_name_type'].add(
+    for result in completion['result']:
+        derived_output_schema['from_name_to_name_type'].add((
             result['from_name'], result['to_name'], result['type']
-        )
-        derived_output_schema['labels']['from_name'].add(tuple(result['value'][result['type']]))
+        ))
+        for label in result['value'][result['type']]:
+            derived_output_schema['labels'][result['from_name']].add(label)
 
 
 def save_completion(task_id, completion):

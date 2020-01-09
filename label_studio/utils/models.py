@@ -149,18 +149,19 @@ class Project(object):
         if isinstance(config, str):
             config = parse_config(config)
         input_types, input_values = set(), set()
-        for i in map(itemgetter('inputs'), config.values()):
-            input_types.add(i['type'])
-            input_values.add(i['value'])
+        for input_items in map(itemgetter('inputs'), config.values()):
+            for input_item in input_items:
+                input_types.add(input_item['type'])
+                input_values.add(input_item['value'])
         for item in input_schema:
             if item['type'] not in input_types:
                 raise ValidationError(
                     f'You\'ve already imported tasks of type {item["type"]}, '
-                    f'but this type is not found among input types exposed by label config: {list(input_types)}')
+                    f'but this type is not found among input types: {list(input_types)}')
             if item['value'] not in input_values:
                 raise ValidationError(
-                    f'You\'ve already imported tasks with keys "{item["type"]}", '
-                    f'but this key is not found among input tag attribute "value" exposed by label config:'
+                    f'You\'ve already imported tasks with keys "{item["value"]}", '
+                    f'but this key is not found among input tags attributes "value":'
                     f' {list(input_values)}')
 
     @classmethod
@@ -176,8 +177,9 @@ class Project(object):
             config = parse_config(config)
 
         completion_tuples = set()
+
         for from_name, to in config.items():
-            completion_tuples.add((from_name, to['to_name'], to['type']))
+            completion_tuples.add((from_name, to['to_name'][0], to['type'].lower()))
 
         for from_name, to_name, type in output_schema['from_name_to_name_type']:
             if (from_name, to_name, type) not in completion_tuples:
@@ -192,11 +194,11 @@ class Project(object):
                     f'name={from_name} is expected'
                 )
             found_labels = set(config[from_name]['labels'])
-            extra_labels = list(found_labels - expected_label_set)
+            extra_labels = list(expected_label_set - found_labels)
             if extra_labels:
                 raise ValidationError(
                     f'You\'ve already completed some tasks, but some of them couldn\'t be loaded with this config: '
-                    f'there are labels already created for tag with name={from_name}:\n{extra_labels}'
+                    f'there are labels already created for "{from_name}":\n{extra_labels}'
                 )
 
     @classmethod
