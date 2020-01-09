@@ -1,6 +1,9 @@
 import os
 import pkg_resources
 
+from contextlib import contextmanager
+from tempfile import mkstemp
+
 
 def find_node(package_name, node_path, node_type):
     assert node_type in ('dir', 'file', 'any')
@@ -43,3 +46,10 @@ def find_editor_files():
     editor_js = [f'/static/editor/js/{f}' for f in os.listdir(editor_js_dir) if f.endswith('.js')]
     editor_css = [f'/static/editor/css/{f}' for f in os.listdir(editor_css_dir) if f.endswith('.css')]
     return {'editor_css': editor_css, 'editor_js': editor_js}
+
+
+@contextmanager
+def get_temp_file():
+    fd, path = mkstemp()
+    yield path
+    os.close(fd)

@@ -9,12 +9,13 @@ import logging
 import hashlib
 import pandas as pd
 try import ujson as json except import json
+import tarfile
 
 from urllib.parse import unquote
 from datetime import datetime
 from copy import deepcopy
 from inspect import currentframe, getframeinfo
-from flask import request, jsonify, make_response, Response, Response as HttpResponse
+from flask import request, jsonify, make_response, Response, Response as HttpResponse, send_file
 from flask_api import status
 
 import label_studio.utils.db as db
@@ -22,7 +23,7 @@ from label_studio.utils.functions import generate_sample_task
 from label_studio.utils.analytics import Analytics
 from label_studio.utils.models import DEFAULT_PROJECT_ID, Project, MLBackend
 from label_studio.utils.prompts import LabelStudioConfigPrompt
-from label_studio.utils.io import find_file, find_dir, find_editor_files
+from label_studio.utils.io import find_file, find_dir, find_editor_files, get_temp_file
 from label_studio.utils import uploader
 from label_studio.utils.validation import TaskValidator
 from label_studio.utils.exceptions import ValidationError
@@ -399,6 +400,18 @@ def api_import():
     }), status.HTTP_201_CREATED)
 
 
+@app.route('/api/export', methods=['GET'])
+def api_export():
+    global c
+
+    output_dir = c['output_dir']
+    with get_temp_file() as temp_file:
+        archive_name = temp_file + '.tar.gz'
+        with tarfile.open(archive_name, mode='w:gz') as archive:
+            archive.add(output_dir, recursive=True)
+        return send_file(archive_name)
+
+
 @app.route(f'/api/projects/{DEFAULT_PROJECT_ID}/next/', methods=['GET'])
 @exception_treatment
 def api_generate_next_task():
@@ -554,11 +567,11 @@ def main():
 def main_open_browser():
     import threading, webbrowser
 
-    reload_config(prompt_inputs=True)
+    reload_config()
     port = c['port']
     browser_url = f'http://127.0.0.1:{port}'
     threading.Timer(1.25, lambda: webbrowser.open(browser_url)).start()
-    app.run(host='0.0.0.0', port=c['port'], debug=c['debug'])
+    app.run(host='0.0.0.0', port=c['port'], debug=False)
 
 
 if __name__ == "__main__":

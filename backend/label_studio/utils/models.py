@@ -148,9 +148,10 @@ class Project(object):
         # toName points to existent name
         names = set(all_names)
         toNames = re.findall(r'toName="([^"]*)"', config_string)
-        for toName in toNames:
-            if toName not in names:
-                raise ValidationError(f'toName="{toName}" not found in names: {sorted(names)}')
+        for toName_ in toNames:
+            for toName in toName_.split(','):
+                if toName not in names:
+                    raise ValidationError(f'toName="{toName}" not found in names: {sorted(names)}')
 
 
 class BaseHTTPAPI(object):
