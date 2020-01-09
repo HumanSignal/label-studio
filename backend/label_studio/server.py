@@ -8,8 +8,11 @@ import flask
 import logging
 import hashlib
 import pandas as pd
-try import ujson as json except import json
 import tarfile
+try:
+    import ujson as json
+except:
+    import json
 
 from urllib.parse import unquote
 from datetime import datetime
