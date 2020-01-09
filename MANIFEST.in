@@ -1,0 +1,1 @@
+include label_studio/examples/*/*.xml

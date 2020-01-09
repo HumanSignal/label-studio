@@ -179,7 +179,7 @@ def label_config_page():
     global c, project
     reload_config()
 
-    templates = get_config_templates(c['templates_dir'])
+    templates = get_config_templates()
     analytics.send(getframeinfo(currentframe()).function)
     return flask.render_template('settings.html', config=c, project=project, templates=templates)
 
