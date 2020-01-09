@@ -129,7 +129,7 @@ def send_log():
 
 
 @app.route('/')
-def labeling():
+def labeling_page():
     """ Label studio frontend: task labeling
     """
     global c
@@ -151,6 +151,16 @@ def labeling():
     analytics.send(getframeinfo(currentframe()).function)
     return flask.render_template('labeling.html', config=c, label_config_line=label_config_line,
                                  task_id=task_id, task_data=task_data, **find_editor_files())
+
+
+@app.route('/welcome')
+def welcome_page():
+    """ Label studio frontend: task labeling
+    """
+    global c, project
+    reload_config()
+    analytics.send(getframeinfo(currentframe()).function)
+    return flask.render_template('welcome.html', config=c, project=project)
 
 
 @app.route('/data')
