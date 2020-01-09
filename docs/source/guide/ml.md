@@ -1,5 +1,5 @@
 ---
-title: Machine Learning
+title: Integrate machine learning
 type: guide
 order: 1030
 ---

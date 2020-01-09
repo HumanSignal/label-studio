@@ -1,5 +1,5 @@
 ---
-title: Frontend
+title: Embed frontend
 type: guide
 order: 1010
 ---
