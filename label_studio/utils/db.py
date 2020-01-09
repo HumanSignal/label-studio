@@ -166,11 +166,11 @@ def init(config):
             else:
                 logger.warning(f'Unrecognized file format for file {f}')
 
-        if len(tasks) == 0:
-            input_data_types = '\n'.join(f'"{t.tag}"' for t in input_data_tags)
-            raise ValueError(
-                f'We didn\'t find any tasks that match specified data types:\n{input_data_types}\n'
-                f'Please check input arguments and try again.')
+        # if len(tasks) == 0:
+        #     input_data_types = '\n'.join(f'"{t.tag}"' for t in input_data_tags)
+        #     raise ValueError(
+        #         f'We didn\'t find any tasks that match specified data types:\n{input_data_types}\n'
+        #         f'Please check input arguments and try again.')
         print(f'{len(tasks)} tasks loaded from: {c["input_path"]}')
 
 
