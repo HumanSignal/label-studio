@@ -26,14 +26,14 @@ from label_studio.utils.functions import generate_sample_task
 from label_studio.utils.analytics import Analytics
 from label_studio.utils.models import DEFAULT_PROJECT_ID, Project, MLBackend
 from label_studio.utils.prompts import LabelStudioConfigPrompt
-from label_studio.utils.io import find_file, find_dir, find_editor_files, get_temp_file
+from label_studio.utils.io import find_dir, find_editor_files, get_temp_file
 from label_studio.utils import uploader
 from label_studio.utils.validation import TaskValidator
 from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.functions import generate_sample_task_without_check, data_examples
 from label_studio.utils.misc import (
     exception_treatment, log_config, log, load_config, config_line_stripped, config_comments_free,
-    get_config_templates
+    get_config_templates, parse_input_args
 )
 
 logger = logging.getLogger(__name__)
@@ -588,6 +588,7 @@ def get_data_file(filename):
 
 
 def main():
+    parse_input_args()
     reload_config()
     app.run(host='0.0.0.0', port=c['port'], debug=c['debug'])
 
@@ -595,6 +596,8 @@ def main():
 def main_open_browser():
     import threading
     import webbrowser
+
+    parse_input_args()
 
     if reload_config():
         port = c['port']

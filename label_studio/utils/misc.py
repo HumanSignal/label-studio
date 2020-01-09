@@ -18,6 +18,11 @@ from .db import re_init
 from label_studio.utils.io import find_file, find_dir
 
 
+input_args = None
+config_path = None
+prev_config = None
+
+
 # settings from django analogue
 class Settings:
     TASKS_MAX_NUMBER = 250000
@@ -209,105 +214,105 @@ def label_studio_init(output_dir, label_config=None):
     print('')
     print(f'Label Studio has been successfully initialized. Check project states in {output_dir}')
     print(f'Start the server: label-studio start {output_dir}')
-    
+
 
 def load_config(re_init_db=True):
+    global input_args, config_path
+
+    c = json.load(open(config_path))
+    c['port'] = input_args.port if input_args.port else c['port']
+    c['label_config'] = input_args.label_config if input_args.label_config else c['label_config']
+    c['input_path'] = input_args.input_path if input_args.input_path else c['input_path']
+    c['output_dir'] = input_args.output_dir if input_args.output_dir else c['output_dir']
+
+    # re-init db
+    if prev_config != c and re_init_db:
+        print('Config changes detected, reloading DB')
+        re_init(c)
+
+    return c
+
+
+def parse_input_args():
     """ Combine args with json config
 
     :return: config dict
     """
-    def generator():
-        import sys
-        import argparse
+    import sys
+    import argparse
 
-        # if no arguments passed make 'server.py start default'
-        if len(sys.argv) == 1:
-            sys.argv += ['start', 'default']
+    global input_args, config_path, prev_config
 
-        parser = argparse.ArgumentParser(description='Label studio')
+    # if no arguments passed make 'server.py start default'
+    if len(sys.argv) == 1:
+        sys.argv += ['start', 'default']
 
-        subparsers = parser.add_subparsers(dest='command', help='Available commands')
+    parser = argparse.ArgumentParser(description='Label studio')
 
-        # init sub-command parser
+    subparsers = parser.add_subparsers(dest='command', help='Available commands')
 
-        available_templates = [os.path.basename(os.path.dirname(f)) for f in iter_config_templates()]
+    # init sub-command parser
 
-        parser_init = subparsers.add_parser('init', help='Initialize Label Studio')
-        parser_init.add_argument(
-            'project_name',
-            help='Path to directory where project state will be initialized')
-        parser_init.add_argument(
-            '--template', dest='template', choices=available_templates,
-            help='Choose from predefined project templates'
-        )
+    available_templates = [os.path.basename(os.path.dirname(f)) for f in iter_config_templates()]
 
-        # start sub-command parser
+    parser_init = subparsers.add_parser('init', help='Initialize Label Studio')
+    parser_init.add_argument(
+        'project_name',
+        help='Path to directory where project state will be initialized')
+    parser_init.add_argument(
+        '--template', dest='template', choices=available_templates,
+        help='Choose from predefined project templates'
+    )
 
-        parser_start = subparsers.add_parser('start', help='Start Label Studio server')
-        parser_start.add_argument(
-            'project_name',
-            help='Path to directory where project state has been initialized'
-        )
-        parser_start.add_argument(
-            '--init', dest='init', action='store_true',
-            help='Initialize if project is not initialized yet'
-        )
-        parser_start.add_argument(
-            '--template', dest='template', choices=available_templates,
-            help='Choose from predefined project templates'
-        )
-        parser_start.add_argument(
-            '-c', '--config', dest='config_path', default=os.path.join(os.path.dirname(__file__), '..', 'config.json'),
-            help='backend config')
-        parser_start.add_argument(
-            '-l', '--label-config', dest='label_config', default='',
-            help='label config path')
-        parser_start.add_argument(
-            '-i', '--input-path', dest='input_path', default='',
-            help='input path to task file or directory with tasks')
-        parser_start.add_argument(
-            '-o', '--output-dir', dest='output_dir', default='',
-            help='output directory for completions')
-        parser_start.add_argument(
-            '-p', '--port', dest='port', default=8200, type=int,
-            help='backend port')
-        parser_start.add_argument(
-            '-v', '--verbose', action='store_true',
-            help='increase output verbosity')
+    # start sub-command parser
 
-        args = parser.parse_args()
-        if args.label_config:
-            label_config = args.label_config
-        elif args.template:
-            label_config = os.path.join(find_dir('examples'), args.template, 'config.xml')
-        else:
-            label_config = None
-        if args.command == 'init' or args.init:
-            label_studio_init(args.project_name, label_config)
-            if args.command == 'init':
-                return
-        print('Working dir', os.getcwd())
-        config_path = os.path.join(args.project_name, 'config.json')
-        if not os.path.exists(config_path):
-            config_path = args.config_path
-        prev_config = None
+    parser_start = subparsers.add_parser('start', help='Start Label Studio server')
+    parser_start.add_argument(
+        'project_name',
+        help='Path to directory where project state has been initialized'
+    )
+    parser_start.add_argument(
+        '--init', dest='init', action='store_true',
+        help='Initialize if project is not initialized yet'
+    )
+    parser_start.add_argument(
+        '--template', dest='template', choices=available_templates,
+        help='Choose from predefined project templates'
+    )
+    parser_start.add_argument(
+        '-c', '--config', dest='config_path', default=os.path.join(os.path.dirname(__file__), '..', 'config.json'),
+        help='backend config')
+    parser_start.add_argument(
+        '-l', '--label-config', dest='label_config', default='',
+        help='label config path')
+    parser_start.add_argument(
+        '-i', '--input-path', dest='input_path', default='',
+        help='input path to task file or directory with tasks')
+    parser_start.add_argument(
+        '-o', '--output-dir', dest='output_dir', default='',
+        help='output directory for completions')
+    parser_start.add_argument(
+        '-p', '--port', dest='port', default=8200, type=int,
+        help='backend port')
+    parser_start.add_argument(
+        '-v', '--verbose', action='store_true',
+        help='increase output verbosity')
 
-        while True:
-            c = json.load(open(config_path))
-            c['port'] = args.port if args.port else c['port']
-            c['label_config'] = args.label_config if args.label_config else c['label_config']
-            c['input_path'] = args.input_path if args.input_path else c['input_path']
-            c['output_dir'] = args.output_dir if args.output_dir else c['output_dir']
-
-            # re-init db
-            if prev_config != c and re_init_db:
-                print('Config changes detected, reloading DB')
-                re_init(c)
-
-            yield c
-
-    for new_config in generator():
-        return new_config
+    input_args = parser.parse_args()
+    if input_args.label_config:
+        label_config = input_args.label_config
+    elif input_args.template:
+        label_config = os.path.join(find_dir('examples'), input_args.template, 'config.xml')
+    else:
+        label_config = None
+    if input_args.command == 'init' or input_args.init:
+        label_studio_init(input_args.project_name, label_config)
+        if input_args.command == 'init':
+            return
+    print('Working dir', os.getcwd())
+    config_path = os.path.join(input_args.project_name, 'config.json')
+    if not os.path.exists(config_path):
+        config_path = input_args.config_path
 
 
 class LabelConfigParser(object):
