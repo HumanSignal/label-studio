@@ -43,6 +43,9 @@
     <a href="/import" class="{% if url_for(request.endpoint) == '/import' %}active{% endif %}">Import</a>
     <span class="delim">|</span>
 
+      <a href="/api/export" class="{% if url_for(request.endpoint) == '/export' %}active{% endif %}">Export</a>
+        <span class="delim">|</span>
+
     <a href="/" class="{% if url_for(request.endpoint) == '/' %}active{% endif %}">Labeling</a>
     <span class="delim">|</span>
 
