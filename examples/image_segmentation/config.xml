@@ -1,8 +1,0 @@
-<!-- {"title": "Image brush labeling", "category": "image"} -->
-<View>
-  <Image name="img" value="$image"></Image>
-  <BrushLabels name="tag" toName="img">
-    <Label value="Planet"></Label>
-    <Label value="Moonwalker" background="blue"></Label>
-  </BrushLabels>
-</View>
