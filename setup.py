@@ -1,7 +1,7 @@
 import setuptools
 
 # Package version
-version = '0.0.1'
+version = '0.4.0rc3'
 
 # Readme
 with open('README.md', 'r') as f:
@@ -21,6 +21,7 @@ setuptools.setup(
     long_description_content_type='text/markdown',
     url='https://github.com/heartexlabs/label-studio',
     packages=setuptools.find_packages(),
+    include_package_data=True,
     classifiers=[
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: MIT License',
