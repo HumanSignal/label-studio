@@ -157,7 +157,7 @@ def load_tasks(request, temp_dir):
     """
     # take tasks from request FILES
     if len(request.FILES):
-        check_file_sizes_and_number(request.FILES)
+        # check_file_sizes_and_number(request.FILES)
         files = aggregate_files(request.FILES, temp_dir)
         tasks = aggregate_tasks(files)
 
