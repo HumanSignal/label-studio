@@ -8,6 +8,7 @@ import json  # it MUST be included after flask!
 import inspect
 import pkg_resources
 
+from shutil import copy2
 from collections import defaultdict
 from appdirs import user_config_dir
 from pythonjsonlogger import jsonlogger
@@ -139,12 +140,15 @@ def config_comments_free(xml_config):
     return xml_config
 
 
-def label_studio_init(output_dir):
+def label_studio_init(output_dir, label_config=None):
     os.makedirs(output_dir, exist_ok=True)
     default_config_file = os.path.join(output_dir, 'config.json')
     default_label_config_file = os.path.join(output_dir, 'config.xml')
     default_output_dir = os.path.join(output_dir, 'completions')
     default_input_path = os.path.join(output_dir, 'tasks.json')
+
+    if label_config:
+        copy2(label_config, default_label_config_file)
 
     default_config = {
         'title': 'Label Studio',
@@ -221,10 +225,16 @@ def load_config(re_init_db=True):
 
         # init subcommand parser
 
+        available_templates = [os.path.basename(os.path.dirname(f)) for f in iter_config_templates()]
+
         parser_init = subparsers.add_parser('init', help='Initialize Label Studio')
         parser_init.add_argument(
             'project_name',
             help='Path to directory where project state will be initialized')
+        parser_init.add_argument(
+            '--template', dest='template', choices=available_templates,
+            help='Choose from predefined project templates'
+        )
 
         # start subcommand parser
 
@@ -232,6 +242,14 @@ def load_config(re_init_db=True):
         parser_start.add_argument(
             'project_name',
             help='Path to directory where project state has been initialized'
+        )
+        parser_start.add_argument(
+            '--init', dest='init', action='store_true',
+            help='Initialize if project is not initialized yet'
+        )
+        parser_start.add_argument(
+            '--template', dest='template', choices=available_templates,
+            help='Choose from predefined project templates'
         )
         parser_start.add_argument(
             '-c', '--config', dest='config_path', default=os.path.join(os.path.dirname(__file__), '..', 'config.json'),
@@ -253,29 +271,35 @@ def load_config(re_init_db=True):
             help='increase output verbosity')
 
         args = parser.parse_args()
-        if args.command == 'init':
-            label_studio_init(args.project_name)
-            return
+        if args.label_config:
+            label_config = args.label_config
+        elif args.template:
+            label_config = os.path.join(find_dir('examples'), args.template, 'config.xml')
         else:
-            print('Working dir', os.getcwd())
-            config_path = os.path.join(args.project_name, 'config.json')
-            if not os.path.exists(config_path):
-                config_path = args.config_path
-            prev_config = None
+            label_config = None
+        if args.command == 'init' or args.init:
+            label_studio_init(args.project_name, label_config)
+            if args.command == 'init':
+                return
+        print('Working dir', os.getcwd())
+        config_path = os.path.join(args.project_name, 'config.json')
+        if not os.path.exists(config_path):
+            config_path = args.config_path
+        prev_config = None
 
-            while True:
-                c = json.load(open(config_path))
-                c['port'] = args.port if args.port else c['port']
-                c['label_config'] = args.label_config if args.label_config else c['label_config']
-                c['input_path'] = args.input_path if args.input_path else c['input_path']
-                c['output_dir'] = args.output_dir if args.output_dir else c['output_dir']
+        while True:
+            c = json.load(open(config_path))
+            c['port'] = args.port if args.port else c['port']
+            c['label_config'] = args.label_config if args.label_config else c['label_config']
+            c['input_path'] = args.input_path if args.input_path else c['input_path']
+            c['output_dir'] = args.output_dir if args.output_dir else c['output_dir']
 
-                # re-init db
-                if prev_config != c and re_init_db:
-                    print('Config changes detected, reloading DB')
-                    re_init(c)
+            # re-init db
+            if prev_config != c and re_init_db:
+                print('Config changes detected, reloading DB')
+                re_init(c)
 
-                yield c
+            yield c
 
     for new_config in generator():
         return new_config
@@ -351,18 +375,23 @@ def parse_config(config_string):
     return outputs
 
 
-def get_config_templates(root_dir):
+def iter_config_templates():
+    templates_dir = find_dir('examples')
+    for d in os.listdir(templates_dir):
+        # check xml config file exists
+        path = os.path.join(templates_dir, d, 'config.xml')
+        if not os.path.exists(path):
+            continue
+        yield path
+
+
+def get_config_templates():
     """ Get label config templates from directory (as usual 'examples' directory)
     """
     from collections import defaultdict
     templates = defaultdict(list)
 
-    for i, d in enumerate(os.listdir(root_dir)):
-        # check xml config file exists
-        path = os.path.join(root_dir, d, 'config.xml')
-        if not os.path.exists(path):
-            continue
-
+    for i, path in enumerate(iter_config_templates()):
         # open and check xml
         code = open(path).read()
         try:

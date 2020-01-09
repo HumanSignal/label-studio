@@ -1,6 +1,6 @@
 import setuptools
 
-# Package version
+# Package versio
 version = '0.4.0rc3'
 
 # Readme
