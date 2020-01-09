@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block body %}
+
+  <div class="ui container" id="export">
+    <!-- Export help message -->
+    <div class="ui message">
+      <i class="close icon"></i>
+
+      <!-- Label config -->
+      <div class="header">Export help</div>
+      <div class="content">
+        <ul class="ui list">
+          <li>Here you can export task completions in Label Studio Format as JSON file.</li>
+          <li>You can
+            <a target="_blank" class="no-go" href="https://github.com/heartexlabs/converter">manually convert</a>
+            exported Label Studio JSON file to formats below:</li>
+          <ul>
+            <li>CSV, TSV</li>
+            <li>CoNLL 2003
+              <span class="ui label basic tiny">named entity recognition</span>
+            </li>
+            <li>COCO
+              <span class="ui label basic tiny">image segmentation</span>
+              <span class="ui label basic tiny">semantic segmentation</span>
+            </li>
+            <li>Pascal VOC XML
+              <span class="ui label basic tiny">image segmentation</span>
+              <span class="ui label basic tiny">semantic segmentation</span>
+            </li>
+          </ul>
+
+          <li>We extend our converter formats constantly and if your format is missed contact us
+            <a class="no-go" href="https://docs.google.com/forms/d/e/1FAIpQLSdLHZx5EeT1J350JPwnY2xLanfmvplJi6VZk65C2R4XSsRBHg/viewform">via Slack</a>!
+          </li>
+        </ul>
+      </div>
+      <br>
+
+    </div>
+
+    <center>
+      <br>
+      <a class="ui button positive center" href="/api/export">Export Completions</a>
+    </center>
+    <br/>
+
+    <center>
+      <div style="margin-top: 5em">
+        <img src="static/images/opossum_snuggle.svg" width="250px">
+      </div>
+    </center>
+{% endblock %}

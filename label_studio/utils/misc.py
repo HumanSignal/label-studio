@@ -217,13 +217,18 @@ def load_config(re_init_db=True):
     :return: config dict
     """
     def generator():
+        import sys
         import argparse
+
+        # if no arguments passed make 'server.py start default'
+        if len(sys.argv) == 1:
+            sys.argv += ['start', 'default']
 
         parser = argparse.ArgumentParser(description='Label studio')
 
         subparsers = parser.add_subparsers(dest='command', help='Available commands')
 
-        # init subcommand parser
+        # init sub-command parser
 
         available_templates = [os.path.basename(os.path.dirname(f)) for f in iter_config_templates()]
 
@@ -236,7 +241,7 @@ def load_config(re_init_db=True):
             help='Choose from predefined project templates'
         )
 
-        # start subcommand parser
+        # start sub-command parser
 
         parser_start = subparsers.add_parser('start', help='Start Label Studio server')
         parser_start.add_argument(
