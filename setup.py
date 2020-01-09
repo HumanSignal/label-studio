@@ -1,7 +1,7 @@
 import setuptools
-import os
-import io
-import json
+
+# Package version
+version = '0.0.1'
 
 # Readme
 with open('README.md', 'r') as f:
@@ -10,15 +10,6 @@ with open('README.md', 'r') as f:
 # Module dependencies
 with open('requirements.txt') as f:
     requirements = f.read().splitlines()
-
-
-# Sync module version with npm package version
-version = '0.0.1'  # default version
-package_file = os.path.join(os.path.dirname(__file__), '..', 'package.json')
-if os.path.exists(package_file):
-    with io.open(package_file) as f:
-        info = json.load(f)
-        version = info.get('version', version)
 
 setuptools.setup(
     name='label-studio',
