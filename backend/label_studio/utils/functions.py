@@ -1,6 +1,6 @@
 # big chunks of code
 import os
-import ujson as json
+try import ujson as json except import json
 from lxml import etree
 
 # examples for import tasks

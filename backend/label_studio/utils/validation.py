@@ -1,5 +1,5 @@
 import logging
-import ujson as json
+try import ujson as json except import json
 from .exceptions import ValidationError
 
 

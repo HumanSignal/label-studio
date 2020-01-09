@@ -8,7 +8,7 @@ import flask
 import logging
 import hashlib
 import pandas as pd
-import ujson as json  # it MUST be included after flask!
+try import ujson as json except import json
 
 from urllib.parse import unquote
 from datetime import datetime
@@ -164,7 +164,7 @@ def tasks_page():
                                  completed_at=completed_at)
 
 
-@app.route('/label-config')
+@app.route('/settings')
 def label_config_page():
     """ Setup label config
     """
@@ -173,7 +173,7 @@ def label_config_page():
 
     templates = get_config_templates(c['templates_dir'])
     analytics.send(getframeinfo(currentframe()).function)
-    return flask.render_template('label_config.html', config=c, project=project, templates=templates)
+    return flask.render_template('settings.html', config=c, project=project, templates=templates)
 
 
 @app.route('/import')

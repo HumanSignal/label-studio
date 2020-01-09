@@ -7,7 +7,7 @@ import zipfile
 import rarfile
 import logging
 import tempfile
-import ujson as json
+try import ujson as json except import json
 import pandas as pd
 
 from os.path import join

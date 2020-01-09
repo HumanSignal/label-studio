@@ -60,6 +60,11 @@
           <h3>Labeling Config</h3>
           <textarea name="label_config" cols="40" rows="10" class="project-form htx-html-editor"
                     id="id_label_config">{{ project.label_config_full | safe }}</textarea>
+          <!-- Submit button -->
+          <br/>
+          <input type="submit" disabled id="submit_form"
+                 class="project-form field ui button positive centered" value="Save"
+                 onclick="create_project(event)"/>
         </div>
         <div class="column" style="padding-left: 0;">
 
@@ -79,15 +84,7 @@
 
       <!-- Buttons Back / Next -->
       <div class="ui error message validation"></div>
-      <br/>
-
-      <!-- Submit button -->
-      <center>
-        <input type="submit" disabled id="submit_form"
-               class="project-form field ui button positive centered" value="Save"
-               onclick="create_project(event)"/>
-      </center>
-      <br/>
+      <br/>      
     </form>
 
     <!-- Error dialog -->
@@ -290,7 +287,8 @@
         iframe.attr('id', 'render-editor');
         iframe.show();
         // set height for iframe
-        let obj = document.getElementById('render-editor');
+          let obj = document.getElementById('render-editor');
+          obj.style.width = "100%";
         obj.style.height = (obj.contentWindow.document.body.scrollHeight + 30) + 'px';
         // hide "..."
         $('#preload-editor').hide();

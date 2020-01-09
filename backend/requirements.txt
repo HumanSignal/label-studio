@@ -29,7 +29,6 @@ Werkzeug==0.16.0
 orjson==2.1.3
 PyInquirer==1.0.3
 rarfile>=3.1
-ujson>=1.35
 flask_api>=2.0
 pandas>=0.24.0
 jsonschema>=3.2.0

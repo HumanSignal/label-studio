@@ -7,7 +7,7 @@ import logging
 import xmljson
 import requests
 import jsonschema
-import ujson as json
+try import ujson as json except import json
 
 from lxml import etree
 from datetime import datetime
