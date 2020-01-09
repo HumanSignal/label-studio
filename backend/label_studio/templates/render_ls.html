@@ -24,6 +24,13 @@
     background-color: #c3c3c3 !important;
     border: 2px solid #b4b4b4 !important;
   }
+
+  #label-studio div[class^="App_editor"],
+  div[class*="App_editor"] {
+      width: 100% !important;
+      min-width: 100% !important;
+      max-width: 100% !important;
+  }
 </style>
 
 <script src="/static/js/jquery.min.js"></script>
@@ -31,7 +38,7 @@
 
 <!-- Editor -->
 <div class="ui content">
-  <div id="label-studio">
+  <div id="label-studio" style="width: 100%;">
     <div class="ui loader active inline centered"></div>
   </div>
 </div>

@@ -180,8 +180,8 @@ a {
 }
 
 #label-studio div[class^="App_editor"],
-div[class*=" App_editor"] {
-    width: 100%;
+div[class*="App_editor"] {
+    width: 100% !important;
 }
 
 @media only screen and (max-width: 768px) {
@@ -329,5 +329,5 @@ pre {
     white-space: -o-pre-wrap;
     word-wrap: break-word;
 }
-1
+
 /* label config finish */
