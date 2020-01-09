@@ -10,7 +10,7 @@ import pkg_resources
 
 from appdirs import user_config_dir
 from pythonjsonlogger import jsonlogger
-from lxml import etree
+from lxml import etree, objectify
 from xml.etree import ElementTree
 from .db import re_init
 from label_studio.utils.io import find_file, find_dir
@@ -111,7 +111,17 @@ def exception_treatment(f):
 
 
 def config_line_stripped(xml_config):
-    """ Remove comments, \n and \r from xml, flat xml to string
+    """ Remove comments
+
+    :param xml_config: xml config string
+    :return: xml config string
+    """
+    xml_config = config_comments_free(xml_config)
+    return xml_config.replace('\n', '').replace('\r', '')
+
+
+def config_comments_free(xml_config):
+    """ Remove \n and \r from xml, flat xml to string
 
     :param xml_config: xml config string
     :return: xml config string
@@ -121,10 +131,11 @@ def config_line_stripped(xml_config):
 
     for xml_config in comments:
         p = xml_config.getparent()
-        p.remove(xml_config)
+        if p:
+            p.remove(xml_config)
         xml_config = etree.tostring(tree, method='html').decode("utf-8")
 
-    return xml_config.replace('\n', '').replace('\r', '')
+    return xml_config
 
 
 def load_config(re_init_db=True):
@@ -241,3 +252,44 @@ def parse_config(config_string):
             tag_info['inputs'].append(inputs[input_tag_name])
 
     return outputs
+
+
+def get_config_templates(root_dir):
+    """ Get label config templates from directory (as usual 'examples' directory)
+    """
+    from collections import defaultdict
+    templates = defaultdict(list)
+
+    for i, d in enumerate(os.listdir(root_dir)):
+        # check xml config file exists
+        path = os.path.join(root_dir, d, 'config.xml')
+        if not os.path.exists(path):
+            continue
+
+        # open and check xml
+        code = open(path).read()
+        try:
+            objectify.fromstring(code)
+        except Exception as e:
+            logging.error(f"Can't parse XML for label config template from {path}: {str(e)}")
+            continue
+
+        # extract fields from xml and pass them to template
+        try:
+            json_string = code.split('<!--')[1].split('-->')[0]
+            meta = json.loads(json_string)
+        except Exception as e:
+            logging.error(f"Can't parse meta info from label config: {str(e)}")
+            continue
+
+        meta['pk'] = i
+        meta['label_config'] = '-->\n'.join(code.split('-->\n')[1:])  # remove all comments at the beginning of code
+
+        meta['category'] = meta['category'] if 'category' in meta else 'no category'
+        templates[meta['category']].append(meta)
+
+    # sort by title
+    for key in templates:
+        templates[key] = sorted(templates[key], key=lambda x: x['title'])
+
+    return templates

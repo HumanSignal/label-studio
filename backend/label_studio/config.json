@@ -9,6 +9,7 @@
 
   "instruction": "Type some <b>hypertext</b> for label experts!",
   "allow_delete_completions": true,
+  "templates_dir": "../examples",
 
   "editor": {
     "debug": false

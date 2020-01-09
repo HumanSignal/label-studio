@@ -1,3 +1,4 @@
+<!-- {"title": "Image brush labeling", "category": "image"} -->
 <View>
   <Image name="img" value="$image"></Image>
   <BrushLabels name="tag" toName="img">

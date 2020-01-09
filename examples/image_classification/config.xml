@@ -1,3 +1,4 @@
+<!-- {"title": "Image classifier", "category": "image"} -->
 <View>
   <Image name="img" value="$image_url"></Image>
   <Choices name="choice" toName="img">

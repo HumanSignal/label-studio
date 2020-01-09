@@ -1,3 +1,4 @@
+<!-- {"title": "Image mixed labeling", "category": "image"} -->
 <View>
   <Image name="img" value="$image"></Image>
   <RectangleLabels name="tag" toName="img" canRotate="false">

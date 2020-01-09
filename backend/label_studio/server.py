@@ -28,7 +28,8 @@ from label_studio.utils.validation import TaskValidator
 from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.functions import generate_sample_task_without_check, data_examples
 from label_studio.utils.misc import (
-    exception_treatment, log_config, log, config_line_stripped, load_config
+    exception_treatment, log_config, log, load_config, config_line_stripped, config_comments_free,
+    get_config_templates
 )
 
 logger = logging.getLogger(__name__)
@@ -48,7 +49,7 @@ ml_backend = None
 project = None
 
 
-def reload_config(prompt_inputs=False):
+def reload_config(prompt_inputs=False, force=False):
     global c
     global label_config_line
     global analytics
@@ -68,16 +69,17 @@ def reload_config(prompt_inputs=False):
     # Initialize DBs
     db.re_init(c)
 
-    label_config_line = config_line_stripped(open(c['label_config']).read())
+    label_config_full = config_comments_free(open(c['label_config']).read())
+    label_config_line = config_line_stripped(label_config_full)
     if analytics is None:
         analytics = Analytics(label_config_line, c.get('collect_analytics', True))
     else:
         analytics.update_info(label_config_line, c.get('collect_analytics', True))
     # configure project
-    if project is None:
-        project = Project(label_config=label_config_line)
+    if project is None or force:
+        project = Project(label_config=label_config_line, label_config_full=label_config_full)
     # configure machine learning backend
-    if ml_backend is None:
+    if ml_backend is None or force:
         ml_backend_params = c.get('ml_backend')
         if ml_backend_params:
             ml_backend = MLBackend.from_params(ml_backend_params)
@@ -169,8 +171,9 @@ def label_config_page():
     global c, project
     reload_config()
 
+    templates = get_config_templates(c['templates_dir'])
     analytics.send(getframeinfo(currentframe()).function)
-    return flask.render_template('label_config.html', config=c, project=project)
+    return flask.render_template('label_config.html', config=c, project=project, templates=templates)
 
 
 @app.route('/import')
@@ -210,16 +213,14 @@ def api_render_label_studio():
     example_task_data = {
         'id': 1764,
         'data': task_data,
-        'project': 1,
-        'accuracy': 0,
-        'created_at': '2019-02-06T14:06:26.001197Z',
-        'updated_at': '2019-02-06T14:06:26.001252Z'
+        'project': DEFAULT_PROJECT_ID,
+        'created_at': '2019-02-06T14:06:42.000420Z',
+        'updated_at': '2019-02-06T14:06:42.000420Z'
     }
 
     # prepare context for html
-    config_line = Project.config_line_stipped(config)
+    config_line = config_line_stripped(config)
     response = {
-        'full_editor': full_editor == "t",
         'label_config_line': config_line,
         'task_ser': example_task_data
     }
@@ -242,6 +243,31 @@ def api_validate_config():
         return make_response(jsonify({'label_config': e.msg_to_list()}), status.HTTP_400_BAD_REQUEST)
 
     return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@app.route('/api/save-config', methods=['POST'])
+def api_save_config():
+    """ Save label config
+    """
+    global c, project
+    if 'label_config' not in request.form:
+        return make_response('No label_config in POST', status.HTTP_417_EXPECTATION_FAILED)
+
+    # check config before save
+    label_config = request.form['label_config']
+    try:
+        project.validate_label_config(label_config)
+    except ValidationError as e:
+        return make_response(jsonify({'label_config': e.msg_to_list()}), status.HTTP_400_BAD_REQUEST)
+
+    # save xml label config to file
+    path = c['label_config']
+    open(path, 'w').write(label_config)
+    logger.info(f'Label config saved to: {path}')
+
+    reload_config(force=True)
+    analytics.send(getframeinfo(currentframe()).function)
+    return Response(status=status.HTTP_201_CREATED)
 
 
 @app.route('/api/import-example', methods=['GET', 'POST'])

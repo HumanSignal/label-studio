@@ -1,7 +1,7 @@
 [
     {
         "data": {
-            "image": "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg"
+            "image": "https:\/\/htx-misc.s3.amazonaws.com\/opensource\/label-studio\/examples\/images\/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg"
         },
         "predictions": [
             {
@@ -15,14 +15,14 @@
                         "to_name": "img",
                         "type": "rectanglelabels",
                         "value": {
-                            "height": 11.612284069097889,
+                            "height": 11.6122840691,
                             "rectanglelabels": [
                                 "Moonwalker"
                             ],
                             "rotation": 0,
                             "width": 39.6,
                             "x": 13.2,
-                            "y": 34.702495201535505
+                            "y": 34.7024952015
                         }
                     }
                 ]
@@ -38,14 +38,14 @@
                         "to_name": "img",
                         "type": "rectanglelabels",
                         "value": {
-                            "height": 33.61228406909789,
+                            "height": 33.6122840691,
                             "rectanglelabels": [
                                 "Moonwalker"
                             ],
                             "rotation": 0,
                             "width": 39.6,
                             "x": 13.2,
-                            "y": 54.702495201535505
+                            "y": 54.7024952015
                         }
                     }
                 ]
@@ -54,12 +54,12 @@
     },
     {
         "data": {
-            "image": "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/history-in-hd-e5eDHbmHprg-unsplash.jpg"
+            "image": "https:\/\/htx-misc.s3.amazonaws.com\/opensource\/label-studio\/examples\/images\/history-in-hd-e5eDHbmHprg-unsplash.jpg"
         }
     },
     {
         "data": {
-            "image": "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/soroush-karimi-crjPrExvShc-unsplash.jpg"
+            "image": "https:\/\/htx-misc.s3.amazonaws.com\/opensource\/label-studio\/examples\/images\/soroush-karimi-crjPrExvShc-unsplash.jpg"
         }
     }
 ]

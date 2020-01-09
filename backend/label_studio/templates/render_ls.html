@@ -8,6 +8,24 @@
   <script src="{{ js }}"></script>
 {% endfor %}
 
+<style>
+  body::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 2px rgba(178, 178, 178, 0.3) !important;
+    background-color: #F5F5F5 !important;
+  }
+
+  body::-webkit-scrollbar {
+    width: 2px !important;
+    height: 2px !important;
+    background-color: #F5F5F5 !important;
+  }
+
+  body::-webkit-scrollbar-thumb {
+    background-color: #c3c3c3 !important;
+    border: 2px solid #b4b4b4 !important;
+  }
+</style>
+
 <script src="/static/js/jquery.min.js"></script>
 <script src="/static/js/lsb.js"></script>
 
@@ -20,23 +38,23 @@
 
 <script>
   window.onload = function () {
-      var task = {{ task_ser | json | safe }};
+    var task = {{ task_ser | json | safe }};
 
-      var LS = new LabelStudio("label-studio", {
-          config: '{{ label_config_line | safe }}',
-          user: { pk: 1, firstName: "Awesome", lastName: "User" },
+    var LS = new LabelStudio("label-studio", {
+      config: '{{ label_config_line | safe }}',
+      user: {pk: 1, firstName: "Awesome", lastName: "User"},
 
-          task: _convertTask(task),
+      task: _convertTask(task),
 
-          interfaces: [
-              "basic",
-              "side-column"
-          ],
+      interfaces: [
+        "basic",
+        "side-column"
+      ],
 
-          onLabelStudioLoad: function (LS) {
-              var c = LS.completionStore.addCompletion({ userGenerate: true });
-              LS.completionStore.selectCompletion(c.id);
-          }
-      });
+      onLabelStudioLoad: function (LS) {
+        var c = LS.completionStore.addCompletion({userGenerate: true});
+        LS.completionStore.selectCompletion(c.id);
+      }
+    });
   };
 </script>

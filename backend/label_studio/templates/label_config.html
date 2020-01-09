@@ -27,7 +27,7 @@
 
 <div class="ui container">
   <div class="ui wrapper">
-    <form action="/api/setup-label-config" method="post" class="ui form">
+    <form action="/api/save-config" method="post" class="ui form">
 
       <!-- Help message about tags-->
       <div class="ui message">
@@ -36,14 +36,22 @@
         <div class="content">
           Label config is based on html-like tags, you can read more about what we support in our
           <a href="https://labelstud.io/tags" target="_blank">documentation</a>.
-          {# <br>Try predefined configs:
-            <ul>
-             for t in templates %}
-                <li><a class="use-template no-go" href="#" data-value="{{ t.pk }}">{{ t.title }}</a></li>
-              {% endfor #}
-          </ul>
+          <br>Try predefined configs:
+
+          <div class="ui grid" style="margin: 0.7em auto;">
+            {% for category in templates %}
+              <div class="four wide column">
+                {% for t in templates[category] %}
+                  <div class="ui item"><a class="use-template no-go" href="#" data-value="{{ t.pk }}">{{ t.title }}</a>
+                  </div>
+                {% endfor %}
+              </div>
+            {% endfor %}
+          </div>
+
         </div>
       </div>
+
       <br/>
 
       <!-- Textarea & Preview in two cols -->
@@ -51,7 +59,7 @@
         <div class="column">
           <h3>Labeling Config</h3>
           <textarea name="label_config" cols="40" rows="10" class="project-form htx-html-editor"
-                    id="id_label_config"></textarea>
+                    id="id_label_config">{{ project.label_config_full | safe }}</textarea>
         </div>
         <div class="column" style="padding-left: 0;">
 
@@ -60,19 +68,20 @@
           <pre id="preload-editor">...</pre>
 
           <h3>Input Task Preview</h3>
-          <pre class="segment" id="upload-data-example">...</pre>
+          <pre class="segment" id="upload-data-example" style="word-wrap: break-word">...</pre>
 
           <h3>Output Completion Preview</h3>
           <div class="segment">
-            <pre class="segment" id="data-results">...</pre>
+            <pre class="segment" id="data-results" style="word-wrap: break-word ">...</pre>
           </div>
         </div>
       </div>
 
       <!-- Buttons Back / Next -->
       <div class="ui error message validation"></div>
-
       <br/>
+
+      <!-- Submit button -->
       <center>
         <input type="submit" disabled id="submit_form"
                class="project-form field ui button positive centered" value="Save"
@@ -84,9 +93,9 @@
     <!-- Error dialog -->
     <div class="ui basic modal" id="error-message">
       <div class="ui icon header">
-        <i class="exclamation triangle icon"></i>
+        <i id="error-message-icon" class="exclamation triangle icon"></i>
       </div>
-      <div class="content" style="text-align: center;">
+      <div class="ui content text" style="text-align: center; font-size: 120%">
         <p id="error-message-text">Error message here</p>
       </div>
     </div>
@@ -94,15 +103,17 @@
     <!-- Dimmer and loader --->
     <div class="ui dimmer" id="dimmer" style="position: fixed !important;">
       <div class="ui text active orange loader big slow">
-        Preparing the project and scanning for ML backends ...<br/>
+        Saving label config ...<br/>
       </div>
     </div>
 
     <!-- Hidden template codes -->
-    {% for t in templates %}
-      {% autoescape off %}
-      <script data-template-pk="{{ t.pk }}" type="text">{{ t.label_config }}</script>
-      {% endautoescape %}
+    {% for category in templates %}
+      {% for t in templates[category] %}
+        {% autoescape off %}
+        <script data-template-pk="{{ t.pk }}" type="text">{{ t.label_config }}</script>
+        {% endautoescape %}
+      {% endfor %}
     {% endfor %}
 
     <!-- Change template dialog -->
@@ -112,7 +123,8 @@
         <i class="exclamation triangle icon"></i>
       </div>
       <div class="content">
-        <p style="text-align: center;">Data that you've putted into textarea will be replaced, proceed?</p>
+        <p style="text-align: center;font-size:120%">Data that you've putted into textarea will be replaced,
+          proceed?</p>
       </div>
       <div class="actions">
         <div class="ui deny button red basic inverted" id="abort-button">
@@ -143,12 +155,16 @@
 
       $('#dimmer').removeClass('active');
       $('#error-message-text').text(msg);
+      $('#error-message-icon').attr('class', 'red exclamation triangle icon');
       $('#error-message').modal('show');
     }
 
     // success
     else {
-      window.location = "/import"
+      $('#dimmer').removeClass('active');
+      $('#error-message-icon').attr('class', 'green check icon');
+      $('#error-message-text').text("Label config saved!");
+      $('#error-message').modal('show');
     }
   }
 
@@ -354,6 +370,15 @@
     }, 500));
 
     window.labelEditor = labelEditor;
+
+    // validate config on start
+    validate_config(window.labelEditor);
+
+    // click on close icon of messages
+    $('.message .close')
+      .on('click', function () {
+        $(this).closest('.message').transition('fade');
+      });
   });
 </script>
 

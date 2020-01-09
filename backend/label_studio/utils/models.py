@@ -12,7 +12,7 @@ import ujson as json
 from lxml import etree
 from datetime import datetime
 from requests.adapters import HTTPAdapter
-from label_studio.utils.misc import get_data_dir
+from label_studio.utils.misc import get_data_dir, config_line_stripped
 from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.functions import _LABEL_CONFIG_SCHEMA_DATA
 
@@ -31,8 +31,10 @@ class Project(object):
     created_at = attr.ib(factory=lambda: datetime.now())
     # Input source / output tags schema exposed for connected ML backend
     schema = attr.ib(default='')
-    # label config
+    # label config line stripped
     label_config = attr.ib(default='')
+    # label config full with line breaks
+    label_config_full = attr.ib(default='')
     # credentials for restricted data access
     task_data_login = attr.ib(default='')
     task_data_password = attr.ib(default='')
@@ -42,6 +44,8 @@ class Project(object):
     max_tasks_file_size = attr.ib(default=250)
 
     def __attrs_post_init__(self):
+        """ Init analogue for attr class
+        """
         self.data_types = self.extract_data_types(self.label_config)
 
     def connect(self, ml_backend):
@@ -147,19 +151,6 @@ class Project(object):
         for toName in toNames:
             if toName not in names:
                 raise ValidationError(f'toName="{toName}" not found in names: {sorted(names)}')
-
-    @classmethod
-    def config_line_stipped(cls, c):
-        tree = etree.fromstring(c)
-        comments = tree.xpath('//comment()')
-
-        for c in comments:
-            p = c.getparent()
-            if p is not None:
-                p.remove(c)
-            c = etree.tostring(tree, method='html').decode("utf-8")
-
-        return c.replace('\n', '').replace('\r', '')
 
 
 class BaseHTTPAPI(object):
