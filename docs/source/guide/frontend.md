@@ -10,13 +10,13 @@ Instantiate a new Label Studio object with a selector for the div that should be
 
 ```xhtml
 <!-- Include Label Studio stylesheet -->
-<link href="https://unpkg.com/browse/label-studio@0.4.0/build/static/css/main.14acfaa5.css" rel="stylesheet">
+<link href="https://unpkg.com/label-studio@0.4.0/build/static/css/main.14acfaa5.css" rel="stylesheet">
 
 <!-- Create the Label Studio container -->
-<div id="editor"></div>
+<div id="label-studio"></div>
 
 <!-- Include the Label Studio library -->
-<script src="https://unpkg.com/browse/label-studio@0.4.0/build/static/js/main.0249ea16.js"></script>
+<script src="https://unpkg.com/label-studio@0.4.0/build/static/js/main.0249ea16.js"></script>
 
 <!-- Initialize Label Studio -->
 <script>
@@ -32,13 +32,14 @@ Instantiate a new Label Studio object with a selector for the div that should be
     `,
 
     interfaces: [
-      "controls",
-      "completions",
-      "completions:menu",
       "panel",
-      "side-column",
       "update",
-      "check-empty",
+      "controls",
+      "side-column",
+      "completions:menu",
+      "completions:add-new",
+      "completions:delete",
+      "predictions:menu",
     ],
 
     user: {
@@ -105,32 +106,29 @@ Collection of UI elements to show:
 
 ```javascript
 [
-  "controls",
-  "side-column",
-  "panel",
-  "submit",
-  "skip",
-  "update",
-  "predictions:menu",
-  "completions:add-new"
-  "completions:delete"
-  "completions:set-groundtruth"
-  "completions:menu",
+    "completions:add-new",
+    "completions:delete",
+    "completions:menu",
+    "controls",
+    "panel",
+    "predictions:menu",
+    "side-column",
+    "skip",
+    "submit"
+    "update",
 ]
 ```
 
-- `controls` - enable panel with controls (submit, update, skip)
-- `side-column` - enable panel with entities
-- `panel` - navigation panel of current task with buttons: undo, redo and reset
-- `submit` - show button of submit or update current completion
-- `skip` - show button of skip current task
-- `update` - show button of update current task after submitting
-- `check-empty` - enable validation of submit empty task
-- `predictions:menu` - show predictions menu
-- `completions:menu` - show completions menu
 - `completions:add-new` - show add new completions button
 - `completions:delete` - show delete current completion button
-- `completions:set-groundtruth` - show set as a ground truth button
+- `completions:menu` - show completions menu
+- `controls` - enable panel with controls (submit, update, skip)
+- `panel` - navigation panel of current task with buttons: undo, redo and reset
+- `predictions:menu` - show predictions menu
+- `side-column` - enable panel with entities
+- `skip` - show button of skip current task
+- `submit` - show button of submit or update current completion
+- `update` - show button of update current task after submitting
 
 ### messages
 
