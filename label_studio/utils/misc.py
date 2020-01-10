@@ -243,13 +243,9 @@ def parse_input_args():
 
     global input_args, config_path, prev_config
 
-    # if no arguments passed make 'server.py start default'
-    if len(sys.argv) == 1:
-        sys.argv += ['start', 'default']
-
     parser = argparse.ArgumentParser(description='Label studio')
 
-    subparsers = parser.add_subparsers(dest='command', help='Available commands')
+    subparsers = parser.add_subparsers(dest='command', help='Available commands', required=True)
 
     # init sub-command parser
 
@@ -310,9 +306,15 @@ def parse_input_args():
         if input_args.command == 'init':
             return False
     print('Working dir', os.getcwd())
+    if not os.path.exists(input_args.project_name):
+        raise FileNotFoundError(
+            f'Couldn\'t find directory {input_args.project_name}, maybe you mean:\n'
+            f'label-studio start {input_args.project_name} --init')
     config_path = os.path.join(input_args.project_name, 'config.json')
     if not os.path.exists(config_path):
-        config_path = input_args.config_path
+        raise FileNotFoundError(
+            f'Couldn\'t find config file {config_path} in project directory {input_args.project_name}, '
+            f'may be you mean:\nlabel-studio start {input_args.project_name} --init')
     return True
 
 
