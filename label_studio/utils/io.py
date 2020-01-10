@@ -8,7 +8,8 @@ from tempfile import mkstemp
 def find_node(package_name, node_path, node_type):
     assert node_type in ('dir', 'file', 'any')
     basedir = pkg_resources.resource_filename(package_name, '')
-    search_by_path = '/' in node_path
+    node_path = os.path.join(*node_path.split('/'))  # linux to windows compatibility
+    search_by_path = '/' in node_path or '\\' in node_path
 
     for path, dirs, filenames in os.walk(basedir):
         if node_type == 'file':
