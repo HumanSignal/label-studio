@@ -10,13 +10,13 @@ Instantiate a new Label Studio object with a selector for the div that should be
 
 ```xhtml
 <!-- Include Label Studio stylesheet -->
-<link href="https://unpkg.com/browse/label-studio@0.3.0-beta/build/static/css/main.334c1172.css" rel="stylesheet">
+<link href="https://unpkg.com/browse/label-studio@0.4.0/build/static/css/main.14acfaa5.css" rel="stylesheet">
 
 <!-- Create the Label Studio container -->
 <div id="editor"></div>
 
 <!-- Include the Label Studio library -->
-<script src="https://unpkg.com/browse/label-studio@0.3.0-beta/build/static/js/main.3cf2578f.js"></script>
+<script src="https://unpkg.com/browse/label-studio@0.4.0/build/static/js/main.0249ea16.js"></script>
 
 <!-- Initialize Label Studio -->
 <script>
@@ -76,11 +76,11 @@ Take a look at the [Label Studio]("https://labelstud.io") website for more docum
 ## CDN
 
 ```xhtml
-<!-- Main Label Studio library -->
-<script src="https://unpkg.com/label-studio@0.2.1/build/static/js/main.0000e798.js"></script>
-
 <!-- Theme included stylesheets -->
-<link href="https://unpkg.com/label-studio@0.2.1/build/static/css/main.05fec320.css" rel="stylesheet">
+<link href="https://unpkg.com/browse/label-studio@0.4.0/build/static/css/main.14acfaa5.css" rel="stylesheet">
+
+<!-- Main Label Studio library -->
+<script src="https://unpkg.com/browse/label-studio@0.4.0/build/static/js/main.0249ea16.js"></script>
 ```
 
 ## Options
@@ -242,13 +242,13 @@ Callbacks can be used to execute actions based on user interaction with the inte
 
 Type data: `function`
 
-Called when a button `submit` is pressed. `result` is value of current completion.
+Called when a button `submit` is pressed. `ls` is label studio instance, `completion` is value of current completion.
 
 #### Example
 
 ```javascript
-onSubmitCompletion: function(result) {
-  console.log(result)
+onSubmitCompletion: function(ls, completion) {
+  console.log(completion)
 }
 ```
 
@@ -256,12 +256,12 @@ onSubmitCompletion: function(result) {
 
 Type data: `function`
 
-Called when a button `update` is pressed. `result` is value of current completion.
+Called when a button `update` is pressed. `ls` is label studio instance, `completion` is value of current completion.
 
 #### Example
 
 ```javascript
-updateCompletion: function(result) {
+updateCompletion: function(ls, completion) {
   console.log(result)
 }
 ```
@@ -270,12 +270,12 @@ updateCompletion: function(result) {
 
 Type data: `function`
 
-Called when a button `delete` is pressed. `result` is value of current completion.
+Called when a button `delete` is pressed. `ls` is label studio instance, `completion` is value of current completion.
 
 #### Example
 
 ```javascript
-deleteCompletion: function(result) {
+onDeleteCompletion: function(ls, completion) {
   console.log(result)
 }
 ```
@@ -312,26 +312,12 @@ onEntityDelete: function(region) {
 
 Type data: `function`
 
-Called when a button `skip` is pressed. `result` is value of current completion.
+Called when a button `skip` is pressed. `ls` is label studio instance.
 
 #### Example
 
 ```javascript
-onSkipTask: function(result) {
-  console.log(result)
-}
-```
-
-### onTaskLoad
-
-Type data: `function`
-
-Called when a task gets loaded. `result` is the value of the task
-
-#### Example
-
-```javascript
-onTaskLoad: function(result) {
+onSkipTask: function(ls) {
   console.log(result)
 }
 ```
@@ -340,12 +326,12 @@ onTaskLoad: function(result) {
 
 Type data: `function`
 
-Called when label studio has fully loaded and is ready, `result` is the label studio instance
+Called when label studio has fully loaded and is ready, `ls` is the label studio instance
 
 #### Example
 
 ```javascript
-onLabelStudioLoad: function(result) {
+onLabelStudioLoad: function(ls) {
   console.log(result)
 }
 ```
