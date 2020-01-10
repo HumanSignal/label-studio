@@ -1,0 +1,40 @@
+<!-- Help message -->
+<div class="ui message">
+  <i class="close icon"></i>
+
+  <!-- Label config -->
+  <div class="header">Labeling configuration help</div>
+  <div class="content">
+    <ul class="ui list">
+      <li>Labeling interface is based on html-like tags, read more in our
+        <a href="https://labelstud.io/tags" target="_blank">documentation</a>.
+      </li>
+      <li>You can fully customize the appearance and workflow by modifying Labeling Config.</li>
+      <li>Tag values can use variables that start with "$" sign,
+        and those correspond to the fields in imported tasks from JSON or CSV files.
+      </li>
+    </ul>
+  </div>
+  <br>
+
+  <!-- Templates -->
+  <div class="header">Try predefined configs</div>
+  <div class="content" style="margin-top: 0">
+    <!-- Templates categories -->
+    <div class="ui grid stackable" style="margin: 0 auto;">
+      {% for category in templates %}
+        <div class="four wide column">
+          <!-- Template -->
+          {% for t in templates[category] %}
+            <div class="ui item">
+              <a class="use-template no-go" href="#" data-value="{{ t.pk }}">{{ t.title }}</a>
+            </div>
+          {% endfor %}
+        </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</div>
+
+<br/>

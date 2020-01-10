@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+{% block body %}
+
+<!-- Import Data Dialog with Wait for Add more data -->
+
+<div class="ui container" id="import-tasks">
+
+  <!-- Dimmer and loader -->
+  <div class="ui page dimmer">
+    <div class="ui large text loader">Importing in progress ...</div>
+  </div>
+
+  <!-- Input file form -->
+  <div class="ui form">
+    <input id="file-input" type="file" name="file" multiple onchange="send_data(event)" style="display: none"/>
+
+    <div class="ui content">
+      <div id="holder">
+        <div class="text">
+          <i class="ui icon huge upload"></i>
+          <p>Drag and drop your files here or click for import</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <br>
+
+  <!-- URL: Use iframe and form to enable autocomplete for URL input -->
+  <iframe name="my_iframe" src="about:blank" hidden></iframe>
+  <form target="my_iframe" action="about:blank" method="get">
+
+    <div class="ui form">
+      <label for="url-input" class="description">Or paste a file URL or task in JSON format here</label><br/>
+      <input style="height: 36px; width:85%" id="url-input" type="text" name="url" autofocus autocomplete="on"/>
+      <div style="display: inline-block !important; width: 14%; min-width: 100px" class="ui positive button icon"
+           id="url-button" onclick="send_data(event, $('#url-input').val())">Import
+      </div>
+    </div>
+
+  </form>
+
+  <!-- Help message -->
+  <div class="ui divider hidden"></div>
+  <div class="ui" style="display: block !important;">
+    {% include "import_help.html" %}
+  </div>
+
+
+  <!-- Dialog: Add more data WAIT  -->
+  <div class="ui modal" id="upload-dialog">
+    <!--suppress CheckTagEmptyBody -->
+    <i class="close icon"></i>
+    <div class="header red">
+      Import status
+    </div>
+    <div class="content">
+      <div class="description" id="upload-dialog-msg"></div>
+    </div>
+    <div class="actions">
+      <!-- Done button -->
+      <button class="ui icon button" id="upload-done-button"
+              hidden onclick="location.reload()" autofocus>Done
+      </button>
+    </div>
+  </div>
+
+</div> <!-- container -->
+
+<script>
+
+  $('.upload-data').on('click', function () {
+    $("#start-upload-dialog").modal({
+      closable: false
+    }).modal('show');
+  });
+
+  $('#holder').on('click', function () {
+    $('#file-input').trigger('click');
+  });
+
+  // drag & drop files
+  $(document).ready(function () {
+    let holder = $('#holder');
+    holder.on('drop', function (e) {
+      e.preventDefault();
+      $(this).removeClass('hover');
+      const event = {target: {files: e.originalEvent.dataTransfer.files}};
+      send_data(event);
+    });
+    holder.on('dragover', function (e) {
+      e.stopPropagation();
+      e.preventDefault();
+      $(this).addClass('hover');
+    });
+    holder.on('dragleave', function (e) {
+      e.preventDefault();
+      $(this).removeClass('hover');
+    });
+  });
+
+  // show upload wait
+  function start_wait() {
+    $('#start-upload-dialog').modal('hide');
+    $('.ui.page.dimmer').addClass('active');
+  }
+
+  // stop upload wait
+  function stop_wait(msg, success) {
+    $('.ui.page.dimmer').removeClass('active');
+    $('#upload-dialog-msg').html(msg);
+    $('#upload-dialog').modal({
+      closable: false, // protect closing of uploading dialog
+      onDeny() {
+        return false;
+      },
+      onHide() {
+        return false;
+      }
+    }).modal('show');
+
+    if (success) {
+      $('#upload-done-button').addClass('positive')
+    } else {
+      $('#upload-done-button').addClass('red')
+    }
+  }
+
+  // send data with tasks to server (add more data)
+  function send_data(event, upload_url = '') {
+    if (upload_url === '' && typeof event.target.files === 'undefined') {
+      return;
+    }
+
+    // show upload wait dialog
+    start_wait();
+    let fd = null;
+    let request = {};
+
+    // send url to file
+    if (upload_url !== '') {
+      // send url as task data
+      if (IsJsonString(upload_url)) {
+        request = {
+          url: "api/import",
+          data: upload_url,
+          contentType: 'application/json',
+          method: 'post'
+        }
+      }
+      // send url as regular url
+      else {
+        request = {
+          url: "api/import",
+          data: {url: upload_url},
+          method: 'post'
+        }
+      }
+    }
+
+    // files from disk
+    else {
+      fd = new FormData;
+      for (let i = 0; i < event.target.files.length; i++) {
+
+        const f = event.target.files[i];
+        let max_size_mb = {{ project.max_tasks_file_size }};
+        if (f.size / 1024.0 / 1024.0 > max_size_mb) {
+          stop_wait('Sorry, but file size is too big (more ' + max_size_mb + ' mb).\n<br/>' +
+            'Try to split your file by chunks or zip it', false);
+        }
+
+        // make form and attach file to it
+        fd.append(f.name, f);
+      }
+
+      request = {
+        url: "api/import",
+        data: fd,
+        method: 'POST',
+        processData: false,
+        contentType: false
+      }
+    }
+
+    $.ajax(request)
+      .done(answer => {
+        let msg = 'Tasks created: ' + answer['task_count'] +
+          '<br/>Completions created: ' + answer['completion_count'] +
+          '<br/>Predictions created: ' + answer['prediction_count'] +
+          '<br/>Duration: ' + answer['duration'].toFixed(2) + ' sec';
+        stop_wait(msg, true);
+
+      })
+      .fail(answer => {
+        let msg = "Error: can't upload/process file on server side. Reasons:<br><br>";
+
+        if (answer.responseJSON != null) {
+          let rows = answer.responseJSON;
+          for (let i in rows) {
+            const escaped = $('<div>').text(rows[i]).html();
+            const split = escaped.split('::');
+            msg += '<div class="upload-row-error">' +
+              '<div class=desc>' + split[0] + '</div>' +
+              (split.length > 1 ? '<div class=code>' + split[1] + '</div>' : '') +
+              '</div><br/>\n';
+          }
+        } else {
+          msg += 'Critical error, see console for more description';
+          console.log(answer);
+        }
+
+        stop_wait(msg, false);
+      });
+  }
+
+  $(function () {
+    $('.ui.accordion').accordion();
+  });
+</script>
+
+{% endblock %}

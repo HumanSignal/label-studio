@@ -1,28 +1,57 @@
 ---
-title: Introduction
+title: Getting started
 type: guide
 order: 100
 ---
 
-## What is Label Studio?
-
 Label Studio is a data labeling and annotation tool. Unlike other tools, Label Studio is designed from the ground up to be incrementally extensible and adaptable for different data labeling needs. It works with different data types, mobile-friendly, and can be easily integrated into your pipelines.
 
-## Getting Started
+Label Studio consists of two parts. Server is a flask server that provides a data management interface (import & export) and initialization of the frontend. The frontend is a [React](https://reactjs.org/) + [MST](https://github.com/mobxjs/mobx-state-tree) app that is backend agnostic and can be used separately, for example, if you want to embed labeling into your applications.
 
-Label Studio consists of two parts. Backend is a simple flask server that is used to load the data and save the results. The frontend is a [React](https://reactjs.org/) + [MST](https://github.com/mobxjs/mobx-state-tree) app that is backend agnostic and can be used separately, for example, if you want to embed labeling into your applications.
+## Install
 
+#### Prerequisites
 
-## Run
+Label Studio is supported for Python 3.6 or greater.
 
-To launch the backend server locally, do
+#### Install from pip
+
+To install Label Studio via pip, you need Python>=3.6 and run:
 ```bash
-cd backend
-bash start.sh
+pip install label-studio
 ```
 
-To run it locally we include the compiled version of the frontend part and an example implementation of the backend. That bash script initializes python environment, installs dependencies and starts an example python server.
+#### Install from source
 
-## Ready for More?
+To install Label Studio locally from source, run
 
-We've briefly introduced essential features of label studio core - the rest of this guide will cover them and other advanced features with much finer details, so make sure to read through it all!
+```bash
+git clone https://github.com/heartexlabs/label-studio.git
+cd label-studio
+pip install -e .
+```
+
+## Usage
+
+First create a new labeling project:
+
+```bash
+label-studio init labeling_project
+```
+
+To launch Label Studio server, just run in your terminal:
+
+```bash
+label-studio start labeling_project
+```
+
+Now open up [http://localhost:8200](http://localhost:8200) in your browser.
+
+#### Ready for More?
+
+We've briefly introduced essential features of label studio core, but there are a lot other interesting things you can do with Label Studio!
+ 
+ Check our docs if you want to learn about how to:
+- [extend and build UI frontend part](frontend.md)
+- [embed Label Studio into your applications](frontend.md)
+- [integrate machine learning frameworks for active learning & prelabeling](ml.md)

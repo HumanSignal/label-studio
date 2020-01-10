@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block body %}
+
+<div class="ui container">
+  <div class="wrapper">
+
+    <!-- Statistics -->
+    <div class="ui one column center aligned page grid">
+      <div class="ui statistics">
+        <div class="statistic">
+          <span class="value">{{ task_ids|length }}</span>
+          <span class="label">Total tasks</span>
+          <i class="small">{{ config['input_path'] }}</i>
+        </div>
+
+        <div class="statistic">
+          <span class="value">{{ completions|length }}</span>
+          <span class="label">Total completions</span>
+          <i class="small">{{ config['output_dir'] }}</i>
+        </div>
+      </div>
+    </div>
+
+    <br/><br/><br/>
+    <div class="ui one column center aligned page grid">
+
+      <a class="ui button positive" href="/" style="margin-bottom: 14px;">Start Labeling</a>
+    </div>
+    <br/><br/>
+
+
+    <!-- Table -->
+    <table>
+      <tr>
+        <th>Task ID</th>
+        <th>Completed at</th>
+        <th>Completion</th>
+      </tr>
+
+      {% for id in task_ids %}
+        <tr>
+          <td class="text-center">
+            <a href="/?task_id={{ id }}" target="_blank">
+              <i class="fas fa-eye eye show-completion"></i>
+            </a>
+            &nbsp;
+            {{ id }}
+          </td>
+          <td>{{ completed_at[id] }}</td>
+          <td class="text-center">
+            {% if id in completions %}
+              <i data-task-id="{{ id }}" class="fas fa-trash-alt trash remove-completion"></i>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+    <br/>
+  </div>
+</div>
+
+
+<script>
+  document.querySelectorAll(".remove-completion").forEach(function (test) {
+    test.addEventListener("click", function (event) {
+      var id = event.target.dataset.taskId;
+      var request = new XMLHttpRequest();
+      request.open("DELETE", "/api/tasks/" + id + "/completions/" + id + "/", true);
+      request.onload = function () {
+        window.location.reload();
+      }
+      request.send(null);
+    })
+  })
+</script>
+
+{% endblock %}

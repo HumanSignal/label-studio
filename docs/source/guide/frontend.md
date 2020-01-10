@@ -1,7 +1,7 @@
 ---
-title: Frontend
+title: Embed
 type: guide
-order: 1010
+order: 905
 ---
 
 ## Quickstart
@@ -10,13 +10,13 @@ Instantiate a new Label Studio object with a selector for the div that should be
 
 ```xhtml
 <!-- Include Label Studio stylesheet -->
-<link href="https://unpkg.com/label-studio@0.2.1-3/build/static/css/main.05fec320.css" rel="stylesheet">
+<link href="https://unpkg.com/browse/label-studio@0.3.0-beta/build/static/css/main.334c1172.css" rel="stylesheet">
 
 <!-- Create the Label Studio container -->
 <div id="editor"></div>
 
 <!-- Include the Label Studio library -->
-<script src="https://unpkg.com/label-studio@0.2.1-3/build/static/js/main.c684fef9.js"></script>
+<script src="https://unpkg.com/browse/label-studio@0.3.0-beta/build/static/js/main.3cf2578f.js"></script>
 
 <!-- Initialize Label Studio -->
 <script>
@@ -41,7 +41,7 @@ Instantiate a new Label Studio object with a selector for the div that should be
       "check-empty",
     ],
 
-    expert: {
+    user: {
       pk: 1,
       firstName: "James",
       lastName: "Dean"
@@ -54,6 +54,13 @@ Instantiate a new Label Studio object with a selector for the div that should be
       data: {
         image: "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg"
       }
+    },
+    
+    onLabelStudioLoad: function(LS) {
+      var c = LS.completionStore.addCompletion({
+        userGenerate: true
+      });
+      LS.completionStore.selectCompletion(c.id);
     }
   });
 </script>
@@ -64,7 +71,7 @@ Take a look at the [Label Studio]("https://labelstud.io") website for more docum
 ## Download
 
 - npm - `npm install label-studio`
-- tar - [https://github.com/heartexlabs/label-studio](https://github.com/heartexlabs/label-studio)
+- tar - [https://github.com/heartexlabs/label-studio-frontend](https://github.com/heartexlabs/label-studio-frontend)
 
 ## CDN
 
@@ -88,33 +95,13 @@ Type data: `string`
 
 XML configuration of task. Whitelist of formats to allow in the editor.
 
-### supports
-
-Default: `null`
-
-Type data: `array`
-
-```javascript
-[
-  "completions:load",
-  "predictions:load",
-  "check-empty",
-  "next:load"
-]
-```
-
-- `completions` - enable support for completions
-- `predictions` - enable support for predictions
-- `check-empty` - check if completion is empty before submit and show a warning if it is
-- `next:load` - load next task after submitting the selected one 
-
 ### interfaces
 
 Default: `null`
 
 Type data: `array`
 
-Collection of modules to include and respective options:
+Collection of UI elements to show:
 
 ```javascript
 [
@@ -175,14 +162,6 @@ Type data: `string`
 
 Description of the current task.
 
-### apiCalls
-
-Default: `true`
-
-Type data: `boolean`
-
-Whether to instantiate the Label Studio to API Calls mode with the backend. If `false`, submissions can be triggered via the callbacks.
-
 ### task
 
 Task data
@@ -215,46 +194,6 @@ Type data: `integer`
 
 Default: `null`
 
-#### auth
-
-Type data: `object`
-
-Default: `null`
-
-The object is necessary to support data from servers with HTTP basic authentication.
-
-##### enable
-
-Type data: `boolean`
-
-Default: `false`
-
-##### to
-
-Type data: `string`
-
-Default: ` `
-
-##### username
-
-Type data: `string`
-
-Default: ` `
-
-##### password
-
-Type data: `string`
-
-Default: ` `
-
-#### load
-
-Type data: `boolean`
-
-Default: `false`
-
-The flag is necessary to support the loading of API data.
-
 #### data
 
 #### completions
@@ -269,9 +208,9 @@ Type data: `array`
 
 Array of predictions. Every object as completion. See [Completions Documentation](https://labelstud.io/guide/format.html#Input) for more information.
 
-### expert
+### user
 
-Collaborator data
+User data
 
 Type data: `object`
 
@@ -295,40 +234,9 @@ Type data: `string`
 
 Type data: `string`
 
-### project
-
-Default: `null`
-
-Type data: `object`
-
-```json
-{
-  id: 1
-}
-```
-
-#### id
-
-Default: `null`
-
-Type data: `number`
-
-### isLoading
-
-Default: `false`
-
-Type data: `boolean`
-
-### explore
-
-Type data: `boolean`
-
-Default: `false`
-
-Flag fo labeling of tasks, if the flag is true then after submitting the next task will be called from the backend. 
-
-
 ## Callbacks
+
+Callbacks can be used to execute actions based on user interaction with the interface. For example label-studio server is using it to communicate with an API. Pass them along with other options when initiating the instance.
 
 ### onSubmitCompletion
 
@@ -439,33 +347,5 @@ Called when label studio has fully loaded and is ready, `result` is the label st
 ```javascript
 onLabelStudioLoad: function(result) {
   console.log(result)
-}
-```
-
-## Custom data
-
-If you want to use Label Studio with data from server with [HTTP basic authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication), then you need to configure Headers on the server:
-
-```shell
-Access-Control-Allow-Origin: '*';
-Access-Control-Allow-Credentials: true;
-Access-Control-Allow-Methods: 'GET, POST, OPTIONS';
-Access-Control-Allow-Headers: 'Cache-Control, Pragma, Origin, Authorization, Content-Type, X-Requested-With';
-Access-Control-Expose-Headers: 'Content-Length,Content-Range';
-```
-
-And configure LS:
-
-```javascript
-task: {
-  auth: {
-    enable: true,
-    to: 'image',
-    username: 'user',
-    password: 'pass',
-  },
-  data: {
-    image: 'https://example.com/custom_data_with_http_auth.jpg'
-  }
 }
 ```

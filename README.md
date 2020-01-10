@@ -1,125 +1,141 @@
-<div align="center">
-    <a href="https://labelstud.io/" title="Label Studio by Heartex Labs"><img src="https://github.com/heartexlabs/label-studio/blob/master/images/heartex_icon_opossum_green@2x.png?raw=true" title="Label Studio by Heartex Labs" height="140" width="140"></a>
-    <br/>
-    <h1><a href="https://labelstud.io">Label Studio</a></h1>
-    <p>Label Studio is an open-source, configurable data annotation tool.</p>
-    <p>Its purpose is to help you label different types of data using a simple interface with a standardized output format. It's mobile-friendly and fast.</p>
-</div>
+# Label Studio &middot; ![GitHub](https://img.shields.io/github/license/heartexlabs/label-studio?logo=heartex) [![Build Status](https://travis-ci.com/heartexlabs/label-studio.svg?branch=master)](https://travis-ci.com/heartexlabs/label-studio) [![codecov](https://codecov.io/gh/heartexlabs/label-studio/branch/master/graph/badge.svg)](https://codecov.io/gh/heartexlabs/label-studio) ![GitHub release](https://img.shields.io/github/v/release/heartexlabs/label-studio?include_prereleases) &middot; :sunny:
 
-[Website](https://labelstud.io/) • [Docs](https://labelstud.io/docs) • [Twitter](https://twitter.com/heartexlabs) • [Join Slack Community <img src="https://go.heartex.net/docs/images/slack-mini.png" width="18px"/>](https://docs.google.com/forms/d/e/1FAIpQLSdLHZx5EeT1J350JPwnY2xLanfmvplJi6VZk65C2R4XSsRBHg/viewform?usp=sf_link)
+[Website](https://labelstud.io/) • [Docs](https://labelstud.io/guide) • [Twitter](https://twitter.com/heartexlabs) • [Join Slack Community <img src="https://go.heartex.net/docs/images/slack-mini.png" width="18px"/>](https://docs.google.com/forms/d/e/1FAIpQLSdLHZx5EeT1J350JPwnY2xLanfmvplJi6VZk65C2R4XSsRBHg/viewform?usp=sf_link)
 
-![GitHub](https://img.shields.io/github/license/heartexlabs/label-studio?logo=heartex) [![Build Status](https://travis-ci.com/heartexlabs/label-studio.svg?branch=master)](https://travis-ci.com/heartexlabs/label-studio) [![codecov](https://codecov.io/gh/heartexlabs/label-studio/branch/master/graph/badge.svg)](https://codecov.io/gh/heartexlabs/label-studio) ![GitHub release](https://img.shields.io/github/v/release/heartexlabs/label-studio?include_prereleases) [![Gitter](https://badges.gitter.im/label-studio/community.svg)](https://gitter.im/label-studio/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+<br/>
+
+ **Label Studio is a swiss army knife of data labeling and annotation tools :v:**
+ 
+Its purpose is to help you label different types of data using a simple interface with a standardized output format. You're dealing with the custom dataset and thinking about creating your tool? Don't - using Label Studio, you can save time and create a custom tool and interface in minutes. 
 
 ![Label Studio](https://raw.githubusercontent.com/heartexlabs/label-studio/master/images/label-studio-examples.gif)
 
-## Features ✨
+<br/>
 
-**Simple**: Crafted with minimal UI design. A simple design is the best design.
+## Summary
 
-**Configurable**: Using high-level jsx tags config, you can fully customize the interface for your data.
+<img align="right" height="180" src="https://github.com/heartexlabs/label-studio/blob/master/images/heartex_icon_opossum_green@2x.png?raw=true" />
 
-**Embeddable**: It's an NPM package too. You can include it into your projects.
+- [Quick Start](#quick-start)
+- [One Click Deploy](#one-click-deploy)
+- [Features :star2:](#features-star2)
+- [Use Cases](#use-cases)
+- [Machine Learning Integration](#machine-learning-integration)
+- [For Teams and Enterprises :office:](#label-studio-for-teams-startups-and-enterprises-office)
+- [Ecosystem](#ecosystem)
+- [License](#license)
 
-## Quick Labeling Guides
+## Quick Start
 
-- [Classify text for sentiment](https://labelstud.io/templates/sentiment_analysis.html)
-- [Named entities recognition](https://labelstud.io/templates/named_entity.html)
-- [Transcribe audio](https://labelstud.io/templates/transcribe_audio.html)
-- [Classify audio](https://labelstud.io/templates/audio_classification.html) 
-- [Conversational modeling & chatbots](https://labelstud.io/templates/dialogue_analysis.html)
-- [Image object detection](https://labelstud.io/templates/image_bbox.html) 
-- [Audio regions](https://labelstud.io/templates/audio_regions.html)
-- [Image KeyPoints](https://labelstud.io/templates/image_keypoints.html)
-- [Image Polygons](https://labelstud.io/templates/image_polygons.html)
-- [HTML Documents](https://labelstud.io/templates/html_document.html)<sup>New</sup>
+```bash
+# Requires >=Python3.6 
+pip install label-studio
 
-Coming Soon:
+# Initialize the project in labeling_project path
+label-studio init labeling_project
 
-- Time series
-- Video
-
-## Usage
-
-### Frontend package
-
-```sh
-npm install label-studio
+# Start the server
+label-studio start labeling_project
 ```
 
-Check [documentation](https://labelstud.io/guide/frontend.html) about frontend integration.
+## One Click Deploy
 
-### Backend and frontend
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+[![Deploy to Azure](https://azurecomcdn.azureedge.net/mediahandler/acomblog/media/Default/blog/deploybutton.png)](https://azuredeploy.net/)
+[![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run)
 
-Check [documentation](https://labelstud.io/guide/backend.html) about backend + frontend integration.
+## Features :star2:
 
-### Docker
-```sh
-docker run -p 8200:8200 -t -i heartexlabs/label-studio -c config.json -l ../examples/chatbot_analysis/config.xml -i ../examples/chatbot_analysis/tasks.json -o output
-```
+- **Simple**: Crafted with minimal UI design. A simple design is the best design.
+- **Configurable**: Using high-level jsx tags config, you can fully customize the visual interface for your data. It feels like building a custom labeling tool for your specific needs. And it's fast to do.
+- **Collaborative Annotations**: Label the same task by two or more people and compare the results. 
+- **Multiple Data Types**: Label _Images_, _Audios_, _Texts_, _HTMLs_, _Pairwise_ types with different labeling scenarios that you define yourself.
+- **Import Formats**: JSON, CSV, TSV, RAR and ZIP archives
+- **Mobile-Friendly**: Works on devices of different sizes.
+- **Embeddable**: It's an [NPM package](https://github.com/heartexlabs/label-studio-frontend) too. You can include it in your projects.
+- **Machine Learning**: Integration support for machine learning. Visualize and compare predictions from different models. Use the best ones for pre-labeling.
+- **Stylable**: Configure the visual appearance to match your company brand, distribute the labeling tasks as a part of your product.
 
-### Machine learning integration
+## Use Cases
+
+The list of supported use cases for data annotation. Please contribute your own configs and feel free to extend the base types to support more scenarios. Note that it's not an extensive list and has only major scenarios.
+
+| Task | Description |
+|-|-|
+| **Image** | | 
+| Classification |  Put images into categories |
+| Object Detection | Detect objects in an image using a bounding box or polygons |
+| Semantic Segmentation | Detect for each pixel the object category it belongs to | 
+| Pose Estimation | Mark positions of a person’s joints |
+| **Text** | | 
+| Classification | Put texts into categories |
+| Summarization | Create a summary that represents the most relevant information within the original content |
+| HTML Tagging | Annotate things like resumes, research, legal papers and excel sheet converted to HTML | 
+| **Audio** | |
+| Classification | Put audios into categories |
+| Speaker Diarisation | partitioning an input audio stream into homogeneous segments according to the speaker identity | 
+| Emotion Recognition | Tag and identifying emotion from the audio |
+| Transcription | Write down verbal communication in text | 
+| **Comparison** | |
+| Pairwise | Comparing entities in pairs to judge which of each entity is preferred | 
+| Ranking | Sort items in the list according to some property |
+
+## Machine Learning Integration
 
 You can easily connect your favorite machine learning framework with Label Studio by using [Heartex SDK](https://github.com/heartexlabs/pyheartex). 
 
-That gives you the opportunities to:
-- use model predictions as prelabeling
-- simultaneously update (retrain) your model while new annotations are coming
-- perform labeling in active learning mode
-- instantly create running production-ready prediction service
+That gives you the opportunities to use:
+- **Pre-labeling**: Use model predictions for pre-labeling
+- **Online Learning**: Simultaneously update (retrain) your model while new annotations are coming
+- **Active Learning**: Perform labeling in active learning mode
+- **Prediction Service**: Instantly create running production-ready prediction service
 
-There is a quick example tutorial how to do that with simple image classification:
+There is a quick example tutorial on how to do that with simple image classification:
 
+0. Create a new project
+   ```bash
+   label-studio init --template=image_classification imgcls
+   ```
 1. Clone pyheartex, and start serving:
     ```bash
     git clone https://github.com/heartexlabs/pyheartex.git
     cd pyheartex/examples/docker
     docker-compose up -d
     ```
-2. Specify running server in your label config:
+2. Specify running server url in `imgcls/config.json`:
     ```json
     "ml_backend": {
       "url": "http://localhost:9090",
       "model_name": "my_super_model"
     }
     ```
-3. Launch Label Studio with [image classification config](examples/image_classification/config.xml):
+3. Launch Label Studio server:
     ```bash
-    python server.py -l ../examples/image_classification/config.xml
+    label-studio start imgcls
     ```
     
-Once you're satisfied with prelabeling results, you can imediately send prediction requests via REST API:
+Once you're satisfied with pre-labeling results, you can immediately send prediction requests via REST API:
 ```bash
 curl -X POST -H 'Content-Type: application/json' -d '{"image_url": "https://go.heartex.net/static/samples/kittens.jpg"}' http://localhost:8200/predict
 ```
 
 Feel free to play around any other models & frameworks apart from image classifiers! (see instructions [here](https://github.com/heartexlabs/pyheartex#advanced-usage))
 
-## Changelog
-
-Detailed changes for each release are documented in the [release notes](https://github.com/heartexlabs/label-studio/releases).
-
-## Stay In Touch
-
-- [Slack](https://docs.google.com/forms/d/e/1FAIpQLSdLHZx5EeT1J350JPwnY2xLanfmvplJi6VZk65C2R4XSsRBHg/viewform?usp=sf_link)
-- [Twitter](https://twitter.com/heartexlabs)
-- [Email](mailto:hi@heartex.net)
-
-## Contributing
-
-Please make sure to read the
-
-- [Contributing Guideline](/CONTRIBUTING.md)
-- [Code Of Conduct](/CODE_OF_CONDUCT.md)
-
-## Label Studio for Teams, Startups, and Enterprises
+## Label Studio for Teams, Startups, and Enterprises :office:
 
 Label Studio for Teams is our enterprise edition (cloud & on-prem), that includes a data manager, high-quality baseline models, active learning, collaborators support, and more. Please visit the [website](https://www.heartex.ai/) to learn more.
 
+## Ecosystem
+
+| Project | Description |
+|-|-|
+| label-studio | Server part, distributed as a pip package |
+| [label-studio-frontend](https://github.com/heartexlabs/label-studio-frontend) | Frontend part, written in JavaScript and React, can be embedded into your application | 
+| [converter](https://github.com/heartexlabs/converter) | Encode labels into the format of your favorite machine learning library | 
+| [label-studio-transformers](https://github.com/heartexlabs/label-studio-transformers) | Transformers library connected and configured for use with label studio | 
+
 ## License
 
-This software is licensed under the [Apache 2.0 LICENSE](/LICENSE) © [Heartex](https://www.heartex.net/).
+This software is licensed under the [Apache 2.0 LICENSE](/LICENSE) © [Heartex](https://www.heartex.ai/). 2020
 
-<div align="center">
-    <a href="https://labelstud.io/"><img src="https://github.com/heartexlabs/label-studio/blob/master/images/opossum_looking.png?raw=true" title="Hey everyone!" height="140" width="140"></a>
-    <h3>Happy Labeling!</h3>
-</div>
+<img src="https://github.com/heartexlabs/label-studio/blob/master/images/opossum_looking.png?raw=true" title="Hey everyone!" height="140" width="140" />

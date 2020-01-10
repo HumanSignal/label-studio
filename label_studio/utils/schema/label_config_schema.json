@@ -1,0 +1,137 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "title": "LabelConfig",
+  "definitions": {
+    "$": {
+      "type": "string"
+    },
+    "@name": {
+      "type": "string"
+    },
+    "@toName": {
+      "type": "string"
+    },
+    "@value": {
+      "type": "string"
+    },
+    "tag_with_value": {
+      "type": "object",
+      "required": [
+        "@value"
+      ],
+      "properties": {
+        "@value": {
+          "$ref": "#/definitions/@value"
+        },
+        "$": {
+          "$ref": "#/definitions/$"
+        }
+      }
+    },
+    "tag_with_value_required_name": {
+      "type": "object",
+      "required": [
+        "@name",
+        "@value"
+      ],
+      "properties": {
+        "@value": {
+          "$ref": "#/definitions/@value"
+        },
+        "$": {
+          "$ref": "#/definitions/$"
+        }
+      }
+    },
+    "tags_with_value": {
+      "anyOf": [{
+        "type": "array",
+        "items": {"$ref": "#/definitions/tag_with_value"}
+      }, {"$ref": "#/definitions/tag_with_value"}]
+    },
+    "tags_with_value_required_name": {
+      "anyOf": [{
+        "type": "array",
+        "items": {"$ref": "#/definitions/tag_with_value_required_name"}
+      }, {"$ref": "#/definitions/tag_with_value_required_name"}]
+    },
+    "Choice": {
+      "$ref": "#/definitions/tag_with_value"
+    },
+    "Label": {
+      "$ref": "#/definitions/tag_with_value"
+    },
+    "Choices": {
+      "type": "object",
+      "required": [
+        "@name",
+        "@toName",
+        "Choice"
+      ],
+      "properties": {
+        "@name": {
+          "$ref": "#/definitions/@name"
+        },
+        "@toName": {
+          "$ref": "#/definitions/@toName"
+        },
+        "$": {
+          "$ref": "#/definitions/$"
+        },
+        "Choice": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/Choice"}
+        }
+      }
+    },
+    "Labels": {
+      "type": "object",
+      "required": [
+        "@name",
+        "@toName",
+        "Label"
+      ],
+      "properties": {
+        "@name": {
+          "$ref": "#/definitions/@name"
+        },
+        "@toName": {
+          "$ref": "#/definitions/@toName"
+        },
+        "$": {
+          "$ref": "#/definitions/$"
+        },
+        "Label": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Label"
+          }
+        }
+      }
+    }
+  },
+  "type": "object",
+  "properties": {
+    "View": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "Choices": {
+          "anyOf": [{
+            "type": "array",
+            "items": {"$ref": "#/definitions/Choices"}
+          }, {"$ref": "#/definitions/Choices"}]
+        },
+        "Labels": {
+          "anyOf": [{
+            "type": "array",
+            "items": {"$ref": "#/definitions/Labels"}
+          }, {"$ref": "#/definitions/Labels"}]
+        },
+        "Image": {"$ref": "#/definitions/tags_with_value_required_name"},
+        "Text": {"$ref": "#/definitions/tags_with_value_required_name"},
+        "HyperText": {"$ref": "#/definitions/tags_with_value_required_name"}
+      }
+    }
+  }
+}

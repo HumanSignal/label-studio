@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% block body %}
+  <style>
+    .circular.label {
+      width: 100px !important;
+      height: 100px !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    .circular.label div {
+      padding-top: 28px !important;
+      padding-left: 5px !important;
+      margin: 0 !important;
+      font-size: 17px !important;
+      color: #AAA !important;
+    }
+
+    .icon.big {
+      padding-top: 18px !important;
+      padding-left: 5px !important;
+      margin: 0 !important;
+      font-size: 30px !important;
+      color: #999 !important;
+    }
+
+    .items {
+      margin: 0 auto !important;
+    }
+
+    .item .content {
+      max-width: 400px !important;
+    }
+
+    .item {
+      max-width: 450px !important;
+      margin: 2em auto !important;
+    }
+
+    .item .header {
+      font-size: 25px !important;
+      font-weight: 100 !important;
+      margin-top: 40px !important;
+      margin-left: 30px !important;
+      color: #555 !important;
+    }
+    .item .meta {
+      margin-left: 30px !important;
+    }
+
+    .title {
+      font-size: 35px !important;
+      font-weight: 100 !important;
+      text-align: center;
+      margin: 0 auto 2em auto;
+      color: #444;
+    }
+
+  </style>
+
+  <div class="ui">
+
+    <div class="title">
+      <img src="static/images/heartex_icon_opossum_green@2x.png" style="margin-bottom: 15px" width="100px">
+      <br>Welcome to Label Studio!</div>
+
+    <div class="ui message" style="max-width: 600px; margin: 0 auto;">
+    <div class="ui items">
+
+      <div class="item">
+        <div class="ui circular label">
+          <i class="icon code grey big"></i>
+          <div>Step 1</div>
+        </div>
+        <div class="content">
+          <span class="header"><a href="/settings">Setup</a> your label config</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="ui circular label">
+          <i class="icon cloud download alternate grey big"></i>
+          <div>Step 2</div>
+        </div>
+        <div class="content">
+          <span class="header"><a href="/import">Import</a> tasks to project</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="ui circular label">
+          <i class="icon play grey big"></i>
+          <div>Step 3</div>
+        </div>
+        <div class="content">
+          <span class="header"><a href="/">Start</a> labeling tasks</span>
+        </div>
+      </div>
+
+      <div class="item">
+        <div class="ui circular label">
+          <i class="icon cloud upload alternate grey big"></i>
+          <div>Step 4</div>
+        </div>
+        <div class="content">
+          <span class="header"><a href="/export">Export</a> completions</span>
+
+        </div>
+      </div>
+
+    </div>
+    </div>
+    
+    <center>
+      <div style="margin-top: 5em">Made with<img src="static/images/opossum_looking.png" width="60px" style="margin-top: -10px;">
+        in California</div>
+    </center>
+  </div>
+  <br>
+
+{% endblock %}

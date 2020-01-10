@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <title>{{ config['title'] }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta charset="utf-8"/>
+
+  <link href="//fonts.googleapis.com/css?family=Dosis:500&amp;text=LabelStudio" rel="stylesheet" type="text/css">
+  <link rel="shortcut icon" href="/static/favicon.ico"/>
+  <link rel="stylesheet" href="/static/css/reset.css">
+  <link rel="stylesheet" href="/static/css/main.css?v2">
+  <link rel="stylesheet" href="/static/css/fontall.min.css">
+  <link rel="stylesheet" href="/static/semantic/semantic.min.css">
+
+  <script src="/static/js/jquery.min.js"></script>
+  <script src="/static/semantic/semantic.min.js"></script>
+  <script src="/static/js/helpers.js"></script>
+
+  <!-- Editor CSS -->
+  {% for css in editor_css %}
+    <link href="{{ css }}" rel="stylesheet">
+  {% endfor %}
+
+  <!-- Editor JS -->
+  {% for js in editor_js %}
+    <script src="{{ js }}"></script>
+  {% endfor %}
+
+</head>
+
+<body>
+
+<!-- Header -->
+<div id="header">
+  <a id="logo" href="/welcome">
+    <img src="/static/images/ls_logo.png" alt="label studio logo" class="img-logo">
+    <span class="img-text">{{ config['title'] }}</span>
+  </a>
+  <ul id="nav">
+    <a href="/" class="{% if url_for(request.endpoint) == '/' %}active{% endif %}">Labeling</a>
+    <span class="delim">|</span>
+
+    <a href="/data" class="{% if url_for(request.endpoint) == '/data' %}active{% endif %}">Data</a>
+    <span class="delim">|</span>
+
+    <a href="/import" class="{% if url_for(request.endpoint) == '/import' %}active{% endif %}">Import</a>
+    <span class="delim">|</span>
+    
+    <a href="/export" class="{% if url_for(request.endpoint) == '/export' %}active{% endif %}">Export</a>
+    <span class="delim">|</span>
+
+    <a href="/settings" class="{% if url_for(request.endpoint) == '/settings' %}active{% endif %}">Settings</a>
+    <span class="delim">|</span>
+
+    <a href="https://labelstud.io/guide/" target="_blank">Docs</a>
+    <span class="delim">|</span>
+
+    <a href="https://github.com/heartexlabs/label-studio" target="_blank"><img src="/static/images/github.svg"
+                                                                               height="22"/></a>
+
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSdLHZx5EeT1J350JPwnY2xLanfmvplJi6VZk65C2R4XSsRBHg/viewform?usp=sf_link"
+       target="_blank"><img src="/static/images/slack.png" height="22"/></a>
+
+  </ul>
+</div>
+
+{% block body %}
+  <div>Heidi is an Opossum!</div>
+{% endblock %}
+
+</body>
+</html>

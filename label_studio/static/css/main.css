@@ -1,0 +1,348 @@
+html {
+    overflow: auto;
+    min-width: 640px;
+}
+
+body {
+    background: #fcfcfc;
+    font-family: Rubik, sans-serif;
+    color: #333;
+}
+
+table {
+    border: 1px solid #ccc;
+    margin: 0 auto;
+    border-collapse: collapse;
+}
+
+h2 {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+td,
+th {
+    padding: 0.4em 2em;
+    border: 1px solid #ccc;
+}
+
+
+.wrapper {
+    max-width: 1400px;
+}
+
+/* Disallow selection on page for Editor Ranker */
+.noselect {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.link {
+    display: block;
+    color: rgb(24, 144, 255);
+    text-decoration: none;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.eye {
+    color: rgb(24, 144, 255);
+}
+
+.trash {
+    color: rgb(255, 13, 23);
+}
+
+.show-completion {
+    cursor: pointer;
+}
+
+.remove-completion {
+    cursor: pointer;
+}
+
+a {
+    text-decoration: none;
+}
+
+#header {
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    padding: 10px 20px 10px 40px;
+    position: relative;
+    z-index: 100;
+    box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 3px 0px;
+    margin-bottom: 3em;
+    min-width: 500px;
+}
+
+#logo {
+    font-size: 1.5em;
+    line-height: 40px;
+    color: #273849;
+    font-family: "Dosis", "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
+    font-weight: 500;
+    display: flex;
+}
+
+.img-logo {
+    vertical-align: middle;
+    margin-right: 6px;
+    width: 40px;
+    height: 40px;
+}
+
+.img-text {
+    font-size: 1.4em;
+}
+
+#nav {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    right: 30px;
+    line-height: 40px;
+    display: flex;
+    align-items: center;
+}
+
+#nav a {
+    color: #304455;
+    font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
+    margin-right: 1em;
+    font-size: 14px;
+}
+
+#nav a:hover {
+    text-decoration: underline;
+}
+
+#nav a.active {
+    font-weight: bold;
+}
+
+.btn {
+    line-height: 1.5;
+    position: relative;
+    display: inline-block;
+    font-weight: 400;
+    white-space: nowrap;
+    text-align: center;
+    background-image: none;
+    cursor: pointer;
+    -webkit-transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+    padding: 10px 25px;
+    font-size: 14px;
+    border-radius: 4px;
+    color: rgba(0, 0, 0, 0.65);
+    color: #fff;
+    background-color: #1890ff;
+    border-color: #1890ff;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.12);
+    -webkit-box-shadow: 0 2px 0 rgba(0, 0, 0, 0.045);
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.045);
+    margin-right: 10px;
+    padding-top: 7px;
+}
+
+.delim {
+    color: #89ac00;
+    margin-right: 1em;
+    font-weight: bold;
+}
+
+.small {
+    font-size: 75%;
+}
+
+/* editor width */
+#label-studio {
+    width: 100%;
+    max-width: 1440px;
+    padding-left: 1em;
+    padding-right: 1em;
+    margin: 0 auto;
+}
+
+#label-studio div[class^="App_editor"],
+div[class*="App_editor"] {
+    width: 100% !important;
+}
+
+@media only screen and (max-width: 768px) {
+    #logo {
+        font-size: 1.5em;
+        line-height: 40px;
+        color: #273849;
+        font-family: "Dosis", "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
+        font-weight: 500;
+        display: flex;
+    }
+
+    .img-text {
+        display: none;
+    }
+
+    #header {
+        padding: 5px 3px 5px 5px;
+    }
+}
+
+
+/* Import */
+
+
+.upload-row-error {
+    margin-top: 0.5%;
+}
+
+.upload-row-error .code {
+    display: block;
+    font-size: 85%;
+}
+
+.upload-row-error * {
+    display: inline-block;
+}
+
+.help-button, .settings-button {
+    padding: 0.80571429em 0.7em 0.80571429em !important;
+}
+
+#holder {
+    display: table;
+    border: 1px dashed #a2a2a2;
+    border-radius: 8px;
+    width: 100%;
+    height: 150px;
+    transition: border 0.4s, color 0.4s;
+    cursor: pointer;
+}
+
+#holder.hover, #holder:hover {
+    border-color: rgb(24, 144, 255);
+}
+
+#holder .text {
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+    color: gray;
+    transition: color 0.4s;
+}
+
+#holder .text i {
+    opacity: 0.35;
+    margin-bottom: 0.1em;
+    transition: color 0.4s, opacity 0.4s;
+}
+
+#holder.hover .text {
+    color: #1f7834;
+}
+
+#holder.hover .text i {
+    color: #1F7834;
+    opacity: 1;
+}
+
+.top-margin-none {
+    margin-top: 0 !important;
+}
+
+.message a.no-go {
+    text-decoration: none;
+    border-bottom: 1px dashed #5994cb;
+}
+
+/* Import Finish */
+
+/* semantic ui pretty */
+
+.ui .button {
+    font-weight: 400 !important;
+}
+
+.ui .button.positive {
+    background: rgb(24, 144, 255) !important;
+    color: #fff !important;
+    border-color: rgb(24, 144, 255) !important;
+}
+
+.ui .button {
+    transition: 0.3s;
+}
+
+.ui .button:hover {
+    transition: 0.3s;
+}
+
+.ui h3 {
+    font-weight: 400;
+}
+
+.ui .message {
+    background: none !important;
+    box-shadow: 0 0 0 1px rgba(34, 36, 38, .15) !important;
+}
+
+.ui .message .content {
+    margin-top: 0.7em;
+}
+
+.ui ul, ol {
+    list-style: none !important;
+    margin: 1em 0 0 2em;
+}
+
+.ui ul li::before {
+  content: "\2022";
+  color: rgba(0,0,0,0.4) !important;
+  font-weight: normal;
+  display: inline-block;
+  width: 1em;
+  margin-left: -1em;
+}
+
+.ui .label.basic {
+    color: #999 !important;
+}
+
+/* semantic ui pretty finish */
+
+/* label config */
+
+.editor-iframe {
+    display: none;
+    width: 100%;
+    overflow: hidden !important;
+    border: none;
+}
+
+
+pre {
+    white-space: pre-wrap; /* css-3 */
+    white-space: -moz-pre-wrap;
+    white-space: -pre-wrap;
+    white-space: -o-pre-wrap;
+    word-wrap: break-word;
+}
+
+/* label config finish */

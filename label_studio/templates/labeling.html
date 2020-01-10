@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block body %}
+
+<script src="/static/js/lsb.js"></script>
+
+<!-- Editor -->
+<div class="content">
+  <div id="label-studio">
+    <div class="ui loader active inline centered"></div>
+  </div>
+</div>
+
+<script>
+  window.onload = function () {
+    let task = {{ task_data | json | safe }};
+    window.LSBI = LSB("label-studio", '{{ label_config_line | safe }}', task);
+  }
+</script>
+
+{% endblock %}

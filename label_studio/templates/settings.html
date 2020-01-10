@@ -1,0 +1,361 @@
+{% extends 'base.html' %}
+{% block body %}
+
+<link rel="stylesheet" href="static/css/codemirror.css">
+<style>
+  .error {
+    background: #ffc5c3;
+  }
+
+  .correct {
+    background: #ddffd1;
+  }
+
+  .validation {
+    margin: 1em 0;
+    padding: 1em 1em;
+    width: 100%;
+  }
+
+  .CodeMirror {
+    height: 500px;
+  }
+
+  .hidden {
+    display: none;
+  }
+</style>
+
+<div class="ui container">
+  <div class="ui wrapper">
+    <form action="/api/save-config" method="post" class="ui form">
+
+      {% include 'settings_help.html' %}
+
+      <!-- Textarea & Preview in two cols -->
+      <div class="ui two column grid zero-margin step2 stackable">
+        <div class="column">
+          <h3>Labeling Config</h3>
+          <textarea name="label_config" cols="40" rows="10" class="project-form htx-html-editor"
+                    id="id_label_config">{{ project.label_config_full | safe }}</textarea>
+          <!-- Submit button -->
+          <br/>
+          <input type="submit" disabled id="submit_form"
+                 class="project-form field ui button positive centered" value="Save"
+                 onclick="create_project(event)"/>
+        </div>
+        <div class="column" style="padding-left: 0;">
+
+          <h3>Interface Preview</h3>
+          <div id="editor-wrap"></div>
+          <pre id="preload-editor">...</pre>
+
+          <h3>Input Task Preview</h3>
+          <pre class="segment" id="upload-data-example" style="word-wrap: break-word">...</pre>
+
+          <h3>Output Completion Preview</h3>
+          <div class="segment">
+            <pre class="segment" id="data-results" style="word-wrap: break-word ">...</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Buttons Back / Next -->
+      <div class="ui error message validation"></div>
+      <br/>      
+    </form>
+
+    <!-- Error dialog -->
+    <div class="ui basic modal" id="error-message">
+      <div class="ui icon header">
+        <i id="error-message-icon" class="exclamation triangle icon"></i>
+      </div>
+      <div class="ui content text" style="text-align: center; font-size: 120%">
+        <p id="error-message-text">Error message here</p>
+      </div>
+    </div>
+
+    <!-- Dimmer and loader --->
+    <div class="ui dimmer" id="dimmer" style="position: fixed !important;">
+      <div class="ui text active orange loader big slow">
+        Saving label config ...<br/>
+      </div>
+    </div>
+
+    <!-- Hidden template codes -->
+    {% for category in templates %}
+      {% for t in templates[category] %}
+        {% autoescape off %}
+        <script data-template-pk="{{ t.pk }}" type="text">{{ t.label_config }}</script>
+        {% endautoescape %}
+      {% endfor %}
+    {% endfor %}
+
+    <!-- Change template dialog -->
+    <div class="ui basic modal" id="confirm-config-template-dialog">
+      <i class="close icon"></i>
+      <div class="ui icon header">
+        <i class="exclamation triangle icon"></i>
+      </div>
+      <div class="content">
+        <p style="text-align: center;font-size:120%">Data that you've putted into textarea will be replaced,
+          proceed?</p>
+      </div>
+      <div class="actions">
+        <div class="ui deny button red basic inverted" id="abort-button">
+          <i class="remove icon"></i>
+          Abort
+        </div>
+        <div class="ui green ok inverted button" id="proceed" role="button" tabindex="0">
+          <i class="checkmark icon"></i>
+          Proceed
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="static/js/codemirror.js"></script>
+<script src="static/js/xml.js"></script>
+
+<script>
+
+  // process create request
+  function process_request(result) {
+    // error
+    if (result.status !== 201) {
+      console.log(result);
+      let msg = message_from_response(result);
+
+      $('#dimmer').removeClass('active');
+      $('#error-message-text').text(msg);
+      $('#error-message-icon').attr('class', 'red exclamation triangle icon');
+      $('#error-message').modal('show');
+    }
+
+    // success
+    else {
+      $('#dimmer').removeClass('active');
+      $('#error-message-icon').attr('class', 'green check icon');
+      $('#error-message-text').text("Label config saved!");
+      $('#error-message').modal('show');
+    }
+  }
+
+  // final action for create project
+  function create_project(event) {
+    $('#dimmer').addClass('active');
+    smart_submit(process_request);
+    event.preventDefault();
+    return false;
+  }
+
+  $(function () {
+
+    function addTemplateConfig($el) {
+      var template_pk = $el.data('value');
+      var value = $('[data-template-pk="' + template_pk + '"]').html();
+
+      labelEditor.setValue(value);
+    }
+
+    $('.use-template').on('click', function () {
+      var $el = $(this);
+
+      if (labelEditor.getValue() !== '') {
+        var dialog = $('#confirm-config-template-dialog');
+        dialog.modal({
+          closable: true,
+          keyboardShortcuts: true,
+          onApprove: function () {
+            addTemplateConfig($el);
+          }
+        }).modal('show');
+
+        // close on enter, unfortunately keyboardShortcuts doesn't work
+        dialog.on('keypress', function () {
+          if (event.keyCode === 13) {
+            dialog.modal('hide');
+            addTemplateConfig($el);
+          }
+        });
+
+      } else {
+        addTemplateConfig($el);
+      }
+
+      return false;
+    });
+  });
+
+  function debounce(func, wait, immediate) {
+    let timeout;
+
+    return function () {
+      const context = this, args = arguments;
+      const later = () => {
+        timeout = null;
+        if (!immediate) func.apply(context, args);
+      };
+      const callNow = immediate && !timeout;
+
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+      if (callNow) func.apply(context, args);
+    };
+  }
+
+  $(function () {
+    var prev_completion = null;
+
+    // serialize editor output by timer
+    setInterval(function () {
+      let iframe = document.getElementById('render-editor');
+      if (iframe !== null) {
+        let Htx = iframe.contentWindow.Htx;
+        if (typeof Htx !== 'undefined') {
+          var completion = JSON.stringify(Htx.completionStore.selected.serializeCompletion(), null, 4);
+          if (prev_completion !== completion) {
+            $('#data-results').text(completion);
+            prev_completion = completion;
+          }
+        }
+      }
+    }, 500);
+
+    function validation_message(msg, status) {
+      let o = $('.validation');
+      o.text(msg);
+
+      if (status === -1) {
+        o.removeClass('hidden');
+        o.addClass('visible');
+      }
+      if (status === 0) {
+        o.removeClass('visible');
+        o.addClass('hidden');
+      }
+    }
+
+    // storage of validation results
+    // let is_collection_ok = false;
+    let is_label_ok = false;
+
+    function check_submit_button() {
+      // Create new project behaviour
+      if (is_label_ok && labelEditor.getValue() !== '') {
+        $('#submit_form').prop('disabled', false);
+      } else {
+        $('#submit_form').prop('disabled', true);
+      }
+    }
+
+    function editor_iframe(res) {
+      // generate new iframe
+      let iframe = $('<iframe class="editor-iframe"><iframe>');
+      // add iframe to wrapper div
+      $('#editor-wrap').append(iframe);
+
+      iframe.on('load', function () {
+        // remove old iframe
+        $('#render-editor').hide();
+        $('#render-editor').remove();
+        // assign id to new iframe
+        iframe.attr('id', 'render-editor');
+        iframe.show();
+        // set height for iframe
+          let obj = document.getElementById('render-editor');
+          obj.style.width = "100%";
+        obj.style.height = (obj.contentWindow.document.body.scrollHeight + 30) + 'px';
+        // hide "..."
+        $('#preload-editor').hide();
+      });
+
+      // load new data into iframe
+      iframe.attr('srcdoc', res);
+    }
+
+    function show_render_editor(editor) {
+      let config = labelEditor.getValue();
+      $.ajax({
+        url: '/api/render-label-studio',
+        method: 'POST',
+        data: {config: config},
+        success: editor_iframe,
+        error: function () {
+          $('#preload-editor').show();
+        }
+      })
+    }
+
+    // send request to server with configs to validate
+    function validate_config(editor) {
+      // get current scheme type from current editor
+      let url = '/api/validate-config';
+      var val = labelEditor.getValue();
+
+      if (!val.length)
+        return;
+
+      // label config validation
+      $.ajax({
+        url: url,
+        method: 'POST',
+        data: {label_config: val},
+        success: function (res) {
+          is_label_ok = true;
+          validation_message('', 0);
+          show_render_editor(editor);
+          check_submit_button();
+        },
+        error: function (res) {
+          is_label_ok = false;
+          validation_message(res.responseJSON['label_config'][0], -1);
+          $('#render-editor').hide();
+          $('#preload-editor').show();
+          check_submit_button();
+        }
+      });
+
+      // load sample task
+      $.post({
+        url: '/api/import-example',
+        data: {label_config: val}
+      })
+        .fail(o => {
+          $('#upload-data-example').text('...')
+        })
+        .done(o => {
+          $('#upload-data-example').text(JSON.stringify(JSON.parse(o), null, 4))
+        })
+    }
+
+    // Label code mirror
+    let labelEditor = CodeMirror.fromTextArea(document.getElementById('id_label_config'), {
+      lineNumbers: true,
+      mode: "text/html"
+    });
+    // refresh for proper line numbers drawing
+    labelEditor.refresh();
+    // add validation
+    labelEditor.on('change', debounce(function (editor) {
+      validate_config(editor);
+      $('#id_label_config').val(editor.getValue());
+
+    }, 500));
+
+    window.labelEditor = labelEditor;
+
+    // validate config on start
+    validate_config(window.labelEditor);
+
+    // click on close icon of messages
+    $('.message .close')
+      .on('click', function () {
+        $(this).closest('.message').transition('fade');
+      });
+  });
+</script>
+
+{% endblock %}

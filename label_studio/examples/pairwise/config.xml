@@ -1,0 +1,6 @@
+<!-- {"title": "Text pairwise labeling", "category": "text"} -->
+<View>
+  <Pairwise name="pw" toName="txt-1,txt-2"></Pairwise>
+  <Text name="txt-1" value="$text1" />
+  <Text name="txt-2" value="$text2" />
+</View>

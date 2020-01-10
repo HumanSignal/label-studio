@@ -1,8 +1,10 @@
 ---
 title: Build
 type: guide
-order: 1005
+order: 805
 ---
+
+Label Studio frontend is a separate package that can be included into your applications. It's repository is located at https://github.com/heartexlabs/label-studio-frontend
 
 ## Development usage
 

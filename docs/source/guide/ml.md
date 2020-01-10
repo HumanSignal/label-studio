@@ -1,7 +1,7 @@
 ---
-title: Machine Learning
+title: Integrate Machine Learning
 type: guide
-order: 1030
+order: 605
 ---
 
 You can easily connect your favorite machine learning framework with Label Studio by using [Heartex SDK](https://github.com/heartexlabs/pyheartex). 
