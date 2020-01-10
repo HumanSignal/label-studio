@@ -247,7 +247,8 @@ def parse_input_args():
 
     parser = argparse.ArgumentParser(description='Label studio')
 
-    subparsers = parser.add_subparsers(dest='command', help='Available commands', required=True)
+    subparsers = parser.add_subparsers(dest='command', help='Available commands')
+    subparsers.required=True
 
     # init sub-command parser
 
