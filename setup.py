@@ -1,7 +1,7 @@
 import setuptools
 
 # Package version
-version = '0.4.0rc8'
+version = '0.4.1'
 
 # Readme
 with open('README.md', 'r') as f:
@@ -30,6 +30,6 @@ setuptools.setup(
     install_requires=requirements,
     python_requires='>=3.6',
     entry_points={
-        'console_scripts': ['label-studio=label_studio.server:main_open_browser'],
+        'console_scripts': ['label-studio=label_studio.server:main'],
     }
 )
