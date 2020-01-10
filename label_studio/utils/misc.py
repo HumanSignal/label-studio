@@ -5,22 +5,15 @@ import traceback as tb
 import io
 from flask import request, jsonify, make_response
 import json  # it MUST be included after flask!
-import inspect
 import pkg_resources
 
-from shutil import copy2
 from collections import defaultdict
 from appdirs import user_config_dir
 from pythonjsonlogger import jsonlogger
 from lxml import etree, objectify
 from xml.etree import ElementTree
-from .db import re_init
+
 from label_studio.utils.io import find_file, find_dir
-
-
-input_args = None
-config_path = None
-prev_config = None
 
 
 # settings from django analogue
@@ -143,182 +136,6 @@ def config_comments_free(xml_config):
         xml_config = etree.tostring(tree, method='html').decode("utf-8")
 
     return xml_config
-
-
-def label_studio_init(output_dir, label_config=None):
-    os.makedirs(output_dir, exist_ok=True)
-    default_config_file = os.path.join(output_dir, 'config.json')
-    default_label_config_file = os.path.join(output_dir, 'config.xml')
-    default_output_dir = os.path.join(output_dir, 'completions')
-    default_input_path = os.path.join(output_dir, 'tasks.json')
-
-    if label_config:
-        copy2(label_config, default_label_config_file)
-
-    default_config = {
-        'title': 'Label Studio',
-        'port': 8200,
-        'debug': False,
-
-        'label_config': default_label_config_file,
-        'input_path': default_input_path,
-        'output_dir': default_output_dir,
-
-        'instruction': 'Type some <b>hypertext</b> for label experts!',
-        'allow_delete_completions': True,
-        'templates_dir': 'examples',
-
-        'editor': {
-            'debug': False
-        },
-
-        '!ml_backend': {
-            'url': 'http://localhost:9090',
-            'model_name': 'my_super_model'
-        },
-        'sampling': 'uniform'
-    }
-
-    # create input_path (tasks.json)
-    if not os.path.exists(default_input_path):
-        with io.open(default_input_path, mode='w') as fout:
-            json.dump([], fout, indent=2)
-        print(f'{default_input_path} input path has been created.')
-    else:
-        print(f'{default_input_path} input path already exists.')
-
-    # create config file (config.json)
-    if not os.path.exists(default_config_file):
-        with io.open(default_config_file, mode='w') as fout:
-            json.dump(default_config, fout, indent=2)
-        print(f'{default_config_file} config file has been created.')
-    else:
-        print(f'{default_config_file} config file already exists.')
-
-    # create label config (config.xml)
-    if not os.path.exists(default_label_config_file):
-        default_label_config = '<View></View>'
-        with io.open(default_label_config_file, mode='w') as fout:
-            fout.write(default_label_config)
-        print(f'{default_label_config_file} label config file has been created.')
-    else:
-        print(f'{default_label_config_file} label config file already exists.')
-
-    # create output dir (completions)
-    if not os.path.exists(default_output_dir):
-        os.makedirs(default_output_dir)
-        print(f'{default_output_dir} output directory has been created.')
-    else:
-        print(f'{default_output_dir} output directory already exists.')
-
-    print('')
-    print(f'Label Studio has been successfully initialized. Check project states in {output_dir}')
-    print(f'Start the server: label-studio start {output_dir}')
-
-
-def load_config(re_init_db=True):
-    global input_args, config_path
-
-    c = json.load(open(config_path))
-    c['port'] = input_args.port if input_args.port else c['port']
-    c['label_config'] = input_args.label_config if input_args.label_config else c['label_config']
-    c['input_path'] = input_args.input_path if input_args.input_path else c['input_path']
-    c['output_dir'] = input_args.output_dir if input_args.output_dir else c['output_dir']
-
-    # re-init db
-    if prev_config != c and re_init_db:
-        print('Config changes detected, reloading DB')
-        re_init(c)
-
-    return c
-
-
-def parse_input_args():
-    """ Combine args with json config
-
-    :return: config dict
-    """
-    import sys
-    import argparse
-
-    global input_args, config_path, prev_config
-    if len(sys.argv) == 1:
-        print('\nQuick start usage: label-studio start my_project --init\n')
-
-    parser = argparse.ArgumentParser(description='Label studio')
-
-    subparsers = parser.add_subparsers(dest='command', help='Available commands')
-    subparsers.required=True
-
-    # init sub-command parser
-
-    available_templates = [os.path.basename(os.path.dirname(f)) for f in iter_config_templates()]
-
-    parser_init = subparsers.add_parser('init', help='Initialize Label Studio')
-    parser_init.add_argument(
-        'project_name',
-        help='Path to directory where project state will be initialized')
-    parser_init.add_argument(
-        '--template', dest='template', choices=available_templates,
-        help='Choose from predefined project templates'
-    )
-
-    # start sub-command parser
-
-    parser_start = subparsers.add_parser('start', help='Start Label Studio server')
-    parser_start.add_argument(
-        'project_name',
-        help='Path to directory where project state has been initialized'
-    )
-    parser_start.add_argument(
-        '--init', dest='init', action='store_true',
-        help='Initialize if project is not initialized yet'
-    )
-    parser_start.add_argument(
-        '--template', dest='template', choices=available_templates,
-        help='Choose from predefined project templates'
-    )
-    parser_start.add_argument(
-        '-c', '--config', dest='config_path', default=os.path.join(os.path.dirname(__file__), '..', 'config.json'),
-        help='backend config')
-    parser_start.add_argument(
-        '-l', '--label-config', dest='label_config', default='',
-        help='label config path')
-    parser_start.add_argument(
-        '-i', '--input-path', dest='input_path', default='',
-        help='input path to task file or directory with tasks')
-    parser_start.add_argument(
-        '-o', '--output-dir', dest='output_dir', default='',
-        help='output directory for completions')
-    parser_start.add_argument(
-        '-p', '--port', dest='port', default=8200, type=int,
-        help='backend port')
-    parser_start.add_argument(
-        '-v', '--verbose', action='store_true',
-        help='increase output verbosity')
-
-    input_args = parser.parse_args()
-    if hasattr(input_args, 'label_config') and input_args.label_config:
-        label_config = input_args.label_config
-    elif input_args.template:
-        label_config = os.path.join(find_dir('examples'), input_args.template, 'config.xml')
-    else:
-        label_config = None
-    if input_args.command == 'init' or input_args.init:
-        label_studio_init(input_args.project_name, label_config)
-        if input_args.command == 'init':
-            return False
-    print('Working dir', os.getcwd())
-    if not os.path.exists(input_args.project_name):
-        raise FileNotFoundError(
-            f'Couldn\'t find directory {input_args.project_name}, maybe you mean:\n'
-            f'label-studio start {input_args.project_name} --init')
-    config_path = os.path.join(input_args.project_name, 'config.json')
-    if not os.path.exists(config_path):
-        raise FileNotFoundError(
-            f'Couldn\'t find config file {config_path} in project directory {input_args.project_name}, '
-            f'may be you mean:\nlabel-studio start {input_args.project_name} --init')
-    return True
 
 
 class LabelConfigParser(object):

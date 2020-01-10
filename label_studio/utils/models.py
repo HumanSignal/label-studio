@@ -145,6 +145,11 @@ class Project(object):
         :return: True if config match already imported tasks
         """
         input_schema = db.derived_input_schema
+
+        # check if schema exists, i.e. at least one task has been uploaded
+        if not input_schema:
+            return
+        
         config = config_string_or_parsed_config
         if isinstance(config, str):
             config = parse_config(config)
@@ -153,16 +158,21 @@ class Project(object):
             for input_item in input_items:
                 input_types.add(input_item['type'])
                 input_values.add(input_item['value'])
-        for item in input_schema:
-            if item['type'] not in input_types:
+
+        input_schema_types = set([item['type'] for item in input_schema])
+        input_schema_values = set([item['value'] for item in input_schema])
+
+        # check input data types: they must be in schema
+        for item in input_types:
+            if item not in input_schema_types:
                 raise ValidationError(
-                    f'You\'ve already imported tasks of type {item["type"]}, '
-                    f'but this type is not found among input types: {list(input_types)}')
-            if item['value'] not in input_values:
+                    f'Can\'t find type "{item}" among already imported tasks with types {list(input_schema_types)}')
+
+        # check input data values: they must be in schema
+        for item in input_values:
+            if item not in input_schema_values:
                 raise ValidationError(
-                    f'You\'ve already imported tasks with keys "{item["value"]}", '
-                    f'but this key is not found among input tags attributes "value":'
-                    f' {list(input_values)}')
+                    f'Can\t find key "{item}" among already imported tasks with keys {list(input_schema_values)}')
 
     @classmethod
     def validate_label_config_on_derived_output_schema(cls, config_string_or_parsed_config):
@@ -172,6 +182,11 @@ class Project(object):
         :return: True if config match already created completions
         """
         output_schema = db.derived_output_schema
+
+        # check if schema exists, i.e. at least one completion has been created
+        if not output_schema['from_name_to_name_type']:
+            return
+
         config = config_string_or_parsed_config
         if isinstance(config, str):
             config = parse_config(config)

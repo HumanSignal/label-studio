@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 from __future__ import print_function
 
+import io
 import os
+from shutil import copy2
+
 import lxml
 import time
 import flask
@@ -32,8 +35,8 @@ from label_studio.utils.validation import TaskValidator
 from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.functions import generate_sample_task_without_check, data_examples
 from label_studio.utils.misc import (
-    exception_treatment, log_config, log, load_config, config_line_stripped, config_comments_free,
-    get_config_templates, parse_input_args
+    exception_treatment, log_config, log, config_line_stripped, config_comments_free,
+    get_config_templates, iter_config_templates
 )
 
 logger = logging.getLogger(__name__)
@@ -43,6 +46,10 @@ app.secret_key = 'A0Zrdqwf1AQWj12ajkhgFN]dddd/,?RfDWQQT'
 
 # init
 c = None
+# config file path
+config_path = None
+# input arguments
+input_args = None
 # load editor config from XML
 label_config_line = None
 # analytics
@@ -59,11 +66,15 @@ def reload_config(prompt_inputs=False, force=False):
     global analytics
     global ml_backend
     global project
+    global config_path
 
-    # Read config from config.json & input arguments (dont initialize any inner DBs)
-    c = load_config(re_init_db=False)
-    if not c:
-        return False
+    # Read config from config.json & input arguments
+    c = json.load(open(config_path))
+    c['port'] = input_args.port if input_args.port else c['port']
+    c['label_config'] = input_args.label_config if input_args.label_config else c['label_config']
+    c['input_path'] = input_args.input_path if input_args.input_path else c['input_path']
+    c['output_dir'] = input_args.output_dir if input_args.output_dir else c['output_dir']
+    c['debug'] = input_args.debug if input_args.debug is not None else c['debug']
 
     # If specified, prompt user in console about specific inputs
     if prompt_inputs:
@@ -591,26 +602,208 @@ def get_data_file(filename):
     return flask.send_from_directory(directory, filename, as_attachment=True)
 
 
+def label_studio_init(output_dir, label_config=None):
+    os.makedirs(output_dir, exist_ok=True)
+    default_config_file = os.path.join(output_dir, 'config.json')
+    default_label_config_file = os.path.join(output_dir, 'config.xml')
+    default_output_dir = os.path.join(output_dir, 'completions')
+    default_input_path = os.path.join(output_dir, 'tasks.json')
+
+    if label_config:
+        copy2(label_config, default_label_config_file)
+
+    default_config = {
+        'title': 'Label Studio',
+        'port': 8200,
+        'debug': False,
+
+        'label_config': default_label_config_file,
+        'input_path': default_input_path,
+        'output_dir': default_output_dir,
+
+        'instruction': 'Type some <b>hypertext</b> for label experts!',
+        'allow_delete_completions': True,
+        'templates_dir': 'examples',
+
+        'editor': {
+            'debug': False
+        },
+
+        '!ml_backend': {
+            'url': 'http://localhost:9090',
+            'model_name': 'my_super_model'
+        },
+        'sampling': 'uniform'
+    }
+
+    # create input_path (tasks.json)
+    if not os.path.exists(default_input_path):
+        with io.open(default_input_path, mode='w') as fout:
+            json.dump([], fout, indent=2)
+        print(f'{default_input_path} input path has been created.')
+    else:
+        print(f'{default_input_path} input path already exists.')
+
+    # create config file (config.json)
+    if not os.path.exists(default_config_file):
+        with io.open(default_config_file, mode='w') as fout:
+            json.dump(default_config, fout, indent=2)
+        print(f'{default_config_file} config file has been created.')
+    else:
+        print(f'{default_config_file} config file already exists.')
+
+    # create label config (config.xml)
+    if not os.path.exists(default_label_config_file):
+        default_label_config = '<View></View>'
+        with io.open(default_label_config_file, mode='w') as fout:
+            fout.write(default_label_config)
+        print(f'{default_label_config_file} label config file has been created.')
+    else:
+        print(f'{default_label_config_file} label config file already exists.')
+
+    # create output dir (completions)
+    if not os.path.exists(default_output_dir):
+        os.makedirs(default_output_dir)
+        print(f'{default_output_dir} output directory has been created.')
+    else:
+        print(f'{default_output_dir} output directory already exists.')
+
+    print('')
+    print(f'Label Studio has been successfully initialized. Check project states in {output_dir}')
+    print(f'Start the server: label-studio start {output_dir}')
+
+
+def _get_config(args):
+    # if config is explicitly specified, just return it
+    if args.config_path:
+        return args.config_path
+
+    # check if project directory exists
+    if not os.path.exists(args.project_name):
+        raise FileNotFoundError(
+            f'Couldn\'t find directory {args.project_name}, maybe you\'ve missed appending "--init" option:\n'
+            f'label-studio start {args.project_name} --init')
+
+    # check config.json exists in directory
+    config_path = os.path.join(args.project_name, 'config.json')
+    if not os.path.exists(config_path):
+        raise FileNotFoundError(
+            f'Couldn\'t find config file {config_path} in project directory {args.project_name}, '
+            f'maybe you\'ve missed appending "--init" option:\nlabel-studio start {args.project_name} --init')
+
+    return config_path
+
+
+def parse_input_args():
+    """ Combine args with json config
+
+    :return: config dict
+    """
+    import sys
+    import argparse
+
+    if len(sys.argv) == 1:
+        print('\nQuick start usage: label-studio start my_project --init\n')
+
+    root_parser = argparse.ArgumentParser(add_help=False)
+    root_parser.add_argument(
+        '-b', '--no-browser', dest='no_browser', action='store_true',
+        help='Do not open browser at label studio start'
+    )
+    root_parser.add_argument(
+        '-d', '--debug', dest='debug', action='store_true',
+        help='Debug mode for Flask', default=None
+    )
+
+    parser = argparse.ArgumentParser(description='Label studio')
+
+    subparsers = parser.add_subparsers(dest='command', help='Available commands')
+    subparsers.required = True
+
+    # init sub-command parser
+
+    available_templates = [os.path.basename(os.path.dirname(f)) for f in iter_config_templates()]
+
+    parser_init = subparsers.add_parser('init', help='Initialize Label Studio', parents=[root_parser])
+    parser_init.add_argument(
+        'project_name',
+        help='Path to directory where project state will be initialized')
+    parser_init.add_argument(
+        '--template', dest='template', choices=available_templates,
+        help='Choose from predefined project templates'
+    )
+
+    # start sub-command parser
+
+    parser_start = subparsers.add_parser('start', help='Start Label Studio server', parents=[root_parser])
+    parser_start.add_argument(
+        'project_name',
+        help='Path to directory where project state has been initialized'
+    )
+    parser_start.add_argument(
+        '--init', dest='init', action='store_true',
+        help='Initialize if project is not initialized yet'
+    )
+    parser_start.add_argument(
+        '--template', dest='template', choices=available_templates,
+        help='Choose from predefined project templates'
+    )
+    parser_start.add_argument(
+        '-c', '--config', dest='config_path',
+        help='Server config')
+    parser_start.add_argument(
+        '-l', '--label-config', dest='label_config', default='',
+        help='Label config path')
+    parser_start.add_argument(
+        '-i', '--input-path', dest='input_path', default='',
+        help='Input path to task file or directory with tasks')
+    parser_start.add_argument(
+        '-o', '--output-dir', dest='output_dir', default='',
+        help='Output directory for completions')
+    parser_start.add_argument(
+        '-p', '--port', dest='port', default=8200, type=int,
+        help='Server port')
+    parser_start.add_argument(
+        '-v', '--verbose', action='store_true',
+        help='Increase output verbosity')
+
+    args = parser.parse_args()
+    label_config_explicitly_specified = hasattr(args, 'label_config') and args.label_config
+    if args.template and not label_config_explicitly_specified:
+        args.label_config = os.path.join(find_dir('examples'), args.template, 'config.xml')
+    if not hasattr(args, 'label_config'):
+        args.label_config = None
+
+    return args
+
+
 def main():
-    start_server = parse_input_args()
-    if start_server:
-        reload_config()
-        app.run(host='0.0.0.0', port=c['port'], debug=c['debug'])
-
-
-def main_open_browser():
     import threading
     import webbrowser
 
-    start_server = parse_input_args()
+    global config_path, input_args
 
-    if start_server:
+    input_args = parse_input_args()
+
+    # On `init` command, create directory args.project_name with initial project state and exit
+    if input_args.command == 'init':
+        label_studio_init(input_args.project_name, input_args.label_config)
+        return
+
+    # If --init option is specified, do the same as with `init` command, but continue to run app
+    elif input_args.init:
+        label_studio_init(input_args.project_name, input_args.label_config)
+
+    # On `start` command, launch browser if --no-browser is not specified and start label studio server
+    if input_args.command == 'start':
+        config_path = _get_config(input_args)
         reload_config()
-        port = c['port']
-        browser_url = f'http://127.0.0.1:{port}/welcome'
-        print(f'Start browser at URL: {browser_url}')
-        threading.Timer(2.5, lambda: webbrowser.open(browser_url)).start()
-        app.run(host='0.0.0.0', port=c['port'], debug=False)
+        if not input_args.no_browser:
+            browser_url = f'http://127.0.0.1:{c["port"]}/welcome'
+            threading.Timer(2.5, lambda: webbrowser.open(browser_url)).start()
+            print(f'Start browser at URL: {browser_url}')
+
+        app.run(host='0.0.0.0', port=c['port'], debug=c['debug'])
 
 
 if __name__ == "__main__":

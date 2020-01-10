@@ -22,7 +22,6 @@ derived_output_schema = {
     'labels': defaultdict(set)
 }
 
-
 _allowed_extensions = {
     'Text': ('.txt',),
     'Image': ('.png', '.jpg', '.jpeg', '.tiff', '.bmp', '.gif'),

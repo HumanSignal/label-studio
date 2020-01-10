@@ -1,7 +1,7 @@
 {
   "title": "Label Studio",
   "port": 8200,
-  "debug": true,
+  "debug": false,
 
   "label_config": "examples/image_bbox/config.xml",
   "input_path": "examples/image_bbox",

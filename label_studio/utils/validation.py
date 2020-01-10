@@ -16,11 +16,11 @@ class Settings:
 
 
 _DATA_TYPES = {
-    'Text': str,
-    'HyperText': str,
-    'Image': str,
-    'List': list,
-    'Dialog': list
+    'Text': [str, int],
+    'HyperText': [str],
+    'Image': [str],
+    'List': [list],
+    'Dialog': [list]
 }
 logger = logging.getLogger(__name__)
 settings = Settings()
@@ -53,11 +53,11 @@ class TaskValidator:
             if data_key not in data:
                 raise ValidationError(f'"{data_key}" key is expected in task data')
 
-            expected_type = _DATA_TYPES.get(data_type, str)
-            if not isinstance(data[data_key], expected_type):
+            expected_types = _DATA_TYPES.get(data_type, str)
+            if not isinstance(data[data_key], tuple(expected_types)):
                 raise ValidationError(f'data["{data_key}"]={data[data_key]} '
                                       f'is of type "{type(data[data_key])}", '
-                                      f'but type "{expected_type}" is expected')
+                                      f'but types "{expected_types}" are expected')
 
             if data_type == 'List':
                 for item in data[data_key]:
