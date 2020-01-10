@@ -224,6 +224,7 @@ def load_config(re_init_db=True):
     c['label_config'] = input_args.label_config if input_args.label_config else c['label_config']
     c['input_path'] = input_args.input_path if input_args.input_path else c['input_path']
     c['output_dir'] = input_args.output_dir if input_args.output_dir else c['output_dir']
+    c['debug'] = input_args.debug if input_args.debug is not None else c['debug']
 
     # re-init db
     if prev_config != c and re_init_db:
@@ -245,15 +246,26 @@ def parse_input_args():
     if len(sys.argv) == 1:
         print('\nQuick start usage: label-studio start my_project --init\n')
 
+    root_parser = argparse.ArgumentParser(add_help=False)
+    root_parser.add_argument(
+        '-b', '--no-browser', dest='no_browser', action='store_true',
+        help='Do not open browser at label studio start'
+    )
+    root_parser.add_argument(
+        '-d', '--debug', dest='debug', action='store_true',
+        help='Debug mode for Flask', default=None
+    )
+
     parser = argparse.ArgumentParser(description='Label studio')
 
-    subparsers = parser.add_subparsers(dest='command', help='Available commands', required=True)
+    subparsers = parser.add_subparsers(dest='command', help='Available commands')
+    subparsers.required = True
 
     # init sub-command parser
 
     available_templates = [os.path.basename(os.path.dirname(f)) for f in iter_config_templates()]
 
-    parser_init = subparsers.add_parser('init', help='Initialize Label Studio')
+    parser_init = subparsers.add_parser('init', help='Initialize Label Studio', parents=[root_parser])
     parser_init.add_argument(
         'project_name',
         help='Path to directory where project state will be initialized')
@@ -264,7 +276,7 @@ def parse_input_args():
 
     # start sub-command parser
 
-    parser_start = subparsers.add_parser('start', help='Start Label Studio server')
+    parser_start = subparsers.add_parser('start', help='Start Label Studio server', parents=[root_parser])
     parser_start.add_argument(
         'project_name',
         help='Path to directory where project state has been initialized'
@@ -307,6 +319,7 @@ def parse_input_args():
         label_studio_init(input_args.project_name, label_config)
         if input_args.command == 'init':
             return False
+
     print('Working dir', os.getcwd())
     if not os.path.exists(input_args.project_name):
         raise FileNotFoundError(
@@ -317,7 +330,8 @@ def parse_input_args():
         raise FileNotFoundError(
             f'Couldn\'t find config file {config_path} in project directory {input_args.project_name}, '
             f'may be you mean:\nlabel-studio start {input_args.project_name} --init')
-    return True
+
+    return input_args
 
 
 class LabelConfigParser(object):

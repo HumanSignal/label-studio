@@ -592,8 +592,8 @@ def get_data_file(filename):
 
 
 def main():
-    start_server = parse_input_args()
-    if start_server:
+    args = parse_input_args()
+    if args:
         reload_config()
         app.run(host='0.0.0.0', port=c['port'], debug=c['debug'])
 
@@ -602,15 +602,18 @@ def main_open_browser():
     import threading
     import webbrowser
 
-    start_server = parse_input_args()
+    args = parse_input_args()
 
-    if start_server:
+    if args:
         reload_config()
-        port = c['port']
-        browser_url = f'http://127.0.0.1:{port}/welcome'
-        print(f'Start browser at URL: {browser_url}')
+
+    if args and not args.no_browser:
+        browser_url = f'http://127.0.0.1:{c["port"]}/welcome'
         threading.Timer(2.5, lambda: webbrowser.open(browser_url)).start()
-        app.run(host='0.0.0.0', port=c['port'], debug=False)
+        print(f'Start browser at URL: {browser_url}')
+
+    if args:
+        app.run(host='0.0.0.0', port=c['port'], debug=c['debug'])
 
 
 if __name__ == "__main__":
