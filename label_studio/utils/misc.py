@@ -242,6 +242,8 @@ def parse_input_args():
     import argparse
 
     global input_args, config_path, prev_config
+    if len(sys.argv) == 1:
+        print('\nQuick start usage: label-studio start my_project --init\n')
 
     parser = argparse.ArgumentParser(description='Label studio')
 
@@ -360,7 +362,7 @@ def get_app_version():
 def parse_config(config_string):
 
     def _is_input_tag(tag):
-        return tag.attrib.get('name') and tag.attrib.get('value', '').startswith('$')
+        return tag.attrib.get('name') and tag.attrib.get('value')
 
     def _is_output_tag(tag):
         return tag.attrib.get('name') and tag.attrib.get('toName')

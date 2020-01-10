@@ -270,6 +270,8 @@ def api_validate_config():
         project.validate_label_config(request.form['label_config'])
     except ValidationError as e:
         return make_response(jsonify({'label_config': e.msg_to_list()}), status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return make_response(jsonify({'label_config': [str(e)]}), status.HTTP_400_BAD_REQUEST)
 
     return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -288,6 +290,8 @@ def api_save_config():
         project.validate_label_config(label_config)
     except ValidationError as e:
         return make_response(jsonify({'label_config': e.msg_to_list()}), status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return make_response(jsonify({'label_config': [str(e)]}), status.HTTP_400_BAD_REQUEST)
 
     # save xml label config to file
     path = c['label_config']
@@ -313,7 +317,7 @@ def api_import_example():
     try:
         Project.validate_label_config(config)
         output = generate_sample_task_without_check(config, mode='editor_preview')
-    except (ValueError, ValidationError, lxml.etree.Error):
+    except (ValueError, ValidationError, lxml.etree.Error, KeyError):
         response = HttpResponse('error while example generating', status=status.HTTP_400_BAD_REQUEST)
     else:
         response = HttpResponse(json.dumps(output))
