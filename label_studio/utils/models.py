@@ -145,6 +145,11 @@ class Project(object):
         :return: True if config match already imported tasks
         """
         input_schema = db.derived_input_schema
+
+        # check if schema exists, i.e. at least one task has been uploaded
+        if not input_schema:
+            return
+        
         config = config_string_or_parsed_config
         if isinstance(config, str):
             config = parse_config(config)
@@ -177,6 +182,11 @@ class Project(object):
         :return: True if config match already created completions
         """
         output_schema = db.derived_output_schema
+
+        # check if schema exists, i.e. at least one completion has been created
+        if not output_schema['from_name_to_name_type']:
+            return
+
         config = config_string_or_parsed_config
         if isinstance(config, str):
             config = parse_config(config)

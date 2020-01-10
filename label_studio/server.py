@@ -767,12 +767,14 @@ def parse_input_args():
         '-v', '--verbose', action='store_true',
         help='Increase output verbosity')
 
-    input_args = parser.parse_args()
-    label_config_explicitly_specified = hasattr(input_args, 'label_config') and input_args.label_config
-    if input_args.template and not label_config_explicitly_specified:
-        input_args.label_config = os.path.join(find_dir('examples'), input_args.template, 'config.xml')
+    args = parser.parse_args()
+    label_config_explicitly_specified = hasattr(args, 'label_config') and args.label_config
+    if args.template and not label_config_explicitly_specified:
+        args.label_config = os.path.join(find_dir('examples'), args.template, 'config.xml')
+    if not hasattr(args, 'label_config'):
+        args.label_config = None
 
-    return input_args
+    return args
 
 
 def main():
