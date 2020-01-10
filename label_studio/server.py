@@ -588,18 +588,20 @@ def get_data_file(filename):
 
 
 def main():
-    parse_input_args()
-    reload_config()
-    app.run(host='0.0.0.0', port=c['port'], debug=c['debug'])
+    start_server = parse_input_args()
+    if start_server:
+        reload_config()
+        app.run(host='0.0.0.0', port=c['port'], debug=c['debug'])
 
 
 def main_open_browser():
     import threading
     import webbrowser
 
-    parse_input_args()
+    start_server = parse_input_args()
 
-    if reload_config():
+    if start_server:
+        reload_config()
         port = c['port']
         browser_url = f'http://127.0.0.1:{port}/welcome'
         print(f'Start browser at URL: {browser_url}')

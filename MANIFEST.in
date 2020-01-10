@@ -3,3 +3,4 @@ recursive-include label_studio/static *
 include label_studio/templates/*.html
 include label_studio/utils/schema/*.json
 include label_studio/logger.json
+include label_studio/config.json

@@ -299,7 +299,7 @@ def parse_input_args():
         help='increase output verbosity')
 
     input_args = parser.parse_args()
-    if input_args.label_config:
+    if hasattr(input_args, 'label_config') and input_args.label_config:
         label_config = input_args.label_config
     elif input_args.template:
         label_config = os.path.join(find_dir('examples'), input_args.template, 'config.xml')
@@ -308,11 +308,12 @@ def parse_input_args():
     if input_args.command == 'init' or input_args.init:
         label_studio_init(input_args.project_name, label_config)
         if input_args.command == 'init':
-            return
+            return False
     print('Working dir', os.getcwd())
     config_path = os.path.join(input_args.project_name, 'config.json')
     if not os.path.exists(config_path):
         config_path = input_args.config_path
+    return True
 
 
 class LabelConfigParser(object):

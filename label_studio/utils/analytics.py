@@ -1,6 +1,7 @@
 import logging
 import os
 import io
+import requests
 
 from mixpanel import Mixpanel, MixpanelException
 from copy import deepcopy
@@ -63,7 +64,16 @@ class Analytics(object):
         data = deepcopy(kwargs)
         data['version'] = self._version
         data['label_types'] = self._label_types
+        event_name = f'LS:{event_name}'
         try:
-            mp.track(self._user_id, f'LS:{event_name}', data)
+            mp.track(self._user_id, event_name, data)
         except MixpanelException as exc:
             logger.error(f'Can\'t track {event_name}. Reason: {exc}', exc_info=True)
+
+        json_data = data
+        json_data['event'] = event_name
+        json_data['user_id'] = self._user_id
+        try:
+            requests.post(url='https://analytics.labelstudio.io/prod', json=json_data)
+        except requests.RequestException:
+            pass
