@@ -1,7 +1,7 @@
 import setuptools
 
 # Package version
-version = '0.4.1'
+version = '0.4.2'
 
 # Readme
 with open('README.md', 'r') as f:
@@ -28,7 +28,7 @@ setuptools.setup(
         'Operating System :: OS Independent',
     ],
     install_requires=requirements,
-    python_requires='>=3.6',
+    python_requires='>=3.5',
     entry_points={
         'console_scripts': ['label-studio=label_studio.server:main'],
     }
