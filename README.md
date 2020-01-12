@@ -59,9 +59,9 @@ pip install label-studio
 
 ## One Click Deploy
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
-[![Deploy to Azure](https://azurecomcdn.azureedge.net/mediahandler/acomblog/media/Default/blog/deploybutton.png)](https://azuredeploy.net/)
-[![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run)
+[<img src="https://www.herokucdn.com/deploy/button.svg" height="30px">](https://heroku.com/deploy)
+[<img src="https://azurecomcdn.azureedge.net/mediahandler/acomblog/media/Default/blog/deploybutton.png" height="30px">](https://azuredeploy.net/)
+[<img src="https://deploy.cloud.run/button.svg" height="30px">](https://deploy.cloud.run)
 
 ## Features :star2:
 
