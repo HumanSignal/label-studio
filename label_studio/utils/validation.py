@@ -53,7 +53,7 @@ class TaskValidator:
             if data_key not in data:
                 raise ValidationError('"{data_key}" key is expected in task data'.format(data_key=data_key))
 
-            expected_types = _DATA_TYPES.get(data_type, str)
+            expected_types = _DATA_TYPES.get(data_type, (str, ))
             if not isinstance(data[data_key], tuple(expected_types)):
                 raise ValidationError('data["{data_key}"]={data_value} '
                                       'is of type "{type}", '

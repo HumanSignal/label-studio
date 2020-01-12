@@ -3,6 +3,7 @@ from __future__ import print_function
 
 import io
 import os
+import zipfile
 from shutil import copy2
 
 import lxml
@@ -11,7 +12,7 @@ import flask
 import logging
 import hashlib
 import pandas as pd
-import tarfile
+
 try:
     import ujson as json
 except:
@@ -193,8 +194,8 @@ def tasks_page():
                                  completed_at=completed_at)
 
 
-@app.route('/settings')
-def settings_page():
+@app.route('/setup')
+def setup_page():
     """ Setup label config
     """
     global c, project
@@ -203,7 +204,7 @@ def settings_page():
     templates = get_config_templates()
     input_values = {}
     analytics.send(getframeinfo(currentframe()).function)
-    return flask.render_template('settings.html', config=c, project=project, templates=templates,
+    return flask.render_template('setup.html', config=c, project=project, templates=templates,
                                  input_values=input_values)
 
 
@@ -450,11 +451,11 @@ def api_export():
     global c
 
     output_dir = c['output_dir']
-    with get_temp_file() as temp_file:
-        archive_name = temp_file + '.tar.gz'
-        with tarfile.open(archive_name, mode='w:gz') as archive:
-            archive.add(output_dir, recursive=True)
-        return send_file(archive_name)
+    files = [f for f in os.listdir(output_dir) if f.endswith('.json')]
+    completions = [json.load(open(f)) for f in files]
+    path = os.path.join(c['output_dir'], '/export.json')
+    json.dump(open(path, 'w'), completions)
+    return send_file(path)
 
 
 @app.route('/api/projects/' + str(DEFAULT_PROJECT_ID) + '/next/', methods=['GET'])
@@ -782,9 +783,9 @@ def parse_input_args():
 def main():
     import threading
     import webbrowser
-    print('YOHOHOHOHOH!')
-
     global config_path, input_args
+    import sys
+    print('Python version: ', sys.version_info)
 
     input_args = parse_input_args()
 
