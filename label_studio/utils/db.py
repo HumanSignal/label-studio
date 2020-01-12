@@ -31,8 +31,9 @@ _allowed_extensions = {
 
 def _get_single_input_value(input_data_tags):
     if len(input_data_tags) > 1:
-        print(f'Warning! Multiple input data tags found: '
-              f'{",".join(tag.attrib.get("name") for tag in input_data_tags)}. Only first one is used.')
+        val = ",".join(tag.attrib.get("name") for tag in input_data_tags)
+        print('Warning! Multiple input data tags found: ' +
+              val + '. Only first one is used.')
     input_data_tag = input_data_tags[0]
     data_key = input_data_tag.attrib.get('value').lstrip('$')
     return data_key
@@ -44,9 +45,9 @@ def _create_task_with_local_uri(filepath, data_key, task_id):
     global c
     filename = os.path.basename(filepath)
     params = urllib.parse.urlencode({'d': os.path.dirname(filepath)})
-    base_url = f'http://localhost:{c.get("port")}/'
-    image_url_path = base_url + urllib.parse.quote(f'data/{filename}')
-    image_local_url = f'{image_url_path}?{params}'
+    base_url = 'http://localhost:{port}/'.format(port=c.get("port"))
+    image_url_path = base_url + urllib.parse.quote('data/' + filename)
+    image_local_url = '{image_url_path}?{params}'.format(image_url_path=image_url_path, params=params)
     return {
         'id': task_id,
         'task_path': filepath,
@@ -92,7 +93,7 @@ def tasks_from_json_file(path, tasks):
         if 'predictions' in root:
             tasks[task_id]['predictions'] = root['predictions']
 
-    logger.debug(f'Reading tasks from JSON file {path}')
+    logger.debug('Reading tasks from JSON file ' + path)
     with open(path) as f:
         json_body = orjson.loads(f.read())
 
@@ -117,7 +118,7 @@ def init(config):
     """
     global c, tasks, derived_input_schema, derived_output_schema
     c = config
-    
+
     label_config = LabelConfigParser(c['label_config'])
 
     if not os.path.exists(c['output_dir']):
@@ -168,10 +169,11 @@ def init(config):
                 task_id = len(tasks) + 1
                 tasks[task_id] = _create_task_with_local_uri(f, data_key, task_id)
             else:
-                logger.warning(f'Unrecognized file format for file {f}')
+                logger.warning('Unrecognized file format for file ' + f)
 
         num_tasks_loaded = len(tasks)
 
+        # make derived input scheme
         if num_tasks_loaded > 0:
             for tag in input_data_tags:
                 derived_input_schema.append({
@@ -187,7 +189,7 @@ def init(config):
                 for completion in completions:
                     _update_derived_output_schema(completion)
 
-        print(f'{len(tasks)} tasks loaded from: {c["input_path"]}')
+        print(str(len(tasks)) + 'tasks loaded from: ' + c["input_path"])
 
 
 def re_init(config):
@@ -221,7 +223,7 @@ def iter_tasks():
         random.shuffle(keys)
         return ((k, tasks[k]) for k in keys)
     else:
-        raise NotImplementedError(f'Unknown sampling method {sampling}.')
+        raise NotImplementedError('Unknown sampling method ' + sampling)
 
 
 def get_task(task_id):

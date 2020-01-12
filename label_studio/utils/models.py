@@ -149,7 +149,7 @@ class Project(object):
         # check if schema exists, i.e. at least one task has been uploaded
         if not input_schema:
             return
-        
+
         config = config_string_or_parsed_config
         if isinstance(config, str):
             config = parse_config(config)
@@ -166,13 +166,15 @@ class Project(object):
         for item in input_types:
             if item not in input_schema_types:
                 raise ValidationError(
-                    f'Can\'t find type "{item}" among already imported tasks with types {list(input_schema_types)}')
+                    'Can\'t find type "{item}" among already imported tasks with types {input_schema_types}'
+                        .format(item=item, input_schema_types=list(input_schema_types)))
 
         # check input data values: they must be in schema
         for item in input_values:
             if item not in input_schema_values:
                 raise ValidationError(
-                    f'Can\t find key "{item}" among already imported tasks with keys {list(input_schema_values)}')
+                    'Can\t find key "{item}" among already imported tasks with keys {input_schema_values}'
+                        .format(item=item, input_schema_values=list(input_schema_types)))
 
     @classmethod
     def validate_label_config_on_derived_output_schema(cls, config_string_or_parsed_config):
@@ -199,21 +201,23 @@ class Project(object):
         for from_name, to_name, type in output_schema['from_name_to_name_type']:
             if (from_name, to_name, type) not in completion_tuples:
                 raise ValidationError(
-                    f'You\'ve already completed some tasks, but some of them couldn\'t be loaded with this config: '
-                    f'name={from_name}, toName={to_name}, type={type} are expected'
+                    'You\'ve already completed some tasks, but some of them couldn\'t be loaded with this config: '
+                    'name={from_name}, toName={to_name}, type={type} are expected'
+                    .format(from_name=from_name, to_name=to_name, type=type)
                 )
         for from_name, expected_label_set in output_schema['labels'].items():
             if from_name not in config:
                 raise ValidationError(
-                    f'You\'ve already completed some tasks, but some of them couldn\'t be loaded with this config: '
-                    f'name={from_name} is expected'
+                    'You\'ve already completed some tasks, but some of them couldn\'t be loaded with this config: '
+                    'name=' + from_name + ' is expected'
                 )
             found_labels = set(config[from_name]['labels'])
             extra_labels = list(expected_label_set - found_labels)
             if extra_labels:
                 raise ValidationError(
-                    f'You\'ve already completed some tasks, but some of them couldn\'t be loaded with this config: '
-                    f'there are labels already created for "{from_name}":\n{extra_labels}'
+                    'You\'ve already completed some tasks, but some of them couldn\'t be loaded with this config: '
+                    'there are labels already created for "{from_name}":\n{extra_labels}'
+                    .format(from_name=from_name, extra_labels=extra_labels)
                 )
 
     @classmethod
@@ -240,7 +244,8 @@ class Project(object):
         for toName_ in toNames:
             for toName in toName_.split(','):
                 if toName not in names:
-                    raise ValidationError(f'toName="{toName}" not found in names: {sorted(names)}')
+                    raise ValidationError('toName="{toName}" not found in names: {names}'
+                                          .format(toName=toName, names=sorted(names)))
 
         parsed_config = parse_config(config_string)
         cls.validate_label_config_on_derived_input_schema(parsed_config)
@@ -354,30 +359,30 @@ class MLApi(BaseHTTPAPI):
     def _post(self, url_suffix, request, *args, **kwargs):
         url = self._get_url(url_suffix)
         headers = dict(self.http.headers)
-        logger.debug(f'Request to {url}: {json.dumps(request, indent=2)}')
+        logger.debug('Request to ' + url + ':' + json.dumps(request, indent=2))
         response = None
         try:
             response = self.post(url=url, json=request, *args, **kwargs)
             response.raise_for_status()
         except requests.exceptions.RequestException as e:
-            logger.debug(f'Error getting response from {url}. ', exc_info=True)
+            logger.debug('Error getting response from ' + url, exc_info=True)
             status_code = response.status_code if response is not None else 0
             return MLApiResult(url, request, {'error': str(e)}, headers, 'error', status_code=status_code)
         status_code = response.status_code
         try:
             response = response.json()
         except ValueError as e:
-            logger.debug(f'Error parsing JSON response from {url}. Response: {response.content}', exc_info=True)
+            logger.debug('Error parsing JSON response from '+url+'. Response: ' + str(response.content), exc_info=True)
             return MLApiResult(
                 url, request, {'error': str(e), 'response': response.content}, headers, 'error',
                 status_code=status_code
             )
-        logger.debug(f'Response from {url}: {json.dumps(response, indent=2)}')
+        logger.debug('Response from ' + url + ':' + json.dumps(response, indent=2))
         return MLApiResult(url, request, response, headers, status_code=status_code)
 
     @staticmethod
     def _create_project_uid(project):
-        return f'{project.id}.{project.ml_backend.model_name}'
+        return str(project.id) + '.' + project.ml_backend.model_name
 
     def update(self, task, results, project, retrain=True):
         """
@@ -482,17 +487,18 @@ class MLBackend(object):
         :return:
         """
         if not os.path.exists(self._TRAIN_JOBS_FILE):
-            logger.warning(f'Can\'t restore train job because {self._TRAIN_JOBS_FILE} not found')
+            logger.warning('Can\'t restore train job because ' + self._TRAIN_JOBS_FILE + ' not found')
             return
         with io.open(self._TRAIN_JOBS_FILE) as f:
             train_jobs = json.load(f)
             if self.model_name not in train_jobs:
                 logger.warning(
-                    f'Can\'t restore train job because {self.model_name} key not found in {self._TRAIN_JOBS_FILE}')
+                    'Can\'t restore train job because ' + self.model_name + ' key not found in ' + self._TRAIN_JOBS_FILE)
             else:
                 train_job = train_jobs[self.model_name]
                 logger.debug(
-                    f'Train job {train_job} for model name {self.model_name} restored from {self._TRAIN_JOBS_FILE}')
+                    'Train job ' + train_job + ' for model name ' + self.model_name +
+                    ' restored from ' + self._TRAIN_JOBS_FILE)
 
     def save_train_job(self):
         """
@@ -518,16 +524,16 @@ class MLBackend(object):
         if self._api_exists() and project.train_job is not None:
             response = self.api.get_train_job_status(project.train_job)
             if response.is_error:
-                logger.error(f'Can\'t fetch train job status for job {project.train_job}: '
-                             f'ML backend returns error: {response.error_message}')
+                logger.error('Can\'t fetch train job status for job ' + project.train_job + ': '
+                             'ML backend returns error: ' + response.error_message)
             else:
                 return response.response['job_status'] in ('queued', 'started')
         return False
 
     def _api_exists(self):
         if self.api is None or not self.api.is_ok():
-            logger.debug(f'Can\'t make predictions because ML backend was not specified: '
-                         f'add "ml_backend" option with URL in your config file')
+            logger.debug('Can\'t make predictions because ML backend was not specified: '
+                         'add "ml_backend" option with URL in your config file')
             return False
         return True
 
@@ -536,9 +542,9 @@ class MLBackend(object):
             response = self.api.predict([task], self.model_version, project)
             if response.is_error:
                 if response.status_code == 404:
-                    logger.info(f'Can\'t make predictions: model is not found (probably not trained yet)')
+                    logger.info('Can\'t make predictions: model is not found (probably not trained yet)')
                 else:
-                    logger.error(f'Can\'t make predictions: ML backend returns error: {response.error_message}')
+                    logger.error('Can\'t make predictions: ML backend returns error: ' + response.error_message)
             else:
                 return response.response['results']
 
@@ -548,23 +554,23 @@ class MLBackend(object):
             retrain = not self.train_job_is_running(project)
             response = self.api.update(task, results, project, retrain)
             if response.is_error:
-                logger.error(f'Can\'t update model: ML backend returns error: {response.error_message}')
+                logger.error('Can\'t update model: ML backend returns error: ' + response.error_message)
             else:
                 maybe_job = response.response.get('job')
                 if maybe_job:
                     self.train_job = maybe_job
                     self.save_train_job()
-                    logger.debug(f'Project {project} successfully updated train job {self.train_job}')
+                    logger.debug('Project ' + str(project) + ' successfully updated train job ' + self.train_job)
 
     def get_schema(self, label_config, project):
         if self._api_exists():
             response = self.api.validate(project.label_config)
             if response.is_error:
-                logger.error(f'Can\'t infer schema for label config {label_config}. '
-                             f'ML backend returns error: {response.error_message}')
+                logger.error('Can\'t infer schema for label config ' + label_config + '. '
+                             'ML backend returns error: ' + response.error_message)
             else:
                 schema = response.response
                 if len(schema) > 1:
-                    logger.warning(f'ML backend returns multiple schemas for label config {label_config}: {schema}'
-                                   f'We currently support only one schema, so 0th schema is used.')
+                    logger.warning('ML backend returns multiple schemas for label config ' + label_config + ': ' +
+                                   schema + '\nWe currently support only one schema, so 0th schema is used.')
                 return schema[0]

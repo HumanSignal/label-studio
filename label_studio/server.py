@@ -3,6 +3,7 @@ from __future__ import print_function
 
 import io
 import os
+import zipfile
 from shutil import copy2
 
 import lxml
@@ -11,7 +12,7 @@ import flask
 import logging
 import hashlib
 import pandas as pd
-import tarfile
+
 try:
     import ujson as json
 except:
@@ -43,6 +44,7 @@ logger = logging.getLogger(__name__)
 
 app = flask.Flask(__name__, static_url_path='')
 app.secret_key = 'A0Zrdqwf1AQWj12ajkhgFN]dddd/,?RfDWQQT'
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 # init
 c = None
@@ -193,16 +195,18 @@ def tasks_page():
                                  completed_at=completed_at)
 
 
-@app.route('/settings')
-def label_config_page():
+@app.route('/setup')
+def setup_page():
     """ Setup label config
     """
     global c, project
     reload_config()
 
     templates = get_config_templates()
+    input_values = {}
     analytics.send(getframeinfo(currentframe()).function)
-    return flask.render_template('settings.html', config=c, project=project, templates=templates)
+    return flask.render_template('setup.html', config=c, project=project, templates=templates,
+                                 input_values=input_values)
 
 
 @app.route('/import')
@@ -307,7 +311,7 @@ def api_save_config():
     # save xml label config to file
     path = c['label_config']
     open(path, 'w').write(label_config)
-    logger.info(f'Label config saved to: {path}')
+    logger.info('Label config saved to: {path}'.format(path=path))
 
     reload_config(force=True)
     analytics.send(getframeinfo(currentframe()).function)
@@ -416,7 +420,7 @@ def api_import():
         now = datetime.now()
         data = json.dumps(new_tasks, ensure_ascii=False)
         md5 = hashlib.md5(json.dumps(data).encode('utf-8')).hexdigest()
-        name = 'import-' + now.strftime('%Y-%m-%d-%H-%M') + f'-{md5[0:8]}'
+        name = 'import-' + now.strftime('%Y-%m-%d-%H-%M') + '-' + str(md5[0:8])
         path = os.path.join(task_dir, name + '.json')
         tasks = new_tasks
     else:
@@ -425,8 +429,8 @@ def api_import():
         old_tasks = json.load(open(path))
         assert isinstance(old_tasks, list), 'Tasks from input_path must be list'
         tasks = old_tasks + new_tasks
-        logger.error(f"It's recommended to use directory as input_path: "
-                     f"{c['input_path']} -> {os.path.dirname(c['input_path'])}")
+        logger.error("It's recommended to use directory as input_path: " +
+                     c['input_path'] + ' -> ' + os.path.dirname(c['input_path']))
 
     with open(path, 'w') as f:
         json.dump(tasks, f, ensure_ascii=False, indent=4)
@@ -447,15 +451,19 @@ def api_import():
 def api_export():
     global c
 
+    now = datetime.now()
     output_dir = c['output_dir']
-    with get_temp_file() as temp_file:
-        archive_name = temp_file + '.tar.gz'
-        with tarfile.open(archive_name, mode='w:gz') as archive:
-            archive.add(output_dir, recursive=True)
-        return send_file(archive_name)
+    export_file = now.strftime('%Y-%m-%d-%H-%M-%S') + '.json.export'
+    files = [os.path.join(output_dir, f) for f in os.listdir(output_dir) if f.endswith('.json')]
+    completions = [json.load(open(f)) for f in files]
+    path = os.path.join(output_dir, export_file)
+    json.dump(completions, open(path, 'w'))
+    response = send_file(os.path.abspath(path), as_attachment=True)
+    response.headers['filename'] = export_file
+    return response
 
 
-@app.route(f'/api/projects/{DEFAULT_PROJECT_ID}/next/', methods=['GET'])
+@app.route('/api/projects/' + str(DEFAULT_PROJECT_ID) + '/next/', methods=['GET'])
 @exception_treatment
 def api_generate_next_task():
     """ Generate next task to label
@@ -477,7 +485,7 @@ def api_generate_next_task():
     return make_response('', 404)
 
 
-@app.route(f'/api/projects/{DEFAULT_PROJECT_ID}/task_ids/', methods=['GET'])
+@app.route('/api/projects/' + str(DEFAULT_PROJECT_ID) + '/task_ids/', methods=['GET'])
 @exception_treatment
 def api_all_task_ids():
     """ Get all tasks ids
@@ -499,7 +507,7 @@ def api_tasks(task_id):
     return make_response(jsonify(task_data), 200)
 
 
-@app.route(f'/api/projects/{DEFAULT_PROJECT_ID}/completions_ids/', methods=['GET'])
+@app.route('/api/projects/' + str(DEFAULT_PROJECT_ID) + '/completions_ids/', methods=['GET'])
 @exception_treatment
 def api_all_completion_ids():
     """ Get all completion ids
@@ -570,7 +578,7 @@ def api_completion_update(task_id, completion_id):
     return make_response('ok', 201)
 
 
-@app.route(f'/api/projects/{DEFAULT_PROJECT_ID}/expert_instruction')
+@app.route('/api/projects/' + str(DEFAULT_PROJECT_ID) + '/expert_instruction')
 @exception_treatment
 def api_instruction():
     """ Instruction for annotators
@@ -640,37 +648,37 @@ def label_studio_init(output_dir, label_config=None):
     if not os.path.exists(default_input_path):
         with io.open(default_input_path, mode='w') as fout:
             json.dump([], fout, indent=2)
-        print(f'{default_input_path} input path has been created.')
+        print(default_input_path + ' input path has been created.')
     else:
-        print(f'{default_input_path} input path already exists.')
+        print(default_input_path +' input path already exists.')
 
     # create config file (config.json)
     if not os.path.exists(default_config_file):
         with io.open(default_config_file, mode='w') as fout:
             json.dump(default_config, fout, indent=2)
-        print(f'{default_config_file} config file has been created.')
+        print(default_config_file + ' config file has been created.')
     else:
-        print(f'{default_config_file} config file already exists.')
+        print(default_config_file + ' config file already exists.')
 
     # create label config (config.xml)
     if not os.path.exists(default_label_config_file):
         default_label_config = '<View></View>'
         with io.open(default_label_config_file, mode='w') as fout:
             fout.write(default_label_config)
-        print(f'{default_label_config_file} label config file has been created.')
+        print(default_label_config_file + ' label config file has been created.')
     else:
-        print(f'{default_label_config_file} label config file already exists.')
+        print(default_label_config_file + ' label config file already exists.')
 
     # create output dir (completions)
     if not os.path.exists(default_output_dir):
         os.makedirs(default_output_dir)
-        print(f'{default_output_dir} output directory has been created.')
+        print(default_output_dir + ' output directory has been created.')
     else:
-        print(f'{default_output_dir} output directory already exists.')
+        print(default_output_dir + ' output directory already exists.')
 
     print('')
-    print(f'Label Studio has been successfully initialized. Check project states in {output_dir}')
-    print(f'Start the server: label-studio start {output_dir}')
+    print('Label Studio has been successfully initialized. Check project states in ' + output_dir)
+    print('Start the server: label-studio start ' + output_dir)
 
 
 def _get_config(args):
@@ -681,15 +689,15 @@ def _get_config(args):
     # check if project directory exists
     if not os.path.exists(args.project_name):
         raise FileNotFoundError(
-            f'Couldn\'t find directory {args.project_name}, maybe you\'ve missed appending "--init" option:\n'
-            f'label-studio start {args.project_name} --init')
+            'Couldn\'t find directory ' + args.project_name + ', maybe you\'ve missed appending "--init" option:\n'
+            'label-studio start ' + args.project_name + ' --init')
 
     # check config.json exists in directory
     config_path = os.path.join(args.project_name, 'config.json')
     if not os.path.exists(config_path):
         raise FileNotFoundError(
-            f'Couldn\'t find config file {config_path} in project directory {args.project_name}, '
-            f'maybe you\'ve missed appending "--init" option:\nlabel-studio start {args.project_name} --init')
+            'Couldn\'t find config file ' + config_path + ' in project directory ' + args.project_name + ', '
+            'maybe you\'ve missed appending "--init" option:\nlabel-studio start ' + args.project_name + ' --init')
 
     return config_path
 
@@ -780,8 +788,8 @@ def parse_input_args():
 def main():
     import threading
     import webbrowser
-
     global config_path, input_args
+    import sys
 
     input_args = parse_input_args()
 
@@ -790,7 +798,7 @@ def main():
         label_studio_init(input_args.project_name, input_args.label_config)
         return
 
-    # If --init option is specified, do the same as with `init` command, but continue to run app
+    # If `start --init` option is specified, do the same as with `init` command, but continue to run app
     elif input_args.init:
         label_studio_init(input_args.project_name, input_args.label_config)
 
@@ -799,9 +807,9 @@ def main():
         config_path = _get_config(input_args)
         reload_config()
         if not input_args.no_browser:
-            browser_url = f'http://127.0.0.1:{c["port"]}/welcome'
+            browser_url = 'http://127.0.0.1:' + str(c["port"]) + '/welcome'
             threading.Timer(2.5, lambda: webbrowser.open(browser_url)).start()
-            print(f'Start browser at URL: {browser_url}')
+            print('Start browser at URL: ' + browser_url)
 
         app.run(host='0.0.0.0', port=c['port'], debug=c['debug'])
 

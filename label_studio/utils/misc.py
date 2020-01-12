@@ -201,8 +201,9 @@ def parse_config(config_string):
         tag_info['inputs'] = []
         for input_tag_name in tag_info['to_name']:
             if input_tag_name not in inputs:
-                raise KeyError(f'to_name={input_tag_name} is specified for output tag name={output_tag}, '
-                               f'but we can\'t find it among input tags')
+                raise KeyError('to_name={input_tag_name} is specified for output tag name={output_tag}, '
+                               'but we can\'t find it among input tags'
+                               .format(input_tag_name=input_tag_name, output_tag=output_tag))
             tag_info['inputs'].append(inputs[input_tag_name])
         tag_info['labels'] = list(labels[output_tag])
     return outputs
@@ -230,7 +231,7 @@ def get_config_templates():
         try:
             objectify.fromstring(code)
         except Exception as e:
-            logging.error(f"Can't parse XML for label config template from {path}: {str(e)}")
+            logging.error("Can't parse XML for label config template from " + path + ':' + str(e))
             continue
 
         # extract fields from xml and pass them to template
@@ -238,7 +239,7 @@ def get_config_templates():
             json_string = code.split('<!--')[1].split('-->')[0]
             meta = json.loads(json_string)
         except Exception as e:
-            logging.error(f"Can't parse meta info from label config: {str(e)}")
+            logging.error("Can't parse meta info from label config: " + str(e))
             continue
 
         meta['pk'] = i

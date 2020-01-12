@@ -38,11 +38,30 @@ label-studio init labeling_project
 label-studio start labeling_project
 ```
 
+#### Windows  
+It's not necessary to install Visual Studio Compiler, 
+just download "regex" (or other packages you need to compile) from gholke builds corresponding to your python version: 
+https://www.lfd.uci.edu/~gohlke/pythonlibs/#regex
+
+and then 
+ 
+```bash
+# Upgrade pip 
+pip install -U pip
+
+# Install regex
+pip install <path-to-downloaded-package>.whl
+
+# Install label studio
+pip install label-studio
+```
+
+
 ## One Click Deploy
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
-[![Deploy to Azure](https://azurecomcdn.azureedge.net/mediahandler/acomblog/media/Default/blog/deploybutton.png)](https://azuredeploy.net/)
-[![Run on Google Cloud](https://deploy.cloud.run/button.svg)](https://deploy.cloud.run)
+[<img src="https://www.herokucdn.com/deploy/button.svg" height="30px">](https://heroku.com/deploy)
+[<img src="https://azurecomcdn.azureedge.net/mediahandler/acomblog/media/Default/blog/deploybutton.png" height="30px">](https://azuredeploy.net/)
+[<img src="https://deploy.cloud.run/button.svg" height="30px">](https://deploy.cloud.run)
 
 ## Features :star2:
 

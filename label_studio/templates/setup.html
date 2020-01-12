@@ -30,16 +30,28 @@
   <div class="ui wrapper">
     <form action="/api/save-config" method="post" class="ui form">
 
-      {% include 'settings_help.html' %}
+      {% include 'setup_help.html' %}
 
       <!-- Textarea & Preview in two cols -->
       <div class="ui two column grid zero-margin step2 stackable">
         <div class="column">
           <h3>Labeling Config</h3>
+
+          <!-- Code -->
           <textarea name="label_config" cols="40" rows="10" class="project-form htx-html-editor"
                     id="id_label_config">{{ project.label_config_full | safe }}</textarea>
+          <br>
+
+          <!-- Input values from imported data -->
+          {% if input_values %}
+            <div class="ui">
+              {% for key in input_values %}
+                <a class="ui label basic">{{key}}</a>
+              {% endfor %}
+            </div>
+          {% endif %}
+
           <!-- Submit button -->
-          <br/>
           <input type="submit" disabled id="submit_form"
                  class="project-form field ui button positive centered" value="Save"
                  onclick="create_project(event)"/>
@@ -47,6 +59,10 @@
         <div class="column" style="padding-left: 0;">
 
           <h3>Interface Preview</h3>
+
+          <!--Validation message -->
+          <div class="ui error message validation"></div>
+
           <div id="editor-wrap"></div>
           <pre id="preload-editor">...</pre>
 
@@ -60,9 +76,7 @@
         </div>
       </div>
 
-      <!-- Buttons Back / Next -->
-      <div class="ui error message validation"></div>
-      <br/>      
+      <br/>
     </form>
 
     <!-- Error dialog -->
@@ -270,6 +284,7 @@
         obj.style.height = (obj.contentWindow.document.body.scrollHeight + 30) + 'px';
         // hide "..."
         $('#preload-editor').hide();
+        $('#preload-editor').text('');
       });
 
       // load new data into iframe

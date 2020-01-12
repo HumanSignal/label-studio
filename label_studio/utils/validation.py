@@ -40,7 +40,7 @@ class TaskValidator:
         """
 
         if data is None:
-            raise ValidationError(f'Task is empty (None)')
+            raise ValidationError('Task is empty (None)')
 
         # assign undefined key name from data to the first key from config, e.g. for txt loading
         if settings.UPLOAD_DATA_UNDEFINED_NAME in data and project.data_types.keys():
@@ -51,19 +51,21 @@ class TaskValidator:
         # iterate over data types from project
         for data_key, data_type in project.data_types.items():
             if data_key not in data:
-                raise ValidationError(f'"{data_key}" key is expected in task data')
+                raise ValidationError('"{data_key}" key is expected in task data'.format(data_key=data_key))
 
-            expected_types = _DATA_TYPES.get(data_type, str)
+            expected_types = _DATA_TYPES.get(data_type, (str, ))
             if not isinstance(data[data_key], tuple(expected_types)):
-                raise ValidationError(f'data["{data_key}"]={data[data_key]} '
-                                      f'is of type "{type(data[data_key])}", '
-                                      f'but types "{expected_types}" are expected')
+                raise ValidationError('data["{data_key}"]={data_value} '
+                                      'is of type "{type}", '
+                                      'but types "{expected_types}" are expected'
+                                      .format(data_key=data_key, data_value=data[data_key],
+                                              type=type(data[data_key]), expected_types=expected_types))
 
             if data_type == 'List':
                 for item in data[data_key]:
                     key = 'text'  # FIXME: read key from config (elementValue from List)
                     if key not in item:
-                        raise ValidationError(f'Each item from List must have key {key}')
+                        raise ValidationError('Each item from List must have key ' + key)
 
         return data
 
@@ -108,7 +110,7 @@ class TaskValidator:
     @staticmethod
     def raise_if_wrong_class(task, key, class_def):
         if key in task and not isinstance(task[key], class_def):
-            raise ValidationError(f'Task[{key}] must be {class_def}')
+            raise ValidationError('Task[{key}] must be {class_def}'.format(key=key, class_def=class_def))
 
     def validate(self, task):
         """ Validate whole task with task['data'] and task['completions']. task['predictions']
@@ -126,9 +128,9 @@ class TaskValidator:
                 try:
                     data = json.loads(self.instance.data)
                 except ValueError as e:
-                    raise ValidationError(f"Can't parse task data: {str(e)}")
+                    raise ValidationError("Can't parse task data: " + str(e))
             else:
-                raise ValidationError(f'Field "data" must be string or dict, but "{type(self.instance.data)}" found')
+                raise ValidationError('Field "data" must be string or dict, but not "' + type(self.instance.data) + '"')
             self.check_data_and_root(self.instance.project, data)
             return task
 
@@ -178,12 +180,14 @@ class TaskValidator:
     @staticmethod
     def format_error(i, detail, item):
         if len(detail) == 1:
-            code = f' {detail[0].code}' if detail[0].code != "invalid" else ''
-            return f'Error{code} at item {i}: {detail[0]} :: {item}'
+            code = (str(detail[0].code + ' ')) if detail[0].code != "invalid" else ''
+            return 'Error {code} at item {i}: {detail} :: {item}'\
+                .format(code=code, i=i, detail=detail[0], item=item)
         else:
             errors = ', '.join(detail)
-            codes = [d.code for d in detail]
-            return f'Errors {codes} at item {i}: {errors} :: {item}'
+            codes = str([d.code for d in detail])
+            return 'Errors {codes} at item {i}: {errors} :: {item}'\
+                .format(codes=codes, i=i, errors=errors, item=item)
 
     def to_internal_value(self, data):
         """ Body of run_validation for all data items
@@ -219,7 +223,7 @@ class TaskValidator:
                     self.prediction_count += len(item['predictions'])
 
         if any(errors):
-            logger.warning(f'Can\'t deserialize tasks due to {errors}')
+            logger.warning('Can\'t deserialize tasks due to ' + str(errors))
             raise ValidationError(errors)
 
         return ret

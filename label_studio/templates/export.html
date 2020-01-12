@@ -40,7 +40,7 @@
 
     <center>
       <br>
-      <a class="ui button positive center" href="/api/export">Export Completions</a>
+      <a class="ui button positive center" onclick="downloadFile('/api/export')">Export Completions</a>
     </center>
     <br/>
 
@@ -49,4 +49,29 @@
         <img src="static/images/opossum_snuggle.svg" width="250px">
       </div>
     </center>
+
+  <script>
+    // download file by url
+    function downloadFile(urlToSend) {
+      let req = new XMLHttpRequest();
+      req.open("GET", urlToSend, true);
+      req.responseType = "blob";
+      req.onload = function (event) {
+        let blob = req.response;
+
+        // file generated, start downloading
+        if (req.status === 200) {
+          let link = document.createElement('a');
+          link.href = window.URL.createObjectURL(blob);
+          link.download = req.getResponseHeader('filename');
+          console.log(req)
+          link.click();
+          link.remove();
+        } else {
+          alert('Error occurred while export.');
+        }
+      };
+      req.send();
+  }
+  </script>
 {% endblock %}

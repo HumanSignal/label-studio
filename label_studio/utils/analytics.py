@@ -38,12 +38,12 @@ class Analytics(object):
                         'version': self._version
                     })
                 except MixpanelException as exc:
-                    logger.error(f'Can\'t send user profile analytics. Reason: {exc}', exc_info=True)
-            logger.debug(f'Your user ID {user_id} is saved to {user_id_file}')
+                    logger.error('Can\'t send user profile analytics. Reason: ' + str(exc), exc_info=True)
+            logger.debug('Your user ID ' + str(user_id) + ' is saved to ' + str(user_id_file))
         else:
             with io.open(user_id_file) as f:
                 user_id = f.read()
-            logger.debug(f'Your user ID {user_id} is loaded from {user_id_file}')
+            logger.debug('Your user ID ' + str(user_id) + ' is loaded from ' + str(user_id_file))
         return user_id
 
     def _get_label_types(self):
@@ -64,11 +64,11 @@ class Analytics(object):
         data = deepcopy(kwargs)
         data['version'] = self._version
         data['label_types'] = self._label_types
-        event_name = f'LS:{event_name}'
+        event_name = 'LS:' + str(event_name)
         try:
             mp.track(self._user_id, event_name, data)
         except MixpanelException as exc:
-            logger.error(f'Can\'t track {event_name}. Reason: {exc}', exc_info=True)
+            logger.error('Can\'t track ' + str(event_name) + ' . Reason: ' + str(exc), exc_info=True)
 
         json_data = data
         json_data['event'] = event_name

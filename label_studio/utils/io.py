@@ -44,8 +44,8 @@ def find_editor_files():
     """
     editor_js_dir = find_dir('static/editor/js')
     editor_css_dir = find_dir('static/editor/css')
-    editor_js = [f'/static/editor/js/{f}' for f in os.listdir(editor_js_dir) if f.endswith('.js')]
-    editor_css = [f'/static/editor/css/{f}' for f in os.listdir(editor_css_dir) if f.endswith('.css')]
+    editor_js = ['/static/editor/js/' + f for f in os.listdir(editor_js_dir) if f.endswith('.js')]
+    editor_css = ['/static/editor/css/' + f for f in os.listdir(editor_css_dir) if f.endswith('.css')]
     return {'editor_css': editor_css, 'editor_js': editor_js}
 
 

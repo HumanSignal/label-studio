@@ -37,13 +37,13 @@ def tasks_from_file(filename, file):
         elif filename.endswith('.json'):
             tasks = json.load(file)  # try simple json
         else:
-            raise ValueError(f'Unsupported input file format')
+            raise ValueError('Unsupported input file format')
     except Exception as exc:
-        raise ValidationError(f'Failed to parse input file {filename}: {exc}')
+        raise ValidationError('Failed to parse input file ' + filename + ': ' + exc)
 
     # null in file
     if tasks is None:
-        raise ValidationError(f'null in {filename} is not allowed')
+        raise ValidationError('null in ' + filename + ' is not allowed')
 
     # one task as dict
     elif isinstance(tasks, dict):
@@ -55,8 +55,8 @@ def tasks_from_file(filename, file):
 
     # something strange
     else:
-        raise ValidationError(f'Incorrect task type in {filename}: "{str(tasks)[0:100]}". '
-                              f'It is allowed "dict" or "list of dicts" only')
+        raise ValidationError('Incorrect task type in ' + filename + ': "' + str(str(tasks)[0:100]) + '". '
+                              'It is allowed "dict" or "list of dicts" only')
 
     return tasks
 
@@ -78,26 +78,29 @@ def extract_archive(archive, filename, temp_dir):
     """
     final_dir = join(temp_dir, filename)
     names = {join(final_dir, name): 'archive' for name in archive.namelist()}
-    logger.info(f'ZIP archive {filename} found with {len(names)} files inside, extracting to {final_dir}')
+    logger.info('ZIP archive {filename} found with {names} files inside, extracting to {final_dir}'
+                .format(filename=filename, names=len(names), final_dir=final_dir))
 
     archive.extractall(final_dir)
-    logger.info(f'ZIP archive {filename} extracted successfully')
+    logger.info('ZIP archive {filename} extracted successfully')
     return names
 
 
 def check_max_task_number(tasks):
     # max tasks
     if len(tasks) > settings.TASKS_MAX_NUMBER:
-        raise ValidationError(f'Maximum task number is {settings.TASKS_MAX_NUMBER}, '
-                              f'current task number is {len(tasks)}')
+        raise ValidationError('Maximum task number is {TASKS_MAX_NUMBER}, '
+                              'current task number is {num_tasks}'
+                              .format(TASKS_MAX_NUMBER=settings.TASKS_MAX_FILE_SIZE, num_tasks=len(tasks)))
 
 
 def check_file_sizes_and_number(files):
     total = sum([file.size for _, file in files.items()])
 
     if total >= settings.TASKS_MAX_FILE_SIZE:
-        raise ValidationError(f'Maximum total size of all files is {settings.TASKS_MAX_FILE_SIZE} bytes, '
-                              f'current size is {total} bytes')
+        raise ValidationError('Maximum total size of all files is {TASKS_MAX_FILE_SIZE} bytes, '
+                              'current size is {total} bytes'
+                              .format(TASKS_MAX_FILE_SIZE=settings.TASKS_MAX_FILE_SIZE, total=total))
 
 
 def aggregate_files(request_files, temp_dir):
