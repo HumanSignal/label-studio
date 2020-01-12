@@ -44,6 +44,7 @@ logger = logging.getLogger(__name__)
 
 app = flask.Flask(__name__, static_url_path='')
 app.secret_key = 'A0Zrdqwf1AQWj12ajkhgFN]dddd/,?RfDWQQT'
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 # init
 c = None
@@ -452,12 +453,14 @@ def api_export():
 
     now = datetime.now()
     output_dir = c['output_dir']
-    export_file = now.strftime('%Y-%m-%d-%H-%M') + '.json.export'
+    export_file = now.strftime('%Y-%m-%d-%H-%M-%S') + '.json.export'
     files = [os.path.join(output_dir, f) for f in os.listdir(output_dir) if f.endswith('.json')]
     completions = [json.load(open(f)) for f in files]
     path = os.path.join(output_dir, export_file)
     json.dump(completions, open(path, 'w'))
-    return send_file(os.path.abspath(path), as_attachment=True)
+    response = send_file(os.path.abspath(path), as_attachment=True)
+    response.headers['filename'] = export_file
+    return response
 
 
 @app.route('/api/projects/' + str(DEFAULT_PROJECT_ID) + '/next/', methods=['GET'])
