@@ -450,12 +450,14 @@ def api_import():
 def api_export():
     global c
 
+    now = datetime.now()
     output_dir = c['output_dir']
-    files = [f for f in os.listdir(output_dir) if f.endswith('.json')]
+    export_file = now.strftime('%Y-%m-%d-%H-%M') + '.json.export'
+    files = [os.path.join(output_dir, f) for f in os.listdir(output_dir) if f.endswith('.json')]
     completions = [json.load(open(f)) for f in files]
-    path = os.path.join(c['output_dir'], '/export.json')
-    json.dump(open(path, 'w'), completions)
-    return send_file(path)
+    path = os.path.join(output_dir, export_file)
+    json.dump(completions, open(path, 'w'))
+    return send_file(os.path.abspath(path), as_attachment=True)
 
 
 @app.route('/api/projects/' + str(DEFAULT_PROJECT_ID) + '/next/', methods=['GET'])
@@ -785,7 +787,6 @@ def main():
     import webbrowser
     global config_path, input_args
     import sys
-    print('Python version: ', sys.version_info)
 
     input_args = parse_input_args()
 

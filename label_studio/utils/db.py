@@ -189,7 +189,7 @@ def init(config):
                 for completion in completions:
                     _update_derived_output_schema(completion)
 
-        print('{len(tasks)} tasks loaded from: ' + c["input_path"])
+        print(str(len(tasks)) + 'tasks loaded from: ' + c["input_path"])
 
 
 def re_init(config):
