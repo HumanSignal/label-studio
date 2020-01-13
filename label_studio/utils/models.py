@@ -18,7 +18,8 @@ from operator import itemgetter
 from lxml import etree
 from datetime import datetime
 from requests.adapters import HTTPAdapter
-from label_studio.utils.misc import get_data_dir, parse_config
+from label_studio.utils.misc import parse_config
+from label_studio.utils.io import get_data_dir
 from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.functions import _LABEL_CONFIG_SCHEMA_DATA
 
@@ -27,9 +28,9 @@ logger = logging.getLogger(__name__)
 
 
 @attr.s
-class Project(object):
+class ProjectObj(object):
     """
-    Project object holds general labeling project settings
+    ProjectObj object holds general labeling project settings
     """
     # project ID
     id = attr.ib(default=DEFAULT_PROJECT_ID)

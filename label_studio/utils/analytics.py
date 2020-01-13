@@ -7,7 +7,8 @@ from mixpanel import Mixpanel, MixpanelException
 from copy import deepcopy
 from operator import itemgetter
 from uuid import uuid4
-from .misc import get_config_dir, get_app_version, parse_config
+from .misc import get_app_version, parse_config
+from label_studio.utils.io import get_config_dir
 
 logger = logging.getLogger(__name__)
 
