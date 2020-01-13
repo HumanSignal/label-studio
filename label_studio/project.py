@@ -49,7 +49,7 @@ class Project(object):
 
     @property
     def id(self):
-        return self.name
+        return self.project_obj.id
 
     @property
     def data_types(self):
