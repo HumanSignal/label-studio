@@ -7,13 +7,14 @@ import orjson
 import random
 
 from shutil import copy2
-from uuid import uuid4
 from collections import OrderedDict, defaultdict
 from datetime import datetime
+from operator import itemgetter
 
-from .utils.misc import LabelConfigParser, config_line_stripped, config_comments_free
+from .utils.misc import LabelConfigParser, config_line_stripped, config_comments_free, parse_config
 from .utils.analytics import Analytics
 from .utils.models import ProjectObj, MLBackend
+from .utils.exceptions import ValidationError
 
 
 logger = logging.getLogger(__name__)
@@ -34,7 +35,6 @@ class Project(object):
         self.name = name
 
         self.tasks = None
-        self.completions = None
         self.derived_input_schema = []
         self.derived_output_schema = {
             'from_name_to_name_type': set(),
@@ -45,6 +45,8 @@ class Project(object):
         self.project_obj = None
         self.analytics = None
 
+        self.reload()
+
     @property
     def id(self):
         return self.name
@@ -53,12 +55,21 @@ class Project(object):
     def data_types(self):
         return self.project_obj.data_types
 
+    def extract_data_types(self, config):
+        return self.project_obj.extract_data_types(config)
+
+    def validate_label_config(self, config_string):
+        self.project_obj.validate_label_config(config_string)
+
+        parsed_config = parse_config(config_string)
+        self.validate_label_config_on_derived_input_schema(parsed_config)
+        self.validate_label_config_on_derived_output_schema(parsed_config)
+
     def update_label_config(self, new_label_config):
         label_config_file = self.config['label_config']
         # save xml label config to file
         with io.open(label_config_file, mode='w') as fout:
             fout.write(new_label_config)
-        self.config['label_config'] = new_label_config
         logger.info('Label config saved to: {path}'.format(path=label_config_file))
 
     def _get_single_input_value(self, input_data_tags):
@@ -116,23 +127,103 @@ class Project(object):
             for label in result['value'][result['type']]:
                 self.derived_output_schema['labels'][result['from_name']].add(label)
 
-    def tasks_from_json_file(self, path, tasks):
+    def validate_label_config_on_derived_input_schema(self, config_string_or_parsed_config):
+        """
+        Validate label config on input schemas (tasks types and data keys) derived from imported tasks
+        :param config_string_or_parsed_config: label config string or parsed config object
+        :return: True if config match already imported tasks
+        """
+        input_schema = self.derived_input_schema
+
+        # check if schema exists, i.e. at least one task has been uploaded
+        if not input_schema:
+            return
+
+        config = config_string_or_parsed_config
+        if isinstance(config, str):
+            config = parse_config(config)
+        input_types, input_values = set(), set()
+        for input_items in map(itemgetter('inputs'), config.values()):
+            for input_item in input_items:
+                input_types.add(input_item['type'])
+                input_values.add(input_item['value'])
+
+        input_schema_types = set([item['type'] for item in input_schema])
+        input_schema_values = set([item['value'] for item in input_schema])
+
+        # check input data types: they must be in schema
+        for item in input_types:
+            if item not in input_schema_types:
+                raise ValidationError(
+                    'Can\'t find type "{item}" among already imported tasks with types {input_schema_types}'
+                        .format(item=item, input_schema_types=list(input_schema_types)))
+
+        # check input data values: they must be in schema
+        for item in input_values:
+            if item not in input_schema_values:
+                raise ValidationError(
+                    'Can\t find key "{item}" among already imported tasks with keys {input_schema_values}'
+                        .format(item=item, input_schema_values=list(input_schema_types)))
+
+    def validate_label_config_on_derived_output_schema(self, config_string_or_parsed_config):
+        """
+        Validate label config on output schema (from_names, to_names and labeling types) derived from completions
+        :param config_string_or_parsed_config: label config string or parsed config object
+        :return: True if config match already created completions
+        """
+        output_schema = self.derived_output_schema
+
+        # check if schema exists, i.e. at least one completion has been created
+        if not output_schema['from_name_to_name_type']:
+            return
+
+        config = config_string_or_parsed_config
+        if isinstance(config, str):
+            config = parse_config(config)
+
+        completion_tuples = set()
+
+        for from_name, to in config.items():
+            completion_tuples.add((from_name, to['to_name'][0], to['type'].lower()))
+
+        for from_name, to_name, type in output_schema['from_name_to_name_type']:
+            if (from_name, to_name, type) not in completion_tuples:
+                raise ValidationError(
+                    'You\'ve already completed some tasks, but some of them couldn\'t be loaded with this config: '
+                    'name={from_name}, toName={to_name}, type={type} are expected'
+                    .format(from_name=from_name, to_name=to_name, type=type)
+                )
+        for from_name, expected_label_set in output_schema['labels'].items():
+            if from_name not in config:
+                raise ValidationError(
+                    'You\'ve already completed some tasks, but some of them couldn\'t be loaded with this config: '
+                    'name=' + from_name + ' is expected'
+                )
+            found_labels = set(config[from_name]['labels'])
+            extra_labels = list(expected_label_set - found_labels)
+            if extra_labels:
+                raise ValidationError(
+                    'You\'ve already completed some tasks, but some of them couldn\'t be loaded with this config: '
+                    'there are labels already created for "{from_name}":\n{extra_labels}'
+                    .format(from_name=from_name, extra_labels=extra_labels)
+                )
+
+    def tasks_from_json_file(self, path):
         """ Prepare tasks from json
 
         :param path: path to json with list or dict
         :param tasks: main db instance of tasks
         :return: new task id
         """
-
         def push_task(root):
-            task_id = len(tasks) + 1
+            task_id = len(self.tasks) + 1
             data = root['data'] if 'data' in root else root
-            tasks[task_id] = {'id': task_id, 'task_path': path, 'data': data}
+            self.tasks[task_id] = {'id': task_id, 'task_path': path, 'data': data}
             if 'predictions' in data:
-                tasks[task_id]['predictions'] = data['predictions']
-                tasks[task_id]['data'].pop('predictions', None)
+                self.tasks[task_id]['predictions'] = data['predictions']
+                self.tasks[task_id]['data'].pop('predictions', None)
             if 'predictions' in root:
-                tasks[task_id]['predictions'] = root['predictions']
+                self.tasks[task_id]['predictions'] = root['predictions']
 
         logger.debug('Reading tasks from JSON file ' + path)
         with open(path) as f:
@@ -162,7 +253,7 @@ class Project(object):
         input_data_tags = label_config.get_input_data_tags()
 
         # load at first start
-        tasks = OrderedDict()
+        self.tasks = OrderedDict()
 
         # file
         if os.path.isfile(self.config['input_path']):
@@ -182,7 +273,7 @@ class Project(object):
 
             # load tasks from json
             if f.endswith('.json'):
-                self.tasks_from_json_file(path, tasks)
+                self.tasks_from_json_file(path)
 
             # load tasks from txt: line by line, task by task
             elif self.is_text_annotation(input_data_tags, f):
@@ -190,21 +281,21 @@ class Project(object):
                     data_key = self._get_single_input_value(input_data_tags)
                 with io.open(path) as fin:
                     for line in fin:
-                        task_id = len(tasks) + 1
-                        tasks[task_id] = {'id': task_id, 'task_path': path, 'data': {data_key: line.strip()}}
+                        task_id = len(self.tasks) + 1
+                        self.tasks[task_id] = {'id': task_id, 'task_path': path, 'data': {data_key: line.strip()}}
 
             # load tasks from files: creating URI to local resources
             elif self.is_image_annotation(input_data_tags, f) or self.is_audio_annotation(input_data_tags, f):
                 if data_key is None:
                     data_key = self._get_single_input_value(input_data_tags)
-                task_id = len(tasks) + 1
-                tasks[task_id] = self._create_task_with_local_uri(f, data_key, task_id)
+                task_id = len(self.tasks) + 1
+                self.tasks[task_id] = self._create_task_with_local_uri(f, data_key, task_id)
             else:
                 logger.warning('Unrecognized file format for file ' + f)
 
-        num_tasks_loaded = len(tasks)
+        num_tasks_loaded = len(self.tasks)
 
-        # make derived input scheme
+        # make derived input schema
         if num_tasks_loaded > 0:
             for tag in input_data_tags:
                 self.derived_input_schema.append({
@@ -220,7 +311,7 @@ class Project(object):
                 for completion in completions:
                     self._update_derived_output_schema(completion)
 
-        print(str(len(tasks)) + 'tasks loaded from: ' + self.config['input_path'])
+        print(str(len(self.tasks)) + ' tasks loaded from: ' + self.config['input_path'])
 
     def get_tasks(self):
         """ Load tasks from JSON files in input_path directory
@@ -352,7 +443,6 @@ class Project(object):
 
     def reload(self):
         self.tasks = None
-        self.completions = None
         self.derived_input_schema = []
         self.derived_output_schema = {
             'from_name_to_name_type': set(),
@@ -362,12 +452,12 @@ class Project(object):
         self._init()
 
         label_config_full = config_comments_free(open(self.config['label_config']).read())
-        label_config_line = config_line_stripped(label_config_full)
+        self.label_config_line = config_line_stripped(label_config_full)
 
         if self.analytics is None:
-            self.analytics = Analytics(label_config_line, self.config.get('collect_analytics', True))
+            self.analytics = Analytics(self.label_config_line, self.config.get('collect_analytics', True))
         else:
-            self.analytics.update_info(label_config_line, self.config.get('collect_analytics', True))
+            self.analytics.update_info(self.label_config_line, self.config.get('collect_analytics', True))
 
         # configure project
         if self.project_obj is None:
@@ -384,7 +474,7 @@ class Project(object):
         return os.path.join(args.root_dir, project_name)
 
     @classmethod
-    def _create_project_dir(cls, project_name, args):
+    def create_project_dir(cls, project_name, args):
         """
         Create project directory in args.root_dir/project_name, and initialize there all required files
         If some files are missed, restore them from defaults.
@@ -393,21 +483,20 @@ class Project(object):
         :param args:
         :return:
         """
-
-        dir = cls.get_project_dir(args, project_name)
+        dir = cls.get_project_dir(project_name, args)
         os.makedirs(dir, exist_ok=True)
         default_config_file = os.path.join(dir, 'config.json')
         default_label_config_file = os.path.join(dir, 'config.xml')
         default_output_dir = os.path.join(dir, 'completions')
         default_input_path = os.path.join(dir, 'tasks.json')
 
-        if args.config_path:
+        if hasattr(args, 'config_path') and args.config_path:
             copy2(args.config_path, default_config_file)
-        if args.input_path:
+        if hasattr(args, 'input_path') and args.input_path:
             copy2(args.input_path, default_input_path)
-        if args.output_dir:
+        if hasattr(args, 'output_dir') and args.output_dir:
             copy2(args.output_dir, default_output_dir)
-        if args.label_config:
+        if hasattr(args, 'label_config') and args.label_config:
             copy2(args.label_config, default_label_config_file)
 
         default_config = {
@@ -467,7 +556,7 @@ class Project(object):
             print(default_output_dir + ' output directory already exists.')
 
         print('')
-        print('Label Studio has been successfully initialized. Check project states in ' + output_dir)
+        print('Label Studio has been successfully initialized. Check project states in ' + dir)
         print('Start the server: label-studio start ' + dir)
         return dir
 
@@ -528,7 +617,7 @@ class Project(object):
     def get(cls, project_name, args):
 
         # If project stored in memory, just return it
-        if project_name in cls._storage[project_name]:
+        if project_name in cls._storage:
             return cls._storage[project_name]
 
         # If project directory exists, load project from directory and update in-memory storage
@@ -542,7 +631,7 @@ class Project(object):
     @classmethod
     def create(cls, project_name, args):
         # "create" method differs from "get" as it can create new directory with project resources
-        project_dir = cls._create_project_dir(args, project_name)
+        project_dir = cls.create_project_dir(project_name, args)
         project = cls._load_from_dir(project_dir, project_name, args)
         cls._storage[project_name] = project
         return project
@@ -551,6 +640,9 @@ class Project(object):
     def get_or_create(cls, project_name, args):
         try:
             project = cls.get(project_name, args)
+            logger.info('Project "' + project_name + '" got.')
         except KeyError:
             project = cls.create(project_name, args)
+            print('Project "' + project_name + '" created.')
+            logger.info('Project "' + project_name + '" created.')
         return project

@@ -1,13 +1,8 @@
-#!/usr/bin/env python
-from __future__ import print_function
-
-import io
+import logging
 import os
-
 import lxml
 import time
 import flask
-import logging
 import hashlib
 import pandas as pd
 
@@ -31,17 +26,16 @@ from .utils.validation import TaskValidator
 from .utils.exceptions import ValidationError
 from .utils.functions import generate_sample_task_without_check, data_examples
 from .utils.misc import (
-    exception_treatment, log_config, log, config_line_stripped, config_comments_free,
+    exception_treatment, log_config, log, config_line_stripped,
     get_config_templates, iter_config_templates
 )
-from .project import Project, ProjectObj
+from .project import Project
 
 logger = logging.getLogger(__name__)
 
 app = flask.Flask(__name__, static_url_path='')
 app.secret_key = 'A0Zrdqwf1AQWj12ajkhgFN]dddd/,?RfDWQQT'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
-
 
 # input arguments
 input_args = None
@@ -224,7 +218,7 @@ def api_render_label_studio():
     examples = data_examples(mode='editor_preview')
     task_data = {
         data_key: examples.get(data_type, '')
-        for data_key, data_type in Project.extract_data_types(config).items()
+        for data_key, data_type in project.extract_data_types(config).items()
     }
     example_task_data = {
         'id': 1764,
@@ -252,9 +246,9 @@ def api_validate_config():
     """
     if 'label_config' not in request.form:
         return make_response('No label_config in POST', status.HTTP_417_EXPECTATION_FAILED)
-
+    project = project_get_or_create()
     try:
-        ProjectObj.validate_label_config(request.form['label_config'])
+        project.validate_label_config(request.form['label_config'])
     except ValidationError as e:
         return make_response(jsonify({'label_config': e.msg_to_list()}), status.HTTP_400_BAD_REQUEST)
     except Exception as e:
@@ -270,16 +264,16 @@ def api_save_config():
     if 'label_config' not in request.form:
         return make_response('No label_config in POST', status.HTTP_417_EXPECTATION_FAILED)
 
+    project = project_get_or_create()
     # check config before save
     label_config = request.form['label_config']
     try:
-        ProjectObj.validate_label_config(label_config)
+        project.validate_label_config(label_config)
     except ValidationError as e:
         return make_response(jsonify({'label_config': e.msg_to_list()}), status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return make_response(jsonify({'label_config': [str(e)]}), status.HTTP_400_BAD_REQUEST)
 
-    project = project_get_or_create()
     project.update_label_config(label_config)
     project.reload()
     project.analytics.send(getframeinfo(currentframe()).function)
@@ -293,12 +287,12 @@ def api_import_example():
     # django compatibility
     request.GET = request.args
     request.POST = request.form
-
+    project = project_get_or_create()
     config = request.GET.get('label_config', '')
     if not config:
         config = request.POST.get('label_config', '')
     try:
-        ProjectObj.validate_label_config(config)
+        project.validate_label_config(config)
         output = generate_sample_task_without_check(config, mode='editor_preview')
     except (ValueError, ValidationError, lxml.etree.Error, KeyError):
         response = HttpResponse('error while example generating', status=status.HTTP_400_BAD_REQUEST)
@@ -604,6 +598,13 @@ def parse_input_args():
         '-d', '--debug', dest='debug', action='store_true',
         help='Debug mode for Flask', default=None
     )
+    root_parser.add_argument(
+        '--root-dir', dest='root_dir', default='.',
+        help='Projects root directory'
+    )
+    root_parser.add_argument(
+        '-v', '--verbose', dest='verbose', action='store_true',
+        help='Increase output verbosity')
 
     parser = argparse.ArgumentParser(description='Label studio')
 
@@ -654,13 +655,6 @@ def parse_input_args():
         '-p', '--port', dest='port', default=8200, type=int,
         help='Server port')
     parser_start.add_argument(
-        '-v', '--verbose', dest='verbose', action='store_true',
-        help='Increase output verbosity')
-    parser_start.add_argument(
-        '--root-dir', dest='root_dir', default='.',
-        help='Projects root directory'
-    )
-    parser.add_argument(
         '--make-session-projects', dest='make_session_projects', action='store_true',
         help='Create new project for each browser session'
     )
@@ -684,14 +678,14 @@ def main():
 
     # On `init` command, create directory args.project_name with initial project state and exit
     if input_args.command == 'init':
-        Project.create(input_args.project_name, input_args)
+        Project.create_project_dir(input_args.project_name, input_args)
         return
 
     elif input_args.command == 'start':
 
         # If `start --init` option is specified, do the same as with `init` command, but continue to run app
         if input_args.init:
-            Project.create(input_args.project_name, input_args)
+            Project.create_project_dir(input_args.project_name, input_args)
 
     # On `start` command, launch browser if --no-browser is not specified and start label studio server
     if input_args.command == 'start':
