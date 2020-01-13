@@ -12,7 +12,8 @@ Named entity for the HTML Documents
 ## Run
 
 ```bash
-python server.py -c config.json -l ../examples/html_document/config.xml -i ../examples/html_document/tasks.json -o output_html_ner
+label-studio init --template=html_document html_document_project
+label-studio start html_document_project 
 ```
 
 ## Config 

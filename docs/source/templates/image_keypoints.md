@@ -11,7 +11,8 @@ Key Points labeling for the images
 ## Run
 
 ```bash
-python server.py -c config.json -l ../examples/image_keypoints/config.xml -i ../examples/image_keypoints/tasks.json -o output_keypoints
+label-studio init --template=image_keypoints image_keypoints_project
+label-studio start image_keypoints_project 
 ```
 
 ## Config 

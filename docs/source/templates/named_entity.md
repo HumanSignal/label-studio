@@ -11,7 +11,8 @@ Named entity recognition for a piece of text
 ## Run
 
 ```bash
-python server.py -c config.json -l ../examples/named_entity/config.xml -i ../examples/named_entity/tasks.json -o output_ner
+label-studio init --template=named_entity named_entity_project
+label-studio start named_entity_project 
 ```
 
 ## Config 

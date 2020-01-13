@@ -11,7 +11,8 @@ Listen to an audio file and transcribe its content in natural language
 ## Run
 
 ```bash
-python server.py -c config.json -l ../examples/transcribe_audio/config.xml -i ../examples/transcribe_audio/tasks.json -o output_transcribe_audio
+label-studio init --template=transcribe_audio transcribe_audio_project
+label-studio start transcribe_audio_project 
 ```
 
 ## Config 
