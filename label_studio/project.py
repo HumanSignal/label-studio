@@ -41,6 +41,7 @@ class Project(object):
             'labels': defaultdict(set)
         }
         self.label_config_line = None
+        self.label_config_full = None
         self.ml_backend = None
         self.project_obj = None
         self.analytics = None
@@ -451,8 +452,8 @@ class Project(object):
 
         self._init()
 
-        label_config_full = config_comments_free(open(self.config['label_config']).read())
-        self.label_config_line = config_line_stripped(label_config_full)
+        self.label_config_full = config_comments_free(open(self.config['label_config']).read())
+        self.label_config_line = config_line_stripped(self.label_config_full)
 
         if self.analytics is None:
             self.analytics = Analytics(self.label_config_line, self.config.get('collect_analytics', True))
@@ -461,7 +462,7 @@ class Project(object):
 
         # configure project
         if self.project_obj is None:
-            self.project_obj = ProjectObj(label_config=self.label_config_line, label_config_full=label_config_full)
+            self.project_obj = ProjectObj(label_config=self.label_config_line, label_config_full=self.label_config_full)
         # configure machine learning backend
         if self.ml_backend is None:
             ml_backend_params = self.config.get('ml_backend')

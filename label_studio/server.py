@@ -48,7 +48,7 @@ def project_get_or_create():
     - "session": project is based on "project_name" key restored from flask.session object
     :return:
     """
-    if input_args.make_session_projects:
+    if input_args.command == 'start-multi-session':
         if 'project_name' in session:
             project_name = session['project_name']
         else:
@@ -170,6 +170,7 @@ def setup_page():
         'setup.html',
         config=project.config,
         project=project.project_obj,
+        label_config_full=project.label_config_full,
         templates=templates,
         input_values=input_values
     )
@@ -659,6 +660,30 @@ def parse_input_args():
         help='Create new project for each browser session'
     )
 
+    # start-multi-session sub-command parser
+
+    parser_start_ms = subparsers.add_parser(
+        'start-multi-session', help='Start Label Studio server', parents=[root_parser])
+    parser_start_ms.add_argument(
+        '--template', dest='template', choices=available_templates,
+        help='Choose from predefined project templates'
+    )
+    parser_start_ms.add_argument(
+        '-c', '--config', dest='config_path',
+        help='Server config')
+    parser_start_ms.add_argument(
+        '-l', '--label-config', dest='label_config', default='',
+        help='Label config path')
+    parser_start_ms.add_argument(
+        '-i', '--input-path', dest='input_path', default='',
+        help='Input path to task file or directory with tasks')
+    parser_start_ms.add_argument(
+        '-o', '--output-dir', dest='output_dir', default='',
+        help='Output directory for completions')
+    parser_start_ms.add_argument(
+        '-p', '--port', dest='port', default=8200, type=int,
+        help='Server port')
+
     args = parser.parse_args()
     label_config_explicitly_specified = hasattr(args, 'label_config') and args.label_config
     if args.template and not label_config_explicitly_specified:
@@ -694,6 +719,10 @@ def main():
             threading.Timer(2.5, lambda: webbrowser.open(browser_url)).start()
             print('Start browser at URL: ' + browser_url)
 
+        app.run(host='0.0.0.0', port=input_args.port, debug=input_args.debug)
+
+    # On `start-multi-session` command, server creates project based on browser sessions
+    elif input_args.command == 'start-multi-session':
         app.run(host='0.0.0.0', port=input_args.port, debug=input_args.debug)
 
 
