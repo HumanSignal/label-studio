@@ -16,7 +16,7 @@ from urllib.parse import unquote
 from datetime import datetime
 from copy import deepcopy
 from inspect import currentframe, getframeinfo
-from flask import request, jsonify, make_response, Response, Response as HttpResponse, send_file, session
+from flask import request, jsonify, make_response, Response, Response as HttpResponse, send_file, session, redirect
 from flask_api import status
 
 from .utils.functions import generate_sample_task
@@ -98,6 +98,8 @@ def labeling_page():
     """ Label studio frontend: task labeling
     """
     project = project_get_or_create()
+    if len(project.tasks) == 0:
+        return redirect('/welcome')
 
     # task data: load task or task with completions if it exists
     task_data = None
@@ -133,7 +135,7 @@ def welcome_page():
     )
 
 
-@app.route('/data')
+@app.route('/tasks')
 def tasks_page():
     """ Tasks and completions page: tasks.html
     """
@@ -148,7 +150,7 @@ def tasks_page():
     task_ids = [i[0] for i in task_ids]  # take only id back
     project.analytics.send(getframeinfo(currentframe()).function)
     return flask.render_template(
-        'data.html',
+        'tasks.html',
         config=project.config,
         label_config=label_config,
         task_ids=task_ids,
