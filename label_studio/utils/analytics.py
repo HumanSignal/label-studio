@@ -17,9 +17,10 @@ mp = Mixpanel('269cd4e25e97cc15bdca5b401e429892')
 
 class Analytics(object):
 
-    def __init__(self, label_config_line, collect_analytics=True):
+    def __init__(self, label_config_line, collect_analytics=True, project_name=''):
         self._label_config_line = label_config_line
         self._collect_analytics = collect_analytics
+        self._project_name = project_name
 
         self._version = get_app_version()
         self._user_id = self._get_user_id()
@@ -54,10 +55,11 @@ class Analytics(object):
             label_types.append({tag_info['type']: list(map(itemgetter('type'), tag_info['inputs']))})
         return label_types
 
-    def update_info(self, label_config_line, collect_analytics=True):
+    def update_info(self, label_config_line, collect_analytics=True, project_name=''):
         if label_config_line != self._label_config_line:
             self._label_types = self._get_label_types()
         self._collect_analytics = collect_analytics
+        self._project_name = project_name
 
     def send(self, event_name, **kwargs):
         if not self._collect_analytics:
@@ -65,6 +67,7 @@ class Analytics(object):
         data = deepcopy(kwargs)
         data['version'] = self._version
         data['label_types'] = self._label_types
+        data['project'] = self._project_name
         event_name = 'LS:' + str(event_name)
         try:
             mp.track(self._user_id, event_name, data)
@@ -75,6 +78,9 @@ class Analytics(object):
         json_data['event'] = event_name
         json_data['user_id'] = self._user_id
         try:
-            requests.post(url='https://analytics.labelstudio.io/prod', json=json_data)
-        except requests.RequestException:
+            url = 'https://analytics.labelstudio.io/prod'
+            logger.debug('Sending to {url}:\n{data}'.format(url=url, data=json_data))
+            requests.post(url=url, json=json_data)
+        except requests.RequestException as exc:
+            logger.debug('Analytics error: {exc}'.format(exc=str(exc)))
             pass

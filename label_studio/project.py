@@ -456,9 +456,9 @@ class Project(object):
         self.label_config_line = config_line_stripped(self.label_config_full)
 
         if self.analytics is None:
-            self.analytics = Analytics(self.label_config_line, self.config.get('collect_analytics', True))
+            self.analytics = Analytics(self.label_config_line, self.config.get('collect_analytics', True), self.name)
         else:
-            self.analytics.update_info(self.label_config_line, self.config.get('collect_analytics', True))
+            self.analytics.update_info(self.label_config_line, self.config.get('collect_analytics', True), self.name)
 
         # configure project
         if self.project_obj is None:
