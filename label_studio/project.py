@@ -644,6 +644,5 @@ class Project(object):
             logger.info('Project "' + project_name + '" got.')
         except KeyError:
             project = cls.create(project_name, args)
-            print('Project "' + project_name + '" created.')
             logger.info('Project "' + project_name + '" created.')
         return project

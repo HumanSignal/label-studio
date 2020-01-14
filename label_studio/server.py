@@ -721,7 +721,7 @@ def main():
 
         app.run(host='0.0.0.0', port=input_args.port, debug=input_args.debug)
 
-    # On `start-multi-session` command, server creates project based on browser sessions
+    # On `start-multi-session` command, server creates one project per each browser sessions
     elif input_args.command == 'start-multi-session':
         app.run(host='0.0.0.0', port=input_args.port, debug=input_args.debug)
 
