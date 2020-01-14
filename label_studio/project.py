@@ -641,7 +641,7 @@ class Project(object):
     def get_or_create(cls, project_name, args):
         try:
             project = cls.get(project_name, args)
-            logger.info('Project "' + project_name + '" got.')
+            logger.info('Get project "' + project_name + '".')
         except KeyError:
             project = cls.create(project_name, args)
             logger.info('Project "' + project_name + '" created.')
