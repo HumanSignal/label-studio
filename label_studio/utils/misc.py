@@ -6,6 +6,7 @@ import io
 from flask import request, jsonify, make_response
 import json  # it MUST be included after flask!
 import pkg_resources
+import hashlib
 
 from collections import defaultdict
 from pythonjsonlogger import jsonlogger
@@ -238,3 +239,7 @@ def get_config_templates():
         templates[key] = sorted(templates[key], key=lambda x: x['title'])
 
     return templates
+
+
+def convert_string_to_hash(string):
+    return hashlib.md5(string.encode()).hexdigest()

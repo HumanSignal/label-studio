@@ -7,7 +7,7 @@ from mixpanel import Mixpanel, MixpanelException
 from copy import deepcopy
 from operator import itemgetter
 from uuid import uuid4
-from .misc import get_app_version, parse_config
+from .misc import get_app_version, parse_config, convert_string_to_hash
 from .io import get_config_dir
 
 logger = logging.getLogger(__name__)
@@ -20,7 +20,7 @@ class Analytics(object):
     def __init__(self, label_config_line, collect_analytics=True, project_name=''):
         self._label_config_line = label_config_line
         self._collect_analytics = collect_analytics
-        self._project_name = project_name
+        self._project_name = convert_string_to_hash(project_name)
 
         self._version = get_app_version()
         self._user_id = self._get_user_id()
@@ -52,14 +52,21 @@ class Analytics(object):
         info = parse_config(self._label_config_line)
         label_types = []
         for tag_info in info.values():
-            label_types.append({tag_info['type']: list(map(itemgetter('type'), tag_info['inputs']))})
+            output_type = tag_info['type']
+            input_types = list(map(itemgetter('type'), tag_info['inputs']))
+            label_types.append({
+                output_type: {
+                    'input_types': input_types,
+                    'num_labels': len(tag_info['labels'])
+                }
+            })
         return label_types
 
     def update_info(self, label_config_line, collect_analytics=True, project_name=''):
         if label_config_line != self._label_config_line:
             self._label_types = self._get_label_types()
         self._collect_analytics = collect_analytics
-        self._project_name = project_name
+        self._project_name = convert_string_to_hash(project_name)
 
     def send(self, event_name, **kwargs):
         if not self._collect_analytics:
