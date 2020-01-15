@@ -10,13 +10,17 @@
         <div class="statistic">
           <span class="value">{{ task_ids|length }}</span>
           <span class="label">Total tasks</span>
+            {% if show_paths %}
           <i class="small">{{ config['input_path'] }}</i>
+            {% endif %}
         </div>
 
         <div class="statistic">
           <span class="value">{{ completions|length }}</span>
           <span class="label">Total completions</span>
+            {% if show_paths %}
           <i class="small">{{ config['output_dir'] }}</i>
+            {% endif %}
         </div>
       </div>
     </div>

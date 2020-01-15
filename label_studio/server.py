@@ -152,6 +152,7 @@ def tasks_page():
     project.analytics.send(getframeinfo(currentframe()).function)
     return flask.render_template(
         'tasks.html',
+        show_paths=input_args.command != 'start-multi-session',
         config=project.config,
         label_config=label_config,
         task_ids=task_ids,
