@@ -7,7 +7,8 @@ from mixpanel import Mixpanel, MixpanelException
 from copy import deepcopy
 from operator import itemgetter
 from uuid import uuid4
-from .misc import get_config_dir, get_app_version, parse_config
+from .misc import get_app_version, parse_config, convert_string_to_hash
+from .io import get_config_dir
 
 logger = logging.getLogger(__name__)
 
@@ -16,9 +17,10 @@ mp = Mixpanel('269cd4e25e97cc15bdca5b401e429892')
 
 class Analytics(object):
 
-    def __init__(self, label_config_line, collect_analytics=True):
+    def __init__(self, label_config_line, collect_analytics=True, project_name=''):
         self._label_config_line = label_config_line
         self._collect_analytics = collect_analytics
+        self._project_name = convert_string_to_hash(project_name)
 
         self._version = get_app_version()
         self._user_id = self._get_user_id()
@@ -50,13 +52,21 @@ class Analytics(object):
         info = parse_config(self._label_config_line)
         label_types = []
         for tag_info in info.values():
-            label_types.append({tag_info['type']: list(map(itemgetter('type'), tag_info['inputs']))})
+            output_type = tag_info['type']
+            input_types = list(map(itemgetter('type'), tag_info['inputs']))
+            label_types.append({
+                output_type: {
+                    'input_types': input_types,
+                    'num_labels': len(tag_info['labels'])
+                }
+            })
         return label_types
 
-    def update_info(self, label_config_line, collect_analytics=True):
+    def update_info(self, label_config_line, collect_analytics=True, project_name=''):
         if label_config_line != self._label_config_line:
             self._label_types = self._get_label_types()
         self._collect_analytics = collect_analytics
+        self._project_name = convert_string_to_hash(project_name)
 
     def send(self, event_name, **kwargs):
         if not self._collect_analytics:
@@ -64,6 +74,7 @@ class Analytics(object):
         data = deepcopy(kwargs)
         data['version'] = self._version
         data['label_types'] = self._label_types
+        data['project'] = self._project_name
         event_name = 'LS:' + str(event_name)
         try:
             mp.track(self._user_id, event_name, data)
@@ -74,6 +85,9 @@ class Analytics(object):
         json_data['event'] = event_name
         json_data['user_id'] = self._user_id
         try:
-            requests.post(url='https://analytics.labelstudio.io/prod', json=json_data)
-        except requests.RequestException:
+            url = 'https://analytics.labelstudio.io/prod'
+            logger.debug('Sending to {url}:\n{data}'.format(url=url, data=json_data))
+            requests.post(url=url, json=json_data)
+        except requests.RequestException as exc:
+            logger.debug('Analytics error: {exc}'.format(exc=str(exc)))
             pass

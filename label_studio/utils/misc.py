@@ -6,9 +6,9 @@ import io
 from flask import request, jsonify, make_response
 import json  # it MUST be included after flask!
 import pkg_resources
+import hashlib
 
 from collections import defaultdict
-from appdirs import user_config_dir
 from pythonjsonlogger import jsonlogger
 from lxml import etree, objectify
 from xml.etree import ElementTree
@@ -159,20 +159,6 @@ class LabelConfigParser(object):
         ]
 
 
-def get_config_dir():
-    config_dir = user_config_dir(appname='label-studio')
-    if not os.path.exists(config_dir):
-        os.makedirs(config_dir)
-    return config_dir
-
-
-def get_data_dir():
-    data_dir = user_config_dir(appname='label-studio')
-    if not os.path.exists(data_dir):
-        os.makedirs(data_dir)
-    return data_dir
-
-
 def get_app_version():
     return pkg_resources.get_distribution('label-studio').version
 
@@ -253,3 +239,7 @@ def get_config_templates():
         templates[key] = sorted(templates[key], key=lambda x: x['title'])
 
     return templates
+
+
+def convert_string_to_hash(string):
+    return hashlib.md5(string.encode()).hexdigest()

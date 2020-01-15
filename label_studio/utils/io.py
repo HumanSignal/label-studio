@@ -4,6 +4,8 @@ import pkg_resources
 from contextlib import contextmanager
 from tempfile import mkstemp
 
+from appdirs import user_config_dir, user_data_dir
+
 
 def find_node(package_name, node_path, node_type):
     assert node_type in ('dir', 'file', 'any')
@@ -54,3 +56,17 @@ def get_temp_file():
     fd, path = mkstemp()
     yield path
     os.close(fd)
+
+
+def get_config_dir():
+    config_dir = user_config_dir(appname='label-studio')
+    if not os.path.exists(config_dir):
+        os.makedirs(config_dir)
+    return config_dir
+
+
+def get_data_dir():
+    data_dir = user_config_dir(appname='label-studio')
+    if not os.path.exists(data_dir):
+        os.makedirs(data_dir)
+    return data_dir
