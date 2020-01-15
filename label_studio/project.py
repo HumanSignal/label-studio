@@ -491,10 +491,13 @@ class Project(object):
         """
         dir = cls.get_project_dir(project_name, args)
         os.makedirs(dir, exist_ok=True)
+        label_config_name = 'config.xml'
+        output_dir_name = 'completions'
+        input_path_name = 'tasks.json'
         default_config_file = os.path.join(dir, 'config.json')
-        default_label_config_file = os.path.join(dir, 'config.xml')
-        default_output_dir = os.path.join(dir, 'completions')
-        default_input_path = os.path.join(dir, 'tasks.json')
+        default_label_config_file = os.path.join(dir, label_config_name)
+        default_output_dir = os.path.join(dir, output_dir_name)
+        default_input_path = os.path.join(dir, input_path_name)
 
         if hasattr(args, 'config_path') and args.config_path:
             copy2(args.config_path, default_config_file)
@@ -510,9 +513,9 @@ class Project(object):
             'port': 8200,
             'debug': False,
 
-            'label_config': default_label_config_file,
-            'input_path': default_input_path,
-            'output_dir': default_output_dir,
+            'label_config': label_config_name,
+            'input_path': input_path_name,
+            'output_dir': output_dir_name,
 
             'instruction': 'Type some <b>hypertext</b> for label experts!',
             'allow_delete_completions': True,
