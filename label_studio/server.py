@@ -21,7 +21,7 @@ from flask import request, jsonify, make_response, Response, Response as HttpRes
 from flask_api import status
 
 from .utils.functions import generate_sample_task
-from .utils.io import find_dir, find_editor_files, get_temp_file, get_temp_dir
+from .utils.io import find_dir, find_editor_files, get_temp_dir
 from .utils import uploader
 from .utils.validation import TaskValidator
 from .utils.exceptions import ValidationError
@@ -416,9 +416,7 @@ def api_import():
 @app.route('/api/export', methods=['GET'])
 def api_export():
     export_format = request.args.get('format')
-
     project = project_get_or_create()
-
     now = datetime.now()
     completion_dir = project.config['output_dir']
     export_dirname = now.strftime('%Y-%m-%d-%H-%M-%S')

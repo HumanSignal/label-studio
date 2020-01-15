@@ -593,6 +593,7 @@ class Project(object):
                     'Couldn\'t find config file ' + config_path + ' in project directory ' + project_dir +
                     ', maybe you\'ve missed appending "--init" option:\nlabel-studio start ' + args.project_name + ' --init'
                 )
+
         config_path = os.path.abspath(config_path)
         with io.open(config_path) as c:
             config = json.load(c)
