@@ -1,8 +1,11 @@
 import os
 import pkg_resources
+import shutil
 
 from contextlib import contextmanager
-from tempfile import mkstemp
+from tempfile import mkstemp, mkdtemp
+
+from appdirs import user_config_dir, user_data_dir
 
 from appdirs import user_config_dir, user_data_dir
 
@@ -58,6 +61,13 @@ def get_temp_file():
     os.close(fd)
 
 
+@contextmanager
+def get_temp_dir():
+    dirpath = mkdtemp()
+    yield dirpath
+    shutil.rmtree(dirpath)
+
+
 def get_config_dir():
     config_dir = user_config_dir(appname='label-studio')
     if not os.path.exists(config_dir):
@@ -66,7 +76,7 @@ def get_config_dir():
 
 
 def get_data_dir():
-    data_dir = user_config_dir(appname='label-studio')
+    data_dir = user_data_dir(appname='label-studio')
     if not os.path.exists(data_dir):
         os.makedirs(data_dir)
     return data_dir

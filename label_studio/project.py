@@ -11,6 +11,8 @@ from collections import OrderedDict, defaultdict
 from datetime import datetime
 from operator import itemgetter
 
+from label_studio_converter import Converter
+
 from .utils.misc import LabelConfigParser, config_line_stripped, config_comments_free, parse_config
 from .utils.analytics import Analytics
 from .utils.models import ProjectObj, MLBackend
@@ -45,6 +47,7 @@ class Project(object):
         self.ml_backend = None
         self.project_obj = None
         self.analytics = None
+        self.converter = None
 
         self.reload()
 
@@ -470,6 +473,8 @@ class Project(object):
                 ml_backend = MLBackend.from_params(ml_backend_params)
                 self.project_obj.connect(ml_backend)
 
+        self.converter = Converter(self.label_config_full)
+
     @classmethod
     def get_project_dir(cls, project_name, args):
         return os.path.join(args.root_dir, project_name)
@@ -486,10 +491,13 @@ class Project(object):
         """
         dir = cls.get_project_dir(project_name, args)
         os.makedirs(dir, exist_ok=True)
+        label_config_name = 'config.xml'
+        output_dir_name = 'completions'
+        input_path_name = 'tasks.json'
         default_config_file = os.path.join(dir, 'config.json')
-        default_label_config_file = os.path.join(dir, 'config.xml')
-        default_output_dir = os.path.join(dir, 'completions')
-        default_input_path = os.path.join(dir, 'tasks.json')
+        default_label_config_file = os.path.join(dir, label_config_name)
+        default_output_dir = os.path.join(dir, output_dir_name)
+        default_input_path = os.path.join(dir, input_path_name)
 
         if hasattr(args, 'config_path') and args.config_path:
             copy2(args.config_path, default_config_file)
@@ -505,9 +513,9 @@ class Project(object):
             'port': 8200,
             'debug': False,
 
-            'label_config': default_label_config_file,
-            'input_path': default_input_path,
-            'output_dir': default_output_dir,
+            'label_config': label_config_name,
+            'input_path': input_path_name,
+            'output_dir': output_dir_name,
 
             'instruction': 'Type some <b>hypertext</b> for label experts!',
             'allow_delete_completions': True,
@@ -589,6 +597,7 @@ class Project(object):
                     ', maybe you\'ve missed appending "--init" option:\nlabel-studio start ' + args.project_name + ' --init'
                 )
 
+        config_path = os.path.abspath(config_path)
         with io.open(config_path) as c:
             config = json.load(c)
 
@@ -606,6 +615,12 @@ class Project(object):
 
         if args.debug is not None:
             config['debug'] = args.debug
+
+        # absolutize paths relative to config.json
+        config_dir = os.path.dirname(config_path)
+        config['label_config'] = os.path.join(config_dir, config['label_config'])
+        config['input_path'] = os.path.join(config_dir, config['input_path'])
+        config['output_dir'] = os.path.join(config_dir, config['output_dir'])
 
         return config
 

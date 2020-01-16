@@ -5,6 +5,7 @@ import time
 import flask
 import hashlib
 import pandas as pd
+import shutil
 
 try:
     import ujson as json
@@ -20,7 +21,7 @@ from flask import request, jsonify, make_response, Response, Response as HttpRes
 from flask_api import status
 
 from .utils.functions import generate_sample_task
-from .utils.io import find_dir, find_editor_files
+from .utils.io import find_dir, find_editor_files, get_temp_dir
 from .utils import uploader
 from .utils.validation import TaskValidator
 from .utils.exceptions import ValidationError
@@ -151,6 +152,7 @@ def tasks_page():
     project.analytics.send(getframeinfo(currentframe()).function)
     return flask.render_template(
         'tasks.html',
+        show_paths=input_args.command != 'start-multi-session',
         config=project.config,
         label_config=label_config,
         task_ids=task_ids,
@@ -201,6 +203,7 @@ def export_page():
     return flask.render_template(
         'export.html',
         config=project.config,
+        formats=project.converter.supported_formats,
         project=project.project_obj
     )
 
@@ -413,19 +416,20 @@ def api_import():
 
 @app.route('/api/export', methods=['GET'])
 def api_export():
+    export_format = request.args.get('format')
     project = project_get_or_create()
-
     now = datetime.now()
-    output_dir = project.config['output_dir']
-    export_file = now.strftime('%Y-%m-%d-%H-%M-%S') + '.json.export'
-    files = [os.path.join(output_dir, f) for f in os.listdir(output_dir) if f.endswith('.json')]
-    completions = [json.load(open(f)) for f in files]
-    path = os.path.join(output_dir, export_file)
-    json.dump(completions, open(path, 'w'))
-    response = send_file(os.path.abspath(path), as_attachment=True)
-    response.headers['filename'] = export_file
-    project.analytics.send(getframeinfo(currentframe()).function)
-    return response
+    completion_dir = project.config['output_dir']
+    export_dirname = now.strftime('%Y-%m-%d-%H-%M-%S')
+    with get_temp_dir() as temp_dir:
+        export_dirpath = os.path.join(temp_dir, export_dirname)
+        project.converter.convert(completion_dir, export_dirpath, format=export_format)
+        shutil.make_archive(export_dirpath, 'zip', export_dirpath)
+        export_zipfile = export_dirpath + '.zip'
+        response = send_file(export_zipfile, as_attachment=True)
+        response.headers['filename'] = os.path.basename(export_zipfile)
+        project.analytics.send(getframeinfo(currentframe()).function)
+        return response
 
 
 @app.route('/api/projects/1/next/', methods=['GET'])
