@@ -14,9 +14,10 @@ except:
     import json
 
 from os.path import join
+from urllib.request import urlopen
+
 from .exceptions import ValidationError
 from .misc import Settings
-from urllib.request import urlopen
 
 settings = Settings
 logger = logging.getLogger(__name__)

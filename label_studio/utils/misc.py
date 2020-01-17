@@ -13,7 +13,7 @@ from pythonjsonlogger import jsonlogger
 from lxml import etree, objectify
 from xml.etree import ElementTree
 
-from label_studio.utils.io import find_file, find_dir
+from .io import find_file, find_dir
 
 
 # settings from django analogue

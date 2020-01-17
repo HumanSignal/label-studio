@@ -7,8 +7,6 @@ from tempfile import mkstemp, mkdtemp
 
 from appdirs import user_config_dir, user_data_dir
 
-from appdirs import user_config_dir, user_data_dir
-
 
 def find_node(package_name, node_path, node_type):
     assert node_type in ('dir', 'file', 'any')

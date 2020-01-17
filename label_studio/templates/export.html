@@ -1,91 +1,96 @@
 {% extends 'base.html' %}
 {% block body %}
 
-    <div class="ui container" id="export">
-        <!-- Export help message -->
-        <div class="ui message">
-            <i class="close icon"></i>
+  <div class="ui container" id="export">
+    <!-- Export help message -->
+    <div class="ui message">
+      <i class="close icon"></i>
 
-            <!-- Label config -->
-            <div class="header">Export help</div>
-            <div class="content">
-                <ul class="ui list">
-                    <li>You can export completed tasks to one of the following formats:</li>
-                    <ul>
-                        <li>JSON</li>
-                        <li>CSV, TSV</li>
-                        <li>CoNLL 2003
-                            <span class="ui label basic tiny">named entity recognition</span>
-                        </li>
-                        <li>COCO
-                            <span class="ui label basic tiny">image segmentation</span>
-                            <span class="ui label basic tiny">semantic segmentation</span>
-                        </li>
-                        <li>Pascal VOC XML
-                            <span class="ui label basic tiny">image segmentation</span>
-                            <span class="ui label basic tiny">semantic segmentation</span>
-                        </li>
-                    </ul>
-                    <li>Can't find desired export format?<br> Please report us
-                        <a class="no-go" href="https://docs.google.com/forms/d/e/1FAIpQLSdLHZx5EeT1J350JPwnY2xLanfmvplJi6VZk65C2R4XSsRBHg/viewform">via Slack</a>
-                        or create an issue on our <a class="no-go" href="https://github.com/heartexlabs/label-studio-converter/issues">GitHub page</a> </li>
-                </ul>
-            </div>
-            <br>
-        </div>
-
-        <!-- Dimmer and loader --->
-        <div class="ui dimmer" id="dimmer" style="position: fixed !important;">
-            <div class="ui text active orange loader big slow">
-                Creating export file...<br/>
-            </div>
-        </div>
-
-        <center>
-            <div class="header">Choose export format:</div>
-            <select id="export-format-dropdown" class="ui dropdown">
-                {% for format in formats %}
-                    <option value="{{ format }}">{{ format }}</option>
-                {% endfor %}
-            </select>
-            <br>
-            <br>
-            <a class="ui button positive center"
-               onclick="downloadFile('/api/export?format=' + $('#export-format-dropdown').val())">
-                Export Completions</a>
-        </center>
-        <br/>
-
-        <center>
-            <div style="margin-top: 5em">
-                <img src="static/images/opossum_snuggle.svg" width="250px">
-            </div>
-        </center>
+      <!-- Label config -->
+      <div class="header">Export help</div>
+      <div class="content">
+        <ul class="ui list">
+          <li>You can export completed tasks to one of the following formats:</li>
+          <ul>
+            <li>JSON</li>
+            <li>CSV, TSV</li>
+            <li>CoNLL 2003
+              <span class="ui label basic tiny">named entity recognition</span>
+            </li>
+            <li>COCO
+              <span class="ui label basic tiny">image segmentation</span>
+              <span class="ui label basic tiny">semantic segmentation</span>
+            </li>
+            <li>Pascal VOC XML
+              <span class="ui label basic tiny">image segmentation</span>
+              <span class="ui label basic tiny">semantic segmentation</span>
+            </li>
+          </ul>
+          <li>Can't find desired export format?<br> Please report us
+            <a class="no-go"
+               href="https://docs.google.com/forms/d/e/1FAIpQLSdLHZx5EeT1J350JPwnY2xLanfmvplJi6VZk65C2R4XSsRBHg/viewform">via
+              Slack</a>
+            or create an issue on our <a class="no-go"
+                                         href="https://github.com/heartexlabs/label-studio-converter/issues">GitHub
+              page</a>
+          </li>
+        </ul>
+      </div>
+      <br>
     </div>
 
-    <script>
-        // download file by url
-        function downloadFile(urlToSend) {
-            $('#dimmer').addClass('active');
-            let req = new XMLHttpRequest();
-            req.open("GET", urlToSend, true);
-            req.responseType = "blob";
-            req.onload = function (event) {
-                let blob = req.response;
+    <!-- Dimmer and loader --->
+    <div class="ui dimmer" id="dimmer" style="position: fixed !important;">
+      <div class="ui text active orange loader big slow">
+        Creating export file...<br/>
+      </div>
+    </div>
 
-                // file generated, start downloading
-                if (req.status === 200) {
-                    let link = document.createElement('a');
-                    link.href = window.URL.createObjectURL(blob);
-                    link.download = req.getResponseHeader('filename');
-                    link.click();
-                    link.remove();
-                } else {
-                    alert('Error occurred while export.');
-                }
-                $('#dimmer').removeClass('active');
-            };
-            req.send();
+    <center>
+      <div class="header">Choose export format:</div>
+      <select id="export-format-dropdown" class="ui dropdown">
+        {% for format in formats %}
+          <option value="{{ format }}">{{ format }}</option>
+        {% endfor %}
+      </select>
+      <br>
+      <br>
+      <a class="ui button positive center"
+         onclick="downloadFile('/api/export?format=' + $('#export-format-dropdown').val())">
+        Export Completions</a>
+      <br>
+
+      <div style="margin-top: 5em">
+        <img src="static/images/opossum_snuggle.png" width="250px" style="display: block;" />
+      </div>
+    </center>
+
+  </div>
+
+  <script>
+    // download file by url
+    function downloadFile(urlToSend) {
+      $('#dimmer').addClass('active');
+      let req = new XMLHttpRequest();
+      req.open("GET", urlToSend, true);
+      req.responseType = "blob";
+      req.onload = function (event) {
+        let blob = req.response;
+
+        // file generated, start downloading
+        if (req.status === 200) {
+          let link = document.createElement('a');
+          link.href = window.URL.createObjectURL(blob);
+          link.download = req.getResponseHeader('filename');
+          link.click();
+          link.remove();
+        } else {
+          alert('Error occurred while export.');
         }
-    </script>
+        $('#dimmer').removeClass('active');
+      };
+      req.send();
+    }
+
+  </script>
 {% endblock %}

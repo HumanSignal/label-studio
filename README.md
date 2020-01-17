@@ -28,7 +28,7 @@ Its purpose is to help you label different types of data using a simple interfac
 ## Quick Start
 
 ```bash
-# Requires >=Python3.6 
+# Requires >=Python3.5
 pip install label-studio
 
 # Initialize the project in labeling_project path
@@ -54,6 +54,17 @@ pip install <path-to-downloaded-package>.whl
 
 # Install label studio
 pip install label-studio
+```
+
+#### Local development
+Running the latest Label Studio version locally without installing package from pip could be done by:
+```bash
+# Install all package dependencies
+pip install -e .
+```
+```bash
+# Start the server
+python label-studio/server.py start labeling_project --init
 ```
 
 
@@ -125,7 +136,7 @@ There is a quick example tutorial on how to do that with simple image classifica
     ```json
     "ml_backend": {
       "url": "http://localhost:9090",
-      "model_name": "my_super_model"
+      "model_name": "my_image_classifier"
     }
     ```
 3. Launch Label Studio server:
@@ -150,7 +161,7 @@ Label Studio for Teams is our enterprise edition (cloud & on-prem), that include
 |-|-|
 | label-studio | Server part, distributed as a pip package |
 | [label-studio-frontend](https://github.com/heartexlabs/label-studio-frontend) | Frontend part, written in JavaScript and React, can be embedded into your application | 
-| [converter](https://github.com/heartexlabs/converter) | Encode labels into the format of your favorite machine learning library | 
+| [label-studio-converter](https://github.com/heartexlabs/label-studio-converter) | Encode labels into the format of your favorite machine learning library | 
 | [label-studio-transformers](https://github.com/heartexlabs/label-studio-transformers) | Transformers library connected and configured for use with label studio | 
 
 ## License

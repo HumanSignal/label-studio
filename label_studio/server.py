@@ -1,11 +1,12 @@
-import logging
 import os
+import sys
 import lxml
 import time
+import shutil
 import flask
 import hashlib
+import logging
 import pandas as pd
-import shutil
 
 try:
     import ujson as json
@@ -20,17 +21,17 @@ from inspect import currentframe, getframeinfo
 from flask import request, jsonify, make_response, Response, Response as HttpResponse, send_file, session, redirect
 from flask_api import status
 
-from .utils.functions import generate_sample_task
-from .utils.io import find_dir, find_editor_files, get_temp_dir
-from .utils import uploader
-from .utils.validation import TaskValidator
-from .utils.exceptions import ValidationError
-from .utils.functions import generate_sample_task_without_check, data_examples
-from .utils.misc import (
+from label_studio.utils.functions import generate_sample_task
+from label_studio.utils.io import find_dir, find_editor_files, get_temp_dir
+from label_studio.utils import uploader
+from label_studio.utils.validation import TaskValidator
+from label_studio.utils.exceptions import ValidationError
+from label_studio.utils.functions import generate_sample_task_without_check, data_examples
+from label_studio.utils.misc import (
     exception_treatment, log_config, log, config_line_stripped,
     get_config_templates, iter_config_templates
 )
-from .project import Project
+from label_studio.project import Project
 
 logger = logging.getLogger(__name__)
 

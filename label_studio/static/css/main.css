@@ -1,6 +1,5 @@
 html {
     overflow: auto;
-    min-width: 640px;
 }
 
 body {
@@ -80,9 +79,8 @@ a {
     padding: 10px 20px 10px 40px;
     position: relative;
     z-index: 100;
-    box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 3px 0px;
+    box-shadow: rgba(0, 0, 0, 0.15) 0 2px 3px 0;
     margin-bottom: 3em;
-    min-width: 500px;
 }
 
 #logo {
@@ -184,25 +182,6 @@ a {
 #label-studio div[class^="App_editor"],
 div[class*="App_editor"] {
     width: 100% !important;
-}
-
-@media only screen and (max-width: 768px) {
-    #logo {
-        font-size: 1.5em;
-        line-height: 40px;
-        color: #273849;
-        font-family: "Dosis", "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
-        font-weight: 500;
-        display: flex;
-    }
-
-    .img-text {
-        display: none;
-    }
-
-    #header {
-        padding: 5px 3px 5px 5px;
-    }
 }
 
 
@@ -346,3 +325,49 @@ pre {
 }
 
 /* label config finish */
+
+
+
+@media only screen and (max-width: 768px) {
+    #logo {
+        font-size: 1.5em;
+        line-height: 40px;
+        color: #273849;
+        font-family: "Dosis", "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
+        font-weight: 500;
+        display: flex;
+    }
+
+    .img-text {
+        display: none;
+    }
+
+    #header {
+        padding: 5px 3px 5px 5px;
+    }
+
+    #nav {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        flex-direction: row;
+        right: 1px;
+    }
+
+    #logo {
+        display: inline-flex;
+    }
+
+}
+
+@media only screen and (max-width: 550px) {
+    #logo {
+        display: none;
+    }
+    #header {
+        height: 80px;
+        display: flex;
+        justify-content: center;
+    }
+}

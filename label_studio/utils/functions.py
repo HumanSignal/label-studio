@@ -69,13 +69,4 @@ def generate_sample_task(project):
     :return: task dict
     """
     task = generate_sample_task_without_check(project.label_config)
-
-    # check generated task
-    '''if project:
-        try:
-            TaskSerializer.check_data(project, task)
-        except ValidationError as e:
-            raise ValidationError(str(e) + ': task example = ' + json.dumps(task) +
-                                  ', project config = ' + project.label_config +
-                                  ', project data_types = ' + json.dumps(project.data_types))'''
     return task

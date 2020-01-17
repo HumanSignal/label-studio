@@ -37,6 +37,7 @@
     <span class="img-text">{{ config['title'] }}</span>
   </a>
   <ul id="nav">
+  &nbsp;
     <a href="/" class="{% if url_for(request.endpoint) == '/' %}active{% endif %}">Labeling</a>
     <span class="delim">|</span>
 
@@ -68,5 +69,6 @@
   <div>Heidi is an Opossum!</div>
 {% endblock %}
 
+<br>
 </body>
 </html>

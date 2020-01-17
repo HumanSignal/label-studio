@@ -13,10 +13,10 @@ from operator import itemgetter
 
 from label_studio_converter import Converter
 
-from .utils.misc import LabelConfigParser, config_line_stripped, config_comments_free, parse_config
-from .utils.analytics import Analytics
-from .utils.models import ProjectObj, MLBackend
-from .utils.exceptions import ValidationError
+from label_studio.utils.misc import LabelConfigParser, config_line_stripped, config_comments_free, parse_config
+from label_studio.utils.analytics import Analytics
+from label_studio.utils.models import ProjectObj, MLBackend
+from label_studio.utils.exceptions import ValidationError
 
 
 logger = logging.getLogger(__name__)
@@ -464,8 +464,8 @@ class Project(object):
             self.analytics.update_info(self.label_config_line, self.config.get('collect_analytics', True), self.name)
 
         # configure project
-        if self.project_obj is None:
-            self.project_obj = ProjectObj(label_config=self.label_config_line, label_config_full=self.label_config_full)
+        self.project_obj = ProjectObj(label_config=self.label_config_line, label_config_full=self.label_config_full)
+
         # configure machine learning backend
         if self.ml_backend is None:
             ml_backend_params = self.config.get('ml_backend')
