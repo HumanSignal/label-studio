@@ -232,7 +232,7 @@
   .content
     padding-left: 0
     &.with-sidebar
-      margin: auto
+      margin: 2em auto
     h2, h3
       &:before
         content: ""
@@ -253,6 +253,10 @@
       margin-left: 0
   iframe
     margin: 0 !important
+
+@media screen and (max-width: 400px)
+  .github-button-wrap
+    display: none;
 
 @media print
   .footer
