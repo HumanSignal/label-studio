@@ -3,7 +3,6 @@ type: playground
 order: 201
 ---
 
-<!--suppress BadExpressionStatementJS -->
 <div style="padding-left: 60px; max-width: 700px; margin: 0 auto; margin-bottom: 2em;">
     <h1>Playground</h1>
     Start typing in the config, and you can quickly preview the labeling interface. At the bottom of the page, you have live serialization updates of what Label Studio expects as an input and what it gives you as a result of your labeling work.
