@@ -1,10 +1,9 @@
 import logging
-from .exceptions import ValidationError
 try:
     import ujson as json
 except:
     import json
-
+from .exceptions import ValidationError
 
 class SkipField(Exception):
     pass

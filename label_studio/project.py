@@ -13,10 +13,10 @@ from operator import itemgetter
 
 from label_studio_converter import Converter
 
-from utils.misc import LabelConfigParser, config_line_stripped, config_comments_free, parse_config
-from utils.analytics import Analytics
-from utils.models import ProjectObj, MLBackend
-from utils.exceptions import ValidationError
+from label_studio.utils.misc import LabelConfigParser, config_line_stripped, config_comments_free, parse_config
+from label_studio.utils.analytics import Analytics
+from label_studio.utils.models import ProjectObj, MLBackend
+from label_studio.utils.exceptions import ValidationError
 
 
 logger = logging.getLogger(__name__)
