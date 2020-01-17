@@ -11,7 +11,8 @@ Image polygons labeling
 ## Run
 
 ```bash
-python server.py -c config.json -l ../examples/image_polygons/config.xml -i ../examples/image_polygons/tasks.json -o output_polygons
+label-studio init --template=image_polygons image_polygons_project
+label-studio start image_polygons_project 
 ```
 
 ## Config 

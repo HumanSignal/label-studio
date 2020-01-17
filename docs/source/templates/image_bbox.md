@@ -11,7 +11,8 @@ Image bounding box labeling
 ## Run
 
 ```bash
-python server.py -c config.json -l ../examples/image_bbox/config.xml -i ../examples/image_bbox/tasks.json -o output_bbox
+label-studio init --template=image_bbox image_bbox_project
+label-studio start image_bbox_project 
 ```
 
 ## Config 

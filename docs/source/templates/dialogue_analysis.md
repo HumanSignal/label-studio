@@ -11,7 +11,8 @@ Analyze the chat dialog, classify it and provide your own answer
 ## Run
 
 ```bash
-python server.py -c config.json -l ../examples/dialogue_analysis/config.xml -i ../examples/dialogue_analysis/tasks.json -o output_dialogue_analysis
+label-studio init --template=dialogue_analysis dialogue_analysis_project
+label-studio start dialogue_analysis_project 
 ```
 
 ## Config 

@@ -3,11 +3,11 @@
     <% var fileName = p.path.replace(/^.+?\/([\w-]+)\.html/, '$1') %>
 
 <% if (type === 'guide') { %>
-      <% if (fileName === 'config') { %>
+      <% if (fileName === 'format') { %>
           <li><h4>Server</h4></li>
       <% } %>
 
-      <% if (fileName === 'build') { %>
+      <% if (fileName === 'frontend') { %>
           <li><h4>Frontend</h4></li>
       <% } %>
 <% } %>
