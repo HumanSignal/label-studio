@@ -34,11 +34,11 @@ pip install label-studio
 # Initialize the project in labeling_project path
 label-studio init labeling_project
 
-# Start the server
+# Start the server at http://localhost:8200
 label-studio start labeling_project
 ```
 
-#### Windows  
+#### Install on Windows  
 It's not necessary to install Visual Studio Compiler, 
 just download "regex" (or other packages you need to compile) from gholke builds corresponding to your python version: 
 https://www.lfd.uci.edu/~gohlke/pythonlibs/#regex
@@ -63,8 +63,19 @@ Running the latest Label Studio version locally without installing package from 
 pip install -e .
 ```
 ```bash
-# Start the server
+# Start the server at http://localhost:8200
 python label-studio/server.py start labeling_project --init
+```
+
+## Run docker
+You can also pull prebuilt image and start server at `http://localhost:8200`:
+```bash
+docker start --rm -p 8200:8200 heartexlabs/label-studio:latest
+```
+
+In order to build local image, run:
+```bash
+docker build -t heartexlabs/label-studio:latest .
 ```
 
 
