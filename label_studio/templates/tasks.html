@@ -26,9 +26,13 @@
     </div>
 
     <br/><br/><br/>
-    <div class="ui one column center aligned page grid">
 
+    <div class="ui one column center aligned page grid">
+    {% if task_ids|length > 0 %}
       <a class="ui button positive" href="/" style="margin-bottom: 14px;">Start Labeling</a>
+    {% else %}
+      <a class="ui button positive" href="/import" style="margin-bottom: 14px;">Import Tasks</a>
+    {% endif %}
     </div>
     <br/><br/>
 
@@ -61,6 +65,12 @@
     </table>
     <br/>
   </div>
+  <br/><br/>
+{% if task_ids|length > 0 %}
+<div class="ui one column center aligned page grid">
+  <div id="clear-tasks-button" class="ui button red" style="margin-bottom: 14px;">Clear tasks</div>
+</div>
+{% endif %}
 </div>
 
 
@@ -72,10 +82,19 @@
       request.open("DELETE", "/api/tasks/" + id + "/completions/" + id + "/", true);
       request.onload = function () {
         window.location.reload();
-      }
+      };
       request.send(null);
     })
-  })
+  });
+
+  document.getElementById("clear-tasks-button").onclick = function() {
+      let request = new XMLHttpRequest();
+      request.open("DELETE", "/api/tasks/delete", true);
+      request.onload = function () {
+        window.location.reload();
+      };
+      request.send(null);
+  }
 </script>
 
 {% endblock %}

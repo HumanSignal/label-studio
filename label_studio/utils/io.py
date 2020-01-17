@@ -1,6 +1,7 @@
 import os
 import pkg_resources
 import shutil
+import glob
 
 from contextlib import contextmanager
 from tempfile import mkstemp, mkdtemp
@@ -78,3 +79,8 @@ def get_data_dir():
     if not os.path.exists(data_dir):
         os.makedirs(data_dir)
     return data_dir
+
+
+def delete_dir_content(dirpath):
+    for f in glob.glob(dirpath + '/*'):
+        os.remove(f)
