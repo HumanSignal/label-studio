@@ -3,5 +3,10 @@ npm-debug.log
 Dockerfile
 .dockerignore
 # build
+dist
+docs
+tests
+public
+label_studio.egg-info
 .github
 .vscode

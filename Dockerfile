@@ -1,16 +1,16 @@
 # Building the main container
 FROM python:3.6-slim
-WORKDIR /app
+WORKDIR /label-studio
 
 # Copy and install requirements.txt first for caching
-COPY backend/requirements.txt /app/backend/
-RUN pip install -r backend/requirements.txt
+COPY requirements.txt /label-studio
+RUN pip install -r requirements.txt
 
 
 ENV PORT="8200"
-
-COPY . /app
 EXPOSE ${PORT}
-WORKDIR /app/backend
+
+COPY . /label-studio
+
 RUN pip install -e .
-CMD ["/app/scripts/run-demo.sh", "image_bbox"]
+CMD ["label-studio", "start", "new_project", "--init"]
