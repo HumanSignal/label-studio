@@ -12,7 +12,7 @@ if command -v python3 &>/dev/null; then
     pip install -r requirements.txt
     pip install -e .
     cd label_studio
-    python server.py
+    python server.py start my_project --init
 
     echo "Server started"
     echo "Go to http://localhost:8200"

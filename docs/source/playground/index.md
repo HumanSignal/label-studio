@@ -14,20 +14,27 @@ order: 201
 <style scoped>
  .content {
      max-width: none !important;
-     padding-right: 50px;
-     margin-left: 0px !important;
+     margin-left: 0 !important;
+     padding: 1em 0 0 0;
  }
 
  .validation {
      margin-top: 1em;
      margin-left: 1em;
      color: red;
+     text-transform: capitalize;
+ }
+ 
+ h3 {
+  margin: 1em !important;
+  width: unset;
+  height: unset;
  }
  
  iframe {
-     border: 0px;
+     border: 0;
  }
-
+ 
  #render-editor {
      width: 100%;
  }
@@ -46,7 +53,7 @@ order: 201
 .editor-row {
     display: flex; 
     margin-bottom: 1em; 
-    width: 100%;
+    width: 100% !important;
 }
 
  .data-row {
@@ -59,16 +66,15 @@ order: 201
     background: rgb(252,252,252);
  }
 
- .editor-area {
- border: 1px solid #f48a4259;
- }
+.editor-area {
+    border: 1px solid #f48a4259;
+}
  
  .config-col {
     color: rgba(0,0,0,.6); 
     background: rgb(252,252,252); 
     margin-right: 2em; 
-    width: 400px; 
-    
+    width: 40%; 
  }
 
  .input-col {
@@ -94,7 +100,7 @@ order: 201
 }
 
 .config-col {
-    widht: 100%;
+    width: 100%;
  }
  
  .input-col, .output-col { width: 100%; }
@@ -106,31 +112,32 @@ order: 201
 <div>
   <div class="editor-row">
     <div class="config-col">
-      <h3>Config</h3>
+      <h3>Label Config</h3>
       <div class="editor-area">
       <!-- Textarea -->
       <textarea name="label_config" cols="40" rows="10" class="project-form htx-html-editor"
                 id="id_label_config"></textarea>
-      <div class="validation"></div>
       </div>
+      <div class="validation"></div><br>
     </div>
     <div class="preview-col">
-      <h3>Preview</h3>
+      <h3>Interface preview</h3>
       <div id="editor-wrap"></div>
       <pre class="preview" id="preload-editor">...</pre>
     </div>
   </div>
 </div>
+
 <!--  & Preview in two cols -->
 <div class="data-row">
   <div class="input-col">
-    <h3>Input Preview</h3>
+    <h3>Input preview</h3>
     <div>
       <pre class="preview" id="upload-data-example">...</pre>
     </div>
   </div>
   <div class="output-col">
-    <h3>Output Preview</h3>
+    <h3>Output preview</h3>
     <div class="ui positive message">
       <pre class="preview" id="data-results">...</pre>
     </div>
@@ -157,13 +164,23 @@ order: 201
  }
 
  $(function () {
-     // serialize editor output by timer
-     setInterval(function () {
-         if (typeof Htx !== 'undefined') {
-             $('#data-results').text(JSON.stringify(Htx.completionStore.selected.serializeCompletion(), null, 4));
-             $('#data-results').parent().show();
-         }
-     }, 500);
+    var prev_completion = null;
+    
+    // serialize editor output by timer
+    setInterval(function () {
+      let iframe = document.getElementById('render-editor');
+      if (iframe !== null) {
+        let Htx = iframe.contentWindow.Htx;
+        if (typeof Htx !== 'undefined') {
+          var completion = JSON.stringify(Htx.completionStore.selected.serializeCompletion(), null, 4);
+          if (prev_completion !== completion) {
+            $('#data-results').text(completion);
+            prev_completion = completion;
+          }
+        }
+      }
+    }, 500);
+
 
      var host = "https://go.heartex.net";
      var url_string = window.location.href
@@ -177,14 +194,42 @@ order: 201
 
      var _c = url.searchParams.get("config");
      if (_c && _c.length > 0) {
-         console.log("wtf");
          var config = url.searchParams.get("config");
          config = config.replace(/[<][b][r][>]/gm, "\n");
          labelEditor.setValue(config);
-         validate_config();
      } else {
-         labelEditor.setValue("<View>\n  \n</View>");
+         labelEditor.setValue(`<View>
+         
+<!-- Image with Polygons -->
+<View style="padding: 25px; 
+             box-shadow: 2px 2px 8px #AAA">
+  <Header value="Label the image with polygons"/>
+  <Image name="img" value="$image"/>
+  <Text name="text1" 
+        value="Select label, start to click on image"/>
+        
+  <PolygonLabels name="tag" toName="img">
+    <Label value="Opossum" background="red"/>
+    <Label value="Cat" background="blue"/>  
+  </PolygonLabels>
+</View>
+
+<!-- Text with multi-choices -->
+<View style="margin-top: 20px; padding: 25px; 
+             box-shadow: 2px 2px 8px #AAA;">
+  <Header value="Classify the text"/>
+  <Text name="text2" value="$text"/>
+  
+  <Choices name="" toName="img" choice="multiple">
+    <Choice alias="wisdom" value="Wisdom"/>
+    <Choice alias="long" value="Long"/>
+  </Choices>
+</View>
+
+</View>
+`);
      }
+     validate_config(labelEditor);
      
      // refresh for proper line numbers drawing
      labelEditor.refresh();
@@ -233,6 +278,8 @@ order: 201
              $('#render-editor').remove();
              // assign id to new iframe
              iframe.attr('id', 'render-editor');
+             // force to hide undo / redo / reset buttons 
+             $('#render-editor').contents().find('head').append('<style>.ls-panel{display:none;}</style>');
              iframe.show();
              // set height for iframe
              let obj = document.getElementById('render-editor');
