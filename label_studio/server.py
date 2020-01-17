@@ -483,9 +483,8 @@ def api_tasks(task_id):
 @app.route('/api/tasks/delete', methods=['DELETE'])
 @exception_treatment
 def api_tasks_delete():
-    """ Delete all tasks
+    """ Delete all tasks & completions
     """
-    # try to get task with completions first
     project = project_get_or_create()
     project.delete_tasks()
     return make_response(jsonify({}), 204)

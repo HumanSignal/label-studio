@@ -326,6 +326,10 @@ class Project(object):
         return self.tasks
 
     def delete_tasks(self):
+        """
+        Deletes all tasks & completions from filesystem, then reloads clean project
+        :return:
+        """
         delete_dir_content(self.config['output_dir'])
         with io.open(self.config['input_path'], mode='w') as f:
             json.dump([], f)
