@@ -32,9 +32,11 @@
 
     <div class="ui form">
       <label for="url-input" class="description">Or paste a file URL or task in JSON format here</label><br/>
-      <input style="height: 36px; width:85%" id="url-input" type="text" name="url" autofocus autocomplete="on"/>
-      <div style="display: inline-block !important; width: 14%; min-width: 100px" class="ui positive button icon"
-           id="url-button" onclick="send_data(event, $('#url-input').val())">Import
+      <div class="ui action input fluid">
+        <input id="url-input" type="text" name="url" autofocus autocomplete="on"/>
+        <button style="display: inline-block !important; width: 14%; min-width: 80px !important;"
+                class="ui positive button" id="url-button" onclick="send_data(event, $('#url-input').val())">Import
+        </button>
       </div>
     </div>
 
