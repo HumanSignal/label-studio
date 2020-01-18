@@ -1,8 +1,8 @@
 <!-- {"title": "Image classifier", "category": "image"} -->
 <View>
-  <Image name="img" value="$image_url"></Image>
-  <Choices name="choice" toName="img">
-    <Choice value="CAT" />
-    <Choice value="DOG" />
+  <Image name="img" value="$image_url"/>
+  <Choices name="choice" toName="img" showInLine="true">
+    <Choice value="Cat" background="blue"/>
+    <Choice value="Dog" background="green" />
   </Choices>
 </View>

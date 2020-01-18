@@ -17,6 +17,7 @@ from label_studio.utils.misc import LabelConfigParser, config_line_stripped, con
 from label_studio.utils.analytics import Analytics
 from label_studio.utils.models import ProjectObj, MLBackend
 from label_studio.utils.exceptions import ValidationError
+from label_studio.utils.io import find_file
 
 
 logger = logging.getLogger(__name__)
@@ -159,6 +160,7 @@ class Project(object):
         for item in input_types:
             if item not in input_schema_types:
                 raise ValidationError(
+                    'You have already imported tasks and they are incompatible with a new config. '
                     'Can\'t find type "{item}" among already imported tasks with types {input_schema_types}'
                         .format(item=item, input_schema_types=list(input_schema_types)))
 
@@ -166,6 +168,7 @@ class Project(object):
         for item in input_values:
             if item not in input_schema_values:
                 raise ValidationError(
+                    'You have already imported tasks and they are incompatible with a new config. '
                     'Can\t find key "{item}" among already imported tasks with keys {input_schema_values}'
                         .format(item=item, input_schema_values=list(input_schema_types)))
 
@@ -550,7 +553,9 @@ class Project(object):
 
         # create label config (config.xml)
         if not os.path.exists(default_label_config_file):
-            default_label_config = '<View></View>'
+            path = find_file('examples/image_polygons/config.xml')
+            default_label_config = open(path).read()
+
             with io.open(default_label_config_file, mode='w') as fout:
                 fout.write(default_label_config)
             print(default_label_config_file + ' label config file has been created.')

@@ -13,7 +13,7 @@
 <script>
   window.onload = function () {
     let task = {{ task_data | json | safe }};
-    window.LSBI = LSB("label-studio", '{{ label_config_line | safe }}', task);
+    window.LSBI = LSB("label-studio", `{{ label_config_line | safe }}`, task);
   }
 </script>
 

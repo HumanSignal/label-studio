@@ -1,37 +1,43 @@
-<!-- Editor CSS -->
-{% for css in editor_css %}
-  <link href="{{ css }}" rel="stylesheet">
-{% endfor %}
+<html>
+<head>
 
-<!-- Editor JS -->
-{% for js in editor_js %}
-  <script src="{{ js }}"></script>
-{% endfor %}
+  <!-- Editor CSS -->
+  {% for css in editor_css %}
+    <link href="{{ css }}" rel="stylesheet">
+  {% endfor %}
 
-<style>
-  body::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 2px rgba(178, 178, 178, 0.3) !important;
-    background-color: #F5F5F5 !important;
-  }
+  <!-- Editor JS -->
+  {% for js in editor_js %}
+    <script src="{{ js }}"></script>
+  {% endfor %}
 
-  body::-webkit-scrollbar {
-    width: 2px !important;
-    height: 2px !important;
-    background-color: #F5F5F5 !important;
-  }
+  <style>
+    body::-webkit-scrollbar-track {
+      -webkit-box-shadow: inset 0 0 2px rgba(178, 178, 178, 0.3) !important;
+      background-color: #F5F5F5 !important;
+    }
 
-  body::-webkit-scrollbar-thumb {
-    background-color: #c3c3c3 !important;
-    border: 2px solid #b4b4b4 !important;
-  }
+    body::-webkit-scrollbar {
+      width: 2px !important;
+      height: 2px !important;
+      background-color: #F5F5F5 !important;
+    }
 
-  #label-studio div[class^="App_editor"],
-  div[class*="App_editor"] {
+    body::-webkit-scrollbar-thumb {
+      background-color: #c3c3c3 !important;
+      border: 2px solid #b4b4b4 !important;
+    }
+
+    #label-studio div[class^="App_editor"],
+    div[class*="App_editor"] {
       width: 98% !important;
       min-width: 98% !important;
       max-width: 98% !important;
-  }
-</style>
+    }
+  </style>
+
+</head>
+<body>
 
 <script src="/static/js/jquery.min.js"></script>
 <script src="/static/js/lsb.js"></script>
@@ -48,7 +54,7 @@
     var task = {{ task_ser | json | safe }};
 
     var LS = new LabelStudio("label-studio", {
-      config: '{{ label_config_line | safe }}',
+      config: `{{ label_config_line | safe }}`,
       user: {pk: 1, firstName: "Awesome", lastName: "User"},
 
       task: _convertTask(task),
@@ -65,3 +71,6 @@
     });
   };
 </script>
+
+</body>
+</html>

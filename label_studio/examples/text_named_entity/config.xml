@@ -1,0 +1,17 @@
+<!-- {"title": "Named enitity recognition", "category": "text"} -->
+<View>
+  <Labels name="ner" toName="text">
+    <Label value="Person" background="red"/>
+    <Label value="Organization" background="darkorange"/>
+    <Label value="Fact" background="orange"/>
+    <Label value="Money" background="green"/>
+    <Label value="Date" background="darkblue"/>
+    <Label value="Time" background="blue"/>
+    <Label value="Ordinal" background="purple"/>
+    <Label value="Percent" background="#842"/>
+    <Label value="Product" background="#428"/>
+    <Label value="Language" background="#482"/>
+    <Label value="Location" background="rgba(0,0,0,0.8)"/>
+  </Labels>
+  <Text name="text" value="$text"/>
+</View>

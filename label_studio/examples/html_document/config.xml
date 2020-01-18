@@ -1,8 +1,13 @@
-<!-- {"title": "HTML tagging", "category": "html"} -->
+<!-- {"title": "HTML NER tagging", "category": "html"} -->
 <View>
   <HyperTextLabels name="ner" toName="text">
-    <Label value="Person"></Label>
-    <Label value="Organization"></Label>
+    <Label value="Person" background="green"/>
+    <Label value="Organization" background="blue"/>
   </HyperTextLabels>
-  <HyperText name="text" value="$text"></HyperText>
+
+  <View style="border: 1px solid #CCC;
+               border-radius: 10px;
+               padding: 5px">
+    <HyperText name="text" value="$text"/>
+  </View>
 </View>
