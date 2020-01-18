@@ -68,12 +68,12 @@ python label-studio/server.py start labeling_project --init
 ```
 
 ## Run docker
-You can also pull prebuilt image and start server at `http://localhost:8200`:
+You can also start serving at `http://localhost:8200` by using docker:
 ```bash
 docker start --rm -p 8200:8200 heartexlabs/label-studio:latest
 ```
 
-In order to build local image, run:
+If you want to build a local image, run:
 ```bash
 docker build -t heartexlabs/label-studio:latest .
 ```
