@@ -1,12 +1,14 @@
 <!-- {"title": "Dialogue analysis", "category": "text"} -->
 <View>
-  <HyperText name="dialog" value="$dialogs"></HyperText>
-  <Header value="Rate last answer:"></Header>
+  <HyperText name="dialog" value="$dialogs"/>
+
+  <Header value="Rate last answer"/>
   <Choices name="chc-1" choice="single-radio" toName="dialog" showInline="true">
-    <Choice value="Bad answer"></Choice>
-    <Choice value="Neutral answer"></Choice>
-    <Choice value="Good answer"></Choice>
+    <Choice value="Bad answer"/>
+    <Choice value="Neutral answer"/>
+    <Choice value="Good answer"/>
   </Choices>
-  <Header value="Your answer:"></Header>
-  <TextArea name="answer"></TextArea>
+
+  <Header value="Your answer"/>
+  <TextArea name="answer"/>
 </View>
