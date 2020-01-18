@@ -1,9 +1,10 @@
 <!-- {"title": "Audio classifier", "category": "audio"} -->
 <View>
-  <Header value="Listen the audio:"/>
+  <Header value="Listen to the audio"/>
   <Audio name="audio" value="$url"/>
-  <Header value="Select its topic:"/>
-  <Choices name="label" toName="audio" choice="single-radio" showInline="true">
+  <Header value="Select its topic"/>
+  <Choices name="label" toName="audio"
+           choice="single-radio" showInline="true">
     <Choice value="Politics"/>
     <Choice value="Business"/>
     <Choice value="Education"/>
