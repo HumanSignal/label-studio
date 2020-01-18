@@ -18,11 +18,15 @@
   }
 
   .CodeMirror {
-    height: 500px;
+    height: 600px;
   }
 
   .hidden {
     display: none;
+  }
+
+  iframe {
+    min-height: 300px;
   }
 </style>
 
@@ -134,6 +138,7 @@
 <script src="static/js/xml.js"></script>
 
 <script>
+  var confirm_already_shown = false;
 
   // process create request
   function process_request(result) {
@@ -177,7 +182,7 @@
     $('.use-template').on('click', function () {
       var $el = $(this);
 
-      if (labelEditor.getValue() !== '') {
+      if (labelEditor.getValue() !== '' && !confirm_already_shown) {
         var dialog = $('#confirm-config-template-dialog');
         dialog.modal({
           closable: true,
@@ -194,6 +199,8 @@
             addTemplateConfig($el);
           }
         });
+
+        confirm_already_shown = true;
 
       } else {
         addTemplateConfig($el);
@@ -279,9 +286,14 @@
         iframe.attr('id', 'render-editor');
         iframe.show();
         // set height for iframe
-          let obj = document.getElementById('render-editor');
-          obj.style.width = "100%";
-        obj.style.height = (obj.contentWindow.document.body.scrollHeight + 30) + 'px';
+        let obj = document.getElementById('render-editor');
+        obj.style.width = "100%";
+
+        // wait until all images and resources from iframe loading
+        setTimeout(function() {
+          obj.style.height = (obj.contentWindow.document.body.scrollHeight + 30) + 'px';
+        }, 1000);
+
         // hide "..."
         $('#preload-editor').hide();
         $('#preload-editor').text('');

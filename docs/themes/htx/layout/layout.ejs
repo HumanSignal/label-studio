@@ -35,6 +35,8 @@
 
       <!-- Place this tag in your head or just before your close body tag. -->
       <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+      <script src="<%- url_for("/js/smooth-scroll.min.js") %>"></script>
     
     <!-- main page styles -->
     <%- css(isIndex ? 'css/index' : 'css/page') %>
@@ -52,14 +54,12 @@
   <body class="<%- isIndex ? '' : 'docs' -%>">
     <div id="mobile-bar" <%- isIndex ? 'class="top"' : '' %>>
         <a class="menu-button"></a>
-        <a class="logo" href="/"></a>
     </div>
     <% if (!isIndex) { %> <%- partial('partials/header') %> <% } %>
     <% if (!isIndex) { %>
         <div id="main" class="fix-sidebar">
             <%- body %>
         </div>
-        <script src="<%- url_for("/js/smooth-scroll.min.js") %>"></script>
     <% } else { %>
         <%- partial('partials/index') %>
     <% } %>
