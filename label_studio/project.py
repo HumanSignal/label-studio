@@ -17,6 +17,7 @@ from label_studio.utils.misc import LabelConfigParser, config_line_stripped, con
 from label_studio.utils.analytics import Analytics
 from label_studio.utils.models import ProjectObj, MLBackend
 from label_studio.utils.exceptions import ValidationError
+from label_studio.utils.io import find_file
 
 
 logger = logging.getLogger(__name__)
@@ -551,6 +552,13 @@ class Project(object):
         # create label config (config.xml)
         if not os.path.exists(default_label_config_file):
             default_label_config = '<View></View>'
+            try:
+                path = find_file('examples/image_polygons/config.xml')
+            except IOError:
+                pass
+            else:
+                default_label_config = open(path).read()
+
             with io.open(default_label_config_file, mode='w') as fout:
                 fout.write(default_label_config)
             print(default_label_config_file + ' label config file has been created.')

@@ -1,0 +1,10 @@
+<!-- {"title": "Text references", "category": "text"} -->
+<View>
+  <Header>Are there any missing words?</Header>
+  <Text name="text" value="$text"/>
+  <Choices name="validation-label" toName="text"
+           choice="single-radio">
+    <Choice value="Missing words" alias="missing-words"/>
+    <Choice value="Valid" alias="valid"/>
+  </Choices>
+</View>

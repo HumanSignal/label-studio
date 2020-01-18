@@ -1,8 +1,12 @@
 <!-- {"title": "Image polygon labeling", "category": "image"} -->
 <View>
-  <Image name="img" value="$image" showMousePos="true" zoom="true"></Image>
-  <PolygonLabels name="tag" toName="img" strokewidth="5" fillcolor="red" pointstyle="circle" pointsize="small">
-    <Label value="Hello" background="red"></Label>
-    <Label value="World" background="blue"></Label>  
+  <Text name="text"
+        value="Select label and start to click on image"/>
+
+  <Image name="img" value="$image"/>
+
+  <PolygonLabels name="tag" toName="img" strokewidth="5">
+    <Label value="Hello" background="red"/>
+    <Label value="World" background="blue"/>
   </PolygonLabels>
 </View>
