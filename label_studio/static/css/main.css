@@ -326,6 +326,9 @@ pre {
 
 /* label config finish */
 
+.category .icon {
+    color: #777;
+}
 
 
 @media only screen and (max-width: 768px) {
