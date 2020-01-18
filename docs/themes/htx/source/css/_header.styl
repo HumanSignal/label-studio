@@ -13,7 +13,7 @@ red-dot-before(leftPos = -8px)
 #header
   background-color: #fff
   height: $header-height
-  padding: $heading-padding-vertical 20px $heading-padding-vertical 40px;
+  padding: $heading-padding-vertical 20px $heading-padding-vertical 60px;
   position: relative
   z-index: 100
   display: flex
@@ -127,32 +127,22 @@ body.docs
     height: $header-height
 
 #mobile-bar
+  cursor: pointer;
   position: fixed
   top: 0
   left: 0
-  width: 100%
   height: 40px
-  background-color: #fff
-  z-index: 9
+  z-index: 1000
   display: none
-  box-shadow: 0 0 2px rgba(0,0,0,.25)
+
   .menu-button
     position: absolute
     width: 24px
     height: 24px
-    top: 8px
-    left: 12px
+    top: 21px
+    left: 8px
     background: url(../images/menu.png) center center no-repeat
     background-size: 24px
-  .logo
-    position: absolute
-    width: 30px
-    height: 30px
-    background: url(../images/logo.png) center center no-repeat
-    top: 5px
-    left: 50%
-    margin-left: -15px
-    background-size: 30px
 
 @media print
   #header

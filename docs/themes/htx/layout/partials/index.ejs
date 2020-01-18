@@ -83,22 +83,22 @@
  }
 
  .cards {
- width: 1170px;
+ width: 100%;
  display: flex;
  padding-bottom: 100px;
+ justify-content: center;
  }
 
  .card {
- width: 33%;
- padding: 1em;
- width: 350px;
-     display: flex;
-     flex-direction: column;
-     border: 3px solid rgba(74,144,226,0.2);
-     background-color: #fff;
-     color: #000;
-     padding: 20px;
-     margin: 0 20px;
+    padding: 1em;
+    display: flex;
+    flex-direction: column;
+    border: 3px solid rgba(74,144,226,0.2);
+    background-color: #fff;
+    color: #000;
+    padding: 20px;
+    margin: 0 20px;
+    max-width: 350px;
  }
 
  .img-car {
@@ -159,7 +159,7 @@
  margin-right: 2em;
  }
 
- 
+
  .cards {
  flex-direction: column;
  }
@@ -183,18 +183,21 @@
 
  }
 
- .footer a {
-  text-decoration: underline;
+ .footer a:hover {
+   text-decoration: underline;
  }
  
  .footer {
  background-color: #0f0f0f; color: white; display: flex; justify-content: center; min-height: 300px; align-items: center;
  }
- 
-</style>
 
-<style>
-  img {
+ .footer .item {
+   margin-right: 10px;
+   margin-left: 10px;
+ }
+ 
+
+img {
   max-width: 100%;
   vertical-align: middle;
 }
@@ -325,7 +328,7 @@
   <div class="fix-sidebar">
     <%- partial('partials/sidebar', { type: page.type === 'menu' ? 'guide' : page.type, index: page.index }) %>
     <div>
-      <div id="bodybag">
+      <div id="bodybag" class='content'>
         <section style="background-color: #fffaff;">
           <div style="position: relative; padding-top: 100px; padding-bottom: 100px;">
             <div style="display: flex; justify-content: center;">
@@ -460,44 +463,50 @@
           </div>
         </section>
         
-        <section class="footer">
-          <div style="display: flex; width: 1170px;">
-            
-            <div style="display: flex; justify-content: space-between; width: 100%">
-              <div style="padding-top: 6px;">
-                <a href="/"><img src="<%- url_for("/images/opossum/other/opossum_looking.svg") %>" alt="label studio logo" height="100" /></a>
-              </div>
-              <div>
-                <h2 style="margin-top: 0">Project</h2>
+        <div class="footer">
+          <div style="display: flex; width: 100%; margin-right: 30px">
+
+            <div style="padding-top: 6px; margin-right: 30px">
+              <a href="/"><img src="<%- url_for("/images/opossum/other/opossum_looking.svg") %>" alt="label studio logo" height="100" /></a>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; flex-wrap:wrap; width: 100%">
+
+              <div class="item">
+                <h2 class="no-menu">Project</h2>
                 <div>
                   <a href="/guide">Guide</a><br/>
                   <a href="/tags">Tags</a><br/>
                   <a href="/templates">Templates</a>
                 </div>
               </div>
-              <div>
-                <h2 style="margin-top: 0">Help</h2>
+
+              <div class="item">
+                <h2 class="no-menu">Help</h2>
                 <div>
                   <a href="https://docs.google.com/forms/d/e/1FAIpQLSdLHZx5EeT1J350JPwnY2xLanfmvplJi6VZk65C2R4XSsRBHg/viewform?usp=sf_link">Slack</a><br/>
                   <a href="https://github.com/heartexlabs/label-studio/issues">Github Issues</a><br/>
                   <a href="mailto:hi@heartex.ai">hi@heartex.ai</a>
                 </div>
               </div>
-              <div>
-                <h2 style="margin-top: 0">Company</h2>
-                <div>
-                  <a href="https://heartex.ai/">Heartex</a>
-                </div>
-              </div>
-              <div>
-                <h2 style="margin-top: 0">Social</h2>
+
+              <div class="item">
+                <h2 class="no-menu">Social</h2>
                 <div>
                   <a href="https://twitter.com/heartexlabs">Twitter</a><br/>
                   <a href="https://github.com/heartexlabs/label-studio">Github</a>
                 </div>
               </div>
+
+              <div class="item">
+                <h2 class="no-menu">Company</h2>
+                <div>
+                  <a href="https://heartex.ai/">Heartex</a>
+                </div>
+              </div>
+
+
             </div>
-            <div></div>
           </div>
         </section>
       </div>

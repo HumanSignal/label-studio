@@ -287,6 +287,9 @@
       var headers = content.querySelectorAll("h2");
       if (headers.length) {
         each.call(headers, function(h) {
+          if (h.classList.contains('no-menu')) {
+             return "";
+          }
           sectionContainer.appendChild(makeLink(h));
           var h3s = collectH3s(h);
           allHeaders.push(h);
@@ -380,6 +383,7 @@
     function makeLink(h) {
       var link = document.createElement("li");
       window.arst = h;
+
       var text = [].slice
         .call(h.childNodes)
         .map(function(node) {
