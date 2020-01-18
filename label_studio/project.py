@@ -160,7 +160,7 @@ class Project(object):
         for item in input_types:
             if item not in input_schema_types:
                 raise ValidationError(
-                    'You have imported tasks already and they are not compatible with new config. '
+                    'You have already imported tasks and they are incompatible with a new config. '
                     'Can\'t find type "{item}" among already imported tasks with types {input_schema_types}'
                         .format(item=item, input_schema_types=list(input_schema_types)))
 
@@ -168,7 +168,7 @@ class Project(object):
         for item in input_values:
             if item not in input_schema_values:
                 raise ValidationError(
-                    'You have imported tasks already and they are not compatible with new config. '
+                    'You have already imported tasks and they are incompatible with a new config. '
                     'Can\t find key "{item}" among already imported tasks with keys {input_schema_values}'
                         .format(item=item, input_schema_values=list(input_schema_types)))
 
