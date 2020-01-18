@@ -553,13 +553,8 @@ class Project(object):
 
         # create label config (config.xml)
         if not os.path.exists(default_label_config_file):
-            default_label_config = '<View></View>'
-            try:
-                path = find_file('examples/image_polygons/config.xml')
-            except IOError:
-                pass
-            else:
-                default_label_config = open(path).read()
+            path = find_file('examples/image_polygons/config.xml')
+            default_label_config = open(path).read()
 
             with io.open(default_label_config_file, mode='w') as fout:
                 fout.write(default_label_config)
