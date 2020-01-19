@@ -25,14 +25,19 @@ order: 201
      text-transform: capitalize;
  }
  
+ .CodeMirror {
+     min-height: 500px !important;
+ }
+ 
  h3 {
-  margin: 1em !important;
-  width: unset;
-  height: unset;
+    margin: 1em !important;
+    width: unset;
+    height: unset;
  }
  
  iframe {
      border: 0;
+     margin: 0 !important;
  }
  
  #render-editor {
@@ -41,7 +46,8 @@ order: 201
 
  #editor-wrap {
      background-color: rgb(252,252,252);
-     padding: 5px;
+     padding: 0;
+     margin: 0;
      display: none;
  }
 

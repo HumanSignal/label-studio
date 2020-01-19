@@ -6,6 +6,8 @@
 
  **Label Studio is a swiss army knife of data labeling and annotation tools :v:**
  
+Try it now in [running app](https://app.labelstud.io)!
+ 
 Its purpose is to help you label different types of data using a simple interface with a standardized output format. You're dealing with the custom dataset and thinking about creating your tool? Don't - using Label Studio, you can save time and create a custom tool and interface in minutes. 
 
 ![Label Studio](https://raw.githubusercontent.com/heartexlabs/label-studio/master/images/label-studio-examples.gif)
@@ -68,12 +70,12 @@ python label-studio/server.py start labeling_project --init
 ```
 
 ## Run docker
-You can also pull prebuilt image and start server at `http://localhost:8200`:
+You can also start serving at `http://localhost:8200` by using docker:
 ```bash
 docker start --rm -p 8200:8200 heartexlabs/label-studio:latest
 ```
 
-In order to build local image, run:
+If you want to build a local image, run:
 ```bash
 docker build -t heartexlabs/label-studio:latest .
 ```

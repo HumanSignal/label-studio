@@ -168,6 +168,15 @@ a {
 
 .small {
     font-size: 75%;
+    white-space: pre-wrap; /* css-3 */
+    white-space: -moz-pre-wrap;
+    white-space: -pre-wrap;
+    white-space: -o-pre-wrap;
+    word-wrap: break-word;
+}
+
+div.task-buttons .button {
+    margin: 10px
 }
 
 /* editor width */
@@ -326,6 +335,9 @@ pre {
 
 /* label config finish */
 
+.category .icon {
+    color: #777;
+}
 
 
 @media only screen and (max-width: 768px) {

@@ -43,7 +43,8 @@
 
     <% if (page.type === "playground") { %>
       <%- css('css/codemirror') %>
-      <script src="<%- url_for("/js/jquery.min.js") %>"></script>      
+      <script src="<%- url_for("/js/jquery.min.js") %>"></script>
+      <script src="<%- url_for("/js/jquery-ui.js") %>"></script>
       <script src="<%- url_for("/js/codemirror.js") %>"></script>
       <script src="<%- url_for("/js/xml.js") %>"></script>      
     <% } %>

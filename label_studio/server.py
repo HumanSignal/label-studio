@@ -480,6 +480,16 @@ def api_tasks(task_id):
     return make_response(jsonify(task_data), 200)
 
 
+@app.route('/api/tasks/delete', methods=['DELETE'])
+@exception_treatment
+def api_tasks_delete():
+    """ Delete all tasks & completions
+    """
+    project = project_get_or_create()
+    project.delete_tasks()
+    return make_response(jsonify({}), 204)
+
+
 @app.route('/api/projects/1/completions_ids/', methods=['GET'])
 @exception_treatment
 def api_all_completion_ids():
