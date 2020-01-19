@@ -85,10 +85,9 @@
     });
 
     document.getElementById("clear-tasks-button").onclick = function (e) {
-      const sure = 'Are you sure?';
-      if ($(e.target).text() !== sure) {
-        $(e.target).text(sure);
-      } else {
+      const deletion_confirmed = confirm(
+        'You are going to delete all existing tasks.\nWarning! this operation cannot be undone.\nPlease confirm your action.');
+      if (deletion_confirmed) {
         let request = new XMLHttpRequest();
         request.open("DELETE", "/api/tasks/delete", true);
         request.onload = function () {
