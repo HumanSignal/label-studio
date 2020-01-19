@@ -1,7 +1,8 @@
+<!-- {"title": "Image bounding boxes", "category": "image"} -->
 <View>
-  <Image name="img" value="$image"></Image>
+  <Image name="img" value="$image"/>
   <RectangleLabels name="tag" toName="img">
-    <Label value="Planet"></Label>
-    <Label value="Moonwalker" background="blue"></Label>
+    <Label value="Planet" background="green"/>
+    <Label value="Moonwalker" background="blue"/>
   </RectangleLabels>
 </View>
