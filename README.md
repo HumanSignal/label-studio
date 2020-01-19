@@ -6,6 +6,8 @@
 
  **Label Studio is a swiss army knife of data labeling and annotation tools :v:**
  
+Try it now in [running app](app.labelstud.io)!
+ 
 Its purpose is to help you label different types of data using a simple interface with a standardized output format. You're dealing with the custom dataset and thinking about creating your tool? Don't - using Label Studio, you can save time and create a custom tool and interface in minutes. 
 
 ![Label Studio](https://raw.githubusercontent.com/heartexlabs/label-studio/master/images/label-studio-examples.gif)
