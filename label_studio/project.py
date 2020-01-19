@@ -17,7 +17,7 @@ from label_studio.utils.misc import LabelConfigParser, config_line_stripped, con
 from label_studio.utils.analytics import Analytics
 from label_studio.utils.models import ProjectObj, MLBackend
 from label_studio.utils.exceptions import ValidationError
-from label_studio.utils.io import find_file
+from label_studio.utils.io import find_file, delete_dir_content
 
 
 logger = logging.getLogger(__name__)
@@ -326,6 +326,16 @@ class Project(object):
         :return: file list
         """
         return self.tasks
+
+    def delete_tasks(self):
+        """
+        Deletes all tasks & completions from filesystem, then reloads clean project
+        :return:
+        """
+        delete_dir_content(self.config['output_dir'])
+        with io.open(self.config['input_path'], mode='w') as f:
+            json.dump([], f)
+        self.reload()
 
     def iter_tasks(self):
         sampling = self.config.get('sampling', 'sequential')

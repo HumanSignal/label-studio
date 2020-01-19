@@ -1,81 +1,101 @@
 {% extends 'base.html' %}
 {% block body %}
 
-<div class="ui container">
-  <div class="wrapper">
+  <div class="ui container">
+    <center class="wrapper">
 
-    <!-- Statistics -->
-    <div class="ui one column center aligned page grid">
-      <div class="ui statistics">
-        <div class="statistic">
-          <span class="value">{{ task_ids|length }}</span>
-          <span class="label">Total tasks</span>
+      <!-- Statistics -->
+      <div class="ui two column centered grid">
+
+        <div class="column center aligned">
+          <div class="ui statistic">
+            <span class="value">{{ task_ids|length }}</span>
+            <span class="label">Total tasks</span>
             {% if show_paths %}
-          <i class="small">{{ config['input_path'] }}</i>
+              <i class="small">{{ config['input_path'] }}</i>
             {% endif %}
+          </div>
+        </div>
+        <div class="column center aligned">
+          <div class="ui statistic">
+            <span class="value">{{ completions|length }}</span>
+            <span class="label">Total completions</span>
+            {% if show_paths %}
+              <i class="small">{{ config['output_dir'] }}</i>
+            {% endif %}
+          </div>
         </div>
 
-        <div class="statistic">
-          <span class="value">{{ completions|length }}</span>
-          <span class="label">Total completions</span>
-            {% if show_paths %}
-          <i class="small">{{ config['output_dir'] }}</i>
-            {% endif %}
+        <div class="two column center aligned clearing task-buttons">
+          {% if task_ids|length > 0 %}
+            <a class="ui button positive" href="/">Start Labeling</a>
+            <a id="clear-tasks-button" class="ui button red">Delete All Tasks</a>
+          {% else %}
+            <a class="ui button positive" href="/import">Import Tasks</a>
+          {% endif %}
+          <br/><br/>
         </div>
+
       </div>
-    </div>
-
-    <br/><br/><br/>
-    <div class="ui one column center aligned page grid">
-
-      <a class="ui button positive" href="/" style="margin-bottom: 14px;">Start Labeling</a>
-    </div>
-    <br/><br/>
 
 
-    <!-- Table -->
-    <table>
-      <tr>
-        <th>Task ID</th>
-        <th>Completed at</th>
-        <th>Completion</th>
-      </tr>
-
-      {% for id in task_ids %}
+      <!-- Table -->
+      <table>
         <tr>
-          <td class="text-center">
-            <a href="/?task_id={{ id }}">
-              <i class="fas fa-eye eye show-completion"></i>
-            </a>
-            &nbsp;
-            {{ id }}
-          </td>
-          <td>{{ completed_at[id] }}</td>
-          <td class="text-center">
-            {% if id in completions %}
-              <i data-task-id="{{ id }}" class="fas fa-trash-alt trash remove-completion"></i>
-            {% endif %}
-          </td>
+          <th>Task ID</th>
+          <th>Completed at</th>
+          <th>Completion</th>
         </tr>
-      {% endfor %}
-    </table>
-    <br/>
+
+        {% for id in task_ids %}
+          <tr>
+            <td class="text-center">
+              <a href="/?task_id={{ id }}">
+                <i class="fas fa-eye eye show-completion"></i>
+              </a>
+              &nbsp;
+              {{ id }}
+            </td>
+            <td>{{ completed_at[id] }}</td>
+            <td class="text-center">
+              {% if id in completions %}
+                <i data-task-id="{{ id }}" class="fas fa-trash-alt trash remove-completion"></i>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </table>
+      <br/>
   </div>
-</div>
+  <br/><br/>
+  </div>
 
 
-<script>
-  document.querySelectorAll(".remove-completion").forEach(function (test) {
-    test.addEventListener("click", function (event) {
-      var id = event.target.dataset.taskId;
-      var request = new XMLHttpRequest();
-      request.open("DELETE", "/api/tasks/" + id + "/completions/" + id + "/", true);
-      request.onload = function () {
-        window.location.reload();
+  <script>
+    document.querySelectorAll(".remove-completion").forEach(function (test) {
+      test.addEventListener("click", function (event) {
+        var id = event.target.dataset.taskId;
+        var request = new XMLHttpRequest();
+        request.open("DELETE", "/api/tasks/" + id + "/completions/" + id + "/", true);
+        request.onload = function () {
+          window.location.reload();
+        };
+        request.send(null);
+      })
+    });
+
+    document.getElementById("clear-tasks-button").onclick = function (e) {
+      const deletion_confirmed = confirm(
+        'You are going to delete all existing tasks.\nWarning! this operation cannot be undone.\nPlease confirm your action.');
+      if (deletion_confirmed) {
+        let request = new XMLHttpRequest();
+        request.open("DELETE", "/api/tasks/delete", true);
+        request.onload = function () {
+          window.location.reload();
+        };
+        request.send(null);
       }
-      request.send(null);
-    })
-  })
-</script>
+    }
+  </script>
 
 {% endblock %}
