@@ -475,10 +475,13 @@ class Project(object):
         self.label_config_full = config_comments_free(open(self.config['label_config']).read())
         self.label_config_line = config_line_stripped(self.label_config_full)
 
+        collect_analytics = os.getenv('collect_analytics')
+        if collect_analytics is None:
+            collect_analytics = self.config.get('collect_analytics', True)
         if self.analytics is None:
-            self.analytics = Analytics(self.label_config_line, self.config.get('collect_analytics', True), self.name)
+            self.analytics = Analytics(self.label_config_line, collect_analytics, self.name)
         else:
-            self.analytics.update_info(self.label_config_line, self.config.get('collect_analytics', True), self.name)
+            self.analytics.update_info(self.label_config_line, collect_analytics, self.name)
 
         # configure project
         self.project_obj = ProjectObj(label_config=self.label_config_line, label_config_full=self.label_config_full)
