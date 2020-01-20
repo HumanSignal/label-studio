@@ -43,22 +43,26 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 input_args = None
 
 
-def project_get_or_create():
+def project_get_or_create(multi_session_force_recreate=False):
     """
     Return existed or create new project based on environment. Currently supported methods:
     - "fixed": project is based on "project_name" attribute specified by input args when app starts
     - "session": project is based on "project_name" key restored from flask.session object
     :return:
     """
+    user = session.get('user', str(uuid4()))
+
     if input_args.command == 'start-multi-session':
-        if 'project_name' in session:
+        if 'project_name' in session and not multi_session_force_recreate:
             project_name = session['project_name']
         else:
-            project_name = str(uuid4())
+            project_name = session['user'] + '+' + str(uuid4())
             session['project_name'] = project_name
-        return Project.get_or_create(project_name, input_args)
+        return Project.get_or_create(project_name, input_args, context={'user': user, 'multi_session': True})
     else:
-        return Project.get_or_create(input_args.project_name, input_args)
+        if multi_session_force_recreate:
+            raise Exception('Not supported in not multi-session mode')
+        return Project.get_or_create(input_args.project_name, input_args, context={'user': user, 'multi_session': False})
 
 
 @app.template_filter('json')
@@ -130,10 +134,12 @@ def welcome_page():
     """
     project = project_get_or_create()
     project.analytics.send(getframeinfo(currentframe()).function)
+    project.update_on_boarding_state()
     return flask.render_template(
         'welcome.html',
         config=project.config,
-        project=project.project_obj
+        project=project.project_obj,
+        on_boarding=project.on_boarding
     )
 
 
@@ -177,7 +183,8 @@ def setup_page():
         project=project.project_obj,
         label_config_full=project.label_config_full,
         templates=templates,
-        input_values=input_values
+        input_values=input_values ,
+        multi_session=input_args.command == 'start-multi-session'
     )
 
 
@@ -454,6 +461,17 @@ def api_generate_next_task():
     # no tasks found
     project.analytics.send(getframeinfo(currentframe()).function, error=404)
     return make_response('', 404)
+
+
+@app.route('/api/project/', methods=['POST', 'GET'])
+@exception_treatment
+def api_project():
+    """ Project global operation
+    """
+    project = project_get_or_create(multi_session_force_recreate=False)
+    if request.method == 'POST' and request.args.get('new', False):
+        project = project_get_or_create(multi_session_force_recreate=True)
+    return make_response(jsonify({'project_name': project.name}), 201)
 
 
 @app.route('/api/projects/1/task_ids/', methods=['GET'])

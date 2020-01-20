@@ -25,9 +25,15 @@ function message_from_response(result) {
   // result is object from XHR, check responseText first, it is always presented
   if (!result.responseText) return "Critical error on server";
   // grab responseJSON detail
-  else if (result.responseJSON.hasOwnProperty("detail")) return result.responseJSON["detail"];
+  else if (result.responseJSON && result.responseJSON.hasOwnProperty("detail")) {
+    return result.responseJSON["detail"];
+  }
   // something strange inside of responseJSON
-  else return JSON.stringify(result.responseJSON);
+  else if (result.hasOwnProperty('responseJSON'))
+    return JSON.stringify(result.responseJSON);
+  else {
+    return 'Critical error on the server side'
+  }
 }
 
 // Take closest form (or form by id) and submit it,

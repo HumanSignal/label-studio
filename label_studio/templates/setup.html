@@ -32,9 +32,9 @@
 
 <div class="ui container">
   <div class="ui wrapper">
-    <form action="/api/save-config" method="post" class="ui form">
+    {% include 'setup_help.html' %}
 
-      {% include 'setup_help.html' %}
+    <form action="/api/save-config" method="post" class="ui form">
 
       <!-- Textarea & Preview in two cols -->
       <div class="ui two column grid zero-margin step2 stackable">

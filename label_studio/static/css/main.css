@@ -129,6 +129,11 @@ a {
     font-weight: bold;
 }
 
+#new-project-button:hover {
+    background: #db2828 !important;
+    color: white;
+}
+
 .btn {
     line-height: 1.5;
     position: relative;
