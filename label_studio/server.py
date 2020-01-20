@@ -701,10 +701,10 @@ def parse_input_args():
     parser_start_ms.add_argument(
         '-p', '--port', dest='port', default=8200, type=int,
         help='Server port')
-    parser_start.add_argument(
+    parser_start_ms.add_argument(
         '--ml-backend-url', dest='ml_backend_url',
         help='Machine learning backend URL')
-    parser_start.add_argument(
+    parser_start_ms.add_argument(
         '--ml-backend-name', dest='ml_backend_name',
         help='Machine learning backend name')
 
