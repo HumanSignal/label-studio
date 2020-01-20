@@ -60,6 +60,10 @@ class Project(object):
     def data_types(self):
         return self.project_obj.data_types
 
+    @property
+    def label_config(self):
+        return self.project_obj.label_config
+
     def extract_data_types(self, config):
         return self.project_obj.extract_data_types(config)
 
