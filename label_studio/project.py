@@ -524,7 +524,8 @@ class Project(object):
         if hasattr(args, 'input_path') and args.input_path:
             copy2(args.input_path, default_input_path)
         if hasattr(args, 'output_dir') and args.output_dir:
-            copy2(args.output_dir, default_output_dir)
+            if os.path.exists(args.output_dir):
+                copy2(args.output_dir, default_output_dir)
         if hasattr(args, 'label_config') and args.label_config:
             copy2(args.label_config, default_label_config_file)
 
