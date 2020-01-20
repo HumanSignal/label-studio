@@ -82,9 +82,8 @@ class Project(object):
             f.write(new_label_config)
 
         # save project config state
-        default_config_path = os.path.join(os.path.dirname(label_config_file), 'config.json')
         self.config['label_config_updated'] = True
-        with io.open(self.config.get('config_path', default_config_path), mode='w') as f:
+        with io.open(self.config['config_path'], mode='w') as f:
             json.dump(self.config, f)
         logger.info('Label config saved to: {path}'.format(path=label_config_file))
 

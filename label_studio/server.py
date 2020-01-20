@@ -182,7 +182,7 @@ def setup_page():
         project=project.project_obj,
         label_config_full=project.label_config_full,
         templates=templates,
-        input_values=input_values ,
+        input_values=input_values,
         multi_session=input_args.command == 'start-multi-session'
     )
 
