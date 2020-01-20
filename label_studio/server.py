@@ -1,5 +1,4 @@
 import os
-import sys
 import lxml
 import time
 import shutil
@@ -673,9 +672,11 @@ def parse_input_args():
         '-p', '--port', dest='port', default=8200, type=int,
         help='Server port')
     parser_start.add_argument(
-        '--make-session-projects', dest='make_session_projects', action='store_true',
-        help='Create new project for each browser session'
-    )
+        '--ml-backend-url', dest='ml_backend_url',
+        help='Machine learning backend URL')
+    parser_start.add_argument(
+        '--ml-backend-name', dest='ml_backend_name',
+        help='Machine learning backend name')
 
     # start-multi-session sub-command parser
 
@@ -700,6 +701,12 @@ def parse_input_args():
     parser_start_ms.add_argument(
         '-p', '--port', dest='port', default=8200, type=int,
         help='Server port')
+    parser_start.add_argument(
+        '--ml-backend-url', dest='ml_backend_url',
+        help='Machine learning backend URL')
+    parser_start.add_argument(
+        '--ml-backend-name', dest='ml_backend_name',
+        help='Machine learning backend name')
 
     args = parser.parse_args()
     label_config_explicitly_specified = hasattr(args, 'label_config') and args.label_config

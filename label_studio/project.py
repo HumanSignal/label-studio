@@ -638,6 +638,16 @@ class Project(object):
         if args.debug is not None:
             config['debug'] = args.debug
 
+        if args.ml_backend_url:
+            if 'ml_backend' not in config:
+                config['ml_backend'] = {}
+            config['ml_backend']['url'] = args.ml_backend_url
+
+        if args.ml_backend_name:
+            if 'ml_backend' not in config:
+                config['ml_backend'] = {}
+            config['ml_backend']['name'] = args.ml_backend_name
+
         # absolutize paths relative to config.json
         config_dir = os.path.dirname(config_path)
         config['label_config'] = os.path.join(config_dir, config['label_config'])
