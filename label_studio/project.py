@@ -482,12 +482,13 @@ class Project(object):
         self.label_config_full = config_comments_free(open(self.config['label_config']).read())
         self.label_config_line = config_line_stripped(self.label_config_full)
 
+        collect_analytics = os.getenv('collect_analytics')
+        if collect_analytics is None:
+            collect_analytics = self.config.get('collect_analytics', True)
         if self.analytics is None:
-            self.analytics = Analytics(self.label_config_line, self.config.get('collect_analytics', True), self.name,
-                                       self.context)
+            self.analytics = Analytics(self.label_config_line, collect_analytics, self.name, self.context)
         else:
-            self.analytics.update_info(self.label_config_line, self.config.get('collect_analytics', True), self.name,
-                                       self.context)
+            self.analytics.update_info(self.label_config_line, collect_analytics, self.name, self.context)
 
         # configure project
         self.project_obj = ProjectObj(label_config=self.label_config_line, label_config_full=self.label_config_full)
@@ -530,7 +531,8 @@ class Project(object):
         if hasattr(args, 'input_path') and args.input_path:
             copy2(args.input_path, default_input_path)
         if hasattr(args, 'output_dir') and args.output_dir:
-            copy2(args.output_dir, default_output_dir)
+            if os.path.exists(args.output_dir):
+                copy2(args.output_dir, default_output_dir)
         if hasattr(args, 'label_config') and args.label_config:
             copy2(args.label_config, default_label_config_file)
 
@@ -643,6 +645,16 @@ class Project(object):
 
         if args.debug is not None:
             config['debug'] = args.debug
+
+        if args.ml_backend_url:
+            if 'ml_backend' not in config:
+                config['ml_backend'] = {}
+            config['ml_backend']['url'] = args.ml_backend_url
+
+        if args.ml_backend_name:
+            if 'ml_backend' not in config:
+                config['ml_backend'] = {}
+            config['ml_backend']['name'] = args.ml_backend_name
 
         # absolutize paths relative to config.json
         config_dir = os.path.dirname(config_path)

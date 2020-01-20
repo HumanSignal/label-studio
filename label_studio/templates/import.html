@@ -34,7 +34,7 @@
       <label for="url-input" class="description">Or paste a file URL or task in JSON format here</label><br/>
       <div class="ui action input fluid">
         <input id="url-input" type="text" name="url" autofocus autocomplete="on"
-               placeholder='URL: http://example.com/tasks.json OR TASK BODY: {"image_url": "http://my.image.jpg"}'/>
+               placeholder='http://example.com/tasks.json OR {"image_url": "http://my.image.jpg"}'/>
         <button style="display: inline-block !important; width: 14%; min-width: 80px !important;"
                 class="ui positive button" id="url-button" onclick="send_data(event, $('#url-input').val())">Import
         </button>
@@ -43,8 +43,8 @@
 
   </form>
 
-  <!-- Help message -->
-  <div class="ui divider hidden"></div>
+  <!--essage -->
+  <div class="ui divider /div>
   <div class="ui" style="display: block !important;">
     {% include "import_help.html" %}
   </div>
