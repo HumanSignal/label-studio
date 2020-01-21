@@ -49,19 +49,33 @@ def project_get_or_create(multi_session_force_recreate=False):
     - "session": project is based on "project_name" key restored from flask.session object
     :return:
     """
-    user = session.get('user', str(uuid4()))
-
     if input_args.command == 'start-multi-session':
-        if 'project_name' in session and not multi_session_force_recreate:
-            project_name = session['project_name']
-        else:
-            project_name = session['user'] + '+' + str(uuid4())
-            session['project_name'] = project_name
-        return Project.get_or_create(project_name, input_args, context={'user': user, 'multi_session': True})
+        # get user from session
+        if 'user' not in session:
+            session['user'] = str(uuid4())
+        user = session['user']
+
+        # get project from session
+        if 'project' not in session or multi_session_force_recreate:
+            session['project'] = str(uuid4())
+        project = session['project']
+
+        project_name = user + '/' + project
+        return Project.get_or_create(project_name, input_args, context={
+            'user': user,
+            'project': project,
+            'multi_session': True,
+        })
     else:
         if multi_session_force_recreate:
-            raise Exception('Not supported in not multi-session mode')
-        return Project.get_or_create(input_args.project_name, input_args, context={'user': user, 'multi_session': False})
+            raise NotImplementedError(
+                '"multi_session_force_recreate" option supported only with "start-multi-session" mode')
+        user = project = input_args.project_name  # in standalone mode, user and project are singletons and consts
+        return Project.get_or_create(input_args.project_name, input_args, context={
+            'user': user,
+            'project': project,
+            'multi_session': False
+        })
 
 
 @app.template_filter('json')

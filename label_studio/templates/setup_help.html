@@ -57,7 +57,7 @@
 
 <script>
   function new_project() {
-    let yes = confirm("You will lose ALL YOUR DATA, this action CAN'T BE UNDO. Are you sure?");
+    let yes = confirm("You will lose ALL YOUR DATA, this action CAN'T BE UNDONE.\nAre you sure?");
     if (yes) {
       let request = new XMLHttpRequest();
       request.open("POST", "/api/project/?new=true", true);
