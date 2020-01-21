@@ -753,9 +753,13 @@ def main():
     import threading
     import webbrowser
 
+    import label_studio.utils.functions
+
     global input_args
 
     input_args = parse_input_args()
+
+    label_studio.utils.functions.HOSTNAME = 'http://localhost:' + str(input_args.port)
 
     # On `init` command, create directory args.project_name with initial project state and exit
     if input_args.command == 'init':
