@@ -2,7 +2,7 @@
 <View>
   <Image name="img" value="$image_url"/>
   <Choices name="choice" toName="img" showInLine="true">
-    <Choice value="Cat" background="blue"/>
-    <Choice value="Dog" background="green" />
+    <Choice value="Boeing" background="blue"/>
+    <Choice value="Airbus" background="green" />
   </Choices>
 </View>
