@@ -42,7 +42,7 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 input_args = None
 
 
-def project_get_or_create():
+def project_get_or_create(multi_session_force_recreate=False):
     """
     Return existed or create new project based on environment. Currently supported methods:
     - "fixed": project is based on "project_name" attribute specified by input args when app starts
@@ -50,14 +50,32 @@ def project_get_or_create():
     :return:
     """
     if input_args.command == 'start-multi-session':
-        if 'project_name' in session:
-            project_name = session['project_name']
-        else:
-            project_name = str(uuid4())
-            session['project_name'] = project_name
-        return Project.get_or_create(project_name, input_args)
+        # get user from session
+        if 'user' not in session:
+            session['user'] = str(uuid4())
+        user = session['user']
+
+        # get project from session
+        if 'project' not in session or multi_session_force_recreate:
+            session['project'] = str(uuid4())
+        project = session['project']
+
+        project_name = user + '/' + project
+        return Project.get_or_create(project_name, input_args, context={
+            'user': user,
+            'project': project,
+            'multi_session': True,
+        })
     else:
-        return Project.get_or_create(input_args.project_name, input_args)
+        if multi_session_force_recreate:
+            raise NotImplementedError(
+                '"multi_session_force_recreate" option supported only with "start-multi-session" mode')
+        user = project = input_args.project_name  # in standalone mode, user and project are singletons and consts
+        return Project.get_or_create(input_args.project_name, input_args, context={
+            'user': user,
+            'project': project,
+            'multi_session': False
+        })
 
 
 @app.template_filter('json')
@@ -129,10 +147,12 @@ def welcome_page():
     """
     project = project_get_or_create()
     project.analytics.send(getframeinfo(currentframe()).function)
+    project.update_on_boarding_state()
     return flask.render_template(
         'welcome.html',
         config=project.config,
-        project=project.project_obj
+        project=project.project_obj,
+        on_boarding=project.on_boarding
     )
 
 
@@ -176,7 +196,8 @@ def setup_page():
         project=project.project_obj,
         label_config_full=project.label_config_full,
         templates=templates,
-        input_values=input_values
+        input_values=input_values,
+        multi_session=input_args.command == 'start-multi-session'
     )
 
 
@@ -455,6 +476,17 @@ def api_generate_next_task():
     return make_response('', 404)
 
 
+@app.route('/api/project/', methods=['POST', 'GET'])
+@exception_treatment
+def api_project():
+    """ Project global operation
+    """
+    project = project_get_or_create(multi_session_force_recreate=False)
+    if request.method == 'POST' and request.args.get('new', False):
+        project = project_get_or_create(multi_session_force_recreate=True)
+    return make_response(jsonify({'project_name': project.name}), 201)
+
+
 @app.route('/api/projects/1/task_ids/', methods=['GET'])
 @exception_treatment
 def api_all_task_ids():
@@ -721,9 +753,13 @@ def main():
     import threading
     import webbrowser
 
+    import label_studio.utils.functions
+
     global input_args
 
     input_args = parse_input_args()
+
+    label_studio.utils.functions.HOSTNAME = 'http://localhost:' + str(input_args.port)
 
     # On `init` command, create directory args.project_name with initial project state and exit
     if input_args.command == 'init':

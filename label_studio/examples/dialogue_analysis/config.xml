@@ -9,6 +9,6 @@
     <Choice value="Good answer"/>
   </Choices>
 
-  <Header value="Your answer"/>
+  <Header value="Write your answer and press Enter"/>
   <TextArea name="answer"/>
 </View>

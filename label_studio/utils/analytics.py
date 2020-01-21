@@ -17,7 +17,7 @@ mp = Mixpanel('269cd4e25e97cc15bdca5b401e429892')
 
 class Analytics(object):
 
-    def __init__(self, label_config_line, collect_analytics=True, project_name=''):
+    def __init__(self, label_config_line, collect_analytics=True, project_name='', context=None):
         self._label_config_line = label_config_line
         self._collect_analytics = collect_analytics
         self._project_name = convert_string_to_hash(project_name)
@@ -25,6 +25,7 @@ class Analytics(object):
         self._version = get_app_version()
         self._user_id = self._get_user_id()
         self._label_types = self._get_label_types()
+        self._context = context or {}
 
     def _get_user_id(self):
         user_id_file = os.path.join(get_config_dir(), 'user_id')
@@ -62,10 +63,11 @@ class Analytics(object):
             })
         return label_types
 
-    def update_info(self, label_config_line, collect_analytics=True, project_name=''):
+    def update_info(self, label_config_line, collect_analytics=True, project_name='', context=None):
         if label_config_line != self._label_config_line:
             self._label_types = self._get_label_types()
         self._collect_analytics = collect_analytics
+        self._context = context or {}
         self._project_name = convert_string_to_hash(project_name)
 
     def send(self, event_name, **kwargs):
@@ -75,6 +77,7 @@ class Analytics(object):
         data['version'] = self._version
         data['label_types'] = self._label_types
         data['project'] = self._project_name
+        data.update(self._context)
         event_name = 'LS:' + str(event_name)
         try:
             mp.track(self._user_id, event_name, data)

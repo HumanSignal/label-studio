@@ -4,7 +4,7 @@
   <Header>Select label then click on image</Header>
   <KeyPointLabels name="tag" toName="img"
                   strokewidth="5" fillcolor="red">
-    <Label value="Eye" background="lightgreen"/>
-    <Label value="Nose" background="lightblue"/>
+    <Label value="Engine" background="red"/>
+    <Label value="Tail" background="rgba(0, 255, 0, 0.9)"/>
   </KeyPointLabels>
 </View>

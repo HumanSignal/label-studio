@@ -33,7 +33,7 @@ class Project(object):
         'Audio': ('.wav', '.aiff', '.mp3', '.au', '.flac')
     }
 
-    def __init__(self, config, name):
+    def __init__(self, config, name, context=None):
         self.config = config
         self.name = name
 
@@ -49,7 +49,8 @@ class Project(object):
         self.project_obj = None
         self.analytics = None
         self.converter = None
-
+        self.on_boarding = {}
+        self.context = context or {}
         self.reload()
 
     @property
@@ -77,8 +78,13 @@ class Project(object):
     def update_label_config(self, new_label_config):
         label_config_file = self.config['label_config']
         # save xml label config to file
-        with io.open(label_config_file, mode='w') as fout:
-            fout.write(new_label_config)
+        with io.open(label_config_file, mode='w') as f:
+            f.write(new_label_config)
+
+        # save project config state
+        self.config['label_config_updated'] = True
+        with io.open(self.config['config_path'], mode='w') as f:
+            json.dump(self.config, f)
         logger.info('Label config saved to: {path}'.format(path=label_config_file))
 
     def _get_single_input_value(self, input_data_tags):
@@ -479,9 +485,9 @@ class Project(object):
         if collect_analytics is None:
             collect_analytics = self.config.get('collect_analytics', True)
         if self.analytics is None:
-            self.analytics = Analytics(self.label_config_line, collect_analytics, self.name)
+            self.analytics = Analytics(self.label_config_line, collect_analytics, self.name, self.context)
         else:
-            self.analytics.update_info(self.label_config_line, collect_analytics, self.name)
+            self.analytics.update_info(self.label_config_line, collect_analytics, self.name, self.context)
 
         # configure project
         self.project_obj = ProjectObj(label_config=self.label_config_line, label_config_full=self.label_config_full)
@@ -654,16 +660,17 @@ class Project(object):
         config['label_config'] = os.path.join(config_dir, config['label_config'])
         config['input_path'] = os.path.join(config_dir, config['input_path'])
         config['output_dir'] = os.path.join(config_dir, config['output_dir'])
+        config['config_path'] = config_path
 
         return config
 
     @classmethod
-    def _load_from_dir(cls, project_dir, project_name, args):
+    def _load_from_dir(cls, project_dir, project_name, args, context):
         config = cls._get_config(project_dir, args)
-        return cls(config, project_name)
+        return cls(config, project_name, context)
 
     @classmethod
-    def get(cls, project_name, args):
+    def get(cls, project_name, args, context):
 
         # If project stored in memory, just return it
         if project_name in cls._storage:
@@ -672,25 +679,31 @@ class Project(object):
         # If project directory exists, load project from directory and update in-memory storage
         project_dir = cls.get_project_dir(project_name, args)
         if os.path.exists(project_dir):
-            project = cls._load_from_dir(project_dir, project_name, args)
+            project = cls._load_from_dir(project_dir, project_name, args, context)
             cls._storage[project_name] = project
 
         raise KeyError('Project {p} doesn\'t exist'.format(p=project_name))
 
     @classmethod
-    def create(cls, project_name, args):
+    def create(cls, project_name, args, context):
         # "create" method differs from "get" as it can create new directory with project resources
         project_dir = cls.create_project_dir(project_name, args)
-        project = cls._load_from_dir(project_dir, project_name, args)
+        project = cls._load_from_dir(project_dir, project_name, args, context)
         cls._storage[project_name] = project
         return project
 
     @classmethod
-    def get_or_create(cls, project_name, args):
+    def get_or_create(cls, project_name, args, context):
         try:
-            project = cls.get(project_name, args)
+            project = cls.get(project_name, args, context)
             logger.info('Get project "' + project_name + '".')
         except KeyError:
-            project = cls.create(project_name, args)
+            project = cls.create(project_name, args, context)
             logger.info('Project "' + project_name + '" created.')
         return project
+
+    def update_on_boarding_state(self):
+        self.on_boarding['setup'] = self.config.get('label_config_updated', False)
+        self.on_boarding['import'] = len(self.tasks) > 0
+        self.on_boarding['labeled'] = len(os.listdir(self.config['output_dir'])) > 0
+        return self.on_boarding
