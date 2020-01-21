@@ -159,7 +159,7 @@ There is a quick example tutorial on how to do that with simple image classifica
     
 Once you're satisfied with pre-labeling results, you can immediately send prediction requests via REST API:
 ```bash
-curl -X POST -H 'Content-Type: application/json' -d '{"image_url": "https://go.heartex.net/static/samples/kittens.jpg"}' http://localhost:8200/predict
+curl -X POST -H 'Content-Type: application/json' -d '{"image_url": "https://go.heartex.net/static/samples/sample.jpg"}' http://localhost:8200/predict
 ```
 
 Feel free to play around any other models & frameworks apart from image classifiers! (see instructions [here](https://github.com/heartexlabs/pyheartex#advanced-usage))
