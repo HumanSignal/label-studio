@@ -10,9 +10,9 @@ Try it now in [running app](https://app.labelstud.io)!
  
 Its purpose is to help you label different types of data using a simple interface with a standardized output format. You're dealing with the custom dataset and thinking about creating your tool? Don't - using Label Studio, you can save time and create a custom tool and interface in minutes. 
 
-![Label Studio](https://raw.githubusercontent.com/heartexlabs/label-studio/master/images/annotation_examples.gif)
-
 <br/>
+
+![Label Studio](https://raw.githubusercontent.com/heartexlabs/label-studio/master/images/annotation_examples.gif)
 
 ## Summary
 
