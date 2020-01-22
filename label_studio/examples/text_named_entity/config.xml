@@ -1,4 +1,4 @@
-<!-- {"title": "Named enitity recognition", "category": "text"} -->
+<!-- {"title": "Named entity recognition", "category": "text"} -->
 <View>
   <Labels name="ner" toName="text">
     <Label value="Person" background="red"/>
