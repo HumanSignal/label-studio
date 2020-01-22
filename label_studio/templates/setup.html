@@ -139,6 +139,7 @@
 
 <script>
   var confirm_already_shown = false;
+  var iframeTimer = null;
 
   // process create request
   function process_request(result) {
@@ -290,7 +291,8 @@
         obj.style.width = "100%";
 
         // wait until all images and resources from iframe loading
-        setTimeout(function() {
+        clearTimeout(iframeTimer);
+        iframeTimer = setTimeout(function() {
           obj.style.height = (obj.contentWindow.document.body.scrollHeight + 30) + 'px';
         }, 1000);
 
