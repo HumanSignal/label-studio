@@ -33,7 +33,8 @@
     <div class="ui form">
       <label for="url-input" class="description">Or paste a file URL or task in JSON format here</label><br/>
       <div class="ui action input fluid">
-        <input id="url-input" type="text" name="url" autofocus autocomplete="on"/>
+        <input id="url-input" type="text" name="url" autofocus autocomplete="on"
+               placeholder='http://example.com/tasks.json OR {"image_url": "http://my.image.jpg"}'/>
         <button style="display: inline-block !important; width: 14%; min-width: 80px !important;"
                 class="ui positive button" id="url-button" onclick="send_data(event, $('#url-input').val())">Import
         </button>
@@ -60,9 +61,14 @@
       <div class="description" id="upload-dialog-msg"></div>
     </div>
     <div class="actions">
+      <span id="success-actions" hidden>
+        <a data-tooltip="You can start the labeling right now" class="ui button positive" href="/">Start Labeling</a>
+        <a data-tooltip="Explore all imported tasks" class="ui button positive" href="/tasks">Explore Tasks</a>
+      </span>
+
       <!-- Done button -->
       <button class="ui icon button" id="upload-done-button"
-              hidden onclick="location.reload()" autofocus>Done
+              hidden onclick="location.reload()" autofocus>Close
       </button>
     </div>
   </div>
@@ -122,7 +128,8 @@
     }).modal('show');
 
     if (success) {
-      $('#upload-done-button').addClass('positive')
+      $('#upload-done-button').addClass('positive');
+      $('#success-actions').show();
     } else {
       $('#upload-done-button').addClass('red')
     }
@@ -187,12 +194,11 @@
 
     $.ajax(request)
       .done(answer => {
-        let msg = 'Tasks created: ' + answer['task_count'] +
-          '<br/>Completions created: ' + answer['completion_count'] +
-          '<br/>Predictions created: ' + answer['prediction_count'] +
-          '<br/>Duration: ' + answer['duration'].toFixed(2) + ' sec';
+        let msg = '<h2>Tasks created: ' + answer['task_count'] + '</h2>' +
+          'Completions created: ' + answer['completion_count'] +
+          '<br>Predictions created: ' + answer['prediction_count'] +
+          '<br><br>Duration: ' + answer['duration'].toFixed(2) + ' sec';
         stop_wait(msg, true);
-
       })
       .fail(answer => {
         let msg = "Error: can't upload/process file on server side. Reasons:<br><br>";

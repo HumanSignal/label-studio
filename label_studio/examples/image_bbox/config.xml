@@ -2,7 +2,7 @@
 <View>
   <Image name="img" value="$image"/>
   <RectangleLabels name="tag" toName="img">
-    <Label value="Planet" background="green"/>
-    <Label value="Moonwalker" background="blue"/>
+    <Label value="Airplane" background="green"/>
+    <Label value="Car" background="blue"/>
   </RectangleLabels>
 </View>

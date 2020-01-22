@@ -11,8 +11,8 @@
 
     <RectangleLabels name="tag" toName="img"
                      canRotate="false">
-      <Label value="Planet" background="red"/>
-      <Label value="Moonwalker" background="blue"/>
+      <Label value="Airplane" background="red"/>
+      <Label value="Car" background="blue"/>
     </RectangleLabels>
   </View>
 

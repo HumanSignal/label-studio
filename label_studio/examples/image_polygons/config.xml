@@ -6,7 +6,7 @@
   <Image name="img" value="$image"/>
 
   <PolygonLabels name="tag" toName="img" strokewidth="5">
-    <Label value="Hello" background="red"/>
-    <Label value="World" background="blue"/>
+    <Label value="Airplane" background="red"/>
+    <Label value="Car" background="blue"/>
   </PolygonLabels>
 </View>

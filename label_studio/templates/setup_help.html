@@ -15,7 +15,18 @@
       </li>
     </ul>
   </div>
+  <br/>
+
+  {% if multi_session %}
+  <div class="header">Reset everything and start a new project</div>
+  <div class="content">
+    <button onclick="new_project()" id="new-project-button"
+            class="ui button negative basic" style="height: 24px; padding-top: 5px;">
+      Start new project
+    </button>
+  </div>
   <br>
+  {% endif %}
 
   <!-- Templates -->
   <div class="header">Try predefined configs</div>
@@ -43,3 +54,17 @@
 </div>
 
 <br/>
+
+<script>
+  function new_project() {
+    let yes = confirm("You will lose ALL YOUR DATA, this action CAN'T BE UNDONE.\nAre you sure?");
+    if (yes) {
+      let request = new XMLHttpRequest();
+      request.open("POST", "/api/project/?new=true", true);
+      request.onload = function () {
+        window.location.reload();
+      };
+      request.send(null);
+    }
+  }
+</script>

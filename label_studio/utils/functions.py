@@ -15,6 +15,9 @@ with open(_LABEL_CONFIG_SCHEMA) as f:
     _LABEL_CONFIG_SCHEMA_DATA = json.load(f)
 
 
+HOSTNAME = ''
+
+
 def data_examples(mode):
     """ Data examples for editor preview and task upload examples
     """
@@ -28,7 +31,7 @@ def data_examples(mode):
         for root in roots:
             for key, value in _DATA_EXAMPLES[root].items():
                 if isinstance(value, str):
-                    _DATA_EXAMPLES[root][key] = value.replace('<HOSTNAME>', '')
+                    _DATA_EXAMPLES[root][key] = value.replace('<HOSTNAME>', HOSTNAME)
 
     return _DATA_EXAMPLES[mode]
 
