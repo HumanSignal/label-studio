@@ -759,8 +759,6 @@ def main():
 
     input_args = parse_input_args()
 
-    label_studio.utils.functions.HOSTNAME = 'http://localhost:' + str(input_args.port)
-
     # On `init` command, create directory args.project_name with initial project state and exit
     if input_args.command == 'init':
         Project.create_project_dir(input_args.project_name, input_args)
@@ -771,6 +769,8 @@ def main():
         # If `start --init` option is specified, do the same as with `init` command, but continue to run app
         if input_args.init:
             Project.create_project_dir(input_args.project_name, input_args)
+
+    label_studio.utils.functions.HOSTNAME = 'http://localhost:' + str(input_args.port)
 
     # On `start` command, launch browser if --no-browser is not specified and start label studio server
     if input_args.command == 'start':
