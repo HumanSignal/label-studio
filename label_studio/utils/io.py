@@ -84,3 +84,17 @@ def get_data_dir():
 def delete_dir_content(dirpath):
     for f in glob.glob(dirpath + '/*'):
         os.remove(f)
+
+
+def remove_file_or_dir(path):
+    if os.path.isfile(path):
+        os.remove(path)
+    elif os.path.isdir(path):
+        shutil.rmtree(path)
+
+
+def iter_files(root_dir, ext):
+    for root, _, files in os.walk(root_dir):
+        for f in files:
+            if f.lower().endswith(ext):
+                yield os.path.join(root, f)

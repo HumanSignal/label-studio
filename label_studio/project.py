@@ -6,7 +6,7 @@ import urllib
 import orjson
 import random
 
-from shutil import copy2
+from shutil import copy2, copytree
 from collections import OrderedDict, defaultdict
 from datetime import datetime
 from operator import itemgetter
@@ -17,8 +17,8 @@ from label_studio.utils.misc import LabelConfigParser, config_line_stripped, con
 from label_studio.utils.analytics import Analytics
 from label_studio.utils.models import ProjectObj, MLBackend
 from label_studio.utils.exceptions import ValidationError
-from label_studio.utils.io import find_file, delete_dir_content
-
+from label_studio.utils.io import find_file, delete_dir_content, remove_file_or_dir
+from label_studio.tasks import Tasks
 
 logger = logging.getLogger(__name__)
 
@@ -99,11 +99,14 @@ class Project(object):
     def _create_task_with_local_uri(self, filepath, data_key, task_id):
         """ Convert filepath to task with flask serving URL
         """
-        filename = os.path.basename(self, filepath)
+        from label_studio.utils.functions import HOSTNAME
+
+        filename = os.path.basename(filepath)
         params = urllib.parse.urlencode({'d': os.path.dirname(filepath)})
-        base_url = 'http://localhost:{port}/'.format(port=self.config.get("port"))
+        base_url = HOSTNAME + '/'
         image_url_path = base_url + urllib.parse.quote('data/' + filename)
         image_local_url = '{image_url_path}?{params}'.format(image_url_path=image_url_path, params=params)
+        print(image_local_url)
         return {
             'id': task_id,
             'task_path': filepath,
@@ -259,15 +262,26 @@ class Project(object):
                 raise Exception('Unsupported task data:', path)
 
     def _init(self):
-        label_config = LabelConfigParser(self.config['label_config'])
 
-        if not os.path.exists(self.config['output_dir']):
-            os.mkdir(self.config['output_dir'])
+        # initialize or cleanup output dir
+        output_dir = self.config['output_dir']
+        if not os.path.exists(output_dir):
+            os.mkdir(output_dir)
+        else:
+            delete_dir_content(output_dir)
+
+        label_config = LabelConfigParser(self.config['label_config'])
+        input_data_tags = label_config.get_input_data_tags()
+        input_data_type = self.config.get('input_data_type', 'json')
+        task_loader = Tasks()
+        input_path = self.config['input_path']
+        if input_data_type == 'json':
+            tasks = task_loader.from_json_file()
 
         task_id = 0
         data_key = None
 
-        input_data_tags = label_config.get_input_data_tags()
+
 
         # load at first start
         self.tasks = OrderedDict()
@@ -343,8 +357,9 @@ class Project(object):
         :return:
         """
         delete_dir_content(self.config['output_dir'])
-        with io.open(self.config['input_path'], mode='w') as f:
-            json.dump([], f)
+        if os.path.exists(self.config['input_path']) and os.path.isfile(self.config['input_path']):
+            with io.open(self.config['input_path'], mode='w') as f:
+                json.dump([], f)
         self.reload()
 
     def iter_tasks(self):
@@ -469,7 +484,9 @@ class Project(object):
         os.remove(filename)
 
     def reload(self):
-        self.tasks = None
+
+        #
+
         self.derived_input_schema = []
         self.derived_output_schema = {
             'from_name_to_name_type': set(),
@@ -506,6 +523,29 @@ class Project(object):
         return os.path.join(args.root_dir, project_name)
 
     @classmethod
+    def _read_tasks_from_json_file(cls, json_file, start_id=0):
+        tasks = []
+
+        def push_task(root):
+
+
+        logger.debug('Reading tasks from JSON file ' + json_file)
+        with open(json_file) as f:
+            json_body = orjson.loads(f.read())
+
+            # multiple tasks in file
+            if isinstance(json_body, list):
+                [push_task(data) for data in json_body]
+
+            # one task in file
+            elif isinstance(json_body, dict):
+                push_task(json_body)
+
+            # unsupported task type
+            else:
+                raise Exception('Unsupported task data:', json_file)
+
+    @classmethod
     def create_project_dir(cls, project_name, args):
         """
         Create project directory in args.root_dir/project_name, and initialize there all required files
@@ -528,10 +568,15 @@ class Project(object):
         if hasattr(args, 'config_path') and args.config_path:
             copy2(args.config_path, default_config_file)
         if hasattr(args, 'input_path') and args.input_path:
-            copy2(args.input_path, default_input_path)
+            if os.path.isfile(args.input_path):
+                copy2(args.input_path, default_input_path)
+            elif os.path.isdir(args.input_path):
+                if os.path.exists(default_input_path):
+                    remove_file_or_dir(default_input_path)
+                copytree(args.input_path, default_input_path)
         if hasattr(args, 'output_dir') and args.output_dir:
             if os.path.exists(args.output_dir):
-                copy2(args.output_dir, default_output_dir)
+                copytree(args.output_dir, default_output_dir)
         if hasattr(args, 'label_config') and args.label_config:
             copy2(args.label_config, default_label_config_file)
 

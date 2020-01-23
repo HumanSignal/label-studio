@@ -208,6 +208,7 @@ def import_page():
     project = project_get_or_create()
 
     project.analytics.send(getframeinfo(currentframe()).function)
+    project.project_obj.name = project.name
     return flask.render_template(
         'import.html',
         config=project.config,
@@ -417,8 +418,6 @@ def api_import():
         old_tasks = json.load(open(path))
         assert isinstance(old_tasks, list), 'Tasks from input_path must be list'
         tasks = old_tasks + new_tasks
-        logger.error("It's recommended to use directory as input_path: " +
-                     project.config['input_path'] + ' -> ' + os.path.dirname(project.config['input_path']))
 
     with open(path, 'w') as f:
         json.dump(tasks, f, ensure_ascii=False, indent=4)
@@ -627,126 +626,7 @@ def get_data_file(filename):
     return flask.send_from_directory(directory, filename, as_attachment=True)
 
 
-def parse_input_args():
-    """ Combine args with json config
 
-    :return: config dict
-    """
-    import sys
-    import argparse
-
-    if len(sys.argv) == 1:
-        print('\nQuick start usage: label-studio start my_project --init\n')
-
-    root_parser = argparse.ArgumentParser(add_help=False)
-    root_parser.add_argument(
-        '-b', '--no-browser', dest='no_browser', action='store_true',
-        help='Do not open browser at label studio start'
-    )
-    root_parser.add_argument(
-        '-d', '--debug', dest='debug', action='store_true',
-        help='Debug mode for Flask', default=None
-    )
-    root_parser.add_argument(
-        '--root-dir', dest='root_dir', default='.',
-        help='Projects root directory'
-    )
-    root_parser.add_argument(
-        '-v', '--verbose', dest='verbose', action='store_true',
-        help='Increase output verbosity')
-
-    parser = argparse.ArgumentParser(description='Label studio')
-
-    subparsers = parser.add_subparsers(dest='command', help='Available commands')
-    subparsers.required = True
-
-    # init sub-command parser
-
-    available_templates = [os.path.basename(os.path.dirname(f)) for f in iter_config_templates()]
-
-    parser_init = subparsers.add_parser('init', help='Initialize Label Studio', parents=[root_parser])
-    parser_init.add_argument(
-        'project_name',
-        help='Path to directory where project state will be initialized')
-    parser_init.add_argument(
-        '--template', dest='template', choices=available_templates,
-        help='Choose from predefined project templates'
-    )
-
-    # start sub-command parser
-
-    parser_start = subparsers.add_parser('start', help='Start Label Studio server', parents=[root_parser])
-    parser_start.add_argument(
-        'project_name',
-        help='Path to directory where project state has been initialized'
-    )
-    parser_start.add_argument(
-        '--init', dest='init', action='store_true',
-        help='Initialize if project is not initialized yet'
-    )
-    parser_start.add_argument(
-        '--template', dest='template', choices=available_templates,
-        help='Choose from predefined project templates'
-    )
-    parser_start.add_argument(
-        '-c', '--config', dest='config_path',
-        help='Server config')
-    parser_start.add_argument(
-        '-l', '--label-config', dest='label_config', default='',
-        help='Label config path')
-    parser_start.add_argument(
-        '-i', '--input-path', dest='input_path', default='',
-        help='Input path to task file or directory with tasks')
-    parser_start.add_argument(
-        '-o', '--output-dir', dest='output_dir', default='',
-        help='Output directory for completions')
-    parser_start.add_argument(
-        '-p', '--port', dest='port', default=8200, type=int,
-        help='Server port')
-    parser_start.add_argument(
-        '--ml-backend-url', dest='ml_backend_url',
-        help='Machine learning backend URL')
-    parser_start.add_argument(
-        '--ml-backend-name', dest='ml_backend_name',
-        help='Machine learning backend name')
-
-    # start-multi-session sub-command parser
-
-    parser_start_ms = subparsers.add_parser(
-        'start-multi-session', help='Start Label Studio server', parents=[root_parser])
-    parser_start_ms.add_argument(
-        '--template', dest='template', choices=available_templates,
-        help='Choose from predefined project templates'
-    )
-    parser_start_ms.add_argument(
-        '-c', '--config', dest='config_path',
-        help='Server config')
-    parser_start_ms.add_argument(
-        '-l', '--label-config', dest='label_config', default='',
-        help='Label config path')
-    parser_start_ms.add_argument(
-        '-i', '--input-path', dest='input_path', default='',
-        help='Input path to task file or directory with tasks')
-    parser_start_ms.add_argument(
-        '-o', '--output-dir', dest='output_dir', default='',
-        help='Output directory for completions')
-    parser_start_ms.add_argument(
-        '-p', '--port', dest='port', default=8200, type=int,
-        help='Server port')
-    parser_start_ms.add_argument(
-        '--ml-backend-url', dest='ml_backend_url',
-        help='Machine learning backend URL')
-    parser_start_ms.add_argument(
-        '--ml-backend-name', dest='ml_backend_name',
-        help='Machine learning backend name')
-
-    args = parser.parse_args()
-    label_config_explicitly_specified = hasattr(args, 'label_config') and args.label_config
-    if args.template and not label_config_explicitly_specified:
-        args.label_config = os.path.join(find_dir('examples'), args.template, 'config.xml')
-    if not hasattr(args, 'label_config'):
-        args.label_config = None
-    return args
 
 
 def main():
