@@ -2,6 +2,8 @@ import os
 import pkg_resources
 import shutil
 import glob
+import io
+import json
 
 from contextlib import contextmanager
 from tempfile import mkstemp, mkdtemp
@@ -98,3 +100,8 @@ def iter_files(root_dir, ext):
         for f in files:
             if f.lower().endswith(ext):
                 yield os.path.join(root, f)
+
+
+def json_load(file):
+    with io.open(file) as f:
+        return json.load(f)

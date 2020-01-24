@@ -26,10 +26,9 @@ from label_studio.utils import uploader
 from label_studio.utils.validation import TaskValidator
 from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.functions import generate_sample_task_without_check, data_examples
-from label_studio.utils.misc import (
-    exception_treatment, log_config, log, config_line_stripped,
-    get_config_templates, iter_config_templates
-)
+from label_studio.utils.misc import exception_treatment, log_config, log, config_line_stripped, get_config_templates
+from label_studio.utils.argparser import parse_input_args
+
 from label_studio.project import Project
 
 logger = logging.getLogger(__name__)
@@ -303,7 +302,6 @@ def api_save_config():
         return make_response(jsonify({'label_config': [str(e)]}), status.HTTP_400_BAD_REQUEST)
 
     project.update_label_config(label_config)
-    project.reload()
     project.analytics.send(getframeinfo(currentframe()).function)
     return Response(status=status.HTTP_201_CREATED)
 
@@ -422,8 +420,9 @@ def api_import():
     with open(path, 'w') as f:
         json.dump(tasks, f, ensure_ascii=False, indent=4)
 
-    # load new tasks
-    project.reload()
+    # load new tasks and everything related
+    project.load_tasks()
+    project.load_derived_schemas()
 
     duration = time.time() - start
     return make_response(jsonify({
@@ -626,18 +625,16 @@ def get_data_file(filename):
     return flask.send_from_directory(directory, filename, as_attachment=True)
 
 
-
-
-
 def main():
     import threading
     import webbrowser
 
-    import label_studio.utils.functions
-
     global input_args
 
     input_args = parse_input_args()
+
+    import label_studio.utils.functions
+    label_studio.utils.functions.HOSTNAME = 'http://localhost:' + str(input_args.port)
 
     # On `init` command, create directory args.project_name with initial project state and exit
     if input_args.command == 'init':
@@ -649,8 +646,6 @@ def main():
         # If `start --init` option is specified, do the same as with `init` command, but continue to run app
         if input_args.init:
             Project.create_project_dir(input_args.project_name, input_args)
-
-    label_studio.utils.functions.HOSTNAME = 'http://localhost:' + str(input_args.port)
 
     # On `start` command, launch browser if --no-browser is not specified and start label studio server
     if input_args.command == 'start':

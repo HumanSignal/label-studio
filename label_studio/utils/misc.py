@@ -138,27 +138,6 @@ def config_comments_free(xml_config):
     return xml_config
 
 
-class LabelConfigParser(object):
-
-    def __init__(self, filepath):
-        with io.open(filepath) as f:
-            self._config = f.read()
-
-    def get_value_for_name(self, name):
-        tag_iter = ElementTree.fromstring(self._config).iter()
-        return next((
-            tag.attrib.get('value') for tag in tag_iter
-            if tag.attrib.get('name') == name), None
-        )
-
-    def get_input_data_tags(self):
-        tag_iter = ElementTree.fromstring(self._config).iter()
-        return [
-            tag for tag in tag_iter
-            if tag.attrib.get('name') and tag.attrib.get('value', '').startswith('$')
-        ]
-
-
 def get_app_version():
     return pkg_resources.get_distribution('label-studio').version
 
