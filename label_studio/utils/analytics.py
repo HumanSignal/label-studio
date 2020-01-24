@@ -88,7 +88,7 @@ class Analytics(object):
         json_data['event'] = event_name
         json_data['user_id'] = self._user_id
         try:
-            url = 'https://analytics.labelstudio.io/prod'
+            url = 'https://analytics.labelstud.io/prod'
             logger.debug('Sending to {url}:\n{data}'.format(url=url, data=json_data))
             requests.post(url=url, json=json_data)
         except requests.RequestException as exc:
