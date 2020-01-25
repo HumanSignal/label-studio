@@ -30,6 +30,7 @@ from label_studio.utils.misc import exception_treatment, log_config, log, config
 from label_studio.utils.argparser import parse_input_args
 
 from label_studio.project import Project
+from label_studio.tasks import Tasks
 
 logger = logging.getLogger(__name__)
 
@@ -400,25 +401,15 @@ def api_import():
     except ValidationError as e:
         return make_response(jsonify(e.msg_to_list()), status.HTTP_400_BAD_REQUEST)
 
-    # save task file to input dir
-    if os.path.isdir(project.config['input_path']):
-        # tasks are in directory, write a new file with tasks
-        task_dir = project.config['input_path']
-        now = datetime.now()
-        data = json.dumps(new_tasks, ensure_ascii=False)
-        md5 = hashlib.md5(json.dumps(data).encode('utf-8')).hexdigest()
-        name = 'import-' + now.strftime('%Y-%m-%d-%H-%M') + '-' + str(md5[0:8])
-        path = os.path.join(task_dir, name + '.json')
-        tasks = new_tasks
-    else:
-        # tasks are all in one file, append it
-        path = project.config['input_path']
-        old_tasks = json.load(open(path))
-        assert isinstance(old_tasks, list), 'Tasks from input_path must be list'
-        tasks = old_tasks + new_tasks
+    # tasks are all in one file, append it
+    path = project.config['input_path']
+    old_tasks = json.load(open(path))
+    max_id_in_old_tasks = max(old_tasks.keys()) if old_tasks else -1
+    new_tasks = Tasks().from_list_of_dicts(new_tasks, max_id_in_old_tasks + 1)
+    old_tasks.update(new_tasks)
 
     with open(path, 'w') as f:
-        json.dump(tasks, f, ensure_ascii=False, indent=4)
+        json.dump(old_tasks, f, ensure_ascii=False, indent=4)
 
     # load new tasks and everything related
     project.load_tasks()

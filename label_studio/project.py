@@ -544,6 +544,7 @@ class Project(object):
         with io.open(config_path) as c:
             config = json.load(c)
 
+        config['config_path'] = config_path
         config['input_path'] = os.path.join(os.path.dirname(config_path), config['input_path'])
         config['label_config'] = os.path.join(os.path.dirname(config_path), config['label_config'])
         config['output_dir'] = os.path.join(os.path.dirname(config_path), config['output_dir'])

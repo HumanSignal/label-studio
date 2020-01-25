@@ -41,6 +41,12 @@ class Tasks(object):
             task[task_id]['predictions'] = d['predictions']
         return task
 
+    def from_list_of_dicts(self, l, start_task_id=0):
+        tasks = {}
+        for i, t in enumerate(l):
+            tasks.update(self.from_dict(t, start_task_id + i))
+        return tasks
+
     def from_json_file(self, path, start_task_id=0):
         with open(path) as f:
             json_body = orjson.loads(f.read())
