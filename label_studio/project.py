@@ -169,7 +169,7 @@ class Project(object):
             self.derived_output_schema['from_name_to_name_type'].add((
                 result['from_name'], result['to_name'], result['type']
             ))
-            for label in result['value'][result['type']]:
+            for label in result['value'].get(result['type'], []):
                 self.derived_output_schema['labels'][result['from_name']].add(label)
 
     def validate_label_config_on_derived_input_schema(self, config_string_or_parsed_config):
