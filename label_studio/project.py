@@ -46,11 +46,7 @@ class Project(object):
         self.label_config_line, self.label_config_full, self.input_data_tags = None, None, None
         self.load_label_config()
 
-        self.derived_input_schema = []
-        self.derived_output_schema = {
-            'from_name_to_name_type': set(),
-            'labels': defaultdict(set)
-        }
+        self.derived_input_schema, self.derived_output_schema = None, None
         self.load_derived_schemas()
 
         self.analytics = None
@@ -74,6 +70,11 @@ class Project(object):
 
     def load_derived_schemas(self):
         num_tasks_loaded = len(self.tasks)
+        self.derived_input_schema = []
+        self.derived_output_schema = {
+            'from_name_to_name_type': set(),
+            'labels': defaultdict(set)
+        }
         if num_tasks_loaded > 0:
             for tag in self.input_data_tags:
                 self.derived_input_schema.append({
@@ -126,6 +127,7 @@ class Project(object):
         self.project_obj.validate_label_config(config_string)
 
         parsed_config = parse_config(config_string)
+
         self.validate_label_config_on_derived_input_schema(parsed_config)
         self.validate_label_config_on_derived_output_schema(parsed_config)
 
