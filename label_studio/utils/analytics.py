@@ -2,10 +2,13 @@ import logging
 import os
 import io
 import requests
+import calendar
 
+from datetime import datetime
 from mixpanel import Mixpanel, MixpanelException
 from copy import deepcopy
 from operator import itemgetter
+
 from uuid import uuid4
 from .misc import get_app_version, parse_config, convert_string_to_hash
 from .io import get_config_dir
@@ -63,6 +66,9 @@ class Analytics(object):
             })
         return label_types
 
+    def _get_timestamp_now(self):
+        return calendar.timegm(datetime.now().timetuple())
+
     def update_info(self, label_config_line, collect_analytics=True, project_name='', context=None):
         if label_config_line != self._label_config_line:
             self._label_types = self._get_label_types()
@@ -86,9 +92,10 @@ class Analytics(object):
 
         json_data = data
         json_data['event'] = event_name
-        json_data['user_id'] = self._user_id
+        json_data['server_id'] = self._user_id
+        json_data['server_time'] = self._get_timestamp_now()
         try:
-            url = 'https://analytics.labelstudio.io/prod'
+            url = 'https://analytics.labelstud.io/prod'
             logger.debug('Sending to {url}:\n{data}'.format(url=url, data=json_data))
             requests.post(url=url, json=json_data)
         except requests.RequestException as exc:

@@ -2,23 +2,23 @@ import os
 import io
 import logging
 import json
-import urllib
-import orjson
 import random
 
 from shutil import copy2
-from collections import OrderedDict, defaultdict
+from collections import defaultdict
 from datetime import datetime
 from operator import itemgetter
+from xml.etree import ElementTree
+from uuid import uuid4
 
 from label_studio_converter import Converter
 
-from label_studio.utils.misc import LabelConfigParser, config_line_stripped, config_comments_free, parse_config
+from label_studio.utils.misc import config_line_stripped, config_comments_free, parse_config
 from label_studio.utils.analytics import Analytics
 from label_studio.utils.models import ProjectObj, MLBackend
 from label_studio.utils.exceptions import ValidationError
-from label_studio.utils.io import find_file, delete_dir_content
-
+from label_studio.utils.io import find_file, delete_dir_content, json_load
+from label_studio.tasks import Tasks
 
 logger = logging.getLogger(__name__)
 
@@ -37,21 +37,76 @@ class Project(object):
         self.config = config
         self.name = name
 
+        self.on_boarding = {}
+        self.context = context or {}
+
         self.tasks = None
+        self.load_tasks()
+
+        self.label_config_line, self.label_config_full, self.input_data_tags = None, None, None
+        self.load_label_config()
+
+        self.derived_input_schema, self.derived_output_schema = None, None
+        self.load_derived_schemas()
+
+        self.analytics = None
+        self.load_analytics()
+
+        self.project_obj, self.ml_backend = None, None
+        self.load_project_ml_backend()
+
+        self.converter = None
+        self.load_converter()
+
+    def load_tasks(self):
+        self.tasks = json_load(self.config['input_path'])
+        self.tasks = {int(k): v for k, v in self.tasks.items()}
+        print(str(len(self.tasks)) + ' tasks loaded from: ' + self.config['input_path'])
+
+    def load_label_config(self):
+        self.label_config_full = config_comments_free(open(self.config['label_config']).read())
+        self.label_config_line = config_line_stripped(self.label_config_full)
+        self.input_data_tags = self.get_input_data_tags(self.label_config_line)
+
+    def load_derived_schemas(self):
+        num_tasks_loaded = len(self.tasks)
         self.derived_input_schema = []
         self.derived_output_schema = {
             'from_name_to_name_type': set(),
             'labels': defaultdict(set)
         }
-        self.label_config_line = None
-        self.label_config_full = None
-        self.ml_backend = None
-        self.project_obj = None
-        self.analytics = None
-        self.converter = None
-        self.on_boarding = {}
-        self.context = context or {}
-        self.reload()
+        if num_tasks_loaded > 0:
+            for tag in self.input_data_tags:
+                self.derived_input_schema.append({
+                    'type': tag.tag,
+                    'value': tag.attrib['value'].lstrip('$')
+                })
+
+        # for all already completed tasks we update derived output schema for further label config validation
+        for task_id in self.get_task_ids():
+            task_with_completions = self.get_task_with_completions(task_id)
+            if task_with_completions and 'completions' in task_with_completions:
+                completions = task_with_completions['completions']
+                for completion in completions:
+                    self._update_derived_output_schema(completion)
+
+    def load_analytics(self):
+        collect_analytics = os.getenv('collect_analytics')
+        if collect_analytics is None:
+            collect_analytics = self.config.get('collect_analytics', True)
+        self.analytics = Analytics(self.label_config_line, collect_analytics, self.name, self.context)
+
+    def load_project_ml_backend(self):
+        # configure project
+        self.project_obj = ProjectObj(label_config=self.label_config_line, label_config_full=self.label_config_full)
+        # configure machine learning backend
+        ml_backend_params = self.config.get('ml_backend')
+        if ml_backend_params:
+            self.ml_backend = MLBackend.from_params(ml_backend_params)
+            self.project_obj.connect(self.ml_backend)
+
+    def load_converter(self):
+        self.converter = Converter(self.label_config_full)
 
     @property
     def id(self):
@@ -72,6 +127,7 @@ class Project(object):
         self.project_obj.validate_label_config(config_string)
 
         parsed_config = parse_config(config_string)
+
         self.validate_label_config_on_derived_input_schema(parsed_config)
         self.validate_label_config_on_derived_output_schema(parsed_config)
 
@@ -81,13 +137,21 @@ class Project(object):
         with io.open(label_config_file, mode='w') as f:
             f.write(new_label_config)
 
+        # reload everything that depends on label config
+        self.load_label_config()
+        self.load_derived_schemas()
+        self.load_analytics()
+        self.load_project_ml_backend()
+        self.load_converter()
+
         # save project config state
         self.config['label_config_updated'] = True
         with io.open(self.config['config_path'], mode='w') as f:
             json.dump(self.config, f)
         logger.info('Label config saved to: {path}'.format(path=label_config_file))
 
-    def _get_single_input_value(self, input_data_tags):
+    @classmethod
+    def _get_single_input_value(cls, input_data_tags):
         if len(input_data_tags) > 1:
             val = ",".join(tag.attrib.get("name") for tag in input_data_tags)
             print('Warning! Multiple input data tags found: ' +
@@ -95,38 +159,6 @@ class Project(object):
         input_data_tag = input_data_tags[0]
         data_key = input_data_tag.attrib.get('value').lstrip('$')
         return data_key
-
-    def _create_task_with_local_uri(self, filepath, data_key, task_id):
-        """ Convert filepath to task with flask serving URL
-        """
-        filename = os.path.basename(self, filepath)
-        params = urllib.parse.urlencode({'d': os.path.dirname(filepath)})
-        base_url = 'http://localhost:{port}/'.format(port=self.config.get("port"))
-        image_url_path = base_url + urllib.parse.quote('data/' + filename)
-        image_local_url = '{image_url_path}?{params}'.format(image_url_path=image_url_path, params=params)
-        return {
-            'id': task_id,
-            'task_path': filepath,
-            'data': {data_key: image_local_url}
-        }
-
-    def is_text_annotation(self, input_data_tags, filepath):
-        return (
-            len(input_data_tags) == 1 and input_data_tags[0].tag == 'Text'
-            and filepath.endswith(self._allowed_extensions['Text'])
-        )
-
-    def is_image_annotation(self, input_data_tags, filepath):
-        return (
-            len(input_data_tags) == 1 and input_data_tags[0].tag == 'Image'
-            and filepath.lower().endswith(self._allowed_extensions['Image'])
-        )
-
-    def is_audio_annotation(self, input_data_tags, filepath):
-        return (
-            len(input_data_tags) == 1 and input_data_tags[0].tag in ('Audio', 'AudioPlus')
-            and filepath.lower().endswith(self._allowed_extensions['Audio'])
-        )
 
     def _update_derived_output_schema(self, completion):
         """
@@ -139,7 +171,7 @@ class Project(object):
             self.derived_output_schema['from_name_to_name_type'].add((
                 result['from_name'], result['to_name'], result['type']
             ))
-            for label in result['value'][result['type']]:
+            for label in result['value'].get(result['type'], []):
                 self.derived_output_schema['labels'][result['from_name']].add(label)
 
     def validate_label_config_on_derived_input_schema(self, config_string_or_parsed_config):
@@ -225,111 +257,6 @@ class Project(object):
                     .format(from_name=from_name, extra_labels=extra_labels)
                 )
 
-    def tasks_from_json_file(self, path):
-        """ Prepare tasks from json
-
-        :param path: path to json with list or dict
-        :param tasks: main db instance of tasks
-        :return: new task id
-        """
-        def push_task(root):
-            task_id = len(self.tasks) + 1
-            data = root['data'] if 'data' in root else root
-            self.tasks[task_id] = {'id': task_id, 'task_path': path, 'data': data}
-            if 'predictions' in data:
-                self.tasks[task_id]['predictions'] = data['predictions']
-                self.tasks[task_id]['data'].pop('predictions', None)
-            if 'predictions' in root:
-                self.tasks[task_id]['predictions'] = root['predictions']
-
-        logger.debug('Reading tasks from JSON file ' + path)
-        with open(path) as f:
-            json_body = orjson.loads(f.read())
-
-            # multiple tasks in file
-            if isinstance(json_body, list):
-                [push_task(data) for data in json_body]
-
-            # one task in file
-            elif isinstance(json_body, dict):
-                push_task(json_body)
-
-            # unsupported task type
-            else:
-                raise Exception('Unsupported task data:', path)
-
-    def _init(self):
-        label_config = LabelConfigParser(self.config['label_config'])
-
-        if not os.path.exists(self.config['output_dir']):
-            os.mkdir(self.config['output_dir'])
-
-        task_id = 0
-        data_key = None
-
-        input_data_tags = label_config.get_input_data_tags()
-
-        # load at first start
-        self.tasks = OrderedDict()
-
-        # file
-        if os.path.isfile(self.config['input_path']):
-            files = [os.path.basename(self.config['input_path'])]
-            root_dir = os.path.normpath(os.path.dirname(self.config['input_path']))
-
-        # directory
-        else:
-            root_dir = os.path.normpath(self.config['input_path'])
-            files = [os.path.join(root, f) for root, _, files in os.walk(root_dir) for f in files \
-                     if 'completion' not in f and 'completion' not in root]
-
-        # walk over all the files
-        for f in files:
-            norm_f = os.path.normpath(f)
-            path = os.path.join(root_dir, norm_f) if not norm_f.startswith(root_dir) else f
-
-            # load tasks from json
-            if f.endswith('.json'):
-                self.tasks_from_json_file(path)
-
-            # load tasks from txt: line by line, task by task
-            elif self.is_text_annotation(input_data_tags, f):
-                if data_key is None:
-                    data_key = self._get_single_input_value(input_data_tags)
-                with io.open(path) as fin:
-                    for line in fin:
-                        task_id = len(self.tasks) + 1
-                        self.tasks[task_id] = {'id': task_id, 'task_path': path, 'data': {data_key: line.strip()}}
-
-            # load tasks from files: creating URI to local resources
-            elif self.is_image_annotation(input_data_tags, f) or self.is_audio_annotation(input_data_tags, f):
-                if data_key is None:
-                    data_key = self._get_single_input_value(input_data_tags)
-                task_id = len(self.tasks) + 1
-                self.tasks[task_id] = self._create_task_with_local_uri(f, data_key, task_id)
-            else:
-                logger.warning('Unrecognized file format for file ' + f)
-
-        num_tasks_loaded = len(self.tasks)
-
-        # make derived input schema
-        if num_tasks_loaded > 0:
-            for tag in input_data_tags:
-                self.derived_input_schema.append({
-                    'type': tag.tag,
-                    'value': tag.attrib['value'].lstrip('$')
-                })
-
-        # for all already completed tasks we update derived output schema for further label config validation
-        for task_id in self.get_task_ids():
-            task_with_completions = self.get_task_with_completions(task_id)
-            if task_with_completions and 'completions' in task_with_completions:
-                completions = task_with_completions['completions']
-                for completion in completions:
-                    self._update_derived_output_schema(completion)
-
-        print(str(len(self.tasks)) + ' tasks loaded from: ' + self.config['input_path'])
-
     def get_tasks(self):
         """ Load tasks from JSON files in input_path directory
 
@@ -343,9 +270,13 @@ class Project(object):
         :return:
         """
         delete_dir_content(self.config['output_dir'])
-        with io.open(self.config['input_path'], mode='w') as f:
-            json.dump([], f)
-        self.reload()
+        if os.path.exists(self.config['input_path']) and os.path.isfile(self.config['input_path']):
+            with io.open(self.config['input_path'], mode='w') as f:
+                json.dump({}, f)
+
+        # reload everything related to tasks
+        self.load_tasks()
+        self.load_derived_schemas()
 
     def iter_tasks(self):
         sampling = self.config.get('sampling', 'sequential')
@@ -468,42 +399,39 @@ class Project(object):
         filename = os.path.join(self.config['output_dir'], str(task_id) + '.json')
         os.remove(filename)
 
-    def reload(self):
-        self.tasks = None
-        self.derived_input_schema = []
-        self.derived_output_schema = {
-            'from_name_to_name_type': set(),
-            'labels': defaultdict(set)
-        }
-
-        self._init()
-
-        self.label_config_full = config_comments_free(open(self.config['label_config']).read())
-        self.label_config_line = config_line_stripped(self.label_config_full)
-
-        collect_analytics = os.getenv('collect_analytics')
-        if collect_analytics is None:
-            collect_analytics = self.config.get('collect_analytics', True)
-        if self.analytics is None:
-            self.analytics = Analytics(self.label_config_line, collect_analytics, self.name, self.context)
-        else:
-            self.analytics.update_info(self.label_config_line, collect_analytics, self.name, self.context)
-
-        # configure project
-        self.project_obj = ProjectObj(label_config=self.label_config_line, label_config_full=self.label_config_full)
-
-        # configure machine learning backend
-        if self.ml_backend is None:
-            ml_backend_params = self.config.get('ml_backend')
-            if ml_backend_params:
-                ml_backend = MLBackend.from_params(ml_backend_params)
-                self.project_obj.connect(ml_backend)
-
-        self.converter = Converter(self.label_config_full)
-
     @classmethod
     def get_project_dir(cls, project_name, args):
         return os.path.join(args.root_dir, project_name)
+
+    @classmethod
+    def get_input_data_tags(cls, label_config):
+        tag_iter = ElementTree.fromstring(label_config).iter()
+        return [
+            tag for tag in tag_iter
+            if tag.attrib.get('name') and tag.attrib.get('value', '').startswith('$')
+        ]
+
+    @classmethod
+    def _load_tasks(cls, input_path, args, label_config_file):
+        with io.open(label_config_file) as f:
+            label_config = f.read()
+
+        task_loader = Tasks()
+        if args.input_format == 'json':
+            return task_loader.from_json_file(input_path)
+        if args.input_format == 'json-dir':
+            return task_loader.from_dir_with_json_files(input_path)
+        input_data_tags = cls.get_input_data_tags(label_config)
+        data_key = Project._get_single_input_value(input_data_tags)
+        if args.input_format == 'text':
+            return task_loader.from_text_file(input_path, data_key)
+        if args.input_format == 'text-dir':
+            return task_loader.from_dir_with_text_files(input_path, data_key)
+        if args.input_format == 'image-dir':
+            return task_loader.from_dir_with_image_files(input_path, data_key)
+        if args.input_format == 'audio-dir':
+            return task_loader.from_dir_with_audio_files(input_path, data_key)
+        raise RuntimeError('Can\'t load tasks for input format={}'.format(args.input_format))
 
     @classmethod
     def create_project_dir(cls, project_name, args):
@@ -517,81 +445,74 @@ class Project(object):
         """
         dir = cls.get_project_dir(project_name, args)
         os.makedirs(dir, exist_ok=True)
-        label_config_name = 'config.xml'
-        output_dir_name = 'completions'
-        input_path_name = 'tasks.json'
-        default_config_file = os.path.join(dir, 'config.json')
-        default_label_config_file = os.path.join(dir, label_config_name)
-        default_output_dir = os.path.join(dir, output_dir_name)
-        default_input_path = os.path.join(dir, input_path_name)
 
-        if hasattr(args, 'config_path') and args.config_path:
-            copy2(args.config_path, default_config_file)
-        if hasattr(args, 'input_path') and args.input_path:
-            copy2(args.input_path, default_input_path)
-        if hasattr(args, 'output_dir') and args.output_dir:
-            if os.path.exists(args.output_dir):
-                copy2(args.output_dir, default_output_dir)
-        if hasattr(args, 'label_config') and args.label_config:
-            copy2(args.label_config, default_label_config_file)
+        config = json_load(args.config_path) if args.config_path else json_load(find_file('default_config.json'))
 
-        default_config = {
-            'title': 'Label Studio',
-            'port': 8200,
-            'debug': False,
+        def already_exists_error(what, path):
+            raise RuntimeError('{path} {what} already exists. Use "--force" option to recreate it.'.format(
+                path=path, what=what
+            ))
 
-            'label_config': label_config_name,
-            'input_path': input_path_name,
-            'output_dir': output_dir_name,
-
-            'instruction': 'Type some <b>hypertext</b> for label experts!',
-            'allow_delete_completions': True,
-            'templates_dir': 'examples',
-
-            'editor': {
-                'debug': False
-            },
-
-            '!ml_backend': {
-                'url': 'http://localhost:9090',
-                'model_name': 'my_super_model'
-            },
-            'sampling': 'uniform'
-        }
-
-        # create input_path (tasks.json)
-        if not os.path.exists(default_input_path):
-            with io.open(default_input_path, mode='w') as fout:
-                json.dump([], fout, indent=2)
-            print(default_input_path + ' input path has been created.')
+        # save label config
+        config_xml = 'config.xml'
+        config_xml_path = os.path.join(dir, config_xml)
+        label_config_file = args.label_config or config.get('label_config')
+        if label_config_file:
+            copy2(label_config_file, config_xml_path)
+            print(label_config_file + ' label config copied to ' + config_xml_path)
         else:
-            print(default_input_path + ' input path already exists.')
+            if os.path.exists(config_xml_path) and not args.force:
+                already_exists_error('label config', config_xml_path)
+            default_label_config = find_file('examples/image_polygons/config.xml')
+            copy2(default_label_config, config_xml_path)
+            print(default_label_config + ' label config copied to ' + config_xml_path)
+        config['label_config'] = config_xml
 
-        # create config file (config.json)
-        if not os.path.exists(default_config_file):
-            with io.open(default_config_file, mode='w') as fout:
-                json.dump(default_config, fout, indent=2)
-            print(default_config_file + ' config file has been created.')
+        # save tasks.json
+        tasks_json = 'tasks.json'
+        tasks_json_path = os.path.join(dir, tasks_json)
+        input_path = args.input_path or config.get('input_path')
+        if input_path:
+            tasks = cls._load_tasks(input_path, args, config_xml_path)
+            with io.open(tasks_json_path, mode='w') as fout:
+                json.dump(tasks, fout, indent=2)
+            print(tasks_json_path + ' input path has been created from ' + input_path)
         else:
-            print(default_config_file + ' config file already exists.')
+            if os.path.exists(tasks_json_path) and not args.force:
+                already_exists_error('input path', tasks_json_path)
+            with io.open(tasks_json_path, mode='w') as fout:
+                json.dump({}, fout)
+            print(tasks_json_path + ' input path has been created with empty tasks.')
+        config['input_path'] = tasks_json
 
-        # create label config (config.xml)
-        if not os.path.exists(default_label_config_file):
-            path = find_file('examples/image_polygons/config.xml')
-            default_label_config = open(path).read()
-
-            with io.open(default_label_config_file, mode='w') as fout:
-                fout.write(default_label_config)
-            print(default_label_config_file + ' label config file has been created.')
+        # create completions dir
+        completions_dir = os.path.join(dir, 'completions')
+        if os.path.exists(completions_dir) and not args.force:
+            already_exists_error('output dir', completions_dir)
+        if os.path.exists(completions_dir):
+            delete_dir_content(completions_dir)
+            print(completions_dir + ' output dir already exists. Clear it.')
         else:
-            print(default_label_config_file + ' label config file already exists.')
+            os.makedirs(completions_dir, exist_ok=True)
+            print(completions_dir + ' output dir has been created.')
+        config['output_dir'] = 'completions'
 
-        # create output dir (completions)
-        if not os.path.exists(default_output_dir):
-            os.makedirs(default_output_dir)
-            print(default_output_dir + ' output directory has been created.')
-        else:
-            print(default_output_dir + ' output directory already exists.')
+        if args.ml_backend_url:
+            if 'ml_backend' not in config or not isinstance(config['ml_backend'], dict):
+                config['ml_backend'] = {}
+            config['ml_backend']['url'] = args.ml_backend_url
+            if args.ml_backend_name:
+                config['ml_backend']['name'] = args.ml_backend_name
+            else:
+                config['ml_backend']['name'] = str(uuid4())
+
+        # create config.json
+        config_json = 'config.json'
+        config_json_path = os.path.join(dir, config_json)
+        if os.path.exists(config_json_path) and not args.force:
+            already_exists_error('config', config_json_path)
+        with io.open(config_json_path, mode='w') as f:
+            json.dump(config, f, indent=2)
 
         print('')
         print('Label Studio has been successfully initialized. Check project states in ' + dir)
@@ -601,67 +522,34 @@ class Project(object):
     @classmethod
     def _get_config(cls, project_dir, args):
         """
-        Get config path from input args Namespace acquired by Argparser
-        :param args:
+        Get config from input args Namespace acquired by Argparser
         :param args:
         :return:
         """
-        # if config is explicitly specified, just return it
-        if args.config_path:
-            config_path = args.config_path
-        else:
-            # check if project directory exists
-            if not os.path.exists(project_dir):
-                raise FileNotFoundError(
-                    'Couldn\'t find directory ' + project_dir +
-                    ', maybe you\'ve missed appending "--init" option:\nlabel-studio start ' +
-                    args.project_name + ' --init'
-                )
+        # check if project directory exists
+        if not os.path.exists(project_dir):
+            raise FileNotFoundError(
+                'Couldn\'t find directory ' + project_dir +
+                ', maybe you\'ve missed appending "--init" option:\nlabel-studio start ' +
+                args.project_name + ' --init'
+            )
 
-            # check config.json exists in directory
-            config_path = os.path.join(project_dir, 'config.json')
-            if not os.path.exists(config_path):
-                raise FileNotFoundError(
-                    'Couldn\'t find config file ' + config_path + ' in project directory ' + project_dir +
-                    ', maybe you\'ve missed appending "--init" option:\nlabel-studio start ' + args.project_name + ' --init'
-                )
+        # check config.json exists in directory
+        config_path = os.path.join(project_dir, 'config.json')
+        if not os.path.exists(config_path):
+            raise FileNotFoundError(
+                'Couldn\'t find config file ' + config_path + ' in project directory ' + project_dir +
+                ', maybe you\'ve missed appending "--init" option:\nlabel-studio start ' + args.project_name + ' --init'
+            )
 
         config_path = os.path.abspath(config_path)
         with io.open(config_path) as c:
             config = json.load(c)
 
-        if args.port:
-            config['port'] = args.port
-
-        if args.label_config:
-            config['label_config'] = args.label_config
-
-        if args.input_path:
-            config['input_path'] = args.input_path
-
-        if args.output_dir:
-            config['output_dir'] = args.output_dir
-
-        if args.debug is not None:
-            config['debug'] = args.debug
-
-        if args.ml_backend_url:
-            if 'ml_backend' not in config:
-                config['ml_backend'] = {}
-            config['ml_backend']['url'] = args.ml_backend_url
-
-        if args.ml_backend_name:
-            if 'ml_backend' not in config:
-                config['ml_backend'] = {}
-            config['ml_backend']['name'] = args.ml_backend_name
-
-        # absolutize paths relative to config.json
-        config_dir = os.path.dirname(config_path)
-        config['label_config'] = os.path.join(config_dir, config['label_config'])
-        config['input_path'] = os.path.join(config_dir, config['input_path'])
-        config['output_dir'] = os.path.join(config_dir, config['output_dir'])
         config['config_path'] = config_path
-
+        config['input_path'] = os.path.join(os.path.dirname(config_path), config['input_path'])
+        config['label_config'] = os.path.join(os.path.dirname(config_path), config['label_config'])
+        config['output_dir'] = os.path.join(os.path.dirname(config_path), config['output_dir'])
         return config
 
     @classmethod
@@ -681,6 +569,7 @@ class Project(object):
         if os.path.exists(project_dir):
             project = cls._load_from_dir(project_dir, project_name, args, context)
             cls._storage[project_name] = project
+            return project
 
         raise KeyError('Project {p} doesn\'t exist'.format(p=project_name))
 
