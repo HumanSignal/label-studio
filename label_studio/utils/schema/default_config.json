@@ -1,0 +1,23 @@
+{
+    "title": "Label Studio",
+    "port": 8200,
+    "debug": false,
+
+    "label_config": null,
+    "input_path": null,
+    "output_dir": "completions",
+
+    "instruction": "Type some <b>hypertext</b> for label experts!",
+    "allow_delete_completions": true,
+    "templates_dir": "examples",
+
+    "editor": {
+        "debug": false
+    },
+
+    "!ml_backend": {
+        "url": "http://localhost:9090",
+        "model_name": "my_super_model"
+    },
+    "sampling": "uniform"
+}
