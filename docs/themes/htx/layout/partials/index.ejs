@@ -25,21 +25,19 @@
      font-weight: bold;
      border-radius: 4px;
      color: rgba(0,0,0,0.65);
-     background-color: #fff;
-     border-color: #d9d9d9;
-     
+
      color: #fff;
      background-color: #1890ff;
      border-color: #1890ff;
      text-shadow: 0 -1px 0 rgba(0,0,0,0.12);
      -webkit-box-shadow: 0 2px 0 rgba(0,0,0,0.045);
      box-shadow: 0 2px 0 rgba(0,0,0,0.045);
-     margin-right: 10px;
-     padding-top: 7px;
+     margin: 5px;
+     padding-top: 9px;
  }
 
 .btn-slack {
-           background-color: #3f0e40;
+           background-color: #5c175d;
            border-color: #8b538c;
 }
 
@@ -194,6 +192,7 @@
  .footer .item {
    margin-right: 10px;
    margin-left: 10px;
+   line-height: 1.8em;
  }
  
 
@@ -344,12 +343,13 @@ img {
                   <li>— Mobile-Friendly, adaptable for any device</li>
                   <li>— Visually configurable from top to the bottom</li>
                 </ul>
-                <div style="display: flex; flex-direction: rows; margin-top: 1em;">
-                  <div>
-                      <a href="https://app.labelstud.io?ref=labelstud.io" class="btn">Try Demo</a>
-                  <a href="<%- url_for("guide/") %>" class="btn">Get Started</a>
-                  <a href="https://docs.google.com/forms/d/e/1FAIpQLSdLHZx5EeT1J350JPwnY2xLanfmvplJi6VZk65C2R4XSsRBHg/viewform?usp=sf_link" class="btn btn-slack"><img src="<%- url_for("/images/slack.png") %>" height="18" style="margin-right: 8px;"  />Join Slack</a>
-                  </div>
+                <div style="display: flex; flex-direction: row; margin-top: 2em;">
+                  <center>
+                      <a href="https://app.labelstud.io/welcome?ref=labelstud.io" class="btn">Try Demo</a>
+                      <a href="<%- url_for("guide/") %>" class="btn">Get Started</a>
+                      <a href="https://docs.google.com/forms/d/e/1FAIpQLSdLHZx5EeT1J350JPwnY2xLanfmvplJi6VZk65C2R4XSsRBHg/viewform?usp=sf_link" class="btn btn-slack">
+                      <img src="<%- url_for("/images/slack.png") %>" height="18" style="margin-right: 8px;"  />Join Slack</a>
+                  </center>
                   <!-- <div><a href="" class="btn">Watch video</a></div> -->
                 </div>
               </div>                            
@@ -361,7 +361,16 @@ img {
 
           <div class="slider-wrapper">
             <div class="slider">
-              <input type="radio" name="slider" class="trigger" id="one" checked="checked" />
+              <input type="radio" name="slider" class="trigger" id="zero" checked="checked" />
+              <!-- GIF -->
+              <div class="slide">
+                <figure class="slide-figure">
+                  <img class="slide-img" src="/images/annotation_examples.gif" style="border-radius: 5px;" />
+                </figure>
+              </div>
+
+              <!-- Images -->
+              <input type="radio" name="slider" class="trigger" id="one" />
               <div class="slide">
                 <figure class="slide-figure">
                   <img class="slide-img" src="/images/screens/image_bbox.png" />
@@ -398,6 +407,7 @@ img {
               </div>
             </div>
             <ul class="slider-nav">
+              <li class="slider-nav__item"><label class="slider-nav__label" for="zero"> </label></li>
               <li class="slider-nav__item"><label class="slider-nav__label" for="one"> </label></li>
               <li class="slider-nav__item"><label class="slider-nav__label" for="two"> </label></li>
               <li class="slider-nav__item"><label class="slider-nav__label" for="three"> </label></li>
@@ -465,7 +475,7 @@ img {
         </section>
         
         <div class="footer">
-          <div style="display: flex; width: 100%; margin-right: 30px">
+          <div style="display: flex; width: 100%; margin-right: 30px; max-width: 800px">
 
             <div style="padding-top: 6px; margin-right: 30px">
               <a href="/"><img src="<%- url_for("/images/opossum/other/opossum_looking.svg") %>" alt="label studio logo" height="100" /></a>
