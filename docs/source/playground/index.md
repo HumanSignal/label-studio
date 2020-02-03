@@ -124,17 +124,23 @@ order: 201
       <textarea name="label_config" cols="40" rows="10" class="project-form htx-html-editor"
                 id="id_label_config"></textarea>
       </div>
-      <div class="validation"></div><br>
     </div>
     <div class="preview-col">
       <h3>Interface preview</h3>
-      <div id="editor-wrap"></div>
-      <pre class="preview" id="preload-editor">...</pre>
+      <div class="validation"></div><br>
+      <div id="editor-wrap">   
+      </div >
+      <div class="preview" id="preload-editor">
+        <div class="loading" style="margin: 20px; opacity: 0.8">
+            <img width="40px" src="/images/loading.gif">
+            <span style="position: relative; top: -14px">&nbsp;&nbsp;&nbsp;Loading Label Studio, please wait ...</span>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
-<!--  & Preview in two cols -->
+<!-- Preview in two cols -->
 <div class="data-row">
   <div class="input-col">
     <h3>Input preview</h3>
@@ -152,6 +158,8 @@ order: 201
 </div>
 
 <script>
+ var iframeTimer = null;
+  
  function debounce(func, wait, immediate) {
      let timeout;
 
@@ -215,8 +223,8 @@ order: 201
         value="Select label, start to click on image"/>
         
   <PolygonLabels name="tag" toName="img">
-    <Label value="Opossum" background="red"/>
-    <Label value="Cat" background="blue"/>  
+    <Label value="Airbus" background="blue"/>
+    <Label value="Boeing" background="red"/>  
   </PolygonLabels>
 </View>
 
@@ -275,7 +283,7 @@ order: 201
          let iframe = $('<iframe><iframe>');
          iframe.className="editor-preview";
          // add iframe to wrapper div
-         $('#editor-wrap').append(iframe);
+         $('#editor-wrap').html(iframe);
          $('#editor-wrap').fadeIn();
          
          iframe.on('load', function () {
@@ -287,9 +295,13 @@ order: 201
              // force to hide undo / redo / reset buttons 
              $('#render-editor').contents().find('head').append('<style>.ls-panel{display:none;}</style>');
              iframe.show();
-             // set height for iframe
              let obj = document.getElementById('render-editor');
-             obj.style.height = (obj.contentWindow.document.body.scrollHeight + 30) + 'px';
+             
+             // wait until all images and resources from iframe loading
+             clearTimeout(iframeTimer);
+             iframeTimer = setInterval(function () {
+               obj.style.height = (obj.contentWindow.document.body.scrollHeight) + 'px';
+             }, 500);
              // hide "..."
              $('#preload-editor').hide();
          });

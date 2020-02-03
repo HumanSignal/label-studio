@@ -16,10 +16,10 @@ HyperText tag shows an HTML markup that can be labeled
 
 ```html
 <View>
-  <Labels name="type" toName="html-1">
+  <HyperTextLabels name="type" toName="html-1">
     <Label alias="B" value="Brand"></Label>
     <Label alias="P" value="Product"></Label>
-  </Labels>
+  </HyperTextLabels>
   <HyperText name="html-1" value="$text"></HyperText>
 </View>
 ```
