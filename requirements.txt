@@ -32,4 +32,4 @@ flask_api>=2.0
 pandas>=0.24.0
 jsonschema>=3.2.0
 xmljson==0.2.0
-label-studio-converter>=0.0.4
+label-studio-converter>=0.0.7
