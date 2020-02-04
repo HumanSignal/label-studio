@@ -44,7 +44,7 @@
     <% if (page.type === "playground") { %>
       <%- css('css/codemirror') %>
       <script src="<%- url_for("/js/jquery.min.js") %>"></script>
-      <script src="<%- url_for("/js/jquery-ui.js") %>"></script>
+      <script src="<%- url_for("/js/jquery-ui.min.js") %>"></script>
       <script src="<%- url_for("/js/codemirror.js") %>"></script>
       <script src="<%- url_for("/js/xml.js") %>"></script>      
     <% } %>
@@ -53,7 +53,7 @@
     
   </head>
   <body class="<%- isIndex ? '' : 'docs' -%>">
-    <div id="mobile-bar" <%- isIndex ? 'class="top"' : '' %>>
+    <div id="mobile-bar" <%- isIndex ? 'style="display: none"' : '' %>>
         <a class="menu-button"></a>
     </div>
     <% if (!isIndex) { %> <%- partial('partials/header') %> <% } %>
