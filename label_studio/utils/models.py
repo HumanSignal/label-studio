@@ -422,7 +422,7 @@ class MLBackend(object):
     @classmethod
     def from_params(cls, params):
         ml_api = MLApi(params['url'])
-        m = MLBackend(api=ml_api, model_name=params['model_name'])
+        m = MLBackend(api=ml_api, model_name=params['name'])
         m.restore_train_job()
         return m
 
