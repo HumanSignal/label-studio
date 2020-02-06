@@ -37,7 +37,6 @@ class TaskValidator:
     def check_data(project, data):
         """ Validate data from task['data']
         """
-
         if data is None:
             raise ValidationError('Task is empty (None)')
 
@@ -92,7 +91,7 @@ class TaskValidator:
 
     @staticmethod
     def check_allowed(task):
-        allowed = ['data', 'completions', 'predictions', 'meta']
+        allowed = ['data', 'completions', 'predictions', 'meta', 'id']
 
         # check each task filled
         for key in task.keys():

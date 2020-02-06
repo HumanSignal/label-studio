@@ -351,7 +351,7 @@ class MLApi(BaseHTTPAPI):
         """
         return self._post('setup', request={
             'project': self._create_project_uid(project),
-            'schema': project.ml_backend_active_connection.schema
+            'schema': project.schema
         })
 
     def delete(self, project):
@@ -445,6 +445,14 @@ class MLBackend(object):
 
     def make_predictions(self, task, project):
         if self._api_exists():
+            r = self.api.setup(project)
+            if not r.is_error:
+                model_version = r.response['model_version']
+                if self.model_version != model_version:
+                    self.model_version = model_version
+                    logger.debug('Model version has changed: ' + model_version)
+                else:
+                    logger.debug('Model version hasn\'t changed: ' + model_version)
             response = self.api.predict([task], self.model_version, project)
             if response.is_error:
                 if response.status_code == 404:
@@ -480,3 +488,11 @@ class MLBackend(object):
                     logger.warning('ML backend returns multiple schemas for label config ' + label_config + ': ' +
                                    schema + '\nWe currently support only one schema, so 0th schema is used.')
                 return schema[0]
+
+    def clear(self, project):
+        if self._api_exists():
+            response = self.api.delete(project)
+            if response.is_error:
+                logger.error('Can\'t clear ML backend for project ' + project.name + ': ' + response.error_message)
+            else:
+                logger.info('ML backend for project ' + project.name + ' has been cleared.')

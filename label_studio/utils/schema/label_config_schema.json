@@ -102,10 +102,11 @@
           "$ref": "#/definitions/$"
         },
         "Label": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Label"
-          }
+          "anyOf": [{
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/Label"
+            }}, {"$ref": "#/definitions/Label"}]
         }
       }
     }
@@ -123,6 +124,30 @@
           }, {"$ref": "#/definitions/Choices"}]
         },
         "Labels": {
+          "anyOf": [{
+            "type": "array",
+            "items": {"$ref": "#/definitions/Labels"}
+          }, {"$ref": "#/definitions/Labels"}]
+        },
+        "RectangleLabels": {
+          "anyOf": [{
+            "type": "array",
+            "items": {"$ref": "#/definitions/Labels"}
+          }, {"$ref": "#/definitions/Labels"}]
+        },
+        "PolygonLabels": {
+          "anyOf": [{
+            "type": "array",
+            "items": {"$ref": "#/definitions/Labels"}
+          }, {"$ref": "#/definitions/Labels"}]
+        },
+        "KeypointLabels": {
+          "anyOf": [{
+            "type": "array",
+            "items": {"$ref": "#/definitions/Labels"}
+          }, {"$ref": "#/definitions/Labels"}]
+        },
+        "HyperTextLabels": {
           "anyOf": [{
             "type": "array",
             "items": {"$ref": "#/definitions/Labels"}
