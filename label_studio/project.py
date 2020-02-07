@@ -175,10 +175,11 @@ class Project(object):
         :return:
         """
         for result in completion['result']:
+            result_type = result.get('type')
             self.derived_output_schema['from_name_to_name_type'].add((
-                result['from_name'], result['to_name'], result['type']
+                result['from_name'], result['to_name'], result_type
             ))
-            for label in result['value'].get(result['type'], []):
+            for label in result['value'].get(result_type, []):
                 self.derived_output_schema['labels'][result['from_name']].add(label)
 
     def validate_label_config_on_derived_input_schema(self, config_string_or_parsed_config):
@@ -270,7 +271,8 @@ class Project(object):
                 json.dump({}, f)
 
         # delete everything on ML backend
-        self.ml_backend.clear(self)
+        if self.ml_backend:
+            self.ml_backend.clear(self)
 
         # reload everything related to tasks
         self.load_tasks()
