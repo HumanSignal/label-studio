@@ -283,7 +283,6 @@ class Project(object):
             actual_tasks = (self.tasks[task_id] for task_id in self.tasks if task_id not in completed_tasks_ids)
             return next(actual_tasks, None)
         elif sampling == 'uniform':
-            print('!!!!', list(self.tasks.keys()), completed_tasks_ids)
             actual_tasks_ids = [task_id for task_id in self.tasks if task_id not in completed_tasks_ids]
             if not actual_tasks_ids:
                 return None

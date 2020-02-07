@@ -177,7 +177,6 @@ const LSB = function(elid, config, task) {
     user: { pk: 1, firstName: "Awesome", lastName: "User" },
 
     task: _convertTask(task),
-    usePrediction: true,
     interfaces: [
       "basic",
       "panel", // undo, redo, reset panel
