@@ -276,14 +276,19 @@ class Project(object):
         self.load_tasks()
         self.load_derived_schemas()
 
-    def iter_tasks(self):
+    def next_task(self, completed_tasks_ids):
+        completed_tasks_ids = set(completed_tasks_ids)
         sampling = self.config.get('sampling', 'sequential')
         if sampling == 'sequential':
-            return self.tasks.items()
+            actual_tasks = (self.tasks[task_id] for task_id in self.tasks if task_id not in completed_tasks_ids)
+            return next(actual_tasks, None)
         elif sampling == 'uniform':
-            keys = list(self.tasks.keys())
-            random.shuffle(keys)
-            return ((k, self.tasks[k]) for k in keys)
+            print('!!!!', list(self.tasks.keys()), completed_tasks_ids)
+            actual_tasks_ids = [task_id for task_id in self.tasks if task_id not in completed_tasks_ids]
+            if not actual_tasks_ids:
+                return None
+            random.shuffle(actual_tasks_ids)
+            return self.tasks[actual_tasks_ids[0]]
         else:
             raise NotImplementedError('Unknown sampling method ' + sampling)
 

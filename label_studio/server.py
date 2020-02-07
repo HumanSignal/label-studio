@@ -127,7 +127,7 @@ def labeling_page():
         task_data = project.get_task_with_completions(task_id) or project.get_task(task_id)
         if project.ml_backend:
             task_data = deepcopy(task_data)
-            task_data['predictions'] = project.ml_backend.make_predictions(task_data, project)
+            task_data['predictions'] = project.ml_backend.make_predictions(task_data, project.project_obj)
 
     project.analytics.send(getframeinfo(currentframe()).function)
     return flask.render_template(
@@ -446,22 +446,21 @@ def api_export():
 def api_generate_next_task():
     """ Generate next task to label
     """
-    # try to find task is not presented in completions
     project = project_get_or_create()
-    completions = project.get_completions_ids()
-    for task_id, task in project.iter_tasks():
-        if task_id not in completions:
-            log.info(msg='New task for labeling', extra=task)
-            project.analytics.send(getframeinfo(currentframe()).function)
-            # try to use ml backend for predictions
-            if project.ml_backend:
-                task = deepcopy(task)
-                task['predictions'] = project.ml_backend.make_predictions(task, project.project_obj)
-            return make_response(jsonify(task), 200)
+    # try to find task is not presented in completions
+    completed_tasks_ids = project.get_completions_ids()
+    task = project.next_task(completed_tasks_ids)
+    if not task:
+        # no tasks found
+        project.analytics.send(getframeinfo(currentframe()).function, error=404)
+        return make_response('', 404)
 
-    # no tasks found
-    project.analytics.send(getframeinfo(currentframe()).function, error=404)
-    return make_response('', 404)
+    project.analytics.send(getframeinfo(currentframe()).function)
+    # try to use ml backend for predictions
+    if project.ml_backend:
+        task = deepcopy(task)
+        task['predictions'] = project.ml_backend.make_predictions(task, project.project_obj)
+    return make_response(jsonify(task), 200)
 
 
 @app.route('/api/project/', methods=['POST', 'GET'])
