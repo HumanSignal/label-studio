@@ -6,9 +6,9 @@ order: 504
 
 There are two possible ways to import data to your labeling project:
 
-1. Start Label Studio without specifying input path and then import through the web interfaces available at [http://127.0.0.1:8200/import](here)
+ - Start Label Studio without specifying input path and then import through the web interfaces available at [http://127.0.0.1:8200/import](here)
 
-2. Initialize Label Studio project by directly specifying the paths, e.g. `label-studio init --input-path my_tasks.json --input-format json`
+ - Initialize Label Studio project by directly specifying the paths, e.g. `label-studio init --input-path my_tasks.json --input-format json`
 
 The `--input-path` argument points to a file or a directory where your labeling tasks reside. By default it expects [JSON-formatted tasks](config.html#JSON-file),
 but you can also specify all other formats listed bellow by using `--input-format` option. 
@@ -36,6 +36,19 @@ Depending on the object tag type, field values are interpreted differently:
 - `<Audio>`: value is taken as a valid URL to audio file
 - `<AudioPlus>`: value is taken as a valid URL to an audio file with CORS policy enabled on the server side
 - `<Image>`: is a valid URL to an image file
+
+#### Predefined completions and predictions
+
+In case you want to import predefined completions and/or predictions for labeling (e.g. after being exported from another Label Studio's project in [JSON format](#Export-data)),
+use the following high level task structure
+```json
+{
+  "data": {"my_key": "my_value_1"},
+  "completions": [...],
+  "predictions": [...]
+}
+```
+where `"completions"` and `"predictions"` are taken from [raw completion format](#Completion-format)
 
 
 ### Directory with JSON files
@@ -99,8 +112,69 @@ label-studio init --input-path=my/audios/dir --input-format=audio-dir
 You can point to a local directory, which is scanned recursively for image files. Each file is used to create one task. 
 
 Supported formats are `.wav, .aiff, .mp3, .au, .flac`
-   
+
+
 ## Export data
+
+Your annotation results are stored in [raw completion format](#Completion-format) inside `my_project_name/completions` directory, one file per labeled task named as `task_id.json`.
+
+You can optionally convert and export raw completions to more common format by doing one of the following:
+
+- From [/export](http://localhost:8200/export) page by choosing target format;
+- Applying [converter tool](https://github.com/heartexlabs/label-studio-converter) to `my_project_name/completions` directory
+
+
+Several _Export formats_ are supported:
+
+### JSON
+
+List of items in [raw completion format](#Completion-format) stored in JSON file
+
+### JSON_MIN
+
+List of items where only `"from_name", "to_name"` values from [raw completion format](#Completion-format) are kept:
+
+```json
+{
+  "image": "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg",
+  "tag": [{
+    "height": 10.458911419423693,
+    "rectanglelabels": [
+        "Moonwalker"
+    ],
+    "rotation": 0,
+    "width": 12.4,
+    "x": 50.8,
+    "y": 5.869797225186766
+  }]
+}
+```
+
+### CSV
+
+Results are stored in comma-separated tabular file with column names specified by `"from_name"` `"to_name"` values
+
+### TSV
+
+Results are stored in tab-separated tabular file with column names specified by `"from_name"` `"to_name"` values
+
+
+### CONLL2003
+
+Popular format used for [CoNLL-2003 named entity recognition challenge](https://www.clips.uantwerpen.be/conll2003/ner/)
+
+
+### COCO
+
+Popular machine learning format used by [COCO dataset](http://cocodataset.org/#home) for object detection and image segmentation tasks
+
+
+### Pascal VOC XML
+
+Popular XML-formatted task data used for object detection and image segmentation tasks
+
+
+## Completion format
 
 The output data is stored in _completions_ - JSON formatted files, one per each completed task saved in project directory in `completions` folder or in the [`"output_dir"` option](config.html#output_dir) The example structure of _completion_ is the following:
 
@@ -182,12 +256,9 @@ The output data is stored in _completions_ - JSON formatted files, one per each 
                 }
             ]
         }
-    ],
-    "task_path": "../examples/image_bbox/tasks.json"
+    ]
 }
 ```
-
-For popular machine learning libraries, there is a converter code to transform Label Studio format into an ML library format. [Learn More](/guide/converters.html)  about it.
 
 ### completions
 
@@ -236,7 +307,3 @@ Task identifier
 ### predictions
 
 Machine learning predictions (aka _pre-labeling results_)
-
-### task_path
-
-Path to local file from where the current task was taken
