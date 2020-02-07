@@ -32,13 +32,16 @@ class Tasks(object):
 
     def from_dict(self, d, task_id=0):
         task = {}
-        data = d['data'] if 'data' in d else d
-        task[task_id] = {'id': task_id, 'data': data}
-        if 'predictions' in data:
-            task[task_id]['predictions'] = data['predictions']
-            task[task_id]['data'].pop('predictions', None)
-        if 'predictions' in d:
-            task[task_id]['predictions'] = d['predictions']
+        if 'data' in d and isinstance(d['data'], dict):
+            # if "data" key is presented, task is considered underneath
+            task[task_id] = {'id': task_id, 'data': d['data']}
+            if 'completions' in d:
+                task[task_id]['completions'] = d['completions']
+            if 'predictions' in d:
+                task[task_id]['predictions'] = d['predictions']
+        else:
+            # all input dict is considered as task data, no completions/predictions is expected
+            task[task_id] = {'id': task_id, 'data': d}
         return task
 
     def from_list_of_dicts(self, l, start_task_id=0):

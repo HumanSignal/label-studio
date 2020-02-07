@@ -115,9 +115,16 @@ const loadNext = function(ls) {
         ls.resetState();
         ls.assignTask(response);
         ls.initializeStore(_convertTask(response));
+        let cs = ls.completionStore;
+        let c;
+        if (cs.predictions.length > 0) {
+          c = ls.completionStore.addCompletionFromPrediction(cs.predictions[0]);
+        }
+        else {
+          c = ls.completionStore.addCompletion({ userGenerate: true });
+        }
 
-        const c = ls.completionStore.addCompletion({ userGenerate: true });
-        ls.completionStore.selectCompletion(c.id);
+        cs.selectCompletion(c.id);
 
         ls.setFlags({ isLoading: false });
 
@@ -170,13 +177,13 @@ const LSB = function(elid, config, task) {
     user: { pk: 1, firstName: "Awesome", lastName: "User" },
 
     task: _convertTask(task),
-
     interfaces: [
       "basic",
       "panel", // undo, redo, reset panel
       "controls", // all control buttons: skip, submit, update
       "submit", // submit button on controls
       "update", // update button  on controls
+      "predictions",
       "predictions:menu", // right menu with prediction items
       "completions:menu", // right menu with completion items
       "completions:add-new",

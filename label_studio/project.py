@@ -23,6 +23,10 @@ from label_studio.tasks import Tasks
 logger = logging.getLogger(__name__)
 
 
+class ProjectNotFound(KeyError):
+    pass
+
+
 class Project(object):
 
     _storage = {}
@@ -41,12 +45,10 @@ class Project(object):
         self.context = context or {}
 
         self.tasks = None
-        self.load_tasks()
-
         self.label_config_line, self.label_config_full, self.input_data_tags = None, None, None
-        self.load_label_config()
-
         self.derived_input_schema, self.derived_output_schema = None, None
+        self.load_tasks()
+        self.load_label_config()
         self.load_derived_schemas()
 
         self.analytics = None
@@ -59,8 +61,19 @@ class Project(object):
         self.load_converter()
 
     def load_tasks(self):
-        self.tasks = json_load(self.config['input_path'])
-        self.tasks = {int(k): v for k, v in self.tasks.items()}
+        self.tasks = {}
+        self.derived_input_schema = set()
+        tasks = json_load(self.config['input_path'])
+        if len(tasks) == 0:
+            logger.warning('No tasks loaded from ' + self.config['input_path'])
+            return
+        for task_id, task in tasks.items():
+            self.tasks[int(task_id)] = task
+            data_keys = set(task['data'].keys())
+            if not self.derived_input_schema:
+                self.derived_input_schema = data_keys
+            else:
+                self.derived_input_schema &= data_keys
         print(str(len(self.tasks)) + ' tasks loaded from: ' + self.config['input_path'])
 
     def load_label_config(self):
@@ -69,18 +82,11 @@ class Project(object):
         self.input_data_tags = self.get_input_data_tags(self.label_config_line)
 
     def load_derived_schemas(self):
-        num_tasks_loaded = len(self.tasks)
-        self.derived_input_schema = []
+
         self.derived_output_schema = {
             'from_name_to_name_type': set(),
             'labels': defaultdict(set)
         }
-        if num_tasks_loaded > 0:
-            for tag in self.input_data_tags:
-                self.derived_input_schema.append({
-                    'type': tag.tag,
-                    'value': tag.attrib['value'].lstrip('$')
-                })
 
         # for all already completed tasks we update derived output schema for further label config validation
         for task_id in self.get_task_ids():
@@ -94,6 +100,7 @@ class Project(object):
         collect_analytics = os.getenv('collect_analytics')
         if collect_analytics is None:
             collect_analytics = self.config.get('collect_analytics', True)
+        collect_analytics = bool(collect_analytics)
         self.analytics = Analytics(self.label_config_line, collect_analytics, self.name, self.context)
 
     def load_project_ml_backend(self):
@@ -180,10 +187,9 @@ class Project(object):
         :param config_string_or_parsed_config: label config string or parsed config object
         :return: True if config match already imported tasks
         """
-        input_schema = self.derived_input_schema
 
         # check if schema exists, i.e. at least one task has been uploaded
-        if not input_schema:
+        if not self.derived_input_schema:
             return
 
         config = config_string_or_parsed_config
@@ -195,24 +201,13 @@ class Project(object):
                 input_types.add(input_item['type'])
                 input_values.add(input_item['value'])
 
-        input_schema_types = set([item['type'] for item in input_schema])
-        input_schema_values = set([item['value'] for item in input_schema])
-
-        # check input data types: they must be in schema
-        for item in input_types:
-            if item not in input_schema_types:
-                raise ValidationError(
-                    'You have already imported tasks and they are incompatible with a new config. '
-                    'Can\'t find type "{item}" among already imported tasks with types {input_schema_types}'
-                        .format(item=item, input_schema_types=list(input_schema_types)))
-
         # check input data values: they must be in schema
         for item in input_values:
-            if item not in input_schema_values:
+            if item not in self.derived_input_schema:
                 raise ValidationError(
                     'You have already imported tasks and they are incompatible with a new config. '
-                    'Can\t find key "{item}" among already imported tasks with keys {input_schema_values}'
-                        .format(item=item, input_schema_values=list(input_schema_types)))
+                    'You\'ve specified value=${item}, but imported tasks contain only keys: {input_schema_values}'
+                        .format(item=item, input_schema_values=list(self.derived_input_schema)))
 
     def validate_label_config_on_derived_output_schema(self, config_string_or_parsed_config):
         """
@@ -274,18 +269,25 @@ class Project(object):
             with io.open(self.config['input_path'], mode='w') as f:
                 json.dump({}, f)
 
+        # delete everything on ML backend
+        self.ml_backend.clear(self)
+
         # reload everything related to tasks
         self.load_tasks()
         self.load_derived_schemas()
 
-    def iter_tasks(self):
+    def next_task(self, completed_tasks_ids):
+        completed_tasks_ids = set(completed_tasks_ids)
         sampling = self.config.get('sampling', 'sequential')
         if sampling == 'sequential':
-            return self.tasks.items()
+            actual_tasks = (self.tasks[task_id] for task_id in self.tasks if task_id not in completed_tasks_ids)
+            return next(actual_tasks, None)
         elif sampling == 'uniform':
-            keys = list(self.tasks.keys())
-            random.shuffle(keys)
-            return ((k, self.tasks[k]) for k in keys)
+            actual_tasks_ids = [task_id for task_id in self.tasks if task_id not in completed_tasks_ids]
+            if not actual_tasks_ids:
+                return None
+            random.shuffle(actual_tasks_ids)
+            return self.tasks[actual_tasks_ids[0]]
         else:
             raise NotImplementedError('Unknown sampling method ' + sampling)
 
@@ -344,6 +346,9 @@ class Project(object):
             task_id = int(task_id)  # check task_id is int (disallow to escape from output_dir)
         except ValueError:
             return None
+
+        if 'completions' in self.tasks[task_id]:
+            return self.tasks[task_id]
 
         filename = os.path.join(self.config['output_dir'], str(task_id) + '.json')
 
@@ -453,6 +458,8 @@ class Project(object):
                 path=path, what=what
             ))
 
+        input_path = args.input_path or config.get('input_path')
+
         # save label config
         config_xml = 'config.xml'
         config_xml_path = os.path.join(dir, config_xml)
@@ -463,15 +470,21 @@ class Project(object):
         else:
             if os.path.exists(config_xml_path) and not args.force:
                 already_exists_error('label config', config_xml_path)
-            default_label_config = find_file('examples/image_polygons/config.xml')
-            copy2(default_label_config, config_xml_path)
-            print(default_label_config + ' label config copied to ' + config_xml_path)
+            if not input_path:
+                # create default config with polygons only if input data is not set
+                default_label_config = find_file('examples/image_polygons/config.xml')
+                copy2(default_label_config, config_xml_path)
+                print(default_label_config + ' label config copied to ' + config_xml_path)
+            else:
+                with io.open(config_xml_path, mode='w') as fout:
+                    fout.write('<View></View>')
+                print('Empty config has been created in ' + config_xml_path)
+
         config['label_config'] = config_xml
 
         # save tasks.json
         tasks_json = 'tasks.json'
         tasks_json_path = os.path.join(dir, tasks_json)
-        input_path = args.input_path or config.get('input_path')
         if input_path:
             tasks = cls._load_tasks(input_path, args, config_xml_path)
             with io.open(tasks_json_path, mode='w') as fout:
@@ -571,7 +584,7 @@ class Project(object):
             cls._storage[project_name] = project
             return project
 
-        raise KeyError('Project {p} doesn\'t exist'.format(p=project_name))
+        raise ProjectNotFound('Project {p} doesn\'t exist'.format(p=project_name))
 
     @classmethod
     def create(cls, project_name, args, context):
@@ -586,7 +599,7 @@ class Project(object):
         try:
             project = cls.get(project_name, args, context)
             logger.info('Get project "' + project_name + '".')
-        except KeyError:
+        except ProjectNotFound:
             project = cls.create(project_name, args, context)
             logger.info('Project "' + project_name + '" created.')
         return project
