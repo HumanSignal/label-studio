@@ -62,11 +62,11 @@ class Project(object):
 
     def load_tasks(self):
         self.tasks = {}
+        self.derived_input_schema = set()
         tasks = json_load(self.config['input_path'])
         if len(tasks) == 0:
             logger.warning('No tasks loaded from ' + self.config['input_path'])
             return
-        self.derived_input_schema = set()
         for task_id, task in tasks.items():
             self.tasks[int(task_id)] = task
             data_keys = set(task['data'].keys())
