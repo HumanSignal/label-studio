@@ -11,7 +11,7 @@ You can build simple video classifier using HyperText tag.
 
 ## Input data
 
-You need prepare input data like this, read more about HTML video tag 
+You need to prepare input data like this, read more about HTML video tag 
 <a href="https://www.w3schools.com/tags/att_video_src.asp">here</a>: 
 
 ```json 
