@@ -1,0 +1,40 @@
+---
+title: Video Classifier
+type: templates
+order: 213
+is_new: t
+---
+
+You can build simple video classifier using HyperText tag. 
+
+## Input data
+
+You need prepare input data like this, read more about HTML video tag 
+<a href="https://www.w3schools.com/tags/att_video_src.asp">here</a>: 
+
+```json 
+[
+ { "html": "<video src='examples.com/1.mp4'>" },
+ { "html": "<video src='examples.com/2.mp4'>" }
+]
+```
+
+Or you can even use embeds from Youtube:
+ 
+```json 
+[
+ { "html": "<iframe src="https://www.youtube.com/embed/mf9TKj0NuTQ"></iframe>" }
+]
+```
+
+## Config 
+
+```html
+<View>
+  <Choices name="type" toName="video" choice="single-radio">
+    <Choice value="Motion"></Choice>
+    <Choice value="Stable"></Choice>
+  </Choices>
+  <HyperText name="video" value="$html"></HyperText>
+</View>
+```
