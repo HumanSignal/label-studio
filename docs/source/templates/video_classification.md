@@ -7,7 +7,7 @@ is_new: t
 
 You can build simple video classifier using HyperText tag.
 
-<img src="/images/screens/video_class.png" class="img-template-example" title="Video Classifier" /> 
+<img src="/images/screens/video_classification.png" class="img-template-example" title="Video Classifier" /> 
 
 ## Input data
 
