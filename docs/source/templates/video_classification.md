@@ -23,7 +23,7 @@ Or you can even use embeds from Youtube:
  
 ```json 
 [
- { "html": "<iframe src="https://www.youtube.com/embed/mf9TKj0NuTQ"></iframe>" }
+ { "html": "<iframe src='https://www.youtube.com/embed/mf9TKj0NuTQ'></iframe>" }
 ]
 ```
 
@@ -38,3 +38,5 @@ Or you can even use embeds from Youtube:
   <HyperText name="video" value="$html"></HyperText>
 </View>
 ```
+
+Note: preview for this config uses another sample input data, so it won't display proper task with video.  
