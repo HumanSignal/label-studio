@@ -39,4 +39,4 @@ Or you can even use embeds from Youtube:
 </View>
 ```
 
-Note: preview for this config uses another sample input data, so it won't display proper task with video.  
+Note: preview for this config uses another sample input data, so it won't display the proper task with the video.  
