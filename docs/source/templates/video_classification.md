@@ -1,7 +1,7 @@
 ---
 title: Video Classifier
 type: templates
-order: 213
+order: 501
 is_new: t
 ---
 

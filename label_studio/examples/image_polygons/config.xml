@@ -1,7 +1,6 @@
 <!-- {"title": "Image polygon labeling", "category": "image"} -->
 <View>
-  <Text name="text"
-        value="Select label and start to click on image"/>
+  <Header value="Select label and start to click on image"/>
 
   <Image name="img" value="$image"/>
 

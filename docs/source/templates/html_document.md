@@ -1,7 +1,7 @@
 ---
-title: HTML Documents NER
+title: HyperText Documents NER
 type: templates
-order: 205
+order: 302
 is_new: t
 ---
 

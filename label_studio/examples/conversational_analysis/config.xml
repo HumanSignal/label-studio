@@ -1,4 +1,4 @@
-<!-- {"title": "Dialogue analysis", "category": "text"} -->
+<!-- {"title": "Conversational analysis", "category": "html"} -->
 <View>
   <HyperText name="dialog" value="$dialogs"/>
 

@@ -1,7 +1,7 @@
 ---
 title: Image Classification
 type: templates
-order: 207
+order: 101
 ---
 
 Image classification with checkboxes.

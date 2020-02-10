@@ -1,7 +1,7 @@
 ---
 title: Pairwise Comparison
 type: templates
-order: 210
+order: 10001
 is_new: t
 ---
 

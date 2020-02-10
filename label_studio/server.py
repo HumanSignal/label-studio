@@ -242,11 +242,7 @@ def api_render_label_studio():
         return make_response('No config in POST', status.HTTP_417_EXPECTATION_FAILED)
 
     # prepare example
-    examples = data_examples(mode='editor_preview')
-    task_data = {
-        data_key: examples.get(data_type, '')
-        for data_key, data_type in project.extract_data_types(config).items()
-    }
+    task_data = generate_sample_task_without_check(config, mode='editor_preview')
     example_task_data = {
         'id': 1764,
         'data': task_data,

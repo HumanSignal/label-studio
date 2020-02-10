@@ -1,7 +1,7 @@
 ---
 title: Image Key Points
 type: templates
-order: 206
+order: 103
 ---
 
 Key Points labeling for the images

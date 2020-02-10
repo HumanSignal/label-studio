@@ -1,7 +1,7 @@
 ---
-title: Named Entity Recognition
+title: Text Named Entity Recognition
 type: templates
-order: 209
+order: 201
 ---
 
 Named entity recognition for a piece of text
