@@ -20,11 +20,11 @@ from flask import request, jsonify, make_response, Response, Response as HttpRes
 from flask_api import status
 
 from label_studio.utils.functions import generate_sample_task
-from label_studio.utils.io import find_dir, find_editor_files, get_temp_dir
+from label_studio.utils.io import find_dir, find_editor_files
 from label_studio.utils import uploader
 from label_studio.utils.validation import TaskValidator
 from label_studio.utils.exceptions import ValidationError
-from label_studio.utils.functions import generate_sample_task_without_check, data_examples
+from label_studio.utils.functions import generate_sample_task_without_check
 from label_studio.utils.misc import exception_treatment, log_config, log, config_line_stripped, get_config_templates
 from label_studio.utils.argparser import parse_input_args
 
@@ -425,16 +425,18 @@ def api_export():
     project = project_get_or_create()
     now = datetime.now()
     completion_dir = project.config['output_dir']
-    export_dirname = now.strftime('%Y-%m-%d-%H-%M-%S')
-    with get_temp_dir() as temp_dir:
-        export_dirpath = os.path.join(temp_dir, export_dirname)
-        project.converter.convert(completion_dir, export_dirpath, format=export_format)
-        shutil.make_archive(export_dirpath, 'zip', export_dirpath)
-        export_zipfile = export_dirpath + '.zip'
-        response = send_file(export_zipfile, as_attachment=True)
-        response.headers['filename'] = os.path.basename(export_zipfile)
-        project.analytics.send(getframeinfo(currentframe()).function)
-        return response
+    project_export_dir = os.path.join(project.name, 'export')
+
+    zip_dir = os.path.join(project_export_dir, now.strftime('%Y-%m-%d-%H-%M-%S'))
+    os.makedirs(zip_dir, exist_ok=True)
+
+    project.converter.convert(completion_dir, zip_dir, format=export_format)
+    shutil.make_archive(zip_dir, 'zip', zip_dir)
+
+    response = send_file(zip_dir+'.zip', as_attachment=True)
+    response.headers['filename'] = os.path.basename(zip_dir+'.zip')
+    project.analytics.send(getframeinfo(currentframe()).function)
+    return response
 
 
 @app.route('/api/projects/1/next/', methods=['GET'])
