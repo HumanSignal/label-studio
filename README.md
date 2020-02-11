@@ -106,19 +106,21 @@ The list of supported use cases for data annotation. Please contribute your own 
 | Task | Description |
 |-|-|
 | **Image** | | 
-| Classification |  Put images into categories |
+| [Classification](https://labelstud.io/templates/image_classification.html) | Put images into categories |
 | Object Detection | Detect objects in an image using a bounding box or polygons |
 | Semantic Segmentation | Detect for each pixel the object category it belongs to | 
 | Pose Estimation | Mark positions of a person’s joints |
 | **Text** | | 
-| Classification | Put texts into categories |
+| [Classification](https://labelstud.io/templates/sentiment_analysis.html) | Put texts into categories |
 | Summarization | Create a summary that represents the most relevant information within the original content |
 | HTML Tagging | Annotate things like resumes, research, legal papers and excel sheet converted to HTML | 
 | **Audio** | |
-| Classification | Put audios into categories |
+| [Classification](https://labelstud.io/templates/audio_classification.html) | Put audios into categories |
 | Speaker Diarisation | partitioning an input audio stream into homogeneous segments according to the speaker identity | 
 | Emotion Recognition | Tag and identifying emotion from the audio |
-| Transcription | Write down verbal communication in text | 
+| Transcription | Write down verbal communication in text |
+| **Video** | |
+| [Classification](https://labelstud.io/templates/video_classification.html) | Put videos into categories | 
 | **Comparison** | |
 | Pairwise | Comparing entities in pairs to judge which of each entity is preferred | 
 | Ranking | Sort items in the list according to some property |
