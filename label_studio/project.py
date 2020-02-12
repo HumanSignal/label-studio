@@ -176,6 +176,12 @@ class Project(object):
         """
         for result in completion['result']:
             result_type = result.get('type')
+            if result_type == 'relation':
+                continue
+            if 'from_name' not in result or 'to_name' not in result:
+                logger.error('Unexpected completion.result format: "from_name" or "to_name" not found in %r' % result)
+                continue
+
             self.derived_output_schema['from_name_to_name_type'].add((
                 result['from_name'], result['to_name'], result_type
             ))
