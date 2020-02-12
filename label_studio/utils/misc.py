@@ -186,6 +186,8 @@ def iter_config_templates():
 
 def get_config_templates():
     """ Get label config templates from directory (as usual 'examples' directory)
+
+    :param project: if there is samples provided by template then they will be added to project as examples
     """
     from collections import defaultdict
     templates = defaultdict(list)

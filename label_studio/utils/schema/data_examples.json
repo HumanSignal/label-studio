@@ -7,7 +7,8 @@
     "AudioPlus": "<HOSTNAME>/static/samples/game.wav",
     "List": [ { "#elementValue": "Hello world" }, { "#elementValue": "Goodbye world" } ],
     "Header": "Task header",
-    "Dialog":  [{"name": "Jack", "text": "Yes! Tell me more!"}, {"name": "Anna", "text": "No, stop it."}]
+    "Dialog":  [{"name": "Jack", "text": "Yes! Tell me more!"}, {"name": "Anna", "text": "No, stop it."}],
+    "$video": "<video src='https://htx-misc.s3.amazonaws.com/label-studio/video_classification/opossum_snow.mp4' width=100% controls>"
   },
   "upload": {
     "Text": "To have faith is to trust yourself to the water",
@@ -17,7 +18,8 @@
     "AudioPlus": "<HOSTNAME>/static/samples/game.wav",
     "List": [ { "#elementValue": "Hello world" }, { "#elementValue": "Goodbye world" } ],
     "Header": "Task header",
-    "Dialog":  [{"name": "Jack", "text": "Yes! Tell me more!"}, {"name": "Anna", "text": "No, stop it."}]
+    "Dialog":  [{"name": "Jack", "text": "Yes! Tell me more!"}, {"name": "Anna", "text": "No, stop it."}],
+    "$video": "<video src='https://htx-misc.s3.amazonaws.com/label-studio/video_classification/opossum_snow.mp4' width=100% controls>"
   }
 }
 

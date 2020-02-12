@@ -1,7 +1,7 @@
 ---
-title: Dialogue Analysis
+title: HyperText Dialogue Analysis
 type: templates
-order: 204
+order: 301
 ---
 
 Analyze the chat dialog, classify it and provide your own answer

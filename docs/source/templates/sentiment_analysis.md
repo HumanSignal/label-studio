@@ -1,7 +1,7 @@
 ---
-title: Sentiment Analysis
+title: Text Sentiment Analysis
 type: templates
-order: 211
+order: 202
 ---
 
 Classify sentiment of reviews for musical instruments found on Amazon

@@ -34,11 +34,12 @@
     <!-- Templates categories -->
     <div class="ui grid stackable" style="margin: 0 auto;">
       {% for category in templates %}
-        <div class="four wide column category">
+        <div class="three wide column category">
           {% if category == 'audio' %} <i class="icon sound"></i> {% endif %}
           {% if category == 'text' %} <i class="icon font"></i> {% endif %}
           {% if category == 'html' %} <i class="icon code"></i> {% endif %}
           {% if category == 'image' %} <i class="icon image"></i> {% endif %}
+          {% if category == 'video' %} <i class="icon video"></i> {% endif %}
 
           <!-- Template -->
           {% for t in templates[category] %}

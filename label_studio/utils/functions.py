@@ -60,7 +60,10 @@ def generate_sample_task_without_check(label_config, mode='upload'):
             examples['List'] = [{key: 'Hello world'}, {key: 'Goodbye world'}]
 
         if value and value[0] == '$':
-            task[value[1:]] = examples.get(p.tag, 'Something')
+            # try get example by variable name
+            by_name = examples.get(value, None)
+            # not found by name, try get example by type
+            task[value[1:]] = examples.get(p.tag, 'Something') if by_name is None else by_name
 
     return task
 
