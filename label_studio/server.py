@@ -425,13 +425,16 @@ def api_export():
     project = project_get_or_create()
     now = datetime.now()
     completion_dir = project.config['output_dir']
-    project_export_dir = os.path.join(project.name, 'export')
+
+    project_export_dir = os.path.join(os.path.dirname(completion_dir), 'export')
+    os.makedirs(project_export_dir, exist_ok=True)
 
     zip_dir = os.path.join(project_export_dir, now.strftime('%Y-%m-%d-%H-%M-%S'))
     os.makedirs(zip_dir, exist_ok=True)
 
     project.converter.convert(completion_dir, zip_dir, format=export_format)
     shutil.make_archive(zip_dir, 'zip', zip_dir)
+    shutil.rmtree(zip_dir)
 
     response = send_file(zip_dir+'.zip', as_attachment=True)
     response.headers['filename'] = os.path.basename(zip_dir+'.zip')
