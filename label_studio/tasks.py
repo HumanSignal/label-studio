@@ -1,4 +1,8 @@
-import orjson
+try:
+    import orjson as json
+except ImportError:
+    import json
+
 import os
 import io
 import urllib
@@ -52,7 +56,7 @@ class Tasks(object):
 
     def from_json_file(self, path, start_task_id=0):
         with open(path) as f:
-            json_body = orjson.loads(f.read())
+            json_body = json.loads(f.read())
 
             # multiple tasks in file
             if isinstance(json_body, list):
