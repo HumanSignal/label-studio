@@ -137,6 +137,7 @@ class Project(object):
 
         self.validate_label_config_on_derived_input_schema(parsed_config)
         self.validate_label_config_on_derived_output_schema(parsed_config)
+        self.ml_backend.validate(config_string)
 
     def update_label_config(self, new_label_config):
         label_config_file = self.config['label_config']

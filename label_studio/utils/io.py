@@ -71,15 +71,13 @@ def get_temp_dir():
 
 def get_config_dir():
     config_dir = user_config_dir(appname='label-studio')
-    if not os.path.exists(config_dir):
-        os.makedirs(config_dir)
+    os.makedirs(config_dir, exist_ok=True)
     return config_dir
 
 
 def get_data_dir():
     data_dir = user_data_dir(appname='label-studio')
-    if not os.path.exists(data_dir):
-        os.makedirs(data_dir)
+    os.makedirs(data_dir, exist_ok=True)
     return data_dir
 
 
