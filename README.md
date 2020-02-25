@@ -72,7 +72,17 @@ python label-studio/server.py start labeling_project --init
 ## Run docker
 You can also start serving at `http://localhost:8200` by using docker:
 ```bash
-docker run --rm -p 8200:8200 heartexlabs/label-studio:latest
+docker run --rm -p 8200:8200 -v `pwd`/my_project:/label-studio/my_project heartexlabs/label-studio:latest
+```
+
+By default, it starts blank project in `./my_project` directory.
+
+> Note: if `./my_project` folder exists, an exception will be thrown. Please delete this folder or use `--force` option.
+
+You can override the default startup command by appending:
+
+```bash
+docker run -p 8200:8200 heartexlabs/label-studio:latest label-studio start my_project --init --force --template image_ranking
 ```
 
 If you want to build a local image, run:
