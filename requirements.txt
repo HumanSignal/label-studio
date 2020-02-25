@@ -1,6 +1,6 @@
 appdirs==1.4.3
 attrs==19.1.0
-blis==0.2.4
+blis==0.4.1
 certifi==2019.11.28
 chardet==3.0.4
 Click==7.0
@@ -32,4 +32,4 @@ flask_api>=2.0
 pandas>=0.24.0
 jsonschema>=3.2.0
 xmljson==0.2.0
-label-studio-converter>=0.0.10
+label-studio-converter>=0.0.10.post2
