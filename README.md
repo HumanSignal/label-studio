@@ -42,12 +42,9 @@ label-studio start labeling_project
 
 #### Install on Windows
 
-For running on Windows, the following wheel packages are needed to be manually downloaded from [Gohlke builds](https://www.lfd.uci.edu/~gohlke/pythonlibs) with the right python version:
+For running on Windows, the following wheel packages are needed to be manually downloaded from [Gohlke builds](https://www.lfd.uci.edu/~gohlke/pythonlibs), by ensuring the right python version:
 
-```text
-lxml
-preshed
-```
+- [lxml](https://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml)
 
 Install Label Studio:
  
@@ -55,8 +52,8 @@ Install Label Studio:
 # Upgrade pip 
 pip install -U pip
 
-# Install packages downloaded form Gohlke
-pip install <path-to-downloaded-package>.whl
+# Assuming you are running Win64 with Python 3.8, install packages downloaded form Gohlke:
+pip install lxml‑4.5.0‑cp38‑cp38‑win_amd64.whl
 
 # Install label studio
 pip install label-studio
