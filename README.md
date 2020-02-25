@@ -40,18 +40,22 @@ label-studio init labeling_project
 label-studio start labeling_project
 ```
 
-#### Install on Windows  
-It's not necessary to install Visual Studio Compiler, 
-just download "regex" (or other packages you need to compile) from gholke builds corresponding to your python version: 
-https://www.lfd.uci.edu/~gohlke/pythonlibs/#regex
+#### Install on Windows
 
-and then 
+For running on Windows, the following wheel packages are needed to be manually downloaded from [Gohlke builds](https://www.lfd.uci.edu/~gohlke/pythonlibs) with the right python version:
+
+```text
+lxml
+preshed
+```
+
+Install Label Studio:
  
 ```bash
 # Upgrade pip 
 pip install -U pip
 
-# Install regex
+# Install packages downloaded form Gohlke
 pip install <path-to-downloaded-package>.whl
 
 # Install label studio
