@@ -1,9 +1,6 @@
 # Building the main container
 FROM python:3.6-slim
 
-RUN apt-get update && \
-    apt-get install -y netcat
-
 WORKDIR /label-studio
 
 # Copy and install requirements.txt first for caching
