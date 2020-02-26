@@ -297,7 +297,11 @@ def api_save_config():
     except Exception as e:
         return make_response(jsonify({'label_config': [str(e)]}), status.HTTP_400_BAD_REQUEST)
 
-    project.update_label_config(label_config)
+    try:
+        project.update_label_config(label_config)
+    except Exception as e:
+        return make_response(jsonify({'label_config': [str(e)]}), status.HTTP_400_BAD_REQUEST)
+
     project.analytics.send(getframeinfo(currentframe()).function)
     return Response(status=status.HTTP_201_CREATED)
 

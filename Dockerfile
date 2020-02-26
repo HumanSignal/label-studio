@@ -1,5 +1,6 @@
 # Building the main container
 FROM python:3.6-slim
+
 WORKDIR /label-studio
 
 # Copy and install requirements.txt first for caching
