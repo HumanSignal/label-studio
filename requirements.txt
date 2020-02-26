@@ -1,6 +1,6 @@
 appdirs==1.4.3
 attrs==19.1.0
-blis==0.2.4
+blis==0.4.1
 certifi==2019.11.28
 chardet==3.0.4
 Click==7.0
@@ -9,13 +9,10 @@ Flask==1.1.1
 idna==2.8
 itsdangerous==1.1.0
 Jinja2==2.10.3
-lxml==4.2.5
+lxml>=4.2.5
 MarkupSafe==1.1.1
 mixpanel==4.4.0
-murmurhash==1.0.2
 numpy==1.17.4
-plac==0.9.6
-preshed==2.0.1
 python-dateutil==2.8.1
 python-json-logger==0.1.11
 pytz==2019.3
@@ -32,4 +29,4 @@ flask_api>=2.0
 pandas>=0.24.0
 jsonschema>=3.2.0
 xmljson==0.2.0
-label-studio-converter>=0.0.10
+label-studio-converter>=0.0.10.post2

@@ -2,7 +2,7 @@ node_modules
 npm-debug.log
 Dockerfile
 .dockerignore
-# build
+build
 dist
 docs
 tests
@@ -10,3 +10,11 @@ public
 label_studio.egg-info
 .github
 .vscode
+.editorconfig
+.gitignore
+*.md
+*.yml
+.python-version
+
+# shell scripts
+update_pypi.sh

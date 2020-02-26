@@ -40,19 +40,20 @@ label-studio init labeling_project
 label-studio start labeling_project
 ```
 
-#### Install on Windows  
-It's not necessary to install Visual Studio Compiler, 
-just download "regex" (or other packages you need to compile) from gholke builds corresponding to your python version: 
-https://www.lfd.uci.edu/~gohlke/pythonlibs/#regex
+#### Install on Windows
 
-and then 
+For running on Windows, the following wheel packages are needed to be manually downloaded from [Gohlke builds](https://www.lfd.uci.edu/~gohlke/pythonlibs), by ensuring the right python version:
+
+- [lxml](https://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml)
+
+Install Label Studio:
  
 ```bash
 # Upgrade pip 
 pip install -U pip
 
-# Install regex
-pip install <path-to-downloaded-package>.whl
+# Assuming you are running Win64 with Python 3.8, install packages downloaded form Gohlke:
+pip install lxml‑4.5.0‑cp38‑cp38‑win_amd64.whl
 
 # Install label studio
 pip install label-studio
@@ -72,7 +73,17 @@ python label-studio/server.py start labeling_project --init
 ## Run docker
 You can also start serving at `http://localhost:8200` by using docker:
 ```bash
-docker run --rm -p 8200:8200 heartexlabs/label-studio:latest
+docker run --rm -p 8200:8200 -v `pwd`/my_project:/label-studio/my_project heartexlabs/label-studio:latest
+```
+
+By default, it starts blank project in `./my_project` directory.
+
+> Note: if `./my_project` folder exists, an exception will be thrown. Please delete this folder or use `--force` option.
+
+You can override the default startup command by appending:
+
+```bash
+docker run -p 8200:8200 heartexlabs/label-studio:latest label-studio start my_project --init --force --template image_ranking
 ```
 
 If you want to build a local image, run:
