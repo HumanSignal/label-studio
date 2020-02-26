@@ -6,6 +6,7 @@ build
 dist
 docs
 tests
+tox.ini
 public
 label_studio.egg-info
 .github
@@ -13,7 +14,9 @@ label_studio.egg-info
 .editorconfig
 .gitignore
 *.md
+!README.md
 *.yml
+*.json
 .python-version
 
 # shell scripts

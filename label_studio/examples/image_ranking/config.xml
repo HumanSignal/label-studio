@@ -1,0 +1,3 @@
+<View>
+  <Ranker name="ranker" value="$items" elementtag="Image"/>
+</View>
