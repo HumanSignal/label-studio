@@ -54,7 +54,7 @@ def parse_input_args():
     root_parser.add_argument(
         '--input-format', dest='input_format',
         choices=('json', 'json-dir', 'text', 'text-dir', 'image-dir', 'audio-dir'), default='json',
-        help='Input path to task file or directory with tasks')
+        help='Input tasks format. Unless you are using "json" or "json-dir" format, --label-config option is required')
     root_parser.add_argument(
         '-o', '--output-dir', dest='output_dir', type=valid_filepath,
         help='Output directory for completions')
