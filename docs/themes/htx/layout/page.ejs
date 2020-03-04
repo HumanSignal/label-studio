@@ -8,17 +8,28 @@
   </div>
 <% } %>
 <div class="content <%- page.type ? page.type + ' with-sidebar' : '' %> <%- page.type === 'guide' ? page.path.replace(/.+\//, '').replace('.html', '') + '-guide' : '' %>">
+
+  <div id="local-search-result-wrapper"></div>
+  <script>
+      var search_path = "<%= config.search.path %>";
+      if (search_path.length === 0) {
+        search_path = "search.xml";
+      }
+      var path = "<%= config.root %>" + search_path;
+      searchFunc(path, 'local-search-input', 'local-search-result-wrapper');
+  </script>
+
   <% if (page.type) { %>
     <% if (page.type === 'menu') { %>
       <form id="search-form">
         <input type="text" id="search-query-menu" class="search-query st-default-search-input">
       </form>
-      <%- partial('partials/toc', { type: 'guide' }) %>    
+      <%- partial('partials/toc', { type: 'guide' }) %>
     <% } %>
   <% } %>
   <% if (page.title.trim()) { %>
     <h1><%- page.title %><%- page.type === 'examples' ? ' Example' : '' %></h1>
-  <% } %>  
+  <% } %>
   <%- page.content %>
   <% if (page.type === 'guide') { %>
     <div class="guide-links">
@@ -32,7 +43,7 @@
       <% } %>
     </div>
   <% } %>
-  <div class="footer">    
+  <div class="footer">
       <!-- Caught a mistake or want to contribute to the documentation?
 	   <a href="https://github.com/heartexlabs/label-studio/blob/master/src/<%- page.path.replace(/\.html$/, '.md') %>" target="_blank">
 	   Edit this page on GitHub!

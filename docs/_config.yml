@@ -95,3 +95,8 @@ deploy:
   type: git
   repo: git@github.com:heartexlabs/heartexlabs.github.io.git
   branch: master
+
+search:
+  path: search.xml
+  field: all
+  content: true

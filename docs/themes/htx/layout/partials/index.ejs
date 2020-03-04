@@ -1,524 +1,567 @@
 <style>
- .btn {
-     line-height: 1.5;
-     position: relative;
-     display: inline-block;
-     font-weight: 400;
-     white-space: nowrap;
-     text-align: center;
-     background-image: none;
-     border: 1px solid transparent;
-     -webkit-box-shadow: 0 2px 0 rgba(0,0,0,0.015);
-     box-shadow: 0 2px 0 rgba(0,0,0,0.015);
-     cursor: pointer;
-     -webkit-transition: all .3s cubic-bezier(.645, .045, .355, 1);
-     transition: all .3s cubic-bezier(.645, .045, .355, 1);
-     -webkit-user-select: none;
-     -moz-user-select: none;
-     -ms-user-select: none;
-     user-select: none;
-     -ms-touch-action: manipulation;
-     touch-action: manipulation;
-     
-     padding: 10px 25px;
-     font-size: 14px;
-     font-weight: bold;
-     border-radius: 4px;
-     color: rgba(0,0,0,0.65);
+  .btn {
+    line-height: 1.5;
+    position: relative;
+    display: inline-block;
+    font-weight: 400;
+    white-space: nowrap;
+    text-align: center;
+    background-image: none;
+    border: 1px solid transparent;
+    -webkit-box-shadow: 0 2px 0 rgba(0, 0, 0, 0.015);
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.015);
+    cursor: pointer;
+    -webkit-transition: all .3s cubic-bezier(.645, .045, .355, 1);
+    transition: all .3s cubic-bezier(.645, .045, .355, 1);
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
 
-     color: #fff;
-     background-color: #1890ff;
-     border-color: #1890ff;
-     text-shadow: 0 -1px 0 rgba(0,0,0,0.12);
-     -webkit-box-shadow: 0 2px 0 rgba(0,0,0,0.045);
-     box-shadow: 0 2px 0 rgba(0,0,0,0.045);
-     margin: 5px;
-     padding-top: 9px;
- }
+    padding: 10px 25px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 4px;
+    color: rgba(0, 0, 0, 0.65);
 
-.btn-slack {
-           background-color: #5c175d;
-           border-color: #8b538c;
-}
+    color: #fff;
+    background-color: #1890ff;
+    border-color: #1890ff;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.12);
+    -webkit-box-shadow: 0 2px 0 rgba(0, 0, 0, 0.045);
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.045);
+    margin: 5px;
+    padding-top: 9px;
+  }
 
- .underline {
-   text-decoration: underline;
- }
- 
- .btn-orange {
-     background-color: #f58a48;
-     border-color: #f58a48;          
- }
- 
- .code-block {
-     font-family: "Source Code Pro",monospace;
-     border: 1px solid #e1dddc;
-     background-color: #fbfbfb;
-     padding: 13px 17px;
-     color: #46659e;
-     margin-bottom: 40px;
- }
+  .btn-slack {
+    background-color: #5c175d;
+    border-color: #8b538c;
+  }
 
- .border-card {
-     
- }
+  .underline {
+    text-decoration: underline;
+  }
 
- .light-blue {
- background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMzkzcHgiIGhlaWdodD0iMzc1cHgiIHZpZXdCb3g9IjAgMCAzOTMgMzc1IiB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPgogICAgPCEtLSBHZW5lcmF0b3I6IFNrZXRjaCA1MiAoNjY4NjkpIC0gaHR0cDovL3d3dy5ib2hlbWlhbmNvZGluZy5jb20vc2tldGNoIC0tPgogICAgPHRpdGxlPmhlcm8tYmFja2dyb3VuZC1sZWZ0PC90aXRsZT4KICAgIDxkZXNjPkNyZWF0ZWQgd2l0aCBTa2V0Y2guPC9kZXNjPgogICAgPGcgaWQ9IlBhZ2UtMSIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPGcgaWQ9Imhlcm8tYmFja2dyb3VuZC1sZWZ0Ij4KICAgICAgICAgICAgPHBhdGggZD0iTTExOC4yNTU1NDEsNDkgTDE3OS43NDQ0NTksNDkgQzE4My4zMTA1MzQsNDkgMTg0LjYwMzY3OSw0OS4zNzEzMDI0IDE4NS45MDczODMsNTAuMDY4NTMwOCBDMTg3LjIxMTA4Nyw1MC43NjU3NTkyIDE4OC4yMzQyNDEsNTEuNzg4OTEzNSAxODguOTMxNDY5LDUzLjA5MjYxNzIgQzE4OS42Mjg2OTgsNTQuMzk2MzIwOSAxOTAsNTUuNjg5NDY1OCAxOTAsNTkuMjU1NTQwOCBMMTkwLDE1OC43NDQ0NTkgQzE5MCwxNjIuMzEwNTM0IDE4OS42Mjg2OTgsMTYzLjYwMzY3OSAxODguOTMxNDY5LDE2NC45MDczODMgQzE4OC4yMzQyNDEsMTY2LjIxMTA4NyAxODcuMjExMDg3LDE2Ny4yMzQyNDEgMTg1LjkwNzM4MywxNjcuOTMxNDY5IEMxODQuNjAzNjc5LDE2OC42Mjg2OTggMTgzLjMxMDUzNCwxNjkgMTc5Ljc0NDQ1OSwxNjkgTDExOC4yNTU1NDEsMTY5IEMxMTQuNjg5NDY2LDE2OSAxMTMuMzk2MzIxLDE2OC42Mjg2OTggMTEyLjA5MjYxNywxNjcuOTMxNDY5IEMxMTAuNzg4OTEzLDE2Ny4yMzQyNDEgMTA5Ljc2NTc1OSwxNjYuMjExMDg3IDEwOS4wNjg1MzEsMTY0LjkwNzM4MyBDMTA4LjM3MTMwMiwxNjMuNjAzNjc5IDEwOCwxNjIuMzEwNTM0IDEwOCwxNTguNzQ0NDU5IEwxMDgsNTkuMjU1NTQwOCBDMTA4LDU1LjY4OTQ2NTggMTA4LjM3MTMwMiw1NC4zOTYzMjA5IDEwOS4wNjg1MzEsNTMuMDkyNjE3MiBDMTA5Ljc2NTc1OSw1MS43ODg5MTM1IDExMC43ODg5MTMsNTAuNzY1NzU5MiAxMTIuMDkyNjE3LDUwLjA2ODUzMDggQzExMy4zOTYzMjEsNDkuMzcxMzAyNCAxMTQuNjg5NDY2LDQ5IDExOC4yNTU1NDEsNDkgWiIgaWQ9IlJlY3RhbmdsZS03LUNvcHktNyIgZmlsbD0iI0ZBREVFMiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTQ5LjAwMDAwMCwgMTA5LjAwMDAwMCkgcm90YXRlKC05MC4wMDAwMDApIHRyYW5zbGF0ZSgtMTQ5LjAwMDAwMCwgLTEwOS4wMDAwMDApICI+PC9wYXRoPgogICAgICAgICAgICA8cGF0aCBkPSJNODAuMjU1NTQwOCwyNjIgTDE1My43NDQ0NTksMjYyIEMxNTcuMzEwNTM0LDI2MiAxNTguNjAzNjc5LDI2Mi4zNzEzMDIgMTU5LjkwNzM4MywyNjMuMDY4NTMxIEMxNjEuMjExMDg3LDI2My43NjU3NTkgMTYyLjIzNDI0MSwyNjQuNzg4OTEzIDE2Mi45MzE0NjksMjY2LjA5MjYxNyBDMTYzLjYyODY5OCwyNjcuMzk2MzIxIDE2NCwyNjguNjg5NDY2IDE2NCwyNzIuMjU1NTQxIEwxNjQsMzgzLjc0NDQ1OSBDMTY0LDM4Ny4zMTA1MzQgMTYzLjYyODY5OCwzODguNjAzNjc5IDE2Mi45MzE0NjksMzg5LjkwNzM4MyBDMTYyLjIzNDI0MSwzOTEuMjExMDg3IDE2MS4yMTEwODcsMzkyLjIzNDI0MSAxNTkuOTA3MzgzLDM5Mi45MzE0NjkgQzE1OC42MDM2NzksMzkzLjYyODY5OCAxNTcuMzEwNTM0LDM5NCAxNTMuNzQ0NDU5LDM5NCBMODAuMjU1NTQwOCwzOTQgQzc2LjY4OTQ2NTgsMzk0IDc1LjM5NjMyMDksMzkzLjYyODY5OCA3NC4wOTI2MTcyLDM5Mi45MzE0NjkgQzcyLjc4ODkxMzUsMzkyLjIzNDI0MSA3MS43NjU3NTkyLDM5MS4yMTEwODcgNzEuMDY4NTMwOCwzODkuOTA3MzgzIEM3MC4zNzEzMDI0LDM4OC42MDM2NzkgNzAsMzg3LjMxMDUzNCA3MCwzODMuNzQ0NDU5IEw3MCwyNzIuMjU1NTQxIEM3MCwyNjguNjg5NDY2IDcwLjM3MTMwMjQsMjY3LjM5NjMyMSA3MS4wNjg1MzA4LDI2Ni4wOTI2MTcgQzcxLjc2NTc1OTIsMjY0Ljc4ODkxMyA3Mi43ODg5MTM1LDI2My43NjU3NTkgNzQuMDkyNjE3MiwyNjMuMDY4NTMxIEM3NS4zOTYzMjA5LDI2Mi4zNzEzMDIgNzYuNjg5NDY1OCwyNjIgODAuMjU1NTQwOCwyNjIgWiIgaWQ9IlJlY3RhbmdsZS03LUNvcHktMTEiIGZpbGw9IiNEREVGRkIiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDExNy4wMDAwMDAsIDMyOC4wMDAwMDApIHJvdGF0ZSgtOTAuMDAwMDAwKSB0cmFuc2xhdGUoLTExNy4wMDAwMDAsIC0zMjguMDAwMDAwKSAiPjwvcGF0aD4KICAgICAgICAgICAgPHBhdGggZD0iTTIzNS4yNTU1NDEsOTggTDI2Ni43NDQ0NTksOTggQzI3MC4zMTA1MzQsOTggMjcxLjYwMzY3OSw5OC4zNzEzMDI0IDI3Mi45MDczODMsOTkuMDY4NTMwOCBDMjc0LjIxMTA4Nyw5OS43NjU3NTkyIDI3NS4yMzQyNDEsMTAwLjc4ODkxMyAyNzUuOTMxNDY5LDEwMi4wOTI2MTcgQzI3Ni42Mjg2OTgsMTAzLjM5NjMyMSAyNzcsMTA0LjY4OTQ2NiAyNzcsMTA4LjI1NTU0MSBMMjc3LDEzOS43NDQ0NTkgQzI3NywxNDMuMzEwNTM0IDI3Ni42Mjg2OTgsMTQ0LjYwMzY3OSAyNzUuOTMxNDY5LDE0NS45MDczODMgQzI3NS4yMzQyNDEsMTQ3LjIxMTA4NyAyNzQuMjExMDg3LDE0OC4yMzQyNDEgMjcyLjkwNzM4MywxNDguOTMxNDY5IEMyNzEuNjAzNjc5LDE0OS42Mjg2OTggMjcwLjMxMDUzNCwxNTAgMjY2Ljc0NDQ1OSwxNTAgTDIzNS4yNTU1NDEsMTUwIEMyMzEuNjg5NDY2LDE1MCAyMzAuMzk2MzIxLDE0OS42Mjg2OTggMjI5LjA5MjYxNywxNDguOTMxNDY5IEMyMjcuNzg4OTEzLDE0OC4yMzQyNDEgMjI2Ljc2NTc1OSwxNDcuMjExMDg3IDIyNi4wNjg1MzEsMTQ1LjkwNzM4MyBDMjI1LjM3MTMwMiwxNDQuNjAzNjc5IDIyNSwxNDMuMzEwNTM0IDIyNSwxMzkuNzQ0NDU5IEwyMjUsMTA4LjI1NTU0MSBDMjI1LDEwNC42ODk0NjYgMjI1LjM3MTMwMiwxMDMuMzk2MzIxIDIyNi4wNjg1MzEsMTAyLjA5MjYxNyBDMjI2Ljc2NTc1OSwxMDAuNzg4OTEzIDIyNy43ODg5MTMsOTkuNzY1NzU5MiAyMjkuMDkyNjE3LDk5LjA2ODUzMDggQzIzMC4zOTYzMjEsOTguMzcxMzAyNCAyMzEuNjg5NDY2LDk4IDIzNS4yNTU1NDEsOTggWiIgaWQ9IlJlY3RhbmdsZS03LUNvcHktNSIgZmlsbD0iI0RERUZGQiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjUxLjAwMDAwMCwgMTI0LjAwMDAwMCkgcm90YXRlKC05MC4wMDAwMDApIHRyYW5zbGF0ZSgtMjUxLjAwMDAwMCwgLTEyNC4wMDAwMDApICI+PC9wYXRoPgogICAgICAgICAgICA8cGF0aCBkPSJNMTU4LjI1NTU0MSwtOSBMMTg5Ljc0NDQ1OSwtOSBDMTkzLjMxMDUzNCwtOSAxOTQuNjAzNjc5LC04LjYyODY5NzU2IDE5NS45MDczODMsLTcuOTMxNDY5MTggQzE5Ny4yMTEwODcsLTcuMjM0MjQwODEgMTk4LjIzNDI0MSwtNi4yMTEwODY1MiAxOTguOTMxNDY5LC00LjkwNzM4MjgxIEMxOTkuNjI4Njk4LC0zLjYwMzY3OTExIDIwMCwtMi4zMTA1MzQxNiAyMDAsMS4yNTU1NDA4IEwyMDAsNTAuNzQ0NDU5MiBDMjAwLDU0LjMxMDUzNDIgMTk5LjYyODY5OCw1NS42MDM2NzkxIDE5OC45MzE0NjksNTYuOTA3MzgyOCBDMTk4LjIzNDI0MSw1OC4yMTEwODY1IDE5Ny4yMTEwODcsNTkuMjM0MjQwOCAxOTUuOTA3MzgzLDU5LjkzMTQ2OTIgQzE5NC42MDM2NzksNjAuNjI4Njk3NiAxOTMuMzEwNTM0LDYxIDE4OS43NDQ0NTksNjEgTDE1OC4yNTU1NDEsNjEgQzE1NC42ODk0NjYsNjEgMTUzLjM5NjMyMSw2MC42Mjg2OTc2IDE1Mi4wOTI2MTcsNTkuOTMxNDY5MiBDMTUwLjc4ODkxMyw1OS4yMzQyNDA4IDE0OS43NjU3NTksNTguMjExMDg2NSAxNDkuMDY4NTMxLDU2LjkwNzM4MjggQzE0OC4zNzEzMDIsNTUuNjAzNjc5MSAxNDgsNTQuMzEwNTM0MiAxNDgsNTAuNzQ0NDU5MiBMMTQ4LDEuMjU1NTQwOCBDMTQ4LC0yLjMxMDUzNDE2IDE0OC4zNzEzMDIsLTMuNjAzNjc5MTEgMTQ5LjA2ODUzMSwtNC45MDczODI4MSBDMTQ5Ljc2NTc1OSwtNi4yMTEwODY1MiAxNTAuNzg4OTEzLC03LjIzNDI0MDgxIDE1Mi4wOTI2MTcsLTcuOTMxNDY5MTggQzE1My4zOTYzMjEsLTguNjI4Njk3NTYgMTU0LjY4OTQ2NiwtOSAxNTguMjU1NTQxLC05IFoiIGlkPSJSZWN0YW5nbGUtNy1Db3B5LTEzIiBmaWxsPSIjRERFRkZCIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNzQuMDAwMDAwLCAyNi4wMDAwMDApIHJvdGF0ZSgtOTAuMDAwMDAwKSB0cmFuc2xhdGUoLTE3NC4wMDAwMDAsIC0yNi4wMDAwMDApICI+PC9wYXRoPgogICAgICAgICAgICA8cGF0aCBkPSJNMjM1LjI1NTU0MSwzMCBMMzgyLjc0NDQ1OSwzMCBDMzg2LjMxMDUzNCwzMCAzODcuNjAzNjc5LDMwLjM3MTMwMjQgMzg4LjkwNzM4MywzMS4wNjg1MzA4IEMzOTAuMjExMDg3LDMxLjc2NTc1OTIgMzkxLjIzNDI0MSwzMi43ODg5MTM1IDM5MS45MzE0NjksMzQuMDkyNjE3MiBDMzkyLjYyODY5OCwzNS4zOTYzMjA5IDM5MywzNi42ODk0NjU4IDM5Myw0MC4yNTU1NDA4IEwzOTMsNzEuNzQ0NDU5MiBDMzkzLDc1LjMxMDUzNDIgMzkyLjYyODY5OCw3Ni42MDM2NzkxIDM5MS45MzE0NjksNzcuOTA3MzgyOCBDMzkxLjIzNDI0MSw3OS4yMTEwODY1IDM5MC4yMTEwODcsODAuMjM0MjQwOCAzODguOTA3MzgzLDgwLjkzMTQ2OTIgQzM4Ny42MDM2NzksODEuNjI4Njk3NiAzODYuMzEwNTM0LDgyIDM4Mi43NDQ0NTksODIgTDIzNS4yNTU1NDEsODIgQzIzMS42ODk0NjYsODIgMjMwLjM5NjMyMSw4MS42Mjg2OTc2IDIyOS4wOTI2MTcsODAuOTMxNDY5MiBDMjI3Ljc4ODkxMyw4MC4yMzQyNDA4IDIyNi43NjU3NTksNzkuMjExMDg2NSAyMjYuMDY4NTMxLDc3LjkwNzM4MjggQzIyNS4zNzEzMDIsNzYuNjAzNjc5MSAyMjUsNzUuMzEwNTM0MiAyMjUsNzEuNzQ0NDU5MiBMMjI1LDQwLjI1NTU0MDggQzIyNSwzNi42ODk0NjU4IDIyNS4zNzEzMDIsMzUuMzk2MzIwOSAyMjYuMDY4NTMxLDM0LjA5MjYxNzIgQzIyNi43NjU3NTksMzIuNzg4OTEzNSAyMjcuNzg4OTEzLDMxLjc2NTc1OTIgMjI5LjA5MjYxNywzMS4wNjg1MzA4IEMyMzAuMzk2MzIxLDMwLjM3MTMwMjQgMjMxLjY4OTQ2NiwzMCAyMzUuMjU1NTQxLDMwIFoiIGlkPSJSZWN0YW5nbGUtNy1Db3B5LTkiIGZpbGw9IiNGRkY0REIiPjwvcGF0aD4KICAgICAgICAgICAgPHBhdGggZD0iTTI4OC4yNTU1NDEsMTEzIEwzNDkuNzQ0NDU5LDExMyBDMzUzLjMxMDUzNCwxMTMgMzU0LjYwMzY3OSwxMTMuMzcxMzAyIDM1NS45MDczODMsMTE0LjA2ODUzMSBDMzU3LjIxMTA4NywxMTQuNzY1NzU5IDM1OC4yMzQyNDEsMTE1Ljc4ODkxMyAzNTguOTMxNDY5LDExNy4wOTI2MTcgQzM1OS42Mjg2OTgsMTE4LjM5NjMyMSAzNjAsMTE5LjY4OTQ2NiAzNjAsMTIzLjI1NTU0MSBMMzYwLDE1NC43NDQ0NTkgQzM2MCwxNTguMzEwNTM0IDM1OS42Mjg2OTgsMTU5LjYwMzY3OSAzNTguOTMxNDY5LDE2MC45MDczODMgQzM1OC4yMzQyNDEsMTYyLjIxMTA4NyAzNTcuMjExMDg3LDE2My4yMzQyNDEgMzU1LjkwNzM4MywxNjMuOTMxNDY5IEMzNTQuNjAzNjc5LDE2NC42Mjg2OTggMzUzLjMxMDUzNCwxNjUgMzQ5Ljc0NDQ1OSwxNjUgTDI4OC4yNTU1NDEsMTY1IEMyODQuNjg5NDY2LDE2NSAyODMuMzk2MzIxLDE2NC42Mjg2OTggMjgyLjA5MjYxNywxNjMuOTMxNDY5IEMyODAuNzg4OTEzLDE2My4yMzQyNDEgMjc5Ljc2NTc1OSwxNjIuMjExMDg3IDI3OS4wNjg1MzEsMTYwLjkwNzM4MyBDMjc4LjM3MTMwMiwxNTkuNjAzNjc5IDI3OCwxNTguMzEwNTM0IDI3OCwxNTQuNzQ0NDU5IEwyNzgsMTIzLjI1NTU0MSBDMjc4LDExOS42ODk0NjYgMjc4LjM3MTMwMiwxMTguMzk2MzIxIDI3OS4wNjg1MzEsMTE3LjA5MjYxNyBDMjc5Ljc2NTc1OSwxMTUuNzg4OTEzIDI4MC43ODg5MTMsMTE0Ljc2NTc1OSAyODIuMDkyNjE3LDExNC4wNjg1MzEgQzI4My4zOTYzMjEsMTEzLjM3MTMwMiAyODQuNjg5NDY2LDExMyAyODguMjU1NTQxLDExMyBaIiBpZD0iUmVjdGFuZ2xlLTctQ29weS04IiBmaWxsPSIjRkFERUUyIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgzMTkuMDAwMDAwLCAxMzkuMDAwMDAwKSByb3RhdGUoLTkwLjAwMDAwMCkgdHJhbnNsYXRlKC0zMTkuMDAwMDAwLCAtMTM5LjAwMDAwMCkgIj48L3BhdGg+CiAgICAgICAgICAgIDxwYXRoIGQ9Ik0xMC4yNTU1NDA4LDE2NiBMMjY2Ljc0NDQ1OSwxNjYgQzI3MC4zMTA1MzQsMTY2IDI3MS42MDM2NzksMTY2LjM3MTMwMiAyNzIuOTA3MzgzLDE2Ny4wNjg1MzEgQzI3NC4yMTEwODcsMTY3Ljc2NTc1OSAyNzUuMjM0MjQxLDE2OC43ODg5MTMgMjc1LjkzMTQ2OSwxNzAuMDkyNjE3IEMyNzYuNjI4Njk4LDE3MS4zOTYzMjEgMjc3LDE3Mi42ODk0NjYgMjc3LDE3Ni4yNTU1NDEgTDI3NywyNTQuNzQ0NDU5IEMyNzcsMjU4LjMxMDUzNCAyNzYuNjI4Njk4LDI1OS42MDM2NzkgMjc1LjkzMTQ2OSwyNjAuOTA3MzgzIEMyNzUuMjM0MjQxLDI2Mi4yMTEwODcgMjc0LjIxMTA4NywyNjMuMjM0MjQxIDI3Mi45MDczODMsMjYzLjkzMTQ2OSBDMjcxLjYwMzY3OSwyNjQuNjI4Njk4IDI3MC4zMTA1MzQsMjY1IDI2Ni43NDQ0NTksMjY1IEwxMC4yNTU1NDA4LDI2NSBDNi42ODk0NjU4NCwyNjUgNS4zOTYzMjA4OSwyNjQuNjI4Njk4IDQuMDkyNjE3MTksMjYzLjkzMTQ2OSBDMi43ODg5MTM0OCwyNjMuMjM0MjQxIDEuNzY1NzU5MTksMjYyLjIxMTA4NyAxLjA2ODUzMDgyLDI2MC45MDczODMgQzAuMzcxMzAyNDQ1LDI1OS42MDM2NzkgMi44ODU4NDI3N2UtMTQsMjU4LjMxMDUzNCAyLjg0MjE3MDk0ZS0xNCwyNTQuNzQ0NDU5IEwyLjg5NzQxNTc2ZS0xNCwxNzYuMjU1NTQxIEMyLjg1Mzc0Mzk0ZS0xNCwxNzIuNjg5NDY2IDAuMzcxMzAyNDQ1LDE3MS4zOTYzMjEgMS4wNjg1MzA4MiwxNzAuMDkyNjE3IEMxLjc2NTc1OTE5LDE2OC43ODg5MTMgMi43ODg5MTM0OCwxNjcuNzY1NzU5IDQuMDkyNjE3MTksMTY3LjA2ODUzMSBDNS4zOTYzMjA4OSwxNjYuMzcxMzAyIDYuNjg5NDY1ODQsMTY2IDEwLjI1NTU0MDgsMTY2IFoiIGlkPSJSZWN0YW5nbGUtNy1Db3B5LTE2IiBmaWxsPSIjRkZGNERCIj48L3BhdGg+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4=);
-     background-repeat: no-repeat;
- background-position: 20px 20px;
- background-size: 47.7%;
- 
-     background-color: #e9f7ff;
-     padding-top: 110px;
- }
+  .btn-orange {
+    background-color: #f58a48;
+    border-color: #f58a48;
+  }
 
- .quickstart-row {
- display: flex;
- justify-content: center;
- padding-top: 100px;
- padding-bottom: 100px;
- }
+  .code-block {
+    font-family: "Source Code Pro", monospace;
+    border: 1px solid #e1dddc;
+    background-color: #fbfbfb;
+    padding: 13px 17px;
+    color: #46659e;
+    margin-bottom: 40px;
+  }
 
- .cards {
- width: 100%;
- display: flex;
- padding-bottom: 100px;
- justify-content: center;
- }
+  .border-card {
 
- .card {
+  }
+
+  .light-blue {
+    background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMzkzcHgiIGhlaWdodD0iMzc1cHgiIHZpZXdCb3g9IjAgMCAzOTMgMzc1IiB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPgogICAgPCEtLSBHZW5lcmF0b3I6IFNrZXRjaCA1MiAoNjY4NjkpIC0gaHR0cDovL3d3dy5ib2hlbWlhbmNvZGluZy5jb20vc2tldGNoIC0tPgogICAgPHRpdGxlPmhlcm8tYmFja2dyb3VuZC1sZWZ0PC90aXRsZT4KICAgIDxkZXNjPkNyZWF0ZWQgd2l0aCBTa2V0Y2guPC9kZXNjPgogICAgPGcgaWQ9IlBhZ2UtMSIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPGcgaWQ9Imhlcm8tYmFja2dyb3VuZC1sZWZ0Ij4KICAgICAgICAgICAgPHBhdGggZD0iTTExOC4yNTU1NDEsNDkgTDE3OS43NDQ0NTksNDkgQzE4My4zMTA1MzQsNDkgMTg0LjYwMzY3OSw0OS4zNzEzMDI0IDE4NS45MDczODMsNTAuMDY4NTMwOCBDMTg3LjIxMTA4Nyw1MC43NjU3NTkyIDE4OC4yMzQyNDEsNTEuNzg4OTEzNSAxODguOTMxNDY5LDUzLjA5MjYxNzIgQzE4OS42Mjg2OTgsNTQuMzk2MzIwOSAxOTAsNTUuNjg5NDY1OCAxOTAsNTkuMjU1NTQwOCBMMTkwLDE1OC43NDQ0NTkgQzE5MCwxNjIuMzEwNTM0IDE4OS42Mjg2OTgsMTYzLjYwMzY3OSAxODguOTMxNDY5LDE2NC45MDczODMgQzE4OC4yMzQyNDEsMTY2LjIxMTA4NyAxODcuMjExMDg3LDE2Ny4yMzQyNDEgMTg1LjkwNzM4MywxNjcuOTMxNDY5IEMxODQuNjAzNjc5LDE2OC42Mjg2OTggMTgzLjMxMDUzNCwxNjkgMTc5Ljc0NDQ1OSwxNjkgTDExOC4yNTU1NDEsMTY5IEMxMTQuNjg5NDY2LDE2OSAxMTMuMzk2MzIxLDE2OC42Mjg2OTggMTEyLjA5MjYxNywxNjcuOTMxNDY5IEMxMTAuNzg4OTEzLDE2Ny4yMzQyNDEgMTA5Ljc2NTc1OSwxNjYuMjExMDg3IDEwOS4wNjg1MzEsMTY0LjkwNzM4MyBDMTA4LjM3MTMwMiwxNjMuNjAzNjc5IDEwOCwxNjIuMzEwNTM0IDEwOCwxNTguNzQ0NDU5IEwxMDgsNTkuMjU1NTQwOCBDMTA4LDU1LjY4OTQ2NTggMTA4LjM3MTMwMiw1NC4zOTYzMjA5IDEwOS4wNjg1MzEsNTMuMDkyNjE3MiBDMTA5Ljc2NTc1OSw1MS43ODg5MTM1IDExMC43ODg5MTMsNTAuNzY1NzU5MiAxMTIuMDkyNjE3LDUwLjA2ODUzMDggQzExMy4zOTYzMjEsNDkuMzcxMzAyNCAxMTQuNjg5NDY2LDQ5IDExOC4yNTU1NDEsNDkgWiIgaWQ9IlJlY3RhbmdsZS03LUNvcHktNyIgZmlsbD0iI0ZBREVFMiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTQ5LjAwMDAwMCwgMTA5LjAwMDAwMCkgcm90YXRlKC05MC4wMDAwMDApIHRyYW5zbGF0ZSgtMTQ5LjAwMDAwMCwgLTEwOS4wMDAwMDApICI+PC9wYXRoPgogICAgICAgICAgICA8cGF0aCBkPSJNODAuMjU1NTQwOCwyNjIgTDE1My43NDQ0NTksMjYyIEMxNTcuMzEwNTM0LDI2MiAxNTguNjAzNjc5LDI2Mi4zNzEzMDIgMTU5LjkwNzM4MywyNjMuMDY4NTMxIEMxNjEuMjExMDg3LDI2My43NjU3NTkgMTYyLjIzNDI0MSwyNjQuNzg4OTEzIDE2Mi45MzE0NjksMjY2LjA5MjYxNyBDMTYzLjYyODY5OCwyNjcuMzk2MzIxIDE2NCwyNjguNjg5NDY2IDE2NCwyNzIuMjU1NTQxIEwxNjQsMzgzLjc0NDQ1OSBDMTY0LDM4Ny4zMTA1MzQgMTYzLjYyODY5OCwzODguNjAzNjc5IDE2Mi45MzE0NjksMzg5LjkwNzM4MyBDMTYyLjIzNDI0MSwzOTEuMjExMDg3IDE2MS4yMTEwODcsMzkyLjIzNDI0MSAxNTkuOTA3MzgzLDM5Mi45MzE0NjkgQzE1OC42MDM2NzksMzkzLjYyODY5OCAxNTcuMzEwNTM0LDM5NCAxNTMuNzQ0NDU5LDM5NCBMODAuMjU1NTQwOCwzOTQgQzc2LjY4OTQ2NTgsMzk0IDc1LjM5NjMyMDksMzkzLjYyODY5OCA3NC4wOTI2MTcyLDM5Mi45MzE0NjkgQzcyLjc4ODkxMzUsMzkyLjIzNDI0MSA3MS43NjU3NTkyLDM5MS4yMTEwODcgNzEuMDY4NTMwOCwzODkuOTA3MzgzIEM3MC4zNzEzMDI0LDM4OC42MDM2NzkgNzAsMzg3LjMxMDUzNCA3MCwzODMuNzQ0NDU5IEw3MCwyNzIuMjU1NTQxIEM3MCwyNjguNjg5NDY2IDcwLjM3MTMwMjQsMjY3LjM5NjMyMSA3MS4wNjg1MzA4LDI2Ni4wOTI2MTcgQzcxLjc2NTc1OTIsMjY0Ljc4ODkxMyA3Mi43ODg5MTM1LDI2My43NjU3NTkgNzQuMDkyNjE3MiwyNjMuMDY4NTMxIEM3NS4zOTYzMjA5LDI2Mi4zNzEzMDIgNzYuNjg5NDY1OCwyNjIgODAuMjU1NTQwOCwyNjIgWiIgaWQ9IlJlY3RhbmdsZS03LUNvcHktMTEiIGZpbGw9IiNEREVGRkIiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDExNy4wMDAwMDAsIDMyOC4wMDAwMDApIHJvdGF0ZSgtOTAuMDAwMDAwKSB0cmFuc2xhdGUoLTExNy4wMDAwMDAsIC0zMjguMDAwMDAwKSAiPjwvcGF0aD4KICAgICAgICAgICAgPHBhdGggZD0iTTIzNS4yNTU1NDEsOTggTDI2Ni43NDQ0NTksOTggQzI3MC4zMTA1MzQsOTggMjcxLjYwMzY3OSw5OC4zNzEzMDI0IDI3Mi45MDczODMsOTkuMDY4NTMwOCBDMjc0LjIxMTA4Nyw5OS43NjU3NTkyIDI3NS4yMzQyNDEsMTAwLjc4ODkxMyAyNzUuOTMxNDY5LDEwMi4wOTI2MTcgQzI3Ni42Mjg2OTgsMTAzLjM5NjMyMSAyNzcsMTA0LjY4OTQ2NiAyNzcsMTA4LjI1NTU0MSBMMjc3LDEzOS43NDQ0NTkgQzI3NywxNDMuMzEwNTM0IDI3Ni42Mjg2OTgsMTQ0LjYwMzY3OSAyNzUuOTMxNDY5LDE0NS45MDczODMgQzI3NS4yMzQyNDEsMTQ3LjIxMTA4NyAyNzQuMjExMDg3LDE0OC4yMzQyNDEgMjcyLjkwNzM4MywxNDguOTMxNDY5IEMyNzEuNjAzNjc5LDE0OS42Mjg2OTggMjcwLjMxMDUzNCwxNTAgMjY2Ljc0NDQ1OSwxNTAgTDIzNS4yNTU1NDEsMTUwIEMyMzEuNjg5NDY2LDE1MCAyMzAuMzk2MzIxLDE0OS42Mjg2OTggMjI5LjA5MjYxNywxNDguOTMxNDY5IEMyMjcuNzg4OTEzLDE0OC4yMzQyNDEgMjI2Ljc2NTc1OSwxNDcuMjExMDg3IDIyNi4wNjg1MzEsMTQ1LjkwNzM4MyBDMjI1LjM3MTMwMiwxNDQuNjAzNjc5IDIyNSwxNDMuMzEwNTM0IDIyNSwxMzkuNzQ0NDU5IEwyMjUsMTA4LjI1NTU0MSBDMjI1LDEwNC42ODk0NjYgMjI1LjM3MTMwMiwxMDMuMzk2MzIxIDIyNi4wNjg1MzEsMTAyLjA5MjYxNyBDMjI2Ljc2NTc1OSwxMDAuNzg4OTEzIDIyNy43ODg5MTMsOTkuNzY1NzU5MiAyMjkuMDkyNjE3LDk5LjA2ODUzMDggQzIzMC4zOTYzMjEsOTguMzcxMzAyNCAyMzEuNjg5NDY2LDk4IDIzNS4yNTU1NDEsOTggWiIgaWQ9IlJlY3RhbmdsZS03LUNvcHktNSIgZmlsbD0iI0RERUZGQiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjUxLjAwMDAwMCwgMTI0LjAwMDAwMCkgcm90YXRlKC05MC4wMDAwMDApIHRyYW5zbGF0ZSgtMjUxLjAwMDAwMCwgLTEyNC4wMDAwMDApICI+PC9wYXRoPgogICAgICAgICAgICA8cGF0aCBkPSJNMTU4LjI1NTU0MSwtOSBMMTg5Ljc0NDQ1OSwtOSBDMTkzLjMxMDUzNCwtOSAxOTQuNjAzNjc5LC04LjYyODY5NzU2IDE5NS45MDczODMsLTcuOTMxNDY5MTggQzE5Ny4yMTEwODcsLTcuMjM0MjQwODEgMTk4LjIzNDI0MSwtNi4yMTEwODY1MiAxOTguOTMxNDY5LC00LjkwNzM4MjgxIEMxOTkuNjI4Njk4LC0zLjYwMzY3OTExIDIwMCwtMi4zMTA1MzQxNiAyMDAsMS4yNTU1NDA4IEwyMDAsNTAuNzQ0NDU5MiBDMjAwLDU0LjMxMDUzNDIgMTk5LjYyODY5OCw1NS42MDM2NzkxIDE5OC45MzE0NjksNTYuOTA3MzgyOCBDMTk4LjIzNDI0MSw1OC4yMTEwODY1IDE5Ny4yMTEwODcsNTkuMjM0MjQwOCAxOTUuOTA3MzgzLDU5LjkzMTQ2OTIgQzE5NC42MDM2NzksNjAuNjI4Njk3NiAxOTMuMzEwNTM0LDYxIDE4OS43NDQ0NTksNjEgTDE1OC4yNTU1NDEsNjEgQzE1NC42ODk0NjYsNjEgMTUzLjM5NjMyMSw2MC42Mjg2OTc2IDE1Mi4wOTI2MTcsNTkuOTMxNDY5MiBDMTUwLjc4ODkxMyw1OS4yMzQyNDA4IDE0OS43NjU3NTksNTguMjExMDg2NSAxNDkuMDY4NTMxLDU2LjkwNzM4MjggQzE0OC4zNzEzMDIsNTUuNjAzNjc5MSAxNDgsNTQuMzEwNTM0MiAxNDgsNTAuNzQ0NDU5MiBMMTQ4LDEuMjU1NTQwOCBDMTQ4LC0yLjMxMDUzNDE2IDE0OC4zNzEzMDIsLTMuNjAzNjc5MTEgMTQ5LjA2ODUzMSwtNC45MDczODI4MSBDMTQ5Ljc2NTc1OSwtNi4yMTEwODY1MiAxNTAuNzg4OTEzLC03LjIzNDI0MDgxIDE1Mi4wOTI2MTcsLTcuOTMxNDY5MTggQzE1My4zOTYzMjEsLTguNjI4Njk3NTYgMTU0LjY4OTQ2NiwtOSAxNTguMjU1NTQxLC05IFoiIGlkPSJSZWN0YW5nbGUtNy1Db3B5LTEzIiBmaWxsPSIjRERFRkZCIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxNzQuMDAwMDAwLCAyNi4wMDAwMDApIHJvdGF0ZSgtOTAuMDAwMDAwKSB0cmFuc2xhdGUoLTE3NC4wMDAwMDAsIC0yNi4wMDAwMDApICI+PC9wYXRoPgogICAgICAgICAgICA8cGF0aCBkPSJNMjM1LjI1NTU0MSwzMCBMMzgyLjc0NDQ1OSwzMCBDMzg2LjMxMDUzNCwzMCAzODcuNjAzNjc5LDMwLjM3MTMwMjQgMzg4LjkwNzM4MywzMS4wNjg1MzA4IEMzOTAuMjExMDg3LDMxLjc2NTc1OTIgMzkxLjIzNDI0MSwzMi43ODg5MTM1IDM5MS45MzE0NjksMzQuMDkyNjE3MiBDMzkyLjYyODY5OCwzNS4zOTYzMjA5IDM5MywzNi42ODk0NjU4IDM5Myw0MC4yNTU1NDA4IEwzOTMsNzEuNzQ0NDU5MiBDMzkzLDc1LjMxMDUzNDIgMzkyLjYyODY5OCw3Ni42MDM2NzkxIDM5MS45MzE0NjksNzcuOTA3MzgyOCBDMzkxLjIzNDI0MSw3OS4yMTEwODY1IDM5MC4yMTEwODcsODAuMjM0MjQwOCAzODguOTA3MzgzLDgwLjkzMTQ2OTIgQzM4Ny42MDM2NzksODEuNjI4Njk3NiAzODYuMzEwNTM0LDgyIDM4Mi43NDQ0NTksODIgTDIzNS4yNTU1NDEsODIgQzIzMS42ODk0NjYsODIgMjMwLjM5NjMyMSw4MS42Mjg2OTc2IDIyOS4wOTI2MTcsODAuOTMxNDY5MiBDMjI3Ljc4ODkxMyw4MC4yMzQyNDA4IDIyNi43NjU3NTksNzkuMjExMDg2NSAyMjYuMDY4NTMxLDc3LjkwNzM4MjggQzIyNS4zNzEzMDIsNzYuNjAzNjc5MSAyMjUsNzUuMzEwNTM0MiAyMjUsNzEuNzQ0NDU5MiBMMjI1LDQwLjI1NTU0MDggQzIyNSwzNi42ODk0NjU4IDIyNS4zNzEzMDIsMzUuMzk2MzIwOSAyMjYuMDY4NTMxLDM0LjA5MjYxNzIgQzIyNi43NjU3NTksMzIuNzg4OTEzNSAyMjcuNzg4OTEzLDMxLjc2NTc1OTIgMjI5LjA5MjYxNywzMS4wNjg1MzA4IEMyMzAuMzk2MzIxLDMwLjM3MTMwMjQgMjMxLjY4OTQ2NiwzMCAyMzUuMjU1NTQxLDMwIFoiIGlkPSJSZWN0YW5nbGUtNy1Db3B5LTkiIGZpbGw9IiNGRkY0REIiPjwvcGF0aD4KICAgICAgICAgICAgPHBhdGggZD0iTTI4OC4yNTU1NDEsMTEzIEwzNDkuNzQ0NDU5LDExMyBDMzUzLjMxMDUzNCwxMTMgMzU0LjYwMzY3OSwxMTMuMzcxMzAyIDM1NS45MDczODMsMTE0LjA2ODUzMSBDMzU3LjIxMTA4NywxMTQuNzY1NzU5IDM1OC4yMzQyNDEsMTE1Ljc4ODkxMyAzNTguOTMxNDY5LDExNy4wOTI2MTcgQzM1OS42Mjg2OTgsMTE4LjM5NjMyMSAzNjAsMTE5LjY4OTQ2NiAzNjAsMTIzLjI1NTU0MSBMMzYwLDE1NC43NDQ0NTkgQzM2MCwxNTguMzEwNTM0IDM1OS42Mjg2OTgsMTU5LjYwMzY3OSAzNTguOTMxNDY5LDE2MC45MDczODMgQzM1OC4yMzQyNDEsMTYyLjIxMTA4NyAzNTcuMjExMDg3LDE2My4yMzQyNDEgMzU1LjkwNzM4MywxNjMuOTMxNDY5IEMzNTQuNjAzNjc5LDE2NC42Mjg2OTggMzUzLjMxMDUzNCwxNjUgMzQ5Ljc0NDQ1OSwxNjUgTDI4OC4yNTU1NDEsMTY1IEMyODQuNjg5NDY2LDE2NSAyODMuMzk2MzIxLDE2NC42Mjg2OTggMjgyLjA5MjYxNywxNjMuOTMxNDY5IEMyODAuNzg4OTEzLDE2My4yMzQyNDEgMjc5Ljc2NTc1OSwxNjIuMjExMDg3IDI3OS4wNjg1MzEsMTYwLjkwNzM4MyBDMjc4LjM3MTMwMiwxNTkuNjAzNjc5IDI3OCwxNTguMzEwNTM0IDI3OCwxNTQuNzQ0NDU5IEwyNzgsMTIzLjI1NTU0MSBDMjc4LDExOS42ODk0NjYgMjc4LjM3MTMwMiwxMTguMzk2MzIxIDI3OS4wNjg1MzEsMTE3LjA5MjYxNyBDMjc5Ljc2NTc1OSwxMTUuNzg4OTEzIDI4MC43ODg5MTMsMTE0Ljc2NTc1OSAyODIuMDkyNjE3LDExNC4wNjg1MzEgQzI4My4zOTYzMjEsMTEzLjM3MTMwMiAyODQuNjg5NDY2LDExMyAyODguMjU1NTQxLDExMyBaIiBpZD0iUmVjdGFuZ2xlLTctQ29weS04IiBmaWxsPSIjRkFERUUyIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgzMTkuMDAwMDAwLCAxMzkuMDAwMDAwKSByb3RhdGUoLTkwLjAwMDAwMCkgdHJhbnNsYXRlKC0zMTkuMDAwMDAwLCAtMTM5LjAwMDAwMCkgIj48L3BhdGg+CiAgICAgICAgICAgIDxwYXRoIGQ9Ik0xMC4yNTU1NDA4LDE2NiBMMjY2Ljc0NDQ1OSwxNjYgQzI3MC4zMTA1MzQsMTY2IDI3MS42MDM2NzksMTY2LjM3MTMwMiAyNzIuOTA3MzgzLDE2Ny4wNjg1MzEgQzI3NC4yMTEwODcsMTY3Ljc2NTc1OSAyNzUuMjM0MjQxLDE2OC43ODg5MTMgMjc1LjkzMTQ2OSwxNzAuMDkyNjE3IEMyNzYuNjI4Njk4LDE3MS4zOTYzMjEgMjc3LDE3Mi42ODk0NjYgMjc3LDE3Ni4yNTU1NDEgTDI3NywyNTQuNzQ0NDU5IEMyNzcsMjU4LjMxMDUzNCAyNzYuNjI4Njk4LDI1OS42MDM2NzkgMjc1LjkzMTQ2OSwyNjAuOTA3MzgzIEMyNzUuMjM0MjQxLDI2Mi4yMTEwODcgMjc0LjIxMTA4NywyNjMuMjM0MjQxIDI3Mi45MDczODMsMjYzLjkzMTQ2OSBDMjcxLjYwMzY3OSwyNjQuNjI4Njk4IDI3MC4zMTA1MzQsMjY1IDI2Ni43NDQ0NTksMjY1IEwxMC4yNTU1NDA4LDI2NSBDNi42ODk0NjU4NCwyNjUgNS4zOTYzMjA4OSwyNjQuNjI4Njk4IDQuMDkyNjE3MTksMjYzLjkzMTQ2OSBDMi43ODg5MTM0OCwyNjMuMjM0MjQxIDEuNzY1NzU5MTksMjYyLjIxMTA4NyAxLjA2ODUzMDgyLDI2MC45MDczODMgQzAuMzcxMzAyNDQ1LDI1OS42MDM2NzkgMi44ODU4NDI3N2UtMTQsMjU4LjMxMDUzNCAyLjg0MjE3MDk0ZS0xNCwyNTQuNzQ0NDU5IEwyLjg5NzQxNTc2ZS0xNCwxNzYuMjU1NTQxIEMyLjg1Mzc0Mzk0ZS0xNCwxNzIuNjg5NDY2IDAuMzcxMzAyNDQ1LDE3MS4zOTYzMjEgMS4wNjg1MzA4MiwxNzAuMDkyNjE3IEMxLjc2NTc1OTE5LDE2OC43ODg5MTMgMi43ODg5MTM0OCwxNjcuNzY1NzU5IDQuMDkyNjE3MTksMTY3LjA2ODUzMSBDNS4zOTYzMjA4OSwxNjYuMzcxMzAyIDYuNjg5NDY1ODQsMTY2IDEwLjI1NTU0MDgsMTY2IFoiIGlkPSJSZWN0YW5nbGUtNy1Db3B5LTE2IiBmaWxsPSIjRkZGNERCIj48L3BhdGg+CiAgICAgICAgPC9nPgogICAgPC9nPgo8L3N2Zz4=);
+    background-repeat: no-repeat;
+    background-position: 20px 20px;
+    background-size: 47.7%;
+
+    background-color: #e9f7ff;
+    padding-top: 110px;
+  }
+
+  .quickstart-row {
+    display: flex;
+    justify-content: center;
+    padding-top: 100px;
+    padding-bottom: 100px;
+  }
+
+  .cards {
+    width: 100%;
+    display: flex;
+    padding-bottom: 100px;
+    justify-content: center;
+  }
+
+  .card {
     padding: 1em;
     display: flex;
     flex-direction: column;
-    border: 3px solid rgba(74,144,226,0.2);
+    border: 3px solid rgba(74, 144, 226, 0.2);
     background-color: #fff;
     color: #000;
     padding: 20px;
     margin: 0 20px;
     max-width: 350px;
- }
-
- .img-car {
- width: 740px;
- filter: drop-shadow(0 0 10px #999);
- }
- 
- .subscribe {
- width: 600px;
- text-align: center;
- display: flex;
- justify-content: center;
- height: 400px;
- align-items: center;
- margin: 0 auto;
- }
-
- .tagline {
- display: flex;
- }
-
- .images-carousel {
- margin-right: 2em;
- }
-
- .quickstart {
-   margin-left: 4em;
-   margin-right: 2em;
- }
- 
- @media screen and (max-width: 900px) {
-
- .header-ul { padding-left: 0px; }
- 
- .quickstart {
-
- margin-left: 2em;
- }
- 
- 
- .tagline-text {
-   text-align: center;
- }
- 
- .tagline {
- flex-direction: column;
- }
- 
- .img-car {
- width: 90%;
- margin-left: 2em;
-
- }
- 
- .subscribe {
- width: auto;
- margin-left: 2em;
- margin-right: 2em;
- }
-
-
- .cards {
- flex-direction: column;
- }
-
- .card {
- margin-bottom: 2em;
- }
- 
- .quickstart-row {
- flex-direction: column;
- padding-top: 60px;
- }
-
- .images-carousel {
- margin: 0 auto;
- }
- }
- 
- .footer a, .footer h2 {
- color: white;
-
- }
-
- .footer a:hover {
-   text-decoration: underline;
- }
- 
- .footer {
- background-color: #0f0f0f; color: white; display: flex; justify-content: center; min-height: 300px; align-items: center;
- }
-
- .footer .item {
-   margin-right: 10px;
-   margin-left: 10px;
-   line-height: 1.8em;
- }
- 
-
-img {
-  max-width: 100%;
-  vertical-align: middle;
-}
-
-.trigger {
-  display: none;
-}
-
-.slider {
-  position: relative;
-  height: 392px;
-  width: 760px;
-  margin-left: 2em;
   }
 
-  .slider-wrapper {
-  position: relative;
-}
-
-.slide {
-  width: 100%;
-  overflow: hidden;
-  position: absolute;
-  height: 100%;
-  left: 0;
-  top: 0;
-  z-index: 5000;
-  opacity: 0;
-  transition: opacity .5s ease-in-out;
-  filter: drop-shadow(0 0 10px #999);
-  border-radius: 5px;
-}
-
-.slide-img {
-  height: 100%;
-  object-fit: fill;
-  display: block;
-  margin: 0 auto;
-  filter: drop-shadow(0 0 10px #999);
-}
-
-.slide-figure {
-  height: 100%;
-  position: relative;
-  margin: 0;
-}
-
-.slide-caption {
-  position: absolute;
-  bottom: 0%;
-  width: 100%;
-  color: white;
-  text-align: center;
-  background: rgba(0,0,0,0.4);
-}
-
-.trigger:checked + .slide {
-  z-index: 6000;
-  opacity: 1;
-}
-
-.slider-nav {
-  width: 100%;
-  text-align: center;
-  margin: 1rem 0;
-  padding: 0px;
-}
-
-.slider-nav__item {
-  display: inline-block;
-}
-
-.slider-nav__label {
-  font-size: 13px;
-  background-color: #333;
-  display: block;
-  height: 1.5em;
-  line-height: 2em;
-  width: 1.5em;
-  text-align: center;
-  border-radius: 50%;
-  color: white;
-  cursor: pointer;
-  transition: background-color .25s, color .25s ease-in-out;
-}
-
-.slider-nav__label:hover,
-.slider-nav__label:active,
-.slider-nav__label:focus {
-  background-color: gray;
-  color: black;
+  .img-car {
+    width: 740px;
+    filter: drop-shadow(0 0 10px #999);
   }
 
-
- @media screen and (max-width: 900px) {
-  .slider {
-  width: 90%;
-  margin-left: 2em;
-  margin-right: 2em;
-  height: 250px;
+  .subscribe {
+    width: 600px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    height: 400px;
+    align-items: center;
+    margin: 0 auto;
   }
 
-  .slide-img {
-  width: 100%;
-  height: auto;
+  .tagline {
+    display: flex;
   }
-  
-  .slider-wrapper {
-  width: 100%;
-  
 
+  .images-carousel {
+    margin-right: 2em;
+  }
+
+  .quickstart {
+    margin-left: 4em;
+    margin-right: 2em;
+  }
+
+  @media screen and (max-width: 1000px) {
+
+    .header-ul {
+      padding-left: 0;
+    }
+
+    .quickstart {
+
+      margin-left: 2em;
+    }
+
+    .tagline-text {
+      text-align: center;
+    }
+
+    .tagline {
+      flex-direction: column;
+    }
+
+    .img-car {
+      width: 90%;
+      margin-left: 2em;
+    }
+
+    .subscribe {
+      width: auto;
+      margin-left: 2em;
+      margin-right: 2em;
+    }
+
+    .cards {
+      flex-direction: column;
+    }
+
+    .card {
+      margin-bottom: 2em;
+    }
+
+    .quickstart-row {
+      flex-direction: column;
+      padding-top: 60px;
+    }
+
+    .images-carousel {
+      margin: 0 auto;
     }
   }
 
+  .footer a, .footer h2 {
+    color: white;
+
+  }
+
+  .footer a:hover {
+    text-decoration: underline;
+  }
+
+  .footer {
+    background-color: #0f0f0f;
+    color: white;
+    display: flex;
+    justify-content: center;
+    min-height: 300px;
+    align-items: center;
+  }
+
+  .footer .item {
+    margin-right: 10px;
+    margin-left: 10px;
+    line-height: 1.8em;
+  }
+
+
+  img {
+    max-width: 100%;
+    vertical-align: middle;
+  }
+
+  .trigger {
+    display: none;
+  }
+
+  .slider {
+    position: relative;
+    height: 392px;
+    width: 760px;
+    margin-left: 2em;
+  }
+
+  .slider-wrapper {
+    position: relative;
+  }
+
+  .slide {
+    width: 100%;
+    overflow: hidden;
+    position: absolute;
+    height: 100%;
+    left: 0;
+    top: 0;
+    z-index: 5000;
+    opacity: 0;
+    transition: opacity .5s ease-in-out;
+    filter: drop-shadow(0 0 10px #999);
+    border-radius: 5px;
+  }
+
+  .slide-img {
+    height: 100%;
+    object-fit: fill;
+    display: block;
+    margin: 0 auto;
+    filter: drop-shadow(0 0 10px #999);
+  }
+
+  .slide-figure {
+    height: 100%;
+    position: relative;
+    margin: 0;
+  }
+
+  .slide-caption {
+    position: absolute;
+    bottom: 0%;
+    width: 100%;
+    color: white;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.4);
+  }
+
+  .trigger:checked + .slide {
+    z-index: 6000;
+    opacity: 1;
+  }
+
+  .slider-nav {
+    width: 100%;
+    text-align: center;
+    margin: 1rem 0;
+    padding: 0px;
+  }
+
+  .slider-nav__item {
+    display: inline-block;
+  }
+
+  .slider-nav__label {
+    font-size: 13px;
+    background-color: #333;
+    display: block;
+    height: 1.5em;
+    line-height: 2em;
+    width: 1.5em;
+    text-align: center;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+    transition: background-color .25s, color .25s ease-in-out;
+  }
+
+  .slider-nav__label:hover,
+  .slider-nav__label:active,
+  .slider-nav__label:focus {
+    background-color: gray;
+    color: black;
+  }
+
+  #site_search {
+    margin-right: 0 !important;
+  }
+
+  @media screen and (max-width: 900px) {
+    #site_search {
+      top: 5px !important;
+      margin-right: 5px !important;
+    }
+    #local-search-result-wrapper {
+      top: 40px;
+    }
+
+    .slider {
+      width: 90%;
+      margin-left: 2em;
+      margin-right: 2em;
+      height: 250px;
+    }
+
+    .slide-img {
+      width: 100%;
+      height: auto;
+    }
+
+    .slider-wrapper {
+      width: 100%;
+    }
+  }
 </style>
 
-<div id="header" style="box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 3px 0px;">
-    <a id="logo" href="<%- url_for("/") %>">
-        <img src="<%- url_for("/images/ls_logo.png") %>" alt="label studio logo" />
-        <span>Label Studio</span>
-    </a>
-    <ul id="nav" style="display: flex; align-items: center">
-        <%- partial('partials/main_menu', { context: 'nav' }) %>
-    </ul>
-</div>
 
 <body>
-  <div class="fix-sidebar">
-    <%- partial('partials/sidebar', { type: page.type === 'menu' ? 'guide' : page.type, index: page.index }) %>
-    <div>
-      <div id="bodybag" class='content'>
-        <section style="background-color: #fffaff;">
-          <div style="position: relative; padding-top: 100px; padding-bottom: 100px;">
-            <div style="display: flex; justify-content: center;">
-              <div style="display: flex; flex-direction: column; align-items: center;">
-                <div class="tagline">
-                  <img src="<%- url_for("/images/opossum/heartex_icon_opossum_green.svg") %>" alt="label studio logo" height="180" />
-                  <div class="tagline-text">
-                    <h1 style="font-size: 2em;">Open-source<br/>data labeling, annotation<br/> and exploration tool<br/></h1>
-                  </div>
+
+<div id="header" style="box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 3px 0px;">
+  <a id="logo" href="<%- url_for("/") %>">
+    <img src="<%- url_for("/images/ls_logo.png") %>" alt="label studio logo"/>
+    <span>Label Studio</span>
+  </a>
+  <ul id="nav" style="display: flex; align-items: center">
+    <%- partial('partials/main_menu', {context: 'nav'}) %>
+  </ul>
+</div>
+
+<div id="local-search-result-wrapper"></div>
+<script>
+    var search_path = "<%= config.search.path %>";
+    if (search_path.length === 0) {
+        search_path = "search.xml";
+    }
+    var path = "<%= config.root %>" + search_path;
+    searchFunc(path, 'local-search-input', 'local-search-result-wrapper');
+</script>
+
+<div class="fix-sidebar">
+  <%- partial('partials/sidebar', {type: page.type === 'menu' ? 'guide' : page.type, index: page.index}) %>
+  <div>
+    <div id="bodybag" class='content'>
+      <section style="background-color: #fffaff;">
+        <div style="position: relative; padding-top: 100px; padding-bottom: 100px;">
+          <div style="display: flex; justify-content: center;">
+            <div style="display: flex; flex-direction: column; align-items: center;">
+              <div class="tagline">
+                <img src="<%- url_for("/images/opossum/heartex_icon_opossum_green.svg") %>" alt="label studio logo"
+                     height="180"/>
+                <div class="tagline-text">
+                  <h1 style="font-size: 2em;">Open-source<br/>data labeling, annotation<br/> and exploration tool<br/>
+                  </h1>
                 </div>
-                <ul style="list-style-type: none;" class="header-ul">
-                  <li>— Simplicity built-in, no overcomplicated UIs</li>
-                  <li>— Mobile-Friendly, adaptable for any device</li>
-                  <li>— Visually configurable from top to the bottom</li>
-                </ul>
-                <div style="display: flex; flex-direction: row; margin-top: 2em;">
-                  <center>
-                      <a href="https://app.labelstud.io/welcome?ref=labelstud.io" class="btn">Try Demo</a>
-                      <a href="<%- url_for("guide/") %>" class="btn">Get Started</a>
-                      <a href="https://docs.google.com/forms/d/e/1FAIpQLSdLHZx5EeT1J350JPwnY2xLanfmvplJi6VZk65C2R4XSsRBHg/viewform?usp=sf_link" class="btn btn-slack">
-                      <img src="<%- url_for("/images/slack.png") %>" height="18" style="margin-right: 8px;"  />Join Slack</a>
-                  </center>
-                  <!-- <div><a href="" class="btn">Watch video</a></div> -->
-                </div>
-              </div>                            
+              </div>
+              <ul style="list-style-type: none;" class="header-ul">
+                <li>— Simplicity built-in, no overcomplicated UIs</li>
+                <li>— Mobile-Friendly, adaptable for any device</li>
+                <li>— Visually configurable from top to the bottom</li>
+              </ul>
+              <div style="display: flex; flex-direction: row; margin-top: 2em;">
+                <center>
+                  <a href="https://app.labelstud.io/welcome?ref=labelstud.io" class="btn">Try Demo</a>
+                  <a href="<%- url_for("guide/") %>" class="btn">Get Started</a>
+                  <a
+                    href="https://docs.google.com/forms/d/e/1FAIpQLSdLHZx5EeT1J350JPwnY2xLanfmvplJi6VZk65C2R4XSsRBHg/viewform?usp=sf_link"
+                    class="btn btn-slack">
+                    <img src="<%- url_for("/images/slack.png") %>" height="18" style="margin-right: 8px;"/>Join
+                    Slack</a>
+                </center>
+                <!-- <div><a href="" class="btn">Watch video</a></div> -->
+              </div>
             </div>
           </div>
-        </section>
-        
-        <section class="quickstart-row">
+        </div>
+      </section>
 
-          <div class="slider-wrapper">
-            <div class="slider">
-              <input type="radio" name="slider" class="trigger" id="zero" checked="checked" />
-              <!-- GIF -->
-              <div class="slide">
-                <figure class="slide-figure">
-                  <img class="slide-img" src="/images/annotation_examples.gif" style="border-radius: 5px;" />
-                </figure>
-              </div>
+      <section class="quickstart-row">
 
-              <!-- Images -->
-              <input type="radio" name="slider" class="trigger" id="one" />
-              <div class="slide">
-                <figure class="slide-figure">
-                  <img class="slide-img" src="/images/screens/image_bbox.png" />
-                  <figcaption class="slide-caption"><p>Image Bounding Box</p></figcaption>
-                </figure>
-              </div>
-              <input type="radio" name="slider" class="trigger" id="two" />
-              <div class="slide">
-                <figure class="slide-figure">
-                  <img class="slide-img" src="/images/screens/audio_transcription.png" />
-                  <figcaption class="slide-caption"><p>Audio Transcription</p></figcaption>
-                </figure>
-              </div>
-              <input type="radio" name="slider" class="trigger" id="three" />
-              <div class="slide">
-                <figure class="slide-figure">
-                  <img class="slide-img" src="/images/screens/dialogue_analysis.png" />
-                  <figcaption class="slide-caption"><p>Dialogue Analysis</p></figcaption>
-                </figure>
-              </div>
-              <input type="radio" name="slider" class="trigger" id="four" />
-              <div class="slide">
-                <figure class="slide-figure">
-                  <img class="slide-img" src="/images/screens/audio_regions.png" />
-                  <figcaption class="slide-caption"><p>Audio Regions</p></figcaption>
-                </figure>
-              </div>
-              <input type="radio" name="slider" class="trigger" id="five" />
-              <div class="slide">
-                <figure class="slide-figure">
-                  <img class="slide-img" src="/images/screens/named_entity.png" />
-                  <figcaption class="slide-caption"><p>Named Entity Recognition</p></figcaption>
-                </figure>
-              </div>
+        <div class="slider-wrapper">
+          <div class="slider">
+            <input type="radio" name="slider" class="trigger" id="zero" checked="checked"/>
+            <!-- GIF -->
+            <div class="slide">
+              <figure class="slide-figure">
+                <img class="slide-img" src="/images/annotation_examples.gif" style="border-radius: 5px;"/>
+              </figure>
             </div>
-            <ul class="slider-nav">
-              <li class="slider-nav__item"><label class="slider-nav__label" for="zero"> </label></li>
-              <li class="slider-nav__item"><label class="slider-nav__label" for="one"> </label></li>
-              <li class="slider-nav__item"><label class="slider-nav__label" for="two"> </label></li>
-              <li class="slider-nav__item"><label class="slider-nav__label" for="three"> </label></li>
-              <li class="slider-nav__item"><label class="slider-nav__label" for="four"> </label></li>
-              <li class="slider-nav__item"><label class="slider-nav__label" for="five"> </label></li>
-            </ul>
+
+            <!-- Images -->
+            <input type="radio" name="slider" class="trigger" id="one"/>
+            <div class="slide">
+              <figure class="slide-figure">
+                <img class="slide-img" src="/images/screens/image_bbox.png"/>
+                <figcaption class="slide-caption"><p>Image Bounding Box</p></figcaption>
+              </figure>
+            </div>
+            <input type="radio" name="slider" class="trigger" id="two"/>
+            <div class="slide">
+              <figure class="slide-figure">
+                <img class="slide-img" src="/images/screens/audio_transcription.png"/>
+                <figcaption class="slide-caption"><p>Audio Transcription</p></figcaption>
+              </figure>
+            </div>
+            <input type="radio" name="slider" class="trigger" id="three"/>
+            <div class="slide">
+              <figure class="slide-figure">
+                <img class="slide-img" src="/images/screens/dialogue_analysis.png"/>
+                <figcaption class="slide-caption"><p>Dialogue Analysis</p></figcaption>
+              </figure>
+            </div>
+            <input type="radio" name="slider" class="trigger" id="four"/>
+            <div class="slide">
+              <figure class="slide-figure">
+                <img class="slide-img" src="/images/screens/audio_regions.png"/>
+                <figcaption class="slide-caption"><p>Audio Regions</p></figcaption>
+              </figure>
+            </div>
+            <input type="radio" name="slider" class="trigger" id="five"/>
+            <div class="slide">
+              <figure class="slide-figure">
+                <img class="slide-img" src="/images/screens/named_entity.png"/>
+                <figcaption class="slide-caption"><p>Named Entity Recognition</p></figcaption>
+              </figure>
+            </div>
           </div>
-          
-          <div class="quickstart">
-            <h1>Quickstart</h1>
-            <div class="code-block">
-              <p># Install the package<br><b>pip install label-studio</b></p>
-              <p># Create a new project<br><b>label-studio init my_project</b></p>
-              <p># Launch it!<br/><b>label-studio start my_project</b></p>
-            </div>
-            <p>Check out the templates configured for specific data labeling needs.</p>
-            <a href="<%- url_for("/templates/index.html") %>" class="btn" target="_blank">Templates</a>
+          <ul class="slider-nav">
+            <li class="slider-nav__item"><label class="slider-nav__label" for="zero"> </label></li>
+            <li class="slider-nav__item"><label class="slider-nav__label" for="one"> </label></li>
+            <li class="slider-nav__item"><label class="slider-nav__label" for="two"> </label></li>
+            <li class="slider-nav__item"><label class="slider-nav__label" for="three"> </label></li>
+            <li class="slider-nav__item"><label class="slider-nav__label" for="four"> </label></li>
+            <li class="slider-nav__item"><label class="slider-nav__label" for="five"> </label></li>
+          </ul>
+        </div>
+
+        <div class="quickstart">
+          <h1>Quickstart</h1>
+          <div class="code-block">
+            <p># Install the package<br><b>pip install label-studio</b></p>
+            <p># Create a new project<br><b>label-studio init my_project</b></p>
+            <p># Launch it!<br/><b>label-studio start my_project</b></p>
           </div>
-        </section>
-        <section class="light-blue" style="display: flex; justify-content: center;">          
-          <div class="cards">
-            <div class="card">
-              <h3>Configurable</h3>
-              <p>Using HTML-like tags, you can quickly configure the UI for your particular needs. It's not just an image or text. It can be a pairwise comparison, multi-type classification, and beyond. Label Studio is a swiss army knife of data labeling and annotation.</p>
-              <a href="<%- url_for("/guide/configuration.html") %>" class="underline">Learn More</a>
-            </div>
-            <div class="card">
-              <h3>Multiple data types</h3>
-              <p>Label Studio is type agnostic. The overall goal is to be able to process all data types. Right now it supports <a href="<%- url_for("/tags/audio.html") %>" class="underline">Audio</a>, <a href="<%- url_for("/tags/text.html") %>" class="underline">Text</a>, <a href="<%- url_for("/tags/image.html") %>" class="underline">Images</a>, and <a href="<%- url_for("/tags/hypertext.html") %>" class="underline">HTML</a>. <br/><br/>Each interface can include a mix of the types with different workflows.</p>
-            </div>
-            <div class="card">
-              <h3>Embeddable and Extendable</h3>
-              <p>Label Studio includes a powerful embedding feature that enables you to embed entire UI in your pipeline. You can extend core functionality with new visual constructs and customize it for different use cases.</p>
-              <a href="<%- url_for("/guide/frontend.html") %>" class="underline">Learn More</a>
-            </div>
-          </div>                    
-        </section>
+          <p>Check out the templates configured for specific data labeling needs.</p>
+          <a href="<%- url_for("/templates/index.html") %>" class="btn" target="_blank">Templates</a>
+        </div>
+      </section>
+      <section class="light-blue" style="display: flex; justify-content: center;">
+        <div class="cards">
+          <div class="card">
+            <h3>Configurable</h3>
+            <p>Using HTML-like tags, you can quickly configure the UI for your particular needs. It's not just an image
+              or text. It can be a pairwise comparison, multi-type classification, and beyond. Label Studio is a swiss
+              army knife of data labeling and annotation.</p>
+            <a href="<%- url_for("/guide/configuration.html") %>" class="underline">Learn More</a>
+          </div>
+          <div class="card">
+            <h3>Multiple data types</h3>
+            <p>Label Studio is type agnostic. The overall goal is to be able to process all data types. Right now it
+              supports <a href="<%- url_for("/tags/audio.html") %>" class="underline">Audio</a>, <a
+                href="<%- url_for("/tags/text.html") %>" class="underline">Text</a>, <a
+                href="<%- url_for("/tags/image.html") %>" class="underline">Images</a>, and <a
+                href="<%- url_for("/tags/hypertext.html") %>" class="underline">HTML</a>. <br/><br/>Each interface can
+              include a mix of the types with different workflows.</p>
+          </div>
+          <div class="card">
+            <h3>Embeddable and Extendable</h3>
+            <p>Label Studio includes a powerful embedding feature that enables you to embed entire UI in your pipeline.
+              You can extend core functionality with new visual constructs and customize it for different use cases.</p>
+            <a href="<%- url_for("/guide/frontend.html") %>" class="underline">Learn More</a>
+          </div>
+        </div>
+      </section>
 
-        <section class="subscribe">
+      <section class="subscribe">
 
-        <iframe width="640" height="320" src="https://labelstudio.substack.com/embed" frameborder="0" scrolling="no"></iframe>
+        <iframe width="640" height="320" src="https://labelstudio.substack.com/embed" frameborder="0"
+                scrolling="no"></iframe>
 
 
-        </section>
-        
-        <section style="background-color: #1f104d; display: flex; justify-content: center; color: white; align-items: center; padding-top: 100px; padding-bottom: 100px; display: none;">
-          
+      </section>
+
+      <section
+        style="background-color: #1f104d; display: flex; justify-content: center; color: white; align-items: center; padding-top: 100px; padding-bottom: 100px; display: none;">
+
+        <div>
+          <h3 style="color: white;">Looking to scale?</h3>
+          <ul style="list-style-type: none;">
+            <li>— Do you have more data than you can possibly label by hand?</li>
+            <li>— Do you want to distribute the labeling to multiple annotators?</li>
+            <li>— Do you want to control the quality of the annotations?</li>
+            <li>— Do you want to include your entire team into the process to achive greater results?</li>
+          </ul>
+
+          <p>We provide commercial offering built on top of Label Studio.</p>
           <div>
-            <h3 style="color: white;">Looking to scale?</h3>
-            <ul style="list-style-type: none;">
-              <li>— Do you have more data than you can possibly label by hand?</li>
-              <li>— Do you want to distribute the labeling to multiple annotators?</li>
-              <li>— Do you want to control the quality of the annotations?</li>
-              <li>— Do you want to include your entire team into the process to achive greater results?</li>
-            </ul>
-
-            <p>We provide commercial offering built on top of Label Studio.</p>
-            <div>
-              <a href="" class="btn btn-orange">Check it out</a>                            
-            </div>
+            <a href="" class="btn btn-orange">Check it out</a>
           </div>
-          <div>
-            <img src="https://uploads-ssl.webflow.com/5cb5a799cf58f5f8d19a9441/5d24d11f82791f2dd51831ae_screely-1562693910207.png" alt="Quickstart" width="600">
-          </div>
-        </section>
-        
-        <div class="footer">
-          <div style="display: flex; width: 100%; margin-right: 30px; max-width: 800px">
+        </div>
+        <div>
+          <img
+            src="https://uploads-ssl.webflow.com/5cb5a799cf58f5f8d19a9441/5d24d11f82791f2dd51831ae_screely-1562693910207.png"
+            alt="Quickstart" width="600">
+        </div>
+      </section>
 
-            <div style="padding-top: 6px; margin-right: 30px">
-              <a href="/"><img src="<%- url_for("/images/opossum/other/opossum_looking.svg") %>" alt="label studio logo" height="100" /></a>
+      <div class="footer">
+        <div style="display: flex; width: 100%; margin-right: 30px; max-width: 800px">
+
+          <div style="padding-top: 6px; margin-right: 30px">
+            <a href="/"><img src="<%- url_for("/images/opossum/other/opossum_looking.svg") %>" alt="label studio logo"
+                             height="100"/></a>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; flex-wrap:wrap; width: 100%">
+
+            <div class="item">
+              <h2 class="no-menu">Project</h2>
+              <div>
+                <a href="/guide">Guide</a><br/>
+                <a href="/tags">Tags</a><br/>
+                <a href="/templates">Templates</a>
+              </div>
             </div>
 
-            <div style="display: flex; justify-content: space-between; flex-wrap:wrap; width: 100%">
-
-              <div class="item">
-                <h2 class="no-menu">Project</h2>
-                <div>
-                  <a href="/guide">Guide</a><br/>
-                  <a href="/tags">Tags</a><br/>
-                  <a href="/templates">Templates</a>
-                </div>
+            <div class="item">
+              <h2 class="no-menu">Help</h2>
+              <div>
+                <a
+                  href="https://docs.google.com/forms/d/e/1FAIpQLSdLHZx5EeT1J350JPwnY2xLanfmvplJi6VZk65C2R4XSsRBHg/viewform?usp=sf_link">Slack</a><br/>
+                <a href="https://github.com/heartexlabs/label-studio/issues">Github Issues</a><br/>
+                <a href="mailto:hi@heartex.ai">hi@heartex.ai</a>
               </div>
-
-              <div class="item">
-                <h2 class="no-menu">Help</h2>
-                <div>
-                  <a href="https://docs.google.com/forms/d/e/1FAIpQLSdLHZx5EeT1J350JPwnY2xLanfmvplJi6VZk65C2R4XSsRBHg/viewform?usp=sf_link">Slack</a><br/>
-                  <a href="https://github.com/heartexlabs/label-studio/issues">Github Issues</a><br/>
-                  <a href="mailto:hi@heartex.ai">hi@heartex.ai</a>
-                </div>
-              </div>
-
-              <div class="item">
-                <h2 class="no-menu">Social</h2>
-                <div>
-                  <a href="https://twitter.com/heartexlabs">Twitter</a><br/>
-                  <a href="https://github.com/heartexlabs/label-studio">Github</a>
-                </div>
-              </div>
-
-              <div class="item">
-                <h2 class="no-menu">Company</h2>
-                <div>
-                  <a href="https://heartex.ai/">Heartex</a>
-                </div>
-              </div>
-
-
             </div>
+
+            <div class="item">
+              <h2 class="no-menu">Social</h2>
+              <div>
+                <a href="https://twitter.com/heartexlabs">Twitter</a><br/>
+                <a href="https://github.com/heartexlabs/label-studio">Github</a>
+              </div>
+            </div>
+
+            <div class="item">
+              <h2 class="no-menu">Company</h2>
+              <div>
+                <a href="https://heartex.ai/">Heartex</a>
+              </div>
+            </div>
+
+
           </div>
+        </div>
         </section>
       </div>
     </div>
