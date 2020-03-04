@@ -500,7 +500,7 @@ class MLBackend(object):
         schema = self.validate(project.label_config)
         if len(schema) > 1:
             logger.warning('ML backend returns multiple schemas for label config ' + project.label_config + ': ' +
-                           schema + '\nWe currently support only one schema, so 0th schema is used.')
+                           str(schema) + '\nWe currently support only one schema, so 0th schema is used.')
         return schema[0]
 
     def clear(self, project):
