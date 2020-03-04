@@ -398,6 +398,9 @@ class Project(object):
         filename = os.path.join(self.config['output_dir'], str(task_id) + '.json')
         os.remove(filename)
 
+        self.load_tasks()
+        self.load_derived_schemas()
+
     @classmethod
     def get_project_dir(cls, project_name, args):
         return os.path.join(args.root_dir, project_name)
