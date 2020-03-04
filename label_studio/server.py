@@ -641,6 +641,11 @@ def main():
         if input_args.init:
             Project.create_project_dir(input_args.project_name, input_args)
 
+        if not os.path.exists(input_args.project_name):
+            raise FileNotFoundError(
+                'Project directory "{pdir}" not found. '
+                'Did you miss create it first with `label-studio init {pdir}` ?'.format(pdir=input_args.project_name))
+
     # On `start` command, launch browser if --no-browser is not specified and start label studio server
     if input_args.command == 'start':
         if not input_args.no_browser:

@@ -14,7 +14,7 @@ class Tasks(object):
 
     _allowed_extensions = {
         'Text': ('.txt',),
-        'Image': ('.png', '.jpg', '.jpeg', '.tiff', '.bmp', '.gif'),
+        'Image': ('.png', '.jpg', '.jpeg', '.tiff', '.tif', '.bmp', '.gif'),
         'Audio': ('.wav', '.aiff', '.mp3', '.au', '.flac')
     }
 
