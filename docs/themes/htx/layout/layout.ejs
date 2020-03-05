@@ -13,7 +13,7 @@
       <meta property="og:description" content="<%- theme.site_description %>">
       <meta property="og:image" content="https://repository-images.githubusercontent.com/192640529/6b34d180-dd95-11e9-8016-fddd7751cb2c">
       <meta name="thumbnail" content="https://<%- theme.root_domain %>/images/opossum/heartex_icon_opossum_green@2x.png"/>
-    
+
 
       <meta name="twitter:card" content="summary">
       <meta name="twitter:title" content="<%- page.title ? page.title + ' — ' : '' %>Label Studio">
@@ -27,30 +27,33 @@
       <link rel="manifest" href="/manifest.json">
 
       <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico"/>
-      
+
       <link href='//fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600|Roboto Mono' rel='stylesheet' type='text/css'>
       <link href='//fonts.googleapis.com/css?family=Dosis:500&text=LabelStudio' rel='stylesheet' type='text/css'>
 
       <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
       <!-- Place this tag in your head or just before your close body tag. -->
+      <script src="<%- url_for("js/jquery.min.js") %>"></script>
       <script async defer src="https://buttons.github.io/buttons.js"></script>
+      <script src="<%- url_for("js/search.js") %>"></script>
 
       <script src="<%- url_for("/js/smooth-scroll.min.js") %>"></script>
-    
+
     <!-- main page styles -->
     <%- css(isIndex ? 'css/index' : 'css/page') %>
+    <%- css('css/search') %>
 
     <% if (page.type === "playground") { %>
       <%- css('css/codemirror') %>
       <script src="<%- url_for("/js/jquery.min.js") %>"></script>
       <script src="<%- url_for("/js/jquery-ui.min.js") %>"></script>
       <script src="<%- url_for("/js/codemirror.js") %>"></script>
-      <script src="<%- url_for("/js/xml.js") %>"></script>      
+      <script src="<%- url_for("/js/xml.js") %>"></script>
     <% } %>
 
     <!-- this needs to be loaded before guide's inline scripts -->
-    
+
   </head>
   <body class="<%- isIndex ? '' : 'docs' -%>">
     <div id="mobile-bar" <%- isIndex ? 'style="display: none"' : '' %>>
@@ -68,5 +71,5 @@
     <script src="<%- url_for("/js/css.escape.js") %>"></script>
     <script src="<%- url_for("/js/common.js") %>"></script>
     <%- partial('partials/google_analytics') %>
-  </body>  
+  </body>
 </html>

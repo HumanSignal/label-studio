@@ -1,4 +1,5 @@
 
+
 <% if (page.type === "guide") { %>
 <span style="margin-right: 1em;">Guide</span>
 <% } else { %>
@@ -30,7 +31,10 @@
        data-size="large" data-show-count="true" aria-label="Star heartexlabs/label-studio on GitHub"></a>
 
 </div>
-<img src="/images/github-icon.png" height="25px" style="margin-left: 10px; cursor:pointer"
+<img src="/images/github-icon.png" height="25px" style="margin-left: 10px; cursor:pointer" class="github-link"
      onclick="window.location='https://github.com/heartexlabs/label-studio'">
 
-
+<div id="site_search">
+  <input type="text" id="local-search-input" name="q" results="0"
+         placeholder="Search" class="st-search-input st-default-search-input form-control"/>
+</div>
