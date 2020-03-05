@@ -8,10 +8,98 @@ order: 201
     Start typing in the config, and you can quickly preview the labeling interface. At the bottom of the page, you have live serialization updates of what Label Studio expects as an input and what it gives you as a result of your labeling work.
 </div>
 
-
 {% raw %}
+<!-- html -->
 
-<style scoped>
+<!-- Templates -->
+<div class="ui message">
+  <div class="content" style="margin-top: 0">
+    <!-- Templates categories -->
+    <div class="ui grid stackable" style="margin: 0 auto;">
+
+      <div class="three wide column category">
+        <i class="icon sound"></i>
+        <!-- Template -->
+        <div class="ui item">
+          <a class="use-template no-go" href="#" data-value="11">Audio classifier</a>
+        </div>
+        <div class="ui item">
+          <a class="use-template no-go" href="#" data-value="8">Audio segmentation</a>
+        </div>
+        <div class="ui item">
+          <a class="use-template no-go" href="#" data-value="0">Audio transcription</a>
+        </div>
+      </div>
+
+      <div class="three wide column category">
+        <i class="icon image"></i>
+        <!-- Template -->
+        <div class="ui item">
+          <a class="use-template no-go" href="#" data-value="6">Image bounding boxes</a>
+        </div>
+        <div class="ui item">
+          <a class="use-template no-go" href="#" data-value="13">Image classifier</a>
+        </div>
+        <div class="ui item">
+          <a class="use-template no-go" href="#" data-value="14">Image keypoints and landmarks</a>
+        </div>
+        <div class="ui item">
+          <a class="use-template no-go" href="#" data-value="1">Image mixed labeling</a>
+        </div>
+        <div class="ui item">
+          <a class="use-template no-go" href="#" data-value="5">Image polygon labeling</a>
+        </div>
+      </div>
+
+      <div class="three wide column category">
+        <i class="icon code"></i>
+        <!-- Template -->
+        <div class="ui item">
+          <a class="use-template no-go" href="#" data-value="2">Conversational analysis</a>
+        </div>
+        <div class="ui item">
+          <a class="use-template no-go" href="#" data-value="3">HTML NER tagging</a>
+        </div>
+      </div>
+
+      <div class="three wide column category">
+        <i class="icon font"></i>
+        <!-- Template -->
+        <div class="ui item">
+          <a class="use-template no-go" href="#" data-value="9">Named entity recognition</a>
+        </div>
+        <div class="ui item">
+          <a class="use-template no-go" href="#" data-value="4">Text classifier</a>
+        </div>
+        <div class="ui item">
+          <a class="use-template no-go" href="#" data-value="12">Text pairwise labeling</a>
+        </div>
+        <div class="ui item">
+          <a class="use-template no-go" href="#" data-value="10">Text references</a>
+        </div>
+      </div>
+
+      <div class="three wide column category">
+        <i class="icon video"></i>
+        <!-- Template -->
+        <div class="ui item">
+          <a class="use-template no-go" href="#" data-value="7">Video classifier</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+<style>
  .content {
      max-width: none !important;
      margin-left: 0 !important;
@@ -76,49 +164,48 @@ order: 201
     border: 1px solid #f48a4259;
 }
  
- .config-col {
+.config-col {
     color: rgba(0,0,0,.6); 
     background: rgb(252,252,252); 
     margin-right: 2em; 
     width: 40%; 
- }
+}
 
- .input-col {
- width: 49%;
- margin-right: 2%;
- }
-
- .output-col {
+.input-col {
     width: 49%;
- }
+    margin-right: 2%;
+}
+
+.output-col {
+    width: 49%;
+}
+.hidden {
+    display: none !important;
+}
  
 @media screen and (max-width: 900px) {
-.editor-row {
-    flex-direction: column;
- }
-
- .data-row {
-    flex-direction: column;
- }
-
-.preview-col {
-    width: 100%;
+    .editor-row {
+        flex-direction: column;
+    }
+    .data-row {
+        flex-direction: column;
+    }
+    .preview-col {
+        width: 100%;
+    }
+    .config-col {
+        width: 100%;
+    }
+    .input-col, .output-col { 
+        width: 100%; 
+    }
 }
-
-.config-col {
-    width: 100%;
- }
- 
- .input-col, .output-col { width: 100%; }
- 
-}
- 
 </style>
 
 <div>
   <div class="editor-row">
     <div class="config-col">
-      <h3>Label Config</h3>
+      <h3>Label config</h3>
       <div class="editor-area">
       <!-- Textarea -->
       <textarea name="label_config" cols="40" rows="10" class="project-form htx-html-editor"
@@ -127,9 +214,9 @@ order: 201
     </div>
     <div class="preview-col">
       <h3>Interface preview</h3>
-      <div class="validation"></div><br>
+      <div class="validation"></div>
       <div id="editor-wrap">   
-      </div >
+      </div>
       <div class="preview" id="preload-editor">
         <div class="loading" style="margin: 20px; opacity: 0.8">
             <img width="40px" src="/images/loading.gif">
@@ -154,7 +241,6 @@ order: 201
       <pre class="preview" id="data-results">...</pre>
     </div>
   </div>
-</div>
 </div>
 
 <script>
@@ -367,6 +453,272 @@ order: 201
 
  });
 </script>
+</div>
 
+
+   <!-- Hidden template codes -->
+    
+      
+        
+        <script data-template-pk="11" type="text"><View>
+  <Header value="Listen to the audio"/>
+  <Audio name="audio" value="$url"/>
+  <Header value="Select its topic"/>
+  <Choices name="label" toName="audio"
+           choice="single-radio" showInline="true">
+    <Choice value="Politics"/>
+    <Choice value="Business"/>
+    <Choice value="Education"/>
+    <Choice value="Other"/>
+  </Choices>
+</View>
+</script>
+        
+      
+        
+        <script data-template-pk="8" type="text"><View>
+  <Header value="Select genre"/>
+  <Choices name="choice" toName="audio" choice="multiple">
+    <Choice value="Lo-Fi" />
+    <Choice value="Rock" />
+    <Choice value="Pop" />
+  </Choices>
+
+  <Header value="Select regions"/>
+  <Labels name="label" toName="audio" choice="multiple">
+    <Label value="Beat" background="gray"/>
+    <Label value="Voice" background="red"/>
+    <Label value="Guitar" background="blue"/>
+    <Label value="Other"/>
+  </Labels>
+
+  <Header value="Listen the audio"/>
+  <AudioPlus name="audio" value="$url"/>
+</View>
+</script>
+        
+      
+        
+        <script data-template-pk="0" type="text"><View>
+  <Header value="Listen the audio"/>
+  <Audio name="audio" value="$url"/>
+  <View style="margin-top: 3em">
+    <Header value="Write the transcription and press enter"/>
+    <TextArea name="answer"/>
+  </View>
+</View>
+</script>
+        
+      
+    
+      
+        
+        <script data-template-pk="6" type="text"><View>
+  <Image name="img" value="$image"/>
+  <RectangleLabels name="tag" toName="img">
+    <Label value="Airplane" background="green"/>
+    <Label value="Car" background="blue"/>
+  </RectangleLabels>
+</View></script>
+        
+      
+        
+        <script data-template-pk="13" type="text"><View>
+  <Image name="img" value="$image_url"/>
+  <Choices name="choice" toName="img" showInLine="true">
+    <Choice value="Boeing" background="blue"/>
+    <Choice value="Airbus" background="green" />
+  </Choices>
+</View>
+</script>
+        
+      
+        
+        <script data-template-pk="14" type="text"><View>
+  <Image name="img" value="$image" zoom="true"/>
+  <Header>Select label then click on image</Header>
+  <KeyPointLabels name="tag" toName="img"
+                  strokewidth="5" fillcolor="red">
+    <Label value="Engine" background="red"/>
+    <Label value="Tail" background="rgba(0, 255, 0, 0.9)"/>
+  </KeyPointLabels>
+</View>
+</script>
+        
+      
+        
+        <script data-template-pk="1" type="text"><View>
+
+  <!-- Image with bounding boxes -->
+  <View style="padding: 25px;
+             box-shadow: 2px 2px 8px #AAA">
+    <Header value="Label the image with bounding boxes"/>
+    <Image name="img" value="$image"/>
+    <Text name="text1"
+          value="Select label, click and drag on image"/>
+
+    <RectangleLabels name="tag" toName="img"
+                     canRotate="false">
+      <Label value="Airplane" background="red"/>
+      <Label value="Car" background="blue"/>
+    </RectangleLabels>
+  </View>
+
+  <!-- Image with single choice -->
+  <View style="margin-top: 20px; padding: 25px;
+             box-shadow: 2px 2px 8px #AAA;">
+    <Header value="Do you like this image?"/>
+
+    <Choices name="choices1" toName="img"
+             choice="single">
+      <Choice alias="yes" value="Yes"/>
+      <Choice alias="no" value="No"/>
+      <Choice alias="unknown" value="Don't know"/>
+    </Choices>
+  </View>
+
+  <!-- Text with multi-choices -->
+  <View style="margin-top: 20px; padding: 25px;
+             box-shadow: 2px 2px 8px #AAA;">
+    <Header value="Classify the text"/>
+    <Text name="text2" value="$text"/>
+
+    <Choices name="choices2" toName="text2"
+             choice="multiple">
+      <Choice alias="wisdom" value="Wisdom"/>
+      <Choice alias="long" value="Long"/>
+    </Choices>
+  </View>
+
+</View>
+</script>
+        
+      
+        
+        <script data-template-pk="5" type="text"><View>
+  <Header value="Select label and start to click on image"/>
+
+  <Image name="img" value="$image"/>
+
+  <PolygonLabels name="tag" toName="img" strokewidth="5">
+    <Label value="Airplane" background="red"/>
+    <Label value="Car" background="blue"/>
+  </PolygonLabels>
+</View>
+</script>
+        
+      
+    
+      
+        
+        <script data-template-pk="2" type="text"><View>
+  <HyperText name="dialog" value="$dialogs"/>
+
+  <Header value="Rate last answer"/>
+  <Choices name="chc-1" choice="single-radio" toName="dialog" showInline="true">
+    <Choice value="Bad answer"/>
+    <Choice value="Neutral answer"/>
+    <Choice value="Good answer"/>
+  </Choices>
+
+  <Header value="Write your answer and press Enter"/>
+  <TextArea name="answer"/>
+</View>
+</script>
+        
+      
+        
+        <script data-template-pk="3" type="text"><View>
+  <HyperTextLabels name="ner" toName="text">
+    <Label value="Person" background="green"/>
+    <Label value="Organization" background="blue"/>
+  </HyperTextLabels>
+
+  <View style="border: 1px solid #CCC;
+               border-radius: 10px;
+               padding: 5px">
+    <HyperText name="text" value="$text"/>
+  </View>
+</View>
+</script>
+        
+      
+    
+      
+        
+        <script data-template-pk="9" type="text"><View>
+  <Labels name="ner" toName="text">
+    <Label value="Person" background="red"/>
+    <Label value="Organization" background="darkorange"/>
+    <Label value="Fact" background="orange"/>
+    <Label value="Money" background="green"/>
+    <Label value="Date" background="darkblue"/>
+    <Label value="Time" background="blue"/>
+    <Label value="Ordinal" background="purple"/>
+    <Label value="Percent" background="#842"/>
+    <Label value="Product" background="#428"/>
+    <Label value="Language" background="#482"/>
+    <Label value="Location" background="rgba(0,0,0,0.8)"/>
+  </Labels>
+  <Text name="text" value="$text"/>
+</View>
+</script>
+        
+      
+        
+        <script data-template-pk="4" type="text"><View>
+  <Text name="my_text" value="$reviewText"/>
+  <View style="box-shadow: 2px 2px 5px #999;
+               padding: 20px; margin-top: 2em;
+               border-radius: 5px;">
+    <Header value="Choose text sentiment"/>
+    <Choices name="sentiment" toName="my_text"
+             choice="single" showInLine="true">
+      <Choice value="Positive"/>
+      <Choice value="Negative"/>
+      <Choice value="Neutral"/>
+    </Choices>
+  </View>
+</View>
+</script>
+        
+      
+        
+        <script data-template-pk="12" type="text"><View>
+  <Header>Select one of two items</Header>
+  <Pairwise name="pw" toName="txt-1,txt-2"/>
+  <Text name="txt-1" value="$text1" />
+  <Text name="txt-2" value="$text2" />
+</View>
+</script>
+        
+      
+        
+        <script data-template-pk="10" type="text"><View>
+  <Header>Are there any missing words?</Header>
+  <Text name="text" value="$text"/>
+  <Choices name="validation-label" toName="text"
+           choice="single-radio">
+    <Choice value="Missing words" alias="missing-words"/>
+    <Choice value="Valid" alias="valid"/>
+  </Choices>
+</View>
+</script>
+        
+      
+    
+      
+        
+        <script data-template-pk="7" type="text"><View>
+  <Choices name="type" toName="video" choice="single-radio">
+    <Choice value="Awesome"/>
+    <Choice value="Groove"/>
+  </Choices>
+  <HyperText name="video" value="$video"/>
+</View></script>
+        
+
+
+<!-- endhtml -->
 
 {% endraw %}
