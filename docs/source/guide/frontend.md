@@ -1,5 +1,5 @@
 ---
-title: Introduction
+title: Frontend development
 type: guide
 order: 705
 ---

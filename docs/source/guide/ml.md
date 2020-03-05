@@ -1,7 +1,7 @@
 ---
-title: Machine Learning
+title: Machine learning backend
 type: guide
-order: 605
+order: 906
 ---
 
 You can easily connect your favorite machine learning framework with Label Studio by using [Heartex SDK](https://github.com/heartexlabs/pyheartex). 
@@ -44,8 +44,6 @@ curl -X POST -H 'Content-Type: application/json' -d '{"image_url": "https://go.h
 ```
 
 Feel free to play around any other models & frameworks apart from image classifiers! (see instructions [here](https://github.com/heartexlabs/pyheartex#advanced-usage))
-
-## Debugging 
 
 When something goes wrong, for example your predictions are failing, first thing to do is to check the log
 

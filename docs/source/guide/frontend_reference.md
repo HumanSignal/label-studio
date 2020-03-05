@@ -1,5 +1,5 @@
 ---
-title: Reference
+title: Frontend reference
 type: guide
 order: 905
 ---
