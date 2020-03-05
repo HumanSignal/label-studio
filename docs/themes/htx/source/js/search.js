@@ -40,7 +40,8 @@ var searchFunc = function (path, search_id, content_id) {
       if ($("#" + search_id).length > 0) {
         $input.addEventListener('input', function () {
           var str = '<div id="local-search-result"><h3>Search results</h3><ul class=\"search-result-list\">';
-          var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+          let search_value = this.value;
+          var keywords = search_value.trim().toLowerCase().split(/[\s\-]+/);
           $resultContent.innerHTML = "";
           if (this.value.trim().length <= 0) {
             return;
@@ -71,7 +72,7 @@ var searchFunc = function (path, search_id, content_id) {
                   if (index_content < 0) {
                     index_content = 0;
                   }
-                  if (i == 0) {
+                  if (i === 0) {
                     first_occur = index_content;
                   }
                   // content_index.push({index_content:index_content, keyword_len:keyword_len});
@@ -85,7 +86,8 @@ var searchFunc = function (path, search_id, content_id) {
               found = true;
 
               str += "<li onclick='window.location=\"" + data_url + "\"'>" +
-                  "<a href='" + data_url + "' class='search-result-title'>" + data_title + "</a>";
+                     "<a href='" + data_url + "?from_search=" + search_value +
+                     "' class='search-result-title'>" + data_title + "</a>";
               var content = data.content.trim().replace(/<[^>]+>/g, " ");
               if (first_occur >= 0) {
                 // cut out 100 characters
@@ -96,7 +98,7 @@ var searchFunc = function (path, search_id, content_id) {
                   start = 0;
                 }
 
-                if (start == 0) {
+                if (start === 0) {
                   end = 100;
                 }
 
