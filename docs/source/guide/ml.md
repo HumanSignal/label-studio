@@ -33,6 +33,9 @@ Once you're satisfied with pre-labeling results, you can immediately send predic
 curl -X POST -H 'Content-Type: application/json' -d '{"image_url": "https://go.heartex.net/static/samples/sample.jpg"}' http://localhost:8200/predict
 ```
 
+> Note: There is a limitation of using ML backend with locally hosted files, i.e. you can't train your models on tasks with localhost like `{"url": "http://localhost:8200/static/image.png"}`. Tasks URLs should be accessible from out there. 
+
+
 Feel free to play around any other models & frameworks apart from image classifiers! (see instructions [here](https://github.com/heartexlabs/pyheartex#advanced-usage))
 
 When something goes wrong, for example your predictions are failing, first thing to do is to check the _runtime logs_

@@ -1,5 +1,5 @@
 ---
-title: Tasks import
+title: Import tasks
 type: guide
 order: 101
 ---
@@ -14,7 +14,7 @@ The `--input-path` argument points to a file or a directory where your labeling 
 but you can also specify all other formats listed bellow by using `--input-format` option. 
 
 
-## JSON file
+## from JSON
 
 ```bash
 label-studio init --input-path=my_tasks.json
@@ -46,10 +46,9 @@ use the following high level task structure
   "predictions": [...]
 }
 ```
-where `"completions"` and `"predictions"` are taken from [raw completion format](#Completion-format)
+where `"completions"` and `"predictions"` are taken from [raw completion format](completions.html#Completion-fields)
 
-
-## Directory with JSON files
+## from directory with JSON files
 
 ```bash
 label-studio init --input-path=dir/with/json/files --input-format=json-dir
@@ -57,7 +56,7 @@ label-studio init --input-path=dir/with/json/files --input-format=json-dir
 
 Instead of putting all tasks into one file, you can split your input data into several _tasks.json_, and specify the directory path. Each JSON file is formatted the same as above.
 
-## CSV, TSV
+## from CSV, TSV
 
 When CSV/TSV formatted text file is used, column names are interpreted in the same manner as keys in JSON formatted file, i.e.
 ```csv
@@ -67,7 +66,7 @@ my_value_2
 ```
 Here `"my_key"` is specified by `value` attribute from some [object tag from label config](/tags/text.html), e.g. `<Text value="$my_key"/>`.
 
-## Plain text file
+## from plain text
 
 ```bash
 label-studio init --input-path=my_tasks.txt --input-format=text
@@ -80,10 +79,10 @@ my_value_1
 my_value_2
 ...
 ```
-Values interpretation is the same as in [single JSON file](config.html#JSON-file) case
+Values interpretation is the same as in [single JSON file](tasks.html#from-JSON) case
 
 
-## Directory with text files
+## from directory with text files
 
 ```bash
 label-studio init --input-path=dir/with/text/files --input-format=text-dir
@@ -91,7 +90,7 @@ label-studio init --input-path=dir/with/text/files --input-format=text-dir
 
 You can split your input data into several plain text files, and specify the directory path. Each plain text file is formatted the same as above.
 
-## Directory with image files
+## from directory with image files
 
 ```bash
 label-studio init --input-path=dir/with/images --input-format=image-dir
@@ -101,7 +100,7 @@ You can point to a local directory, which is scanned recursively for image files
 
 Supported formats are `.png, .jpg, .jpeg, .tiff, .bmp, .gif`
 
-## Directory with audio files
+## from directory with audio files
 
 ```bash
 label-studio init --input-path=my/audios/dir --input-format=audio-dir
@@ -110,3 +109,12 @@ label-studio init --input-path=my/audios/dir --input-format=audio-dir
 You can point to a local directory, which is scanned recursively for image files. Each file is used to create one task. 
 
 Supported formats are `.wav, .aiff, .mp3, .au, .flac`
+
+## from API
+
+Use API to import tasks in [JSON format](tasks.html#from-JSON) if for some reason you can't access neither to local filesystem nor Web UI (e.g. if you are creating a data stream)
+
+```bash
+curl -X POST -H Content-Type:application/json http://localhost:8200/api/import \
+--data "[{\"my_key\": \"my_value_1\"}, {\"my_key\": \"my_value_2\"}]"
+```
