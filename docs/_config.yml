@@ -29,6 +29,7 @@ category_dir: categories
 code_dir: downloads/code
 i18n_dir: :lang
 skip_render:
+    source/playground/render.html
 favicon: images/favicon.ico
 
 # Writing
@@ -66,7 +67,7 @@ index_generator:
   path: ''
   per_page: 10
   order_by: -date
-  
+
 # Category & Tag
 default_category: uncategorized
 category_map:

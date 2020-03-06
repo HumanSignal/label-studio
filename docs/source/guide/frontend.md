@@ -11,7 +11,7 @@ It's repository is located at https://github.com/heartexlabs/label-studio-fronte
 ## Install
 
 ```bash
-npm install label-studio`
+npm install label-studio
 ```
 
 ## CDN
