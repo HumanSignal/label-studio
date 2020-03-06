@@ -148,26 +148,18 @@ That gives you the opportunities to use:
 
 There is a quick example tutorial on how to do that with simple image classification:
 
-0. Create a new project
-   ```bash
-   label-studio init --template=image_classification imgcls
-   ```
-1. Clone pyheartex, and start serving:
+1. Clone pyheartex, and start serving example image classifier ML backend at `http://localhost:9090`
     ```bash
     git clone https://github.com/heartexlabs/pyheartex.git
     cd pyheartex/examples/docker
     docker-compose up -d
     ```
-2. Specify running server url in `imgcls/config.json`:
-    ```json
-    "ml_backend": {
-      "url": "http://localhost:9090",
-      "model_name": "my_image_classifier"
-    }
-    ```
-3. Launch Label Studio server:
+   
+2. Run Label Studio project specifying ML backend URLs:
+
     ```bash
-    label-studio start imgcls
+    label-studio start imgcls --init --template image_classification \
+    --ml-backend-url http://localhost:9090 --ml-backend-name my_model
     ```
     
 Once you're satisfied with pre-labeling results, you can immediately send prediction requests via REST API:
