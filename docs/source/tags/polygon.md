@@ -4,7 +4,7 @@ type: tags
 order: 405
 ---
 
-Polygon is used to add polygons to an image
+Polygon is used to add polygons to an image. Just start to click on the image. 
 
 ### Parameters
 

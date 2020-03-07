@@ -1,4 +1,5 @@
 <% var isIndex = page.path === 'index.html' %>
+<% var isBlog = page.type === 'blog' %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -56,12 +57,13 @@
 
   </head>
   <body class="<%- isIndex ? '' : 'docs' -%>">
-    <div id="mobile-bar" <%- isIndex ? 'style="display: none"' : '' %>>
+    <div id="mobile-bar" <%- isIndex || isBlog ? 'style="display: none"' : '' %>>
         <a class="menu-button"></a>
     </div>
     <% if (!isIndex) { %> <%- partial('partials/header') %> <% } %>
+
     <% if (!isIndex) { %>
-        <div id="main" class="fix-sidebar">
+        <div id="main" <%- !isBlog ? 'class="fix-sidebar"': '' %>>
             <%- body %>
         </div>
     <% } else { %>
