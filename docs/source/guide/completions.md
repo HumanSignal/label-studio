@@ -12,57 +12,7 @@ You can optionally convert and export raw completions to more common format by d
 - Applying [converter tool](https://github.com/heartexlabs/label-studio-converter) to `my_project_name/completions` directory
 
 
-## Output formats
-
-### JSON
-
-List of items in [raw completion format](#Completion-format) stored in JSON file
-
-### JSON_MIN
-
-List of items where only `"from_name", "to_name"` values from [raw completion format](#Completion-format) are kept:
-
-```json
-{
-  "image": "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg",
-  "tag": [{
-    "height": 10.458911419423693,
-    "rectanglelabels": [
-        "Moonwalker"
-    ],
-    "rotation": 0,
-    "width": 12.4,
-    "x": 50.8,
-    "y": 5.869797225186766
-  }]
-}
-```
-
-### CSV
-
-Results are stored in comma-separated tabular file with column names specified by `"from_name"` `"to_name"` values
-
-### TSV
-
-Results are stored in tab-separated tabular file with column names specified by `"from_name"` `"to_name"` values
-
-
-### CONLL2003
-
-Popular format used for [CoNLL-2003 named entity recognition challenge](https://www.clips.uantwerpen.be/conll2003/ner/)
-
-
-### COCO
-
-Popular machine learning format used by [COCO dataset](http://cocodataset.org/#home) for object detection and image segmentation tasks
-
-
-### Pascal VOC XML
-
-Popular XML-formatted task data used for object detection and image segmentation tasks
-
-
-## Completion fields
+## Basic format
 
 The output data is stored in _completions_ - JSON formatted files, one per each completed task saved in project directory in `completions` folder or in the [`"output_dir"` option](config.html#output_dir) The example structure of _completion_ is the following:
 
@@ -194,4 +144,56 @@ Task identifier
 
 ### predictions
 
-Machine learning predictions (aka _pre-labeling results_)
+Machine learning predictions (aka _pre-labeling results_). Follows the [same format](completions.html#completions) as completion, with some additional fields related to machine learning inference:
+
+- **score** - the overall result score (probabilistic output, confidence level, etc.)
+
+
+## Export formats
+
+### JSON
+
+List of items in [raw completion format](#Completion-format) stored in JSON file
+
+### JSON_MIN
+
+List of items where only `"from_name", "to_name"` values from [raw completion format](#Completion-format) are kept:
+
+```json
+{
+  "image": "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg",
+  "tag": [{
+    "height": 10.458911419423693,
+    "rectanglelabels": [
+        "Moonwalker"
+    ],
+    "rotation": 0,
+    "width": 12.4,
+    "x": 50.8,
+    "y": 5.869797225186766
+  }]
+}
+```
+
+### CSV
+
+Results are stored in comma-separated tabular file with column names specified by `"from_name"` `"to_name"` values
+
+### TSV
+
+Results are stored in tab-separated tabular file with column names specified by `"from_name"` `"to_name"` values
+
+
+### CONLL2003
+
+Popular format used for [CoNLL-2003 named entity recognition challenge](https://www.clips.uantwerpen.be/conll2003/ner/)
+
+
+### COCO
+
+Popular machine learning format used by [COCO dataset](http://cocodataset.org/#home) for object detection and image segmentation tasks
+
+
+### Pascal VOC XML
+
+Popular XML-formatted task data used for object detection and image segmentation tasks

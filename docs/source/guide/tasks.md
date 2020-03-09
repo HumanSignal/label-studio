@@ -17,8 +17,8 @@ Label Studio gets JSON-formatted list of _tasks_ as input. Each _task_ is a dict
     - `<AudioPlus value="$my_key">`: `my_value` is taken as a valid URL to an audio file with CORS policy enabled on the server side
     - `<Image value="$my_key">`: `my_value` is a valid URL to an image file
 * (optional) **id** - integer task ID
-* (optional) **completions** - list of output annotation results, where each result saved in [Label Studio's completion format](/completions.html#Completion-format). You can import annotation results in order to use them in consequent labeling task.
-* (optional) **predictions** - list of model prediction results, where each result saved in [Label Studio's prediction format](/completions.html#Prediction-format). Importing predictions is useful for automatic task prelabeling & active learning.
+* (optional) **completions** - list of output annotation results, where each result saved in [Label Studio's completion format](/guide/completions.html#completions). You can import annotation results in order to use them in consequent labeling task.
+* (optional) **predictions** - list of model prediction results, where each result saved in [Label Studio's prediction format](/guide/completions.html#predictions). Importing predictions is useful for automatic task prelabeling & active learning.
 
 > Note: in case when `"data"` field is missed in imported task object, the whole task body is interpreted as `task["data"]`, i.e. `[{"my_key": "my_value"}]` will be internally converted to `[{"data": {"my_key": "my_value"}}]`
 
