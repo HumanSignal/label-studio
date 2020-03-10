@@ -16,7 +16,7 @@ Here are the main concepts behind Label Studio's workflow:
 - **Completions** are the labeling results in [JSON format](completions.html#Completion-fields). They could be [exported](completions.html) in various common formats, ready to use in machine learning pipelines.
 - **Predictions** are the optional labeling results in [the same format](completions.html#Completion-fields), but unlike completions they are used for generating pre-labeling during the annotation process, or validating the model predictions.
 - [**Machine learning backend** connects](ml.html) popular machine learning frameworks to Label Studio for active learning & generating model predictions on-the-fly.
-- **Config** is a simple [XML tree with **tags**](setup.html#Labeling-config) used to configure UI elements, connect input data to output labeling scheme.
+- **Labeling config** is a simple [XML tree with **tags**](setup.html#Labeling-config) used to configure UI elements, connect input data to output labeling scheme.
 - **Project** encompasses tasks, config, predictions and completions all-in-one in an isolated directory
 - **Frontend Labeling UI** is accessible from any browser, distributed as precompiled js/css scripts and could be [easily extendable with new labeling tags](frontend.html). You can also [embed Label Studio UI into your applications](frontend.html#Quickstart).
 

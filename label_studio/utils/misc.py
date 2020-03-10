@@ -154,13 +154,14 @@ def parse_config(config_string):
 
     inputs, outputs, labels = {}, {}, defaultdict(set)
     for tag in xml_tree.iter():
-        if _is_input_tag(tag):
-            inputs[tag.attrib['name']] = {'type': tag.tag, 'value': tag.attrib['value'].lstrip('$')}
-        elif _is_output_tag(tag):
+        if _is_output_tag(tag):
             outputs[tag.attrib['name']] = {'type': tag.tag, 'to_name': tag.attrib['toName'].split(',')}
+        elif _is_input_tag(tag):
+            inputs[tag.attrib['name']] = {'type': tag.tag, 'value': tag.attrib['value'].lstrip('$')}
         parent = tag.getparent()
         if parent is not None and parent.attrib.get('name') in outputs:
-            labels[parent.attrib['name']].add(tag.attrib['value'])
+            actual_value = tag.attrib.get('alias') or tag.attrib['value']
+            labels[parent.attrib['name']].add(actual_value)
 
     for output_tag, tag_info in outputs.items():
         tag_info['inputs'] = []

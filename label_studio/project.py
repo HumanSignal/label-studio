@@ -217,12 +217,15 @@ class Project(object):
         config = config_string_or_parsed_config
         if isinstance(config, str):
             config = parse_config(config)
-
         completion_tuples = set()
 
         for from_name, to in config.items():
+            # ====== TEMP FIX: TODO: remove this when <Polygon> will support proper from_name/to_name
+            if to['type'].lower() == 'polygon':
+                completion_tuples.add((to['to_name'][0], to['to_name'][0], to['type'].lower()))
+                continue
+            # =================
             completion_tuples.add((from_name, to['to_name'][0], to['type'].lower()))
-
         for from_name, to_name, type in output_schema['from_name_to_name_type']:
             if (from_name, to_name, type) not in completion_tuples:
                 raise ValidationError(
@@ -230,6 +233,7 @@ class Project(object):
                     'name={from_name}, toName={to_name}, type={type} are expected'
                     .format(from_name=from_name, to_name=to_name, type=type)
                 )
+        print('!!!!', output_schema)
         for from_name, expected_label_set in output_schema['labels'].items():
             if from_name not in config:
                 raise ValidationError(
@@ -238,6 +242,7 @@ class Project(object):
                 )
             found_labels = set(config[from_name]['labels'])
             extra_labels = list(expected_label_set - found_labels)
+            print(found_labels, extra_labels)
             if extra_labels:
                 raise ValidationError(
                     'You\'ve already completed some tasks, but some of them couldn\'t be loaded with this config: '
