@@ -30,6 +30,9 @@ order: 201
     width: unset;
     height: unset;
   }
+  h3:before {
+    height: unset;
+  }
   
   iframe {
      border: 0;
@@ -314,7 +317,10 @@ order: 201
 <div>
   <div class="editor-row">
     <div class="config-col">
-      <h3>Label config</h3>
+      <div>
+        <h3>Label config <i class="icon sound"></i></h3>
+
+      </div>
       <div class="editor-area">
       <!-- Textarea -->
       <textarea name="label_config" cols="40" rows="10" class="project-form htx-html-editor"
@@ -828,7 +834,7 @@ order: 201
         return;
 
       // change history url
-      history.pushState({}, "Label Studio Playground", "?config=" + val);
+      history.pushState({}, "Label Studio Playground", "?config=" + escape(val));
 
       // label config validation
       $.ajax({
@@ -865,4 +871,3 @@ order: 201
 
   });
 </script>
-
