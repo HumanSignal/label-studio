@@ -30,9 +30,6 @@ order: 201
     width: unset;
     height: unset;
   }
-  h3:before {
-    height: unset;
-  }
   
   iframe {
      border: 0;
@@ -84,7 +81,7 @@ order: 201
   
   .input-col {
       width: 49%;
-      margin-right: 2%;
+      padding-right: 2%;
   }
   
   .output-col {
@@ -124,9 +121,7 @@ order: 201
   .use-template:hover {
     border-bottom: 1px dashed darkorange;
   }
-  
-  
-  
+
   @font-face {
     font-family: 'Icons';
     src: url("/fonts/icons.eot");
@@ -138,9 +133,8 @@ order: 201
     text-transform: none;
   }
   i.icon {
-    opacity: 0.75 !important;
+    opacity: 0.75;
     display: inline-block;
-    opacity: 1;
     margin: 0 0.25rem 0 0;
     width: 1.18em;
     height: 1em;
@@ -158,7 +152,6 @@ order: 201
   i.icon:before {
     background: none !important;
   }
-
   i.icon.sound:before {
     content: "\f025";
   }
@@ -174,7 +167,28 @@ order: 201
   i.icon.video:before {
     content: "\f03d";
   }
-  
+  i.icon.share:before {
+    content: "\f064"
+  }
+  i.icon.copy.outline:before {
+    content: "\f0c5"
+  }
+
+  .share-buttons {
+    float:right;
+    margin: 1em;
+  }
+  .share-buttons i {
+    cursor: pointer;
+    opacity: 0.5 !important;
+    color: #f58a48;
+    transition: 0.25s;
+  }
+  .share-buttons i:hover {
+    opacity: 1 !important;
+    transition: 0.25s;
+  }
+
   .intro { 
     max-width: 700px; 
     margin: 0 auto;  
@@ -318,8 +332,11 @@ order: 201
   <div class="editor-row">
     <div class="config-col">
       <div>
-        <h3>Label config <i class="icon sound"></i></h3>
-
+        <h3 style="display: inline-block">Label config</h3>
+        <span class="share-buttons">
+          <i class="icon copy outline" style="cursor: pointer" title="Copy label config"></i>
+          <i class="icon share" style="cursor: pointer" title="Copy link to this playground"></i>
+        </span>
       </div>
       <div class="editor-area">
       <!-- Textarea -->
@@ -330,7 +347,7 @@ order: 201
     <div class="preview-col">
       <h3>Interface preview</h3>
       <div class="validation"></div>
-      <div id="editor-wrap">   
+      <div id="editor-wrap">
       </div>
       <div class="preview" id="preload-editor">
         <div class="loading" style="margin: 20px; opacity: 0.8">
@@ -346,15 +363,11 @@ order: 201
 <div class="data-row">
   <div class="input-col">
     <h3>Input preview</h3>
-    <div>
-      <pre class="preview" id="upload-data-example">...</pre>
-    </div>
+    <pre class="preview" id="upload-data-example">...</pre>
   </div>
   <div class="output-col">
     <h3>Output preview</h3>
-    <div class="ui positive message">
-      <pre class="preview" id="data-results">...</pre>
-    </div>
+    <pre class="preview" id="data-results">...</pre>
   </div>
 </div>
 
@@ -648,6 +661,27 @@ order: 201
 
 
 <script>
+  // copy to clipboard
+  var copyToClipboard = function (str) {
+    var el = document.createElement('textarea');  // Create a <textarea> element
+    el.value = str;                                 // Set its value to the string that you want copied
+    el.setAttribute('readonly', '');                // Make it readonly to be tamper-proof
+    el.style.position = 'absolute';
+    el.style.left = '-9999px';                      // Move outside the screen to make it invisible
+    document.body.appendChild(el);                  // Append the <textarea> element to the HTML document
+    var selected =
+      document.getSelection().rangeCount > 0        // Check if there is any content selected previously
+        ? document.getSelection().getRangeAt(0)     // Store selection if found
+        : false;                                    // Mark as false to know no selection existed before
+    el.select();                                    // Select the <textarea> content
+    document.execCommand('copy');                   // Copy - only works as a result of a user action (e.g. click events)
+    document.body.removeChild(el);                  // Remove the <textarea> element
+    if (selected) {                                 // If a selection existed before copying
+      document.getSelection().removeAllRanges();    // Unselect everything on the HTML document
+      document.getSelection().addRange(selected);   // Restore the original selection
+    }
+  };
+
   var confirm_already_shown = true; 
   
   $(function () {
@@ -735,6 +769,7 @@ order: 201
       lineNumbers: true,
       mode: "text/html",
     });
+    labelEditor.focus();
 
     var _c = url.searchParams.get("config");
     if (_c && _c.length > 0) {
@@ -833,9 +868,6 @@ order: 201
       if (!val.length)
         return;
 
-      // change history url
-      history.pushState({}, "Label Studio Playground", "?config=" + escape(val));
-
       // label config validation
       $.ajax({
         url: url,
@@ -868,6 +900,20 @@ order: 201
           $('#upload-data-example').text(JSON.stringify(JSON.parse(o), null, 4))
         })
     }
+
+    $('.share-buttons .copy').on('click', function() {
+       copyToClipboard(labelEditor.getValue());
+        $(event.target).css('color', 'green');
+    });
+
+    $('.share-buttons .share').on('click', function() {
+        let config = labelEditor.getValue();
+        config = encodeURIComponent(config.replace(/(\r\n|\n|\r)/gm, "<br>"));
+        let link = window.location.origin + window.location.pathname + '?config=' + config;
+        copyToClipboard(link);
+        $(event.target).css('color', 'green');
+    });
+
 
   });
 </script>
