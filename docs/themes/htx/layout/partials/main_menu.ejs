@@ -18,6 +18,6 @@
 
 <!-- Search -->
 <div id="site_search">
-  <input type="text" id="local-search-input" name="q" results="0"
+  <input type="text" id="local-search-input" name="q" results="0" <%- page.type !== "playground" ? "autofocus": "" %>
          placeholder="Search" class="st-search-input st-default-search-input form-control"/>
 </div>

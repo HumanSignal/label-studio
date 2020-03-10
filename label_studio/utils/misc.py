@@ -186,10 +186,8 @@ def iter_config_templates():
 
 def get_config_templates():
     """ Get label config templates from directory (as usual 'examples' directory)
-
-    :param project: if there is samples provided by template then they will be added to project as examples
     """
-    from collections import defaultdict
+    from collections import defaultdict, OrderedDict
     templates = defaultdict(list)
 
     for i, path in enumerate(iter_config_templates()):
@@ -216,10 +214,12 @@ def get_config_templates():
         templates[meta['category']].append(meta)
 
     # sort by title
-    for key in templates:
-        templates[key] = sorted(templates[key], key=lambda x: x['title'])
+    ordered_templates = OrderedDict()
+    for key in sorted(templates.keys()):
+        print(key)
+        ordered_templates[key] = sorted(templates[key], key=lambda x: x['title'])
 
-    return templates
+    return ordered_templates
 
 
 def convert_string_to_hash(string):

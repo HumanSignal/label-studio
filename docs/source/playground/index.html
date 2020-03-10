@@ -822,10 +822,13 @@ order: 201
 
       // get current scheme type from current editor
       let url = host + '/api/projects/validate/';
-      var val = labelEditor.getValue();
+      let val = labelEditor.getValue();
 
       if (!val.length)
         return;
+
+      // change history url
+      history.pushState({}, "Label Studio Playground", "?config=" + val);
 
       // label config validation
       $.ajax({
