@@ -7,7 +7,7 @@ order: 102
 ## Overview
 
 **Project** is a directory where all annotation assets are located. It is a self-contained entity: when you start Label Studio for the first time e.g. `label-studio start ./my_project --init`,
-it will create a directory `./my_project` from the place of launch. 
+it creates a directory `./my_project` from the place of launch. 
 If you want to start another project, just remove `./my_project` directory, or create a new one by running `label-studio start /path/to/new/project --init`.
 
 **Project directory** is structured as follows:
@@ -23,10 +23,10 @@ If you want to start another project, just remove `./my_project` directory, or c
 │   │   ├── 2020-03-06-15-23-47.zip
 ```
 
-> Warning: It is not recommended to modify any of internal project files. For importing tasks, exporting completions or changing label config please use web UI or command line arguments (see `label-studio start --help` for details)
+> Warning: It is not recommended to modify any of the internal project files. For importing tasks, exporting completions or changing label config please use web UI or command line arguments (see `label-studio start --help` for details)
 
 ## Labeling config
-Project labeling config is a XML file consists of 
+Project labeling config is an XML file consists of 
 - **object tags** specifying input data sources from imported tasks,
 - **control tags** for configuring labeling schema (how annotation result looks like)
 - **visual tags** applying different user interface styles
@@ -54,4 +54,4 @@ label-studio my_new_project start --init --label-config config.xml
 
 ## Setup from UI
 
-You can also use web interface at [`/setup`](http://localhost:8200/setup) to paste your labeling config.
+You can also use the web interface at [`/setup`](http://localhost:8200/setup) to paste your labeling config.

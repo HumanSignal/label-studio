@@ -6,7 +6,7 @@ order: 101
 
 ## Basic format
 
-Label Studio gets JSON-formatted list of _tasks_ as input. Each _task_ is a dictionary-like structure, with some specific keys reserved for internal use:
+Label Studio gets the JSON-formatted list of _tasks_ as input. Each _task_ is a dictionary-like structure, with some specific keys reserved for internal use:
 
 * **data** - task body represented as a dictionary `{"my_key": my_value}`. It is possible to store any number of key-value pairs within task data, but there should be _source keys_ defined by [label config](/guide/setup.html#Labeling-config) (i.e. what is defined by object tag's attribute `value="$my_key"`).
     Depending on the object tag type, field values are interpreted differently:
@@ -80,7 +80,7 @@ Here is an example of tasks list consists of one element, for text classificatio
 
 ## Import formats
 
-There are few possible ways to import data files to your labeling project:
+There are a few possible ways to import data files to your labeling project:
 
  - Start Label Studio without specifying input path and then import through the web interfaces available at [http://127.0.0.1:8200/import](here)
 
@@ -122,7 +122,7 @@ this is a second task,456
 label-studio init --input-path=my_tasks.txt --input-format=text --label-config=config.xml
 ```
 
-In a common scenario, you may use only one input data stream (or in other words only one [object tag](/tags) specified in label config). In this case, you don't need to use JSON format, but simply write down your values in a plain text file, line by line, e.g.
+In a typical scenario, you may use only one input data stream (or in other words only one [object tag](/tags) specified in label config). In this case, you don't need to use JSON format, but simply write down your values in a plain text file, line by line, e.g.
 
 ```text
 this is a first task
@@ -170,7 +170,7 @@ Supported formats are `.wav, .aiff, .mp3, .au, .flac`
 
 ## Import using API
 
-Use API to import tasks in [Label Studio basic format](tasks.html#Basic-format) if for some reason you can't access neither to local filesystem nor Web UI (e.g. if you are creating a data stream)
+Use API to import tasks in [Label Studio basic format](tasks.html#Basic-format) if for some reason you can't access either a local filesystem nor Web UI (e.g. if you are creating a data stream)
 
 ```bash
 curl -X POST -H Content-Type:application/json http://localhost:8200/api/import \

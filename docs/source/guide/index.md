@@ -14,7 +14,7 @@ Here are the main concepts behind Label Studio's workflow:
 
 - **Tasks** are the labeled items. Label Studio is a multi-type labeling tool - you can [import](tasks.html) either text, image, audio URL, HTML text or any number and combination of these data resources.
 - **Completions** are the labeling results in [JSON format](completions.html#Completion-fields). They could be [exported](completions.html) in various common formats, ready to use in machine learning pipelines.
-- **Predictions** are the optional labeling results in [the same format](completions.html#Completion-fields), but unlike completions they are used for generating prelabelings in annotation process.
+- **Predictions** are the optional labeling results in [the same format](completions.html#Completion-fields), but unlike completions they are used for generating prelabelings in the annotation process.
 - [**Machine learning backend** connects](ml.html) popular machine learning frameworks to Label Studio for active learning & generating model predictions on-the-fly
 - **Config** is a simple [XML tree with **tags**](setup.html#Labeling-config)) used to configure UI elements, connect input data to output labeling scheme.
 - **Project** encompasses tasks, config, predictions and completions all-in-one in an isolated directory
@@ -27,7 +27,7 @@ Here are the main concepts behind Label Studio's workflow:
 
 Label Studio is supported for Python 3.5 or greater, running on Linux, Windows and MacOSX.
 
-> Note: for Windows users the default installation may fail building `lxml` package. Consider manually installing it from [unofficial Windows binaries](https://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml) e.g. if you are running on x64 with Python 3.8, run `pip install lxml‑4.5.0‑cp38‑cp38‑win_amd64.whl`.
+> Note: for Windows users the default installation may fail to build `lxml` package. Consider manually installing it from [unofficial Windows binaries](https://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml) e.g. if you are running on x64 with Python 3.8, run `pip install lxml‑4.5.0‑cp38‑cp38‑win_amd64.whl`.
 
 
 ### Running with pip
@@ -37,12 +37,12 @@ To install Label Studio via pip, you need Python>=3.5 and run:
 pip install label-studio
 ```
 
-Then launch new project which stores all labeling data in a local directory `my_labeling_project`:
+Then launch a new project which stores all labeling data in a local directory `my_labeling_project`:
 
 ```bash
 label-studio start my_labeling_project --init
 ```
-The default browser will open automatically at [http://localhost:8200](http://localhost:8200). 
+The default browser opens automatically at [http://localhost:8200](http://localhost:8200). 
 
 ### Running with Docker
 
@@ -53,7 +53,7 @@ Install and start Label Studio at [http://localhost:8200](http://localhost:8200)
 docker run --rm -p 8200:8200 -v `pwd`/my_labeling_project:/label-studio/my_labeling_project --name label-studio heartexlabs/label-studio:latest
 ```
 
-> Note: if `./my_labeling_project` folder exists, an exception will be thrown. Please delete this folder or use `--force` option.
+> Note: if `./my_labeling_project` the folder exists, an exception will be thrown. Please delete this folder or use `--force` option.
 > Note: for Windows, you have to modify the volumes paths set by `-v` option
 
 You can override the default startup command by appending any of [available command line arguments]():
@@ -77,7 +77,7 @@ cd label-studio
 python setup.py develop
 ```
 
-Then launch new project which stores all labeling data in a local directory `my_labeling_project`:
+Then launch a new project which stores all labeling data in a local directory `my_labeling_project`:
 
 ```bash
 label-studio start my_labeling_project --init
@@ -87,4 +87,4 @@ The default browser will open automatically at [http://localhost:8200](http://lo
 
 ## Command line arguments
 
-You can specify input tasks, project config, machine learning backend and other options via command line interface. Run `label-studio start --help` to see all available options.
+You can specify input tasks, project config, machine learning backend and other options via the command line interface. Run `label-studio start --help` to see all available options.
