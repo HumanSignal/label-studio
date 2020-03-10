@@ -4,11 +4,12 @@ type: guide
 order: 102
 ---
 
-## Overview
-
 **Project** is a directory where all annotation assets are located. It is a self-contained entity: when you start Label Studio for the first time e.g. `label-studio start ./my_project --init`,
-it creates a directory `./my_project` from the place of launch. 
+it creates a directory `./my_project` from where its launched.
+
 If you want to start another project, just remove `./my_project` directory, or create a new one by running `label-studio start /path/to/new/project --init`.
+
+## Structure
 
 **Project directory** is structured as follows:
 
@@ -26,27 +27,32 @@ If you want to start another project, just remove `./my_project` directory, or c
 > Warning: It is not recommended to modify any of the internal project files. For importing tasks, exporting completions or changing label config please use web UI or command line arguments (see `label-studio start --help` for details)
 
 ## Labeling config
-Project labeling config is an XML file consists of 
+
+Project labeling config is an XML file that consists of:
+
 - **object tags** specifying input data sources from imported tasks,
 - **control tags** for configuring labeling schema (how annotation result looks like)
 - **visual tags** applying different user interface styles
 
-[Check all tags available](/tags).
+<a class="button" href="/tags">Check Available Tags</a>
 
 #### Example
-Here an example of XML config for classifying images exposed by task data key `image_url` onto Cats & Dogs:
 
-```xml
-<Image name="image_object" value="$image_url"/>
-<Choices name="image_classes" toName="image_object">
+Here an example config for classifying images provided by `image_url` key into two classes:
+
+```html
+<View>
+  <Image name="image_object" value="$image_url"/>
+  <Choices name="image_classes" toName="image_object">
     <Choice value="Cat"/>
     <Choice value="Dog"/>
-</Choices>
+  </Choices>
+</View>
 ```
 
 ## Setup from file
 
-It is possible to create `config.xml` with labeling config and initialize project:
+It is possible to initialize a new project with predefined `config.xml`:
 
 ```bash
 label-studio my_new_project start --init --label-config config.xml
@@ -54,4 +60,4 @@ label-studio my_new_project start --init --label-config config.xml
 
 ## Setup from UI
 
-You can also use the web interface at [`/setup`](http://localhost:8200/setup) to paste your labeling config.
+You can also use the web interface at [`/setup`](http://localhost:8200/setup) to paste your labeling config. Using web UI you also get a live update while you're editting the config.

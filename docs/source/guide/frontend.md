@@ -1,10 +1,10 @@
 ---
-title: Frontend development
+title: Frontend library
 type: guide
 order: 705
 ---
 
-Frontend, as its name suggests, is the frontend library developed using React and mobx-state-tree, distributed as an NPM package. You can include it in your applications and provide data annotation support to your users. It can be granularly customized and extended.
+Frontend, as its name suggests, is the frontend library based on React and mobx-state-tree, distributed as an NPM package. You can include it in your applications and provide data annotation support to your users. It can be granularly customized and extended.
 
 Its repository is located at https://github.com/heartexlabs/label-studio-frontend
 

@@ -4,13 +4,12 @@ type: guide
 order: 104
 ---
 
-Your annotation results are stored in [raw completion format](#Completion-format) inside `my_project_name/completions` directory, one file per labeled task named as `task_id.json`.
+Your annotations are stored in [raw completion format](#Completion-format) inside `my_project_name/completions` directory, one file per labeled task named as `task_id.json`.
 
 You can optionally convert and export raw completions to a more common format by doing one of the following:
 
-- From [/export](http://localhost:8200/export) page by choosing target format;
+- From [/export](http://localhost:8200/export) page by choosing target format
 - Applying [converter tool](https://github.com/heartexlabs/label-studio-converter) to `my_project_name/completions` directory
-
 
 ## Basic format
 

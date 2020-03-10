@@ -6,19 +6,19 @@ order: 100
 
 ## Overview
 
-Label Studio is a self-contained Web application for multi-typed data labeling and exploration. The _backend_ is written in pure Python powered by [Flask](https://github.com/pallets/flask). The _frontend_ part is a backend-agnostic [React](https://reactjs.org/) + [MST](https://github.com/mobxjs/mobx-state-tree) precompiled scripts. 
+Label Studio is a self-contained Web application for multi-typed data labeling and exploration. The _backend_ is written in pure Python powered by [Flask](https://github.com/pallets/flask). The _frontend_ part is a backend-agnostic [React](https://reactjs.org/) + [MST](https://github.com/mobxjs/mobx-state-tree) app, included as a precompiled script.
 
 Here are the main concepts behind Label Studio's workflow:
 
 <div style="margin:auto; text-align:center; width:100%"><img src="/images/label-studio-overview.png"/></div>
 
-- **Tasks** are the labeled items. Label Studio is a multi-type labeling tool - you can [import](tasks.html) either text, image, audio URL, HTML text or any number and combination of these data resources.
+- **Tasks** represent an individual dataset items. Label Studio is a multi-type labeling tool - you can [import](tasks.html) either text, image, audio URL, HTML text or any number and combination of these data resources.
 - **Completions** are the labeling results in [JSON format](completions.html#Completion-fields). They could be [exported](completions.html) in various common formats, ready to use in machine learning pipelines.
-- **Predictions** are the optional labeling results in [the same format](completions.html#Completion-fields), but unlike completions they are used for generating prelabelings in the annotation process.
-- [**Machine learning backend** connects](ml.html) popular machine learning frameworks to Label Studio for active learning & generating model predictions on-the-fly
-- **Config** is a simple [XML tree with **tags**](setup.html#Labeling-config)) used to configure UI elements, connect input data to output labeling scheme.
+- **Predictions** are the optional labeling results in [the same format](completions.html#Completion-fields), but unlike completions they are used for generating pre-labeling during the annotation process, or validating the model predictions.
+- [**Machine learning backend** connects](ml.html) popular machine learning frameworks to Label Studio for active learning & generating model predictions on-the-fly.
+- **Config** is a simple [XML tree with **tags**](setup.html#Labeling-config) used to configure UI elements, connect input data to output labeling scheme.
 - **Project** encompasses tasks, config, predictions and completions all-in-one in an isolated directory
-- **Labeling UI** is accessible from any browser, distributed as precompiled js/css scripts and could be [easily extendable with new labeling tags](frontend.html). You can also [embed Label Studio UI into your applications](frontend.html#Quickstart).
+- **Frontend Labeling UI** is accessible from any browser, distributed as precompiled js/css scripts and could be [easily extendable with new labeling tags](frontend.html). You can also [embed Label Studio UI into your applications](frontend.html#Quickstart).
 
 
 ## Quickstart
@@ -69,7 +69,7 @@ docker build -t heartexlabs/label-studio:latest .
 
 ### Running from source
 
-If you want to use nighty builds, consider to download using Git and run Label Studio locally from source:
+If you want to use nighty builds, or extend the functionality, consider to download the source code using Git and run Label Studio locally:
 
 ```bash
 git clone https://github.com/heartexlabs/label-studio.git
@@ -77,7 +77,7 @@ cd label-studio
 python setup.py develop
 ```
 
-Then launch a new project which stores all labeling data in a local directory `my_labeling_project`:
+Then create a new project, it stores all labeling data in a local directory `my_labeling_project`:
 
 ```bash
 label-studio start my_labeling_project --init
