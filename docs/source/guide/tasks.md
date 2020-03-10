@@ -8,14 +8,14 @@ order: 101
 
 Label Studio expects the JSON-formatted list of _tasks_ as input. Each _task_ is a dictionary-like structure, with some specific keys reserved for internal use:
 
-* **data** - task body represented as a dictionary `{"my_key": my_value}`. It is possible to store any number of key-value pairs within task data, but there should be _source keys_ defined by [label config](/guide/setup.html#Labeling-config) (i.e. what is defined by object tag's attribute `value="$my_key"`).
+* **data** - task body is represented as a dictionary `{"key": "value"}`. It is possible to store any number of key-value pairs within task data, but there should be _source keys_ defined by [label config](/guide/setup.html#Labeling-config) (i.e. what is defined by object tag's attribute `value="$key"`).
     Depending on the object tag type, field values are interpreted differently:
-    - `<Text value="$my_key">`: `my_key` is taken as plain text
-    - `<HyperText value="$my_key">`: `my_key` is a HTML markup
-    - `<HyperText value="$my_key" encoding="base64">`: `my_key` is a base64 encoded HTML markup
-    - `<Audio value="$my_key">`: `my_key` is taken as a valid URL to audio file
-    - `<AudioPlus value="$my_key">`: `my_key` is taken as a valid URL to an audio file with CORS policy enabled on the server side
-    - `<Image value="$my_key">`: `my_key` is a valid URL to an image file
+    - `<Text value="$key">`: `value` is taken as plain text
+    - `<HyperText value="$key">`: `value` is a HTML markup
+    - `<HyperText value="$key" encoding="base64">`: `value` is a base64 encoded HTML markup
+    - `<Audio value="$key">`: `value` is taken as a valid URL to audio file
+    - `<AudioPlus value="$key">`: `value` is taken as a valid URL to an audio file with CORS policy enabled on the server side
+    - `<Image value="$key">`: `value` is a valid URL to an image file
 * (optional) **id** - integer task ID
 * (optional) **completions** - list of output annotation results, where each result is saved using [Label Studio's completion format](/guide/completions.html#completions). You can import annotation results in order to use them in consequent labeling task.
 * (optional) **predictions** - list of model prediction results, where each result is saved using [Label Studio's prediction format](/guide/completions.html#predictions). Importing predictions is useful for automatic task prelabeling & active learning & exploration.
