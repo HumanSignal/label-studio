@@ -1,5 +1,5 @@
 ---
-title: Label Studio Blog
+title: Data Labeling Blog
 type: blog
 order: 101
 ---
@@ -11,22 +11,24 @@ order: 101
     margin: 60px auto 50px auto;
     padding: 0;
   }
+
   .blog-body {
     margin-bottom: 100px;
   }
+
   .grid {
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
     -webkit-box-orient: horizontal;
     -webkit-box-direction: normal;
-        -ms-flex-direction: row;
-            flex-direction: row;
+    -ms-flex-direction: row;
+    flex-direction: row;
     -ms-flex-wrap: wrap;
-        flex-wrap: wrap;
+    flex-wrap: wrap;
     -webkit-box-align: stretch;
-        -ms-flex-align: stretch;
-            align-items: stretch;
+    -ms-flex-align: stretch;
+    align-items: stretch;
     padding: 0;
   }
 
@@ -37,21 +39,35 @@ order: 101
   .card {
     margin: 2em 1em;
   }
-  .card .image {
-    background-color: rgba(29, 255, 0, 0.05);
+
+  .card .image-wrap:hover {
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    transition: linear 0.25s;
+  }
+
+  .card .image-wrap {
+    transition: linear 0.25s;
+    border-radius: 7px;
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+    padding: 5px;
+  }
+
+  .card .image-wrap .image {
+    margin: 0 auto;
+    width: 95%;
+    height: 250px;
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center center;
-    width: 95%;
-    height: 200px;
-    border-radius: 7px;
   }
+
   .card .title {
     margin-top: 0.5em;
     font-size: 130%;
     font-weight: bold;
     color: #555;
   }
+
   .card .desc {
     margin-top: 0.3em;
     font-size: 80%;
@@ -59,79 +75,81 @@ order: 101
     color: #777;
   }
 
-@media screen and (max-width: 900px) {
-  @media only screen and (max-width: 768px) {
-    .grid {
-      width: auto;
-      margin-left: 0 !important;
-      margin-right: 0 !important;
-    }
+  @media screen and (max-width: 900px) {
+    @media only screen and (max-width: 768px) {
+      .grid {
+        width: auto;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+      }
 
-    .column {
-      width: 100% !important;
-      margin: 0 0 !important;
-      -webkit-box-shadow: none !important;
-      box-shadow: none !important;
-      padding: 1rem 1rem !important;
+      .column {
+        width: 100% !important;
+        margin: 0 0 !important;
+        -webkit-box-shadow: none !important;
+        box-shadow: none !important;
+        padding: 1rem 1rem !important;
+      }
     }
   }
-}
 </style>
 
 <div class="blog-body">
 
-<div class="grid">
+  <div class="grid">
 
-  <div class="column">
-    <a href="/test">
-      <div class="card">
-        <div class="image" style="background-image: url(/images/screens/audio_regions.png)"></div>
-        <div class="title">It's a testing header</div>
-        <div class="desc">2020.03.03 5 min read</div>
-      </div>
-    </a>
-  </div>
-
-  <div class="column">
-    <div class="card">
-      <div class="image" style="background-image: url(/images/screens/audio_regions.png)"></div>
-      <div class="title">It's a testing header</div>
-      <div class="desc">2020.03.03 5 min read</div>
+    <!-- Release 0.5.0 -->
+    <div class="column">
+      <a href="/blog/release-050.html">
+        <div class="card">
+          <div class="image-wrap">
+            <div style="background-image: url(/images/release-050-views.png)" class="image"></div>
+          </div>
+          <div class="title">Label Studio 0.5.0 Release</div>
+          <div class="desc">9 Mar 2020, 5 min read</div>
+        </div>
+      </a>
     </div>
-  </div>
 
-  <div class="column">
-    <div class="card">
-      <div class="image" style="background-image: url(/images/screens/audio_regions.png)"></div>
-      <div class="title">It's a testing veryyyyyyyyyy long header veryyyy long again long again</div>
-      <div class="desc">2020.03.03 5 min read</div>
+    <!-- Bert -->
+    <div class="column">
+      <a href="https://towardsdatascience.com/how-to-finetune-bert-to-classify-your-slack-chats-without-coding-3a7002936bcf">
+        <div class="card">
+          <div class="image-wrap">
+            <div class="image" style="background-image: url(/images/ls-bert-slack.jpg)"></div>
+          </div>
+          <div class="title">How to fine-tune BERT to classify your Slack chats without coding</div>
+          <div class="desc">18 Feb 2020, 5 min read</div>
+        </div>
+      </a>
     </div>
-  </div>
 
-  <div class="column">
-    <div class="card">
-      <div class="image" style="background-image: url(/images/screens/audio_regions.png)"></div>
-      <div class="title">It's a testing veryyyyyyyyyy long header veryyyy long again long again</div>
-      <div class="desc">2020.03.03 5 min read</div>
+    <!-- Intro LS -->
+    <div class="column">
+      <a href="https://towardsdatascience.com/introducing-label-studio-a-swiss-army-knife-of-data-labeling-140c1be92881">
+        <div class="card">
+          <div class="image-wrap">
+            <div class="image" style="background-image: url(/images/annotation_examples.gif)"></div>
+          </div>
+          <div class="title">Introducing Label Studio, a swiss army knife of data labeling</div>
+          <div class="desc">28 Jan 2020, 8 min read</div>
+        </div>
+      </a>
     </div>
-  </div>
 
-  <div class="column">
-    <div class="card">
-      <div class="image" style="background-image: url(/images/screens/audio_regions.png)"></div>
-      <div class="title">It's a testing header</div>
-      <div class="desc">2020.03.03 5 min read</div>
+    <!-- AL -->
+    <div class="column">
+      <a href="https://towardsdatascience.com/learn-faster-with-smarter-data-labeling-15d0272614c4">
+        <div class="card">
+          <div class="image-wrap">
+            <div class="image" style="background-image: url(/images/AL-learn-fast.png)"></div>
+          </div>
+          <div class="title">Learn faster with smarter data labeling</div>
+          <div class="desc">21 Aug 2019, 8 min read</div>
+        </div>
+      </a>
     </div>
-  </div>
 
-  <div class="column">
-    <div class="card">
-      <div class="image" style="background-image: url(/images/screens/audio_regions.png)"></div>
-      <div class="title">It's a testing header</div>
-      <div class="desc">2020.03.03 5 min read</div>
-    </div>
   </div>
-
-</div>
 
 </div>
