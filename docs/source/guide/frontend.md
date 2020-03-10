@@ -1,12 +1,12 @@
 ---
-title: Introduction
+title: Frontend library
 type: guide
 order: 705
 ---
 
-Frontend, as its name suggests, is the frontend library developed using React and mobx-state-tree, distributed as an NPM package. You can include it in your applications and provide data annotation support to your users. It can be granularly customized and extended.
+Frontend, as its name suggests, is the frontend library based on React and mobx-state-tree, distributed as an NPM package. You can include it in your applications and provide data annotation support to your users. It can be granularly customized and extended.
 
-It's repository is located at https://github.com/heartexlabs/label-studio-frontend
+Its repository is located at https://github.com/heartexlabs/label-studio-frontend
 
 ## Install
 
@@ -89,4 +89,4 @@ Instantiate a new Label Studio object with a selector for the div that should be
 
 > You can use [Playground](/playground) to test out different types of config.
 
-To see all the available options for initialization of **LabelStudio**, please check the [Reference](frontend_reference.html).
+To see all the available options for the initialization of **LabelStudio**, please check the [Reference](frontend_reference.html).

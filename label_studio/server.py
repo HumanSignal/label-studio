@@ -111,6 +111,12 @@ def send_log():
     return Response(open(logfile).read(), mimetype='text/plain')
 
 
+@app.errorhandler(ValidationError)
+def validation_error_handler(error):
+    logger.error(error)
+    return str(error), 500
+
+
 @app.route('/')
 def labeling_page():
     """ Label studio frontend: task labeling
