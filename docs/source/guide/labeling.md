@@ -4,7 +4,6 @@ type: guide
 order: 103
 ---
 
-## Labeling interface
 Let's explore the complex example of multi-task labeling which includes text + image + audio data objects:
 <br>
 
@@ -18,7 +17,8 @@ Let's explore the complex example of multi-task labeling which includes text + i
 
 Here you can see relations among labeling objects: tasks, completions, results, etc.
 
-One completion is provided by one user, it's atomic and it consists of the result items. Result items can have relations between themselves with specified direction of three types: left-right, right-left or bidirectional. Normalizations are additional information in the custom string format about the current result item.  
+One user provides one completion, it’s atomic, and it consists of the result items. Result items can have relations between themselves with the specified direction of three types: left-right, right-left, or bidirectional. Normalizations are additional information in the custom string format about the current result item.
+ 
 <br>
 <center><img src="/images/labeling-scheme.png" style="max-width: 600px; opacity: 0.6"></center>
 <br>
@@ -26,33 +26,32 @@ Completions and Predictions are very similar. But predictions must be generated 
 
 ## Instructions
 
-The most of actions described in this section are similar for all the data objects (images, audio, text, etc).
+Most of the actions described in this section are similar for all the data objects (images, audio, text, etc.).
 
 ### Choices, TextArea and other simple tags
-Such tags have a very simple labeling mechanics, it's intuitive for users, so let's talk about more complex things :-)     
+Such tags have straightforward labeling mechanics. It’s intuitive for users, so let’s talk about more complex things below :-) 
 
-### Add segment
+### Add region
 1. Select label you want to add (if you use Tag without labels like Polygon, just go to 2)
 2. Click on your data object (image, audio, text, etc) 
 
 ### Change label
-You can change the label of existing result item: 
-1. Select result item (span, bounding box, segment, region, etc)
+You can change the label of the existing region:
+1. Select entity (span, bounding box, image segment, audio region, etc)
 2. Select a new label
 
-### Delete result item
-1. Select result item
-2. Press Backspace or go to Results panel and remove the current item 
+### Delete entity
+1. Select entity 
+2. Press Backspace or go to Results panel and remove selected item 
 
 ### Add relation
-1. Select the first result item (on data object or on Results panel)
+1. Select a first region (bounding box, text span, etc)
 2. Click on "Create Relation" button
-3. Select the second result item (on data object **only**)
+3. Select the second region
 4. Optionally: After the relation is created you can change the direction by click on the direction button  
 
 ## Hotkeys
 Use hotkeys to improve your labeling performance. Hotkeys help is available in the labeling settings dialog.
-
 
 <table>
 <tr><th>Key</th><th>Description</th></tr>
