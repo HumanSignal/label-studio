@@ -655,7 +655,7 @@ def main():
     # On `start` command, launch browser if --no-browser is not specified and start label studio server
     if input_args.command == 'start':
         if not input_args.no_browser:
-            browser_url = 'http://127.0.0.1:' + str(input_args.port) + '/welcome'
+            browser_url = label_studio.utils.functions.HOSTNAME + '/welcome'
             threading.Timer(2.5, lambda: webbrowser.open(browser_url)).start()
             print('Start browser at URL: ' + browser_url)
 
