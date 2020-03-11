@@ -13,7 +13,7 @@ red-dot-before(leftPos = -8px)
 #header
   background-color: #fff
   height: $header-height
-  padding: $heading-padding-vertical 20px $heading-padding-vertical 60px;
+  padding: $heading-padding-vertical 20px $heading-padding-vertical 40px;
   position: relative
   z-index: 100
   display: flex
@@ -48,8 +48,9 @@ body.docs
   span
     font-weight: bold;
   a
-    border-bottom: 2px solid #fff
+    margin-right: 1em;
     &:hover, &.current
+      padding-top: 2px;
       border-bottom: 2px solid $green
       transition: 200ms;
   .nav-dropdown
@@ -113,7 +114,6 @@ body.docs
     border-color: $green
 
 #logo
-  display: inline-block
   font-size: 1.5em
   line-height: $header-height
   color: $dark

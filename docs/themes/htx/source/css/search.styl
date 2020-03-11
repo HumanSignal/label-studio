@@ -1,0 +1,60 @@
+#site_search
+  right: 0;
+  z-index: 2000;
+  margin-right: 1em;
+  margin-left: 1em;
+
+#local-search-input
+  padding: 5px;
+  border-radius: 3px;
+  border: solid 1px #d67500 !important;
+  opacity: 0.7;
+
+#local-search-result-wrapper
+  margin-bottom: 3em;
+  position: fixed;
+  background: white;
+  z-index: 1000;
+  top: 70px;
+  right: 0;
+  margin-right: 1em;
+  margin-left: 1em;
+
+#local-search-result
+  min-width: 400px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  border-radius: 5px;
+  background: white;
+  overflow: auto;
+  max-height: 4in;
+  padding: 20px;
+  word-break: break-all;
+
+  h3
+    margin-top: 1.5em;
+
+ul.search-result-list
+  padding-left: 20px;
+
+  li
+    margin-top: 1em;
+    margin-bottom: 0.5em;
+    cursor: pointer;
+
+a.search-result-title
+  margin-top: 2em !important;
+  font-weight: bold;
+  color: #f58a48;
+
+p.search-result
+  color: #555;
+  margin-top: 0;
+
+em.search-keyword
+  border-bottom: 1px dashed #4088b8;
+  font-weight: bold !important;
+  font-style: normal;
+
+@media screen and (max-width: 900px)
+  #local-search-result
+    min-width: 200px;
