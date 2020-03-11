@@ -67,6 +67,10 @@ def parse_input_args():
     root_parser.add_argument(
         '-p', '--port', dest='port', default=8200, type=int,
         help='Server port')
+    root_parser.add_argument(
+        '--log-level', dest='log_level', choices=['DEBUG', 'INFO', 'WARNING', 'ERROR'], default=None,
+        help='Logging level'
+    )
 
     parser = argparse.ArgumentParser(description='Label studio')
 

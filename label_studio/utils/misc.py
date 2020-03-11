@@ -1,19 +1,17 @@
 import os
-import datetime
-import logging.config
+import logging
 import traceback as tb
-import io
 from flask import request, jsonify, make_response
 import json  # it MUST be included after flask!
 import pkg_resources
 import hashlib
 
 from collections import defaultdict
-from pythonjsonlogger import jsonlogger
 from lxml import etree, objectify
-from xml.etree import ElementTree
 
-from .io import find_file, find_dir
+from .io import find_dir
+
+logger = logging.getLogger(__name__)
 
 
 # settings from django analogue
@@ -21,38 +19,6 @@ class Settings:
     TASKS_MAX_NUMBER = 250000
     TASKS_MAX_FILE_SIZE = 200 * 1024 * 1024
     UPLOAD_DATA_UNDEFINED_NAME = '$undefined$'
-
-
-# this must be before logger setup
-class CustomJsonFormatter(jsonlogger.JsonFormatter):
-    def add_fields(self, log_record, record, message_dict):
-        super(CustomJsonFormatter, self).add_fields(log_record, record, message_dict)
-        if not log_record.get('timestamp'):
-            # this doesn't use record.created, so it is slightly off
-            now = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
-            log_record['timestamp'] = now
-        if log_record.get('level'):
-            log_record['level'] = log_record['level'].upper()
-        else:
-            log_record['level'] = record.levelname
-
-
-# read logger config
-with open(find_file('logger.json')) as f:
-    log_config = json.load(f)
-logfile = os.path.join(os.path.dirname(__file__), '..', 'static', 'logs', 'service.log')
-
-# create log file
-os.makedirs(os.path.dirname(logfile), exist_ok=True)
-
-open(logfile, 'w') if not os.path.exists(logfile) else ()
-file_handler = logging.FileHandler(logfile)
-file_handler.setLevel(logging.DEBUG)
-file_handler.setFormatter(CustomJsonFormatter())
-# set logger config
-logging.config.dictConfig(log_config)
-log = logging.getLogger('service')
-log.addHandler(file_handler)
 
 
 # make an answer to client
@@ -89,7 +55,6 @@ def exception_treatment(f):
 
         except AnswerException as e:
             traceback = tb.format_exc()
-            log.critical('\n\n--------------\n' + traceback + '--------------\n')
 
             if 'traceback' not in e.result:
                 e.result['traceback'] = traceback
@@ -99,7 +64,6 @@ def exception_treatment(f):
 
         except Exception as e:
             traceback = tb.format_exc()
-            log.critical('\n\n--------------\n' + traceback + '--------------\n')
 
             body = {'traceback': traceback}
             if hasattr(exception_f, 'request_id'):
@@ -197,7 +161,7 @@ def get_config_templates():
         try:
             objectify.fromstring(code)
         except Exception as e:
-            logging.error("Can't parse XML for label config template from " + path + ':' + str(e))
+            logger.error("Can't parse XML for label config template from " + path + ':' + str(e))
             continue
 
         # extract fields from xml and pass them to template
@@ -205,7 +169,7 @@ def get_config_templates():
             json_string = code.split('<!--')[1].split('-->')[0]
             meta = json.loads(json_string)
         except Exception as e:
-            logging.error("Can't parse meta info from label config: " + str(e))
+            logger.error("Can't parse meta info from label config: " + str(e))
             continue
 
         meta['pk'] = i
