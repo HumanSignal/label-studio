@@ -13,15 +13,6 @@
       "formatter": "standard"
     }
   },
-  "loggers": {
-    "service": {
-      "level": "DEBUG",
-      "handlers": [
-        "console"
-      ],
-      "propagate": false
-    }
-  },
   "root": {
     "level": "ERROR",
     "handlers": [
