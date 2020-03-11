@@ -217,7 +217,6 @@ def get_config_templates():
     # sort by title
     ordered_templates = OrderedDict()
     for key in sorted(templates.keys()):
-        print(key)
         ordered_templates[key] = sorted(templates[key], key=lambda x: x['title'])
 
     return ordered_templates

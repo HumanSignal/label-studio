@@ -105,3 +105,36 @@ A significant contribution from @lrlunin, implementing ellipses labeling for the
 
 ## Label Studio Backend
 
+### Multiplatform
+
+Support for Windows, MacOSX, Linux with Python 3.5 or greater
+
+### Extended import possibilities
+
+The are now several ways on how you can import your tasks for labeling:
+
+- uploading files via [web UI](http://localhost:8200/import)
+- by [specifying path](/guide/tasks.html#Import-formats) to a file or directory with images, audios or text files on Label Studio initialization
+- using [import API](/guide/tasks.html#Import-using-API)
+
+### On-the-fly labeling config validation
+
+Previously changing a config after importing or labeling tasks could be dangerous because of created tasks/completions invalidation, therefore this was switched off. Now you should not worry about that - labeling config validation is taken on the fly considering the data already created. You can freely change the appearance of your project on [setup page](http://localhost:8200/setup) and even add new labels - when you modify something crucial, you'll be alerted about.
+
+### Exporting with automatic converters
+
+When finishing your project - go to the [export page](http://localhost:8200/export) and choose in between the [common export formats](/guide/completions.html#Export-formats) valid for your current project configuration.
+
+### Connection to running Machine Learning backend
+
+[Connecting to a running machine learning backend](/guide/ml.html) gives your an opportunity to constantly retrain your model and visually inspect how its predictions behaves on tasks. Just specify ML backend URL when launching Label Studio, and start labeling.
+
+## Miscellanious
+
+### Docker support
+
+Now Label Studio is also maintained and distributed as Docker container - [run one-liner](/guide/index.html#Running-with-Docker) to build your own cloud labeling solution.
+
+### Multisession mode
+
+You can launch Label Studio in [multisession mode](/guide/#Multisession-mode) - then each browser session dynamically creates its own project. 

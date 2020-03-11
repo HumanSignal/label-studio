@@ -42,7 +42,8 @@ Then launch a new project which stores all labeling data in a local directory `m
 ```bash
 label-studio start my_labeling_project --init
 ```
-The default browser opens automatically at [http://localhost:8200](http://localhost:8200). 
+The default browser opens automatically at [http://localhost:8200](http://localhost:8200).
+
 
 ### Running with Docker
 
@@ -83,6 +84,17 @@ Then create a new project, it stores all labeling data in a local directory `my_
 label-studio start my_labeling_project --init
 ```
 The default browser will open automatically at [http://localhost:8200](http://localhost:8200).
+
+
+### Multisession mode
+
+You can start Label Studio in _multisession mode_ - each browser session creates it's own project with associated session ID as a name.
+
+In order to launch Label Studio in multisession mode and keep all projects in a separate directory `session_projects`, run
+
+```bash
+label-studio start-multi-session --root-dir ./session_projects
+```
 
 
 ## Command line arguments
