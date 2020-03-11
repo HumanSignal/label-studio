@@ -28,7 +28,7 @@ label-studio start audio_regions_project
     <Label value="Education" background="blue"></Label>
     <Label value="Other"></Label>
   </Labels>
-  <Header value="Listen the audio:"></Header>
+  <Header value="Listen to the audio:"></Header>
   <AudioPlus name="audio" value="$url"></AudioPlus>
 </View>
 ```
