@@ -1,7 +1,7 @@
 import setuptools
 
 # Package version
-version = '0.4.8'
+version = '0.5.0'
 
 # Readme
 with open('README.md', 'r') as f:
