@@ -217,12 +217,10 @@ class Project(object):
         config = config_string_or_parsed_config
         if isinstance(config, str):
             config = parse_config(config)
-
         completion_tuples = set()
 
         for from_name, to in config.items():
             completion_tuples.add((from_name, to['to_name'][0], to['type'].lower()))
-
         for from_name, to_name, type in output_schema['from_name_to_name_type']:
             if (from_name, to_name, type) not in completion_tuples:
                 raise ValidationError(
@@ -397,6 +395,9 @@ class Project(object):
         """
         filename = os.path.join(self.config['output_dir'], str(task_id) + '.json')
         os.remove(filename)
+
+        self.load_tasks()
+        self.load_derived_schemas()
 
     @classmethod
     def get_project_dir(cls, project_name, args):

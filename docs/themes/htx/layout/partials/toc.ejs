@@ -5,12 +5,8 @@
     <% var fileName = p.path.replace(/^.+?\/([\w-]+)\.html/, '$1') %>
 
 <% if (type === 'guide') { %>
-      <% if (fileName === 'format') { %>
-          <li><h4>Server</h4></li>
-      <% } %>
-
       <% if (fileName === 'frontend') { %>
-          <li><h4>Frontend</h4></li>
+          <li><h4>Advanced usage</h4></li>
       <% } %>
 <% } %>
 
@@ -27,7 +23,7 @@
       <% } %>
 
       <% if (fileName === 'header') { %>
-          <li><h4>Visual</h4></li>
+          <li><h4>Visual & Experience</h4></li>
       <% } %>
 
       <% } %>

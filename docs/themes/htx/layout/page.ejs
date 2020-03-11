@@ -7,7 +7,7 @@
     </ul>
   </div>
 <% } %>
-<div class="content <%- page.type ? page.type + ' with-sidebar' : '' %> <%- page.type === 'guide' ? page.path.replace(/.+\//, '').replace('.html', '') + '-guide' : '' %>">
+<div class="content <%- page.type ? page.type: '' %> <%- page.type && page.type !== 'blog' ? 'with-sidebar' : '' %> <%- page.type === 'guide' ? page.path.replace(/.+\//, '').replace('.html', '') + '-guide' : '' %>">
 
   <div id="local-search-result-wrapper"></div>
   <script>

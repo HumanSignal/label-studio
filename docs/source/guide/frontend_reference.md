@@ -1,8 +1,12 @@
 ---
-title: Reference
+title: Frontend reference
 type: guide
 order: 905
 ---
+
+```javascript
+var labelStudio = new LabelStudio('editor', options);
+```
 
 The following options are recognized when initializing **LabelStudio** instance:
 

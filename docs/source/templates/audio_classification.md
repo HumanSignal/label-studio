@@ -18,7 +18,7 @@ python server.py -c config.json -l ../examples/audio_classification/config.xml -
 
 ```html
 <View>
-  <Header value="Listen the audio:"></Header>
+  <Header value="Listen to the audio:"></Header>
   <Audio name="audio" value="$url"></Audio>
   <Header value="Select its topic:"></Header>
   <Choices name="label" toName="audio" choice="single-radio" showInline="true">

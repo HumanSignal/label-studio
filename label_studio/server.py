@@ -1,15 +1,21 @@
 import os
+import io
 import lxml
 import time
 import shutil
 import flask
-import logging
 import pandas as pd
+import logging
+import logging.config
 
 try:
     import ujson as json
 except:
     import json
+
+# setup default config
+with io.open(os.path.join(os.path.dirname(__file__), 'logger.json')) as f:
+    logging.config.dictConfig(json.load(f))
 
 from uuid import uuid4
 from urllib.parse import unquote
@@ -20,12 +26,12 @@ from flask import request, jsonify, make_response, Response, Response as HttpRes
 from flask_api import status
 
 from label_studio.utils.functions import generate_sample_task
-from label_studio.utils.io import find_dir, find_editor_files
+from label_studio.utils.io import find_dir, find_file, find_editor_files
 from label_studio.utils import uploader
 from label_studio.utils.validation import TaskValidator
 from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.functions import generate_sample_task_without_check
-from label_studio.utils.misc import exception_treatment, log_config, log, config_line_stripped, get_config_templates
+from label_studio.utils.misc import exception_treatment, config_line_stripped, get_config_templates
 from label_studio.utils.argparser import parse_input_args
 
 from label_studio.project import Project
@@ -103,12 +109,10 @@ def send_static(path):
     return flask.send_from_directory(static_dir, path)
 
 
-@app.route('/logs')
-def send_log():
-    """ Log access via web
-    """
-    logfile = log_config['handlers']['file']['filename']
-    return Response(open(logfile).read(), mimetype='text/plain')
+@app.errorhandler(ValidationError)
+def validation_error_handler(error):
+    logger.error(error)
+    return str(error), 500
 
 
 @app.route('/')
@@ -535,7 +539,6 @@ def api_completions(task_id):
         completion = request.json
         completion.pop('state', None)  # remove editor state
         completion_id = project.save_completion(task_id, completion)
-        log.info(msg='Completion saved', extra={'task_id': task_id, 'output': request.json})
         # try to train model with new completions
         if project.ml_backend:
             project.ml_backend.update_model(project.get_task(task_id), completion, project.project_obj)
@@ -580,7 +583,6 @@ def api_completion_update(task_id, completion_id):
     completion.pop('state', None)  # remove editor state
     completion['id'] = int(completion_id)
     project.save_completion(task_id, completion)
-    log.info(msg='Completion saved', extra={'task_id': task_id, 'output': request.json})
     project.analytics.send(getframeinfo(currentframe()).function)
     return make_response('ok', 201)
 
@@ -626,6 +628,10 @@ def main():
     global input_args
 
     input_args = parse_input_args()
+
+    # setup logging level
+    if input_args.log_level:
+        logging.root.setLevel(input_args.log_level)
 
     import label_studio.utils.functions
     label_studio.utils.functions.HOSTNAME = 'http://localhost:' + str(input_args.port)

@@ -1,19 +1,17 @@
 import os
-import datetime
-import logging.config
+import logging
 import traceback as tb
-import io
 from flask import request, jsonify, make_response
 import json  # it MUST be included after flask!
 import pkg_resources
 import hashlib
 
 from collections import defaultdict
-from pythonjsonlogger import jsonlogger
 from lxml import etree, objectify
-from xml.etree import ElementTree
 
-from .io import find_file, find_dir
+from .io import find_dir
+
+logger = logging.getLogger(__name__)
 
 
 # settings from django analogue
@@ -21,38 +19,6 @@ class Settings:
     TASKS_MAX_NUMBER = 250000
     TASKS_MAX_FILE_SIZE = 200 * 1024 * 1024
     UPLOAD_DATA_UNDEFINED_NAME = '$undefined$'
-
-
-# this must be before logger setup
-class CustomJsonFormatter(jsonlogger.JsonFormatter):
-    def add_fields(self, log_record, record, message_dict):
-        super(CustomJsonFormatter, self).add_fields(log_record, record, message_dict)
-        if not log_record.get('timestamp'):
-            # this doesn't use record.created, so it is slightly off
-            now = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
-            log_record['timestamp'] = now
-        if log_record.get('level'):
-            log_record['level'] = log_record['level'].upper()
-        else:
-            log_record['level'] = record.levelname
-
-
-# read logger config
-with open(find_file('logger.json')) as f:
-    log_config = json.load(f)
-logfile = os.path.join(os.path.dirname(__file__), '..', 'static', 'logs', 'service.log')
-
-# create log file
-os.makedirs(os.path.dirname(logfile), exist_ok=True)
-
-open(logfile, 'w') if not os.path.exists(logfile) else ()
-file_handler = logging.FileHandler(logfile)
-file_handler.setLevel(logging.DEBUG)
-file_handler.setFormatter(CustomJsonFormatter())
-# set logger config
-logging.config.dictConfig(log_config)
-log = logging.getLogger('service')
-log.addHandler(file_handler)
 
 
 # make an answer to client
@@ -89,7 +55,6 @@ def exception_treatment(f):
 
         except AnswerException as e:
             traceback = tb.format_exc()
-            log.critical('\n\n--------------\n' + traceback + '--------------\n')
 
             if 'traceback' not in e.result:
                 e.result['traceback'] = traceback
@@ -99,7 +64,6 @@ def exception_treatment(f):
 
         except Exception as e:
             traceback = tb.format_exc()
-            log.critical('\n\n--------------\n' + traceback + '--------------\n')
 
             body = {'traceback': traceback}
             if hasattr(exception_f, 'request_id'):
@@ -154,13 +118,14 @@ def parse_config(config_string):
 
     inputs, outputs, labels = {}, {}, defaultdict(set)
     for tag in xml_tree.iter():
-        if _is_input_tag(tag):
-            inputs[tag.attrib['name']] = {'type': tag.tag, 'value': tag.attrib['value'].lstrip('$')}
-        elif _is_output_tag(tag):
+        if _is_output_tag(tag):
             outputs[tag.attrib['name']] = {'type': tag.tag, 'to_name': tag.attrib['toName'].split(',')}
+        elif _is_input_tag(tag):
+            inputs[tag.attrib['name']] = {'type': tag.tag, 'value': tag.attrib['value'].lstrip('$')}
         parent = tag.getparent()
         if parent is not None and parent.attrib.get('name') in outputs:
-            labels[parent.attrib['name']].add(tag.attrib['value'])
+            actual_value = tag.attrib.get('alias') or tag.attrib['value']
+            labels[parent.attrib['name']].add(actual_value)
 
     for output_tag, tag_info in outputs.items():
         tag_info['inputs'] = []
@@ -186,10 +151,8 @@ def iter_config_templates():
 
 def get_config_templates():
     """ Get label config templates from directory (as usual 'examples' directory)
-
-    :param project: if there is samples provided by template then they will be added to project as examples
     """
-    from collections import defaultdict
+    from collections import defaultdict, OrderedDict
     templates = defaultdict(list)
 
     for i, path in enumerate(iter_config_templates()):
@@ -198,7 +161,7 @@ def get_config_templates():
         try:
             objectify.fromstring(code)
         except Exception as e:
-            logging.error("Can't parse XML for label config template from " + path + ':' + str(e))
+            logger.error("Can't parse XML for label config template from " + path + ':' + str(e))
             continue
 
         # extract fields from xml and pass them to template
@@ -206,7 +169,7 @@ def get_config_templates():
             json_string = code.split('<!--')[1].split('-->')[0]
             meta = json.loads(json_string)
         except Exception as e:
-            logging.error("Can't parse meta info from label config: " + str(e))
+            logger.error("Can't parse meta info from label config: " + str(e))
             continue
 
         meta['pk'] = i
@@ -216,10 +179,11 @@ def get_config_templates():
         templates[meta['category']].append(meta)
 
     # sort by title
-    for key in templates:
-        templates[key] = sorted(templates[key], key=lambda x: x['title'])
+    ordered_templates = OrderedDict()
+    for key in sorted(templates.keys()):
+        ordered_templates[key] = sorted(templates[key], key=lambda x: x['title'])
 
-    return templates
+    return ordered_templates
 
 
 def convert_string_to_hash(string):

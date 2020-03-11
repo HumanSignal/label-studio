@@ -8,25 +8,24 @@ PolygonLabels tag, create labeled polygons
 
 ### Parameters
 
--   `name` **[string]** name of tag
--   `toname` **[string]** name of image to label
--   `opacity` **[number]** opacity of polygon (optional, default `0.6`)
--   `fillColor` **[string]?** rectangle fill color, default is transparent
--   `strokeColor` **[string]?** stroke color
--   `strokeWidth` **[number]** width of stroke (optional, default `1`)
--   `pointSize` **(small | medium | large)** size of polygon handle points (optional, default `medium`)
--   `pointStyle` **(rectangle | circle)** style of points (optional, default `rectangle`)
--   `choice` **(single | multiple)** configure if you can select just one or multiple labels (optional, default `single`)
--   `showInline` **[boolean]** show labels in the same visual line (optional, default `false`)
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| name | <code>string</code> |  | name of tag |
+| toName | <code>string</code> |  | name of image to label |
+| [opacity] | <code>number</code> | <code>0.6</code> | opacity of polygon |
+| [fillColor] | <code>string</code> |  | rectangle fill color, default is transparent |
+| [strokeColor] | <code>string</code> |  | stroke color |
+| [strokeWidth] | <code>number</code> | <code>1</code> | width of stroke |
+| [pointSize] | <code>small</code> \| <code>medium</code> \| <code>large</code> | <code>medium</code> | size of polygon handle points |
+| [pointStyle] | <code>rectangle</code> \| <code>circle</code> | <code>rectangle</code> | style of points |
 
-### Examples
-
+### Example  
 ```html
 <View>
-  <Image name="image" value="$image"></Image>
+  <Image name="image" value="$image" />
   <PolygonLabels name="lables" toName="image">
-    <Label value="Car"></Label>
-    <Label value="Sign"></Label>
+    <Label value="Car" />
+    <Label value="Sign" />
   </PolygonLabels>
 </View>
 ```

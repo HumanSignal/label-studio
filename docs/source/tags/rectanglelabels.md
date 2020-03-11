@@ -4,28 +4,27 @@ type: tags
 order: 408
 ---
 
-RectangleLabels tag creates labeled rectangles
+RectangleLabels tag creates labeled rectangles on the image
 
 ### Parameters
 
--   `name` **[string]** name of the element
--   `toname` **[string]** name of the image to label
--   `opacity` **float** opacity of rectangle (optional, default `0.6`)
--   `fillColor` **[string]?** rectangle fill color, default is transparent
--   `strokeColor` **[string]?** stroke color
--   `strokeWidth` **[number]** width of stroke (optional, default `1`)
--   `canRotate` **[boolean]** show or hide rotation handle (optional, default `true`)
--   `choice` **(single | multiple)** configure if you can select just one or multiple labels (optional, default `single`)
--   `showInline` **[boolean]** show labels in the same visual line (optional, default `false`)
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| name | <code>string</code> |  | name of the element |
+| toName | <code>string</code> |  | name of the image to label |
+| [opacity] | <code>float</code> | <code>0.6</code> | opacity of rectangle |
+| [fillColor] | <code>string</code> |  | rectangle fill color, default is transparent |
+| [strokeColor] | <code>string</code> |  | stroke color |
+| [strokeWidth] | <code>number</code> | <code>1</code> | width of stroke |
+| [canRotate] | <code>boolean</code> | <code>true</code> | show or hide rotation handle |
 
-### Examples
-
+### Example  
 ```html
 <View>
   <RectangleLabels name="labels" toName="image">
-    <Label value="Person"></Label>
-    <Label value="Animal"></Label>
+    <Label value="Person" />
+    <Label value="Animal" />
   </RectangleLabels>
-  <Image name="image" value="$image"></Image>
+  <Image name="image" value="$image" />
 </View>
 ```

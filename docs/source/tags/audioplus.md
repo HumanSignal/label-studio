@@ -8,21 +8,23 @@ AudioPlus tag plays the audio and shows its wave making it available for region 
 
 ### Parameters
 
--   `name` **[string]** of the element
--   `value` **[string]** of the element
--   `zoom` **[boolean]** show the zoom slider (optional, default `true`)
--   `volume` **[boolean]** show the volume slider (optional, default `true`)
--   `speed` **[boolean]** show the speed slider (optional, default `true`)
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| name | <code>string</code> |  | name of the element |
+| value | <code>string</code> |  | value of the element |
+| [volume] | <code>boolean</code> | <code>true</code> | show the volume slider (from 0 to 1) |
+| [speed] | <code>boolean</code> | <code>true</code> | show the speed slider (from 0.5 to 3) |
+| [zoom] | <code>boolean</code> | <code>true</code> | show the zoom slider |
+| [hotkey] | <code>string</code> |  | hotkey used to play/pause audio |
 
-### Examples
-
+### Example  
 ```html
 <View>
   <Labels name="lbl-1" toName="audio-1">
-    <Label value="Hello"></Label>
-    <Label value="World"></Label>
+    <Label value="Hello" />
+    <Label value="World" />
   </Labels>
-  <Rating name="rate-1" toName="audio-1"></Rating>
-  <AudioPlus name="audio-1" value="$audio"></AudioPlus>
+  <Rating name="rate-1" toName="audio-1" />
+  <AudioPlus name="audio-1" value="$audio" />
 </View>
 ```
