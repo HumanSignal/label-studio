@@ -8,16 +8,17 @@ Shortcut helps you predefine label objects that you can add in one click. Right 
 
 ### Parameters
 
--   `value` **[string]** value to add to the object
--   `alias` **[string]?** alias to show on label
--   `hotkey` **[string]** hotkey
+| Param | Type | Description |
+| --- | --- | --- |
+| value | <code>string</code> | A value of the shortcut |
+| [alias] | <code>string</code> | Shortcut alias |
+| [hotkey] | <code>string</code> | Hotkey |
 
-### Examples
-
+### Example  
 ```html
 <View>
-  <TextArea name="ta">
-    <Shortcut value="<SILENCE>" alias="Silence" hotkey="ctrl+1" />
+  <TextArea name="txt-1">
+    <Shortcut alias="Silence" value="<SILENCE>" hotkey="ctrl+1" />
   </TextArea>
 </View>
 ```

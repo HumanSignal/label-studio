@@ -8,17 +8,19 @@ KeyPoint is used to add a keypoint to an image
 
 ### Parameters
 
--   `name` **[string]** name of the element
--   `toname` **[string]** name of the image to label
--   `opacity` **float** opacity of rectangle (optional, default `0.9`)
--   `fillColor` **[string]** keypoint fill color (optional, default `8bad00`)
--   `strokeWidth` **[number]** width of the stroke (optional, default `1`)
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| name | <code>string</code> |  | name of the element |
+| toName | <code>string</code> |  | name of the image to label |
+| [opacity] | <code>float</code> | <code>0.9</code> | opacity of keypoint |
+| [fillColor] | <code>string</code> | <code>&quot;#8bad00&quot;</code> | keypoint fill color |
+| [strokeWidth] | <code>number</code> | <code>1</code> | width of the stroke |
+| [stokeColor] | <code>string</code> | <code>&quot;#8bad00&quot;</code> | keypoint stroke color |
 
-### Examples
-
+### Example  
 ```html
 <View>
-  <KeyPoint name="rect-1" toName="img-1"></KeyPoint>
-  <Image name="img-1" value="$img"></Image>
+  <KeyPoint name="kp-1" toName="img-1" />
+  <Image name="img-1" value="$img" />
 </View>
 ```

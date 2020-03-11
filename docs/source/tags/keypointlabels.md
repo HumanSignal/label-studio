@@ -8,22 +8,22 @@ KeyPointLabels tag creates labeled keypoints
 
 ### Parameters
 
--   `name` **[string]** name of the element
--   `toname` **[string]** name of the image to label
--   `opacity` **float** opacity of rectangle (optional, default `0.9`)
--   `fillColor` **[string]?** rectangle fill color, default is transparent
--   `strokeWidth` **[number]** width of stroke (optional, default `1`)
--   `choice` **(single | multiple)** configure if you can select just one or multiple labels (optional, default `single`)
--   `showInline` **[boolean]** show labels in the same visual line (optional, default `false`)
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| name | <code>string</code> |  | name of the element |
+| toName | <code>string</code> |  | name of the image to label |
+| [opacity] | <code>float</code> | <code>0.9</code> | opacity of keypoint |
+| [fillColor] | <code>string</code> |  | keypoint fill color, default is transparent |
+| [strokeWidth] | <code>number</code> | <code>1</code> | width of the stroke |
+| [stokeColor] | <code>string</code> | <code>&quot;#8bad00&quot;</code> | keypoint stroke color |
 
-### Examples
-
+### Example  
 ```html
 <View>
-  <KeyPointLabels name="labels" toName="image">
-    <Label value="Person"></Label>
-    <Label value="Animal"></Label>
+  <KeyPointLabels name="kp-1" toName="img-1">
+    <Label value="Face" />
+    <Label value="Nose" />
   </KeyPointLabels>
-  <Image name="image" value="$image"></Image>
+  <Image name="img-1" value="$img" />
 </View>
 ```

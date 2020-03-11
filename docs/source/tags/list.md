@@ -1,19 +1,19 @@
-## List
 
 List element, used for ranking results. Great choice for recomendation systems.
 
 ### Parameters
 
--   `elementValue` **[string]** lookup key for child object
--   `elementTag` **([Text] \| [Image] \| [Audio])** element used to render children
--   `value` **[string]** list value
--   `name` **[string]** of group
--   `sortedHighlightColor` **[string]?** color
--   `axis` **[string]?** axis used for drag-n-drop
--   `lockAxis` **[string]?** lock axis
+| Param | Type | Description |
+| --- | --- | --- |
+| elementValue | <code>string</code> | lookup key for child object |
+| elementTag | [<code>Text</code>](#Text) \| [<code>Image</code>](#Image) \| [<code>Audio</code>](#Audio) | element used to render children |
+| value | <code>string</code> | list value |
+| name | <code>string</code> | of group |
+| [sortedHighlightColor] | <code>string</code> | color |
+| [axis] | <code>string</code> | axis used for drag-n-drop |
+| [lockAxis] | <code>string</code> | lock axis |
 
-### Examples
-
+### Example  
 ```html
 <View>
  <HyperText value="$markup"></HyperText>

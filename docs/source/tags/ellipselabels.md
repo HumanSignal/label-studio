@@ -1,10 +1,10 @@
 ---
-title: RectangleLabels
+title: EllipseLabels
 type: tags
-order: 408
+order: 416
 ---
 
-RectangleLabels tag creates labeled rectangles on the image
+EllipseLabels tag creates labeled ellipses. Used to create an ellipse on the image 
 
 ### Parameters
 
@@ -13,7 +13,7 @@ RectangleLabels tag creates labeled rectangles on the image
 | name | <code>string</code> |  | name of the element |
 | toName | <code>string</code> |  | name of the image to label |
 | [opacity] | <code>float</code> | <code>0.6</code> | opacity of rectangle |
-| [fillColor] | <code>string</code> |  | rectangle fill color, default is transparent |
+| [fillColor] | <code>string</code> |  | ellipse fill color, default is transparent |
 | [strokeColor] | <code>string</code> |  | stroke color |
 | [strokeWidth] | <code>number</code> | <code>1</code> | width of stroke |
 | [canRotate] | <code>boolean</code> | <code>true</code> | show or hide rotation handle |
@@ -21,10 +21,10 @@ RectangleLabels tag creates labeled rectangles on the image
 ### Example  
 ```html
 <View>
-  <RectangleLabels name="labels" toName="image">
+  <EllipseLabels name="labels" toName="image">
     <Label value="Person" />
     <Label value="Animal" />
-  </RectangleLabels>
+  </EllipseLabels>
   <Image name="image" value="$image" />
 </View>
 ```

@@ -8,15 +8,16 @@ TextArea tag shows the textarea for user input
 
 ### Parameters
 
--   `name` **[string]** name of the element
--   `toName` **[string]** name of the element that you want to label if any
--   `value` **[string]** 
--   `label` **[string]?** label text
--   `placeholder` **[string]?** placeholder text
--   `maxSubmissions` **[string]?** maximum number of submissions
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>string</code> | name of the element |
+| toName | <code>string</code> | name of the element that you want to label if any |
+| value | <code>string</code> |  |
+| [label] | <code>string</code> | label text |
+| [placeholder] | <code>string</code> | placeholder text |
+| [maxSubmissions] | <code>string</code> | maximum number of submissions |
 
-### Examples
-
+### Example  
 ```html
 <View>
   <TextArea name="ta"></TextArea>
