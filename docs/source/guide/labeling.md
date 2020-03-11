@@ -28,8 +28,8 @@ Completions and Predictions are very similar. But predictions must be generated 
 
 The most of actions described in this section are similar for all the data objects (images, audio, text, etc).
 
-### Choices
-Choices have a very simple labeling mechanics, it's intuitive for users, so let's talk about more complex things :-)     
+### Choices, TextArea and other simple tags
+Such tags have a very simple labeling mechanics, it's intuitive for users, so let's talk about more complex things :-)     
 
 ### Add segment
 1. Select label you want to add (if you use Tag without labels like Polygon, just go to 2)
