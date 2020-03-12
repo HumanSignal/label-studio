@@ -2,6 +2,7 @@
 title: BrushLabels
 type: tags
 order: 418
+is_new: t
 ---
 
 BrushLabels tag creates segmented labeling

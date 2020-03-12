@@ -2,6 +2,7 @@
 title: Relation
 type: tags
 order: 420
+is_new: t
 ---
 
 Relation tag represents a single relation label
