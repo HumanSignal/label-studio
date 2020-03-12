@@ -2,6 +2,7 @@
 title: Ellipse
 type: tags
 order: 415
+is_new: t
 ---
 
 Ellipse is used to add ellipse (elleptic Bounding Box) to an image

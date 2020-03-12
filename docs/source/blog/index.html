@@ -1,5 +1,4 @@
 ---
-title: Label Studio Blog
 type: blog
 order: 101
 ---
@@ -40,6 +39,21 @@ order: 101
     width: 50% !important;
   }
 
+  .highlight {
+      
+  }
+  
+  .category {
+      cursor: pointer;
+    display: inline-block;
+    color: #4E148C;
+    margin-top: 18px;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+  
   .card {
     margin: 2em 1em;
   }
@@ -50,6 +64,11 @@ order: 101
     padding: 5px;
     opacity: 0.8;
   }
+
+  .highlight {
+      border: 2px solid #f48a42;
+  }
+  
   .card .image-wrap:hover {
     opacity: 1;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
@@ -108,10 +127,25 @@ order: 101
           <div class="image-wrap">
             <div style="background-image: url(/images/release-050-views.png)" class="image"></div>
           </div>
+          <div class="category">release notes</div>
           <div class="title">Label Studio 0.5.0 Release</div>
           <div class="desc">9 Mar 2020, 5 min read</div>
         </div>
       </a>
+    </div>
+
+    <div class="column ">
+      <div class="card ">
+        <div class="image-wrap highlight">
+          <center>
+            <div class="title">Label Studio Newsletter</div>
+            <p>We send a periodic newsletter announcing new features as well as some ML-related papers, label techniques that are innovative and funny stories.</p>
+            <iframe src="https://labelstudio.substack.com/embed" frameborder="0" scrolling="no"></iframe>
+            
+          </center>
+        </div>
+      </div>
+      
     </div>
 
     <!-- Bert -->
@@ -121,6 +155,7 @@ order: 101
           <div class="image-wrap">
             <div class="image" style="background-image: url(/images/ls-bert-slack.jpg)"></div>
           </div>
+          <div class="category">tutorial</div>
           <div class="title">How to fine-tune BERT to classify your Slack chats without coding</div>
           <div class="desc">18 Feb 2020, 5 min read</div>
         </div>
@@ -134,6 +169,7 @@ order: 101
           <div class="image-wrap">
             <div class="image" style="background-image: url(/images/annotation_examples.gif)"></div>
           </div>
+          <div class="category">article</div>
           <div class="title">Introducing Label Studio, a swiss army knife of data labeling</div>
           <div class="desc">28 Jan 2020, 8 min read</div>
         </div>
@@ -147,16 +183,12 @@ order: 101
           <div class="image-wrap">
             <div class="image" style="background-image: url(/images/AL-learn-fast.png)"></div>
           </div>
+          <div class="category">article</div>
           <div class="title">Learn faster with smarter data labeling</div>
           <div class="desc">21 Aug 2019, 8 min read</div>
         </div>
       </a>
     </div>
-
   </div>
-
-  <center>
-    <iframe src="https://labelstudio.substack.com/embed" frameborder="0" scrolling="no"></iframe>
-  </center>
 
 </div>

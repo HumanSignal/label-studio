@@ -2,6 +2,7 @@
 title: EllipseLabels
 type: tags
 order: 416
+is_new: t
 ---
 
 EllipseLabels tag creates labeled ellipses. Used to create an ellipse on the image 

@@ -4,13 +4,9 @@ type: blog
 order: 102
 ---
 
+A month in the making, this new release brings a lot of bugfixes, updated documentation, and of course, a set of new features that have been requested. 
+
 ## Label Studio Frontend
-
-### Image Segmentation
-
-Initial implementation of the image segmentation using masks. You get two controls, brush with configurable size, and eraser. The output format is RLE implemented by [rle-pack](https://www.npmjs.com/package/@thi.ng/rle-pack) library.
-
-There is a [new template]() available that provides more information about the setup.
 
 ### Relations labeling
 
@@ -38,6 +34,12 @@ NER got an update, nested entities representation is more apparent now, and it's
 
 <br>
 <img src="/images/release-050-ner.png">
+
+### Image Segmentation
+
+Initial implementation of the image segmentation using masks. You get two controls, brush with configurable size, and eraser. The output format is RLE implemented by [rle-pack](https://www.npmjs.com/package/@thi.ng/rle-pack) library.
+
+There is a [new template](/templates/image_segmentation.html) available that provides more information about the setup.
 
 ### Changing the labels
 
@@ -82,7 +84,9 @@ That enables you to build more complex interfaces. Here is an example that puts 
 
 ### Image Ellipses labeling
 
-A significant contribution from @lrlunin, implementing ellipses labeling for the images, checkout the [template]().
+A significant contribution from [@lrlunin](https://github.com/lrlunin), implementing ellipses labeling for the images, checkout the [template](/templates/image_ellipse.html).
+
+<img src="/images/screens/image_ellipse.png" class="img-template-example" title="Images Ellipse" />
 
 ### Misc
 
@@ -94,7 +98,7 @@ A significant contribution from @lrlunin, implementing ellipses labeling for the
 
 - **simplifying the creation of concave polygons** - polygons are not closed unless fully defined, that enables you to create concave polygons easily
 
-- **HyperText works with it's body** now you can put in html right into the HyperText tag, here is an example config:
+- **HyperText works with its body** now you can put in HTML right into the HyperText tag, here is an example config:
 
 ```html
 <View>
@@ -111,7 +115,7 @@ Support for Windows, MacOSX, Linux with Python 3.5 or greater
 
 ### Extended import possibilities
 
-The are now several ways on how you can import your tasks for labeling:
+There are now several ways on how you can import your tasks for labeling:
 
 - uploading files via [web UI](http://localhost:8200/import)
 - by [specifying path](/guide/tasks.html#Import-formats) to a file or directory with images, audios or text files on Label Studio initialization
@@ -127,9 +131,9 @@ When finishing your project - go to the [export page](http://localhost:8200/expo
 
 ### Connection to running Machine Learning backend
 
-[Connecting to a running machine learning backend](/guide/ml.html) gives your an opportunity to constantly retrain your model and visually inspect how its predictions behaves on tasks. Just specify ML backend URL when launching Label Studio, and start labeling.
+[Connecting to a running machine learning backend](/guide/ml.html) allows you to retrain your model continually and visually inspect how its predictions behave on tasks. Just specify ML backend URL when launching Label Studio, and start labeling.
 
-## Miscellanious
+## Miscellaneous
 
 ### Docker support
 

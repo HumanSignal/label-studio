@@ -2,6 +2,7 @@
 title: Relations
 type: tags
 order: 421
+is_new: t
 ---
 
 Relations tag, create relations labels

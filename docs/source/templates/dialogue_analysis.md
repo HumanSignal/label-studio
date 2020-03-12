@@ -1,5 +1,5 @@
 ---
-title: HyperText Dialogue Analysis
+title: Dialogue Analysis
 type: templates
 order: 301
 ---
