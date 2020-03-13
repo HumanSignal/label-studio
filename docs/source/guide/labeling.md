@@ -45,10 +45,19 @@ You can change the label of the existing region:
 2. Press Backspace or go to Results panel and remove selected item 
 
 ### Add relation
+
+You can create relations between two results with  
+ * direction 
+ * and labels ([read more about relations with labels](/tags/relations.html))
+
+<br>
+<img src="/images/screens/relations.png">
+
 1. Select a first region (bounding box, text span, etc)
 2. Click on "Create Relation" button
 3. Select the second region
-4. Optionally: After the relation is created you can change the direction by click on the direction button  
+4. **Optionally**: After the relation is created you can change the direction by click on the direction button
+4. **Optionally**: [If you've configured labels](/tags/relations.html), click on the triple dots button and add your predefined labels
 
 ## Hotkeys
 Use hotkeys to improve your labeling performance. Hotkeys help is available in the labeling settings dialog.
