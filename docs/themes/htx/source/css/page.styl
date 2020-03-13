@@ -192,15 +192,23 @@
   margin-top: 2em
   height: 1em
 
-.footer
+.footer-slack
   color: $light
-  display: flex;
-  background: #FCEADE;
-  padding-left: 1em;          
+  border: rgba(245, 138, 72, 0.4) solid 1px;
   border-radius: 7px;
   align-items: center;
   max-width: 700px;
-  margin: 2em auto;
+  margin: 70px auto;
+  padding: 1em;
+
+  a
+    color: $light
+    font-weight: normal;
+    transition: 0.25s
+
+  a:hover
+    color: $green - 25
+    transition: 0.25s
 
 .img-template-example
   filter: drop-shadow(0 0 10px #999);
