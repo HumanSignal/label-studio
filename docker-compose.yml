@@ -1,0 +1,13 @@
+version: "3"
+
+services: 
+  label_studio:
+    container_name: label_studio_server
+    build: .
+    volumes: 
+      - ".:/label-studio"
+    working_dir: /label-studio
+    command: "label-studio start my_project --init --force"
+    ports: 
+      - "8200:8200"
+    restart: always

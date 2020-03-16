@@ -14,4 +14,3 @@ EXPOSE ${PORT}
 COPY . /label-studio
 
 RUN pip install -e .
-CMD ["label-studio", "start", "my_project", "--init"]
