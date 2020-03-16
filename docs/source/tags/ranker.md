@@ -1,15 +1,15 @@
-## Ranker
 
 Ranker tag, used to ranking models
 
 ### Parameters
 
--   `name` **[string]** of group
--   `axis` **(y | x)** axis direction (optional, default `y`)
--   `sortedHighlightColor` **[string]** sorted color
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| name | <code>string</code> |  | of group |
+| [axis] | <code>y</code> \| <code>x</code> | <code>y</code> | axis direction |
+| sortedHighlightColor | <code>string</code> |  | sorted color |
 
-### Examples
-
+### Example  
 ```html
 <View>
   <Ranker name="ranker" value="$items"></Ranker>

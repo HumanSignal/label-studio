@@ -1,10 +1,10 @@
-<% if (page.type !== "playground") { %>
+<% if (page.type !== "playground" && page.type !== "blog") { %>
 <div class="sidebar">
   <div class="sidebar-inner">
     <div class="list">
       <%- partial('partials/toc', { type: type }) %>
     </div>
   </div>
-  <img src="<%- url_for("/images/opossum/other/5.svg") %>" alt="label studio logo" height="120" />
+  <a href="/"><img src="<%- url_for("/images/opossum/other/5.svg") %>" alt="label studio logo" height="120" /></a>
 </div>
 <% } %>

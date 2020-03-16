@@ -8,19 +8,23 @@ Choices tag, create a group of choices, radio, or checkboxes. Shall be used for 
 
 ### Parameters
 
--   `name` **[string]** of the group
--   `toName` **[string]** name of the elements that you want to label
--   `choice` **(single | single-radio | multiple)** single or multi-class (optional, default `single`)
--   `showInline` **[boolean]** show items in the same visual line (optional, default `false`)
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| name | <code>string</code> |  | name of the group |
+| toName | <code>string</code> |  | name of the element that you want to label |
+| [choice] | <code>single</code> \| <code>single-radio</code> \| <code>multiple</code> | <code>single</code> | single or multi-class |
+| [showInline] | <code>boolean</code> | <code>false</code> | show items in the same visual line |
+| [required] | <code>boolean</code> | <code>false</code> | validation if choice has been selected |
+| [requiredMessage] | <code>string</code> |  | message to show if validation fails |
 
-### Examples
+### Example
 
 ```html
 <View>
   <Choices name="gender" toName="txt-1" choice="single-radio">
-    <Choice alias="M" value="Male"></Choice>
-    <Choice alias="F" value="Female"></Choice>
+    <Choice alias="M" value="Male" />
+    <Choice alias="F" value="Female" />
   </Choices>
-  <Text name="txt-1" value="John went to see Marry"></Text>
+  <Text name="txt-1" value="John went to see Marry" />
 </View>
 ```

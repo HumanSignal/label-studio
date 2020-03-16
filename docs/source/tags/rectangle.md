@@ -4,23 +4,24 @@ type: tags
 order: 407
 ---
 
-Rectangle is used to add rectangle (BBox) to an image
+Rectangle is used to add rectangle (Bounding Box) to an image
 
 ### Parameters
 
--   `name` **[string]** name of the element
--   `toname` **[string]** name of the image to label
--   `opacity` **float** opacity of rectangle (optional, default `0.6`)
--   `fillColor` **[string]?** rectangle fill color, default is transparent
--   `strokeColor` **[string]** stroke color (optional, default `#f48a42`)
--   `strokeWidth` **[number]** width of the stroke (optional, default `1`)
--   `canRotate` **[boolean]** show or hide rotation handle (optional, default `true`)
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| name | <code>string</code> |  | name of the element |
+| toName | <code>string</code> |  | name of the image to label |
+| [opacity] | <code>float</code> | <code>0.6</code> | opacity of rectangle |
+| [fillColor] | <code>string</code> |  | rectangle fill color, default is transparent |
+| [strokeColor] | <code>string</code> | <code>&quot;#f48a42&quot;</code> | stroke color |
+| [strokeWidth] | <code>number</code> | <code>1</code> | width of the stroke |
+| [canRotate] | <code>boolean</code> | <code>true</code> | show or hide rotation handle |
 
-### Examples
-
+### Example  
 ```html
 <View>
-  <Rectangle name="rect-1" toName="img-1"></Rectangle>
-  <Image name="img-1" value="$img"></Image>
+  <Rectangle name="rect-1" toName="img-1" />
+  <Image name="img-1" value="$img" />
 </View>
 ```

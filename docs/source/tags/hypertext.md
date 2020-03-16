@@ -4,22 +4,18 @@ type: tags
 order: 305
 ---
 
-HyperText tag shows an HTML markup that can be labeled
+HyperText tag shows an HyperText markup that can be labeled
 
 ### Parameters
 
--   `name` **[string]** of the element
--   `value` **[string]** of the element
--   `encoding` ["string"|"base64"] provide the html as an escaped string or base64 encoded string
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| name | <code>string</code> |  | name of the element |
+| value | <code>string</code> |  | value of the element |
+| [showLabels] | <code>boolean</code> | <code>false</code> | show labels next to the region |
+| [encoding] | <code>string</code> | <code>&quot;string|base64&quot;</code> | provide the html as an escaped string or base64 encoded string |
 
-### Examples
-
+### Example  
 ```html
-<View>
-  <HyperTextLabels name="type" toName="html-1">
-    <Label alias="B" value="Brand"></Label>
-    <Label alias="P" value="Product"></Label>
-  </HyperTextLabels>
-  <HyperText name="html-1" value="$text"></HyperText>
-</View>
+<HyperText name="text-1" value="$text" />
 ```

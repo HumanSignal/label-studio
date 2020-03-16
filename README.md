@@ -1,6 +1,6 @@
 # Label Studio &middot; ![GitHub](https://img.shields.io/github/license/heartexlabs/label-studio?logo=heartex) [![Build Status](https://travis-ci.com/heartexlabs/label-studio.svg?branch=master)](https://travis-ci.com/heartexlabs/label-studio) [![codecov](https://codecov.io/gh/heartexlabs/label-studio/branch/master/graph/badge.svg)](https://codecov.io/gh/heartexlabs/label-studio) ![GitHub release](https://img.shields.io/github/v/release/heartexlabs/label-studio?include_prereleases) &middot; :sunny:
 
-[Website](https://labelstud.io/) • [Docs](https://labelstud.io/guide) • [Twitter](https://twitter.com/heartexlabs) • [Join Slack Community <img src="https://go.heartex.net/docs/images/slack-mini.png" width="18px"/>](https://docs.google.com/forms/d/e/1FAIpQLSdLHZx5EeT1J350JPwnY2xLanfmvplJi6VZk65C2R4XSsRBHg/viewform?usp=sf_link)
+[Website](https://labelstud.io/) • [Docs](https://labelstud.io/guide) • [Twitter](https://twitter.com/heartexlabs) • [Join Slack Community <img src="https://go.heartex.net/docs/images/slack-mini.png" width="18px"/>](https://join.slack.com/t/label-studio/shared_invite/zt-cr8b7ygm-6L45z7biEBw4HXa5A2b5pw)
 
 <br/>
 
@@ -148,26 +148,18 @@ That gives you the opportunities to use:
 
 There is a quick example tutorial on how to do that with simple image classification:
 
-0. Create a new project
-   ```bash
-   label-studio init --template=image_classification imgcls
-   ```
-1. Clone pyheartex, and start serving:
+1. Clone pyheartex, and start serving example image classifier ML backend at `http://localhost:9090`
     ```bash
     git clone https://github.com/heartexlabs/pyheartex.git
     cd pyheartex/examples/docker
     docker-compose up -d
     ```
-2. Specify running server url in `imgcls/config.json`:
-    ```json
-    "ml_backend": {
-      "url": "http://localhost:9090",
-      "model_name": "my_image_classifier"
-    }
-    ```
-3. Launch Label Studio server:
+   
+2. Run Label Studio project specifying ML backend URLs:
+
     ```bash
-    label-studio start imgcls
+    label-studio start imgcls --init --template image_classification \
+    --ml-backend-url http://localhost:9090 --ml-backend-name my_model
     ```
     
 Once you're satisfied with pre-labeling results, you can immediately send prediction requests via REST API:

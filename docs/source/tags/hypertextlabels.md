@@ -4,21 +4,22 @@ type: tags
 order: 408
 ---
 
-Use HyperTextLabels tag with HyperText objects. 
+HyperTextLabels tag creates labeled hyper text (HTML)
 
 ### Parameters
 
--   `name` **[string]** name of the element
--   `toname` **[string]** name of the image to label
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>string</code> | name of the element |
+| toName | <code>string</code> | name of the html element to label |
 
-### Examples
-
+### Example  
 ```html
 <View>
-  <HyperTextLabels name="type" toName="html-1">
-    <Label alias="B" value="Brand"></Label>
-    <Label alias="P" value="Product"></Label>
+  <HyperTextLabels name="labels" toName="ht">
+    <Label value="Face" />
+    <Label value="Nose" />
   </HyperTextLabels>
-  <HyperText name="html-1" value="$text"></HyperText>
+  <HyperText name="ht" value="$html" />
 </View>
 ```

@@ -1,6 +1,6 @@
 <!-- {"title": "Audio transcription", "category": "audio"} -->
 <View>
-  <Header value="Listen the audio"/>
+  <Header value="Listen to the audio"/>
   <Audio name="audio" value="$url"/>
   <View style="margin-top: 3em">
     <Header value="Write the transcription and press enter"/>

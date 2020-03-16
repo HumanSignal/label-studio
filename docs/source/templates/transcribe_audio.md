@@ -19,7 +19,7 @@ label-studio start transcribe_audio_project
 
 ```html
 <View>
-  <Header value="Listen the audio:"></Header>
+  <Header value="Listen to the audio:"></Header>
   <Audio name="audio" value="$url"></Audio>
   <Header value="Write the transcription:"></Header>
   <TextArea name="answer"></TextArea>

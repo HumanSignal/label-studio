@@ -8,33 +8,38 @@ Audio tag plays a simple audio file
 
 ### Parameters
 
--   `name` **[string]** of the element
--   `value` **[string]** of the element
--   `hotkey` **[string]** hotkey used to play/pause audio
+| Param | Type | Description |
+| --- | --- | --- |
+| name | <code>string</code> | name of the element |
+| value | <code>string</code> | value of the element |
+| hotkey | <code>string</code> | hotkey used to play/pause audio |
 
-### Examples
-
+### Example  
 ```html
 <View>
-  <Audio name="audio" value="$audio"></Audio>
+  <Audio name="audio" value="$audio" />
 </View>
 ```
+### Example  
+
+Audio classification
 
 ```html
-<!-- Audio classification -->
 <View>
-  <Audio name="audio" value="$audio"></Audio>
+  <Audio name="audio" value="$audio" />
   <Choices name="ch" toName="audio">
-    <Choice value="Positive"></Choice>
-    <Choice value="Negative"></Choice>
+    <Choice value="Positive" />
+    <Choice value="Negative" />
   </Choices>
 </View>
 ```
+### Example
+
+Audio transcription
 
 ```html
-<!-- Audio transcription -->
 <View>
-  <Audio name="audio" value="$audio"></Audio>
-  <TextArea name="ta" toName="audio"></TextArea>
+  <Audio name="audio" value="$audio" />
+  <TextArea name="ta" toName="audio" />
 </View>
 ```

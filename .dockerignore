@@ -15,9 +15,16 @@ label_studio.egg-info
 .gitignore
 *.md
 !README.md
+*.txt
+!requirements.txt
 *.yml
 *.json
 .python-version
 
 # shell scripts
 update_pypi.sh
+
+# misc folders
+tmp
+etc
+my_*

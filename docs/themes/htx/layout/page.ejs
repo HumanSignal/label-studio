@@ -7,18 +7,29 @@
     </ul>
   </div>
 <% } %>
-<div class="content <%- page.type ? page.type + ' with-sidebar' : '' %> <%- page.type === 'guide' ? page.path.replace(/.+\//, '').replace('.html', '') + '-guide' : '' %>">
+<div class="content <%- page.type ? page.type: '' %> <%- page.type && page.type !== 'blog' ? 'with-sidebar' : '' %> <%- page.type === 'guide' ? page.path.replace(/.+\//, '').replace('.html', '') + '-guide' : '' %>">
+
+  <div id="local-search-result-wrapper"></div>
+  <script>
+      var search_path = "<%= config.search.path %>";
+      if (search_path.length === 0) {
+        search_path = "search.xml";
+      }
+      var path = "<%= config.root %>" + search_path;
+      searchFunc(path, 'local-search-input', 'local-search-result-wrapper');
+  </script>
+
   <% if (page.type) { %>
     <% if (page.type === 'menu') { %>
       <form id="search-form">
         <input type="text" id="search-query-menu" class="search-query st-default-search-input">
       </form>
-      <%- partial('partials/toc', { type: 'guide' }) %>    
+      <%- partial('partials/toc', { type: 'guide' }) %>
     <% } %>
   <% } %>
   <% if (page.title.trim()) { %>
     <h1><%- page.title %><%- page.type === 'examples' ? ' Example' : '' %></h1>
-  <% } %>  
+  <% } %>
   <%- page.content %>
   <% if (page.type === 'guide') { %>
     <div class="guide-links">
@@ -31,11 +42,12 @@
         <span style="float: right;"><a href="<%- url_for(nextPage.path) %>"><%- nextPage.title %></a> →</span>
       <% } %>
     </div>
-  <% } %>
-  <div class="footer">    
-      <!-- Caught a mistake or want to contribute to the documentation?
-	   <a href="https://github.com/heartexlabs/label-studio/blob/master/src/<%- page.path.replace(/\.html$/, '.md') %>" target="_blank">
-	   Edit this page on GitHub!
-	   </a> -->
+    <% } %>
+
+  <div class="footer-slack">
+    <a href="https://join.slack.com/t/label-studio/shared_invite/zt-cr8b7ygm-6L45z7biEBw4HXa5A2b5pw">
+      Could not find what you were looking for or have found an error? Please drop us a note on
+      Slack&nbsp;<img style="height: 18px; position: absolute" src="/images/slack.png" />
+    </a>
   </div>
 </div>

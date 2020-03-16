@@ -31,12 +31,6 @@ class Project(object):
 
     _storage = {}
 
-    _allowed_extensions = {
-        'Text': ('.txt',),
-        'Image': ('.png', '.jpg', '.jpeg', '.tiff', '.bmp', '.gif'),
-        'Audio': ('.wav', '.aiff', '.mp3', '.au', '.flac')
-    }
-
     def __init__(self, config, name, context=None):
         self.config = config
         self.name = name
@@ -159,16 +153,6 @@ class Project(object):
             json.dump(self.config, f)
         logger.info('Label config saved to: {path}'.format(path=label_config_file))
 
-    @classmethod
-    def _get_single_input_value(cls, input_data_tags):
-        if len(input_data_tags) > 1:
-            val = ",".join(tag.attrib.get("name") for tag in input_data_tags)
-            print('Warning! Multiple input data tags found: ' +
-                  val + '. Only first one is used.')
-        input_data_tag = input_data_tags[0]
-        data_key = input_data_tag.attrib.get('value').lstrip('$')
-        return data_key
-
     def _update_derived_output_schema(self, completion):
         """
         Given completion, output schema is updated. Output schema consists of unique tuples (from_name, to_name, type)
@@ -233,12 +217,10 @@ class Project(object):
         config = config_string_or_parsed_config
         if isinstance(config, str):
             config = parse_config(config)
-
         completion_tuples = set()
 
         for from_name, to in config.items():
             completion_tuples.add((from_name, to['to_name'][0], to['type'].lower()))
-
         for from_name, to_name, type in output_schema['from_name_to_name_type']:
             if (from_name, to_name, type) not in completion_tuples:
                 raise ValidationError(
@@ -414,6 +396,9 @@ class Project(object):
         filename = os.path.join(self.config['output_dir'], str(task_id) + '.json')
         os.remove(filename)
 
+        self.load_tasks()
+        self.load_derived_schemas()
+
     @classmethod
     def get_project_dir(cls, project_name, args):
         return os.path.join(args.root_dir, project_name)
@@ -437,7 +422,20 @@ class Project(object):
         if args.input_format == 'json-dir':
             return task_loader.from_dir_with_json_files(input_path)
         input_data_tags = cls.get_input_data_tags(label_config)
-        data_key = Project._get_single_input_value(input_data_tags)
+
+        if len(input_data_tags) > 1:
+            val = ",".join(tag.attrib.get("name") for tag in input_data_tags)
+            print('Warning! Multiple input data tags found: ' +
+                  val + '. Only first one is used.')
+        elif len(input_data_tags) == 0:
+            raise ValueError(
+                'You\'ve specified input format "{fmt}" which requires label config being explicitly defined. '
+                'Please specify --label-config=path/to/config.xml or use --format=json or format=json_dir'.format(
+                    fmt=args.input_format)
+            )
+        input_data_tag = input_data_tags[0]
+        data_key = input_data_tag.attrib.get('value').lstrip('$')
+
         if args.input_format == 'text':
             return task_loader.from_text_file(input_path, data_key)
         if args.input_format == 'text-dir':
@@ -499,7 +497,8 @@ class Project(object):
             tasks = cls._load_tasks(input_path, args, config_xml_path)
             with io.open(tasks_json_path, mode='w') as fout:
                 json.dump(tasks, fout, indent=2)
-            print(tasks_json_path + ' input path has been created from ' + input_path)
+            print('{tasks_json_path} input file with {n} tasks has been created from {input_path}'.format(
+                tasks_json_path=tasks_json_path, n=len(tasks), input_path=input_path))
         else:
             if os.path.exists(tasks_json_path) and not args.force:
                 already_exists_error('input path', tasks_json_path)

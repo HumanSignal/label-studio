@@ -4,24 +4,25 @@ type: tags
 order: 405
 ---
 
-Polygon is used to add polygons to an image
+Polygon is used to add polygons to an image. Just start to click on the image. 
 
 ### Parameters
 
--   `name` **[string]** name of tag
--   `toname` **[string]** name of image to label
--   `opacity` **[number]** opacity of polygon (optional, default `0.6`)
--   `fillColor` **[string]?** rectangle fill color, default is transparent
--   `strokeColor` **[string]?** stroke color
--   `strokeWidth` **[number]** width of stroke (optional, default `1`)
--   `pointSize` **(small | medium | large)** size of polygon handle points (optional, default `medium`)
--   `pointStyle` **(rectangle | circle)** style of points (optional, default `rectangle`)
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| name | <code>string</code> |  | name of tag |
+| toname | <code>string</code> |  | name of image to label |
+| [opacity] | <code>number</code> | <code>0.6</code> | opacity of polygon |
+| [fillColor] | <code>string</code> |  | rectangle fill color, default is transparent |
+| [strokeColor] | <code>string</code> |  | stroke color |
+| [strokeWidth] | <code>number</code> | <code>1</code> | width of stroke |
+| [pointSize] | <code>small</code> \| <code>medium</code> \| <code>large</code> | <code>medium</code> | size of polygon handle points |
+| [pointStyle] | <code>rectangle</code> \| <code>circle</code> | <code>circle</code> | style of points |
 
-### Examples
-
+### Example  
 ```html
 <View>
-  <Polygon name="rect-1" toName="img-1" value="Add Rectangle"></Polygon>
-  <Image name="img-1" value="$img"></Image>
+  <Polygon name="rect-1" toName="img-1" />
+  <Image name="img-1" value="$img" />
 </View>
 ```

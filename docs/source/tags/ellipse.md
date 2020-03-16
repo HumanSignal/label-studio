@@ -1,0 +1,28 @@
+---
+title: Ellipse
+type: tags
+order: 415
+is_new: t
+---
+
+Ellipse is used to add ellipse (elleptic Bounding Box) to an image
+
+### Parameters
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| name | <code>string</code> |  | name of the element |
+| toName | <code>string</code> |  | name of the image to label |
+| [opacity] | <code>float</code> | <code>0.6</code> | opacity of ellipse |
+| [fillColor] | <code>string</code> |  | rectangle fill color, default is transparent |
+| [strokeColor] | <code>string</code> | <code>&quot;#f48a42&quot;</code> | stroke color |
+| [strokeWidth] | <code>number</code> | <code>1</code> | width of the stroke |
+| [canRotate] | <code>boolean</code> | <code>true</code> | show or hide rotation handle |
+
+### Example  
+```html
+<View>
+  <Ellipse name="ellipse1-1" toName="img-1" />
+  <Image name="img-1" value="$img" />
+</View>
+```
