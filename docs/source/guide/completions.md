@@ -10,6 +10,7 @@ You can optionally convert and export raw completions to a more common format by
 
 - From [/export](http://localhost:8200/export) page by choosing target format
 - Applying [converter tool](https://github.com/heartexlabs/label-studio-converter) to `my_project_name/completions` directory
+- By using [Export API](#Export-using-API)
 
 ## Basic format
 
@@ -196,3 +197,13 @@ Popular machine learning format used by [COCO dataset](http://cocodataset.org/#h
 ### Pascal VOC XML
 
 Popular XML-formatted task data used for object detection and image segmentation tasks
+
+## Export using API
+
+You can use an API to request a file with exported results, e.g.
+
+```bash
+curl http://localhost:8200/api/export?format=JSON > exported_results.tar.gz
+```
+
+The `format` parameter could be one of available [export formats](#Export-formats)
