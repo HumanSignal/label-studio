@@ -48,3 +48,4 @@ build/static/media/config.*.xml
 #project files
 label_studio.egg-info/
 my_project/
+label-studio-projects
