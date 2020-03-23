@@ -189,6 +189,7 @@ const LSB = function(elid, config, task) {
       "completions:add-new",
       "completions:delete",
       "side-column", // entity
+      "skip"
     ],
 
     onSubmitCompletion: function(ls, c) {
@@ -236,18 +237,22 @@ const LSB = function(elid, config, task) {
     onSkipTask: function(ls, completion) {
       ls.setFlags({ loading: true });
 
-      try {
-        const json = Requests.post(
-          `${API_URL.MAIN}${API_URL.TASKS}/${self.task.id}${API_URL.CANCEL}`,
-          JSON.stringify({ data: JSON.stringify({ error: "cancelled" }) }),
-        );
+      Requests.poster(
+        `${API_URL.MAIN}${API_URL.TASKS}/${ls.task.id}${API_URL.CANCEL}`,
+        JSON.stringify(completion),
+      ).then(function(response) {
+        response.json().then(function (res) {
+          // if (res && res.id) completion.updatePersonalKey(res.id.toString());
 
-        self.resetState();
+          if (task) {
+            ls.setFlags({ isLoading: false });
+          } else {
+            loadNext(ls);
+          }
+        })
+      });
 
-        return loadTask();
-      } catch (err) {
-        console.error("Failed to skip task ", err);
-      }
+      return true;
     },
 
     onGroundTruth: function(ls, c, value) {

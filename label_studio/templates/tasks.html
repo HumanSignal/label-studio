@@ -6,7 +6,7 @@
 
       <!-- Statistics -->
       <div class="ui two column centered grid">
-
+        <div class="row">
         <div class="column center aligned">
           <div class="ui statistic">
             <span class="value">{{ task_ids|length }}</span>
@@ -25,20 +25,25 @@
             {% endif %}
           </div>
         </div>
+        </div>
 
-        <div class="two column center aligned clearing task-buttons">
+        <div class="row">
+          <div class="ui message">
+            <p>Tasks sampling: <span class="ui orange horizontal label">{{ config['sampling'] }}</span> </p>
+          </div>
+        </div>
+
+        <div class="row">
           {% if task_ids|length > 0 %}
             <a class="ui button positive" href="/">Start Labeling</a>
             <a id="clear-tasks-button" class="ui button red">Delete All Tasks</a>
           {% else %}
             <a class="ui button positive" href="/import">Import Tasks</a>
           {% endif %}
-          <br/><br/>
         </div>
 
       </div>
-
-
+      <div class="ui divider hidden"></div>
       <!-- Table -->
       <table>
         <tr>

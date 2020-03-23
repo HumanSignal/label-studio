@@ -528,6 +528,8 @@ class Project(object):
             else:
                 config['ml_backend']['name'] = str(uuid4())
 
+        config['sampling'] = args.sampling
+
         # create config.json
         config_json = 'config.json'
         config_json_path = os.path.join(dir, config_json)
