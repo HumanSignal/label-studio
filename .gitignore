@@ -30,6 +30,7 @@ Desktop.ini
 .DS_Store
 
 # Env
+.env
 .env.local
 .env.development.local
 .env.test.local
@@ -43,3 +44,8 @@ src/examples
 
 # XML configs
 build/static/media/config.*.xml
+
+#project files
+label_studio.egg-info/
+my_project/
+label-studio-projects

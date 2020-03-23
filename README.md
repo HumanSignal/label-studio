@@ -73,7 +73,7 @@ python label-studio/server.py start labeling_project --init
 ## Run docker
 You can also start serving at `http://localhost:8200` by using docker:
 ```bash
-docker run --rm -p 8200:8200 -v `pwd`/my_project:/label-studio/my_project --name label-studio heartexlabs/label-studio:latest
+docker run --rm -p 8200:8200 -v `pwd`/my_project:/label-studio/my_project --name label-studio heartexlabs/label-studio:latest label-studio start my_project --init
 ```
 
 By default, it starts blank project in `./my_project` directory.
@@ -91,6 +91,27 @@ If you want to build a local image, run:
 docker build -t heartexlabs/label-studio:latest .
 ```
 
+## Using docker-compose
+
+You can also start serving at `http://localhost:8200` using docker-compose.
+
+### First time to run the app
+```bash
+INIT_COMMAND='--init' docker-compose up -d
+```
+### Run the app with existing project data
+```bash
+docker-compose up -d
+```
+### Run the app reseting project data
+```bash
+INIT_COMMAND='--init --force' docker-compose up -d
+```
+
+Or you can just use .env file instead of INIT_COMMAND='...' adding this line:
+```bash
+INIT_COMMAND=--init --force
+```
 
 ## One Click Deploy
 
