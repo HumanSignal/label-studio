@@ -7,11 +7,11 @@ WORKDIR /label-studio
 COPY requirements.txt /label-studio
 RUN pip install -r requirements.txt
 
-ENV PORT="8200"
+ENV PORT="8080"
 ENV collect_analytics=0
 EXPOSE ${PORT}
 
 COPY . /label-studio
 
 RUN pip install -e .
-CMD ["label-studio", "start", "my_project", "--init"]
+CMD ["label-studio", "start", "my_project", "--init", "--no-browser", "--port", "8080"]
