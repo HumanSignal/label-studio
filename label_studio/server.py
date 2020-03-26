@@ -204,6 +204,19 @@ def setup_page():
     )
 
 
+@app.route('/ml')
+def ml_page():
+    """ Machine learning
+    """
+    project = project_get_or_create()
+    project.analytics.send(getframeinfo(currentframe()).function)
+    return flask.render_template(
+        'ml.html',
+        config=project.config,
+        project=project.project_obj
+    )
+
+
 @app.route('/import')
 def import_page():
     """ Import tasks from JSON, CSV, ZIP and more
@@ -621,11 +634,21 @@ def get_data_file(filename):
     return flask.send_from_directory(directory, filename, as_attachment=True)
 
 
+def str2datetime(timestamp_str):
+    try:
+        ts = int(timestamp_str)
+    except:
+        return timestamp_str
+    return datetime.utcfromtimestamp(ts).strftime('%Y%m%d.%H%M%S')
+
+
 def main():
     import threading
     import webbrowser
 
     global input_args
+
+    app.jinja_env.filters['str2datetime'] = str2datetime
 
     input_args = parse_input_args()
 
