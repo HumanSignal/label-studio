@@ -550,6 +550,19 @@ def api_completions(task_id):
         return make_response('Incorrect request method', 500)
 
 
+@app.route('/api/tasks/<task_id>/cancel', methods=['POST'])
+@exception_treatment
+def api_tasks_cancel(task_id):
+    project = project_get_or_create()
+    skipped_completion = {
+        'result': [],
+        'skipped': True
+    }
+    completion_id = project.save_completion(task_id, skipped_completion)
+    project.analytics.send(getframeinfo(currentframe()).function)
+    return make_response(json.dumps({'id': completion_id}), 201)
+
+
 @app.route('/api/tasks/<task_id>/completions/<completion_id>/', methods=['DELETE'])
 @exception_treatment
 def api_completion_by_id(task_id, completion_id):
@@ -647,10 +660,11 @@ def main():
         if input_args.init:
             Project.create_project_dir(input_args.project_name, input_args)
 
-        if not os.path.exists(input_args.project_name):
+        if not os.path.exists(Project.get_project_dir(input_args.project_name, input_args)):
             raise FileNotFoundError(
                 'Project directory "{pdir}" not found. '
-                'Did you miss create it first with `label-studio init {pdir}` ?'.format(pdir=input_args.project_name))
+                'Did you miss create it first with `label-studio init {pdir}` ?'.format(
+                    pdir=Project.get_project_dir(input_args.project_name, input_args)))
 
     # On `start` command, launch browser if --no-browser is not specified and start label studio server
     if input_args.command == 'start':

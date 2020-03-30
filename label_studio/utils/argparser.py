@@ -65,6 +65,10 @@ def parse_input_args():
         '--ml-backend-name', dest='ml_backend_name',
         help='Machine learning backend name')
     root_parser.add_argument(
+        '--sampling', dest='sampling', choices=['sequential', 'uniform'], default='uniform',
+        help='Sampling type that defines tasks order'
+    )
+    root_parser.add_argument(
         '-p', '--port', dest='port', default=8200, type=int,
         help='Server port')
     root_parser.add_argument(
