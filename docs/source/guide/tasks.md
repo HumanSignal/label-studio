@@ -87,7 +87,7 @@ Here is an example of a config and tasks list composed of one element, for text 
 
 There are a few possible ways to import data files to your labeling project:
 
- - Start Label Studio without specifying input path and then import through the web interfaces available at [http://127.0.0.1:8200/import](here)
+ - Start Label Studio without specifying input path and then import through the web interfaces available at [http://127.0.0.1:8080/import](here)
 
  - Initialize Label Studio project and directly specify the paths, e.g. `label-studio init --input-path my_tasks.json --input-format json`
 
@@ -177,6 +177,6 @@ Supported formats are: `.wav` `.aiff` `.mp3` `.au` `.flac`
 Use API to import tasks in [Label Studio basic format](tasks.html#Basic-format) if for any reason you can't access either a local filesystem nor Web UI (e.g. if you are creating a data stream)
 
 ```bash
-curl -X POST -H Content-Type:application/json http://localhost:8200/api/import \
+curl -X POST -H Content-Type:application/json http://localhost:8080/api/import \
 --data "[{\"my_key\": \"my_value_1\"}, {\"my_key\": \"my_value_2\"}]"
 ```

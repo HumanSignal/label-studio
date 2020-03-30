@@ -42,16 +42,16 @@ Then launch a new project which stores all labeling data in a local directory `m
 ```bash
 label-studio start my_labeling_project --init
 ```
-The default browser opens automatically at [http://localhost:8200](http://localhost:8200).
+The default browser opens automatically at [http://localhost:8080](http://localhost:8080).
 
 
 ### Running with Docker
 
 Label Studio is also distributed as a docker container. Make sure you have [Docker](https://www.docker.com/) installed on your local machine.
 
-Install and start Label Studio at [http://localhost:8200](http://localhost:8200) storing all labeling data in `./my_labeling_project` directory:
+Install and start Label Studio at [http://localhost:8080](http://localhost:8080) storing all labeling data in `./my_labeling_project` directory:
 ```bash
-docker run --rm -p 8200:8200 -v `pwd`/my_labeling_project:/label-studio/my_labeling_project --name label-studio heartexlabs/label-studio:latest
+docker run --rm -p 8080:8080 -v `pwd`/my_labeling_project:/label-studio/my_labeling_project --name label-studio heartexlabs/label-studio:latest
 ```
 
 > Note: if `./my_labeling_project` the folder exists, an exception will be thrown. Please delete this folder or use `--force` option.
@@ -60,7 +60,7 @@ docker run --rm -p 8200:8200 -v `pwd`/my_labeling_project:/label-studio/my_label
 You can override the default startup command by appending any of [available command line arguments]():
 
 ```bash
-docker run -p 8200:8200 -v `pwd`/my_project:/label-studio/my_project --name label-studio heartexlabs/label-studio:latest label-studio start my_project --init --force --template image_mixedlabel
+docker run -p 8080:8080 -v `pwd`/my_project:/label-studio/my_project --name label-studio heartexlabs/label-studio:latest label-studio start my_project --init --force --template image_mixedlabel
 ```
 
 If you want to build a local image, run:
@@ -83,7 +83,7 @@ Then create a new project, it stores all labeling data in a local directory `my_
 ```bash
 label-studio start my_labeling_project --init
 ```
-The default browser will open automatically at [http://localhost:8200](http://localhost:8200).
+The default browser will open automatically at [http://localhost:8080](http://localhost:8080).
 
 
 ### Multisession mode

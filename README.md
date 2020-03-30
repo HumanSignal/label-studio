@@ -36,7 +36,7 @@ pip install label-studio
 # Initialize the project in labeling_project path
 label-studio init labeling_project
 
-# Start the server at http://localhost:8200
+# Start the server at http://localhost:8080
 label-studio start labeling_project
 ```
 
@@ -66,14 +66,14 @@ Running the latest Label Studio version locally without installing package from 
 pip install -e .
 ```
 ```bash
-# Start the server at http://localhost:8200
+# Start the server at http://localhost:8080
 python label-studio/server.py start labeling_project --init
 ```
 
 ## Run docker
-You can also start serving at `http://localhost:8200` by using docker:
+You can also start serving at `http://localhost:8080` by using docker:
 ```bash
-docker run --rm -p 8200:8200 -v `pwd`/my_project:/label-studio/my_project --name label-studio heartexlabs/label-studio:latest label-studio start my_project --init
+docker run --rm -p 8080:8080 -v `pwd`/my_project:/label-studio/my_project --name label-studio heartexlabs/label-studio:latest label-studio start my_project --init
 ```
 
 By default, it starts blank project in `./my_project` directory.
@@ -83,7 +83,7 @@ By default, it starts blank project in `./my_project` directory.
 You can override the default startup command by appending:
 
 ```bash
-docker run -p 8200:8200 -v `pwd`/my_project:/label-studio/my_project --name label-studio heartexlabs/label-studio:latest label-studio start my_project --init --force --template image_mixedlabel
+docker run -p 8080:8080 -v `pwd`/my_project:/label-studio/my_project --name label-studio heartexlabs/label-studio:latest label-studio start my_project --init --force --template image_mixedlabel
 ```
 
 If you want to build a local image, run:
@@ -93,7 +93,7 @@ docker build -t heartexlabs/label-studio:latest .
 
 ## Using docker-compose
 
-You can also start serving at `http://localhost:8200` using docker-compose.
+You can also start serving at `http://localhost:8080` using docker-compose.
 
 ### First time to run the app
 ```bash
@@ -185,7 +185,7 @@ There is a quick example tutorial on how to do that with simple image classifica
     
 Once you're satisfied with pre-labeling results, you can immediately send prediction requests via REST API:
 ```bash
-curl -X POST -H 'Content-Type: application/json' -d '{"image_url": "https://go.heartex.net/static/samples/sample.jpg"}' http://localhost:8200/predict
+curl -X POST -H 'Content-Type: application/json' -d '{"image_url": "https://go.heartex.net/static/samples/sample.jpg"}' http://localhost:8080/predict
 ```
 
 Feel free to play around any other models & frameworks apart from image classifiers! (see instructions [here](https://github.com/heartexlabs/pyheartex#advanced-usage))

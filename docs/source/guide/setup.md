@@ -60,4 +60,4 @@ label-studio my_new_project start --init --label-config config.xml
 
 ## Setup from UI
 
-You can also use the web interface at [`/setup`](http://localhost:8200/setup) to paste your labeling config. Using web UI you also get a live update while you're editting the config.
+You can also use the web interface at [`/setup`](http://localhost:8080/setup) to paste your labeling config. Using web UI you also get a live update while you're editting the config.

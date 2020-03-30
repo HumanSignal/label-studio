@@ -30,10 +30,10 @@ Here is a quick example tutorial on how to do that with simple image classificat
     
 Once you're satisfied with pre-labeling results, you can immediately send prediction requests via REST API:
 ```bash
-curl -X POST -H 'Content-Type: application/json' -d '{"image_url": "https://go.heartex.net/static/samples/sample.jpg"}' http://localhost:8200/predict
+curl -X POST -H 'Content-Type: application/json' -d '{"image_url": "https://go.heartex.net/static/samples/sample.jpg"}' http://localhost:8080/predict
 ```
 
-> Note: There is a limitation of using ML backend with locally hosted files, i.e. you can't train your models on tasks with URLs like `{"url": "http://localhost:8200/static/image.png"}`. URLs should be accessible from the outside.
+> Note: There is a limitation of using ML backend with locally hosted files, i.e. you can't train your models on tasks with URLs like `{"url": "http://localhost:8080/static/image.png"}`. URLs should be accessible from the outside.
 
 Feel free to play around with any other models & frameworks apart from image classifiers! [See instructions](https://github.com/heartexlabs/pyheartex#advanced-usage) on how to connect existing models.
 

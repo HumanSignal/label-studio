@@ -1,6 +1,6 @@
 {
     "title": "Label Studio",
-    "port": 8200,
+    "port": 8080,
     "debug": false,
 
     "label_config": null,

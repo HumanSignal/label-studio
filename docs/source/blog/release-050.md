@@ -117,17 +117,17 @@ Support for Windows, MacOSX, Linux with Python 3.5 or greater
 
 There are now several ways on how you can import your tasks for labeling:
 
-- uploading files via [web UI](http://localhost:8200/import)
+- uploading files via [web UI](http://localhost:8080/import)
 - by [specifying path](/guide/tasks.html#Import-formats) to a file or directory with images, audios or text files on Label Studio initialization
 - using [import API](/guide/tasks.html#Import-using-API)
 
 ### On-the-fly labeling config validation
 
-Previously changing a config after importing or labeling tasks could be dangerous because of created tasks/completions invalidation, therefore this was switched off. Now you should not worry about that - labeling config validation is taken on the fly considering the data already created. You can freely change the appearance of your project on [setup page](http://localhost:8200/setup) and even add new labels - when you modify something crucial, you'll be alerted about.
+Previously changing a config after importing or labeling tasks could be dangerous because of created tasks/completions invalidation, therefore this was switched off. Now you should not worry about that - labeling config validation is taken on the fly considering the data already created. You can freely change the appearance of your project on [setup page](http://localhost:8080/setup) and even add new labels - when you modify something crucial, you'll be alerted about.
 
 ### Exporting with automatic converters
 
-When finishing your project - go to the [export page](http://localhost:8200/export) and choose in between the [common export formats](/guide/completions.html#Export-formats) valid for your current project configuration.
+When finishing your project - go to the [export page](http://localhost:8080/export) and choose in between the [common export formats](/guide/completions.html#Export-formats) valid for your current project configuration.
 
 ### Connection to running Machine Learning backend
 

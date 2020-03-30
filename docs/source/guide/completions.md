@@ -8,7 +8,7 @@ Your annotations are stored in [raw completion format](#Completion-format) insid
 
 You can optionally convert and export raw completions to a more common format by doing one of the following:
 
-- From [/export](http://localhost:8200/export) page by choosing target format
+- From [/export](http://localhost:8080/export) page by choosing target format
 - Applying [converter tool](https://github.com/heartexlabs/label-studio-converter) to `my_project_name/completions` directory
 - By using [Export API](#Export-using-API)
 
@@ -203,7 +203,7 @@ Popular XML-formatted task data used for object detection and image segmentation
 You can use an API to request a file with exported results, e.g.
 
 ```bash
-curl http://localhost:8200/api/export?format=JSON > exported_results.tar.gz
+curl http://localhost:8080/api/export?format=JSON > exported_results.tar.gz
 ```
 
 The `format` parameter could be one of available [export formats](#Export-formats)

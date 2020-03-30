@@ -69,7 +69,7 @@ def parse_input_args():
         help='Sampling type that defines tasks order'
     )
     root_parser.add_argument(
-        '-p', '--port', dest='port', default=8200, type=int,
+        '-p', '--port', dest='port', default=8080, type=int,
         help='Server port')
     root_parser.add_argument(
         '--log-level', dest='log_level', choices=['DEBUG', 'INFO', 'WARNING', 'ERROR'], default=None,

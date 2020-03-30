@@ -9,5 +9,5 @@ services:
       - ./my_project:/label-studio/my_project
     command: "label-studio start my_project ${INIT_COMMAND} "
     ports: 
-      - "8200:8200"
+      - "8080:8080"
     restart: always
