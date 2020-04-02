@@ -419,8 +419,7 @@ def api_import():
 
     start = time.time()
     # get tasks from request
-    uploader.project = project
-    parsed_data = uploader.load_tasks(DjangoRequest())
+    parsed_data = uploader.load_tasks(DjangoRequest(), project)
     # validate tasks
     validator = TaskValidator(project)
     try:
