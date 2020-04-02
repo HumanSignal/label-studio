@@ -233,6 +233,18 @@ def export_page():
     )
 
 
+@app.route('/ml')
+def ml_page():
+    """ Export completions as JSON or using converters
+    """
+    project = project_get_or_create()
+    project.analytics.send(getframeinfo(currentframe()).function)
+    return flask.render_template(
+        'ml.html',
+        project=project
+    )
+
+
 @app.route('/api/render-label-studio', methods=['GET', 'POST'])
 def api_render_label_studio():
     """ Label studio frontend rendering for iframe

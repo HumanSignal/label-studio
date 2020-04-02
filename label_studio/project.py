@@ -121,6 +121,10 @@ class Project(object):
     def label_config(self):
         return self.project_obj.label_config
 
+    @property
+    def ml_backend_connected(self):
+        return self.ml_backend is not None
+
     def extract_data_types(self, config):
         return self.project_obj.extract_data_types(config)
 

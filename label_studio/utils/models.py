@@ -331,6 +331,7 @@ class MLApi(BaseHTTPAPI):
             'project': self._create_project_uid(project),
             'schema': project.schema,
             'params': {
+                'force_load': True,
                 'login': project.task_data_login,
                 'password': project.task_data_password
             }
@@ -388,6 +389,10 @@ class MLBackend(object):
     train_job = attr.ib(default=None)
 
     _TRAIN_JOBS_FILE = os.path.join(get_data_dir(), 'train_jobs.json')
+
+    @property
+    def url(self):
+        return self.api._url
 
     def restore_train_job(self):
         """
@@ -452,19 +457,17 @@ class MLBackend(object):
                 model_version = r.response['model_version']
                 if self.model_version != model_version:
                     self.model_version = model_version
-                    logger.debug('Model version has changed: ' + model_version)
+                    logger.debug('Model version has changed: ' + str(model_version))
                 else:
-                    logger.debug('Model version hasn\'t changed: ' + model_version)
-                response = self.api.predict([task], self.model_version, project)
-                if response.is_error:
-                    if response.status_code == 404:
-                        logger.info('Can\'t make predictions: model is not found (probably not trained yet)')
-                    else:
-                        logger.error('Can\'t make predictions: ML backend returns error: ' + response.error_message)
+                    logger.debug('Model version hasn\'t changed: ' + str(model_version))
+            response = self.api.predict([task], self.model_version, project)
+            if response.is_error:
+                if response.status_code == 404:
+                    logger.info('Can\'t make predictions: model is not found (probably not trained yet)')
                 else:
-                    return response.response['results']
+                    logger.error('Can\'t make predictions: ML backend returns error: ' + response.error_message)
             else:
-                logger.warning('ML backend setup returns error: ' + r.error_message)
+                return response.response['results']
 
     def update_model(self, task, completion, project):
         if self._api_exists():

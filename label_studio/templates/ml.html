@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block body %}
+  <div class="ui container">
+  <h3>Machine learning backend is
+  {% if project.ml_backend_connected %}
+    <span style="color:lightgreen">connected!</span>
+    <table class="ui definition table">
+  <tbody>
+  <tr><td>URL</td><td>{{ project.ml_backend.url }}</td></tr>
+  <tr><td>Model name</td><td>{{ project.ml_backend.model_name }}</td></tr>
+  <tr><td>Model version</td><td>{{ project.ml_backend.model_version }}</td></tr>
+</tbody></table>
+  {% else %}
+    disconnected. <a href="https://labelstud.io/guide/ml.html" target="_blank">Learn how to connect your model to Label Studio.</a>
+  {% endif %}
+  </h3>
+  </div>
+
+{% endblock %}
