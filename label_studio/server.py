@@ -101,6 +101,16 @@ def send_media(path):
     return flask.send_from_directory(media_dir, path)
 
 
+@app.route('/upload/<path:path>')
+def send_upload(path):
+    """ User uploaded files
+    """
+    project = project_get_or_create()
+    project_dir = os.path.join(project.name, 'upload')
+    print(project_dir, path)
+    return open(os.path.join(project_dir, path), 'rb').read()
+
+
 @app.route('/static/<path:path>')
 def send_static(path):
     """ Static serving
@@ -409,6 +419,7 @@ def api_import():
 
     start = time.time()
     # get tasks from request
+    uploader.project = project
     parsed_data = uploader.load_tasks(DjangoRequest())
     # validate tasks
     validator = TaskValidator(project)
@@ -436,7 +447,8 @@ def api_import():
         'task_count': len(new_tasks),
         'completion_count': validator.completion_count,
         'prediction_count': validator.prediction_count,
-        'duration': duration
+        'duration': duration,
+        'new_task_ids': [t for t in new_tasks]
     }), status.HTTP_201_CREATED)
 
 
