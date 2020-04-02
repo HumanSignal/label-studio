@@ -344,8 +344,12 @@ pre {
     color: #777;
 }
 
+.statistic .value small {
+    font-size: 65%;
+}
 
-@media only screen and (max-width: 768px) {
+
+@media only screen and (max-width: 890px) {
     #logo {
         font-size: 1.5em;
         line-height: 40px;

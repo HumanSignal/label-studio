@@ -214,19 +214,6 @@ def setup_page():
     )
 
 
-@app.route('/ml2')
-def ml_page2():
-    """ Machine learning
-    """
-    project = project_get_or_create()
-    project.analytics.send(getframeinfo(currentframe()).function)
-    return flask.render_template(
-        'ml.html',
-        config=project.config,
-        project=project.project_obj
-    )
-
-
 @app.route('/import')
 def import_page():
     """ Import tasks from JSON, CSV, ZIP and more
@@ -258,13 +245,14 @@ def export_page():
 
 @app.route('/ml')
 def ml_page():
-    """ Export completions as JSON or using converters
-    """
+    """ Machine learning
+       """
     project = project_get_or_create()
     project.analytics.send(getframeinfo(currentframe()).function)
     return flask.render_template(
         'ml.html',
-        project=project
+        config=project.config,
+        project=project.project_obj
     )
 
 
