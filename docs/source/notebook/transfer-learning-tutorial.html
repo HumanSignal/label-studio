@@ -13113,7 +13113,6 @@ div#notebook {
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
 <span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
 <span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">import</span> <span class="nn">os</span>
 
 <span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DataLoader</span>
 <span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">models</span><span class="p">,</span> <span class="n">transforms</span>
@@ -13404,7 +13403,7 @@ First of all, let's create launch script called <code>wsgi.py</code>:</p>
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="n">label</span><span class="o">-</span><span class="n">studio</span> <span class="n">init</span> <span class="n">new_project</span> <span class="o">--</span><span class="n">ml</span><span class="o">-</span><span class="n">backend</span><span class="o">-</span><span class="n">url</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">:</span><span class="mi">9090</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="err">!</span> <span class="n">label</span><span class="o">-</span><span class="n">studio</span> <span class="n">start</span> <span class="n">new_project</span> <span class="o">--</span><span class="n">init</span> <span class="o">--</span><span class="n">ml</span><span class="o">-</span><span class="n">backend</span><span class="o">-</span><span class="n">url</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">:</span><span class="mi">9090</span> <span class="o">--</span><span class="n">template</span> <span class="n">image_classification</span>
 </pre></div>
 
     </div>
@@ -13431,8 +13430,7 @@ Then clone Git repo:</p>
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="err">!</span> <span class="n">git</span> <span class="n">clone</span> <span class="n">https</span>
-<span class="err">!</span> <span class="n">cd</span> <span class="n">label</span><span class="o">-</span><span class="n">studio</span><span class="o">-</span><span class="n">ml</span><span class="o">-</span><span class="n">backend</span><span class="o">/</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="err">!</span> <span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">heartexlabs</span><span class="o">/</span><span class="n">label</span><span class="o">-</span><span class="n">studio</span><span class="o">-</span><span class="n">ml</span><span class="o">-</span><span class="n">backend</span>
 </pre></div>
 
     </div>
@@ -13443,7 +13441,7 @@ Then clone Git repo:</p>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Copy your files <code>wsgi.py</code> and <code>my_model.py</code> into the root directory. Then build and run server:</p>
+<p>Copy your files <code>wsgi.py</code> and <code>my_model.py</code> into the root directory <code>label-studio-ml-backend/</code>. Then build and run server:</p>
 
 </div>
 </div>
@@ -13453,8 +13451,7 @@ Then clone Git repo:</p>
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="err">!</span> <span class="n">cd</span> <span class="n">configs</span>
-<span class="err">!</span> <span class="n">docker</span><span class="o">-</span><span class="n">compose</span> <span class="n">up</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="err">!</span> <span class="n">docker</span><span class="o">-</span><span class="n">compose</span> <span class="n">up</span>
 </pre></div>
 
     </div>
@@ -13465,7 +13462,7 @@ Then clone Git repo:</p>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>That's it. Everything is set, you can connect Label Studio to your backend similar as above</p>
+<p>That's it. If everything is set, you can connect run Label Studio connected to your ML backend the same as above</p>
 
 </div>
 </div>
@@ -13475,13 +13472,21 @@ Then clone Git repo:</p>
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython2"><pre><span></span><span class="err">!</span> <span class="n">label</span><span class="o">-</span><span class="n">studio</span> <span class="n">init</span> <span class="n">new_project</span> <span class="o">--</span><span class="n">ml</span><span class="o">-</span><span class="n">backend</span><span class="o">-</span><span class="n">url</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">:</span><span class="mi">9090</span>
+<div class=" highlight hl-ipython2"><pre><span></span><span class="err">!</span> <span class="n">label</span><span class="o">-</span><span class="n">studio</span> <span class="n">start</span> <span class="n">new_project</span> <span class="o">--</span><span class="n">init</span> <span class="o">--</span><span class="n">ml</span><span class="o">-</span><span class="n">backend</span><span class="o">-</span><span class="n">url</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">localhost</span><span class="p">:</span><span class="mi">9090</span> <span class="o">--</span><span class="n">template</span> <span class="n">image_classification</span>
 </pre></div>
 
     </div>
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Go to <a href="http://localhost:8080/ml.html">Label Studio Machine Learning page</a> to check if everything is connected.</p>
+
+</div>
+</div>
 </div>
     </div>
   </div>
