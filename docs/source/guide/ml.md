@@ -12,6 +12,15 @@ That gives you the opportunities to use:
 - **Active Learning**: Perform labeling in active learning mode
 - **Prediction Service**: Instantly create running production-ready prediction service
 
+
+## Tutorials
+
+- [Transfer learning with PyTorch](/notebook/transfer-learning-tutorial.html)
+- [Implementing your own ML backend using API](https://github.com/heartexlabs/label-studio-ml-backend)
+
+<iframe src="/notebook/transfer-learning-tutorial.html"></iframe>
+## Quickstart
+
 Here is a quick example tutorial on how to do that with simple image classification:
    
 1. Clone [pyheartex](https://github.com/heartexlabs/pyheartex), and start serving example image classifier ML backend at `http://localhost:9090`
@@ -34,6 +43,7 @@ curl -X POST -H 'Content-Type: application/json' -d '{"image_url": "https://go.h
 ```
 
 > Note: There is a limitation of using ML backend with locally hosted files, i.e. you can't train your models on tasks with URLs like `{"url": "http://localhost:8080/static/image.png"}`. URLs should be accessible from the outside.
+> Note: If you're running Label Studio from a docker, localhost is not accessible there and result to connection errors
 
 Feel free to play around with any other models & frameworks apart from image classifiers! [See instructions](https://github.com/heartexlabs/pyheartex#advanced-usage) on how to connect existing models.
 
