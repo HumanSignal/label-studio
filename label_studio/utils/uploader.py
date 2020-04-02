@@ -2,6 +2,7 @@
 
 import os
 import csv
+import hashlib
 import shutil
 import zipfile
 import rarfile
@@ -46,11 +47,15 @@ def tasks_from_file(filename, file):
             except TypeError:
                 tasks = json.loads(raw_data.decode('utf8'))
         else:
+            # save file to disk
+            data = file.read()
             upload_dir = os.path.join(project.name, 'upload')
             os.makedirs(upload_dir, exist_ok=True)
+            filename = hashlib.md5(data).hexdigest() + '-' + filename
             path = os.path.join(upload_dir, filename)
-            open(path, 'wb').write(file.read())
-            tasks = [{'data': {settings.UPLOAD_DATA_UNDEFINED_NAME: HOSTNAME + '/upload/' + os.path.basename(path)}}]
+            open(path, 'wb').write(data)
+            # prepare task
+            tasks = [{'data': {settings.UPLOAD_DATA_UNDEFINED_NAME: HOSTNAME + '/upload/' + filename}}]
 
     except Exception as exc:
         raise ValidationError('Failed to parse input file ' + filename + ': ' + str(exc))

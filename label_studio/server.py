@@ -214,8 +214,8 @@ def setup_page():
     )
 
 
-@app.route('/ml')
-def ml_page():
+@app.route('/ml2')
+def ml_page2():
     """ Machine learning
     """
     project = project_get_or_create()

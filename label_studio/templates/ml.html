@@ -4,50 +4,60 @@
   <div class="ui container">
     <center class="wrapper">
 
-      <!-- Statistics -->
-      <div class="ui stackable grid">
 
-        <div class="eight wide column">
-          <div class="ui statistic">
-            <span class="value"><small>{{ project.ml_backend.model_name }}</small></span>
-            <span class="label">Machine Learning Model</span>
-          </div>
+      {% if not project.ml_backend %}
+        <div class="ui statistic">
+          <span class="value">
+            <small>Model not connected</small>
+          </span>
+          <span class="label">Machine Learning</span>
         </div>
+      {% else %}
 
-        <div class="eight wide column">
-          <div class="ui statistic">
-            <span class="value">
-              <small>{{ project.ml_backend.model_version|str2datetime }}</small>
-            </span>
-            <span class="label">Model Version</span>
+        <!-- Statistics -->
+        <div class="ui stackable grid">
+
+          <div class="eight wide column">
+            <div class="ui statistic">
+              <span class="value"><small>{{ project.ml_backend.model_name }}</small></span>
+              <span class="label">Machine Learning Model</span>
+            </div>
           </div>
-        </div>
 
-        <!-- <div class="eight wide column">
-          <p>ML Backend: {{ project.ml_backend.api._url }}</p>
-        </div> -->
-        <div class="ui divider hidden"></div>
+          <div class="eight wide column">
+            <div class="ui statistic">
+              <span class="value">
+                <small>{{ project.ml_backend.model_version|str2datetime }}</small>
+              </span>
+              <span class="label">Model Version</span>
+            </div>
+          </div>
 
-        <div class="sixteen wide column">
-          <!-- Input file form -->
-          <div class="ui form">
-            <input id="file-input" type="file" name="file" multiple onchange="send_data(event)" style="display: none"/>
+          <!-- <div class="eight wide column">
+            <p>ML Backend: {{ project.ml_backend.api._url }}</p>
+          </div> -->
+          <div class="ui divider hidden"></div>
 
-            <div class="ui content">
-              <div id="holder">
-                <div class="text">
-                  <i class="ui icon huge upload"></i>
-                  <p>Check the machine learning model, drop your image here</p>
+          <div class="sixteen wide column">
+            <!-- Input file form -->
+            <div class="ui form">
+              <input id="file-input" type="file" name="file" multiple onchange="send_data(event)" style="display: none"/>
+
+              <div class="ui content">
+                <div id="holder">
+                  <div class="text">
+                    <i class="ui icon huge upload"></i>
+                    <p>Check the machine learning model, drop your file here</p>
+                  </div>
                 </div>
               </div>
+
             </div>
 
+            <br/>
           </div>
-
-          <br/>
         </div>
-
-      </div>
+      {% endif %}
     </center>
   </div>
 
