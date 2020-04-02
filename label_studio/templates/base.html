@@ -50,6 +50,9 @@
     <a href="/export" class="{% if url_for(request.endpoint) == '/export' %}active{% endif %}">Export</a>
     <span class="delim">|</span>
 
+    <a href="/ml" class="{% if url_for(request.endpoint) == '/ml' %}active{% endif %}">Learning</a>
+    <span class="delim">|</span>
+
     <a href="/setup" class="{% if url_for(request.endpoint) == '/setup' %}active{% endif %}">Setup</a>
     <span class="delim">|</span>
 

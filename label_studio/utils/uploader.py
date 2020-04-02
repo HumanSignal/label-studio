@@ -2,6 +2,7 @@
 
 import os
 import csv
+import hashlib
 import shutil
 import zipfile
 import rarfile
@@ -18,10 +19,13 @@ from urllib.request import urlopen
 
 from .exceptions import ValidationError
 from .misc import Settings
+from label_studio.utils.functions import HOSTNAME
+
 
 settings = Settings
 logger = logging.getLogger(__name__)
 csv.field_size_limit(131072 * 10)
+project = None
 
 
 def tasks_from_file(filename, file):
@@ -43,9 +47,18 @@ def tasks_from_file(filename, file):
             except TypeError:
                 tasks = json.loads(raw_data.decode('utf8'))
         else:
-            raise ValueError('Unsupported input file format')
+            # save file to disk
+            data = file.read()
+            upload_dir = os.path.join(project.name, 'upload')
+            os.makedirs(upload_dir, exist_ok=True)
+            filename = hashlib.md5(data).hexdigest() + '-' + filename
+            path = os.path.join(upload_dir, filename)
+            open(path, 'wb').write(data)
+            # prepare task
+            tasks = [{'data': {settings.UPLOAD_DATA_UNDEFINED_NAME: HOSTNAME + '/upload/' + filename}}]
+
     except Exception as exc:
-        raise ValidationError('Failed to parse input file ' + filename + ': ' + exc)
+        raise ValidationError('Failed to parse input file ' + filename + ': ' + str(exc))
 
     # null in file
     if tasks is None:

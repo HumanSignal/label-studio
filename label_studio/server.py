@@ -101,6 +101,16 @@ def send_media(path):
     return flask.send_from_directory(media_dir, path)
 
 
+@app.route('/upload/<path:path>')
+def send_upload(path):
+    """ User uploaded files
+    """
+    project = project_get_or_create()
+    project_dir = os.path.join(project.name, 'upload')
+    print(project_dir, path)
+    return open(os.path.join(project_dir, path), 'rb').read()
+
+
 @app.route('/static/<path:path>')
 def send_static(path):
     """ Static serving
@@ -201,6 +211,19 @@ def setup_page():
         templates=templates,
         input_values=input_values,
         multi_session=input_args.command == 'start-multi-session'
+    )
+
+
+@app.route('/ml2')
+def ml_page2():
+    """ Machine learning
+    """
+    project = project_get_or_create()
+    project.analytics.send(getframeinfo(currentframe()).function)
+    return flask.render_template(
+        'ml.html',
+        config=project.config,
+        project=project.project_obj
     )
 
 
@@ -408,6 +431,7 @@ def api_import():
 
     start = time.time()
     # get tasks from request
+    uploader.project = project
     parsed_data = uploader.load_tasks(DjangoRequest())
     # validate tasks
     validator = TaskValidator(project)
@@ -435,7 +459,8 @@ def api_import():
         'task_count': len(new_tasks),
         'completion_count': validator.completion_count,
         'prediction_count': validator.prediction_count,
-        'duration': duration
+        'duration': duration,
+        'new_task_ids': [t for t in new_tasks]
     }), status.HTTP_201_CREATED)
 
 
@@ -646,11 +671,21 @@ def get_data_file(filename):
     return flask.send_from_directory(directory, filename, as_attachment=True)
 
 
+def str2datetime(timestamp_str):
+    try:
+        ts = int(timestamp_str)
+    except:
+        return timestamp_str
+    return datetime.utcfromtimestamp(ts).strftime('%Y%m%d.%H%M%S')
+
+
 def main():
     import threading
     import webbrowser
 
     global input_args
+
+    app.jinja_env.filters['str2datetime'] = str2datetime
 
     input_args = parse_input_args()
 
