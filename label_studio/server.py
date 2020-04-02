@@ -252,7 +252,7 @@ def ml_page():
     return flask.render_template(
         'ml.html',
         config=project.config,
-        project=project.project_obj
+        project=project
     )
 
 
