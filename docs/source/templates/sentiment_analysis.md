@@ -11,7 +11,7 @@ Classify sentiment of reviews for musical instruments found on Amazon
 ## Run
 
 ```bash
-label-studio init --template=sentiment_analysis sentiment_analysis_project
+label-studio init --template=text_sentiment sentiment_analysis_project
 label-studio start sentiment_analysis_project 
 ```
 
