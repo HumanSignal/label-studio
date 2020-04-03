@@ -53,6 +53,7 @@ class Project(object):
 
         self.converter = None
         self.load_converter()
+        self.max_tasks_file_size = 250
 
     def load_tasks(self):
         self.tasks = {}
