@@ -492,7 +492,7 @@ def api_generate_next_task():
     # try to use ml backend for predictions
     if project.ml_backend:
         task = deepcopy(task)
-        task['predictions'] = project.ml_backend.make_predictions(task, project.project_obj)
+        task['predictions'] = project.ml_backend.make_predictions(task, project)
     return make_response(jsonify(task), 200)
 
 

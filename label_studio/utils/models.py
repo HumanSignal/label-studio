@@ -264,6 +264,29 @@ class MLApi(BaseHTTPAPI):
             url += '/'
         return urllib.parse.urljoin(url, url_suffix)
 
+    def _get(self, url_suffix, *args, **kwargs):
+        url = self._get_url(url_suffix)
+        headers = dict(self.http.headers)
+        response = None
+        try:
+            response = self.get(url=url, *args, **kwargs)
+            response.raise_for_status()
+        except requests.exceptions.RequestException as e:
+            logger.debug('Error getting response from ' + url, exc_info=True)
+            status_code = response.status_code if response is not None else 0
+            return MLApiResult(url, {}, {'error': str(e)}, headers, 'error', status_code=status_code)
+        status_code = response.status_code
+        try:
+            response = response.json()
+        except ValueError as e:
+            logger.debug('Error parsing JSON response from '+url+'. Response: ' + str(response.content), exc_info=True)
+            return MLApiResult(
+                url, {}, {'error': str(e), 'response': response.content}, headers, 'error',
+                status_code=status_code
+            )
+        logger.debug('Response from ' + url + ':' + json.dumps(response, indent=2))
+        return MLApiResult(url, {}, response, headers, status_code=status_code)
+
     def _post(self, url_suffix, request, *args, **kwargs):
         url = self._get_url(url_suffix)
         headers = dict(self.http.headers)
@@ -305,7 +328,7 @@ class MLApi(BaseHTTPAPI):
         request = {
             'id': task['id'],
             'project': self._create_project_uid(project),
-            'schema': project.schema,
+            'schema': project.label_config_line,
             'data': task['data'],
             'meta': task.get('meta', {}),
             'result': results,
@@ -329,11 +352,10 @@ class MLApi(BaseHTTPAPI):
             'tasks': tasks,
             'model_version': model_version,
             'project': self._create_project_uid(project),
-            'schema': project.schema,
+            'schema': project.label_config_line,
             'params': {
-                'force_load': True,
-                'login': project.task_data_login,
-                'password': project.task_data_password
+                'login': project.project_obj.task_data_login,
+                'password': project.project_obj.task_data_password
             }
         }
         return self._post('predict', request)
@@ -354,7 +376,7 @@ class MLApi(BaseHTTPAPI):
         """
         return self._post('setup', request={
             'project': self._create_project_uid(project),
-            'schema': project.schema
+            'schema': project.label_config_line
         })
 
     def delete(self, project):
@@ -372,6 +394,9 @@ class MLApi(BaseHTTPAPI):
         :return:
         """
         return self._post('job_status', request={'job': train_job})
+
+    def check_connection(self):
+        return self._get('health')
 
 
 @attr.s
@@ -393,6 +418,14 @@ class MLBackend(object):
     @property
     def url(self):
         return self.api._url
+
+    @property
+    def connected(self):
+        if self._api_exists():
+            r = self.api.check_connection()
+            if r.is_error:
+                return False
+            return True
 
     def restore_train_job(self):
         """

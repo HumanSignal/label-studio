@@ -105,7 +105,8 @@ class Project(object):
         ml_backend_params = self.config.get('ml_backend')
         if ml_backend_params:
             self.ml_backend = MLBackend.from_params(ml_backend_params)
-            self.project_obj.connect(self.ml_backend)
+            if not self.ml_backend.connected:
+                raise ValueError('ML backend is not connected.')
 
     def load_converter(self):
         self.converter = Converter(self.label_config_full)
@@ -136,8 +137,6 @@ class Project(object):
 
         self.validate_label_config_on_derived_input_schema(parsed_config)
         self.validate_label_config_on_derived_output_schema(parsed_config)
-        if self.ml_backend:
-            self.ml_backend.validate(config_string)
 
     def update_label_config(self, new_label_config):
         label_config_file = self.config['label_config']
