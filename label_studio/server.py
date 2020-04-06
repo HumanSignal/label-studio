@@ -243,14 +243,14 @@ def export_page():
     )
 
 
-@app.route('/ml')
-def ml_page():
+@app.route('/model')
+def model_page():
     """ Machine learning
        """
     project = project_get_or_create()
     project.analytics.send(getframeinfo(currentframe()).function)
     return flask.render_template(
-        'ml.html',
+        'model.html',
         config=project.config,
         project=project
     )
