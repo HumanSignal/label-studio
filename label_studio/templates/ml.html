@@ -44,7 +44,15 @@
           <div class="row centered aligned">
             <div class="eight wide column centered aligned">
               <div class="ui statistic">
-                <span class="value"><small>{{ project.ml_backend.model_name }}</small></span>
+                <span class="value">
+                  <small>
+                    {% if project.ml_backend.model_name|length >= 20 %}
+                      {{ project.ml_backend.model_name[:17z] }} ...
+                    {% else %}
+                      {{ project.ml_backend.model_name }}
+                    {% endif %}
+                  </small>
+                </span>
                 <span class="label">Machine Learning Model</span>
               </div>
             </div>
