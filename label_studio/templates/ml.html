@@ -47,7 +47,7 @@
                 <span class="value">
                   <small>
                     {% if project.ml_backend.model_name|length >= 20 %}
-                      {{ project.ml_backend.model_name[:17z] }} ...
+                      {{ project.ml_backend.model_name[:17] }} ...
                     {% else %}
                       {{ project.ml_backend.model_name }}
                     {% endif %}
