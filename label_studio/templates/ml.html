@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+{% block body %}
+
+  <div class="ui container">
+    <center class="wrapper">
+
+
+      {% if not project.ml_backend %}
+        <div class="ui statistic">
+          <span class="value">
+            <small>Model not connected</small>
+          </span>
+          <span class="label">Machine Learning</span>
+        </div>
+
+        <br>
+        <a href="https://labelstud.io/guide/ml.html" target="_blank">
+          Learn how to connect your model to Label Studio
+        </a>
+
+      {% else %}
+
+        <!-- Statistics -->
+        <div class="ui stackable grid">
+          <div class="row">
+            <div class="eight wide column centered aligned">
+              <div class="ui statistic">
+              <span class="value">
+                <small>Enabled</small>
+              </span>
+                <span class="label">Machine Learning</span>
+              </div>
+            </div>
+
+            <div class="eight wide column centered aligned">
+              <div class="ui statistic">
+                <span class="value"><small>Backend</small></span>
+                <span class="label">{{ project.ml_backend.url }}</span>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="row centered aligned">
+            <div class="eight wide column centered aligned">
+              <div class="ui statistic">
+                <span class="value">
+                  <small>
+                    {% if project.ml_backend.model_name|length >= 20 %}
+                      {{ project.ml_backend.model_name[:17] }} ...
+                    {% else %}
+                      {{ project.ml_backend.model_name }}
+                    {% endif %}
+                  </small>
+                </span>
+                <span class="label">Machine Learning Model</span>
+              </div>
+            </div>
+
+            <div class="eight wide column centered aligned">
+              <div class="ui statistic">
+                <span class="value">
+                  <small>{{ project.ml_backend.model_version|str2datetime }}</small>
+                </span>
+                <span class="label">Model Version</span>
+              </div>
+            </div>
+
+          </div>
+
+          <br>
+          <div></div>
+
+          <div class="ui divider hidden"></div>
+
+          {% if project.data_types|length == 1 %}
+            <!-- File uploader -->
+            <div class="sixteen wide column">
+              <!-- Input file form -->
+              <div class="ui form">
+                <input id="file-input" type="file" name="file" multiple onchange="send_data(event)"
+                       style="display: none"/>
+
+                <div class="ui content">
+                  <div id="holder">
+                    <div class="text">
+                      <i class="ui icon huge upload"></i>
+                      <p>Import new data and check the model prediction, drop your file here</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <br/>
+
+            </div>
+          {% endif %} {# Uploader #}
+
+        </div>
+      {% endif %}
+    </center>
+  </div>
+
+  <!-- Dimmer and loader -->
+  <div class="ui page dimmer">
+    <div class="ui large text orange loader">Processing, please wait</div>
+  </div>
+
+  <script>
+
+      $('#holder').on('click', function () {
+          $('#file-input').trigger('click');
+      });
+
+      // drag & drop files
+      $(document).ready(function () {
+          let holder = $('#holder');
+          holder.on('drop', function (e) {
+              e.preventDefault();
+              $(this).removeClass('hover');
+              const event = {target: {files: e.originalEvent.dataTransfer.files}};
+              send_data(event);
+          });
+          holder.on('dragover', function (e) {
+              e.stopPropagation();
+              e.preventDefault();
+              $(this).addClass('hover');
+          });
+          holder.on('dragleave', function (e) {
+              e.preventDefault();
+              $(this).removeClass('hover');
+          });
+      });
+
+      // show upload wait
+      function start_wait() {
+          $('.ui.page.dimmer').addClass('active');
+      }
+
+      // stop upload wait
+      function stop_wait(obj, success) {
+          if (success) {
+              window.location = '/?task_id=' + obj[0];
+          } else {
+              alert(obj);
+          }
+
+      }
+
+      // send data with tasks to server (add more data)
+      function send_data(event) {
+          if (typeof event.target.files === 'undefined') {
+              return;
+          }
+
+          // show upload wait dialog
+          start_wait();
+          let fd = null;
+          let request = {};
+
+          // files from disk
+          fd = new FormData;
+          for (let i = 0; i < event.target.files.length; i++) {
+              const f = event.target.files[i];
+              let max_size_mb = {{ project.max_tasks_file_size }};
+              if (f.size / 1024.0 / 1024.0 > max_size_mb) {
+                  alert('Sorry, but file size is too big (more ' + max_size_mb + ' mb).\n<br/>' +
+                      'Try to split your file by chunks or zip it', false);
+                  return;
+              }
+
+              // make form and attach file to it
+              fd.append(f.name, f);
+          }
+
+          request = {
+              url: "api/import",
+              data: fd,
+              method: 'POST',
+              processData: false,
+              contentType: false
+          };
+
+          $.ajax(request)
+              .done(answer => {
+                  stop_wait(answer['new_task_ids'], true);
+              })
+              .fail(answer => {
+                  let msg = "Error: can't upload/process file on server side. Reasons:<br><br>";
+
+                  if (answer.responseJSON != null) {
+                      let rows = answer.responseJSON;
+                      for (let i in rows) {
+                          const escaped = $('<div>').text(rows[i]).html();
+                          const split = escaped.split('::');
+                          msg += '<div class="upload-row-error">' +
+                              '<div class=desc>' + split[0] + '</div>' +
+                              (split.length > 1 ? '<div class=code>' + split[1] + '</div>' : '') +
+                              '</div><br/>\n';
+                      }
+                  } else {
+                      msg += 'Critical error, see console for more description';
+                      console.log(answer);
+                  }
+
+                  stop_wait(msg, false);
+              });
+      }
+  </script>
+
+{% endblock %}

@@ -53,6 +53,7 @@ class Project(object):
 
         self.converter = None
         self.load_converter()
+        self.max_tasks_file_size = 250
 
     def load_tasks(self):
         self.tasks = {}
@@ -120,6 +121,10 @@ class Project(object):
     @property
     def label_config(self):
         return self.project_obj.label_config
+
+    @property
+    def ml_backend_connected(self):
+        return self.ml_backend is not None
 
     def extract_data_types(self, config):
         return self.project_obj.extract_data_types(config)

@@ -2,6 +2,7 @@
 
 import os
 import csv
+import hashlib
 import shutil
 import zipfile
 import rarfile
@@ -18,13 +19,15 @@ from urllib.request import urlopen
 
 from .exceptions import ValidationError
 from .misc import Settings
+from label_studio.utils.functions import HOSTNAME
+
 
 settings = Settings
 logger = logging.getLogger(__name__)
 csv.field_size_limit(131072 * 10)
 
 
-def tasks_from_file(filename, file):
+def tasks_from_file(filename, file, project):
     try:
         if filename.endswith('.csv'):
             tasks = pd.read_csv(file).fillna('').to_dict('records')
@@ -43,9 +46,18 @@ def tasks_from_file(filename, file):
             except TypeError:
                 tasks = json.loads(raw_data.decode('utf8'))
         else:
-            raise ValueError('Unsupported input file format')
+            # save file to disk
+            data = file.read()
+            upload_dir = os.path.join(project.name, 'upload')
+            os.makedirs(upload_dir, exist_ok=True)
+            filename = hashlib.md5(data).hexdigest() + '-' + filename
+            path = os.path.join(upload_dir, filename)
+            open(path, 'wb').write(data)
+            # prepare task
+            tasks = [{'data': {settings.UPLOAD_DATA_UNDEFINED_NAME: HOSTNAME + '/upload/' + filename}}]
+
     except Exception as exc:
-        raise ValidationError('Failed to parse input file ' + filename + ': ' + exc)
+        raise ValidationError('Failed to parse input file ' + filename + ': ' + str(exc))
 
     # null in file
     if tasks is None:
@@ -142,7 +154,7 @@ def aggregate_files(request_files, temp_dir):
     return files
 
 
-def aggregate_tasks(files):
+def aggregate_tasks(files, project):
     tasks = []
 
     # scan all files
@@ -150,10 +162,10 @@ def aggregate_tasks(files):
         # extracted file from archive
         if file is 'archive':
             with open(filename) as f:
-                tasks += tasks_from_file(filename, f)
+                tasks += tasks_from_file(filename, f, project)
         # file from request
         else:
-            tasks += tasks_from_file(filename, file)
+            tasks += tasks_from_file(filename, file, project)
 
         check_max_task_number(tasks)
 
@@ -161,14 +173,14 @@ def aggregate_tasks(files):
 
 
 @create_and_release_temp_dir
-def load_tasks(request, temp_dir):
+def load_tasks(request, project, temp_dir):
     """ Load tasks from different types of request.data / request.files
     """
     # take tasks from request FILES
     if len(request.FILES):
         # check_file_sizes_and_number(request.FILES)
         files = aggregate_files(request.FILES, temp_dir)
-        tasks = aggregate_tasks(files)
+        tasks = aggregate_tasks(files, project)
 
     # take tasks from url address
     elif 'application/x-www-form-urlencoded' in request.content_type:
@@ -184,7 +196,7 @@ def load_tasks(request, temp_dir):
 
                 # start parsing
                 files = aggregate_files(request_files, temp_dir)
-                tasks = aggregate_tasks(files)
+                tasks = aggregate_tasks(files, project)
 
         except ValidationError as e:
             raise e
