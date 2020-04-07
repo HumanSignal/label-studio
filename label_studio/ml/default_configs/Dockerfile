@@ -10,6 +10,8 @@ COPY supervisord.conf /etc/supervisor/conf.d/
 
 WORKDIR ${HOME}
 
+RUN pip install label-studio
+
 COPY . ${HOME}/
 
 EXPOSE 9090

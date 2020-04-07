@@ -23,12 +23,12 @@ def _predict():
     data = json.loads(request.data)
     tasks = data['tasks']
     project = data.get('project')
-    schema = data.get('schema')
+    label_config = data.get('label_config')
     force_reload = data.get('force_reload', False)
     try_fetch = data.get('try_fetch', True)
     params = data.get('params') or {}
     logger.debug(f'Request: predict {len(tasks)} tasks for project {project}')
-    predictions, model = _manager.predict(tasks, project, schema, force_reload, try_fetch, predict_kwargs=params)
+    predictions, model = _manager.predict(tasks, project, label_config, force_reload, try_fetch, predict_kwargs=params)
     response = {
         'results': predictions,
         'model_version': model.model_version
@@ -49,15 +49,15 @@ def _setup():
 @_server.route('/train', methods=['POST'])
 def _train():
     data = json.loads(request.data)
-    tasks = data['tasks']
+    completions = data['completions']
     project = data.get('project')
-    schema = data.get('schema')
+    label_config = data.get('label_config')
     params = data.get('params', {})
-    if len(tasks) == 0:
+    if len(completions) == 0:
         return jsonify({'status': 'error', 'message': 'No tasks found.'}), 400
-    logger.debug(f'Request: train for project {project} with {len(tasks)} tasks')
-    job = _manager.train(tasks, project, schema, **params)
-    response = {'job': job.id}
+    logger.debug(f'Request: train for project {project} with {len(completions)} tasks')
+    job = _manager.train(completions, project, label_config, **params)
+    response = {'job': job.id} if job else {}
     return jsonify(response), 201
 
 

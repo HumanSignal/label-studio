@@ -4,6 +4,10 @@ import argparse
 import shutil
 
 from label_studio.utils.io import find_dir
+from label_studio.ml.utils import get_all_classes_inherited_LabelStudioMLBase
+
+
+logger = logging.getLogger(__name__)
 
 
 def get_args():
@@ -28,7 +32,7 @@ def get_args():
         'project_name',
         help='Path to directory where project state will be initialized')
     parser_init.add_argument(
-        '--script', dest='script', required=True,
+        '--script', dest='script',
         help='Machine learning script of the following format: /my/script/path:ModelClass'
     )
     parser_init.add_argument(
@@ -57,7 +61,24 @@ def create_dir(args):
     default_configs_dir = find_dir('default_configs')
     shutil.copytree(default_configs_dir, output_dir)
 
-    script_path, model_class = args.script.split(':')
+    # extract script name and model class
+    if not args.script:
+        logger.warning('You don\'t specify script path: by default, "./model.py" is used')
+        script_path = 'model.py'
+    else:
+        script_path = args.script
+
+    if ':' not in script_path:
+        model_classes = get_all_classes_inherited_LabelStudioMLBase(script_path)
+        if len(model_classes) > 1:
+            raise ValueError(
+                'You don\'t specify target model class, and we\'ve found {num} possible candidates within {script}. '
+                'Please specify explicitly which one should be used using the following format:\n '
+                '{script}:{model_class}'.format(num=len(model_classes), script=script_path, model_class=model_classes[0]))
+        model_class = model_classes[0]
+    else:
+        script_path, model_class = args.script.split(':')
+
     script_base_name = os.path.basename(script_path)
     local_script_path = os.path.join(output_dir, os.path.basename(script_path))
     shutil.copy2(script_path, local_script_path)
