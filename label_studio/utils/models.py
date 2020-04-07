@@ -354,8 +354,9 @@ class MLApi(BaseHTTPAPI):
             'project': self._create_project_uid(project),
             'schema': project.label_config_line,
             'params': {
-                'login': project.project_obj.task_data_login,
-                'password': project.project_obj.task_data_password
+                'force_load': True,
+                'login': project.task_data_login,
+                'password': project.task_data_password
             }
         }
         return self._post('predict', request)
