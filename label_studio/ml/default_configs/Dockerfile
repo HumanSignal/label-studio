@@ -10,6 +10,7 @@ COPY supervisord.conf /etc/supervisor/conf.d/
 
 WORKDIR ${HOME}
 
+# RUN pip install git+https://github.com/heartexlabs/label-studio.git@master
 RUN pip install label-studio
 
 COPY . ${HOME}/
