@@ -20,6 +20,8 @@
 
       {% else %}
 
+        <div class="ui positive button" onclick="start_train()">Start training</div>
+
         <!-- Statistics -->
         <div class="ui stackable grid">
           <div class="row">
@@ -204,6 +206,40 @@
 
                   stop_wait(msg, false);
               });
+      }
+
+      function message_from_response(result) {
+        console.log(result);
+
+        // result is dict
+        if (result.hasOwnProperty('detail') && result.detail)
+          return result.detail;
+
+        // result is object from XHR, check responseText first, it is always presented
+        if (!result.responseText)
+          return 'Critical error on server';
+
+        // grab responseJSON detail
+        else if (result.responseJSON.hasOwnProperty('detail'))
+          return result.responseJSON['detail'];
+
+        // something strange inside of responseJSON
+        else
+          return JSON.stringify(result.responseJSON);
+      }
+
+      function start_train() {
+        let request = {
+          url: "api/train",
+          method: 'POST',
+        };
+        $.ajax(request)
+          .done(response => {
+            alert(response.responseJSON.detail);
+          })
+          .fail(response => {
+            alert(response.responseJSON.detail);
+          })
       }
   </script>
 

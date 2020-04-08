@@ -15,46 +15,34 @@ That gives you the opportunities to use:
 
 ## Tutorials
 
-- [Transfer learning with PyTorch](/notebook/transfer-learning-tutorial.html)
-- [Implementing your own ML backend using API](https://github.com/heartexlabs/label-studio-ml-backend)
+- [Create the simplest ML backend](/tutorials/dummy_model.html)
+- [Text classification with Scikit-Learn](/tutorials/sklearn-text-classifier.html)
+- [Transfer learning for images with PyTorch](/tutorials/pytorch-image-transfer-learning.html)
 
-<iframe src="/notebook/transfer-learning-tutorial.html"></iframe>
 ## Quickstart
 
-Here is a quick example tutorial on how to do that with simple image classification:
+Here is a quick example tutorial on how to do that with simple text classification:
+
+0. Clone repo
+   ```bash
+   git clone https://github.com/heartexlabs/label-studio  
+   ```
    
-1. Clone [pyheartex](https://github.com/heartexlabs/pyheartex), and start serving example image classifier ML backend at `http://localhost:9090`
-    ```bash
-    git clone https://github.com/heartexlabs/pyheartex.git
-    cd pyheartex/examples/docker
-    docker-compose up -d
-    ```
+1. Create new ML backend
+   ```bash
+   label-studio-ml init my_ml_backend --script label-studio/ml/examples/simple_text_classifier.py
+   ```
    
-2. Run Label Studio project specifying ML backend URLs:
-
+2. Start ML backend server
+   ```bash
+   label-studio-ml start my_ml_backend
+   ```
+   
+3. Run Label Studio connecting it to the running ML backend:
     ```bash
-    label-studio start imgcls --init --template image_classification \
-    --ml-backend-url http://localhost:9090 --ml-backend-name my_model
+    label-studio start text_classification_project --init --template text_sentiment --ml-backend-url http://localhost:9090
     ```
-    
-Once you're satisfied with pre-labeling results, you can immediately send prediction requests via REST API:
-```bash
-curl -X POST -H 'Content-Type: application/json' -d '{"image_url": "https://go.heartex.net/static/samples/sample.jpg"}' http://localhost:8080/predict
-```
 
-> Note: There is a limitation of using ML backend with locally hosted files, i.e. you can't train your models on tasks with URLs like `{"url": "http://localhost:8080/static/image.png"}`. URLs should be accessible from the outside.
-> Note: If you're running Label Studio from a docker, localhost is not accessible there and result to connection errors
+## Create your own ML backend
 
-Feel free to play around with any other models & frameworks apart from image classifiers! [See instructions](https://github.com/heartexlabs/pyheartex#advanced-usage) on how to connect existing models.
-
-When something goes wrong, for example your predictions are failing, the first thing to do is to check the _runtime logs_
-
-```bash
-docker exec -it model_server sh -c "tail -n50 /tmp/wsgi.log"
-```
-
-To see what happens during model training, check _training logs_:
-
-```bash
-docker exec -it model_server sh -c "tail -n50 /tmp/rq.log"
-```
+Check examples in `label-studio/ml/examples` directory.

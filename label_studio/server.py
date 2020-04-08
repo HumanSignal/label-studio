@@ -245,8 +245,7 @@ def export_page():
 
 @app.route('/model')
 def model_page():
-    """ Machine learning
-       """
+    """ Machine learning"""
     project = project_get_or_create()
     project.analytics.send(getframeinfo(currentframe()).function)
     return flask.render_template(
@@ -492,7 +491,7 @@ def api_generate_next_task():
     # try to use ml backend for predictions
     if project.ml_backend:
         task = deepcopy(task)
-        task['predictions'] = project.ml_backend.make_predictions(task, project.project_obj)
+        task['predictions'] = project.ml_backend.make_predictions(task, project)
     return make_response(jsonify(task), 200)
 
 
@@ -563,9 +562,6 @@ def api_completions(task_id):
         completion = request.json
         completion.pop('state', None)  # remove editor state
         completion_id = project.save_completion(task_id, completion)
-        # try to train model with new completions
-        if project.ml_backend:
-            project.ml_backend.update_model(project.get_task(task_id), completion, project.project_obj)
         project.analytics.send(getframeinfo(currentframe()).function)
         return make_response(json.dumps({'id': completion_id}), 201)
 
@@ -645,6 +641,20 @@ def api_predict():
         predictions = project.ml_backend.make_predictions({'data': task}, project.project_obj)
         project.analytics.send(getframeinfo(currentframe()).function)
         return make_response(jsonify(predictions), 200)
+    else:
+        project.analytics.send(getframeinfo(currentframe()).function, error=400)
+        return make_response(jsonify("No ML backend"), 400)
+
+
+@app.route('/api/train', methods=['POST'])
+@exception_treatment
+def api_train():
+    """Send train signal to ML backend"""
+    project = project_get_or_create()
+    if project.ml_backend:
+        project.train()
+        project.analytics.send(getframeinfo(currentframe()).function)
+        return make_response(jsonify({'details': 'Train started'}), 200)
     else:
         project.analytics.send(getframeinfo(currentframe()).function, error=400)
         return make_response(jsonify("No ML backend"), 400)

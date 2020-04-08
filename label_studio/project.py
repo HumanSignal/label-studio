@@ -105,7 +105,8 @@ class Project(object):
         ml_backend_params = self.config.get('ml_backend')
         if ml_backend_params:
             self.ml_backend = MLBackend.from_params(ml_backend_params)
-            self.project_obj.connect(self.ml_backend)
+            if not self.ml_backend.connected:
+                raise ValueError('ML backend is not connected.')
 
     def load_converter(self):
         self.converter = Converter(self.label_config_full)
@@ -126,6 +127,14 @@ class Project(object):
     def ml_backend_connected(self):
         return self.ml_backend is not None
 
+    @property
+    def task_data_login(self):
+        return self.project_obj.task_data_login
+
+    @property
+    def task_data_password(self):
+        return self.project_obj.task_data_password
+
     def extract_data_types(self, config):
         return self.project_obj.extract_data_types(config)
 
@@ -136,8 +145,6 @@ class Project(object):
 
         self.validate_label_config_on_derived_input_schema(parsed_config)
         self.validate_label_config_on_derived_output_schema(parsed_config)
-        if self.ml_backend:
-            self.ml_backend.validate(config_string)
 
     def update_label_config(self, new_label_config):
         label_config_file = self.config['label_config']
@@ -307,15 +314,22 @@ class Project(object):
             return None
         return self.tasks.get(task_id)
 
+    def iter_completions(self):
+        root_dir = self.config['output_dir']
+        os.mkdir(root_dir) if not os.path.exists(root_dir) else ()
+        files = os.listdir(root_dir)
+        for f in files:
+            if f.endswith('.json'):
+                yield os.path.join(root_dir, f)
+
     def get_completions_ids(self):
         """ List completion ids from output_dir directory
 
         :return: filenames without extensions and directories
         """
-        root_dir = self.config['output_dir']
-        os.mkdir(root_dir) if not os.path.exists(root_dir) else ()
-        files = os.listdir(root_dir)
-        completions = [int(os.path.splitext(f)[0]) for f in files if f.endswith('.json')]
+        completions = []
+        for f in self.iter_completions():
+            completions.append(int(os.path.splitext(os.path.basename(f))[0]))
         logger.debug('{num} completions found in {output_dir}'.format(
             num=len(completions), output_dir=self.config["output_dir"]))
         return sorted(completions)
@@ -403,6 +417,12 @@ class Project(object):
 
         self.load_tasks()
         self.load_derived_schemas()
+
+    def train(self):
+        completions = []
+        for f in self.iter_completions():
+            completions.append(json_load(f))
+        self.ml_backend.train(completions, self)
 
     @classmethod
     def get_project_dir(cls, project_name, args):
