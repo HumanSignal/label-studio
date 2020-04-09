@@ -30,6 +30,9 @@ setuptools.setup(
     install_requires=requirements,
     python_requires='>=3.5',
     entry_points={
-        'console_scripts': ['label-studio=label_studio.server:main'],
+        'console_scripts': [
+            'label-studio=label_studio.server:main',
+            'label-studio-ml=label_studio.ml.server:main'
+        ],
     }
 )
