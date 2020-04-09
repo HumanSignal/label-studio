@@ -17,6 +17,9 @@ Rating adds rating selection
 | [size] | <code>string</code> | <code>&quot;medium&quot;</code> | One of: small, medium, large |
 | [icon] | <code>string</code> | <code>&quot;start&quot;</code> | One of: star, heart, fire, smile |
 | hotkey | <code>string</code> |  | HotKey for changing rating value |
+| [required] | <code>boolean</code> | <code>false</code> | validation if rating is required |
+| [requiredMessage] | <code>string</code> |  | message to show if validation fails |
+| [perRegion] | <code>boolean</code> |  | use this tag for region labeling instead of the whole object labeling |
 
 ### Example  
 ```html
