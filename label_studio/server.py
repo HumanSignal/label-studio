@@ -252,7 +252,9 @@ def model_page():
     return flask.render_template(
         'model.html',
         config=project.config,
-        project=project
+        project=project,
+        train_log=project.ml_backend.train_log(),
+        prediction_log=project.ml_backend.prediction_log()
     )
 
 

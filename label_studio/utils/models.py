@@ -513,3 +513,9 @@ class MLBackend(object):
                 logger.error('Can\'t clear ML backend for project ' + project.name + ': ' + response.error_message)
             else:
                 logger.info('ML backend for project ' + project.name + ' has been cleared.')
+
+    def train_log(self):
+        return 'here is train log\n' * 100
+
+    def prediction_log(self):
+        return 'here is prediction log\n' * 100
