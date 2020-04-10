@@ -2,17 +2,15 @@
 {% block body %}
 
   <div class="ui container">
-    <center class="wrapper">
-
-
+    <div class="wrapper">
       {% if not project.ml_backend %}
+        <!-- No ML Backend -->
         <div class="ui statistic">
           <span class="value">
             <small>Model not connected</small>
           </span>
           <span class="label">Machine Learning</span>
         </div>
-
         <br>
         <a href="https://labelstud.io/guide/ml.html" target="_blank">
           Learn how to connect your model to Label Studio
@@ -20,11 +18,9 @@
 
       {% else %}
 
-        <div class="ui positive button" onclick="start_train()">Start training</div>
-
-        <!-- Statistics -->
+        <!-- ML Backend info -->
         <div class="ui stackable grid">
-          <div class="row">
+          <div class="row centered aligned">
             <div class="eight wide column centered aligned">
               <div class="ui statistic">
               <span class="value">
@@ -40,7 +36,6 @@
                 <span class="label">{{ project.ml_backend.url }}</span>
               </div>
             </div>
-
           </div>
 
           <div class="row centered aligned">
@@ -67,13 +62,12 @@
                 <span class="label">Model Version</span>
               </div>
             </div>
-
           </div>
 
-          <br>
-          <div></div>
-
-          <div class="ui divider hidden"></div>
+          <!-- Start train -->
+          <div class="row centered aligned">
+              <div class="ui positive big button" onclick="start_train()">Start training</div>
+          </div>
 
           {% if project.data_types|length == 1 %}
             <!-- File uploader -->
@@ -96,10 +90,23 @@
 
             </div>
           {% endif %} {# Uploader #}
-
         </div>
+
+        <!-- Train & Prediction logs -->
+        <div class="ui styled accordion fluid">
+          <div class="title"><i class="dropdown icon"></i> Train log</div>
+          <div class="scrolling content" style="max-height: 400px; overflow-y: scroll;">
+            <pre>{{ train_log }}</pre>
+          </div>
+
+          <div class="title"><i class="dropdown icon"></i> Prediction log</div>
+          <div class="scrolling content" style="max-height: 400px; overflow-y: scroll;">
+            <pre>{{ prediction_log }}</pre>
+          </div>
+        </div>
+
       {% endif %}
-    </center>
+    </div>
   </div>
 
   <!-- Dimmer and loader -->
@@ -115,6 +122,8 @@
 
       // drag & drop files
       $(document).ready(function () {
+          $('.accordion').accordion();
+
           let holder = $('#holder');
           holder.on('drop', function (e) {
               e.preventDefault();
