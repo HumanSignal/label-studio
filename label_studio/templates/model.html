@@ -4,12 +4,12 @@
   <div class="ui container">
     <div class="wrapper">
 
-        <div class="ui action input fluid">
-          <input id="ml_backend_url" type="text" placeholder="http://localhost:9090">
-          <button class="ui positive button" onclick="addMlBackend()">Add Backend</button>
-        </div>
-        <div class="ui divider hidden"></div>
-        <div class="ui three column grid">
+      <div class="ui action input fluid">
+        <input id="ml_backend_url" type="text" placeholder="http://localhost:9090">
+        <button class="ui positive button" onclick="addMlBackend()">Add Backend</button>
+      </div>
+      <div class="ui divider hidden"></div>
+      <div class="ui three column grid">
 
         {% for ml_backend in project.ml_backends %}
           <div class="column">
@@ -31,46 +31,47 @@
         {% else %}
           <div class="row centered aligned"><p>No connected ML backends</p></div>
         {% endfor %}
-          <!-- Train & Prediction logs -->
-{#          <div class="ui styled accordion fluid">#}
-{#            <div class="title"><i class="dropdown icon"></i> Train log</div>#}
-{#            <div class="scrolling content" style="max-height: 400px; overflow-y: scroll;">#}
-{#              <pre>{{ ml_backend.train_log }}</pre>#}
-{#            </div>#}
-{##}
-{#            <div class="title"><i class="dropdown icon"></i> Prediction log</div>#}
-{#            <div class="scrolling content" style="max-height: 400px; overflow-y: scroll;">#}
-{#              <pre>{{ ml_backend.prediction_log }}</pre>#}
-{#            </div>#}
-{#          </div>#}
 
-          <!-- Start train -->
-          <div class="row centered aligned">
-              <div class="ui positive big button" onclick="start_train()">Start Training</div>
-          </div>
+        <!-- Train & Prediction logs -->
+        {#          <div class="ui styled accordion fluid">#}
+        {#            <div class="title"><i class="dropdown icon"></i> Train log</div>#}
+        {#            <div class="scrolling content" style="max-height: 400px; overflow-y: scroll;">#}
+        {#              <pre>{{ ml_backend.train_log }}</pre>#}
+        {#            </div>#}
+        {##}
+        {#            <div class="title"><i class="dropdown icon"></i> Prediction log</div>#}
+        {#            <div class="scrolling content" style="max-height: 400px; overflow-y: scroll;">#}
+        {#              <pre>{{ ml_backend.prediction_log }}</pre>#}
+        {#            </div>#}
+        {#          </div>#}
 
-          {% if project.data_types|length == 1 %}
-            <!-- File uploader -->
-            <div class="sixteen wide column">
-              <!-- Input file form -->
-              <div class="ui form">
-                <input id="file-input" type="file" name="file" multiple onchange="send_data(event)"
-                       style="display: none"/>
+        <!-- Start train -->
+        <div class="row centered aligned">
+          <div class="ui positive big button" onclick="start_train()">Start Training</div>
+        </div>
 
-                <div class="ui content">
-                  <div id="holder">
-                    <div class="text">
-                      <i class="ui icon huge upload"></i>
-                      <p>Import new data and check the model prediction, drop your file here</p>
-                    </div>
+        {% if project.data_types|length == 1 %}
+          <!-- File uploader -->
+          <div class="sixteen wide column">
+            <!-- Input file form -->
+            <div class="ui form">
+              <input id="file-input" type="file" name="file" multiple onchange="send_data(event)"
+                     style="display: none"/>
+
+              <div class="ui content">
+                <div id="holder">
+                  <div class="text">
+                    <i class="ui icon huge upload"></i>
+                    <p>Import new data and check the model prediction, drop your file here</p>
                   </div>
                 </div>
               </div>
-              <br/>
-
             </div>
-          {% endif %} {# Uploader #}
-        </div>
+            <br/>
+
+          </div>
+        {% endif %} {# Uploader #}
+      </div>
 
     </div>
   </div>
@@ -81,26 +82,26 @@
   </div>
 
   <script>
-    function addMlBackend() {
-      let ml_backend = document.getElementById("ml_backend_url").value;
-      let req = {
-        url: "api/project/",
-        data: JSON.stringify({ml_backend: ml_backend}),
-        type: "patch",
-        dataType: "json",
-        contentType: "application/json; charset=utf-8"
-      };
-      $.ajax(req)
-        .done(resp => {
-          location.reload();
-        })
-        .fail(resp => {
-        alert(ml_backend_url);
-      })
-    }
+      function addMlBackend() {
+          let ml_backend = document.getElementById("ml_backend_url").value;
+          let req = {
+              url: "api/project/",
+              data: JSON.stringify({ml_backend: ml_backend}),
+              type: "patch",
+              dataType: "json",
+              contentType: "application/json; charset=utf-8"
+          };
+          $.ajax(req)
+              .done(resp => {
+                  location.reload();
+              })
+              .fail(resp => {
+                  alert(message_from_response(resp));
+              })
+      }
 
 
-  $('#holder').on('click', function () {
+      $('#holder').on('click', function () {
           $('#file-input').trigger('click');
       });
 
@@ -202,17 +203,17 @@
       }
 
       function start_train() {
-        let request = {
-          url: "api/train",
-          method: 'POST',
-        };
-        $.ajax(request)
-          .done(response => {
-            alert(response.responseJSON.detail);
-          })
-          .fail(response => {
-            alert(response.responseJSON.detail);
-          })
+          let request = {
+              url: "api/train",
+              method: 'POST',
+          };
+          $.ajax(request)
+              .done(response => {
+                  alert(response.responseJSON.detail);
+              })
+              .fail(response => {
+                  alert(response.responseJSON.detail);
+              })
       }
   </script>
 
