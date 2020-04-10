@@ -3,66 +3,58 @@
 
   <div class="ui container">
     <div class="wrapper">
-      {% if not project.ml_backend %}
+      {% if not project.ml_backends_connected %}
         <!-- No ML Backend -->
         <div class="ui statistic">
           <span class="value">
-            <small>Model not connected</small>
+            <small>Models are not connected</small>
           </span>
           <span class="label">Machine Learning</span>
         </div>
         <br>
         <a href="https://labelstud.io/guide/ml.html" target="_blank">
-          Learn how to connect your model to Label Studio
+          Learn how to connect your models to Label Studio
         </a>
 
       {% else %}
 
-        <!-- ML Backend info -->
-        <div class="ui stackable grid">
-          <div class="row centered aligned">
-            <div class="eight wide column centered aligned">
-              <div class="ui statistic">
-              <span class="value">
-                <small>Enabled</small>
-              </span>
-                <span class="label">Machine Learning</span>
-              </div>
-            </div>
+        <div class="ui action input">
+          <input id="ml_backend_url" type="text" placeholder="http://localhost:9090">
+          <button class="ui button" onclick="addMlBackend()">Add new backend</button>
+        </div>
+        <div class="ui divider"></div>
+        <div class="ui three column grid">
 
-            <div class="eight wide column centered aligned">
-              <div class="ui statistic">
-                <span class="value"><small>Backend</small></span>
-                <span class="label">{{ project.ml_backend.url }}</span>
+        {% for ml_backend in project.ml_backends %}
+          <div class="column">
+            <div class="ui card">
+              <div class="content">
+                <a class="header">{{ ml_backend.url }}</a>
+                <div class="meta">
+                  <span class="info">Model version: {{ ml_backend.model_version }}</span>
+                </div>
+              </div>
+              <div class="extra content">
+                <a>
+                  <i class="toggle on wide icon" style="color: #00c22e"></i>
+                  Enabled
+                </a>
               </div>
             </div>
           </div>
-
-          <div class="row centered aligned">
-            <div class="eight wide column centered aligned">
-              <div class="ui statistic">
-                <span class="value">
-                  <small>
-                    {% if project.ml_backend.model_name|length >= 20 %}
-                      {{ project.ml_backend.model_name[:17] }} ...
-                    {% else %}
-                      {{ project.ml_backend.model_name }}
-                    {% endif %}
-                  </small>
-                </span>
-                <span class="label">Machine Learning Model</span>
-              </div>
-            </div>
-
-            <div class="eight wide column centered aligned">
-              <div class="ui statistic">
-                <span class="value">
-                  <small>{{ project.ml_backend.model_version|str2datetime }}</small>
-                </span>
-                <span class="label">Model Version</span>
-              </div>
-            </div>
-          </div>
+        {% endfor %}
+          <!-- Train & Prediction logs -->
+{#          <div class="ui styled accordion fluid">#}
+{#            <div class="title"><i class="dropdown icon"></i> Train log</div>#}
+{#            <div class="scrolling content" style="max-height: 400px; overflow-y: scroll;">#}
+{#              <pre>{{ ml_backend.train_log }}</pre>#}
+{#            </div>#}
+{##}
+{#            <div class="title"><i class="dropdown icon"></i> Prediction log</div>#}
+{#            <div class="scrolling content" style="max-height: 400px; overflow-y: scroll;">#}
+{#              <pre>{{ ml_backend.prediction_log }}</pre>#}
+{#            </div>#}
+{#          </div>#}
 
           <!-- Start train -->
           <div class="row centered aligned">
@@ -92,19 +84,6 @@
           {% endif %} {# Uploader #}
         </div>
 
-        <!-- Train & Prediction logs -->
-        <div class="ui styled accordion fluid">
-          <div class="title"><i class="dropdown icon"></i> Train log</div>
-          <div class="scrolling content" style="max-height: 400px; overflow-y: scroll;">
-            <pre>{{ train_log }}</pre>
-          </div>
-
-          <div class="title"><i class="dropdown icon"></i> Prediction log</div>
-          <div class="scrolling content" style="max-height: 400px; overflow-y: scroll;">
-            <pre>{{ prediction_log }}</pre>
-          </div>
-        </div>
-
       {% endif %}
     </div>
   </div>
@@ -115,8 +94,26 @@
   </div>
 
   <script>
+    function addMlBackend() {
+      let ml_backend = document.getElementById("ml_backend_url").value;
+      let req = {
+        url: "api/project/",
+        data: JSON.stringify({ml_backend: ml_backend}),
+        type: "patch",
+        dataType: "json",
+        contentType: "application/json; charset=utf-8"
+      };
+      $.ajax(req)
+        .done(resp => {
+          location.reload();
+        })
+        .fail(resp => {
+        alert(ml_backend_url);
+      })
+    }
 
-      $('#holder').on('click', function () {
+
+  $('#holder').on('click', function () {
           $('#file-input').trigger('click');
       });
 
@@ -215,26 +212,6 @@
 
                   stop_wait(msg, false);
               });
-      }
-
-      function message_from_response(result) {
-        console.log(result);
-
-        // result is dict
-        if (result.hasOwnProperty('detail') && result.detail)
-          return result.detail;
-
-        // result is object from XHR, check responseText first, it is always presented
-        if (!result.responseText)
-          return 'Critical error on server';
-
-        // grab responseJSON detail
-        else if (result.responseJSON.hasOwnProperty('detail'))
-          return result.responseJSON['detail'];
-
-        // something strange inside of responseJSON
-        else
-          return JSON.stringify(result.responseJSON);
       }
 
       function start_train() {

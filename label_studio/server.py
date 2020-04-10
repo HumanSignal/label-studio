@@ -250,9 +250,7 @@ def model_page():
     return flask.render_template(
         'model.html',
         config=project.config,
-        project=project,
-        train_log=project.ml_backend.train_log(),
-        prediction_log=project.ml_backend.prediction_log()
+        project=project
     )
 
 
@@ -497,14 +495,15 @@ def api_generate_next_task():
     return make_response(jsonify(task), 200)
 
 
-@app.route('/api/project/', methods=['POST', 'GET'])
+@app.route('/api/project/', methods=['POST', 'GET', 'PATCH'])
 @exception_treatment
 def api_project():
-    """ Project global operation
-    """
+    """ Project global operation"""
     project = project_get_or_create(multi_session_force_recreate=False)
     if request.method == 'POST' and request.args.get('new', False):
         project = project_get_or_create(multi_session_force_recreate=True)
+    elif request.method == 'PATCH':
+        project.update_params(request.json)
     return make_response(jsonify({'project_name': project.name}), 201)
 
 

@@ -117,7 +117,7 @@ class LabelStudioMLManager(object):
             job.delete()
 
     @classmethod
-    def _get_latest_training_job_result(cls, project):
+    def _get_latest_job_result_from_redis(cls, project):
         job_results_key = cls._get_job_results_key(project)
         try:
             num_finished_jobs = cls._redis.llen(job_results_key)
@@ -132,6 +132,20 @@ class LabelStudioMLManager(object):
             return json.loads(latest_job)
 
     @classmethod
+    def _get_latest_job_result_from_workdir(cls, project):
+        project_model_dir = os.path.join(cls.model_dir, project or '')
+        if not os.path.exists(project_model_dir):
+            return
+        subdirs = list(filter(lambda d: d.isdigit(), os.listdir(project_model_dir)))
+        if subdirs:
+            last_version = str(list(sorted(map(int, subdirs)))[-1])
+            job_result_file = os.path.join(project_model_dir, last_version, 'job_result.json')
+            if not os.path.exists(job_result_file):
+                return
+            with open(job_result_file) as f:
+                return json.load(f)
+
+    @classmethod
     def _key(cls, project):
         return project, os.getpid()
 
@@ -141,11 +155,7 @@ class LabelStudioMLManager(object):
 
     @classmethod
     def get(cls, project):
-        from_memory_model = cls._current_model.get(cls._key(project))
-        if not from_memory_model:
-            # try search latest timestamp subdir in model dir
-            project_model_dir = os.path.join(cls.model_dir, project or '')
-            
+        return cls._current_model.get(cls._key(project))
 
     @classmethod
     def create(cls, project=None, label_config=None, train_output=None, version=None, **kwargs):
@@ -168,12 +178,12 @@ class LabelStudioMLManager(object):
     @classmethod
     def fetch(cls, project=None, label_config=None, force_reload=False, **kwargs):
         if cls.without_redis:
-            return cls.get_or_create(project, label_config, force_reload, **kwargs)
+            job_result = cls._get_latest_job_result_from_workdir(project) or {}
         else:
-            job_result = cls._get_latest_training_job_result(project) or {}
-            train_output = job_result.get('train_output')
-            version = job_result.get('version')
-            return cls.get_or_create(project, label_config, force_reload, train_output, version, **kwargs)
+            job_result = cls._get_latest_job_result_from_redis(project) or {}
+        train_output = job_result.get('train_output')
+        version = job_result.get('version')
+        return cls.get_or_create(project, label_config, force_reload, train_output, version, **kwargs)
 
     @classmethod
     def job_status(cls, job_id):
@@ -250,6 +260,10 @@ class LabelStudioMLManager(object):
             'job_id': job_id,
             'time': time.time() - t
         })
+        if workdir:
+            job_result_file = os.path.join(workdir, 'job_result.json')
+            with open(job_result_file, mode='w') as fout:
+                fout.write(job_result)
         if not cls.without_redis:
             cls._redis.rpush(cls._get_job_results_key(project), job_result)
         return job_result

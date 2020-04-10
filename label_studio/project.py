@@ -105,6 +105,7 @@ class Project(object):
         self.project_obj = ProjectObj(label_config=self.label_config_line, label_config_full=self.label_config_full)
 
         # configure multiple machine learning backends
+        self.ml_backends = []
         ml_backends_params = self.config.get('ml_backends', [])
         for ml_backend_params in ml_backends_params:
             ml_backend = MLBackend.from_params(ml_backend_params)
@@ -149,6 +150,14 @@ class Project(object):
 
         self.validate_label_config_on_derived_input_schema(parsed_config)
         self.validate_label_config_on_derived_output_schema(parsed_config)
+
+    def update_params(self, params):
+        if 'ml_backend' in params:
+            url = params['ml_backend']
+            self.config['ml_backends'].append({'url': url, 'name': str(uuid4())})
+            self.load_project_ml_backend()
+            with io.open(self.config['config_path'], mode='w') as f:
+                json.dump(self.config, f, indent=2)
 
     def update_label_config(self, new_label_config):
         label_config_file = self.config['label_config']
@@ -427,7 +436,9 @@ class Project(object):
         task = deepcopy(task)
         task['predictions'] = []
         for ml_backend in self.ml_backends:
-            task['predictions'].append(ml_backend.make_predictions(task, self))
+            predictions = ml_backend.make_predictions(task, self)
+            predictions['created_by'] = ml_backend.model_name[:8]
+            task['predictions'].append(predictions)
         return task
 
     def train(self):
