@@ -3,33 +3,19 @@
 
   <div class="ui container">
     <div class="wrapper">
-      {% if not project.ml_backends_connected %}
-        <!-- No ML Backend -->
-        <div class="ui statistic">
-          <span class="value">
-            <small>Models are not connected</small>
-          </span>
-          <span class="label">Machine Learning</span>
-        </div>
-        <br>
-        <a href="https://labelstud.io/guide/ml.html" target="_blank">
-          Learn how to connect your models to Label Studio
-        </a>
 
-      {% else %}
-
-        <div class="ui action input">
+        <div class="ui action input fluid">
           <input id="ml_backend_url" type="text" placeholder="http://localhost:9090">
-          <button class="ui button" onclick="addMlBackend()">Add new backend</button>
+          <button class="ui positive button" onclick="addMlBackend()">Add Backend</button>
         </div>
-        <div class="ui divider"></div>
+        <div class="ui divider hidden"></div>
         <div class="ui three column grid">
 
         {% for ml_backend in project.ml_backends %}
           <div class="column">
             <div class="ui card">
               <div class="content">
-                <a class="header">{{ ml_backend.url }}</a>
+                <a class="header" style="font-weight: lighter; color: #333">{{ ml_backend.url }}</a>
                 <div class="meta">
                   <span class="info">Model version: {{ ml_backend.model_version }}</span>
                 </div>
@@ -42,6 +28,8 @@
               </div>
             </div>
           </div>
+        {% else %}
+          <div class="row centered aligned"><p>No connected ML backends</p></div>
         {% endfor %}
           <!-- Train & Prediction logs -->
 {#          <div class="ui styled accordion fluid">#}
@@ -58,7 +46,7 @@
 
           <!-- Start train -->
           <div class="row centered aligned">
-              <div class="ui positive big button" onclick="start_train()">Start training</div>
+              <div class="ui positive big button" onclick="start_train()">Start Training</div>
           </div>
 
           {% if project.data_types|length == 1 %}
@@ -84,7 +72,6 @@
           {% endif %} {# Uploader #}
         </div>
 
-      {% endif %}
     </div>
   </div>
 
