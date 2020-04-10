@@ -57,7 +57,7 @@ class LabelStudioMLManager(object):
     @classmethod
     def initialize(
         cls, model_class, model_dir=None, redis_host='localhost', redis_port=6379, redis_queue='default',
-        **train_kwargs
+        **init_kwargs
     ):
         if not issubclass(model_class, LabelStudioMLBase):
             raise ValueError('Inference class should be the subclass of ' + LabelStudioMLBase.__class__.__name__)
@@ -67,7 +67,7 @@ class LabelStudioMLManager(object):
         if cls.model_dir:
             cls.model_dir = os.path.expanduser(cls.model_dir)
             os.makedirs(cls.model_dir, exist_ok=True)
-        cls.train_kwargs = train_kwargs
+        cls.init_kwargs = init_kwargs
         cls.redis_host = redis_host
         cls.redis_port = redis_port
 
@@ -141,11 +141,16 @@ class LabelStudioMLManager(object):
 
     @classmethod
     def get(cls, project):
-        return cls._current_model.get(cls._key(project))
+        from_memory_model = cls._current_model.get(cls._key(project))
+        if not from_memory_model:
+            # try search latest timestamp subdir in model dir
+            project_model_dir = os.path.join(cls.model_dir, project or '')
+            
 
     @classmethod
     def create(cls, project=None, label_config=None, train_output=None, version=None, **kwargs):
         key = cls._key(project)
+        kwargs.update(cls.init_kwargs)
         cls._current_model[key] = ModelWrapper(
             model=cls.model_class(label_config=label_config, train_output=train_output, **kwargs),
             model_version=version or cls._generate_version()
@@ -187,19 +192,16 @@ class LabelStudioMLManager(object):
 
     @classmethod
     def predict(
-        cls, tasks, project=None, label_config=None, force_reload=False, try_fetch=True,
-        init_kwargs=None, predict_kwargs=None
+        cls, tasks, project=None, label_config=None, force_reload=False, try_fetch=True, **kwargs
     ):
-        init_kwargs = init_kwargs or {}
-        predict_kwargs = predict_kwargs or {}
         if try_fetch:
-            m = cls.fetch(project, label_config, force_reload, **init_kwargs)
+            m = cls.fetch(project, label_config, force_reload)
         else:
             m = cls.get(project)
             if not m:
                 raise FileNotFoundError('No model loaded. Specify "try_fetch=True" option.')
 
-        predictions = m.model.predict(tasks, **predict_kwargs)
+        predictions = m.model.predict(tasks, **kwargs)
         return predictions, m
 
     @classmethod
@@ -214,7 +216,7 @@ class LabelStudioMLManager(object):
             json.dump({'count': len(data)}, fout, indent=2)
 
     @classmethod
-    def train_script_wrapper(cls, project, label_config, init_kwargs, train_kwargs, tasks=()):
+    def train_script_wrapper(cls, project, label_config, train_kwargs, tasks=()):
         version = cls._generate_version()
 
         if cls.model_dir:
@@ -233,7 +235,7 @@ class LabelStudioMLManager(object):
             cls.create_data_snapshot(iter(data_stream), workdir)
 
         t = time.time()
-        m = cls.fetch(project, label_config, **init_kwargs)
+        m = cls.fetch(project, label_config)
         train_output = m.model.fit(data_stream, workdir, **train_kwargs)
         if cls.without_redis:
             job_id = None
@@ -253,10 +255,10 @@ class LabelStudioMLManager(object):
         return job_result
 
     @classmethod
-    def _start_training_job(cls, project, label_config, init_kwargs):
+    def _start_training_job(cls, project, label_config, train_kwargs):
         job = cls._redis_queue.enqueue(
             cls.train_script_wrapper,
-            args=(project, label_config, init_kwargs, cls.train_kwargs),
+            args=(project, label_config, train_kwargs),
             job_timeout='365d',
             ttl=-1,
             result_ttl=-1,
@@ -271,9 +273,9 @@ class LabelStudioMLManager(object):
         job = None
         if cls.without_redis:
             job_result = cls.train_script_wrapper(
-                project, label_config, init_kwargs=kwargs, train_kwargs=cls.train_kwargs, tasks=tasks)
+                project, label_config, train_kwargs=kwargs, tasks=tasks)
             train_output = json.loads(job_result)['train_output']
-            cls.get_or_create(project, label_config, force_reload=True, train_output=train_output, **kwargs)
+            cls.get_or_create(project, label_config, force_reload=True, train_output=train_output)
         else:
             tasks_key = cls._get_tasks_key(project)
             cls._redis.delete(tasks_key)

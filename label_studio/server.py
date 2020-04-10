@@ -139,9 +139,8 @@ def labeling_page():
 
     if task_id is not None:
         task_data = project.get_task_with_completions(task_id) or project.get_task(task_id)
-        if project.ml_backend:
-            task_data = deepcopy(task_data)
-            task_data['predictions'] = project.ml_backend.make_predictions(task_data, project.project_obj)
+        if project.ml_backends_connected:
+            task_data = project.make_predictions(task_data)
 
     project.analytics.send(getframeinfo(currentframe()).function)
     return flask.render_template(
@@ -488,10 +487,11 @@ def api_generate_next_task():
         return make_response('', 404)
 
     project.analytics.send(getframeinfo(currentframe()).function)
-    # try to use ml backend for predictions
-    if project.ml_backend:
-        task = deepcopy(task)
-        task['predictions'] = project.ml_backend.make_predictions(task, project)
+
+    # collect prediction from multiple ml backends
+    if project.ml_backends_connected:
+        task = project.make_predictions(task)
+
     return make_response(jsonify(task), 200)
 
 
@@ -633,14 +633,14 @@ def api_instruction():
 @app.route('/predict', methods=['POST'])
 @exception_treatment
 def api_predict():
-    """ Make ML prediction using ml_backend
+    """ Make ML prediction using ml_backends
     """
-    task = request.json
+    task = {'data': request.json}
     project = project_get_or_create()
-    if project.ml_backend:
-        predictions = project.ml_backend.make_predictions({'data': task}, project.project_obj)
+    if project.ml_backends_connected:
+        task_with_predictions = project.make_predictions(task)
         project.analytics.send(getframeinfo(currentframe()).function)
-        return make_response(jsonify(predictions), 200)
+        return make_response(jsonify(task_with_predictions), 200)
     else:
         project.analytics.send(getframeinfo(currentframe()).function, error=400)
         return make_response(jsonify("No ML backend"), 400)
@@ -651,7 +651,7 @@ def api_predict():
 def api_train():
     """Send train signal to ML backend"""
     project = project_get_or_create()
-    if project.ml_backend:
+    if project.ml_backends_connected:
         project.train()
         project.analytics.send(getframeinfo(currentframe()).function)
         return make_response(jsonify({'details': 'Train started'}), 200)

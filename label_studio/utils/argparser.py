@@ -59,11 +59,8 @@ def parse_input_args():
         '-o', '--output-dir', dest='output_dir', type=valid_filepath,
         help='Output directory for completions')
     root_parser.add_argument(
-        '--ml-backend-url', dest='ml_backend_url',
-        help='Machine learning backend URL')
-    root_parser.add_argument(
-        '--ml-backend-name', dest='ml_backend_name',
-        help='Machine learning backend name')
+        '--ml-backends', dest='ml_backends', nargs='+',
+        help='Machine learning backends URLs')
     root_parser.add_argument(
         '--sampling', dest='sampling', choices=['sequential', 'uniform'], default='uniform',
         help='Sampling type that defines tasks order'
