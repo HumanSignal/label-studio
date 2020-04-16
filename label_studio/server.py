@@ -247,10 +247,15 @@ def model_page():
     """ Machine learning"""
     project = project_get_or_create()
     project.analytics.send(getframeinfo(currentframe()).function)
+    ml_backends = []
+    for ml_backend in project.ml_backends:
+        ml_backend.training_in_progress = ml_backend.is_training(project)
+        ml_backends.append(ml_backend)
     return flask.render_template(
         'model.html',
         config=project.config,
-        project=project
+        project=project,
+        ml_backends=ml_backends
     )
 
 

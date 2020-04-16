@@ -154,7 +154,8 @@ class Project(object):
     def update_params(self, params):
         if 'ml_backend' in params:
             url = params['ml_backend']
-            self.config['ml_backends'].append({'url': url, 'name': str(uuid4())})
+            name = str(uuid4())[:8]
+            self.config['ml_backends'].append({'url': url, 'name': name})
             self.load_project_ml_backend()
             with io.open(self.config['config_path'], mode='w') as f:
                 json.dump(self.config, f, indent=2)
@@ -573,7 +574,11 @@ class Project(object):
             if 'ml_backends' not in config or not isinstance(config['ml_backends'], list):
                 config['ml_backends'] = []
             for url in args.ml_backends:
-                config['ml_backends'].append({'url': url, 'name': str(uuid4())})
+                if '=http' in url:
+                    name, url = url.split('=', 1)
+                else:
+                    name = str(uuid4())[:8]
+                config['ml_backends'].append({'url': url, 'name': name})
 
         config['sampling'] = args.sampling
 

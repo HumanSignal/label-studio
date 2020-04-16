@@ -9,6 +9,7 @@ tests
 tox.ini
 public
 label_studio.egg-info
+.git
 .github
 .vscode
 .editorconfig
@@ -19,6 +20,7 @@ label_studio.egg-info
 !requirements.txt
 *.yml
 *.json
+*.pem
 .python-version
 
 # shell scripts

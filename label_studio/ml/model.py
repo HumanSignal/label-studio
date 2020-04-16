@@ -23,6 +23,8 @@ logger = logging.getLogger(__name__)
 class ModelWrapper(object):
     model = attr.ib()
     model_version = attr.ib()
+    is_training = attr.attrib(default=False)
+    job_id = attr.ib(default=None)
 
 
 class LabelStudioMLBase(ABC):
@@ -155,11 +157,14 @@ class LabelStudioMLManager(object):
 
     @classmethod
     def get(cls, project):
-        return cls._current_model.get(cls._key(project))
+        key = cls._key(project)
+        logger.debug('Get project ' + str(key))
+        return cls._current_model.get(key)
 
     @classmethod
     def create(cls, project=None, label_config=None, train_output=None, version=None, **kwargs):
         key = cls._key(project)
+        logger.debug('Create project ' + str(key))
         kwargs.update(cls.init_kwargs)
         cls._current_model[key] = ModelWrapper(
             model=cls.model_class(label_config=label_config, train_output=train_output, **kwargs),
@@ -199,6 +204,17 @@ class LabelStudioMLManager(object):
         if job.is_finished and isinstance(job.result, str):
             response['result'] = json.loads(job.result)
         return response
+
+    @classmethod
+    def is_training(cls, project):
+        if not cls.has_active_model(project):
+            return False
+        m = cls.get(project)
+        if cls.without_redis:
+            return m.is_training
+        else:
+            job = Job.fetch(m.job_id, connection=cls._redis)
+            return job.is_queued or job.is_started
 
     @classmethod
     def predict(
@@ -246,6 +262,7 @@ class LabelStudioMLManager(object):
 
         t = time.time()
         m = cls.fetch(project, label_config)
+        m.is_training = True
         train_output = m.model.fit(data_stream, workdir, **train_kwargs)
         if cls.without_redis:
             job_id = None
@@ -266,6 +283,7 @@ class LabelStudioMLManager(object):
                 fout.write(job_result)
         if not cls.without_redis:
             cls._redis.rpush(cls._get_job_results_key(project), job_result)
+        m.is_training = False
         return job_result
 
     @classmethod

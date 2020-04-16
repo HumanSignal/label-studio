@@ -11,19 +11,31 @@
       <div class="ui divider hidden"></div>
       <div class="ui three column grid">
 
-        {% for ml_backend in project.ml_backends %}
+        {% for ml_backend in ml_backends %}
           <div class="column">
             <div class="ui card">
               <div class="content">
-                <a class="header" style="font-weight: lighter; color: #333">{{ ml_backend.url }}</a>
+                <a class="header" style="font-weight: lighter; color: #333">{{ ml_backend.model_name }}</a>
                 <div class="meta">
-                  <span class="info">Model version: {{ ml_backend.model_version }}</span>
+                  <span class="info">{{ ml_backend.url }}</span>
+                </div>
+                <div class="description">
+                  {% if ml_backend.model_version  %}
+                    Model version: {{ ml_backend.model_version | str2datetime }}
+                  {% else %}
+                    Model is not trained.
+                  {% endif %}
                 </div>
               </div>
               <div class="extra content">
                 <a>
-                  <i class="toggle on wide icon" style="color: #00c22e"></i>
-                  Enabled
+                  {% if ml_backend.training_in_progress %}
+                    <i class="hourglass half wide icon" style="color: #da671b"></i>
+                    Training in progress...
+                  {% else %}
+                    <i class="toggle on wide icon" style="color: #00c22e"></i>
+                    Enabled
+                  {% endif %}
                 </a>
               </div>
             </div>
@@ -213,7 +225,8 @@
               })
               .fail(response => {
                   alert(response.responseJSON.detail);
-              })
+              });
+          location.reload();
       }
   </script>
 

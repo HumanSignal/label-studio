@@ -61,6 +61,13 @@ def _train():
     return jsonify(response), 201
 
 
+@_server.route('/is_training', methods=['GET'])
+def _is_training():
+    project = request.args.get('project')
+    is_training = _manager.is_training(project)
+    return jsonify({'is_training': is_training})
+
+
 @_server.route('/health', methods=['GET'])
 def health():
     return jsonify({'status': 'UP'})

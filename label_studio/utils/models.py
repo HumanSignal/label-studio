@@ -384,11 +384,18 @@ class MLApi(BaseHTTPAPI):
         """
         return self._post('job_status', request={'job': train_job})
 
+    def is_training(self, project):
+        return self._get('is_training?project=' + self._create_project_uid(project))
+
     def check_connection(self):
         return self._get('health')
 
 
 class CantStartTrainJobError(Exception):
+    pass
+
+
+class CantValidateIsTraining(Exception):
     pass
 
 
@@ -494,6 +501,13 @@ class MLBackend(object):
                     logger.error('Can\'t make predictions: ML backend returns error: ' + response.error_message)
             else:
                 return response.response['results'][0]
+
+    def is_training(self, project):
+        if self._api_exists():
+            response = self.api.is_training(project)
+            if response.is_error:
+                raise CantValidateIsTraining('Can\'t validate whether model is training for project ' + project)
+            return response.response.get('is_training')
 
     def train(self, completions, project):
         if self._api_exists():
