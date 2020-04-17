@@ -10,7 +10,7 @@ const API_URL = {
   COMPLETIONS: "/completions",
   CANCEL: "/cancel",
   PROJECTS: "/projects",
-  NEXT: "/next",
+  NEXT: "/next/",
   EXPERT_INSRUCTIONS: "/expert_instruction",
 };
 
