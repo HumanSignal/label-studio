@@ -88,6 +88,7 @@ class Tasks(object):
         with io.open(path) as f:
             for line in f:
                 tasks[task_id] = {'id': task_id, 'data': {data_key: line.strip()}}
+                task_id += 1
         return tasks
 
     def from_dir_with_text_files(self, path, data_key):
