@@ -5,12 +5,12 @@
  */
 
 const API_URL = {
-  MAIN: "/api",
+  MAIN: "api",
   TASKS: "/tasks",
   COMPLETIONS: "/completions",
   CANCEL: "/cancel",
   PROJECTS: "/projects",
-  NEXT: "/next",
+  NEXT: "/next/",
   EXPERT_INSRUCTIONS: "/expert_instruction",
 };
 
@@ -228,7 +228,7 @@ const LSB = function(elid, config, task) {
     onDeleteCompletion: function(ls, completion) {
       ls.setFlags({ isLoading: true });
 
-      const req = Requests.remover("/api/tasks/" + ls.task.id + "/completions/" + completion.pk + "/");
+      const req = Requests.remover(`${API_URL.MAIN}${API_URL.TASKS}/${ls.task.id}${API_URL.COMPLETIONS}/${completion.pk}/`);
       req.then(function(httpres) {
         ls.setFlags({ isLoading: false });
       });
