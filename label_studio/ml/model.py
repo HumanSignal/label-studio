@@ -105,7 +105,7 @@ class LabelStudioMLManager(object):
 
     @classmethod
     def _get_job_results_key(cls, project):
-        return f'project:' + str(project) + 'job_results'
+        return 'project:' + str(project) + 'job_results'
 
     @classmethod
     def _remove_jobs(cls, project):
@@ -115,7 +115,7 @@ class LabelStudioMLManager(object):
             job = Job.fetch(job_id, connection=cls._redis)
             if job.meta.get('project') != project:
                 continue
-            logger.info(f'Deleting job_id {job_id}')
+            logger.info('Deleting job_id ' + job_id)
             job.delete()
 
     @classmethod

@@ -27,7 +27,6 @@ def _predict():
     force_reload = data.get('force_reload', False)
     try_fetch = data.get('try_fetch', True)
     params = data.get('params') or {}
-    logger.debug(f'Request: predict {len(tasks)} tasks for project {project}')
     predictions, model = _manager.predict(tasks, project, label_config, force_reload, try_fetch, **params)
     response = {
         'results': predictions,
@@ -55,7 +54,6 @@ def _train():
     params = data.get('params', {})
     if len(completions) == 0:
         return jsonify({'status': 'error', 'message': 'No tasks found.'}), 400
-    logger.debug(f'Request: train for project {project} with {len(completions)} tasks')
     job = _manager.train(completions, project, label_config, **params)
     response = {'job': job.id} if job else {}
     return jsonify(response), 201
@@ -80,11 +78,11 @@ def metrics():
 
 @_server.errorhandler(NoSuchJobError)
 def no_such_job_error_handler(error):
-    logger.warning(f'Got error: {str(error)}')
+    logger.warning('Got error: ' + str(error))
     return str(error), 410
 
 
 @_server.errorhandler(FileNotFoundError)
 def file_not_found_error_handler(error):
-    logger.warning(f'Got error: {str(error)}')
+    logger.warning('Got error: ' + str(error))
     return str(error), 404
