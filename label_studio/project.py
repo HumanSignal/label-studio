@@ -10,6 +10,7 @@ from datetime import datetime
 from operator import itemgetter
 from xml.etree import ElementTree
 from uuid import uuid4
+from copy import deepcopy
 
 from label_studio_converter import Converter
 
@@ -48,7 +49,8 @@ class Project(object):
         self.analytics = None
         self.load_analytics()
 
-        self.project_obj, self.ml_backend = None, None
+        self.project_obj = None
+        self.ml_backends = []
         self.load_project_ml_backend()
 
         self.converter = None
@@ -101,12 +103,15 @@ class Project(object):
     def load_project_ml_backend(self):
         # configure project
         self.project_obj = ProjectObj(label_config=self.label_config_line, label_config_full=self.label_config_full)
-        # configure machine learning backend
-        ml_backend_params = self.config.get('ml_backend')
-        if ml_backend_params:
-            self.ml_backend = MLBackend.from_params(ml_backend_params)
-            if not self.ml_backend.connected:
-                raise ValueError('ML backend is not connected.')
+
+        # configure multiple machine learning backends
+        self.ml_backends = []
+        ml_backends_params = self.config.get('ml_backends', [])
+        for ml_backend_params in ml_backends_params:
+            ml_backend = MLBackend.from_params(ml_backend_params)
+            if not ml_backend.connected:
+                raise ValueError('ML backend ' + str(ml_backend_params) + ' is not connected.')
+            self.ml_backends.append(ml_backend)
 
     def load_converter(self):
         self.converter = Converter(self.label_config_full)
@@ -124,8 +129,8 @@ class Project(object):
         return self.project_obj.label_config
 
     @property
-    def ml_backend_connected(self):
-        return self.ml_backend is not None
+    def ml_backends_connected(self):
+        return len(self.ml_backends) > 0
 
     @property
     def task_data_login(self):
@@ -145,6 +150,15 @@ class Project(object):
 
         self.validate_label_config_on_derived_input_schema(parsed_config)
         self.validate_label_config_on_derived_output_schema(parsed_config)
+
+    def update_params(self, params):
+        if 'ml_backend' in params:
+            url = params['ml_backend']
+            name = str(uuid4())[:8]
+            self.config['ml_backends'].append({'url': url, 'name': name})
+            self.load_project_ml_backend()
+            with io.open(self.config['config_path'], mode='w') as f:
+                json.dump(self.config, f, indent=2)
 
     def update_label_config(self, new_label_config):
         label_config_file = self.config['label_config']
@@ -273,8 +287,9 @@ class Project(object):
                 json.dump({}, f)
 
         # delete everything on ML backend
-        if self.ml_backend:
-            self.ml_backend.clear(self)
+        if self.ml_backends_connected:
+            for m in self.ml_backends:
+                m.clear(self)
 
         # reload everything related to tasks
         self.load_tasks()
@@ -418,11 +433,22 @@ class Project(object):
         self.load_tasks()
         self.load_derived_schemas()
 
+    def make_predictions(self, task):
+        task = deepcopy(task)
+        task['predictions'] = []
+        for ml_backend in self.ml_backends:
+            predictions = ml_backend.make_predictions(task, self)
+            predictions['created_by'] = ml_backend.model_name[:8]
+            task['predictions'].append(predictions)
+        return task
+
     def train(self):
         completions = []
         for f in self.iter_completions():
             completions.append(json_load(f))
-        self.ml_backend.train(completions, self)
+        if self.ml_backends_connected:
+            for ml_backend in self.ml_backends:
+                ml_backend.train(completions, self)
 
     @classmethod
     def get_project_dir(cls, project_name, args):
@@ -544,14 +570,15 @@ class Project(object):
             print(completions_dir + ' output dir has been created.')
         config['output_dir'] = 'completions'
 
-        if args.ml_backend_url:
-            if 'ml_backend' not in config or not isinstance(config['ml_backend'], dict):
-                config['ml_backend'] = {}
-            config['ml_backend']['url'] = args.ml_backend_url
-            if args.ml_backend_name:
-                config['ml_backend']['name'] = args.ml_backend_name
-            else:
-                config['ml_backend']['name'] = str(uuid4())
+        if args.ml_backends:
+            if 'ml_backends' not in config or not isinstance(config['ml_backends'], list):
+                config['ml_backends'] = []
+            for url in args.ml_backends:
+                if '=http' in url:
+                    name, url = url.split('=', 1)
+                else:
+                    name = str(uuid4())[:8]
+                config['ml_backends'].append({'url': url, 'name': name})
 
         config['sampling'] = args.sampling
 

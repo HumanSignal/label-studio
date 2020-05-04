@@ -250,9 +250,10 @@ class MLApiScheme(object):
 
 class MLApi(BaseHTTPAPI):
 
-    def __init__(self, url, **kwargs):
+    def __init__(self, url, name, **kwargs):
         super(MLApi, self).__init__(url=url, **kwargs)
         self._validate_request_timeout = 10
+        self._name = name
 
     def is_ok(self):
         url_is_ok = self._url is not None and isinstance(self._url, str)
@@ -311,9 +312,8 @@ class MLApi(BaseHTTPAPI):
         logger.debug('Response from ' + url + ':' + json.dumps(response, indent=2))
         return MLApiResult(url, request, response, headers, status_code=status_code)
 
-    @staticmethod
-    def _create_project_uid(project):
-        return str(project.id) + '.' + project.ml_backend.model_name
+    def _create_project_uid(self, project):
+        return str(project.id) + '.' + self._name
 
     def train(self, completions, project):
         """Upload new task results and update model when necessary"""
@@ -384,11 +384,18 @@ class MLApi(BaseHTTPAPI):
         """
         return self._post('job_status', request={'job': train_job})
 
+    def is_training(self, project):
+        return self._get('is_training?project=' + self._create_project_uid(project))
+
     def check_connection(self):
         return self._get('health')
 
 
 class CantStartTrainJobError(Exception):
+    pass
+
+
+class CantValidateIsTraining(Exception):
     pass
 
 
@@ -454,7 +461,7 @@ class MLBackend(object):
 
     @classmethod
     def from_params(cls, params):
-        ml_api = MLApi(params['url'])
+        ml_api = MLApi(params['url'], params['name'])
         m = MLBackend(api=ml_api, model_name=params['name'])
         m.restore_train_job()
         return m
@@ -493,7 +500,14 @@ class MLBackend(object):
                 else:
                     logger.error('Can\'t make predictions: ML backend returns error: ' + response.error_message)
             else:
-                return response.response['results']
+                return response.response['results'][0]
+
+    def is_training(self, project):
+        if self._api_exists():
+            response = self.api.is_training(project)
+            if response.is_error:
+                raise CantValidateIsTraining('Can\'t validate whether model is training for project ' + project)
+            return response.response.get('is_training')
 
     def train(self, completions, project):
         if self._api_exists():
@@ -539,3 +553,9 @@ class MLBackend(object):
                 logger.error('Can\'t clear ML backend for project ' + project.name + ': ' + response.error_message)
             else:
                 logger.info('ML backend for project ' + project.name + ' has been cleared.')
+
+    def train_log(self):
+        return 'here is train log\n' * 100
+
+    def prediction_log(self):
+        return 'here is prediction log\n' * 100

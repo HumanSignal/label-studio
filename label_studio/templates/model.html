@@ -2,104 +2,90 @@
 {% block body %}
 
   <div class="ui container">
-    <center class="wrapper">
+    <div class="wrapper">
 
+      <div class="ui action input fluid">
+        <input id="ml_backend_url" type="text" placeholder="http://localhost:9090">
+        <button class="ui positive button" onclick="addMlBackend()">Add Backend</button>
+      </div>
+      <div class="ui divider hidden"></div>
+      <div class="ui three column grid">
 
-      {% if not project.ml_backend %}
-        <div class="ui statistic">
-          <span class="value">
-            <small>Model not connected</small>
-          </span>
-          <span class="label">Machine Learning</span>
+        {% for ml_backend in ml_backends %}
+          <div class="column">
+            <div class="ui card">
+              <div class="content">
+                <a class="header" style="font-weight: lighter; color: #333">{{ ml_backend.model_name }}</a>
+                <div class="meta">
+                  <span class="info">{{ ml_backend.url }}</span>
+                </div>
+                <div class="description">
+                  {% if ml_backend.model_version  %}
+                    Model version: {{ ml_backend.model_version | str2datetime }}
+                  {% else %}
+                    Model is not trained.
+                  {% endif %}
+                </div>
+              </div>
+              <div class="extra content">
+                <a>
+                  {% if ml_backend.training_in_progress %}
+                    <i class="hourglass half wide icon" style="color: #da671b"></i>
+                    Training in progress...
+                  {% else %}
+                    <i class="toggle on wide icon" style="color: #00c22e"></i>
+                    Enabled
+                  {% endif %}
+                </a>
+              </div>
+            </div>
+          </div>
+        {% else %}
+          <div class="row centered aligned"><p>No connected ML backends</p></div>
+        {% endfor %}
+
+        <!-- Train & Prediction logs -->
+        {#          <div class="ui styled accordion fluid">#}
+        {#            <div class="title"><i class="dropdown icon"></i> Train log</div>#}
+        {#            <div class="scrolling content" style="max-height: 400px; overflow-y: scroll;">#}
+        {#              <pre>{{ ml_backend.train_log }}</pre>#}
+        {#            </div>#}
+        {##}
+        {#            <div class="title"><i class="dropdown icon"></i> Prediction log</div>#}
+        {#            <div class="scrolling content" style="max-height: 400px; overflow-y: scroll;">#}
+        {#              <pre>{{ ml_backend.prediction_log }}</pre>#}
+        {#            </div>#}
+        {#          </div>#}
+
+        <!-- Start train -->
+        <div class="row centered aligned">
+          <div class="ui positive big button" onclick="start_train()">Start Training</div>
         </div>
 
-        <br>
-        <a href="https://labelstud.io/guide/ml.html" target="_blank">
-          Learn how to connect your model to Label Studio
-        </a>
+        {% if project.data_types|length == 1 %}
+          <!-- File uploader -->
+          <div class="sixteen wide column">
+            <!-- Input file form -->
+            <div class="ui form">
+              <input id="file-input" type="file" name="file" multiple onchange="send_data(event)"
+                     style="display: none"/>
 
-      {% else %}
-
-        <div class="ui positive button" onclick="start_train()">Start training</div>
-
-        <!-- Statistics -->
-        <div class="ui stackable grid">
-          <div class="row">
-            <div class="eight wide column centered aligned">
-              <div class="ui statistic">
-              <span class="value">
-                <small>Enabled</small>
-              </span>
-                <span class="label">Machine Learning</span>
-              </div>
-            </div>
-
-            <div class="eight wide column centered aligned">
-              <div class="ui statistic">
-                <span class="value"><small>Backend</small></span>
-                <span class="label">{{ project.ml_backend.url }}</span>
-              </div>
-            </div>
-
-          </div>
-
-          <div class="row centered aligned">
-            <div class="eight wide column centered aligned">
-              <div class="ui statistic">
-                <span class="value">
-                  <small>
-                    {% if project.ml_backend.model_name|length >= 20 %}
-                      {{ project.ml_backend.model_name[:17] }} ...
-                    {% else %}
-                      {{ project.ml_backend.model_name }}
-                    {% endif %}
-                  </small>
-                </span>
-                <span class="label">Machine Learning Model</span>
-              </div>
-            </div>
-
-            <div class="eight wide column centered aligned">
-              <div class="ui statistic">
-                <span class="value">
-                  <small>{{ project.ml_backend.model_version|str2datetime }}</small>
-                </span>
-                <span class="label">Model Version</span>
-              </div>
-            </div>
-
-          </div>
-
-          <br>
-          <div></div>
-
-          <div class="ui divider hidden"></div>
-
-          {% if project.data_types|length == 1 %}
-            <!-- File uploader -->
-            <div class="sixteen wide column">
-              <!-- Input file form -->
-              <div class="ui form">
-                <input id="file-input" type="file" name="file" multiple onchange="send_data(event)"
-                       style="display: none"/>
-
-                <div class="ui content">
-                  <div id="holder">
-                    <div class="text">
-                      <i class="ui icon huge upload"></i>
-                      <p>Import new data and check the model prediction, drop your file here</p>
-                    </div>
+              <div class="ui content">
+                <div id="holder">
+                  <div class="text">
+                    <i class="ui icon huge upload"></i>
+                    <p>Import new data and check the model prediction, drop your file here</p>
                   </div>
                 </div>
               </div>
-              <br/>
-
             </div>
-          {% endif %} {# Uploader #}
+            <br/>
 
-        </div>
-      {% endif %}
-    </center>
+          </div>
+        {% endif %} {# Uploader #}
+      </div>
+
+    </div>
   </div>
 
   <!-- Dimmer and loader -->
@@ -108,6 +94,24 @@
   </div>
 
   <script>
+      function addMlBackend() {
+          let ml_backend = document.getElementById("ml_backend_url").value;
+          let req = {
+              url: "api/project/",
+              data: JSON.stringify({ml_backend: ml_backend}),
+              type: "patch",
+              dataType: "json",
+              contentType: "application/json; charset=utf-8"
+          };
+          $.ajax(req)
+              .done(resp => {
+                  location.reload();
+              })
+              .fail(resp => {
+                  alert(message_from_response(resp));
+              })
+      }
+
 
       $('#holder').on('click', function () {
           $('#file-input').trigger('click');
@@ -115,6 +119,8 @@
 
       // drag & drop files
       $(document).ready(function () {
+          $('.accordion').accordion();
+
           let holder = $('#holder');
           holder.on('drop', function (e) {
               e.preventDefault();
@@ -208,38 +214,19 @@
               });
       }
 
-      function message_from_response(result) {
-        console.log(result);
-
-        // result is dict
-        if (result.hasOwnProperty('detail') && result.detail)
-          return result.detail;
-
-        // result is object from XHR, check responseText first, it is always presented
-        if (!result.responseText)
-          return 'Critical error on server';
-
-        // grab responseJSON detail
-        else if (result.responseJSON.hasOwnProperty('detail'))
-          return result.responseJSON['detail'];
-
-        // something strange inside of responseJSON
-        else
-          return JSON.stringify(result.responseJSON);
-      }
-
       function start_train() {
-        let request = {
-          url: "api/train",
-          method: 'POST',
-        };
-        $.ajax(request)
-          .done(response => {
-            alert(response.responseJSON.detail);
-          })
-          .fail(response => {
-            alert(response.responseJSON.detail);
-          })
+          let request = {
+              url: "api/train",
+              method: 'POST',
+          };
+          $.ajax(request)
+              .done(response => {
+                  alert(response.responseJSON.detail);
+              })
+              .fail(response => {
+                  alert(response.responseJSON.detail);
+              });
+          location.reload();
       }
   </script>
 

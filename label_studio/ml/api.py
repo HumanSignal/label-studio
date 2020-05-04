@@ -12,9 +12,9 @@ _server = Flask(__name__)
 _manager = LabelStudioMLManager()
 
 
-def init_app(**kwargs):
+def init_app(model_class, **kwargs):
     global _manager
-    _manager.initialize(**kwargs)
+    _manager.initialize(model_class, **kwargs)
     return _server
 
 
@@ -28,7 +28,7 @@ def _predict():
     try_fetch = data.get('try_fetch', True)
     params = data.get('params') or {}
     logger.debug(f'Request: predict {len(tasks)} tasks for project {project}')
-    predictions, model = _manager.predict(tasks, project, label_config, force_reload, try_fetch, predict_kwargs=params)
+    predictions, model = _manager.predict(tasks, project, label_config, force_reload, try_fetch, **params)
     response = {
         'results': predictions,
         'model_version': model.model_version
@@ -59,6 +59,13 @@ def _train():
     job = _manager.train(completions, project, label_config, **params)
     response = {'job': job.id} if job else {}
     return jsonify(response), 201
+
+
+@_server.route('/is_training', methods=['GET'])
+def _is_training():
+    project = request.args.get('project')
+    is_training = _manager.is_training(project)
+    return jsonify({'is_training': is_training})
 
 
 @_server.route('/health', methods=['GET'])
