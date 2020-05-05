@@ -108,11 +108,24 @@ def get_app_version():
 
 def parse_config(config_string):
 
+    LABEL_TAGS = {'Label', 'Choice'}
+
     def _is_input_tag(tag):
         return tag.attrib.get('name') and tag.attrib.get('value')
 
     def _is_output_tag(tag):
         return tag.attrib.get('name') and tag.attrib.get('toName')
+
+    def _get_parent_output_tag_name(tag, outputs):
+        # Find parental <Choices> tag for nested tags like <Choices><View><View><Choice>...
+        parent = tag
+        while True:
+            parent = parent.getparent()
+            if parent is None:
+                return
+            name = parent.attrib.get('name')
+            if name in outputs:
+                return name
 
     xml_tree = etree.fromstring(config_string)
 
@@ -122,10 +135,17 @@ def parse_config(config_string):
             outputs[tag.attrib['name']] = {'type': tag.tag, 'to_name': tag.attrib['toName'].split(',')}
         elif _is_input_tag(tag):
             inputs[tag.attrib['name']] = {'type': tag.tag, 'value': tag.attrib['value'].lstrip('$')}
-        parent = tag.getparent()
-        if parent is not None and parent.attrib.get('name') in outputs:
-            actual_value = tag.attrib.get('alias') or tag.attrib['value']
-            labels[parent.attrib['name']].add(actual_value)
+        if tag.tag not in LABEL_TAGS:
+            continue
+        parent_name = _get_parent_output_tag_name(tag, outputs)
+        if parent_name is not None:
+            actual_value = tag.attrib.get('alias') or tag.attrib.get('value')
+            if not actual_value:
+                logger.debug(
+                    'Inspecting tag {tag_name}... found no "value" or "alias" attributes.'.format(
+                        tag_name=etree.tostring(tag, encoding='unicode').strip()[:50]))
+            else:
+                labels[parent_name].add(actual_value)
 
     for output_tag, tag_info in outputs.items():
         tag_info['inputs'] = []
@@ -136,6 +156,7 @@ def parse_config(config_string):
                                .format(input_tag_name=input_tag_name, output_tag=output_tag))
             tag_info['inputs'].append(inputs[input_tag_name])
         tag_info['labels'] = list(labels[output_tag])
+    logger.debug('Parsed config:\n' + json.dumps(outputs, indent=2))
     return outputs
 
 

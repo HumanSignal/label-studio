@@ -144,11 +144,16 @@ class Project(object):
         return self.project_obj.extract_data_types(config)
 
     def validate_label_config(self, config_string):
+        logger.debug('Validate label config')
         self.project_obj.validate_label_config(config_string)
 
+        logger.debug('Get parsed config')
         parsed_config = parse_config(config_string)
 
+        logger.debug('Validate label config on derived input schema')
         self.validate_label_config_on_derived_input_schema(parsed_config)
+
+        logger.debug('Validate label config on derived output schema')
         self.validate_label_config_on_derived_output_schema(parsed_config)
 
     def update_params(self, params):

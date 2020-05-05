@@ -136,18 +136,25 @@ class ProjectObj(object):
     def validate_label_config(cls, config_string):
         # xml and schema
         try:
+            logger.debug('Convert label config from XML to JSON')
             config = cls.parse_config_to_json(config_string)
             jsonschema.validate(config, _LABEL_CONFIG_SCHEMA_DATA)
         except (etree.XMLSyntaxError, etree.XMLSchemaParseError, ValueError) as exc:
+            logger.debug('Parsing error')
             raise ValidationError(str(exc))
         except jsonschema.exceptions.ValidationError as exc:
+            logger.debug('Validation error')
             error_message = exc.context[-1].message if len(exc.context) else exc.message
             error_message = 'Validation failed on {}: {}'.format('/'.join(exc.path), error_message.replace('@', ''))
             raise ValidationError(error_message)
+        except Exception as exc:
+            logger.debug('Unknown error: ' + str(exc))
+            raise ValidationError(str(exc))
 
         # unique names in config # FIXME: 'name =' (with spaces) won't work
         all_names = re.findall(r'name="([^"]*)"', config_string)
         if len(set(all_names)) != len(all_names):
+            logger.debug(all_names)
             raise ValidationError('Label config contains non-unique names')
 
         # toName points to existent name
