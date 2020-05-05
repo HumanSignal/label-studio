@@ -581,6 +581,8 @@ class Project(object):
                 config['ml_backends'].append({'url': url, 'name': name})
 
         config['sampling'] = args.sampling
+        config['port'] = args.port
+        config['host'] = args.host
 
         # create config.json
         config_json = 'config.json'
@@ -596,7 +598,11 @@ class Project(object):
         return dir
 
     @classmethod
-    def _get_config(cls, project_dir, args):
+    def get_config(cls, project_name, args):
+        return cls._get_config(cls.get_project_dir(project_name, args))
+
+    @classmethod
+    def _get_config(cls, project_dir, args=None):
         """
         Get config from input args Namespace acquired by Argparser
         :param args:
@@ -604,18 +610,20 @@ class Project(object):
         """
         # check if project directory exists
         if not os.path.exists(project_dir):
+            project_name = args.project_name if args is not None else '<project_name>'
             raise FileNotFoundError(
                 'Couldn\'t find directory ' + project_dir +
                 ', maybe you\'ve missed appending "--init" option:\nlabel-studio start ' +
-                args.project_name + ' --init'
+                project_name + ' --init'
             )
 
         # check config.json exists in directory
         config_path = os.path.join(project_dir, 'config.json')
         if not os.path.exists(config_path):
+            project_name = args.project_name if args is not None else '<project_name>'
             raise FileNotFoundError(
                 'Couldn\'t find config file ' + config_path + ' in project directory ' + project_dir +
-                ', maybe you\'ve missed appending "--init" option:\nlabel-studio start ' + args.project_name + ' --init'
+                ', maybe you\'ve missed appending "--init" option:\nlabel-studio start ' + project_name + ' --init'
             )
 
         config_path = os.path.abspath(config_path)

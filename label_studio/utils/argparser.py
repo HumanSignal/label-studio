@@ -66,12 +66,6 @@ def parse_input_args():
         help='Sampling type that defines tasks order'
     )
     root_parser.add_argument(
-        '--host', dest='host', default='0.0.0.0', type=str,
-        help='Server port')
-    root_parser.add_argument(
-        '-p', '--port', dest='port', default=8080, type=int,
-        help='Server port')
-    root_parser.add_argument(
         '--log-level', dest='log_level', choices=['DEBUG', 'INFO', 'WARNING', 'ERROR'], default=None,
         help='Logging level'
     )
@@ -87,6 +81,12 @@ def parse_input_args():
     parser_init.add_argument(
         'project_name',
         help='Path to directory where project state will be initialized')
+    parser_init.add_argument(
+        '--host', dest='host', default='0.0.0.0', type=str,
+        help='Server port')
+    parser_init.add_argument(
+        '-p', '--port', dest='port', default=8080, type=int,
+        help='Server port')
 
     # start sub-command parser
 
@@ -97,6 +97,12 @@ def parse_input_args():
     parser_start.add_argument(
         '--init', dest='init', action='store_true',
         help='Initialize if project is not initialized yet')
+    parser_start.add_argument(
+        '--host', dest='host', type=str,
+        help='Server port')
+    parser_start.add_argument(
+        '-p', '--port', dest='port', type=int,
+        help='Server port')
 
     # start-multi-session sub-command parser
 

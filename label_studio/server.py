@@ -700,9 +700,6 @@ def main():
     if input_args.log_level:
         logging.root.setLevel(input_args.log_level)
 
-    import label_studio.utils.functions
-    label_studio.utils.functions.HOSTNAME = 'http://localhost:' + str(input_args.port)
-
     # On `init` command, create directory args.project_name with initial project state and exit
     if input_args.command == 'init':
         Project.create_project_dir(input_args.project_name, input_args)
@@ -722,20 +719,24 @@ def main():
 
     # On `start` command, launch browser if --no-browser is not specified and start label studio server
     if input_args.command == 'start':
+        import label_studio.utils.functions
+
+        config = Project.get_config(input_args.project_name, input_args)
+        host = input_args.host or config['host']
+        port = input_args.port or config['port']
+
+        label_studio.utils.functions.HOSTNAME = 'http://localhost:' + str(port)
+
         if not input_args.no_browser:
             browser_url = label_studio.utils.functions.HOSTNAME + '/welcome'
             threading.Timer(2.5, lambda: webbrowser.open(browser_url)).start()
             print('Start browser at URL: ' + browser_url)
 
-        app.run(
-            host=input_args.host, port=input_args.port, debug=input_args.debug
-        )
+        app.run(host=host, port=port, debug=input_args.debug)
 
     # On `start-multi-session` command, server creates one project per each browser sessions
     elif input_args.command == 'start-multi-session':
-        app.run(
-            host=input_args.host, port=input_args.port, debug=input_args.debug
-        )
+        app.run(host=input_args.host, port=input_args.port, debug=input_args.debug)
 
 
 if __name__ == "__main__":
