@@ -91,3 +91,9 @@ def file_not_found_error_handler(error):
 def assertion_error(error):
     logger.error(str(error), exc_info=True)
     return str(error), 500
+
+
+@_server.errorhandler(IndexError)
+def index_error(error):
+    logger.error(str(error), exc_info=True)
+    return str(error), 500

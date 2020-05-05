@@ -523,11 +523,12 @@ class MLBackend(object):
             if response.is_error:
                 raise CantStartTrainJobError('Can\'t update model: ML backend returns error: ' + response.error_message)
             else:
+                self.num_completions = len(completions)
+                logger.info('Training job with ' + str(self.num_completions) + ' completions has been started.')
                 maybe_job = response.response.get('job')
                 if maybe_job:
                     self.train_job = maybe_job
                     self.save_train_job()
-                    self.num_completions = len(completions)
                     logger.debug('Project ' + str(project) + ' successfully updated train job ' + self.train_job)
 
     def validate(self, label_config):
