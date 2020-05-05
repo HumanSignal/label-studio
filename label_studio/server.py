@@ -722,8 +722,8 @@ def main():
         import label_studio.utils.functions
 
         config = Project.get_config(input_args.project_name, input_args)
-        host = input_args.host or config['host']
-        port = input_args.port or config['port']
+        host = input_args.host or config.get('host', 'localhost')
+        port = input_args.port or config.get('port', 8080)
 
         label_studio.utils.functions.HOSTNAME = 'http://localhost:' + str(port)
 

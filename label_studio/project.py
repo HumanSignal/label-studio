@@ -575,9 +575,9 @@ class Project(object):
             print(completions_dir + ' output dir has been created.')
         config['output_dir'] = 'completions'
 
+        if 'ml_backends' not in config or not isinstance(config['ml_backends'], list):
+            config['ml_backends'] = []
         if args.ml_backends:
-            if 'ml_backends' not in config or not isinstance(config['ml_backends'], list):
-                config['ml_backends'] = []
             for url in args.ml_backends:
                 if '=http' in url:
                     name, url = url.split('=', 1)
@@ -585,9 +585,12 @@ class Project(object):
                     name = str(uuid4())[:8]
                 config['ml_backends'].append({'url': url, 'name': name})
 
-        config['sampling'] = args.sampling
-        config['port'] = args.port
-        config['host'] = args.host
+        if args.sampling:
+            config['sampling'] = args.sampling
+        if args.port:
+            config['port'] = args.port
+        if args.host:
+            config['host'] = args.host
 
         # create config.json
         config_json = 'config.json'
