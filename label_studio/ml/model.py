@@ -211,10 +211,18 @@ class LabelStudioMLManager(object):
             return False
         m = cls.get(project)
         if cls.without_redis:
-            return m.is_training
+            is_training = m.is_training
+            backend = 'subprocess'
         else:
             job = Job.fetch(m.job_id, connection=cls._redis)
-            return job.is_queued or job.is_started
+            is_training = job.is_queued or job.is_started
+            backend = 'redis'
+        return {
+            'is_training': is_training,
+            'model_version': m.model_version,
+            'job_id': m.job_id,
+            'backend': backend
+        }
 
     @classmethod
     def predict(

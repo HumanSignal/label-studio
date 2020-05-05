@@ -33,7 +33,7 @@ def get_single_tag_keys(parsed_label_config, control_type, object_type):
     """
     assert len(parsed_label_config) == 1
     from_name, info = list(parsed_label_config.items())[0]
-    assert info['type'] == control_type
+    assert info['type'] == control_type, 'Label config has control tag "<' + info['type'] + '>" but "<' + control_type + '>" is expected for this model.'  # noqa
 
     assert len(info['to_name']) == 1
     assert len(info['inputs']) == 1

@@ -21,7 +21,7 @@
                 </div>
                 <div class="description">
                   {% if ml_backend.model_version  %}
-                    Model version: {{ ml_backend.model_version | str2datetime }}
+                    Model version: {{ ml_backend.model_version | str2datetime }} ({{ ml_backend.num_completions }} examples)
                   {% else %}
                     Model is not trained.
                   {% endif %}

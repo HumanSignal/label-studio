@@ -249,7 +249,10 @@ def model_page():
     project.analytics.send(getframeinfo(currentframe()).function)
     ml_backends = []
     for ml_backend in project.ml_backends:
-        ml_backend.training_in_progress = ml_backend.is_training(project)
+        ml_backend.sync(project)
+        training_status = ml_backend.is_training(project)
+        ml_backend.training_in_progress = training_status['is_training']
+        ml_backend.model_version = training_status['model_version']
         ml_backends.append(ml_backend)
     return flask.render_template(
         'model.html',
@@ -679,7 +682,8 @@ def str2datetime(timestamp_str):
         ts = int(timestamp_str)
     except:
         return timestamp_str
-    return datetime.utcfromtimestamp(ts).strftime('%Y%m%d.%H%M%S')
+    # return datetime.utcfromtimestamp(ts).strftime('%Y%m%d.%H%M%S')
+    return datetime.utcfromtimestamp(ts).strftime('%c')
 
 
 def main():

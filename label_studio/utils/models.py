@@ -282,7 +282,7 @@ class MLApi(BaseHTTPAPI):
         except ValueError as e:
             logger.debug('Error parsing JSON response from '+url+'. Response: ' + str(response.content), exc_info=True)
             return MLApiResult(
-                url, {}, {'error': str(e), 'response': response.content}, headers, 'error',
+                url, {}, {'error': str(e), 'response': response.content.decode('utf-8')}, headers, 'error',
                 status_code=status_code
             )
         logger.debug('Response from ' + url + ':' + json.dumps(response, indent=2))
@@ -299,7 +299,8 @@ class MLApi(BaseHTTPAPI):
         except requests.exceptions.RequestException as e:
             logger.debug('Error getting response from ' + url, exc_info=True)
             status_code = response.status_code if response is not None else 0
-            return MLApiResult(url, request, {'error': str(e)}, headers, 'error', status_code=status_code)
+            return MLApiResult(
+                url, request, {'error': response.content.decode('utf-8')}, headers, 'error', status_code=status_code)
         status_code = response.status_code
         try:
             response = response.json()
@@ -412,6 +413,8 @@ class MLBackend(object):
     model_version = attr.ib(default=None)
     # train job running on ML backend
     train_job = attr.ib(default=None)
+    # number of completions fed
+    num_completions = attr.ib(type=int, default=0)
 
     _TRAIN_JOBS_FILE = os.path.join(get_data_dir(), 'train_jobs.json')
 
@@ -483,31 +486,34 @@ class MLBackend(object):
             return False
         return True
 
+    def sync(self, project):
+        r = self.api.setup(project)
+        if r.is_error:
+            raise ValueError(r.error_message)
+        model_version = r.response['model_version']
+        if self.model_version != model_version:
+            self.model_version = model_version
+            logger.debug('Model version has changed: ' + str(model_version))
+        else:
+            logger.debug('Model version hasn\'t changed: ' + str(model_version))
+
     def make_predictions(self, task, project):
-        if self._api_exists():
-            r = self.api.setup(project)
-            if not r.is_error:
-                model_version = r.response['model_version']
-                if self.model_version != model_version:
-                    self.model_version = model_version
-                    logger.debug('Model version has changed: ' + str(model_version))
-                else:
-                    logger.debug('Model version hasn\'t changed: ' + str(model_version))
-            response = self.api.predict([task], self.model_version, project)
-            if response.is_error:
-                if response.status_code == 404:
-                    logger.info('Can\'t make predictions: model is not found (probably not trained yet)')
-                else:
-                    logger.error('Can\'t make predictions: ML backend returns error: ' + response.error_message)
+        self.sync(project)
+        response = self.api.predict([task], self.model_version, project)
+        if response.is_error:
+            if response.status_code == 404:
+                logger.info('Can\'t make predictions: model is not found (probably not trained yet)')
             else:
-                return response.response['results'][0]
+                logger.error('Can\'t make predictions: ML backend returns error: ' + response.error_message)
+        else:
+            return response.response['results'][0]
 
     def is_training(self, project):
         if self._api_exists():
             response = self.api.is_training(project)
             if response.is_error:
-                raise CantValidateIsTraining('Can\'t validate whether model is training for project ' + project)
-            return response.response.get('is_training')
+                raise CantValidateIsTraining('Can\'t validate whether model is training for project ' + project.name)
+            return response.response
 
     def train(self, completions, project):
         if self._api_exists():
@@ -521,6 +527,7 @@ class MLBackend(object):
                 if maybe_job:
                     self.train_job = maybe_job
                     self.save_train_job()
+                    self.num_completions = len(completions)
                     logger.debug('Project ' + str(project) + ' successfully updated train job ' + self.train_job)
 
     def validate(self, label_config):
