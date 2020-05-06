@@ -109,8 +109,8 @@ class Project(object):
         ml_backends_params = self.config.get('ml_backends', [])
         for ml_backend_params in ml_backends_params:
             ml_backend = MLBackend.from_params(ml_backend_params)
-            if not ml_backend.connected:
-                raise ValueError('ML backend ' + str(ml_backend_params) + ' is not connected.')
+            # if not ml_backend.connected:
+            #     raise ValueError('ML backend ' + str(ml_backend_params) + ' is not connected.')
             self.ml_backends.append(ml_backend)
 
     def load_converter(self):
@@ -442,6 +442,8 @@ class Project(object):
         task = deepcopy(task)
         task['predictions'] = []
         for ml_backend in self.ml_backends:
+            if not ml_backend.connected:
+                continue
             predictions = ml_backend.make_predictions(task, self)
             predictions['created_by'] = ml_backend.model_name[:8]
             task['predictions'].append(predictions)
@@ -453,7 +455,8 @@ class Project(object):
             completions.append(json_load(f))
         if self.ml_backends_connected:
             for ml_backend in self.ml_backends:
-                ml_backend.train(completions, self)
+                if ml_backend.connected:
+                    ml_backend.train(completions, self)
 
     @classmethod
     def get_project_dir(cls, project_name, args):

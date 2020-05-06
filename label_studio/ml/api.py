@@ -52,7 +52,7 @@ def _train():
     label_config = data.get('label_config')
     params = data.get('params', {})
     if len(completions) == 0:
-        return jsonify({'status': 'error', 'message': 'No tasks found.'}), 400
+        return jsonify('No completions found.'), 400
     job = _manager.train(completions, project, label_config, **params)
     response = {'job': job.id} if job else {}
     return jsonify(response), 201

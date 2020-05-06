@@ -20,7 +20,6 @@ with io.open(os.path.join(os.path.dirname(__file__), 'logger.json')) as f:
 from uuid import uuid4
 from urllib.parse import unquote
 from datetime import datetime
-from copy import deepcopy
 from inspect import currentframe, getframeinfo
 from flask import request, jsonify, make_response, Response, Response as HttpResponse, send_file, session, redirect
 from flask_api import status
@@ -249,10 +248,18 @@ def model_page():
     project.analytics.send(getframeinfo(currentframe()).function)
     ml_backends = []
     for ml_backend in project.ml_backends:
-        ml_backend.sync(project)
-        training_status = ml_backend.is_training(project)
-        ml_backend.training_in_progress = training_status['is_training']
-        ml_backend.model_version = training_status['model_version']
+        if ml_backend.connected:
+            try:
+                ml_backend.sync(project)
+                training_status = ml_backend.is_training(project)
+                ml_backend.training_in_progress = training_status['is_training']
+                ml_backend.model_version = training_status['model_version']
+                ml_backend.is_connected = True
+            except Exception as exc:
+                logger.error(str(exc), exc_info=True)
+                ml_backend.is_error = True
+        else:
+            ml_backend.is_connected = False
         ml_backends.append(ml_backend)
     return flask.render_template(
         'model.html',
@@ -512,6 +519,7 @@ def api_project():
         project = project_get_or_create(multi_session_force_recreate=True)
     elif request.method == 'PATCH':
         project.update_params(request.json)
+    project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
     return make_response(jsonify({'project_name': project.name}), 201)
 
 

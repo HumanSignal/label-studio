@@ -68,7 +68,7 @@ def exception_treatment(f):
             body = {'traceback': traceback}
             if hasattr(exception_f, 'request_id'):
                 body['request_id'] = exception_f.request_id
-            return answer(501, str(e), body)
+            return answer(500, str(e), body)
 
     exception_f.__name__ = f.__name__
     return exception_f

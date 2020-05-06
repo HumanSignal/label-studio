@@ -282,7 +282,8 @@ class MLApi(BaseHTTPAPI):
         except requests.exceptions.RequestException as e:
             logger.debug('Error getting response from ' + url, exc_info=True)
             status_code = response.status_code if response is not None else 0
-            return MLApiResult(url, {}, {'error': str(e)}, headers, 'error', status_code=status_code)
+            error_msg = response.content.decode('utf-8') if response is not None else str(e)
+            return MLApiResult(url, {}, {'error': error_msg}, headers, 'error', status_code=status_code)
         status_code = response.status_code
         try:
             response = response.json()
@@ -306,8 +307,8 @@ class MLApi(BaseHTTPAPI):
         except requests.exceptions.RequestException as e:
             logger.debug('Error getting response from ' + url, exc_info=True)
             status_code = response.status_code if response is not None else 0
-            return MLApiResult(
-                url, request, {'error': response.content.decode('utf-8')}, headers, 'error', status_code=status_code)
+            error_msg = response.content.decode('utf-8') if response is not None else str(e)
+            return MLApiResult(url, request, {'error': error_msg}, headers, 'error', status_code=status_code)
         status_code = response.status_code
         try:
             response = response.json()
@@ -321,7 +322,7 @@ class MLApi(BaseHTTPAPI):
         return MLApiResult(url, request, response, headers, status_code=status_code)
 
     def _create_project_uid(self, project):
-        return str(project.id) + '.' + self._name
+        return self._name
 
     def train(self, completions, project):
         """Upload new task results and update model when necessary"""
@@ -431,11 +432,13 @@ class MLBackend(object):
 
     @property
     def connected(self):
-        if self._api_exists():
+        try:
             r = self.api.check_connection()
             if r.is_error:
                 return False
-            return True
+        except:
+            return False
+        return True
 
     def restore_train_job(self):
         """
@@ -481,7 +484,7 @@ class MLBackend(object):
             response = self.api.get_train_job_status(self.train_job)
             if response.is_error:
                 logger.error('Can\'t fetch train job status for job ' + self.train_job + ': '
-                             'ML backend returns error: ' + response.error_message)
+                             'ML backend returns an error: ' + response.error_message)
             else:
                 return response.response['job_status'] in ('queued', 'started')
         return False
@@ -511,7 +514,7 @@ class MLBackend(object):
             if response.status_code == 404:
                 logger.info('Can\'t make predictions: model is not found (probably not trained yet)')
             else:
-                logger.error('Can\'t make predictions: ML backend returns error: ' + response.error_message)
+                logger.error('Can\'t make predictions: ML backend returns an error: ' + response.error_message)
         else:
             return response.response['results'][0]
 
@@ -523,20 +526,19 @@ class MLBackend(object):
             return response.response
 
     def train(self, completions, project):
-        if self._api_exists():
-            if self.train_job_is_running():
-                raise CantStartTrainJobError('Train job is running.')
-            response = self.api.train(completions, project)
-            if response.is_error:
-                raise CantStartTrainJobError('Can\'t update model: ML backend returns error: ' + response.error_message)
-            else:
-                self.num_completions = len(completions)
-                logger.info('Training job with ' + str(self.num_completions) + ' completions has been started.')
-                maybe_job = response.response.get('job')
-                if maybe_job:
-                    self.train_job = maybe_job
-                    self.save_train_job()
-                    logger.debug('Project ' + str(project) + ' successfully updated train job ' + self.train_job)
+        if self.train_job_is_running():
+            raise CantStartTrainJobError('Train job is running.')
+        response = self.api.train(completions, project)
+        if response.is_error:
+            raise CantStartTrainJobError('Can\'t update model: ML backend returns an error: ' + response.error_message)
+        else:
+            self.num_completions = len(completions)
+            logger.info('Training job with ' + str(self.num_completions) + ' completions has been started.')
+            maybe_job = response.response.get('job')
+            if maybe_job:
+                self.train_job = maybe_job
+                self.save_train_job()
+                logger.debug('Project ' + str(project) + ' successfully updated train job ' + self.train_job)
 
     def validate(self, label_config):
         if self._api_exists():
