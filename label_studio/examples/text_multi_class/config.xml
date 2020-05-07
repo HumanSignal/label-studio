@@ -1,8 +1,8 @@
 <!-- {"title": "Multi classification", "category": "text", "complexity": "basic"} -->
 <View>
-  <Text name="my_text" value="$reviewText" valueType="text" />
-  <Choices name="sentiment" toName="my_text" choice="multiple">
-    <View style="display: flex; justfy-content: space-between">
+  <Text name="text" value="text" valueType="text" />
+  <Choices name="sentiment" toName="text" choice="multiple">
+    <View style="display: flex; justify-content: space-between">
       <View style="width: 50%">
         <Header value="Select Topics" />
         <Choice value="Politics"/>

@@ -202,10 +202,17 @@ def get_config_templates():
         templates[meta['complexity']][meta['category']].append(meta)
 
     # sort by title
+    ordering = {
+        'basic': ['audio', 'image', 'text', 'html', 'other'],
+        'advanced': ['layouts', 'nested', 'per-region', 'other']
+    }
     ordered_templates = OrderedDict()
     for complexity in ['basic', 'advanced']:
         ordered_templates[complexity] = OrderedDict()
-        for category in sorted(templates[complexity].keys()):
+        # add the rest from categories not presented in manual ordering
+        x, y = ordering[complexity], templates[complexity].keys()
+        ordering[complexity] = x + list((set(x) | set(y)) - set(x))
+        for category in ordering[complexity]:
             sort = sorted(templates[complexity][category], key=lambda x: x['title'])
             ordered_templates[complexity][category] = sort
 

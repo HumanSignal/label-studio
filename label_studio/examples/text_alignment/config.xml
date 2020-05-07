@@ -1,6 +1,6 @@
 <!-- {"title": "Word alignment", "category": "text", "complexity": "basic"} -->
 <View>
-  <Labels name="ner" toName="text">
+  <Labels name="label" toName="text">
     <Label value="Person" />
     <Label value="Organization" />
   </Labels>
