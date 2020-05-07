@@ -213,7 +213,7 @@ def get_config_templates():
         x, y = ordering[complexity], templates[complexity].keys()
         ordering[complexity] = x + list((set(x) | set(y)) - set(x))
         for category in ordering[complexity]:
-            sort = sorted(templates[complexity][category], key=lambda x: x['title'])
+            sort = sorted(templates[complexity][category], key=lambda z: z.get('order', None) or z['title'])
             ordered_templates[complexity][category] = sort
 
     return ordered_templates

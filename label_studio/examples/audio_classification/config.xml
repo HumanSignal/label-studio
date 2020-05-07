@@ -1,4 +1,4 @@
-<!-- {"title": "Audio classification", "category": "audio", "complexity": "basic"} -->
+<!-- {"title": "Audio classification", "category": "audio", "complexity": "basic", "order": "!"} -->
 <View>
   <Header value="Listen to the audio"/>
   <Audio name="audio" value="$audio"/>
