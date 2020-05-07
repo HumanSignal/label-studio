@@ -138,6 +138,7 @@ class ProjectObj(object):
         try:
             logger.debug('Convert label config from XML to JSON')
             config = cls.parse_config_to_json(config_string)
+            logger.debug(json.dumps(dict(config), indent=2))
             jsonschema.validate(config, _LABEL_CONFIG_SCHEMA_DATA)
         except (etree.XMLSyntaxError, etree.XMLSchemaParseError, ValueError) as exc:
             logger.debug('Parsing error')
