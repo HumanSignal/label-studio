@@ -1,4 +1,4 @@
-<!-- {"title": "Image classification", "category": "image", "complexity": "basic", "complexity": "basic"} -->
+<!-- {"title": "Image classification", "category": "image", "complexity": "basic", "complexity": "basic", "order": "!"} -->
 <View>
   <Image name="img" value="$image"/>
   <Choices name="choice" toName="img" showInLine="true">
