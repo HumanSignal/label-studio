@@ -109,12 +109,13 @@ def get_app_version():
 def parse_config(config_string):
 
     LABEL_TAGS = {'Label', 'Choice'}
+    NOT_CONTROL_TAGS = {'Filter',}
 
     def _is_input_tag(tag):
         return tag.attrib.get('name') and tag.attrib.get('value')
 
     def _is_output_tag(tag):
-        return tag.attrib.get('name') and tag.attrib.get('toName')
+        return tag.attrib.get('name') and tag.attrib.get('toName') and tag.tag not in NOT_CONTROL_TAGS
 
     def _get_parent_output_tag_name(tag, outputs):
         # Find parental <Choices> tag for nested tags like <Choices><View><View><Choice>...
