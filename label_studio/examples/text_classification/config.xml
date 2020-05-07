@@ -1,0 +1,9 @@
+<!-- {"title": "Text classification", "category": "text", "complexity": "basic"} -->
+<View>
+  <Text name="my_text" value="$text"/>
+  <Choices name="sentiment" toName="my_text" choice="single">
+    <Choice value="Positive"/>
+    <Choice value="Negative"/>
+    <Choice value="Neutral"/>
+  </Choices>
+</View>

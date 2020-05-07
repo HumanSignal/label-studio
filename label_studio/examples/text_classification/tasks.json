@@ -1,0 +1,1618 @@
+[
+    {
+        "data": {
+            "reviewerID": "A2IBPI20UZIR0U",
+            "asin": "1384719342",
+            "reviewerName": "cassandra tu \"Yeah, well, that's just like, u...",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "Not much to write about here, but it does exactly what it's supposed to. filters out the pop sounds. now my recordings are much more crisp. it is one of the lowest prices pop filters on amazon so might as well buy it, they honestly work the same despite their pricing,",
+            "overall": 5,
+            "summary": "good",
+            "unixReviewTime": 1393545600,
+            "reviewTime": "02 28, 2014"
+        },
+        "predictions": [
+            {
+                "result": [
+                    {
+                        "from_name": "sentiment",
+                        "id": "sZ2AW3fNVw",
+                        "to_name": "my_text",
+                        "type": "choices",
+                        "value": {
+                            "choices": [
+                                "Positive"
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "data": {
+            "reviewerID": "A14VAT5EAX3D9S",
+            "asin": "1384719342",
+            "reviewerName": "Jake",
+            "helpful": [
+                13,
+                14
+            ],
+            "reviewText": "The product does exactly as it should and is quite affordable.I did not realized it was double screened until it arrived, so it was even better than I had expected.As an added bonus, one of the screens carries a small hint of the smell of an old grape candy I used to buy, so for reminiscent's sake, I cannot stop putting the pop filter next to my nose and smelling it after recording. :DIf you needed a pop filter, this will work just as well as the expensive ones, and it may even come with a pleasing aroma like mine did!Buy this product! :]",
+            "overall": 5,
+            "summary": "Jake",
+            "unixReviewTime": 1363392000,
+            "reviewTime": "03 16, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A195EZSQDW3E21",
+            "asin": "1384719342",
+            "reviewerName": "Rick Bennette \"Rick Bennette\"",
+            "helpful": [
+                1,
+                1
+            ],
+            "reviewText": "The primary job of this device is to block the breath that would otherwise produce a popping sound, while allowing your voice to pass through with no noticeable reduction of volume or high frequencies. The double cloth filter blocks the pops and lets the voice through with no coloration. The metal clamp mount attaches to the mike stand secure enough to keep it attached. The goose neck needs a little coaxing to stay where you put it.",
+            "overall": 5,
+            "summary": "It Does The Job Well",
+            "unixReviewTime": 1377648000,
+            "reviewTime": "08 28, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A2C00NNG1ZQQG2",
+            "asin": "1384719342",
+            "reviewerName": "RustyBill \"Sunday Rocker\"",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "Nice windscreen protects my MXL mic and prevents pops. Only thing is that the gooseneck is only marginally able to hold the screen in position and requires careful positioning of the clamp to avoid sagging.",
+            "overall": 5,
+            "summary": "GOOD WINDSCREEN FOR THE MONEY",
+            "unixReviewTime": 1392336000,
+            "reviewTime": "02 14, 2014"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A94QU4C90B1AX",
+            "asin": "1384719342",
+            "reviewerName": "SEAN MASLANKA",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "This pop filter is great. It looks and performs like a studio filter. If you're recording vocals this will eliminate the pops that gets recorded when you sing.",
+            "overall": 5,
+            "summary": "No more pops when I record my vocals.",
+            "unixReviewTime": 1392940800,
+            "reviewTime": "02 21, 2014"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A2A039TZMZHH9Y",
+            "asin": "B00004Y2UT",
+            "reviewerName": "Bill Lewey \"blewey\"",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "So good that I bought another one.  Love the heavy cord and gold connectors.  Bass sounds great.  I just learned last night how to coil them up.  I guess I should read instructions more carefully.  But no harm done, still works great!",
+            "overall": 5,
+            "summary": "The Best Cable",
+            "unixReviewTime": 1356048000,
+            "reviewTime": "12 21, 2012"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A1UPZM995ZAH90",
+            "asin": "B00004Y2UT",
+            "reviewerName": "Brian",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "I have used monster cables for years, and with good reason. The lifetime warranty is worth the price alone. Simple fact: cables break, but getting to replace them at no cost is where it's at.",
+            "overall": 5,
+            "summary": "Monster Standard 100 - 21' Instrument Cable",
+            "unixReviewTime": 1390089600,
+            "reviewTime": "01 19, 2014"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "AJNFQI3YR6XJ5",
+            "asin": "B00004Y2UT",
+            "reviewerName": "Fender Guy \"Rick\"",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "I now use this cable to run from the output of my pedal chain to the input of my Fender Amp. After I bought Monster Cable to hook up my pedal board I thought I would try another one and update my guitar. I had been using a high end Planet Waves cable that I bought in the 1980's... Once I found out the input jacks on the new Monster cable didn't fit into the Fender Strat jack I was a little disappointed... I didn't return it and as stated I use it for the output on the pedal board. Save your money... I went back to my Planet Waves Cable...I payed $30.00 back in the eighties for the Planet Waves which now comes in at around $50.00. What I'm getting at is you get what you pay for. I thought Waves was a lot of money back in the day...but I haven't bought a guitar cable since this one...20 plus years and still working...Planet Waves wins.",
+            "overall": 3,
+            "summary": "Didn't fit my 1996 Fender Strat...",
+            "unixReviewTime": 1353024000,
+            "reviewTime": "11 16, 2012"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A3M1PLEYNDEYO8",
+            "asin": "B00004Y2UT",
+            "reviewerName": "G. Thomas \"Tom\"",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "Perfect for my Epiphone Sheraton II.  Monster cables are well constructed.  I have several and never had any problems with any of them over the years.  Got this one because I wanted the 90 degree plug.",
+            "overall": 5,
+            "summary": "Great cable",
+            "unixReviewTime": 1215302400,
+            "reviewTime": "07 6, 2008"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "AMNTZU1YQN1TH",
+            "asin": "B00004Y2UT",
+            "reviewerName": "Kurt Robair",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "Monster makes the best cables and a lifetime warranty doesnt hurt either. This isnt their top of the line series but it works great with my bass guitar rig and has for some time. You cant go wrong with Monster Cables.",
+            "overall": 5,
+            "summary": "Best Instrument Cables On The Market",
+            "unixReviewTime": 1389139200,
+            "reviewTime": "01 8, 2014"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A2NYK9KWFMJV4Y",
+            "asin": "B00004Y2UT",
+            "reviewerName": "Mike Tarrani \"Jazz Drummer\"",
+            "helpful": [
+                6,
+                6
+            ],
+            "reviewText": "Monster makes a wide array of cables, including some that are very high end. I initially purchased a pair ofMonster Rock Instrument Cable - 21 Feet - Angled to Straight 1/4-Inch plugto use with my keyboards, but when it came time to purchase cables for my bass and guitar I thought I'd pinch a few pennies.  I am so glad I did.I compared this cable model to the more expensive models I previously purchased and, aside from looks, could not detect any difference in sound. I Swapped back and forth between my guitars and keyboards, ensuring that each model was used on each instrument - still no difference.What the more expensive model has going for it is looks. I am not sure it (the higher priced model) is even more sturdy because the molded stress relief ends on this model seem to make it more reliable than its pricier sibling.Bottom line: carefully compare both cables using your own instrument and amp - if possible - before making a purchase decision. You may find, as I did, that higher price does not necessarily equal higher value, even from the same manufacturer.",
+            "overall": 5,
+            "summary": "One of the best instrument cables within the brand",
+            "unixReviewTime": 1334793600,
+            "reviewTime": "04 19, 2012"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A35QFQI0M46LWO",
+            "asin": "B00005ML71",
+            "reviewerName": "Christopher C",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "I got it to have it if I needed it. I have found that i don't really need it that often and rarely use it. If I was really good I can see the need. But this is a keyboard not an organ.",
+            "overall": 4,
+            "summary": "It works great but I hardly use it.",
+            "unixReviewTime": 1398124800,
+            "reviewTime": "04 22, 2014"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A2NIT6BKW11XJQ",
+            "asin": "B00005ML71",
+            "reviewerName": "Jai",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "If you are not use to using a large sustaining pedal while playing the piano, it may appear little awkward.",
+            "overall": 3,
+            "summary": "HAS TO GET USE TO THE SIZE",
+            "unixReviewTime": 1384646400,
+            "reviewTime": "11 17, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A1C0O09LOLVI39",
+            "asin": "B00005ML71",
+            "reviewerName": "Michael",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "I love it, I used this for my Yamaha ypt-230 and it works great, I would recommend it to anyone",
+            "overall": 5,
+            "summary": "awesome",
+            "unixReviewTime": 1371340800,
+            "reviewTime": "06 16, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A17SLR18TUMULM",
+            "asin": "B00005ML71",
+            "reviewerName": "Straydogger",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "I bought this to use in my home studio to control my midi keyboard. It does just what I wanted it to do.",
+            "overall": 5,
+            "summary": "It works!",
+            "unixReviewTime": 1356912000,
+            "reviewTime": "12 31, 2012"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A2PD27UKAD3Q00",
+            "asin": "B00005ML71",
+            "reviewerName": "Wilhelmina Zeitgeist \"coolartsybabe\"",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "I bought this to use with my keyboard. I wasn't really aware that there were other options for keyboard pedals. It doesn't work as smoothly as the pedals do on an acoustic piano, which is what I'd always used. Doesn't have the same feel either. Nowhere close.In my opinion, a sustain pedal like the M-Audio SP-2 Sustain Pedal with Piano Style Action or other similar pedal is a much better choice. The price difference is only a few dollars and the feel and action are so much better. The only thing I've found the Yamaha FC-5 Sustain Pedal is good for is taking up space in a drawer where I keep my electric guitar pedals.",
+            "overall": 2,
+            "summary": "Definitely Not For The Seasoned Piano Player",
+            "unixReviewTime": 1376697600,
+            "reviewTime": "08 17, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "AKSFZ4G1AXYFC",
+            "asin": "B000068NSX",
+            "reviewerName": "C.E. \"Frank\"",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "This Fender cable is the perfect length for me! Sometimes I find it a bit too long but I don't mind. The build quality is great and I know that it will last. The only gripe I have with this cable is that the metal sleeve gets unscrewed way too easily, requiring me to tighten it often.Sound quality is not affected, and the color is cool, definitely try this cable out.",
+            "overall": 4,
+            "summary": "Durable Instrument Cable",
+            "unixReviewTime": 1376352000,
+            "reviewTime": "08 13, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A67OJZLHBBUQ9",
+            "asin": "B000068NSX",
+            "reviewerName": "Charles F. Marks \"charlie marks\"",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "wanted it just on looks alone...It is a nice looking cord... I know it will perform...as for Sam Ash ...this cord was packed in a mailer inside another box with my Roc n Soc... his shipping team do great work..never any complaints from me... I love Sam Ash.. thanks Amazon",
+            "overall": 5,
+            "summary": "fender 18 ft. Cali clear...",
+            "unixReviewTime": 1373328000,
+            "reviewTime": "07 9, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A2EZWZ8MBEDOLN",
+            "asin": "B000068NSX",
+            "reviewerName": "Charlo",
+            "helpful": [
+                3,
+                3
+            ],
+            "reviewText": "I've been using these cables for more than 4 months and they are holding up pretty well.  For years I used seemingly indestructable guitar cables that were made for me by an electrician friend.  When they finally gave out, I got in the habit of using the no-name cables that are always on display near the register at Guitar Center- really more of an impulse buy than something I put any thought into.  After the third or fourth Guitar Center cable failed from light use I decided to try these cables.  Not only are they cheaper but they seem to be holding up better.  I am not terribly hard on my gear but my cables tend to get twisted as I move around and the cheaper ones  eventually fail mid-cable.  I don't mind spending a few extra dollars if the cable is a little more durable.  This cable is actually cheaper- $12 or so shipped- and it's holding up pretty well.  These are actually very reasonably priced for 18' cables.  There is some kind of limited life warantee on this product but I haven't needed it.  Five stars for a nicely made 18 foot guitar cable that costs $12 shipped!Incidentally- these cables are shielded and are meant to connect your instrument to your amp's input.  Do not use these to connect an amplifier to a speaker cab.  You want to use unshielded cables for that purpose.Edit-  More than 6 months has passed and this cable is functioning without any issues.  The price on these things has gone up significantly and although the cable is highly recommended, there are probably better values from Hosa, Monster or Planet Waves-",
+            "overall": 5,
+            "summary": "So far so good.  Will revisit at the 6 month mark ;)",
+            "unixReviewTime": 1363564800,
+            "reviewTime": "03 18, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A1CL807EOUPVP1",
+            "asin": "B000068NSX",
+            "reviewerName": "GunHawk",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "Fender cords look great and work just as well. By adding the word California to the description I'm sure to sound like the Beach Boys...",
+            "overall": 5,
+            "summary": "Add California to the name and I jump!",
+            "unixReviewTime": 1375833600,
+            "reviewTime": "08 7, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A1GMWTGXW682GB",
+            "asin": "B000068NSX",
+            "reviewerName": "MetalFan",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "This is a cool looking cheap cable which works well. I bent one of the connectors pretty badly but that was my fault. One thing to consider with the cable is to tighten the connectors once in awhile. You'll be able to hear them rattle. It seems that the 'retro' look is screw on connectors over some black rubber, but other than that, the cable looks cool and works well.I also have the shorter red cable which goes with one of my guitars perfectly. I bought theses to use while practicing with others who use black cables. It's easier to plug into different amps without cutting someone out by accident. The green cable is good for that.",
+            "overall": 4,
+            "summary": "Cheap and cool looking, good length",
+            "unixReviewTime": 1331856000,
+            "reviewTime": "03 16, 2012"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A2G12DY50U700V",
+            "asin": "B000068NSX",
+            "reviewerName": "Ricky Shows",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "The Fender 18 Feet California Clear Instrument Cable - Lake Placid Blue  is a very good extra cord for a good price.",
+            "overall": 5,
+            "summary": "Fender 18 Feet California Clear Instrument Cable - Lake Placid Blue",
+            "unixReviewTime": 1390953600,
+            "reviewTime": "01 29, 2014"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A3E0CF25A7LD2",
+            "asin": "B000068NSX",
+            "reviewerName": "WBowie",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "Very good cable. Well made and it looks great with my Candy Apple Red Tele. The reason I gave it only 4 stars is because it tends not to lay flat on the floor.",
+            "overall": 4,
+            "summary": "Guitar Cable",
+            "unixReviewTime": 1354924800,
+            "reviewTime": "12 8, 2012"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A2W3CLAYZLDPTV",
+            "asin": "B000068NTU",
+            "reviewerName": "Amazon Customer \"=Chris=\"",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "Got this cable to run a rockband keyboard controller to my M-audio profire 2626 to control midi in Pro Tools. Works great! Firm fit, solidly molded ends, reputable branded cable.(a bit on the thin side, but i haven't seen to have any issue due to this or anything. Couldn't go wrong for $5 at the time of my purchase and prime eligibility.",
+            "overall": 5,
+            "summary": "Quality cable!",
+            "unixReviewTime": 1341446400,
+            "reviewTime": "07 5, 2012"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A398X9POBHK69N",
+            "asin": "B000068NTU",
+            "reviewerName": "Ann Vande Zande",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "When I was searching for MIDI cables for my ART X-15 foot controller, I came across these Hosa ones, and they were $2 dollars each! As they are now $6, I realize I would still be happy with that price as well, as they are high quality plastic and metal connectors, and work flawlessly. You must realize that they are only 5 feet, as I overestimated it and now wish they were longer. For any connection from racked sound modules, this will be perfect.",
+            "overall": 5,
+            "summary": "I Got Great Pricing, But Still a Really Good Product",
+            "unixReviewTime": 1383177600,
+            "reviewTime": "10 31, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "AXWB93VKVML6K",
+            "asin": "B000068NTU",
+            "reviewerName": "Michael Hassey",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "Cant go wrong. Great quality on a budget price  - Hosa is the go to when you need to hook things up",
+            "overall": 4,
+            "summary": "Its a Hosa",
+            "unixReviewTime": 1372809600,
+            "reviewTime": "07 3, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A2FZ4Z0UFA1OR8",
+            "asin": "B000068NTU",
+            "reviewerName": "Pat",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "The ends of the midi cable look and feel like quality. Connection is secure, no worries about uneven connections, it also detaches without a hitch. Highly recommended.",
+            "overall": 5,
+            "summary": "Quality and Secure",
+            "unixReviewTime": 1327449600,
+            "reviewTime": "01 25, 2012"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "AXP9CF1UTFRSU",
+            "asin": "B000068NTU",
+            "reviewerName": "tada",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "Just trying to find a midi to midi was a task, and you have to make sure the pin config is correct.  This one is a good product and works just fine",
+            "overall": 5,
+            "summary": "Midi to Midi",
+            "unixReviewTime": 1381795200,
+            "reviewTime": "10 15, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A2CCGGDGZ694CT",
+            "asin": "B000068NVI",
+            "reviewerName": "b carney",
+            "helpful": [
+                1,
+                1
+            ],
+            "reviewText": "The Hosa XLR cables are affordable and very heavily made.I have a large mixer and rack and cables everywhere.I decided to purchase shorter cables and the Hosa cables 5ft measurement worked perfectly.You really will not be disappointed with these.",
+            "overall": 4,
+            "summary": "Very Heavy Cables At Affordable Price",
+            "unixReviewTime": 1341964800,
+            "reviewTime": "07 11, 2012"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A27DR1VO079F1V",
+            "asin": "B000068NVI",
+            "reviewerName": "Dan Edman",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "I bought these to go from my board to the amp. We use them for a mobile church so they take a beating. They are still going strong.",
+            "overall": 5,
+            "summary": "Still going",
+            "unixReviewTime": 1392768000,
+            "reviewTime": "02 19, 2014"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A1LQC225SE8UNI",
+            "asin": "B000068NVI",
+            "reviewerName": "David Burch",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "Sturdy cord and plugs, inexpensive, good value. I don't require professional-level equipment, so this cord serves my purposes well. Satisfied with purchase.",
+            "overall": 5,
+            "summary": "Does what it's supposed to do",
+            "unixReviewTime": 1337990400,
+            "reviewTime": "05 26, 2012"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "AU9BPT3Y3K6J4",
+            "asin": "B000068NVI",
+            "reviewerName": "G. L. Beebe",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "Use it every week at gigs.  Solid, no problems with the solder joints.  A good quality cable at a very good price.",
+            "overall": 5,
+            "summary": "Good cable",
+            "unixReviewTime": 1376092800,
+            "reviewTime": "08 10, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A14Z9LAETO21KL",
+            "asin": "B000068NVI",
+            "reviewerName": "Gutjammer",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "Hosa products are a good bang for the buck. I haven't looked up the specifications, but I'm guessing the wire is 22 to 24 AWG, but since it's only 10' long, it's good enough.",
+            "overall": 4,
+            "summary": "Good Enough",
+            "unixReviewTime": 1394496000,
+            "reviewTime": "03 11, 2014"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A2074KEJGRYJV4",
+            "asin": "B000068NVI",
+            "reviewerName": "hcross",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "This was exactly what I was after. I have a voice touch and needed a small cord to connect the mic to the voice touch and this was perfect. Before I used a 20 foot cord to go about 12 inches. I highly recommend this for those who keep the mic on a stand and have a voice touch or other stand connected device for vocals.",
+            "overall": 5,
+            "summary": "Great little cord",
+            "unixReviewTime": 1379289600,
+            "reviewTime": "09 16, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A7TRK2GG6BHWD",
+            "asin": "B000068NVI",
+            "reviewerName": "Johnny Pasta \"Johnny Pasta\"",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "I bought these because I really had too long of mike cords for my solo live show. And these are really nice cords if you have a home portastudio recording studio like myself. Who needs all the spaghetti to trip on all over the place? I bought two because I use a Digitech Live 2 Harmony processor and two XLR mike cords are required to make it operational. Good price here too. Hard to find just 10' mike cords. Usually longer ones are only obtainable.",
+            "overall": 5,
+            "summary": "Does the job. What more do you need?",
+            "unixReviewTime": 1325808000,
+            "reviewTime": "01 6, 2012"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A319B090A2POEB",
+            "asin": "B000068NVI",
+            "reviewerName": "Lee",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "This cable seems like it will last me for a while. As it is only being used to connect a DI box it will not get abused as much as the vocal mics always do.",
+            "overall": 4,
+            "summary": "Decent mic cable",
+            "unixReviewTime": 1329004800,
+            "reviewTime": "02 12, 2012"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A396ELNTQDFYPO",
+            "asin": "B000068NVI",
+            "reviewerName": "Mark King",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "These are not the greatest but they're cheap and they get to you fast when you need them. I've only had one fail and I've bought many of them to use in our broadcast studio.Amazon is the first place I go when I need cables for audio, video, computers or concert lighting.Good music to all!",
+            "overall": 4,
+            "summary": "Decent inexpensive cable",
+            "unixReviewTime": 1379289600,
+            "reviewTime": "09 16, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A17CU1D2CWXOHB",
+            "asin": "B000068NVI",
+            "reviewerName": "Rick",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "This is a fine cable at a decent price point, nothing exceptional mind, but it gets the job done well enough.",
+            "overall": 4,
+            "summary": "a fine cable.",
+            "unixReviewTime": 1387065600,
+            "reviewTime": "12 15, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A1S0HTDO0P4N5V",
+            "asin": "B000068NVI",
+            "reviewerName": "R. Wristen \"The Party Doc VJ and Karaoke\"",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "I've used a lot of cables and I always come back to HOSA, they are indeed some of the best audio cables in their price range on the market.",
+            "overall": 5,
+            "summary": "Hosa is the best",
+            "unixReviewTime": 1379376000,
+            "reviewTime": "09 17, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A3DWQW2L39RB1S",
+            "asin": "B000068NVI",
+            "reviewerName": "S. Dawdy",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "I bought this cord after returning a cheap one that I should've known better than to buy. My son, who has some experience as a musician recommended the Hosa brand when I was seeking a proper replacement.I bought it for a small home recording setup which includes a Behringer C-1 Condenser Microphone and a Behringer Xenyx 302 Mixer, and both ends make a reliable connection to both the board and the mic; the sound quality is excellent.An excellent value for the money.",
+            "overall": 4,
+            "summary": "Excellent quality, exactly what I needed",
+            "unixReviewTime": 1355443200,
+            "reviewTime": "12 14, 2012"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "AQQ91U1U4YKDF",
+            "asin": "B000068NVI",
+            "reviewerName": "Vince Lewis \"Vince\"",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "Nice solid cables, with excellent support at the ends.  Should last a lifetime of usage no problem and just what I needed to connect my tube preamp.",
+            "overall": 5,
+            "summary": "great value",
+            "unixReviewTime": 1372464000,
+            "reviewTime": "06 29, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "AA5TINW2RJ195",
+            "asin": "B000068NW5",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "Good quality cable and sounds very good",
+            "overall": 5,
+            "summary": "Five Stars",
+            "unixReviewTime": 1405382400,
+            "reviewTime": "07 15, 2014"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "ABC68JUCPTVOE",
+            "asin": "B000068NW5",
+            "reviewerName": "A. Fabbri \"afabbri\"",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "Zero issues with this cable so far.  It feels fairly cheap and light weight but it has survived for months of plugging in, unplugging, and packing between practice spaces.I'll update this review if/when it breaks.",
+            "overall": 5,
+            "summary": "Pretty cheap cable that has lasted so far",
+            "unixReviewTime": 1333152000,
+            "reviewTime": "03 31, 2012"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A3W2E6S24BTXXK",
+            "asin": "B000068NW5",
+            "reviewerName": "airchamp \"ariel\"",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "Realtively inexpensive patch cable for electric guitar.I have had it for a few months and so far it has held up pretty well",
+            "overall": 5,
+            "summary": "very nice cable",
+            "unixReviewTime": 1401235200,
+            "reviewTime": "05 28, 2014"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A3872Y2XH0YDX1",
+            "asin": "B000068NW5",
+            "reviewerName": "Amazon Customer",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "I bought this because I wanted a cheap replacement cable for one that had a short. I'm pleasantly surprised with this cable. It's decent sound and decent build quality, for a good price.",
+            "overall": 5,
+            "summary": "Nice guitar cable, even better price",
+            "unixReviewTime": 1363132800,
+            "reviewTime": "03 13, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A398X9POBHK69N",
+            "asin": "B000068NW5",
+            "reviewerName": "Ann Vande Zande",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "This is a very nice cable for the price. I already bent one end of it though, fortunately it still works fine. Inside the phono connector the wires are covered by white shrink plastic. Haven't noticed any hum or crackles. For sure a good buy.",
+            "overall": 4,
+            "summary": "Does What You Want",
+            "unixReviewTime": 1388966400,
+            "reviewTime": "01 6, 2014"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A13A81NN0NRD1S",
+            "asin": "B000068NW5",
+            "reviewerName": "aspiring saint \"TATITTLE\"",
+            "helpful": [
+                12,
+                13
+            ],
+            "reviewText": "Cheap and good texture rubber that does not get stiff.  Only time will tell how well the soldering is.  Sounds fine to me.",
+            "overall": 4,
+            "summary": "flexible, soft rubber is great.",
+            "unixReviewTime": 1290038400,
+            "reviewTime": "11 18, 2010"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A1EUO0BU72JR7T",
+            "asin": "B000068NW5",
+            "reviewerName": "Bilbo",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "Seems sturdy enough, and no noise issues, so I'm pretty much satified with it; it doesn't leave the house so I'm not asking it to handle a lot, but with reasonable care it should last a while.",
+            "overall": 5,
+            "summary": "Works wonderfully, no noise",
+            "unixReviewTime": 1372291200,
+            "reviewTime": "06 27, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A1H4WSC8JWS59N",
+            "asin": "B000068NW5",
+            "reviewerName": "bradley",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "I'm not a professional, but have been playing for many, many years.  This is the best cord I've ever had, though I'm sure Eric Clapton has something better.",
+            "overall": 5,
+            "summary": "excellent",
+            "unixReviewTime": 1359504000,
+            "reviewTime": "01 30, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A3OXHLG6DIBRW8",
+            "asin": "B000068NW5",
+            "reviewerName": "C. Hill \"CFH\"",
+            "helpful": [
+                0,
+                1
+            ],
+            "reviewText": "This Hosa Cable is very well made, with good quality connectors and a nice long length. My son is expanding his collection of amps and effects pedals so needed additional cables to get everything connected. This 25' cable gives him flexibility to move around and it is sturdy enough that it can take being stepped on and pulled around.The cable works well and is a good value for a decent quality cable.Highly Recommended!CFH",
+            "overall": 5,
+            "summary": "Great Guitar Cable, Good Value - Highly Recommended",
+            "unixReviewTime": 1346803200,
+            "reviewTime": "09 5, 2012"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A12ABV9NU02O29",
+            "asin": "B000068NW5",
+            "reviewerName": "C. Longo",
+            "helpful": [
+                2,
+                2
+            ],
+            "reviewText": "I didn't expect this cable to be so thin. It's easily 1/2 the thickness of any guitar cable I've used. Not sure about long-term durability or signal loss/interference. If I had the foresight I'd spend a couple extra bucks on a thicker cable.  Still, it works and was inexpensive.EDIT: 6 months later and it's dead already.  Wire frayed at the right angle jack.  You get what you pay for.",
+            "overall": 2,
+            "summary": "Cannot recommend",
+            "unixReviewTime": 1309910400,
+            "reviewTime": "07 6, 2011"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A2U1Z3TZ4P76JB",
+            "asin": "B000068NW5",
+            "reviewerName": "C. Zemer",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "Bought this for my daughter along with her new guitar. It seems to work well, no issues in the first couple of weeks.",
+            "overall": 5,
+            "summary": "Cable works as described",
+            "unixReviewTime": 1393977600,
+            "reviewTime": "03 5, 2014"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A1L7M2JXN4EZCR",
+            "asin": "B000068NW5",
+            "reviewerName": "David G",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "It hums, crackles, and I think I'm having problems with my equipment.  As soon as I use any of my other cords then the problem is gone.  Hosa makes some other products that have good value.  But based on my experience I don't recommend this one.",
+            "overall": 1,
+            "summary": "I have bought many cables and this one is the only one that gives me problems",
+            "unixReviewTime": 1391904000,
+            "reviewTime": "02 9, 2014"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A37A41GWQFMK3D",
+            "asin": "B000068NW5",
+            "reviewerName": "Dr. Freud",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "I am not hard on cables.  I typically just plug them in to my guitar, dont move around much, and play for an hour or two a day.  this one seem to perform just fine.  no buzz, and/or other noises noted.  I have several of them and they have all performed well.",
+            "overall": 4,
+            "summary": "gets the job done",
+            "unixReviewTime": 1370649600,
+            "reviewTime": "06 8, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A2JK2ITE138P7Z",
+            "asin": "B000068NW5",
+            "reviewerName": "Dr. Marc",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "I have found Hosa cables to be an excellent value. More expensive cables may be more rugged, but for the price, I'm very happy with the Hosa's I have purchased.",
+            "overall": 5,
+            "summary": "Nice cable for the price",
+            "unixReviewTime": 1399939200,
+            "reviewTime": "05 13, 2014"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A1DVUFG2QSJ6IK",
+            "asin": "B000068NW5",
+            "reviewerName": "grandpa \"Randy\"",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "This is good cable. Excellent 1/4&#34; plugs. The lugs and solder joints are covered with heat shrink material, which will hold everything in place for years. Grade A+ cable at a very affordable price. Definitely  going back for more. The 25 ft. cable was only a couple dollars more than 10 ft.",
+            "overall": 5,
+            "summary": "Well made audio cable",
+            "unixReviewTime": 1381190400,
+            "reviewTime": "10 8, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A34VZEFXQJJ7AT",
+            "asin": "B000068NW5",
+            "reviewerName": "Guitarslim",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "Pretty crappy cable. It works and gets the job done, but after purchasing this product and using it, I will shell out the extra bucks for better quality.",
+            "overall": 5,
+            "summary": "Eh",
+            "unixReviewTime": 1374710400,
+            "reviewTime": "07 25, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A1SD1C8XK3Z3V1",
+            "asin": "B000068NW5",
+            "reviewerName": "guitfiddleblue \"guitfiddleblue\"",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "I use this cord in my church to run from my pedalboard to my amp (which is in a soundproof box). The cord is reliable and clean sounding. I like it and have used HOSA products in the past with confidence. Excellent cord. Hopefully this review will be usefull to you.",
+            "overall": 5,
+            "summary": "great, affordable, cord",
+            "unixReviewTime": 1392163200,
+            "reviewTime": "02 12, 2014"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "AKHWZ3S1UVZAO",
+            "asin": "B000068NW5",
+            "reviewerName": "Hagen LeBray",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "This my second Hosa guitar cable.  (The other one is shorter.)  Like my first Hosa cable, this is a high quality item.  I'd definitely buy more cables of this brand.",
+            "overall": 4,
+            "summary": "Nice Cable",
+            "unixReviewTime": 1397779200,
+            "reviewTime": "04 18, 2014"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A3LNNEYLGGCO25",
+            "asin": "B000068NW5",
+            "reviewerName": "Hans R",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "Works for practice ... it's a guitar instrument cable, what can I say ... maybe not the best but it serves it's purpose.",
+            "overall": 3,
+            "summary": "maybe not the best but it serves it's purpose",
+            "unixReviewTime": 1404518400,
+            "reviewTime": "07 5, 2014"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "AMACM7BGUQCZD",
+            "asin": "B000068NW5",
+            "reviewerName": "IBZANE",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "These cables have taken a beating the last few months, and have served me well with no problems..Real metal ends, not molded on, with high quality silicone jackets and strain reliefs at the connectors..",
+            "overall": 5,
+            "summary": "High quality low cost",
+            "unixReviewTime": 1390521600,
+            "reviewTime": "01 24, 2014"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A38HMS5RYSYF8G",
+            "asin": "B000068NW5",
+            "reviewerName": "James I Van Asten",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "In my opinion it does not hurt to have extra guitar cables around. From experience they tend to just die without notice. I have a feeling this one will last a long time. It is built sturdy and sounds really good.I recommend this product.",
+            "overall": 5,
+            "summary": "works as advertised....",
+            "unixReviewTime": 1389571200,
+            "reviewTime": "01 13, 2014"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A6D91KPQGIDKZ",
+            "asin": "B000068NW5",
+            "reviewerName": "Jim R. \"Photo man\"",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "Hosa guitar cables work great. Never had any problems with them. I own several of different lengths and they all sound perfect.",
+            "overall": 5,
+            "summary": "Good cables",
+            "unixReviewTime": 1343001600,
+            "reviewTime": "07 23, 2012"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A2RCCN4KEXZGC8",
+            "asin": "B000068NW5",
+            "reviewerName": "Joe Average \"Joe Average\"",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "This product does exactly what it is supposed to do at a decent price.  I have absolutely no complaints.  This is my first experience with the brand and I am not disappointed.",
+            "overall": 5,
+            "summary": "No Complaints",
+            "unixReviewTime": 1377388800,
+            "reviewTime": "08 25, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A3GAP455S8YH0M",
+            "asin": "B000068NW5",
+            "reviewerName": "Joe's Gadgets \"JOE H.\"",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "Good quality guitar cord.Very low noise, repairable, effective strain releaf,thick rubber cover!! This is a great buy, under 10 bucks for a quality cord.Of course I just got it..it might not be durable but it looks durable.If I change my mind about anything I will update my review.For now, I would say, buy one!!Joe",
+            "overall": 5,
+            "summary": "Good Quality",
+            "unixReviewTime": 1373068800,
+            "reviewTime": "07 6, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A1N06X05VZWO5Y",
+            "asin": "B000068NW5",
+            "reviewerName": "Joe Toland",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "This is a good solid cable with no problems. When I'm on stage, I like a longer cable but at practice I don't need all the extra length tangleing up on everything...",
+            "overall": 5,
+            "summary": "Perfect for practice!",
+            "unixReviewTime": 1391385600,
+            "reviewTime": "02 3, 2014"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A3TA1UJWRJF9NC",
+            "asin": "B000068NW5",
+            "reviewerName": "jschristian44",
+            "helpful": [
+                3,
+                3
+            ],
+            "reviewText": "This guitar cable is very nice.  It looks high quality and has the white ends.  Fantastic deal for this cable.",
+            "overall": 5,
+            "summary": "Nice high quality guitar cable",
+            "unixReviewTime": 1293580800,
+            "reviewTime": "12 29, 2010"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A3VPISTBNS66C5",
+            "asin": "B000068NW5",
+            "reviewerName": "k2review",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "Good product at a good price. Have used it multiple times and works well with my guitar and speaker. Great to have when friends come over to jam.",
+            "overall": 4,
+            "summary": "Works well",
+            "unixReviewTime": 1359072000,
+            "reviewTime": "01 25, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A1E5FQZTUM8OC1",
+            "asin": "B000068NW5",
+            "reviewerName": "Kenwood",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "This item is well built and I like the terminal ends and how they have the spring built in. These aren't going to be the most durable road cables but for home and light road use they will work well.",
+            "overall": 5,
+            "summary": "Well built cable",
+            "unixReviewTime": 1373846400,
+            "reviewTime": "07 15, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A3MYWHYZ30WLQJ",
+            "asin": "B000068NW5",
+            "reviewerName": "kyle c.",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "This amp plug is great for the price its 10 ft long the perfect size for jammin at home and it has a quality look to it aesthetically totally worth the price",
+            "overall": 5,
+            "summary": "pperfect amp chord.for home use",
+            "unixReviewTime": 1377734400,
+            "reviewTime": "08 29, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A1FHOW9NVOH8XR",
+            "asin": "B000068NW5",
+            "reviewerName": "Lee",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "Hosa Cable GTR210 Guitar Instrument Cable - 10ft. is a High quality Instrument Cable, but low cost, won't break the bank. I'm very satisfied with my purchase.",
+            "overall": 5,
+            "summary": "Hosa Cable GTR210 Guitar Instrument Cable - 10ft.",
+            "unixReviewTime": 1359936000,
+            "reviewTime": "02 4, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A319B090A2POEB",
+            "asin": "B000068NW5",
+            "reviewerName": "Lee",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "...unbalanced guitar cable is notoriously noisy especially around florescent lights. These are no different. I would prefer to use cables with better shielding but cannot justify the expense considering how rarely these things get used.",
+            "overall": 3,
+            "summary": "Standard guitar cable",
+            "unixReviewTime": 1329004800,
+            "reviewTime": "02 12, 2012"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A2VH0UT5EQFB6P",
+            "asin": "B000068NW5",
+            "reviewerName": "Loveguitar",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "This is your basic, black electric guitar cable but it works great.  So far the connections at both ends are solid and the sound from the amp is great!  Nice and rubbery and 10 feet is long enough.  If problems arise later with this cable, I will update this review, but as of now there has been no problems whatsoever with this cable.",
+            "overall": 5,
+            "summary": "Hosa Electric Guitar Cable GTR210",
+            "unixReviewTime": 1389830400,
+            "reviewTime": "01 16, 2014"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A396ELNTQDFYPO",
+            "asin": "B000068NW5",
+            "reviewerName": "Mark King",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "Hosa cable quality can be all over the place, some of their products are good (sound good, reliable, long lasting) and some of their products are not good (affect sound negatively, break prematurely, short useful life span).These guitar cords are actually quite nice, they feel good (gooey soft rubber jacket like Mogami), they sound good and so far they are working reliably, the rubber jacket is about .25&#34; in diameter (by eye) and there is a short heat shrink overwrap to add strength where the wire enters the plug.I bought these when I needed cables fast for an internet concert, we had lots of pedals and signal splits to connect up. These cables arrived in good working condition and we've been using them continuously since.We have over a dozen tube amps and are very particular about sound degradation but so far these cables have not disappointed anyone.I would buy more if I needed them.",
+            "overall": 4,
+            "summary": "So Far So Good",
+            "unixReviewTime": 1358726400,
+            "reviewTime": "01 21, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A2WYAHJGST6AOT",
+            "asin": "B000068NW5",
+            "reviewerName": "Matt",
+            "helpful": [
+                0,
+                1
+            ],
+            "reviewText": "It's a cable, no frills, tangles pretty easy and due to it's design it might rattle a little when you move around but it works like it should",
+            "overall": 3,
+            "summary": "average cable",
+            "unixReviewTime": 1393372800,
+            "reviewTime": "02 26, 2014"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A781ITP3HE2N5",
+            "asin": "B000068NW5",
+            "reviewerName": "Michael Livote \"dragon2knight\"",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "I never really considered a cheaper cable, I was always taught to get the best I could afford. When this showed up in a cable search on amazon, I jumped on it. I figured I had nothing to lose.To my surprise, this is an excellent cable, with good build quality and a strong, thick jacket that inspires confidence. The sound through it is identical to my Monster cables, and it cost one quarter the price....hmmmm, guess I should have tried to figure this out myself instead of listening to &#34;snobs&#34; for so many years. I will never do that again.This is worth the money twice over, try it out for yourself and kiss overpriced cables goodbye!",
+            "overall": 5,
+            "summary": "Good quality, low price",
+            "unixReviewTime": 1380844800,
+            "reviewTime": "10 4, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "AN73VQ17FZVJ8",
+            "asin": "B000068NW5",
+            "reviewerName": "MJK",
+            "helpful": [
+                2,
+                2
+            ],
+            "reviewText": "One end was loose, so I tightened it, it keeps coming loose so I had to put a dab of crazy glue on the threads, hope I don't ever have to open the end for repair.",
+            "overall": 3,
+            "summary": "Good for the Price",
+            "unixReviewTime": 1371168000,
+            "reviewTime": "06 14, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "ALUTHT4U058KZ",
+            "asin": "B000068NW5",
+            "reviewerName": "M. M. Jackson",
+            "helpful": [
+                6,
+                6
+            ],
+            "reviewText": "For the price, fantastic.They do feel light and I don't trust the build quality at the key stress points (where cable meets connector), but then again I am not going to push it.Set your guitar down on it by accident when it's plugged in and...who knows.But for seven bucks it gets the job done. Recommended if you are doing the \"beginner\" thing and testing the waters.Otherwise, spend a few more bucks for something with higher chances of lasting.",
+            "overall": 4,
+            "summary": "Feel a little flimsy and can see easily breaking, but the work",
+            "unixReviewTime": 1334620800,
+            "reviewTime": "04 17, 2012"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A1A15ECLHM9BQY",
+            "asin": "B000068NW5",
+            "reviewerName": "Nick",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "Hosa makes good stuff, this is no exception. I've trusted them for years, I can't think if a single Hosa cable I've owned that's failed.",
+            "overall": 5,
+            "summary": "Excellent",
+            "unixReviewTime": 1404950400,
+            "reviewTime": "07 10, 2014"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A1S8R9OAIQT7YI",
+            "asin": "B000068NW5",
+            "reviewerName": "patriotsarebest",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "Only complaint is the size which is my fault. If you can buy at least a 15 foot if you plan to use it on stage.",
+            "overall": 4,
+            "summary": "Only complaint is the size which is my fault. ...",
+            "unixReviewTime": 1403913600,
+            "reviewTime": "06 28, 2014"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A3RHT4KI3H5TVH",
+            "asin": "B000068NW5",
+            "reviewerName": "pops",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "Hard to day too much, but it works great. No issues to speak of. It does the job perfectly well",
+            "overall": 5,
+            "summary": "worth it",
+            "unixReviewTime": 1379894400,
+            "reviewTime": "09 23, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "AVY8D3ULJTX0H",
+            "asin": "B000068NW5",
+            "reviewerName": "P. Panehal",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "For the price, this works really well. I see no faults. It can unscrew pretty easily, but this is hardly a problem right now.",
+            "overall": 5,
+            "summary": "Works",
+            "unixReviewTime": 1357603200,
+            "reviewTime": "01 8, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A15BHBF0L0HV1F",
+            "asin": "B000068NW5",
+            "reviewerName": "Quaestor \"Raoul Duke\"",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "This cable disproves the notion that you get what you pay for. It's quality outweighs its price. Let's face it, a cable is a cable is a cable. But the quality of these cables can vary greatly. I replaced a lighter cable with this one and I was surprised at the difference in the quality of the sound from my amp. I have an Ibanez ART series guitar into an Ibanez 15 watt amp set up in my home. With nothing changed but the cable, there was a significant difference in quality and volume. So much so that I checked with my guitar teacher who said he was not surprised. The quality appears good. The ends are heavy duty and the little bit of hum I had due to the proximity of everything was attenuated to the point where it was inconsequential. I've seen more expensive cables and this one is (so far) great.Hosa GTR210 Guitar Cable 10 Ft",
+            "overall": 5,
+            "summary": "Good quality, great price",
+            "unixReviewTime": 1320192000,
+            "reviewTime": "11 2, 2011"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A1AFN4T80DZ3RR",
+            "asin": "B000068NW5",
+            "reviewerName": "Quique",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "I was looking for a long cable to perform live with my band and i'm glad with HOSA quality. It feels reliable and without adding noise.",
+            "overall": 5,
+            "summary": "Very good quality for an excellent price",
+            "unixReviewTime": 1383868800,
+            "reviewTime": "11 8, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A3DCG2MNPR4BW",
+            "asin": "B000068NW5",
+            "reviewerName": "RAYON ORMOND",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "These are Good cables at a good price!! Not sure they would hold up to heavy use, but for practicing at home they are really great!",
+            "overall": 5,
+            "summary": "Good cables at a good price!!",
+            "unixReviewTime": 1369180800,
+            "reviewTime": "05 22, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A3NGAQKJ6X088B",
+            "asin": "B000068NW5",
+            "reviewerName": "R. Beckmeyer \"Positively Positive\"",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "very sturdy, high quality with little to no feedback, i use it for performing for my friends and they all love it",
+            "overall": 5,
+            "summary": "works well, great quality",
+            "unixReviewTime": 1402876800,
+            "reviewTime": "06 16, 2014"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A35XRT4BW4I6UD",
+            "asin": "B000068NW5",
+            "reviewerName": "Richard R. Casper",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "Unless you're going to go for the very top of the line most expensive professional chords, these will do for any medium sized venue.",
+            "overall": 5,
+            "summary": "Great Value",
+            "unixReviewTime": 1346976000,
+            "reviewTime": "09 7, 2012"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "AKYDGCKCY7H9F",
+            "asin": "B000068NW5",
+            "reviewerName": "R. W. Milyard \"GearJunky\"",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "I have many lengths of these Hosa cables and have neverhad a problem with them.I am not an active musician, so have not put any of them throughthe riggers of what happens on stage; so I cannot comment on thistype of usage.In my over 40 years (10 of them on stage) I have come to realize, thatyou should ALWAYS have extra cables (just like strings) with you, aseven the most expensive cables will sometimes let you down.",
+            "overall": 5,
+            "summary": "Good cables",
+            "unixReviewTime": 1381363200,
+            "reviewTime": "10 10, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A19NGYCQ1NCF3W",
+            "asin": "B000068NW5",
+            "reviewerName": "S. Haney",
+            "helpful": [
+                4,
+                4
+            ],
+            "reviewText": "I've been using these for about 3 weeks now - they are strong but flexible and don't seem to develop kinks or bending \"habits\" if you roll them up the proper way.I've seen and used some better cables but not at this price point.  And I've certainly seen quite a few worse!  This is a pretty good sweet spot, in my opinion.",
+            "overall": 4,
+            "summary": "Very Solid Cables",
+            "unixReviewTime": 1295568000,
+            "reviewTime": "01 21, 2011"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A3UD50M7M72150",
+            "asin": "B000068NW5",
+            "reviewerName": "synthezatory",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "I'm a pro-cheapo and I hated this thing. They're noisy, and the cables feel really cheap, gummy-like. Drop few more bucks and get something else!",
+            "overall": 1,
+            "summary": "Crap",
+            "unixReviewTime": 1394755200,
+            "reviewTime": "03 14, 2014"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A2B78RXJ2PB6ZD",
+            "asin": "B000068NW5",
+            "reviewerName": "Tom",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "Works great on my 100 watt Amp. Almost compares to a monster cable. And with Its length Its plenty of Room from your Guitar to amp. GOOD PRODUCT!",
+            "overall": 5,
+            "summary": "Works Good. No complaints!!!",
+            "unixReviewTime": 1328313600,
+            "reviewTime": "02 4, 2012"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A18RGYRCEN181M",
+            "asin": "B000068NW5",
+            "reviewerName": "Truvor",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "Good cable, as good as any expensive brand. Thick, a bit stiff and seems to be shielded. No complaints at all.",
+            "overall": 5,
+            "summary": "Good guitar cable",
+            "unixReviewTime": 1386633600,
+            "reviewTime": "12 10, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A18LZ6VHS4DK69",
+            "asin": "B000068NW5",
+            "reviewerName": "Wesley Newell",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "I own lots of hosa cables they are cheap and quality is there. I've only recieved one bad cable out of around 50 or so. I use a lot of these guys and if they work when you get them, they havn't failed yet.",
+            "overall": 5,
+            "summary": "hosa rocks",
+            "unixReviewTime": 1360886400,
+            "reviewTime": "02 15, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "AQG6AQXC703WD",
+            "asin": "B000068NZC",
+            "reviewerName": "Bob",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "It is a decent cable. It does its job, but it leaves much to be desired as far as structural integrity is concerned. The mating part of the connector jiggles back and forth. The switch is also loose. The connector will move around 2mm out of the microphone without the switch being pressed.'I would not recommend using this cable for critical applications. It would be more suited to home or hobby use.",
+            "overall": 3,
+            "summary": "Does Its Job",
+            "unixReviewTime": 1395792000,
+            "reviewTime": "03 26, 2014"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A2YGWCX3DQ6ER0",
+            "asin": "B000068NZC",
+            "reviewerName": "Christian Morales",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "the cable is great for connecting directly to the computer microphone to record live without a console or mixer...... its great  i recomended",
+            "overall": 5,
+            "summary": "good for direct connect to computer",
+            "unixReviewTime": 1372550400,
+            "reviewTime": "06 30, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A21VM9WVF8EOSJ",
+            "asin": "B000068NZC",
+            "reviewerName": "J. Warren \"NiALTA\"",
+            "helpful": [
+                3,
+                3
+            ],
+            "reviewText": "Bought this to hook up a Beta 58 to a Panasonic G2 DSLR and a Kodak Zi8 for interviews. Works the way it's supposed to. 90 degree TRS is a nice touch. Good price.",
+            "overall": 5,
+            "summary": "Does what it was intended for",
+            "unixReviewTime": 1323129600,
+            "reviewTime": "12 6, 2011"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A3M48SSAOTBSMW",
+            "asin": "B000068NZC",
+            "reviewerName": "L. Rapoport \"lenrapp\"",
+            "helpful": [
+                3,
+                3
+            ],
+            "reviewText": "Just received this cord and it seems to work as expected. What can you say about an adapter cord?  It is well made, good construction and sound from my DSLR with my mic is superb.",
+            "overall": 5,
+            "summary": "Works as expected",
+            "unixReviewTime": 1335312000,
+            "reviewTime": "04 25, 2012"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "AFLRU6952DEFX",
+            "asin": "B000068NZC",
+            "reviewerName": "S.",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "If you're like me, you probably bought this to hook up an XLR microphone to a digital recorder or a PC.It works fine for the handy type recorders.But forget hooking this directly to a PC.  Way too much noise.",
+            "overall": 4,
+            "summary": "Good for some uses",
+            "unixReviewTime": 1396828800,
+            "reviewTime": "04 7, 2014"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "A1W3CEEQBJ4GTN",
+            "asin": "B000068NZC",
+            "reviewerName": "S. Marchuk",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "I bought this for my Canon Vixia HF G10 Video Camera and a Shotgun Mic that I recently purchased for it. I needed a 12&#34; wire for it to be a perfect fit from my mic (which is mounted on the Mini Advanced Shoe) to the microphone plug on the Video Camera...The wire on this thing is *not* 1 foot long. the actual wire is under 8&#34; long itself. I would have returned this thing but it was cheap enough that it wasn't worth the hassle... I'd have rated it 1 star, but I tried it on my Nikon D3200 (Shoe mounted Shotgun Mike) and it worked out ok. Still a tight fit though (since there's only 8&#34; of wire)...I'd recommend anyone looking for a short cable go with a 2' adapter; worst case scenario, you can zip-tie a loop instead of getting angry that it doesn't fit.Also, not sure if it's the wire (so this didn't affect stars) but I hear a hiss when recording. Again; unsure if it's the way the wires are stretched out to the max on the DSLR or not (or my shotgun mic).",
+            "overall": 2,
+            "summary": "Measure your damned wires before sending them...",
+            "unixReviewTime": 1379289600,
+            "reviewTime": "09 16, 2013"
+        }
+    },
+    {
+        "data": {
+            "reviewerID": "AXP9CF1UTFRSU",
+            "asin": "B000068NZC",
+            "reviewerName": "tada",
+            "helpful": [
+                0,
+                0
+            ],
+            "reviewText": "Well made, XLR 3 pin adaptor to mini.  Needed to get a real XLR mic into the computer and this did the job.",
+            "overall": 5,
+            "summary": "Recommend",
+            "unixReviewTime": 1369526400,
+            "reviewTime": "05 26, 2013"
+        }
+    }
+]

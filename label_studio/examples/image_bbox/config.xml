@@ -1,7 +1,7 @@
-<!-- {"title": "Image bounding boxes", "category": "image"} -->
+<!-- {"title": "Bbox object detection", "category": "image", "complexity": "basic"} -->
 <View>
-  <Image name="img" value="$image"/>
-  <RectangleLabels name="tag" toName="img">
+  <Image name="image" value="$image"/>
+  <RectangleLabels name="label" toName="image">
     <Label value="Airplane" background="green"/>
     <Label value="Car" background="blue"/>
   </RectangleLabels>

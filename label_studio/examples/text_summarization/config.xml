@@ -1,0 +1,9 @@
+<!-- {"title": "Text summarization", "category": "text", "complexity": "basic"} -->
+<View>
+  <Header value="Please read the text" />
+  <Text name="text" value="$text" />
+  <Header value="Provide one sentence summary" />
+  <TextArea name="answer" toName="text"
+            showSubmitButton="true" maxSubmissions="1" editable="true"
+            required="true" />
+</View>
