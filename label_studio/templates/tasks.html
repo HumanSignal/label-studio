@@ -35,10 +35,10 @@
 
         <div class="row">
           {% if task_ids|length > 0 %}
-            <a class="ui button positive" href="/">Start Labeling</a>
+            <a class="ui button positive" href=".">Start Labeling</a>
             <a id="clear-tasks-button" class="ui button red">Delete All Tasks</a>
           {% else %}
-            <a class="ui button positive" href="/import">Import Tasks</a>
+            <a class="ui button positive" href="import">Import Tasks</a>
           {% endif %}
         </div>
 
@@ -55,7 +55,7 @@
         {% for id in task_ids %}
           <tr>
             <td class="text-center">
-              <a href="/?task_id={{ id }}">
+              <a href=".?task_id={{ id }}">
                 <i class="fas fa-eye eye show-completion"></i>
               </a>
               &nbsp;
@@ -81,7 +81,7 @@
       test.addEventListener("click", function (event) {
         var id = event.target.dataset.taskId;
         var request = new XMLHttpRequest();
-        request.open("DELETE", "/api/tasks/" + id + "/completions/" + id + "/", true);
+        request.open("DELETE", "api/tasks/" + id + "/completions/" + id + "/", true);
         request.onload = function () {
           window.location.reload();
         };
@@ -94,7 +94,7 @@
         'You are going to delete all existing tasks.\nWarning! this operation cannot be undone.\nPlease confirm your action.');
       if (deletion_confirmed) {
         let request = new XMLHttpRequest();
-        request.open("DELETE", "/api/tasks/delete", true);
+        request.open("DELETE", "api/tasks/delete", true);
         request.onload = function () {
           window.location.reload();
         };

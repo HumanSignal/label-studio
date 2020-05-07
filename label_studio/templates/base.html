@@ -6,15 +6,15 @@
   <meta charset="utf-8"/>
 
   <link href="//fonts.googleapis.com/css?family=Dosis:500&amp;text=LabelStudio" rel="stylesheet" type="text/css">
-  <link rel="shortcut icon" href="/static/favicon.ico"/>
-  <link rel="stylesheet" href="/static/css/reset.css">
-  <link rel="stylesheet" href="/static/css/main.css?v2">
-  <link rel="stylesheet" href="/static/css/fontall.min.css">
-  <link rel="stylesheet" href="/static/semantic/semantic.min.css">
+  <link rel="shortcut icon" href="static/favicon.ico"/>
+  <link rel="stylesheet" href="static/css/reset.css">
+  <link rel="stylesheet" href="static/css/main.css?v2">
+  <link rel="stylesheet" href="static/css/fontall.min.css">
+  <link rel="stylesheet" href="static/semantic/semantic.min.css">
 
-  <script src="/static/js/jquery.min.js"></script>
-  <script src="/static/semantic/semantic.min.js"></script>
-  <script src="/static/js/helpers.js"></script>
+  <script src="static/js/jquery.min.js"></script>
+  <script src="static/semantic/semantic.min.js"></script>
+  <script src="static/js/helpers.js"></script>
 
   <!-- Editor CSS -->
   {% for css in editor_css %}
@@ -32,39 +32,39 @@
 
 <!-- Header -->
 <div id="header">
-  <a id="logo" href="/welcome">
-    <img src="/static/images/ls_logo.png" alt="label studio logo" class="img-logo">
+  <a id="logo" href="welcome">
+    <img src="static/images/ls_logo.png" alt="label studio logo" class="img-logo">
     <span class="img-text">{{ config['title'] }}</span>
   </a>
   <ul id="nav">
   &nbsp;
-    <a href="/" class="{% if url_for(request.endpoint) == '/' %}active{% endif %}">Labeling</a>
+    <a href="." class="{% if url_for(request.endpoint) == '/' %}active{% endif %}">Labeling</a>
     <span class="delim">|</span>
 
-    <a href="/tasks" class="{% if url_for(request.endpoint) == '/tasks' %}active{% endif %}">Tasks</a>
+    <a href="tasks" class="{% if url_for(request.endpoint) == '/tasks' %}active{% endif %}">Tasks</a>
     <span class="delim">|</span>
 
-    <a href="/import" class="{% if url_for(request.endpoint) == '/import' %}active{% endif %}">Import</a>
+    <a href="import" class="{% if url_for(request.endpoint) == '/import' %}active{% endif %}">Import</a>
     <span class="delim">|</span>
 
-    <a href="/export" class="{% if url_for(request.endpoint) == '/export' %}active{% endif %}">Export</a>
+    <a href="export" class="{% if url_for(request.endpoint) == '/export' %}active{% endif %}">Export</a>
     <span class="delim">|</span>
 
-    <a href="/model" class="{% if url_for(request.endpoint) == '/model' %}active{% endif %}">Model</a>
+    <a href="model" class="{% if url_for(request.endpoint) == '/model' %}active{% endif %}">Model</a>
     <span class="delim">|</span>
 
-    <a href="/setup" class="{% if url_for(request.endpoint) == '/setup' %}active{% endif %}">Setup</a>
+    <a href="setup" class="{% if url_for(request.endpoint) == '/setup' %}active{% endif %}">Setup</a>
     <span class="delim">|</span>
 
     <a href="https://labelstud.io/guide/" target="_blank">Docs</a>
     <span class="delim">|</span>
 
     <a href="https://github.com/heartexlabs/label-studio" target="_blank">
-      <img src="/static/images/github.svg" height="22"/></a>
+      <img src="static/images/github.svg" height="22"/></a>
 
     <a href="https://docs.google.com/forms/d/e/1FAIpQLSdLHZx5EeT1J350JPwnY2xLanfmvplJi6VZk65C2R4XSsRBHg/viewform?usp=sf_link"
        data-tooltip="If you have any troubles or suggestion just report us to Slack" data-position="bottom right"
-       target="_blank"><img src="/static/images/slack.png" height="22"/></a>
+       target="_blank"><img src="static/images/slack.png" height="22"/></a>
 
   </ul>
 </div>
