@@ -1,4 +1,4 @@
-<!-- {"title": "Text pairwise labeling", "category": "text"} -->
+<!-- {"title": "Pairwise comparison", "category": "other", "complexity": "basic"} -->
 <View>
   <Header>Select one of two items</Header>
   <Pairwise name="pw" toName="txt-1,txt-2"/>

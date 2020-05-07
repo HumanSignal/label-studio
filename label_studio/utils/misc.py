@@ -174,7 +174,7 @@ def get_config_templates():
     """ Get label config templates from directory (as usual 'examples' directory)
     """
     from collections import defaultdict, OrderedDict
-    templates = defaultdict(list)
+    templates = defaultdict(lambda: defaultdict(list))
 
     for i, path in enumerate(iter_config_templates()):
         # open and check xml
@@ -197,12 +197,16 @@ def get_config_templates():
         meta['label_config'] = '-->\n'.join(code.split('-->\n')[1:])  # remove all comments at the beginning of code
 
         meta['category'] = meta['category'] if 'category' in meta else 'no category'
-        templates[meta['category']].append(meta)
+        meta['complexity'] = meta['complexity'] if 'complexity' in meta else 'no complexity'
+        templates[meta['complexity']][meta['category']].append(meta)
 
     # sort by title
     ordered_templates = OrderedDict()
-    for key in sorted(templates.keys()):
-        ordered_templates[key] = sorted(templates[key], key=lambda x: x['title'])
+    for complexity in ['basic', 'advanced']:
+        ordered_templates[complexity] = OrderedDict()
+        for category in sorted(templates[complexity].keys()):
+            sort = sorted(templates[complexity][category], key=lambda x: x['title'])
+            ordered_templates[complexity][category] = sort
 
     return ordered_templates
 

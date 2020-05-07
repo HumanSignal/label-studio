@@ -1,0 +1,16 @@
+<!-- {"title": "Relations among entities", "category": "other", "complexity": "basic"} -->
+<View>
+  <Relations>
+    <Relation value="Is A" />
+    <Relation value="Has Function" />
+    <Relation value="Involved In" />
+    <Relation value="Related To" />
+  </Relations>
+  <Labels name="lbl-1" toName="txt-1">
+    <Label value="Subject" />
+    <Label value="Object" />
+  </Labels>
+  <Text name="txt-1" value="$text" />
+
+  <Header value="Note: To manage relations you need the entity panel to be shown" />
+</View>

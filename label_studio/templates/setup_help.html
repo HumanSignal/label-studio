@@ -3,7 +3,7 @@
   <i class="close icon"></i>
 
   <!-- Label config -->
-  <div class="header">Labeling configuration help</div>
+  <div class="header">Labeling config help</div>
   <div class="content">
     <ul class="ui list">
       <li>Labeling interface is based on html-like tags, read more in our
@@ -28,21 +28,26 @@
   <br>
   {% endif %}
 
-  <!-- Templates -->
-  <div class="header">Try predefined configs</div>
+  <!-- Basic Templates -->
+  {% for complexity in templates %}
+  <div class="header">{{complexity|capitalize}} config examples</div>
   <div class="content" style="margin-top: 0">
     <!-- Templates categories -->
     <div class="ui grid stackable" style="margin: 0 auto;">
-      {% for category in templates %}
+      {% for category in templates[complexity] %}
         <div class="three wide column category">
-          {% if category == 'audio' %} <i class="icon sound"></i> {% endif %}
-          {% if category == 'text' %} <i class="icon font"></i> {% endif %}
-          {% if category == 'html' %} <i class="icon code"></i> {% endif %}
-          {% if category == 'image' %} <i class="icon image"></i> {% endif %}
-          {% if category == 'video' %} <i class="icon video"></i> {% endif %}
+          {% if category == 'audio' %} <i class="icon sound" title="Audio sources"></i> {% endif %}
+          {% if category == 'text' %} <i class="icon font" title="Text sources"></i> {% endif %}
+          {% if category == 'html' %} <i class="icon code" title="HTML sources"></i> {% endif %}
+          {% if category == 'image' %} <i class="icon image" title="Image sources"></i> {% endif %}
+          {% if category == 'other' %} <i class="icon archive" title="Other sources"></i> {% endif %}
+
+          {% if category == 'layouts' %} <i class="icon eye" title="View layout examples"></i> {% endif %}
+          {% if category == 'per-region' %} <i class="icon vector square" title="Per region examples"></i> {% endif %}
+
 
           <!-- Template -->
-          {% for t in templates[category] %}
+          {% for t in templates[complexity][category] %}
             <div class="ui item">
               <a class="use-template no-go" href="#" data-value="{{ t.pk }}">{{ t.title }}</a>
             </div>
@@ -50,8 +55,9 @@
         </div>
       {% endfor %}
     </div>
-
   </div>
+  {% endfor %}
+
 </div>
 
 <br/>

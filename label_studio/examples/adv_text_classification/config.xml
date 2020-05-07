@@ -1,4 +1,4 @@
-<!-- {"title": "Text classifier", "category": "text"} -->
+<!-- {"title": "Pretty choices", "category": "layouts", "complexity": "advanced"} -->
 <View>
   <Text name="my_text" value="$reviewText"/>
   <View style="box-shadow: 2px 2px 5px #999;
