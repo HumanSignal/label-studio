@@ -34,7 +34,7 @@
   <div class="ui wrapper">
     {% include 'setup_help.html' %}
 
-    <form action="/api/save-config" method="post" class="ui form">
+    <form action="api/save-config" method="post" class="ui form">
 
       <!-- Textarea & Preview in two cols -->
       <div class="ui two column grid zero-margin step2 stackable">
@@ -307,7 +307,7 @@
     function show_render_editor(editor) {
       let config = labelEditor.getValue();
       $.ajax({
-        url: '/api/render-label-studio',
+        url: 'api/render-label-studio',
         method: 'POST',
         data: {config: config},
         success: editor_iframe,
@@ -320,7 +320,7 @@
     // send request to server with configs to validate
     function validate_config(editor) {
       // get current scheme type from current editor
-      let url = '/api/validate-config';
+      let url = 'api/validate-config';
       var val = labelEditor.getValue();
 
       if (!val.length)
@@ -348,7 +348,7 @@
 
       // load sample task
       $.post({
-        url: '/api/import-example',
+        url: 'api/import-example',
         data: {label_config: val}
       })
         .fail(o => {
