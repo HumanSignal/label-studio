@@ -19,6 +19,7 @@ from label_studio.utils.analytics import Analytics
 from label_studio.utils.models import ProjectObj, MLBackend
 from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.io import find_file, delete_dir_content, json_load
+from label_studio.utils.validation import is_url
 from label_studio.tasks import Tasks
 
 logger = logging.getLogger(__name__)
@@ -100,6 +101,27 @@ class Project(object):
         collect_analytics = bool(collect_analytics)
         self.analytics = Analytics(self.label_config_line, collect_analytics, self.name, self.context)
 
+    def add_ml_backend(self, params, raise_on_error=True):
+        ml_backend = MLBackend.from_params(params)
+        if not ml_backend.connected and raise_on_error:
+            raise ValueError('ML backend with URL: "' + str(params['url']) + '" is not connected.')
+        self.ml_backends.append(ml_backend)
+
+    def remove_ml_backend(self, name):
+        # remove from memory
+        remove_idx = next((i for i, b in enumerate(self.ml_backends) if b.model_name == name), None)
+        if remove_idx is None:
+            raise KeyError('Can\'t remove ML backend with name "' + name + '": not found.')
+        self.ml_backends.pop(remove_idx)
+
+        # remove from config
+        config_params = self.config.get('ml_backends', [])
+        remove_idx = next((i for i, b in enumerate(config_params) if b['name'] == name), None)
+        if remove_idx is not None:
+            config_params.pop(remove_idx)
+        self.config['ml_backends'] = config_params
+        self._save_config()
+
     def load_project_ml_backend(self):
         # configure project
         self.project_obj = ProjectObj(label_config=self.label_config_line, label_config_full=self.label_config_full)
@@ -108,10 +130,7 @@ class Project(object):
         self.ml_backends = []
         ml_backends_params = self.config.get('ml_backends', [])
         for ml_backend_params in ml_backends_params:
-            ml_backend = MLBackend.from_params(ml_backend_params)
-            # if not ml_backend.connected:
-            #     raise ValueError('ML backend ' + str(ml_backend_params) + ' is not connected.')
-            self.ml_backends.append(ml_backend)
+            self.add_ml_backend(ml_backend_params, raise_on_error=False)
 
     def load_converter(self):
         self.converter = Converter(self.label_config_full)
@@ -156,14 +175,16 @@ class Project(object):
         logger.debug('Validate label config on derived output schema')
         self.validate_label_config_on_derived_output_schema(parsed_config)
 
+    def _save_config(self):
+        with io.open(self.config['config_path'], mode='w') as f:
+            json.dump(self.config, f, indent=2)
+
     def update_params(self, params):
         if 'ml_backend' in params:
-            url = params['ml_backend']
-            name = str(uuid4())[:8]
-            self.config['ml_backends'].append({'url': url, 'name': name})
-            self.load_project_ml_backend()
-            with io.open(self.config['config_path'], mode='w') as f:
-                json.dump(self.config, f, indent=2)
+            ml_backend_params = self._create_ml_backend_params(params['ml_backend'])
+            self.add_ml_backend(ml_backend_params)
+            self.config['ml_backends'].append(ml_backend_params)
+            self._save_config()
 
     def update_label_config(self, new_label_config):
         label_config_file = self.config['label_config']
@@ -453,10 +474,13 @@ class Project(object):
         completions = []
         for f in self.iter_completions():
             completions.append(json_load(f))
+        train_status = False
         if self.ml_backends_connected:
             for ml_backend in self.ml_backends:
                 if ml_backend.connected:
                     ml_backend.train(completions, self)
+                    train_status = True
+        return train_status
 
     @classmethod
     def get_project_dir(cls, project_name, args):
@@ -504,6 +528,16 @@ class Project(object):
         if args.input_format == 'audio-dir':
             return task_loader.from_dir_with_audio_files(input_path, data_key)
         raise RuntimeError('Can\'t load tasks for input format={}'.format(args.input_format))
+
+    @classmethod
+    def _create_ml_backend_params(cls, url):
+        if '=http' in url:
+            name, url = url.split('=', 1)
+        else:
+            name = str(uuid4())[:8]
+        if not is_url(url):
+            raise ValueError('Specified string "' + url + '" doesn\'t look like URL.')
+        return {'url': url, 'name': name}
 
     @classmethod
     def create_project_dir(cls, project_name, args):
@@ -582,11 +616,7 @@ class Project(object):
             config['ml_backends'] = []
         if args.ml_backends:
             for url in args.ml_backends:
-                if '=http' in url:
-                    name, url = url.split('=', 1)
-                else:
-                    name = str(uuid4())[:8]
-                config['ml_backends'].append({'url': url, 'name': name})
+                config['ml_backends'].append(cls._create_ml_backend_params(url))
 
         if args.sampling:
             config['sampling'] = args.sampling

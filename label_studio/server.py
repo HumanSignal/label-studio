@@ -647,6 +647,16 @@ def api_instruction():
     return make_response(project.config['instruction'], 200)
 
 
+@app.route('/api/remove-ml-backend', methods=['POST'])
+@exception_treatment
+def api_remove_ml_backend():
+    project = project_get_or_create()
+    ml_backend_name = request.json['name']
+    project.remove_ml_backend(ml_backend_name)
+    project.analytics.send(getframeinfo(currentframe()).function)
+    return make_response(jsonify('Deleted!'), 204)
+
+
 @app.route('/predict', methods=['POST'])
 @exception_treatment
 def api_predict():
@@ -669,9 +679,16 @@ def api_train():
     """Send train signal to ML backend"""
     project = project_get_or_create()
     if project.ml_backends_connected:
-        project.train()
-        project.analytics.send(getframeinfo(currentframe()).function)
-        return make_response(jsonify({'details': 'Train started'}), 200)
+        training_started = project.train()
+        if training_started:
+            logger.debug('Training started.')
+            project.analytics.send(getframeinfo(currentframe()).function)
+            return make_response(jsonify({'details': 'Training started'}), 200)
+        else:
+            logger.debug('Training failed.')
+            project.analytics.send(getframeinfo(currentframe()).function, error=400)
+            return make_response(
+                jsonify('Training is not started: seems that you don\'t have any ML backend connected'), 400)
     else:
         project.analytics.send(getframeinfo(currentframe()).function, error=400)
         return make_response(jsonify("No ML backend"), 400)

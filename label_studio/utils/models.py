@@ -527,7 +527,10 @@ class MLBackend(object):
 
     def train(self, completions, project):
         if self.train_job_is_running():
-            raise CantStartTrainJobError('Train job is running.')
+            raise CantStartTrainJobError('Can\'t start new training: Train job is running.')
+        train_status = self.is_training(project)
+        if train_status['is_training']:
+            raise CantStartTrainJobError('Can\'t start new training: Train job is running.')
         response = self.api.train(completions, project)
         if response.is_error:
             raise CantStartTrainJobError('Can\'t update model: ML backend returns an error: ' + response.error_message)

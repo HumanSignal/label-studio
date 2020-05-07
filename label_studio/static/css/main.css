@@ -68,6 +68,18 @@ th {
     cursor: pointer;
 }
 
+.upper-right {
+    position:absolute;
+    top: 5px;
+    right: 0;
+}
+
+.no-border {
+    padding: 0;
+    border: none;
+    background: none;
+}
+
 a {
     text-decoration: none;
 }
@@ -316,6 +328,11 @@ div[class*="App_editor"] {
 
 .ui .label.basic {
     color: #999 !important;
+}
+
+.ui .x.icon {
+    width: 2em;
+    height: auto;
 }
 
 /* semantic ui pretty finish */

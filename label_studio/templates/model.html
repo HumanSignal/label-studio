@@ -15,6 +15,8 @@
           <div class="column">
             <div class="ui card">
               <div class="content">
+              <button class="upper-right no-border" onclick='remove_ml_backend({{ ml_backend.model_name|tojson }})'><i class="x icon"></i></button>
+
                 <a class="header" style="font-weight: lighter; color: #333">{{ ml_backend.model_name }}</a>
                 <div class="meta">
                   <span class="info">{{ ml_backend.url }}</span>
@@ -65,10 +67,12 @@
         {#            </div>#}
         {#          </div>#}
 
+        {% if project.ml_backends_connected %}
         <!-- Start train -->
-        <div class="row centered aligned">
-          <div class="ui positive big button" onclick="start_train()">Start Training</div>
-        </div>
+          <div class="row centered aligned">
+            <div class="ui positive big button" onclick="start_train()">Start Training</div>
+          </div>
+      {% endif %}
 
         {% if project.data_types|length == 1 %}
           <!-- File uploader -->
@@ -104,20 +108,19 @@
   <script>
       function addMlBackend() {
           let ml_backend = document.getElementById("ml_backend_url").value;
-          let req = {
-              url: "api/project/",
-              data: JSON.stringify({ml_backend: ml_backend}),
-              type: "patch",
-              dataType: "json",
-              contentType: "application/json; charset=utf-8"
-          };
-          $.ajax(req)
-              .done(resp => {
-                  location.reload();
-              })
-              .fail(resp => {
-                  alert(message_from_response(resp));
-              })
+          $.ajax({
+            url: "api/project/",
+            data: JSON.stringify({ml_backend: ml_backend}),
+            type: "patch",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function (response) {
+              location.reload();
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+              alert(xhr.responseJSON.msg);
+            }
+          });
       }
 
 
@@ -222,18 +225,57 @@
               });
       }
 
+      function message_from_error(e) {
+        if (e.hasOwnProperty('responseJSON')) {
+          if (e.responseJSON.hasOwnProperty('msg')) {
+            return e.responseJSON.msg;
+          }
+          if (e.responseJSON.hasOwnProperty('detail')) {
+            return e.responseJSON.detail;
+          } else {
+            return e.responseJSON;
+          }
+        }
+        if (e.hasOwnProperty('responseText')) {
+          return e.responseText;
+        }
+      }
+
       function start_train() {
           $.ajax({
             url: "api/train",
             method: 'POST',
-            success: function (response) {
-              alert(response);
-              location.reload();
-            },
-            error: function (xhr, ajaxOptions, thrownError) {
-              alert(xhr.responseJSON.msg);
+            timeout: 500,
+            error: function(xhr, textStatus, thrownError) {
+              if (textStatus === 'timeout') {
+                location.reload()
+              }
+              else {
+                alert(message_from_error(xhr));
+              }
             }
+          })
+      }
+      function remove_ml_backend(name) {
+          console.log(name);
+          const confirmed = confirm('You are going to delete ml backend.\nWarning! this operation cannot be undone.\nPlease confirm your action.');
+          if (confirmed) {
+            $.ajax({
+              type: 'POST',
+              url: "api/remove-ml-backend",
+              data: JSON.stringify({name: name}),
+              dataType: "json",
+              contentType: "application/json; charset=utf-8",
+              success: function (response) {
+                console.log(response);
+              },
+              error: function (xhr, ajaxOptions, thrownError) {
+                alert(message_from_error(xhr));
+              }
           });
+          }
+          location.reload();
+          return false;
       }
   </script>
 
