@@ -303,6 +303,10 @@ div[class*="App_editor"] {
     font-weight: 400;
 }
 
+.ui .accordion .title {
+    font-size: 16px !important;
+}
+
 .ui .message {
     background: none !important;
     box-shadow: 0 0 0 1px rgba(34, 36, 38, .15) !important;
@@ -398,7 +402,7 @@ pre {
 
 }
 
-@media only screen and (max-width: 550px) {
+@media only screen and (max-width: 650px) {
     #logo {
         display: none;
     }

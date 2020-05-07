@@ -1,0 +1,8 @@
+<!-- {"title": "Word alignment", "category": "text", "complexity": "basic"} -->
+<View>
+  <Labels name="label" toName="text">
+    <Label value="Person" />
+    <Label value="Organization" />
+  </Labels>
+  <Text name="text" value="$text" granularity="word" />
+</View>

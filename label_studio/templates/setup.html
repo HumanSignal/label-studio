@@ -101,11 +101,13 @@
     </div>
 
     <!-- Hidden template codes -->
-    {% for category in templates %}
-      {% for t in templates[category] %}
-        {% autoescape off %}
-        <script data-template-pk="{{ t.pk }}" type="text">{{ t.label_config }}</script>
-        {% endautoescape %}
+    {% for complexity in templates %}
+      {% for category in templates[complexity] %}
+        {% for t in templates[complexity][category] %}
+          {% autoescape off %}
+          <script data-template-pk="{{ t.pk }}" type="text">{{ t.label_config }}</script>
+          {% endautoescape %}
+        {% endfor %}
       {% endfor %}
     {% endfor %}
 
@@ -291,9 +293,9 @@
 
         // wait until all images and resources from iframe loading
         clearTimeout(iframeTimer);
-        iframeTimer = setTimeout(function() {
-          obj.style.height = (obj.contentWindow.document.body.scrollHeight + 30) + 'px';
-        }, 1000);
+        iframeTimer = setInterval(function() {
+          obj.style.height = (obj.contentWindow.document.body.scrollHeight) + 'px';
+        }, 200);
 
         // hide "..."
         $('#preload-editor').hide();
