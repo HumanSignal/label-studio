@@ -682,11 +682,11 @@ def api_train():
         training_started = project.train()
         if training_started:
             logger.debug('Training started.')
-            project.analytics.send(getframeinfo(currentframe()).function)
+            project.analytics.send(getframeinfo(currentframe()).function, num_backends=len(project.ml_backends))
             return make_response(jsonify({'details': 'Training started'}), 200)
         else:
             logger.debug('Training failed.')
-            project.analytics.send(getframeinfo(currentframe()).function, error=400)
+            project.analytics.send(getframeinfo(currentframe()).function, error=400, training_started=training_started)
             return make_response(
                 jsonify('Training is not started: seems that you don\'t have any ML backend connected'), 400)
     else:
