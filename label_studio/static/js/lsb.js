@@ -154,7 +154,7 @@ const _convertTask = function(task) {
     for (let tp of task.predictions) {
       tp.pk = tp.pk;
       tp.createdAgo = tp.created_ago;
-      tp.createdBy = tp.model_version;
+      tp.createdBy = tp.created_by;
     }
   }
 

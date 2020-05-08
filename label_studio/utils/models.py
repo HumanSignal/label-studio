@@ -424,12 +424,22 @@ class MLBackend(object):
     train_job = attr.ib(default=None)
     # number of completions fed
     num_completions = attr.ib(type=int, default=0)
+    # backend dir
+    _dir = attr.ib(default=None)
 
     _TRAIN_JOBS_FILE = os.path.join(get_data_dir(), 'train_jobs.json')
 
     @property
     def url(self):
         return self.api._url
+
+    @property
+    def dir(self):
+        if self._dir is None:
+            r = self.api.check_connection()
+            if not r.is_error:
+                self._dir = os.path.basename(r.response['model_dir'])
+        return self._dir
 
     @property
     def connected(self):

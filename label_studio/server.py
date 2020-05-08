@@ -140,7 +140,6 @@ def labeling_page():
         task_data = project.get_task_with_completions(task_id) or project.get_task(task_id)
         if project.ml_backends_connected:
             task_data = project.make_predictions(task_data)
-
     project.analytics.send(getframeinfo(currentframe()).function)
     return flask.render_template(
         'labeling.html',

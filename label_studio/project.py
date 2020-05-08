@@ -466,7 +466,7 @@ class Project(object):
             if not ml_backend.connected:
                 continue
             predictions = ml_backend.make_predictions(task, self)
-            predictions['created_by'] = ml_backend.model_name[:8]
+            predictions['created_by'] = ml_backend.model_name
             task['predictions'].append(predictions)
         return task
 
