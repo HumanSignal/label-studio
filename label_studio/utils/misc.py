@@ -64,7 +64,7 @@ def exception_treatment(f):
 
         except Exception as e:
             traceback = tb.format_exc()
-
+            logger.debug(traceback)
             body = {'traceback': traceback}
             if hasattr(exception_f, 'request_id'):
                 body['request_id'] = exception_f.request_id
