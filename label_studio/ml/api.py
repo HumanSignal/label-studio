@@ -67,7 +67,7 @@ def _is_training():
 
 @_server.route('/health', methods=['GET'])
 def health():
-    return jsonify({'status': 'UP'})
+    return jsonify({'status': 'UP', 'model_dir': _manager.model_dir})
 
 
 @_server.route('/metrics', methods=['GET'])
