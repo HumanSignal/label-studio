@@ -3,7 +3,7 @@
   <Header value="Listen to the audio"/>
   <Audio name="audio" value="$audio"/>
   <Header value="Select its topic"/>
-  <Choices name="label" toName="audio"
+  <Choices name="topic" toName="audio"
            choice="single-radio" showInline="true">
     <Choice value="Politics"/>
     <Choice value="Business"/>

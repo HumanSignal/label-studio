@@ -1,12 +1,13 @@
 <!-- {"title": "Three level classification", "category": "nested", "complexity": "advanced"} -->
 <View>
   <Text name="text" value="$text" />
+  
   <Choices name="sentiment" toName="text" showInLine="true">
     <Choice value="Positive" />
     <Choice value="Negative" />
     <Choice value="Neutral" />
   </Choices>
-
+  
   <Choices name="other-props" toName="text"
   	   choice="single" showInLine="true"
            visibleWhen="choice-selected"

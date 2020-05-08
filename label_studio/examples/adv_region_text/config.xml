@@ -9,17 +9,17 @@
 
   <View>
     <View style="height: 200px; overflow-y: auto">
-      <Text name="text" value="$text" valueType="text" />
+      <Text name="text" value="$text" />
     </View>
     <View>
-      <Choices name="ch" toName="text" perRegion="true">
+      <Choices name="relevance" toName="text" perRegion="true">
       	<Choice value="Relevant" />
         <Choice value="Non Relevant" />
       </Choices>
       <View visibleWhen="region-selected">
       	<Header value="Your confidence" />
       </View>
-      <Rating name="rt" toName="text" perRegion="true" />
+      <Rating name="confidence" toName="text" perRegion="true" />
     </View>
 
     <View style="width: 100%; display: block">
