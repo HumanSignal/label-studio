@@ -8,7 +8,7 @@
 
   <View visibleWhen="region-selected">
     <Header value="Describe object" />
-    <TextArea name="text" toName="image" editable="true"
+    <TextArea name="answer" toName="image" editable="true"
               perRegion="true" required="true" />
     <Choices name="choices" toName="image"
              perRegion="true">
