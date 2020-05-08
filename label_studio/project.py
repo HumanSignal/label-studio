@@ -216,7 +216,7 @@ class Project(object):
         """
         for result in completion['result']:
             result_type = result.get('type')
-            if result_type in ('relation', 'rating'):
+            if result_type in ('relation', 'rating', 'pairwise'):
                 continue
             if 'from_name' not in result or 'to_name' not in result:
                 logger.error('Unexpected completion.result format: "from_name" or "to_name" not found in %r' % result)
