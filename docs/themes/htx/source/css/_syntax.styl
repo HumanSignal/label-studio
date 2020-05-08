@@ -1,3 +1,10 @@
+.small-block
+      height: 250px;
+      overflow: auto;
+
+.small-block > table
+  width: 100%;
+
 pre
   border-radius: $radius
   position: relative
@@ -88,7 +95,7 @@ pre code
     &-xml &-css,
     &-xml &-cdata
       opacity: 0.5
-
+  
   &.hljs
     &.html, &.js, &.bash, &.css
       &::before
@@ -106,7 +113,7 @@ pre code
 
     &.html::before
       content: "HTML"
-
+    
     &.js::before
       content: "JS"
 
