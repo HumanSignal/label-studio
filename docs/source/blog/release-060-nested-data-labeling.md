@@ -4,11 +4,7 @@ type: blog
 order: 101
 ---
 
-Two months in the baking, this release features the evolution of the labeling interface into supporting not only multiple data types and labeling scenarios, but also exploring the path of bringing additional dimensions into the labeling task. Along with that purely UI work a major update to the model assisted labeling.
-
-We've had a panel for the predictions for a while, the idea behind it is to provide a set of predictions possibly coming from different models to explore and adjust, and now there is a new models page to easier manage what is connected and used for generating those predictions.
-
-Here is more on the results of this update: 
+Two months in the baking, this release features the evolution of the labeling interface into supporting not only multiple data types and labeling scenarios, but also exploring the path of bringing additional dimensions into the labeling task.
 
 ## Nested Labeling 
 
