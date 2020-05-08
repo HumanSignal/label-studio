@@ -462,12 +462,15 @@ class Project(object):
     def make_predictions(self, task):
         task = deepcopy(task)
         task['predictions'] = []
-        for ml_backend in self.ml_backends:
-            if not ml_backend.connected:
-                continue
-            predictions = ml_backend.make_predictions(task, self)
-            predictions['created_by'] = ml_backend.model_name
-            task['predictions'].append(predictions)
+        try:
+            for ml_backend in self.ml_backends:
+                if not ml_backend.connected:
+                    continue
+                predictions = ml_backend.make_predictions(task, self)
+                predictions['created_by'] = ml_backend.model_name
+                task['predictions'].append(predictions)
+        except Exception as exc:
+            logger.debug(exc)
         return task
 
     def train(self):
