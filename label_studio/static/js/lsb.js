@@ -269,7 +269,7 @@ const LSB = function(elid, config, task) {
         ls.setFlags({ isLoading: true });
         loadNext(ls);
       } else {
-          if (ls.completionStore.completions.length === 0) {
+          if (! task || ! task.completions || task.completions.length === 0) {
               var c = ls.completionStore.addCompletion({ userGenerate: true });
               ls.completionStore.selectCompletion(c.id);
           }

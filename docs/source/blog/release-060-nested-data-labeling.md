@@ -4,7 +4,11 @@ type: blog
 order: 101
 ---
 
-Two months in the baking, this release features the evolution of the labeling interface into supporting not only multiple data types and labeling scenarios, but also exploring the path of bringing additional dimensions into the labeling task.
+Two months in the baking, this release features the evolution of the labeling interface into supporting not only multiple data types and labeling scenarios, but also exploring the path of bringing additional dimensions into the labeling task. Along with that purely UI work a major update to the model assisted labeling.
+
+We've had a panel for the predictions for a while, the idea behind it is to provide a set of predictions possibly coming from different models to explore and adjust, and now there is a new models page to easier manage what is connected and used for generating those predictions.
+
+Here is more on the results of this update: 
 
 ## Nested Labeling 
 
@@ -24,6 +28,22 @@ With per region labeling you can now provide additional attributes to the labele
 <img src="/images/release-060/per-region.gif" class="gif-border" />
 
 It nicely integrates with the nested labeling, for example, you can provide multiple levels of classification for any particular region. 
+
+## Machine Learning Updates
+
+New ML page in UI, where you can specify URLs to connect ML backends, manually trigger model training, explore training statuses, and quickly check predictions by drag-n-dropping tasks.
+
+<br/>
+<img src="/images/release-060/model_page.png" class="gif-border" />
+
+
+### Multiple Backends
+
+Label Studio now supports multiple ML backends connected together. You can simultaneously get multiple predictions for each task and do comparative performance analysis for different models or different hyperparameters of a single model. It's possible to connect as many backends as you want by using `--ml-backend url1 url2 ...` command-line option or adding them via UI.
+
+### Connecting models
+
+Creating & connecting machine learning backend becomes way easier - simply define your model.py script with `.fit()` / `.predict()` methods and run ML backend with `label-studio-ml start --init --script=model.py`. Check quickstart and tutorials on how to connect sklearn and PyTorch models
 
 ## Filtering
 
