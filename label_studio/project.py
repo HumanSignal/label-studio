@@ -41,8 +41,9 @@ class Project(object):
         self.context = context or {}
 
         self.tasks = None
-        self.label_config_line, self.label_config_full, self.input_data_tags = None, None, None
+        self.label_config_line, self.label_config_full, self.parsed_label_config, self.input_data_tags = None, None, None, None  # noqa
         self.derived_input_schema, self.derived_output_schema = None, None
+
         self.load_tasks()
         self.load_label_config()
         self.load_derived_schemas()
@@ -77,6 +78,7 @@ class Project(object):
     def load_label_config(self):
         self.label_config_full = config_comments_free(open(self.config['label_config']).read())
         self.label_config_line = config_line_stripped(self.label_config_full)
+        self.parsed_label_config = parse_config(self.label_config_line)
         self.input_data_tags = self.get_input_data_tags(self.label_config_line)
 
     def load_derived_schemas(self):
@@ -133,7 +135,7 @@ class Project(object):
             self.add_ml_backend(ml_backend_params, raise_on_error=False)
 
     def load_converter(self):
-        self.converter = Converter(self.label_config_full)
+        self.converter = Converter(self.parsed_label_config)
 
     @property
     def id(self):

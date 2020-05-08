@@ -147,7 +147,6 @@ def parse_config(config_string):
                         tag_name=etree.tostring(tag, encoding='unicode').strip()[:50]))
             else:
                 labels[parent_name].add(actual_value)
-
     for output_tag, tag_info in outputs.items():
         tag_info['inputs'] = []
         for input_tag_name in tag_info['to_name']:
