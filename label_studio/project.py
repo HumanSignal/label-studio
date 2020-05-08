@@ -214,7 +214,7 @@ class Project(object):
         """
         for result in completion['result']:
             result_type = result.get('type')
-            if result_type == 'relation':
+            if result_type in ('relation', 'rating'):
                 continue
             if 'from_name' not in result or 'to_name' not in result:
                 logger.error('Unexpected completion.result format: "from_name" or "to_name" not found in %r' % result)
@@ -440,7 +440,11 @@ class Project(object):
             completion['id'] = task['id'] * 1000 + len(task['completions']) + 1
             task['completions'].append(completion)
 
-        self._update_derived_output_schema(completion)
+        try:
+            self._update_derived_output_schema(completion)
+        except Exception as exc:
+            logger.error(exc, exc_info=True)
+            logger.debug(json.dumps(completion, indent=2))
 
         # write task + completions to file
         filename = os.path.join(self.config['output_dir'], str(task_id) + '.json')
