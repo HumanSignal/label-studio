@@ -1,0 +1,14 @@
+<!-- {"title": "Emotion segmentation", "category": "audio", "complexity": "basic"} -->
+<View>
+  <Labels name="emotion" toName="audio" choice="multiple">
+    <Label value="Fear" background="#ff0000" />
+    <Label value="Anger" background="#d50000" />
+    <Label value="Sadness" background="#5050ff" />
+    <Label value="Joy" background="#ffff53" />
+    <Label value="Disgust" background="#ff53ff" />
+    <Label value="Surprise" background="#58beff" />
+    <Label value="Trust" background="#009700" />
+    <Label value="Anticipation" background="#ffa953" />
+  </Labels>
+  <AudioPlus name="audio" value="$audio"/>
+</View>

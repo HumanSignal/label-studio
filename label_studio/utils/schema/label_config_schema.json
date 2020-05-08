@@ -95,7 +95,7 @@
     },
     "Choices": {
       "type": "object",
-      "oneOf": [
+      "anyOf": [
         {"required": ["@name", "@toName", "Choice"]},
         {"required": ["@name", "@toName", "View"]}
       ],
@@ -124,7 +124,7 @@
     },
     "Labels": {
       "type": "object",
-      "oneOf": [
+      "anyOf": [
         {"required": ["@name", "@toName", "Label"]},
         {"required": ["@name", "@toName", "View"]}
       ],

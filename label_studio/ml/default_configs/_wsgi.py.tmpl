@@ -15,7 +15,7 @@ if __name__ == "__main__":
         '--kwargs', dest='kwargs', metavar='KEY=VAL', nargs='+', type=lambda kv: kv.split('='),
         help='Additional LabelStudioMLBase model initialization kwargs')
     parser.add_argument(
-        '--debug', dest='debug', action='store_true',
+        '-d', '--debug', dest='debug', action='store_true',
         help='Switch debug mode')
     parser.add_argument(
         '--log-level', dest='log_level', choices=['DEBUG', 'INFO', 'WARNING', 'ERROR'], default=None,

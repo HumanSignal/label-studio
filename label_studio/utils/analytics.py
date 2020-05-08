@@ -88,7 +88,7 @@ class Analytics(object):
         try:
             mp.track(self._user_id, event_name, data)
         except MixpanelException as exc:
-            logger.error('Can\'t track ' + str(event_name) + ' . Reason: ' + str(exc), exc_info=True)
+            logger.debug('Can\'t track ' + str(event_name) + ' . Reason: ' + str(exc), exc_info=True)
 
         json_data = data
         json_data['event'] = event_name

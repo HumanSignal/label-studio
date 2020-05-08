@@ -1,10 +1,9 @@
-<!-- {"title": "Image keypoints and landmarks", "category": "image"} -->
+<!-- {"title": "Keypoints and landmarks", "category": "image", "complexity": "basic"} -->
 <View>
-  <Image name="img" value="$image" zoom="true"/>
-  <Header>Select label then click on image</Header>
-  <KeyPointLabels name="tag" toName="img"
-                  strokewidth="5" fillcolor="red">
-    <Label value="Engine" background="red"/>
-    <Label value="Tail" background="rgba(0, 255, 0, 0.9)"/>
+  <Image name="image" value="$image" zoom="true" zoomControl="true"/>
+  <KeyPointLabels name="label" toName="image"
+                  strokewidth="2" opacity="1" >
+      <Label value="Engine" background="red"/>
+      <Label value="Tail" background="blue"/>
   </KeyPointLabels>
 </View>

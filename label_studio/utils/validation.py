@@ -4,6 +4,8 @@ try:
 except:
     import json
 from .exceptions import ValidationError
+from urllib.parse import urlparse
+
 
 class SkipField(Exception):
     pass
@@ -225,3 +227,11 @@ class TaskValidator:
             raise ValidationError(errors)
 
         return ret
+
+
+def is_url(string):
+    try:
+        result = urlparse(string.strip())
+        return all([result.scheme, result.netloc])
+    except ValueError:
+        return False

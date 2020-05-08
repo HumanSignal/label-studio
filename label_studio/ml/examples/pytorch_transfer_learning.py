@@ -7,6 +7,7 @@ import numpy as np
 import requests
 import io
 import hashlib
+import urllib
 
 from PIL import Image
 from torch.utils.data import Dataset, DataLoader
@@ -31,10 +32,14 @@ os.makedirs(image_cache_dir, exist_ok=True)
 
 
 def get_transformed_image(url):
-    is_local_file = url.startswith('http://localhost:')
+    is_local_file = url.startswith('http://localhost:') and '/data/' in url
     if is_local_file:
-        filename, dir_path = url.split('/static/')[1].split('?d=')
-        with open(os.path.join(dir_path, filename)) as f:
+        filename, dir_path = url.split('/data/')[1].split('?d=')
+        dir_path = str(urllib.parse.unquote(dir_path))
+        filepath = os.path.join(dir_path, filename)
+        if not os.path.exists(filepath):
+            raise FileNotFoundError(filepath)
+        with open(filepath, mode='rb') as f:
             image = Image.open(f).convert('RGB')
     else:
         cached_file = os.path.join(image_cache_dir, hashlib.md5(url.encode()).hexdigest())
@@ -156,13 +161,16 @@ class ImageClassifierAPI(LabelStudioMLBase):
         super(ImageClassifierAPI, self).__init__(**kwargs)
         self.from_name, self.to_name, self.value, self.classes = get_single_tag_keys(
             self.parsed_label_config, 'Choices', 'Image')
-
+        self.freeze_extractor = freeze_extractor
         if self.train_output:
             self.classes = self.train_output['classes']
             self.model = ImageClassifier(len(self.classes), freeze_extractor)
             self.model.load(self.train_output['model_path'])
         else:
             self.model = ImageClassifier(len(self.classes), freeze_extractor)
+
+    def reset_model(self):
+        self.model = ImageClassifier(len(self.classes), self.freeze_extractor)
 
     def predict(self, tasks, **kwargs):
         image_urls = [task['data'][self.value] for task in tasks]
@@ -199,6 +207,7 @@ class ImageClassifierAPI(LabelStudioMLBase):
         dataloader = DataLoader(dataset, shuffle=True, batch_size=batch_size)
 
         print('Train model...')
+        self.reset_model()
         self.model.train(dataloader, num_epochs=num_epochs)
 
         print('Save model...')

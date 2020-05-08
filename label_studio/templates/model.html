@@ -15,7 +15,9 @@
           <div class="column">
             <div class="ui card">
               <div class="content">
-                <a class="header" style="font-weight: lighter; color: #333">{{ ml_backend.model_name }}</a>
+              <button class="upper-right no-border" onclick='remove_ml_backend({{ ml_backend.model_name|tojson }})'><i class="x icon"></i></button>
+
+                <div class="header" style="font-weight: lighter; color: #333">{{ ml_backend.dir }} > {{ ml_backend.model_name }}</div>
                 <div class="meta">
                   <span class="info">{{ ml_backend.url }}</span>
                 </div>
@@ -28,15 +30,23 @@
                 </div>
               </div>
               <div class="extra content">
-                <a>
-                  {% if ml_backend.training_in_progress %}
+                <div>
+                  {% if ml_backend.is_error %}
+                    <i class="x icon" style="color: #ff2733"></i>
+                    Error. Check console logs...
+                  {% elif not ml_backend.is_connected %}
+                    <i class="toggle off wide icon"></i>
+                    Disconnected
+                    {% elif ml_backend.is_error %}
+
+                  {% elif ml_backend.training_in_progress %}
                     <i class="hourglass half wide icon" style="color: #da671b"></i>
                     Training in progress...
                   {% else %}
                     <i class="toggle on wide icon" style="color: #00c22e"></i>
-                    Enabled
+                    Connected
                   {% endif %}
-                </a>
+                </div>
               </div>
             </div>
           </div>
@@ -57,10 +67,12 @@
         {#            </div>#}
         {#          </div>#}
 
+        {% if project.ml_backends_connected %}
         <!-- Start train -->
-        <div class="row centered aligned">
-          <div class="ui positive big button" onclick="start_train()">Start Training</div>
-        </div>
+          <div class="row centered aligned">
+            <div class="ui positive big button" onclick="start_train()">Start Training</div>
+          </div>
+      {% endif %}
 
         {% if project.data_types|length == 1 %}
           <!-- File uploader -->
@@ -96,20 +108,19 @@
   <script>
       function addMlBackend() {
           let ml_backend = document.getElementById("ml_backend_url").value;
-          let req = {
-              url: "api/project/",
-              data: JSON.stringify({ml_backend: ml_backend}),
-              type: "patch",
-              dataType: "json",
-              contentType: "application/json; charset=utf-8"
-          };
-          $.ajax(req)
-              .done(resp => {
-                  location.reload();
-              })
-              .fail(resp => {
-                  alert(message_from_response(resp));
-              })
+          $.ajax({
+            url: "api/project/",
+            data: JSON.stringify({ml_backend: ml_backend}),
+            type: "patch",
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function (response) {
+              location.reload();
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+              alert(xhr.responseJSON.msg);
+            }
+          });
       }
 
 
@@ -214,19 +225,57 @@
               });
       }
 
+      function message_from_error(e) {
+        if (e.hasOwnProperty('responseJSON')) {
+          if (e.responseJSON.hasOwnProperty('msg')) {
+            return e.responseJSON.msg;
+          }
+          if (e.responseJSON.hasOwnProperty('detail')) {
+            return e.responseJSON.detail;
+          } else {
+            return e.responseJSON;
+          }
+        }
+        if (e.hasOwnProperty('responseText')) {
+          return e.responseText;
+        }
+      }
+
       function start_train() {
-          let request = {
-              url: "api/train",
-              method: 'POST',
-          };
-          $.ajax(request)
-              .done(response => {
-                  alert(response.responseJSON.detail);
-              })
-              .fail(response => {
-                  alert(response.responseJSON.detail);
-              });
+          $.ajax({
+            url: "api/train",
+            method: 'POST',
+            timeout: 500,
+            error: function(xhr, textStatus, thrownError) {
+              if (textStatus === 'timeout') {
+                location.reload()
+              }
+              else {
+                alert(message_from_error(xhr));
+              }
+            }
+          })
+      }
+      function remove_ml_backend(name) {
+          console.log(name);
+          const confirmed = confirm('You are going to delete ml backend.\nWarning! this operation cannot be undone.\nPlease confirm your action.');
+          if (confirmed) {
+            $.ajax({
+              type: 'POST',
+              url: "api/remove-ml-backend",
+              data: JSON.stringify({name: name}),
+              dataType: "json",
+              contentType: "application/json; charset=utf-8",
+              success: function (response) {
+                console.log(response);
+              },
+              error: function (xhr, ajaxOptions, thrownError) {
+                alert(message_from_error(xhr));
+              }
+          });
+          }
           location.reload();
+          return false;
       }
   </script>
 

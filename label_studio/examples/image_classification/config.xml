@@ -1,7 +1,7 @@
-<!-- {"title": "Image classifier", "category": "image"} -->
+<!-- {"title": "Image classification", "category": "image", "complexity": "basic", "complexity": "basic", "order": "!"} -->
 <View>
-  <Image name="img" value="$image_url"/>
-  <Choices name="choice" toName="img" showInLine="true">
+  <Image name="image" value="$image"/>
+  <Choices name="choice" toName="image" showInLine="true">
     <Choice value="Boeing" background="blue"/>
     <Choice value="Airbus" background="green" />
   </Choices>

@@ -1,0 +1,14 @@
+<!-- {"title": "Transcription per region", "category": "audio", "complexity": "basic"} -->
+<View>
+  <Labels name="labels" toName="audio">
+    <Label value="Speaker 1" />
+    <Label value="Speaker 2" />
+  </Labels>
+  <AudioPlus name="audio" value="$audio"/>
+  <View visibleWhen="region-selected">
+    <Header value="Provide Transcription" />
+  </View>
+  <TextArea name="transcription" toName="audio"
+            rows="2" editable="true"
+            perRegion="true" required="true" />
+</View>

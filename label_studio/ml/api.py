@@ -1,4 +1,3 @@
-import json
 import logging
 
 from flask import Flask, request, jsonify, send_file
@@ -20,7 +19,7 @@ def init_app(model_class, **kwargs):
 
 @_server.route('/predict', methods=['POST'])
 def _predict():
-    data = json.loads(request.data)
+    data = request.json
     tasks = data['tasks']
     project = data.get('project')
     label_config = data.get('label_config')
@@ -37,7 +36,7 @@ def _predict():
 
 @_server.route('/setup', methods=['POST'])
 def _setup():
-    data = json.loads(request.data)
+    data = request.json
     project = data.get('project')
     schema = data.get('schema')
     force_reload = data.get('force_reload', False)
@@ -47,13 +46,13 @@ def _setup():
 
 @_server.route('/train', methods=['POST'])
 def _train():
-    data = json.loads(request.data)
+    data = request.json
     completions = data['completions']
     project = data.get('project')
     label_config = data.get('label_config')
     params = data.get('params', {})
     if len(completions) == 0:
-        return jsonify({'status': 'error', 'message': 'No tasks found.'}), 400
+        return jsonify('No completions found.'), 400
     job = _manager.train(completions, project, label_config, **params)
     response = {'job': job.id} if job else {}
     return jsonify(response), 201
@@ -62,13 +61,13 @@ def _train():
 @_server.route('/is_training', methods=['GET'])
 def _is_training():
     project = request.args.get('project')
-    is_training = _manager.is_training(project)
-    return jsonify({'is_training': is_training})
+    output = _manager.is_training(project)
+    return jsonify(output)
 
 
 @_server.route('/health', methods=['GET'])
 def health():
-    return jsonify({'status': 'UP'})
+    return jsonify({'status': 'UP', 'model_dir': _manager.model_dir})
 
 
 @_server.route('/metrics', methods=['GET'])
@@ -86,3 +85,15 @@ def no_such_job_error_handler(error):
 def file_not_found_error_handler(error):
     logger.warning('Got error: ' + str(error))
     return str(error), 404
+
+
+@_server.errorhandler(AssertionError)
+def assertion_error(error):
+    logger.error(str(error), exc_info=True)
+    return str(error), 500
+
+
+@_server.errorhandler(IndexError)
+def index_error(error):
+    logger.error(str(error), exc_info=True)
+    return str(error), 500

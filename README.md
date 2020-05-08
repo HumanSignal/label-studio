@@ -4,7 +4,9 @@
 
 <br/>
 
- **Label Studio is a swiss army knife of data labeling and annotation tools :v:**
+> **NEW** Release 0.6.0: Nested & Per-Region Labeling, Filtering & Cueing the active labels, read the [release notes](https://labelstud.io/blog/release-060-nested-data-labeling.html).
+
+**Label Studio is a swiss army knife of data labeling and annotation tools :v:**
  
 Try it now in a **[running app](https://app.labelstud.io)** and check out the **[introductory post](https://towardsdatascience.com/introducing-label-studio-a-swiss-army-knife-of-data-labeling-140c1be92881#3907-fd502dc24c8d)**.
  

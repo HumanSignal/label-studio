@@ -1,0 +1,31 @@
+<!-- {"title": "Audio regions labeling", "category": "per-region", "complexity": "advanced"} -->
+<View style="display: flex;">
+  <View style="width: 100%; margin-left: 1em;">
+    <Labels name="label" toName="audio">
+      <Label value="Speaker 1" />
+      <Label value="Speaker 2" />
+    </Labels>
+    <AudioPlus name="audio" value="$audio"/>
+    <View style="padding: 10px 20px; margin-top: 2em; box-shadow: 2px 2px 8px #AAA; margin-right: 1em;"
+          visibleWhen="region-selected">
+      <Header value="Provide Transcription" />
+      <TextArea name="transcription" toName="audio"
+                rows="2" editable="true" perRegion="true"
+                required="true" />
+    </View>
+    <View style="padding: 10px 20px; margin-top: 2em; box-shadow: 2px 2px 8px #AAA; margin-right: 1em;"
+          visibleWhen="region-selected">
+      <Header value="Select Gender" />
+      <Choices name="gender" toName="audio"
+               perRegion="true" required="true">
+        <Choice value="Male" />
+        <Choice value="Female" />
+      </Choices>
+    </View>
+
+    <View style="width: 100%; display: block">
+      <Header value="Select region after creation to go next"/>
+    </View>
+
+  </View>
+</View>

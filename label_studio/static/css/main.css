@@ -68,6 +68,18 @@ th {
     cursor: pointer;
 }
 
+.upper-right {
+    position:absolute;
+    top: 5px;
+    right: 0;
+}
+
+.no-border {
+    padding: 0;
+    border: none;
+    background: none;
+}
+
 a {
     text-decoration: none;
 }
@@ -291,6 +303,10 @@ div[class*="App_editor"] {
     font-weight: 400;
 }
 
+.ui .accordion .title {
+    font-size: 16px !important;
+}
+
 .ui .message {
     background: none !important;
     box-shadow: 0 0 0 1px rgba(34, 36, 38, .15) !important;
@@ -316,6 +332,11 @@ div[class*="App_editor"] {
 
 .ui .label.basic {
     color: #999 !important;
+}
+
+.ui .x.icon {
+    width: 2em;
+    height: auto;
 }
 
 /* semantic ui pretty finish */
@@ -381,7 +402,7 @@ pre {
 
 }
 
-@media only screen and (max-width: 550px) {
+@media only screen and (max-width: 650px) {
     #logo {
         display: none;
     }
