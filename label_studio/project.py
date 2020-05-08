@@ -41,8 +41,9 @@ class Project(object):
         self.context = context or {}
 
         self.tasks = None
-        self.label_config_line, self.label_config_full, self.input_data_tags = None, None, None
+        self.label_config_line, self.label_config_full, self.parsed_label_config, self.input_data_tags = None, None, None, None  # noqa
         self.derived_input_schema, self.derived_output_schema = None, None
+
         self.load_tasks()
         self.load_label_config()
         self.load_derived_schemas()
@@ -77,6 +78,7 @@ class Project(object):
     def load_label_config(self):
         self.label_config_full = config_comments_free(open(self.config['label_config']).read())
         self.label_config_line = config_line_stripped(self.label_config_full)
+        self.parsed_label_config = parse_config(self.label_config_line)
         self.input_data_tags = self.get_input_data_tags(self.label_config_line)
 
     def load_derived_schemas(self):
@@ -133,7 +135,7 @@ class Project(object):
             self.add_ml_backend(ml_backend_params, raise_on_error=False)
 
     def load_converter(self):
-        self.converter = Converter(self.label_config_full)
+        self.converter = Converter(self.parsed_label_config)
 
     @property
     def id(self):
@@ -214,7 +216,7 @@ class Project(object):
         """
         for result in completion['result']:
             result_type = result.get('type')
-            if result_type == 'relation':
+            if result_type in ('relation', 'rating'):
                 continue
             if 'from_name' not in result or 'to_name' not in result:
                 logger.error('Unexpected completion.result format: "from_name" or "to_name" not found in %r' % result)
@@ -440,7 +442,11 @@ class Project(object):
             completion['id'] = task['id'] * 1000 + len(task['completions']) + 1
             task['completions'].append(completion)
 
-        self._update_derived_output_schema(completion)
+        try:
+            self._update_derived_output_schema(completion)
+        except Exception as exc:
+            logger.error(exc, exc_info=True)
+            logger.debug(json.dumps(completion, indent=2))
 
         # write task + completions to file
         filename = os.path.join(self.config['output_dir'], str(task_id) + '.json')

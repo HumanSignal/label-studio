@@ -418,6 +418,7 @@ def api_import_example_file():
 
 
 @app.route('/api/import', methods=['POST'])
+@exception_treatment
 def api_import():
     project = project_get_or_create()
 

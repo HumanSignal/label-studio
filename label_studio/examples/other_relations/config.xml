@@ -11,5 +11,5 @@
     <Label value="Subject" />
     <Label value="Object" />
   </Labels>
-  <Text name="text" value="$label" />
+  <Text name="text" value="$text" />
 </View>

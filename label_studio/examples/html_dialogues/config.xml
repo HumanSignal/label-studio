@@ -3,7 +3,7 @@
   <HyperText name="dialog" value="$dialogs"/>
 
   <Header value="Rate last answer"/>
-  <Choices name="chc-1" choice="single-radio" toName="dialog" showInline="true">
+  <Choices name="rating" choice="single-radio" toName="dialog" showInline="true">
     <Choice value="Bad answer"/>
     <Choice value="Neutral answer"/>
     <Choice value="Good answer"/>

@@ -7,13 +7,11 @@
     <Choice value="Negative" />
     <Choice value="Neutral" />
   </Choices>
-
   <View visibleWhen="choice-selected"
         whenTagName="sentiment" whenChoiceValue="Positive">
     <Header value="What about this text?" />
     <Text name="text2" value="$text2" />
   </View>
-  
   <Choices name="sentiment2" toName="text2"
   	   choice="single" showInLine="true"
            visibleWhen="choice-selected"

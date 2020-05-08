@@ -5,11 +5,10 @@
     <Label value="Speaker 2" />
   </Labels>
   <AudioPlus name="audio" value="$audio"/>
-
   <View visibleWhen="region-selected">
     <Header value="Provide Transcription" />
-    <TextArea name="text" toName="audio"
-              rows="2" editable="true"
-              perRegion="true" required="true" />
   </View>
+  <TextArea name="transcription" toName="audio"
+            rows="2" editable="true"
+            perRegion="true" required="true" />
 </View>
