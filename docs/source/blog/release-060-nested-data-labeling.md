@@ -59,3 +59,4 @@ Don’t forget to unselect the region when you want to select a new label, other
 * --host argument now available via command-line argument (thanks to [@hachreak](https://github.com/hachreak))
 * fixed upload with plain text tasks (thanks to [@gauthamsuresh09](https://github.com/gauthamsuresh09))
 * fixed one-click deploy on Google Cloud (thanks to [@iCorv](https://github.com/iCorv))
+* fixed URL paths for proxy safety (thanks to [ezavesky](https://github.com/ezavesky))
