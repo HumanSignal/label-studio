@@ -16,6 +16,11 @@ Choices tag, create a group of choices, radio, or checkboxes. Shall be used for 
 | [showInline] | <code>boolean</code> | <code>false</code> | show items in the same visual line |
 | [required] | <code>boolean</code> | <code>false</code> | validation if choice has been selected |
 | [requiredMessage] | <code>string</code> |  | message to show if validation fails |
+| [visibleWhen] | <code>region-selected</code> \| <code>choice-selected</code> \| <code>no-region-selected</code> |  | show the choices when condition is true |
+| [whenTagName] | <code>string</code> |  | narrow down visibility by name of the tag, for regions use the name of the labels tag, for choices use the name of the choices tag |
+| [whenLabelValue] | <code>string</code> |  | narrow down visibility by label value |
+| [whenChoiceValue] | <code>string</code> |  | narrow down visibility by choice value |
+| [perRegion] | <code>boolean</code> | <code>false</code> | use this tag for region labeling instead of the whole object labeling |
 
 ### Example
 
