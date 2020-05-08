@@ -30,7 +30,7 @@
   },
   "scripts": {
     "server": "hexo serve",
-    "publish": "hexo generate && hexo clean && hexo deploy",
+    "publish": "hexo generate && hexo deploy",
     "new": "hexo new"
   }
 }

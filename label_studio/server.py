@@ -23,6 +23,7 @@ from datetime import datetime
 from inspect import currentframe, getframeinfo
 from flask import request, jsonify, make_response, Response, Response as HttpResponse, send_file, session, redirect
 from flask_api import status
+from types import SimpleNamespace
 
 from label_studio.utils.functions import generate_sample_task
 from label_studio.utils.io import find_dir, find_file, find_editor_files
@@ -39,11 +40,18 @@ from label_studio.tasks import Tasks
 logger = logging.getLogger(__name__)
 
 app = flask.Flask(__name__, static_url_path='')
+
 app.secret_key = 'A0Zrdqwf1AQWj12ajkhgFN]dddd/,?RfDWQQT'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 # input arguments
 input_args = None
+if os.path.exists('server.json'):
+    try:
+        with open('server.json') as f:
+            input_args = SimpleNamespace(**json.load(f))
+    except:
+        pass
 
 
 def project_get_or_create(multi_session_force_recreate=False):
