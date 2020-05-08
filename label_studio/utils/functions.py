@@ -53,11 +53,15 @@ def generate_sample_task_without_check(label_config, mode='upload'):
     parent = xml.findall('.//*[@value]')  # take all tags with value attribute
     for p in parent:
         value = p.get('value')
+        value_type = p.get('valueType', 'text')
 
         # process List
         if p.tag == 'List':
             key = p.get('elementValue').replace('$', '')
             examples['List'] = [{key: 'Hello world'}, {key: 'Goodbye world'}]
+
+        # Text with valueType=URL
+        examples['Text'] = examples['TextUrl'] if value_type == 'url' else examples['TextRaw']
 
         if value and value[0] == '$':
             # try get example by variable name
