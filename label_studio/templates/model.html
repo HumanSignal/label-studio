@@ -17,7 +17,7 @@
               <div class="content">
               <button class="upper-right no-border" onclick='remove_ml_backend({{ ml_backend.model_name|tojson }})'><i class="x icon"></i></button>
 
-                <a class="header" style="font-weight: lighter; color: #333">{{ ml_backend.model_name }}</a>
+                <div class="header" style="font-weight: lighter; color: #333">{{ ml_backend.model_name }}</div>
                 <div class="meta">
                   <span class="info">{{ ml_backend.url }}</span>
                 </div>
@@ -30,7 +30,7 @@
                 </div>
               </div>
               <div class="extra content">
-                <a>
+                <div>
                   {% if ml_backend.is_error %}
                     <i class="x icon" style="color: #ff2733"></i>
                     Error. Check console logs...
@@ -46,7 +46,7 @@
                     <i class="toggle on wide icon" style="color: #00c22e"></i>
                     Connected
                   {% endif %}
-                </a>
+                </div>
               </div>
             </div>
           </div>

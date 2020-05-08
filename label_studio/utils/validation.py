@@ -231,7 +231,7 @@ class TaskValidator:
 
 def is_url(string):
     try:
-        result = urlparse(string)
+        result = urlparse(string.strip())
         return all([result.scheme, result.netloc])
     except ValueError:
         return False
