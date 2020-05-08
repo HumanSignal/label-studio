@@ -1,5 +1,4 @@
 <!-- {"title": "Conditional classification", "category": "nested", "complexity": "advanced"} -->
-<!-- {"title": "Conditional classification", "category": "nested", "complexity": "advanced"} -->
 <View>
   <Text name="text1" value="$text1" />
   <Choices name="sentiment" toName="text1" showInLine="true">
@@ -7,11 +6,13 @@
     <Choice value="Negative" />
     <Choice value="Neutral" />
   </Choices>
+
   <View visibleWhen="choice-selected"
         whenTagName="sentiment" whenChoiceValue="Positive">
     <Header value="What about this text?" />
     <Text name="text2" value="$text2" />
   </View>
+
   <Choices name="sentiment2" toName="text2"
   	   choice="single" showInLine="true"
            visibleWhen="choice-selected"

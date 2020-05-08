@@ -1,6 +1,7 @@
 <!-- {"title": "Multi classification", "category": "text", "complexity": "basic"} -->
 <View>
   <Text name="text" value="text" />
+
   <Choices name="sentiment" toName="text" choice="multiple">
     <View style="display: flex; justify-content: space-between">
       <View style="width: 50%">
@@ -17,4 +18,5 @@
       </View>
     </View>
   </Choices>
+
 </View>

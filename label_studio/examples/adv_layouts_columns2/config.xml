@@ -6,6 +6,7 @@
       <Label value="Organization" />
     </Labels>
   </View>
+
   <View>
     <Text name="text" value="$text" />
   </View>

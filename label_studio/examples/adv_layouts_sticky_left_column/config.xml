@@ -8,6 +8,7 @@
       </Labels>
     </View>
   </View>
+
   <View>
     <Text name="text" value="$text" />
   </View>

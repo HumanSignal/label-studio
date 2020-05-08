@@ -10,5 +10,6 @@
     <Label value="Trust" background="#009700" />
     <Label value="Anticipation" background="#ffa953" />
   </Labels>
+
   <AudioPlus name="audio" value="$audio"/>
 </View>

@@ -13,5 +13,6 @@
     <Label value="Language" background="#482"/>
     <Label value="Location" background="rgba(0,0,0,0.8)"/>
   </Labels>
+
   <Text name="text" value="$text"/>
 </View>

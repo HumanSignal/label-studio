@@ -7,6 +7,7 @@
       <Label value="Organization" />
     </Labels>
   </View>
+
   <View style="height: 400px; overflow: auto">
     <Text name="text" value="$text" />
   </View>

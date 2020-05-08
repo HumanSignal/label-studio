@@ -8,6 +8,7 @@
       </Labels>
     </View>
   </View>
+
   <View style="height: 300px; overflow: auto;">
     <Text name="text" value="$longText" />
   </View>

@@ -11,11 +11,13 @@
     <View style="height: 200px; overflow-y: auto">
       <Text name="text" value="$text" />
     </View>
+
     <View>
       <Choices name="relevance" toName="text" perRegion="true">
       	<Choice value="Relevant" />
         <Choice value="Non Relevant" />
       </Choices>
+
       <View visibleWhen="region-selected">
       	<Header value="Your confidence" />
       </View>
