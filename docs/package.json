@@ -32,5 +32,8 @@
     "server": "hexo serve",
     "publish": "hexo generate && hexo deploy",
     "new": "hexo new"
+  },
+  "devDependencies": {
+    "hexo-deployer-aws-s3": "^1.0.2"
   }
 }
