@@ -91,11 +91,11 @@ pagination_dir: page
 theme: htx
 
 # Deployment
-## Docs: http://hexo.io/docs/deployment.html
 deploy:
-  type: git
-  repo: git@github.com:heartexlabs/heartexlabs.github.io.git
-  branch: master
+  type: aws-s3
+  region: us-east-1
+  bucket: labelstud.io
+
 
 search:
   path: search.xml
