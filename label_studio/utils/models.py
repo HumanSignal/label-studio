@@ -540,6 +540,7 @@ class MLBackend(object):
         if self.train_job_is_running():
             raise CantStartTrainJobError('Can\'t start new training: Train job is running.')
         train_status = self.is_training(project)
+        print(train_status)
         if train_status['is_training']:
             raise CantStartTrainJobError('Can\'t start new training: Train job is running.')
         response = self.api.train(completions, project)

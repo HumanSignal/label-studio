@@ -30,7 +30,7 @@ class SimpleTextClassifier(LabelStudioMLBase):
 
         if not self.train_output:
             # If there is no trainings, define cold-started the simple TF-IDF text classifier
-            self.model = make_pipeline(TfidfVectorizer(), LogisticRegression())
+            self.reset_model()
             # This is an array of <Choice> labels
             self.labels = self.info['labels']
             # make some dummy initialization
@@ -48,6 +48,9 @@ class SimpleTextClassifier(LabelStudioMLBase):
             print('Loaded from train output with from_name={from_name}, to_name={to_name}, labels={labels}'.format(
                 from_name=self.from_name, to_name=self.to_name, labels=str(self.labels)
             ))
+
+    def reset_model(self):
+        self.model = make_pipeline(TfidfVectorizer(ngram_range=(1, 3)), LogisticRegression(C=10, verbose=True))
 
     def predict(self, tasks, **kwargs):
         # collect input texts
@@ -77,20 +80,34 @@ class SimpleTextClassifier(LabelStudioMLBase):
 
     def fit(self, completions, workdir=None, **kwargs):
         input_texts = []
-        output_labels = []
+        output_labels, output_labels_idx = [], []
         label2idx = {l: i for i, l in enumerate(self.labels)}
         for completion in completions:
             # get input text from task data
+
+            if completion['completions'][0].get('skipped'):
+                continue
+
             input_text = completion['data'][self.value]
+            input_texts.append(input_text)
 
             # get an annotation
             output_label = completion['completions'][0]['result'][0]['value']['choices'][0]
+            output_labels.append(output_label)
             output_label_idx = label2idx[output_label]
-            input_texts.append(input_text)
-            output_labels.append(output_label_idx)
+            output_labels_idx.append(output_label_idx)
+
+        new_labels = set(output_labels)
+        added_labels = new_labels - set(self.labels)
+        if len(added_labels) > 0:
+            print('Label set has been changed. Added ones: ' + str(list(added_labels)))
+            self.labels = list(sorted(new_labels))
+            label2idx = {l: i for i, l in enumerate(self.labels)}
+            output_labels_idx = [label2idx[label] for label in output_labels]
 
         # train the model
-        self.model.fit(input_texts, output_labels)
+        self.reset_model()
+        self.model.fit(input_texts, output_labels_idx)
 
         # save output resources
         model_file = os.path.join(workdir, 'model.pkl')

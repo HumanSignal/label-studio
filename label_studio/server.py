@@ -7,6 +7,7 @@ import flask
 import pandas as pd
 import logging
 import logging.config
+import random
 
 try:
     import ujson as json
@@ -697,6 +698,27 @@ def api_train():
             project.analytics.send(getframeinfo(currentframe()).function, error=400, training_started=training_started)
             return make_response(
                 jsonify('Training is not started: seems that you don\'t have any ML backend connected'), 400)
+    else:
+        project.analytics.send(getframeinfo(currentframe()).function, error=400)
+        return make_response(jsonify("No ML backend"), 400)
+
+
+@app.route('/api/predictions', methods=['POST'])
+@exception_treatment
+def api_predictions():
+    """Send creating predictions signal to ML backend"""
+    project = project_get_or_create()
+    if project.ml_backends_connected:
+        # get tasks ids without predictions
+        tasks_with_predictions = []
+        for i in project.tasks.keys():
+            task_pred = project.make_predictions(project.tasks[i])
+            tasks_with_predictions.append(task_pred)
+
+        with open(project.config['input_path'], mode='w') as fout:
+            json.dump(tasks_with_predictions, fout, ensure_ascii=False, indent=2)
+
+        return make_response(jsonify({'details': 'Predictions done.'}), 200)
     else:
         project.analytics.send(getframeinfo(currentframe()).function, error=400)
         return make_response(jsonify("No ML backend"), 400)

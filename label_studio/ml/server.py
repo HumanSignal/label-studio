@@ -47,6 +47,8 @@ def create_dir(args):
     output_dir = os.path.join(args.root_dir, args.project_name)
     if os.path.exists(output_dir) and args.force:
         shutil.rmtree(output_dir)
+    elif os.path.exists(output_dir):
+        raise FileExistsError('Model directory already exists. Please remove it or use --force option.')
 
     default_configs_dir = find_dir('default_configs')
     shutil.copytree(default_configs_dir, output_dir)
@@ -57,6 +59,9 @@ def create_dir(args):
         script_path = 'model.py'
     else:
         script_path = args.script
+
+    if not os.path.exists(script_path):
+        raise FileNotFoundError(script_path)
 
     if ':' not in script_path:
         model_classes = get_all_classes_inherited_LabelStudioMLBase(script_path)

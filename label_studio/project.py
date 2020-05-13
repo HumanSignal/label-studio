@@ -183,7 +183,7 @@ class Project(object):
 
     def update_params(self, params):
         if 'ml_backend' in params:
-            ml_backend_params = self._create_ml_backend_params(params['ml_backend'])
+            ml_backend_params = self._create_ml_backend_params(params['ml_backend'], self.name)
             self.add_ml_backend(ml_backend_params)
             self.config['ml_backends'].append(ml_backend_params)
             self._save_config()
@@ -539,11 +539,12 @@ class Project(object):
         raise RuntimeError('Can\'t load tasks for input format={}'.format(args.input_format))
 
     @classmethod
-    def _create_ml_backend_params(cls, url):
+    def _create_ml_backend_params(cls, url, project_name=None):
         if '=http' in url:
             name, url = url.split('=', 1)
         else:
-            name = str(uuid4())[:8]
+            project_name = os.path.basename(project_name or '')
+            name = project_name + str(uuid4())[:4]
         if not is_url(url):
             raise ValueError('Specified string "' + url + '" doesn\'t look like URL.')
         return {'url': url, 'name': name}
@@ -625,7 +626,7 @@ class Project(object):
             config['ml_backends'] = []
         if args.ml_backends:
             for url in args.ml_backends:
-                config['ml_backends'].append(cls._create_ml_backend_params(url))
+                config['ml_backends'].append(cls._create_ml_backend_params(url, project_name))
 
         if args.sampling:
             config['sampling'] = args.sampling
