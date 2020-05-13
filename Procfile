@@ -1,0 +1,1 @@
+web: label-studio start my_project --init --no-browser --port $PORT --host 0.0.0.0
