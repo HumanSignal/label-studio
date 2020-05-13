@@ -14,4 +14,4 @@ EXPOSE ${PORT}
 COPY . /label-studio
 
 RUN pip install -e .
-CMD ["label-studio", "start", "my_project", "--init", "--no-browser", "--port", "8080"]
+CMD ["label-studio", "start", "my_project", "--init", "--no-browser", "--port", "8080", "--host", "0.0.0.0"]
