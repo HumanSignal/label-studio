@@ -1,6 +1,5 @@
 build:
   docker:
     web: Dockerfile
-
 run:
-  web: "/app/scripts/run-demo.sh image_bbox"
+  web: ./tools/run.sh
