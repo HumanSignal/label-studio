@@ -543,17 +543,22 @@ def api_all_task_ids():
     return make_response(jsonify(ids), 200)
 
 
-@app.route('/api/tasks/<task_id>/', methods=['GET'])
+@app.route('/api/tasks/<task_id>/', methods=['GET', 'DELETE'])
 @exception_treatment
 def api_tasks(task_id):
     """ Get task by id
     """
     # try to get task with completions first
     project = project_get_or_create()
-    task_data = project.get_task_with_completions(task_id)
-    task_data = project.get_task(task_id) if task_data is None else task_data
-    project.analytics.send(getframeinfo(currentframe()).function)
-    return make_response(jsonify(task_data), 200)
+    if request.method == 'GET':
+        task_data = project.get_task_with_completions(task_id)
+        task_data = project.get_task(task_id) if task_data is None else task_data
+        project.analytics.send(getframeinfo(currentframe()).function)
+        return make_response(jsonify(task_data), 200)
+    elif request.method == 'DELETE':
+        project.remove_task(task_id)
+        project.analytics.send(getframeinfo(currentframe()).function)
+        return make_response(jsonify('Task deleted.'), 204)
 
 
 @app.route('/api/tasks/delete', methods=['DELETE'])

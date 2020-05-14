@@ -304,6 +304,10 @@ class Project(object):
         """
         return self.tasks
 
+    def _save_tasks(self):
+        with open(self.config['input_path'], mode='w') as fout:
+            json.dump(self.tasks, fout, ensure_ascii=False, indent=2)
+
     def delete_tasks(self):
         """
         Deletes all tasks & completions from filesystem, then reloads clean project
@@ -356,6 +360,12 @@ class Project(object):
         except ValueError:
             return None
         return self.tasks.get(task_id)
+
+    def remove_task(self, task_id):
+        if isinstance(task_id, str):
+            task_id = int(task_id)
+        self.tasks.pop(task_id, None)
+        self._save_tasks()
 
     def iter_completions(self):
         root_dir = self.config['output_dir']
