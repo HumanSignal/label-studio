@@ -205,6 +205,22 @@ Label Studio for Teams is our enterprise edition (cloud & on-prem), that include
 | [label-studio-converter](https://github.com/heartexlabs/label-studio-converter) | Encode labels into the format of your favorite machine learning library | 
 | [label-studio-transformers](https://github.com/heartexlabs/label-studio-transformers) | Transformers library connected and configured for use with label studio | 
 
+## Citation
+
+```tex
+@misc{Label Studio,
+  title={{Label Studio}: A Swiss Army Knife of Data Labeling and Annotation Tools},
+  url={https://github.com/heartexlabs/label-studio},
+  note={Open source software available from https://github.com/heartexlabs/label-studio},
+  author={
+    Maxim Tkachenko and
+    Mikhail Malyuk and
+    Nikita Shevchenko and
+    Nikolai Liubimov},
+  year={2020},
+}
+```
+
 ## License
 
 This software is licensed under the [Apache 2.0 LICENSE](/LICENSE) © [Heartex](https://www.heartex.ai/). 2020
