@@ -1,6 +1,6 @@
 {
   "title": "Label Studio",
-  "host": "localhost",
+  "host": "0.0.0.0",
   "port": 8080,
   "debug": false,
   "label_config": null,
