@@ -7,9 +7,10 @@ order: 906
 You can easily connect your favorite machine learning framework with Label Studio by using [Heartex SDK](https://github.com/heartexlabs/pyheartex). 
 
 That gives you the opportunities to use:
-- **Pre-labeling**: Use model predictions for pre-labeling
+- **Pre-labeling**: Use model predictions for pre-labeling (e.g. make use on-the-fly model predictions for creating rough image segmentations for further manual refinements)
+- **Autolabeling**: Create automatic annotations
 - **Online Learning**: Simultaneously update (retrain) your model while new annotations are coming
-- **Active Learning**: Perform labeling in active learning mode
+- **Active Learning**: Perform labeling in active learning mode - select only most complex examples
 - **Prediction Service**: Instantly create running production-ready prediction service
 
 

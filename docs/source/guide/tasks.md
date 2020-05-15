@@ -78,6 +78,7 @@ Here is an example of a config and tasks list composed of one element, for text 
         "choices": ["Neutral"]
       }
     }],
+  # score is used for active learning sampling mode
     "score": 0.95
   }]
 }]
@@ -184,3 +185,23 @@ Use API to import tasks in [Label Studio basic format](tasks.html#Basic-format) 
 curl -X POST -H Content-Type:application/json http://localhost:8080/api/import \
 --data "[{\"my_key\": \"my_value_1\"}, {\"my_key\": \"my_value_2\"}]"
 ```
+
+## Sampling
+
+You can define the way of how your imported tasks are exposed to annotators. Several options are available. To enable one of them, specify `--sampling=<option>` as command line option.
+
+#### sequential
+
+Tasks are ordered ascending by their `"id"` fields. This is default mode.
+
+#### uniform
+
+Tasks are sampled with equal probabilities.
+
+#### prediction-score-min
+
+Task with minimum average prediction score is taken. When this option is set, `task["predictions"]` list should be presented along with `"score"` field within each prediction.
+
+#### prediction-score-max
+
+Task with maximum average prediction score is taken. When this option is set, `task["predictions"]` list should be presented along with `"score"` field within each prediction.

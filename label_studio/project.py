@@ -335,15 +335,21 @@ class Project(object):
     def next_task(self, completed_tasks_ids):
         completed_tasks_ids = set(completed_tasks_ids)
         sampling = self.config.get('sampling', 'sequential')
+
+        # Tasks are ordered ascending by their "id" fields. This is default mode.
         if sampling == 'sequential':
             actual_tasks = (self.tasks[task_id] for task_id in self.tasks if task_id not in completed_tasks_ids)
             return next(actual_tasks, None)
+
+        # Tasks are sampled with equal probabilities
         elif sampling == 'uniform':
             actual_tasks_ids = [task_id for task_id in self.tasks if task_id not in completed_tasks_ids]
             if not actual_tasks_ids:
                 return None
             random.shuffle(actual_tasks_ids)
             return self.tasks[actual_tasks_ids[0]]
+
+        # Task with minimum / maximum average prediction score is taken
         elif sampling.startswith('prediction-score'):
             id_score_map = {}
             for task_id, task in self.tasks.items():
