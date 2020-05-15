@@ -714,13 +714,12 @@ def api_predictions():
     project = project_get_or_create()
     if project.ml_backends_connected:
         # get tasks ids without predictions
-        tasks_with_predictions = []
+        tasks_with_predictions = {}
         for i in project.tasks.keys():
             task_pred = project.make_predictions(project.tasks[i])
-            tasks_with_predictions.append(task_pred)
-
-        with open(project.config['input_path'], mode='w') as fout:
-            json.dump(tasks_with_predictions, fout, ensure_ascii=False, indent=2)
+            tasks_with_predictions[task_pred['id']] = task_pred
+        project.tasks = tasks_with_predictions
+        project._save_tasks()
 
         return make_response(jsonify({'details': 'Predictions done.'}), 200)
     else:

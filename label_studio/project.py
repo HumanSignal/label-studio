@@ -66,7 +66,12 @@ class Project(object):
         if len(tasks) == 0:
             logger.warning('No tasks loaded from ' + self.config['input_path'])
             return
-        for task_id, task in tasks.items():
+        if isinstance(tasks, dict):
+            tasks_iter = tasks.items()
+        elif isinstance(tasks, list):
+            tasks_iter = ((task['id'], task) for task in tasks)
+
+        for task_id, task in tasks_iter:
             self.tasks[int(task_id)] = task
             data_keys = set(task['data'].keys())
             if not self.derived_input_schema:
@@ -339,6 +344,23 @@ class Project(object):
                 return None
             random.shuffle(actual_tasks_ids)
             return self.tasks[actual_tasks_ids[0]]
+        elif sampling.startswith('prediction-score'):
+            id_score_map = {}
+            for task_id, task in self.tasks.items():
+                if task_id in completed_tasks_ids:
+                    continue
+                if 'predictions' in task and len(task['predictions']) > 0:
+                    score = sum((p['score'] for p in task['predictions']), 0) / len(task['predictions'])
+                    id_score_map[task_id] = score
+            if not id_score_map:
+                return None
+            if sampling.endswith('-min'):
+                best_idx = min(id_score_map, key=id_score_map.get)
+            elif sampling.endswith('-max'):
+                best_idx = max(id_score_map, key=id_score_map.get)
+            else:
+                raise NotImplementedError('Unknown sampling method ' + sampling)
+            return self.tasks[best_idx]
         else:
             raise NotImplementedError('Unknown sampling method ' + sampling)
 
