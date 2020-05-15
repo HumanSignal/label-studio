@@ -394,6 +394,7 @@ class Project(object):
             task_id = int(task_id)
         self.tasks.pop(task_id, None)
         self._save_tasks()
+        self.delete_completion(task_id)
 
     def iter_completions(self):
         root_dir = self.config['output_dir']
