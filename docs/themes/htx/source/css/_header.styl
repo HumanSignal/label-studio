@@ -12,14 +12,17 @@ red-dot-before(leftPos = -8px)
 
 #header
   background-color: #fff
-  height: $header-height
-  padding: $heading-padding-vertical 20px $heading-padding-vertical 40px;
   position: relative
-  z-index: 100
+  box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 3px 0px
+  z-index: 99999
+  
+.header {
+  padding: $heading-padding-vertical 20px $heading-padding-vertical 40px;
   display: flex
   align-items: center
   justify-content: space-between
-
+  height: $header-height
+}
 body.docs
   #header
     position: fixed

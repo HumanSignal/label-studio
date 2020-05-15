@@ -45,6 +45,25 @@
     <%- css(isIndex ? 'css/index' : 'css/page') %>
     <%- css('css/search') %>
 
+      <style>
+       /* Style the header */
+       .header {
+           
+       }
+
+       /* The sticky class is added to the header with JS when it reaches its scroll position */
+       .sticky {
+           position: fixed !important;
+           top: 0;
+           width: 100%
+       }
+
+       /* Add some top padding to the page content to prevent sudden quick movement (as the header gets a new position at the top of the page (position:fixed and top:0) */
+       .sticky + .content {
+           padding-top: 102px;
+       }
+      </style>
+      
     <% if (page.type === "playground") { %>
       <%- css('css/codemirror') %>
       <script src="<%- url_for("/js/jquery.min.js") %>"></script>
@@ -73,5 +92,23 @@
     <script src="<%- url_for("/js/css.escape.js") %>"></script>
     <script src="<%- url_for("/js/common.js") %>"></script>
     <%- partial('partials/google_analytics') %>
+    <script>
+     window.onscroll = function() {myFunction()};
+
+     // Get the header
+     var header = document.getElementById("header");
+
+     // Get the offset position of the navbar
+     var sticky = header.offsetTop;
+
+     // Add the sticky class to the header when you reach its scroll position. Remove "sticky" when you leave the scroll position
+     function myFunction() {
+         if (window.pageYOffset > sticky) {
+             header.classList.add("sticky");
+         } else {
+             header.classList.remove("sticky");
+         }
+     }
+    </script>
   </body>
 </html>

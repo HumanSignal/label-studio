@@ -1,11 +1,16 @@
 <div id="header">
+  <div class="header">
   <a id="logo" href="<%- url_for("/") %>">
+    <!-- <img src="<%- url_for("/images/opossum/heartex_icon_opossum_green.svg") %>" alt="label studio logo" -->
+    <!--                  height="180"/> -->
+
     <img src="<%- url_for("/images/ls_logo.png") %>" alt="label studio logo" />
     <span style="font-size: 1.2em;">Label Studio</span>
   </a>
   <ul id="nav" style="display: flex; align-items: center">
     <%- partial('partials/main_menu', { context: 'nav' }) %>
   </ul>
+  </div>
 </div>
 
 
