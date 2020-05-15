@@ -7,7 +7,6 @@ import flask
 import pandas as pd
 import logging
 import logging.config
-import random
 
 try:
     import ujson as json
@@ -27,7 +26,7 @@ from flask_api import status
 from types import SimpleNamespace
 
 from label_studio.utils.functions import generate_sample_task
-from label_studio.utils.io import find_dir, find_file, find_editor_files
+from label_studio.utils.io import find_dir, find_editor_files
 from label_studio.utils import uploader
 from label_studio.utils.validation import TaskValidator
 from label_studio.utils.exceptions import ValidationError
@@ -730,9 +729,14 @@ def api_predictions():
 
 
 @app.route('/data/<path:filename>')
+@exception_treatment
 def get_data_file(filename):
     """ External resource serving
     """
+    project = project_get_or_create()
+    if not project.config.get('allow_serving_local_files'):
+        raise FileNotFoundError('Serving local files is not allowed. '
+                                'Use "allow_serving_local_files": true config option to enable local serving')
     directory = request.args.get('d')
     return flask.send_from_directory(directory, filename, as_attachment=True)
 

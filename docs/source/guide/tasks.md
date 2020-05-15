@@ -146,13 +146,15 @@ You can split your input data into several plain text files, and specify the dir
 ### Directory with image files
 
 ```bash
-label-studio init --input-path=dir/with/images --input-format=image-dir --label-config=config.xml
+label-studio init --input-path=dir/with/images --input-format=image-dir --label-config=config.xml --allow-serving-local-files
 ```
+
+> WARNING: "--allow-serving-local-files" is intended to use only for locally running instances: avoid using it for remote servers unless you are sure what you're doing.
 
 You can point to a local directory, which is scanned recursively for image files. Each file is used to create one task. Since Label Studio works only with URLs, a web link is created for each task, pointing to your local directory as follows:
 
 ```
-http://<host:port>/static/filename?d=<path/to/the/local/directory>
+http://<host:port>/data/filename?d=<path/to/the/local/directory>
 ```
 
 Supported formats are: `.png` `.jpg` `.jpeg` `.tiff` `.bmp` `.gif`
@@ -160,13 +162,15 @@ Supported formats are: `.png` `.jpg` `.jpeg` `.tiff` `.bmp` `.gif`
 ### Directory with audio files
 
 ```bash
-label-studio init --input-path=my/audios/dir --input-format=audio-dir --label-config=config.xml
+label-studio init --input-path=my/audios/dir --input-format=audio-dir --label-config=config.xml --allow-serving-local-files
 ```
+
+> WARNING: "--allow-serving-local-files" is intended to use only for locally running instances: avoid using it for remote servers unless you are sure what you're doing.
 
 You can point to a local directory, which is scanned recursively for audio files. Each file is used to create one task. Since Label Studio works only with URLs, a web link is created for each task, pointing to your local directory as follows:
 
 ```
-http://<host:port>/static/filename?d=<path/to/the/local/directory>
+http://<host:port>/data/filename?d=<path/to/the/local/directory>
 ```
 
 Supported formats are: `.wav` `.aiff` `.mp3` `.au` `.flac`

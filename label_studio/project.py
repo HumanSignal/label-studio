@@ -644,6 +644,8 @@ class Project(object):
             config['port'] = args.port
         if args.host:
             config['host'] = args.host
+        if args.allow_serving_local_files:
+            config['allow_serving_local_files'] = True
 
         # create config.json
         config_json = 'config.json'
