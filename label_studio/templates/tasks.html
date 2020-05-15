@@ -70,7 +70,7 @@
               {% endif %}
             </td>
           <td class="text-center">
-            <i data-task-id="{{ id }}" id="remove-task-button" class="fas fa-trash-alt trash"></i>
+            <i data-task-id="{{ id }}" class="fas fa-trash-alt trash remove-task"></i>
           </td>
           </tr>
         {% endfor %}
@@ -94,18 +94,19 @@
       })
     });
 
-    document.getElementById("remove-task-button").onclick = function (e) {
-      const confirmed = confirm('Are you sure to delete the task?');
-      if (confirmed) {
-        var id = e.target.dataset.taskId;
-        let request = new XMLHttpRequest();
-        request.open("DELETE", "api/tasks/" + id + "/");
-        request.onload = function () {
-          location.reload();
-        };
-        request.send(null);
-      }
-    };
+    document.querySelectorAll(".remove-task").forEach(function (test) {
+      test.addEventListener("click", function (e){
+        const confirmed = confirm('Are you sure to delete the task?');
+        if (confirmed) {
+          var id = e.target.dataset.taskId;
+          let request = new XMLHttpRequest();
+          request.open("DELETE", "api/tasks/" + id + "/");
+          request.onload = function () {
+            location.reload();
+          };
+          request.send(null);
+        }})
+    });
 
     document.getElementById("clear-tasks-button").onclick = function (e) {
       const deletion_confirmed = confirm(

@@ -68,6 +68,10 @@ th {
     cursor: pointer;
 }
 
+.remove-task {
+    cursor: pointer;
+}
+
 .upper-right {
     position:absolute;
     top: 5px;
