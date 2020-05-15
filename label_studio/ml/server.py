@@ -51,7 +51,7 @@ def create_dir(args):
         raise FileExistsError('Model directory already exists. Please remove it or use --force option.')
 
     default_configs_dir = find_dir('default_configs')
-    shutil.copytree(default_configs_dir, output_dir)
+    shutil.copytree(default_configs_dir, output_dir, ignore=shutil.ignore_patterns('*.tmpl'))
 
     # extract script name and model class
     if not args.script:
@@ -78,14 +78,15 @@ def create_dir(args):
     local_script_path = os.path.join(output_dir, os.path.basename(script_path))
     shutil.copy2(script_path, local_script_path)
 
-    wsgi_script_file = os.path.join(output_dir, '_wsgi.py.tmpl')
+    wsgi_script_file = os.path.join(default_configs_dir, '_wsgi.py.tmpl')
     with open(wsgi_script_file) as f:
         wsgi_script = f.read()
     wsgi_script = wsgi_script.format(
         script=os.path.splitext(script_base_name)[0],
         model_class=model_class
     )
-    with open(wsgi_script_file.split('.tmpl')[0], mode='w') as fout:
+    wsgi_name = os.path.basename(wsgi_script_file).split('.tmpl', 1)[0]
+    with open(os.path.join(output_dir, wsgi_name), mode='w') as fout:
         fout.write(wsgi_script)
 
 

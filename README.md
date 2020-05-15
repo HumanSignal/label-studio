@@ -61,6 +61,14 @@ pip install lxml‑4.5.0‑cp38‑cp38‑win_amd64.whl
 pip install label-studio
 ```
 
+#### Install from Anaconda
+
+```bash
+conda create --name label-studio python=3.8
+conda activate label-studio
+pip install label-studio
+```
+
 #### Local development
 Running the latest Label Studio version locally without installing package from pip could be done by:
 ```bash
