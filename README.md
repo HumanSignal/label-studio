@@ -69,6 +69,12 @@ conda activate label-studio
 pip install label-studio
 ```
 
+If you see any errors during installation, try to rerun installation
+
+```bash
+pip install --ignore-installed label-studio
+```
+
 #### Local development
 Running the latest Label Studio version locally without installing package from pip could be done by:
 ```bash
