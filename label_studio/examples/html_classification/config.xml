@@ -1,0 +1,17 @@
+<!-- {"title": "Web page classification", "category": "html", "complexity": "basic", "order": "!"} -->
+<View>
+  <Choices name="toxicity" toName="web_page" choice="multiple" showInline="true">
+    <Choice value="Toxic" background="red"/>
+    <Choice value="Severe Toxic" background="brown"/>
+    <Choice value="Obsene" background="green"/>
+    <Choice value="Threat" background="blue"/>
+    <Choice value="Insult" background="orange"/>
+    <Choice value="Identity Hate" background="grey"/>
+  </Choices>
+
+  <View style="border: 1px solid #CCC;
+               border-radius: 10px;
+               padding: 5px">
+    <HyperText name="web_page" value="$text"/>
+  </View>
+</View>

@@ -78,6 +78,7 @@ Here is an example of a config and tasks list composed of one element, for text 
         "choices": ["Neutral"]
       }
     }],
+  # score is used for active learning sampling mode
     "score": 0.95
   }]
 }]
@@ -146,13 +147,15 @@ You can split your input data into several plain text files, and specify the dir
 ### Directory with image files
 
 ```bash
-label-studio init --input-path=dir/with/images --input-format=image-dir --label-config=config.xml
+label-studio init --input-path=dir/with/images --input-format=image-dir --label-config=config.xml --allow-serving-local-files
 ```
+
+> WARNING: "--allow-serving-local-files" is intended to use only for locally running instances: avoid using it for remote servers unless you are sure what you're doing.
 
 You can point to a local directory, which is scanned recursively for image files. Each file is used to create one task. Since Label Studio works only with URLs, a web link is created for each task, pointing to your local directory as follows:
 
 ```
-http://<host:port>/static/filename?d=<path/to/the/local/directory>
+http://<host:port>/data/filename?d=<path/to/the/local/directory>
 ```
 
 Supported formats are: `.png` `.jpg` `.jpeg` `.tiff` `.bmp` `.gif`
@@ -160,13 +163,15 @@ Supported formats are: `.png` `.jpg` `.jpeg` `.tiff` `.bmp` `.gif`
 ### Directory with audio files
 
 ```bash
-label-studio init --input-path=my/audios/dir --input-format=audio-dir --label-config=config.xml
+label-studio init --input-path=my/audios/dir --input-format=audio-dir --label-config=config.xml --allow-serving-local-files
 ```
+
+> WARNING: "--allow-serving-local-files" is intended to use only for locally running instances: avoid using it for remote servers unless you are sure what you're doing.
 
 You can point to a local directory, which is scanned recursively for audio files. Each file is used to create one task. Since Label Studio works only with URLs, a web link is created for each task, pointing to your local directory as follows:
 
 ```
-http://<host:port>/static/filename?d=<path/to/the/local/directory>
+http://<host:port>/data/filename?d=<path/to/the/local/directory>
 ```
 
 Supported formats are: `.wav` `.aiff` `.mp3` `.au` `.flac`
@@ -180,3 +185,23 @@ Use API to import tasks in [Label Studio basic format](tasks.html#Basic-format) 
 curl -X POST -H Content-Type:application/json http://localhost:8080/api/import \
 --data "[{\"my_key\": \"my_value_1\"}, {\"my_key\": \"my_value_2\"}]"
 ```
+
+## Sampling
+
+You can define the way of how your imported tasks are exposed to annotators. Several options are available. To enable one of them, specify `--sampling=<option>` as command line option.
+
+#### sequential
+
+Tasks are ordered ascending by their `"id"` fields. This is default mode.
+
+#### uniform
+
+Tasks are sampled with equal probabilities.
+
+#### prediction-score-min
+
+Task with minimum average prediction score is taken. When this option is set, `task["predictions"]` list should be presented along with `"score"` field within each prediction.
+
+#### prediction-score-max
+
+Task with maximum average prediction score is taken. When this option is set, `task["predictions"]` list should be presented along with `"score"` field within each prediction.

@@ -71,6 +71,9 @@
         <!-- Start train -->
           <div class="row centered aligned">
             <div class="ui positive big button" onclick="start_train()">Start Training</div>
+            {% if project.config['enable_predictions_button'] %}
+              <div class="ui positive big button" onclick="start_predictions()">Start Predictions</div>
+            {% endif %}
           </div>
       {% endif %}
 
@@ -256,6 +259,19 @@
             }
           })
       }
+
+      function start_predictions() {
+          $.ajax({
+            url: "api/predictions",
+            method: 'POST',
+            error: function(xhr, textStatus, thrownError) {
+              alert(message_from_error(xhr));
+            }
+          });
+          location.reload();
+          return false;
+      }
+
       function remove_ml_backend(name) {
           console.log(name);
           const confirmed = confirm('You are going to delete ml backend.\nWarning! this operation cannot be undone.\nPlease confirm your action.');

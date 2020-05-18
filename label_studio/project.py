@@ -66,7 +66,12 @@ class Project(object):
         if len(tasks) == 0:
             logger.warning('No tasks loaded from ' + self.config['input_path'])
             return
-        for task_id, task in tasks.items():
+        if isinstance(tasks, dict):
+            tasks_iter = tasks.items()
+        elif isinstance(tasks, list):
+            tasks_iter = ((task['id'], task) for task in tasks)
+
+        for task_id, task in tasks_iter:
             self.tasks[int(task_id)] = task
             data_keys = set(task['data'].keys())
             if not self.derived_input_schema:
@@ -183,7 +188,7 @@ class Project(object):
 
     def update_params(self, params):
         if 'ml_backend' in params:
-            ml_backend_params = self._create_ml_backend_params(params['ml_backend'])
+            ml_backend_params = self._create_ml_backend_params(params['ml_backend'], self.name)
             self.add_ml_backend(ml_backend_params)
             self.config['ml_backends'].append(ml_backend_params)
             self._save_config()
@@ -304,6 +309,10 @@ class Project(object):
         """
         return self.tasks
 
+    def _save_tasks(self):
+        with open(self.config['input_path'], mode='w') as fout:
+            json.dump(self.tasks, fout, ensure_ascii=False, indent=2)
+
     def delete_tasks(self):
         """
         Deletes all tasks & completions from filesystem, then reloads clean project
@@ -326,15 +335,38 @@ class Project(object):
     def next_task(self, completed_tasks_ids):
         completed_tasks_ids = set(completed_tasks_ids)
         sampling = self.config.get('sampling', 'sequential')
+
+        # Tasks are ordered ascending by their "id" fields. This is default mode.
         if sampling == 'sequential':
             actual_tasks = (self.tasks[task_id] for task_id in self.tasks if task_id not in completed_tasks_ids)
             return next(actual_tasks, None)
+
+        # Tasks are sampled with equal probabilities
         elif sampling == 'uniform':
             actual_tasks_ids = [task_id for task_id in self.tasks if task_id not in completed_tasks_ids]
             if not actual_tasks_ids:
                 return None
             random.shuffle(actual_tasks_ids)
             return self.tasks[actual_tasks_ids[0]]
+
+        # Task with minimum / maximum average prediction score is taken
+        elif sampling.startswith('prediction-score'):
+            id_score_map = {}
+            for task_id, task in self.tasks.items():
+                if task_id in completed_tasks_ids:
+                    continue
+                if 'predictions' in task and len(task['predictions']) > 0:
+                    score = sum((p['score'] for p in task['predictions']), 0) / len(task['predictions'])
+                    id_score_map[task_id] = score
+            if not id_score_map:
+                return None
+            if sampling.endswith('-min'):
+                best_idx = min(id_score_map, key=id_score_map.get)
+            elif sampling.endswith('-max'):
+                best_idx = max(id_score_map, key=id_score_map.get)
+            else:
+                raise NotImplementedError('Unknown sampling method ' + sampling)
+            return self.tasks[best_idx]
         else:
             raise NotImplementedError('Unknown sampling method ' + sampling)
 
@@ -356,6 +388,13 @@ class Project(object):
         except ValueError:
             return None
         return self.tasks.get(task_id)
+
+    def remove_task(self, task_id):
+        if isinstance(task_id, str):
+            task_id = int(task_id)
+        self.tasks.pop(task_id, None)
+        self._save_tasks()
+        self.delete_completion(task_id)
 
     def iter_completions(self):
         root_dir = self.config['output_dir']
@@ -539,11 +578,12 @@ class Project(object):
         raise RuntimeError('Can\'t load tasks for input format={}'.format(args.input_format))
 
     @classmethod
-    def _create_ml_backend_params(cls, url):
+    def _create_ml_backend_params(cls, url, project_name=None):
         if '=http' in url:
             name, url = url.split('=', 1)
         else:
-            name = str(uuid4())[:8]
+            project_name = os.path.basename(project_name or '')
+            name = project_name + str(uuid4())[:4]
         if not is_url(url):
             raise ValueError('Specified string "' + url + '" doesn\'t look like URL.')
         return {'url': url, 'name': name}
@@ -625,7 +665,7 @@ class Project(object):
             config['ml_backends'] = []
         if args.ml_backends:
             for url in args.ml_backends:
-                config['ml_backends'].append(cls._create_ml_backend_params(url))
+                config['ml_backends'].append(cls._create_ml_backend_params(url, project_name))
 
         if args.sampling:
             config['sampling'] = args.sampling
@@ -633,6 +673,8 @@ class Project(object):
             config['port'] = args.port
         if args.host:
             config['host'] = args.host
+        if args.allow_serving_local_files:
+            config['allow_serving_local_files'] = True
 
         # create config.json
         config_json = 'config.json'

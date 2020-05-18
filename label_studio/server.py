@@ -26,7 +26,7 @@ from flask_api import status
 from types import SimpleNamespace
 
 from label_studio.utils.functions import generate_sample_task
-from label_studio.utils.io import find_dir, find_file, find_editor_files
+from label_studio.utils.io import find_dir, find_editor_files
 from label_studio.utils import uploader
 from label_studio.utils.validation import TaskValidator
 from label_studio.utils.exceptions import ValidationError
@@ -542,17 +542,22 @@ def api_all_task_ids():
     return make_response(jsonify(ids), 200)
 
 
-@app.route('/api/tasks/<task_id>/', methods=['GET'])
+@app.route('/api/tasks/<task_id>/', methods=['GET', 'DELETE'])
 @exception_treatment
 def api_tasks(task_id):
     """ Get task by id
     """
     # try to get task with completions first
     project = project_get_or_create()
-    task_data = project.get_task_with_completions(task_id)
-    task_data = project.get_task(task_id) if task_data is None else task_data
-    project.analytics.send(getframeinfo(currentframe()).function)
-    return make_response(jsonify(task_data), 200)
+    if request.method == 'GET':
+        task_data = project.get_task_with_completions(task_id)
+        task_data = project.get_task(task_id) if task_data is None else task_data
+        project.analytics.send(getframeinfo(currentframe()).function)
+        return make_response(jsonify(task_data), 200)
+    elif request.method == 'DELETE':
+        project.remove_task(task_id)
+        project.analytics.send(getframeinfo(currentframe()).function)
+        return make_response(jsonify('Task deleted.'), 204)
 
 
 @app.route('/api/tasks/delete', methods=['DELETE'])
@@ -702,10 +707,35 @@ def api_train():
         return make_response(jsonify("No ML backend"), 400)
 
 
+@app.route('/api/predictions', methods=['POST'])
+@exception_treatment
+def api_predictions():
+    """Send creating predictions signal to ML backend"""
+    project = project_get_or_create()
+    if project.ml_backends_connected:
+        # get tasks ids without predictions
+        tasks_with_predictions = {}
+        for i in project.tasks.keys():
+            task_pred = project.make_predictions(project.tasks[i])
+            tasks_with_predictions[task_pred['id']] = task_pred
+        project.tasks = tasks_with_predictions
+        project._save_tasks()
+
+        return make_response(jsonify({'details': 'Predictions done.'}), 200)
+    else:
+        project.analytics.send(getframeinfo(currentframe()).function, error=400)
+        return make_response(jsonify("No ML backend"), 400)
+
+
 @app.route('/data/<path:filename>')
+@exception_treatment
 def get_data_file(filename):
     """ External resource serving
     """
+    project = project_get_or_create()
+    if not project.config.get('allow_serving_local_files'):
+        raise FileNotFoundError('Serving local files is not allowed. '
+                                'Use "allow_serving_local_files": true config option to enable local serving')
     directory = request.args.get('d')
     return flask.send_from_directory(directory, filename, as_attachment=True)
 
@@ -769,7 +799,7 @@ def main():
 
     # On `start-multi-session` command, server creates one project per each browser sessions
     elif input_args.command == 'start-multi-session':
-        app.run(host=input_args.host, port=input_args.port, debug=input_args.debug)
+        app.run(host=input_args.host or '0.0.0.0', port=input_args.port or 8080, debug=input_args.debug)
 
 
 if __name__ == "__main__":

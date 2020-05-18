@@ -75,6 +75,9 @@ def parse_input_args():
     root_parser.add_argument(
         '-p', '--port', dest='port', type=int,
         help='Server port')
+    root_parser.add_argument(
+        '--allow-serving-local-files', dest='allow_serving_local_files', action='store_true',
+        help='Allow serving local files (Warning! use this option only for your local runs)')
 
     parser = argparse.ArgumentParser(description='Label studio')
 

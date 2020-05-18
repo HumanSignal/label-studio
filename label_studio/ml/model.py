@@ -208,7 +208,7 @@ class LabelStudioMLManager(object):
     @classmethod
     def is_training(cls, project):
         if not cls.has_active_model(project):
-            return False
+            return {'is_training': False}
         m = cls.get(project)
         if cls.without_redis:
             is_training = m.is_training
@@ -271,27 +271,31 @@ class LabelStudioMLManager(object):
         t = time.time()
         m = cls.fetch(project, label_config)
         m.is_training = True
-        train_output = m.model.fit(data_stream, workdir, **train_kwargs)
-        if cls.without_redis:
-            job_id = None
-        else:
-            job_id = get_current_job().id
-        job_result = json.dumps({
-            'status': 'ok',
-            'train_output': train_output,
-            'project': project,
-            'workdir': workdir,
-            'version': version,
-            'job_id': job_id,
-            'time': time.time() - t
-        })
-        if workdir:
-            job_result_file = os.path.join(workdir, 'job_result.json')
-            with open(job_result_file, mode='w') as fout:
-                fout.write(job_result)
-        if not cls.without_redis:
-            cls._redis.rpush(cls._get_job_results_key(project), job_result)
-        m.is_training = False
+        try:
+            train_output = m.model.fit(data_stream, workdir, **train_kwargs)
+            if cls.without_redis:
+                job_id = None
+            else:
+                job_id = get_current_job().id
+            job_result = json.dumps({
+                'status': 'ok',
+                'train_output': train_output,
+                'project': project,
+                'workdir': workdir,
+                'version': version,
+                'job_id': job_id,
+                'time': time.time() - t
+            })
+            if workdir:
+                job_result_file = os.path.join(workdir, 'job_result.json')
+                with open(job_result_file, mode='w') as fout:
+                    fout.write(job_result)
+            if not cls.without_redis:
+                cls._redis.rpush(cls._get_job_results_key(project), job_result)
+        except:
+            raise
+        finally:
+            m.is_training = False
         return job_result
 
     @classmethod

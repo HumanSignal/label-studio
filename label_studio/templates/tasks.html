@@ -43,13 +43,15 @@
         </div>
 
       </div>
+      {% if task_ids|length > 0 %}
       <div class="ui divider hidden"></div>
       <!-- Table -->
       <table>
         <tr>
-          <th>Task ID</th>
+          <th>Task ID </th>
           <th>Completed at</th>
-          <th>Completion</th>
+          <th>Delete completion?</th>
+          <th>Delete task?</th>
         </tr>
 
         {% for id in task_ids %}
@@ -67,13 +69,16 @@
                 <i data-task-id="{{ id }}" class="fas fa-trash-alt trash remove-completion"></i>
               {% endif %}
             </td>
+          <td class="text-center">
+            <i data-task-id="{{ id }}" class="fas fa-trash-alt trash remove-task"></i>
+          </td>
           </tr>
         {% endfor %}
       </table>
+      {% endif %}
       <br/>
-  </div>
+    </center></div>
   <br/><br/>
-  </div>
 
 
   <script>
@@ -87,6 +92,20 @@
         };
         request.send(null);
       })
+    });
+
+    document.querySelectorAll(".remove-task").forEach(function (test) {
+      test.addEventListener("click", function (e){
+        const confirmed = confirm('Are you sure to delete the task?');
+        if (confirmed) {
+          var id = e.target.dataset.taskId;
+          let request = new XMLHttpRequest();
+          request.open("DELETE", "api/tasks/" + id + "/");
+          request.onload = function () {
+            location.reload();
+          };
+          request.send(null);
+        }})
     });
 
     document.getElementById("clear-tasks-button").onclick = function (e) {

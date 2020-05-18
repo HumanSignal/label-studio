@@ -47,9 +47,11 @@ def create_dir(args):
     output_dir = os.path.join(args.root_dir, args.project_name)
     if os.path.exists(output_dir) and args.force:
         shutil.rmtree(output_dir)
+    elif os.path.exists(output_dir):
+        raise FileExistsError('Model directory already exists. Please remove it or use --force option.')
 
     default_configs_dir = find_dir('default_configs')
-    shutil.copytree(default_configs_dir, output_dir)
+    shutil.copytree(default_configs_dir, output_dir, ignore=shutil.ignore_patterns('*.tmpl'))
 
     # extract script name and model class
     if not args.script:
@@ -57,6 +59,9 @@ def create_dir(args):
         script_path = 'model.py'
     else:
         script_path = args.script
+
+    if not os.path.exists(script_path):
+        raise FileNotFoundError(script_path)
 
     if ':' not in script_path:
         model_classes = get_all_classes_inherited_LabelStudioMLBase(script_path)
@@ -73,14 +78,15 @@ def create_dir(args):
     local_script_path = os.path.join(output_dir, os.path.basename(script_path))
     shutil.copy2(script_path, local_script_path)
 
-    wsgi_script_file = os.path.join(output_dir, '_wsgi.py.tmpl')
+    wsgi_script_file = os.path.join(default_configs_dir, '_wsgi.py.tmpl')
     with open(wsgi_script_file) as f:
         wsgi_script = f.read()
     wsgi_script = wsgi_script.format(
         script=os.path.splitext(script_base_name)[0],
         model_class=model_class
     )
-    with open(wsgi_script_file.split('.tmpl')[0], mode='w') as fout:
+    wsgi_name = os.path.basename(wsgi_script_file).split('.tmpl', 1)[0]
+    with open(os.path.join(output_dir, wsgi_name), mode='w') as fout:
         fout.write(wsgi_script)
 
 
