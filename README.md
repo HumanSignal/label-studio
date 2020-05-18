@@ -93,7 +93,7 @@ By default, it starts blank project in `./my_project` directory.
 You can override the default startup command by appending:
 
 ```bash
-docker run -p 8080:8080 -v `pwd`/my_project:/label-studio/my_project --name label-studio heartexlabs/label-studio:latest label-studio start my_project --init --force --template image_mixedlabel
+docker run -p 8080:8080 -v `pwd`/my_project:/label-studio/my_project --name label-studio heartexlabs/label-studio:latest label-studio start my_project --init --force --template text_classification
 ```
 
 If you want to build a local image, run:
@@ -169,36 +169,16 @@ The list of supported use cases for data annotation. Please contribute your own 
 
 ## Machine Learning Integration
 
-You can easily connect your favorite machine learning framework with Label Studio by using [Heartex SDK](https://github.com/heartexlabs/pyheartex). 
+You can easily connect your favorite machine learning framework with Label Studio Machine Learning SDK. It's done in the simple 2 steps:
+1. Start your own ML backend server ([check here for detailed instructions](label_studio/ml/README.md)),
+2. Connect Label Studio to the running ML backend on [/model](http://localhost:8080/model.html) page
 
 That gives you the opportunities to use:
-- **Pre-labeling**: Use model predictions for pre-labeling
+- **Pre-labeling**: Use model predictions for pre-labeling (e.g. make use on-the-fly model predictions for creating rough image segmentations for further manual refinements)
+- **Autolabeling**: Create automatic annotations
 - **Online Learning**: Simultaneously update (retrain) your model while new annotations are coming
-- **Active Learning**: Perform labeling in active learning mode
+- **Active Learning**: Perform labeling in active learning mode - select only most complex examples
 - **Prediction Service**: Instantly create running production-ready prediction service
-
-There is a quick example tutorial on how to do that with simple image classification:
-
-1. Clone pyheartex, and start serving example image classifier ML backend at `http://localhost:9090`
-    ```bash
-    git clone https://github.com/heartexlabs/pyheartex.git
-    cd pyheartex/examples/docker
-    docker-compose up -d
-    ```
-   
-2. Run Label Studio project specifying ML backend URLs:
-
-    ```bash
-    label-studio start imgcls --init --template image_classification \
-    --ml-backend-url http://localhost:9090 --ml-backend-name my_model
-    ```
-    
-Once you're satisfied with pre-labeling results, you can immediately send prediction requests via REST API:
-```bash
-curl -X POST -H 'Content-Type: application/json' -d '{"image_url": "https://go.heartex.net/static/samples/sample.jpg"}' http://localhost:8080/predict
-```
-
-Feel free to play around any other models & frameworks apart from image classifiers! (see instructions [here](https://github.com/heartexlabs/pyheartex#advanced-usage))
 
 ## Label Studio for Teams, Startups, and Enterprises :office:
 
