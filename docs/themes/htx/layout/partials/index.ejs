@@ -1,8 +1,30 @@
 <style>
-  .header-ul {
+ #main-screen {
+     display: flex;
+     justify-content: center;
+     align-items: center;
+ }
+
+ .ms-left {
+     position: relative;
+     padding-top: 60px;
+     padding-bottom: 100px;
+     margin-right: 1.9%;
+     width: 48%;
+ }
+
+ .ms-right {
+     width: 48%; padding: 2em;
+     background: #f6f6f6;
+     border-radius: 10px;
+     padding-top: 1em;
+     max-width: 500px;
+ }
+ 
+ .header-ul {
      font-size: 1.2em;
 
-  }
+ }
  .btn {
      line-height: 1.5;
      position: relative;
@@ -46,7 +68,7 @@
  }
 
  .underline {
-     text-decoration: underline;
+     color: #1890ff;
  }
 
  .btn-orange {
@@ -74,7 +96,7 @@
      background-size: 47.7%;
 
      background-color: #eff0f2;
-     padding-top: 110px;
+     
  }
 
  .quickstart-row {
@@ -97,15 +119,15 @@
      color: #000;
      padding: 20px;
      margin: 0 20px;
-  max-width: 350px;
-  padding: 45px 45px 90px 45px;
-  box-shadow: 0 4px 18px rgba(11,33,74,0.1), 0 -2px 4px rgba(11,33,74,0.03);
+     max-width: 350px;
+     padding: 35px 45px 60px 45px;
+     box-shadow: 0 4px 18px rgba(11,33,74,0.1), 0 -2px 4px rgba(11,33,74,0.03);
  }
 
-  .card h3 {
-  font-size: 24px;
-  }
-  
+ .card h3 {
+     font-size: 24px;
+ }
+ 
  .img-car {
      width: 740px;
      filter: drop-shadow(0 0 10px #999);
@@ -165,7 +187,7 @@
  @media screen and (max-width: 1000px) {
 
      .header-ul {
- padding-left: 0;
+         padding-left: 0;
      }
 
      .quickstart {
@@ -334,6 +356,16 @@
  }
 
  @media screen and (max-width: 900px) {
+     #main-screen {
+         display: block;
+         margin-bottom: 4em;
+     }
+     .ms-left, .ms-right {
+         width: auto;
+         margin-left: 2em;
+         margin-right: 2em;
+         
+     }
      #site_search {
          top: 5px !important;
          margin-right: 5px !important;
@@ -381,8 +413,9 @@
   <div>
     <div id="bodybag" class='content'>
         <section>
-            <div style="display: flex; justify-content: center"> 
-        <div style="position: relative; padding-top: 60px; padding-bottom: 100px;">
+          <div id="main-screen">
+            
+        <div class="ms-left">
           <div style="display: flex; justify-content: center;">
             <div style="display: flex; flex-direction: column; align-items: center;">
               <div class="tagline">
@@ -413,19 +446,29 @@
             </div>
           </div>
         </div>
+
+        <div class="ms-right">
+          <div>
+          <h4>Introducing version 0.6.0 - Nested data labeling</h4>
+          <p>Specify multiple classification options for more accurate labeling decisions.
+            <a href="/blog/release-060-nested-data-labeling.html" class="underline">Read more</a> in our blog.</p>
+          <a href="/blog/release-060-nested-data-labeling.html"><img src="https://labelstud.io/images/release-060/nested_labeling.gif" style="border: 1px solid #ccc;" /></a>
+          </div>
+        </div>
         
         </div>
       </section>
 
         
-      <section class="cards" style="padding-top: 50px; padding-bottom: 50px; background: #eff0f2;">
-        <div class="card" style="text-align: center;">
+      <section class="cards" style="padding-top: 50px; padding-bottom: 50px; background: #eff0f2; display: none;">
+        <div class="card" style="text-align: center; min-width: 150px; padding: 1em;">
           <h3>
             2800+<br/>
             Stargazers</h3></div>
-        <div class="card" style="text-align: center;">
+        <div class="card" style="text-align: center; min-width: 150px; padding: 1em;">
           <h3>10000+<br/>Users</div>
-        <div class="card" style="text-align: center;">
+        <div class="card" style="text-align: center; min-width: 150px; padding: 1em;">
+          <img src="https://www.kindpng.com/picc/m/181-1817035_fork-branching-github-computer-icons-free-transparent-github.png" height="100" />
           <h3>200+<br/>Forks</h3></div>
       </section>
 
@@ -504,7 +547,11 @@
           <a href="<%- url_for("/templates/index.html") %>" class="btn" target="_blank">Templates</a>
         </div>
       </section>
-      <section class="light-blue" style="display: flex; justify-content: center;">
+      <section  class="light-blue" >
+        <div style="padding-top: 50px; text-align: center">
+          <h2 style="font-size: 2em">Why Label Studio?</h2>
+        </div>
+        <div style="padding-top: 60px; display: flex; justify-content: center;">
         <div class="cards">
           <div class="card">
             <h3>Configurable</h3>
@@ -528,6 +575,7 @@
               You can extend core functionality with new visual constructs and customize it for different use cases.</p>
             <a href="<%- url_for("/guide/frontend.html") %>" class="btn">Learn More</a>
           </div>
+        </div>
         </div>
       </section>
 
@@ -574,14 +622,24 @@
           <div style="display: flex; justify-content: space-between; flex-wrap:wrap; width: 100%">
 
             <div class="item">
-              <h2 class="no-menu">Project</h2>
+              <h2 class="no-menu">Resources</h2>
               <div>
+              <a href="/explore/label-studio-features">Features</a><br/>
                 <a href="/guide">Guide</a><br/>
                 <a href="/tags">Tags</a><br/>
                 <a href="/templates">Templates</a>
               </div>
             </div>
 
+            <div class="item">
+              <h2 class="no-menu">Solutions</h2>
+              <div>
+                <a href="/explore/use-labelstudio-for-the-insurance-industry">Insurance</a><br/>
+                <a href="/explore/data-labeling-in-finance-industry">Finance</a><br/>
+              </div>
+            </div>
+            
+            
             <div class="item">
               <h2 class="no-menu">Help</h2>
               <div>
@@ -592,18 +650,13 @@
               </div>
             </div>
 
-            <div class="item">
-              <h2 class="no-menu">Social</h2>
-              <div>
-                <a href="https://twitter.com/heartexlabs">Twitter</a><br/>
-                <a href="https://github.com/heartexlabs/label-studio">Github</a>
-              </div>
-            </div>
 
             <div class="item">
               <h2 class="no-menu">Company</h2>
               <div>
-                <a href="https://heartex.ai/">Heartex</a>
+                <a href="https://heartex.ai/">Heartex</a><br/>
+                <a href="https://twitter.com/heartexlabs">Twitter</a><br/>
+                <a href="https://github.com/heartexlabs/label-studio">Github</a>
               </div>
             </div>
 
