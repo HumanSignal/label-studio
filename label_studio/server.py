@@ -31,7 +31,8 @@ from label_studio.utils import uploader
 from label_studio.utils.validation import TaskValidator
 from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.functions import generate_sample_task_without_check
-from label_studio.utils.misc import exception_treatment, config_line_stripped, get_config_templates
+from label_studio.utils.misc import (
+    exception_treatment, config_line_stripped, get_config_templates, convert_string_to_hash)
 from label_studio.utils.argparser import parse_input_args
 
 from label_studio.project import Project
@@ -73,12 +74,14 @@ def project_get_or_create(multi_session_force_recreate=False):
         project = session['project']
 
         project_name = user + '/' + project
-        return Project.get_or_create(project_name, input_args, context={'multi_session': True})
+        return Project.get_or_create(project_name, input_args, context={
+            'multi_session': True,
+            'user': convert_string_to_hash(user)
+        })
     else:
         if multi_session_force_recreate:
             raise NotImplementedError(
                 '"multi_session_force_recreate" option supported only with "start-multi-session" mode')
-        user = project = input_args.project_name  # in standalone mode, user and project are singletons and consts
         return Project.get_or_create(input_args.project_name, input_args, context={'multi_session': False})
 
 
