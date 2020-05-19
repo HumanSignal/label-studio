@@ -73,21 +73,13 @@ def project_get_or_create(multi_session_force_recreate=False):
         project = session['project']
 
         project_name = user + '/' + project
-        return Project.get_or_create(project_name, input_args, context={
-            'user': user,
-            'project': project,
-            'multi_session': True,
-        })
+        return Project.get_or_create(project_name, input_args, context={'multi_session': True})
     else:
         if multi_session_force_recreate:
             raise NotImplementedError(
                 '"multi_session_force_recreate" option supported only with "start-multi-session" mode')
         user = project = input_args.project_name  # in standalone mode, user and project are singletons and consts
-        return Project.get_or_create(input_args.project_name, input_args, context={
-            'user': user,
-            'project': project,
-            'multi_session': False
-        })
+        return Project.get_or_create(input_args.project_name, input_args, context={'multi_session': False})
 
 
 @app.template_filter('json')
