@@ -183,6 +183,15 @@
      background-color: green;
      height: 100px;
  }
+
+ .frameworks {
+   display: flex;
+    justify-content: space-around;
+    max-width: 900px;
+ align-items: center;
+ margin: 4em auto;
+ 
+ }
  
  @media screen and (max-width: 1000px) {
 
@@ -374,6 +383,15 @@
          top: 40px;
      }
 
+ .frameworks {
+         margin: 0 auto;
+         flex-direction: column;
+     }
+
+     .frameworks img {
+         margin-top: 2em;
+     }
+ 
      .slider {
          width: 90%;
          margin-left: 2em;
@@ -435,11 +453,8 @@
                 <center>
                   <a href="https://app.labelstud.io/welcome?ref=labelstud.io" class="btn">Try Demo</a>
                   <a href="<%- url_for("guide/") %>" class="btn">Get Started</a>
-                  <a
-                    href="https://join.slack.com/t/label-studio/shared_invite/zt-cr8b7ygm-6L45z7biEBw4HXa5A2b5pw"
-                    class="btn btn-slack">
-                    <img src="<%- url_for("/images/slack.png") %>" height="18" style="margin-right: 8px;"/>Join
-                    Slack</a>
+                  <a href="https://join.slack.com/t/label-studio/shared_invite/zt-cr8b7ygm-6L45z7biEBw4HXa5A2b5pw" class="btn btn-slack">
+                    <img src="<%- url_for("/images/slack.png") %>" height="18" style="margin-right: 8px;"/>Join Slack</a>
                 </center>
                 <!-- <div><a href="" class="btn">Watch video</a></div> -->
               </div>
@@ -459,18 +474,13 @@
         </div>
       </section>
 
+        <section class="cards" style="padding-top: 50px; padding-bottom: 50px; background: #eff0f2; ">
+          <div style="max-width: 700px; text-align: center;">
+          <h2>10000+ Users</h2>
+          <p>Data Scientists, Machine Learning Engineers, and aspiring developers are using Label Studio to produce innovative machine learning models for real-world applications.</p>
+          </div>
+        </section>
         
-      <section class="cards" style="padding-top: 50px; padding-bottom: 50px; background: #eff0f2; display: none;">
-        <div class="card" style="text-align: center; min-width: 150px; padding: 1em;">
-          <h3>
-            2800+<br/>
-            Stargazers</h3></div>
-        <div class="card" style="text-align: center; min-width: 150px; padding: 1em;">
-          <h3>10000+<br/>Users</div>
-        <div class="card" style="text-align: center; min-width: 150px; padding: 1em;">
-          <img src="https://www.kindpng.com/picc/m/181-1817035_fork-branching-github-computer-icons-free-transparent-github.png" height="100" />
-          <h3>200+<br/>Forks</h3></div>
-      </section>
 
       <!-- <div style="padding-top: 100px; text-align: center"> -->
       <!--     <h4>News: Introducing Label Studio 0.6.0 Nested labeling</h4> -->
@@ -579,6 +589,19 @@
         </div>
       </section>
 
+      <section class="" style="padding-top: 50px;">
+        <div style="text-align: center;">
+          <h2>Compatible with major libraries & frameworks</h2>
+          <div class="frameworks">
+            <img src="<%- url_for("/images/frameworks/pytorch_logo.png") %>" height="50" />
+            <img src="<%- url_for("/images/frameworks/tensorflow_logo.png") %>" height="60" />
+            <img src="<%- url_for("/images/frameworks/scikit_logo.png") %>" height="50" />
+            <img src="<%- url_for("/images/frameworks/keras_logo.png") %>" height="50" />
+            
+          </div>
+        </div>
+        </section>
+      
       <section class="subscribe">
 
         <iframe width="640" height="320" src="https://labelstudio.substack.com/embed" frameborder="0"
