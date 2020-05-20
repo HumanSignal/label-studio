@@ -523,12 +523,23 @@ def api_generate_next_task():
 def api_project():
     """ Project global operation"""
     project = project_get_or_create(multi_session_force_recreate=False)
+    code = 200
+
     if request.method == 'POST' and request.args.get('new', False):
         project = project_get_or_create(multi_session_force_recreate=True)
+        code = 201
     elif request.method == 'PATCH':
         project.update_params(request.json)
+        code = 201
+
+    output = {
+        'project_name': project.name,
+        'task_count': len(project.tasks),
+        'completion_count': len(project.get_completions_ids()),
+        'config': project.config
+    }
     project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
-    return make_response(jsonify({'project_name': project.name}), 201)
+    return make_response(jsonify(output), code)
 
 
 @app.route('/api/projects/1/task_ids/', methods=['GET'])
@@ -540,6 +551,46 @@ def api_all_task_ids():
     ids = sorted(project.get_task_ids())
     project.analytics.send(getframeinfo(currentframe()).function)
     return make_response(jsonify(ids), 200)
+
+
+@app.route('/api/tasks', methods=['GET'])
+@exception_treatment
+def api_all_tasks():
+    """ Get full tasks with pagination, completions and predictions
+    """
+    project = project_get_or_create()
+    page, page_size = int(request.args.get('page', 1)), int(request.args.get('page_size', 10))
+    order = request.args.get('order', 'id')
+    if page < 1 or page_size < 1:
+        return make_response(jsonify({'detail': 'Incorrect page or page_size'}), 422)
+
+    order_inverted = order[0] == '-'
+    order = order[1:] if order_inverted else order
+    if order not in ['id', 'completed_at']:
+        return make_response(jsonify({'detail': 'Incorrect order'}), 422)
+
+    # get task ids and sort them by completed time
+    task_ids = project.get_tasks().keys()
+    completed_at = project.get_completed_at(task_ids)
+
+    # ordering
+    pre_order = [{'id': i, 'completed_at': completed_at[i] if i in completed_at else '9'} for i in task_ids]
+    ordered = sorted(pre_order, key=lambda x: x[order])
+    ordered = ordered[::-1] if order_inverted else ordered
+    paginated = ordered[(page - 1) * page_size:page * page_size]
+
+    # get tasks with completions
+    tasks = []
+    for item in paginated:
+        i = item['id']
+        task = project.get_task_with_completions(i)
+        if task is None:  # no completion at task
+            task = project.get_task(i)
+        else:
+            task['completed_at'] = item['completed_at']
+        tasks.append(task)
+
+    return make_response(jsonify(tasks), 200)
 
 
 @app.route('/api/tasks/<task_id>/', methods=['GET', 'DELETE'])
