@@ -44,8 +44,10 @@
     <a href="tasks" class="{% if url_for(request.endpoint) == '/tasks' %}active{% endif %}">Tasks</a>
     <span class="delim">|</span>
 
-    <a href="import" class="{% if url_for(request.endpoint) == '/import' %}active{% endif %}">Import</a>
-    <span class="delim">|</span>
+    {% if project.can_manage_tasks %}
+      <a href="import" class="{% if url_for(request.endpoint) == '/import' %}active{% endif %}">Import</a>
+      <span class="delim">|</span>
+    {% endif %}
 
     <a href="export" class="{% if url_for(request.endpoint) == '/export' %}active{% endif %}">Export</a>
     <span class="delim">|</span>
