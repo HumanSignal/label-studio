@@ -710,11 +710,10 @@ def api_predictions():
     if project.ml_backends_connected:
         # get tasks ids without predictions
         tasks_with_predictions = {}
-        for i in project.tasks.keys():
-            task_pred = project.make_predictions(project.tasks[i])
+        for task_id, task in project.source_storage.items():
+            task_pred = project.make_predictions(task)
             tasks_with_predictions[task_pred['id']] = task_pred
-        project.tasks = tasks_with_predictions
-        project._save_tasks()
+        project.source_storage.set_many(tasks_with_predictions.keys(), tasks_with_predictions.values())
 
         return make_response(jsonify({'details': 'Predictions done.'}), 200)
     else:

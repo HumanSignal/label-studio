@@ -362,7 +362,7 @@ class Project(object):
                 best_idx = max(id_score_map, key=id_score_map.get)
             else:
                 raise NotImplementedError('Unknown sampling method ' + sampling)
-            return self.tasks[best_idx]
+            return self.source_storage.get(best_idx)
         else:
             raise NotImplementedError('Unknown sampling method ' + sampling)
 
