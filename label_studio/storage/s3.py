@@ -19,7 +19,7 @@ class S3Storage(BaseStorage):
 
     def __init__(self, prefix=None, regex=None, create_local_copy=True, **kwargs):
         super(S3Storage, self).__init__(**kwargs)
-        self.prefix = prefix
+        self.prefix = prefix or ''
         self.regex = re.compile(regex) if regex else None
         self.local_dir = os.path.join(self.project_path, self.path, *self.prefix.split('/'))
         os.makedirs(self.local_dir, exist_ok=True)
