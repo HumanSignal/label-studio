@@ -3,14 +3,16 @@ import boto3
 import json
 import re
 import os
-import botocore.errorfactory
+import threading
 
+from datetime import datetime, timedelta
 from .base import BaseStorage
 from label_studio.utils.io import json_load
 
 logger = logging.getLogger(__name__)
 logging.getLogger('botocore').setLevel(logging.CRITICAL)
 boto3.set_stream_logger(level=logging.INFO)
+thread_lock = threading.Lock()
 
 
 class S3Storage(BaseStorage):
@@ -29,6 +31,8 @@ class S3Storage(BaseStorage):
         self.s3 = boto3.resource('s3')
         self.client = boto3.client('s3')
         self.bucket = self.s3.Bucket(self.path)
+        self.last_sync_time = None
+        self.sync_period_in_sec = 30
 
         self._ids_keys_map = {}
         self._keys_ids_map = {}
@@ -105,21 +109,43 @@ class S3Storage(BaseStorage):
         return max(self._ids_keys_map.keys(), default=-1)
 
     def ids(self):
-        logger.debug('Sync with S3 ' + self.readable_path)
         self.sync()
         return self._ids_keys_map.keys()
 
+    def _ready_to_sync(self):
+        if self.last_sync_time is None:
+            return True
+        return (datetime.now() - self.last_sync_time) > timedelta(seconds=self.sync_period_in_sec)
+
     def sync(self):
+        if self._ready_to_sync():
+            logger.debug('Sync with S3 ' + self.readable_path)
+            thread = threading.Thread(target=self._sync)
+            thread.start()
+        else:
+            logger.debug('Not ready to sync.')
+
+    def _sync(self):
+        with thread_lock:
+            self.last_sync_time = datetime.now()
+
         new_id = self.max_id() + 1
+        new_ids_keys_map = {}
+        new_keys_ids_map = {}
+
         for obj in self.bucket.objects.filter(Prefix=self.prefix + '/', Delimiter='/').all():
             key = obj.key
             if self.regex and not self.regex.match(key):
                 continue
             if key not in self._keys_ids_map:
-                self._ids_keys_map[new_id] = {'key': key, 'exists': True}
-                self._keys_ids_map[key] = new_id
+                new_ids_keys_map[new_id] = {'key': key, 'exists': True}
+                new_keys_ids_map[key] = new_id
                 new_id += 1
-        self._save_ids()
+
+        with thread_lock:
+            self._ids_keys_map.update(new_ids_keys_map)
+            self._keys_ids_map.update(new_keys_ids_map)
+            self._save_ids()
 
     def items(self):
         for id in self.ids():
@@ -134,7 +160,6 @@ class S3Storage(BaseStorage):
         raise NotImplementedError
 
     def empty(self):
-        logger.debug('Sync with S3 ' + self.readable_path)
         self.sync()
         return len(self._ids_keys_map) == 0
 
@@ -149,11 +174,7 @@ class S3BlobStorage(S3Storage):
         self.data_key = data_key
 
     def _get_value(self, key):
-        url = self.client.generate_presigned_url(
-            ClientMethod='get_object',
-            Params={'Bucket': self.bucket.name, 'Key': key})
-        logger.debug('Presigned URL {url} generated for object key {key}'.format(url=url, key=key))
-        return {self.data_key: url}
+        return {self.data_key: 's3://' + self.bucket.name + '/' + key}
 
     def _set_value(self, key, value):
         raise NotImplementedError

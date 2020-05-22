@@ -34,6 +34,7 @@ from label_studio.utils.functions import generate_sample_task_without_check
 from label_studio.utils.misc import (
     exception_treatment, config_line_stripped, get_config_templates, convert_string_to_hash)
 from label_studio.utils.argparser import parse_input_args
+from label_studio.utils.uri_resolver import resolve_task_data_uri
 
 from label_studio.project import Project
 from label_studio.tasks import Tasks
@@ -143,8 +144,11 @@ def labeling_page():
         task_id = int(task_id)
         # Task explore mode
         task_data = project.get_task_with_completions(task_id) or project.source_storage.get(task_id)
+        task_data = resolve_task_data_uri(task_data)
+
         if project.ml_backends_connected:
             task_data = project.make_predictions(task_data)
+
     project.analytics.send(getframeinfo(currentframe()).function)
     return flask.render_template(
         'labeling.html',
@@ -184,6 +188,7 @@ def tasks_page():
     completed_task_ids = list(sorted(completed_at, key=completed_at.get))[::-1]
     task_ids = completed_task_ids + [i for i in task_ids if i not in completed_at]
     project.analytics.send(getframeinfo(currentframe()).function)
+
     return flask.render_template(
         'tasks.html',
         show_paths=input_args.command != 'start-multi-session',
@@ -501,6 +506,8 @@ def api_generate_next_task():
         # no tasks found
         project.analytics.send(getframeinfo(currentframe()).function, error=404)
         return make_response('', 404)
+
+    task = resolve_task_data_uri(task)
 
     project.analytics.send(getframeinfo(currentframe()).function)
 
