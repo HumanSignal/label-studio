@@ -44,6 +44,10 @@
   }
 </style>
 
+{% endraw %}
+  {# {% include 'storages.html' %} #}
+{% raw %}
+
 <div id="vue_loader" class="ui large text loader loading active">Loading ...</div>
 
 <div class="ui container" id="app" :class="{'visible-app': vue_loaded}" style="display: none">
@@ -52,6 +56,10 @@
 
   <!-- Main content -->
   <center class="wrapper" v-else>
+
+
+  <div class="ui container">
+    <center class="wrapper">
 
     <!-- Statistics -->
     <div class="ui two column centered grid">
@@ -62,7 +70,7 @@
             <span class="value"><animated-number :number="project.task_count"/></span>
             <span class="label">Total tasks</span>
             {% endraw %}{% if show_paths %}
-            <i class="small">{{ config['input_path'] }}</i>
+            <i class="small">{{ project.source_storage.readable_path }}</i>
             {% endif %}{% raw %}
           </div>
         </div>
@@ -72,7 +80,7 @@
             <span class="value"><animated-number :number="project.completion_count"/></span>
             <span class="label">Total completions</span>
             {% endraw %}{% if show_paths %}
-            <i class="small">{{ config['output_dir'] }}</i>
+            <i class="small">{{ project.target_storage.readable_path }}</i>
             {% endif %}{% raw %}
           </div>
         </div>
@@ -88,10 +96,10 @@
       <!-- Control buttons -->
       <div class="row" v-if="project.task_count > 0">
         <a class="ui button positive" href="/">Start Labeling</a>
-        <a class="ui button red" @click="deleteAllTasks()">Delete All Tasks</a>
+        <a class="ui button red" @click="deleteAllTasks()" v-if="project.can_manage_tasks">Delete All Tasks</a>
       </div>
       <div class="row" v-else>
-        <a class="ui button positive" href="/import">Import Tasks</a>
+        <a class="ui button positive" href="/import" v-if="project.can_manage_tasks">Import Tasks</a>
       </div>
 
     </div>
@@ -126,8 +134,8 @@
             :class="{'up': this.order=='completed_at', 'down': this.order=='-completed_at'}"
             @click="changeOrder('completed_at')">Completed at
         </th>
-        <th>Delete task?</th>
-        <th>Delete completion?</th>
+        <th v-if="project.can_manage_tasks">Delete task?</th>
+        <th v-if="project.can_manage_completions">Delete completion?</th>
       </tr>
 
       <!-- Task row -->
@@ -142,12 +150,12 @@
         <!-- Completed at -->
         <td>{{ task.completed_at }}</td>
         <!-- Task -->
-        <td class="text-center">
+        <td class="text-center" v-if="project.can_manage_tasks">
           <i @click="deleteTask(task.id)"
              class="fas fa-trash-alt trash remove-task">&nbsp;&nbsp;</i>
         </td>
         <!-- Completion -->
-        <td class="text-center">
+        <td class="text-center" v-if="project.can_manage_completions">
           <i v-for="completion_id in task.completions" @click="deleteCompletion(task.id, completion_id)"
              class="fas fa-trash-alt trash remove-completion">&nbsp;&nbsp;</i>
         </td>
@@ -159,6 +167,7 @@
   <br/><br/>
 </div>
 
+<script src="/static/js/components/animatedNumber.js"></script>
 <script>
     var app = new Vue({
         el: '#app',

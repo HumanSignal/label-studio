@@ -31,8 +31,10 @@ from label_studio.utils import uploader
 from label_studio.utils.validation import TaskValidator
 from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.functions import generate_sample_task_without_check
-from label_studio.utils.misc import exception_treatment, config_line_stripped, get_config_templates
+from label_studio.utils.misc import (
+    exception_treatment, config_line_stripped, get_config_templates, convert_string_to_hash)
 from label_studio.utils.argparser import parse_input_args
+from label_studio.utils.uri_resolver import resolve_task_data_uri
 
 from label_studio.project import Project
 from label_studio.tasks import Tasks
@@ -74,20 +76,14 @@ def project_get_or_create(multi_session_force_recreate=False):
 
         project_name = user + '/' + project
         return Project.get_or_create(project_name, input_args, context={
-            'user': user,
-            'project': project,
             'multi_session': True,
+            'user': convert_string_to_hash(user)
         })
     else:
         if multi_session_force_recreate:
             raise NotImplementedError(
                 '"multi_session_force_recreate" option supported only with "start-multi-session" mode')
-        user = project = input_args.project_name  # in standalone mode, user and project are singletons and consts
-        return Project.get_or_create(input_args.project_name, input_args, context={
-            'user': user,
-            'project': project,
-            'multi_session': False
-        })
+        return Project.get_or_create(input_args.project_name, input_args, context={'multi_session': False})
 
 
 @app.template_filter('json')
@@ -137,7 +133,7 @@ def labeling_page():
     """ Label studio frontend: task labeling
     """
     project = project_get_or_create()
-    if len(project.tasks) == 0:
+    if project.no_tasks():
         return redirect('/welcome')
 
     # task data: load task or task with completions if it exists
@@ -145,12 +141,18 @@ def labeling_page():
     task_id = request.args.get('task_id', None)
 
     if task_id is not None:
-        task_data = project.get_task_with_completions(task_id) or project.get_task(task_id)
+        task_id = int(task_id)
+        # Task explore mode
+        task_data = project.get_task_with_completions(task_id) or project.source_storage.get(task_id)
+        task_data = resolve_task_data_uri(task_data)
+
         if project.ml_backends_connected:
             task_data = project.make_predictions(task_data)
+
     project.analytics.send(getframeinfo(currentframe()).function)
     return flask.render_template(
         'labeling.html',
+        project=project,
         config=project.config,
         label_config_line=project.label_config_line,
         task_id=task_id,
@@ -169,7 +171,7 @@ def welcome_page():
     return flask.render_template(
         'welcome.html',
         config=project.config,
-        project=project.project_obj,
+        project=project,
         on_boarding=project.on_boarding
     )
 
@@ -179,18 +181,18 @@ def tasks_page():
     """ Tasks and completions page: tasks.html
     """
     project = project_get_or_create()
-
     label_config = open(project.config['label_config']).read()  # load editor config from XML
-    task_ids = project.get_tasks().keys()
+    task_ids = project.source_storage.ids()
     completed_at = project.get_completed_at(task_ids)
-
     # sort by completed time
-    task_ids = sorted([(i, completed_at[i] if i in completed_at else '9') for i in task_ids], key=lambda x: x[1])
-    task_ids = [i[0] for i in task_ids]  # take only id back
+    completed_task_ids = list(sorted(completed_at, key=completed_at.get))[::-1]
+    task_ids = completed_task_ids + [i for i in task_ids if i not in completed_at]
     project.analytics.send(getframeinfo(currentframe()).function)
+
     return flask.render_template(
         'tasks.html',
         show_paths=input_args.command != 'start-multi-session',
+        project=project,
         config=project.config,
         label_config=label_config,
         task_ids=task_ids,
@@ -211,7 +213,7 @@ def setup_page():
     return flask.render_template(
         'setup.html',
         config=project.config,
-        project=project.project_obj,
+        project=project,
         label_config_full=project.label_config_full,
         templates=templates,
         input_values=input_values,
@@ -226,11 +228,10 @@ def import_page():
     project = project_get_or_create()
 
     project.analytics.send(getframeinfo(currentframe()).function)
-    project.project_obj.name = project.name
     return flask.render_template(
         'import.html',
         config=project.config,
-        project=project.project_obj
+        project=project
     )
 
 
@@ -448,19 +449,16 @@ def api_import():
     except ValidationError as e:
         return make_response(jsonify(e.msg_to_list()), status.HTTP_400_BAD_REQUEST)
 
-    # tasks are all in one file, append it
-    path = project.config['input_path']
-    old_tasks = json.load(open(path))
-    max_id_in_old_tasks = int(max(old_tasks.keys())) if old_tasks else -1
+    max_id_in_old_tasks = -1
+    if not project.no_tasks():
+        max_id_in_old_tasks = project.source_storage.max_id()
+
     new_tasks = Tasks().from_list_of_dicts(new_tasks, max_id_in_old_tasks + 1)
-    old_tasks.update(new_tasks)
+    project.source_storage.set_many(new_tasks.keys(), new_tasks.values())
 
-    with open(path, 'w') as f:
-        json.dump(old_tasks, f, ensure_ascii=False, indent=4)
-
-    # load new tasks and everything related
-    project.load_tasks()
-    project.load_derived_schemas()
+    # update schemas based on newly uploaded tasks
+    project.update_derived_input_schema()
+    project.update_derived_output_schema()
 
     duration = time.time() - start
     return make_response(jsonify({
@@ -504,17 +502,19 @@ def api_generate_next_task():
     # try to find task is not presented in completions
     completed_tasks_ids = project.get_completions_ids()
     task = project.next_task(completed_tasks_ids)
-    if not task:
+    if task is None:
         # no tasks found
         project.analytics.send(getframeinfo(currentframe()).function, error=404)
         return make_response('', 404)
+
+    task = resolve_task_data_uri(task)
 
     project.analytics.send(getframeinfo(currentframe()).function)
 
     # collect prediction from multiple ml backends
     if project.ml_backends_connected:
         task = project.make_predictions(task)
-
+    logger.debug('Next task:\n' + json.dumps(task, indent=2))
     return make_response(jsonify(task), 200)
 
 
@@ -536,7 +536,9 @@ def api_project():
         'project_name': project.name,
         'task_count': len(project.tasks),
         'completion_count': len(project.get_completions_ids()),
-        'config': project.config
+        'config': project.config,
+        'can_manage_tasks': project.can_manage_tasks,
+        'can_manage_completions': project.can_manage_completions
     }
     project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
     return make_response(jsonify(output), code)
@@ -548,7 +550,7 @@ def api_all_task_ids():
     """ Get all tasks ids
     """
     project = project_get_or_create()
-    ids = sorted(project.get_task_ids())
+    ids = list(sorted(project.source_storage.ids()))
     project.analytics.send(getframeinfo(currentframe()).function)
     return make_response(jsonify(ids), 200)
 
@@ -599,10 +601,10 @@ def api_tasks(task_id):
     """ Get task by id
     """
     # try to get task with completions first
+    task_id = int(task_id)
     project = project_get_or_create()
     if request.method == 'GET':
-        task_data = project.get_task_with_completions(task_id)
-        task_data = project.get_task(task_id) if task_data is None else task_data
+        task_data = project.get_task_with_completions(task_id) or project.source_storage.get(task_id)
         project.analytics.send(getframeinfo(currentframe()).function)
         return make_response(jsonify(task_data), 200)
     elif request.method == 'DELETE':
@@ -642,7 +644,7 @@ def api_completions(task_id):
     if request.method == 'POST':
         completion = request.json
         completion.pop('state', None)  # remove editor state
-        completion_id = project.save_completion(task_id, completion)
+        completion_id = project.save_completion(int(task_id), completion)
         project.analytics.send(getframeinfo(currentframe()).function)
         return make_response(json.dumps({'id': completion_id}), 201)
 
@@ -654,6 +656,7 @@ def api_completions(task_id):
 @app.route('/api/tasks/<task_id>/cancel', methods=['POST'])
 @exception_treatment
 def api_tasks_cancel(task_id):
+    task_id = int(task_id)
     project = project_get_or_create()
     skipped_completion = {
         'result': [],
@@ -674,7 +677,7 @@ def api_completion_by_id(task_id, completion_id):
 
     if request.method == 'DELETE':
         if project.config.get('allow_delete_completions', False):
-            project.delete_completion(task_id)
+            project.delete_completion(int(task_id))
             project.analytics.send(getframeinfo(currentframe()).function)
             return make_response('deleted', 204)
         else:
@@ -691,6 +694,7 @@ def api_completion_update(task_id, completion_id):
     """ Rewrite existing completion with patch.
         This is technical api call for editor testing only. It's used for Rewrite button in editor.
     """
+    task_id = int(task_id)
     project = project_get_or_create()
     completion = request.json
 
@@ -766,11 +770,10 @@ def api_predictions():
     if project.ml_backends_connected:
         # get tasks ids without predictions
         tasks_with_predictions = {}
-        for i in project.tasks.keys():
-            task_pred = project.make_predictions(project.tasks[i])
+        for task_id, task in project.source_storage.items():
+            task_pred = project.make_predictions(task)
             tasks_with_predictions[task_pred['id']] = task_pred
-        project.tasks = tasks_with_predictions
-        project._save_tasks()
+        project.source_storage.set_many(tasks_with_predictions.keys(), tasks_with_predictions.values())
 
         return make_response(jsonify({'details': 'Predictions done.'}), 200)
     else:

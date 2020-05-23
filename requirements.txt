@@ -30,3 +30,4 @@ jsonschema>=3.2.0
 xmljson==0.2.0
 label-studio-converter>=0.0.16
 rq==1.0
+boto3>=1.13.16

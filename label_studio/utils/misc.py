@@ -5,9 +5,13 @@ from flask import request, jsonify, make_response
 import json  # it MUST be included after flask!
 import pkg_resources
 import hashlib
+import calendar
+import pytz
 
 from collections import defaultdict
 from lxml import etree, objectify
+from datetime import datetime
+from dateutil.tz import tzlocal
 
 from .io import find_dir
 
@@ -220,3 +224,21 @@ def get_config_templates():
 
 def convert_string_to_hash(string):
     return hashlib.md5(string.encode()).hexdigest()
+
+
+def datetime_to_timestamp(dt):
+    if dt.tzinfo:
+        dt = dt.astimezone(pytz.UTC)
+    return calendar.timegm(dt.timetuple())
+
+
+def timestamp_to_datetime(timestamp, tz=pytz.UTC):
+    return datetime.fromtimestamp(timestamp, tz)
+
+
+def timestamp_to_local_datetime(timestamp):
+    return timestamp_to_datetime(timestamp, tzlocal())
+
+
+def timestamp_now():
+    return datetime_to_timestamp(datetime.utcnow())
