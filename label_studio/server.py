@@ -178,26 +178,16 @@ def welcome_page():
 
 @app.route('/tasks')
 def tasks_page():
-    """ Tasks and completions page: tasks.html
+    """ Tasks and completions page
     """
     project = project_get_or_create()
-    label_config = open(project.config['label_config']).read()  # load editor config from XML
-    task_ids = project.source_storage.ids()
-    completed_at = project.get_completed_at(task_ids)
-    # sort by completed time
-    completed_task_ids = list(sorted(completed_at, key=completed_at.get))[::-1]
-    task_ids = completed_task_ids + [i for i in task_ids if i not in completed_at]
     project.analytics.send(getframeinfo(currentframe()).function)
 
     return flask.render_template(
         'tasks.html',
         show_paths=input_args.command != 'start-multi-session',
         project=project,
-        config=project.config,
-        label_config=label_config,
-        task_ids=task_ids,
-        completions=project.get_completions_ids(),
-        completed_at=completed_at
+        config=project.config
     )
 
 
@@ -534,7 +524,7 @@ def api_project():
 
     output = {
         'project_name': project.name,
-        'task_count': len(project.tasks),
+        'task_count': len(project.tasks) if project.tasks else 0,
         'completion_count': len(project.get_completions_ids()),
         'config': project.config,
         'can_manage_tasks': project.can_manage_tasks,
@@ -572,7 +562,7 @@ def api_all_tasks():
         return make_response(jsonify({'detail': 'Incorrect order'}), 422)
 
     # get task ids and sort them by completed time
-    task_ids = project.get_tasks().keys()
+    task_ids = project.source_storage.ids()
     completed_at = project.get_completed_at(task_ids)
 
     # ordering
@@ -587,7 +577,7 @@ def api_all_tasks():
         i = item['id']
         task = project.get_task_with_completions(i)
         if task is None:  # no completion at task
-            task = project.get_task(i)
+            task = project.source_storage.get(i)
         else:
             task['completed_at'] = item['completed_at']
         tasks.append(task)
