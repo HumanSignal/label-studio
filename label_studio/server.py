@@ -524,7 +524,7 @@ def api_project():
 
     output = {
         'project_name': project.name,
-        'task_count': len(project.tasks) if project.tasks else 0,
+        'task_count': len(project.source_storage.ids()),
         'completion_count': len(project.get_completions_ids()),
         'config': project.config,
         'can_manage_tasks': project.can_manage_tasks,
