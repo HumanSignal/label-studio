@@ -80,9 +80,9 @@ class S3Storage(BaseStorage):
     def _id_to_key(self, id):
         if not isinstance(id, str):
             id = str(id)
-        if id.startswith(self.prefix):
-            return id
-        if self.prefix is not None:
+        if self.prefix:
+            if id.startswith(self.prefix):
+                return id
             if self.prefix.endswith('/'):
                 return self.prefix + id
             return self.prefix + '/' + id
@@ -121,6 +121,7 @@ class S3Storage(BaseStorage):
         if self._ready_to_sync():
             logger.debug('Sync with S3 ' + self.readable_path)
             thread = threading.Thread(target=self._sync)
+            thread.daemon = True
             thread.start()
         else:
             logger.debug('Not ready to sync.')
@@ -132,8 +133,11 @@ class S3Storage(BaseStorage):
         new_id = self.max_id() + 1
         new_ids_keys_map = {}
         new_keys_ids_map = {}
-
-        for obj in self.bucket.objects.filter(Prefix=self.prefix + '/', Delimiter='/').all():
+        if self.prefix:
+            bucket_iter = self.bucket.objects.filter(Prefix=self.prefix + '/', Delimiter='/')
+        else:
+            bucket_iter = self.bucket.objects
+        for obj in bucket_iter.all():
             key = obj.key
             if self.regex and not self.regex.match(key):
                 continue
