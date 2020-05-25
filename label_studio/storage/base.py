@@ -49,7 +49,7 @@ class BaseStorage(ABC):
     def get(self, id):
         pass
 
-    def get_form(self):
+    def get_form(self, form_data=None):
         return {}
 
     @abstractmethod
@@ -115,7 +115,7 @@ class CloudStorage(BaseStorage):
 
     def __init__(self, prefix=None, regex=None, create_local_copy=True, **kwargs):
         super(CloudStorage, self).__init__(**kwargs)
-        self.form = CloudStorageForm()
+        self.form = None
         self.prefix = prefix or ''
         self.regex = re.compile(regex) if regex else None
         self.local_dir = os.path.join(self.project_path, self.path, *self.prefix.split('/'))
@@ -134,7 +134,8 @@ class CloudStorage(BaseStorage):
         self._ids_file = os.path.join(self.local_dir, 'ids.json')
         self._load_ids()
 
-    def get_form(self):
+    def get_form(self, form_data=None):
+        self.form = CloudStorageForm(formdata=form_data)
         return self.form
 
     @abstractmethod

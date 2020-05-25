@@ -34,7 +34,8 @@ from label_studio.utils.validation import TaskValidator
 from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.functions import generate_sample_task_without_check
 from label_studio.utils.misc import (
-    exception_treatment, config_line_stripped, get_config_templates, convert_string_to_hash)
+    exception_treatment, config_line_stripped, get_config_templates, convert_string_to_hash, serialize_class
+)
 from label_studio.utils.argparser import parse_input_args
 from label_studio.utils.uri_resolver import resolve_task_data_uri
 
@@ -540,12 +541,12 @@ def api_project():
     return make_response(jsonify(output), code)
 
 
-@app.route('/api/storage-settings', methods=['GET', 'POST'])
+@app.route('/api/project/1/storage-settings', methods=['GET', 'POST'])
 def api_project_storage_settings():
     project = project_get_or_create()
     project.analytics.send(getframeinfo(currentframe()).function)
-
-    form = project.source_storage.get_form()
+    from werkzeug.datastructures import ImmutableMultiDict
+    form = project.source_storage.get_form(ImmutableMultiDict(request.json))
     if request.method == 'POST':
         if form.validate_on_submit():
             # Save the comment here.
@@ -553,7 +554,8 @@ def api_project_storage_settings():
         else:
             return make_response(jsonify({'errors': form.errors}), 422)
 
-    return make_response(jsonify(form.data), 200)
+    output = [serialize_class(field) for field in form]
+    return make_response(jsonify(output), 200)
 
 
 @app.route('/api/projects/1/task_ids/', methods=['GET'])

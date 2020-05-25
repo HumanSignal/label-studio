@@ -301,18 +301,21 @@ div[class*="App_editor"] {
 .ui .button {
     font-weight: 400 !important;
     margin-bottom: 5px !important;
+    transition: background-color ease-in-out 0.25s, border ease-in-out 0.5s;
 }
-
 .ui .button.positive {
     background: rgb(24, 144, 255) !important;
     color: #fff !important;
     border-color: rgb(24, 144, 255) !important;
+    transition: background-color ease-in-out 0.25s;
 }
-
+.ui .button.positive:hover {
+    background: rgb(54, 162, 255) !important;
+    transition: background-color ease-in-out 0.25s;
+}
 .ui .button {
     transition: 0.3s;
 }
-
 .ui .button:hover {
     transition: 0.3s;
 }
@@ -359,6 +362,33 @@ div[class*="App_editor"] {
 
 .ui .pagination.menu {
     box-shadow: none;
+}
+
+.ui.modal {
+    box-shadow: none !important;
+}
+.ui.modal>.header {
+    font-weight: normal !important;
+    background: none;
+}
+.ui.modal>.actions {
+    background: none !important;
+    padding-top: 12px !important;
+    padding-bottom: 6px !important;;
+}
+.ui.modal>.icon.close {
+    color: #555;
+}
+
+.ui.form label {
+    font-weight: normal !important;
+}
+.ui.form input {
+    font-size: 0.85em !important;
+}
+
+.ui.dimmer {
+    background-color: rgba(0,0,0,0.5) !important;
 }
 
 /* semantic ui pretty finish */
