@@ -57,7 +57,7 @@ class S3BlobStorage(S3Storage):
 
     def __init__(self, data_key, **kwargs):
         super(S3BlobStorage, self).__init__(**kwargs)
-        self.form = CloudStorageBlobForm
+        self.form = CloudStorageBlobForm()
         self.data_key = data_key
 
     def _get_value(self, key):
