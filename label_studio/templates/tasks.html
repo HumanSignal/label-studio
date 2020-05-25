@@ -1,125 +1,342 @@
 {% extends 'base.html' %}
 {% block body %}
+{% raw %}
+<script src="/static/js/vue.js"></script>
+
+<style>
+  .visible-app {
+    display: block !important;
+  }
+  .pagination {
+    height: 10px !important;
+  }
+  .predict-image {
+    border-radius: 5px;
+    height: 50px;
+  }
+
+  .fade-enter-active, .fade-leave-active {
+    transition: opacity 0.5s ease-in-out;
+  }
+  .fade-enter-to {
+    opacity: 1;
+    height: 50px;
+  }
+  .fade-enter, .fade-leave-to {
+    opacity: 0;
+    height: 0;
+  }
+
+  .pagination-size {
+    border: none;
+    background: none;
+  }
+
+  .order {
+    cursor: pointer;
+  }
+  .order.up, .order.down {
+    font-weight: bold;
+  }
+  .order.up:after {
+    font-family: 'FontAwesome';
+    content: " \f0d8";
+  }
+  .order.down:after {
+    font-family: 'FontAwesome';
+    content: " \f0d7";
+  }
+</style>
+
+{% endraw %}
+  {# {% include 'storages.html' %} #}
+{% raw %}
+
+<div id="vue_loader" class="ui large text loader loading active">Loading ...</div>
+
+<div class="ui container" id="app" :class="{'visible-app': vue_loaded}" style="display: none">
+  <!-- Project loader -->
+  <div class="ui large text loader center aligned loading active" v-if="!project_loaded">Project Loading ...</div>
+
+  <!-- Main content -->
+  <center class="wrapper" v-else>
+
 
   <div class="ui container">
     <center class="wrapper">
 
-      <!-- Statistics -->
-      <div class="ui two column centered grid">
-        <div class="row">
+    <!-- Statistics -->
+    <div class="ui two column centered grid stackable">
+      <div class="row">
+        <!-- Total tasks -->
         <div class="column center aligned">
-          <div class="ui statistic">
-            <span class="value">{{ task_ids|length }}</span>
+          <div class="ui statistic small">
+            <span class="value"><animated-number :number="project.task_count"/></span>
             <span class="label">Total tasks</span>
-            {% if show_paths %}
-              <i class="small">{{ config['input_path'] }}</i>
-            {% endif %}
+            <i class="word-break" v-if="project.multi_session_mode">{{ project.source_storage.readable_path }}</i>
+            {% endraw %}{% include 'storages.html' %}{% raw %}
           </div>
         </div>
+        <!-- Total completions -->
         <div class="column center aligned">
-          <div class="ui statistic">
-            <span class="value">{{ completions|length }}</span>
+          <div class="ui statistic small">
+            <span class="value"><animated-number :number="project.completion_count"/></span>
             <span class="label">Total completions</span>
-            {% if show_paths %}
-              <i class="small">{{ config['output_dir'] }}</i>
-            {% endif %}
+            <i class="word-break" v-if="project.multi_session_mode">{{ project.target_storage.readable_path }}</i>
           </div>
         </div>
-        </div>
-
-        <div class="row">
-          <div class="ui message">
-            <p>Tasks sampling: <span class="ui orange horizontal label">{{ config['sampling'] }}</span> </p>
-          </div>
-        </div>
-
-        <div class="row">
-          {% if task_ids|length > 0 %}
-            <a class="ui button positive" href=".">Start Labeling</a>
-            <a id="clear-tasks-button" class="ui button red">Delete All Tasks</a>
-          {% else %}
-            <a class="ui button positive" href="import">Import Tasks</a>
-          {% endif %}
-        </div>
-
       </div>
-      {% if task_ids|length > 0 %}
-      <div class="ui divider hidden"></div>
-      <!-- Table -->
-      <table>
-        <tr>
-          <th>Task ID </th>
-          <th>Completed at</th>
-          <th>Delete completion?</th>
-          <th>Delete task?</th>
-        </tr>
 
-        {% for id in task_ids %}
-          <tr>
-            <td class="text-center">
-              <a href=".?task_id={{ id }}">
-                <i class="fas fa-eye eye show-completion"></i>
-              </a>
-              &nbsp;
-              {{ id }}
-            </td>
-            <td>{{ completed_at[id] }}</td>
-            <td class="text-center">
-              {% if id in completions %}
-                <i data-task-id="{{ id }}" class="fas fa-trash-alt trash remove-completion"></i>
-              {% endif %}
-            </td>
-          <td class="text-center">
-            <i data-task-id="{{ id }}" class="fas fa-trash-alt trash remove-task"></i>
-          </td>
-          </tr>
-        {% endfor %}
-      </table>
-      {% endif %}
-      <br/>
-    </center></div>
+
+      <!-- Control buttons -->
+      <div class="ui row stackable" v-if="project.task_count > 0">
+        <div class="column center aligned">
+          <!-- Start labeling -->
+          <a class="ui button positive" href="/">Start Labeling</a>
+
+          <!-- Sampling -->
+          <span class="ui button basic" style="padding-top: 5px; padding-bottom: 5px;">
+            Tasks sampling:
+            <span class="ui orange label">
+              {{ project.config['sampling'] }}
+            </span>
+          </span>
+
+          <!-- Delete all tasks -->
+          <a class="ui button red" @click="deleteAllTasks()" v-if="project.can_manage_tasks">Delete All Tasks</a>
+        </div>
+      </div>
+
+      <!-- Import tasks -->
+      <div class="row" v-else>
+        <a class="ui button positive" href="/import" v-if="project.can_manage_tasks">Import Tasks</a>
+      </div>
+
+    </div>
+    <div class="ui divider hidden"></div>
+
+    <!-- Pagination -->
+    <div class="ui pagination menu" v-if="project.task_count > 0">
+      <a class="item" :class="{'active': page>1, 'disabled': page<=1}"
+         @click="if (page!=1) page--">Prev</a>
+
+      <div class="item">
+        <input v-model="page" style="border:none" type="number" min="1" :max="totalPages">
+        &nbsp; of &nbsp;&nbsp;
+        {{ totalPages }}
+      </div>
+
+      <div class="item">
+        <select class="pagination-size" v-model="page_size">
+          <option>1</option>
+          <option>5</option>
+          <option selected="selected">10</option>
+          <option>50</option>
+          <option>100</option>
+          <option>500</option>
+          <option>1000</option>
+        </select>
+      </div>
+
+      <a class="item" :class="{'active': page<totalPages, 'disabled': page>=totalPages}"
+         @click="if (page<totalPages) page++">Next</a>
+    </div>
+
+    <div class="ui divider hidden"></div>
+
+    <!-- Table -->
+    <table v-if="project.task_count > 0" class="responsive">
+      <!-- Header -->
+      <tr>
+        <th class="order"
+            :class="{'up': this.order=='id', 'down': this.order=='-id'}"
+            @click="changeOrder('id')">Task ID
+        </th>
+        <th class="order"
+            :class="{'up': this.order=='completed_at', 'down': this.order=='-completed_at'}"
+            @click="changeOrder('completed_at')">Completed at
+        </th>
+        <th v-if="project.can_manage_tasks">Delete task?</th>
+        <th v-if="project.can_manage_completions">Delete completion?</th>
+      </tr>
+
+      <!-- Task row -->
+      <tr v-for="task in tasks">
+        <!-- Task ID -->
+        <td class="text-center">
+          <a :href="'/?task_id=' + task.id">
+            <i class="fas fa-eye eye show-completion"></i>
+          </a>
+          &nbsp;{{ task.id }}
+        </td>
+        <!-- Completed at -->
+        <td>{{ task.completed_at }}</td>
+        <!-- Task -->
+        <td class="text-center" v-if="project.can_manage_tasks">
+          <i @click="deleteTask(task.id)"
+             class="fas fa-trash-alt trash remove-task">&nbsp;&nbsp;</i>
+        </td>
+        <!-- Completion -->
+        <td class="text-center" v-if="project.can_manage_completions">
+          <i v-for="completion_id in task.completions" @click="deleteCompletion(task.id, completion_id)"
+             class="fas fa-trash-alt trash remove-completion">&nbsp;&nbsp;</i>
+        </td>
+      </tr>
+    </table>
+
+    <br/>
+  </center>
   <br/><br/>
+</div>
 
+<script src="/static/js/components/animatedNumber.js"></script>
+<script>
+    var app = new Vue({
+        el: '#app',
 
-  <script>
-    document.querySelectorAll(".remove-completion").forEach(function (test) {
-      test.addEventListener("click", function (event) {
-        var id = event.target.dataset.taskId;
-        var request = new XMLHttpRequest();
-        request.open("DELETE", "api/tasks/" + id + "/completions/" + id + "/", true);
-        request.onload = function () {
-          window.location.reload();
-        };
-        request.send(null);
-      })
+        data: function () {
+            return {
+                // provided by api/project
+                project: {
+                    task_count: 0,
+                    completion_count: 0,
+                    project_name: "",
+                    config: {
+                        sampling: "none"
+                    }
+                },
+                // provided by api/tasks
+                tasks: [],
+
+                // internal variables
+                vue_loaded: false,
+                project_loaded: false,
+                page: 1,
+                page_size: 10,
+                order: 'id',
+                timer: null
+            }
+        },
+
+        // components for different source types
+        components: {
+            'animated-number': animatedNumber
+        },
+
+        computed: {
+            currentPage: function () {
+                return this.tasks;
+            },
+            totalPages: function () {
+                return Math.ceil(this.project.task_count / parseInt(this.page_size));
+            }
+        },
+
+        methods: {
+            // get tasks from api
+            tasksUpdate: function () {
+                var root = this;
+                $.get('/api/tasks?page=' + this.page + '&page_size=' + parseInt(this.page_size) + '&order=' + this.order +
+                    '&rnd=' + Math.random())
+                    .done(function (data) {
+                        root.tasks = data;
+                        console.log('tasks loaded');
+                    })
+                    .fail(function () {
+                        console.log('no tasks loaded')
+                    })
+            },
+
+            // get project info from api
+            projectUpdate: function () {
+                var root = this;
+                $.get('/api/project?rnd=' + Math.random())
+                    .done(function (data) {
+                        root.project = data;
+                        root.project_loaded = true;
+                        console.log('project loaded');
+                    })
+                    .fail(function () {
+                        root.project_loaded = true;
+                        console.log('no project loaded')
+                    })
+            },
+
+            // update all objects via api
+            totalUpdate: function () {
+                this.projectUpdate();
+                this.tasksUpdate();
+            },
+
+            // change order of sorting in table
+            changeOrder: function (name) {
+                console.log('order changed to ' + name);
+                var old = getUrlArg('order', 'id');
+                if (old === name) {
+                    name = '-' + name;
+                }
+                this.order = name;
+                refreshHistoryArg('order', name);
+                this.tasksUpdate();
+            },
+
+            // delete completion with trash button
+            deleteCompletion: function (task_id, completion_id) {
+                var request = new XMLHttpRequest();
+                request.open("DELETE", "/api/tasks/" + task_id + "/completions/" + completion_id + "/", true);
+                request.onload = this.tasksUpdate;
+                request.send();
+            },
+
+            // delete completion with trash button
+            deleteTask: function (task_id) {
+                var request = new XMLHttpRequest();
+                request.open("DELETE", "/api/tasks/" + task_id + "/", true);
+                request.onload = this.tasksUpdate;
+                request.send();
+            },
+
+            // delete all tasks from project
+            deleteAllTasks: function () {
+                var deletion_confirmed = confirm(
+                    'You are going to delete all existing tasks.\n' +
+                    'Warning! this operation cannot be undone.\nPlease confirm your action.');
+                if (deletion_confirmed) {
+                    var request = new XMLHttpRequest();
+                    request.open("DELETE", "/api/tasks/delete", true);
+                    request.onload = this.totalUpdate;
+                    request.send();
+                }
+            }
+        },
+
+        watch: {
+            // watch for page variable changes
+            page: function () {
+                this.tasksUpdate();
+            },
+            page_size: function() {
+                this.tasksUpdate();
+            }
+        },
+
+        // vue mounting of page
+        mounted: function () {
+            this.vue_loaded = true;
+            this.project_loaded = false;
+
+            this.order = getUrlArg('order', 'id');
+            this.totalUpdate();
+            this.timer = setInterval(this.totalUpdate, 5000);
+
+            $('#vue_loader').hide();
+            console.log('Vue mounting success');
+        }
+
     });
 
-    document.querySelectorAll(".remove-task").forEach(function (test) {
-      test.addEventListener("click", function (e){
-        const confirmed = confirm('Are you sure to delete the task?');
-        if (confirmed) {
-          var id = e.target.dataset.taskId;
-          let request = new XMLHttpRequest();
-          request.open("DELETE", "api/tasks/" + id + "/");
-          request.onload = function () {
-            location.reload();
-          };
-          request.send(null);
-        }})
-    });
 
-    document.getElementById("clear-tasks-button").onclick = function (e) {
-      const deletion_confirmed = confirm(
-        'You are going to delete all existing tasks.\nWarning! this operation cannot be undone.\nPlease confirm your action.');
-      if (deletion_confirmed) {
-        let request = new XMLHttpRequest();
-        request.open("DELETE", "api/tasks/delete", true);
-        request.onload = function () {
-          window.location.reload();
-        };
-        request.send(null);
-      }
-    }
-  </script>
+</script>
 
+{% endraw %}
 {% endblock %}
