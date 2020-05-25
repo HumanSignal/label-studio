@@ -1,5 +1,19 @@
-from abc import ABC, abstractmethod
+import os
+import json
+import re
+import logging
+import threading
 
+from abc import ABC, abstractmethod
+from datetime import datetime, timedelta
+
+from flask_wtf import FlaskForm
+from wtforms import StringField, BooleanField
+from wtforms.validators import InputRequired, Optional, ValidationError
+
+from label_studio.utils.io import json_load
+
+logger = logging.getLogger(__name__)
 
 _storage = {}
 
@@ -70,3 +84,186 @@ class BaseStorage(ABC):
     @abstractmethod
     def empty(self):
         pass
+
+
+class IsValidRegex(object):
+
+    def __call__(self, form, field):
+        try:
+            re.compile(field.data)
+        except re.error:
+            raise ValidationError(field.data + ' is not a valid regular expression')
+
+
+class CloudStorageForm(FlaskForm):
+    path = StringField('Path', [InputRequired()])
+    prefix = StringField('Prefix', [Optional()])
+    regex = StringField('Regex', [IsValidRegex()])
+    create_local_copy = BooleanField('Create local copy')
+
+
+class CloudStorageBlobForm(CloudStorageForm):
+    data_key = StringField('Data key', [InputRequired()])
+
+
+class CloudStorage(BaseStorage):
+
+    thread_lock = threading.Lock()
+
+    def __init__(self, prefix=None, regex=None, create_local_copy=True, **kwargs):
+        super(CloudStorage, self).__init__(**kwargs)
+        self.form = CloudStorageForm()
+        self.prefix = prefix or None
+        self.regex = re.compile(regex) if regex else None
+        self.local_dir = os.path.join(self.project_path, self.path, *self.prefix.split('/'))
+        os.makedirs(self.local_dir, exist_ok=True)
+        self.create_local_copy = create_local_copy
+        if self.create_local_copy:
+            self.objects_dir = os.path.join(self.local_dir, 'objects')
+            os.makedirs(self.objects_dir, exist_ok=True)
+
+        self.client = self._get_client()
+        self.last_sync_time = None
+        self.sync_period_in_sec = 30
+
+        self._ids_keys_map = {}
+        self._keys_ids_map = {}
+        self._ids_file = os.path.join(self.local_dir, 'ids.json')
+        self._load_ids()
+
+    def get_form(self):
+        return self.form
+
+    @abstractmethod
+    def _get_client(self):
+        pass
+
+    @property
+    @abstractmethod
+    def readable_path(self):
+        pass
+
+    def _load_ids(self):
+        if os.path.exists(self._ids_file):
+            self._ids_keys_map = json_load(self._ids_file, int_keys=True)
+            self._keys_ids_map = {item['key']: id for id, item in self._ids_keys_map.items()}
+
+    def _save_ids(self):
+        with open(self._ids_file, mode='w') as fout:
+            json.dump(self._ids_keys_map, fout, indent=2)
+
+    @abstractmethod
+    def _get_value(self, key):
+        pass
+
+    def get(self, id):
+        item = self._ids_keys_map.get(id)
+        if item:
+            data = self._get_value(item['key'])
+            if data is None:
+                return
+            if 'data' in data:
+                data['id'] = id
+                return data
+            else:
+                return {'data': data, 'id': id}
+
+    def _id_to_key(self, id):
+        if not isinstance(id, str):
+            id = str(id)
+        if self.prefix:
+            if id.startswith(self.prefix):
+                return id
+            if self.prefix.endswith('/'):
+                return self.prefix + id
+            return self.prefix + '/' + id
+        return id
+
+    @abstractmethod
+    def _set_value(self, key, value):
+        pass
+
+    def set(self, id, value):
+        key = self._id_to_key(id)
+        logger.debug('Create ' + key + ' in ' + self.readable_path)
+        self._set_value(key, value)
+        self._ids_keys_map[id] = {'key': key, 'exists': True}
+        self._keys_ids_map[key] = id
+        self._save_ids()
+        if self.create_local_copy:
+            self._create_local(id, value)
+
+    def set_many(self, keys, values):
+        raise NotImplementedError
+
+    def _create_local(self, id, value):
+        with open(os.path.join(self.objects_dir, str(id)), mode='w') as fout:
+            json.dump(value, fout, indent=2)
+
+    def max_id(self):
+        return max(self._ids_keys_map.keys(), default=-1)
+
+    def ids(self):
+        self.sync()
+        return self._ids_keys_map.keys()
+
+    def _ready_to_sync(self):
+        if self.last_sync_time is None:
+            return True
+        return (datetime.now() - self.last_sync_time) > timedelta(seconds=self.sync_period_in_sec)
+
+    def sync(self):
+        if self._ready_to_sync():
+            thread = threading.Thread(target=self._sync)
+            thread.daemon = True
+            thread.start()
+        else:
+            logger.debug('Not ready to sync.')
+
+    def _sync(self):
+        with self.thread_lock:
+            self.last_sync_time = datetime.now()
+
+        new_id = self.max_id() + 1
+        new_ids_keys_map = {}
+        new_keys_ids_map = {}
+        if self.prefix:
+            bucket_iter = self.bucket.objects.filter(Prefix=self.prefix + '/', Delimiter='/')
+        else:
+            bucket_iter = self.bucket.objects
+        for obj in bucket_iter.all():
+            key = obj.key
+            if self.regex and not self.regex.match(key):
+                continue
+            if key not in self._keys_ids_map:
+                new_ids_keys_map[new_id] = {'key': key, 'exists': True}
+                new_keys_ids_map[key] = new_id
+                new_id += 1
+
+        with self.thread_lock:
+            self._ids_keys_map.update(new_ids_keys_map)
+            self._keys_ids_map.update(new_keys_ids_map)
+            self._save_ids()
+
+    @abstractmethod
+    def _get_objects(self):
+        pass
+
+    def items(self):
+        for id in self.ids():
+            obj = self.get(id)
+            if obj:
+                yield id, obj
+
+    def empty(self):
+        self.sync()
+        return len(self._ids_keys_map) == 0
+
+    def __contains__(self, id):
+        return id in self._ids_keys_map
+
+    def remove(self, key):
+        raise NotImplementedError
+
+    def remove_all(self):
+        raise NotImplementedError

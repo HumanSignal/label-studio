@@ -8,12 +8,11 @@
       <div class="ui two column centered grid">
         <div class="row">
         <div class="column center aligned">
-        {% include 'storages.html' %}
           <div class="ui statistic">
             <span class="value">{{ task_ids|length }}</span>
             <span class="label">Total tasks</span>
             {% if show_paths %}
-              <i class="small">{{ project.source_storage.readable_path }}</i>
+              <i class="small">{{ config['input_path'] }}</i>
             {% endif %}
           </div>
         </div>
@@ -22,7 +21,7 @@
             <span class="value">{{ completions|length }}</span>
             <span class="label">Total completions</span>
             {% if show_paths %}
-              <i class="small">{{ project.target_storage.readable_path }}</i>
+              <i class="small">{{ config['output_dir'] }}</i>
             {% endif %}
           </div>
         </div>
@@ -37,13 +36,9 @@
         <div class="row">
           {% if task_ids|length > 0 %}
             <a class="ui button positive" href=".">Start Labeling</a>
-            {% if project.can_manage_tasks %}
-              <a id="clear-tasks-button" class="ui button red">Delete All Tasks</a>
-            {% endif %}
+            <a id="clear-tasks-button" class="ui button red">Delete All Tasks</a>
           {% else %}
-            {% if project.can_manage_tasks %}
-              <a class="ui button positive" href="import">Import Tasks</a>
-            {% endif %}
+            <a class="ui button positive" href="import">Import Tasks</a>
           {% endif %}
         </div>
 
@@ -55,12 +50,8 @@
         <tr>
           <th>Task ID </th>
           <th>Completed at</th>
-          {% if project.can_manage_completions %}
-            <th>Delete completion?</th>
-          {% endif %}
-          {% if project.can_manage_tasks %}
-            <th>Delete task?</th>
-          {% endif %}
+          <th>Delete completion?</th>
+          <th>Delete task?</th>
         </tr>
 
         {% for id in task_ids %}
@@ -73,18 +64,14 @@
               {{ id }}
             </td>
             <td>{{ completed_at[id] }}</td>
-          {% if project.can_manage_completions %}
             <td class="text-center">
               {% if id in completions %}
                 <i data-task-id="{{ id }}" class="fas fa-trash-alt trash remove-completion"></i>
               {% endif %}
             </td>
-          {% endif %}
-          {% if project.can_manage_tasks %}
-            <td class="text-center">
-              <i data-task-id="{{ id }}" class="fas fa-trash-alt trash remove-task"></i>
-            </td>
-          {% endif %}
+          <td class="text-center">
+            <i data-task-id="{{ id }}" class="fas fa-trash-alt trash remove-task"></i>
+          </td>
           </tr>
         {% endfor %}
       </table>
