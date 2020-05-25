@@ -90,9 +90,8 @@
           <a class="ui button positive" href="/">Start Labeling</a>
 
           <!-- Sampling -->
-          <span class="ui button basic disabled" style="padding-top: 5px; padding-bottom: 5px;">
-            Tasks sampling:
-            <span class="ui orange label">
+          <span class="ui segment" style="padding-top: 8px; padding-bottom: 8px;">
+            Tasks sampling:&nbsp;<span class="ui orange label">
               {{ project.config['sampling'] }}
             </span>
           </span>
@@ -233,39 +232,42 @@
         },
 
         methods: {
-            // get tasks from api
-            tasksUpdate: function () {
+            getApi: function (dst, url, done) {
                 var root = this;
-                $.get('/api/tasks?page=' + this.page + '&page_size=' + parseInt(this.page_size) + '&order=' + this.order +
-                    '&rnd=' + Math.random())
+                $.get(url + '?&rnd=' +  Math.random())
                     .done(function (data) {
-                        root.tasks = data;
-                        console.log('tasks loaded');
+                        root[dst] = data;
+                        done();
+                        console.log(dst + ' loaded');
                     })
                     .fail(function () {
-                        console.log('no tasks loaded')
+                        console.log('no '+ dst +' loaded')
                     })
+            },
+
+            // get tasks from api
+            storageSettingsUpdate: function () {
+                this.getApi('storage_settings', '/api/project/1/storage-settings');
+            },
+
+            // get tasks from api
+            tasksUpdate: function () {
+                var url = '/api/tasks?page=' + this.page + '&page_size=' + parseInt(this.page_size) +
+                          '&order=' + this.order;
+                this.getApi('tasks', url)
             },
 
             // get project info from api
             projectUpdate: function () {
                 var root = this;
-                $.get('/api/project?rnd=' + Math.random())
-                    .done(function (data) {
-                        root.project = data;
-                        root.project_loaded = true;
-                        console.log('project loaded');
-                    })
-                    .fail(function () {
-                        root.project_loaded = true;
-                        console.log('no project loaded')
-                    })
+                this.getApi('project', '/api/project', function() {root.project_loaded = true;});
             },
 
             // update all objects via api
             totalUpdate: function () {
                 this.projectUpdate();
                 this.tasksUpdate();
+                this.storageSettingsUpdate();
             },
 
             // change order of sorting in table
@@ -323,7 +325,7 @@
         // vue mounting of page
         mounted: function () {
             this.vue_loaded = true;
-            this.project_loaded = false;
+            this.project_loaded = true;
 
             this.order = getUrlArg('order', 'id');
             this.totalUpdate();
@@ -332,7 +334,6 @@
             $('#vue_loader').hide();
             console.log('Vue mounting success');
         }
-
     });
 
 
