@@ -357,6 +357,10 @@ div[class*="App_editor"] {
     height: auto;
 }
 
+.ui .pagination.menu {
+    box-shadow: none;
+}
+
 /* semantic ui pretty finish */
 
 /* label config */
