@@ -26,6 +26,7 @@ from flask import (
 )
 from flask_api import status
 from types import SimpleNamespace
+from werkzeug.datastructures import ImmutableMultiDict
 
 from label_studio.utils.functions import generate_sample_task
 from label_studio.utils.io import find_dir, find_editor_files
@@ -48,6 +49,7 @@ app = flask.Flask(__name__, static_url_path='')
 
 app.secret_key = 'A0Zrdqwf1AQWj12ajkhgFN]dddd/,?RfDWQQT'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+app.config['WTF_CSRF_ENABLED'] = False
 
 # input arguments
 input_args = None
@@ -545,7 +547,7 @@ def api_project():
 def api_project_storage_settings():
     project = project_get_or_create()
     project.analytics.send(getframeinfo(currentframe()).function)
-    from werkzeug.datastructures import ImmutableMultiDict
+
     form = project.source_storage.get_form(ImmutableMultiDict(request.json))
     if request.method == 'POST':
         if form.validate_on_submit():
