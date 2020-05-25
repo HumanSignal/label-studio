@@ -22,7 +22,7 @@ from urllib.parse import unquote
 from datetime import datetime
 from inspect import currentframe, getframeinfo
 from flask import (
-    request, jsonify, make_response, Response, Response as HttpResponse, send_file, session, redirect, flash
+    request, jsonify, make_response, Response, Response as HttpResponse, send_file, session, redirect
 )
 from flask_api import status
 from types import SimpleNamespace
@@ -39,6 +39,7 @@ from label_studio.utils.misc import (
 )
 from label_studio.utils.argparser import parse_input_args
 from label_studio.utils.uri_resolver import resolve_task_data_uri
+from label_studio.storage import get_available_storages
 
 from label_studio.project import Project
 from label_studio.tasks import Tasks
@@ -536,7 +537,8 @@ def api_project():
         'can_manage_completions': project.can_manage_completions,
         'multi_session_mode': input_args.command != 'start-multi-session',
         'target_storage': {'readable_path': project.target_storage.readable_path},
-        'source_storage': {'readable_path': project.source_storage.readable_path}
+        'source_storage': {'readable_path': project.source_storage.readable_path},
+        'available_storages': get_available_storages()
     }
     logger.debug(str(output))
     project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
@@ -557,6 +559,9 @@ def api_project_storage_settings():
             return make_response(jsonify({'errors': form.errors}), 422)
 
     output = [serialize_class(field) for field in form]
+    # TODO: populate storage_for, storage_kwargs
+    project.update_storage(storage_for, storage_kwargs)
+
     return make_response(jsonify(output), 200)
 
 
@@ -795,18 +800,6 @@ def api_predictions():
     else:
         project.analytics.send(getframeinfo(currentframe()).function, error=400)
         return make_response(jsonify("No ML backend"), 400)
-
-
-@app.route('/api/project/1/storage-settings', methods=['POST'])
-def api_storages():
-    # populate storage kwargs from request
-    storage_for = 'source'
-    storage_kwargs = {}
-
-    project = project_get_or_create()
-    project.update_storage(storage_for, storage_kwargs)
-
-    return make_response(jsonify({}), 200)
 
 
 @app.route('/data/<path:filename>')
