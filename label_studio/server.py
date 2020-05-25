@@ -553,7 +553,9 @@ def api_project_storage_settings():
     form = project.source_storage.get_form(ImmutableMultiDict(request.json))
     if request.method == 'POST':
         if form.validate_on_submit():
-            project.update_storage(request.json['storage_for'], form.data)
+            storage_kwargs = dict(form.data)
+            storage_kwargs['type'] = request.json['type']  # storage type
+            project.update_storage(request.json['storage_for'], storage_kwargs)
         else:
             return make_response(jsonify({'errors': form.errors}), 422)
 
