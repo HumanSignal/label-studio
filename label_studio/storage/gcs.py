@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 class GCSStorage(CloudStorage):
 
+    @property
     def readable_path(self):
         return 'gs://' + self.path + '/' + self.prefix
 
@@ -22,9 +23,10 @@ class GCSStorage(CloudStorage):
         }
 
     def _get_objects(self):
+        logger.debug('Getting GCS blobs from ' + self.path)
         bucket = self.client['bucket']
         files = bucket.list_blobs(prefix=self.prefix)
-        return (f.name for f in files)
+        return (f.name for f in files if f.name != (self.prefix + '/'))
 
     def _get_value(self, key):
         bucket = self.client['bucket']

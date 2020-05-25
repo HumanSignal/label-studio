@@ -545,6 +545,7 @@ def api_project():
         'target_storage': {'readable_path': project.target_storage.readable_path},
         'source_storage': {'readable_path': project.source_storage.readable_path}
     }
+    logger.debug(str(output))
     project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
     return make_response(jsonify(output), code)
 
