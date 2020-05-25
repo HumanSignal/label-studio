@@ -180,7 +180,7 @@ def tasks_page():
     """
     project = project_get_or_create()
 
-    label_config = open(project.config['label_config']).read()  # load editor config from XML
+    label_config = open(project.config['label_config'], encoding='utf8').read()  # load editor config from XML
     task_ids = project.get_tasks().keys()
     completed_at = project.get_completed_at(task_ids)
 
