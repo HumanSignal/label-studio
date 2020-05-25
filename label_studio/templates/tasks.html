@@ -74,7 +74,6 @@
             <span class="value"><animated-number :number="project.task_count"/></span>
             <span class="label">Total tasks</span>
             <i class="word-break" v-if="project.multi_session_mode">{{ project.source_storage.readable_path }}</i>
-            {% endraw %}{% include 'storages.html' %}{% raw %}
           </div>
         </div>
         <!-- Total completions -->

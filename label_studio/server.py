@@ -186,20 +186,10 @@ def tasks_page():
     project = project_get_or_create()
     project.analytics.send(getframeinfo(currentframe()).function)
 
-    form = project.source_storage.get_form()
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            # Save the comment here.
-            print('!!!!!', form.data)
-        else:
-            for error_field, error_msgs in form.errors.items():
-                flash('Error in field "' + error_field + '": ' + '. '.join(error_msgs), 'error')
-
     return flask.render_template(
         'tasks.html',
         project=project,
-        config=project.config,
-        form=form
+        config=project.config
     )
 
 
@@ -548,6 +538,22 @@ def api_project():
     logger.debug(str(output))
     project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
     return make_response(jsonify(output), code)
+
+
+@app.route('/api/storage-settings', methods=['GET', 'POST'])
+def api_project_storage_settings():
+    project = project_get_or_create()
+    project.analytics.send(getframeinfo(currentframe()).function)
+
+    form = project.source_storage.get_form()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            # Save the comment here.
+            print('!!!!!', form.data)
+        else:
+            return make_response(jsonify({'errors': form.errors}), 422)
+
+    return make_response(jsonify(form.data), 200)
 
 
 @app.route('/api/projects/1/task_ids/', methods=['GET'])
