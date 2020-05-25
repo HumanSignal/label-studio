@@ -21,7 +21,9 @@ from uuid import uuid4
 from urllib.parse import unquote
 from datetime import datetime
 from inspect import currentframe, getframeinfo
-from flask import request, jsonify, make_response, Response, Response as HttpResponse, send_file, session, redirect
+from flask import (
+    request, jsonify, make_response, Response, Response as HttpResponse, send_file, session, redirect, flash
+)
 from flask_api import status
 from types import SimpleNamespace
 
@@ -176,17 +178,28 @@ def welcome_page():
     )
 
 
-@app.route('/tasks')
+@app.route('/tasks', methods=['GET', 'POST'])
 def tasks_page():
     """ Tasks and completions page
     """
+
     project = project_get_or_create()
     project.analytics.send(getframeinfo(currentframe()).function)
+
+    form = project.source_storage.get_form()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            # Save the comment here.
+            print('!!!!!', form.data)
+        else:
+            for error_field, error_msgs in form.errors.items():
+                flash('Error in field "' + error_field + '": ' + '. '.join(error_msgs), 'error')
 
     return flask.render_template(
         'tasks.html',
         project=project,
-        config=project.config
+        config=project.config,
+        form=form
     )
 
 
@@ -771,6 +784,12 @@ def api_predictions():
     else:
         project.analytics.send(getframeinfo(currentframe()).function, error=400)
         return make_response(jsonify("No ML backend"), 400)
+
+
+@app.route('/api/storages', methods=['POST'])
+def api_storages():
+
+    return make_response(jsonify({}), 200)
 
 
 @app.route('/data/<path:filename>')

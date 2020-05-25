@@ -31,6 +31,7 @@ class JSONStorage(BaseStorage):
     def get(self, id):
         return self.data.get(int(id))
 
+
     def set(self, id, value):
         self.data[int(id)] = value
         self._save()
