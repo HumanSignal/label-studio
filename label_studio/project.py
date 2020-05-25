@@ -71,6 +71,28 @@ class Project(object):
         self.source_storage = create_storage(source['type'], source['path'], self.path, **source.get('params', {}))
         self.target_storage = create_storage(target['type'], target['path'], self.path, **target.get('params', {}))
 
+    def update_storage(self, storage_for, storage_kwargs):
+
+        def _update_storage(storage_for, storage_kwargs):
+            storage_name = storage_kwargs.pop('name', storage_for)
+            storage_type = storage_kwargs.pop('type')
+            storage_path = storage_kwargs.pop('path')
+            self.config[storage_for] = {
+                'name': storage_name,
+                'type': storage_type,
+                'path': storage_path,
+                'params': storage_kwargs
+            }
+            self._save_config()
+            return create_storage(storage_type, storage_path, self.path, **storage_kwargs)
+
+        if storage_for == 'source':
+            self.source_storage = _update_storage('source', storage_kwargs)
+        elif storage_for == 'target':
+            self.target_storage = _update_storage('target', storage_kwargs)
+        self.update_derived_input_schema()
+        self.update_derived_output_schema()
+
     @property
     def can_manage_tasks(self):
         return self.config['source']['type'] not in {'s3', 's3blob', 'gcs', 'gcsblob'}
