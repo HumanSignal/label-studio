@@ -30,6 +30,10 @@ def create_storage(storage_type, path, project_path=None, **kwargs):
     return _storage[storage_type](path=path, project_path=project_path, **kwargs)
 
 
+def get_available_storages():
+    return list(sorted(_storage.keys()))
+
+
 class BaseStorage(ABC):
 
     def __init__(self, path, project_path=None, **kwargs):
