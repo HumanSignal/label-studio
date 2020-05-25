@@ -103,14 +103,14 @@ class IsValidRegex(object):
 
 
 class CloudStorageForm(FlaskForm):
-    path = StringField('Path', [InputRequired()])
-    prefix = StringField('Prefix', [Optional()])
-    regex = StringField('Regex', [IsValidRegex()])
-    create_local_copy = BooleanField('Create local copy')
+    path = StringField('Path', [InputRequired()], description='Bucket path')
+    prefix = StringField('Prefix', [Optional()], description='Prefix')
+    regex = StringField('Regex', [IsValidRegex()], description='Filter files by regex')
+    create_local_copy = BooleanField('Create local copy', description='Create local copy on your disk')
 
 
 class CloudStorageBlobForm(CloudStorageForm):
-    data_key = StringField('Data key', [InputRequired()])
+    data_key = StringField('Data key', [InputRequired()], description='Task value key from your label config')
 
 
 class CloudStorage(BaseStorage):

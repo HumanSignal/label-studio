@@ -465,3 +465,23 @@ pre {
         justify-content: center;
     }
 }
+
+.ui .button.positive {
+    background: rgb(24, 144, 255) !important;
+    color: #fff !important;
+    border-color: rgb(24, 144, 255) !important;
+    transition: background-color ease-in-out 0.25s;
+}
+.ui .button.positive:hover {
+    background: rgb(54, 162, 255) !important;
+    transition: background-color ease-in-out 0.25s;
+}
+.sup-button {
+    font-size: 0.75em;
+    color: rgb(24, 144, 255);
+    transition: background-color ease-in-out 0.25s;
+}
+.sup-button:hover {
+    color: rgb(54, 162, 255);
+    transition: background-color ease-in-out 0.25s;
+}

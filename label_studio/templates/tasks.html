@@ -38,14 +38,6 @@
   .order.up, .order.down {
     font-weight: bold;
   }
-  .order.up:after {
-    font-family: 'FontAwesome';
-    content: " \f0d8";
-  }
-  .order.down:after {
-    font-family: 'FontAwesome';
-    content: " \f0d7";
-  }
 </style>
 
 <div id="vue_loader" class="ui large text loader loading active">Loading ...</div>
@@ -57,7 +49,6 @@
   <!-- Main content -->
   <center class="wrapper" v-else>
 
-
   <div class="ui container">
     <center class="wrapper">
 
@@ -67,7 +58,10 @@
         <!-- Total tasks -->
         <div class="column center aligned">
           <div class="ui statistic small">
-            <span class="value"><animated-number :number="project.task_count"/></span>
+            <span class="value">
+              <animated-number :number="project.task_count"></animated-number>
+              <sup><i class="fas fa-cog sup-button" onclick="$('#storage-settings-dialog').show()"></i></sup>
+            </span>
             <span class="label">Total tasks</span>
             <i class="word-break" v-if="project.multi_session_mode">{{ project.source_storage.readable_path }}</i>
           </div>
@@ -81,7 +75,6 @@
           </div>
         </div>
       </div>
-
 
       <!-- Control buttons -->
       <div class="ui row stackable" v-if="project.task_count > 0">
@@ -142,13 +135,11 @@
     <table v-if="project.task_count > 0" class="responsive">
       <!-- Header -->
       <tr>
-        <th class="order"
-            :class="{'up': this.order=='id', 'down': this.order=='-id'}"
-            @click="changeOrder('id')">Task ID
+        <th class="order" @click="changeOrder('id')">Task ID
+          <i class="fas" :class="{'fa-sort-up': this.order=='id', 'fa-sort-down': this.order=='-id'}"></i>
         </th>
-        <th class="order"
-            :class="{'up': this.order=='completed_at', 'down': this.order=='-completed_at'}"
-            @click="changeOrder('completed_at')">Completed at
+        <th class="order" @click="changeOrder('completed_at')">Completed at
+          <i class="fas" :class="{'fa-sort-up': this.order=='completed_at', 'fa-sort-down': this.order=='-completed_at'}"></i>
         </th>
         <th v-if="project.can_manage_tasks">Delete task?</th>
         <th v-if="project.can_manage_completions">Delete completion?</th>
@@ -206,6 +197,8 @@
                 },
                 // provided by api/tasks
                 tasks: [],
+                // provided by api/project/storage-settings
+                storage_settings: [],
 
                 // internal variables
                 vue_loaded: false,
@@ -213,7 +206,8 @@
                 page: 1,
                 page_size: 10,
                 order: 'id',
-                timer: null
+                timer: null,
+                show_storage_settings: false
             }
         },
 
@@ -232,12 +226,12 @@
         },
 
         methods: {
-            getApi: function (dst, url, done) {
+            getApi: function (dst, url, done=null) {
                 var root = this;
-                $.get(url + '?&rnd=' +  Math.random())
+                $.get(url + (url.includes('?') ? '&' :'?') + 'rnd=' +  Math.random())
                     .done(function (data) {
                         root[dst] = data;
-                        done();
+                        if (done) done();
                         console.log(dst + ' loaded');
                     })
                     .fail(function () {
@@ -247,20 +241,19 @@
 
             // get tasks from api
             storageSettingsUpdate: function () {
-                this.getApi('storage_settings', '/api/project/1/storage-settings');
+                this.getApi('storage_settings', 'api/project/storage-settings');
             },
 
             // get tasks from api
             tasksUpdate: function () {
-                var url = '/api/tasks?page=' + this.page + '&page_size=' + parseInt(this.page_size) +
-                          '&order=' + this.order;
-                this.getApi('tasks', url)
+                this.getApi('tasks', '/api/tasks?page=' + this.page + '&page_size=' + parseInt(this.page_size) +
+                            '&order=' + this.order)
             },
 
             // get project info from api
             projectUpdate: function () {
                 var root = this;
-                this.getApi('project', '/api/project', function() {root.project_loaded = true;});
+                this.getApi('project', '/api/project', function() {root.project_loaded = true});
             },
 
             // update all objects via api

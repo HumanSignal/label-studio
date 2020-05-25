@@ -545,7 +545,7 @@ def api_project():
     return make_response(jsonify(output), code)
 
 
-@app.route('/api/project/1/storage-settings', methods=['GET', 'POST'])
+@app.route('/api/project/storage-settings', methods=['GET', 'POST'])
 def api_project_storage_settings():
     project = project_get_or_create()
     project.analytics.send(getframeinfo(currentframe()).function)
@@ -553,15 +553,11 @@ def api_project_storage_settings():
     form = project.source_storage.get_form(ImmutableMultiDict(request.json))
     if request.method == 'POST':
         if form.validate_on_submit():
-            # Save the comment here.
-            print('!!!!!', form.data)
+            project.update_storage(storage_for, form.data)
         else:
             return make_response(jsonify({'errors': form.errors}), 422)
 
     output = [serialize_class(field) for field in form]
-    # TODO: populate storage_for, storage_kwargs
-    project.update_storage(storage_for, storage_kwargs)
-
     return make_response(jsonify(output), 200)
 
 
