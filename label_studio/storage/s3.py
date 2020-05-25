@@ -1,8 +1,6 @@
 import logging
 import boto3
 import json
-import re
-import os
 
 from .base import CloudStorage, CloudStorageBlobForm
 
@@ -43,14 +41,16 @@ class S3Storage(CloudStorage):
         if not isinstance(value, str):
             value = json.dumps(value)
         s3 = self.client['s3']
-        s3.Object(self.bucket.name, key).put(Body=value)
+        bucket = self.client['bucket']
+        s3.Object(bucket.name, key).put(Body=value)
 
     def _get_objects(self):
         bucket = self.client['bucket']
         if self.prefix:
-            return bucket.objects.filter(Prefix=self.prefix + '/', Delimiter='/')
+            bucket_iter = bucket.objects.filter(Prefix=self.prefix + '/', Delimiter='/').all()
         else:
-            return bucket.objects
+            bucket_iter = bucket.objects.all()
+        return (obj.key for obj in bucket_iter)
 
 
 class S3BlobStorage(S3Storage):
@@ -61,7 +61,8 @@ class S3BlobStorage(S3Storage):
         self.data_key = data_key
 
     def _get_value(self, key):
-        return {self.data_key: 's3://' + self.bucket.name + '/' + key}
+        bucket = self.client['bucket']
+        return {self.data_key: 's3://' + bucket.name + '/' + key}
 
     def _set_value(self, key, value):
         raise NotImplementedError

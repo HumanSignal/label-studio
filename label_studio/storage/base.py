@@ -230,12 +230,8 @@ class CloudStorage(BaseStorage):
         new_id = self.max_id() + 1
         new_ids_keys_map = {}
         new_keys_ids_map = {}
-        if self.prefix:
-            bucket_iter = self.bucket.objects.filter(Prefix=self.prefix + '/', Delimiter='/')
-        else:
-            bucket_iter = self.bucket.objects
-        for obj in bucket_iter.all():
-            key = obj.key
+
+        for key in self._get_objects():
             if self.regex and not self.regex.match(key):
                 continue
             if key not in self._keys_ids_map:
