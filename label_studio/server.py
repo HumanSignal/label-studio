@@ -787,7 +787,7 @@ def api_predictions():
         for task_id, task in project.source_storage.items():
             task_pred = project.make_predictions(task)
             tasks_with_predictions[task_pred['id']] = task_pred
-        project.source_storage.set_many(tasks_with_predictions.keys(), tasks_with_predictions.values())
+        proct.source_storage.set_many(tasks_with_predictions.keys(), tasks_with_predictions.values())
 
         return make_response(jsonify({'details': 'Predictions done.'}), 200)
     else:
@@ -795,8 +795,14 @@ def api_predictions():
         return make_response(jsonify("No ML backend"), 400)
 
 
-@app.route('/api/storages', methods=['POST'])
+@app.route('/api/project/1/storage-settings', methods=['POST'])
 def api_storages():
+    # populate storage kwargs from request
+    storage_for = 'source'
+    storage_kwargs = {}
+
+    project = project_get_or_create()
+    project.update_storage(storage_for, storage_kwargs)
 
     return make_response(jsonify({}), 200)
 
