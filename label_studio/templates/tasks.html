@@ -48,10 +48,6 @@
   }
 </style>
 
-{% endraw %}
-  {# {% include 'storages.html' %} #}
-{% raw %}
-
 <div id="vue_loader" class="ui large text loader loading active">Loading ...</div>
 
 <div class="ui container" id="app" :class="{'visible-app': vue_loaded}" style="display: none">
@@ -94,7 +90,7 @@
           <a class="ui button positive" href="/">Start Labeling</a>
 
           <!-- Sampling -->
-          <span class="ui button basic" style="padding-top: 5px; padding-bottom: 5px;">
+          <span class="ui button basic disabled" style="padding-top: 5px; padding-bottom: 5px;">
             Tasks sampling:
             <span class="ui orange label">
               {{ project.config['sampling'] }}
@@ -186,6 +182,11 @@
     <br/>
   </center>
   <br/><br/>
+
+  {% endraw %}
+  {% include 'storages.html' %}
+  {% raw %}
+
 </div>
 
 <script src="/static/js/components/animatedNumber.js"></script>

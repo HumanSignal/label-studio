@@ -8,7 +8,8 @@ import hashlib
 import calendar
 import pytz
 
-from collections import defaultdict
+from json import JSONEncoder
+from collections import defaultdict, OrderedDict
 from lxml import etree, objectify
 from datetime import datetime
 from dateutil.tz import tzlocal
@@ -242,3 +243,26 @@ def timestamp_to_local_datetime(timestamp):
 
 def timestamp_now():
     return datetime_to_timestamp(datetime.utcnow())
+
+
+def serialize_class(class_instance, keys=None):
+    """ Serialize class instance
+
+    param keys: list of fields to serialize
+    """
+    keys = [d for d in dir(class_instance) if not d.startswith('_')] \
+        if keys is None else keys
+
+    # execute fields
+    dictionary = {key: getattr(class_instance, key) for key in keys}
+
+    # convert fields
+    output = OrderedDict()
+    for key in keys:
+        value = dictionary[key]
+        if isinstance(value, str) or isinstance(value, bool) \
+                or isinstance(value, int) or isinstance(value, float) \
+                or value is None:
+            output[key] = dictionary[key]
+
+    return output

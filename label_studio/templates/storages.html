@@ -1,3 +1,47 @@
+<div class="ui small modal">
+  <i class="close icon"></i>
+  <div class="header">Storage settings</div>
+  <div class="content">
+    <div class="ui form">
+
+      <div class="field">
+        <label>Data key</label>
+        <input type="text" placeholder="image">
+      </div>
+
+      <div class="field">
+        <label>Path</label>
+        <input type="text" placeholder="">
+      </div>
+
+      <div class="field">
+        <label>Prefix</label>
+        <input type="text" placeholder="dataset/training-set">
+      </div>
+
+      <div class="field">
+        <label>Regex</label>
+        <input type="text" placeholder="*.jpe?g">
+      </div>
+
+      <div class="ui field checkbox">
+        <input type="checkbox">
+        <label>Create local copy</label>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="ui button positive">Save</button>
+    <button class="ui button basic cancel">Close</button>
+  </div>
+</div>
+
+<script>
+  //$(".ui.modal").modal('show')
+</script>
+{#
 {% with errors = get_flashed_messages(category_filter=["error"]) %}
   {% if errors %}
     {% for error in errors %}
@@ -23,3 +67,4 @@
 <script>
   $('.ui.toggle.checkbox').checkbox();
 </script>
+#}
