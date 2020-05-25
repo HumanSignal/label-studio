@@ -49,6 +49,9 @@ class BaseStorage(ABC):
     def get(self, id):
         pass
 
+    def get_form(self):
+        return {}
+
     @abstractmethod
     def __contains__(self, id):
         pass
