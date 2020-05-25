@@ -27,6 +27,11 @@
     height: 0;
   }
 
+  .pagination-size {
+    border: none;
+    background: none;
+  }
+
   .order {
     cursor: pointer;
   }
@@ -61,42 +66,47 @@
     <center class="wrapper">
 
     <!-- Statistics -->
-    <div class="ui two column centered grid">
+    <div class="ui two column centered grid stackable">
       <div class="row">
         <!-- Total tasks -->
         <div class="column center aligned">
-          <div class="ui statistic">
+          <div class="ui statistic small">
             <span class="value"><animated-number :number="project.task_count"/></span>
             <span class="label">Total tasks</span>
-            {% endraw %}{% if show_paths %}
-            <i class="small">{{ project.source_storage.readable_path }}</i>
-            {% endif %}{% raw %}
+            <i class="word-break" v-if="project.multi_session_mode">{{ project.source_storage.readable_path }}</i>
           </div>
         </div>
         <!-- Total completions -->
         <div class="column center aligned">
-          <div class="ui statistic">
+          <div class="ui statistic small">
             <span class="value"><animated-number :number="project.completion_count"/></span>
             <span class="label">Total completions</span>
-            {% endraw %}{% if show_paths %}
-            <i class="small">{{ project.target_storage.readable_path }}</i>
-            {% endif %}{% raw %}
+            <i class="word-break" v-if="project.multi_session_mode">{{ project.target_storage.readable_path }}</i>
           </div>
         </div>
       </div>
 
-      <!-- Sampling -->
-      <div class="row">
-        <div class="ui message">
-          <p>Tasks sampling: <span class="ui orange horizontal label">{{ project.config['sampling'] }}</span></p>
+
+      <!-- Control buttons -->
+      <div class="ui row stackable" v-if="project.task_count > 0">
+        <div class="column center aligned">
+          <!-- Start labeling -->
+          <a class="ui button positive" href="/">Start Labeling</a>
+
+          <!-- Sampling -->
+          <span class="ui button basic" style="padding-top: 5px; padding-bottom: 5px;">
+            Tasks sampling:
+            <span class="ui orange label">
+              {{ project.config['sampling'] }}
+            </span>
+          </span>
+
+          <!-- Delete all tasks -->
+          <a class="ui button red" @click="deleteAllTasks()" v-if="project.can_manage_tasks">Delete All Tasks</a>
         </div>
       </div>
 
-      <!-- Control buttons -->
-      <div class="row" v-if="project.task_count > 0">
-        <a class="ui button positive" href="/">Start Labeling</a>
-        <a class="ui button red" @click="deleteAllTasks()" v-if="project.can_manage_tasks">Delete All Tasks</a>
-      </div>
+      <!-- Import tasks -->
       <div class="row" v-else>
         <a class="ui button positive" href="/import" v-if="project.can_manage_tasks">Import Tasks</a>
       </div>
@@ -115,6 +125,18 @@
         {{ totalPages }}
       </div>
 
+      <div class="item">
+        <select class="pagination-size" v-model="page_size">
+          <option>1</option>
+          <option>5</option>
+          <option selected="selected">10</option>
+          <option>50</option>
+          <option>100</option>
+          <option>500</option>
+          <option>1000</option>
+        </select>
+      </div>
+
       <a class="item" :class="{'active': page<totalPages, 'disabled': page>=totalPages}"
          @click="if (page<totalPages) page++">Next</a>
     </div>
@@ -122,7 +144,7 @@
     <div class="ui divider hidden"></div>
 
     <!-- Table -->
-    <table v-if="project.task_count > 0">
+    <table v-if="project.task_count > 0" class="responsive">
       <!-- Header -->
       <tr>
         <th class="order"
@@ -205,7 +227,7 @@
                 return this.tasks;
             },
             totalPages: function () {
-                return Math.ceil(this.project.task_count / this.page_size);
+                return Math.ceil(this.project.task_count / parseInt(this.page_size));
             }
         },
 
@@ -213,7 +235,7 @@
             // get tasks from api
             tasksUpdate: function () {
                 var root = this;
-                $.get('/api/tasks?page=' + this.page + '&size=' + this.page_size + '&order=' + this.order +
+                $.get('/api/tasks?page=' + this.page + '&page_size=' + parseInt(this.page_size) + '&order=' + this.order +
                     '&rnd=' + Math.random())
                     .done(function (data) {
                         root.tasks = data;
@@ -290,6 +312,9 @@
         watch: {
             // watch for page variable changes
             page: function () {
+                this.tasksUpdate();
+            },
+            page_size: function() {
                 this.tasksUpdate();
             }
         },

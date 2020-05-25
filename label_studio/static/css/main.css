@@ -9,10 +9,24 @@ body {
 }
 
 table {
-    border: 1px solid #ccc;
-    margin: 0 auto;
     border-collapse: collapse;
 }
+
+table.responsive {
+    width: 100%;
+}
+
+@media screen and (max-width: 768px) {
+    table.responsive tbody th,
+    table.responsive tbody td {
+        display: block;
+        border: none;
+    }
+    table tr {
+        border-top: 1px solid #ddd;
+    }
+}
+
 
 h2 {
     font-size: 1.2em;
@@ -73,7 +87,7 @@ th {
 }
 
 .upper-right {
-    position:absolute;
+    position: absolute;
     top: 5px;
     right: 0;
 }
@@ -187,13 +201,12 @@ a {
     font-weight: bold;
 }
 
-.small {
-    font-size: 75%;
+.word-break {
     white-space: pre-wrap; /* css-3 */
     white-space: -moz-pre-wrap;
     white-space: -pre-wrap;
     white-space: -o-pre-wrap;
-    word-wrap: break-word;
+    word-wrap: break-word !important;
 }
 
 div.task-buttons .button {
@@ -287,6 +300,7 @@ div[class*="App_editor"] {
 
 .ui .button {
     font-weight: 400 !important;
+    margin-bottom: 5px !important;
 }
 
 .ui .button.positive {
@@ -326,12 +340,12 @@ div[class*="App_editor"] {
 }
 
 .ui ul li::before {
-  content: "\2022";
-  color: rgba(0,0,0,0.4) !important;
-  font-weight: normal;
-  display: inline-block;
-  width: 1em;
-  margin-left: -1em;
+    content: "\2022";
+    color: rgba(0, 0, 0, 0.4) !important;
+    font-weight: normal;
+    display: inline-block;
+    width: 1em;
+    margin-left: -1em;
 }
 
 .ui .label.basic {
@@ -410,6 +424,7 @@ pre {
     #logo {
         display: none;
     }
+
     #header {
         height: 80px;
         display: flex;

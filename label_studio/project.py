@@ -79,6 +79,10 @@ class Project(object):
     def can_manage_completions(self):
         return self.config['target']['type'] not in {'s3', 's3blob'}
 
+    @property
+    def data_types_json(self):
+        return self.project_obj.data_types_json
+
     def load_label_config(self):
         self.label_config_full = config_comments_free(open(self.config['label_config']).read())
         self.label_config_line = config_line_stripped(self.label_config_full)

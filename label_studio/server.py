@@ -185,7 +185,6 @@ def tasks_page():
 
     return flask.render_template(
         'tasks.html',
-        show_paths=input_args.command != 'start-multi-session',
         project=project,
         config=project.config
     )
@@ -528,7 +527,10 @@ def api_project():
         'completion_count': len(project.get_completions_ids()),
         'config': project.config,
         'can_manage_tasks': project.can_manage_tasks,
-        'can_manage_completions': project.can_manage_completions
+        'can_manage_completions': project.can_manage_completions,
+        'multi_session_mode': input_args.command != 'start-multi-session',
+        'target_storage': {'readable_path': project.target_storage.readable_path},
+        'source_storage': {'readable_path': project.source_storage.readable_path}
     }
     project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
     return make_response(jsonify(output), code)
