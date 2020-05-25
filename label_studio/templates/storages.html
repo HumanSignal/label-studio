@@ -1,0 +1,25 @@
+{% with errors = get_flashed_messages(category_filter=["error"]) %}
+  {% if errors %}
+    {% for error in errors %}
+      <div class="ui negative message">{{ error }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<form class="ui form" method="POST" action="">
+    {{ form.csrf_token }}
+  {% for field in form %}
+    {% if field.type == 'BooleanField' %}
+      <div class="inline field"><div class="ui toggle checkbox">{{ field.label }} {{ field }}</div></div>
+    {% elif field.name == 'csrf_token' %}
+    {% else %}
+      <div class="inline field">{{ field.label }} {{ field }}</div>
+    {% endif %}
+  {% endfor %}
+
+  <button class="ui button" type="submit">Submit</button>
+</form>
+
+<script>
+  $('.ui.toggle.checkbox').checkbox();
+</script>

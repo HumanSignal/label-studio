@@ -4,6 +4,10 @@ import json
 import re
 import os
 import threading
+from flask_wtf import FlaskForm
+from wtforms import StringField, BooleanField
+from wtforms.validators import InputRequired, Optional, ValidationError
+
 
 from datetime import datetime, timedelta
 from .base import BaseStorage
@@ -13,6 +17,26 @@ logger = logging.getLogger(__name__)
 logging.getLogger('botocore').setLevel(logging.CRITICAL)
 boto3.set_stream_logger(level=logging.INFO)
 thread_lock = threading.Lock()
+
+
+class IsValidRegex(object):
+
+    def __call__(self, form, field):
+        try:
+            re.compile(field.data)
+        except re.error:
+            raise ValidationError(field.data + ' is not a valid regular expression')
+
+
+class S3StorageForm(FlaskForm):
+    path = StringField('Path', [InputRequired()])
+    prefix = StringField('Prefix', [Optional()])
+    regex = StringField('Regex', [IsValidRegex()])
+    create_local_copy = BooleanField('Create local copy')
+
+
+class S3BlobStorageForm(S3StorageForm):
+    data_key = StringField('Data key', [InputRequired()])
 
 
 class S3Storage(BaseStorage):
@@ -38,6 +62,10 @@ class S3Storage(BaseStorage):
         self._keys_ids_map = {}
         self._ids_file = os.path.join(self.local_dir, 'ids.json')
         self._load_ids()
+
+    def get_form(self):
+        form = S3StorageForm()
+        return form
 
     def _load_ids(self):
         if os.path.exists(self._ids_file):
@@ -176,6 +204,10 @@ class S3BlobStorage(S3Storage):
     def __init__(self, data_key, **kwargs):
         super(S3BlobStorage, self).__init__(**kwargs)
         self.data_key = data_key
+
+    def get_form(self):
+        form = S3BlobStorageForm()
+        return form
 
     def _get_value(self, key):
         return {self.data_key: 's3://' + self.bucket.name + '/' + key}

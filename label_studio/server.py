@@ -21,7 +21,9 @@ from uuid import uuid4
 from urllib.parse import unquote
 from datetime import datetime
 from inspect import currentframe, getframeinfo
-from flask import request, jsonify, make_response, Response, Response as HttpResponse, send_file, session, redirect
+from flask import (
+    request, jsonify, make_response, Response, Response as HttpResponse, send_file, session, redirect, flash
+)
 from flask_api import status
 from types import SimpleNamespace
 
@@ -176,11 +178,22 @@ def welcome_page():
     )
 
 
-@app.route('/tasks')
+@app.route('/tasks', methods=['GET', 'POST'])
 def tasks_page():
     """ Tasks and completions page: tasks.html
     """
+
     project = project_get_or_create()
+
+    form = project.source_storage.get_form()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            # Save the comment here.
+            print('!!!!!', form.data)
+        else:
+            for error_field, error_msgs in form.errors.items():
+                flash('Error in field "' + error_field + '": ' + '. '.join(error_msgs), 'error')
+
     label_config = open(project.config['label_config']).read()  # load editor config from XML
     task_ids = project.source_storage.ids()
     completed_at = project.get_completed_at(task_ids)
@@ -197,7 +210,8 @@ def tasks_page():
         label_config=label_config,
         task_ids=task_ids,
         completions=project.get_completions_ids(),
-        completed_at=completed_at
+        completed_at=completed_at,
+        form=form
     )
 
 
@@ -726,6 +740,12 @@ def api_predictions():
     else:
         project.analytics.send(getframeinfo(currentframe()).function, error=400)
         return make_response(jsonify("No ML backend"), 400)
+
+
+@app.route('/api/storages', methods=['POST'])
+def api_storages():
+
+    return make_response(jsonify({}), 200)
 
 
 @app.route('/data/<path:filename>')

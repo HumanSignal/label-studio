@@ -1,8 +1,6 @@
 {% extends 'base.html' %}
 {% block body %}
 
-{#  {% include 'storages.html' %}#}
-
   <div class="ui container">
     <center class="wrapper">
 
@@ -10,6 +8,7 @@
       <div class="ui two column centered grid">
         <div class="row">
         <div class="column center aligned">
+        {% include 'storages.html' %}
           <div class="ui statistic">
             <span class="value">{{ task_ids|length }}</span>
             <span class="label">Total tasks</span>
