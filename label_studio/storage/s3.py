@@ -13,28 +13,6 @@ boto3.set_stream_logger(level=logging.INFO)
 
 class S3Storage(CloudStorage):
 
-    def __init__(self, prefix=None, regex=None, create_local_copy=True, **kwargs):
-        super(S3Storage, self).__init__(**kwargs)
-        self.prefix = prefix or ''
-        self.regex = re.compile(regex) if regex else None
-        self.local_dir = os.path.join(self.project_path, self.path, *self.prefix.split('/'))
-        os.makedirs(self.local_dir, exist_ok=True)
-        self.create_local_copy = create_local_copy
-        if self.create_local_copy:
-            self.objects_dir = os.path.join(self.local_dir, 'objects')
-            os.makedirs(self.objects_dir, exist_ok=True)
-
-        self.s3 = boto3.resource('s3')
-        self.client = boto3.client('s3')
-        self.bucket = self.s3.Bucket(self.path)
-        self.last_sync_time = None
-        self.sync_period_in_sec = 30
-
-        self._ids_keys_map = {}
-        self._keys_ids_map = {}
-        self._ids_file = os.path.join(self.local_dir, 'ids.json')
-        self._load_ids()
-
     def _get_client(self):
         s3 = boto3.resource('s3')
         return {
@@ -49,8 +27,9 @@ class S3Storage(CloudStorage):
 
     def _get_value(self, key):
         s3 = self.client['s3']
+        bucket = self.client['bucket']
         try:
-            obj = s3.Object(self.bucket.name, key).get()['Body'].read().decode('utf-8')
+            obj = s3.Object(bucket.name, key).get()['Body'].read().decode('utf-8')
             value = json.loads(obj)
         except self.client.exceptions.NoSuchKey as e:
             logger.error('Key ' + key + ' not found in ' + self.readable_path, exc_info=True)
