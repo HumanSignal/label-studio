@@ -29,7 +29,7 @@ class S3Storage(CloudStorage):
         try:
             obj = s3.Object(bucket.name, key).get()['Body'].read().decode('utf-8')
             value = json.loads(obj)
-        except self.client.exceptions.NoSuchKey as e:
+        except self.client['client'].exceptions.NoSuchKey as e:
             logger.error('Key ' + key + ' not found in ' + self.readable_path, exc_info=True)
             return None
         except Exception as e:
