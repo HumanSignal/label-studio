@@ -26,7 +26,6 @@ from flask import (
 )
 from flask_api import status
 from types import SimpleNamespace
-from werkzeug.datastructures import ImmutableMultiDict
 
 from label_studio.utils.functions import generate_sample_task
 from label_studio.utils.io import find_dir, find_editor_files
@@ -39,7 +38,7 @@ from label_studio.utils.misc import (
 )
 from label_studio.utils.argparser import parse_input_args
 from label_studio.utils.uri_resolver import resolve_task_data_uri
-from label_studio.storage import get_available_storages, get_available_storage_names, get_storage_form
+from label_studio.storage import get_available_storage_names, get_storage_form
 
 from label_studio.project import Project
 from label_studio.tasks import Tasks
