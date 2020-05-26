@@ -284,7 +284,7 @@
               },
 
               // get tasks from api
-              loadStorageSettings: function (storage_for) {
+              loadStorageSettings: function (storage_for) { 
                   var root = this;
                   root.storage_settings[storage_for].type_loading = true;
                   this.getApi('storage_settings.' + storage_for, 'api/project/storage-settings' +
