@@ -6,12 +6,16 @@
            :id="storage_for + '-storage-settings-dialog'"
            v-for="(storage, storage_for) in storage_settings">
   <i class="icon close" @click="storage.show=false"></i>
+
+  <!-- Header -->
   <div class="header">
     <i class="fas" style="opacity: 0.65"
        :class="{'fa-cloud-upload-alt': storage_for=='source', 'fa-cloud-download-alt': storage_for=='target'}"></i>
     &nbsp;{{ capitalizeFirstLetter(storage_for) }} storage
     &nbsp;<div :class="{active: storage.type_loading}" class="ui loader inline mini grey"></div>
   </div>
+
+  <!-- Content -->
   <div class="content">
     <form class="ui form" :id="storage.storage_for + '-storage-form'">
       <input hidden name="storage_for" :value="storage_for">
@@ -20,7 +24,7 @@
       <div class="ui field" v-if="storage.type != ''" :class="{disabled: storage.type_loading}">
         <label>Storage type</label>
         <select class="ui dropdown" name="type" v-model="storage.type">
-          <option v-for="(full_name, key) in project.available_storages" :value="key">{{ full_name }}</option>
+          <option v-for="(item, i) in project.available_storages" :value="item[0]">{{ item[1] }}</option>
         </select>
       </div>
 

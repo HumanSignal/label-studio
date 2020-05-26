@@ -537,7 +537,7 @@ def api_project():
         'multi_session_mode': input_args.command != 'start-multi-session',
         'target_storage': {'readable_path': project.target_storage.readable_path},
         'source_storage': {'readable_path': project.source_storage.readable_path},
-        'available_storages': get_available_storage_names()
+        'available_storages': list(get_available_storage_names().items())
     }
     logger.debug(str(output))
     project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
