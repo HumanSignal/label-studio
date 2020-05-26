@@ -26,7 +26,6 @@ from flask import (
 )
 from flask_api import status
 from types import SimpleNamespace
-from werkzeug.datastructures import ImmutableMultiDict
 
 from label_studio.utils.functions import generate_sample_task
 from label_studio.utils.io import find_dir, find_editor_files
@@ -39,7 +38,7 @@ from label_studio.utils.misc import (
 )
 from label_studio.utils.argparser import parse_input_args
 from label_studio.utils.uri_resolver import resolve_task_data_uri
-from label_studio.storage import get_available_storages, get_available_storage_names, get_storage_form
+from label_studio.storage import get_available_storage_names, get_storage_form
 
 from label_studio.project import Project
 from label_studio.tasks import Tasks
@@ -570,7 +569,7 @@ def api_project_storage_settings():
 
     # POST: update storage given filled form
     if request.method == 'POST':
-        form = get_storage_form(selected_type)()
+        form = get_storage_form(selected_type)(data=request.json)
         if form.validate_on_submit():
             storage_kwargs = dict(form.data)
             storage_kwargs['type'] = request.json['type']  # storage type
@@ -581,6 +580,7 @@ def api_project_storage_settings():
             else:
                 return make_response(jsonify({'result': 'ok'}), 201)
         else:
+            logger.error('Errors: ' + str(form.errors) + ' for request body ' + str(request.json))
             return make_response(jsonify({'errors': form.errors}), 400)
 
 
