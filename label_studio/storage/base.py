@@ -34,11 +34,16 @@ def get_available_storages():
     return list(sorted(_storage.keys()))
 
 
+class BaseStorageForm(FlaskForm):
+    path = StringField('Path', [InputRequired()], description='Path')
+
+
 class BaseStorage(ABC):
 
     def __init__(self, path, project_path=None, **kwargs):
         self.path = path
         self.project_path = project_path
+        self.form = BaseStorageForm()
 
     @property
     @abstractmethod
@@ -54,7 +59,8 @@ class BaseStorage(ABC):
         pass
 
     def get_form(self, form_data=None):
-        return {}
+        self.form = BaseStorageForm(formdata=form_data)
+        return self.form
 
     @abstractmethod
     def __contains__(self, id):
@@ -102,7 +108,7 @@ class IsValidRegex(object):
             raise ValidationError(field.data + ' is not a valid regular expression')
 
 
-class CloudStorageForm(FlaskForm):
+class CloudStorageForm(BaseStorageForm):
     path = StringField('Path', [InputRequired()], description='Bucket path')
     prefix = StringField('Prefix', [Optional()], description='Prefix')
     regex = StringField('Regex', [IsValidRegex()], description='Filter files by regex')
@@ -137,6 +143,7 @@ class CloudStorage(BaseStorage):
         self._keys_ids_map = {}
         self._ids_file = os.path.join(self.local_dir, 'ids.json')
         self._load_ids()
+        self.sync()
 
     def get_form(self, form_data=None):
         self.form = CloudStorageForm(formdata=form_data)
