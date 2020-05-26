@@ -210,10 +210,7 @@
                       completion_count: 0,
                       project_name: "",
                       config: {
-                          sampling: "none",
-                          source: {
-                              type: ''
-                          }
+                          sampling: "none"
                       }
                   },
 
@@ -238,7 +235,7 @@
               }
           },
 
-          // components for different source types
+          // components
           components: {
               'animated-number': animatedNumber
           },
@@ -286,7 +283,7 @@
                   var root = this;
                   root.storage_settings[storage_for].type_loading = true;
                   this.getApi('storage_settings.' + storage_for, 'api/project/storage-settings' +
-                      '?type=' + this.storage_settings.source.type + '&storage_for=' + storage_for,
+                      '?type=' + this.storage_settings[storage_for].type + '&storage_for=' + storage_for,
                       function() {
                         root.storage_settings[storage_for].type_loading = false;
                       });
@@ -298,7 +295,7 @@
                   $.ajax({
                       type: 'POST',
                       url: '/api/project/storage-settings' +
-                          '?type=' + this.storage_settings.source.type +
+                          '?type=' + this.storage_settings[storage_for].type +
                           '&storage_for=' + storage_for,
                       contentType: 'application/json',
                       dataType: 'json',

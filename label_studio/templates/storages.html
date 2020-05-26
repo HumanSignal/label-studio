@@ -11,7 +11,7 @@
     &nbsp;<div :class="{active: storage.type_loading}" class="ui loader inline mini grey"></div>
   </div>
   <div class="content">
-    <form class="ui form" id="source-storage-form">
+    <form class="ui form" :id="storage.storage_for + '-storage-form'">
       <input hidden name="storage_for" :value="storage_for">
 
       <!-- Storage Type -->
@@ -34,7 +34,7 @@
         <input type="text" :placeholder="field.name" :name="field.name" v-model="field.data"
                v-if="field.type!='BooleanField'">
         <div class="ui message error" v-if="storage.errors[field.name]">storage.errors[field.name]</div>
-        
+
 
       </div>
 
