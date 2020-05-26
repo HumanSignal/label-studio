@@ -1,19 +1,20 @@
 {% raw %}
 
 <!-- Two dialogs: source and target -->
-<div class="ui small modal" :id="storage_for + '-storage-settings-dialog'"
-     v-for="(settings, storage_for) in storage_settings">
+<sui-modal v-model="storage.show" v-bind:class="{inverted: 1, small: 1}" v-on:hide="loadAll();"
+            :id="storage_for + '-storage-settings-dialog'"
+            v-for="(storage, storage_for) in storage_settings">
 
   <i class="close icon"></i>
-  <div class="header">{{ storage_for }} storage settings</div>
+  <div class="header">{{ capitalizeFirstLetter(storage_for) }} storage</div>
   <div class="content">
     <form class="ui form" id="source-storage-form">
       <input hidden name="storage_for" value="source">
 
       <!-- Storage Type -->
-      <div class="ui field">
+      <div class="ui field" v-if="storage.type != ''">
         <label>Storage type</label>
-        <select class="ui dropdown" name="type" v-model="settings.source.type">
+        <select class="ui dropdown" name="type" v-model="storage.type">
           <option v-for="item in project.available_storages">{{ item }}</option>
         </select>
       </div>
@@ -21,18 +22,17 @@
       <div class="ui divider hidden"></div>
 
       <!-- Fields -->
-      <div class="ui field" :class="{checkbox: field.type=='BooleanField'}"
-           v-for="field in settings.fields">
+      <div class="ui field" v-for="field in storage.fields">
         <label>{{ field.description }}</label>
-        <input :type="field.type=='BooleanField' ? 'checkbox': 'text'" :placeholder="field.name" v-model="field.data">
+        <sui-checkbox v-model="field.data" v-if="field.type=='BooleanField'"></sui-checkbox>
+        <input type="text" :placeholder="field.name" v-model="field.data" v-if="field.type!='BooleanField'">
       </div>
     </form>
 
-    <div class="ui divider hidden"></div>
-
     <!-- Errors -->
-    <div class="ui message error" v-if="settings.errors">
-      <div v-for="(error, key) in settings.errors">
+    <div class="ui divider hidden" v-if="Object.keys(storage.errors).length"></div>
+    <div class="ui message error" v-if="Object.keys(storage.errors).length">
+      <div v-for="(error, key) in storage.errors">
         {{ key }}: {{ error }}
       </div>
     </div>
@@ -40,10 +40,10 @@
 
   <!-- Actions -->
   <div class="actions">
-    <button class="ui button positive approve">Save</button>
-    <button class="ui button basic cancel">Close</button>
+    <button class="ui button positive approve" @click="saveStorageSettings(storage_for)">Save</button>
+    <button class="ui button basic cancel" @click="storage.show=false; loadAll();">Close</button>
   </div>
-</div>
 
+</sui-modal>
 
 {% endraw %}

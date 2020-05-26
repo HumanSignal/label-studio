@@ -383,13 +383,6 @@ div[class*="App_editor"] {
 .ui.form label {
     font-weight: normal !important;
 }
-.ui.form input {
-    font-size: 0.85em !important;
-}
-.ui.form select.dropdown {
-    font-size: 0.85em !important;
-    height: 32.55px;
-}
 
 .ui.dimmer {
     background-color: rgba(0,0,0,0.5) !important;

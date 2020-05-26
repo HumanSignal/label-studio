@@ -2,6 +2,7 @@
 {% block body %}
   {% raw %}
   <script src="/static/js/vue.js"></script>
+  <script src="/static/semantic/semantic-ui-vue.min.js"></script>
 
   <style>
     .visible-app {
@@ -70,7 +71,7 @@
               <span>
                 <i class="word-break" v-if="project.multi_session_mode">{{ project.source_storage.readable_path }}</i>&nbsp;
                 <span data-tooltip="Change storage settings">
-                  <i class="fas fa-cog sup-button big" onclick="$('#source-storage-settings-dialog').modal('show')"></i>
+                  <i class="fas fa-cog sup-button big" @click="storage_settings.source.show=true"></i>
                 </span>
               </span>
             </div>
@@ -80,7 +81,12 @@
             <div class="ui statistic small">
               <span class="value"><animated-number :number="project.completion_count"/></span>
               <span class="label">Total completions</span>
-              <i class="word-break" v-if="project.multi_session_mode">{{ project.target_storage.readable_path }}</i>
+              <span>
+                <i class="word-break" v-if="project.multi_session_mode">{{ project.target_storage.readable_path }}</i>&nbsp;
+                <span data-tooltip="Change storage settings">
+                  <i class="fas fa-cog sup-button big" @click="storage_settings.target.show=true"></i>
+                </span>
+              </span>
             </div>
           </div>
         </div>
@@ -191,6 +197,8 @@
 
   <script src="/static/js/components/animatedNumber.js"></script>
   <script>
+      Vue.use(SemanticUIVue);
+
       var app = new Vue({
           el: '#app',
 
@@ -214,8 +222,8 @@
 
                   // provided by api/project/storage-settings
                   storage_settings: {
-                      source: { fields: [], errors: [], type: 'current', storage_for: 'source'},
-                      target: { fields: [], errors: [], type: 'current', storage_for: 'target'}
+                      source: { fields: [], errors: [], type: '', storage_for: 'source', show: false},
+                      target: { fields: [], errors: [], type: '', storage_for: 'target', show: false}
                   },
 
                   // internal variables
@@ -247,8 +255,8 @@
                   var root = this;
                   $.get(url + (url.includes('?') ? '&' : '?') + 'rnd=' + Math.random())
                       .done(function (data) {
-                          root[dst] = data;
-                          if (done) done();
+                          setValue(root, dst, data);
+                          if (done) done(data);
                           console.log(dst + ' loaded');
                       })
                       .fail(function () {
@@ -273,22 +281,24 @@
               // get tasks from api
               loadStorageSettings: function (storage_for) {
                   this.getApi('storage_settings.' + storage_for, 'api/project/storage-settings' +
-                      '?type=' + this.storage_settings.source.type +
-                      '&storage_for=' + storage_for);
+                      '?type=' + this.storage_settings.source.type + '&storage_for=' + storage_for);
               },
 
               saveStorageSettings(storage_for) {
                   var root = this;
                   $.ajax({
                       type: 'POST',
-                      url: '/api/project/storage-settings?type=' + this.storage_settings.source.type,
+                      url: '/api/project/storage-settings' +
+                          '?type=' + this.storage_settings.source.type +
+                          '&storage_for=' + storage_for,
                       contentType: 'application/json',
                       dataType: 'json',
-                      data: JSON.stringify(getFormData($('#source-storage-form')))
+                      data: JSON.stringify(getFormData($('#'+storage_for+'-storage-form')))
                   }).fail(function (data) {
-                      alert("Save storage settings failed");
-                      console.log(data);
-                      root.storage_settings_errors = data.responseJSON.errors;
+                      if (storage_for === 'source')
+                          root.$set(root.storage_settings.source, 'errors', data.responseJSON.errors);
+                      else if (storage_for === 'target')
+                          root.$set(root.storage_settings.target, 'errors', data.responseJSON.errors);
                   });
                   return false;
               },
@@ -369,23 +379,9 @@
               //this.timer = setInterval(this.loadAll, 5000);
 
               $('#vue_loader').hide();
-              this['test.go.go'] = 1;
               console.log('Vue mounting success');
           }
       });
-
-      $(function () {
-          $('#source-storage-settings-dialog, #target-storage-settings-dialog').modal({
-              onApprove: function () {
-                  app.saveStorageSettings();
-                  return false;
-              },
-              onDeny: function () {
-                  app.loadAll();
-                  $('#storage-settings-dialog').modal('hide all');
-              },
-          });
-      })
 
   </script>
 

@@ -548,34 +548,34 @@ def api_project():
 @app.route('/api/project/storage-settings', methods=['GET', 'POST'])
 def api_project_storage_settings():
     project = project_get_or_create()
-
     selected_type = request.args.get('type')
     storage_for = request.args.get('storage_for')
-    assert storage_for is not None
-
     current_type = project.config.get(storage_for, {'type': ''})['type']
+    selected_type = selected_type if selected_type else current_type
+    assert storage_for is not None
 
     # GET: return selected form, populated with current storage parameters
     if request.method == 'GET':
-
         form_class = get_storage_form(selected_type)
         if selected_type == current_type:
             storage = project.get_storage(storage_for)
             form = form_class(data=storage.get_params())
         else:
             form = form_class()
-        output = [serialize_class(field) for field in form]
+        output = {'fields': [serialize_class(field) for field in form],
+                  'type': selected_type, 'errors': [], 'storage_for': storage_for}
         return make_response(jsonify(output), 200)
 
     # POST: update storage given filled form
-    form = get_storage_form(selected_type)()
-    if form.validate_on_submit():
-        storage_kwargs = dict(form.data)
-        storage_kwargs['type'] = request.json['type']  # storage type
-        project.update_storage(storage_for, storage_kwargs)
-        return make_response(jsonify({'result': 'ok'}), 201)
-    else:
-        return make_response(jsonify({'errors': form.errors}), 400)
+    if request.method == 'POST':
+        form = get_storage_form(selected_type)()
+        if form.validate_on_submit():
+            storage_kwargs = dict(form.data)
+            storage_kwargs['type'] = request.json['type']  # storage type
+            project.update_storage(storage_for, storage_kwargs)
+            return make_response(jsonify({'result': 'ok'}), 201)
+        else:
+            return make_response(jsonify({'errors': form.errors}), 400)
 
 
 @app.route('/api/projects/1/task_ids/', methods=['GET'])
