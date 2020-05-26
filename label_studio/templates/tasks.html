@@ -250,7 +250,7 @@
 
               // get tasks from api
               storageSettingsUpdate: function () {
-                  this.getApi('storage_settings', 'api/project/storage-settings?type=' + this.project.config.source.type);
+                  this.getApi('storage_settings', 'api/project/storage-settings?type=' + this.project.config.source.type + '&storage_for=source');
               },
 
               // get tasks from api

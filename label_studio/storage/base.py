@@ -26,7 +26,11 @@ def register_storage(storage_type, class_def, form_def):
     _storage_form[storage_type] = form_def
 
 
-def get_storage_form(storage_type):
+def get_storage_form(storage_type_or_class):
+    if isinstance(storage_type_or_class, BaseStorage):
+        storage_type = next(t for t, c in _storage.items() if issubclass(c, BaseStorage))
+    else:
+        storage_type = storage_type_or_class
     return _storage_form[storage_type]
 
 
@@ -47,16 +51,24 @@ def get_available_storages():
 class BaseStorageForm(FlaskForm):
     path = StringField('Path', [InputRequired()], description='Path')
 
+    # Bind here form fields to storage fields {"form field": "storage_field"}
+    bound_params = dict(path='path')
+
 
 class BaseStorage(ABC):
+
+    form = BaseStorageForm
 
     def __init__(self, path, project_path=None, **kwargs):
         self.path = path
         self.project_path = project_path
-        self.form = BaseStorageForm()
+        self.form_class = BaseStorageForm
 
     def get_params(self):
-        return {'path': self.path}
+        return {
+            form_param: getattr(self, storage_param)
+            for form_param, storage_param in self.form.bound_params.items()
+        }
 
     @property
     @abstractmethod
@@ -123,9 +135,18 @@ class CloudStorageForm(BaseStorageForm):
     prefix = StringField('Prefix', [Optional()], description='Prefix')
     regex = StringField('Regex', [IsValidRegex()], description='Filter files by regex')
 
+    bound_params = dict(
+        prefix='prefix',
+        create_local_copy='create_local_copy',
+        regex='regex',
+        **BaseStorageForm.bound_params
+    )
+
 
 class CloudStorageBlobForm(CloudStorageForm):
     data_key = StringField('Data key', [InputRequired()], description='Task value key from your label config')
+
+    bound_params = dict(data_key='data_key', **CloudStorageForm.bound_params)
 
 
 class CloudStorage(BaseStorage):

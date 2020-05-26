@@ -50,9 +50,10 @@ class GCSStorage(CloudStorage):
 
 class GCSBlobStorage(GCSStorage):
 
+    form = CloudStorageBlobForm
+
     def __init__(self, data_key, **kwargs):
         super(GCSBlobStorage, self).__init__(**kwargs)
-        self.form = CloudStorageBlobForm()
         self.data_key = data_key
 
     def _get_value(self, key):
