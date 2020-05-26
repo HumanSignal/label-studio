@@ -65,10 +65,14 @@
             <div class="ui statistic small">
             <span class="value">
               <animated-number :number="project.task_count"></animated-number>
-              <sup><i class="fas fa-cog sup-button" onclick="$('#storage-settings-dialog').modal('show')"></i></sup>
             </span>
               <span class="label">Total tasks</span>
-              <i class="word-break" v-if="project.multi_session_mode">{{ project.source_storage.readable_path }}</i>
+              <span>
+                <i class="word-break" v-if="project.multi_session_mode">{{ project.source_storage.readable_path }}</i>&nbsp;
+                <span data-tooltip="Change storage settings">
+                  <i class="fas fa-cog sup-button big" onclick="$('#storage-settings-dialog').modal('show')"></i>
+                </span>
+              </span>
             </div>
           </div>
           <!-- Total completions -->
@@ -204,11 +208,16 @@
                           }
                       }
                   },
+
                   // provided by api/tasks
                   tasks: [],
+
                   // provided by api/project/storage-settings
-                  storage_settings: [],
-                  storage_settings_errors: [],
+                  source_storage_settings: {
+                      fields: [],
+                      errors: [],
+                      type: 'current'
+                  },
 
                   // internal variables
                   vue_loaded: false,
@@ -250,7 +259,7 @@
 
               // get tasks from api
               storageSettingsUpdate: function () {
-                  this.getApi('storage_settings', 'api/project/storage-settings?type=' + this.project.config.source.type);
+                  this.getApi('storage_settings', 'api/project/storage-settings?type=' + this.source_storage_settings.type);
               },
 
               // get tasks from api
@@ -319,7 +328,7 @@
                   var root = this;
                   $.ajax({
                       type: 'POST',
-                      url: '/api/project/storage-settings?type=' + this.project.config.source.type,
+                      url: '/api/project/storage-settings?type=' + this.source_storage_settings.type,
                       contentType: 'application/json',
                       dataType: 'json',
                       data: JSON.stringify(getFormData($('#source-storage-form')))
@@ -340,7 +349,7 @@
               page_size: function () {
                   this.tasksUpdate();
               },
-              'project.config.source.type': function () {
+              'source_storage_settings.type': function () {
                   this.storageSettingsUpdate()
               }
           },

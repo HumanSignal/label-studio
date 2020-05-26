@@ -8,14 +8,15 @@
 
       <div class="ui field">
         <label>Storage type</label>
-        <select class="ui dropdown" name="type" v-model="project.config.source.type">
+        <select class="ui dropdown" name="type" v-model="source_storage_settings.type">
           <option v-for="item in project.available_storages">{{ item }}</option>
         </select>
       </div>
 
       <div class="ui divider hidden"></div>
 
-      <div class="ui field" :class="{checkbox: field.type=='BooleanField'}" v-for="field in storage_settings">
+      <div class="ui field" :class="{checkbox: field.type=='BooleanField'}"
+           v-for="field in source_storage_settings.fields">
         <label>{{ field.description }}</label>
         <input :type="field.type=='BooleanField' ? 'checkbox': 'text'" :placeholder="field.name" v-model="field.data">
       </div>
@@ -23,8 +24,8 @@
 
     <div class="ui divider hidden"></div>
 
-    <div class="ui message error" v-if="storage_settings_errors">
-      <div v-for="(error, key) in storage_settings_errors">
+    <div class="ui message error" v-if="source_storage_settings.errors">
+      <div v-for="(error, key) in source_storage_settings.errors">
         {{ key }}: {{ error }}
       </div>
     </div>
@@ -38,31 +39,3 @@
 </div>
 
 {% endraw %}
-
-{#
-{% with errors = get_flashed_messages(category_filter=["error"]) %}
-  {% if errors %}
-    {% for error in errors %}
-      <div class="ui negative message">{{ error }}</div>
-    {% endfor %}
-  {% endif %}
-{% endwith %}
-
-<form class="ui form" method="POST" action="">
-    {{ form.csrf_token }}
-  {% for field in form %}
-    {% if field.type == 'BooleanField' %}
-      <div class="inline field"><div class="ui toggle checkbox">{{ field.label }} {{ field }}</div></div>
-    {% elif field.name == 'csrf_token' %}
-    {% else %}
-      <div class="inline field">{{ field.label }} {{ field }}</div>
-    {% endif %}
-  {% endfor %}
-
-  <button class="ui button" type="submit">Submit</button>
-</form>
-
-<script>
-  $('.ui.toggle.checkbox').checkbox();
-</script>
-#}

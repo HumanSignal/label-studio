@@ -471,11 +471,17 @@ pre {
 }
 
 .sup-button {
+    position: relative;
+    top: 2px;
     cursor: pointer;
     font-size: 0.75em;
     color: rgb(24, 144, 255);
     transition: background-color ease-in-out 0.25s;
 }
+.sup-button.big {
+    font-size: 1.25em !important;
+}
+
 .sup-button:hover {
     color: rgb(54, 162, 255);
     transition: background-color ease-in-out 0.25s;
