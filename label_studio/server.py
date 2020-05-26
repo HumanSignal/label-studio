@@ -568,13 +568,14 @@ def api_project_storage_settings():
 
     # POST: update storage given filled form
     if request.method == 'POST':
-        form = get_storage_form(selected_type)()
+        form = get_storage_form(selected_type)(data=request.json)
         if form.validate_on_submit():
             storage_kwargs = dict(form.data)
             storage_kwargs['type'] = request.json['type']  # storage type
             project.update_storage(storage_for, storage_kwargs)
             return make_response(jsonify({'result': 'ok'}), 201)
         else:
+            logger.error('Errors: ' + str(form.errors) + ' for request body ' + str(request.json))
             return make_response(jsonify({'errors': form.errors}), 400)
 
 
