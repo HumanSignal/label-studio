@@ -149,7 +149,8 @@ class CloudStorage(BaseStorage):
         self.prefix = prefix or ''
         self.regex_str = regex
         self.regex = re.compile(self.regex_str) if self.regex_str else None
-        self.local_dir = os.path.join(self.project_path, self.path, *self.prefix.split('/'))
+        self.local_dir = os.path.join(
+            self.project_path, self.__class__.__name__.lower(), self.path, *self.prefix.split('/'))
         os.makedirs(self.local_dir, exist_ok=True)
         self.create_local_copy = create_local_copy
         if self.create_local_copy:
