@@ -65,6 +65,12 @@ class Project(object):
         self.load_converter()
         self.max_tasks_file_size = 250
 
+    def get_storage(self, storage_for):
+        if storage_for == 'source':
+            return self.source_storage
+        elif storage_for == 'target':
+            return self.target_storage
+
     def create_storages(self):
         source = self.config['source']
         target = self.config['target']
@@ -84,6 +90,7 @@ class Project(object):
                 'params': storage_kwargs
             }
             self._save_config()
+            logger.debug('Create storage type "' + storage_type + '"')
             return create_storage(storage_type, storage_path, self.path, **storage_kwargs)
 
         if storage_for == 'source':

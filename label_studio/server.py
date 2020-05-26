@@ -26,7 +26,7 @@ from flask import (
 )
 from flask_api import status
 from types import SimpleNamespace
-from werkzeug.datastructures import ImmutableMultiDict, ImmutableList
+from werkzeug.datastructures import ImmutableMultiDict
 
 from label_studio.utils.functions import generate_sample_task
 from label_studio.utils.io import find_dir, find_editor_files
@@ -39,7 +39,7 @@ from label_studio.utils.misc import (
 )
 from label_studio.utils.argparser import parse_input_args
 from label_studio.utils.uri_resolver import resolve_task_data_uri
-from label_studio.storage import get_available_storages, get_available_storage_names
+from label_studio.storage import get_available_storages, get_available_storage_names, get_storage_form
 
 from label_studio.project import Project
 from label_studio.tasks import Tasks
@@ -548,40 +548,34 @@ def api_project():
 @app.route('/api/project/storage-settings', methods=['GET', 'POST'])
 def api_project_storage_settings():
     project = project_get_or_create()
-    # project.analytics.send(getframeinfo(currentframe()).function)  # TODO: back it
-    form_data = ImmutableMultiDict(request.json)
-    current = project.config.get('source', {'type': ''})['type']
-    storage_type = request.args.get('type', 'current')
-    storage_type = current if not storage_type else storage_type
 
-    # select storage by type
-    storages = get_available_storages()
-    if storage_type in storages:
-        # get empty form without values
-        form = storages[storage_type].form(formdata=form_data)
-    elif storage_type == current and request.method == 'POST':
-        # get empty form without values
-        form = project.source_storage.form(formdata=form_data)
-    elif storage_type == current and request.method == 'GET':
-        # get initialized form with current project instance
-        form = project.source_storage.get_form()
-    else:
-        raise Exception('Unrecognized storage type')
+    selected_type = request.args.get('type')
+    storage_for = request.args.get('storage_for')
+    assert storage_for is not None
 
-    # Get form for UI
+    current_type = project.config.get(storage_for, {'type': ''})['type']
+
+    # GET: return selected form, populated with current storage parameters
     if request.method == 'GET':
+
+        form_class = get_storage_form(selected_type)
+        if selected_type == current_type:
+            storage = project.get_storage(storage_for)
+            form = form_class(data=storage.get_params())
+        else:
+            form = form_class()
         output = [serialize_class(field) for field in form]
         return make_response(jsonify(output), 200)
 
-    # Post form for save
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            storage_kwargs = dict(form.data)
-            storage_kwargs['type'] = request.json['type']  # storage type
-            project.update_storage(request.json['storage_for'], storage_kwargs)
-        else:
-            return make_response(jsonify({'errors': form.errors}), 422)
-        return make_response(jsonify({'result': 'ok'}), 200)
+    # POST: update storage given filled form
+    form = get_storage_form(selected_type)()
+    if form.validate_on_submit():
+        storage_kwargs = dict(form.data)
+        storage_kwargs['type'] = request.json['type']  # storage type
+        project.update_storage(storage_for, storage_kwargs)
+        return make_response(jsonify({'result': 'ok'}), 201)
+    else:
+        return make_response(jsonify({'errors': form.errors}), 400)
 
 
 @app.route('/api/projects/1/task_ids/', methods=['GET'])
