@@ -30,11 +30,16 @@ def create_storage(storage_type, path, project_path=None, **kwargs):
     return _storage[storage_type](path=path, project_path=project_path, **kwargs)
 
 
-def get_available_storages():
+def get_available_storage_names():
     return list(sorted(_storage.keys()))
 
 
+def get_available_storages():
+    return _storage
+
+
 class BaseStorage(ABC):
+    form = None
 
     def __init__(self, path, project_path=None, **kwargs):
         self.path = path
@@ -53,8 +58,8 @@ class BaseStorage(ABC):
     def get(self, id):
         pass
 
-    def get_form(self, form_data=None):
-        return {}
+    def get_form(self):
+        return None
 
     @abstractmethod
     def __contains__(self, id):
@@ -103,10 +108,10 @@ class IsValidRegex(object):
 
 
 class CloudStorageForm(FlaskForm):
+    create_local_copy = BooleanField('Create local copy', description='Create local copy on your disk')
     path = StringField('Path', [InputRequired()], description='Bucket path')
     prefix = StringField('Prefix', [Optional()], description='Prefix')
     regex = StringField('Regex', [IsValidRegex()], description='Filter files by regex')
-    create_local_copy = BooleanField('Create local copy', description='Create local copy on your disk')
 
 
 class CloudStorageBlobForm(CloudStorageForm):
@@ -116,10 +121,10 @@ class CloudStorageBlobForm(CloudStorageForm):
 class CloudStorage(BaseStorage):
 
     thread_lock = threading.Lock()
+    form = CloudStorageForm
 
     def __init__(self, prefix=None, regex=None, create_local_copy=True, **kwargs):
         super(CloudStorage, self).__init__(**kwargs)
-        self.form = None
         self.prefix = prefix or ''
         self.regex = re.compile(regex) if regex else None
         self.local_dir = os.path.join(self.project_path, self.path, *self.prefix.split('/'))
@@ -138,9 +143,11 @@ class CloudStorage(BaseStorage):
         self._ids_file = os.path.join(self.local_dir, 'ids.json')
         self._load_ids()
 
-    def get_form(self, form_data=None):
-        self.form = CloudStorageForm(formdata=form_data)
-        return self.form
+    def get_form(self):
+        # TODO: insert form_data from this class instance: form_data = {'data_key': self.data_key, ... }
+        # so we will have form initialized with current values of this storage and this will be shown in UI
+        form_data = {}
+        return self.form(formdata=form_data)
 
     @abstractmethod
     def _get_client(self):

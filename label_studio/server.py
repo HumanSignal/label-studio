@@ -26,7 +26,7 @@ from flask import (
 )
 from flask_api import status
 from types import SimpleNamespace
-from werkzeug.datastructures import ImmutableMultiDict
+from werkzeug.datastructures import ImmutableMultiDict, ImmutableList
 
 from label_studio.utils.functions import generate_sample_task
 from label_studio.utils.io import find_dir, find_editor_files
@@ -39,7 +39,7 @@ from label_studio.utils.misc import (
 )
 from label_studio.utils.argparser import parse_input_args
 from label_studio.utils.uri_resolver import resolve_task_data_uri
-from label_studio.storage import get_available_storages
+from label_studio.storage import get_available_storages, get_available_storage_names
 
 from label_studio.project import Project
 from label_studio.tasks import Tasks
@@ -538,7 +538,7 @@ def api_project():
         'multi_session_mode': input_args.command != 'start-multi-session',
         'target_storage': {'readable_path': project.target_storage.readable_path},
         'source_storage': {'readable_path': project.source_storage.readable_path},
-        'available_storages': get_available_storages()
+        'available_storages': get_available_storage_names()
     }
     logger.debug(str(output))
     project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
@@ -548,9 +548,30 @@ def api_project():
 @app.route('/api/project/storage-settings', methods=['GET', 'POST'])
 def api_project_storage_settings():
     project = project_get_or_create()
-    project.analytics.send(getframeinfo(currentframe()).function)
+    # project.analytics.send(getframeinfo(currentframe()).function)  # TODO: back it
+    form_data = ImmutableMultiDict(request.json)
+    storage_type = request.args.get('type', 'current')
 
-    form = project.source_storage.get_form(ImmutableMultiDict(request.json))
+    # select storage by type
+    storages = get_available_storages()
+    if storage_type in storages:
+        # get empty form without values
+        form = storages[storage_type].form(formdata=form_data)
+    elif storage_type == 'current' and request.method == 'POST':
+        # get empty form without values
+        form = project.source_storage.form(formdata=form_data)
+    elif storage_type == 'current' and request.method == 'GET':
+        # get initialized form with current project instance
+        form = project.source_storage.get_form()
+    else:
+        raise Exception('Unrecognized storage type')
+
+    # Get form for UI
+    if request.method == 'GET':
+        output = [serialize_class(field) for field in form]
+        return make_response(jsonify(output), 200)
+
+    # Post form for save
     if request.method == 'POST':
         if form.validate_on_submit():
             storage_kwargs = dict(form.data)
@@ -558,9 +579,7 @@ def api_project_storage_settings():
             project.update_storage(request.json['storage_for'], storage_kwargs)
         else:
             return make_response(jsonify({'errors': form.errors}), 422)
-
-    output = [serialize_class(field) for field in form]
-    return make_response(jsonify(output), 200)
+        return make_response(jsonify({'result': 'ok'}), 200)
 
 
 @app.route('/api/projects/1/task_ids/', methods=['GET'])

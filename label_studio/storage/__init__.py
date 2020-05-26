@@ -1,4 +1,4 @@
-from .base import create_storage, register_storage, get_available_storages
+from .base import create_storage, register_storage, get_available_storages, get_available_storage_names
 from .filesystem import JSONStorage, DirJSONsStorage
 from .s3 import S3Storage, S3BlobStorage
 from .gcs import GCSStorage, GCSBlobStorage

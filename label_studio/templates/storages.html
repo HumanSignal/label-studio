@@ -1,42 +1,35 @@
+{% raw %}
 <div class="ui small modal" id="storage-settings-dialog">
   <i class="close icon"></i>
-  <div class="header">Storage settings</div>
+  <div class="header">Source storage settings</div>
   <div class="content">
-    <div class="ui form">
+    <form class="ui form" id="source-storage-form">
+      <input hidden name="storage_for" value="source">
 
-      <div class="field">
-        <label>Data key</label>
-        <input type="text" placeholder="image">
+      <div class="ui field">
+        <label>Storage type</label>
+        <select class="ui dropdown" name="type">
+          <option v-for="item in project.available_storages">{{ item }}</option>
+        </select>
       </div>
 
-      <div class="field">
-        <label>Path</label>
-        <input type="text" placeholder="">
+      <div class="ui divider hidden"></div>
+
+      <div class="ui field" :class="{checkbox: field.type=='BooleanField'}" v-for="field in storage_settings">
+        <label>{{ field.description }}</label>
+        <input :type="field.type=='BooleanField' ? 'checkbox': 'text'" :placeholder="field.name" v-model="field.data">
       </div>
 
-      <div class="field">
-        <label>Prefix</label>
-        <input type="text" placeholder="dataset/training-set">
-      </div>
-
-      <div class="field">
-        <label>Regex</label>
-        <input type="text" placeholder="*.jpe?g">
-      </div>
-
-      <div class="ui field checkbox">
-        <input type="checkbox">
-        <label>Create local copy</label>
-      </div>
-
-    </div>
+    </form>
   </div>
 
   <div class="actions">
-    <button class="ui button positive">Save</button>
+    <button class="ui button positive" @click="saveStorageSettings()">Save</button>
     <button class="ui button basic cancel">Close</button>
   </div>
 </div>
+
+{% endraw %}
 
 {#
 {% with errors = get_flashed_messages(category_filter=["error"]) %}

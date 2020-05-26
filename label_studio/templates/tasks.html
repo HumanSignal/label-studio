@@ -60,7 +60,7 @@
           <div class="ui statistic small">
             <span class="value">
               <animated-number :number="project.task_count"></animated-number>
-              <sup><i class="fas fa-cog sup-button" onclick="$('#storage-settings-dialog').show()"></i></sup>
+              <sup><i class="fas fa-cog sup-button" onclick="$('#storage-settings-dialog').modal('show')"></i></sup>
             </span>
             <span class="label">Total tasks</span>
             <i class="word-break" v-if="project.multi_session_mode">{{ project.source_storage.readable_path }}</i>
@@ -302,6 +302,19 @@
                     request.onload = this.totalUpdate;
                     request.send();
                 }
+            },
+
+            saveStorageSettings() {
+                $.ajax({
+                    type: 'POST',
+                    url: '/api/project/storage-settings',
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    data: JSON.stringify(getFormData($('#source-storage-form')))
+                }).fail(function(data){
+                    alert("Save storage settings failed");
+                    console.log(data);
+                })
             }
         },
 
@@ -326,6 +339,10 @@
 
             $('#vue_loader').hide();
             console.log('Vue mounting success');
+
+            $('.modal').modal({
+              onClose: function() { app.totalUpdate(); }
+            }).modal('show')
         }
     });
 

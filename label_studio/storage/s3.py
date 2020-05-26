@@ -55,9 +55,10 @@ class S3Storage(CloudStorage):
 
 class S3BlobStorage(S3Storage):
 
+    form = CloudStorageBlobForm
+
     def __init__(self, data_key, **kwargs):
         super(S3BlobStorage, self).__init__(**kwargs)
-        self.form = CloudStorageBlobForm()
         self.data_key = data_key
 
     def _get_value(self, key):
@@ -66,3 +67,9 @@ class S3BlobStorage(S3Storage):
 
     def _set_value(self, key, value):
         raise NotImplementedError
+
+    def get_form(self):
+        # TODO: insert form_data from this class instance: form_data = {'data_key': self.data_key, ... }
+        # so we will have form initialized with current values of this storage and this will be shown in UI
+        form_data = {}
+        return self.form(formdata=form_data)
