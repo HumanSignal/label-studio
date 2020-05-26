@@ -71,17 +71,28 @@ class Project(object):
         elif storage_for == 'target':
             return self.target_storage
 
+    def _fix_target_storage_type(self, target_type):
+        # "blob" types have no sense for target storages
+        if target_type == 's3blob':
+            return 's3'
+        if target_type == 'gcsblob':
+            return 'gcs'
+        return target_type
+
     def create_storages(self):
         source = self.config['source']
         target = self.config['target']
+        target_type = self._fix_target_storage_type(target['type'])
         self.source_storage = create_storage(source['type'], source['path'], self.path, **source.get('params', {}))
-        self.target_storage = create_storage(target['type'], target['path'], self.path, **target.get('params', {}))
+        self.target_storage = create_storage(target_type, target['path'], self.path, **target.get('params', {}))
 
     def update_storage(self, storage_for, storage_kwargs):
 
         def _update_storage(storage_for, storage_kwargs):
             storage_name = storage_kwargs.pop('name', storage_for)
             storage_type = storage_kwargs.pop('type')
+            if storage_for == 'target':
+                storage_type = self._fix_target_storage_type(storage_type)
             storage_path = storage_kwargs.pop('path')
             self.config[storage_for] = {
                 'name': storage_name,

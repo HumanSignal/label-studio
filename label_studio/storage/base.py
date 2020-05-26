@@ -16,22 +16,16 @@ from label_studio.utils.io import json_load
 logger = logging.getLogger(__name__)
 
 _storage = {}
-_storage_form = {}
 
 
-def register_storage(storage_type, class_def, form_def):
+def register_storage(storage_type, class_def):
     if storage_type in _storage:
         raise IndexError('Storage {} already exists'.format(storage_type))
     _storage[storage_type] = class_def
-    _storage_form[storage_type] = form_def
 
 
-def get_storage_form(storage_type_or_class):
-    if isinstance(storage_type_or_class, BaseStorage):
-        storage_type = next(t for t, c in _storage.items() if issubclass(c, BaseStorage))
-    else:
-        storage_type = storage_type_or_class
-    return _storage_form[storage_type]
+def get_storage_form(storage_type):
+    return _storage[storage_type].form
 
 
 def create_storage(storage_type, path, project_path=None, **kwargs):
@@ -42,10 +36,6 @@ def create_storage(storage_type, path, project_path=None, **kwargs):
 
 def get_available_storage_names():
     return list(sorted(_storage.keys()))
-
-
-def get_available_storages():
-    return _storage
 
 
 class BaseStorageForm(FlaskForm):
