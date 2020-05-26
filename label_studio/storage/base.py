@@ -16,12 +16,18 @@ from label_studio.utils.io import json_load
 logger = logging.getLogger(__name__)
 
 _storage = {}
+_storage_form = {}
 
 
-def register_storage(storage_type, class_def):
+def register_storage(storage_type, class_def, form_def):
     if storage_type in _storage:
         raise IndexError('Storage {} already exists'.format(storage_type))
     _storage[storage_type] = class_def
+    _storage_form[storage_type] = form_def
+
+
+def get_storage_form(storage_type):
+    return _storage_form[storage_type]
 
 
 def create_storage(storage_type, path, project_path=None, **kwargs):
@@ -43,12 +49,14 @@ class BaseStorageForm(FlaskForm):
 
 
 class BaseStorage(ABC):
-    form = None
 
     def __init__(self, path, project_path=None, **kwargs):
         self.path = path
         self.project_path = project_path
         self.form = BaseStorageForm()
+
+    def get_params(self):
+        return {'path': self.path}
 
     @property
     @abstractmethod
@@ -62,10 +70,6 @@ class BaseStorage(ABC):
     @abstractmethod
     def get(self, id):
         pass
-
-    def get_form(self, form_data=None):
-        self.form = BaseStorageForm(formdata=form_data)
-        return self.form
 
     @abstractmethod
     def __contains__(self, id):
@@ -132,7 +136,8 @@ class CloudStorage(BaseStorage):
     def __init__(self, prefix=None, regex=None, create_local_copy=True, **kwargs):
         super(CloudStorage, self).__init__(**kwargs)
         self.prefix = prefix or ''
-        self.regex = re.compile(regex) if regex else None
+        self.regex_str = regex
+        self.regex = re.compile(self.regex_str) if self.regex_str else None
         self.local_dir = os.path.join(self.project_path, self.path, *self.prefix.split('/'))
         os.makedirs(self.local_dir, exist_ok=True)
         self.create_local_copy = create_local_copy
@@ -150,11 +155,14 @@ class CloudStorage(BaseStorage):
         self._load_ids()
         self.sync()
 
-    def get_form(self):
-        # TODO: insert form_data from this class instance: form_data = {'data_key': self.data_key, ... }
-        # so we will have form initialized with current values of this storage and this will be shown in UI
-        form_data = {}
-        return self.form(formdata=form_data)
+    def get_params(self):
+        params = super(CloudStorage, self).get_params()
+        params.update({
+            'prefix': self.prefix,
+            'regex': self.regex_str,
+            'create_local_copy': self.create_local_copy
+        })
+        return params
 
     @abstractmethod
     def _get_client(self):

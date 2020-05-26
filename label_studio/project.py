@@ -84,6 +84,7 @@ class Project(object):
                 'params': storage_kwargs
             }
             self._save_config()
+            logger.debug('Create storage type "' + storage_type + '"')
             return create_storage(storage_type, storage_path, self.path, **storage_kwargs)
 
         if storage_for == 'source':
