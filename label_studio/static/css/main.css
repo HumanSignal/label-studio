@@ -298,6 +298,10 @@ div[class*="App_editor"] {
 
 /* semantic ui pretty */
 
+.ui .segment {
+    box-shadow: none !important;
+}
+
 .ui .button {
     font-weight: 400 !important;
     margin-bottom: 5px !important;

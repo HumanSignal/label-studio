@@ -8,11 +8,6 @@
     .visible-app {
       display: block !important;
     }
-
-    .pagination {
-      height: 10px !important;
-    }
-
     .predict-image {
       border-radius: 5px;
       height: 50px;
@@ -21,26 +16,25 @@
     .fade-enter-active, .fade-leave-active {
       transition: opacity 0.5s ease-in-out;
     }
-
     .fade-enter-to {
       opacity: 1;
       height: 50px;
     }
-
     .fade-enter, .fade-leave-to {
       opacity: 0;
       height: 0;
     }
 
+    .pagination {
+      height: 10px !important;
+    }
     .pagination-size {
       border: none;
       background: none;
     }
-
     .order {
       cursor: pointer;
     }
-
     .order.up, .order.down {
       font-weight: bold;
     }
@@ -70,7 +64,7 @@
               <span class="label">Total tasks</span>
               <span>
                 <i class="word-break" v-if="project.multi_session_mode">{{ project.source_storage.readable_path }}</i>&nbsp;
-                <span data-tooltip="Change storage settings">
+                <span data-tooltip="Change source storage settings">
                   <i class="fas fa-cog sup-button big" @click="storage_settings.source.show=true"></i>
                 </span>
               </span>
@@ -83,7 +77,7 @@
               <span class="label">Total completions</span>
               <span>
                 <i class="word-break" v-if="project.multi_session_mode">{{ project.target_storage.readable_path }}</i>&nbsp;
-                <span data-tooltip="Change storage settings">
+                <span data-tooltip="Change target storage settings">
                   <i class="fas fa-cog sup-button big" @click="storage_settings.target.show=true"></i>
                 </span>
               </span>
@@ -98,7 +92,7 @@
             <a class="ui button positive" href="/">Start Labeling</a>
 
             <!-- Sampling -->
-            <span class="ui segment" style="padding-top: 8px; padding-bottom: 8px;">
+            <span class="ui segment" style="padding-top: 9px; padding-bottom: 10px;">
             Tasks sampling:&nbsp;<span class="ui orange label">
               {{ project.config['sampling'] }}
             </span>
@@ -162,27 +156,37 @@
         </tr>
 
         <!-- Task row -->
-        <tr v-for="task in tasks">
-          <!-- Task ID -->
-          <td class="text-center">
-            <a :href="'/?task_id=' + task.id">
-              <i class="fas fa-eye eye show-completion"></i>
-            </a>
-            &nbsp;{{ task.id }}
-          </td>
-          <!-- Completed at -->
-          <td>{{ task.completed_at }}</td>
-          <!-- Task -->
-          <td class="text-center" v-if="project.can_manage_tasks">
-            <i @click="deleteTask(task.id)"
-               class="fas fa-trash-alt trash remove-task">&nbsp;&nbsp;</i>
-          </td>
-          <!-- Completion -->
-          <td class="text-center" v-if="project.can_manage_completions">
-            <i v-for="completion_id in task.completions" @click="deleteCompletion(task.id, completion_id)"
-               class="fas fa-trash-alt trash remove-completion">&nbsp;&nbsp;</i>
-          </td>
-        </tr>
+        <template v-for="task in tasks">
+          <!-- Broken task -->
+          <tr v-if="task == null" class="text-center">
+            <td colspan="2"><small>broken task [backend returns null]</small></td>
+          </tr>
+
+          <!-- Correct task -->
+          <tr v-else>
+            <!-- Task ID -->
+            <td class="text-center">
+              <a :href="'/?task_id=' + task.id">
+                <i class="fas fa-eye eye show-completion"></i>
+              </a>
+              &nbsp;{{ task.id }}
+            </td>
+            <!-- Completed at -->
+            <td>{{ task.completed_at }}</td>
+            <!-- Task -->
+            <td class="text-center" v-if="project.can_manage_tasks">
+              <i @click="deleteTask(task.id)"
+                 class="fas fa-trash-alt trash remove-task">&nbsp;&nbsp;</i>
+            </td>
+            <!-- Completion -->
+            <td class="text-center" v-if="project.can_manage_completions">
+              <i v-for="completion_id in task.completions" @click="deleteCompletion(task.id, completion_id)"
+                 class="fas fa-trash-alt trash remove-completion">&nbsp;&nbsp;</i>
+            </td>
+          </tr>
+        </template>
+
+
       </table>
 
       <br/>
@@ -222,7 +226,8 @@
                       source: { fields: [], errors: [], type: '', storage_for: 'source',
                                 show: true, loading: false, type_loading: false},
                       target: { fields: [], errors: [], type: '', storage_for: 'target',
-                                show: false, loading: false, type_loading: false}
+                                show: false, loading: false, type_loading: false},
+                      cached: { }
                   },
 
                   // internal variables

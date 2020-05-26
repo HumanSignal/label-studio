@@ -2,12 +2,14 @@
 
 <!-- Two dialogs: source and target -->
 <sui-modal v-model="storage.show" v-bind:class="{inverted: 1, small: 1}"
-           v-on:hide="loadAll();" size="small" closable="0"
+           v-on:hide="loadAll();" size="small"
            :id="storage_for + '-storage-settings-dialog'"
            v-for="(storage, storage_for) in storage_settings">
-
-  <i class="close icon"></i>
-  <div class="header">{{ capitalizeFirstLetter(storage_for) }} storage
+  <i class="icon close" @click="storage.show=false"></i>
+  <div class="header">
+    <i class="fas" style="opacity: 0.65"
+       :class="{'fa-cloud-upload-alt': storage_for=='source', 'fa-cloud-download-alt': storage_for=='target'}"></i>
+    &nbsp;{{ capitalizeFirstLetter(storage_for) }} storage
     &nbsp;<div :class="{active: storage.type_loading}" class="ui loader inline mini grey"></div>
   </div>
   <div class="content">
@@ -18,7 +20,7 @@
       <div class="ui field" v-if="storage.type != ''" :class="{disabled: storage.type_loading}">
         <label>Storage type</label>
         <select class="ui dropdown" name="type" v-model="storage.type">
-          <option v-for="item in project.available_storages">{{ item }}</option>
+          <option v-for="(full_name, key) in project.available_storages" :value="key">{{ full_name }}</option>
         </select>
       </div>
 
@@ -33,8 +35,11 @@
         <sui-checkbox v-model="field.data" :name="field.name" v-if="field.type=='BooleanField'"></sui-checkbox>
         <input type="text" :placeholder="field.name" :name="field.name" v-model="field.data"
                v-if="field.type!='BooleanField'">
-        <div class="ui message error" v-if="storage.errors[field.name]">storage.errors[field.name]</div>
 
+        <!-- Errors -->
+        <div class="ui bulleted list" v-if="field.name in storage.errors">
+          <div class="ui item red text" v-for="error in storage.errors[field.name]">{{ error }}</div>
+        </div>
 
       </div>
 
@@ -52,7 +57,8 @@
   <!-- Actions -->
   <div class="actions">
     <!-- Save -->
-    <button class="ui button positive approve" :class="{disabled: storage.loading}"
+    <button class="ui button positive approve"
+            :class="{disabled: storage.loading || storage.type_loading}"
             @click="saveStorageSettings(storage_for)">
       <div class="ui active mini inline loader" v-if="storage.loading"></div>
       <span v-if="!storage.loading">Save</span>

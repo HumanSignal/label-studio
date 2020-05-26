@@ -557,12 +557,32 @@ def api_project_storage_settings():
 
     # GET: return selected form, populated with current storage parameters
     if request.method == 'GET':
+        # render all forms for caching in web
+        if storage_for == 'all':
+            all_forms = {'source': [], 'target': []}
+            names = get_available_storage_names()
+            for storage_for in all_forms:
+                for name in names:
+                    form_class = get_storage_form(name)
+                    form = form_class(data=project.get_storage(storage_for).get_params()) \
+                        if name == current_type else form_class()
+                    all_forms[storage_for].append({
+                        'fields': [serialize_class(field) for field in form],
+                        'type': name
+                    })
+            return make_response(jsonify(all_forms), 200)
+
         form_class = get_storage_form(selected_type)
+
+        # render project current form with filled params
         if selected_type == current_type:
             storage = project.get_storage(storage_for)
             form = form_class(data=storage.get_params())
+
+        # render requested empty form
         else:
             form = form_class()
+
         output = {'fields': [serialize_class(field) for field in form],
                   'type': selected_type, 'errors': [], 'storage_for': storage_for}
         return make_response(jsonify(output), 200)

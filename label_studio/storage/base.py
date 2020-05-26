@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 from flask_wtf import FlaskForm
 from wtforms import StringField, BooleanField
 from wtforms.validators import InputRequired, Optional, ValidationError
+from collections import OrderedDict
 
 from label_studio.utils.io import json_load
 
@@ -41,7 +42,26 @@ def create_storage(storage_type, path, project_path=None, **kwargs):
 
 
 def get_available_storage_names():
-    return list(sorted(_storage.keys()))
+    pairs = OrderedDict([
+        ('json', 'JSON task file'),
+        ('dir-jsons', 'Directory with JSON task files'),
+        ('gcs', 'Google Cloud Storage'),
+        ('gcsblob', 'Google Cloud Storage with Blobs (image / audio files)'),
+        ('s3', 'Amazon S3'),
+        ('s3blob', 'Amazon S3 with Blobs (image / audio files)')
+    ])
+
+    # copy pairs with order saving
+    out = OrderedDict()
+    for key in pairs:
+        if key in _storage.keys():
+            out[key] = pairs[key]
+
+    # check all keys are in out
+    for key in _storage.keys():
+        if key not in out:
+            out[key] = key  # full description are not presented in pairs
+    return out
 
 
 def get_available_storages():
