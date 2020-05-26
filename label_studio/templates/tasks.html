@@ -70,7 +70,7 @@
               <span>
                 <i class="word-break" v-if="project.multi_session_mode">{{ project.source_storage.readable_path }}</i>&nbsp;
                 <span data-tooltip="Change storage settings">
-                  <i class="fas fa-cog sup-button big" onclick="$('#storage-settings-dialog').modal('show')"></i>
+                  <i class="fas fa-cog sup-button big" onclick="$('#source-storage-settings-dialog').modal('show')"></i>
                 </span>
               </span>
             </div>
@@ -213,10 +213,9 @@
                   tasks: [],
 
                   // provided by api/project/storage-settings
-                  source_storage_settings: {
-                      fields: [],
-                      errors: [],
-                      type: 'current'
+                  storage_settings: {
+                      source: { fields: [], errors: [], type: 'current', storage_for: 'source'},
+                      target: { fields: [], errors: [], type: 'current', storage_for: 'target'}
                   },
 
                   // internal variables
@@ -258,29 +257,48 @@
               },
 
               // get tasks from api
-              storageSettingsUpdate: function () {
-                  this.getApi('storage_settings', 'api/project/storage-settings?type=' + this.source_storage_settings.type);
-              },
-
-              // get tasks from api
-              tasksUpdate: function () {
+              loadTasks: function () {
                   this.getApi('tasks', '/api/tasks?page=' + this.page + '&page_size=' + parseInt(this.page_size) +
                       '&order=' + this.order)
               },
 
               // get project info from api
-              projectUpdate: function () {
+              loadProject: function () {
                   var root = this;
                   this.getApi('project', '/api/project', function () {
                       root.project_loaded = true
                   });
               },
 
+              // get tasks from api
+              loadStorageSettings: function (storage_for) {
+                  this.getApi('storage_settings.' + storage_for, 'api/project/storage-settings' +
+                      '?type=' + this.storage_settings.source.type +
+                      '&storage_for=' + storage_for);
+              },
+
+              saveStorageSettings(storage_for) {
+                  var root = this;
+                  $.ajax({
+                      type: 'POST',
+                      url: '/api/project/storage-settings?type=' + this.storage_settings.source.type,
+                      contentType: 'application/json',
+                      dataType: 'json',
+                      data: JSON.stringify(getFormData($('#source-storage-form')))
+                  }).fail(function (data) {
+                      alert("Save storage settings failed");
+                      console.log(data);
+                      root.storage_settings_errors = data.responseJSON.errors;
+                  });
+                  return false;
+              },
+
               // update all objects via api
-              totalUpdate: function () {
-                  this.projectUpdate();
-                  this.tasksUpdate();
-                  this.storageSettingsUpdate();
+              loadAll: function () {
+                  this.loadProject();
+                  this.loadTasks();
+                  this.loadStorageSettings('source');
+                  this.loadStorageSettings('target');
               },
 
               // change order of sorting in table
@@ -292,14 +310,14 @@
                   }
                   this.order = name;
                   refreshHistoryArg('order', name);
-                  this.tasksUpdate();
+                  this.loadTasks();
               },
 
               // delete completion with trash button
               deleteCompletion: function (task_id, completion_id) {
                   var request = new XMLHttpRequest();
                   request.open("DELETE", "/api/tasks/" + task_id + "/completions/" + completion_id + "/", true);
-                  request.onload = this.tasksUpdate;
+                  request.onload = this.loadTasks;
                   request.send();
               },
 
@@ -307,7 +325,7 @@
               deleteTask: function (task_id) {
                   var request = new XMLHttpRequest();
                   request.open("DELETE", "/api/tasks/" + task_id + "/", true);
-                  request.onload = this.tasksUpdate;
+                  request.onload = this.loadTasks;
                   request.send();
               },
 
@@ -319,38 +337,25 @@
                   if (deletion_confirmed) {
                       var request = new XMLHttpRequest();
                       request.open("DELETE", "/api/tasks/delete", true);
-                      request.onload = this.totalUpdate;
+                      request.onload = this.loadAll;
                       request.send();
                   }
-              },
-
-              saveStorageSettings() {
-                  var root = this;
-                  $.ajax({
-                      type: 'POST',
-                      url: '/api/project/storage-settings?type=' + this.source_storage_settings.type,
-                      contentType: 'application/json',
-                      dataType: 'json',
-                      data: JSON.stringify(getFormData($('#source-storage-form')))
-                  }).fail(function (data) {
-                      alert("Save storage settings failed");
-                      console.log(data);
-                      root.storage_settings_errors = data.responseJSON.errors;
-                  });
-                  return false;
               }
           },
 
           watch: {
               // watch for page variable changes
               page: function () {
-                  this.tasksUpdate();
+                  this.loadTasks();
               },
               page_size: function () {
-                  this.tasksUpdate();
+                  this.loadTasks();
               },
-              'source_storage_settings.type': function () {
-                  this.storageSettingsUpdate()
+              'storage_settings.source.type': function () {
+                  this.loadStorageSettings('source')
+              },
+              'storage_settings.target.type': function () {
+                  this.loadStorageSettings('target')
               }
           },
 
@@ -360,22 +365,23 @@
               this.project_loaded = true;
 
               this.order = getUrlArg('order', 'id');
-              this.totalUpdate();
-              //this.timer = setInterval(this.totalUpdate, 5000);
+              this.loadAll();
+              //this.timer = setInterval(this.loadAll, 5000);
 
               $('#vue_loader').hide();
+              this['test.go.go'] = 1;
               console.log('Vue mounting success');
           }
       });
 
       $(function () {
-          $('#storage-settings-dialog').modal({
+          $('#source-storage-settings-dialog, #target-storage-settings-dialog').modal({
               onApprove: function () {
                   app.saveStorageSettings();
                   return false;
               },
               onDeny: function () {
-                  app.totalUpdate();
+                  app.loadAll();
                   $('#storage-settings-dialog').modal('hide all');
               },
           });

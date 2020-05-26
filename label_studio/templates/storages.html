@@ -1,22 +1,28 @@
 {% raw %}
-<div class="ui small modal" id="storage-settings-dialog">
+
+<!-- Two dialogs: source and target -->
+<div class="ui small modal" :id="storage_for + '-storage-settings-dialog'"
+     v-for="(settings, storage_for) in storage_settings">
+
   <i class="close icon"></i>
-  <div class="header">Source storage settings</div>
+  <div class="header">{{ storage_for }} storage settings</div>
   <div class="content">
     <form class="ui form" id="source-storage-form">
       <input hidden name="storage_for" value="source">
 
+      <!-- Storage Type -->
       <div class="ui field">
         <label>Storage type</label>
-        <select class="ui dropdown" name="type" v-model="source_storage_settings.type">
+        <select class="ui dropdown" name="type" v-model="settings.source.type">
           <option v-for="item in project.available_storages">{{ item }}</option>
         </select>
       </div>
 
       <div class="ui divider hidden"></div>
 
+      <!-- Fields -->
       <div class="ui field" :class="{checkbox: field.type=='BooleanField'}"
-           v-for="field in source_storage_settings.fields">
+           v-for="field in settings.fields">
         <label>{{ field.description }}</label>
         <input :type="field.type=='BooleanField' ? 'checkbox': 'text'" :placeholder="field.name" v-model="field.data">
       </div>
@@ -24,18 +30,20 @@
 
     <div class="ui divider hidden"></div>
 
-    <div class="ui message error" v-if="source_storage_settings.errors">
-      <div v-for="(error, key) in source_storage_settings.errors">
+    <!-- Errors -->
+    <div class="ui message error" v-if="settings.errors">
+      <div v-for="(error, key) in settings.errors">
         {{ key }}: {{ error }}
       </div>
     </div>
-
   </div>
 
+  <!-- Actions -->
   <div class="actions">
     <button class="ui button positive approve">Save</button>
     <button class="ui button basic cancel">Close</button>
   </div>
 </div>
+
 
 {% endraw %}
