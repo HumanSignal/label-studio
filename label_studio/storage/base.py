@@ -17,22 +17,16 @@ from label_studio.utils.io import json_load
 logger = logging.getLogger(__name__)
 
 _storage = {}
-_storage_form = {}
 
 
-def register_storage(storage_type, class_def, form_def):
+def register_storage(storage_type, class_def):
     if storage_type in _storage:
         raise IndexError('Storage {} already exists'.format(storage_type))
     _storage[storage_type] = class_def
-    _storage_form[storage_type] = form_def
 
 
-def get_storage_form(storage_type_or_class):
-    if isinstance(storage_type_or_class, BaseStorage):
-        storage_type = next(t for t, c in _storage.items() if issubclass(c, BaseStorage))
-    else:
-        storage_type = storage_type_or_class
-    return _storage_form[storage_type]
+def get_storage_form(storage_type):
+    return _storage[storage_type].form
 
 
 def create_storage(storage_type, path, project_path=None, **kwargs):
@@ -62,10 +56,6 @@ def get_available_storage_names():
         if key not in out:
             out[key] = key  # full description are not presented in pairs
     return out
-
-
-def get_available_storages():
-    return _storage
 
 
 class BaseStorageForm(FlaskForm):
@@ -179,7 +169,8 @@ class CloudStorage(BaseStorage):
         self.prefix = prefix or ''
         self.regex_str = regex
         self.regex = re.compile(self.regex_str) if self.regex_str else None
-        self.local_dir = os.path.join(self.project_path, self.path, *self.prefix.split('/'))
+        self.local_dir = os.path.join(
+            self.project_path, self.__class__.__name__.lower(), self.path, *self.prefix.split('/'))
         os.makedirs(self.local_dir, exist_ok=True)
         self.create_local_copy = create_local_copy
         if self.create_local_copy:
