@@ -35,7 +35,7 @@ def answer(status=0, msg='', result=None):
     if status == 200 and not msg:
         msg = 'ok'
 
-    a = {"status": status, "msg": msg}
+    a = {"status": status, "detail": msg}
     a.update({'request': request.args})
 
     if result is not None:

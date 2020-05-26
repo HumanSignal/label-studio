@@ -546,6 +546,7 @@ def api_project():
 
 
 @app.route('/api/project/storage-settings', methods=['GET', 'POST'])
+@exception_treatment
 def api_project_storage_settings():
     project = project_get_or_create()
     selected_type = request.args.get('type')
@@ -553,6 +554,7 @@ def api_project_storage_settings():
     current_type = project.config.get(storage_for, {'type': ''})['type']
     selected_type = selected_type if selected_type else current_type
     assert storage_for is not None
+    project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
 
     # GET: return selected form, populated with current storage parameters
     if request.method == 'GET':
@@ -572,8 +574,12 @@ def api_project_storage_settings():
         if form.validate_on_submit():
             storage_kwargs = dict(form.data)
             storage_kwargs['type'] = request.json['type']  # storage type
-            project.update_storage(storage_for, storage_kwargs)
-            return make_response(jsonify({'result': 'ok'}), 201)
+            try:
+                project.update_storage(storage_for, storage_kwargs)
+            except Exception as e:
+                return make_response(jsonify({'detail': 'Error while storage update: ' + str(e)}), 400)
+            else:
+                return make_response(jsonify({'result': 'ok'}), 201)
         else:
             return make_response(jsonify({'errors': form.errors}), 400)
 

@@ -1,9 +1,10 @@
 {% raw %}
 
 <!-- Two dialogs: source and target -->
-<sui-modal v-model="storage.show" v-bind:class="{inverted: 1, small: 1}" v-on:hide="loadAll();"
-            :id="storage_for + '-storage-settings-dialog'"
-            v-for="(storage, storage_for) in storage_settings">
+<sui-modal v-model="storage.show" v-bind:class="{inverted: 1, small: 1}"
+           v-on:hide="loadAll();"
+           :id="storage_for + '-storage-settings-dialog'"
+           v-for="(storage, storage_for) in storage_settings">
 
   <i class="close icon"></i>
   <div class="header">{{ capitalizeFirstLetter(storage_for) }} storage</div>
@@ -24,8 +25,9 @@
       <!-- Fields -->
       <div class="ui field" v-for="field in storage.fields">
         <label>{{ field.description }}</label>
-        <sui-checkbox v-model="field.data" v-if="field.type=='BooleanField'"></sui-checkbox>
-        <input type="text" :placeholder="field.name" v-model="field.data" v-if="field.type!='BooleanField'">
+        <sui-checkbox v-model="field.data" :name="field.name" v-if="field.type=='BooleanField'"></sui-checkbox>
+        <input type="text" :placeholder="field.name" :name="field.name" v-model="field.data"
+               v-if="field.type!='BooleanField'">
       </div>
     </form>
 
@@ -40,8 +42,14 @@
 
   <!-- Actions -->
   <div class="actions">
-    <button class="ui button positive approve" @click="saveStorageSettings(storage_for)">Save</button>
-    <button class="ui button basic cancel" @click="storage.show=false; loadAll();">Close</button>
+    <button class="ui button positive approve" :class="{disabled: storage.loading}"
+            @click="saveStorageSettings(storage_for); storage.loading=true;">
+      <div class="ui active mini inline loader" v-if="storage.loading"></div>
+      <span v-if="!storage.loading">Save</span>
+    </button>
+    <button class="ui button basic cancel"
+            :class="{disabled: storage.loading}"
+            @click="storage.show=false; loadAll();">Close</button>
   </div>
 
 </sui-modal>

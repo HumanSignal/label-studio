@@ -222,8 +222,8 @@
 
                   // provided by api/project/storage-settings
                   storage_settings: {
-                      source: { fields: [], errors: [], type: '', storage_for: 'source', show: false},
-                      target: { fields: [], errors: [], type: '', storage_for: 'target', show: false}
+                      source: { fields: [], errors: [], type: '', storage_for: 'source', show: true, loading: false},
+                      target: { fields: [], errors: [], type: '', storage_for: 'target', show: false, loading: false}
                   },
 
                   // internal variables
@@ -295,10 +295,16 @@
                       dataType: 'json',
                       data: JSON.stringify(getFormData($('#'+storage_for+'-storage-form')))
                   }).fail(function (data) {
-                      if (storage_for === 'source')
-                          root.$set(root.storage_settings.source, 'errors', data.responseJSON.errors);
-                      else if (storage_for === 'target')
-                          root.$set(root.storage_settings.target, 'errors', data.responseJSON.errors);
+                      if (data.hasOwnProperty('responseJSON') && data.responseJSON.hasOwnProperty('errors')) {
+                          root.$set(root.storage_settings[storage_for], 'errors', data.responseJSON.errors);
+                      }
+                      else {
+                          alert(message_from_response(data));
+                      }
+                      console.log('save storage settings error: ');
+                      console.log(data);
+                  }).always(function(data) {
+                      root.storage_settings[storage_for].loading = false;
                   });
                   return false;
               },
