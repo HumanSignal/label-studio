@@ -32,13 +32,14 @@ class GCSStorage(CloudStorage):
         bucket = self.client['bucket']
         blob = bucket.blob(key)
         blob_str = blob.download_as_string()
-        try:
-            value = json.loads(blob_str)
-        except Exception as e:
-            logger.error(e, exc_info=True)
-            return None
-        else:
-            return value
+        return json.loads(blob_str)
+        # try:
+        #     value = json.loads(blob_str)
+        # except Exception as e:
+        #     logger.error(e, exc_info=True)
+        #     return None
+        # else:
+        #     return value
 
     def _set_value(self, key, value):
         if not isinstance(value, str):

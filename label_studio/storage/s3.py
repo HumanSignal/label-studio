@@ -26,16 +26,19 @@ class S3Storage(CloudStorage):
     def _get_value(self, key):
         s3 = self.client['s3']
         bucket = self.client['bucket']
-        try:
-            obj = s3.Object(bucket.name, key).get()['Body'].read().decode('utf-8')
-            value = json.loads(obj)
-        except self.client['client'].exceptions.NoSuchKey as e:
-            logger.error('Key ' + key + ' not found in ' + self.readable_path, exc_info=True)
-            return None
-        except Exception as e:
-            logger.error(e, exc_info=True)
-        else:
-            return value
+        obj = s3.Object(bucket.name, key).get()['Body'].read().decode('utf-8')
+        value = json.loads(obj)
+        return value
+        # try:
+        #     obj = s3.Object(bucket.name, key).get()['Body'].read().decode('utf-8')
+        #     value = json.loads(obj)
+        # except self.client['client'].exceptions.NoSuchKey as e:
+        #     logger.error('Key ' + key + ' not found in ' + self.readable_path, exc_info=True)
+        #     return None
+        # except Exception as e:
+        #     logger.error(e, exc_info=True)
+        # else:
+        #     return value
 
     def _set_value(self, key, value):
         if not isinstance(value, str):
