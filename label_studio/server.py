@@ -550,17 +550,19 @@ def api_project_storage_settings():
     project = project_get_or_create()
     # project.analytics.send(getframeinfo(currentframe()).function)  # TODO: back it
     form_data = ImmutableMultiDict(request.json)
+    current = project.config.get('source', {'type': ''})['type']
     storage_type = request.args.get('type', 'current')
+    storage_type = current if not storage_type else storage_type
 
     # select storage by type
     storages = get_available_storages()
     if storage_type in storages:
         # get empty form without values
         form = storages[storage_type].form(formdata=form_data)
-    elif storage_type == 'current' and request.method == 'POST':
+    elif storage_type == current and request.method == 'POST':
         # get empty form without values
         form = project.source_storage.form(formdata=form_data)
-    elif storage_type == 'current' and request.method == 'GET':
+    elif storage_type == current and request.method == 'GET':
         # get initialized form with current project instance
         form = project.source_storage.get_form()
     else:
