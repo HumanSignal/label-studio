@@ -549,15 +549,19 @@ def api_project():
 def api_project_storage_settings():
     project = project_get_or_create()
 
-    current_type = project.config.get('source', {'type': ''})['type']
-    selected_type = request.args.get('type', current_type)
+    selected_type = request.args.get('type')
+    storage_for = request.args.get('storage_for')
+    assert storage_for is not None
+
+    current_type = project.config.get(storage_for, {'type': ''})['type']
 
     # GET: return selected form, populated with current storage parameters
     if request.method == 'GET':
 
         form_class = get_storage_form(selected_type)
         if selected_type == current_type:
-            form = form_class(data=project.source_storage.get_params())
+            storage = project.get_storage(storage_for)
+            form = form_class(data=storage.get_params())
         else:
             form = form_class()
         output = [serialize_class(field) for field in form]
@@ -568,7 +572,7 @@ def api_project_storage_settings():
     if form.validate_on_submit():
         storage_kwargs = dict(form.data)
         storage_kwargs['type'] = request.json['type']  # storage type
-        project.update_storage(request.json['storage_for'], storage_kwargs)
+        project.update_storage(storage_for, storage_kwargs)
         return make_response(jsonify({'result': 'ok'}), 201)
     else:
         return make_response(jsonify({'errors': form.errors}), 400)
