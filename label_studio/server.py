@@ -473,6 +473,7 @@ def api_import():
 
 
 @app.route('/api/export', methods=['GET'])
+@exception_treatment
 def api_export():
     export_format = request.args.get('format')
     project = project_get_or_create()
