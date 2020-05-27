@@ -527,7 +527,6 @@ def api_project():
         project.update_params(request.json)
         code = 201
 
-    # we don't expose configurable filesystem storage in UI to avoid security problems
     banlist = ('json', 'dir-jsons')
     available_storages = list(filter(lambda i: i[0] not in banlist, get_available_storage_names().items()))
 
@@ -558,9 +557,8 @@ def api_project_storage_settings():
     if request.method == 'GET':
         # render all forms for caching in web
         all_forms = {'source': {}, 'target': {}}
-        names = get_available_storage_names()
         for storage_for in all_forms:
-            for name in names:
+            for name in project.get_available_storage_names(storage_for):
                 current_type = project.config.get(storage_for, {'type': ''})['type']
                 current = name == current_type
                 form_class = get_storage_form(name)

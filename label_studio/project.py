@@ -21,7 +21,7 @@ from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.io import find_file, delete_dir_content, json_load, remove_file_or_dir
 from label_studio.utils.validation import is_url
 from label_studio.tasks import Tasks
-from label_studio.storage import create_storage
+from label_studio.storage import create_storage, get_available_storage_names
 
 logger = logging.getLogger(__name__)
 
@@ -71,8 +71,30 @@ class Project(object):
         elif storage_for == 'target':
             return self.target_storage
 
+    def get_available_storage_names(self, storage_for):
+        if storage_for == 'source':
+            return self.get_available_source_storage_names()
+        elif storage_for == 'target':
+            return self.get_available_target_storage_names()
+
+    def get_available_source_storage_names(self):
+        names = []
+        for name in get_available_storage_names():
+            # we don't expose configurable filesystem storage in UI to avoid security problems
+            if name not in ('json', 'dir-jsons'):
+                names.append(name)
+        return names
+
+    def get_available_target_storage_names(self):
+        names = []
+        for name in get_available_storage_names():
+            # blobs have no sense for target storages
+            if name not in ('s3blob', 'gcsblob'):
+                names.append(name)
+        return names
+
     def _fix_target_storage_type(self, target_type):
-        # "blob" types have no sense for target storages
+        # blobs have no sense for output storages
         if target_type == 's3blob':
             return 's3'
         if target_type == 'gcsblob':

@@ -212,8 +212,6 @@ class CloudStorage(BaseStorage):
         item = self._ids_keys_map.get(id)
         if item:
             data = self._get_value(item['key'])
-            if data is None:
-                return
             if 'data' in data:
                 data['id'] = id
                 return data
@@ -281,7 +279,9 @@ class CloudStorage(BaseStorage):
         new_keys_ids_map = {}
 
         for key in self._get_objects():
+            logger.debug('Read key=' + key)
             if self.regex and not self.regex.match(key):
+                logger.debug(key + ' is skipped by regex filter')
                 continue
             if key not in self._keys_ids_map:
                 id = new_id
