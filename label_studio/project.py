@@ -81,7 +81,7 @@ class Project(object):
         names = OrderedDict()
         for name, desc in get_available_storage_names().items():
             # we don't expose configurable filesystem storage in UI to avoid security problems
-            if name not in ('json', 'dir-jsons'):
+            if name not in ('json', 'dir-jsons', 'completions-dir'):
                 names[name] = desc
         return names
 
@@ -89,7 +89,7 @@ class Project(object):
         names = OrderedDict()
         for name, desc in get_available_storage_names().items():
             # blobs have no sense for target storages
-            if name not in ('s3blob', 'gcsblob'):
+            if name not in ('s3blob', 'gcsblob', 'tasks-json'):
                 names[name] = desc
         return names
 
