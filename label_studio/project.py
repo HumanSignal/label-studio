@@ -469,8 +469,8 @@ class Project(object):
         :param task_id: task ids
         :return: json dict with completion
         """
-        logger.debug('Get task ' + str(task_id) + ' from target storage')
         data = self.target_storage.get(task_id)
+        logger.debug('Get task ' + str(task_id) + ' from target storage: ' + str(data))
 
         if data:
             logger.debug('Get predictions ' + str(task_id) + ' from source storage')
@@ -489,8 +489,10 @@ class Project(object):
 
         # init task if completions with task not exists
         if not task:
-            task = self.source_storage.get(task_id)
+            task = deepcopy(self.source_storage.get(task_id))
             task['completions'] = []
+        else:
+            task = deepcopy(task)
 
         # update old completion
         updated = False
