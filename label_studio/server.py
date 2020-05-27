@@ -7,6 +7,7 @@ import flask
 import pandas as pd
 import logging
 import logging.config
+import traceback as tb
 
 try:
     import ujson as json
@@ -571,6 +572,8 @@ def api_project_storage_settings():
             try:
                 project.update_storage(storage_for, storage_kwargs)
             except Exception as e:
+                traceback = tb.format_exc()
+                logger.error(str(traceback))
                 return make_response(jsonify({'detail': 'Error while storage update: ' + str(e)}), 400)
             else:
                 return make_response(jsonify({'result': 'ok'}), 201)

@@ -221,7 +221,9 @@ class CloudStorage(BaseStorage):
             try:
                 data = self._get_value(item['key'])
             except Exception as exc:
-                return {'error': True, 'message': str(exc)}
+                # return {'error': True, 'message': str(exc)}
+                logger.error(str(exc), exc_info=True)
+                return
             if 'data' in data:
                 data['id'] = id
                 return data
@@ -290,7 +292,6 @@ class CloudStorage(BaseStorage):
         new_keys_ids_map = {}
 
         for key in self._get_objects():
-            logger.debug('Read key=' + key)
             if self.regex and not self.regex.match(key):
                 logger.debug(key + ' is skipped by regex filter')
                 continue
