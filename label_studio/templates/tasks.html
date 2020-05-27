@@ -240,7 +240,7 @@
                           show: false, loading: false, type_loading: false, save_success: false
                       }
                   },
-                  storage_settings_cache: {},
+                  storage_settings_all: {},
 
                   // internal variables
                   vue_loaded: false,
@@ -300,7 +300,7 @@
               loadStorageSettings: function () {
                   var root = this;
                   root.storage_settings.source.type_loading = root.storage_settings.target.type_loading = true;
-                  this.getApi('storage_settings_cache', '/api/project/storage-settings',
+                  this.getApi('storage_settings_all', '/api/project/storage-settings',
                       function () {
                           root.storage_settings.source.type_loading = root.storage_settings.target.type_loading = false;
                           root.changeStorageSettings('source', 'current');
@@ -310,7 +310,7 @@
 
               changeStorageSettings: function (storage_for, storage_type) {
                   if (storage_type === 'current') {
-                      var storages = this.storage_settings_cache[storage_for];
+                      var storages = this.storage_settings_all[storage_for];
                       for (var type in storages) {
                           var value = storages[type];
                           if (value.current) {
@@ -320,7 +320,7 @@
                       }
                   }
                   else {
-                      var value = this.storage_settings_cache[storage_for][storage_type];
+                      var value = this.storage_settings_all[storage_for][storage_type];
                       setValue(this, 'storage_settings.'+storage_for, value);
                   }
 
