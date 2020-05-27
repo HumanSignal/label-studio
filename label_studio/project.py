@@ -115,7 +115,7 @@ class Project(object):
             storage_type = storage_kwargs.pop('type')
             if storage_for == 'target':
                 storage_type = self._fix_target_storage_type(storage_type)
-            storage_path = storage_kwargs.pop('path')
+            storage_path = storage_kwargs.pop('path', None)
             self.config[storage_for] = {
                 'name': storage_name,
                 'type': storage_type,

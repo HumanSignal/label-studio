@@ -43,7 +43,7 @@ def get_available_storage_names():
 
 
 class BaseForm(FlaskForm):
-    pass
+    bound_params = {}
 
 
 class BaseStorageForm(BaseForm):
