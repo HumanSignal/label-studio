@@ -218,7 +218,10 @@ class CloudStorage(BaseStorage):
     def get(self, id):
         item = self._ids_keys_map.get(id)
         if item:
-            data = self._get_value(item['key'])
+            try:
+                data = self._get_value(item['key'])
+            except Exception as exc:
+                return {'error': True, 'message': str(exc)}
             if 'data' in data:
                 data['id'] = id
                 return data
