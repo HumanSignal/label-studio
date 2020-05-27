@@ -558,14 +558,14 @@ def api_project_storage_settings():
         # render all forms for caching in web
         all_forms = {'source': {}, 'target': {}}
         for storage_for in all_forms:
-            for name in project.get_available_storage_names(storage_for):
+            for name, description in project.get_available_storage_names(storage_for).items():
                 current_type = project.config.get(storage_for, {'type': ''})['type']
                 current = name == current_type
                 form_class = get_storage_form(name)
                 form = form_class(data=project.get_storage(storage_for).get_params()) if current else form_class()
                 all_forms[storage_for][name] = {
                     'fields': [serialize_class(field) for field in form],
-                    'type': name, 'current': current
+                    'type': name, 'current': current, 'description': description
                 }
         return make_response(jsonify(all_forms), 200)
 
