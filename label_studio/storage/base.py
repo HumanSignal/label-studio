@@ -43,7 +43,7 @@ def get_available_storage_names():
 
 
 class BaseForm(FlaskForm):
-    pass
+    bound_params = {}
 
 
 class BaseStorageForm(BaseForm):
@@ -161,14 +161,15 @@ class CloudStorage(BaseStorage):
         self.regex = re.compile(self.regex_str) if self.regex_str else None
         self.local_dir = os.path.join(
             self.project_path, self.__class__.__name__.lower(), self.path, *self.prefix.split('/'))
-        os.makedirs(self.local_dir, exist_ok=True)
         self.create_local_copy = create_local_copy
-        if self.create_local_copy:
-            self.objects_dir = os.path.join(self.local_dir, 'objects')
-            os.makedirs(self.objects_dir, exist_ok=True)
 
         self.client = self._get_client()
         self.validate_connection()
+
+        os.makedirs(self.local_dir, exist_ok=True)
+        if self.create_local_copy:
+            self.objects_dir = os.path.join(self.local_dir, 'objects')
+            os.makedirs(self.objects_dir, exist_ok=True)
 
         self.last_sync_time = None
         self.sync_period_in_sec = 30
@@ -269,6 +270,7 @@ class CloudStorage(BaseStorage):
         return (datetime.now() - self.last_sync_time) > timedelta(seconds=self.sync_period_in_sec)
 
     def sync(self):
+        self.validate_connection()
         if self._ready_to_sync():
             thread = threading.Thread(target=self._sync)
             thread.daemon = True
