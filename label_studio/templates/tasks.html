@@ -108,7 +108,7 @@
             <a class="ui button positive" href="/">Start Labeling</a>
 
             <!-- Sampling -->
-            <span class="ui segment" style="padding-top: 9px; padding-bottom: 10px; margin-right: 3px;">
+            <span class="ui segment" style="padding-top: 9px; padding-bottom: 10px; padding-left: 3px;">
             Tasks sampling:&nbsp;<span class="ui orange label">
               {{ project.config['sampling'] }}
             </span>
@@ -183,7 +183,8 @@
             <!-- Task ID -->
             <td class="text-center">
               <a :href="'/?task_id=' + task.id">
-                <i class="fas fa-eye eye show-completion"></i>
+                <span class="ui mini loader inline active" v-if="task.processing"></span>
+                <i class="fas fa-eye eye show-completion" v-else></i>
               </a>
               &nbsp;{{ task.id }}
             </td>
@@ -191,12 +192,12 @@
             <td>{{ task.completed_at }}</td>
             <!-- Task -->
             <td class="text-center" v-if="project.can_manage_tasks">
-              <i @click="deleteTask(task.id)"
+              <i @click="deleteTask(task)"
                  class="fas fa-trash-alt trash remove-task">&nbsp;&nbsp;</i>
             </td>
             <!-- Completion -->
             <td class="text-center" v-if="project.can_manage_completions">
-              <i v-for="completion_id in task.completions" @click="deleteCompletion(task.id, completion_id)"
+              <i v-for="completion_id in task.completions" @click="deleteCompletion(task, completion_id)"
                  class="fas fa-trash-alt trash remove-completion">&nbsp;&nbsp;</i>
             </td>
           </tr>
@@ -389,17 +390,18 @@
               },
 
               // delete completion with trash button
-              deleteCompletion: function (task_id, completion_id) {
+              deleteCompletion: function (task, completion_id) {
                   var request = new XMLHttpRequest();
-                  request.open("DELETE", "/api/tasks/" + task_id + "/completions/" + completion_id + "/", true);
+                  request.open("DELETE", "/api/tasks/" + task.id + "/completions/" + completion_id + "/", true);
                   request.onload = this.loadProjectAndTasks;
                   request.send();
               },
 
               // delete completion with trash button
-              deleteTask: function (task_id) {
+              deleteTask: function (task) {
+                  task.processing = true;
                   var request = new XMLHttpRequest();
-                  request.open("DELETE", "/api/tasks/" + task_id + "/", true);
+                  request.open("DELETE", "/api/tasks/" + task.id + "/", true);
                   request.onload = this.loadProjectAndTasks;
                   request.send();
               },

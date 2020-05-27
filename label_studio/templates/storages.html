@@ -16,8 +16,7 @@
 
   <!-- Content -->
   <div class="content">
-    <form class="ui form" :id="storage.storage_for + '-storage-form'"
-          v-on:keyup.enter="saveStorageSettings(storage_for)" v-on:keyup.escape="storage.show=false">
+    <form class="ui form" :id="storage.storage_for + '-storage-form'">
       <input hidden name="storage_for" :value="storage_for">
 
       <!-- Storage Type -->

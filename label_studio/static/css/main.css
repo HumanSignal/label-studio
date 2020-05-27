@@ -27,14 +27,13 @@ table.responsive {
     }
 }
 
+h1 {
+    font-weight: normal !important;
+}
 
 h2 {
     font-size: 1.2em;
-    font-weight: normal;
-}
-
-h1 {
-    font-weight: normal;
+    font-weight: normal !important;
 }
 
 td,
