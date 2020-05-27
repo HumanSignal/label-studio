@@ -294,11 +294,12 @@ class CloudStorage(BaseStorage):
             if self.regex and not self.regex.match(key):
                 continue
             if key not in self._keys_ids_map:
-                new_ids_keys_map[new_id] = {'key': key, 'exists': True}
-                new_keys_ids_map[key] = new_id
+                id = new_id
                 new_id += 1
             else:
-                new_ids_keys_map[self._keys_ids_map[key]] = {'key': key, 'exists': True}
+                id = self._keys_ids_map[key]
+            new_ids_keys_map[id] = {'key': key, 'exists': True}
+            new_keys_ids_map[key] = id
 
         with self.thread_lock:
             self._ids_keys_map = new_ids_keys_map
