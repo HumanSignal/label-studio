@@ -370,6 +370,12 @@
                   this.loadStorageSettings();
               },
 
+              // update all objects via api
+              loadProjectAndTasks: function () {
+                  this.loadProject();
+                  this.loadTasks();
+              },
+
               // change order of sorting in table
               changeOrder: function (name) {
                   console.log('order changed to ' + name);
@@ -386,7 +392,7 @@
               deleteCompletion: function (task_id, completion_id) {
                   var request = new XMLHttpRequest();
                   request.open("DELETE", "/api/tasks/" + task_id + "/completions/" + completion_id + "/", true);
-                  request.onload = this.loadTasks;
+                  request.onload = this.loadProjectAndTasks;
                   request.send();
               },
 
@@ -394,7 +400,7 @@
               deleteTask: function (task_id) {
                   var request = new XMLHttpRequest();
                   request.open("DELETE", "/api/tasks/" + task_id + "/", true);
-                  request.onload = this.loadTasks;
+                  request.onload = this.loadProjectAndTasks;
                   request.send();
               },
 
@@ -406,7 +412,7 @@
                   if (deletion_confirmed) {
                       var request = new XMLHttpRequest();
                       request.open("DELETE", "/api/tasks/delete", true);
-                      request.onload = this.loadAll;
+                      request.onload = this.loadProjectAndTasks;
                       request.send();
                   }
               },
