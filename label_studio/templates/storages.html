@@ -15,7 +15,7 @@
   </div>
 
   <!-- Content -->
-  <div class="content">
+  <div class="content" v-on:keyup.escape="storage.show=false">
     <form class="ui form" :id="storage.storage_for + '-storage-form'">
       <input hidden name="storage_for" :value="storage_for">
 
