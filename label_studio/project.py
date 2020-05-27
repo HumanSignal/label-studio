@@ -838,6 +838,7 @@ class Project(object):
             'config': project.config,
             'can_manage_tasks': project.can_manage_tasks,
             'can_manage_completions': project.can_manage_completions,
+            'can_delete_tasks': project.can_delete_tasks,
             'target_storage': {'readable_path': project.target_storage.readable_path},
             'source_storage': {'readable_path': project.source_storage.readable_path},
             'available_storages': available_storages
