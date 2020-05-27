@@ -819,3 +819,23 @@ class Project(object):
     @property
     def generate_sample_task_escape(self):
         return self.project_obj.generate_sample_task_escape
+
+    def serialize(self):
+        """ Serialize project to json dict
+        """
+        project = self
+        banlist = ('json', 'dir-jsons')
+        available_storages = list(filter(lambda i: i[0] not in banlist, get_available_storage_names().items()))
+
+        output = {
+            'project_name': project.name,
+            'task_count': len(project.source_storage.ids()),
+            'completion_count': len(project.get_completions_ids()),
+            'config': project.config,
+            'can_manage_tasks': project.can_manage_tasks,
+            'can_manage_completions': project.can_manage_completions,
+            'target_storage': {'readable_path': project.target_storage.readable_path},
+            'source_storage': {'readable_path': project.source_storage.readable_path},
+            'available_storages': available_storages
+        }
+        return output

@@ -217,14 +217,7 @@
           data: function () {
               return {
                   // provided by api/project
-                  project: {
-                      task_count: 0,
-                      completion_count: 0,
-                      project_name: "",
-                      config: {
-                          sampling: "none"
-                      }
-                  },
+                  project: {% endraw %}{{ serialized_project|json|safe }}{% raw %},
 
                   // provided by api/tasks
                   tasks: [],

@@ -188,11 +188,13 @@ def tasks_page():
 
     project = project_get_or_create()
     project.analytics.send(getframeinfo(currentframe()).function)
+    serialized_project = project.serialize()
+    serialized_project['multi_session_mode'] = input_args.command != 'start-multi-session'
 
     return flask.render_template(
         'tasks.html',
         project=project,
-        config=project.config
+        serialized_project=serialized_project
     )
 
 
@@ -527,22 +529,8 @@ def api_project():
         project.update_params(request.json)
         code = 201
 
-    banlist = ('json', 'dir-jsons')
-    available_storages = list(filter(lambda i: i[0] not in banlist, get_available_storage_names().items()))
-
-    output = {
-        'project_name': project.name,
-        'task_count': len(project.source_storage.ids()),
-        'completion_count': len(project.get_completions_ids()),
-        'config': project.config,
-        'can_manage_tasks': project.can_manage_tasks,
-        'can_manage_completions': project.can_manage_completions,
-        'multi_session_mode': input_args.command != 'start-multi-session',
-        'target_storage': {'readable_path': project.target_storage.readable_path},
-        'source_storage': {'readable_path': project.source_storage.readable_path},
-        'available_storages': available_storages
-    }
-    logger.debug(str(output))
+    output = project.serialize()
+    output['multi_session_mode'] = input_args.command != 'start-multi-session'
     project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
     return make_response(jsonify(output), code)
 
