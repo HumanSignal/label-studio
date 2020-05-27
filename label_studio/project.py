@@ -5,7 +5,7 @@ import json
 import random
 
 from shutil import copy2
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from operator import itemgetter
 from xml.etree import ElementTree
 from uuid import uuid4
@@ -78,19 +78,19 @@ class Project(object):
             return self.get_available_target_storage_names()
 
     def get_available_source_storage_names(self):
-        names = []
-        for name in get_available_storage_names():
+        names = OrderedDict()
+        for name, desc in get_available_storage_names().items():
             # we don't expose configurable filesystem storage in UI to avoid security problems
             if name not in ('json', 'dir-jsons'):
-                names.append(name)
+                names[name] = desc
         return names
 
     def get_available_target_storage_names(self):
-        names = []
-        for name in get_available_storage_names():
+        names = OrderedDict()
+        for name, desc in get_available_storage_names().items():
             # blobs have no sense for target storages
             if name not in ('s3blob', 'gcsblob'):
-                names.append(name)
+                names[name] = desc
         return names
 
     def _fix_target_storage_type(self, target_type):
