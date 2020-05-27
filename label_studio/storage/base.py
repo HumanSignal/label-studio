@@ -297,10 +297,12 @@ class CloudStorage(BaseStorage):
                 new_ids_keys_map[new_id] = {'key': key, 'exists': True}
                 new_keys_ids_map[key] = new_id
                 new_id += 1
+            else:
+                new_ids_keys_map[self._keys_ids_map[key]] = {'key': key, 'exists': True}
 
         with self.thread_lock:
-            self._ids_keys_map.update(new_ids_keys_map)
-            self._keys_ids_map.update(new_keys_ids_map)
+            self._ids_keys_map = new_ids_keys_map
+            self._keys_ids_map = new_keys_ids_map
             self._save_ids()
 
     @abstractmethod
