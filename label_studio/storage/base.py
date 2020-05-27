@@ -161,14 +161,15 @@ class CloudStorage(BaseStorage):
         self.regex = re.compile(self.regex_str) if self.regex_str else None
         self.local_dir = os.path.join(
             self.project_path, self.__class__.__name__.lower(), self.path, *self.prefix.split('/'))
-        os.makedirs(self.local_dir, exist_ok=True)
         self.create_local_copy = create_local_copy
-        if self.create_local_copy:
-            self.objects_dir = os.path.join(self.local_dir, 'objects')
-            os.makedirs(self.objects_dir, exist_ok=True)
 
         self.client = self._get_client()
         self.validate_connection()
+
+        os.makedirs(self.local_dir, exist_ok=True)
+        if self.create_local_copy:
+            self.objects_dir = os.path.join(self.local_dir, 'objects')
+            os.makedirs(self.objects_dir, exist_ok=True)
 
         self.last_sync_time = None
         self.sync_period_in_sec = 30

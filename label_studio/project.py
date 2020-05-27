@@ -116,6 +116,7 @@ class Project(object):
             if storage_for == 'target':
                 storage_type = self._fix_target_storage_type(storage_type)
             storage_path = storage_kwargs.pop('path', None)
+            storage = create_storage(storage_type, storage_path, self.path, **storage_kwargs)
             self.config[storage_for] = {
                 'name': storage_name,
                 'type': storage_type,
@@ -123,8 +124,8 @@ class Project(object):
                 'params': storage_kwargs
             }
             self._save_config()
-            logger.debug('Create storage type "' + storage_type + '"')
-            return create_storage(storage_type, storage_path, self.path, **storage_kwargs)
+            logger.debug('Created storage type "' + storage_type + '"')
+            return storage
 
         if storage_for == 'source':
             self.source_storage = _update_storage('source', storage_kwargs)
