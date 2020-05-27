@@ -269,6 +269,7 @@ class CloudStorage(BaseStorage):
         return (datetime.now() - self.last_sync_time) > timedelta(seconds=self.sync_period_in_sec)
 
     def sync(self):
+        self.validate_connection()
         if self._ready_to_sync():
             thread = threading.Thread(target=self._sync)
             thread.daemon = True
