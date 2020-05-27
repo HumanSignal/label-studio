@@ -37,7 +37,7 @@ def create_storage(storage_type, path, project_path=None, **kwargs):
 
 def get_available_storage_names():
     out = OrderedDict()
-    for key in sorted(_storage):
+    for key in sorted(_storage, key=lambda x: _storage[x].description):
         out[key] = _storage[key].description
     return out
 

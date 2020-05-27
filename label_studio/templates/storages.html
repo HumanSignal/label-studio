@@ -24,8 +24,8 @@
       <div class="ui field" v-if="storage.type != ''" :class="{disabled: storage.type_loading}">
         <label>Storage type</label>
         <select class="ui dropdown" name="type" v-model="storage.type">
-          <option v-for="(item, name) in storage_settings_all[storage_for]" :value="name" :some="console.log(name)">
-            {{ item.description }}
+          <option v-for="(item, name) in storage_settings_all[storage_for]" :value="name">
+            {{ item.description }} {{ item.current ? '*' : ' ' }}
           </option>
         </select>
       </div>
