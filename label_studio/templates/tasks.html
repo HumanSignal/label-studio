@@ -115,7 +115,7 @@
             </span> &nbsp;
 
             <!-- Delete all tasks -->
-            <a class="ui button red" @click="deleteAllTasks()" v-if="project.can_manage_tasks">Delete All Tasks</a>
+            <a class="ui button red" @click="deleteAllTasks()" v-if="project.can_delete_tasks">Delete All Tasks</a>
           </div>
         </div>
 
@@ -167,7 +167,7 @@
             <i class="fas"
                :class="{'fa-sort-up': this.order=='completed_at', 'fa-sort-down': this.order=='-completed_at'}"></i>
           </th>
-          <th v-if="project.can_manage_tasks">Delete task?</th>
+          <th v-if="project.can_delete_tasks">Delete task?</th>
           <th v-if="project.can_manage_completions">Delete completion?</th>
         </tr>
 
@@ -191,7 +191,7 @@
             <!-- Completed at -->
             <td>{{ task.completed_at }}</td>
             <!-- Task -->
-            <td class="text-center" v-if="project.can_manage_tasks">
+            <td class="text-center" v-if="project.can_delete_tasks">
               <i @click="deleteTask(task)"
                  class="fas fa-trash-alt trash remove-task">&nbsp;&nbsp;</i>
             </td>
