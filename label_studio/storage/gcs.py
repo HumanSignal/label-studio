@@ -24,6 +24,9 @@ class GCSStorage(CloudStorage):
             'bucket': client.get_bucket(self.path)
         }
 
+    def validate_connection(self):
+        pass
+
     def _get_objects(self):
         logger.debug('Getting GCS blobs from ' + self.path)
         bucket = self.client['bucket']

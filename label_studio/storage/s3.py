@@ -2,6 +2,8 @@ import logging
 import boto3
 import json
 
+from botocore.client import ClientError
+
 from .base import CloudStorage, CloudStorageBlobForm
 
 logger = logging.getLogger(__name__)
@@ -20,6 +22,9 @@ class S3Storage(CloudStorage):
             'client': boto3.client('s3'),
             'bucket': s3.Bucket(self.path)
         }
+
+    def validate_connection(self):
+        self.client['client'].head_bucket(Bucket=self.path)
 
     @property
     def readable_path(self):

@@ -168,6 +168,8 @@ class CloudStorage(BaseStorage):
             os.makedirs(self.objects_dir, exist_ok=True)
 
         self.client = self._get_client()
+        self.validate_connection()
+
         self.last_sync_time = None
         self.sync_period_in_sec = 30
 
@@ -185,6 +187,10 @@ class CloudStorage(BaseStorage):
             'create_local_copy': self.create_local_copy
         })
         return params
+
+    @abstractmethod
+    def validate_connection(self):
+        pass
 
     @abstractmethod
     def _get_client(self):
