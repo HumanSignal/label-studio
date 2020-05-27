@@ -162,7 +162,7 @@
           </select>
         </div>
 
-        <div class="item"><span data-tooltip="Auto update project info and tasks by timer">
+        <div class="item"><span data-tooltip="Auto update project info and tasks by timer (about 5 sec)">
           <i class="far fa-clock" :style="{opacity: auto_update_timer ? 1.0: 0.5, cursor: 'pointer'}"
              @click="toggleAutoUpdateTimer()"></i>
         </span></div>
@@ -461,7 +461,7 @@
                     this.auto_update_timer = null;
                   }
                   else {
-                    this.auto_update_timer = setInterval(this.loadProjectAndTasks, 1000);
+                    this.auto_update_timer = setInterval(this.loadProjectAndTasks, 5000);
                   }
               },
 
