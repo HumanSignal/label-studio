@@ -293,11 +293,12 @@
           },
 
           methods: {
-              getApi: function (dst, url, always, fail) {
+              getApi: function (dst, url, always, fail, done) {
                   var root = this;
                   $.get(url + (url.includes('?') ? '&' : '?') + 'rnd=' + randomInteger(0, 100000))
                       .done(function (data) {
                           setValue(root, dst, data);
+                          if (done) done(data);
                           if (always) always(data);
                           console.log(dst + ' loaded');
                       })
@@ -318,16 +319,16 @@
               // get project info from api
               loadProject: function () {
                   var root = this;
-                  root.error = null;
                   this.getApi('project', '/api/project/',
                       // always
-                      function () {
-                          root.project_loaded = true;
-                      },
+                      function () { root.project_loaded = true; },
                       // fail
                       function (data) {
                           root.error = { message: message_from_response(data), header: 'Project loading error' };
-                      });
+                      },
+                      // done
+                      function (data) { root.error = null; }
+                  );
               },
 
               // get tasks from api
