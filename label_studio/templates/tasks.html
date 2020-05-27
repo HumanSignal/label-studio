@@ -325,9 +325,13 @@
                       // fail
                       function (data) {
                           root.error = { message: message_from_response(data), header: 'Project loading error' };
+                          root.$forceUpdate();
                       },
                       // done
-                      function (data) { root.error = null; }
+                      function () {
+                        root.error = null;
+                        root.$forceUpdate();
+                      }
                   );
               },
 
