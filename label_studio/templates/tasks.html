@@ -49,10 +49,9 @@
   <div id="vue_loader" class="ui large text loader loading active">Loading ...</div>
 
   <div class="ui container" id="app" :class="{'visible-app': vue_loaded}" style="display: none">
-  <!-- Project loader -->
-  <div class="ui large text loader center aligned loading active" v-if="!project_loaded">Project Loading ...</div>
+
   <!-- Main content -->
-  <center class="center" v-else>
+  <center class="center">
 
   <div class="ui container">
     <div class="wrapper">
@@ -63,7 +62,12 @@
           <!-- Total tasks -->
           <div class="column center aligned">
             <div class="ui statistic small">
-            <span class="value">
+            <!-- Project loading -->
+            <center v-if="!project_loaded" style="margin-bottom: 3px">
+              <div class="ui loader loading active inline"></div>
+            </center>
+            <!-- Number -->
+            <span class="value" v-else>
               <animated-number :number="project.task_count"></animated-number>
             </span>
               <span class="label">Total tasks</span>
@@ -78,26 +82,33 @@
           <!-- Total completions -->
           <div class="column center aligned">
             <div class="ui statistic small">
-              <span class="value"><animated-number :number="project.completion_count"/></span>
-              <span class="label">Total completions</span>
-              <span class="sub-label">
-                <i class="word-break" v-if="project.multi_session_mode">{{ project.target_storage.readable_path }}</i>&nbsp;
-                <span data-tooltip="Change target storage settings">
-                  <i class="fas fa-cog sup-button big" @click="storage_settings.target.show=true"></i>
-                </span>
+            <!-- Project loading -->
+            <center v-if="!project_loaded" style="margin-bottom: 3px">
+              <div class="ui loader loading active inline"></div>
+            </center>
+            <!-- Number -->
+            <span class="value" v-else>
+              <animated-number :number="project.completion_count"></animated-number>
+            </span>
+            <span class="label">Total completions</span>
+            <span class="sub-label">
+              <i class="word-break" v-if="project.multi_session_mode">{{ project.target_storage.readable_path }}</i>&nbsp;
+              <span data-tooltip="Change target storage settings">
+                <i class="fas fa-cog sup-button big" @click="storage_settings.target.show=true"></i>
               </span>
+            </span>
             </div>
           </div>
         </div>
 
         <!-- Control buttons -->
         <div class="ui row stackable" v-if="project.task_count > 0">
-          <div class="column center aligned">
+          <div class="center aligned">
             <!-- Start labeling -->
             <a class="ui button positive" href="/">Start Labeling</a>
 
             <!-- Sampling -->
-            <span class="ui segment" style="padding-top: 9px; padding-bottom: 10px;">
+            <span class="ui segment" style="padding-top: 9px; padding-bottom: 10px; margin-right: 3px;">
             Tasks sampling:&nbsp;<span class="ui orange label">
               {{ project.config['sampling'] }}
             </span>
@@ -197,14 +208,14 @@
       <br/>
     </div>
     <br/><br/>
-
-    {% endraw %}
-    {% include 'storages.html' %}
-    {% raw %}
-
   </div>
 
   </center>
+
+  {% endraw %}
+  {% include 'storages.html' %}
+  {% raw %}
+
   </div>
 
   <script src="/static/js/components/animatedNumber.js"></script>
@@ -262,7 +273,7 @@
           methods: {
               getApi: function (dst, url, always) {
                   var root = this;
-                  $.get(url + (url.includes('?') ? '&' : '?') + 'rnd=' + Math.random())
+                  $.get(url + (url.includes('?') ? '&' : '?') + 'rnd=' + Math.random().toString().slice(0, 5))
                       .done(function (data) {
                           setValue(root, dst, data);
                           if (always) always(data);
@@ -301,6 +312,7 @@
                       });
               },
 
+              // get settings from storage_settings_all
               changeStorageSettings: function (storage_for, storage_type) {
                   if (storage_type === 'current') {
                       var storages = this.storage_settings_all[storage_for];
@@ -341,7 +353,10 @@
                       console.log(data);
                   }).done(function() {
                       root.storage_settings[storage_for].save_success = true;
-                      root.loadAll();
+                      root.project_loaded = false;
+                      setTimeout(function(){
+                        root.loadAll();
+                      }, 2000);
                   }).always(function () {
                       root.storage_settings[storage_for].loading = false;
                   });

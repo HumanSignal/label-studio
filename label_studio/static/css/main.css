@@ -30,7 +30,7 @@ table.responsive {
 
 h2 {
     font-size: 1.2em;
-    font-weight: bold;
+    font-weight: normal;
 }
 
 td,
@@ -304,7 +304,6 @@ div[class*="App_editor"] {
 
 .ui .button {
     font-weight: 400 !important;
-    margin-bottom: 5px !important;
     transition: background-color ease-in-out 0.25s, border ease-in-out 0.5s;
 }
 .ui .button.positive {
@@ -339,6 +338,10 @@ div[class*="App_editor"] {
 
 .ui .message .content {
     margin-top: 0.7em;
+}
+
+.ui .message .header {
+    font-weight: normal !important;
 }
 
 .ui ul, ol {
