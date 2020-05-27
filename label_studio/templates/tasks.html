@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block body %}
-  {% raw %}
+{% raw %}
   <script src="/static/js/vue.js"></script>
   <script src="/static/semantic/semantic-ui-vue.min.js"></script>
 
@@ -8,6 +8,7 @@
     .visible-app {
       display: block !important;
     }
+
     .predict-image {
       border-radius: 5px;
       height: 50px;
@@ -16,10 +17,12 @@
     .fade-enter-active, .fade-leave-active {
       transition: opacity 0.5s ease-in-out;
     }
+
     .fade-enter-to {
       opacity: 1;
       height: 50px;
     }
+
     .fade-enter, .fade-leave-to {
       opacity: 0;
       height: 0;
@@ -28,13 +31,16 @@
     .pagination {
       height: 10px !important;
     }
+
     .pagination-size {
       border: none;
       background: none;
     }
+
     .order {
       cursor: pointer;
     }
+
     .order.up, .order.down {
       font-weight: bold;
     }
@@ -45,12 +51,11 @@
   <div class="ui container" id="app" :class="{'visible-app': vue_loaded}" style="display: none">
   <!-- Project loader -->
   <div class="ui large text loader center aligned loading active" v-if="!project_loaded">Project Loading ...</div>
-
   <!-- Main content -->
-  <center class="wrapper" v-else>
+  <center class="center" v-else>
 
   <div class="ui container">
-    <center class="wrapper">
+    <div class="wrapper">
 
       <!-- Statistics -->
       <div class="ui two column centered grid stackable">
@@ -190,13 +195,16 @@
       </table>
 
       <br/>
-    </center>
+    </div>
     <br/><br/>
 
     {% endraw %}
     {% include 'storages.html' %}
     {% raw %}
 
+  </div>
+
+  </center>
   </div>
 
   <script src="/static/js/components/animatedNumber.js"></script>
@@ -223,12 +231,16 @@
 
                   // provided by api/project/storage-settings
                   storage_settings: {
-                      source: { fields: [], errors: [], type: '', storage_for: 'source',
-                                show: true, loading: false, type_loading: false},
-                      target: { fields: [], errors: [], type: '', storage_for: 'target',
-                                show: false, loading: false, type_loading: false},
+                      source: {
+                          fields: [], errors: [], type: 'json', storage_for: 'source',
+                          show: false, loading: false, type_loading: false, save_success: false
+                      },
+                      target: {
+                          fields: [], errors: [], type: 'json', storage_for: 'target',
+                          show: false, loading: false, type_loading: false, save_success: false
+                      }
                   },
-                  storage_settings_cache: { },
+                  storage_settings_cache: {},
 
                   // internal variables
                   vue_loaded: false,
@@ -255,7 +267,7 @@
           },
 
           methods: {
-              getApi: function (dst, url, always=null) {
+              getApi: function (dst, url, always) {
                   var root = this;
                   $.get(url + (url.includes('?') ? '&' : '?') + 'rnd=' + Math.random())
                       .done(function (data) {
@@ -271,8 +283,9 @@
 
               // get tasks from api
               loadTasks: function () {
-                  this.getApi('tasks', '/api/tasks?page=' + this.page + '&page_size=' + parseInt(this.page_size) +
-                      '&order=' + this.order)
+                  this.getApi('tasks', '/api/tasks?page=' + this.page +
+                                       '&page_size=' + parseInt(this.page_size) +
+                                       '&order=' + this.order)
               },
 
               // get project info from api
@@ -284,19 +297,40 @@
               },
 
               // get tasks from api
-              loadStorageSettings: function (storage_for) { 
+              loadStorageSettings: function () {
                   var root = this;
-                  root.storage_settings[storage_for].type_loading = true;
-                  this.getApi('storage_settings.' + storage_for, 'api/project/storage-settings' +
-                      '?type=' + this.storage_settings[storage_for].type + '&storage_for=' + storage_for,
-                      function() {
-                        root.storage_settings[storage_for].type_loading = false;
+                  root.storage_settings.source.type_loading = root.storage_settings.target.type_loading = true;
+                  this.getApi('storage_settings_cache', '/api/project/storage-settings',
+                      function () {
+                          root.storage_settings.source.type_loading = root.storage_settings.target.type_loading = false;
+                          root.changeStorageSettings('source', 'current');
+                          root.changeStorageSettings('target', 'current');
                       });
               },
 
-              saveStorageSettings(storage_for) {
+              changeStorageSettings: function (storage_for, storage_type) {
+                  if (storage_type === 'current') {
+                      var storages = this.storage_settings_cache[storage_for];
+                      for (var type in storages) {
+                          var value = storages[type];
+                          if (value.current) {
+                              setValue(this, 'storage_settings.'+storage_for, value);
+                              break;
+                          }
+                      }
+                  }
+                  else {
+                      var value = this.storage_settings_cache[storage_for][storage_type];
+                      setValue(this, 'storage_settings.'+storage_for, value);
+                  }
+
+              },
+
+              saveStorageSettings: function(storage_for) {
                   var root = this;
                   root.storage_settings[storage_for].loading = true;
+                  root.storage_settings[storage_for].save_success = false;
+                  root.$set(root.storage_settings[storage_for], 'errors', []);
                   $.ajax({
                       type: 'POST',
                       url: '/api/project/storage-settings' +
@@ -304,7 +338,7 @@
                           '&storage_for=' + storage_for,
                       contentType: 'application/json',
                       dataType: 'json',
-                      data: JSON.stringify(getFormData($('#'+storage_for+'-storage-form')))
+                      data: JSON.stringify(getFormData($('#' + storage_for + '-storage-form')))
                   }).fail(function (data) {
                       if (data.hasOwnProperty('responseJSON') && data.responseJSON.hasOwnProperty('errors'))
                           root.$set(root.storage_settings[storage_for], 'errors', data.responseJSON.errors);
@@ -312,7 +346,10 @@
                           alert(message_from_response(data));
                       console.log('save storage settings error:');
                       console.log(data);
-                  }).always(function(data) {
+                  }).done(function() {
+                      root.storage_settings[storage_for].save_success = true;
+                      root.loadAll();
+                  }).always(function () {
                       root.storage_settings[storage_for].loading = false;
                   });
                   return false;
@@ -322,8 +359,7 @@
               loadAll: function () {
                   this.loadProject();
                   this.loadTasks();
-                  this.loadStorageSettings('source');
-                  this.loadStorageSettings('target');
+                  this.loadStorageSettings();
               },
 
               // change order of sorting in table
@@ -365,7 +401,13 @@
                       request.onload = this.loadAll;
                       request.send();
                   }
-              }
+              },
+
+              pageReload: function () {
+                  window.location.reload();
+              },
+
+              capitalizeFirstLetter: capitalizeFirstLetter // from helpers.js
           },
 
           watch: {
@@ -377,10 +419,10 @@
                   this.loadTasks();
               },
               'storage_settings.source.type': function () {
-                  this.loadStorageSettings('source')
+                 this.changeStorageSettings('source', this.storage_settings.source.type)
               },
               'storage_settings.target.type': function () {
-                  this.loadStorageSettings('target')
+                 this.changeStorageSettings('target', this.storage_settings.target.type)
               }
           },
 
@@ -400,5 +442,5 @@
 
   </script>
 
-  {% endraw %}
+{% endraw %}
 {% endblock %}

@@ -8,7 +8,7 @@ function IsJsonString(str) {
     if (typeof str !== "string") return false;
 
     try {
-        let json = JSON.parse(str);
+        var json = JSON.parse(str);
         return typeof json === "object";
     } catch (e) {
         return false;
@@ -132,12 +132,12 @@ function setUrlArg(key, value, url) {
 // set request arg param
 function popUrlArg(key, url) {
     if (!url) url = window.location.href;
-    const deleteRegex = new RegExp(key + '(=|&|$)');
+    var deleteRegex = new RegExp(key + '(=|&|$)');
 
-    const split_url = url.split('?');
-    const params = split_url.slice(1).join('').split('&');
-    let search = [];
-    for (let i = 0; i < params.length; i++) {
+    var split_url = url.split('?');
+    var params = split_url.slice(1).join('').split('&');
+    var search = [];
+    for (var i = 0; i < params.length; i++) {
         if (deleteRegex.test(params[i]) === false && params[i]) {
             search.push(params[i]);
         }
@@ -147,8 +147,8 @@ function popUrlArg(key, url) {
 }
 
 function togglePageArg(name) {
-    let url = window.location.href;
-    let result = popUrlArg(name);
+    var url = window.location.href;
+    var result = popUrlArg(name);
     if (result === url) {
         window.location = setUrlArg(name, 'true', url)
     } else {
@@ -197,5 +197,5 @@ function setValue(obj, path, value) {
 }
 
 function capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
+    return string[0].toUpperCase() + string.slice(1);
 }

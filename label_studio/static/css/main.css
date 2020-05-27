@@ -392,6 +392,12 @@ div[class*="App_editor"] {
     background-color: rgba(0,0,0,0.5) !important;
 }
 
+.ui.list .item.error {
+    color: #9f3a38;
+    margin-left: 1em;
+    font-size: 0.85em;
+}
+
 /* semantic ui pretty finish */
 
 /* label config */
