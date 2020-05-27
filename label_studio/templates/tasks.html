@@ -108,11 +108,11 @@
             <a class="ui button positive" href="/">Start Labeling</a>
 
             <!-- Sampling -->
-            <span class="ui segment" style="padding-top: 9px; padding-bottom: 10px; padding-left: 3px;">
-            Tasks sampling:&nbsp;<span class="ui orange label">
-              {{ project.config['sampling'] }}
-            </span>
-          </span>
+            <span class="ui segment" style="padding-top: 8px; padding-bottom: 11px;"
+                  data-tooltip="The order in which tasks will be shown in the Labeling page,
+                                change it in config file or at run arguments">
+              Tasks sampling:&nbsp;<span class="ui orange label">{{ project.config['sampling'] }}</span>
+            </span> &nbsp;
 
             <!-- Delete all tasks -->
             <a class="ui button red" @click="deleteAllTasks()" v-if="project.can_manage_tasks">Delete All Tasks</a>
@@ -448,6 +448,8 @@
               this.project_loaded = true;
 
               this.order = getUrlArg('order', 'id');
+              this.page = getUrlArg('page', this.page);
+              this.page_size = getUrlArg('page_size', this.page_size);
               this.loadAll();
               //this.timer = setInterval(this.loadAll, 5000);
 
