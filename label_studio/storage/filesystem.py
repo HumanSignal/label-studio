@@ -119,7 +119,8 @@ class DirJSONsStorage(BaseStorage):
 
     def remove(self, key):
         filename = os.path.join(self.path, str(key) + '.json')
-        os.remove(filename)
+        if os.path.exists(filename):
+            os.remove(filename)
 
     def remove_all(self):
         delete_dir_content(self.path)
