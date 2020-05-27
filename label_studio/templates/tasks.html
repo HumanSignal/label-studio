@@ -197,7 +197,7 @@
             </td>
             <!-- Completion -->
             <td class="text-center" v-if="project.can_manage_completions">
-              <i v-for="completion_id in task.completions" @click="deleteCompletion(task, completion_id)"
+              <i v-for="completion in task.completions" @click="deleteCompletion(task, completion)"
                  class="fas fa-trash-alt trash remove-completion">&nbsp;&nbsp;</i>
             </td>
           </tr>
@@ -263,11 +263,14 @@
           },
 
           computed: {
-              currentPage: function () {
+              currentTasks: function () {
                   return this.tasks;
               },
               totalPages: function () {
-                  return Math.ceil(this.project.task_count / parseInt(this.page_size));
+                  var total = Math.ceil(this.project.task_count / parseInt(this.page_size));
+                  if (this.page > total)
+                      this.page = total;
+                  return total;
               }
           },
 
@@ -390,9 +393,10 @@
               },
 
               // delete completion with trash button
-              deleteCompletion: function (task, completion_id) {
+              deleteCompletion: function (task, completion) {
+                  task.processing = true;
                   var request = new XMLHttpRequest();
-                  request.open("DELETE", "/api/tasks/" + task.id + "/completions/" + completion_id + "/", true);
+                  request.open("DELETE", "/api/tasks/" + task.id + "/completions/" + completion.id + "/", true);
                   request.onload = this.loadProjectAndTasks;
                   request.send();
               },
