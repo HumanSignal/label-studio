@@ -322,11 +322,11 @@
                       // always
                       function () {
                           root.project_loaded = true
+                          root.error = null;
                       },
                       // fail
                       function (data) {
                           root.error = { message: message_from_response(data), header: 'Project loading error' };
-                          //root.$forceUpdate();
                       });
               },
 
