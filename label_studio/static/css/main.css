@@ -426,6 +426,9 @@ pre {
 .statistic .value small {
     font-size: 65%;
 }
+.statistic .sub-label {
+    color: #555;
+}
 
 
 @media only screen and (max-width: 890px) {

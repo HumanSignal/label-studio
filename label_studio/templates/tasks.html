@@ -67,7 +67,7 @@
               <animated-number :number="project.task_count"></animated-number>
             </span>
               <span class="label">Total tasks</span>
-              <span>
+              <span class="sub-label">
                 <i class="word-break" v-if="project.multi_session_mode">{{ project.source_storage.readable_path }}</i>&nbsp;
                 <span data-tooltip="Change source storage settings">
                   <i class="fas fa-cog sup-button big" @click="storage_settings.source.show=true"></i>
@@ -80,7 +80,7 @@
             <div class="ui statistic small">
               <span class="value"><animated-number :number="project.completion_count"/></span>
               <span class="label">Total completions</span>
-              <span>
+              <span class="sub-label">
                 <i class="word-break" v-if="project.multi_session_mode">{{ project.target_storage.readable_path }}</i>&nbsp;
                 <span data-tooltip="Change target storage settings">
                   <i class="fas fa-cog sup-button big" @click="storage_settings.target.show=true"></i>
