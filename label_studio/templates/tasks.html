@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block body %}
 {% raw %}
-  <script src="/static/js/vue-dev.js"></script>
+  <script src="/static/js/vue.js"></script>
   <script src="/static/semantic/semantic-ui-vue.min.js"></script>
 
   <style>
@@ -318,11 +318,11 @@
               // get project info from api
               loadProject: function () {
                   var root = this;
+                  root.error = null;
                   this.getApi('project', '/api/project/',
                       // always
                       function () {
-                          root.project_loaded = true
-                          root.error = null;
+                          root.project_loaded = true;
                       },
                       // fail
                       function (data) {
