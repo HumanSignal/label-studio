@@ -36,29 +36,17 @@ def create_storage(storage_type, path, project_path=None, **kwargs):
 
 
 def get_available_storage_names():
-    pairs = OrderedDict([
-        ('json', 'JSON task file'),
-        ('dir-jsons', 'Directory with JSON task files'),
-        ('gcs', 'Google Cloud Storage'),
-        ('gcsblob', 'Google Cloud Storage with Blobs (image / audio files)'),
-        ('s3', 'Amazon S3'),
-        ('s3blob', 'Amazon S3 with Blobs (image / audio files)')
-    ])
-
-    # copy pairs with order saving
     out = OrderedDict()
-    for key in pairs:
-        if key in _storage.keys():
-            out[key] = pairs[key]
-
-    # check all keys are in out
-    for key in _storage.keys():
-        if key not in out:
-            out[key] = key  # full description are not presented in pairs
+    for key in sorted(_storage):
+        out[key] = _storage[key].description
     return out
 
 
-class BaseStorageForm(FlaskForm):
+class BaseForm(FlaskForm):
+    pass
+
+
+class BaseStorageForm(BaseForm):
     path = StringField('Path', [InputRequired()], description='Path')
 
     # Bind here form fields to storage fields {"form field": "storage_field"}
@@ -68,6 +56,7 @@ class BaseStorageForm(FlaskForm):
 class BaseStorage(ABC):
 
     form = BaseStorageForm
+    description = 'Base Storage'
 
     def __init__(self, path, project_path=None, **kwargs):
         self.path = path
@@ -163,6 +152,7 @@ class CloudStorage(BaseStorage):
 
     thread_lock = threading.Lock()
     form = CloudStorageForm
+    description = 'Base Cloud Storage'
 
     def __init__(self, prefix=None, regex=None, create_local_copy=True, **kwargs):
         super(CloudStorage, self).__init__(**kwargs)

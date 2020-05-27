@@ -11,6 +11,8 @@ boto3.set_stream_logger(level=logging.INFO)
 
 class S3Storage(CloudStorage):
 
+    description = 'Amazon S3'
+
     def _get_client(self):
         s3 = boto3.resource('s3')
         return {
@@ -59,6 +61,7 @@ class S3Storage(CloudStorage):
 class S3BlobStorage(S3Storage):
 
     form = CloudStorageBlobForm
+    description = 'Amazon S3 with Blobs (image / audio files)'
 
     def __init__(self, data_key, **kwargs):
         super(S3BlobStorage, self).__init__(**kwargs)

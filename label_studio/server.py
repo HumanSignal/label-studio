@@ -527,6 +527,10 @@ def api_project():
         project.update_params(request.json)
         code = 201
 
+    # we don't expose configurable filesystem storage in UI to avoid security problems
+    banlist = ('json', 'dir-jsons')
+    available_storages = list(filter(lambda i: i[0] not in banlist, get_available_storage_names().items()))
+
     output = {
         'project_name': project.name,
         'task_count': len(project.source_storage.ids()),
@@ -537,7 +541,7 @@ def api_project():
         'multi_session_mode': input_args.command != 'start-multi-session',
         'target_storage': {'readable_path': project.target_storage.readable_path},
         'source_storage': {'readable_path': project.source_storage.readable_path},
-        'available_storages': list(get_available_storage_names().items())
+        'available_storages': available_storages
     }
     logger.debug(str(output))
     project.analytics.send(getframeinfo(currentframe()).function, method=request.method)

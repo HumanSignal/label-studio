@@ -2,10 +2,12 @@ import json
 import os
 
 from label_studio.utils.io import json_load, delete_dir_content, iter_files
-from .base import BaseStorage
+from .base import BaseStorage, BaseForm
 
 
 class JSONStorage(BaseStorage):
+
+    description = 'JSON task file'
 
     def __init__(self, **kwargs):
         super(JSONStorage, self).__init__(**kwargs)
@@ -75,6 +77,8 @@ def already_exists_error(what, path):
 
 class DirJSONsStorage(BaseStorage):
 
+    description = 'Directory with JSON task files'
+
     def __init__(self, **kwargs):
         super(DirJSONsStorage, self).__init__(**kwargs)
         os.makedirs(self.path, exist_ok=True)
@@ -123,3 +127,25 @@ class DirJSONsStorage(BaseStorage):
 
     def empty(self):
         return next(self.ids(), None) is None
+
+
+class TasksJSONStorage(JSONStorage):
+
+    form = BaseForm
+    description = 'Tasks are stored locally in "tasks.json" file'
+
+    def __init__(self, path, project_path, **kwargs):
+        super(TasksJSONStorage, self).__init__(
+            project_path=project_path,
+            path=os.path.join(project_path, 'tasks.json'))
+
+
+class CompletionsDirStorage(DirJSONsStorage):
+
+    form = BaseForm
+    description = 'Completions are stored locally in "completions" directory'
+
+    def __init__(self, path, project_path, **kwargs):
+        super(CompletionsDirStorage, self).__init__(
+            project_path=project_path,
+            path=os.path.join(project_path, 'completions'))

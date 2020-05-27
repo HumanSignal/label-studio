@@ -11,6 +11,8 @@ logger = logging.getLogger(__name__)
 
 class GCSStorage(CloudStorage):
 
+    description = 'Google Cloud Storage'
+
     @property
     def readable_path(self):
         return 'gs://' + self.path + '/' + self.prefix
@@ -52,6 +54,7 @@ class GCSStorage(CloudStorage):
 class GCSBlobStorage(GCSStorage):
 
     form = CloudStorageBlobForm
+    description = 'Google Cloud Storage with Blobs (image / audio files)'
 
     def __init__(self, data_key, **kwargs):
         super(GCSBlobStorage, self).__init__(**kwargs)
