@@ -89,7 +89,7 @@ class Project(object):
         names = OrderedDict()
         for name, desc in get_available_storage_names().items():
             # blobs have no sense for target storages
-            if name not in ('s3blob', 'gcsblob', 'tasks-json'):
+            if name not in ('s3blob', 'gcsblob', 'tasks-json', 'json', 'dir-jsons'):
                 names[name] = desc
         return names
 

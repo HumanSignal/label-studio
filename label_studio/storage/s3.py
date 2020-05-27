@@ -2,8 +2,6 @@ import logging
 import boto3
 import json
 
-from botocore.client import ClientError
-
 from .base import CloudStorage, CloudStorageBlobForm
 
 logger = logging.getLogger(__name__)
