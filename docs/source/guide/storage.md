@@ -36,7 +36,7 @@ label-studio start --init --source s3 --source-path my-bucket-name
 label-studio start --init --source s3blob --source-path my-bucket-name --source-params "{\"data_key\": \"my-data-key\"}"
 ```
 
-`"data_key"` parameter leads to the input task formatted in a way:
+`"data_key"` required parameter leads to the input task formatted in a way:
 
 ```json
 {
@@ -47,9 +47,9 @@ label-studio start --init --source s3blob --source-path my-bucket-name --source-
 ### Change settings in a running app
 
 
-### Additional parameters
+### Optional parameters
 
-You can specify additional parameters with the input JSON string or from UI.
+You can specify additional parameters with the input JSON string via `--source-params` / `--target-params` or from UI.
 
 #### prefix
 
@@ -86,7 +86,7 @@ label-studio start --init --source gcs --source-path my-bucket-name
 label-studio start --init --source gcsblob --source-path my-bucket-name --source-params "{\"data_key\": \"my-data-key\"}"
 ```
 
-`"data_key"` parameter leads to the input task formatted in a way:
+`"data_key"` required parameter leads to the input task formatted in a way:
 
 ```json
 {
@@ -97,9 +97,9 @@ label-studio start --init --source gcsblob --source-path my-bucket-name --source
 ### Change settings in a running app
 
 
-### Additional parameters
+### Optional parameters
 
-You can specify additional parameters with the input JSON string or from UI.
+You can specify additional parameters with the input JSON string via `--source-params` / `--target-params` or from UI.
 
 #### prefix
 
