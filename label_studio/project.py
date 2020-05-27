@@ -81,7 +81,7 @@ class Project(object):
         print(str(len(self.tasks)) + ' tasks loaded from: ' + self.config['input_path'])
 
     def load_label_config(self):
-        self.label_config_full = config_comments_free(open(self.config['label_config']).read())
+        self.label_config_full = config_comments_free(open(self.config['label_config'], encoding='utf8').read())
         self.label_config_line = config_line_stripped(self.label_config_full)
         self.parsed_label_config = parse_config(self.label_config_line)
         self.input_data_tags = self.get_input_data_tags(self.label_config_line)
@@ -196,7 +196,8 @@ class Project(object):
     def update_label_config(self, new_label_config):
         label_config_file = self.config['label_config']
         # save xml label config to file
-        with io.open(label_config_file, mode='w') as f:
+        new_label_config = new_label_config.replace('\r\n', '\n')
+        with io.open(label_config_file, mode='w', encoding='utf8') as f:
             f.write(new_label_config)
 
         # reload everything that depends on label config
@@ -208,7 +209,7 @@ class Project(object):
 
         # save project config state
         self.config['label_config_updated'] = True
-        with io.open(self.config['config_path'], mode='w') as f:
+        with io.open(self.config['config_path'], mode='w', encoding='utf8') as f:
             json.dump(self.config, f)
         logger.info('Label config saved to: {path}'.format(path=label_config_file))
 
@@ -446,7 +447,7 @@ class Project(object):
         filename = os.path.join(self.config['output_dir'], str(task_id) + '.json')
 
         if os.path.exists(filename):
-            data = json.load(open(filename))
+            data = json.load(open(filename, encoding='utf8'))
             # tasks can hold the newest version of predictions, so task it from tasks
             data['predictions'] = self.tasks[task_id].get('predictions', [])
         else:
@@ -490,7 +491,7 @@ class Project(object):
         # write task + completions to file
         filename = os.path.join(self.config['output_dir'], str(task_id) + '.json')
         os.mkdir(self.config['output_dir']) if not os.path.exists(self.config['output_dir']) else ()
-        json.dump(task, open(filename, 'w'), indent=4, sort_keys=True)
+        json.dump(task, open(filename, 'w', encoding='utf8'), indent=4, sort_keys=True, ensure_ascii=False)
         return completion['id']
 
     def delete_completion(self, task_id):
@@ -544,7 +545,7 @@ class Project(object):
 
     @classmethod
     def _load_tasks(cls, input_path, args, label_config_file):
-        with io.open(label_config_file) as f:
+        with io.open(label_config_file, encoding='utf8') as f:
             label_config = f.read()
 
         task_loader = Tasks()
