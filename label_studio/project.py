@@ -79,43 +79,35 @@ class Project(object):
 
     def get_available_source_storage_names(self):
         names = OrderedDict()
+        nameset = {'tasks-json', 's3', 'gcs'}
         for name, desc in get_available_storage_names().items():
             # we don't expose configurable filesystem storage in UI to avoid security problems
-            if name not in ('json', 'dir-jsons', 'completions-dir'):
+            if name in nameset:
                 names[name] = desc
         return names
 
     def get_available_target_storage_names(self):
         names = OrderedDict()
+        nameset = {'completions-dir', 's3-completions', 'gcs-completions'}
         for name, desc in get_available_storage_names().items():
             # blobs have no sense for target storages
-            if name not in ('s3blob', 'gcsblob', 'tasks-json', 'json', 'dir-jsons'):
+            if name in nameset:
                 names[name] = desc
         return names
-
-    def _fix_target_storage_type(self, target_type):
-        # blobs have no sense for output storages
-        if target_type == 's3blob':
-            return 's3'
-        if target_type == 'gcsblob':
-            return 'gcs'
-        return target_type
 
     def create_storages(self):
         source = self.config['source']
         target = self.config['target']
-        target_type = self._fix_target_storage_type(target['type'])
         self.source_storage = create_storage(source['type'], source['path'], self.path, **source.get('params', {}))
-        self.target_storage = create_storage(target_type, target['path'], self.path, **target.get('params', {}))
+        self.target_storage = create_storage(target['type'], target['path'], self.path, **target.get('params', {}))
 
     def update_storage(self, storage_for, storage_kwargs):
 
         def _update_storage(storage_for, storage_kwargs):
             storage_name = storage_kwargs.pop('name', storage_for)
             storage_type = storage_kwargs.pop('type')
-            if storage_for == 'target':
-                storage_type = self._fix_target_storage_type(storage_type)
-            storage_path = storage_kwargs.pop('path', None)
+            # storage_path = storage_kwargs.pop('path', None)
+            storage_path = self.config[storage_for]['path']
             storage = create_storage(storage_type, storage_path, self.path, **storage_kwargs)
             self.config[storage_for] = {
                 'name': storage_name,
@@ -446,7 +438,10 @@ class Project(object):
 
         :return: filenames without extensions and directories
         """
-        completions = list(self.target_storage.ids())
+        task_ids = set(self.source_storage.ids())
+        completion_ids = set(self.target_storage.ids())
+        completions = completion_ids.intersection(task_ids)
+        #completions = list(self.target_storage.ids())
         logger.debug('{num} completions found in {output_dir}'.format(
             num=len(completions), output_dir=self.config["output_dir"]))
         return sorted(completions)
