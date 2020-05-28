@@ -1,10 +1,6 @@
-try:
-    import orjson as json
-except ImportError:
-    import json
-
-import os
 import io
+import json
+import os
 import urllib
 
 from label_studio.utils.io import iter_files

@@ -1,0 +1,103 @@
+<div class="ui message accordion">
+
+  <div class="header active title"><i class="dropdown icon"></i>Import formats and examples</div>
+  <div class="content active">
+    You can use open source datasets and build tasks in
+    <a class="no-go" target="_blank" href='https://data.heartex.net/?data_types={{ project.data_types_json }}&ref=label-studio&p={{ project.name }}'>
+      Heartex.Datasets
+    </a>.
+    <br/><br/>
+
+    For this project we support the following file formats:
+    <ul>
+      {% if 'json' in project.supported_formats %}
+        <li>
+          <a class="use-template no-go" href="api/import-example-file?q=json"
+             download
+             data-tooltip="Download JSON example" data-position="bottom center">JSON</a>:
+          text files in javascript object notation format
+        </li>
+      {% endif %}
+      {% if 'csv' in project.supported_formats %}
+        <li>
+          <a class="use-template no-go" href="api/import-example-file?q=csv"
+             download
+             data-tooltip="Download CSV example" data-position="bottom center">CSV</a>:
+          text files with tables in Comma Separated Values format
+        </li>
+      {% endif %}
+      {% if 'tsv' in project.supported_formats %}
+        <li>
+          <a class="use-template no-go" href="api/import-example-file?q=tsv"
+             download
+             data-tooltip="Download TSV example" data-position="bottom center">TSV</a>:
+          text files with tables in Tab Separated Value format
+        </li>
+      {% endif %}
+
+      {% if 'txt' in project.supported_formats %}
+        <li>
+          <a class="use-template no-go" href="api/import-example-file?q=txt"
+             download
+             data-tooltip="Download TXT example" data-position="bottom center">TXT</a>:
+          simple text files, similar to CSV with one column and no header, supported if the project config contains one
+          source only
+        </li>
+      {% endif %}
+
+
+      <li>ZIP / RAR with one or multiple files inside from the list below, e.g.:
+        "<span style="cursor:pointer" onclick="copyToClipboard($(this).text())"
+               data-tooltip="Click to copy" data-position="bottom center">zip archive.zip *.json</span>"
+      </li>
+
+      <li>Import multiple files at once if you need</li>
+
+      <li>Or click
+        <a onclick="add_sample_task()" class="no-go" href="javascript:void(0)">here to add a sample task</a>
+        right now.<br/></li>
+
+      <li><a href="https://labelstud.io/guide/format.html#Import-data">
+        Read more</a> about import in our documentation</li>
+    </ul>
+
+    <script>
+      // add sample task to data manager
+      function add_sample_task() {
+        const url = "api/import";
+        {% autoescape off %}
+        const sample = '{{ project.generate_sample_task_escape }}';
+        {% endautoescape %}
+        $.post({url: url, data: sample, contentType: 'application/json'})
+          .fail(function (e) {
+            alert('Error: see more in browser console');
+            console.log(e)
+          })
+          .done(function () {
+            window.location = "/tasks"
+          })
+      }
+    </script>
+
+  </div> <!-- content -->
+
+
+  <!-- Import my resources-->
+  <div class="header title"><i class="dropdown icon"></i>How to import my resource files (audio, images, video, etc)?</div>
+  <div class="content">
+    <ul class="top-margin-none ui">
+      <li>If you use text only just import JSON/CSV/TSV with your texts.</li><br>
+      <li>If you run Label Studio Backend locally you may use local path to resources as input and LS Backend will serve it,
+        e.g.:
+        <div style="font-size: 80%">
+          label-studio init -i /my/dataset/images --input-format image-dir
+        </div>
+        <br>
+      </li>
+      <li>Images, audio, video and other external files could be imported to any hosting with http/https access.
+        Your JSON/CSV/TSV must contain http/https URLs to them.
+      </li>
+    </ul>
+  </div> <!-- content -->
+
+</div>

@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block body %}
+
+<div class="ui container">
+  <!-- Critical error while project loading -->
+  <div class="ui error message">
+    <div class="header">{{ header }}</div>
+    <div class="content">{{ error }}</div>
+  </div>
+</div>
+
+{% endblock %}
