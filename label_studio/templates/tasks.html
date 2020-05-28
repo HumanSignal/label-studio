@@ -258,10 +258,10 @@
           </select>
         </div>
 
-        <div class="item"><span data-tooltip="Auto update project info and tasks by timer (about 5 sec)">
+        <!-- <div class="item"><span data-tooltip="Auto update project info and tasks by timer (about 5 sec)">
           <i class="far fa-clock" :style="{opacity: auto_update_timer ? 1.0: 0.5, cursor: 'pointer'}"
              @click="toggleAutoUpdateTimer()"></i>
-        </span></div>
+        </span></div> -->
 
         <a class="item" :class="{'active': page<totalPages, 'disabled': page>=totalPages}"
            @click="page<totalPages ? page++: page">Next</a>
@@ -540,6 +540,7 @@
               this.page_size = getUrlArg('page_size', this.page_size);
               this.loadAll();
 
+              this.toggleAutoUpdateTimer();
               $('#vue_loader').hide();
               console.log('Vue mounting success');
           }

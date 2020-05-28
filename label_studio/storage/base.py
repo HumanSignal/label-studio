@@ -131,10 +131,10 @@ class IsValidRegex(object):
 class CloudStorageForm(BaseForm):
 
     create_local_copy = BooleanField('Create local copy', description='Create a local copy on your disk')
-    use_blob_urls = BooleanField('Use BLOBs URLs', description='Use objects as BLOBs by generating URLs')
-    prefix = StringField('Prefix', [Optional()], description='Prefix')
-    regex = StringField('Regex', [IsValidRegex()], description='Filter files by regex, example: .*jpe?g')
-    data_key = StringField('Data key', [InputRequired()], description='Task value key from your label config')
+    use_blob_urls = BooleanField('Use BLOBs URLs', description='Generate tasks with filtered files using tag key')
+    prefix = StringField('Prefix', [Optional()], description='File prefix')
+    regex = StringField('Regex', [IsValidRegex()], description='File filter by regex, example: .*jpe?g')
+    data_key = StringField('Data key', [InputRequired()], description='Task tag key from your label config')
 
     bound_params = dict(
         prefix='prefix',

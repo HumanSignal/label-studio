@@ -620,7 +620,7 @@ def api_all_tasks():
     completed_at = project.get_completed_at(task_ids)
 
     # ordering
-    pre_order = [{'id': i, 'completed_at': completed_at[i] if i in completed_at else '9'} for i in task_ids]
+    pre_order = [{'id': i, 'completed_at': completed_at[i] if i in completed_at else "can't obtain"} for i in task_ids]
     ordered = sorted(pre_order, key=lambda x: x[order])
     ordered = ordered[::-1] if order_inverted else ordered
     paginated = ordered[(page - 1) * page_size:page * page_size]
