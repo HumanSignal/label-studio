@@ -34,7 +34,7 @@ label-studio start --init --source s3 --source-path my-bucket-name
 #### Read bucket with BLOBs (image or audio files)
 
 ```bash
-label-studio start --init --source s3blob --source-path my-bucket-name --source-params "{\"data_key\": \"my-data-key\"}"
+label-studio start --init --source s3 --source-path my-bucket-name --source-params "{\"data_key\": \"my-data-key\", \"use_blob_urls\": true}"
 ```
 
 `"data_key"` required parameter leads to the input task formatted in a way:
@@ -45,7 +45,11 @@ label-studio start --init --source s3blob --source-path my-bucket-name --source-
 }
 ```
 
-### Change settings in a running app
+#### Write results to the bucket
+
+```bash
+label-studio start --init --target s3-completions --target-path my-bucket-name
+```
 
 
 ### Optional parameters
@@ -84,7 +88,7 @@ label-studio start --init --source gcs --source-path my-bucket-name
 #### Read bucket with BLOBs (image or audio files)
 
 ```bash
-label-studio start --init --source gcsblob --source-path my-bucket-name --source-params "{\"data_key\": \"my-data-key\"}"
+label-studio start --init --source gcs --source-path my-bucket-name --source-params "{\"data_key\": \"my-data-key\", \"use_blob_urls\": true}"
 ```
 
 `"data_key"` required parameter leads to the input task formatted in a way:
@@ -95,7 +99,11 @@ label-studio start --init --source gcsblob --source-path my-bucket-name --source
 }
 ```
 
-### Change settings in a running app
+#### Write results to the bucket
+
+```bash
+label-studio start --init --target gcs-completions --target-path my-bucket-name
+```
 
 
 ### Optional parameters
