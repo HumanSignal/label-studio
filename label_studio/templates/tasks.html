@@ -209,6 +209,7 @@
           <tr v-if="task != null" class="text-center" v-for="task in tasks">
             <!-- Task ID -->
             <td class="text-center">
+              <span class="ui mini blue loader inline active" v-if="task.processing"></span>
               {{ task.id }}
             </td>
             <!-- Completed at -->
@@ -216,26 +217,26 @@
             <!-- Label -->
             <td class="text-center">
               <a :href="'/?task_id=' + task.id">
-                <span class="ui mini loader inline active" v-if="task.processing"></span>
-                <i class="fas fa-eye eye show-completion" v-else></i>
+                <i class="fas fa-eye eye show-completion"></i>
               </a>
             </td>
             <!-- Delete -->
             <td class="text-center">
               <div class="actions-card">
-                <div v-if="project.can_delete_tasks">
-                  <a href="" class="trash" @click="deleteTask(task)">
-                    Task <i class="fas fa-trash-alt trash remove-task">&nbsp;&nbsp;</i> 
+                <span v-if="project.can_delete_tasks">
+                  <a class="trash" @click="deleteTask(task)" data-tooltip="Delete task">
+                    <i class="fas fa-trash-alt trash remove-task">&nbsp;&nbsp;</i>
                   </a>
-                </div>
-                <div v-if="project.can_manage_completions">
-                  <div v-for="completion in task.completions">
-                    <a href="" class="trash" @click="deleteCompletion(task, completion)">
-                      Completion {{ completion.id }}
+                </span>
+                <span v-if="project.can_manage_completions">
+                  &nbsp;&nbsp;
+                  <span v-if="task.completions">
+                    <a class="trash" @click="deleteCompletion(task, task.completions[0])"
+                       data-tooltip="Delete all completions of this task">
                       <i class="far fa-trash-alt trash remove-completion">&nbsp;&nbsp;</i>
                     </a>
-                  </div>
-                </div>
+                  </span>
+                </span>
               </div>
             </td>
           </tr>
@@ -480,6 +481,7 @@
               // delete completion with trash button
               deleteCompletion: function (task, completion) {
                   task.processing = true;
+                  this.$forceUpdate();
                   var request = new XMLHttpRequest();
                   request.open("DELETE", "/api/tasks/" + task.id + "/completions/" + completion.id + "/", true);
                   request.onload = this.loadProjectAndTasks;
@@ -489,6 +491,7 @@
               // delete completion with trash button
               deleteTask: function (task) {
                   task.processing = true;
+                  this.$forceUpdate();
                   var request = new XMLHttpRequest();
                   request.open("DELETE", "/api/tasks/" + task.id + "/", true);
                   request.onload = this.loadProjectAndTasks;

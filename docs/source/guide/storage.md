@@ -95,7 +95,7 @@ label-studio start --init --source gcs --source-path my-bucket-name --source-par
 
 You can leave "data_key" empty (or skip it at all) then LS generates it automatically with the first task key from label config.
 
-`"my-data_key"` required parameter leads to the input task formatted in a way:
+`"my-data-key"` required parameter leads to the input task formatted in a way:
 
 ```json
 {
