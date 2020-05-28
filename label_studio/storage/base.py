@@ -130,7 +130,6 @@ class IsValidRegex(object):
 
 class CloudStorageForm(BaseForm):
 
-    create_local_copy = BooleanField('Create local copy', description='Create a local copy on your disk')
     use_blob_urls = BooleanField('Use BLOBs URLs', description='Use objects as BLOBs by generating URLs')
     prefix = StringField('Prefix', [Optional()], description='Prefix')
     regex = StringField('Regex', [IsValidRegex()], description='Filter files by regex, example: .*jpe?g')
