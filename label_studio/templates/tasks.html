@@ -98,9 +98,8 @@
                 </span>
                 <span class="label">Tasks</span>
                 <span class="sub-label">
-                  <i class="word-break" v-if="project.multi_session_mode">
-                    {{ project.source_storage.readable_path }}
-                  </i>&nbsp;
+                  <i class="word-break" v-if="project.multi_session_mode">{{ project.source_storage.readable_path }}</i>
+                  &nbsp;
                 </span>
                 <!-- Controls -->
                 <div style="margin-top: 7px">
@@ -132,9 +131,8 @@
                 </span>
                 <span class="label">Completions</span>
                 <span class="sub-label">
-                  <i class="word-break" v-if="project.multi_session_mode">
-                    {{ project.target_storage.readable_path }}
-                  </i>&nbsp;
+                  <i class="word-break" v-if="project.multi_session_mode">{{ project.target_storage.readable_path }}</i>
+                  &nbsp;
                 </span>
                 <!-- Controls -->
                 <div style="margin-top: 7px">
@@ -519,7 +517,15 @@
                   }
               },
 
-              capitalizeFirstLetter: capitalizeFirstLetter // from helpers.js
+              capitalizeFirstLetter: capitalizeFirstLetter,  // from helpers.js
+
+              getCurrentStorage: function (storage_for) {
+                  var all = this.storage_settings_all[storage_for];
+                  for (var key in all)
+                      if (all[key].current)
+                          return item;
+                  return {description: '[No storage defined]', name: '[No storage defined]'}
+              }
           },
 
           watch: {

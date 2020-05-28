@@ -339,12 +339,18 @@ div[class*="App_editor"] {
     box-shadow: 0 0 0 1px rgba(34, 36, 38, .15) !important;
 }
 
-.ui .message .content {
-    margin-top: 0.7em;
-}
-
 .ui .message .header {
     font-weight: normal !important;
+}
+
+.ui .message .icon {
+    opacity: 0.1 !important;
+}
+.ui.message .content:first-of-type {
+    margin-top: 0 !important;
+}
+.ui .message .content {
+    margin-top: 0.7em;
 }
 
 .ui ul, ol {
@@ -433,6 +439,7 @@ pre {
     font-size: 65%;
 }
 .statistic .sub-label {
+    margin-top:7px;
     color: #555;
 }
 
