@@ -384,14 +384,7 @@
                       function () { root.project_loaded = true; },
                       // fail
                       function (data) {
-                          this.showError('Project loading error', message_from_response(data));
-                          //root.error = {message: message_from_response(data), header: 'Project loading error' };
-                          //root.$forceUpdate();
-                      },
-                      // done
-                      function () {
-                        //root.error = null;
-                        //root.$forceUpdate();
+                          root.showError('Project loading error', message_from_response(data));
                       }
                   );
               },
