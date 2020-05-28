@@ -673,7 +673,7 @@ class Project(object):
             config['input_path'] = tasks_json
             config['source'] = {
                 'name': 'Tasks',
-                'type': 'json',
+                'type': 'tasks-json',
                 'path': os.path.abspath(tasks_json_path)
             }
             logger.debug('{tasks_json_path} input file with {n} tasks has been created from {input_path}'.format(
@@ -699,7 +699,7 @@ class Project(object):
             config['output_dir'] = 'completions'
             config['target'] = {
                 'name': 'Completions',
-                'type': 'dir-jsons',
+                'type': 'completions-dir',
                 'path': os.path.abspath(completions_dir)
             }
 
