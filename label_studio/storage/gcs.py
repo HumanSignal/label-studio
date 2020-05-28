@@ -3,7 +3,7 @@ import logging
 
 from google.cloud import storage
 
-from .base import CloudStorage, CloudStorageBlobForm
+from .base import CloudStorage, BaseForm, StringField, Optional
 
 
 logger = logging.getLogger(__name__)
@@ -38,13 +38,9 @@ class GCSStorage(CloudStorage):
         blob = bucket.blob(key)
         blob_str = blob.download_as_string()
         return json.loads(blob_str)
-        # try:
-        #     value = json.loads(blob_str)
-        # except Exception as e:
-        #     logger.error(e, exc_info=True)
-        #     return None
-        # else:
-        #     return value
+
+    def _get_value_url(self, key):
+        return {self.data_key: 'gs://' + self.path + '/' + key}
 
     def _set_value(self, key, value):
         if not isinstance(value, str):
@@ -54,17 +50,23 @@ class GCSStorage(CloudStorage):
         blob.upload_from_string(value)
 
 
-class GCSBlobStorage(GCSStorage):
+class GCSCompletionsStorageForm(BaseForm):
+    prefix = StringField('Prefix', [Optional()], description='GCS Bucket prefix')
 
-    form = CloudStorageBlobForm
-    description = 'Google Cloud Storage with Blobs (image / audio files)'
+    bound_params = dict(
+        prefix='prefix'
+    )
 
-    def __init__(self, data_key, **kwargs):
-        super(GCSBlobStorage, self).__init__(**kwargs)
-        self.data_key = data_key
 
-    def _get_value(self, key):
-        return {self.data_key: 'gs://' + self.path + '/' + key}
+class GCSCompletionsStorage(GCSStorage):
 
-    def _set_value(self, key, value):
-        raise NotImplementedError
+    form = GCSCompletionsStorageForm
+
+    def _validate_object(self, key):
+        value = self._get_value(key)
+        if any((
+            'completions' not in value,
+            'id' not in value,
+            not isinstance(value['completions'], list)
+        )):
+            raise ValueError('Invalid completion format found by key ' + key)

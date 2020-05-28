@@ -128,24 +128,20 @@ class IsValidRegex(object):
             raise ValidationError(field.data + ' is not a valid regular expression')
 
 
-class CloudStorageForm(BaseStorageForm):
+class CloudStorageForm(BaseForm):
+
     create_local_copy = BooleanField('Create local copy', description='Create a local copy on your disk')
-    path = StringField('Path', [InputRequired()], description='Bucket name')
+    use_blob_urls = BooleanField('Use BLOBs URLs', description='Use objects as BLOBs by generating URLs')
     prefix = StringField('Prefix', [Optional()], description='Prefix')
     regex = StringField('Regex', [IsValidRegex()], description='Filter files by regex, example: .*jpe?g')
+    data_key = StringField('Data key', [InputRequired()], description='Task value key from your label config')
 
     bound_params = dict(
         prefix='prefix',
-        create_local_copy='create_local_copy',
         regex='regex',
-        **BaseStorageForm.bound_params
+        use_blob_urls='use_blob_urls',
+        data_key='data_key'
     )
-
-
-class CloudStorageBlobForm(CloudStorageForm):
-    data_key = StringField('Data key', [InputRequired()], description='Task value key from your label config')
-
-    bound_params = dict(data_key='data_key', **CloudStorageForm.bound_params)
 
 
 class CloudStorage(BaseStorage):
@@ -154,14 +150,15 @@ class CloudStorage(BaseStorage):
     form = CloudStorageForm
     description = 'Base Cloud Storage'
 
-    def __init__(self, prefix=None, regex=None, create_local_copy=True, **kwargs):
+    def __init__(self, prefix=None, regex=None, create_local_copy=True, use_blob_urls=False, data_key=None, **kwargs):
         super(CloudStorage, self).__init__(**kwargs)
         self.prefix = prefix or ''
         self.regex_str = regex
         self.regex = re.compile(self.regex_str) if self.regex_str else None
-        self.local_dir = os.path.join(
-            self.project_path, self.__class__.__name__.lower(), self.path, *self.prefix.split('/'))
+        self.local_dir = os.path.join(self.project_path, self.__class__.__name__.lower(), self.path)
         self.create_local_copy = create_local_copy
+        self.use_blob_urls = use_blob_urls
+        self.data_key = data_key
 
         self.client = self._get_client()
         self.validate_connection()
@@ -175,6 +172,7 @@ class CloudStorage(BaseStorage):
         self.sync_period_in_sec = 30
 
         self._ids_keys_map = {}
+        self._selected_ids = []
         self._keys_ids_map = {}
         self._ids_file = os.path.join(self.local_dir, 'ids.json')
         self._load_ids()
@@ -215,11 +213,18 @@ class CloudStorage(BaseStorage):
     def _get_value(self, key):
         pass
 
+    @abstractmethod
+    def _get_value_url(self, key):
+        pass
+
     def get(self, id):
         item = self._ids_keys_map.get(id)
         if item:
             try:
-                data = self._get_value(item['key'])
+                if self.use_blob_urls:
+                    data = self._get_value_url(item['key'])
+                else:
+                    data = self._get_value(item['key'])
             except Exception as exc:
                 # return {'error': True, 'message': str(exc)}
                 logger.error(str(exc), exc_info=True)
@@ -251,6 +256,7 @@ class CloudStorage(BaseStorage):
         self._set_value(key, value)
         self._ids_keys_map[id] = {'key': key, 'exists': True}
         self._keys_ids_map[key] = id
+        self._selected_ids.append(id)
         self._save_ids()
         if self.create_local_copy:
             self._create_local(id, value)
@@ -267,7 +273,7 @@ class CloudStorage(BaseStorage):
 
     def ids(self):
         self.sync()
-        return self._ids_keys_map.keys()
+        return self._selected_ids
 
     def _ready_to_sync(self):
         if self.last_sync_time is None:
@@ -283,6 +289,9 @@ class CloudStorage(BaseStorage):
         else:
             logger.debug('Not ready to sync.')
 
+    def _validate_object(self, key):
+        pass
+
     def _sync(self):
         with self.thread_lock:
             self.last_sync_time = datetime.now()
@@ -292,6 +301,10 @@ class CloudStorage(BaseStorage):
         new_keys_ids_map = {}
 
         for key in self._get_objects():
+            try:
+                self._validate_object(key)
+            except Exception as exc:
+                continue
             if self.regex and not self.regex.match(key):
                 logger.debug(key + ' is skipped by regex filter')
                 continue
@@ -304,8 +317,9 @@ class CloudStorage(BaseStorage):
             new_keys_ids_map[key] = id
 
         with self.thread_lock:
-            self._ids_keys_map = new_ids_keys_map
-            self._keys_ids_map = new_keys_ids_map
+            self._selected_ids = list(new_ids_keys_map.keys())
+            self._ids_keys_map.update(new_ids_keys_map)
+            self._keys_ids_map.update(new_keys_ids_map)
             self._save_ids()
 
     @abstractmethod

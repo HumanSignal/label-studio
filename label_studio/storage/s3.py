@@ -2,7 +2,10 @@ import logging
 import boto3
 import json
 
-from .base import CloudStorage, CloudStorageBlobForm
+from wtforms import StringField
+from wtforms.validators import InputRequired, Optional
+
+from .base import CloudStorage, BaseForm
 
 logger = logging.getLogger(__name__)
 logging.getLogger('botocore').setLevel(logging.CRITICAL)
@@ -34,16 +37,10 @@ class S3Storage(CloudStorage):
         obj = s3.Object(bucket.name, key).get()['Body'].read().decode('utf-8')
         value = json.loads(obj)
         return value
-        # try:
-        #     obj = s3.Object(bucket.name, key).get()['Body'].read().decode('utf-8')
-        #     value = json.loads(obj)
-        # except self.client['client'].exceptions.NoSuchKey as e:
-        #     logger.error('Key ' + key + ' not found in ' + self.readable_path, exc_info=True)
-        #     return None
-        # except Exception as e:
-        #     logger.error(e, exc_info=True)
-        # else:
-        #     return value
+
+    def _get_value_url(self, key):
+        bucket = self.client['bucket']
+        return {self.data_key: 's3://' + bucket.name + '/' + key}
 
     def _set_value(self, key, value):
         if not isinstance(value, str):
@@ -61,18 +58,23 @@ class S3Storage(CloudStorage):
         return (obj.key for obj in bucket_iter)
 
 
-class S3BlobStorage(S3Storage):
+class S3CompletionsStorageForm(BaseForm):
+    prefix = StringField('Prefix', [Optional()], description='S3 Bucket prefix')
 
-    form = CloudStorageBlobForm
-    description = 'Amazon S3 with Blobs (image / audio files)'
+    bound_params = dict(
+        prefix='prefix'
+    )
 
-    def __init__(self, data_key, **kwargs):
-        super(S3BlobStorage, self).__init__(**kwargs)
-        self.data_key = data_key
 
-    def _get_value(self, key):
-        bucket = self.client['bucket']
-        return {self.data_key: 's3://' + bucket.name + '/' + key}
+class S3CompletionsStorage(S3Storage):
 
-    def _set_value(self, key, value):
-        raise NotImplementedError
+    form = S3CompletionsStorageForm
+
+    def _validate_object(self, key):
+        value = self._get_value(key)
+        if any((
+            'completions' not in value,
+            'id' not in value,
+            not isinstance(value['completions'], list)
+        )):
+            raise ValueError('Invalid completion format found by key ' + key)
