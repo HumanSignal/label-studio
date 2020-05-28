@@ -562,6 +562,11 @@ def api_project_storage_settings():
                     'fields': [serialize_class(field) for field in form],
                     'type': name, 'current': current, 'description': description
                 }
+                # generate data key automatically
+                if project.data_types.keys():
+                    for field in all_forms[storage_for][name]['fields']:
+                        if field['name'] == 'data_key' and not field['data']:
+                            field['data'] = list(project.data_types.keys())[0]
         return make_response(jsonify(all_forms), 200)
 
     # POST: update storage given filled form

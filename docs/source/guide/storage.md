@@ -37,11 +37,13 @@ label-studio start --init --source s3 --source-path my-bucket-name
 label-studio start --init --source s3blob --source-path my-bucket-name --source-params "{\"data_key\": \"my-data-key\"}"
 ```
 
-`"data_key"` required parameter leads to the input task formatted in a way:
+You can leave "data_key" empty (or skip it at all) then LS generates it automatically with the first task key from label config.    
+
+`"my-data-key"` required parameter leads to the input task formatted in a way:
 
 ```json
 {
-  "data_key": "s3://my-bucket-name/my-blob.ext"
+  "my-data-key": "s3://my-bucket-name/my-blob.ext"
 }
 ```
 
@@ -87,11 +89,13 @@ label-studio start --init --source gcs --source-path my-bucket-name
 label-studio start --init --source gcsblob --source-path my-bucket-name --source-params "{\"data_key\": \"my-data-key\"}"
 ```
 
-`"data_key"` required parameter leads to the input task formatted in a way:
+You can leave "data_key" empty (or skip it at all) then LS generates it automatically with the first task key from label config.
+
+`"my-data_key"` required parameter leads to the input task formatted in a way:
 
 ```json
 {
-  "data_key": "gs://my-bucket-name/my-blob.ext"
+  "my-data-key": "gs://my-bucket-name/my-blob.ext"
 }
 ```
 
