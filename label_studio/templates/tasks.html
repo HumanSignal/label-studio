@@ -325,6 +325,7 @@
                   page_size: 10,
                   order: 'id',
                   auto_update_timer: null,
+                  timer_interval: 5000,
                   error: null
               }
           },
@@ -365,9 +366,14 @@
 
               // get tasks from api
               loadTasks: function () {
+                  var root = this;
                   this.getApi('tasks', '/api/tasks?page=' + this.page +
                                        '&page_size=' + parseInt(this.page_size) +
-                                       '&order=' + this.order)
+                                       '&order=' + this.order, null,
+                      // fail
+                      function(data) {
+                        root.showError('Tasks loading error', message_from_response(data))
+                      });
               },
 
               // get project info from api
@@ -378,13 +384,14 @@
                       function () { root.project_loaded = true; },
                       // fail
                       function (data) {
-                          root.error = { message: message_from_response(data), header: 'Project loading error' };
-                          root.$forceUpdate();
+                          this.showError('Project loading error', message_from_response(data));
+                          //root.error = {message: message_from_response(data), header: 'Project loading error' };
+                          //root.$forceUpdate();
                       },
                       // done
                       function () {
-                        root.error = null;
-                        root.$forceUpdate();
+                        //root.error = null;
+                        //root.$forceUpdate();
                       }
                   );
               },
@@ -515,7 +522,7 @@
                     this.auto_update_timer = null;
                   }
                   else {
-                    this.auto_update_timer = setInterval(this.loadProjectAndTasks, 5000);
+                    this.auto_update_timer = setInterval(this.loadProjectAndTasks, this.timer_interval);
                   }
               },
 
@@ -527,6 +534,16 @@
                       if (all[key].current)
                           return all[key];
                   return {description: '[No storage defined]', name: '[No storage defined]'}
+              },
+
+              showError: function(title, message) {
+                  $('body').toast({
+                      class: 'error',
+                      title: title,
+                      message: message,
+                      displayTime: this.timer_interval * 2,
+                      position: 'bottom center'
+                  })
               }
           },
 
@@ -558,7 +575,8 @@
               this.page_size = getUrlArg('page_size', this.page_size);
               this.loadAll();
 
-              if (getUrlArg('timer', '1') === '1')
+              this.timer_interval = parseInt(getUrlArg('timer', '5000'));
+              if (this.timer_interval > 0)
                 this.toggleAutoUpdateTimer();
 
               $('#vue_loader').hide();

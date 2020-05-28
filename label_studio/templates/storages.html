@@ -2,7 +2,7 @@
 
 <!-- Two dialogs: source and target -->
 <sui-modal v-model="storage.show" v-bind:class="{inverted: 1, small: 1}" size="small"
-           :id="storage_for + '-storage-settings-dialog'" :closable="false"
+           :id="storage_for + '-storage-settings-dialog'"
            v-for="(storage, storage_for) in storage_settings" v-bind:key="storage_for">
   <i class="icon close" @click="storage.show=false"></i>
 
@@ -19,10 +19,10 @@
     <form class="ui form" :id="storage.storage_for + '-storage-form'">
       <input hidden name="storage_for" :value="storage_for">
 
-      <p>
-        <span v-if="storage.type=='tasks-json'">To add new tasks go to <a href="./import">Import page</a>.</span><br/>
+      <span>
+        <span v-if="storage.type=='tasks-json'">To add new tasks go to <a href="./import">Import page</a>.<br/></span>
         To change the storage type restart Label Studio with <a href="https://labelstud.io">storage arguments</a>.
-      </p>
+      </span>
 
       <!-- Storage Type - form needs it to correctly be processed -->
       <div class="ui field" style="display: none"
@@ -67,9 +67,9 @@
     <div class="ui icon message" v-if="storage_for=='source'">
       <i class="ui icon fas fa-info-circle"></i>
       <div class="content">
-        Filter task files from Amazon S3 or Google Cloud.<br/>
+        Here you can filter task files from Amazon S3 or Google Cloud.<br/>
         The each filter generates a new portion of tasks which will be added to Label Studio DB.<br/>
-        When you go to previous filters all the tasks and completions will be loaded back.<br/>
+        When you enter the previous filter settings all the tasks and completions will be loaded back.<br/>
         <a href="http://labelstud.io">Read more in documentation</a>
       </div>
     </div>

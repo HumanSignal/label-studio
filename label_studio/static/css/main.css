@@ -414,6 +414,10 @@ div[class*="App_editor"] {
     font-size: 0.85em;
 }
 
+.ui .toast.error {
+    background-color: rgba(255, 0, 0, 0.85) !important;
+}
+
 /* semantic ui pretty finish */
 
 /* label config */
