@@ -96,19 +96,24 @@
                 <span class="value" v-else>
                   <animated-number :number="project.task_count"></animated-number>
                 </span>
-                <span class="label">Tasks
-                  <a @click="deleteAllTasks()" v-if="project.can_delete_tasks"><i class="fas fa-trash-alt trash remove-task">&nbsp;&nbsp;</i></a>
-                </span>
+                <span class="label">Tasks</span>
                 <span class="sub-label">
-                  <i class="word-break" v-if="project.multi_session_mode">{{ project.source_storage.readable_path }}</i>&nbsp;
-                  <span data-tooltip="Change source storage settings">
-                    <i class="fas fa-cog sup-button big" @click="storage_settings.source.show=true"></i>
-                  </span>
+                  <i class="word-break" v-if="project.multi_session_mode">
+                    {{ project.source_storage.readable_path }}
+                  </i>&nbsp;
                 </span>
-                <br/>
-                <!-- Delete all tasks -->
-                
-              </div>
+                <!-- Controls -->
+                <div style="margin-top: 7px">
+                  <span data-tooltip="Change source storage filter">
+                    <i class="fas fa-cloud-download-alt sup-button big" @click="storage_settings.source.show=true"></i>
+                  </span>
+                  <span style="margin-right: 15px"></span>
+                  <span @click="deleteAllTasks()" v-if="project.can_delete_tasks"
+                        data-tooltip="Delete all tasks">
+                    <i class="fas fa-trash-alt trash remove-task">&nbsp;&nbsp;</i>
+                  </span>
+                </div>
+              </div> <!-- statistic -->
               
             </div>
           </div>
@@ -127,11 +132,16 @@
                 </span>
                 <span class="label">Completions</span>
                 <span class="sub-label">
-                  <i class="word-break" v-if="project.multi_session_mode">{{ project.target_storage.readable_path }}</i>&nbsp;
-                  <span data-tooltip="Change target storage settings">
-                    <i class="fas fa-cog sup-button big" @click="storage_settings.target.show=true"></i>
-                  </span>
+                  <i class="word-break" v-if="project.multi_session_mode">
+                    {{ project.target_storage.readable_path }}
+                  </i>&nbsp;
                 </span>
+                <!-- Controls -->
+                <div style="margin-top: 7px">
+                  <span data-tooltip="Change target storage filter">
+                    <i class="fas fa-cloud-upload-alt sup-button big" @click="storage_settings.target.show=true"></i>
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -143,7 +153,7 @@
               <div class="ui row stackable" v-if="project.task_count > 0">
                 <div class="center aligned action-buttons">
                   <!-- Sampling -->
-                  <span class="ui segment" style="padding-top: 8px; padding-bottom: 11px;"
+                  <span style="padding-top: 8px; padding-bottom: 11px;"
                         data-tooltip="Selecting which task to take next. Edit config file to change">
                     Tasks sampling:&nbsp;<span class="ui label">{{ project.config['sampling'] }}</span>
                   </span>                  
@@ -222,7 +232,7 @@
                   <div v-for="completion in task.completions">
                     <a href="" class="trash" @click="deleteCompletion(task, completion)">
                       Completion {{ completion.id }}
-                      <i class="fas fa-trash-alt trash remove-completion">&nbsp;&nbsp;</i>
+                      <i class="far fa-trash-alt trash remove-completion">&nbsp;&nbsp;</i>
                     </a>
                   </div>
                 </div>
