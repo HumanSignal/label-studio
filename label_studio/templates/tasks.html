@@ -190,14 +190,14 @@
         </tr>
 
         <!-- Task row -->
-        <template v-for="task in tasks">
+
           <!-- Broken task -->
-          <tr v-if="task == null" class="text-center">
+          <tr v-if="task == null" class="text-center" v-for="task in tasks">
             <td colspan="2"><small>broken task [backend returns null, check storage settings]</small></td>
           </tr>
 
           <!-- Correct task -->
-          <tr v-else>
+          <tr v-if="task != null" class="text-center" v-for="task in tasks">
             <!-- Task ID -->
             <td class="text-center">
               <a :href="'/?task_id=' + task.id">
