@@ -2,7 +2,7 @@
 
 <!-- Two dialogs: source and target -->
 <sui-modal v-model="storage.show" v-bind:class="{inverted: 1, small: 1}" size="small"
-           :id="storage_for + '-storage-settings-dialog'"
+           :id="storage_for + '-storage-settings-dialog'" style="z-index: 1000"
            v-for="(storage, storage_for) in storage_settings" v-bind:key="storage_for">
   <i class="icon close" @click="storage.show=false"></i>
 
@@ -21,7 +21,8 @@
 
       <span>
         <span v-if="storage.type=='tasks-json'">To add new tasks go to <a href="./import">Import page</a>.<br/></span>
-        To change the storage type restart Label Studio with <a href="https://labelstud.io">storage arguments</a>.
+        To change the storage type restart Label Studio with
+        <a href="https://labelstud.io/guide/storage.html#Create-connection-on-startup">storage arguments</a>.
       </span>
 
       <!-- Storage Type - form needs it to correctly be processed -->
@@ -70,7 +71,7 @@
         Here you can filter task files from Amazon S3 or Google Cloud.<br/>
         The each filter generates a new portion of tasks which will be added to Label Studio DB.<br/>
         When you enter the previous filter settings all the tasks and completions will be loaded back.<br/>
-        <a href="http://labelstud.io">Read more in documentation</a>
+        <a href="http://labelstud.io/guide/storage.html">Read more in documentation</a>
       </div>
     </div>
 
@@ -79,7 +80,7 @@
       <i class="ui icon fas fa-info-circle"></i>
       <div class="content">
         Save completion files to Amazon S3 or Google Cloud.<br/>
-        <a href="http://labelstud.io">Read more in documentation</a>
+        <a href="http://labelstud.io/guide/storage.html#Create-connection-on-startup">Read more in documentation</a>
       </div>
     </div>
   </div>
