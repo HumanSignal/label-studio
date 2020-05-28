@@ -72,8 +72,17 @@
     function downloadFile(urlToSend) {
       $('#dimmer').addClass('active');
       let req = new XMLHttpRequest();
+      req.onreadystatechange = function() {
+        if(req.readyState == 2) {
+            if(req.status == 200) {
+                req.responseType = "blob";
+            } else {
+                req.responseType = "json";
+            }
+        }
+      };
       req.open("GET", urlToSend, true);
-      req.responseType = "blob";
+      {#req.responseType = "blob";#}
       req.onload = function (event) {
         let blob = req.response;
 
@@ -85,7 +94,7 @@
           link.click();
           link.remove();
         } else {
-          alert('Error occurred while export.');
+          alert(req.response.msg);
         }
         $('#dimmer').removeClass('active');
       };
