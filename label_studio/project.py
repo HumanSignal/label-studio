@@ -128,11 +128,11 @@ class Project(object):
 
     @property
     def can_manage_tasks(self):
-        return self.config['source']['type'] not in {'s3', 's3blob', 'gcs', 'gcsblob'}
+        return self.config['source']['type'] not in {'s3', 's3-completions', 'gcs', 'gcs-completions'}
 
     @property
     def can_manage_completions(self):
-        return self.config['target']['type'] not in {'s3', 's3blob', 'gcs', 'gcsblob'}
+        return self.config['target']['type'] not in {'s3', 's3-completions', 'gcs', 'gcs-completions'}
 
     @property
     def can_delete_tasks(self):
