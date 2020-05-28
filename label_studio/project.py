@@ -770,6 +770,18 @@ class Project(object):
         config['label_config'] = os.path.join(os.path.dirname(config_path), config['label_config'])
         if config.get('output_dir'):
             config['output_dir'] = os.path.join(os.path.dirname(config_path), config['output_dir'])
+        if not config.get('source'):
+            config['source'] = {
+                'name': 'Tasks',
+                'type': 'tasks-json',
+                'path': os.path.abspath(config['input_path'])
+            }
+        if not config.get('target'):
+            config['target'] = {
+                'name': 'Completions',
+                'type': 'completions-dir',
+                'path': os.path.abspath(config['output_dir'])
+            }
         return config
 
     @classmethod
