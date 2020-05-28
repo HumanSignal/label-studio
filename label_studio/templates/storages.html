@@ -9,7 +9,7 @@
   <!-- Header -->
   <div class="header">
     <i class="fas" style="opacity: 0.65"
-       :class="{'fa-cloud-upload-alt': storage_for=='source', 'fa-cloud-download-alt': storage_for=='target'}"></i>
+       :class="{'fa-cloud-download-alt': storage_for=='source', 'fa-cloud-upload-alt': storage_for=='target'}"></i>
     &nbsp;{{ capitalizeFirstLetter(storage_for) }} storage
     &nbsp;<div :class="{active: storage.type_loading}" class="ui loader inline mini grey"></div>
   </div>

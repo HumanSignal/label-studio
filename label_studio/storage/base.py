@@ -129,10 +129,10 @@ class IsValidRegex(object):
 
 
 class CloudStorageForm(BaseStorageForm):
-    create_local_copy = BooleanField('Create local copy', description='Create local copy on your disk')
-    path = StringField('Path', [InputRequired()], description='Bucket path')
+    create_local_copy = BooleanField('Create local copy', description='Create a local copy on your disk')
+    path = StringField('Path', [InputRequired()], description='Bucket name')
     prefix = StringField('Prefix', [Optional()], description='Prefix')
-    regex = StringField('Regex', [IsValidRegex()], description='Filter files by regex')
+    regex = StringField('Regex', [IsValidRegex()], description='Filter files by regex, example: .*jpe?g')
 
     bound_params = dict(
         prefix='prefix',

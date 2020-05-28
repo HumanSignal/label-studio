@@ -132,7 +132,7 @@ class DirJSONsStorage(BaseStorage):
 class TasksJSONStorage(JSONStorage):
 
     form = BaseForm
-    description = 'Local storage (tasks are in "tasks.json" file)'
+    description = 'Local storage (loading tasks from "tasks.json" file)'
 
     def __init__(self, path, project_path, **kwargs):
         super(TasksJSONStorage, self).__init__(

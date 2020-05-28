@@ -44,6 +44,29 @@
     .order.up, .order.down {
       font-weight: bold;
     }
+
+    .actions-card {
+        display: flex;
+    }
+
+    .db-card {
+        background: #f1f1f1;
+        border-radius: 5px;
+        padding: 2em;
+    }
+
+    .action-buttons {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .align-grid {
+        display: grid !important;
+    }
+
+    .trash:hover {
+        color: rgb(255, 13, 23);
+    }
   </style>
 
   <div id="vue_loader" class="ui large text loader loading active">Loading ...</div>
@@ -57,46 +80,76 @@
     <div class="wrapper">
 
       <!-- Statistics -->
-      <div class="ui two column centered grid stackable">
+      <div class="ui three column centered grid stackable">
         <div class="row">
+          
           <!-- Total tasks -->
-          <div class="column center aligned">
-            <div class="ui statistic small">
-            <!-- Project loading -->
-            <center v-if="!project_loaded" style="margin-bottom: 3px">
-              <div class="ui loader loading active inline"></div>
-            </center>
-            <!-- Number -->
-            <span class="value" v-else>
-              <animated-number :number="project.task_count"></animated-number>
-            </span>
-              <span class="label">Total tasks</span>
-              <span class="sub-label">
-                <i class="word-break" v-if="project.multi_session_mode">{{ project.source_storage.readable_path }}</i>&nbsp;
-                <span data-tooltip="Change source storage settings">
-                  <i class="fas fa-cog sup-button big" @click="storage_settings.source.show=true"></i>
+          <div class="column center aligned align-grid">
+            <div class="ui db-card">
+              <div class="ui statistic small">
+                <!-- Project loading -->
+                <center v-if="!project_loaded" style="margin-bottom: 3px">
+                  <div class="ui loader loading active inline"></div>
+                </center>
+                <!-- Number -->
+                <span class="value" v-else>
+                  <animated-number :number="project.task_count"></animated-number>
                 </span>
-              </span>
+                <span class="label">Tasks
+                  <a @click="deleteAllTasks()" v-if="project.can_delete_tasks"><i class="fas fa-trash-alt trash remove-task">&nbsp;&nbsp;</i></a>
+                </span>
+                <span class="sub-label">
+                  <i class="word-break" v-if="project.multi_session_mode">{{ project.source_storage.readable_path }}</i>&nbsp;
+                  <span data-tooltip="Change source storage settings">
+                    <i class="fas fa-cog sup-button big" @click="storage_settings.source.show=true"></i>
+                  </span>
+                </span>
+                <br/>
+                <!-- Delete all tasks -->
+                
+              </div>
+              
             </div>
           </div>
+          
           <!-- Total completions -->
-          <div class="column center aligned">
-            <div class="ui statistic small">
-            <!-- Project loading -->
-            <center v-if="!project_loaded" style="margin-bottom: 3px">
-              <div class="ui loader loading active inline"></div>
-            </center>
-            <!-- Number -->
-            <span class="value" v-else>
-              <animated-number :number="project.completion_count"></animated-number>
-            </span>
-            <span class="label">Total completions</span>
-            <span class="sub-label">
-              <i class="word-break" v-if="project.multi_session_mode">{{ project.target_storage.readable_path }}</i>&nbsp;
-              <span data-tooltip="Change target storage settings">
-                <i class="fas fa-cog sup-button big" @click="storage_settings.target.show=true"></i>
-              </span>
-            </span>
+          <div class="column center aligned align-grid">
+            <div class="ui db-card">
+              <div class="ui statistic small">
+                <!-- Project loading -->
+                <center v-if="!project_loaded" style="margin-bottom: 3px">
+                  <div class="ui loader loading active inline"></div>
+                </center>
+                <!-- Number -->
+                <span class="value" v-else>
+                  <animated-number :number="project.completion_count"></animated-number>
+                </span>
+                <span class="label">Completions</span>
+                <span class="sub-label">
+                  <i class="word-break" v-if="project.multi_session_mode">{{ project.target_storage.readable_path }}</i>&nbsp;
+                  <span data-tooltip="Change target storage settings">
+                    <i class="fas fa-cog sup-button big" @click="storage_settings.target.show=true"></i>
+                  </span>
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Action Buttons -->
+          <div class="column center aligned align-grid">
+            <div class="ui db-card">
+              <!-- Control buttons -->
+              <div class="ui row stackable" v-if="project.task_count > 0">
+                <div class="center aligned action-buttons">
+                  <!-- Sampling -->
+                  <span class="ui segment" style="padding-top: 8px; padding-bottom: 11px;"
+                        data-tooltip="Selecting which task to take next. Edit config file to change">
+                    Tasks sampling:&nbsp;<span class="ui label">{{ project.config['sampling'] }}</span>
+                  </span>                  
+                  <!-- Start labeling -->
+                  <a class="ui button positive" href="/">Start Labeling</a>                                    
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -111,33 +164,75 @@
           <div class="ui hidden divier"></div>
         </div>
 
-
-        <!-- Control buttons -->
-        <div class="ui row stackable" v-if="project.task_count > 0">
-          <div class="center aligned">
-            <!-- Start labeling -->
-            <a class="ui button positive" href="/">Start Labeling</a>
-
-            <!-- Sampling -->
-            <span class="ui segment" style="padding-top: 8px; padding-bottom: 11px;"
-                  data-tooltip="The order in which tasks will be shown on the Labeling page,
-                                change it in config file or at run arguments">
-              Tasks sampling:&nbsp;<span class="ui orange label">{{ project.config['sampling'] }}</span>
-            </span> &nbsp;
-
-            <!-- Delete all tasks -->
-            <a class="ui button red" @click="deleteAllTasks()" v-if="project.can_delete_tasks">Delete All Tasks</a>
-          </div>
-        </div>
-
         <!-- Import tasks -->
-        <div class="row" v-else>
+        <div class="row" v-if="project.task_count == 0">
           <a class="ui button positive" href="/import" v-if="project.can_manage_tasks">Import Tasks</a>
         </div>
 
       </div>
       <div class="ui divider hidden"></div>
+     
+      <!-- Table -->
+      <table v-if="project.task_count > 0" class="responsive">
+        <!-- Header -->
+        <tr>
+          <th class="order" @click="changeOrder('id')">Task ID
+            <i class="fas" :class="{'fa-sort-up': this.order=='id', 'fa-sort-down': this.order=='-id'}"></i>
+          </th>
+          <th class="order" @click="changeOrder('completed_at')">Completed at
+            <i class="fas"
+               :class="{'fa-sort-up': this.order=='completed_at', 'fa-sort-down': this.order=='-completed_at'}"></i>
+          </th>
+          <th>Label</th>
+          <th>Delete</th>
+        </tr>
 
+        <!-- Task row -->
+        <template v-for="task in tasks">
+          <!-- Broken task -->
+          <tr v-if="task == null" class="text-center">
+            <td colspan="2"><small>broken task [backend returns null, check storage settings]</small></td>
+          </tr>
+
+          <!-- Correct task -->
+          <tr v-else>
+            <!-- Task ID -->
+            <td class="text-center">
+              {{ task.id }}
+            </td>
+            <!-- Completed at -->
+            <td>{{ task.completed_at }}</td>
+            <!-- Label -->
+            <td class="text-center">
+              <a :href="'/?task_id=' + task.id">
+                <span class="ui mini loader inline active" v-if="task.processing"></span>
+                <i class="fas fa-eye eye show-completion" v-else></i>
+              </a>
+            </td>
+            <!-- Delete -->
+            <td class="text-center">
+              <div class="actions-card">
+                <div v-if="project.can_delete_tasks">
+                  <a href="" class="trash" @click="deleteTask(task)">
+                    Task <i class="fas fa-trash-alt trash remove-task">&nbsp;&nbsp;</i> 
+                  </a>
+                </div>
+                <div v-if="project.can_manage_completions">
+                  <div v-for="completion in task.completions">
+                    <a href="" class="trash" @click="deleteCompletion(task, completion)">
+                      Completion {{ completion.id }}
+                      <i class="fas fa-trash-alt trash remove-completion">&nbsp;&nbsp;</i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </template>
+      </table>
+
+      <div class="ui divider hidden"></div>
+      
       <!-- Pagination -->
       <div class="ui pagination menu" v-if="project.task_count > 0">
         <a class="item" :class="{'active': page>1, 'disabled': page<=1}"
@@ -170,59 +265,7 @@
         <a class="item" :class="{'active': page<totalPages, 'disabled': page>=totalPages}"
            @click="page<totalPages ? page++: page">Next</a>
       </div>
-
-      <div class="ui divider hidden"></div>
-
-      <!-- Table -->
-      <table v-if="project.task_count > 0" class="responsive">
-        <!-- Header -->
-        <tr>
-          <th class="order" @click="changeOrder('id')">Task ID
-            <i class="fas" :class="{'fa-sort-up': this.order=='id', 'fa-sort-down': this.order=='-id'}"></i>
-          </th>
-          <th class="order" @click="changeOrder('completed_at')">Completed at
-            <i class="fas"
-               :class="{'fa-sort-up': this.order=='completed_at', 'fa-sort-down': this.order=='-completed_at'}"></i>
-          </th>
-          <th v-if="project.can_delete_tasks">Delete task?</th>
-          <th v-if="project.can_manage_completions">Delete completion?</th>
-        </tr>
-
-        <!-- Task row -->
-        <template v-for="task in tasks">
-          <!-- Broken task -->
-          <tr v-if="task == null" class="text-center">
-            <td colspan="2"><small>broken task [backend returns null, check storage settings]</small></td>
-          </tr>
-
-          <!-- Correct task -->
-          <tr v-else>
-            <!-- Task ID -->
-            <td class="text-center">
-              <a :href="'/?task_id=' + task.id">
-                <span class="ui mini loader inline active" v-if="task.processing"></span>
-                <i class="fas fa-eye eye show-completion" v-else></i>
-              </a>
-              &nbsp;{{ task.id }}
-            </td>
-            <!-- Completed at -->
-            <td>{{ task.completed_at }}</td>
-            <!-- Task -->
-            <td class="text-center" v-if="project.can_delete_tasks">
-              <i @click="deleteTask(task)"
-                 class="fas fa-trash-alt trash remove-task">&nbsp;&nbsp;</i>
-            </td>
-            <!-- Completion -->
-            <td class="text-center" v-if="project.can_manage_completions">
-              <i v-for="completion in task.completions" @click="deleteCompletion(task, completion)"
-                 class="fas fa-trash-alt trash remove-completion">&nbsp;&nbsp;</i>
-            </td>
-          </tr>
-        </template>
-
-
-      </table>
-
+      
       <br/>
     </div>
     <br/><br/>
