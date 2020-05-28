@@ -130,7 +130,10 @@ class IsValidRegex(object):
 
 class CloudStorageForm(BaseForm):
 
-    use_blob_urls = BooleanField('Use BLOBs URLs', description='Generate tasks with filtered files using tag key')
+    use_blob_urls = BooleanField('Use BLOBs URLs', description='Generate tasks with filtered files using tag key '
+                                                               '(for resources like jpg, mp3, etc). \n'
+                                                               'If not selected filtered files will be interpreted '
+                                                               'as jsons with Label Studio task items inside.')
     prefix = StringField('Prefix', [Optional()], description='File prefix')
     regex = StringField('Regex', [IsValidRegex()], description='File filter by regex, example: .*jpe?g')
     data_key = StringField('Data key', [InputRequired()], description='Task tag key from your label config')

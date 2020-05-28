@@ -102,13 +102,17 @@
                 </span>
                 <!-- Controls -->
                 <div style="margin-top: 7px">
+                  <!-- Storage settings -->
                   <span data-tooltip="Change source storage filter">
                     <i class="fas fa-cloud-download-alt sup-button big" @click="storage_settings.source.show=true"></i>
                   </span>
-                  <span style="margin-right: 15px"></span>
-                  <span @click="deleteAllTasks()" v-if="project.can_delete_tasks"
-                        data-tooltip="Delete all tasks">
-                    <i class="fas fa-trash-alt trash remove-task">&nbsp;&nbsp;</i>
+                  <!-- Delete tasks -->
+                  <span v-if="project.can_delete_tasks">
+                    <span style="margin-right: 15px"></span>
+                    <span @click="deleteAllTasks()"
+                          data-tooltip="Delete all tasks">
+                      <i class="fas fa-trash-alt trash remove-task">&nbsp;&nbsp;</i>
+                    </span>
                   </span>
                 </div>
               </div> <!-- statistic -->
@@ -134,7 +138,7 @@
                 </span>
                 <!-- Controls -->
                 <div style="margin-top: 7px">
-                  <span data-tooltip="Change target storage filter">
+                  <span data-tooltip="Change target storage">
                     <i class="fas fa-cloud-upload-alt sup-button big" @click="storage_settings.target.show=true"></i>
                   </span>
                 </div>
@@ -441,7 +445,7 @@
                       root.project_loaded = false;
                       setTimeout(function(){
                         root.loadAll();
-                      }, 2000);
+                      }, 4000);
                   }).always(function () {
                       root.storage_settings[storage_for].loading = false;
                   });

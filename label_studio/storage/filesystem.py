@@ -132,7 +132,7 @@ class DirJSONsStorage(BaseStorage):
 class TasksJSONStorage(JSONStorage):
 
     form = BaseForm
-    description = 'Local storage (loading tasks from "tasks.json" file)'
+    description = 'Local [loading tasks from "tasks.json" file]'
 
     def __init__(self, path, project_path, **kwargs):
         super(TasksJSONStorage, self).__init__(
@@ -143,7 +143,7 @@ class TasksJSONStorage(JSONStorage):
 class CompletionsDirStorage(DirJSONsStorage):
 
     form = BaseForm
-    description = 'Local storage (completions are in "completions" directory)'
+    description = 'Local [completions are in "completions" directory]'
 
     def __init__(self, path, project_path, **kwargs):
         super(CompletionsDirStorage, self).__init__(

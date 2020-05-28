@@ -10,7 +10,7 @@
   <div class="header">
     <i class="fas" style="opacity: 0.65"
        :class="{'fa-cloud-download-alt': storage_for=='source', 'fa-cloud-upload-alt': storage_for=='target'}"></i>
-    &nbsp;{{ capitalizeFirstLetter(storage_for) }} storage
+    &nbsp;{{ capitalizeFirstLetter(storage_for) }} storage: {{ storage.description }}
     &nbsp;<div :class="{active: storage.type_loading}" class="ui loader inline mini grey"></div>
   </div>
 
@@ -19,8 +19,9 @@
     <form class="ui form" :id="storage.storage_for + '-storage-form'">
       <input hidden name="storage_for" :value="storage_for">
 
-      <p>You are currently using <span class="ui label">{{ storage.description }}</span>.<br/>
-        <span v-if="storage.type=='tasks-json'">To add new tasks got to <a href="./import">Import page</a></span>
+      <p>
+        <span v-if="storage.type=='tasks-json'">To add new tasks go to <a href="./import">Import page</a>.</span><br/>
+        To change the storage type restart Label Studio with <a href="https://labelstud.io">storage arguments</a>.
       </p>
 
       <!-- Storage Type - form needs it to correctly be processed -->
@@ -41,7 +42,7 @@
            v-for="field in storage.fields"
            :class="{disabled: storage.type_loading, error: field.name in storage.errors}">
 
-        <label>{{ field.description }}</label>
+        <label :for="field.name">{{ field.description }}</label>
         <sui-checkbox v-model="field.data" :name="field.name" v-if="field.type=='BooleanField'"></sui-checkbox>
         <input type="text" :placeholder="field.name" :name="field.name" v-model="field.data"
                v-if="field.type!='BooleanField'">
