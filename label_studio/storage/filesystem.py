@@ -23,7 +23,7 @@ class JSONStorage(BaseStorage):
         self._save()
 
     def _save(self):
-        with open(self.path, mode='w') as fout:
+        with open(self.path, mode='w', encoding='utf8') as fout:
             json.dump(self.data, fout, ensure_ascii=False, indent=2)
 
     @property
@@ -96,7 +96,7 @@ class DirJSONsStorage(BaseStorage):
 
     def set(self, id, value):
         filename = os.path.join(self.path, str(id) + '.json')
-        with open(filename, 'w') as fout:
+        with open(filename, 'w', encoding='utf8') as fout:
             json.dump(value, fout, indent=2, sort_keys=True)
 
     def set_many(self, keys, values):

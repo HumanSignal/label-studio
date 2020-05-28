@@ -266,7 +266,7 @@ class CloudStorage(BaseStorage):
         raise NotImplementedError
 
     def _create_local(self, id, value):
-        with open(os.path.join(self.objects_dir, str(id)), mode='w') as fout:
+        with open(os.path.join(self.objects_dir, str(id)), mode='w', encoding='utf8') as fout:
             json.dump(value, fout, indent=2)
 
     def max_id(self):
