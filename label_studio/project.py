@@ -454,8 +454,12 @@ class Project(object):
         """
         times = {}
         for id, data in self.target_storage.items():
-            latest_time = max(data['completions'], key=itemgetter('created_at'))['created_at']
-            times[id] = timestamp_to_local_datetime(latest_time).strftime('%Y-%m-%d %H:%M:%S')
+            try:
+                latest_time = max(data['completions'], key=itemgetter('created_at'))['created_at']
+            except Exception as exc:
+                times[id] = None
+            else:
+                times[id] = timestamp_to_local_datetime(latest_time).strftime('%Y-%m-%d %H:%M:%S')
         return times
 
     def get_task_with_completions(self, task_id):
