@@ -1,7 +1,7 @@
 import setuptools
+import label_studio
 
-# Package version
-version = '0.6.1'
+print('Label Studio', label_studio.__version__)
 
 # Readme
 with open('README.md', 'r') as f:
@@ -13,7 +13,7 @@ with open('requirements.txt') as f:
 
 setuptools.setup(
     name='label-studio',
-    version=version,
+    version=label_studio.__version__,
     author='Heartex',
     author_email="hello@heartex.ai",
     description='Label Studio annotation tool',

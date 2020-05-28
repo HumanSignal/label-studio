@@ -26,6 +26,9 @@ def parse_input_args():
 
     root_parser = argparse.ArgumentParser(add_help=False)
     root_parser.add_argument(
+        '--version', dest='version', action='store_true',
+        help='Show Label Studio version')
+    root_parser.add_argument(
         '-b', '--no-browser', dest='no_browser', action='store_true',
         help='Do not open browser at label studio start')
     root_parser.add_argument(
@@ -111,6 +114,8 @@ def parse_input_args():
 
     # init sub-command parser
 
+    parser_version = subparsers.add_parser('version', help='Print version info', parents=[root_parser])
+
     parser_init = subparsers.add_parser('init', help='Initialize Label Studio', parents=[root_parser])
     parser_init.add_argument(
         'project_name',
@@ -132,6 +137,12 @@ def parse_input_args():
         'start-multi-session', help='Start Label Studio server', parents=[root_parser])
 
     args = parser.parse_args()
+
+    # print version
+    if args.version or args.command == 'version':
+        from label_studio import __version__
+        print('\nLabel Studio version:', __version__, '\n')
+
     if args.output_dir is not None:
         raise RuntimeError('"--output-dir" option is deprecated and has no effect.\n'
                            'All output results are saved to project_name/completions directory')
