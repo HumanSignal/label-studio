@@ -19,24 +19,13 @@
     <form class="ui form" :id="storage.storage_for + '-storage-form'">
       <input hidden name="storage_for" :value="storage_for">
 
-      <div class="ui icon message" v-if="storage_for=='source'">
-        <i class="ui icon fas fa-info-circle"></i>
-        <div class="content">
-          Filter task files from Amazon S3 or Google Cloud.<br/>
-          The each filter generates a new portion of tasks which will be added to Label Studio DB.<br/>
-          When you go to previous filters all the tasks and completions will be loaded back.<br/>
-          You are currently using {{ getCurrentStorage(storage_for).description }} storage type.<br/>
-          <a href="http://labelstud.io">Read more in documentation</a>
-        </div>
-      </div>
-
-      <p v-if="storage_for=='target'">
-        Save completion files to Amazon S3 or Google Cloud.
-
+      <p>You are currently using <span class="ui label">{{ storage.description }}</span>.<br/>
+        <span v-if="storage.type=='tasks-json'">To add new tasks got to <a href="./import">Import page</a></span>
       </p>
 
       <!-- Storage Type - form needs it to correctly be processed -->
-      <div class="ui field hidden" v-if="storage.type != ''" :class="{disabled: storage.type_loading}">
+      <div class="ui field" style="display: none"
+           :class="{disabled: storage.type_loading}">
         <label>Storage type</label>
         <select class="ui dropdown" name="type" v-model="storage.type">
           <option v-for="(item, name) in storage_settings_all[storage_for]" :value="name">
@@ -72,6 +61,26 @@
     <div class="ui message error" v-if="'common' in storage.errors">
       {{ storage.errors.common }}
     </div>
+
+    <!-- Source help -->
+    <div class="ui icon message" v-if="storage_for=='source'">
+      <i class="ui icon fas fa-info-circle"></i>
+      <div class="content">
+        Filter task files from Amazon S3 or Google Cloud.<br/>
+        The each filter generates a new portion of tasks which will be added to Label Studio DB.<br/>
+        When you go to previous filters all the tasks and completions will be loaded back.<br/>
+        <a href="http://labelstud.io">Read more in documentation</a>
+      </div>
+    </div>
+
+    <!-- Target help -->
+    <div class="ui icon message" v-if="storage_for=='target'">
+      <i class="ui icon fas fa-info-circle"></i>
+      <div class="content">
+        Save completion files to Amazon S3 or Google Cloud.<br/>
+        <a href="http://labelstud.io">Read more in documentation</a>
+      </div>
+    </div>
   </div>
 
   <!-- Actions -->
@@ -81,11 +90,15 @@
     <!-- Filter & Add tasks for Source -->
     <button class="ui button positive approve"
             :class="{disabled: storage.loading || storage.type_loading}"
-            @click="saveStorageSettings(storage_for)">
+            @click="saveStorageSettings(storage_for)"
+            v-if="storage_for=='source' && storage.type!='tasks-json'">
+      <!-- don't show button in Local storage for Source -->
       <span class="ui active mini inline loader" v-if="storage.loading"></span>
       <span v-if="!storage.loading">
-        <span v-if="storage_for=='source' && storage.type != 'tasks-json'">Filter & Add Tasks</span> <!-- Button for Source type -->
-        <span v-if="storage_for=='target'">Save</span>  <!-- Button for Target type -->
+        <!-- Button text for Source type -->
+        <span v-if="storage_for=='source'">Filter & Add Tasks</span>
+        <!-- Button text for Target type -->
+        <span v-if="storage_for=='target'">Save</span>
       </span>
 
     </button>

@@ -367,6 +367,10 @@ div[class*="App_editor"] {
     margin-left: -1em;
 }
 
+.ui.label {
+    background-color: #f1f1f1 !important;
+}
+
 .ui .label.basic {
     color: #999 !important;
 }

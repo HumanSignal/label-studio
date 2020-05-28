@@ -99,7 +99,6 @@
                 <span class="label">Tasks</span>
                 <span class="sub-label">
                   <i class="word-break" v-if="project.multi_session_mode">{{ project.source_storage.readable_path }}</i>
-                  &nbsp;
                 </span>
                 <!-- Controls -->
                 <div style="margin-top: 7px">
@@ -132,7 +131,6 @@
                 <span class="label">Completions</span>
                 <span class="sub-label">
                   <i class="word-break" v-if="project.multi_session_mode">{{ project.target_storage.readable_path }}</i>
-                  &nbsp;
                 </span>
                 <!-- Controls -->
                 <div style="margin-top: 7px">
@@ -523,7 +521,7 @@
                   var all = this.storage_settings_all[storage_for];
                   for (var key in all)
                       if (all[key].current)
-                          return item;
+                          return all[key];
                   return {description: '[No storage defined]', name: '[No storage defined]'}
               }
           },
@@ -556,7 +554,9 @@
               this.page_size = getUrlArg('page_size', this.page_size);
               this.loadAll();
 
-              this.toggleAutoUpdateTimer();
+              if (getUrlArg('timer', '1') === '1')
+                this.toggleAutoUpdateTimer();
+
               $('#vue_loader').hide();
               console.log('Vue mounting success');
           }
