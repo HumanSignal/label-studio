@@ -438,7 +438,10 @@ class Project(object):
 
         :return: filenames without extensions and directories
         """
-        completions = list(self.target_storage.ids())
+        task_ids = set(self.source_storage.ids())
+        completion_ids = set(self.target_storage.ids())
+        completions = completion_ids.intersection(task_ids)
+        #completions = list(self.target_storage.ids())
         logger.debug('{num} completions found in {output_dir}'.format(
             num=len(completions), output_dir=self.config["output_dir"]))
         return sorted(completions)

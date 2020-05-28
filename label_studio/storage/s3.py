@@ -2,10 +2,7 @@ import logging
 import boto3
 import json
 
-from wtforms import StringField
-from wtforms.validators import InputRequired, Optional
-
-from .base import CloudStorage, BaseForm
+from .base import CloudStorage, BaseForm, BooleanField, Optional, StringField
 
 logger = logging.getLogger(__name__)
 logging.getLogger('botocore').setLevel(logging.CRITICAL)
@@ -60,9 +57,11 @@ class S3Storage(CloudStorage):
 
 class S3CompletionsStorageForm(BaseForm):
     prefix = StringField('Prefix', [Optional()], description='S3 Bucket prefix')
+    create_local_copy = BooleanField('Create local copy', description='Create a local copy on your disk')
 
     bound_params = dict(
-        prefix='prefix'
+        prefix='prefix',
+        create_local_copy='create_local_copy'
     )
 
 
