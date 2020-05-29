@@ -87,7 +87,7 @@ def get_data_dir():
 
 def delete_dir_content(dirpath):
     for f in glob.glob(dirpath + '/*'):
-        shutil.rmtree(f)
+        remove_file_or_dir(f)
 
 
 def remove_file_or_dir(path):

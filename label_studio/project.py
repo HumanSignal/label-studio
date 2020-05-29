@@ -632,7 +632,7 @@ class Project(object):
         """
         dir = cls.get_project_dir(project_name, args)
         if args.force:
-            remove_file_or_dir(dir)
+            delete_dir_content(dir)
         os.makedirs(dir, exist_ok=True)
 
         config = json_load(args.config_path) if args.config_path else json_load(find_file('default_config.json'))
