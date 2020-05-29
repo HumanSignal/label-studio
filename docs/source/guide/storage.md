@@ -25,38 +25,34 @@ To connect your [S3](https://aws.amazon.com/s3) bucket with Label Studio, be sur
 
 The following commands launch Label Studio, configure the connection to your S3 bucket, scan for existing tasks, and load them into the labeling app.
 
-#### Read bucket for JSON-formatted tasks
+#### Read bucket with JSON-formatted tasks
 
 ```bash
-label-studio start --init --source s3 --source-path my-bucket-name
+label-studio start --init --source s3 --source-path my-s3-bucket
 ```
 
-#### Read bucket with BLOBs (image or audio files)
+
+#### Write completions to bucket
 
 ```bash
-label-studio start --init --source s3 --source-path my-bucket-name --source-params "{\"data_key\": \"my-data-key\", \"use_blob_urls\": true}"
+label-studio start --init --target s3-completions --target-path my-s3-bucket
 ```
 
-You can leave "data_key" empty (or skip it at all) then LS generates it automatically with the first task key from label config.    
+### Working with Binary Large OBjects (BLOBs)
 
-`"my-data-key"` required parameter leads to the input task formatted in a way:
-
-```json
-{
-  "my-data-key": "s3://my-bucket-name/my-blob.ext"
-}
-```
-
-#### Write results to the bucket
+When you are storing BLOBs in your S3 bucket (like images or audio files), you might want to use then as is, by generating URLs pointing to those objects (e.g. `gs://my-s3-bucket/image.jpg`)
+Label Studio allows you to generate input tasks with corresponding URLs automatically on-the-fly. You can to this either specifying `--source-params` when launching app:
 
 ```bash
-label-studio start --init --target s3-completions --target-path my-bucket-name
+label-studio start --init --source s3 --source-path my-s3-bucket --source-params "{\"data_key\": \"my-object-tag-$value\", \"use_blob_urls\": true}"
 ```
+
+You can leave `"data_key"` empty (or skip it at all) then LS generates it automatically with the first task key from label config (it's useful when you have only one object tag exposed).
 
 
 ### Optional parameters
 
-You can specify additional parameters with the input JSON string via `--source-params` / `--target-params` or from UI.
+You can specify additional parameters with the command line escaped JSON string via `--source-params` / `--target-params` or from UI.
 
 #### prefix
 
@@ -70,6 +66,9 @@ A regular expression for filtering bucket objects
 
 If set true, the local copy of the remote storage will be created.
 
+#### use_blob_urls
+
+Generate task data with URLs pointed to your bucket objects(for resources like jpg, mp3, etc). If not selected, bucket objects will be interpreted as tasksin Label Studio JSON format, one object per task.
 
 
 ## Google Cloud Storage
@@ -81,38 +80,33 @@ To connect your [GCS](https://cloud.google.com/storage) bucket with Label Studio
 
 The following commands launch Label Studio, configure the connection to your GCS bucket, scan for existing tasks, and load them into the app for the labeling.
 
-#### Read bucket for JSON-formatted tasks
+#### Read bucket with JSON-formatted tasks
 
 ```bash
-label-studio start --init --source gcs --source-path my-bucket-name
+label-studio start --init --source gcs --source-path my-gcs-bucket
 ```
 
-#### Read bucket with BLOBs (image or audio files)
+#### Write completions to bucket
 
 ```bash
-label-studio start --init --source gcs --source-path my-bucket-name --source-params "{\"data_key\": \"my-data-key\", \"use_blob_urls\": true}"
+label-studio start --init --target gcs-completions --source-path my-gcs-bucket
 ```
 
-You can leave "data_key" empty (or skip it at all) then LS generates it automatically with the first task key from label config.
+### Working with Binary Large OBjects (BLOBs)
 
-`"my-data-key"` required parameter leads to the input task formatted in a way:
-
-```json
-{
-  "my-data-key": "gs://my-bucket-name/my-blob.ext"
-}
-```
-
-#### Write results to the bucket
+When you are storing BLOBs in your GCS bucket (like images or audio files), you might want to use then as is, by generating URLs pointing to those objects (e.g. `gs://my-gcs-bucket/image.jpg`)
+Label Studio allows you to generate input tasks with corresponding URLs automatically on-the-fly. You can to this either specifying `--source-params` when launching app:
 
 ```bash
-label-studio start --init --target gcs-completions --target-path my-bucket-name
+label-studio start --init --source gcs --source-path my-gcs-bucket --source-params "{\"data_key\": \"my-object-tag-$value\", \"use_blob_urls\": true}"
 ```
+
+You can leave `"data_key"` empty (or skip it at all) then LS generates it automatically with the first task key from label config (it's useful when you have only one object tag exposed).
 
 
 ### Optional parameters
 
-You can specify additional parameters with the input JSON string via `--source-params` / `--target-params` or from UI.
+You can specify additional parameters with the command line escaped JSON string via `--source-params` / `--target-params` or from UI.
 
 #### prefix
 
@@ -125,3 +119,7 @@ A regular expression for filtering bucket objects
 #### create_local_copy
 
 If set true, the local copy of the remote storage will be created.
+
+#### use_blob_urls
+
+Generate task data with URLs pointed to your bucket objects(for resources like jpg, mp3, etc). If not selected, bucket objects will be interpreted as tasksin Label Studio JSON format, one object per task.

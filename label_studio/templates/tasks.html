@@ -202,7 +202,7 @@
 
           <!-- Broken task -->
           <tr v-if="task == null" class="text-center" v-for="task in tasks">
-            <td colspan="2"><small>broken task [backend returns null, check storage settings]</small></td>
+            <td colspan="2"><small>broken task [backend returns null, check storage settings (may be you forgot to activate "Generate task data with URLs..." checkbox on storage settings?)]</small></td>
           </tr>
 
           <!-- Correct task -->

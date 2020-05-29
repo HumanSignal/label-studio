@@ -133,10 +133,10 @@ class CloudStorageForm(BaseForm):
     prefix = StringField('Prefix', [Optional()], description='File prefix')
     regex = StringField('Regex', [IsValidRegex()], description='File filter by regex, example: .*jpe?g')
     data_key = StringField('Data key', [InputRequired()], description='Task tag key from your label config')
-    use_blob_urls = BooleanField('Use BLOBs URLs', description='Generate tasks with filtered files using tag key '
+    use_blob_urls = BooleanField('Use BLOBs URLs', description='Generate task data with URLs pointed to your bucket objects'
                                                                '(for resources like jpg, mp3, etc). \n'
-                                                               'If not selected filtered files will be interpreted '
-                                                               'as jsons with Label Studio task items inside.')
+                                                               'If not selected, bucket objects will be interpreted as tasks'
+                                                               'in Label Studio JSON format, one object per task.')
     bound_params = dict(
         prefix='prefix',
         regex='regex',
