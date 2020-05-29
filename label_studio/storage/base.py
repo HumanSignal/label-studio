@@ -164,7 +164,7 @@ class CloudStorage(BaseStorage):
     form = CloudStorageForm
     description = 'Base Cloud Storage'
 
-    def __init__(self, prefix=None, regex=None, create_local_copy=True, use_blob_urls=False, data_key=None, **kwargs):
+    def __init__(self, prefix=None, regex=None, create_local_copy=True, use_blob_urls=True, data_key=None, **kwargs):
         super(CloudStorage, self).__init__(**kwargs)
         self.prefix = prefix or ''
         self.regex_str = regex
