@@ -45,6 +45,9 @@
     <%- css(isIndex ? 'css/index' : 'css/page') %>
     <%- css('css/search') %>
 
+      <style>
+      </style>
+      
     <% if (page.type === "playground") { %>
       <%- css('css/codemirror') %>
       <script src="<%- url_for("/js/jquery.min.js") %>"></script>
@@ -56,7 +59,7 @@
     <!-- this needs to be loaded before guide's inline scripts -->
 
   </head>
-  <body class="<%- isIndex ? '' : 'docs' -%>">
+  <body >
     <div id="mobile-bar" <%- isIndex || isBlog ? 'style="display: none"' : '' %>>
         <a class="menu-button"></a>
     </div>
@@ -73,5 +76,23 @@
     <script src="<%- url_for("/js/css.escape.js") %>"></script>
     <script src="<%- url_for("/js/common.js") %>"></script>
     <%- partial('partials/google_analytics') %>
+    <script>
+     window.onscroll = function() {myFunction()};
+
+     // Get the header
+     var header = document.getElementById("header");
+
+     // Get the offset position of the navbar
+     var sticky = header.offsetTop;
+
+     // Add the sticky class to the header when you reach its scroll position. Remove "sticky" when you leave the scroll position
+     function myFunction() {
+         if (window.pageYOffset > sticky) {
+             header.classList.add("sticky");
+         } else {
+             header.classList.remove("sticky");
+         }
+     }
+    </script>
   </body>
 </html>
