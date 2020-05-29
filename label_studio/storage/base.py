@@ -165,9 +165,8 @@ class CloudStorage(BaseStorage):
         self.validate_connection()
 
         os.makedirs(self.local_dir, exist_ok=True)
-        if self.create_local_copy:
-            self.objects_dir = os.path.join(self.local_dir, 'objects')
-            os.makedirs(self.objects_dir, exist_ok=True)
+        self.objects_dir = os.path.join(self.project_path, 'completions')
+        os.makedirs(self.objects_dir, exist_ok=True)
 
         self.last_sync_time = None
         self.sync_period_in_sec = 30
@@ -266,7 +265,7 @@ class CloudStorage(BaseStorage):
         raise NotImplementedError
 
     def _create_local(self, id, value):
-        with open(os.path.join(self.objects_dir, str(id)), mode='w', encoding='utf8') as fout:
+        with open(os.path.join(self.objects_dir, str(id) + '.json'), mode='w', encoding='utf8') as fout:
             json.dump(value, fout, indent=2)
 
     def max_id(self):
@@ -277,6 +276,8 @@ class CloudStorage(BaseStorage):
         return self._selected_ids
 
     def _ready_to_sync(self):
+        if not self.regex_str:
+            return False
         if self.last_sync_time is None:
             return True
         return (datetime.now() - self.last_sync_time) > timedelta(seconds=self.sync_period_in_sec)
@@ -306,7 +307,7 @@ class CloudStorage(BaseStorage):
                 self._validate_object(key)
             except Exception as exc:
                 continue
-            if self.regex and not self.regex.match(key):
+            if not self.regex.match(key):
                 logger.debug(key + ' is skipped by regex filter')
                 continue
             if key not in self._keys_ids_map:

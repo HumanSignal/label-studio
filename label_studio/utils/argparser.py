@@ -12,6 +12,7 @@ def parse_input_args():
     """
     import sys
     import argparse
+    from label_studio.project import Project
 
     if len(sys.argv) == 1:
         print('\nQuick start usage: label-studio start my_project --init\n')
@@ -56,26 +57,20 @@ def parse_input_args():
         '-i', '--input-path', dest='input_path', type=valid_filepath,
         help='Input path for task file or directory with tasks')
     root_parser.add_argument(
-        '-s', '--source', dest='source',
-        help='Source data storage type {s3,gcs}')
+        '-s', '--source', dest='source', choices=Project.get_available_source_storages(),
+        help='Source data storage type')
     root_parser.add_argument(
         '--source-path', dest='source_path',
         help='Source bucket name')
     root_parser.add_argument(
-        '--source-name', dest='source_name', default='Tasks',
-        help='Source key prefix')
-    root_parser.add_argument(
         '--source-params', dest='source_params', type=json.loads, default={},
         help='JSON string representing source parameters')
     root_parser.add_argument(
-        '-t', '--target', dest='target',
-        help='Target data storage type {s3,gcs}')
+        '-t', '--target', dest='target', choices=Project.get_available_target_storages(),
+        help='Target data storage type')
     root_parser.add_argument(
         '--target-path', dest='target_path',
         help='Target bucket name')
-    root_parser.add_argument(
-        '--target-name', dest='target_name', default='Completions',
-        help='Target key prefix')
     root_parser.add_argument(
         '--target-params', dest='target_params', type=json.loads, default={},
         help='JSON string representing target parameters')

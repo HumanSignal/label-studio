@@ -77,9 +77,17 @@ class Project(object):
         elif storage_for == 'target':
             return self.get_available_target_storage_names()
 
+    @classmethod
+    def get_available_source_storages(cls):
+        return ['tasks-json', 's3', 'gcs']
+
+    @classmethod
+    def get_available_target_storages(cls):
+        return ['completions-dir', 's3-completions', 'gcs-completions']
+
     def get_available_source_storage_names(self):
         names = OrderedDict()
-        nameset = {'tasks-json', 's3', 'gcs'}
+        nameset = set(self.get_available_source_storages())
         for name, desc in get_available_storage_names().items():
             # we don't expose configurable filesystem storage in UI to avoid security problems
             if name in nameset:
@@ -88,7 +96,7 @@ class Project(object):
 
     def get_available_target_storage_names(self):
         names = OrderedDict()
-        nameset = {'completions-dir', 's3-completions', 'gcs-completions'}
+        nameset = set(self.get_available_target_storages())
         for name, desc in get_available_storage_names().items():
             # blobs have no sense for target storages
             if name in nameset:
@@ -660,7 +668,6 @@ class Project(object):
 
         if args.source:
             config['source'] = {
-                'name': args.source_name or 'Tasks',
                 'type': args.source,
                 'path': args.source_path,
                 'params': args.source_params
@@ -686,7 +693,6 @@ class Project(object):
 
         if args.target:
             config['target'] = {
-                'name': args.target_name or 'Completions',
                 'type': args.target,
                 'path': args.target_path,
                 'params': args.target_params
