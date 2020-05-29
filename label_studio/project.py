@@ -865,6 +865,8 @@ class Project(object):
             'can_delete_tasks': project.can_delete_tasks,
             'target_storage': {'readable_path': project.target_storage.readable_path},
             'source_storage': {'readable_path': project.source_storage.readable_path},
-            'available_storages': available_storages
+            'available_storages': available_storages,
+            'source_syncing': self.source_storage.is_syncing,
+            'target_syncing': self.target_storage.is_syncing
         }
         return output
