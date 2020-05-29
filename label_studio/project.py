@@ -5,8 +5,7 @@ import json
 import random
 
 from shutil import copy2
-from collections import defaultdict
-from datetime import datetime
+from collections import defaultdict, OrderedDict
 from operator import itemgetter
 from xml.etree import ElementTree
 from uuid import uuid4
@@ -14,13 +13,15 @@ from copy import deepcopy
 
 from label_studio_converter import Converter
 
-from label_studio.utils.misc import config_line_stripped, config_comments_free, parse_config
+from label_studio.utils.misc import (
+    config_line_stripped, config_comments_free, parse_config, timestamp_now, timestamp_to_local_datetime)
 from label_studio.utils.analytics import Analytics
 from label_studio.utils.models import ProjectObj, MLBackend
 from label_studio.utils.exceptions import ValidationError
-from label_studio.utils.io import find_file, delete_dir_content, json_load
+from label_studio.utils.io import find_file, delete_dir_content, json_load, remove_file_or_dir
 from label_studio.utils.validation import is_url
 from label_studio.tasks import Tasks
+from label_studio.storage import create_storage, get_available_storage_names
 
 logger = logging.getLogger(__name__)
 
@@ -33,20 +34,25 @@ class Project(object):
 
     _storage = {}
 
-    def __init__(self, config, name, context=None):
+    def __init__(self, config, name, root_dir='.', context=None):
         self.config = config
         self.name = name
+        self.path = os.path.join(root_dir, self.name)
 
         self.on_boarding = {}
         self.context = context or {}
+
+        self.source_storage = None
+        self.target_storage = None
+        self.create_storages()
 
         self.tasks = None
         self.label_config_line, self.label_config_full, self.parsed_label_config, self.input_data_tags = None, None, None, None  # noqa
         self.derived_input_schema, self.derived_output_schema = None, None
 
-        self.load_tasks()
         self.load_label_config()
-        self.load_derived_schemas()
+        self.update_derived_input_schema()
+        self.update_derived_output_schema()
 
         self.analytics = None
         self.load_analytics()
@@ -59,53 +65,126 @@ class Project(object):
         self.load_converter()
         self.max_tasks_file_size = 250
 
-    def load_tasks(self):
-        self.tasks = {}
-        self.derived_input_schema = set()
-        tasks = json_load(self.config['input_path'])
-        if len(tasks) == 0:
-            logger.warning('No tasks loaded from ' + self.config['input_path'])
-            return
-        if isinstance(tasks, dict):
-            tasks_iter = tasks.items()
-        elif isinstance(tasks, list):
-            tasks_iter = ((task['id'], task) for task in tasks)
+    def get_storage(self, storage_for):
+        if storage_for == 'source':
+            return self.source_storage
+        elif storage_for == 'target':
+            return self.target_storage
 
-        for task_id, task in tasks_iter:
-            self.tasks[int(task_id)] = task
+    def get_available_storage_names(self, storage_for):
+        if storage_for == 'source':
+            return self.get_available_source_storage_names()
+        elif storage_for == 'target':
+            return self.get_available_target_storage_names()
+
+    @classmethod
+    def get_available_source_storages(cls):
+        return ['tasks-json', 's3', 'gcs']
+
+    @classmethod
+    def get_available_target_storages(cls):
+        return ['completions-dir', 's3-completions', 'gcs-completions']
+
+    def get_available_source_storage_names(self):
+        names = OrderedDict()
+        nameset = set(self.get_available_source_storages())
+        for name, desc in get_available_storage_names().items():
+            # we don't expose configurable filesystem storage in UI to avoid security problems
+            if name in nameset:
+                names[name] = desc
+        return names
+
+    def get_available_target_storage_names(self):
+        names = OrderedDict()
+        nameset = set(self.get_available_target_storages())
+        for name, desc in get_available_storage_names().items():
+            # blobs have no sense for target storages
+            if name in nameset:
+                names[name] = desc
+        return names
+
+    def create_storages(self):
+        source = self.config['source']
+        target = self.config['target']
+        self.source_storage = create_storage(source['type'], source['path'], self.path, self,
+                                             **source.get('params', {}))
+        self.target_storage = create_storage(target['type'], target['path'], self.path, self,
+                                             **target.get('params', {}))
+
+    def update_storage(self, storage_for, storage_kwargs):
+
+        def _update_storage(storage_for, storage_kwargs):
+            storage_name = storage_kwargs.pop('name', storage_for)
+            storage_type = storage_kwargs.pop('type')
+            # storage_path = storage_kwargs.pop('path', None)
+            storage_path = self.config[storage_for]['path']
+            storage = create_storage(storage_type, storage_path, self.path, self, **storage_kwargs)
+            self.config[storage_for] = {
+                'name': storage_name,
+                'type': storage_type,
+                'path': storage_path,
+                'params': storage_kwargs
+            }
+            self._save_config()
+            logger.debug('Created storage type "' + storage_type + '"')
+            return storage
+
+        if storage_for == 'source':
+            self.source_storage = _update_storage('source', storage_kwargs)
+        elif storage_for == 'target':
+            self.target_storage = _update_storage('target', storage_kwargs)
+        self.update_derived_input_schema()
+        self.update_derived_output_schema()
+
+    @property
+    def can_manage_tasks(self):
+        return self.config['source']['type'] not in {'s3', 's3-completions', 'gcs', 'gcs-completions'}
+
+    @property
+    def can_manage_completions(self):
+        return self.config['target']['type'] not in {'s3', 's3-completions', 'gcs', 'gcs-completions'}
+
+    @property
+    def can_delete_tasks(self):
+        return self.can_manage_tasks and self.can_manage_completions
+
+    @property
+    def data_types_json(self):
+        return self.project_obj.data_types_json
+
+    def load_label_config(self):
+        self.label_config_full = config_comments_free(open(self.config['label_config'], encoding='utf8').read())
+        self.label_config_line = config_line_stripped(self.label_config_full)
+        self.parsed_label_config = parse_config(self.label_config_line)
+        self.input_data_tags = self.get_input_data_tags(self.label_config_line)
+
+    def update_derived_input_schema(self):
+        self.derived_input_schema = set()
+        for task_id, task in self.source_storage.items():
             data_keys = set(task['data'].keys())
             if not self.derived_input_schema:
                 self.derived_input_schema = data_keys
             else:
                 self.derived_input_schema &= data_keys
-        print(str(len(self.tasks)) + ' tasks loaded from: ' + self.config['input_path'])
+        logger.debug('Derived input schema: ' + str(self.derived_input_schema))
 
-    def load_label_config(self):
-        self.label_config_full = config_comments_free(open(self.config['label_config']).read())
-        self.label_config_line = config_line_stripped(self.label_config_full)
-        self.parsed_label_config = parse_config(self.label_config_line)
-        self.input_data_tags = self.get_input_data_tags(self.label_config_line)
-
-    def load_derived_schemas(self):
-
+    def update_derived_output_schema(self):
         self.derived_output_schema = {
             'from_name_to_name_type': set(),
             'labels': defaultdict(set)
         }
 
         # for all already completed tasks we update derived output schema for further label config validation
-        for task_id in self.get_task_ids():
-            task_with_completions = self.get_task_with_completions(task_id)
-            if task_with_completions and 'completions' in task_with_completions:
-                completions = task_with_completions['completions']
-                for completion in completions:
-                    self._update_derived_output_schema(completion)
+        for task_id, c in self.target_storage.items():
+            for completion in c['completions']:
+                self._update_derived_output_schema(completion)
+        logger.debug('Derived output schema: ' + str(self.derived_output_schema))
 
     def load_analytics(self):
         collect_analytics = os.getenv('collect_analytics')
         if collect_analytics is None:
             collect_analytics = self.config.get('collect_analytics', True)
-        collect_analytics = bool(collect_analytics)
+        collect_analytics = bool(int(collect_analytics))
         self.analytics = Analytics(self.label_config_line, collect_analytics, self.name, self.context)
 
     def add_ml_backend(self, params, raise_on_error=True):
@@ -196,19 +275,20 @@ class Project(object):
     def update_label_config(self, new_label_config):
         label_config_file = self.config['label_config']
         # save xml label config to file
-        with io.open(label_config_file, mode='w') as f:
+        new_label_config = new_label_config.replace('\r\n', '\n')
+        with io.open(label_config_file, mode='w', encoding='utf8') as f:
             f.write(new_label_config)
 
         # reload everything that depends on label config
         self.load_label_config()
-        self.load_derived_schemas()
+        self.update_derived_output_schema()
         self.load_analytics()
         self.load_project_ml_backend()
         self.load_converter()
 
         # save project config state
         self.config['label_config_updated'] = True
-        with io.open(self.config['config_path'], mode='w') as f:
+        with io.open(self.config['config_path'], mode='w', encoding='utf8') as f:
             json.dump(self.config, f)
         logger.info('Label config saved to: {path}'.format(path=label_config_file))
 
@@ -302,57 +382,47 @@ class Project(object):
                     .format(from_name=from_name, extra_labels=extra_labels)
                 )
 
-    def get_tasks(self):
-        """ Load tasks from JSON files in input_path directory
-
-        :return: file list
-        """
-        return self.tasks
-
-    def _save_tasks(self):
-        with open(self.config['input_path'], mode='w') as fout:
-            json.dump(self.tasks, fout, ensure_ascii=False, indent=2)
+    def no_tasks(self):
+        return self.source_storage.empty()
 
     def delete_tasks(self):
         """
         Deletes all tasks & completions from filesystem, then reloads clean project
         :return:
         """
-        delete_dir_content(self.config['output_dir'])
-        if os.path.exists(self.config['input_path']) and os.path.isfile(self.config['input_path']):
-            with io.open(self.config['input_path'], mode='w') as f:
-                json.dump({}, f)
+        self.source_storage.remove_all()
+        self.target_storage.remove_all()
+        self.update_derived_input_schema()
+        self.update_derived_output_schema()
 
         # delete everything on ML backend
         if self.ml_backends_connected:
             for m in self.ml_backends:
                 m.clear(self)
 
-        # reload everything related to tasks
-        self.load_tasks()
-        self.load_derived_schemas()
-
     def next_task(self, completed_tasks_ids):
         completed_tasks_ids = set(completed_tasks_ids)
         sampling = self.config.get('sampling', 'sequential')
 
         # Tasks are ordered ascending by their "id" fields. This is default mode.
+        task_iter = filter(lambda i: i not in self.target_storage, self.source_storage.ids())
         if sampling == 'sequential':
-            actual_tasks = (self.tasks[task_id] for task_id in self.tasks if task_id not in completed_tasks_ids)
-            return next(actual_tasks, None)
+            task_id = next(task_iter, None)
+            if task_id is not None:
+                return self.source_storage.get(task_id)
 
         # Tasks are sampled with equal probabilities
         elif sampling == 'uniform':
-            actual_tasks_ids = [task_id for task_id in self.tasks if task_id not in completed_tasks_ids]
+            actual_tasks_ids = list(task_iter)
             if not actual_tasks_ids:
                 return None
             random.shuffle(actual_tasks_ids)
-            return self.tasks[actual_tasks_ids[0]]
+            return self.source_storage.get(actual_tasks_ids[0])
 
         # Task with minimum / maximum average prediction score is taken
         elif sampling.startswith('prediction-score'):
             id_score_map = {}
-            for task_id, task in self.tasks.items():
+            for task_id, task in self.source_storage.items():
                 if task_id in completed_tasks_ids:
                     continue
                 if 'predictions' in task and len(task['predictions']) > 0:
@@ -366,52 +436,23 @@ class Project(object):
                 best_idx = max(id_score_map, key=id_score_map.get)
             else:
                 raise NotImplementedError('Unknown sampling method ' + sampling)
-            return self.tasks[best_idx]
+            return self.source_storage.get(best_idx)
         else:
             raise NotImplementedError('Unknown sampling method ' + sampling)
 
-    def get_task_ids(self):
-        """ Get task ids only
-
-        :return: list of task ids
-        """
-        return list(self.tasks.keys())
-
-    def get_task(self, task_id):
-        """ Get one task
-
-        :param task_id:
-        :return: task
-        """
-        try:
-            task_id = int(task_id)
-        except ValueError:
-            return None
-        return self.tasks.get(task_id)
-
     def remove_task(self, task_id):
-        if isinstance(task_id, str):
-            task_id = int(task_id)
-        self.tasks.pop(task_id, None)
-        self._save_tasks()
+        self.source_storage.remove(task_id)
         self.delete_completion(task_id)
-
-    def iter_completions(self):
-        root_dir = self.config['output_dir']
-        os.mkdir(root_dir) if not os.path.exists(root_dir) else ()
-        files = os.listdir(root_dir)
-        for f in files:
-            if f.endswith('.json'):
-                yield os.path.join(root_dir, f)
 
     def get_completions_ids(self):
         """ List completion ids from output_dir directory
 
         :return: filenames without extensions and directories
         """
-        completions = []
-        for f in self.iter_completions():
-            completions.append(int(os.path.splitext(os.path.basename(f))[0]))
+        task_ids = set(self.source_storage.ids())
+        completion_ids = set(self.target_storage.ids())
+        completions = completion_ids.intersection(task_ids)
+        #completions = list(self.target_storage.ids())
         logger.debug('{num} completions found in {output_dir}'.format(
             num=len(completions), output_dir=self.config["output_dir"]))
         return sorted(completions)
@@ -422,11 +463,14 @@ class Project(object):
         :param task_ids: list of task ids
         :return: list of string with formatted datetime
         """
-        root_dir = self.config['output_dir']
-        existing_completions = set(self.get_completions_ids())
-        ids = existing_completions.intersection(task_ids)
-        times = {i: os.path.getmtime(os.path.join(root_dir, str(i) + '.json')) for i in ids}
-        times = {i: datetime.fromtimestamp(t).strftime('%Y-%m-%d %H:%M:%S') for i, t in times.items()}
+        times = {}
+        for id, data in self.target_storage.items():
+            try:
+                latest_time = max(data['completions'], key=itemgetter('created_at'))['created_at']
+            except Exception as exc:
+                times[id] = 'undefined'
+            else:
+                times[id] = timestamp_to_local_datetime(latest_time).strftime('%Y-%m-%d %H:%M:%S')
         return times
 
     def get_task_with_completions(self, task_id):
@@ -435,22 +479,13 @@ class Project(object):
         :param task_id: task ids
         :return: json dict with completion
         """
-        try:
-            task_id = int(task_id)  # check task_id is int (disallow to escape from output_dir)
-        except ValueError:
-            return None
+        data = self.target_storage.get(task_id)
+        logger.debug('Get task ' + str(task_id) + ' from target storage: ' + str(data))
 
-        if 'completions' in self.tasks[task_id]:
-            return self.tasks[task_id]
-
-        filename = os.path.join(self.config['output_dir'], str(task_id) + '.json')
-
-        if os.path.exists(filename):
-            data = json.load(open(filename))
+        if data:
+            logger.debug('Get predictions ' + str(task_id) + ' from source storage')
             # tasks can hold the newest version of predictions, so task it from tasks
-            data['predictions'] = self.tasks[task_id].get('predictions', [])
-        else:
-            data = None
+            data['predictions'] = self.source_storage.get(task_id).get('predictions', [])
         return data
 
     def save_completion(self, task_id, completion):
@@ -459,14 +494,15 @@ class Project(object):
         :param task_id: task id
         :param completion: json data from label (editor)
         """
-
         # try to get completions with task first
         task = self.get_task_with_completions(task_id)
 
         # init task if completions with task not exists
         if not task:
-            task = self.get_task(task_id)
+            task = deepcopy(self.source_storage.get(task_id))
             task['completions'] = []
+        else:
+            task = deepcopy(task)
 
         # update old completion
         updated = False
@@ -475,7 +511,6 @@ class Project(object):
                 if item['id'] == completion['id']:
                     task['completions'][i].update(completion)
                     updated = True
-
         # write new completion
         if not updated:
             completion['id'] = task['id'] * 1000 + len(task['completions']) + 1
@@ -487,10 +522,12 @@ class Project(object):
             logger.error(exc, exc_info=True)
             logger.debug(json.dumps(completion, indent=2))
 
+        # save completion time
+        completion['created_at'] = timestamp_now()
+
         # write task + completions to file
-        filename = os.path.join(self.config['output_dir'], str(task_id) + '.json')
-        os.mkdir(self.config['output_dir']) if not os.path.exists(self.config['output_dir']) else ()
-        json.dump(task, open(filename, 'w'), indent=4, sort_keys=True)
+        self.target_storage.set(task_id, task)
+        logger.debug('Completion ' + str(task_id) + ' saved:\n' + json.dumps(task, indent=2))
         return completion['id']
 
     def delete_completion(self, task_id):
@@ -498,11 +535,8 @@ class Project(object):
 
         :param task_id: task id
         """
-        filename = os.path.join(self.config['output_dir'], str(task_id) + '.json')
-        os.remove(filename)
-
-        self.load_tasks()
-        self.load_derived_schemas()
+        self.target_storage.remove(task_id)
+        self.update_derived_output_schema()
 
     def make_predictions(self, task):
         task = deepcopy(task)
@@ -520,8 +554,8 @@ class Project(object):
 
     def train(self):
         completions = []
-        for f in self.iter_completions():
-            completions.append(json_load(f))
+        for _, c in self.target_storage.items():
+            completions.append(c)
         train_status = False
         if self.ml_backends_connected:
             for ml_backend in self.ml_backends:
@@ -544,7 +578,7 @@ class Project(object):
 
     @classmethod
     def _load_tasks(cls, input_path, args, label_config_file):
-        with io.open(label_config_file) as f:
+        with io.open(label_config_file, encoding='utf8') as f:
             label_config = f.read()
 
         task_loader = Tasks()
@@ -599,6 +633,8 @@ class Project(object):
         :return:
         """
         dir = cls.get_project_dir(project_name, args)
+        if args.force:
+            delete_dir_content(dir)
         os.makedirs(dir, exist_ok=True)
 
         config = json_load(args.config_path) if args.config_path else json_load(find_file('default_config.json'))
@@ -632,34 +668,53 @@ class Project(object):
 
         config['label_config'] = config_xml
 
-        # save tasks.json
-        tasks_json = 'tasks.json'
-        tasks_json_path = os.path.join(dir, tasks_json)
-        if input_path:
-            tasks = cls._load_tasks(input_path, args, config_xml_path)
+        if args.source:
+            config['source'] = {
+                'type': args.source,
+                'path': args.source_path,
+                'params': args.source_params
+            }
+        else:
+            # save tasks.json
+            tasks_json = 'tasks.json'
+            tasks_json_path = os.path.join(dir, tasks_json)
+            if input_path:
+                tasks = cls._load_tasks(input_path, args, config_xml_path)
+            else:
+                tasks = {}
             with io.open(tasks_json_path, mode='w') as fout:
                 json.dump(tasks, fout, indent=2)
-            print('{tasks_json_path} input file with {n} tasks has been created from {input_path}'.format(
+            config['input_path'] = tasks_json
+            config['source'] = {
+                'name': 'Tasks',
+                'type': 'tasks-json',
+                'path': os.path.abspath(tasks_json_path)
+            }
+            logger.debug('{tasks_json_path} input file with {n} tasks has been created from {input_path}'.format(
                 tasks_json_path=tasks_json_path, n=len(tasks), input_path=input_path))
-        else:
-            if os.path.exists(tasks_json_path) and not args.force:
-                already_exists_error('input path', tasks_json_path)
-            with io.open(tasks_json_path, mode='w') as fout:
-                json.dump({}, fout)
-            print(tasks_json_path + ' input path has been created with empty tasks.')
-        config['input_path'] = tasks_json
 
-        # create completions dir
-        completions_dir = os.path.join(dir, 'completions')
-        if os.path.exists(completions_dir) and not args.force:
-            already_exists_error('output dir', completions_dir)
-        if os.path.exists(completions_dir):
-            delete_dir_content(completions_dir)
-            print(completions_dir + ' output dir already exists. Clear it.')
+        if args.target:
+            config['target'] = {
+                'type': args.target,
+                'path': args.target_path,
+                'params': args.target_params
+            }
         else:
-            os.makedirs(completions_dir, exist_ok=True)
-            print(completions_dir + ' output dir has been created.')
-        config['output_dir'] = 'completions'
+            completions_dir = os.path.join(dir, 'completions')
+            if os.path.exists(completions_dir) and not args.force:
+                already_exists_error('output dir', completions_dir)
+            if os.path.exists(completions_dir):
+                delete_dir_content(completions_dir)
+                print(completions_dir + ' output dir already exists. Clear it.')
+            else:
+                os.makedirs(completions_dir, exist_ok=True)
+                print(completions_dir + ' output dir has been created.')
+            config['output_dir'] = 'completions'
+            config['target'] = {
+                'name': 'Completions',
+                'type': 'completions-dir',
+                'path': os.path.abspath(completions_dir)
+            }
 
         if 'ml_backends' not in config or not isinstance(config['ml_backends'], list):
             config['ml_backends'] = []
@@ -723,15 +778,29 @@ class Project(object):
             config = json.load(c)
 
         config['config_path'] = config_path
-        config['input_path'] = os.path.join(os.path.dirname(config_path), config['input_path'])
+        if config.get('input_path'):
+            config['input_path'] = os.path.join(os.path.dirname(config_path), config['input_path'])
         config['label_config'] = os.path.join(os.path.dirname(config_path), config['label_config'])
-        config['output_dir'] = os.path.join(os.path.dirname(config_path), config['output_dir'])
+        if config.get('output_dir'):
+            config['output_dir'] = os.path.join(os.path.dirname(config_path), config['output_dir'])
+        if not config.get('source'):
+            config['source'] = {
+                'name': 'Tasks',
+                'type': 'tasks-json',
+                'path': os.path.abspath(config['input_path'])
+            }
+        if not config.get('target'):
+            config['target'] = {
+                'name': 'Completions',
+                'type': 'completions-dir',
+                'path': os.path.abspath(config['output_dir'])
+            }
         return config
 
     @classmethod
     def _load_from_dir(cls, project_dir, project_name, args, context):
         config = cls._get_config(project_dir, args)
-        return cls(config, project_name, context)
+        return cls(config, project_name, context=context, root_dir=args.root_dir)
 
     @classmethod
     def get(cls, project_name, args, context):
@@ -769,6 +838,37 @@ class Project(object):
 
     def update_on_boarding_state(self):
         self.on_boarding['setup'] = self.config.get('label_config_updated', False)
-        self.on_boarding['import'] = len(self.tasks) > 0
-        self.on_boarding['labeled'] = len(os.listdir(self.config['output_dir'])) > 0
+        self.on_boarding['import'] = not self.no_tasks()
+        self.on_boarding['labeled'] = not self.target_storage.empty()
         return self.on_boarding
+
+    @property
+    def generate_sample_task_escape(self):
+        return self.project_obj.generate_sample_task_escape
+
+    @property
+    def supported_formats(self):
+        return self.project_obj.supported_formats
+
+    def serialize(self):
+        """ Serialize project to json dict
+        """
+        project = self
+        banlist = ('json', 'dir-jsons')
+        available_storages = list(filter(lambda i: i[0] not in banlist, get_available_storage_names().items()))
+
+        output = {
+            'project_name': project.name,
+            'task_count': len(project.source_storage.ids()),
+            'completion_count': len(project.get_completions_ids()),
+            'config': project.config,
+            'can_manage_tasks': project.can_manage_tasks,
+            'can_manage_completions': project.can_manage_completions,
+            'can_delete_tasks': project.can_delete_tasks,
+            'target_storage': {'readable_path': project.target_storage.readable_path},
+            'source_storage': {'readable_path': project.source_storage.readable_path},
+            'available_storages': available_storages,
+            'source_syncing': self.source_storage.is_syncing,
+            'target_syncing': self.target_storage.is_syncing
+        }
+        return output

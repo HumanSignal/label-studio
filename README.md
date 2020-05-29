@@ -4,7 +4,7 @@
 
 <br/>
 
-> **NEW** Release 0.6.0: Nested & Per-Region Labeling, Filtering & Cueing the active labels, read the [release notes](https://labelstud.io/blog/release-060-nested-data-labeling.html).
+> **NEW** Release 0.7.0 - Cloud Storage Enablement: read the [release notes](https://labelstud.io/blog/release-070-cloud-storage-enablement.html).
 
 **Label Studio is a swiss army knife of data labeling and annotation tools :v:**
  
@@ -203,13 +203,14 @@ Label Studio for Teams is our enterprise edition (cloud & on-prem), that include
 
 ```tex
 @misc{Label Studio,
-  title={{Label Studio}: A Swiss Army Knife of Data Labeling and Annotation Tools},
+  title={{Label Studio}: Data labeling software},
   url={https://github.com/heartexlabs/label-studio},
   note={Open source software available from https://github.com/heartexlabs/label-studio},
   author={
     Maxim Tkachenko and
     Mikhail Malyuk and
     Nikita Shevchenko and
+    Andrey Holmanyuk
     Nikolai Liubimov},
   year={2020},
 }

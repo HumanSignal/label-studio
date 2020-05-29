@@ -1,0 +1,88 @@
+<!-- Help message -->
+<div class="ui message">
+  <i class="close icon"></i>
+
+  <!-- Label config -->
+  <div class="ui accordion">
+    <div class="active title"><i class="dropdown icon"></i> Labeling config help</div>
+    <div class="active content">
+      <ul class="ui list">
+        <li>Labeling interface is based on html-like tags, read more in our
+          <a href="https://labelstud.io/tags" target="_blank">documentation</a>.
+        </li>
+        <li>You can fully customize the appearance and workflow by modifying Labeling Config.</li>
+        <li>Tag values can use variables that start with "$" sign,
+          and those correspond to the fields in imported tasks from JSON or CSV files.
+        </li>
+      </ul>
+      <div style="margin: 0.25em"></div>
+    </div>
+  </div>
+
+  {% if multi_session %}
+  <div class="ui accordion">
+    <div class="active title"><i class="dropdown icon"></i> Reset everything and start a new project</div>
+    <div class="active content">
+      <button onclick="new_project()" id="new-project-button"
+              class="ui button negative basic" style="height: 24px; padding-top: 5px; margin-left: 5px;">
+        Start new project
+      </button>
+      <div style="margin: 0.25em"></div>
+      <br/>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Basic Templates -->
+  {% for complexity in templates %}
+  <div class="ui accordion">
+    <div class="{{ 'active' if complexity == 'basic' else '' }} title">
+      <i class="dropdown icon"></i> {{complexity|capitalize}} config examples
+    </div>
+    <div class="{{ 'active' if complexity == 'basic' else '' }} content" style="margin-top:-8px">
+      <!-- Templates categories -->
+      <div class="ui grid stackable" style="margin: 0 auto;">
+        {% for category in templates[complexity] %}
+          <div class="three wide column category">
+            {% if category == 'audio' %} <i class="icon sound" title="Audio sources"></i> {% endif %}
+            {% if category == 'text' %} <i class="icon font" title="Text sources"></i> {% endif %}
+            {% if category == 'html' %} <i class="icon code" title="HTML sources"></i> {% endif %}
+            {% if category == 'image' %} <i class="icon image" title="Image sources"></i> {% endif %}
+            {% if category == 'other' %} <i class="icon archive" title="Other sources"></i> {% endif %}
+
+            {% if category == 'layouts' %} <i class="icon eye" title="View layout examples"></i> {% endif %}
+            {% if category == 'per-region' %} <i class="icon vector square" title="Per region examples"></i> {% endif %}
+            {% if category == 'nested' %} <i class="icon bullseye" title="Nested examples with conditional behaviour"></i> {% endif %}
+
+            <!-- Template -->
+            {% for t in templates[complexity][category] %}
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="{{ t.pk }}">{{ t.title }}</a>
+              </div>
+            {% endfor %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+
+</div>
+
+<br/>
+
+<script>
+  function new_project() {
+    let yes = confirm("You will lose ALL YOUR DATA, this action CAN'T BE UNDONE.\nAre you sure?");
+    if (yes) {
+      let request = new XMLHttpRequest();
+      request.open("POST", "api/project/?new=true", true);
+      request.onload = function () {
+        window.location.reload();
+      };
+      request.send(null);
+    }
+  }
+
+  $('.ui .accordion').accordion({collapsible: true});
+</script>

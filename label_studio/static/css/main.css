@@ -9,14 +9,31 @@ body {
 }
 
 table {
-    border: 1px solid #ccc;
-    margin: 0 auto;
     border-collapse: collapse;
+}
+
+table.responsive {
+
+}
+
+@media screen and (max-width: 768px) {
+    table.responsive tbody th,
+    table.responsive tbody td {
+        display: block;
+        border: none;
+    }
+    table tr {
+        border-top: 1px solid #ddd;
+    }
+}
+
+h1 {
+    font-weight: normal !important;
 }
 
 h2 {
     font-size: 1.2em;
-    font-weight: bold;
+    font-weight: normal !important;
 }
 
 td,
@@ -73,7 +90,7 @@ th {
 }
 
 .upper-right {
-    position:absolute;
+    position: absolute;
     top: 5px;
     right: 0;
 }
@@ -187,13 +204,12 @@ a {
     font-weight: bold;
 }
 
-.small {
-    font-size: 75%;
+.word-break {
     white-space: pre-wrap; /* css-3 */
     white-space: -moz-pre-wrap;
     white-space: -pre-wrap;
     white-space: -o-pre-wrap;
-    word-wrap: break-word;
+    word-wrap: break-word !important;
 }
 
 div.task-buttons .button {
@@ -285,20 +301,27 @@ div[class*="App_editor"] {
 
 /* semantic ui pretty */
 
-.ui .button {
-    font-weight: 400 !important;
+.ui .segment {
+    box-shadow: none !important;
 }
 
+.ui .button {
+    font-weight: 400 !important;
+    transition: background-color ease-in-out 0.25s, border ease-in-out 0.5s;
+}
 .ui .button.positive {
     background: rgb(24, 144, 255) !important;
     color: #fff !important;
     border-color: rgb(24, 144, 255) !important;
+    transition: background-color ease-in-out 0.25s;
 }
-
+.ui .button.positive:hover {
+    background: rgb(54, 162, 255) !important;
+    transition: background-color ease-in-out 0.25s;
+}
 .ui .button {
     transition: 0.3s;
 }
-
 .ui .button:hover {
     transition: 0.3s;
 }
@@ -316,6 +339,13 @@ div[class*="App_editor"] {
     box-shadow: 0 0 0 1px rgba(34, 36, 38, .15) !important;
 }
 
+.ui .message .header {
+    font-weight: normal !important;
+}
+
+.ui.message .content:first-of-type {
+    margin-top: 0 !important;
+}
 .ui .message .content {
     margin-top: 0.7em;
 }
@@ -326,12 +356,12 @@ div[class*="App_editor"] {
 }
 
 .ui ul li::before {
-  content: "\2022";
-  color: rgba(0,0,0,0.4) !important;
-  font-weight: normal;
-  display: inline-block;
-  width: 1em;
-  margin-left: -1em;
+    content: "\2022";
+    color: rgba(0, 0, 0, 0.4) !important;
+    font-weight: normal;
+    display: inline-block;
+    width: 1em;
+    margin-left: -1em;
 }
 
 .ui .label.basic {
@@ -341,6 +371,44 @@ div[class*="App_editor"] {
 .ui .x.icon {
     width: 2em;
     height: auto;
+}
+
+.ui .pagination.menu {
+    box-shadow: none;
+}
+
+.ui.modal {
+    box-shadow: none !important;
+}
+.ui.modal>.header {
+    font-weight: normal !important;
+    background: none;
+}
+.ui.modal>.actions {
+    background: none !important;
+    padding-top: 12px !important;
+    padding-bottom: 6px !important;;
+}
+.ui.modal>.icon.close {
+    color: #555;
+}
+
+.ui.form label {
+    font-weight: normal !important;
+}
+
+.ui.dimmer {
+    background-color: rgba(0,0,0,0.7) !important;
+}
+
+.ui.list .item.error {
+    color: #9f3a38;
+    margin-left: 1em;
+    font-size: 0.85em;
+}
+
+.ui .toast.error {
+    background-color: rgba(255, 0, 0, 0.85) !important;
 }
 
 /* semantic ui pretty finish */
@@ -370,6 +438,10 @@ pre {
 
 .statistic .value small {
     font-size: 65%;
+}
+.statistic .sub-label {
+    margin-top:7px;
+    color: #555;
 }
 
 
@@ -410,9 +482,27 @@ pre {
     #logo {
         display: none;
     }
+
     #header {
         height: 80px;
         display: flex;
         justify-content: center;
     }
+}
+
+.sup-button {
+    position: relative;
+    top: 2px;
+    cursor: pointer;
+    font-size: 0.75em;
+    color: rgb(24, 144, 255);
+    transition: background-color ease-in-out 0.25s;
+}
+.sup-button.big {
+    font-size: 1.25em !important;
+}
+
+.sup-button:hover {
+    color: rgb(54, 162, 255);
+    transition: background-color ease-in-out 0.25s;
 }

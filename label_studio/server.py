@@ -7,6 +7,7 @@ import flask
 import pandas as pd
 import logging
 import logging.config
+import traceback as tb
 
 try:
     import ujson as json
@@ -21,7 +22,9 @@ from uuid import uuid4
 from urllib.parse import unquote
 from datetime import datetime
 from inspect import currentframe, getframeinfo
-from flask import request, jsonify, make_response, Response, Response as HttpResponse, send_file, session, redirect
+from flask import (
+    request, jsonify, make_response, Response, Response as HttpResponse, send_file, session, redirect
+)
 from flask_api import status
 from types import SimpleNamespace
 
@@ -31,8 +34,13 @@ from label_studio.utils import uploader
 from label_studio.utils.validation import TaskValidator
 from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.functions import generate_sample_task_without_check
-from label_studio.utils.misc import exception_treatment, config_line_stripped, get_config_templates
+from label_studio.utils.misc import (
+    exception_treatment, exception_treatment_page,
+    config_line_stripped, get_config_templates, convert_string_to_hash, serialize_class
+)
 from label_studio.utils.argparser import parse_input_args
+from label_studio.utils.uri_resolver import resolve_task_data_uri
+from label_studio.storage import get_storage_form
 
 from label_studio.project import Project
 from label_studio.tasks import Tasks
@@ -43,6 +51,7 @@ app = flask.Flask(__name__, static_url_path='')
 
 app.secret_key = 'A0Zrdqwf1AQWj12ajkhgFN]dddd/,?RfDWQQT'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+app.config['WTF_CSRF_ENABLED'] = False
 
 # input arguments
 input_args = None
@@ -74,20 +83,14 @@ def project_get_or_create(multi_session_force_recreate=False):
 
         project_name = user + '/' + project
         return Project.get_or_create(project_name, input_args, context={
-            'user': user,
-            'project': project,
             'multi_session': True,
+            'user': convert_string_to_hash(user)
         })
     else:
         if multi_session_force_recreate:
             raise NotImplementedError(
                 '"multi_session_force_recreate" option supported only with "start-multi-session" mode')
-        user = project = input_args.project_name  # in standalone mode, user and project are singletons and consts
-        return Project.get_or_create(input_args.project_name, input_args, context={
-            'user': user,
-            'project': project,
-            'multi_session': False
-        })
+        return Project.get_or_create(input_args.project_name, input_args, context={'multi_session': False})
 
 
 @app.template_filter('json')
@@ -133,11 +136,12 @@ def validation_error_handler(error):
 
 
 @app.route('/')
+@exception_treatment_page
 def labeling_page():
     """ Label studio frontend: task labeling
     """
     project = project_get_or_create()
-    if len(project.tasks) == 0:
+    if project.no_tasks():
         return redirect('/welcome')
 
     # task data: load task or task with completions if it exists
@@ -145,12 +149,18 @@ def labeling_page():
     task_id = request.args.get('task_id', None)
 
     if task_id is not None:
-        task_data = project.get_task_with_completions(task_id) or project.get_task(task_id)
+        task_id = int(task_id)
+        # Task explore mode
+        task_data = project.get_task_with_completions(task_id) or project.source_storage.get(task_id)
+        task_data = resolve_task_data_uri(task_data)
+
         if project.ml_backends_connected:
             task_data = project.make_predictions(task_data)
+
     project.analytics.send(getframeinfo(currentframe()).function)
     return flask.render_template(
         'labeling.html',
+        project=project,
         config=project.config,
         label_config_line=project.label_config_line,
         task_id=task_id,
@@ -160,6 +170,7 @@ def labeling_page():
 
 
 @app.route('/welcome')
+@exception_treatment_page
 def welcome_page():
     """ Label studio frontend: task labeling
     """
@@ -169,37 +180,37 @@ def welcome_page():
     return flask.render_template(
         'welcome.html',
         config=project.config,
-        project=project.project_obj,
+        project=project,
         on_boarding=project.on_boarding
     )
 
 
-@app.route('/tasks')
+@app.route('/tasks', methods=['GET', 'POST'])
+@exception_treatment_page
 def tasks_page():
-    """ Tasks and completions page: tasks.html
+    """ Tasks and completions page
     """
-    project = project_get_or_create()
-
-    label_config = open(project.config['label_config']).read()  # load editor config from XML
-    task_ids = project.get_tasks().keys()
-    completed_at = project.get_completed_at(task_ids)
-
-    # sort by completed time
-    task_ids = sorted([(i, completed_at[i] if i in completed_at else '9') for i in task_ids], key=lambda x: x[1])
-    task_ids = [i[0] for i in task_ids]  # take only id back
-    project.analytics.send(getframeinfo(currentframe()).function)
-    return flask.render_template(
-        'tasks.html',
-        show_paths=input_args.command != 'start-multi-session',
-        config=project.config,
-        label_config=label_config,
-        task_ids=task_ids,
-        completions=project.get_completions_ids(),
-        completed_at=completed_at
-    )
+    try:
+        project = project_get_or_create()
+        serialized_project = project.serialize()
+        serialized_project['multi_session_mode'] = input_args.command != 'start-multi-session'
+        project.analytics.send(getframeinfo(currentframe()).function)
+        return flask.render_template(
+            'tasks.html',
+            project=project,
+            serialized_project=serialized_project
+        )
+    except Exception as e:
+        error = str(e)
+        traceback = tb.format_exc()
+        return flask.render_template(
+            'includes/error.html',
+            error=error, header="Project loading error", traceback=traceback
+        )
 
 
 @app.route('/setup')
+@exception_treatment_page
 def setup_page():
     """ Setup label config
     """
@@ -211,7 +222,7 @@ def setup_page():
     return flask.render_template(
         'setup.html',
         config=project.config,
-        project=project.project_obj,
+        project=project,
         label_config_full=project.label_config_full,
         templates=templates,
         input_values=input_values,
@@ -220,21 +231,22 @@ def setup_page():
 
 
 @app.route('/import')
+@exception_treatment_page
 def import_page():
     """ Import tasks from JSON, CSV, ZIP and more
     """
     project = project_get_or_create()
 
     project.analytics.send(getframeinfo(currentframe()).function)
-    project.project_obj.name = project.name
     return flask.render_template(
         'import.html',
         config=project.config,
-        project=project.project_obj
+        project=project
     )
 
 
 @app.route('/export')
+@exception_treatment_page
 def export_page():
     """ Export completions as JSON or using converters
     """
@@ -249,6 +261,7 @@ def export_page():
 
 
 @app.route('/model')
+@exception_treatment_page
 def model_page():
     """ Machine learning"""
     project = project_get_or_create()
@@ -448,19 +461,16 @@ def api_import():
     except ValidationError as e:
         return make_response(jsonify(e.msg_to_list()), status.HTTP_400_BAD_REQUEST)
 
-    # tasks are all in one file, append it
-    path = project.config['input_path']
-    old_tasks = json.load(open(path))
-    max_id_in_old_tasks = int(max(old_tasks.keys())) if old_tasks else -1
+    max_id_in_old_tasks = -1
+    if not project.no_tasks():
+        max_id_in_old_tasks = project.source_storage.max_id()
+
     new_tasks = Tasks().from_list_of_dicts(new_tasks, max_id_in_old_tasks + 1)
-    old_tasks.update(new_tasks)
+    project.source_storage.set_many(new_tasks.keys(), new_tasks.values())
 
-    with open(path, 'w') as f:
-        json.dump(old_tasks, f, ensure_ascii=False, indent=4)
-
-    # load new tasks and everything related
-    project.load_tasks()
-    project.load_derived_schemas()
+    # update schemas based on newly uploaded tasks
+    project.update_derived_input_schema()
+    project.update_derived_output_schema()
 
     duration = time.time() - start
     return make_response(jsonify({
@@ -473,6 +483,7 @@ def api_import():
 
 
 @app.route('/api/export', methods=['GET'])
+@exception_treatment
 def api_export():
     export_format = request.args.get('format')
     project = project_get_or_create()
@@ -504,17 +515,19 @@ def api_generate_next_task():
     # try to find task is not presented in completions
     completed_tasks_ids = project.get_completions_ids()
     task = project.next_task(completed_tasks_ids)
-    if not task:
+    if task is None:
         # no tasks found
         project.analytics.send(getframeinfo(currentframe()).function, error=404)
         return make_response('', 404)
+
+    task = resolve_task_data_uri(task)
 
     project.analytics.send(getframeinfo(currentframe()).function)
 
     # collect prediction from multiple ml backends
     if project.ml_backends_connected:
         task = project.make_predictions(task)
-
+    logger.debug('Next task:\n' + json.dumps(task, indent=2))
     return make_response(jsonify(task), 200)
 
 
@@ -523,12 +536,71 @@ def api_generate_next_task():
 def api_project():
     """ Project global operation"""
     project = project_get_or_create(multi_session_force_recreate=False)
+    code = 200
+
     if request.method == 'POST' and request.args.get('new', False):
         project = project_get_or_create(multi_session_force_recreate=True)
+        code = 201
     elif request.method == 'PATCH':
         project.update_params(request.json)
+        code = 201
+
+    output = project.serialize()
+    output['multi_session_mode'] = input_args.command != 'start-multi-session'
     project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
-    return make_response(jsonify({'project_name': project.name}), 201)
+    return make_response(jsonify(output), code)
+
+
+@app.route('/api/project/storage-settings', methods=['GET', 'POST'])
+@exception_treatment
+def api_project_storage_settings():
+    project = project_get_or_create()
+    project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
+
+    # GET: return selected form, populated with current storage parameters
+    if request.method == 'GET':
+        # render all forms for caching in web
+        all_forms = {'source': {}, 'target': {}}
+        for storage_for in all_forms:
+            for name, description in project.get_available_storage_names(storage_for).items():
+                current_type = project.config.get(storage_for, {'type': ''})['type']
+                current = name == current_type
+                form_class = get_storage_form(name)
+                form = form_class(data=project.get_storage(storage_for).get_params()) if current else form_class()
+                all_forms[storage_for][name] = {
+                    'fields': [serialize_class(field) for field in form],
+                    'type': name, 'current': current, 'description': description,
+                    'path': getattr(project, storage_for + '_storage').readable_path
+                }
+                # generate data key automatically
+                if project.data_types.keys():
+                    for field in all_forms[storage_for][name]['fields']:
+                        if field['name'] == 'data_key' and not field['data']:
+                            field['data'] = list(project.data_types.keys())[0]
+        return make_response(jsonify(all_forms), 200)
+
+    # POST: update storage given filled form
+    if request.method == 'POST':
+        selected_type = request.args.get('type', '')
+        storage_for = request.args.get('storage_for')
+        current_type = project.config.get(storage_for, {'type': ''})['type']
+        selected_type = selected_type if selected_type else current_type
+
+        form = get_storage_form(selected_type)(data=request.json)
+        if form.validate_on_submit():
+            storage_kwargs = dict(form.data)
+            storage_kwargs['type'] = request.json['type']  # storage type
+            try:
+                project.update_storage(storage_for, storage_kwargs)
+            except Exception as e:
+                traceback = tb.format_exc()
+                logger.error(str(traceback))
+                return make_response(jsonify({'detail': 'Error while storage update: ' + str(e)}), 400)
+            else:
+                return make_response(jsonify({'result': 'ok'}), 201)
+        else:
+            logger.error('Errors: ' + str(form.errors) + ' for request body ' + str(request.json))
+            return make_response(jsonify({'errors': form.errors}), 400)
 
 
 @app.route('/api/projects/1/task_ids/', methods=['GET'])
@@ -537,9 +609,49 @@ def api_all_task_ids():
     """ Get all tasks ids
     """
     project = project_get_or_create()
-    ids = sorted(project.get_task_ids())
+    ids = list(sorted(project.source_storage.ids()))
     project.analytics.send(getframeinfo(currentframe()).function)
     return make_response(jsonify(ids), 200)
+
+
+@app.route('/api/tasks', methods=['GET'])
+@exception_treatment
+def api_all_tasks():
+    """ Get full tasks with pagination, completions and predictions
+    """
+    project = project_get_or_create()
+    page, page_size = int(request.args.get('page', 1)), int(request.args.get('page_size', 10))
+    order = request.args.get('order', 'id')
+    if page < 1 or page_size < 1:
+        return make_response(jsonify({'detail': 'Incorrect page or page_size'}), 422)
+
+    order_inverted = order[0] == '-'
+    order = order[1:] if order_inverted else order
+    if order not in ['id', 'completed_at']:
+        return make_response(jsonify({'detail': 'Incorrect order'}), 422)
+
+    # get task ids and sort them by completed time
+    task_ids = project.source_storage.ids()
+    completed_at = project.get_completed_at(task_ids)
+
+    # ordering
+    pre_order = [{'id': i, 'completed_at': completed_at[i] if i in completed_at else "can't obtain"} for i in task_ids]
+    ordered = sorted(pre_order, key=lambda x: x[order])
+    ordered = ordered[::-1] if order_inverted else ordered
+    paginated = ordered[(page - 1) * page_size:page * page_size]
+
+    # get tasks with completions
+    tasks = []
+    for item in paginated:
+        i = item['id']
+        task = project.get_task_with_completions(i)
+        if task is None:  # no completion at task
+            task = project.source_storage.get(i)
+        else:
+            task['completed_at'] = item['completed_at']
+        tasks.append(task)
+
+    return make_response(jsonify(tasks), 200)
 
 
 @app.route('/api/tasks/<task_id>/', methods=['GET', 'DELETE'])
@@ -548,10 +660,10 @@ def api_tasks(task_id):
     """ Get task by id
     """
     # try to get task with completions first
+    task_id = int(task_id)
     project = project_get_or_create()
     if request.method == 'GET':
-        task_data = project.get_task_with_completions(task_id)
-        task_data = project.get_task(task_id) if task_data is None else task_data
+        task_data = project.get_task_with_completions(task_id) or project.source_storage.get(task_id)
         project.analytics.send(getframeinfo(currentframe()).function)
         return make_response(jsonify(task_data), 200)
     elif request.method == 'DELETE':
@@ -591,7 +703,7 @@ def api_completions(task_id):
     if request.method == 'POST':
         completion = request.json
         completion.pop('state', None)  # remove editor state
-        completion_id = project.save_completion(task_id, completion)
+        completion_id = project.save_completion(int(task_id), completion)
         project.analytics.send(getframeinfo(currentframe()).function)
         return make_response(json.dumps({'id': completion_id}), 201)
 
@@ -603,6 +715,7 @@ def api_completions(task_id):
 @app.route('/api/tasks/<task_id>/cancel', methods=['POST'])
 @exception_treatment
 def api_tasks_cancel(task_id):
+    task_id = int(task_id)
     project = project_get_or_create()
     skipped_completion = {
         'result': [],
@@ -623,7 +736,7 @@ def api_completion_by_id(task_id, completion_id):
 
     if request.method == 'DELETE':
         if project.config.get('allow_delete_completions', False):
-            project.delete_completion(task_id)
+            project.delete_completion(int(task_id))
             project.analytics.send(getframeinfo(currentframe()).function)
             return make_response('deleted', 204)
         else:
@@ -640,6 +753,7 @@ def api_completion_update(task_id, completion_id):
     """ Rewrite existing completion with patch.
         This is technical api call for editor testing only. It's used for Rewrite button in editor.
     """
+    task_id = int(task_id)
     project = project_get_or_create()
     completion = request.json
 
@@ -715,11 +829,10 @@ def api_predictions():
     if project.ml_backends_connected:
         # get tasks ids without predictions
         tasks_with_predictions = {}
-        for i in project.tasks.keys():
-            task_pred = project.make_predictions(project.tasks[i])
+        for task_id, task in project.source_storage.items():
+            task_pred = project.make_predictions(task)
             tasks_with_predictions[task_pred['id']] = task_pred
-        project.tasks = tasks_with_predictions
-        project._save_tasks()
+        project.source_storage.set_many(tasks_with_predictions.keys(), tasks_with_predictions.values())
 
         return make_response(jsonify({'details': 'Predictions done.'}), 200)
     else:
@@ -749,10 +862,18 @@ def str2datetime(timestamp_str):
     return datetime.utcfromtimestamp(ts).strftime('%c')
 
 
-def main():
+def start_browser(ls_url, no_browser):
     import threading
     import webbrowser
+    if no_browser:
+        return
 
+    browser_url = ls_url + '/welcome'
+    threading.Timer(2.5, lambda: webbrowser.open(browser_url)).start()
+    print('Start browser at URL: ' + browser_url)
+
+
+def main():
     global input_args
 
     app.jinja_env.filters['str2datetime'] = str2datetime
@@ -787,15 +908,22 @@ def main():
         config = Project.get_config(input_args.project_name, input_args)
         host = input_args.host or config.get('host', 'localhost')
         port = input_args.port or config.get('port', 8080)
-
         label_studio.utils.functions.HOSTNAME = 'http://localhost:' + str(port)
 
-        if not input_args.no_browser:
-            browser_url = label_studio.utils.functions.HOSTNAME + '/welcome'
-            threading.Timer(2.5, lambda: webbrowser.open(browser_url)).start()
-            print('Start browser at URL: ' + browser_url)
-
-        app.run(host=host, port=port, debug=input_args.debug)
+        try:
+            start_browser(label_studio.utils.functions.HOSTNAME, input_args.no_browser)
+            app.run(host=host, port=port, debug=input_args.debug)
+        except OSError as e:
+            # address already is in use
+            if e.errno == 98:
+                new_port = int(port) + 1
+                print('\n*** WARNING! ***\n* Port ' + str(port) + ' is in use.\n'
+                      '* Try to start at ' + str(new_port) + '\n****************\n')
+                label_studio.utils.functions.HOSTNAME = 'http://localhost:' + str(new_port)
+                start_browser(label_studio.utils.functions.HOSTNAME, input_args.no_browser)
+                app.run(host=host, port=new_port, debug=input_args.debug)
+            else:
+                raise e
 
     # On `start-multi-session` command, server creates one project per each browser sessions
     elif input_args.command == 'start-multi-session':

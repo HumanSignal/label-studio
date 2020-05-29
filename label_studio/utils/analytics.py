@@ -80,10 +80,10 @@ class Analytics(object):
         if not self._collect_analytics:
             return
         data = deepcopy(kwargs)
+        data.update(self._context)
         data['version'] = self._version
         data['label_types'] = self._label_types
         data['project'] = self._project_name
-        data.update(self._context)
         event_name = 'LS:' + str(event_name)
         try:
             mp.track(self._user_id, event_name, data)

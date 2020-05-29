@@ -11,6 +11,10 @@ from tempfile import mkstemp, mkdtemp
 from appdirs import user_config_dir, user_data_dir
 
 
+def good_path(path):
+    return os.path.abspath(os.path.expanduser(path))
+
+
 def find_node(package_name, node_path, node_type):
     assert node_type in ('dir', 'file', 'any')
     basedir = pkg_resources.resource_filename(package_name, '')
@@ -83,7 +87,7 @@ def get_data_dir():
 
 def delete_dir_content(dirpath):
     for f in glob.glob(dirpath + '/*'):
-        os.remove(f)
+        remove_file_or_dir(f)
 
 
 def remove_file_or_dir(path):
@@ -100,6 +104,10 @@ def iter_files(root_dir, ext):
                 yield os.path.join(root, f)
 
 
-def json_load(file):
+def json_load(file, int_keys=False):
     with io.open(file) as f:
-        return json.load(f)
+        data = json.load(f)
+        if int_keys:
+            return {int(k): v for k, v in data.items()}
+        else:
+            return data

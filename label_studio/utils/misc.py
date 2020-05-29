@@ -5,9 +5,15 @@ from flask import request, jsonify, make_response
 import json  # it MUST be included after flask!
 import pkg_resources
 import hashlib
+import calendar
+import pytz
+import flask
 
-from collections import defaultdict
+from json import JSONEncoder
+from collections import defaultdict, OrderedDict
 from lxml import etree, objectify
+from datetime import datetime
+from dateutil.tz import tzlocal
 
 from .io import find_dir
 
@@ -30,7 +36,7 @@ def answer(status=0, msg='', result=None):
     if status == 200 and not msg:
         msg = 'ok'
 
-    a = {"status": status, "msg": msg}
+    a = {"status": status, "detail": msg}
     a.update({'request': request.args})
 
     if result is not None:
@@ -69,6 +75,23 @@ def exception_treatment(f):
             if hasattr(exception_f, 'request_id'):
                 body['request_id'] = exception_f.request_id
             return answer(500, str(e), body)
+
+    exception_f.__name__ = f.__name__
+    return exception_f
+
+
+# standard exception treatment for any page function
+def exception_treatment_page(f):
+    def exception_f(*args, **kwargs):
+        try:
+            return f(*args, **kwargs)
+        except Exception as e:
+            error = str(e)
+            traceback = tb.format_exc()
+            logger.debug(traceback)
+            return flask.render_template(
+                'includes/error.html',
+                error=error, header="Project loading error", traceback=traceback)
 
     exception_f.__name__ = f.__name__
     return exception_f
@@ -220,3 +243,44 @@ def get_config_templates():
 
 def convert_string_to_hash(string):
     return hashlib.md5(string.encode()).hexdigest()
+
+
+def datetime_to_timestamp(dt):
+    if dt.tzinfo:
+        dt = dt.astimezone(pytz.UTC)
+    return calendar.timegm(dt.timetuple())
+
+
+def timestamp_to_datetime(timestamp, tz=pytz.UTC):
+    return datetime.fromtimestamp(timestamp, tz)
+
+
+def timestamp_to_local_datetime(timestamp):
+    return timestamp_to_datetime(timestamp, tzlocal())
+
+
+def timestamp_now():
+    return datetime_to_timestamp(datetime.utcnow())
+
+
+def serialize_class(class_instance, keys=None):
+    """ Serialize class instance
+
+    param keys: list of fields to serialize
+    """
+    keys = [d for d in dir(class_instance) if not d.startswith('_')] \
+        if keys is None else keys
+
+    # execute fields
+    dictionary = {key: getattr(class_instance, key) for key in keys}
+
+    # convert fields
+    output = OrderedDict()
+    for key in keys:
+        value = dictionary[key]
+        if isinstance(value, str) or isinstance(value, bool) \
+                or isinstance(value, int) or isinstance(value, float) \
+                or value is None:
+            output[key] = dictionary[key]
+
+    return output

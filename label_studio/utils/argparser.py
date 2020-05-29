@@ -1,4 +1,5 @@
 import os
+import json
 
 from label_studio.utils.io import find_dir
 from label_studio.utils.misc import iter_config_templates
@@ -11,6 +12,7 @@ def parse_input_args():
     """
     import sys
     import argparse
+    from label_studio.project import Project
 
     if len(sys.argv) == 1:
         print('\nQuick start usage: label-studio start my_project --init\n')
@@ -25,6 +27,9 @@ def parse_input_args():
 
     root_parser = argparse.ArgumentParser(add_help=False)
     root_parser.add_argument(
+        '--version', dest='version', action='store_true',
+        help='Show Label Studio version')
+    root_parser.add_argument(
         '-b', '--no-browser', dest='no_browser', action='store_true',
         help='Do not open browser at label studio start')
     root_parser.add_argument(
@@ -32,10 +37,10 @@ def parse_input_args():
         help='Debug mode for Flask', default=None)
     root_parser.add_argument(
         '--force', dest='force', action='store_true',
-        help='Force creation new resources if exist')
+        help='Force overwrite existing files')
     root_parser.add_argument(
         '--root-dir', dest='root_dir', default='.',
-        help='Projects root directory')
+        help='Project root directory')
     root_parser.add_argument(
         '-v', '--verbose', dest='verbose', action='store_true',
         help='Increase output verbosity')
@@ -50,14 +55,32 @@ def parse_input_args():
         help='Label config path')
     root_parser.add_argument(
         '-i', '--input-path', dest='input_path', type=valid_filepath,
-        help='Input path to task file or directory with tasks')
+        help='Input path for task file or directory with tasks')
+    root_parser.add_argument(
+        '-s', '--source', dest='source', choices=Project.get_available_source_storages(),
+        help='Source data storage type')
+    root_parser.add_argument(
+        '--source-path', dest='source_path',
+        help='Source bucket name')
+    root_parser.add_argument(
+        '--source-params', dest='source_params', type=json.loads, default={},
+        help='JSON string representing source parameters')
+    root_parser.add_argument(
+        '-t', '--target', dest='target', choices=Project.get_available_target_storages(),
+        help='Target data storage type')
+    root_parser.add_argument(
+        '--target-path', dest='target_path',
+        help='Target bucket name')
+    root_parser.add_argument(
+        '--target-params', dest='target_params', type=json.loads, default={},
+        help='JSON string representing target parameters')
     root_parser.add_argument(
         '--input-format', dest='input_format',
         choices=('json', 'json-dir', 'text', 'text-dir', 'image-dir', 'audio-dir'), default='json',
         help='Input tasks format. Unless you are using "json" or "json-dir" format, --label-config option is required')
     root_parser.add_argument(
         '-o', '--output-dir', dest='output_dir', type=valid_filepath,
-        help='Output directory for completions')
+        help='Output directory for completions (unless cloud storage is used)')
     root_parser.add_argument(
         '--ml-backends', dest='ml_backends', nargs='+',
         help='Machine learning backends URLs')
@@ -86,6 +109,8 @@ def parse_input_args():
 
     # init sub-command parser
 
+    parser_version = subparsers.add_parser('version', help='Print version info', parents=[root_parser])
+
     parser_init = subparsers.add_parser('init', help='Initialize Label Studio', parents=[root_parser])
     parser_init.add_argument(
         'project_name',
@@ -107,6 +132,12 @@ def parse_input_args():
         'start-multi-session', help='Start Label Studio server', parents=[root_parser])
 
     args = parser.parse_args()
+
+    # print version
+    if args.version or args.command == 'version':
+        from label_studio import __version__
+        print('\nLabel Studio version:', __version__, '\n')
+
     if args.output_dir is not None:
         raise RuntimeError('"--output-dir" option is deprecated and has no effect.\n'
                            'All output results are saved to project_name/completions directory')

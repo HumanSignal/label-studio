@@ -172,7 +172,7 @@ const LSB = function(elid, config, task) {
     return body;
   };
 
-  return new LabelStudio(elid, {
+  var LS = new LabelStudio(elid, {
     config: config,
     user: { pk: 1, firstName: "Awesome", lastName: "User" },
 
@@ -276,4 +276,13 @@ const LSB = function(elid, config, task) {
       }
     },
   });
+
+    // TODO WIP here, we will move that code to the SDK
+    var sdk = {
+        "loadNext": function () { loadNext(LS) },        
+    };
+    
+    LS._sdk = sdk;
+    
+    return LS;
 };
