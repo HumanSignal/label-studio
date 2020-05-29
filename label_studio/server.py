@@ -853,10 +853,18 @@ def str2datetime(timestamp_str):
     return datetime.utcfromtimestamp(ts).strftime('%c')
 
 
-def main():
+def start_browser(ls_url, no_browser):
     import threading
     import webbrowser
+    if no_browser:
+        return
 
+    browser_url = ls_url + '/welcome'
+    threading.Timer(2.5, lambda: webbrowser.open(browser_url)).start()
+    print('Start browser at URL: ' + browser_url)
+
+
+def main():
     global input_args
 
     app.jinja_env.filters['str2datetime'] = str2datetime
@@ -891,15 +899,22 @@ def main():
         config = Project.get_config(input_args.project_name, input_args)
         host = input_args.host or config.get('host', 'localhost')
         port = input_args.port or config.get('port', 8080)
-
         label_studio.utils.functions.HOSTNAME = 'http://localhost:' + str(port)
 
-        if not input_args.no_browser:
-            browser_url = label_studio.utils.functions.HOSTNAME + '/welcome'
-            threading.Timer(2.5, lambda: webbrowser.open(browser_url)).start()
-            print('Start browser at URL: ' + browser_url)
-
-        app.run(host=host, port=port, debug=input_args.debug)
+        try:
+            start_browser(label_studio.utils.functions.HOSTNAME, input_args.no_browser)
+            app.run(host=host, port=port, debug=input_args.debug)
+        except OSError as e:
+            # address already is in use
+            if e.errno == 98:
+                new_port = int(port) + 1
+                print('\n*** WARNING! ***\n* Port ' + str(port) + ' is in use.\n'
+                      '* Try to start at ' + str(new_port) + '\n****************\n')
+                label_studio.utils.functions.HOSTNAME = 'http://localhost:' + str(new_port)
+                start_browser(label_studio.utils.functions.HOSTNAME, input_args.no_browser)
+                app.run(host=host, port=new_port, debug=input_args.debug)
+            else:
+                raise e
 
     # On `start-multi-session` command, server creates one project per each browser sessions
     elif input_args.command == 'start-multi-session':

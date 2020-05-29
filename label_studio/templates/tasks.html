@@ -154,8 +154,11 @@
                 <div class="center aligned action-buttons">
                   <!-- Sampling -->
                   <span style="padding-top: 8px; padding-bottom: 11px;"
-                        data-tooltip="Selecting which task to take next. Edit config file to change">
-                    Tasks sampling:&nbsp;<span class="ui label">{{ project.config['sampling'] }}</span>
+                        data-tooltip="Tasks sampling: selecting which task to take next in labeling. Edit project config file to change">
+                    <span class="ui icon label">
+                      <i class="ui icon far shuffle"></i>
+                      {{ project.config['sampling'] }}
+                    </span>
                   </span>                  
                   <!-- Start labeling -->
                   <a class="ui button positive" href="/">Start Labeling</a>                                    
@@ -202,7 +205,8 @@
 
           <!-- Broken task -->
           <tr v-if="task == null" class="text-center" v-for="task in tasks">
-            <td colspan="2"><small>broken task [backend returns null, check storage settings (may be you forgot to activate "Generate task data with URLs..." checkbox on storage settings?)]</small></td>
+            <td colspan="2"><small>broken task [backend returns null, check storage settings,
+              may be you forgot "Generate task data with URLs ..." checkbox on source storage settings?]</small></td>
           </tr>
 
           <!-- Correct task -->
@@ -276,7 +280,9 @@
 
         <a class="item" :class="{'active': page<totalPages, 'disabled': page>=totalPages}"
            @click="page<totalPages ? page++: page">Next</a>
-      </div>
+      </div> <!-- pagination -->
+      <span class="ui loader active blue tiny inline"
+            :style="{opacity: tasks_loaded ? 0: 0.5, 'margin-left': '10px'}"></span>
       
       <br/>
     </div>
@@ -322,6 +328,7 @@
                   // internal variables
                   vue_loaded: false,
                   project_loaded: false,
+                  tasks_loaded: false,
                   page: 1,
                   page_size: 10,
                   order: 'id',
@@ -368,13 +375,20 @@
               // get tasks from api
               loadTasks: function () {
                   var root = this;
+                  root.tasks_loaded = false;
                   this.getApi('tasks', '/api/tasks?page=' + this.page +
                                        '&page_size=' + parseInt(this.page_size) +
                                        '&order=' + this.order, null,
                       // fail
                       function(data) {
                         root.showError('Tasks loading error', message_from_response(data))
-                      });
+                      },
+
+                      // always
+                      function(data) {
+                        root.tasks_loaded = true;
+                      }
+                  );
               },
 
               // get project info from api

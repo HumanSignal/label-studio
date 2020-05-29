@@ -68,7 +68,7 @@ If set true, the local copy of the remote storage will be created.
 
 #### use_blob_urls
 
-Generate task data with URLs pointed to your bucket objects(for resources like jpg, mp3, etc). If not selected, bucket objects will be interpreted as tasksin Label Studio JSON format, one object per task.
+Generate task data with URLs pointed to your bucket objects(for resources like jpg, mp3, etc). If not selected, bucket objects will be interpreted as tasks in Label Studio JSON format, one object per task.
 
 
 ## Google Cloud Storage
@@ -122,4 +122,4 @@ If set true, the local copy of the remote storage will be created.
 
 #### use_blob_urls
 
-Generate task data with URLs pointed to your bucket objects(for resources like jpg, mp3, etc). If not selected, bucket objects will be interpreted as tasksin Label Studio JSON format, one object per task.
+Generate task data with URLs pointed to your bucket objects(for resources like jpg, mp3, etc). If not selected, bucket objects will be interpreted as tasks in Label Studio JSON format, one object per task.
