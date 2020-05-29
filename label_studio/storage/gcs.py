@@ -52,7 +52,7 @@ class GCSStorage(CloudStorage):
 
 class GCSCompletionsStorageForm(BaseForm):
     prefix = StringField('Prefix', [Optional()], description='GCS Bucket prefix')
-    create_local_copy = BooleanField('Create local copy', description='Create a local copy on your disk')
+    create_local_copy = BooleanField('Create local copy', description='Create a local copy on your disk', default=True)
 
     bound_params = dict(
         prefix='prefix',
