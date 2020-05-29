@@ -35,11 +35,12 @@ from label_studio.utils.validation import TaskValidator
 from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.functions import generate_sample_task_without_check
 from label_studio.utils.misc import (
-    exception_treatment, config_line_stripped, get_config_templates, convert_string_to_hash, serialize_class
+    exception_treatment, exception_treatment_page,
+    config_line_stripped, get_config_templates, convert_string_to_hash, serialize_class
 )
 from label_studio.utils.argparser import parse_input_args
 from label_studio.utils.uri_resolver import resolve_task_data_uri
-from label_studio.storage import get_available_storage_names, get_storage_form
+from label_studio.storage import get_storage_form
 
 from label_studio.project import Project
 from label_studio.tasks import Tasks
@@ -135,6 +136,7 @@ def validation_error_handler(error):
 
 
 @app.route('/')
+@exception_treatment_page
 def labeling_page():
     """ Label studio frontend: task labeling
     """
@@ -168,6 +170,7 @@ def labeling_page():
 
 
 @app.route('/welcome')
+@exception_treatment_page
 def welcome_page():
     """ Label studio frontend: task labeling
     """
@@ -183,6 +186,7 @@ def welcome_page():
 
 
 @app.route('/tasks', methods=['GET', 'POST'])
+@exception_treatment_page
 def tasks_page():
     """ Tasks and completions page
     """
@@ -206,6 +210,7 @@ def tasks_page():
 
 
 @app.route('/setup')
+@exception_treatment_page
 def setup_page():
     """ Setup label config
     """
@@ -226,6 +231,7 @@ def setup_page():
 
 
 @app.route('/import')
+@exception_treatment_page
 def import_page():
     """ Import tasks from JSON, CSV, ZIP and more
     """
@@ -240,6 +246,7 @@ def import_page():
 
 
 @app.route('/export')
+@exception_treatment_page
 def export_page():
     """ Export completions as JSON or using converters
     """
@@ -254,6 +261,7 @@ def export_page():
 
 
 @app.route('/model')
+@exception_treatment_page
 def model_page():
     """ Machine learning"""
     project = project_get_or_create()

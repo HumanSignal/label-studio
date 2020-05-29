@@ -7,6 +7,7 @@ import pkg_resources
 import hashlib
 import calendar
 import pytz
+import flask
 
 from json import JSONEncoder
 from collections import defaultdict, OrderedDict
@@ -74,6 +75,23 @@ def exception_treatment(f):
             if hasattr(exception_f, 'request_id'):
                 body['request_id'] = exception_f.request_id
             return answer(500, str(e), body)
+
+    exception_f.__name__ = f.__name__
+    return exception_f
+
+
+# standard exception treatment for any page function
+def exception_treatment_page(f):
+    def exception_f(*args, **kwargs):
+        try:
+            return f(*args, **kwargs)
+        except Exception as e:
+            error = str(e)
+            traceback = tb.format_exc()
+            logger.debug(traceback)
+            return flask.render_template(
+                'includes/error.html',
+                error=error, header="Project loading error", traceback=traceback)
 
     exception_f.__name__ = f.__name__
     return exception_f
