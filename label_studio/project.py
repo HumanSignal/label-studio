@@ -844,6 +844,10 @@ class Project(object):
     def generate_sample_task_escape(self):
         return self.project_obj.generate_sample_task_escape
 
+    @property
+    def supported_formats(self):
+        return self.project_obj.supported_formats
+
     def serialize(self):
         """ Serialize project to json dict
         """
