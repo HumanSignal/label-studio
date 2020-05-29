@@ -106,8 +106,10 @@ class Project(object):
     def create_storages(self):
         source = self.config['source']
         target = self.config['target']
-        self.source_storage = create_storage(source['type'], source['path'], self.path, **source.get('params', {}))
-        self.target_storage = create_storage(target['type'], target['path'], self.path, **target.get('params', {}))
+        self.source_storage = create_storage(source['type'], source['path'], self.path, self,
+                                             **source.get('params', {}))
+        self.target_storage = create_storage(target['type'], target['path'], self.path, self,
+                                             **target.get('params', {}))
 
     def update_storage(self, storage_for, storage_kwargs):
 
@@ -116,7 +118,7 @@ class Project(object):
             storage_type = storage_kwargs.pop('type')
             # storage_path = storage_kwargs.pop('path', None)
             storage_path = self.config[storage_for]['path']
-            storage = create_storage(storage_type, storage_path, self.path, **storage_kwargs)
+            storage = create_storage(storage_type, storage_path, self.path, self, **storage_kwargs)
             self.config[storage_for] = {
                 'name': storage_name,
                 'type': storage_type,

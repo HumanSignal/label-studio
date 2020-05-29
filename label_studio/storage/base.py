@@ -29,10 +29,10 @@ def get_storage_form(storage_type):
     return _storage[storage_type].form
 
 
-def create_storage(storage_type, path, project_path=None, **kwargs):
+def create_storage(storage_type, path, project_path=None, project=None, **kwargs):
     if storage_type not in _storage:
         raise NotImplementedError('Can\'t create storage "{}"'.format(storage_type))
-    return _storage[storage_type](path=path, project_path=project_path, **kwargs)
+    return _storage[storage_type](path=path, project_path=project_path, project=project, **kwargs)
 
 
 def get_available_storage_names():
@@ -58,9 +58,10 @@ class BaseStorage(ABC):
     form = BaseStorageForm
     description = 'Base Storage'
 
-    def __init__(self, path, project_path=None, **kwargs):
+    def __init__(self, path, project_path=None, project=None, **kwargs):
         self.path = path
         self.project_path = project_path
+        self.project = project
         self.form_class = BaseStorageForm
 
     def get_params(self):
@@ -68,6 +69,16 @@ class BaseStorage(ABC):
             form_param: getattr(self, storage_param)
             for form_param, storage_param in self.form.bound_params.items()
         }
+
+    def set_project(self, project):
+        self.project = project
+
+    @property
+    def default_data_key(self):
+        if self.project is not None:
+            if self.project.data_types.keys():
+                return list(self.project.data_types.keys())[0]
+        return ''
 
     @property
     @abstractmethod
@@ -133,10 +144,11 @@ class CloudStorageForm(BaseForm):
     prefix = StringField('Prefix', [Optional()], description='File prefix')
     regex = StringField('Regex', [IsValidRegex()], description='File filter by regex, example: .*jpe?g')
     data_key = StringField('Data key', [InputRequired()], description='Task tag key from your label config')
-    use_blob_urls = BooleanField('Use BLOBs URLs', description='Generate task data with URLs pointed to your bucket '
-                                                               'objects(for resources like jpg, mp3, other BLOBs). \n'
-                                                               'If not selected, bucket objects will be interpreted as '
-                                                               'tasks in Label Studio JSON format, one object per task')
+    use_blob_urls = BooleanField('Use BLOBs URLs', default=True,
+                                 description='Generate task data with URLs pointed to your bucket '
+                                             'objects(for resources like jpg, mp3, other BLOBs). \n'
+                                             'If not selected, bucket objects will be interpreted as '
+                                             'tasks in Label Studio JSON format, one object per task')
     bound_params = dict(
         prefix='prefix',
         regex='regex',
