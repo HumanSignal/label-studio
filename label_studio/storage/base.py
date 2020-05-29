@@ -63,6 +63,7 @@ class BaseStorage(ABC):
         self.project_path = project_path
         self.project = project
         self.form_class = BaseStorageForm
+        self.is_syncing = False
 
     def get_params(self):
         return {
