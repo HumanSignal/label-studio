@@ -57,7 +57,7 @@ class S3Storage(CloudStorage):
 
 class S3CompletionsStorageForm(BaseForm):
     prefix = StringField('Prefix', [Optional()], description='S3 Bucket prefix')
-    create_local_copy = BooleanField('Create local copy', description='Create a local copy on your disk')
+    create_local_copy = BooleanField('Create local copy', description='Create a local copy on your disk', default=True)
 
     bound_params = dict(
         prefix='prefix',
