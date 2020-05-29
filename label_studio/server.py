@@ -569,7 +569,8 @@ def api_project_storage_settings():
                 form = form_class(data=project.get_storage(storage_for).get_params()) if current else form_class()
                 all_forms[storage_for][name] = {
                     'fields': [serialize_class(field) for field in form],
-                    'type': name, 'current': current, 'description': description
+                    'type': name, 'current': current, 'description': description,
+                    'path': getattr(project, storage_for + '_storage').readable_path
                 }
                 # generate data key automatically
                 if project.data_types.keys():

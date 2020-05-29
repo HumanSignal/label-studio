@@ -9,9 +9,14 @@
   <!-- Header -->
   <div class="header">
     <i class="fas" style="opacity: 0.65"
-       :class="{'fa-cloud-download-alt': storage_for=='source', 'fa-cloud-upload-alt': storage_for=='target'}"></i>
+       :class="{'fa-cloud-download-alt': storage_for=='source', 'fa-cloud-upload-alt': storage_for=='target'}"
+       v-if="!storage.type_loading"
+    ></i>
+    <i :class="{active: storage.type_loading}" class="ui loader inline mini grey"></i>
     &nbsp;{{ capitalizeFirstLetter(storage_for) }} storage: {{ storage.description }}
-    &nbsp;<div :class="{active: storage.type_loading}" class="ui loader inline mini grey"></div>
+
+    <br/>
+    <small style="margin-left: 2.2em; color:#555">{{ storage.path }}</small>
   </div>
 
   <!-- Content -->
