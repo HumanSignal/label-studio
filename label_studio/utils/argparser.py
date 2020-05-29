@@ -36,10 +36,10 @@ def parse_input_args():
         help='Debug mode for Flask', default=None)
     root_parser.add_argument(
         '--force', dest='force', action='store_true',
-        help='Force creation new resources if exist')
+        help='Force overwrite existing files')
     root_parser.add_argument(
         '--root-dir', dest='root_dir', default='.',
-        help='Projects root directory')
+        help='Project root directory')
     root_parser.add_argument(
         '-v', '--verbose', dest='verbose', action='store_true',
         help='Increase output verbosity')
@@ -54,28 +54,28 @@ def parse_input_args():
         help='Label config path')
     root_parser.add_argument(
         '-i', '--input-path', dest='input_path', type=valid_filepath,
-        help='Input path to task file or directory with tasks')
+        help='Input path for task file or directory with tasks')
     root_parser.add_argument(
         '-s', '--source', dest='source',
-        help='Source data storage')
+        help='Source data storage type {s3,gcs}')
     root_parser.add_argument(
         '--source-path', dest='source_path',
-        help='Source data storage path')
+        help='Source bucket name')
     root_parser.add_argument(
         '--source-name', dest='source_name', default='Tasks',
-        help='Source data storage name')
+        help='Source key prefix')
     root_parser.add_argument(
         '--source-params', dest='source_params', type=json.loads, default={},
         help='JSON string representing source parameters')
     root_parser.add_argument(
         '-t', '--target', dest='target',
-        help='Target data storage')
+        help='Target data storage type {s3,gcs}')
     root_parser.add_argument(
         '--target-path', dest='target_path',
-        help='Target data storage path')
+        help='Target bucket name')
     root_parser.add_argument(
         '--target-name', dest='target_name', default='Completions',
-        help='Target data storage name')
+        help='Target key prefix')
     root_parser.add_argument(
         '--target-params', dest='target_params', type=json.loads, default={},
         help='JSON string representing target parameters')
@@ -85,7 +85,7 @@ def parse_input_args():
         help='Input tasks format. Unless you are using "json" or "json-dir" format, --label-config option is required')
     root_parser.add_argument(
         '-o', '--output-dir', dest='output_dir', type=valid_filepath,
-        help='Output directory for completions')
+        help='Output directory for completions (unless cloud storage is used)')
     root_parser.add_argument(
         '--ml-backends', dest='ml_backends', nargs='+',
         help='Machine learning backends URLs')
