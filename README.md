@@ -4,7 +4,7 @@
 
 <br/>
 
-> **NEW** Release 0.6.0: Nested & Per-Region Labeling, Filtering & Cueing the active labels, read the [release notes](https://labelstud.io/blog/release-060-nested-data-labeling.html).
+> **NEW** Release 0.7.0: read the [release notes](https://labelstud.io/blog/release-070.html).
 
 **Label Studio is a swiss army knife of data labeling and annotation tools :v:**
  

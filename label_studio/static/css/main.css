@@ -343,9 +343,6 @@ div[class*="App_editor"] {
     font-weight: normal !important;
 }
 
-.ui .message .icon {
-    opacity: 0.1 !important;
-}
 .ui.message .content:first-of-type {
     margin-top: 0 !important;
 }
