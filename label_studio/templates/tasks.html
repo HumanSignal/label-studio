@@ -107,7 +107,8 @@
                 <div style="margin-top: 7px">
                   <!-- Storage settings -->
                   <span data-tooltip="Change source storage filter">
-                    <i class="fas fa-cloud-download-alt sup-button big" @click="storage_settings.source.show=true"></i>
+                    <i class="fas fa-cloud-download-alt sup-button big"
+                       @click="loadStorageSettings(); storage_settings.source.show=true"></i>
                   </span>
                   <!-- Delete tasks -->
                   <span v-if="project.can_delete_tasks">
@@ -145,7 +146,8 @@
                 <!-- Controls -->
                 <div style="margin-top: 7px">
                   <span data-tooltip="Change target storage">
-                    <i class="fas fa-cloud-upload-alt sup-button big" @click="storage_settings.target.show=true"></i>
+                    <i class="fas fa-cloud-upload-alt sup-button big"
+                       @click="loadStorageSettings(); storage_settings.target.show=true"></i>
                   </span>
                 </div>
               </div>

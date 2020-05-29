@@ -468,7 +468,7 @@ class Project(object):
             try:
                 latest_time = max(data['completions'], key=itemgetter('created_at'))['created_at']
             except Exception as exc:
-                times[id] = None
+                times[id] = 'undefined'
             else:
                 times[id] = timestamp_to_local_datetime(latest_time).strftime('%Y-%m-%d %H:%M:%S')
         return times
