@@ -169,6 +169,7 @@ class CloudStorage(BaseStorage):
         os.makedirs(self.objects_dir, exist_ok=True)
 
         self.last_sync_time = None
+        self.is_syncing = False
         self.sync_period_in_sec = 30
 
         self._ids_keys_map = {}
@@ -297,6 +298,7 @@ class CloudStorage(BaseStorage):
     def _sync(self):
         with self.thread_lock:
             self.last_sync_time = datetime.now()
+            self.is_syncing = True
 
         new_id = self.max_id() + 1
         new_ids_keys_map = {}
@@ -323,6 +325,7 @@ class CloudStorage(BaseStorage):
             self._ids_keys_map.update(new_ids_keys_map)
             self._keys_ids_map.update(new_keys_ids_map)
             self._save_ids()
+            self.is_syncing = False
 
     @abstractmethod
     def _get_objects(self):
