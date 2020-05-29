@@ -37,7 +37,8 @@ class S3Storage(CloudStorage):
 
     def _get_value_url(self, key):
         bucket = self.client['bucket']
-        return {self.data_key: 's3://' + bucket.name + '/' + key}
+        data_key = self.data_key if self.data_key else self.default_data_key
+        return {data_key: 's3://' + bucket.name + '/' + key}
 
     def _set_value(self, key, value):
         if not isinstance(value, str):

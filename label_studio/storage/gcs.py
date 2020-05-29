@@ -40,7 +40,8 @@ class GCSStorage(CloudStorage):
         return json.loads(blob_str)
 
     def _get_value_url(self, key):
-        return {self.data_key: 'gs://' + self.path + '/' + key}
+        data_key = self.data_key if self.data_key else self.default_data_key
+        return {data_key: 'gs://' + self.path + '/' + key}
 
     def _set_value(self, key, value):
         if not isinstance(value, str):

@@ -99,12 +99,16 @@
                 <span class="label">Tasks</span>
                 <span class="sub-label">
                   <i class="word-break" v-if="project.multi_session_mode">{{ project.source_storage.readable_path }}</i>
+                  <span data-tooltip="Source storage sync in progress">
+                    <i class="ui loader loading active inline mini" v-if="project.source_syncing"></i>
+                  </span>
                 </span>
                 <!-- Controls -->
                 <div style="margin-top: 7px">
                   <!-- Storage settings -->
                   <span data-tooltip="Change source storage filter">
-                    <i class="fas fa-cloud-download-alt sup-button big" @click="storage_settings.source.show=true"></i>
+                    <i class="fas fa-cloud-download-alt sup-button big"
+                       @click="loadStorageSettings(); storage_settings.source.show=true"></i>
                   </span>
                   <!-- Delete tasks -->
                   <span v-if="project.can_delete_tasks">
@@ -135,11 +139,15 @@
                 <span class="label">Completions</span>
                 <span class="sub-label">
                   <i class="word-break" v-if="project.multi_session_mode">{{ project.target_storage.readable_path }}</i>
+                  <span data-tooltip="Target storage sync in progress">
+                    <i class="ui loader loading active inline mini" v-if="project.target_syncing"></i>
+                  </span>
                 </span>
                 <!-- Controls -->
                 <div style="margin-top: 7px">
                   <span data-tooltip="Change target storage">
-                    <i class="fas fa-cloud-upload-alt sup-button big" @click="storage_settings.target.show=true"></i>
+                    <i class="fas fa-cloud-upload-alt sup-button big"
+                       @click="loadStorageSettings(); storage_settings.target.show=true"></i>
                   </span>
                 </div>
               </div>
@@ -250,6 +258,10 @@
       <div class="ui divider hidden"></div>
       
       <!-- Pagination -->
+
+      <!-- this element is needed for pretty symmetrical alignment with loader on the right side -->
+      <span class="ui loader active blue tiny inline" style="opacity: 0; margin-left:10px"></span>
+
       <div class="ui pagination menu" v-if="project.task_count > 0">
         <a class="item" :class="{'active': page>1, 'disabled': page<=1}"
            @click="page!=1 ? page--: page">Prev</a>
@@ -281,9 +293,10 @@
         <a class="item" :class="{'active': page<totalPages, 'disabled': page>=totalPages}"
            @click="page<totalPages ? page++: page">Next</a>
       </div> <!-- pagination -->
-      <span class="ui loader active blue tiny inline"
-            :style="{opacity: tasks_loaded ? 0: 0.5, 'margin-left': '10px'}"></span>
-      
+
+      <i class="ui loader active blue tiny inline"
+            :style="{opacity: tasks_loaded ? 0: 0.5, 'margin-left': '10px'}"></i>
+
       <br/>
     </div>
     <br/><br/>
