@@ -12,14 +12,15 @@
      margin-right: 1.9%;
      width: 48%;
  }
-
  .ms-right {
-     width: 48%; padding: 2em;
-     background: #f1f1f1;
-     border-radius: 10px;
+     width: auto;
+     padding: 0 4em;
      padding-top: 1em;
+     background: rgb(250,250,250);
+     background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(247,247,247,1) 100%);
+     border-radius: 10px;
+     border: 2px solid rgba(244, 138, 66, 0.75);
      max-width: 500px;
-     border: 1px solid #ccc;
  }
  
  .header-ul {
@@ -117,7 +118,7 @@
  .card {
      padding: 1em;
      background-color: #fff;
-     color: #000;
+     color: #444;
      padding: 20px;
      margin: 0 20px;
      max-width: 350px;
@@ -376,6 +377,12 @@
          margin-right: 2em;
          
      }
+     .ms-right {
+        margin: 0 auto;
+     }
+     .ms-wrapper {
+       padding: 0 2em;
+     }
      #site_search {
          top: 5px !important;
          margin-right: 5px !important;
@@ -431,16 +438,16 @@
   <%- partial('partials/sidebar', {type: page.type === 'menu' ? 'guide' : page.type, index: page.index}) %>
   <div>
     <div id="bodybag" class='content'>
-        <section>
-          <div id="main-screen">
-            
+    <section>
+        <div id="main-screen">
+
         <div class="ms-left">
           <div style="display: flex; justify-content: center;">
             <div style="display: flex; flex-direction: column; align-items: center;">
               <div class="tagline">
-                
+
                 <div class="tagline-text">
-                  
+
                   <h1 style="font-size: 48px; margin-top: 0.6em; text-align: center">Open Source<br/>Data Labeling Tool
                   </h1>
                 </div>
@@ -457,26 +464,28 @@
                   <a href="https://join.slack.com/t/label-studio/shared_invite/zt-cr8b7ygm-6L45z7biEBw4HXa5A2b5pw" class="btn btn-slack">
                     <img src="<%- url_for("/images/slack.png") %>" height="18" style="margin-right: 8px;"/>Join Slack</a>
                 </center>
-                <!-- <div><a href="" class="btn">Watch video</a></div> -->
+
               </div>
             </div>
           </div>
         </div>
 
-        <div class="ms-right">
-            <div style="text-align: center;">
-                <h3>Introducing version 0.7.0 - Cloud Storage Enablement</h3>
-                <p>Load assets from AWS S3 or GCP.
-                    <a href="/blog/release-070-cloud-storage-enablement.html" class="underline">Read more</a> in our blog.</p>
-                <a href="/blog/release-070-cloud-storage-enablement.html"><img src="/images/release-070/s3-mascot-04.png" height="280" /></a>
-            </div>
+        <div class="ms-wrapper">
+          <div class="ms-right">
+              <div style="text-align: center;">
+                  <h3>Introducing version 0.7.0 - Cloud Storage Enablement</h3>
+                  <p>Load assets from AWS S3 or GCP.
+                      <a href="/blog/release-070-cloud-storage-enablement.html" class="underline">Read more</a> in our blog.</p>
+                  <a href="/blog/release-070-cloud-storage-enablement.html"><img src="/images/release-070/s3-mascot-04.png" style="max-height:280px" /></a>
+              </div>
+          </div>
         </div>
-        
+
         </div>
       </section>
 
         <section class="cards" style="padding-top: 50px; padding-bottom: 50px; background: #eff0f2; ">
-          <div style="max-width: 700px; text-align: center;">
+          <div style="max-width: 700px; text-align: center; margin: 0 auto;">
           <h2>10000+ Users</h2>
           <p>Data Scientists, Machine Learning Engineers, and aspiring developers are using Label Studio to produce innovative machine learning models for real-world applications.</p>
           </div>

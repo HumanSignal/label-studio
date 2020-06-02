@@ -138,16 +138,16 @@ var moveSearchState = 1;
 function moveSearch() {
   if ($(window).width() > 600 && $('#nav').is(':visible')) {
       if (moveSearchState === 2) {
-          let element = $('#site_search').detach();
+          var element = $('#site_search').detach();
           $('#nav').append(element);
           element.css({'position': 'relative', 'top': 0, 'margin-right': '1em'});
           moveSearchState = 1;
       }
   } else {
       if (moveSearchState === 1){
-        let element = $('#site_search').detach();
+        var element = $('#site_search').detach();
         $('body').append(element);
-        element.css({'position': 'fixed', 'top': '75px', 'margin-right': '1.75em'});
+        element.css({'position': 'fixed', 'top': '25px', 'margin-right': '1.75em'});
         moveSearchState = 2;
     }
   }
