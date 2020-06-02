@@ -172,6 +172,7 @@ class CloudStorage(BaseStorage):
         self.prefix = prefix or ''
         self.regex_str = regex
         self.regex = re.compile(self.regex_str) if self.regex_str else None
+        self._ids_file = None
         if self.project_path is not None:
             self.local_dir = os.path.join(self.project_path, self.__class__.__name__.lower(), self.path)
             self.objects_dir = os.path.join(self.project_path, 'completions')
@@ -184,7 +185,7 @@ class CloudStorage(BaseStorage):
         self.data_key = data_key
         self.sync_in_thread = sync_in_thread
 
-        self.client = self._get_client(**kwargs)
+        self.client = self._get_client()
         self.validate_connection()
 
         self.last_sync_time = None
@@ -211,7 +212,7 @@ class CloudStorage(BaseStorage):
         pass
 
     @abstractmethod
-    def _get_client(self, **kwargs):
+    def _get_client(self):
         pass
 
     @property
@@ -219,14 +220,19 @@ class CloudStorage(BaseStorage):
     def readable_path(self):
         pass
 
+    @property
+    def _save_to_file_enabled(self):
+        return self.project_path is not None and self._ids_file is not None and os.path.exists(self._ids)
+
     def _load_ids(self):
-        if os.path.exists(self._ids_file):
+        if self._save_to_file_enabled:
             self._ids_keys_map = json_load(self._ids_file, int_keys=True)
             self._keys_ids_map = {item['key']: id for id, item in self._ids_keys_map.items()}
 
     def _save_ids(self):
-        with open(self._ids_file, mode='w') as fout:
-            json.dump(self._ids_keys_map, fout, indent=2)
+        if self._save_to_file_enabled:
+            with open(self._ids_file, mode='w') as fout:
+                json.dump(self._ids_keys_map, fout, indent=2)
 
     @abstractmethod
     def _get_value(self, key):

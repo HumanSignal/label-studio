@@ -9,6 +9,14 @@ logging.getLogger('botocore').setLevel(logging.CRITICAL)
 boto3.set_stream_logger(level=logging.INFO)
 
 
+def get_client_and_resource(aws_access_key_id=None, aws_secret_access_key=None, aws_session_token=None):
+    session = boto3.Session(
+        aws_access_key_id=aws_access_key_id,
+        aws_secret_access_key=aws_secret_access_key,
+        aws_session_token=aws_session_token)
+    return session.client('s3'), session.resource('s3')
+
+
 class S3Storage(CloudStorage):
 
     description = 'Amazon S3'
@@ -21,14 +29,10 @@ class S3Storage(CloudStorage):
         super(S3Storage, self).__init__(**kwargs)
 
     def _get_client(self):
-        session = boto3.Session(
-            aws_access_key_id=self.aws_access_key_id,
-            aws_secret_access_key=self.aws_secret_access_key,
-            aws_session_token=self.aws_session_token)
-        s3 = session.resource('s3')
+        client, s3 = get_client_and_resource(self.aws_access_key_id, self.aws_secret_access_key, self.aws_session_token)
         return {
             's3': s3,
-            'client': session.client('s3'),
+            'client': client,
             'bucket': s3.Bucket(self.path)
         }
 
