@@ -121,7 +121,7 @@
               location.reload();
             },
             error: function (xhr, ajaxOptions, thrownError) {
-              alert(xhr.responseJSON.msg);
+              alert(message_from_response(xhr));
             }
           });
       }
