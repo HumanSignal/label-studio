@@ -222,7 +222,7 @@ class CloudStorage(BaseStorage):
 
     @property
     def _save_to_file_enabled(self):
-        return self.project_path is not None and self._ids_file is not None and os.path.exists(self._ids)
+        return self.project_path is not None and self._ids_file is not None and os.path.exists(self._ids_file)
 
     def _load_ids(self):
         if self._save_to_file_enabled:
