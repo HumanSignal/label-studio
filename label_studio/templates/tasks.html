@@ -559,6 +559,23 @@
                   return {description: '[No storage defined]', name: '[No storage defined]'}
               },
 
+              showStorageField: function(field_name, storage) {
+                if (field_name !== 'create_local_copy') {
+                    // find field use_blob_urls inside of list
+                    var use_blob_urls = null;
+                    for (var i in storage.fields) {
+                        if (storage.fields[i].name === 'use_blob_urls') {
+                            use_blob_urls = storage.fields[i];
+                            break;
+                        }
+                    }
+                    if (field_name === 'data_key' && !use_blob_urls.data) {
+                      return false;
+                    }
+                    return true;
+                }
+              },
+
               showError: function(title, message) {
                   $('body').toast({
                       class: 'error',

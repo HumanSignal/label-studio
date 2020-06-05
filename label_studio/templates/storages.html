@@ -47,9 +47,9 @@
       <div class="ui field"
            :class="{disabled: storage.type_loading, error: field.name in storage.errors}"
            v-for="field in storage.fields"
-           v-if="field.name != 'create_local_copy'"> <!-- TODO: back create_local_copy in next releases -->
+           v-if="showStorageField(field.name, storage)"> <!-- TODO: back create_local_copy in next releases -->
 
-        <label :for="field.name">{{ field.description }}</label>
+        <label :for="field.name" v-html="field.description"></label>
         <sui-checkbox v-model="field.data" :name="field.name" v-if="field.type=='BooleanField'"></sui-checkbox>
         <input type="text" :placeholder="field.name" :name="field.name" v-model="field.data"
                v-if="field.type!='BooleanField'">
