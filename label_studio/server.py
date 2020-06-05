@@ -547,7 +547,8 @@ def api_project():
 
     output = project.serialize()
     output['multi_session_mode'] = input_args.command != 'start-multi-session'
-    project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
+    if request.args.get('fast', False):
+        project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
     return make_response(jsonify(output), code)
 
 

@@ -407,7 +407,7 @@
               // get project info from api
               loadProject: function () {
                   var root = this;
-                  this.getApi('project', '/api/project/',
+                  this.getApi('project', '/api/project/?fast=1',
                       // always
                       function () { root.project_loaded = true; },
                       // fail
