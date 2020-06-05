@@ -222,10 +222,10 @@ class CloudStorage(BaseStorage):
 
     @property
     def _save_to_file_enabled(self):
-        return self.project_path is not None and self._ids_file is not None and os.path.exists(self._ids_file)
+        return self.project_path is not None and self._ids_file is not None
 
     def _load_ids(self):
-        if self._save_to_file_enabled:
+        if self._save_to_file_enabled and os.path.exists(self._ids_file):
             self._ids_keys_map = json_load(self._ids_file, int_keys=True)
             self._keys_ids_map = {item['key']: id for id, item in self._ids_keys_map.items()}
 
