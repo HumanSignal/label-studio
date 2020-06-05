@@ -65,6 +65,10 @@ class GCSCompletionsStorage(GCSStorage):
 
     form = GCSCompletionsStorageForm
 
+    def __init__(self, use_blob_urls=False, regex='.*', **kwargs):
+        """Completion Storages are unfiltered JSON storages"""
+        super(GCSCompletionsStorage, self).__init__(use_blob_urls=False, regex='.*', **kwargs)
+
     def _validate_object(self, key):
         value = self._get_value(key)
         if any((

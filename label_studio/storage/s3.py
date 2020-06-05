@@ -84,6 +84,10 @@ class S3CompletionsStorageForm(BaseForm):
 class S3CompletionsStorage(S3Storage):
 
     form = S3CompletionsStorageForm
+    
+    def __init__(self, use_blob_urls=False, regex='.*', **kwargs):
+        """Completion Storages are unfiltered JSON storages"""
+        super(S3CompletionsStorage, self).__init__(use_blob_urls=False, regex='.*', **kwargs)
 
     def _validate_object(self, key):
         value = self._get_value(key)

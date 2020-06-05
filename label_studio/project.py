@@ -18,7 +18,7 @@ from label_studio.utils.misc import (
 from label_studio.utils.analytics import Analytics
 from label_studio.utils.models import ProjectObj, MLBackend
 from label_studio.utils.exceptions import ValidationError
-from label_studio.utils.io import find_file, delete_dir_content, json_load, remove_file_or_dir
+from label_studio.utils.io import find_file, delete_dir_content, json_load
 from label_studio.utils.validation import is_url
 from label_studio.tasks import Tasks
 from label_studio.storage import create_storage, get_available_storage_names
