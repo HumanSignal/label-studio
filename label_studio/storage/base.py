@@ -164,22 +164,29 @@ class CloudStorage(BaseStorage):
     form = CloudStorageForm
     description = 'Base Cloud Storage'
 
-    def __init__(self, prefix=None, regex=None, create_local_copy=True, use_blob_urls=True, data_key=None, **kwargs):
+    def __init__(
+        self, prefix=None, regex=None, create_local_copy=True, use_blob_urls=True, data_key=None,
+        sync_in_thread=True, **kwargs
+    ):
         super(CloudStorage, self).__init__(**kwargs)
         self.prefix = prefix or ''
         self.regex_str = regex
         self.regex = re.compile(self.regex_str) if self.regex_str else None
-        self.local_dir = os.path.join(self.project_path, self.__class__.__name__.lower(), self.path)
+        self._ids_file = None
+        if self.project_path is not None:
+            self.local_dir = os.path.join(self.project_path, self.__class__.__name__.lower(), self.path)
+            self.objects_dir = os.path.join(self.project_path, 'completions')
+            os.makedirs(self.local_dir, exist_ok=True)
+            os.makedirs(self.objects_dir, exist_ok=True)
+            self._ids_file = os.path.join(self.local_dir, 'ids.json')
+
         self.create_local_copy = create_local_copy
         self.use_blob_urls = use_blob_urls
         self.data_key = data_key
+        self.sync_in_thread = sync_in_thread
 
         self.client = self._get_client()
         self.validate_connection()
-
-        os.makedirs(self.local_dir, exist_ok=True)
-        self.objects_dir = os.path.join(self.project_path, 'completions')
-        os.makedirs(self.objects_dir, exist_ok=True)
 
         self.last_sync_time = None
         self.is_syncing = False
@@ -188,7 +195,6 @@ class CloudStorage(BaseStorage):
         self._ids_keys_map = {}
         self._selected_ids = []
         self._keys_ids_map = {}
-        self._ids_file = os.path.join(self.local_dir, 'ids.json')
         self._load_ids()
         self.sync()
 
@@ -214,14 +220,19 @@ class CloudStorage(BaseStorage):
     def readable_path(self):
         pass
 
+    @property
+    def _save_to_file_enabled(self):
+        return self.project_path is not None and self._ids_file is not None and os.path.exists(self._ids)
+
     def _load_ids(self):
-        if os.path.exists(self._ids_file):
+        if self._save_to_file_enabled:
             self._ids_keys_map = json_load(self._ids_file, int_keys=True)
             self._keys_ids_map = {item['key']: id for id, item in self._ids_keys_map.items()}
 
     def _save_ids(self):
-        with open(self._ids_file, mode='w') as fout:
-            json.dump(self._ids_keys_map, fout, indent=2)
+        if self._save_to_file_enabled:
+            with open(self._ids_file, mode='w') as fout:
+                json.dump(self._ids_keys_map, fout, indent=2)
 
     @abstractmethod
     def _get_value(self, key):
@@ -231,14 +242,17 @@ class CloudStorage(BaseStorage):
     def _get_value_url(self, key):
         pass
 
+    def get_data(self, key):
+        if self.use_blob_urls:
+            return self._get_value_url(key)
+        else:
+            return self._get_value(key)
+
     def get(self, id):
         item = self._ids_keys_map.get(id)
         if item:
             try:
-                if self.use_blob_urls:
-                    data = self._get_value_url(item['key'])
-                else:
-                    data = self._get_value(item['key'])
+                data = self.get_data(item['key'])
             except Exception as exc:
                 # return {'error': True, 'message': str(exc)}
                 logger.error(str(exc), exc_info=True)
@@ -298,15 +312,29 @@ class CloudStorage(BaseStorage):
 
     def sync(self):
         self.validate_connection()
-        if self._ready_to_sync():
-            thread = threading.Thread(target=self._sync)
-            thread.daemon = True
-            thread.start()
+        if self.sync_in_thread:
+            if self._ready_to_sync():
+                thread = threading.Thread(target=self._sync)
+                thread.daemon = True
+                thread.start()
+            else:
+                logger.debug('Not ready to sync.')
         else:
-            logger.debug('Not ready to sync.')
+            self._sync()
 
     def _validate_object(self, key):
         pass
+
+    def iter_keys(self):
+        for key in self._get_objects():
+            try:
+                self._validate_object(key)
+            except Exception as exc:
+                continue
+            if not self.regex.match(key):
+                logger.debug(key + ' is skipped by regex filter')
+                continue
+            yield key
 
     def _sync(self):
         with self.thread_lock:
@@ -317,14 +345,7 @@ class CloudStorage(BaseStorage):
         new_ids_keys_map = {}
         new_keys_ids_map = {}
 
-        for key in self._get_objects():
-            try:
-                self._validate_object(key)
-            except Exception as exc:
-                continue
-            if not self.regex.match(key):
-                logger.debug(key + ' is skipped by regex filter')
-                continue
+        for key in self.iter_keys():
             if key not in self._keys_ids_map:
                 id = new_id
                 new_id += 1

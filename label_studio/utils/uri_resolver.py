@@ -11,28 +11,29 @@ from google.cloud import storage as gs
 logger = logging.getLogger(__name__)
 
 
-def resolve_task_data_uri(task):
+def resolve_task_data_uri(task, **kwargs):
     out = {}
     for key, data in task['data'].items():
         if not isinstance(data, str):
             out[key] = data
         elif data.startswith('s3://'):
-            out[key] = resolve_s3(data)
+            out[key] = resolve_s3(data, **kwargs)
         elif data.startswith('gs://'):
-            out[key] = resolve_gs(data)
+            out[key] = resolve_gs(data, **kwargs)
         else:
             out[key] = data
     task['data'] = out
     return task
 
 
-def resolve_s3(url):
+def resolve_s3(url, s3_client=None, **kwargs):
     r = urlparse(url, allow_fragments=False)
     bucket_name = r.netloc
     key = r.path.lstrip('/')
-    client = boto3.client('s3')
+    if s3_client is None:
+        s3_client = boto3.client('s3')
     try:
-        presigned_url = client.generate_presigned_url(
+        presigned_url = s3_client.generate_presigned_url(
             ClientMethod='get_object',
             Params={'Bucket': bucket_name, 'Key': key}
         )
@@ -45,7 +46,7 @@ def resolve_s3(url):
         return presigned_url
 
 
-def resolve_gs(url):
+def resolve_gs(url, **kwargs):
     r = urlparse(url, allow_fragments=False)
     bucket_name = r.netloc
     key = r.path.lstrip('/')
