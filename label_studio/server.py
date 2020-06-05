@@ -632,7 +632,7 @@ def api_all_tasks():
 
     # get task ids and sort them by completed time
     task_ids = project.source_storage.ids()
-    completed_at = project.get_completed_at(task_ids)
+    completed_at = project.get_completed_at(None)
 
     # ordering
     pre_order = [{'id': i, 'completed_at': completed_at[i] if i in completed_at else "can't obtain"} for i in task_ids]

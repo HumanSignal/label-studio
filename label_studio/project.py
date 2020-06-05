@@ -464,7 +464,8 @@ class Project(object):
         :return: list of string with formatted datetime
         """
         times = {}
-        for id, data in self.target_storage.items():
+        for _, data in self.target_storage.items():
+            id = data['id']
             try:
                 latest_time = max(data['completions'], key=itemgetter('created_at'))['created_at']
             except Exception as exc:
