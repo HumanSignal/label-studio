@@ -106,4 +106,3 @@ class Analytics(object):
             requests.post(url=url, json=json_data)
         except requests.RequestException as exc:
             logger.debug('Analytics error: {exc}'.format(exc=str(exc)))
-            pass
