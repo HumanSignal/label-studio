@@ -522,7 +522,7 @@ def api_generate_next_task():
 
     task = resolve_task_data_uri(task)
 
-    project.analytics.send(getframeinfo(currentframe()).function)
+    #project.analytics.send(getframeinfo(currentframe()).function)
 
     # collect prediction from multiple ml backends
     if project.ml_backends_connected:
@@ -547,7 +547,8 @@ def api_project():
 
     output = project.serialize()
     output['multi_session_mode'] = input_args.command != 'start-multi-session'
-    project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
+    if not request.args.get('fast', False):
+        project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
     return make_response(jsonify(output), code)
 
 
