@@ -213,7 +213,7 @@ def get_config_templates():
             json_string = code.split('<!--')[1].split('-->')[0]
             meta = json.loads(json_string)
         except Exception as e:
-            logger.error("Can't parse meta info from label config: " + str(e))
+            logger.error("Can't parse meta info from label config " + path + ': ' + str(e))
             continue
 
         meta['pk'] = i

@@ -493,6 +493,14 @@
                   this.loadTasks();
               },
 
+              // update all objects via api
+              loadProjectAndTasksByTimer: function () {
+                  if (this.project_loaded && this.tasks_loaded) {
+                      this.loadProject();
+                      this.loadTasks();
+                  }
+              },
+
               // change order of sorting in table
               changeOrder: function (name) {
                   console.log('order changed to ' + name);
@@ -545,7 +553,7 @@
                     this.auto_update_timer = null;
                   }
                   else {
-                    this.auto_update_timer = setInterval(this.loadProjectAndTasks, this.timer_interval);
+                    this.auto_update_timer = setInterval(this.loadProjectAndTasksByTimer, this.timer_interval);
                   }
               },
 
