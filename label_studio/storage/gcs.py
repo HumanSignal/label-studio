@@ -14,8 +14,12 @@ class GCSStorage(CloudStorage):
     description = 'Google Cloud Storage'
 
     @property
+    def url_prefix(self):
+        return 'gs://'
+
+    @property
     def readable_path(self):
-        return 'gs://' + self.path + '/' + self.prefix
+        return self.url_prefix + self.path + '/' + self.prefix
 
     def _get_client(self):
         client = storage.Client()
@@ -38,10 +42,6 @@ class GCSStorage(CloudStorage):
         blob = bucket.blob(key)
         blob_str = blob.download_as_string()
         return json.loads(blob_str)
-
-    def _get_value_url(self, key):
-        data_key = self.data_key if self.data_key else self.default_data_key
-        return {data_key: 'gs://' + self.path + '/' + key}
 
     def _set_value(self, key, value):
         if not isinstance(value, str):

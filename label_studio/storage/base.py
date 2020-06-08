@@ -7,6 +7,7 @@ import threading
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
 
+from shutil import copy2
 from flask_wtf import FlaskForm
 from wtforms import StringField, BooleanField
 from wtforms.validators import InputRequired, Optional, ValidationError
@@ -176,11 +177,9 @@ class CloudStorage(BaseStorage):
         self.regex = re.compile(self.regex_str) if self.regex_str else None
         self._ids_file = None
         if self.project_path is not None:
-            self.local_dir = os.path.join(self.project_path, self.__class__.__name__.lower(), self.path)
             self.objects_dir = os.path.join(self.project_path, 'completions')
-            os.makedirs(self.local_dir, exist_ok=True)
             os.makedirs(self.objects_dir, exist_ok=True)
-            self._ids_file = os.path.join(self.local_dir, 'ids.json')
+            self._ids_file = os.path.join(self.project_path, 'ids.json')
 
         self.create_local_copy = create_local_copy
         self.use_blob_urls = use_blob_urls
@@ -219,6 +218,11 @@ class CloudStorage(BaseStorage):
 
     @property
     @abstractmethod
+    def url_prefix(self):
+        pass
+
+    @property
+    @abstractmethod
     def readable_path(self):
         pass
 
@@ -240,9 +244,9 @@ class CloudStorage(BaseStorage):
     def _get_value(self, key):
         pass
 
-    @abstractmethod
     def _get_value_url(self, key):
-        pass
+        data_key = self.data_key if self.data_key else self.default_data_key
+        return {data_key: key}
 
     def get_data(self, key):
         if self.use_blob_urls:
@@ -336,7 +340,7 @@ class CloudStorage(BaseStorage):
             if not self.regex.match(key):
                 logger.debug(key + ' is skipped by regex filter')
                 continue
-            yield key
+            yield self.url_prefix + self.path + '/' + key
 
     def _sync(self):
         with self.thread_lock:

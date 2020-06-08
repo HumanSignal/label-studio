@@ -534,6 +534,7 @@ class MLBackend(object):
             response = self.api.is_training(project)
             if response.is_error:
                 raise CantValidateIsTraining('Can\'t validate whether model is training for project ' + project.name)
+            logger.debug(response.response)
             return response.response
 
     def train(self, completions, project):

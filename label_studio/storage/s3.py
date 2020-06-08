@@ -40,8 +40,12 @@ class S3Storage(CloudStorage):
         self.client['client'].head_bucket(Bucket=self.path)
 
     @property
+    def url_prefix(self):
+        return 's3://'
+
+    @property
     def readable_path(self):
-        return 's3://' + self.path + '/' + self.prefix
+        return self.url_prefix + self.path + '/' + self.prefix
 
     def _get_value(self, key):
         s3 = self.client['s3']
@@ -49,11 +53,6 @@ class S3Storage(CloudStorage):
         obj = s3.Object(bucket.name, key).get()['Body'].read().decode('utf-8')
         value = json.loads(obj)
         return value
-
-    def _get_value_url(self, key):
-        bucket = self.client['bucket']
-        data_key = self.data_key if self.data_key else self.default_data_key
-        return {data_key: 's3://' + bucket.name + '/' + key}
 
     def _set_value(self, key, value):
         if not isinstance(value, str):
