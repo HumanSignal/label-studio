@@ -28,14 +28,14 @@ The following commands launch Label Studio, configure the connection to your S3 
 #### Read bucket with JSON-formatted tasks
 
 ```bash
-label-studio start --init --source s3 --source-path my-s3-bucket
+label-studio start my_project --init --source s3 --source-path my-s3-bucket
 ```
 
 
 #### Write completions to bucket
 
 ```bash
-label-studio start --init --target s3-completions --target-path my-s3-bucket
+label-studio start my_project --init --target s3-completions --target-path my-s3-bucket
 ```
 
 ### Working with Binary Large OBjects (BLOBs)
@@ -44,7 +44,7 @@ When you are storing BLOBs in your S3 bucket (like images or audio files), you m
 Label Studio allows you to generate input tasks with corresponding URLs automatically on-the-fly. You can to this either specifying `--source-params` when launching app:
 
 ```bash
-label-studio start --init --source s3 --source-path my-s3-bucket --source-params "{\"data_key\": \"my-object-tag-$value\", \"use_blob_urls\": true}"
+label-studio start my_project --init --source s3 --source-path my-s3-bucket --source-params "{\"data_key\": \"my-object-tag-$value\", \"use_blob_urls\": true}"
 ```
 
 You can leave `"data_key"` empty (or skip it at all) then LS generates it automatically with the first task key from label config (it's useful when you have only one object tag exposed).
@@ -83,13 +83,13 @@ The following commands launch Label Studio, configure the connection to your GCS
 #### Read bucket with JSON-formatted tasks
 
 ```bash
-label-studio start --init --source gcs --source-path my-gcs-bucket
+label-studio start my_project --init --source gcs --source-path my-gcs-bucket
 ```
 
 #### Write completions to bucket
 
 ```bash
-label-studio start --init --target gcs-completions --source-path my-gcs-bucket
+label-studio start my_project --init --target gcs-completions --source-path my-gcs-bucket
 ```
 
 ### Working with Binary Large OBjects (BLOBs)
@@ -98,7 +98,7 @@ When you are storing BLOBs in your GCS bucket (like images or audio files), you 
 Label Studio allows you to generate input tasks with corresponding URLs automatically on-the-fly. You can to this either specifying `--source-params` when launching app:
 
 ```bash
-label-studio start --init --source gcs --source-path my-gcs-bucket --source-params "{\"data_key\": \"my-object-tag-$value\", \"use_blob_urls\": true}"
+label-studio start my_project --init --source gcs --source-path my-gcs-bucket --source-params "{\"data_key\": \"my-object-tag-$value\", \"use_blob_urls\": true}"
 ```
 
 You can leave `"data_key"` empty (or skip it at all) then LS generates it automatically with the first task key from label config (it's useful when you have only one object tag exposed).
