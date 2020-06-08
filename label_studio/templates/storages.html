@@ -31,8 +31,7 @@
       </span>
 
       <!-- Storage Type - form needs it to correctly be processed -->
-      <div class="ui field" style="display: none"
-           :class="{disabled: storage.type_loading}">
+      <div class="ui field" :class="{disabled: storage.type_loading}">
         <label>Storage type</label>
         <select class="ui dropdown" name="type" v-model="storage.type">
           <option v-for="(item, name) in storage_settings_all[storage_for]" :value="name">
