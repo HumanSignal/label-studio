@@ -29,5 +29,5 @@ class DummyModel(LabelStudioMLBase):
             })
         return results
 
-    def fit(self, completions, **kwargs):
+    def fit(self, completions, workdir=None, **kwargs):
         return {'random': random.randint(1, 10)}
