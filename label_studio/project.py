@@ -116,8 +116,8 @@ class Project(object):
         def _update_storage(storage_for, storage_kwargs):
             storage_name = storage_kwargs.pop('name', storage_for)
             storage_type = storage_kwargs.pop('type')
-            # storage_path = storage_kwargs.pop('path', None)
-            storage_path = self.config[storage_for]['path']
+            storage_path = storage_kwargs.pop('path', None)
+            # storage_path = self.config[storage_for]['path']
             storage = create_storage(storage_type, storage_path, self.path, self, **storage_kwargs)
             self.config[storage_for] = {
                 'name': storage_name,
