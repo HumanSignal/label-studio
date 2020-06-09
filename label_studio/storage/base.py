@@ -143,6 +143,7 @@ class IsValidRegex(object):
 
 class CloudStorageForm(BaseForm):
 
+    path = StringField('Path', [InputRequired()], description='Storage path (e.g. bucket name)')
     prefix = StringField('Prefix', [Optional()], description='File prefix')
     regex = StringField('Regex', [IsValidRegex()], description='File filter by regex, example: .*jpe?g')
     data_key = StringField('Data key', [InputRequired()], description='Task tag key from your label config')
@@ -154,6 +155,7 @@ class CloudStorageForm(BaseForm):
                                              "tasks in Label Studio JSON format and it's suitable "
                                              "for <b>multiple data keys</b>")
     bound_params = dict(
+        path='path',
         prefix='prefix',
         regex='regex',
         use_blob_urls='use_blob_urls',
@@ -200,6 +202,7 @@ class CloudStorage(BaseStorage):
         self.sync()
 
     def get_params(self):
+        """Get params to fill the form"""
         params = super(CloudStorage, self).get_params()
         params.update({
             'prefix': self.prefix,
