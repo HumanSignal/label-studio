@@ -149,8 +149,9 @@ class ExternalTasksJSONStorage(CloudStorage):
     form = BaseForm
     description = 'Local [loading tasks from "tasks.json" file]'
 
-    def __init__(self, path, project_path, prefix=None, create_local_copy=False, regex='.*', **kwargs):
+    def __init__(self, name, path, project_path, prefix=None, create_local_copy=False, regex='.*', **kwargs):
         super(ExternalTasksJSONStorage, self).__init__(
+            name=name,
             project_path=project_path,
             path=os.path.join(project_path, 'tasks.json'),
             use_blob_urls=False,
@@ -235,7 +236,8 @@ class CompletionsDirStorage(DirJSONsStorage):
     form = BaseForm
     description = 'Local [completions are in "completions" directory]'
 
-    def __init__(self, path, project_path, **kwargs):
+    def __init__(self, name, path, project_path, **kwargs):
         super(CompletionsDirStorage, self).__init__(
+            name=name,
             project_path=project_path,
             path=os.path.join(project_path, 'completions'))

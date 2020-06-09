@@ -202,6 +202,7 @@ def tasks_page():
         )
     except Exception as e:
         error = str(e)
+        logger.error(error, exc_info=True)
         traceback = tb.format_exc()
         return flask.render_template(
             'includes/error.html',
