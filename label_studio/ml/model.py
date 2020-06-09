@@ -63,21 +63,34 @@ class LabelStudioMLManager(object):
     ):
         if not issubclass(model_class, LabelStudioMLBase):
             raise ValueError('Inference class should be the subclass of ' + LabelStudioMLBase.__class__.__name__)
-        cls.model_class = model_class
 
+        cls.model_class = model_class
+        cls.redis_queue = redis_queue
         cls.model_dir = model_dir
-        if cls.model_dir:
-            cls.model_dir = os.path.expanduser(cls.model_dir)
-            os.makedirs(cls.model_dir, exist_ok=True)
         cls.init_kwargs = init_kwargs
         cls.redis_host = redis_host
         cls.redis_port = redis_port
+
+        if cls.model_dir:
+            cls.model_dir = os.path.expanduser(cls.model_dir)
+            os.makedirs(cls.model_dir, exist_ok=True)
 
         cls._redis = cls._get_redis(redis_host, redis_port)
         if cls._redis:
             cls._redis_queue = Queue(name=redis_queue, connection=cls._redis)
 
         cls._current_model = {}
+
+    @classmethod
+    def get_initialization_params(cls):
+        return dict(
+            model_class=cls.model_class,
+            model_dir=cls.model_dir,
+            redis_host=cls.redis_host,
+            redis_port=cls.redis_port,
+            redis_queue=cls.redis_queue,
+            **cls.init_kwargs
+        )
 
     @classmethod
     def without_redis(cls):
@@ -101,7 +114,7 @@ class LabelStudioMLManager(object):
 
     @classmethod
     def _get_tasks_key(cls, project):
-        return 'project:' + str(project) + 'tasks'
+        return 'project:' + str(project) + ':tasks'
 
     @classmethod
     def _get_job_results_key(cls, project):
@@ -263,14 +276,13 @@ class LabelStudioMLManager(object):
 
     @classmethod
     def train_script_wrapper(
-        cls, project, label_config, train_kwargs,
-        init_kwargs=None, model_dir=None, model_class=None, initialize=False, tasks=()
+        cls, project, label_config, train_kwargs, initialization_params=None, tasks=()
     ):
 
-        if initialize:
-            # Reinitialize for using in RQ context
-            init_kwargs = init_kwargs or {}
-            cls.initialize(model_class, model_dir, **init_kwargs)
+        if initialization_params:
+            # Reinitialize new cls instance for using in RQ context
+            initialization_params = initialization_params or {}
+            cls.initialize(**initialization_params)
 
         version = cls._generate_version()
 
@@ -326,7 +338,7 @@ class LabelStudioMLManager(object):
     def _start_training_job(cls, project, label_config, train_kwargs):
         job = cls._redis_queue.enqueue(
             cls.train_script_wrapper,
-            args=(project, label_config, train_kwargs, cls.init_kwargs, cls.model_dir, cls.model_class, True),
+            args=(project, label_config, train_kwargs, cls.get_initialization_params()),
             job_timeout='365d',
             ttl=-1,
             result_ttl=-1,

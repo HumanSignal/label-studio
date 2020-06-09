@@ -98,10 +98,9 @@ class SimpleTextClassifier(LabelStudioMLBase):
             output_labels_idx.append(output_label_idx)
 
         new_labels = set(output_labels)
-        added_labels = new_labels - set(self.labels)
-        if len(added_labels) > 0:
-            print('Label set has been changed. Added ones: ' + str(list(added_labels)))
+        if len(new_labels) != len(self.labels):
             self.labels = list(sorted(new_labels))
+            print('Label set has been changed:' + str(self.labels))
             label2idx = {l: i for i, l in enumerate(self.labels)}
             output_labels_idx = [label2idx[label] for label in output_labels]
 

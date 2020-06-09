@@ -222,6 +222,10 @@ class CloudStorage(BaseStorage):
         pass
 
     @property
+    def key_prefix(self):
+        return self.url_prefix + self.path + '/'
+
+    @property
     @abstractmethod
     def readable_path(self):
         pass
@@ -246,7 +250,7 @@ class CloudStorage(BaseStorage):
 
     def _get_value_url(self, key):
         data_key = self.data_key if self.data_key else self.default_data_key
-        return {data_key: key}
+        return {data_key: self.url_prefix + self.path + '/' + key}
 
     def get_data(self, key):
         if self.use_blob_urls:
@@ -258,7 +262,8 @@ class CloudStorage(BaseStorage):
         item = self._ids_keys_map.get(id)
         if item:
             try:
-                data = self.get_data(item['key'])
+                key = item['key'].split(self.key_prefix, 1)[-1]
+                data = self.get_data(key)
             except Exception as exc:
                 # return {'error': True, 'message': str(exc)}
                 logger.error(str(exc), exc_info=True)
@@ -285,11 +290,12 @@ class CloudStorage(BaseStorage):
         pass
 
     def set(self, id, value):
-        key = self._id_to_key(id)
-        logger.debug('Create ' + key + ' in ' + self.readable_path)
+        key = str(id)
+        full_key = self.key_prefix + key
+        logger.debug('Create ' + full_key + ' in ' + self.readable_path)
         self._set_value(key, value)
-        self._ids_keys_map[id] = {'key': key, 'exists': True}
-        self._keys_ids_map[key] = id
+        self._ids_keys_map[id] = {'key': full_key, 'exists': True}
+        self._keys_ids_map[full_key] = id
         self._selected_ids.append(id)
         self._save_ids()
         if self.create_local_copy:
@@ -331,7 +337,7 @@ class CloudStorage(BaseStorage):
     def _validate_object(self, key):
         pass
 
-    def iter_keys(self):
+    def iter_full_keys(self):
         for key in self._get_objects():
             try:
                 self._validate_object(key)
@@ -340,7 +346,7 @@ class CloudStorage(BaseStorage):
             if not self.regex.match(key):
                 logger.debug(key + ' is skipped by regex filter')
                 continue
-            yield self.url_prefix + self.path + '/' + key
+            yield self.key_prefix + key
 
     def _sync(self):
         with self.thread_lock:
@@ -351,7 +357,7 @@ class CloudStorage(BaseStorage):
         new_ids_keys_map = {}
         new_keys_ids_map = {}
 
-        for key in self.iter_keys():
+        for key in self.iter_full_keys():
             if key not in self._keys_ids_map:
                 id = new_id
                 new_id += 1

@@ -251,11 +251,14 @@
             timeout: 500,
             error: function(xhr, textStatus, thrownError) {
               if (textStatus === 'timeout') {
-                location.reload()
+                location.reload();
               }
               else {
                 alert(message_from_error(xhr));
               }
+            },
+            success: function(res) {
+              location.reload();
             }
           })
       }
