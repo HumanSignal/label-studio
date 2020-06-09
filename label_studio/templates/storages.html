@@ -24,11 +24,7 @@
     <form class="ui form" :id="storage.storage_for + '-storage-form'">
       <input hidden name="storage_for" :value="storage_for">
 
-      <span>
-        <span v-if="storage.type=='tasks-json'">To add new tasks go to <a href="./import">Import page</a>.<br/></span>
-        To change the storage type restart Label Studio with
-        <a href="https://labelstud.io/guide/storage.html#Create-connection-on-startup">storage arguments</a>.
-      </span>
+      <span v-if="storage.type=='tasks-json'">To add new tasks go to <a href="./import">Import page</a>.<br/></span>
 
       <!-- Storage Type - form needs it to correctly be processed -->
       <div class="ui field" :class="{disabled: storage.type_loading}">
