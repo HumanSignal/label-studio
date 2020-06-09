@@ -90,14 +90,15 @@
   <div class="actions">
     <span class="ui green text" v-if="storage.save_success"><i class="fas fa-check"></i> Success</span>
 
-    <!-- Filter & Switch tasks for Source -->
+    <!-- Filter & Switch / Save tasks for Source -->
     <button class="ui button positive approve"
             :class="{disabled: storage.loading || storage.type_loading}"
-            @click="saveStorageSettings(storage_for)">
+            @click="saveStorageSettings(storage_for)"
+            v-if="storage_for=='source'">
       <!-- don't show button in Local storage for Source -->
       <span class="ui active mini inline loader" v-if="storage.loading"></span>
       <span v-if="!storage.loading">{{
-        storage_for=='source' && storage.type!='tasks-json' ? 'Filter & Switch Tasks': 'Save'
+        storage.type!='tasks-json' ? 'Filter & Switch Tasks': 'Save'
       }}</span>
     </button>
 
@@ -105,7 +106,7 @@
     <button class="ui button positive approve"
             :class="{disabled: storage.loading || storage.type_loading}"
             @click="saveStorageSettings(storage_for)"
-            v-if="storage_for=='target' && storage.type!='completions-dir'">
+            v-if="storage_for=='target'">
       <!-- don't show button in Local storage for Source -->
       <span class="ui active mini inline loader" v-if="storage.loading"></span>
       <span v-if="!storage.loading">Save</span>
