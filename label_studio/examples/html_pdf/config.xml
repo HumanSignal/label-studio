@@ -1,0 +1,12 @@
+<!-- {"title": "Rate PDF", "category": "html", "complexity": "basic"} -->
+<View>
+  <HyperText name="pdf" value="$pdf"/>
+
+  <Header value="Rate this article"/>
+  <Rating name="rating" toName="pdf" maxRating="10" icon="star" size="medium" />
+
+  <Choices name="choices" choice="single-radio" toName="pdf" showInline="true">
+    <Choice value="Important article"/>
+    <Choice value="Yellow press"/>
+  </Choices>
+</View>
