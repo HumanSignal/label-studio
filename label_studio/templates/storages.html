@@ -93,11 +93,12 @@
     <!-- Filter & Switch tasks for Source -->
     <button class="ui button positive approve"
             :class="{disabled: storage.loading || storage.type_loading}"
-            @click="saveStorageSettings(storage_for)"
-            v-if="storage_for=='source' && storage.type!='tasks-json'">
+            @click="saveStorageSettings(storage_for)">
       <!-- don't show button in Local storage for Source -->
       <span class="ui active mini inline loader" v-if="storage.loading"></span>
-      <span v-if="!storage.loading">Filter & Switch Tasks</span>
+      <span v-if="!storage.loading">{{
+        storage_for=='source' && storage.type!='tasks-json' ? 'Filter & Switch Tasks': 'Save'
+      }}</span>
     </button>
 
     <!-- Save for Target -->
