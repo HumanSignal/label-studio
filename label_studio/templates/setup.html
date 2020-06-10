@@ -84,7 +84,7 @@
     </form>
 
     <!-- Error dialog -->
-    <div class="ui basic modal" id="error-message">
+    <div class="ui basic modal" id="error-message" onclick="$('#error-message').modal('hide')">
       <div class="ui icon header">
         <i id="error-message-icon" class="exclamation triangle icon"></i>
       </div>
@@ -148,7 +148,7 @@
     // error
     if (result.status !== 201) {
       console.log(result);
-      let msg = message_from_response(result);
+      var msg = message_from_response(result);
 
       $('#dimmer').removeClass('active');
       $('#error-message-text').text(msg);
