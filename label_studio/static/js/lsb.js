@@ -86,7 +86,7 @@ const Requests = (function(window) {
   };
 })(window);
 
-const _loadTask(ls, url) {
+const _loadTask = function(ls, url) {
     try {
         const req = Requests.fetcher(url);
 
