@@ -1,6 +1,6 @@
 /*
  * Label Studio Backend - interlayer code that connects example server
- * implmenetation with the frontend part. At the moment it's based on
+ * implementation with the frontend part. At the moment it's based on
  * callbacks.
  */
 

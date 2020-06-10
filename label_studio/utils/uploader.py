@@ -54,7 +54,7 @@ def tasks_from_file(filename, file, project):
             path = os.path.join(upload_dir, filename)
             open(path, 'wb').write(data)
             # prepare task
-            tasks = [{'data': {settings.UPLOAD_DATA_UNDEFINED_NAME: HOSTNAME + '/upload/' + filename}}]
+            tasks = [{'data': {settings.UPLOAD_DATA_UNDEFINED_NAME: HOSTNAME + '/data/upload/' + filename}}]
 
     except Exception as exc:
         raise ValidationError('Failed to parse input file ' + filename + ': ' + str(exc))

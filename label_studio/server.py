@@ -115,9 +115,10 @@ def send_media(path):
 def send_upload(path):
     """ User uploaded files
     """
+    logger.warning('Task path starting with "/upload/" is deprecated and will be removed in next releases, '
+                   'replace "/upload/" => "/data/upload/" in your tasks.json files')
     project = project_get_or_create()
     project_dir = os.path.join(project.name, 'upload')
-    print(project_dir, path)
     return open(os.path.join(project_dir, path), 'rb').read()
 
 
@@ -847,6 +848,15 @@ def get_data_file(filename):
     """ External resource serving
     """
     project = project_get_or_create()
+
+    # support for upload via GUI
+    if filename.startswith('upload/'):
+        path = os.path.join(project.name, filename)
+        directory = os.path.abspath(os.path.dirname(path))
+        filename = os.path.basename(path)
+        return flask.send_from_directory(directory, filename, as_attachment=True)
+
+    # serving files from local storage
     if not project.config.get('allow_serving_local_files'):
         raise FileNotFoundError('Serving local files is not allowed. '
                                 'Use "allow_serving_local_files": true config option to enable local serving')
