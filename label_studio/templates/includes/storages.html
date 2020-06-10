@@ -1,7 +1,7 @@
 {% raw %}
 
 <!-- Two dialogs: source and target -->
-<sui-modal v-model="storage.show" v-bind:class="{inverted: 1, small: 1}" size="small"
+<sui-modal v-model="storage.show" v-bind:class="{inverted: 1, small: 1, scrollable: 1}" size="small"
            :id="storage_for + '-storage-settings-dialog'" style="z-index: 1000"
            v-for="(storage, storage_for) in storage_settings" v-bind:key="storage_for">
   <i class="icon close" @click="storage.show=false"></i>
@@ -17,7 +17,7 @@
   </div>
 
   <!-- Content -->
-  <div class="content">
+  <div class="scrolling content">
     <form class="ui form" :id="storage.storage_for + '-storage-form'">
       <input hidden name="storage_for" :value="storage_for">
 
