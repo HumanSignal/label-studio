@@ -444,6 +444,9 @@ class Project(object):
         self.source_storage.remove(task_id)
         self.delete_completion(task_id)
 
+        self.update_derived_input_schema()
+        self.update_derived_output_schema()
+
     def get_completions_ids(self):
         """ List completion ids from output_dir directory
 
