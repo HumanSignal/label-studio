@@ -2,7 +2,7 @@ import logging
 import boto3
 import json
 
-from .base import CloudStorage, BaseForm, BooleanField, Optional, StringField
+from .base import CloudStorage, BaseStorageForm, BooleanField, Optional, StringField
 
 logger = logging.getLogger(__name__)
 logging.getLogger('botocore').setLevel(logging.CRITICAL)
@@ -59,6 +59,7 @@ class S3Storage(CloudStorage):
             value = json.dumps(value)
         s3 = self.client['s3']
         bucket = self.client['bucket']
+        logger.debug('Create new S3 object on ' + self.key_prefix + key)
         s3.Object(bucket.name, key).put(Body=value)
 
     def _get_objects(self):
@@ -70,13 +71,14 @@ class S3Storage(CloudStorage):
         return (obj.key for obj in bucket_iter)
 
 
-class S3CompletionsStorageForm(BaseForm):
+class S3CompletionsStorageForm(BaseStorageForm):
     prefix = StringField('Prefix', [Optional()], description='S3 Bucket prefix')
     create_local_copy = BooleanField('Create local copy', description='Create a local copy on your disk', default=True)
 
     bound_params = dict(
         prefix='prefix',
-        create_local_copy='create_local_copy'
+        create_local_copy='create_local_copy',
+        **BaseStorageForm.bound_params
     )
 
 

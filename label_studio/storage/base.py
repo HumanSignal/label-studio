@@ -30,10 +30,10 @@ def get_storage_form(storage_type):
     return _storage[storage_type].form
 
 
-def create_storage(storage_type, path, project_path=None, project=None, **kwargs):
+def create_storage(storage_type, name, path, project_path=None, project=None, **kwargs):
     if storage_type not in _storage:
         raise NotImplementedError('Can\'t create storage "{}"'.format(storage_type))
-    return _storage[storage_type](path=path, project_path=project_path, project=project, **kwargs)
+    return _storage[storage_type](name=name, path=path, project_path=project_path, project=project, **kwargs)
 
 
 def get_available_storage_names():
@@ -48,7 +48,7 @@ class BaseForm(FlaskForm):
 
 
 class BaseStorageForm(BaseForm):
-    path = StringField('Path', [InputRequired()], description='Path')
+    path = StringField('Path', [InputRequired()], description='Storage path (e.g. bucket name)')
 
     # Bind here form fields to storage fields {"form field": "storage_field"}
     bound_params = dict(path='path')
@@ -59,7 +59,8 @@ class BaseStorage(ABC):
     form = BaseStorageForm
     description = 'Base Storage'
 
-    def __init__(self, path, project_path=None, project=None, **kwargs):
+    def __init__(self, name, path, project_path=None, project=None, **kwargs):
+        self.name = name
         self.path = path
         self.project_path = project_path
         self.project = project
@@ -141,9 +142,8 @@ class IsValidRegex(object):
             raise ValidationError(field.data + ' is not a valid regular expression')
 
 
-class CloudStorageForm(BaseForm):
+class CloudStorageForm(BaseStorageForm):
 
-    path = StringField('Path', [InputRequired()], description='Storage path (e.g. bucket name)')
     prefix = StringField('Prefix', [Optional()], description='File prefix')
     regex = StringField('Regex', [IsValidRegex()], description='File filter by regex, example: .*jpe?g')
     data_key = StringField('Data key', [InputRequired()], description='Task tag key from your label config')
@@ -155,11 +155,11 @@ class CloudStorageForm(BaseForm):
                                              "tasks in Label Studio JSON format and it's suitable "
                                              "for <b>multiple data keys</b>")
     bound_params = dict(
-        path='path',
         prefix='prefix',
         regex='regex',
         use_blob_urls='use_blob_urls',
-        data_key='data_key'
+        data_key='data_key',
+        **BaseStorageForm.bound_params
     )
 
 
@@ -181,7 +181,7 @@ class CloudStorage(BaseStorage):
         if self.project_path is not None:
             self.objects_dir = os.path.join(self.project_path, 'completions')
             os.makedirs(self.objects_dir, exist_ok=True)
-            self._ids_file = os.path.join(self.project_path, 'ids.json')
+            self._ids_file = os.path.join(self.project_path, self.name + '.json')
 
         self.create_local_copy = create_local_copy
         self.use_blob_urls = use_blob_urls
@@ -293,7 +293,10 @@ class CloudStorage(BaseStorage):
         pass
 
     def set(self, id, value):
-        key = str(id)
+        if self.prefix:
+            key = self.prefix + '/' + str(id)
+        else:
+            key = str(id)
         full_key = self.key_prefix + key
         logger.debug('Create ' + full_key + ' in ' + self.readable_path)
         self._set_value(key, value)

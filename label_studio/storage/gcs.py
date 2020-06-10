@@ -3,7 +3,7 @@ import logging
 
 from google.cloud import storage
 
-from .base import CloudStorage, BaseForm, StringField, BooleanField, Optional
+from .base import CloudStorage, BaseStorageForm, StringField, BooleanField, Optional
 
 
 logger = logging.getLogger(__name__)
@@ -51,13 +51,14 @@ class GCSStorage(CloudStorage):
         blob.upload_from_string(value)
 
 
-class GCSCompletionsStorageForm(BaseForm):
+class GCSCompletionsStorageForm(BaseStorageForm):
     prefix = StringField('Prefix', [Optional()], description='GCS Bucket prefix')
     create_local_copy = BooleanField('Create local copy', description='Create a local copy on your disk', default=True)
 
     bound_params = dict(
         prefix='prefix',
-        create_local_copy='create_local_copy'
+        create_local_copy='create_local_copy',
+        **BaseStorageForm.bound_params
     )
 
 
