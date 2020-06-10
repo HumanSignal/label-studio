@@ -198,6 +198,7 @@ def tasks_page():
         project.analytics.send(getframeinfo(currentframe()).function)
         return flask.render_template(
             'tasks.html',
+            config=project.config,
             project=project,
             serialized_project=serialized_project
         )
