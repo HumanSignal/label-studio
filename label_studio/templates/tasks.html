@@ -431,21 +431,27 @@
 
               // get settings from storage_settings_all
               changeStorageSettings: function (storage_for, storage_type) {
+                  // change to current on backend
                   if (storage_type === 'current') {
                       var storages = this.storage_settings_all[storage_for];
                       for (var type in storages) {
                           var value = storages[type];
                           if (value.current) {
+                              storage_type = type;
                               setValue(this, 'storage_settings.'+storage_for, value);
                               break;
                           }
                       }
                   }
+                  // change to new type
                   else {
                       var value = this.storage_settings_all[storage_for][storage_type];
                       setValue(this, 'storage_settings.'+storage_for, value);
                   }
 
+                  // hide/show link to import page
+                  document.getElementById('menu-import').style.display =
+                      storage_type === 'tasks-json' ? 'block' : 'none';
               },
 
               saveStorageSettings: function(storage_for) {
