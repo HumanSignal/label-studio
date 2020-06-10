@@ -557,7 +557,6 @@ def api_project():
 @exception_treatment
 def api_project_storage_settings():
     project = project_get_or_create()
-    project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
 
     # GET: return selected form, populated with current storage parameters
     if request.method == 'GET':
@@ -579,6 +578,7 @@ def api_project_storage_settings():
                     for field in all_forms[storage_for][name]['fields']:
                         if field['name'] == 'data_key' and not field['data']:
                             field['data'] = list(project.data_types.keys())[0]
+        project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
         return make_response(jsonify(all_forms), 200)
 
     # POST: update storage given filled form
@@ -589,6 +589,9 @@ def api_project_storage_settings():
         selected_type = selected_type if selected_type else current_type
 
         form = get_storage_form(selected_type)(data=request.json)
+        project.analytics.send(
+            getframeinfo(currentframe()).function, method=request.method, storage=selected_type,
+            storage_for=storage_for)
         if form.validate_on_submit():
             storage_kwargs = dict(form.data)
             storage_kwargs['type'] = request.json['type']  # storage type
