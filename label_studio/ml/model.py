@@ -11,7 +11,7 @@ from datetime import datetime
 from itertools import tee
 from redis import Redis
 from rq import Queue, get_current_job
-from rq.registry import StartedJobRegistry, FinishedJobRegistry
+from rq.registry import StartedJobRegistry, FinishedJobRegistry, FailedJobRegistry
 from rq.job import Job
 
 from label_studio.utils.misc import parse_config
@@ -231,8 +231,9 @@ class LabelStudioMLManager(object):
             }
         else:
             started_jobs = StartedJobRegistry(cls._redis_queue.name, cls._redis_queue.connection).get_job_ids()
-            finished_jobs = StartedJobRegistry(cls._redis_queue.name, cls._redis_queue.connection).get_job_ids()
-            running_jobs = list(set(finished_jobs) - set(started_jobs))
+            finished_jobs = FinishedJobRegistry(cls._redis_queue.name, cls._redis_queue.connection).get_job_ids()
+            failed_jobs = FailedJobRegistry(cls._redis_queue.name, cls._redis_queue.connection).get_job_ids()
+            running_jobs = list(set(started_jobs) - set(finished_jobs + failed_jobs))
             logger.debug('Running jobs: ' + str(running_jobs))
             for job_id in running_jobs:
                 job = Job.fetch(job_id, connection=cls._redis)
