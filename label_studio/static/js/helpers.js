@@ -17,7 +17,7 @@ function IsJsonString(str) {
 
 // Extract message from response to print it
 function message_from_response(result) {
-    console.log(result);
+    console.log('message_from_response', result);
 
     // result is dict
     if (result.hasOwnProperty("detail") && result.detail) return result.detail;
@@ -29,10 +29,14 @@ function message_from_response(result) {
         return result.responseJSON["detail"];
     }
     // something strange inside of responseJSON
-    else if (result.hasOwnProperty('responseJSON'))
+    else if (result.hasOwnProperty('responseJSON')) {
         return JSON.stringify(result.responseJSON);
+    }
+    else if (result.responseText) {
+        return result.responseText;
+    }
     else {
-        return 'Critical error on the server side'
+        return 'Critical error on the server side';
     }
 }
 

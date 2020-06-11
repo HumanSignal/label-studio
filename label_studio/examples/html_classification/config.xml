@@ -1,4 +1,4 @@
-<!-- {"title": "Web page classification", "category": "html", "complexity": "basic", "order": "!"} -->
+<!-- {"title": "HTML classification", "category": "html", "complexity": "basic", "order": "!1"} -->
 <View>
   <Choices name="toxicity" toName="web_page" choice="multiple" showInline="true">
     <Choice value="Toxic" background="red"/>

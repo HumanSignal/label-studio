@@ -1,7 +1,7 @@
 ---
 title: Project setup
 type: guide
-order: 102
+order: 101
 ---
 
 **Project** is a directory where all annotation assets are located. It is a self-contained entity: when you start Label Studio for the first time e.g. `label-studio start ./my_project --init`,

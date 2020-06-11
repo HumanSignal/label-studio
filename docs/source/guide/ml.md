@@ -52,7 +52,36 @@ Here is a quick example tutorial on how to run the ML backend with a simple text
     label-studio start text_classification_project --init --template text_sentiment --ml-backend-url http://localhost:9090
     ```
 
+## Start with docker compose
 
+Label Studio ML scripts include everything you need to create production ready ML backend server, powered by docker. It uses [uWSGI](https://uwsgi-docs.readthedocs.io/en/latest/) + [supervisord](http://supervisord.org/) stack, and handles background training jobs using [RQ](https://python-rq.org/).
+
+After running this command:
+
+```bash
+label-studio-ml init my-ml-backend --script label_studio/ml/examples/simple_text_classifier.py
+```
+
+you'll see configs in `my-ml-backend/` directory needed to build and run docker image using docker-compose. 
+
+Some preliminaries:
+
+1. Ensure all requirements are specified in `my-ml-backend/requirements.txt` file, e.g. place
+
+    ```requirements.txt
+    scikit-learn
+    ```
+   
+2. There are no services currently running on ports 9090, 6379 (otherwise change default ports in `my-ml-backend/docker-compose.yml`)
+
+Then from `my-ml-backend/` directory run
+```bash
+docker-compose up
+```
+
+The server starts listening on port 9090, and you can connect it to Label Studio by specifying `--ml-backend http://localhost:9090`
+ or via UI on **Model** page.
+ 
 ## Create your own ML backend
 
 Check examples in `label-studio/ml/examples` directory.

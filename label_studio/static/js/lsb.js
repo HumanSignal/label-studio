@@ -1,6 +1,6 @@
 /*
  * Label Studio Backend - interlayer code that connects example server
- * implmenetation with the frontend part. At the moment it's based on
+ * implementation with the frontend part. At the moment it's based on
  * callbacks.
  */
 
@@ -86,54 +86,62 @@ const Requests = (function(window) {
   };
 })(window);
 
+const _loadTask = function(ls, url) {
+    try {
+        const req = Requests.fetcher(url);
+
+        req.then(function(loadedTask) {
+            if (loadedTask instanceof Response && loadedTask.status === 404) {
+                ls.setFlags({ isLoading: false, noTask: true });
+                return;
+            }
+
+            if (loadedTask instanceof Response && loadedTask.status === 403) {
+                ls.setFlags({ isLoading: false, noAccess: true });
+                return;
+            }
+
+            loadedTask.json().then(response => {
+                /**
+                 * Convert received data to string for MST support
+                 */
+                response.data = JSON.stringify(response.data);
+
+                /**
+                 * Add new data from received task
+                 */
+                ls.resetState();
+                ls.assignTask(response);
+                ls.initializeStore(_convertTask(response));
+                let cs = ls.completionStore;
+                let c;
+                if (cs.predictions.length > 0) {
+                    c = ls.completionStore.addCompletionFromPrediction(cs.predictions[0]);
+                }
+                else {
+                    c = ls.completionStore.addCompletion({ userGenerate: true });
+                }
+
+                cs.selectCompletion(c.id);
+
+                ls.setFlags({ isLoading: false });
+
+                // getEnv(self).onTaskLoad(self.task);
+            });
+        });
+    } catch (err) {
+        console.error("Failed to load next task ", err);
+    }
+}
+
 const loadNext = function(ls) {
   var url = `${API_URL.MAIN}${API_URL.PROJECTS}/1${API_URL.NEXT}`;
+    return _loadTask(ls, url);
+};
 
-  try {
-    const req = Requests.fetcher(url);
-
-    req.then(function(loadedTask) {
-      if (loadedTask instanceof Response && loadedTask.status === 404) {
-        ls.setFlags({ isLoading: false, noTask: true });
-        return;
-      }
-
-      if (loadedTask instanceof Response && loadedTask.status === 403) {
-        ls.setFlags({ isLoading: false, noAccess: true });
-        return;
-      }
-
-      loadedTask.json().then(response => {
-        /**
-         * Convert received data to string for MST support
-         */
-        response.data = JSON.stringify(response.data);
-
-        /**
-         * Add new data from received task
-         */
-        ls.resetState();
-        ls.assignTask(response);
-        ls.initializeStore(_convertTask(response));
-        let cs = ls.completionStore;
-        let c;
-        if (cs.predictions.length > 0) {
-          c = ls.completionStore.addCompletionFromPrediction(cs.predictions[0]);
-        }
-        else {
-          c = ls.completionStore.addCompletion({ userGenerate: true });
-        }
-
-        cs.selectCompletion(c.id);
-
-        ls.setFlags({ isLoading: false });
-
-        // getEnv(self).onTaskLoad(self.task);
-      });
-    });
-  } catch (err) {
-    console.error("Failed to load next task ", err);
-  }
+const loadTask = function(ls, taskID) {
+  var url = `${API_URL.MAIN}${API_URL.PROJECTS}/1${API_URL.TASKS}/${taskID}`;
+    return _loadTask(ls, url);
 };
 
 const _convertTask = function(task) {
@@ -279,7 +287,8 @@ const LSB = function(elid, config, task) {
 
     // TODO WIP here, we will move that code to the SDK
     var sdk = {
-        "loadNext": function () { loadNext(LS) },        
+        "loadNext": function () { loadNext(LS) },
+        "loadTask": function (taskID) { loadTask(LS, taskID) }
     };
     
     LS._sdk = sdk;

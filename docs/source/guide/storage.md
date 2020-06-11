@@ -1,12 +1,12 @@
 ---
 title: Cloud storages
 type: guide
-order: 101
+order: 103
 ---
 
 You can integrate the popular cloud storage with Label Studio, collect new tasks uploaded to your buckets, and sync back annotation results to use them in your machine learning pipelines.
 
-Cloud storage type and bucket need to be configured during the start of the server, and further configured during the runtime via UI.
+You can configure storage type, bucket and prefixes during the start of the server or during the runtime via UI on **Tasks** page.
 
 You can configure one or both:
 
@@ -16,6 +16,8 @@ You can configure one or both:
 The connection to both storages is synced, so you can see new tasks after uploading them to the bucket without restarting Label Studio.
 
 The parameters like prefix or matching filename regex could be changed any time from the webapp interface.
+
+> Note: Choose target storage carefully: be sure it's empty when you just start labeling project, or it contains completions that match previously created/import tasks from source storage. Tasks are synced with completions based on internal ids (keys in `source.json`/`target.json` files in your project directory), so if you accidentally connect to the target storage with existed completions with the same ids, you may fail with undefined behaviour.  
 
 ## Amazon S3
 

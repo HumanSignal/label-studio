@@ -115,9 +115,10 @@ def send_media(path):
 def send_upload(path):
     """ User uploaded files
     """
+    logger.warning('Task path starting with "/upload/" is deprecated and will be removed in next releases, '
+                   'replace "/upload/" => "/data/upload/" in your tasks.json files')
     project = project_get_or_create()
     project_dir = os.path.join(project.name, 'upload')
-    print(project_dir, path)
     return open(os.path.join(project_dir, path), 'rb').read()
 
 
@@ -197,11 +198,13 @@ def tasks_page():
         project.analytics.send(getframeinfo(currentframe()).function)
         return flask.render_template(
             'tasks.html',
+            config=project.config,
             project=project,
             serialized_project=serialized_project
         )
     except Exception as e:
         error = str(e)
+        logger.error(error, exc_info=True)
         traceback = tb.format_exc()
         return flask.render_template(
             'includes/error.html',
@@ -522,7 +525,7 @@ def api_generate_next_task():
 
     task = resolve_task_data_uri(task)
 
-    project.analytics.send(getframeinfo(currentframe()).function)
+    #project.analytics.send(getframeinfo(currentframe()).function)
 
     # collect prediction from multiple ml backends
     if project.ml_backends_connected:
@@ -547,7 +550,8 @@ def api_project():
 
     output = project.serialize()
     output['multi_session_mode'] = input_args.command != 'start-multi-session'
-    project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
+    if not request.args.get('fast', False):
+        project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
     return make_response(jsonify(output), code)
 
 
@@ -555,7 +559,6 @@ def api_project():
 @exception_treatment
 def api_project_storage_settings():
     project = project_get_or_create()
-    project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
 
     # GET: return selected form, populated with current storage parameters
     if request.method == 'GET':
@@ -577,6 +580,7 @@ def api_project_storage_settings():
                     for field in all_forms[storage_for][name]['fields']:
                         if field['name'] == 'data_key' and not field['data']:
                             field['data'] = list(project.data_types.keys())[0]
+        project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
         return make_response(jsonify(all_forms), 200)
 
     # POST: update storage given filled form
@@ -587,6 +591,9 @@ def api_project_storage_settings():
         selected_type = selected_type if selected_type else current_type
 
         form = get_storage_form(selected_type)(data=request.json)
+        project.analytics.send(
+            getframeinfo(currentframe()).function, method=request.method, storage=selected_type,
+            storage_for=storage_for)
         if form.validate_on_submit():
             storage_kwargs = dict(form.data)
             storage_kwargs['type'] = request.json['type']  # storage type
@@ -846,6 +853,15 @@ def get_data_file(filename):
     """ External resource serving
     """
     project = project_get_or_create()
+
+    # support for upload via GUI
+    if filename.startswith('upload/'):
+        path = os.path.join(project.name, filename)
+        directory = os.path.abspath(os.path.dirname(path))
+        filename = os.path.basename(path)
+        return flask.send_from_directory(directory, filename, as_attachment=True)
+
+    # serving files from local storage
     if not project.config.get('allow_serving_local_files'):
         raise FileNotFoundError('Serving local files is not allowed. '
                                 'Use "allow_serving_local_files": true config option to enable local serving')

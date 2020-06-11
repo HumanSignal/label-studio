@@ -45,10 +45,10 @@
     <a href="tasks" class="{% if url_for(request.endpoint) == '/tasks' %}active{% endif %}">Tasks</a>
     <span class="delim">|</span>
 
-    {% if project and project.can_manage_tasks %}
+    <span id="menu-import" style="{{ 'block' if project and project.can_manage_tasks else 'none'}}">
       <a href="import" class="{% if url_for(request.endpoint) == '/import' %}active{% endif %}">Import</a>
       <span class="delim">|</span>
-    {% endif %}
+    </span>
 
     <a href="export" class="{% if url_for(request.endpoint) == '/export' %}active{% endif %}">Export</a>
     <span class="delim">|</span>
@@ -66,7 +66,7 @@
       <img src="static/images/github.svg" height="22"/></a>
 
     <a href="https://join.slack.com/t/label-studio/shared_invite/zt-cr8b7ygm-6L45z7biEBw4HXa5A2b5pw"
-       data-tooltip="If you have any troubles or suggestion just report us to Slack" data-position="bottom right"
+       data-tooltip="If you have found a bug or have questions ping us in Slack" data-position="bottom right"
        target="_blank"><img src="static/images/slack.png" height="22"/></a>
 
   </ul>

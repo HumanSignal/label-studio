@@ -2,7 +2,7 @@ import logging
 import boto3
 import json
 
-from .base import CloudStorage, BaseForm, BooleanField, Optional, StringField
+from .base import CloudStorage, BaseStorageForm, BooleanField, Optional, StringField
 
 logger = logging.getLogger(__name__)
 logging.getLogger('botocore').setLevel(logging.CRITICAL)
@@ -40,8 +40,12 @@ class S3Storage(CloudStorage):
         self.client['client'].head_bucket(Bucket=self.path)
 
     @property
+    def url_prefix(self):
+        return 's3://'
+
+    @property
     def readable_path(self):
-        return 's3://' + self.path + '/' + self.prefix
+        return self.url_prefix + self.path + '/' + self.prefix
 
     def _get_value(self, key):
         s3 = self.client['s3']
@@ -50,16 +54,12 @@ class S3Storage(CloudStorage):
         value = json.loads(obj)
         return value
 
-    def _get_value_url(self, key):
-        bucket = self.client['bucket']
-        data_key = self.data_key if self.data_key else self.default_data_key
-        return {data_key: 's3://' + bucket.name + '/' + key}
-
     def _set_value(self, key, value):
         if not isinstance(value, str):
             value = json.dumps(value)
         s3 = self.client['s3']
         bucket = self.client['bucket']
+        logger.debug('Create new S3 object on ' + self.key_prefix + key)
         s3.Object(bucket.name, key).put(Body=value)
 
     def _get_objects(self):
@@ -71,13 +71,14 @@ class S3Storage(CloudStorage):
         return (obj.key for obj in bucket_iter)
 
 
-class S3CompletionsStorageForm(BaseForm):
+class S3CompletionsStorageForm(BaseStorageForm):
     prefix = StringField('Prefix', [Optional()], description='S3 Bucket prefix')
     create_local_copy = BooleanField('Create local copy', description='Create a local copy on your disk', default=True)
 
     bound_params = dict(
         prefix='prefix',
-        create_local_copy='create_local_copy'
+        create_local_copy='create_local_copy',
+        **BaseStorageForm.bound_params
     )
 
 

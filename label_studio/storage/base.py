@@ -7,6 +7,7 @@ import threading
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
 
+from shutil import copy2
 from flask_wtf import FlaskForm
 from wtforms import StringField, BooleanField
 from wtforms.validators import InputRequired, Optional, ValidationError
@@ -29,10 +30,10 @@ def get_storage_form(storage_type):
     return _storage[storage_type].form
 
 
-def create_storage(storage_type, path, project_path=None, project=None, **kwargs):
+def create_storage(storage_type, name, path, project_path=None, project=None, **kwargs):
     if storage_type not in _storage:
         raise NotImplementedError('Can\'t create storage "{}"'.format(storage_type))
-    return _storage[storage_type](path=path, project_path=project_path, project=project, **kwargs)
+    return _storage[storage_type](name=name, path=path, project_path=project_path, project=project, **kwargs)
 
 
 def get_available_storage_names():
@@ -47,7 +48,7 @@ class BaseForm(FlaskForm):
 
 
 class BaseStorageForm(BaseForm):
-    path = StringField('Path', [InputRequired()], description='Path')
+    path = StringField('Path', [InputRequired()], description='Storage path (e.g. bucket name)')
 
     # Bind here form fields to storage fields {"form field": "storage_field"}
     bound_params = dict(path='path')
@@ -58,7 +59,8 @@ class BaseStorage(ABC):
     form = BaseStorageForm
     description = 'Base Storage'
 
-    def __init__(self, path, project_path=None, project=None, **kwargs):
+    def __init__(self, name, path, project_path=None, project=None, **kwargs):
+        self.name = name
         self.path = path
         self.project_path = project_path
         self.project = project
@@ -140,21 +142,24 @@ class IsValidRegex(object):
             raise ValidationError(field.data + ' is not a valid regular expression')
 
 
-class CloudStorageForm(BaseForm):
+class CloudStorageForm(BaseStorageForm):
 
     prefix = StringField('Prefix', [Optional()], description='File prefix')
-    regex = StringField('Regex', [IsValidRegex()], description='File filter by regex, example: .*jpe?g')
-    data_key = StringField('Data key', [InputRequired()], description='Task tag key from your label config')
+    regex = StringField('Regex', [IsValidRegex()], description='File filter by regex, example: .* (If not specified, all files will be skipped)')  # noqa
+    data_key = StringField('Data key', [Optional()], description='Task tag key from your label config')
     use_blob_urls = BooleanField('Use BLOBs URLs', default=True,
-                                 description='Generate task data with URLs pointed to your bucket '
-                                             'objects(for resources like jpg, mp3, other BLOBs). \n'
+                                 description='Generate task data with URLs pointed to your bucket objects '
+                                             '(for resources like jpg, mp3 & other BLOBs). This could be used for '
+                                             'label configs with <b>one data key only</b>. '
                                              'If not selected, bucket objects will be interpreted as '
-                                             'tasks in Label Studio JSON format, one object per task')
+                                             "tasks in Label Studio JSON format and it's suitable "
+                                             "for <b>multiple data keys</b>")
     bound_params = dict(
         prefix='prefix',
         regex='regex',
         use_blob_urls='use_blob_urls',
-        data_key='data_key'
+        data_key='data_key',
+        **BaseStorageForm.bound_params
     )
 
 
@@ -174,11 +179,9 @@ class CloudStorage(BaseStorage):
         self.regex = re.compile(self.regex_str) if self.regex_str else None
         self._ids_file = None
         if self.project_path is not None:
-            self.local_dir = os.path.join(self.project_path, self.__class__.__name__.lower(), self.path)
             self.objects_dir = os.path.join(self.project_path, 'completions')
-            os.makedirs(self.local_dir, exist_ok=True)
             os.makedirs(self.objects_dir, exist_ok=True)
-            self._ids_file = os.path.join(self.local_dir, 'ids.json')
+            self._ids_file = os.path.join(self.project_path, self.name + '.json')
 
         self.create_local_copy = create_local_copy
         self.use_blob_urls = use_blob_urls
@@ -199,6 +202,7 @@ class CloudStorage(BaseStorage):
         self.sync()
 
     def get_params(self):
+        """Get params to fill the form"""
         params = super(CloudStorage, self).get_params()
         params.update({
             'prefix': self.prefix,
@@ -214,6 +218,15 @@ class CloudStorage(BaseStorage):
     @abstractmethod
     def _get_client(self):
         pass
+
+    @property
+    @abstractmethod
+    def url_prefix(self):
+        pass
+
+    @property
+    def key_prefix(self):
+        return self.url_prefix + self.path + '/'
 
     @property
     @abstractmethod
@@ -238,9 +251,9 @@ class CloudStorage(BaseStorage):
     def _get_value(self, key):
         pass
 
-    @abstractmethod
     def _get_value_url(self, key):
-        pass
+        data_key = self.data_key if self.data_key else self.default_data_key
+        return {data_key: self.url_prefix + self.path + '/' + key}
 
     def get_data(self, key):
         if self.use_blob_urls:
@@ -252,7 +265,8 @@ class CloudStorage(BaseStorage):
         item = self._ids_keys_map.get(id)
         if item:
             try:
-                data = self.get_data(item['key'])
+                key = item['key'].split(self.key_prefix, 1)[-1]
+                data = self.get_data(key)
             except Exception as exc:
                 # return {'error': True, 'message': str(exc)}
                 logger.error(str(exc), exc_info=True)
@@ -279,11 +293,15 @@ class CloudStorage(BaseStorage):
         pass
 
     def set(self, id, value):
-        key = self._id_to_key(id)
-        logger.debug('Create ' + key + ' in ' + self.readable_path)
+        if self.prefix:
+            key = self.prefix + '/' + str(id)
+        else:
+            key = str(id)
+        full_key = self.key_prefix + key
+        logger.debug('Create ' + full_key + ' in ' + self.readable_path)
         self._set_value(key, value)
-        self._ids_keys_map[id] = {'key': key, 'exists': True}
-        self._keys_ids_map[key] = id
+        self._ids_keys_map[id] = {'key': full_key, 'exists': True}
+        self._keys_ids_map[full_key] = id
         self._selected_ids.append(id)
         self._save_ids()
         if self.create_local_copy:
@@ -293,7 +311,9 @@ class CloudStorage(BaseStorage):
         raise NotImplementedError
 
     def _create_local(self, id, value):
-        with open(os.path.join(self.objects_dir, str(id) + '.json'), mode='w', encoding='utf8') as fout:
+        local_file = os.path.join(self.objects_dir, str(id) + '.json')
+        logger.debug('Creating local copy in file ' + local_file)
+        with open(local_file, mode='w', encoding='utf8') as fout:
             json.dump(value, fout, indent=2)
 
     def max_id(self):
@@ -325,7 +345,7 @@ class CloudStorage(BaseStorage):
     def _validate_object(self, key):
         pass
 
-    def iter_keys(self):
+    def iter_full_keys(self):
         for key in self._get_objects():
             try:
                 self._validate_object(key)
@@ -334,7 +354,7 @@ class CloudStorage(BaseStorage):
             if not self.regex.match(key):
                 logger.debug(key + ' is skipped by regex filter')
                 continue
-            yield key
+            yield self.key_prefix + key
 
     def _sync(self):
         with self.thread_lock:
@@ -345,7 +365,7 @@ class CloudStorage(BaseStorage):
         new_ids_keys_map = {}
         new_keys_ids_map = {}
 
-        for key in self.iter_keys():
+        for key in self.iter_full_keys():
             if key not in self._keys_ids_map:
                 id = new_id
                 new_id += 1

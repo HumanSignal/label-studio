@@ -3,6 +3,7 @@ import os
 import io
 import requests
 import calendar
+import threading
 
 from datetime import datetime
 from mixpanel import Mixpanel, MixpanelException
@@ -77,6 +78,11 @@ class Analytics(object):
         self._project_name = convert_string_to_hash(project_name)
 
     def send(self, event_name, **kwargs):
+        # self.send_job(event_name, **kwargs)
+        thread = threading.Thread(target=self.send_job, args=(event_name,), kwargs=kwargs)
+        thread.start()
+
+    def send_job(self, event_name, **kwargs):
         if not self._collect_analytics:
             return
         data = deepcopy(kwargs)
@@ -100,4 +106,3 @@ class Analytics(object):
             requests.post(url=url, json=json_data)
         except requests.RequestException as exc:
             logger.debug('Analytics error: {exc}'.format(exc=str(exc)))
-            pass

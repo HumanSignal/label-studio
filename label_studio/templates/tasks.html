@@ -305,7 +305,7 @@
   </center>
 
   {% endraw %}
-  {% include 'storages.html' %}
+  {% include 'includes/storages.html' %}
   {% raw %}
 
   </div>
@@ -370,18 +370,23 @@
 
           methods: {
               getApi: function (dst, url, always, fail, done) {
+                  /* this api call will do vue.data['dst'] = get(url) */
+
                   var root = this;
                   $.get(url + (url.includes('?') ? '&' : '?') + 'rnd=' + randomInteger(0, 100000))
                       .done(function (data) {
                           setValue(root, dst, data);
                           if (done) done(data);
                           if (always) always(data);
-                          console.log(dst + ' loaded');
+                          // console.log(dst + ' loaded');
                       })
                       .fail(function (data) {
                           if (fail) fail(data);
+                          else {
+                              root.showError('Error while get api for <' + dst + '>:', message_from_response(data));
+                          }
                           if (always) always(data);
-                          console.log('no ' + dst + ' loaded')
+                          console.log('error: no ' + dst + ' loaded')
                       })
               },
 
@@ -407,7 +412,7 @@
               // get project info from api
               loadProject: function () {
                   var root = this;
-                  this.getApi('project', '/api/project/',
+                  this.getApi('project', '/api/project/?fast=1',
                       // always
                       function () { root.project_loaded = true; },
                       // fail
@@ -431,21 +436,28 @@
 
               // get settings from storage_settings_all
               changeStorageSettings: function (storage_for, storage_type) {
+                  // change to current on backend
                   if (storage_type === 'current') {
                       var storages = this.storage_settings_all[storage_for];
                       for (var type in storages) {
                           var value = storages[type];
                           if (value.current) {
+                              storage_type = type;
                               setValue(this, 'storage_settings.'+storage_for, value);
                               break;
                           }
                       }
                   }
+                  // change to new type
                   else {
                       var value = this.storage_settings_all[storage_for][storage_type];
                       setValue(this, 'storage_settings.'+storage_for, value);
                   }
 
+                  // hide/show link to import page
+                  if (storage_for === 'source') {
+                      $('#menu-import').css("display", storage_type === 'tasks-json' ? 'block' : 'none');
+                  }
               },
 
               saveStorageSettings: function(storage_for) {
@@ -464,8 +476,11 @@
                   }).fail(function (data) {
                       if (data.hasOwnProperty('responseJSON') && data.responseJSON.hasOwnProperty('errors'))
                           root.$set(root.storage_settings[storage_for], 'errors', data.responseJSON.errors);
-                      else
-                          root.storage_settings[storage_for].errors = {common: message_from_response(data)};
+                      else {
+                          var msg = message_from_response(data);
+                          root.storage_settings[storage_for].errors = {common: msg};
+                          root.showError('Storage settings error', msg)
+                      }
                       console.log('save storage settings error:');
                       console.log(data);
                   }).done(function() {
@@ -491,6 +506,14 @@
               loadProjectAndTasks: function () {
                   this.loadProject();
                   this.loadTasks();
+              },
+
+              // update all objects via api
+              loadProjectAndTasksByTimer: function () {
+                  if (this.project_loaded && this.tasks_loaded) {
+                      this.loadProject();
+                      this.loadTasks();
+                  }
               },
 
               // change order of sorting in table
@@ -545,7 +568,7 @@
                     this.auto_update_timer = null;
                   }
                   else {
-                    this.auto_update_timer = setInterval(this.loadProjectAndTasks, this.timer_interval);
+                    this.auto_update_timer = setInterval(this.loadProjectAndTasksByTimer, this.timer_interval);
                   }
               },
 
@@ -557,6 +580,23 @@
                       if (all[key].current)
                           return all[key];
                   return {description: '[No storage defined]', name: '[No storage defined]'}
+              },
+
+              showStorageField: function(field_name, storage) {
+                if (field_name !== 'create_local_copy') {
+                    // find field use_blob_urls inside of list
+                    var use_blob_urls = null;
+                    for (var i in storage.fields) {
+                        if (storage.fields[i].name === 'use_blob_urls') {
+                            use_blob_urls = storage.fields[i];
+                            break;
+                        }
+                    }
+                    if (field_name === 'data_key' && !use_blob_urls.data) {
+                      return false;
+                    }
+                    return true;
+                }
               },
 
               showError: function(title, message) {
