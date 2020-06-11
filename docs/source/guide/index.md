@@ -13,7 +13,7 @@ Here are the main concepts behind Label Studio's workflow:
 <div style="margin:auto; text-align:center; width:100%"><img src="/images/label-studio-ov.jpg" style="opacity: 0.7"/></div>
 
 - **Tasks** represent an individual dataset items. Label Studio is a multi-type labeling tool - you can [import](tasks.html) either text, image, audio URL, HTML text or any number and combination of these data resources.
-- **Completions** are the labeling results in [JSON format](export.html#Completion-fields). They could be [exported](completions.html) in various common formats, ready to use in machine learning pipelines.
+- **Completions** are the labeling results in [JSON format](export.html#Completion-fields). They could be [exported](export.html) in various common formats, ready to use in machine learning pipelines.
 - **Predictions** are the optional labeling results in [the same format](export.html#Completion-fields), but unlike completions they are used for generating pre-labeling during the annotation process, or validating the model predictions.
 - [**Machine learning backend** connects](ml.html) popular machine learning frameworks to Label Studio for active learning & generating model predictions on-the-fly.
 - **Labeling config** is a simple [XML tree with **tags**](setup.html#Labeling-config) used to configure UI elements, connect input data to output labeling scheme.
@@ -70,7 +70,7 @@ docker build -t heartexlabs/label-studio:latest .
 
 ### Running from source
 
-If you want to use nighty builds, or extend the functionality, consider to download the source code using Git and run Label Studio locally:
+If you want to use nightly builds, or extend the functionality, consider to download the source code using Git and run Label Studio locally:
 
 ```bash
 git clone https://github.com/heartexlabs/label-studio.git

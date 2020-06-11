@@ -88,7 +88,7 @@ Here is an example of a config and tasks list composed of one element, for text 
 
 There are a few possible ways to import data files to your labeling project:
 
- - Start Label Studio without specifying input path and then import through the web interfaces available at [http://127.0.0.1:8080/import](here)
+ - Start Label Studio without specifying input path and then import through the web interfaces available at [http://localhost:8080/import](http://localhost:8080/import)
 
  - Initialize Label Studio project and directly specify the paths, e.g. `label-studio init --input-path my_tasks.json --input-format json`
 
