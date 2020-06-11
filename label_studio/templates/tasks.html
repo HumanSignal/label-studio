@@ -450,8 +450,9 @@
                   }
 
                   // hide/show link to import page
-                  document.getElementById('menu-import').style.display =
-                      storage_type === 'tasks-json' ? 'block' : 'none';
+                  if (storage_for === 'source') {
+                      $('#menu-import').css("display", storage_type === 'tasks-json' ? 'block' : 'none');
+                  }
               },
 
               saveStorageSettings: function(storage_for) {
