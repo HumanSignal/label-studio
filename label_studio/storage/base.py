@@ -145,8 +145,8 @@ class IsValidRegex(object):
 class CloudStorageForm(BaseStorageForm):
 
     prefix = StringField('Prefix', [Optional()], description='File prefix')
-    regex = StringField('Regex', [IsValidRegex()], description='File filter by regex, example: .*jpe?g')
-    data_key = StringField('Data key', [InputRequired()], description='Task tag key from your label config')
+    regex = StringField('Regex', [IsValidRegex()], description='File filter by regex, example: .* (If not specified, all files will be skipped)')  # noqa
+    data_key = StringField('Data key', [Optional()], description='Task tag key from your label config')
     use_blob_urls = BooleanField('Use BLOBs URLs', default=True,
                                  description='Generate task data with URLs pointed to your bucket objects '
                                              '(for resources like jpg, mp3 & other BLOBs). This could be used for '
@@ -311,7 +311,9 @@ class CloudStorage(BaseStorage):
         raise NotImplementedError
 
     def _create_local(self, id, value):
-        with open(os.path.join(self.objects_dir, str(id) + '.json'), mode='w', encoding='utf8') as fout:
+        local_file = os.path.join(self.objects_dir, str(id) + '.json')
+        logger.debug('Creating local copy in file ' + local_file)
+        with open(local_file, mode='w', encoding='utf8') as fout:
             json.dump(value, fout, indent=2)
 
     def max_id(self):
