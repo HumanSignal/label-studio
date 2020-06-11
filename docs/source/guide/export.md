@@ -14,7 +14,7 @@ You can optionally convert and export raw completions to a more common format by
 
 ## Basic format
 
-The output data is stored in _completions_ - JSON formatted files, one per each completed task saved in project directory in `completions` folder or in the [`"output_dir"` option](config.html#output_dir) The example structure of _completion_ is the following:
+The output data is stored in _completions_ - JSON formatted files, one per each completed task saved in project directory in `completions` folder or in the [`"output_dir"` option](setup.html#Structure) The example structure of _completion_ is the following:
 
 ```json
 {
@@ -136,7 +136,7 @@ Tag specific value that includes the labeling result details. The exact structur
 
 ### data
 
-Data copied from [input task](config.html#JSON-file)
+Data copied from [input task](tasks.html#Basic-format)
 
 ### id
 
@@ -144,7 +144,7 @@ Task identifier
 
 ### predictions
 
-Machine learning predictions (aka _pre-labeling results_). Follows the [same format](completions.html#completions) as completion, with some additional fields related to machine learning inference:
+Machine learning predictions (aka _pre-labeling results_). Follows the [same format](export.html#completions) as completion, with some additional fields related to machine learning inference:
 
 - **score** - the overall result score (probabilistic output, confidence level, etc.)
 

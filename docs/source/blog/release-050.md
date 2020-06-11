@@ -127,7 +127,7 @@ Previously changing a config after importing or labeling tasks could be dangerou
 
 ### Exporting with automatic converters
 
-When finishing your project - go to the [export page](http://localhost:8080/export) and choose in between the [common export formats](/guide/completions.html#Export-formats) valid for your current project configuration.
+When finishing your project - go to the [export page](http://localhost:8080/export) and choose in between the [common export formats](/guide/export.html#Export-formats) valid for your current project configuration.
 
 ### Connection to running Machine Learning backend
 

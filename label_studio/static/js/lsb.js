@@ -140,7 +140,7 @@ const loadNext = function(ls) {
 };
 
 const loadTask = function(ls, taskID) {
-  var url = `${API_URL.MAIN}${API_URL.PROJECTS}/1${API_URL.TASKS}/${taskID}`;
+  var url = `${API_URL.MAIN}${API_URL.TASKS}/${taskID}`;
     return _loadTask(ls, url);
 };
 

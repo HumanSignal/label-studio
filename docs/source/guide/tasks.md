@@ -17,8 +17,8 @@ Label Studio expects the JSON-formatted list of _tasks_ as input. Each _task_ is
     - `<AudioPlus value="$key">`: `value` is taken as a valid URL to an audio file with CORS policy enabled on the server side
     - `<Image value="$key">`: `value` is a valid URL to an image file
 * (optional) **id** - integer task ID
-* (optional) **completions** - list of output annotation results, where each result is saved using [Label Studio's completion format](/guide/completions.html#completions). You can import annotation results in order to use them in consequent labeling task.
-* (optional) **predictions** - list of model prediction results, where each result is saved using [Label Studio's prediction format](/guide/completions.html#predictions). Importing predictions is useful for automatic task prelabeling & active learning & exploration.
+* (optional) **completions** - list of output annotation results, where each result is saved using [Label Studio's completion format](/guide/export.html#completions). You can import annotation results in order to use them in consequent labeling task.
+* (optional) **predictions** - list of model prediction results, where each result is saved using [Label Studio's prediction format](/guide/export.html#predictions). Importing predictions is useful for automatic task prelabeling & active learning & exploration.
 
 > Note: in case `"data"` field is missing in imported task object, the whole task body is interpreted as `task["data"]`, i.e. `[{"my_key": "my_value"}]` will be internally converted to `[{"data": {"my_key": "my_value"}}]`
 
@@ -92,7 +92,7 @@ There are a few possible ways to import data files to your labeling project:
 
  - Initialize Label Studio project and directly specify the paths, e.g. `label-studio init --input-path my_tasks.json --input-format json`
 
-The `--input-path` argument points to a file or a directory where your labeling tasks reside. By default it expects [JSON-formatted tasks](config.html#JSON-file), but you can also specify all other formats listed bellow by using `--input-format` option.
+The `--input-path` argument points to a file or a directory where your labeling tasks reside. By default it expects [JSON-formatted tasks](tasks.html#JSON), but you can also specify all other formats listed bellow by using `--input-format` option.
 
 ### JSON
 

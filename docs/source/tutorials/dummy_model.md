@@ -10,8 +10,8 @@ If you create ML backend by using Label Studio's ML SDK, you have to follow the 
 
 - created model class should be inherited from `label_studio.ml.LabelStudioMLBase`
 - 2 methods should be overrided:
-    - `predict()` takes [input tasks](/guide/tasks.html#Basic-format) and outputs [predictions](/guide/completions.html#predictions) in a Label Studio format
-    - `train()` receives [completions](/guide/completions.html#Basic-format) iterable and returns dictionary with created links and resources. This dictionary will be later used for model loading via `self.train_output` field.
+    - `predict()` takes [input tasks](/guide/tasks.html#Basic-format) and outputs [predictions](/guide/export.html#predictions) in a Label Studio format
+    - `train()` receives [completions](/guide/export.html#Basic-format) iterable and returns dictionary with created links and resources. This dictionary will be later used for model loading via `self.train_output` field.
 
 Create a file `model.py` with the following content:
 
