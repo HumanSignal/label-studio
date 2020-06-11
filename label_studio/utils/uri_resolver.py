@@ -7,6 +7,8 @@ from botocore.exceptions import ClientError
 from urllib.parse import urlparse
 from google.cloud import storage as gs
 
+from label_studio.storage.s3 import get_client_and_resource
+
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +33,7 @@ def resolve_s3(url, s3_client=None, **kwargs):
     bucket_name = r.netloc
     key = r.path.lstrip('/')
     if s3_client is None:
-        s3_client = boto3.client('s3')
+        s3_client, _ = get_client_and_resource(**kwargs)
     try:
         presigned_url = s3_client.generate_presigned_url(
             ClientMethod='get_object',
