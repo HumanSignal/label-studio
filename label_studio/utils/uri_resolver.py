@@ -12,6 +12,8 @@ from datetime import datetime, timedelta
 
 from label_studio.storage.s3 import get_client_and_resource
 
+from label_studio.storage.s3 import get_client_and_resource
+
 
 logger = logging.getLogger(__name__)
 
