@@ -370,18 +370,23 @@
 
           methods: {
               getApi: function (dst, url, always, fail, done) {
+                  /* this api call will do vue.data['dst'] = get(url) */
+
                   var root = this;
                   $.get(url + (url.includes('?') ? '&' : '?') + 'rnd=' + randomInteger(0, 100000))
                       .done(function (data) {
                           setValue(root, dst, data);
                           if (done) done(data);
                           if (always) always(data);
-                          console.log(dst + ' loaded');
+                          // console.log(dst + ' loaded');
                       })
                       .fail(function (data) {
                           if (fail) fail(data);
+                          else {
+                              root.showError('Error while get api for <' + dst + '>:', message_from_response(data));
+                          }
                           if (always) always(data);
-                          console.log('no ' + dst + ' loaded')
+                          console.log('error: no ' + dst + ' loaded')
                       })
               },
 
