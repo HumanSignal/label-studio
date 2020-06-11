@@ -476,8 +476,11 @@
                   }).fail(function (data) {
                       if (data.hasOwnProperty('responseJSON') && data.responseJSON.hasOwnProperty('errors'))
                           root.$set(root.storage_settings[storage_for], 'errors', data.responseJSON.errors);
-                      else
-                          root.storage_settings[storage_for].errors = {common: message_from_response(data)};
+                      else {
+                          var msg = message_from_response(data);
+                          root.storage_settings[storage_for].errors = {common: msg};
+                          root.showError('Storage settings error', msg)
+                      }
                       console.log('save storage settings error:');
                       console.log(data);
                   }).done(function() {
