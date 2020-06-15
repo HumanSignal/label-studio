@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.5,]
+        python-version: [3.5, 3.6, 3.7, 3.8]
 
     steps:
     - uses: actions/checkout@v2
@@ -33,4 +33,4 @@ jobs:
         label-studio init my_project
     - name: Test with pytest
       run: |
-        python -m pytest
+        python -m pytest -v
