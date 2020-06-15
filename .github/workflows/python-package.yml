@@ -5,7 +5,7 @@ name: label-studio package
 
 on:
   push:
-    branches: [ master ]
+    branches: [ feature/test_framework ]
   pull_request:
     branches: [ master ]
 
