@@ -4,20 +4,23 @@ from types import SimpleNamespace
 
 # 3rd party
 import pytest
+from _pytest import monkeypatch
+from flask import template_rendered
 
 # label_studio
-from label_studio.server import app
+from label_studio.server import app, str2datetime
+from label_studio import server
 from label_studio.project import Project
 
 
 @pytest.fixture(scope='module')
 def test_client():
-    #flask_app = create_app('flask_test.cfg')
 
     app.config['TESTING'] = True
     app.config['DEBUG'] = False
+    app.jinja_env.filters['str2datetime'] = str2datetime
 
-    # Flask provides a way to test your application by exposing the Werkzeug test Client
+    # Flask provides a way to test your application by exposing test Client
     # and handling the context locals for you.
     testing_client = app.test_client()
 
@@ -32,7 +35,20 @@ def test_client():
     ctx.pop()
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture
+def captured_templates():
+    recorded = []
+
+    def record(sender, template, context, **extra):
+        recorded.append((template, context))
+
+    template_rendered.connect(record, app)
+    try:
+        yield recorded
+    finally:
+        template_rendered.disconnect(record, app)
+
+
 def new_project():
     project_name = 'my_project'
     user = 'admin'
@@ -44,3 +60,8 @@ def new_project():
             'multi_session': False
     })
     return project
+
+
+
+
+

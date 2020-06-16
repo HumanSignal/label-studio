@@ -48,11 +48,31 @@ from label_studio.tasks import Tasks
 
 logger = logging.getLogger(__name__)
 
-app = flask.Flask(__name__, static_url_path='')
 
-app.secret_key = 'A0Zrdqwf1AQWj12ajkhgFN]dddd/,?RfDWQQT'
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
-app.config['WTF_CSRF_ENABLED'] = False
+def create_app():
+    """Create application factory, as explained here:
+    http://flask.pocoo.org/docs/patterns/appfactories/.
+
+        config_object="label_studio.settings"
+    :param config_object: The configuration object to use.
+    """
+    app = flask.Flask(__name__, static_url_path='')
+    #app.config.from_object(config_object)
+    app.secret_key = 'A0Zrdqwf1AQWj12ajkhgFN]dddd/,?RfDWQQT'
+    app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+    app.config['WTF_CSRF_ENABLED'] = False
+
+    #register_extensions(app)
+    #register_blueprints(app)
+    #register_errorhandlers(app)
+    #register_shellcontext(app)
+    #register_commands(app)
+    #configure_logger(app)
+    return app
+
+
+app = create_app()
+
 
 # input arguments
 input_args = None
@@ -71,7 +91,7 @@ def project_get_or_create(multi_session_force_recreate=False):
     - "session": project is based on "project_name" key restored from flask.session object
     :return:
     """
-    if input_args.command == 'start-multi-session':
+    if input_args and input_args.command == 'start-multi-session':
         # get user from session
         if 'user' not in session:
             session['user'] = str(uuid4())

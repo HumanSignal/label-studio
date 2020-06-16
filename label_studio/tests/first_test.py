@@ -1,62 +1,124 @@
 # python
+import os
+from types import SimpleNamespace
 
 # 3rd party
 import pytest
+#from pytest import monkeypatch
 
 # label_studio
+from label_studio import server
 from label_studio.server import (
-    app,
+    input_args,
     validation_error_handler,
+    project_get_or_create,
 )
 from label_studio.tests.base import (
-    test_client, new_project
+    test_client, captured_templates, new_project,
 )
 
 
-#def test_project_get_or_create():
+@pytest.fixture(autouse=True)
+def default_project(monkeypatch):
+    """
+        apply patch for
+        label_studio.server.project_get_or_create()
+        for all tests.
+    """
+    monkeypatch.setattr(server, 'project_get_or_create', new_project)
 
 
-def test_validation_error_handler():
-    assert validation_error_handler('error') == ('error', 500)
+class TestUtilities:
+
+    def test_validation_error_handler(self):
+        assert validation_error_handler('error') == ('error', 500)
 
 
-def test_labeling_page(test_client):
-    response = test_client.get('/')
-    assert response.status_code == 200
+class TestMain:
+    """/ Main"""
+
+    def test_labeling_page(self, test_client, captured_templates):
+
+        response = test_client.get('/')
+        #print('\n response', response)
+        #print('\n response.data', response.data)
+        #print('\n captured_templates', captured_templates)
+        template, context = captured_templates[0]
+        #print('\n template', template)
+        #print('\n context', context)
+        assert template.name == 'labeling.html'
+        assert response.status_code == 200
+        assert context.get('label_config_line', None) != None
 
 
-def test_welcome(test_client):
-    response = test_client.get('/welcome')
-    assert response.status_code == 200
+class TestWelcome:
+    """Welcome"""
+
+    def test_welcome_returns_200(self, test_client, captured_templates):
+        """Login successful."""
+        response = test_client.get("/welcome")
+        template, context = captured_templates[0]
+
+        assert template.name == 'welcome.html'
+        assert response.status_code == 200
+
+    def test_welcome_no_post(self, test_client):
+        response = test_client.post('/welcome')
+        assert response.status_code == 405
 
 
-def test_welcome_no_post(test_client):
-    response = test_client.post('/welcome')
-    assert response.status_code == 405
+class TestTasks:
+    """Welcome"""
 
-def test_tasks_page(test_client):
-    response = test_client.get('/welcome')
-    assert response.status_code == 200
+    def test_tasks_returns_200(self, test_client, captured_templates):
+        # Goes to homepage
+        response = test_client.get("/api/tasks")
+        #template, context = captured_templates
+        #print('\n context', context)
 
-
-def test_setup_page(test_client):
-    response = test_client.get('/setup')
-    assert response.status_code == 200
-
-
-def test_import_page(test_client):
-    response = test_client.get('/import')
-    assert response.status_code == 200
+        #assert template.name == 'tasks.html'
+        assert response.status_code == 200
 
 
-def test_export_page(test_client):
-    response = test_client.get('/export')
-    assert response.status_code == 200
+class TestSetup:
+    """Setup"""
+    def test_setup_page(self, test_client, captured_templates):
+        response = test_client.get('/setup')
+        template, context = captured_templates[0]
+
+        #assert template.name == 'setup.html'
+        assert response.status_code == 200
 
 
-def test_model_page(test_client):
-    response = test_client.get('/model')
-    assert response.status_code == 200
+class TestImport:
+    """Import"""
+    def test_import_page(self, test_client, captured_templates):
+        response = test_client.get('/import')
+        template, context = captured_templates[0]
+
+        assert template.name == 'import.html'
+        assert response.status_code == 200
+
+
+class TestExport:
+    """Export"""
+    def test_export_page(self, test_client, captured_templates):
+        response = test_client.get('/export')
+        template, context = captured_templates[0]
+
+        assert template.name == 'export.html'
+        assert response.status_code == 200
+
+
+class TestModel:
+    """Model"""
+    def test_model_page(self, test_client,  captured_templates):
+        response = test_client.get('/model')
+        template, context = captured_templates[0]
+
+        assert template.name == 'model.html'
+        assert response.status_code == 200
+
 
 #def api_render_label_studio():
 #def api_validate_config():
