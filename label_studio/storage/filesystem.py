@@ -158,6 +158,7 @@ class ExternalTasksJSONStorage(CloudStorage):
             prefix=None,
             regex='.*',
             create_local_copy=False,
+            sync_in_thread=False,
             **kwargs
         )
         # data is used as a local cache for tasks.json file
