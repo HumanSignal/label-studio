@@ -34,4 +34,5 @@ jobs:
     - name: Test with pytest
       run: |
         python -m pytest -vs
+        coverage run -m --source=label_studio pytest
         coverage report -m
