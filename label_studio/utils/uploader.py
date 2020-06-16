@@ -9,6 +9,7 @@ import rarfile
 import logging
 import tempfile
 import pandas as pd
+import htmlmin
 try:
     import ujson as json
 except:
@@ -45,6 +46,10 @@ def tasks_from_file(filename, file, project):
                 tasks = json.loads(raw_data)
             except TypeError:
                 tasks = json.loads(raw_data.decode('utf8'))
+        elif filename.endswith('.html'):
+            data = file.read()
+            body = htmlmin.minify(data.decode('utf8'), remove_all_empty_space=True)
+            tasks = [{'data': {settings.UPLOAD_DATA_UNDEFINED_NAME: body}}]
         else:
             # save file to disk
             data = file.read()
