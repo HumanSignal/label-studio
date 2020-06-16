@@ -17,7 +17,8 @@ class Settings:
 
 
 _DATA_TYPES = {
-    'Text': [str, int],
+    'Text': [str, int, float],
+    'Header': [str, int, float],
     'HyperText': [str],
     'Image': [str],
     'List': [list],
