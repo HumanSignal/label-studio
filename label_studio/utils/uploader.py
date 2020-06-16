@@ -21,7 +21,7 @@ from urllib.request import urlopen
 
 from .exceptions import ValidationError
 from .misc import Settings
-from label_studio.utils.functions import get_full_hostname, get_web_protocol
+from label_studio.utils.functions import HOSTNAME
 
 
 settings = Settings
