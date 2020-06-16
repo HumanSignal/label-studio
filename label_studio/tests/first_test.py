@@ -37,11 +37,15 @@ class TestMain:
     def test_labeling_page(self, test_client, captured_templates):
 
         response = test_client.get('/')
-        print('\n captured_templates', captured_templates)
-        #template, context = captured_templates[0]
-        #assert template.name == 'labeling.html'
-        assert response.status_code == 200
-        #assert context.get('label_config_line', None) != None
+        # tasks exists
+        if response.status_code == 200:
+            print('\n captured_templates', captured_templates)
+            template, context = captured_templates[0]
+            assert template.name == 'labeling.html'
+            assert context.get('label_config_line', None) != None
+        else:
+            #no tasks
+            assert response.status_code == 302
 
 
 class TestWelcome:
