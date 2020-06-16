@@ -33,4 +33,5 @@ jobs:
         label-studio init my_project
     - name: Test with pytest
       run: |
-        python -m pytest -v
+        python -m pytest -vs
+        coverage report -m

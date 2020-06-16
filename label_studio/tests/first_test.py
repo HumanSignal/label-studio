@@ -1,10 +1,8 @@
 # python
 import os
-from types import SimpleNamespace
 
 # 3rd party
 import pytest
-#from pytest import monkeypatch
 
 # label_studio
 from label_studio import server
@@ -40,12 +38,8 @@ class TestMain:
     def test_labeling_page(self, test_client, captured_templates):
 
         response = test_client.get('/')
-        #print('\n response', response)
-        #print('\n response.data', response.data)
-        #print('\n captured_templates', captured_templates)
+        print('\n captured_templates', captured_templates)
         template, context = captured_templates[0]
-        #print('\n template', template)
-        #print('\n context', context)
         assert template.name == 'labeling.html'
         assert response.status_code == 200
         assert context.get('label_config_line', None) != None
@@ -68,14 +62,10 @@ class TestWelcome:
 
 
 class TestTasks:
-    """Welcome"""
+    """Tasks"""
 
     def test_tasks_returns_200(self, test_client, captured_templates):
-        # Goes to homepage
         response = test_client.get("/api/tasks")
-        #template, context = captured_templates
-        #print('\n context', context)
-
         #assert template.name == 'tasks.html'
         assert response.status_code == 200
 
