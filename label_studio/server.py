@@ -23,7 +23,8 @@ from urllib.parse import unquote
 from datetime import datetime
 from inspect import currentframe, getframeinfo
 from flask import (
-    request, jsonify, make_response, Response, Response as HttpResponse, send_file, session, redirect
+    request, jsonify, make_response, Response, Response as HttpResponse,
+    send_file, session, redirect
 )
 from flask_api import status
 from types import SimpleNamespace
@@ -90,7 +91,8 @@ def project_get_or_create(multi_session_force_recreate=False):
         if multi_session_force_recreate:
             raise NotImplementedError(
                 '"multi_session_force_recreate" option supported only with "start-multi-session" mode')
-        return Project.get_or_create(input_args.project_name, input_args, context={'multi_session': False})
+        return Project.get_or_create(input_args.project_name,
+                                     input_args, context={'multi_session': False})
 
 
 @app.template_filter('json')

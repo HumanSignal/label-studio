@@ -3,43 +3,44 @@ import os
 from types import SimpleNamespace
 
 # 3rd party
-import unittest
+import pytest
 
 # label_studio
 from label_studio.server import app
 from label_studio.project import Project
 
 
-class BasicTest(unittest.TestCase):
+@pytest.fixture(scope='module')
+def test_client():
+    #flask_app = create_app('flask_test.cfg')
 
-    ############################
-    #### setup and teardown ####
-    ############################
+    app.config['TESTING'] = True
+    app.config['DEBUG'] = False
 
-    def setUp(self):
-        """
-            executed prior to each test
-        """
-        app.config['TESTING'] = True
-        app.config['DEBUG'] = False
+    # Flask provides a way to test your application by exposing the Werkzeug test Client
+    # and handling the context locals for you.
+    testing_client = app.test_client()
 
-        self.app = app.test_client()
+    # Establish an application context before running the tests.
+    ctx = app.app_context()
+    ctx.push()
+    assert app.debug == False
 
-        project_name = 'my_project'
-        user = 'admin'
-        input_args_dict = {
-            'root_dir':os.path.join(os.path.dirname(__file__), '../../')
-        }
-        input_args = SimpleNamespace(**input_args_dict)
+    # this is where the testing happens!
+    yield testing_client
 
-        project = Project.get_or_create(project_name, input_args, context={
+    ctx.pop()
+
+
+@pytest.fixture(scope='module')
+def new_project():
+    project_name = 'my_project'
+    user = 'admin'
+    input_args_dict = {
+        'root_dir':os.path.join(os.path.dirname(__file__), '../../')
+    }
+    input_args = SimpleNamespace(**input_args_dict)
+    project = Project.get_or_create(project_name, input_args, context={
             'multi_session': False
-        })
-
-        # Disable sending emails during unit testing
-        # mail.init_app(app)
-        self.assertEqual(app.debug, False)
-
-    # executed after each test
-    def tearDown(self):
-        pass
+    })
+    return project
