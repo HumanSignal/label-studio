@@ -263,19 +263,25 @@ class CloudStorage(BaseStorage):
 
     def get(self, id):
         item = self._ids_keys_map.get(id)
-        if item:
-            try:
-                key = item['key'].split(self.key_prefix, 1)[-1]
-                data = self.get_data(key)
-            except Exception as exc:
-                # return {'error': True, 'message': str(exc)}
-                logger.error(str(exc), exc_info=True)
-                return
-            if 'data' in data:
-                data['id'] = id
-                return data
-            else:
-                return {'data': data, 'id': id}
+        if not item:
+            # selected id not found in fetched keys
+            return
+        item_key = item['key']
+        if not item_key.startswith(self.key_prefix + self.prefix):
+            # found key not from current storage
+            return
+        try:
+            key = item_key.split(self.key_prefix, 1)[-1]
+            data = self.get_data(key)
+        except Exception as exc:
+            # return {'error': True, 'message': str(exc)}
+            logger.error(str(exc), exc_info=True)
+            return
+        if 'data' in data:
+            data['id'] = id
+            return data
+        else:
+            return {'data': data, 'id': id}
 
     def _id_to_key(self, id):
         if not isinstance(id, str):
