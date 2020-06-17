@@ -671,6 +671,7 @@ def api_tasks(task_id):
     project = project_get_or_create()
     if request.method == 'GET':
         task_data = project.get_task_with_completions(task_id) or project.source_storage.get(task_id)
+        task_data = resolve_task_data_uri(task_data)
         project.analytics.send(getframeinfo(currentframe()).function)
         return make_response(jsonify(task_data), 200)
     elif request.method == 'DELETE':
