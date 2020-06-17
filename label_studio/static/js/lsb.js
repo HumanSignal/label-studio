@@ -186,11 +186,13 @@ const LSB = function(elid, config, task) {
     return body;
   };
 
-  function addHistory(ls, task_id, completion_id) {
-        if (!ls.taskHistoryIds) {
+  function initHistory(ls) {
+      if (!ls.taskHistoryIds) {
           ls.taskHistoryIds = [];
           ls.taskHistoryCurrent = -1;
       }
+  }
+  function addHistory(ls, task_id, completion_id) {
       ls.taskHistoryIds.push({task_id: task_id, completion_id: completion_id});
       ls.taskHistoryCurrent = ls.taskHistoryIds.length;
   }
@@ -255,7 +257,6 @@ const LSB = function(elid, config, task) {
                      'Next <i class="ui icon fa-angle-right"></i></button>');
         firstBlock.after(block);
       }
-
     },
 
     onUpdateCompletion: function(ls, c) {
@@ -315,6 +316,7 @@ const LSB = function(elid, config, task) {
       var self = ls;
       ls.onTaskLoad = this.onTaskLoad;  // FIXME: make it inside of LSF
       ls.onPrevButton = this.onPrevButton; // FIXME: remove it in future
+      initHistory(ls);
 
       if (!task) {
         ls.setFlags({ isLoading: true });
