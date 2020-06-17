@@ -121,7 +121,6 @@ const _loadTask = function(ls, url, completionID) {
 
                 // we are on history item, take completion id from history
                 else if (ls.completionStore.completions.length > 0 && completionID) {
-                    console.log(completionID);
                     c = {id: completionID};
                 }
 
@@ -129,7 +128,7 @@ const _loadTask = function(ls, url, completionID) {
                     c = ls.completionStore.addCompletion({ userGenerate: true });
                 }
 
-                cs.selectCompletion(c.id);
+                if (c.id) cs.selectCompletion(c.id);
 
                 ls.setFlags({ isLoading: false });
 
@@ -187,6 +186,15 @@ const LSB = function(elid, config, task) {
     return body;
   };
 
+  function addHistory(ls, task_id, completion_id) {
+        if (!ls.taskHistoryIds) {
+          ls.taskHistoryIds = [];
+          ls.taskHistoryCurrent = -1;
+      }
+      ls.taskHistoryIds.push({task_id: task_id, completion_id: completion_id});
+      ls.taskHistoryCurrent = ls.taskHistoryIds.length;
+  }
+
   var LS = new LabelStudio(elid, {
     config: config,
     user: { pk: 1, firstName: "Awesome", lastName: "User" },
@@ -209,21 +217,13 @@ const LSB = function(elid, config, task) {
 
     onSubmitCompletion: function(ls, c) {
       ls.setFlags({ isLoading: true });
-      if (!ls.taskHistoryIds) {
-          ls.taskHistoryIds = [];
-          ls.taskHistoryCurrent = -1;
-      }
-      ls.taskHistoryIds.push({task_id: ls.task.id, completion_id: null});
-      ls.taskHistoryCurrent = ls.taskHistoryIds.length;
-
       const req = Requests.poster(`${API_URL.MAIN}${API_URL.TASKS}/${ls.task.id}${API_URL.COMPLETIONS}/`, _prepData(c));
 
       req.then(function(httpres) {
         httpres.json().then(function(res) {
           if (res && res.id) {
               c.updatePersonalKey(res.id.toString());
-              ls.taskHistoryIds[ls.taskHistoryIds.length-1].completion_id = res.id;
-              console.log(ls.taskHistoryIds)
+              addHistory(ls, ls.task.id, res.id);
           }
 
           if (task) {
@@ -283,13 +283,15 @@ const LSB = function(elid, config, task) {
 
     onSkipTask: function(ls, completion) {
       ls.setFlags({ loading: true });
+      let root = this;
 
       Requests.poster(
         `${API_URL.MAIN}${API_URL.TASKS}/${ls.task.id}${API_URL.CANCEL}`,
         JSON.stringify(completion),
       ).then(function(response) {
         response.json().then(function (res) {
-          // if (res && res.id) completion.updatePersonalKey(res.id.toString());
+           addHistory(ls, ls.task.id, null);
+           // if (res && res.id) completion.updatePersonalKey(res.id.toString());
 
           if (task) {
             ls.setFlags({ isLoading: false });
