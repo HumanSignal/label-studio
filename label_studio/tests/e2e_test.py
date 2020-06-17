@@ -5,6 +5,7 @@ import os
 
 # 3rd party
 import pytest
+import unittest
 from flask import (
     jsonify,
 )
@@ -30,47 +31,41 @@ def default_project(monkeypatch):
 
 
 @pytest.fixture
-def label_config():
-    return """\
-<View>
-    <Text name="text" value="$text"/>
-    <Choices name="sentiment" toName="text" choice="single">
-        <Choice value="Positive"/>
-        <Choice value="Negative"/>
-        <Choice value="Neutral"/>
-    <Choice value="XXX"/>
-    </Choices>
-</View>
-"""
-
-
-@pytest.fixture
-def text_filename():
-    return 'lorem_ipsum.txt'
-
-
-@pytest.fixture
-def label_data():
+def test_case_config():
     return {
-        "lead_time":474.108,
-        "result": [{
-                "id":"_qRv9kaetd",
-                "from_name":"sentiment",
-                "to_name":"text",
-                "type":"choices",
-                "value":{"choices":["Neutral"]}
-            }]
+        'label_config': """\
+            <View>
+                <Text name="text" value="$text"/>
+                <Choices name="sentiment" toName="text" choice="single">
+                    <Choice value="Positive"/>
+                    <Choice value="Negative"/>
+                    <Choice value="Neutral"/>
+                <Choice value="XXX"/>
+                </Choices>
+            </View>
+            """,
+        'text_filename': 'lorem_ipsum.txt',
+        'label_data' : {
+            "lead_time":474.108,
+            "result": [{
+                    "id":"_qRv9kaetd",
+                    "from_name":"sentiment",
+                    "to_name":"text",
+                    "type":"choices",
+                    "value":{"choices":["Neutral"]}
+                }]
+            }
         }
 
 
-def test_prepare(test_client):
+def prepare():
     """
         prepare test project - empty ?
     """
     pass
 
 
-def test_config(test_client, label_config):
+def test_config(test_client, test_case_config):
     """
         set project labeling config
         make sure it matchs config preset name
@@ -81,7 +76,7 @@ def test_config(test_client, label_config):
         'Accept': mimetype
     }
     data = {
-        'label_config': label_config
+        'label_config': test_case_config['label_config']
     }
     response = test_client.post('/api/save-config',
                                 data=data, headers=headers)
@@ -94,7 +89,7 @@ def test_config(test_client, label_config):
     with open(project.config.get('label_config', None), 'r') as file:
         data = file.read()
         print(data)
-        assert data == label_config
+        assert data == test_case_config['label_config']
 
 
 """
@@ -107,13 +102,14 @@ sed do eiusmod tempor incididunt
 ut labore et dolore magna aliqua.
 """
 
-def test_text_import(test_client, text_filename):
+def test_text_import(test_client, test_case_config):
     """
         import data
         make sure it is in project directory
         and tasks r created
 
     """
+    text_filename = test_case_config['text_filename']
     mimetype = 'multipart/form-data'
     #mimetype = 'application/json'
     #mimetype = 'application/x-www-form-urlencoded'
@@ -138,13 +134,13 @@ def test_text_import(test_client, text_filename):
         print('\ntest_text_import >> data\n',data)
 
 
-def test_label(test_client, label_data):
+def test_label(test_client, test_case_config):
     """
         import data
         make sure it is in project directory
 
     """
-
+    label_data = test_case_config['label_data']
     #get task_id
     task_id = 71
     response = test_client.get(f'/?task={task_id}')
@@ -170,5 +166,4 @@ def test_export(test_client):
     """
     response = test_client.get('api/export')
     assert response.status_code == 200
-
 
