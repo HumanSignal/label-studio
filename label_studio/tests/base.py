@@ -37,6 +37,7 @@ def test_client():
 
 @pytest.fixture
 def captured_templates():
+    """receive templates name and context during flask render"""
     recorded = []
 
     def record(sender, template, context, **extra):
@@ -61,8 +62,3 @@ def goc_project():
             'multi_session': False
     })
     return project
-
-
-
-
-

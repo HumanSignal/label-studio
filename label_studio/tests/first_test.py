@@ -111,32 +111,3 @@ class TestModel:
 
         assert template.name == 'model.html'
         assert response.status_code == 200
-
-
-#def api_render_label_studio():
-#def api_validate_config():
-#def api_save_config():
-#def api_import_example():
-#def api_import_example_file():
-#def api_import():
-#def api_export():
-#def api_generate_next_task():
-#def api_project():
-#def api_project_storage_settings():
-#def api_all_task_ids():
-#def api_all_tasks():
-#def api_tasks(task_id):
-#def api_tasks_delete():
-#def api_all_completion_ids():
-#def api_completions(task_id):
-#def api_tasks_cancel(task_id):
-#def api_completion_by_id(task_id, completion_id):
-#def api_completion_update(task_id, completion_id):
-#def api_instruction():
-#def api_remove_ml_backend():
-#def api_predict():
-#def api_train():
-#def api_predictions():
-#def get_data_file(filename):
-#def str2datetime(timestamp_str):
-#def start_browser(ls_url, no_browser):
