@@ -48,7 +48,6 @@ def action_import(test_client, case_config):
         action
         import data
     """
-    source = case_config['source']
     filepath = case_config['filepath']
     filename = case_config['filename']
     headers = {
