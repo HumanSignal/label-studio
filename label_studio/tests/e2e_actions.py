@@ -3,9 +3,7 @@ import json
 import os
 
 # label_studio
-from label_studio.tests.base import (
-    goc_project,
-)
+from label_studio.tests.base import goc_project
 
 
 def prepare(test_client, case_config):
@@ -94,8 +92,7 @@ def action_get_task(test_client, case_config):
         get task by task_id
     """
     # get task by task_id
-    #TODO task_id to case_config
-    task_id = 0
+    task_id = case_config['task_id']
     response = test_client.get('/api/tasks/{task_id}/'.format(task_id=task_id))
     assert response.status_code == 200
 
@@ -105,7 +102,7 @@ def action_label(test_client, case_config):
         action
         send labeled data request
     """
-    label_data = case_config['label_data']
+    completion = case_config['completion']
     #get task_id
     response = test_client.get('/api/projects/1/task_ids/')
     data = json.loads(response.data.decode('utf-8'))
@@ -117,7 +114,7 @@ def action_label(test_client, case_config):
         'Content-Type': 'application/json',
     }
     response = test_client.post('api/tasks/{task_id}/completions/'.format(task_id=task_id),
-                                data=json.dumps(label_data),
+                                data=json.dumps(completion),
                                 headers=headers)
     assert response.status_code == 201
 
@@ -127,7 +124,7 @@ def action_label_test(test_client, case_config):
         test
         make sure completion result same as planned
     """
-    label_data = case_config['label_data']
+    completion = case_config['completion']
 
     response = test_client.get('/api/projects/1/task_ids/')
     data = json.loads(response.data.decode('utf-8'))
@@ -138,7 +135,7 @@ def action_label_test(test_client, case_config):
                             '{task_id}.json'.format(task_id=task_id))
     with open(filename) as json_file:
         completion = json.load(json_file)
-        assert completion.get('completions', {})[0].get('result', []) == label_data['result']
+        assert completion.get('completions', {})[0].get('result', []) == completion['result']
 
 
 def action_export(test_client, case_config):
@@ -146,7 +143,9 @@ def action_export(test_client, case_config):
         export data
         make sure it is in project directory
     """
-    response = test_client.get('/api/export?format=JSON')
+    export_format = case_config['format']
+    response = test_client.get('/api/export?format={export_format}'.format(
+        export_format=export_format))
     assert response.status_code == 200
 
 
@@ -155,5 +154,7 @@ def action_export_test(test_client, case_config):
         export data
         make sure it is in project directory
     """
-    response = test_client.get('/api/export?format=JSON')
+    export_format = case_config['format']
+    response = test_client.get('/api/export?format={export_format}'.format(
+        export_format=export_format))
     assert response.status_code == 200

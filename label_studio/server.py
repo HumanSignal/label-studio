@@ -57,17 +57,10 @@ def create_app():
     :param config_object: The configuration object to use.
     """
     app = flask.Flask(__name__, static_url_path='')
-    #app.config.from_object(config_object)
     app.secret_key = 'A0Zrdqwf1AQWj12ajkhgFN]dddd/,?RfDWQQT'
     app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
     app.config['WTF_CSRF_ENABLED'] = False
 
-    #register_extensions(app)
-    #register_blueprints(app)
-    #register_errorhandlers(app)
-    #register_shellcontext(app)
-    #register_commands(app)
-    #configure_logger(app)
     return app
 
 

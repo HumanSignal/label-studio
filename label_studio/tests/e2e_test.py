@@ -19,7 +19,7 @@ from label_studio.tests.e2e_actions import (
     action_label, action_label_test,
     action_export, action_export_test,
 )
-from label_studio.tests.suits import Scenarios
+from label_studio.tests.scenarios import scenarios
 
 
 ACTIONS = {
@@ -50,17 +50,13 @@ class TestCase:
     """
         Test case parametrised factory
         to run different scenarios
-        from Scenarios class
+        from scenarios
     """
 
-    test_case_config = [
-        Scenarios.__getattribute__(Scenarios, x) for x in
-        [attr for attr in dir(Scenarios) if not attr.startswith('__')]
-    ]
+    test_case_config = scenarios
 
     @pytest.mark.parametrize('test_case_config', test_case_config, ids=idfn)
     def test_start(self, test_client, test_case_config):
         case = list(test_case_config.values())[0]
-        actions = case['actions']
-        for a in actions:
-            ACTIONS[a](test_client, case)
+        for a, data in case:
+            ACTIONS[a](test_client, data)

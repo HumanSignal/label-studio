@@ -1,9 +1,9 @@
 # python
 import os
+import pytest
 from types import SimpleNamespace
 
 # 3rd party
-import pytest
 from _pytest import monkeypatch
 from flask import template_rendered
 
