@@ -139,7 +139,7 @@ def action_get_all_tasks(test_client, case_config):
     """
     #TODO get tasks
     response = test_client.get('/api/projects/1/task_ids/')
-    data = json.loads(response.data)
+    data = json.loads(response.data.decode('utf-8'))
     assert isinstance(data, list) == True
 
 
@@ -152,7 +152,6 @@ def action_get_task(test_client, case_config):
     #TODO task_id to case_config
     task_id = 3
     response = test_client.get('/api/tasks/{task_id}/'.format(task_id=task_id))
-    #data = response.data
     assert response.status_code == 200
 
 
@@ -164,7 +163,7 @@ def action_label(test_client, case_config):
     label_data = case_config['label_data']
     #get task_id
     response = test_client.get('/api/projects/1/task_ids/')
-    data = json.loads(response.data)
+    data = json.loads(response.data.decode('utf-8'))
     task_id = data[-1]
     response = test_client.get('/?task_id={task_id}'.format(task_id=task_id))
     assert response.status_code == 200
@@ -186,7 +185,7 @@ def action_label_test(test_client, case_config):
     label_data = case_config['label_data']
 
     response = test_client.get('/api/projects/1/task_ids/')
-    data = json.loads(response.data)
+    data = json.loads(response.data.decode('utf-8'))
     task_id = data[-1]
 
     project = goc_project()
