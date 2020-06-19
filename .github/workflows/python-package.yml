@@ -33,6 +33,6 @@ jobs:
         label-studio init my_project
     - name: Test with pytest
       run: |
-        python -m pytest -vs
+        python -m pytest -vrP
         coverage run -m --source=label_studio pytest
         coverage report -m

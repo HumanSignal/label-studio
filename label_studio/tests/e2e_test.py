@@ -9,16 +9,18 @@ import unittest
 from flask import (
     jsonify,
 )
-
+import requests
 
 # label_studio
 from label_studio import server
 from label_studio.utils.exceptions import *
 from label_studio.tests.base import (
-    test_client, captured_templates, new_project,
+    test_client, captured_templates, goc_project,
 )
 from label_studio.utils import uploader
 
+#TODO
+# label_studio.utils.io.find_file/find_dir
 
 @pytest.fixture(autouse=True)
 def default_project(monkeypatch):
@@ -27,11 +29,11 @@ def default_project(monkeypatch):
         label_studio.server.project_get_or_create()
         for all tests.
     """
-    monkeypatch.setattr(server, 'project_get_or_create', new_project)
+    monkeypatch.setattr(server, 'project_get_or_create', goc_project)
 
 
 @pytest.fixture
-def test_case_config():
+def case_config():
     return {
         'label_config': """\
             <View>
@@ -44,7 +46,9 @@ def test_case_config():
                 </Choices>
             </View>
             """,
-        'text_filename': 'lorem_ipsum.txt',
+        'source': 'local',
+        'filepath': os.path.join(os.path.dirname(__file__), '../static/samples/'),
+        'filename': 'lorem_ipsum.txt',
         'label_data' : {
             "lead_time":474.108,
             "result": [{
@@ -58,17 +62,19 @@ def test_case_config():
         }
 
 
-def prepare():
+def prepare(test_client, case_config):
     """
-        prepare test project - empty ?
+        prepare test project
+        make empty?
     """
-    pass
+    goc_project()
 
 
-def test_config(test_client, test_case_config):
+
+def action_config(test_client, case_config):
     """
+        action
         set project labeling config
-        make sure it matchs config preset name
     """
     mimetype = 'multipart/form-data'
     headers = {
@@ -76,94 +82,138 @@ def test_config(test_client, test_case_config):
         'Accept': mimetype
     }
     data = {
-        'label_config': test_case_config['label_config']
+        'label_config': case_config['label_config']
     }
-    response = test_client.post('/api/save-config',
-                                data=data, headers=headers)
-    #print('\nresponse\n', response)
-    project = new_project()
+    response = test_client.post('/api/save-config', data=data, headers=headers)
+    assert response.status_code == 201
 
-    #print('\nproject.config\n', project.config)
-    #print('\nproject._storagn', project._storage)
+
+def action_config_test(test_client, case_config):
+    """
+        test
+        make sure it matchs config preset name
+    """
+    project = goc_project()
 
     with open(project.config.get('label_config', None), 'r') as file:
         data = file.read()
-        print(data)
-        assert data == test_case_config['label_config']
+        assert data == case_config['label_config']
 
 
-"""
-Content-Disposition: form-data; name="lorem_ipsum.txt"; filename="lorem_ipsum.txt"
-Content-Type: text/plain
-
-Lorem ipsum dolor sit amet,
-consectetur adipiscing elit,
-sed do eiusmod tempor incididunt
-ut labore et dolore magna aliqua.
-"""
-
-def test_text_import(test_client, test_case_config):
+def action_import(test_client, case_config):
     """
+        action
         import data
-        make sure it is in project directory
-        and tasks r created
-
     """
-    text_filename = test_case_config['text_filename']
-    mimetype = 'multipart/form-data'
-    #mimetype = 'application/json'
-    #mimetype = 'application/x-www-form-urlencoded'
+    source = case_config['source']
+    filepath = case_config['filepath']
+    filename = case_config['filename']
     headers = {
-        'Content-Type': mimetype,
-        'Accept': mimetype
+        'Content-Type': 'multipart/form-data',
     }
-    filepath = os.path.join(os.path.dirname(__file__), '../static/samples/', text_filename)
+    filepath = os.path.join(filepath, filename)
     with open(filepath, 'rb') as file:
-        file_data = file.read()
-    data = {
-        'file': (BytesIO(b'test text for labeling'), text_filename),
-    }
-    response = test_client.post('/api/import',
-                                data=data, headers=headers)
-    #print('\ntest_text_import >> response\n', response)
-    #print('\ntest_text_import >> response\n', response.data)
-    project = new_project()
+        data = {
+            filename: (file, filename),
+        }
 
+        response = test_client.post('/api/import', data=data)
+    assert response.status_code == 201
+
+
+def action_import_test(test_client, case_config):
+    """
+        test
+        make sure impoted file is in project directory
+        and tasks r created
+    """
+    project = goc_project()
     with open(project.config.get('input_path', None), 'r') as file:
         data = file.read()
-        print('\ntest_text_import >> data\n',data)
 
 
-def test_label(test_client, test_case_config):
+def action_get_all_tasks(test_client, case_config):
     """
-        import data
-        make sure it is in project directory
-
+        action
+        get all tasks
     """
-    label_data = test_case_config['label_data']
+    #TODO get tasks
+    response = test_client.get('/api/projects/1/task_ids/')
+    data = json.loads(response.data)
+    assert isinstance(data, list) == True
+
+
+def action_get_task(test_client, case_config):
+    """
+        action
+        get task by task_id
+    """
+    # get task by task_id
+    #TODO task_id to case_config
+    task_id = 3
+    response = test_client.get(f'/api/tasks/{task_id}/')
+    #data = response.data
+    assert response.status_code == 200
+
+
+def action_label(test_client, case_config):
+    """
+        action
+        send labeled data request
+    """
+    label_data = case_config['label_data']
     #get task_id
-    task_id = 71
-    response = test_client.get(f'/?task={task_id}')
-    #print('\n test_label >> response\n', response.data)
+    response = test_client.get('/api/projects/1/task_ids/')
+    data = json.loads(response.data)
+    task_id = data[-1]
+    response = test_client.get(f'/?task_id={task_id}')
+    assert response.status_code == 200
 
-    response = test_client.post(
-        f'api/tasks/{task_id}/completions/', data=json.dumps(label_data))
+    headers = {
+        'Content-Type': 'application/json',
+    }
+    response = test_client.post(f'api/tasks/{task_id}/completions/',
+                                data=json.dumps(label_data),
+                                headers=headers)
+    assert response.status_code == 201
 
-    project = new_project()
+
+def action_label_test(test_client, case_config):
+    """
+        test
+        make sure completion result same as planned
+    """
+    label_data = case_config['label_data']
+
+    response = test_client.get('/api/projects/1/task_ids/')
+    data = json.loads(response.data)
+    task_id = data[-1]
+
+    project = goc_project()
     filename = os.path.join(project.config.get('output_dir', None), f'{task_id}.json')
-    print('\n test_label >> filename\n', filename)
     with open(filename) as json_file:
         completion = json.load(json_file)
-        print('completion', completion)
         assert completion.get('completions', {})[0].get('result', []) == label_data['result']
 
 
-def test_export(test_client):
+def action_export(test_client, case_config):
     """
         export data
         make sure it is in project directory
 
     """
-    response = test_client.get('api/export')
+    response = test_client.get('/api/export?format=JSON')
     assert response.status_code == 200
+
+
+
+def action_export_test(test_client, case_config):
+    """
+        export data
+        make sure it is in project directory
+
+    """
+    response = test_client.get('/api/export?format=JSON')
+    assert response.status_code == 200
+
 

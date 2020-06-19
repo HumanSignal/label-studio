@@ -11,7 +11,7 @@ from label_studio.server import (
     validation_error_handler,
 )
 from label_studio.tests.base import (
-    test_client, captured_templates, new_project,
+    test_client, captured_templates, goc_project,
 )
 
 
@@ -22,7 +22,7 @@ def default_project(monkeypatch):
         label_studio.server.project_get_or_create()
         for all tests.
     """
-    monkeypatch.setattr(server, 'project_get_or_create', new_project)
+    monkeypatch.setattr(server, 'project_get_or_create', goc_project)
 
 
 class TestUtilities:

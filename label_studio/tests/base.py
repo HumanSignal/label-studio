@@ -49,7 +49,8 @@ def captured_templates():
         template_rendered.disconnect(record, app)
 
 
-def new_project():
+def goc_project():
+    """monkeypatch for  get_or_create_project"""
     project_name = 'my_project'
     user = 'admin'
     input_args_dict = {

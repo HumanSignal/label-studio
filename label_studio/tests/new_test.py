@@ -1,4 +1,5 @@
 # python
+import os
 
 # 3rd party
 import pytest
@@ -7,11 +8,26 @@ import unittest
 # label_studio
 from label_studio import server
 from label_studio.tests.base import (
-    test_client, captured_templates, new_project,
+    test_client, captured_templates, goc_project,
 )
 from label_studio.tests.e2e_test import (
-    test_config, test_text_import, test_label, test_export,
+    prepare,
+    action_config, action_config_test,
+    action_import, action_import_test,
+    action_get_all_tasks,
+    action_get_task,
+    action_label, action_label_test,
+    action_export, action_export_test,
 )
+
+ACTIONS = {
+    'prepare': prepare,
+    'config': action_config,
+    'import': action_import,
+    'get_task': action_get_task,
+    'label': action_label,
+    'export': action_export
+}
 
 
 @pytest.fixture(autouse=True)
@@ -21,12 +37,20 @@ def default_project(monkeypatch):
         label_studio.server.project_get_or_create()
         for all tests.
     """
-    monkeypatch.setattr(server, 'project_get_or_create', new_project)
+    monkeypatch.setattr(server, 'project_get_or_create', goc_project)
 
 
 @pytest.fixture(scope='class')
-def test_case_config():
+def case_config():
     return {
+        'actions':[
+                'prepare',
+                'config',
+                'import',
+                'get_task',
+                'label',
+                'export'
+        ],
         'label_config': """\
             <View>
                 <Text name="text" value="$text"/>
@@ -38,7 +62,9 @@ def test_case_config():
                 </Choices>
             </View>
             """,
-        'text_filename': 'lorem_ipsum.txt',
+        'source': 'local',
+        'filepath': os.path.join(os.path.dirname(__file__), '../','static/samples/'),
+        'filename': 'lorem_ipsum.txt',
         'label_data' : {
             "lead_time":474.108,
             "result": [{
@@ -48,17 +74,38 @@ def test_case_config():
                     "type":"choices",
                     "value":{"choices":["Neutral"]}
                 }]
-            }
-        }
+        },
+    }
 
 
-class MyTest:
+class TestDefault:
 
-    def start(self):
-        print('\n'+ '> '*40 +'\n')
+    def test_start(self, test_client, case_config):
+        # prepare
+        prepare(test_client, case_config)
+        # config
+        action_config(test_client, case_config)
+        action_config_test(test_client, case_config)
+        # import
+        action_import(test_client, case_config)
+        action_import_test(test_client, case_config)
+        # tasks
+        action_get_all_tasks(test_client, case_config)
+        action_get_task(test_client, case_config)
+        # label
+        action_label(test_client, case_config)
+        action_label_test(test_client, case_config)
+        # export
+        action_export(test_client, case_config)
 
-        test_config(test_client, test_case_config)
-        test_text_import(test_client, test_case_config)
-        test_label(test_client, test_case_config)
-        test_export(test_client)
+
+
+class TestCaseOne:
+
+    def test_start(self, test_client, case_config):
+        actions = case_config['actions']
+        for a in actions:
+            ACTIONS[a](test_client, case_config)
+
+
 
