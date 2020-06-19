@@ -23,6 +23,31 @@ e2e_test.TestCase - runner for scenarios
 
 scenarios.scenarios - [] wrapper for scenarios
 
+
+### how to run tests
+
+```
+git clone https://github.com/heartexlabs/label-studio.git
+cd label-studio
+python -m venv venv
+. venv/bin/activate
+pip install pytest blinker coverage
+pip install -e .
+label-studio init my_project
+python -m pytest -vrP
+
+```
+also you could see test coverage
+
+```
+coverage run -m --source=label_studio pytest
+coverage report -m
+```
+
+
+## e2e test framework doc
+
+### scenarios
 example:
 
 ```
@@ -44,41 +69,17 @@ scenarios = []
 scenarios.append( ... )
 ```
 
-
-### how to run tests
-
-```
-git clone https://github.com/heartexlabs/label-studio.git
-cd label-studio
-python -m venv venv
-. venv/bin/activate
-pip install pytest blinker coverage
-pip install -e .
-label-studio init my_project
-python -m pytest -vrP
-
-```
-also you could see coverage with coverage
-
-```
-coverage run -m --source=label_studio pytest
-coverage report -m
-```
-
-
-## e2e test framework doc
-
 ### actons with arguments
-* means - look below for data examples
+\* means - look below for data examples
 
-| Actons | data arguments | example |
+| actions | data arguments | example |
 | ------ | ------ | ------ |
-| prepare |  |  |
-| config | label_config | * |
-| import | filepath | * |
+| `prepare` |  |  |
+| `config` | label_config | * |
+| `import` | filepath | * |
 |  | filename | 'lorem_ipsum.txt'|
-| get_task | task_id | 1 |
-| label | completion | * |
+| `get_task` | task_id | 1 |
+| `label` | completion | * |
 
 
 ### action data examples
