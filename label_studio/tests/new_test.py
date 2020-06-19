@@ -108,4 +108,54 @@ class TestCaseOne:
             ACTIONS[a](test_client, case_config)
 
 
+def idfn(test_val):
+    return list(test_val.keys())[0]
 
+
+class TestCaseTwo:
+
+    # Place configs for the new test suites here
+    test_case_config = [{
+        # Test most common scenario
+        'test_common_scenario': {
+            'actions':[
+                    'prepare',
+                    'config',
+                    'import',
+                    'get_task',
+                    'label',
+                    'export'
+            ],
+            'label_config': """
+                <View>
+                    <Text name="text" value="$text"/>
+                    <Choices name="sentiment" toName="text" choice="single">
+                        <Choice value="Positive"/>
+                        <Choice value="Negative"/>
+                        <Choice value="Neutral"/>
+                    <Choice value="YYY"/>
+                    </Choices>
+                </View>
+                """,
+            'source': 'local',
+            'filepath': os.path.join(os.path.dirname(__file__), '../','static/samples/'),
+            'filename': 'lorem_ipsum.txt',
+            'label_data' : {
+                "lead_time":474.108,
+                "result": [{
+                        "id":"_qRv9kaetd",
+                        "from_name":"sentiment",
+                        "to_name":"text",
+                        "type":"choices",
+                        "value":{"choices":["Neutral"]}
+                    }]
+            },
+        }
+    }]
+
+    @pytest.mark.parametrize('test_case_config', test_case_config, ids=idfn)
+    def test_start(self, test_client, test_case_config):
+        case = list(test_case_config.values())[0]
+        actions = case['actions']
+        for a in actions:
+            ACTIONS[a](test_client, case)
