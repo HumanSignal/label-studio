@@ -151,7 +151,7 @@ def action_get_task(test_client, case_config):
     # get task by task_id
     #TODO task_id to case_config
     task_id = 3
-    response = test_client.get(f'/api/tasks/{task_id}/')
+    response = test_client.get('/api/tasks/{task_id}/'.format(task_id=task_id))
     #data = response.data
     assert response.status_code == 200
 
@@ -166,13 +166,13 @@ def action_label(test_client, case_config):
     response = test_client.get('/api/projects/1/task_ids/')
     data = json.loads(response.data)
     task_id = data[-1]
-    response = test_client.get(f'/?task_id={task_id}')
+    response = test_client.get('/?task_id={task_id}'.format(task_id=task_id))
     assert response.status_code == 200
 
     headers = {
         'Content-Type': 'application/json',
     }
-    response = test_client.post(f'api/tasks/{task_id}/completions/',
+    response = test_client.post('api/tasks/{task_id}/completions/'.format(task_id=task_id),
                                 data=json.dumps(label_data),
                                 headers=headers)
     assert response.status_code == 201
@@ -190,7 +190,8 @@ def action_label_test(test_client, case_config):
     task_id = data[-1]
 
     project = goc_project()
-    filename = os.path.join(project.config.get('output_dir', None), f'{task_id}.json')
+    filename = os.path.join(project.config.get('output_dir', None),
+                            '{task_id}.json'.format(task_id=task_id))
     with open(filename) as json_file:
         completion = json.load(json_file)
         assert completion.get('completions', {})[0].get('result', []) == label_data['result']
