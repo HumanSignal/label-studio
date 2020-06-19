@@ -150,7 +150,7 @@ def action_get_task(test_client, case_config):
     """
     # get task by task_id
     #TODO task_id to case_config
-    task_id = 3
+    task_id = 0
     response = test_client.get('/api/tasks/{task_id}/'.format(task_id=task_id))
     assert response.status_code == 200
 
