@@ -50,6 +50,7 @@ scenarios = [
             'task_id': 0,
             }),
         ('label', {
+            'task_id': 0,
             'completion' : {
                 "lead_time":474.108,
                 "result": [{

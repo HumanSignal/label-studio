@@ -102,10 +102,7 @@ def action_label(test_client, case_config):
         send labeled data request
     """
     completion = case_config['completion']
-    #get task_id
-    response = test_client.get('/api/projects/1/task_ids/')
-    data = json.loads(response.data.decode('utf-8'))
-    task_id = data[-1]
+    task_id = case_config['task_id']
     response = test_client.get('/?task_id={task_id}'.format(task_id=task_id))
     assert response.status_code == 200
 
@@ -125,9 +122,7 @@ def action_label_test(test_client, case_config):
     """
     completion = case_config['completion']
 
-    response = test_client.get('/api/projects/1/task_ids/')
-    data = json.loads(response.data.decode('utf-8'))
-    task_id = data[-1]
+    task_id = case_config['task_id']
 
     project = goc_project()
     filename = os.path.join(project.config.get('output_dir', None),

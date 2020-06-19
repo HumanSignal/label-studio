@@ -35,7 +35,6 @@ pip install pytest blinker coverage
 pip install -e .
 label-studio init my_project
 python -m pytest -vrP
-
 ```
 also you could see test coverage
 
@@ -43,7 +42,6 @@ also you could see test coverage
 coverage run -m --source=label_studio pytest
 coverage report -m
 ```
-
 
 ## e2e test framework doc
 
@@ -78,8 +76,10 @@ scenarios.append( ... )
 | `config` | label_config | * |
 | `import` | filepath | * |
 |  | filename | 'lorem_ipsum.txt'|
-| `get_task` | task_id | 1 |
-| `label` | completion | * |
+| `get_task` | task_id | 0 |
+| `label` | task_id | 0 |
+|  | completion | * |
+| `export` | format | JSON |
 
 
 ### action data examples
@@ -107,16 +107,3 @@ samples_path = os.path.join(os.path.dirname(__file__), '../','static/samples/')
         }]
 },
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
