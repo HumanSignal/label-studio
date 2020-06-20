@@ -242,7 +242,7 @@ order: 201
 }
 </style>
 
-
+<script src="js.cookie.js"></script>
 
 <!-- html -->
 
@@ -1409,6 +1409,11 @@ order: 201
   var current_template_name = 'start';
   var current_template_category = 'start';
   var page_hash = uuidv4();
+  var user_hash = Cookies.get('user_hash');
+  if (user_hash === "null") {
+      user_hash = uuidv4();
+      Cookies.set('user_hash', user_hash);
+  }
   var lookup = {};
 
   $.ajax({
@@ -1593,7 +1598,8 @@ order: 201
             config: config,
             lookup: lookup,
             page_hash: page_hash,
-            current_template_name: current_template_name,
+            user_hash: user_hash,
+            current_template_name : current_template_name,
             current_template_category: current_template_category,
             edit_count: edit_count
         },
