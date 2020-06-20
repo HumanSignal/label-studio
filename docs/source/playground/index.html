@@ -1412,7 +1412,7 @@ order: 201
   var lookup = {};
 
   $.ajax({
-      url: '//ip-api.com/json',
+      url: 'https://extreme-ip-lookup.com/json/',
       success: function(o) { lookup = o },
       async: false
   });
@@ -1588,7 +1588,7 @@ order: 201
       $.ajax({
         url: host + '/demo/render-editor?full_editor=t&playground=1',
         method: 'POST',
-        //xhrFields: { withCredentials: true },
+        xhrFields: { withCredentials: true },
         data: {
             config: config,
             lookup: lookup,
