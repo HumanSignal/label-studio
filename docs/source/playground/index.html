@@ -1397,19 +1397,38 @@ order: 201
     }
   };
 
-  var confirm_already_shown = true; 
-  
-  $(function () {
+  function uuidv4() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
 
+  var confirm_already_shown = true;
+  var edit_count = 0;
+  var current_template_name = 'start';
+  var current_template_category = 'start';
+  var page_hash = uuidv4();
+  var lookup = {};
+
+  $.ajax({
+      url: '//ip-api.com/json',
+      success: function(o) { lookup = o },
+      async: false
+  });
+
+  $(function () {
     function addTemplateConfig($el) {
       var template_pk = $el.data('value');
       var value = $('[data-template-pk="' + template_pk + '"]').html();
-
       labelEditor.setValue(value);
     }
 
     $('.use-template').on('click', function () {
       var $el = $(this);
+      edit_count = 0;
+      current_template_name = $el.text();
+      current_template_category = $($el.parent().parent().find('i')[0]).attr('title');
 
       if (labelEditor.getValue() !== '' && !confirm_already_shown) {
         var dialog = $('#confirm-config-template-dialog');
@@ -1551,7 +1570,9 @@ order: 201
         // wait until all images and resources from iframe loading
         clearTimeout(iframeTimer);
         iframeTimer = setInterval(function () {
-          obj.style.height = (obj.contentWindow.document.body.scrollHeight) + 'px';
+          if (obj.contentWindow) {
+            obj.style.height = (obj.contentWindow.document.body.scrollHeight) + 'px';
+          }
         }, 500);
         // hide "..."
         $('#preload-editor').hide();
@@ -1563,9 +1584,19 @@ order: 201
 
     function show_render_editor(editor) {
       let config = labelEditor.getValue();
+      edit_count++;
       $.ajax({
-        url: host + '/demo/render-editor?full_editor=t&config=' + encodeURIComponent(config),
-        method: 'GET',
+        url: host + '/demo/render-editor?full_editor=t&playground=1',
+        method: 'POST',
+        //xhrFields: { withCredentials: true },
+        data: {
+            config: config,
+            lookup: lookup,
+            page_hash: page_hash,
+            current_template_name: current_template_name,
+            current_template_category: current_template_category,
+            edit_count: edit_count
+        },
         success: editor_iframe,
         error: function () {
           $('#preload-editor').show();
@@ -1604,7 +1635,7 @@ order: 201
       });
 
       // load sample task
-      $.get({
+      $.post({
         url: host + '/business/projects/upload-example/',
         data: {label_config: val}
       })
