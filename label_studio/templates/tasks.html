@@ -566,20 +566,7 @@
                       request.send();
                   }
               },
-
-              // has task skipped completions
-              hasTaskSkippedCompletions: function(task) {
-                if (!task.completions)
-                    return false;
-
-                for (var i in task.completions) {
-                    if (task.completions[i].skipped) {
-                        return true;
-                    }
-                }
-                return false;
-              },
-
+              
               // start timer with project & task api loading
               toggleAutoUpdateTimer: function () {
                   if (this.auto_update_timer) {
