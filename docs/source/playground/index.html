@@ -1410,7 +1410,7 @@ order: 201
   var current_template_category = 'start';
   var page_hash = uuidv4();
   var user_hash = Cookies.get('user_hash');
-  if (user_hash === "null") {
+  if (user_hash === "null" || !user_hash) {
       user_hash = uuidv4();
       Cookies.set('user_hash', user_hash);
   }
