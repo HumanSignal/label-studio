@@ -291,7 +291,7 @@ const LSB = function(elid, config, task) {
         JSON.stringify(completion),
       ).then(function(response) {
         response.json().then(function (res) {
-           addHistory(ls, ls.task.id, null);
+           addHistory(ls, ls.task.id, res.id);
            // if (res && res.id) completion.updatePersonalKey(res.id.toString());
 
           if (task) {

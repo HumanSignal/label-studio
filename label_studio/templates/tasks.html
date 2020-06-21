@@ -225,7 +225,13 @@
             {{ task.id }}
           </td>
           <!-- Completed at -->
-          <td>{{ task.completed_at }}</td>
+          <td>
+           <span data-tooltip="Task has skipped completions" style="cursor:pointer"
+                 @click="changeOrder('has_skipped_completions')">
+             <i class="ui icon forward grey" v-if="task.has_skipped_completions"></i>
+           </span>
+           {{ task.completed_at }}
+          </td>
           <!-- Label -->
           <td class="text-center">
             <a :href="'/?task_id=' + task.id">
@@ -559,6 +565,19 @@
                       request.onload = this.loadProjectAndTasks;
                       request.send();
                   }
+              },
+
+              // has task skipped completions
+              hasTaskSkippedCompletions: function(task) {
+                if (!task.completions)
+                    return false;
+
+                for (var i in task.completions) {
+                    if (task.completions[i].skipped) {
+                        return true;
+                    }
+                }
+                return false;
               },
 
               // start timer with project & task api loading

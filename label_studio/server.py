@@ -36,7 +36,8 @@ from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.functions import generate_sample_task_without_check
 from label_studio.utils.misc import (
     exception_treatment, exception_treatment_page,
-    config_line_stripped, get_config_templates, convert_string_to_hash, serialize_class
+    config_line_stripped, get_config_templates, convert_string_to_hash, serialize_class,
+    DirectionSwitch
 )
 from label_studio.utils.argparser import parse_input_args
 from label_studio.utils.uri_resolver import resolve_task_data_uri
@@ -634,17 +635,26 @@ def api_all_tasks():
 
     order_inverted = order[0] == '-'
     order = order[1:] if order_inverted else order
-    if order not in ['id', 'completed_at']:
+    if order not in ['id', 'completed_at', 'has_skipped_completions']:
         return make_response(jsonify({'detail': 'Incorrect order'}), 422)
 
     # get task ids and sort them by completed time
     task_ids = project.source_storage.ids()
-    completed_at = project.get_completed_at(None)
+    completed_at = project.get_completed_at()
+    skipped_status = project.get_skipped_status()
 
     # ordering
-    pre_order = [{'id': i, 'completed_at': completed_at[i] if i in completed_at else "can't obtain"} for i in task_ids]
-    ordered = sorted(pre_order, key=lambda x: x[order])
-    ordered = ordered[::-1] if order_inverted else ordered
+    pre_order = [{
+        'id': i,
+        'completed_at': completed_at[i] if i in completed_at else None,
+        'has_skipped_completions': skipped_status[i] if i in completed_at else None,
+    } for i in task_ids]
+    # for has_skipped_completions use two keys ordering
+    if order == 'has_skipped_completions':
+        ordered = sorted(pre_order, key=lambda x: (DirectionSwitch(x['has_skipped_completions'], order_inverted),
+                                                   DirectionSwitch(x['completed_at'], False)))
+    else:
+        ordered = sorted(pre_order, key=lambda x: (DirectionSwitch(x[order], order_inverted)))
     paginated = ordered[(page - 1) * page_size:page * page_size]
 
     # get tasks with completions
@@ -656,6 +666,7 @@ def api_all_tasks():
             task = project.source_storage.get(i)
         else:
             task['completed_at'] = item['completed_at']
+            task['has_skipped_completions'] = item['has_skipped_completions']
         tasks.append(task)
 
     return make_response(jsonify(tasks), 200)

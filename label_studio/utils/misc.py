@@ -284,3 +284,18 @@ def serialize_class(class_instance, keys=None):
             output[key] = dictionary[key]
 
     return output
+
+
+class DirectionSwitch:
+    def __init__(self, obj, inverted):
+        self.obj = obj
+        self.inverted = inverted
+
+    def __eq__(self, other):
+        return False if self.obj is None or other.obj is None else (other.obj == self.obj)
+
+    def __lt__(self, other):
+        if self.obj is None or other.obj is None:
+            return False
+        result = other.obj < self.obj
+        return not result if self.inverted else result

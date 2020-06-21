@@ -460,10 +460,9 @@ class Project(object):
             num=len(completions), output_dir=self.config["output_dir"]))
         return sorted(completions)
 
-    def get_completed_at(self, task_ids):
-        """ Get completed time for list of task ids
+    def get_completed_at(self):
+        """ Get completed time for tasks
 
-        :param task_ids: list of task ids
         :return: list of string with formatted datetime
         """
         times = {}
@@ -476,6 +475,22 @@ class Project(object):
             else:
                 times[id] = timestamp_to_local_datetime(latest_time).strftime('%Y-%m-%d %H:%M:%S')
         return times
+
+    def get_skipped_status(self):
+        """ Get skipped status for tasks: returns skipped completion number for task
+
+        :return: list of int
+        """
+        items = {}
+        for _, data in self.target_storage.items():
+            id = data['id']
+            try:
+                flag = sum([completion.get('skipped', False) for completion in data['completions']])
+            except Exception as exc:
+                items[id] = -1
+            else:
+                items[id] = flag
+        return items
 
     def get_task_with_completions(self, task_id):
         """ Get task with completions
