@@ -41,3 +41,5 @@ jobs:
         python -m pytest -vrP
         coverage run -m --source=label_studio pytest
         coverage report -m
+        coverage-badge -o .github/test-coverage.svg
+
