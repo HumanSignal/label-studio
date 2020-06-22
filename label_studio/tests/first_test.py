@@ -39,7 +39,6 @@ class TestMain:
         response = test_client.get('/')
         # tasks exists
         if response.status_code == 200:
-            print('\n captured_templates', captured_templates)
             template, context = captured_templates[0]
             assert template.name == 'labeling.html'
             assert context.get('label_config_line', None) != None
