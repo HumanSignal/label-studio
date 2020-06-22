@@ -29,9 +29,10 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip setuptools pytest blinker coverage pyaml
+        python -m pip install --upgrade pip setuptools
         pip install -e .
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        if [ -f label_studio/tests/requirements.txt ]; then pip install -r label_studio/tests/requirements.txt; fi
     - name: init project
       run: |
         label-studio init my_project
