@@ -82,7 +82,6 @@ for filepath in os.listdir(cases_path):
         datadoc = yaml.load_all(file)
         for datamap in datadoc:
             name = datamap.get('scenario')
-            print('scenario', name)
             yaml_actions = datamap.get('actions')
             actions = []
             for a_name, a_attrs in yaml_actions.items():
