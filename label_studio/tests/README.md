@@ -47,11 +47,11 @@ coverage run -m --source=label_studio pytest
 coverage report -m
 ```
 
-generate test coverage BADGE with
-after merging all Pull Requests in release/x-y-z branch
-generate badge
-and commit to release/x-y-z
-before merge to master
+generate test coverage BADGE<br/>
+after merging all Pull Requests into release/x-y-z branch<br/>
+generate badge<br/>
+and commit to release/x-y-z<br/>
+before merge to master<br/>
 
 ```
 pip install coverage-badge
@@ -129,7 +129,7 @@ actions:
 
 ```
 
-### actons with arguments
+### actions with arguments
 \* means - look below for data examples<br/>
 currently e2e test framework is under developement so<br/>
 better take a look at e2e_actions code to be sure of desired action<br/>
@@ -147,9 +147,10 @@ better take a look at e2e_actions code to be sure of desired action<br/>
 | `delete_all_tasks` |  |  |
 | `cancel_task` | task_id | 0 |
 | `label` | task_id | 0 |
+|  | completion | * |
 | `get_all_completions` | task_id | 0 |
 | `change_completion` | task_id | 0 |
-|  | completion | * |
+|  | completion_id | 0 |
 | `export` | format | JSON |
 
 
