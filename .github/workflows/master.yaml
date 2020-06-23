@@ -29,8 +29,7 @@ jobs:
         label-studio init my_project
     - name: Test with pytest
       run: |
-        python -m pytest -vrP
         coverage run -m --source=label_studio pytest
-        coverage report -m
+        coverage report -m --fail-under=40
 
 

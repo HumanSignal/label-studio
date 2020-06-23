@@ -1,4 +1,4 @@
-scenario: 'second'
+scenario: 'complex_case_1st_part'
 actions:
     prepare:
     config:
@@ -30,20 +30,9 @@ actions:
                 }]
             }
 ---
-scenario: 'third'
+scenario: 'complex_case_2nd_part'
 actions:
     prepare:
-    config:
-        label_config: |
-            <View>
-                <Text name="text" value="$text"/>
-                <Choices name="sentiment" toName="text" choice="single">
-                    <Choice value="Positive"/>
-                    <Choice value="Negative"/>
-                    <Choice value="Neutral"/>
-                <Choice value="YYY"/>
-                </Choices>
-            </View>
     import:
         filepath: $samples_path
         filename: 'lorem_ipsum.txt'

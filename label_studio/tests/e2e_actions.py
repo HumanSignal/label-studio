@@ -43,6 +43,16 @@ def action_config_test(test_client, case_config):
         assert data == case_config['label_config']
 
 
+def action_set_storage(test_client, case_config):
+    """
+        action
+    """
+    #TODO set storage
+    response = test_client.get('/api/project/storage-settings')
+    #data = json.loads(response.data.decode('utf-8'))
+    #assert isinstance(data, dict) == True
+
+
 def action_import(test_client, case_config):
     """
         action
@@ -74,12 +84,22 @@ def action_import_test(test_client, case_config):
         data = file.read()
 
 
-def action_get_all_tasks(test_client, case_config):
+def action_next_task(test_client, case_config):
     """
         action
         get all tasks
     """
     #TODO get tasks
+    response = test_client.get('/api/projects/1/next/')
+    data = json.loads(response.data.decode('utf-8'))
+    assert isinstance(data, dict) == True
+
+
+def action_get_all_tasks(test_client, case_config):
+    """
+        action
+        get all tasks
+    """
     response = test_client.get('/api/projects/1/task_ids/')
     data = json.loads(response.data.decode('utf-8'))
     assert isinstance(data, list) == True
@@ -93,6 +113,36 @@ def action_get_task(test_client, case_config):
     # get task by task_id
     task_id = case_config['task_id']
     response = test_client.get('/api/tasks/{task_id}/'.format(task_id=task_id))
+    assert response.status_code == 200
+
+
+def action_delete_task(test_client, case_config):
+    """
+        action
+        delete task by task_id
+    """
+    # get task by task_id
+    task_id = case_config['task_id']
+    response = test_client.delete('/api/tasks/{task_id}/'.format(task_id=task_id))
+    assert response.status_code == 204
+
+
+def action_delete_all_tasks(test_client, case_config):
+    """
+        action
+        delete all tasks
+    """
+    response = test_client.delete('/api/tasks/delete')
+    assert response.status_code == 204
+
+
+def action_cancel_task(test_client, case_config):
+    """
+        action
+        cancel task
+    """
+    task_id = case_config['task_id']
+    response = test_client.delete('/api/tasks/{task_id}/cancel'.format(task_id))
     assert response.status_code == 200
 
 
@@ -130,6 +180,30 @@ def action_label_test(test_client, case_config):
     with open(filename) as json_file:
         completion = json.load(json_file)
         assert completion.get('completions', {})[0].get('result', []) == completion['result']
+
+
+def action_get_all_completions(test_client, case_config):
+    """
+        test
+        Delete or save new completion to output_dir
+    """
+    task_id = case_config['task_id']
+    response = test_client.get('/api/tasks/{task_id}/completions/'.format(
+        task_id=task_id))
+    assert response.status_code in [200, 404]
+
+
+def action_get_change_completion(test_client, case_config):
+    """
+        test
+        make sure completion result same as planned
+    """
+    #TODO
+    task_id = case_config['task_id']
+    completion_id = case_config['completion_id']
+    response = test_client.get('/api/tasks/{task_id}/completions/{completion_id}/'.format(
+        task_id=task_id, completion_id=completion_id))
+    assert response.status_code == 200
 
 
 def action_export(test_client, case_config):
