@@ -365,7 +365,7 @@ div[class*="App_editor"] {
 }
 
 .ui .label.basic {
-    color: #999 !important;
+    font-weight: normal;
 }
 
 .ui .x.icon {
