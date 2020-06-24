@@ -205,6 +205,10 @@
             <i class="fas"
                :class="{'fa-sort-up': this.order=='completed_at', 'fa-sort-down': this.order=='-completed_at'}"></i>
           </th>
+          <th class="order" @click="changeOrder('has_skipped_completions')">Skipped
+            <i class="fas"
+               :class="{'fa-sort-up': this.order=='has_skipped_completions', 'fa-sort-down': this.order=='-has_skipped_completions'}"></i>
+          </th>
           <th>Label</th>
           <th v-if="project.can_delete_tasks || project.can_manage_completions">Delete</th>
         </tr>
@@ -226,11 +230,14 @@
           </td>
           <!-- Completed at -->
           <td>
-           <span data-tooltip="Task has skipped completions" style="cursor:pointer"
+           {{ task.completed_at }}
+          </td>
+          <!-- Skipped -->
+          <td>
+            <span data-tooltip="Task has skipped completions" style="cursor:pointer"
                  @click="changeOrder('has_skipped_completions')">
              <i class="ui icon forward grey" v-if="task.has_skipped_completions"></i>
            </span>
-           {{ task.completed_at }}
           </td>
           <!-- Label -->
           <td class="text-center">
