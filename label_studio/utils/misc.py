@@ -8,6 +8,8 @@ import hashlib
 import calendar
 import pytz
 import flask
+import socket
+import errno
 
 from json import JSONEncoder
 from collections import defaultdict, OrderedDict
@@ -299,3 +301,8 @@ class DirectionSwitch:
             return False
         result = other.obj < self.obj
         return not result if self.inverted else result
+
+
+def check_port_in_use(host, port):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        return s.connect_ex((host, port)) == 0
