@@ -205,6 +205,10 @@
             <i class="fas"
                :class="{'fa-sort-up': this.order=='completed_at', 'fa-sort-down': this.order=='-completed_at'}"></i>
           </th>
+          <th class="order" @click="changeOrder('has_skipped_completions')">Skipped
+            <i class="fas"
+               :class="{'fa-sort-up': this.order=='has_skipped_completions', 'fa-sort-down': this.order=='-has_skipped_completions'}"></i>
+          </th>
           <th>Label</th>
           <th v-if="project.can_delete_tasks || project.can_manage_completions">Delete</th>
         </tr>
@@ -225,7 +229,16 @@
             {{ task.id }}
           </td>
           <!-- Completed at -->
-          <td>{{ task.completed_at }}</td>
+          <td>
+           {{ task.completed_at }}
+          </td>
+          <!-- Skipped -->
+          <td>
+            <span data-tooltip="Task has skipped completions" style="cursor:pointer"
+                 @click="changeOrder('has_skipped_completions')">
+             <i class="ui icon forward grey" v-if="task.has_skipped_completions"></i>
+           </span>
+          </td>
           <!-- Label -->
           <td class="text-center">
             <a :href="'/?task_id=' + task.id">
@@ -412,7 +425,7 @@
               // get project info from api
               loadProject: function () {
                   var root = this;
-                  this.getApi('project', '/api/project/?fast=1',
+                  this.getApi('project', '/api/project/',
                       // always
                       function () { root.project_loaded = true; },
                       // fail

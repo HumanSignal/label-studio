@@ -33,3 +33,4 @@ boto3==1.12.32
 google-cloud-storage==1.28.1
 flask_wtf==0.14.3
 label-studio-converter>=0.0.17
+htmlmin==0.1.12

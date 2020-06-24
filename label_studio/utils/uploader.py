@@ -9,6 +9,7 @@ import rarfile
 import logging
 import tempfile
 import pandas as pd
+import htmlmin
 try:
     import ujson as json
 except:
@@ -45,8 +46,18 @@ def tasks_from_file(filename, file, project):
                 tasks = json.loads(raw_data)
             except TypeError:
                 tasks = json.loads(raw_data.decode('utf8'))
+
+        # upload file via drag & drop
+        elif len(project.data_types) > 1:
+            raise ValidationError('Your label config has more than one data keys, direct file upload supports only'
+                                  ' one data key. To import data with multiple data keys use JSON or CSV')
+        # convert html file to json task
+        elif filename.endswith('.html') or filename.endswith('.htm') or filename.endswith('.xml'):
+            data = file.read()
+            body = htmlmin.minify(data.decode('utf8'), remove_all_empty_space=True)
+            tasks = [{'data': {settings.UPLOAD_DATA_UNDEFINED_NAME: body}}]
+        # hosting for file
         else:
-            # save file to disk
             data = file.read()
             upload_dir = os.path.join(project.name, 'upload')
             os.makedirs(upload_dir, exist_ok=True)

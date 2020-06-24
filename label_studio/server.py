@@ -37,7 +37,8 @@ from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.functions import generate_sample_task_without_check
 from label_studio.utils.misc import (
     exception_treatment, exception_treatment_page,
-    config_line_stripped, get_config_templates, convert_string_to_hash, serialize_class
+    config_line_stripped, get_config_templates, convert_string_to_hash, serialize_class,
+    DirectionSwitch, check_port_in_use
 )
 from label_studio.utils.argparser import parse_input_args
 from label_studio.utils.uri_resolver import resolve_task_data_uri
@@ -565,8 +566,6 @@ def api_project():
 
     output = project.serialize()
     output['multi_session_mode'] = input_args.command != 'start-multi-session'
-    if not request.args.get('fast', False):
-        project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
     return make_response(jsonify(output), code)
 
 
@@ -649,17 +648,26 @@ def api_all_tasks():
 
     order_inverted = order[0] == '-'
     order = order[1:] if order_inverted else order
-    if order not in ['id', 'completed_at']:
+    if order not in ['id', 'completed_at', 'has_skipped_completions']:
         return make_response(jsonify({'detail': 'Incorrect order'}), 422)
 
     # get task ids and sort them by completed time
     task_ids = project.source_storage.ids()
-    completed_at = project.get_completed_at(None)
+    completed_at = project.get_completed_at()
+    skipped_status = project.get_skipped_status()
 
     # ordering
-    pre_order = [{'id': i, 'completed_at': completed_at[i] if i in completed_at else "can't obtain"} for i in task_ids]
-    ordered = sorted(pre_order, key=lambda x: x[order])
-    ordered = ordered[::-1] if order_inverted else ordered
+    pre_order = [{
+        'id': i,
+        'completed_at': completed_at[i] if i in completed_at else None,
+        'has_skipped_completions': skipped_status[i] if i in completed_at else None,
+    } for i in task_ids]
+    # for has_skipped_completions use two keys ordering
+    if order == 'has_skipped_completions':
+        ordered = sorted(pre_order, key=lambda x: (DirectionSwitch(x['has_skipped_completions'], order_inverted),
+                                                   DirectionSwitch(x['completed_at'], False)))
+    else:
+        ordered = sorted(pre_order, key=lambda x: (DirectionSwitch(x[order], order_inverted)))
     paginated = ordered[(page - 1) * page_size:page * page_size]
 
     # get tasks with completions
@@ -671,6 +679,7 @@ def api_all_tasks():
             task = project.source_storage.get(i)
         else:
             task['completed_at'] = item['completed_at']
+            task['has_skipped_completions'] = item['has_skipped_completions']
         tasks.append(task)
 
     return make_response(jsonify(tasks), 200)
@@ -686,6 +695,7 @@ def api_tasks(task_id):
     project = project_get_or_create()
     if request.method == 'GET':
         task_data = project.get_task_with_completions(task_id) or project.source_storage.get(task_id)
+        task_data = resolve_task_data_uri(task_data)
         project.analytics.send(getframeinfo(currentframe()).function)
         return make_response(jsonify(task_data), 200)
     elif request.method == 'DELETE':
@@ -939,22 +949,17 @@ def main():
         config = Project.get_config(input_args.project_name, input_args)
         host = input_args.host or config.get('host', 'localhost')
         port = input_args.port or config.get('port', 8080)
-        label_studio.utils.functions.HOSTNAME = 'http://localhost:' + str(port)
 
-        try:
-            start_browser(label_studio.utils.functions.HOSTNAME, input_args.no_browser)
-            app.run(host=host, port=port, debug=input_args.debug)
-        except OSError as e:
-            # address already is in use
-            if e.errno == 98:
-                new_port = int(port) + 1
-                print('\n*** WARNING! ***\n* Port ' + str(port) + ' is in use.\n'
-                      '* Try to start at ' + str(new_port) + '\n****************\n')
-                label_studio.utils.functions.HOSTNAME = 'http://localhost:' + str(new_port)
-                start_browser(label_studio.utils.functions.HOSTNAME, input_args.no_browser)
-                app.run(host=host, port=new_port, debug=input_args.debug)
-            else:
-                raise e
+        if check_port_in_use('localhost', port):
+            old_port = port
+            port = int(port) + 1
+            print('\n*** WARNING! ***\n* Port ' + str(old_port) + ' is in use.\n' +
+                  '* Try to start at ' + str(port) +
+                  '\n****************\n')
+
+        label_studio.utils.functions.HOSTNAME = 'http://localhost:' + str(port)
+        start_browser(label_studio.utils.functions.HOSTNAME, input_args.no_browser)
+        app.run(host=host, port=port, debug=input_args.debug)
 
     # On `start-multi-session` command, server creates one project per each browser sessions
     elif input_args.command == 'start-multi-session':
