@@ -38,6 +38,7 @@ Desktop.ini
 
 # Testing
 coverage/
+.coverage
 
 # Examples of local env
 src/examples
@@ -49,3 +50,6 @@ build/static/media/config.*.xml
 label_studio.egg-info/
 my_project/
 label-studio-projects
+build/
+dist/
+venv/
