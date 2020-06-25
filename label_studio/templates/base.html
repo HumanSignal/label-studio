@@ -55,7 +55,7 @@
     <a href="tasks" class="{% if url_for(request.endpoint) == '/tasks' %}active{% endif %}">Tasks</a>
     <span class="delim">|</span>
 
-    <span id="menu-import" style="display:{{ 'block' if project and project.can_manage_tasks else 'none'}}">
+    <span id="menu-import" style="display:{{'block' if project and project.can_manage_tasks else 'none'}}">
       <a href="import" class="{% if url_for(request.endpoint) == '/import' %}active{% endif %}">Import</a>
       <span class="delim">|</span>
     </span>

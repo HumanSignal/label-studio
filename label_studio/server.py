@@ -275,7 +275,7 @@ def export_page():
         'export.html',
         config=project.config,
         formats=project.converter.supported_formats,
-        project=project.project_obj
+        project=project
     )
 
 
