@@ -950,7 +950,7 @@ def main():
         host = input_args.host or config.get('host', 'localhost')
         port = input_args.port or config.get('port', 8080)
 
-        if check_port_in_use('localhost', port):
+        if check_port_in_use('localhost', port) and not input_args.debug:
             old_port = port
             port = int(port) + 1
             print('\n*** WARNING! ***\n* Port ' + str(old_port) + ' is in use.\n' +
