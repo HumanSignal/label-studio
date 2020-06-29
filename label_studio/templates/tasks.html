@@ -355,9 +355,9 @@
                   vue_loaded: false,
                   project_loaded: false,
                   tasks_loaded: false,
-                  page: 1,
-                  page_size: 10,
-                  order: 'id',
+                  page: Cookies.get('page', 1),
+                  page_size: Cookies.get('page_size', 10),
+                  order: Cookies.get('order', 'id'),
                   auto_update_timer: null,
                   timer_interval: 5000,
                   error: null
@@ -537,6 +537,7 @@
                       name = '-' + name;
                   }
                   this.order = name;
+                  Cookies.set('order', this.order);
                   refreshHistoryArg('order', name);
                   this.loadTasks();
               },
@@ -627,10 +628,12 @@
               // watch for page variable changes
               page: function () {
                   this.loadTasks();
+                  Cookies.set('page', this.page);
                   refreshHistoryArg('page', this.page);
               },
               page_size: function () {
                   this.loadTasks();
+                  Cookies.set('page_size', this.page_size);
                   refreshHistoryArg('page_size', this.page_size);
               },
               'storage_settings.source.type': function () {
