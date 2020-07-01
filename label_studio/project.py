@@ -888,6 +888,7 @@ class Project(object):
             'source_storage': {'readable_path': project.source_storage.readable_path},
             'available_storages': available_storages,
             'source_syncing': self.source_storage.is_syncing,
-            'target_syncing': self.target_storage.is_syncing
+            'target_syncing': self.target_storage.is_syncing,
+            'data_types': self.data_types
         }
         return output

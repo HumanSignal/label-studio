@@ -19,6 +19,7 @@ table.responsive {
 @media screen and (max-width: 768px) {
     table.responsive tbody th,
     table.responsive tbody td {
+        text-align: left;
         display: block;
         border: none;
     }

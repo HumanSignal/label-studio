@@ -10,9 +10,15 @@
       display: block !important;
     }
 
-    .predict-image {
+    .preview-image {
       border-radius: 5px;
       height: 50px;
+      cursor: pointer;
+    }
+
+    .full-preview-image {
+      max-height: 400px;
+      max-width: 400px;
     }
 
     .fade-enter-active, .fade-leave-active {
@@ -47,7 +53,7 @@
     }
 
     .actions-card {
-        display: flex;
+
     }
 
     .db-card {
@@ -67,6 +73,13 @@
 
     .trash:hover {
         color: rgb(255, 13, 23);
+    }
+
+    @media screen and (max-width: 768px) {
+      .full-preview-image {
+        max-height: 250px;
+        max-width: 330px;
+      }
     }
   </style>
 
@@ -211,6 +224,9 @@
           </th>
           <th>Label</th>
           <th v-if="project.can_delete_tasks || project.can_manage_completions">Delete</th>
+
+          <!-- Label config fields -->
+          <th v-for="(value, key) in project.data_types" v-if="value === 'Image'">${{ key }}</th>
         </tr>
 
         <!-- Task row -->
@@ -263,6 +279,11 @@
                 </span>
               </span>
             </div>
+          </td>
+
+          <!-- Label config fields -->
+          <td v-for="(value, key) in project.data_types" v-if="value === 'Image'">
+            <image-with-fade-in :src="task.data[key]"></image-with-fade-in>
           </td>
         </tr>
 
@@ -324,8 +345,11 @@
   </div>
 
   <script src="static/js/components/animatedNumber.js"></script>
+  <script src="static/js/components/imageWithFadeIn.js"></script>
+  <script src="static/js/components/vue-tippy.min.js"></script>
   <script>
       Vue.use(SemanticUIVue);
+      Vue.use(VueTippy);
 
       var app = new Vue({
           el: '#app',
@@ -366,7 +390,8 @@
 
           // components
           components: {
-              'animated-number': animatedNumber
+              'animated-number': animatedNumber,
+              'image-with-fade-in': imageWithFadeIn
           },
 
           computed: {
