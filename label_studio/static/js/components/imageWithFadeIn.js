@@ -19,7 +19,11 @@ var imageWithFadeIn = Vue.component('imageWithFadeIn', {props: ['src'],
         }
     },
     watch: {
-        src: function () {
+        src: function (value, old) {
+            // prevent updates when s3 or gsc regenerate new link to images
+            if (value.split('?')[0] === old.split('?')[0]) {
+                return old;
+            }
             this.loaded = false;
         }
     },

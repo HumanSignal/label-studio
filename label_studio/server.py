@@ -680,6 +680,7 @@ def api_all_tasks():
         else:
             task['completed_at'] = item['completed_at']
             task['has_skipped_completions'] = item['has_skipped_completions']
+        task = resolve_task_data_uri(task)
         tasks.append(task)
 
     return make_response(jsonify(tasks), 200)
