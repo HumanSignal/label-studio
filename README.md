@@ -4,8 +4,6 @@
 
 <br/>
 
-> **NEW** Release 0.7.0 - Cloud Storage Enablement: read the [release notes](https://labelstud.io/blog/release-070-cloud-storage-enablement.html).
-
 **Label Studio is a swiss army knife of data labeling and annotation tools :v:**
  
 Try it now in a **[running app](https://app.labelstud.io)** and check out the **[introductory post](https://towardsdatascience.com/introducing-label-studio-a-swiss-army-knife-of-data-labeling-140c1be92881#3907-fd502dc24c8d)**.
@@ -146,6 +144,7 @@ INIT_COMMAND=--init --force
 - **Embeddable**: It's an [NPM package](https://github.com/heartexlabs/label-studio-frontend) too. You can include it in your projects.
 - **Machine Learning**: Integration support for machine learning. Visualize and compare predictions from different models. Use the best ones for pre-labeling.
 - **Stylable**: Configure the visual appearance to match your company brand, distribute the labeling tasks as a part of your product.
+- **Amazon S3 and Google GCS**: [Read more](https://labelstud.io/blog/release-070-cloud-storage-enablement.html) about Cloud Storages Support and release 0.7.0.
 
 ## Use Cases
 
