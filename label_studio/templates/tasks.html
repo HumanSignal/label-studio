@@ -681,7 +681,7 @@
               this.vue_loaded = true;
               this.project_loaded = true;
 
-              this.order = getUrlArg('order', 'id');
+              this.order = getUrlArg('order', this.order);
               this.page = getUrlArg('page', this.page);
               this.page_size = getUrlArg('page_size', this.page_size);
               this.loadAll();
