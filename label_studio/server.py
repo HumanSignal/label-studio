@@ -46,6 +46,7 @@ from label_studio.storage import get_storage_form
 
 from label_studio.project import Project
 from label_studio.tasks import Tasks
+from label_studio.utils.auth import requires_auth
 
 logger = logging.getLogger(__name__)
 
@@ -120,6 +121,7 @@ def app_init():
 
 
 @app.route('/static/media/<path:path>')
+@requires_auth
 def send_media(path):
     """ Static for label tool js and css
     """
@@ -128,6 +130,7 @@ def send_media(path):
 
 
 @app.route('/upload/<path:path>')
+@requires_auth
 def send_upload(path):
     """ User uploaded files
     """
@@ -139,6 +142,7 @@ def send_upload(path):
 
 
 @app.route('/static/<path:path>')
+@requires_auth
 def send_static(path):
     """ Static serving
     """
@@ -153,6 +157,7 @@ def validation_error_handler(error):
 
 
 @app.route('/')
+@requires_auth
 @exception_treatment_page
 def labeling_page():
     """ Label studio frontend: task labeling
@@ -187,6 +192,7 @@ def labeling_page():
 
 
 @app.route('/welcome')
+@requires_auth
 @exception_treatment_page
 def welcome_page():
     """ Label studio frontend: task labeling
@@ -203,6 +209,7 @@ def welcome_page():
 
 
 @app.route('/tasks', methods=['GET', 'POST'])
+@requires_auth
 @exception_treatment_page
 def tasks_page():
     """ Tasks and completions page
@@ -229,6 +236,7 @@ def tasks_page():
 
 
 @app.route('/setup')
+@requires_auth
 @exception_treatment_page
 def setup_page():
     """ Setup label config
@@ -250,6 +258,7 @@ def setup_page():
 
 
 @app.route('/import')
+@requires_auth
 @exception_treatment_page
 def import_page():
     """ Import tasks from JSON, CSV, ZIP and more
@@ -265,6 +274,7 @@ def import_page():
 
 
 @app.route('/export')
+@requires_auth
 @exception_treatment_page
 def export_page():
     """ Export completions as JSON or using converters
@@ -280,6 +290,7 @@ def export_page():
 
 
 @app.route('/model')
+@requires_auth
 @exception_treatment_page
 def model_page():
     """ Machine learning"""
@@ -309,6 +320,7 @@ def model_page():
 
 
 @app.route('/api/render-label-studio', methods=['GET', 'POST'])
+@requires_auth
 def api_render_label_studio():
     """ Label studio frontend rendering for iframe
     """
@@ -343,6 +355,7 @@ def api_render_label_studio():
 
 
 @app.route('/api/validate-config', methods=['POST'])
+@requires_auth
 def api_validate_config():
     """ Validate label config via tags schema
     """
@@ -360,6 +373,7 @@ def api_validate_config():
 
 
 @app.route('/api/save-config', methods=['POST'])
+@requires_auth
 def api_save_config():
     """ Save label config
     """
@@ -386,6 +400,7 @@ def api_save_config():
 
 
 @app.route('/api/import-example', methods=['GET', 'POST'])
+@requires_auth
 def api_import_example():
     """ Generate upload data example by config only
     """
@@ -407,6 +422,7 @@ def api_import_example():
 
 
 @app.route('/api/import-example-file')
+@requires_auth
 def api_import_example_file():
     """ Task examples for import
     """
@@ -458,6 +474,7 @@ def api_import_example_file():
 
 
 @app.route('/api/import', methods=['POST'])
+@requires_auth
 @exception_treatment
 def api_import():
     project = project_get_or_create()
@@ -502,6 +519,7 @@ def api_import():
 
 
 @app.route('/api/export', methods=['GET'])
+@requires_auth
 @exception_treatment
 def api_export():
     export_format = request.args.get('format')
@@ -526,6 +544,7 @@ def api_export():
 
 
 @app.route('/api/projects/1/next/', methods=['GET'])
+@requires_auth
 @exception_treatment
 def api_generate_next_task():
     """ Generate next task to label
@@ -551,6 +570,7 @@ def api_generate_next_task():
 
 
 @app.route('/api/project/', methods=['POST', 'GET', 'PATCH'])
+@requires_auth
 @exception_treatment
 def api_project():
     """ Project global operation"""
@@ -570,6 +590,7 @@ def api_project():
 
 
 @app.route('/api/project/storage-settings', methods=['GET', 'POST'])
+@requires_auth
 @exception_treatment
 def api_project_storage_settings():
     project = project_get_or_create()
@@ -625,6 +646,7 @@ def api_project_storage_settings():
 
 
 @app.route('/api/projects/1/task_ids/', methods=['GET'])
+@requires_auth
 @exception_treatment
 def api_all_task_ids():
     """ Get all tasks ids
@@ -636,6 +658,7 @@ def api_all_task_ids():
 
 
 @app.route('/api/tasks', methods=['GET'])
+@requires_auth
 @exception_treatment
 def api_all_tasks():
     """ Get full tasks with pagination, completions and predictions
@@ -687,6 +710,7 @@ def api_all_tasks():
 
 
 @app.route('/api/tasks/<task_id>/', methods=['GET', 'DELETE'])
+@requires_auth
 @exception_treatment
 def api_tasks(task_id):
     """ Get task by id
@@ -706,6 +730,7 @@ def api_tasks(task_id):
 
 
 @app.route('/api/tasks/delete', methods=['DELETE'])
+@requires_auth
 @exception_treatment
 def api_tasks_delete():
     """ Delete all tasks & completions
@@ -716,6 +741,7 @@ def api_tasks_delete():
 
 
 @app.route('/api/projects/1/completions_ids/', methods=['GET'])
+@requires_auth
 @exception_treatment
 def api_all_completion_ids():
     """ Get all completion ids
@@ -727,6 +753,7 @@ def api_all_completion_ids():
 
 
 @app.route('/api/tasks/<task_id>/completions/', methods=['POST', 'DELETE'])
+@requires_auth
 @exception_treatment
 def api_completions(task_id):
     """ Delete or save new completion to output_dir with the same name as task_id
@@ -746,6 +773,7 @@ def api_completions(task_id):
 
 
 @app.route('/api/tasks/<task_id>/cancel', methods=['POST'])
+@requires_auth
 @exception_treatment
 def api_tasks_cancel(task_id):
     task_id = int(task_id)
@@ -760,6 +788,7 @@ def api_tasks_cancel(task_id):
 
 
 @app.route('/api/tasks/<task_id>/completions/<completion_id>/', methods=['DELETE'])
+@requires_auth
 @exception_treatment
 def api_completion_by_id(task_id, completion_id):
     """ Delete or save new completion to output_dir with the same name as task_id.
@@ -781,6 +810,7 @@ def api_completion_by_id(task_id, completion_id):
 
 
 @app.route('/api/tasks/<task_id>/completions/<completion_id>/', methods=['PATCH'])
+@requires_auth
 @exception_treatment
 def api_completion_update(task_id, completion_id):
     """ Rewrite existing completion with patch.
@@ -798,6 +828,7 @@ def api_completion_update(task_id, completion_id):
 
 
 @app.route('/api/projects/1/expert_instruction')
+@requires_auth
 @exception_treatment
 def api_instruction():
     """ Instruction for annotators
@@ -808,6 +839,7 @@ def api_instruction():
 
 
 @app.route('/api/remove-ml-backend', methods=['POST'])
+@requires_auth
 @exception_treatment
 def api_remove_ml_backend():
     project = project_get_or_create()
@@ -818,6 +850,7 @@ def api_remove_ml_backend():
 
 
 @app.route('/predict', methods=['POST'])
+@requires_auth
 @exception_treatment
 def api_predict():
     """ Make ML prediction using ml_backends
@@ -834,6 +867,7 @@ def api_predict():
 
 
 @app.route('/api/train', methods=['POST'])
+@requires_auth
 @exception_treatment
 def api_train():
     """Send train signal to ML backend"""
@@ -855,6 +889,7 @@ def api_train():
 
 
 @app.route('/api/predictions', methods=['POST'])
+@requires_auth
 @exception_treatment
 def api_predictions():
     """Send creating predictions signal to ML backend"""
@@ -874,6 +909,7 @@ def api_predictions():
 
 
 @app.route('/data/<path:filename>')
+@requires_auth
 @exception_treatment
 def get_data_file(filename):
     """ External resource serving
@@ -946,8 +982,15 @@ def main():
     # On `start` command, launch browser if --no-browser is not specified and start label studio server
     if input_args.command == 'start':
         import label_studio.utils.functions
-
+        import label_studio.utils.auth
         config = Project.get_config(input_args.project_name, input_args)
+
+        # set username and password
+        label_studio.utils.auth.USERNAME = input_args.username or \
+            config.get('username') or label_studio.utils.auth.USERNAME
+        label_studio.utils.auth.PASSWORD = input_args.password or config.get('password', '')
+
+        # set host name
         host = input_args.host or config.get('host', 'localhost')
         port = input_args.port or config.get('port', 8080)
 

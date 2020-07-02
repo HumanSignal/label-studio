@@ -125,6 +125,12 @@ def parse_input_args():
     parser_start.add_argument(
         '--init', dest='init', action='store_true',
         help='Initialize if project is not initialized yet')
+    parser_start.add_argument(
+        '--password', dest='password', default='',
+        help='Password for web access')
+    parser_start.add_argument(
+        '--username', dest='username', default='',
+        help='Username for web access')
 
     # start-multi-session sub-command parser
 
