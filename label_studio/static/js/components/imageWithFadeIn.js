@@ -22,7 +22,7 @@ var imageWithFadeIn = Vue.component('imageWithFadeIn', {props: ['src'],
         },
         updateInitialPath: function () {
             // save initial path to show in tippy
-            if (this.initial_path.split('?')[0] !== this.src.split('?')[0]) {
+            if (this.src && this.initial_path.split('?')[0] !== this.src.split('?')[0]) {
                 this.initial_path = this.src;
             }
         }
@@ -35,7 +35,7 @@ var imageWithFadeIn = Vue.component('imageWithFadeIn', {props: ['src'],
             this.updateInitialPath();
 
             // prevent updates when s3 or gsc regenerate new link to images
-            if (value.split('?')[0] === old.split('?')[0]) {
+            if (value && old && value.split('?')[0] === old.split('?')[0]) {
                 return;
             }
             this.loaded = false;

@@ -6,6 +6,10 @@
   <script src="static/semantic/semantic-ui-vue.min.js"></script>
 
   <style>
+    body {
+      overflow: auto;
+    }
+
     .visible-app {
       display: block !important;
     }
@@ -85,7 +89,7 @@
 
   <div id="vue_loader" class="ui large text loader loading active">Loading ...</div>
 
-  <div class="ui container" id="app" :class="{'visible-app': vue_loaded}" style="display: none">
+  <div class="ui " id="app" :class="{'visible-app': vue_loaded}" style="display: none">
 
   <!-- Main content -->
   <center class="center">
@@ -206,7 +210,10 @@
 
       </div>
       <div class="ui divider hidden"></div>
-     
+
+
+
+
       <!-- Table -->
       <table v-if="project.task_count > 0" class="responsive">
         <!-- Header -->
@@ -266,15 +273,15 @@
             <div class="actions-card">
               <span v-if="project.can_delete_tasks">
                 <a class="trash" @click="deleteTask(task)" data-tooltip="Delete task">
-                  <i class="fas fa-trash-alt trash remove-task">&nbsp;&nbsp;</i>
+                  <i class="fas fa-trash-alt trash remove-task"></i>
                 </a>
               </span>
               <span v-if="project.can_manage_completions">
-                &nbsp;&nbsp;
                 <span v-if="task.completions">
                   <a class="trash" @click="deleteCompletion(task, task.completions[0])"
+                     style="margin-left: 10px"
                      data-tooltip="Delete all completions of this task">
-                    <i class="far fa-trash-alt trash remove-completion">&nbsp;&nbsp;</i>
+                    <i class="far fa-trash-alt trash remove-completion"></i>
                   </a>
                 </span>
               </span>
@@ -562,7 +569,7 @@
                       name = '-' + name;
                   }
                   this.order = name;
-                  Cookies.set('order', this.order);
+                  Cookies.set('order', name);
                   refreshHistoryArg('order', name);
                   this.loadTasks();
               },
