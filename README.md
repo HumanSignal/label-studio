@@ -83,7 +83,7 @@ pip install -e .
 ```
 ```bash
 # Start the server at http://localhost:8080
-python label-studio/server.py start labeling_project --init
+python label_studio/server.py start labeling_project --init
 ```
 
 ## Run docker
