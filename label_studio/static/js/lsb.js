@@ -285,10 +285,11 @@ const LSB = function(elid, config, task) {
     onSkipTask: function(ls, completion) {
       ls.setFlags({ loading: true });
       let root = this;
+      completion = _prepData(ls.completionStore.selected);
 
       Requests.poster(
         `${API_URL.MAIN}${API_URL.TASKS}/${ls.task.id}${API_URL.CANCEL}`,
-        JSON.stringify(completion),
+        completion
       ).then(function(response) {
         response.json().then(function (res) {
            addHistory(ls, ls.task.id, res.id);

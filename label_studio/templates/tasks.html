@@ -225,7 +225,8 @@
             <i class="fas"
                :class="{'fa-sort-up': this.order=='completed_at', 'fa-sort-down': this.order=='-completed_at'}"></i>
           </th>
-          <th class="order" @click="changeOrder('has_skipped_completions')">Skipped
+          <th class="order" @click="changeOrder('has_skipped_completions')">
+            Skipped
             <i class="fas"
                :class="{'fa-sort-up': this.order=='has_skipped_completions', 'fa-sort-down': this.order=='-has_skipped_completions'}"></i>
           </th>
@@ -257,8 +258,7 @@
           </td>
           <!-- Skipped -->
           <td>
-            <span data-tooltip="Task has skipped completions" style="cursor:pointer"
-                 @click="changeOrder('has_skipped_completions')">
+            <span style="cursor:pointer">
              <i class="ui icon forward grey" v-if="task.has_skipped_completions"></i>
            </span>
           </td>

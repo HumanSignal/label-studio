@@ -763,6 +763,8 @@ def api_completions(task_id):
     if request.method == 'POST':
         completion = request.json
         completion.pop('state', None)  # remove editor state
+        completion.pop('skipped', None)
+        completion.pop('was_cancelled', None)
         completion_id = project.save_completion(int(task_id), completion)
         project.analytics.send(getframeinfo(currentframe()).function)
         return make_response(json.dumps({'id': completion_id}), 201)
@@ -778,10 +780,10 @@ def api_completions(task_id):
 def api_tasks_cancel(task_id):
     task_id = int(task_id)
     project = project_get_or_create()
-    skipped_completion = {
-        'result': [],
-        'skipped': True
-    }
+    skipped_completion = request.json
+    skipped_completion['was_cancelled'] = True  # for platform support
+    skipped_completion['skipped'] = True
+
     completion_id = project.save_completion(task_id, skipped_completion)
     project.analytics.send(getframeinfo(currentframe()).function)
     return make_response(json.dumps({'id': completion_id}), 201)
@@ -821,6 +823,8 @@ def api_completion_update(task_id, completion_id):
     completion = request.json
 
     completion.pop('state', None)  # remove editor state
+    completion['skipped'] = completion['was_cancelled'] = False  # pop is a bad idea because of dict updating inside
+
     completion['id'] = int(completion_id)
     project.save_completion(task_id, completion)
     project.analytics.send(getframeinfo(currentframe()).function)
