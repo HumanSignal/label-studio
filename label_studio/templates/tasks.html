@@ -6,8 +6,22 @@
   <script src="static/semantic/semantic-ui-vue.min.js"></script>
 
   <style>
-    body {
-      overflow: auto;
+    .table-wrapper {
+      overflow-x: auto;
+      padding-bottom: 1em;
+    }
+    ::-webkit-scrollbar-track {
+      -webkit-box-shadow: inset 0 0 8px rgba(178, 178, 178, 0.3) !important;
+      background-color: #F5F5F5 !important;
+    }
+    ::-webkit-scrollbar {
+      width: 8px !important;
+      height: 8px !important;
+      background-color: #F5F5F5 !important;
+    }
+    ::-webkit-scrollbar-thumb {
+      background-color: #c3c3c3 !important;
+      border: 8px solid #b4b4b4 !important;
     }
 
     .visible-app {
@@ -215,7 +229,8 @@
 
 
       <!-- Table -->
-      <table v-if="project.task_count > 0" class="responsive">
+      <div class="table-wrapper">
+        <table v-if="project.task_count > 0" class="responsive">
         <!-- Header -->
         <tr>
           <th class="order" @click="changeOrder('id')">Task ID
@@ -295,7 +310,7 @@
         </tr>
 
       </table>
-
+      </div>
       <div class="ui divider hidden"></div>
       
       <!-- Pagination -->

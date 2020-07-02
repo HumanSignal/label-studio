@@ -176,13 +176,15 @@ const _convertTask = function(task) {
 };
 
 const LSB = function(elid, config, task) {
-  const _prepData = function(c) {
-    const data = c.serializeCompletion();
-    const body = JSON.stringify({
-      lead_time: (new Date() - c.loadedDate) / 1000, // task execution time
-      result: data,
-    });
-
+  const _prepData = function(c, includeId) {
+    var completion = {
+      lead_time: (new Date() - c.loadedDate) / 1000,  // task execution time
+      result: c.serializeCompletion()
+    };
+    if (includeId) {
+        completion.id = parseInt(c.id);
+    }
+    const body = JSON.stringify(completion);
     return body;
   };
 
@@ -264,12 +266,13 @@ const LSB = function(elid, config, task) {
 
       const req = Requests.patch(
         `${API_URL.MAIN}${API_URL.TASKS}/${ls.task.id}${API_URL.COMPLETIONS}/${c.pk}/`,
-        _prepData(c),
+        _prepData(c)
       );
 
       req.then(function(httpres) {
         ls.setFlags({ isLoading: false });
-        ls.onTaskLoad(ls);
+        // refresh task from server
+        loadTask(ls, ls.task.id, ls.completionStore.selected.id);
       });
     },
 
@@ -282,21 +285,25 @@ const LSB = function(elid, config, task) {
       });
     },
 
-    onSkipTask: function(ls, completion) {
+    onSkipTask: function(ls) {
       ls.setFlags({ loading: true });
-      let root = this;
-      completion = _prepData(ls.completionStore.selected);
+      var c = ls.completionStore.selected;
+      var completion = _prepData(c, true);
 
       Requests.poster(
         `${API_URL.MAIN}${API_URL.TASKS}/${ls.task.id}${API_URL.CANCEL}`,
         completion
       ).then(function(response) {
         response.json().then(function (res) {
-           addHistory(ls, ls.task.id, res.id);
-           // if (res && res.id) completion.updatePersonalKey(res.id.toString());
+          if (res && res.id) {
+            c.updatePersonalKey(res.id.toString());
+            addHistory(ls, ls.task.id, res.id);
+          }
 
           if (task) {
             ls.setFlags({ isLoading: false });
+            // refresh task from server
+            loadTask(ls, ls.task.id, res.id);
           } else {
             loadNext(ls);
           }
@@ -309,7 +316,7 @@ const LSB = function(elid, config, task) {
     onGroundTruth: function(ls, c, value) {
       Requests.patch(
         `${API_URL.MAIN}${API_URL.TASKS}/${ls.task.id}${API_URL.COMPLETIONS}/${c.pk}/`,
-        JSON.stringify({ honeypot: value }),
+        JSON.stringify({ honeypot: value })
       );
     },
 
