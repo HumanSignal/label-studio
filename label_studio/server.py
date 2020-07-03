@@ -175,7 +175,8 @@ def labeling_page():
     if task_id is not None:
         task_id = int(task_id)
         # Task explore mode
-        task_data = project.get_task_with_completions(task_id) or project.source_storage.get(task_id)
+        task_data = project.get_task_with_completions(task_id) or\
+                    project.source_storage.get(task_id)
         task_data = resolve_task_data_uri(task_data)
 
         if project.ml_backends_connected:
