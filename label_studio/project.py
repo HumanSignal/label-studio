@@ -294,12 +294,14 @@ class Project(object):
 
     def _update_derived_output_schema(self, completion):
         """
-        Given completion, output schema is updated. Output schema consists of unique tuples (from_name, to_name, type)
+        Given completion, output schema is updated.
+        Output schema consists of unique tuples (from_name, to_name, type)
         and list of unique labels derived from existed completions
         :param completion:
         :return:
         """
-        for result in completion['result']:
+        completion_result = completion.get('result', []) or completion.get('draft', [])
+        for result in completion_result:
             result_type = result.get('type')
             if result_type in ('relation', 'rating', 'pairwise'):
                 continue
@@ -509,6 +511,10 @@ class Project(object):
 
     def save_completion(self, task_id, completion):
         """ Save completion
+            save cases
+                save new - without id
+                update - with id
+                autosave - update draft field, dont touch result
 
         :param task_id: task id
         :param completion: json data from label (editor)
@@ -523,16 +529,22 @@ class Project(object):
         else:
             task = deepcopy(task)
 
-        # update old completion
-        updated = False
+        # create draft field if it is autosave
+        if completion.get('draft', False):
+            completion['draft'] = completion['result']
+            completion.pop('result')
+
+        # update existed completion
         if 'id' in completion:
             for i, item in enumerate(task['completions']):
                 if item['id'] == completion['id']:
                     task['completions'][i].update(completion)
-                    updated = True
         # write new completion
-        if not updated:
+        else:
             completion['id'] = task['id'] * 1000 + len(task['completions']) + 1
+            # in case result wasnt send from js
+            if not completion.get('result'):
+                completion['result'] = []
             task['completions'].append(completion)
 
         try:
