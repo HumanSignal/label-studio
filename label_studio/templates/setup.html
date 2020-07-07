@@ -160,7 +160,9 @@
     else {
       $('#dimmer').removeClass('active');
       $('#error-message-icon').attr('class', 'green check icon');
-      $('#error-message-text').text("Label config saved!");
+      $('#error-message-text').html(
+          "Label config saved! <br><br> " +
+          "<a class='ui positive button' href='/import'>Start Import Tasks</a>");
       $('#error-message').modal('show');
     }
   }

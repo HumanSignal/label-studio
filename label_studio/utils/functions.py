@@ -80,3 +80,13 @@ def generate_sample_task(project):
     """
     task = generate_sample_task_without_check(project.label_config)
     return task
+
+
+def set_full_hostname(hostname):
+    global HOSTNAME
+    HOSTNAME = hostname
+
+
+def get_full_hostname():
+    global HOSTNAME
+    return HOSTNAME

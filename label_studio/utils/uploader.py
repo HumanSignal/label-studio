@@ -1,6 +1,7 @@
 # Import tasks from json, csv, zip, txt and more
 
 import os
+import io
 import csv
 import hashlib
 import shutil
@@ -20,7 +21,7 @@ from urllib.request import urlopen
 
 from .exceptions import ValidationError
 from .misc import Settings
-from label_studio.utils.functions import HOSTNAME
+from label_studio.utils.functions import get_full_hostname
 
 
 settings = Settings
@@ -58,14 +59,16 @@ def tasks_from_file(filename, file, project):
             tasks = [{'data': {settings.UPLOAD_DATA_UNDEFINED_NAME: body}}]
         # hosting for file
         else:
-            data = file.read()
+            # read as text or binary file
+            data = open(filename, 'rb').read() if isinstance(file, io.TextIOWrapper) else file.read()
+
             upload_dir = os.path.join(project.name, 'upload')
             os.makedirs(upload_dir, exist_ok=True)
-            filename = hashlib.md5(data).hexdigest() + '-' + filename
+            filename = hashlib.md5(data).hexdigest() + '-' + os.path.basename(filename)
             path = os.path.join(upload_dir, filename)
             open(path, 'wb').write(data)
             # prepare task
-            tasks = [{'data': {settings.UPLOAD_DATA_UNDEFINED_NAME: HOSTNAME + '/data/upload/' + filename}}]
+            tasks = [{'data': {settings.UPLOAD_DATA_UNDEFINED_NAME: get_full_hostname() + '/data/upload/' + filename}}]
 
     except Exception as exc:
         raise ValidationError('Failed to parse input file ' + filename + ': ' + str(exc))
