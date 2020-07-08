@@ -304,7 +304,7 @@ class DirectionSwitch:
 
 
 def check_port_in_use(host, port):
-    print('Chick host & port is available', host + ':' + str(port))
+    logger.info('Checking if host & port is available', host + ':' + str(port))
     host = host.replace('https://', '').replace('http://', '')
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         return s.connect_ex((host, port)) == 0
