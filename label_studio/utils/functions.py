@@ -15,6 +15,7 @@ with open(_LABEL_CONFIG_SCHEMA) as f:
     _LABEL_CONFIG_SCHEMA_DATA = json.load(f)
 
 
+PROTOCOL = ''
 HOSTNAME = ''
 
 
@@ -90,3 +91,17 @@ def set_full_hostname(hostname):
 def get_full_hostname():
     global HOSTNAME
     return HOSTNAME
+
+
+def get_web_protocol():
+    """ http or https
+    """
+    global PROTOCOL
+    return PROTOCOL
+
+
+def set_web_protocol(protocol):
+    """ http or https
+    """
+    global PROTOCOL
+    PROTOCOL = protocol

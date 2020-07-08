@@ -21,7 +21,7 @@ from urllib.request import urlopen
 
 from .exceptions import ValidationError
 from .misc import Settings
-from label_studio.utils.functions import get_full_hostname
+from label_studio.utils.functions import get_full_hostname, get_web_protocol
 
 
 settings = Settings
@@ -68,7 +68,9 @@ def tasks_from_file(filename, file, project):
             path = os.path.join(upload_dir, filename)
             open(path, 'wb').write(data)
             # prepare task
-            tasks = [{'data': {settings.UPLOAD_DATA_UNDEFINED_NAME: get_full_hostname() + '/data/upload/' + filename}}]
+
+            path = get_full_hostname() + '/data/upload/' + filename
+            tasks = [{'data': {settings.UPLOAD_DATA_UNDEFINED_NAME: path}}]
 
     except Exception as exc:
         raise ValidationError('Failed to parse input file ' + filename + ': ' + str(exc))

@@ -34,7 +34,9 @@ from label_studio.utils.io import find_dir, find_editor_files
 from label_studio.utils import uploader
 from label_studio.utils.validation import TaskValidator
 from label_studio.utils.exceptions import ValidationError
-from label_studio.utils.functions import generate_sample_task_without_check, set_full_hostname
+from label_studio.utils.functions import (
+    generate_sample_task_without_check, set_full_hostname, set_web_protocol, get_web_protocol
+)
 from label_studio.utils.misc import (
     exception_treatment, exception_treatment_page,
     config_line_stripped, get_config_templates, convert_string_to_hash, serialize_class,
@@ -995,7 +997,7 @@ def main():
         label_studio.utils.auth.PASSWORD = input_args.password or config.get('password', '')
 
         # set host name
-        host = input_args.host or config.get('host', 'https://localhost')
+        host = input_args.host or config.get('host', 'localhost')
         port = input_args.port or config.get('port', 8080)
 
         if check_port_in_use('localhost', port) and not input_args.debug:
@@ -1005,8 +1007,8 @@ def main():
                   '* Trying to start at ' + str(port) +
                   '\n****************\n')
 
-        protocol = 'http://' if '://' not in host else ''
-        set_full_hostname(protocol + host.replace('0.0.0.0', 'localhost') + ':' + str(port))
+        set_web_protocol(config.get('protocol', 'http://'))
+        set_full_hostname(get_web_protocol() + host.replace('0.0.0.0', 'localhost') + ':' + str(port))
 
         start_browser('http://localhost:' + str(port), input_args.no_browser)
         app.run(host=host, port=port, debug=input_args.debug)
