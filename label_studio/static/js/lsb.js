@@ -220,6 +220,20 @@ const LSB = function(elid, config, task) {
       return true;
     },
 
+    onSubmitDraft: function(ls, c) {
+      ls.setFlags({ isLoading: true });
+
+      const req = Requests.poster(`${API_URL.MAIN}${API_URL.TASKS}/${ls.task.id}${API_URL.COMPLETIONS}/`, _prepData(c));
+
+      return req.then(function(httpres) {
+        httpres.json().then(function(res) {
+          if (task) {
+            ls.setFlags({ isLoading: false });
+          }
+        });
+      });
+    },
+
     onUpdateCompletion: function(ls, c) {
       ls.setFlags({ isLoading: true });
 
