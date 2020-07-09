@@ -299,7 +299,7 @@ class DirectionSwitch:
         if self.obj is None and other.obj is not None:
             return False
         if self.obj is not None and other.obj is None:
-            return True
+            return False
 
         return other.obj == self.obj
 
