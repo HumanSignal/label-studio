@@ -15,6 +15,7 @@ with open(_LABEL_CONFIG_SCHEMA) as f:
     _LABEL_CONFIG_SCHEMA_DATA = json.load(f)
 
 
+PROTOCOL = ''
 HOSTNAME = ''
 
 
@@ -80,3 +81,27 @@ def generate_sample_task(project):
     """
     task = generate_sample_task_without_check(project.label_config)
     return task
+
+
+def set_full_hostname(hostname):
+    global HOSTNAME
+    HOSTNAME = hostname
+
+
+def get_full_hostname():
+    global HOSTNAME
+    return HOSTNAME
+
+
+def get_web_protocol():
+    """ http or https
+    """
+    global PROTOCOL
+    return PROTOCOL
+
+
+def set_web_protocol(protocol):
+    """ http or https
+    """
+    global PROTOCOL
+    PROTOCOL = protocol

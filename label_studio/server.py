@@ -23,7 +23,8 @@ from urllib.parse import unquote
 from datetime import datetime
 from inspect import currentframe, getframeinfo
 from flask import (
-    request, jsonify, make_response, Response, Response as HttpResponse, send_file, session, redirect
+    request, jsonify, make_response, Response, Response as HttpResponse,
+    send_file, session, redirect
 )
 from flask_api import status
 from types import SimpleNamespace
@@ -33,10 +34,13 @@ from label_studio.utils.io import find_dir, find_editor_files
 from label_studio.utils import uploader
 from label_studio.utils.validation import TaskValidator
 from label_studio.utils.exceptions import ValidationError
-from label_studio.utils.functions import generate_sample_task_without_check
+from label_studio.utils.functions import (
+    generate_sample_task_without_check, set_full_hostname, set_web_protocol, get_web_protocol
+)
 from label_studio.utils.misc import (
     exception_treatment, exception_treatment_page,
-    config_line_stripped, get_config_templates, convert_string_to_hash, serialize_class
+    config_line_stripped, get_config_templates, convert_string_to_hash, serialize_class,
+    DirectionSwitch, check_port_in_use
 )
 from label_studio.utils.argparser import parse_input_args
 from label_studio.utils.uri_resolver import resolve_task_data_uri
@@ -44,14 +48,28 @@ from label_studio.storage import get_storage_form
 
 from label_studio.project import Project
 from label_studio.tasks import Tasks
+from label_studio.utils.auth import requires_auth
 
 logger = logging.getLogger(__name__)
 
-app = flask.Flask(__name__, static_url_path='')
 
-app.secret_key = 'A0Zrdqwf1AQWj12ajkhgFN]dddd/,?RfDWQQT'
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
-app.config['WTF_CSRF_ENABLED'] = False
+def create_app():
+    """Create application factory, as explained here:
+    http://flask.pocoo.org/docs/patterns/appfactories/.
+
+        config_object="label_studio.settings"
+    :param config_object: The configuration object to use.
+    """
+    app = flask.Flask(__name__, static_url_path='')
+    app.secret_key = 'A0Zrdqwf1AQWj12ajkhgFN]dddd/,?RfDWQQT'
+    app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+    app.config['WTF_CSRF_ENABLED'] = False
+
+    return app
+
+
+app = create_app()
+
 
 # input arguments
 input_args = None
@@ -70,7 +88,7 @@ def project_get_or_create(multi_session_force_recreate=False):
     - "session": project is based on "project_name" key restored from flask.session object
     :return:
     """
-    if input_args.command == 'start-multi-session':
+    if input_args and input_args.command == 'start-multi-session':
         # get user from session
         if 'user' not in session:
             session['user'] = str(uuid4())
@@ -90,7 +108,8 @@ def project_get_or_create(multi_session_force_recreate=False):
         if multi_session_force_recreate:
             raise NotImplementedError(
                 '"multi_session_force_recreate" option supported only with "start-multi-session" mode')
-        return Project.get_or_create(input_args.project_name, input_args, context={'multi_session': False})
+        return Project.get_or_create(input_args.project_name,
+                                     input_args, context={'multi_session': False})
 
 
 @app.template_filter('json')
@@ -104,6 +123,7 @@ def app_init():
 
 
 @app.route('/static/media/<path:path>')
+@requires_auth
 def send_media(path):
     """ Static for label tool js and css
     """
@@ -112,6 +132,7 @@ def send_media(path):
 
 
 @app.route('/upload/<path:path>')
+@requires_auth
 def send_upload(path):
     """ User uploaded files
     """
@@ -123,6 +144,7 @@ def send_upload(path):
 
 
 @app.route('/static/<path:path>')
+@requires_auth
 def send_static(path):
     """ Static serving
     """
@@ -137,6 +159,7 @@ def validation_error_handler(error):
 
 
 @app.route('/')
+@requires_auth
 @exception_treatment_page
 def labeling_page():
     """ Label studio frontend: task labeling
@@ -171,6 +194,7 @@ def labeling_page():
 
 
 @app.route('/welcome')
+@requires_auth
 @exception_treatment_page
 def welcome_page():
     """ Label studio frontend: task labeling
@@ -187,6 +211,7 @@ def welcome_page():
 
 
 @app.route('/tasks', methods=['GET', 'POST'])
+@requires_auth
 @exception_treatment_page
 def tasks_page():
     """ Tasks and completions page
@@ -213,6 +238,7 @@ def tasks_page():
 
 
 @app.route('/setup')
+@requires_auth
 @exception_treatment_page
 def setup_page():
     """ Setup label config
@@ -234,6 +260,7 @@ def setup_page():
 
 
 @app.route('/import')
+@requires_auth
 @exception_treatment_page
 def import_page():
     """ Import tasks from JSON, CSV, ZIP and more
@@ -249,6 +276,7 @@ def import_page():
 
 
 @app.route('/export')
+@requires_auth
 @exception_treatment_page
 def export_page():
     """ Export completions as JSON or using converters
@@ -259,11 +287,12 @@ def export_page():
         'export.html',
         config=project.config,
         formats=project.converter.supported_formats,
-        project=project.project_obj
+        project=project
     )
 
 
 @app.route('/model')
+@requires_auth
 @exception_treatment_page
 def model_page():
     """ Machine learning"""
@@ -293,6 +322,7 @@ def model_page():
 
 
 @app.route('/api/render-label-studio', methods=['GET', 'POST'])
+@requires_auth
 def api_render_label_studio():
     """ Label studio frontend rendering for iframe
     """
@@ -327,6 +357,7 @@ def api_render_label_studio():
 
 
 @app.route('/api/validate-config', methods=['POST'])
+@requires_auth
 def api_validate_config():
     """ Validate label config via tags schema
     """
@@ -344,6 +375,7 @@ def api_validate_config():
 
 
 @app.route('/api/save-config', methods=['POST'])
+@requires_auth
 def api_save_config():
     """ Save label config
     """
@@ -370,6 +402,7 @@ def api_save_config():
 
 
 @app.route('/api/import-example', methods=['GET', 'POST'])
+@requires_auth
 def api_import_example():
     """ Generate upload data example by config only
     """
@@ -391,6 +424,7 @@ def api_import_example():
 
 
 @app.route('/api/import-example-file')
+@requires_auth
 def api_import_example_file():
     """ Task examples for import
     """
@@ -442,6 +476,7 @@ def api_import_example_file():
 
 
 @app.route('/api/import', methods=['POST'])
+@requires_auth
 @exception_treatment
 def api_import():
     project = project_get_or_create()
@@ -486,6 +521,7 @@ def api_import():
 
 
 @app.route('/api/export', methods=['GET'])
+@requires_auth
 @exception_treatment
 def api_export():
     export_format = request.args.get('format')
@@ -510,6 +546,7 @@ def api_export():
 
 
 @app.route('/api/projects/1/next/', methods=['GET'])
+@requires_auth
 @exception_treatment
 def api_generate_next_task():
     """ Generate next task to label
@@ -535,6 +572,7 @@ def api_generate_next_task():
 
 
 @app.route('/api/project/', methods=['POST', 'GET', 'PATCH'])
+@requires_auth
 @exception_treatment
 def api_project():
     """ Project global operation"""
@@ -550,12 +588,11 @@ def api_project():
 
     output = project.serialize()
     output['multi_session_mode'] = input_args.command != 'start-multi-session'
-    if not request.args.get('fast', False):
-        project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
     return make_response(jsonify(output), code)
 
 
 @app.route('/api/project/storage-settings', methods=['GET', 'POST'])
+@requires_auth
 @exception_treatment
 def api_project_storage_settings():
     project = project_get_or_create()
@@ -611,6 +648,7 @@ def api_project_storage_settings():
 
 
 @app.route('/api/projects/1/task_ids/', methods=['GET'])
+@requires_auth
 @exception_treatment
 def api_all_task_ids():
     """ Get all tasks ids
@@ -622,6 +660,7 @@ def api_all_task_ids():
 
 
 @app.route('/api/tasks', methods=['GET'])
+@requires_auth
 @exception_treatment
 def api_all_tasks():
     """ Get full tasks with pagination, completions and predictions
@@ -634,17 +673,26 @@ def api_all_tasks():
 
     order_inverted = order[0] == '-'
     order = order[1:] if order_inverted else order
-    if order not in ['id', 'completed_at']:
+    if order not in ['id', 'completed_at', 'has_skipped_completions']:
         return make_response(jsonify({'detail': 'Incorrect order'}), 422)
 
     # get task ids and sort them by completed time
     task_ids = project.source_storage.ids()
-    completed_at = project.get_completed_at(None)
+    completed_at = project.get_completed_at()
+    skipped_status = project.get_skipped_status()
 
     # ordering
-    pre_order = [{'id': i, 'completed_at': completed_at[i] if i in completed_at else "can't obtain"} for i in task_ids]
-    ordered = sorted(pre_order, key=lambda x: x[order])
-    ordered = ordered[::-1] if order_inverted else ordered
+    pre_order = [{
+        'id': i,
+        'completed_at': completed_at[i] if i in completed_at else None,
+        'has_skipped_completions': skipped_status[i] if i in completed_at else None,
+    } for i in task_ids]
+    # for has_skipped_completions use two keys ordering
+    if order == 'has_skipped_completions':
+        ordered = sorted(pre_order, key=lambda x: (DirectionSwitch(x['has_skipped_completions'], order_inverted),
+                                                   DirectionSwitch(x['completed_at'], False)))
+    else:
+        ordered = sorted(pre_order, key=lambda x: (DirectionSwitch(x[order], order_inverted)))
     paginated = ordered[(page - 1) * page_size:page * page_size]
 
     # get tasks with completions
@@ -656,12 +704,15 @@ def api_all_tasks():
             task = project.source_storage.get(i)
         else:
             task['completed_at'] = item['completed_at']
+            task['has_skipped_completions'] = item['has_skipped_completions']
+        task = resolve_task_data_uri(task)
         tasks.append(task)
 
     return make_response(jsonify(tasks), 200)
 
 
 @app.route('/api/tasks/<task_id>/', methods=['GET', 'DELETE'])
+@requires_auth
 @exception_treatment
 def api_tasks(task_id):
     """ Get task by id
@@ -671,6 +722,7 @@ def api_tasks(task_id):
     project = project_get_or_create()
     if request.method == 'GET':
         task_data = project.get_task_with_completions(task_id) or project.source_storage.get(task_id)
+        task_data = resolve_task_data_uri(task_data)
         project.analytics.send(getframeinfo(currentframe()).function)
         return make_response(jsonify(task_data), 200)
     elif request.method == 'DELETE':
@@ -680,6 +732,7 @@ def api_tasks(task_id):
 
 
 @app.route('/api/tasks/delete', methods=['DELETE'])
+@requires_auth
 @exception_treatment
 def api_tasks_delete():
     """ Delete all tasks & completions
@@ -690,6 +743,7 @@ def api_tasks_delete():
 
 
 @app.route('/api/projects/1/completions_ids/', methods=['GET'])
+@requires_auth
 @exception_treatment
 def api_all_completion_ids():
     """ Get all completion ids
@@ -701,6 +755,7 @@ def api_all_completion_ids():
 
 
 @app.route('/api/tasks/<task_id>/completions/', methods=['POST', 'DELETE'])
+@requires_auth
 @exception_treatment
 def api_completions(task_id):
     """ Delete or save new completion to output_dir with the same name as task_id
@@ -710,6 +765,8 @@ def api_completions(task_id):
     if request.method == 'POST':
         completion = request.json
         completion.pop('state', None)  # remove editor state
+        completion.pop('skipped', None)
+        completion.pop('was_cancelled', None)
         completion_id = project.save_completion(int(task_id), completion)
         project.analytics.send(getframeinfo(currentframe()).function)
         return make_response(json.dumps({'id': completion_id}), 201)
@@ -720,20 +777,22 @@ def api_completions(task_id):
 
 
 @app.route('/api/tasks/<task_id>/cancel', methods=['POST'])
+@requires_auth
 @exception_treatment
 def api_tasks_cancel(task_id):
     task_id = int(task_id)
     project = project_get_or_create()
-    skipped_completion = {
-        'result': [],
-        'skipped': True
-    }
+    skipped_completion = request.json
+    skipped_completion['was_cancelled'] = True  # for platform support
+    skipped_completion['skipped'] = True
+
     completion_id = project.save_completion(task_id, skipped_completion)
     project.analytics.send(getframeinfo(currentframe()).function)
     return make_response(json.dumps({'id': completion_id}), 201)
 
 
 @app.route('/api/tasks/<task_id>/completions/<completion_id>/', methods=['DELETE'])
+@requires_auth
 @exception_treatment
 def api_completion_by_id(task_id, completion_id):
     """ Delete or save new completion to output_dir with the same name as task_id.
@@ -755,6 +814,7 @@ def api_completion_by_id(task_id, completion_id):
 
 
 @app.route('/api/tasks/<task_id>/completions/<completion_id>/', methods=['PATCH'])
+@requires_auth
 @exception_treatment
 def api_completion_update(task_id, completion_id):
     """ Rewrite existing completion with patch.
@@ -765,6 +825,8 @@ def api_completion_update(task_id, completion_id):
     completion = request.json
 
     completion.pop('state', None)  # remove editor state
+    completion['skipped'] = completion['was_cancelled'] = False  # pop is a bad idea because of dict updating inside
+
     completion['id'] = int(completion_id)
     project.save_completion(task_id, completion)
     project.analytics.send(getframeinfo(currentframe()).function)
@@ -772,6 +834,7 @@ def api_completion_update(task_id, completion_id):
 
 
 @app.route('/api/projects/1/expert_instruction')
+@requires_auth
 @exception_treatment
 def api_instruction():
     """ Instruction for annotators
@@ -782,6 +845,7 @@ def api_instruction():
 
 
 @app.route('/api/remove-ml-backend', methods=['POST'])
+@requires_auth
 @exception_treatment
 def api_remove_ml_backend():
     project = project_get_or_create()
@@ -792,6 +856,7 @@ def api_remove_ml_backend():
 
 
 @app.route('/predict', methods=['POST'])
+@requires_auth
 @exception_treatment
 def api_predict():
     """ Make ML prediction using ml_backends
@@ -808,6 +873,7 @@ def api_predict():
 
 
 @app.route('/api/train', methods=['POST'])
+@requires_auth
 @exception_treatment
 def api_train():
     """Send train signal to ML backend"""
@@ -829,6 +895,7 @@ def api_train():
 
 
 @app.route('/api/predictions', methods=['POST'])
+@requires_auth
 @exception_treatment
 def api_predictions():
     """Send creating predictions signal to ML backend"""
@@ -848,6 +915,7 @@ def api_predictions():
 
 
 @app.route('/data/<path:filename>')
+@requires_auth
 @exception_treatment
 def get_data_file(filename):
     """ External resource serving
@@ -920,26 +988,30 @@ def main():
     # On `start` command, launch browser if --no-browser is not specified and start label studio server
     if input_args.command == 'start':
         import label_studio.utils.functions
-
+        import label_studio.utils.auth
         config = Project.get_config(input_args.project_name, input_args)
+
+        # set username and password
+        label_studio.utils.auth.USERNAME = input_args.username or \
+            config.get('username') or label_studio.utils.auth.USERNAME
+        label_studio.utils.auth.PASSWORD = input_args.password or config.get('password', '')
+
+        # set host name
         host = input_args.host or config.get('host', 'localhost')
         port = input_args.port or config.get('port', 8080)
-        label_studio.utils.functions.HOSTNAME = 'http://localhost:' + str(port)
 
-        try:
-            start_browser(label_studio.utils.functions.HOSTNAME, input_args.no_browser)
-            app.run(host=host, port=port, debug=input_args.debug)
-        except OSError as e:
-            # address already is in use
-            if e.errno == 98:
-                new_port = int(port) + 1
-                print('\n*** WARNING! ***\n* Port ' + str(port) + ' is in use.\n'
-                      '* Try to start at ' + str(new_port) + '\n****************\n')
-                label_studio.utils.functions.HOSTNAME = 'http://localhost:' + str(new_port)
-                start_browser(label_studio.utils.functions.HOSTNAME, input_args.no_browser)
-                app.run(host=host, port=new_port, debug=input_args.debug)
-            else:
-                raise e
+        if not input_args.debug and check_port_in_use('localhost', port):
+            old_port = port
+            port = int(port) + 1
+            print('\n*** WARNING! ***\n* Port ' + str(old_port) + ' is in use.\n' +
+                  '* Trying to start at ' + str(port) +
+                  '\n****************\n')
+
+        set_web_protocol(config.get('protocol', 'http://'))
+        set_full_hostname(get_web_protocol() + host.replace('0.0.0.0', 'localhost') + ':' + str(port))
+
+        start_browser('http://localhost:' + str(port), input_args.no_browser)
+        app.run(host=host, port=port, debug=input_args.debug)
 
     # On `start-multi-session` command, server creates one project per each browser sessions
     elif input_args.command == 'start-multi-session':

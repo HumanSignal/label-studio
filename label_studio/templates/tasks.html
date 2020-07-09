@@ -1,18 +1,42 @@
 {% extends 'base.html' %}
 {% block body %}
 {% raw %}
-  <script src="/static/js/polyfill.min.js"></script>
-  <script src="/static/js/vue.js"></script>
-  <script src="/static/semantic/semantic-ui-vue.min.js"></script>
+  <script src="static/js/polyfill.min.js"></script>
+  <script src="static/js/vue.js"></script>
+  <script src="static/semantic/semantic-ui-vue.min.js"></script>
 
   <style>
+    .table-wrapper {
+      overflow-x: auto;
+      padding-bottom: 1em;
+    }
+    ::-webkit-scrollbar-track {
+      -webkit-box-shadow: inset 0 0 8px rgba(178, 178, 178, 0.3) !important;
+      background-color: #F5F5F5 !important;
+    }
+    ::-webkit-scrollbar {
+      width: 8px !important;
+      height: 8px !important;
+      background-color: #F5F5F5 !important;
+    }
+    ::-webkit-scrollbar-thumb {
+      background-color: #c3c3c3 !important;
+      border: 8px solid #b4b4b4 !important;
+    }
+
     .visible-app {
       display: block !important;
     }
 
-    .predict-image {
+    .preview-image {
       border-radius: 5px;
       height: 50px;
+      cursor: pointer;
+    }
+
+    .full-preview-image {
+      max-height: 400px;
+      max-width: 400px;
     }
 
     .fade-enter-active, .fade-leave-active {
@@ -47,7 +71,7 @@
     }
 
     .actions-card {
-        display: flex;
+
     }
 
     .db-card {
@@ -68,11 +92,18 @@
     .trash:hover {
         color: rgb(255, 13, 23);
     }
+
+    @media screen and (max-width: 768px) {
+      .full-preview-image {
+        max-height: 250px;
+        max-width: 330px;
+      }
+    }
   </style>
 
   <div id="vue_loader" class="ui large text loader loading active">Loading ...</div>
 
-  <div class="ui container" id="app" :class="{'visible-app': vue_loaded}" style="display: none">
+  <div class="ui " id="app" :class="{'visible-app': vue_loaded}" style="display: none">
 
   <!-- Main content -->
   <center class="center">
@@ -193,9 +224,13 @@
 
       </div>
       <div class="ui divider hidden"></div>
-     
+
+
+
+
       <!-- Table -->
-      <table v-if="project.task_count > 0" class="responsive">
+      <div class="table-wrapper">
+        <table v-if="project.task_count > 0" class="responsive">
         <!-- Header -->
         <tr>
           <th class="order" @click="changeOrder('id')">Task ID
@@ -205,8 +240,16 @@
             <i class="fas"
                :class="{'fa-sort-up': this.order=='completed_at', 'fa-sort-down': this.order=='-completed_at'}"></i>
           </th>
+          <th class="order" @click="changeOrder('has_skipped_completions')">
+            Skipped
+            <i class="fas"
+               :class="{'fa-sort-up': this.order=='has_skipped_completions', 'fa-sort-down': this.order=='-has_skipped_completions'}"></i>
+          </th>
           <th>Label</th>
           <th v-if="project.can_delete_tasks || project.can_manage_completions">Delete</th>
+
+          <!-- Label config fields -->
+          <th v-for="(value, key) in project.data_types" v-if="value === 'Image'">${{ key }}</th>
         </tr>
 
         <!-- Task row -->
@@ -225,7 +268,15 @@
             {{ task.id }}
           </td>
           <!-- Completed at -->
-          <td>{{ task.completed_at }}</td>
+          <td>
+           {{ task.completed_at }}
+          </td>
+          <!-- Skipped -->
+          <td>
+            <span style="cursor:pointer">
+             <i class="ui icon forward grey" v-if="task.has_skipped_completions"></i>
+           </span>
+          </td>
           <!-- Label -->
           <td class="text-center">
             <a :href="'/?task_id=' + task.id">
@@ -237,24 +288,29 @@
             <div class="actions-card">
               <span v-if="project.can_delete_tasks">
                 <a class="trash" @click="deleteTask(task)" data-tooltip="Delete task">
-                  <i class="fas fa-trash-alt trash remove-task">&nbsp;&nbsp;</i>
+                  <i class="fas fa-trash-alt trash remove-task"></i>
                 </a>
               </span>
               <span v-if="project.can_manage_completions">
-                &nbsp;&nbsp;
                 <span v-if="task.completions">
                   <a class="trash" @click="deleteCompletion(task, task.completions[0])"
+                     style="margin-left: 10px"
                      data-tooltip="Delete all completions of this task">
-                    <i class="far fa-trash-alt trash remove-completion">&nbsp;&nbsp;</i>
+                    <i class="far fa-trash-alt trash remove-completion"></i>
                   </a>
                 </span>
               </span>
             </div>
           </td>
+
+          <!-- Label config fields -->
+          <td v-for="(value, key) in project.data_types" v-if="value === 'Image'">
+            <image-with-fade-in :src="task.data[key]"></image-with-fade-in>
+          </td>
         </tr>
 
       </table>
-
+      </div>
       <div class="ui divider hidden"></div>
       
       <!-- Pagination -->
@@ -280,8 +336,6 @@
             <option selected="selected">10</option>
             <option>50</option>
             <option>100</option>
-            <option>500</option>
-            <option>1000</option>
           </select>
         </div>
 
@@ -310,9 +364,12 @@
 
   </div>
 
-  <script src="/static/js/components/animatedNumber.js"></script>
+  <script src="static/js/components/animatedNumber.js"></script>
+  <script src="static/js/components/imageWithFadeIn.js"></script>
+  <script src="static/js/components/vue-tippy.min.js"></script>
   <script>
       Vue.use(SemanticUIVue);
+      Vue.use(VueTippy);
 
       var app = new Vue({
           el: '#app',
@@ -342,9 +399,9 @@
                   vue_loaded: false,
                   project_loaded: false,
                   tasks_loaded: false,
-                  page: 1,
-                  page_size: 10,
-                  order: 'id',
+                  page: Cookies.get('page', 1),
+                  page_size: Cookies.get('page_size', 10),
+                  order: Cookies.get('order', 'id'),
                   auto_update_timer: null,
                   timer_interval: 5000,
                   error: null
@@ -353,7 +410,8 @@
 
           // components
           components: {
-              'animated-number': animatedNumber
+              'animated-number': animatedNumber,
+              'image-with-fade-in': imageWithFadeIn
           },
 
           computed: {
@@ -412,7 +470,7 @@
               // get project info from api
               loadProject: function () {
                   var root = this;
-                  this.getApi('project', '/api/project/?fast=1',
+                  this.getApi('project', '/api/project/',
                       // always
                       function () { root.project_loaded = true; },
                       // fail
@@ -524,6 +582,7 @@
                       name = '-' + name;
                   }
                   this.order = name;
+                  Cookies.set('order', name);
                   refreshHistoryArg('order', name);
                   this.loadTasks();
               },
@@ -614,10 +673,12 @@
               // watch for page variable changes
               page: function () {
                   this.loadTasks();
+                  Cookies.set('page', this.page);
                   refreshHistoryArg('page', this.page);
               },
               page_size: function () {
                   this.loadTasks();
+                  Cookies.set('page_size', this.page_size);
                   refreshHistoryArg('page_size', this.page_size);
               },
               'storage_settings.source.type': function () {
@@ -633,7 +694,7 @@
               this.vue_loaded = true;
               this.project_loaded = true;
 
-              this.order = getUrlArg('order', 'id');
+              this.order = getUrlArg('order', this.order);
               this.page = getUrlArg('page', this.page);
               this.page_size = getUrlArg('page_size', this.page_size);
               this.loadAll();

@@ -31,8 +31,8 @@ If you want to start another project, just remove `./my_project` directory, or c
 Project labeling config is an XML file that consists of:
 
 - **object tags** specifying input data sources from imported tasks,
-- **control tags** for configuring labeling schema (how annotation result looks like)
-- **visual tags** applying different user interface styles
+- **control tags** for configuring labeling schema (how annotation result looks like),
+- **visual tags** applying different user interface styles.
 
 <a class="button" href="/tags">Check Available Tags</a>
 
@@ -50,7 +50,7 @@ Here an example config for classifying images provided by `image_url` key into t
 </View>
 ```
 
-## Setup from file
+### Setup labeling config from file
 
 It is possible to initialize a new project with predefined `config.xml`:
 
@@ -58,6 +58,6 @@ It is possible to initialize a new project with predefined `config.xml`:
 label-studio my_new_project start --init --label-config config.xml
 ```
 
-## Setup from UI
+### Setup labeling config from UI
 
 You can also use the web interface at [`/setup`](http://localhost:8080/setup) to paste your labeling config. Using web UI you also get a live update while you're editting the config.

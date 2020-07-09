@@ -15,10 +15,16 @@ table {
 table.responsive {
 
 }
+td,
+th {
+    padding: 0.4em 2em;
+    border: 1px solid #ccc;
+}
 
 @media screen and (max-width: 768px) {
     table.responsive tbody th,
     table.responsive tbody td {
+        text-align: left;
         display: block;
         border: none;
     }
@@ -35,13 +41,6 @@ h2 {
     font-size: 1.2em;
     font-weight: normal !important;
 }
-
-td,
-th {
-    padding: 0.4em 2em;
-    border: 1px solid #ccc;
-}
-
 
 .wrapper {
     max-width: 1400px;
@@ -365,7 +364,7 @@ div[class*="App_editor"] {
 }
 
 .ui .label.basic {
-    color: #999 !important;
+    font-weight: normal;
 }
 
 .ui .x.icon {

@@ -71,10 +71,10 @@
     // download file by url
     function downloadFile(urlToSend) {
       $('#dimmer').addClass('active');
-      let req = new XMLHttpRequest();
+      var req = new XMLHttpRequest();
       req.onreadystatechange = function() {
-        if(req.readyState == 2) {
-            if(req.status == 200) {
+        if (req.readyState === 2) {
+            if(req.status === 200) {
                 req.responseType = "blob";
             } else {
                 req.responseType = "json";
@@ -84,17 +84,17 @@
       req.open("GET", urlToSend, true);
       {#req.responseType = "blob";#}
       req.onload = function (event) {
-        let blob = req.response;
+        var blob = req.response;
 
         // file generated, start downloading
         if (req.status === 200) {
-          let link = document.createElement('a');
+          var link = document.createElement('a');
           link.href = window.URL.createObjectURL(blob);
           link.download = req.getResponseHeader('filename');
           link.click();
           link.remove();
         } else {
-          alert(req.response.msg);
+          alert(message_from_response(req.response));
         }
         $('#dimmer').removeClass('active');
       };

@@ -51,7 +51,7 @@ class Tasks(object):
         return tasks
 
     def from_json_file(self, path, start_task_id=0):
-        with open(path) as f:
+        with open(path, encoding="utf8") as f:
             json_body = json.loads(f.read())
 
             # multiple tasks in file
@@ -81,7 +81,7 @@ class Tasks(object):
     def from_text_file(self, path, data_key, start_task_id=0):
         tasks = {}
         task_id = start_task_id
-        with io.open(path) as f:
+        with io.open(path, encoding="utf8") as f:
             for line in f:
                 tasks[task_id] = {'id': task_id, 'data': {data_key: line.strip()}}
                 task_id += 1

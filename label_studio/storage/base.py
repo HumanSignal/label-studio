@@ -261,21 +261,33 @@ class CloudStorage(BaseStorage):
         else:
             return self._get_value(key)
 
-    def get(self, id):
+    def _get_key_by_id(self, id):
         item = self._ids_keys_map.get(id)
-        if item:
-            try:
-                key = item['key'].split(self.key_prefix, 1)[-1]
-                data = self.get_data(key)
-            except Exception as exc:
-                # return {'error': True, 'message': str(exc)}
-                logger.error(str(exc), exc_info=True)
-                return
-            if 'data' in data:
-                data['id'] = id
-                return data
-            else:
-                return {'data': data, 'id': id}
+        if not item:
+            # selected id not found in fetched keys
+            return
+        item_key = item['key']
+        if not item_key.startswith(self.key_prefix + self.prefix):
+            # found key not from current storage
+            return
+        return item_key
+
+    def get(self, id):
+        item_key = self._get_key_by_id(id)
+        if not item_key:
+            return
+        try:
+            key = item_key.split(self.key_prefix, 1)[-1]
+            data = self.get_data(key)
+        except Exception as exc:
+            # return {'error': True, 'message': str(exc)}
+            logger.error(str(exc), exc_info=True)
+            return
+        if 'data' in data:
+            data['id'] = id
+            return data
+        else:
+            return {'data': data, 'id': id}
 
     def _id_to_key(self, id):
         if not isinstance(id, str):
@@ -396,7 +408,8 @@ class CloudStorage(BaseStorage):
         return len(self._ids_keys_map) == 0
 
     def __contains__(self, id):
-        return id in self._ids_keys_map
+        item_key = self._get_key_by_id(id)
+        return item_key is not None
 
     def remove(self, key):
         raise NotImplementedError

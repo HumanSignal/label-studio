@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block body %}
 
-<script src="static/js/lsb.js"></script>
+<script src="static/js/lsf-sdk.js"></script>
 
 <!-- Editor -->
 <div class="content">
@@ -12,8 +12,8 @@
 
 <script>
   window.onload = function () {
-    let task = {{ task_data | json | safe }};
-    window.LSBI = LSB("label-studio", `{{ label_config_line | safe }}`, task);
+    var task = {{ task_data | json | safe }};
+    window.LSF_SDK = LSF_SDK("label-studio", `{{ label_config_line | safe }}`, task);
   }
 </script>
 

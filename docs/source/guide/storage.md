@@ -46,7 +46,7 @@ When you are storing BLOBs in your S3 bucket (like images or audio files), you m
 Label Studio allows you to generate input tasks with corresponding URLs automatically on-the-fly. You can to this either specifying `--source-params` when launching app:
 
 ```bash
-label-studio start my_project --init --source s3 --source-path my-s3-bucket --source-params "{\"data_key\": \"my-object-tag-$value\", \"use_blob_urls\": true}"
+label-studio start my_project --init --source s3 --source-path my-s3-bucket --source-params "{\"data_key\": \"my-object-tag-$value\", \"use_blob_urls\": true, \"regex\": ".*"}"
 ```
 
 You can leave `"data_key"` empty (or skip it at all) then LS generates it automatically with the first task key from label config (it's useful when you have only one object tag exposed).
@@ -62,7 +62,7 @@ Bucket prefix (typically used to specify internal folder/container)
 
 #### regex
 
-A regular expression for filtering bucket objects
+A regular expression for filtering bucket objects. Default is skipping all bucket objects (Use ".*" explicitly to collect all objects)
 
 #### create_local_copy
 
@@ -100,7 +100,7 @@ When you are storing BLOBs in your GCS bucket (like images or audio files), you 
 Label Studio allows you to generate input tasks with corresponding URLs automatically on-the-fly. You can to this either specifying `--source-params` when launching app:
 
 ```bash
-label-studio start my_project --init --source gcs --source-path my-gcs-bucket --source-params "{\"data_key\": \"my-object-tag-$value\", \"use_blob_urls\": true}"
+label-studio start my_project --init --source gcs --source-path my-gcs-bucket --source-params "{\"data_key\": \"my-object-tag-$value\", \"use_blob_urls\": true, \"regex\": ".*"}"
 ```
 
 You can leave `"data_key"` empty (or skip it at all) then LS generates it automatically with the first task key from label config (it's useful when you have only one object tag exposed).
@@ -116,7 +116,7 @@ Bucket prefix (typically used to specify internal folder/container)
 
 #### regex
 
-A regular expression for filtering bucket objects
+A regular expression for filtering bucket objects. Default is skipping all bucket objects (Use ".*" explicitly to collect all objects)
 
 #### create_local_copy
 

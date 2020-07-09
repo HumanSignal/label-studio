@@ -15,7 +15,18 @@
 
   <script src="static/js/jquery.min.js"></script>
   <script src="static/semantic/semantic.min.js"></script>
+  <script src="static/js/js.cookie.js"></script>
+  <script src="static/js/popper.min.js"></script>
+  <script src="static/js/tippy-bundle.umd.min.js"></script>
   <script src="static/js/helpers.js"></script>
+
+  <script
+  src="https://browser.sentry-cdn.com/5.17.0/bundle.min.js"
+  integrity="sha384-lowBFC6YTkvMIWPORr7+TERnCkZdo5ab00oH5NkFLeQUAmBTLGwJpFjF6djuxJ/5"
+  crossorigin="anonymous"></script>
+  <script>
+    Sentry.init({ dsn: 'https://f24f3e8da54c4a16a1ce9bef30ea9c30@o227124.ingest.sentry.io/5285295' });
+  </script>
 
   <!-- Editor CSS -->
   {% for css in editor_css %}
@@ -45,7 +56,7 @@
     <a href="tasks" class="{% if url_for(request.endpoint) == '/tasks' %}active{% endif %}">Tasks</a>
     <span class="delim">|</span>
 
-    <span id="menu-import" style="{{ 'block' if project and project.can_manage_tasks else 'none'}}">
+    <span id="menu-import" style="display:{{'block' if project and project.can_manage_tasks else 'none'}}">
       <a href="import" class="{% if url_for(request.endpoint) == '/import' %}active{% endif %}">Import</a>
       <span class="delim">|</span>
     </span>
@@ -77,5 +88,10 @@
 {% endblock %}
 
 <br>
+<script>
+  $(function() {
+    tippy('[data-tippy-content]', {allowHTML: true});
+  });
+</script>
 </body>
 </html>

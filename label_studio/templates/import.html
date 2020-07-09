@@ -171,7 +171,6 @@
     else {
       fd = new FormData;
       for (let i = 0; i < event.target.files.length; i++) {
-
         const f = event.target.files[i];
         let max_size_mb = {{ project.max_tasks_file_size }};
         if (f.size / 1024.0 / 1024.0 > max_size_mb) {

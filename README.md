@@ -1,10 +1,8 @@
-# Label Studio &middot; ![GitHub](https://img.shields.io/github/license/heartexlabs/label-studio?logo=heartex) [![Build Status](https://travis-ci.com/heartexlabs/label-studio.svg?branch=master)](https://travis-ci.com/heartexlabs/label-studio) [![codecov](https://codecov.io/gh/heartexlabs/label-studio/branch/master/graph/badge.svg)](https://codecov.io/gh/heartexlabs/label-studio) ![GitHub release](https://img.shields.io/github/v/release/heartexlabs/label-studio?include_prereleases) &middot; :sunny:
+# Label Studio &middot; ![GitHub](https://img.shields.io/github/license/heartexlabs/label-studio?logo=heartex) ![label-studio:build](https://github.com/heartexlabs/label-studio/workflows/label-studio:build/badge.svg) [![Build Status](https://travis-ci.com/heartexlabs/label-studio.svg?branch=master)](https://travis-ci.com/heartexlabs/label-studio) ![code-coverage](https://github.com/heartexlabs/label-studio/.github/test-coverage.svg) [![codecov](https://codecov.io/gh/heartexlabs/label-studio/branch/master/graph/badge.svg)](https://codecov.io/gh/heartexlabs/label-studio) ![GitHub release](https://img.shields.io/github/v/release/heartexlabs/label-studio?include_prereleases) &middot; :sunny:
 
 [Website](https://labelstud.io/) • [Docs](https://labelstud.io/guide/) • [Twitter](https://twitter.com/heartexlabs) • [Join Slack Community <img src="https://go.heartex.net/docs/images/slack-mini.png" width="18px"/>](https://join.slack.com/t/label-studio/shared_invite/zt-cr8b7ygm-6L45z7biEBw4HXa5A2b5pw)
 
 <br/>
-
-> **NEW** Release 0.7.0 - Cloud Storage Enablement: read the [release notes](https://labelstud.io/blog/release-070-cloud-storage-enablement.html).
 
 **Label Studio is a swiss army knife of data labeling and annotation tools :v:**
  
@@ -83,7 +81,7 @@ pip install -e .
 ```
 ```bash
 # Start the server at http://localhost:8080
-python label-studio/server.py start labeling_project --init
+python label_studio/server.py start labeling_project --init
 ```
 
 ## Run docker
@@ -146,6 +144,7 @@ INIT_COMMAND=--init --force
 - **Embeddable**: It's an [NPM package](https://github.com/heartexlabs/label-studio-frontend) too. You can include it in your projects.
 - **Machine Learning**: Integration support for machine learning. Visualize and compare predictions from different models. Use the best ones for pre-labeling.
 - **Stylable**: Configure the visual appearance to match your company brand, distribute the labeling tasks as a part of your product.
+- **Amazon S3 and Google GCS**: [Read more](https://labelstud.io/blog/release-070-cloud-storage-enablement.html) about Cloud Storages Support and release 0.7.0.
 
 ## Use Cases
 

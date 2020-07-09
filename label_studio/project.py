@@ -20,6 +20,7 @@ from label_studio.utils.models import ProjectObj, MLBackend
 from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.io import find_file, delete_dir_content, json_load
 from label_studio.utils.validation import is_url
+from label_studio.utils.functions import get_full_hostname
 from label_studio.tasks import Tasks
 from label_studio.storage import create_storage, get_available_storage_names
 
@@ -460,10 +461,9 @@ class Project(object):
             num=len(completions), output_dir=self.config["output_dir"]))
         return sorted(completions)
 
-    def get_completed_at(self, task_ids):
-        """ Get completed time for list of task ids
+    def get_completed_at(self):
+        """ Get completed time for tasks
 
-        :param task_ids: list of task ids
         :return: list of string with formatted datetime
         """
         times = {}
@@ -476,6 +476,22 @@ class Project(object):
             else:
                 times[id] = timestamp_to_local_datetime(latest_time).strftime('%Y-%m-%d %H:%M:%S')
         return times
+
+    def get_skipped_status(self):
+        """ Get skipped status for tasks: returns skipped completion number for task
+
+        :return: list of int
+        """
+        items = {}
+        for _, data in self.target_storage.items():
+            id = data['id']
+            try:
+                flag = sum([completion.get('skipped', False) for completion in data['completions']])
+            except Exception as exc:
+                items[id] = -1
+            else:
+                items[id] = flag
+        return items
 
     def get_task_with_completions(self, task_id):
         """ Get task with completions
@@ -873,6 +889,7 @@ class Project(object):
             'source_storage': {'readable_path': project.source_storage.readable_path},
             'available_storages': available_storages,
             'source_syncing': self.source_storage.is_syncing,
-            'target_syncing': self.target_storage.is_syncing
+            'target_syncing': self.target_storage.is_syncing,
+            'data_types': self.data_types
         }
         return output

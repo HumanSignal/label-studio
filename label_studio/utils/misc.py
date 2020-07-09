@@ -8,6 +8,8 @@ import hashlib
 import calendar
 import pytz
 import flask
+import socket
+import errno
 
 from json import JSONEncoder
 from collections import defaultdict, OrderedDict
@@ -284,3 +286,37 @@ def serialize_class(class_instance, keys=None):
             output[key] = dictionary[key]
 
     return output
+
+
+class DirectionSwitch:
+    def __init__(self, obj, inverted):
+        self.obj = obj
+        self.inverted = inverted
+
+    def __eq__(self, other):
+        if self.obj is None and other.obj is None:
+            return True
+        if self.obj is None and other.obj is not None:
+            return False
+        if self.obj is not None and other.obj is None:
+            return True
+
+        return other.obj == self.obj
+
+    def __lt__(self, other):
+        if self.obj is None and other.obj is None:
+            return True
+        if self.obj is None and other.obj is not None:
+            return False
+        if self.obj is not None and other.obj is None:
+            return True
+
+        result = other.obj < self.obj
+        return not result if self.inverted else result
+
+
+def check_port_in_use(host, port):
+    logger.info('Checking if host & port is available', host + ':' + str(port))
+    host = host.replace('https://', '').replace('http://', '')
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        return s.connect_ex((host, port)) == 0

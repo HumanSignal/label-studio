@@ -100,3 +100,24 @@ label-studio start-multi-session --root-dir ./session_projects
 ## Command line arguments
 
 You can specify input tasks, project config, machine learning backend and other options via the command line interface. Run `label-studio start --help` to see all available options.
+
+
+### Auth with login and password
+You can restrict the access for LS instance with the basic HTTP auth.
+
+```
+label-studio start my_labeling_project --username user --password pwd 
+```
+
+Or put `username` and `password` in the project config.json.
+ 
+```
+{ 
+ ...
+ "username": "user", 
+ "password": "pwd",
+ ...
+}
+```
+
+It will be the same username and password for all the users.  

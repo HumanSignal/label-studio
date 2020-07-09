@@ -32,7 +32,7 @@ os.makedirs(image_cache_dir, exist_ok=True)
 
 
 def get_transformed_image(url):
-    is_local_file = url.startswith('http://localhost:') and '/data/' in url
+    is_local_file = url.startswith('/data')
     if is_local_file:
         filename, dir_path = url.split('/data/')[1].split('?d=')
         dir_path = str(urllib.parse.unquote(dir_path))
