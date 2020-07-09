@@ -294,11 +294,23 @@ class DirectionSwitch:
         self.inverted = inverted
 
     def __eq__(self, other):
-        return False if self.obj is None or other.obj is None else (other.obj == self.obj)
+        if self.obj is None and other.obj is None:
+            return True
+        if self.obj is None and other.obj is not None:
+            return False
+        if self.obj is not None and other.obj is None:
+            return True
+
+        return other.obj == self.obj
 
     def __lt__(self, other):
-        if self.obj is None or other.obj is None:
+        if self.obj is None and other.obj is None:
+            return True
+        if self.obj is None and other.obj is not None:
             return False
+        if self.obj is not None and other.obj is None:
+            return True
+
         result = other.obj < self.obj
         return not result if self.inverted else result
 
