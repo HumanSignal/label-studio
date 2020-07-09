@@ -19,9 +19,8 @@ const TOKEN = process.env.GITHUB_TOKEN;
 async function get(ref = 'master') {
   let res, json, sha, branch = '';
 
-  var lsf_tmp = 'lsf_tmp';
-  if (!fs.existsSync(lsf_tmp)) {
-    fs.mkdirSync(lsf_tmp);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir);
   }
 
   if (ref.length < 30) {
@@ -47,6 +46,7 @@ async function get(ref = 'master') {
   res = await fetch(buildUrl, { headers: { Authorization: `token ${TOKEN}` }});
 
   const filename = `${dir}/${sha}.zip`;
+  console.info('Create write stream:', filename);
   const fileStream = fs.createWriteStream(filename);
   await new Promise((resolve, reject) => {
     res.body.pipe(fileStream);
@@ -67,25 +67,18 @@ async function get(ref = 'master') {
     commit: json.sha,
     branch,
     date: (json.author && json.author.date) || (json.committer && json.committer.date),
-  }
+  };
   fs.writeFileSync(`${dir}/static/version.json`, JSON.stringify(info, null, 2));
   console.info('Version info written to static/version.json');
 
 
   // move build to target folder
-  var oldPath = lsf_tmp + '/static';
-  var newPath = '../label_studio/static/editor';
+  var oldPath = path.join(dir, 'static');
+  var newPath = path.join(dir, '..', '..', 'label_studio', 'static', 'editor');
   fs.rmdirSync(newPath, {recursive: true});
   fs.rename(oldPath, newPath, function (err) {
     if (err) throw err;
     console.log('Successfully renamed - AKA moved!')
-  });
-
-  // add to git new lsf build
-  var exec = require('child_process').exec;
-  exec('git add ../label_studio/static/editor/*', function callback(error, stdout, stderr){
-      console.log('Git added ../label-studio/static/editor/*');
-      console.log(stdout, stderr);
   });
 }
 
