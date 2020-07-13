@@ -122,7 +122,7 @@ def config_comments_free(xml_config):
         p = xml_config.getparent()
         if p:
             p.remove(xml_config)
-        xml_config = etree.tostring(tree, method='html').decode("utf-8")
+        xml_config = etree.tostring(tree, encoding='utf8', method='html').decode("utf-8")
 
     return xml_config
 
