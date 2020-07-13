@@ -180,13 +180,13 @@ const LSF_SDK = function(elid, config, task) {
   const showHistory = task === null;  // show history buttons only if label stream mode, not for task explorer
     console.log(task === null);
 
-  const _prepData = function(c, includeId) {
+  const _prepData = function(c, append) {
     var completion = {
       lead_time: (new Date() - c.loadedDate) / 1000,  // task execution time
       result: c.serializeCompletion()
     };
-    if (includeId) {
-        completion.id = parseInt(c.id);
+    if (append && typeof append === "object") {
+      Object.assign(completion, append);
     }
     const body = JSON.stringify(completion);
     return body;
@@ -227,7 +227,7 @@ const LSF_SDK = function(elid, config, task) {
       ls.setFlags({ isLoading: true });
       const req = Requests.poster(`${API_URL.MAIN}${API_URL.TASKS}/${ls.task.id}${API_URL.COMPLETIONS}/`, _prepData(c));
 
-      req.then(function(httpres) {
+      return req.then(function(httpres) {
         httpres.json().then(function(res) {
           if (res && res.id) {
               c.updatePersonalKey(res.id.toString());
@@ -241,8 +241,23 @@ const LSF_SDK = function(elid, config, task) {
           }
         });
       });
+    },
 
-      return true;
+    onSubmitDraft: function(ls, c) {
+      ls.setFlags({ isLoading: true });
+
+      const req = Requests.poster(
+        `${API_URL.MAIN}${API_URL.TASKS}/${ls.task.id}${API_URL.COMPLETIONS}/`,
+        _prepData(c, { draft: true })
+      );
+
+      return req.then(function(httpres) {
+        httpres.json().then(function(res) {
+          if (task) {
+            ls.setFlags({ isLoading: false });
+          }
+        });
+      });
     },
 
     onTaskLoad: function(ls) {
@@ -292,7 +307,7 @@ const LSF_SDK = function(elid, config, task) {
     onSkipTask: function(ls) {
       ls.setFlags({ loading: true });
       var c = ls.completionStore.selected;
-      var completion = _prepData(c, true);
+      var completion = _prepData(c, { id: parseInt(c.id) });
 
       Requests.poster(
         `${API_URL.MAIN}${API_URL.TASKS}/${ls.task.id}${API_URL.CANCEL}`,
