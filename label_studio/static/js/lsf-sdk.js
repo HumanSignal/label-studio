@@ -253,7 +253,7 @@ const LSF_SDK = function(elid, config, task) {
 
       return req.then(httpres => httpres.json()
         .then(function(res) {
-          isNewDraft && red.id && c.updatePersonalKey(res.id.toString());
+          isNewDraft && res.id && c.updatePersonalKey(res.id.toString());
           return res;
         })
         .catch(() => true)
