@@ -531,15 +531,22 @@ class Project(object):
             task = deepcopy(task)
 
         # create draft field if it is autosave
-        if completion.get('draft', False):
-            completion['draft'] = completion['result']
-            completion.pop('result')
+        # or drop draft field if submit/update
+        draft_key = completion.get('draft', None)
+        if draft_key != None:
+            if draft_key == True:
+                completion['draft'] = completion['result']
+                completion.pop('result')
 
         # update existed completion
         if 'id' in completion:
             for i, item in enumerate(task['completions']):
                 if item['id'] == completion['id']:
                     task['completions'][i].update(completion)
+                    # if real submit/update - remove draft field
+                    if draft_key in (False, None):
+                        task['completions'][i].pop('draft')
+
         # write new completion
         else:
             completion['id'] = task['id'] * 1000 + len(task['completions']) + 1
