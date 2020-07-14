@@ -245,24 +245,19 @@ const LSF_SDK = function(elid, config, task) {
 
     onSubmitDraft: function(ls, c) {
       const isNewDraft = !c.pk;
-      let req;
-      if (isNewDraft) {
-        req = Requests.poster(
-          `${API_URL.MAIN}${API_URL.TASKS}/${ls.task.id}${API_URL.COMPLETIONS}/`,
-          _prepData(c, { draft: true })
-        );
-      } else {
-        req = Requests.patch(
-          `${API_URL.MAIN}${API_URL.TASKS}/${ls.task.id}${API_URL.COMPLETIONS}/${c.pk}/`,
-          _prepData(c)
-        );
-      }
+      const url = `${API_URL.MAIN}${API_URL.TASKS}/${ls.task.id}${API_URL.COMPLETIONS}/`;
+      const data = _prepData(c, { draft: true });
+      const req = isNewDraft
+        ? Requests.poster(url, data)
+        : Requests.patch(`${url}${c.pk}/`, data);
 
-      return req.then(function(httpres) {
-        httpres.json().then(function(res) {
-          isNewDraft && c.updatePersonalKey(res.id.toString());
-        });
-      });
+      return req.then(httpres => httpres.json()
+        .then(function(res) {
+          isNewDraft && red.id && c.updatePersonalKey(res.id.toString());
+          return res;
+        })
+        .catch(() => true)
+      );
     },
 
     onTaskLoad: function(ls) {
