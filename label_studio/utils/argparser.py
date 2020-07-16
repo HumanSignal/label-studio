@@ -101,6 +101,9 @@ def parse_input_args():
     root_parser.add_argument(
         '--allow-serving-local-files', dest='allow_serving_local_files', action='store_true',
         help='Allow serving local files (Warning! use this option only for your local runs)')
+    root_parser.add_argument(
+        '--use-gevent', dest='use_gevent', action='store_true',
+        help='Use gevent for better concurrency', default=False)
 
     parser = argparse.ArgumentParser(description='Label studio')
 
