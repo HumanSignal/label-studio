@@ -1443,8 +1443,8 @@
       }
     }
     function mergeField(key) {
-      var strat = strats[key] || defaultStrat;
-      options[key] = strat(parent[key], child[key], vm, key);
+      var start = strats[key] || defaultStrat;
+      options[key] = start(parent[key], child[key], vm, key);
     }
     return options;
   }
@@ -7559,7 +7559,7 @@
     }
 
     function performLeave() {
-      // the delayed leave may have already been cancelled
+      // the delayed leave may have already been canceled
       if (cb.cancelled) {
         return;
       }

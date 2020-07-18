@@ -22,7 +22,7 @@ from .io import find_dir
 logger = logging.getLogger(__name__)
 
 
-# settings from django analogue
+# settings from django analog
 class Settings:
     TASKS_MAX_NUMBER = 250000
     TASKS_MAX_FILE_SIZE = 200 * 1024 * 1024

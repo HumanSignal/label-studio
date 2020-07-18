@@ -5062,7 +5062,7 @@
     pushOperation(cm.curOp);
   }
 
-  // Finish an operation, updating the display and signalling delayed events
+  // Finish an operation, updating the display and signaling delayed events
   function endOperation(cm) {
     var op = cm.curOp;
     if (op) {

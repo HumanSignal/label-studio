@@ -66,7 +66,7 @@ That enables you to build more complex interfaces. Here is an example that puts 
         <Choice value="Politics" />
       </View>
       <View style="padding: 1em 4em; background: rgba(255,255,0,0.1)">
-        <Header size="4" value="Speach Type" />
+        <Header size="4" value="Speech Type" />
         <Choice value="Legible" />
         <Choice value="Slurred" />
       </View>
