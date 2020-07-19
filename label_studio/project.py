@@ -750,6 +750,10 @@ class Project(object):
             config['host'] = args.host
         if args.allow_serving_local_files:
             config['allow_serving_local_files'] = True
+        if args.key_file and args.cert_file:
+            config['protocol'] = 'https://'
+            config['cert'] = args.cert_file
+            config['key'] = args.key_file
 
         # create config.json
         config_json = 'config.json'

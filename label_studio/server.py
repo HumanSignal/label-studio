@@ -1000,6 +1000,13 @@ def main():
         host = input_args.host or config.get('host', 'localhost')
         port = input_args.port or config.get('port', 8080)
 
+        cert_file = input_args.cert_file or config.get('cert')
+        key_file = input_args.key_file or config.get('key')
+        ssl_context = None
+        if cert_file and key_file:
+            config['protocol'] = 'https://'
+            ssl_context = (cert_file, key_file)
+
         if not input_args.debug and check_port_in_use('localhost', port):
             old_port = port
             port = int(port) + 1
@@ -1010,8 +1017,8 @@ def main():
         set_web_protocol(config.get('protocol', 'http://'))
         set_full_hostname(get_web_protocol() + host.replace('0.0.0.0', 'localhost') + ':' + str(port))
 
-        start_browser('http://localhost:' + str(port), input_args.no_browser)
-        app.run(host=host, port=port, debug=input_args.debug)
+        start_browser(f'{get_web_protocol()}localhost:' + str(port), input_args.no_browser)
+        app.run(host=host, port=port, debug=input_args.debug, ssl_context=ssl_context)
 
     # On `start-multi-session` command, server creates one project per each browser sessions
     elif input_args.command == 'start-multi-session':
