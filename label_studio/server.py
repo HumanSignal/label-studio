@@ -166,7 +166,7 @@ def labeling_page():
     """
     project = project_get_or_create()
     if project.no_tasks():
-        return redirect('/welcome')
+        return redirect('welcome')
 
     # task data: load task or task with completions if it exists
     task_data = None
