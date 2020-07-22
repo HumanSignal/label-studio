@@ -452,7 +452,7 @@
               loadTasks: function () {
                   var root = this;
                   root.tasks_loaded = false;
-                  this.getApi('tasks', 'api/tasks?page=' + this.page +
+                  this.getApi('tasks', 'api/tasks/?page=' + this.page +
                                        '&page_size=' + parseInt(this.page_size) +
                                        '&order=' + this.order, null,
                       // fail
@@ -484,7 +484,7 @@
               loadStorageSettings: function () {
                   var root = this;
                   root.storage_settings.source.type_loading = root.storage_settings.target.type_loading = true;
-                  this.getApi('storage_settings_all', 'api/project/storage-settings',
+                  this.getApi('storage_settings_all', 'api/project/storage-settings/',
                       function () {
                           root.storage_settings.source.type_loading = root.storage_settings.target.type_loading = false;
                           root.changeStorageSettings('source', 'current');
@@ -525,7 +525,7 @@
                   root.$set(root.storage_settings[storage_for], 'errors', []);
                   $.ajax({
                       type: 'POST',
-                      url: 'api/project/storage-settings' +
+                      url: 'api/project/storage-settings/' +
                           '?type=' + this.storage_settings[storage_for].type +
                           '&storage_for=' + storage_for,
                       contentType: 'application/json',

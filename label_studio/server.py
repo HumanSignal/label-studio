@@ -64,7 +64,7 @@ def create_app():
     app.secret_key = 'A0Zrdqwf1AQWj12ajkhgFN]dddd/,?RfDWQQT'
     app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
     app.config['WTF_CSRF_ENABLED'] = False
-
+    app.url_map.strict_slashes = False
     return app
 
 
@@ -591,7 +591,7 @@ def api_project():
     return make_response(jsonify(output), code)
 
 
-@app.route('/api/project/storage-settings', methods=['GET', 'POST'])
+@app.route('/api/project/storage-settings/', methods=['GET', 'POST'])
 @requires_auth
 @exception_treatment
 def api_project_storage_settings():
@@ -659,7 +659,7 @@ def api_all_task_ids():
     return make_response(jsonify(ids), 200)
 
 
-@app.route('/api/tasks', methods=['GET'])
+@app.route('/api/tasks/', methods=['GET'])
 @requires_auth
 @exception_treatment
 def api_all_tasks():
