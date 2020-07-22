@@ -315,6 +315,20 @@ class DirectionSwitch:
         return not result if self.inverted else result
 
 
+def compare_with_none(field, inverted):
+    def compare_with_none_func(a, b):
+        if a[field] is None and b[field] is None:
+            return True
+        if a[field] is None and b[field] is not None:
+            return False
+        if a[field] is not None and b[field] is None:
+            return True
+
+        result = b[field] < a[field]
+        return not result if inverted else result
+    return compare_with_none_func
+
+
 def check_port_in_use(host, port):
     logger.info('Checking if host & port is available', host + ':' + str(port))
     host = host.replace('https://', '').replace('http://', '')

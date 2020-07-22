@@ -114,7 +114,7 @@
       <!-- Statistics -->
       <div class="ui three column centered grid stackable">
         <div class="row">
-          
+
           <!-- Total tasks -->
           <div class="column center aligned align-grid">
             <div class="ui db-card">
@@ -151,10 +151,10 @@
                   </span>
                 </div>
               </div> <!-- statistic -->
-              
+
             </div>
           </div>
-          
+
           <!-- Total completions -->
           <div class="column center aligned align-grid">
             <div class="ui db-card">
@@ -184,7 +184,7 @@
               </div>
             </div>
           </div>
-          
+
           <!-- Action Buttons -->
           <div class="column center aligned align-grid">
             <div class="ui db-card">
@@ -198,7 +198,7 @@
                       <i class="ui icon far shuffle"></i>
                       {{ project.config['sampling'] }}
                     </span>
-                  </span>                  
+                  </span>
                   <!-- Start labeling -->
                   <a class="ui button positive" href=".">Start Labeling</a>
                 </div>
@@ -312,7 +312,7 @@
       </table>
       </div>
       <div class="ui divider hidden"></div>
-      
+
       <!-- Pagination -->
 
       <!-- this element is needed for pretty symmetrical alignment with loader on the right side -->
@@ -620,14 +620,22 @@
                   }
               },
 
-              // start timer with project & task api loading
+              // start/stop timer with project & task api loading
+              stopAutoUpdateTimer: function() {
+                  clearInterval(this.auto_update_timer);
+                  this.auto_update_timer = null;
+              },
+              startAutoUpdateTimer: function() {
+                  if (this.timer_interval > 0) {
+                      this.auto_update_timer = setInterval(this.loadProjectAndTasksByTimer, this.timer_interval);
+                  }
+              },
               toggleAutoUpdateTimer: function () {
                   if (this.auto_update_timer) {
-                    clearInterval(this.auto_update_timer);
-                    this.auto_update_timer = null;
+                      this.stopAutoUpdateTimer();
                   }
                   else {
-                    this.auto_update_timer = setInterval(this.loadProjectAndTasksByTimer, this.timer_interval);
+                      this.startAutoUpdateTimer();
                   }
               },
 
@@ -699,9 +707,11 @@
               this.page_size = getUrlArg('page_size', this.page_size);
               this.loadAll();
 
-              this.timer_interval = parseInt(getUrlArg('timer', '5000'));
-              if (this.timer_interval > 0)
-                this.toggleAutoUpdateTimer();
+              this.timer_interval = parseInt(getUrlArg('timer', '10000'));
+              this.startAutoUpdateTimer();
+              if (this.timer_interval > 0) {
+                console.log('auto update enabled, use ?timer=0 to disable it on this page')
+              }
 
               $('#vue_loader').hide();
               console.log('Vue mounting success');

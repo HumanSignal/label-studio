@@ -1,8 +1,8 @@
 import os
-import json
 import re
 import logging
 import threading
+import ujson as json
 
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
@@ -304,7 +304,7 @@ class CloudStorage(BaseStorage):
     def _set_value(self, key, value):
         pass
 
-    def set(self, id, value):
+    def _pre_set(self, id, value):
         if self.prefix:
             key = self.prefix + '/' + str(id)
         else:
@@ -314,6 +314,10 @@ class CloudStorage(BaseStorage):
         self._ids_keys_map[id] = {'key': full_key, 'exists': True}
         self._keys_ids_map[full_key] = id
         self._selected_ids.append(id)
+        return full_key
+
+    def set(self, id, value):
+        full_key = self._pre_set(id, value)
         self._save_ids()
         logger.debug('Create ' + full_key + ' in ' + self.readable_path)
 
@@ -360,13 +364,16 @@ class CloudStorage(BaseStorage):
 
     def iter_full_keys(self):
         for key in self._get_objects():
+
+            if self.regex is not None and not self.regex.match(key):
+                logger.debug(key + ' is skipped by regex filter')
+                continue
+
             try:
                 self._validate_object(key)
             except Exception as exc:
                 continue
-            if not self.regex.match(key):
-                logger.debug(key + ' is skipped by regex filter')
-                continue
+
             yield self.key_prefix + key
 
     def _sync(self):
@@ -378,14 +385,29 @@ class CloudStorage(BaseStorage):
         new_ids_keys_map = {}
         new_keys_ids_map = {}
 
-        for key in self.iter_full_keys():
+        full = set(self.iter_full_keys())
+        intersect = full & set(self._keys_ids_map)
+        exclusion = full - intersect
+
+        for key in exclusion:
+            id = new_id
+            new_id += 1
+            new_ids_keys_map[id] = {'key': key, 'exists': True}
+            new_keys_ids_map[key] = id
+
+        for key in intersect:
+            id = self._keys_ids_map[key]
+            new_ids_keys_map[id] = {'key': key, 'exists': True}
+            new_keys_ids_map[key] = id
+
+        ''' for key in self.iter_full_keys():
             if key not in self._keys_ids_map:
                 id = new_id
                 new_id += 1
             else:
                 id = self._keys_ids_map[key]
             new_ids_keys_map[id] = {'key': key, 'exists': True}
-            new_keys_ids_map[key] = id
+            new_keys_ids_map[key] = id '''
 
         with self.thread_lock:
             self._selected_ids = list(new_ids_keys_map.keys())

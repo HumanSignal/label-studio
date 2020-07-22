@@ -156,7 +156,7 @@ class ExternalTasksJSONStorage(CloudStorage):
             path=os.path.join(project_path, 'tasks.json'),
             use_blob_urls=False,
             prefix=None,
-            regex='.*',
+            regex=None,
             create_local_copy=False,
             sync_in_thread=False,
             **kwargs
@@ -194,8 +194,12 @@ class ExternalTasksJSONStorage(CloudStorage):
 
     def set_many(self, ids, values):
         for id, value in zip(ids, values):
-            super(ExternalTasksJSONStorage, self).set(id, value)
+            super(ExternalTasksJSONStorage, self)._pre_set(id, value)
+        self._save_ids()
         self._save()
+
+    def iter_full_keys(self):
+        return (self.key_prefix + key for key in self._get_objects())
 
     def _get_objects(self):
         self.data = json_load(self.path, int_keys=True)

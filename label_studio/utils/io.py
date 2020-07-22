@@ -3,7 +3,7 @@ import pkg_resources
 import shutil
 import glob
 import io
-import json
+import ujson as json
 
 from contextlib import contextmanager
 from tempfile import mkstemp, mkdtemp

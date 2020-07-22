@@ -682,17 +682,25 @@ def api_all_tasks():
     skipped_status = project.get_skipped_status()
 
     # ordering
-    pre_order = [{
+    pre_order = ({
         'id': i,
         'completed_at': completed_at[i] if i in completed_at else None,
         'has_skipped_completions': skipped_status[i] if i in completed_at else None,
-    } for i in task_ids]
-    # for has_skipped_completions use two keys ordering
-    if order == 'has_skipped_completions':
-        ordered = sorted(pre_order, key=lambda x: (DirectionSwitch(x['has_skipped_completions'], order_inverted),
-                                                   DirectionSwitch(x['completed_at'], False)))
+    } for i in task_ids)
+
+    if order == 'id':
+        ordered = sorted(pre_order, key=lambda x: x['id'], reverse=order_inverted)
+
     else:
-        ordered = sorted(pre_order, key=lambda x: (DirectionSwitch(x[order], order_inverted)))
+        # for has_skipped_completions use two keys ordering
+        if order == 'has_skipped_completions':
+            ordered = sorted(pre_order,
+                             key=lambda x: (DirectionSwitch(x['has_skipped_completions'], not order_inverted),
+                                            DirectionSwitch(x['completed_at'], False)))
+        # another orderings
+        else:
+            ordered = sorted(pre_order, key=lambda x: (DirectionSwitch(x[order], not order_inverted)))
+
     paginated = ordered[(page - 1) * page_size:page * page_size]
 
     # get tasks with completions
