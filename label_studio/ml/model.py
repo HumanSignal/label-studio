@@ -269,11 +269,11 @@ class LabelStudioMLManager(object):
         data = list(data_iter)
         data_file = os.path.join(workdir, 'train_data.json')
         with io.open(data_file, mode='w') as fout:
-            json.dump(data, fout, ensure_ascii=False, indent=2)
+            json.dump(data, fout, ensure_ascii=False)
 
         info_file = os.path.join(workdir, 'train_data_info.json')
         with io.open(info_file, mode='w') as fout:
-            json.dump({'count': len(data)}, fout, indent=2)
+            json.dump({'count': len(data)}, fout)
 
     @classmethod
     def train_script_wrapper(

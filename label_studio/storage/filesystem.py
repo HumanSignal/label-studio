@@ -28,7 +28,7 @@ class JSONStorage(BaseStorage):
 
     def _save(self):
         with open(self.path, mode='w', encoding='utf8') as fout:
-            json.dump(self.data, fout, ensure_ascii=False, indent=2)
+            json.dump(self.data, fout, ensure_ascii=False)
 
     @property
     def readable_path(self):
@@ -166,7 +166,7 @@ class ExternalTasksJSONStorage(CloudStorage):
 
     def _save(self):
         with open(self.path, mode='w', encoding='utf8') as fout:
-            json.dump(self.data, fout, ensure_ascii=False, indent=2)
+            json.dump(self.data, fout, ensure_ascii=False)
 
     def _get_client(self):
         pass

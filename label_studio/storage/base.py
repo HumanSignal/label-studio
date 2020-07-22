@@ -245,7 +245,7 @@ class CloudStorage(BaseStorage):
     def _save_ids(self):
         if self._save_to_file_enabled:
             with open(self._ids_file, mode='w') as fout:
-                json.dump(self._ids_keys_map, fout, indent=2)
+                json.dump(self._ids_keys_map, fout)
 
     @abstractmethod
     def _get_value(self, key):
@@ -310,12 +310,13 @@ class CloudStorage(BaseStorage):
         else:
             key = str(id)
         full_key = self.key_prefix + key
-        logger.debug('Create ' + full_key + ' in ' + self.readable_path)
         self._set_value(key, value)
         self._ids_keys_map[id] = {'key': full_key, 'exists': True}
         self._keys_ids_map[full_key] = id
         self._selected_ids.append(id)
         self._save_ids()
+        logger.debug('Create ' + full_key + ' in ' + self.readable_path)
+
         if self.create_local_copy:
             self._create_local(id, value)
 
@@ -326,7 +327,7 @@ class CloudStorage(BaseStorage):
         local_file = os.path.join(self.objects_dir, str(id) + '.json')
         logger.debug('Creating local copy in file ' + local_file)
         with open(local_file, mode='w', encoding='utf8') as fout:
-            json.dump(value, fout, indent=2)
+            json.dump(value, fout)
 
     def max_id(self):
         return max(self._ids_keys_map.keys(), default=-1)
