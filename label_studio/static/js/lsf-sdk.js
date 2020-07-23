@@ -146,7 +146,7 @@ const loadNext = function(ls) {
 };
 
 const loadTask = function(ls, taskID, completionID) {
-  var url = `${API_URL.MAIN}${API_URL.TASKS}/${taskID}`;
+  var url = `${API_URL.MAIN}${API_URL.TASKS}/${taskID}/`;
     return _loadTask(ls, url, completionID);
 };
 

@@ -400,15 +400,6 @@ class CloudStorage(BaseStorage):
             new_ids_keys_map[id] = {'key': key, 'exists': True}
             new_keys_ids_map[key] = id
 
-        ''' for key in self.iter_full_keys():
-            if key not in self._keys_ids_map:
-                id = new_id
-                new_id += 1
-            else:
-                id = self._keys_ids_map[key]
-            new_ids_keys_map[id] = {'key': key, 'exists': True}
-            new_keys_ids_map[key] = id '''
-
         with self.thread_lock:
             self._selected_ids = list(new_ids_keys_map.keys())
             self._ids_keys_map.update(new_ids_keys_map)
