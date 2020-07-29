@@ -890,6 +890,7 @@ class Project(object):
             'available_storages': available_storages,
             'source_syncing': self.source_storage.is_syncing,
             'target_syncing': self.target_storage.is_syncing,
-            'data_types': self.data_types
+            'data_types': self.data_types,
+            'label_config_line': self.label_config_line
         }
         return output

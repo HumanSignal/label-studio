@@ -216,25 +216,17 @@ def welcome_page():
 def tasks_page():
     """ Tasks and completions page
     """
-    try:
-        project = project_get_or_create()
-        serialized_project = project.serialize()
-        serialized_project['multi_session_mode'] = input_args.command != 'start-multi-session'
-        project.analytics.send(getframeinfo(currentframe()).function)
-        return flask.render_template(
-            'tasks.html',
-            config=project.config,
-            project=project,
-            serialized_project=serialized_project
-        )
-    except Exception as e:
-        error = str(e)
-        logger.error(error, exc_info=True)
-        traceback = tb.format_exc()
-        return flask.render_template(
-            'includes/error.html',
-            error=error, header="Project loading error", traceback=traceback
-        )
+    project = project_get_or_create()
+    serialized_project = project.serialize()
+    serialized_project['multi_session_mode'] = input_args.command != 'start-multi-session'
+    project.analytics.send(getframeinfo(currentframe()).function)
+    return flask.render_template(
+        'tasks.html',
+        config=project.config,
+        project=project,
+        serialized_project=serialized_project,
+        **find_editor_files()
+    )
 
 
 @app.route('/setup')

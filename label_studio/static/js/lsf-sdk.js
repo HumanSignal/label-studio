@@ -123,6 +123,9 @@ const _loadTask = function(ls, url, completionID) {
                 else if (ls.completionStore.completions.length > 0 && completionID) {
                     c = {id: completionID};
                 }
+                else if (ls.completionStore.completions.length > 0 && completionID === 'auto') {
+                    c = {id: ls.completionStore.completions[0].id};
+                }
 
                 else {
                     c = ls.completionStore.addCompletion({ userGenerate: true });
@@ -178,7 +181,6 @@ const _convertTask = function(task) {
 const LSF_SDK = function(elid, config, task) {
 
   const showHistory = task === null;  // show history buttons only if label stream mode, not for task explorer
-    console.log(task === null);
 
   const _prepData = function(c, includeId) {
     var completion = {
@@ -342,28 +344,28 @@ const LSF_SDK = function(elid, config, task) {
     }
   });
 
-    // TODO WIP here, we will move that code to the SDK
-    var sdk = {
-        "loadNext": function () { loadNext(LS) },
-        "loadTask": function (taskID) { loadTask(LS, taskID) },
-        'prevButtonClick': function() {
-            LS.taskHistoryCurrent--;
+  // TODO WIP here, we will move that code to the SDK
+  var sdk = {
+      "loadNext": function () { loadNext(LS) },
+      "loadTask": function (taskID, completionID) { loadTask(LS, taskID, completionID) },
+      'prevButtonClick': function() {
+          LS.taskHistoryCurrent--;
+          let prev = LS.taskHistoryIds[LS.taskHistoryCurrent];
+          loadTask(LS, prev.task_id, prev.completion_id);
+      },
+      'nextButtonClick': function() {
+          LS.taskHistoryCurrent++;
+          if (LS.taskHistoryCurrent < LS.taskHistoryIds.length) {
             let prev = LS.taskHistoryIds[LS.taskHistoryCurrent];
             loadTask(LS, prev.task_id, prev.completion_id);
-        },
-        'nextButtonClick': function() {
-            LS.taskHistoryCurrent++;
-            if (LS.taskHistoryCurrent < LS.taskHistoryIds.length) {
-              let prev = LS.taskHistoryIds[LS.taskHistoryCurrent];
-              loadTask(LS, prev.task_id, prev.completion_id);
-            }
-            else {
-              loadNext(LS);  // new task
-            }
-        }
-    };
-    
-    LS._sdk = sdk;
-    
-    return LS;
+          }
+          else {
+            loadNext(LS);  // new task
+          }
+      }
+  };
+
+  LS._sdk = sdk;
+
+  return LS;
 };
