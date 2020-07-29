@@ -371,12 +371,14 @@ def api_validate_config():
 def api_save_config():
     """ Save label config
     """
-    if 'label_config' not in request.form:
-        return make_response('No label_config in POST', status.HTTP_417_EXPECTATION_FAILED)
+    label_config = None
+    if 'label_config' in request.form:
+        label_config = request.form['label_config']
+    elif 'label_config' in request.json:
+        label_config = request.json['label_config']
 
     project = project_get_or_create()
     # check config before save
-    label_config = request.form['label_config']
     try:
         project.validate_label_config(label_config)
     except ValidationError as e:
