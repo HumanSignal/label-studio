@@ -866,7 +866,10 @@ def api_remove_ml_backend():
 def api_predict():
     """ Make ML prediction using ml_backends
     """
-    task = {'data': request.json}
+    if 'data' not in request.json:
+        task = {'data': request.json}
+    else:
+        task = request.json
     project = project_get_or_create()
     if project.ml_backends_connected:
         task_with_predictions = project.make_predictions(task)
