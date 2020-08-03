@@ -22,6 +22,9 @@ from uuid import uuid4
 from urllib.parse import unquote
 from datetime import datetime
 from inspect import currentframe, getframeinfo
+
+from gevent.pywsgi import WSGIServer
+
 from flask import (
     request, jsonify, make_response, Response, Response as HttpResponse,
     send_file, session, redirect
@@ -1013,11 +1016,24 @@ def main():
         set_full_hostname(get_web_protocol() + host.replace('0.0.0.0', 'localhost') + ':' + str(port))
 
         start_browser('http://localhost:' + str(port), input_args.no_browser)
-        app.run(host=host, port=port, debug=input_args.debug)
+        if input_args.use_gevent:
+            app.debug = input_args.debug
+            http_server = WSGIServer((host, port), app, log=app.logger)
+            http_server.serve_forever()
+        else:
+            app.run(host=host, port=port, debug=input_args.debug)
 
     # On `start-multi-session` command, server creates one project per each browser sessions
     elif input_args.command == 'start-multi-session':
-        app.run(host=input_args.host or '0.0.0.0', port=input_args.port or 8080, debug=input_args.debug)
+        host = input_args.host or '0.0.0.0'
+        port = input_args.port or 8080
+
+        if input_args.use_gevent:
+            app.debug = input_args.debug
+            http_server = WSGIServer((host, port), app, log=app.logger)
+            http_server.serve_forever()
+        else:
+            app.run(host=host, port=port, debug=input_args.debug)
 
 
 if __name__ == "__main__":
