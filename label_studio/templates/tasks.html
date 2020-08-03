@@ -142,7 +142,7 @@
 
     <!-- Main content -->
 
-    <div class="ui container wrapper">
+    <div class="ui container wrapper" v-if="!quick_view">
 
       <!-- Statistics -->
       <div class="ui three column centered grid stackable">
@@ -390,10 +390,11 @@
               <a class="item" :class="{'active': page<totalPages, 'disabled': page>=totalPages}"
                  @click="nextPage()">Next</a>
             </div> <!-- pagination -->
-          </div>
 
-          <i class="ui loader active blue tiny inline"
-             :style="{opacity: tasks_loaded ? 0: 0.5, 'margin-left': '10px'}"></i>
+
+            <i class="ui loader active blue tiny inline"
+               :style="{opacity: tasks_loaded ? 0: 0.5, 'margin-left': '10px', 'margin-top': quick_view ? '0' : '13px'}"></i>
+          </div>
         </div>
 
         <div class="column eleven wide" :style="{display: quick_view ? 'inherit': 'none'}">
