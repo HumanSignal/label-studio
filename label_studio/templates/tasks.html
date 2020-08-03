@@ -26,7 +26,10 @@
     }
 
     tr.selected {
-      background-color: rgba(24, 144, 255, 0.04);
+      background-color: rgba(0, 0, 0, 0.03);
+    }
+    tr {
+      cursor: pointer;
     }
 
     .visible-app {
@@ -60,6 +63,7 @@
 
     .pagination {
       height: 10px !important;
+      min-width: 300px;
     }
 
     .pagination-size {
@@ -96,6 +100,15 @@
 
     .trash:hover {
         color: rgb(255, 13, 23);
+    }
+
+    .center-margin {
+      margin: 0 auto !important;
+    }
+    .center-flex {
+      align-content: center;
+      justify-content: center;
+      display: flex;
     }
 
     @media screen and (max-width: 768px) {
@@ -227,13 +240,15 @@
 
     </div>
     <div class="ui divider hidden"></div>
+  </div> <!-- container -->
 
+  <div class="ui container" style="width: 98%">
 
     <div class="ui grid stackable">
-      <div class="column" :class="{'five wide': show_task, 'sixteen wide': !show_task}">
+      <div class="column" :class="{'five wide': quick_view, 'sixteen wide': !quick_view}" style="min-width: 300px;">
         <!-- Table -->
         <div class="table-wrapper">
-          <table v-if="project.task_count > 0" class="responsive">
+          <table v-if="project.task_count > 0" class="responsive" :class="{'center-margin': !quick_view}">
           <!-- Header -->
           <tr>
             <th class="order" @click="changeOrder('id')" v-if="columns.includes('id')">Task ID
@@ -248,7 +263,6 @@
               <i class="fas"
                  :class="{'fa-sort-up': this.order=='has_skipped_completions', 'fa-sort-down': this.order=='-has_skipped_completions'}"></i>
             </th>
-            <th v-if="columns.includes('label')">Label</th>
             <th v-if="columns.includes('delete') && (project.can_delete_tasks || project.can_manage_completions)">Delete</th>
 
             <!-- Label config fields -->
@@ -266,7 +280,8 @@
           <!-- Correct task -->
           <tr v-if="task != null" class="text-center"
               v-for="task in tasks"
-              :class="{selected: current_task_preview && current_task_preview.id===task.id}">
+              :class="{selected: current_task_preview && current_task_preview.id===task.id}"
+              @click.exact="toggleTaskPreview(task)" @click.ctrl="window.open('.?task_id=' + task.id)">
             <!-- Task ID -->
             <td class="text-center" v-if="columns.includes('id')">
               <span class="ui mini blue loader inline active" v-if="task.processing"></span>
@@ -281,12 +296,6 @@
               <span style="cursor:pointer">
                <i class="ui icon forward grey" v-if="task.has_skipped_completions"></i>
              </span>
-            </td>
-            <!-- Label -->
-            <td class="text-center" v-if="columns.includes('label')">
-              <a @click.exact="toggleTaskPreview(task)" @click.ctrl="window.open('.?task_id=' + task.id)">
-                <i class="fas fa-eye eye show-completion"></i>
-              </a>
             </td>
             <!-- Delete -->
             <td class="text-center"
@@ -322,41 +331,44 @@
         <!-- Pagination -->
 
         <!-- this element is needed for pretty symmetrical alignment with loader on the right side -->
-        <div class="ui pagination menu" v-if="project.task_count > 0">
-          <a class="item" :class="{'active': page>1, 'disabled': page<=1}"
-             @click="page!=1 ? page--: page">Prev</a>
+        <div :class="{'center-flex': !quick_view}">
+          <div class="ui pagination menu center-margin"
+               v-if="project.task_count > 0">
+            <a class="item" :class="{'active': page>1, 'disabled': page<=1}"
+               @click="page!=1 ? page--: page">Prev</a>
 
-          <div class="item">
-            <input v-model="page" style="border:none" type="number" min="1" :max="totalPages">
-            <span style="cursor:pointer" @click="page=totalPages">&nbsp; of &nbsp;&nbsp;
-              {{ totalPages }}
-            </span>
-          </div>
+            <div class="item">
+              <input v-model="page" style="border:none" type="number" min="1" :max="totalPages">
+              <span style="cursor:pointer" @click="page=totalPages">&nbsp; of &nbsp;&nbsp;
+                {{ totalPages }}
+              </span>
+            </div>
 
-          <div class="item">
-            <select class="pagination-size" v-model="page_size">
-              <option>1</option>
-              <option>5</option>
-              <option selected="selected">10</option>
-              <option>50</option>
-              <option>100</option>
-            </select>
-          </div>
+            <div class="item">
+              <select class="pagination-size" v-model="page_size">
+                <option>1</option>
+                <option>5</option>
+                <option selected="selected">10</option>
+                <option>50</option>
+                <option>100</option>
+              </select>
+            </div>
 
-          <!-- <div class="item"><span data-tooltip="Auto update project info and tasks by timer (about 5 sec)">
-            <i class="far fa-clock" :style="{opacity: auto_update_timer ? 1.0: 0.5, cursor: 'pointer'}"
-               @click="toggleAutoUpdateTimer()"></i>
-          </span></div> -->
+            <!-- <div class="item"><span data-tooltip="Auto update project info and tasks by timer (about 5 sec)">
+              <i class="far fa-clock" :style="{opacity: auto_update_timer ? 1.0: 0.5, cursor: 'pointer'}"
+                 @click="toggleAutoUpdateTimer()"></i>
+            </span></div> -->
 
-          <a class="item" :class="{'active': page<totalPages, 'disabled': page>=totalPages}"
-             @click="page<totalPages ? page++: page">Next</a>
-        </div> <!-- pagination -->
+            <a class="item" :class="{'active': page<totalPages, 'disabled': page>=totalPages}"
+               @click="page<totalPages ? page++: page">Next</a>
+          </div> <!-- pagination -->
+        </div>
 
         <i class="ui loader active blue tiny inline"
               :style="{opacity: tasks_loaded ? 0: 0.5, 'margin-left': '10px'}"></i>
       </div>
 
-      <div class="column eleven wide" :style="{display: show_task ? 'inherit': 'none'}">
+      <div class="column eleven wide" :style="{display: quick_view ? 'inherit': 'none'}">
         <!-- LS Frontend -->
         <div id="label-studio">
           <div class="ui loader active inline centered"></div>
@@ -398,10 +410,10 @@
                   error: null,
 
                   // quick task preview
-                  full_columns: ['id', 'completed_by', 'skipped', 'label', 'delete', 'others'],
-                  quick_columns: ['id', 'label'],
+                  full_columns: ['id', 'completed_at', 'skipped', 'delete', 'others'],
+                  quick_columns: ['id', 'completed_at'],
                   columns: [],
-                  show_task: false,
+                  quick_view: false,
                   current_task_preview: null,
 
                   // provided by api/project
@@ -697,7 +709,7 @@
               },
 
               openTaskPreview: function(task) {
-                this.show_task = true;
+                this.quick_view = true;
                 this.current_task_preview = task;
                 this.columns = this.quick_columns;
 
@@ -710,11 +722,11 @@
                 }
               },
               closeTaskPreview: function () {
-                this.show_task = false;
+                this.quick_view = false;
                 this.columns = this.full_columns;
               },
               toggleTaskPreview: function(task) {
-                  this.current_task_preview && this.current_task_preview.id === task.id && this.show_task
+                  this.current_task_preview && this.current_task_preview.id === task.id && this.quick_view
                     ? this.closeTaskPreview() : this.openTaskPreview(task);
               }
           },
