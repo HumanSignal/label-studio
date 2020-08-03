@@ -1008,6 +1008,14 @@ def main():
         host = input_args.host or config.get('host', 'localhost')
         port = input_args.port or config.get('port', 8080)
 
+        # ssl certificate and key
+        cert_file = input_args.cert_file or config.get('cert')
+        key_file = input_args.key_file or config.get('key')
+        ssl_context = None
+        if cert_file and key_file:
+            config['protocol'] = 'https://'
+            ssl_context = (cert_file, key_file)
+
         if not input_args.debug and check_port_in_use('localhost', port):
             old_port = port
             port = int(port) + 1
@@ -1024,7 +1032,7 @@ def main():
             http_server = WSGIServer((host, port), app, log=app.logger)
             http_server.serve_forever()
         else:
-            app.run(host=host, port=port, debug=input_args.debug)
+            app.run(host=host, port=port, debug=input_args.debug, ssl_context=ssl_context)
 
     # On `start-multi-session` command, server creates one project per each browser sessions
     elif input_args.command == 'start-multi-session':
