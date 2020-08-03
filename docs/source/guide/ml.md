@@ -84,4 +84,4 @@ The server starts listening on port 9090, and you can connect it to Label Studio
  
 ## Create your own ML backend
 
-Check examples in `label_studio/ml/examples` directory.
+Check examples in `label-studio/ml/examples` directory.
