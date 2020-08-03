@@ -1,25 +1,29 @@
 {% extends 'base.html' %}
 {% block body %}
-{% raw %}
+  {% raw %}
   <script src="static/js/polyfill.min.js"></script>
   <script src="static/js/vue.js"></script>
   <script src="static/semantic/semantic-ui-vue.min.js"></script>
   <script src="static/js/lsf-sdk.js"></script>
+  <script src="static/js/mousetrap.min.js"></script>
 
   <style>
     .table-wrapper {
       overflow-x: auto;
       padding-bottom: 1em;
     }
+
     ::-webkit-scrollbar-track {
       -webkit-box-shadow: inset 0 0 8px rgba(178, 178, 178, 0.3) !important;
       background-color: #F5F5F5 !important;
     }
+
     ::-webkit-scrollbar {
       width: 8px !important;
       height: 8px !important;
       background-color: #F5F5F5 !important;
     }
+
     ::-webkit-scrollbar-thumb {
       background-color: #c3c3c3 !important;
       border: 8px solid #b4b4b4 !important;
@@ -28,6 +32,7 @@
     tr.selected {
       background-color: rgba(0, 0, 0, 0.03);
     }
+
     tr {
       cursor: pointer;
     }
@@ -63,7 +68,7 @@
 
     .pagination {
       height: 10px !important;
-      min-width: 300px;
+      min-width: 347px;
     }
 
     .pagination-size {
@@ -84,27 +89,39 @@
     }
 
     .db-card {
-        background: #f7f7f7;
-        border-radius: 5px;
-        padding: 2em;
+      background: #f7f7f7;
+      border-radius: 5px;
+      padding: 2em;
     }
 
     .action-buttons {
-        display: flex;
-        flex-direction: column;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .action-item {
+      opacity: 0.5;
+      transition: 0.1s ease-in-out opacity;
+      cursor: pointer;
+    }
+
+    .action-item:hover {
+      opacity: 0.8;
+      transition: 0.1s ease-in-out opacity;
     }
 
     .align-grid {
-        display: grid !important;
+      display: grid !important;
     }
 
     .trash:hover {
-        color: rgb(255, 13, 23);
+      color: rgb(255, 13, 23);
     }
 
     .center-margin {
       margin: 0 auto !important;
     }
+
     .center-flex {
       align-content: center;
       justify-content: center;
@@ -123,190 +140,197 @@
 
   <div class="ui " id="app" :class="{'visible-app': vue_loaded}" style="display: none">
 
-  <!-- Main content -->
+    <!-- Main content -->
 
-  <div class="ui container wrapper">
+    <div class="ui container wrapper">
 
-    <!-- Statistics -->
-    <div class="ui three column centered grid stackable">
-      <div class="row">
+      <!-- Statistics -->
+      <div class="ui three column centered grid stackable">
+        <div class="row">
 
-        <!-- Total tasks -->
-        <div class="column center aligned align-grid">
-          <div class="ui db-card">
-            <div class="ui statistic small">
-              <!-- Project loading -->
-              <center v-if="!project_loaded" style="margin-bottom: 3px">
-                <div class="ui loader loading active inline"></div>
-              </center>
-              <!-- Number -->
-              <span class="value" v-else>
+          <!-- Total tasks -->
+          <div class="column center aligned align-grid">
+            <div class="ui db-card">
+              <div class="ui statistic small">
+                <!-- Project loading -->
+                <center v-if="!project_loaded" style="margin-bottom: 3px">
+                  <div class="ui loader loading active inline"></div>
+                </center>
+                <!-- Number -->
+                <span class="value" v-else>
                 <animated-number :number="project.task_count"></animated-number>
               </span>
-              <span class="label">Tasks</span>
-              <span class="sub-label">
+                <span class="label">Tasks</span>
+                <span class="sub-label">
                 <i class="word-break" v-if="project.multi_session_mode">{{ project.source_storage.readable_path }}</i>
                 <span data-tooltip="Source storage sync in progress">
                   <i class="ui loader loading active inline mini" v-if="project.source_syncing"></i>
                 </span>
               </span>
-              <!-- Controls -->
-              <div style="margin-top: 7px">
-                <!-- Storage settings -->
-                <span data-tooltip="Change source storage filter">
+                <!-- Controls -->
+                <div style="margin-top: 7px">
+                  <!-- Storage settings -->
+                  <span data-tooltip="Change source storage filter">
                   <i class="fas fa-cog sup-button big"
                      @click="loadStorageSettings(); storage_settings.source.show=true"></i>
                 </span>
-                <!-- Delete tasks -->
-                <span v-if="project.can_delete_tasks">
+                  <!-- Delete tasks -->
+                  <span v-if="project.can_delete_tasks">
                   <span style="margin-right: 15px"></span>
                   <span @click="deleteAllTasks()"
                         data-tooltip="Delete all tasks">
                     <i class="fas fa-trash-alt trash remove-task">&nbsp;&nbsp;</i>
                   </span>
                 </span>
-              </div>
-            </div> <!-- statistic -->
+                </div>
+              </div> <!-- statistic -->
 
+            </div>
           </div>
-        </div>
 
-        <!-- Total completions -->
-        <div class="column center aligned align-grid">
-          <div class="ui db-card">
-            <div class="ui statistic small">
-              <!-- Project loading -->
-              <center v-if="!project_loaded" style="margin-bottom: 3px">
-                <div class="ui loader loading active inline"></div>
-              </center>
-              <!-- Number -->
-              <span class="value" v-else>
+          <!-- Total completions -->
+          <div class="column center aligned align-grid">
+            <div class="ui db-card">
+              <div class="ui statistic small">
+                <!-- Project loading -->
+                <center v-if="!project_loaded" style="margin-bottom: 3px">
+                  <div class="ui loader loading active inline"></div>
+                </center>
+                <!-- Number -->
+                <span class="value" v-else>
                 <animated-number :number="project.completion_count"></animated-number>
               </span>
-              <span class="label">Completions</span>
-              <span class="sub-label">
+                <span class="label">Completions</span>
+                <span class="sub-label">
                 <i class="word-break" v-if="project.multi_session_mode">{{ project.target_storage.readable_path }}</i>
                 <span data-tooltip="Target storage sync in progress">
                   <i class="ui loader loading active inline mini" v-if="project.target_syncing"></i>
                 </span>
               </span>
-              <!-- Controls -->
-              <div style="margin-top: 7px">
+                <!-- Controls -->
+                <div style="margin-top: 7px">
                 <span data-tooltip="Change target storage">
                   <i class="fas fa-cog sup-button big"
                      @click="loadStorageSettings(); storage_settings.target.show=true"></i>
                 </span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Action Buttons -->
-        <div class="column center aligned align-grid">
-          <div class="ui db-card">
-            <!-- Control buttons -->
-            <div class="ui row stackable" v-if="project.task_count > 0">
-              <div class="center aligned action-buttons">
-                <!-- Sampling -->
-                <span style="padding-top: 8px; padding-bottom: 11px;"
-                      data-tooltip="Tasks sampling: selecting which task to take next in labeling. Edit project config file to change">
+          <!-- Action Buttons -->
+          <div class="column center aligned align-grid">
+            <div class="ui db-card">
+              <!-- Control buttons -->
+              <div class="ui row stackable" v-if="project.task_count > 0">
+                <div class="center aligned action-buttons">
+                  <!-- Sampling -->
+                  <span style="padding-top: 8px; padding-bottom: 11px;"
+                        data-tooltip="Tasks sampling: selecting which task to take next in labeling. Edit project config file to change">
                   <span class="ui icon label">
                     <i class="ui icon far shuffle"></i>
                     {{ project.config['sampling'] }}
                   </span>
                 </span>
-                <!-- Start labeling -->
-                <a class="ui button positive" href=".">Start Labeling</a>
+                  <!-- Start labeling -->
+                  <a class="ui button positive" href=".">Start Labeling</a>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Critical error -->
-      <div v-if="error">
-        <div class="ui hidden divier"></div>
-        <div class="ui error message">
-          <div class="header">{{ error.header }}</div>
-          <div class="content">{{ error.message }}</div>
+        <!-- Critical error -->
+        <div v-if="error">
+          <div class="ui hidden divier"></div>
+          <div class="ui error message">
+            <div class="header">{{ error.header }}</div>
+            <div class="content">{{ error.message }}</div>
+          </div>
+          <div class="ui hidden divier"></div>
         </div>
-        <div class="ui hidden divier"></div>
+
+        <!-- Import tasks -->
+        <div class="row" v-if="project.task_count == 0">
+          <a class="ui button positive" href="/import" v-if="project.can_manage_tasks">Import Tasks</a>
+        </div>
+
       </div>
+      <div class="ui divider hidden"></div>
+    </div> <!-- container -->
 
-      <!-- Import tasks -->
-      <div class="row" v-if="project.task_count == 0">
-        <a class="ui button positive" href="/import" v-if="project.can_manage_tasks">Import Tasks</a>
-      </div>
+    <div class="ui container" style="width: 98%">
 
-    </div>
-    <div class="ui divider hidden"></div>
-  </div> <!-- container -->
+      <div class="ui grid stackable">
+        <div class="column" :class="{'five wide': quick_view, 'sixteen wide': !quick_view}" style="min-width: 300px;">
+          <!-- Table -->
+          <div class="table-wrapper">
+            <table v-if="project.task_count > 0" class="responsive" :class="{'center-margin': !quick_view}">
+              <!-- Header -->
+              <tr>
+                <th class="order" @click="changeOrder('id')" v-if="columns.includes('id')">Task ID
+                  <i class="fas" :class="{'fa-sort-up': this.order=='id', 'fa-sort-down': this.order=='-id'}"></i>
+                </th>
+                <th class="order" @click="changeOrder('completed_at')" v-if="columns.includes('completed_at')">Completed
+                  at
+                  <i class="fas"
+                     :class="{'fa-sort-up': this.order=='completed_at', 'fa-sort-down': this.order=='-completed_at'}"></i>
+                </th>
+                <th class="order" @click="changeOrder('has_skipped_completions')" v-if="columns.includes('skipped')">
+                  Skipped
+                  <i class="fas"
+                     :class="{'fa-sort-up': this.order=='has_skipped_completions', 'fa-sort-down': this.order=='-has_skipped_completions'}"></i>
+                </th>
+                <th v-if="columns.includes('delete') && (project.can_delete_tasks || project.can_manage_completions)">
+                  Delete
+                </th>
 
-  <div class="ui container" style="width: 98%">
+                <!-- Label config fields -->
+                <th v-for="(value, key) in project.data_types" v-if="value === 'Image' && columns.includes('others')">
+                  ${{ key }}
+                </th>
+              </tr>
 
-    <div class="ui grid stackable">
-      <div class="column" :class="{'five wide': quick_view, 'sixteen wide': !quick_view}" style="min-width: 300px;">
-        <!-- Table -->
-        <div class="table-wrapper">
-          <table v-if="project.task_count > 0" class="responsive" :class="{'center-margin': !quick_view}">
-          <!-- Header -->
-          <tr>
-            <th class="order" @click="changeOrder('id')" v-if="columns.includes('id')">Task ID
-              <i class="fas" :class="{'fa-sort-up': this.order=='id', 'fa-sort-down': this.order=='-id'}"></i>
-            </th>
-            <th class="order" @click="changeOrder('completed_at')" v-if="columns.includes('completed_at')">Completed at
-              <i class="fas"
-                 :class="{'fa-sort-up': this.order=='completed_at', 'fa-sort-down': this.order=='-completed_at'}"></i>
-            </th>
-            <th class="order" @click="changeOrder('has_skipped_completions')" v-if="columns.includes('skipped')">
-              Skipped
-              <i class="fas"
-                 :class="{'fa-sort-up': this.order=='has_skipped_completions', 'fa-sort-down': this.order=='-has_skipped_completions'}"></i>
-            </th>
-            <th v-if="columns.includes('delete') && (project.can_delete_tasks || project.can_manage_completions)">Delete</th>
+              <!-- Task row -->
 
-            <!-- Label config fields -->
-            <th v-for="(value, key) in project.data_types" v-if="value === 'Image' && columns.includes('others')">${{ key }}</th>
-          </tr>
+              <!-- Broken task -->
+              <tr v-if="task == null" class="text-center" v-for="task in tasks">
+                <td colspan="3"><small>broken task [backend returns null, check storage settings,
+                  may be you forgot "Generate task data with URLs ..." checkbox on source storage settings?]</small>
+                </td>
+              </tr>
 
-          <!-- Task row -->
-
-          <!-- Broken task -->
-          <tr v-if="task == null" class="text-center" v-for="task in tasks">
-            <td colspan="3"><small>broken task [backend returns null, check storage settings,
-              may be you forgot "Generate task data with URLs ..." checkbox on source storage settings?]</small></td>
-          </tr>
-
-          <!-- Correct task -->
-          <tr v-if="task != null" class="text-center"
-              v-for="task in tasks"
-              :class="{selected: current_task_preview && current_task_preview.id===task.id}"
-              @click.exact="toggleTaskPreview(task)" @click.ctrl="window.open('.?task_id=' + task.id)">
-            <!-- Task ID -->
-            <td class="text-center" v-if="columns.includes('id')">
-              <span class="ui mini blue loader inline active" v-if="task.processing"></span>
-              {{ task.id }}
-            </td>
-            <!-- Completed at -->
-            <td v-if="columns.includes('completed_at')">
-             {{ task.completed_at }}
-            </td>
-            <!-- Skipped -->
-            <td v-if="columns.includes('skipped')">
+              <!-- Correct task -->
+              <tr v-if="task != null" class="text-center"
+                  v-for="task, index in tasks"
+                  :class="{selected: current_task && current_task.id===task.id}"
+                  @click.exact="toggleTaskPreview(index)" @click.ctrl.exact="window.open('.?task_id=' + task.id)"
+              >
+                <!-- Task ID -->
+                <td class="text-center" v-if="columns.includes('id')">
+                  <span class="ui mini blue loader inline active" v-if="task.processing"></span>
+                  {{ task.id }}
+                </td>
+                <!-- Completed at -->
+                <td v-if="columns.includes('completed_at')">
+                  {{ task.completed_at }}
+                </td>
+                <!-- Skipped -->
+                <td v-if="columns.includes('skipped')">
               <span style="cursor:pointer">
                <i class="ui icon forward grey" v-if="task.has_skipped_completions"></i>
              </span>
-            </td>
-            <!-- Delete -->
-            <td class="text-center"
-                v-if="columns.includes('delete') && (project.can_delete_tasks || project.can_manage_completions)">
-              <div class="actions-card">
+                </td>
+                <!-- Delete -->
+                <td class="text-center"
+                    v-if="columns.includes('delete') && (project.can_delete_tasks || project.can_manage_completions)">
+                  <div class="actions-card">
                 <span v-if="project.can_delete_tasks">
                   <a class="trash" @click="deleteTask(task)" data-tooltip="Delete task">
                     <i class="fas fa-trash-alt trash remove-task"></i>
                   </a>
                 </span>
-                <span v-if="project.can_manage_completions">
+                    <span v-if="project.can_manage_completions">
                   <span v-if="task.completions">
                     <a class="trash" @click="deleteCompletion(task, task.completions[0])"
                        style="margin-left: 10px"
@@ -315,74 +339,133 @@
                     </a>
                   </span>
                 </span>
-              </div>
-            </td>
+                  </div>
+                </td>
 
-            <!-- Label config fields -->
-            <td v-for="(value, key) in project.data_types" v-if="value === 'Image' && columns.includes('others')">
-              <image-with-fade-in :src="task.data[key]"></image-with-fade-in>
-            </td>
-          </tr>
+                <!-- Label config fields -->
+                <td v-for="(value, key) in project.data_types" v-if="value === 'Image' && columns.includes('others')">
+                  <image-with-fade-in :src="task.data[key]"></image-with-fade-in>
+                </td>
+              </tr>
 
-        </table>
-        </div>
-        <div class="ui divider hidden"></div>
+            </table>
+          </div>
+          <div class="ui divider hidden"></div>
 
-        <!-- Pagination -->
+          <!-- Pagination -->
 
-        <!-- this element is needed for pretty symmetrical alignment with loader on the right side -->
-        <div :class="{'center-flex': !quick_view}">
-          <div class="ui pagination menu center-margin"
-               v-if="project.task_count > 0">
-            <a class="item" :class="{'active': page>1, 'disabled': page<=1}"
-               @click="page!=1 ? page--: page">Prev</a>
+          <!-- this element is needed for pretty symmetrical alignment with loader on the right side -->
+          <div :class="{'center-flex': !quick_view}">
+            <div class="ui pagination menu"
+                 v-if="project.task_count > 0">
+              <a class="item" :class="{'active': page>1, 'disabled': page<=1}"
+                 @click="prevPage()">Prev</a>
 
-            <div class="item">
-              <input v-model="page" style="border:none" type="number" min="1" :max="totalPages">
-              <span style="cursor:pointer" @click="page=totalPages">&nbsp; of &nbsp;&nbsp;
+              <div class="item">
+                <input v-model="page" style="border:none" type="number" min="1" :max="totalPages">
+                <span style="cursor:pointer" @click="page=totalPages">&nbsp; of &nbsp;&nbsp;
                 {{ totalPages }}
               </span>
-            </div>
+              </div>
 
-            <div class="item">
-              <select class="pagination-size" v-model="page_size">
-                <option>1</option>
-                <option>5</option>
-                <option selected="selected">10</option>
-                <option>50</option>
-                <option>100</option>
-              </select>
-            </div>
+              <div class="item">
+                <select class="pagination-size" v-model="page_size">
+                  <option>1</option>
+                  <option>5</option>
+                  <option selected="selected">10</option>
+                  <option>50</option>
+                  <option>100</option>
+                </select>
+              </div>
 
-            <!-- <div class="item"><span data-tooltip="Auto update project info and tasks by timer (about 5 sec)">
-              <i class="far fa-clock" :style="{opacity: auto_update_timer ? 1.0: 0.5, cursor: 'pointer'}"
-                 @click="toggleAutoUpdateTimer()"></i>
-            </span></div> -->
+              <!-- <div class="item"><span data-tooltip="Auto update project info and tasks by timer (about 5 sec)">
+                <i class="far fa-clock" :style="{opacity: auto_update_timer ? 1.0: 0.5, cursor: 'pointer'}"
+                   @click="toggleAutoUpdateTimer()"></i>
+              </span></div> -->
 
-            <a class="item" :class="{'active': page<totalPages, 'disabled': page>=totalPages}"
-               @click="page<totalPages ? page++: page">Next</a>
-          </div> <!-- pagination -->
+              <div class="item action-item" @click="show_table_settings=!show_table_settings">
+                <i class="fa fa-cog"></i>
+              </div>
+
+              <a class="item" :class="{'active': page<totalPages, 'disabled': page>=totalPages}"
+                 @click="nextPage()">Next</a>
+            </div> <!-- pagination -->
+          </div>
+
+          <i class="ui loader active blue tiny inline"
+             :style="{opacity: tasks_loaded ? 0: 0.5, 'margin-left': '10px'}"></i>
         </div>
 
-        <i class="ui loader active blue tiny inline"
-              :style="{opacity: tasks_loaded ? 0: 0.5, 'margin-left': '10px'}"></i>
-      </div>
-
-      <div class="column eleven wide" :style="{display: quick_view ? 'inherit': 'none'}">
-        <!-- LS Frontend -->
-        <div id="label-studio">
-          <div class="ui loader active inline centered"></div>
+        <div class="column eleven wide" :style="{display: quick_view ? 'inherit': 'none'}">
+          <!-- LS Frontend -->
+          <div id="label-studio">
+            <div class="ui loader active inline centered"></div>
+          </div>
         </div>
+
       </div>
 
+      <br/><br/>
     </div>
 
-    <br/><br/>
-  </div>
 
-  {% endraw %}
-  {% include 'includes/storages.html' %}
-  {% raw %}
+
+    <!-- Table Settings -->
+    <sui-modal v-model="show_table_settings" v-bind:class="{inverted: 1, small: 1, scrollable: 1}"
+               size="small" style="z-index: 1000">
+      <i class="icon close" @click="show_table_settings=false"></i>
+
+      <!-- Header -->
+      <div class="header">Settings</div>
+
+      <!-- Content -->
+      <div class="scrolling content">
+        <h4>Columns to show</h4>
+        <div class="ui list">
+          <div class="item ui checkbox" v-for="item in all_columns">
+            <input type="checkbox" class="ui checkbox" v-model="columns" :value="item">
+            <label>{{ item }}</label>
+          </div>
+        </div>
+
+        <div class="ui divider hidden"></div>
+
+        <h4>Hotkeys</h4>
+        <div style="margin-top: 1em">
+              <div class="hotkey-helper">
+                <div class="keys"><hotkey>shift</hotkey> + <hotkey>←</hotkey> or <hotkey>a</hotkey></div>
+                <span class="description">previous page</span>
+              </div>
+
+              <div class="hotkey-helper">
+                <div class="keys"><hotkey>shift</hotkey> + <hotkey>→</hotkey> or <hotkey>d</hotkey></div>
+                <span class="description">next page</span>
+              </div>
+
+              <div class="hotkey-helper">
+                <div class="keys"><hotkey>shift</hotkey> + <hotkey>↑</hotkey> or <hotkey>w</hotkey></div>
+                <span class="description">previous item</span>
+              </div>
+
+              <div class="hotkey-helper">
+                <div class="keys"><hotkey>shift</hotkey> + <hotkey>↓</hotkey> or <hotkey>s</hotkey></div>
+                <span class="description">next item</span>
+              </div>
+
+              <div class="hotkey-helper">
+                <div class="keys"><hotkey>ctrl</hotkey> + <hotkey>click on row</hotkey></div>
+                <span class="description">open task explore in new window</span>
+              </div>
+
+        </div>
+      </div>
+    </sui-modal>
+
+
+
+    {% endraw %}
+    {% include 'includes/storages.html' %}
+    {% raw %}
 
   </div>
 
@@ -390,390 +473,432 @@
   <script src="static/js/components/imageWithFadeIn.js"></script>
   <script src="static/js/components/vue-tippy.min.js"></script>
   <script>
-      Vue.use(SemanticUIVue);
-      Vue.use(VueTippy);
+    Vue.use(SemanticUIVue);
+    Vue.use(VueTippy);
 
-      var app = new Vue({
-          el: '#app',
+    var app = new Vue({
+      el: '#app',
 
-          data: function () {
-              var data = {
-                  // internal variables
-                  vue_loaded: false,
-                  project_loaded: false,
-                  tasks_loaded: false,
-                  page: Cookies.get('page', 1),
-                  page_size: Cookies.get('page_size', 10),
-                  order: Cookies.get('order', 'id'),
-                  auto_update_timer: null,
-                  timer_interval: 5000,
-                  error: null,
+      data: function () {
+        var data = {
+          // internal variables
+          vue_loaded: false,
+          project_loaded: false,
+          tasks_loaded: false,
+          page: Cookies.get('page', 1),
+          page_size: Cookies.get('page_size', 10),
+          order: Cookies.get('order', 'id'),
+          auto_update_timer: null,
+          show_table_settings: false,
+          timer_interval: 5000,
+          error: null,
 
-                  // quick task preview
-                  full_columns: ['id', 'completed_at', 'skipped', 'delete', 'others'],
-                  quick_columns: ['id', 'completed_at'],
-                  columns: [],
-                  quick_view: false,
-                  current_task_preview: null,
+          // quick task preview
+          all_columns: ['id', 'completed_at', 'skipped', 'delete', 'others'],
+          full_columns: ['id', 'completed_at', 'skipped', 'delete', 'others'],
+          quick_columns: ['id', 'completed_at'],
+          quick_view: false,
+          current_task: null,
+          current_task_index: -1,
 
-                  // provided by api/project
-                  project: {% endraw %}{{ serialized_project|json|safe }}{% raw %},
+          // provided by api/project
+          project: {% endraw %}{{ serialized_project|json|safe }}{% raw %},
 
-                  // provided by api/tasks
-                  tasks: [],
+          // provided by api/tasks
+          tasks: [],
 
-                  // provided by api/project/storage-settings
-                  storage_settings: {
-                      source: {
-                          fields: [], errors: [], type: 'json', storage_for: 'source',
-                          show: false, loading: false, type_loading: false, save_success: false
-                      },
-                      target: {
-                          fields: [], errors: [], type: 'json', storage_for: 'target',
-                          show: false, loading: false, type_loading: false, save_success: false
-                      }
-                  },
-                  storage_settings_all: {}
-              };
-
-              data.columns = data.full_columns;
-              return data;
+          // provided by api/project/storage-settings
+          storage_settings: {
+            source: {
+              fields: [], errors: [], type: 'json', storage_for: 'source',
+              show: false, loading: false, type_loading: false, save_success: false
+            },
+            target: {
+              fields: [], errors: [], type: 'json', storage_for: 'target',
+              show: false, loading: false, type_loading: false, save_success: false
+            }
           },
+          storage_settings_all: {}
+        };
 
-          // components
-          components: {
-              'animated-number': animatedNumber,
-              'image-with-fade-in': imageWithFadeIn
-          },
+        data.columns = data.full_columns;
+        return data;
+      },
 
-          computed: {
-              currentTasks: function () {
-                  return this.tasks;
-              },
-              totalPages: function () {
-                  var total = Math.ceil(this.project.task_count / parseInt(this.page_size));
-                  if (this.page > total)
-                      this.page = total;
-                  return total;
+      // components
+      components: {
+        'animated-number': animatedNumber,
+        'image-with-fade-in': imageWithFadeIn
+      },
+
+      computed: {
+        currentTasks: function () {
+          return this.tasks;
+        },
+        totalPages: function () {
+          var total = Math.ceil(this.project.task_count / parseInt(this.page_size));
+          if (this.page > total)
+            this.page = total;
+          return total;
+        }
+      },
+
+      methods: {
+        getApi: function (dst, url, always, fail, done) {
+          /* this api call will do vue.data['dst'] = get(url) */
+
+          var root = this;
+          $.get(url + (url.includes('?') ? '&' : '?') + 'rnd=' + randomInteger(0, 100000))
+            .done(function (data) {
+              setValue(root, dst, data);
+              if (done) done(data);
+              if (always) always(data);
+              // console.log(dst + ' loaded');
+            })
+            .fail(function (data) {
+              if (fail) fail(data);
+              else {
+                root.showError('Error while get api for <' + dst + '>:', message_from_response(data));
               }
-          },
+              if (always) always(data);
+              console.log('error: no ' + dst + ' loaded')
+            })
+        },
 
-          methods: {
-              getApi: function (dst, url, always, fail, done) {
-                  /* this api call will do vue.data['dst'] = get(url) */
+        // get tasks from api
+        loadTasks: function () {
+          var root = this;
+          root.tasks_loaded = false;
+          this.getApi('tasks', 'api/tasks/?page=' + this.page +
+            '&page_size=' + parseInt(this.page_size) +
+            '&order=' + this.order, null,
+            // fail
+            function (data) {
+              root.showError('Tasks loading error', message_from_response(data))
+            },
 
-                  var root = this;
-                  $.get(url + (url.includes('?') ? '&' : '?') + 'rnd=' + randomInteger(0, 100000))
-                      .done(function (data) {
-                          setValue(root, dst, data);
-                          if (done) done(data);
-                          if (always) always(data);
-                          // console.log(dst + ' loaded');
-                      })
-                      .fail(function (data) {
-                          if (fail) fail(data);
-                          else {
-                              root.showError('Error while get api for <' + dst + '>:', message_from_response(data));
-                          }
-                          if (always) always(data);
-                          console.log('error: no ' + dst + ' loaded')
-                      })
-              },
+            // always
+            function (data) {
+              root.tasks_loaded = true;
+            }
+          );
+        },
 
-              // get tasks from api
-              loadTasks: function () {
-                  var root = this;
-                  root.tasks_loaded = false;
-                  this.getApi('tasks', 'api/tasks/?page=' + this.page +
-                                       '&page_size=' + parseInt(this.page_size) +
-                                       '&order=' + this.order, null,
-                      // fail
-                      function(data) {
-                        root.showError('Tasks loading error', message_from_response(data))
-                      },
+        // get project info from api
+        loadProject: function () {
+          var root = this;
+          this.getApi('project', 'api/project/',
+            // always
+            function () {
+              root.project_loaded = true;
+            },
+            // fail
+            function (data) {
+              root.showError('Project loading error', message_from_response(data));
+            }
+          );
+        },
 
-                      // always
-                      function(data) {
-                        root.tasks_loaded = true;
-                      }
-                  );
-              },
+        // get tasks from api
+        loadStorageSettings: function () {
+          var root = this;
+          root.storage_settings.source.type_loading = root.storage_settings.target.type_loading = true;
+          this.getApi('storage_settings_all', 'api/project/storage-settings/',
+            function () {
+              root.storage_settings.source.type_loading = root.storage_settings.target.type_loading = false;
+              root.changeStorageSettings('source', 'current');
+              root.changeStorageSettings('target', 'current');
+            });
+        },
 
-              // get project info from api
-              loadProject: function () {
-                  var root = this;
-                  this.getApi('project', 'api/project/',
-                      // always
-                      function () { root.project_loaded = true; },
-                      // fail
-                      function (data) {
-                          root.showError('Project loading error', message_from_response(data));
-                      }
-                  );
-              },
-
-              // get tasks from api
-              loadStorageSettings: function () {
-                  var root = this;
-                  root.storage_settings.source.type_loading = root.storage_settings.target.type_loading = true;
-                  this.getApi('storage_settings_all', 'api/project/storage-settings/',
-                      function () {
-                          root.storage_settings.source.type_loading = root.storage_settings.target.type_loading = false;
-                          root.changeStorageSettings('source', 'current');
-                          root.changeStorageSettings('target', 'current');
-                      });
-              },
-
-              // get settings from storage_settings_all
-              changeStorageSettings: function (storage_for, storage_type) {
-                  // change to current on backend
-                  if (storage_type === 'current') {
-                      var storages = this.storage_settings_all[storage_for];
-                      for (var type in storages) {
-                          var value = storages[type];
-                          if (value.current) {
-                              storage_type = type;
-                              setValue(this, 'storage_settings.'+storage_for, value);
-                              break;
-                          }
-                      }
-                  }
-                  // change to new type
-                  else {
-                      var value = this.storage_settings_all[storage_for][storage_type];
-                      setValue(this, 'storage_settings.'+storage_for, value);
-                  }
-
-                  // hide/show link to import page
-                  if (storage_for === 'source') {
-                      $('#menu-import').css("display", storage_type === 'tasks-json' ? 'block' : 'none');
-                  }
-              },
-
-              saveStorageSettings: function(storage_for) {
-                  var root = this;
-                  root.storage_settings[storage_for].loading = true;
-                  root.storage_settings[storage_for].save_success = false;
-                  root.$set(root.storage_settings[storage_for], 'errors', []);
-                  $.ajax({
-                      type: 'POST',
-                      url: 'api/project/storage-settings/' +
-                          '?type=' + this.storage_settings[storage_for].type +
-                          '&storage_for=' + storage_for,
-                      contentType: 'application/json',
-                      dataType: 'json',
-                      data: JSON.stringify(getFormData($('#' + storage_for + '-storage-form')))
-                  }).fail(function (data) {
-                      if (data.hasOwnProperty('responseJSON') && data.responseJSON.hasOwnProperty('errors'))
-                          root.$set(root.storage_settings[storage_for], 'errors', data.responseJSON.errors);
-                      else {
-                          var msg = message_from_response(data);
-                          root.storage_settings[storage_for].errors = {common: msg};
-                          root.showError('Storage settings error', msg)
-                      }
-                      console.log('save storage settings error:');
-                      console.log(data);
-                  }).done(function() {
-                      root.storage_settings[storage_for].save_success = true;
-                      root.project_loaded = false;
-                      setTimeout(function(){
-                        root.loadAll();
-                      }, 4000);
-                  }).always(function () {
-                      root.storage_settings[storage_for].loading = false;
-                  });
-                  return false;
-              },
-
-              // update all objects via api
-              loadAll: function () {
-                  this.loadProject();
-                  this.loadTasks();
-                  this.loadStorageSettings();
-              },
-
-              // update all objects via api
-              loadProjectAndTasks: function () {
-                  this.loadProject();
-                  this.loadTasks();
-              },
-
-              // update all objects via api
-              loadProjectAndTasksByTimer: function () {
-                  if (this.project_loaded && this.tasks_loaded) {
-                      this.loadProject();
-                      this.loadTasks();
-                  }
-              },
-
-              // change order of sorting in table
-              changeOrder: function (name) {
-                  console.log('order changed to ' + name);
-                  var old = getUrlArg('order', 'id');
-                  if (old === name) {
-                      name = '-' + name;
-                  }
-                  this.order = name;
-                  Cookies.set('order', name);
-                  refreshHistoryArg('order', name);
-                  this.loadTasks();
-              },
-
-              // delete completion with trash button
-              deleteCompletion: function (task, completion) {
-                  task.processing = true;
-                  this.$forceUpdate();
-                  var request = new XMLHttpRequest();
-                  request.open("DELETE", "api/tasks/" + task.id + "/completions/" + completion.id + "/", true);
-                  request.onload = this.loadProjectAndTasks;
-                  request.send();
-              },
-
-              // delete completion with trash button
-              deleteTask: function (task) {
-                  task.processing = true;
-                  this.$forceUpdate();
-                  var request = new XMLHttpRequest();
-                  request.open("DELETE", "api/tasks/" + task.id + "/", true);
-                  request.onload = this.loadProjectAndTasks;
-                  request.send();
-              },
-
-              // delete all tasks from project
-              deleteAllTasks: function () {
-                  var deletion_confirmed = confirm(
-                      'You are going to delete all existing tasks.\n' +
-                      'Warning! this operation cannot be undone.\nPlease confirm your action.');
-                  if (deletion_confirmed) {
-                      var request = new XMLHttpRequest();
-                      request.open("DELETE", "api/tasks/delete", true);
-                      request.onload = this.loadProjectAndTasks;
-                      request.send();
-                  }
-              },
-
-              // start/stop timer with project & task api loading
-              stopAutoUpdateTimer: function() {
-                  clearInterval(this.auto_update_timer);
-                  this.auto_update_timer = null;
-              },
-              startAutoUpdateTimer: function() {
-                  if (this.timer_interval > 0) {
-                      this.auto_update_timer = setInterval(this.loadProjectAndTasksByTimer, this.timer_interval);
-                  }
-              },
-              toggleAutoUpdateTimer: function () {
-                  if (this.auto_update_timer) {
-                      this.stopAutoUpdateTimer();
-                  }
-                  else {
-                      this.startAutoUpdateTimer();
-                  }
-              },
-
-              capitalizeFirstLetter: capitalizeFirstLetter,  // from helpers.js
-
-              getCurrentStorage: function (storage_for) {
-                  var all = this.storage_settings_all[storage_for];
-                  for (var key in all)
-                      if (all[key].current)
-                          return all[key];
-                  return {description: '[No storage defined]', name: '[No storage defined]'}
-              },
-
-              showStorageField: function(field_name, storage) {
-                if (field_name !== 'create_local_copy') {
-                    // find field use_blob_urls inside of list
-                    var use_blob_urls = null;
-                    for (var i in storage.fields) {
-                        if (storage.fields[i].name === 'use_blob_urls') {
-                            use_blob_urls = storage.fields[i];
-                            break;
-                        }
-                    }
-                    if (field_name === 'data_key' && !use_blob_urls.data) {
-                      return false;
-                    }
-                    return true;
-                }
-              },
-
-              showError: function(title, message) {
-                  $('body').toast({
-                      class: 'error',
-                      title: title,
-                      message: message,
-                      displayTime: this.timer_interval * 2,
-                      position: 'bottom center'
-                  })
-              },
-
-              openTaskPreview: function(task) {
-                this.quick_view = true;
-                this.current_task_preview = task;
-                this.columns = this.quick_columns;
-
-                // init
-                if (this.labelStudio) {
-                  this.labelStudio._sdk.loadTask(task.id, 'auto');
-                }
-                else {
-                  this.labelStudio = LSF_SDK("label-studio", this.project.label_config_line, task);
-                }
-              },
-              closeTaskPreview: function () {
-                this.quick_view = false;
-                this.columns = this.full_columns;
-              },
-              toggleTaskPreview: function(task) {
-                  this.current_task_preview && this.current_task_preview.id === task.id && this.quick_view
-                    ? this.closeTaskPreview() : this.openTaskPreview(task);
+        // get settings from storage_settings_all
+        changeStorageSettings: function (storage_for, storage_type) {
+          // change to current on backend
+          if (storage_type === 'current') {
+            var storages = this.storage_settings_all[storage_for];
+            for (var type in storages) {
+              var value = storages[type];
+              if (value.current) {
+                storage_type = type;
+                setValue(this, 'storage_settings.' + storage_for, value);
+                break;
               }
-          },
-
-          watch: {
-              // watch for page variable changes
-              page: function () {
-                  this.loadTasks();
-                  Cookies.set('page', this.page);
-                  refreshHistoryArg('page', this.page);
-              },
-              page_size: function () {
-                  this.loadTasks();
-                  Cookies.set('page_size', this.page_size);
-                  refreshHistoryArg('page_size', this.page_size);
-              },
-              'storage_settings.source.type': function () {
-                 this.changeStorageSettings('source', this.storage_settings.source.type)
-              },
-              'storage_settings.target.type': function () {
-                 this.changeStorageSettings('target', this.storage_settings.target.type)
-              }
-          },
-
-          // vue mounting of page
-          mounted: function () {
-              this.vue_loaded = true;
-              this.project_loaded = true;
-              //this.labelStudio = LSF_SDK("label-studio", this.project.label_config_line);
-
-              this.order = getUrlArg('order', this.order);
-              this.page = getUrlArg('page', this.page);
-              this.page_size = getUrlArg('page_size', this.page_size);
-              this.loadAll();
-
-              this.timer_interval = parseInt(getUrlArg('timer', '10000'));
-              this.startAutoUpdateTimer();
-              if (this.timer_interval > 0) {
-                console.log('auto update enabled, use ?timer=0 to disable it on this page')
-              }
-
-              $('#vue_loader').hide();
-              console.log('Vue mounting success');
+            }
           }
-      });
+          // change to new type
+          else {
+            var value = this.storage_settings_all[storage_for][storage_type];
+            setValue(this, 'storage_settings.' + storage_for, value);
+          }
+
+          // hide/show link to import page
+          if (storage_for === 'source') {
+            $('#menu-import').css("display", storage_type === 'tasks-json' ? 'block' : 'none');
+          }
+        },
+
+        saveStorageSettings: function (storage_for) {
+          var root = this;
+          root.storage_settings[storage_for].loading = true;
+          root.storage_settings[storage_for].save_success = false;
+          root.$set(root.storage_settings[storage_for], 'errors', []);
+          $.ajax({
+            type: 'POST',
+            url: 'api/project/storage-settings/' +
+              '?type=' + this.storage_settings[storage_for].type +
+              '&storage_for=' + storage_for,
+            contentType: 'application/json',
+            dataType: 'json',
+            data: JSON.stringify(getFormData($('#' + storage_for + '-storage-form')))
+          }).fail(function (data) {
+            if (data.hasOwnProperty('responseJSON') && data.responseJSON.hasOwnProperty('errors'))
+              root.$set(root.storage_settings[storage_for], 'errors', data.responseJSON.errors);
+            else {
+              var msg = message_from_response(data);
+              root.storage_settings[storage_for].errors = {common: msg};
+              root.showError('Storage settings error', msg)
+            }
+            console.log('save storage settings error:');
+            console.log(data);
+          }).done(function () {
+            root.storage_settings[storage_for].save_success = true;
+            root.project_loaded = false;
+            setTimeout(function () {
+              root.loadAll();
+            }, 4000);
+          }).always(function () {
+            root.storage_settings[storage_for].loading = false;
+          });
+          return false;
+        },
+
+        // update all objects via api
+        loadAll: function () {
+          this.loadProject();
+          this.loadTasks();
+          this.loadStorageSettings();
+        },
+
+        // update all objects via api
+        loadProjectAndTasks: function () {
+          this.loadProject();
+          this.loadTasks();
+        },
+
+        // update all objects via api
+        loadProjectAndTasksByTimer: function () {
+          if (this.project_loaded && this.tasks_loaded) {
+            this.loadProject();
+            this.loadTasks();
+          }
+        },
+
+        // change order of sorting in table
+        changeOrder: function (name) {
+          console.log('order changed to ' + name);
+          var old = getUrlArg('order', 'id');
+          if (old === name) {
+            name = '-' + name;
+          }
+          this.order = name;
+          Cookies.set('order', name);
+          refreshHistoryArg('order', name);
+          this.loadTasks();
+        },
+
+        // delete completion with trash button
+        deleteCompletion: function (task, completion) {
+          task.processing = true;
+          this.$forceUpdate();
+          var request = new XMLHttpRequest();
+          request.open("DELETE", "api/tasks/" + task.id + "/completions/" + completion.id + "/", true);
+          request.onload = this.loadProjectAndTasks;
+          request.send();
+        },
+
+        // delete completion with trash button
+        deleteTask: function (task) {
+          task.processing = true;
+          this.$forceUpdate();
+          var request = new XMLHttpRequest();
+          request.open("DELETE", "api/tasks/" + task.id + "/", true);
+          request.onload = this.loadProjectAndTasks;
+          request.send();
+        },
+
+        // delete all tasks from project
+        deleteAllTasks: function () {
+          var deletion_confirmed = confirm(
+            'You are going to delete all existing tasks.\n' +
+            'Warning! this operation cannot be undone.\nPlease confirm your action.');
+          if (deletion_confirmed) {
+            var request = new XMLHttpRequest();
+            request.open("DELETE", "api/tasks/delete", true);
+            request.onload = this.loadProjectAndTasks;
+            request.send();
+          }
+        },
+
+        // start/stop timer with project & task api loading
+        stopAutoUpdateTimer: function () {
+          clearInterval(this.auto_update_timer);
+          this.auto_update_timer = null;
+        },
+        startAutoUpdateTimer: function () {
+          if (this.timer_interval > 0) {
+            this.auto_update_timer = setInterval(this.loadProjectAndTasksByTimer, this.timer_interval);
+          }
+        },
+        toggleAutoUpdateTimer: function () {
+          if (this.auto_update_timer) {
+            this.stopAutoUpdateTimer();
+          } else {
+            this.startAutoUpdateTimer();
+          }
+        },
+
+        capitalizeFirstLetter: capitalizeFirstLetter,  // from helpers.js
+
+        getCurrentStorage: function (storage_for) {
+          var all = this.storage_settings_all[storage_for];
+          for (var key in all)
+            if (all[key].current)
+              return all[key];
+          return {description: '[No storage defined]', name: '[No storage defined]'}
+        },
+
+        showStorageField: function (field_name, storage) {
+          if (field_name !== 'create_local_copy') {
+            // find field use_blob_urls inside of list
+            var use_blob_urls = null;
+            for (var i in storage.fields) {
+              if (storage.fields[i].name === 'use_blob_urls') {
+                use_blob_urls = storage.fields[i];
+                break;
+              }
+            }
+            if (field_name === 'data_key' && !use_blob_urls.data) {
+              return false;
+            }
+            return true;
+          }
+        },
+
+        showError: function (title, message) {
+          $('body').toast({
+            class: 'error',
+            title: title,
+            message: message,
+            displayTime: this.timer_interval * 2,
+            position: 'bottom center'
+          })
+        },
+
+        openTaskPreview: function (task) {
+          if (!task) task = this.current_task;
+          this.quick_view = true;
+          this.current_task = task;
+          this.columns = this.quick_columns;
+
+          // init
+          if (this.labelStudio) {
+            this.labelStudio._sdk.loadTask(task.id, 'auto');
+          } else {
+            this.labelStudio = LSF_SDK("label-studio", this.project.label_config_line, task);
+          }
+        },
+        closeTaskPreview: function () {
+          this.quick_view = false;
+          this.columns = this.full_columns;
+        },
+        toggleTaskPreview: function (index) {
+          this.current_task_index = index;
+          var task = this.tasks[index];
+          this.current_task && this.current_task.id === task.id && this.quick_view
+            ? this.closeTaskPreview() : this.openTaskPreview(task);
+        },
+
+        nextPage: function () {
+          this.page<this.totalPages ? this.page++: this.page;
+          this.current_task_index = -1;
+        },
+        prevPage: function() {
+          this.page!==1 ? this.page--: this.page;
+          this.current_task_index = -1;
+        },
+        nextTask: function() {
+          if (this.current_task_index < this.tasks.length-1)
+            this.toggleTaskPreview(this.current_task_index+1)
+        },
+        prevTask: function() {
+          if (this.current_task_index > 0)
+            this.toggleTaskPreview(this.current_task_index-1)
+          else if (this.current_task_index === -1)
+            this.toggleTaskPreview(0)
+        }
+      },
+
+      watch: {
+        // watch for page variable changes
+        page: function () {
+          this.loadTasks();
+          Cookies.set('page', this.page);
+          refreshHistoryArg('page', this.page);
+        },
+        page_size: function () {
+          this.loadTasks();
+          Cookies.set('page_size', this.page_size);
+          refreshHistoryArg('page_size', this.page_size);
+        },
+        'storage_settings.source.type': function () {
+          this.changeStorageSettings('source', this.storage_settings.source.type)
+        },
+        'storage_settings.target.type': function () {
+          this.changeStorageSettings('target', this.storage_settings.target.type)
+        },
+
+        columns: function(values) {
+          if (this.quick_view) {
+            this.quick_columns = values;
+          }
+          else {
+            this.full_columns = values;
+          }
+        }
+
+      },
+
+      // vue mounting of page
+      mounted: function () {
+        this.vue_loaded = true;
+        this.project_loaded = true;
+        //this.labelStudio = LSF_SDK("label-studio", this.project.label_config_line);
+
+        this.order = getUrlArg('order', this.order);
+        this.page = getUrlArg('page', this.page);
+        this.page_size = getUrlArg('page_size', this.page_size);
+        this.loadAll();
+
+        this.timer_interval = parseInt(getUrlArg('timer', '10000'));
+        this.startAutoUpdateTimer();
+        if (this.timer_interval > 0) {
+          console.log('auto update enabled, use ?timer=0 to disable it on this page')
+        }
+
+        $('#vue_loader').hide();
+        $('.ui.checkbox').checkbox();
+
+        var root = this;
+        Mousetrap.bind(['shift+left', 'a'], this.prevPage);
+        Mousetrap.bind(['shift+right', 'd'], this.nextPage);
+        Mousetrap.bind(['shift+up', 'w'], this.prevTask);
+        Mousetrap.bind(['shift+down', 's'], this.nextTask);
+
+        console.log('Vue mounting success');
+      }
+    });
 
   </script>
 
-{% endraw %}
+  {% endraw %}
 {% endblock %}

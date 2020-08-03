@@ -42,6 +42,30 @@ h2 {
     font-weight: normal !important;
 }
 
+hotkey {
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 0.1em 0.5em;
+    margin: 0 0.2em;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 2px #fff inset;
+    background-color: #f7f7f7;
+}
+hotkey i {
+    color: #777;
+}
+.hotkey-helper {
+    margin-bottom: 1.0em;
+}
+.hotkey-helper .keys {
+    min-width: 15em;
+    display: inline-block;
+}
+.hotkey-helper .description {
+    margin-left: 1.5em;
+    display: inline-block;
+}
+
 .wrapper {
     max-width: 1400px;
 }
