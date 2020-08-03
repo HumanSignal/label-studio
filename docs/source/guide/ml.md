@@ -49,7 +49,7 @@ Here is a quick example tutorial on how to run the ML backend with a simple text
    
 4. Run Label Studio connecting it to the running ML backend:
     ```bash
-    label-studio start text_classification_project --init --template text_sentiment --ml-backend-url http://localhost:9090
+    label-studio start text_classification_project --init --template text_sentiment --ml-backends http://localhost:9090
     ```
 
 ## Start with docker compose
@@ -79,9 +79,9 @@ Then from `my-ml-backend/` directory run
 docker-compose up
 ```
 
-The server starts listening on port 9090, and you can connect it to Label Studio by specifying `--ml-backend http://localhost:9090`
+The server starts listening on port 9090, and you can connect it to Label Studio by specifying `--ml-backends http://localhost:9090`
  or via UI on **Model** page.
  
 ## Create your own ML backend
 
-Check examples in `label-studio/ml/examples` directory.
+Check examples in `label_studio/ml/examples` directory.
