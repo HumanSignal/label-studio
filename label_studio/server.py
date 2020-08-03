@@ -1016,6 +1016,7 @@ def main():
             config['protocol'] = 'https://'
             ssl_context = (cert_file, key_file)
 
+        # check port is busy
         if not input_args.debug and check_port_in_use('localhost', port):
             old_port = port
             port = int(port) + 1
@@ -1029,7 +1030,8 @@ def main():
         start_browser('http://localhost:' + str(port), input_args.no_browser)
         if input_args.use_gevent:
             app.debug = input_args.debug
-            http_server = WSGIServer((host, port), app, log=app.logger)
+            ssl_args = {'keyfile': key_file, 'certfile': cert_file} if ssl_context else {}
+            http_server = WSGIServer((host, port), app, log=app.logger, **ssl_args)
             http_server.serve_forever()
         else:
             app.run(host=host, port=port, debug=input_args.debug, ssl_context=ssl_context)
