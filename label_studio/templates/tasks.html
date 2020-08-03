@@ -25,6 +25,10 @@
       border: 8px solid #b4b4b4 !important;
     }
 
+    tr.selected {
+      background-color: rgba(24, 144, 255, 0.04);
+    }
+
     .visible-app {
       display: block !important;
     }
@@ -225,30 +229,30 @@
     <div class="ui divider hidden"></div>
 
 
-    <div class="ui grid two column stackable">
-      <div class="column">
+    <div class="ui grid stackable">
+      <div class="column" :class="{'five wide': show_task, 'sixteen wide': !show_task}">
         <!-- Table -->
         <div class="table-wrapper">
           <table v-if="project.task_count > 0" class="responsive">
           <!-- Header -->
           <tr>
-            <th class="order" @click="changeOrder('id')">Task ID
+            <th class="order" @click="changeOrder('id')" v-if="columns.includes('id')">Task ID
               <i class="fas" :class="{'fa-sort-up': this.order=='id', 'fa-sort-down': this.order=='-id'}"></i>
             </th>
-            <th class="order" @click="changeOrder('completed_at')">Completed at
+            <th class="order" @click="changeOrder('completed_at')" v-if="columns.includes('completed_at')">Completed at
               <i class="fas"
                  :class="{'fa-sort-up': this.order=='completed_at', 'fa-sort-down': this.order=='-completed_at'}"></i>
             </th>
-            <th class="order" @click="changeOrder('has_skipped_completions')">
+            <th class="order" @click="changeOrder('has_skipped_completions')" v-if="columns.includes('skipped')">
               Skipped
               <i class="fas"
                  :class="{'fa-sort-up': this.order=='has_skipped_completions', 'fa-sort-down': this.order=='-has_skipped_completions'}"></i>
             </th>
-            <th>Label</th>
-            <th v-if="project.can_delete_tasks || project.can_manage_completions">Delete</th>
+            <th v-if="columns.includes('label')">Label</th>
+            <th v-if="columns.includes('delete') && (project.can_delete_tasks || project.can_manage_completions)">Delete</th>
 
             <!-- Label config fields -->
-            <th v-for="(value, key) in project.data_types" v-if="value === 'Image'">${{ key }}</th>
+            <th v-for="(value, key) in project.data_types" v-if="value === 'Image' && columns.includes('others')">${{ key }}</th>
           </tr>
 
           <!-- Task row -->
@@ -260,33 +264,33 @@
           </tr>
 
           <!-- Correct task -->
-          <tr v-if="task != null" class="text-center" v-for="task in tasks">
+          <tr v-if="task != null" class="text-center"
+              v-for="task in tasks"
+              :class="{selected: current_task_preview && current_task_preview.id===task.id}">
             <!-- Task ID -->
-            <td class="text-center">
+            <td class="text-center" v-if="columns.includes('id')">
               <span class="ui mini blue loader inline active" v-if="task.processing"></span>
               {{ task.id }}
             </td>
             <!-- Completed at -->
-            <td>
+            <td v-if="columns.includes('completed_at')">
              {{ task.completed_at }}
             </td>
             <!-- Skipped -->
-            <td>
+            <td v-if="columns.includes('skipped')">
               <span style="cursor:pointer">
                <i class="ui icon forward grey" v-if="task.has_skipped_completions"></i>
              </span>
             </td>
             <!-- Label -->
-            <td class="text-center">
-              <a :href="'.?task_id=' + task.id">
-                <i class="fas fa-eye eye show-completion"></i>
-              </a>
-              <a @click="openTask(task)">
+            <td class="text-center" v-if="columns.includes('label')">
+              <a @click.exact="toggleTaskPreview(task)" @click.ctrl="window.open('.?task_id=' + task.id)">
                 <i class="fas fa-eye eye show-completion"></i>
               </a>
             </td>
             <!-- Delete -->
-            <td class="text-center" v-if="project.can_delete_tasks || project.can_manage_completions">
+            <td class="text-center"
+                v-if="columns.includes('delete') && (project.can_delete_tasks || project.can_manage_completions)">
               <div class="actions-card">
                 <span v-if="project.can_delete_tasks">
                   <a class="trash" @click="deleteTask(task)" data-tooltip="Delete task">
@@ -306,7 +310,7 @@
             </td>
 
             <!-- Label config fields -->
-            <td v-for="(value, key) in project.data_types" v-if="value === 'Image'">
+            <td v-for="(value, key) in project.data_types" v-if="value === 'Image' && columns.includes('others')">
               <image-with-fade-in :src="task.data[key]"></image-with-fade-in>
             </td>
           </tr>
@@ -352,7 +356,7 @@
               :style="{opacity: tasks_loaded ? 0: 0.5, 'margin-left': '10px'}"></i>
       </div>
 
-      <div class="column">
+      <div class="column eleven wide" :style="{display: show_task ? 'inherit': 'none'}">
         <!-- LS Frontend -->
         <div id="label-studio">
           <div class="ui loader active inline centered"></div>
@@ -381,7 +385,25 @@
           el: '#app',
 
           data: function () {
-              return {
+              var data = {
+                  // internal variables
+                  vue_loaded: false,
+                  project_loaded: false,
+                  tasks_loaded: false,
+                  page: Cookies.get('page', 1),
+                  page_size: Cookies.get('page_size', 10),
+                  order: Cookies.get('order', 'id'),
+                  auto_update_timer: null,
+                  timer_interval: 5000,
+                  error: null,
+
+                  // quick task preview
+                  full_columns: ['id', 'completed_by', 'skipped', 'label', 'delete', 'others'],
+                  quick_columns: ['id', 'label'],
+                  columns: [],
+                  show_task: false,
+                  current_task_preview: null,
+
                   // provided by api/project
                   project: {% endraw %}{{ serialized_project|json|safe }}{% raw %},
 
@@ -399,19 +421,11 @@
                           show: false, loading: false, type_loading: false, save_success: false
                       }
                   },
-                  storage_settings_all: {},
+                  storage_settings_all: {}
+              };
 
-                  // internal variables
-                  vue_loaded: false,
-                  project_loaded: false,
-                  tasks_loaded: false,
-                  page: Cookies.get('page', 1),
-                  page_size: Cookies.get('page_size', 10),
-                  order: Cookies.get('order', 'id'),
-                  auto_update_timer: null,
-                  timer_interval: 5000,
-                  error: null
-              }
+              data.columns = data.full_columns;
+              return data;
           },
 
           // components
@@ -682,7 +696,11 @@
                   })
               },
 
-              openTask: function(task) {
+              openTaskPreview: function(task) {
+                this.show_task = true;
+                this.current_task_preview = task;
+                this.columns = this.quick_columns;
+
                 // init
                 if (this.labelStudio) {
                   this.labelStudio._sdk.loadTask(task.id, 'auto');
@@ -690,6 +708,14 @@
                 else {
                   this.labelStudio = LSF_SDK("label-studio", this.project.label_config_line, task);
                 }
+              },
+              closeTaskPreview: function () {
+                this.show_task = false;
+                this.columns = this.full_columns;
+              },
+              toggleTaskPreview: function(task) {
+                  this.current_task_preview && this.current_task_preview.id === task.id && this.show_task
+                    ? this.closeTaskPreview() : this.openTaskPreview(task);
               }
           },
 
