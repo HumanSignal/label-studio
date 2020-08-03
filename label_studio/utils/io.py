@@ -3,7 +3,7 @@ import pkg_resources
 import shutil
 import glob
 import io
-import json
+import ujson as json
 
 from contextlib import contextmanager
 from tempfile import mkstemp, mkdtemp
@@ -105,7 +105,7 @@ def iter_files(root_dir, ext):
 
 
 def json_load(file, int_keys=False):
-    with io.open(file) as f:
+    with io.open(file, encoding='utf8') as f:
         data = json.load(f)
         if int_keys:
             return {int(k): v for k, v in data.items()}

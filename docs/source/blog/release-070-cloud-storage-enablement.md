@@ -29,7 +29,7 @@ You can configure it to store the results back to s3/gcp, making Label Studio a 
 
 Finally with a lot of [work](https://github.com/heartexlabs/label-studio-frontend/pull/75) from [Andrew](https://github.com/hlomzik) there is an implementation of frontend testing. This will make sure that we don’t break things when we introduce new features. Along with that another  Important part — improved building and publishing process, configured CI. Now the npm frontend package will be published along with the pip package.
 
-## Labeling Paragraphs and Dialogues
+## Labeling Paragraphs and Dialogs
 
 Introducing a new object tag called “Paragraphs”. A paragraph is a piece of text with potentially additional metadata like the author and the timestamp. With this tag we’re also experimenting now with an idea of providing predefined layouts. For example to label the dialogue you can use the following config: `<Paragraphs name=“conversation” value=“$conv” layout=“dialogue” />`
 

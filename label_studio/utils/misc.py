@@ -122,7 +122,7 @@ def config_comments_free(xml_config):
         p = xml_config.getparent()
         if p:
             p.remove(xml_config)
-        xml_config = etree.tostring(tree, method='html').decode("utf-8")
+        xml_config = etree.tostring(tree, encoding='utf8', method='html').decode("utf-8")
 
     return xml_config
 
@@ -299,7 +299,7 @@ class DirectionSwitch:
         if self.obj is None and other.obj is not None:
             return False
         if self.obj is not None and other.obj is None:
-            return True
+            return False
 
         return other.obj == self.obj
 
@@ -313,6 +313,20 @@ class DirectionSwitch:
 
         result = other.obj < self.obj
         return not result if self.inverted else result
+
+
+def compare_with_none(field, inverted):
+    def compare_with_none_func(a, b):
+        if a[field] is None and b[field] is None:
+            return True
+        if a[field] is None and b[field] is not None:
+            return False
+        if a[field] is not None and b[field] is None:
+            return True
+
+        result = b[field] < a[field]
+        return not result if inverted else result
+    return compare_with_none_func
 
 
 def check_port_in_use(host, port):

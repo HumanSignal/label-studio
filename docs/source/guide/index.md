@@ -120,4 +120,9 @@ Or put `username` and `password` in the project config.json.
 }
 ```
 
-It will be the same username and password for all the users.  
+It will be the same username and password for all the users.
+
+
+### WSGIServer instead of Flask
+
+Use `--use-gevent` option at start to enable WSGI server. It wraps around app.run with gevent's WSGIServer to enable the server to better handle concurrent requests.    

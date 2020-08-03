@@ -131,7 +131,7 @@ actions:
 
 ### actions with arguments
 \* means - look below for data examples<br/>
-currently e2e test framework is under developement so<br/>
+currently e2e test framework is under development so<br/>
 better take a look at e2e_actions code to be sure of desired action<br/>
 
 | actions | data arguments | example |
