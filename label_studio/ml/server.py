@@ -60,9 +60,6 @@ def create_dir(args):
     else:
         script_path = args.script
 
-    if not os.path.exists(script_path):
-        raise FileNotFoundError(script_path)
-
     if ':' not in script_path:
         model_classes = get_all_classes_inherited_LabelStudioMLBase(script_path)
         if len(model_classes) > 1:
@@ -73,6 +70,9 @@ def create_dir(args):
         model_class = model_classes[0]
     else:
         script_path, model_class = args.script.split(':')
+
+    if not os.path.exists(script_path):
+        raise FileNotFoundError(script_path)
 
     script_base_name = os.path.basename(script_path)
     local_script_path = os.path.join(output_dir, os.path.basename(script_path))
