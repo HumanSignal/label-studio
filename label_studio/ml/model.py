@@ -341,7 +341,7 @@ class LabelStudioMLManager(object):
             cls.train_script_wrapper,
             args=(project, label_config, train_kwargs, cls.get_initialization_params()),
             job_timeout='365d',
-            ttl=-1,
+            ttl=None,
             result_ttl=-1,
             failure_ttl=300,
             meta={'project': project},
