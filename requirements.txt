@@ -32,8 +32,7 @@ rq>=1.0
 boto3>=1.12.32
 google-cloud-storage==1.28.1
 flask_wtf==0.14.3
-# label-studio-converter>=0.0.17
--e "git+https://github.com/heartexlabs/label-studio-converter.git@brush-converter#egg=label-studio-converter"
+label-studio-converter>=0.0.18rc0
 htmlmin==0.1.12
 gevent>=20.6.2
 ujson==3.0.0
