@@ -162,9 +162,12 @@
       $('#error-message-icon').attr('class', 'green check icon');
       $('#error-message-text').html(
           "Label config saved! <br><br> " +
-          "<a style='margin-bottom: 15px' class='ui positive button' href='import'>&nbsp;&nbsp;Import Tasks&nbsp;&nbsp;</a><br/>" +
-          "<a style='margin-bottom: 15px' class='ui positive button' href='.'>Start Labeling</a><br/>" +
-          "<a class='ui positive button' href='tasks'>Explore Tasks</a><br/>");
+          "<a style='margin-bottom: 15px; min-width: 150px' class='ui positive button' href='import'>Import Tasks</a><br/>"
+          {% if not project.no_tasks %} +
+          "<a style='margin-bottom: 15px; min-width: 150px' class='ui positive button' href='.'>Start Labeling</a><br/>" +
+          "<a class='ui positive button' style='min-width: 150px' href='tasks'>Explore Tasks</a><br/>"
+          {% endif %}
+      );
       $('#error-message').modal('show');
     }
   }

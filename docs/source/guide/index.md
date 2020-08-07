@@ -37,10 +37,10 @@ To install Label Studio via pip, you need Python>=3.5 and run:
 pip install label-studio
 ```
 
-Then launch a new project which stores all labeling data in a local directory `my_labeling_project`:
+Then launch a new project which stores all labeling data in a local directory `my_project`:
 
 ```bash
-label-studio start my_labeling_project --init
+label-studio start my_project --init
 ```
 The default browser opens automatically at [http://localhost:8080](http://localhost:8080).
 
@@ -49,12 +49,12 @@ The default browser opens automatically at [http://localhost:8080](http://localh
 
 Label Studio is also distributed as a docker container. Make sure you have [Docker](https://www.docker.com/) installed on your local machine.
 
-Install and start Label Studio at [http://localhost:8080](http://localhost:8080) storing all labeling data in `./my_labeling_project` directory:
+Install and start Label Studio at [http://localhost:8080](http://localhost:8080) storing all labeling data in `./my_project` directory:
 ```bash
-docker run --rm -p 8080:8080 -v `pwd`/my_labeling_project:/label-studio/my_labeling_project --name label-studio heartexlabs/label-studio:latest
+docker run --rm -p 8080:8080 -v `pwd`/my_project:/label-studio/my_project --name label-studio heartexlabs/label-studio:latest
 ```
 
-> Note: if `./my_labeling_project` the folder exists, an exception will be thrown. Please delete this folder or use `--force` option.
+> Note: if `./my_project` the folder exists, an exception will be thrown. Please delete this folder or use `--force` option.
 > Note: for Windows, you have to modify the volumes paths set by `-v` option
 
 You can override the default startup command by appending any of [available command line arguments]():
@@ -78,10 +78,10 @@ cd label-studio
 python setup.py develop
 ```
 
-Then create a new project, it stores all labeling data in a local directory `my_labeling_project`:
+Then create a new project, it stores all labeling data in a local directory `my_project`:
 
 ```bash
-label-studio start my_labeling_project --init
+label-studio start my_project --init
 ```
 The default browser will open automatically at [http://localhost:8080](http://localhost:8080).
 
@@ -106,7 +106,7 @@ You can specify input tasks, project config, machine learning backend and other 
 You can restrict the access for LS instance with the basic HTTP auth.
 
 ```
-label-studio start my_labeling_project --username user --password pwd 
+label-studio start my_project --username user --password pwd 
 ```
 
 Or put `username` and `password` in the project config.json.
