@@ -8,6 +8,7 @@ import pandas as pd
 import logging
 import logging.config
 import traceback as tb
+import label_studio
 
 try:
     import ujson as json
@@ -920,6 +921,19 @@ def api_predictions():
     else:
         project.analytics.send(getframeinfo(currentframe()).function, error=400)
         return make_response(jsonify("No ML backend"), 400)
+
+
+@app.route('/version')
+@requires_auth
+@exception_treatment
+def version():
+    """Show backend and frontend version"""
+    lsf = json.load(open(find_dir('static/editor') + '/version.json'))
+    ver = {
+        'label-studio-frontend': lsf,
+        'label-studio-backend': label_studio.__version__
+    }
+    return make_response(jsonify(ver), 200)
 
 
 @app.route('/data/<path:filename>')

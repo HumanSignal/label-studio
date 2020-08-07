@@ -1,6 +1,6 @@
 {
-  "message": "Fix broken TextArea",
-  "commit": "7fb95988bebf60307f8943679956f5e6fc3d220b",
-  "branch": "master",
-  "date": "2020-07-22T16:01:21Z"
+  "message": "Don't store region labels to RLE",
+  "commit": "53c0d41715d620d9194258ead3f9648863b59a47",
+  "branch": "bugfix/0.7.4-fixes",
+  "date": "2020-08-07T19:31:25Z"
 }
