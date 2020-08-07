@@ -210,6 +210,63 @@ def welcome_page():
     )
 
 
+@app.route('/dm', methods=['GET', 'POST'])
+@requires_auth
+@exception_treatment_page
+def dm_page():
+    """ Tasks and completions page
+    """
+    try:
+        project = project_get_or_create()
+        task_ids = project.source_storage.ids()
+        tasks = []
+        
+        for i in task_ids:            
+            task = project.get_task_with_completions(i)
+            if task is None:  # no completion at task
+                task = project.source_storage.get(i)
+
+            task['created_at'] = "2019-08-06T19:27:29.289566Z"
+            # else:
+            #     task['completed_at'] = item['completed_at']
+            #     task['has_skipped_completions'] = item['has_skipped_completions']
+
+            task = resolve_task_data_uri(task)
+            # if project.ml_backends_connected:
+            #     task = project.make_predictions(task)
+
+            tasks.append(task)
+            
+        serialized_project = project.serialize()
+        serialized_project['multi_session_mode'] = input_args.command != 'start-multi-session'
+        project.analytics.send(getframeinfo(currentframe()).function)
+
+        from flask import json as flask_json
+        import base64
+        import json
+        data = json.dumps(tasks)
+        encodedBytes = base64.b64encode(data.encode("utf-8"))
+        encodedStr = str(encodedBytes, "utf-8")
+        
+        return flask.render_template(
+            'dm.html',
+            label_config_line=config_line_stripped(project.label_config_full),
+            project=project,
+            tasks=tasks,
+            tasks_base64=str(encodedBytes, "utf-8"),
+            tasks_str=flask_json.htmlsafe_dumps(tasks),
+            serialized_project=serialized_project
+        )
+    except Exception as e:
+        error = str(e)
+        logger.error(error, exc_info=True)
+        traceback = tb.format_exc()
+        return flask.render_template(
+            'includes/error.html',
+            error=error, header="Project loading error", traceback=traceback
+        )
+
+
 @app.route('/tasks', methods=['GET', 'POST'])
 @requires_auth
 @exception_treatment_page
@@ -723,6 +780,7 @@ def api_tasks(task_id):
     if request.method == 'GET':
         task_data = project.get_task_with_completions(task_id) or project.source_storage.get(task_id)
         task_data = resolve_task_data_uri(task_data)
+        
         project.analytics.send(getframeinfo(currentframe()).function)
         return make_response(jsonify(task_data), 200)
     elif request.method == 'DELETE':
@@ -1013,7 +1071,7 @@ def main():
         set_web_protocol(config.get('protocol', 'http://'))
         set_full_hostname(get_web_protocol() + host.replace('0.0.0.0', 'localhost') + ':' + str(port))
 
-        start_browser('http://localhost:' + str(port), input_args.no_browser)
+        # start_browser('http://localhost:' + str(port), input_args.no_browser)
         app.run(host=host, port=port, debug=input_args.debug)
 
     # On `start-multi-session` command, server creates one project per each browser sessions

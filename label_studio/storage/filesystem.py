@@ -203,7 +203,7 @@ class ExternalTasksJSONStorage(CloudStorage):
 
     def _remove_id_from_keys_map(self, id):
         full_key = self.key_prefix + str(id)
-        assert self._ids_keys_map[id]['key'] == full_key
+        assert self._ids_keys_map[id]['key'] == full_key, (self._ids_keys_map[id]['key'], full_key)
         self._selected_ids.remove(id)
         self._ids_keys_map.pop(id)
         self._keys_ids_map.pop(full_key)

@@ -150,13 +150,17 @@ class LabelStudioMLManager(object):
     def _get_latest_job_result_from_workdir(cls, project):
         project_model_dir = os.path.join(cls.model_dir, project or '')
         if not os.path.exists(project_model_dir):
+            print(project_model_dir + ' doesn\'t exist')
             return
-        subdirs = list(filter(lambda d: d.isdigit(), os.listdir(project_model_dir)))
-        if subdirs:
-            last_version = str(list(sorted(map(int, subdirs)))[-1])
-            job_result_file = os.path.join(project_model_dir, last_version, 'job_result.json')
+
+        # sort directories by decreasing timestamps
+        for subdir in reversed(sorted(map(int, filter(lambda d: d.isdigit(), os.listdir(project_model_dir))))):
+            job_result_file = os.path.join(project_model_dir, str(subdir), 'job_result.json')
             if not os.path.exists(job_result_file):
-                return
+                print('The latest job result file ' + job_result_file + ' doesn\'t exist')
+                continue
+            # logger.debug('Read the latest job result file ' + job_result_file)
+            print('Read the latest job result file ' + job_result_file)
             with open(job_result_file) as f:
                 return json.load(f)
 
@@ -171,13 +175,15 @@ class LabelStudioMLManager(object):
     @classmethod
     def get(cls, project):
         key = cls._key(project)
-        logger.debug('Get project ' + str(key))
+        # logger.debug('Get project ' + str(key))
+        print('Get project ' + str(key))
         return cls._current_model.get(key)
 
     @classmethod
     def create(cls, project=None, label_config=None, train_output=None, version=None, **kwargs):
         key = cls._key(project)
-        logger.debug('Create project ' + str(key))
+        # logger.debug('Create project ' + str(key))
+        print('Create project ' + str(key))
         kwargs.update(cls.init_kwargs)
         cls._current_model[key] = ModelWrapper(
             model=cls.model_class(label_config=label_config, train_output=train_output, **kwargs),
@@ -196,8 +202,10 @@ class LabelStudioMLManager(object):
     @classmethod
     def fetch(cls, project=None, label_config=None, force_reload=False, **kwargs):
         if cls.without_redis():
+            logger.debug('Fetch ' + project + ' from local directory')
             job_result = cls._get_latest_job_result_from_workdir(project) or {}
         else:
+            logger.debug('Fetch ' + project + ' from Redis')
             job_result = cls._get_latest_job_result_from_redis(project) or {}
         train_output = job_result.get('train_output')
         version = job_result.get('version')
@@ -285,15 +293,21 @@ class LabelStudioMLManager(object):
             initialization_params = initialization_params or {}
             cls.initialize(**initialization_params)
 
+        t = time.time()
+        m = cls.fetch(project, label_config)
+        m.is_training = True
+
         version = cls._generate_version()
 
         if cls.model_dir:
-            logger.debug('Running in model dir: ' + cls.model_dir)
+            # logger.debug('Running in model dir: ' + cls.model_dir)
+            print('Running in model dir: ' + cls.model_dir)
             project_model_dir = os.path.join(cls.model_dir, project or '')
             workdir = os.path.join(project_model_dir, version)
             os.makedirs(workdir, exist_ok=True)
         else:
-            logger.debug('Running without model dir')
+            # logger.debug('Running without model dir')
+            print('Running without model dir')
             workdir = None
 
         if cls.without_redis():
@@ -305,9 +319,6 @@ class LabelStudioMLManager(object):
             data_stream, snapshot = tee(data_stream)
             cls.create_data_snapshot(snapshot, workdir)
 
-        t = time.time()
-        m = cls.fetch(project, label_config)
-        m.is_training = True
         try:
             train_output = m.model.fit(data_stream, workdir, **train_kwargs)
             if cls.without_redis():
@@ -341,8 +352,8 @@ class LabelStudioMLManager(object):
             cls.train_script_wrapper,
             args=(project, label_config, train_kwargs, cls.get_initialization_params()),
             job_timeout='365d',
-            ttl=-1,
-            result_ttl=-1,
+            ttl=999999,
+            result_ttl=999999,
             failure_ttl=300,
             meta={'project': project},
         )
