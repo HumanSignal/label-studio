@@ -569,7 +569,7 @@ class Project(object):
                 predictions['created_by'] = ml_backend.model_name
                 task['predictions'].append(predictions)
         except Exception as exc:
-            logger.debug(exc)
+            logger.debug(exc, exc_info=True)
         return task
 
     def train(self):
