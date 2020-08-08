@@ -11,6 +11,10 @@
     .table-wrapper {
       overflow-x: auto;
       padding-bottom: 1em;
+      min-width: 347px;
+    }
+    .task-table {
+      min-width: 347px;
     }
 
     ::-webkit-scrollbar-track {
@@ -265,7 +269,7 @@
         <div class="column" :class="{'five wide': quick_view, 'sixteen wide': !quick_view}" style="min-width: 300px;">
           <!-- Table -->
           <div class="table-wrapper">
-            <table v-if="project.task_count > 0" class="responsive" :class="{'center-margin': !quick_view}">
+            <table v-if="project.task_count > 0" class="task-table responsive" :class="{'center-margin': !quick_view}">
               <!-- Header -->
               <tr>
                 <th class="order" @click="changeOrder('id')" v-if="columns.includes('id')">Task ID
