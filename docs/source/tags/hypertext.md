@@ -14,6 +14,7 @@ HyperText tag shows an HyperText markup that can be labeled
 | value | <code>string</code> |  | value of the element |
 | [showLabels] | <code>boolean</code> | <code>false</code> | show labels next to the region |
 | [encoding] | <code>string</code> | <code>&quot;string|base64&quot;</code> | provide the html as an escaped string or base64 encoded string |
+| [clickableLinks=false] | <code>boolean</code> | allow to open resources from links
 
 ### Example  
 ```html
