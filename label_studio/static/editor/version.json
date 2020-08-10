@@ -1,6 +1,6 @@
 {
-  "message": "Fix linting errors",
-  "commit": "34201333cb453bf61ca73db7c53627dffe4c4e88",
-  "branch": "master",
-  "date": "2020-07-09T12:38:28Z"
+  "message": "Don't store region labels to RLE",
+  "commit": "53c0d41715d620d9194258ead3f9648863b59a47",
+  "branch": "bugfix/0.7.4-fixes",
+  "date": "2020-08-07T19:31:25Z"
 }

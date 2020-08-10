@@ -17,7 +17,7 @@ The connection to both storages is synced, so you can see new tasks after upload
 
 The parameters like prefix or matching filename regex could be changed any time from the webapp interface.
 
-> Note: Choose target storage carefully: be sure it's empty when you just start labeling project, or it contains completions that match previously created/import tasks from source storage. Tasks are synced with completions based on internal ids (keys in `source.json`/`target.json` files in your project directory), so if you accidentally connect to the target storage with existed completions with the same ids, you may fail with undefined behaviour.  
+> Note: Choose target storage carefully: be sure it's empty when you just start labeling project, or it contains completions that match previously created/import tasks from source storage. Tasks are synced with completions based on internal ids (keys in `source.json`/`target.json` files in your project directory), so if you accidentally connect to the target storage with existed completions with the same ids, you may fail with undefined behavior.  
 
 ## Amazon S3
 

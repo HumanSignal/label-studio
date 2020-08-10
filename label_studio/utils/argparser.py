@@ -99,8 +99,19 @@ def parse_input_args():
         '-p', '--port', dest='port', type=int,
         help='Server port')
     root_parser.add_argument(
+        '--cert', dest='cert_file', type=valid_filepath,
+        help='Certificate file for HTTPS (in PEM format)'
+    )
+    root_parser.add_argument(
+        '--key', dest='key_file', type=valid_filepath,
+        help='Private key file for HTTPS (in PEM format)'
+    )
+    root_parser.add_argument(
         '--allow-serving-local-files', dest='allow_serving_local_files', action='store_true',
         help='Allow serving local files (Warning! use this option only for your local runs)')
+    root_parser.add_argument(
+        '--use-gevent', dest='use_gevent', action='store_true',
+        help='Use gevent for better concurrency', default=False)
 
     parser = argparse.ArgumentParser(description='Label studio')
 

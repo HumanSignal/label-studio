@@ -198,6 +198,10 @@ Popular machine learning format used by [COCO dataset](http://cocodataset.org/#h
 
 Popular XML-formatted task data used for object detection and image segmentation tasks
 
+### Brush Labels to Numpy & PNG
+
+Export your brushe labels to numpy 2d arrays and PNG images. One label is equal to one image.   
+
 ## Export using API
 
 You can use an API to request a file with exported results, e.g.

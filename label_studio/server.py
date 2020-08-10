@@ -8,6 +8,7 @@ import pandas as pd
 import logging
 import logging.config
 import traceback as tb
+import label_studio
 
 try:
     import ujson as json
@@ -22,6 +23,9 @@ from uuid import uuid4
 from urllib.parse import unquote
 from datetime import datetime
 from inspect import currentframe, getframeinfo
+
+from gevent.pywsgi import WSGIServer
+
 from flask import (
     request, jsonify, make_response, Response, Response as HttpResponse,
     send_file, session, redirect
@@ -64,7 +68,7 @@ def create_app():
     app.secret_key = 'A0Zrdqwf1AQWj12ajkhgFN]dddd/,?RfDWQQT'
     app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
     app.config['WTF_CSRF_ENABLED'] = False
-
+    app.url_map.strict_slashes = False
     return app
 
 
@@ -166,7 +170,7 @@ def labeling_page():
     """
     project = project_get_or_create()
     if project.no_tasks():
-        return redirect('/welcome')
+        return redirect('welcome')
 
     # task data: load task or task with completions if it exists
     task_data = None
@@ -273,25 +277,17 @@ def dm_page():
 def tasks_page():
     """ Tasks and completions page
     """
-    try:
-        project = project_get_or_create()
-        serialized_project = project.serialize()
-        serialized_project['multi_session_mode'] = input_args.command != 'start-multi-session'
-        project.analytics.send(getframeinfo(currentframe()).function)
-        return flask.render_template(
-            'tasks.html',
-            config=project.config,
-            project=project,
-            serialized_project=serialized_project
-        )
-    except Exception as e:
-        error = str(e)
-        logger.error(error, exc_info=True)
-        traceback = tb.format_exc()
-        return flask.render_template(
-            'includes/error.html',
-            error=error, header="Project loading error", traceback=traceback
-        )
+    project = project_get_or_create()
+    serialized_project = project.serialize()
+    serialized_project['multi_session_mode'] = input_args.command != 'start-multi-session'
+    project.analytics.send(getframeinfo(currentframe()).function)
+    return flask.render_template(
+        'tasks.html',
+        config=project.config,
+        project=project,
+        serialized_project=serialized_project,
+        **find_editor_files()
+    )
 
 
 @app.route('/setup')
@@ -436,12 +432,14 @@ def api_validate_config():
 def api_save_config():
     """ Save label config
     """
-    if 'label_config' not in request.form:
-        return make_response('No label_config in POST', status.HTTP_417_EXPECTATION_FAILED)
+    label_config = None
+    if 'label_config' in request.form:
+        label_config = request.form['label_config']
+    elif 'label_config' in request.json:
+        label_config = request.json['label_config']
 
     project = project_get_or_create()
     # check config before save
-    label_config = request.form['label_config']
     try:
         project.validate_label_config(label_config)
     except ValidationError as e:
@@ -624,7 +622,7 @@ def api_generate_next_task():
     # collect prediction from multiple ml backends
     if project.ml_backends_connected:
         task = project.make_predictions(task)
-    logger.debug('Next task:\n' + json.dumps(task, indent=2))
+    logger.debug('Next task:\n' + json.dumps(task))
     return make_response(jsonify(task), 200)
 
 
@@ -648,7 +646,7 @@ def api_project():
     return make_response(jsonify(output), code)
 
 
-@app.route('/api/project/storage-settings', methods=['GET', 'POST'])
+@app.route('/api/project/storage-settings/', methods=['GET', 'POST'])
 @requires_auth
 @exception_treatment
 def api_project_storage_settings():
@@ -716,7 +714,7 @@ def api_all_task_ids():
     return make_response(jsonify(ids), 200)
 
 
-@app.route('/api/tasks', methods=['GET'])
+@app.route('/api/tasks/', methods=['GET'])
 @requires_auth
 @exception_treatment
 def api_all_tasks():
@@ -739,17 +737,25 @@ def api_all_tasks():
     skipped_status = project.get_skipped_status()
 
     # ordering
-    pre_order = [{
+    pre_order = ({
         'id': i,
         'completed_at': completed_at[i] if i in completed_at else None,
         'has_skipped_completions': skipped_status[i] if i in completed_at else None,
-    } for i in task_ids]
-    # for has_skipped_completions use two keys ordering
-    if order == 'has_skipped_completions':
-        ordered = sorted(pre_order, key=lambda x: (DirectionSwitch(x['has_skipped_completions'], order_inverted),
-                                                   DirectionSwitch(x['completed_at'], False)))
+    } for i in task_ids)
+
+    if order == 'id':
+        ordered = sorted(pre_order, key=lambda x: x['id'], reverse=order_inverted)
+
     else:
-        ordered = sorted(pre_order, key=lambda x: (DirectionSwitch(x[order], order_inverted)))
+        # for has_skipped_completions use two keys ordering
+        if order == 'has_skipped_completions':
+            ordered = sorted(pre_order,
+                             key=lambda x: (DirectionSwitch(x['has_skipped_completions'], not order_inverted),
+                                            DirectionSwitch(x['completed_at'], False)))
+        # another orderings
+        else:
+            ordered = sorted(pre_order, key=lambda x: (DirectionSwitch(x[order], not order_inverted)))
+
     paginated = ordered[(page - 1) * page_size:page * page_size]
 
     # get tasks with completions
@@ -975,6 +981,19 @@ def api_predictions():
         return make_response(jsonify("No ML backend"), 400)
 
 
+@app.route('/version')
+@requires_auth
+@exception_treatment
+def version():
+    """Show backend and frontend version"""
+    lsf = json.load(open(find_dir('static/editor') + '/version.json'))
+    ver = {
+        'label-studio-frontend': lsf,
+        'label-studio-backend': label_studio.__version__
+    }
+    return make_response(jsonify(ver), 200)
+
+
 @app.route('/data/<path:filename>')
 @requires_auth
 @exception_treatment
@@ -1061,6 +1080,15 @@ def main():
         host = input_args.host or config.get('host', 'localhost')
         port = input_args.port or config.get('port', 8080)
 
+        # ssl certificate and key
+        cert_file = input_args.cert_file or config.get('cert')
+        key_file = input_args.key_file or config.get('key')
+        ssl_context = None
+        if cert_file and key_file:
+            config['protocol'] = 'https://'
+            ssl_context = (cert_file, key_file)
+
+        # check port is busy
         if not input_args.debug and check_port_in_use('localhost', port):
             old_port = port
             port = int(port) + 1
@@ -1071,12 +1099,26 @@ def main():
         set_web_protocol(config.get('protocol', 'http://'))
         set_full_hostname(get_web_protocol() + host.replace('0.0.0.0', 'localhost') + ':' + str(port))
 
-        # start_browser('http://localhost:' + str(port), input_args.no_browser)
-        app.run(host=host, port=port, debug=input_args.debug)
+        start_browser('http://localhost:' + str(port), input_args.no_browser)
+        if input_args.use_gevent:
+            app.debug = input_args.debug
+            ssl_args = {'keyfile': key_file, 'certfile': cert_file} if ssl_context else {}
+            http_server = WSGIServer((host, port), app, log=app.logger, **ssl_args)
+            http_server.serve_forever()
+        else:
+            app.run(host=host, port=port, debug=input_args.debug, ssl_context=ssl_context)
 
     # On `start-multi-session` command, server creates one project per each browser sessions
     elif input_args.command == 'start-multi-session':
-        app.run(host=input_args.host or '0.0.0.0', port=input_args.port or 8080, debug=input_args.debug)
+        host = input_args.host or '0.0.0.0'
+        port = input_args.port or 8080
+
+        if input_args.use_gevent:
+            app.debug = input_args.debug
+            http_server = WSGIServer((host, port), app, log=app.logger)
+            http_server.serve_forever()
+        else:
+            app.run(host=host, port=port, debug=input_args.debug)
 
 
 if __name__ == "__main__":

@@ -157,10 +157,9 @@ class LabelStudioMLManager(object):
         for subdir in reversed(sorted(map(int, filter(lambda d: d.isdigit(), os.listdir(project_model_dir))))):
             job_result_file = os.path.join(project_model_dir, str(subdir), 'job_result.json')
             if not os.path.exists(job_result_file):
+                # logger.error('The latest job result file ' + job_result_file + ' doesn\'t exist')
                 print('The latest job result file ' + job_result_file + ' doesn\'t exist')
                 continue
-            # logger.debug('Read the latest job result file ' + job_result_file)
-            print('Read the latest job result file ' + job_result_file)
             with open(job_result_file) as f:
                 return json.load(f)
 
@@ -277,11 +276,11 @@ class LabelStudioMLManager(object):
         data = list(data_iter)
         data_file = os.path.join(workdir, 'train_data.json')
         with io.open(data_file, mode='w') as fout:
-            json.dump(data, fout, ensure_ascii=False, indent=2)
+            json.dump(data, fout, ensure_ascii=False)
 
         info_file = os.path.join(workdir, 'train_data_info.json')
         with io.open(info_file, mode='w') as fout:
-            json.dump({'count': len(data)}, fout, indent=2)
+            json.dump({'count': len(data)}, fout)
 
     @classmethod
     def train_script_wrapper(
@@ -293,6 +292,7 @@ class LabelStudioMLManager(object):
             initialization_params = initialization_params or {}
             cls.initialize(**initialization_params)
 
+        # fetching the latest model version before we generate the next one
         t = time.time()
         m = cls.fetch(project, label_config)
         m.is_training = True
@@ -352,8 +352,8 @@ class LabelStudioMLManager(object):
             cls.train_script_wrapper,
             args=(project, label_config, train_kwargs, cls.get_initialization_params()),
             job_timeout='365d',
-            ttl=999999,
-            result_ttl=999999,
+            ttl=None,
+            result_ttl=-1,
             failure_ttl=300,
             meta={'project': project},
         )
