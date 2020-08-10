@@ -62,7 +62,7 @@ def tasks_from_file(filename, file, project):
             # read as text or binary file
             data = open(filename, 'rb').read() if isinstance(file, io.TextIOWrapper) else file.read()
 
-            upload_dir = os.path.join(project.name, 'upload')
+            upload_dir = os.path.join(project.path, 'upload')
             os.makedirs(upload_dir, exist_ok=True)
             filename = hashlib.md5(data).hexdigest() + '-' + os.path.basename(filename)
             path = os.path.join(upload_dir, filename)
