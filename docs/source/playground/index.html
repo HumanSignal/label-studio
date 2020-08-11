@@ -303,6 +303,10 @@ order: 201
         </div>
 
         <div class="ui item">
+          <a class="use-template no-go" href="#" data-value="6006">Brush segmentation</a>
+        </div>
+
+        <div class="ui item">
           <a class="use-template no-go" href="#" data-value="25">Circular object detector</a>
         </div>
 
@@ -1333,6 +1337,13 @@ order: 201
 </script>
 
 
+          <script data-template-pk="6006" type="text"><View>
+  <Image name="image" value="$image"></Image>
+  <BrushLabels name="tag" toName="image">
+    <Label value="Planet" background="rgba(0, 0, 255, 0.75)"></Label>
+    <Label value="Moonwalker" background="rgba(255, 0, 0, 0.75)"></Label>
+  </BrushLabels>
+</View></script>
 
           <script data-template-pk="10" type="text"><View>
   <Header value="Please select everything you see on the image" />
