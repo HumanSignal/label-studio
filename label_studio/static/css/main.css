@@ -134,7 +134,6 @@ a {
     align-items: center;
     padding: 10px 20px 10px 40px;
     position: relative;
-    z-index: 100;
     box-shadow: rgba(0, 0, 0, 0.15) 0 2px 3px 0;
     margin-bottom: 3em;
 }
