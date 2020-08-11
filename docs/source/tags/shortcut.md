@@ -1,10 +1,10 @@
 ---
 title: Shortcut
 type: tags
-order: 509
+order: 421
 ---
 
-Shortcut helps you predefine label objects that you can add in one click. Right now Shortcuts are supported only for the TextArea tag.
+Shortcut tag can be used to define a shortcut, which adds a predefined object
 
 ### Parameters
 
@@ -14,7 +14,7 @@ Shortcut helps you predefine label objects that you can add in one click. Right 
 | [alias] | <code>string</code> | Shortcut alias |
 | [hotkey] | <code>string</code> | Hotkey |
 
-### Example  
+### Example
 ```html
 <View>
   <TextArea name="txt-1">

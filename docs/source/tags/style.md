@@ -1,14 +1,14 @@
 ---
 title: Style
 type: tags
-order: 515
+order: 503
 ---
 
 Style tag, add css styles right through the config
 
-### Example 
-
-```js
+### Parameters
+### Example
+```html
 <View>
   <Style> .cls-name { background: red; }</Style>
   <View className="cls-name">

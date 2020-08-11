@@ -1,30 +1,28 @@
 ---
 title: Relations
 type: tags
-order: 421
-is_new: t
+order: 420
 ---
 
-Relations tag, create relations labels<br>
-<img src="/images/screens/relations.png">
+Relations tag, create relations labels
 
 ### Parameters
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| [choice] | <code>single</code> | <code>multiple</code> | <code>single</code> | configure if you can select just one or multiple labels |
+| [choice] | <code>single</code> \| <code>multiple</code> | <code>single</code> | configure if you can select just one or multiple labels |
 
-### Example  
+### Example
 ```html
 <View>
   <Relations>
-    <Relation value="friends" />
-    <Relation value="enemies" />
+    <Relation value="hello" />
+    <Relation value="world" />
   </Relations>
   <Text name="txt-1" value="$text" />
   <Labels name="lbl-1" toName="txt-1">
-    <Label value="Opossum" />
-    <Label value="Raccoon" />
+    <Label value="Relevant" />
+    <Label value="Not Relevant" />
   </Labels>
 </View>
 ```

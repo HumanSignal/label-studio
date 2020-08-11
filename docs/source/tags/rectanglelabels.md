@@ -1,10 +1,11 @@
 ---
 title: RectangleLabels
 type: tags
-order: 408
+order: 418
 ---
 
-RectangleLabels tag creates labeled rectangles on the image
+RectangleLabels tag creates labeled rectangles
+Used only for Image
 
 ### Parameters
 
@@ -18,7 +19,7 @@ RectangleLabels tag creates labeled rectangles on the image
 | [strokeWidth] | <code>number</code> | <code>1</code> | width of stroke |
 | [canRotate] | <code>boolean</code> | <code>true</code> | show or hide rotation handle |
 
-### Example  
+### Example
 ```html
 <View>
   <RectangleLabels name="labels" toName="image">

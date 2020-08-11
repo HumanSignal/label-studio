@@ -1,12 +1,14 @@
 ---
 title: Pairwise
 type: tags
-order: 418
+order: 412
 ---
 
 Pairwise element. Compare two different objects, works with any label studio object
 
 ### Parameters
+**Params**: <code>string</code> [leftClass=left]  - class name of the left object  
+**Params**: <code>string</code> [rightClass=left] - class name of the right object  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -14,7 +16,7 @@ Pairwise element. Compare two different objects, works with any label studio obj
 | toName | <code>string</code> | names of the elements you want to compare |
 | [selectionStyle] | <code>string</code> | style of the selection |
 
-### Example  
+### Example
 ```html
 <View>
   <Pairwise name="pairwise" leftClass="text1" rightClass="text2" toName="txt-1,txt-2"></Pairwise>
@@ -22,9 +24,9 @@ Pairwise element. Compare two different objects, works with any label studio obj
   <Text name="txt-2" value="Text 2" />
 </View>
 ```
-### Example  
+### Example
 ```html
-You can also style the appearance using the View tag:
+You can also style the appearence using the View tag:
 <View>
   <Pairwise name="pw" toName="txt-1,txt-2"></Pairwise>
   <View style="display: flex;">
