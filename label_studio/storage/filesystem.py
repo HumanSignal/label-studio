@@ -1,6 +1,7 @@
 import json
 import os
 import logging
+from copy import deepcopy
 
 from label_studio.utils.io import json_load, delete_dir_content, iter_files
 from .base import BaseStorage, BaseForm, CloudStorage
@@ -183,7 +184,7 @@ class ExternalTasksJSONStorage(CloudStorage):
         return self.path
 
     def _get_value(self, key):
-        return self.data[int(key)]
+        return deepcopy(self.data[int(key)])
 
     def _set_value(self, key, value):
         self.data[int(key)] = value
