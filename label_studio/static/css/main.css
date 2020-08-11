@@ -120,18 +120,12 @@ a {
     background-color: #fff;
     display: flex;
     align-items: center;
-    padding: 10px 20px 10px 40px;
+    padding: 5px 20px 5px 40px;
     position: relative;
     box-shadow: 0 4px 3px -2px rgba(0, 0, 0, 0.0774);
     margin-bottom: 3em;
+    height: 50px;
 }
-
-#header a.active {
-      color: #2493FB !important;
-      border-bottom: 3px #2493FB solid;
-      padding-top: 12px;
-      padding-bottom: 9px;
-    }
 
 #logo {
     font-size: 1.5em;
@@ -167,18 +161,43 @@ a {
 }
 
 #nav a {
-    color: #304455;
+    color: #797979;
     font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
-    margin-right: 1em;
+    margin-right: 2em;
     font-size: 14px;
+
+    transition: border-bottom-color 0.25s ease-in-out;
+    border-bottom: 3px rgba(74, 251, 130, 0) solid;
+    padding: 7px 0.4em 4px;
 }
 
 #nav a:hover {
-    text-decoration: underline;
+    transition: border-bottom-color 0.25s ease-in-out;
+    border-bottom: 3px #2493FB solid;
 }
 
 #nav a.active {
-    font-weight: bold;
+    color: #2493FB;
+    transition: border-bottom-color 0.25s ease-in-out;
+    border-bottom: 3px #2493FB solid;
+}
+
+#nav .outside-links, #nav .outside-links:hover {
+    border-bottom-color: rgba(0,0,0,0.0);
+    padding-left: unset;
+    padding-right: unset;
+}
+.outside-links {
+    transition: opacity 0.25s ease-in-out !important;
+    color: #444 !important;
+    opacity: 0.7;
+}
+.outside-links:hover {
+    transition: opacity 0.25s ease-in-out !important;
+    opacity: 1.0;
+}
+.outside-links.first {
+    margin-left: 3em;
 }
 
 #new-project-button:hover {
@@ -481,7 +500,7 @@ pre {
 }
 
 
-@media only screen and (max-width: 890px) {
+@media only screen and (max-width: 905px) {
     #logo {
         font-size: 1.5em;
         line-height: 40px;
@@ -489,6 +508,7 @@ pre {
         font-family: "Dosis", "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
         font-weight: 500;
         display: inline-flex;
+        margin-left: 10px;
     }
     .img-logo {
         margin-top: 0 !important;
@@ -522,16 +542,24 @@ pre {
     table tr {
         border-top: 1px solid #ddd;
     }
-}
 
-@media only screen and (max-width: 650px) {
     #logo {
         display: none;
     }
 
     #header {
-        height: 80px;
         display: flex;
         justify-content: center;
+        height: 80px;
+    }
+
+    #nav a {
+        padding-top: 0;
+        padding-bottom: 0;
+        line-height: 25px;
+        margin: 0 0.5em;
+    }
+    #nav a.outside-links.first {
+        margin-left: 2em;
     }
 }

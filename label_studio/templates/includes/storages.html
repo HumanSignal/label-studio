@@ -21,7 +21,7 @@
     <form class="ui form" :id="storage.storage_for + '-storage-form'">
       <input hidden name="storage_for" :value="storage_for">
 
-      <span v-if="storage.type=='tasks-json'">To add new tasks go to <a href="./import">Import page</a>.<br/></span>
+      <span v-if="storage.type=='tasks-json'">To add new tasks go to <a href="./import">Import page</a>.<br/><br/></span>
 
       <!-- Storage Type - form needs it to correctly be processed -->
       <div class="ui field" :class="{disabled: storage.type_loading}">
