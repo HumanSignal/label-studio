@@ -388,18 +388,14 @@ div[class*="App_editor"] {
     margin-top: 0.7em;
 }
 
-.ui ul, ol {
+.ui ul.list, .ui .list ol {
     list-style: none !important;
     margin: 1em 0 0 2em;
 }
 
-.ui ul li::before {
+.ui ul.list li::before {
     content: "\2022";
     color: rgba(0, 0, 0, 0.4) !important;
-    font-weight: normal;
-    display: inline-block;
-    width: 1em;
-    margin-left: -1em;
 }
 
 .ui .label.basic {

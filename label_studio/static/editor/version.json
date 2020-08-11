@@ -1,6 +1,6 @@
 {
-  "message": "Don't store region labels to RLE",
-  "commit": "53c0d41715d620d9194258ead3f9648863b59a47",
-  "branch": "bugfix/0.7.4-fixes",
-  "date": "2020-08-07T19:31:25Z"
+  "message": "Merge pull request #130 from heartexlabs/feature/show-hide-region\n\nAdd button to regions list to hide/show region",
+  "commit": "8928b7d1d03eaeb0b5dc61e0d6e92d7551c0065e",
+  "branch": "master",
+  "date": "2020-08-11T13:37:56Z"
 }
