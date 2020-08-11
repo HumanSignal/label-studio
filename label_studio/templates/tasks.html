@@ -330,13 +330,13 @@
                     v-if="columns.includes('delete') && (project.can_delete_tasks || project.can_manage_completions)">
                   <div class="actions-card">
                 <span v-if="project.can_delete_tasks">
-                  <a class="trash" @click="deleteTask(task)" data-tooltip="Delete task">
+                  <a class="trash" @click.stop="deleteTask(task)" data-tooltip="Delete task">
                     <i class="fas fa-trash-alt trash remove-task"></i>
                   </a>
                 </span>
                     <span v-if="project.can_manage_completions">
                   <span v-if="task.completions">
-                    <a class="trash" @click="deleteCompletion(task, task.completions[0])"
+                    <a class="trash" @click.stop="deleteCompletion(task, task.completions[0])"
                        style="margin-left: 10px"
                        data-tooltip="Delete all completions of this task">
                       <i class="far fa-trash-alt trash remove-completion"></i>
