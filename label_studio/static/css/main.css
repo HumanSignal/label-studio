@@ -21,18 +21,6 @@ th {
     border: 1px solid #ccc;
 }
 
-@media screen and (max-width: 768px) {
-    table.responsive tbody th,
-    table.responsive tbody td {
-        text-align: left;
-        display: block;
-        border: none;
-    }
-    table tr {
-        border-top: 1px solid #ddd;
-    }
-}
-
 h1 {
     font-weight: normal !important;
 }
@@ -134,9 +122,16 @@ a {
     align-items: center;
     padding: 10px 20px 10px 40px;
     position: relative;
-    box-shadow: rgba(0, 0, 0, 0.15) 0 2px 3px 0;
+    box-shadow: 0 4px 3px -2px rgba(0, 0, 0, 0.0774);
     margin-bottom: 3em;
 }
+
+#header a.active {
+      color: #2493FB !important;
+      border-bottom: 3px #2493FB solid;
+      padding-top: 12px;
+      padding-bottom: 9px;
+    }
 
 #logo {
     font-size: 1.5em;
@@ -149,13 +144,15 @@ a {
 
 .img-logo {
     vertical-align: middle;
-    margin-right: 6px;
-    width: 40px;
-    height: 40px;
+    margin-right: 5px;
+    margin-top: 5px;
+    width: 30px;
+    height: 30px;
 }
 
 .img-text {
-    font-size: 1.4em;
+    font-size: 24px;
+    margin-left: 0.25em
 }
 
 #nav {
@@ -466,6 +463,23 @@ pre {
     color: #555;
 }
 
+.sup-button {
+    position: relative;
+    top: 2px;
+    cursor: pointer;
+    font-size: 0.75em;
+    color: rgb(24, 144, 255);
+    transition: background-color ease-in-out 0.25s;
+}
+.sup-button.big {
+    font-size: 1.25em !important;
+}
+
+.sup-button:hover {
+    color: rgb(54, 162, 255);
+    transition: background-color ease-in-out 0.25s;
+}
+
 
 @media only screen and (max-width: 890px) {
     #logo {
@@ -474,7 +488,10 @@ pre {
         color: #273849;
         font-family: "Dosis", "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
         font-weight: 500;
-        display: flex;
+        display: inline-flex;
+    }
+    .img-logo {
+        margin-top: 0 !important;
     }
 
     .img-text {
@@ -493,11 +510,18 @@ pre {
         flex-direction: row;
         right: 1px;
     }
+}
 
-    #logo {
-        display: inline-flex;
+@media screen and (max-width: 768px) {
+    table.responsive tbody th,
+    table.responsive tbody td {
+        text-align: left;
+        display: block;
+        border: none;
     }
-
+    table tr {
+        border-top: 1px solid #ddd;
+    }
 }
 
 @media only screen and (max-width: 650px) {
@@ -510,21 +534,4 @@ pre {
         display: flex;
         justify-content: center;
     }
-}
-
-.sup-button {
-    position: relative;
-    top: 2px;
-    cursor: pointer;
-    font-size: 0.75em;
-    color: rgb(24, 144, 255);
-    transition: background-color ease-in-out 0.25s;
-}
-.sup-button.big {
-    font-size: 1.25em !important;
-}
-
-.sup-button:hover {
-    color: rgb(54, 162, 255);
-    transition: background-color ease-in-out 0.25s;
 }
