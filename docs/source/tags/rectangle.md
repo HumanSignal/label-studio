@@ -1,9 +1,10 @@
 ---
 title: Rectangle
 type: tags
-order: 407
+order: 417
 ---
 
+Rectangle
 Rectangle is used to add rectangle (Bounding Box) to an image
 
 ### Parameters
@@ -18,7 +19,7 @@ Rectangle is used to add rectangle (Bounding Box) to an image
 | [strokeWidth] | <code>number</code> | <code>1</code> | width of the stroke |
 | [canRotate] | <code>boolean</code> | <code>true</code> | show or hide rotation handle |
 
-### Example  
+### Example
 ```html
 <View>
   <Rectangle name="rect-1" toName="img-1" />

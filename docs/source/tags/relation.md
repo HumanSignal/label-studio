@@ -1,8 +1,7 @@
 ---
 title: Relation
 type: tags
-order: 420
-is_new: t
+order: 419
 ---
 
 Relation tag represents a single relation label
@@ -14,7 +13,7 @@ Relation tag represents a single relation label
 | value | <code>string</code> | value of the relation |
 | [background] | <code>string</code> | background color of active label |
 
-### Example  
+### Example
 ```html
 <View>
   <Relations>

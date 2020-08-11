@@ -1,3 +1,8 @@
+---
+title: Ranker
+type: tags
+order: 415
+---
 
 Ranker tag, used to ranking models
 
@@ -9,7 +14,7 @@ Ranker tag, used to ranking models
 | [axis] | <code>y</code> \| <code>x</code> | <code>y</code> | axis direction |
 | sortedHighlightColor | <code>string</code> |  | sorted color |
 
-### Example  
+### Example
 ```html
 <View>
   <Ranker name="ranker" value="$items"></Ranker>

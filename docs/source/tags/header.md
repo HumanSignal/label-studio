@@ -1,7 +1,7 @@
 ---
 title: Header
 type: tags
-order: 501
+order: 502
 ---
 
 Header tag, show header
@@ -15,11 +15,11 @@ Header tag, show header
 | [style] | <code>string</code> |  | css style string |
 | [underline] | <code>boolean</code> | <code>false</code> | underline of header |
 
-### Example  
+### Example
 ```html
 <Header name="text-1" value="$text" />
 ```
-### Example  
+### Example
 ```html
 <Header name="text-1" value="Please select the class" />
 ```

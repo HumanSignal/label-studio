@@ -1,10 +1,10 @@
 ---
 title: Ellipse
 type: tags
-order: 415
-is_new: t
+order: 404
 ---
 
+Ellipse
 Ellipse is used to add ellipse (elleptic Bounding Box) to an image
 
 ### Parameters
@@ -19,7 +19,7 @@ Ellipse is used to add ellipse (elleptic Bounding Box) to an image
 | [strokeWidth] | <code>number</code> | <code>1</code> | width of the stroke |
 | [canRotate] | <code>boolean</code> | <code>true</code> | show or hide rotation handle |
 
-### Example  
+### Example
 ```html
 <View>
   <Ellipse name="ellipse1-1" toName="img-1" />

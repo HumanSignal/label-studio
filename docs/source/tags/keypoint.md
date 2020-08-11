@@ -4,6 +4,7 @@ type: tags
 order: 407
 ---
 
+KeyPoint tag
 KeyPoint is used to add a keypoint to an image
 
 ### Parameters
@@ -17,7 +18,7 @@ KeyPoint is used to add a keypoint to an image
 | [strokeWidth] | <code>number</code> | <code>1</code> | width of the stroke |
 | [stokeColor] | <code>string</code> | <code>&quot;#8bad00&quot;</code> | keypoint stroke color |
 
-### Example  
+### Example
 ```html
 <View>
   <KeyPoint name="kp-1" toName="img-1" />

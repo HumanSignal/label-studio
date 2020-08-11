@@ -1,19 +1,18 @@
 ---
 title: Table
 type: tags
-order: 503
+order: 504
 ---
 
 Table tag, show object keys and values in a table
 
 ### Parameters
 
--   `value` **[string]** 
+| Param | Type |
+| --- | --- |
+| value | <code>string</code> | 
 
-### Examples
-
+### Example
 ```html
-<View>
-  <Table name="text-1" value="$text"></Table>
-</View>
+<Table name="text-1" value="$text"></Table>
 ```

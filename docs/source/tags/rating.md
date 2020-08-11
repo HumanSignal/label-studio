@@ -1,7 +1,7 @@
 ---
 title: Rating
 type: tags
-order: 409
+order: 416
 ---
 
 Rating adds rating selection
@@ -21,7 +21,7 @@ Rating adds rating selection
 | [requiredMessage] | <code>string</code> |  | message to show if validation fails |
 | [perRegion] | <code>boolean</code> |  | use this tag for region labeling instead of the whole object labeling |
 
-### Example  
+### Example
 ```html
 <View>
   <Text name="txt" value="$text" />
