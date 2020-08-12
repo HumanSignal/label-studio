@@ -10,6 +10,7 @@ from operator import itemgetter
 from xml.etree import ElementTree
 from uuid import uuid4
 from copy import deepcopy
+from datetime import datetime
 
 from label_studio_converter import Converter
 
@@ -567,6 +568,7 @@ class Project(object):
                     continue
                 predictions = ml_backend.make_predictions(task, self)
                 predictions['created_by'] = ml_backend.model_name
+                predictions['created_date'] = datetime.now().isoformat()
                 task['predictions'].append(predictions)
         except Exception as exc:
             logger.debug(exc, exc_info=True)
