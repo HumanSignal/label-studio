@@ -6,10 +6,11 @@ order: 201
 
 Editor configuration is based on XML-like tags. Tags can be divided into three categories:
 
+- Object tags (**data sources**) used to show elements that can be labeled: **Image**, **Text**, **Audio**, **AudioPlus**.
+- Control tags used to label the objects, examples: **Labels**, **Choices**, **Rating**, **TextArea**.
 - Visual tags used for visual only elements
 (non-interactive), examples: **View**, **Header**. 
-- Control tags used to label the objects, examples: **Labels**, **Choices**, **Rating**, **TextArea**. 
-- Object tags used to show elements that can be labeled: **Image**, **Text**, **Audio**, **AudioPlus**.
+ 
 
 ## Connecting elements
 
