@@ -172,6 +172,7 @@ const _convertTask = function(task) {
       tp.pk = tp.pk;
       tp.createdAgo = tp.created_ago;
       tp.createdBy = tp.created_by;
+      tp.createdDate = tp.created_date;
     }
   }
 
