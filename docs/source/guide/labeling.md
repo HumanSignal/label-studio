@@ -17,7 +17,7 @@ Let's explore the complex example of multi-task labeling which includes text + i
 
 Here you can see relations among labeling objects: tasks, completions, results, etc.
 
-One user provides one completion, it’s atomic, and it consists of the result items. my_projectResult items can have relations between themselves with the specified direction of three types: left-right, right-left, or bidirectional. Normalizations are additional information in the custom string format about the current result item.
+One user provides one completion, it’s atomic, and it consists of the result items. Result items can have relations between themselves with the specified direction of three types: left-right, right-left, or bidirectional. Normalizations are additional information in the custom string format about the current result item.
  
 <br>
 <center><img src="/images/labeling-scheme.png" style="max-width: 600px; opacity: 0.6"></center>
