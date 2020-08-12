@@ -1,6 +1,6 @@
 {
-  "message": "Merge pull request #130 from heartexlabs/feature/show-hide-region\n\nAdd button to regions list to hide/show region",
-  "commit": "8928b7d1d03eaeb0b5dc61e0d6e92d7551c0065e",
+  "message": "Fix ids for Regions tree when copy prediction",
+  "commit": "fd1e7cad9fdab9ca3c55691b2d0ee23905d51d59",
   "branch": "master",
-  "date": "2020-08-11T13:37:56Z"
+  "date": "2020-08-12T20:30:46Z"
 }
