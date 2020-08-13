@@ -21,6 +21,18 @@ Here are the main concepts behind Label Studio's workflow:
 - **Frontend Labeling UI** is accessible from any browser, distributed as precompiled js/css scripts and could be [easily extendable with new labeling tags](frontend.html). You can also [embed Label Studio UI into your applications](frontend.html#Quickstart).
 
 
+**Relations among tasks, completions and results** 
+
+Here you can see relations among labeling objects: tasks, completions, results, etc.
+
+One user provides one completion, it’s atomic, and it consists of the result items. Result items can have relations between themselves with the specified direction of three types: left-right, right-left, or bidirectional. Normalizations are additional information in the custom string format about the current result item.
+ 
+<br>
+<center><img src="/images/labeling-scheme.png" style="max-width: 600px; opacity: 0.6"></center>
+<br>
+Completions and Predictions are very similar. But predictions must be generated automatically by ML models.   
+
+
 ## Quickstart
 
 ### Prerequisites
