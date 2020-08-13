@@ -16,7 +16,7 @@ Choice tag represents a single choice
 | [style] | <code>style</code> | css style of the checkbox element |
 | [hotkey] | <code>string</code> | hotkey |
 
-### Example  
+### Example
 ```html
 <View>
   <Choices name="gender" toName="txt-1" choice="single">

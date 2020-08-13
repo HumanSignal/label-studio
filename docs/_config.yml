@@ -6,7 +6,7 @@
 title: Label Studio
 subtitle: Data labeling, annotation and exploration tool
 description: Label Studio is a multi-type data labeling and annotation tool with standardized output format
-keywords: computer-vision, deep-learning, image-annotation, annotation-tool, annotation, labeling, labeling-tool, image-labeling, image-labelling-tool, boundingbox, image-classification, annotations, imagenet, semantic-segmentation, dataset, datasets, label-studio, label-region, data-labeling, text-annotation
+keywords: computer-vision, deep-learning, image-annotation, annotation-tool, annotation, labeling, labeling-tool, image-labeling, image-labeling-tool, boundingbox, image-classification, annotations, imagenet, semantic-segmentation, dataset, datasets, label-studio, label-region, data-labeling, text-annotation
 author: Heartex
 language: en
 timezone:

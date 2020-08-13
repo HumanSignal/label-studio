@@ -1,7 +1,7 @@
 ---
 title: TextArea
 type: tags
-order: 409
+order: 422
 ---
 
 TextArea tag shows the textarea for user input
@@ -12,6 +12,7 @@ TextArea tag shows the textarea for user input
 | --- | --- | --- | --- |
 | name | <code>string</code> |  | name of the element |
 | toName | <code>string</code> |  | name of the element that you want to label if any |
+| value | <code>string</code> |  |  |
 | [label] | <code>string</code> |  | label text |
 | [placeholder] | <code>string</code> |  | placeholder text |
 | [maxSubmissions] | <code>string</code> |  | maximum number of submissions |
@@ -19,10 +20,10 @@ TextArea tag shows the textarea for user input
 | [rows] | <code>number</code> |  | number of rows in the textarea |
 | [required] | <code>boolean</code> | <code>false</code> | validation if textarea is required |
 | [requiredMessage] | <code>string</code> |  | message to show if validation fails |
-| [showSubmitButton] | <code>boolean</code> |  | show submit button or hide it, it's shown by default when rows value is larger than one (i.e. textarea mode) |
+| [showSubmitButton] | <code>boolean</code> |  | show submit button or hide it, it's shown by default when rows is more than one (i.e. textarea mode) |
 | [perRegion] | <code>boolean</code> |  | use this tag for region labeling instead of the whole object labeling |
 
-### Example  
+### Example
 ```html
 <View>
   <TextArea name="ta"></TextArea>

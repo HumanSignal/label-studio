@@ -10,6 +10,7 @@ from operator import itemgetter
 from xml.etree import ElementTree
 from uuid import uuid4
 from copy import deepcopy
+from datetime import datetime
 
 from label_studio_converter import Converter
 
@@ -406,7 +407,7 @@ class Project(object):
         sampling = self.config.get('sampling', 'sequential')
 
         # Tasks are ordered ascending by their "id" fields. This is default mode.
-        task_iter = filter(lambda i: i not in self.target_storage, self.source_storage.ids())
+        task_iter = filter(lambda i: i not in completed_tasks_ids, self.source_storage.ids())
         if sampling == 'sequential':
             task_id = next(task_iter, None)
             if task_id is not None:
@@ -567,9 +568,10 @@ class Project(object):
                     continue
                 predictions = ml_backend.make_predictions(task, self)
                 predictions['created_by'] = ml_backend.model_name
+                predictions['created_date'] = datetime.now().isoformat()
                 task['predictions'].append(predictions)
         except Exception as exc:
-            logger.debug(exc)
+            logger.debug(exc, exc_info=True)
         return task
 
     def train(self):
@@ -750,6 +752,10 @@ class Project(object):
             config['host'] = args.host
         if args.allow_serving_local_files:
             config['allow_serving_local_files'] = True
+        if args.key_file and args.cert_file:
+            config['protocol'] = 'https://'
+            config['cert'] = args.cert_file
+            config['key'] = args.key_file
 
         # create config.json
         config_json = 'config.json'
@@ -890,6 +896,7 @@ class Project(object):
             'available_storages': available_storages,
             'source_syncing': self.source_storage.is_syncing,
             'target_syncing': self.target_storage.is_syncing,
-            'data_types': self.data_types
+            'data_types': self.data_types,
+            'label_config_line': self.label_config_line
         }
         return output

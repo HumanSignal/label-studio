@@ -1,8 +1,7 @@
 ---
 title: BrushLabels
 type: tags
-order: 418
-is_new: t
+order: 401
 ---
 
 BrushLabels tag creates segmented labeling
@@ -13,9 +12,8 @@ BrushLabels tag creates segmented labeling
 | --- | --- | --- |
 | name | <code>string</code> | name of the element |
 | toName | <code>string</code> | name of the image to label |
-| background | <code>string</code> | brush fill color, e.g.: rgba(255,0,0,0.5), 0.5 is opacity |  
 
-### Example  
+### Example
 ```html
 <View>
   <BrushLabels name="labels" toName="image">

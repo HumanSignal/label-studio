@@ -57,7 +57,7 @@
 
   </head>
   <body >
-    <div id="mobile-bar" <%- isIndex || isBlog ? 'style="display: none"' : '' %>>
+    <div id="mobile-bar" <%- isBlog ? 'style="display: none"' : '' %>>
         <a class="menu-button"></a>
     </div>
     <% if (!isIndex) { %> <%- partial('partials/header') %> <% } %>

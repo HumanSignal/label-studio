@@ -44,6 +44,7 @@ var imageWithFadeIn = Vue.component('imageWithFadeIn', {props: ['src'],
     template:
         '<transition name="fade">' +
         '<img v-bind:src="src" ' +
+            '@click.stop.prevent ' +
             'class="preview-image" ' +
             'v-show="loaded" ' +
             'v-on:load="onLoaded()" ' +

@@ -10,17 +10,17 @@ Audio tag plays a simple audio file
 
 | Param | Type | Description |
 | --- | --- | --- |
-| name | <code>string</code> | name of the element |
-| value | <code>string</code> | value of the element |
+| name | <code>string</code> | of the element |
+| value | <code>string</code> | of the element |
 | hotkey | <code>string</code> | hotkey used to play/pause audio |
 
-### Example  
+### Example
 ```html
 <View>
   <Audio name="audio" value="$audio" />
 </View>
 ```
-### Example  
+### Example
 
 Audio classification
 

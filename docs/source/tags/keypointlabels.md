@@ -1,9 +1,10 @@
 ---
-title: KeypointLabels
+title: KeyPointLabels
 type: tags
 order: 408
 ---
 
+KeyPointLabels tag
 KeyPointLabels tag creates labeled keypoints
 
 ### Parameters
@@ -17,7 +18,7 @@ KeyPointLabels tag creates labeled keypoints
 | [strokeWidth] | <code>number</code> | <code>1</code> | width of the stroke |
 | [stokeColor] | <code>string</code> | <code>&quot;#8bad00&quot;</code> | keypoint stroke color |
 
-### Example  
+### Example
 ```html
 <View>
   <KeyPointLabels name="kp-1" toName="img-1">

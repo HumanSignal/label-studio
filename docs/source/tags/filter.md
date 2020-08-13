@@ -1,33 +1,25 @@
 ---
 title: Filter
 type: tags
-order: 510
-is_new: t
+order: 501
 ---
 
-Filter tag, show filter input to seek through classes
+Filter tag, show filter
 
 ### Parameters
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| name | <code>string</code> |  | name of the filter |
-| toName | <code>string</code> |  | name of the labels/choices element it connects to |
-| [casesensetive] | <code>boolean</code> | <code>false</code> | case sensetive or insensetive match |
-| [cleanup] | <code>boolean</code> | <code>true</code> | remove the search if you click Enter |
-| [placeholder] | <code>string</code> |  | placeholder for the empty filter |
-| [minlength] | <code>number</code> | <code>3</code> | length of string after which to initiate the search |
-| [hotkey] | <code>string</code> |  | hotkey that activate the search |
+| value | <code>string</code> |  | text of filter |
+| [size] | <code>number</code> | <code>4</code> | size of filter |
+| [style] | <code>string</code> |  | css style string |
+| [underline] | <code>boolean</code> | <code>false</code> | underline of filter |
 
 ### Example
-
-```js
-<View>
-  <Filter name="text-1" toName="labels" />
-  <Labels name="labels" toName="text">
-    <Label value="Hello" />
-    <Label value="World" />
-  </Labels>
-  <Text name="text" value="$text" />
-</View>
+```html
+<Filter name="text-1" value="$text" />
+```
+### Example
+```html
+<Filter name="text-1" value="Please select the class" />
 ```

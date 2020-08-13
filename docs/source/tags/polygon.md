@@ -1,10 +1,11 @@
 ---
 title: Polygon
 type: tags
-order: 405
+order: 413
 ---
 
-Polygon is used to add polygons to an image. Just start to click on the image. 
+Polygon tag
+Polygon is used to add polygons to an image
 
 ### Parameters
 
@@ -19,7 +20,7 @@ Polygon is used to add polygons to an image. Just start to click on the image.
 | [pointSize] | <code>small</code> \| <code>medium</code> \| <code>large</code> | <code>medium</code> | size of polygon handle points |
 | [pointStyle] | <code>rectangle</code> \| <code>circle</code> | <code>circle</code> | style of points |
 
-### Example  
+### Example
 ```html
 <View>
   <Polygon name="rect-1" toName="img-1" />

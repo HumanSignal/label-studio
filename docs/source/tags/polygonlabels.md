@@ -1,7 +1,7 @@
 ---
 title: PolygonLabels
 type: tags
-order: 406
+order: 414
 ---
 
 PolygonLabels tag, create labeled polygons
@@ -19,7 +19,7 @@ PolygonLabels tag, create labeled polygons
 | [pointSize] | <code>small</code> \| <code>medium</code> \| <code>large</code> | <code>medium</code> | size of polygon handle points |
 | [pointStyle] | <code>rectangle</code> \| <code>circle</code> | <code>rectangle</code> | style of points |
 
-### Example  
+### Example
 ```html
 <View>
   <Image name="image" value="$image" />

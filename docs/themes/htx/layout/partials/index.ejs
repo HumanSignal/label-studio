@@ -435,7 +435,7 @@
 
 
 <div class="fix-sidebar">
-  <%- partial('partials/sidebar', {type: page.type === 'menu' ? 'guide' : page.type, index: page.index}) %>
+  <%- partial('partials/sidebar_main_page', {type: page.type === 'menu' ? 'guide' : page.type, index: page.index}) %>
   <div>
     <div id="bodybag" class='content'>
     <section>
@@ -477,7 +477,7 @@
                   <p>Load assets from AWS S3 or GCP.
                       <a href="/blog/release-070-cloud-storage-enablement.html" class="underline">Read more</a> in our blog.</p>
                   <a href="/blog/release-070-cloud-storage-enablement.html"><img src="/images/release-070/s3-mascot-04.png" style="max-height:280px" /></a>
-                  <div style="font-weight: lighter">Current version is 0.7.3</div>
+                  <div style="font-weight: lighter">Last version is 0.7.4</div>
               </div>
           </div>
         </div>
@@ -529,7 +529,7 @@
             <div class="slide">
               <figure class="slide-figure">
                 <img class="slide-img" src="/images/screens/dialogue_analysis.png"/>
-                <figcaption class="slide-caption"><p>Dialogue Analysis</p></figcaption>
+                <figcaption class="slide-caption"><p>Dialog Analysis</p></figcaption>
               </figure>
             </div>
             <input type="radio" name="slider" class="trigger" id="four"/>
@@ -630,7 +630,7 @@
             <li>— Do you have more data than you can possibly label by hand?</li>
             <li>— Do you want to distribute the labeling to multiple annotators?</li>
             <li>— Do you want to control the quality of the annotations?</li>
-            <li>— Do you want to include your entire team into the process to achive greater results?</li>
+            <li>— Do you want to include your entire team into the process to achieve greater results?</li>
           </ul>
 
           <p>We provide commercial offering built on top of Label Studio.</p>

@@ -162,7 +162,12 @@
       $('#error-message-icon').attr('class', 'green check icon');
       $('#error-message-text').html(
           "Label config saved! <br><br> " +
-          "<a class='ui positive button' href='/import'>Start Import Tasks</a>");
+          "<a style='margin-bottom: 15px; min-width: 150px' class='ui positive button' href='import'>Import Tasks</a><br/>"
+          {% if not project.no_tasks %} +
+          "<a style='margin-bottom: 15px; min-width: 150px' class='ui positive button' href='.'>Start Labeling</a><br/>" +
+          "<a class='ui positive button' style='min-width: 150px' href='tasks'>Explore Tasks</a><br/>"
+          {% endif %}
+      );
       $('#error-message').modal('show');
     }
   }
@@ -269,7 +274,7 @@
     let is_label_ok = false;
 
     function check_submit_button() {
-      // Create new project behaviour
+      // Create new project behavior
       if (is_label_ok && labelEditor.getValue() !== '') {
         $('#submit_form').prop('disabled', false);
       } else {

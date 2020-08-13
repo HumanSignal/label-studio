@@ -1,7 +1,7 @@
 ---
 title: View
 type: tags
-order: 508
+order: 505
 ---
 
 View element. It's analogous to div element in html and can be used to visual configure display of blocks
@@ -18,7 +18,7 @@ View element. It's analogous to div element in html and can be used to visual co
 | [whenLabelValue] | <code>string</code> | narrow down visibility by label value |
 | [whenChoiceValue] | <code>string</code> | narrow down visibility by choice value |
 
-### Example  
+### Example
 ```html
 <View style="display: flex;">
   <View style="flex: 50%">
