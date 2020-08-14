@@ -698,7 +698,7 @@ def api_all_tasks():
     # get tasks with completions
     tasks = []
     for item in paginated:
-        if item['completed_at'] != 'undefined':
+        if item['completed_at'] != 'undefined' and item['completed_at'] is not None:
             item['completed_at'] = timestamp_to_local_datetime(item['completed_at']).strftime('%Y-%m-%d %H:%M:%S')
         i = item['id']
         task = project.get_task_with_completions(i)
