@@ -1,5 +1,6 @@
 import logging
 import boto3
+from botocore.client import Config
 import json
 
 from .base import CloudStorage, BaseStorageForm, BooleanField, Optional, StringField
@@ -14,7 +15,7 @@ def get_client_and_resource(aws_access_key_id=None, aws_secret_access_key=None, 
         aws_access_key_id=aws_access_key_id,
         aws_secret_access_key=aws_secret_access_key,
         aws_session_token=aws_session_token)
-    return session.client('s3'), session.resource('s3')
+    return session.client('s3', config=boto3.session.Config(signature_version='s3v4')), session.resource('s3')
 
 
 class S3Storage(CloudStorage):
