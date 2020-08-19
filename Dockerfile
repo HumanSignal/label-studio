@@ -9,6 +9,7 @@ RUN pip install -r requirements.txt
 
 ENV PORT="8080"
 ENV PROJECT_NAME=my_project
+ENV HOST=0.0.0.0
 
 EXPOSE ${PORT}
 

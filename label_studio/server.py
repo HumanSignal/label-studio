@@ -1019,8 +1019,9 @@ def main():
         label_studio.utils.auth.PASSWORD = input_args.password or config.get('password', '')
 
         # set host name
-        host = input_args.host or config.get('host', 'localhost')
+        host = input_args.host or config.get('host', 'localhost')  # name for internal LS usage
         port = input_args.port or config.get('port', 8080)
+        server_host = 'localhost' if host == 'localhost' else '0.0.0.0'  # web server host
 
         # ssl certificate and key
         cert_file = input_args.cert_file or config.get('cert')
@@ -1045,22 +1046,22 @@ def main():
         if input_args.use_gevent:
             app.debug = input_args.debug
             ssl_args = {'keyfile': key_file, 'certfile': cert_file} if ssl_context else {}
-            http_server = WSGIServer((host, port), app, log=app.logger, **ssl_args)
+            http_server = WSGIServer((server_host, port), app, log=app.logger, **ssl_args)
             http_server.serve_forever()
         else:
-            app.run(host=host, port=port, debug=input_args.debug, ssl_context=ssl_context)
+            app.run(host=server_host, port=port, debug=input_args.debug, ssl_context=ssl_context)
 
     # On `start-multi-session` command, server creates one project per each browser sessions
     elif input_args.command == 'start-multi-session':
-        host = input_args.host or '0.0.0.0'
+        server_host = input_args.host or '0.0.0.0'
         port = input_args.port or 8080
 
         if input_args.use_gevent:
             app.debug = input_args.debug
-            http_server = WSGIServer((host, port), app, log=app.logger)
+            http_server = WSGIServer((server_host, port), app, log=app.logger)
             http_server.serve_forever()
         else:
-            app.run(host=host, port=port, debug=input_args.debug)
+            app.run(host=server_host, port=port, debug=input_args.debug)
 
 
 if __name__ == "__main__":

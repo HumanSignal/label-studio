@@ -94,7 +94,7 @@ def parse_input_args():
     )
     root_parser.add_argument(
         '--host', dest='host', type=str,
-        help='Server port')
+        help='Server hostname')
     root_parser.add_argument(
         '-p', '--port', dest='port', type=int,
         help='Server port')
