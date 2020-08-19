@@ -8,8 +8,11 @@ COPY requirements.txt /label-studio
 RUN pip install -r requirements.txt
 
 ENV PORT="8080"
-ENV PROJECT_NAME=my_project
+ENV PROJECT_NAME="my_project"
 ENV HOST=0.0.0.0
+# basic auth params
+ENV USERNAME=""
+ENV PASSWORD=""
 
 EXPOSE ${PORT}
 

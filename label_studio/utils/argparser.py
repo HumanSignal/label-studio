@@ -94,7 +94,9 @@ def parse_input_args():
     )
     root_parser.add_argument(
         '--host', dest='host', type=str,
-        help='Server hostname')
+        help='Server hostname for LS internal usage like upload task urls, sample task urls, etc. '
+             'If you need to start server on localhost instead of 0.0.0.0, just make it "localhost". '
+             'Otherwise web-server host will be 0.0.0.0 always independent of this parameter.')
     root_parser.add_argument(
         '-p', '--port', dest='port', type=int,
         help='Server port')
