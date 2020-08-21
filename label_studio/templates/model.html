@@ -16,54 +16,58 @@
       <div class="ui divider hidden"></div>
       <div class="ui three column grid">
 
-        {% for ml_backend in ml_backends %}
-          <div class="sixteen wide column ui cards">
-            <div class="ui card">
-              <div class="content">
-              <button class="upper-right no-border" onclick='remove_ml_backend({{ ml_backend.model_name|tojson }})'><i class="x icon"></i></button>
+        <div class="sixteen wide column">
+          <div class="ui cards">
+          {% for ml_backend in ml_backends %}
 
-                <div class="header" style="font-weight: lighter; color: #333">{{ ml_backend.dir }} > {{ ml_backend.model_name }}</div>
-                <div class="meta">
-                  <span class="info">{{ ml_backend.url }}</span>
+              <div class="ui card">
+                <div class="content">
+                <button class="upper-right no-border" onclick='remove_ml_backend({{ ml_backend.model_name|tojson }})'><i class="x icon"></i></button>
+
+                  <div class="header" style="font-weight: lighter; color: #333">{{ ml_backend.dir }} > {{ ml_backend.model_name }}</div>
+                  <div class="meta">
+                    <span class="info">{{ ml_backend.url }}</span>
+                  </div>
+                  <div class="description">
+                    {% if ml_backend.model_version  %}
+                      Model version: {{ ml_backend.model_version | str2datetime }}
+                    {% else %}
+                      Model is not trained.
+                    {% endif %}
+                  </div>
                 </div>
-                <div class="description">
-                  {% if ml_backend.model_version  %}
-                    Model version: {{ ml_backend.model_version | str2datetime }}
-                  {% else %}
-                    Model is not trained.
-                  {% endif %}
+                <div class="extra content">
+                  <div>
+                    {% if ml_backend.is_error %}
+                      <a class="log-link" onclick="show_logs(`{{ ml_backend.error.detail }}`, `{{ ml_backend.error.result.traceback }}`, {{ ml_backend.error.status }})">
+                        <i class="x icon" style="color: #ff2733"></i>
+                        Error. Check logs
+                      </a>
+                    {% elif not ml_backend.is_connected %}
+                      <i class="toggle off wide icon"></i>
+                      Disconnected
+                    {% elif ml_backend.is_error %}
+
+                    {% elif ml_backend.training_in_progress %}
+                      <i class="hourglass half wide icon" style="color: #da671b"></i>
+                      Training in progress...
+                    {% else %}
+                      <i class="toggle on wide icon" style="color: #00c22e"></i>
+                      Connected
+                    {% endif %}
+                  </div>
                 </div>
               </div>
-              <div class="extra content">
-                <div>
-                  {% if ml_backend.is_error %}
-                    <a class="log-link" onclick="show_logs(`{{ ml_backend.error.detail }}`, `{{ ml_backend.error.result.traceback }}`, {{ ml_backend.error.status }})">
-                      <i class="x icon" style="color: #ff2733"></i>
-                      Error. Check logs
-                    </a>
-                  {% elif not ml_backend.is_connected %}
-                    <i class="toggle off wide icon"></i>
-                    Disconnected
-                  {% elif ml_backend.is_error %}
 
-                  {% elif ml_backend.training_in_progress %}
-                    <i class="hourglass half wide icon" style="color: #da671b"></i>
-                    Training in progress...
-                  {% else %}
-                    <i class="toggle on wide icon" style="color: #00c22e"></i>
-                    Connected
-                  {% endif %}
-                </div>
-              </div>
+          {% else %}
+            <div class="row centered aligned">
+              <p>No connected ML backends.
+                <a href="https://labelstud.io/guide/ml.html">How to use ML models in Label Studio?</a>
+              </p>
             </div>
+          {% endfor %}
           </div>
-        {% else %}
-          <div class="row centered aligned">
-            <p>No connected ML backends.
-              <a href="https://labelstud.io/guide/ml.html">How to use ML models in Label Studio?</a>
-            </p>
-          </div>
-        {% endfor %}
+        </div>
 
         <!-- Train & Prediction logs -->
         {#          <div class="ui styled accordion fluid">#}
