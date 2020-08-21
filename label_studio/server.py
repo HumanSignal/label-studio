@@ -303,9 +303,16 @@ def model_page():
                 ml_backend.training_in_progress = training_status['is_training']
                 ml_backend.model_version = training_status['model_version']
                 ml_backend.is_connected = True
+                ml_backend.is_error = False
             except Exception as exc:
                 logger.error(str(exc), exc_info=True)
                 ml_backend.is_error = True
+                try:
+                    # try to parse json as the result of @exception_treatment
+                    ml_backend.error = json.loads(str(exc))
+                except ValueError:
+                    ml_backend.error = {'detail': "Can't parse exception message from ML Backend"}
+
         else:
             ml_backend.is_connected = False
         ml_backends.append(ml_backend)

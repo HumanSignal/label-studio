@@ -1,5 +1,10 @@
 {% extends 'base.html' %}
 {% block body %}
+  <style>
+  #error-log-traceback {
+    font-size: 0.9em;
+  }
+  </style>
 
   <div class="ui container">
     <div class="wrapper">
@@ -12,7 +17,7 @@
       <div class="ui three column grid">
 
         {% for ml_backend in ml_backends %}
-          <div class="column">
+          <div class="sixteen wide column ui cards">
             <div class="ui card">
               <div class="content">
               <button class="upper-right no-border" onclick='remove_ml_backend({{ ml_backend.model_name|tojson }})'><i class="x icon"></i></button>
@@ -32,12 +37,14 @@
               <div class="extra content">
                 <div>
                   {% if ml_backend.is_error %}
-                    <i class="x icon" style="color: #ff2733"></i>
-                    Error. Check console logs...
+                    <a class="log-link" onclick="show_logs(`{{ ml_backend.error.detail }}`, `{{ ml_backend.error.result.traceback }}`, {{ ml_backend.error.status }})">
+                      <i class="x icon" style="color: #ff2733"></i>
+                      Error. Check logs
+                    </a>
                   {% elif not ml_backend.is_connected %}
                     <i class="toggle off wide icon"></i>
                     Disconnected
-                    {% elif ml_backend.is_error %}
+                  {% elif ml_backend.is_error %}
 
                   {% elif ml_backend.training_in_progress %}
                     <i class="hourglass half wide icon" style="color: #da671b"></i>
@@ -107,14 +114,39 @@
     </div>
   </div>
 
+  <!-- Error log dialog -->
+  <div class="ui modal" id="error-log-dialog">
+    <i class="close icon"></i>
+    <div class="header red">
+      ML Backend Error
+    </div>
+    <div class="content scrolling">
+      <div class="description" id="error-log-detail"></div>
+      <div class="description" id="error-log-status"></div>
+      <div class="ui divider"></div>
+      <pre class="description" id="error-log-traceback"></pre>
+    </div>
+    <div class="actions">
+      <!-- Close button -->
+      <a class="ui icon cancel button basic" id="upload-done-button" autofocus>Close</a>
+    </div>
+  </div>
+
   <!-- Dimmer and loader -->
   <div class="ui page dimmer">
     <div class="ui large text orange loader">Processing, please wait</div>
   </div>
 
   <script>
+      function show_logs(detail, traceback, status) {
+          $('#error-log-detail').html(detail);
+          $('#error-log-status').html(status);
+          $('#error-log-traceback').html(traceback);
+          $('#error-log-dialog').modal('show');
+      }
+
       function addMlBackend() {
-          let ml_backend = document.getElementById("ml_backend_url").value;
+          var ml_backend = document.getElementById("ml_backend_url").value;
           $.ajax({
             url: "api/project/",
             data: JSON.stringify({ml_backend: ml_backend}),
@@ -139,7 +171,7 @@
       $(document).ready(function () {
           $('.accordion').accordion();
 
-          let holder = $('#holder');
+          var holder = $('#holder');
           holder.on('drop', function (e) {
               e.preventDefault();
               $(this).removeClass('hover');
@@ -180,14 +212,14 @@
 
           // show upload wait dialog
           start_wait();
-          let fd = null;
-          let request = {};
+          var fd = null;
+          var request = {};
 
           // files from disk
           fd = new FormData;
-          for (let i = 0; i < event.target.files.length; i++) {
-              const f = event.target.files[i];
-              let max_size_mb = {{ project.max_tasks_file_size }};
+          for (var i = 0; i < event.target.files.length; i++) {
+              var f = event.target.files[i];
+              var max_size_mb = {{ project.max_tasks_file_size }};
               if (f.size / 1024.0 / 1024.0 > max_size_mb) {
                   alert('Sorry, but file size is too big (more ' + max_size_mb + ' mb).\n<br/>' +
                       'Try to split your file by chunks or zip it', false);
@@ -207,15 +239,15 @@
           };
 
           $.ajax(request)
-              .done(answer => {
+              .done(function(answer) {
                   stop_wait(answer['new_task_ids'], true);
               })
-              .fail(answer => {
-                  let msg = "Error: can't upload/process file on server side. Reasons:<br><br>";
+              .fail(function(answer) {
+                  var msg = "Error: can't upload/process file on server side. Reasons:<br><br>";
 
                   if (answer.responseJSON != null) {
-                      let rows = answer.responseJSON;
-                      for (let i in rows) {
+                      var rows = answer.responseJSON;
+                      for (var i in rows) {
                           const escaped = $('<div>').text(rows[i]).html();
                           const split = escaped.split('::');
                           msg += '<div class="upload-row-error">' +
