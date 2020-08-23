@@ -311,7 +311,7 @@ class CloudStorage(BaseStorage):
         except Exception as exc:
             # return {'error': True, 'message': str(exc)}
             logger.error(str(exc), exc_info=True)
-            raise exc
+            return
         if 'data' in data:
             data['id'] = id
             return data
