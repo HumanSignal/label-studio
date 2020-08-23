@@ -793,7 +793,7 @@
           $('body').toast({
             class: 'error',
             title: title,
-            message: message,
+            message: '<pre>' + message + '</pre>',
             displayTime: this.timer_interval * 2,
             position: 'bottom center'
           })

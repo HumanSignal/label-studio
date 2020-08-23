@@ -559,3 +559,15 @@ pre {
         margin-left: 2em;
     }
 }
+
+.toast .content {
+    max-width: 600px;
+}
+.toast pre {
+    font-family: Rubik, sans-serif;
+    white-space: pre-wrap; /* css-3 */
+    white-space: -moz-pre-wrap;
+    white-space: -pre-wrap;
+    white-space: -o-pre-wrap;
+    word-wrap: break-word !important;
+}
