@@ -360,6 +360,7 @@ def model_page():
                 ml_backend.training_in_progress = training_status['is_training']
                 ml_backend.model_version = training_status['model_version']
                 ml_backend.is_connected = True
+                ml_backend.is_error = False
             except Exception as exc:
                 logger.error(str(exc), exc_info=True)
                 ml_backend.is_error = True
