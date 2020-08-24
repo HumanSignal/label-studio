@@ -60,7 +60,7 @@
               </div>
 
           {% else %}
-            <div class="row centered aligned">
+            <div style="margin: 0 auto">
               <p>No connected ML backends.
                 <a href="https://labelstud.io/guide/ml.html">How to use ML models in Label Studio?</a>
               </p>
@@ -90,7 +90,7 @@
               <div class="ui positive big button" onclick="start_predictions()">Start Predictions</div>
             {% endif %}
           </div>
-      {% endif %}
+        {% endif %}
 
         {% if project.data_types|length == 1 %}
           <!-- File uploader -->

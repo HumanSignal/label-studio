@@ -53,6 +53,7 @@ class Project(object):
         self.derived_input_schema, self.derived_output_schema = None, None
 
         self.load_label_config()
+        self.load_project_and_ml_backends()
         self.update_derived_input_schema()
         self.update_derived_output_schema()
 
@@ -61,7 +62,6 @@ class Project(object):
 
         self.project_obj = None
         self.ml_backends = []
-        self.load_project_ml_backend()
 
         self.converter = None
         self.load_converter()
@@ -210,7 +210,7 @@ class Project(object):
         self.config['ml_backends'] = config_params
         self._save_config()
 
-    def load_project_ml_backend(self):
+    def load_project_and_ml_backends(self):
         # configure project
         self.project_obj = ProjectObj(label_config=self.label_config_line, label_config_full=self.label_config_full)
 
@@ -285,7 +285,7 @@ class Project(object):
         self.load_label_config()
         self.update_derived_output_schema()
         self.load_analytics()
-        self.load_project_ml_backend()
+        self.load_project_and_ml_backends()
         self.load_converter()
 
         # save project config state
