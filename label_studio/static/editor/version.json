@@ -1,6 +1,6 @@
 {
-  "message": "Fix ids for Regions tree when copy prediction",
-  "commit": "fd1e7cad9fdab9ca3c55691b2d0ee23905d51d59",
+  "message": "Merge pull request #136 from heartexlabs/feature/granularity-per-label\n\nAdd granularity per Label",
+  "commit": "1b4b1867aea6c6475513ca938c0ecc67ee0fa7e2",
   "branch": "master",
-  "date": "2020-08-12T20:30:46Z"
+  "date": "2020-08-24T14:01:38Z"
 }
