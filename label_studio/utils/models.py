@@ -47,7 +47,7 @@ class ProjectObj(object):
     max_tasks_file_size = attr.ib(default=250)
 
     def __attrs_post_init__(self):
-        """ Init analogue for attr class
+        """ Init analog for attr class
         """
         self.data_types = self.extract_data_types(self.label_config)
 

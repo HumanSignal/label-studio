@@ -61,3 +61,21 @@ label-studio my_new_project start --init --label-config config.xml
 ### Setup labeling config from UI
 
 You can also use the web interface at [`/setup`](http://localhost:8080/setup) to paste your labeling config. Using web UI you also get a live update while you're editting the config.
+
+
+
+### Setup labeling config from API
+
+Save labeling config for the project using API: 
+```
+curl -X POST -H Content-Type:application/json http://localhost:8080/api/save-config \
+--data "{\"label_config\": \"<View>[...]</View>\"}"
+```
+
+The backend should return status 201 if config is valid and saved. 
+If errors occur the backend returns status 400 and response body will be JSON dict: 
+```
+{
+  "label_config": ["error 1 description", " error 2 description", ...]
+}
+```

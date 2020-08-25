@@ -6,13 +6,13 @@ order: 301
 
 Analyze the chat dialog, classify it and provide your own answer
 
-<img src="/images/screens/dialogue_analysis.png" class="img-template-example" title="Dialogue Analysis" />
+<img src="/images/screens/dialogue_analysis.png" class="img-template-example" title="Dialog Analysis" />
 
 ## Run
 
 ```bash
-label-studio init --template=dialogue_analysis dialogue_analysis_project
-label-studio start dialogue_analysis_project 
+label-studio init --template=dialog_analysis dialog_analysis_project
+label-studio start dialog_analysis_project 
 ```
 
 ## Config 

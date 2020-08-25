@@ -1,5 +1,5 @@
 ---
-title: Labeling
+title: Labeling Interface
 type: guide
 order: 104
 ---
@@ -13,23 +13,13 @@ Let's explore the complex example of multi-task labeling which includes text + i
 
 * Labeling interface is highly configurable: you can enable or disable some parts of it (completions panel, predictions panel, results panel, controls, submit & skip buttons).  
 
-## Key concepts
-
-Here you can see relations among labeling objects: tasks, completions, results, etc.
-
-One user provides one completion, it’s atomic, and it consists of the result items. Result items can have relations between themselves with the specified direction of three types: left-right, right-left, or bidirectional. Normalizations are additional information in the custom string format about the current result item.
- 
-<br>
-<center><img src="/images/labeling-scheme.png" style="max-width: 600px; opacity: 0.6"></center>
-<br>
-Completions and Predictions are very similar. But predictions must be generated automatically by ML models.   
 
 ## Instructions
 
 Most of the actions described in this section are similar for all the data objects (images, audio, text, etc.).
 
 ### Choices, TextArea and other simple tags
-Such tags have straightforward labeling mechanics. It’s intuitive for users, so let’s talk about more complex things below :-) 
+Such tags have straightforward labeling mechanics. It’s intuitive for users, so let’s talk about more complex things below. 
 
 ### Add region
 1. Select label you want to add (if you use Tag without labels like Polygon, just go to 2)

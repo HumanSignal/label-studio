@@ -1,11 +1,11 @@
 ---
 title: EllipseLabels
 type: tags
-order: 416
-is_new: t
+order: 405
 ---
 
-EllipseLabels tag creates labeled ellipses. Used to create an ellipse on the image 
+EllipseLabels tag creates labeled ellipses
+Used only for Image
 
 ### Parameters
 
@@ -19,7 +19,7 @@ EllipseLabels tag creates labeled ellipses. Used to create an ellipse on the ima
 | [strokeWidth] | <code>number</code> | <code>1</code> | width of stroke |
 | [canRotate] | <code>boolean</code> | <code>true</code> | show or hide rotation handle |
 
-### Example  
+### Example
 ```html
 <View>
   <EllipseLabels name="labels" toName="image">

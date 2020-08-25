@@ -1,6 +1,7 @@
 import json
 import os
 import logging
+from copy import deepcopy
 
 from label_studio.utils.io import json_load, delete_dir_content, iter_files
 from .base import BaseStorage, BaseForm, CloudStorage
@@ -28,7 +29,7 @@ class JSONStorage(BaseStorage):
 
     def _save(self):
         with open(self.path, mode='w', encoding='utf8') as fout:
-            json.dump(self.data, fout, ensure_ascii=False, indent=2)
+            json.dump(self.data, fout, ensure_ascii=False)
 
     @property
     def readable_path(self):
@@ -156,7 +157,7 @@ class ExternalTasksJSONStorage(CloudStorage):
             path=os.path.join(project_path, 'tasks.json'),
             use_blob_urls=False,
             prefix=None,
-            regex='.*',
+            regex=None,
             create_local_copy=False,
             sync_in_thread=False,
             **kwargs
@@ -166,7 +167,7 @@ class ExternalTasksJSONStorage(CloudStorage):
 
     def _save(self):
         with open(self.path, mode='w', encoding='utf8') as fout:
-            json.dump(self.data, fout, ensure_ascii=False, indent=2)
+            json.dump(self.data, fout, ensure_ascii=False)
 
     def _get_client(self):
         pass
@@ -183,7 +184,7 @@ class ExternalTasksJSONStorage(CloudStorage):
         return self.path
 
     def _get_value(self, key):
-        return self.data[int(key)]
+        return deepcopy(self.data[int(key)])
 
     def _set_value(self, key, value):
         self.data[int(key)] = value
@@ -194,8 +195,12 @@ class ExternalTasksJSONStorage(CloudStorage):
 
     def set_many(self, ids, values):
         for id, value in zip(ids, values):
-            super(ExternalTasksJSONStorage, self).set(id, value)
+            super(ExternalTasksJSONStorage, self)._pre_set(id, value)
+        self._save_ids()
         self._save()
+
+    def iter_full_keys(self):
+        return (self.key_prefix + key for key in self._get_objects())
 
     def _get_objects(self):
         self.data = json_load(self.path, int_keys=True)
@@ -203,7 +208,7 @@ class ExternalTasksJSONStorage(CloudStorage):
 
     def _remove_id_from_keys_map(self, id):
         full_key = self.key_prefix + str(id)
-        assert self._ids_keys_map[id]['key'] == full_key
+        assert self._ids_keys_map[id]['key'] == full_key, (self._ids_keys_map[id]['key'], full_key)
         self._selected_ids.remove(id)
         self._ids_keys_map.pop(id)
         self._keys_ids_map.pop(full_key)

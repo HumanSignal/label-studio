@@ -21,18 +21,6 @@ th {
     border: 1px solid #ccc;
 }
 
-@media screen and (max-width: 768px) {
-    table.responsive tbody th,
-    table.responsive tbody td {
-        text-align: left;
-        display: block;
-        border: none;
-    }
-    table tr {
-        border-top: 1px solid #ddd;
-    }
-}
-
 h1 {
     font-weight: normal !important;
 }
@@ -40,6 +28,30 @@ h1 {
 h2 {
     font-size: 1.2em;
     font-weight: normal !important;
+}
+
+hotkey {
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 0.1em 0.5em;
+    margin: 0 0.2em;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 2px #fff inset;
+    background-color: #f7f7f7;
+}
+hotkey i {
+    color: #777;
+}
+.hotkey-helper {
+    margin-bottom: 1.0em;
+}
+.hotkey-helper .keys {
+    min-width: 15em;
+    display: inline-block;
+}
+.hotkey-helper .description {
+    margin-left: 1.5em;
+    display: inline-block;
 }
 
 .wrapper {
@@ -108,11 +120,11 @@ a {
     background-color: #fff;
     display: flex;
     align-items: center;
-    padding: 10px 20px 10px 40px;
+    padding: 5px 20px 5px 40px;
     position: relative;
-    z-index: 100;
-    box-shadow: rgba(0, 0, 0, 0.15) 0 2px 3px 0;
+    box-shadow: 0 4px 3px -2px rgba(0, 0, 0, 0.0774);
     margin-bottom: 3em;
+    height: 50px;
 }
 
 #logo {
@@ -126,13 +138,15 @@ a {
 
 .img-logo {
     vertical-align: middle;
-    margin-right: 6px;
-    width: 40px;
-    height: 40px;
+    margin-right: 5px;
+    margin-top: 5px;
+    width: 30px;
+    height: 30px;
 }
 
 .img-text {
-    font-size: 1.4em;
+    font-size: 24px;
+    margin-left: 0.25em
 }
 
 #nav {
@@ -147,18 +161,43 @@ a {
 }
 
 #nav a {
-    color: #304455;
+    color: #797979;
     font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
-    margin-right: 1em;
+    margin-right: 2em;
     font-size: 14px;
+
+    transition: border-bottom-color 0.25s ease-in-out;
+    border-bottom: 3px rgba(74, 251, 130, 0) solid;
+    padding: 7px 0.4em 4px;
 }
 
 #nav a:hover {
-    text-decoration: underline;
+    transition: border-bottom-color 0.25s ease-in-out;
+    border-bottom: 3px #2493FB solid;
 }
 
 #nav a.active {
-    font-weight: bold;
+    color: #2493FB;
+    transition: border-bottom-color 0.25s ease-in-out;
+    border-bottom: 3px #2493FB solid;
+}
+
+#nav .outside-links, #nav .outside-links:hover {
+    border-bottom-color: rgba(0,0,0,0.0);
+    padding-left: unset;
+    padding-right: unset;
+}
+.outside-links {
+    transition: opacity 0.25s ease-in-out !important;
+    color: #444 !important;
+    opacity: 0.7;
+}
+.outside-links:hover {
+    transition: opacity 0.25s ease-in-out !important;
+    opacity: 1.0;
+}
+.outside-links.first {
+    margin-left: 3em;
 }
 
 #new-project-button:hover {
@@ -349,18 +388,14 @@ div[class*="App_editor"] {
     margin-top: 0.7em;
 }
 
-.ui ul, ol {
+.ui ul.list, .ui .list ol {
     list-style: none !important;
     margin: 1em 0 0 2em;
 }
 
-.ui ul li::before {
+.ui ul.list li::before {
     content: "\2022";
     color: rgba(0, 0, 0, 0.4) !important;
-    font-weight: normal;
-    display: inline-block;
-    width: 1em;
-    margin-left: -1em;
 }
 
 .ui .label.basic {
@@ -443,15 +478,36 @@ pre {
     color: #555;
 }
 
+.sup-button {
+    position: relative;
+    top: 2px;
+    cursor: pointer;
+    font-size: 0.75em;
+    color: rgb(24, 144, 255);
+    transition: background-color ease-in-out 0.25s;
+}
+.sup-button.big {
+    font-size: 1.25em !important;
+}
 
-@media only screen and (max-width: 890px) {
+.sup-button:hover {
+    color: rgb(54, 162, 255);
+    transition: background-color ease-in-out 0.25s;
+}
+
+
+@media only screen and (max-width: 905px) {
     #logo {
         font-size: 1.5em;
         line-height: 40px;
         color: #273849;
         font-family: "Dosis", "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
         font-weight: 500;
-        display: flex;
+        display: inline-flex;
+        margin-left: 10px;
+    }
+    .img-logo {
+        margin-top: 0 !important;
     }
 
     .img-text {
@@ -470,38 +526,36 @@ pre {
         flex-direction: row;
         right: 1px;
     }
-
-    #logo {
-        display: inline-flex;
-    }
-
 }
 
-@media only screen and (max-width: 650px) {
+@media screen and (max-width: 768px) {
+    table.responsive tbody th,
+    table.responsive tbody td {
+        text-align: left;
+        display: block;
+        border: none;
+    }
+    table tr {
+        border-top: 1px solid #ddd;
+    }
+
     #logo {
         display: none;
     }
 
     #header {
-        height: 80px;
         display: flex;
         justify-content: center;
+        height: 80px;
     }
-}
 
-.sup-button {
-    position: relative;
-    top: 2px;
-    cursor: pointer;
-    font-size: 0.75em;
-    color: rgb(24, 144, 255);
-    transition: background-color ease-in-out 0.25s;
-}
-.sup-button.big {
-    font-size: 1.25em !important;
-}
-
-.sup-button:hover {
-    color: rgb(54, 162, 255);
-    transition: background-color ease-in-out 0.25s;
+    #nav a {
+        padding-top: 0;
+        padding-bottom: 0;
+        line-height: 25px;
+        margin: 0 0.5em;
+    }
+    #nav a.outside-links.first {
+        margin-left: 2em;
+    }
 }
