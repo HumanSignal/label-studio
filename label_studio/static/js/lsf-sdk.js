@@ -256,7 +256,7 @@ const LSF_SDK = function(elid, config, task) {
 
       return req.then(httpres => httpres.json()
         .then(function(res) {
-          isNewDraft && red.id && c.updatePersonalKey(res.id.toString());
+          isNewDraft && res.id && c.updatePersonalKey(res.id.toString());
           return res;
         })
         .catch(() => true)
@@ -292,9 +292,14 @@ const LSF_SDK = function(elid, config, task) {
       );
 
       req.then(function(httpres) {
-        ls.setFlags({ isLoading: false });
-        // refresh task from server
-        loadTask(ls, ls.task.id, ls.completionStore.selected.id);
+        // if that was actually the submit after some autosaved draft
+        if (!task && !c.sentUserGenerate) {
+          loadNext(ls);
+        } else {
+          ls.setFlags({ isLoading: false });
+          // refresh task from server
+          loadTask(ls, ls.task.id, ls.completionStore.selected.id);
+        }
       });
     },
 
