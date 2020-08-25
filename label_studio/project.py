@@ -43,7 +43,7 @@ class Project(object):
 
         self.on_boarding = {}
         self.context = context or {}
-
+        self.project_obj = None
         self.source_storage = None
         self.target_storage = None
         self.create_storages()
@@ -60,7 +60,6 @@ class Project(object):
         self.analytics = None
         self.load_analytics()
 
-        self.project_obj = None
         self.ml_backends = []
 
         self.converter = None
