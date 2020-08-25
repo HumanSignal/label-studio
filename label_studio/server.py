@@ -561,7 +561,7 @@ def api_generate_next_task():
 
     task = resolve_task_data_uri(task)
 
-    #project.analytics.send(getframeinfo(currentframe()).function)
+    project.analytics.send(getframeinfo(currentframe()).function)
 
     # collect prediction from multiple ml backends
     if project.ml_backends_connected:
@@ -587,6 +587,7 @@ def api_project():
 
     output = project.serialize()
     output['multi_session_mode'] = input_args.command != 'start-multi-session'
+    project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
     return make_response(jsonify(output), code)
 
 
@@ -730,11 +731,11 @@ def api_tasks(task_id):
     if request.method == 'GET':
         task_data = project.get_task_with_completions(task_id) or project.source_storage.get(task_id)
         task_data = resolve_task_data_uri(task_data)
-        project.analytics.send(getframeinfo(currentframe()).function)
+        project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
         return make_response(jsonify(task_data), 200)
     elif request.method == 'DELETE':
         project.remove_task(task_id)
-        project.analytics.send(getframeinfo(currentframe()).function)
+        project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
         return make_response(jsonify('Task deleted.'), 204)
 
 
@@ -775,11 +776,11 @@ def api_completions(task_id):
         completion.pop('skipped', None)
         completion.pop('was_cancelled', None)
         completion_id = project.save_completion(int(task_id), completion)
-        project.analytics.send(getframeinfo(currentframe()).function)
+        project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
         return make_response(json.dumps({'id': completion_id}), 201)
 
     else:
-        project.analytics.send(getframeinfo(currentframe()).function, error=500)
+        project.analytics.send(getframeinfo(currentframe()).function, error=500, method=request.method)
         return make_response('Incorrect request method', 500)
 
 
@@ -810,13 +811,13 @@ def api_completion_by_id(task_id, completion_id):
     if request.method == 'DELETE':
         if project.config.get('allow_delete_completions', False):
             project.delete_completion(int(task_id))
-            project.analytics.send(getframeinfo(currentframe()).function)
+            project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
             return make_response('deleted', 204)
         else:
-            project.analytics.send(getframeinfo(currentframe()).function, error=422)
+            project.analytics.send(getframeinfo(currentframe()).function, error=422, method=request.method)
             return make_response('Completion removing is not allowed in server config', 422)
     else:
-        project.analytics.send(getframeinfo(currentframe()).function, error=500)
+        project.analytics.send(getframeinfo(currentframe()).function, error=500, method=request.method)
         return make_response('Incorrect request method', 500)
 
 
