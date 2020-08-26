@@ -44,7 +44,7 @@ from label_studio.utils.functions import (
 from label_studio.utils.misc import (
     exception_treatment, exception_treatment_page,
     config_line_stripped, get_config_templates, convert_string_to_hash, serialize_class,
-    DirectionSwitch, check_port_in_use
+    DirectionSwitch, check_port_in_use, timestamp_to_local_datetime
 )
 from label_studio.utils.argparser import parse_input_args
 from label_studio.utils.uri_resolver import resolve_task_data_uri
@@ -712,6 +712,8 @@ def api_all_tasks():
     # get tasks with completions
     tasks = []
     for item in paginated:
+        if item['completed_at'] != 'undefined' and item['completed_at'] is not None:
+            item['completed_at'] = timestamp_to_local_datetime(item['completed_at']).strftime('%Y-%m-%d %H:%M:%S')
         i = item['id']
         task = project.get_task_with_completions(i)
         if task is None:  # no completion at task

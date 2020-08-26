@@ -15,7 +15,7 @@ from datetime import datetime
 from label_studio_converter import Converter
 
 from label_studio.utils.misc import (
-    config_line_stripped, config_comments_free, parse_config, timestamp_now, timestamp_to_local_datetime)
+    config_line_stripped, config_comments_free, parse_config, timestamp_now)
 from label_studio.utils.analytics import Analytics
 from label_studio.utils.models import ProjectObj, MLBackend
 from label_studio.utils.exceptions import ValidationError
@@ -470,11 +470,9 @@ class Project(object):
         for _, data in self.target_storage.items():
             id = data['id']
             try:
-                latest_time = max(data['completions'], key=itemgetter('created_at'))['created_at']
+                times[id] = max(data['completions'], key=itemgetter('created_at'))['created_at']
             except Exception as exc:
                 times[id] = 'undefined'
-            else:
-                times[id] = timestamp_to_local_datetime(latest_time).strftime('%Y-%m-%d %H:%M:%S')
         return times
 
     def get_skipped_status(self):
