@@ -162,6 +162,9 @@
       .pagination {
         min-width: unset;
       }
+      .mobile-divider {
+        height: 50px;
+      }
     }
   </style>
 
@@ -426,6 +429,8 @@
             <i class="ui loader active blue tiny inline"
                :style="{opacity: tasks_loaded ? 0: 0.5, 'margin-left': '10px', 'margin-top': quick_view ? '0' : '13px'}"></i>
           </div>
+
+          <div class="mobile-divider"></div>
         </div> <!-- left column -->
 
         <div class="column" :class="width_mapping[quick_view_right_width] + ' wide'"
