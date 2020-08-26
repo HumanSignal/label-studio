@@ -14,7 +14,7 @@ The most common mistake while resource loading is <b>CORS</b> (Cross-Origin Reso
 <center>
   <img src='/images/cors-error.png' style="max-width:500px; opacity: 0.8">
   <br/><br/>
-  <img src='/images/cors-error-2.png'>
+  <img src='/images/cors-error-2.png' style="max-width:500px; opacity: 0.8">
 </center>
 
 * If you have an access to the hosting server as admin then you need to allow CORS for the web server. For nginx you can try to add <a href="javascript:void(0)" onclick="$('#nginx-cors-code').toggle()">these lines</a> to `/etc/nginx/nginx.conf` into your `location` section: 
