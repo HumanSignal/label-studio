@@ -11,10 +11,10 @@
     .table-wrapper {
       overflow-x: auto;
       padding-bottom: 1em;
-      min-width: 347px;
+      min-width: 188px;
     }
     .task-table {
-      min-width: 347px;
+      min-width: 188px;
     }
 
     ::-webkit-scrollbar-track {
@@ -72,7 +72,7 @@
 
     .pagination {
       height: 10px !important;
-      min-width: 347px;
+      min-width: 188px;
     }
 
     .pagination-size {
@@ -130,6 +130,11 @@
       align-content: center;
       justify-content: center;
       display: flex;
+    }
+
+    .hidden-items:hover {
+      color: #0c85d0;
+      transition: 0.2s color ease-in-out;
     }
 
     @media screen and (max-width: 768px) {
@@ -263,10 +268,18 @@
       <div class="ui divider hidden"></div>
     </div> <!-- container -->
 
+
+
+
+
+
     <div class="ui container" style="width: 98%">
 
       <div class="ui grid stackable">
-        <div class="column" :class="{'five wide': quick_view, 'sixteen wide': !quick_view}" style="min-width: 300px;">
+        <div class="column" id="left-panel"
+             v-if="!(quick_view_left_width === 0 && quick_view)"
+             :class="quick_view ? width_mapping[quick_view_left_width] + ' wide' : 'sixteen wide'"
+             style="'min-width:188px;">
           <!-- Table -->
           <div class="table-wrapper">
             <table v-if="project.task_count > 0" class="task-table responsive" :class="{'center-margin': !quick_view}">
@@ -308,12 +321,11 @@
               <tr v-if="task != null" class="text-center"
                   v-for="task, index in tasks"
                   :class="{selected: current_task && current_task.id===task.id}"
-                  @click.exact="toggleTaskPreview(index)" @click.ctrl.exact="window.open('.?task_id=' + task.id)"
-              >
+                  @click.exact="toggleTaskPreview(index)" @click.ctrl.exact="window.open('.?task_id=' + task.id)">
                 <!-- Task ID -->
                 <td class="text-center" v-if="columns.includes('id')">
                   <span class="ui mini blue loader inline active" v-if="task.processing"></span>
-                  {{ task.id }}
+                  <span @click.stop="window.open('api/tasks/' + task.id)" class="hidden-items">{{ task.id }}</span>
                 </td>
                 <!-- Completed at -->
                 <td v-if="columns.includes('completed_at')">
@@ -367,12 +379,12 @@
 
               <div class="item">
                 <input v-model="page" style="border:none" type="number" min="1" :max="totalPages">
-                <span style="cursor:pointer" @click="page=totalPages">&nbsp; of &nbsp;&nbsp;
+                <span style="cursor:pointer" @click="page=totalPages" v-if="full_pagination">&nbsp; of &nbsp;&nbsp;
                 {{ totalPages }}
               </span>
               </div>
 
-              <div class="item">
+              <div class="item" v-if="full_pagination">
                 <select class="pagination-size" v-model="page_size">
                   <option>1</option>
                   <option>5</option>
@@ -382,12 +394,7 @@
                 </select>
               </div>
 
-              <!-- <div class="item"><span data-tooltip="Auto update project info and tasks by timer (about 5 sec)">
-                <i class="far fa-clock" :style="{opacity: auto_update_timer ? 1.0: 0.5, cursor: 'pointer'}"
-                   @click="toggleAutoUpdateTimer()"></i>
-              </span></div> -->
-
-              <div class="item action-item" @click="show_table_settings=!show_table_settings">
+              <div class="item action-item" @click="show_table_settings=!show_table_settings" v-if="full_pagination">
                 <i class="fa fa-cog"></i>
               </div>
 
@@ -399,19 +406,29 @@
             <i class="ui loader active blue tiny inline"
                :style="{opacity: tasks_loaded ? 0: 0.5, 'margin-left': '10px', 'margin-top': quick_view ? '0' : '13px'}"></i>
           </div>
-        </div>
+        </div> <!-- left column -->
 
-        <div class="column eleven wide" :style="{display: quick_view ? 'inherit': 'none'}">
+        <div class="column" :class="width_mapping[quick_view_right_width] + ' wide'"
+             :style="{display: quick_view ? 'inherit': 'none'}">
           <!-- LS Frontend -->
           <div id="label-studio">
             <div class="ui loader active inline centered"></div>
           </div>
         </div>
 
-      </div>
+      </div> <!-- right column -->
 
       <br/><br/>
+
+      <!-- Settings while hidden left panel -->
+      <div class="action-item" @click="show_table_settings=!show_table_settings" v-if="!full_pagination">
+        <center><i class="fa fa-cog"></i></center>
+      </div>
+
     </div>
+
+
+
 
 
 
@@ -426,7 +443,7 @@
       <!-- Content -->
       <div class="scrolling content">
         <h4>Columns to show</h4>
-        <div class="ui list">
+        <div class="ui list horizontal">
           <div class="item ui checkbox" v-for="item in all_columns">
             <input type="checkbox" class="ui checkbox" v-model="columns" :value="item">
             <label>{{ item }}</label>
@@ -435,32 +452,72 @@
 
         <div class="ui divider hidden"></div>
 
+        <h4 style="margin-bottom: 12px">Left & right panels in Quick View</h4>
+        <div class="ui form">
+          <div class="fields">
+            <div class="one width field">
+              Left width <input type="number" v-model="quick_view_left_width" min="0" max="14">
+            </div>
+            <div class="one width field">
+              Right width <input type="number" v-model="quick_view_right_width" min="2" max="16">
+            </div>
+          </div>
+
+          <a class="ui button" @click="quick_view_left_width=0"
+             data-tippy-content="Hide left panel in quick view.<br>Use hotkeys to move across tasks<br>
+                                 Press <hotkey style='color:#777;font-size:80%'>q</hotkey> to show settings again">
+            Hide Left Panel
+          </a>
+          <a class="ui button" @click="quick_view_left_width=4;">Restore Defaults</a>
+
+        </div>
+
+        <div class="ui divider hidden"></div>
+
+        <h4>Auto update timer</h4>
+        <div>
+
+          <a class="ui button" @click="toggleAutoUpdateTimer()">
+            <i class="fa-clock" :class="auto_update_timer ? 'fas': 'far'"></i>
+            {{ 'Timer ' + (auto_update_timer ? 'Enabled': 'Disabled') }}
+          </a>
+          Auto update project info and tasks by 5 sec timer
+        </div>
+
+        <div class="ui divider hidden"></div>
+
+        <!-- Hotkeys -->
         <h4>Hotkeys</h4>
         <div style="margin-top: 1em">
-              <div class="hotkey-helper">
-                <div class="keys"><hotkey>shift</hotkey> + <hotkey>←</hotkey> or <hotkey>a</hotkey></div>
-                <span class="description">previous page</span>
-              </div>
+          <div class="hotkey-helper">
+            <div class="keys"><hotkey>q</hotkey></div>
+            <span class="description">show settings</span>
+          </div>
 
-              <div class="hotkey-helper">
-                <div class="keys"><hotkey>shift</hotkey> + <hotkey>→</hotkey> or <hotkey>d</hotkey></div>
-                <span class="description">next page</span>
-              </div>
+          <div class="hotkey-helper">
+            <div class="keys"><hotkey>shift</hotkey> + <hotkey>←</hotkey> or <hotkey>a</hotkey></div>
+            <span class="description">previous page</span>
+          </div>
 
-              <div class="hotkey-helper">
-                <div class="keys"><hotkey>shift</hotkey> + <hotkey>↑</hotkey> or <hotkey>w</hotkey></div>
-                <span class="description">previous item</span>
-              </div>
+          <div class="hotkey-helper">
+            <div class="keys"><hotkey>shift</hotkey> + <hotkey>→</hotkey> or <hotkey>d</hotkey></div>
+            <span class="description">next page</span>
+          </div>
 
-              <div class="hotkey-helper">
-                <div class="keys"><hotkey>shift</hotkey> + <hotkey>↓</hotkey> or <hotkey>s</hotkey></div>
-                <span class="description">next item</span>
-              </div>
+          <div class="hotkey-helper">
+            <div class="keys"><hotkey>shift</hotkey> + <hotkey>↑</hotkey> or <hotkey>w</hotkey></div>
+            <span class="description">previous item</span>
+          </div>
 
-              <div class="hotkey-helper">
-                <div class="keys"><hotkey>ctrl</hotkey> + <hotkey>click on row</hotkey></div>
-                <span class="description">open task explore in new window</span>
-              </div>
+          <div class="hotkey-helper">
+            <div class="keys"><hotkey>shift</hotkey> + <hotkey>↓</hotkey> or <hotkey>s</hotkey></div>
+            <span class="description">next item</span>
+          </div>
+
+          <div class="hotkey-helper">
+            <div class="keys"><hotkey>ctrl</hotkey> + <hotkey>click on row</hotkey></div>
+            <span class="description">open task explore in new window</span>
+          </div>
 
         </div>
       </div>
@@ -478,6 +535,8 @@
   <script src="static/js/components/imageWithFadeIn.js"></script>
   <script src="static/js/components/vue-tippy.min.js"></script>
   <script>
+    var PAGINATION_MAX_WIDTH = 347;
+
     Vue.use(SemanticUIVue);
     Vue.use(VueTippy);
 
@@ -503,8 +562,11 @@
           full_columns: ['id', 'completed_at', 'skipped', 'delete', 'others'],
           quick_columns: ['id', 'completed_at'],
           quick_view: false,
+          quick_view_left_width: 4,
+          quick_view_right_width: 12,
           current_task: null,
-          current_task_index: -1,
+          current_task_index: -10,
+          full_pagination: true,
 
           // provided by api/project
           project: {% endraw %}{{ serialized_project|json|safe }}{% raw %},
@@ -552,10 +614,10 @@
         getApi: function (dst, url, always, fail, done) {
           /* this api call will do vue.data['dst'] = get(url) */
 
-          var root = this;
+          var self = this;
           $.get(url + (url.includes('?') ? '&' : '?') + 'rnd=' + randomInteger(0, 100000))
             .done(function (data) {
-              setValue(root, dst, data);
+              setValue(self, dst, data);
               if (done) done(data);
               if (always) always(data);
               // console.log(dst + ' loaded');
@@ -563,7 +625,7 @@
             .fail(function (data) {
               if (fail) fail(data);
               else {
-                root.showError('Error while get api for <' + dst + '>:', message_from_response(data));
+                self.showError('Error while get api for <' + dst + '>:', message_from_response(data));
               }
               if (always) always(data);
               console.log('error: no ' + dst + ' loaded')
@@ -572,47 +634,60 @@
 
         // get tasks from api
         loadTasks: function () {
-          var root = this;
-          root.tasks_loaded = false;
+          var self = this;
+          self.tasks_loaded = false;
           this.getApi('tasks', 'api/tasks/?page=' + this.page +
             '&page_size=' + parseInt(this.page_size) +
-            '&order=' + this.order, null,
-            // fail
-            function (data) {
-              root.showError('Tasks loading error', message_from_response(data))
-            },
-
+            '&order=' + this.order,
             // always
             function (data) {
-              root.tasks_loaded = true;
+              self.tasks_loaded = true;
+            },
+            // fail
+            function (data) {
+              self.showError('Tasks loading error', message_from_response(data))
+            },
+            // done
+            function () {
+              // set task position to the first task
+              if (self.current_task_index === -1) {
+                self.current_task_index = 0;
+                self.openTaskPreview(self.tasks[self.current_task_index]);
+              }
+              // set task position to the last task
+              else if (self.current_task_index === -2) {
+                self.current_task_index = self.tasks.length - 1;
+                self.openTaskPreview(self.tasks[self.current_task_index]);
+              }
             }
+
           );
         },
 
         // get project info from api
         loadProject: function () {
-          var root = this;
+          var self = this;
           this.getApi('project', 'api/project/',
             // always
             function () {
-              root.project_loaded = true;
+              self.project_loaded = true;
             },
             // fail
             function (data) {
-              root.showError('Project loading error', message_from_response(data));
+              self.showError('Project loading error', message_from_response(data));
             }
           );
         },
 
         // get tasks from api
         loadStorageSettings: function () {
-          var root = this;
-          root.storage_settings.source.type_loading = root.storage_settings.target.type_loading = true;
+          var self = this;
+          self.storage_settings.source.type_loading = self.storage_settings.target.type_loading = true;
           this.getApi('storage_settings_all', 'api/project/storage-settings/',
             function () {
-              root.storage_settings.source.type_loading = root.storage_settings.target.type_loading = false;
-              root.changeStorageSettings('source', 'current');
-              root.changeStorageSettings('target', 'current');
+              self.storage_settings.source.type_loading = self.storage_settings.target.type_loading = false;
+              self.changeStorageSettings('source', 'current');
+              self.changeStorageSettings('target', 'current');
             });
         },
 
@@ -643,10 +718,10 @@
         },
 
         saveStorageSettings: function (storage_for) {
-          var root = this;
-          root.storage_settings[storage_for].loading = true;
-          root.storage_settings[storage_for].save_success = false;
-          root.$set(root.storage_settings[storage_for], 'errors', []);
+          var self = this;
+          self.storage_settings[storage_for].loading = true;
+          self.storage_settings[storage_for].save_success = false;
+          self.$set(self.storage_settings[storage_for], 'errors', []);
           $.ajax({
             type: 'POST',
             url: 'api/project/storage-settings/' +
@@ -657,22 +732,22 @@
             data: JSON.stringify(getFormData($('#' + storage_for + '-storage-form')))
           }).fail(function (data) {
             if (data.hasOwnProperty('responseJSON') && data.responseJSON.hasOwnProperty('errors'))
-              root.$set(root.storage_settings[storage_for], 'errors', data.responseJSON.errors);
+              self.$set(self.storage_settings[storage_for], 'errors', data.responseJSON.errors);
             else {
               var msg = message_from_response(data);
-              root.storage_settings[storage_for].errors = {common: msg};
-              root.showError('Storage settings error', msg)
+              self.storage_settings[storage_for].errors = {common: msg};
+              self.showError('Storage settings error', msg)
             }
             console.log('save storage settings error:');
             console.log(data);
           }).done(function () {
-            root.storage_settings[storage_for].save_success = true;
-            root.project_loaded = false;
+            self.storage_settings[storage_for].save_success = true;
+            self.project_loaded = false;
             setTimeout(function () {
-              root.loadAll();
+              self.loadAll();
             }, 4000);
           }).always(function () {
-            root.storage_settings[storage_for].loading = false;
+            self.storage_settings[storage_for].loading = false;
           });
           return false;
         },
@@ -815,6 +890,7 @@
         closeTaskPreview: function () {
           this.quick_view = false;
           this.columns = this.full_columns;
+          this.current_task_index = -10;
         },
         toggleTaskPreview: function (index) {
           this.current_task_index = index;
@@ -824,22 +900,62 @@
         },
 
         nextPage: function () {
-          this.page<this.totalPages ? this.page++: this.page;
-          this.current_task_index = -1;
+          if (this.page < this.totalPages) {
+            this.page++;
+            if (this.current_task_index !== -10)
+              this.current_task_index = -1;
+          }
         },
         prevPage: function() {
-          this.page!==1 ? this.page--: this.page;
-          this.current_task_index = -1;
+          if (this.page > 1) {
+            this.page--;
+            if (this.current_task_index !== -10)
+              this.current_task_index = -2;
+          }
+        },
+        findCurrentTaskIndex: function() {
+          if (!this.current_task) return -1;
+
+          // find task index for current task
+          for (var i=0; i<this.tasks.length; i++) {
+            if (this.tasks[i].id === this.current_task.id)
+              return i;
+          }
+          return -1;
         },
         nextTask: function() {
-          if (this.current_task_index < this.tasks.length-1)
-            this.toggleTaskPreview(this.current_task_index+1)
+          if (this.current_task_index === -10) {
+            this.current_task_index = this.findCurrentTaskIndex();
+            this.current_task_index = this.current_task_index === -1 ? 0: this.current_task_index;
+            this.openTaskPreview(this.tasks[this.current_task_index]);
+          }
+          else if (0 <= this.current_task_index && this.current_task_index < this.tasks.length-1) {
+            this.current_task_index++;
+            this.openTaskPreview(this.tasks[this.current_task_index]);
+          }
+          else if (this.current_task_index === this.tasks.length-1) {
+            this.nextPage();
+          }
         },
         prevTask: function() {
-          if (this.current_task_index > 0)
-            this.toggleTaskPreview(this.current_task_index-1)
-          else if (this.current_task_index === -1)
-            this.toggleTaskPreview(0)
+          if (this.current_task_index === -10) {
+            this.current_task_index = this.findCurrentTaskIndex();
+            this.current_task_index = this.current_task_index === -1 ? 0: this.current_task_index;
+            this.openTaskPreview(this.tasks[this.current_task_index]);
+          }
+          else if (0 < this.current_task_index && this.current_task_index < this.tasks.length) {
+            this.current_task_index--;
+            this.openTaskPreview(this.tasks[this.current_task_index]);
+          }
+          else if (this.current_task_index === 0) {
+            this.prevPage();
+          }
+        },
+
+        resizeLeftPanel: function() {
+          this.$nextTick(function() {
+            this.full_pagination = $('#left-panel').width() > PAGINATION_MAX_WIDTH;
+          });
         }
       },
 
@@ -869,6 +985,18 @@
           else {
             this.full_columns = values;
           }
+        },
+
+        quick_view: function() {
+          this.resizeLeftPanel();
+        },
+        quick_view_left_width: function() {
+          this.quick_view_right_width = 16 - this.quick_view_left_width;
+          this.resizeLeftPanel();
+        },
+        quick_view_right_width: function() {
+          this.quick_view_left_width = 16 - this.quick_view_right_width;
+          this.resizeLeftPanel();
         }
 
       },
@@ -893,12 +1021,15 @@
         $('#vue_loader').hide();
         $('.ui.checkbox').checkbox();
 
-        var root = this;
+        var self = this;
         Mousetrap.bind(['shift+left', 'a'], this.prevPage);
         Mousetrap.bind(['shift+right', 'd'], this.nextPage);
         Mousetrap.bind(['shift+up', 'w'], this.prevTask);
         Mousetrap.bind(['shift+down', 's'], this.nextTask);
 
+        Mousetrap.bind(['q'], function() { self.show_table_settings = !self.show_table_settings });
+
+        $(window).resize(this.resizeLeftPanel);
         console.log('Vue mounting success');
       }
     });

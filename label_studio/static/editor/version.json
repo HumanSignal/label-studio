@@ -1,6 +1,6 @@
 {
-  "message": "Merge pull request #136 from heartexlabs/feature/granularity-per-label\n\nAdd granularity per Label",
-  "commit": "1b4b1867aea6c6475513ca938c0ecc67ee0fa7e2",
+  "message": "Fix completions with existed ids",
+  "commit": "6bb2fba50116c99566e606e817ca3712ef0ca09b",
   "branch": "master",
-  "date": "2020-08-24T14:01:38Z"
+  "date": "2020-08-25T16:42:43Z"
 }

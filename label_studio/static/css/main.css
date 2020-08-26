@@ -40,7 +40,7 @@ hotkey {
     background-color: #f7f7f7;
 }
 hotkey i {
-    color: #777;
+    color: #777 !important;
 }
 .hotkey-helper {
     margin-bottom: 1.0em;
