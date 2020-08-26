@@ -15,6 +15,7 @@ from collections import OrderedDict
 
 from label_studio.utils.io import json_load
 
+
 logger = logging.getLogger(__name__)
 
 _storage = {}
@@ -110,6 +111,10 @@ class BaseStorage(ABC):
 
     @abstractmethod
     def ids(self):
+        pass
+
+    @abstractmethod
+    def draft_ids(self):
         pass
 
     @abstractmethod
@@ -337,6 +342,11 @@ class CloudStorage(BaseStorage):
         return max(self._ids_keys_map.keys(), default=-1)
 
     def ids(self):
+        self.sync()
+        return self._selected_ids
+
+    def draft_ids(self):
+        #TODO
         self.sync()
         return self._selected_ids
 

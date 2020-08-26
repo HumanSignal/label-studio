@@ -144,7 +144,7 @@ const _loadTask = function(ls, url, completionID) {
 };
 
 const loadNext = function(ls) {
-  var url = `${API_URL.MAIN}${API_URL.PROJECTS}/1${API_URL.NEXT}`;
+    var url = `${API_URL.MAIN}${API_URL.PROJECTS}/1${API_URL.NEXT}`;
     return _loadTask(ls, url);
 };
 

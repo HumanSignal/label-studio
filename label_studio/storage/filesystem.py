@@ -21,10 +21,13 @@ class JSONStorage(BaseStorage):
             tasks = json_load(self.path, int_keys=True)
         if len(tasks) == 0:
             self.data = {}
+            self.drafts = set()
         elif isinstance(tasks, dict):
             self.data = tasks
+            self.drafts = set()
         elif isinstance(self.data, list):
             self.data = {int(task['id']): task for task in tasks}
+            self.drafts = set([int(task['id']) for task in tasks if task.get('draft', 0) == 1])
         self._save()
 
     def _save(self):
@@ -39,7 +42,21 @@ class JSONStorage(BaseStorage):
         return self.data.get(int(id))
 
     def set(self, id, value):
+        """
+            update storage internal dicts:
+            data
+            drafts
+        """
+        # update self.data
         self.data[int(id)] = value
+
+        # update self.drafts
+        if value.get('draft', None):
+            self.drafts.add(int(id))
+        else:
+            if int(id) in self.drafts:
+                self.drafts.remove(int(id))
+
         self._save()
 
     def __contains__(self, id):
@@ -52,6 +69,9 @@ class JSONStorage(BaseStorage):
 
     def ids(self):
         return self.data.keys()
+
+    def draft_ids(self):
+        return self.drafts
 
     def max_id(self):
         return max(self.ids(), default=-1)
@@ -86,6 +106,12 @@ class DirJSONsStorage(BaseStorage):
     def __init__(self, **kwargs):
         super(DirJSONsStorage, self).__init__(**kwargs)
         os.makedirs(self.path, exist_ok=True)
+        self.drafts = set()
+        for f in iter_files(self.path, '.json'):
+            with open(f) as _f:
+                _data = json.load(_f)
+                if _data.get('draft', 0) == 1:
+                    self.drafts.add(_data.get('id'))
 
     @property
     def readable_path(self):
@@ -103,6 +129,12 @@ class DirJSONsStorage(BaseStorage):
         filename = os.path.join(self.path, str(id) + '.json')
         with open(filename, 'w', encoding='utf8') as fout:
             json.dump(value, fout, indent=2, sort_keys=True)
+        # update self.drafts
+        if value.get('draft', 0) == 1:
+            self.drafts.add(int(id))
+        else:
+            if int(id) in self.drafts:
+                self.drafts.remove(int(id))
 
     def set_many(self, keys, values):
         raise NotImplementedError
@@ -110,6 +142,9 @@ class DirJSONsStorage(BaseStorage):
     def ids(self):
         for f in iter_files(self.path, '.json'):
             yield int(os.path.splitext(os.path.basename(f))[0])
+
+    def draft_ids(self):
+        return self.drafts
 
     def max_id(self):
         return max(self.ids(), default=-1)
