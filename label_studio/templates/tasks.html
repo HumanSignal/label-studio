@@ -13,8 +13,14 @@
       padding-bottom: 1em;
       min-width: 188px;
     }
+    .task-container {
+      margin: 0 1em;
+    }
     .task-table {
       min-width: 188px;
+    }
+    td.task-table {
+      min-height: 1em;
     }
 
     ::-webkit-scrollbar-track {
@@ -73,6 +79,7 @@
     .pagination {
       height: 10px !important;
       min-width: 188px;
+      background-color: rgba(0,0,0,.05)
     }
 
     .pagination-size {
@@ -137,10 +144,23 @@
       transition: 0.2s color ease-in-out;
     }
 
+    #label-studio {
+      max-width: unset;
+      padding-left: unset;
+      padding-right: unset;
+      margin: unset;
+    }
+
     @media screen and (max-width: 768px) {
       .full-preview-image {
         max-height: 250px;
         max-width: 330px;
+      }
+      .task-container {
+        width: unset;
+      }
+      .pagination {
+        min-width: unset;
       }
     }
   </style>
@@ -273,7 +293,7 @@
 
 
 
-    <div class="ui container" style="width: 98%">
+    <div class="ui task-container">
 
       <div class="ui grid stackable">
         <div class="column" id="left-panel"
@@ -282,7 +302,7 @@
              style="'min-width:188px;">
           <!-- Table -->
           <div class="table-wrapper">
-            <table v-if="project.task_count > 0" class="task-table responsive" :class="{'center-margin': !quick_view}">
+            <table v-if="project.task_count > 0" class="task-table" :class="{'center-margin': !quick_view}">
               <!-- Header -->
               <tr>
                 <th class="order" @click="changeOrder('id')" v-if="columns.includes('id')">Task ID
@@ -495,6 +515,11 @@
           </div>
 
           <div class="hotkey-helper">
+            <div class="keys"><hotkey>click on row</hotkey></div>
+            <span class="description">open task in Quick mode, click again on selected task to exit</span>
+          </div>
+
+          <div class="hotkey-helper">
             <div class="keys"><hotkey>shift</hotkey> + <hotkey>←</hotkey> or <hotkey>a</hotkey></div>
             <span class="description">previous page</span>
           </div>
@@ -559,11 +584,11 @@
 
           // quick task preview
           all_columns: ['id', 'completed_at', 'skipped', 'delete', 'others'],
-          full_columns: ['id', 'completed_at', 'skipped', 'delete', 'others'],
-          quick_columns: ['id', 'completed_at'],
+          full_columns: JSON.parse(Cookies.get('full_columns', '["id", "completed_at", "skipped", "delete", "others"]')),
+          quick_columns: JSON.parse(Cookies.get('quick_columns', '["id", "completed_at"]')),
           quick_view: false,
-          quick_view_left_width: 4,
-          quick_view_right_width: 12,
+          quick_view_left_width: Cookies.get('quick_view_left_width', 4),
+          quick_view_right_width: Cookies.get('quick_view_right_width', 12),
           current_task: null,
           current_task_index: -10,
           full_pagination: true,
@@ -987,15 +1012,24 @@
           }
         },
 
+        quick_columns: function() {
+          Cookies.set('quick_columns', this.quick_columns);
+        },
+        full_columns: function() {
+          Cookies.set('full_columns', this.full_columns);
+        },
+
         quick_view: function() {
           this.resizeLeftPanel();
         },
         quick_view_left_width: function() {
           this.quick_view_right_width = 16 - this.quick_view_left_width;
+          Cookies.set('quick_view_left_width', this.quick_view_left_width);
           this.resizeLeftPanel();
         },
         quick_view_right_width: function() {
           this.quick_view_left_width = 16 - this.quick_view_right_width;
+          Cookies.set('quick_view_right_width', this.quick_view_right_width);
           this.resizeLeftPanel();
         }
 

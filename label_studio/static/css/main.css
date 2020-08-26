@@ -560,6 +560,12 @@ pre {
     }
 }
 
+@media screen and (max-width: 558px) {
+    #nav a.outside-links.last {
+        margin-right: 2em;
+    }
+}
+
 .toast .content {
     max-width: 600px;
 }

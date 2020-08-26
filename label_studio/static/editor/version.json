@@ -1,6 +1,6 @@
 {
-  "message": "Fix completions with existed ids",
-  "commit": "6bb2fba50116c99566e606e817ca3712ef0ca09b",
+  "message": "Fix back the id; fix pk type cast",
+  "commit": "7297a2e46728d0b8b5a349296a7ca7eb8595af55",
   "branch": "master",
-  "date": "2020-08-25T16:42:43Z"
+  "date": "2020-08-26T15:32:56Z"
 }
