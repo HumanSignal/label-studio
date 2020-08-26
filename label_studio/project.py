@@ -25,6 +25,7 @@ from label_studio.utils.functions import get_full_hostname
 from label_studio.tasks import Tasks
 from label_studio.storage import create_storage, get_available_storage_names
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -413,7 +414,7 @@ class Project(object):
         if sampling == 'sequential':
             task_id = next(task_iter, None)
             if task_id is not None:
-                return self.source_storage.get(task_id)
+                return self.get_task_with_completions(task_id) or self.source_storage.get(task_id)
 
         # Tasks are sampled with equal probabilities
         elif sampling == 'uniform':
@@ -421,7 +422,7 @@ class Project(object):
             if not actual_tasks_ids:
                 return None
             random.shuffle(actual_tasks_ids)
-            return self.source_storage.get(actual_tasks_ids[0])
+            return self.get_task_with_completions(actual_tasks_ids[0]) or self.source_storage.get(actual_tasks_ids[0])
 
         # Task with minimum / maximum average prediction score is taken
         elif sampling.startswith('prediction-score'):
@@ -440,7 +441,7 @@ class Project(object):
                 best_idx = max(id_score_map, key=id_score_map.get)
             else:
                 raise NotImplementedError('Unknown sampling method ' + sampling)
-            return self.source_storage.get(best_idx)
+            return self.get_task_with_completions(best_idx) or self.source_storage.get(best_idx)
         else:
             raise NotImplementedError('Unknown sampling method ' + sampling)
 
@@ -458,8 +459,9 @@ class Project(object):
         """
         task_ids = set(self.source_storage.ids())
         completion_ids = set(self.target_storage.ids())
-        completions = completion_ids.intersection(task_ids)
-        #completions = list(self.target_storage.ids())
+        # retrieve set of drafts - from storage.drafts
+        completion_draft_ids = set(self.target_storage.draft_ids())
+        completions = completion_ids.intersection(task_ids).difference(completion_draft_ids)
         logger.debug('{num} completions found in {output_dir}'.format(
             num=len(completions), output_dir=self.config["output_dir"]))
         return sorted(completions)
@@ -531,6 +533,11 @@ class Project(object):
         else:
             task = deepcopy(task)
 
+        # set completion draft json key
+        # {..., draft:0 }
+        # to avoid include task in label stream
+        task['draft'] = 0
+
         # create draft field if it is autosave
         # or drop draft field if submit/update
         draft_key = completion.get('draft', None)
@@ -538,14 +545,16 @@ class Project(object):
             if draft_key == True:
                 completion['draft'] = completion['result']
                 completion.pop('result')
+                # set draft for whole task to include in label stream
+                task['draft'] = 1
 
         # update existed completion
         if 'id' in completion:
             for i, item in enumerate(task['completions']):
                 if item['id'] == completion['id']:
                     task['completions'][i].update(completion)
-                    # if real submit/update - remove draft field
-                    if draft_key in (False, None):
+                    # if real submit/update - remove draft field - if it exists
+                    if draft_key in (False, None) and 'draft' in task['completions'][i]:
                         task['completions'][i].pop('draft')
 
         # write new completion
