@@ -3,6 +3,9 @@ type: playground
 order: 201
 ---
 <style>
+  .sidebar {
+    display: none;
+  }
   .content {
      max-width: none !important;
      margin-left: 0 !important;
@@ -207,6 +210,10 @@ order: 201
   }
 
 @media screen and (max-width: 900px) {
+  .sidebar {
+    display: flex;
+  }
+}
 @media only screen and (max-width: 767.98px) {
     .intro {
       padding-left: 0;

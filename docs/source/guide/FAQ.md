@@ -1,7 +1,7 @@
 ---
 title: FAQ
 type: guide
-order: 100
+order: 101
 ---
 
 Frequently asked questions about setup and LS usage.
