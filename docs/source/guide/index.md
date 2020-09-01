@@ -21,6 +21,10 @@ Here are the main concepts behind Label Studio's workflow:
 - **Frontend Labeling UI** is accessible from any browser, distributed as precompiled js/css scripts and could be [easily extendable with new labeling tags](frontend.html). You can also [embed Label Studio UI into your applications](frontend.html#Quickstart).
 
 
+**Usage statistics**
+
+Label Studio collects anonymous usage statistics without any sensitive info about page request number and data types from the labeling config. It helps us to improve labeling quality and gives a better understanding about the next development. If you want you can disable it in `config.json` with `"collect_analytics": false` or `export collect_analytics=0` using environment variables, but we would really appreciate your contribution if you leave it as is.  
+
 **Relations among tasks, completions and results** 
 
 Here you can see relations among labeling objects: tasks, completions, results, etc.
