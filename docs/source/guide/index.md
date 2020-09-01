@@ -23,7 +23,7 @@ Here are the main concepts behind Label Studio's workflow:
 
 **Usage statistics**
 
-Label Studio collects anonymous usage statistics without any sensitive info about page request number and data types from the labeling config. It helps us to improve labeling quality and gives a better understanding about the next development. If you want you can disable it in `config.json` with `"collect_analytics": false` or `export collect_analytics=0` using environment variables, but we would really appreciate your contribution if you leave it as is.  
+Label Studio collects anonymous usage statistics without any sensitive info about page request number and data types from the labeling config. It helps us to improve labeling quality and gives a better understanding about the next development.
 
 **Relations among tasks, completions and results** 
 
