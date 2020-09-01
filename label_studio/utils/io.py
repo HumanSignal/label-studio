@@ -100,7 +100,7 @@ def remove_file_or_dir(path):
 def iter_files(root_dir, ext):
     for root, _, files in os.walk(root_dir):
         for f in files:
-            if f.lower().endswith(ext):
+            if f.lower().endswith(ext) and not f.lower().startswith('.'):
                 yield os.path.join(root, f)
 
 
