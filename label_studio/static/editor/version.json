@@ -1,6 +1,6 @@
 {
-  "message": "Fix csv parsing: skip \\r and show better error msg",
-  "commit": "abe4b23e70e486c7c72e51da9edee34e480c5b78",
-  "branch": "master",
-  "date": "2020-09-01T20:50:06Z"
+  "message": "Just build please",
+  "commit": "88d35d5ea87e518dc83ec847d5a891c0ea794bbc",
+  "branch": "tmp/deserialize",
+  "date": "2020-09-02T13:49:29Z"
 }
