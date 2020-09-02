@@ -1,2 +1,2 @@
 # Package version
-__version__ = '0.7.4.post0'
+__version__ = '0.7.5rc0'

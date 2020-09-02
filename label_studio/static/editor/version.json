@@ -1,6 +1,6 @@
 {
-  "message": "Fix ids for Regions tree when copy prediction",
-  "commit": "fd1e7cad9fdab9ca3c55691b2d0ee23905d51d59",
+  "message": "Don't serialize broken regions (polygon, brush)\n\nIf polygon has less than 3 vertices; if brush is empty.",
+  "commit": "705feed7a2a4ce8d91a51b39505d3b558b30ff55",
   "branch": "master",
-  "date": "2020-08-12T20:30:46Z"
+  "date": "2020-08-28T14:59:00Z"
 }

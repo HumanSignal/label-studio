@@ -51,7 +51,21 @@ Here is a quick example tutorial on how to run the ML backend with a simple text
     ```bash
     label-studio start text_classification_project --init --template text_sentiment --ml-backends http://localhost:9090
     ```
+    You can confirm that the model has connected properly from the `/model` subpage in the Label Studio UI.
+    
+5. Getting predictions
+    You should see model predictions in the labeling interface. For example in an image classification task: the model will 
+    pre-select an image class for you to verify. 
 
+6. Model training
+
+   Model training can be triggered manually by pushing the Start Training button on the `/model` page, or by using an API call:
+   ```
+   curl -X POST http://localhost:8080/api/train
+   ```
+   In development mode, training logs will have an output into the console. In production mode, runtime logs are available in    
+   `my_backend/logs/uwsgi.log` and RQ training logs in `my_backend/logs/rq.log`
+   
 ## Start with docker compose
 
 Label Studio ML scripts include everything you need to create production ready ML backend server, powered by docker. It uses [uWSGI](https://uwsgi-docs.readthedocs.io/en/latest/) + [supervisord](http://supervisord.org/) stack, and handles background training jobs using [RQ](https://python-rq.org/).

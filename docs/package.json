@@ -26,7 +26,8 @@
     "hexo-renderer-marked": "^2.0.0",
     "hexo-renderer-stylus": "^0.3.3",
     "hexo-server": "^0.3.3",
-    "save": "^2.4.0"
+    "save": "^2.4.0",
+    "hexo-tag-details": "^0.1.7"
   },
   "scripts": {
     "server": "hexo serve",

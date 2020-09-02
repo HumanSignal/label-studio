@@ -40,7 +40,7 @@ hotkey {
     background-color: #f7f7f7;
 }
 hotkey i {
-    color: #777;
+    color: #777 !important;
 }
 .hotkey-helper {
     margin-bottom: 1.0em;
@@ -558,4 +558,22 @@ pre {
     #nav a.outside-links.first {
         margin-left: 2em;
     }
+}
+
+@media screen and (max-width: 558px) {
+    #nav a.outside-links.last {
+        margin-right: 2em;
+    }
+}
+
+.toast .content {
+    max-width: 600px;
+}
+.toast pre {
+    font-family: Rubik, sans-serif;
+    white-space: pre-wrap; /* css-3 */
+    white-space: -moz-pre-wrap;
+    white-space: -pre-wrap;
+    white-space: -o-pre-wrap;
+    word-wrap: break-word !important;
 }

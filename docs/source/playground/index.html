@@ -3,6 +3,9 @@ type: playground
 order: 201
 ---
 <style>
+  .sidebar {
+    display: none;
+  }
   .content {
      max-width: none !important;
      margin-left: 0 !important;
@@ -207,6 +210,10 @@ order: 201
   }
 
 @media screen and (max-width: 900px) {
+  .sidebar {
+    display: flex;
+  }
+}
 @media only screen and (max-width: 767.98px) {
     .intro {
       padding-left: 0;
@@ -1515,9 +1522,9 @@ order: 201
     var url = new URL(url_string);
 
     // Label code mirror
-    let labelEditor = CodeMirror.fromTextArea(document.getElementById('id_label_config'), {
+    var labelEditor = CodeMirror.fromTextArea(document.getElementById('id_label_config'), {
       lineNumbers: true,
-      mode: "text/html",
+      mode: "text/html"
     });
     labelEditor.focus();
 
@@ -1656,10 +1663,10 @@ order: 201
         url: host + '/business/projects/upload-example/',
         data: {label_config: val}
       })
-        .fail(o => {
+        .fail(function(o) {
           $('#upload-data-example').text('...')
         })
-        .done(o => {
+        .done(function(o) {
           $('#upload-data-example').text(JSON.stringify(JSON.parse(o), null, 4))
         })
     }

@@ -65,17 +65,18 @@
 
     <a href="setup" class="{% if url_for(request.endpoint) == '/setup' %}active{% endif %}">Setup</a>
 
+    <span>
+      <a class="outside-links first" href="https://labelstud.io/guide/" target="_blank">Docs</a>
 
-    <a class="outside-links first" href="https://labelstud.io/guide/" target="_blank">Docs</a>
+      <a class="outside-links" href="https://github.com/heartexlabs/label-studio" target="_blank">
+        <img src="static/images/github.svg" height="22"/>
+      </a>
 
-    <a class="outside-links" href="https://github.com/heartexlabs/label-studio" target="_blank">
-      <img src="static/images/github.svg" height="22"/>
-    </a>
-
-    <a class="outside-links" href="https://join.slack.com/t/label-studio/shared_invite/zt-cr8b7ygm-6L45z7biEBw4HXa5A2b5pw"
-       data-tooltip="If you have found a bug or have questions ping us in Slack" data-position="bottom right"
-       target="_blank"><img src="static/images/slack.png" height="22"/>
-    </a>
+      <a class="outside-links last" href="https://join.slack.com/t/label-studio/shared_invite/zt-cr8b7ygm-6L45z7biEBw4HXa5A2b5pw"
+         data-tooltip="If you have found a bug or have questions ping us in Slack" data-position="bottom right"
+         target="_blank"><img src="static/images/slack.png" height="22"/>
+      </a>
+    </span>
 
   </ul>
 </div>

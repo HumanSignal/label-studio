@@ -44,7 +44,7 @@ from label_studio.utils.functions import (
 from label_studio.utils.misc import (
     exception_treatment, exception_treatment_page,
     config_line_stripped, get_config_templates, convert_string_to_hash, serialize_class,
-    DirectionSwitch, check_port_in_use
+    DirectionSwitch, check_port_in_use, timestamp_to_local_datetime
 )
 from label_studio.utils.argparser import parse_input_args
 from label_studio.utils.uri_resolver import resolve_task_data_uri
@@ -304,9 +304,16 @@ def model_page():
                 ml_backend.training_in_progress = training_status['is_training']
                 ml_backend.model_version = training_status['model_version']
                 ml_backend.is_connected = True
+                ml_backend.is_error = False
             except Exception as exc:
                 logger.error(str(exc), exc_info=True)
                 ml_backend.is_error = True
+                try:
+                    # try to parse json as the result of @exception_treatment
+                    ml_backend.error = json.loads(str(exc))
+                except ValueError:
+                    ml_backend.error = {'detail': "Can't parse exception message from ML Backend"}
+
         else:
             ml_backend.is_connected = False
         ml_backends.append(ml_backend)
@@ -561,7 +568,7 @@ def api_generate_next_task():
 
     task = resolve_task_data_uri(task)
 
-    #project.analytics.send(getframeinfo(currentframe()).function)
+    project.analytics.send(getframeinfo(currentframe()).function)
 
     # collect prediction from multiple ml backends
     if project.ml_backends_connected:
@@ -587,6 +594,7 @@ def api_project():
 
     output = project.serialize()
     output['multi_session_mode'] = input_args.command != 'start-multi-session'
+    project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
     return make_response(jsonify(output), code)
 
 
@@ -705,6 +713,8 @@ def api_all_tasks():
     # get tasks with completions
     tasks = []
     for item in paginated:
+        if item['completed_at'] != 'undefined' and item['completed_at'] is not None:
+            item['completed_at'] = timestamp_to_local_datetime(item['completed_at']).strftime('%Y-%m-%d %H:%M:%S')
         i = item['id']
         task = project.get_task_with_completions(i)
         if task is None:  # no completion at task
@@ -730,11 +740,11 @@ def api_tasks(task_id):
     if request.method == 'GET':
         task_data = project.get_task_with_completions(task_id) or project.source_storage.get(task_id)
         task_data = resolve_task_data_uri(task_data)
-        project.analytics.send(getframeinfo(currentframe()).function)
+        project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
         return make_response(jsonify(task_data), 200)
     elif request.method == 'DELETE':
         project.remove_task(task_id)
-        project.analytics.send(getframeinfo(currentframe()).function)
+        project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
         return make_response(jsonify('Task deleted.'), 204)
 
 
@@ -775,11 +785,11 @@ def api_completions(task_id):
         completion.pop('skipped', None)
         completion.pop('was_cancelled', None)
         completion_id = project.save_completion(int(task_id), completion)
-        project.analytics.send(getframeinfo(currentframe()).function)
+        project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
         return make_response(json.dumps({'id': completion_id}), 201)
 
     else:
-        project.analytics.send(getframeinfo(currentframe()).function, error=500)
+        project.analytics.send(getframeinfo(currentframe()).function, error=500, method=request.method)
         return make_response('Incorrect request method', 500)
 
 
@@ -810,13 +820,13 @@ def api_completion_by_id(task_id, completion_id):
     if request.method == 'DELETE':
         if project.config.get('allow_delete_completions', False):
             project.delete_completion(int(task_id))
-            project.analytics.send(getframeinfo(currentframe()).function)
+            project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
             return make_response('deleted', 204)
         else:
-            project.analytics.send(getframeinfo(currentframe()).function, error=422)
+            project.analytics.send(getframeinfo(currentframe()).function, error=422, method=request.method)
             return make_response('Completion removing is not allowed in server config', 422)
     else:
-        project.analytics.send(getframeinfo(currentframe()).function, error=500)
+        project.analytics.send(getframeinfo(currentframe()).function, error=500, method=request.method)
         return make_response('Incorrect request method', 500)
 
 
@@ -1020,8 +1030,9 @@ def main():
         label_studio.utils.auth.PASSWORD = input_args.password or config.get('password', '')
 
         # set host name
-        host = input_args.host or config.get('host', 'localhost')
+        host = input_args.host or config.get('host', 'localhost')  # name for internal LS usage
         port = input_args.port or config.get('port', 8080)
+        server_host = 'localhost' if host == 'localhost' else '0.0.0.0'  # web server host
 
         # ssl certificate and key
         cert_file = input_args.cert_file or config.get('cert')
@@ -1046,22 +1057,22 @@ def main():
         if input_args.use_gevent:
             app.debug = input_args.debug
             ssl_args = {'keyfile': key_file, 'certfile': cert_file} if ssl_context else {}
-            http_server = WSGIServer((host, port), app, log=app.logger, **ssl_args)
+            http_server = WSGIServer((server_host, port), app, log=app.logger, **ssl_args)
             http_server.serve_forever()
         else:
-            app.run(host=host, port=port, debug=input_args.debug, ssl_context=ssl_context)
+            app.run(host=server_host, port=port, debug=input_args.debug, ssl_context=ssl_context)
 
     # On `start-multi-session` command, server creates one project per each browser sessions
     elif input_args.command == 'start-multi-session':
-        host = input_args.host or '0.0.0.0'
+        server_host = input_args.host or '0.0.0.0'
         port = input_args.port or 8080
 
         if input_args.use_gevent:
             app.debug = input_args.debug
-            http_server = WSGIServer((host, port), app, log=app.logger)
+            http_server = WSGIServer((server_host, port), app, log=app.logger)
             http_server.serve_forever()
         else:
-            app.run(host=host, port=port, debug=input_args.debug)
+            app.run(host=server_host, port=port, debug=input_args.debug)
 
 
 if __name__ == "__main__":

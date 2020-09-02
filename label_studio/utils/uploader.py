@@ -48,6 +48,10 @@ def tasks_from_file(filename, file, project):
             except TypeError:
                 tasks = json.loads(raw_data.decode('utf8'))
 
+        # no drag & drop support
+        elif project is None:
+            raise ValidationError('No tasks found in: ' + filename)
+
         # upload file via drag & drop
         elif len(project.data_types) > 1:
             raise ValidationError('Your label config has more than one data keys, direct file upload supports only'

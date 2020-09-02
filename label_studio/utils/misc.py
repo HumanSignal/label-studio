@@ -132,6 +132,22 @@ def get_app_version():
 
 
 def parse_config(config_string):
+    """
+    :param config_string: Label config string
+    :return: structured config of the form:
+    {
+        "<ControlTag>.name": {
+            "type": "ControlTag",
+            "to_name": ["<ObjectTag1>.name", "<ObjectTag2>.name"],
+            "inputs: [
+                {"type": "ObjectTag1", "value": "<ObjectTag1>.value"},
+                {"type": "ObjectTag2", "value": "<ObjectTag2>.value"}
+            ],
+            "labels": ["Label1", "Label2", "Label3"] // taken from "alias" if exists or "value"
+    }
+    """
+    if not config_string:
+        return {}
 
     LABEL_TAGS = {'Label', 'Choice'}
     NOT_CONTROL_TAGS = {'Filter',}
@@ -330,7 +346,7 @@ def compare_with_none(field, inverted):
 
 
 def check_port_in_use(host, port):
-    logger.info('Checking if host & port is available', host + ':' + str(port))
+    logger.info('Checking if host & port is available :: ' + str(host) + ':' + str(port))
     host = host.replace('https://', '').replace('http://', '')
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         return s.connect_ex((host, port)) == 0
