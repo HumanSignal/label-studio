@@ -1,6 +1,6 @@
 {
-  "message": "Just build please",
-  "commit": "88d35d5ea87e518dc83ec847d5a891c0ea794bbc",
-  "branch": "tmp/deserialize",
-  "date": "2020-09-02T13:49:29Z"
+  "message": "Don't serialize broken regions (polygon, brush)\n\nIf polygon has less than 3 vertices; if brush is empty.",
+  "commit": "705feed7a2a4ce8d91a51b39505d3b558b30ff55",
+  "branch": "master",
+  "date": "2020-08-28T14:59:00Z"
 }
