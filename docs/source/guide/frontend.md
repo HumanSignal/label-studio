@@ -44,72 +44,72 @@ You can include `main.<hash>.css` and `main.<hash>.js` files from CDN directly. 
 ## Frontend integration guide 
 
 Instantiate a new Label Studio object with a selector for the div that should become the editor. To see all the available options for the initialization of LabelStudio object, please check the [Reference](frontend_reference.html).
-
-```xhtml
-<!-- Include Label Studio stylesheet -->
-<link href="https://unpkg.com/browse/label-studio@0.7.3/build/static/css/main.09b8161e.css" rel="stylesheet">
-
-<!-- Create the Label Studio container -->
-<div id="label-studio"></div>
-
-<!-- Include the Label Studio library -->
-<script src="https://unpkg.com/browse/label-studio@0.7.3/build/static/js/main.e963e015.js"></script>
-
-<!-- Initialize Label Studio -->
-<script>
-  var labelStudio = new LabelStudio('editor', {
-    config: `
-      <View>
-        <Image name="img" value="$image"></Image>
-        <RectangleLabels name="tag" toName="img">
-          <Label value="Hello"></Label>
-          <Label value="World"></Label>  
-        </RectangleLabels>
-      </View>
-    `,
-
-    interfaces: [
-      "panel",
-      "update",
-      "controls",
-      "side-column",
-      "completions:menu",
-      "completions:add-new",
-      "completions:delete",
-      "predictions:menu"
-    ],
-
-    user: {
-      pk: 1,
-      firstName: "James",
-      lastName: "Dean"
-    },
-    task: {
-      completions: [],
-      predictions: [],
-      id: 1,
-      data: {
-        image: "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg"
-      }
-    },
     
-    onLabelStudioLoad: function(LS) {
-      var c = LS.completionStore.addCompletion({
-        userGenerate: true
+  ``` xhtml
+    <!-- Include Label Studio stylesheet -->
+    <link href="https://unpkg.com/browse/label-studio@0.7.3/build/static/css/main.09b8161e.css" rel="stylesheet">
+    
+    <!-- Create the Label Studio container -->
+    <div id="label-studio"></div>
+    
+    <!-- Include the Label Studio library -->
+    <script src="https://unpkg.com/browse/label-studio@0.7.3/build/static/js/main.e963e015.js"></script>
+    
+    <!-- Initialize Label Studio -->
+    <script>
+      var labelStudio = new LabelStudio('editor', {
+        config: `
+          <View>
+            <Image name="img" value="$image"></Image>
+            <RectangleLabels name="tag" toName="img">
+              <Label value="Hello"></Label>
+              <Label value="World"></Label>  
+            </RectangleLabels>
+          </View>
+        `,
+    
+        interfaces: [
+          "panel",
+          "update",
+          "controls",
+          "side-column",
+          "completions:menu",
+          "completions:add-new",
+          "completions:delete",
+          "predictions:menu"
+        ],
+    
+        user: {
+          pk: 1,
+          firstName: "James",
+          lastName: "Dean"
+        },
+        task: {
+          completions: [],
+          predictions: [],
+          id: 1,
+          data: {
+            image: "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg"
+          }
+        },
+        
+        onLabelStudioLoad: function(LS) {
+          var c = LS.completionStore.addCompletion({
+            userGenerate: true
+          });
+          LS.completionStore.selectCompletion(c.id);
+        }
       });
-      LS.completionStore.selectCompletion(c.id);
-    }
-  });
-</script>
-```
+    </script>
+  ```
 
 ## Custom LSF + LSB integration
 
 LS frontend (LSF) with the backend (LSB) integration is similar to described in «[Frontend integration guide](#Frontend-integration-guide)». But Javascript part is out and placed in [lsf-sdk.js](https://github.com/heartexlabs/label-studio/blob/master/label_studio/static/js/lsf-sdk.js). The main idea of this integration is the detailed callback development.  
 
-1. Make your custom LSF build by following this [instructions](https://github.com/heartexlabs/label-studio-frontend#development). Final your development with `npm run build-bundle` to build `main.<hash>.css` and `main.<hash>.js` files.
+1. Make your custom LSF build by following this [instructions](https://github.com/heartexlabs/label-studio-frontend#development). Final your development with `npm run build-bundle` to generate `main.<hash>.css` and `main.<hash>.js` files.
 
-2. **Do not to forget** to remove the old build from LSB:
+2. **Do not forget** to remove the old build from LSB:
 ```bash
 rm -r label-studio/label_studio/static/editor/*
 ``` 
