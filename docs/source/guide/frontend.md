@@ -9,6 +9,9 @@ Frontend, as its name suggests, is the frontend library called [«Label Studio F
 LSF is located as a separated github repository: 
 https://github.com/heartexlabs/label-studio-frontend
 
+<br>
+<div style="margin:auto; text-align:center; width:100%"><img src="/images/LSF-modules.png" style="opacity: 0.9"/></div>
+
 
 ## Frontend development 
 
@@ -43,7 +46,7 @@ You can include `main.<hash>.css` and `main.<hash>.js` files from CDN directly. 
 
 ## Frontend integration guide 
 
-Instantiate a new Label Studio object with a selector for the div that should become the editor. To see all the available options for the initialization of LabelStudio object, please check the [Reference](frontend_reference.html).
+You can use Label Studio Frontend separately in your own projects: just include it in your HTML page. Instantiate a new Label Studio object with a selector for the div that should become the editor. To see all the available options for the initialization of LabelStudio object, please check the [Reference](frontend_reference.html).
     
   ``` xhtml
     <!-- Include Label Studio stylesheet -->

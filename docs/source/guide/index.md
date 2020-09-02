@@ -21,7 +21,17 @@ Here are the main concepts behind Label Studio's workflow:
 - **Frontend Labeling UI** is accessible from any browser, distributed as precompiled js/css scripts and could be [easily extendable with new labeling tags](frontend.html). You can also [embed Label Studio UI into your applications](frontend.html#Quickstart).
 
 
-**Relations among tasks, completions and results** 
+### Main modules
+
+The main modules of LS are 
+* [Label Studio Backend](https://github.com/heartexlabs/label-studio/) (LSB, main repository)
+* [Label Studio Frontend](https://github.com/heartexlabs/label-studio-frontend) (LSF, editor)
+* [Machine Learning Backends](https://github.com/heartexlabs/label-studio/tree/master/label_studio/ml) (MLB)
+
+<br>
+<div style="margin:auto; text-align:center; width:100%"><img src="/images/ls-modules-scheme.png" style="opacity: 0.8"/></div>
+
+### Relations among tasks, completions and results 
 
 Here you can see relations among labeling objects: tasks, completions, results, etc.
 
