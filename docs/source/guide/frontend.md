@@ -112,10 +112,27 @@ LS frontend (LSF) with the backend (LSB) integration is similar to described in 
 2. **Do not forget** to remove the old build from LSB:
 ```bash
 rm -r label-studio/label_studio/static/editor/*
-``` 
+```
 
-2. Copy build folder from LSF to LSB: 
-```bash
-cp -r label-studio-frontend/build/static/{js,css} label-studio/label_studio/static/editor/
-``` 
-          
+3. Copy build folder from LSF to LSB: 
+    ```bash
+    cp -r label-studio-frontend/build/static/{js,css} label-studio/label_studio/static/editor/
+    ```
+
+    If you installed LS as pip package then you should to replace `<env-path>/lib/python<version>/site-packages/label_studio/static/editor/`
+
+4. Run LS instance as usual and it will use a new LSF build:
+    ```bash
+    label-studio start <your-project>
+    ```
+    You can check a new build in browser by exploring the source code of Labeling page, there must be something like this in the `<head>` section: 
+    
+    ```xhtml
+     <!-- Editor CSS -->
+     <link href="static/editor/css/main.b50aa47e.css" rel="stylesheet">
+      
+     <!-- Editor JS -->
+     <script src="static/editor/js/main.df658436.js"></script>
+    ```
+
+    If you have doubled css/js files then you need to repeat these instruction from the step 2.  

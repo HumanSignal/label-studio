@@ -1,6 +1,6 @@
 {
-  "message": "Skip whitespaces while detecting csv delimiters",
-  "commit": "d772858c7f330c530acffc152a649f19b0695236",
+  "message": "Fix csv parsing: skip \\r and show better error msg",
+  "commit": "abe4b23e70e486c7c72e51da9edee34e480c5b78",
   "branch": "master",
   "date": "2020-09-01T20:50:06Z"
 }
