@@ -10,7 +10,7 @@ LSF is located as a separated github repository:
 https://github.com/heartexlabs/label-studio-frontend
 
 <br>
-<div style="margin:auto; text-align:center; width:100%"><img src="/images/LSF-modules.png" style="opacity: 0.9"/></div>
+<div style="margin:auto; text-align:center;"><img src="/images/LSF-modules.png" style="opacity: 0.9"/></div>
 
 
 ## Frontend development 

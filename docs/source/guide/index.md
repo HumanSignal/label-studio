@@ -29,7 +29,7 @@ The main modules of LS are
 * [Machine Learning Backends](https://github.com/heartexlabs/label-studio/tree/master/label_studio/ml) (MLB)
 
 <br>
-<div style="margin:auto; text-align:center; width:100%"><img src="/images/ls-modules-scheme.png" style="opacity: 0.8"/></div>
+<div style="margin:auto; text-align:center;"><img src="/images/ls-modules-scheme.png" style="opacity: 0.8"/></div>
 
 ### Relations among tasks, completions and results 
 
@@ -38,7 +38,7 @@ Here you can see relations among labeling objects: tasks, completions, results, 
 One user provides one completion, it’s atomic, and it consists of the result items. Result items can have relations between themselves with the specified direction of three types: left-right, right-left, or bidirectional. Normalizations are additional information in the custom string format about the current result item.
  
 <br>
-<center><img src="/images/labeling-scheme.png" style="max-width: 600px; opacity: 0.6"></center>
+<center><img src="/images/labeling-scheme.png" style="width: 100%; opacity: 0.6"></center>
 <br>
 Completions and Predictions are very similar. But predictions must be generated automatically by ML models.   
 
