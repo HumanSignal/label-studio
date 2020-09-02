@@ -101,3 +101,6 @@ search:
   path: search.xml
   field: all
   content: true
+
+codeblock:
+  copy_button: true

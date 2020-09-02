@@ -1,6 +1,6 @@
 {
-  "message": "Fix back the id; fix pk type cast",
-  "commit": "7297a2e46728d0b8b5a349296a7ca7eb8595af55",
+  "message": "Skip whitespaces while detecting csv delimiters",
+  "commit": "d772858c7f330c530acffc152a649f19b0695236",
   "branch": "master",
-  "date": "2020-08-26T15:32:56Z"
+  "date": "2020-09-01T20:50:06Z"
 }

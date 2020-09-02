@@ -4,39 +4,56 @@ type: guide
 order: 705
 ---
 
-Frontend, as its name suggests, is the frontend library based on React and mobx-state-tree, distributed as an NPM package. You can include it in your applications and provide data annotation support to your users. It can be granularly customized and extended.
+Frontend, as its name suggests, is the frontend library called [«Label Studio Frontend»](https://github.com/heartexlabs/label-studio-frontend) (**LSF**) based on React and mobx-state-tree, distributed as an NPM package. You can include it in your applications without «Label Studio Backend» (**LSB**) part and provide data annotation support to your users. It can be customized and extended.
 
-Its repository is located at https://github.com/heartexlabs/label-studio-frontend
+LSF is located as a separated github repository: 
+https://github.com/heartexlabs/label-studio-frontend
 
-## Install
 
-```bash
-npm install label-studio
+## Frontend development 
+
+### Manual builds
+
+If you want to build a new tag or change the behaviour of default components inside of LSF then you need to go into LSF repo and check [Development part](https://github.com/heartexlabs/label-studio-frontend#development) of readme. Note that this will require you to have a good knowledge of React and Javascript.build.js <branch-name-from-official-lsf-repo>
+
+
+### Github Artifacts
+
+Github Artifacts provide zip archives with LSF builds for download via simple link. Branches from the official LSF repo will be built automatically and placed on Github Artifacts hosting. Check [this link](https://github.com/heartexlabs/label-studio-frontend/actions) to access it. 
+
+Also you can configure github token to obtain artifacts automatically:
+```
+export GITHUB_TOKEN=<token>
+cd label-studio/scripts
+node get-lsf-build.js <branch-name-from-official-lsf-repo>
 ```
 
-## CDN
+### CDN 
+
+You can include `main.<hash>.css` and `main.<hash>.js` files from CDN directly. Explore `https://unpkg.com/browse/label-studio@<LS_version>/build/static/` (e.g. [0.7.3](https://unpkg.com/browse/label-studio@0.7.3/build/static/) to find correct filenames of js/css. 
 
 ```xhtml
 <!-- Theme included stylesheets -->
-<link href="https://unpkg.com/browse/label-studio@0.4.0/build/static/css/main.14acfaa5.css" rel="stylesheet">
+<link href="https://unpkg.com/browse/label-studio@0.7.3/build/static/css/main.14acfaa5.css" rel="stylesheet">
 
 <!-- Main Label Studio library -->
-<script src="https://unpkg.com/browse/label-studio@0.4.0/build/static/js/main.0249ea16.js"></script>
+<script src="https://unpkg.com/browse/label-studio@0.7.3/build/static/js/main.0249ea16.js"></script>
 ```
 
-## Quickstart
 
-Instantiate a new Label Studio object with a selector for the div that should become the editor.
+## Frontend integration guide 
+
+Instantiate a new Label Studio object with a selector for the div that should become the editor. To see all the available options for the initialization of LabelStudio object, please check the [Reference](frontend_reference.html).
 
 ```xhtml
 <!-- Include Label Studio stylesheet -->
-<link href="https://unpkg.com/label-studio@0.4.0/build/static/css/main.14acfaa5.css" rel="stylesheet">
+<link href="https://unpkg.com/browse/label-studio@0.7.3/build/static/css/main.09b8161e.css" rel="stylesheet">
 
 <!-- Create the Label Studio container -->
 <div id="label-studio"></div>
 
 <!-- Include the Label Studio library -->
-<script src="https://unpkg.com/label-studio@0.4.0/build/static/js/main.0249ea16.js"></script>
+<script src="https://unpkg.com/browse/label-studio@0.7.3/build/static/js/main.e963e015.js"></script>
 
 <!-- Initialize Label Studio -->
 <script>
@@ -59,7 +76,7 @@ Instantiate a new Label Studio object with a selector for the div that should be
       "completions:menu",
       "completions:add-new",
       "completions:delete",
-      "predictions:menu",
+      "predictions:menu"
     ],
 
     user: {
@@ -67,7 +84,6 @@ Instantiate a new Label Studio object with a selector for the div that should be
       firstName: "James",
       lastName: "Dean"
     },
-
     task: {
       completions: [],
       predictions: [],
@@ -87,6 +103,19 @@ Instantiate a new Label Studio object with a selector for the div that should be
 </script>
 ```
 
-> You can use [Playground](/playground) to test out different types of config.
+## Custom LSF + LSB integration
 
-To see all the available options for the initialization of **LabelStudio**, please check the [Reference](frontend_reference.html).
+LS frontend (LSF) with the backend (LSB) integration is similar to described in «[Frontend integration guide](#Frontend-integration-guide)». But Javascript part is out and placed in [lsf-sdk.js](https://github.com/heartexlabs/label-studio/blob/master/label_studio/static/js/lsf-sdk.js). The main idea of this integration is the detailed callback development.  
+
+1. Make your custom LSF build by following this [instructions](https://github.com/heartexlabs/label-studio-frontend#development). Final your development with `npm run build-bundle` to build `main.<hash>.css` and `main.<hash>.js` files.
+
+2. **Do not to forget** to remove the old build from LSB:
+```bash
+rm -r label-studio/label_studio/static/editor/*
+``` 
+
+2. Copy build folder from LSF to LSB: 
+```bash
+cp -r label-studio-frontend/build/static/{js,css} label-studio/label_studio/static/editor/
+``` 
+          
