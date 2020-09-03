@@ -119,7 +119,7 @@ const _loadTask = function(ls, url, completionID) {
                     c = ls.completionStore.addCompletionFromPrediction(cs.predictions[0]);
                 }
 
-                else if (ls.completionStore.completions.length > 0 && completionID === 'auto') {
+                else if (ls.completionStore.completions.length > 0 && (completionID === 'auto' || !completionID)) {
                   c = {id: ls.completionStore.completions[0].id};
                 }
 
