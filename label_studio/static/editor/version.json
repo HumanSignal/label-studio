@@ -1,6 +1,6 @@
 {
-  "message": "Don't serialize broken regions (polygon, brush)\n\nIf polygon has less than 3 vertices; if brush is empty.",
-  "commit": "705feed7a2a4ce8d91a51b39505d3b558b30ff55",
-  "branch": "master",
-  "date": "2020-08-28T14:59:00Z"
+  "message": "Fix id/pk issues: random pk on init; find by id/pk",
+  "commit": "da58b02eab1a1ffb503d5a228bd26e332600240c",
+  "branch": "tmp/deserialize",
+  "date": "2020-09-03T18:34:32Z"
 }
