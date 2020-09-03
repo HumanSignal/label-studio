@@ -1,6 +1,6 @@
 {
-  "message": "Don't serialize broken regions (polygon, brush)\n\nIf polygon has less than 3 vertices; if brush is empty.",
-  "commit": "705feed7a2a4ce8d91a51b39505d3b558b30ff55",
-  "branch": "master",
-  "date": "2020-08-28T14:59:00Z"
+  "message": "Fix Submit, block some unsafe old code; fix test",
+  "commit": "51bf2ed0ca49f52606808a3313532471297ac93c",
+  "branch": "tmp/deserialize",
+  "date": "2020-09-02T22:28:58Z"
 }
