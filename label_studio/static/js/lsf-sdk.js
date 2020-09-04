@@ -299,7 +299,7 @@ const LSF_SDK = function(elid, config, task) {
         } else {
           ls.setFlags({ isLoading: false });
           // refresh task from server
-          loadTask(ls, ls.task.id, ls.completionStore.selected.id);
+          loadTask(ls, ls.task.id, ls.completionStore.selected.pk);
         }
       });
     },
