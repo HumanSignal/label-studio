@@ -1,6 +1,6 @@
 {
-  "message": "Fix id/pk issues: random pk on init; find by id/pk",
-  "commit": "da58b02eab1a1ffb503d5a228bd26e332600240c",
+  "message": "Stop autosave on submit",
+  "commit": "60fb4ff202f7d16baa3b34ea25c28218f011c3f8",
   "branch": "tmp/deserialize",
-  "date": "2020-09-03T18:34:32Z"
+  "date": "2020-09-04T14:51:36Z"
 }
