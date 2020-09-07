@@ -1,6 +1,6 @@
 {
-  "message": "Fix Submit, block some unsafe old code; fix test",
-  "commit": "51bf2ed0ca49f52606808a3313532471297ac93c",
+  "message": "Fix TextArea _type bug",
+  "commit": "9fec25c5e7eb5cff139fdb6ae68c6749004c76ed",
   "branch": "tmp/deserialize",
-  "date": "2020-09-02T22:28:58Z"
+  "date": "2020-09-05T22:40:25Z"
 }
