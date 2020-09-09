@@ -15,6 +15,13 @@ exports.config = {
       show: !headless,
       waitForAction: headless ? 100 : 1200,
       windowSize: "1200x900",
+      chrome: {
+        defaultViewport: {
+          width: 1400,
+          height: 1200,
+          deviceScaleFactor: 2,
+        },
+      },
     },
   },
   include: {
