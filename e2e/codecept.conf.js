@@ -13,7 +13,7 @@ exports.config = {
     Puppeteer: {
       url: "http://localhost:8080",
       show: !headless,
-      waitForAction: headless ? 100 : 1200,
+      waitForAction: headless ? 100 : 300,
       windowSize: "1200x900",
       chrome: {
         defaultViewport: {
