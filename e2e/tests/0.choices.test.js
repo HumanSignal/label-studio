@@ -1,6 +1,6 @@
 Feature('choices');
 
-Scenario('Smoke test', (I) => {
+Scenario('Setup choices config from start', (I) => {
   I.amOnPage("/");
   I.waitForText("Welcome to"); // Label Studio uses &nbsp; so don't check it
   I.see("Setup your label config");
@@ -18,6 +18,7 @@ Scenario('Smoke test', (I) => {
 
   I.click("Save");
   I.click("Import Tasks");
+  I.waitInUrl("/import", 3);
   I.click("Add Sample Task");
   // empty table cell in the first row of data table
   I.click(locate("td").after(locate("td").withText("0")));
