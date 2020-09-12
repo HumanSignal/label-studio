@@ -12,6 +12,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, BooleanField
 from wtforms.validators import InputRequired, Optional, ValidationError
 from collections import OrderedDict
+from ordered_set import OrderedSet
 
 from label_studio.utils.io import json_load
 from label_studio.utils.validation import TaskValidator, ValidationError as TaskValidationError
@@ -414,8 +415,8 @@ class CloudStorage(BaseStorage):
         new_ids_keys_map = {}
         new_keys_ids_map = {}
 
-        full = set(self.iter_full_keys())
-        intersect = full & set(self._keys_ids_map)
+        full = OrderedSet(self.iter_full_keys())
+        intersect = full & OrderedSet(self._keys_ids_map)
         exclusion = full - intersect
 
         for key in exclusion:
