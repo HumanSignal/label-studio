@@ -243,17 +243,15 @@
 
   var iframeTimer = null;
 
-  function editor_iframe(res) {
+  function editor_iframe(res, modal) {
     // generate new iframe
     var iframe = $('<iframe onclick="event.stopPropagation()" id="render-editor"></iframe>');
-    iframe.css('width', $(window).width() * 0.8);
-    var modal = $('<div onclick="$(this).remove()" id="preview-wrapper"></div>').append(iframe);
-
-    // add iframe to wrapper div
-    $('body').append(modal);
+    iframe.css('width', $(window).width() * 0.9);
+    iframe.hide();
+    modal.append(iframe);
 
     iframe.on('load', function () {
-      // force to hide undo / redo / reset buttons
+      $('#render-editor-loader').hide();
       iframe.show();
       var obj = document.getElementById('render-editor');
 
@@ -271,6 +269,12 @@
   }
 
   function show_render_editor(config) {
+    // add dimmer modal
+    var modal = $('<div onclick="$(this).remove()" id="preview-wrapper">' +
+      '<div id="render-editor-loader"><img width="50px" src="/images/loading.gif"></div></div>');
+    $('body').append(modal);
+    $('#render-editor-loader').css('width', $(window).width() * 0.9);
+
     $.ajax({
       url: "https://app.heartex.ai/demo/render-editor?full_editor=t",
       method: 'POST',
@@ -279,13 +283,12 @@
         config: config,
         edit_count: 0
       },
-      success: editor_iframe,
+      success: function(res) { editor_iframe(res, modal) },
       error: function () {
         alert("Can't load preview, demo server error");
       }
     })
   }
-
 
   /**
    * Sub headers in sidebar
