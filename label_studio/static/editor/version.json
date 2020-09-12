@@ -1,6 +1,6 @@
 {
-  "message": "Fix long lines in Text objects",
-  "commit": "7e85d59965558fec52d58dde90d073cf512d8adb",
-  "branch": "master",
-  "date": "2020-09-02T18:52:14Z"
+  "message": "Convert Brush to new structure",
+  "commit": "ef5a5b5039c713bfcf422741955b8015c304c20a",
+  "branch": "tmp/deserialize",
+  "date": "2020-09-10T18:19:40Z"
 }
