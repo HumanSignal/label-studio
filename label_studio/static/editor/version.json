@@ -1,6 +1,6 @@
 {
-  "message": "Fix TextArea _type bug",
-  "commit": "9fec25c5e7eb5cff139fdb6ae68c6749004c76ed",
-  "branch": "tmp/deserialize",
-  "date": "2020-09-05T22:40:25Z"
+  "message": "Fix long lines in Text objects",
+  "commit": "7e85d59965558fec52d58dde90d073cf512d8adb",
+  "branch": "master",
+  "date": "2020-09-02T18:52:14Z"
 }

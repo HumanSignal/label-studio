@@ -198,17 +198,11 @@
    */
   function initPreviewButtons() {
     var code = document.querySelectorAll(".html").forEach(code => {
-      var preview = createButton("Open Preview", "lnk");
 
+      var preview = createButton("Open Preview", "lnk");
       preview.onclick = function(ev) {
         ev.preventDefault();
-
-        var config = code.textContent.replace(/(\r\n|\n|\r)/gm, "");
-        var url = "https://go.heartex.net/demo/render-editor?full_editor=t&config=" + encodeURI(config);
-        newwindow = window.open(url, "Preview");
-        if (window.focus) {
-          newwindow.focus();
-        }
+        show_render_editor(code.textContent);
 
         return false;
       };
@@ -234,7 +228,7 @@
       div.appendChild(pg);
 
       code.parentNode.insertAdjacentElement("afterend", div);
-    });
+    })
   }
 
   function createButton(title, clsName) {
@@ -247,17 +241,51 @@
     return a;
   }
 
-  function showPreview(el, config, url) {
-    config = config.replace(/(\r\n|\n|\r)/gm, "");
-    var url = "https://go.heartex.net/demo/render-editor?full_editor=t&config=" + encodeURI(config);
-    var windowName = "Preview";
+  var iframeTimer = null;
 
-    newwindow = window.open(url, windowName);
-    if (window.focus) {
-      newwindow.focus();
-    }
-    return false;
+  function editor_iframe(res) {
+    // generate new iframe
+    var iframe = $('<iframe onclick="event.stopPropagation()" id="render-editor"></iframe>');
+    iframe.css('width', $(window).width() * 0.8);
+    var modal = $('<div onclick="$(this).remove()" id="preview-wrapper"></div>').append(iframe);
+
+    // add iframe to wrapper div
+    $('body').append(modal);
+
+    iframe.on('load', function () {
+      // force to hide undo / redo / reset buttons
+      iframe.show();
+      var obj = document.getElementById('render-editor');
+
+      // wait until all images and resources from iframe loading
+      clearTimeout(iframeTimer);
+      iframeTimer = setInterval(function () {
+        if (obj.contentWindow) {
+          obj.style.height = (obj.contentWindow.document.body.scrollHeight) + 'px';
+        }
+      }, 100);
+    });
+
+    // load new data into iframe
+    iframe.attr('srcdoc', res);
   }
+
+  function show_render_editor(config) {
+    $.ajax({
+      url: "https://app.heartex.ai/demo/render-editor?full_editor=t",
+      method: 'POST',
+      xhrFields: {withCredentials: true},
+      data: {
+        config: config,
+        edit_count: 0
+      },
+      success: editor_iframe,
+      error: function () {
+        alert("Can't load preview, demo server error");
+      }
+    })
+  }
+
 
   /**
    * Sub headers in sidebar

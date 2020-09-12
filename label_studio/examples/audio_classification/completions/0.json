@@ -17,7 +17,7 @@
         }
     ],
     "data": {
-        "url": "https://go.heartex.net/static/samples/game.wav"
+        "url": "https://app.heartex.ai/static/samples/game.wav"
     },
     "id": 0,
     "task_path": "../examples/audio_classification/tasks.json"
