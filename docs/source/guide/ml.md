@@ -96,6 +96,16 @@ docker-compose up
 The server starts listening on port 9090, and you can connect it to Label Studio by specifying `--ml-backends http://localhost:9090`
  or via UI on **Model** page.
  
+## Active Learning & Task Sampling  
+
+The process of creating annotated training data for supervised machine learning models is often expensive and time-consuming. Active Learning is a branch of machine learning that **seeks to minimize the total amount of data required for labeling by strategically sampling observations** that provide new insight into the problem. In particular, Active Learning algorithms seek to select diverse and informative data for annotation (rather than random observations) from a pool of unlabeled data using **prediction scores**. 
+
+Depending on score types you can select a sampling strategy 
+* prediction-score-min (min is the best score) 
+* prediction-score-max (max is the best score)
+ 
+Read more about active learning sampling [on the task page](https://labelstud.io/guide/tasks.html#Sampling). 
+ 
 ## Create your own ML backend
 
 Check examples in `label-studio/ml/examples` directory.
