@@ -27,6 +27,21 @@
               class="ui button negative basic" style="height: 24px; padding-top: 5px; margin-left: 5px;">
         Start new project
       </button>
+        <br> <div> Current Project: {{ current_project }} </div>
+      <div style="margin: 0.25em"></div>
+      <br/>
+    </div>
+  </div>
+  <div class="ui accordion">
+    <div class="active title"><i class="dropdown icon"></i> Switch to new project</div>
+    <div class="active content">
+        <table>
+            {%  for uuid, desc in project_ids.items() %}
+              <div class="ui item">
+                <a id="myLink" href="#" onclick="switch_project('{{uuid}}')" data-value="{{ uuid }}">{{ desc }}</a>
+              </div>
+            {%  endfor %}
+        </table>
       <div style="margin: 0.25em"></div>
       <br/>
     </div>
@@ -73,12 +88,28 @@
 
 <script>
   function new_project() {
-    let yes = confirm("You will lose ALL YOUR DATA, this action CAN'T BE UNDONE.\nAre you sure?");
-    if (yes) {
+    var project_desc = prompt("\"You will lose ALL YOUR DATA, this action CAN'T BE UNDONE.\nAre you sure? If so, please enter your project description", "");
+    if (project_desc) {
       let request = new XMLHttpRequest();
-      request.open("POST", "api/project/?new=true", true);
+      request.open("POST", `api/project/?new=true&desc=${project_desc}`, true);
       request.onload = function () {
         window.location.reload();
+      };
+      request.send(null);
+    }
+  }
+
+  $('.ui .accordion').accordion({collapsible: true});
+</script>
+
+<script>
+  function switch_project(uuid) {
+    let yes = confirm("Please confirm you'd like to switch to project");
+    if (yes) {
+      let request = new XMLHttpRequest();
+      request.open("POST", `/api/project-switch?uuid=${uuid}`, true);
+      request.onload = function () {
+        open(request.responseURL)
       };
       request.send(null);
     }

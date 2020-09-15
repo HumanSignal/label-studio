@@ -1,5 +1,6 @@
 {
   "title": "Label Studio",
+  "description": "project description",
   "protocol": "http://",
   "host": "0.0.0.0",
   "port": 8080,
@@ -14,5 +15,6 @@
     "debug": false
   },
   "sampling": "sequential",
-  "ml_backends": []
+  "ml_backends": [],
+  "show_project_links_in_multisession": true
 }

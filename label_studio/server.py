@@ -240,10 +240,22 @@ def setup_page():
     """ Setup label config
     """
     project = project_get_or_create()
-
+    current_project = project.uuid
+    project_ids = project.get_project_ids(project.path)
     templates = get_config_templates()
     input_values = {}
     project.analytics.send(getframeinfo(currentframe()).function)
+
+    if project.config.get("show_project_links_in_multisession", False):
+        current_project = project.get_config(project.name, input_args).get('description')
+
+        project_names = [os.path.join(os.path.dirname(project.name), id) for id in project_ids]
+        project_desc = [project.get_config(name, input_args).get('description') for name in project_names]
+        project_ids = dict(zip(project_ids, project_desc))
+    #TEMPORARY
+    else:
+        project_ids = dict(zip(project_ids, project_ids))
+
     return flask.render_template(
         'setup.html',
         config=project.config,
@@ -251,7 +263,9 @@ def setup_page():
         label_config_full=project.label_config_full,
         templates=templates,
         input_values=input_values,
-        multi_session=input_args.command == 'start-multi-session'
+        multi_session=input_args.command == 'start-multi-session',
+        current_project=current_project,
+        project_ids=project_ids
     )
 
 
@@ -578,6 +592,7 @@ def api_project():
     code = 200
 
     if request.method == 'POST' and request.args.get('new', False):
+        input_args.project_desc = request.args.get('desc')
         project = project_get_or_create(multi_session_force_recreate=True)
         code = 201
     elif request.method == 'PATCH':
@@ -957,6 +972,18 @@ def get_data_file(filename):
                                 'Use "allow_serving_local_files": true config option to enable local serving')
     directory = request.args.get('d')
     return flask.send_from_directory(directory, filename, as_attachment=True)
+
+@app.route('/api/project-switch', methods=['POST'])
+@requires_auth
+@exception_treatment
+def api_project_switch():
+    """Switch projects"""
+    if request.args.get('uuid') is None:
+        return make_response("Not a valid UUID", 400)
+
+    uuid = request.args.get('uuid')
+    session['project'] = uuid
+    return redirect("/")
 
 
 def str2datetime(timestamp_str):

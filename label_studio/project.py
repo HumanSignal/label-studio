@@ -228,6 +228,10 @@ class Project(object):
         return self.project_obj.id
 
     @property
+    def uuid(self):
+        return os.path.basename(self.path)
+
+    @property
     def data_types(self):
         return self.project_obj.data_types
 
@@ -591,6 +595,10 @@ class Project(object):
         return os.path.join(args.root_dir, project_name)
 
     @classmethod
+    def get_project_ids(cls, project_name):
+        return os.listdir(os.path.dirname(project_name))
+
+    @classmethod
     def get_input_data_tags(cls, label_config):
         tag_iter = ElementTree.fromstring(label_config).iter()
         return [
@@ -756,6 +764,8 @@ class Project(object):
             config['protocol'] = 'https://'
             config['cert'] = args.cert_file
             config['key'] = args.key_file
+        if args.project_desc:
+            config['description'] = args.project_desc
 
         # create config.json
         config_json = 'config.json'
