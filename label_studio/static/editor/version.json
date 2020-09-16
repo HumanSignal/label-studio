@@ -1,6 +1,6 @@
 {
-  "message": "Convert Brush to new structure",
-  "commit": "ef5a5b5039c713bfcf422741955b8015c304c20a",
+  "message": "Fix ids\n\n1. when deserialize completion without id\n2. when serialize relation",
+  "commit": "473b3be40a15e961c3becf1dbfb85cce454d4ec6",
   "branch": "tmp/deserialize",
-  "date": "2020-09-10T18:19:40Z"
+  "date": "2020-09-16T10:09:12Z"
 }
