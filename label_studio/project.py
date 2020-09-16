@@ -498,7 +498,7 @@ class Project(object):
         :return: json dict with completion
         """
         data = self.target_storage.get(task_id)
-        logger.debug('Get task ' + str(task_id) + ' from target storage: ' + str(data))
+        logger.debug('Get task ' + str(task_id) + ' from target storage')
 
         if data:
             logger.debug('Get predictions ' + str(task_id) + ' from source storage')

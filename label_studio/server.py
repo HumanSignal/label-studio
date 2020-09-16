@@ -572,7 +572,7 @@ def api_generate_next_task():
     # collect prediction from multiple ml backends
     if project.ml_backends_connected:
         task = project.make_predictions(task)
-    logger.debug('Next task:\n' + task.get('id', None))
+    logger.debug('Next task:\n' + str(task.get('id', None)))
     return make_response(jsonify(task), 200)
 
 
