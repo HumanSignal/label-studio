@@ -1,6 +1,6 @@
 {
-  "message": "Fix ids\n\n1. when deserialize completion without id\n2. when serialize relation",
-  "commit": "473b3be40a15e961c3becf1dbfb85cce454d4ec6",
+  "message": "Fix multiple root initialization",
+  "commit": "52e6bc8b10f48eda8af795af76d5bf762138823e",
   "branch": "tmp/deserialize",
-  "date": "2020-09-16T10:09:12Z"
+  "date": "2020-09-16T12:07:15Z"
 }
