@@ -6,11 +6,12 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta charset="utf-8"/>
 
-  <link href="//fonts.googleapis.com/css?family=Dosis:500&amp;text=LabelStudio" rel="stylesheet" type="text/css">
   <link rel="shortcut icon" href="static/favicon.ico"/>
+  <link rel="stylesheet" href="static/fonts/dosis/dosis.css">
   <link rel="stylesheet" href="static/css/reset.css">
   <link rel="stylesheet" href="static/css/main.css?v2">
   <link rel="stylesheet" href="static/css/fontall.min.css">
+  <link rel="stylesheet" href="static/css/introjs.min.css">
   <link rel="stylesheet" href="static/semantic/semantic.min.css">
 
   <script src="static/js/jquery.min.js"></script>
@@ -18,13 +19,17 @@
   <script src="static/js/js.cookie.js"></script>
   <script src="static/js/popper.min.js"></script>
   <script src="static/js/tippy-bundle.umd.min.js"></script>
-  <script src="static/js/helpers.js?v2"></script>
+  <script src="static/js/helpers.js?v3"></script>
+
+  <script src="static/js/intro.min.js"></script>
 
   <script src="https://browser.sentry-cdn.com/5.17.0/bundle.min.js"
           integrity="sha384-lowBFC6YTkvMIWPORr7+TERnCkZdo5ab00oH5NkFLeQUAmBTLGwJpFjF6djuxJ/5"
           crossorigin="anonymous"></script>
   <script>
-    Sentry.init({ dsn: 'https://f24f3e8da54c4a16a1ce9bef30ea9c30@o227124.ingest.sentry.io/5285295' });
+    if (typeof Sentry !== 'undefined') {  // sentry could be unavailable if no internet connection
+      Sentry.init({dsn: 'https://f24f3e8da54c4a16a1ce9bef30ea9c30@o227124.ingest.sentry.io/5285295'});
+    }
   </script>
 
   <!-- Editor CSS -->

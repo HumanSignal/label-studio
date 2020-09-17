@@ -449,7 +449,8 @@
       <br/><br/>
 
       <!-- Settings while hidden left panel -->
-      <div class="action-item" @click="show_table_settings=!show_table_settings" v-if="!full_pagination">
+      <div class="action-item" @click="show_table_settings=!show_table_settings" v-if="!full_pagination"
+           data-intro='Hello step one!' data-step="1">
         <center><i class="fa fa-cog"></i></center>
       </div>
 
@@ -1067,16 +1068,24 @@
         $('#vue_loader').hide();
         $('.ui.checkbox').checkbox();
 
+        // hotkeys mapping
         var self = this;
         Mousetrap.bind(['shift+left', 'a'], this.prevPage);
         Mousetrap.bind(['shift+right', 'd'], this.nextPage);
         Mousetrap.bind(['shift+up', 'w'], this.prevTask);
         Mousetrap.bind(['shift+down', 's'], this.nextTask);
-
         Mousetrap.bind(['q'], function() { self.show_table_settings = !self.show_table_settings });
 
         $(window).resize(this.resizeLeftPanel);
         console.log('Vue mounting success');
+
+        //introJs().start();
+      },
+
+      updated: function() {
+        this.$nextTick(function() {
+
+        });
       }
     });
 
