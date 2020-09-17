@@ -1,6 +1,6 @@
 {
-  "message": "Fix multiple root initialization",
-  "commit": "52e6bc8b10f48eda8af795af76d5bf762138823e",
+  "message": "Run GitHub Actions only once per push",
+  "commit": "9b7cfaa55719c9e7a7cdf2d1eecd88b5614e93ae",
   "branch": "tmp/deserialize",
-  "date": "2020-09-16T12:07:15Z"
+  "date": "2020-09-17T02:29:12Z"
 }
