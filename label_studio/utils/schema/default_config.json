@@ -14,5 +14,6 @@
     "debug": false
   },
   "sampling": "sequential",
-  "ml_backends": []
+  "ml_backends": [],
+  "task_page_auto_update_timer": 10000
 }

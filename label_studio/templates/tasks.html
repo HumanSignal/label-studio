@@ -1049,14 +1049,16 @@
       mounted: function () {
         this.vue_loaded = true;
         this.project_loaded = true;
-        //this.labelStudio = LSF_SDK("label-studio", this.project.label_config_line);
 
         this.order = getUrlArg('order', this.order);
         this.page = getUrlArg('page', this.page);
         this.page_size = getUrlArg('page_size', this.page_size);
         this.loadAll();
 
-        this.timer_interval = parseInt(getUrlArg('timer', '10000'));
+        // project and tasks auto update timer
+        var project_timer_interval = this.project.config.task_page_auto_update_timer ?
+          this.project.config.task_page_auto_update_timer.toString(): '10000';
+        this.timer_interval = parseInt(getUrlArg('timer', project_timer_interval));
         this.startAutoUpdateTimer();
         if (this.timer_interval > 0) {
           console.log('auto update enabled, use ?timer=0 to disable it on this page')
