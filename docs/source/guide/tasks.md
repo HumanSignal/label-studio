@@ -178,9 +178,7 @@ Supported formats are: `.wav` `.aiff` `.mp3` `.au` `.flac`
 
 ### Upload resource files on Import page
 
-For label configs with one data key (e.g.: one input image) Label Studio supports a file uploading via GUI, 
-just drag & drop your files (or select them from file dialog) on "Import" page. 
-This option is suitable for limited file number.     
+For label configs with one data key (e.g.: one input image) Label Studio supports a file uploading via GUI, just drag & drop your files (or select them from file dialog) on "Import" page. This option is suitable for limited file number.     
 
 
 ## Import using API

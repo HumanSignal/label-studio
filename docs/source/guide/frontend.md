@@ -108,7 +108,7 @@ You can use Label Studio Frontend separately in your own projects: just include 
 
 ## Custom LSF + LSB integration
 
-LS frontend (LSF) with the backend (LSB) integration is similar to described in «[Frontend integration guide](#Frontend-integration-guide)». But Javascript part is out and placed in [lsf-sdk.js](https://github.com/heartexlabs/label-studio/blob/master/label_studio/static/js/lsf-sdk.js). The main idea of this integration is the detailed callback development.  
+LS Frontend (LSF) with Backend (LSB) integration is similar to described in «[Frontend integration guide](#Frontend-integration-guide)». Javascript integration script is placed in [lsf-sdk.js](https://github.com/heartexlabs/label-studio/blob/master/label_studio/static/js/lsf-sdk.js) in Backend. The main idea of this integration based on LSF callbacks.
 
 1. Make your custom LSF build by following this [instructions](https://github.com/heartexlabs/label-studio-frontend#development). Final your development with `npm run build-bundle` to generate `main.<hash>.css` and `main.<hash>.js` files.
 
@@ -122,13 +122,13 @@ rm -r label-studio/label_studio/static/editor/*
     cp -r label-studio-frontend/build/static/{js,css} label-studio/label_studio/static/editor/
     ```
 
-    If you installed LS as pip package then you should to replace `<env-path>/lib/python<version>/site-packages/label_studio/static/editor/`
+    If you installed LS as a pip package then you should replace `<env-path>/lib/python<version>/site-packages/label_studio/static/editor/`
 
 4. Run LS instance as usual and it will use a new LSF build:
     ```bash
     label-studio start <your-project>
     ```
-    You can check a new build in browser by exploring the source code of Labeling page, there must be something like this in the `<head>` section: 
+    You can check a new build by exploring the source code of Labeling page in your browser, there must be something like this in the `<head>` section: 
     
     ```xhtml
      <!-- Editor CSS -->

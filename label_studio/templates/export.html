@@ -74,7 +74,7 @@
   <script>
     // download file by url
     function downloadFile(urlToSend) {
-      $('#dimmer').addClass('active');
+      $('#dimmer').addClass('active').hide().fadeIn(1000);
       var req = new XMLHttpRequest();
       req.onreadystatechange = function() {
         if (req.readyState === 2) {

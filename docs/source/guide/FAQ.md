@@ -4,7 +4,7 @@ type: guide
 order: 101
 ---
 
-Frequently asked questions about setup and LS usage.
+Frequently asked questions about setup and usage.
 
 ## Image/audio/resource loading error while labeling
 
@@ -12,6 +12,8 @@ The most common mistake while resource loading is <b>CORS</b> (Cross-Origin Reso
 
 <br>
 <center>
+  <img src='../images/cors-lsf-error.png' style="max-width:300px; opacity: 0.8">
+  <br/><br/>
   <img src='/images/cors-error.png' style="max-width:500px; opacity: 0.8">
   <br/><br/>
   <img src='/images/cors-error-2.png' style="max-width:500px; opacity: 0.8">
@@ -77,7 +79,7 @@ You can import pre-annotated tasks into LS. Pre-annotations will be automaticall
       "to_name": "message",
       "type": "choices",
       "value": {
-        "choices": ["Neutral"]
+        "choices": ["Positive"]
       }
     }]
   }]
