@@ -30,7 +30,7 @@ Its purpose is to help you label different types of data using a simple interfac
 ## Quick Start
 
 ```bash
-# Requires >=Python3.5
+# Requires >=Python3.6
 pip install label-studio
 
 # Initialize the project in labeling_project path

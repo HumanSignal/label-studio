@@ -24,11 +24,14 @@ setuptools.setup(
     include_package_data=True,
     classifiers=[
         'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
     ],
     install_requires=requirements,
-    python_requires='>=3.5',
+    python_requires='>=3.6',
     entry_points={
         'console_scripts': [
             'label-studio=label_studio.server:main',
