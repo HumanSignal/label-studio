@@ -52,7 +52,7 @@ class TaskValidator:
         # iterate over data types from project
         for data_key, data_type in project.data_types.items():
             if data_key not in data:
-                raise ValidationError('"{data_key}" key is expected in task data'.format(data_key=data_key))
+                raise ValidationError(f'"{data_key}" key is expected in task data')
 
             expected_types = _DATA_TYPES.get(data_type, (str, ))
             if not isinstance(data[data_key], tuple(expected_types)):
@@ -111,7 +111,7 @@ class TaskValidator:
     @staticmethod
     def raise_if_wrong_class(task, key, class_def):
         if key in task and not isinstance(task[key], class_def):
-            raise ValidationError('Task[{key}] must be {class_def}'.format(key=key, class_def=class_def))
+            raise ValidationError(f'Task[{key}] must be {class_def}')
 
     def validate(self, task):
         """ Validate whole task with task['data'] and task['completions']. task['predictions']

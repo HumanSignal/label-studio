@@ -351,7 +351,7 @@ class LabelStudioMLManager:
             failure_ttl=300,
             meta={'project': project},
         )
-        logger.info('Training job {job} started for project {project}'.format(job=job, project=project))
+        logger.info(f'Training job {job} started for project {project}')
         return job
 
     @classmethod

@@ -22,7 +22,7 @@ _storage = {}
 
 def register_storage(storage_type, class_def):
     if storage_type in _storage:
-        raise IndexError('Storage {} already exists'.format(storage_type))
+        raise IndexError(f'Storage {storage_type} already exists')
     _storage[storage_type] = class_def
 
 
@@ -32,7 +32,7 @@ def get_storage_form(storage_type):
 
 def create_storage(storage_type, name, path, project_path=None, project=None, **kwargs):
     if storage_type not in _storage:
-        raise NotImplementedError('Can\'t create storage "{}"'.format(storage_type))
+        raise NotImplementedError(f'Can\'t create storage "{storage_type}"')
     return _storage[storage_type](name=name, path=path, project_path=project_path, project=project, **kwargs)
 
 

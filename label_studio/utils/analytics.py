@@ -102,7 +102,7 @@ class Analytics:
         json_data['server_time'] = self._get_timestamp_now()
         try:
             url = 'https://analytics.labelstud.io/prod'
-            logger.debug('Sending to {url}:\n{data}'.format(url=url, data=json_data))
+            logger.debug(f'Sending to {url}:\n{json_data}')
             requests.post(url=url, json=json_data)
         except requests.RequestException as exc:
             logger.debug('Analytics error: {exc}'.format(exc=str(exc)))

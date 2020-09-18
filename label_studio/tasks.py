@@ -23,7 +23,7 @@ class Tasks:
         params = urllib.parse.urlencode({'d': os.path.dirname(filepath)})
         base_url = HOSTNAME + '/'
         image_url_path = base_url + urllib.parse.quote('data/' + filename)
-        image_local_url = '{image_url_path}?{params}'.format(image_url_path=image_url_path, params=params)
+        image_local_url = f'{image_url_path}?{params}'
         return {
             'id': task_id,
             'task_path': filepath,

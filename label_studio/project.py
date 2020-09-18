@@ -292,7 +292,7 @@ class Project:
         self.config['label_config_updated'] = True
         with open(self.config['config_path'], mode='w', encoding='utf8') as f:
             json.dump(self.config, f)
-        logger.info('Label config saved to: {path}'.format(path=label_config_file))
+        logger.info(f'Label config saved to: {label_config_file}')
 
     def _update_derived_output_schema(self, completion):
         """
@@ -631,7 +631,7 @@ class Project:
             return task_loader.from_dir_with_image_files(input_path, data_key)
         if args.input_format == 'audio-dir':
             return task_loader.from_dir_with_audio_files(input_path, data_key)
-        raise RuntimeError('Can\'t load tasks for input format={}'.format(args.input_format))
+        raise RuntimeError(f'Can\'t load tasks for input format={args.input_format}')
 
     @classmethod
     def _create_ml_backend_params(cls, url, project_name=None):
@@ -842,7 +842,7 @@ class Project:
             cls._storage[project_name] = project
             return project
 
-        raise ProjectNotFound('Project {p} doesn\'t exist'.format(p=project_name))
+        raise ProjectNotFound(f'Project {project_name} doesn\'t exist')
 
     @classmethod
     def create(cls, project_name, args, context):

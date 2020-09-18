@@ -112,7 +112,7 @@ def action_get_task(test_client, case_config):
     """
     # get task by task_id
     task_id = case_config['task_id']
-    response = test_client.get('/api/tasks/{task_id}/'.format(task_id=task_id))
+    response = test_client.get(f'/api/tasks/{task_id}/')
     assert response.status_code == 200
 
 
@@ -123,7 +123,7 @@ def action_delete_task(test_client, case_config):
     """
     # get task by task_id
     task_id = case_config['task_id']
-    response = test_client.delete('/api/tasks/{task_id}/'.format(task_id=task_id))
+    response = test_client.delete(f'/api/tasks/{task_id}/')
     assert response.status_code == 204
 
 
@@ -153,13 +153,13 @@ def action_label(test_client, case_config):
     """
     completion = case_config['completion']
     task_id = case_config['task_id']
-    response = test_client.get('/?task_id={task_id}'.format(task_id=task_id))
+    response = test_client.get(f'/?task_id={task_id}')
     assert response.status_code == 200
 
     headers = {
         'Content-Type': 'application/json',
     }
-    response = test_client.post('api/tasks/{task_id}/completions/'.format(task_id=task_id),
+    response = test_client.post(f'api/tasks/{task_id}/completions/',
                                 data=json.dumps(completion),
                                 headers=headers)
     assert response.status_code == 201
@@ -176,7 +176,7 @@ def action_label_test(test_client, case_config):
 
     project = goc_project()
     filename = os.path.join(project.config.get('output_dir', None),
-                            '{task_id}.json'.format(task_id=task_id))
+                            f'{task_id}.json')
     with open(filename) as json_file:
         completion = json.load(json_file)
         assert completion.get('completions', {})[0].get('result', []) == completion['result']

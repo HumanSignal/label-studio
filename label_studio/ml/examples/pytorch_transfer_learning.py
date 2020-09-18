@@ -145,7 +145,7 @@ class ImageClassifier:
             epoch_loss = running_loss / len(dataloader.dataset)
             epoch_acc = running_corrects.double() / len(dataloader.dataset)
 
-            print('Train Loss: {:.4f} Acc: {:.4f}'.format(epoch_loss, epoch_acc))
+            print(f'Train Loss: {epoch_loss:.4f} Acc: {epoch_acc:.4f}')
 
         print()
 

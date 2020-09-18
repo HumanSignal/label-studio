@@ -37,7 +37,7 @@ def find_node(package_name, node_path, node_type):
             return os.path.join(path, node_path)
     else:
         raise OSError(
-            'Could not find "{}" at package "{}"'.format(node_path, basedir)
+            f'Could not find "{node_path}" at package "{basedir}"'
         )
 
 
