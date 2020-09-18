@@ -1,5 +1,3 @@
-
-
 # exception for import tasks or config validation
 class ValidationError(Exception):
     def __init__(self, detail=None, code=''):
