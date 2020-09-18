@@ -525,6 +525,8 @@ class Project(object):
         else:
             task = deepcopy(task)
 
+        # remove possible stored predictions
+        task.pop('predictions', None)
         # update old completion
         updated = False
         if 'id' in completion:
