@@ -5,9 +5,8 @@ import os
 import pytest
 
 # label_studio
-from label_studio import server
-from label_studio.server import (
-    input_args,
+from label_studio import blueprint as server
+from label_studio.blueprint import (
     validation_error_handler,
 )
 from label_studio.tests.base import (

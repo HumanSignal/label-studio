@@ -6,7 +6,7 @@ import pytest
 import unittest
 
 # label_studio
-from label_studio import server
+from label_studio import blueprint as server
 from label_studio.tests.base import (
     test_client, captured_templates, goc_project,
 )
