@@ -32,7 +32,7 @@ class ProjectNotFound(KeyError):
     pass
 
 
-class Project(object):
+class Project:
 
     _storage = {}
 
@@ -264,7 +264,7 @@ class Project(object):
         self.validate_label_config_on_derived_output_schema(parsed_config)
 
     def _save_config(self):
-        with io.open(self.config['config_path'], mode='w') as f:
+        with open(self.config['config_path'], mode='w') as f:
             json.dump(self.config, f, indent=2)
 
     def update_params(self, params):
@@ -278,7 +278,7 @@ class Project(object):
         label_config_file = self.config['label_config']
         # save xml label config to file
         new_label_config = new_label_config.replace('\r\n', '\n')
-        with io.open(label_config_file, mode='w', encoding='utf8') as f:
+        with open(label_config_file, mode='w', encoding='utf8') as f:
             f.write(new_label_config)
 
         # reload everything that depends on label config
@@ -290,7 +290,7 @@ class Project(object):
 
         # save project config state
         self.config['label_config_updated'] = True
-        with io.open(self.config['config_path'], mode='w', encoding='utf8') as f:
+        with open(self.config['config_path'], mode='w', encoding='utf8') as f:
             json.dump(self.config, f)
         logger.info('Label config saved to: {path}'.format(path=label_config_file))
 
@@ -600,7 +600,7 @@ class Project(object):
 
     @classmethod
     def _load_tasks(cls, input_path, args, label_config_file):
-        with io.open(label_config_file, encoding='utf8') as f:
+        with open(label_config_file, encoding='utf8') as f:
             label_config = f.read()
 
         task_loader = Tasks()
@@ -684,7 +684,7 @@ class Project(object):
                 copy2(default_label_config, config_xml_path)
                 print(default_label_config + ' label config copied to ' + config_xml_path)
             else:
-                with io.open(config_xml_path, mode='w') as fout:
+                with open(config_xml_path, mode='w') as fout:
                     fout.write('<View></View>')
                 print('Empty config has been created in ' + config_xml_path)
 
@@ -704,7 +704,7 @@ class Project(object):
                 tasks = cls._load_tasks(input_path, args, config_xml_path)
             else:
                 tasks = {}
-            with io.open(tasks_json_path, mode='w') as fout:
+            with open(tasks_json_path, mode='w') as fout:
                 json.dump(tasks, fout, indent=2)
             config['input_path'] = tasks_json
             config['source'] = {
@@ -762,7 +762,7 @@ class Project(object):
         config_json_path = os.path.join(dir, config_json)
         if os.path.exists(config_json_path) and not args.force:
             already_exists_error('config', config_json_path)
-        with io.open(config_json_path, mode='w') as f:
+        with open(config_json_path, mode='w') as f:
             json.dump(config, f, indent=2)
 
         print('')
@@ -800,7 +800,7 @@ class Project(object):
             )
 
         config_path = os.path.abspath(config_path)
-        with io.open(config_path) as c:
+        with open(config_path) as c:
             config = json.load(c)
 
         config['config_path'] = config_path

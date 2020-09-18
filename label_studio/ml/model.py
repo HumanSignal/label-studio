@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 @attr.s
-class ModelWrapper(object):
+class ModelWrapper:
     model = attr.ib()
     model_version = attr.ib()
     is_training = attr.attrib(default=False)
@@ -44,7 +44,7 @@ class LabelStudioMLBase(ABC):
         pass
 
 
-class LabelStudioMLManager(object):
+class LabelStudioMLManager:
 
     model_class = None
     model_dir = None
@@ -271,11 +271,11 @@ class LabelStudioMLManager(object):
     def create_data_snapshot(cls, data_iter, workdir):
         data = list(data_iter)
         data_file = os.path.join(workdir, 'train_data.json')
-        with io.open(data_file, mode='w') as fout:
+        with open(data_file, mode='w') as fout:
             json.dump(data, fout, ensure_ascii=False)
 
         info_file = os.path.join(workdir, 'train_data_info.json')
-        with io.open(info_file, mode='w') as fout:
+        with open(info_file, mode='w') as fout:
             json.dump({'count': len(data)}, fout)
 
     @classmethod

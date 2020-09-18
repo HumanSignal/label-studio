@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 @attr.s
-class ProjectObj(object):
+class ProjectObj:
     """
     ProjectObj object holds general labeling project settings
     """
@@ -168,7 +168,7 @@ class ProjectObj(object):
                                           .format(toName=toName, names=sorted(names)))
 
 
-class BaseHTTPAPI(object):
+class BaseHTTPAPI:
     MAX_RETRIES = 2
     HEADERS = {
         'User-Agent': 'label-studio/',
@@ -221,7 +221,7 @@ class BaseHTTPAPI(object):
 
 
 @attr.s
-class MLApiResult(object):
+class MLApiResult:
     """
     Response returned form ML API
     """
@@ -242,7 +242,7 @@ class MLApiResult(object):
 
 
 @attr.s
-class MLApiScheme(object):
+class MLApiScheme:
     """
     Input source / output tags schema exposed for connected ML backend
     """
@@ -259,7 +259,7 @@ class MLApiScheme(object):
 class MLApi(BaseHTTPAPI):
 
     def __init__(self, url, name, **kwargs):
-        super(MLApi, self).__init__(url=url, **kwargs)
+        super().__init__(url=url, **kwargs)
         self._validate_request_timeout = 10
         self._name = name
 
@@ -410,7 +410,7 @@ class CantValidateIsTraining(Exception):
 
 
 @attr.s
-class MLBackend(object):
+class MLBackend:
     """
     Machine learning backend settings
     """
@@ -459,7 +459,7 @@ class MLBackend(object):
         if not os.path.exists(self._TRAIN_JOBS_FILE):
             logger.warning('Can\'t restore train job because ' + self._TRAIN_JOBS_FILE + ' not found')
             return
-        with io.open(self._TRAIN_JOBS_FILE) as f:
+        with open(self._TRAIN_JOBS_FILE) as f:
             train_jobs = json.load(f)
             if self.model_name not in train_jobs:
                 logger.warning(
@@ -477,10 +477,10 @@ class MLBackend(object):
         """
         train_jobs = {}
         if os.path.exists(self._TRAIN_JOBS_FILE):
-            with io.open(self._TRAIN_JOBS_FILE) as f:
+            with open(self._TRAIN_JOBS_FILE) as f:
                 train_jobs = json.load(f)
         train_jobs[self.model_name] = self.train_job
-        with io.open(self._TRAIN_JOBS_FILE, mode='w') as f:
+        with open(self._TRAIN_JOBS_FILE, mode='w') as f:
             json.dump(train_jobs, f, indent=2)
 
     @classmethod

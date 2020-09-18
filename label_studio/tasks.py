@@ -6,7 +6,7 @@ import urllib
 from label_studio.utils.io import iter_files
 
 
-class Tasks(object):
+class Tasks:
 
     _allowed_extensions = {
         'Text': ('.txt',),
@@ -81,7 +81,7 @@ class Tasks(object):
     def from_text_file(self, path, data_key, start_task_id=0):
         tasks = {}
         task_id = start_task_id
-        with io.open(path, encoding="utf8") as f:
+        with open(path, encoding="utf8") as f:
             for line in f:
                 tasks[task_id] = {'id': task_id, 'data': {data_key: line.strip()}}
                 task_id += 1

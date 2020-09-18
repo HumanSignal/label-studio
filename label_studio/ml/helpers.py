@@ -37,7 +37,7 @@ class LabelStudioMLBaseHelper(LabelStudioMLBase):
 class LabelStudioMLChoices(LabelStudioMLBaseHelper):
 
     def __init__(self, **kwargs):
-        super(LabelStudioMLChoices, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         assert len(self.parsed_label_config) == 1
         self.from_name, self.info = list(self.parsed_label_config.items())[0]
         assert self.info['type'] == 'Choices'

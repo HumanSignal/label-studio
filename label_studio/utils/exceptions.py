@@ -11,7 +11,7 @@ class ValidationError(Exception):
             def __add__(self, other):
                 return self.msg + other
 
-        super(ValidationError, self).__init__(detail)
+        super().__init__(detail)
         if isinstance(detail, list):
             self.detail = []
             for d in detail:

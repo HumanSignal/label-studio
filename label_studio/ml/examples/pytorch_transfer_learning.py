@@ -51,7 +51,7 @@ def get_transformed_image(url):
             r.raise_for_status()
             with io.BytesIO(r.content) as f:
                 image = Image.open(f).convert('RGB')
-            with io.open(cached_file, mode='wb') as fout:
+            with open(cached_file, mode='wb') as fout:
                 fout.write(r.content)
     return image_transforms(image)
 
@@ -79,7 +79,7 @@ class ImageClassifierDataset(Dataset):
         return len(self.images)
 
 
-class ImageClassifier(object):
+class ImageClassifier:
 
     def __init__(self, num_classes, freeze_extractor=False):
         self.model = models.resnet18(pretrained=True)
@@ -158,7 +158,7 @@ class ImageClassifier(object):
 class ImageClassifierAPI(LabelStudioMLBase):
 
     def __init__(self, freeze_extractor=False, **kwargs):
-        super(ImageClassifierAPI, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.from_name, self.to_name, self.value, self.classes = get_single_tag_keys(
             self.parsed_label_config, 'Choices', 'Image')
         self.freeze_extractor = freeze_extractor

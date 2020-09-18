@@ -6,7 +6,7 @@ from label_studio.ml import LabelStudioMLBase
 class DummyModel(LabelStudioMLBase):
 
     def __init__(self, **kwargs):
-        super(DummyModel, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
         from_name, schema = list(self.parsed_label_config.items())[0]
         self.from_name = from_name

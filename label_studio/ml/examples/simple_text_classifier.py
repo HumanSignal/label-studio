@@ -13,7 +13,7 @@ class SimpleTextClassifier(LabelStudioMLBase):
 
     def __init__(self, **kwargs):
         # don't forget to initialize base class...
-        super(SimpleTextClassifier, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
         # then collect all keys from config which will be used to extract data from task and to form prediction
         # Parsed label config contains only one output of <Choices> type

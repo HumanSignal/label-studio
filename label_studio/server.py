@@ -16,7 +16,7 @@ except:
     import json
 
 # setup default config
-with io.open(os.path.join(os.path.dirname(__file__), 'logger.json')) as f:
+with open(os.path.join(os.path.dirname(__file__), 'logger.json')) as f:
     logging.config.dictConfig(json.load(f))
 
 from uuid import uuid4

@@ -15,7 +15,7 @@ class JSONStorage(BaseStorage):
     description = 'JSON task file'
 
     def __init__(self, **kwargs):
-        super(JSONStorage, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         tasks = {}
         if os.path.exists(self.path):
             tasks = json_load(self.path, int_keys=True)
@@ -84,7 +84,7 @@ class DirJSONsStorage(BaseStorage):
     description = 'Directory with JSON task files'
 
     def __init__(self, **kwargs):
-        super(DirJSONsStorage, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         os.makedirs(self.path, exist_ok=True)
 
     @property
@@ -140,7 +140,7 @@ class TasksJSONStorage(JSONStorage):
     description = 'Local [loading tasks from "tasks.json" file]'
 
     def __init__(self, path, project_path, **kwargs):
-        super(TasksJSONStorage, self).__init__(
+        super().__init__(
             project_path=project_path,
             path=os.path.join(project_path, 'tasks.json'))
 
@@ -151,7 +151,7 @@ class ExternalTasksJSONStorage(CloudStorage):
     description = 'Local [loading tasks from "tasks.json" file]'
 
     def __init__(self, name, path, project_path, prefix=None, create_local_copy=False, regex='.*', **kwargs):
-        super(ExternalTasksJSONStorage, self).__init__(
+        super().__init__(
             name=name,
             project_path=project_path,
             path=os.path.join(project_path, 'tasks.json'),
@@ -190,12 +190,12 @@ class ExternalTasksJSONStorage(CloudStorage):
         self.data[int(key)] = value
 
     def set(self, id, value):
-        super(ExternalTasksJSONStorage, self).set(id, value)
+        super().set(id, value)
         self._save()
 
     def set_many(self, ids, values):
         for id, value in zip(ids, values):
-            super(ExternalTasksJSONStorage, self)._pre_set(id, value)
+            super()._pre_set(id, value)
         self._save_ids()
         self._save()
 
@@ -243,7 +243,7 @@ class CompletionsDirStorage(DirJSONsStorage):
     description = 'Local [completions are in "completions" directory]'
 
     def __init__(self, name, path, project_path, **kwargs):
-        super(CompletionsDirStorage, self).__init__(
+        super().__init__(
             name=name,
             project_path=project_path,
             path=os.path.join(project_path, 'completions'))

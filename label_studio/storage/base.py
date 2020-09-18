@@ -133,7 +133,7 @@ class BaseStorage(ABC):
         pass
 
 
-class IsValidRegex(object):
+class IsValidRegex:
 
     def __call__(self, form, field):
         try:
@@ -173,7 +173,7 @@ class CloudStorage(BaseStorage):
         self, prefix=None, regex=None, create_local_copy=True, use_blob_urls=True, data_key=None,
         sync_in_thread=True, **kwargs
     ):
-        super(CloudStorage, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.prefix = prefix or ''
         self.regex_str = regex
         self.regex = re.compile(self.regex_str) if self.regex_str else None
@@ -203,7 +203,7 @@ class CloudStorage(BaseStorage):
 
     def get_params(self):
         """Get params to fill the form"""
-        params = super(CloudStorage, self).get_params()
+        params = super().get_params()
         params.update({
             'prefix': self.prefix,
             'regex': self.regex_str,

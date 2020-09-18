@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 mp = Mixpanel('269cd4e25e97cc15bdca5b401e429892')
 
 
-class Analytics(object):
+class Analytics:
 
     def __init__(self, label_config_line, collect_analytics=True, project_name='', context=None):
         self._label_config_line = label_config_line
@@ -35,7 +35,7 @@ class Analytics(object):
         user_id_file = os.path.join(get_config_dir(), 'user_id')
         if not os.path.exists(user_id_file):
             user_id = str(uuid4())
-            with io.open(user_id_file, mode='w') as fout:
+            with open(user_id_file, mode='w') as fout:
                 fout.write(user_id)
             if self._collect_analytics:
                 try:
@@ -48,7 +48,7 @@ class Analytics(object):
                     logger.error('Can\'t send user profile analytics. Reason: ' + str(exc), exc_info=True)
             logger.debug('Your user ID ' + str(user_id) + ' is saved to ' + str(user_id_file))
         else:
-            with io.open(user_id_file) as f:
+            with open(user_id_file) as f:
                 user_id = f.read()
             logger.debug('Your user ID ' + str(user_id) + ' is loaded from ' + str(user_id_file))
         return user_id
