@@ -44,6 +44,7 @@ def _setup():
     schema = data.get('schema')
     force_reload = data.get('force_reload', False)
     model = _manager.fetch(project, schema, force_reload)
+    logger.debug('Fetch model version: {}'.format(model.model_version))
     return jsonify({'model_version': model.model_version})
 
 
