@@ -85,3 +85,8 @@ You can import pre-annotated tasks into LS. Pre-annotations will be automaticall
   }]
 }]
 ```
+
+## How to display labels on bounding boxes, polygons and other regions
+<center>
+  <img src='../images/lsf-settings.png'>
+</center>
