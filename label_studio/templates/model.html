@@ -273,10 +273,11 @@
             method: 'POST',
             error: function(xhr, textStatus, thrownError) {
               alert(message_from_error(xhr));
+            },
+            success: function(res) {
+              location.reload();
             }
-          });
-          location.reload();
-          return false;
+          })
       }
 
       function remove_ml_backend(name) {
@@ -291,14 +292,13 @@
               contentType: "application/json; charset=utf-8",
               success: function (response) {
                 console.log(response);
+                location.reload();
               },
               error: function (xhr, ajaxOptions, thrownError) {
                 alert(message_from_error(xhr));
               }
-          });
+            })
           }
-          location.reload();
-          return false;
       }
   </script>
 
