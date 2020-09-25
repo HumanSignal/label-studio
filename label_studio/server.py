@@ -241,7 +241,7 @@ def setup_page():
     """
     project = project_get_or_create()
 
-    templates = get_config_templates()
+    templates = get_config_templates(project.config)
     input_values = {}
     project.analytics.send(getframeinfo(currentframe()).function)
     return flask.render_template(
