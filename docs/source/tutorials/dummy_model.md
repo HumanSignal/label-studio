@@ -79,7 +79,7 @@ label-studio-ml init my_backend
 
 The last command takes your script `./model.py` then creates `./my_backend` directory at the same level and copies configs and scripts needed for launching ML backend either in development or production modes.
 
-> Note: You can specify different location for your model script, e.g. `label-studio init my_backend --script /path/to/my/script.py`
+> Note: You can specify different location for your model script, e.g. `label-studio-ml init my_backend --script /path/to/my/script.py`
 
 ### Launch ML backend server
 
