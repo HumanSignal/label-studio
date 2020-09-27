@@ -289,6 +289,14 @@ div[class*="App_editor"] {
     padding: 0.80571429em 0.7em 0.80571429em !important;
 }
 
+.settings-cog {
+    cursor: pointer;
+    opacity: 0.75 !important;
+}
+.settings-cog:hover {
+    opacity: 1.0 !important;
+}
+
 #holder {
     display: table;
     border: 1px dashed #a2a2a2;
@@ -434,6 +442,12 @@ div[class*="App_editor"] {
 
 .ui.modal .section {
     margin-left: 1em;
+}
+.ui.modal .section p {
+    margin-top: 1em;
+}
+.ui.modal .section p:not(:last-child) {
+    margin-bottom: 1em;
 }
 
 .ui.form label {

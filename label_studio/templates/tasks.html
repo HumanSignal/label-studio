@@ -151,6 +151,11 @@
       margin: unset;
     }
 
+    /* hide full screen mode for LSF because it's not working correctly */
+    .ant-btn.ls-fs {
+      display: none;
+    }
+
     @media screen and (max-width: 768px) {
       .full-preview-image {
         max-height: 250px;
@@ -301,14 +306,14 @@
 
     <div class="ui task-container">
 
-      <div class="ui grid stackable">
-        <div class="column" id="left-panel"
+      <div class="ui grid stackable" ref="task_grid">
+        <div class="column" id="left-panel" ref="left_panel"
              v-if="!(quick_view_left_width === 0 && quick_view)"
-             :class="quick_view ? width_mapping[quick_view_left_width] + ' wide' : 'sixteen wide'"
-             style="'min-width:188px;">
+             :class="quick_view ? width_mapping[quick_view_left_width] + ' wide' : 'sixteen wide'">
           <!-- Table -->
           <div class="table-wrapper">
-            <table v-if="project.task_count > 0" class="task-table" :class="{'center-margin': !quick_view}">
+            <table v-if="project.task_count > 0" ref="task_table"
+                   class="task-table" :class="{'center-margin': !quick_view}">
               <!-- Header -->
               <tr>
                 <th class="order" @click="changeOrder('id')" v-if="columns.includes('id')">Task ID
@@ -437,7 +442,7 @@
             &nbsp;
 
             <!-- Settings while hidden left panel -->
-            <i class="icon grey cog" style="cursor: pointer; opacity: 0.75"
+            <i class="icon grey cog settings-cog" style="cursor: pointer; opacity: 0.75"
                @click="show_table_settings=!show_table_settings" v-if="!full_pagination"></i>
 
             <!-- Loader -->
@@ -449,7 +454,7 @@
           <div class="mobile-divider"></div>
         </div> <!-- left column -->
 
-        <div class="column" :class="width_mapping[quick_view_right_width] + ' wide'"
+        <div class="column" :class="width_mapping[quick_view_right_width] + ' wide'" id="right-panel" ref="right_panel"
              :style="{display: quick_view ? 'inherit': 'none'}">
           <!-- LS Frontend -->
           <div id="label-studio">
@@ -459,7 +464,13 @@
 
       </div> <!-- right column -->
 
-      <br/><br/>
+      <br/>
+      <!-- settings button -->
+      <center>
+        <i class="icon grey large cog settings-cog"
+           @click="show_table_settings=!show_table_settings" v-if="quick_view_left_width === 0 && quick_view"></i>
+      </center>
+      <br/>
 
     </div>
 
@@ -491,20 +502,16 @@
 
         <h4>Quick view</h4>
         <div class="section">
+          <p>
+            Quick view combines the task table and the labeling interface on left and right panels into one window.<br>
+            To start quick view click on the table row near Task ID.
+            You can move over tasks using hotkeys.
+            Press <hotkey style='color:#777;font-size:80%;padding: 0.05em 0.35em;'>q</hotkey> or
+            <i class="icon cog" style="opacity: 0.75"></i>on the page bottom to show settings again.
+          </p>
           <div class="ui form">
-            <div class="fields">
-              <div class="one width field">
-                Left width <input type="number" v-model="quick_view_left_width" min="0" max="14">
-              </div>
-              <div class="one width field">
-                Right width <input type="number" v-model="quick_view_right_width" min="2" max="16">
-              </div>
-            </div>
-
-            <a class="ui button" @click="quick_view_left_width=0"
-               data-tippy-content="Hide left panel in quick view.<br>Use hotkeys to move across tasks<br>
-                                   Press <hotkey style='color:#777;font-size:80%'>q</hotkey> to show settings again">
-              Hide Left Panel
+            <a class="ui button" @click="quick_view_left_width=0">
+              Hide Task Table
             </a>
             <a class="ui button" @click="quick_view_left_width=4;">Restore Defaults</a>
           </div>
@@ -512,11 +519,11 @@
 
         <h4>Auto update timer</h4>
         <div class="section">
+          <p>Auto update project info and tasks by 5 sec timer</p>
           <a class="ui button" @click="toggleAutoUpdateTimer()">
             <i class="fa-clock" :class="auto_update_timer ? 'fas': 'far'"></i>
             {{ 'Timer ' + (auto_update_timer ? 'Enabled': 'Disabled') }}
           </a>
-          <p style="margin-top: 1em">Auto update project info and tasks by 5 sec timer</p>
         </div>
 
         <!-- Hotkeys -->
@@ -573,7 +580,7 @@
   <script src="static/js/components/imageWithFadeIn.js"></script>
   <script src="static/js/components/vue-tippy.min.js"></script>
   <script>
-    var PAGINATION_MAX_WIDTH = 347;
+    var PAGINATION_MAX_WIDTH = 400;
 
     Vue.use(SemanticUIVue);
     Vue.use(VueTippy);
@@ -600,8 +607,8 @@
           full_columns: JSON.parse(Cookies.get('full_columns', '["id", "completed_at", "task_code", "skipped", "delete", "others"]')),
           quick_columns: JSON.parse(Cookies.get('quick_columns', '["id"]')),
           quick_view: false,
-          quick_view_left_width: Cookies.get('quick_view_left_width', 4),
-          quick_view_right_width: Cookies.get('quick_view_right_width', 12),
+          quick_view_left_width: 4,
+          quick_view_right_width: 12,
           current_task: null,
           current_task_index: -10,
           full_pagination: true,
@@ -992,9 +999,29 @@
           }
         },
 
-        resizeLeftPanel: function() {
+        evalPanelWidth: function() {
           this.$nextTick(function() {
-            this.full_pagination = $('#left-panel').width() > PAGINATION_MAX_WIDTH;
+            if (this.quick_view_left_width > 0) {
+              // check that task table width > left panel size
+              var table_grid_width = this.$refs.task_grid.getBoundingClientRect().width;
+              var table_width = this.$refs.task_table.getBoundingClientRect().width + 50;
+              var one_part_width = table_grid_width / 16.0;
+              // set min left panel for current table width
+              this.quick_view_left_width = Math.round(table_width / one_part_width);
+              this.quick_view_right_width = 16 - this.quick_view_left_width;
+
+              // select ful pagination or small
+              this.full_pagination = table_width > PAGINATION_MAX_WIDTH;
+              console.log(this.full_pagination, table_width, PAGINATION_MAX_WIDTH);
+            }
+          });
+        },
+
+        resizeLeftPanel: function() {
+          // do it after redraw
+          this.$nextTick(function() {
+
+
           });
         }
       },
@@ -1021,6 +1048,7 @@
         columns: function(values) {
           if (this.quick_view) {
             this.quick_columns = values;
+            this.evalPanelWidth()
           }
           else {
             this.full_columns = values;
@@ -1035,19 +1063,8 @@
         },
 
         quick_view: function() {
-          this.resizeLeftPanel();
-        },
-        quick_view_left_width: function() {
-          this.quick_view_right_width = 16 - this.quick_view_left_width;
-          Cookies.set('quick_view_left_width', this.quick_view_left_width);
-          this.resizeLeftPanel();
-        },
-        quick_view_right_width: function() {
-          this.quick_view_left_width = 16 - this.quick_view_right_width;
-          Cookies.set('quick_view_right_width', this.quick_view_right_width);
-          this.resizeLeftPanel();
+          this.evalPanelWidth();
         }
-
       },
 
       // vue mounting of page
@@ -1080,16 +1097,10 @@
         Mousetrap.bind(['shift+down', 's'], this.nextTask);
         Mousetrap.bind(['q'], function() { self.show_table_settings = !self.show_table_settings });
 
-        $(window).resize(this.resizeLeftPanel);
+        $(window).resize(this.evalPanelWidth);
         console.log('Vue mounting success');
 
         //introJs().start();
-      },
-
-      updated: function() {
-        this.$nextTick(function() {
-
-        });
       }
     });
 
