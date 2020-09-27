@@ -354,7 +354,8 @@
                 <!-- Task ID -->
                 <td class="text-center" v-if="columns.includes('id')">
                   <span class="ui mini blue loader inline active" v-if="task.processing"></span>
-                  <span @click.stop="window.open('api/tasks/' + task.id)" class="hidden-items">{{ task.id }}</span>
+                  <i class="icon small outline eye"></i>
+                  <span class="hidden-items">{{ task.id }}</span>
                 </td>
                 <!-- Completed at -->
                 <td v-if="columns.includes('completed_at')">
@@ -362,7 +363,7 @@
                 </td>
                 <!-- Show task code -->
                 <td class="text-center" v-if="columns.includes('task_code')">
-                  <i @click.stop="window.open('api/tasks/' + task.id)" class="icon code"></i>
+                  <i @click.stop="window.open('api/tasks/' + task.id)" class="icon code" style="opacity: 0.75"></i>
                 </td>
                 <!-- Skipped -->
                 <td v-if="columns.includes('skipped')">
@@ -405,14 +406,13 @@
           <div :class="{'center-flex': !quick_view}">
             <div class="ui pagination menu"
                  v-if="project.task_count > 0">
-              <a class="item" :class="{'active': page>1, 'disabled': page<=1}"
-                 @click="prevPage()">Prev</a>
+              <a class="item" :class="{'active': page>1, 'disabled': page<=1}" @click="prevPage()">Prev</a>
 
               <div class="item">
                 <input v-model="page" style="border:none" type="number" min="1" :max="totalPages">
                 <span style="cursor:pointer" @click="page=totalPages" v-if="full_pagination">&nbsp; of &nbsp;&nbsp;
-                {{ totalPages }}
-              </span>
+                  {{ totalPages }}
+                </span>
               </div>
 
               <div class="item" v-if="full_pagination">
@@ -433,9 +433,17 @@
                  @click="nextPage()">Next</a>
             </div> <!-- pagination -->
 
+            <div style="margin-top: 1em" v-if="!full_pagination"></div>
+            &nbsp;
 
+            <!-- Settings while hidden left panel -->
+            <i class="icon grey cog" style="cursor: pointer; opacity: 0.75"
+               @click="show_table_settings=!show_table_settings" v-if="!full_pagination"></i>
+
+            <!-- Loader -->
             <i class="ui loader active blue tiny inline"
                :style="{opacity: tasks_loaded ? 0: 0.5, 'margin-left': '10px', 'margin-top': quick_view ? '0' : '13px'}"></i>
+
           </div>
 
           <div class="mobile-divider"></div>
@@ -452,12 +460,6 @@
       </div> <!-- right column -->
 
       <br/><br/>
-
-      <!-- Settings while hidden left panel -->
-      <div class="action-item" @click="show_table_settings=!show_table_settings" v-if="!full_pagination"
-           data-intro='Hello step one!' data-step="1">
-        <center><i class="fa fa-cog"></i></center>
-      </div>
 
     </div>
 
@@ -476,53 +478,50 @@
 
       <!-- Content -->
       <div class="scrolling content">
+
         <h4>Columns to show</h4>
-        <div class="ui list horizontal">
-          <div class="item ui checkbox" v-for="item in all_columns">
-            <input type="checkbox" class="ui checkbox" v-model="columns" :value="item">
-            <label>{{ item.replaceAll('_', ' ') }}</label>
+        <div class="section">
+          <div class="ui list horizontal">
+            <div class="item ui checkbox" v-for="item in all_columns">
+              <input type="checkbox" class="ui checkbox" v-model="columns" :value="item">
+              <label class="cap-first-letter">{{ item.replaceAll('_', ' ') }}</label>
+            </div>
           </div>
         </div>
 
-        <div class="ui divider hidden"></div>
+        <h4>Quick view</h4>
+        <div class="section">
+          <div class="ui form">
+            <div class="fields">
+              <div class="one width field">
+                Left width <input type="number" v-model="quick_view_left_width" min="0" max="14">
+              </div>
+              <div class="one width field">
+                Right width <input type="number" v-model="quick_view_right_width" min="2" max="16">
+              </div>
+            </div>
 
-        <h4 style="margin-bottom: 12px">Left & right panels in Quick View</h4>
-        <div class="ui form">
-          <div class="fields">
-            <div class="one width field">
-              Left width <input type="number" v-model="quick_view_left_width" min="0" max="14">
-            </div>
-            <div class="one width field">
-              Right width <input type="number" v-model="quick_view_right_width" min="2" max="16">
-            </div>
+            <a class="ui button" @click="quick_view_left_width=0"
+               data-tippy-content="Hide left panel in quick view.<br>Use hotkeys to move across tasks<br>
+                                   Press <hotkey style='color:#777;font-size:80%'>q</hotkey> to show settings again">
+              Hide Left Panel
+            </a>
+            <a class="ui button" @click="quick_view_left_width=4;">Restore Defaults</a>
           </div>
-
-          <a class="ui button" @click="quick_view_left_width=0"
-             data-tippy-content="Hide left panel in quick view.<br>Use hotkeys to move across tasks<br>
-                                 Press <hotkey style='color:#777;font-size:80%'>q</hotkey> to show settings again">
-            Hide Left Panel
-          </a>
-          <a class="ui button" @click="quick_view_left_width=4;">Restore Defaults</a>
-
         </div>
-
-        <div class="ui divider hidden"></div>
 
         <h4>Auto update timer</h4>
-        <div>
-
+        <div class="section">
           <a class="ui button" @click="toggleAutoUpdateTimer()">
             <i class="fa-clock" :class="auto_update_timer ? 'fas': 'far'"></i>
             {{ 'Timer ' + (auto_update_timer ? 'Enabled': 'Disabled') }}
           </a>
-          Auto update project info and tasks by 5 sec timer
+          <p style="margin-top: 1em">Auto update project info and tasks by 5 sec timer</p>
         </div>
-
-        <div class="ui divider hidden"></div>
 
         <!-- Hotkeys -->
         <h4>Hotkeys</h4>
-        <div style="margin-top: 1em">
+        <div class="section">
           <div class="hotkey-helper">
             <div class="keys"><hotkey>q</hotkey></div>
             <span class="description">show settings</span>
@@ -598,8 +597,8 @@
 
           // quick task preview
           all_columns: ['id', 'completed_at', 'task_code', 'skipped', 'delete', 'others'],
-          full_columns: JSON.parse(Cookies.get('full_columns', '["id", "completed_at", "skipped", "delete", "others"]')),
-          quick_columns: JSON.parse(Cookies.get('quick_columns', '["id", "completed_at"]')),
+          full_columns: JSON.parse(Cookies.get('full_columns', '["id", "completed_at", "task_code", "skipped", "delete", "others"]')),
+          quick_columns: JSON.parse(Cookies.get('quick_columns', '["id"]')),
           quick_view: false,
           quick_view_left_width: Cookies.get('quick_view_left_width', 4),
           quick_view_right_width: Cookies.get('quick_view_right_width', 12),

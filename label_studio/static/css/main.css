@@ -427,6 +427,15 @@ div[class*="App_editor"] {
     color: #555;
 }
 
+.ui.modal h4:not(:first-child) {
+    margin-top: 2.5em;
+    margin-bottom: 1em;
+}
+
+.ui.modal .section {
+    margin-left: 1em;
+}
+
 .ui.form label {
     font-weight: normal !important;
 }
@@ -493,6 +502,10 @@ pre {
 .sup-button:hover {
     color: rgb(54, 162, 255);
     transition: background-color ease-in-out 0.25s;
+}
+
+.cap-first-letter:first-letter  {
+    text-transform: capitalize;
 }
 
 
