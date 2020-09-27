@@ -314,10 +314,13 @@
                 <th class="order" @click="changeOrder('id')" v-if="columns.includes('id')">Task ID
                   <i class="fas" :class="{'fa-sort-up': this.order=='id', 'fa-sort-down': this.order=='-id'}"></i>
                 </th>
-                <th class="order" @click="changeOrder('completed_at')" v-if="columns.includes('completed_at')">Completed
-                  at
+                <th class="order" @click="changeOrder('completed_at')" v-if="columns.includes('completed_at')">
+                  Completed at
                   <i class="fas"
                      :class="{'fa-sort-up': this.order=='completed_at', 'fa-sort-down': this.order=='-completed_at'}"></i>
+                </th>
+                <th v-if="columns.includes('task_code')">
+                  Task Code
                 </th>
                 <th class="order" @click="changeOrder('has_skipped_completions')" v-if="columns.includes('skipped')">
                   Skipped
@@ -325,7 +328,7 @@
                      :class="{'fa-sort-up': this.order=='has_skipped_completions', 'fa-sort-down': this.order=='-has_skipped_completions'}"></i>
                 </th>
                 <th v-if="columns.includes('delete') && (project.can_delete_tasks || project.can_manage_completions)">
-                  Delete
+                  Actions
                 </th>
 
                 <!-- Label config fields -->
@@ -357,11 +360,13 @@
                 <td v-if="columns.includes('completed_at')">
                   {{ task.completed_at }}
                 </td>
+                <!-- Show task code -->
+                <td class="text-center" v-if="columns.includes('task_code')">
+                  <i @click.stop="window.open('api/tasks/' + task.id)" class="icon code"></i>
+                </td>
                 <!-- Skipped -->
                 <td v-if="columns.includes('skipped')">
-              <span style="cursor:pointer">
-               <i class="ui icon forward grey" v-if="task.has_skipped_completions"></i>
-             </span>
+                  <i class="ui icon forward grey" v-if="task.has_skipped_completions"></i>
                 </td>
                 <!-- Delete -->
                 <td class="text-center"
@@ -475,7 +480,7 @@
         <div class="ui list horizontal">
           <div class="item ui checkbox" v-for="item in all_columns">
             <input type="checkbox" class="ui checkbox" v-model="columns" :value="item">
-            <label>{{ item }}</label>
+            <label>{{ item.replaceAll('_', ' ') }}</label>
           </div>
         </div>
 
@@ -592,7 +597,7 @@
           error: null,
 
           // quick task preview
-          all_columns: ['id', 'completed_at', 'skipped', 'delete', 'others'],
+          all_columns: ['id', 'completed_at', 'task_code', 'skipped', 'delete', 'others'],
           full_columns: JSON.parse(Cookies.get('full_columns', '["id", "completed_at", "skipped", "delete", "others"]')),
           quick_columns: JSON.parse(Cookies.get('quick_columns', '["id", "completed_at"]')),
           quick_view: false,
