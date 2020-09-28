@@ -503,17 +503,17 @@
         <h4>Quick view</h4>
         <div class="section">
           <p>
-            Quick view combines the task table and the labeling interface on left and right panels into one window.<br>
+            Quick view combines the task table and the labeling interface on left and right panels into one window.
             To start quick view click on the table row near Task ID.
             You can move over tasks using hotkeys.
             Press <hotkey style='color:#777;font-size:80%;padding: 0.05em 0.35em;'>q</hotkey> or
             <i class="icon cog" style="opacity: 0.75"></i>on the page bottom to show settings again.
           </p>
           <div class="ui form">
-            <a class="ui button" @click="quick_view_left_width=0">
+            <a class="ui button" @click="quick_view_left_width=0; quick_view_right_width=16">
               Hide Task Table
             </a>
-            <a class="ui button" @click="quick_view_left_width=4;">Restore Defaults</a>
+            <a class="ui button" @click="evalPanelWidth()">Restore Defaults</a>
           </div>
         </div>
 
@@ -1008,12 +1008,12 @@
               var one_part_width = table_grid_width / 16.0;
               // set min left panel for current table width
               this.quick_view_left_width = Math.round(table_width / one_part_width);
-              this.quick_view_right_width = 16 - this.quick_view_left_width;
 
               // select ful pagination or small
               this.full_pagination = table_width > PAGINATION_MAX_WIDTH;
               console.log(this.full_pagination, table_width, PAGINATION_MAX_WIDTH);
             }
+            this.quick_view_right_width = 16 - this.quick_view_left_width;
           });
         },
 
