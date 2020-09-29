@@ -742,7 +742,7 @@ def api_tasks(task_id):
 
         if project.ml_backends_connected:
             task_data = project.make_predictions(task_data)
-        
+
         project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
         return make_response(jsonify(task_data), 200)
     elif request.method == 'DELETE':
