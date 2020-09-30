@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "server:reset": "cd .. && rm -rf _e2e_project && label-studio start --init _e2e_project -b",
-    "server": "cd .. && label-studio start _e2e_project -b",
+    "server:reset": "cd .. && rm -rf _e2e_project && python label_studio/server.py start --init _e2e_project -b",
+    "server": "cd .. && python label_studio/server.py start _e2e_project -b",
     "client": "sleep 2 && codeceptjs run --steps",
     "client:headless": "sleep 2 && HEADLESS=true codeceptjs run --steps",
     "test": "npm-run-all -p -r server:reset client",
