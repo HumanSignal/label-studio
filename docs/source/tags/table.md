@@ -14,7 +14,5 @@ Table tag, show object keys and values in a table
 
 ### Example
 ```html
-<View>
-    <Table name="text-1" value="$text"></Table>
-</View>
+<Table name="text-1" value="$text"></Table>
 ```

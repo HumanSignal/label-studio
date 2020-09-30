@@ -4,7 +4,6 @@ type: tags
 order: 406
 ---
 
-HyperTextLabels tag
 HyperTextLabels tag creates labeled hyper text (HTML)
 
 ### Parameters

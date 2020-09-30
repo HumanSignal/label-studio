@@ -20,5 +20,7 @@ Text tag shows an Text markup that can be labeled
 
 ### Example
 ```html
-<Text name="text-1" value="$text" granularity="symbol" highlightColor="#ff0000" />
+<View>
+  <Text name="text-1" value="$text" granularity="symbol" highlightColor="#ff0000" />
+</View>
 ```
