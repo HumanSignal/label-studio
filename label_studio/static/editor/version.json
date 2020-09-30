@@ -1,6 +1,6 @@
 {
-  "message": "Fix Labels view of Regions panel",
-  "commit": "22d0165f797f8b674a3e97df10aab4babdaf44bc",
+  "message": "Same fix for spans in HyperText",
+  "commit": "1b8d04f40c82a23435acdc23aed9ac54bd1ea997",
   "branch": "tmp/deserialize",
-  "date": "2020-09-24T10:35:44Z"
+  "date": "2020-09-29T12:46:41Z"
 }
