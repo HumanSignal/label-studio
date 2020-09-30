@@ -1033,7 +1033,7 @@ def main():
         label_studio.utils.auth.PASSWORD = input_args.password or config.get('password', '')
 
         # set host name
-        host = input_args.host or config.get('host', 'localhost')  # name for internal LS usage
+        host = input_args.host or config.get('host', 'localhost')  # name for external links generation
         port = input_args.port or config.get('port', 8080)
         server_host = 'localhost' if host == 'localhost' else '0.0.0.0'  # web server host
 
@@ -1053,7 +1053,7 @@ def main():
                   '* Trying to start at ' + str(port) +
                   '\n****************\n')
 
-        set_web_protocol(config.get('protocol', 'http://'))
+        set_web_protocol(input_args.protocol or config.get('protocol', 'http://'))
         set_full_hostname(get_web_protocol() + host.replace('0.0.0.0', 'localhost') + ':' + str(port))
 
         start_browser('http://localhost:' + str(port), input_args.no_browser)

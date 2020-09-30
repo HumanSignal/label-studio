@@ -537,7 +537,7 @@
 
           <div class="hotkey-helper">
             <div class="keys"><hotkey>click on row</hotkey></div>
-            <span class="description">open task in Quick mode, click again on selected task to exit</span>
+            <span class="description">open task in Quick mode, <br>click again on selected task to exit</span>
           </div>
 
           <div class="hotkey-helper">
@@ -1018,7 +1018,7 @@
           this.$refs.right_panel.style.width = right_width + 'px';
 
           // select ful pagination or small
-          this.full_pagination = table_width > PAGINATION_MAX_WIDTH;
+          this.full_pagination = (table_width > PAGINATION_MAX_WIDTH) || !this.quick_view;
           // console.log(grid_width, table_width);
         }
       },

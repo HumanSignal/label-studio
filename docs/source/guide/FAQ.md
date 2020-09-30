@@ -90,3 +90,20 @@ You can import pre-annotated tasks into LS. Pre-annotations will be automaticall
 <center>
   <img src='../images/lsf-settings.png'>
 </center>
+
+## How to run LSB with external domain name
+ 
+If you want to run LSB with some domain name you need to use Host, Protocol, Port parameters at LS run. They are responsible for correct URLs while a resource files import (images, audio, etc) and sample tasks generation.   
+
+There are several possible ways to do it:
+ 
+1. Replace these parameters inside of your `project/config.json` (or `label_studio/utils/schema/default_config.json` from LSB package directory).
+2. Specify these parameters at start: `label-studio start --host label-studio.example.com --protocol http:// --port 8080`.
+3. For docker usage: specify environment variables `HOST`, `PROTOCOL`, `PORT` while docker setup. 
+
+LSB web server always use `0.0.0.0` address for start. But if you really need to change it to `localhost` just set Host as `localhost` and web server will start at `localhost`.  
+
+<br/>
+<center>
+  <img style="opacity: 0.75" src='../images/host-protocol-port.png'>
+</center>
