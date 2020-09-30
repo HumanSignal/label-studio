@@ -796,6 +796,25 @@ def api_completions(task_id):
         return make_response('Incorrect request method', 500)
 
 
+@app.route('/api/project/completions/', methods=['DELETE'])
+@requires_auth
+@exception_treatment
+def api_all_completions():
+    """ Delete all completions
+    """
+    project = project_get_or_create()
+
+    if request.method == 'DELETE':
+        project.delete_all_completions()
+        project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
+        return make_response('done', 201)
+
+    else:
+        project.analytics.send(getframeinfo(currentframe()).function, error=500, method=request.method)
+        return make_response('Incorrect request method', 500)
+
+
+
 @app.route('/api/tasks/<task_id>/cancel', methods=['POST'])
 @requires_auth
 @exception_treatment

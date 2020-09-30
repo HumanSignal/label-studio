@@ -5,6 +5,7 @@ WORKDIR /label-studio
 
 # Copy and install requirements.txt first for caching
 COPY requirements.txt /label-studio
+RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 ENV PORT="8080"

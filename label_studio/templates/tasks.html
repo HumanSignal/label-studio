@@ -213,15 +213,15 @@
                   <span data-tooltip="Change source storage filter">
                   <i class="fas fa-cog sup-button big"
                      @click="loadStorageSettings(); storage_settings.source.show=true"></i>
-                </span>
+                  </span>
                   <!-- Delete tasks -->
                   <span v-if="project.can_delete_tasks">
-                  <span style="margin-right: 15px"></span>
-                  <span @click="deleteAllTasks()"
-                        data-tooltip="Delete all tasks">
-                    <i class="fas fa-trash-alt trash remove-task">&nbsp;&nbsp;</i>
+                    <span style="margin-right: 15px"></span>
+                    <span @click="deleteAllTasks()"
+                          data-tooltip="Delete all tasks">
+                      <i class="fas fa-trash-alt trash remove-task">&nbsp;&nbsp;</i>
+                    </span>
                   </span>
-                </span>
                 </div>
               </div> <!-- statistic -->
 
@@ -249,10 +249,19 @@
               </span>
                 <!-- Controls -->
                 <div style="margin-top: 7px">
-                <span data-tooltip="Change target storage">
-                  <i class="fas fa-cog sup-button big"
-                     @click="loadStorageSettings(); storage_settings.target.show=true"></i>
-                </span>
+                  <!-- Target storage settings -->
+                  <span data-tooltip="Change target storage">
+                    <i class="fas fa-cog sup-button big"
+                       @click="loadStorageSettings(); storage_settings.target.show=true"></i>
+                  </span>
+                  <!-- Delete completions -->
+                  <span v-if="project.can_manage_completions">
+                    <span style="margin-right: 15px"></span>
+                    <span @click="deleteAllCompletions()"
+                          data-tooltip="Delete all completions">
+                      <i class="far fa-trash-alt trash remove-completion">&nbsp;&nbsp;</i>
+                    </span>
+                  </span>
                 </div>
               </div>
             </div>
@@ -861,6 +870,19 @@
           if (deletion_confirmed) {
             var request = new XMLHttpRequest();
             request.open("DELETE", "api/tasks/delete", true);
+            request.onload = this.loadProjectAndTasks;
+            request.send();
+          }
+        },
+
+        // delete all completions from project
+        deleteAllCompletions: function () {
+          var deletion_confirmed = confirm(
+            'You are going to delete all existing completions.\n' +
+            'Warning! this operation cannot be undone.\nPlease confirm your action.');
+          if (deletion_confirmed) {
+            var request = new XMLHttpRequest();
+            request.open("DELETE", "api/project/completions", true);
             request.onload = this.loadProjectAndTasks;
             request.send();
           }

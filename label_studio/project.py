@@ -549,11 +549,17 @@ class Project(object):
         return completion['id']
 
     def delete_completion(self, task_id):
-        """ Delete completion from disk
+        """ Delete completion
 
         :param task_id: task id
         """
         self.target_storage.remove(task_id)
+        self.update_derived_output_schema()
+
+    def delete_all_completions(self):
+        """ Delete all completions from project
+        """
+        self.target_storage.remove_all()
         self.update_derived_output_schema()
 
     def make_predictions(self, task):
