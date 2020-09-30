@@ -10,6 +10,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+    - uses: py-actions/py-dependency-install@v2
+    - run: pip install -e .
+
     - uses: actions/setup-node@v1
       with:
         node-version: 12
