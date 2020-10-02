@@ -126,7 +126,7 @@ this is a second task,456
 ### Plain text
 
 ```bash
-label-studio init --input-path=my_tasks.txt --input-format=text --label-config=config.xml
+label-studio init my-project --input-path=my_tasks.txt --input-format=text --label-config=config.xml
 ```
 
 In a typical scenario, you may use only one input data stream (or in other words only one [object tag](/tags) specified in label config). In this case, you don't need to use JSON format, but simply write down your values in a plain text file, line by line, e.g.
@@ -139,7 +139,7 @@ this is a second task
 ### Directory with plain text files
 
 ```bash
-label-studio init --input-path=dir/with/text/files --input-format=text-dir --label-config=config.xml
+label-studio init my-project --input-path=dir/with/text/files --input-format=text-dir --label-config=config.xml
 ```
 
 You can split your input data into several plain text files, and specify the directory path. Then Label Studio scans each file line-by-line, creating one task per line. Each plain text file is formatted the same as above.
@@ -147,7 +147,7 @@ You can split your input data into several plain text files, and specify the dir
 ### Directory with image files
 
 ```bash
-label-studio init --input-path=dir/with/images --input-format=image-dir --label-config=config.xml --allow-serving-local-files
+label-studio init my-project --input-path=dir/with/images --input-format=image-dir --label-config=config.xml --allow-serving-local-files
 ```
 
 > WARNING: "--allow-serving-local-files" is intended to use only for locally running instances: avoid using it for remote servers unless you are sure what you're doing.
@@ -163,7 +163,7 @@ Supported formats are: `.png` `.jpg` `.jpeg` `.tiff` `.bmp` `.gif`
 ### Directory with audio files
 
 ```bash
-label-studio init --input-path=my/audios/dir --input-format=audio-dir --label-config=config.xml --allow-serving-local-files
+label-studio init my-project --input-path=my/audios/dir --input-format=audio-dir --label-config=config.xml --allow-serving-local-files
 ```
 
 > WARNING: "--allow-serving-local-files" is intended to use only for locally running instances: avoid using it for remote servers unless you are sure what you're doing.

@@ -1,6 +1,6 @@
 {
-  "message": "Run GitHub Actions only once per push",
-  "commit": "9b7cfaa55719c9e7a7cdf2d1eecd88b5614e93ae",
+  "message": "Same fix for spans in HyperText",
+  "commit": "1b8d04f40c82a23435acdc23aed9ac54bd1ea997",
   "branch": "tmp/deserialize",
-  "date": "2020-09-17T02:29:12Z"
+  "date": "2020-09-29T12:46:41Z"
 }

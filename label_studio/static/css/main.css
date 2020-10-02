@@ -289,6 +289,14 @@ div[class*="App_editor"] {
     padding: 0.80571429em 0.7em 0.80571429em !important;
 }
 
+.settings-cog {
+    cursor: pointer;
+    opacity: 0.75 !important;
+}
+.settings-cog:hover {
+    opacity: 1.0 !important;
+}
+
 #holder {
     display: table;
     border: 1px dashed #a2a2a2;
@@ -427,6 +435,21 @@ div[class*="App_editor"] {
     color: #555;
 }
 
+.ui.modal h4:not(:first-child) {
+    margin-top: 2.5em;
+    margin-bottom: 1em;
+}
+
+.ui.modal .section {
+    margin-left: 1em;
+}
+.ui.modal .section p {
+    margin-top: 1em;
+}
+.ui.modal .section p:not(:last-child) {
+    margin-bottom: 1em;
+}
+
 .ui.form label {
     font-weight: normal !important;
 }
@@ -493,6 +516,10 @@ pre {
 .sup-button:hover {
     color: rgb(54, 162, 255);
     transition: background-color ease-in-out 0.25s;
+}
+
+.cap-first-letter:first-letter  {
+    text-transform: capitalize;
 }
 
 

@@ -201,8 +201,12 @@ def parse_config(config_string):
     return outputs
 
 
-def iter_config_templates():
-    templates_dir = find_dir('examples')
+def iter_config_templates(templates_dir=None):
+    try:
+        templates_dir = find_dir('examples') if templates_dir is None else find_dir(templates_dir)
+    except IOError:
+        pass  # use templates_dir as is
+
     for d in os.listdir(templates_dir):
         # check xml config file exists
         path = os.path.join(templates_dir, d, 'config.xml')
@@ -211,13 +215,14 @@ def iter_config_templates():
         yield path
 
 
-def get_config_templates():
+def get_config_templates(config):
     """ Get label config templates from directory (as usual 'examples' directory)
     """
     from collections import defaultdict, OrderedDict
     templates = defaultdict(lambda: defaultdict(list))
 
-    for i, path in enumerate(iter_config_templates()):
+    template_dir = config.get('templates_dir', 'examples')
+    for i, path in enumerate(iter_config_templates(template_dir)):
         # open and check xml
         code = open(path).read()
         try:

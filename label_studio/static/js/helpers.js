@@ -245,14 +245,14 @@ var width_mapping = {
 
 // Detect resize of any element
 function ResizeSensor(element, callback) {
-  let zIndex = parseInt(getComputedStyle(element));
+  var zIndex = parseInt(getComputedStyle(element));
   if (isNaN(zIndex)) {
     zIndex = 0;
   }
   ;
   zIndex--;
 
-  let expand = document.createElement('div');
+  var expand = document.createElement('div');
   expand.style.position = "absolute";
   expand.style.left = "0px";
   expand.style.top = "0px";
@@ -262,7 +262,7 @@ function ResizeSensor(element, callback) {
   expand.style.zIndex = zIndex;
   expand.style.visibility = "hidden";
 
-  let expandChild = document.createElement('div');
+  var expandChild = document.createElement('div');
   expandChild.style.position = "absolute";
   expandChild.style.left = "0px";
   expandChild.style.top = "0px";
@@ -270,7 +270,7 @@ function ResizeSensor(element, callback) {
   expandChild.style.height = "10000000px";
   expand.appendChild(expandChild);
 
-  let shrink = document.createElement('div');
+  var shrink = document.createElement('div');
   shrink.style.position = "absolute";
   shrink.style.left = "0px";
   shrink.style.top = "0px";
@@ -280,7 +280,7 @@ function ResizeSensor(element, callback) {
   shrink.style.zIndex = zIndex;
   shrink.style.visibility = "hidden";
 
-  let shrinkChild = document.createElement('div');
+  var shrinkChild = document.createElement('div');
   shrinkChild.style.position = "absolute";
   shrinkChild.style.left = "0px";
   shrinkChild.style.top = "0px";
@@ -300,16 +300,16 @@ function ResizeSensor(element, callback) {
   }
   setScroll();
 
-  let size = element.getBoundingClientRect();
+  var size = element.getBoundingClientRect();
 
-  let currentWidth = size.width;
-  let currentHeight = size.height;
+  var currentWidth = size.width;
+  var currentHeight = size.height;
 
-  let onScroll = function () {
-    let size = element.getBoundingClientRect();
+  var onScroll = function () {
+    var size = element.getBoundingClientRect();
 
-    let newWidth = size.width;
-    let newHeight = size.height;
+    var newWidth = size.width;
+    var newHeight = size.height;
 
     if (newWidth != currentWidth || newHeight != currentHeight) {
       currentWidth = newWidth;
@@ -323,4 +323,10 @@ function ResizeSensor(element, callback) {
 
   expand.addEventListener('scroll', onScroll);
   shrink.addEventListener('scroll', onScroll);
+}
+
+function capitalize (string) {
+  return [].map.call(string, function(char, i) {
+    i ? char : char.toUpperCase()
+  }).join('')
 }

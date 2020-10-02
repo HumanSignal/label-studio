@@ -18,7 +18,7 @@ Shortcut tag can be used to define a shortcut, which adds a predefined object
 ```html
 <View>
   <TextArea name="txt-1">
-    <Shortcut alias="Silence" value="<SILENCE>" hotkey="ctrl+1" />
+    <Shortcut alias="Silence" value="SILENCE" hotkey="ctrl+1" />
   </TextArea>
 </View>
 ```

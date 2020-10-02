@@ -256,7 +256,7 @@ def setup_page():
     input_args = current_app.label_studio.input_args
     project = project_get_or_create()
 
-    templates = get_config_templates()
+    templates = get_config_templates(project.config)
     input_values = {}
     project.analytics.send(getframeinfo(currentframe()).function)
     return flask.render_template(
@@ -755,6 +755,10 @@ def api_tasks(task_id):
     if request.method == 'GET':
         task_data = project.get_task_with_completions(task_id) or project.source_storage.get(task_id)
         task_data = resolve_task_data_uri(task_data)
+
+        if project.ml_backends_connected:
+            task_data = project.make_predictions(task_data)
+
         project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
         return make_response(jsonify(task_data), 200)
     elif request.method == 'DELETE':
@@ -806,6 +810,25 @@ def api_completions(task_id):
     else:
         project.analytics.send(getframeinfo(currentframe()).function, error=500, method=request.method)
         return make_response('Incorrect request method', 500)
+
+
+@blueprint.route('/api/project/completions/', methods=['DELETE'])
+@requires_auth
+@exception_treatment
+def api_all_completions():
+    """ Delete all completions
+    """
+    project = project_get_or_create()
+
+    if request.method == 'DELETE':
+        project.delete_all_completions()
+        project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
+        return make_response('done', 201)
+
+    else:
+        project.analytics.send(getframeinfo(currentframe()).function, error=500, method=request.method)
+        return make_response('Incorrect request method', 500)
+
 
 
 @blueprint.route('/api/tasks/<task_id>/cancel', methods=['POST'])
@@ -1042,7 +1065,7 @@ def main():
         label_studio.utils.auth.PASSWORD = input_args.password or config.get('password', '')
 
         # set host name
-        host = input_args.host or config.get('host', 'localhost')  # name for internal LS usage
+        host = input_args.host or config.get('host', 'localhost')  # name for external links generation
         port = input_args.port or config.get('port', 8080)
         server_host = 'localhost' if host == 'localhost' else '0.0.0.0'  # web server host
 
@@ -1062,7 +1085,7 @@ def main():
                   '* Trying to start at ' + str(port) +
                   '\n****************\n')
 
-        set_web_protocol(config.get('protocol', 'http://'))
+        set_web_protocol(input_args.protocol or config.get('protocol', 'http://'))
         set_full_hostname(get_web_protocol() + host.replace('0.0.0.0', 'localhost') + ':' + str(port))
 
         start_browser('http://localhost:' + str(port), input_args.no_browser)

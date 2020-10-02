@@ -95,10 +95,6 @@
       font-weight: bold;
     }
 
-    .actions-card {
-
-    }
-
     .db-card {
       background: #f7f7f7;
       border-radius: 5px;
@@ -108,6 +104,10 @@
     .action-buttons {
       display: flex;
       flex-direction: column;
+    }
+
+    .action-button:not(:last-child) {
+      margin-right: 5px;
     }
 
     .action-item {
@@ -149,6 +149,11 @@
       padding-left: unset;
       padding-right: unset;
       margin: unset;
+    }
+
+    /* hide full screen mode for LSF because it's not working correctly */
+    .ant-btn.ls-fs {
+      display: none;
     }
 
     @media screen and (max-width: 768px) {
@@ -208,15 +213,15 @@
                   <span data-tooltip="Change source storage filter">
                   <i class="fas fa-cog sup-button big"
                      @click="loadStorageSettings(); storage_settings.source.show=true"></i>
-                </span>
+                  </span>
                   <!-- Delete tasks -->
                   <span v-if="project.can_delete_tasks">
-                  <span style="margin-right: 15px"></span>
-                  <span @click="deleteAllTasks()"
-                        data-tooltip="Delete all tasks">
-                    <i class="fas fa-trash-alt trash remove-task">&nbsp;&nbsp;</i>
+                    <span style="margin-right: 15px"></span>
+                    <span @click="deleteAllTasks()"
+                          data-tooltip="Delete all tasks">
+                      <i class="fas fa-trash-alt trash remove-task">&nbsp;&nbsp;</i>
+                    </span>
                   </span>
-                </span>
                 </div>
               </div> <!-- statistic -->
 
@@ -244,10 +249,19 @@
               </span>
                 <!-- Controls -->
                 <div style="margin-top: 7px">
-                <span data-tooltip="Change target storage">
-                  <i class="fas fa-cog sup-button big"
-                     @click="loadStorageSettings(); storage_settings.target.show=true"></i>
-                </span>
+                  <!-- Target storage settings -->
+                  <span data-tooltip="Change target storage">
+                    <i class="fas fa-cog sup-button big"
+                       @click="loadStorageSettings(); storage_settings.target.show=true"></i>
+                  </span>
+                  <!-- Delete completions -->
+                  <span v-if="project.can_manage_completions">
+                    <span style="margin-right: 15px"></span>
+                    <span @click="deleteAllCompletions()"
+                          data-tooltip="Delete all completions">
+                      <i class="far fa-trash-alt trash remove-completion">&nbsp;&nbsp;</i>
+                    </span>
+                  </span>
                 </div>
               </div>
             </div>
@@ -301,21 +315,22 @@
 
     <div class="ui task-container">
 
-      <div class="ui grid stackable">
+      <div class="ui grid stackable" ref="grid">
         <div class="column" id="left-panel"
+             ref="left_panel"
              v-if="!(quick_view_left_width === 0 && quick_view)"
-             :class="quick_view ? width_mapping[quick_view_left_width] + ' wide' : 'sixteen wide'"
-             style="'min-width:188px;">
+             :class="quick_view ? '' : 'sixteen wide'">
           <!-- Table -->
           <div class="table-wrapper">
-            <table v-if="project.task_count > 0" class="task-table" :class="{'center-margin': !quick_view}">
+            <table v-if="project.task_count > 0" ref="task_table"
+                   class="task-table" :class="{'center-margin': !quick_view}">
               <!-- Header -->
               <tr>
                 <th class="order" @click="changeOrder('id')" v-if="columns.includes('id')">Task ID
                   <i class="fas" :class="{'fa-sort-up': this.order=='id', 'fa-sort-down': this.order=='-id'}"></i>
                 </th>
-                <th class="order" @click="changeOrder('completed_at')" v-if="columns.includes('completed_at')">Completed
-                  at
+                <th class="order" @click="changeOrder('completed_at')" v-if="columns.includes('completed_at')">
+                  Completed at
                   <i class="fas"
                      :class="{'fa-sort-up': this.order=='completed_at', 'fa-sort-down': this.order=='-completed_at'}"></i>
                 </th>
@@ -324,8 +339,8 @@
                   <i class="fas"
                      :class="{'fa-sort-up': this.order=='has_skipped_completions', 'fa-sort-down': this.order=='-has_skipped_completions'}"></i>
                 </th>
-                <th v-if="columns.includes('delete') && (project.can_delete_tasks || project.can_manage_completions)">
-                  Delete
+                <th v-if="columns.includes('actions')">
+                  Actions
                 </th>
 
                 <!-- Label config fields -->
@@ -351,7 +366,8 @@
                 <!-- Task ID -->
                 <td class="text-center" v-if="columns.includes('id')">
                   <span class="ui mini blue loader inline active" v-if="task.processing"></span>
-                  <span @click.stop="window.open('api/tasks/' + task.id)" class="hidden-items">{{ task.id }}</span>
+                  <i class="icon small outline eye"></i>
+                  <span class="hidden-items">{{ task.id }}</span>
                 </td>
                 <!-- Completed at -->
                 <td v-if="columns.includes('completed_at')">
@@ -359,28 +375,30 @@
                 </td>
                 <!-- Skipped -->
                 <td v-if="columns.includes('skipped')">
-              <span style="cursor:pointer">
-               <i class="ui icon forward grey" v-if="task.has_skipped_completions"></i>
-             </span>
+                  <i class="ui icon forward grey" v-if="task.has_skipped_completions"></i>
                 </td>
-                <!-- Delete -->
-                <td class="text-center"
-                    v-if="columns.includes('delete') && (project.can_delete_tasks || project.can_manage_completions)">
+                <!-- Actions -->
+                <td class="text-center" v-if="columns.includes('actions')">
                   <div class="actions-card">
-                <span v-if="project.can_delete_tasks">
-                  <a class="trash" @click.stop="deleteTask(task)" data-tooltip="Delete task">
-                    <i class="fas fa-trash-alt trash remove-task"></i>
-                  </a>
-                </span>
-                    <span v-if="project.can_manage_completions">
-                  <span v-if="task.completions">
-                    <a class="trash" @click.stop="deleteCompletion(task, task.completions[0])"
-                       style="margin-left: 10px"
-                       data-tooltip="Delete all completions of this task">
-                      <i class="far fa-trash-alt trash remove-completion"></i>
-                    </a>
-                  </span>
-                </span>
+                    <!-- Show task code -->
+                    <span data-tooltip="Show task code" class="action-button">
+                      <i @click.stop="window.open('api/tasks/' + task.id)" class="icon code" style="opacity: 0.75"></i>
+                    </span>
+                    <!-- Delete task -->
+                    <span v-if="project.can_delete_tasks" class="action-button">
+                      <a class="trash" @click.stop="deleteTask(task)" data-tooltip="Delete task">
+                        <i class="fas fa-trash-alt trash remove-task"></i>
+                      </a>
+                    </span>
+                    <!-- Delete completions -->
+                    <span v-if="project.can_manage_completions" class="action-button">
+                      <span v-if="task.completions">
+                        <a class="trash" @click.stop="deleteCompletion(task, task.completions[0])"
+                           data-tooltip="Delete all completions of this task">
+                          <i class="far fa-trash-alt trash remove-completion"></i>
+                        </a>
+                      </span>
+                    </span>
                   </div>
                 </td>
 
@@ -400,14 +418,13 @@
           <div :class="{'center-flex': !quick_view}">
             <div class="ui pagination menu"
                  v-if="project.task_count > 0">
-              <a class="item" :class="{'active': page>1, 'disabled': page<=1}"
-                 @click="prevPage()">Prev</a>
+              <a class="item" :class="{'active': page>1, 'disabled': page<=1}" @click="prevPage()">Prev</a>
 
               <div class="item">
                 <input v-model="page" style="border:none" type="number" min="1" :max="totalPages">
                 <span style="cursor:pointer" @click="page=totalPages" v-if="full_pagination">&nbsp; of &nbsp;&nbsp;
-                {{ totalPages }}
-              </span>
+                  {{ totalPages }}
+                </span>
               </div>
 
               <div class="item" v-if="full_pagination">
@@ -420,7 +437,8 @@
                 </select>
               </div>
 
-              <div class="item action-item" @click="show_table_settings=!show_table_settings" v-if="full_pagination">
+              <div id="full-pagination-settings"
+                   class="item action-item" @click="show_table_settings=!show_table_settings" v-if="full_pagination">
                 <i class="fa fa-cog"></i>
               </div>
 
@@ -428,15 +446,25 @@
                  @click="nextPage()">Next</a>
             </div> <!-- pagination -->
 
+            <div style="margin-top: 1em" v-if="!full_pagination"></div>
+            &nbsp;
 
+            <!-- Settings while hidden left panel -->
+            <i class="icon grey cog settings-cog" style="cursor: pointer; opacity: 0.75"
+               @click="show_table_settings=!show_table_settings" v-if="!full_pagination"></i>
+
+            <!-- Loader -->
             <i class="ui loader active blue tiny inline"
                :style="{opacity: tasks_loaded ? 0: 0.5, 'margin-left': '10px', 'margin-top': quick_view ? '0' : '13px'}"></i>
+
           </div>
 
           <div class="mobile-divider"></div>
         </div> <!-- left column -->
 
-        <div class="column" :class="width_mapping[quick_view_right_width] + ' wide'"
+        <div class="column"
+             id="right-panel"
+             ref="right_panel"
              :style="{display: quick_view ? 'inherit': 'none'}">
           <!-- LS Frontend -->
           <div id="label-studio">
@@ -446,13 +474,13 @@
 
       </div> <!-- right column -->
 
-      <br/><br/>
-
-      <!-- Settings while hidden left panel -->
-      <div class="action-item" @click="show_table_settings=!show_table_settings" v-if="!full_pagination"
-           data-intro='Hello step one!' data-step="1">
-        <center><i class="fa fa-cog"></i></center>
-      </div>
+      <br/>
+      <!-- settings button -->
+      <center>
+        <i class="icon grey large cog settings-cog"
+           @click="show_table_settings=!show_table_settings" v-if="quick_view_left_width === 0 && quick_view"></i>
+      </center>
+      <br/>
 
     </div>
 
@@ -471,53 +499,46 @@
 
       <!-- Content -->
       <div class="scrolling content">
+
         <h4>Columns to show</h4>
-        <div class="ui list horizontal">
-          <div class="item ui checkbox" v-for="item in all_columns">
-            <input type="checkbox" class="ui checkbox" v-model="columns" :value="item">
-            <label>{{ item }}</label>
+        <div class="section">
+          <div class="ui list horizontal">
+            <div class="item ui checkbox" v-for="item in all_columns">
+              <input type="checkbox" class="ui checkbox" v-model="columns" :value="item">
+              <label class="cap-first-letter">{{ item.replaceAll('_', ' ') }}</label>
+            </div>
           </div>
         </div>
 
-        <div class="ui divider hidden"></div>
-
-        <h4 style="margin-bottom: 12px">Left & right panels in Quick View</h4>
-        <div class="ui form">
-          <div class="fields">
-            <div class="one width field">
-              Left width <input type="number" v-model="quick_view_left_width" min="0" max="14">
-            </div>
-            <div class="one width field">
-              Right width <input type="number" v-model="quick_view_right_width" min="2" max="16">
-            </div>
+        <h4>Quick view</h4>
+        <div class="section">
+          <p>
+            Quick view combines the task table and the labeling interface on left and right panels into one window.
+            To start quick view click on the table row near Task ID.
+            You can move over tasks using hotkeys.
+            Press <hotkey style='color:#777;font-size:80%;padding: 0.05em 0.35em;'>q</hotkey> or
+            <i class="icon cog" style="opacity: 0.75"></i>on the page bottom to show settings again.
+          </p>
+          <div class="ui form">
+            <a class="ui button" @click="quick_view_left_width=0">
+              Hide Task Table
+            </a>
+            <a class="ui button" @click="quick_view_left_width=1">Show Task Table</a>
           </div>
-
-          <a class="ui button" @click="quick_view_left_width=0"
-             data-tippy-content="Hide left panel in quick view.<br>Use hotkeys to move across tasks<br>
-                                 Press <hotkey style='color:#777;font-size:80%'>q</hotkey> to show settings again">
-            Hide Left Panel
-          </a>
-          <a class="ui button" @click="quick_view_left_width=4;">Restore Defaults</a>
-
         </div>
-
-        <div class="ui divider hidden"></div>
 
         <h4>Auto update timer</h4>
-        <div>
-
+        <div class="section">
+          <p>Auto update project info and tasks by 5 sec timer</p>
           <a class="ui button" @click="toggleAutoUpdateTimer()">
             <i class="fa-clock" :class="auto_update_timer ? 'fas': 'far'"></i>
             {{ 'Timer ' + (auto_update_timer ? 'Enabled': 'Disabled') }}
           </a>
-          Auto update project info and tasks by 5 sec timer
         </div>
-
-        <div class="ui divider hidden"></div>
 
         <!-- Hotkeys -->
         <h4>Hotkeys</h4>
-        <div style="margin-top: 1em">
+        <div class="section">
           <div class="hotkey-helper">
             <div class="keys"><hotkey>q</hotkey></div>
             <span class="description">show settings</span>
@@ -525,7 +546,7 @@
 
           <div class="hotkey-helper">
             <div class="keys"><hotkey>click on row</hotkey></div>
-            <span class="description">open task in Quick mode, click again on selected task to exit</span>
+            <span class="description">open task in Quick mode, <br>click again on selected task to exit</span>
           </div>
 
           <div class="hotkey-helper">
@@ -568,11 +589,13 @@
   <script src="static/js/components/animatedNumber.js"></script>
   <script src="static/js/components/imageWithFadeIn.js"></script>
   <script src="static/js/components/vue-tippy.min.js"></script>
+  <!-- <script src="static/js/components/vue-intro.min.js"></script> -->
   <script>
-    var PAGINATION_MAX_WIDTH = 347;
+    var PAGINATION_MAX_WIDTH = 400;
 
     Vue.use(SemanticUIVue);
     Vue.use(VueTippy);
+    //Vue.use(VueIntro);
 
     var app = new Vue({
       el: '#app',
@@ -592,12 +615,11 @@
           error: null,
 
           // quick task preview
-          all_columns: ['id', 'completed_at', 'skipped', 'delete', 'others'],
-          full_columns: JSON.parse(Cookies.get('full_columns', '["id", "completed_at", "skipped", "delete", "others"]')),
-          quick_columns: JSON.parse(Cookies.get('quick_columns', '["id", "completed_at"]')),
+          all_columns: ['id', 'completed_at', 'skipped', 'actions', 'others'],
+          full_columns: JSON.parse(Cookies.get('full_columns', '["id", "completed_at", "skipped", "actions", "others"]')),
+          quick_columns: JSON.parse(Cookies.get('quick_columns', '["id"]')),
           quick_view: false,
-          quick_view_left_width: Cookies.get('quick_view_left_width', 4),
-          quick_view_right_width: Cookies.get('quick_view_right_width', 12),
+          quick_view_left_width: 4,
           current_task: null,
           current_task_index: -10,
           full_pagination: true,
@@ -853,6 +875,19 @@
           }
         },
 
+        // delete all completions from project
+        deleteAllCompletions: function () {
+          var deletion_confirmed = confirm(
+            'You are going to delete all existing completions.\n' +
+            'Warning! this operation cannot be undone.\nPlease confirm your action.');
+          if (deletion_confirmed) {
+            var request = new XMLHttpRequest();
+            request.open("DELETE", "api/project/completions", true);
+            request.onload = this.loadProjectAndTasks;
+            request.send();
+          }
+        },
+
         // start/stop timer with project & task api loading
         stopAutoUpdateTimer: function () {
           clearInterval(this.auto_update_timer);
@@ -988,10 +1023,25 @@
           }
         },
 
-        resizeLeftPanel: function() {
-          this.$nextTick(function() {
-            this.full_pagination = $('#left-panel').width() > PAGINATION_MAX_WIDTH;
-          });
+        evalPanelWidth: function() {
+          // check that task table width > left panel size
+          var grid_width = this.$refs.grid.getBoundingClientRect().width;
+          var table_width = 0;
+          var right_width;
+          if (this.quick_view_left_width > 0) {
+            table_width = this.$refs.task_table.getBoundingClientRect().width;
+            this.$refs.left_panel.style.width = (table_width + 28) + 'px';
+            right_width = (grid_width - 28 - table_width - 10);
+          }
+          else {
+            right_width = grid_width;
+          }
+          right_width = right_width < 500 ? 900: right_width;
+          this.$refs.right_panel.style.width = right_width + 'px';
+
+          // select ful pagination or small
+          this.full_pagination = (table_width > PAGINATION_MAX_WIDTH) || !this.quick_view;
+          // console.log(grid_width, table_width);
         }
       },
 
@@ -1017,6 +1067,7 @@
         columns: function(values) {
           if (this.quick_view) {
             this.quick_columns = values;
+            this.evalPanelWidth()
           }
           else {
             this.full_columns = values;
@@ -1024,6 +1075,7 @@
         },
 
         quick_columns: function() {
+          this.evalPanelWidth();
           Cookies.set('quick_columns', this.quick_columns);
         },
         full_columns: function() {
@@ -1031,19 +1083,8 @@
         },
 
         quick_view: function() {
-          this.resizeLeftPanel();
-        },
-        quick_view_left_width: function() {
-          this.quick_view_right_width = 16 - this.quick_view_left_width;
-          Cookies.set('quick_view_left_width', this.quick_view_left_width);
-          this.resizeLeftPanel();
-        },
-        quick_view_right_width: function() {
-          this.quick_view_left_width = 16 - this.quick_view_right_width;
-          Cookies.set('quick_view_right_width', this.quick_view_right_width);
-          this.resizeLeftPanel();
+          this.evalPanelWidth();
         }
-
       },
 
       // vue mounting of page
@@ -1076,15 +1117,50 @@
         Mousetrap.bind(['shift+down', 's'], this.nextTask);
         Mousetrap.bind(['q'], function() { self.show_table_settings = !self.show_table_settings });
 
-        $(window).resize(this.resizeLeftPanel);
+        $(window).resize(this.evalPanelWidth);
         console.log('Vue mounting success');
-
-        //introJs().start();
       },
 
       updated: function() {
-        this.$nextTick(function() {
+        this.evalPanelWidth();
 
+        this.$nextTick(function() {
+          /*if (self.tasks_loaded) {
+            var intro = introJs();
+            intro.setOptions({
+              steps: [
+                {
+                  element: document.querySelector('#full-pagination-settings'),
+                  intro: "Settings and help",
+                },
+                {
+                  element: document.querySelector('#step1'),
+                  intro: "This is a tooltip."
+                },
+                {
+                  element: document.querySelectorAll('#step2')[0],
+                  intro: "Ok, wasn't that fun?",
+                  position: 'right'
+                },
+                {
+                  element: '#step3',
+                  intro: 'More features, more fun.',
+                  position: 'left'
+                },
+                {
+                  element: '#step4',
+                  intro: "Another step.",
+                  position: 'bottom'
+                },
+                {
+                  element: '#step5',
+                  intro: 'Get it, use it.'
+                }
+              ]
+            });
+
+            intro.start();
+          }*/
         });
       }
     });

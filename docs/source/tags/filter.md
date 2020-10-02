@@ -4,22 +4,27 @@ type: tags
 order: 501
 ---
 
-Filter tag, show filter
+Filter search for large amount of labels
 
 ### Parameters
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| value | <code>string</code> |  | text of filter |
-| [size] | <code>number</code> | <code>4</code> | size of filter |
+| [placeholder] | <code>string</code> |  | placeholder text of filter |
+| [minlength] | <code>number</code> | <code>4</code> | size of filter |
 | [style] | <code>string</code> |  | css style string |
-| [underline] | <code>boolean</code> | <code>false</code> | underline of filter |
+| [hotkey] | <code>string</code> |  | hotkey to focus on filter text area |
 
 ### Example
 ```html
-<Filter name="text-1" value="$text" />
-```
-### Example
-```html
-<Filter name="text-1" value="Please select the class" />
+<View>
+  <Filter name="filter" toName="ner"
+          hotkey="shift+f" minlength="0"
+          placeholder="Filter" />
+  <Labels name="ner" toName="text" showInline="false">
+    <Label value="Person" />
+    <Label value="Organization" />
+  </Labels>
+  <Text name="text" value="$text" />
+</View>
 ```
