@@ -18,6 +18,12 @@ The output data is stored in _completions_ - JSON formatted files, one per each 
 
 ```json
 {
+    "id": 1,
+
+    "data": {
+        "image": "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg"
+    },
+    
     "completions": [
         {
             "id": "1001",
@@ -43,10 +49,7 @@ The output data is stored in _completions_ - JSON formatted files, one per each 
             ]
         }
     ],
-    "data": {
-        "image": "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg"
-    },
-    "id": 1,
+
     "predictions": [
         {
             "created_ago": "3 hours",

@@ -1,3 +1,5 @@
 site_description: Label Studio - Data labeling, annotation and exploration tool
 google_analytics: UA-129877673-4
 root_domain: labelstud.io
+
+copy_button: true

@@ -190,7 +190,10 @@ class LabelStudioMLManager(object):
     def get_or_create(
         cls, project=None, label_config=None, force_reload=False, train_output=None, version=None, **kwargs
     ):
-        if not cls.has_active_model(project) or force_reload or cls.get(project).model_version != version:
+        # reload new model if model is not loaded into memory OR force_reload=True OR model versions are mismatched
+        if not cls.has_active_model(project) or force_reload or (cls.get(project).model_version != version and version is not None):  # noqa
+            logger.debug('Reload model for project={project} with version={version}'.format(
+                project=project, version=version))
             cls.create(project, label_config, train_output, version, **kwargs)
         return cls.get(project)
 

@@ -33,12 +33,31 @@ The following commands launch Label Studio, configure the connection to your S3 
 label-studio start my_project --init --source s3 --source-path my-s3-bucket
 ```
 
-
 #### Write completions to bucket
 
 ```bash
 label-studio start my_project --init --target s3-completions --target-path my-s3-bucket
 ```
+
+### CORS and access problems
+
+Check the browser console (Ctrl + Shift + i in Chromium) for errors if you have troubles with the bucket objects access. 
+
+* If you see CORS problems, please [read here](https://docs.aws.amazon.com/AmazonS3/latest/dev/cors.html).
+ <img src='/images/cors-error-2.png' style="opacity: 0.9; max-width: 500px">
+
+* You must specify the `region` when you create a new bucket. Don't forget to change it in your `.aws/config` file. Otherwise your bucket objects will have problems with access.
+
+    E.g.: `~/.aws/config` 
+    ```
+    [default]
+    region=us-east-2  # change to the region of your bucket
+    ```  
+
+* Use LS version >= 0.7.5, it has a signature version s3v4 to support more aws regions.
+
+* If you see 403 errors, make sure you have the correct [credentials configured](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html). 
+ 
 
 ### Working with Binary Large OBjects (BLOBs)
 
@@ -77,7 +96,6 @@ Generate task data with URLs pointed to your bucket objects(for resources like j
 
 To connect your [GCS](https://cloud.google.com/storage) bucket with Label Studio, be sure you have enabled programmatic access. [Check this link](https://cloud.google.com/storage/docs/reference/libraries) to learn more about how to set up access to your GCS bucket.
 
-
 ### Create connection on startup
 
 The following commands launch Label Studio, configure the connection to your GCS bucket, scan for existing tasks, and load them into the app for the labeling.
@@ -93,6 +111,14 @@ label-studio start my_project --init --source gcs --source-path my-gcs-bucket
 ```bash
 label-studio start my_project --init --target gcs-completions --source-path my-gcs-bucket
 ```
+
+### CORS and access problems
+
+Check the browser console (Ctrl + Shift + i in Chromium) for errors if you have troubles with the bucket objects access. 
+
+* If you see CORS problems, please [read here](https://cloud.google.com/storage/docs/configuring-cors).
+ <img src='/images/cors-error-2.png' style="opacity: 0.9; max-width: 500px">
+* If you see 403 errors, make sure you have the correct [credentials configured](https://cloud.google.com/storage/docs/reference/libraries#setting_up_authentication). 
 
 ### Working with Binary Large OBjects (BLOBs)
 

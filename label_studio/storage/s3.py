@@ -1,20 +1,23 @@
 import logging
 import boto3
+from botocore.client import Config
 import json
+import os
 
 from .base import CloudStorage, BaseStorageForm, BooleanField, Optional, StringField
 
 logger = logging.getLogger(__name__)
 logging.getLogger('botocore').setLevel(logging.CRITICAL)
 boto3.set_stream_logger(level=logging.INFO)
-
+S3_REGION = os.environ.get('S3_REGION', '')
 
 def get_client_and_resource(aws_access_key_id=None, aws_secret_access_key=None, aws_session_token=None):
     session = boto3.Session(
         aws_access_key_id=aws_access_key_id,
         aws_secret_access_key=aws_secret_access_key,
         aws_session_token=aws_session_token)
-    return session.client('s3'), session.resource('s3')
+    settings = {'region_name': S3_REGION} if S3_REGION else {}
+    return session.client('s3', config=boto3.session.Config(signature_version='s3v4'), **settings), session.resource('s3')
 
 
 class S3Storage(CloudStorage):
@@ -65,7 +68,7 @@ class S3Storage(CloudStorage):
     def _get_objects(self):
         bucket = self.client['bucket']
         if self.prefix:
-            bucket_iter = bucket.objects.filter(Prefix=self.prefix + '/', Delimiter='/').all()
+            bucket_iter = bucket.objects.filter(Prefix=self.prefix.rstrip('/') + '/', Delimiter='/').all()
         else:
             bucket_iter = bucket.objects.all()
         return (obj.key for obj in bucket_iter)

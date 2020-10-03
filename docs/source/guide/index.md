@@ -21,16 +21,30 @@ Here are the main concepts behind Label Studio's workflow:
 - **Frontend Labeling UI** is accessible from any browser, distributed as precompiled js/css scripts and could be [easily extendable with new labeling tags](frontend.html). You can also [embed Label Studio UI into your applications](frontend.html#Quickstart).
 
 
-**Relations among tasks, completions and results** 
+### Main modules
+
+The main modules of LS are 
+* [Label Studio Backend](https://github.com/heartexlabs/label-studio/) (LSB, main repository)
+* [Label Studio Frontend](https://github.com/heartexlabs/label-studio-frontend) (LSF, editor)
+* [Machine Learning Backends](https://github.com/heartexlabs/label-studio/tree/master/label_studio/ml) (MLB)
+
+<br>
+<div style="margin:auto; text-align:center;"><img src="/images/ls-modules-scheme.png" style="opacity: 0.8"/></div>
+
+### Relations among tasks, completions and results 
 
 Here you can see relations among labeling objects: tasks, completions, results, etc.
 
 One user provides one completion, it’s atomic, and it consists of the result items. Result items can have relations between themselves with the specified direction of three types: left-right, right-left, or bidirectional. Normalizations are additional information in the custom string format about the current result item.
  
 <br>
-<center><img src="/images/labeling-scheme.png" style="max-width: 600px; opacity: 0.6"></center>
+<center><img src="/images/labeling-scheme.png" style="width: 100%; opacity: 0.6"></center>
 <br>
 Completions and Predictions are very similar. But predictions must be generated automatically by ML models.   
+
+**Usage statistics**
+
+Label Studio collects anonymous usage statistics without any sensitive info about page request number and data types from the labeling config. It helps us to improve the labeling quality and gives a better understanding about the next development.
 
 
 ## Quickstart
@@ -131,6 +145,8 @@ Or put `username` and `password` in the project config.json.
  ...
 }
 ```
+
+> For docker you need to setup environment variables `USERNAME` and `PASSWORD`
 
 It will be the same username and password for all the users.
 

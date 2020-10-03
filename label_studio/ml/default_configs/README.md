@@ -16,7 +16,7 @@ $ curl http://localhost:9090/health
 Then connect running backend to Label Studio:
 
 ```bash
-label-studio start --init new_project --ml-backend-url http://localhost:9090 --template image_classification
+label-studio start --init new_project --ml-backends http://localhost:9090 --template image_classification
 ```
 
 

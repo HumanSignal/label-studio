@@ -1,0 +1,24 @@
+<!-- {"title": "Table with text fields", "category": "other", "complexity": "advanced"} -->
+<View>
+  <Style>
+    input[type="text"][name^="table"] { border-radius: 0px; border-right: none;}
+    input[type="text"][name^="table_metric"] { border-right: 1px solid #ddd; }
+    div[class*=" TextAreaRegion_mark"] {background: none; height: 33px; border-radius: 0; min-width: 135px;}
+  </Style>
+
+  <Image value="$image" name="image"/>
+
+  <Header value="Trick to build a table"/>
+
+  <View style="display: grid;  grid-template-columns: 1fr 1fr 1fr; max-height: 300px; width: 400px">
+    <TextArea name="table_name_1" toName="image" placeholder="name" editable="true" maxSubmissions="1"/>
+    <TextArea name="table_value_1" toName="image" placeholder="value" editable="true" maxSubmissions="1"/>
+    <TextArea name="table_metric_1" toName="image" placeholder="metric" editable="true" maxSubmissions="1"/>
+    <TextArea name="table_name_2" toName="image" placeholder="name" editable="true" maxSubmissions="1"/>
+    <TextArea name="table_value_2" toName="image" placeholder="value" editable="true" maxSubmissions="1"/>
+    <TextArea name="table_metric_2" toName="image" placeholder="metric" editable="true" maxSubmissions="1"/>
+    <TextArea name="table_name_3" toName="image" placeholder="name" editable="true" maxSubmissions="1"/>
+    <TextArea name="table_value_3" toName="image" placeholder="value" editable="true" maxSubmissions="1"/>
+    <TextArea name="table_metric_3" toName="image" placeholder="metric" editable="true" maxSubmissions="1"/>
+  </View>
+</View>

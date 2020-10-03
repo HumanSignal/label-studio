@@ -35,7 +35,7 @@ class GCSStorage(CloudStorage):
         logger.debug('Getting GCS blobs from ' + self.path)
         bucket = self.client['bucket']
         files = bucket.list_blobs(prefix=self.prefix)
-        return (f.name for f in files if f.name != (self.prefix + '/'))
+        return (f.name for f in files if f.name != (self.prefix.rstrip('/') + '/'))
 
     def _get_value(self, key):
         bucket = self.client['bucket']

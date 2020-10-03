@@ -8,3 +8,7 @@
   <a href="/"><img src="<%- url_for("/images/opossum/other/5.svg") %>" alt="label studio logo" height="120" /></a>
 </div>
 <% } %>
+
+<% if (page.type === "playground") { %>
+<%- partial('partials/sidebar_main_page', {type: page.type === 'menu' ? 'guide' : page.type, index: page.index}) %>
+<% } %>
