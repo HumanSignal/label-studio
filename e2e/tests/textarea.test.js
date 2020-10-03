@@ -20,8 +20,14 @@ Scenario("Use classification config with textarea", async (I) => {
   I.click("Text summarization");
   // button Proceed is not clickable by unknown reason, so click on icon inside
   I.click(locate("i").inside(locate(".button").withText("Proceed")));
+  // request after validating config and importing example
+  // so hope there will be always anough time
+  // don't try to get through these step in interactive mode!
+  I.waitForResponse(req => req.url().includes("/api/render-label-studio"));
   // sample text from classification config
   I.waitForText("to trust yourself");
+  // header from that config
+  I.waitForText("Provide one sentence summary");
 
   // @todo this doesn't work in headless mode for unknown reason
   // editor rendered inside an iframe
@@ -30,7 +36,7 @@ Scenario("Use classification config with textarea", async (I) => {
   // I.pressKey("Enter");
   // I.switchTo();
 
-  I.click("Save");
+  I.click("input[value=Save]");
   I.waitForText("Import Tasks", 3);
   I.click("Import Tasks");
   I.amOnPage("/import");
