@@ -143,7 +143,7 @@ def send_upload(path):
     logger.warning('Task path starting with "/upload/" is deprecated and will be removed in next releases, '
                    'replace "/upload/" => "/data/upload/" in your tasks.json files')
     project = project_get_or_create()
-    project_dir = os.path.join(project.name, 'upload')
+    project_dir = os.path.join(project.path, 'upload')
     return open(os.path.join(project_dir, path), 'rb').read()
 
 
@@ -979,7 +979,7 @@ def get_data_file(filename):
 
     # support for upload via GUI
     if filename.startswith('upload/'):
-        path = os.path.join(project.name, filename)
+        path = os.path.join(project.path, filename)
         directory = os.path.abspath(os.path.dirname(path))
         filename = os.path.basename(path)
         return flask.send_from_directory(directory, filename, as_attachment=True)
