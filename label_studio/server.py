@@ -143,7 +143,7 @@ def send_upload(path):
     logger.warning('Task path starting with "/upload/" is deprecated and will be removed in next releases, '
                    'replace "/upload/" => "/data/upload/" in your tasks.json files')
     project = project_get_or_create()
-    project_dir = os.path.join(project.name, 'upload')
+    project_dir = os.path.join(project.path, 'upload')
     return open(os.path.join(project_dir, path), 'rb').read()
 
 
@@ -811,6 +811,25 @@ def api_completions(task_id):
         return make_response('Incorrect request method', 500)
 
 
+@app.route('/api/project/completions/', methods=['DELETE'])
+@requires_auth
+@exception_treatment
+def api_all_completions():
+    """ Delete all completions
+    """
+    project = project_get_or_create()
+
+    if request.method == 'DELETE':
+        project.delete_all_completions()
+        project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
+        return make_response('done', 201)
+
+    else:
+        project.analytics.send(getframeinfo(currentframe()).function, error=500, method=request.method)
+        return make_response('Incorrect request method', 500)
+
+
+
 @app.route('/api/tasks/<task_id>/cancel', methods=['POST'])
 @requires_auth
 @exception_treatment
@@ -975,7 +994,7 @@ def get_data_file(filename):
 
     # support for upload via GUI
     if filename.startswith('upload/'):
-        path = os.path.join(project.name, filename)
+        path = os.path.join(project.path, filename)
         directory = os.path.abspath(os.path.dirname(path))
         filename = os.path.basename(path)
         return flask.send_from_directory(directory, filename, as_attachment=True)
@@ -1065,7 +1084,7 @@ def main():
         label_studio.utils.auth.PASSWORD = input_args.password or config.get('password', '')
 
         # set host name
-        host = input_args.host or config.get('host', 'localhost')  # name for internal LS usage
+        host = input_args.host or config.get('host', 'localhost')  # name for external links generation
         port = input_args.port or config.get('port', 8080)
         server_host = 'localhost' if host == 'localhost' else '0.0.0.0'  # web server host
 
@@ -1085,7 +1104,7 @@ def main():
                   '* Trying to start at ' + str(port) +
                   '\n****************\n')
 
-        set_web_protocol(config.get('protocol', 'http://'))
+        set_web_protocol(input_args.protocol or config.get('protocol', 'http://'))
         set_full_hostname(get_web_protocol() + host.replace('0.0.0.0', 'localhost') + ':' + str(port))
 
         start_browser('http://localhost:' + str(port), input_args.no_browser)
