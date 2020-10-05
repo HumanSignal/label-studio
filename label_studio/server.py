@@ -997,7 +997,12 @@ def api_project_switch():
 
     uuid = request.args.get('uuid')
     session['project'] = uuid
-    return redirect("/")
+    code = 200
+
+    project = project_get_or_create()
+    output = project.serialize()
+    output['multi_session_mode'] = input_args.command == 'start-multi-session'
+    return make_response(jsonify(output), code)
 
 
 def str2datetime(timestamp_str):

@@ -88,7 +88,7 @@
 
 <script>
   function new_project() {
-    var project_desc = prompt("\"You will lose ALL YOUR DATA, this action CAN'T BE UNDONE.\nAre you sure? If so, please enter your project description", "");
+    var project_desc = prompt("\"You will lose ALL YOUR DATA, this action CAN'T BE UNDONE.\nAre you sure? If so, please enter your project description", "default");
     if (project_desc) {
       let request = new XMLHttpRequest();
       request.open("POST", `api/project/?new=true&desc=${project_desc}`, true);
@@ -109,7 +109,7 @@
       let request = new XMLHttpRequest();
       request.open("POST", `/api/project-switch?uuid=${uuid}`, true);
       request.onload = function () {
-        open(request.responseURL)
+        window.location = "/"
       };
       request.send(null);
     }
