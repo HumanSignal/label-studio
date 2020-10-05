@@ -12,8 +12,10 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, BooleanField
 from wtforms.validators import InputRequired, Optional, ValidationError
 from collections import OrderedDict
+from ordered_set import OrderedSet
 
 from label_studio.utils.io import json_load
+from label_studio.utils.validation import TaskValidator, ValidationError as TaskValidationError
 
 logger = logging.getLogger(__name__)
 
@@ -255,11 +257,39 @@ class CloudStorage(BaseStorage):
         data_key = self.data_key if self.data_key else self.default_data_key
         return {data_key: self.url_prefix + self.path + '/' + key}
 
+    def _validate_task(self, key, parsed_data):
+        """ Validate parsed data with labeling config and task structure
+        """
+        is_list = isinstance(parsed_data, list)
+        # we support only one task per JSON file
+        if not (is_list and len(parsed_data) == 1 or isinstance(parsed_data, dict)):
+            raise TaskValidationError('Error at ' + key + ':\n'
+                                      'Cloud storages support one task per one JSON file only. '
+                                      'Task must be {} or [{}] with length = 1')
+
+        # classic validation for one task
+        validator = TaskValidator(self.project)
+        try:
+            new_tasks = validator.to_internal_value(parsed_data if is_list else [parsed_data])
+        except TaskValidationError as e:
+            # pretty format of errors
+            messages = e.msg_to_list()
+            out = [(key + ' :: ' + msg) for msg in messages]
+            out = "\n".join(out)
+            raise TaskValidationError(out)
+
+        return new_tasks[0]
+
     def get_data(self, key):
         if self.use_blob_urls:
             return self._get_value_url(key)
         else:
-            return self._get_value(key)
+            # read task json from bucket and validate it
+            try:
+                parsed_data = self._get_value(key)
+            except Exception as e:
+                raise Exception(key + ' :: ' + str(e))
+            return self._validate_task(key, parsed_data)
 
     def _get_key_by_id(self, id):
         item = self._ids_keys_map.get(id)
@@ -282,7 +312,7 @@ class CloudStorage(BaseStorage):
         except Exception as exc:
             # return {'error': True, 'message': str(exc)}
             logger.error(str(exc), exc_info=True)
-            return
+            raise exc
         if 'data' in data:
             data['id'] = id
             return data
@@ -385,8 +415,8 @@ class CloudStorage(BaseStorage):
         new_ids_keys_map = {}
         new_keys_ids_map = {}
 
-        full = set(self.iter_full_keys())
-        intersect = full & set(self._keys_ids_map)
+        full = OrderedSet(self.iter_full_keys())
+        intersect = full & OrderedSet(self._keys_ids_map)
         exclusion = full - intersect
 
         for key in exclusion:

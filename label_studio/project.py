@@ -15,7 +15,7 @@ from datetime import datetime
 from label_studio_converter import Converter
 
 from label_studio.utils.misc import (
-    config_line_stripped, config_comments_free, parse_config, timestamp_now, timestamp_to_local_datetime)
+    config_line_stripped, config_comments_free, parse_config, timestamp_now)
 from label_studio.utils.analytics import Analytics
 from label_studio.utils.models import ProjectObj, MLBackend
 from label_studio.utils.exceptions import ValidationError
@@ -43,7 +43,7 @@ class Project(object):
 
         self.on_boarding = {}
         self.context = context or {}
-
+        self.project_obj = None
         self.source_storage = None
         self.target_storage = None
         self.create_storages()
@@ -53,15 +53,14 @@ class Project(object):
         self.derived_input_schema, self.derived_output_schema = None, None
 
         self.load_label_config()
+        self.load_project_and_ml_backends()
         self.update_derived_input_schema()
         self.update_derived_output_schema()
 
         self.analytics = None
         self.load_analytics()
 
-        self.project_obj = None
         self.ml_backends = []
-        self.load_project_ml_backend()
 
         self.converter = None
         self.load_converter()
@@ -210,7 +209,7 @@ class Project(object):
         self.config['ml_backends'] = config_params
         self._save_config()
 
-    def load_project_ml_backend(self):
+    def load_project_and_ml_backends(self):
         # configure project
         self.project_obj = ProjectObj(label_config=self.label_config_line, label_config_full=self.label_config_full)
 
@@ -289,7 +288,7 @@ class Project(object):
         self.load_label_config()
         self.update_derived_output_schema()
         self.load_analytics()
-        self.load_project_ml_backend()
+        self.load_project_and_ml_backends()
         self.load_converter()
 
         # save project config state
@@ -475,11 +474,9 @@ class Project(object):
         for _, data in self.target_storage.items():
             id = data['id']
             try:
-                latest_time = max(data['completions'], key=itemgetter('created_at'))['created_at']
+                times[id] = max(data['completions'], key=itemgetter('created_at'))['created_at']
             except Exception as exc:
                 times[id] = 'undefined'
-            else:
-                times[id] = timestamp_to_local_datetime(latest_time).strftime('%Y-%m-%d %H:%M:%S')
         return times
 
     def get_skipped_status(self):
@@ -505,7 +502,7 @@ class Project(object):
         :return: json dict with completion
         """
         data = self.target_storage.get(task_id)
-        logger.debug('Get task ' + str(task_id) + ' from target storage: ' + str(data))
+        logger.debug('Get task ' + str(task_id) + ' from target storaget')
 
         if data:
             logger.debug('Get predictions ' + str(task_id) + ' from source storage')

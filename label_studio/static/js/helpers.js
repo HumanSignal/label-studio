@@ -236,3 +236,97 @@ var copyToClipboard = function (str) {
     document.getSelection().addRange(selected);   // Restore the original selection
   }
 };
+
+var width_mapping = {
+    0: "hidden",
+    1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six", 7: "seven", 8: "eight", 9: "nine", 10: "ten",
+    11: "eleven", 12: "twelve", 13: "thirteen", 14: "fourteen", 15: "fifteen", 16: "sixteen"
+};
+
+// Detect resize of any element
+function ResizeSensor(element, callback) {
+  var zIndex = parseInt(getComputedStyle(element));
+  if (isNaN(zIndex)) {
+    zIndex = 0;
+  }
+  ;
+  zIndex--;
+
+  var expand = document.createElement('div');
+  expand.style.position = "absolute";
+  expand.style.left = "0px";
+  expand.style.top = "0px";
+  expand.style.right = "0px";
+  expand.style.bottom = "0px";
+  expand.style.overflow = "hidden";
+  expand.style.zIndex = zIndex;
+  expand.style.visibility = "hidden";
+
+  var expandChild = document.createElement('div');
+  expandChild.style.position = "absolute";
+  expandChild.style.left = "0px";
+  expandChild.style.top = "0px";
+  expandChild.style.width = "10000000px";
+  expandChild.style.height = "10000000px";
+  expand.appendChild(expandChild);
+
+  var shrink = document.createElement('div');
+  shrink.style.position = "absolute";
+  shrink.style.left = "0px";
+  shrink.style.top = "0px";
+  shrink.style.right = "0px";
+  shrink.style.bottom = "0px";
+  shrink.style.overflow = "hidden";
+  shrink.style.zIndex = zIndex;
+  shrink.style.visibility = "hidden";
+
+  var shrinkChild = document.createElement('div');
+  shrinkChild.style.position = "absolute";
+  shrinkChild.style.left = "0px";
+  shrinkChild.style.top = "0px";
+  shrinkChild.style.width = "200%";
+  shrinkChild.style.height = "200%";
+  shrink.appendChild(shrinkChild);
+
+  element.appendChild(expand);
+  element.appendChild(shrink);
+
+  function setScroll() {
+    expand.scrollLeft = 10000000;
+    expand.scrollTop = 10000000;
+
+    shrink.scrollLeft = 10000000;
+    shrink.scrollTop = 10000000;
+  }
+  setScroll();
+
+  var size = element.getBoundingClientRect();
+
+  var currentWidth = size.width;
+  var currentHeight = size.height;
+
+  var onScroll = function () {
+    var size = element.getBoundingClientRect();
+
+    var newWidth = size.width;
+    var newHeight = size.height;
+
+    if (newWidth != currentWidth || newHeight != currentHeight) {
+      currentWidth = newWidth;
+      currentHeight = newHeight;
+
+      callback();
+    }
+
+    setScroll();
+  };
+
+  expand.addEventListener('scroll', onScroll);
+  shrink.addEventListener('scroll', onScroll);
+}
+
+function capitalize (string) {
+  return [].map.call(string, function(char, i) {
+    i ? char : char.toUpperCase()
+  }).join('')
+}

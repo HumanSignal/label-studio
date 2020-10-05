@@ -146,7 +146,7 @@ Let's call ML backend `my_backend` and initialize ML backend directory `./my_bac
 label-studio-ml init my_backend
 ```
 
-The later command takes your script `./model.py` then creates `./my_backend` directory at the same level and copies configs and scripts needed for launching ML backend either in development or production modes.
+The last command takes your script `./model.py` then creates `./my_backend` directory at the same level and copies configs and scripts needed for launching ML backend either in development or production modes.
 
 > Note: You can specify different location for your model script, e.g. `label-studio init my_backend --script /path/to/my/script.py`
 
@@ -183,7 +183,7 @@ Now you can explore runtime logs in `my_backend/logs/uwsgi.log` and RQ training 
 Initialize and start new Label Studio project connecting to the running ML backend:
 
 ```bash
-label-studio start --init --ml-backend-url http://localhost:9090
+label-studio start --init --ml-backends http://localhost:9090
 ```
 
 #### Getting predictions

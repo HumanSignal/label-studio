@@ -29,6 +29,43 @@
   box-shadow: 0 0 1px rgba(0,0,0,.25)
   transition: background-color .3s ease-in-out
 
+#preview-wrapper
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  position: fixed;
+  z-index: 100000;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  min-height: 100vh;
+
+#render-editor-loader
+  max-width: 1200px;
+  background: #fff;
+  padding: 3%;
+  width: 500px;
+  height: 500px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+
+#render-editor
+  max-width: 1200px;
+  border: none;
+  background: #fff;
+  padding: 3%;
+  width: 500px;
+  height: 500px;
+  border-radius: 10px;
+
 .content
   position: relative
   padding: 2.2em 0
