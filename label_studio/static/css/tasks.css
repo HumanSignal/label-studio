@@ -153,14 +153,17 @@ tr {
    vertical-align: top;
 }
 
+.text-preview i.icon {
+  color: rgba(0,0,0, 0.25);
+}
+.text-preview i.icon:hover {
+  color: rgba(0,0,0, 0.5);
+}
+
 .text-preview {
   text-align: left;
   max-width: 200px !important;
   font-size: 80%;
-  white-space: pre-wrap; /* css-3 */
-  white-space: -moz-pre-wrap;
-  white-space: -pre-wrap;
-  white-space: -o-pre-wrap;
   word-wrap: break-word !important;
 }
 

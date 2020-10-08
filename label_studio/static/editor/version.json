@@ -1,6 +1,6 @@
 {
-  "message": "Relations Visualization (#140)\n\n* Relations UI Overlay PoC\r\n\r\n* Debounce updates, remove update on window resize\r\n\r\n* Support rect polygons\r\n\r\n* Support EllipseRegion\r\n\r\n(in Math we trust)\r\n\r\n* Support rectange rotation\r\n\r\n* Support proper rectange rotation\r\n\r\n* Keypoint support\r\n\r\n* Brush support\r\n\r\n* Audio region support\r\n\r\n* Support TextAreaRegion, unify bbox calculation form HTML elements\r\n\r\n* Allow hide/show connection lines\r\n\r\n* Support zoom\r\n\r\n* Highlight relations\r\n\r\n* Code cleanup, fix labels positioning\r\n\r\n* Support Relations tag\r\n\r\n* Fix single choise Relation\r\n\r\n* Make highlighted relation more contrast\r\n\r\n* Fix hook conditional call\r\n\r\n* Support window resize\r\n\r\n* Multiline text regions support\r\n\r\n* Fix BBox calculation for multiline text/html regions\r\n\r\n- Show relation on hover\r\n- Fix Audio region tracking\r\n\r\n* Remove logs, reduce connections transparency\r\n\r\n* Remove excess import\r\n\r\n* Fix connections re-render on window resize\r\n\r\nCo-authored-by: Nikita Skryabin <nr@fenelon.ru>\r\nCo-authored-by: Michael Malyuk <mikhail.maluyk@gmail.com>",
-  "commit": "35370db998ec007d162796a8141d2e9510b0f82a",
-  "branch": "",
-  "date": "2020-10-08T00:29:58Z"
+  "message": "Display label's color on the left stripe",
+  "commit": "324a2933c1874f5f99fcd72b855e270eaa1aeeba",
+  "branch": "master",
+  "date": "2020-10-08T01:31:17Z"
 }

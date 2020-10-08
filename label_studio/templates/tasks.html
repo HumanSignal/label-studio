@@ -260,7 +260,7 @@
                 <!-- Text -->
                 <td class="text-preview-td"
                     v-for="(value, key) in project.data_types" v-if="value === 'Text' && columns.includes('previews')">
-                  <div class="text-preview">{{ task.data[key].slice(0, 500) + (task.data[key].length <= 500 ? '': ' ...') }}</div>
+                  <div class="text-preview" @click.stop="copyValue(task.data[key])">{{ task.data[key].slice(0, 500) + (task.data[key].length <= 500 ? '': ' ...') }}</div>
                 </td>
 
                 <!-- Audio -->
@@ -280,13 +280,13 @@
                 <!-- Audio URLs -->
                 <td v-for="(value, key) in project.data_types" class="text-preview-td"
                     v-if="(value === 'Audio' || value === 'AudioPlus') && columns.includes('audio_urls')">
-                  <div class="text-preview">{{ task.data[key] }}</div>
+                  <div class="text-preview" @click.stop="copyValue(task.data[key])">>{{ task.data[key] }}</div>
                 </td>
 
                 <!-- Image URLs -->
                 <td v-for="(value, key) in project.data_types" class="text-preview-td"
                     v-if="value === 'Image' && columns.includes('image_urls')">
-                  <div class="text-preview">{{ task.data[key] }}</div>
+                  <div class="text-preview" @click.stop="copyValue(task.data[key])">{{ task.data[key] }}</div>
                 </td>
 
               </tr>
@@ -954,6 +954,15 @@
         },
         audioStopAll: function() {
           $('audio').each(function(i, o) { o.pause(); o.currentTime = 0; });
+        },
+
+        copyValue: function(text) {
+          copyToClipboard(text);
+          $('body').toast({
+            class: 'orange center',
+            message: '<center>Copied to clipboard!</center>',
+            position: 'bottom center'
+          })
         }
       },
 
