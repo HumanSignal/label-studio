@@ -28,7 +28,7 @@ from gevent.pywsgi import WSGIServer
 
 from flask import (
     request, jsonify, make_response, Response, Response as HttpResponse,
-    send_file, session, redirect
+    send_file, session, redirect, g
 )
 from flask_api import status
 from types import SimpleNamespace
@@ -46,6 +46,7 @@ from label_studio.utils.misc import (
     config_line_stripped, get_config_templates, convert_string_to_hash, serialize_class,
     DirectionSwitch, check_port_in_use, timestamp_to_local_datetime
 )
+from label_studio.utils.analytics import Analytics
 from label_studio.utils.argparser import parse_input_args
 from label_studio.utils.uri_resolver import resolve_task_data_uri
 from label_studio.storage import get_storage_form
@@ -77,6 +78,7 @@ app = create_app()
 
 # input arguments
 input_args = None
+analytics = None
 if os.path.exists('server.json'):
     try:
         with open('server.json') as f:
@@ -121,9 +123,19 @@ def json_filter(s):
     return json.dumps(s)
 
 
-@app.before_first_request
-def app_init():
-    pass
+@app.before_request
+def app_before_request_callback():
+    # setup session cookie
+    if 'session_id' not in session:
+        session['session_id'] = str(uuid4())
+    g.project = project_get_or_create()
+    g.analytics = Analytics(input_args, g.project)
+
+
+@app.after_request
+def app_after_request_callback(response):
+    g.analytics.send(request, session, response)
+    return response
 
 
 @app.route('/static/media/<path:path>')
@@ -142,8 +154,7 @@ def send_upload(path):
     """
     logger.warning('Task path starting with "/upload/" is deprecated and will be removed in next releases, '
                    'replace "/upload/" => "/data/upload/" in your tasks.json files')
-    project = project_get_or_create()
-    project_dir = os.path.join(project.path, 'upload')
+    project_dir = os.path.join(g.project.path, 'upload')
     return open(os.path.join(project_dir, path), 'rb').read()
 
 
@@ -168,8 +179,7 @@ def validation_error_handler(error):
 def labeling_page():
     """ Label studio frontend: task labeling
     """
-    project = project_get_or_create()
-    if project.no_tasks():
+    if g.project.no_tasks():
         return redirect('welcome')
 
     # task data: load task or task with completions if it exists
@@ -179,18 +189,17 @@ def labeling_page():
     if task_id is not None:
         task_id = int(task_id)
         # Task explore mode
-        task_data = project.get_task_with_completions(task_id) or project.source_storage.get(task_id)
+        task_data = g.project.get_task_with_completions(task_id) or g.project.source_storage.get(task_id)
         task_data = resolve_task_data_uri(task_data)
 
-        if project.ml_backends_connected:
-            task_data = project.make_predictions(task_data)
+        if g.project.ml_backends_connected:
+            task_data = g.project.make_predictions(task_data)
 
-    project.analytics.send(getframeinfo(currentframe()).function)
     return flask.render_template(
         'labeling.html',
-        project=project,
-        config=project.config,
-        label_config_line=project.label_config_line,
+        project=g.project,
+        config=g.project.config,
+        label_config_line=g.project.label_config_line,
         task_id=task_id,
         task_data=task_data,
         **find_editor_files()
@@ -203,14 +212,12 @@ def labeling_page():
 def welcome_page():
     """ Label studio frontend: task labeling
     """
-    project = project_get_or_create()
-    project.analytics.send(getframeinfo(currentframe()).function)
-    project.update_on_boarding_state()
+    g.project.update_on_boarding_state()
     return flask.render_template(
         'welcome.html',
-        config=project.config,
-        project=project,
-        on_boarding=project.on_boarding
+        config=g.project.config,
+        project=g.project,
+        on_boarding=g.project.on_boarding
     )
 
 
@@ -220,14 +227,12 @@ def welcome_page():
 def tasks_page():
     """ Tasks and completions page
     """
-    project = project_get_or_create()
-    serialized_project = project.serialize()
+    serialized_project = g.project.serialize()
     serialized_project['multi_session_mode'] = input_args.command != 'start-multi-session'
-    project.analytics.send(getframeinfo(currentframe()).function)
     return flask.render_template(
         'tasks.html',
-        config=project.config,
-        project=project,
+        config=g.project.config,
+        project=g.project,
         serialized_project=serialized_project,
         **find_editor_files()
     )
@@ -239,16 +244,14 @@ def tasks_page():
 def setup_page():
     """ Setup label config
     """
-    project = project_get_or_create()
-
-    templates = get_config_templates(project.config)
+    templates = get_config_templates(g.project.config)
     input_values = {}
-    project.analytics.send(getframeinfo(currentframe()).function)
+    # project.analytics.send(getframeinfo(currentframe()).function)
     return flask.render_template(
         'setup.html',
-        config=project.config,
-        project=project,
-        label_config_full=project.label_config_full,
+        config=g.project.config,
+        project=g.project,
+        label_config_full=g.project.label_config_full,
         templates=templates,
         input_values=input_values,
         multi_session=input_args.command == 'start-multi-session'
@@ -261,13 +264,10 @@ def setup_page():
 def import_page():
     """ Import tasks from JSON, CSV, ZIP and more
     """
-    project = project_get_or_create()
-
-    project.analytics.send(getframeinfo(currentframe()).function)
     return flask.render_template(
         'import.html',
-        config=project.config,
-        project=project
+        config=g.project.config,
+        project=g.project
     )
 
 
@@ -277,13 +277,11 @@ def import_page():
 def export_page():
     """ Export completions as JSON or using converters
     """
-    project = project_get_or_create()
-    project.analytics.send(getframeinfo(currentframe()).function)
     return flask.render_template(
         'export.html',
-        config=project.config,
-        formats=project.converter.supported_formats,
-        project=project
+        config=g.project.config,
+        formats=g.project.converter.supported_formats,
+        project=g.project
     )
 
 
@@ -292,14 +290,12 @@ def export_page():
 @exception_treatment_page
 def model_page():
     """ Machine learning"""
-    project = project_get_or_create()
-    project.analytics.send(getframeinfo(currentframe()).function)
     ml_backends = []
-    for ml_backend in project.ml_backends:
+    for ml_backend in g.project.ml_backends:
         if ml_backend.connected:
             try:
-                ml_backend.sync(project)
-                training_status = ml_backend.is_training(project)
+                ml_backend.sync(g.project)
+                training_status = ml_backend.is_training(g.project)
                 ml_backend.training_in_progress = training_status['is_training']
                 ml_backend.model_version = training_status['model_version']
                 ml_backend.is_connected = True
@@ -318,8 +314,8 @@ def model_page():
         ml_backends.append(ml_backend)
     return flask.render_template(
         'model.html',
-        config=project.config,
-        project=project,
+        config=g.project.config,
+        project=g.project,
         ml_backends=ml_backends
     )
 
@@ -329,9 +325,6 @@ def model_page():
 def api_render_label_studio():
     """ Label studio frontend rendering for iframe
     """
-    # get args
-    project = project_get_or_create()
-
     config = request.args.get('config', request.form.get('config', ''))
     config = unquote(config)
     if not config:
@@ -342,7 +335,7 @@ def api_render_label_studio():
     example_task_data = {
         'id': 1764,
         'data': task_data,
-        'project': project.id,
+        'project': g.project.id,
         'created_at': '2019-02-06T14:06:42.000420Z',
         'updated_at': '2019-02-06T14:06:42.000420Z'
     }
@@ -355,7 +348,7 @@ def api_render_label_studio():
     }
     response.update(find_editor_files())
 
-    project.analytics.send(getframeinfo(currentframe()).function)
+    # project.analytics.send(getframeinfo(currentframe()).function)
     return flask.render_template('render_ls.html', **response)
 
 
@@ -366,9 +359,8 @@ def api_validate_config():
     """
     if 'label_config' not in request.form:
         return make_response('No label_config in POST', status.HTTP_417_EXPECTATION_FAILED)
-    project = project_get_or_create()
     try:
-        project.validate_label_config(request.form['label_config'])
+        g.project.validate_label_config(request.form['label_config'])
     except ValidationError as e:
         return make_response(jsonify({'label_config': e.msg_to_list()}), status.HTTP_400_BAD_REQUEST)
     except Exception as e:
@@ -388,21 +380,20 @@ def api_save_config():
     elif 'label_config' in request.json:
         label_config = request.json['label_config']
 
-    project = project_get_or_create()
     # check config before save
     try:
-        project.validate_label_config(label_config)
+        g.project.validate_label_config(label_config)
     except ValidationError as e:
         return make_response(jsonify({'label_config': e.msg_to_list()}), status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return make_response(jsonify({'label_config': [str(e)]}), status.HTTP_400_BAD_REQUEST)
 
     try:
-        project.update_label_config(label_config)
+        g.project.update_label_config(label_config)
     except Exception as e:
         return make_response(jsonify({'label_config': [str(e)]}), status.HTTP_400_BAD_REQUEST)
 
-    project.analytics.send(getframeinfo(currentframe()).function)
+    # project.analytics.send(getframeinfo(currentframe()).function)
     return Response(status=status.HTTP_201_CREATED)
 
 
@@ -414,12 +405,11 @@ def api_import_example():
     # django compatibility
     request.GET = request.args
     request.POST = request.form
-    project = project_get_or_create()
     config = request.GET.get('label_config', '')
     if not config:
         config = request.POST.get('label_config', '')
     try:
-        project.validate_label_config(config)
+        g.project.validate_label_config(config)
         output = generate_sample_task_without_check(config, mode='editor_preview')
     except (ValueError, ValidationError, lxml.etree.Error, KeyError):
         response = HttpResponse('error while example generating', status=status.HTTP_400_BAD_REQUEST)
@@ -433,13 +423,12 @@ def api_import_example():
 def api_import_example_file():
     """ Task examples for import
     """
-    project = project_get_or_create()
     request.GET = request.args  # django compatibility
 
     q = request.GET.get('q', 'json')
     filename = 'sample-' + datetime.now().strftime('%Y-%m-%d-%H-%M')
     try:
-        task = generate_sample_task(project)
+        task = generate_sample_task(g.project)
     except (ValueError, ValidationError, lxml.etree.Error):
         return HttpResponse('error while example generating', status=status.HTTP_400_BAD_REQUEST)
 
@@ -458,7 +447,7 @@ def api_import_example_file():
         output = pd.read_json(json.dumps(tasks), orient='records').to_csv(index=False, sep='\t')
 
     elif q == 'txt':
-        if len(project.data_types.keys()) > 1:
+        if len(g.project.data_types.keys()) > 1:
             raise ValueError('TXT is unsupported for projects with multiple sources in config')
 
         filename += '.txt'
@@ -476,7 +465,6 @@ def api_import_example_file():
     response.headers['Content-Disposition'] = 'attachment; filename=%s' % filename
     response.headers['filename'] = filename
 
-    project.analytics.send(getframeinfo(currentframe()).function)
     return response
 
 
@@ -484,8 +472,6 @@ def api_import_example_file():
 @requires_auth
 @exception_treatment
 def api_import():
-    project = project_get_or_create()
-
     # make django compatibility for uploader module
     class DjangoRequest:
         POST = request.form
@@ -496,24 +482,24 @@ def api_import():
 
     start = time.time()
     # get tasks from request
-    parsed_data = uploader.load_tasks(DjangoRequest(), project)
+    parsed_data, formats = uploader.load_tasks(DjangoRequest(), g.project)
     # validate tasks
-    validator = TaskValidator(project)
+    validator = TaskValidator(g.project)
     try:
         new_tasks = validator.to_internal_value(parsed_data)
     except ValidationError as e:
         return make_response(jsonify(e.msg_to_list()), status.HTTP_400_BAD_REQUEST)
 
     max_id_in_old_tasks = -1
-    if not project.no_tasks():
-        max_id_in_old_tasks = project.source_storage.max_id()
+    if not g.project.no_tasks():
+        max_id_in_old_tasks = g.project.source_storage.max_id()
 
     new_tasks = Tasks().from_list_of_dicts(new_tasks, max_id_in_old_tasks + 1)
-    project.source_storage.set_many(new_tasks.keys(), new_tasks.values())
+    g.project.source_storage.set_many(new_tasks.keys(), new_tasks.values())
 
     # update schemas based on newly uploaded tasks
-    project.update_derived_input_schema()
-    project.update_derived_output_schema()
+    g.project.update_derived_input_schema()
+    g.project.update_derived_output_schema()
 
     duration = time.time() - start
     return make_response(jsonify({
@@ -521,6 +507,7 @@ def api_import():
         'completion_count': validator.completion_count,
         'prediction_count': validator.prediction_count,
         'duration': duration,
+        'formats': formats,
         'new_task_ids': [t for t in new_tasks]
     }), status.HTTP_201_CREATED)
 
@@ -530,9 +517,8 @@ def api_import():
 @exception_treatment
 def api_export():
     export_format = request.args.get('format')
-    project = project_get_or_create()
     now = datetime.now()
-    completion_dir = project.config['output_dir']
+    completion_dir = g.project.config['output_dir']
 
     project_export_dir = os.path.join(os.path.dirname(completion_dir), 'export')
     os.makedirs(project_export_dir, exist_ok=True)
@@ -540,13 +526,12 @@ def api_export():
     zip_dir = os.path.join(project_export_dir, now.strftime('%Y-%m-%d-%H-%M-%S'))
     os.makedirs(zip_dir, exist_ok=True)
 
-    project.converter.convert(completion_dir, zip_dir, format=export_format)
+    g.project.converter.convert(completion_dir, zip_dir, format=export_format)
     shutil.make_archive(zip_dir, 'zip', zip_dir)
     shutil.rmtree(zip_dir)
 
     response = send_file(zip_dir+'.zip', as_attachment=True)
     response.headers['filename'] = os.path.basename(zip_dir+'.zip')
-    project.analytics.send(getframeinfo(currentframe()).function)
     return response
 
 
@@ -556,22 +541,18 @@ def api_export():
 def api_generate_next_task():
     """ Generate next task to label
     """
-    project = project_get_or_create()
     # try to find task is not presented in completions
-    completed_tasks_ids = project.get_completions_ids()
-    task = project.next_task(completed_tasks_ids)
+    completed_tasks_ids = g.project.get_completions_ids()
+    task = g.project.next_task(completed_tasks_ids)
     if task is None:
         # no tasks found
-        project.analytics.send(getframeinfo(currentframe()).function, error=404)
         return make_response('', 404)
 
     task = resolve_task_data_uri(task)
 
-    project.analytics.send(getframeinfo(currentframe()).function)
-
     # collect prediction from multiple ml backends
-    if project.ml_backends_connected:
-        task = project.make_predictions(task)
+    if g.project.ml_backends_connected:
+        task = g.project.make_predictions(task)
     logger.debug('Next task:\n' + str(task.get('id', None)))
     return make_response(jsonify(task), 200)
 
@@ -581,19 +562,17 @@ def api_generate_next_task():
 @exception_treatment
 def api_project():
     """ Project global operation"""
-    project = project_get_or_create(multi_session_force_recreate=False)
     code = 200
 
     if request.method == 'POST' and request.args.get('new', False):
-        project = project_get_or_create(multi_session_force_recreate=True)
+        g.project = project_get_or_create(multi_session_force_recreate=True)
         code = 201
     elif request.method == 'PATCH':
-        project.update_params(request.json)
+        g.project.update_params(request.json)
         code = 201
 
-    output = project.serialize()
+    output = g.project.serialize()
     output['multi_session_mode'] = input_args.command != 'start-multi-session'
-    project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
     return make_response(jsonify(output), code)
 
 
@@ -601,47 +580,43 @@ def api_project():
 @requires_auth
 @exception_treatment
 def api_project_storage_settings():
-    project = project_get_or_create()
 
     # GET: return selected form, populated with current storage parameters
     if request.method == 'GET':
         # render all forms for caching in web
         all_forms = {'source': {}, 'target': {}}
         for storage_for in all_forms:
-            for name, description in project.get_available_storage_names(storage_for).items():
-                current_type = project.config.get(storage_for, {'type': ''})['type']
+            for name, description in g.project.get_available_storage_names(storage_for).items():
+                current_type = g.project.config.get(storage_for, {'type': ''})['type']
                 current = name == current_type
                 form_class = get_storage_form(name)
-                form = form_class(data=project.get_storage(storage_for).get_params()) if current else form_class()
+                form = form_class(data=g.project.get_storage(storage_for).get_params()) if current else form_class()
                 all_forms[storage_for][name] = {
                     'fields': [serialize_class(field) for field in form],
                     'type': name, 'current': current, 'description': description,
-                    'path': getattr(project, storage_for + '_storage').readable_path
+                    'path': getattr(g.project, storage_for + '_storage').readable_path
                 }
                 # generate data key automatically
-                if project.data_types.keys():
+                if g.project.data_types.keys():
                     for field in all_forms[storage_for][name]['fields']:
                         if field['name'] == 'data_key' and not field['data']:
-                            field['data'] = list(project.data_types.keys())[0]
-        project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
+                            field['data'] = list(g.project.data_types.keys())[0]
         return make_response(jsonify(all_forms), 200)
 
     # POST: update storage given filled form
     if request.method == 'POST':
         selected_type = request.args.get('type', '')
         storage_for = request.args.get('storage_for')
-        current_type = project.config.get(storage_for, {'type': ''})['type']
+        current_type = g.project.config.get(storage_for, {'type': ''})['type']
         selected_type = selected_type if selected_type else current_type
 
         form = get_storage_form(selected_type)(data=request.json)
-        project.analytics.send(
-            getframeinfo(currentframe()).function, method=request.method, storage=selected_type,
-            storage_for=storage_for)
+
         if form.validate_on_submit():
             storage_kwargs = dict(form.data)
             storage_kwargs['type'] = request.json['type']  # storage type
             try:
-                project.update_storage(storage_for, storage_kwargs)
+                g.project.update_storage(storage_for, storage_kwargs)
             except Exception as e:
                 traceback = tb.format_exc()
                 logger.error(str(traceback))
@@ -653,25 +628,12 @@ def api_project_storage_settings():
             return make_response(jsonify({'errors': form.errors}), 400)
 
 
-@app.route('/api/projects/1/task_ids/', methods=['GET'])
-@requires_auth
-@exception_treatment
-def api_all_task_ids():
-    """ Get all tasks ids
-    """
-    project = project_get_or_create()
-    ids = list(sorted(project.source_storage.ids()))
-    project.analytics.send(getframeinfo(currentframe()).function)
-    return make_response(jsonify(ids), 200)
-
-
 @app.route('/api/tasks/', methods=['GET'])
 @requires_auth
 @exception_treatment
 def api_all_tasks():
     """ Get full tasks with pagination, completions and predictions
     """
-    project = project_get_or_create()
     page, page_size = int(request.args.get('page', 1)), int(request.args.get('page_size', 10))
     order = request.args.get('order', 'id')
     if page < 1 or page_size < 1:
@@ -683,9 +645,9 @@ def api_all_tasks():
         return make_response(jsonify({'detail': 'Incorrect order'}), 422)
 
     # get task ids and sort them by completed time
-    task_ids = project.source_storage.ids()
-    completed_at = project.get_completed_at()
-    skipped_status = project.get_skipped_status()
+    task_ids = g.project.source_storage.ids()
+    completed_at = g.project.get_completed_at()
+    skipped_status = g.project.get_skipped_status()
 
     # ordering
     pre_order = ({
@@ -715,9 +677,9 @@ def api_all_tasks():
         if item['completed_at'] != 'undefined' and item['completed_at'] is not None:
             item['completed_at'] = timestamp_to_local_datetime(item['completed_at']).strftime('%Y-%m-%d %H:%M:%S')
         i = item['id']
-        task = project.get_task_with_completions(i)
+        task = g.project.get_task_with_completions(i)
         if task is None:  # no completion at task
-            task = project.source_storage.get(i)
+            task = g.project.source_storage.get(i)
         else:
             task['completed_at'] = item['completed_at']
             task['has_skipped_completions'] = item['has_skipped_completions']
@@ -735,19 +697,16 @@ def api_tasks(task_id):
     """
     # try to get task with completions first
     task_id = int(task_id)
-    project = project_get_or_create()
     if request.method == 'GET':
-        task_data = project.get_task_with_completions(task_id) or project.source_storage.get(task_id)
+        task_data = g.project.get_task_with_completions(task_id) or g.project.source_storage.get(task_id)
         task_data = resolve_task_data_uri(task_data)
 
-        if project.ml_backends_connected:
-            task_data = project.make_predictions(task_data)
+        if g.project.ml_backends_connected:
+            task_data = g.project.make_predictions(task_data)
 
-        project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
         return make_response(jsonify(task_data), 200)
     elif request.method == 'DELETE':
-        project.remove_task(task_id)
-        project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
+        g.project.remove_task(task_id)
         return make_response(jsonify('Task deleted.'), 204)
 
 
@@ -757,8 +716,7 @@ def api_tasks(task_id):
 def api_tasks_delete():
     """ Delete all tasks & completions
     """
-    project = project_get_or_create()
-    project.delete_tasks()
+    g.project.delete_tasks()
     return make_response(jsonify({}), 204)
 
 
@@ -768,9 +726,7 @@ def api_tasks_delete():
 def api_all_completion_ids():
     """ Get all completion ids
     """
-    project = project_get_or_create()
-    ids = project.get_completions_ids()
-    project.analytics.send(getframeinfo(currentframe()).function)
+    ids = g.project.get_completions_ids()
     return make_response(jsonify(ids), 200)
 
 
@@ -780,19 +736,14 @@ def api_all_completion_ids():
 def api_completions(task_id):
     """ Delete or save new completion to output_dir with the same name as task_id
     """
-    project = project_get_or_create()
-
     if request.method == 'POST':
         completion = request.json
         completion.pop('state', None)  # remove editor state
         completion.pop('skipped', None)
         completion.pop('was_cancelled', None)
-        completion_id = project.save_completion(int(task_id), completion)
-        project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
+        completion_id = g.project.save_completion(int(task_id), completion)
         return make_response(json.dumps({'id': completion_id}), 201)
-
     else:
-        project.analytics.send(getframeinfo(currentframe()).function, error=500, method=request.method)
         return make_response('Incorrect request method', 500)
 
 
@@ -802,15 +753,11 @@ def api_completions(task_id):
 def api_all_completions():
     """ Delete all completions
     """
-    project = project_get_or_create()
-
     if request.method == 'DELETE':
-        project.delete_all_completions()
-        project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
+        g.project.delete_all_completions()
         return make_response('done', 201)
 
     else:
-        project.analytics.send(getframeinfo(currentframe()).function, error=500, method=request.method)
         return make_response('Incorrect request method', 500)
 
 
@@ -819,13 +766,11 @@ def api_all_completions():
 @exception_treatment
 def api_tasks_cancel(task_id):
     task_id = int(task_id)
-    project = project_get_or_create()
     skipped_completion = request.json
     skipped_completion['was_cancelled'] = True  # for platform support
     skipped_completion['skipped'] = True
 
-    completion_id = project.save_completion(task_id, skipped_completion)
-    project.analytics.send(getframeinfo(currentframe()).function)
+    completion_id = g.project.save_completion(task_id, skipped_completion)
     return make_response(json.dumps({'id': completion_id}), 201)
 
 
@@ -836,18 +781,13 @@ def api_completion_by_id(task_id, completion_id):
     """ Delete or save new completion to output_dir with the same name as task_id.
         completion_id with different IDs is not supported in this backend
     """
-    project = project_get_or_create()
-
     if request.method == 'DELETE':
-        if project.config.get('allow_delete_completions', False):
-            project.delete_completion(int(task_id))
-            project.analytics.send(getframeinfo(currentframe()).function, method=request.method)
+        if g.project.config.get('allow_delete_completions', False):
+            g.project.delete_completion(int(task_id))
             return make_response('deleted', 204)
         else:
-            project.analytics.send(getframeinfo(currentframe()).function, error=422, method=request.method)
             return make_response('Completion removing is not allowed in server config', 422)
     else:
-        project.analytics.send(getframeinfo(currentframe()).function, error=500, method=request.method)
         return make_response('Incorrect request method', 500)
 
 
@@ -859,15 +799,13 @@ def api_completion_update(task_id, completion_id):
         This is technical api call for editor testing only. It's used for Rewrite button in editor.
     """
     task_id = int(task_id)
-    project = project_get_or_create()
     completion = request.json
 
     completion.pop('state', None)  # remove editor state
     completion['skipped'] = completion['was_cancelled'] = False  # pop is a bad idea because of dict updating inside
 
     completion['id'] = int(completion_id)
-    project.save_completion(task_id, completion)
-    project.analytics.send(getframeinfo(currentframe()).function)
+    g.project.save_completion(task_id, completion)
     return make_response('ok', 201)
 
 
@@ -877,19 +815,15 @@ def api_completion_update(task_id, completion_id):
 def api_instruction():
     """ Instruction for annotators
     """
-    project = project_get_or_create()
-    project.analytics.send(getframeinfo(currentframe()).function)
-    return make_response(project.config['instruction'], 200)
+    return make_response(g.project.config['instruction'], 200)
 
 
 @app.route('/api/remove-ml-backend', methods=['POST'])
 @requires_auth
 @exception_treatment
 def api_remove_ml_backend():
-    project = project_get_or_create()
     ml_backend_name = request.json['name']
-    project.remove_ml_backend(ml_backend_name)
-    project.analytics.send(getframeinfo(currentframe()).function)
+    g.project.remove_ml_backend(ml_backend_name)
     return make_response(jsonify('Deleted!'), 204)
 
 
@@ -903,13 +837,12 @@ def api_predict():
         task = {'data': request.json}
     else:
         task = request.json
-    project = project_get_or_create()
-    if project.ml_backends_connected:
-        task_with_predictions = project.make_predictions(task)
-        project.analytics.send(getframeinfo(currentframe()).function)
+    if g.project.ml_backends_connected:
+        task_with_predictions = g.project.make_predictions(task)
+        g.project.analytics.send(getframeinfo(currentframe()).function)
         return make_response(jsonify(task_with_predictions), 200)
     else:
-        project.analytics.send(getframeinfo(currentframe()).function, error=400)
+        g.project.analytics.send(getframeinfo(currentframe()).function, error=400)
         return make_response(jsonify("No ML backend"), 400)
 
 
@@ -918,20 +851,16 @@ def api_predict():
 @exception_treatment
 def api_train():
     """Send train signal to ML backend"""
-    project = project_get_or_create()
-    if project.ml_backends_connected:
-        training_started = project.train()
+    if g.project.ml_backends_connected:
+        training_started = g.project.train()
         if training_started:
             logger.debug('Training started.')
-            project.analytics.send(getframeinfo(currentframe()).function, num_backends=len(project.ml_backends))
             return make_response(jsonify({'details': 'Training started'}), 200)
         else:
             logger.debug('Training failed.')
-            project.analytics.send(getframeinfo(currentframe()).function, error=400, training_started=training_started)
             return make_response(
                 jsonify('Training is not started: seems that you don\'t have any ML backend connected'), 400)
     else:
-        project.analytics.send(getframeinfo(currentframe()).function, error=400)
         return make_response(jsonify("No ML backend"), 400)
 
 
@@ -940,18 +869,15 @@ def api_train():
 @exception_treatment
 def api_predictions():
     """Send creating predictions signal to ML backend"""
-    project = project_get_or_create()
-    if project.ml_backends_connected:
+    if g.project.ml_backends_connected:
         # get tasks ids without predictions
         tasks_with_predictions = {}
-        for task_id, task in project.source_storage.items():
-            task_pred = project.make_predictions(task)
+        for task_id, task in g.project.source_storage.items():
+            task_pred = g.project.make_predictions(task)
             tasks_with_predictions[task_pred['id']] = task_pred
-        project.source_storage.set_many(tasks_with_predictions.keys(), tasks_with_predictions.values())
-
+        g.project.source_storage.set_many(tasks_with_predictions.keys(), tasks_with_predictions.values())
         return make_response(jsonify({'details': 'Predictions done.'}), 200)
     else:
-        project.analytics.send(getframeinfo(currentframe()).function, error=400)
         return make_response(jsonify("No ML backend"), 400)
 
 
@@ -974,17 +900,15 @@ def version():
 def get_data_file(filename):
     """ External resource serving
     """
-    project = project_get_or_create()
-
     # support for upload via GUI
     if filename.startswith('upload/'):
-        path = os.path.join(project.path, filename)
+        path = os.path.join(g.project.path, filename)
         directory = os.path.abspath(os.path.dirname(path))
         filename = os.path.basename(path)
         return flask.send_from_directory(directory, filename, as_attachment=True)
 
     # serving files from local storage
-    if not project.config.get('allow_serving_local_files'):
+    if not g.project.config.get('allow_serving_local_files'):
         raise FileNotFoundError('Serving local files is not allowed. '
                                 'Use "allow_serving_local_files": true config option to enable local serving')
     directory = request.args.get('d')
