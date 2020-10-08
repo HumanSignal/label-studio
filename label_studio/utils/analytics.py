@@ -139,7 +139,7 @@ class Analytics(object):
         event_name = payload['endpoint']
         self._prepare_json(payload)
         self._prepare_response(payload, response)
-        print(json.dumps(payload, indent=2))
+        # print(json.dumps(payload, indent=2))
         # try:
         #     mp.track(self.server_id, event_name, payload)
         # except:
