@@ -509,6 +509,8 @@ class Project(object):
         else:
             task = deepcopy(task)
 
+        # remove possible stored predictions
+        task.pop('predictions', None)
         # update old completion
         updated = False
         if 'id' in completion:
@@ -551,6 +553,7 @@ class Project(object):
 
     def make_predictions(self, task):
         task = deepcopy(task)
+        stored_predictions = task.get('predictions')
         task['predictions'] = []
         try:
             for ml_backend in self.ml_backends:
@@ -562,6 +565,8 @@ class Project(object):
                 task['predictions'].append(predictions)
         except Exception as exc:
             logger.debug(exc, exc_info=True)
+        if not task['predictions'] and stored_predictions:
+            task['predictions'] = stored_predictions
         return task
 
     def train(self):
