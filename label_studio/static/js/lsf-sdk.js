@@ -134,6 +134,9 @@ const _loadTask = function(ls, url, completionID) {
 
                 if (c.id) cs.selectCompletion(c.id);
 
+                // fix for broken old references in mst
+                cs.selected.setupHotKeys();
+
                 ls.setFlags({ isLoading: false });
 
                 ls.onTaskLoad(ls, ls.task);
