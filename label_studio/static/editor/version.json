@@ -1,6 +1,6 @@
 {
-  "message": "Display label's color on the left stripe",
-  "commit": "324a2933c1874f5f99fcd72b855e270eaa1aeeba",
+  "message": "Fix parent issue in AudioRegions",
+  "commit": "725e8b83f54743242492266bc0bd32f7f9c876a8",
   "branch": "master",
-  "date": "2020-10-08T01:31:17Z"
+  "date": "2020-10-08T11:40:32Z"
 }

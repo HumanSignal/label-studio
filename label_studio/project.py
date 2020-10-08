@@ -16,7 +16,6 @@ from label_studio_converter import Converter
 
 from label_studio.utils.misc import (
     config_line_stripped, config_comments_free, parse_config, timestamp_now)
-from label_studio.utils.analytics import Analytics
 from label_studio.utils.models import ProjectObj, MLBackend
 from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.io import find_file, delete_dir_content, json_load
@@ -40,6 +39,7 @@ class Project(object):
         self.config = config
         self.name = name
         self.path = os.path.join(root_dir, self.name)
+        self.ml_backends = []
 
         self.on_boarding = {}
         self.context = context or {}
@@ -56,11 +56,6 @@ class Project(object):
         self.load_project_and_ml_backends()
         self.update_derived_input_schema()
         self.update_derived_output_schema()
-
-        self.analytics = None
-        self.load_analytics()
-
-        self.ml_backends = []
 
         self.converter = None
         self.load_converter()
@@ -181,13 +176,6 @@ class Project(object):
                 self._update_derived_output_schema(completion)
         logger.debug('Derived output schema: ' + str(self.derived_output_schema))
 
-    def load_analytics(self):
-        collect_analytics = os.getenv('collect_analytics')
-        if collect_analytics is None:
-            collect_analytics = self.config.get('collect_analytics', True)
-        collect_analytics = bool(int(collect_analytics))
-        self.analytics = Analytics(self.label_config_line, collect_analytics, self.name, self.context)
-
     def add_ml_backend(self, params, raise_on_error=True):
         ml_backend = MLBackend.from_params(params)
         if not ml_backend.connected and raise_on_error:
@@ -283,7 +271,6 @@ class Project(object):
         # reload everything that depends on label config
         self.load_label_config()
         self.update_derived_output_schema()
-        self.load_analytics()
         self.load_project_and_ml_backends()
         self.load_converter()
 

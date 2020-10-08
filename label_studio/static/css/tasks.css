@@ -146,6 +146,9 @@ tr {
 }
 
 .audio-button {
+  color: rgba(0,0,0, 0.25);
+}
+.audio-button:hover {
   color: rgba(0,0,0, 0.5);
 }
 
