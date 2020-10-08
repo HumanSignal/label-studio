@@ -260,7 +260,7 @@
                 <!-- Text -->
                 <td class="text-preview-td"
                     v-for="(value, key) in project.data_types" v-if="value === 'Text' && columns.includes('previews')">
-                  <div class="text-preview"><i class="icon outline file" @click.stop="copyValue(task.data[key])"></i>{{
+                  <div class="text-preview"><i class="icon outline copy" @click.stop="copyValue(task.data[key])"></i>{{
                     text_preview(task.data[key]) }}</div>
                 </td>
 
@@ -281,14 +281,14 @@
                 <!-- Audio URLs -->
                 <td v-for="(value, key) in project.data_types" class="text-preview-td"
                     v-if="(value === 'Audio' || value === 'AudioPlus') && columns.includes('audio_urls')">
-                  <div class="text-preview"><i class="icon outline file" @click.stop="copyValue(task.data[key])"></i>{{
+                  <div class="text-preview"><i class="icon outline copy" @click.stop="copyValue(task.data[key])"></i>{{
                     task.data[key] }}</div>
                 </td>
 
                 <!-- Image URLs -->
                 <td v-for="(value, key) in project.data_types" class="text-preview-td"
                     v-if="value === 'Image' && columns.includes('image_urls')">
-                  <div class="text-preview"><i class="icon outline file" @click.stop="copyValue(task.data[key])"></i>{{
+                  <div class="text-preview"><i class="icon outline copy" @click.stop="copyValue(task.data[key])"></i>{{
                     task.data[key] }}</div>
                 </td>
 
