@@ -1,6 +1,6 @@
 {
-  "message": "Fix parent issue in AudioRegions",
-  "commit": "725e8b83f54743242492266bc0bd32f7f9c876a8",
+  "message": "Fix order by scores; also allow to reverse order",
+  "commit": "d6bc6d6392f7db6ce9a78658413ec89f07cab087",
   "branch": "master",
-  "date": "2020-10-08T11:40:32Z"
+  "date": "2020-10-02T17:29:09Z"
 }
