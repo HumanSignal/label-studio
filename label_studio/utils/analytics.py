@@ -34,7 +34,7 @@ class Analytics(object):
         self.version = get_app_version()
         self.server_id = self._get_server_id()
         self.is_docker = self._is_docker()
-        self.is_multi_session = input_args.command == 'start-multi-session'
+        self.is_multi_session = input_args and input_args.command == 'start-multi-session'
         self.env = self._get_label_studio_env()
 
     def _get_label_studio_env(self):
@@ -120,8 +120,6 @@ class Analytics(object):
             'method': request.method,
             'values': dict(request.values),
             'json': request.json,
-            'remote_addr': request.remote_addr,
-            'access_route': request.access_route,
             'is_docker': self.is_docker,
             'is_multi_session': self.is_multi_session,
             'accept_language': request.accept_languages.to_header(),
