@@ -260,7 +260,7 @@
                 <!-- Text -->
                 <td class="text-preview-td"
                     v-for="(value, key) in project.data_types" v-if="value === 'Text' && columns.includes('previews')">
-                  <div class="text-preview" @click.stop="copyValue(task.data[key])">{{ task.data[key].slice(0, 500) + (task.data[key].length <= 500 ? '': ' ...') }}</div>
+                  <div class="text-preview" @click.stop="copyValue(task.data[key])">{{ text_preview(task.data[key]) }}</div>
                 </td>
 
                 <!-- Audio -->
@@ -395,6 +395,12 @@
               <label class="cap-first-letter">{{ item.replaceAll('_', ' ') }}</label>
             </div>
           </div>
+          <br/><br/>
+
+          Text preview limit
+          <div class="ui input">
+            <input style="height: 30px" type="number" min="10" max="5000" v-model="text_preview_limit">
+          </div> characters
         </div>
 
         <h4>Quick view</h4>
@@ -499,6 +505,7 @@
           auto_update_timer: null,
           show_table_settings: false,
           timer_interval: 5000,
+          text_preview_limit: Cookies.get('text_preview_limit', 400),
           error: null,
 
           // quick task preview
@@ -963,6 +970,11 @@
             message: '<center>Copied to clipboard!</center>',
             position: 'bottom center'
           })
+        },
+
+        text_preview: function(text) {
+          return text.slice(0, this.text_preview_limit) +
+            (text.length <= this.text_preview_limit ? '': ' ...');
         }
       },
 
@@ -1005,6 +1017,10 @@
 
         quick_view: function() {
           this.evalPanelWidth();
+        },
+
+        text_preview_limit: function() {
+          Cookies.set('text_preview_limit', this.text_preview_limit);
         }
       },
 
