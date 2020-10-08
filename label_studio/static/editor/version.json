@@ -1,6 +1,6 @@
 {
-  "message": "Fix Choices with layout=\"select\" choice=\"multiple\"",
-  "commit": "726ed6dd50151bc5d65a67b97f9b4de29d472a6a",
+  "message": "Quick fix for undo/redo with relations\n\nAt least it doesn't crash now!",
+  "commit": "77f034a52576c67d30b7c7a3365851345c23f29f",
   "branch": "master",
-  "date": "2020-10-08T18:16:10Z"
+  "date": "2020-10-08T23:46:35Z"
 }
