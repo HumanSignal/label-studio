@@ -5,6 +5,7 @@ import requests
 import calendar
 import threading
 import json
+import werkzeug
 
 from datetime import datetime
 from mixpanel import Mixpanel, MixpanelException
@@ -111,6 +112,12 @@ class Analytics(object):
         # ignore specific events
         if self._exclude_endpoint(request):
             return
+
+        try:
+            json_body = request.json
+        except werkzeug.exceptions.BadRequest:
+            json_body = None
+
         # prepare payload
         payload = {
             'server_id': self.server_id,
@@ -121,7 +128,7 @@ class Analytics(object):
             'endpoint': request.endpoint,
             'method': request.method,
             'values': dict(request.values),
-            'json': request.json,
+            'json': json_body,
             'is_docker': self.is_docker,
             'is_multi_session': self.is_multi_session,
             'accept_language': request.accept_languages.to_header(),

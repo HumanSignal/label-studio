@@ -1,3 +1,11 @@
+function copiedToClipboardMsg() {
+    $('body').toast({
+        class: 'orange center',
+        message: '<center>Copied to clipboard!</center>',
+        position: 'bottom center'
+    });
+}
+
 var imageWithFadeIn = Vue.component('imageWithFadeIn', {props: ['src'],
     data: function () {
         return {
@@ -13,7 +21,7 @@ var imageWithFadeIn = Vue.component('imageWithFadeIn', {props: ['src'],
           return "<div style='cursor:pointer' " +
               "z-inder='1000' class='full-preview-wrapper'><center>" +
 
-            "<div onclick='copyToClipboard(\""+ path +"\");'>" +
+            "<div onclick='copyToClipboard(\""+ path +"\"); copiedToClipboardMsg();'>" +
                 "<img src='" + this.initial_path + "' class='full-preview-image'><br/>" +
                 "<span style='word-break: break-word'>" + path + "</span><br/>" +
                 "click to copy" +
