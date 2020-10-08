@@ -53,3 +53,4 @@ label-studio-projects
 build/
 dist/
 venv/
+tmp/
