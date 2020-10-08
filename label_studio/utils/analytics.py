@@ -102,6 +102,8 @@ class Analytics(object):
     def _exclude_endpoint(self, request):
         if request.endpoint in ('send_static', 'get_data_file'):
             return True
+        if request.args.get('polling', False):
+            return True
 
     def send(self, request=None, session=None, response=None, **kwargs):
         if not self.collect_analytics:
@@ -137,7 +139,7 @@ class Analytics(object):
         event_name = payload['endpoint']
         self._prepare_json(payload)
         self._prepare_response(payload, response)
-        # print(json.dumps(payload, indent=2))
+        print(json.dumps(payload, indent=2))
         # try:
         #     mp.track(self.server_id, event_name, payload)
         # except:
