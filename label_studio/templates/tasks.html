@@ -1,180 +1,12 @@
 {% extends 'base.html' %}
 {% block body %}
-  {% raw %}
+{% raw %}
   <script src="static/js/polyfill.min.js"></script>
   <script src="static/js/vue.js"></script>
-  <script src="static/semantic/semantic-ui-vue.min.js"></script>
   <script src="static/js/lsf-sdk.js"></script>
   <script src="static/js/mousetrap.min.js"></script>
 
-  <style>
-    .table-wrapper {
-      overflow-x: auto;
-      padding-bottom: 1em;
-      min-width: 188px;
-    }
-    .task-container {
-      margin: 0 1em;
-    }
-    .task-table {
-      min-width: 188px;
-    }
-    table.task-table td {
-      height: 30px !important;
-    }
-
-    ::-webkit-scrollbar-track {
-      -webkit-box-shadow: inset 0 0 8px rgba(178, 178, 178, 0.3) !important;
-      background-color: #F5F5F5 !important;
-    }
-
-    ::-webkit-scrollbar {
-      width: 8px !important;
-      height: 8px !important;
-      background-color: #F5F5F5 !important;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background-color: #c3c3c3 !important;
-      border: 8px solid #b4b4b4 !important;
-    }
-
-    tr.selected {
-      background-color: rgba(0, 0, 0, 0.03);
-    }
-
-    tr {
-      cursor: pointer;
-    }
-
-    .visible-app {
-      display: block !important;
-    }
-
-    .preview-image {
-      border-radius: 5px;
-      height: 50px;
-      cursor: pointer;
-    }
-
-    .full-preview-image {
-      max-height: 400px;
-      max-width: 400px;
-    }
-
-    .fade-enter-active, .fade-leave-active {
-      transition: opacity 0.5s ease-in-out;
-    }
-
-    .fade-enter-to {
-      opacity: 1;
-      height: 50px;
-    }
-
-    .fade-enter, .fade-leave-to {
-      opacity: 0;
-      height: 0;
-    }
-
-    .pagination {
-      height: 10px !important;
-      min-width: 188px;
-      background-color: rgba(0,0,0,.05)
-    }
-
-    .pagination-size {
-      border: none;
-      background: none;
-    }
-
-    .order {
-      cursor: pointer;
-    }
-
-    .order.up, .order.down {
-      font-weight: bold;
-    }
-
-    .db-card {
-      background: #f7f7f7;
-      border-radius: 5px;
-      padding: 2em;
-    }
-
-    .action-buttons {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .action-button:not(:last-child) {
-      margin-right: 5px;
-    }
-
-    .action-item {
-      opacity: 0.5;
-      transition: 0.1s ease-in-out opacity;
-      cursor: pointer;
-    }
-
-    .action-item:hover {
-      opacity: 0.8;
-      transition: 0.1s ease-in-out opacity;
-    }
-
-    .align-grid {
-      display: grid !important;
-    }
-
-    .trash:hover {
-      color: rgb(255, 13, 23);
-    }
-
-    .center-margin {
-      margin: 0 auto !important;
-    }
-
-    .center-flex {
-      align-content: center;
-      justify-content: center;
-      display: flex;
-    }
-
-    .hidden-items:hover {
-      color: #0c85d0;
-      transition: 0.2s color ease-in-out;
-    }
-
-    #label-studio {
-      max-width: unset;
-      padding-left: unset;
-      padding-right: unset;
-      margin: unset;
-    }
-
-    /* hide full screen mode for LSF because it's not working correctly */
-    .ant-btn.ls-fs {
-      display: none;
-    }
-
-    @media screen and (max-width: 768px) {
-      .full-preview-image {
-        max-height: 250px;
-        max-width: 330px;
-      }
-      .task-container {
-        margin: unset;
-      }
-      .task-table {
-        width: 100%;
-      }
-      .pagination {
-        min-width: unset;
-      }
-      .mobile-divider {
-        height: 50px;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="static/css/tasks.css">
 
   <div id="vue_loader" class="ui large text loader loading active">Loading ...</div>
 
@@ -198,15 +30,15 @@
                 </center>
                 <!-- Number -->
                 <span class="value" v-else>
-                <animated-number :number="project.task_count"></animated-number>
-              </span>
+                  <animated-number :number="project.task_count"></animated-number>
+                </span>
                 <span class="label">Tasks</span>
                 <span class="sub-label">
-                <i class="word-break" v-if="project.multi_session_mode">{{ project.source_storage.readable_path }}</i>
-                <span data-tooltip="Source storage sync in progress">
-                  <i class="ui loader loading active inline mini" v-if="project.source_syncing"></i>
+                  <i class="word-break" v-if="project.multi_session_mode">{{ project.source_storage.readable_path }}</i>
+                  <span data-tooltip="Source storage sync in progress">
+                    <i class="ui loader loading active inline mini" v-if="project.source_syncing"></i>
+                  </span>
                 </span>
-              </span>
                 <!-- Controls -->
                 <div style="margin-top: 7px">
                   <!-- Storage settings -->
@@ -224,7 +56,6 @@
                   </span>
                 </div>
               </div> <!-- statistic -->
-
             </div>
           </div>
 
@@ -238,15 +69,15 @@
                 </center>
                 <!-- Number -->
                 <span class="value" v-else>
-                <animated-number :number="project.completion_count"></animated-number>
-              </span>
+                  <animated-number :number="project.completion_count"></animated-number>
+                </span>
                 <span class="label">Completions</span>
                 <span class="sub-label">
-                <i class="word-break" v-if="project.multi_session_mode">{{ project.target_storage.readable_path }}</i>
-                <span data-tooltip="Target storage sync in progress">
-                  <i class="ui loader loading active inline mini" v-if="project.target_syncing"></i>
+                  <i class="word-break" v-if="project.multi_session_mode">{{ project.target_storage.readable_path }}</i>
+                  <span data-tooltip="Target storage sync in progress">
+                    <i class="ui loader loading active inline mini" v-if="project.target_syncing"></i>
+                  </span>
                 </span>
-              </span>
                 <!-- Controls -->
                 <div style="margin-top: 7px">
                   <!-- Target storage settings -->
@@ -276,17 +107,17 @@
                   <!-- Sampling -->
                   <span style="padding-top: 8px; padding-bottom: 11px;"
                         data-tooltip="Tasks sampling: selecting which task to take next in labeling. Edit project config file to change">
-                  <span class="ui icon label">
-                    <i class="ui icon far shuffle"></i>
-                    {{ project.config['sampling'] }}
+                    <span class="ui icon label">
+                      <i class="ui icon far shuffle"></i>
+                      {{ project.config['sampling'] }}
+                    </span>
                   </span>
-                </span>
                   <!-- Start labeling -->
                   <a class="ui button positive" href=".">Start Labeling</a>
                 </div>
               </div>
             </div>
-          </div>
+          </div> <!-- Action buttons -->
         </div>
 
         <!-- Critical error -->
@@ -324,6 +155,8 @@
           <div class="table-wrapper">
             <table v-if="project.task_count > 0" ref="task_table"
                    class="task-table" :class="{'center-margin': !quick_view}">
+              <thead>
+
               <!-- Header -->
               <tr>
                 <th class="order" @click="changeOrder('id')" v-if="columns.includes('id')">Task ID
@@ -344,12 +177,27 @@
                 </th>
 
                 <!-- Label config fields -->
-                <th v-for="(value, key) in project.data_types" v-if="value === 'Image' && columns.includes('others')">
+                <th v-for="(value, key) in project.data_types"
+                    v-if="(value === 'Image' || value === 'Text' || value === 'Audio' || value === 'AudioPlus') && columns.includes('previews')">
                   ${{ key }}
+                </th>
+                <!-- Audio urls -->
+                <th v-for="(value, key) in project.data_types"
+                    v-if="(value === 'Audio' || value === 'AudioPlus') && columns.includes('audio_urls')">
+                  ${{ key }} url
+                </th>
+                <!-- Image urls -->
+                <th v-for="(value, key) in project.data_types"
+                    v-if="value === 'Image' && columns.includes('image_urls')">
+                  ${{ key }} url
                 </th>
               </tr>
 
+              </thead>
+
               <!-- Task row -->
+
+              <tbody>
 
               <!-- Broken task -->
               <tr v-if="task == null" class="text-center" v-for="task in tasks">
@@ -378,7 +226,7 @@
                   <i class="ui icon forward grey" v-if="task.has_skipped_completions"></i>
                 </td>
                 <!-- Actions -->
-                <td class="text-center" v-if="columns.includes('actions')">
+                <td class="text-center" v-if="columns.includes('actions')" @click.stop="/* stop click propagation */">
                   <div class="actions-card">
                     <!-- Show task code -->
                     <span data-tooltip="Show task code" class="action-button">
@@ -402,12 +250,48 @@
                   </div>
                 </td>
 
-                <!-- Label config fields -->
-                <td v-for="(value, key) in project.data_types" v-if="value === 'Image' && columns.includes('others')">
+                <!-- Values from label config -->
+
+                <!-- Image -->
+                <td v-for="(value, key) in project.data_types" v-if="value === 'Image' && columns.includes('previews')">
                   <image-with-fade-in :src="task.data[key]"></image-with-fade-in>
                 </td>
+
+                <!-- Text -->
+                <td class="text-preview-td"
+                    v-for="(value, key) in project.data_types" v-if="value === 'Text' && columns.includes('previews')">
+                  <div class="text-preview">{{ task.data[key].slice(0, 500) + (task.data[key].length <= 500 ? '': ' ...') }}</div>
+                </td>
+
+                <!-- Audio -->
+                <td v-for="(value, key) in project.data_types"
+                    v-if="(value === 'Audio' || value === 'AudioPlus') && columns.includes('previews')"
+                    @click.stop="audioToggle($event.target, task)">
+
+                  <audio preload="metadata"
+                         :src="task.data[key]"
+                         @ended="Vue.set(task, 'playing', false)"
+                         @timeupdate="Vue.set(task, 'playing', !$event.target.paused)">
+                  </audio>
+                  <i class="icon audio-button"
+                     :class="task.playing ? 'pause': 'play'"></i>
+                </td>
+
+                <!-- Audio URLs -->
+                <td v-for="(value, key) in project.data_types" class="text-preview-td"
+                    v-if="(value === 'Audio' || value === 'AudioPlus') && columns.includes('audio_urls')">
+                  <div class="text-preview">{{ task.data[key] }}</div>
+                </td>
+
+                <!-- Image URLs -->
+                <td v-for="(value, key) in project.data_types" class="text-preview-td"
+                    v-if="value === 'Image' && columns.includes('image_urls')">
+                  <div class="text-preview">{{ task.data[key] }}</div>
+                </td>
+
               </tr>
 
+              </tbody>
             </table>
           </div>
           <div class="ui divider hidden"></div>
@@ -416,12 +300,15 @@
 
           <!-- this element is needed for pretty symmetrical alignment with loader on the right side -->
           <div :class="{'center-flex': !quick_view}">
-            <div class="ui pagination menu"
+            <div ref="pagination" class="ui pagination menu"
                  v-if="project.task_count > 0">
               <a class="item" :class="{'active': page>1, 'disabled': page<=1}" @click="prevPage()">Prev</a>
 
               <div class="item">
-                <input v-model="page" style="border:none" type="number" min="1" :max="totalPages">
+                <input v-model="page"
+                       :max="totalPages" min="1"
+                       :style="quick_view && page < 100000 ? 'max-width: 60px': 'max-width: 80px'"
+                       style="border:none" type="number">
                 <span style="cursor:pointer" @click="page=totalPages" v-if="full_pagination">&nbsp; of &nbsp;&nbsp;
                   {{ totalPages }}
                 </span>
@@ -503,7 +390,7 @@
         <h4>Columns to show</h4>
         <div class="section">
           <div class="ui list horizontal">
-            <div class="item ui checkbox" v-for="item in all_columns">
+            <div class="item ui checkbox" :class="item==='id' && quick_view ? 'disabled': ''" v-for="item in all_columns">
               <input type="checkbox" class="ui checkbox" v-model="columns" :value="item">
               <label class="cap-first-letter">{{ item.replaceAll('_', ' ') }}</label>
             </div>
@@ -589,13 +476,13 @@
   <script src="static/js/components/animatedNumber.js"></script>
   <script src="static/js/components/imageWithFadeIn.js"></script>
   <script src="static/js/components/vue-tippy.min.js"></script>
-  <!-- <script src="static/js/components/vue-intro.min.js"></script> -->
+  <script src="static/semantic/semantic-ui-vue.min.js"></script>
+
   <script>
     var PAGINATION_MAX_WIDTH = 400;
 
     Vue.use(SemanticUIVue);
     Vue.use(VueTippy);
-    //Vue.use(VueIntro);
 
     var app = new Vue({
       el: '#app',
@@ -615,8 +502,8 @@
           error: null,
 
           // quick task preview
-          all_columns: ['id', 'completed_at', 'skipped', 'actions', 'others'],
-          full_columns: JSON.parse(Cookies.get('full_columns', '["id", "completed_at", "skipped", "actions", "others"]')),
+          all_columns: ['id', 'completed_at', 'skipped', 'actions', 'previews', 'audio_urls', 'image_urls'],
+          full_columns: JSON.parse(Cookies.get('full_columns', '["id", "completed_at", "skipped", "actions", "previews"]')),
           quick_columns: JSON.parse(Cookies.get('quick_columns', '["id"]')),
           quick_view: false,
           quick_view_left_width: 4,
@@ -975,6 +862,7 @@
             this.page++;
             if (this.current_task_index !== -10)
               this.current_task_index = -1;
+            this.audioStopAll();
           }
         },
         prevPage: function() {
@@ -982,6 +870,7 @@
             this.page--;
             if (this.current_task_index !== -10)
               this.current_task_index = -2;
+            this.audioStopAll();
           }
         },
         findCurrentTaskIndex: function() {
@@ -1026,6 +915,7 @@
         evalPanelWidth: function() {
           // check that task table width > left panel size
           var grid_width = this.$refs.grid.getBoundingClientRect().width;
+            
           var table_width = 0;
           var right_width;
           if (this.quick_view_left_width > 0) {
@@ -1042,6 +932,28 @@
           // select ful pagination or small
           this.full_pagination = (table_width > PAGINATION_MAX_WIDTH) || !this.quick_view;
           // console.log(grid_width, table_width);
+        },
+
+        // audio player play / stop
+        audioToggle: function(target, task) {
+          if (target.nodeName === 'I') {
+            target = target.parentElement;
+          }
+          if (!task.playing) {
+            // stop all
+            $('audio').each(function(i, o) { if (o !== self) o.pause(); });
+            // start audio for current task
+            $(target).children('audio').each(function(i, o){ o.play() });
+            //Vue.set(task, 'playing', true);
+          }
+          else {
+            // stop current task audio
+            $(target).children('audio').each(function(i, o){ o.pause() });
+            //Vue.set(task, 'playing', false);
+          }
+        },
+        audioStopAll: function() {
+          $('audio').each(function(i, o) { o.pause(); o.currentTime = 0; });
         }
       },
 
@@ -1089,6 +1001,17 @@
 
       // vue mounting of page
       mounted: function () {
+        // replace deprecated version 'others'
+        function remove_deprecated_others(array) {
+          var index = array.indexOf('others');
+          if (index >= 0) {
+            array.splice(index, 1);
+            array.push('previews')
+          }
+        }
+        remove_deprecated_others(this.full_columns);
+        remove_deprecated_others(this.quick_columns);
+
         this.vue_loaded = true;
         this.project_loaded = true;
 
@@ -1124,48 +1047,18 @@
       updated: function() {
         this.evalPanelWidth();
 
-        this.$nextTick(function() {
-          /*if (self.tasks_loaded) {
-            var intro = introJs();
-            intro.setOptions({
-              steps: [
-                {
-                  element: document.querySelector('#full-pagination-settings'),
-                  intro: "Settings and help",
-                },
-                {
-                  element: document.querySelector('#step1'),
-                  intro: "This is a tooltip."
-                },
-                {
-                  element: document.querySelectorAll('#step2')[0],
-                  intro: "Ok, wasn't that fun?",
-                  position: 'right'
-                },
-                {
-                  element: '#step3',
-                  intro: 'More features, more fun.',
-                  position: 'left'
-                },
-                {
-                  element: '#step4',
-                  intro: "Another step.",
-                  position: 'bottom'
-                },
-                {
-                  element: '#step5',
-                  intro: 'Get it, use it.'
-                }
-              ]
-            });
+        // set uniform height for all tr-s in table
+        var max = 20;
+        var trs = $('tbody').find('tr');
+        trs.height(max);
+        trs.each(function(i, o) { if (max < $(o).height()) { max = $(o).height(); } });
+        trs.height(max);
 
-            intro.start();
-          }*/
-        });
+        this.$nextTick(function() {});
       }
     });
 
   </script>
 
-  {% endraw %}
+{% endraw %}
 {% endblock %}
