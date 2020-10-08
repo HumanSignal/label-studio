@@ -157,6 +157,7 @@ tr {
 }
 
 .text-preview i.icon {
+  display: inline;
   color: rgba(0,0,0, 0.25);
 }
 .text-preview i.icon:hover {
@@ -167,7 +168,11 @@ tr {
   text-align: left;
   max-width: 200px !important;
   font-size: 80%;
-  word-wrap: break-word !important;
+  word-wrap:  break-word !important;
+  white-space: pre-wrap !important; /* css-3 */
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
 }
 
 @media screen and (max-width: 768px) {

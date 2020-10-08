@@ -149,7 +149,7 @@
       <div class="ui grid stackable" ref="grid">
         <div class="column" id="left-panel"
              ref="left_panel"
-             v-if="!(quick_view_left_width === 0 && quick_view)"
+             v-if="!(quick_view_show_table === false && quick_view)"
              :class="quick_view ? '' : 'sixteen wide'">
           <!-- Table -->
           <div class="table-wrapper">
@@ -281,7 +281,8 @@
                 <!-- Audio URLs -->
                 <td v-for="(value, key) in project.data_types" class="text-preview-td"
                     v-if="(value === 'Audio' || value === 'AudioPlus') && columns.includes('audio_urls')">
-                  <div class="text-preview"><i class="icon outline copy" @click.stop="copyValue(task.data[key])"></i>{{ task.data[key] }}</div>
+                  <div class="text-preview"><i class="icon outline copy" @click.stop="copyValue(task.data[key])"></i>{{
+                    task.data[key] }}</div>
                 </td>
 
                 <!-- Image URLs -->
@@ -327,7 +328,7 @@
               </div>
 
               <div id="full-pagination-settings"
-                   class="item action-item" @click="show_table_settings=!show_table_settings" v-if="full_pagination">
+                   class="item action-item" @click="show_settings=!show_settings" v-if="full_pagination">
                 <i class="fa fa-cog"></i>
               </div>
 
@@ -340,7 +341,7 @@
 
             <!-- Settings while hidden left panel -->
             <i class="icon grey cog settings-cog" style="cursor: pointer; opacity: 0.75"
-               @click="show_table_settings=!show_table_settings" v-if="!full_pagination"></i>
+               @click="show_settings=!show_settings" v-if="!full_pagination"></i>
 
             <!-- Loader -->
             <i class="ui loader active blue tiny inline"
@@ -367,7 +368,7 @@
       <!-- settings button -->
       <center>
         <i class="icon grey large cog settings-cog"
-           @click="show_table_settings=!show_table_settings" v-if="quick_view_left_width === 0 && quick_view"></i>
+           @click="show_settings=!show_settings" v-if="quick_view_show_table === false && quick_view"></i>
       </center>
       <br/>
 
@@ -379,9 +380,9 @@
 
 
     <!-- Table Settings -->
-    <sui-modal v-model="show_table_settings" v-bind:class="{inverted: 1, small: 1, scrollable: 1}"
+    <sui-modal v-model="show_settings" v-bind:class="{inverted: 1, small: 1, scrollable: 1}"
                size="small" style="z-index: 1000">
-      <i class="icon close" @click="show_table_settings=false"></i>
+      <i class="icon close" @click="show_settings=false"></i>
 
       <!-- Header -->
       <div class="header">Settings</div>
@@ -399,10 +400,10 @@
           </div>
           <br/><br/>
 
-          Text preview limit
+          Text preview limit &nbsp;
           <div class="ui input">
             <input style="height: 30px" type="number" min="10" max="5000" v-model="text_preview_limit">
-          </div> characters
+          </div>&nbsp; characters
         </div>
 
         <h4>Quick view</h4>
@@ -411,14 +412,14 @@
             Quick view combines the task table and the labeling interface on left and right panels into one window.
             To start quick view click on the table row near Task ID.
             You can move over tasks using hotkeys.
-            Press <hotkey style='color:#777;font-size:80%;padding: 0.05em 0.35em;'>q</hotkey> or
+            Press <hotkey style='color:#777;font-size:80%;padding: 0.05em 0.35em;'>`</hotkey> or
             <i class="icon cog" style="opacity: 0.75"></i>on the page bottom to show settings again.
           </p>
           <div class="ui form">
-            <a class="ui button" @click="quick_view_left_width=0">
-              Hide Task Table
+            <a class="ui button icon" @click="quick_view_show_table=!quick_view_show_table">
+              <i class="fa" :class="quick_view_show_table ? 'fa-border-all': 'fa-border-none'"></i>
+              {{ quick_view_show_table ? 'Hide': 'Show' }} Task Table
             </a>
-            <a class="ui button" @click="quick_view_left_width=1">Show Task Table</a>
           </div>
         </div>
 
@@ -435,8 +436,18 @@
         <h4>Hotkeys</h4>
         <div class="section">
           <div class="hotkey-helper">
+            <div class="keys"><hotkey style="font-weight: bold">`</hotkey> <small>[gravis key]</small></div>
+            <span class="description">toggle settings</span>
+          </div>
+
+          <div class="hotkey-helper">
             <div class="keys"><hotkey>q</hotkey></div>
-            <span class="description">show settings</span>
+            <span class="description">toggle quick view</span>
+          </div>
+
+          <div class="hotkey-helper">
+            <div class="keys"><hotkey>e</hotkey></div>
+            <span class="description">toggle task table in quick view</span>
           </div>
 
           <div class="hotkey-helper">
@@ -505,7 +516,7 @@
           page_size: Cookies.get('page_size', 10),
           order: Cookies.get('order', 'id'),
           auto_update_timer: null,
-          show_table_settings: false,
+          show_settings: false,
           timer_interval: 5000,
           text_preview_limit: Cookies.get('text_preview_limit', 400),
           error: null,
@@ -515,7 +526,7 @@
           full_columns: JSON.parse(Cookies.get('full_columns', '["id", "completed_at", "skipped", "actions", "previews"]')),
           quick_columns: JSON.parse(Cookies.get('quick_columns', '["id"]')),
           quick_view: false,
-          quick_view_left_width: 4,
+          quick_view_show_table: true,
           current_task: null,
           current_task_index: -10,
           full_pagination: true,
@@ -860,6 +871,10 @@
           this.current_task_index = -10;
         },
         toggleTaskPreview: function (index) {
+          if (!index) {
+            index = this.findCurrentTaskIndex();
+            index = index < 0 ? 0: index;
+          }
           this.current_task_index = index;
           var task = this.tasks[index];
           this.current_task && this.current_task.id === task.id && this.quick_view
@@ -927,7 +942,7 @@
             
           var table_width = 0;
           var right_width;
-          if (this.quick_view_left_width > 0) {
+          if (this.quick_view_show_table) {
             table_width = this.$refs.task_table.getBoundingClientRect().width;
             this.$refs.left_panel.style.width = (table_width + 28) + 'px';
             right_width = (grid_width - 28 - table_width - 10);
@@ -1065,7 +1080,9 @@
         Mousetrap.bind(['shift+right', 'd'], this.nextPage);
         Mousetrap.bind(['shift+up', 'w'], this.prevTask);
         Mousetrap.bind(['shift+down', 's'], this.nextTask);
-        Mousetrap.bind(['q'], function() { self.show_table_settings = !self.show_table_settings });
+        Mousetrap.bind(['`'], function() { self.show_settings = !self.show_settings });
+        Mousetrap.bind(['e'], function() { self.quick_view_show_table = !self.quick_view_show_table });
+        Mousetrap.bind(['q'], function() { self.toggleTaskPreview() });
 
         $(window).resize(this.evalPanelWidth);
         console.log('Vue mounting success');
