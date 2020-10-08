@@ -82,6 +82,8 @@ class Analytics(object):
             payload['json'] = {'result': result, 'lead_time': j['lead_time']}
         elif endpoint == 'api_tasks_cancel':
             payload['json'] = {'lead_time': j['lead_time']}
+        elif endpoint == 'api_import':
+            payload['json'] = None
 
     def _prepare_response(self, payload, response):
         r = {'status_code': response.status_code}
