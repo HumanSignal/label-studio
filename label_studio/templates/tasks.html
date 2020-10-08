@@ -856,14 +856,15 @@
           this.current_task = task;
           this.columns = this.quick_columns;
 
-
-          if (this.labelStudio) {
-            // use already created instance
-            this.labelStudio._sdk.loadTask(task.id, 'auto');
-          } else {
-            // init new instance
-            this.labelStudio = LSF_SDK("label-studio", this.project.label_config_line, task, true);
-          }
+          setTimeout(() => {
+            if (this.labelStudio) {
+              // use already created instance
+              this.labelStudio._sdk.loadTask(task.id, 'auto');
+            } else {
+              // init new instance
+              this.labelStudio = LSF_SDK("label-studio", this.project.label_config_line, task, true);
+            }
+          }, 10);
         },
         closeTaskPreview: function () {
           this.quick_view = false;
@@ -939,7 +940,7 @@
         evalPanelWidth: function() {
           // check that task table width > left panel size
           var grid_width = this.$refs.grid.getBoundingClientRect().width;
-            
+
           var table_width = 0;
           var right_width;
           if (this.quick_view_show_table) {
