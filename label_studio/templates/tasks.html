@@ -877,7 +877,7 @@
           this.current_task_index = -10;
         },
         toggleTaskPreview: function (index) {
-          if (!index) {
+          if (typeof index === 'undefined') {
             index = this.findCurrentTaskIndex();
             index = index < 0 ? 0: index;
           }
