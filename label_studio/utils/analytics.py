@@ -52,13 +52,9 @@ class Analytics(object):
                 fout.write(user_id)
             if self.collect_analytics:
                 try:
-                    mp.people_set(user_id, {
-                        '$name': user_id,
-                        'app': 'label-studio',
-                        'version': self.version
-                    })
-                except MixpanelException as exc:
-                    logger.error('Can\'t send user profile analytics. Reason: ' + str(exc), exc_info=True)
+                    mp.people_set(user_id, {'$name': user_id, 'app': 'label-studio', 'version': self.version})
+                except:
+                    pass
             logger.debug('Your user ID ' + str(user_id) + ' is saved to ' + str(user_id_file))
         else:
             with io.open(user_id_file) as f:
@@ -146,12 +142,12 @@ class Analytics(object):
         # print(json.dumps(payload, indent=2))
         # try:
         #     mp.track(self.server_id, event_name, payload)
-        # except MixpanelException as exc:
-        #     logger.debug('Can\'t track ' + str(event_name) + ' . Reason: ' + str(exc), exc_info=True)
+        # except:
+        #     pass
         #
         # try:
         #     url = 'https://analytics.labelstud.io/prod'
         #     logger.debug('Sending to {url}:\n{data}'.format(url=url, data=payload))
         #     requests.post(url=url, json=payload)
-        # except requests.RequestException as exc:
-        #     logger.debug('Analytics error: {exc}'.format(exc=str(exc)))
+        # except:
+        #     pass

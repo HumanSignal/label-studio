@@ -14,7 +14,6 @@ def get_all_classes_inherited_LabelStudioMLBase(script_file):
     sys.path.append(os.path.dirname(abs_path))
     module = importlib.import_module(module_name)
     for name, obj in inspect.getmembers(module, inspect.isclass):
-        print('!!!', name)
         if name == LabelStudioMLBase.__name__:
             continue
         if issubclass(obj, LabelStudioMLBase):

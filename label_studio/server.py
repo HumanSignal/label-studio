@@ -78,7 +78,6 @@ app = create_app()
 
 # input arguments
 input_args = None
-analytics = None
 if os.path.exists('server.json'):
     try:
         with open('server.json') as f:
@@ -246,7 +245,6 @@ def setup_page():
     """
     templates = get_config_templates(g.project.config)
     input_values = {}
-    # project.analytics.send(getframeinfo(currentframe()).function)
     return flask.render_template(
         'setup.html',
         config=g.project.config,
@@ -348,7 +346,6 @@ def api_render_label_studio():
     }
     response.update(find_editor_files())
 
-    # project.analytics.send(getframeinfo(currentframe()).function)
     return flask.render_template('render_ls.html', **response)
 
 
@@ -393,7 +390,6 @@ def api_save_config():
     except Exception as e:
         return make_response(jsonify({'label_config': [str(e)]}), status.HTTP_400_BAD_REQUEST)
 
-    # project.analytics.send(getframeinfo(currentframe()).function)
     return Response(status=status.HTTP_201_CREATED)
 
 
