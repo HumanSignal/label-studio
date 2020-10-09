@@ -1083,37 +1083,24 @@
 
         // hotkeys mapping
         var self = this;
+        Mousetrap.addKeycodes({
+          119: 'w',
+          115: 's',
+          100: 'd',
+          97:  'a',
+          113: 'q',
+          101: 'e',
+          96: '`'
+        });
+
         Mousetrap.bind(['shift+left', 'a'], this.prevPage);
         Mousetrap.bind(['shift+right', 'd'], this.nextPage);
-        Mousetrap.bind(['shift+up', ' w'], this.prevTask);
+        Mousetrap.bind(['shift+up', 'w'], this.prevTask);
         Mousetrap.bind(['shift+down', 's'], this.nextTask);
         Mousetrap.bind(['`'], function() { self.show_settings = !self.show_settings });
         Mousetrap.bind(['e'], function() { self.quick_view_show_table = !self.quick_view_show_table });
         Mousetrap.bind(['q'], function() { self.toggleTaskPreview() });
-
-        /*
-        document.addEventListener('keypress', function(e) {
-    console.log('KEYPRESS');
-    console.log('keycode', e.keyCode);
-    console.log('which', e.which);
-    console.log('meta', e.metaKey);
-    console.log('shift', e.shiftKey);
-    console.log('alt', e.altKey);
-    console.log('ctrl', e.ctrlKey);
-    console.log('');
-}, false);
-
-document.addEventListener('keydown', function(e) {
-    console.log('KEYDOWN');
-    console.log('keycode', e.keyCode);
-    console.log('which', e.which);
-    console.log('meta', e.metaKey);
-    console.log('shift', e.shiftKey);
-    console.log('alt', e.altKey);
-    console.log('ctrl', e.ctrlKey);
-    console.log('');
-}, false);
-         */
+        Mousetrap.bind(['q'], function() { self.toggleTaskPreview() });
 
         $(window).resize(this.evalPanelWidth);
         console.log('Vue mounting success');
