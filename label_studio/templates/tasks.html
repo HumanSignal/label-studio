@@ -436,7 +436,9 @@
         <h4>Hotkeys</h4>
         <div class="section">
           <div class="hotkey-helper">
-            <div class="keys"><hotkey style="font-weight: bold">`</hotkey> <small>[gravis key]</small></div>
+            <div class="keys">
+              <hotkey style="font-weight: bold">`</hotkey>
+              <small>[gravis key]</small></div>
             <span class="description">toggle settings</span>
           </div>
 
@@ -862,7 +864,7 @@
           this.columns = this.quick_columns;
           var self = this;
 
-          setTimeout(function() {
+          setTimeout(function () {
             if (self.labelStudio) {
               // use already created instance
               self.labelStudio._sdk.loadTask(task.id, 'auto');
@@ -880,7 +882,7 @@
         toggleTaskPreview: function (index) {
           if (typeof index === 'undefined') {
             index = this.findCurrentTaskIndex();
-            index = index < 0 ? 0: index;
+            index = index < 0 ? 0 : index;
           }
           this.current_task_index = index;
           var task = this.tasks[index];
@@ -896,7 +898,7 @@
             this.audioStopAll();
           }
         },
-        prevPage: function() {
+        prevPage: function () {
           if (this.page > 1) {
             this.page--;
             if (this.current_task_index !== -10)
