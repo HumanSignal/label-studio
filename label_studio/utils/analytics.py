@@ -83,6 +83,8 @@ class Analytics(object):
             payload['json'] = {'result': result, 'lead_time': j['lead_time']}
         elif endpoint == 'api_tasks_cancel':
             payload['json'] = {'lead_time': j['lead_time']}
+        elif endpoint == 'api_import':
+            payload['json'] = None
 
     def _prepare_response(self, payload, response):
         r = {'status_code': response.status_code}
@@ -113,34 +115,36 @@ class Analytics(object):
         if self._exclude_endpoint(request):
             return
 
+        j = None
         try:
-            json_body = request.json
-        except werkzeug.exceptions.BadRequest:
-            json_body = None
-
-        # prepare payload
-        payload = {
-            'server_id': self.server_id,
-            'server_time': self._get_timestamp_now(),
-            'session_id': session.get('session_id'),
-            'user_agent': request.user_agent.string,
-            'url': request.url,
-            'endpoint': request.endpoint,
-            'method': request.method,
-            'values': dict(request.values),
-            'json': json_body,
-            'is_docker': self.is_docker,
-            'is_multi_session': self.is_multi_session,
-            'accept_language': request.accept_languages.to_header(),
-            'content_type': request.content_type,
-            'content_length': request.content_length,
-            'env': self.env,
-            'version': self.version,
-            'project_name': self.input_args.project_name if self.input_args else None
-        }
-
-        thread = threading.Thread(target=self.send_job, args=(payload, response))
-        thread.start()
+            j = request.json
+        except:
+            pass
+        try:
+            payload = {
+                'server_id': self.server_id,
+                'server_time': self._get_timestamp_now(),
+                'session_id': session.get('session_id'),
+                'user_agent': request.user_agent.string,
+                'url': request.url,
+                'endpoint': request.endpoint,
+                'method': request.method,
+                'values': dict(request.values),
+                'json': j,
+                'is_docker': self.is_docker,
+                'is_multi_session': self.is_multi_session,
+                'accept_language': request.accept_languages.to_header(),
+                'content_type': request.content_type,
+                'content_length': request.content_length,
+                'env': self.env,
+                'version': self.version,
+                'project_name': self.input_args.project_name if self.input_args else None
+            }
+        except:
+            pass
+        else:
+            thread = threading.Thread(target=self.send_job, args=(payload, response))
+            thread.start()
 
     def send_job(self, payload, response):
         event_name = payload['endpoint']
