@@ -1,6 +1,6 @@
 {
-  "message": "Quick fix for undo/redo with relations\n\nAt least it doesn't crash now!",
-  "commit": "77f034a52576c67d30b7c7a3365851345c23f29f",
+  "message": "Dirty hack for image loading and size calculations",
+  "commit": "ca40aeef8ea0adcf53d229fdefd88f4e43ce9721",
   "branch": "master",
-  "date": "2020-10-08T23:46:35Z"
+  "date": "2020-10-09T14:12:39Z"
 }

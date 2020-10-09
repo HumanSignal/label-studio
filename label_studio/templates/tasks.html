@@ -860,16 +860,17 @@
           this.quick_view = true;
           this.current_task = task;
           this.columns = this.quick_columns;
+          var self = this;
 
-          setTimeout(() => {
-            if (this.labelStudio) {
+          setTimeout(function() {
+            if (self.labelStudio) {
               // use already created instance
-              this.labelStudio._sdk.loadTask(task.id, 'auto');
+              self.labelStudio._sdk.loadTask(task.id, 'auto');
             } else {
               // init new instance
-              this.labelStudio = LSF_SDK("label-studio", this.project.label_config_line, task, true);
+              self.labelStudio = LSF_SDK("label-studio", self.project.label_config_line, task, true);
             }
-          }, 10);
+          }, 100);
         },
         closeTaskPreview: function () {
           this.quick_view = false;
@@ -1084,11 +1085,35 @@
         var self = this;
         Mousetrap.bind(['shift+left', 'a'], this.prevPage);
         Mousetrap.bind(['shift+right', 'd'], this.nextPage);
-        Mousetrap.bind(['shift+up', 'w'], this.prevTask);
+        Mousetrap.bind(['shift+up', ' w'], this.prevTask);
         Mousetrap.bind(['shift+down', 's'], this.nextTask);
         Mousetrap.bind(['`'], function() { self.show_settings = !self.show_settings });
         Mousetrap.bind(['e'], function() { self.quick_view_show_table = !self.quick_view_show_table });
         Mousetrap.bind(['q'], function() { self.toggleTaskPreview() });
+
+        /*
+        document.addEventListener('keypress', function(e) {
+    console.log('KEYPRESS');
+    console.log('keycode', e.keyCode);
+    console.log('which', e.which);
+    console.log('meta', e.metaKey);
+    console.log('shift', e.shiftKey);
+    console.log('alt', e.altKey);
+    console.log('ctrl', e.ctrlKey);
+    console.log('');
+}, false);
+
+document.addEventListener('keydown', function(e) {
+    console.log('KEYDOWN');
+    console.log('keycode', e.keyCode);
+    console.log('which', e.which);
+    console.log('meta', e.metaKey);
+    console.log('shift', e.shiftKey);
+    console.log('alt', e.altKey);
+    console.log('ctrl', e.ctrlKey);
+    console.log('');
+}, false);
+         */
 
         $(window).resize(this.evalPanelWidth);
         console.log('Vue mounting success');
