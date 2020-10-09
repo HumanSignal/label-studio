@@ -324,8 +324,9 @@ class CloudStorage(BaseStorage):
         if self.create_local_copy:
             self._create_local(id, value)
 
-    def set_many(self, keys, values):
-        raise NotImplementedError
+    def set_many(self, ids, values):
+        for id, value in zip(ids, values):
+            self.set(id, value)
 
     def _create_local(self, id, value):
         local_file = os.path.join(self.objects_dir, str(id) + '.json')

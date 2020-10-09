@@ -104,9 +104,6 @@ class DirJSONsStorage(BaseStorage):
         with open(filename, 'w', encoding='utf8') as fout:
             json.dump(value, fout, indent=2, sort_keys=True)
 
-    def set_many(self, keys, values):
-        raise NotImplementedError
-
     def ids(self):
         for f in iter_files(self.path, '.json'):
             yield int(os.path.splitext(os.path.basename(f))[0])
