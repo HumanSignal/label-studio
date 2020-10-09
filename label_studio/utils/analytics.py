@@ -151,14 +151,14 @@ class Analytics(object):
         self._prepare_json(payload)
         self._prepare_response(payload, response)
         # print(json.dumps(payload, indent=2))
-        # try:
-        #     mp.track(self.server_id, event_name, payload)
-        # except:
-        #     pass
-        #
-        # try:
-        #     url = 'https://analytics.labelstud.io/prod'
-        #     logger.debug('Sending to {url}:\n{data}'.format(url=url, data=payload))
-        #     requests.post(url=url, json=payload)
-        # except:
-        #     pass
+        try:
+            mp.track(self.server_id, event_name, payload)
+        except:
+            pass
+
+        try:
+            url = 'https://analytics.labelstud.io/prod'
+            logger.debug('Sending to {url}:\n{data}'.format(url=url, data=payload))
+            requests.post(url=url, json=payload)
+        except:
+            pass

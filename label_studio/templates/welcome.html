@@ -7,6 +7,7 @@
       margin: 0 !important;
       padding: 0 !important;
     }
+
     .circular.label div {
       padding-top: 22px !important;
       padding-left: 4px !important;
@@ -14,6 +15,7 @@
       font-size: 14px !important;
       color: #AAA !important;
     }
+
     .circular.label .check {
       display: none;
     }
@@ -21,9 +23,11 @@
     .done .circular.label {
       background: #00a300;
     }
+
     .done .circular.label .step {
       display: none;
     }
+
     .done .circular.label .check {
       display: block;
       color: white !important;
@@ -61,6 +65,7 @@
       margin-left: 30px !important;
       color: #555 !important;
     }
+
     .item .meta {
       margin-left: 30px !important;
     }
@@ -73,24 +78,27 @@
       color: #444;
       line-height: 150% !important;
     }
+
     .ui .message .icon {
       opacity: 1.0 !important;
     }
 
-  @media only screen and (max-width: 768px) {
-    .item .header {
-      font-size: 22px !important;
-      margin-left: 25px !important;
+    @media only screen and (max-width: 768px) {
+      .item .header {
+        font-size: 22px !important;
+        margin-left: 25px !important;
+      }
+
+      .title {
+        font-size: 25px !important;
+        margin: -20px auto 1.5em auto;
+        line-height: 150% !important;
+      }
+
+      .title img {
+        width: 75px !important;
+      }
     }
-    .title {
-      font-size: 25px !important;
-      margin: -20px auto 1.5em auto;
-      line-height: 150% !important;
-    }
-    .title img {
-      width: 75px !important;
-    }
-  }
 
   </style>
 
@@ -98,62 +106,64 @@
 
     <div class="title">
       <img src="static/images/heartex_icon_opossum_green@2x.png" style="margin-bottom: 15px" width="100px">
-      <br>Welcome to Label&nbsp;Studio!</div>
+      <br>Welcome to Label&nbsp;Studio!
+    </div>
 
     <div class="ui message" style="max-width: 600px; margin: 0 auto;">
-    <div class="ui items">
+      <div class="ui items">
 
-      <div class="item {{ 'done' if on_boarding.setup else '' }}">
-        <div class="ui circular label">
-          <i class="step icon code grey big"></i>
-          <i class="icon check big"></i>
-          <div class="step">Step 1</div>
+        <div class="item {{ 'done' if on_boarding.setup else '' }}">
+          <div class="ui circular label">
+            <i class="step icon code grey big"></i>
+            <i class="icon check big"></i>
+            <div class="step">Step 1</div>
+          </div>
+          <div class="content">
+            <span class="header"><a href="setup">Setup</a> your label config</span>
+          </div>
         </div>
-        <div class="content">
-          <span class="header"><a href="setup">Setup</a> your label config</span>
+
+        <div class="item {{ 'done' if on_boarding.import else '' }}">
+          <div class="ui circular label">
+            <i class="step icon cloud upload alternate grey big"></i>
+            <i class="icon check big"></i>
+            <div class="step">Step 2</div>
+          </div>
+          <div class="content">
+            <span class="header"><a href="import">Import</a> tasks to project</span>
+          </div>
         </div>
+
+        <div class="item {{ 'done' if on_boarding.labeled else '' }}">
+          <div class="ui circular label">
+            <i class="step icon play grey big"></i>
+            <i class="icon check big"></i>
+            <div class="step">Step 3</div>
+          </div>
+          <div class="content">
+            <span class="header"><a href=".">Start</a> labeling tasks</span>
+          </div>
+        </div>
+
+        <div class="item">
+          <div class="ui circular label">
+            <i class="step icon cloud download alternate grey big"></i>
+            <i class="icon check big"></i>
+            <div class="step">Step 4</div>
+          </div>
+          <div class="content">
+            <span class="header"><a href="export">Export</a> completions</span>
+          </div>
+        </div>
+
       </div>
-
-      <div class="item {{ 'done' if on_boarding.import else '' }}">
-        <div class="ui circular label">
-          <i class="step icon cloud upload alternate grey big"></i>
-          <i class="icon check big"></i>
-          <div class="step">Step 2</div>
-        </div>
-        <div class="content">
-          <span class="header"><a href="import">Import</a> tasks to project</span>
-        </div>
-      </div>
-
-      <div class="item {{ 'done' if on_boarding.labeled else '' }}">
-        <div class="ui circular label">
-          <i class="step icon play grey big"></i>
-          <i class="icon check big"></i>
-          <div class="step">Step 3</div>
-        </div>
-        <div class="content">
-          <span class="header"><a href=".">Start</a> labeling tasks</span>
-        </div>
-      </div>
-
-      <div class="item">
-        <div class="ui circular label">
-          <i class="step icon cloud download alternate grey big"></i>
-          <i class="icon check big"></i>
-          <div class="step">Step 4</div>
-        </div>
-        <div class="content">
-          <span class="header"><a href="export">Export</a> completions</span>
-        </div>
-      </div>
-
-    </div>
     </div>
 
     <center>
       <div style="margin-top: 4em">
         Made with<img src="static/images/opossum_looking.png" width="60px" style="margin-top: -10px;">
-        in California</div>
+        in California
+      </div>
     </center>
   </div>
   <br>

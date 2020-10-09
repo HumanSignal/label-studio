@@ -393,7 +393,8 @@
         <h4>Columns to show</h4>
         <div class="section">
           <div class="ui list horizontal">
-            <div class="item ui checkbox" :class="item==='id' && quick_view ? 'disabled': ''" v-for="item in all_columns">
+            <div class="item ui checkbox" :class="item==='id' && quick_view ? 'disabled': ''"
+                 v-for="item in all_columns">
               <input type="checkbox" class="ui checkbox" v-model="columns" :value="item">
               <label class="cap-first-letter">{{ item.replaceAll('_', ' ') }}</label>
             </div>
