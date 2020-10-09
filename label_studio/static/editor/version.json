@@ -1,6 +1,6 @@
 {
-  "message": "Introducing bugfixes\n\n- Fix bug when existing relations were preventing user to switch between completions\n- Fix bug when relation connection was remain shown event when the region is hidden\n- Change \"Show connection lines\" checkbox to a button",
-  "commit": "6f35e3e97e521d7218a342d8863f10e628ed6356",
+  "message": "Merge branch 'master' of github.com:heartexlabs/label-studio-frontend",
+  "commit": "090c077dc93d09c42eeefa15ad99837a44844403",
   "branch": "master",
-  "date": "2020-10-09T18:33:23Z"
+  "date": "2020-10-09T20:39:28Z"
 }

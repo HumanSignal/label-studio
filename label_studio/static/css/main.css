@@ -5,7 +5,7 @@ html {
 body {
     background: #fcfcfc;
     font-family: Rubik, sans-serif;
-    color: #333;
+    color: #444 !important;
 }
 
 table {
