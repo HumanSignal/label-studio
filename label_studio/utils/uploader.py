@@ -18,10 +18,11 @@ except:
 
 from os.path import join
 from urllib.request import urlopen
+from collections import Counter
 
 from .exceptions import ValidationError
 from .misc import Settings
-from label_studio.utils.functions import get_full_hostname, get_web_protocol
+from label_studio.utils.functions import get_full_hostname
 
 
 settings = Settings
@@ -30,16 +31,20 @@ csv.field_size_limit(131072 * 10)
 
 
 def tasks_from_file(filename, file, project):
+    format = None
     try:
         if filename.endswith('.csv'):
             tasks = pd.read_csv(file).fillna('').to_dict('records')
             tasks = [{'data': task} for task in tasks]
+            format = os.path.splitext(filename)[-1]
         elif filename.endswith('.tsv'):
             tasks = pd.read_csv(file, sep='\t').fillna('').to_dict('records')
             tasks = [{'data': task} for task in tasks]
+            format = os.path.splitext(filename)[-1]
         elif filename.endswith('.txt'):
             lines = file.read().splitlines()
             tasks = [{'data': {settings.UPLOAD_DATA_UNDEFINED_NAME: line.decode('utf-8')}} for line in lines]
+            format = os.path.splitext(filename)[-1]
         elif filename.endswith('.json'):
             raw_data = file.read()
             # Python 3.5 compatibility fix https://docs.python.org/3/whatsnew/3.6.html#json
@@ -47,6 +52,11 @@ def tasks_from_file(filename, file, project):
                 tasks = json.loads(raw_data)
             except TypeError:
                 tasks = json.loads(raw_data.decode('utf8'))
+            format = os.path.splitext(filename)[-1]
+
+        # no drag & drop support
+        elif project is None:
+            raise ValidationError('No tasks found in: ' + filename)
 
         # upload file via drag & drop
         elif len(project.data_types) > 1:
@@ -57,6 +67,7 @@ def tasks_from_file(filename, file, project):
             data = file.read()
             body = htmlmin.minify(data.decode('utf8'), remove_all_empty_space=True)
             tasks = [{'data': {settings.UPLOAD_DATA_UNDEFINED_NAME: body}}]
+            format = os.path.splitext(filename)[-1]
         # hosting for file
         else:
             # read as text or binary file
@@ -71,6 +82,7 @@ def tasks_from_file(filename, file, project):
 
             path = get_full_hostname() + '/data/upload/' + filename
             tasks = [{'data': {settings.UPLOAD_DATA_UNDEFINED_NAME: path}}]
+            format = os.path.splitext(filename)[-1]
 
     except Exception as exc:
         raise ValidationError('Failed to parse input file ' + filename + ': ' + str(exc))
@@ -85,14 +97,14 @@ def tasks_from_file(filename, file, project):
 
     # list
     elif isinstance(tasks, list):
-        return tasks
+        pass
 
     # something strange
     else:
         raise ValidationError('Incorrect task type in ' + filename + ': "' + str(str(tasks)[0:100]) + '". '
                               'It is allowed "dict" or "list of dicts" only')
 
-    return tasks
+    return tasks, format
 
 
 def create_and_release_temp_dir(func):
@@ -172,20 +184,24 @@ def aggregate_files(request_files, temp_dir):
 
 def aggregate_tasks(files, project):
     tasks = []
-
+    fileformats = []
     # scan all files
     for filename, file in files.items():
         # extracted file from archive
         if file == 'archive':
             with open(filename) as f:
-                tasks += tasks_from_file(filename, f, project)
+                new_tasks, fileformat = tasks_from_file(filename, f, project)
+                tasks += new_tasks
+                fileformats.append(fileformat)
         # file from request
         else:
-            tasks += tasks_from_file(filename, file, project)
+            new_tasks, fileformat = tasks_from_file(filename, file, project)
+            tasks += new_tasks
+            fileformats.append(fileformat)
 
         check_max_task_number(tasks)
 
-    return tasks
+    return tasks, dict(Counter(fileformats))
 
 
 @create_and_release_temp_dir
@@ -193,10 +209,11 @@ def load_tasks(request, project, temp_dir):
     """ Load tasks from different types of request.data / request.files
     """
     # take tasks from request FILES
+    formats = {}
     if len(request.FILES):
         # check_file_sizes_and_number(request.FILES)
         files = aggregate_files(request.FILES, temp_dir)
-        tasks = aggregate_tasks(files, project)
+        tasks, formats = aggregate_tasks(files, project)
 
     # take tasks from url address
     elif 'application/x-www-form-urlencoded' in request.content_type:
@@ -212,7 +229,7 @@ def load_tasks(request, project, temp_dir):
 
                 # start parsing
                 files = aggregate_files(request_files, temp_dir)
-                tasks = aggregate_tasks(files, project)
+                tasks, formats = aggregate_tasks(files, project)
 
         except ValidationError as e:
             raise e
@@ -222,10 +239,12 @@ def load_tasks(request, project, temp_dir):
     # take one task from request DATA
     elif 'application/json' in request.content_type and isinstance(request.data, dict):
         tasks = [request.data]
+        formats = {'request': 1}
 
         # take many tasks from request DATA
     elif 'application/json' in request.content_type and isinstance(request.data, list):
         tasks = request.data
+        formats = {'request': len(tasks)}
 
     # incorrect data source
     else:
@@ -240,4 +259,4 @@ def load_tasks(request, project, temp_dir):
         raise ValidationError('load_tasks: No tasks added')
 
     check_max_task_number(tasks)
-    return tasks
+    return tasks, formats

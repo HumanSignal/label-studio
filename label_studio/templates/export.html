@@ -30,13 +30,12 @@
               <span class="ui label basic tiny">semantic segmentation</span>
             </li>
           </ul>
-          <li>Can't find an export format?<br> Please let us know in
-            <a class="no-go"
-               href="https://docs.google.com/forms/d/e/1FAIpQLSdLHZx5EeT1J350JPwnY2xLanfmvplJi6VZk65C2R4XSsRBHg/viewform">via
-              Slack</a>
-            or create an issue on our <a class="no-go"
-                                         href="https://github.com/heartexlabs/label-studio-converter/issues">GitHub
-              page</a>
+          <li style="margin-top: 0.5em;">Can't find an export format?<br>
+            <p>Please let us know in <a class="no-go"
+               href="https://docs.google.com/forms/d/e/1FAIpQLSdLHZx5EeT1J350JPwnY2xLanfmvplJi6VZk65C2R4XSsRBHg/viewform">
+              via Slack</a> or create an issue on our
+              <a class="no-go" href="https://github.com/heartexlabs/label-studio-converter/issues">
+              GitHub page</a></p>
           </li>
         </ul>
       </div>
@@ -74,7 +73,7 @@
   <script>
     // download file by url
     function downloadFile(urlToSend) {
-      $('#dimmer').addClass('active');
+      $('#dimmer').addClass('active').hide().fadeIn(1000);
       var req = new XMLHttpRequest();
       req.onreadystatechange = function() {
         if (req.readyState === 2) {

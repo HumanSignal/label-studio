@@ -4,8 +4,7 @@ type: tags
 order: 413
 ---
 
-Polygon tag
-Polygon is used to add polygons to an image
+Polygon is used to add polygons to an image without label selection. It's useful when you have only one label.
 
 ### Parameters
 

@@ -119,12 +119,13 @@ const _loadTask = function(ls, url, completionID) {
                     c = ls.completionStore.addCompletionFromPrediction(cs.predictions[0]);
                 }
 
+                else if (ls.completionStore.completions.length > 0 && completionID === 'auto') {
+                  c = {id: ls.completionStore.completions[0].id};
+                }
+
                 // we are on history item, take completion id from history
                 else if (ls.completionStore.completions.length > 0 && completionID) {
                     c = {id: completionID};
-                }
-                else if (ls.completionStore.completions.length > 0 && completionID === 'auto') {
-                    c = {id: ls.completionStore.completions[0].id};
                 }
 
                 else {
@@ -132,6 +133,9 @@ const _loadTask = function(ls, url, completionID) {
                 }
 
                 if (c.id) cs.selectCompletion(c.id);
+
+                // fix for broken old references in mst
+                cs.selected.setupHotKeys();
 
                 ls.setFlags({ isLoading: false });
 
@@ -179,7 +183,7 @@ const _convertTask = function(task) {
   return task;
 };
 
-const LSF_SDK = function(elid, config, task) {
+const LSF_SDK = function(elid, config, task, hide_skip) {
 
   const showHistory = task === null;  // show history buttons only if label stream mode, not for task explorer
 
@@ -206,12 +210,7 @@ const LSF_SDK = function(elid, config, task) {
       ls.taskHistoryCurrent = ls.taskHistoryIds.length;
   }
 
-  var LS = new LabelStudio(elid, {
-    config: config,
-    user: { pk: 1, firstName: "Awesome", lastName: "User" },
-
-    task: _convertTask(task),
-    interfaces: [
+  var interfaces = [
       "basic",
       "panel", // undo, redo, reset panel
       "controls", // all control buttons: skip, submit, update
@@ -222,9 +221,18 @@ const LSF_SDK = function(elid, config, task) {
       "completions:menu", // right menu with completion items
       "completions:add-new",
       "completions:delete",
-      "side-column", // entity
-      "skip"
-    ],
+      "side-column" // entity
+  ];
+  if (!hide_skip) {
+    interfaces.push('skip');
+  }
+
+  var LS = new LabelStudio(elid, {
+    config: config,
+    user: { pk: 1, firstName: "Awesome", lastName: "User" },
+
+    task: _convertTask(task),
+    interfaces: interfaces,
 
     onSubmitCompletion: function(ls, c) {
       ls.setFlags({ isLoading: true });

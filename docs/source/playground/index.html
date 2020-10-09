@@ -3,6 +3,9 @@ type: playground
 order: 201
 ---
 <style>
+  .sidebar {
+    display: none;
+  }
   .content {
      max-width: none !important;
      margin-left: 0 !important;
@@ -207,6 +210,10 @@ order: 201
   }
 
 @media screen and (max-width: 900px) {
+  .sidebar {
+    display: flex;
+  }
+}
 @media only screen and (max-width: 767.98px) {
     .intro {
       padding-left: 0;
@@ -259,147 +266,173 @@ order: 201
     <div class="ui grid stackable" style="margin: 0 auto;">
 
       <div class="three wide column category">
-        <i class="icon sound" title="Audio sources"></i>
+             <i class="icon sound" title="Audio sources"></i>
 
 
-        <!-- Template -->
+            <!-- Template -->
 
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="15">Audio classification</a>
-        </div>
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="39">Audio classification</a>
+              </div>
 
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="17">Emotion segmentation</a>
-        </div>
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="23">Emotion segmentation</a>
+              </div>
 
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="16">Speaker diarization</a>
-        </div>
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="38">Speaker diarization</a>
+              </div>
 
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="19">Transcription per region</a>
-        </div>
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="24">Transcription per region</a>
+              </div>
 
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="18">Transcription whole audio</a>
-        </div>
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="11">Transcription whole audio</a>
+              </div>
 
-      </div>
+          </div>
 
-      <div class="three wide column category">
-
-
-        <i class="icon image" title="Image sources"></i>
+          <div class="three wide column category">
 
 
-        <!-- Template -->
 
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="26">Image classification</a>
-        </div>
-
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="24">Bbox object detection</a>
-        </div>
-
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="6006">Brush segmentation</a>
-        </div>
-
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="25">Circular object detector</a>
-        </div>
-
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="27">Keypoints and landmarks</a>
-        </div>
-
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="29">Polygon segmentation</a>
-        </div>
-
-      </div>
-
-      <div class="three wide column category">
-
-        <i class="icon font" title="Text sources"></i>
+             <i class="icon image" title="Image sources"></i>
 
 
-        <!-- Template -->
-
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="34">Text classification</a>
-        </div>
-
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="35">Multi classification</a>
-        </div>
-
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="36">Named entity recognition</a>
-        </div>
-
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="37">Text summarization</a>
-        </div>
-
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="33">Word alignment</a>
-        </div>
-
-      </div>
-
-      <div class="three wide column category">
 
 
-        <i class="icon code" title="HTML sources"></i>
 
 
-        <!-- Template -->
+            <!-- Template -->
 
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="20">HTML classification</a>
-        </div>
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="20">Image classification</a>
+              </div>
 
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="0">HTML NER tagging</a>
-        </div>
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="33">Bbox object detection</a>
+              </div>
 
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="21">Dialog &amp; conversations</a>
-        </div>
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="6">Brush segmentation</a>
+              </div>
 
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="23">Rate website</a>
-        </div>
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="25">Circular object detector</a>
+              </div>
 
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="22">Rate PDF</a>
-        </div>
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="10">Keypoints and landmarks</a>
+              </div>
 
-      </div>
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="26">Polygon segmentation</a>
+              </div>
 
-      <div class="three wide column category">
+          </div>
+
+          <div class="three wide column category">
+
+             <i class="icon font" title="Text sources"></i>
 
 
-        <i class="icon archive" title="Other sources"></i>
 
 
-        <!-- Template -->
 
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="30">Pairwise comparison</a>
-        </div>
 
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="31">Relations among entities</a>
-        </div>
 
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="32">Video classifier</a>
-        </div>
 
-      </div>
+            <!-- Template -->
+
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="30">Text classification</a>
+              </div>
+
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="17">Multi classification</a>
+              </div>
+
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="7">Named entity recognition</a>
+              </div>
+
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="12">Text summarization</a>
+              </div>
+
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="40">Word alignment</a>
+              </div>
+
+          </div>
+
+          <div class="three wide column category">
+
+
+             <i class="icon code" title="HTML sources"></i>
+
+
+
+
+
+
+
+            <!-- Template -->
+
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="4">HTML classification</a>
+              </div>
+
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="37">HTML NER tagging</a>
+              </div>
+
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="34">Dialogs &amp; conversations</a>
+              </div>
+
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="0">Rate PDF</a>
+              </div>
+
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="2">Rate website</a>
+              </div>
+
+          </div>
+
+          <div class="three wide column category">
+
+
+
+
+             <i class="icon archive" title="Other sources"></i>
+
+
+
+
+
+            <!-- Template -->
+
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="14">Pairwise comparison</a>
+              </div>
+
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="31">Relations among entities</a>
+              </div>
+
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="16">Table with key-value</a>
+              </div>
+
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="18">Video classifier</a>
+              </div>
+
+          </div>
+
 
     </div>
   </div>
@@ -417,101 +450,126 @@ order: 201
       <div class="three wide column category">
 
 
-        <i class="icon eye" title="View layout examples"></i>
 
 
-        <!-- Template -->
-
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="3">Long text with scrollbar</a>
-        </div>
-
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="14">Pretty choices</a>
-        </div>
-
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="4">Sticky header</a>
-        </div>
-
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="5">Sticky left column</a>
-        </div>
-
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="2">Three columns</a>
-        </div>
-
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="1">Two columns</a>
-        </div>
-
-      </div>
-
-      <div class="three wide column category">
 
 
-        <i class="icon bullseye" title="Nested examples with conditional behavior"></i>
-
-        <!-- Template -->
-
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="8">Conditional classification</a>
-        </div>
-
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="7">Three level classification</a>
-        </div>
-
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="6">Two level classification</a>
-        </div>
-
-      </div>
-
-      <div class="three wide column category">
+             <i class="icon eye" title="View layout examples"></i>
 
 
-        <i class="icon vector square" title="Per region examples"></i>
+
+            <!-- Template -->
+
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="36">Long text with scrollbar</a>
+              </div>
+
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="32">Pretty choices</a>
+              </div>
+
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="1">Sticky header</a>
+              </div>
+
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="21">Sticky left column</a>
+              </div>
+
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="3">Three columns</a>
+              </div>
+
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="28">Two columns</a>
+              </div>
+
+          </div>
+
+          <div class="three wide column category">
 
 
-        <!-- Template -->
-
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="13">Audio regions labeling</a>
-        </div>
-
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="11">Image bboxes labeling</a>
-        </div>
-
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="12">Text spans labeling</a>
-        </div>
-
-      </div>
-
-      <div class="three wide column category">
 
 
-        <i class="icon archive" title="Other sources"></i>
 
 
-        <!-- Template -->
 
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="9">Filtering long labels list</a>
-        </div>
 
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="28">Image &amp; Audio &amp; Text</a>
-        </div>
+             <i class="icon bullseye" title="Nested examples with conditional behavior"></i>
 
-        <div class="ui item">
-          <a class="use-template no-go" href="#" data-value="10">Multi-image classification</a>
-        </div>
+            <!-- Template -->
 
-      </div>
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="8">Conditional classification</a>
+              </div>
+
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="15">Three level classification</a>
+              </div>
+
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="35">Two level classification</a>
+              </div>
+
+          </div>
+
+          <div class="three wide column category">
+
+
+
+
+
+
+
+             <i class="icon vector square" title="Per region examples"></i>
+
+
+            <!-- Template -->
+
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="22">Audio regions labeling</a>
+              </div>
+
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="29">Image bboxes labeling</a>
+              </div>
+
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="5">Text spans labeling</a>
+              </div>
+
+          </div>
+
+          <div class="three wide column category">
+
+
+
+
+             <i class="icon archive" title="Other sources"></i>
+
+
+
+
+
+            <!-- Template -->
+
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="27">Filtering long labels list</a>
+              </div>
+
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="19">Image &amp; Audio &amp; Text</a>
+              </div>
+
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="9">Multi-image classification</a>
+              </div>
+
+              <div class="ui item">
+                <a class="use-template no-go" href="#" data-value="13">Table with text fields</a>
+              </div>
+
+          </div>
     </div>
   </div>
 </div>
@@ -581,8 +639,7 @@ order: 201
 <!-- Hidden template codes -->
 <empty>
 
-
-  <!-- Starting template -->
+   <!-- Starting template -->
   <script id="start-template" type="text"><View>
 
   <!-- Image with Polygons -->
@@ -615,9 +672,8 @@ order: 201
   </script>
 
 
-      
 
-          <script data-template-pk="15" type="text"><View>
+  <script data-template-pk="39" type="text"><View>
   <Header value="Listen to the audio"/>
   <Audio name="audio" value="$audio"/>
   <Header value="Select its topic"/>
@@ -633,7 +689,7 @@ order: 201
 
 
 
-          <script data-template-pk="17" type="text"><View>
+          <script data-template-pk="23" type="text"><View>
   <Labels name="emotion" toName="audio" choice="multiple">
     <Label value="Fear" background="#ff0000" />
     <Label value="Anger" background="#d50000" />
@@ -651,7 +707,7 @@ order: 201
 
 
 
-          <script data-template-pk="16" type="text"><View>
+          <script data-template-pk="38" type="text"><View>
   <Labels name="label" toName="audio" choice="multiple">
     <Label value="Speaker 1" />
     <Label value="Speaker 2" />
@@ -662,7 +718,7 @@ order: 201
 
 
 
-          <script data-template-pk="19" type="text"><View>
+          <script data-template-pk="24" type="text"><View>
   <Labels name="labels" toName="audio">
     <Label value="Speaker 1" />
     <Label value="Speaker 2" />
@@ -681,7 +737,7 @@ order: 201
 
 
 
-          <script data-template-pk="18" type="text"><View>
+          <script data-template-pk="11" type="text"><View>
   <Header value="Listen to the audio" />
   <Audio name="audio" value="$audio" />
   <Header value="Write the transcription" />
@@ -694,7 +750,7 @@ order: 201
 
 
 
-          <script data-template-pk="26" type="text"><View>
+          <script data-template-pk="20" type="text"><View>
   <Image name="image" value="$image"/>
   <Choices name="choice" toName="image" showInLine="true">
     <Choice value="Boeing" background="blue"/>
@@ -705,7 +761,7 @@ order: 201
 
 
 
-          <script data-template-pk="24" type="text"><View>
+          <script data-template-pk="33" type="text"><View>
   <Image name="image" value="$image"/>
   <RectangleLabels name="label" toName="image">
     <Label value="Airplane" background="green"/>
@@ -713,6 +769,16 @@ order: 201
   </RectangleLabels>
 </View>
 </script>
+
+
+
+          <script data-template-pk="6" type="text"><View>
+  <Image name="image" value="$image"></Image>
+  <BrushLabels name="tag" toName="image">
+    <Label value="Planet" background="rgba(0, 0, 255, 0.7)"></Label>
+    <Label value="Moonwalker" background="rgba(255, 0, 0, 0.7)"></Label>
+  </BrushLabels>
+</View></script>
 
 
 
@@ -727,7 +793,7 @@ order: 201
 
 
 
-          <script data-template-pk="27" type="text"><View>
+          <script data-template-pk="10" type="text"><View>
   <Image name="image" value="$image" zoom="true" zoomControl="true"/>
   <KeyPointLabels name="label" toName="image"
                   strokewidth="2" opacity="1" >
@@ -739,7 +805,7 @@ order: 201
 
 
 
-          <script data-template-pk="29" type="text"><View>
+          <script data-template-pk="26" type="text"><View>
 
   <Header value="Select label and start to click on image"/>
   <Image name="image" value="$image"/>
@@ -758,7 +824,7 @@ order: 201
 
 
 
-          <script data-template-pk="34" type="text"><View>
+          <script data-template-pk="30" type="text"><View>
   <Text name="text" value="$text"/>
   <Choices name="sentiment" toName="text" choice="single">
     <Choice value="Positive"/>
@@ -770,7 +836,7 @@ order: 201
 
 
 
-          <script data-template-pk="35" type="text"><View>
+          <script data-template-pk="17" type="text"><View>
   <Text name="text" value="$text" />
 
   <Choices name="sentiment" toName="text" choice="multiple">
@@ -795,7 +861,7 @@ order: 201
 
 
 
-          <script data-template-pk="36" type="text"><View>
+          <script data-template-pk="7" type="text"><View>
   <Labels name="label" toName="text">
     <Label value="Person" background="red"/>
     <Label value="Organization" background="darkorange"/>
@@ -816,7 +882,7 @@ order: 201
 
 
 
-          <script data-template-pk="37" type="text"><View>
+          <script data-template-pk="12" type="text"><View>
   <Header value="Please read the text" />
   <Text name="text" value="$text" />
 
@@ -829,7 +895,7 @@ order: 201
 
 
 
-          <script data-template-pk="33" type="text"><View>
+          <script data-template-pk="40" type="text"><View>
   <Labels name="label" toName="text">
     <Label value="Person" />
     <Label value="Organization" />
@@ -842,7 +908,7 @@ order: 201
 
 
 
-          <script data-template-pk="20" type="text"><View>
+          <script data-template-pk="4" type="text"><View>
   <Choices name="toxicity" toName="web_page" choice="multiple" showInline="true">
     <Choice value="Toxic" background="red"/>
     <Choice value="Severe Toxic" background="brown"/>
@@ -862,7 +928,7 @@ order: 201
 
 
 
-          <script data-template-pk="0" type="text"><View>
+          <script data-template-pk="37" type="text"><View>
   <HyperTextLabels name="ner" toName="text">
     <Label value="Person" background="green"/>
     <Label value="Organization" background="blue"/>
@@ -878,7 +944,7 @@ order: 201
 
 
 
-          <script data-template-pk="21" type="text"><View>
+          <script data-template-pk="34" type="text"><View>
   <HyperText name="dialog" value="$dialogs"/>
 
   <Header value="Rate last answer"/>
@@ -895,7 +961,7 @@ order: 201
 
 
 
-          <script data-template-pk="22" type="text"><View>
+          <script data-template-pk="0" type="text"><View>
   <HyperText name="pdf" value="$pdf"/>
 
   <Header value="Rate this article"/>
@@ -910,7 +976,7 @@ order: 201
 
 
 
-          <script data-template-pk="23" type="text"><View>
+          <script data-template-pk="2" type="text"><View>
   <HyperText name="website" value="$website"/>
 
   <Header value="Rate this website"/>
@@ -927,7 +993,7 @@ order: 201
 
 
 
-          <script data-template-pk="30" type="text"><View>
+          <script data-template-pk="14" type="text"><View>
   <Header>Select one of two items</Header>
   <Pairwise name="pw" toName="text1,text2" />
   <Text name="text1" value="$text1" />
@@ -958,7 +1024,14 @@ order: 201
 
 
 
-          <script data-template-pk="32" type="text"><View>
+          <script data-template-pk="16" type="text"><View>
+    <Header value="Table with {key: value} pairs"/>
+    <Table name="table" value="$item"/>
+</View></script>
+
+
+
+          <script data-template-pk="18" type="text"><View>
   <HyperText name="video" value="$video"/>
   <Choices name="type" toName="video" choice="single-radio">
     <Choice value="Awesome" />
@@ -972,7 +1045,7 @@ order: 201
 
 
 
-          <script data-template-pk="3" type="text"><View style="display: flex;">
+          <script data-template-pk="36" type="text"><View style="display: flex;">
   <View style="padding: 0em 1em; background: #f1f1f1; margin-right: 1em; border-radius: 3px">
     <View style="position: sticky; top: 0">
       <Labels name="label" toName="text">
@@ -989,7 +1062,7 @@ order: 201
 
 
 
-          <script data-template-pk="14" type="text"><View>
+          <script data-template-pk="32" type="text"><View>
   <Text name="text" value="$text"/>
   <View style="box-shadow: 2px 2px 5px #999;
                padding: 20px; margin-top: 2em;
@@ -1007,7 +1080,7 @@ order: 201
 
 
 
-          <script data-template-pk="4" type="text"><View>
+          <script data-template-pk="1" type="text"><View>
   <View style="padding: 0 1em; margin: 1em 0; background: #f1f1f1; position: sticky; top: 0; border-radius: 3px">
     <Labels name="label" toName="text" showInline="true">
       <Label value="Person" />
@@ -1023,7 +1096,7 @@ order: 201
 
 
 
-          <script data-template-pk="5" type="text"><View style="display: flex;">
+          <script data-template-pk="21" type="text"><View style="display: flex;">
   <View style="padding: 0em 1em; background: #f1f1f1; margin-right: 1em; border-radius: 3px">
     <View style="position: sticky; top: 0">
       <Labels name="label" toName="text">
@@ -1041,7 +1114,7 @@ order: 201
 
 
 
-          <script data-template-pk="2" type="text"><View style="display: flex;">
+          <script data-template-pk="3" type="text"><View style="display: flex;">
   <View style="width: 150px; padding: 0 1em; margin-right: 0.5em; background: #f1f1f1; border-radius: 3px">
     <Labels name="label" toName="text">
       <Label value="Person" />
@@ -1066,7 +1139,7 @@ order: 201
 
 
 
-          <script data-template-pk="1" type="text"><View style="display: flex;">
+          <script data-template-pk="28" type="text"><View style="display: flex;">
   <View style="width: 150px; padding-left: 2em; margin-right: 2em; background: #f1f1f1; border-radius: 3px">
     <Labels name="label" toName="text">
       <Label value="Person" />
@@ -1112,7 +1185,7 @@ order: 201
 
 
 
-          <script data-template-pk="7" type="text"><View>
+          <script data-template-pk="15" type="text"><View>
   <Text name="text" value="$text" />
 
   <Choices name="sentiment" toName="text" showInLine="true">
@@ -1150,7 +1223,7 @@ order: 201
 
 
 
-          <script data-template-pk="6" type="text"><View>
+          <script data-template-pk="35" type="text"><View>
 
   <Text name="text" value="$text" />
   <Choices name="sentiment" toName="text" showInLine="true">
@@ -1176,7 +1249,7 @@ order: 201
 
 
 
-          <script data-template-pk="13" type="text"><View style="display: flex;">
+          <script data-template-pk="22" type="text"><View style="display: flex;">
   <View style="width: 100%; margin-left: 1em;">
     <Labels name="label" toName="audio">
       <Label value="Speaker 1" />
@@ -1210,7 +1283,7 @@ order: 201
 
 
 
-          <script data-template-pk="11" type="text"><View>
+          <script data-template-pk="29" type="text"><View>
   <Image name="image" value="$image"/>
 
   <RectangleLabels name="label" toName="image">
@@ -1237,7 +1310,7 @@ order: 201
 
 
 
-          <script data-template-pk="12" type="text"><View style="display: flex;">
+          <script data-template-pk="5" type="text"><View style="display: flex;">
   <View style="width: 150px; padding-left: 2em; margin-right: 2em; background: #f1f1f1; border-radius: 3px">
     <Labels name="ner" toName="text">
       <Label value="Person" />
@@ -1274,7 +1347,7 @@ order: 201
 
 
 
-          <script data-template-pk="9" type="text"><View style="display: flex;">
+          <script data-template-pk="27" type="text"><View style="display: flex;">
   <View style="width: 350px; padding-right: 1em; height: 400px; overflow-y: auto">
     <Filter name="fl" toName="ner" hotkey="shift+f" minlength="1" />
     <Labels name="ner" toName="text" showInline="false">
@@ -1290,7 +1363,7 @@ order: 201
 
 
 
-          <script data-template-pk="28" type="text"><View>
+          <script data-template-pk="19" type="text"><View>
 
   <!-- Image with bounding boxes -->
   <View style="padding: 25px;
@@ -1337,15 +1410,8 @@ order: 201
 </script>
 
 
-          <script data-template-pk="6006" type="text"><View>
-  <Image name="image" value="$image"></Image>
-  <BrushLabels name="tag" toName="image">
-    <Label value="Planet" background="rgba(0, 0, 255, 0.75)"></Label>
-    <Label value="Moonwalker" background="rgba(255, 0, 0, 0.75)"></Label>
-  </BrushLabels>
-</View></script>
 
-          <script data-template-pk="10" type="text"><View>
+          <script data-template-pk="9" type="text"><View>
   <Header value="Please select everything you see on the image" />
 
   <View style="display: flex;">
@@ -1377,6 +1443,32 @@ order: 201
   </View>
 </View>
 </script>
+
+
+
+          <script data-template-pk="13" type="text"><View>
+  <Style>
+    input[type="text"][name^="table"] { border-radius: 0px; border-right: none;}
+    input[type="text"][name^="table_metric"] { border-right: 1px solid #ddd; }
+    div[class*=" TextAreaRegion_mark"] {background: none; height: 33px; border-radius: 0; min-width: 135px;}
+  </Style>
+
+  <Image value="$image" name="image"/>
+
+  <Header value="Trick to build a table"/>
+
+  <View style="display: grid;  grid-template-columns: 1fr 1fr 1fr; max-height: 300px; width: 400px">
+    <TextArea name="table_name_1" toName="image" placeholder="name" editable="true" maxSubmissions="1"/>
+    <TextArea name="table_value_1" toName="image" placeholder="value" editable="true" maxSubmissions="1"/>
+    <TextArea name="table_metric_1" toName="image" placeholder="metric" editable="true" maxSubmissions="1"/>
+    <TextArea name="table_name_2" toName="image" placeholder="name" editable="true" maxSubmissions="1"/>
+    <TextArea name="table_value_2" toName="image" placeholder="value" editable="true" maxSubmissions="1"/>
+    <TextArea name="table_metric_2" toName="image" placeholder="metric" editable="true" maxSubmissions="1"/>
+    <TextArea name="table_name_3" toName="image" placeholder="name" editable="true" maxSubmissions="1"/>
+    <TextArea name="table_value_3" toName="image" placeholder="value" editable="true" maxSubmissions="1"/>
+    <TextArea name="table_metric_3" toName="image" placeholder="metric" editable="true" maxSubmissions="1"/>
+  </View>
+</View></script>
 
 </empty>
 
@@ -1515,9 +1607,9 @@ order: 201
     var url = new URL(url_string);
 
     // Label code mirror
-    let labelEditor = CodeMirror.fromTextArea(document.getElementById('id_label_config'), {
+    var labelEditor = CodeMirror.fromTextArea(document.getElementById('id_label_config'), {
       lineNumbers: true,
-      mode: "text/html",
+      mode: "text/html"
     });
     labelEditor.focus();
 
@@ -1589,7 +1681,7 @@ order: 201
           if (obj.contentWindow) {
             obj.style.height = (obj.contentWindow.document.body.scrollHeight) + 'px';
           }
-        }, 500);
+        }, 100);
         // hide "..."
         $('#preload-editor').hide();
       });
@@ -1656,10 +1748,10 @@ order: 201
         url: host + '/business/projects/upload-example/',
         data: {label_config: val}
       })
-        .fail(o => {
+        .fail(function(o) {
           $('#upload-data-example').text('...')
         })
-        .done(o => {
+        .done(function(o) {
           $('#upload-data-example').text(JSON.stringify(JSON.parse(o), null, 4))
         })
     }

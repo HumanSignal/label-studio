@@ -1,6 +1,31 @@
 import os
 import argparse
 import logging
+import logging.config
+
+logging.config.dictConfig({{
+  "version": 1,
+  "formatters": {{
+    "standard": {{
+      "format": "[%(asctime)s] [%(levelname)s] [%(name)s::%(funcName)s::%(lineno)d] %(message)s"
+    }}
+  }},
+  "handlers": {{
+    "console": {{
+      "class": "logging.StreamHandler",
+      "level": "DEBUG",
+      "stream": "ext://sys.stdout",
+      "formatter": "standard"
+    }}
+  }},
+  "root": {{
+    "level": "ERROR",
+    "handlers": [
+      "console"
+    ],
+    "propagate": True
+  }}
+}})
 
 from label_studio.ml import init_app
 from {script} import {model_class}

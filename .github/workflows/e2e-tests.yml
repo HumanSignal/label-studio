@@ -1,0 +1,40 @@
+name: label-studio:tests
+
+on:
+  push:
+    branches: ['*', '*/*', master]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
+    - uses: py-actions/py-dependency-install@v2
+    - run: pip install -e .
+
+    - uses: actions/setup-node@v1
+      with:
+        node-version: 12
+    # cache npm deps for faster runs
+    - name: Cache node modules
+      uses: actions/cache@v1
+      env:
+        cache-name: cache-node-modules
+      with:
+        path: ~/.npm
+        key: npm-${{ runner.os }}-${{ hashFiles('e2e/package-lock.json') }}
+        restore-keys: |
+          npm-${{ runner.os }}-
+    - run: cd e2e && npm ci
+    - run: cd e2e && npm run test:headless
+
+    - uses: actions/upload-artifact@master
+      if: ${{ failure() }}
+      with:
+        name: e2e output
+        path: e2e/output/

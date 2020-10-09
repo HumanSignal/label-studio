@@ -1,6 +1,6 @@
 {
-  "message": "Fix ids for Regions tree when copy prediction",
-  "commit": "fd1e7cad9fdab9ca3c55691b2d0ee23905d51d59",
+  "message": "Dirty hack for image loading and size calculations",
+  "commit": "ca40aeef8ea0adcf53d229fdefd88f4e43ce9721",
   "branch": "master",
-  "date": "2020-08-12T20:30:46Z"
+  "date": "2020-10-09T14:12:39Z"
 }

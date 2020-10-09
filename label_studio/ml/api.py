@@ -4,6 +4,7 @@ from flask import Flask, request, jsonify, send_file
 from rq.exceptions import NoSuchJobError
 
 from label_studio.ml.model import LabelStudioMLManager
+from label_studio.utils.misc import exception_treatment
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +19,7 @@ def init_app(model_class, **kwargs):
 
 
 @_server.route('/predict', methods=['POST'])
+@exception_treatment
 def _predict():
     data = request.json
     tasks = data['tasks']
@@ -35,16 +37,19 @@ def _predict():
 
 
 @_server.route('/setup', methods=['POST'])
+@exception_treatment
 def _setup():
     data = request.json
     project = data.get('project')
     schema = data.get('schema')
     force_reload = data.get('force_reload', False)
     model = _manager.fetch(project, schema, force_reload)
+    logger.debug('Fetch model version: {}'.format(model.model_version))
     return jsonify({'model_version': model.model_version})
 
 
 @_server.route('/train', methods=['POST'])
+@exception_treatment
 def _train():
     data = request.json
     completions = data['completions']
@@ -59,6 +64,7 @@ def _train():
 
 
 @_server.route('/is_training', methods=['GET'])
+@exception_treatment
 def _is_training():
     project = request.args.get('project')
     output = _manager.is_training(project)
@@ -66,11 +72,13 @@ def _is_training():
 
 
 @_server.route('/health', methods=['GET'])
+@exception_treatment
 def health():
     return jsonify({'status': 'UP', 'model_dir': _manager.model_dir})
 
 
 @_server.route('/metrics', methods=['GET'])
+@exception_treatment
 def metrics():
     return jsonify({})
 

@@ -25,8 +25,10 @@ Pairwise element. Compare two different objects, works with any label studio obj
 </View>
 ```
 ### Example
-```html
+
 You can also style the appearence using the View tag:
+
+```html
 <View>
   <Pairwise name="pw" toName="txt-1,txt-2"></Pairwise>
   <View style="display: flex;">

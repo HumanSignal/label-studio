@@ -1,3 +1,4 @@
+pip>=20.2.3
 appdirs==1.4.3
 attrs==19.1.0
 blis==0.4.1
@@ -22,6 +23,7 @@ tqdm==4.40.2
 urllib3==1.25.7
 wasabi==0.4.2
 Werkzeug==0.16.0
+ordered-set==4.0.2
 orjson>=2.0.11
 rarfile==3.1
 flask_api>=2.0
