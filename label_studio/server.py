@@ -129,6 +129,7 @@ def app_before_request_callback():
         session['session_id'] = str(uuid4())
     g.project = project_get_or_create()
     g.analytics = Analytics(input_args, g.project)
+    g.sid = g.analytics.server_id
 
 
 @app.after_request

@@ -1021,29 +1021,28 @@
           this.changeStorageSettings('target', this.storage_settings.target.type)
         },
 
-        columns: function(values) {
+        columns: function (values) {
           if (this.quick_view) {
             this.quick_columns = values;
             this.evalPanelWidth()
-          }
-          else {
+          } else {
             this.full_columns = values;
           }
         },
 
-        quick_columns: function() {
+        quick_columns: function () {
           this.evalPanelWidth();
           Cookies.set('quick_columns', this.quick_columns);
         },
-        full_columns: function() {
+        full_columns: function () {
           Cookies.set('full_columns', this.full_columns);
         },
 
-        quick_view: function() {
+        quick_view: function () {
           this.evalPanelWidth();
         },
 
-        text_preview_limit: function() {
+        text_preview_limit: function () {
           Cookies.set('text_preview_limit', this.text_preview_limit);
         }
       },
