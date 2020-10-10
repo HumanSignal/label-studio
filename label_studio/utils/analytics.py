@@ -56,11 +56,9 @@ class Analytics(object):
                     mp.people_set(user_id, {'$name': user_id, 'app': 'label-studio', 'version': self.version})
                 except:
                     pass
-            logger.debug('Your user ID ' + str(user_id) + ' is saved to ' + str(user_id_file))
         else:
             with io.open(user_id_file) as f:
                 user_id = f.read()
-            logger.debug('Your user ID ' + str(user_id) + ' is loaded from ' + str(user_id_file))
         return user_id
 
     def _is_docker(self):
@@ -158,7 +156,6 @@ class Analytics(object):
 
         try:
             url = 'https://analytics.labelstud.io/prod'
-            logger.debug('Sending to {url}:\n{data}'.format(url=url, data=payload))
             requests.post(url=url, json=payload)
         except:
             pass
