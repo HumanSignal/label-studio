@@ -2,7 +2,6 @@
 title: Ranker
 type: tags
 order: 416
-order: 415
 ---
 
 Ranker tag, used to ranking models
@@ -59,4 +58,3 @@ Input task example
   }]
 }]
 ```
-
