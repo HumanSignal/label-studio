@@ -1,6 +1,6 @@
 {
-  "message": "Fix tests by longer waiting",
-  "commit": "3dfa81402d8cf4db17f50d3fa4542b17bdcbaba9",
-  "branch": "fix/post-0.7.5",
-  "date": "2020-10-13T14:28:56Z"
+  "message": "Merge branch 'master' of github.com:heartexlabs/label-studio-frontend",
+  "commit": "090c077dc93d09c42eeefa15ad99837a44844403",
+  "branch": "master",
+  "date": "2020-10-09T20:39:28Z"
 }
