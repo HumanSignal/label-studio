@@ -1,5 +1,10 @@
 {% extends 'base.html' %}
 {% block body %}
+  <style>
+    #error-log-traceback {
+      font-size: 0.9em;
+    }
+  </style>
 
   <div class="ui container">
     <div class="wrapper">
@@ -11,52 +16,61 @@
       <div class="ui divider hidden"></div>
       <div class="ui three column grid">
 
-        {% for ml_backend in ml_backends %}
-          <div class="column">
-            <div class="ui card">
-              <div class="content">
-              <button class="upper-right no-border" onclick='remove_ml_backend({{ ml_backend.model_name|tojson }})'><i class="x icon"></i></button>
+        <div class="sixteen wide column">
+          <div class="ui cards">
+            {% for ml_backend in ml_backends %}
 
-                <div class="header" style="font-weight: lighter; color: #333">{{ ml_backend.dir }} > {{ ml_backend.model_name }}</div>
-                <div class="meta">
-                  <span class="info">{{ ml_backend.url }}</span>
+              <div class="ui card">
+                <div class="content">
+                  <button class="upper-right no-border" onclick='remove_ml_backend({{ ml_backend.model_name|tojson }})'>
+                    <i class="x icon"></i></button>
+
+                  <div class="header" style="font-weight: lighter; color: #333">{{ ml_backend.dir }}
+                    > {{ ml_backend.model_name }}</div>
+                  <div class="meta">
+                    <span class="info">{{ ml_backend.url }}</span>
+                  </div>
+                  <div class="description">
+                    {% if ml_backend.model_version %}
+                      Model version: {{ ml_backend.model_version | str2datetime }}
+                    {% else %}
+                      Model is not trained.
+                    {% endif %}
+                  </div>
                 </div>
-                <div class="description">
-                  {% if ml_backend.model_version  %}
-                    Model version: {{ ml_backend.model_version | str2datetime }}
-                  {% else %}
-                    Model is not trained.
-                  {% endif %}
-                </div>
-              </div>
-              <div class="extra content">
-                <div>
-                  {% if ml_backend.is_error %}
-                    <i class="x icon" style="color: #ff2733"></i>
-                    Error. Check console logs...
-                  {% elif not ml_backend.is_connected %}
-                    <i class="toggle off wide icon"></i>
-                    Disconnected
+                <div class="extra content">
+                  <div>
+                    {% if ml_backend.is_error %}
+                      <a class="log-link"
+                         onclick="show_logs(`{{ ml_backend.error.detail }}`, `{{ ml_backend.error.result.traceback }}`, {{ ml_backend.error.status }})">
+                        <i class="x icon" style="color: #ff2733"></i>
+                        Error. Check logs
+                      </a>
+                    {% elif not ml_backend.is_connected %}
+                      <i class="toggle off wide icon"></i>
+                      Disconnected
                     {% elif ml_backend.is_error %}
 
-                  {% elif ml_backend.training_in_progress %}
-                    <i class="hourglass half wide icon" style="color: #da671b"></i>
-                    Training in progress...
-                  {% else %}
-                    <i class="toggle on wide icon" style="color: #00c22e"></i>
-                    Connected
-                  {% endif %}
+                    {% elif ml_backend.training_in_progress %}
+                      <i class="hourglass half wide icon" style="color: #da671b"></i>
+                      Training in progress...
+                    {% else %}
+                      <i class="toggle on wide icon" style="color: #00c22e"></i>
+                      Connected
+                    {% endif %}
+                  </div>
                 </div>
               </div>
-            </div>
+
+            {% else %}
+              <div style="margin: 0 auto">
+                <p>No connected ML backends.
+                  <a href="https://labelstud.io/guide/ml.html">How to use ML models in Label Studio?</a>
+                </p>
+              </div>
+            {% endfor %}
           </div>
-        {% else %}
-          <div class="row centered aligned">
-            <p>No connected ML backends.
-              <a href="https://labelstud.io/guide/ml.html">How to use ML models in Label Studio?</a>
-            </p>
-          </div>
-        {% endfor %}
+        </div>
 
         <!-- Train & Prediction logs -->
         {#          <div class="ui styled accordion fluid">#}
@@ -72,14 +86,14 @@
         {#          </div>#}
 
         {% if project.ml_backends_connected %}
-        <!-- Start train -->
+          <!-- Start train -->
           <div class="row centered aligned">
             <div class="ui positive big button" onclick="start_train()">Start Training</div>
             {% if project.config['enable_predictions_button'] %}
               <div class="ui positive big button" onclick="start_predictions()">Start Predictions</div>
             {% endif %}
           </div>
-      {% endif %}
+        {% endif %}
 
         {% if project.data_types|length == 1 %}
           <!-- File uploader -->
@@ -107,199 +121,223 @@
     </div>
   </div>
 
+  <!-- Error log dialog -->
+  <div class="ui modal" id="error-log-dialog">
+    <i class="close icon"></i>
+    <div class="header red">
+      ML Backend Error
+    </div>
+    <div class="content scrolling">
+      <div class="description" id="error-log-detail"></div>
+      <div class="description" id="error-log-status"></div>
+      <div class="ui divider"></div>
+      <pre class="description" id="error-log-traceback"></pre>
+    </div>
+    <div class="actions">
+      <!-- Close button -->
+      <a class="ui icon cancel button basic" id="upload-done-button" autofocus>Close</a>
+    </div>
+  </div>
+
   <!-- Dimmer and loader -->
   <div class="ui page dimmer">
     <div class="ui large text orange loader">Processing, please wait</div>
   </div>
 
   <script>
-      function addMlBackend() {
-          let ml_backend = document.getElementById("ml_backend_url").value;
-          $.ajax({
-            url: "api/project/",
-            data: JSON.stringify({ml_backend: ml_backend}),
-            type: "patch",
-            dataType: "json",
-            contentType: "application/json; charset=utf-8",
-            success: function (response) {
-              location.reload();
-            },
-            error: function (xhr, ajaxOptions, thrownError) {
-              alert(message_from_response(xhr));
-            }
-          });
-      }
+    function show_logs(detail, traceback, status) {
+      $('#error-log-detail').html(detail);
+      $('#error-log-status').html(status);
+      $('#error-log-traceback').html(traceback);
+      $('#error-log-dialog').modal('show');
+    }
 
-
-      $('#holder').on('click', function () {
-          $('#file-input').trigger('click');
-      });
-
-      // drag & drop files
-      $(document).ready(function () {
-          $('.accordion').accordion();
-
-          let holder = $('#holder');
-          holder.on('drop', function (e) {
-              e.preventDefault();
-              $(this).removeClass('hover');
-              const event = {target: {files: e.originalEvent.dataTransfer.files}};
-              send_data(event);
-          });
-          holder.on('dragover', function (e) {
-              e.stopPropagation();
-              e.preventDefault();
-              $(this).addClass('hover');
-          });
-          holder.on('dragleave', function (e) {
-              e.preventDefault();
-              $(this).removeClass('hover');
-          });
-      });
-
-      // show upload wait
-      function start_wait() {
-          $('.ui.page.dimmer').addClass('active');
-      }
-
-      // stop upload wait
-      function stop_wait(obj, success) {
-          if (success) {
-              window.location = '?task_id=' + obj[0];
-          } else {
-              alert(obj);
-          }
-
-      }
-
-      // send data with tasks to server (add more data)
-      function send_data(event) {
-          if (typeof event.target.files === 'undefined') {
-              return;
-          }
-
-          // show upload wait dialog
-          start_wait();
-          let fd = null;
-          let request = {};
-
-          // files from disk
-          fd = new FormData;
-          for (let i = 0; i < event.target.files.length; i++) {
-              const f = event.target.files[i];
-              let max_size_mb = {{ project.max_tasks_file_size }};
-              if (f.size / 1024.0 / 1024.0 > max_size_mb) {
-                  alert('Sorry, but file size is too big (more ' + max_size_mb + ' mb).\n<br/>' +
-                      'Try to split your file by chunks or zip it', false);
-                  return;
-              }
-
-              // make form and attach file to it
-              fd.append(f.name, f);
-          }
-
-          request = {
-              url: "api/import",
-              data: fd,
-              method: 'POST',
-              processData: false,
-              contentType: false
-          };
-
-          $.ajax(request)
-              .done(answer => {
-                  stop_wait(answer['new_task_ids'], true);
-              })
-              .fail(answer => {
-                  let msg = "Error: can't upload/process file on server side. Reasons:<br><br>";
-
-                  if (answer.responseJSON != null) {
-                      let rows = answer.responseJSON;
-                      for (let i in rows) {
-                          const escaped = $('<div>').text(rows[i]).html();
-                          const split = escaped.split('::');
-                          msg += '<div class="upload-row-error">' +
-                              '<div class=desc>' + split[0] + '</div>' +
-                              (split.length > 1 ? '<div class=code>' + split[1] + '</div>' : '') +
-                              '</div><br/>\n';
-                      }
-                  } else {
-                      msg += 'Critical error, see console for more description';
-                      console.log(answer);
-                  }
-
-                  stop_wait(msg, false);
-              });
-      }
-
-      function message_from_error(e) {
-        if (e.hasOwnProperty('responseJSON')) {
-          if (e.responseJSON.hasOwnProperty('msg')) {
-            return e.responseJSON.msg;
-          }
-          if (e.responseJSON.hasOwnProperty('detail')) {
-            return e.responseJSON.detail;
-          } else {
-            return e.responseJSON;
-          }
-        }
-        if (e.hasOwnProperty('responseText')) {
-          return e.responseText;
-        }
-      }
-
-      function start_train() {
-          $.ajax({
-            url: "api/train",
-            method: 'POST',
-            timeout: 500,
-            error: function(xhr, textStatus, thrownError) {
-              if (textStatus === 'timeout') {
-                location.reload();
-              }
-              else {
-                alert(message_from_error(xhr));
-              }
-            },
-            success: function(res) {
-              location.reload();
-            }
-          })
-      }
-
-      function start_predictions() {
-          $.ajax({
-            url: "api/predictions",
-            method: 'POST',
-            error: function(xhr, textStatus, thrownError) {
-              alert(message_from_error(xhr));
-            }
-          });
+    function addMlBackend() {
+      var ml_backend = document.getElementById("ml_backend_url").value;
+      $.ajax({
+        url: "api/project/",
+        data: JSON.stringify({ml_backend: ml_backend}),
+        type: "patch",
+        dataType: "json",
+        contentType: "application/json; charset=utf-8",
+        success: function (response) {
           location.reload();
-          return false;
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          alert(message_from_response(xhr));
+        }
+      });
+    }
+
+
+    $('#holder').on('click', function () {
+      $('#file-input').trigger('click');
+    });
+
+    // drag & drop files
+    $(document).ready(function () {
+      $('.accordion').accordion();
+
+      var holder = $('#holder');
+      holder.on('drop', function (e) {
+        e.preventDefault();
+        $(this).removeClass('hover');
+        const event = {target: {files: e.originalEvent.dataTransfer.files}};
+        send_data(event);
+      });
+      holder.on('dragover', function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        $(this).addClass('hover');
+      });
+      holder.on('dragleave', function (e) {
+        e.preventDefault();
+        $(this).removeClass('hover');
+      });
+    });
+
+    // show upload wait
+    function start_wait() {
+      $('.ui.page.dimmer').addClass('active');
+    }
+
+    // stop upload wait
+    function stop_wait(obj, success) {
+      if (success) {
+        window.location = '?task_id=' + obj[0];
+      } else {
+        alert(obj);
       }
 
-      function remove_ml_backend(name) {
-          console.log(name);
-          const confirmed = confirm('You are going to delete ml backend.\nWarning! this operation cannot be undone.\nPlease confirm your action.');
-          if (confirmed) {
-            $.ajax({
-              type: 'POST',
-              url: "api/remove-ml-backend",
-              data: JSON.stringify({name: name}),
-              dataType: "json",
-              contentType: "application/json; charset=utf-8",
-              success: function (response) {
-                console.log(response);
-              },
-              error: function (xhr, ajaxOptions, thrownError) {
-                alert(message_from_error(xhr));
-              }
-          });
-          }
-          location.reload();
-          return false;
+    }
+
+    // send data with tasks to server (add more data)
+    function send_data(event) {
+      if (typeof event.target.files === 'undefined') {
+        return;
       }
+
+      // show upload wait dialog
+      start_wait();
+      var fd = null;
+      var request = {};
+
+      // files from disk
+      fd = new FormData;
+      for (var i = 0; i < event.target.files.length; i++) {
+        var f = event.target.files[i];
+        var max_size_mb = {{ project.max_tasks_file_size }};
+        if (f.size / 1024.0 / 1024.0 > max_size_mb) {
+          alert('Sorry, but file size is too big (more ' + max_size_mb + ' mb).\n<br/>' +
+            'Try to split your file by chunks or zip it', false);
+          return;
+        }
+
+        // make form and attach file to it
+        fd.append(f.name, f);
+      }
+
+      request = {
+        url: "api/import",
+        data: fd,
+        method: 'POST',
+        processData: false,
+        contentType: false
+      };
+
+      $.ajax(request)
+        .done(function (answer) {
+          stop_wait(answer['new_task_ids'], true);
+        })
+        .fail(function (answer) {
+          var msg = "Error: can't upload/process file on server side. Reasons:<br><br>";
+
+          if (answer.responseJSON != null) {
+            var rows = answer.responseJSON;
+            for (var i in rows) {
+              const escaped = $('<div>').text(rows[i]).html();
+              const split = escaped.split('::');
+              msg += '<div class="upload-row-error">' +
+                '<div class=desc>' + split[0] + '</div>' +
+                (split.length > 1 ? '<div class=code>' + split[1] + '</div>' : '') +
+                '</div><br/>\n';
+            }
+          } else {
+            msg += 'Critical error, see console for more description';
+            console.log(answer);
+          }
+
+          stop_wait(msg, false);
+        });
+    }
+
+    function message_from_error(e) {
+      if (e.hasOwnProperty('responseJSON')) {
+        if (e.responseJSON.hasOwnProperty('msg')) {
+          return e.responseJSON.msg;
+        }
+        if (e.responseJSON.hasOwnProperty('detail')) {
+          return e.responseJSON.detail;
+        } else {
+          return e.responseJSON;
+        }
+      }
+      if (e.hasOwnProperty('responseText')) {
+        return e.responseText;
+      }
+    }
+
+    function start_train() {
+      $.ajax({
+        url: "api/train",
+        method: 'POST',
+        timeout: 500,
+        error: function (xhr, textStatus, thrownError) {
+          if (textStatus === 'timeout') {
+            location.reload();
+          } else {
+            alert(message_from_error(xhr));
+          }
+        },
+        success: function (res) {
+          location.reload();
+        }
+      })
+    }
+
+    function start_predictions() {
+      $.ajax({
+        url: "api/predictions",
+        method: 'POST',
+        error: function (xhr, textStatus, thrownError) {
+          alert(message_from_error(xhr));
+        },
+        success: function (res) {
+          location.reload();
+        }
+      })
+    }
+
+    function remove_ml_backend(name) {
+      console.log(name);
+      const confirmed = confirm('You are going to delete ml backend.\nWarning! this operation cannot be undone.\nPlease confirm your action.');
+      if (confirmed) {
+        $.ajax({
+          type: 'POST',
+          url: "api/remove-ml-backend",
+          data: JSON.stringify({name: name}),
+          dataType: "json",
+          contentType: "application/json; charset=utf-8",
+          success: function (response) {
+            console.log(response);
+            location.reload();
+          },
+          error: function (xhr, ajaxOptions, thrownError) {
+            alert(message_from_error(xhr));
+          }
+        })
+      }
+    }
   </script>
 
 {% endblock %}

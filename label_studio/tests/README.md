@@ -141,7 +141,6 @@ better take a look at e2e_actions code to be sure of desired action<br/>
 | `import` | filepath | * |
 |  | filename | 'lorem_ipsum.txt'|
 | `get_task` | task_id | 0 |
-| `get_all_tasks` |  |  |
 | `next_task` |  |  |
 | `delete_task` | task_id | 0 |
 | `delete_all_tasks` |  |  |

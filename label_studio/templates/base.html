@@ -6,8 +6,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta charset="utf-8"/>
 
-  <link href="//fonts.googleapis.com/css?family=Dosis:500&amp;text=LabelStudio" rel="stylesheet" type="text/css">
   <link rel="shortcut icon" href="static/favicon.ico"/>
+  <link rel="stylesheet" href="static/fonts/dosis/dosis.css">
   <link rel="stylesheet" href="static/css/reset.css">
   <link rel="stylesheet" href="static/css/main.css?v2">
   <link rel="stylesheet" href="static/css/fontall.min.css">
@@ -18,13 +18,15 @@
   <script src="static/js/js.cookie.js"></script>
   <script src="static/js/popper.min.js"></script>
   <script src="static/js/tippy-bundle.umd.min.js"></script>
-  <script src="static/js/helpers.js"></script>
+  <script src="static/js/helpers.js?v3"></script>
 
   <script src="https://browser.sentry-cdn.com/5.17.0/bundle.min.js"
           integrity="sha384-lowBFC6YTkvMIWPORr7+TERnCkZdo5ab00oH5NkFLeQUAmBTLGwJpFjF6djuxJ/5"
           crossorigin="anonymous"></script>
   <script>
-    Sentry.init({ dsn: 'https://f24f3e8da54c4a16a1ce9bef30ea9c30@o227124.ingest.sentry.io/5285295' });
+    if (typeof Sentry !== 'undefined') {  // sentry could be unavailable if no internet connection
+      Sentry.init({dsn: 'https://f24f3e8da54c4a16a1ce9bef30ea9c30@o227124.ingest.sentry.io/5285295'});
+    }
   </script>
 
   <!-- Editor CSS -->
@@ -65,17 +67,18 @@
 
     <a href="setup" class="{% if url_for(request.endpoint) == '/setup' %}active{% endif %}">Setup</a>
 
+    <span>
+      <a class="outside-links first" href="https://labelstud.io/guide/" target="_blank">Docs</a>
 
-    <a class="outside-links first" href="https://labelstud.io/guide/" target="_blank">Docs</a>
+      <a class="outside-links" href="https://github.com/heartexlabs/label-studio" target="_blank">
+        <img height="22" onerror="this.src='static/images/github.png'" src="https://static.labelstud.io/images/github.svg?sid={{ g.sid }}"/>
+      </a>
 
-    <a class="outside-links" href="https://github.com/heartexlabs/label-studio" target="_blank">
-      <img src="static/images/github.svg" height="22"/>
-    </a>
-
-    <a class="outside-links" href="https://join.slack.com/t/label-studio/shared_invite/zt-cr8b7ygm-6L45z7biEBw4HXa5A2b5pw"
-       data-tooltip="If you have found a bug or have questions ping us in Slack" data-position="bottom right"
-       target="_blank"><img src="static/images/slack.png" height="22"/>
-    </a>
+      <a class="outside-links last" href="https://join.slack.com/t/label-studio/shared_invite/zt-cr8b7ygm-6L45z7biEBw4HXa5A2b5pw"
+         data-tooltip="If you have found a bug or have questions ping us in Slack" data-position="bottom right"
+         target="_blank"><img src="static/images/slack.png" height="22"/>
+      </a>
+    </span>
 
   </ul>
 </div>

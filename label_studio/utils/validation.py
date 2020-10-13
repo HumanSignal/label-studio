@@ -22,7 +22,8 @@ _DATA_TYPES = {
     'HyperText': [str],
     'Image': [str],
     'List': [list],
-    'Dialog': [list]
+    'Dialog': [list],
+    'Table': [dict]
 }
 logger = logging.getLogger(__name__)
 settings = Settings()

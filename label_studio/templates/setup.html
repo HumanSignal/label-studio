@@ -142,6 +142,9 @@
 <script>
   var confirm_already_shown = false;
   var iframeTimer = null;
+  var edit_count = 0;
+  var current_template_name = 0;
+  var current_template_category = 0;
 
   // process create request
   function process_request(result) {
@@ -191,6 +194,9 @@
 
     $('.use-template').on('click', function () {
       var $el = $(this);
+      edit_count = 0;
+      current_template_name = $el.text();
+      current_template_category = $($el.parent().parent().find('i')[0]).attr('title');
 
       if (labelEditor.getValue() !== '' && !confirm_already_shown) {
         var dialog = $('#confirm-config-template-dialog');
@@ -315,10 +321,16 @@
 
     function show_render_editor(editor) {
       let config = labelEditor.getValue();
+      edit_count++;
       $.ajax({
         url: 'api/render-label-studio',
         method: 'POST',
-        data: {config: config},
+        data: {
+          config: config,
+          current_template_name : current_template_name,
+          current_template_category: current_template_category,
+          edit_count: edit_count
+        },
         success: editor_iframe,
         error: function () {
           $('#preload-editor').show();

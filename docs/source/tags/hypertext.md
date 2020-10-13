@@ -18,5 +18,7 @@ HyperText tag shows an HyperText markup that can be labeled
 
 ### Example
 ```html
-<HyperText name="text-1" value="$text" />
+<View>
+  <HyperText name="text-1" value="$text" />
+</View>
 ```

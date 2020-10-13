@@ -132,6 +132,22 @@ def get_app_version():
 
 
 def parse_config(config_string):
+    """
+    :param config_string: Label config string
+    :return: structured config of the form:
+    {
+        "<ControlTag>.name": {
+            "type": "ControlTag",
+            "to_name": ["<ObjectTag1>.name", "<ObjectTag2>.name"],
+            "inputs: [
+                {"type": "ObjectTag1", "value": "<ObjectTag1>.value"},
+                {"type": "ObjectTag2", "value": "<ObjectTag2>.value"}
+            ],
+            "labels": ["Label1", "Label2", "Label3"] // taken from "alias" if exists or "value"
+    }
+    """
+    if not config_string:
+        return {}
 
     LABEL_TAGS = {'Label', 'Choice'}
     NOT_CONTROL_TAGS = {'Filter',}
@@ -185,8 +201,12 @@ def parse_config(config_string):
     return outputs
 
 
-def iter_config_templates():
-    templates_dir = find_dir('examples')
+def iter_config_templates(templates_dir=None):
+    try:
+        templates_dir = find_dir('examples') if templates_dir is None else find_dir(templates_dir)
+    except IOError:
+        pass  # use templates_dir as is
+
     for d in os.listdir(templates_dir):
         # check xml config file exists
         path = os.path.join(templates_dir, d, 'config.xml')
@@ -195,13 +215,14 @@ def iter_config_templates():
         yield path
 
 
-def get_config_templates():
+def get_config_templates(config):
     """ Get label config templates from directory (as usual 'examples' directory)
     """
     from collections import defaultdict, OrderedDict
     templates = defaultdict(lambda: defaultdict(list))
 
-    for i, path in enumerate(iter_config_templates()):
+    template_dir = config.get('templates_dir', 'examples')
+    for i, path in enumerate(iter_config_templates(template_dir)):
         # open and check xml
         code = open(path).read()
         try:
@@ -330,7 +351,7 @@ def compare_with_none(field, inverted):
 
 
 def check_port_in_use(host, port):
-    logger.info('Checking if host & port is available', host + ':' + str(port))
+    logger.info('Checking if host & port is available :: ' + str(host) + ':' + str(port))
     host = host.replace('https://', '').replace('http://', '')
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         return s.connect_ex((host, port)) == 0

@@ -15,8 +15,7 @@ from datetime import datetime
 from label_studio_converter import Converter
 
 from label_studio.utils.misc import (
-    config_line_stripped, config_comments_free, parse_config, timestamp_now, timestamp_to_local_datetime)
-from label_studio.utils.analytics import Analytics
+    config_line_stripped, config_comments_free, parse_config, timestamp_now)
 from label_studio.utils.models import ProjectObj, MLBackend
 from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.io import find_file, delete_dir_content, json_load
@@ -40,10 +39,11 @@ class Project(object):
         self.config = config
         self.name = name
         self.path = os.path.join(root_dir, self.name)
+        self.ml_backends = []
 
         self.on_boarding = {}
         self.context = context or {}
-
+        self.project_obj = None
         self.source_storage = None
         self.target_storage = None
         self.create_storages()
@@ -53,15 +53,9 @@ class Project(object):
         self.derived_input_schema, self.derived_output_schema = None, None
 
         self.load_label_config()
+        self.load_project_and_ml_backends()
         self.update_derived_input_schema()
         self.update_derived_output_schema()
-
-        self.analytics = None
-        self.load_analytics()
-
-        self.project_obj = None
-        self.ml_backends = []
-        self.load_project_ml_backend()
 
         self.converter = None
         self.load_converter()
@@ -182,13 +176,6 @@ class Project(object):
                 self._update_derived_output_schema(completion)
         logger.debug('Derived output schema: ' + str(self.derived_output_schema))
 
-    def load_analytics(self):
-        collect_analytics = os.getenv('collect_analytics')
-        if collect_analytics is None:
-            collect_analytics = self.config.get('collect_analytics', True)
-        collect_analytics = bool(int(collect_analytics))
-        self.analytics = Analytics(self.label_config_line, collect_analytics, self.name, self.context)
-
     def add_ml_backend(self, params, raise_on_error=True):
         ml_backend = MLBackend.from_params(params)
         if not ml_backend.connected and raise_on_error:
@@ -210,7 +197,7 @@ class Project(object):
         self.config['ml_backends'] = config_params
         self._save_config()
 
-    def load_project_ml_backend(self):
+    def load_project_and_ml_backends(self):
         # configure project
         self.project_obj = ProjectObj(label_config=self.label_config_line, label_config_full=self.label_config_full)
 
@@ -284,8 +271,7 @@ class Project(object):
         # reload everything that depends on label config
         self.load_label_config()
         self.update_derived_output_schema()
-        self.load_analytics()
-        self.load_project_ml_backend()
+        self.load_project_and_ml_backends()
         self.load_converter()
 
         # save project config state
@@ -407,7 +393,7 @@ class Project(object):
         sampling = self.config.get('sampling', 'sequential')
 
         # Tasks are ordered ascending by their "id" fields. This is default mode.
-        task_iter = filter(lambda i: i not in completed_tasks_ids, self.source_storage.ids())
+        task_iter = filter(lambda i: i not in completed_tasks_ids, sorted(self.source_storage.ids()))
         if sampling == 'sequential':
             task_id = next(task_iter, None)
             if task_id is not None:
@@ -471,11 +457,9 @@ class Project(object):
         for _, data in self.target_storage.items():
             id = data['id']
             try:
-                latest_time = max(data['completions'], key=itemgetter('created_at'))['created_at']
+                times[id] = max(data['completions'], key=itemgetter('created_at'))['created_at']
             except Exception as exc:
                 times[id] = 'undefined'
-            else:
-                times[id] = timestamp_to_local_datetime(latest_time).strftime('%Y-%m-%d %H:%M:%S')
         return times
 
     def get_skipped_status(self):
@@ -501,7 +485,7 @@ class Project(object):
         :return: json dict with completion
         """
         data = self.target_storage.get(task_id)
-        logger.debug('Get task ' + str(task_id) + ' from target storage: ' + str(data))
+        logger.debug('Get task ' + str(task_id) + ' from target storage')
 
         if data:
             logger.debug('Get predictions ' + str(task_id) + ' from source storage')
@@ -525,6 +509,8 @@ class Project(object):
         else:
             task = deepcopy(task)
 
+        # remove possible stored predictions
+        task.pop('predictions', None)
         # update old completion
         updated = False
         if 'id' in completion:
@@ -552,15 +538,22 @@ class Project(object):
         return completion['id']
 
     def delete_completion(self, task_id):
-        """ Delete completion from disk
+        """ Delete completion
 
         :param task_id: task id
         """
         self.target_storage.remove(task_id)
         self.update_derived_output_schema()
 
+    def delete_all_completions(self):
+        """ Delete all completions from project
+        """
+        self.target_storage.remove_all()
+        self.update_derived_output_schema()
+
     def make_predictions(self, task):
         task = deepcopy(task)
+        stored_predictions = task.get('predictions')
         task['predictions'] = []
         try:
             for ml_backend in self.ml_backends:
@@ -572,6 +565,8 @@ class Project(object):
                 task['predictions'].append(predictions)
         except Exception as exc:
             logger.debug(exc, exc_info=True)
+        if not task['predictions'] and stored_predictions:
+            task['predictions'] = stored_predictions
         return task
 
     def train(self):

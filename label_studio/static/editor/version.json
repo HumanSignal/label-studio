@@ -1,6 +1,6 @@
 {
-  "message": "Fix ids for Regions tree when copy prediction",
-  "commit": "fd1e7cad9fdab9ca3c55691b2d0ee23905d51d59",
-  "branch": "master",
-  "date": "2020-08-12T20:30:46Z"
+  "message": "Fix deserialized Brushes placed to (0; 0)",
+  "commit": "0313b7faa18146d933650aa06241fc0bcce38e71",
+  "branch": "fix/post-0.7.5",
+  "date": "2020-10-13T20:50:50Z"
 }

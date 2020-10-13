@@ -20,6 +20,7 @@ Label tag represents a single label
 | [size] | <code>string</code> | <code>&quot;medium&quot;</code> | size of text in the label |
 | [background] | <code>string</code> |  | background color of an active label |
 | [selectedColor] | <code>string</code> |  | color of text in an active label |
+| [granularity] | <code>symbol</code> \| <code>word</code> |  | control per symbol or word selection (only for Text) |
 
 ### Example
 ```html

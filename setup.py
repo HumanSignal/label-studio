@@ -4,7 +4,7 @@ import label_studio
 print('Label Studio', label_studio.__version__)
 
 # Readme
-with open('README.md', 'r') as f:
+with open('README.md', 'r', encoding='utf-8') as f:
     long_description = f.read()
 
 # Module dependencies
