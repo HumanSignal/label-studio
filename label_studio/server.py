@@ -494,6 +494,12 @@ def api_import():
     new_tasks = Tasks().from_list_of_dicts(new_tasks, max_id_in_old_tasks + 1)
     g.project.source_storage.set_many(new_tasks.keys(), new_tasks.values())
 
+    # if tasks have completion - we need to implicitly save it to target
+    for i in g.project.source_storage.ids():
+        task = g.project.source_storage.get(i)
+        for completion in task.get('completions', []):
+            g.project.save_completion(int(i), completion)
+
     # update schemas based on newly uploaded tasks
     g.project.update_derived_input_schema()
     g.project.update_derived_output_schema()
