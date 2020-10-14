@@ -101,7 +101,7 @@ class Analytics(object):
         payload['response'] = r
 
     def _exclude_endpoint(self, request):
-        if request.endpoint in ('send_static', 'get_data_file'):
+        if request.endpoint in ('static', 'send_static', 'get_data_file'):
             return True
         if request.args.get('polling', False):
             return True

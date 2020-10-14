@@ -134,7 +134,8 @@ def app_before_request_callback():
 
 @app.after_request
 def app_after_request_callback(response):
-    g.analytics.send(request, session, response)
+    if hasattr(g, 'analytics'):
+        g.analytics.send(request, session, response)
     return response
 
 
