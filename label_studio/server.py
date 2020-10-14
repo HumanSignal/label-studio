@@ -918,6 +918,15 @@ def get_data_file(filename):
     return flask.send_from_directory(directory, filename, as_attachment=True)
 
 
+@app.route('/api/health', methods=['GET'])
+@requires_auth
+@exception_treatment
+def health():
+    """ Health check
+    """
+    return make_response('{"status": "up"}', 200)
+
+
 def str2datetime(timestamp_str):
     try:
         ts = int(timestamp_str)
