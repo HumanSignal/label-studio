@@ -6,3 +6,4 @@ include label_studio/utils/schema/*.json
 include label_studio/logger.json
 include label_studio/config.json
 include label_studio/ml/default_configs/*
+include requirements.txt

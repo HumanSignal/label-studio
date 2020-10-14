@@ -1,6 +1,6 @@
 {
-  "message": "Fix BrushRegion relations creation",
-  "commit": "e7739d8d254b2f4de9f4d921b7db05e49a32e4c7",
-  "branch": "fix/brush-region-relations",
-  "date": "2020-10-14T15:12:54Z"
+  "message": "Merge pull request #144 from heartexlabs/fix/post-0.7.5\n\nFixes after 0.7.5 release",
+  "commit": "962834579eee22595375090a993d7a54aeed9649",
+  "branch": "master",
+  "date": "2020-10-14T16:39:13Z"
 }
