@@ -1,0 +1,19 @@
+<!-- {"title": "Time series segmentation", "category": "other", "complexity": "basic", "order": "!"} -->
+<View>
+  <Header value="Select regions"/>
+
+  <TimeSeriesLabels name="label" toName="ts">
+    <Label value="Run"/>
+    <Label value="Walk"/>
+  </TimeSeriesLabels>
+
+  <TimeSeries name="ts" valueType="url" value="$csv"
+              timeValue="#time" overviewChannels="one">
+    <TimeSeriesChannel value="#one" units="miles" showgrid="true"
+                       unitsFormat=",.1f" strokeColor="#1f77b4"
+                       displayName="Sensor 1" />
+    <TimeSeriesChannel value="#two" units="miles" showgrid="true"
+                       unitsFormat=",.1f" strokeColor="#ff7f0e"
+                       displayName="Sensor 2" />
+  </TimeSeries>
+</View>

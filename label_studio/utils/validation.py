@@ -24,7 +24,8 @@ _DATA_TYPES = {
     'List': [list],
     'Dialog': [list],
     'Table': [dict],
-    'TimeSeries': [dict]
+    'TimeSeries': [dict, list, str],
+    'TimeSeriesChannel': [dict, list, str]
 }
 logger = logging.getLogger(__name__)
 settings = Settings()
