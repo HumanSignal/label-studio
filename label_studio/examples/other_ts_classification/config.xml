@@ -4,11 +4,15 @@
 
   <TimeSeries name="ts" valueType="url" value="$csv"
               timeValue="#time" overviewChannels="one">
-    <TimeSeriesChannel value="#one" units="miles" showgrid="true"
-                       unitsFormat=",.1f" strokeColor="#1f77b4"
+    <TimeSeriesChannel value="#one"
+                       units="miles"
+                       unitsFormat=",.1f"
+                       strokeColor="#1f77b4"
                        displayName="Sensor 1" />
-    <TimeSeriesChannel value="#two" units="miles" showgrid="true"
-                       unitsFormat=",.1f" strokeColor="#ff7f0e"
+    <TimeSeriesChannel value="#two"
+                       units="miles"
+                       unitsFormat=",.1f"
+                       strokeColor="#ff7f0e"
                        displayName="Sensor 2" />
   </TimeSeries>
 
