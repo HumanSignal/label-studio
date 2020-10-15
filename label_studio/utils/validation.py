@@ -23,7 +23,8 @@ _DATA_TYPES = {
     'Image': [str],
     'List': [list],
     'Dialog': [list],
-    'Table': [dict]
+    'Table': [dict],
+    'TimeSeries': [dict]
 }
 logger = logging.getLogger(__name__)
 settings = Settings()
