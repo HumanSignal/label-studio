@@ -124,7 +124,7 @@ def json_filter(s):
 
 @app.before_request
 def app_before_request_callback():
-    if request.endpoint in ('static', 'send_static', 'get_data_file'):
+    if request.endpoint in ('static', 'send_static'):
         return
 
     def prepare_globals():

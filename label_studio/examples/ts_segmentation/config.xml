@@ -1,6 +1,8 @@
-<!-- {"title": "Time series segmentation", "category": "other", "complexity": "basic", "order": "!"} -->
+<!-- {"title": "Segmentation CSV file", "category": "time-series", "complexity": "basic"} -->
 <View>
   <Header value="Select regions"/>
+    <Header value="Data is loaded from CSV with header"
+          style="font-size:1.2em; font-weight: normal"/>
 
   <TimeSeriesLabels name="label" toName="ts">
     <Label value="Run"/>

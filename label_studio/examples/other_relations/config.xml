@@ -1,4 +1,4 @@
-<!-- {"title": "Relations among entities", "category": "other", "complexity": "basic"} -->
+<!-- {"title": "Relations among entities", "category": "other2", "complexity": "advanced"} -->
 <View>
   <Header value="Note: To manage relations you need Label Studio entity panel to be shown" />
 

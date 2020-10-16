@@ -1,0 +1,21 @@
+<!-- {"title": "Time series classification", "category": "time-series", "complexity": "basic", "order": "!"} -->
+<View>
+  <Header value="Time series classification" />
+  <Header value="Data is loaded from JSON"
+          style="font-size:1.2em; font-weight: normal"/>
+
+  <TimeSeries name="ts" value="$ts"
+              timeValue="#time">
+    <TimeSeriesChannel value="#one"
+                       strokeColor="#1f77b4" />
+    <TimeSeriesChannel value="#two"
+                       strokeColor="#ff7f0e" />
+  </TimeSeries>
+
+  <Choices name="sentiment" toName="ts" choice="single"
+           showInline="true">
+    <Choice value="Positive"/>
+    <Choice value="Negative"/>
+    <Choice value="Neutral"/>
+  </Choices>
+</View>
