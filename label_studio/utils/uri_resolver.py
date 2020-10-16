@@ -33,12 +33,32 @@ def resolve_task_data_uri(task, **kwargs):
     return task
 
 
+def _get_s3_params_from_project(project):
+    params = {}
+    if not hasattr(project, 'source_storage'):
+        return params
+    storage = project.source_storage
+    if hasattr(storage, 'aws_access_key_id'):
+        params['aws_access_key_id'] = storage.aws_access_key_id
+    if hasattr(storage, 'aws_secret_access_key'):
+        params['aws_secret_access_key'] = storage.aws_secret_access_key
+    if hasattr(storage, 'aws_session_token'):
+        params['aws_session_token'] = storage.aws_session_token
+    if hasattr(storage, 'region'):
+        params['region'] = storage.region
+    return params
+
+
 def resolve_s3(url, s3_client=None, **kwargs):
     r = urlparse(url, allow_fragments=False)
     bucket_name = r.netloc
     key = r.path.lstrip('/')
     if s3_client is None:
-        s3_client, _ = get_client_and_resource(**kwargs)
+        if 'project' in kwargs:
+            params = _get_s3_params_from_project(kwargs['project'])
+        else:
+            params = kwargs
+        s3_client, _ = get_client_and_resource(**params)
     try:
         presigned_url = s3_client.generate_presigned_url(
             ClientMethod='get_object',
