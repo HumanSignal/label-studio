@@ -191,7 +191,7 @@ def labeling_page():
         task_id = int(task_id)
         # Task explore mode
         task_data = g.project.get_task_with_completions(task_id) or g.project.source_storage.get(task_id)
-        task_data = resolve_task_data_uri(task_data)
+        task_data = resolve_task_data_uri(task_data, project=g.project)
 
         if g.project.ml_backends_connected:
             task_data = g.project.make_predictions(task_data)
@@ -551,7 +551,7 @@ def api_generate_next_task():
         # no tasks found
         return make_response('', 404)
 
-    task = resolve_task_data_uri(task)
+    task = resolve_task_data_uri(task, project=g.project)
 
     # collect prediction from multiple ml backends
     if g.project.ml_backends_connected:
@@ -686,7 +686,7 @@ def api_all_tasks():
         else:
             task['completed_at'] = item['completed_at']
             task['has_skipped_completions'] = item['has_skipped_completions']
-        task = resolve_task_data_uri(task)
+        task = resolve_task_data_uri(task, project=g.project)
         tasks.append(task)
 
     return make_response(jsonify(tasks), 200)
@@ -702,7 +702,7 @@ def api_tasks(task_id):
     task_id = int(task_id)
     if request.method == 'GET':
         task_data = g.project.get_task_with_completions(task_id) or g.project.source_storage.get(task_id)
-        task_data = resolve_task_data_uri(task_data)
+        task_data = resolve_task_data_uri(task_data, project=g.project)
 
         if g.project.ml_backends_connected:
             task_data = g.project.make_predictions(task_data)
