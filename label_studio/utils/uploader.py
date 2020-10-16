@@ -30,6 +30,15 @@ logger = logging.getLogger(__name__)
 csv.field_size_limit(131072 * 10)
 
 
+<<<<<<< HEAD
+=======
+def is_time_series_only(project):
+    """ Check whether project config has only one TimeSeries object
+    """
+    return len(project.data_types) == 1 and project.data_types.values()[0] == 'TimeSeries'
+
+
+>>>>>>> d1fbf88... Correct exception treatment with app_before_request_callback
 def tasks_from_file(filename, file, project):
     format = None
     try:
