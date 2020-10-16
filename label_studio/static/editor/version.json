@@ -1,6 +1,6 @@
 {
-  "message": "Merge pull request #18 from heartexlabs/feature/out-of-the-box\n\nLimit transform and drag to keep regions in stage",
-  "commit": "d5d81afc4d08e14a965708fcff4b9d500700bfc0",
-  "branch": "master",
-  "date": "2020-10-05T16:26:28Z"
+  "message": "Fix and reduce inject usages",
+  "commit": "0fdc0854073a85c33870ee8cb52963403ca1af68",
+  "branch": "feature/ts",
+  "date": "2020-10-16T14:23:01Z"
 }
