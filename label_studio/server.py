@@ -124,15 +124,26 @@ def json_filter(s):
 
 @app.before_request
 def app_before_request_callback():
-    # setup session cookie
-    if 'session_id' not in session:
-        session['session_id'] = str(uuid4())
-    g.project = project_get_or_create()
-    g.analytics = Analytics(input_args, g.project)
-    g.sid = g.analytics.server_id
+    if request.endpoint in ('static', 'send_static', 'get_data_file'):
+        return
+
+    def prepare_globals():
+        # setup session cookie
+        if 'session_id' not in session:
+            session['session_id'] = str(uuid4())
+        g.project = project_get_or_create()
+        g.analytics = Analytics(input_args, g.project)
+        g.sid = g.analytics.server_id
+
+    # show different exception pages for api and other endpoints
+    if request.path.startswith('/api'):
+        return exception_treatment(prepare_globals)()
+    else:
+        return exception_treatment_page(prepare_globals)()
 
 
 @app.after_request
+@exception_treatment
 def app_after_request_callback(response):
     if hasattr(g, 'analytics'):
         g.analytics.send(request, session, response)

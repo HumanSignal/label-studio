@@ -33,7 +33,7 @@ csv.field_size_limit(131072 * 10)
 def is_time_series_only(project):
     """ Check whether project config has only one TimeSeries object
     """
-    return len(project.data_types) == 1 #and project.data_types.values()[0] == 'TimeSeries'
+    return len(project.data_types) == 1 and project.data_types.values()[0] == 'TimeSeries'
 
 
 def tasks_from_file(filename, file, project):
