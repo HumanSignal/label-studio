@@ -62,7 +62,7 @@ Time Series analysis is widely used in medical and robotics areas.
 
   `<TimeSeriesLabels>` is linked with `<TimeSeries>` via toName field.  
   
-  `<TimeSeries>` has an attribute `valueType="url"`. This means that LS will store only links to CSV files in LS tasks. Read more about valueType [below](/blog/release-080-time-series.html#JSON) and LS [tasks](guide/tasks.html).
+  `<TimeSeries>` has an attribute `valueType="url"`. This means that LS will store only links to CSV files in LS tasks. Read more about valueType [below](/blog/release-080-time-series.html#JSON) and LS [tasks](/guide/tasks.html).
   
   > Pay attention to `<TimeSeries valueTime="#time">`, `<TimeSeriesChannel>` with `value="#one"` and `value="#two"`: `time`, `one`, `two` are nested columns relative to `$csv`, so we use **`#`** characters for them. 
 
@@ -95,7 +95,7 @@ TSV format is very similar to CSV but the separator is tab (`\t`) instead of com
 
 ### Headless CSV & TSV
 
-The main difference for the headless CSV/TSV usage is another way to name `<TimeSeriesChannel>` values. Since the file has no header and nothing is known about the column names you should use names `colunm#N`, where `N` is a number of column to use in channel. The same is true for `timeValue` from `<TimeSeries>` tag. 
+The main difference for the headless CSV/TSV usage is another way to name `<TimeSeriesChannel>` values. Since the file has no header and nothing is known about the column names you should use names `colunm#N`, where `N` is a number of the column to use in the channel. The same is true for `timeValue` from `<TimeSeries>` tag. 
  
 
 ### JSON

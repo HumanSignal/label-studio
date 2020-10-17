@@ -54,7 +54,7 @@ def generate_sample_task_without_check(label_config, mode='upload'):
     parent = xml.findall('.//*[@value]')  # take all tags with value attribute
     for p in parent:
         value = p.get('value')
-        value_type = p.get('valueType', 'text')
+        value_type = p.get('valueType', p.get('valuetype', None))
 
         # process List
         if p.tag == 'List':
