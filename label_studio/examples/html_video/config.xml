@@ -1,4 +1,4 @@
-<!-- {"title": "Video classifier", "category": "other2", "complexity": "advanced"} -->
+<!-- {"title": "Video classifier", "category": "html", "complexity": "basic"} -->
 <View>
   <HyperText name="video" value="$video"/>
   <Choices name="type" toName="video" choice="single-radio">

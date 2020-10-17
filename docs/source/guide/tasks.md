@@ -123,6 +123,8 @@ this is a second task,456
 
 > Note: Currently CSV / TSV files could be imported only in UI.
 
+> Note: If your config has one TimeSeries instance then CSV/TSV will be interpreted as time series data while import. This CSV/TSV will be hosted as a resource file. The LS will create a task automatically with a proper link to the uploaded CSV/TSV.
+
 ### Plain text
 
 ```bash

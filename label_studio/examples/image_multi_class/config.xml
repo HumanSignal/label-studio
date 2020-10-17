@@ -1,4 +1,4 @@
-<!-- {"title": "Multi-image classification", "category": "other", "complexity": "advanced"} -->
+<!-- {"title": "Multi-image classification", "category": "image", "complexity": "basic", "order": "z"} -->
 <View>
   <Header value="Please select everything you see on the image" />
 

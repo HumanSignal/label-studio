@@ -9,7 +9,7 @@
     <Label value="Walk"/>
   </TimeSeriesLabels>
 
-  <TimeSeries name="ts" valueType="url" value="$csv"
+  <TimeSeries name="ts" valueType="url" value="$headlessCsv"
               timeValue="#column#0" overviewChannels="one">
     <TimeSeriesChannel value="#column#1"
                        units="miles"
