@@ -2,7 +2,6 @@
 title: Image Ellipse
 type: templates
 order: 104
-is_new: t
 ---
 
 Put ellipses on the image
