@@ -3,7 +3,7 @@
   <i class="close icon"></i>
 
   <!-- Label config -->
-  <div class="ui accordion">
+  <div class="ui accordion" id="first-help">
     <div class="active title"><i class="dropdown icon"></i>Labeling config help</div>
     <div class="active content" style="margin-top:0; margin-left: 10px;">
       <ul class="ui list">
@@ -129,11 +129,17 @@
   $('.ui .accordion').accordion({collapsible: true});
 
   // project management state save to/load from cookies
-  $('#project-management').find('.title').on('click', function(event) {
-    Cookies.set('project-management-state', !$(event.target).hasClass('active'))
-  });
-  if (Cookies.get('project-management-state', false) === 'true') {
-    $('#project-management').find('.title').addClass('active');
-    $('#project-management').find('.content').addClass('active');
+  function process_accordion_state(element_id) {
+    var element = $(element_id);
+    element.find('.title').on('click', function (event) {
+      Cookies.set(element_id + '-state', !$(event.target).hasClass('active'))
+    });
+    if (Cookies.get(element_id + '-state', false) === 'true') {
+      $(element_id).find('.title').addClass('active');
+      $(element_id).find('.content').addClass('active');
+    }
   }
+
+  process_accordion_state('#project-management');
+  process_accordion_state('#first-help');
 </script>
