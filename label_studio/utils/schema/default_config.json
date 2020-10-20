@@ -1,5 +1,6 @@
 {
   "title": "Label Studio",
+  "description": "default",
   "protocol": "http://",
   "host": "0.0.0.0",
   "port": 8080,
@@ -15,5 +16,6 @@
   },
   "sampling": "sequential",
   "ml_backends": [],
-  "task_page_auto_update_timer": 10000
+  "task_page_auto_update_timer": 10000,
+  "show_project_links_in_multisession": true
 }

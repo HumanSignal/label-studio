@@ -256,8 +256,20 @@ def tasks_page():
 def setup_page():
     """ Setup label config
     """
-    templates = get_config_templates(g.project.config)
     input_values = {}
+    project = g.project
+    project_ids = g.project.get_sibling_projects(g.project.path)
+    g.project.description = project.get_config(project.name, input_args).get('description')
+
+    if project.config.get("show_project_links_in_multisession", False):
+        project_names = [os.path.join(os.path.dirname(project.name), id) for id in project_ids]
+        project_desc = [project.get_config(name, input_args).get('description') for name in project_names]
+        project_ids = dict(zip(project_ids, project_desc))
+    else:
+        # FIXME: temporary
+        project_ids = {}
+
+    templates = get_config_templates(g.project.config)
     return flask.render_template(
         'setup.html',
         config=g.project.config,
@@ -265,7 +277,8 @@ def setup_page():
         label_config_full=g.project.label_config_full,
         templates=templates,
         input_values=input_values,
-        multi_session=input_args.command == 'start-multi-session'
+        multi_session=input_args.command == 'start-multi-session',
+        project_ids=project_ids
     )
 
 
@@ -579,6 +592,7 @@ def api_project():
     code = 200
 
     if request.method == 'POST' and request.args.get('new', False):
+        input_args.project_desc = request.args.get('desc')
         g.project = project_get_or_create(multi_session_force_recreate=True)
         code = 201
     elif request.method == 'PATCH':
@@ -927,6 +941,26 @@ def get_data_file(filename):
                                 'Use "allow_serving_local_files": true config option to enable local serving')
     directory = request.args.get('d')
     return flask.send_from_directory(directory, filename, as_attachment=True)
+
+@app.route('/api/project-switch', methods=['GET', 'POST'])
+@requires_auth
+@exception_treatment
+def api_project_switch():
+    """ Switch projects """
+
+    if request.args.get('uuid') is None:
+        return make_response("Not a valid UUID", 400)
+
+    uuid = request.args.get('uuid')
+    session['project'] = uuid
+    code = 200
+
+    output = g.project.serialize()
+    output['multi_session_mode'] = input_args.command == 'start-multi-session'
+    if request.method == 'GET':
+        return redirect('../setup')
+    else:
+        return make_response(jsonify(output), code)
 
 
 @app.route('/api/health', methods=['GET'])

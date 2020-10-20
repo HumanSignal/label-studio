@@ -39,6 +39,7 @@ Or you can even use embeds from Youtube:
   </Choices>
   <HyperText name="video" value="$html"></HyperText>
 </View>
+<!-- { "html": "<iframe src='https://www.youtube.com/embed/mf9TKj0NuTQ'></iframe>" } -->
 ```
 
 Note: preview for this config uses another sample input data, so it won't display the proper task with the video.  
