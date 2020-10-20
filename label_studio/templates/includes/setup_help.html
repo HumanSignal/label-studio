@@ -95,8 +95,7 @@
 
 <script>
   function new_project() {
-    var project_desc = prompt("You will lose ALL YOUR DATA,\nthis action CAN'T BE UNDONE.\n" +
-      "Are you sure?\n\n" +
+    var project_desc = prompt("Do you want to create a new project?\n\n" +
       "If yes, please enter a new project title", "default");
     if (project_desc) {
       var request = new XMLHttpRequest();
@@ -109,15 +108,12 @@
   }
 
   function switch_project(uuid, desc) {
-    var yes = confirm('Please confirm you\'d like to switch to project "' + desc + '"');
-    if (yes) {
-      var request = new XMLHttpRequest();
-      request.open("POST", '/api/project-switch?uuid=' + uuid, true);
-      request.onload = function () {
-        window.location = "/setup"
-      };
-      request.send(null);
-    }
+    var request = new XMLHttpRequest();
+    request.open("POST", '/api/project-switch?uuid=' + uuid, true);
+    request.onload = function () {
+      window.location = "/setup"
+    };
+    request.send(null);
   }
 
   function copy_share_link(uuid) {
