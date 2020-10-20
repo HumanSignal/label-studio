@@ -20,9 +20,9 @@
   </div>
 
   {% if multi_session %}
-    <div class="ui accordion">
-      <div class="active title"><i class="dropdown icon"></i>Project management</div>
-      <div class="active content" style="margin-left: 25px; margin-top:0px">
+    <div class="ui accordion" id="project-management">
+      <div class="title"><i class="dropdown icon"></i>Project management</div>
+      <div class="content collapse" style="margin-left: 25px; margin-top:0px">
         <p>You can create multiple projects within one browser session.
           If you don't want to loose your project, just save the shared link in the safety place.
           If you want to share the project with somebody, send a shared link.</p>
@@ -127,4 +127,13 @@
   }
 
   $('.ui .accordion').accordion({collapsible: true});
+
+  // project management state save to/load from cookies
+  $('#project-management').find('.title').on('click', function(event) {
+    Cookies.set('project-management-state', !$(event.target).hasClass('active'))
+  });
+  if (Cookies.get('project-management-state', false) === 'true') {
+    $('#project-management').find('.title').addClass('active');
+    $('#project-management').find('.content').addClass('active');
+  }
 </script>
