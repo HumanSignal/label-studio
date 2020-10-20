@@ -26,6 +26,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
+        sudo apt-get install libxml2 libxslt
         python -m pip install --upgrade pip setuptools
         pip install -e .
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi

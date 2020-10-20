@@ -1,374 +1,343 @@
-import os
-import logging
-import time
-import json
-import redis
-import attr
-import io
+{% extends 'base.html' %}
+{% block body %}
+  <style>
+    #error-log-traceback {
+      font-size: 0.9em;
+    }
+  </style>
 
-from abc import ABC, abstractmethod
-from datetime import datetime
-from itertools import tee
-from redis import Redis
-from rq import Queue, get_current_job
-from rq.registry import StartedJobRegistry, FinishedJobRegistry, FailedJobRegistry
-from rq.job import Job
+  <div class="ui container">
+    <div class="wrapper">
 
-from label_studio.utils.misc import parse_config
+      <div class="ui action input fluid">
+        <input id="ml_backend_url" type="text" placeholder="http://localhost:9090">
+        <button class="ui positive button" onclick="addMlBackend()">Add Backend</button>
+      </div>
+      <div class="ui divider hidden"></div>
+      <div class="ui three column grid">
 
+        <div class="sixteen wide column">
+          <div class="ui cards">
+            {% for ml_backend in ml_backends %}
 
-logger = logging.getLogger(__name__)
+              <div class="ui card">
+                <div class="content">
+                  <button class="upper-right no-border" onclick='remove_ml_backend({{ ml_backend.model_name|tojson }})'>
+                    <i class="x icon"></i></button>
 
+                  <div class="header" style="font-weight: lighter; color: #333">{{ ml_backend.dir }}
+                    > {{ ml_backend.model_name }}</div>
+                  <div class="meta">
+                    <span class="info">{{ ml_backend.url }}</span>
+                  </div>
+                  <div class="description">
+                    {% if ml_backend.model_version %}
+                      Model version: {{ ml_backend.model_version | str2datetime }}
+                    {% else %}
+                      Model is not trained.
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="extra content">
+                  <div>
+                    {% if ml_backend.is_error %}
+                      <a class="log-link"
+                         onclick="show_logs(`{{ ml_backend.error.detail }}`, `{{ ml_backend.error.result.traceback }}`, {{ ml_backend.error.status }})">
+                        <i class="x icon" style="color: #ff2733"></i>
+                        Error. Check logs
+                      </a>
+                    {% elif not ml_backend.is_connected %}
+                      <i class="toggle off wide icon"></i>
+                      Disconnected
+                    {% elif ml_backend.is_error %}
 
-@attr.s
-class ModelWrapper(object):
-    model = attr.ib()
-    model_version = attr.ib()
-    is_training = attr.attrib(default=False)
+                    {% elif ml_backend.training_in_progress %}
+                      <i class="hourglass half wide icon" style="color: #da671b"></i>
+                      Training in progress...
+                    {% else %}
+                      <i class="toggle on wide icon" style="color: #00c22e"></i>
+                      Connected
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
 
+            {% else %}
+              <div style="margin: 0 auto">
+                <p>No connected ML backends.
+                  <a href="https://labelstud.io/guide/ml.html">How to use ML models in Label Studio?</a>
+                </p>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
 
-class LabelStudioMLBase(ABC):
+        <!-- Train & Prediction logs -->
+        {#          <div class="ui styled accordion fluid">#}
+        {#            <div class="title"><i class="dropdown icon"></i> Train log</div>#}
+        {#            <div class="scrolling content" style="max-height: 400px; overflow-y: scroll;">#}
+        {#              <pre>{{ ml_backend.train_log }}</pre>#}
+        {#            </div>#}
+        {##}
+        {#            <div class="title"><i class="dropdown icon"></i> Prediction log</div>#}
+        {#            <div class="scrolling content" style="max-height: 400px; overflow-y: scroll;">#}
+        {#              <pre>{{ ml_backend.prediction_log }}</pre>#}
+        {#            </div>#}
+        {#          </div>#}
 
-    def __init__(self, label_config=None, train_output=None, **kwargs):
-        """Model loader"""
-        self.label_config = label_config
-        self.parsed_label_config = parse_config(self.label_config)
-        self.train_output = train_output
+        {% if project.ml_backends_connected %}
+          <!-- Start train -->
+          <div class="row centered aligned">
+            <div class="ui positive big button" onclick="start_train()">Start Training</div>
+            {% if project.config['enable_predictions_button'] %}
+              <div class="ui positive big button" onclick="start_predictions()">Start Predictions</div>
+            {% endif %}
+          </div>
+        {% endif %}
 
-    @abstractmethod
-    def predict(self, tasks, **kwargs):
-        pass
+        {% if project.data_types|length == 1 %}
+          <!-- File uploader -->
+          <div class="sixteen wide column">
+            <!-- Input file form -->
+            <div class="ui form">
+              <input id="file-input" type="file" name="file" multiple onchange="send_data(event)"
+                     style="display: none"/>
 
-    @abstractmethod
-    def fit(self, completions, workdir=None, **kwargs):
-        pass
+              <div class="ui content">
+                <div id="holder">
+                  <div class="text">
+                    <i class="ui icon huge upload"></i>
+                    <p>Import new data and check the model prediction, drop your file here</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <br/>
 
+          </div>
+        {% endif %} {# Uploader #}
+      </div>
 
-class LabelStudioMLManager(object):
+    </div>
+  </div>
 
-    model_class = None
-    model_dir = None
-    redis_host = None
-    redis_port = None
-    train_kwargs = None
+  <!-- Error log dialog -->
+  <div class="ui modal" id="error-log-dialog">
+    <i class="close icon"></i>
+    <div class="header red">
+      ML Backend Error
+    </div>
+    <div class="content scrolling">
+      <div class="description" id="error-log-detail"></div>
+      <div class="description" id="error-log-status"></div>
+      <div class="ui divider"></div>
+      <pre class="description" id="error-log-traceback"></pre>
+    </div>
+    <div class="actions">
+      <!-- Close button -->
+      <a class="ui icon cancel button basic" id="upload-done-button" autofocus>Close</a>
+    </div>
+  </div>
 
-    _redis = None
-    _redis_queue = None
-    _current_model = None
+  <!-- Dimmer and loader -->
+  <div class="ui page dimmer">
+    <div class="ui large text orange loader">Processing, please wait</div>
+  </div>
 
-    @classmethod
-    def initialize(
-        cls, model_class, model_dir=None, redis_host='localhost', redis_port=6379, redis_queue='default',
-        **init_kwargs
-    ):
-        if not issubclass(model_class, LabelStudioMLBase):
-            raise ValueError('Inference class should be the subclass of ' + LabelStudioMLBase.__class__.__name__)
+  <script>
+    function show_logs(detail, traceback, status) {
+      $('#error-log-detail').html(detail);
+      $('#error-log-status').html(status);
+      $('#error-log-traceback').html(traceback);
+      $('#error-log-dialog').modal('show');
+    }
 
-        cls.model_class = model_class
-        cls.redis_queue = redis_queue
-        cls.model_dir = model_dir
-        cls.init_kwargs = init_kwargs
-        cls.redis_host = redis_host
-        cls.redis_port = redis_port
-
-        if cls.model_dir:
-            cls.model_dir = os.path.expanduser(cls.model_dir)
-            os.makedirs(cls.model_dir, exist_ok=True)
-
-        cls._redis = cls._get_redis(redis_host, redis_port)
-        if cls._redis:
-            cls._redis_queue = Queue(name=redis_queue, connection=cls._redis)
-
-        cls._current_model = {}
-
-    @classmethod
-    def get_initialization_params(cls):
-        return dict(
-            model_class=cls.model_class,
-            model_dir=cls.model_dir,
-            redis_host=cls.redis_host,
-            redis_port=cls.redis_port,
-            redis_queue=cls.redis_queue,
-            **cls.init_kwargs
-        )
-
-    @classmethod
-    def without_redis(cls):
-        return cls._redis is None
-
-    @classmethod
-    def _get_redis(cls, host, port, raise_on_error=False):
-        r = Redis(host=host, port=port)
-        try:
-            r.ping()
-        except redis.ConnectionError:
-            if raise_on_error:
-                raise
-            return None
-        else:
-            return r
-
-    @classmethod
-    def _generate_version(cls):
-        return str(int(datetime.now().timestamp()))
-
-    @classmethod
-    def _get_tasks_key(cls, project):
-        return 'project:' + str(project) + ':tasks'
-
-    @classmethod
-    def _get_job_results_key(cls, project):
-        return 'project:' + str(project) + ':job_results'
-
-    @classmethod
-    def _remove_jobs(cls, project):
-        started_registry = StartedJobRegistry(cls._redis_queue.name, cls._redis_queue.connection)
-        finished_registry = FinishedJobRegistry(cls._redis_queue.name, cls._redis_queue.connection)
-        for job_id in started_registry.get_job_ids() + finished_registry.get_job_ids():
-            job = Job.fetch(job_id, connection=cls._redis)
-            if job.meta.get('project') != project:
-                continue
-            logger.info('Deleting job_id ' + job_id)
-            job.delete()
-
-    @classmethod
-    def _get_latest_job_result_from_redis(cls, project):
-        job_results_key = cls._get_job_results_key(project)
-        try:
-            num_finished_jobs = cls._redis.llen(job_results_key)
-            if num_finished_jobs == 0:
-                logger.info('Job queue is empty')
-                return
-            latest_job = cls._redis.lindex(job_results_key, -1)
-        except redis.exceptions.ConnectionError as exc:
-            logger.error(exc)
-            return
-        else:
-            return json.loads(latest_job)
-
-    @classmethod
-    def _get_latest_job_result_from_workdir(cls, project):
-        project_model_dir = os.path.join(cls.model_dir, project or '')
-        if not os.path.exists(project_model_dir):
-            return
-
-        # sort directories by decreasing timestamps
-        for subdir in reversed(sorted(map(int, filter(lambda d: d.isdigit(), os.listdir(project_model_dir))))):
-            job_result_file = os.path.join(project_model_dir, str(subdir), 'job_result.json')
-            if not os.path.exists(job_result_file):
-                logger.error('The latest job result file ' + job_result_file + ' doesn\'t exist')
-                continue
-            with open(job_result_file) as f:
-                return json.load(f)
-
-    @classmethod
-    def _key(cls, project):
-        return project, os.getpid()
-
-    @classmethod
-    def has_active_model(cls, project):
-        return cls._key(project) in cls._current_model
-
-    @classmethod
-    def get(cls, project):
-        key = cls._key(project)
-        logger.debug('Get project ' + str(key))
-        return cls._current_model.get(key)
-
-    @classmethod
-    def create(cls, project=None, label_config=None, train_output=None, version=None, **kwargs):
-        key = cls._key(project)
-        logger.debug('Create project ' + str(key))
-        kwargs.update(cls.init_kwargs)
-        cls._current_model[key] = ModelWrapper(
-            model=cls.model_class(label_config=label_config, train_output=train_output, **kwargs),
-            model_version=version or cls._generate_version()
-        )
-        return cls._current_model[key]
-
-    @classmethod
-    def get_or_create(
-        cls, project=None, label_config=None, force_reload=False, train_output=None, version=None, **kwargs
-    ):
-        # reload new model if model is not loaded into memory OR force_reload=True OR model versions are mismatched
-        if not cls.has_active_model(project) or force_reload or (cls.get(project).model_version != version and version is not None):  # noqa
-            logger.debug('Reload model for project={project} with version={version}'.format(
-                project=project, version=version))
-            cls.create(project, label_config, train_output, version, **kwargs)
-        return cls.get(project)
-
-    @classmethod
-    def fetch(cls, project=None, label_config=None, force_reload=False, **kwargs):
-        if cls.without_redis():
-            logger.debug('Fetch ' + project + ' from local directory')
-            job_result = cls._get_latest_job_result_from_workdir(project) or {}
-        else:
-            logger.debug('Fetch ' + project + ' from Redis')
-            job_result = cls._get_latest_job_result_from_redis(project) or {}
-        train_output = job_result.get('train_output')
-        version = job_result.get('version')
-        return cls.get_or_create(project, label_config, force_reload, train_output, version, **kwargs)
-
-    @classmethod
-    def job_status(cls, job_id):
-        job = Job.fetch(job_id, connection=cls._redis)
-        response = {
-            'job_status': job.get_status(),
-            'error': job.exc_info,
-            'created_at': job.created_at,
-            'enqueued_at': job.enqueued_at,
-            'started_at': job.started_at,
-            'ended_at': job.ended_at
+    function addMlBackend() {
+      var ml_backend = document.getElementById("ml_backend_url").value;
+      $.ajax({
+        url: "api/project/",
+        data: JSON.stringify({ml_backend: ml_backend}),
+        type: "patch",
+        dataType: "json",
+        contentType: "application/json; charset=utf-8",
+        success: function (response) {
+          location.reload();
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+          alert(message_from_response(xhr));
         }
-        if job.is_finished and isinstance(job.result, str):
-            response['result'] = json.loads(job.result)
-        return response
+      });
+    }
 
-    @classmethod
-    def is_training(cls, project):
-        if not cls.has_active_model(project):
-            return {'is_training': False}
-        m = cls.get(project)
-        if cls.without_redis():
-            return {
-                'is_training': m.is_training,
-                'backend': 'none',
-                'model_version': m.model_version
+
+    $('#holder').on('click', function () {
+      $('#file-input').trigger('click');
+    });
+
+    // drag & drop files
+    $(document).ready(function () {
+      $('.accordion').accordion();
+
+      var holder = $('#holder');
+      holder.on('drop', function (e) {
+        e.preventDefault();
+        $(this).removeClass('hover');
+        const event = {target: {files: e.originalEvent.dataTransfer.files}};
+        send_data(event);
+      });
+      holder.on('dragover', function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        $(this).addClass('hover');
+      });
+      holder.on('dragleave', function (e) {
+        e.preventDefault();
+        $(this).removeClass('hover');
+      });
+    });
+
+    // show upload wait
+    function start_wait() {
+      $('.ui.page.dimmer').addClass('active');
+    }
+
+    // stop upload wait
+    function stop_wait(obj, success) {
+      if (success) {
+        window.location = '?task_id=' + obj[0];
+      } else {
+        alert(obj);
+      }
+
+    }
+
+    // send data with tasks to server (add more data)
+    function send_data(event) {
+      if (typeof event.target.files === 'undefined') {
+        return;
+      }
+
+      // show upload wait dialog
+      start_wait();
+      var fd = null;
+      var request = {};
+
+      // files from disk
+      fd = new FormData;
+      for (var i = 0; i < event.target.files.length; i++) {
+        var f = event.target.files[i];
+        var max_size_mb = {{ project.max_tasks_file_size }};
+        if (f.size / 1024.0 / 1024.0 > max_size_mb) {
+          alert('Sorry, but file size is too big (more ' + max_size_mb + ' mb).\n<br/>' +
+            'Try to split your file by chunks or zip it', false);
+          return;
+        }
+
+        // make form and attach file to it
+        fd.append(f.name, f);
+      }
+
+      request = {
+        url: "api/import",
+        data: fd,
+        method: 'POST',
+        processData: false,
+        contentType: false
+      };
+
+      $.ajax(request)
+        .done(function (answer) {
+          stop_wait(answer['new_task_ids'], true);
+        })
+        .fail(function (answer) {
+          var msg = "Error: can't upload/process file on server side. Reasons:<br><br>";
+
+          if (answer.responseJSON != null) {
+            var rows = answer.responseJSON;
+            for (var i in rows) {
+              const escaped = $('<div>').text(rows[i]).html();
+              const split = escaped.split('::');
+              msg += '<div class="upload-row-error">' +
+                '<div class=desc>' + split[0] + '</div>' +
+                (split.length > 1 ? '<div class=code>' + split[1] + '</div>' : '') +
+                '</div><br/>\n';
             }
-        else:
-            started_jobs = StartedJobRegistry(cls._redis_queue.name, cls._redis_queue.connection).get_job_ids()
-            finished_jobs = FinishedJobRegistry(cls._redis_queue.name, cls._redis_queue.connection).get_job_ids()
-            failed_jobs = FailedJobRegistry(cls._redis_queue.name, cls._redis_queue.connection).get_job_ids()
-            running_jobs = list(set(started_jobs) - set(finished_jobs + failed_jobs))
-            logger.debug('Running jobs: ' + str(running_jobs))
-            for job_id in running_jobs:
-                job = Job.fetch(job_id, connection=cls._redis)
-                if job.meta.get('project') == project:
-                    return {
-                        'is_training': True,
-                        'job_id': job_id,
-                        'backend': 'redis',
-                        'model_version': m.model_version,
-                    }
-            return {
-                'is_training': False,
-                'backend': 'redis',
-                'model_version': m.model_version
-            }
+          } else {
+            msg += 'Critical error, see console for more description';
+            console.log(answer);
+          }
 
-    @classmethod
-    def predict(
-        cls, tasks, project=None, label_config=None, force_reload=False, try_fetch=True, **kwargs
-    ):
-        if try_fetch:
-            m = cls.fetch(project, label_config, force_reload)
-        else:
-            m = cls.get(project)
-            if not m:
-                raise FileNotFoundError('No model loaded. Specify "try_fetch=True" option.')
+          stop_wait(msg, false);
+        });
+    }
 
-        predictions = m.model.predict(tasks, **kwargs)
-        return predictions, m
+    function message_from_error(e) {
+      if (e.hasOwnProperty('responseJSON')) {
+        if (e.responseJSON.hasOwnProperty('msg')) {
+          return e.responseJSON.msg;
+        }
+        if (e.responseJSON.hasOwnProperty('detail')) {
+          return e.responseJSON.detail;
+        } else {
+          return e.responseJSON;
+        }
+      }
+      if (e.hasOwnProperty('responseText')) {
+        return e.responseText;
+      }
+    }
 
-    @classmethod
-    def create_data_snapshot(cls, data_iter, workdir):
-        data = list(data_iter)
-        data_file = os.path.join(workdir, 'train_data.json')
-        with io.open(data_file, mode='w') as fout:
-            json.dump(data, fout, ensure_ascii=False)
+    function start_train() {
+      $.ajax({
+        url: "api/train",
+        method: 'POST',
+        timeout: 500,
+        error: function (xhr, textStatus, thrownError) {
+          if (textStatus === 'timeout') {
+            location.reload();
+          } else {
+            alert(message_from_error(xhr));
+          }
+        },
+        success: function (res) {
+          location.reload();
+        }
+      })
+    }
 
-        info_file = os.path.join(workdir, 'train_data_info.json')
-        with io.open(info_file, mode='w') as fout:
-            json.dump({'count': len(data)}, fout)
+    function start_predictions() {
+      $.ajax({
+        url: "api/predictions",
+        method: 'POST',
+        error: function (xhr, textStatus, thrownError) {
+          alert(message_from_error(xhr));
+        },
+        success: function (res) {
+          location.reload();
+        }
+      })
+    }
 
-    @classmethod
-    def train_script_wrapper(
-        cls, project, label_config, train_kwargs, initialization_params=None, tasks=()
-    ):
+    function remove_ml_backend(name) {
+      console.log(name);
+      const confirmed = confirm('You are going to delete ml backend.\nWarning! this operation cannot be undone.\nPlease confirm your action.');
+      if (confirmed) {
+        $.ajax({
+          type: 'POST',
+          url: "api/remove-ml-backend",
+          data: JSON.stringify({name: name}),
+          dataType: "json",
+          contentType: "application/json; charset=utf-8",
+          success: function (response) {
+            console.log(response);
+            location.reload();
+          },
+          error: function (xhr, ajaxOptions, thrownError) {
+            alert(message_from_error(xhr));
+          }
+        })
+      }
+    }
+  </script>
 
-        if initialization_params:
-            # Reinitialize new cls instance for using in RQ context
-            initialization_params = initialization_params or {}
-            cls.initialize(**initialization_params)
-
-        # fetching the latest model version before we generate the next one
-        t = time.time()
-        m = cls.fetch(project, label_config)
-        m.is_training = True
-
-        version = cls._generate_version()
-
-        if cls.model_dir:
-            logger.debug('Running in model dir: ' + cls.model_dir)
-            project_model_dir = os.path.join(cls.model_dir, project or '')
-            workdir = os.path.join(project_model_dir, version)
-            os.makedirs(workdir, exist_ok=True)
-        else:
-            logger.debug('Running without model dir')
-            workdir = None
-
-        if cls.without_redis():
-            data_stream = tasks
-        else:
-            data_stream = (json.loads(t) for t in cls._redis.lrange(cls._get_tasks_key(project), 0, -1))
-
-        if workdir:
-            data_stream, snapshot = tee(data_stream)
-            cls.create_data_snapshot(snapshot, workdir)
-
-        try:
-            train_output = m.model.fit(data_stream, workdir, **train_kwargs)
-            if cls.without_redis():
-                job_id = None
-            else:
-                job_id = get_current_job().id
-            job_result = json.dumps({
-                'status': 'ok',
-                'train_output': train_output,
-                'project': project,
-                'workdir': workdir,
-                'version': version,
-                'job_id': job_id,
-                'time': time.time() - t
-            })
-            if workdir:
-                job_result_file = os.path.join(workdir, 'job_result.json')
-                with open(job_result_file, mode='w') as fout:
-                    fout.write(job_result)
-            if not cls.without_redis():
-                cls._redis.rpush(cls._get_job_results_key(project), job_result)
-        except:
-            raise
-        finally:
-            m.is_training = False
-        return job_result
-
-    @classmethod
-    def _start_training_job(cls, project, label_config, train_kwargs):
-        job = cls._redis_queue.enqueue(
-            cls.train_script_wrapper,
-            args=(project, label_config, train_kwargs, cls.get_initialization_params()),
-            job_timeout='365d',
-            ttl=None,
-            result_ttl=-1,
-            failure_ttl=300,
-            meta={'project': project},
-        )
-        logger.info('Training job {job} started for project {project}'.format(job=job, project=project))
-        return job
-
-    @classmethod
-    def train(cls, tasks, project=None, label_config=None, **kwargs):
-        job = None
-        if cls.without_redis():
-            job_result = cls.train_script_wrapper(
-                project, label_config, train_kwargs=kwargs, tasks=tasks)
-            train_output = json.loads(job_result)['train_output']
-            cls.get_or_create(project, label_config, force_reload=True, train_output=train_output)
-        else:
-            tasks_key = cls._get_tasks_key(project)
-            cls._redis.delete(tasks_key)
-            for task in tasks:
-                cls._redis.rpush(tasks_key, json.dumps(task))
-            job = cls._start_training_job(project, label_config, kwargs)
-        return job
+{% endblock %}

@@ -18,7 +18,7 @@ python-dateutil==2.8.1
 pytz==2019.3
 requests==2.22.0
 six>=1.13.0
-srsly==0.2.0
+srsly>=0.2.0
 tqdm==4.40.2
 urllib3==1.25.7
 wasabi==0.4.2
@@ -34,7 +34,7 @@ rq>=1.0
 boto3>=1.12.32
 google-cloud-storage==1.28.1
 flask_wtf==0.14.3
-label-studio-converter>=0.0.18
+label-studio-converter>=0.0.19
 htmlmin==0.1.12
 gevent>=20.6.2
 ujson==3.0.0

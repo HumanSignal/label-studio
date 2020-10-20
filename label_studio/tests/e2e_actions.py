@@ -34,7 +34,7 @@ def action_config(test_client, case_config):
 def action_config_test(test_client, case_config):
     """
         test
-        make sure it matchs config preset name
+        make sure it matches config preset name
     """
     project = goc_project()
 
