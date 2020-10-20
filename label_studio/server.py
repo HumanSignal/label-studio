@@ -98,11 +98,20 @@ def project_get_or_create(multi_session_force_recreate=False):
         if 'user' not in session:
             session['user'] = str(uuid4())
         user = session['user']
+        g.user = user
 
         # get project from session
         if 'project' not in session or multi_session_force_recreate:
             session['project'] = str(uuid4())
         project = session['project']
+
+        # check for shared projects and get owner user
+        if project in session.get('shared_projects', []):
+            owner = Project.get_user_by_project(project, input_args.root_dir)
+            if owner is None:  # owner is None when project doesn't exist
+                raise Exception('No such shared project found: project_uuid = ' + project)
+            else:
+                user = owner
 
         project_name = user + '/' + project
         return Project.get_or_create(project_name, input_args, context={
@@ -257,17 +266,27 @@ def setup_page():
     """ Setup label config
     """
     input_values = {}
+    user = g.user
     project = g.project
-    project_ids = g.project.get_sibling_projects(g.project.path)
+
+    project_ids = g.project.get_user_projects(user, input_args.root_dir)
     g.project.description = project.get_config(project.name, input_args).get('description')
 
     if project.config.get("show_project_links_in_multisession", False):
-        project_names = [os.path.join(os.path.dirname(project.name), id) for id in project_ids]
-        project_desc = [project.get_config(name, input_args).get('description') for name in project_names]
-        project_ids = dict(zip(project_ids, project_desc))
+        # own projects
+        project_names = [os.path.join(user, uuid) for uuid in project_ids]
+        project_desc = [Project.get_config(name, input_args).get('description') for name in project_names]
+        own_projects = dict(zip(project_ids, project_desc))
+
+        # shared projects
+        shared_projects = {}
+        for uuid in session.get('shared_projects', []):
+            tmp_user = Project.get_user_by_project(uuid, input_args.root_dir)
+            project_name = os.path.join(tmp_user, uuid)
+            project_desc = Project.get_config(project_name, input_args).get('description')
+            shared_projects[uuid] = project_desc
     else:
-        # FIXME: temporary
-        project_ids = {}
+        own_projects, shared_projects = {}, {}
 
     templates = get_config_templates(g.project.config)
     return flask.render_template(
@@ -278,7 +297,8 @@ def setup_page():
         templates=templates,
         input_values=input_values,
         multi_session=input_args.command == 'start-multi-session',
-        project_ids=project_ids
+        own_projects=own_projects,
+        shared_projects=shared_projects
     )
 
 
@@ -942,6 +962,7 @@ def get_data_file(filename):
     directory = request.args.get('d')
     return flask.send_from_directory(directory, filename, as_attachment=True)
 
+
 @app.route('/api/project-switch', methods=['GET', 'POST'])
 @requires_auth
 @exception_treatment
@@ -952,15 +973,24 @@ def api_project_switch():
         return make_response("Not a valid UUID", 400)
 
     uuid = request.args.get('uuid')
+    user = Project.get_user_by_project(uuid, input_args.root_dir)
+
+    # not owner user tries to open shared project
+    if user != g.user:
+        # create/append shared projects for user
+        if 'shared_projects' not in session:
+            session['shared_projects'] = {}
+        session['shared_projects'].update({uuid: {}})
+
+    # switch project
     session['project'] = uuid
-    code = 200
 
     output = g.project.serialize()
     output['multi_session_mode'] = input_args.command == 'start-multi-session'
     if request.method == 'GET':
         return redirect('../setup')
     else:
-        return make_response(jsonify(output), code)
+        return make_response(jsonify(output), 200)
 
 
 @app.route('/api/health', methods=['GET'])

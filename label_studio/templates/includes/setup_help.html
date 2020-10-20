@@ -4,8 +4,8 @@
 
   <!-- Label config -->
   <div class="ui accordion" id="first-help">
-    <div class="active title"><i class="dropdown icon"></i>Labeling config help</div>
-    <div class="active content" style="margin-top:0; margin-left: 10px;">
+    <div class="title"><i class="dropdown icon"></i>Labeling config help</div>
+    <div class="content" style="margin-top:0; margin-left: 10px;">
       <ul class="ui list">
         <li><p>Labeling interface is based on html-like tags, read more in our
           <a href="https://labelstud.io/tags" target="_blank">documentation</a>.</p>
@@ -25,7 +25,7 @@
       <div class="content collapse" style="margin-left: 25px; margin-top:0px">
         <p>You can create multiple projects within one browser session.
           If you don't want to loose your project, just save the shared link in the safety place.
-          If you want to share the project with somebody, send a shared link.</p>
+          If you want to share the project with somebody, send him or her a shared link.</p>
 
         <button onclick="new_project()" id="new-project-button" class="ui button negative basic"
                 style="height: 24px; padding-top: 5px;">
@@ -36,18 +36,45 @@
         <div> Current project: {{ project.description }} </div>
 
         <div style="margin-top: 10px!important;"></div>
-        <table>
-          {% for uuid, desc in project_ids.items() %}
-            <div class="ui item">
-              <i class="share alternate icon blue small hover-button"
-                 data-tippy-content="Copy shared link to project with uuid<br>{{ uuid }}"
-                 onclick="copy_share_link('{{ uuid }}')"></i>
-              <a id="myLink" href="#" onclick="switch_project('{{ uuid }}', '{{ desc }}')" data-value="{{ uuid }}"
-                 style="font-weight: {% if uuid == project.uuid %}bold{% else %}normal{% endif %}">
-                {{ desc }}</a>
-            </div>
-          {% endfor %}
-        </table>
+        <div style="padding-left: 10px">
+          <table style="margin-left: 10px">
+            {% for uuid, desc in own_projects.items() %}
+              <div class="ui item">
+                <i class="share alternate icon blue small hover-button"
+                   data-tippy-content="Copy shared link to project with uuid<br>{{ uuid }}"
+                   onclick="copy_share_link('{{ uuid }}')"></i>
+                <a id="myLink" href="#" onclick="switch_project('{{ uuid }}', '{{ desc }}')" data-value="{{ uuid }}"
+                   style="font-weight: {% if uuid == project.uuid %}bold{% else %}normal{% endif %}">
+                  {{ desc }}</a>
+              </div>
+            {% endfor %}
+          </table>
+        </div>
+
+        <div style="margin-bottom: 15px!important;"></div>
+        <div>Shared projects with you</div>
+
+        <div style="margin-bottom: 15px!important;"></div>
+        <div style="padding-left: 10px">
+          {% if shared_projects %}
+
+              <table>
+                {% for uuid, desc in shared_projects.items() %}
+                  <div class="ui item">
+                    <i class="share alternate icon blue small hover-button"
+                       data-tippy-content="Copy shared link to project with uuid<br>{{ uuid }}"
+                       onclick="copy_share_link('{{ uuid }}')"></i>
+                    <a id="myLink" href="#" onclick="switch_project('{{ uuid }}', '{{ desc }}')" data-value="{{ uuid }}"
+                       style="font-weight: {% if uuid == project.uuid %}bold{% else %}normal{% endif %}">
+                      {{ desc }}</a>
+                  </div>
+                {% endfor %}
+              </table>
+
+          {% else %}
+            <p>You can add a shared project here if you open a shared link from the other user</p>
+          {% endif %}
+        </div>
         <div style="margin-top: 10px!important;"></div>
       </div> <!-- accordion -->
     </div>
@@ -55,11 +82,11 @@
 
   <!-- Basic Templates -->
   {% for complexity in templates %}
-    <div class="ui accordion">
-      <div class="{{ 'active' if complexity == 'basic' else '' }} title">
+    <div class="ui accordion" id="{{ 'basic-templates' if complexity == 'basic' else 'adv-templates' }}">
+      <div class="title">
         <i class="dropdown icon"></i>{{ complexity|capitalize }} config examples
       </div>
-      <div class="{{ 'active' if complexity == 'basic' else '' }} content" style="margin-top:-8px">
+      <div class="content" style="margin-top:-8px">
         <!-- Templates categories -->
         <div class="ui grid stackable" style="margin: 0 auto;">
           {% for category in templates[complexity] %}
@@ -117,7 +144,7 @@
   }
 
   function copy_share_link(uuid) {
-    copyToClipboard(window.location.origin + '/api/project-switch?uuid=' + uuid)
+    copyToClipboard(window.location.origin + '/api/project-switch?uuid=' + uuid);
     $('body').toast({
       class: 'orange',
       title: 'Copied!',
@@ -129,17 +156,21 @@
   $('.ui .accordion').accordion({collapsible: true});
 
   // project management state save to/load from cookies
-  function process_accordion_state(element_id) {
+  function process_accordion_state(element_id, default_state) {
     var element = $(element_id);
     element.find('.title').on('click', function (event) {
-      Cookies.set(element_id + '-state', !$(event.target).hasClass('active'))
+      Cookies.set(element_id + '-state', !$(event.target).hasClass('active'));
+      console.log('click', element_id);
     });
-    if (Cookies.get(element_id + '-state', false) === 'true') {
-      $(element_id).find('.title').addClass('active');
-      $(element_id).find('.content').addClass('active');
+    if (Cookies.get(element_id + '-state', default_state) === 'true') {
+      element.find('.title').addClass('active');
+      element.find('.content').addClass('active');
+      console.log('load', element_id);
     }
   }
 
-  process_accordion_state('#project-management');
-  process_accordion_state('#first-help');
+  process_accordion_state('#first-help', 'true');
+  process_accordion_state('#project-management', 'false');
+  process_accordion_state('#basic-templates', 'true');
+  process_accordion_state('#adv-templates', 'false');
 </script>
