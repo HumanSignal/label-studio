@@ -74,7 +74,7 @@ class Analytics(object):
     def _prepare_json(self, payload):
         j = payload['json']
         endpoint = payload['endpoint']
-        if endpoint == 'api_completions':
+        if endpoint in ('api_completions', 'api_completion_update'):
             result = []
             for r in j['result']:
                 result.append({'type': r['type'], 'lead_time': r.get('lead_time')})
@@ -148,7 +148,7 @@ class Analytics(object):
         event_name = payload['endpoint']
         self._prepare_json(payload)
         self._prepare_response(payload, response)
-
+        
         try:
             mp.track(self.server_id, event_name, payload)
         except:
