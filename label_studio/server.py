@@ -124,7 +124,7 @@ def json_filter(s):
 
 @app.before_request
 def app_before_request_callback():
-    if request.endpoint in ('static', 'send_static', 'get_data_file'):
+    if request.endpoint in ('static', 'send_static'):
         return
 
     def prepare_globals():
@@ -941,6 +941,7 @@ def get_data_file(filename):
                                 'Use "allow_serving_local_files": true config option to enable local serving')
     directory = request.args.get('d')
     return flask.send_from_directory(directory, filename, as_attachment=True)
+
 
 @app.route('/api/project-switch', methods=['GET', 'POST'])
 @requires_auth
