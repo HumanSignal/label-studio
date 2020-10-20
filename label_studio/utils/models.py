@@ -156,7 +156,7 @@ class ProjectObj(object):
         all_names = re.findall(r'name="([^"]*)"', config_string)
         if len(set(all_names)) != len(all_names):
             logger.debug(all_names)
-            raise ValidationError('Label config contains non-unique names')
+            raise ValidationError('Label config contains non-unique names ' + str(all_names))
 
         # toName points to existent name
         names = set(all_names)

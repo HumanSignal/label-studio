@@ -10,5 +10,5 @@
   </Choices>
 
   <Header value="Write your answer and press Enter"/>
-  <TextArea name="answer"/>
+  <TextArea toName="dialog" name="answer"/>
 </View>

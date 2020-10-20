@@ -30,6 +30,7 @@ on "Import" page:
 <View>
   <Text name="txt-1" value="$text"></Text>
   <Ranker name="ranker-1" toName="txt-1" ranked="true" sortedHighlightColor="red"></Ranker>
+  <Ranker name="ranker" value="$items"></Ranker>
 </View>
 ```
 ### Example

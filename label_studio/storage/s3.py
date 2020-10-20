@@ -68,7 +68,7 @@ class S3Storage(CloudStorage):
     def _get_objects(self):
         bucket = self.client['bucket']
         if self.prefix:
-            bucket_iter = bucket.objects.filter(Prefix=self.prefix + '/', Delimiter='/').all()
+            bucket_iter = bucket.objects.filter(Prefix=self.prefix.rstrip('/') + '/', Delimiter='/').all()
         else:
             bucket_iter = bucket.objects.all()
         return (obj.key for obj in bucket_iter)

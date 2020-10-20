@@ -17,9 +17,13 @@ Header tag, show header
 
 ### Example
 ```html
-<Header name="text-1" value="$text" />
+<View>
+  <Header name="text-1" value="$text" />
+</View>
 ```
 ### Example
 ```html
-<Header name="text-1" value="Please select the class" />
+<View>
+  <Header name="text-1" value="Please select the class" />
+</View>
 ```

@@ -95,16 +95,6 @@ def action_next_task(test_client, case_config):
     assert isinstance(data, dict) == True
 
 
-def action_get_all_tasks(test_client, case_config):
-    """
-        action
-        get all tasks
-    """
-    response = test_client.get('/api/projects/1/task_ids/')
-    data = json.loads(response.data.decode('utf-8'))
-    assert isinstance(data, list) == True
-
-
 def action_get_task(test_client, case_config):
     """
         action

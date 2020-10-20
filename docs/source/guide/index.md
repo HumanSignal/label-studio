@@ -146,6 +146,8 @@ Or put `username` and `password` in the project config.json.
 }
 ```
 
+> For docker you need to setup environment variables `USERNAME` and `PASSWORD`
+
 It will be the same username and password for all the users.
 
 

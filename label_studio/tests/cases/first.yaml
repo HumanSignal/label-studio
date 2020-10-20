@@ -17,7 +17,6 @@ actions:
         filename: 'lorem_ipsum.txt'
     get_task:
         task_id: 0
-    get_all_tasks:
     label:
         task_id: 0
         completion : {

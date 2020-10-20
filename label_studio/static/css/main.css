@@ -5,7 +5,7 @@ html {
 body {
     background: #fcfcfc;
     font-family: Rubik, sans-serif;
-    color: #333;
+    color: #444 !important;
 }
 
 table {
@@ -289,11 +289,11 @@ div[class*="App_editor"] {
     padding: 0.80571429em 0.7em 0.80571429em !important;
 }
 
-.settings-cog {
+.hover-button {
     cursor: pointer;
     opacity: 0.75 !important;
 }
-.settings-cog:hover {
+.hover-button:hover {
     opacity: 1.0 !important;
 }
 
@@ -602,5 +602,5 @@ pre {
     white-space: -moz-pre-wrap;
     white-space: -pre-wrap;
     white-space: -o-pre-wrap;
-    word-wrap: break-word !important;
+    word-wrap:  break-word !important;
 }

@@ -17,8 +17,14 @@ Relation tag represents a single relation label
 ```html
 <View>
   <Relations>
-    <Relation value="Name 1" />
-    <Relation value="Name 2" />
+    <Relation value="hello" />
+    <Relation value="world" />
   </Relations>
+
+  <Text name="txt-1" value="$text" />
+  <Labels name="lbl-1" toName="txt-1">
+    <Label value="Relevant" />
+    <Label value="Not Relevant" />
+  </Labels>
 </View>
 ```
