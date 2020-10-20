@@ -95,13 +95,6 @@ class TaskValidator:
 
     @staticmethod
     def check_allowed(task):
-        allowed = ['data', 'completions', 'predictions', 'meta', 'id']
-
-        # check each task filled
-        for key in task.keys():
-            if key not in allowed:
-                return False
-
         # task is required
         if 'data' not in task:
             return False
