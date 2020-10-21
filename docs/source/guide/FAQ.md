@@ -164,7 +164,7 @@ def convert_from_ls(result):
                w * value['width'] / 100.0, \
                h * value['height'] / 100.0
 
-# convert from pixels to LS units 
+# convert from pixels to LS percent units 
 def convert_to_ls(x, y, width, height, original_width, original_height):
     return x / original_width * 100.0, y / original_height * 100.0, \
            width / original_width * 100.0, height / original_height * 100
