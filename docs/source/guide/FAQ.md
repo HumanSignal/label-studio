@@ -107,3 +107,66 @@ LSB web server always use `0.0.0.0` address for start. But if you really need to
 <center>
   <img style="opacity: 0.75" src='../images/host-protocol-port.png'>
 </center>
+
+
+## What units are x, y, width and height in results for images?
+
+x, y, width and height are in percents of image dimensions.
+
+Convertation formulas for `x, y, width, height` to pixel units:
+
+```
+pixel_x = x / 100.0 * original_width
+pixel_y = y / 100.0 * original_height
+pixel_width = width / 100.0 * original_width
+pixel_height = height / 100.0 * original_height
+```
+
+Completion example: 
+
+```python
+task = {
+    "completions": [{
+        "result": [
+            {
+                "...": "...",
+
+                "original_width": 600,
+                "original_height": 403,
+                "image_rotation": 0,
+
+                "value": {
+                    "x": 5.33,
+                    "y": 23.57,
+                    "width": 29.16,
+                    "height": 31.26,
+                    "rotation": 0,
+                    "rectanglelabels": [
+                        "Airplane"
+                    ]
+                }
+            }
+        ]
+    }]
+}
+
+def convert(result):
+    if 'original_width' not in result or 'original_height' not in result:
+        return None
+
+    value = result['value']
+    w, h = result['original_width'], result['original_height']
+
+    if all([key in value for key in ['x', 'y', 'width', 'height']]):
+        return w * value['x'] / 100.0, \
+               h * value['y'] / 100.0, \
+               w * value['width'] / 100.0, \
+               h * value['height'] / 100.0
+
+output = convert(task['completions'][0]['result'][0])
+if output is None:
+    print('Wrong convert')
+else:
+    pixel_x, pixel_y, pixel_width, pixel_height = output
+    print(pixel_x, pixel_y, pixel_width, pixel_height)
+```
