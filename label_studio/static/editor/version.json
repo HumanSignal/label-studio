@@ -1,6 +1,6 @@
 {
-  "message": "Fix node reference selection",
-  "commit": "761c8f4044ec5c67259268a43be4a39dd5f7c8d8",
+  "message": "Fix TS state restoration",
+  "commit": "f3c9499692811fdb5077102571fed901d0dbf781",
   "branch": "feature/ts",
-  "date": "2020-10-20T22:57:42Z"
+  "date": "2020-10-21T21:05:13Z"
 }
