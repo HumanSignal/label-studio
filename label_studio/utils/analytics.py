@@ -112,7 +112,6 @@ class Analytics(object):
         # ignore specific events
         if self._exclude_endpoint(request):
             return
-
         j = None
         try:
             j = request.json
@@ -148,7 +147,6 @@ class Analytics(object):
         event_name = payload['endpoint']
         self._prepare_json(payload)
         self._prepare_response(payload, response)
-        
         try:
             mp.track(self.server_id, event_name, payload)
         except:

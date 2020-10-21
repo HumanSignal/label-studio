@@ -266,13 +266,14 @@ def setup_page():
     """ Setup label config
     """
     input_values = {}
-    user = g.user
     project = g.project
 
-    project_ids = g.project.get_user_projects(user, input_args.root_dir)
     g.project.description = project.get_config(project.name, input_args).get('description')
 
-    if project.config.get("show_project_links_in_multisession", False):
+    if project.config.get("show_project_links_in_multisession", False) and hasattr(g, 'user'):
+        user = g.user
+        project_ids = g.project.get_user_projects(user, input_args.root_dir)
+
         # own projects
         project_names = [os.path.join(user, uuid) for uuid in project_ids]
         project_desc = [Project.get_config(name, input_args).get('description') for name in project_names]
