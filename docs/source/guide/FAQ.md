@@ -122,7 +122,7 @@ pixel_width = width / 100.0 * original_width
 pixel_height = height / 100.0 * original_height
 ```
 
-Completion example: 
+Example: 
 
 ```python
 task = {
@@ -150,7 +150,8 @@ task = {
     }]
 }
 
-def convert(result):
+# convert from LS percent units to pixels 
+def convert_from_ls(result):
     if 'original_width' not in result or 'original_height' not in result:
         return None
 
@@ -163,10 +164,20 @@ def convert(result):
                w * value['width'] / 100.0, \
                h * value['height'] / 100.0
 
-output = convert(task['completions'][0]['result'][0])
+# convert from pixels to LS units 
+def convert_to_ls(x, y, width, height, original_width, original_height):
+    return x / original_width * 100.0, y / original_height * 100.0, \
+           width / original_width * 100.0, height / original_height * 100
+
+
+# convert from LS
+output = convert_from_ls(task['completions'][0]['result'][0])
 if output is None:
-    print('Wrong convert')
-else:
-    pixel_x, pixel_y, pixel_width, pixel_height = output
-    print(pixel_x, pixel_y, pixel_width, pixel_height)
+    raise Exception('Wrong convert') 
+pixel_x, pixel_y, pixel_width, pixel_height = output
+print(pixel_x, pixel_y, pixel_width, pixel_height)
+
+# convert back to LS 
+x, y, width, height = convert_to_ls(pixel_x, pixel_y, pixel_width, pixel_height, 600, 403)
+print(x, y, width, height)
 ```
