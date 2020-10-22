@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'feature/ts' of github.com:heartexlabs/label-studio-frontend into feature/ts",
-  "commit": "3d13b77a4a39290d3434fc30e0f450838d6fb98b",
+  "message": "Do not attempt to render connection lines if there's no DOM nodes",
+  "commit": "c146648d7e7a8da8a5dc34e7d49ddd2c2b192eb5",
   "branch": "feature/ts",
-  "date": "2020-10-21T23:52:09Z"
+  "date": "2020-10-22T13:16:34Z"
 }
