@@ -222,6 +222,22 @@ def welcome_page():
     )
 
 
+@app.route('/tasks_old', methods=['GET', 'POST'])
+@requires_auth
+@exception_treatment_page
+def tasks_page_old():
+    """ Tasks and completions page
+    """
+    serialized_project = g.project.serialize()
+    serialized_project['multi_session_mode'] = input_args.command != 'start-multi-session'
+    return flask.render_template(
+        'tasks_old.html',
+        config=g.project.config,
+        project=g.project,
+        serialized_project=serialized_project,
+        **find_editor_files()
+    )
+
 @app.route('/tasks', methods=['GET', 'POST'])
 @requires_auth
 @exception_treatment_page
