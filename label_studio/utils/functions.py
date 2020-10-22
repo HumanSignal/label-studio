@@ -1,6 +1,7 @@
 # big chunks of code
 import os
 import numpy as np
+import pandas as pd
 
 from collections import defaultdict
 from urllib.parse import urlencode
@@ -109,21 +110,43 @@ def generate_sample_task_without_check(label_config, mode='upload'):
                 # TODO: add headless #column#N support
                 value_col = value_col[1:]
             value_columns.append(value_col)
+        separator = ts_tag.get('separator')
+        time_format = ts_tag.get('inputFormat')
 
         tag_value = ts_tag.attrib['value'].lstrip('$')
         ts_task = task[tag_value]
         if isinstance(ts_task, str):
             # data is URL
-            task[tag_value] += '?' + urlencode({'time': time_column, 'values': ','.join(value_columns)})
+            params = {'time': time_column, 'values': ','.join(value_columns)}
+            if separator:
+                params['sep'] = separator
+            if time_format:
+                params['tf'] = time_format
+            task[tag_value] += '?' + urlencode(params)
         elif isinstance(ts_task, dict):
             # data is JSON
-            task[tag_value] = generate_time_series_json(time_column, value_columns)
+            task[tag_value] = generate_time_series_json(time_column, value_columns, time_format)
     return task
 
 
-def generate_time_series_json(time_column, value_columns):
+def _is_strftime_string(s):
+    # very dumb but works
+    return '%' in s
+
+
+def generate_time_series_json(time_column, value_columns, time_format=None):
     n = 100
-    ts = {time_column: np.arange(n).tolist()}
+    if time_format is not None and not _is_strftime_string(time_format):
+        time_fmt_map = {
+            'yyyy-MM-dd': '%Y-%m-%d'
+        }
+        time_format = time_fmt_map.get(time_format)
+
+    if time_format is None:
+        times = np.arange(n).tolist()
+    else:
+        times = pd.date_range('2020-01-01', periods=n, freq='D').strftime(time_format).tolist()
+    ts = {time_column: times}
     for value_col in value_columns:
         ts[value_col] = np.random.randn(n).tolist()
     return ts
