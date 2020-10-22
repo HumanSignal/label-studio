@@ -1,6 +1,6 @@
 {
-  "message": "Do not attempt to render connection lines if there's no DOM nodes",
-  "commit": "c146648d7e7a8da8a5dc34e7d49ddd2c2b192eb5",
+  "message": "Add test for parseCSV",
+  "commit": "ac72fd255e95ad53a7b3d800f32cb67d7ec8274c",
   "branch": "feature/ts",
-  "date": "2020-10-22T13:16:34Z"
+  "date": "2020-10-22T17:37:28Z"
 }
