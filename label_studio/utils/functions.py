@@ -1,5 +1,8 @@
 # big chunks of code
 import os
+import numpy as np
+
+from collections import defaultdict
 from lxml import etree
 try:
     import ujson as json
@@ -71,6 +74,7 @@ def generate_sample_task_without_check(label_config, mode='upload'):
     # iterate over xml tree and find values with '$'
     task = {}
     parent = xml.findall('.//*[@value]')  # take all tags with value attribute
+    ts_names = defaultdict(list)
     for p in parent:
         value = p.get('value')
         value_type = p.get('valueType', p.get('valuetype', None))
@@ -90,7 +94,38 @@ def generate_sample_task_without_check(label_config, mode='upload'):
             # not found by name, try get example by type
             task[value[1:]] = examples.get(p.tag, 'Something') if by_name is None else by_name
 
+    # TimeSeries special case
+    for ts_tag in xml.findall('.//TimeSeries'):
+        time_column = ts_tag.get('timeValue')
+        if time_column and isinstance(time_column, str) and time_column.startswith('#'):
+            time_column = time_column[1:]
+        value_columns = []
+        for ts_child in ts_tag:
+            if ts_child.tag != 'TimeSeriesChannel':
+                continue
+            value_col = ts_child.get('value')
+            if value_col and isinstance(value_col, str) and value_col.startswith('#'):
+                # TODO: add headless #column#N support
+                value_col = value_col[1:]
+            value_columns.append(value_col)
+
+        tag_value = ts_tag.attrib['value'].lstrip('$')
+        ts_task = task[tag_value]
+        if isinstance(ts_task, str):
+            # data is URL
+            task[tag_value] += '?time=' + time_column + '&values=' + ','.join(value_columns)
+        elif isinstance(ts_task, dict):
+            # data is JSON
+            task[tag_value] = generate_time_series_json(time_column, value_columns)
     return task
+
+
+def generate_time_series_json(time_column, value_columns):
+    n = 100
+    ts = {time_column: np.arange(n).tolist()}
+    for value_col in value_columns:
+        ts[value_col] = np.random.randn(n).tolist()
+    return ts
 
 
 def generate_sample_task(project):
