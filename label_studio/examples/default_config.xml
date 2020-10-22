@@ -1,5 +1,0 @@
-<View>
-  <Header value="Welcome to Label Studio!" />
-  <Header value="Use examples above to setup the labeling"
-          size="7" />
-</View>
