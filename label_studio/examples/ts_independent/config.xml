@@ -15,7 +15,7 @@
         <Label value="Walk" background="#aa4"/>
     </TimeSeriesLabels>
 
-    <TimeSeries name="ts" valueType="url" value="$csv"
+    <TimeSeries name="ts" valueType="url" value="$csv1"
                 timeValue="#time" separator=","
                 overviewChannels="one">
         <TimeSeriesChannel value="#one" strokeColor="#27b"
@@ -29,7 +29,7 @@
         <Label value="Off" background="red"/>
     </TimeSeriesLabels>
 
-    <TimeSeries name="ts2" valueType="url" value="$csv"
+    <TimeSeries name="ts2" valueType="url" value="$csv2"
                 timeValue="#time" separator=","
                 overviewChannels="one">
         <TimeSeriesChannel value="#two" strokeColor="#f80"
@@ -44,24 +44,19 @@
 -->
 
 <!-- {
-  "data": {
-    "csv": "/static/samples/sample-task-sin.csv"
-  },
   "completions": [
     {
-      "created_at": 1603327352,
-      "id": 2001,
-      "lead_time": 205.945,
+
       "result": [
         {
           "from_name": "label2",
-          "id": "5Zo_YOBhPL",
+          "id": "5b6brspcdS",
           "to_name": "ts2",
           "type": "timeserieslabels",
           "value": {
-            "end": 1592250891909.4644,
+            "end": 6,
             "instant": false,
-            "start": 1592250711999.969,
+            "start": 2,
             "timeserieslabels": [
               "On"
             ]
@@ -69,13 +64,13 @@
         },
         {
           "from_name": "label",
-          "id": "f5UUxZq8VN",
+          "id": "jX-vuDiFf5",
           "to_name": "ts",
           "type": "timeserieslabels",
           "value": {
-            "end": 1592251091951.752,
+            "end": 12,
             "instant": false,
-            "start": 1592250881919.5193,
+            "start": 7,
             "timeserieslabels": [
               "Run"
             ]
@@ -83,13 +78,13 @@
         },
         {
           "from_name": "label2",
-          "id": "ptOJYeLrWr",
+          "id": "dhTSo03_2_",
           "to_name": "ts2",
           "type": "timeserieslabels",
           "value": {
-            "end": 1592251321974.9744,
+            "end": 17,
             "instant": false,
-            "start": 1592251221997.6416,
+            "start": 13,
             "timeserieslabels": [
               "Off"
             ]
@@ -97,42 +92,28 @@
         },
         {
           "from_name": "label",
-          "id": "AqfvsSydt5",
+          "id": "fjIgsxMM4Y",
           "to_name": "ts",
           "type": "timeserieslabels",
           "value": {
-            "end": 1592251731931.9534,
+            "end": 25,
             "instant": false,
-            "start": 1592251461993.5276,
+            "start": 21,
             "timeserieslabels": [
               "Walk"
             ]
           }
         },
         {
-          "from_name": "label",
-          "id": "BJR_8Vc6Ex",
-          "to_name": "ts",
-          "type": "timeserieslabels",
-          "value": {
-            "end": 1592251081992.7,
-            "instant": false,
-            "start": 1592251071946.638,
-            "timeserieslabels": [
-              "Run"
-            ]
-          }
-        },
-        {
           "direction": "right",
-          "from_id": "5Zo_YOBhPL",
-          "to_id": "f5UUxZq8VN",
+          "from_id": "5b6brspcdS",
+          "to_id": "jX-vuDiFf5",
           "type": "relation"
         },
         {
           "direction": "right",
-          "from_id": "ptOJYeLrWr",
-          "to_id": "AqfvsSydt5",
+          "from_id": "dhTSo03_2_",
+          "to_id": "fjIgsxMM4Y",
           "type": "relation"
         }
       ]

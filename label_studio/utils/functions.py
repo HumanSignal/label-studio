@@ -37,7 +37,8 @@ def get_task_from_labeling_config(config):
         except:
             task_data = None
         else:
-            task_data = body['data'] if 'data' in body else body
+            dont_use_root = 'predictions' in body or 'completions' in body
+            task_data = body['data'] if 'data' in body else (None if dont_use_root else body)
             predictions = body['predictions'] if 'predictions' in body else None
             completions = body['completions'] if 'completions' in body else None
     return task_data, completions, predictions
