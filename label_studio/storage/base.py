@@ -69,6 +69,9 @@ class BaseStorage(ABC):
         self.form_class = BaseStorageForm
         self.is_syncing = False
 
+    def __str__(self):
+        return self.__class__.__name__
+
     def get_params(self):
         return {
             form_param: getattr(self, storage_param)

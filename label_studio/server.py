@@ -512,7 +512,10 @@ def api_import():
         max_id_in_old_tasks = g.project.source_storage.max_id()
 
     new_tasks = Tasks().from_list_of_dicts(new_tasks, max_id_in_old_tasks + 1)
-    g.project.source_storage.set_many(new_tasks.keys(), new_tasks.values())
+    try:
+        g.project.source_storage.set_many(new_tasks.keys(), new_tasks.values())
+    except NotImplementedError:
+        raise NotImplementedError('Import is not supported for the current storage ' + str(g.project.source_storage))
 
     # if tasks have completion - we need to implicitly save it to target
     for i in new_tasks.keys():
