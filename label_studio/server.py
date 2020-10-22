@@ -39,7 +39,7 @@ from label_studio.utils import uploader
 from label_studio.utils.validation import TaskValidator
 from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.functions import (
-    generate_sample_task_without_check, set_full_hostname, set_web_protocol, get_web_protocol
+    generate_sample_task_without_check, set_full_hostname, set_web_protocol, get_web_protocol, generate_time_series_json
 )
 from label_studio.utils.misc import (
     exception_treatment, exception_treatment_page,
@@ -168,6 +168,24 @@ def send_upload(path):
                    'replace "/upload/" => "/data/upload/" in your tasks.json files')
     project_dir = os.path.join(g.project.path, 'upload')
     return open(os.path.join(project_dir, path), 'rb').read()
+
+
+@app.route('/static/samples/sample-task-sin.csv')
+@requires_auth
+def sample_task_sin():
+    time_column = request.args.get('time')
+    value_columns = request.args.get('values').split(',')
+    ts = generate_time_series_json(time_column, value_columns)
+    csv_data = pd.DataFrame.from_dict(ts).to_csv(index=False).encode('utf-8')
+    mem = io.BytesIO()
+    mem.write(csv_data)
+    mem.seek(0)
+    return send_file(
+        mem,
+        as_attachment=False,
+        attachment_filename='sample-task-sin.csv',
+        mimetype='text/csv'
+    )
 
 
 @app.route('/static/<path:path>')
