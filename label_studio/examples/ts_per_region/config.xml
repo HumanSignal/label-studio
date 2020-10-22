@@ -10,7 +10,7 @@
 
     <!-- Object tag for time series data source -->
     <TimeSeries name="ts" valueType="url" value="$csv"
-                timeValue="#time">
+                separator="," timeValue="#time">
         <TimeSeriesChannel value="#one" strokeColor="#17b"
                            displayName="Sensor 1"/>
         <TimeSeriesChannel value="#two" strokeColor="#f70"

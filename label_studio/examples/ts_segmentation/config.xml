@@ -11,7 +11,8 @@
     </TimeSeriesLabels>
 
     <!-- Object tag for time series data source -->
-    <TimeSeries name="ts" valueType="url" value="$csv"
+    <TimeSeries name="ts" valueType="url"
+                value="$csv" separator=","
                 timeValue="#time" overviewChannels="one">
         <TimeSeriesChannel value="#one"
                            units="miles"

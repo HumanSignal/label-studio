@@ -170,7 +170,7 @@ def send_upload(path):
     return open(os.path.join(project_dir, path), 'rb').read()
 
 
-@app.route('/static/samples/sample-task-sin.csv')
+@app.route('/static/samples/time-series.csv')
 @requires_auth
 def sample_task_sin():
     time_column = request.args.get('time')
@@ -183,7 +183,7 @@ def sample_task_sin():
     return send_file(
         mem,
         as_attachment=False,
-        attachment_filename='sample-task-sin.csv',
+        attachment_filename='time-series.csv',
         mimetype='text/csv'
     )
 

@@ -21,7 +21,8 @@
         <Label value="None" background="orange"/>
     </TimeSeriesLabels>
 
-    <TimeSeries name="ts" valueType="url" value="$csv" timeValue="#time">
+    <TimeSeries name="ts" valueType="url" value="$csv"
+                separator="," timeValue="#time">
         <TimeSeriesChannel value="#one" strokeColor="#17b"
                            displayName="Sensor 1"/>
     </TimeSeries>

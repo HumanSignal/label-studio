@@ -113,7 +113,8 @@ def generate_sample_task_without_check(label_config, mode='upload'):
         ts_task = task[tag_value]
         if isinstance(ts_task, str):
             # data is URL
-            task[tag_value] += '?time=' + time_column + '&values=' + ','.join(value_columns)
+            task[tag_value] = '/static/samples/time-series.csv?time=' + \
+                              time_column + '&values=' + ','.join(value_columns)
         elif isinstance(ts_task, dict):
             # data is JSON
             task[tag_value] = generate_time_series_json(time_column, value_columns)

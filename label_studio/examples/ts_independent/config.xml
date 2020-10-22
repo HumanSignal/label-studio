@@ -16,7 +16,8 @@
     </TimeSeriesLabels>
 
     <TimeSeries name="ts" valueType="url" value="$csv"
-                timeValue="#time" overviewChannels="one">
+                timeValue="#time" separator=","
+                overviewChannels="one">
         <TimeSeriesChannel value="#one" strokeColor="#27b"
                            displayName="Sensor 1"/>
     </TimeSeries>
@@ -29,7 +30,8 @@
     </TimeSeriesLabels>
 
     <TimeSeries name="ts2" valueType="url" value="$csv"
-                timeValue="#time" overviewChannels="one">
+                timeValue="#column#0" separator=","
+                overviewChannels="one">
         <TimeSeriesChannel value="#two" strokeColor="#f80"
                            displayName="Sensor 2"/>
     </TimeSeries>
