@@ -19,7 +19,7 @@
                 timeValue="#time" separator=","
                 overviewChannels="one">
         <TimeSeriesChannel value="#one" strokeColor="#27b"
-                           displayName="Sensor 1"/>
+                           displayName="One"/>
     </TimeSeries>
 
     <!-- Second TimeSeries with channel 2 -->
@@ -30,10 +30,10 @@
     </TimeSeriesLabels>
 
     <TimeSeries name="ts2" valueType="url" value="$csv"
-                timeValue="#column#0" separator=","
+                timeValue="#time" separator=","
                 overviewChannels="one">
         <TimeSeriesChannel value="#two" strokeColor="#f80"
-                           displayName="Sensor 2"/>
+                           displayName="Two"/>
     </TimeSeries>
 </View>
 
