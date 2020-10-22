@@ -175,11 +175,13 @@ def send_upload(path):
 def sample_task_sin():
     time_column = request.args.get('time')
     value_columns = request.args.get('values').split(',')
+    time_format = request.args.get('tf')
+    separator = request.args.get('sep', ',')
     header = True
     if all(n.startswith('column#') for n in [time_column] + value_columns):
         header = False
-    ts = generate_time_series_json(time_column, value_columns)
-    csv_data = pd.DataFrame.from_dict(ts).to_csv(index=False, header=header).encode('utf-8')
+    ts = generate_time_series_json(time_column, value_columns, time_format)
+    csv_data = pd.DataFrame.from_dict(ts).to_csv(index=False, header=header, sep=separator).encode('utf-8')
     mem = io.BytesIO()
     mem.write(csv_data)
     mem.seek(0)
