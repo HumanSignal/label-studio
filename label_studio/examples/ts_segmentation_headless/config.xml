@@ -1,27 +1,31 @@
 <!-- {"title": "Segmentation CSV headless", "category": "time-series", "complexity": "basic"} -->
 <View>
-  <Header value="Select regions"/>
+    <Header value="Create regions"/>
     <Header value="Data is loaded from headless CSV"
-          style="font-size:1.2em; font-weight: normal"/>
+            style="font-size:1.2em; font-weight: normal"/>
 
-  <TimeSeriesLabels name="label" toName="ts">
-    <Label value="Run"/>
-    <Label value="Walk"/>
-  </TimeSeriesLabels>
+    <!-- Control tag for region labels, draw label buttons -->
+    <TimeSeriesLabels name="label" toName="ts">
+        <Label value="Run" background="#5b5"/>
+        <Label value="Walk" background="#55f"/>
+    </TimeSeriesLabels>
 
-  <TimeSeries name="ts" valueType="url" value="$headlessCsv"
-              timeValue="#column#0" overviewChannels="one">
-    <TimeSeriesChannel value="#column#1"
-                       units="miles"
-                       unitsFormat=",.1f"
-                       strokeColor="#1f77b4"
-                       showGrid="true"
-                       displayName="Sensor 1" />
-    <TimeSeriesChannel value="#column#2"
-                       units="miles"
-                       unitsFormat=",.1f"
-                       showGrid="true"
-                       strokeColor="#ff7f0e"
-                       displayName="Sensor 2" />
-  </TimeSeries>
+    <!-- Object tag for time series data source, draw plots -->
+    <TimeSeries name="ts" valueType="url"
+                value="$headlessCsv"
+                timeValue="#column#0"
+                overviewChannels="column#1,column#2">
+        <TimeSeriesChannel value="#column#1"
+                           units="miles"
+                           unitsFormat=",.1f"
+                           strokeColor="#1f77b4"
+                           showGrid="true"
+                           displayName="Sensor 1"/>
+        <TimeSeriesChannel value="#column#2"
+                           units="miles"
+                           unitsFormat=",.1f"
+                           showGrid="true"
+                           strokeColor="#ff7f0e"
+                           displayName="Sensor 2"/>
+    </TimeSeries>
 </View>

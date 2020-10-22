@@ -1,27 +1,29 @@
 <!-- {"title": "Segmentation CSV file", "category": "time-series", "complexity": "basic"} -->
 <View>
-  <Header value="Select regions"/>
+    <Header value="Create regions"/>
     <Header value="Data is loaded from CSV with header"
-          style="font-size:1.2em; font-weight: normal"/>
+            style="font-size:1.2em; font-weight: normal"/>
 
-  <TimeSeriesLabels name="label" toName="ts">
-    <Label value="Run"/>
-    <Label value="Walk"/>
-  </TimeSeriesLabels>
+    <!-- Control tag for region labels -->
+    <TimeSeriesLabels name="label" toName="ts">
+        <Label value="Run" background="#5b5"/>
+        <Label value="Walk" background="#55f"/>
+    </TimeSeriesLabels>
 
-  <TimeSeries name="ts" valueType="url" value="$csv"
-              timeValue="#time" overviewChannels="one">
-    <TimeSeriesChannel value="#one"
-                       units="miles"
-                       unitsFormat=",.1f"
-                       strokeColor="#1f77b4"
-                       showGrid="true"
-                       displayName="Sensor 1" />
-    <TimeSeriesChannel value="#two"
-                       units="miles"
-                       unitsFormat=",.1f"
-                       showGrid="true"
-                       strokeColor="#ff7f0e"
-                       displayName="Sensor 2" />
-  </TimeSeries>
+    <!-- Object tag for time series data source -->
+    <TimeSeries name="ts" valueType="url" value="$csv"
+                timeValue="#time" overviewChannels="one">
+        <TimeSeriesChannel value="#one"
+                           units="miles"
+                           unitsFormat=",.1f"
+                           strokeColor="#1f77b4"
+                           showGrid="true"
+                           displayName="Sensor 1"/>
+        <TimeSeriesChannel value="#two"
+                           units="miles"
+                           unitsFormat=",.1f"
+                           showGrid="true"
+                           strokeColor="#ff7f0e"
+                           displayName="Sensor 2"/>
+    </TimeSeries>
 </View>

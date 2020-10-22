@@ -34,6 +34,13 @@
       min-width: 98% !important;
       max-width: 98% !important;
     }
+
+    #label-studio .ls-menu {
+      width: 100%;
+    }
+    #label-studio .ls-segment {
+      top: 0;
+    }
   </style>
 
 </head>
@@ -60,9 +67,18 @@
       task: _convertTask(task),
 
       interfaces: [
-        "basic",
-        // "side-column"
-      ],
+      "basic",
+      "panel", // undo, redo, reset panel
+      "controls", // all control buttons: skip, submit, update
+      "submit", // submit button on controls
+      "update", // update button on controls
+      "predictions",
+      "predictions:menu", // right menu with prediction items
+      "completions:menu", // right menu with completion items
+      "completions:add-new",
+      "completions:delete",
+      "side-column" // entity,
+        ],
 
       onLabelStudioLoad: function (LS) {
         var c = LS.completionStore.addCompletion({userGenerate: true});

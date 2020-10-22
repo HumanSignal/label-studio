@@ -1,0 +1,136 @@
+<!-- {"title": "Independent channels", "category": "time-series", "complexity": "basic", "order": "z"} -->
+<View>
+    <Header value="Build relations among regions
+                   from different channels" size="6"/>
+    <!--
+         To disable region syncing between channels
+         we need to use different TimeSeries instances
+         for different channels 1 and 2.
+    -->
+
+    <!-- First TimeSeries with channel 1 -->
+    <Header value="Sensor 1 labels" size="6"/>
+    <TimeSeriesLabels name="label" toName="ts">
+        <Label value="Run" background="#a4a"/>
+        <Label value="Walk" background="#aa4"/>
+    </TimeSeriesLabels>
+
+    <TimeSeries name="ts" valueType="url" value="$csv"
+                timeValue="#time" overviewChannels="one">
+        <TimeSeriesChannel value="#one" strokeColor="#27b"
+                           displayName="Sensor 1"/>
+    </TimeSeries>
+
+    <!-- Second TimeSeries with channel 2 -->
+    <Header value="Sensor 2 labels" size="6"/>
+    <TimeSeriesLabels name="label2" toName="ts2">
+        <Label value="On" background="green"/>
+        <Label value="Off" background="red"/>
+    </TimeSeriesLabels>
+
+    <TimeSeries name="ts2" valueType="url" value="$csv"
+                timeValue="#time" overviewChannels="one">
+        <TimeSeriesChannel value="#two" strokeColor="#f80"
+                           displayName="Sensor 2"/>
+    </TimeSeries>
+</View>
+
+
+<!-- This is the sample task data with prediction -->
+
+<!-- {
+  "completions": [
+    {
+      "created_at": 1603327352,
+      "id": 2001,
+      "lead_time": 205.945,
+      "result": [
+        {
+          "from_name": "label2",
+          "id": "5Zo_YOBhPL",
+          "to_name": "ts2",
+          "type": "timeserieslabels",
+          "value": {
+            "end": 1592250891909.4644,
+            "instant": false,
+            "start": 1592250711999.969,
+            "timeserieslabels": [
+              "On"
+            ]
+          }
+        },
+        {
+          "from_name": "label",
+          "id": "f5UUxZq8VN",
+          "to_name": "ts",
+          "type": "timeserieslabels",
+          "value": {
+            "end": 1592251091951.752,
+            "instant": false,
+            "start": 1592250881919.5193,
+            "timeserieslabels": [
+              "Run"
+            ]
+          }
+        },
+        {
+          "from_name": "label2",
+          "id": "ptOJYeLrWr",
+          "to_name": "ts2",
+          "type": "timeserieslabels",
+          "value": {
+            "end": 1592251321974.9744,
+            "instant": false,
+            "start": 1592251221997.6416,
+            "timeserieslabels": [
+              "Off"
+            ]
+          }
+        },
+        {
+          "from_name": "label",
+          "id": "AqfvsSydt5",
+          "to_name": "ts",
+          "type": "timeserieslabels",
+          "value": {
+            "end": 1592251731931.9534,
+            "instant": false,
+            "start": 1592251461993.5276,
+            "timeserieslabels": [
+              "Walk"
+            ]
+          }
+        },
+        {
+          "from_name": "label",
+          "id": "BJR_8Vc6Ex",
+          "to_name": "ts",
+          "type": "timeserieslabels",
+          "value": {
+            "end": 1592251081992.7,
+            "instant": false,
+            "start": 1592251071946.638,
+            "timeserieslabels": [
+              "Run"
+            ]
+          }
+        },
+        {
+          "direction": "right",
+          "from_id": "5Zo_YOBhPL",
+          "to_id": "f5UUxZq8VN",
+          "type": "relation"
+        },
+        {
+          "direction": "right",
+          "from_id": "ptOJYeLrWr",
+          "to_id": "AqfvsSydt5",
+          "type": "relation"
+        }
+      ]
+    }
+  ],
+  "data": {
+    "csv": "http://localhost:8080/static/samples/sample-task-sin.csv"
+  }
+} -->

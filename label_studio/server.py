@@ -341,11 +341,31 @@ def api_render_label_studio():
     if not config:
         return make_response('No config in POST', status.HTTP_417_EXPECTATION_FAILED)
 
+    # try to get task data, completions & predictions from config comment
+    task_data, completions, predictions = None, None, None
+    start = config.find('<!-- {')
+    start = start if start >= 0 else config.find('<!--{')
+    start += 4
+    end = config[start:].find('-->') if start >= 0 else -1
+    if 3 < start < start + end:
+        try:
+            body = json.loads(config[start:start + end])
+        except:
+            task_data = None
+        else:
+            task_data = body['data'] if 'data' in body else body
+            predictions = body['predictions'] if 'predictions' in body else None
+            completions = body['completions'] if 'completions' in body else None
+
     # prepare example
-    task_data = generate_sample_task_without_check(config, mode='editor_preview')
+    if task_data is None:
+        task_data = generate_sample_task_without_check(config, mode='editor_preview')
+        
     example_task_data = {
         'id': 1764,
         'data': task_data,
+        'completions': completions,
+        'predictions': predictions,
         'project': g.project.id,
         'created_at': '2019-02-06T14:06:42.000420Z',
         'updated_at': '2019-02-06T14:06:42.000420Z'

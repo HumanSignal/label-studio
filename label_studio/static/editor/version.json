@@ -1,6 +1,6 @@
 {
-  "message": "Fix TS state restoration",
-  "commit": "f3c9499692811fdb5077102571fed901d0dbf781",
+  "message": "Merge branch 'feature/ts' of github.com:heartexlabs/label-studio-frontend into feature/ts",
+  "commit": "3d13b77a4a39290d3434fc30e0f450838d6fb98b",
   "branch": "feature/ts",
-  "date": "2020-10-21T21:05:13Z"
+  "date": "2020-10-21T23:52:09Z"
 }
