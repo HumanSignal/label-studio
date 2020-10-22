@@ -122,8 +122,7 @@ def generate_sample_task_without_check(label_config, mode='upload'):
                 params['sep'] = separator
             if time_format:
                 params['tf'] = time_format
-            task[tag_value] = '/static/samples/time-series.csv?time=' + \
-                              '?' + urlencode(params)
+            task[tag_value] = '/static/samples/time-series.csv?' + urlencode(params)
 
         elif isinstance(ts_task, dict):
             # data is JSON
