@@ -1,0 +1,29 @@
+<!-- {"title": "Link regions with text", "category": "time-series", "complexity": "basic", "order": "z"} -->
+<View>
+    <Header value="Link logger events with
+                   monitoring signals using relations"/>
+
+    <!-- Text setup -->
+    <Header value="Mark actions in text" size="6"/>
+    <Labels name="text_label" toName="text">
+        <Label value="Joy" background="red"/>
+        <Label value="Calm" background="darkorange"/>
+        <Label value="Agressive" background="orange"/>
+    </Labels>
+    
+    <Text name="text" value="$text"/>
+
+    <!-- Time series setup -->
+    <Header value="Mark regions in time series" size="6"/>
+    <TimeSeriesLabels name="ts_label" toName="ts">
+        <Label value="Joy" background="red"/>
+        <Label value="Calm" background="darkorange"/>
+        <Label value="Aggressive" background="orange"/>
+    </TimeSeriesLabels>
+
+    <TimeSeries name="ts" valueType="url" value="$csv" timeValue="#time">
+        <TimeSeriesChannel value="#one" strokeColor="#17b"
+                           displayName="Sensor 1"/>
+    </TimeSeries>
+
+</View>

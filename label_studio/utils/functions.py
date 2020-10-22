@@ -19,6 +19,25 @@ PROTOCOL = ''
 HOSTNAME = ''
 
 
+def get_task_from_labeling_config(config):
+    # try to get task data, completions & predictions from config comment
+    task_data, completions, predictions = None, None, None
+    start = config.find('<!-- {')
+    start = start if start >= 0 else config.find('<!--{')
+    start += 4
+    end = config[start:].find('-->') if start >= 0 else -1
+    if 3 < start < start + end:
+        try:
+            body = json.loads(config[start:start + end])
+        except:
+            task_data = None
+        else:
+            task_data = body['data'] if 'data' in body else body
+            predictions = body['predictions'] if 'predictions' in body else None
+            completions = body['completions'] if 'completions' in body else None
+    return task_data, completions, predictions
+
+
 def data_examples(mode):
     """ Data examples for editor preview and task upload examples
     """

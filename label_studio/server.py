@@ -33,7 +33,7 @@ from flask import (
 from flask_api import status
 from types import SimpleNamespace
 
-from label_studio.utils.functions import generate_sample_task
+from label_studio.utils.functions import generate_sample_task, get_task_from_labeling_config
 from label_studio.utils.io import find_dir, find_editor_files
 from label_studio.utils import uploader
 from label_studio.utils.validation import TaskValidator
@@ -341,21 +341,7 @@ def api_render_label_studio():
     if not config:
         return make_response('No config in POST', status.HTTP_417_EXPECTATION_FAILED)
 
-    # try to get task data, completions & predictions from config comment
-    task_data, completions, predictions = None, None, None
-    start = config.find('<!-- {')
-    start = start if start >= 0 else config.find('<!--{')
-    start += 4
-    end = config[start:].find('-->') if start >= 0 else -1
-    if 3 < start < start + end:
-        try:
-            body = json.loads(config[start:start + end])
-        except:
-            task_data = None
-        else:
-            task_data = body['data'] if 'data' in body else body
-            predictions = body['predictions'] if 'predictions' in body else None
-            completions = body['completions'] if 'completions' in body else None
+    task_data, completions, predictions = get_task_from_labeling_config(config)
 
     # prepare example
     if task_data is None:
@@ -439,7 +425,9 @@ def api_import_example():
         config = request.POST.get('label_config', '')
     try:
         g.project.validate_label_config(config)
-        output = generate_sample_task_without_check(config, mode='editor_preview')
+        output, completions, predictions = get_task_from_labeling_config(config)
+        if output is None:
+            output = generate_sample_task_without_check(config, mode='editor_preview')
     except (ValueError, ValidationError, lxml.etree.Error, KeyError):
         response = HttpResponse('error while example generating', status=status.HTTP_400_BAD_REQUEST)
     else:

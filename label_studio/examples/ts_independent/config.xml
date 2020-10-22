@@ -36,9 +36,15 @@
 </View>
 
 
-<!-- This is the sample task data with prediction -->
+<!--
+    This is the sample task data with completion
+    for preview on Setup page only
+-->
 
 <!-- {
+  "data": {
+    "csv": "/static/samples/sample-task-sin.csv"
+  },
   "completions": [
     {
       "created_at": 1603327352,
@@ -129,8 +135,5 @@
         }
       ]
     }
-  ],
-  "data": {
-    "csv": "http://localhost:8080/static/samples/sample-task-sin.csv"
-  }
+  ]
 } -->

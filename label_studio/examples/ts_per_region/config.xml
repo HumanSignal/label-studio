@@ -1,0 +1,31 @@
+<!-- {"title": "Per region classification", "category": "time-series", "complexity": "basic", "order": "z"} -->
+<View>
+    <Header value="Create and select region to classify it" size="6"/>
+
+    <!-- Control tag for region labels -->
+    <TimeSeriesLabels name="label" toName="ts">
+        <Label value="Run" background="#5b5"/>
+        <Label value="Walk" background="#55f"/>
+    </TimeSeriesLabels>
+
+    <!-- Object tag for time series data source -->
+    <TimeSeries name="ts" valueType="url" value="$csv"
+                timeValue="#time">
+        <TimeSeriesChannel value="#one" strokeColor="#17b"
+                           displayName="Sensor 1"/>
+        <TimeSeriesChannel value="#two" strokeColor="#f70"
+                           displayName="Sensor 2"/>
+    </TimeSeries>
+
+  <!-- Per region setup -->
+  <View visibleWhen="region-selected">
+    <Header value="Select signal quality" />
+  </View>
+
+  <Choices name="choices" toName="ts" showInline="true"
+           perRegion="true" required="true">
+  	<Choice value="Normal"/>
+    <Choice value="Neutral"/>
+    <Choice value="Bad"/>
+  </Choices>
+</View>
