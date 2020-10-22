@@ -675,7 +675,7 @@ class Project(object):
                 already_exists_error('label config', config_xml_path)
             if not input_path:
                 # create default config with polygons only if input data is not set
-                default_label_config = find_file('examples/image_polygons/config.xml')
+                default_label_config = find_file('examples/default_config.xml')
                 copy2(default_label_config, config_xml_path)
                 print(default_label_config + ' label config copied to ' + config_xml_path)
             else:

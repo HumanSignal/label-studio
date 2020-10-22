@@ -6,19 +6,19 @@
     <!-- Text setup -->
     <Header value="Mark actions in text" size="6"/>
     <Labels name="text_label" toName="text">
-        <Label value="Joy" background="red"/>
-        <Label value="Calm" background="darkorange"/>
-        <Label value="Agressive" background="orange"/>
+        <Label value="Error" background="red"/>
+        <Label value="High load" background="darkorange"/>
+        <Label value="None" background="orange"/>
     </Labels>
-    
+
     <Text name="text" value="$text"/>
 
     <!-- Time series setup -->
     <Header value="Mark regions in time series" size="6"/>
     <TimeSeriesLabels name="ts_label" toName="ts">
-        <Label value="Joy" background="red"/>
-        <Label value="Calm" background="darkorange"/>
-        <Label value="Aggressive" background="orange"/>
+        <Label value="Error" background="red"/>
+        <Label value="High load" background="darkorange"/>
+        <Label value="None" background="orange"/>
     </TimeSeriesLabels>
 
     <TimeSeries name="ts" valueType="url" value="$csv" timeValue="#time">
@@ -27,3 +27,6 @@
     </TimeSeries>
 
 </View>
+
+<!-- Sample task data -->
+<!-- { "data": { "text": "NetworkManager[1365]: <warn>  [1603289054.3953] error requesting auth for org.freedesktop.NetworkManager.enable-disable-wwan: Authorization check failed: Failed to open file “/proc/1868/status”: No such file or directory", "csv": "/static/samples/sample-task-sin.csv" } } -->
