@@ -289,11 +289,11 @@ div[class*="App_editor"] {
     padding: 0.80571429em 0.7em 0.80571429em !important;
 }
 
-.settings-cog {
+.hover-button {
     cursor: pointer;
     opacity: 0.75 !important;
 }
-.settings-cog:hover {
+.hover-button:hover {
     opacity: 1.0 !important;
 }
 

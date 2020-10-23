@@ -117,6 +117,9 @@ def parse_input_args():
     root_parser.add_argument(
         '--use-gevent', dest='use_gevent', action='store_true',
         help='Use gevent for better concurrency', default=False)
+    root_parser.add_argument(
+        '--initial-project-description', dest='project_desc',
+        help='Project description to identify project')
 
     parser = argparse.ArgumentParser(description='Label studio')
 

@@ -98,11 +98,20 @@ def project_get_or_create(multi_session_force_recreate=False):
         if 'user' not in session:
             session['user'] = str(uuid4())
         user = session['user']
+        g.user = user
 
         # get project from session
         if 'project' not in session or multi_session_force_recreate:
             session['project'] = str(uuid4())
         project = session['project']
+
+        # check for shared projects and get owner user
+        if project in session.get('shared_projects', []):
+            owner = Project.get_user_by_project(project, input_args.root_dir)
+            if owner is None:  # owner is None when project doesn't exist
+                raise Exception('No such shared project found: project_uuid = ' + project)
+            else:
+                user = owner
 
         project_name = user + '/' + project
         return Project.get_or_create(project_name, input_args, context={
@@ -124,15 +133,26 @@ def json_filter(s):
 
 @app.before_request
 def app_before_request_callback():
-    # setup session cookie
-    if 'session_id' not in session:
-        session['session_id'] = str(uuid4())
-    g.project = project_get_or_create()
-    g.analytics = Analytics(input_args, g.project)
-    g.sid = g.analytics.server_id
+    if request.endpoint in ('static', 'send_static'):
+        return
+
+    def prepare_globals():
+        # setup session cookie
+        if 'session_id' not in session:
+            session['session_id'] = str(uuid4())
+        g.project = project_get_or_create()
+        g.analytics = Analytics(input_args, g.project)
+        g.sid = g.analytics.server_id
+
+    # show different exception pages for api and other endpoints
+    if request.path.startswith('/api'):
+        return exception_treatment(prepare_globals)()
+    else:
+        return exception_treatment_page(prepare_globals)()
 
 
 @app.after_request
+@exception_treatment
 def app_after_request_callback(response):
     if hasattr(g, 'analytics'):
         g.analytics.send(request, session, response)
@@ -245,8 +265,31 @@ def tasks_page():
 def setup_page():
     """ Setup label config
     """
-    templates = get_config_templates(g.project.config)
     input_values = {}
+    project = g.project
+
+    g.project.description = project.get_config(project.name, input_args).get('description')
+
+    if project.config.get("show_project_links_in_multisession", False) and hasattr(g, 'user'):
+        user = g.user
+        project_ids = g.project.get_user_projects(user, input_args.root_dir)
+
+        # own projects
+        project_names = [os.path.join(user, uuid) for uuid in project_ids]
+        project_desc = [Project.get_config(name, input_args).get('description') for name in project_names]
+        own_projects = dict(zip(project_ids, project_desc))
+
+        # shared projects
+        shared_projects = {}
+        for uuid in session.get('shared_projects', []):
+            tmp_user = Project.get_user_by_project(uuid, input_args.root_dir)
+            project_name = os.path.join(tmp_user, uuid)
+            project_desc = Project.get_config(project_name, input_args).get('description')
+            shared_projects[uuid] = project_desc
+    else:
+        own_projects, shared_projects = {}, {}
+
+    templates = get_config_templates(g.project.config)
     return flask.render_template(
         'setup.html',
         config=g.project.config,
@@ -254,7 +297,9 @@ def setup_page():
         label_config_full=g.project.label_config_full,
         templates=templates,
         input_values=input_values,
-        multi_session=input_args.command == 'start-multi-session'
+        multi_session=input_args.command == 'start-multi-session',
+        own_projects=own_projects,
+        shared_projects=shared_projects
     )
 
 
@@ -568,6 +613,7 @@ def api_project():
     code = 200
 
     if request.method == 'POST' and request.args.get('new', False):
+        input_args.project_desc = request.args.get('desc')
         g.project = project_get_or_create(multi_session_force_recreate=True)
         code = 201
     elif request.method == 'PATCH':
@@ -916,6 +962,45 @@ def get_data_file(filename):
                                 'Use "allow_serving_local_files": true config option to enable local serving')
     directory = request.args.get('d')
     return flask.send_from_directory(directory, filename, as_attachment=True)
+
+
+@app.route('/api/project-switch', methods=['GET', 'POST'])
+@requires_auth
+@exception_treatment
+def api_project_switch():
+    """ Switch projects """
+
+    if request.args.get('uuid') is None:
+        return make_response("Not a valid UUID", 400)
+
+    uuid = request.args.get('uuid')
+    user = Project.get_user_by_project(uuid, input_args.root_dir)
+
+    # not owner user tries to open shared project
+    if user != g.user:
+        # create/append shared projects for user
+        if 'shared_projects' not in session:
+            session['shared_projects'] = {}
+        session['shared_projects'].update({uuid: {}})
+
+    # switch project
+    session['project'] = uuid
+
+    output = g.project.serialize()
+    output['multi_session_mode'] = input_args.command == 'start-multi-session'
+    if request.method == 'GET':
+        return redirect('../setup')
+    else:
+        return make_response(jsonify(output), 200)
+
+
+@app.route('/api/health', methods=['GET'])
+@requires_auth
+@exception_treatment
+def health():
+    """ Health check
+    """
+    return make_response('{"status": "up"}', 200)
 
 
 def str2datetime(timestamp_str):
