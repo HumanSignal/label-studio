@@ -88,7 +88,7 @@ def generate_sample_task_without_check(label_config, mode='upload'):
 
         # valueType="url"
         examples['Text'] = examples['TextUrl'] if value_type == 'url' else examples['TextRaw']
-        examples['TimeSeries'] = examples['TimeSeriesUrl'] if value_type == 'url' else examples['TimeSeriesRaw']
+        examples['TimeSeries'] = examples['TimeSeriesUrl'] if value_type == 'url' or value_type is None else examples['TimeSeriesRaw']
 
         if value and value[0] == '$':
             # try get example by variable name
