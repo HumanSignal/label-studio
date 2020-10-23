@@ -1,14 +1,26 @@
 <!-- {"title": "Loading from JSON", "category": "time-series", "complexity": "basic", "order": "2"} -->
-<View>
-    <!--
-     Quickstart:
-     Prepare JSON-formatted input: {"ts": {"time": [0,1,2..], "first_column": [...], "second_column": [...]}}
-     Set your data keys in the following attributes:
-     - timeColumn="time"
-     - column="first_column", column="second_column"
-     Add more <Channel> for more columns if needed
-    -->
 
+<!-- readme
+### Quickstart
+1. Prepare JSON-formatted input:
+
+    ```json
+    {
+      "ts": {
+        "time": [0,1,2],
+        "first_column": [3,4,5],
+        "second_column": [6,7,8]}
+    }
+    ```
+
+2. Set your data keys in the following attributes:
+    * `timeColumn="time"`
+    * `column="first_column"` or `column="second_column"`
+
+3. Add more `<Channel>` tags for more columns if needed
+-->
+
+<View>
     <Header value="Time Series from JSON"
         style="font-size:1.2em; font-weight: normal"/>
 

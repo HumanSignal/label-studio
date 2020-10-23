@@ -1,7 +1,6 @@
 <!-- {"title": "Segmentation", "category": "time-series", "complexity": "basic"} -->
 <View>
-    <!--
-     Quickstart:
+    <!-- Quickstart:
      Prepare tabular data CSV format time-series.csv:
 
      time,velocity,acceleration

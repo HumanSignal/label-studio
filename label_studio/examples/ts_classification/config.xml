@@ -1,35 +1,15 @@
 <!-- {"title": "Time Series classification", "category": "time-series", "complexity": "basic", "order": "!"} -->
 <View>
-    <!--
-     Quickstart:
-     Prepare JSON-formatted input: {"ts": {"time": [0,1,2..], "first_column": [...], "second_column": [...]}}
-     Set your data keys in the following attributes:
-     - timeColumn="time"
-     - column="first_column", column="second_column"
-     Add more <Channel> for more columns if needed
-    -->
-    <Header value="Time Series from JSON"
-        style="font-size:1.2em; font-weight: normal"/>
+    <Header value="Time Series Classification" />
 
-    <TimeSeries timeColumn="time"
-                name="ts" value="$ts"  valueType="json">
+    <TimeSeries name="ts" timeColumn="time"
+                value="$ts" valueType="url">
         <Channel column="first_column"
-                 strokeColor="#1f77b4" legend="Signal A" showGrid="true"/>
-        <Channel column="second_column"
-                 strokeColor="#ff7f0e" legend="Signal B" showGrid="true"/>
+                 strokeColor="#1f77b4" />
     </TimeSeries>
 
-    <Header value="Time series classification"/>
-    <Choices name="pattern" toName="ts"
-             choice="single" showInline="true">
+    <Choices name="pattern" toName="ts" showInline="true">
         <Choice value="Growth"/>
         <Choice value="Decay"/>
     </Choices>
-
-    <Header value="Time series segmentation"/>
-    <TimeSeriesLabels name="label" toName="ts">
-        <Label value="Anomaly" background="#a4a"/>
-        <Label value="Ordinary" background="#aa4"/>
-    </TimeSeriesLabels>
-
 </View>

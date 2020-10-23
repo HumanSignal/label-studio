@@ -1,19 +1,25 @@
 <!-- {"title": "Loading from headless CSV", "category": "time-series", "complexity": "basic", "order": "1"} -->
+
+<!-- readme
+### Quickstart
+1. Prepare `time-series.csv` in tabular CSV format without column headers:
+    ```
+    0,12.34,56.78
+    2,-43.21,8765
+    ```
+
+2. Set column names from CSV in the labeling config below:
+    - `timeColumn="0"`
+    - `column="1"`, `column="2"`
+
+3. Add `<Channel>` tags for more columns if needed.
+
+4. After setup you can import your CSV files on Import page and Label Studio will host them OR
+upload your CSV to your hosting (e.g.: `https://my.domain.com/time-series.csv`) and
+<a target="_blank" href="https://labelstud.io/guide/tasks.html">prepare LS tasks for them.</a>
+-->
+
 <View>
-    <!--
-     Quickstart:
-     Prepare tabular data CSV format without column header time-series.csv:
-
-     0,12.34,56.78
-     2,-43.21,8765
-
-     Use local file time-series.csv directly OR
-     Prepare the links to hosted CSV file: "https://my.domain.com/time-series.csv"
-     Flip your column names in the following attributes if needed:
-     - timeColumn="0"
-     - column="1", column="2"
-     Add more <Channel> for more columns
-    -->
     <Header value="Time Series from headless CSV"
             style="font-size:1.2em; font-weight: normal"/>
 

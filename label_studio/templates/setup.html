@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
 {% block body %}
 
+<!-- md to html generator -->
+<script src="static/js/marked.min.js"></script>
+<link rel="stylesheet" href="static/css/github-markdown.css">
+
 <link rel="stylesheet" href="static/css/codemirror.css">
 <style>
   .error {
@@ -38,7 +42,8 @@
 
       <!-- Textarea & Preview in two cols -->
       <div class="ui two column grid zero-margin step2 stackable">
-        <div class="column">
+        <div class="column" id="left-column">
+
           <h3>Labeling Config</h3>
 
           <!-- Code -->
@@ -189,9 +194,26 @@
       var template_pk = $el.data('value');
       var value = $('[data-template-pk="' + template_pk + '"]').html();
 
+      // extract readme
+      $('#readme-body').remove();
+
+      var starter = '<!-- readme', terminator = '-->';
+      var start = value.indexOf(starter);
+      if (start >= 0) {
+        var body_lenght = value.indexOf(terminator, start) - start - starter.length;
+        var readme = value.substr(start + starter.length, body_lenght);
+        var readme_body = $('<div id="readme-body" class="markdown-body"></div>');
+        readme_body.html(marked(readme));
+        $('#left-column').prepend(readme_body);
+
+        // Find first XML tag (<View> as usual) and start from it
+        value = value.slice(value.indexOf('<', start + starter.length + body_lenght + terminator.length))
+      }
+
       labelEditor.setValue(value);
     }
 
+    // switch template by click
     $('.use-template').on('click', function () {
       var $el = $(this);
       edit_count = 0;
