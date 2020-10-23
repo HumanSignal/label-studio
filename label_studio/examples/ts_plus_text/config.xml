@@ -23,7 +23,7 @@
 
     <TimeSeries name="ts" valueType="url" value="$csv"
                 sep="," timeColumn="time">
-        <Channel column="temperature"
+        <Channel column="temperature" units="°C"
                  strokeColor="#17b" legend="Temperature"/>
     </TimeSeries>
 
