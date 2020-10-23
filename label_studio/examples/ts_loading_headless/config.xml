@@ -21,7 +21,7 @@ upload your CSV to your hosting (e.g.: `https://my.domain.com/time-series.csv`) 
 
 <View>
     <Header value="Time Series from headless CSV"
-            style="font-size:1.2em; font-weight: normal"/>
+            style="font-weight: normal"/>
 
     <!-- Control tag for region labels -->
     <TimeSeriesLabels name="label" toName="ts">
@@ -30,20 +30,17 @@ upload your CSV to your hosting (e.g.: `https://my.domain.com/time-series.csv`) 
     </TimeSeriesLabels>
 
     <!-- Object tag for time series data source -->
-    <TimeSeries timeColumn="0"
-                sep=","
-                name="ts" valueType="url" value="$csv"
-                overviewChannels="1">
+    <TimeSeries name="ts" valueType="url"
+                timeColumn="0" value="$csv"
+                sep="," overviewChannels="1,2">
         <Channel column="1"
-                 units="magnitude"
+                 units="miles/h"
                  displayFormat=",.1f"
                  strokeColor="#1f77b4"
-                 showGrid="true"
                  legend="Velocity"/>
         <Channel column="2"
-                 units="magnitude"
+                 units="miles/h^2"
                  displayFormat=",.1f"
-                 showGrid="true"
                  strokeColor="#ff7f0e"
                  legend="Acceleration"/>
     </TimeSeries>

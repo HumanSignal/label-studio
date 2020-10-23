@@ -4,14 +4,14 @@
 ### Quickstart
 1. Prepare `time-series.csv` in tabular CSV format:
     ```
-    time,first_column,second_column
+    time,velocity,acceleration
     0,12.34,56.78
     2,-43.21,8765
     ```
 
 2. Set column names from CSV in the labeling config below:
     - `timeColumn="time"`
-    - `column="first_column"`, `column="second_column"`
+    - `column="velocity"`, `column="acceleration"`
 
 3. Add `<Channel>` tags for more columns if needed.
 
@@ -22,7 +22,7 @@ upload your CSV to your hosting (e.g.: `https://my.domain.com/time-series.csv`) 
 
 <View>
     <Header value="Time Series from CSV"
-            style="font-size:1.2em; font-weight: normal"/>
+            style="font-weight: normal"/>
 
     <!-- Control tag for region labels -->
     <TimeSeriesLabels name="label" toName="ts">
@@ -31,20 +31,17 @@ upload your CSV to your hosting (e.g.: `https://my.domain.com/time-series.csv`) 
     </TimeSeriesLabels>
 
     <!-- Object tag for time series data source -->
-    <TimeSeries timeColumn="time"
-                sep=","
-                name="ts" valueType="url" value="$csv"
-                overviewChannels="velocity">
+    <TimeSeries name="ts" valueType="url"
+                timeColumn="time" value="$csv"
+                sep="," overviewChannels="velocity">
         <Channel column="velocity"
-                 units="magnitude"
+                 units="miles/h"
                  displayFormat=",.1f"
                  strokeColor="#1f77b4"
-                 showGrid="true"
                  legend="Velocity"/>
         <Channel column="acceleration"
-                 units="magnitude"
+                 units="miles/h^2"
                  displayFormat=",.1f"
-                 showGrid="true"
                  strokeColor="#ff7f0e"
                  legend="Acceleration"/>
     </TimeSeries>

@@ -1,11 +1,10 @@
 <!-- {"title": "Time Series classification", "category": "time-series", "complexity": "basic", "order": "!"} -->
 <View>
-    <Header value="Time Series Classification" />
+    <Header value="Time Series Classification"/>
 
     <TimeSeries name="ts" timeColumn="time"
                 value="$ts" valueType="url">
-        <Channel column="first_column"
-                 strokeColor="#1f77b4" />
+        <Channel column="first_column"/>
     </TimeSeries>
 
     <Choices name="pattern" toName="ts" showInline="true">
