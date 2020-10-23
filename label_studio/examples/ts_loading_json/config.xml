@@ -3,7 +3,7 @@
 <!-- readme
 ### Quickstart
 
-JSON is a native format for Label Studio and you can store time series column data right in of LS task.
+JSON is a native format for Label Studio and you can store time series column data right in LS task.
 <a target="_blank" href="https://labelstud.io/guide/tasks.html">Read more about LS tasks.</a>
 
 1. Prepare JSON-formatted input:
@@ -28,24 +28,16 @@ JSON is a native format for Label Studio and you can store time series column da
     <Header value="Time Series from JSON"
             style="font-weight: normal"/>
 
-    <TimeSeries timeColumn="time"
-                name="ts" value="$ts" valueType="json">
-        <Channel column="first_column"
-                 strokeColor="#1f77b4" legend="Signal A"/>
-        <Channel column="second_column"
-                 strokeColor="#ff7f0e" legend="Signal B"/>
-    </TimeSeries>
-
-    <Header value="Time series classification"/>
-    <Choices name="pattern" toName="ts"
-             choice="single" showInline="true">
-        <Choice value="Growth"/>
-        <Choice value="Decay"/>
-    </Choices>
-
-    <Header value="Time series segmentation"/>
     <TimeSeriesLabels name="label" toName="ts">
         <Label value="Anomaly" background="#a4a"/>
         <Label value="Ordinary" background="#aa4"/>
     </TimeSeriesLabels>
+
+    <TimeSeries timeColumn="time"
+                name="ts" value="$ts" valueType="json">
+        <Channel column="first_column"
+                 strokeColor="#1f77b4"/>
+        <Channel column="second_column"
+                 strokeColor="#ff7f0e"/>
+    </TimeSeries>
 </View>

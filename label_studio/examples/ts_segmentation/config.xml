@@ -1,4 +1,4 @@
-<!-- {"title": "Segmentation", "category": "time-series", "complexity": "basic"} -->
+<!-- {"title": "Segmentation & Classification", "category": "time-series", "complexity": "basic"} -->
 
 <!-- readme
 ### Tips
@@ -9,7 +9,7 @@
             style="font-weight: normal"/>
 
     <!-- Control tag for region labels -->
-    <TimeSeriesLabels name="label" toName="ts" opacity="0.01">
+    <TimeSeriesLabels name="label" toName="ts">
         <Label value="Run" background="red"/>
         <Label value="Walk" background="green"/>
         <Label value="Fly" background="blue"/>
@@ -35,4 +35,11 @@
                  strokeColor="#ff7f0e"
                  legend="Acceleration"/>
     </TimeSeries>
+
+    <Header value="Time Series Classification"/>
+    <Choices name="pattern" toName="ts"
+             choice="single" showInline="true">
+        <Choice value="Growth"/>
+        <Choice value="Decay"/>
+    </Choices>
 </View>

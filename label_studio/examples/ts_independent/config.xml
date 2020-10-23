@@ -1,12 +1,14 @@
 <!-- {"title": "Relations between channels", "category": "time-series", "complexity": "basic", "order": "z"} -->
+<!-- readme
+### Notes
+ * To disable region syncing between channels
+ we need to use two different TimeSeries instances
+ for channels 1 and 2.
+-->
+
 <View>
     <Header value="Build relations among regions
                    from different channels" size="6"/>
-    <!--
-         To disable region syncing between channels
-         we need to use different TimeSeries instances
-         for different channels 1 and 2.
-    -->
 
     <!-- First TimeSeries with channel 1 -->
     <Header value="Sensor 1 labels" size="6"/>
