@@ -34,14 +34,8 @@ upload your CSV to your hosting (e.g.: `https://my.domain.com/time-series.csv`) 
                 timeColumn="0" value="$csv"
                 sep="," overviewChannels="1,2">
         <Channel column="1"
-                 units="miles/h"
-                 displayFormat=",.1f"
-                 strokeColor="#1f77b4"
-                 legend="Velocity"/>
+                 strokeColor="#1f77b4"/>
         <Channel column="2"
-                 units="miles/h^2"
-                 displayFormat=",.1f"
-                 strokeColor="#ff7f0e"
-                 legend="Acceleration"/>
+                 strokeColor="#ff7f0e"/>
     </TimeSeries>
 </View>

@@ -9,7 +9,7 @@
             style="font-weight: normal"/>
 
     <!-- Control tag for region labels -->
-    <TimeSeriesLabels name="label" toName="ts">
+    <TimeSeriesLabels name="label" toName="ts" opacity="0.01">
         <Label value="Run" background="red"/>
         <Label value="Walk" background="green"/>
         <Label value="Fly" background="blue"/>
@@ -18,17 +18,19 @@
     </TimeSeriesLabels>
 
     <!-- Object tag for time series data source -->
-    <TimeSeries timeColumn="time"
+    <TimeSeries name="ts" valueType="url" value="$csv"
                 sep=","
-                name="ts" valueType="url" value="$csv"
+                timeColumn="time"
+                timeFormat="%Y-%m-%d %H:%M:%S.%f"
+                timeDisplayFormat="%Y-%m-%d"
                 overviewChannels="velocity">
         <Channel column="velocity"
-                 units="magnitude"
+                 units="miles/h"
                  displayFormat=",.1f"
                  strokeColor="#1f77b4"
                  legend="Velocity"/>
         <Channel column="acceleration"
-                 units="magnitude"
+                 units="miles/h^2"
                  displayFormat=",.1f"
                  strokeColor="#ff7f0e"
                  legend="Acceleration"/>

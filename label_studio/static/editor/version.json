@@ -1,6 +1,6 @@
 {
-  "message": "Change default stroge color for TS",
-  "commit": "086ad7537e07fcb405508e8b73842952576427a5",
+  "message": "Rename separator -> sep",
+  "commit": "932530dd95a1b0cc69e58a44f85fabbaeec53a35",
   "branch": "feature/ts",
-  "date": "2020-10-23T17:24:33Z"
+  "date": "2020-10-23T18:37:11Z"
 }
