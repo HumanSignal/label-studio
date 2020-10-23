@@ -32,6 +32,12 @@
   iframe {
     min-height: 300px;
   }
+
+  .close-icon {
+    float:right;
+    cursor: pointer;
+    padding-right: 10px;
+  }
 </style>
 
 <div class="ui container">
@@ -202,8 +208,13 @@
       if (start >= 0) {
         var body_lenght = value.indexOf(terminator, start) - start - starter.length;
         var readme = value.substr(start + starter.length, body_lenght);
-        var readme_body = $('<div id="readme-body" class="markdown-body"></div>');
-        readme_body.html(marked(readme));
+        var readme_body = $(
+          '<div id="readme-body">' +
+            '<i class="icon close close-icon" onclick="$(\'#readme-body\').remove()"></i>' +
+            '<div class="markdown-body"></div>' +
+          '</div>'
+        );
+        readme_body.find('.markdown-body').html(marked(readme));
         $('#left-column').prepend(readme_body);
 
         // Find first XML tag (<View> as usual) and start from it
