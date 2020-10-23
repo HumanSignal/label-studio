@@ -1,4 +1,4 @@
-<!-- {"title": "Segmentation", "category": "time-series", "complexity": "basic"} -->
+<!-- {"title": "Loading from CSV", "category": "time-series", "complexity": "basic", "order": "1"} -->
 <View>
     <!--
      Quickstart:
@@ -9,8 +9,7 @@
      2,-43.21,8765
 
      Use local file time-series.csv directly OR
-     Prepare the links to hosted CSV file:
-     "https://my.domain.com/time-series.csv"
+     Prepare the links to hosted CSV file: "https://my.domain.com/time-series.csv"
      Set your column names in the following attributes if necessary:
      - timeColumn="time"
      - column="first_column", column="second_column"

@@ -1,4 +1,4 @@
-<!-- {"title": "Time Series from headless CSV", "category": "time-series", "complexity": "basic"} -->
+<!-- {"title": "Loading from headless CSV", "category": "time-series", "complexity": "basic", "order": "1"} -->
 <View>
     <!--
      Quickstart:

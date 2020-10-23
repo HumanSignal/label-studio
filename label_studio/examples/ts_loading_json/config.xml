@@ -1,4 +1,4 @@
-<!-- {"title": "Time Series classification", "category": "time-series", "complexity": "basic", "order": "!"} -->
+<!-- {"title": "Loading from JSON", "category": "time-series", "complexity": "basic", "order": "2"} -->
 <View>
     <!--
      Quickstart:
@@ -8,6 +8,7 @@
      - column="first_column", column="second_column"
      Add more <Channel> for more columns if needed
     -->
+
     <Header value="Time Series from JSON"
         style="font-size:1.2em; font-weight: normal"/>
 
