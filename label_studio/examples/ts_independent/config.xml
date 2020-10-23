@@ -1,4 +1,4 @@
-<!-- {"title": "Independent channels", "category": "time-series", "complexity": "basic", "order": "z"} -->
+<!-- {"title": "Relations between channels", "category": "time-series", "complexity": "basic", "order": "z"} -->
 <View>
     <Header value="Build relations among regions
                    from different channels" size="6"/>
@@ -16,10 +16,10 @@
     </TimeSeriesLabels>
 
     <TimeSeries name="ts" valueType="url" value="$csv"
-                timeValue="#time" separator=","
-                overviewChannels="one">
-        <TimeSeriesChannel value="#one" strokeColor="#27b"
-                           displayName="Sensor 1"/>
+                timeColumn="time" sep=","
+                overviewChannels="sensor_1">
+        <Channel column="sensor_1"
+                 strokeColor="#27b" displayName="Sensor 1"/>
     </TimeSeries>
 
     <!-- Second TimeSeries with channel 2 -->
@@ -30,10 +30,10 @@
     </TimeSeriesLabels>
 
     <TimeSeries name="ts2" valueType="url" value="$csv"
-                timeValue="#column#0" separator=","
-                overviewChannels="one">
-        <TimeSeriesChannel value="#two" strokeColor="#f80"
-                           displayName="Sensor 2"/>
+                timeColumn="0" separator=","
+                overviewChannels="sensor_1">
+        <Channel column="2"
+                 strokeColor="#f80" displayName="Sensor 2"/>
     </TimeSeries>
 </View>
 

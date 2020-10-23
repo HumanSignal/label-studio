@@ -172,13 +172,13 @@ def send_upload(path):
 
 @app.route('/static/samples/time-series.csv')
 @requires_auth
-def sample_task_sin():
+def static_time_series():
     time_column = request.args.get('time')
     value_columns = request.args.get('values').split(',')
     time_format = request.args.get('tf')
     separator = request.args.get('sep', ',')
     header = True
-    if all(n.startswith('column#') for n in [time_column] + value_columns):
+    if all(n.isdigit() for n in [time_column] + value_columns):
         header = False
     ts = generate_time_series_json(time_column, value_columns, time_format)
     csv_data = pd.DataFrame.from_dict(ts).to_csv(index=False, header=header, sep=separator).encode('utf-8')
@@ -448,13 +448,13 @@ def api_import_example():
         config = request.POST.get('label_config', '')
     try:
         g.project.validate_label_config(config)
-        output, completions, predictions = get_task_from_labeling_config(config)
-        if output is None:
-            output = generate_sample_task_without_check(config, mode='editor_preview')
+        predefined_task, _, _ = get_task_from_labeling_config(config)
+        generated_task = generate_sample_task_without_check(config, mode='editor_preview')
+        generated_task.update(predefined_task)
     except (ValueError, ValidationError, lxml.etree.Error, KeyError):
         response = HttpResponse('error while example generating', status=status.HTTP_400_BAD_REQUEST)
     else:
-        response = HttpResponse(json.dumps(output))
+        response = HttpResponse(json.dumps(generated_task))
     return response
 
 

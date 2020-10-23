@@ -1,30 +1,44 @@
-<!-- {"title": "Segmentation CSV headless", "category": "time-series", "complexity": "basic"} -->
+<!-- {"title": "Time Series from headless CSV", "category": "time-series", "complexity": "basic"} -->
 <View>
-    <Header value="Create regions"/>
-    <Header value="Data is loaded from headless CSV"
+    <!--
+     Quickstart:
+     Prepare tabular data CSV format without column header time-series.csv:
+
+     0,12.34,56.78
+     2,-43.21,8765
+
+     Use local file time-series.csv directly OR
+     Prepare the links to hosted CSV file: "https://my.domain.com/time-series.csv"
+     Flip your column names in the following attributes if needed:
+     - timeColumn="0"
+     - column="1", column="2"
+     Add more <Channel> for more columns
+    -->
+    <Header value="Time Series from headless CSV"
             style="font-size:1.2em; font-weight: normal"/>
 
-    <!-- Control tag for region labels, draw label buttons -->
+    <!-- Control tag for region labels -->
     <TimeSeriesLabels name="label" toName="ts">
         <Label value="Run" background="#5b5"/>
         <Label value="Walk" background="#55f"/>
     </TimeSeriesLabels>
 
-    <!-- Object tag for time series data source, draw plots -->
-    <TimeSeries name="ts" valueType="url" timeValue="#column#0"
-                value="$headlessCsv" separator="\t"
-                overviewChannels="column#1,column#2">
-        <TimeSeriesChannel value="#column#1"
-                           units="miles"
-                           unitsFormat=",.1f"
-                           strokeColor="#1f77b4"
-                           showGrid="true"
-                           displayName="Sensor 1"/>
-        <TimeSeriesChannel value="#column#2"
-                           units="miles"
-                           unitsFormat=",.1f"
-                           showGrid="true"
-                           strokeColor="#ff7f0e"
-                           displayName="Sensor 2"/>
+    <!-- Object tag for time series data source -->
+    <TimeSeries timeColumn="0"
+                sep=","
+                name="ts" valueType="url" value="$csv"
+                overviewChannels="1">
+        <Channel column="1"
+                 units="magnitude"
+                 displayFormat=",.1f"
+                 strokeColor="#1f77b4"
+                 showGrid="true"
+                 legend="Velocity"/>
+        <Channel column="2"
+                 units="magnitude"
+                 displayFormat=",.1f"
+                 showGrid="true"
+                 strokeColor="#ff7f0e"
+                 legend="Acceleration"/>
     </TimeSeries>
 </View>

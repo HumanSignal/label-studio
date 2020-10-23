@@ -1,7 +1,21 @@
-<!-- {"title": "Segmentation CSV file", "category": "time-series", "complexity": "basic"} -->
+<!-- {"title": "Time Series from CSV", "category": "time-series", "complexity": "basic"} -->
 <View>
-    <Header value="Create regions"/>
-    <Header value="Data is loaded from CSV with header"
+    <!--
+     Quickstart:
+     Prepare tabular data CSV format time-series.csv:
+
+     time,velocity,acceleration
+     0,12.34,56.78
+     2,-43.21,8765
+
+     Use local file time-series.csv directly OR
+     Prepare the links to hosted CSV file: "https://my.domain.com/time-series.csv"
+     Set your column names in the following attributes if necessary:
+     - timeColumn="time"
+     - column="first_column", column="second_column"
+     Add more <Channel> for more columns
+    -->
+    <Header value="Time Series from CSV"
             style="font-size:1.2em; font-weight: normal"/>
 
     <!-- Control tag for region labels -->
@@ -11,20 +25,21 @@
     </TimeSeriesLabels>
 
     <!-- Object tag for time series data source -->
-    <TimeSeries name="ts" valueType="url"
-                value="$csv" separator=","
-                timeValue="#time" overviewChannels="one">
-        <TimeSeriesChannel value="#one"
-                           units="miles"
-                           unitsFormat=",.1f"
-                           strokeColor="#1f77b4"
-                           showGrid="true"
-                           displayName="Sensor 1"/>
-        <TimeSeriesChannel value="#two"
-                           units="miles"
-                           unitsFormat=",.1f"
-                           showGrid="true"
-                           strokeColor="#ff7f0e"
-                           displayName="Sensor 2"/>
+    <TimeSeries timeColumn="time"
+                sep=","
+                name="ts" valueType="url" value="$csv"
+                overviewChannels="velocity">
+        <Channel column="velocity"
+                 units="magnitude"
+                 displayFormat=",.1f"
+                 strokeColor="#1f77b4"
+                 showGrid="true"
+                 legend="Velocity"/>
+        <Channel column="acceleration"
+                 units="magnitude"
+                 displayFormat=",.1f"
+                 showGrid="true"
+                 strokeColor="#ff7f0e"
+                 legend="Acceleration"/>
     </TimeSeries>
 </View>

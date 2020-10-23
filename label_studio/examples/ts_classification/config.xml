@@ -1,20 +1,35 @@
-<!-- {"title": "Time series classification", "category": "time-series", "complexity": "basic", "order": "!"} -->
+<!-- {"title": "Time Series from JSON", "category": "time-series", "complexity": "basic", "order": "!"} -->
 <View>
-    <Header value="Time series classification"/>
-    <Header value="Data is loaded from JSON"
-            style="font-size:1.2em; font-weight: normal"/>
+    <!--
+     Quickstart:
+     Prepare JSON-formatted input: {"ts": {"time": [0,1,2..], "first_column": [...], "second_column": [...]}}
+     Set your data keys in the following attributes:
+     - timeColumn="time"
+     - column="first_column", column="second_column"
+     Add more <Channel> for more columns if needed
+    -->
+    <Header value="Time Series from JSON"
+        style="font-size:1.2em; font-weight: normal"/>
 
-    <TimeSeries name="ts" value="$ts" timeValue="#time">
-        <TimeSeriesChannel value="#one"
-                           strokeColor="#1f77b4"/>
-        <TimeSeriesChannel value="#two"
-                           strokeColor="#ff7f0e"/>
+    <TimeSeries timeColumn="time"
+                name="ts" value="$ts"  valueType="json">
+        <Channel column="first_column"
+                 strokeColor="#1f77b4" legend="Signal A" showGrid="true"/>
+        <Channel column="second_column"
+                 strokeColor="#ff7f0e" legend="Signal B" showGrid="true"/>
     </TimeSeries>
 
-    <Choices name="sentiment" toName="ts"
+    <Header value="Time series classification"/>
+    <Choices name="pattern" toName="ts"
              choice="single" showInline="true">
-        <Choice value="Positive"/>
-        <Choice value="Negative"/>
-        <Choice value="Neutral"/>
+        <Choice value="Growth"/>
+        <Choice value="Decay"/>
     </Choices>
+
+    <Header value="Time series segmentation"/>
+    <TimeSeriesLabels name="label" toName="ts">
+        <Label value="Anomaly" background="#a4a"/>
+        <Label value="Ordinary" background="#aa4"/>
+    </TimeSeriesLabels>
+
 </View>

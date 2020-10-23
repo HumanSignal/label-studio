@@ -5,13 +5,13 @@
 
     <!-- Text setup -->
     <Header value="Mark actions in text" size="6"/>
-    <Labels name="text_label" toName="text">
+    <Labels name="logger_label" toName="logger">
         <Label value="Error" background="red"/>
         <Label value="High load" background="darkorange"/>
         <Label value="None" background="orange"/>
     </Labels>
 
-    <Text name="text" value="$text"/>
+    <Text name="logger" value="$event"/>
 
     <!-- Time series setup -->
     <Header value="Mark regions in time series" size="6"/>
@@ -22,12 +22,12 @@
     </TimeSeriesLabels>
 
     <TimeSeries name="ts" valueType="url" value="$csv"
-                separator="," timeValue="#time">
-        <TimeSeriesChannel value="#one" strokeColor="#17b"
-                           displayName="Sensor 1"/>
+                sep="," timeColumn="time">
+        <Channel column="temperature"
+                 strokeColor="#17b" legend="Temperature"/>
     </TimeSeries>
 
 </View>
 
 <!-- Sample task data -->
-<!-- { "data": { "text": "NetworkManager[1365]: <warn>  [1603289054.3953] error requesting auth for org.freedesktop.NetworkManager.enable-disable-wwan: Authorization check failed: Failed to open file “/proc/1868/status”: No such file or directory", "csv": "/static/samples/sample-task-sin.csv" } } -->
+<!-- { "data": { "event": "NetworkManager[1365]: <warn>  [1603289054.3953] error requesting auth for org.freedesktop.NetworkManager.enable-disable-wwan: Authorization check failed: Failed to open file “/proc/1868/status”: No such file or directory" } } -->
