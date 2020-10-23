@@ -121,6 +121,12 @@ def project_get_or_create(multi_session_force_recreate=False):
 def json_filter(s):
     return json.dumps(s)
 
+# For development purposes. Uncommen to enable CORS
+# NOT FORM PRODUCTION
+# @app.after_request
+# def after_request_func(response):
+#     response.headers.add('Access-Control-Allow-Origin', "*")
+#     return response
 
 @app.before_request
 def app_before_request_callback():
@@ -140,7 +146,6 @@ def app_before_request_callback():
         return exception_treatment(prepare_globals)()
     else:
         return exception_treatment_page(prepare_globals)()
-
 
 @app.after_request
 @exception_treatment
@@ -369,7 +374,7 @@ def api_render_label_studio():
     # prepare example
     if task_data is None:
         task_data = generate_sample_task_without_check(config, mode='editor_preview')
-        
+
     example_task_data = {
         'id': 1764,
         'data': task_data,
