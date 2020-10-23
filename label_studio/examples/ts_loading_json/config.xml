@@ -3,8 +3,8 @@
 <!-- readme
 ### Quickstart
 
-JSON is a native format for Label Studio and you can store time series column data right in LS task.
-<a target="_blank" href="https://labelstud.io/guide/tasks.html">Read more about LS tasks.</a>
+JSON is a native format for Label Studio and it allows to store time series data right in LS task.
+<a target="_blank" href="https://labelstud.io/guide/tasks.html">Read more about LS tasks in documentation.</a>
 
 1. Prepare JSON-formatted input:
 
@@ -22,6 +22,11 @@ JSON is a native format for Label Studio and you can store time series column da
     * `column="first_column"` and `column="second_column"`
 
 3. Add more `<Channel>` tags for more columns if needed
+
+    Read more about
+<a href="https://labelstud.io/tags/timeseries.html" target="_blank">TimeSeries</a>,
+<a href="https://labelstud.io/tags/timeserieslabels.html" target="_blank">TimeSeriesLabels</a>,
+<a href="https://labelstud.io/tags/channel.html" target="_blank">Channel</a>.
 -->
 
 <View>

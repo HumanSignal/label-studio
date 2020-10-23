@@ -17,6 +17,11 @@
 4. After setup you can import your CSV files on Import page and Label Studio will host them OR
 upload your CSV to your hosting (e.g.: `https://my.domain.com/time-series.csv`) and
 <a target="_blank" href="https://labelstud.io/guide/tasks.html">prepare LS tasks for them.</a>
+
+    Read more about
+<a href="https://labelstud.io/tags/timeseries.html" target="_blank">TimeSeries</a>,
+<a href="https://labelstud.io/tags/timeserieslabels.html" target="_blank">TimeSeriesLabels</a>,
+<a href="https://labelstud.io/tags/channel.html" target="_blank">Channel</a>.
 -->
 
 <View>
