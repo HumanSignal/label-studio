@@ -3,7 +3,7 @@
     <Header value="Time Series Classification"/>
 
     <TimeSeries name="ts" timeColumn="time"
-                value="$ts" valueType="url">
+                value="$csv" valueType="url">
         <Channel column="first_column"/>
     </TimeSeries>
 

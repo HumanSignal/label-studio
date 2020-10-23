@@ -3,6 +3,7 @@ import io
 import logging
 import json
 import random
+import re
 
 from shutil import copy2
 from collections import defaultdict, OrderedDict
@@ -34,6 +35,35 @@ class ProjectNotFound(KeyError):
 class Project(object):
 
     _storage = {}
+
+    @classmethod
+    def get_user_projects(cls, user, root):
+        """ Get all project names by user, this is used in multi-session mode
+        """
+        return os.listdir(os.path.join(root, user))
+
+    @classmethod
+    def get_all_projects(cls, root):
+        """ Get all projects in the system, this is used in multi-session mode
+            Returns {user: projects}
+        """
+        result = {}
+        regex = r'........-....-....-....-............'  # user uuid filter
+
+        for user in os.listdir(root):
+            # leave user dirs satisfied regex only
+            matches = re.search(regex, user)
+            if matches:
+                user_dir = os.path.join(root, user)
+                result[user] = os.listdir(user_dir)
+        return result
+
+    @classmethod
+    def get_user_by_project(cls, project_uuid, root):
+        all_projects = cls.get_all_projects(root)
+        for user in all_projects:
+            if project_uuid in all_projects[user]:
+                return user
 
     def __init__(self, config, name, root_dir='.', context=None):
         self.config = config
@@ -213,6 +243,10 @@ class Project(object):
     @property
     def id(self):
         return self.project_obj.id
+
+    @property
+    def uuid(self):
+        return os.path.basename(self.path)
 
     @property
     def data_types(self):
@@ -751,6 +785,8 @@ class Project(object):
             config['protocol'] = 'https://'
             config['cert'] = args.cert_file
             config['key'] = args.key_file
+        if args.project_desc:
+            config['description'] = args.project_desc
 
         # create config.json
         config_json = 'config.json'

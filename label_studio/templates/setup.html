@@ -343,15 +343,13 @@
 
     function show_render_editor(editor) {
       let config = labelEditor.getValue();
-      edit_count++;
       $.ajax({
         url: 'api/render-label-studio',
         method: 'POST',
         data: {
           config: config,
           current_template_name : current_template_name,
-          current_template_category: current_template_category,
-          edit_count: edit_count
+          current_template_category: current_template_category
         },
         success: editor_iframe,
         error: function () {
@@ -373,7 +371,7 @@
       $.ajax({
         url: url,
         method: 'POST',
-        data: {label_config: val},
+        data: {label_config: val, edit_count: edit_count},
         success: function (res) {
           is_label_ok = true;
           validation_message('', 0);
@@ -412,6 +410,7 @@
     // add validation
     labelEditor.on('change', debounce(function (editor) {
       validate_config(editor);
+      edit_count++;
       $('#id_label_config').val(editor.getValue());
 
     }, 500));
