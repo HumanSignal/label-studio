@@ -121,12 +121,13 @@ def project_get_or_create(multi_session_force_recreate=False):
 def json_filter(s):
     return json.dumps(s)
 
-# For development purposes. Uncommen to enable CORS
+# For development purposes. Uncomment to enable CORS
 # NOT FORM PRODUCTION
 # @app.after_request
 # def after_request_func(response):
 #     response.headers.add('Access-Control-Allow-Origin', "*")
 #     return response
+
 
 @app.before_request
 def app_before_request_callback():
@@ -359,6 +360,13 @@ def model_page():
     )
 
 
+def _get_sample_task(label_config):
+    predefined_task, completions, predictions = get_task_from_labeling_config(label_config)
+    generated_task = generate_sample_task_without_check(label_config, mode='editor_preview')
+    generated_task.update(predefined_task)
+    return generated_task, completions, predictions
+
+
 @app.route('/api/render-label-studio', methods=['GET', 'POST'])
 @requires_auth
 def api_render_label_studio():
@@ -369,11 +377,7 @@ def api_render_label_studio():
     if not config:
         return make_response('No config in POST', status.HTTP_417_EXPECTATION_FAILED)
 
-    task_data, completions, predictions = get_task_from_labeling_config(config)
-
-    # prepare example
-    if task_data is None:
-        task_data = generate_sample_task_without_check(config, mode='editor_preview')
+    task_data, completions, predictions = _get_sample_task(config)
 
     example_task_data = {
         'id': 1764,
@@ -453,13 +457,11 @@ def api_import_example():
         config = request.POST.get('label_config', '')
     try:
         g.project.validate_label_config(config)
-        predefined_task, _, _ = get_task_from_labeling_config(config)
-        generated_task = generate_sample_task_without_check(config, mode='editor_preview')
-        generated_task.update(predefined_task)
+        task_data, _, _ = _get_sample_task(config)
     except (ValueError, ValidationError, lxml.etree.Error, KeyError):
         response = HttpResponse('error while example generating', status=status.HTTP_400_BAD_REQUEST)
     else:
-        response = HttpResponse(json.dumps(generated_task))
+        response = HttpResponse(json.dumps(task_data))
     return response
 
 
