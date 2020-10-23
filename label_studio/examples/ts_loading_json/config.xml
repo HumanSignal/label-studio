@@ -13,7 +13,8 @@ JSON is a native format for Label Studio and it allows to store time series data
       "ts": {
         "time": [0,1,2],
         "first_column": [3,4,5],
-        "second_column": [6,7,8]}
+        "second_column": [6,7,8]
+      }
     }
     ```
 
