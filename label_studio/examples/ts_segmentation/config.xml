@@ -3,8 +3,8 @@
 <!-- readme
 ### Tips
 * Almost all parameters of Time Series are presented in this template.
-* Add one-point region by double click on plot, it will be marked as
-`"instant": true` in the results.
+* One-point region addition: select label and add one-point region by double click on plot,
+it will be marked as `"instant": true` in the results.
 * Read more about Time Series in the documentation:
 
     * <a href="https://labelstud.io/tags/timeseries.html" target="_blank">TimeSeries tag</a>
