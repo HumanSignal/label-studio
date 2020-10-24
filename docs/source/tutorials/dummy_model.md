@@ -114,7 +114,7 @@ Now you can explore runtime logs in `my_backend/logs/uwsgi.log` and RQ training 
 Initialize and start new Label Studio project connecting to the running ML backend:
 
 ```bash
-label-studio start --init --ml-backends http://localhost:9090
+label-studio start my_project --init --ml-backends http://localhost:9090
 ```
 
 #### Getting predictions
