@@ -268,15 +268,16 @@ def setup_page():
     input_values = {}
     project = g.project
 
-    g.project.description = project.get_config(project.name, input_args).get('description')
+    g.project.description = project.get_config(project.name, input_args).get('description', 'Untitled')
 
-    if project.config.get("show_project_links_in_multisession", False) and hasattr(g, 'user'):
+    # evaluate all projects for this user: user_projects + shared_projects
+    if project.config.get("show_project_links_in_multisession", True) and hasattr(g, 'user'):
         user = g.user
         project_ids = g.project.get_user_projects(user, input_args.root_dir)
 
         # own projects
         project_names = [os.path.join(user, uuid) for uuid in project_ids]
-        project_desc = [Project.get_config(name, input_args).get('description') for name in project_names]
+        project_desc = [Project.get_config(name, input_args).get('description', 'Untitled') for name in project_names]
         own_projects = dict(zip(project_ids, project_desc))
 
         # shared projects
@@ -284,7 +285,7 @@ def setup_page():
         for uuid in session.get('shared_projects', []):
             tmp_user = Project.get_user_by_project(uuid, input_args.root_dir)
             project_name = os.path.join(tmp_user, uuid)
-            project_desc = Project.get_config(project_name, input_args).get('description')
+            project_desc = Project.get_config(project_name, input_args).get('description', 'Untitled')
             shared_projects[uuid] = project_desc
     else:
         own_projects, shared_projects = {}, {}
