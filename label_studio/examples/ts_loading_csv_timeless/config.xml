@@ -1,16 +1,18 @@
-<!-- {"title": "Loading from headless CSV", "category": "time-series", "complexity": "basic", "order": "2"} -->
+<!-- {"title": "Loading from CSV timeless", "category": "time-series", "complexity": "basic", "order": "1"} -->
 
 <!-- readme
 ### Quickstart
-1. Prepare `time-series.csv` in tabular CSV format without column headers:
+1. Prepare `time-series.csv` in tabular CSV format:
     ```
-    0,12.34,56.78
-    2,-43.21,8765
+    velocity,acceleration
+    12.34,56.78
+    -43.21,8765
     ```
 
 2. Set column names from CSV in the labeling config below:
-    - `timeColumn="0"`
-    - `column="1"`, `column="2"`
+    - Just drop `timeColumn` attribute out of TimeSeries tag to fill X axis
+    with incremental integer values: `1, 2, 3 ...`
+    - `column="velocity"`, `column="acceleration"`.
 
 3. Add `<Channel>` tags for more columns if needed.
 
@@ -25,7 +27,7 @@ upload your CSV to your hosting (e.g.: `https://my.domain.com/time-series.csv`) 
 -->
 
 <View>
-    <Header value="Time Series from headless CSV"
+    <Header value="Time Series from CSV without time column"
             style="font-weight: normal"/>
 
     <!-- Control tag for region labels -->
@@ -35,12 +37,8 @@ upload your CSV to your hosting (e.g.: `https://my.domain.com/time-series.csv`) 
     </TimeSeriesLabels>
 
     <!-- Object tag for time series data source -->
-    <TimeSeries name="ts" valueType="url"
-                timeColumn="0" value="$csv"
-                sep="," overviewChannels="1,2">
-        <Channel column="1"
+    <TimeSeries name="ts" valueType="url" value="$csv">
+        <Channel column="velocity"
                  strokeColor="#1f77b4"/>
-        <Channel column="2"
-                 strokeColor="#ff7f0e"/>
     </TimeSeries>
 </View>
