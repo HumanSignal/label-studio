@@ -199,7 +199,7 @@ def samples_time_series():
     separator = separator.replace('\\t', '\t')
     aliases = {'dot': '.', 'comma': ',', 'tab': '\t', 'space': ' '}
     if separator in aliases:
-        separator = aliases[aliases]
+        separator = aliases[separator]
 
     # check headless or not
     header = True
