@@ -27,6 +27,7 @@ jobs:
       uses: actions/cache@v1
       env:
         cache-name: cache-node-modules
+        collect_analytics: 0
       with:
         path: ~/.npm
         key: npm-${{ runner.os }}-${{ hashFiles('e2e/package-lock.json') }}
