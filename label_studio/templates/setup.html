@@ -70,6 +70,9 @@
           <input type="submit" disabled id="submit_form"
                  class="project-form field ui button positive centered" value="Save"
                  onclick="create_project(event)"/>
+
+          <div style="margin-top: 2em"></div>
+
         </div>
         <div class="column" style="padding-left: 0;">
 
@@ -231,7 +234,7 @@
           '</div>'
         );
         readme_body.find('.markdown-body').html(marked(readme));
-        $('#left-column').prepend(readme_body);
+        $('#left-column').append(readme_body);
 
         // make collapse action on first header of readme
         $('#markdown-body').find('*:first-child').css('cursor', 'pointer').on('click', function() {
@@ -419,11 +422,7 @@
           $('#preload-editor').show();
           check_submit_button();
 
-          if (first_render) {
-            toggle_readme();
-            first_render = false;
-          }
-
+          first_render = false;
         }
       });
 
