@@ -18,8 +18,25 @@ Read more about Time Series Labeling on [template page](../templates/time_series
 | [timeColumn] | <code>string</code> | column name or index that provides temporal values, if your time-series data has no temporal column then its automatically generated |
 | [timeFormat] | <code>string</code> | pattern used to parse values inside timeColumn, parsing provided by d3 |
 | [timeDisplayFormat] | <code>string</code> | if temporal column is date then use d3 to format it, otherwise, if its a number then use d3 number formatting |
-| [separator] | <code>string</code> | separator for you CSV file, default is comma "," |
+| [sep] | <code>string</code> | separator for you CSV file, default is comma "," |
 | [overviewChannels] | <code>string</code> | comma-separated list of channels names or indexes displayed in overview |
+
+## Channel
+
+Channel tag can be used to label time series data
+
+### Parameters
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| column | <code>string</code> |  | column name or index |
+| [legend] | <code>string</code> |  | display name of the channel |
+| [units] | <code>string</code> |  | display units name |
+| [displayFormat] | <code>string</code> |  | format string for the values, uses d3-format:        [,][.precision][f|%]        , - group thousands with separator (from locale): , (12345.6 -> 12,345.6) ,.2f (12345.6 -> 12,345.60)        .precision - precision for `f|%` type, significant digits for empty type:                     .3f (12.3456 -> 12.345, 1000 -> 1000.000)                     .3 (12.3456 -> 12.3, 1.2345 -> 1.23, 12345 -> 1.23e+4)        f - treat as float, default precision is .6: f (12 -> 12.000000) .2f (12 -> 12.00) .0f (12.34 -> 12)        % - treat as percents and format accordingly: %.0 (0.128 -> 13%) %.1 (1.2345 -> 123.4%) |
+| [height] | <code>number</code> |  | height of the plot |
+| [strokeColor] | <code>string</code> | <code>&quot;#f48a42&quot;</code> | plot stroke color, expects hex value |
+| [strokeWidth] | <code>number</code> | <code>1</code> | plot stroke width |
+
 
 ### Example
 
