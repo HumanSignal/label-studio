@@ -34,9 +34,9 @@
   }
 
   .close-icon {
-    float:right;
     cursor: pointer;
     padding-right: 10px;
+    display: inline;
   }
 </style>
 
@@ -156,6 +156,7 @@
   var edit_count = 0;
   var current_template_name = 0;
   var current_template_category = 0;
+  var first_render = true;
 
   // process create request
   function process_request(result) {
@@ -194,15 +195,30 @@
     return false;
   }
 
+  function toggle_readme() {
+    var icon = $('.close-icon');
+    if (icon.hasClass('down')) {
+      $('#markdown-body').find('*:not(:first-child)').hide();
+      icon.addClass('right');
+      icon.removeClass('down');
+    }
+    else {
+      $('#markdown-body').find('*').show();
+      icon.addClass('down');
+      icon.removeClass('right');
+    }
+  }
+
   $(function () {
 
     function addTemplateConfig($el) {
       var template_pk = $el.data('value');
       var value = $('[data-template-pk="' + template_pk + '"]').html();
 
-      // extract readme
+      // remove old readme
       $('#readme-body').remove();
 
+      // extract readme from config
       var starter = '<!-- readme', terminator = '-->';
       var start = value.indexOf(starter);
       if (start >= 0) {
@@ -210,18 +226,24 @@
         var readme = value.substr(start + starter.length, body_lenght);
         var readme_body = $(
           '<div id="readme-body">' +
-            '<i class="icon close close-icon" onclick="$(\'#readme-body\').remove()"></i>' +
-            '<div class="markdown-body"></div>' +
+            '<i class="icon caret down close-icon" onclick="toggle_readme()"></i>' +
+            '<div class="markdown-body" id="markdown-body"></div>' +
           '</div>'
         );
         readme_body.find('.markdown-body').html(marked(readme));
         $('#left-column').prepend(readme_body);
+
+        // make collapse action on first header of readme
+        $('#markdown-body').find('*:first-child').css('cursor', 'pointer').on('click', function() {
+          toggle_readme();
+        });
 
         // Find first XML tag (<View> as usual) and start from it
         value = value.slice(value.indexOf('<', start + starter.length + body_lenght + terminator.length))
       }
 
       labelEditor.setValue(value);
+      first_render = true;
     }
 
     // switch template by click
@@ -388,6 +410,7 @@
           validation_message('', 0);
           show_render_editor(editor);
           check_submit_button();
+          first_render = false;
         },
         error: function (res) {
           is_label_ok = false;
@@ -395,6 +418,12 @@
           $('#render-editor').hide();
           $('#preload-editor').show();
           check_submit_button();
+
+          if (first_render) {
+            toggle_readme();
+            first_render = false;
+          }
+
         }
       });
 

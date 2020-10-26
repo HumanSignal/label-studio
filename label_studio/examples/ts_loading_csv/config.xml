@@ -1,7 +1,8 @@
-<!-- {"title": "Loading from CSV", "category": "time-series", "complexity": "basic", "order": "1"} -->
+<!-- {"title": "Import from CSV", "category": "time-series", "complexity": "basic", "order": "1"} -->
 
 <!-- readme
 ### Quickstart
+
 1. Prepare `time-series.csv` in tabular CSV format:
     ```
     time,velocity,acceleration
