@@ -5,5 +5,8 @@
   "website": "https://labelstud.io",
   "repository": "https://github.com/heartexlabs/label-studio",
   "logo": "https://labelstud.io/images/opossum/heartex_icon_opossum_green.svg",
-  "stack": "container"
+  "stack": "container",
+  "env": {
+    "LABEL_STUDIO_HEROKU": "1"
+  }
 }
