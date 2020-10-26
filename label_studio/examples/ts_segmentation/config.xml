@@ -6,7 +6,7 @@
 * One-point region addition: select label and add one-point region by double click on the plot,
 it will be marked as `"instant": true` in the results.
 * To read time from input and display it on plot use `timeFormat` and `timeDisplayFormat` as in `strftime` format.
-* To display signal values use `format` as in <a href="https://github.com/d3/d3-format#locale_format" target="_blank">D3 formats</a>.
+* To display signal values use `displayFormat` as in <a href="https://github.com/d3/d3-format#locale_format" target="_blank">D3 formats</a>.
 * Read more about Time Series in the documentation:
 
     * <a href="https://labelstud.io/tags/timeseries.html" target="_blank">TimeSeries tag</a>

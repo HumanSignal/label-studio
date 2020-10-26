@@ -27,7 +27,7 @@ or using [Docker](https://labelstud.io/guide/#Running-with-Docker), [Github sour
   
   For example your project labeling config could be: 
   
-  ```xml
+  ```html
   <View>
     <TimeSeriesLabels name="label" toName="ts">
       <Label value="Run"/>
@@ -36,9 +36,9 @@ or using [Docker](https://labelstud.io/guide/#Running-with-Docker), [Github sour
   
     <TimeSeries name="ts" 
                 valueType="url" value="$csv"
-                timeValue="#time">
-      <TimeSeriesChannel value="#one" />
-      <TimeSeriesChannel value="#two" />
+                timeColumn="time">
+      <Channel column="one" />
+      <Channel column="two" />
     </TimeSeries>
   </View>
   ```
@@ -46,13 +46,26 @@ or using [Docker](https://labelstud.io/guide/#Running-with-Docker), [Github sour
    Here are 3 tags used: 
        * `TimeSeriesLabels` - control tag, it displays controls (buttons with labels) for the region labeling,
        * `TimeSeries` - object tag, it draws time-series signals on the page, 
-       * `TimeSeriesChannel` - it helps TimeSeries detect channels to display and how to setup them.  
+       * `Channel` - it helps TimeSeries detect channels to display and how to setup them.  
 
-  `<TimeSeriesLabels>` is linked with `<TimeSeries>` via toName field.  
+  `<TimeSeriesLabels>` is linked with `<TimeSeries>` via toName field. `<TimeSeries>` has an attribute `valueType="url"` and this means that LS will store only links to CSV files in LS tasks. Read more about valueType [below](/blog/release-080-time-series.html#JSON) and LS [tasks](/guide/tasks.html).
   
-  `<TimeSeries>` has an attribute `valueType="url"`. This means that LS will store only links to CSV files in LS tasks. Read more about valueType [below](/blog/release-080-time-series.html#JSON) and LS [tasks](/guide/tasks.html).
-  
-  > Pay attention to `<TimeSeries valueTime="#time">`, `<TimeSeriesChannel>` with `value="#one"` and `value="#two"`: `time`, `one`, `two` are nested columns relative to `$csv`, so we use **`#`** characters for them. 
+  > Pay attention to `<TimeSeries timeColumn="time">`, `<Channel>` with `column="one"` and `value="two"`: `time`, `one`, `two` are nested columns relative to `$csv` data. 
+
+
+### timeColumn & timeFormat & timeDisplayFormat
+
+* Specify `timeColumn` in `TimeSeries` to use some column from your data as X time axis. Or drop it out if you want to use incremental integer values `1, 2, 3, ...`. 
+
+* `timeFormat` is a parsing rule for `timeColumn` dates as in `strftime` ([explore format here](http://www.cplusplus.com/reference/ctime/strftime/)).
+
+* `timeDisplayFormat` is a rule about how to display dates and time on the plot, it's the same as `strftime` ([explore format here](http://www.cplusplus.com/reference/ctime/strftime/)). 
+
+### units & displayFormat
+
+* `displayFormat` is applied to signal values. Explore [D3 format specification](https://github.com/d3/d3-format#locale_format). 
+* `units` will be added to displaying values on the plot and to the Y axis. 
+
 
 ## Input formats  
 
@@ -74,19 +87,34 @@ time,one,two
 0.2,1.64,5.85
  ```
 
-Your `<TimeSeries>` tag should have an attribute `valueType="url"` which informs LS to open a tag value as URL with CSV file:
+Your `<TimeSeries>` tag should have an attribute `valueType="url"` which informs 
+LS to open a tag value as URL with CSV file:
 
-```xml
-<TimeSeries valueType="url" value="$csv_file"> 
+```html
+<View>
+  <TimeSeries valueType="url" value="$csv_file" sep="," timeColumn="time">
+    <Channel column="0"/>
+  </TimeSeries>             
+</View> 
 ```
 
 ### TSV 
 
-TSV format is very similar to CSV but the separator is tab (`\t`) instead of comma. So, the functionality is the same as CSV.  
+TSV format is very similar to CSV but the separator is tab (`\t`) instead of comma. 
+So, the functionality is the same as CSV.  
+
+```html
+<View>
+  <TimeSeries valueType="url" value="$csv_file" sep="\t" timeColumn="time">
+    <Channel column="0"/>
+  </TimeSeries>
+</View> 
+```
+
 
 ### Headless CSV & TSV
 
-The main difference for the headless CSV/TSV usage is another way to name `<TimeSeriesChannel>` values. Since the file has no header and nothing is known about the column names you should use names `colunm#N`, where `N` is a number of the column to use in the channel. The same is true for `timeValue` from `<TimeSeries>` tag. 
+The main difference for the headless CSV/TSV usage is another way to name `<Channel>` values. Since the file has no header and nothing is known about the column names you should use names `colunm#N`, where `N` is a number of the column to use in the channel. The same is true for `timeColumn` from `<TimeSeries>` tag. 
  
 
 ### JSON
@@ -123,7 +151,7 @@ All tasks in LS are stored in JSON and this is the native format for LS.
   }
   ```
 
-## Output format
+## Output format example
 
 You can export the results on Export page in JSON, JSON_MIN and CSV formats. 
 
@@ -163,7 +191,7 @@ Users make completions while creating a labeling for a single task. One completi
           "type": "timeserieslabels"
       }
     ]
-  } 
+  }] 
 }
 ```
 
