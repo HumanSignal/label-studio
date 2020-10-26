@@ -187,7 +187,7 @@ def send_upload(path):
 
 @app.route('/samples/time-series.csv')
 @requires_auth
-def static_time_series():
+def samples_time_series():
     """ Generate time series example for preview
     """
     time_column = request.args.get('time')
