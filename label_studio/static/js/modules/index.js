@@ -5,13 +5,14 @@ const dmRoot = document.querySelector(".datamanager");
 console.log(dmRoot);
 
 if (dmRoot) {
-  const dm = DataManager({
+  const dm = new DataManager({
     root: dmRoot,
     api: {
       gateway: "/api",
       endpoints: {
         tasks: "/tasks",
-        completion: "/completions",
+        task: "/tasks/:id",
+        completion: "/tasks/:task_id/completions/:id",
         cancel: "/cancel",
         projects: "/projects",
         next: "/next",
