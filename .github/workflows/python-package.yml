@@ -35,6 +35,8 @@ jobs:
       run: |
         label-studio init my_project
     - name: Test with pytest
+      env:
+        collect_analytics: 0
       run: |
         python -m pytest -vrP
         coverage run -m --source=label_studio pytest
