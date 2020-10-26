@@ -185,7 +185,7 @@ def send_upload(path):
     return open(os.path.join(project_dir, path), 'rb').read()
 
 
-@app.route('/static/samples/time-series.csv')
+@app.route('/samples/time-series.csv')
 @requires_auth
 def static_time_series():
     """ Generate time series example for preview
