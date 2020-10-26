@@ -198,17 +198,23 @@
     return false;
   }
 
-  function toggle_readme() {
+  function toggle_readme(user_action) {
     var icon = $('.close-icon');
     if (icon.hasClass('down')) {
       $('#markdown-body').find('*:not(:first-child)').hide();
       icon.addClass('right');
       icon.removeClass('down');
+      Cookies.set('show-readme', false);
+      if (user_action)
+        $.ajax('/api/states?show-readme=0')
     }
     else {
       $('#markdown-body').find('*').show();
       icon.addClass('down');
       icon.removeClass('right');
+      Cookies.set('show-readme', true);
+      if (user_action)
+        $.ajax('/api/states?show-readme=1')
     }
   }
 
@@ -234,11 +240,15 @@
           '</div>'
         );
         readme_body.find('.markdown-body').html(marked(readme));
-        $('#left-column').append(readme_body);
 
-        // make collapse action on first header of readme
+        $('#left-column').prepend(readme_body);
+        if (Cookies.get('show-readme', false) !== "true") {
+          toggle_readme(false);
+        }
+
+        // make collapsible first header of readme
         $('#markdown-body').find('*:first-child').css('cursor', 'pointer').on('click', function() {
-          toggle_readme();
+          toggle_readme(true);
         });
 
         // Find first XML tag (<View> as usual) and start from it

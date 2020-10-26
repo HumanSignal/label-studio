@@ -1052,6 +1052,15 @@ def api_project_switch():
         return make_response(jsonify(output), 200)
 
 
+@app.route('/api/states', methods=['GET'])
+@requires_auth
+@exception_treatment
+def stats():
+    """ Save states
+    """
+    return make_response('{"status": "done"}', 200)
+
+
 @app.route('/api/health', methods=['GET'])
 @requires_auth
 @exception_treatment
