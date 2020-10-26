@@ -326,11 +326,11 @@ div[class*="App_editor"] {
 }
 
 #holder.hover .text {
-    color: #1f7834;
+    color: rgb(24, 144, 255);
 }
 
 #holder.hover .text i {
-    color: #1F7834;
+    color: rgb(24, 144, 255);
     opacity: 1;
 }
 
