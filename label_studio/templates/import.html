@@ -150,6 +150,7 @@
         )
       );
 
+      window.holder_usage = true;
       onGetFiles(files);
     },
     false
@@ -264,7 +265,7 @@
       }
 
       request = {
-        url: "api/import",
+        url: "api/import" + (window.holder_usage ? "?drag=1": ""),
         data: fd,
         method: 'POST',
         processData: false,
@@ -300,6 +301,8 @@
 
         stop_wait(msg, false);
       });
+
+    window.holder_usage = false;
   }
 
   $(function () {
