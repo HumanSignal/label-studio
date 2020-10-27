@@ -276,7 +276,7 @@
     $('#render-editor-loader').css('width', $(window).width() * 0.9);
 
     $.ajax({
-      url: "https://app.heartex.ai/demo/render-editor?full_editor=t",
+      url: "https://app.heartex.ai/demo/render-editor?full_editor=t&playground=1&open_preview=1",
       method: 'POST',
       xhrFields: {withCredentials: true},
       data: {

@@ -20,9 +20,9 @@ Example project configuration for two sensors labeling:
       <Label value="Run"/>
       <Label value="Walk"/>
     </TimeSeriesLabels> 
-    <TimeSeries name="ts" valueType="url" value="$csvUrl" timeColumn="#time">
-      <Channel column="#sensorone" />
-      <Channel column="#sensortwo" />
+    <TimeSeries name="ts" valueType="url" value="$csvUrl" timeColumn="time">
+      <Channel column="sensorone" />
+      <Channel column="sensortwo" />
     </TimeSeries>
   </View>
 ```
