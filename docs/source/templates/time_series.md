@@ -43,7 +43,7 @@ Three tags used above are:
 
 ### Few notes
 
-`<TimeSeriesLabels>` is linked with `<TimeSeries>` via a toName field.  
+`<TimeSeriesLabels>` is linked with `<TimeSeries>` via a toName field.
   
 `<TimeSeries>` has an attribute `valueType="url"`. This means that Label Studio expects links to CSV files in its tasks.
 
@@ -74,7 +74,7 @@ Your `<TimeSeries>` tag should have an attribute `valueType="url"` which informs
 
 ```html
 <View>
-  <TimeSeries valueType="url" value="$csv_url" sep="," timeColumn="time">
+  <TimeSeries name="ts" valueType="url" value="$csv_url" sep="," timeColumn="time">
     <Channel column="sensorone" />
   </TimeSeries>
 </View> 
@@ -95,7 +95,7 @@ So, the functionality is the same as CSV.
 
 ```html
 <View>
-  <TimeSeries valueType="url" value="$csv_url" sep="\t" timeColumn="time">
+  <TimeSeries name="ts" valueType="url" value="$csv_url" sep="\t" timeColumn="time">
     <Channel column="0"/>
   </TimeSeries>
 </View> 

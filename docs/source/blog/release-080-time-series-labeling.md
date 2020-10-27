@@ -31,7 +31,7 @@ For examples below we will be using the following configuration:
     <Label value="Run" />
   </TimeSeriesLabels>
   
-  <TimeSeries name="ts" valueType="url" value="$csv" sep="," overviewChannels="AT">
+  <TimeSeries name="ts" valueType="url" value="$csv" sep="," overviewChannels="sen1,sen2">
     <Channel column="sen1" />
     <Channel column="sen2" />
   </TimeSeries>

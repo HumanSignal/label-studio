@@ -6,7 +6,7 @@ is_new: t
 ---
 
 TimeSeries tag can be used to label time series data.
-Read more about Time Series Labeling on [template page](../templates/time_series.html).
+Read more about Time Series Labeling on [template page](../templates/time_series.html) or in our [blog](/blog/release-080-time-series-labeling.html).
 
 ### Parameters
 
