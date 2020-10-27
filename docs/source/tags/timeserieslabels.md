@@ -19,8 +19,7 @@ TimeSeriesLabels tag creates labeled time range
 ### Example
 ```html
 <View>
-  <View>
- <TimeSeriesLabels name="label" toName="ts">
+  <TimeSeriesLabels name="label" toName="ts">
       <Label value="Run"/>
       <Label value="Walk"/>
   </TimeSeriesLabels>
