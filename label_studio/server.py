@@ -33,13 +33,13 @@ from flask import (
 from flask_api import status
 from types import SimpleNamespace
 
-from label_studio.utils.functions import generate_sample_task
+from label_studio.utils.functions import generate_sample_task, get_task_from_labeling_config
 from label_studio.utils.io import find_dir, find_editor_files
 from label_studio.utils import uploader
 from label_studio.utils.validation import TaskValidator
 from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.functions import (
-    generate_sample_task_without_check, set_full_hostname, set_web_protocol, get_web_protocol
+    generate_sample_task_without_check, set_full_hostname, set_web_protocol, get_web_protocol, generate_time_series_json
 )
 from label_studio.utils.misc import (
     exception_treatment, exception_treatment_page,
@@ -130,6 +130,13 @@ def project_get_or_create(multi_session_force_recreate=False):
 def json_filter(s):
     return json.dumps(s)
 
+# For development purposes. Uncomment to enable CORS
+# NOT FORM PRODUCTION
+# @app.after_request
+# def after_request_func(response):
+#     response.headers.add('Access-Control-Allow-Origin', "*")
+#     return response
+
 
 @app.before_request
 def app_before_request_callback():
@@ -149,7 +156,6 @@ def app_before_request_callback():
         return exception_treatment(prepare_globals)()
     else:
         return exception_treatment_page(prepare_globals)()
-
 
 @app.after_request
 @exception_treatment
@@ -177,6 +183,45 @@ def send_upload(path):
                    'replace "/upload/" => "/data/upload/" in your tasks.json files')
     project_dir = os.path.join(g.project.path, 'upload')
     return open(os.path.join(project_dir, path), 'rb').read()
+
+
+@app.route('/samples/time-series.csv')
+@requires_auth
+def samples_time_series():
+    """ Generate time series example for preview
+    """
+    time_column = request.args.get('time')
+    value_columns = request.args.get('values').split(',')
+    time_format = request.args.get('tf')
+
+    # separator processing
+    separator = request.args.get('sep', ',')
+    separator = separator.replace('\\t', '\t')
+    aliases = {'dot': '.', 'comma': ',', 'tab': '\t', 'space': ' '}
+    if separator in aliases:
+        separator = aliases[separator]
+
+    # check headless or not
+    header = True
+    if all(n.isdigit() for n in [time_column] + value_columns):
+        header = False
+
+    # generate all columns for headless csv
+    if not header:
+        max_column_n = max([int(v) for v in value_columns] + [0])
+        value_columns = range(1, max_column_n+1)
+
+    ts = generate_time_series_json(time_column, value_columns, time_format)
+    csv_data = pd.DataFrame.from_dict(ts).to_csv(index=False, header=header, sep=separator).encode('utf-8')
+    mem = io.BytesIO()
+    mem.write(csv_data)
+    mem.seek(0)
+    return send_file(
+        mem,
+        as_attachment=False,
+        attachment_filename='time-series.csv',
+        mimetype='text/csv'
+    )
 
 
 @app.route('/static/<path:path>')
@@ -211,7 +256,7 @@ def labeling_page():
         task_id = int(task_id)
         # Task explore mode
         task_data = g.project.get_task_with_completions(task_id) or g.project.source_storage.get(task_id)
-        task_data = resolve_task_data_uri(task_data)
+        task_data = resolve_task_data_uri(task_data, project=g.project)
 
         if g.project.ml_backends_connected:
             task_data = g.project.make_predictions(task_data)
@@ -366,6 +411,14 @@ def model_page():
     )
 
 
+def _get_sample_task(label_config):
+    predefined_task, completions, predictions = get_task_from_labeling_config(label_config)
+    generated_task = generate_sample_task_without_check(label_config, mode='editor_preview')
+    if predefined_task is not None:
+        generated_task.update(predefined_task)
+    return generated_task, completions, predictions
+
+
 @app.route('/api/render-label-studio', methods=['GET', 'POST'])
 @requires_auth
 def api_render_label_studio():
@@ -376,11 +429,13 @@ def api_render_label_studio():
     if not config:
         return make_response('No config in POST', status.HTTP_417_EXPECTATION_FAILED)
 
-    # prepare example
-    task_data = generate_sample_task_without_check(config, mode='editor_preview')
+    task_data, completions, predictions = _get_sample_task(config)
+
     example_task_data = {
         'id': 1764,
         'data': task_data,
+        'completions': completions,
+        'predictions': predictions,
         'project': g.project.id,
         'created_at': '2019-02-06T14:06:42.000420Z',
         'updated_at': '2019-02-06T14:06:42.000420Z'
@@ -454,11 +509,11 @@ def api_import_example():
         config = request.POST.get('label_config', '')
     try:
         g.project.validate_label_config(config)
-        output = generate_sample_task_without_check(config, mode='editor_preview')
+        task_data, _, _ = _get_sample_task(config)
     except (ValueError, ValidationError, lxml.etree.Error, KeyError):
         response = HttpResponse('error while example generating', status=status.HTTP_400_BAD_REQUEST)
     else:
-        response = HttpResponse(json.dumps(output))
+        response = HttpResponse(json.dumps(task_data))
     return response
 
 
@@ -539,7 +594,10 @@ def api_import():
         max_id_in_old_tasks = g.project.source_storage.max_id()
 
     new_tasks = Tasks().from_list_of_dicts(new_tasks, max_id_in_old_tasks + 1)
-    g.project.source_storage.set_many(new_tasks.keys(), new_tasks.values())
+    try:
+        g.project.source_storage.set_many(new_tasks.keys(), new_tasks.values())
+    except NotImplementedError:
+        raise NotImplementedError('Import is not supported for the current storage ' + str(g.project.source_storage))
 
     # if tasks have completion - we need to implicitly save it to target
     for i in new_tasks.keys():
@@ -597,7 +655,7 @@ def api_generate_next_task():
         # no tasks found
         return make_response('', 404)
 
-    task = resolve_task_data_uri(task)
+    task = resolve_task_data_uri(task, project=g.project)
 
     # collect prediction from multiple ml backends
     if g.project.ml_backends_connected:
@@ -733,7 +791,7 @@ def api_all_tasks():
         else:
             task['completed_at'] = item['completed_at']
             task['has_skipped_completions'] = item['has_skipped_completions']
-        task = resolve_task_data_uri(task)
+        task = resolve_task_data_uri(task, project=g.project)
         tasks.append(task)
 
     return make_response(jsonify(tasks), 200)
@@ -749,7 +807,7 @@ def api_tasks(task_id):
     task_id = int(task_id)
     if request.method == 'GET':
         task_data = g.project.get_task_with_completions(task_id) or g.project.source_storage.get(task_id)
-        task_data = resolve_task_data_uri(task_data)
+        task_data = resolve_task_data_uri(task_data, project=g.project)
 
         if g.project.ml_backends_connected:
             task_data = g.project.make_predictions(task_data)
@@ -993,6 +1051,15 @@ def api_project_switch():
         return redirect('../setup')
     else:
         return make_response(jsonify(output), 200)
+
+
+@app.route('/api/states', methods=['GET'])
+@requires_auth
+@exception_treatment
+def stats():
+    """ Save states
+    """
+    return make_response('{"status": "done"}', 200)
 
 
 @app.route('/api/health', methods=['GET'])

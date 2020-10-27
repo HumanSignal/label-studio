@@ -172,3 +172,12 @@ Than you need to use `--cert` and `--key` option on start:
 ```
 label-studio start test --cert certificate.pem --key key.pem
 ```
+
+
+### Health check
+
+LS has a special endpoint for health checks: 
+  
+```
+/api/health
+```

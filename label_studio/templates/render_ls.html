@@ -34,6 +34,13 @@
       min-width: 98% !important;
       max-width: 98% !important;
     }
+
+    #label-studio .ls-menu {
+      width: 100%;
+    }
+    #label-studio .ls-segment {
+      top: 0;
+    }
   </style>
 
 </head>
@@ -61,7 +68,8 @@
 
       interfaces: [
         "basic",
-        // "side-column"
+        "side-column",
+        "predictions"
       ],
 
       onLabelStudioLoad: function (LS) {

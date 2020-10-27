@@ -1,6 +1,6 @@
 {
-  "message": "0.7.5",
-  "commit": "08b2c910b0b356dc19e7deb766323014391aeaeb",
-  "branch": "master",
-  "date": "2020-10-16T11:55:06Z"
+  "message": "time series doc updates",
+  "commit": "ae34f9caefe5e289257e83f468d26c75547cbae9",
+  "branch": "feature/ts",
+  "date": "2020-10-27T04:13:50Z"
 }

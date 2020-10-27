@@ -1,0 +1,49 @@
+<!-- {"title": "Segmentation extended", "category": "time-series", "complexity": "basic"} -->
+
+<!-- readme
+### Tips
+* Almost all parameters of Time Series are presented in this template.
+* One-point region addition: select label and add one-point region by double click on the plot,
+it will be marked as `"instant": true` in the results.
+* To read time from input and display it on plot use `timeFormat` and `timeDisplayFormat` as in `strftime` format.
+* To display signal values use `displayFormat` as in <a href="https://github.com/d3/d3-format#locale_format" target="_blank">D3 formats</a>.
+* Read more about Time Series in the documentation:
+
+    * <a href="https://labelstud.io/tags/timeseries.html" target="_blank">TimeSeries tag</a>
+    * <a href="https://labelstud.io/tags/timeserieslabels.html" target="_blank">TimeSeriesLabels tag</a>
+    * <a href="https://labelstud.io/tags/timeseries.html#Channel" target="_blank">Channel tag</a>
+-->
+
+<View>
+    <Header value="Time Series Segmentation"/>
+
+    <!-- Control tag for region labels -->
+    <TimeSeriesLabels name="label" toName="ts">
+        <Label value="Run" background="red"/>
+        <Label value="Walk" background="green"/>
+        <Label value="Fly" background="blue"/>
+        <Label value="Swim" background="#f6a"/>
+        <Label value="Ride" background="#351"/>
+    </TimeSeriesLabels>
+
+    <!-- Object tag for time series data source -->
+    <TimeSeries name="ts" valueType="url" value="$csv"
+                sep=","
+                timeColumn="time"
+                timeFormat="%Y-%m-%d %H:%M:%S.%f"
+                timeDisplayFormat="%Y-%m-%d"
+                overviewChannels="velocity">
+
+        <Channel column="velocity"
+                 units="miles/h"
+                 displayFormat=",.1f"
+                 strokeColor="#1f77b4"
+                 legend="Velocity"/>
+
+        <Channel column="acceleration"
+                 units="miles/h^2"
+                 displayFormat=",.1f"
+                 strokeColor="#ff7f0e"
+                 legend="Acceleration"/>
+    </TimeSeries>
+</View>

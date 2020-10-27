@@ -30,21 +30,27 @@ logger = logging.getLogger(__name__)
 csv.field_size_limit(131072 * 10)
 
 
+def is_time_series_only(project):
+    """ Check whether project config has only one TimeSeries object
+    """
+    return len(project.data_types) == 1 and 'TimeSeries' in project.data_types.values()
+
+
 def tasks_from_file(filename, file, project):
-    format = None
+    file_format = None
     try:
-        if filename.endswith('.csv'):
+        if filename.endswith('.csv') and not is_time_series_only(project):
             tasks = pd.read_csv(file).fillna('').to_dict('records')
             tasks = [{'data': task} for task in tasks]
-            format = os.path.splitext(filename)[-1]
-        elif filename.endswith('.tsv'):
+            file_format = os.path.splitext(filename)[-1]
+        elif filename.endswith('.tsv') and not is_time_series_only(project):
             tasks = pd.read_csv(file, sep='\t').fillna('').to_dict('records')
             tasks = [{'data': task} for task in tasks]
-            format = os.path.splitext(filename)[-1]
+            file_format = os.path.splitext(filename)[-1]
         elif filename.endswith('.txt'):
             lines = file.read().splitlines()
             tasks = [{'data': {settings.UPLOAD_DATA_UNDEFINED_NAME: line.decode('utf-8')}} for line in lines]
-            format = os.path.splitext(filename)[-1]
+            file_format = os.path.splitext(filename)[-1]
         elif filename.endswith('.json'):
             raw_data = file.read()
             # Python 3.5 compatibility fix https://docs.python.org/3/whatsnew/3.6.html#json
@@ -52,14 +58,14 @@ def tasks_from_file(filename, file, project):
                 tasks = json.loads(raw_data)
             except TypeError:
                 tasks = json.loads(raw_data.decode('utf8'))
-            format = os.path.splitext(filename)[-1]
+            file_format = os.path.splitext(filename)[-1]
 
         # no drag & drop support
         elif project is None:
             raise ValidationError('No tasks found in: ' + filename)
 
         # upload file via drag & drop
-        elif len(project.data_types) > 1:
+        elif len(project.data_types) > 1 and not is_time_series_only(project):
             raise ValidationError('Your label config has more than one data keys, direct file upload supports only'
                                   ' one data key. To import data with multiple data keys use JSON or CSV')
         # convert html file to json task
@@ -67,7 +73,7 @@ def tasks_from_file(filename, file, project):
             data = file.read()
             body = htmlmin.minify(data.decode('utf8'), remove_all_empty_space=True)
             tasks = [{'data': {settings.UPLOAD_DATA_UNDEFINED_NAME: body}}]
-            format = os.path.splitext(filename)[-1]
+            file_format = os.path.splitext(filename)[-1]
         # hosting for file
         else:
             # read as text or binary file
@@ -82,7 +88,7 @@ def tasks_from_file(filename, file, project):
 
             path = get_full_hostname() + '/data/upload/' + filename
             tasks = [{'data': {settings.UPLOAD_DATA_UNDEFINED_NAME: path}}]
-            format = os.path.splitext(filename)[-1]
+            file_format = os.path.splitext(filename)[-1]
 
     except Exception as exc:
         raise ValidationError('Failed to parse input file ' + filename + ': ' + str(exc))
@@ -104,7 +110,7 @@ def tasks_from_file(filename, file, project):
         raise ValidationError('Incorrect task type in ' + filename + ': "' + str(str(tasks)[0:100]) + '". '
                               'It is allowed "dict" or "list of dicts" only')
 
-    return tasks, format
+    return tasks, file_format
 
 
 def create_and_release_temp_dir(func):

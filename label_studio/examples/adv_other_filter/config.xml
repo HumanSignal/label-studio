@@ -1,4 +1,4 @@
-<!-- {"title": "Filtering long labels list", "category": "other", "complexity": "advanced"} -->
+<!-- {"title": "Filtering long labels list", "category": "layouts", "complexity": "advanced"} -->
 <View style="display: flex;">
   <View style="width: 350px; padding-right: 1em; height: 400px; overflow-y: auto">
     <Filter name="fl" toName="ner" hotkey="shift+f" minlength="1" />

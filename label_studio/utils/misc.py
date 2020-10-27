@@ -248,8 +248,8 @@ def get_config_templates(config):
 
     # sort by title
     ordering = {
-        'basic': ['audio', 'image', 'text', 'html', 'other'],
-        'advanced': ['layouts', 'nested', 'per-region', 'other']
+        'basic': ['audio', 'image', 'text', 'html', 'time-series'],
+        'advanced': ['layouts', 'nested', 'per-region', 'other', 'time-series']
     }
     ordered_templates = OrderedDict()
     for complexity in ['basic', 'advanced']:

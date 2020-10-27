@@ -16,6 +16,7 @@ Label Studio expects the JSON-formatted list of _tasks_ as input. Each _task_ is
     - `<Audio value="$key">`: `value` is taken as a valid URL to audio file
     - `<AudioPlus value="$key">`: `value` is taken as a valid URL to an audio file with CORS policy enabled on the server side
     - `<Image value="$key">`: `value` is a valid URL to an image file
+    - `<TimeSeries value="$key">`: `value` is a valid URL to an CSV/TSV file if `valueType="url"` otherwise it should be JSON dict with column-arrays `"value": {"first_column": [...], ...}` if `valueType="json"`
 * (optional) **id** - integer task ID
 * (optional) **completions** - list of output annotation results, where each result is saved using [Label Studio's completion format](/guide/export.html#completions). You can import annotation results in order to use them in consequent labeling task.
 * (optional) **predictions** - list of model prediction results, where each result is saved using [Label Studio's prediction format](/guide/export.html#predictions). Importing predictions is useful for automatic task prelabeling & active learning & exploration.
@@ -122,6 +123,8 @@ this is a second task,456
 ```
 
 > Note: Currently CSV / TSV files could be imported only in UI.
+
+> Note: If your config has one TimeSeries instance then CSV/TSV will be interpreted as time series data while import. This CSV/TSV will be hosted as a resource file. The LS will create a task automatically with a proper link to the uploaded CSV/TSV.
 
 ### Plain text
 

@@ -1745,7 +1745,7 @@ order: 201
 
       // load sample task
       $.post({
-        url: host + '/business/projects/upload-example/',
+        url: host + '/business/projects/upload-example/?playground=1',
         data: {label_config: val}
       })
         .fail(function(o) {
