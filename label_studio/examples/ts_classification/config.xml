@@ -1,7 +1,7 @@
 <!-- {"title": "Time Series classification", "category": "time-series", "complexity": "basic", "order": "!"} -->
 
 <!-- readme
-### Intro
+### Quickstart
 
 It's the simplest example of TimeSeries usage.
 Read more about tags in the documentation:
@@ -16,6 +16,8 @@ This config allows to do:
 -->
 
 <View>
+    <Header value="Time Series classification"
+            style="font-weight: normal"/>
     <!-- Choices (whole signal classification) -->
     <Choices name="pattern" toName="ts">
         <Choice value="Growth"/>
