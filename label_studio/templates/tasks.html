@@ -34,7 +34,8 @@
                 </span>
                 <span class="label">Tasks</span>
                 <span class="sub-label">
-                  <i class="word-break" v-if="project.multi_session_mode">{{ project.source_storage.readable_path }}</i>
+                  <i class="word-break" v-if="project.multi_session_mode">{{
+                    get_short_text(project.source_storage.readable_path) }}</i>
                   <span data-tooltip="Source storage sync in progress">
                     <i class="ui loader loading active inline mini" v-if="project.source_syncing"></i>
                   </span>
@@ -73,7 +74,8 @@
                 </span>
                 <span class="label">Completions</span>
                 <span class="sub-label">
-                  <i class="word-break" v-if="project.multi_session_mode">{{ project.target_storage.readable_path }}</i>
+                  <i class="word-break" v-if="project.multi_session_mode">{{
+                    get_short_text(project.target_storage.readable_path) }}</i>
                   <span data-tooltip="Target storage sync in progress">
                     <i class="ui loader loading active inline mini" v-if="project.target_syncing"></i>
                   </span>
@@ -1002,6 +1004,12 @@
         text_preview: function(text) {
           return text.slice(0, this.text_preview_limit) +
             (text.length <= this.text_preview_limit ? '': ' ...');
+        },
+
+        get_short_text: function(text) {
+          const max_len = 40;
+          return (text.length <= max_len ? '': '...') +
+            text.slice(text.length-max_len, text.length);
         }
       },
 
