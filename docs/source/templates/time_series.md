@@ -20,7 +20,7 @@ Example project configuration for multivariate time series labeling:
     <Label value="Run"/>
     <Label value="Walk"/>
   </TimeSeriesLabels> 
-  <TimeSeries name="ts" valueType="url" value="$csvUrl" timeColumn="time">
+  <TimeSeries name="ts" valueType="url" value="$csv_url" timeColumn="time">
     <Channel column="sensorone" />
     <Channel column="sensortwo" />
   </TimeSeries>
