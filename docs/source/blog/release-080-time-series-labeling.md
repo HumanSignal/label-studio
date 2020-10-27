@@ -117,7 +117,7 @@ This is an experimental feature right now, and we're working on finalizing the i
 
 ## Next
 
-Ready to try? [Install Label Studio](http://localhost:4000/guide/#Running-with-pip) following our guide and check the [template]() on time series configuration. Also, join the Slack channel if you need any help, have feedback, or feature requests. 
+Ready to try? [Install Label Studio](/guide/#Running-with-pip) following our guide and check the [template]() on time series configuration. Also, join the Slack channel if you need any help, have feedback, or feature requests. 
 
 Cheers!
 
@@ -130,3 +130,4 @@ Cheers!
 - Machine Learning
   - https://github.com/awslabs/gluon-ts - Probabilistic time series modeling in Python
   - https://github.com/alan-turing-institute/sktime - sktime is a Python machine learning toolbox for time series with a unified interface for multiple learning tasks. 
+  - https://github.com/blue-yonder/tsfresh - Time Series feature extraction package

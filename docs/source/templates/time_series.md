@@ -5,10 +5,12 @@ order: 100
 is_new: t
 ---
 
-## Run 
+## Run
 
+```
 label-studio init time_series_project
 label-studio start time_series_project
+```
   
 ## Config
   
@@ -47,7 +49,7 @@ Three tags used above are:
   
 `<TimeSeries>` has an attribute `valueType="url"`. This means that Label Studio expects links to CSV files in its tasks.
 
-`timeColumn` in `TimeSeries` to use a specific column from your dataset as the X axis. If you skip it then it uses incremental integer values `1, 2, 3, ...`. 
+`timeColumn` in `TimeSeries` to use a specific column from your dataset as the X axis. If you skip it then it uses incremental integer values `0, 1, 2, ...`. 
 
 ## Input formats
 
