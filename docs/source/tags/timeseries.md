@@ -2,11 +2,10 @@
 title: TimeSeries
 type: tags
 order: 306
-is_new: t
 ---
 
 TimeSeries tag can be used to label time series data.
-Read more about Time Series Labeling on [template page](../templates/time_series.html) or in our [blog](/blog/release-080-time-series-labeling.html).
+Read more about Time Series Labeling on [template page](../templates/time_series.html).
 
 ### Parameters
 
@@ -14,10 +13,10 @@ Read more about Time Series Labeling on [template page](../templates/time_series
 | --- | --- | --- |
 | name | <code>string</code> | name of the element |
 | value | <code>string</code> | key used to lookup the data, it needs to reference either URLs for your time-series if valueType=url, otherwise expects JSON |
-| [valueType] | <code>enum</code> | "url" or "json" If set to "url" then it loads value references inside `value` key, otherwise it expects JSON. Defaults to url
+| [valueType] | <code>enum</code> | "url" or "json" If set to "url" then it loads value references inside `value` key, otherwise it expects JSON. Defaults to url |
 | [timeColumn] | <code>string</code> | column name or index that provides temporal values, if your time-series data has no temporal column then its automatically generated |
-| [timeFormat] | <code>string</code> | pattern used to parse values inside timeColumn, parsing provided by d3, and follows `strftime` implementation
-| [timeDisplayFormat] | <code>string</code> | format used to display temporal value, can be a number or a date, if a temporal column is a date then use strftime to format it, otherwise, if it's a number then use [d3 number](https://github.com/d3/d3-format#locale_format) formatting
+| [timeFormat] | <code>string</code> | pattern used to parse values inside timeColumn, parsing provided by d3, and follows `strftime` implementation |
+| [timeDisplayFormat] | <code>string</code> | format used to display temporal value, can be a number or a date, if a temporal column is a date then use strftime to format it, otherwise, if it's a number then use [d3 number](https://github.com/d3/d3-format#locale_format) formatting |
 | [sep] | <code>string</code> | separator for you CSV file, default is comma "," |
 | [overviewChannels] | <code>string</code> | comma-separated list of channels names or indexes displayed in overview |
 
