@@ -335,9 +335,13 @@ def setup_page():
     else:
         own_projects, shared_projects = {}, {}
 
+    # this is useful for the transfer to playground templates
+    template_mode = request.args.get('template_mode')
+    page = 'includes/setup_templates.html' if template_mode else 'setup.html'
+
     templates = get_config_templates(g.project.config)
     return flask.render_template(
-        'setup.html',
+        page,
         config=g.project.config,
         project=g.project,
         label_config_full=g.project.label_config_full,
@@ -345,7 +349,8 @@ def setup_page():
         input_values=input_values,
         multi_session=input_args.command == 'start-multi-session',
         own_projects=own_projects,
-        shared_projects=shared_projects
+        shared_projects=shared_projects,
+        template_mode=template_mode
     )
 
 
