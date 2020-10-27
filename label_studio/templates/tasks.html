@@ -229,7 +229,7 @@
                 <td class="text-center" v-if="columns.includes('actions')" @click.stop="/* stop click propagation */">
                   <div class="actions-card">
                     <!-- Show task code -->
-                    <span data-tooltip="Show task code" class="action-button">
+                    <span data-tooltip="Show task data" class="action-button">
                       <i @click.stop="window.open('api/tasks/' + task.id)" class="icon code" style="opacity: 0.75"></i>
                     </span>
                     <!-- Delete task -->

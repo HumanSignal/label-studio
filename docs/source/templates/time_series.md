@@ -14,7 +14,7 @@ label-studio start time_series_project
   
 Example project configuration for two sensors labeling:
   
-```xml
+```html
   <View>
     <TimeSeriesLabels name="label" toName="ts">
       <Label value="Run"/>
@@ -36,7 +36,21 @@ Three tags used above are:
   
 `<TimeSeries>` has an attribute `valueType="url"`. This means that Label Studio expects links to CSV files in its tasks. Read more about valueType [below](/blog/release-080-time-series.html#JSON) and Label Studio [tasks](/guide/tasks.html).
   
-> Notice that `<TimeSeries timeColumn="#time">`, `<Channel>` with `value="#sensorone"` and `value="#sensortwo"`: `time`, `sensorone`, `sensortwo` are nested columns relative to `$csvUrl`, so we prefix use **`#`** character for them. 
+> Notice that `<TimeSeries timeColumn="#time">`, `<Channel>` with `value="#sensorone"` and `value="#sensortwo"`: `time`, `sensorone`, `sensortwo` are nested columns relative to `$csvUrl`. 
+
+### timeColumn & timeFormat & timeDisplayFormat
+
+* Specify `timeColumn` in `TimeSeries` to use some column from your data as X time axis. Or drop it out if you want to use incremental integer values `1, 2, 3, ...`. 
+
+* `timeFormat` is a parsing rule for `timeColumn` dates as in `strftime` ([explore format here](http://www.cplusplus.com/reference/ctime/strftime/)).
+
+* `timeDisplayFormat` is a rule about how to display dates and time on the plot, it's the same as `strftime` ([explore format here](http://www.cplusplus.com/reference/ctime/strftime/)). 
+
+### units & displayFormat
+
+* `displayFormat` is applied to signal values. Explore [D3 format specification](https://github.com/d3/d3-format#locale_format). 
+* `units` will be added to displaying values on the plot and to the Y axis. 
+
 
 ## Input formats  
 
@@ -61,23 +75,29 @@ time,sensorone,sensortwo
 
 Your `<TimeSeries>` tag should have an attribute `valueType="url"` which informs Label Studio to open value as URL with CSV file:
 
-```xml
-<TimeSeries valueType="url" value="$csvUrl"> 
-```
-
-Example input:
-
-```csv
-
+```html
+<View>
+  <TimeSeries valueType="url" value="$csv_file" sep="," timeColumn="time">
+    <Channel column="0"/>
+  </TimeSeries>             
+</View> 
 ```
 
 ### TSV 
 
 For TSV you need to configure a separator, you can use `sep` attribute on the `TimeSeries` tag:
 
-```xml
-<TimeSeries valueType="url" value="$tsvUrl" separator="\t"> 
+TSV format is very similar to CSV but the separator is tab (`\t`) instead of comma. 
+So, the functionality is the same as CSV.  
+
+```html
+<View>
+  <TimeSeries valueType="url" value="$csv_file" sep="\t" timeColumn="time">
+    <Channel column="0"/>
+  </TimeSeries>
+</View> 
 ```
+
 
 ### Headless CSV & TSV
 
@@ -117,7 +137,7 @@ All tasks in LS are stored in JSON and this is the native format for Label Studi
   }
   ```
 
-## Output format
+## Output format example
 
 You can export the results on the Export page in JSON, JSON_MIN, and CSV formats. 
 
@@ -155,9 +175,8 @@ Users make completions while creating labeling for a single task. One completion
           "to_name": "ts",
           "type": "timeserieslabels"
       }
-    ],
-    ...
-  } 
+    ]
+  }] 
 }
 ```
 

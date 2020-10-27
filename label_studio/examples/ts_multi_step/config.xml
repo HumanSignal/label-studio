@@ -34,8 +34,9 @@
                 maxRating="10" icon="star"
                 perRegion="true"/>
         <!-- Per region Choices  -->
-        <Choices name="choices" toName="ts" showInline="true"
-                 perRegion="true" required="true">
+        <Choices name="choices" toName="ts"
+                 showInline="true" required="true"
+                 perRegion="true">
             <Choice value="Good"/>
             <Choice value="Medium"/>
             <Choice value="Poor"/>

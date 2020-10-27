@@ -185,9 +185,9 @@ def send_upload(path):
     return open(os.path.join(project_dir, path), 'rb').read()
 
 
-@app.route('/static/samples/time-series.csv')
+@app.route('/samples/time-series.csv')
 @requires_auth
-def static_time_series():
+def samples_time_series():
     """ Generate time series example for preview
     """
     time_column = request.args.get('time')
@@ -199,7 +199,7 @@ def static_time_series():
     separator = separator.replace('\\t', '\t')
     aliases = {'dot': '.', 'comma': ',', 'tab': '\t', 'space': ' '}
     if separator in aliases:
-        separator = aliases[aliases]
+        separator = aliases[separator]
 
     # check headless or not
     header = True
@@ -1050,6 +1050,15 @@ def api_project_switch():
         return redirect('../setup')
     else:
         return make_response(jsonify(output), 200)
+
+
+@app.route('/api/states', methods=['GET'])
+@requires_auth
+@exception_treatment
+def stats():
+    """ Save states
+    """
+    return make_response('{"status": "done"}', 200)
 
 
 @app.route('/api/health', methods=['GET'])

@@ -1,6 +1,6 @@
 {
-  "message": "Rename separator -> sep",
-  "commit": "932530dd95a1b0cc69e58a44f85fabbaeec53a35",
+  "message": "Fix for TS regions with strings",
+  "commit": "ee40d8035b8c7be77e4e201359d7fdc25bbdc217",
   "branch": "feature/ts",
-  "date": "2020-10-23T18:37:11Z"
+  "date": "2020-10-26T14:54:52Z"
 }

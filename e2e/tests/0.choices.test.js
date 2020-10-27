@@ -1,6 +1,7 @@
 Feature('choices');
 
 Scenario('Setup choices config from start', (I) => {
+  I.wait(3);
   I.amOnPage("/");
   I.waitForText("Welcome to"); // Label Studio uses &nbsp; so don't check it
   I.see("Setup your label config");

@@ -1,12 +1,13 @@
-<!-- {"title": "Loading from CSV", "category": "time-series", "complexity": "basic", "order": "1"} -->
+<!-- {"title": "Import CSV", "category": "time-series", "complexity": "basic", "order": "1"} -->
 
 <!-- readme
 ### Quickstart
+
 1. Prepare `time-series.csv` in tabular CSV format:
     ```
     time,velocity,acceleration
     0,12.34,56.78
-    2,-43.21,8765
+    2,43.21,87.65
     ```
 
 2. Set column names from CSV in the labeling config below:
@@ -22,7 +23,7 @@ upload your CSV to your hosting (e.g.: `https://my.domain.com/time-series.csv`) 
     Read more about
 <a href="https://labelstud.io/tags/timeseries.html" target="_blank">TimeSeries</a>,
 <a href="https://labelstud.io/tags/timeserieslabels.html" target="_blank">TimeSeriesLabels</a>,
-<a href="https://labelstud.io/tags/channel.html" target="_blank">Channel</a>.
+<a href="https://labelstud.io/tags/timeseries.html#Channel" target="_blank">Channel</a>.
 -->
 
 <View>
