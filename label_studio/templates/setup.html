@@ -114,16 +114,9 @@
       </div>
     </div>
 
-    <!-- Hidden template codes -->
-    {% for complexity in templates %}
-      {% for category in templates[complexity] %}
-        {% for t in templates[complexity][category] %}
-          {% autoescape off %}
-          <script data-template-pk="{{ t.pk }}" type="text">{{ t.label_config }}</script>
-          {% endautoescape %}
-        {% endfor %}
-      {% endfor %}
-    {% endfor %}
+    {% with template_mode="codes" %}
+      {% include 'includes/setup_templates.html' %}
+    {% endwith %}
 
     <!-- Change template dialog -->
     <div class="ui basic modal" id="confirm-config-template-dialog">
@@ -231,8 +224,8 @@
       var starter = '<!-- readme', terminator = '-->';
       var start = value.indexOf(starter);
       if (start >= 0) {
-        var body_lenght = value.indexOf(terminator, start) - start - starter.length;
-        var readme = value.substr(start + starter.length, body_lenght);
+        var body_length = value.indexOf(terminator, start) - start - starter.length;
+        var readme = value.substr(start + starter.length, body_length);
         var readme_body = $(
           '<div id="readme-body">' +
             '<i class="icon caret down close-icon" onclick="toggle_readme()"></i>' +
@@ -251,8 +244,8 @@
           toggle_readme(true);
         });
 
-        // Find first XML tag (<View> as usual) and start from it
-        value = value.slice(value.indexOf('<', start + starter.length + body_lenght + terminator.length))
+        // find first XML tag (<View> as usual) and start from it
+        value = value.slice(value.indexOf('<', start + starter.length + body_length + terminator.length))
       }
 
       labelEditor.setValue(value);
