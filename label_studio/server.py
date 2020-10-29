@@ -190,8 +190,8 @@ def send_upload(path):
 def samples_time_series():
     """ Generate time series example for preview
     """
-    time_column = request.args.get('time')
-    value_columns = request.args.get('values').split(',')
+    time_column = request.args.get('time', '')
+    value_columns = request.args.get('values', '').split(',')
     time_format = request.args.get('tf')
 
     # separator processing
@@ -213,6 +213,7 @@ def samples_time_series():
 
     ts = generate_time_series_json(time_column, value_columns, time_format)
     csv_data = pd.DataFrame.from_dict(ts).to_csv(index=False, header=header, sep=separator).encode('utf-8')
+
     mem = io.BytesIO()
     mem.write(csv_data)
     mem.seek(0)
