@@ -1,13 +1,40 @@
 version: "3"
 
-services: 
-  label-studio:
-    container_name: label-studio
-    build: .
-    working_dir: /label-studio
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx_proxy
     volumes:
-      - ./my_project:/label-studio/my_project
-    command: "label-studio start my_project ${INIT_COMMAND} --host 0.0.0.0"
-    ports: 
-      - "8080:8080"
+      - ./config/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - 80:80
+      - 443:443
     restart: always
+  labels1:
+    build: .
+    container_name: labels1
+    command: 'label-studio start my_project  --host 0.0.0.0'
+    volumes:
+      - ./projects/labels1:/label-studio/my_project
+    expose:
+      - "8080"
+    restart: always
+  labels2:
+    build: .
+    container_name: labels2
+    command: 'label-studio start my_project  --host 0.0.0.0'
+    volumes:
+      - ./projects/labels2:/label-studio/my_project
+    expose:
+      - "8080"
+    restart: always
+  labels3:
+    build: .
+    container_name: labels3
+    command: 'label-studio start my_project  --host 0.0.0.0'
+    volumes:
+      - ./projects/labels3:/label-studio/my_project
+    expose:
+      - "8080"
+    restart: always
+

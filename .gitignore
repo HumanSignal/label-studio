@@ -54,3 +54,9 @@ build/
 dist/
 venv/
 tmp/
+
+# Generated (Docker/Nginx)
+config/nginx.conf
+
+# Project Directory
+projects/
