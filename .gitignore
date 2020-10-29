@@ -57,6 +57,7 @@ tmp/
 
 # Generated (Docker/Nginx)
 config/nginx.conf
+docker-compose.yml
 
 # Project Directory
 projects/
