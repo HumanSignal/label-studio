@@ -79,7 +79,6 @@ echo "    sub_filter 'localhost:8080' 'labels$i.$BASE_URL';" >> $FILE
 echo '    sub_filter_once off;' >> $FILE
 echo '    location / {' >> $FILE
 echo "      proxy_pass 'http://labels$i:8080';" >> $FILE
-echo "      proxy_redirect http://labels$i.$BASE_URL/welcome https://labels$i.$BASE_URL/welcome;" >> $FILE
 echo '      rewrite ^/(.*)$ /$1 break;' >> $FILE
 echo '    }' >> $FILE
 echo '' >> $FILE
