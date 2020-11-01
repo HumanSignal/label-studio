@@ -1011,8 +1011,7 @@
 
         get_short_text: function(text) {
           const max_len = 40;
-          return (text.length <= max_len ? '': '...') +
-            text.slice(text.length-max_len, text.length);
+          return (text.length <= max_len ? text: ('...' + text.slice(text.length-max_len, text.length)));
         }
       },
 
