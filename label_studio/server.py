@@ -818,7 +818,15 @@ def api_tasks(task_id):
         if g.project.ml_backends_connected:
             task_data = g.project.make_predictions(task_data)
 
-        return make_response(jsonify(task_data), 200)
+        # change indent for jsonify
+        indent = 2 if request.values.get('pretty', False) else None
+        response = app.response_class(
+            json.dumps(task_data, indent=indent) + "\n",
+            mimetype=app.config["JSONIFY_MIMETYPE"],
+        )
+        return make_response(response, 200)
+
+    # delete task
     elif request.method == 'DELETE':
         g.project.remove_task(task_id)
         return make_response(jsonify('Task deleted.'), 204)

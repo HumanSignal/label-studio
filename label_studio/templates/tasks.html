@@ -235,7 +235,7 @@
                   <div class="actions-card">
                     <!-- Show task code -->
                     <span data-tooltip="Show task data" class="action-button">
-                      <i @click.stop="window.open('api/tasks/' + task.id)" class="icon code" style="opacity: 0.75"></i>
+                      <i @click.stop="window.open('api/tasks/' + task.id + '/?pretty=1')" class="icon code" style="opacity: 0.75"></i>
                     </span>
                     <!-- Delete task -->
                     <span v-if="project.can_delete_tasks" class="action-button">
