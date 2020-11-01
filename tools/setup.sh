@@ -74,7 +74,6 @@ echo '' >> $FILE
 for i in $(seq "$NUMBER_OF_SERVERS"); do
 echo '  server {' >> $FILE
 echo "    server_name labels$i.$BASE_URL;" >> $FILE
-echo '    sub_filter http https;' >> $FILE
 echo "    sub_filter 'localhost:8080' 'labels$i.$BASE_URL';" >> $FILE
 echo '    sub_filter_once off;' >> $FILE
 echo '    location / {' >> $FILE
