@@ -3,7 +3,7 @@
 ![code-coverage](https://github.com/heartexlabs/label-studio/.github/test-coverage.svg)
 
 
-### structure
+### Structure
 
 - functional tests
     --pytest
@@ -14,7 +14,7 @@
     --combination of actions and data
 
 
-### important
+### Important
 
 e2e_actions - contains action functions
 
@@ -27,7 +27,7 @@ scenarios.scenarios - [] wrapper for scenarios
 
 
 
-### how to run tests
+### How to run tests
 
 ```
 git clone https://github.com/heartexlabs/label-studio.git
@@ -36,6 +36,7 @@ python -m venv venv
 . venv/bin/activate
 pip install -e .
 pip install -r label_studio/tests/requirements.txt
+cd label_studio
 label-studio init my_project
 python -m pytest -vrP
 ```
@@ -61,7 +62,7 @@ coverage-badge -o .github/test-coverage.svg
 
 ## e2e test framework doc
 
-### scenarios
+### Scenarios
 scenario can be written as<br/>
 1) python code (manually append)<br/>
 2) yaml single-doc / multi-doc file in tests/cases<br/>
@@ -129,7 +130,7 @@ actions:
 
 ```
 
-### actions with arguments
+### Actions with arguments
 \* means - look below for data examples<br/>
 currently e2e test framework is under development so<br/>
 better take a look at e2e_actions code to be sure of desired action<br/>
@@ -153,7 +154,7 @@ better take a look at e2e_actions code to be sure of desired action<br/>
 | `export` | format | JSON |
 
 
-### action data examples
+### Action data examples
 ```
 samples_path = os.path.join(os.path.dirname(__file__), '../','static/samples/')
 

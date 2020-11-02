@@ -8,36 +8,36 @@ from _pytest import monkeypatch
 from flask import template_rendered
 
 # label_studio
-from label_studio.server import app, str2datetime
-from label_studio import server
+from label_studio.blueprint import create_app
+from label_studio import blueprint as server
 from label_studio.project import Project
 
 
-@pytest.fixture(scope='module')
-def test_client():
-
+@pytest.fixture(scope="module")
+def label_studio_app():
+    app = create_app(set_str2datetime=True)
     app.config['TESTING'] = True
     app.config['DEBUG'] = False
-    app.jinja_env.filters['str2datetime'] = str2datetime
-
-    # Flask provides a way to test your application by exposing test Client
-    # and handling the context locals for you.
-    testing_client = app.test_client()
 
     # Establish an application context before running the tests.
     ctx = app.app_context()
     ctx.push()
     assert app.debug == False
-
-    # this is where the testing happens!
-    yield testing_client
-
+    yield app
     ctx.pop()
 
 
+@pytest.fixture(scope="module")
+def test_client(label_studio_app):
+    # Flask provides a way to test your application by exposing test Client
+    # and handling the context locals for you.
+    return label_studio_app.test_client() # this is where the testing happens!
+
+
 @pytest.fixture
-def captured_templates():
+def captured_templates(label_studio_app):
     """receive templates name and context during flask render"""
+    app = label_studio_app
     recorded = []
 
     def record(sender, template, context, **extra):
