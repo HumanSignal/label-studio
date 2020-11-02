@@ -82,6 +82,7 @@ if os.path.exists('server.json'):
     try:
         with open('server.json') as f:
             input_args = SimpleNamespace(**json.load(f))
+            logger.debug("Successfully read server.json")
     except:
         pass
 
@@ -1101,11 +1102,16 @@ def main():
 
     app.jinja_env.filters['str2datetime'] = str2datetime
 
-    input_args = parse_input_args()
+    input_args = parse_input_args(existing_args=input_args)
 
     # setup logging level
     if input_args.log_level:
         logging.root.setLevel(input_args.log_level)
+
+    # print version
+    if args.version or args.command == 'version':
+        from label_studio import __version__
+        print('\nLabel Studio version:', __version__, '\n')
 
     # On `init` command, create directory args.project_name with initial project state and exit
     if input_args.command == 'init':

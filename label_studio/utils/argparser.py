@@ -1,20 +1,30 @@
 import os
 import json
+from types import SimpleNamespace
 
 from label_studio.utils.io import find_dir
 from label_studio.utils.misc import iter_config_templates
 
 
-def parse_input_args():
+def parse_input_args(existing_args=None, custom_args=None):
     """ Combine args with json config
 
-    :return: config dict
+    :existing_args: existing config as SimpleNamespace
+    :custom_args: overwrite sys.argv with list of simulated cmd line arguments
+
+    :return: config SimpleNamespace
     """
     import sys
     import argparse
     from label_studio.project import Project
 
-    if len(sys.argv) == 1:
+    # Select args:
+    if custom_args:
+        env_args = custom_args
+    else:
+        env_args = sys.argv[1:]
+
+    if len(env_args) == 0:
         print('\nQuick start usage: label-studio start my_project --init\n')
 
     available_templates = [os.path.basename(os.path.dirname(f)) for f in iter_config_templates()]
@@ -39,7 +49,7 @@ def parse_input_args():
         '--force', dest='force', action='store_true',
         help='Force overwrite existing files')
     root_parser.add_argument(
-        '--root-dir', dest='root_dir', default='.',
+        '--root-dir', dest='root_dir',
         help='Project root directory')
     root_parser.add_argument(
         '-v', '--verbose', dest='verbose', action='store_true',
@@ -76,7 +86,7 @@ def parse_input_args():
         help='JSON string representing target parameters')
     root_parser.add_argument(
         '--input-format', dest='input_format',
-        choices=('json', 'json-dir', 'text', 'text-dir', 'image-dir', 'audio-dir'), default='json',
+        choices=('json', 'json-dir', 'text', 'text-dir', 'image-dir', 'audio-dir'), 
         help='Input tasks format. Unless you are using "json" or "json-dir" format, --label-config option is required')
     root_parser.add_argument(
         '-o', '--output-dir', dest='output_dir', type=valid_filepath,
@@ -85,7 +95,7 @@ def parse_input_args():
         '--ml-backends', dest='ml_backends', nargs='+',
         help='Machine learning backends URLs')
     root_parser.add_argument(
-        '--sampling', dest='sampling', choices=['sequential', 'uniform'], default='sequential',
+        '--sampling', dest='sampling', choices=['sequential', 'uniform'],
         help='Sampling type that defines tasks order'
     )
     root_parser.add_argument(
@@ -156,12 +166,7 @@ def parse_input_args():
     parser_start_ms = subparsers.add_parser(
         'start-multi-session', help='Start Label Studio server', parents=[root_parser])
 
-    args = parser.parse_args()
-
-    # print version
-    if args.version or args.command == 'version':
-        from label_studio import __version__
-        print('\nLabel Studio version:', __version__, '\n')
+    args = parser.parse_args(env_args)
 
     if args.output_dir is not None:
         raise RuntimeError('"--output-dir" option is deprecated and has no effect.\n'
@@ -172,4 +177,25 @@ def parse_input_args():
         args.label_config = os.path.join(find_dir('examples'), args.template, 'config.xml')
     if not hasattr(args, 'label_config'):
         args.label_config = None
+
+    # The following part merges with existing arguments if provided.
+    # Command-line arguments have priority over existing arguments.
+    if existing_args:
+        # We need to filter for arguments that were actually provided in the
+        # command line - otherwise we overwrite with default values:
+        args_set = {key:value for key, value in vars(args).items() if value}
+
+        # Merge these dicts: First use the complete list with defaults (args),
+        # then overwrite with the existing arguments, then overwrite these 
+        # with the arguments that were actually set (args_set):
+        args_merged = {**vars(args), **vars(existing_args), **args_set}
+        args = SimpleNamespace(**args_merged)
+
+    # To comply with legacy code, some arguments have to be set as default
+    # if they aren't defined yet:
+    args.root_dir = args.root_dir or "."
+    args.input_format = args.input_format or "json"
+    args.sampling = args.sampling or "sequential"
+
     return args
+    
