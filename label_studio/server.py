@@ -1109,7 +1109,7 @@ def main():
         logging.root.setLevel(input_args.log_level)
 
     # print version
-    if args.version or args.command == 'version':
+    if input_args.version or input_args.command == 'version':
         from label_studio import __version__
         print('\nLabel Studio version:', __version__, '\n')
 
