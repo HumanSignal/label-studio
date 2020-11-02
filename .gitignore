@@ -55,3 +55,4 @@ build/
 dist/
 venv/
 tmp/
+server.json
