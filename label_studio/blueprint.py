@@ -985,10 +985,10 @@ def api_predict():
         task = request.json
     if g.project.ml_backends_connected:
         task_with_predictions = g.project.make_predictions(task)
-        g.project.analytics.send(getframeinfo(currentframe()).function)
+        g.analytics.send(getframeinfo(currentframe()).function)
         return make_response(jsonify(task_with_predictions), 200)
     else:
-        g.project.analytics.send(getframeinfo(currentframe()).function, error=400)
+        g.analytics.send(getframeinfo(currentframe()).function, error=400)
         return make_response(jsonify("No ML backend"), 400)
 
 
