@@ -40,11 +40,11 @@ from label_studio.utils.io import find_dir, find_editor_files
 from label_studio.utils.validation import TaskValidator
 from label_studio.utils.exceptions import ValidationError, LabelStudioError
 from label_studio.utils.functions import (
-    generate_sample_task_without_check, set_full_hostname, set_web_protocol, get_web_protocol,
-    generate_time_series_json, generate_sample_task, get_task_from_labeling_config
+    set_full_hostname, set_web_protocol, get_web_protocol,
+    generate_time_series_json, generate_sample_task, get_sample_task
 )
 from label_studio.utils.misc import (
-    exception_handler, exception_treatment_page,
+    exception_handler, exception_handler_page,
     config_line_stripped, get_config_templates, convert_string_to_hash, serialize_class,
     DirectionSwitch, check_port_in_use, timestamp_to_local_datetime
 )
@@ -151,11 +151,6 @@ def project_get_or_create(multi_session_force_recreate=False):
                                      input_args, context={'multi_session': False})
 
 
-@blueprint.app_template_filter('json')
-def json_filter(s):
-    return json.dumps(s)
-
-
 @blueprint.before_request
 def app_before_request_callback():
     # skip endpoints where no project is needed
@@ -175,7 +170,7 @@ def app_before_request_callback():
     if request.path.startswith('/api'):
         return exception_handler(prepare_globals)()
     else:
-        return exception_treatment_page(prepare_globals)()
+        return exception_handler_page(prepare_globals)()
 
 
 @blueprint.after_request
@@ -204,6 +199,36 @@ def send_upload(path):
                    'replace "/upload/" => "/data/upload/" in your tasks.json files')
     project_dir = os.path.join(g.project.path, 'upload')
     return open(os.path.join(project_dir, path), 'rb').read()
+
+
+@blueprint.route('/static/<path:path>')
+@requires_auth
+def send_static(path):
+    """ Static serving
+    """
+    static_dir = find_dir('static')
+    return flask.send_from_directory(static_dir, path)
+
+
+@blueprint.route('/data/<path:filename>')
+@requires_auth
+@exception_handler
+def get_data_file(filename):
+    """ External resource serving
+    """
+    # support for upload via GUI
+    if filename.startswith('upload/'):
+        path = os.path.join(g.project.path, filename)
+        directory = os.path.abspath(os.path.dirname(path))
+        filename = os.path.basename(path)
+        return flask.send_from_directory(directory, filename, as_attachment=True)
+
+    # serving files from local storage
+    if not g.project.config.get('allow_serving_local_files'):
+        raise FileNotFoundError('Serving local files is not allowed. '
+                                'Use "allow_serving_local_files": true config option to enable local serving')
+    directory = request.args.get('d')
+    return flask.send_from_directory(directory, filename, as_attachment=True)
 
 
 @blueprint.route('/samples/time-series.csv')
@@ -246,26 +271,11 @@ def samples_time_series():
     )
 
 
-@blueprint.route('/static/<path:path>')
-@requires_auth
-def send_static(path):
-    """ Static serving
-    """
-    static_dir = find_dir('static')
-    return flask.send_from_directory(static_dir, path)
-
-
-@blueprint.errorhandler(ValidationError)
-def validation_error_handler(error):
-    logger.error(error)
-    return str(error), 500
-
-
 @blueprint.route('/')
 @requires_auth
-@exception_treatment_page
+@exception_handler_page
 def labeling_page():
-    """ Label studio frontend: task labeling
+    """ Label stream for tasks
     """
     if g.project.no_tasks():
         return redirect('welcome')
@@ -296,9 +306,9 @@ def labeling_page():
 
 @blueprint.route('/welcome')
 @requires_auth
-@exception_treatment_page
+@exception_handler_page
 def welcome_page():
-    """ Label studio frontend: task labeling
+    """ On-boarding page
     """
     g.project.update_on_boarding_state()
     return flask.render_template(
@@ -311,7 +321,7 @@ def welcome_page():
 
 @blueprint.route('/tasks', methods=['GET', 'POST'])
 @requires_auth
-@exception_treatment_page
+@exception_handler_page
 def tasks_page():
     """ Tasks and completions page
     """
@@ -328,9 +338,9 @@ def tasks_page():
 
 @blueprint.route('/setup')
 @requires_auth
-@exception_treatment_page
+@exception_handler_page
 def setup_page():
-    """ Setup label config
+    """ Setup labeling config
     """
     input_values = {}
     project = g.project
@@ -379,7 +389,7 @@ def setup_page():
 
 @blueprint.route('/import')
 @requires_auth
-@exception_treatment_page
+@exception_handler_page
 def import_page():
     """ Import tasks from JSON, CSV, ZIP and more
     """
@@ -392,9 +402,9 @@ def import_page():
 
 @blueprint.route('/export')
 @requires_auth
-@exception_treatment_page
+@exception_handler_page
 def export_page():
-    """ Export completions as JSON or using converters
+    """ Export page: export completions as JSON or using converters
     """
     return flask.render_template(
         'export.html',
@@ -406,9 +416,10 @@ def export_page():
 
 @blueprint.route('/model')
 @requires_auth
-@exception_treatment_page
+@exception_handler_page
 def model_page():
-    """ Machine learning"""
+    """ Machine learning backends page
+    """
     ml_backends = []
     for ml_backend in g.project.ml_backends:
         if ml_backend.connected:
@@ -439,15 +450,21 @@ def model_page():
     )
 
 
-def _get_sample_task(label_config):
-    predefined_task, completions, predictions = get_task_from_labeling_config(label_config)
-    generated_task = generate_sample_task_without_check(label_config, mode='editor_preview')
-    if predefined_task is not None:
-        generated_task.update(predefined_task)
-    return generated_task, completions, predictions
+@blueprint.route('/version')
+@requires_auth
+@exception_handler
+def version():
+    """ Show LS backend and LS frontend versions
+    """
+    lsf = json.load(open(find_dir('static/editor') + '/version.json'))
+    ver = {
+        'label-studio-frontend': lsf,
+        'label-studio-backend': label_studio.__version__
+    }
+    return make_response(jsonify(ver), 200)
 
 
-@blueprint.route('/api/render-label-studio', methods=['GET', 'POST'])
+@blueprint.route('/render-label-studio', methods=['GET', 'POST'])
 @requires_auth
 def api_render_label_studio():
     """ Label studio frontend rendering for iframe
@@ -457,7 +474,7 @@ def api_render_label_studio():
     if not config:
         return make_response('No config in POST', status.HTTP_417_EXPECTATION_FAILED)
 
-    task_data, completions, predictions = _get_sample_task(config)
+    task_data, completions, predictions = get_sample_task(config)
 
     example_task_data = {
         'id': 1764,
@@ -497,33 +514,6 @@ def api_validate_config():
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-@blueprint.route('/api/save-config', methods=['POST'])
-@requires_auth
-def api_save_config():
-    """ Save label config
-    """
-    label_config = None
-    if 'label_config' in request.form:
-        label_config = request.form['label_config']
-    elif 'label_config' in request.json:
-        label_config = request.json['label_config']
-
-    # check config before save
-    try:
-        g.project.validate_label_config(label_config)
-    except ValidationError as e:
-        return make_response(jsonify({'label_config': e.msg_to_list()}), status.HTTP_400_BAD_REQUEST)
-    except Exception as e:
-        return make_response(jsonify({'label_config': [str(e)]}), status.HTTP_400_BAD_REQUEST)
-
-    try:
-        g.project.update_label_config(label_config)
-    except Exception as e:
-        return make_response(jsonify({'label_config': [str(e)]}), status.HTTP_400_BAD_REQUEST)
-
-    return Response(status=status.HTTP_201_CREATED)
-
-
 @blueprint.route('/api/import-example', methods=['GET', 'POST'])
 @requires_auth
 def api_import_example():
@@ -537,7 +527,7 @@ def api_import_example():
         config = request.POST.get('label_config', '')
     try:
         g.project.validate_label_config(config)
-        task_data, _, _ = _get_sample_task(config)
+        task_data, _, _ = get_sample_task(config)
     except (ValueError, ValidationError, lxml.etree.Error, KeyError):
         response = HttpResponse('error while example generating', status=status.HTTP_400_BAD_REQUEST)
     else:
@@ -591,16 +581,68 @@ def api_import_example_file():
     response = HttpResponse(output)
     response.headers['Content-Disposition'] = 'attachment; filename=%s' % filename
     response.headers['filename'] = filename
-
     return response
 
 
-@blueprint.route('/api/import', methods=['POST'])
+@blueprint.route('/api/project', methods=['POST', 'GET', 'PATCH'])
+@requires_auth
+@exception_handler
+def api_project():
+    """ Project
+    """
+    code = 200
+    input_args = current_app.label_studio.input_args
+
+    # new project
+    if request.method == 'POST' and request.args.get('new', False):
+        input_args.project_desc = request.args.get('desc')
+        g.project = project_get_or_create(multi_session_force_recreate=True)
+        code = 201
+
+    # update project params, ml backend settings
+    elif request.method == 'PATCH':
+        g.project.update_params(request.json)
+        code = 201
+
+    output = g.project.serialize()
+    output['multi_session_mode'] = input_args.command != 'start-multi-session'
+    return make_response(jsonify(output), code)
+
+
+@blueprint.route('/api/project/config', methods=['POST'])
+@requires_auth
+def api_save_config():
+    """ Save labeling config
+    """
+    label_config = None
+    if 'label_config' in request.form:
+        label_config = request.form['label_config']
+    elif 'label_config' in request.json:
+        label_config = request.json['label_config']
+
+    # check config before save
+    try:
+        g.project.validate_label_config(label_config)
+    except ValidationError as e:
+        return make_response(jsonify({'label_config': e.msg_to_list()}), status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return make_response(jsonify({'label_config': [str(e)]}), status.HTTP_400_BAD_REQUEST)
+
+    try:
+        g.project.update_label_config(label_config)
+    except Exception as e:
+        return make_response(jsonify({'label_config': [str(e)]}), status.HTTP_400_BAD_REQUEST)
+
+    return Response(status=status.HTTP_201_CREATED)
+
+
+@blueprint.route('/api/project/import', methods=['POST'])
 @requires_auth
 @exception_handler
 def api_import():
     # make django compatibility for uploader module
     class DjangoRequest:
+        def __init__(self): pass
         POST = request.form
         GET = request.args
         FILES = request.files
@@ -670,7 +712,7 @@ def api_export():
     return response
 
 
-@blueprint.route('/api/projects/1/next/', methods=['GET'])
+@blueprint.route('/api/projects/1/next', methods=['GET'])
 @requires_auth
 @exception_handler
 def api_generate_next_task():
@@ -690,27 +732,6 @@ def api_generate_next_task():
         task = g.project.make_predictions(task)
     logger.debug('Next task:\n' + str(task.get('id', None)))
     return make_response(jsonify(task), 200)
-
-
-@blueprint.route('/api/project/', methods=['POST', 'GET', 'PATCH'])
-@requires_auth
-@exception_handler
-def api_project():
-    """ Project global operation"""
-    code = 200
-    input_args = current_app.label_studio.input_args
-
-    if request.method == 'POST' and request.args.get('new', False):
-        input_args.project_desc = request.args.get('desc')
-        g.project = project_get_or_create(multi_session_force_recreate=True)
-        code = 201
-    elif request.method == 'PATCH':
-        g.project.update_params(request.json)
-        code = 201
-
-    output = g.project.serialize()
-    output['multi_session_mode'] = input_args.command != 'start-multi-session'
-    return make_response(jsonify(output), code)
 
 
 @blueprint.route('/api/project/storage-settings/', methods=['GET', 'POST'])
@@ -1025,45 +1046,12 @@ def api_predictions():
         return make_response(jsonify("No ML backend"), 400)
 
 
-@blueprint.route('/version')
-@requires_auth
-@exception_handler
-def version():
-    """Show backend and frontend version"""
-    lsf = json.load(open(find_dir('static/editor') + '/version.json'))
-    ver = {
-        'label-studio-frontend': lsf,
-        'label-studio-backend': label_studio.__version__
-    }
-    return make_response(jsonify(ver), 200)
-
-
-@blueprint.route('/data/<path:filename>')
-@requires_auth
-@exception_handler
-def get_data_file(filename):
-    """ External resource serving
-    """
-    # support for upload via GUI
-    if filename.startswith('upload/'):
-        path = os.path.join(g.project.path, filename)
-        directory = os.path.abspath(os.path.dirname(path))
-        filename = os.path.basename(path)
-        return flask.send_from_directory(directory, filename, as_attachment=True)
-
-    # serving files from local storage
-    if not g.project.config.get('allow_serving_local_files'):
-        raise FileNotFoundError('Serving local files is not allowed. '
-                                'Use "allow_serving_local_files": true config option to enable local serving')
-    directory = request.args.get('d')
-    return flask.send_from_directory(directory, filename, as_attachment=True)
-
-
 @blueprint.route('/api/project-switch', methods=['GET', 'POST'])
 @requires_auth
 @exception_handler
 def api_project_switch():
-    """ Switch projects """
+    """ Switch projects in multi-session mode
+    """
     input_args = current_app.label_studio.input_args
 
     if request.args.get('uuid') is None:
@@ -1106,6 +1094,17 @@ def health():
     """ Health check
     """
     return make_response('{"status": "up"}', 200)
+
+
+@blueprint.errorhandler(ValidationError)
+def validation_error_handler(error):
+    logger.error(error)
+    return str(error), 500
+
+
+@blueprint.app_template_filter('json')
+def json_filter(s):
+    return json.dumps(s)
 
 
 def str2datetime(timestamp_str):

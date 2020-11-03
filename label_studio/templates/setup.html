@@ -44,7 +44,7 @@
   <div class="ui wrapper">
     {% include 'includes/setup_help.html' %}
 
-    <form action="api/save-config" method="post" class="ui form">
+    <form action="api/project/config" method="post" class="ui form">
 
       <!-- Textarea & Preview in two cols -->
       <div class="ui two column grid zero-margin step2 stackable">
@@ -383,7 +383,7 @@
     function show_render_editor(editor) {
       let config = labelEditor.getValue();
       $.ajax({
-        url: 'api/render-label-studio',
+        url: 'render-label-studio',
         method: 'POST',
         data: {
           config: config,

@@ -189,7 +189,7 @@ For label configs with one data key (e.g.: one input image) Label Studio support
 Use API to import tasks in [Label Studio basic format](tasks.html#Basic-format) if for any reason you can't access either a local filesystem nor Web UI (e.g. if you are creating a data stream)
 
 ```bash
-curl -X POST -H Content-Type:application/json http://localhost:8080/api/import \
+curl -X POST -H Content-Type:application/json http://localhost:8080/api/project/import \
 --data "[{\"my_key\": \"my_value_1\"}, {\"my_key\": \"my_value_2\"}]"
 ```
 

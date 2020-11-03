@@ -83,7 +83,7 @@ def exception_handler(f):
 
 
 # standard exception treatment for any page function
-def exception_treatment_page(f):
+def exception_handler_page(f):
     def exception_f(*args, **kwargs):
         try:
             return f(*args, **kwargs)

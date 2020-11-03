@@ -27,7 +27,7 @@ def action_config(test_client, case_config):
     data = {
         'label_config': case_config['label_config']
     }
-    response = test_client.post('/api/save-config', data=data, headers=headers)
+    response = test_client.post('/api/project/config', data=data, headers=headers)
     assert response.status_code == 201
 
 
@@ -69,7 +69,7 @@ def action_import(test_client, case_config):
             filename: (file, filename),
         }
 
-        response = test_client.post('/api/import', data=data)
+        response = test_client.post('/api/project/import', data=data)
     assert response.status_code == 201
 
 
