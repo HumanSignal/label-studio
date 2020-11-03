@@ -38,7 +38,7 @@ from types import SimpleNamespace
 from label_studio.utils import uploader
 from label_studio.utils.io import find_dir, find_editor_files
 from label_studio.utils.validation import TaskValidator
-from label_studio.utils.exceptions import ValidationError
+from label_studio.utils.exceptions import ValidationError, LabelStudioError
 from label_studio.utils.functions import (
     generate_sample_task_without_check, set_full_hostname, set_web_protocol, get_web_protocol,
     generate_time_series_json, generate_sample_task, get_task_from_labeling_config
@@ -78,13 +78,11 @@ def config_from_file():
     try:
         config_file = INPUT_ARGUMENTS_PATH.open(encoding='utf8')
     except OSError:
-        return None
+        raise LabelStudioError("Can't open input_args file: " + str(INPUT_ARGUMENTS_PATH) + ", " 
+                               "use set_input_arguments_path() to setup it")
 
     with config_file:
-        try:
-            data = json.load(config_file)
-        except json.JSONDecodeError:
-            return None
+        data = json.load(config_file)
     return LabelStudioConfig(input_args=SimpleNamespace(**data))
 
 
@@ -92,7 +90,7 @@ def create_app(label_studio_config=None, set_str2datetime=False):
     """ Create application factory, as explained here:
         http://flask.pocoo.org/docs/patterns/appfactories/.
 
-    :param label_studio_config: The LabelStudioConfig object to use.
+    :param label_studio_config: LabelStudioConfig object to use with input_args params
     :param set_str2datetime: install set_str2datatime to filters
     """
     app = flask.Flask(__package__, static_url_path='')
@@ -103,6 +101,11 @@ def create_app(label_studio_config=None, set_str2datetime=False):
     if set_str2datetime:
         app.jinja_env.filters['str2datetime'] = str2datetime
     app.label_studio = label_studio_config or config_from_file()
+
+    # check LabelStudioConfig correct loading
+    if app.label_studio is None:
+        raise LabelStudioError('LabelStudioConfig is not loaded correctly')
+
     app.register_blueprint(blueprint)
     return app
 

@@ -19,7 +19,7 @@ Scenario('Setup choices config from start', (I) => {
 
   I.click("Save");
   I.click("Import Tasks");
-  I.waitInUrl("/import", 3);
+  I.waitInUrl("/import", 6);
   I.click("Add Sample Task");
   // empty table cell in the first row of data table
   I.click(locate("td").after(locate("td").withText("0")));
