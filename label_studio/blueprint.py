@@ -44,7 +44,7 @@ from label_studio.utils.functions import (
     generate_time_series_json, generate_sample_task, get_task_from_labeling_config
 )
 from label_studio.utils.misc import (
-    exception_treatment, exception_treatment_page,
+    exception_handler, exception_treatment_page,
     config_line_stripped, get_config_templates, convert_string_to_hash, serialize_class,
     DirectionSwitch, check_port_in_use, timestamp_to_local_datetime
 )
@@ -173,13 +173,13 @@ def app_before_request_callback():
 
     # show different exception pages for api and other endpoints
     if request.path.startswith('/api'):
-        return exception_treatment(prepare_globals)()
+        return exception_handler(prepare_globals)()
     else:
         return exception_treatment_page(prepare_globals)()
 
 
 @blueprint.after_request
-@exception_treatment
+@exception_handler
 def app_after_request_callback(response):
     if hasattr(g, 'analytics'):
         g.analytics.send(request, session, response)
@@ -423,7 +423,7 @@ def model_page():
                 logger.error(str(exc), exc_info=True)
                 ml_backend.is_error = True
                 try:
-                    # try to parse json as the result of @exception_treatment
+                    # try to parse json as the result of @exception_handler
                     ml_backend.error = json.loads(str(exc))
                 except ValueError:
                     ml_backend.error = {'detail': "Can't parse exception message from ML Backend"}
@@ -597,7 +597,7 @@ def api_import_example_file():
 
 @blueprint.route('/api/import', methods=['POST'])
 @requires_auth
-@exception_treatment
+@exception_handler
 def api_import():
     # make django compatibility for uploader module
     class DjangoRequest:
@@ -649,7 +649,7 @@ def api_import():
 
 @blueprint.route('/api/export', methods=['GET'])
 @requires_auth
-@exception_treatment
+@exception_handler
 def api_export():
     export_format = request.args.get('format')
     now = datetime.now()
@@ -672,7 +672,7 @@ def api_export():
 
 @blueprint.route('/api/projects/1/next/', methods=['GET'])
 @requires_auth
-@exception_treatment
+@exception_handler
 def api_generate_next_task():
     """ Generate next task to label
     """
@@ -694,7 +694,7 @@ def api_generate_next_task():
 
 @blueprint.route('/api/project/', methods=['POST', 'GET', 'PATCH'])
 @requires_auth
-@exception_treatment
+@exception_handler
 def api_project():
     """ Project global operation"""
     code = 200
@@ -715,7 +715,7 @@ def api_project():
 
 @blueprint.route('/api/project/storage-settings/', methods=['GET', 'POST'])
 @requires_auth
-@exception_treatment
+@exception_handler
 def api_project_storage_settings():
 
     # GET: return selected form, populated with current storage parameters
@@ -767,7 +767,7 @@ def api_project_storage_settings():
 
 @blueprint.route('/api/tasks/', methods=['GET'])
 @requires_auth
-@exception_treatment
+@exception_handler
 def api_all_tasks():
     """ Get full tasks with pagination, completions and predictions
     """
@@ -828,7 +828,7 @@ def api_all_tasks():
 
 @blueprint.route('/api/tasks/<task_id>/', methods=['GET', 'DELETE'])
 @requires_auth
-@exception_treatment
+@exception_handler
 def api_tasks(task_id):
     """ Get task by id
     """
@@ -857,7 +857,7 @@ def api_tasks(task_id):
 
 @blueprint.route('/api/tasks/delete', methods=['DELETE'])
 @requires_auth
-@exception_treatment
+@exception_handler
 def api_tasks_delete():
     """ Delete all tasks & completions
     """
@@ -867,7 +867,7 @@ def api_tasks_delete():
 
 @blueprint.route('/api/projects/1/completions_ids/', methods=['GET'])
 @requires_auth
-@exception_treatment
+@exception_handler
 def api_all_completion_ids():
     """ Get all completion ids
     """
@@ -877,7 +877,7 @@ def api_all_completion_ids():
 
 @blueprint.route('/api/tasks/<task_id>/completions/', methods=['POST', 'DELETE'])
 @requires_auth
-@exception_treatment
+@exception_handler
 def api_completions(task_id):
     """ Delete or save new completion to output_dir with the same name as task_id
     """
@@ -895,7 +895,7 @@ def api_completions(task_id):
 
 @blueprint.route('/api/project/completions/', methods=['DELETE'])
 @requires_auth
-@exception_treatment
+@exception_handler
 def api_all_completions():
     """ Delete all completions
     """
@@ -909,7 +909,7 @@ def api_all_completions():
 
 @blueprint.route('/api/tasks/<task_id>/cancel', methods=['POST'])
 @requires_auth
-@exception_treatment
+@exception_handler
 def api_tasks_cancel(task_id):
     task_id = int(task_id)
     skipped_completion = request.json
@@ -922,7 +922,7 @@ def api_tasks_cancel(task_id):
 
 @blueprint.route('/api/tasks/<task_id>/completions/<completion_id>/', methods=['DELETE'])
 @requires_auth
-@exception_treatment
+@exception_handler
 def api_completion_by_id(task_id, completion_id):
     """ Delete or save new completion to output_dir with the same name as task_id.
         completion_id with different IDs is not supported in this backend
@@ -939,7 +939,7 @@ def api_completion_by_id(task_id, completion_id):
 
 @blueprint.route('/api/tasks/<task_id>/completions/<completion_id>/', methods=['PATCH'])
 @requires_auth
-@exception_treatment
+@exception_handler
 def api_completion_update(task_id, completion_id):
     """ Rewrite existing completion with patch.
         This is technical api call for editor testing only. It's used for Rewrite button in editor.
@@ -957,7 +957,7 @@ def api_completion_update(task_id, completion_id):
 
 @blueprint.route('/api/projects/1/expert_instruction')
 @requires_auth
-@exception_treatment
+@exception_handler
 def api_instruction():
     """ Instruction for annotators
     """
@@ -966,7 +966,7 @@ def api_instruction():
 
 @blueprint.route('/api/remove-ml-backend', methods=['POST'])
 @requires_auth
-@exception_treatment
+@exception_handler
 def api_remove_ml_backend():
     ml_backend_name = request.json['name']
     g.project.remove_ml_backend(ml_backend_name)
@@ -975,7 +975,7 @@ def api_remove_ml_backend():
 
 @blueprint.route('/predict', methods=['POST'])
 @requires_auth
-@exception_treatment
+@exception_handler
 def api_predict():
     """ Make ML prediction using ml_backends
     """
@@ -992,7 +992,7 @@ def api_predict():
 
 @blueprint.route('/api/train', methods=['POST'])
 @requires_auth
-@exception_treatment
+@exception_handler
 def api_train():
     """Send train signal to ML backend"""
     if g.project.ml_backends_connected:
@@ -1010,7 +1010,7 @@ def api_train():
 
 @blueprint.route('/api/predictions', methods=['POST'])
 @requires_auth
-@exception_treatment
+@exception_handler
 def api_predictions():
     """Send creating predictions signal to ML backend"""
     if g.project.ml_backends_connected:
@@ -1027,7 +1027,7 @@ def api_predictions():
 
 @blueprint.route('/version')
 @requires_auth
-@exception_treatment
+@exception_handler
 def version():
     """Show backend and frontend version"""
     lsf = json.load(open(find_dir('static/editor') + '/version.json'))
@@ -1040,7 +1040,7 @@ def version():
 
 @blueprint.route('/data/<path:filename>')
 @requires_auth
-@exception_treatment
+@exception_handler
 def get_data_file(filename):
     """ External resource serving
     """
@@ -1061,7 +1061,7 @@ def get_data_file(filename):
 
 @blueprint.route('/api/project-switch', methods=['GET', 'POST'])
 @requires_auth
-@exception_treatment
+@exception_handler
 def api_project_switch():
     """ Switch projects """
     input_args = current_app.label_studio.input_args
@@ -1092,7 +1092,7 @@ def api_project_switch():
 
 @blueprint.route('/api/states', methods=['GET'])
 @requires_auth
-@exception_treatment
+@exception_handler
 def stats():
     """ Save states
     """
@@ -1101,7 +1101,7 @@ def stats():
 
 @blueprint.route('/api/health', methods=['GET'])
 @requires_auth
-@exception_treatment
+@exception_handler
 def health():
     """ Health check
     """

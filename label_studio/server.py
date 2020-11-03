@@ -15,6 +15,8 @@ def create_app(*args, **kwargs):
 
 
 def setup_default_logging_config():
+    """ Setup default logging for Label Studio blueprint
+    """
     with LOG_CONFIG_PATH.open(encoding='utf8') as f:
         logging.config.dictConfig(json.load(f))
 
