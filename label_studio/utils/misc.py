@@ -91,6 +91,7 @@ def exception_treatment_page(f):
             error = str(e)
             traceback = tb.format_exc()
             logger.debug(traceback)
+            print(traceback)
             return flask.render_template(
                 'includes/error.html',
                 error=error, header="Project loading error", traceback=traceback)

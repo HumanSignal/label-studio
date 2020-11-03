@@ -68,6 +68,11 @@ class LabelStudioConfig:
     input_args = attr.ib()
 
 
+def set_input_arguments_path(path):
+    global INPUT_ARGUMENTS_PATH
+    INPUT_ARGUMENTS_PATH = pathlib.Path(path)
+
+
 @functools.lru_cache(maxsize=1)
 def config_from_file():
     try:

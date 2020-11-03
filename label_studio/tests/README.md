@@ -36,7 +36,6 @@ python -m venv venv
 . venv/bin/activate
 pip install -e .
 pip install -r label_studio/tests/requirements.txt
-cd label_studio
 label-studio init my_project
 python -m pytest -vrP
 ```
