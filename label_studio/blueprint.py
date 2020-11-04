@@ -151,11 +151,6 @@ def project_get_or_create(multi_session_force_recreate=False):
                                      input_args, context={'multi_session': False})
 
 
-@blueprint.app_template_filter('json')
-def json_filter(s):
-    return json.dumps(s)
-
-
 @blueprint.before_request
 def app_before_request_callback():
     # skip endpoints where no project is needed
@@ -195,6 +190,20 @@ def send_media(path):
     return flask.send_from_directory(media_dir, path)
 
 
+@blueprint.route('/version')
+@requires_auth
+@exception_treatment
+def version():
+    """ Show backend and frontend version
+    """
+    lsf = json.load(open(find_dir('static/editor') + '/version.json'))
+    ver = {
+        'label-studio-frontend': lsf,
+        'label-studio-backend': label_studio.__version__
+    }
+    return make_response(jsonify(ver), 200)
+
+
 @blueprint.route('/upload/<path:path>')
 @requires_auth
 def send_upload(path):
@@ -204,6 +213,27 @@ def send_upload(path):
                    'replace "/upload/" => "/data/upload/" in your tasks.json files')
     project_dir = os.path.join(g.project.path, 'upload')
     return open(os.path.join(project_dir, path), 'rb').read()
+
+
+@blueprint.route('/data/<path:filename>')
+@requires_auth
+@exception_treatment
+def get_data_file(filename):
+    """ External resource serving
+    """
+    # support for upload via GUI
+    if filename.startswith('upload/'):
+        path = os.path.join(g.project.path, filename)
+        directory = os.path.abspath(os.path.dirname(path))
+        filename = os.path.basename(path)
+        return flask.send_from_directory(directory, filename, as_attachment=True)
+
+    # serving files from local storage
+    if not g.project.config.get('allow_serving_local_files'):
+        raise FileNotFoundError('Serving local files is not allowed. '
+                                'Use "allow_serving_local_files": true config option to enable local serving')
+    directory = request.args.get('d')
+    return flask.send_from_directory(directory, filename, as_attachment=True)
 
 
 @blueprint.route('/samples/time-series.csv')
@@ -265,10 +295,11 @@ def validation_error_handler(error):
 @requires_auth
 @exception_treatment_page
 def labeling_page():
-    """ Label studio frontend: task labeling
+    """ Label stream with tasks
     """
     if g.project.no_tasks():
-        return redirect('welcome')
+        from flask import url_for
+        return redirect(url_for('label_studio.welcome_page', _external=True))
 
     # task data: load task or task with completions if it exists
     task_data = None
@@ -1025,40 +1056,6 @@ def api_predictions():
         return make_response(jsonify("No ML backend"), 400)
 
 
-@blueprint.route('/version')
-@requires_auth
-@exception_treatment
-def version():
-    """Show backend and frontend version"""
-    lsf = json.load(open(find_dir('static/editor') + '/version.json'))
-    ver = {
-        'label-studio-frontend': lsf,
-        'label-studio-backend': label_studio.__version__
-    }
-    return make_response(jsonify(ver), 200)
-
-
-@blueprint.route('/data/<path:filename>')
-@requires_auth
-@exception_treatment
-def get_data_file(filename):
-    """ External resource serving
-    """
-    # support for upload via GUI
-    if filename.startswith('upload/'):
-        path = os.path.join(g.project.path, filename)
-        directory = os.path.abspath(os.path.dirname(path))
-        filename = os.path.basename(path)
-        return flask.send_from_directory(directory, filename, as_attachment=True)
-
-    # serving files from local storage
-    if not g.project.config.get('allow_serving_local_files'):
-        raise FileNotFoundError('Serving local files is not allowed. '
-                                'Use "allow_serving_local_files": true config option to enable local serving')
-    directory = request.args.get('d')
-    return flask.send_from_directory(directory, filename, as_attachment=True)
-
-
 @blueprint.route('/api/project-switch', methods=['GET', 'POST'])
 @requires_auth
 @exception_treatment
@@ -1106,6 +1103,11 @@ def health():
     """ Health check
     """
     return make_response('{"status": "up"}', 200)
+
+
+@blueprint.app_template_filter('json')
+def json_filter(s):
+    return json.dumps(s)
 
 
 def str2datetime(timestamp_str):
