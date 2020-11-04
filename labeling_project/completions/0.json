@@ -1,0 +1,34 @@
+{
+  "completions": [
+    {
+      "created_at": 1604496820,
+      "id": 1,
+      "lead_time": 14.394,
+      "result": [
+        {
+          "from_name": "label",
+          "id": "gz62PCzj8v",
+          "image_rotation": 0,
+          "original_height": 403,
+          "original_width": 600,
+          "to_name": "image",
+          "type": "rectanglelabels",
+          "value": {
+            "height": 19.602977667493796,
+            "rectanglelabels": [
+              "Airplane"
+            ],
+            "rotation": 0,
+            "width": 13.5,
+            "x": 34.333333333333336,
+            "y": 40.94292803970223
+          }
+        }
+      ]
+    }
+  ],
+  "data": {
+    "image": "http://localhost:8080/static/samples/sample.jpg"
+  },
+  "id": 0
+}
