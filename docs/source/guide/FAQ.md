@@ -63,7 +63,7 @@ The most common mistake while resource loading is <b>CORS</b> (Cross-Origin Reso
 
 <br/> 
 
-## How to make pre-annotations & pre-labeling
+## How to make pre-annotations & pre-labeling & predictions
 You can import pre-annotated tasks into LS. Pre-annotations will be automatically shown on Labeling page. Prepare your tasks with `predictions` field which is very similar to `completions` and then import your tasks to LS. [Read more](tasks.html#Basic-format) about task format and predictions. The same format of predictions is used for the ML backend output. 
 <br>
 
