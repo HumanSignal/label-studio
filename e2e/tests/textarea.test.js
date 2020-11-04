@@ -23,7 +23,7 @@ Scenario("Use classification config with textarea", async (I) => {
   // request after validating config and importing example
   // so hope there will be always anough time
   // don't try to get through these step in interactive mode!
-  I.waitForResponse(req => req.url().includes("/api/render-label-studio"));
+  I.waitForResponse(req => req.url().includes("/render-label-studio"));
   // sample text from classification config
   I.waitForText("to trust yourself");
   // header from that config

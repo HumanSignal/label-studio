@@ -876,7 +876,8 @@
               self.labelStudio._sdk.loadTask(task.id, 'auto');
             } else {
               // init new instance
-              self.labelStudio = LSF_SDK("label-studio", self.project.label_config_line, task, true);
+              self.labelStudio = LSF_SDK("label-studio", self.project.label_config_line, task,
+                                         true, self.project.instruction);
             }
           }, 100);
         },

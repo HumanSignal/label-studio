@@ -56,7 +56,7 @@ class AnswerException(Exception):
 
 
 # standard exception treatment for any api function
-def exception_treatment(f):
+def exception_handler(f):
     def exception_f(*args, **kwargs):
         try:
             return f(*args, **kwargs)
@@ -83,7 +83,7 @@ def exception_treatment(f):
 
 
 # standard exception treatment for any page function
-def exception_treatment_page(f):
+def exception_handler_page(f):
     def exception_f(*args, **kwargs):
         try:
             return f(*args, **kwargs)

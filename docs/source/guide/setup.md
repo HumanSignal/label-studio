@@ -68,7 +68,7 @@ You can also use the web interface at [`/setup`](http://localhost:8080/setup) to
 
 Save labeling config for the project using API: 
 ```
-curl -X POST -H Content-Type:application/json http://localhost:8080/api/save-config \
+curl -X POST -H Content-Type:application/json http://localhost:8080/api/project/config \
 --data "{\"label_config\": \"<View>[...]</View>\"}"
 ```
 

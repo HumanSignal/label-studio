@@ -910,20 +910,20 @@ class Project(object):
     def serialize(self):
         """ Serialize project to json dict
         """
-        project = self
-        banlist = ('json', 'dir-jsons')
-        available_storages = list(filter(lambda i: i[0] not in banlist, get_available_storage_names().items()))
+        ban_list = ('json', 'dir-jsons')
+        available_storages = list(filter(lambda i: i[0] not in ban_list, get_available_storage_names().items()))
 
         output = {
-            'project_name': project.name,
-            'task_count': len(project.source_storage.ids()),
-            'completion_count': len(project.get_completions_ids()),
-            'config': project.config,
-            'can_manage_tasks': project.can_manage_tasks,
-            'can_manage_completions': project.can_manage_completions,
-            'can_delete_tasks': project.can_delete_tasks,
-            'target_storage': {'readable_path': project.target_storage.readable_path},
-            'source_storage': {'readable_path': project.source_storage.readable_path},
+            'project_name': self.name,
+            'task_count': len(self.source_storage.ids()),
+            'completion_count': len(self.get_completions_ids()),
+            'config': self.config,
+            'instruction': self.config['instruction'],
+            'can_manage_tasks': self.can_manage_tasks,
+            'can_manage_completions': self.can_manage_completions,
+            'can_delete_tasks': self.can_delete_tasks,
+            'target_storage': {'readable_path': self.target_storage.readable_path},
+            'source_storage': {'readable_path': self.source_storage.readable_path},
             'available_storages': available_storages,
             'source_syncing': self.source_storage.is_syncing,
             'target_syncing': self.target_storage.is_syncing,

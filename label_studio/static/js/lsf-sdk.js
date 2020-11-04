@@ -6,12 +6,12 @@
 
 const API_URL = {
   MAIN: "api",
+  PROJECT: "/project",
   TASKS: "/tasks",
   COMPLETIONS: "/completions",
   CANCEL: "/cancel",
-  PROJECTS: "/projects",
-  NEXT: "/next/",
-  EXPERT_INSTRUCTIONS: "/expert_instruction"
+  NEXT: "/next",
+  INSTRUCTION: "/project?fields=instruction"
 };
 
 const Requests = (function(window) {
@@ -148,7 +148,7 @@ const _loadTask = function(ls, url, completionID) {
 };
 
 const loadNext = function(ls) {
-  var url = `${API_URL.MAIN}${API_URL.PROJECTS}/1${API_URL.NEXT}`;
+  var url = `${API_URL.MAIN}${API_URL.PROJECT}${API_URL.NEXT}`;
     return _loadTask(ls, url);
 };
 
@@ -183,7 +183,7 @@ const _convertTask = function(task) {
   return task;
 };
 
-const LSF_SDK = function(elid, config, task, hide_skip) {
+const LSF_SDK = function(elid, config, task, hide_skip, description) {
 
   const showHistory = task === null;  // show history buttons only if label stream mode, not for task explorer
 
@@ -233,6 +233,7 @@ const LSF_SDK = function(elid, config, task, hide_skip) {
 
     task: _convertTask(task),
     interfaces: interfaces,
+    description: description,
 
     onSubmitCompletion: function(ls, c) {
       ls.setFlags({ isLoading: true });

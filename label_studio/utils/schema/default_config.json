@@ -8,7 +8,7 @@
   "label_config": null,
   "input_path": null,
   "output_dir": "completions",
-  "instruction": "Type some <b>hypertext</b> for label experts!",
+  "instruction": "<img src='/static/images/ls_logo.png'><br> Type some <b>hypertext</b> for annotators here!<br> <a href='https://labelstud.io/guide/labeling.html'>Read more</a> about the labeling interface.",
   "allow_delete_completions": true,
   "templates_dir": "examples",
   "editor": {

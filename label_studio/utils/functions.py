@@ -25,6 +25,9 @@ HOSTNAME = ''
 
 
 def get_task_from_labeling_config(config):
+    """ Get task, completions and predictions from labeling config comment,
+        it must start from "<!-- {" and end as "} -->"
+    """
     # try to get task data, completions & predictions from config comment
     task_data, completions, predictions = {}, None, None
     start = config.find('<!-- {')
@@ -125,11 +128,13 @@ def generate_sample_task_without_check(label_config, mode='upload'):
 
 
 def _is_strftime_string(s):
-    # very dumb but works
+    # simple way to detect strftime format
     return '%' in s
 
 
 def generate_time_series_json(time_column, value_columns, time_format=None):
+    """ Generate sample for time series
+    """
     n = 100
     if time_format is not None and not _is_strftime_string(time_format):
         time_fmt_map = {
@@ -155,6 +160,16 @@ def generate_sample_task(project):
     """
     task = generate_sample_task_without_check(project.label_config)
     return task
+
+
+def get_sample_task(label_config):
+    """ Get sample task from labeling config and combine it with generated sample task
+    """
+    predefined_task, completions, predictions = get_task_from_labeling_config(label_config)
+    generated_task = generate_sample_task_without_check(label_config, mode='editor_preview')
+    if predefined_task is not None:
+        generated_task.update(predefined_task)
+    return generated_task, completions, predictions
 
 
 def set_full_hostname(hostname):
