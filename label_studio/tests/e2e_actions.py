@@ -90,7 +90,7 @@ def action_next_task(test_client, case_config):
         get all tasks
     """
     #TODO get tasks
-    response = test_client.get('/api/projects/1/next/')
+    response = test_client.get('/api/project/next')
     data = json.loads(response.data.decode('utf-8'))
     assert isinstance(data, dict) == True
 
@@ -202,7 +202,7 @@ def action_export(test_client, case_config):
         make sure it is in project directory
     """
     export_format = case_config['format']
-    response = test_client.get('/api/export?format={export_format}'.format(
+    response = test_client.get('/api/project/export?format={export_format}'.format(
         export_format=export_format))
     assert response.status_code == 200
 
@@ -213,6 +213,6 @@ def action_export_test(test_client, case_config):
         make sure it is in project directory
     """
     export_format = case_config['format']
-    response = test_client.get('/api/export?format={export_format}'.format(
+    response = test_client.get('/api/project/export?format={export_format}'.format(
         export_format=export_format))
     assert response.status_code == 200

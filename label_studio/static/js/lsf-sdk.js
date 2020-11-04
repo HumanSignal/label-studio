@@ -6,11 +6,11 @@
 
 const API_URL = {
   MAIN: "api",
+  PROJECT: "/project",
   TASKS: "/tasks",
   COMPLETIONS: "/completions",
   CANCEL: "/cancel",
-  PROJECTS: "/projects",
-  NEXT: "/next/",
+  NEXT: "/next",
   EXPERT_INSTRUCTIONS: "/expert_instruction"
 };
 
@@ -148,7 +148,7 @@ const _loadTask = function(ls, url, completionID) {
 };
 
 const loadNext = function(ls) {
-  var url = `${API_URL.MAIN}${API_URL.PROJECTS}/1${API_URL.NEXT}`;
+  var url = `${API_URL.MAIN}${API_URL.PROJECT}${API_URL.NEXT}`;
     return _loadTask(ls, url);
 };
 

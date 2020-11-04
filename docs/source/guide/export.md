@@ -210,7 +210,7 @@ Export your brushe labels to numpy 2d arrays and PNG images. One label is equal 
 You can use an API to request a file with exported results, e.g.
 
 ```bash
-curl http://localhost:8080/api/export?format=JSON > exported_results.zip
+curl http://localhost:8080/api/project/export?format=JSON > exported_results.zip
 ```
 
 The formats description are presented [above](#Export-formats). 

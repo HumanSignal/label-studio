@@ -628,6 +628,7 @@ def api_save_config():
     except Exception as e:
         return make_response(jsonify({'label_config': [str(e)]}), status.HTTP_400_BAD_REQUEST)
 
+    # update config states
     try:
         g.project.update_label_config(label_config)
     except Exception as e:
@@ -689,7 +690,7 @@ def api_import():
     }), status.HTTP_201_CREATED)
 
 
-@blueprint.route('/api/export', methods=['GET'])
+@blueprint.route('/api/project/export', methods=['GET'])
 @requires_auth
 @exception_handler
 def api_export():
@@ -712,7 +713,7 @@ def api_export():
     return response
 
 
-@blueprint.route('/api/projects/1/next', methods=['GET'])
+@blueprint.route('/api/project/next', methods=['GET'])
 @requires_auth
 @exception_handler
 def api_generate_next_task():
