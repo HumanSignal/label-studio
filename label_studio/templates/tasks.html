@@ -3,7 +3,6 @@
 {% raw %}
   <script src="static/js/polyfill.min.js"></script>
   <script src="static/js/vue.js"></script>
-  <script src="static/js/lsf-sdk.js"></script>
   <script src="static/js/mousetrap.min.js"></script>
 
   <link rel="stylesheet" href="static/css/tasks.css">
@@ -146,115 +145,6 @@
 
     <!-- DataManager -->
     <div class="datamanager"></div>
-
-
-    <!-- Table Settings -->
-    <sui-modal v-model="show_settings" v-bind:class="{inverted: 1, small: 1, scrollable: 1}"
-               size="small" style="z-index: 1000">
-      <i class="icon close" @click="show_settings=false"></i>
-
-      <!-- Header -->
-      <div class="header">Settings</div>
-
-      <!-- Content -->
-      <div class="scrolling content">
-
-        <h4>Columns to show</h4>
-        <div class="section">
-          <div class="ui list horizontal">
-            <div class="item ui checkbox" :class="item==='id' && quick_view ? 'disabled': ''"
-                 v-for="item in all_columns">
-              <input type="checkbox" class="ui checkbox" v-model="columns" :value="item">
-              <label class="cap-first-letter">{{ item.replaceAll('_', ' ') }}</label>
-            </div>
-          </div>
-          <br/><br/>
-
-          Text preview limit &nbsp;
-          <div class="ui input">
-            <input style="height: 30px" type="number" min="10" max="5000" v-model="text_preview_limit">
-          </div>&nbsp; characters
-        </div>
-
-        <h4>Quick view</h4>
-        <div class="section">
-          <p>
-            Quick view combines the task table and the labeling interface on left and right panels into one window.
-            To start quick view click on the table row near Task ID.
-            You can move over tasks using hotkeys.
-            Press <hotkey style='color:#777;font-size:80%;padding: 0.05em 0.35em;'>`</hotkey> or
-            <i class="icon cog" style="opacity: 0.75"></i>on the page bottom to show settings again.
-          </p>
-          <div class="ui form">
-            <a class="ui button icon" @click="quick_view_show_table=!quick_view_show_table">
-              <i class="fa" :class="quick_view_show_table ? 'fa-border-all': 'fa-border-none'"></i>
-              {{ quick_view_show_table ? 'Hide': 'Show' }} Task Table
-            </a>
-          </div>
-        </div>
-
-        <h4>Auto update timer</h4>
-        <div class="section">
-          <p>Auto update project info and tasks by 5 sec timer</p>
-          <a class="ui button" @click="toggleAutoUpdateTimer()">
-            <i class="fa-clock" :class="auto_update_timer ? 'fas': 'far'"></i>
-            {{ 'Timer ' + (auto_update_timer ? 'Enabled': 'Disabled') }}
-          </a>
-        </div>
-
-        <!-- Hotkeys -->
-        <h4>Hotkeys</h4>
-        <div class="section">
-          <div class="hotkey-helper">
-            <div class="keys">
-              <hotkey style="font-weight: bold">`</hotkey>
-              <small>[gravis key]</small></div>
-            <span class="description">toggle settings</span>
-          </div>
-
-          <div class="hotkey-helper">
-            <div class="keys"><hotkey>q</hotkey></div>
-            <span class="description">toggle quick view</span>
-          </div>
-
-          <div class="hotkey-helper">
-            <div class="keys"><hotkey>e</hotkey></div>
-            <span class="description">toggle task table in quick view</span>
-          </div>
-
-          <div class="hotkey-helper">
-            <div class="keys"><hotkey>click on row</hotkey></div>
-            <span class="description">open task in Quick mode, <br>click again on selected task to exit</span>
-          </div>
-
-          <div class="hotkey-helper">
-            <div class="keys"><hotkey>shift</hotkey> + <hotkey>←</hotkey> or <hotkey>a</hotkey></div>
-            <span class="description">previous page</span>
-          </div>
-
-          <div class="hotkey-helper">
-            <div class="keys"><hotkey>shift</hotkey> + <hotkey>→</hotkey> or <hotkey>d</hotkey></div>
-            <span class="description">next page</span>
-          </div>
-
-          <div class="hotkey-helper">
-            <div class="keys"><hotkey>shift</hotkey> + <hotkey>↑</hotkey> or <hotkey>w</hotkey></div>
-            <span class="description">previous item</span>
-          </div>
-
-          <div class="hotkey-helper">
-            <div class="keys"><hotkey>shift</hotkey> + <hotkey>↓</hotkey> or <hotkey>s</hotkey></div>
-            <span class="description">next item</span>
-          </div>
-
-          <div class="hotkey-helper">
-            <div class="keys"><hotkey>ctrl</hotkey> + <hotkey>click on row</hotkey></div>
-            <span class="description">open task explore in new window</span>
-          </div>
-
-        </div>
-      </div>
-    </sui-modal>
 
     {% endraw %}
     {% include 'includes/storages.html' %}
@@ -631,18 +521,6 @@
           this.current_task = task;
           this.columns = this.quick_columns;
           var self = this;
-
-          setTimeout(function () {
-            if (self.labelStudio) {
-              // use already created instance
-              self.labelStudio._sdk.loadTask(task.id, 'auto');
-            } else {
-              // init new instance
-              self.labelStudio = LSF_SDK("label-studio", self.project.label_config_line, task, true,
-                                         self.project.instruction);
-              self.labelStudio._sdk.loadTask(task.id, 'auto');
-            }
-          }, 100);
         },
         closeTaskPreview: function () {
           this.quick_view = false;
@@ -716,25 +594,7 @@
         },
 
         evalPanelWidth: function() {
-          // check that task table width > left panel size
-          var grid_width = this.$refs.grid.getBoundingClientRect().width;
 
-          var table_width = 0;
-          var right_width;
-          if (this.quick_view_show_table) {
-            table_width = this.$refs.task_table.getBoundingClientRect().width;
-            this.$refs.left_panel.style.width = (table_width + 28) + 'px';
-            right_width = (grid_width - 28 - table_width - 10);
-          }
-          else {
-            right_width = grid_width;
-          }
-          right_width = right_width < 500 ? 900: right_width;
-          this.$refs.right_panel.style.width = right_width + 'px';
-
-          // select ful pagination or small
-          this.full_pagination = (table_width > PAGINATION_MAX_WIDTH) || !this.quick_view;
-          // console.log(grid_width, table_width);
         },
 
         // audio player play / stop
@@ -855,10 +715,6 @@
         var project_timer_interval = this.project.config.task_page_auto_update_timer ?
           this.project.config.task_page_auto_update_timer.toString(): '10000';
         this.timer_interval = parseInt(getUrlArg('timer', project_timer_interval));
-        this.startAutoUpdateTimer();
-        if (this.timer_interval > 0) {
-          console.log('auto update enabled, use ?timer=0 to disable it on this page')
-        }
 
         $('#vue_loader').hide();
         $('.ui.checkbox').checkbox();

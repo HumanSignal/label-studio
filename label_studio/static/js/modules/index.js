@@ -10,8 +10,12 @@ if (dmRoot) {
     api: {
       gateway: "/api",
       endpoints: {
+        project: "/project",
+        columns: "/project/columns",
+        tabs: "/project/tabs",
+
         tasks: {
-          path: "/tasks",
+          path: "/project/tabs/:tab_id/tasks",
           convert(result) {
             return {
               tasks: result,
@@ -19,13 +23,21 @@ if (dmRoot) {
             }
           }
         },
+        annotations: {
+          path: "/project/tabs/:tab_id/annotations",
+          convert(result) {
+            return {
+              tasks: result,
+              total: 106,
+            }
+          }
+        },
+
         task: "/tasks/:id",
+        cancel: "/tasks/:task_id/completions?was_cancelled=1",
+        next: "/project/next",
+
         completion: "/tasks/:task_id/completions/:id",
-        cancel: "/cancel",
-        projects: "/projects",
-        next: "/projects/1/next",
-        project: "/project",
-        expertInstructions: "/expert_instruction",
         submitCompletion: {
           path: "/tasks/:taskId/completions",
           method: "post",

@@ -1043,6 +1043,65 @@ def api_predictions():
         return make_response(jsonify("No ML backend"), 400)
 
 
+@blueprint.route('/api/project/columns', methods=['GET'])
+@requires_auth
+@exception_handler
+def api_project_columns():
+    """ Project columns for data manager tabs
+    """
+    result = {
+        'columns': [
+            {
+                'id': 'id',
+                'title': "ID",
+                'type': "Number",
+                'target': 'tasks|annotations',
+                'schema': {
+                    'min': 0,
+                    'max': 100
+                }
+            },
+            {
+                'id': 'id2',
+                'title': 'ID 2',
+                'type': 'Number',
+                'target': 'tasks|annotations',
+                'parent': 'id',
+                'schema': {
+                    'min': 0,
+                    'max': 100
+                }
+            }
+        ]
+    }
+    return make_response(jsonify(result), 200)
+
+
+@blueprint.route('/api/project/tabs', methods=['GET'])
+@requires_auth
+@exception_handler
+def api_project_tabs():
+    """ Project tabs for data manager
+    """
+    result = {
+        'tabs': [
+            {
+                'id': 1,
+                'title': 'Tab 1',
+                'hiddenColumns': None,
+                'filters': [
+                    {
+                        'filter': "agreement-filter",
+                        'value': {'min': 0.2, 'max': 0.5},
+                        'operator': "in",
+                    },
+                ],
+            },
+        ]
+    }
+    return make_response(jsonify(result), 200)
+
+
 @blueprint.route('/api/states', methods=['GET'])
 @requires_auth
 @exception_handler
