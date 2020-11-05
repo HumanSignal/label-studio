@@ -44,7 +44,7 @@ from label_studio.utils.functions import (
     generate_time_series_json, generate_sample_task, get_sample_task
 )
 from label_studio.utils.misc import (
-    exception_handler, exception_handler_page, check_port_in_use,
+    exception_handler, exception_handler_page, check_port_in_use, start_browser,
     config_line_stripped, get_config_templates, convert_string_to_hash, serialize_class
 )
 from label_studio.utils.analytics import Analytics
@@ -1079,17 +1079,6 @@ def str2datetime(timestamp_str):
         return timestamp_str
     # return datetime.utcfromtimestamp(ts).strftime('%Y%m%d.%H%M%S')
     return datetime.utcfromtimestamp(ts).strftime('%c')
-
-
-def start_browser(ls_url, no_browser):
-    import threading
-    import webbrowser
-    if no_browser:
-        return
-
-    browser_url = ls_url + '/welcome'
-    threading.Timer(2.5, lambda: webbrowser.open(browser_url)).start()
-    print('Start browser at URL: ' + browser_url)
 
 
 def main():

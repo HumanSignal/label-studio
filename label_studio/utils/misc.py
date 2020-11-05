@@ -356,3 +356,14 @@ def check_port_in_use(host, port):
     host = host.replace('https://', '').replace('http://', '')
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         return s.connect_ex((host, port)) == 0
+
+
+def start_browser(ls_url, no_browser):
+    import threading
+    import webbrowser
+    if no_browser:
+        return
+
+    browser_url = ls_url + '/welcome'
+    threading.Timer(2.5, lambda: webbrowser.open(browser_url)).start()
+    print('Start browser at URL: ' + browser_url)

@@ -1,6 +1,6 @@
 {
-  "message": "Fix headless csv",
-  "commit": "da7e1fe96a8d73fd2296e94e791f74ecfaf84a67",
+  "message": "Change tooltip for skip button to make clear was_cancelled field in completion",
+  "commit": "1fd2267a2668782f2af80af5c27df4d8ba96bea3",
   "branch": "master",
-  "date": "2020-10-30T20:00:08Z"
+  "date": "2020-11-04T22:15:33Z"
 }
