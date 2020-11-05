@@ -1,0 +1,7 @@
+<!-- {"title": "Pairwise comparison", "category": "other", "complexity": "advanced"} -->
+<View>
+  <Header>Select one of two items</Header>
+  <Pairwise name="pw" toName="text1,text2" />
+  <Text name="text1" value="$text1" />
+  <Text name="text2" value="$text2" />
+</View>

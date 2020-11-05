@@ -80,42 +80,9 @@
     </div>
   {% endif %}
 
-  <!-- Basic Templates -->
-  {% for complexity in templates %}
-    <div class="ui accordion" id="{{ 'basic-templates' if complexity == 'basic' else 'adv-templates' }}">
-      <div class="title">
-        <i class="dropdown icon"></i>{{ complexity|capitalize }} config examples
-      </div>
-      <div class="content" style="margin-top:-8px">
-        <!-- Templates categories -->
-        <div class="ui grid stackable" style="margin: 0 auto;">
-          {% for category in templates[complexity] %}
-            <div class="three wide column category">
-              {% if category == 'audio' %} <i class="icon sound" title="Audio sources"></i> {% endif %}
-              {% if category == 'text' %} <i class="icon font" title="Text sources"></i> {% endif %}
-              {% if category == 'html' %} <i class="icon code" title="HTML sources"></i> {% endif %}
-              {% if category == 'image' %} <i class="icon image" title="Image sources"></i> {% endif %}
-              {% if category == 'other' %} <i class="icon archive" title="Other sources"></i> {% endif %}
-
-              {% if category == 'layouts' %} <i class="icon eye" title="View layout examples"></i> {% endif %}
-              {% if category == 'per-region' %}
-                <i class="icon vector square" title="Per region examples"></i> {% endif %}
-              {% if category == 'nested' %}
-                <i class="icon bullseye" title="Nested examples with conditional behavior"></i> {% endif %}
-
-              <!-- Template -->
-              {% for t in templates[complexity][category] %}
-                <div class="ui item">
-                  <a class="use-template no-go" href="#" data-value="{{ t.pk }}">{{ t.title }}</a>
-                </div>
-              {% endfor %}
-            </div>
-          {% endfor %}
-        </div>
-      </div>
-    </div>
-  {% endfor %}
-
+  {% with template_mode="titles" %}
+    {% include 'includes/setup_templates.html' %}
+  {% endwith %}
 </div>
 
 <br/>

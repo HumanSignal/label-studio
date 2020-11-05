@@ -1,0 +1,124 @@
+<!-- {"title": "Relations with text", "category": "time-series", "complexity": "advanced", "order": "z"} -->
+
+<!-- readme
+### Notes
+ * Link text pieces with time-series events using this template.
+ * Select region first and add a relation to other region using [+]
+ button on Results panel at the bottom.
+ <a target="_blank" href="https://labelstud.io/guide/labeling.html#Add-relation">Read more about relations</a>
+-->
+
+<View>
+    <Header value="Link logger events with
+                   monitoring signals using relations"/>
+
+    <!-- Text setup -->
+    <Header value="Mark actions in text" size="6"/>
+    <Labels name="logger_label" toName="logger">
+        <Label value="Error" background="red"/>
+        <Label value="Success" background="orange"/>
+    </Labels>
+
+    <Text name="logger" value="$event" valueType="text"/>
+
+    <!-- Time series setup -->
+    <Header value="Mark regions in time series" size="6"/>
+    <TimeSeriesLabels name="ts_label" toName="ts">
+        <Label value="Error" background="red"/>
+        <Label value="High load" background="darkorange"/>
+    </TimeSeriesLabels>
+
+    <TimeSeries name="ts" valueType="url" value="$csv"
+                sep="," timeColumn="time">
+        <Channel column="temperature" units="°C"
+                 strokeColor="#17b" legend="Temperature"/>
+    </TimeSeries>
+
+</View>
+
+
+<!--
+    Sample task data and completion
+    are for preview only
+-->
+
+
+<!-- {
+  "data": {
+    "event": "Authorization success\nError requesting auth: Authorization check failed"
+  },
+  "completions": [{
+
+    "result": [
+        {
+            "value": {
+                "start": 22,
+                "end": 71,
+                "text": "Error requesting auth: Authorization check failed",
+                "labels": [
+                    "Error"
+                ]
+            },
+            "id": "ohdmBWCbqB",
+            "from_name": "logger_label",
+            "to_name": "logger",
+            "type": "labels"
+        },
+        {
+            "value": {
+                "start": 6,
+                "end": 17,
+                "instant": false,
+                "timeserieslabels": [
+                    "High load"
+                ]
+            },
+            "id": "JlujfAED9-",
+            "from_name": "ts_label",
+            "to_name": "ts",
+            "type": "timeserieslabels"
+        },
+        {
+            "value": {
+                "start": 0,
+                "end": 21,
+                "text": "Authorization success",
+                "labels": [
+                    "Success"
+                ]
+            },
+            "id": "pA0JwD5dAF",
+            "from_name": "logger_label",
+            "to_name": "logger",
+            "type": "labels"
+        },
+        {
+            "value": {
+                "start": 13,
+                "end": 22,
+                "instant": false,
+                "timeserieslabels": [
+                    "Error"
+                ]
+            },
+            "id": "G4m2fkQAb4",
+            "from_name": "ts_label",
+            "to_name": "ts",
+            "type": "timeserieslabels"
+        },
+        {
+            "from_id": "JlujfAED9-",
+            "to_id": "pA0JwD5dAF",
+            "type": "relation",
+            "direction": "right"
+        },
+        {
+            "from_id": "G4m2fkQAb4",
+            "to_id": "ohdmBWCbqB",
+            "type": "relation",
+            "direction": "right"
+        }
+    ]
+  }]
+}
+-->

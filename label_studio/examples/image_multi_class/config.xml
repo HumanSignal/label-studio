@@ -1,0 +1,32 @@
+<!-- {"title": "Multi-image classification", "category": "image", "complexity": "basic", "order": "z"} -->
+<View>
+  <Header value="Please select everything you see on the image" />
+
+  <View style="display: flex;">
+    <View style="width: 49%; margin-right: 1.99%">
+      <Image name="img-left" value="$image1"/>
+      <Choices name="class-left" toName="img-left" choice="multiple">
+        <Choice value="People" />
+        <Choice value="Trees" />
+        <Choice value="Animals" />
+      </Choices>
+    </View>
+
+    <View style="width: 49%;">
+      <Image name="img-right" value="$image2"/>
+      <Choices name="class-right" toName="img-right" choice="multiple">
+        <Choice value="Food" />
+        <Choice value="Cars" />
+        <Choice value="Buildings" />
+      </Choices>
+    </View>
+  </View>
+
+  <View>
+    <Header value="Which one is clearer to you?" />
+    <Choices name="comparison" toName="img-left" showInline="true">
+      <Choice value="Left" />
+      <Choice value="Right" />
+    </Choices>
+  </View>
+</View>

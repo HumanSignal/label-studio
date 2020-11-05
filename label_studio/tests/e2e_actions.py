@@ -27,7 +27,7 @@ def action_config(test_client, case_config):
     data = {
         'label_config': case_config['label_config']
     }
-    response = test_client.post('/api/save-config', data=data, headers=headers)
+    response = test_client.post('/api/project/config', data=data, headers=headers)
     assert response.status_code == 201
 
 
@@ -69,7 +69,7 @@ def action_import(test_client, case_config):
             filename: (file, filename),
         }
 
-        response = test_client.post('/api/import', data=data)
+        response = test_client.post('/api/project/import', data=data)
     assert response.status_code == 201
 
 
@@ -90,7 +90,7 @@ def action_next_task(test_client, case_config):
         get all tasks
     """
     #TODO get tasks
-    response = test_client.get('/api/projects/1/next/')
+    response = test_client.get('/api/project/next')
     data = json.loads(response.data.decode('utf-8'))
     assert isinstance(data, dict) == True
 
@@ -122,7 +122,7 @@ def action_delete_all_tasks(test_client, case_config):
         action
         delete all tasks
     """
-    response = test_client.delete('/api/tasks/delete')
+    response = test_client.delete('/api/tasks')
     assert response.status_code == 204
 
 
@@ -202,7 +202,7 @@ def action_export(test_client, case_config):
         make sure it is in project directory
     """
     export_format = case_config['format']
-    response = test_client.get('/api/export?format={export_format}'.format(
+    response = test_client.get('/api/project/export?format={export_format}'.format(
         export_format=export_format))
     assert response.status_code == 200
 
@@ -213,6 +213,6 @@ def action_export_test(test_client, case_config):
         make sure it is in project directory
     """
     export_format = case_config['format']
-    response = test_client.get('/api/export?format={export_format}'.format(
+    response = test_client.get('/api/project/export?format={export_format}'.format(
         export_format=export_format))
     assert response.status_code == 200

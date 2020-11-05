@@ -13,7 +13,8 @@
 <script>
   window.onload = function () {
     var task = {{ task_data | json | safe }};
-    window.LSF_SDK = LSF_SDK("label-studio", `{{ label_config_line | safe }}`, task);
+    window.LSF_SDK = LSF_SDK("label-studio", `{{ label_config_line | safe }}`, task, false,
+                             `{{ project.config['instruction'] | safe }}`);
   }
 </script>
 

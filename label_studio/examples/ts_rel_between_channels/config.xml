@@ -1,0 +1,131 @@
+<!-- {"title": "Relations between channels", "category": "time-series", "complexity": "advanced", "order": "z"} -->
+
+<!-- readme
+### Notes
+ * To disable region syncing between channels we need to use
+ two different TimeSeries instances for Signal 1 and Signal 2.
+ * Select region first and add a relation to other region using [+]
+ button on Results panel at the bottom.
+ <a target="_blank" href="https://labelstud.io/guide/labeling.html#Add-relation">Read more about relations</a>
+-->
+
+<View>
+    <Header value="Build relations among regions
+                   from different channels" size="6"/>
+
+    <!-- First TimeSeries with Sensor 1 -->
+    <Header value="Sensor 1 labels" size="6"/>
+    <TimeSeriesLabels name="labels1" toName="ts1">
+        <Label value="Run" background="#a4a"/>
+        <Label value="Walk" background="#aa4"/>
+    </TimeSeriesLabels>
+
+    <TimeSeries name="ts1" valueType="url" value="$csv1"
+                sep="," timeColumn="time"
+                overviewChannels="sensor1">
+        <Channel column="sensor1"
+                 displayName="Sensor 1"
+                 strokeColor="#27b"/>
+    </TimeSeries>
+
+    <!-- Second TimeSeries with Sensor 2 -->
+    <Header value="Sensor 2 labels" size="6"/>
+    <TimeSeriesLabels name="labels2" toName="ts2">
+        <Label value="On" background="green"/>
+        <Label value="Off" background="red"/>
+    </TimeSeriesLabels>
+
+    <TimeSeries name="ts2" valueType="url" value="$csv2"
+                timeColumn="0" separator=","
+                overviewChannels="1">
+        <Channel column="2"
+                 displayName="Sensor 2"
+                 strokeColor="#f80"/>
+    </TimeSeries>
+</View>
+
+
+<!--
+    This is the completion
+    for the result preview
+    on Setup page only
+-->
+
+
+<!-- {
+  "completions": [
+    {
+
+      "result": [
+        {
+          "from_name": "labels2",
+          "id": "5b6brspcdS",
+          "to_name": "ts2",
+          "type": "timeserieslabels",
+          "value": {
+            "end": 6,
+            "instant": false,
+            "start": 2,
+            "timeserieslabels": [
+              "On"
+            ]
+          }
+        },
+        {
+          "from_name": "labels1",
+          "id": "jX-vuDiFf5",
+          "to_name": "ts1",
+          "type": "timeserieslabels",
+          "value": {
+            "end": 12,
+            "instant": false,
+            "start": 7,
+            "timeserieslabels": [
+              "Run"
+            ]
+          }
+        },
+        {
+          "from_name": "labels2",
+          "id": "dhTSo03_2_",
+          "to_name": "ts2",
+          "type": "timeserieslabels",
+          "value": {
+            "end": 17,
+            "instant": false,
+            "start": 13,
+            "timeserieslabels": [
+              "Off"
+            ]
+          }
+        },
+        {
+          "from_name": "labels1",
+          "id": "fjIgsxMM4Y",
+          "to_name": "ts1",
+          "type": "timeserieslabels",
+          "value": {
+            "end": 25,
+            "instant": false,
+            "start": 21,
+            "timeserieslabels": [
+              "Walk"
+            ]
+          }
+        },
+        {
+          "direction": "right",
+          "from_id": "5b6brspcdS",
+          "to_id": "jX-vuDiFf5",
+          "type": "relation"
+        },
+        {
+          "direction": "right",
+          "from_id": "dhTSo03_2_",
+          "to_id": "fjIgsxMM4Y",
+          "type": "relation"
+        }
+      ]
+    }
+  ]
+} -->

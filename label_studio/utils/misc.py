@@ -56,7 +56,7 @@ class AnswerException(Exception):
 
 
 # standard exception treatment for any api function
-def exception_treatment(f):
+def exception_handler(f):
     def exception_f(*args, **kwargs):
         try:
             return f(*args, **kwargs)
@@ -83,7 +83,7 @@ def exception_treatment(f):
 
 
 # standard exception treatment for any page function
-def exception_treatment_page(f):
+def exception_handler_page(f):
     def exception_f(*args, **kwargs):
         try:
             return f(*args, **kwargs)
@@ -91,6 +91,7 @@ def exception_treatment_page(f):
             error = str(e)
             traceback = tb.format_exc()
             logger.debug(traceback)
+            print(traceback)
             return flask.render_template(
                 'includes/error.html',
                 error=error, header="Project loading error", traceback=traceback)
@@ -248,8 +249,8 @@ def get_config_templates(config):
 
     # sort by title
     ordering = {
-        'basic': ['audio', 'image', 'text', 'html', 'other'],
-        'advanced': ['layouts', 'nested', 'per-region', 'other']
+        'basic': ['audio', 'image', 'text', 'html', 'time-series'],
+        'advanced': ['layouts', 'nested', 'per-region', 'other', 'time-series']
     }
     ordered_templates = OrderedDict()
     for complexity in ['basic', 'advanced']:
@@ -355,3 +356,14 @@ def check_port_in_use(host, port):
     host = host.replace('https://', '').replace('http://', '')
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         return s.connect_ex((host, port)) == 0
+
+
+def start_browser(ls_url, no_browser):
+    import threading
+    import webbrowser
+    if no_browser:
+        return
+
+    browser_url = ls_url + '/welcome'
+    threading.Timer(2.5, lambda: webbrowser.open(browser_url)).start()
+    print('Start browser at URL: ' + browser_url)

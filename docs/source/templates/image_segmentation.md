@@ -2,7 +2,6 @@
 title: Image Segmentation
 type: templates
 order: 103
-is_new: t
 ---
 
 Image segmentation using a brush and producing a mask

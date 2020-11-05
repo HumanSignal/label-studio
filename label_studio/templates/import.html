@@ -76,7 +76,89 @@
 </div> <!-- container -->
 
 <script>
+  const fileUploader = ({ root, onHover, onLeave, onGetFiles }) => {
+  const dropZone = root;
 
+  const hover = (e) => {
+    e.preventDefault();
+    onHover(dropZone);
+  };
+
+  const leave = (e) => {
+    e.preventDefault();
+    onLeave(dropZone);
+  };
+
+  dropZone.addEventListener("dragstart", hover);
+  dropZone.addEventListener("dragenter", hover);
+  dropZone.addEventListener("dragover", hover);
+  dropZone.addEventListener("dragleave", leave);
+
+  function traverseFileTree(item, path) {
+    return new Promise((resolve) => {
+      path = path || "";
+      if (item.isFile) {
+        // Avoid hidden files
+        if (item.name[0] === ".") return resolve([]);
+
+        resolve([item]);
+      } else if (item.isDirectory) {
+        // Get folder contents
+        const result = [];
+        const dirReader = item.createReader();
+        const dirPath = path + item.name + "/";
+
+        dirReader.readEntries(async function (entries) {
+          for (let i = 0; i < entries.length; i++) {
+            const entry = entries[i];
+            const files = await traverseFileTree(entry, dirPath);
+            result.push(...files);
+          }
+
+          resolve(result);
+        });
+      }
+    });
+  }
+
+  const getFiles = async (e) => {
+    const result = [];
+    const files = e.dataTransfer.items;
+
+    if (files.length) {
+      // Use DataTransferItemList interface to access the file(s)
+      for (let i = 0, l = files.length; i < l; i++) {
+        // If dropped items aren't files, reject them
+        const item = files[i].webkitGetAsEntry();
+        const dir = await traverseFileTree(item);
+        result.push(...dir);
+      }
+    }
+
+    return result;
+  };
+
+  dropZone.addEventListener(
+    "drop",
+    async (e) => {
+      leave(e);
+      const fileEntries = await getFiles(e);
+
+      const files = await Promise.all(
+        fileEntries.map(
+          (fileEntry) => new Promise((resolve) => fileEntry.file(resolve))
+        )
+      );
+
+      window.holder_usage = true;
+      onGetFiles(files);
+    },
+    false
+  );
+};
+</script>
+
+<script>
   $('.upload-data').on('click', function () {
     $("#start-upload-dialog").modal({
       closable: false
@@ -90,20 +172,20 @@
   // drag & drop files
   $(document).ready(function () {
     let holder = $('#holder');
-    holder.on('drop', function (e) {
-      e.preventDefault();
-      $(this).removeClass('hover');
-      const event = {target: {files: e.originalEvent.dataTransfer.files}};
-      send_data(event);
-    });
-    holder.on('dragover', function (e) {
-      e.stopPropagation();
-      e.preventDefault();
-      $(this).addClass('hover');
-    });
-    holder.on('dragleave', function (e) {
-      e.preventDefault();
-      $(this).removeClass('hover');
+
+    fileUploader({
+      root: holder.get(0),
+      onHover(holder) {
+        holder.classList.add('hover')
+      },
+      onLeave(holder) {
+        holder.classList.remove('hover')
+      },
+      onGetFiles(files) {
+        send_data({
+          target: {files}
+        });
+      }
     });
   });
 
@@ -151,7 +233,7 @@
       // send url as task data
       if (IsJsonString(upload_url)) {
         request = {
-          url: "api/import",
+          url: "api/project/import",
           data: upload_url,
           contentType: 'application/json',
           method: 'post'
@@ -160,7 +242,7 @@
       // send url as regular url
       else {
         request = {
-          url: "api/import",
+          url: "api/project/import",
           data: {url: upload_url},
           method: 'post'
         }
@@ -183,7 +265,7 @@
       }
 
       request = {
-        url: "api/import",
+        url: "api/project/import" + (window.holder_usage ? "?drag=1": ""),
         data: fd,
         method: 'POST',
         processData: false,
@@ -219,6 +301,8 @@
 
         stop_wait(msg, false);
       });
+
+    window.holder_usage = false;
   }
 
   $(function () {

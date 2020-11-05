@@ -1,0 +1,642 @@
+---
+type: playground
+order: 201
+---
+<style>
+  .sidebar {
+    display: none;
+  }
+  .content {
+     max-width: none !important;
+     margin-left: 0 !important;
+     padding: 1em 0 0 0;
+  }
+  
+  .validation {
+     margin-top: 1em;
+     margin-left: 1em;
+     color: red;
+     text-transform: capitalize;
+  }
+  
+  .CodeMirror {
+     min-height: 500px !important;
+  }
+  
+  h1 {
+    margin-bottom: 0.5em !important;
+  }
+  
+  h3 {
+    margin: 1em !important;
+    width: unset;
+    height: unset;
+  }
+  
+  iframe {
+     border: 0;
+     margin: 0 !important;
+  }
+  
+  #render-editor {
+     width: 100%;
+  }
+  
+  #editor-wrap {
+     background-color: rgb(252,252,252);
+     padding: 0;
+     margin: 0;
+     display: none;
+  }
+  
+  .preview {
+     padding: 5px;
+     overflow: auto;
+  }
+ 
+  .editor-row {
+      display: flex; 
+      margin-bottom: 1em; 
+      width: 100% !important;
+  }
+  
+   .data-row {
+      display: flex;
+   }
+   
+  .preview-col {
+      width: 60%; 
+      flex: 1; 
+      background: rgb(252,252,252);
+   }
+  
+  .editor-area {
+      border: 1px solid #f48a4259;
+  }
+   
+  .config-col {
+      color: rgba(0,0,0,.6); 
+      background: rgb(252,252,252); 
+      margin-right: 2em; 
+      width: 40%; 
+  }
+  
+  .input-col {
+      width: 49%;
+      padding-right: 2%;
+  }
+  
+  .output-col {
+      width: 49%;
+  }
+  .hidden {
+      display: none !important;
+  }
+
+  /* hide title "basic template configs" */
+  #basic-templates>.title {
+    display: none;
+  }
+  #adv-templates>.title>.icon.dropdown {
+    display: none;
+  }
+  #adv-templates>.title {
+    text-align: center;
+    margin-bottom: 1em;
+  }
+
+  .message, .accordion {
+    width: 90%;
+    max-width: 1000px;
+    margin: 1em auto 1.75em auto;
+  }
+  .grid { 
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: row;
+            flex-direction: row;
+    -ms-flex-wrap: wrap;
+        flex-wrap: wrap;
+    -webkit-box-align: stretch;
+        -ms-flex-align: stretch;
+            align-items: stretch;
+    padding: 0;
+  }
+  
+  .column {
+    width: 20% !important;
+  }
+  .use-template {
+    font-weight: normal!important;
+  }
+  .use-template:hover {
+    border-bottom: 1px dashed darkorange;
+  }
+
+  @font-face {
+    font-family: 'Icons';
+    src: url("/fonts/icons.eot");
+    src: url("/fonts/icons.eot?#iefix") format('embedded-opentype'), url("/fonts/icons.woff2") format('woff2'), url("/fonts/icons.woff") format('woff'), url("/fonts/icons.ttf") format('truetype'), url("/fonts/icons.svg#icons") format('svg');
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-decoration: inherit;
+    text-transform: none;
+  }
+  i.icon {
+    opacity: 0.75;
+    display: inline-block;
+    margin: 0 0.25rem 0 0;
+    width: 1.18em;
+    height: 1em;
+    font-family: 'Icons';
+    font-style: normal;
+    font-weight: normal;
+    text-decoration: inherit;
+    text-align: center;
+    speak: none;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+  }
+  i.icon:before {
+    background: none !important;
+  }
+  i.icon.sound:before {
+    content: "\f025";
+  }
+  i.icon.image:before {
+    content: "\f03e";
+  }
+  i.icon.code:before {
+    content: "\f121";
+  }
+  i.icon.font:before {
+    content: "\f031";
+  }
+  i.icon.video:before {
+    content: "\f03d";
+  }
+  i.icon.share:before {
+    content: "\f064"
+  }
+  i.icon.copy.outline:before {
+    content: "\f0c5"
+  }
+  i.icon.archive:before {
+    content: "\f187";
+  }
+  i.icon.eye:before {
+    content: "\f06e";
+  }
+  i.icon.bullseye:before {
+    content: "\f140";
+  }
+  i.icon.vector.square:before {
+    content: "\f5cb";
+  }
+  i.icon.wave.square:before {
+    content: "\f83e"
+  }
+
+  .share-buttons {
+    float:right;
+    margin: 1.2em 1em 1em 1em;
+  }
+  .share-buttons i {
+    cursor: pointer;
+    opacity: 0.5 !important;
+    color: #f58a48;
+    transition: 0.25s;
+  }
+  .share-buttons i:hover {
+    opacity: 1 !important;
+    transition: 0.25s;
+  }
+
+  .intro { 
+    max-width: 700px; 
+    margin: 0 auto;  
+    margin-top: 1.5em;
+  }
+
+@media screen and (max-width: 900px) {
+  .sidebar {
+    display: flex;
+  }
+}
+@media only screen and (max-width: 767.98px) {
+    .intro {
+      padding-left: 0;
+    }
+    .grid {
+      width: auto;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+    }
+    .column {
+      width: 100% !important;
+      margin: 0 0 !important;
+      -webkit-box-shadow: none !important;
+              box-shadow: none !important;
+      padding: 1rem 1rem !important;
+    }
+
+    .editor-row {
+        flex-direction: column;
+    }
+    .data-row {
+        flex-direction: column;
+    }
+    .preview-col {
+        width: 100%;
+    }
+    .config-col {
+        width: 100%;
+    }
+    .input-col, .output-col { 
+        width: 100%; 
+    }
+}
+</style>
+
+<script src="js.cookie.js"></script>
+
+<!-- html -->
+
+<div class="intro">
+    <h1>Playground</h1>
+    Start typing in the config, and you can quickly preview the labeling interface. At the bottom of the page, you have live serialization updates of what Label Studio expects as an input and what it gives you as a result of your labeling work.
+</div>
+
+
+<%- include('template_titles') %>
+
+<div>
+  <div class="editor-row">
+    <div class="config-col">
+      <div>
+        <h3 style="display: inline-block">Labeling config</h3>
+        <span class="share-buttons">
+          <i class="icon copy outline" style="cursor: pointer" title="Copy labeling config"></i>
+          <i class="icon share" style="cursor: pointer" title="Copy link to this playground"></i>
+        </span>
+      </div>
+      <div class="editor-area">
+      <!-- Textarea -->
+      <textarea name="label_config" cols="40" rows="10" class="project-form htx-html-editor"
+                id="id_label_config"></textarea>
+      </div>
+    </div>
+    <div class="preview-col">
+      <h3>Interface Preview</h3>
+      <div class="validation"></div>
+      <div id="editor-wrap">
+      </div>
+      <div class="preview" id="preload-editor">
+        <div class="loading" style="margin: 20px; opacity: 0.8">
+            <img width="40px" src="/images/loading.gif">
+            <span style="position: relative; top: -14px">&nbsp;&nbsp;&nbsp;Loading Label Studio, please wait ...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Preview in two cols -->
+<div class="data-row">
+  <div class="input-col">
+    <h3>Input preview</h3>
+    <pre class="preview" id="upload-data-example">...</pre>
+  </div>
+  <div class="output-col">
+    <h3>Output preview</h3>
+    <pre class="preview" id="data-results">...</pre>
+  </div>
+</div>
+
+</div>
+
+
+
+
+<!-- Hidden template codes -->
+<empty>
+  <%- include('template_start') %>
+  <%- include('template_codes') %>
+</empty>
+
+
+
+
+<script>
+  // copy to clipboard
+  var copyToClipboard = function (str) {
+    var el = document.createElement('textarea');  // Create a <textarea> element
+    el.value = str;                                 // Set its value to the string that you want copied
+    el.setAttribute('readonly', '');                // Make it readonly to be tamper-proof
+    el.style.position = 'absolute';
+    el.style.left = '-9999px';                      // Move outside the screen to make it invisible
+    document.body.appendChild(el);                  // Append the <textarea> element to the HTML document
+    var selected =
+      document.getSelection().rangeCount > 0        // Check if there is any content selected previously
+        ? document.getSelection().getRangeAt(0)     // Store selection if found
+        : false;                                    // Mark as false to know no selection existed before
+    el.select();                                    // Select the <textarea> content
+    document.execCommand('copy');                   // Copy - only works as a result of a user action (e.g. click events)
+    document.body.removeChild(el);                  // Remove the <textarea> element
+    if (selected) {                                 // If a selection existed before copying
+      document.getSelection().removeAllRanges();    // Unselect everything on the HTML document
+      document.getSelection().addRange(selected);   // Restore the original selection
+    }
+  };
+
+  function uuidv4() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+
+  var confirm_already_shown = true;
+  var edit_count = 0;
+  var current_template_name = 'start';
+  var current_template_category = 'start';
+  var page_hash = uuidv4();
+  var user_hash = Cookies.get('user_hash');
+  if (user_hash === "null" || !user_hash) {
+      user_hash = uuidv4();
+      Cookies.set('user_hash', user_hash);
+  }
+  var lookup = {};
+
+  $.ajax({
+      url: 'https://extreme-ip-lookup.com/json/',
+      success: function(o) { lookup = o },
+      async: false
+  });
+
+  $(function () {
+
+    function addTemplateConfig($el) {
+      var template_pk = $el.data('value');
+      var value = $('[data-template-pk="' + template_pk + '"]').html();
+
+      // extract readme from config
+      var starter = '<!-- readme', terminator = '-->';
+      var start = value.indexOf(starter);
+      if (start >= 0) {
+        var body_length = value.indexOf(terminator, start) - start - starter.length;
+        var readme = value.substr(start + starter.length, body_length);
+
+        // find first XML tag (<View> as usual) and start from it
+        value = value.slice(value.indexOf('<', start + starter.length + body_length + terminator.length))
+      }
+
+      labelEditor.setValue(value);
+    }
+
+    $('.use-template').on('click', function () {
+      var $el = $(this);
+      edit_count = 0;
+      current_template_name = $el.text();
+      current_template_category = $($el.parent().parent().find('i')[0]).attr('title');
+
+      if (labelEditor.getValue() !== '' && !confirm_already_shown) {
+        var dialog = $('#confirm-config-template-dialog');
+        dialog.modal({
+          closable: true,
+          keyboardShortcuts: true,
+          onApprove: function () {
+            addTemplateConfig($el);
+          }
+        }).modal('show');
+
+        // close on enter, unfortunately keyboardShortcuts doesn't work
+        dialog.on('keypress', function () {
+          if (event.keyCode === 13) {
+            dialog.modal('hide');
+            addTemplateConfig($el);
+          }
+        });
+
+        confirm_already_shown = true;
+
+      } else {
+        addTemplateConfig($el);
+      }
+
+      return false;
+    });
+
+    var iframeTimer = null;
+
+    function debounce(func, wait, immediate) {
+      let timeout;
+
+      return function () {
+        const context = this, args = arguments;
+        const later = () => {
+          timeout = null;
+          if (!immediate) func.apply(context, args);
+        };
+        const callNow = immediate && !timeout;
+
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+        if (callNow) func.apply(context, args);
+      };
+    }
+
+    var prev_completion = null;
+
+    // serialize editor output by timer
+    setInterval(function () {
+      let iframe = document.getElementById('render-editor');
+      if (iframe !== null) {
+        let Htx = iframe.contentWindow.Htx;
+        if (typeof Htx !== 'undefined') {
+          var completion = JSON.stringify(Htx.completionStore.selected.serializeCompletion(), null, 4);
+          if (prev_completion !== completion) {
+            $('#data-results').text(completion);
+            prev_completion = completion;
+          }
+        }
+      }
+    }, 500);
+
+
+    var host = "https://app.heartex.ai";
+    var url_string = window.location.href;
+    var url = new URL(url_string);
+
+    // Label code mirror
+    var labelEditor = CodeMirror.fromTextArea(document.getElementById('id_label_config'), {
+      lineNumbers: true,
+      mode: "text/html"
+    });
+    labelEditor.focus();
+
+    var _c = url.searchParams.get("config");
+    if (_c && _c.length > 0) {
+      var config = url.searchParams.get("config");
+      config = config.replace(/[<][b][r][>]/gm, "\n");
+      labelEditor.setValue(config);
+    } else {
+      labelEditor.setValue($('#start-template').html());
+    }
+    validate_config(labelEditor);
+
+    // refresh for proper line numbers drawing
+    labelEditor.refresh();
+    // add validation
+    labelEditor.on('change', debounce(function (editor) {
+      validate_config(editor);
+    }, 500));
+
+    window.labelEditor = labelEditor;
+
+    function validate_name() {
+      let name = $('#id_title').val();
+      validation_message('', 0);
+      return 0;
+    }
+
+    function validation_message(msg, status) {
+      let o = $('.validation');
+      o.text(msg);
+
+      if (status === -1) {
+        o.removeClass('hidden');
+        o.addClass('visible');
+      }
+      if (status === 0) {
+        o.removeClass('visible');
+        o.addClass('hidden');
+      }
+    }
+
+    // storage of validation results
+    // let is_collection_ok = false;
+    let is_label_ok = false;
+
+    function editor_iframe(res) {
+      // generate new iframe
+      let iframe = $('<iframe><iframe>');
+      iframe.className = "editor-preview";
+      // add iframe to wrapper div
+      $('#editor-wrap').html(iframe);
+      $('#editor-wrap').fadeIn();
+
+      iframe.on('load', function () {
+        // remove old iframe
+        $('#render-editor').hide();
+        $('#render-editor').remove();
+        // assign id to new iframe
+        iframe.attr('id', 'render-editor');
+        // force to hide undo / redo / reset buttons
+        $('#render-editor').contents().find('head').append('<style>.ls-panel{display:none;}</style>');
+        iframe.show();
+        let obj = document.getElementById('render-editor');
+
+        // wait until all images and resources from iframe loading
+        clearTimeout(iframeTimer);
+        iframeTimer = setInterval(function () {
+          if (obj.contentWindow) {
+            obj.style.height = (obj.contentWindow.document.body.scrollHeight) + 'px';
+          }
+        }, 100);
+        // hide "..."
+        $('#preload-editor').hide();
+      });
+
+      // load new data into iframe
+      iframe.attr('srcdoc', res);
+    }
+
+    function show_render_editor(editor) {
+      let config = labelEditor.getValue();
+      edit_count++;
+      $.ajax({
+        url: host + '/demo/render-editor?full_editor=t&playground=1',
+        method: 'POST',
+        xhrFields: { withCredentials: true },
+        data: {
+            config: config,
+            lookup: lookup,
+            page_hash: page_hash,
+            user_hash: user_hash,
+            current_template_name : current_template_name,
+            current_template_category: current_template_category,
+            edit_count: edit_count
+        },
+        success: editor_iframe,
+        error: function () {
+          $('#preload-editor').show();
+        }
+      })
+    }
+
+    // send request to server with configs to validate
+    function validate_config(editor) {
+
+      // get current scheme type from current editor
+      let url = host + '/api/projects/validate/';
+      let val = labelEditor.getValue();
+
+      if (!val.length)
+        return;
+
+      // label config validation
+      $.ajax({
+        url: url,
+        method: 'POST',
+        data: {label_config: val},
+        success: function (res) {
+          is_label_ok = true;
+          validation_message('', 0);
+          $('#render-editor').show();
+          show_render_editor(editor);
+          // check_submit_button();
+        },
+        error: function (res) {
+          is_label_ok = false;
+          validation_message(res.responseJSON['label_config'][0], -1);
+          $('#render-editor').hide();
+          // check_submit_button();
+        }
+      });
+
+      // load sample task
+      $.post({
+        url: host + '/business/projects/upload-example/?playground=1',
+        data: {label_config: val}
+      })
+        .fail(function(o) {
+          $('#upload-data-example').text('...')
+        })
+        .done(function(o) {
+          $('#upload-data-example').text(JSON.stringify(JSON.parse(o), null, 4))
+        })
+    }
+
+    $('.share-buttons .copy').on('click', function() {
+       copyToClipboard(labelEditor.getValue());
+        $(event.target).css('color', 'green');
+    });
+
+    $('.share-buttons .share').on('click', function() {
+        let config = labelEditor.getValue();
+        config = encodeURIComponent(config.replace(/(\r\n|\n|\r)/gm, "<br>"));
+        let link = window.location.origin + window.location.pathname + '?config=' + config;
+        copyToClipboard(link);
+        $(event.target).css('color', 'green');
+    });
+
+
+  });
+</script>

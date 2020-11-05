@@ -238,7 +238,7 @@
       }
 
       request = {
-        url: "api/import",
+        url: "api/project/import",
         data: fd,
         method: 'POST',
         processData: false,
@@ -289,7 +289,7 @@
 
     function start_train() {
       $.ajax({
-        url: "api/train",
+        url: "api/models/train",
         method: 'POST',
         timeout: 500,
         error: function (xhr, textStatus, thrownError) {
@@ -307,7 +307,7 @@
 
     function start_predictions() {
       $.ajax({
-        url: "api/predictions",
+        url: "api/models/predictions?mode=all_tasks",
         method: 'POST',
         error: function (xhr, textStatus, thrownError) {
           alert(message_from_error(xhr));
@@ -323,8 +323,8 @@
       const confirmed = confirm('You are going to delete ml backend.\nWarning! this operation cannot be undone.\nPlease confirm your action.');
       if (confirmed) {
         $.ajax({
-          type: 'POST',
-          url: "api/remove-ml-backend",
+          type: 'DELETE',
+          url: "api/models",
           data: JSON.stringify({name: name}),
           dataType: "json",
           contentType: "application/json; charset=utf-8",

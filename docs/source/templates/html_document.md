@@ -2,7 +2,6 @@
 title: HTML Documents NER
 type: templates
 order: 302
-is_new: t
 ---
 
 Named entity for the HTML Documents

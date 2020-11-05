@@ -4,8 +4,6 @@ on:
   push:
     branches: [ master ]
   pull_request:
-    branches: [ master ]
-    types: [opened, synchronize, reopened]
 
 jobs:
   build:
@@ -28,7 +26,7 @@ jobs:
         pip install -e .
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         if [ -f label_studio/tests/requirements.txt ]; then pip install -r label_studio/tests/requirements.txt; fi
-    - name: init project
+    - name: Init project
       run: |
         label-studio init my_project
     - name: Test with pytest

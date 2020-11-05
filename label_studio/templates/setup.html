@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
 {% block body %}
 
+<!-- md to html generator -->
+<script src="static/js/marked.min.js"></script>
+<link rel="stylesheet" href="static/css/github-markdown.css">
+
 <link rel="stylesheet" href="static/css/codemirror.css">
 <style>
   .error {
@@ -28,17 +32,24 @@
   iframe {
     min-height: 300px;
   }
+
+  .close-icon {
+    cursor: pointer;
+    padding-right: 10px;
+    display: inline;
+  }
 </style>
 
 <div class="ui container">
   <div class="ui wrapper">
     {% include 'includes/setup_help.html' %}
 
-    <form action="api/save-config" method="post" class="ui form">
+    <form action="api/project/config" method="post" class="ui form">
 
       <!-- Textarea & Preview in two cols -->
       <div class="ui two column grid zero-margin step2 stackable">
-        <div class="column">
+        <div class="column" id="left-column">
+
           <h3>Labeling Config</h3>
 
           <!-- Code -->
@@ -59,6 +70,9 @@
           <input type="submit" disabled id="submit_form"
                  class="project-form field ui button positive centered" value="Save"
                  onclick="create_project(event)"/>
+
+          <div style="margin-top: 2em"></div>
+
         </div>
         <div class="column" style="padding-left: 0;">
 
@@ -73,7 +87,7 @@
           <h3>Input Task Preview</h3>
           <pre class="segment" id="upload-data-example" style="word-wrap: break-word">...</pre>
 
-          <h3>Output Completion Preview</h3>
+          <h3>Output Result Preview</h3>
           <div class="segment">
             <pre class="segment" id="data-results" style="word-wrap: break-word ">...</pre>
           </div>
@@ -100,16 +114,9 @@
       </div>
     </div>
 
-    <!-- Hidden template codes -->
-    {% for complexity in templates %}
-      {% for category in templates[complexity] %}
-        {% for t in templates[complexity][category] %}
-          {% autoescape off %}
-          <script data-template-pk="{{ t.pk }}" type="text">{{ t.label_config }}</script>
-          {% endautoescape %}
-        {% endfor %}
-      {% endfor %}
-    {% endfor %}
+    {% with template_mode="codes" %}
+      {% include 'includes/setup_templates.html' %}
+    {% endwith %}
 
     <!-- Change template dialog -->
     <div class="ui basic modal" id="confirm-config-template-dialog">
@@ -145,6 +152,7 @@
   var edit_count = 0;
   var current_template_name = 0;
   var current_template_category = 0;
+  var first_render = true;
 
   // process create request
   function process_request(result) {
@@ -183,15 +191,68 @@
     return false;
   }
 
+  function toggle_readme(user_action) {
+    var icon = $('.close-icon');
+    if (icon.hasClass('down')) {
+      $('#markdown-body').find('*:not(:first-child)').hide();
+      icon.addClass('right');
+      icon.removeClass('down');
+      Cookies.set('show-readme', false);
+      if (user_action)
+        $.ajax('/api/states?show-readme=0')
+    }
+    else {
+      $('#markdown-body').find('*').show();
+      icon.addClass('down');
+      icon.removeClass('right');
+      Cookies.set('show-readme', true);
+      if (user_action)
+        $.ajax('/api/states?show-readme=1')
+    }
+  }
+
   $(function () {
 
     function addTemplateConfig($el) {
       var template_pk = $el.data('value');
       var value = $('[data-template-pk="' + template_pk + '"]').html();
 
+      // remove old readme
+      $('#readme-body').remove();
+
+      // extract readme from config
+      var starter = '<!-- readme', terminator = '-->';
+      var start = value.indexOf(starter);
+      if (start >= 0) {
+        var body_length = value.indexOf(terminator, start) - start - starter.length;
+        var readme = value.substr(start + starter.length, body_length);
+        var readme_body = $(
+          '<div id="readme-body">' +
+            '<i class="icon caret down close-icon" onclick="toggle_readme()"></i>' +
+            '<div class="markdown-body" id="markdown-body"></div>' +
+          '</div>'
+        );
+        readme_body.find('.markdown-body').html(marked(readme));
+
+        $('#left-column').prepend(readme_body);
+        if (Cookies.get('show-readme', false) !== "true") {
+          toggle_readme(false);
+        }
+
+        // make collapsible first header of readme
+        $('#markdown-body').find('*:first-child').css('cursor', 'pointer').on('click', function() {
+          toggle_readme(true);
+        });
+
+        // find first XML tag (<View> as usual) and start from it
+        value = value.slice(value.indexOf('<', start + starter.length + body_length + terminator.length))
+      }
+
       labelEditor.setValue(value);
+      first_render = true;
     }
 
+    // switch template by click
     $('.use-template').on('click', function () {
       var $el = $(this);
       edit_count = 0;
@@ -322,7 +383,7 @@
     function show_render_editor(editor) {
       let config = labelEditor.getValue();
       $.ajax({
-        url: 'api/render-label-studio',
+        url: 'render-label-studio',
         method: 'POST',
         data: {
           config: config,
@@ -355,6 +416,7 @@
           validation_message('', 0);
           show_render_editor(editor);
           check_submit_button();
+          first_render = false;
         },
         error: function (res) {
           is_label_ok = false;
@@ -362,6 +424,8 @@
           $('#render-editor').hide();
           $('#preload-editor').show();
           check_submit_button();
+
+          first_render = false;
         }
       });
 

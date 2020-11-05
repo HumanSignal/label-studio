@@ -2,7 +2,6 @@
 title: Video Classifier
 type: templates
 order: 501
-is_new: t
 ---
 
 You can build simple video classifier using HyperText tag.

@@ -1,0 +1,31 @@
+<!-- Starting template -->
+<script id="start-template" type="text"><View>
+
+  <!-- Image with Polygons -->
+  <View style="padding: 25px;
+               box-shadow: 2px 2px 8px #AAA">
+    <Header value="Label the image with polygons"/>
+    <Image name="img" value="$image"/>
+    <Text name="text1"
+          value="Select label, start to click on image"/>
+
+    <PolygonLabels name="tag" toName="img">
+      <Label value="Airbus" background="blue"/>
+      <Label value="Boeing" background="red"/>
+    </PolygonLabels>
+  </View>
+
+  <!-- Text with multi-choices -->
+  <View style="margin-top: 20px; padding: 25px;
+               box-shadow: 2px 2px 8px #AAA;">
+    <Header value="Classify the text"/>
+    <Text name="text2" value="$text"/>
+
+    <Choices name="" toName="img" choice="multiple">
+      <Choice alias="wisdom" value="Wisdom"/>
+      <Choice alias="long" value="Long"/>
+    </Choices>
+  </View>
+
+</View>
+</script>

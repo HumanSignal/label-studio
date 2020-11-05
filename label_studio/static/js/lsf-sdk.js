@@ -6,12 +6,12 @@
 
 const API_URL = {
   MAIN: "api",
+  PROJECT: "/project",
   TASKS: "/tasks",
   COMPLETIONS: "/completions",
-  CANCEL: "/cancel",
-  PROJECTS: "/projects",
-  NEXT: "/next/",
-  EXPERT_INSTRUCTIONS: "/expert_instruction"
+  CANCEL: "?was_cancelled=1",
+  NEXT: "/next",
+  INSTRUCTION: "/project?fields=instruction"
 };
 
 const Requests = (function(window) {
@@ -115,12 +115,13 @@ const _loadTask = function(ls, url, completionID) {
                 ls.initializeStore(_convertTask(response));
                 let cs = ls.completionStore;
                 let c;
-                if (cs.predictions.length > 0) {
-                    c = ls.completionStore.addCompletionFromPrediction(cs.predictions[0]);
+
+                if (ls.completionStore.completions.length > 0 && completionID === 'auto') {
+                  c = {id: ls.completionStore.completions[0].id};
                 }
 
-                else if (ls.completionStore.completions.length > 0 && completionID === 'auto') {
-                  c = {id: ls.completionStore.completions[0].id};
+                else if (cs.predictions.length > 0) {
+                    c = ls.completionStore.addCompletionFromPrediction(cs.predictions[0]);
                 }
 
                 // we are on history item, take completion id from history
@@ -148,13 +149,13 @@ const _loadTask = function(ls, url, completionID) {
 };
 
 const loadNext = function(ls) {
-  var url = `${API_URL.MAIN}${API_URL.PROJECTS}/1${API_URL.NEXT}`;
-    return _loadTask(ls, url);
+  var url = `${API_URL.MAIN}${API_URL.PROJECT}${API_URL.NEXT}`;
+  return _loadTask(ls, url);
 };
 
 const loadTask = function(ls, taskID, completionID) {
   var url = `${API_URL.MAIN}${API_URL.TASKS}/${taskID}/`;
-    return _loadTask(ls, url, completionID);
+  return _loadTask(ls, url, completionID);
 };
 
 const _convertTask = function(task) {
@@ -183,7 +184,7 @@ const _convertTask = function(task) {
   return task;
 };
 
-const LSF_SDK = function(elid, config, task, hide_skip) {
+const LSF_SDK = function(elid, config, task, hide_skip, description) {
 
   const showHistory = task === null;  // show history buttons only if label stream mode, not for task explorer
 
@@ -233,6 +234,7 @@ const LSF_SDK = function(elid, config, task, hide_skip) {
 
     task: _convertTask(task),
     interfaces: interfaces,
+    description: description,
 
     onSubmitCompletion: function(ls, c) {
       ls.setFlags({ isLoading: true });
@@ -306,7 +308,7 @@ const LSF_SDK = function(elid, config, task, hide_skip) {
       var completion = _prepData(c, true);
 
       Requests.poster(
-        `${API_URL.MAIN}${API_URL.TASKS}/${ls.task.id}${API_URL.CANCEL}`,
+        `${API_URL.MAIN}${API_URL.TASKS}/${ls.task.id}${API_URL.COMPLETIONS}${API_URL.CANCEL}`,
         completion
       ).then(function(response) {
         response.json().then(function (res) {

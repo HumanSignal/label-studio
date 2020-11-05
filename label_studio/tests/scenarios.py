@@ -79,7 +79,7 @@ scenarios.append({'test_common_scenario': [
 # and put variable_name = variable in this module
 for filepath in os.listdir(cases_path):
     with open(os.path.join(cases_path, filepath)) as file:
-        datadoc = yaml.load_all(file)
+        datadoc = yaml.load_all(file, Loader=yaml.FullLoader)
         for datamap in datadoc:
             name = datamap.get('scenario')
             yaml_actions = datamap.get('actions')

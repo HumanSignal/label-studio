@@ -34,7 +34,9 @@
                 </span>
                 <span class="label">Tasks</span>
                 <span class="sub-label">
-                  <i class="word-break" v-if="project.multi_session_mode">{{ project.source_storage.readable_path }}</i>
+                  <i class="word-break" v-if="project.multi_session_mode"
+                     :data-tippy-content="project.source_storage.readable_path">{{
+                    get_short_text(project.source_storage.readable_path) }}</i>
                   <span data-tooltip="Source storage sync in progress">
                     <i class="ui loader loading active inline mini" v-if="project.source_syncing"></i>
                   </span>
@@ -73,7 +75,10 @@
                 </span>
                 <span class="label">Completions</span>
                 <span class="sub-label">
-                  <i class="word-break" v-if="project.multi_session_mode">{{ project.target_storage.readable_path }}</i>
+                  <i class="word-break" v-if="project.multi_session_mode"
+                     :data-tippy-content="project.target_storage.readable_path"
+                  >{{
+                    get_short_text(project.target_storage.readable_path) }}</i>
                   <span data-tooltip="Target storage sync in progress">
                     <i class="ui loader loading active inline mini" v-if="project.target_syncing"></i>
                   </span>
@@ -287,8 +292,8 @@
           error: null,
 
           // quick task preview
-          all_columns: ['id', 'completed_at', 'skipped', 'actions', 'previews', 'audio_urls', 'image_urls'],
-          full_columns: JSON.parse(Cookies.get('full_columns', '["id", "completed_at", "skipped", "actions", "previews"]')),
+          all_columns: ['id', 'completed_at', 'was_cancelled', 'actions', 'previews', 'audio_urls', 'image_urls'],
+          full_columns: JSON.parse(Cookies.get('full_columns', '["id", "completed_at", "was_cancelled", "actions", "previews"]')),
           quick_columns: JSON.parse(Cookies.get('quick_columns', '["id"]')),
           quick_view: false,
           quick_view_show_table: true,
@@ -521,7 +526,7 @@
           task.processing = true;
           this.$forceUpdate();
           var request = new XMLHttpRequest();
-          request.open("DELETE", "api/tasks/" + task.id + "/completions/" + completion.id + "/", true);
+          request.open("DELETE", "api/tasks/" + task.id + "/completions", true);
           request.onload = this.loadProjectAndTasks;
           request.send();
         },
@@ -543,7 +548,7 @@
             'Warning! this operation cannot be undone.\nPlease confirm your action.');
           if (deletion_confirmed) {
             var request = new XMLHttpRequest();
-            request.open("DELETE", "api/tasks/delete", true);
+            request.open("DELETE", "api/tasks", true);
             request.onload = this.loadProjectAndTasks;
             request.send();
           }
@@ -556,7 +561,7 @@
             'Warning! this operation cannot be undone.\nPlease confirm your action.');
           if (deletion_confirmed) {
             var request = new XMLHttpRequest();
-            request.open("DELETE", "api/project/completions", true);
+            request.open("DELETE", "api/completions", true);
             request.onload = this.loadProjectAndTasks;
             request.send();
           }
@@ -633,7 +638,9 @@
               self.labelStudio._sdk.loadTask(task.id, 'auto');
             } else {
               // init new instance
-              self.labelStudio = LSF_SDK("label-studio", self.project.label_config_line, task, true);
+              self.labelStudio = LSF_SDK("label-studio", self.project.label_config_line, task, true,
+                                         self.project.instruction);
+              self.labelStudio._sdk.loadTask(task.id, 'auto');
             }
           }, 100);
         },
@@ -764,6 +771,11 @@
         text_preview: function(text) {
           return text.slice(0, this.text_preview_limit) +
             (text.length <= this.text_preview_limit ? '': ' ...');
+        },
+
+        get_short_text: function(text) {
+          const max_len = 40;
+          return (text.length <= max_len ? text: ('...' + text.slice(text.length-max_len, text.length)));
         }
       },
 
@@ -820,6 +832,12 @@
           if (index >= 0) {
             array.splice(index, 1);
             array.push('previews')
+          }
+          // replace deprecated version 'skipped'
+          var index = array.indexOf('skipped');
+          if (index >= 0) {
+            array.splice(index, 1);
+            array.push('was_cancelled')
           }
         }
         remove_deprecated_others(this.full_columns);

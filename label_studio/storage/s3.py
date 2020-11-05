@@ -4,40 +4,69 @@ from botocore.client import Config
 import json
 import os
 
-from .base import CloudStorage, BaseStorageForm, BooleanField, Optional, StringField
+from .base import CloudStorage, CloudStorageForm, BaseStorageForm, BooleanField, Optional, StringField
 
 logger = logging.getLogger(__name__)
 logging.getLogger('botocore').setLevel(logging.CRITICAL)
 boto3.set_stream_logger(level=logging.INFO)
-S3_REGION = os.environ.get('S3_REGION', '')
+S3_REGION = os.environ.get('S3_REGION', 'us-east-1')
 
-def get_client_and_resource(aws_access_key_id=None, aws_secret_access_key=None, aws_session_token=None):
+
+def get_client_and_resource(
+    aws_access_key_id=None, aws_secret_access_key=None, aws_session_token=None, region=None
+):
     session = boto3.Session(
         aws_access_key_id=aws_access_key_id,
         aws_secret_access_key=aws_secret_access_key,
         aws_session_token=aws_session_token)
-    settings = {'region_name': S3_REGION} if S3_REGION else {}
-    return session.client('s3', config=boto3.session.Config(signature_version='s3v4'), **settings), session.resource('s3')
+    settings = {}
+    region = region or S3_REGION
+    if region:
+        settings['region_name'] = region
+    client = session.client('s3', config=boto3.session.Config(signature_version='s3v4'), **settings)
+    resource = session.resource('s3')
+    return client, resource
+
+
+class S3StorageForm(CloudStorageForm):
+    region = StringField('Prefix', [Optional()], description='AWS region name for S3 bucket', default='us-east-1')
+
+    bound_params = dict(
+        region='region',
+        **BaseStorageForm.bound_params
+    )
 
 
 class S3Storage(CloudStorage):
 
     description = 'Amazon S3'
+    form = S3StorageForm
 
-    def __init__(self, aws_access_key_id=None, aws_secret_access_key=None, aws_session_token=None, **kwargs):
+    def __init__(self, aws_access_key_id=None, aws_secret_access_key=None, aws_session_token=None, region='us-east-1',
+                 **kwargs):
         self.aws_access_key_id = aws_access_key_id
         self.aws_secret_access_key = aws_secret_access_key
         self.aws_session_token = aws_session_token
-        
-        super(S3Storage, self).__init__(**kwargs)
+        self.region = region
+
+        super(S3Storage, self).__init__(region=region, **kwargs)
 
     def _get_client(self):
-        client, s3 = get_client_and_resource(self.aws_access_key_id, self.aws_secret_access_key, self.aws_session_token)
+        client, s3 = get_client_and_resource(
+            self.aws_access_key_id, self.aws_secret_access_key, self.aws_session_token, self.region)
         return {
             's3': s3,
             'client': client,
             'bucket': s3.Bucket(self.path)
         }
+
+    def get_params(self):
+        """Get params to fill the form"""
+        params = super(S3Storage, self).get_params()
+        params.update({
+            'region': self.region
+        })
+        return params
 
     def validate_connection(self):
         self.client['client'].head_bucket(Bucket=self.path)
@@ -88,7 +117,7 @@ class S3CompletionsStorageForm(BaseStorageForm):
 class S3CompletionsStorage(S3Storage):
 
     form = S3CompletionsStorageForm
-    
+
     def __init__(self, use_blob_urls=False, regex='.*', **kwargs):
         """Completion Storages are unfiltered JSON storages"""
         super(S3CompletionsStorage, self).__init__(use_blob_urls=False, regex='.*', **kwargs)

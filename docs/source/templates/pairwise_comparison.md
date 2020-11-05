@@ -2,7 +2,6 @@
 title: Pairwise Comparison
 type: templates
 order: 10001
-is_new: t
 ---
 
 Pairwise comparison of different objects
