@@ -44,9 +44,8 @@ from label_studio.utils.functions import (
     generate_time_series_json, generate_sample_task, get_sample_task
 )
 from label_studio.utils.misc import (
-    exception_handler, exception_handler_page,
-    config_line_stripped, get_config_templates, convert_string_to_hash, serialize_class,
-    DirectionSwitch, check_port_in_use, timestamp_to_local_datetime
+    exception_handler, exception_handler_page, check_port_in_use,
+    config_line_stripped, get_config_templates, convert_string_to_hash, serialize_class
 )
 from label_studio.utils.analytics import Analytics
 from label_studio.utils.argparser import parse_input_args
@@ -55,7 +54,7 @@ from label_studio.utils.auth import requires_auth
 from label_studio.storage import get_storage_form
 from label_studio.project import Project
 from label_studio.tasks import Tasks
-
+from label_studio.utils.task_view import prepare_tasks
 
 INPUT_ARGUMENTS_PATH = pathlib.Path("server.json")
 
@@ -800,260 +799,6 @@ def api_project_storage_settings():
             return make_response(jsonify({'errors': form.errors}), 400)
 
 
-@blueprint.route('/api/tasks/', methods=['GET'])
-@requires_auth
-@exception_handler
-def api_all_tasks():
-    """ Get full tasks with pagination, completions and predictions
-    """
-    fields = request.values.get('fields', 'all').split(',')
-    page, page_size = int(request.values.get('page', 1)), int(request.values.get('page_size', 10))
-    order = request.values.get('order', 'id')
-    if page < 1 or page_size < 1:
-        return make_response(jsonify({'detail': 'Incorrect page or page_size'}), 422)
-
-    order_inverted = order[0] == '-'
-    order = order[1:] if order_inverted else order
-    if order not in ['id', 'completed_at', 'has_skipped_completions']:
-        return make_response(jsonify({'detail': 'Incorrect order'}), 422)
-
-    # get task ids and sort them by completed time
-    task_ids = g.project.source_storage.ids()
-    completed_at = g.project.get_completed_at()  # task can have multiple completions, get the last of completed
-    skipped_status = g.project.get_skipped_status()
-
-    # ordering
-    pre_order = ({
-        'id': i,
-        'completed_at': completed_at[i] if i in completed_at else None,
-        'has_skipped_completions': skipped_status[i] if i in completed_at else None,
-    } for i in task_ids)
-
-    if order == 'id':
-        ordered = sorted(pre_order, key=lambda x: x['id'], reverse=order_inverted)
-
-    else:
-        # for has_skipped_completions use two keys ordering
-        if order == 'has_skipped_completions':
-            ordered = sorted(pre_order,
-                             key=lambda x: (DirectionSwitch(x['has_skipped_completions'], not order_inverted),
-                                            DirectionSwitch(x['completed_at'], False)))
-        # another orderings
-        else:
-            ordered = sorted(pre_order, key=lambda x: (DirectionSwitch(x[order], not order_inverted)))
-
-    paginated = ordered[(page - 1) * page_size:page * page_size]
-
-    # get tasks with completions
-    tasks = []
-    for item in paginated:
-        i = item['id']
-        task = g.project.get_task_with_completions(i)
-
-        # no completions at task, get task without completions
-        if task is None:
-            task = g.project.source_storage.get(i)
-        else:
-            # evaluate completed_at time
-            completed_at = item['completed_at']
-            if completed_at != 'undefined' and completed_at is not None:
-                completed_at = timestamp_to_local_datetime(completed_at).strftime('%Y-%m-%d %H:%M:%S')
-            task['completed_at'] = completed_at
-            task['has_skipped_completions'] = item['has_skipped_completions']
-
-        # don't resolve data (s3/gcs is slow) if it's not in fields
-        if 'all' in fields or 'data' in fields:
-            task = resolve_task_data_uri(task, project=g.project)
-
-        # leave only chosen fields
-        if 'all' not in fields:
-            task = {field: task[field] for field in fields}
-
-        tasks.append(task)
-
-    return make_response(jsonify(tasks), 200)
-
-
-@blueprint.route('/api/tasks/<task_id>/', methods=['GET', 'DELETE'])
-@requires_auth
-@exception_handler
-def api_tasks(task_id):
-    """ Get task by id
-    """
-    # try to get task with completions first
-    task_id = int(task_id)
-    if request.method == 'GET':
-        task_data = g.project.get_task_with_completions(task_id) or g.project.source_storage.get(task_id)
-        task_data = resolve_task_data_uri(task_data, project=g.project)
-
-        if g.project.ml_backends_connected:
-            task_data = g.project.make_predictions(task_data)
-
-        # change indent for jsonify
-        indent = 2 if request.values.get('pretty', False) else None
-        response = current_app.response_class(
-            json.dumps(task_data, indent=indent) + "\n",
-            mimetype=current_app.config["JSONIFY_MIMETYPE"],
-        )
-        return make_response(response, 200)
-
-    # delete task
-    elif request.method == 'DELETE':
-        g.project.remove_task(task_id)
-        return make_response(jsonify('Task deleted.'), 204)
-
-
-@blueprint.route('/api/tasks/delete', methods=['DELETE'])
-@requires_auth
-@exception_handler
-def api_tasks_delete():
-    """ Delete all tasks & completions
-    """
-    g.project.delete_tasks()
-    return make_response(jsonify({}), 204)
-
-
-@blueprint.route('/api/tasks/<task_id>/completions/', methods=['POST', 'DELETE'])
-@requires_auth
-@exception_handler
-def api_completions(task_id):
-    """ Delete or save new completion to output_dir with the same name as task_id
-    """
-    if request.method == 'POST':
-        completion = request.json
-        completion.pop('state', None)  # remove editor state
-        completion.pop('skipped', None)
-        completion.pop('was_cancelled', None)
-        completion_id = g.project.save_completion(int(task_id), completion)
-        return make_response(json.dumps({'id': completion_id}), 201)
-
-    else:
-        return make_response('Incorrect request method', 500)
-
-
-@blueprint.route('/api/project/completions/', methods=['DELETE'])
-@requires_auth
-@exception_handler
-def api_all_completions():
-    """ Delete all completions
-    """
-    if request.method == 'DELETE':
-        g.project.delete_all_completions()
-        return make_response('done', 201)
-
-    else:
-        return make_response('Incorrect request method', 500)
-
-
-@blueprint.route('/api/tasks/<task_id>/cancel', methods=['POST'])
-@requires_auth
-@exception_handler
-def api_tasks_cancel(task_id):
-    task_id = int(task_id)
-    skipped_completion = request.json
-    skipped_completion['was_cancelled'] = True  # for platform support
-    skipped_completion['skipped'] = True
-
-    completion_id = g.project.save_completion(task_id, skipped_completion)
-    return make_response(json.dumps({'id': completion_id}), 201)
-
-
-@blueprint.route('/api/tasks/<task_id>/completions/<completion_id>/', methods=['DELETE'])
-@requires_auth
-@exception_handler
-def api_completion_by_id(task_id, completion_id):
-    """ Delete or save new completion to output_dir with the same name as task_id.
-        completion_id with different IDs is not supported in this backend
-    """
-    if request.method == 'DELETE':
-        if g.project.config.get('allow_delete_completions', False):
-            g.project.delete_completion(int(task_id))
-            return make_response('deleted', 204)
-        else:
-            return make_response('Completion removing is not allowed in server config', 422)
-    else:
-        return make_response('Incorrect request method', 500)
-
-
-@blueprint.route('/api/tasks/<task_id>/completions/<completion_id>/', methods=['PATCH'])
-@requires_auth
-@exception_handler
-def api_completion_update(task_id, completion_id):
-    """ Rewrite existing completion with patch.
-        This is technical api call for editor testing only. It's used for Rewrite button in editor.
-    """
-    task_id = int(task_id)
-    completion = request.json
-
-    completion.pop('state', None)  # remove editor state
-    completion['skipped'] = completion['was_cancelled'] = False  # pop is a bad idea because of dict updating inside
-
-    completion['id'] = int(completion_id)
-    g.project.save_completion(task_id, completion)
-    return make_response('ok', 201)
-
-
-@blueprint.route('/api/remove-ml-backend', methods=['POST'])
-@requires_auth
-@exception_handler
-def api_remove_ml_backend():
-    ml_backend_name = request.json['name']
-    g.project.remove_ml_backend(ml_backend_name)
-    return make_response(jsonify('Deleted!'), 204)
-
-
-@blueprint.route('/predict', methods=['POST'])
-@requires_auth
-@exception_handler
-def api_predict():
-    """ Make ML prediction using ml_backends
-    """
-    if 'data' not in request.json:
-        task = {'data': request.json}
-    else:
-        task = request.json
-    if g.project.ml_backends_connected:
-        task_with_predictions = g.project.make_predictions(task)
-        return make_response(jsonify(task_with_predictions), 200)
-    else:
-        return make_response(jsonify("No ML backend"), 400)
-
-
-@blueprint.route('/api/train', methods=['POST'])
-@requires_auth
-@exception_handler
-def api_train():
-    """Send train signal to ML backend"""
-    if g.project.ml_backends_connected:
-        training_started = g.project.train()
-        if training_started:
-            logger.debug('Training started.')
-            return make_response(jsonify({'details': 'Training started'}), 200)
-        else:
-            logger.debug('Training failed.')
-            return make_response(
-                jsonify('Training is not started: seems that you don\'t have any ML backend connected'), 400)
-    else:
-        return make_response(jsonify("No ML backend"), 400)
-
-
-@blueprint.route('/api/predictions', methods=['POST'])
-@requires_auth
-@exception_handler
-def api_predictions():
-    """Send creating predictions signal to ML backend"""
-    if g.project.ml_backends_connected:
-        # get tasks ids without predictions
-        tasks_with_predictions = {}
-        for task_id, task in g.project.source_storage.items():
-            task_pred = g.project.make_predictions(task)
-            tasks_with_predictions[task_pred['id']] = task_pred
-        g.project.source_storage.set_many(tasks_with_predictions.keys(), tasks_with_predictions.values())
-        return make_response(jsonify({'details': 'Predictions done.'}), 200)
-    else:
-        return make_response(jsonify("No ML backend"), 400)
-
-
 @blueprint.route('/api/project-switch', methods=['GET', 'POST'])
 @requires_auth
 @exception_handler
@@ -1084,6 +829,218 @@ def api_project_switch():
         return redirect('../setup')
     else:
         return make_response(jsonify(output), 200)
+
+
+@blueprint.route('/api/tasks', methods=['GET', 'DELETE'])
+@requires_auth
+@exception_handler
+def api_all_tasks():
+    """ Tasks API: retrieve by filters, delete all tasks
+    """
+    # retrieve tasks (plus completions and predictions) with pagination & ordering
+    if request.method == 'GET':
+        # get filter parameters from request
+        fields = request.values.get('fields', 'all').split(',')
+        page, page_size = int(request.values.get('page', 1)), int(request.values.get('page_size', 10))
+        order = request.values.get('order', 'id')
+        if page < 1 or page_size < 1:
+            return make_response(jsonify({'detail': 'Incorrect page or page_size'}), 422)
+
+        params = SimpleNamespace(fields=fields, page=page, page_size=page_size, order=order)
+        tasks = prepare_tasks(g.project, params)
+        return make_response(jsonify(tasks), 200)
+
+    # delete all tasks with completions
+    if request.method == 'DELETE':
+        g.project.delete_tasks()
+        return make_response(jsonify({'detail': 'deleted'}), 204)
+
+
+@blueprint.route('/api/tasks/<task_id>', methods=['GET', 'DELETE'])
+@requires_auth
+@exception_handler
+def api_task_by_id(task_id):
+    """ Get task by id, this call will refresh this task predictions
+    """
+    task_id = int(task_id)
+
+    # try to get task with completions first
+    if request.method == 'GET':
+        task_data = g.project.get_task_with_completions(task_id) or g.project.source_storage.get(task_id)
+        task_data = resolve_task_data_uri(task_data, project=g.project)
+
+        if g.project.ml_backends_connected:
+            task_data = g.project.make_predictions(task_data)
+
+        # change indent for pretty jsonify
+        indent = 2 if request.values.get('pretty', False) else None
+        response = current_app.response_class(
+            json.dumps(task_data, indent=indent) + "\n",
+            mimetype=current_app.config["JSONIFY_MIMETYPE"],
+        )
+        return make_response(response, 200)
+
+    # delete task
+    elif request.method == 'DELETE':
+        g.project.remove_task(task_id)
+        return make_response(jsonify('Task deleted.'), 204)
+
+
+@blueprint.route('/api/tasks/<task_id>/completions/', methods=['POST', 'DELETE'])
+@requires_auth
+@exception_handler
+def api_tasks_completions(task_id):
+    """ Save new completion or delete all completions
+    """
+    task_id = int(task_id)
+
+    # save completion
+    if request.method == 'POST':
+        completion = request.json
+
+        # cancelled completion
+        was_cancelled = request.values.get('was_cancelled', False)
+        if was_cancelled:
+            completion['was_cancelled'] = True
+
+        # regular completion
+        else:
+            completion.pop('skipped', None)  # deprecated
+            completion.pop('was_cancelled', None)
+
+        completion_id = g.project.save_completion(task_id, completion)
+        return make_response(json.dumps({'id': completion_id}), 201)
+
+    # remove all task completions
+    if request.method == 'DELETE':
+        if g.project.config.get('allow_delete_completions', False):
+            g.project.delete_task_completions(task_id)
+            return make_response('deleted', 204)
+        else:
+            return make_response({'detail': 'Completion removing is not allowed in server config'}, 422)
+
+
+@blueprint.route('/api/tasks/<task_id>/completions/<completion_id>', methods=['PATCH', 'DELETE'])
+@requires_auth
+@exception_handler
+def api_completion_by_id(task_id, completion_id):
+    """ Update existing completion with patch.
+    """
+    # catch case when completion is not submitted yet, but user tries to act with it
+    if completion_id == 'null':
+        return make_response('completion id is null', 200)
+
+    task_id = int(task_id)
+    completion_id = int(completion_id)
+
+    # update completion
+    if request.method == 'PATCH':
+        completion = request.json
+        completion['id'] = completion_id
+        if 'was_cancelled' in completion:
+            completion['was_cancelled'] = False
+
+        g.project.save_completion(task_id, completion)
+        return make_response('ok', 201)
+
+    # delete completion
+    elif request.method == 'DELETE':
+        if g.project.config.get('allow_delete_completions', False):
+            g.project.delete_task_completion(task_id, completion_id)
+            return make_response('deleted', 204)
+        else:
+            return make_response({'detail': 'Completion removing is not allowed in server config'}, 422)
+
+
+@blueprint.route('/api/completions', methods=['DELETE'])
+@requires_auth
+@exception_handler
+def api_all_completions():
+    """ Delete all project completions
+    """
+    if request.method == 'DELETE':
+        g.project.delete_all_completions()
+        return make_response('done', 201)
+
+    else:
+        return make_response('Incorrect request method', 500)
+
+
+@blueprint.route('/api/models', methods=['GET', 'DELETE'])
+@requires_auth
+@exception_handler
+def api_models():
+    """ List ML backends names and remove it by name
+    """
+    # list all ml backends
+    if request.method == 'GET':
+        model_names = [model.model_name for model in g.project.ml_backends]
+        return make_response(jsonify({'models': model_names}), 200)
+
+    # delete specified ml backend
+    if request.method == 'DELETE':
+        ml_backend_name = request.json['name']
+        g.project.remove_ml_backend(ml_backend_name)
+        return make_response(jsonify('ML backend deleted'), 204)
+
+
+@blueprint.route('/api/models/train', methods=['POST'])
+@requires_auth
+@exception_handler
+def api_train():
+    """ Send train signal to ML backend
+    """
+    if g.project.ml_backends_connected:
+        training_started = g.project.train()
+        if training_started:
+            logger.debug('Training started.')
+            return make_response(jsonify({'details': 'Training started'}), 200)
+        else:
+            logger.debug('Training failed.')
+            return make_response(
+                jsonify('Training is not started: seems that you don\'t have any ML backend connected'), 400)
+    else:
+        return make_response(jsonify("No ML backend"), 400)
+
+
+@blueprint.route('/api/models/predictions', methods=['GET', 'POST'])
+@requires_auth
+@exception_handler
+def api_predictions():
+    """ Make ML predictions using ML backends
+
+        param mode: "data" [default] - task data will be taken and predicted from request.json
+                    "all_tasks" - make predictions for all tasks in DB
+    """
+    mode = request.values.get('mode', 'data')  # data | all_tasks
+    if g.project.ml_backends_connected:
+
+        # make prediction for task data from request
+        if mode == 'data':
+            if request.json is None:
+                return make_response(jsonify({'detail': 'no task data found in request json'}), 422)
+
+            task = request.json if 'data' in request.json else {'data': request.json}
+            task_with_predictions = g.project.make_predictions(task)
+            return make_response(jsonify(task_with_predictions), 200)
+
+        # make prediction for all tasks
+        elif mode == 'all_tasks':
+            # get tasks ids without predictions
+            tasks_with_predictions = {}
+            for task_id, task in g.project.source_storage.items():
+                task_pred = g.project.make_predictions(task)
+                tasks_with_predictions[task_pred['id']] = task_pred
+
+            # save tasks with predictions to storage
+            g.project.source_storage.set_many(tasks_with_predictions.keys(), tasks_with_predictions.values())
+            return make_response(jsonify({'details': 'predictions are ready'}), 200)
+
+        # unknown mode
+        else:
+            return make_response(jsonify({'detail': 'unknown mode'}), 422)
+    else:
+        return make_response(jsonify("No ML backend"), 400)
 
 
 @blueprint.route('/api/states', methods=['GET'])

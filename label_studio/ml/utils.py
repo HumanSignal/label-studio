@@ -46,7 +46,8 @@ def get_single_tag_keys(parsed_label_config, control_type, object_type):
 def is_skipped(completion):
     if len(completion['completions']) != 1:
         return False
-    return completion['completions'][0].get('skipped', False)
+    completion = completion['completions'][0]
+    return completion.get('skipped', False) or completion.get('was_cancelled', False)
 
 
 def get_choice(completion):

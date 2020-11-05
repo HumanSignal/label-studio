@@ -1,4 +1,4 @@
-<!-- {"title": "Video timeline segmentation", "category": "other", "complexity": "advanced"} -->
+<!-- {"title": "Video time segmentation", "category": "other", "complexity": "advanced"} -->
 <View>
   <Header value="Video timeline segmentation via AudioPlus sync trick"/>
   <HyperText name="video" value="$video"/>

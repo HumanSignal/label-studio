@@ -464,7 +464,7 @@ class Project(object):
 
     def remove_task(self, task_id):
         self.source_storage.remove(task_id)
-        self.delete_completion(task_id)
+        self.delete_task_completions(task_id)
 
         self.update_derived_input_schema()
         self.update_derived_output_schema()
@@ -496,8 +496,8 @@ class Project(object):
                 times[id] = 'undefined'
         return times
 
-    def get_skipped_status(self):
-        """ Get skipped status for tasks: returns skipped completion number for task
+    def get_cancelled_status(self):
+        """ Get was_cancelled (skipped) status for tasks: returns cancelled completion number for task
 
         :return: list of int
         """
@@ -505,7 +505,9 @@ class Project(object):
         for _, data in self.target_storage.items():
             id = data['id']
             try:
-                flag = sum([completion.get('skipped', False) for completion in data['completions']])
+                # note: skipped will be deprecated
+                flag = sum([completion.get('skipped', False) or completion.get('was_cancelled', False)
+                            for completion in data['completions']])
             except Exception as exc:
                 items[id] = -1
             else:
@@ -568,13 +570,34 @@ class Project(object):
 
         # write task + completions to file
         self.target_storage.set(task_id, task)
-        logger.debug('Completion ' + str(task_id) + ' saved:\n' + json.dumps(task, indent=2))
+        logger.debug('Completion for task ' + str(task_id) + ' saved with id =' + str(completion['id']))
         return completion['id']
 
-    def delete_completion(self, task_id):
-        """ Delete completion
+    def delete_task_completion(self, task_id, completion_id):
+        """ Delete one task completion by id
+        """
+        # try to get completions with task first
+        task = self.get_task_with_completions(task_id)
 
-        :param task_id: task id
+        if not task:
+            return False
+        else:
+            task = deepcopy(task)
+
+        # remove completion from task
+        for i, item in enumerate(task['completions']):
+            if item['id'] == completion_id:
+                del task['completions'][i]
+
+        self.update_derived_output_schema()
+
+        # write task + completions to file
+        self.target_storage.set(task_id, task)
+        logger.debug('Completion ' + str(completion_id) + ' removed:\n')
+        return True
+
+    def delete_task_completions(self, task_id):
+        """ Delete all task completions
         """
         self.target_storage.remove(task_id)
         self.update_derived_output_schema()

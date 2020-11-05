@@ -122,7 +122,7 @@ def action_delete_all_tasks(test_client, case_config):
         action
         delete all tasks
     """
-    response = test_client.delete('/api/tasks/delete')
+    response = test_client.delete('/api/tasks')
     assert response.status_code == 204
 
 

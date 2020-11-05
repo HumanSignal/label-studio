@@ -85,7 +85,7 @@ class SimpleTextClassifier(LabelStudioMLBase):
         for completion in completions:
             # get input text from task data
 
-            if completion['completions'][0].get('skipped'):
+            if completion['completions'][0].get('skipped') or completion['completions'][0].get('was_cancelled'):
                 continue
 
             input_text = completion['data'][self.value]

@@ -57,15 +57,23 @@ Here is a quick example tutorial on how to run the ML backend with a simple text
     ```
     You can confirm that the model has connected properly from the `/model` subpage in the Label Studio UI.
     
-5. Getting predictions
-    You should see model predictions in the labeling interface. For example in an image classification task: the model will 
-    pre-select an image class for you to verify. 
+### Getting predictions
 
-6. Model training
+   You should see model predictions in the labeling interface and Tasks page (/tasks). For example in an image classification task: the model will pre-select an image class for you to verify.
+   
+   Also you can obtain a prediction via Label Studio Backend working on `http://localhost:8080`:
+    
+   ```
+    curl -X POST -d '{"text":"some text"}' -H "Content-Type: application/json" http://localhost:8080/api/models/predictions
+   ```
+
+   where `{"text":"some text"}` is your task data. 
+   
+### Model training
 
    Model training can be triggered manually by pushing the Start Training button on the `/model` page, or by using an API call:
    ```
-   curl -X POST http://localhost:8080/api/train
+   curl -X POST http://localhost:8080/api/models/train
    ```
    In development mode, training logs will have an output into the console. In production mode, runtime logs are available in    
    `my_backend/logs/uwsgi.log` and RQ training logs in `my_backend/logs/rq.log`
