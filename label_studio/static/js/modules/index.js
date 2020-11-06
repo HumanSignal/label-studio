@@ -14,24 +14,8 @@ if (dmRoot) {
         columns: "/project/columns",
         tabs: "/project/tabs",
 
-        tasks: {
-          path: "/project/tabs/:tabID/tasks",
-          convert(result) {
-            return {
-              tasks: result,
-              total: 106,
-            }
-          }
-        },
-        annotations: {
-          path: "/project/tabs/:tabID/annotations",
-          convert(result) {
-            return {
-              tasks: result,
-              total: 106,
-            }
-          }
-        },
+        tasks: "/project/tabs/:tabID/tasks",
+        annotations: "/project/tabs/:tabID/annotations",
 
         task: "/tasks/:id",
         cancel: "/tasks/:taskID/completions?was_cancelled=1",

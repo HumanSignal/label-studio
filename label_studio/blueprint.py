@@ -54,7 +54,7 @@ from label_studio.utils.auth import requires_auth
 from label_studio.storage import get_storage_form
 from label_studio.project import Project
 from label_studio.tasks import Tasks
-from label_studio.utils.task_view import prepare_tasks
+from label_studio.utils.task_view import prepare_tasks, prepare_annotations
 
 INPUT_ARGUMENTS_PATH = pathlib.Path("server.json")
 
@@ -77,8 +77,8 @@ def config_from_file():
     try:
         config_file = INPUT_ARGUMENTS_PATH.open(encoding='utf8')
     except OSError:
-        raise LabelStudioError("Can't open input_args file: " + str(INPUT_ARGUMENTS_PATH) + ", " 
-                               "use set_input_arguments_path() to setup it")
+        raise LabelStudioError("Can't open input_args file: " + str(INPUT_ARGUMENTS_PATH) + ", "
+                                                                                            "use set_input_arguments_path() to setup it")
 
     with config_file:
         data = json.load(config_file)
@@ -255,7 +255,7 @@ def samples_time_series():
     # generate all columns for headless csv
     if not header:
         max_column_n = max([int(v) for v in value_columns] + [0])
-        value_columns = range(1, max_column_n+1)
+        value_columns = range(1, max_column_n + 1)
 
     ts = generate_time_series_json(time_column, value_columns, time_format)
     csv_data = pd.DataFrame.from_dict(ts).to_csv(index=False, header=header, sep=separator).encode('utf-8')
@@ -646,9 +646,11 @@ def api_import():
         * files (as web form, files will be hosted by this flask server)
         * url links to images, audio, csv (if you use TimeSeries in labeling config)
     """
+
     # make django compatibility for uploader module
     class DjangoRequest:
         def __init__(self): pass
+
         POST = request.form
         GET = request.args
         FILES = request.files
@@ -716,8 +718,8 @@ def api_export():
     shutil.make_archive(zip_dir, 'zip', zip_dir)
     shutil.rmtree(zip_dir)
 
-    response = send_file(zip_dir+'.zip', as_attachment=True)
-    response.headers['filename'] = os.path.basename(zip_dir+'.zip')
+    response = send_file(zip_dir + '.zip', as_attachment=True)
+    response.headers['filename'] = os.path.basename(zip_dir + '.zip')
     return response
 
 
@@ -831,6 +833,23 @@ def api_project_switch():
         return make_response(jsonify(output), 200)
 
 
+@blueprint.route('/tasks_old', methods=['GET', 'POST'])
+@requires_auth
+@exception_handler_page
+def tasks_old_page():
+    """ Tasks and completions page
+    """
+    serialized_project = g.project.serialize()
+    serialized_project['multi_session_mode'] = current_app.label_studio.input_args.command != 'start-multi-session'
+    return flask.render_template(
+        'tasks_old.html',
+        config=g.project.config,
+        project=g.project,
+        serialized_project=serialized_project,
+        **find_editor_files()
+    )
+
+
 @blueprint.route('/api/tasks', methods=['GET', 'DELETE'])
 @requires_auth
 @exception_handler
@@ -847,7 +866,7 @@ def api_all_tasks():
             return make_response(jsonify({'detail': 'Incorrect page or page_size'}), 422)
 
         params = SimpleNamespace(fields=fields, page=page, page_size=page_size, order=order)
-        tasks = prepare_tasks(g.project, params)
+        tasks = prepare_tasks(g.project, params)['tasks']
         return make_response(jsonify(tasks), 200)
 
     # delete all tasks with completions
@@ -1072,11 +1091,14 @@ def api_project_tab_annotations(tab_id):
     if page < 1 or page_size < 1:
         return make_response(jsonify({'detail': 'Incorrect page or page_size'}), 422)
 
-    params = SimpleNamespace(fields=fields, page=page, page_size=page_size, order=order)
-    tasks = prepare_tasks(g.project, params)
-    for t in tasks:
-        t['task_id'] = t['id']
-    return make_response(jsonify(tasks), 200)
+    # get tasks first
+    task_params = SimpleNamespace(fields=fields, page=0, page_size=0, order=order)
+    tasks = prepare_tasks(g.project, task_params)
+
+    # pass tasks to get annotation by them
+    annotation_params = SimpleNamespace(fields=fields, page=page, page_size=page_size, order=order)
+    annotations = prepare_annotations(tasks['tasks'], annotation_params)
+    return make_response(jsonify(annotations), 200)
 
 
 @blueprint.route('/api/project/columns', methods=['GET'])
@@ -1085,30 +1107,62 @@ def api_project_tab_annotations(tab_id):
 def api_project_columns():
     """ Project columns for data manager tabs
     """
-    result = {
-        'columns': [
-            # --- Tasks ---
-            {
-                'id': 'id',
-                'title': "Task ID",
-                'type': "Number",
-                'target': 'tasks'
-            },
-            # --- Completions ---
-            {
-                'id': 'id',
-                'title': 'Annotation ID',
-                'type': 'Number',
-                'target': 'annotations'
-            },
-            {
-                'id': 'task_id',
-                'title': 'Task ID',
-                'type': 'Number',
-                'target': 'annotations'
-            }
-        ]
-    }
+    result = {'columns': []}
+
+    # frontend uses MST data model, so we need two directional referencing parent <-> child
+    task_data_children = []
+    for key, data_type in g.project.data_types.items():
+        column = {
+            'id': 'data-' + key,
+            'title': key,
+            'type': 'String',  # data_type,
+            'target': 'tasks',
+            'parent': 'data'
+        }
+        result['columns'].append(column)
+        task_data_children.append(column['id'])
+
+    result['columns'] += [
+        # --- Tasks ---
+        {
+            'id': 'id',
+            'title': "Task ID",
+            'type': "Number",
+            'target': 'tasks'
+        },
+        {
+            'id': 'completed_at',
+            'title': "Completed at",
+            'type': "Number",
+            'target': 'tasks'
+        },
+        {
+            'id': 'was_cancelled',
+            'title': "Cancelled",
+            'type': "Number",
+            'target': 'tasks'
+        },
+        {
+            'id': 'data',
+            'title': "Data",
+            'type': "List",
+            'target': 'tasks',
+            'children': task_data_children
+        },
+        # --- Completions ---
+        {
+            'id': 'id',
+            'title': 'Annotation ID',
+            'type': 'Number',
+            'target': 'annotations'
+        },
+        {
+            'id': 'task_id',
+            'title': 'Task ID',
+            'type': 'Number',
+            'target': 'annotations'
+        }
+    ]
     return make_response(jsonify(result), 200)
 
 
@@ -1118,24 +1172,33 @@ def api_project_columns():
 def api_project_tabs():
     """ Project tabs for data manager
     """
-    result = {
-        'tabs': [
-            {
-                'id': 1,
-                'title': 'Tab 1',
-                'hiddenColumns': None,
+    if request.method == 'GET':
+        if 'tab_data' not in session:
+            result = {
+                'tabs': [
+                    {
+                        'id': 1,
+                        'title': 'Tab 1',
+                        'hiddenColumns': None,
 
-            },
-        ]
-    }
-    {'filters': [
-        {
-            'filter': "agreement-filter",
-            'value': {'min': 0.2, 'max': 0.5},
-            'operator': "in",
-        },
-    ],}
-    return make_response(jsonify(result), 200)
+                    }
+                ]
+            }
+            """ 'filters': [
+                {
+                    'filter': "tasks-id",
+                    'value': {'min': 0, 'max': 9999999999999},
+                    'operator': "in",
+                }
+            ] """
+            return make_response(jsonify(result), 200)
+        else:
+            return make_response(jsonify(session['tab_data']), 200)
+
+    if request.method == 'POST':
+        tab_data = request.json()
+        session['tab_data'] = tab_data
+        return make_response(jsonify(tab_data), 200)
 
 
 @blueprint.route('/api/states', methods=['GET'])
@@ -1209,7 +1272,7 @@ def main():
 
         # set username and password
         label_studio.utils.auth.USERNAME = input_args.username or \
-            config.get('username') or label_studio.utils.auth.USERNAME
+                                           config.get('username') or label_studio.utils.auth.USERNAME
         label_studio.utils.auth.PASSWORD = input_args.password or config.get('password', '')
 
         # set host name

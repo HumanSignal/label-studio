@@ -40,7 +40,13 @@ def prepare_tasks(project, params):
         else:
             ordered = sorted(pre_order, key=lambda x: (DirectionSwitch(x[order], not ascending)))
 
-    paginated = ordered[(page - 1) * page_size:page * page_size]
+    total = len(ordered)
+
+    # skip pagination if page<0 and page_size<=0
+    if page >= 0 and page_size > 0:
+        paginated = ordered[(page - 1) * page_size:page * page_size]
+    else:
+        paginated = ordered
 
     # get tasks with completions
     tasks = []
@@ -69,4 +75,25 @@ def prepare_tasks(project, params):
 
         tasks.append(task)
 
-    return tasks
+    return {'tasks': tasks, 'total': total}
+
+
+def prepare_annotations(tasks, params):
+    order, page, page_size = params.order, params.page, params.page_size
+
+    # unpack completions from tasks
+    items = []
+    for task in tasks:
+        completions = task.get('completions', [])
+        # assign task ids to have link between completion and task in the data manager
+        for completion in completions:
+            completion['task_id'] = task['id']
+        items += completions
+
+    total = len(items)
+
+    # skip pagination if page<0 and page_size<=0
+    if page >= 0 and page_size > 0:
+        items = items[(page - 1)*page_size: page*page_size]
+
+    return {'annotations': items, 'total': total}
