@@ -1055,7 +1055,7 @@ def api_project_columns():
                 'id': 'id',
                 'title': "ID",
                 'type': "Number",
-                'target': 'tasks|annotations',
+                'target': 'tasks',
                 'schema': {
                     'min': 0,
                     'max': 100
@@ -1065,7 +1065,7 @@ def api_project_columns():
                 'id': 'id2',
                 'title': 'ID 2',
                 'type': 'Number',
-                'target': 'tasks|annotations',
+                'target': 'annotations',
                 'parent': 'id',
                 'schema': {
                     'min': 0,
