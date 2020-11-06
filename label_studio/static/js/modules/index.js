@@ -15,7 +15,7 @@ if (dmRoot) {
         tabs: "/project/tabs",
 
         tasks: {
-          path: "/project/tabs/:tab_id/tasks",
+          path: "/tasks",
           convert(result) {
             return {
               tasks: result,
