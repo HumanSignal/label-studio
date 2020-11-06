@@ -15,7 +15,7 @@ if (dmRoot) {
         tabs: "/project/tabs",
 
         tasks: {
-          path: "/tasks",
+          path: "/project/tabs/:tabID/tasks",
           convert(result) {
             return {
               tasks: result,
@@ -24,7 +24,7 @@ if (dmRoot) {
           }
         },
         annotations: {
-          path: "/project/tabs/:tab_id/annotations",
+          path: "/project/tabs/:tabID/annotations",
           convert(result) {
             return {
               tasks: result,
@@ -34,12 +34,12 @@ if (dmRoot) {
         },
 
         task: "/tasks/:id",
-        cancel: "/tasks/:task_id/completions?was_cancelled=1",
+        cancel: "/tasks/:taskID/completions?was_cancelled=1",
         next: "/project/next",
 
-        completion: "/tasks/:task_id/completions/:id",
+        completion: "/tasks/:taskID/completions/:id",
         submitCompletion: {
-          path: "/tasks/:taskId/completions",
+          path: "/tasks/:taskID/completions",
           method: "post",
           headers: {
             ContentType: "application/json",

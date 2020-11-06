@@ -1043,6 +1043,42 @@ def api_predictions():
         return make_response(jsonify("No ML backend"), 400)
 
 
+@blueprint.route('/api/project/tabs/<tab_id>/tasks', methods=['GET'])
+@requires_auth
+@exception_handler
+def api_project_tab_tasks(tab_id):
+    tab_id = int(tab_id)
+
+    fields = ['all']
+    order = request.values.get('order', 'id')
+    page, page_size = int(request.values.get('page', 1)), int(request.values.get('page_size', 10))
+    if page < 1 or page_size < 1:
+        return make_response(jsonify({'detail': 'Incorrect page or page_size'}), 422)
+
+    params = SimpleNamespace(fields=fields, page=page, page_size=page_size, order=order)
+    tasks = prepare_tasks(g.project, params)
+    return make_response(jsonify(tasks), 200)
+
+
+@blueprint.route('/api/project/tabs/<tab_id>/annotations', methods=['GET'])
+@requires_auth
+@exception_handler
+def api_project_tab_annotations(tab_id):
+    tab_id = int(tab_id)
+
+    fields = ['all']
+    order = request.values.get('order', 'id')
+    page, page_size = int(request.values.get('page', 1)), int(request.values.get('page_size', 10))
+    if page < 1 or page_size < 1:
+        return make_response(jsonify({'detail': 'Incorrect page or page_size'}), 422)
+
+    params = SimpleNamespace(fields=fields, page=page, page_size=page_size, order=order)
+    tasks = prepare_tasks(g.project, params)
+    for t in tasks:
+        t['task_id'] = t['id']
+    return make_response(jsonify(tasks), 200)
+
+
 @blueprint.route('/api/project/columns', methods=['GET'])
 @requires_auth
 @exception_handler
@@ -1051,26 +1087,25 @@ def api_project_columns():
     """
     result = {
         'columns': [
+            # --- Tasks ---
             {
                 'id': 'id',
-                'title': "ID",
+                'title': "Task ID",
                 'type': "Number",
-                'target': 'tasks',
-                'schema': {
-                    'min': 0,
-                    'max': 100
-                }
+                'target': 'tasks'
+            },
+            # --- Completions ---
+            {
+                'id': 'id',
+                'title': 'Annotation ID',
+                'type': 'Number',
+                'target': 'annotations'
             },
             {
-                'id': 'id2',
-                'title': 'ID 2',
+                'id': 'task_id',
+                'title': 'Task ID',
                 'type': 'Number',
-                'target': 'annotations',
-                'parent': 'id',
-                'schema': {
-                    'min': 0,
-                    'max': 100
-                }
+                'target': 'annotations'
             }
         ]
     }
@@ -1089,16 +1124,17 @@ def api_project_tabs():
                 'id': 1,
                 'title': 'Tab 1',
                 'hiddenColumns': None,
-                'filters': [
-                    {
-                        'filter': "agreement-filter",
-                        'value': {'min': 0.2, 'max': 0.5},
-                        'operator': "in",
-                    },
-                ],
+
             },
         ]
     }
+    {'filters': [
+        {
+            'filter': "agreement-filter",
+            'value': {'min': 0.2, 'max': 0.5},
+            'operator': "in",
+        },
+    ],}
     return make_response(jsonify(result), 200)
 
 
