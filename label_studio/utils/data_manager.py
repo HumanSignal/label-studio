@@ -2,7 +2,7 @@ from label_studio.utils.misc import DirectionSwitch, timestamp_to_local_datetime
 from label_studio.utils.uri_resolver import resolve_task_data_uri
 
 
-class TaskViewException(Exception):
+class DataManagerException(Exception):
     pass
 
 
@@ -10,10 +10,10 @@ def prepare_tasks(project, params):
     order, page, page_size = params.order, params.page, params.page_size
     fields = params.fields
 
-    ascending = order[0] != '-'
+    ascending = order[0] == '-'
     order = order[1:] if order[0] == '-' else order
     if order not in ['id', 'completed_at', 'has_cancelled_completions']:
-        raise TaskViewException('Incorrect order')
+        raise DataManagerException('Incorrect order')
 
     # get task ids and sort them by completed time
     task_ids = project.source_storage.ids()

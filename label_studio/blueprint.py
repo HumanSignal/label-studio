@@ -54,7 +54,7 @@ from label_studio.utils.auth import requires_auth
 from label_studio.storage import get_storage_form
 from label_studio.project import Project
 from label_studio.tasks import Tasks
-from label_studio.utils.task_view import prepare_tasks
+from label_studio.utils.data_manager import prepare_tasks
 
 INPUT_ARGUMENTS_PATH = pathlib.Path("server.json")
 
