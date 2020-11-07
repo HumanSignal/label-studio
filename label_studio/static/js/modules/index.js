@@ -13,8 +13,17 @@ if (dmRoot) {
         project: "/project",
         columns: "/project/columns",
         tabs: "/project/tabs",
-        updateTab: "/project/tabs/:tabID",
-        deleteTab: "/project/tabs/:tabID",
+        updateTab: {
+          path: "/project/tabs/:tabID",
+          method: "post",
+          headers: {
+            'Content-Type': "application/json",
+          },
+        },
+        deleteTab: {
+          path: "/project/tabs/:tabID",
+          method: "delete",
+        },
 
         tasks: "/project/tabs/:tabID/tasks",
         annotations: "/project/tabs/:tabID/annotations",
