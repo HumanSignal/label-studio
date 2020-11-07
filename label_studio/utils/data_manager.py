@@ -1,9 +1,80 @@
 from label_studio.utils.misc import DirectionSwitch, timestamp_to_local_datetime
 from label_studio.utils.uri_resolver import resolve_task_data_uri
 
+DEFAULT_TABS = {
+    'tabs': [
+        {
+            'id': 1,
+            'title': 'Tab 1',
+            'hiddenColumns': None,
 
-class TaskViewException(Exception):
+        }
+    ]
+}
+
+
+class DataManagerException(Exception):
     pass
+
+
+def make_columns(project):
+    result = {'columns': []}
+
+    # frontend uses MST data model, so we need two directional referencing parent <-> child
+    task_data_children = []
+    for key, data_type in project.data_types.items():
+        column = {
+            'id': key,
+            'title': key,
+            'type': 'String',  # data_type,
+            'target': 'tasks',
+            'parent': 'data'
+        }
+        result['columns'].append(column)
+        task_data_children.append(column['id'])
+
+    result['columns'] += [
+        # --- Tasks ---
+        {
+            'id': 'id',
+            'title': "Task ID",
+            'type': "Number",
+            'target': 'tasks'
+        },
+        {
+            'id': 'completed_at',
+            'title': "Completed at",
+            'type': "Number",
+            'target': 'tasks'
+        },
+        {
+            'id': 'was_cancelled',
+            'title': "Cancelled",
+            'type': "Number",
+            'target': 'tasks'
+        },
+        {
+            'id': 'data',
+            'title': "Data",
+            'type': "List",
+            'target': 'tasks',
+            'children': task_data_children
+        },
+        # --- Completions ---
+        {
+            'id': 'id',
+            'title': 'Annotation ID',
+            'type': 'Number',
+            'target': 'annotations'
+        },
+        {
+            'id': 'task_id',
+            'title': 'Task ID',
+            'type': 'Number',
+            'target': 'annotations'
+        }
+    ]
+    return result
 
 
 def prepare_tasks(project, params):
@@ -13,7 +84,7 @@ def prepare_tasks(project, params):
     ascending = order[0] != '-'
     order = order[1:] if order[0] == '-' else order
     if order not in ['id', 'completed_at', 'has_cancelled_completions']:
-        raise TaskViewException('Incorrect order')
+        raise DataManagerException('Incorrect order')
 
     # get task ids and sort them by completed time
     task_ids = project.source_storage.ids()

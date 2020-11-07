@@ -54,7 +54,9 @@ from label_studio.utils.auth import requires_auth
 from label_studio.storage import get_storage_form
 from label_studio.project import Project
 from label_studio.tasks import Tasks
-from label_studio.utils.task_view import prepare_tasks, prepare_annotations
+from label_studio.utils.data_manager import (
+    prepare_tasks, prepare_annotations, make_columns, DEFAULT_TABS, DataManagerException
+)
 
 INPUT_ARGUMENTS_PATH = pathlib.Path("server.json")
 
@@ -1107,62 +1109,7 @@ def api_project_tab_annotations(tab_id):
 def api_project_columns():
     """ Project columns for data manager tabs
     """
-    result = {'columns': []}
-
-    # frontend uses MST data model, so we need two directional referencing parent <-> child
-    task_data_children = []
-    for key, data_type in g.project.data_types.items():
-        column = {
-            'id': key,
-            'title': key,
-            'type': 'String',  # data_type,
-            'target': 'tasks',
-            'parent': 'data'
-        }
-        result['columns'].append(column)
-        task_data_children.append(column['id'])
-
-    result['columns'] += [
-        # --- Tasks ---
-        {
-            'id': 'id',
-            'title': "Task ID",
-            'type': "Number",
-            'target': 'tasks'
-        },
-        {
-            'id': 'completed_at',
-            'title': "Completed at",
-            'type': "Number",
-            'target': 'tasks'
-        },
-        {
-            'id': 'was_cancelled',
-            'title': "Cancelled",
-            'type': "Number",
-            'target': 'tasks'
-        },
-        {
-            'id': 'data',
-            'title': "Data",
-            'type': "List",
-            'target': 'tasks',
-            'children': task_data_children
-        },
-        # --- Completions ---
-        {
-            'id': 'id',
-            'title': 'Annotation ID',
-            'type': 'Number',
-            'target': 'annotations'
-        },
-        {
-            'id': 'task_id',
-            'title': 'Task ID',
-            'type': 'Number',
-            'target': 'annotations'
-        }
-    ]
+    result = make_columns(g.project)
     return make_response(jsonify(result), 200)
 
 
@@ -1174,23 +1121,7 @@ def api_project_tabs():
     """
     if request.method == 'GET':
         if 'tab_data' not in session:
-            result = {
-                'tabs': [
-                    {
-                        'id': 1,
-                        'title': 'Tab 1',
-                        'hiddenColumns': None,
-
-                    }
-                ]
-            }
-            """ 'filters': [
-                {
-                    'filter': "tasks-id",
-                    'value': {'min': 0, 'max': 9999999999999},
-                    'operator': "in",
-                }
-            ] """
+            result = DEFAULT_TABS
             return make_response(jsonify(result), 200)
         else:
             return make_response(jsonify(session['tab_data']), 200)
@@ -1199,6 +1130,38 @@ def api_project_tabs():
         tab_data = request.json()
         session['tab_data'] = tab_data
         return make_response(jsonify(tab_data), 200)
+
+
+@blueprint.route('/api/project/tabs/<tab_id>', methods=['GET', 'POST'])
+@requires_auth
+@exception_handler
+def api_project_tabs_id(tab_id):
+    """ Specified tab for data manager
+    """
+    tab_id = int(tab_id)
+
+    # load tab data
+    if 'tab_data' not in session:
+        data = DEFAULT_TABS
+    else:
+        data = session['tab_data']
+
+    # select by tab id
+    for tab in data['tabs']:
+        if tab['id'] == tab_id:
+            break
+    else:
+        raise DataManagerException('No tab with id: ' + str(tab_id))
+
+    # get tab data
+    if request.method == 'GET':
+        return make_response(jsonify(tab), 200)
+
+    # set tab data
+    if request.method == 'POST':
+        tab.update(request.json())
+        session['tab_data'] = data
+        return make_response(jsonify(data), 200)
 
 
 @blueprint.route('/api/states', methods=['GET'])
