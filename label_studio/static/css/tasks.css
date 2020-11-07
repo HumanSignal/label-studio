@@ -175,6 +175,10 @@ tr {
   white-space: -o-pre-wrap;
 }
 
+.datamanager {
+  padding: 1rem;
+}
+
 @media screen and (max-width: 768px) {
   .full-preview-image {
     max-height: 250px;

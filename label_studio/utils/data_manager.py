@@ -1,6 +1,7 @@
 from label_studio.utils.misc import DirectionSwitch, timestamp_to_local_datetime
 from label_studio.utils.uri_resolver import resolve_task_data_uri
 
+DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 DEFAULT_TABS = {
     'tabs': [
         {
@@ -44,7 +45,7 @@ def make_columns(project):
         {
             'id': 'completed_at',
             'title': "Completed at",
-            'type': "Number",
+            'type': "String",
             'target': 'tasks'
         },
         {
@@ -72,24 +73,25 @@ def make_columns(project):
             'title': 'Task ID',
             'type': 'Number',
             'target': 'annotations'
+        },
+        {
+            'id': 'created_at',
+            'title': "Completed at",
+            'type': "String",
+            'target': 'annotations'
         }
     ]
     return result
 
 
-def prepare_tasks(project, params):
-    order, page, page_size = params.order, params.page, params.page_size
-    fields = params.fields
+def order_tasks(params, task_ids, completed_at, cancelled_status):
+    order = params.order
 
+    # ascending or descending
     ascending = order[0] == '-'
     order = order[1:] if order[0] == '-' else order
     if order not in ['id', 'completed_at', 'has_cancelled_completions']:
         raise DataManagerException('Incorrect order')
-
-    # get task ids and sort them by completed time
-    task_ids = project.source_storage.ids()
-    completed_at = project.get_completed_at()  # task can have multiple completions, get the last of completed
-    cancelled_status = project.get_cancelled_status()
 
     # ordering
     pre_order = ({
@@ -111,17 +113,13 @@ def prepare_tasks(project, params):
         else:
             ordered = sorted(pre_order, key=lambda x: (DirectionSwitch(x[order], not ascending)))
 
-    total = len(ordered)
+    return ordered
 
-    # skip pagination if page<0 and page_size<=0
-    if page > 0 and page_size > 0:
-        paginated = ordered[(page - 1) * page_size:page * page_size]
-    else:
-        paginated = ordered
 
+def post_process_tasks(project, fields, input_tasks):
     # get tasks with completions
     tasks = []
-    for item in paginated:
+    for item in input_tasks:
         i = item['id']
         task = project.get_task_with_completions(i)
 
@@ -132,7 +130,7 @@ def prepare_tasks(project, params):
             # evaluate completed_at time
             completed_at = item['completed_at']
             if completed_at != 'undefined' and completed_at is not None:
-                completed_at = timestamp_to_local_datetime(completed_at).strftime('%Y-%m-%d %H:%M:%S')
+                completed_at = timestamp_to_local_datetime(completed_at).strftime(DATETIME_FORMAT)
             task['completed_at'] = completed_at
             task['has_cancelled_completions'] = item['has_cancelled_completions']
 
@@ -146,19 +144,51 @@ def prepare_tasks(project, params):
 
         tasks.append(task)
 
+    return tasks
+
+
+def prepare_tasks(project, params):
+    """ Main function to get tasks
+    """
+    page, page_size = params.page, params.page_size
+    fields, filters = params.fields, params.filters
+
+    # get task ids and sort them by completed time
+    task_ids = project.source_storage.ids()
+    completed_at = project.get_completed_at()  # task can have multiple completions, get the last of completed
+    cancelled_status = project.get_cancelled_status()
+
+    # order
+    tasks = order_tasks(params, task_ids, completed_at, cancelled_status)
+    total = len(tasks)
+
+    tasks = post_process_tasks(project, fields, tasks)
+
+    # pagination
+    if page > 0 and page_size > 0:
+        tasks = tasks[(page - 1) * page_size:page * page_size]
+
     return {'tasks': tasks, 'total': total}
 
 
 def prepare_annotations(tasks, params):
+    """ Main function to get annotations
+    """
     order, page, page_size = params.order, params.page, params.page_size
 
     # unpack completions from tasks
     items = []
     for task in tasks:
         completions = task.get('completions', [])
+
         # assign task ids to have link between completion and task in the data manager
         for completion in completions:
             completion['task_id'] = task['id']
+            # convert created_at
+            created_at = completion.get('created_at', None)
+            if created_at:
+                completion['created_at'] = timestamp_to_local_datetime(created_at).strftime(DATETIME_FORMAT)
+
         items += completions
 
     total = len(items)

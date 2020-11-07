@@ -26,7 +26,6 @@ with io.open(os.path.join(os.path.dirname(__file__), 'logger.json')) as f:
 from uuid import uuid4
 from urllib.parse import unquote
 from datetime import datetime
-from inspect import currentframe, getframeinfo
 from gevent.pywsgi import WSGIServer
 from flask import (
     request, jsonify, make_response, Response, Response as HttpResponse,
@@ -1072,11 +1071,15 @@ def api_project_tab_tasks(tab_id):
 
     fields = ['all']
     order = request.values.get('order', 'id')
+    filters = [{'id': 'text', 'type': 'contains', 'value': 'ta'},
+               {'id': 'text', 'type': 'contains', 'value': 'ab'}]
+
+    # get pagination
     page, page_size = int(request.values.get('page', 1)), int(request.values.get('page_size', 10))
     if page < 1 or page_size < 1:
         return make_response(jsonify({'detail': 'Incorrect page or page_size'}), 422)
 
-    params = SimpleNamespace(fields=fields, page=page, page_size=page_size, order=order)
+    params = SimpleNamespace(fields=fields, page=page, page_size=page_size, order=order, filters=filters)
     tasks = prepare_tasks(g.project, params)
     return make_response(jsonify(tasks), 200)
 
@@ -1088,13 +1091,14 @@ def api_project_tab_annotations(tab_id):
     tab_id = int(tab_id)
 
     fields = ['all']
+    filters = []
     order = request.values.get('order', 'id')
     page, page_size = int(request.values.get('page', 1)), int(request.values.get('page_size', 10))
     if page < 1 or page_size < 1:
         return make_response(jsonify({'detail': 'Incorrect page or page_size'}), 422)
 
     # get tasks first
-    task_params = SimpleNamespace(fields=fields, page=0, page_size=0, order=order)
+    task_params = SimpleNamespace(fields=fields, page=0, page_size=0, order=order, filters=[])
     tasks = prepare_tasks(g.project, task_params)
 
     # pass tasks to get annotation by them
@@ -1125,11 +1129,6 @@ def api_project_tabs():
             return make_response(jsonify(result), 200)
         else:
             return make_response(jsonify(session['tab_data']), 200)
-
-    if request.method == 'POST':
-        tab_data = request.json()
-        session['tab_data'] = tab_data
-        return make_response(jsonify(tab_data), 200)
 
 
 @blueprint.route('/api/project/tabs/<tab_id>', methods=['GET', 'POST'])

@@ -54,7 +54,7 @@ hotkey i {
     display: inline-block;
 }
 
-.wrapper {
+.max-width-wrapper {
     max-width: 1400px;
 }
 
