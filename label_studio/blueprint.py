@@ -1113,7 +1113,7 @@ def api_project_columns():
     task_data_children = []
     for key, data_type in g.project.data_types.items():
         column = {
-            'id': 'data-' + key,
+            'id': key,
             'title': key,
             'type': 'String',  # data_type,
             'target': 'tasks',
