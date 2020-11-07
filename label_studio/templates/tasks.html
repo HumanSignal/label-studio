@@ -13,7 +13,7 @@
 
     <!-- Main content -->
 
-    <div class="ui container wrapper" v-if="!quick_view">
+    <div class="ui container wrapper">
 
       <!-- Statistics -->
       <div class="ui three column centered grid stackable">
@@ -181,16 +181,6 @@
           text_preview_limit: Cookies.get('text_preview_limit', 400),
           error: null,
 
-          // quick task preview
-          all_columns: ['id', 'completed_at', 'was_cancelled', 'actions', 'previews', 'audio_urls', 'image_urls'],
-          full_columns: JSON.parse(Cookies.get('full_columns', '["id", "completed_at", "was_cancelled", "actions", "previews"]')),
-          quick_columns: JSON.parse(Cookies.get('quick_columns', '["id"]')),
-          quick_view: false,
-          quick_view_show_table: true,
-          current_task: null,
-          current_task_index: -10,
-          full_pagination: true,
-
           // provided by api/project
           project: {% endraw %}{{ serialized_project|json|safe }}{% raw %},
 
@@ -217,8 +207,7 @@
 
       // components
       components: {
-        'animated-number': animatedNumber,
-        'image-with-fade-in': imageWithFadeIn
+        'animated-number': animatedNumber
       },
 
       computed: {
@@ -253,40 +242,6 @@
               if (always) always(data);
               console.log('error: no ' + dst + ' loaded')
             })
-        },
-
-        // get tasks from api
-        loadTasks: function (polling) {
-          var self = this;
-          self.tasks_loaded = false;
-          this.getApi('tasks', 'api/tasks/' +
-            '?page=' + this.page +
-            '&page_size=' + parseInt(this.page_size) +
-            '&order=' + this.order +
-            (polling ? '&polling=true': ''),
-            // always
-            function (data) {
-              self.tasks_loaded = true;
-            },
-            // fail
-            function (data) {
-              self.showError('Tasks loading error', message_from_response(data))
-            },
-            // done
-            function () {
-              // set task position to the first task
-              if (self.current_task_index === -1) {
-                self.current_task_index = 0;
-                self.openTaskPreview(self.tasks[self.current_task_index]);
-              }
-              // set task position to the last task
-              else if (self.current_task_index === -2) {
-                self.current_task_index = self.tasks.length - 1;
-                self.openTaskPreview(self.tasks[self.current_task_index]);
-              }
-            }
-
-          );
         },
 
         // get project info from api
@@ -380,55 +335,12 @@
         // update all objects via api
         loadAll: function () {
           this.loadProject();
-          this.loadTasks();
           this.loadStorageSettings();
         },
 
         // update all objects via api
         loadProjectAndTasks: function () {
           this.loadProject();
-          this.loadTasks();
-        },
-
-        // update all objects via api
-        loadProjectAndTasksByTimer: function (polling) {
-          if (this.project_loaded && this.tasks_loaded) {
-            this.loadProject(polling);
-            this.loadTasks(polling);
-          }
-        },
-
-        // change order of sorting in table
-        changeOrder: function (name) {
-          console.log('order changed to ' + name);
-          var old = getUrlArg('order', 'id');
-          if (old === name) {
-            name = '-' + name;
-          }
-          this.order = name;
-          Cookies.set('order', name);
-          refreshHistoryArg('order', name);
-          this.loadTasks();
-        },
-
-        // delete completion with trash button
-        deleteCompletion: function (task, completion) {
-          task.processing = true;
-          this.$forceUpdate();
-          var request = new XMLHttpRequest();
-          request.open("DELETE", "api/tasks/" + task.id + "/completions", true);
-          request.onload = this.loadProjectAndTasks;
-          request.send();
-        },
-
-        // delete completion with trash button
-        deleteTask: function (task) {
-          task.processing = true;
-          this.$forceUpdate();
-          var request = new XMLHttpRequest();
-          request.open("DELETE", "api/tasks/" + task.id + "/", true);
-          request.onload = this.loadProjectAndTasks;
-          request.send();
         },
 
         // delete all tasks from project
@@ -458,26 +370,6 @@
         },
 
         // start/stop timer with project & task api loading
-        stopAutoUpdateTimer: function () {
-          clearInterval(this.auto_update_timer);
-          this.auto_update_timer = null;
-        },
-        startAutoUpdateTimer: function () {
-          if (this.timer_interval > 0) {
-            var self = this;
-            this.auto_update_timer = setInterval(function() {
-              self.loadProjectAndTasksByTimer(true); // run with polling = true to distinct request from timer
-            }, this.timer_interval);
-          }
-        },
-        toggleAutoUpdateTimer: function () {
-          if (this.auto_update_timer) {
-            this.stopAutoUpdateTimer();
-          } else {
-            this.startAutoUpdateTimer();
-          }
-        },
-
         capitalizeFirstLetter: capitalizeFirstLetter,  // from helpers.js
 
         getCurrentStorage: function (storage_for) {
@@ -515,109 +407,11 @@
           })
         },
 
-        openTaskPreview: function (task) {
-          if (!task) task = this.current_task;
-          this.quick_view = true;
-          this.current_task = task;
-          this.columns = this.quick_columns;
-          var self = this;
-        },
-        closeTaskPreview: function () {
-          this.quick_view = false;
-          this.columns = this.full_columns;
-          this.current_task_index = -10;
-        },
-        toggleTaskPreview: function (index) {
-          if (typeof index === 'undefined') {
-            index = this.findCurrentTaskIndex();
-            index = index < 0 ? 0 : index;
-          }
-          this.current_task_index = index;
-          var task = this.tasks[index];
-          this.current_task && this.current_task.id === task.id && this.quick_view
-            ? this.closeTaskPreview() : this.openTaskPreview(task);
-        },
-
-        nextPage: function () {
-          if (this.page < this.totalPages) {
-            this.page++;
-            if (this.current_task_index !== -10)
-              this.current_task_index = -1;
-            this.audioStopAll();
-          }
-        },
-        prevPage: function () {
-          if (this.page > 1) {
-            this.page--;
-            if (this.current_task_index !== -10)
-              this.current_task_index = -2;
-            this.audioStopAll();
-          }
-        },
-        findCurrentTaskIndex: function() {
-          if (!this.current_task) return -1;
-
-          // find task index for current task
-          for (var i=0; i<this.tasks.length; i++) {
-            if (this.tasks[i].id === this.current_task.id)
-              return i;
-          }
-          return -1;
-        },
-        nextTask: function() {
-          if (this.current_task_index === -10) {
-            this.current_task_index = this.findCurrentTaskIndex();
-            this.current_task_index = this.current_task_index === -1 ? 0: this.current_task_index;
-            this.openTaskPreview(this.tasks[this.current_task_index]);
-          }
-          else if (0 <= this.current_task_index && this.current_task_index < this.tasks.length-1) {
-            this.current_task_index++;
-            this.openTaskPreview(this.tasks[this.current_task_index]);
-          }
-          else if (this.current_task_index === this.tasks.length-1) {
-            this.nextPage();
-          }
-        },
-        prevTask: function() {
-          if (this.current_task_index === -10) {
-            this.current_task_index = this.findCurrentTaskIndex();
-            this.current_task_index = this.current_task_index === -1 ? 0: this.current_task_index;
-            this.openTaskPreview(this.tasks[this.current_task_index]);
-          }
-          else if (0 < this.current_task_index && this.current_task_index < this.tasks.length) {
-            this.current_task_index--;
-            this.openTaskPreview(this.tasks[this.current_task_index]);
-          }
-          else if (this.current_task_index === 0) {
-            this.prevPage();
-          }
-        },
-
-        evalPanelWidth: function() {
-
-        },
+        evalPanelWidth: function() {},
 
         // audio player play / stop
-        audioToggle: function(target, task) {
-          if (target.nodeName === 'I') {
-            target = target.parentElement;
-          }
-          if (!task.playing) {
-            // stop all
-            $('audio').each(function(i, o) { if (o !== self) o.pause(); });
-            // start audio for current task
-            $(target).children('audio').each(function(i, o){ o.play() });
-            //Vue.set(task, 'playing', true);
-          }
-          else {
-            // stop current task audio
-            $(target).children('audio').each(function(i, o){ o.pause() });
-            //Vue.set(task, 'playing', false);
-          }
-        },
-        audioStopAll: function() {
-          $('audio').each(function(i, o) { o.pause(); o.currentTime = 0; });
-        },
+        audioToggle: function(target, task) {},
+        audioStopAll: function() {},
 
         copyValue: function(text) {
           copyToClipboard(text);
@@ -628,11 +422,6 @@
           })
         },
 
-        text_preview: function(text) {
-          return text.slice(0, this.text_preview_limit) +
-            (text.length <= this.text_preview_limit ? '': ' ...');
-        },
-
         get_short_text: function(text) {
           const max_len = 40;
           return (text.length <= max_len ? text: ('...' + text.slice(text.length-max_len, text.length)));
@@ -640,121 +429,23 @@
       },
 
       watch: {
-        // watch for page variable changes
-        page: function () {
-          this.loadTasks();
-          Cookies.set('page', this.page);
-          refreshHistoryArg('page', this.page);
-        },
-        page_size: function () {
-          this.loadTasks();
-          Cookies.set('page_size', this.page_size);
-          refreshHistoryArg('page_size', this.page_size);
-        },
         'storage_settings.source.type': function () {
           this.changeStorageSettings('source', this.storage_settings.source.type)
         },
         'storage_settings.target.type': function () {
           this.changeStorageSettings('target', this.storage_settings.target.type)
-        },
-
-        columns: function (values) {
-          if (this.quick_view) {
-            this.quick_columns = values;
-            this.evalPanelWidth()
-          } else {
-            this.full_columns = values;
-          }
-        },
-
-        quick_columns: function () {
-          this.evalPanelWidth();
-          Cookies.set('quick_columns', this.quick_columns);
-        },
-        full_columns: function () {
-          Cookies.set('full_columns', this.full_columns);
-        },
-
-        quick_view: function () {
-          this.evalPanelWidth();
-        },
-
-        text_preview_limit: function () {
-          Cookies.set('text_preview_limit', this.text_preview_limit);
         }
       },
 
       // vue mounting of page
       mounted: function () {
-        // replace deprecated version 'others'
-        function remove_deprecated_others(array) {
-          var index = array.indexOf('others');
-          if (index >= 0) {
-            array.splice(index, 1);
-            array.push('previews')
-          }
-          // replace deprecated version 'skipped'
-          var index = array.indexOf('skipped');
-          if (index >= 0) {
-            array.splice(index, 1);
-            array.push('was_cancelled')
-          }
-        }
-        remove_deprecated_others(this.full_columns);
-        remove_deprecated_others(this.quick_columns);
-
         this.vue_loaded = true;
         this.project_loaded = true;
-
-        this.order = getUrlArg('order', this.order);
-        this.page = getUrlArg('page', this.page);
-        this.page_size = getUrlArg('page_size', this.page_size);
         this.loadAll();
-
-        // project and tasks auto update timer
-        var project_timer_interval = this.project.config.task_page_auto_update_timer ?
-          this.project.config.task_page_auto_update_timer.toString(): '10000';
-        this.timer_interval = parseInt(getUrlArg('timer', project_timer_interval));
 
         $('#vue_loader').hide();
         $('.ui.checkbox').checkbox();
-
-        // hotkeys mapping
-        var self = this;
-        Mousetrap.addKeycodes({
-          119: 'w',
-          115: 's',
-          100: 'd',
-          97:  'a',
-          113: 'q',
-          69: 'e',
-          96: '`'
-        });
-
-        Mousetrap.bind(['shift+left', 'a'], this.prevPage);
-        Mousetrap.bind(['shift+right', 'd'], this.nextPage);
-        Mousetrap.bind(['shift+up', 'w'], this.prevTask);
-        Mousetrap.bind(['shift+down', 's'], this.nextTask);
-        Mousetrap.bind(['`'], function() { self.show_settings = !self.show_settings });
-        Mousetrap.bind(['e'], function() { self.quick_view_show_table = !self.quick_view_show_table });
-        Mousetrap.bind(['q'], function() { self.toggleTaskPreview() });
-        Mousetrap.bind(['q'], function() { self.toggleTaskPreview() });
-
-        $(window).resize(this.evalPanelWidth);
         console.log('Vue mounting success');
-      },
-
-      updated: function() {
-        this.evalPanelWidth();
-
-        // set uniform height for all tr-s in table
-        var max = 20;
-        var trs = $('tbody').find('tr');
-        trs.height(max);
-        trs.each(function(i, o) { if (max < $(o).height()) { max = $(o).height(); } });
-        trs.height(max);
-
-        this.$nextTick(function() {});
       }
     });
 

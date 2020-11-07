@@ -13,37 +13,34 @@ if (dmRoot) {
         project: "/project",
         columns: "/project/columns",
         tabs: "/project/tabs",
+        updateTab: "/project/tabs/:tabID",
+        deleteTab: "/project/tabs/:tabID",
 
-        tasks: {
-          path: "/tasks",
-          convert(result) {
-            return {
-              tasks: result,
-              total: 106,
-            }
-          }
-        },
-        annotations: {
-          path: "/project/tabs/:tab_id/annotations",
-          convert(result) {
-            return {
-              tasks: result,
-              total: 106,
-            }
-          }
-        },
+        tasks: "/project/tabs/:tabID/tasks",
+        annotations: "/project/tabs/:tabID/annotations",
 
-        task: "/tasks/:id",
-        cancel: "/tasks/:task_id/completions?was_cancelled=1",
-        next: "/project/next",
+        task: "/tasks/:taskID",
+        skipTask: "/tasks/:taskID/completions?was_cancelled=1",
+        nextTask: "/project/next",
 
-        completion: "/tasks/:task_id/completions/:id",
+        completion: "/tasks/:taskID/completions/:id",
         submitCompletion: {
-          path: "/tasks/:taskId/completions",
+          path: "/tasks/:taskID/completions",
           method: "post",
           headers: {
-            ContentType: "application/json",
+            'Content-Type': "application/json",
           },
+        },
+        updateCompletion: {
+          path: "/completions/:completionID",
+          method: "post",
+          headers: {
+            'Content-Type': "application/json",
+          },
+        },
+        deleteCompletion: {
+          path: "/completions/:completionID",
+          method: "delete",
         },
       },
     },
