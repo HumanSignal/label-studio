@@ -133,7 +133,7 @@ tr {
   transition: 0.2s color ease-in-out;
 }
 
-#label-studio {
+.label-studio, #label-studio {
   max-width: unset;
   padding-left: unset;
   padding-right: unset;

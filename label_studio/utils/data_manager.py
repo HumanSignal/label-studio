@@ -81,7 +81,7 @@ def prepare_tasks(project, params):
     order, page, page_size = params.order, params.page, params.page_size
     fields = params.fields
 
-    ascending = order[0] != '-'
+    ascending = order[0] == '-'
     order = order[1:] if order[0] == '-' else order
     if order not in ['id', 'completed_at', 'has_cancelled_completions']:
         raise DataManagerException('Incorrect order')
@@ -114,7 +114,7 @@ def prepare_tasks(project, params):
     total = len(ordered)
 
     # skip pagination if page<0 and page_size<=0
-    if page >= 0 and page_size > 0:
+    if page > 0 and page_size > 0:
         paginated = ordered[(page - 1) * page_size:page * page_size]
     else:
         paginated = ordered
@@ -164,7 +164,7 @@ def prepare_annotations(tasks, params):
     total = len(items)
 
     # skip pagination if page<0 and page_size<=0
-    if page >= 0 and page_size > 0:
+    if page > 0 and page_size > 0:
         items = items[(page - 1)*page_size: page*page_size]
 
     return {'annotations': items, 'total': total}
