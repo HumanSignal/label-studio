@@ -28,14 +28,14 @@ if (dmRoot) {
           path: "/tasks/:taskID/completions",
           method: "post",
           headers: {
-            ContentType: "application/json",
+            'Content-Type': "application/json",
           },
         },
         updateCompletion: {
           path: "/completions/:completionID",
           method: "post",
           headers: {
-            ContentType: "application/json",
+            'Content-Type': "application/json",
           },
         },
         deleteCompletion: {
