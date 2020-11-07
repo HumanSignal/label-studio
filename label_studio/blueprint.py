@@ -1159,7 +1159,7 @@ def api_project_tabs_id(tab_id):
 
     # set tab data
     if request.method == 'POST':
-        tab.update(request.json())
+        tab.update(request.json)
         session['tab_data'] = data
         return make_response(jsonify(data), 200)
 
