@@ -41,14 +41,14 @@ if (dmRoot) {
           },
         },
         updateCompletion: {
-          path: "/completions/:completionID",
+          path: "/tasks/:taskID/completions/:completionID",
           method: "post",
           headers: {
             'Content-Type': "application/json",
           },
         },
         deleteCompletion: {
-          path: "/completions/:completionID",
+          path: "/tasks/:taskID/completions/:completionID",
           method: "delete",
         },
       },

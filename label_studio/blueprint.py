@@ -54,7 +54,7 @@ from label_studio.storage import get_storage_form
 from label_studio.project import Project
 from label_studio.tasks import Tasks
 from label_studio.utils.data_manager import (
-    prepare_tasks, prepare_annotations, make_columns, DEFAULT_TABS, DataManagerException
+    prepare_tasks, prepare_annotations, make_columns, DEFAULT_TABS, load_tab, save_tab
 )
 
 INPUT_ARGUMENTS_PATH = pathlib.Path("server.json")
@@ -940,7 +940,7 @@ def api_tasks_completions(task_id):
             return make_response({'detail': 'Completion removing is not allowed in server config'}, 422)
 
 
-@blueprint.route('/api/tasks/<task_id>/completions/<completion_id>', methods=['PATCH', 'DELETE'])
+@blueprint.route('/api/tasks/<task_id>/completions/<completion_id>', methods=['PATCH', 'DELETE', 'POST'])
 @requires_auth
 @exception_handler
 def api_completion_by_id(task_id, completion_id):
@@ -954,7 +954,7 @@ def api_completion_by_id(task_id, completion_id):
     completion_id = int(completion_id)
 
     # update completion
-    if request.method == 'PATCH':
+    if request.method == 'PATCH' or request.method == 'POST':
         completion = request.json
         completion['id'] = completion_id
         if 'was_cancelled' in completion:
@@ -1138,29 +1138,17 @@ def api_project_tabs_id(tab_id):
     """ Specified tab for data manager
     """
     tab_id = int(tab_id)
-
-    # load tab data
-    if 'tab_data' not in session:
-        data = DEFAULT_TABS
-    else:
-        data = session['tab_data']
-
-    # select by tab id
-    for tab in data['tabs']:
-        if tab['id'] == tab_id:
-            break
-    else:
-        raise DataManagerException('No tab with id: ' + str(tab_id))
+    tab_data = load_tab(tab_id, raise_if_not_exists=request.method == 'GET')
 
     # get tab data
     if request.method == 'GET':
-        return make_response(jsonify(tab), 200)
+        return make_response(jsonify(tab_data), 200)
 
     # set tab data
     if request.method == 'POST':
-        tab.update(request.json)
-        session['tab_data'] = data
-        return make_response(jsonify(data), 200)
+        tab_data.update(request.json)
+        save_tab(tab_id, tab_data)
+        return make_response(jsonify(tab_data), 201)
 
 
 @blueprint.route('/api/states', methods=['GET'])

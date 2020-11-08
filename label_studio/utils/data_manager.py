@@ -1,5 +1,7 @@
+from flask import session
 from label_studio.utils.misc import DirectionSwitch, timestamp_to_local_datetime
 from label_studio.utils.uri_resolver import resolve_task_data_uri
+
 
 DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 DEFAULT_TABS = {
@@ -51,7 +53,7 @@ def make_columns(project):
         {
             'id': 'was_cancelled',
             'title': "Cancelled",
-            'type': "Number",
+            'type': "String",
             'target': 'tasks'
         },
         {
@@ -79,9 +81,50 @@ def make_columns(project):
             'title': "Completed at",
             'type': "String",
             'target': 'annotations'
+        },
+        {
+            'id': 'was_cancelled',
+            'title': "Cancelled",
+            'type': "String",
+            'target': 'annotations'
         }
     ]
     return result
+
+
+def load_tab(tab_id, raise_if_not_exists=False):
+    # load tab data
+    data = DEFAULT_TABS if 'tab_data' not in session else session['tab_data']
+
+    # select by tab id
+    for tab in data['tabs']:
+        if tab['id'] == tab_id:
+            break
+    else:
+        if raise_if_not_exists:
+            raise DataManagerException('No tab with id: ' + str(tab_id))
+
+        # create a new tab
+        tab = {'id': tab_id}
+    return tab
+
+
+def save_tab(tab_id, tab_data):
+    # load tab data
+    data = DEFAULT_TABS if 'tab_data' not in session else session['tab_data']
+    tab_data['id'] = tab_id
+
+    # select by tab id
+    for i, tab in enumerate(data['tabs']):
+        if tab['id'] == tab_id:
+            data['tabs'][i] = tab_data
+            break
+    else:
+        # create a new tab
+        tab_data['id'] = tab_id
+        data['tabs'].append(tab_data)
+
+    session['tab_data'] = data
 
 
 def order_tasks(params, task_ids, completed_at, cancelled_status):
@@ -147,11 +190,18 @@ def post_process_tasks(project, fields, input_tasks):
     return tasks
 
 
+def filters(tasks, params):
+    conjunction, filters = params.filters, params.filter_conjunction
+    filters
+    for filter in filters:
+        filter
+
+
 def prepare_tasks(project, params):
     """ Main function to get tasks
     """
     page, page_size = params.page, params.page_size
-    fields, filters = params.fields, params.filters
+    fields = params.fields
 
     # get task ids and sort them by completed time
     task_ids = project.source_storage.ids()

@@ -116,8 +116,6 @@
                       {{ project.config['sampling'] }}
                     </span>
                   </span>
-                  <!-- Start labeling -->
-                  <a class="ui button positive" href=".">Start Labeling</a>
                 </div>
               </div>
             </div>
@@ -126,7 +124,7 @@
 
         <!-- Critical error -->
         <div v-if="error">
-          <div class="ui hidden divier"></div>
+          <div class="ui hidden divider"></div>
           <div class="ui error message">
             <div class="header">{{ error.header }}</div>
             <div class="content">{{ error.message }}</div>
