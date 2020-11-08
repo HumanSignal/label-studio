@@ -190,11 +190,80 @@ def post_process_tasks(project, fields, input_tasks):
     return tasks
 
 
+def operator(op, a, b):
+    if op == 'equal':
+        return a == b
+    if op == 'not_equal':
+        return a != b
+    if op == 'contains':
+        return a in b
+    if op == 'not_contains':
+        return a not in b
+    if op == 'empty' and a:  # TODO: check it
+        return b is None or not b
+    if op == 'not_empty' and not a:  # TODO: check it
+        return b is not None or not b
+
+    if op == 'less':
+        return b < a
+    if op == 'greater':
+        return b > a
+    if op == 'less_or_equal':
+        return b <= a
+    if op == 'greater_or_equal':
+        return b >= a
+
+    if op == 'in':
+        a, c = a['min'], a['max']
+        return a <= b <= c
+    if op == 'not_in':
+        a, c = a['min'], a['max']
+        return not (a <= b <= c)
+
+
+def resolve_task_field(task, field):
+    """ Get task field from root or 'data' sub-dict
+    """
+    result = task.get(field, None)
+    if result is None:
+        result = task['data'].get(field, None)
+        if result is None:
+            raise DataManagerException("Can't get task field: " + field)
+    return result
+
+
 def filters(tasks, params):
-    conjunction, filters = params.filters, params.filter_conjunction
-    filters
-    for filter in filters:
-        filter
+    # check for filtering params
+    filtering = params.filtering
+    if filtering is None:
+        return tasks
+    filters = filtering.get('filters', None)
+    if not filters:
+        return tasks
+    conjunction = filtering['conjunction']
+
+    new_tasks = tasks if conjunction == 'and' else []
+
+    # go over all the filters
+    for f in filters:
+        parts = f['filter'].split('-')
+        target = parts[0]  # 'tasks | annotations'
+        field = '-'.join(parts[1:-1])  # skip last '-filter'
+        op, value = f['operator'], f['value']
+
+        if target != 'tasks':
+            raise DataManagerException('Filtering target ' + target + ' is not yet supported')
+
+        if conjunction == 'and':
+            new_tasks = [task for task in new_tasks if operator(op, value, resolve_task_field(task, field))]
+
+        elif conjunction == 'or':
+            new_tasks += [task for task in tasks if operator(op, value, resolve_task_field(task, field))]
+
+        else:
+            raise DataManagerException('Filtering conjunction ' + op + ' is not supported')
+
+    return new_tasks
 
 
 def prepare_tasks(project, params):
@@ -213,6 +282,8 @@ def prepare_tasks(project, params):
     total = len(tasks)
 
     tasks = post_process_tasks(project, fields, tasks)
+
+    tasks = filters(tasks, params)
 
     # pagination
     if page > 0 and page_size > 0:

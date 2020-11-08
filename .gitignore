@@ -51,7 +51,7 @@ label_studio.egg-info/
 my_project/
 my_project1/
 label-studio-projects
-build/
+./build/
 dist/
 venv/
 tmp/

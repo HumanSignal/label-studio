@@ -866,7 +866,7 @@ def api_all_tasks():
         if page < 1 or page_size < 1:
             return make_response(jsonify({'detail': 'Incorrect page or page_size'}), 422)
 
-        params = SimpleNamespace(fields=fields, page=page, page_size=page_size, order=order)
+        params = SimpleNamespace(fields=fields, page=page, page_size=page_size, order=order, filtering=None)
         tasks = prepare_tasks(g.project, params)['tasks']
         return make_response(jsonify(tasks), 200)
 
@@ -1071,15 +1071,14 @@ def api_project_tab_tasks(tab_id):
 
     fields = ['all']
     order = request.values.get('order', 'id')
-    filters = [{'id': 'text', 'type': 'contains', 'value': 'ta'},
-               {'id': 'text', 'type': 'contains', 'value': 'ab'}]
+    filtering = load_tab(tab_id, True)
 
     # get pagination
     page, page_size = int(request.values.get('page', 1)), int(request.values.get('page_size', 10))
     if page < 1 or page_size < 1:
         return make_response(jsonify({'detail': 'Incorrect page or page_size'}), 422)
 
-    params = SimpleNamespace(fields=fields, page=page, page_size=page_size, order=order, filters=filters)
+    params = SimpleNamespace(fields=fields, page=page, page_size=page_size, order=order, filtering=filtering)
     tasks = prepare_tasks(g.project, params)
     return make_response(jsonify(tasks), 200)
 
@@ -1091,14 +1090,13 @@ def api_project_tab_annotations(tab_id):
     tab_id = int(tab_id)
 
     fields = ['all']
-    filters = []
     order = request.values.get('order', 'id')
     page, page_size = int(request.values.get('page', 1)), int(request.values.get('page_size', 10))
     if page < 1 or page_size < 1:
         return make_response(jsonify({'detail': 'Incorrect page or page_size'}), 422)
 
     # get tasks first
-    task_params = SimpleNamespace(fields=fields, page=0, page_size=0, order=order, filters=[])
+    task_params = SimpleNamespace(fields=fields, page=0, page_size=0, order=order, filtering=None)
     tasks = prepare_tasks(g.project, task_params)
 
     # pass tasks to get annotation by them
