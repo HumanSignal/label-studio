@@ -152,6 +152,11 @@ def project_get_or_create(multi_session_force_recreate=False):
                                      input_args, context={'multi_session': False})
 
 
+@blueprint.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
+
 @blueprint.before_request
 def app_before_request_callback():
     # skip endpoints where no project is needed
