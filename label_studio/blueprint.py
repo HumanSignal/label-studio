@@ -79,7 +79,7 @@ def config_from_file():
         config_file = INPUT_ARGUMENTS_PATH.open(encoding='utf8')
     except OSError:
         raise LabelStudioError("Can't open input_args file: " + str(INPUT_ARGUMENTS_PATH) + ", "
-                                                                                            "use set_input_arguments_path() to setup it")
+                               "use set_input_arguments_path() to setup it")
 
     with config_file:
         data = json.load(config_file)
@@ -152,11 +152,6 @@ def project_get_or_create(multi_session_force_recreate=False):
                                      input_args, context={'multi_session': False})
 
 
-@blueprint.after_request
-def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    return response
-
 @blueprint.before_request
 def app_before_request_callback():
     # skip endpoints where no project is needed
@@ -184,6 +179,8 @@ def app_before_request_callback():
 def app_after_request_callback(response):
     if hasattr(g, 'analytics'):
         g.analytics.send(request, session, response)
+
+    response.headers.add('Access-Control-Allow-Origin', '*')
     return response
 
 
