@@ -29,7 +29,7 @@ def make_columns(project):
         column = {
             'id': key,
             'title': key,
-            'type': 'String',  # data_type,
+            'type': 'Image' if key == 'image' else 'String',  # data_type,
             'target': 'tasks',
             'parent': 'data'
         }
@@ -47,13 +47,13 @@ def make_columns(project):
         {
             'id': 'completed_at',
             'title': "Completed at",
-            'type': "String",
+            'type': "Datetime",
             'target': 'tasks'
         },
         {
             'id': 'was_cancelled',
             'title': "Cancelled",
-            'type': "String",
+            'type': "Boolean",
             'target': 'tasks'
         },
         {
@@ -79,13 +79,13 @@ def make_columns(project):
         {
             'id': 'created_at',
             'title': "Completed at",
-            'type': "String",
+            'type': "Datetime",
             'target': 'annotations'
         },
         {
             'id': 'was_cancelled',
             'title': "Cancelled",
-            'type': "String",
+            'type': "Boolean",
             'target': 'annotations'
         }
     ]
