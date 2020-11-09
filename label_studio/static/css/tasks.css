@@ -197,3 +197,7 @@ tr {
     height: 50px;
   }
 }
+
+.datamanager {
+  height: 100vh;
+}
