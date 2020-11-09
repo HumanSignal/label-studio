@@ -87,6 +87,12 @@ def make_columns(project):
             'title': "Cancelled",
             'type': "Boolean",
             'target': 'annotations'
+        },
+        {
+            'id': 'lead_time',
+            'title': "Lead time",
+            'type': "Number",
+            'target': 'annotations'
         }
     ]
     return result
