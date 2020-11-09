@@ -3,6 +3,7 @@
 import os
 import io
 import csv
+import ssl
 import hashlib
 import shutil
 import zipfile
@@ -228,8 +229,12 @@ def load_tasks(request, project, temp_dir):
     # take tasks from url address
     elif 'application/x-www-form-urlencoded' in request.content_type:
         try:
+            ctx = ssl.create_default_context()
+            ctx.check_hostname = False
+            ctx.verify_mode = ssl.CERT_NONE
+
             url = request.data['url']
-            with urlopen(url) as file:
+            with urlopen(url, context=ctx) as file:
                 # check size
                 meta = file.info()
                 file.size = int(meta.get("Content-Length"))
