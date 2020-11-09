@@ -21,6 +21,8 @@ class DataManagerException(Exception):
 
 
 def make_columns(project):
+    """ Make columns info for the frontend data manager
+    """
     result = {'columns': []}
 
     # frontend uses MST data model, so we need two directional referencing parent <-> child
@@ -99,6 +101,8 @@ def make_columns(project):
 
 
 def load_tab(tab_id, raise_if_not_exists=False):
+    """ Load tab info from DB
+    """
     # load tab data
     data = DEFAULT_TABS if 'tab_data' not in session else session['tab_data']
 
@@ -116,6 +120,8 @@ def load_tab(tab_id, raise_if_not_exists=False):
 
 
 def save_tab(tab_id, tab_data):
+    """ Save tab info to DB
+    """
     # load tab data
     data = DEFAULT_TABS if 'tab_data' not in session else session['tab_data']
     tab_data['id'] = tab_id
@@ -134,6 +140,8 @@ def save_tab(tab_id, tab_data):
 
 
 def order_tasks(params, task_ids, completed_at, cancelled_status):
+    """ Apply ordering to tasks
+    """
     order = params.order
 
     # ascending or descending
@@ -166,6 +174,9 @@ def order_tasks(params, task_ids, completed_at, cancelled_status):
 
 
 def post_process_tasks(project, fields, input_tasks):
+    """ Resolve tasks: evaluate pre-signed urls for storages,
+        aggregate over completion data, etc
+    """
     # get tasks with completions
     tasks = []
     for item in input_tasks:
@@ -197,6 +208,8 @@ def post_process_tasks(project, fields, input_tasks):
 
 
 def operator(op, a, b):
+    """ Filter operators
+    """
     if op == 'equal':
         return a == b
     if op == 'not_equal':
@@ -230,15 +243,19 @@ def operator(op, a, b):
 def resolve_task_field(task, field):
     """ Get task field from root or 'data' sub-dict
     """
-    result = task.get(field, None)
+    if field.startswith('data.'):
+        result = task['data'].get(field[5:], None)
+    else:
+        result = task.get(field, None)
+
     if result is None:
-        result = task['data'].get(field, None)
-        if result is None:
-            raise DataManagerException("Can't get task field: " + field)
+        raise DataManagerException("Can't get task field: " + field)
     return result
 
 
-def filters(tasks, params):
+def filter_tasks(tasks, params):
+    """ Filter tasks using
+    """
     # check for filtering params
     filtering = params.filtering
     if filtering is None:
@@ -252,9 +269,9 @@ def filters(tasks, params):
 
     # go over all the filters
     for f in filters:
-        parts = f['filter'].split('-')
-        target = parts[0]  # 'tasks | annotations'
-        field = '-'.join(parts[1:-1])  # skip last '-filter'
+        parts = f['filter'].split(':')  # filters:<tasks|annotations>:field_name
+        target = parts[1]  # 'tasks | annotations'
+        field = parts[2]  # field name
         op, value = f['operator'], f['value']
 
         if target != 'tasks':
@@ -289,7 +306,7 @@ def prepare_tasks(project, params):
 
     tasks = post_process_tasks(project, fields, tasks)
 
-    tasks = filters(tasks, params)
+    tasks = filter_tasks(tasks, params)
 
     # pagination
     if page > 0 and page_size > 0:
