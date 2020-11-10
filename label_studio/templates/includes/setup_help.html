@@ -37,7 +37,8 @@
 
         <div style="margin-top: 10px!important;"></div>
         <div style="padding-left: 10px">
-          <table style="margin-left: 10px">
+            <style>.ui.item:hover i { color: darkorange!important; }</style>
+
             {% for uuid, desc in own_projects.items() %}
               <div class="ui item">
                 <i class="share alternate icon blue small hover-button"
@@ -48,7 +49,7 @@
                   {{ desc }}</a>
               </div>
             {% endfor %}
-          </table>
+
         </div>
 
         <div style="margin-bottom: 15px!important;"></div>
