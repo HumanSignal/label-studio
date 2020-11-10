@@ -181,6 +181,11 @@ def app_after_request_callback(response):
         g.analytics.send(request, session, response)
 
     response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PATCH,PUT,DELETE,UPDATE')
+
+    if request.method != 'GET':
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+
     return response
 
 

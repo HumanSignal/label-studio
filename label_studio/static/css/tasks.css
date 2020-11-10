@@ -13,22 +13,6 @@ table.task-table td {
   height: 30px !important;
 }
 
-::-webkit-scrollbar-track {
-  -webkit-box-shadow: inset 0 0 8px rgba(178, 178, 178, 0.3) !important;
-  background-color: #F5F5F5 !important;
-}
-
-::-webkit-scrollbar {
-  width: 8px !important;
-  height: 8px !important;
-  background-color: #F5F5F5 !important;
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: #c3c3c3 !important;
-  border: 8px solid #b4b4b4 !important;
-}
-
 tr.selected {
   background-color: rgba(0, 0, 0, 0.03);
 }
