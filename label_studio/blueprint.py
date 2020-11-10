@@ -595,7 +595,7 @@ def api_project():
 
     # new project
     if request.method == 'POST' and request.args.get('new', False):
-        input_args.project_desc = request.args.get('desc')
+        input_args.web_gui_project_desc = request.args.get('desc')
         g.project = project_get_or_create(multi_session_force_recreate=True)
         code = 201
 

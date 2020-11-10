@@ -808,8 +808,8 @@ class Project(object):
             config['protocol'] = 'https://'
             config['cert'] = args.cert_file
             config['key'] = args.key_file
-        if args.project_desc:
-            config['description'] = args.project_desc
+        if (hasattr(args, 'web_gui_project_desc') and args.web_gui_project_desc) or args.project_desc:
+            config['description'] = args.web_gui_project_desc or args.project_desc
 
         # create config.json
         config_json = 'config.json'
