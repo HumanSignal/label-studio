@@ -47,7 +47,11 @@
 <div id="header">
   <a id="logo" href="welcome">
     <img src="static/images/ls_logo.png" alt="label studio logo" class="img-logo">
-    <span class="img-text">{{ config['title'] }}</span>
+    <span class="img-text" id="logo-text">{% if config['description'] and config['description'] != 'default' %}
+      {{ config['description'] }}
+    {% else %}
+      {{ config['title'] }}
+    {% endif %}</span>
   </a>
   <ul id="nav">
   &nbsp;
@@ -92,6 +96,18 @@
   $(function() {
     tippy('[data-tippy-content]', {allowHTML: true});
   });
+
+  // hide logo if it intersects with menu
+  $(window).resize(function() {
+    var logo = $('#logo-text');
+    logo.show();  // show logo text to calc its position
+    if (logo.offset().left + logo.width() >= $('#nav').offset().left) {
+      logo.hide();
+    }
+    else {
+      logo.show();
+    }
+  })
 </script>
 <script src="static/js/build/index.js"></script>
 </body>
