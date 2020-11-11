@@ -16,9 +16,6 @@ if (dmRoot) {
         updateTab: {
           path: "/project/tabs/:tabID",
           method: "post",
-          headers: {
-            'Content-Type': "application/json",
-          },
         },
         deleteTab: {
           path: "/project/tabs/:tabID",
@@ -36,16 +33,10 @@ if (dmRoot) {
         submitCompletion: {
           path: "/tasks/:taskID/completions",
           method: "post",
-          headers: {
-            'Content-Type': "application/json",
-          },
         },
         updateCompletion: {
           path: "/tasks/:taskID/completions/:completionID",
           method: "post",
-          headers: {
-            'Content-Type': "application/json",
-          },
         },
         deleteCompletion: {
           path: "/tasks/:taskID/completions/:completionID",
