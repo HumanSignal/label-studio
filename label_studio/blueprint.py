@@ -344,6 +344,23 @@ def tasks_page():
     )
 
 
+@blueprint.route('/tasks_old', methods=['GET', 'POST'])
+@requires_auth
+@exception_handler_page
+def tasks_old_page():
+    """ Tasks and completions page
+    """
+    serialized_project = g.project.serialize()
+    serialized_project['multi_session_mode'] = current_app.label_studio.input_args.command != 'start-multi-session'
+    return flask.render_template(
+        'tasks_old.html',
+        config=g.project.config,
+        project=g.project,
+        serialized_project=serialized_project,
+        **find_editor_files()
+    )
+
+
 @blueprint.route('/setup')
 @requires_auth
 @exception_handler_page
@@ -841,23 +858,6 @@ def api_project_switch():
         return make_response(jsonify(output), 200)
 
 
-@blueprint.route('/tasks_old', methods=['GET', 'POST'])
-@requires_auth
-@exception_handler_page
-def tasks_old_page():
-    """ Tasks and completions page
-    """
-    serialized_project = g.project.serialize()
-    serialized_project['multi_session_mode'] = current_app.label_studio.input_args.command != 'start-multi-session'
-    return flask.render_template(
-        'tasks_old.html',
-        config=g.project.config,
-        project=g.project,
-        serialized_project=serialized_project,
-        **find_editor_files()
-    )
-
-
 @blueprint.route('/api/tasks', methods=['GET', 'DELETE'])
 @requires_auth
 @exception_handler
@@ -1075,17 +1075,14 @@ def api_predictions():
 @exception_handler
 def api_project_tab_tasks(tab_id):
     tab_id = int(tab_id)
-
-    fields = ['all']
-    order = request.values.get('order', 'id')
-    filtering = load_tab(tab_id, True)
+    tab = load_tab(tab_id, True)
 
     # get pagination
     page, page_size = int(request.values.get('page', 1)), int(request.values.get('page_size', 10))
     if page < 1 or page_size < 1:
         return make_response(jsonify({'detail': 'Incorrect page or page_size'}), 422)
 
-    params = SimpleNamespace(fields=fields, page=page, page_size=page_size, order=order, filtering=filtering)
+    params = SimpleNamespace(page=page, page_size=page_size, tab=tab)
     tasks = prepare_tasks(g.project, params)
     return make_response(jsonify(tasks), 200)
 
@@ -1095,19 +1092,18 @@ def api_project_tab_tasks(tab_id):
 @exception_handler
 def api_project_tab_annotations(tab_id):
     tab_id = int(tab_id)
+    tab = load_tab(tab_id, True)
 
-    fields = ['all']
-    order = request.values.get('order', 'id')
     page, page_size = int(request.values.get('page', 1)), int(request.values.get('page_size', 10))
     if page < 1 or page_size < 1:
         return make_response(jsonify({'detail': 'Incorrect page or page_size'}), 422)
 
     # get tasks first
-    task_params = SimpleNamespace(fields=fields, page=0, page_size=0, order=order, filtering=None)
+    task_params = SimpleNamespace(page=0, page_size=0, tab=tab)  # take all tasks from tab
     tasks = prepare_tasks(g.project, task_params)
 
-    # pass tasks to get annotation by them
-    annotation_params = SimpleNamespace(fields=fields, page=page, page_size=page_size, order=order)
+    # pass tasks to get annotation over them
+    annotation_params = SimpleNamespace(page=page, page_size=page_size, tab=tab)
     annotations = prepare_annotations(tasks['tasks'], annotation_params)
     return make_response(jsonify(annotations), 200)
 

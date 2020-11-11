@@ -142,7 +142,9 @@ def save_tab(tab_id, tab_data):
 def order_tasks(params, task_ids, completed_at, cancelled_status):
     """ Apply ordering to tasks
     """
-    order = params.order
+    ordering = params.tab.get('ordering', [])  # ordering = ['id', 'completed_at', ...]
+    ordering = [o.replace('tasks:', '') for o in ordering if o.startswith('tasks:')]
+    order = 'id' if not ordering else ordering[0] # we support only one column ordering right now
 
     # ascending or descending
     ascending = order[0] == '-'
@@ -257,13 +259,13 @@ def filter_tasks(tasks, params):
     """ Filter tasks using
     """
     # check for filtering params
-    filtering = params.filtering
-    if filtering is None:
+    tab = params.tab
+    if tab is None:
         return tasks
-    filters = filtering.get('filters', None)
+    filters = tab.get('filters', None)
     if not filters:
         return tasks
-    conjunction = filtering['conjunction']
+    conjunction = tab['conjunction']
 
     new_tasks = tasks if conjunction == 'and' else []
 
@@ -293,7 +295,7 @@ def prepare_tasks(project, params):
     """ Main function to get tasks
     """
     page, page_size = params.page, params.page_size
-    fields = params.fields
+    fields = ['all']
 
     # get task ids and sort them by completed time
     task_ids = project.source_storage.ids()
