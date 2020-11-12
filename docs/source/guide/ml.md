@@ -19,6 +19,7 @@ That gives you the opportunities to use:
 - [Create the simplest ML backend](/tutorials/dummy_model.html)
 - [Text classification with Scikit-Learn](/tutorials/sklearn-text-classifier.html)
 - [Transfer learning for images with PyTorch](/tutorials/pytorch-image-transfer-learning.html)
+- [Image Object Detector](/tutorials/object-detector.html)
 
 #### Create your own ML backend
 

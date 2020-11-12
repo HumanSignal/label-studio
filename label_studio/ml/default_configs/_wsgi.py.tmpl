@@ -31,6 +31,18 @@ from label_studio.ml import init_app
 from {script} import {model_class}
 
 
+_DEFAULT_CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'config.json')
+
+
+def get_kwargs_from_config(config_path=_DEFAULT_CONFIG_PATH):
+    if not os.path.exists(config_path):
+        return dict()
+    with open(config_path) as f:
+        config = json.load(f)
+    assert isinstance(config, dict)
+    return config
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Label studio')
     parser.add_argument(
@@ -40,7 +52,7 @@ if __name__ == "__main__":
         '--host', dest='host', type=str, default='0.0.0.0',
         help='Server host')
     parser.add_argument(
-        '--kwargs', dest='kwargs', metavar='KEY=VAL', nargs='+', type=lambda kv: kv.split('='),
+        '--kwargs', '--with', dest='kwargs', metavar='KEY=VAL', nargs='+', type=lambda kv: kv.split('='),
         help='Additional LabelStudioMLBase model initialization kwargs')
     parser.add_argument(
         '-d', '--debug', dest='debug', action='store_true',
@@ -83,7 +95,10 @@ if __name__ == "__main__":
                 param[k] = v
         return param
 
-    kwargs = parse_kwargs() if args.kwargs else dict()
+    kwargs = get_kwargs_from_config()
+
+    if args.kwargs:
+        kwargs.update(parse_kwargs())
 
     if args.check:
         print('Check "' + {model_class}.__name__ + '" instance creation..')

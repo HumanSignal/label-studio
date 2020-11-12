@@ -1,7 +1,7 @@
 ---
 title: Labeling Interface
 type: guide
-order: 104
+order: 705
 ---
 
 Let's explore the complex example of multi-task labeling which includes text + image + audio data objects:
