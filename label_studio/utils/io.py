@@ -8,7 +8,10 @@ import ujson as json
 from contextlib import contextmanager
 from tempfile import mkstemp, mkdtemp
 
-from appdirs import user_config_dir, user_data_dir
+from appdirs import user_config_dir, user_data_dir, user_cache_dir
+
+
+_DIR_APP_NAME = 'label-studio'
 
 
 def good_path(path):
@@ -74,15 +77,21 @@ def get_temp_dir():
 
 
 def get_config_dir():
-    config_dir = user_config_dir(appname='label-studio')
+    config_dir = user_config_dir(appname=_DIR_APP_NAME)
     os.makedirs(config_dir, exist_ok=True)
     return config_dir
 
 
 def get_data_dir():
-    data_dir = user_data_dir(appname='label-studio')
+    data_dir = user_data_dir(appname=_DIR_APP_NAME)
     os.makedirs(data_dir, exist_ok=True)
     return data_dir
+
+
+def get_cache_dir():
+    cache_dir = user_cache_dir(appname=_DIR_APP_NAME)
+    os.makedirs(cache_dir, exist_ok=True)
+    return cache_dir
 
 
 def delete_dir_content(dirpath):

@@ -38,3 +38,4 @@ label-studio-converter>=0.0.19
 htmlmin==0.1.12
 gevent>=20.6.2
 ujson==3.0.0
+Colorama==0.4.4

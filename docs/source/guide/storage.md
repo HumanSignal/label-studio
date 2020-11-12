@@ -1,7 +1,7 @@
 ---
-title: Cloud storages
+title: Connecting Cloud storages
 type: guide
-order: 103
+order: 706
 ---
 
 You can integrate the popular cloud storage with Label Studio, collect new tasks uploaded to your buckets, and sync back annotation results to use them in your machine learning pipelines.
