@@ -1,7 +1,7 @@
 ---
 title: FAQ
 type: guide
-order: 101
+order: 106
 ---
 
 Frequently asked questions about setup and usage.
