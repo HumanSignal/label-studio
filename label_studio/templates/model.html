@@ -44,7 +44,7 @@
                       <a class="log-link"
                          onclick="show_logs(`{{ ml_backend.error.detail }}`, `{{ ml_backend.error.result.traceback }}`, {{ ml_backend.error.status }})">
                         <i class="x icon" style="color: #ff2733"></i>
-                        Error. Check logs
+                        Error. Click here for details.
                       </a>
                     {% elif not ml_backend.is_connected %}
                       <i class="toggle off wide icon"></i>
