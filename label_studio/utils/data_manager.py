@@ -51,13 +51,15 @@ def make_columns(project):
             'id': 'completed_at',
             'title': "Completed at",
             'type': "Datetime",
-            'target': 'tasks'
+            'target': 'tasks',
+            'help': 'Last completion date'
         },
         {
-            'id': 'was_cancelled',
+            'id': 'has_cancelled_completions',
             'title': "Cancelled",
-            'type': "Boolean",
-            'target': 'tasks'
+            'type': "Number",
+            'target': 'tasks',
+            'help': 'Number of cancelled completions'
         },
         {
             'id': 'data',
@@ -152,7 +154,7 @@ def order_tasks(params, task_ids, completed_at, cancelled_status):
     order = order[1:] if order[0] == '-' else order
 
     if order not in ['id', 'completed_at', 'has_cancelled_completions']:
-        raise DataManagerException('Incorrect order')
+        raise DataManagerException('Incorrect order: ' + order)
 
     # ordering
     pre_order = ({
@@ -322,7 +324,7 @@ def prepare_tasks(project, params):
 def prepare_annotations(tasks, params):
     """ Main function to get annotations
     """
-    order, page, page_size = params.order, params.page, params.page_size
+    page, page_size = params.page, params.page_size
 
     # unpack completions from tasks
     items = []
