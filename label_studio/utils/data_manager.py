@@ -14,6 +14,7 @@ DEFAULT_TABS = {
         }
     ]
 }
+TASKS = 'tasks:'
 
 
 class DataManagerException(Exception):
@@ -143,12 +144,13 @@ def order_tasks(params, task_ids, completed_at, cancelled_status):
     """ Apply ordering to tasks
     """
     ordering = params.tab.get('ordering', [])  # ordering = ['id', 'completed_at', ...]
-    ordering = [o.replace('tasks:', '') for o in ordering if o.startswith('tasks:')]
-    order = 'id' if not ordering else ordering[0] # we support only one column ordering right now
+    ordering = [o.replace(TASKS, '') for o in ordering if o.startswith(TASKS) or o.startswith('-' + TASKS)]
+    order = 'id' if not ordering else ordering[0]  # we support only one column ordering right now
 
     # ascending or descending
     ascending = order[0] == '-'
     order = order[1:] if order[0] == '-' else order
+
     if order not in ['id', 'completed_at', 'has_cancelled_completions']:
         raise DataManagerException('Incorrect order')
 
