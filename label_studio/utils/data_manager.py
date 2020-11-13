@@ -195,7 +195,7 @@ def post_process_tasks(project, fields, input_tasks):
         else:
             # evaluate completed_at time
             completed_at = item['completed_at']
-            if completed_at != 'undefined' and completed_at is not None:
+            if completed_at != 0 and completed_at is not None:
                 completed_at = timestamp_to_local_datetime(completed_at).strftime(DATETIME_FORMAT)
             task['completed_at'] = completed_at
             task['has_cancelled_completions'] = item['has_cancelled_completions']

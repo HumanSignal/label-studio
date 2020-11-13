@@ -490,10 +490,14 @@ class Project(object):
         times = {}
         for _, data in self.target_storage.items():
             id = data['id']
+            # check for empty array []
+            if len(data.get('completions', [])) == 0:
+                continue
+            # aggregate completion created_at by max
             try:
                 times[id] = max(data['completions'], key=itemgetter('created_at'))['created_at']
             except Exception as exc:
-                times[id] = 'undefined'
+                times[id] = 0
         return times
 
     def get_cancelled_status(self):
