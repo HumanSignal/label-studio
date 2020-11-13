@@ -34,7 +34,8 @@ def make_columns(project):
             'title': key,
             'type': 'Image' if key == 'image' else 'String',  # data_type,
             'target': 'tasks',
-            'parent': 'data'
+            'parent': 'data',
+            'orderable': False
         }
         result['columns'].append(column)
         task_data_children.append(column['id'])
@@ -63,7 +64,7 @@ def make_columns(project):
         },
         {
             'id': 'data',
-            'title': "Data",
+            'title': "data",
             'type': "List",
             'target': 'tasks',
             'children': task_data_children
@@ -73,31 +74,36 @@ def make_columns(project):
             'id': 'id',
             'title': 'Annotation ID',
             'type': 'Number',
-            'target': 'annotations'
+            'target': 'annotations',
+            'orderable': False
         },
         {
             'id': 'task_id',
             'title': 'Task ID',
             'type': 'Number',
-            'target': 'annotations'
+            'target': 'annotations',
+            'orderable': False
         },
         {
             'id': 'created_at',
             'title': "Completed at",
             'type': "Datetime",
-            'target': 'annotations'
+            'target': 'annotations',
+            'orderable': False
         },
         {
             'id': 'was_cancelled',
             'title': "Cancelled",
             'type': "Boolean",
-            'target': 'annotations'
+            'target': 'annotations',
+            'orderable': False
         },
         {
             'id': 'lead_time',
             'title': "Lead time",
             'type': "Number",
-            'target': 'annotations'
+            'target': 'annotations',
+            'orderable': False
         }
     ]
     return result
@@ -253,9 +259,6 @@ def resolve_task_field(task, field):
         result = task['data'].get(field[5:], None)
     else:
         result = task.get(field, None)
-
-    if result is None:
-        raise DataManagerException("Can't get task field: " + field)
     return result
 
 
