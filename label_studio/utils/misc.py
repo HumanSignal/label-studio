@@ -63,16 +63,17 @@ def exception_handler(f):
 
         except AnswerException as e:
             traceback = tb.format_exc()
-
+            logger.error(traceback)
             if 'traceback' not in e.result:
                 e.result['traceback'] = traceback
             if hasattr(exception_f, 'request_id') and not e.result['request_id']:
                 e.result['request_id'] = exception_f.request_id
+
             return answer(e.status, e.msg, e.result)
 
         except Exception as e:
             traceback = tb.format_exc()
-            logger.debug(traceback)
+            logger.error(traceback)
             body = {'traceback': traceback}
             if hasattr(exception_f, 'request_id'):
                 body['request_id'] = exception_f.request_id
