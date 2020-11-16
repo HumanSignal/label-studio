@@ -118,4 +118,29 @@ Depending on score types you can select a sampling strategy
 * prediction-score-max (max is the best score)
  
 Read more about active learning sampling [on the task page](https://labelstud.io/guide/tasks.html#Sampling). 
- 
+
+
+## Troubleshooting
+
+When you encounter any error, there are several hints to get more insights. 
+Most of the problems could be easily investigated from the server console log. 
+Note that since you run ML backend as a separate server, you have to check its logs (not Label Studio server's ones!)
+
+> Note: When you start ML backend using docker-compose, the logs are located in:
+> - main process / inference logs: logs/uwsgi.log
+> - training logs: logs/rq.log
+
+**I've launched ML backend, but after adding it in Label Studio's UI it results to _Disconnected_ state.**
+
+Perhaps your ML backend server didn't start properly. Try to do healthcheck via `curl -X GET http://localhost:9090/health`. 
+If it doesn't respond or you see any errors, check server logs. When you're using docker-compose for starting ML backend, one common cause of errors is missed `requirements.txt` to set up environment inside docker.
+
+**ML backend seems to be connected, but after I press "Start Training", I see "Error. Click here for details." message.**
+
+Check for the traceback after you click on error message. Some common errors are insufficient amount of annotations made or memory issues.
+If you can't resolve them by yourself, <a href="https://join.slack.com/t/label-studio/shared_invite/zt-cr8b7ygm-6L45z7biEBw4HXa5A2b5pw">write us on Slack</a>.
+
+**My predictions are wrong / I can't see the model prediction result on labeling page**
+
+ML backend predictions format follows exactly the same structure as [predictions in imported preannotations](/guide/tasks.html#How-to-import-preannotations)
+
