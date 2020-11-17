@@ -8,6 +8,7 @@ Label Studio is supported for Python 3.5 or greater, running on Linux, Windows a
 
 > Note: for Windows users the default installation may fail to build `lxml` package. Consider manually installing it from [unofficial Windows binaries](https://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml) e.g. if you are running on x64 with Python 3.8, run `pip install lxml‑4.5.0‑cp38‑cp38‑win_amd64.whl`.
 
+> Note: On Windows we recommend to use Python 3.5 - 3.8. Python 3.9 has not all pre-built packages for Windows. 
 
 ## Running with pip
 

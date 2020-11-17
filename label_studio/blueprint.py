@@ -44,7 +44,7 @@ from label_studio.utils.functions import (
     generate_time_series_json, generate_sample_task, get_sample_task
 )
 from label_studio.utils.misc import (
-    exception_handler, exception_handler_page, check_port_in_use, start_browser,
+    exception_handler, exception_handler_page, check_port_in_use, start_browser, str2datetime,
     config_line_stripped, get_config_templates, convert_string_to_hash, serialize_class
 )
 from label_studio.utils.analytics import Analytics
@@ -188,17 +188,6 @@ def send_media(path):
     """
     media_dir = find_dir('static/media')
     return flask.send_from_directory(media_dir, path)
-
-
-@blueprint.route('/upload/<path:path>')
-@requires_auth
-def send_upload(path):
-    """ User uploaded files
-    """
-    logger.warning('Task path starting with "/upload/" is deprecated and will be removed in next releases, '
-                   'replace "/upload/" => "/data/upload/" in your tasks.json files')
-    project_dir = os.path.join(g.project.path, 'upload')
-    return open(os.path.join(project_dir, path), 'rb').read()
 
 
 @blueprint.route('/static/<path:path>')
@@ -952,15 +941,22 @@ def api_completion_by_id(task_id, completion_id):
             return make_response({'detail': 'Completion removing is not allowed in server config'}, 422)
 
 
-@blueprint.route('/api/completions', methods=['DELETE'])
+@blueprint.route('/api/completions', methods=['GET', 'DELETE'])
 @requires_auth
 @exception_handler
 def api_all_completions():
-    """ Delete all project completions
+    """ Get all completion ids
+        Delete all project completions
     """
+    # delete all completions
     if request.method == 'DELETE':
         g.project.delete_all_completions()
         return make_response('done', 201)
+
+    # get all completions ids
+    elif request.method == 'GET':
+        ids = g.project.get_completions_ids()
+        return make_response(jsonify({'ids': ids}), 200)
 
     else:
         return make_response('Incorrect request method', 500)
@@ -1072,16 +1068,10 @@ def json_filter(s):
     return json.dumps(s)
 
 
-def str2datetime(timestamp_str):
-    try:
-        ts = int(timestamp_str)
-    except:
-        return timestamp_str
-    # return datetime.utcfromtimestamp(ts).strftime('%Y%m%d.%H%M%S')
-    return datetime.utcfromtimestamp(ts).strftime('%c')
-
-
 def main():
+    # this will avoid looped imports and will register deprecated endpoints in the blueprint
+    import label_studio.deprecated
+
     input_args = parse_input_args()
     app = create_app(LabelStudioConfig(input_args=input_args), set_str2datetime=True)
 
