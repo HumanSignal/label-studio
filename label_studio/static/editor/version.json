@@ -1,6 +1,6 @@
 {
-  "message": "Revert \"Datamanager height\"\n\nThis reverts commit a3873809c61ac68b1dbcc6d8bc1afebcbe784212.",
-  "commit": "c883b7368e054f95a17697845bc52d285a4bd08c",
+  "message": "Fix deserialization of tree view in Regions panel",
+  "commit": "57cbe6765b3aa0b59da23c39569d2a2abd9b59aa",
   "branch": "master",
-  "date": "2020-11-17T12:53:49Z"
+  "date": "2020-11-12T22:21:54Z"
 }
