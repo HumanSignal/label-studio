@@ -1,6 +1,6 @@
 {
-  "message": "Datamanager height",
-  "commit": "a3873809c61ac68b1dbcc6d8bc1afebcbe784212",
+  "message": "Fix deserialization of tree view in Regions panel",
+  "commit": "57cbe6765b3aa0b59da23c39569d2a2abd9b59aa",
   "branch": "master",
-  "date": "2020-11-09T20:51:39Z"
+  "date": "2020-11-12T22:21:54Z"
 }

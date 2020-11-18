@@ -172,12 +172,20 @@ def get_sample_task(label_config):
     return generated_task, completions, predictions
 
 
-def set_full_hostname(hostname):
+def set_external_hostname(hostname):
+    """ External host name for LS instance e.g.: label-studio.my-domain.com.
+        It is used for data import paths, they must be absolute paths always,
+        otherwise machine learning backends couldn't access them
+    """
     global HOSTNAME
     HOSTNAME = hostname
 
 
-def get_full_hostname():
+def get_external_hostname():
+    """ External host name for LS instance e.g.: label-studio.my-domain.com.
+        It is used for data import paths, they must be absolute paths always,
+        otherwise machine learning backends couldn't access them
+    """
     global HOSTNAME
     return HOSTNAME
 

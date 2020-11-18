@@ -34,9 +34,9 @@ means that
     label-studio-ml init coco-detector --from label_studio/ml/examples/mmdetection.py
     ```
 
-2. Setup MMDetection environment following [this installation guide](https://mmdetection.readthedocs.io/en/v1.2.0/INSTALL.html)
+2. Setup ML backend environment `pip install -r coco-detector/requirements.txt`. 
 
-3. Download `config_file` and `checkpoint_file` from MMDetection model zoo (use [recommended Faster RCNN for quickstarting](https://mmdetection.readthedocs.io/en/latest/1_exist_data_model.html#inference-with-existing-models)).
+3. Setup MMDetection environment following [this installation guide](https://mmdetection.readthedocs.io/en/v1.2.0/INSTALL.html). Download `config_file` and `checkpoint_file` from MMDetection model zoo (use [recommended Faster RCNN for quickstarting](https://mmdetection.readthedocs.io/en/latest/1_exist_data_model.html#inference-with-existing-models)).
 
 4. Launch ML backend server:
 

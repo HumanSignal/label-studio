@@ -39,11 +39,11 @@ from label_studio.utils.io import find_dir, find_editor_files
 from label_studio.utils.validation import TaskValidator
 from label_studio.utils.exceptions import ValidationError, LabelStudioError
 from label_studio.utils.functions import (
-    set_full_hostname, set_web_protocol, get_web_protocol,
+    set_external_hostname, set_web_protocol, get_web_protocol,
     generate_time_series_json, generate_sample_task, get_sample_task
 )
 from label_studio.utils.misc import (
-    exception_handler, exception_handler_page, check_port_in_use, start_browser,
+    exception_handler, exception_handler_page, check_port_in_use, start_browser, str2datetime,
     config_line_stripped, get_config_templates, convert_string_to_hash, serialize_class
 )
 from label_studio.utils.analytics import Analytics
@@ -60,7 +60,10 @@ from label_studio.utils.data_manager import (
 INPUT_ARGUMENTS_PATH = pathlib.Path("server.json")
 
 logger = logging.getLogger(__name__)
-blueprint = Blueprint(__package__, __name__)
+blueprint = Blueprint(__package__, __name__,
+                      static_folder='static', static_url_path='/static',
+                      template_folder='templates')
+blueprint.add_app_template_filter(str2datetime, 'str2datetime')
 
 
 @attr.s(frozen=True)
@@ -86,20 +89,17 @@ def config_from_file():
     return LabelStudioConfig(input_args=SimpleNamespace(**data))
 
 
-def create_app(label_studio_config=None, set_str2datetime=False):
+def create_app(label_studio_config=None):
     """ Create application factory, as explained here:
         http://flask.pocoo.org/docs/patterns/appfactories/.
 
     :param label_studio_config: LabelStudioConfig object to use with input_args params
-    :param set_str2datetime: install set_str2datatime to filters
     """
     app = flask.Flask(__package__, static_url_path='')
     app.secret_key = 'A0Zrdqwf1AQWj12ajkhgFN]dddd/,?RfDWQQT'
     app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
     app.config['WTF_CSRF_ENABLED'] = False
     app.url_map.strict_slashes = False
-    if set_str2datetime:
-        app.jinja_env.filters['str2datetime'] = str2datetime
     app.label_studio = label_studio_config or config_from_file()
 
     # check LabelStudioConfig correct loading
@@ -196,17 +196,6 @@ def send_media(path):
     """
     media_dir = find_dir('static/media')
     return flask.send_from_directory(media_dir, path)
-
-
-@blueprint.route('/upload/<path:path>')
-@requires_auth
-def send_upload(path):
-    """ User uploaded files
-    """
-    logger.warning('Task path starting with "/upload/" is deprecated and will be removed in next releases, '
-                   'replace "/upload/" => "/data/upload/" in your tasks.json files')
-    project_dir = os.path.join(g.project.path, 'upload')
-    return open(os.path.join(project_dir, path), 'rb').read()
 
 
 @blueprint.route('/static/<path:path>')
@@ -914,7 +903,7 @@ def api_task_by_id(task_id):
         return make_response(jsonify('Task deleted.'), 204)
 
 
-@blueprint.route('/api/tasks/<task_id>/completions/', methods=['POST', 'DELETE'])
+@blueprint.route('/api/tasks/<task_id>/completions', methods=['POST', 'DELETE'])
 @requires_auth
 @exception_handler
 def api_tasks_completions(task_id):
@@ -980,15 +969,22 @@ def api_completion_by_id(task_id, completion_id):
             return make_response({'detail': 'Completion removing is not allowed in server config'}, 422)
 
 
-@blueprint.route('/api/completions', methods=['DELETE'])
+@blueprint.route('/api/completions', methods=['GET', 'DELETE'])
 @requires_auth
 @exception_handler
 def api_all_completions():
-    """ Delete all project completions
+    """ Get all completion ids
+        Delete all project completions
     """
+    # delete all completions
     if request.method == 'DELETE':
         g.project.delete_all_completions()
         return make_response('done', 201)
+
+    # get all completions ids
+    elif request.method == 'GET':
+        ids = g.project.get_completions_ids()
+        return make_response(jsonify({'ids': ids}), 200)
 
     else:
         return make_response('Incorrect request method', 500)
@@ -1182,18 +1178,12 @@ def json_filter(s):
     return json.dumps(s)
 
 
-def str2datetime(timestamp_str):
-    try:
-        ts = int(timestamp_str)
-    except:
-        return timestamp_str
-    # return datetime.utcfromtimestamp(ts).strftime('%Y%m%d.%H%M%S')
-    return datetime.utcfromtimestamp(ts).strftime('%c')
-
-
 def main():
+    # this will avoid looped imports and will register deprecated endpoints in the blueprint
+    import label_studio.deprecated
+
     input_args = parse_input_args()
-    app = create_app(LabelStudioConfig(input_args=input_args), set_str2datetime=True)
+    app = create_app(LabelStudioConfig(input_args=input_args))
 
     # setup logging level
     if input_args.log_level:
@@ -1228,7 +1218,7 @@ def main():
         label_studio.utils.auth.PASSWORD = input_args.password or config.get('password', '')
 
         # set host name
-        host = input_args.host or config.get('host', 'localhost')  # name for external links generation
+        host = input_args.host or config.get('host', 'localhost')
         port = input_args.port or config.get('port', 8080)
         server_host = 'localhost' if host == 'localhost' else '0.0.0.0'  # web server host
 
@@ -1248,8 +1238,13 @@ def main():
                   '* Trying to start at ' + str(port) +
                   '\n****************\n')
 
+        # external hostname is used for data import paths, they must be absolute always,
+        # otherwise machine learning backends couldn't access them
         set_web_protocol(input_args.protocol or config.get('protocol', 'http://'))
-        set_full_hostname(get_web_protocol() + host.replace('0.0.0.0', 'localhost') + ':' + str(port))
+        external_hostname = get_web_protocol() + host.replace('0.0.0.0', 'localhost')
+        if host in ['0.0.0.0', 'localhost', '127.0.0.1']:
+            external_hostname += ':' + str(port)
+        set_external_hostname(external_hostname)
 
         start_browser('http://localhost:' + str(port), input_args.no_browser)
         if input_args.use_gevent:

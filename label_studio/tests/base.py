@@ -16,8 +16,7 @@ from label_studio.project import Project
 def label_studio_app():
     input_args = SimpleNamespace(command='start', project_name='my_project',
                                  root_dir=os.path.join(os.path.dirname(__file__), '../../'))
-    app = create_app(LabelStudioConfig(input_args=input_args),
-                     set_str2datetime=True)
+    app = create_app(LabelStudioConfig(input_args=input_args))
     app.config['TESTING'] = True
     app.config['DEBUG'] = False
 

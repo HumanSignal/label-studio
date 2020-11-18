@@ -9,9 +9,11 @@ import calendar
 import pytz
 import flask
 import socket
-import errno
+import requests
+import label_studio
 
-from json import JSONEncoder
+from pkg_resources import parse_version
+
 from collections import defaultdict, OrderedDict
 from lxml import etree, objectify
 from datetime import datetime
@@ -374,3 +376,29 @@ def start_browser(ls_url, no_browser):
     browser_url = ls_url + '/welcome'
     threading.Timer(2.5, lambda: webbrowser.open(browser_url)).start()
     print('Start browser at URL: ' + browser_url)
+
+
+def get_latest_version():
+    pypi_url = 'https://pypi.org/pypi/%s/json' % label_studio.package_name
+    try:
+        response = requests.get(pypi_url).text
+        latest_version = json.loads(response)['info']['version']
+    except Exception as exc:
+        logger.error("Can't get latest version.", exc_info=True)
+    else:
+        return latest_version
+
+
+def current_version_is_outdated(latest_version):
+    latest_version = parse_version(latest_version)
+    current_version = parse_version(label_studio.__version__)
+    return current_version < latest_version
+
+
+def str2datetime(timestamp_str):
+    try:
+        ts = int(timestamp_str)
+    except:
+        return timestamp_str
+    # return datetime.utcfromtimestamp(ts).strftime('%Y%m%d.%H%M%S')
+    return datetime.utcfromtimestamp(ts).strftime('%c')
