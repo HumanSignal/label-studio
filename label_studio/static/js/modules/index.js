@@ -26,7 +26,7 @@ if (dmRoot) {
         annotations: "/project/tabs/:tabID/annotations",
 
         task: "/tasks/:taskID",
-        skipTask: "/tasks/:taskID/completions?was_cancelled=1",
+        skipTask: "/tasks/:taskID/completions",
         nextTask: "/project/next",
 
         completion: "/tasks/:taskID/completions/:id",
