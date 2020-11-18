@@ -392,3 +392,12 @@ def current_version_is_outdated(latest_version):
     latest_version = parse_version(latest_version)
     current_version = parse_version(label_studio.__version__)
     return current_version < latest_version
+
+
+def str2datetime(timestamp_str):
+    try:
+        ts = int(timestamp_str)
+    except:
+        return timestamp_str
+    # return datetime.utcfromtimestamp(ts).strftime('%Y%m%d.%H%M%S')
+    return datetime.utcfromtimestamp(ts).strftime('%c')

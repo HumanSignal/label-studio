@@ -21,7 +21,7 @@ from label_studio.utils.models import ProjectObj, MLBackend
 from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.io import find_file, delete_dir_content, json_load
 from label_studio.utils.validation import is_url
-from label_studio.utils.functions import get_full_hostname
+from label_studio.utils.functions import get_external_hostname
 from label_studio.tasks import Tasks
 from label_studio.storage import create_storage, get_available_storage_names
 
@@ -78,7 +78,6 @@ class Project(object):
         self.target_storage = None
         self.create_storages()
 
-        self.tasks = None
         self.label_config_line, self.label_config_full, self.parsed_label_config, self.input_data_tags = None, None, None, None  # noqa
         self.derived_input_schema, self.derived_output_schema = None, None
 

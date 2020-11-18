@@ -23,7 +23,7 @@ from collections import Counter
 
 from .exceptions import ValidationError
 from .misc import Settings
-from label_studio.utils.functions import get_full_hostname
+from label_studio.utils.functions import get_external_hostname
 
 
 settings = Settings
@@ -91,7 +91,7 @@ def tasks_from_file(filename, file, project):
             open(path, 'wb').write(data)
             # prepare task
 
-            path = get_full_hostname() + '/data/upload/' + filename
+            path = get_external_hostname() + '/data/upload/' + filename
             tasks = [{'data': {settings.UPLOAD_DATA_UNDEFINED_NAME: path}}]
             file_format = os.path.splitext(filename)[-1]
 
