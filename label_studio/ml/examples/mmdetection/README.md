@@ -28,15 +28,15 @@ means that
 
 ## Installation
 
-1. Create and initialize directory `./coco-detector`:
+1. Setup MMDetection environment following [this installation guide](https://mmdetection.readthedocs.io/en/v1.2.0/INSTALL.html). Depending on your OS, some of the dependencies could be missed (gcc-c++, mesa-libGL) - install them using your package manager.
+
+2. Create and initialize directory `./coco-detector`:
 
     ```bash
     label-studio-ml init coco-detector --from label_studio/ml/examples/mmdetection.py
     ```
 
-2. Setup ML backend environment `pip install -r coco-detector/requirements.txt`. 
-
-3. Setup MMDetection environment following [this installation guide](https://mmdetection.readthedocs.io/en/v1.2.0/INSTALL.html). Download `config_file` and `checkpoint_file` from MMDetection model zoo (use [recommended Faster RCNN for quickstarting](https://mmdetection.readthedocs.io/en/latest/1_exist_data_model.html#inference-with-existing-models)).
+3. Download `config_file` and `checkpoint_file` from MMDetection model zoo (use [recommended Faster RCNN for quickstarting](https://mmdetection.readthedocs.io/en/latest/1_exist_data_model.html#inference-with-existing-models)).
 
 4. Launch ML backend server:
 
