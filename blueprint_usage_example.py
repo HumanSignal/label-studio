@@ -2,6 +2,8 @@
 
     Run this demo flask app within Label Studio python environment:
     python blueprint_usage_example.py
+
+    And then go to http://localhost:5000/
 """
 import json
 from types import SimpleNamespace
