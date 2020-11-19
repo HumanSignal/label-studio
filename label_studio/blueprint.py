@@ -30,7 +30,7 @@ from inspect import currentframe, getframeinfo
 from gevent.pywsgi import WSGIServer
 from flask import (
     request, jsonify, make_response, Response, Response as HttpResponse,
-    send_file, session, redirect, current_app, Blueprint, g
+    send_file, session, redirect, current_app, Blueprint, url_for, g
 )
 from flask_api import status
 from types import SimpleNamespace
@@ -267,7 +267,7 @@ def labeling_page():
     """ Label stream for tasks
     """
     if g.project.no_tasks():
-        return redirect('welcome')
+        return redirect(url_for('label_studio.welcome_page'))
 
     # task data: load task or task with completions if it exists
     task_data = None
@@ -815,7 +815,7 @@ def api_project_switch():
     output = g.project.serialize()
     output['multi_session_mode'] = input_args.command == 'start-multi-session'
     if request.method == 'GET':
-        return redirect('../setup')
+        return redirect(url_for('label_studio.setup_page'))
     else:
         return make_response(jsonify(output), 200)
 

@@ -20,7 +20,7 @@ app = Flask('my-ml-platform',  static_url_path='')
 app.secret_key = 'some-secret-key'
 app.config['WTF_CSRF_ENABLED'] = False
 app.url_map.strict_slashes = False  # it's very important to disable this option
-app.register_blueprint(label_studio_blueprint, url_prefix='/label-studio')
+app.register_blueprint(label_studio_blueprint, url_prefix='/label-studio/')
 
 # check label_studio.utils.argparser to know all options: *_parser.add_argument(option_name, ...)
 input_args = {'project_name': 'my_project', 'command': 'start', 'root_dir': '.', 'force': False}
