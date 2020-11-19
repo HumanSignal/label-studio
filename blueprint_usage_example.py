@@ -1,14 +1,12 @@
 """ This is an example about how Label Studio could be included into your flask app as blueprint
 
-    1. Copy this file outside of LS repository to avoid incorrect `label_studio` module imports!
-
-    2. You need to initialize LS project in the same directory where this file is placed:
+    1. You need to initialize LS project in the same directory where this file is placed:
         > label-studio init my_project
 
-    3. Run this demo flask app within Label Studio python environment:
+    2. Run this demo flask app within Label Studio python environment:
         > python blueprint_usage_example.py
 
-    4. Go to http://localhost:5000/
+    3. Go to http://localhost:5000/
 """
 import json
 from types import SimpleNamespace
