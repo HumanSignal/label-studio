@@ -1,3 +1,8 @@
+""" This is example how Label Studio can be included into your flask app as blueprint
+
+    Run this demo flask app within Label Studio python environment:
+    python blueprint_usage_example.py 
+"""
 import json
 from types import SimpleNamespace
 from flask import Flask, make_response, g
