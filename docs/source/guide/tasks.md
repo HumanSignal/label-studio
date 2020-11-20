@@ -186,59 +186,8 @@ For label configs with one data key (e.g.: one input image) Label Studio support
 
 ## Import using API
 
-Use API to import tasks in [Label Studio basic format](tasks.html#Basic-format) if for any reason you can't access either a local filesystem nor Web UI (e.g. if you are creating a data stream)
+Import your data using server API. Check [API page](api.html) for more details.
 
-```bash
-curl -X POST -H Content-Type:application/json http://localhost:8080/api/import \
---data "[{\"my_key\": \"my_value_1\"}, {\"my_key\": \"my_value_2\"}]"
-```
-
-## Retrieve tasks using API
-
-You can retrieve project settings including total task count using API in JSON format: 
-
-```json   
-http://<host:port>/api/project
-```
-
-Response example: 
-
-```json
-{
-  ... 
-  "task_count": 3,
-  ...
-}
-```
-
-To get tasks with pagination in JSON format:
-
-```
-http://<host:port>/api/tasks?page=1&page_size=10&order={-}[id|completed_at]
-```
-
-Response example:
- 
-```json
-[
-  {
-    "completed_at": "2020-05-29 03:31:15", 
-    "completions": [
-      {
-        "created_at": 1590712275, 
-        "id": 10001, 
-        "lead_time": 4.0, 
-        "result": [ ... ]
-      }
-    ], 
-    "data": {
-      "image": "s3://htx-dev/dataset/training_set/dogs/dog.102.jpg"
-    }, 
-    "id": 2, 
-    "predictions": []
-  }
-]
-```
 
 ## Sampling
 
