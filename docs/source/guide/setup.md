@@ -143,23 +143,6 @@ label-studio my_new_project start --init --label-config config.xml
 You can also use the web interface at [`/setup`](http://localhost:8080/setup) to paste your labeling config. Using web UI you also get a live update while you're editting the config.
 
 
-
-### Setup labeling config from API
-
-Save labeling config for the project using API: 
-```
-curl -X POST -H Content-Type:application/json http://localhost:8080/api/project/config \
---data "{\"label_config\": \"<View>[...]</View>\"}"
-```
-
-The backend should return status 201 if config is valid and saved. 
-If errors occur the backend returns status 400 and response body will be JSON dict: 
-```
-{
-  "label_config": ["error 1 description", " error 2 description", ...]
-}
-```
-
 ## Sampling
 
 You can define the way of how your imported tasks are exposed to annotators. Several options are available. To enable one of them, specify `--sampling=<option>` as command line option.
@@ -179,3 +162,8 @@ Task with minimum average prediction score is taken. When this option is set, `t
 #### prediction-score-max
 
 Task with maximum average prediction score is taken. When this option is set, `task["predictions"]` list should be presented along with `"score"` field within each prediction.
+
+
+### Setup labeling config from API
+
+You can configure your labeling config via server API. Check [Backend API page](api.html) for more details.
