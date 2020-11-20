@@ -10,7 +10,7 @@ That gives you the opportunities to use:
 - **Pre-labeling**: Use model predictions for pre-labeling (e.g. make use of on-the-fly model predictions for creating rough image segmentations for further manual refinements)
 - **Autolabeling**: Create automatic annotations
 - **Online Learning**: Simultaneously update (retrain) your model while new annotations are coming
-- **Active Learning**: Perform labeling in active learning mode - select only the example models is uncertain about
+- **Active Learning**: Perform labeling in active learning mode - select examples model is uncertain about
 - **Prediction Service**: Instantly create running production-ready prediction service
 
 
@@ -21,7 +21,7 @@ That gives you the opportunities to use:
 - [Transfer learning for images with PyTorch](/tutorials/pytorch-image-transfer-learning.html)
 - [Image Object Detector](/tutorials/object-detector.html)
 
-#### Create your own ML backend
+#### Create ML backend
 
 Check examples in [`label-studio/ml/examples`](https://github.com/heartexlabs/label-studio/tree/master/label_studio/ml/examples) directory.
 
@@ -104,7 +104,7 @@ Then from `my-ml-backend/` directory run
 docker-compose up
 ```
 
-The server starts listening on port 9090, and you can connect it to Label Studio by specifying `--ml-backends http://localhost:9090` or via UI on **Model** page.
+The server starts listening on port 9090, and you can connect it to Label Studio by specifying `--ml-backends http://localhost:9090` or via UI on the **Model** page.
 
 ## Active Learning
 
