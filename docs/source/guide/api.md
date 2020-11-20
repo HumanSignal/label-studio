@@ -111,7 +111,7 @@ The `format` parameters could be found on Export page in the dropdown (JSON, JSO
 | /api/tasks/\<task_id>              | `GET` retrieve task <br> `DELETE` delete task  |
 | /api/tasks/\<task_id>/completions  | `POST` create a new completion <br> `DELETE` delete all task completions |
 | /api/tasks/\<task_id>/completions/\<completion_id> | `PATCH` update completion <br> `DELETE` delete completion |
-| /api/completions                  | `GET`: return all completion ids <br> `DELETE` delete all project completions |
+| /api/completions                  | `GET` return all completion ids <br> `DELETE` delete all project completions |
 | **Machine Learning Models** | 
 | /api/models                       | `GET` list all models <br> `DELETE` remove model with `name` field from request json body |  
 | /api/models/train                 | `POST` send training signal to ML backend | 
