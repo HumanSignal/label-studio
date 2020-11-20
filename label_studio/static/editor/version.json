@@ -1,6 +1,6 @@
 {
-  "message": "Support render to a particular DOM node",
-  "commit": "35fe53a96e27e9ced22106ab1d5e0734d7cd77b8",
+  "message": "Fix deserialization of tree view in Regions panel",
+  "commit": "57cbe6765b3aa0b59da23c39569d2a2abd9b59aa",
   "branch": "master",
-  "date": "2020-11-05T21:03:28Z"
+  "date": "2020-11-12T22:21:54Z"
 }

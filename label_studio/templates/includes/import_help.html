@@ -66,7 +66,7 @@
     <script>
       // add sample task to data manager
       function add_sample_task() {
-        const url = "api/import?sample_task=1";
+        const url = "api/project/import?sample_task=1";
         {% autoescape off %}
         const sample = '{{ project.generate_sample_task_escape }}';
         {% endautoescape %}
@@ -76,7 +76,7 @@
             console.log(e)
           })
           .done(function () {
-            window.location = "/tasks"
+            window.location = "tasks"
           })
       }
     </script>

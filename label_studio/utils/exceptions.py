@@ -25,3 +25,7 @@ class ValidationError(Exception):
 
     def msg_to_list(self):
         return [d.msg for d in self.detail]
+
+
+class LabelStudioError(Exception):
+    pass

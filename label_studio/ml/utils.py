@@ -3,8 +3,20 @@ import importlib.util
 import inspect
 import os
 import sys
+import urllib
+import hashlib
+import requests
+import logging
+import io
+
+from urllib.parse import urlparse
+from PIL import Image
 
 from .model import LabelStudioMLBase
+from label_studio.utils.io import get_cache_dir
+
+
+logger = logging.getLogger(__name__)
 
 
 def get_all_classes_inherited_LabelStudioMLBase(script_file):
@@ -46,8 +58,36 @@ def get_single_tag_keys(parsed_label_config, control_type, object_type):
 def is_skipped(completion):
     if len(completion['completions']) != 1:
         return False
-    return completion['completions'][0].get('skipped', False)
+    completion = completion['completions'][0]
+    return completion.get('skipped', False) or completion.get('was_cancelled', False)
 
 
 def get_choice(completion):
     return completion['completions'][0]['result'][0]['value']['choices'][0]
+
+
+def get_image_local_path(url, image_cache_dir=None):
+    is_local_file = url.startswith('/data')
+    if is_local_file:
+        filename, dir_path = url.split('/data/')[1].split('?d=')
+        dir_path = str(urllib.parse.unquote(dir_path))
+        filepath = os.path.join(dir_path, filename)
+        if not os.path.exists(filepath):
+            raise FileNotFoundError(filepath)
+    else:
+        image_cache_dir = image_cache_dir or get_cache_dir()
+        parsed_url = urlparse(url)
+        url_filename = os.path.basename(parsed_url.path)
+        url_hash = hashlib.md5(url.encode()).hexdigest()[:6]
+        filepath = os.path.join(image_cache_dir, url_hash + '__' + url_filename)
+        if not os.path.exists(filepath):
+            logger.info('Download {url} to {filepath}'.format(url=url, filepath=filepath))
+            r = requests.get(url, stream=True)
+            r.raise_for_status()
+            with io.open(filepath, mode='wb') as fout:
+                fout.write(r.content)
+    return filepath
+
+
+def get_image_size(filepath):
+    return Image.open(filepath).size

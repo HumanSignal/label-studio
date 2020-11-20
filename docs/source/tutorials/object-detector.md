@@ -1,0 +1,1 @@
+../../../label_studio/ml/examples/mmdetection/README.md

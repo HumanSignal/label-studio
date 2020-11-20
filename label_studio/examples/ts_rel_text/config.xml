@@ -19,7 +19,7 @@
         <Label value="Success" background="orange"/>
     </Labels>
 
-    <Text name="logger" value="$event"/>
+    <Text name="logger" value="$event" valueType="text"/>
 
     <!-- Time series setup -->
     <Header value="Mark regions in time series" size="6"/>

@@ -21,7 +21,7 @@ from label_studio.utils.models import ProjectObj, MLBackend
 from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.io import find_file, delete_dir_content, json_load
 from label_studio.utils.validation import is_url
-from label_studio.utils.functions import get_full_hostname
+from label_studio.utils.functions import get_external_hostname
 from label_studio.tasks import Tasks
 from label_studio.storage import create_storage, get_available_storage_names
 
@@ -78,7 +78,6 @@ class Project(object):
         self.target_storage = None
         self.create_storages()
 
-        self.tasks = None
         self.label_config_line, self.label_config_full, self.parsed_label_config, self.input_data_tags = None, None, None, None  # noqa
         self.derived_input_schema, self.derived_output_schema = None, None
 
@@ -464,7 +463,7 @@ class Project(object):
 
     def remove_task(self, task_id):
         self.source_storage.remove(task_id)
-        self.delete_completion(task_id)
+        self.delete_task_completions(task_id)
 
         self.update_derived_input_schema()
         self.update_derived_output_schema()
@@ -496,8 +495,8 @@ class Project(object):
                 times[id] = 'undefined'
         return times
 
-    def get_skipped_status(self):
-        """ Get skipped status for tasks: returns skipped completion number for task
+    def get_cancelled_status(self):
+        """ Get was_cancelled (skipped) status for tasks: returns cancelled completion number for task
 
         :return: list of int
         """
@@ -505,7 +504,9 @@ class Project(object):
         for _, data in self.target_storage.items():
             id = data['id']
             try:
-                flag = sum([completion.get('skipped', False) for completion in data['completions']])
+                # note: skipped will be deprecated
+                flag = sum([completion.get('skipped', False) or completion.get('was_cancelled', False)
+                            for completion in data['completions']])
             except Exception as exc:
                 items[id] = -1
             else:
@@ -568,13 +569,34 @@ class Project(object):
 
         # write task + completions to file
         self.target_storage.set(task_id, task)
-        logger.debug('Completion ' + str(task_id) + ' saved:\n' + json.dumps(task, indent=2))
+        logger.debug('Completion for task ' + str(task_id) + ' saved with id =' + str(completion['id']))
         return completion['id']
 
-    def delete_completion(self, task_id):
-        """ Delete completion
+    def delete_task_completion(self, task_id, completion_id):
+        """ Delete one task completion by id
+        """
+        # try to get completions with task first
+        task = self.get_task_with_completions(task_id)
 
-        :param task_id: task id
+        if not task:
+            return False
+        else:
+            task = deepcopy(task)
+
+        # remove completion from task
+        for i, item in enumerate(task['completions']):
+            if item['id'] == completion_id:
+                del task['completions'][i]
+
+        self.update_derived_output_schema()
+
+        # write task + completions to file
+        self.target_storage.set(task_id, task)
+        logger.debug('Completion ' + str(completion_id) + ' removed:\n')
+        return True
+
+    def delete_task_completions(self, task_id):
+        """ Delete all task completions
         """
         self.target_storage.remove(task_id)
         self.update_derived_output_schema()
@@ -910,20 +932,20 @@ class Project(object):
     def serialize(self):
         """ Serialize project to json dict
         """
-        project = self
-        banlist = ('json', 'dir-jsons')
-        available_storages = list(filter(lambda i: i[0] not in banlist, get_available_storage_names().items()))
+        ban_list = ('json', 'dir-jsons')
+        available_storages = list(filter(lambda i: i[0] not in ban_list, get_available_storage_names().items()))
 
         output = {
-            'project_name': project.name,
-            'task_count': len(project.source_storage.ids()),
-            'completion_count': len(project.get_completions_ids()),
-            'config': project.config,
-            'can_manage_tasks': project.can_manage_tasks,
-            'can_manage_completions': project.can_manage_completions,
-            'can_delete_tasks': project.can_delete_tasks,
-            'target_storage': {'readable_path': project.target_storage.readable_path},
-            'source_storage': {'readable_path': project.source_storage.readable_path},
+            'project_name': self.name,
+            'task_count': len(self.source_storage.ids()),
+            'completion_count': len(self.get_completions_ids()),
+            'config': self.config,
+            'instruction': self.config['instruction'],
+            'can_manage_tasks': self.can_manage_tasks,
+            'can_manage_completions': self.can_manage_completions,
+            'can_delete_tasks': self.can_delete_tasks,
+            'target_storage': {'readable_path': self.target_storage.readable_path},
+            'source_storage': {'readable_path': self.source_storage.readable_path},
             'available_storages': available_storages,
             'source_syncing': self.source_storage.is_syncing,
             'target_syncing': self.target_storage.is_syncing,

@@ -34,7 +34,9 @@
                 </span>
                 <span class="label">Tasks</span>
                 <span class="sub-label">
-                  <i class="word-break" v-if="project.multi_session_mode">{{ project.source_storage.readable_path }}</i>
+                  <i class="word-break" v-if="project.multi_session_mode"
+                     :data-tippy-content="project.source_storage.readable_path">{{
+                    get_short_text(project.source_storage.readable_path) }}</i>
                   <span data-tooltip="Source storage sync in progress">
                     <i class="ui loader loading active inline mini" v-if="project.source_syncing"></i>
                   </span>
@@ -73,7 +75,10 @@
                 </span>
                 <span class="label">Completions</span>
                 <span class="sub-label">
-                  <i class="word-break" v-if="project.multi_session_mode">{{ project.target_storage.readable_path }}</i>
+                  <i class="word-break" v-if="project.multi_session_mode"
+                     :data-tippy-content="project.target_storage.readable_path"
+                  >{{
+                    get_short_text(project.target_storage.readable_path) }}</i>
                   <span data-tooltip="Target storage sync in progress">
                     <i class="ui loader loading active inline mini" v-if="project.target_syncing"></i>
                   </span>
@@ -167,10 +172,10 @@
                   <i class="fas"
                      :class="{'fa-sort-up': this.order=='completed_at', 'fa-sort-down': this.order=='-completed_at'}"></i>
                 </th>
-                <th class="order" @click="changeOrder('has_skipped_completions')" v-if="columns.includes('skipped')">
-                  Skipped
+                <th class="order" @click="changeOrder('has_cancelled_completions')" v-if="columns.includes('was_cancelled')">
+                  <span data-tippy-content="Skipped = was cancelled">Cancelled</span>
                   <i class="fas"
-                     :class="{'fa-sort-up': this.order=='has_skipped_completions', 'fa-sort-down': this.order=='-has_skipped_completions'}"></i>
+                     :class="{'fa-sort-up': this.order=='has_cancelled_completions', 'fa-sort-down': this.order=='-has_cancelled_completions'}"></i>
                 </th>
                 <th v-if="columns.includes('actions')">
                   Actions
@@ -221,16 +226,16 @@
                 <td v-if="columns.includes('completed_at')">
                   {{ task.completed_at }}
                 </td>
-                <!-- Skipped -->
-                <td v-if="columns.includes('skipped')">
-                  <i class="ui icon forward grey" v-if="task.has_skipped_completions"></i>
+                <!-- Was cancelled (skipped) -->
+                <td v-if="columns.includes('was_cancelled')">
+                  <i class="ui icon forward grey" v-if="task.has_cancelled_completions"></i>
                 </td>
                 <!-- Actions -->
                 <td class="text-center" v-if="columns.includes('actions')" @click.stop="/* stop click propagation */">
                   <div class="actions-card">
                     <!-- Show task code -->
                     <span data-tooltip="Show task data" class="action-button">
-                      <i @click.stop="window.open('api/tasks/' + task.id)" class="icon code" style="opacity: 0.75"></i>
+                      <i @click.stop="window.open('api/tasks/' + task.id + '/?pretty=1')" class="icon code" style="opacity: 0.75"></i>
                     </span>
                     <!-- Delete task -->
                     <span v-if="project.can_delete_tasks" class="action-button">
@@ -525,8 +530,8 @@
           error: null,
 
           // quick task preview
-          all_columns: ['id', 'completed_at', 'skipped', 'actions', 'previews', 'audio_urls', 'image_urls'],
-          full_columns: JSON.parse(Cookies.get('full_columns', '["id", "completed_at", "skipped", "actions", "previews"]')),
+          all_columns: ['id', 'completed_at', 'was_cancelled', 'actions', 'previews', 'audio_urls', 'image_urls'],
+          full_columns: JSON.parse(Cookies.get('full_columns', '["id", "completed_at", "was_cancelled", "actions", "previews"]')),
           quick_columns: JSON.parse(Cookies.get('quick_columns', '["id"]')),
           quick_view: false,
           quick_view_show_table: true,
@@ -759,7 +764,7 @@
           task.processing = true;
           this.$forceUpdate();
           var request = new XMLHttpRequest();
-          request.open("DELETE", "api/tasks/" + task.id + "/completions/" + completion.id + "/", true);
+          request.open("DELETE", "api/tasks/" + task.id + "/completions", true);
           request.onload = this.loadProjectAndTasks;
           request.send();
         },
@@ -781,7 +786,7 @@
             'Warning! this operation cannot be undone.\nPlease confirm your action.');
           if (deletion_confirmed) {
             var request = new XMLHttpRequest();
-            request.open("DELETE", "api/tasks/delete", true);
+            request.open("DELETE", "api/tasks", true);
             request.onload = this.loadProjectAndTasks;
             request.send();
           }
@@ -794,7 +799,7 @@
             'Warning! this operation cannot be undone.\nPlease confirm your action.');
           if (deletion_confirmed) {
             var request = new XMLHttpRequest();
-            request.open("DELETE", "api/project/completions", true);
+            request.open("DELETE", "api/completions", true);
             request.onload = this.loadProjectAndTasks;
             request.send();
           }
@@ -871,7 +876,9 @@
               self.labelStudio._sdk.loadTask(task.id, 'auto');
             } else {
               // init new instance
-              self.labelStudio = LSF_SDK("label-studio", self.project.label_config_line, task, true);
+              self.labelStudio = LSF_SDK("label-studio", self.project.label_config_line, task, true,
+                                         self.project.instruction);
+              self.labelStudio._sdk.loadTask(task.id, 'auto');
             }
           }, 100);
         },
@@ -1002,6 +1009,11 @@
         text_preview: function(text) {
           return text.slice(0, this.text_preview_limit) +
             (text.length <= this.text_preview_limit ? '': ' ...');
+        },
+
+        get_short_text: function(text) {
+          const max_len = 40;
+          return (text.length <= max_len ? text: ('...' + text.slice(text.length-max_len, text.length)));
         }
       },
 
@@ -1058,6 +1070,12 @@
           if (index >= 0) {
             array.splice(index, 1);
             array.push('previews')
+          }
+          // replace deprecated version 'skipped'
+          var index = array.indexOf('skipped');
+          if (index >= 0) {
+            array.splice(index, 1);
+            array.push('was_cancelled')
           }
         }
         remove_deprecated_others(this.full_columns);

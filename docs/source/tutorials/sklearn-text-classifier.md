@@ -195,5 +195,5 @@ You should see model predictions in a labeling interface.
 Model training is triggered manually by pushing `Start training` button on [/model](http://localhost:8080/model) page, or by using an API call:
 
 ```bash
-curl -X POST http://localhost:8080/api/train
+curl -X POST http://localhost:8080/api/models/train
 ```

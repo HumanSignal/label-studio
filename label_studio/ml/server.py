@@ -2,11 +2,14 @@ import os
 import logging
 import argparse
 import shutil
+import colorama
 
+from colorama import Fore
 from label_studio.utils.io import find_dir
 from label_studio.ml.utils import get_all_classes_inherited_LabelStudioMLBase
 
 
+colorama.init()
 logger = logging.getLogger(__name__)
 
 
@@ -27,7 +30,7 @@ def get_args():
         'project_name',
         help='Path to directory where project state will be initialized')
     parser_init.add_argument(
-        '--script', dest='script',
+        '--script', '--from', dest='script',
         help='Machine learning script of the following format: /my/script/path:ModelClass')
     parser_init.add_argument(
         '--force', dest='force', action='store_true',
@@ -44,6 +47,7 @@ def get_args():
 
 
 def create_dir(args):
+
     output_dir = os.path.join(args.root_dir, args.project_name)
     if os.path.exists(output_dir) and args.force:
         shutil.rmtree(output_dir)
@@ -74,9 +78,15 @@ def create_dir(args):
     if not os.path.exists(script_path):
         raise FileNotFoundError(script_path)
 
+    def use(filename):
+        filepath = os.path.join(os.path.dirname(script_path), filename)
+        if os.path.exists(filepath):
+            shutil.copy2(filepath, output_dir)
+
     script_base_name = os.path.basename(script_path)
-    local_script_path = os.path.join(output_dir, os.path.basename(script_path))
-    shutil.copy2(script_path, local_script_path)
+    use(script_base_name)
+    use('requirements.txt')
+    use('README.md')
 
     wsgi_script_file = os.path.join(default_configs_dir, '_wsgi.py.tmpl')
     with open(wsgi_script_file) as f:
@@ -88,6 +98,9 @@ def create_dir(args):
     wsgi_name = os.path.basename(wsgi_script_file).split('.tmpl', 1)[0]
     with open(os.path.join(output_dir, wsgi_name), mode='w') as fout:
         fout.write(wsgi_script)
+
+    print(Fore.GREEN + 'Congratulations! ML Backend has been successfully initialized in ' + output_dir)
+    print(Fore.RESET + 'Now start it by using:\n' + Fore.CYAN + 'label-studio-ml start ' + output_dir)
 
 
 def start_server(args, subprocess_params):

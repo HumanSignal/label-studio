@@ -3,6 +3,7 @@
 import os
 import io
 import csv
+import ssl
 import hashlib
 import shutil
 import zipfile
@@ -22,7 +23,7 @@ from collections import Counter
 
 from .exceptions import ValidationError
 from .misc import Settings
-from label_studio.utils.functions import get_full_hostname
+from label_studio.utils.functions import get_external_hostname
 
 
 settings = Settings
@@ -86,7 +87,7 @@ def tasks_from_file(filename, file, project):
             open(path, 'wb').write(data)
             # prepare task
 
-            path = get_full_hostname() + '/data/upload/' + filename
+            path = get_external_hostname() + '/data/upload/' + filename
             tasks = [{'data': {settings.UPLOAD_DATA_UNDEFINED_NAME: path}}]
             file_format = os.path.splitext(filename)[-1]
 
@@ -224,8 +225,12 @@ def load_tasks(request, project, temp_dir):
     # take tasks from url address
     elif 'application/x-www-form-urlencoded' in request.content_type:
         try:
+            ctx = ssl.create_default_context()
+            ctx.check_hostname = False
+            ctx.verify_mode = ssl.CERT_NONE
+
             url = request.data['url']
-            with urlopen(url) as file:
+            with urlopen(url, context=ctx) as file:
                 # check size
                 meta = file.info()
                 file.size = int(meta.get("Content-Length"))

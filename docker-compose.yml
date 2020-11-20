@@ -8,6 +8,6 @@ services:
     volumes:
       - ./my_project:/label-studio/my_project
     command: "label-studio start my_project ${INIT_COMMAND} --host 0.0.0.0"
-    ports: 
+    ports:
       - "8080:8080"
     restart: always
