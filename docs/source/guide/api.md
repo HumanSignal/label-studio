@@ -4,10 +4,11 @@ type: guide
 order: 907
 ---
 
-> These API endpoints become actual starting from Label Studio version 0.8.1. 
+> These API endpoints were introduced in Label Studio version 0.8.1. Subject to change before version 1.0.0
 
+### Setup project configuration
 
-### Setup labeling config
+`POST /api/project/config`
 
 Save labeling config for the project using API: 
 ```
@@ -15,31 +16,33 @@ curl -X POST -H Content-Type:application/json http://localhost:8080/api/project/
 --data "{\"label_config\": \"<View>[...]</View>\"}"
 ```
 
-The backend should return status 201 if config is valid and saved. 
-If errors occur the backend returns status 400 and response body will be JSON dict: 
+The backend should return status 201 if the config is valid and saved. 
+If errors occur the backend returns status 400 and the response body will be JSON dict: 
 ```
 {
   "label_config": ["error 1 description", " error 2 description", ...]
 }
 ```
 
-
 ### Import data and tasks 
 
-Use API to import tasks in [Label Studio basic format](tasks.html#Basic-format) if for any reason you can't access either a local filesystem nor Web UI (e.g. if you are creating a data stream)
+`POST /api/project/import`
+
+Use API to import tasks in [Label Studio basic format](tasks.html#Basic-format) useful when you are creating a data stream.
 
 ```bash
 curl -X POST -H Content-Type:application/json http://localhost:8080/api/project/import \
 --data "[{\"my_key\": \"my_value_1\"}, {\"my_key\": \"my_value_2\"}]"
 ```
 
+### Retrieve project
 
-### Retrieve tasks
+`GET /api/project`
 
 You can retrieve project settings including total task count using API in JSON format: 
 
-```json   
-http://<host:port>/api/project/export
+```json
+curl http://localhost:8080/api/project/
 ```
 
 Response example: 
@@ -52,10 +55,14 @@ Response example:
 }
 ```
 
+### Retrieve tasks
+
+`GET /api/tasks`
+
 To get tasks with pagination in JSON format:
 
 ```
-http://<host:port>/api/tasks?page=1&page_size=10&order={-}[id|completed_at]
+curl http://localhost:8080/api/tasks?page=1&page_size=10&order=-completed_at
 ```
 
 Response example:
@@ -81,37 +88,39 @@ Response example:
 ]
 ```
 
+`order` can be either one of `id`, `-id`, `completed_at`, `-completed_at`
 
 ### Export annotations
 
-You can use an API to request a file with exported results, e.g.
+`GET /api/project/export`
+
+You can use an API to request a file with all annotations, e.g.
 
 ```bash
-curl http://localhost:8080/api/project/export?format=JSON > exported_results.zip
+curl http://localhost:8080/api/project/export?format=JSON > exported_results.json
 ```
 
-The formats description are presented [above](#Export-formats). 
-The `format` parameters could be found on Export page in the dropdown (JSON, JSON_MIN, COCO, VOC, etc).
+The formats descriptions are presented [above](#Export-formats). 
+The `format` parameters could be found on the Export page in the dropdown (`JSON`, `JSON_MIN`, `COCO`, `VOC`, etc).
 
-
-### All endpoints
+### Reference
 
 | URL | Description |
 | --- | --- |
 | **Project** |
 | /api/project                      | `GET` return project settings and states (like task and completion counters) <br> `POST` create a new project for multi-session-mode with `desc` field from request args as project title <br> `PATCH` update project settings |
-| /api/project/config               | `POST` save labeling config |
-| /api/project/import               | `POST` import data or tasks |
-| /api/project/export               | `GET` generate export file with `format` field |
-| /api/project/next                 | `GET` generate the next task for labeling stream |
+| /api/project/config               | `POST` save project configuration (labeling config, etc) |
+| /api/project/import               | `POST` import data or annotations |
+| /api/project/export               | `GET` downalod annotations, pass `format` param to specify the format |
+| /api/project/next                 | `GET` return next task available for labeling |
 | /api/project/storage-settings     | `GET` current storage settings <br> `POST` set storage settings |
 | /api/project-switch               | `GET` switch to specified project by project UUID in multi-session mode |
 | **Tasks** |
 | /api/tasks                        | `GET` retrieve all tasks from project <br> `DELETE` delete all tasks from project |
-| /api/tasks/\<task_id>              | `GET` retrieve task <br> `DELETE` delete task  |
+| /api/tasks/\<task_id>              | `GET` retrieve specific task <br> `DELETE` delete specific task  |
 | /api/tasks/\<task_id>/completions  | `POST` create a new completion <br> `DELETE` delete all task completions |
 | /api/tasks/\<task_id>/completions/\<completion_id> | `PATCH` update completion <br> `DELETE` delete completion |
-| /api/completions                  | `GET`: return all completion ids <br> `DELETE` delete all project completions |
+| /api/completions                  | `GET` returns all completion ids <br> `DELETE` delete all project completions |
 | **Machine Learning Models** | 
 | /api/models                       | `GET` list all models <br> `DELETE` remove model with `name` field from request json body |  
 | /api/models/train                 | `POST` send training signal to ML backend | 
