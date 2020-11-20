@@ -112,10 +112,10 @@ The `format` parameters could be found on Export page in the dropdown (JSON, JSO
 | **Machine Learning Models** | 
 | /api/models                       | `GET` list all models <br> `DELETE` remove model with `name` field from request json body |  
 | /api/models/train                 | `POST` send training signal to ML backend | 
-| /api/models/predictions?mode={data\|all_tasks} | `GET \| POST`<br> `mode=data`: generate ML model predictions for one task from `data` field of request json body<br> `mode=all_tasks` generate ML model predictions for all loaded tasks from LS DB | 
+| /api/models/predictions?mode={data\|all_tasks} | `GET \| POST`<br> `mode=data`: generate ML model predictions for one task from `data` field of request json body<br> `mode=all_tasks`: generate ML model predictions for all LS DB tasks | 
 | **Helpers** |
 | /api/validate-config              | `POST` check labeling config for errors |
 | /api/import-example               | `GET \| POST` generate example for import by given labeling config |
-| /api/import-example-file          | `GET` generate example file for import using project labeling config | 
+| /api/import-example-file          | `GET` generate example file for import using current project labeling config | 
 | /api/health                       | `GET` health check |
 | /version                          | `GET` current Label Studio Backend and Frontend versions |
