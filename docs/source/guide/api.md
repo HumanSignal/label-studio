@@ -100,14 +100,14 @@ The `format` parameters could be found on Export page in the dropdown (JSON, JSO
 | /api/project/config               | `POST` save labeling config |
 | /api/project/import               | `POST` import data or tasks |
 | /api/project/export               | `GET` generate export file with `format` field |
-| /api/project/next GET             | `GET` generate the next task for labeling stream |
+| /api/project/next                 | `GET` generate the next task for labeling stream |
 | /api/project/storage-settings     | `GET` current storage settings <br> `POST` set storage settings |
 | /api/project-switch               | `GET` switch to specified project by project UUID in multi-session mode |
 | **Tasks** |
 | /api/tasks                        | `GET` retrieve all tasks from project <br> `DELETE` delete all tasks from project |
-| /api/tasks/<task_id>              | `GET` retrieve task <br> `DELETE` delete task  |
-| /api/tasks/<task_id>/completions  | `POST` create a new completion <br> `DELETE` delete all task completions |
-| /api/tasks/<task_id>/completions/<completion_id> | `PATCH` update completion <br> `DELETE` delete completion |
+| /api/tasks/\<task_id>              | `GET` retrieve task <br> `DELETE` delete task  |
+| /api/tasks/\<task_id>/completions  | `POST` create a new completion <br> `DELETE` delete all task completions |
+| /api/tasks/\<task_id>/completions/\<completion_id> | `PATCH` update completion <br> `DELETE` delete completion |
 | /api/completions                  | `GET`: return all completion ids <br> `DELETE` delete all project completions |
 | **Machine Learning Models** | 
 | /api/models                       | `GET` list all models <br> `DELETE` remove model with `name` field from request json body |  
