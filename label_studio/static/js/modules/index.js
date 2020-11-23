@@ -26,10 +26,13 @@ if (dmRoot) {
         annotations: "/project/tabs/:tabID/annotations",
 
         task: "/tasks/:taskID",
-        skipTask: "/tasks/:taskID/completions",
         nextTask: "/project/next",
 
         completion: "/tasks/:taskID/completions/:id",
+        skipTask: {
+          path: "/tasks/:taskID/completions",
+          method: "post",
+        },
         submitCompletion: {
           path: "/tasks/:taskID/completions",
           method: "post",

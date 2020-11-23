@@ -20,6 +20,15 @@ TASKS = 'tasks:'
 class DataManagerException(Exception):
     pass
 
+def column_type(key):
+    if key == 'image':
+        return 'Image'
+    elif key == 'audio':
+        return 'Audio'
+    elif key == 'audioplus':
+        return 'AudioPlus'
+    else:
+        return 'String'
 
 def make_columns(project):
     """ Make columns info for the frontend data manager
@@ -32,7 +41,7 @@ def make_columns(project):
         column = {
             'id': key,
             'title': key,
-            'type': 'Image' if key == 'image' else 'String',  # data_type,
+            'type': column_type(key), # data_type,
             'target': 'tasks',
             'parent': 'data',
             'orderable': False
