@@ -26,10 +26,11 @@ with io.open(os.path.join(os.path.dirname(__file__), 'logger.json')) as f:
 from uuid import uuid4
 from urllib.parse import unquote
 from datetime import datetime
+from inspect import currentframe, getframeinfo
 from gevent.pywsgi import WSGIServer
 from flask import (
     request, jsonify, make_response, Response, Response as HttpResponse,
-    send_file, session, redirect, current_app, Blueprint, g
+    send_file, session, redirect, current_app, Blueprint, url_for, g
 )
 from flask_api import status
 from types import SimpleNamespace
@@ -79,7 +80,7 @@ def config_from_file():
     try:
         config_file = INPUT_ARGUMENTS_PATH.open(encoding='utf8')
     except OSError:
-        raise LabelStudioError("Can't open input_args file: " + str(INPUT_ARGUMENTS_PATH) + ", "
+        raise LabelStudioError("Can't open input_args file: " + str(INPUT_ARGUMENTS_PATH) + ", " 
                                "use set_input_arguments_path() to setup it")
 
     with config_file:
@@ -256,7 +257,7 @@ def samples_time_series():
     # generate all columns for headless csv
     if not header:
         max_column_n = max([int(v) for v in value_columns] + [0])
-        value_columns = range(1, max_column_n + 1)
+        value_columns = range(1, max_column_n+1)
 
     ts = generate_time_series_json(time_column, value_columns, time_format)
     csv_data = pd.DataFrame.from_dict(ts).to_csv(index=False, header=header, sep=separator).encode('utf-8')
@@ -279,7 +280,7 @@ def labeling_page():
     """ Label stream for tasks
     """
     if g.project.no_tasks():
-        return redirect('welcome')
+        return redirect(url_for('label_studio.welcome_page'))
 
     # task data: load task or task with completions if it exists
     task_data = None
@@ -630,11 +631,9 @@ def api_import():
         * files (as web form, files will be hosted by this flask server)
         * url links to images, audio, csv (if you use TimeSeries in labeling config)
     """
-
     # make django compatibility for uploader module
     class DjangoRequest:
         def __init__(self): pass
-
         POST = request.form
         GET = request.args
         FILES = request.files
@@ -702,8 +701,8 @@ def api_export():
     shutil.make_archive(zip_dir, 'zip', zip_dir)
     shutil.rmtree(zip_dir)
 
-    response = send_file(zip_dir + '.zip', as_attachment=True)
-    response.headers['filename'] = os.path.basename(zip_dir + '.zip')
+    response = send_file(zip_dir+'.zip', as_attachment=True)
+    response.headers['filename'] = os.path.basename(zip_dir+'.zip')
     return response
 
 
@@ -812,7 +811,7 @@ def api_project_switch():
     output = g.project.serialize()
     output['multi_session_mode'] = input_args.command == 'start-multi-session'
     if request.method == 'GET':
-        return redirect('../setup')
+        return redirect(url_for('label_studio.setup_page'))
     else:
         return make_response(jsonify(output), 200)
 
@@ -909,7 +908,7 @@ def api_tasks_completions(task_id):
             return make_response({'detail': 'Completion removing is not allowed in server config'}, 422)
 
 
-@blueprint.route('/api/tasks/<task_id>/completions/<completion_id>', methods=['PATCH', 'DELETE', 'POST'])
+@blueprint.route('/api/tasks/<task_id>/completions/<completion_id>', methods=['PATCH', 'DELETE'])
 @requires_auth
 @exception_handler
 def api_completion_by_id(task_id, completion_id):
@@ -1104,7 +1103,7 @@ def main():
 
         # set username and password
         label_studio.utils.auth.USERNAME = input_args.username or \
-                                           config.get('username') or label_studio.utils.auth.USERNAME
+            config.get('username') or label_studio.utils.auth.USERNAME
         label_studio.utils.auth.PASSWORD = input_args.password or config.get('password', '')
 
         # set host name

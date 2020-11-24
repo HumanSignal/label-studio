@@ -7,10 +7,10 @@ order: 906
 You can easily connect your favorite machine learning framework with Label Studio Machine Learning SDK. 
 
 That gives you the opportunities to use:
-- **Pre-labeling**: Use model predictions for pre-labeling (e.g. make use on-the-fly model predictions for creating rough image segmentations for further manual refinements)
+- **Pre-labeling**: Use model predictions for pre-labeling (e.g. make use of on-the-fly model predictions for creating rough image segmentations for further manual refinements)
 - **Autolabeling**: Create automatic annotations
 - **Online Learning**: Simultaneously update (retrain) your model while new annotations are coming
-- **Active Learning**: Perform labeling in active learning mode - select only most complex examples
+- **Active Learning**: Perform labeling in active learning mode - select examples model is uncertain about
 - **Prediction Service**: Instantly create running production-ready prediction service
 
 
@@ -21,7 +21,7 @@ That gives you the opportunities to use:
 - [Transfer learning for images with PyTorch](/tutorials/pytorch-image-transfer-learning.html)
 - [Image Object Detector](/tutorials/object-detector.html)
 
-#### Create your own ML backend
+#### Create ML backend
 
 Check examples in [`label-studio/ml/examples`](https://github.com/heartexlabs/label-studio/tree/master/label_studio/ml/examples) directory.
 
@@ -56,8 +56,8 @@ Here is a quick example tutorial on how to run the ML backend with a simple text
     ```bash
     label-studio start text_classification_project --init --template text_sentiment --ml-backends http://localhost:9090
     ```
-    You can confirm that the model has connected properly from the `/model` subpage in the Label Studio UI.
-    
+    To confirm that the model was properly connected go to `/model` page in the Label Studio webapp.
+
 ### Getting predictions
 
    You should see model predictions in the labeling interface and Tasks page (/tasks). For example in an image classification task: the model will pre-select an image class for you to verify.
@@ -76,13 +76,11 @@ Here is a quick example tutorial on how to run the ML backend with a simple text
    ```
    curl -X POST http://localhost:8080/api/models/train
    ```
-   In development mode, training logs will have an output into the console. In production mode, runtime logs are available in    
+   In development mode, training logs show up in the console. In production mode, runtime logs are available in    
    `my_backend/logs/uwsgi.log` and RQ training logs in `my_backend/logs/rq.log`
    
 ## Start with docker compose
-
-Label Studio ML scripts include everything you need to create production ready ML backend server, powered by docker. It uses [uWSGI](https://uwsgi-docs.readthedocs.io/en/latest/) + [supervisord](http://supervisord.org/) stack, and handles background training jobs using [RQ](https://python-rq.org/).
-
+Label Studio ML scripts include everything you need to create a production ready ML backend server, powered by docker. It uses [uWSGI](https://uwsgi-docs.readthedocs.io/en/latest/) + [supervisord](http://supervisord.org/) stack, and handles background training jobs using [RQ](https://python-rq.org/).
 After running this command:
 
 ```bash
@@ -106,9 +104,8 @@ Then from `my-ml-backend/` directory run
 docker-compose up
 ```
 
-The server starts listening on port 9090, and you can connect it to Label Studio by specifying `--ml-backends http://localhost:9090`
- or via UI on **Model** page.
- 
+The server starts listening on port 9090, and you can connect it to Label Studio by specifying `--ml-backends http://localhost:9090` or via UI on the **Model** page.
+
 ## Active Learning
 
 The process of creating annotated training data for supervised machine learning models is often expensive and time-consuming. Active Learning is a branch of machine learning that **seeks to minimize the total amount of data required for labeling by strategically sampling observations** that provide new insight into the problem. In particular, Active Learning algorithms seek to select diverse and informative data for annotation (rather than random observations) from a pool of unlabeled data using **prediction scores**. 
@@ -118,7 +115,7 @@ Depending on score types you can select a sampling strategy
 * prediction-score-max (max is the best score)
  
 Read more about active learning sampling [on the task page](https://labelstud.io/guide/tasks.html#Sampling). 
-
+ 
 
 ## Troubleshooting
 
@@ -130,17 +127,16 @@ Note that since you run ML backend as a separate server, you have to check its l
 > - main process / inference logs: logs/uwsgi.log
 > - training logs: logs/rq.log
 
-**I've launched ML backend, but after adding it in Label Studio's UI it results to _Disconnected_ state.**
+**I've launched ML backend, but after adding it in Label Studio's UI it results in a _Disconnected_ state.**
 
 Perhaps your ML backend server didn't start properly. Try to do healthcheck via `curl -X GET http://localhost:9090/health`. 
-If it doesn't respond or you see any errors, check server logs. When you're using docker-compose for starting ML backend, one common cause of errors is missed `requirements.txt` to set up environment inside docker.
+If it doesn't respond or you see any errors, check server logs. When you're using docker-compose for starting ML backend, one common cause of errors is missed `requirements.txt` to set up the environment inside docker.
 
 **ML backend seems to be connected, but after I press "Start Training", I see "Error. Click here for details." message.**
 
-Check for the traceback after you click on error message. Some common errors are insufficient amount of annotations made or memory issues.
+Check for the traceback after you click on the error message. Some common errors are an insufficient amount of annotations made or memory issues.
 If you can't resolve them by yourself, <a href="https://join.slack.com/t/label-studio/shared_invite/zt-cr8b7ygm-6L45z7biEBw4HXa5A2b5pw">write us on Slack</a>.
 
-**My predictions are wrong / I can't see the model prediction result on labeling page**
+**My predictions are wrong / I can't see the model prediction result on the labeling page**
 
-ML backend predictions format follows exactly the same structure as [predictions in imported preannotations](/guide/tasks.html#How-to-import-preannotations)
-
+ML backend predictions format follows the same structure as [predictions in imported preannotations](/guide/tasks.html#How-to-import-preannotations)

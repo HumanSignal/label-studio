@@ -105,19 +105,21 @@ If you want to build a local image, run:
 docker build -t heartexlabs/label-studio:latest .
 ```
 
-## Using docker-compose
+## Run docker-compose
 
 You can also start serving at `http://localhost:8080` using docker-compose.
 
-### First time to run the app
+**First time to run the app**
 ```bash
 INIT_COMMAND='--init' docker-compose up -d
 ```
-### Run the app with existing project data
+
+**Run the app with existing project data**
 ```bash
 docker-compose up -d
 ```
-### Run the app reseting project data
+
+**Run the app reseting project data**
 ```bash
 INIT_COMMAND='--init --force' docker-compose up -d
 ```
@@ -173,6 +175,9 @@ The list of supported use cases for data annotation. Please contribute your own 
 | **Comparison** | |
 | Pairwise | Comparing entities in pairs to judge which of each entity is preferred | 
 | Ranking | Sort items in the list according to some property |
+| **Time Series** | |
+| Classification |  |
+| Segmentation |  |
 
 ## Machine Learning Integration
 
@@ -186,6 +191,11 @@ That gives you the opportunities to use:
 - **Online Learning**: Simultaneously update (retrain) your model while new annotations are coming
 - **Active Learning**: Perform labeling in active learning mode - select only most complex examples
 - **Prediction Service**: Instantly create running production-ready prediction service
+
+## Label Studio Integration to your services
+
+* You can use [Label Studio Frontend](https://github.com/heartexlabs/label-studio-frontend) as a separated React library, [read more here](https://labelstud.io/guide/frontend.html). 
+* Label Studio Backend (this repo) can be integrated to your app via Flask Blueprints. [See example of integration here](https://github.com/heartexlabs/label-studio/blob/master/blueprint_usage_example.py).
 
 ## Label Studio for Teams, Startups, and Enterprises :office:
 

@@ -1,9 +1,12 @@
 """ This is an example about how Label Studio could be included into your flask app as blueprint
 
-    Run this demo flask app within Label Studio python environment:
-    python blueprint_usage_example.py
+    1. You need to initialize LS project in the same directory where this file is placed:
+        > label-studio init my_project
 
-    And then go to http://localhost:5000/
+    2. Run this demo flask app within Label Studio python environment:
+        > python blueprint_usage_example.py
+
+    3. Go to http://localhost:5000/
 """
 import json
 from types import SimpleNamespace
@@ -13,16 +16,12 @@ from label_studio.blueprint import (blueprint as label_studio_blueprint,
 
 app = Flask('my-ml-platform',  static_url_path='')
 app.secret_key = 'some-secret-key'
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config['WTF_CSRF_ENABLED'] = False
-app.url_map.strict_slashes = False
-app.register_blueprint(label_studio_blueprint, url_prefix='/label-studio')
-
-# Warning: you need to call command below in the same directory where this file is placed:
-# > label-studio init my_project
+app.url_map.strict_slashes = False  # it's very important to disable this option
+app.register_blueprint(label_studio_blueprint, url_prefix='/label-studio/')
 
 # check label_studio.utils.argparser to know all options: *_parser.add_argument(option_name, ...)
-input_args = {'project_name': 'my_project', 'command': 'start', 'root_dir': '.'}
+input_args = {'project_name': 'my_project', 'command': 'start', 'root_dir': '.', 'force': False}
 set_external_hostname('http://localhost:5000/label-studio')
 app.label_studio = LabelStudioConfig(input_args=SimpleNamespace(**input_args))
 
