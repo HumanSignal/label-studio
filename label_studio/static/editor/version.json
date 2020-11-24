@@ -1,6 +1,6 @@
 {
-  "message": "Fix deserialization of tree view in Regions panel",
-  "commit": "57cbe6765b3aa0b59da23c39569d2a2abd9b59aa",
-  "branch": "master",
-  "date": "2020-11-12T22:21:54Z"
+  "message": "Fix valueType=url for Text",
+  "commit": "3f0e7f55e41b888cb4c16f426140739fbc307602",
+  "branch": "release/0.8.1",
+  "date": "2020-11-19T17:24:57Z"
 }
