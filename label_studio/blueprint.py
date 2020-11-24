@@ -823,6 +823,8 @@ def api_project_switch():
 def api_all_tasks():
     """ Tasks API: retrieve by filters, delete all tasks
     """
+    from label_studio.data_manager.functions import prepare_tasks
+
     # retrieve tasks (plus completions and predictions) with pagination & ordering
     if request.method == 'GET':
         # get filter parameters from request
