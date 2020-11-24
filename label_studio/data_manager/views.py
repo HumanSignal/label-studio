@@ -4,9 +4,10 @@ from flask import Blueprint, current_app, g
 from label_studio.utils.auth import requires_auth
 from label_studio.utils.misc import exception_handler_page
 from label_studio.utils.io import find_editor_files
-from label_studio.blueprint import blueprint
+import label_studio.data_manager.api  # we need to import this to import api
 
-# blueprint = Blueprint('data_manager_blueprint', __name__, template_folder='templates')
+
+blueprint = Blueprint('data_manager_blueprint', __name__, template_folder='templates')
 
 
 @blueprint.route('/tasks', methods=['GET', 'POST'])

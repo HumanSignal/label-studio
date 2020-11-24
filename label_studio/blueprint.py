@@ -87,6 +87,42 @@ def config_from_file():
     return LabelStudioConfig(input_args=SimpleNamespace(**data))
 
 
+def app_before_request_callback():
+    # skip endpoints where no project is needed
+    if request.endpoint in ('static', 'send_static'):
+        return
+
+    # prepare global variables
+    def prepare_globals():
+        # setup session cookie
+        if 'session_id' not in session:
+            session['session_id'] = str(uuid4())
+        g.project = project_get_or_create()
+        g.analytics = Analytics(current_app.label_studio.input_args, g.project)
+        g.sid = g.analytics.server_id
+
+    # show different exception pages for api and other endpoints
+    if request.path.startswith('/api'):
+        return exception_handler(prepare_globals)()
+    else:
+        return exception_handler_page(prepare_globals)()
+
+
+@exception_handler
+def app_after_request_callback(response):
+    if hasattr(g, 'analytics'):
+        g.analytics.send(request, session, response)
+
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PATCH,PUT,DELETE')
+
+    if request.method != 'GET':
+        response.headers.add('Allow', 'GET, POST, PATCH, PUT, DELETE')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+
+    return response
+
+
 def create_app(label_studio_config=None):
     """ Create application factory, as explained here:
         http://flask.pocoo.org/docs/patterns/appfactories/.
@@ -95,8 +131,7 @@ def create_app(label_studio_config=None):
     """
     # we need to include this modules here because there are endpoints inside
     # and they use label_studio.blueprint
-    import label_studio.data_manager.views
-    import label_studio.data_manager.api
+    from label_studio.data_manager.views import blueprint as data_manager_blueprint
 
     app = flask.Flask(__package__, static_url_path='')
     app.secret_key = 'A0Zrdqwf1AQWj12ajkhgFN]dddd/,?RfDWQQT'
@@ -110,6 +145,9 @@ def create_app(label_studio_config=None):
         raise LabelStudioError('LabelStudioConfig is not loaded correctly')
 
     app.register_blueprint(blueprint)
+    app.register_blueprint(data_manager_blueprint)
+    app.before_request(app_before_request_callback)
+    app.after_request(app_after_request_callback)
     return app
 
 
@@ -153,44 +191,6 @@ def project_get_or_create(multi_session_force_recreate=False):
                 '"multi_session_force_recreate" option supported only with "start-multi-session" mode')
         return Project.get_or_create(input_args.project_name,
                                      input_args, context={'multi_session': False})
-
-
-@blueprint.before_request
-def app_before_request_callback():
-    # skip endpoints where no project is needed
-    if request.endpoint in ('static', 'send_static'):
-        return
-
-    # prepare global variables
-    def prepare_globals():
-        # setup session cookie
-        if 'session_id' not in session:
-            session['session_id'] = str(uuid4())
-        g.project = project_get_or_create()
-        g.analytics = Analytics(current_app.label_studio.input_args, g.project)
-        g.sid = g.analytics.server_id
-
-    # show different exception pages for api and other endpoints
-    if request.path.startswith('/api'):
-        return exception_handler(prepare_globals)()
-    else:
-        return exception_handler_page(prepare_globals)()
-
-
-@blueprint.after_request
-@exception_handler
-def app_after_request_callback(response):
-    if hasattr(g, 'analytics'):
-        g.analytics.send(request, session, response)
-
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PATCH,PUT,DELETE')
-
-    if request.method != 'GET':
-        response.headers.add('Allow', 'GET, POST, PATCH, PUT, DELETE')
-        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
-
-    return response
 
 
 @blueprint.route('/static/media/<path:path>')
