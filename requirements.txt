@@ -13,13 +13,13 @@ Jinja2==2.10.3
 lxml>=4.2.5
 MarkupSafe==1.1.1
 mixpanel==4.4.0
-numpy==1.17.4
+numpy>=1.17.4
 python-dateutil==2.8.1
 pytz==2019.3
 requests==2.22.0
 six>=1.13.0
 srsly>=0.2.0
-tqdm==4.40.2
+tqdm>=4.40.2
 urllib3==1.25.7
 wasabi==0.4.2
 Werkzeug==0.16.0
