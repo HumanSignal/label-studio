@@ -5,7 +5,7 @@ from label_studio.utils.misc import exception_handler
 from label_studio.data_manager.functions import (
     prepare_tasks, prepare_annotations, make_columns, DEFAULT_TABS, load_tab, save_tab
 )
-from label_studio.data_manager.views import blueprint
+from label_studio.blueprint import blueprint
 
 
 @blueprint.route('/api/project/tabs/<tab_id>/tasks', methods=['GET'])

@@ -46,7 +46,6 @@ from label_studio.utils.misc import (
     exception_handler, exception_handler_page, check_port_in_use, start_browser, str2datetime,
     config_line_stripped, get_config_templates, convert_string_to_hash, serialize_class
 )
-from label_studio.data_manager import blueprint as data_manager_blueprint
 from label_studio.utils.analytics import Analytics
 from label_studio.utils.argparser import parse_input_args
 from label_studio.utils.uri_resolver import resolve_task_data_uri
@@ -63,7 +62,6 @@ blueprint = Blueprint(__package__, __name__,
                       static_folder='static', static_url_path='/static',
                       template_folder='templates')
 blueprint.add_app_template_filter(str2datetime, 'str2datetime')
-blueprint.register(data_manager_blueprint)
 
 
 @attr.s(frozen=True)
@@ -95,6 +93,11 @@ def create_app(label_studio_config=None):
 
     :param label_studio_config: LabelStudioConfig object to use with input_args params
     """
+    # we need to include this modules here because there are endpoints inside
+    # and they use label_studio.blueprint
+    import label_studio.data_manager.views
+    import label_studio.data_manager.api
+
     app = flask.Flask(__package__, static_url_path='')
     app.secret_key = 'A0Zrdqwf1AQWj12ajkhgFN]dddd/,?RfDWQQT'
     app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0

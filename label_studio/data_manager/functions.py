@@ -2,15 +2,13 @@ from flask import session
 from label_studio.utils.misc import DirectionSwitch, timestamp_to_local_datetime
 from label_studio.utils.uri_resolver import resolve_task_data_uri
 
-
 DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
 DEFAULT_TABS = {
     'tabs': [
         {
             'id': 1,
             'title': 'Tab 1',
-            'hiddenColumns': None,
-
+            'hiddenColumns': None
         }
     ]
 }
@@ -19,6 +17,7 @@ TASKS = 'tasks:'
 
 class DataManagerException(Exception):
     pass
+
 
 def column_type(key):
     if key == 'image':
@@ -29,6 +28,7 @@ def column_type(key):
         return 'AudioPlus'
     else:
         return 'String'
+
 
 def make_columns(project):
     """ Make columns info for the frontend data manager
@@ -41,7 +41,7 @@ def make_columns(project):
         column = {
             'id': key,
             'title': key,
-            'type': column_type(key), # data_type,
+            'type': column_type(key),  # data_type,
             'target': 'tasks',
             'parent': 'data',
             'orderable': False
@@ -357,6 +357,6 @@ def prepare_annotations(tasks, params):
 
     # skip pagination if page<0 and page_size<=0
     if page > 0 and page_size > 0:
-        items = items[(page - 1)*page_size: page*page_size]
+        items = items[(page - 1) * page_size: page * page_size]
 
     return {'annotations': items, 'total': total}
