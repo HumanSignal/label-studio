@@ -761,7 +761,7 @@ class Project(object):
             config['source'] = {
                 'name': 'Tasks',
                 'type': 'tasks-json',
-                'path': os.path.abspath(tasks_json_path)
+                'path': tasks_json
             }
             logger.debug('{tasks_json_path} input file with {n} tasks has been created from {input_path}'.format(
                 tasks_json_path=tasks_json_path, n=len(tasks), input_path=input_path))
@@ -786,7 +786,7 @@ class Project(object):
             config['target'] = {
                 'name': 'Completions',
                 'type': 'completions-dir',
-                'path': os.path.abspath(completions_dir)
+                'path': 'completions'
             }
 
         if 'ml_backends' not in config or not isinstance(config['ml_backends'], list):
