@@ -1,8 +1,7 @@
-import { DataManager } from "htx-data-manager";
+import { DataManager } from "@heartex/datamanager";
+import '@heartex/datamanager/build/static/css/main.css';
 
 const dmRoot = document.querySelector(".datamanager");
-
-console.log(dmRoot);
 
 if (dmRoot) {
   const dm = new DataManager({
