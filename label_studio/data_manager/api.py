@@ -92,4 +92,4 @@ def api_project_tabs_id(tab_id):
     # delete tab data
     if request.method == 'DELETE':
         delete_tab(tab_id)
-        return make_response(jsonify({'detail': 'done'}), 204)
+        return make_response(jsonify(tab_data), 204)

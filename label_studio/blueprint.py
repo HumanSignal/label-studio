@@ -1070,7 +1070,7 @@ def json_filter(s):
 
 def main():
     # this will avoid looped imports and will register deprecated endpoints in the blueprint
-    import label_studio.deprecated
+    # import label_studio.deprecated
 
     input_args = parse_input_args()
     app = create_app(LabelStudioConfig(input_args=input_args))
