@@ -85,9 +85,9 @@ tr {
 }
 
 .db-card {
-  background: #f7f7f7;
+  background: #fafafa;
   border-radius: 5px;
-  padding: 2em;
+  padding: 1em 2em 1em 2em !important;
 }
 
 .action-buttons {

@@ -605,7 +605,7 @@
           this.getApi('tasks', 'api/tasks/' +
             '?page=' + this.page +
             '&page_size=' + parseInt(this.page_size) +
-            '&order=' + this.order +
+            '&order=tasks:' + this.order +
             (polling ? '&polling=true': ''),
             // always
             function (data) {

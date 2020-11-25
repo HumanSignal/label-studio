@@ -2,7 +2,7 @@ from flask import session
 from label_studio.utils.misc import DirectionSwitch, timestamp_to_local_datetime
 from label_studio.utils.uri_resolver import resolve_task_data_uri
 
-DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
+DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 TASKS = 'tasks:'
 
 
@@ -48,8 +48,7 @@ def make_columns(project):
             'title': key,
             'type': column_type(key),  # data_type,
             'target': 'tasks',
-            'parent': 'data',
-            'orderable': False
+            'parent': 'data'
         }
         result['columns'].append(column)
         task_data_children.append(column['id'])
@@ -70,6 +69,13 @@ def make_columns(project):
             'help': 'Last completion date'
         },
         {
+            'id': 'total_completions',
+            'title': "Completion number",
+            'type': "String",
+            'target': 'tasks',
+            'help': 'Total completions per task'
+        },
+        {
             'id': 'has_cancelled_completions',
             'title': "Cancelled",
             'type': "Number",
@@ -82,42 +88,6 @@ def make_columns(project):
             'type': "List",
             'target': 'tasks',
             'children': task_data_children
-        },
-        # --- Completions ---
-        {
-            'id': 'id',
-            'title': 'Annotation ID',
-            'type': 'Number',
-            'target': 'annotations',
-            'orderable': False
-        },
-        {
-            'id': 'task_id',
-            'title': 'Task ID',
-            'type': 'Number',
-            'target': 'annotations',
-            'orderable': False
-        },
-        {
-            'id': 'created_at',
-            'title': "Completed at",
-            'type': "Datetime",
-            'target': 'annotations',
-            'orderable': False
-        },
-        {
-            'id': 'was_cancelled',
-            'title': "Cancelled",
-            'type': "Boolean",
-            'target': 'annotations',
-            'orderable': False
-        },
-        {
-            'id': 'lead_time',
-            'title': "Lead time",
-            'type': "Number",
-            'target': 'annotations',
-            'orderable': False
         }
     ]
     return result
@@ -183,71 +153,42 @@ def delete_tab(tab_id):
     return True
 
 
-def order_tasks(params, task_ids, completed_at, cancelled_status):
-    """ Apply ordering to tasks
+def preload_tasks(project, resolve_uri=False):
+    """ Preload tasks: get completed_at, has_cancelled_completions,
+        evaluate pre-signed urls for storages, aggregate over completion data, etc.
     """
-    ordering = params.tab.get('ordering', [])  # ordering = ['id', 'completed_at', ...]
-    ordering = [o.replace(TASKS, '') for o in ordering if o.startswith(TASKS) or o.startswith('-' + TASKS)]
-    order = 'id' if not ordering else ordering[0]  # we support only one column ordering right now
+    task_ids = project.source_storage.ids()  # get task ids for all tasks in DB
+    all_completed_at = project.get_completed_at()  # task can have multiple completions, get the last of completed
+    all_cancelled_status = project.get_cancelled_status()  # number of all cancelled completions in task
 
-    # ascending or descending
-    ascending = order[0] == '-'
-    order = order[1:] if order[0] == '-' else order
-
-    if order not in ['id', 'completed_at', 'has_cancelled_completions']:
-        raise DataManagerException('Incorrect order: ' + order)
-
-    # ordering
-    pre_order = ({
-        'id': i,
-        'completed_at': completed_at[i] if i in completed_at else None,
-        'has_cancelled_completions': cancelled_status[i] if i in completed_at else None,
-    } for i in task_ids)
-
-    if order == 'id':
-        ordered = sorted(pre_order, key=lambda x: x['id'], reverse=ascending)
-
-    else:
-        # for has_cancelled_completions use two keys ordering
-        if order == 'has_cancelled_completions':
-            ordered = sorted(pre_order,
-                             key=lambda x: (DirectionSwitch(x['has_cancelled_completions'], not ascending),
-                                            DirectionSwitch(x['completed_at'], False)))
-        # another orderings
-        else:
-            ordered = sorted(pre_order, key=lambda x: (DirectionSwitch(x[order], not ascending)))
-
-    return ordered
-
-
-def post_process_tasks(project, fields, input_tasks):
-    """ Resolve tasks: evaluate pre-signed urls for storages,
-        aggregate over completion data, etc
-    """
     # get tasks with completions
     tasks = []
-    for item in input_tasks:
-        i = item['id']
+    for i in task_ids:
         task = project.get_task_with_completions(i)
 
         # no completions at task, get task without completions
         if task is None:
             task = project.source_storage.get(i)
+
+        # with completions
         else:
-            # evaluate completed_at time
-            completed_at = item['completed_at']
-            if completed_at != 0 and completed_at is not None:
-                completed_at = timestamp_to_local_datetime(completed_at).strftime(DATETIME_FORMAT)
-            task['completed_at'] = completed_at
-            task['has_cancelled_completions'] = item['has_cancelled_completions']
+            # completed_at
+            if i in all_completed_at:
+                completed_at = all_completed_at[i]
+                if completed_at != 0 and isinstance(completed_at, int):
+                    completed_at = timestamp_to_local_datetime(completed_at).strftime(DATETIME_FORMAT)
+                task['completed_at'] = completed_at
 
-        # don't resolve data (s3/gcs is slow) if it's not in fields
-        if 'all' in fields or 'data' in fields:
+            # cancelled completions number
+            if i in all_cancelled_status:
+                task['has_cancelled_completions'] = all_cancelled_status[i]
+
+            # total completions
+            task['total_completions'] = len(task['completions'])
+
+        # don't resolve data (s3/gcs is slow) if it's not necessary (it's very slow)
+        if resolve_uri:
             task = resolve_task_data_uri(task, project=project)
-
-        # leave only chosen fields
-        if 'all' not in fields:
-            task = {field: task[field] for field in fields}
 
         tasks.append(task)
 
@@ -297,6 +238,34 @@ def resolve_task_field(task, field):
     return result
 
 
+def order_tasks(params, tasks):
+    """ Apply ordering to tasks
+    """
+    ordering = params.tab.get('ordering', [])  # ordering = ['id', 'completed_at', ...]
+    # remove 'tasks:' prefix for tasks api, for annotations it will be 'annotations:'
+    ordering = [o.replace(TASKS, '') for o in ordering if o.startswith(TASKS) or o.startswith('-' + TASKS)]
+    order = 'id' if not ordering else ordering[0]  # we support only one column ordering right now
+
+    # ascending or descending
+    ascending = order[0] == '-'
+    order = order[1:] if order[0] == '-' else order
+
+    # id
+    if order == 'id':
+        ordered = sorted(tasks, key=lambda x: x['id'], reverse=ascending)
+
+    # cancelled: for has_cancelled_completions use two keys ordering
+    elif order == 'has_cancelled_completions':
+        ordered = sorted(tasks,
+                         key=lambda x: (DirectionSwitch(x.get('has_cancelled_completions', None), not ascending),
+                                        DirectionSwitch(x.get('completed_at', None), False)))
+    # another orderings
+    else:
+        ordered = sorted(tasks, key=lambda x: (DirectionSwitch(resolve_task_field(x, order), not ascending)))
+
+    return ordered
+
+
 def filter_tasks(tasks, params):
     """ Filter tasks using
     """
@@ -333,28 +302,46 @@ def filter_tasks(tasks, params):
     return new_tasks
 
 
+def get_used_fields(params):
+    """ Get all used fields from filter and order params
+    """
+    fields = []
+    filters = params.tab.get('filters', None) or []
+    for item in filters:
+        fields.append(item['filter'])
+
+    ordering = params.tab.get('ordering', None) or []
+    ordering = [o.replace(TASKS, '') for o in ordering if o.startswith(TASKS) or o.startswith('-' + TASKS)]
+    order = 'id' if not ordering else ordering[0]  # we support only one column ordering right now
+    fields.append(order)
+    return list(set(fields))
+
+
 def prepare_tasks(project, params):
     """ Main function to get tasks
     """
     page, page_size = params.page, params.page_size
-    fields = ['all']
+    # use only necessary fields for filtering and ordering to avoid storage (s3/gcs/etc) overloading
+    working_fields = get_used_fields(params)
+    need_uri_resolving = any(['data.' in field for field in working_fields])
 
-    # get task ids and sort them by completed time
-    task_ids = project.source_storage.ids()
-    completed_at = project.get_completed_at()  # task can have multiple completions, get the last of completed
-    cancelled_status = project.get_cancelled_status()
+    # load all tasks from db with some aggregations over completions
+    tasks = preload_tasks(project, resolve_uri=need_uri_resolving)
+
+    # filter
+    tasks = filter_tasks(tasks, params)
 
     # order
-    tasks = order_tasks(params, task_ids, completed_at, cancelled_status)
+    tasks = order_tasks(params, tasks)
     total = len(tasks)
-
-    tasks = post_process_tasks(project, fields, tasks)
-
-    tasks = filter_tasks(tasks, params)
 
     # pagination
     if page > 0 and page_size > 0:
         tasks = tasks[(page - 1) * page_size:page * page_size]
+
+    # resolve all task fields
+    for i, task in enumerate(tasks):
+        tasks[i] = resolve_task_data_uri(task, project=project)
 
     return {'tasks': tasks, 'total': total}
 

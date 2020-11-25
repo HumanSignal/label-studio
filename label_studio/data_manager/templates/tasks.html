@@ -9,11 +9,11 @@
 
   <div id="vue_loader" class="ui large text loader loading active">Loading ...</div>
 
-  <div class="ui " id="app" :class="{'visible-app': vue_loaded}" style="display: none">
+  <div class="ui " id="app" :class="{'visible-app': vue_loaded}" style="display: none; margin-top:-40px; margin-bottom: -30px;">
 
     <!-- Main content -->
 
-    <div class="ui container max-width-wrapper">
+    <div class="ui">
 
       <!-- Statistics -->
       <div class="ui three column centered grid stackable">
@@ -22,16 +22,17 @@
           <!-- Total tasks -->
           <div class="column center aligned align-grid">
             <div class="ui">
-              <div class="ui statistic tiny">
+              <div class="ui statistic mini" style="display: inline">
                 <!-- Project loading -->
                 <center v-if="!project_loaded" style="margin-bottom: 3px">
                   <div class="ui loader loading active inline"></div>
                 </center>
                 <!-- Number -->
-                <span class="value" v-else>
+                <span class="value" v-else  style="display: inline!important;white-space:nowrap!important;">
                   <animated-number :number="project.task_count"></animated-number>
                 </span>
-                <span class="label">Tasks</span>
+                <span class="label" style="display: inline!important;white-space:nowrap!important;">Tasks</span>
+                <br>
                 <span class="sub-label">
                   <i class="word-break" v-if="project.multi_session_mode"
                      :data-tippy-content="project.source_storage.readable_path">{{
@@ -39,23 +40,22 @@
                   <span data-tooltip="Source storage sync in progress">
                     <i class="ui loader loading active inline mini" v-if="project.source_syncing"></i>
                   </span>
-                </span>
+
                 <!-- Controls -->
-                <div style="margin-top: 7px">
+
                   <!-- Storage settings -->
                   <span data-tooltip="Change source storage filter">
-                  <i class="fas fa-cog sup-button big"
-                     @click="loadStorageSettings(); storage_settings.source.show=true"></i>
+                    <i class="fas fa-cog sup-button big"
+                       @click="loadStorageSettings(); storage_settings.source.show=true"></i>
                   </span>
                   <!-- Delete tasks -->
                   <span v-if="project.can_delete_tasks">
-                    <span style="margin-right: 15px"></span>
                     <span @click="deleteAllTasks()"
                           data-tooltip="Delete all tasks">
                       <i class="fas fa-trash-alt trash remove-task">&nbsp;&nbsp;</i>
                     </span>
                   </span>
-                </div>
+                </span>
               </div> <!-- statistic -->
             </div>
           </div>
@@ -63,7 +63,7 @@
           <!-- Total completions -->
           <div class="column center aligned align-grid">
             <div class="ui">
-              <div class="ui statistic tiny">
+              <div class="ui statistic mini" style="display: inline">
                 <!-- Project loading -->
                 <center v-if="!project_loaded" style="margin-bottom: 3px">
                   <div class="ui loader loading active inline"></div>
@@ -73,6 +73,7 @@
                   <animated-number :number="project.completion_count"></animated-number>
                 </span>
                 <span class="label">Completions</span>
+                <br>
                 <span class="sub-label">
                   <i class="word-break" v-if="project.multi_session_mode"
                      :data-tippy-content="project.target_storage.readable_path"
@@ -81,9 +82,7 @@
                   <span data-tooltip="Target storage sync in progress">
                     <i class="ui loader loading active inline mini" v-if="project.target_syncing"></i>
                   </span>
-                </span>
-                <!-- Controls -->
-                <div style="margin-top: 7px">
+                  <!-- Controls -->
                   <!-- Target storage settings -->
                   <span data-tooltip="Change target storage">
                     <i class="fas fa-cog sup-button big"
@@ -91,13 +90,12 @@
                   </span>
                   <!-- Delete completions -->
                   <span v-if="project.can_manage_completions">
-                    <span style="margin-right: 15px"></span>
                     <span @click="deleteAllCompletions()"
                           data-tooltip="Delete all completions">
                       <i class="far fa-trash-alt trash remove-completion">&nbsp;&nbsp;</i>
                     </span>
                   </span>
-                </div>
+                </span>
               </div>
             </div>
           </div>
@@ -124,14 +122,15 @@
       <div class="ui divider hidden"></div>
     </div> <!-- container -->
 
-    <!-- DataManager -->
-    <div class="datamanager"></div>
-
     {% endraw %}
     {% include 'includes/storages.html' %}
     {% raw %}
 
   </div>
+
+  <!-- DataManager -->
+  <div class="datamanager"></div>
+
 
   <script src="static/js/components/animatedNumber.js"></script>
   <script src="static/js/components/imageWithFadeIn.js"></script>
