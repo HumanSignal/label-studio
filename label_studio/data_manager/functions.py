@@ -3,20 +3,25 @@ from label_studio.utils.misc import DirectionSwitch, timestamp_to_local_datetime
 from label_studio.utils.uri_resolver import resolve_task_data_uri
 
 DATETIME_FORMAT = '%Y-%m-%d %H:%M:%S'
-DEFAULT_TABS = {
-    'tabs': [
-        {
-            'id': 1,
-            'title': 'Tab 1',
-            'hiddenColumns': None
-        }
-    ]
-}
 TASKS = 'tasks:'
 
 
 class DataManagerException(Exception):
     pass
+
+
+def create_default_tabs():
+    """ Create default state for all tabs as initialization
+    """
+    return {
+        'tabs': [
+            {
+                'id': 1,
+                'title': 'Tab 1',
+                'hiddenColumns': None
+            }
+        ]
+    }
 
 
 def column_type(key):
@@ -122,7 +127,7 @@ def load_tab(tab_id, raise_if_not_exists=False):
     """ Load tab info from DB
     """
     # load tab data
-    data = DEFAULT_TABS if 'tab_data' not in session else session['tab_data']
+    data = create_default_tabs() if 'tab_data' not in session else session['tab_data']
 
     # select by tab id
     for tab in data['tabs']:
@@ -141,7 +146,7 @@ def save_tab(tab_id, tab_data):
     """ Save tab info to DB
     """
     # load tab data
-    data = DEFAULT_TABS if 'tab_data' not in session else session['tab_data']
+    data = create_default_tabs() if 'tab_data' not in session else session['tab_data']
     tab_data['id'] = tab_id
 
     # select by tab id
@@ -155,6 +160,27 @@ def save_tab(tab_id, tab_data):
         data['tabs'].append(tab_data)
 
     session['tab_data'] = data
+
+
+def delete_tab(tab_id):
+    """ Delete tab from DB
+    """
+    # load tab data
+    if 'tab_data' not in session:
+        return False
+
+    data = session['tab_data']
+
+    # select by tab id
+    for i, tab in enumerate(data['tabs']):
+        if tab['id'] == tab_id:
+            del data['tabs'][i]
+            break
+    else:
+        return False
+
+    session['tab_data'] = data
+    return True
 
 
 def order_tasks(params, task_ids, completed_at, cancelled_status):

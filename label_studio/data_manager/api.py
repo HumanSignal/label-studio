@@ -3,7 +3,7 @@ from flask import make_response, request, session, jsonify, g
 from label_studio.utils.auth import requires_auth
 from label_studio.utils.misc import exception_handler
 from label_studio.data_manager.functions import (
-    prepare_tasks, prepare_annotations, make_columns, DEFAULT_TABS, load_tab, save_tab
+    prepare_tasks, prepare_annotations, make_columns, create_default_tabs, load_tab, save_tab, delete_tab
 )
 from label_studio.blueprint import blueprint
 
@@ -64,13 +64,13 @@ def api_project_tabs():
     """
     if request.method == 'GET':
         if 'tab_data' not in session:
-            result = DEFAULT_TABS
+            result = create_default_tabs()
             return make_response(jsonify(result), 200)
         else:
             return make_response(jsonify(session['tab_data']), 200)
 
 
-@blueprint.route('/api/project/tabs/<tab_id>', methods=['GET', 'POST'])
+@blueprint.route('/api/project/tabs/<tab_id>', methods=['GET', 'POST', 'DELETE'])
 @requires_auth
 @exception_handler
 def api_project_tabs_id(tab_id):
@@ -88,3 +88,8 @@ def api_project_tabs_id(tab_id):
         tab_data.update(request.json)
         save_tab(tab_id, tab_data)
         return make_response(jsonify(tab_data), 201)
+
+    # delete tab data
+    if request.method == 'DELETE':
+        delete_tab(tab_id)
+        return make_response(jsonify({'detail': 'done'}), 204)

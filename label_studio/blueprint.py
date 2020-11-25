@@ -133,6 +133,7 @@ def create_app(label_studio_config=None):
     # we need to include this modules here because there are endpoints inside
     # and they use label_studio.blueprint
     from label_studio.data_manager.views import blueprint as data_manager_blueprint
+    # import label_studio.data_manager.views
 
     app = flask.Flask(__package__, static_url_path='')
     app.secret_key = 'A0Zrdqwf1AQWj12ajkhgFN]dddd/,?RfDWQQT'
