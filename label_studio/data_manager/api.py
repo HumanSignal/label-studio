@@ -12,6 +12,8 @@ from label_studio.blueprint import blueprint
 @requires_auth
 @exception_handler
 def api_project_tab_tasks(tab_id):
+    """ Get tasks for specified tab
+    """
     tab_id = int(tab_id)
     tab = load_tab(tab_id, True)
 
@@ -29,6 +31,8 @@ def api_project_tab_tasks(tab_id):
 @requires_auth
 @exception_handler
 def api_project_tab_annotations(tab_id):
+    """ Get annotations for specified tab
+    """
     tab_id = int(tab_id)
     tab = load_tab(tab_id, True)
 

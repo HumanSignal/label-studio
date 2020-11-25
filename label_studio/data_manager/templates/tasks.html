@@ -17,12 +17,12 @@
 
       <!-- Statistics -->
       <div class="ui three column centered grid stackable">
-        <div class="row">
+        <div class="row db-card">
 
           <!-- Total tasks -->
           <div class="column center aligned align-grid">
-            <div class="ui db-card">
-              <div class="ui statistic small">
+            <div class="ui">
+              <div class="ui statistic tiny">
                 <!-- Project loading -->
                 <center v-if="!project_loaded" style="margin-bottom: 3px">
                   <div class="ui loader loading active inline"></div>
@@ -62,8 +62,8 @@
 
           <!-- Total completions -->
           <div class="column center aligned align-grid">
-            <div class="ui db-card">
-              <div class="ui statistic small">
+            <div class="ui">
+              <div class="ui statistic tiny">
                 <!-- Project loading -->
                 <center v-if="!project_loaded" style="margin-bottom: 3px">
                   <div class="ui loader loading active inline"></div>
@@ -102,24 +102,7 @@
             </div>
           </div>
 
-          <!-- Action Buttons -->
-          <div class="column center aligned align-grid">
-            <div class="ui db-card">
-              <!-- Control buttons -->
-              <div class="ui row stackable" v-if="project.task_count > 0">
-                <div class="center aligned action-buttons">
-                  <!-- Sampling -->
-                  <span style="padding-top: 8px; padding-bottom: 11px;"
-                        data-tooltip="Tasks sampling: selecting which task to take next in labeling. Edit project config file to change">
-                    <span class="ui icon label">
-                      <i class="ui icon far shuffle"></i>
-                      {{ project.config['sampling'] }}
-                    </span>
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div> <!-- Action buttons -->
+
         </div>
 
         <!-- Critical error -->

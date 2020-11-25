@@ -497,8 +497,9 @@ pre {
     font-size: 65%;
 }
 .statistic .sub-label {
-    margin-top:7px;
+    margin-top:2px;
     color: #555;
+    font-size:90%
 }
 
 .sup-button {
