@@ -66,14 +66,26 @@ def get_choice(completion):
     return completion['completions'][0]['result'][0]['value']['choices'][0]
 
 
-def get_image_local_path(url, image_cache_dir=None):
-    is_local_file = url.startswith('/data')
+def get_image_local_path(url, image_cache_dir=None, project_dir=None):
+    is_local_file = url.startswith('/data/') and '?d=' in url
+    is_uploaded_file = url.startswith('/data/upload')
+
+    # File reference created with --allow-serving-local-files option
     if is_local_file:
         filename, dir_path = url.split('/data/')[1].split('?d=')
         dir_path = str(urllib.parse.unquote(dir_path))
         filepath = os.path.join(dir_path, filename)
         if not os.path.exists(filepath):
             raise FileNotFoundError(filepath)
+
+    # File uploaded via import UI
+    elif is_uploaded_file:
+        if not project_dir or not os.path.exists(project_dir):
+            raise FileNotFoundError(
+                "Can't find uploaded file by URL {url}: you need to pass a valid project_dir".format(url=url))
+        filepath = os.path.join(project_dir, 'upload', os.path.basename(url))
+
+    # File specified by remote URL - download and cache it
     else:
         image_cache_dir = image_cache_dir or get_cache_dir()
         parsed_url = urlparse(url)

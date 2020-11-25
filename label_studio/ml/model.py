@@ -33,7 +33,7 @@ class LabelStudioMLBase(ABC):
         """Model loader"""
         self.label_config = label_config
         self.parsed_label_config = parse_config(self.label_config)
-        self.train_output = train_output
+        self.train_output = train_output or {}
 
     @abstractmethod
     def predict(self, tasks, **kwargs):

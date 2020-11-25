@@ -1,10 +1,14 @@
 import os
+import logging
 
 from mmdet.apis import init_detector, inference_detector
 
 from label_studio.ml import LabelStudioMLBase
 from label_studio.ml.utils import get_image_local_path, get_image_size, get_single_tag_keys
 from label_studio.utils.io import json_load
+
+
+logger = logging.getLogger(__name__)
 
 
 class MMDetection(LabelStudioMLBase):
@@ -48,11 +52,15 @@ class MMDetection(LabelStudioMLBase):
         print('Load new model from: ', config_file, checkpoint_file)
         self.model = init_detector(config_file, checkpoint_file, device=device)
         self.score_thresh = score_threshold
+        if self.train_output:
+            self.project_path = self.train_output['project_path']
+        else:
+            self.project_path = None
 
     def predict(self, tasks, **kwargs):
         assert len(tasks) == 1
         task = tasks[0]
-        image_path = get_image_local_path(task['data'][self.value])
+        image_path = get_image_local_path(task['data'][self.value], project_dir=self.project_path)
         model_results = inference_detector(self.model, image_path)
         results = []
         all_scores = []
@@ -92,4 +100,9 @@ class MMDetection(LabelStudioMLBase):
         }]
 
     def fit(self, completions, workdir=None, **kwargs):
-        return {}
+        project_path = kwargs.get('project_full_path')
+        if os.path.exists(project_path):
+            logger.info('Found project in local path ' + project_path)
+        else:
+            logger.error('Project not found in local path ' + project_path + '. Serving uploaded data will fail.')
+        return {'project_path': project_path}
