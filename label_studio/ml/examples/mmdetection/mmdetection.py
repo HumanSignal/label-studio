@@ -3,7 +3,7 @@ import os
 from mmdet.apis import init_detector, inference_detector
 
 from label_studio.ml import LabelStudioMLBase
-from label_studio.ml.utils import get_image_local_path, get_image_size
+from label_studio.ml.utils import get_image_local_path, get_image_size, get_single_tag_keys
 from label_studio.utils.io import json_load
 
 
@@ -33,10 +33,10 @@ class MMDetection(LabelStudioMLBase):
         else:
             self.label_map = {}
 
-        from_name, schema = list(self.parsed_label_config.items())[0]
-        self.from_name = from_name
-        self.to_name = schema['to_name'][0]
-        self.labels_in_config = set(schema['labels'])
+        self.from_name, self.to_name, self.value, self.labels_in_config = get_single_tag_keys(
+            self.parsed_label_config, 'RectangleLabels', 'Image')
+        schema = list(self.parsed_label_config.values())[0]
+        self.labels_in_config = set(self.labels_in_config)
 
         # Collect label maps from `predicted_values="airplane,car"` attribute in <Label> tag
         self.labels_attrs = schema.get('labels_attrs')
@@ -52,7 +52,7 @@ class MMDetection(LabelStudioMLBase):
     def predict(self, tasks, **kwargs):
         assert len(tasks) == 1
         task = tasks[0]
-        image_path = get_image_local_path(task['data']['image_url'])
+        image_path = get_image_local_path(task['data'][self.value])
         model_results = inference_detector(self.model, image_path)
         results = []
         all_scores = []
