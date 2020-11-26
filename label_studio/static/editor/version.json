@@ -1,6 +1,6 @@
 {
-  "message": "Fix valueType=url for Text",
-  "commit": "3f0e7f55e41b888cb4c16f426140739fbc307602",
-  "branch": "release/0.8.1",
-  "date": "2020-11-19T17:24:57Z"
+  "message": "Add Paragraphs to label structured text",
+  "commit": "64d1468253200e7ba602c6a07425c89491139aea",
+  "branch": "release/0.8.2",
+  "date": "2020-11-25T17:39:16Z"
 }
