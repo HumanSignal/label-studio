@@ -72,7 +72,7 @@ def make_columns(project):
         {
             'id': 'total_completions',
             'title': "Completion number",
-            'type': "String",
+            'type': "Number",
             'target': 'tasks',
             'help': 'Total completions per task'
         },
@@ -225,6 +225,16 @@ def preload_tasks(project, resolve_uri=False):
 def operator(op, a, b):
     """ Filter operators
     """
+    if op == 'empty':  # TODO: check it
+        return (b is None or not b) and a
+    if op == 'not_empty':  # TODO: check it
+        return (b is not None or not b) and a
+
+    if a is None:
+        return False
+    if b is None:
+        return False
+
     if op == 'equal':
         return a == b
     if op == 'not_equal':
@@ -233,10 +243,6 @@ def operator(op, a, b):
         return a in b
     if op == 'not_contains':
         return a not in b
-    if op == 'empty' and a:  # TODO: check it
-        return b is None or not b
-    if op == 'not_empty' and not a:  # TODO: check it
-        return b is not None or not b
 
     if op == 'less':
         return b < a
