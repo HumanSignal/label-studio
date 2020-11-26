@@ -1,6 +1,6 @@
 {
-  "message": "Hide Create Normalization button",
-  "commit": "0199cf696a0383cfb8809c09d2e9c9f396e420d9",
+  "message": "Add Taxonomy inlineSearchInput for fixing tree view",
+  "commit": "5d8b2ce6bb99812940709212db5be0697d395bac",
   "branch": "release/0.8.2",
-  "date": "2020-11-26T08:52:53Z"
+  "date": "2020-11-26T10:24:47Z"
 }

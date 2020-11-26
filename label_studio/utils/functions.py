@@ -65,7 +65,7 @@ def data_examples(mode):
     return _DATA_EXAMPLES[mode]
 
 
-def generate_sample_task_without_check(label_config, mode='upload'):
+def generate_sample_task_without_check(label_config, mode='upload', secure_mode=False):
     """ Generate sample task only
     """
     # load config
@@ -88,6 +88,10 @@ def generate_sample_task_without_check(label_config, mode='upload'):
             continue
         value = value[1:]
 
+        # detect secured mode - objects served as URLs
+        value_type = p.get('valueType') or p.get('valuetype')
+        only_urls = secure_mode or value_type == 'url'
+
         if p.tag == 'Paragraphs':
             # Paragraphs special case - replace nameKey/textKey if presented
             name_key = p.get('nameKey') or p.get('namekey') or 'author'
@@ -107,24 +111,20 @@ def generate_sample_task_without_check(label_config, mode='upload'):
             sep = p.get('sep')
             time_format = p.get('timeFormat')
 
-            tag_value = p.attrib['value'].lstrip('$')
-            ts_task = task[tag_value]
-            if isinstance(ts_task, str):
+            if only_urls:
                 # data is URL
                 params = {'time': time_column, 'values': ','.join(value_columns)}
                 if sep:
                     params['sep'] = sep
                 if time_format:
                     params['tf'] = time_format
-                task[tag_value] = '/samples/time-series.csv?' + urlencode(params)
-
-            elif isinstance(ts_task, dict):
+                task[value] = '/samples/time-series.csv?' + urlencode(params)
+            else:
                 # data is JSON
-                task[tag_value] = generate_time_series_json(time_column, value_columns, time_format)
+                task[value] = generate_time_series_json(time_column, value_columns, time_format)
 
         else:
             # Any other object tag - get static examples from data_examples.json
-            value_type = p.get('valueType') or p.get('valuetype')
 
             # patch for valueType="url"
             examples['Text'] = examples['TextUrl'] if value_type == 'url' else examples['TextRaw']

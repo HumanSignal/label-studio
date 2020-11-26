@@ -6,7 +6,7 @@
       <Label value="Negate"></Label>
       <Label value="Affirm"></Label>
   </ParagraphLabels>
-    
+
   <Paragraphs
           audioUrl="$audio"
           name="dialogue"
