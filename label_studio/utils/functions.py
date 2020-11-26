@@ -127,7 +127,7 @@ def generate_sample_task_without_check(label_config, mode='upload', secure_mode=
             # Any other object tag - get static examples from data_examples.json
 
             # patch for valueType="url"
-            examples['Text'] = examples['TextUrl'] if value_type == 'url' else examples['TextRaw']
+            examples['Text'] = examples['TextUrl'] if only_urls else examples['TextRaw']
 
             # try get example by variable name
             task[value] = examples.get('$' + value)
