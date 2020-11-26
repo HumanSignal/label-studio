@@ -90,6 +90,22 @@ class Project(object):
         self.load_converter()
         self.max_tasks_file_size = 250
 
+    @property
+    def config_path(self):
+        return os.path.join(self.path, 'config.json')
+
+    @property
+    def label_config_path(self):
+        return os.path.join(self.path, 'config.xml')
+
+    @property
+    def input_path(self):
+        return os.path.join(self.path, 'tasks.json')
+
+    @property
+    def output_dir(self):
+        return os.path.join(self.path, 'completions')
+
     def get_storage(self, storage_for):
         if storage_for == 'source':
             return self.source_storage
@@ -178,7 +194,7 @@ class Project(object):
         return self.project_obj.data_types_json
 
     def load_label_config(self):
-        self.label_config_full = config_comments_free(open(self.config['label_config'], encoding='utf8').read())
+        self.label_config_full = config_comments_free(open(self.label_config_path, encoding='utf8').read())
         self.label_config_line = config_line_stripped(self.label_config_full)
         self.parsed_label_config = parse_config(self.label_config_line)
         self.input_data_tags = self.get_input_data_tags(self.label_config_line)
@@ -284,7 +300,7 @@ class Project(object):
         self.validate_label_config_on_derived_output_schema(parsed_config)
 
     def _save_config(self):
-        with io.open(self.config['config_path'], mode='w') as f:
+        with io.open(self.config_path, mode='w') as f:
             json.dump(self.config, f, indent=2)
 
     def update_params(self, params):
@@ -295,10 +311,9 @@ class Project(object):
             self._save_config()
 
     def update_label_config(self, new_label_config):
-        label_config_file = self.config['label_config']
         # save xml label config to file
         new_label_config = new_label_config.replace('\r\n', '\n')
-        with io.open(label_config_file, mode='w', encoding='utf8') as f:
+        with io.open(self.label_config_path, mode='w', encoding='utf8') as f:
             f.write(new_label_config)
 
         # reload everything that depends on label config
@@ -309,9 +324,9 @@ class Project(object):
 
         # save project config state
         self.config['label_config_updated'] = True
-        with io.open(self.config['config_path'], mode='w', encoding='utf8') as f:
+        with io.open(self.config_path, mode='w', encoding='utf8') as f:
             json.dump(self.config, f)
-        logger.info('Label config saved to: {path}'.format(path=label_config_file))
+        logger.info('Label config saved to: {path}'.format(path=self.label_config_path))
 
     def _update_derived_output_schema(self, completion):
         """
@@ -852,27 +867,20 @@ class Project(object):
                 ', maybe you\'ve missed appending "--init" option:\nlabel-studio start ' + project_name + ' --init'
             )
 
-        config_path = os.path.abspath(config_path)
-        with io.open(config_path) as c:
+        with io.open(os.path.abspath(config_path)) as c:
             config = json.load(c)
 
-        config['config_path'] = config_path
-        if config.get('input_path'):
-            config['input_path'] = os.path.join(os.path.dirname(config_path), config['input_path'])
-        config['label_config'] = os.path.join(os.path.dirname(config_path), config['label_config'])
-        if config.get('output_dir'):
-            config['output_dir'] = os.path.join(os.path.dirname(config_path), config['output_dir'])
         if not config.get('source'):
             config['source'] = {
                 'name': 'Tasks',
                 'type': 'tasks-json',
-                'path': os.path.abspath(config['input_path'])
+                'path': 'tasks.json'
             }
         if not config.get('target'):
             config['target'] = {
                 'name': 'Completions',
                 'type': 'completions-dir',
-                'path': os.path.abspath(config['output_dir'])
+                'path': 'completions'
             }
         return config
 
