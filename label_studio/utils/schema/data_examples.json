@@ -6,38 +6,15 @@
     "Image": "static/samples/sample.jpg",
     "Audio": "static/samples/game.wav",
     "AudioPlus": "static/samples/game.wav",
-    "List": [ { "#elementValue": "Hello world" }, { "#elementValue": "Goodbye world" } ],
     "Header": "Task header",
-    "Dialog":  [{"name": "Jack", "text": "Yes! Tell me more!"}, {"name": "Anna", "text": "No, stop it."}],
+    "Paragraphs":  [{"author": "Alice", "text": "Hi, Bob."}, {"author": "Bob", "text": "Hello, Alice!"}, {"author": "Alice", "text": "What's up?"}, {"author": "Bob", "text": "Good. Ciao!"}, {"author": "Alice", "text": "Bye, Bob."}],
     "Table": {"Card number": 18799210, "First name": "Max", "Last name":  "Nobel"},
     "$video": "<video src='static/samples/opossum_snow.mp4' width=100% controls>",
     "$longText": "Opossums are frequently considered to be living fossils, and as a result are often used to approximate the ancestral therian condition in comparative studies. However, this is inaccurate, the oldest opossum fossils are early Miocene in age (roughly 20 million years old) and the last common ancestor of all living opossums approximately dates to the Oligocene-Miocene boundary (roughly 23 million years ago) and is at most no older than Oligocene in age. Many extinct metatherians once considered early opossums, such as Alphadon, Peradectes, Herpetotherium, and Pucadelphys, have since been recognized to have been previously grouped with opossums on the basis of plesiomorphies and are now considered to represent older branches of Metatheria only distantly related to modern opossums.",
     "$pdf": "<embed src='static/samples/sample.pdf' width='100%' height='600px'/>",
     "$website": "<iframe src='http://heartex.ai' width='100%' height='600px'/>",
     "$headlessCsv": "static/samples/sample-task-sin-headless.csv",
-    "TimeSeriesUrl": "static/samples/sample-task-sin.csv",
-    "TimeSeriesRaw": {
-        "time": [1592250491999.9731, 1592250502000.8528, 1592250511995.9402, 1592250521907.7957, 1592250531958.7983,
-          1592250541999.4128, 1592250551987.2368, 1592250561916.2224, 1592250571937.3018, 1592250581914.861,
-          1592250591959.91, 1592250602002.6792, 1592250611980.193, 1592250621972.136, 1592250631908.0818,
-          1592250641999.0237, 1592250651978.02, 1592250662003.2505, 1592250671950.9492, 1592250681925.8862,
-          1592250692004.1423, 1592250701968.076, 1592250711999.969, 1592250721990.9875, 1592250731949.857
-        ],
-        "one": [
-          3.8633430837930365, 29.051553479500623, 64.90225843422421, 35.101674507707315, 53.965040360464,
-          43.31087606203771, 67.76766225726678, 58.91724400213194, 64.39627234588062, 96.41980540779943,
-          83.4956897064981, 89.29918202473353, 127.37012726774479, 131.53062096560495, 133.66169583708373,
-          93.83517130075063, 115.6700888095121, 108.36650588093624, 144.42374083164185, 143.80187340640762,
-          161.68563340217042, 134.02548024086985, 137.9069890423578, 173.49454803619048, 163.37425905602268
-        ],
-        "two": [
-          0.0, 25.18821039570759, 35.850704954723604, -29.80058392651691, 18.86336585275669,
-          -10.654164298426297, 24.45678619522907, -8.85041825513484, 5.4790283437486815, 32.023533061918805,
-          -12.924115701301332, 5.803492318235413, 38.070945243011295, 4.160493697860146, 2.131074871478773,
-          -39.826524536333096, 21.834917508761464, -7.30358292857585, 36.057234950705606, -0.6218674252341998,
-          17.883759995762773, -27.660153161300567, 3.881508801487968, 35.58755899383269, -10.1202889801678
-        ]
-      }
+    "TimeSeriesUrl": "static/samples/sample-task-sin.csv"
   },
   "upload": {
     "TextRaw": "To have faith is to trust yourself to the water",
@@ -46,37 +23,14 @@
     "Image": "static/samples/sample.jpg",
     "Audio": "static/samples/game.wav",
     "AudioPlus": "static/samples/game.wav",
-    "List": [ { "#elementValue": "Hello world" }, { "#elementValue": "Goodbye world" } ],
     "Header": "Task header",
-    "Dialog":  [{"name": "Jack", "text": "Yes! Tell me more!"}, {"name": "Anna", "text": "No, stop it."}],
+    "Paragraphs":  [{"author": "Alice", "text": "Hi, Bob."}, {"author": "Bob", "text": "Hello, Alice!"}, {"author": "Alice", "text": "What's up?"}, {"author": "Bob", "text": "Good. Ciao!"}, {"author": "Alice", "text": "Bye, Bob."}],
     "Table": {"Card number": 18799210, "First name": "Max", "Last name":  "Nobel"},
     "$video": "<video src='static/samples/opossum_snow.mp4' width=100% controls>",
     "$longText": "Opossums are frequently considered to be living fossils, and as a result are often used to approximate the ancestral therian condition in comparative studies. However, this is inaccurate, the oldest opossum fossils are early Miocene in age (roughly 20 million years old) and the last common ancestor of all living opossums approximately dates to the Oligocene-Miocene boundary (roughly 23 million years ago) and is at most no older than Oligocene in age. Many extinct metatherians once considered early opossums, such as Alphadon, Peradectes, Herpetotherium, and Pucadelphys, have since been recognized to have been previously grouped with opossums on the basis of plesiomorphies and are now considered to represent older branches of Metatheria only distantly related to modern opossums.",
     "$pdf": "<embed src='static/samples/sample.pdf' width='100%' height='600px'/>",
     "$website": "<iframe src='https://heartex.ai' width='100%' height='600px'/>",
     "$headlessCsv": "static/samples/sample-task-sin-headless.csv",
-    "TimeSeriesUrl": "static/samples/sample-task-sin.csv",
-    "TimeSeriesRaw": {
-        "time": [1592250491999.9731, 1592250502000.8528, 1592250511995.9402, 1592250521907.7957, 1592250531958.7983,
-          1592250541999.4128, 1592250551987.2368, 1592250561916.2224, 1592250571937.3018, 1592250581914.861,
-          1592250591959.91, 1592250602002.6792, 1592250611980.193, 1592250621972.136, 1592250631908.0818,
-          1592250641999.0237, 1592250651978.02, 1592250662003.2505, 1592250671950.9492, 1592250681925.8862,
-          1592250692004.1423, 1592250701968.076, 1592250711999.969, 1592250721990.9875, 1592250731949.857
-        ],
-        "one": [
-          3.8633430837930365, 29.051553479500623, 64.90225843422421, 35.101674507707315, 53.965040360464,
-          43.31087606203771, 67.76766225726678, 58.91724400213194, 64.39627234588062, 96.41980540779943,
-          83.4956897064981, 89.29918202473353, 127.37012726774479, 131.53062096560495, 133.66169583708373,
-          93.83517130075063, 115.6700888095121, 108.36650588093624, 144.42374083164185, 143.80187340640762,
-          161.68563340217042, 134.02548024086985, 137.9069890423578, 173.49454803619048, 163.37425905602268
-        ],
-        "two": [
-          0.0, 25.18821039570759, 35.850704954723604, -29.80058392651691, 18.86336585275669,
-          -10.654164298426297, 24.45678619522907, -8.85041825513484, 5.4790283437486815, 32.023533061918805,
-          -12.924115701301332, 5.803492318235413, 38.070945243011295, 4.160493697860146, 2.131074871478773,
-          -39.826524536333096, 21.834917508761464, -7.30358292857585, 36.057234950705606, -0.6218674252341998,
-          17.883759995762773, -27.660153161300567, 3.881508801487968, 35.58755899383269, -10.1202889801678
-        ]
-      }
+    "TimeSeriesUrl": "static/samples/sample-task-sin.csv"
   }
 }

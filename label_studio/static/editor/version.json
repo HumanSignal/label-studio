@@ -1,6 +1,6 @@
 {
-  "message": "Add Paragraphs to label structured text",
-  "commit": "64d1468253200e7ba602c6a07425c89491139aea",
+  "message": "Hide Create Normalization button",
+  "commit": "0199cf696a0383cfb8809c09d2e9c9f396e420d9",
   "branch": "release/0.8.2",
-  "date": "2020-11-25T17:39:16Z"
+  "date": "2020-11-26T08:52:53Z"
 }

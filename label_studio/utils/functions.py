@@ -81,49 +81,60 @@ def generate_sample_task_without_check(label_config, mode='upload'):
     task = {}
     parent = xml.findall('.//*[@value]')  # take all tags with value attribute
     for p in parent:
+
+        # Make sure it is a real object tag, extract data placeholder key
         value = p.get('value')
-        value_type = p.get('valueType', p.get('valuetype', None))
+        if not value or not value.startswith('$'):
+            continue
+        value = value[1:]
 
-        # process List
-        if p.tag == 'List':
-            key = p.get('elementValue').replace('$', '')
-            examples['List'] = [{key: 'Hello world'}, {key: 'Goodbye world'}]
+        if p.tag == 'Paragraphs':
+            # Paragraphs special case - replace nameKey/textKey if presented
+            name_key = p.get('nameKey') or p.get('namekey') or 'author'
+            text_key = p.get('textKey') or p.get('textkey') or 'text'
+            task[value] = []
+            for item in examples[p.tag]:
+                task[value].append({name_key: item['author'], text_key: item['text']})
 
-        # valueType="url"
-        examples['Text'] = examples['TextUrl'] if value_type == 'url' else examples['TextRaw']
-        examples['TimeSeries'] = examples['TimeSeriesUrl'] if value_type == 'url' or value_type is None else examples['TimeSeriesRaw']
+        elif p.tag == 'TimeSeries':
+            # TimeSeries special case - generate signals on-the-fly
+            time_column = p.get('timeColumn')
+            value_columns = []
+            for ts_child in p:
+                if ts_child.tag != 'Channel':
+                    continue
+                value_columns.append(ts_child.get('column'))
+            sep = p.get('sep')
+            time_format = p.get('timeFormat')
 
-        if value and value[0] == '$':
+            tag_value = p.attrib['value'].lstrip('$')
+            ts_task = task[tag_value]
+            if isinstance(ts_task, str):
+                # data is URL
+                params = {'time': time_column, 'values': ','.join(value_columns)}
+                if sep:
+                    params['sep'] = sep
+                if time_format:
+                    params['tf'] = time_format
+                task[tag_value] = '/samples/time-series.csv?' + urlencode(params)
+
+            elif isinstance(ts_task, dict):
+                # data is JSON
+                task[tag_value] = generate_time_series_json(time_column, value_columns, time_format)
+
+        else:
+            # Any other object tag - get static examples from data_examples.json
+            value_type = p.get('valueType') or p.get('valuetype')
+
+            # patch for valueType="url"
+            examples['Text'] = examples['TextUrl'] if value_type == 'url' else examples['TextRaw']
+
             # try get example by variable name
-            by_name = examples.get(value, None)
-            # not found by name, try get example by type
-            task[value[1:]] = examples.get(p.tag, 'Something') if by_name is None else by_name
+            task[value] = examples.get('$' + value)
+            if not task[value]:
+                # not found by name, try get example by type
+                task[value] = examples.get(p.tag, 'Something')
 
-    # TimeSeries special case
-    for ts_tag in xml.findall('.//TimeSeries'):
-        time_column = ts_tag.get('timeColumn')
-        value_columns = []
-        for ts_child in ts_tag:
-            if ts_child.tag != 'Channel':
-                continue
-            value_columns.append(ts_child.get('column'))
-        sep = ts_tag.get('sep')
-        time_format = ts_tag.get('timeFormat')
-
-        tag_value = ts_tag.attrib['value'].lstrip('$')
-        ts_task = task[tag_value]
-        if isinstance(ts_task, str):
-            # data is URL
-            params = {'time': time_column, 'values': ','.join(value_columns)}
-            if sep:
-                params['sep'] = sep
-            if time_format:
-                params['tf'] = time_format
-            task[tag_value] = '/samples/time-series.csv?' + urlencode(params)
-
-        elif isinstance(ts_task, dict):
-            # data is JSON
-            task[tag_value] = generate_time_series_json(time_column, value_columns, time_format)
     return task
 
 
