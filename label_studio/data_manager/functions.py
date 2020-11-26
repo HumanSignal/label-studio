@@ -1,4 +1,5 @@
 from flask import session
+from operator import itemgetter
 from label_studio.utils.misc import DirectionSwitch, timestamp_to_local_datetime
 from label_studio.utils.uri_resolver import resolve_task_data_uri
 
@@ -153,43 +154,69 @@ def delete_tab(tab_id):
     return True
 
 
+def get_completed_at(task):
+    """ Get completed time for task
+    """
+    # check for empty array []
+    if len(task.get('completions', [])) == 0:
+        return None
+
+    # aggregate completion created_at by max
+    try:
+        return max(task['completions'], key=itemgetter('created_at'))['created_at']
+    except Exception as exc:
+        return 0
+
+
+def get_cancelled_number(task):
+    """ Get was_cancelled (skipped) status for task: returns cancelled completion number for task
+    """
+    try:
+        # note: skipped will be deprecated
+        return sum([completion.get('skipped', False) or completion.get('was_cancelled', False)
+                    for completion in task['completions']])
+    except Exception as exc:
+        return None
+
+
+def preload_task(project, task_id, resolve_uri=False):
+    task = project.get_task_with_completions(task_id)
+
+    # no completions at task, get task without completions
+    if task is None:
+        task = project.source_storage.get(task_id)
+
+    # with completions
+    else:
+        # completed_at
+        completed_at = get_completed_at(task)
+        if completed_at != 0 and isinstance(completed_at, int):
+            completed_at = timestamp_to_local_datetime(completed_at).strftime(DATETIME_FORMAT)
+        task['completed_at'] = completed_at
+
+        # cancelled completions number
+        task['has_cancelled_completions'] = get_cancelled_number(task)
+
+        # total completions
+        task['total_completions'] = len(task['completions'])
+
+    # don't resolve data (s3/gcs is slow) if it's not necessary (it's very slow)
+    if resolve_uri:
+        task = resolve_task_data_uri(task, project=project)
+
+    return task
+
+
 def preload_tasks(project, resolve_uri=False):
     """ Preload tasks: get completed_at, has_cancelled_completions,
         evaluate pre-signed urls for storages, aggregate over completion data, etc.
     """
     task_ids = project.source_storage.ids()  # get task ids for all tasks in DB
-    all_completed_at = project.get_completed_at()  # task can have multiple completions, get the last of completed
-    all_cancelled_status = project.get_cancelled_status()  # number of all cancelled completions in task
 
     # get tasks with completions
     tasks = []
     for i in task_ids:
-        task = project.get_task_with_completions(i)
-
-        # no completions at task, get task without completions
-        if task is None:
-            task = project.source_storage.get(i)
-
-        # with completions
-        else:
-            # completed_at
-            if i in all_completed_at:
-                completed_at = all_completed_at[i]
-                if completed_at != 0 and isinstance(completed_at, int):
-                    completed_at = timestamp_to_local_datetime(completed_at).strftime(DATETIME_FORMAT)
-                task['completed_at'] = completed_at
-
-            # cancelled completions number
-            if i in all_cancelled_status:
-                task['has_cancelled_completions'] = all_cancelled_status[i]
-
-            # total completions
-            task['total_completions'] = len(task['completions'])
-
-        # don't resolve data (s3/gcs is slow) if it's not necessary (it's very slow)
-        if resolve_uri:
-            task = resolve_task_data_uri(task, project=project)
-
+        task = preload_task(project, i, resolve_uri)
         tasks.append(task)
 
     return tasks

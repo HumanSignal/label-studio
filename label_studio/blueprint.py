@@ -855,16 +855,16 @@ def api_task_by_id(task_id):
 
     # try to get task with completions first
     if request.method == 'GET':
-        task_data = g.project.get_task_with_completions(task_id) or g.project.source_storage.get(task_id)
-        task_data = resolve_task_data_uri(task_data, project=g.project)
+        from label_studio.data_manager.functions import preload_task
+        task = preload_task(g.project, task_id, resolve_uri=True)
 
         if g.project.ml_backends_connected:
-            task_data = g.project.make_predictions(task_data)
+            task = g.project.make_predictions(task)
 
         # change indent for pretty jsonify
         indent = 2 if request.values.get('pretty', False) else None
         response = current_app.response_class(
-            json.dumps(task_data, indent=indent) + "\n",
+            json.dumps(task, indent=indent) + "\n",
             mimetype=current_app.config["JSONIFY_MIMETYPE"],
         )
         return make_response(response, 200)
@@ -909,7 +909,7 @@ def api_tasks_completions(task_id):
             return make_response({'detail': 'Completion removing is not allowed in server config'}, 422)
 
 
-@blueprint.route('/api/tasks/<task_id>/completions/<completion_id>', methods=['PATCH', 'DELETE'])
+@blueprint.route('/api/tasks/<task_id>/completions/<completion_id>', methods=['POST', 'PATCH', 'DELETE'])
 @requires_auth
 @exception_handler
 def api_completion_by_id(task_id, completion_id):

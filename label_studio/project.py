@@ -481,42 +481,6 @@ class Project(object):
             num=len(completions), output_dir=self.config["output_dir"]))
         return sorted(completions)
 
-    def get_completed_at(self):
-        """ Get completed time for tasks
-
-        :return: list of string with formatted datetime
-        """
-        times = {}
-        for _, data in self.target_storage.items():
-            id = data['id']
-            # check for empty array []
-            if len(data.get('completions', [])) == 0:
-                continue
-            # aggregate completion created_at by max
-            try:
-                times[id] = max(data['completions'], key=itemgetter('created_at'))['created_at']
-            except Exception as exc:
-                times[id] = 0
-        return times
-
-    def get_cancelled_status(self):
-        """ Get was_cancelled (skipped) status for tasks: returns cancelled completion number for task
-
-        :return: list of int
-        """
-        items = {}
-        for _, data in self.target_storage.items():
-            id = data['id']
-            try:
-                # note: skipped will be deprecated
-                flag = sum([completion.get('skipped', False) or completion.get('was_cancelled', False)
-                            for completion in data['completions']])
-            except Exception as exc:
-                items[id] = -1
-            else:
-                items[id] = flag
-        return items
-
     def get_task_with_completions(self, task_id):
         """ Get task with completions
 
