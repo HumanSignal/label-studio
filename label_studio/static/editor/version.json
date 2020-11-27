@@ -1,6 +1,6 @@
 {
-  "message": "Fix deserialization of tree view in Regions panel",
-  "commit": "57cbe6765b3aa0b59da23c39569d2a2abd9b59aa",
-  "branch": "master",
-  "date": "2020-11-12T22:21:54Z"
+  "message": "Add Taxonomy inlineSearchInput for fixing tree view",
+  "commit": "5d8b2ce6bb99812940709212db5be0697d395bac",
+  "branch": "release/0.8.2",
+  "date": "2020-11-26T10:24:47Z"
 }

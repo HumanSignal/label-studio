@@ -199,6 +199,9 @@ class ExternalTasksJSONStorage(CloudStorage):
         self._save_ids()
         self._save()
 
+    def _extract_task_id(self, full_key):
+        return int(full_key.split(self.key_prefix, 1)[-1])
+
     def iter_full_keys(self):
         return (self.key_prefix + key for key in self._get_objects())
 

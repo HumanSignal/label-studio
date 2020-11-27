@@ -333,7 +333,8 @@ class MLApi(BaseHTTPAPI):
             'label_config': project.label_config_line,
             'params': {
                 'login': project.task_data_login,
-                'password': project.task_data_password
+                'password': project.task_data_password,
+                'project_full_path': os.path.abspath(project.path)
             }
         }
         return self._post('train', request)

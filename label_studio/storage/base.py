@@ -409,6 +409,10 @@ class CloudStorage(BaseStorage):
 
             yield self.key_prefix + key
 
+    def _extract_task_id(self, full_key):
+        """Infer task ID from specified key (e.g. by splitting tasks.json/123)"""
+        pass
+
     def _sync(self):
         with self.thread_lock:
             self.last_sync_time = datetime.now()
@@ -422,12 +426,22 @@ class CloudStorage(BaseStorage):
         intersect = full & OrderedSet(self._keys_ids_map)
         exclusion = full - intersect
 
-        for key in exclusion:
+        def _get_new_id(key):
+            global new_id
+            id = self._extract_task_id(key)
+            if id is not None:
+                return id
             id = new_id
             new_id += 1
+            return id
+
+        # new tasks
+        for key in exclusion:
+            id = _get_new_id(key)
             new_ids_keys_map[id] = {'key': key, 'exists': True}
             new_keys_ids_map[key] = id
 
+        # old existed tasks
         for key in intersect:
             id = self._keys_ids_map[key]
             new_ids_keys_map[id] = {'key': key, 'exists': True}
