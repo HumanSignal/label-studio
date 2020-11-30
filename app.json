@@ -7,6 +7,10 @@
   "logo": "https://labelstud.io/images/opossum/heartex_icon_opossum_green.svg",
   "stack": "container",
   "env": {
-    "LABEL_STUDIO_HEROKU": "1"
+    "LABEL_STUDIO_ONE_CLICK_DEPLOY": {
+      "description": "Label Studio One Click Deploy Environmental Flag",
+      "value": "1",
+      "required": false
+    }
   }
 }
