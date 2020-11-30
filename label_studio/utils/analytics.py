@@ -124,7 +124,7 @@ class Analytics(object):
                 'session_id': session.get('session_id'),
                 'user_agent': request.user_agent.string,
                 'url': request.url,
-                'endpoint': request.endpoint,
+                'endpoint': request.endpoint.replace('label_studio.', ''),
                 'method': request.method,
                 'values': dict(request.values),
                 'json': j,
