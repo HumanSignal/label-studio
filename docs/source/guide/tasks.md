@@ -244,7 +244,7 @@ There are a few possible ways to import data files to your labeling project:
 
  - Start Label Studio without specifying input path and then import through the web interfaces available at [http://localhost:8080/import](http://localhost:8080/import)
 
- - Initialize Label Studio project and directly specify the paths, e.g. `label-studio init --input-path my_tasks.json --input-format json`
+ - Initialize Label Studio project and directly specify the paths, e.g. `label-studio init my_project --input-path my_tasks.json --input-format json`
 
 The `--input-path` argument points to a file or a directory where your labeling tasks reside. By default it expects [JSON-formatted tasks](tasks.html#JSON), but you can also specify all other formats listed bellow by using `--input-format` option.
 
@@ -259,7 +259,7 @@ label-studio init --input-path=my_tasks.json
 ### Directory with JSON files
 
 ```bash
-label-studio init --input-path=dir/with/json/files --input-format=json-dir
+label-studio init my_project --input-path=dir/with/json/files --input-format=json-dir
 ```
 
 Instead of putting all tasks into one file, you can split your input data into several _tasks.json_, and specify the directory path. Each JSON file contains tasks in a [basic Label Studio JSON format](tasks.html#Basic-format).
