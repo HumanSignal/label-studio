@@ -1,6 +1,6 @@
 {
-  "message": "Fix deserialization of tree view in Regions panel",
-  "commit": "57cbe6765b3aa0b59da23c39569d2a2abd9b59aa",
-  "branch": "master",
-  "date": "2020-11-12T22:21:54Z"
+  "message": "iAllow to delete non-perRegion TextArea items",
+  "commit": "8f89391a106a99498158c2bd727a306b29327fda",
+  "branch": "release/0.8.2",
+  "date": "2020-12-01T16:07:37Z"
 }

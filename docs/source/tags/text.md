@@ -1,10 +1,12 @@
 ---
 title: Text
 type: tags
-order: 305
+order: 306
 ---
 
-Text tag shows an Text markup that can be labeled
+Text tag shows an Text markup that can be labeled.
+You can use `<Style>.htx-text{ white-space: pre-wrap; }</Style>` to preserve all the spaces.
+In any case every space counts for result offsets.
 
 ### Parameters
 

@@ -1,14 +1,19 @@
-<!-- {"title": "Dialogs & conversations", "category": "html", "complexity": "basic"} -->
+<!-- {"title": "Dialogs & conversations", "category": "html", "complexity": "basic", "order": "1", "new": true} -->
 <View>
-  <HyperText name="dialog" value="$dialogs"/>
+  <ParagraphLabels name="actions" toName="dialogue">
+      <Label value="Inform"></Label>
+      <Label value="Request"></Label>
+      <Label value="Negate"></Label>
+      <Label value="Affirm"></Label>
+  </ParagraphLabels>
 
-  <Header value="Rate last answer"/>
-  <Choices name="rating" choice="single-radio" toName="dialog" showInline="true">
-    <Choice value="Bad answer"/>
-    <Choice value="Neutral answer"/>
-    <Choice value="Good answer"/>
-  </Choices>
-
-  <Header value="Write your answer and press Enter"/>
-  <TextArea toName="dialog" name="answer"/>
+  <Paragraphs
+          audioUrl="$audio"
+          name="dialogue"
+          value="$dialogue"
+          layout="dialogue"
+          savetextresult="yes"
+          nameKey="speaker"
+          textKey="phrase"
+  />
 </View>

@@ -20,6 +20,7 @@ That gives you the opportunities to use:
 - [Text classification with Scikit-Learn](/tutorials/sklearn-text-classifier.html)
 - [Transfer learning for images with PyTorch](/tutorials/pytorch-image-transfer-learning.html)
 - [Image Object Detector](/tutorials/object-detector.html)
+- [Chatbot response generation with HuggingFace's GPT2 model](/tutorials/gpt.html)
 
 #### Create ML backend
 

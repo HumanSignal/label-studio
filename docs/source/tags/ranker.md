@@ -1,7 +1,7 @@
 ---
 title: Ranker
 type: tags
-order: 415
+order: 417
 ---
 
 Ranker tag, used to ranking models

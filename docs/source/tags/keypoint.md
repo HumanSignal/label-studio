@@ -1,7 +1,7 @@
 ---
 title: KeyPoint
 type: tags
-order: 407
+order: 408
 ---
 
 KeyPoint is used to add a keypoint to an image without label selection. It's useful when you have only one label.

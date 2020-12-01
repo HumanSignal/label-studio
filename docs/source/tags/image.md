@@ -4,7 +4,8 @@ type: tags
 order: 304
 ---
 
-Image tag shows an image on the page
+Image tag shows an image on the page.
+All the region numbers are percents of image original sizes — [0, 100]
 
 ### Parameters
 
