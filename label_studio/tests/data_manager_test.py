@@ -40,8 +40,7 @@ class TestTabs:
         assert response.json == [1, 2, 3]
 
         response = test_client.patch('/api/project/tabs/1/selected-items', json=[4, 5])
-        assert response.status_code == 201
-
+        assert response.status_code == 20
         response = test_client.get('/api/project/tabs/1/selected-items')
         assert response.status_code == 200
         assert response.json == [1, 2, 3, 4, 5]
