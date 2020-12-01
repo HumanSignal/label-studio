@@ -71,7 +71,7 @@ def make_columns(project):
         },
         {
             'id': 'total_completions',
-            'title': "Completion number",
+            'title': "Completions",
             'type': "Number",
             'target': 'tasks',
             'help': 'Total completions per task'
@@ -81,7 +81,7 @@ def make_columns(project):
             'title': "Cancelled",
             'type': "Number",
             'target': 'tasks',
-            'help': 'Number of cancelled completions'
+            'help': 'Number of cancelled (skipped) completions'
         },
         {
             'id': 'data',
