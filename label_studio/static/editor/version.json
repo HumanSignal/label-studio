@@ -1,6 +1,6 @@
 {
-  "message": "Fix weird crashes on task update",
-  "commit": "38a8537dedfecd9cb5c0c0c76f123c2d42873a34",
+  "message": "Merge branch 'master' into release/0.8.2",
+  "commit": "2b483628e96b9a7de01b2918a2ebcdc8a0b2084c",
   "branch": "release/0.8.2",
-  "date": "2020-11-30T08:30:06Z"
+  "date": "2020-12-01T12:22:42Z"
 }
