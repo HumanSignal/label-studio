@@ -28,7 +28,8 @@ def action_config(test_client, case_config):
         'label_config': case_config['label_config']
     }
     response = test_client.post('/api/project/config', data=data, headers=headers)
-    print('\n\n\n\n --------', response, '\n\n\n')
+    if response.status_code != 201:
+        print('\n\n\n -- response.data -->', response.data, '\n\n\n')
     assert response.status_code == 201
 
 
