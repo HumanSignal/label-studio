@@ -693,20 +693,18 @@ def api_export():
     """
     export_format = request.args.get('format')
     now = datetime.now()
-    completion_dir = g.project.config['output_dir']
 
-    project_export_dir = os.path.join(os.path.dirname(completion_dir), 'export')
-    os.makedirs(project_export_dir, exist_ok=True)
+    os.makedirs(g.project.export_dir, exist_ok=True)
 
-    zip_dir = os.path.join(project_export_dir, now.strftime('%Y-%m-%d-%H-%M-%S'))
+    zip_dir = os.path.join(g.project.export_dir, now.strftime('%Y-%m-%d-%H-%M-%S'))
     os.makedirs(zip_dir, exist_ok=True)
-
-    g.project.converter.convert(completion_dir, zip_dir, format=export_format)
+    g.project.converter.convert(g.project.output_dir, zip_dir, format=export_format)
     shutil.make_archive(zip_dir, 'zip', zip_dir)
     shutil.rmtree(zip_dir)
 
-    response = send_file(zip_dir+'.zip', as_attachment=True)
-    response.headers['filename'] = os.path.basename(zip_dir+'.zip')
+    zip_dir_full_path = os.path.abspath(zip_dir + '.zip')
+    response = send_file(zip_dir_full_path, as_attachment=True)
+    response.headers['filename'] = os.path.basename(zip_dir_full_path)
     return response
 
 
