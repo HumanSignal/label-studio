@@ -1,4 +1,4 @@
-<!-- {"title": "Chatbot", "category": "html", "complexity": "basic"} -->
+<!-- {"title": "Chatbot", "category": "html", "complexity": "basic", "new": true, "order": "2"} -->
 <View>
   <Paragraphs
           name="dialogue"
