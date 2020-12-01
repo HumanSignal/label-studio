@@ -1,6 +1,6 @@
 {
-  "message": "Add Taxonomy inlineSearchInput for fixing tree view",
-  "commit": "5d8b2ce6bb99812940709212db5be0697d395bac",
+  "message": "Fix weird crashes on task update",
+  "commit": "38a8537dedfecd9cb5c0c0c76f123c2d42873a34",
   "branch": "release/0.8.2",
-  "date": "2020-11-26T10:24:47Z"
+  "date": "2020-11-30T08:30:06Z"
 }
