@@ -1,3 +1,5 @@
+import os
+import ujson as json
 from flask import session
 from operator import itemgetter
 from label_studio.utils.misc import DirectionSwitch, timestamp_to_local_datetime
@@ -94,11 +96,24 @@ def make_columns(project):
     return result
 
 
-def load_tab(tab_id, raise_if_not_exists=False):
+def load_all_tabs(project):
+    """ Load all tabs from disk
+    """
+    tab_path = os.path.join(project.path, 'tabs.json')
+    return json.load(open(tab_path)) if os.path.exists(tab_path) else create_default_tabs()
+
+
+def save_all_tabs(project, data):
+    """ Save all tabs to disk
+    """
+    tab_path = os.path.join(project.path, 'tabs.json')
+    json.dump(data, open(tab_path, 'w', encoding='utf-8'))
+
+
+def load_tab(tab_id, raise_if_not_exists=False, project=None):
     """ Load tab info from DB
     """
-    # load tab data
-    data = create_default_tabs() if 'tab_data' not in session else session['tab_data']
+    data = load_all_tabs(project)
 
     # select by tab id
     for tab in data['tabs']:
@@ -113,11 +128,11 @@ def load_tab(tab_id, raise_if_not_exists=False):
     return tab
 
 
-def save_tab(tab_id, tab_data):
+def save_tab(tab_id, tab_data, project):
     """ Save tab info to DB
     """
     # load tab data
-    data = create_default_tabs() if 'tab_data' not in session else session['tab_data']
+    data = load_all_tabs(project)
     tab_data['id'] = tab_id
 
     # select by tab id
@@ -130,7 +145,7 @@ def save_tab(tab_id, tab_data):
         tab_data['id'] = tab_id
         data['tabs'].append(tab_data)
 
-    session['tab_data'] = data
+    save_all_tabs(project, data)
 
 
 def delete_tab(tab_id):
