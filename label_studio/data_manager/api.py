@@ -15,7 +15,7 @@ def api_project_tab_tasks(tab_id):
     """ Get tasks for specified tab
     """
     tab_id = int(tab_id)
-    tab = load_tab(tab_id, True)
+    tab = load_tab(tab_id, True, g.project)
 
     # get pagination
     page, page_size = int(request.values.get('page', 1)), int(request.values.get('page_size', 10))
@@ -34,7 +34,7 @@ def api_project_tab_annotations(tab_id):
     """ Get annotations for specified tab
     """
     tab_id = int(tab_id)
-    tab = load_tab(tab_id, True)
+    tab = load_tab(tab_id, True, g.project)
 
     page, page_size = int(request.values.get('page', 1)), int(request.values.get('page_size', 10))
     if page < 1 or page_size < 1:
@@ -81,7 +81,7 @@ def api_project_tabs_id(tab_id):
     """ Specified tab for data manager
     """
     tab_id = int(tab_id)
-    tab_data = load_tab(tab_id, raise_if_not_exists=request.method == 'GET')
+    tab_data = load_tab(tab_id, raise_if_not_exists=request.method == 'GET', project=g.project)
 
     # get tab data
     if request.method == 'GET':
@@ -90,7 +90,7 @@ def api_project_tabs_id(tab_id):
     # set tab data
     if request.method == 'POST':
         tab_data.update(request.json)
-        save_tab(tab_id, tab_data)
+        save_tab(tab_id, tab_data, g.project)
         return make_response(jsonify(tab_data), 201)
 
     # delete tab data
@@ -106,7 +106,7 @@ def api_project_tabs_selected_items(tab_id):
     """ Selected items (checkboxes for tasks/annotations)
     """
     tab_id = int(tab_id)
-    tab_data = load_tab(tab_id, raise_if_not_exists=request.method == 'GET')
+    tab_data = load_tab(tab_id, raise_if_not_exists=request.method == 'GET', project=g.project)
 
     # get tab data
     if request.method == 'GET':
@@ -119,7 +119,7 @@ def api_project_tabs_selected_items(tab_id):
     # set whole
     if request.method == 'POST':
         tab_data['selectedItems'] = items
-        save_tab(tab_id, tab_data)
+        save_tab(tab_id, tab_data, g.project)
         return make_response(jsonify(tab_data), 201)
 
     # init selectedItems
@@ -130,11 +130,11 @@ def api_project_tabs_selected_items(tab_id):
     if request.method == 'PATCH':
         # {[1,2,3]} U {[2,3,4]}
         tab_data['selectedItems'] = list(set(tab_data['selectedItems']).union(set(items)))
-        save_tab(tab_id, tab_data)
+        save_tab(tab_id, tab_data, g.project)
         return make_response(jsonify(tab_data), 201)
 
     # delete specified items
     if request.method == 'DELETE':
         tab_data['selectedItems'] = list(set(tab_data['selectedItems']) - set(items))
-        save_tab(tab_id, tab_data)
+        save_tab(tab_id, tab_data, g.project)
         return make_response(jsonify(tab_data), 204)
