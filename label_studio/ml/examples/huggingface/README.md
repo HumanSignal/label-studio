@@ -23,7 +23,7 @@ Collect your next superpower chatbot dataset by edit, remove or add new phrases!
 3. Run Label Studio, then go to the **Model** page. Paste the selected ML backend URL then click on **Add Backend**.
 
 
-Now you can import your chat dialogs in the input format of [`<Paragraphs>` object tag](), or use sample task import just for give it a try.
+Now you can import your chat dialogs in the input format of [`<Paragraphs>` object tag](/tags/paragraphs.html), or use sample task import just for give it a try.
 
 Finally you'll see text boxes with generated answers - 
 

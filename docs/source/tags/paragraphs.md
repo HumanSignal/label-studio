@@ -6,7 +6,7 @@ is_new: t
 ---
 
 Paragraphs tag shows an Paragraphs markup that can be labeled
-it expects an array of objects like that [{ $nameKey: "Author name", $textKey: "Text" }, ... ]
+it expects an array of objects like that `[{ $nameKey: "Author name", $textKey: "Text" }, ... ]`
 
 ### Parameters
 
