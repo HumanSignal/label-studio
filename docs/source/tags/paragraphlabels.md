@@ -1,10 +1,12 @@
 ---
-title: HyperTextLabels
+title: ParagraphLabels
 type: tags
-order: 407
+order: 414
+is_new: t
 ---
 
-HyperTextLabels tag creates labeled hyper text (HTML)
+ParagraphLabels tag
+ParagraphLabels tag creates labeled paragraph
 
 ### Parameters
 
@@ -16,10 +18,10 @@ HyperTextLabels tag creates labeled hyper text (HTML)
 ### Example
 ```html
 <View>
-  <HyperTextLabels name="labels" toName="ht">
+  <ParagraphLabels name="labels" toName="prg">
     <Label value="Face" />
     <Label value="Nose" />
-  </HyperTextLabels>
-  <HyperText name="ht" value="$html" />
+  </ParagraphLabels>
+  <Paragraphs name="prg" value="$dialogue" layout="dialogue" />
 </View>
 ```

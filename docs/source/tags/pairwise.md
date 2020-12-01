@@ -1,7 +1,7 @@
 ---
 title: Pairwise
 type: tags
-order: 412
+order: 413
 ---
 
 Pairwise element. Compare two different objects, works with any label studio object

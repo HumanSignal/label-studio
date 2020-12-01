@@ -1,7 +1,7 @@
 ---
 title: Rating
 type: tags
-order: 416
+order: 418
 ---
 
 Rating adds rating selection

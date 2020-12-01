@@ -1,7 +1,7 @@
 ---
 title: Polygon
 type: tags
-order: 413
+order: 415
 ---
 
 Polygon is used to add polygons to an image without label selection. It's useful when you have only one label.

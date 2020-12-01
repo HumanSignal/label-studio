@@ -1,7 +1,7 @@
 ---
 title: Shortcut
 type: tags
-order: 421
+order: 423
 ---
 
 Shortcut tag can be used to define a shortcut, which adds a predefined object
