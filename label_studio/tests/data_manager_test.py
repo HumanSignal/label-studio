@@ -53,8 +53,9 @@ class TestTabs:
         assert response.status_code == 200
         assert response.json == [1, 2, 4, 5]
 
-        response = test_client.post('/api/project/tabs/1/selected-items', json=[1, 2, 3])
-        assert response.status_code == 201
+        response = test_client.get('/api/project/tabs/1/')
+        assert response.status_code == 200
+        assert response.json['selectedItems'] == [1, 2, 4, 5]
 
 
 class TestTasksAndAnnotations:
