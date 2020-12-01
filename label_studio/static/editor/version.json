@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'master' into release/0.8.2",
-  "commit": "2b483628e96b9a7de01b2918a2ebcdc8a0b2084c",
+  "message": "iAllow to delete non-perRegion TextArea items",
+  "commit": "8f89391a106a99498158c2bd727a306b29327fda",
   "branch": "release/0.8.2",
-  "date": "2020-12-01T12:22:42Z"
+  "date": "2020-12-01T16:07:37Z"
 }
