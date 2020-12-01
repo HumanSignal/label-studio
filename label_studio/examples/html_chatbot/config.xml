@@ -1,0 +1,16 @@
+<!-- {"title": "Chatbot", "category": "html", "complexity": "basic", "new": true, "order": "2"} -->
+<View>
+  <Paragraphs
+          name="dialogue"
+          value="$dialogue"
+          layout="dialogue"
+          savetextresult="yes"
+          nameKey="speaker"
+          textKey="phrase"
+  />
+   <TextArea name="response" toName="dialogue"
+             editable="true"
+             required="true"
+             placeholder="Put your response here..."/>
+</View>
+

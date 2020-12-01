@@ -1,4 +1,4 @@
-<!-- {"title": "Dialogs & conversations", "category": "html", "complexity": "basic"} -->
+<!-- {"title": "Dialogs & conversations", "category": "html", "complexity": "basic", "order": "1", "new": true} -->
 <View>
   <ParagraphLabels name="actions" toName="dialogue">
       <Label value="Inform"></Label>

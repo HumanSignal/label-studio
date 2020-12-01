@@ -1,7 +1,7 @@
 ---
 title: TimeSeries
 type: tags
-order: 306
+order: 307
 ---
 
 TimeSeries tag can be used to label time series data.

@@ -1,4 +1,4 @@
-<!-- {"title": "Text taxonomy", "category": "text", "complexity": "basic"} -->
+<!-- {"title": "Text taxonomy", "category": "text", "complexity": "basic", "new": true} -->
 <View>
   <Text name="text" value="$text"/>
   <Taxonomy name="" toName="text">

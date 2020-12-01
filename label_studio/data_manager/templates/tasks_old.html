@@ -42,7 +42,7 @@
                 <!-- Controls -->
                 <div style="margin-top: 7px">
                   <!-- Storage settings -->
-                  <span data-tooltip="Change source storage filter">
+                  <span data-tooltip="Change source storage">
                   <i class="fas fa-cog sup-button big"
                      @click="loadStorageSettings(); storage_settings.source.show=true"></i>
                   </span>
@@ -106,7 +106,7 @@
                 <div class="center aligned action-buttons">
                   <!-- Sampling -->
                   <span style="padding-top: 8px; padding-bottom: 11px;"
-                        data-tooltip="Tasks sampling: selecting which task to take next in labeling. Edit project config file to change">
+                        data-tooltip="Method for consecutive tasks sampling: modify 'sampling' option in project_dir/config.json">
                     <span class="ui icon label">
                       <i class="ui icon far shuffle"></i>
                       {{ project.config['sampling'] }}

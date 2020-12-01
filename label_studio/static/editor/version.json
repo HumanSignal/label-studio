@@ -1,6 +1,6 @@
 {
-  "message": "Add Taxonomy inlineSearchInput for fixing tree view",
-  "commit": "5d8b2ce6bb99812940709212db5be0697d395bac",
+  "message": "iAllow to delete non-perRegion TextArea items",
+  "commit": "8f89391a106a99498158c2bd727a306b29327fda",
   "branch": "release/0.8.2",
-  "date": "2020-11-26T10:24:47Z"
+  "date": "2020-12-01T16:07:37Z"
 }

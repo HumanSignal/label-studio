@@ -1,4 +1,4 @@
-<!-- {"title": "COCO annotation", "category": "image", "complexity": "basic"} -->
+<!-- {"title": "COCO annotation", "category": "image", "complexity": "basic", "new": true} -->
 
 <View>
     <Header value="Common Objects in Context"/>

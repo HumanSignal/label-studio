@@ -106,6 +106,10 @@ class Project(object):
     def output_dir(self):
         return os.path.join(self.path, 'completions')
 
+    @property
+    def export_dir(self):
+        return os.path.join(self.path, 'export')
+
     def get_storage(self, storage_for):
         if storage_for == 'source':
             return self.source_storage
