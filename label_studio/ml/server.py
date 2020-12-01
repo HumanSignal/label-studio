@@ -64,7 +64,13 @@ def create_dir(args):
     else:
         script_path = args.script
 
-    if ':' not in script_path:
+    def model_def_in_path(path):
+        is_windows_path = path[1:].startswith(':\\')
+        return ':' in path[2:] if is_windows_path else ':' in path
+
+    if model_def_in_path(script_path):
+        script_path, model_class = args.script.rsplit(':', 1)
+    else:
         model_classes = get_all_classes_inherited_LabelStudioMLBase(script_path)
         if len(model_classes) > 1:
             raise ValueError(
@@ -72,8 +78,6 @@ def create_dir(args):
                 'Please specify explicitly which one should be used using the following format:\n '
                 '{script}:{model_class}'.format(num=len(model_classes), script=script_path, model_class=model_classes[0]))
         model_class = model_classes[0]
-    else:
-        script_path, model_class = args.script.split(':')
 
     if not os.path.exists(script_path):
         raise FileNotFoundError(script_path)
