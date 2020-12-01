@@ -97,3 +97,44 @@ def api_project_tabs_id(tab_id):
     if request.method == 'DELETE':
         delete_tab(tab_id)
         return make_response(jsonify(tab_data), 204)
+
+
+@blueprint.route('/api/project/tabs/<tab_id>/selected-items', methods=['GET', 'POST', 'PATCH', 'DELETE'])
+@requires_auth
+@exception_handler
+def api_project_tabs_selected_items(tab_id):
+    """ Selected items (checkboxes for tasks/annotations)
+    """
+    tab_id = int(tab_id)
+    tab_data = load_tab(tab_id, raise_if_not_exists=request.method == 'GET')
+
+    # get tab data
+    if request.method == 'GET':
+        return make_response(jsonify(tab_data.get('selectedItems', [])), 200)
+
+    # check json body for list
+    assert isinstance(request.json, list), 'json body must be list with selected task ids'
+    items = request.json
+
+    # set whole
+    if request.method == 'POST':
+        tab_data['selectedItems'] = items
+        save_tab(tab_id, tab_data)
+        return make_response(jsonify(tab_data), 201)
+
+    # init selectedItems
+    if 'selectedItems' not in tab_data:
+        tab_data['selectedItems'] = []
+
+    # set particular
+    if request.method == 'PATCH':
+        # {[1,2,3]} U {[2,3,4]}
+        tab_data['selectedItems'] = list(set(tab_data['selectedItems']).union(set(items)))
+        save_tab(tab_id, tab_data)
+        return make_response(jsonify(tab_data), 201)
+
+    # delete specified items
+    if request.method == 'DELETE':
+        tab_data['selectedItems'] = list(set(tab_data['selectedItems']) - set(items))
+        save_tab(tab_id, tab_data)
+        return make_response(jsonify(tab_data), 204)

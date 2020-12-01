@@ -66,8 +66,9 @@ class TestTasks:
     """Tasks"""
 
     def test_tasks_returns_200(self, test_client, captured_templates):
-        response = test_client.get("/api/tasks")
-        #assert template.name == 'tasks.html'
+        response = test_client.get("/tasks")
+        template, context = captured_templates[0]
+        assert template.name == 'tasks.html'
         assert response.status_code == 200
 
 
