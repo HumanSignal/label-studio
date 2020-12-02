@@ -839,7 +839,7 @@ def api_all_tasks():
 
     # delete all tasks with completions
     if request.method == 'DELETE':
-        g.project.delete_tasks()
+        g.project.delete_all_tasks()
         return make_response(jsonify({'detail': 'deleted'}), 204)
 
 

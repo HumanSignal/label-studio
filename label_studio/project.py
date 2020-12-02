@@ -425,7 +425,7 @@ class Project(object):
     def no_tasks(self):
         return self.source_storage.empty()
 
-    def delete_tasks(self):
+    def delete_all_tasks(self):
         """
         Deletes all tasks & completions from filesystem, then reloads clean project
         :return:
@@ -483,6 +483,14 @@ class Project(object):
     def remove_task(self, task_id):
         self.source_storage.remove(task_id)
         self.delete_task_completions(task_id)
+
+        self.update_derived_input_schema()
+        self.update_derived_output_schema()
+
+    def remove_tasks(self, task_ids):
+        for task_id in task_ids:
+            self.source_storage.remove(task_id)
+            self.delete_task_completions(task_id)
 
         self.update_derived_input_schema()
         self.update_derived_output_schema()
@@ -583,9 +591,16 @@ class Project(object):
         return True
 
     def delete_task_completions(self, task_id):
-        """ Delete all task completions
+        """ Delete all completions for specified task
         """
         self.target_storage.remove(task_id)
+        self.update_derived_output_schema()
+
+    def delete_tasks_completions(self, task_ids):
+        """ Delete all completions for specified tasks
+        """
+        for task_id in task_ids:
+            self.target_storage.remove(task_id)
         self.update_derived_output_schema()
 
     def delete_all_completions(self):

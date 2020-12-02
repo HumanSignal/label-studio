@@ -38,22 +38,7 @@ def column_type(key):
         return 'String'
 
 
-def make_actions(project):
-    return {
-        'actions': [
-            {
-                'id': 'delete_tasks',
-                'title': 'Delete tasks'
-            },
-            {
-                'id': 'delete_completions',
-                'title': 'Delete completions'
-            }
-        ]
-    }
-
-
-def make_columns(project):
+def get_all_columns(project):
     """ Make columns info for the frontend data manager
     """
     result = {'columns': []}
@@ -125,7 +110,7 @@ def save_all_tabs(project, data: dict):
     json.dump(data, open(tab_path, 'w', encoding='utf-8'))
 
 
-def load_tab(tab_id, raise_if_not_exists=False, project=None):
+def load_tab(tab_id, project=None, raise_if_not_exists=False):
     """ Load tab info from DB
     """
     data = load_all_tabs(project)
@@ -438,10 +423,3 @@ def prepare_annotations(tasks, params):
         items = items[(page - 1) * page_size: page * page_size]
 
     return {'annotations': items, 'total': total}
-
-
-def get_action_items_for_tab(tab):
-    selected = tab.get('selectedItems', [])
-    if not selected:
-        pass
-        # tab

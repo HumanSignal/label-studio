@@ -62,7 +62,7 @@ def deprecated_api_generate_next_task():
 @requires_auth
 def deprecated_api_tasks_delete():
     deprecated_message('/api/tasks/delete', 'DELETE /api/tasks')
-    g.project.delete_tasks()
+    g.project.delete_all_tasks()
     return make_response(jsonify({}), 204)
 
 
