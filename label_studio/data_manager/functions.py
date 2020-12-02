@@ -38,6 +38,21 @@ def column_type(key):
         return 'String'
 
 
+def make_actions(project):
+    return {
+        'actions': [
+            {
+                'id': 'delete_tasks',
+                'title': 'Delete tasks'
+            },
+            {
+                'id': 'delete_completions',
+                'title': 'Delete completions'
+            }
+        ]
+    }
+
+
 def make_columns(project):
     """ Make columns info for the frontend data manager
     """
@@ -417,3 +432,10 @@ def prepare_annotations(tasks, params):
         items = items[(page - 1) * page_size: page * page_size]
 
     return {'annotations': items, 'total': total}
+
+
+def get_action_items_for_tab(tab):
+    selected = tab.get('selectedItems', [])
+    if not selected:
+        pass
+        # tab
