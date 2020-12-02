@@ -301,6 +301,9 @@ def order_tasks(params, tasks):
     """ Apply ordering to tasks
     """
     ordering = params.tab.get('ordering', [])  # ordering = ['id', 'completed_at', ...]
+    if ordering is None:
+        return tasks
+
     # remove 'tasks:' prefix for tasks api, for annotations it will be 'annotations:'
     ordering = [o.replace(TASKS, '') for o in ordering if o.startswith(TASKS) or o.startswith('-' + TASKS)]
     order = 'id' if not ordering else ordering[0]  # we support only one column ordering right now
@@ -379,13 +382,8 @@ def get_used_fields(params):
 def prepare_tasks(project, params):
     """ Main function to get tasks
     """
-    page, page_size = params.page, params.page_size
-    # use only necessary fields for filtering and ordering to avoid storage (s3/gcs/etc) overloading
-    working_fields = get_used_fields(params)
-    need_uri_resolving = any(['data.' in field for field in working_fields])
-
     # load all tasks from db with some aggregations over completions
-    tasks = preload_tasks(project, resolve_uri=need_uri_resolving)
+    tasks = preload_tasks(project, resolve_uri=False)
 
     # filter
     tasks = filter_tasks(tasks, params)
@@ -395,18 +393,26 @@ def prepare_tasks(project, params):
     total = len(tasks)
 
     # pagination
+    page, page_size = params.page, params.page_size
     if page > 0 and page_size > 0:
         tasks = tasks[(page - 1) * page_size:page * page_size]
 
+    # use only necessary fields to avoid storage (s3/gcs/etc) overloading
+    need_uri_resolving = True
+    if hasattr(params, 'fields'):  # TODO: or tab.hiddenColumns
+        need_uri_resolving = any(['data.' in field for field in params.fields])
+
     # resolve all task fields
-    for i, task in enumerate(tasks):
-        tasks[i] = resolve_task_data_uri(task, project=project)
+    if need_uri_resolving:
+        for i, task in enumerate(tasks):
+            tasks[i] = resolve_task_data_uri(task, project=project)
 
     return {'tasks': tasks, 'total': total}
 
 
 def prepare_annotations(tasks, params):
     """ Main function to get annotations
+        TODO: it's a draft only
     """
     page, page_size = params.page, params.page_size
 

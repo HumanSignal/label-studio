@@ -61,7 +61,7 @@ def api_project_tabs_id(tab_id):
 
     # delete tab data
     if request.method == 'DELETE':
-        delete_tab(tab_id, project)
+        delete_tab(tab_id, g.project)
         return make_response(jsonify(tab_data), 204)
 
 
@@ -74,7 +74,7 @@ def api_project_tabs_selected_items(tab_id):
     tab_id = int(tab_id)
     tab = load_tab(tab_id, raise_if_not_exists=request.method == 'GET', project=g.project)
 
-    # get tab data
+    # GET: get selected items from tab
     if request.method == 'GET':
         return make_response(jsonify(tab.get('selectedItems', [])), 200)
 
@@ -83,14 +83,13 @@ def api_project_tabs_selected_items(tab_id):
         'json body must be list with selected task ids OR string equal to "all"'
     items = request.json
 
-    # set whole
+    # POST: set whole
     if request.method == 'POST':
         # get all tasks from tab filters
         if items == 'all':
             # load all tasks from db with some aggregations over completions and filter them
-            tasks = preload_tasks(project, resolve_uri=need_uri_resolving)
-            tasks = filter_tasks(tasks, params=SimpleNamespace(tab=tab))
-            items = [t['id'] for t in tasks]
+            data = prepare_tasks(g.project, params=SimpleNamespace(page=-1, page_size=-1, tab=tab, fields=['id']))
+            items = [t['id'] for t in data['tasks']]
 
         tab['selectedItems'] = sorted(items)  # we need to use sorting because of frontend limitations
         save_tab(tab_id, tab, g.project)
@@ -100,14 +99,14 @@ def api_project_tabs_selected_items(tab_id):
     if 'selectedItems' not in tab:
         tab['selectedItems'] = []
 
-    # set particular
+    # PATCH: set particular
     if request.method == 'PATCH':
         # [ {[1,2,3]} U {[2,3,4]} ]
         tab['selectedItems'] = sorted(list(set(tab['selectedItems']).union(set(items))))
         save_tab(tab_id, tab, g.project)
         return make_response(jsonify(tab), 201)
 
-    # delete specified items
+    # DELETE: delete specified items
     if request.method == 'DELETE':
         # remove all items
         if items == 'all':

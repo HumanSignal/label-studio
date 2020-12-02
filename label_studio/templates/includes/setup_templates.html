@@ -28,7 +28,9 @@
           {% for t in templates[complexity][category] %}<div class="ui item">
               <a class="use-template no-go" href="#" data-value="{{ t.pk }}">{{ t.title }}</a>
               {%  if t.new %}
-                <i class="ui icon orange tiny circle" style="opacity:0.55; position: relative; top:-2px"></i>
+                <span data-tippy-content="New template!">
+                  <i class="ui icon orange tiny circle" style="opacity:0.55; position: relative; top:-2px"></i>
+                </span>
               {% endif %}
             </div>{% endfor %}
         </div>
