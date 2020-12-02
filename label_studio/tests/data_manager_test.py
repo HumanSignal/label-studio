@@ -63,6 +63,8 @@ class TestTabs:
         # select all
         response = test_client.post('/api/project/tabs/1/selected-items', json='all')
         assert response.status_code == 201
+        response = test_client.get('/api/project/tabs/1/selected-items')
+        assert response.status_code == 200
         assert response.json['selectedItems'] == list(range(0, 32))
 
         # delete all
