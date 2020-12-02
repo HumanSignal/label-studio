@@ -22,7 +22,7 @@ Scenario('Setup choices config from start', (I) => {
   I.waitInUrl("/import", 6);
   I.click("Add Sample Task");
   // empty table cell in the first row of data table
-  I.click(locate("td").after(locate("td").withText("0")));
+  I.click(locate("span").withText("Filters"));
 
   I.dontSee("Update");
   I.see("Submit");
