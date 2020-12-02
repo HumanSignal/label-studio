@@ -1,9 +1,9 @@
 from types import SimpleNamespace
-from flask import make_response, request, session, jsonify, g
+from flask import make_response, request, jsonify, g
 from label_studio.utils.auth import requires_auth
 from label_studio.utils.misc import exception_handler
 from label_studio.data_manager.functions import (
-    prepare_tasks, prepare_annotations, make_columns, create_default_tabs, load_tab, save_tab, delete_tab
+    prepare_tasks, prepare_annotations, make_columns, load_tab, save_tab, delete_tab, load_all_tabs
 )
 from label_studio.blueprint import blueprint
 
@@ -67,11 +67,8 @@ def api_project_tabs():
     """ Project tabs for data manager
     """
     if request.method == 'GET':
-        if 'tab_data' not in session:
-            result = create_default_tabs()
-            return make_response(jsonify(result), 200)
-        else:
-            return make_response(jsonify(session['tab_data']), 200)
+        data = load_all_tabs(g.project)
+        return make_response(jsonify(data), 200)
 
 
 @blueprint.route('/api/project/tabs/<tab_id>', methods=['GET', 'POST', 'DELETE'])
@@ -95,7 +92,7 @@ def api_project_tabs_id(tab_id):
 
     # delete tab data
     if request.method == 'DELETE':
-        delete_tab(tab_id)
+        delete_tab(tab_id, project)
         return make_response(jsonify(tab_data), 204)
 
 

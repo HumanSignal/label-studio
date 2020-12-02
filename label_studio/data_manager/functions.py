@@ -96,14 +96,14 @@ def make_columns(project):
     return result
 
 
-def load_all_tabs(project):
+def load_all_tabs(project) -> dict:
     """ Load all tabs from disk
     """
     tab_path = os.path.join(project.path, 'tabs.json')
-    return json.load(open(tab_path)) if os.path.exists(tab_path) else create_default_tabs()
+    return json.load(open(tab_path, encoding='utf-8')) if os.path.exists(tab_path) else create_default_tabs()
 
 
-def save_all_tabs(project, data):
+def save_all_tabs(project, data: dict):
     """ Save all tabs to disk
     """
     tab_path = os.path.join(project.path, 'tabs.json')
@@ -148,14 +148,10 @@ def save_tab(tab_id, tab_data, project):
     save_all_tabs(project, data)
 
 
-def delete_tab(tab_id):
+def delete_tab(tab_id, project):
     """ Delete tab from DB
     """
-    # load tab data
-    if 'tab_data' not in session:
-        return False
-
-    data = session['tab_data']
+    data = load_all_tabs(project)
 
     # select by tab id
     for i, tab in enumerate(data['tabs']):
@@ -165,7 +161,7 @@ def delete_tab(tab_id):
     else:
         return False
 
-    session['tab_data'] = data
+    save_all_tabs(project, data)
     return True
 
 
