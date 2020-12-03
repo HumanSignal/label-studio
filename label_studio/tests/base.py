@@ -34,6 +34,7 @@ def test_client(label_studio_app):
     # and handling the context locals for you.
     project = goc_project()  # FIXME: move project reset to the proper place
     project.delete_all_tasks()
+    project.delete_all_completions()
 
     return label_studio_app.test_client()  # this is where the testing happens!
 

@@ -19,14 +19,17 @@ def api_project_columns():
     return make_response(jsonify(result), 200)
 
 
-@blueprint.route('/api/project/actions', methods=['GET'])
+@blueprint.route('/api/project/actions', methods=['GET', 'POST'])
 @requires_auth
 @exception_handler
 def api_project_actions():
     """ Project actions for data manager tabs
     """
-    result = get_all_actions(g.project)
-    return make_response(jsonify(result), 200)
+    if request.method == 'GET':
+        result = get_all_actions(g.project)
+        return make_response(jsonify(result), 200)
+    elif request.method == 'POST':
+        return api_project_tab_action(None)
 
 
 @blueprint.route('/api/project/tabs', methods=['GET'])
@@ -168,9 +171,15 @@ def api_project_tab_annotations(tab_id):
 def api_project_tab_action(tab_id):
     """ Perform actions with selected items from tab
     """
-    tab_id = int(tab_id)
-    tab = load_tab(tab_id, g.project, raise_if_not_exists=True)
-    items = tab.get('selectedItems', None)
+    # try to get params from request
+    if tab_id is None:
+        items = request.values.get('selected-items', [])
+        tab = None
+    # use tab
+    else:
+        tab_id = int(tab_id)
+        tab = load_tab(tab_id, g.project, raise_if_not_exists=True)
+        items = tab.get('selectedItems', None)
 
     # no selected items on tab
     if not items:
@@ -180,7 +189,7 @@ def api_project_tab_action(tab_id):
     # empty action id
     action_id = request.values.get('id', None)
     if action_id is None:
-        response = {'detail': 'No action id' + str(action_id) + ', use ?id=<action-id>'}
+        response = {'detail': 'No action id "' + str(action_id) + '", use ?id=<action-id>'}
         return make_response(jsonify(response), 422)
 
     result = perform_action(action_id, g.project, tab, items)

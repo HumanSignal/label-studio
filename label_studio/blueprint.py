@@ -825,16 +825,19 @@ def api_all_tasks():
 
     # retrieve tasks (plus completions and predictions) with pagination & ordering
     if request.method == 'GET':
+        tab = {
+            'ordering': [request.values.get('order', 'id')],
+            'filters': request.values.get('filters', None),
+            'fields': request.values.get('fields', 'all').split(',')
+        }
+
         # get filter parameters from request
-        fields = request.values.get('fields', 'all').split(',')
         page, page_size = int(request.values.get('page', 1)), int(request.values.get('page_size', 10))
-        order = request.values.get('order', 'id')
         if page < 1 or page_size < 1:
             return make_response(jsonify({'detail': 'Incorrect page or page_size'}), 422)
 
-        tab = {'ordering': [order], 'filters': None, 'fields': fields}
         params = SimpleNamespace(page=page, page_size=page_size, tab=tab)
-        tasks = prepare_tasks(g.project, params)['tasks']
+        tasks = prepare_tasks(g.project, params)
         return make_response(jsonify(tasks), 200)
 
     # delete all tasks with completions

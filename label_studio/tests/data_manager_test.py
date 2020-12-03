@@ -27,9 +27,9 @@ def project_init_source():
 def project_init_target():
     project = goc_project()
     ids = range(0, 16)
-    value = {'text': '123', 'completions': [{'id': 1001}]}
     project.target_storage.remove_all()
     for i in ids:
+        value = {'text': '123', 'completions': [{'id': 1001 + i}]}
         project.target_storage.set(i, value)
     return project
 
@@ -119,7 +119,20 @@ class TestActions:
         after_task_ids = set(project.source_storage.ids())
         assert before_task_ids - set(items) == after_task_ids, 'Tasks after deletion are incorrect'
 
+    def test_action_tasks_completions_delete(self, test_client, captured_templates):
+        """ Remove all completions for task ids
+        """
+        project = project_init_target()
 
+        """# POST: delete 3 tasks
+        before_ids = set(project.target_storage.ids())
+        items = [4, 5, 6]
+        response = test_client.post('/api/project/tabs/1/selected-items', json=items)
+        assert response.status_code == 201
+        response = test_client.post('/api/project/tabs/1/actions?id=delete_tasks_completions')
+        assert response.status_code == 200
+        after_ids = set(project.source_storage.ids())
+        assert before_ids - set(items) == after_ids, 'Completions after deletion are incorrect'"""
 
 
 class TestTasksAndAnnotations:
