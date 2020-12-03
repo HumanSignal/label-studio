@@ -18,7 +18,7 @@ def default_project(monkeypatch):
 def project_init_source():
     project = goc_project()
     ids = range(0, 16)
-    values = [{'image': '123', 'text': '123'}] * 16
+    values = [{'data': {'image': '123', 'text': '123'}, 'id': i} for i in range(0, 16)]
     project.source_storage.remove_all()
     project.source_storage.set_many(ids, values)
     return project
@@ -29,7 +29,11 @@ def project_init_target():
     ids = range(0, 16)
     project.target_storage.remove_all()
     for i in ids:
-        value = {'text': '123', 'completions': [{'id': 1001 + i}]}
+        value = {
+            'id': i,
+            'data': {'image': '123', 'text': '123'},
+            'completions': [{'id': 1001 + i}]
+        }
         project.target_storage.set(i, value)
     return project
 

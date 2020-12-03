@@ -47,6 +47,9 @@ def perform_action(action_id, project, tab, items):
 def delete_tasks(project, tab, items):
     """ Delete tasks by ids
     """
+    # if you want to use tab - don't forget about none check
+    if tab is None:
+        pass
     project.delete_tasks(items)
     return {'processed_items': len(items)}
 
@@ -54,6 +57,9 @@ def delete_tasks(project, tab, items):
 def delete_tasks_completions(project, tab, items):
     """ Delete all completions by tasks ids
     """
+    # if you want to use tab - don't forget about none check
+    if tab is None:
+        pass
     project.delete_tasks_completions(items)
     return {'processed_items': len(items)}
 
