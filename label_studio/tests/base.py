@@ -32,6 +32,9 @@ def label_studio_app():
 def test_client(label_studio_app):
     # Flask provides a way to test your application by exposing test Client
     # and handling the context locals for you.
+    project = goc_project()  # FIXME: move project reset to the proper place
+    project.delete_all_tasks()
+
     return label_studio_app.test_client()  # this is where the testing happens!
 
 

@@ -5,7 +5,7 @@ from label_studio.utils.misc import exception_handler
 from label_studio.data_manager.functions import (
     prepare_tasks, prepare_annotations, get_all_columns, load_tab, save_tab, delete_tab, load_all_tabs,
 )
-from label_studio.data_manager.actions import make_actions, perform_action
+from label_studio.data_manager.actions import get_all_actions, perform_action
 from label_studio.blueprint import blueprint
 
 
@@ -25,7 +25,7 @@ def api_project_columns():
 def api_project_actions():
     """ Project actions for data manager tabs
     """
-    result = make_actions(g.project)
+    result = get_all_actions(g.project)
     return make_response(jsonify(result), 200)
 
 
@@ -166,7 +166,7 @@ def api_project_tab_annotations(tab_id):
 @requires_auth
 @exception_handler
 def api_project_tab_action(tab_id):
-    """ Make actions with selected items from tab
+    """ Perform actions with selected items from tab
     """
     tab_id = int(tab_id)
     tab = load_tab(tab_id, g.project, raise_if_not_exists=True)
@@ -184,4 +184,4 @@ def api_project_tab_action(tab_id):
         return make_response(jsonify(response), 422)
 
     result = perform_action(action_id, g.project, tab, items)
-    return make_response(jsonify(result))
+    return make_response(jsonify(result), 200)

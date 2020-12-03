@@ -3,19 +3,22 @@
     Data manager uses _actions to know the list of available actions,
     they are called by entry_points from _actions dict items.
 """
+from copy import copy
 from label_studio.data_manager.functions import DataManagerException
 
 _actions = {}
 
 
-def get_all_actions(project, include_entry_points=False):
+def get_all_actions(project):
     """ Return dict with registered actions
     """
-    actions = {key: _actions[key] for key in _actions}  # copy
-    if not include_entry_points:
-        for key in actions:
-            actions[key].pop('entry_point')  # exclude entry points
-        return _actions
+    # copy and sort by order key
+    actions = list(_actions.values())
+    actions = sorted(actions, key=lambda x: x['order'])
+    actions = [copy(action) for action in actions]
+    for i, _ in enumerate(actions):
+        actions[i].pop('entry_point')  # exclude entry points
+    return actions
 
 
 def register_action(action_id, title, order, entry_point):
@@ -42,13 +45,18 @@ def perform_action(action_id, project, tab, items):
 
 
 def delete_tasks(project, tab, items):
-    project.delete_a
-    return {'deleted': 42}
+    """ Delete tasks by ids
+    """
+    project.delete_tasks(items)
+    return {'processed_items': len(items)}
 
 
-def delete_completions(project, tab, items):
-    return {'deleted': 42}
+def delete_tasks_completions(project, tab, items):
+    """ Delete all completions by tasks ids
+    """
+    project.delete_tasks_completions(items)
+    return {'processed_items': len(items)}
 
 
 register_action('delete_tasks', 'Delete tasks', 100, delete_tasks)
-register_action('delete_completions', 'Delete completions', 101, delete_completions)
+register_action('delete_completions', 'Delete completions', 101, delete_tasks_completions)

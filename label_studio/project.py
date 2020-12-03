@@ -480,21 +480,6 @@ class Project(object):
         else:
             raise NotImplementedError('Unknown sampling method ' + sampling)
 
-    def remove_task(self, task_id):
-        self.source_storage.remove(task_id)
-        self.delete_task_completions(task_id)
-
-        self.update_derived_input_schema()
-        self.update_derived_output_schema()
-
-    def remove_tasks(self, task_ids):
-        for task_id in task_ids:
-            self.source_storage.remove(task_id)
-            self.delete_task_completions(task_id)
-
-        self.update_derived_input_schema()
-        self.update_derived_output_schema()
-
     def get_completions_ids(self):
         """ List completion ids from output_dir directory
 
@@ -567,8 +552,27 @@ class Project(object):
         logger.debug('Completion for task ' + str(task_id) + ' saved with id =' + str(completion['id']))
         return completion['id']
 
+    def delete_task(self, task_id):
+        """ Delete one task
+        """
+        self.source_storage.remove(task_id)
+        self.delete_task_completions(task_id)
+
+        self.update_derived_input_schema()
+        self.update_derived_output_schema()
+
+    def delete_tasks(self, task_ids):
+        """ Delete by list of task ids
+        """
+        for task_id in task_ids:
+            self.source_storage.remove(task_id)
+            self.delete_task_completions(task_id)
+
+        self.update_derived_input_schema()
+        self.update_derived_output_schema()
+
     def delete_task_completion(self, task_id, completion_id):
-        """ Delete one task completion by id
+        """ Delete one completion by id
         """
         # try to get completions with task first
         task = self.get_task_with_completions(task_id)
@@ -591,13 +595,13 @@ class Project(object):
         return True
 
     def delete_task_completions(self, task_id):
-        """ Delete all completions for specified task
+        """ Delete all completions for one task
         """
         self.target_storage.remove(task_id)
         self.update_derived_output_schema()
 
     def delete_tasks_completions(self, task_ids):
-        """ Delete all completions for specified tasks
+        """ Delete all completions for list of task ids
         """
         for task_id in task_ids:
             self.target_storage.remove(task_id)

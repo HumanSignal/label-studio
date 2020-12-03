@@ -869,7 +869,7 @@ def api_task_by_id(task_id):
 
     # delete task
     elif request.method == 'DELETE':
-        g.project.remove_task(task_id)
+        g.project.delete_task(task_id)
         return make_response(jsonify('Task deleted.'), 204)
 
 
