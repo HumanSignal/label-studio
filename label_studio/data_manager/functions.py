@@ -45,16 +45,19 @@ def get_all_columns(project):
 
     # frontend uses MST data model, so we need two directional referencing parent <-> child
     task_data_children = []
+    i = 0
     for key, data_type in project.data_types.items():
         column = {
             'id': key,
             'title': key,
             'type': column_type(key),  # data_type,
             'target': 'tasks',
-            'parent': 'data'
+            'parent': 'data',
+            'show_in_quickview_default': i == 0
         }
         result['columns'].append(column)
         task_data_children.append(column['id'])
+        i += 1
 
     result['columns'] += [
         # --- Tasks ---
@@ -62,7 +65,8 @@ def get_all_columns(project):
             'id': 'id',
             'title': "Task ID",
             'type': "Number",
-            'target': 'tasks'
+            'target': 'tasks',
+            'show_in_quickview_default': True
         },
         {
             'id': 'completed_at',
@@ -347,21 +351,6 @@ def filter_tasks(tasks, params):
             raise DataManagerException('Filtering conjunction ' + op + ' is not supported')
 
     return new_tasks
-
-
-def get_used_fields(params):
-    """ Get all used fields from filter and order params
-    """
-    fields = []
-    filters = params.tab.get('filters', None) or []
-    for item in filters:
-        fields.append(item['filter'])
-
-    ordering = params.tab.get('ordering', None) or []
-    ordering = [o.replace(TASKS, '') for o in ordering if o.startswith(TASKS) or o.startswith('-' + TASKS)]
-    order = 'id' if not ordering else ordering[0]  # we support only one column ordering right now
-    fields.append(order)
-    return list(set(fields))
 
 
 def prepare_tasks(project, params):

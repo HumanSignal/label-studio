@@ -617,6 +617,8 @@
             },
             // done
             function () {
+              setValue(self, 'tasks', self.tasks.tasks);
+
               // set task position to the first task
               if (self.current_task_index === -1) {
                 self.current_task_index = 0;
