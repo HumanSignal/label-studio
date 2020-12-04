@@ -31,7 +31,7 @@
                 <span class="value" v-else  style="display: inline!important;white-space:nowrap!important;">
                   <animated-number :number="project.task_count"></animated-number>
                 </span>
-                <span class="label" style="display: inline!important;white-space:nowrap!important;">Tasks</span>
+                <span class="label">Tasks</span>
                 <br>
                 <span class="sub-label">
                   <i class="word-break" v-if="project.multi_session_mode"
@@ -123,7 +123,7 @@
     </div> <!-- container -->
 
     {% endraw %}
-    {% include 'includes/storages.html' %}
+    {% include 'storages_old.html' %}
     {% raw %}
 
   </div>

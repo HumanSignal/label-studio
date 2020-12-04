@@ -6,7 +6,7 @@ from label_studio.data_manager.functions import (
     prepare_tasks, prepare_annotations, get_all_columns, load_tab, save_tab, delete_tab, load_all_tabs,
 )
 from label_studio.data_manager.actions import get_all_actions, perform_action
-from label_studio.blueprint import blueprint
+from label_studio.data_manager import blueprint
 
 
 @blueprint.route('/api/project/columns', methods=['GET'])

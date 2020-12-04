@@ -490,13 +490,12 @@
 
 
     {% endraw %}
-    {% include 'includes/storages.html' %}
+    {% include 'storages_old.html' %}
     {% raw %}
 
   </div>
 
   <script src="static/js/components/animatedNumber.js"></script>
-  <script src="static/js/components/imageWithFadeIn.js"></script>
   <script src="static/js/components/vue-tippy.min.js"></script>
   <script src="static/semantic/semantic-ui-vue.min.js"></script>
 
@@ -560,8 +559,7 @@
 
       // components
       components: {
-        'animated-number': animatedNumber,
-        'image-with-fade-in': imageWithFadeIn
+        'animated-number': animatedNumber
       },
 
       computed: {

@@ -1,0 +1,9 @@
+.visible-app {
+  display: block !important;
+}
+
+.db-card {
+  background: #fafafa;
+  border-radius: 5px;
+  padding: 1em 2em 1em 2em !important;
+}

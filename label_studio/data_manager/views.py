@@ -1,13 +1,11 @@
 import flask
-from flask import Blueprint, current_app, g
+from flask import current_app, g
 
 from label_studio.utils.auth import requires_auth
 from label_studio.utils.misc import exception_handler_page
 from label_studio.utils.io import find_editor_files
-import label_studio.data_manager.api  # we need to import this to register api endpoints
-# from label_studio.blueprint import blueprint
-
-blueprint = Blueprint('data_manager_blueprint', __name__, template_folder='templates')
+from label_studio.data_manager import blueprint
+import label_studio.data_manager.api  # !: we need to import it here to register api endpoints
 
 
 @blueprint.route('/tasks', methods=['GET', 'POST'])
@@ -26,7 +24,7 @@ def tasks_page():
     )
 
 
-@blueprint.route('/tasks_old', methods=['GET', 'POST'])
+@blueprint.route('/tasks-old', methods=['GET', 'POST'])
 @requires_auth
 @exception_handler_page
 def tasks_old_page():

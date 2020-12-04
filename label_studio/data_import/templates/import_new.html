@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block body %}
+{% raw %}
+  <script src="static/js/polyfill.min.js"></script>
+  <script src="static/js/vue.js"></script>
+  <script src="static/js/components/vue-tippy.min.js"></script>
+  <script src="static/semantic/semantic-ui-vue.min.js"></script>
+
+  <link rel="stylesheet" href="static/css/import-new.css">
+
+  <!-- Spinner while vue loading -->
+  <div id="vue_loader" class="ui large text loader loading active">Loading ...</div>
+
+  <!-- Vue app -->
+  <div class="ui" id="app" :class="{'visible-app': vueLoaded}" style="display: none;">
+    <center>
+      <button v-if="!storageState.show"
+              @click="storageState.show=true"
+              class="ui button positive approve">Cloud Storages</button>
+    </center>
+
+    <cloud-storages v-if="storageState.show" :state="storageState"></cloud-storages>
+  </div>
+
+  {% endraw %}
+  {% include 'includes/import_storages.html' %}
+  {% raw %}
+
+  <script>
+    Vue.use(SemanticUIVue);
+    Vue.use(VueTippy);
+
+    var app = new Vue({
+      el: '#app',
+      components: ["cloud-storages"],
+
+      data: function () {
+
+        return {
+          vueLoaded: false, 
+          storageState: { show: false }
+        };
+      },
+
+      methods: {
+
+      },
+
+      watch: {
+
+      },
+
+      // vue mounting of page
+      mounted: function () {
+        this.vueLoaded = true;
+
+        $('#vue_loader').hide();
+        console.log('Vue mounting success');
+      }
+    });
+  </script>
+
+{% endraw %}
+{% endblock %}
