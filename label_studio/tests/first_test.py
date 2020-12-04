@@ -88,7 +88,7 @@ class TestImport:
         response = test_client.get('/import')
         template, context = captured_templates[0]
 
-        assert template.name == 'import.html'
+        assert template.name == 'import_new.html'
         assert response.status_code == 200
 
 
