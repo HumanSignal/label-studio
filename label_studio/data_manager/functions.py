@@ -1,7 +1,7 @@
 import os
 import ujson as json
-from flask import session
 from operator import itemgetter
+from types import SimpleNamespace
 from label_studio.utils.misc import DirectionSwitch, timestamp_to_local_datetime
 from label_studio.utils.uri_resolver import resolve_task_data_uri
 
@@ -325,14 +325,14 @@ def filter_tasks(tasks, params):
     if tab is None:
         return tasks
     filters = tab.get('filters', None)
-    if not filters:
+    if not filters or not filters.get('items', None) or not filters.get('conjunction', None):
         return tasks
-    conjunction = tab['conjunction']
 
+    conjunction = filters['conjunction']
     new_tasks = tasks if conjunction == 'and' else []
 
     # go over all the filters
-    for f in filters:
+    for f in filters['items']:
         parts = f['filter'].split(':')  # filters:<tasks|annotations>:field_name
         target = parts[1]  # 'tasks | annotations'
         field = parts[2]  # field name
@@ -348,7 +348,7 @@ def filter_tasks(tasks, params):
             new_tasks += [task for task in tasks if operator(op, value, resolve_task_field(task, field))]
 
         else:
-            raise DataManagerException('Filtering conjunction ' + op + ' is not supported')
+            raise DataManagerException('Filtering conjunction "' + op + '" is not supported')
 
     return new_tasks
 
@@ -412,3 +412,12 @@ def prepare_annotations(tasks, params):
         items = items[(page - 1) * page_size: page * page_size]
 
     return {'annotations': items, 'total': total}
+
+
+def get_all_tasks_ids(filters, ordering):
+    """ Apply filter and ordering to all tasks
+    """
+    tab = {'filters': filters, 'ordering': ordering}
+    # load all tasks from db with some aggregations over completions and filter them
+    data = prepare_tasks(g.project, params=SimpleNamespace(page=-1, page_size=-1, tab=tab, fields=['id']))
+    return [t['id'] for t in data['tasks']]

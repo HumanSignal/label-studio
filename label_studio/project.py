@@ -440,19 +440,27 @@ class Project(object):
             for m in self.ml_backends:
                 m.clear(self)
 
-    def next_task(self, completed_tasks_ids):
-        completed_tasks_ids = set(completed_tasks_ids)
-        sampling = self.config.get('sampling', 'sequential')
+    def next_task(self, completed_tasks_ids, task_ids=None, sampling=None):
+        """ Generate next task for labeling
 
-        # Tasks are ordered ascending by their "id" fields. This is default mode.
-        task_iter = filter(lambda i: i not in completed_tasks_ids, sorted(self.source_storage.ids()))
+            :param completed_tasks_ids: ids of tasks that have completions
+            :param task_ids: array of dicts with tasks (dict.items())
+            :param sampling: string with sampling names: sequential, random-uniform,
+                             prediction-score-max, prediction-score-min
+        """
+        completed_tasks_ids = set(completed_tasks_ids)
+        task_ids = self.source_storage.ids() if task_ids is None else task_ids
+        sampling = self.config.get('sampling', 'sequential') if sampling is None else sampling
+
+        # Tasks are ordered ascending by their "id" fields. This is default mode
+        task_iter = filter(lambda i: i not in completed_tasks_ids, task_ids)
         if sampling == 'sequential':
             task_id = next(task_iter, None)
             if task_id is not None:
                 return self.source_storage.get(task_id)
 
         # Tasks are sampled with equal probabilities
-        elif sampling == 'uniform':
+        elif sampling == 'uniform' or sampling == 'random-uniform':
             actual_tasks_ids = list(task_iter)
             if not actual_tasks_ids:
                 return None
@@ -462,20 +470,27 @@ class Project(object):
         # Task with minimum / maximum average prediction score is taken
         elif sampling.startswith('prediction-score'):
             id_score_map = {}
-            for task_id, task in self.source_storage.items():
-                if task_id in completed_tasks_ids:
+
+            for task_id, task in task_ids:
+                # get task from storage and check it has completions
+                task = self.source_storage.get(task_id)
+                if task_id in completed_tasks_ids or task is None:
                     continue
+                # average all predictions and save score
                 if 'predictions' in task and len(task['predictions']) > 0:
                     score = sum((p['score'] for p in task['predictions']), 0) / len(task['predictions'])
                     id_score_map[task_id] = score
+
             if not id_score_map:
                 return None
+
             if sampling.endswith('-min'):
                 best_idx = min(id_score_map, key=id_score_map.get)
             elif sampling.endswith('-max'):
                 best_idx = max(id_score_map, key=id_score_map.get)
             else:
                 raise NotImplementedError('Unknown sampling method ' + sampling)
+
             return self.source_storage.get(best_idx)
         else:
             raise NotImplementedError('Unknown sampling method ' + sampling)
@@ -504,7 +519,7 @@ class Project(object):
 
         if data:
             logger.debug('Get predictions ' + str(task_id) + ' from source storage')
-            # tasks can hold the newest version of predictions, so task it from tasks
+            # tasks can hold the newest version of predictions, so get it from tasks
             data['predictions'] = self.source_storage.get(task_id).get('predictions', [])
         return data
 

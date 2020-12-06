@@ -58,8 +58,6 @@ from label_studio.tasks import Tasks
 from label_studio.data_manager.views import blueprint as data_manager_blueprint
 from label_studio.data_import.views import blueprint as data_import_blueprint
 
-
-
 INPUT_ARGUMENTS_PATH = pathlib.Path("server.json")
 
 logger = logging.getLogger(__name__)
@@ -572,7 +570,7 @@ def api_generate_next_task():
     """
     # try to find task is not presented in completions
     completed_tasks_ids = g.project.get_completions_ids()
-    task = g.project.next_task(completed_tasks_ids)
+    task = g.project.next_task(completed_tasks_ids, tasks=None, sampling=None)
     if task is None:
         # no tasks found
         return make_response('', 404)
