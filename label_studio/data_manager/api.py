@@ -7,6 +7,7 @@ from label_studio.data_manager.functions import (
 )
 from label_studio.data_manager.actions import get_all_actions, perform_action
 from label_studio.data_manager import blueprint
+from label_studio.data_manager.functions import DataManagerException
 
 
 @blueprint.route('/api/project/columns', methods=['GET'])
@@ -174,6 +175,13 @@ def api_project_tab_action(tab_id):
     # try to get params from request
     if tab_id is None:
         items = request.values.get('selected-items', [])
+        if isinstance(items, list):
+            pass
+        elif isinstance(items, dict):
+            pass
+        else:
+            raise DataManagerException('selected-items must be list or dict '
+                                       '{"all": [true|false], "excluded": [...task_ids...], "included":[...task_ids...]}')
         tab = None
     # use tab
     else:
