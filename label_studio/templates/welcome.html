@@ -1,81 +1,23 @@
 {% extends 'base.html' %}
 {% block body %}
   <style>
-    .circular.label {
-      width: 80px !important;
-      height: 80px !important;
-      margin: 0 !important;
-      padding: 0 !important;
+
+    /* Hiding main menu and it's shadow */
+
+    #header {
+      box-shadow: none;
     }
 
-    .circular.label div {
-      padding-top: 22px !important;
-      padding-left: 4px !important;
-      margin: 0 !important;
-      font-size: 14px !important;
-      color: #AAA !important;
-    }
-
-    .circular.label .check {
-      display: none;
-    }
-
-    .done .circular.label {
-      background: #00a300;
-    }
-
-    .done .circular.label .step {
-      display: none;
-    }
-
-    .done .circular.label .check {
-      display: block;
-      color: white !important;
-      padding-top: 22px !important;
-    }
-
-    .icon.big {
-      padding-top: 14px !important;
-      padding-left: 3px !important;
-      margin: 0 !important;
-      font-size: 24px !important;
-      color: #999 !important;
-    }
-
-    .items {
-      margin: 0 auto !important;
-    }
-
-    .item .content {
-      max-width: 400px !important;
-      line-height: 200% !important;
-      margin-top: -5px !important;
-    }
-
-    .item {
-      flex-direction: unset !important;
-      max-width: 500px !important;
-      margin: 2em auto !important;
-    }
-
-    .item .header {
-      font-size: 25px !important;
-      font-weight: 100 !important;
-      margin-top: 32px !important;
-      margin-left: 30px !important;
-      color: #555 !important;
-    }
-
-    .item .meta {
-      margin-left: 30px !important;
+    #header #nav > a {
+      display: none !important;
     }
 
     .title {
-      font-size: 35px !important;
-      font-weight: 100 !important;
+      font-size: 24px !important;
+      font-weight: 700 !important;
       text-align: center;
-      margin: 0 auto 1.5em auto;
-      color: #444;
+      margin: 0 auto 2em auto;
+      color: #171819;
       line-height: 150% !important;
     }
 
@@ -83,14 +25,22 @@
       opacity: 1.0 !important;
     }
 
+    .ui p {
+      font-size: 16px;
+      color: #171819;
+      margin-bottom: 2em;
+    }
+
     @media only screen and (max-width: 768px) {
+      #logo {}
+
       .item .header {
         font-size: 22px !important;
         margin-left: 25px !important;
       }
 
       .title {
-        font-size: 25px !important;
+        font-size: 24px !important;
         margin: -20px auto 1.5em auto;
         line-height: 150% !important;
       }
@@ -102,65 +52,20 @@
 
   </style>
 
-  <div class="ui" id="welcome">
-
+  <div class="ui" id="welcome" style="max-height: 800px;">
     <div class="title">
-      <img src="static/images/heartex_icon_opossum_green@2x.png" style="margin-bottom: 15px" width="100px">
-      <br>Welcome to Label&nbsp;Studio!!
+      <img src="static/images/heartex_icon_opossum_green@2x.png" style="margin-bottom: 15px" width="128px">
+      <br>Welcome to Label&nbsp;Studio
     </div>
 
-    <div class="ui message" style="max-width: 600px; margin: 0 auto;">
-      <div class="ui items">
-
-        <div class="item {{ 'done' if on_boarding.setup else '' }}">
-          <div class="ui circular label">
-            <i class="step icon code grey big"></i>
-            <i class="icon check big"></i>
-            <div class="step">Step 1</div>
-          </div>
-          <div class="content">
-            <span class="header"><a href="setup">Setup</a> your label config</span>
-          </div>
-        </div>
-
-        <div class="item {{ 'done' if on_boarding.import else '' }}">
-          <div class="ui circular label">
-            <i class="step icon cloud upload alternate grey big"></i>
-            <i class="icon check big"></i>
-            <div class="step">Step 2</div>
-          </div>
-          <div class="content">
-            <span class="header"><a href="import">Import</a> tasks to project</span>
-          </div>
-        </div>
-
-        <div class="item {{ 'done' if on_boarding.labeled else '' }}">
-          <div class="ui circular label">
-            <i class="step icon play grey big"></i>
-            <i class="icon check big"></i>
-            <div class="step">Step 3</div>
-          </div>
-          <div class="content">
-            <span class="header"><a href=".">Start</a> labeling tasks</span>
-          </div>
-        </div>
-
-        <div class="item">
-          <div class="ui circular label">
-            <i class="step icon cloud download alternate grey big"></i>
-            <i class="icon check big"></i>
-            <div class="step">Step 4</div>
-          </div>
-          <div class="content">
-            <span class="header"><a href="export">Export</a> completions</span>
-          </div>
-        </div>
-
-      </div>
+    <div class="ui" style="max-width: 600px; margin: 0 auto; text-align: center;">
+        <p>Before labeling your data, you have to first import it.</p>
+        <br>
+        <a class="ui button positive" href="/import">Import</a>
     </div>
 
     <center>
-      <div style="margin-top: 4em">
+      <div style="margin-top: 6em">
         Made with<img src="static/images/opossum_looking.png" width="60px" style="margin-top: -10px;">
         in California
       </div>
