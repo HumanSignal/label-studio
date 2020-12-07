@@ -1,9 +1,34 @@
-.visible-app {
-  display: block !important;
-}
-
 .db-card {
   background: #fafafa;
   border-radius: 5px;
   padding: 1em 2em 1em 2em !important;
+}
+
+.hidden {
+  display: none;
+}
+
+#import-tasks .center {
+  text-align: center;
+}
+
+/* Source switch */
+
+.source-switch {
+  display: flex;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.source-switch > span {
+  margin-right: 32px;
+  font-weight: 800;
+}
+
+.source-switch .ui.buttons .button:not(:first-child) {
+  margin-left: -1px;
+}
+
+.source-switch .ui.buttons .button {
+  padding: 9px 18px;
 }

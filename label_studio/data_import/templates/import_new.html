@@ -12,14 +12,43 @@
   <div id="vue_loader" class="ui large text loader loading active">Loading ...</div>
 
   <!-- Vue app -->
-  <div class="ui" id="app" :class="{'visible-app': vueLoaded}" style="display: none;">
-    <center>
-      <button v-if="!storageState.show"
-              @click="storageState.show=true"
-              class="ui button positive approve">Cloud Storages</button>
-    </center>
+  <div class="ui" id="import-tasks" :class="{'visible-app': vueLoaded}">
+    <div v-if="preview">
+      <h1>Files loaded</h1>
+      <table>
+        <tr v-for="row in preview">
+          <td v-for="value in row">{{value}}</td>
+        </tr>
+      </table>
+    </div>
 
-    <cloud-storages v-if="storageState.show" :state="storageState"></cloud-storages>
+    <div v-if="loading">Loading...</div>
+
+    <div :class="{ hidden: loading || preview }">
+      <div class="source-switch">
+        <span>Source</span>
+        <div class="ui buttons">
+          <button
+            v-for="title, name in sources"
+            class="ui basic button"
+            :class="{ primary: source === name, ['state-' + name]: true }"
+            @click="source=name"
+          >{{title}}</button>
+        </div>
+      </div>
+
+      <div class="ui form tab-files" v-if="source === 'files'" ref="files">
+        <h2>Files</h2>
+      </div>
+
+      <div class="ui form tab-url" v-if="source === 'url'" ref="url">
+        <h2>By URL</h2>
+      </div>
+
+      <div class="ui form tab-cloud" v-if="source === 'cloud'" ref="cloud">
+        <cloud-storages @finish="finish"></cloud-storages>
+      </div>
+    </div>
   </div>
 
   {% endraw %}
@@ -31,19 +60,30 @@
     Vue.use(VueTippy);
 
     var app = new Vue({
-      el: '#app',
+      el: '#import-tasks',
       components: ["cloud-storages"],
 
       data: function () {
 
         return {
+          loading: false,
+          preview: null,
           vueLoaded: false, 
-          storageState: { show: false }
+          source: 'files',
+          sources: {'files': 'Files', 'url': 'URL', 'cloud': 'Cloud'},
         };
       },
 
       methods: {
+        start: function() {
+          this.loading = true;
+        },
 
+        finish: function(data) {
+          this.loading = false;
+          this.preview = ["config.xml", "index.js", "tasks.json"]
+            .map((filename, i) => ({ id: i + 1, filename: '/usr/heartex/examples/' + filename }));
+        }
       },
 
       watch: {

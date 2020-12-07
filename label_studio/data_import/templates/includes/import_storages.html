@@ -1,9 +1,7 @@
 {% raw %}
 <script type="text/x-template" id="cloud-storages-template">
 
-  <div v-for="(storage, storage_for) in storage_settings"
-       class="ui segment" style="width: 500px; margin: 2em auto"
-       v-if="state.show">
+  <div v-for="(storage, storage_for) in storage_settings">
 
     <!-- Header -->
     <h4 class="header">
@@ -141,12 +139,6 @@
         }}</span>
       </button>
 
-      <!-- Close -->
-      <button class="ui button basic cancel"
-              :class="{disabled: storage.loading}"
-              @click="state.show=false">Close
-      </button>
-
       <!-- Success -->
       <span class="ui green text" v-if="storage.save_success"><i class="fas fa-check"></i> Success</span>
     </div>
@@ -161,7 +153,7 @@
 <script>
 var cloudStorages = Vue.component('cloud-storages', {
   template: "#cloud-storages-template",
-  props: ['state'],
+  props: [],
 
   data: function () {
     return {
@@ -266,7 +258,7 @@ var cloudStorages = Vue.component('cloud-storages', {
         dataType: 'json',
         data: JSON.stringify(getFormData($('#' + storage_for + '-storage-form')))
       })
-        .fail(function (data) {
+      .fail(function (data) {
         if (data.hasOwnProperty('responseJSON') && data.responseJSON.hasOwnProperty('errors'))
           self.$set(self.storage_settings[storage_for], 'errors', data.responseJSON.errors);
         else {
@@ -277,15 +269,16 @@ var cloudStorages = Vue.component('cloud-storages', {
         console.log('save storage settings error:');
         console.log(data);
       })
-        .done(function () {
+      .done(function () {
         self.storage_settings[storage_for].save_success = true;
         self.project_loaded = false;
         setTimeout(function () {
           self.loadAll();
         }, 4000);
       })
-        .always(function () {
+      .always(function () {
         self.storage_settings[storage_for].loading = false;
+        self.$emit('finish');
       });
       return false;
     },
