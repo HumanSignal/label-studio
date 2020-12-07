@@ -92,7 +92,7 @@ def action_next_task(test_client, case_config):
         get all tasks
     """
     #TODO get tasks
-    response = test_client.get('/api/project/next')
+    response = test_client.get('/api/project/actions?id=next_task')
     data = json.loads(response.data.decode('utf-8'))
     assert isinstance(data, dict) == True
 
