@@ -98,6 +98,32 @@ class TestTabs:
         assert response.status_code == 200
         assert response.json == {'all': True, 'excluded': []}
 
+    def test_selected_items_excluded(self, test_client, captured_templates):
+        project_init_source()
+
+        # post
+        response = test_client.post('/api/project/tabs/1/selected-items', json={"all": True, "excluded": [1, 2, 3]})
+        assert response.status_code == 201
+
+        # get
+        response = test_client.get('/api/project/tabs/1/selected-items')
+        assert response.status_code == 200
+        assert response.json == {'all': True, 'excluded': [1, 2, 3]}
+
+        # patch
+        response = test_client.patch('/api/project/tabs/1/selected-items', json={"all": True, "excluded": [4, 5]})
+        assert response.status_code == 201
+        response = test_client.get('/api/project/tabs/1/selected-items')
+        assert response.status_code == 200
+        assert response.json == {'all': True, 'excluded': [1, 2, 3, 4, 5]}
+
+        # delete
+        response = test_client.delete('/api/project/tabs/1/selected-items', json={"all": True, "excluded": [3]})
+        assert response.status_code == 204
+        response = test_client.get('/api/project/tabs/1/selected-items')
+        assert response.status_code == 200
+        assert response.json == {'all': True, 'excluded': [1, 2, 4, 5]}
+
 
 class TestActions:
 
