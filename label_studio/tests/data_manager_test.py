@@ -108,14 +108,15 @@ class TestActions:
         assert response.json == [{'id': 'delete_tasks', 'order': 100, 'title': 'Delete tasks'},
                                  {'id': 'delete_tasks_completions', 'order': 101, 'title': 'Delete completions'}]
 
-    def test_action_tasks_delete(self, test_client, captured_templates):
+    @staticmethod
+    def action_tasks_delete(test_client, captured_templates, key):
         """ Remove tasks by ids
         """
         project = project_init_source()
 
         # POST: delete 3 tasks
         before_task_ids = set(project.source_storage.ids())
-        data = {'all': False, 'included': [4, 5, 6]}
+        data = {'all': key == 'excluded', key: [4, 5, 6]}
         response = test_client.post('/api/project/tabs/1/selected-items', json=data)
         assert response.status_code == 201
 
@@ -123,7 +124,15 @@ class TestActions:
         assert response.status_code == 200
 
         after_task_ids = set(project.source_storage.ids())
-        assert before_task_ids - set(data['included']) == after_task_ids, 'Tasks after deletion are incorrect'
+        return before_task_ids, after_task_ids, set(data[key])
+
+    def test_action_tasks_delete_included(self, test_client, captured_templates):
+        before, after, result = self.action_tasks_delete(test_client, captured_templates, 'included')
+        assert before - result == after, 'Tasks after deletion are incorrect'
+
+    def test_action_tasks_delete_excluded(self, test_client, captured_templates):
+        before, after, result = self.action_tasks_delete(test_client, captured_templates, 'excluded')
+        assert result == after, 'Tasks after deletion are incorrect'
 
     def test_action_tasks_completions_delete(self, test_client, captured_templates):
         """ Remove all completions for task ids

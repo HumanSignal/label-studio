@@ -193,7 +193,7 @@ def api_project_tab_action(tab_id):
 
     filters = request.values.get('filters') or tab.get('filters', None)
     ordering = request.values.get('ordering') or tab.get('ordering', None)
-    items = get_selected_items(selected, filters, ordering)
+    items = get_selected_items(g.project, selected, filters, ordering)
 
     # make advanced params for actions
     params = SimpleNamespace(tab=tab, values=request.values)
