@@ -1,12 +1,15 @@
 {% extends 'base.html' %}
-{% block body %}
-{% raw %}
-  <script src="static/js/polyfill.min.js"></script>
-  <script src="static/js/vue.js"></script>
-  <script src="static/js/components/vue-tippy.min.js"></script>
-  <script src="static/semantic/semantic-ui-vue.min.js"></script>
+{% block head %}
+<script src="static/js/polyfill.min.js"></script>
+<script src="static/js/vue.js"></script>
+<script src="static/js/components/vue-tippy.min.js"></script>
+<script src="static/semantic/semantic-ui-vue.min.js"></script>
 
-  <link rel="stylesheet" href="static/css/import-new.css">
+<link rel="stylesheet" href="static/css/import-new.css">
+{% endblock %}
+{% block body %}
+{% include 'includes/import_storages.html' %}
+{% raw %}
 
   <!-- Spinner while vue loading -->
   <div id="vue_loader" class="ui large text loader loading active">Loading ...</div>
@@ -50,10 +53,6 @@
       </div>
     </div>
   </div>
-
-  {% endraw %}
-  {% include 'includes/import_storages.html' %}
-  {% raw %}
 
   <script>
     Vue.use(SemanticUIVue);
