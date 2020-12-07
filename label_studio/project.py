@@ -110,6 +110,10 @@ class Project(object):
     def export_dir(self):
         return os.path.join(self.path, 'export')
 
+    @property
+    def upload_dir(self):
+        return os.path.join(self.path, 'upload')
+
     def get_storage(self, storage_for):
         if storage_for == 'source':
             return self.source_storage

@@ -1,8 +1,6 @@
 import os
 import io
 import attr
-import lxml
-import time
 import shutil
 import flask
 import pathlib
@@ -11,7 +9,6 @@ import logging
 import logging.config
 import pandas as pd
 import traceback as tb
-import lxml.etree
 import label_studio
 
 try:
@@ -26,22 +23,18 @@ with io.open(os.path.join(os.path.dirname(__file__), 'logger.json')) as f:
 from uuid import uuid4
 from urllib.parse import unquote
 from datetime import datetime
-from inspect import currentframe, getframeinfo
 from gevent.pywsgi import WSGIServer
 from flask import (
-    request, jsonify, make_response, Response, Response as HttpResponse,
-    send_file, session, redirect, current_app, Blueprint, url_for, g
+    request, jsonify, make_response, Response, send_file, session, redirect, current_app, Blueprint, url_for, g
 )
 from flask_api import status
 from types import SimpleNamespace
 
-from label_studio.utils import uploader
 from label_studio.utils.io import find_dir, find_editor_files
-from label_studio.utils.validation import TaskValidator
 from label_studio.utils.exceptions import ValidationError, LabelStudioError
 from label_studio.utils.functions import (
     set_external_hostname, set_web_protocol, get_web_protocol,
-    generate_time_series_json, generate_sample_task, get_sample_task
+    generate_time_series_json, get_sample_task
 )
 from label_studio.utils.misc import (
     exception_handler, exception_handler_page, check_port_in_use, start_browser, str2datetime,
@@ -53,7 +46,6 @@ from label_studio.utils.uri_resolver import resolve_task_data_uri
 from label_studio.utils.auth import requires_auth
 from label_studio.storage import get_storage_form
 from label_studio.project import Project
-from label_studio.tasks import Tasks
 
 from label_studio.data_manager.views import blueprint as data_manager_blueprint
 from label_studio.data_import.views import blueprint as data_import_blueprint

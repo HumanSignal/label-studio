@@ -3,7 +3,6 @@
 import os
 import io
 import csv
-import ssl
 import hashlib
 import shutil
 import zipfile
@@ -18,11 +17,10 @@ except:
     import json
 
 from os.path import join
-from urllib.request import urlopen
 from collections import Counter
 
-from .exceptions import ValidationError
-from .misc import Settings
+from label_studio.utils.exceptions import ValidationError
+from label_studio.utils.misc import Settings
 from label_studio.utils.functions import get_external_hostname
 
 
@@ -209,65 +207,3 @@ def aggregate_tasks(files, project):
         check_max_task_number(tasks)
 
     return tasks, dict(Counter(fileformats))
-
-
-@create_and_release_temp_dir
-def load_tasks(request, project, temp_dir):
-    """ Load tasks from different types of request.data / request.files
-    """
-    # take tasks from request FILES
-    formats = {}
-    if len(request.FILES):
-        # check_file_sizes_and_number(request.FILES)
-        files = aggregate_files(request.FILES, temp_dir)
-        tasks, formats = aggregate_tasks(files, project)
-
-    # take tasks from url address
-    elif 'application/x-www-form-urlencoded' in request.content_type:
-        try:
-            ctx = ssl.create_default_context()
-            ctx.check_hostname = False
-            ctx.verify_mode = ssl.CERT_NONE
-
-            url = request.data['url']
-            with urlopen(url, context=ctx) as file:
-                # check size
-                meta = file.info()
-                file.size = int(meta.get("Content-Length"))
-                file.urlopen = True
-                request_files = {url: file}
-                check_file_sizes_and_number(request_files)
-
-                # start parsing
-                files = aggregate_files(request_files, temp_dir)
-                tasks, formats = aggregate_tasks(files, project)
-
-        except ValidationError as e:
-            raise e
-        except Exception as e:
-            raise ValidationError(str(e))
-
-    # take one task from request DATA
-    elif 'application/json' in request.content_type and isinstance(request.data, dict):
-        tasks = [request.data]
-        formats = {'request': 1}
-
-        # take many tasks from request DATA
-    elif 'application/json' in request.content_type and isinstance(request.data, list):
-        tasks = request.data
-        formats = {'request': len(tasks)}
-
-    # incorrect data source
-    else:
-        raise ValidationError('load_tasks: No data found in DATA or in FILES')
-
-    # check is data root is list
-    if not isinstance(tasks, list):
-        raise ValidationError('load_tasks: Data root must be list')
-
-    # empty tasks error
-    if not tasks:
-        raise ValidationError('load_tasks: No tasks added')
-
-    check_max_task_number(tasks)
-    return tasks, formats
