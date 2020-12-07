@@ -9,13 +9,14 @@
 {% endblock %}
 {% block body %}
 {% include 'includes/import_storages.html' %}
+{% include 'includes/import_files.html' %}
 {% raw %}
 
   <!-- Spinner while vue loading -->
   <div id="vue_loader" class="ui large text loader loading active">Loading ...</div>
 
   <!-- Vue app -->
-  <div class="ui" id="import-tasks" :class="{'visible-app': vueLoaded}">
+  <div class="ui" id="import-tasks" :class="{ hidden: !vueLoaded }">
     <div v-if="preview">
       <h1>Files loaded</h1>
       <table>
@@ -41,7 +42,7 @@
       </div>
 
       <div class="ui form tab-files" v-if="source === 'files'" ref="files">
-        <h2>Files</h2>
+        <import-files @start="start" @finish="finish"></import-files>
       </div>
 
       <div class="ui form tab-url" v-if="source === 'url'" ref="url">

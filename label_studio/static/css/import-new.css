@@ -32,3 +32,75 @@
 .source-switch .ui.buttons .button {
   padding: 9px 18px;
 }
+
+/* Import files via dropzone */
+
+#import-tasks {
+  width: 560px;
+  margin: 0 auto;
+}
+
+#import-tasks > header {
+  position: relative;
+  margin-bottom: 32px;
+}
+
+#import-tasks > header h1 {
+  font-size: 24px;
+  line-height: 40px;
+  font-weight: 900 !important;
+}
+
+#import-tasks > header img {
+  position: absolute;
+  left: -132px;
+  width: 100px;
+}
+
+#holder.dropzone {
+  background: rgba(24, 144, 255, 0.05);
+  border: 1px dashed rgba(24, 144, 255, 0.5);
+  border-radius: 4px;
+  padding: 32px;
+  margin-bottom: 32px;
+}
+
+#holder.dropzone .content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #003C74;
+  opacity: 0.5;
+}
+
+#holder.dropzone .content > *:not(:first-child) {
+  margin-top: 32px;
+}
+
+#holder.dropzone .content header {
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 800;
+}
+
+#holder.dropzone .content .icon {
+  height: 100px;
+}
+
+#holder.dropzone .content dl {
+  display: grid;
+  grid-template: auto / auto auto;
+  font-size: 12px;
+  line-height: 20px;
+  gap: 0 30px;
+}
+
+
+#holder.dropzone .content dl dd {
+  font-weight: 900;
+}
+
+#holder.dropzone .content dl dt:last-of-type,
+#holder.dropzone .content dl dd:last-of-type {
+  margin-top: 20px;
+}
