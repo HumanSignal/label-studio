@@ -86,41 +86,43 @@ def api_project_tabs_selected_items(tab_id):
 
     # GET: get selected items from tab
     if request.method == 'GET':
-        return make_response(jsonify(tab.get('selectedItems', [])), 200)
+        return make_response(jsonify(tab.get('selectedItems', None)), 200)
 
     # check json body for list or str "all"
-    assert isinstance(request.json, dict), 'json body must be dict: {"all": true|false, ' \
-                                           '"excluded|included": [..task_ids..]}'
-    selected = request.json
+    data = request.json
+    assert isinstance(data, dict) and 'all' in data and (
+        (data['all'] and 'excluded' in data) or
+        (not data['all'] and 'included' in data)), \
+        'JSON body must be dict: ' \
+        '{"all": true, "excluded": [..task_ids..]} or ' \
+        '{"all": false, "included": [..task_ids..]}'
 
     # POST: set whole
     if request.method == 'POST':
-        items = get_selected_items(selected, tab['filters'], tab['ordering'])
-        tab['selectedItems'] = sorted(items)  # we need to use sorting because of frontend limitations
+        tab['selectedItems'] = data
         save_tab(tab_id, tab, g.project)
         return make_response(jsonify(tab), 201)
 
     # init selectedItems, we need to read it in PATCH and DELETE
     if 'selectedItems' not in tab:
-        tab['selectedItems'] = []
+        tab['selectedItems'] = {'all': False, 'included': []}
 
-    # PATCH: set particular
+    tab_data = tab['selectedItems']
+    assert tab_data['all'] == data['all'], 'Unsupported operands: tab_data["all"] != data["all"]'
+    key = 'excluded' if data['all'] else 'included'
+    left = set(tab_data[key])
+    right = set(data.get(key, []))
+
+    # PATCH: set particular with union
     if request.method == 'PATCH':
-        # [ {[1,2,3]} U {[2,3,4]} ]
-        items = get_selected_items(selected, tab['filters'], tab['ordering'])
-        tab['selectedItems'] = sorted(list(set(tab['selectedItems']).union(set(items))))
+        # make union, sorting is needed for the frontend
+        tab['selectedItems'][key] = sorted(list(left.union(right)))
         save_tab(tab_id, tab, g.project)
         return make_response(jsonify(tab), 201)
 
     # DELETE: delete specified items
     if request.method == 'DELETE':
-        # remove all items
-        if selected.get('all', False):
-            tab['selectedItems'] = []
-        # exclude specified items
-        else:
-            items = selected.get('included')
-            tab['selectedItems'] = sorted(list(set(tab['selectedItems']) - set(items)))
+        tab['selectedItems'][key] = sorted(list(left - right))
         save_tab(tab_id, tab, g.project)
         return make_response(jsonify(tab), 204)
 
@@ -178,21 +180,20 @@ def api_project_tab_action(tab_id):
     if tab_id is not None:
         tab_id = int(tab_id)
         tab = load_tab(tab_id, g.project, raise_if_not_exists=True)
-        items = tab.get('selectedItems', None)
+        selected = tab.get('selectedItems', None)
     else:
         tab = {}
-        items = None
+        selected = None
 
     # use filters and selected items from request if it's specified
-    selected = request.values.get('selectedItems', None)
-    if selected:
-        if not isinstance(selected, dict):
-            raise DataManagerException('selectedItems must be dict: {"all": [true|false], '
-                                       '"excluded | included": [...task_ids...]}')
+    selected = request.values.get('selectedItems', selected)
+    if not selected or not isinstance(selected, dict):
+        raise DataManagerException('selectedItems must be dict: {"all": [true|false], '
+                                   '"excluded | included": [...task_ids...]}')
 
-        filters = request.values.get('filters') or tab.get('filters', None)
-        ordering = request.values.get('ordering') or tab.get('ordering', None)
-        items = get_selected_items(selected, filters, ordering)
+    filters = request.values.get('filters') or tab.get('filters', None)
+    ordering = request.values.get('ordering') or tab.get('ordering', None)
+    items = get_selected_items(selected, filters, ordering)
 
     # make advanced params for actions
     params = SimpleNamespace(tab=tab, values=request.values)

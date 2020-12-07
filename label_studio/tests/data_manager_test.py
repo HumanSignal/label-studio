@@ -57,46 +57,46 @@ class TestTabs:
         project_init_source()
 
         # post
-        response = test_client.post('/api/project/tabs/1/selected-items', json={"included": [1, 2, 3]})
+        response = test_client.post('/api/project/tabs/1/selected-items', json={"all": False, "included": [1, 2, 3]})
         assert response.status_code == 201
 
         # get
         response = test_client.get('/api/project/tabs/1/selected-items')
         assert response.status_code == 200
-        assert response.json == [1, 2, 3]
+        assert response.json == {'all': False, 'included': [1, 2, 3]}
 
         # patch
-        response = test_client.patch('/api/project/tabs/1/selected-items', json={"included": [4, 5]})
+        response = test_client.patch('/api/project/tabs/1/selected-items', json={"all": False, "included": [4, 5]})
         assert response.status_code == 201
         response = test_client.get('/api/project/tabs/1/selected-items')
         assert response.status_code == 200
-        assert response.json == [1, 2, 3, 4, 5]
+        assert response.json == {'all': False, 'included': [1, 2, 3, 4, 5]}
 
         # delete
-        response = test_client.delete('/api/project/tabs/1/selected-items', json={"included": [3]})
+        response = test_client.delete('/api/project/tabs/1/selected-items', json={"all": False, "included": [3]})
         assert response.status_code == 204
         response = test_client.get('/api/project/tabs/1/selected-items')
         assert response.status_code == 200
-        assert response.json == [1, 2, 4, 5]
+        assert response.json == {'all': False, 'included': [1, 2, 4, 5]}
 
         # check TAB has selectedItems
         response = test_client.get('/api/project/tabs/1/')
         assert response.status_code == 200
-        assert response.json['selectedItems'] == [1, 2, 4, 5]
+        assert response.json['selectedItems'] == {'all': False, 'included': [1, 2, 4, 5]}
 
         # select all
-        response = test_client.post('/api/project/tabs/1/selected-items', json={'all': True})
+        response = test_client.post('/api/project/tabs/1/selected-items', json={'all': True, 'excluded': []})
         assert response.status_code == 201
         response = test_client.get('/api/project/tabs/1/selected-items')
         assert response.status_code == 200
-        assert response.json == list(range(0, 16))
+        assert response.json == {'all': True, 'excluded': []}
 
         # delete all
-        response = test_client.delete('/api/project/tabs/1/selected-items', json={'all': True})
+        response = test_client.delete('/api/project/tabs/1/selected-items', json={'all': True, 'excluded': []})
         assert response.status_code == 204
         response = test_client.get('/api/project/tabs/1/selected-items')
         assert response.status_code == 200
-        assert response.json == []
+        assert response.json == {'all': True, 'excluded': []}
 
 
 class TestActions:
@@ -115,13 +115,15 @@ class TestActions:
 
         # POST: delete 3 tasks
         before_task_ids = set(project.source_storage.ids())
-        items = [4, 5, 6]
-        response = test_client.post('/api/project/tabs/1/selected-items', json=items)
+        data = {'all': False, 'included': [4, 5, 6]}
+        response = test_client.post('/api/project/tabs/1/selected-items', json=data)
         assert response.status_code == 201
+
         response = test_client.post('/api/project/tabs/1/actions?id=delete_tasks')
         assert response.status_code == 200
+
         after_task_ids = set(project.source_storage.ids())
-        assert before_task_ids - set(items) == after_task_ids, 'Tasks after deletion are incorrect'
+        assert before_task_ids - set(data['included']) == after_task_ids, 'Tasks after deletion are incorrect'
 
     def test_action_tasks_completions_delete(self, test_client, captured_templates):
         """ Remove all completions for task ids
