@@ -68,11 +68,16 @@ def delete_tasks_completions(project, params, items):
 
 def next_task(project, params, items):
     """ Generate next task for labeling stream
+
+        :param project: project
+        :param params.values['sampling'] = sequential | random-uniform | prediction-score-min | prediction-score-max
+        :param items: task ids to sample from
     """
     # try to find task is not presented in completions
+    sampling = None if params is None else params.values.get('sampling', None)
     completed_tasks_ids = project.get_completions_ids()
-    task = project.next_task(completed_tasks_ids, task_ids=items,
-                             sampling=params.values.get('sampling', None))
+    task = project.next_task(completed_tasks_ids, task_ids=items, sampling=sampling)
+
     if task is None:
         # no tasks found
         return {'response_code': 404}

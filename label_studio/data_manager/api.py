@@ -1,14 +1,16 @@
 from types import SimpleNamespace
 from flask import make_response, request, jsonify, g
+
 from label_studio.utils.auth import requires_auth
 from label_studio.utils.misc import exception_handler
-from label_studio.data_manager.functions import (
-    prepare_tasks, prepare_annotations, get_all_columns, load_tab, save_tab, delete_tab, load_all_tabs,
-    get_all_tasks_ids
-)
+
 from label_studio.data_manager.actions import get_all_actions, perform_action
 from label_studio.data_manager import blueprint
 from label_studio.data_manager.functions import DataManagerException
+from label_studio.data_manager.functions import (
+    prepare_tasks, prepare_annotations, get_all_columns, load_tab, save_tab, delete_tab, load_all_tabs,
+    eval_task_ids, get_selected_items
+)
 
 
 @blueprint.route('/api/project/columns', methods=['GET'])
@@ -27,11 +29,14 @@ def api_project_columns():
 def api_project_actions():
     """ Project actions for data manager tabs
     """
-    if request.method == 'GET':
+    # POST or GET with action id: perform action
+    if request.method == 'POST' or (request.method == 'GET' and request.values.get('id', None)):
+        return api_project_tab_action(None)
+
+    # GET: return all action descriptions
+    elif request.method == 'GET':
         result = get_all_actions(g.project)
         return make_response(jsonify(result), 200)
-    elif request.method == 'POST':
-        return api_project_tab_action(None)
 
 
 @blueprint.route('/api/project/tabs', methods=['GET'])
@@ -84,28 +89,25 @@ def api_project_tabs_selected_items(tab_id):
         return make_response(jsonify(tab.get('selectedItems', [])), 200)
 
     # check json body for list or str "all"
-    assert isinstance(request.json, list) or (isinstance(request.json, str) and request.json == 'all'), \
-        'json body must be list with selected task ids OR string equal to "all"'
-    items = request.json
+    assert isinstance(request.json, dict), 'json body must be dict: {"all": true|false, ' \
+                                           '"excluded|included": [..task_ids..]}'
+    selected = request.json
 
     # POST: set whole
     if request.method == 'POST':
-        # get all tasks from tab filters
-        if items == 'all':
-            # get all tasks from tab filters
-            items = get_all_tasks_ids(g.project, None, None)
-
+        items = get_selected_items(selected, tab['filters'], tab['ordering'])
         tab['selectedItems'] = sorted(items)  # we need to use sorting because of frontend limitations
         save_tab(tab_id, tab, g.project)
         return make_response(jsonify(tab), 201)
 
-    # init selectedItems
+    # init selectedItems, we need to read it in PATCH and DELETE
     if 'selectedItems' not in tab:
         tab['selectedItems'] = []
 
     # PATCH: set particular
     if request.method == 'PATCH':
         # [ {[1,2,3]} U {[2,3,4]} ]
+        items = get_selected_items(selected, tab['filters'], tab['ordering'])
         tab['selectedItems'] = sorted(list(set(tab['selectedItems']).union(set(items))))
         save_tab(tab_id, tab, g.project)
         return make_response(jsonify(tab), 201)
@@ -113,13 +115,12 @@ def api_project_tabs_selected_items(tab_id):
     # DELETE: delete specified items
     if request.method == 'DELETE':
         # remove all items
-        if items == 'all':
+        if selected.get('all', False):
             tab['selectedItems'] = []
-
         # exclude specified items
         else:
+            items = selected.get('included')
             tab['selectedItems'] = sorted(list(set(tab['selectedItems']) - set(items)))
-
         save_tab(tab_id, tab, g.project)
         return make_response(jsonify(tab), 204)
 
@@ -173,24 +174,25 @@ def api_project_tab_action(tab_id):
     """ Perform actions with selected items from tab,
         also it could be used by POST /api/project/actions
     """
-    # use filters and selected items from request
-    items = request.values.get('selectedItems', None)
-    if tab_id is None or items is not None:
-        tab = None
-        if isinstance(items, list):
-            pass
-        elif isinstance(items, dict):
-            # TODO: selectedItems == all, filters
-            raise DataManagerException('selectedItems as dict are not supported yet')
-        else:
-            raise DataManagerException('selectedItems must be list (task ids) or dict: {"all": [true|false], '
-                                       '"excluded": [...task_ids...], "included":[...task_ids...]}')
-
     # use filters and selected items from tab
-    else:
+    if tab_id is not None:
         tab_id = int(tab_id)
         tab = load_tab(tab_id, g.project, raise_if_not_exists=True)
         items = tab.get('selectedItems', None)
+    else:
+        tab = {}
+        items = None
+
+    # use filters and selected items from request if it's specified
+    selected = request.values.get('selectedItems', None)
+    if selected:
+        if not isinstance(selected, dict):
+            raise DataManagerException('selectedItems must be dict: {"all": [true|false], '
+                                       '"excluded | included": [...task_ids...]}')
+
+        filters = request.values.get('filters') or tab.get('filters', None)
+        ordering = request.values.get('ordering') or tab.get('ordering', None)
+        items = get_selected_items(selected, filters, ordering)
 
     # make advanced params for actions
     params = SimpleNamespace(tab=tab, values=request.values)

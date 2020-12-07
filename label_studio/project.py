@@ -449,7 +449,7 @@ class Project(object):
                              prediction-score-max, prediction-score-min
         """
         completed_tasks_ids = set(completed_tasks_ids)
-        task_ids = self.source_storage.ids() if task_ids is None else task_ids
+        task_ids = sorted(self.source_storage.ids()) if task_ids is None else task_ids
         sampling = self.config.get('sampling', 'sequential') if sampling is None else sampling
 
         # Tasks are ordered ascending by their "id" fields. This is default mode

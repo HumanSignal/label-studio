@@ -562,28 +562,6 @@ def api_export():
     return response
 
 
-@blueprint.route('/api/project/next', methods=['GET'])
-@requires_auth
-@exception_handler
-def api_generate_next_task():
-    """ Generate next task for labeling page (label stream)
-    """
-    # try to find task is not presented in completions
-    completed_tasks_ids = g.project.get_completions_ids()
-    task = g.project.next_task(completed_tasks_ids, task_ids=None, sampling=None)
-    if task is None:
-        # no tasks found
-        return make_response('', 404)
-
-    task = resolve_task_data_uri(task, project=g.project)
-
-    # collect prediction from multiple ml backends
-    if g.project.ml_backends_connected:
-        task = g.project.make_predictions(task)
-    logger.debug('Next task:\n' + str(task.get('id', None)))
-    return make_response(jsonify(task), 200)
-
-
 @blueprint.route('/api/project/storage-settings', methods=['GET', 'POST'])
 @requires_auth
 @exception_handler
@@ -928,7 +906,7 @@ def json_filter(s):
 
 def main():
     # this will avoid looped imports and will register deprecated endpoints in the blueprint
-    # import label_studio.deprecated
+    import label_studio.deprecated
 
     input_args = parse_input_args()
     app = create_app(LabelStudioConfig(input_args=input_args))

@@ -57,7 +57,7 @@ class TestTabs:
         project_init_source()
 
         # post
-        response = test_client.post('/api/project/tabs/1/selected-items', json=[1, 2, 3])
+        response = test_client.post('/api/project/tabs/1/selected-items', json={"included": [1, 2, 3]})
         assert response.status_code == 201
 
         # get
@@ -66,33 +66,33 @@ class TestTabs:
         assert response.json == [1, 2, 3]
 
         # patch
-        response = test_client.patch('/api/project/tabs/1/selected-items', json=[4, 5])
+        response = test_client.patch('/api/project/tabs/1/selected-items', json={"included": [4, 5]})
         assert response.status_code == 201
         response = test_client.get('/api/project/tabs/1/selected-items')
         assert response.status_code == 200
         assert response.json == [1, 2, 3, 4, 5]
 
         # delete
-        response = test_client.delete('/api/project/tabs/1/selected-items', json=[3])
+        response = test_client.delete('/api/project/tabs/1/selected-items', json={"included": [3]})
         assert response.status_code == 204
         response = test_client.get('/api/project/tabs/1/selected-items')
         assert response.status_code == 200
         assert response.json == [1, 2, 4, 5]
 
-        # check tab has selectedItems
+        # check TAB has selectedItems
         response = test_client.get('/api/project/tabs/1/')
         assert response.status_code == 200
         assert response.json['selectedItems'] == [1, 2, 4, 5]
 
         # select all
-        response = test_client.post('/api/project/tabs/1/selected-items', json='all')
+        response = test_client.post('/api/project/tabs/1/selected-items', json={'all': True})
         assert response.status_code == 201
         response = test_client.get('/api/project/tabs/1/selected-items')
         assert response.status_code == 200
         assert response.json == list(range(0, 16))
 
         # delete all
-        response = test_client.delete('/api/project/tabs/1/selected-items', json='all')
+        response = test_client.delete('/api/project/tabs/1/selected-items', json={'all': True})
         assert response.status_code == 204
         response = test_client.get('/api/project/tabs/1/selected-items')
         assert response.status_code == 200

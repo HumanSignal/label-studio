@@ -125,3 +125,11 @@ def deprecated_api_predict():
 def deprecated_api_train():
     deprecated_message('/api/train', '/api/models/train')
     return api_train()
+
+
+@blueprint.route('/api/project/next', methods=['GET'])
+@requires_auth
+def api_generate_next_task():
+    from label_studio.data_manager.actions import next_task
+    deprecated_message('/api/project/next', '/api/project/actions?id=next_task')
+    return next_task(g.project, None, None)

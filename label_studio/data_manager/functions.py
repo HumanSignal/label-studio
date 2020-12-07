@@ -414,10 +414,27 @@ def prepare_annotations(tasks, params):
     return {'annotations': items, 'total': total}
 
 
-def get_all_tasks_ids(project, filters, ordering):
+def eval_task_ids(project, filters, ordering):
     """ Apply filter and ordering to all tasks
     """
     tab = {'filters': filters, 'ordering': ordering}
-    # load all tasks from db with some aggregations over completions and filter them
     data = prepare_tasks(project, params=SimpleNamespace(page=-1, page_size=-1, tab=tab, fields=['id']))
     return [t['id'] for t in data['tasks']]
+
+
+def get_selected_items(selected, filters, ordering):
+    """ Get selected items
+
+        :param selected: dict {'all': true|false, 'included|excluded': [...task_ids...]}
+        :param filters: filters as on tab
+        :param ordering: ordering as on tab
+    """
+    # all_tasks - excluded
+    if selected.get('all', False):
+        items = eval_task_ids(g.project, filters=filters, ordering=ordering)  # get tasks from tab filters
+        for value in selected.get('excluded', []):
+            items.remove(value)
+    # included only
+    else:
+        items = selected.get('included', [])
+    return items
