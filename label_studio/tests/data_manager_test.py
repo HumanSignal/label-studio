@@ -106,7 +106,7 @@ class TestActions:
         response = test_client.get('/api/project/actions')
         assert response.status_code == 200
         assert response.json == [{'id': 'delete_tasks', 'order': 100, 'title': 'Delete tasks'},
-                                 {'id': 'delete_completions', 'order': 101, 'title': 'Delete completions'}]
+                                 {'id': 'delete_tasks_completions', 'order': 101, 'title': 'Delete completions'}]
 
     def test_action_tasks_delete(self, test_client, captured_templates):
         """ Remove tasks by ids

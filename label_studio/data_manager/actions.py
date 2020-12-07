@@ -19,11 +19,10 @@ def get_all_actions(project):
     # copy and sort by order key
     actions = list(_actions.values())
     actions = sorted(actions, key=lambda x: x['order'])
-    actions = [copy(action) for action in actions]
-    for i, _ in enumerate(actions):
-        if actions[i].get('hidden', False):
-            continue
-        actions[i].pop('entry_point')  # exclude entry points
+    actions = [
+        {key: action[key] for key in action if key != 'entry_point'}
+        for action in actions if not action.get('hidden', False)
+    ]
     return actions
 
 

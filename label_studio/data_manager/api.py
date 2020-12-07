@@ -93,7 +93,7 @@ def api_project_tabs_selected_items(tab_id):
         # get all tasks from tab filters
         if items == 'all':
             # get all tasks from tab filters
-            items = get_all_tasks_ids()
+            items = get_all_tasks_ids(g.project, None, None)
 
         tab['selectedItems'] = sorted(items)  # we need to use sorting because of frontend limitations
         save_tab(tab_id, tab, g.project)

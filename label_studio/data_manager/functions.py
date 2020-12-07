@@ -414,10 +414,10 @@ def prepare_annotations(tasks, params):
     return {'annotations': items, 'total': total}
 
 
-def get_all_tasks_ids(filters, ordering):
+def get_all_tasks_ids(project, filters, ordering):
     """ Apply filter and ordering to all tasks
     """
     tab = {'filters': filters, 'ordering': ordering}
     # load all tasks from db with some aggregations over completions and filter them
-    data = prepare_tasks(g.project, params=SimpleNamespace(page=-1, page_size=-1, tab=tab, fields=['id']))
+    data = prepare_tasks(project, params=SimpleNamespace(page=-1, page_size=-1, tab=tab, fields=['id']))
     return [t['id'] for t in data['tasks']]

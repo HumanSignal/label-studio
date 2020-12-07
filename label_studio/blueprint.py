@@ -570,7 +570,7 @@ def api_generate_next_task():
     """
     # try to find task is not presented in completions
     completed_tasks_ids = g.project.get_completions_ids()
-    task = g.project.next_task(completed_tasks_ids, tasks=None, sampling=None)
+    task = g.project.next_task(completed_tasks_ids, task_ids=None, sampling=None)
     if task is None:
         # no tasks found
         return make_response('', 404)
