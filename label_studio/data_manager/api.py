@@ -188,10 +188,11 @@ def api_project_tab_action(tab_id):
         selected = None
 
     # use filters and selected items from request if it's specified
-    selected = request.json.get('selectedItems', selected)
-    if not selected or not isinstance(selected, dict):
-        raise DataManagerException('selectedItems must be dict: {"all": [true|false], '
-                                   '"excluded | included": [...task_ids...]}')
+    if request.json is not None:
+        selected = request.json.get('selectedItems', selected)
+        if not selected or not isinstance(selected, dict):
+            raise DataManagerException('selectedItems must be dict: {"all": [true|false], '
+                                       '"excluded | included": [...task_ids...]}')
 
     filters = request.values.get('filters') or tab.get('filters', None)
     ordering = request.values.get('ordering') or tab.get('ordering', None)

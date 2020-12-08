@@ -116,14 +116,14 @@ class TestTabs:
         assert response.status_code == 201
         response = test_client.get('/api/project/tabs/1/selected-items')
         assert response.status_code == 200
-        assert response.json == {'all': True, 'excluded': [3]}
+        assert response.json == {'all': True, 'excluded':  [1, 2, 3]}
 
         # delete
         response = test_client.delete('/api/project/tabs/1/selected-items', json={"all": True, "excluded": [4, 5]})
         assert response.status_code == 204
         response = test_client.get('/api/project/tabs/1/selected-items')
         assert response.status_code == 200
-        assert response.json == {'all': True, 'excluded': [3, 4, 5]}
+        assert response.json == {'all': True, 'excluded': [1, 2, 3]}
 
 
 class TestActions:
@@ -132,8 +132,11 @@ class TestActions:
         # GET: check action list
         response = test_client.get('/api/project/actions')
         assert response.status_code == 200
-        assert response.json == [{'id': 'delete_tasks', 'order': 100, 'title': 'Delete tasks'},
-                                 {'id': 'delete_tasks_completions', 'order': 101, 'title': 'Delete completions'}]
+        assert response.json == [
+            {'id': 'delete_tasks', 'order': 100, 'title': 'Delete tasks',
+             'permissions': 'project.can_delete_tasks'},
+            {'id': 'delete_tasks_completions', 'order': 101, 'title': 'Delete completions',
+             'permissions': 'project.can_manage_completions'}]
 
     @staticmethod
     def action_tasks_delete(test_client, captured_templates, key):
