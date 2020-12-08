@@ -8,8 +8,38 @@
   display: none;
 }
 
+#import-tasks .error {
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 50vh;
+  overflow: auto;
+  margin-bottom: 32px;
+}
+
 #import-tasks .center {
   text-align: center;
+}
+
+#import-tasks h1 {
+  position: relative;
+  margin-bottom: 32px;
+  font-size: 24px;
+  line-height: 40px;
+  font-weight: 900 !important;
+}
+
+#import-tasks h1.fade {
+  opacity: 0.3;
+}
+
+#import-tasks h1::before {
+  content: "";
+  background-image: url(/static/images/heartex_icon_opossum_green@2x.png);
+  background-size: 100px;
+  position: absolute;
+  left: -132px;
+  width: 100px;
+  height: 100px;
 }
 
 /* Source switch */
@@ -103,4 +133,29 @@
 #holder.dropzone .content dl dt:last-of-type,
 #holder.dropzone .content dl dd:last-of-type {
   margin-top: 20px;
+}
+
+/* Preview */
+
+table.preview {
+  text-align: left;
+  width: 100%;
+  position: relative;
+}
+
+table.preview td,
+table.preview th {
+  border: none;
+}
+
+/* fade out */
+table.preview::after {
+  content: "";
+  background: linear-gradient(0deg, white, transparent);
+  width: 100%;
+  display: block;
+  position: absolute;
+  bottom: 0;
+  height: 30%;
+  max-height: 100px;
 }

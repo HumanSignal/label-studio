@@ -7,7 +7,9 @@
 
 <link rel="stylesheet" href="static/css/import-new.css">
 {% endblock %}
+
 {% block body %}
+
 {% include 'includes/import_storages.html' %}
 {% include 'includes/import_files.html' %}
 {% raw %}
@@ -17,18 +19,36 @@
 
   <!-- Vue app -->
   <div class="ui" id="import-tasks" :class="{ hidden: !vueLoaded }">
-    <div v-if="preview">
+    <div v-if="preview && !errors.length">
       <h1>Files loaded</h1>
-      <table>
+      <table class="preview">
+        <thead>
+          <tr>
+            <th v-for="_, title in preview[0]">{{title}}</th>
+          </tr>
+        </thead>
         <tr v-for="row in preview">
           <td v-for="value in row">{{value}}</td>
         </tr>
       </table>
     </div>
 
-    <div v-if="loading">Loading...</div>
+    <div v-if="loading">
+      <h1 class="fade">Import data</h1>
+      <p>Loading...</p>
+    </div>
+
+    <div v-if="errors.length">
+      <h1>Errors</h1>
+      <div class="error" v-for="error in errors">{{error}}</div>
+      <p class="center">
+        <button class="ui primary button" @click="reset">Try another input</button>
+      </p>
+    </div>
 
     <div :class="{ hidden: loading || preview }">
+      <h1>Import data</h1>
+
       <div class="source-switch">
         <span>Source</span>
         <div class="ui buttons">
@@ -42,7 +62,7 @@
       </div>
 
       <div class="ui form tab-files" v-if="source === 'files'" ref="files">
-        <import-files @start="start" @finish="finish"></import-files>
+        <import-files @start="start" @finish="finish" @error="error"></import-files>
       </div>
 
       <div class="ui form tab-url" v-if="source === 'url'" ref="url">
@@ -66,6 +86,7 @@
       data: function () {
 
         return {
+          errors: [],
           loading: false,
           preview: null,
           vueLoaded: false, 
@@ -83,7 +104,18 @@
           this.loading = false;
           this.preview = ["config.xml", "index.js", "tasks.json"]
             .map((filename, i) => ({ id: i + 1, filename: '/usr/heartex/examples/' + filename }));
-        }
+        },
+
+        error: function(error) {
+          this.loading = false;
+          this.errors.push(error);
+        },
+
+        reset() {
+          this.loading = false;
+          this.errors = [];
+          this.preview = null;
+        },
       },
 
       watch: {
