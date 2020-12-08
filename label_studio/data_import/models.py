@@ -76,7 +76,7 @@ class ImportState(object):
 
     @property
     def tasks_preview(self):
-        return self.tasks
+        return [task['data'] for task in self.tasks]
 
     @property
     def total_tasks(self):

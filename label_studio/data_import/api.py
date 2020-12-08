@@ -99,16 +99,14 @@ def api_import_example_file():
     return response
 
 
-ALLOWED_EXTENSIONS = {}
-
-
 def _is_allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    """Secured mode allows only certain file extensions being uploaded on server"""
+    return True
 
 
 def _upload_files(request_files, project):
     filelist = []
-    for _, file in request_files:
+    for _, file in request_files.items():
         if file and file.filename and _is_allowed_file(file.filename):
             filename = secure_filename(file.filename)
             filepath = os.path.join(project.upload_dir, filename)
@@ -118,19 +116,10 @@ def _upload_files(request_files, project):
 
 
 def _create_import_state(request, g):
-    # make django compatibility for uploader module
-    class DjangoRequest:
-        def __init__(self): pass
-
-        POST = request.form
-        GET = request.args
-        FILES = request.files
-        data = request.json if request.json else request.form
-        content_type = request.content_type
 
     # Files import
-    if len(request.FILES):
-        uploaded_files = _upload_files(request.FILES, g.project)
+    if len(request.files):
+        uploaded_files = _upload_files(request.files, g.project)
         import_state = ImportState.create_from_filelist(filelist=uploaded_files, project=g.project)
 
     # URL import
@@ -166,10 +155,10 @@ def _create_import_state(request, g):
     return import_state
 
 
-@blueprint.route('/api/project/import', methods=['POST'])
+@blueprint.route('/api/project/<int:project_id>/import', methods=['POST'])
 @requires_auth
 @exception_handler
-def api_import():
+def api_import(project_id):
     """ The main API for task import, supports
         * json task data
         * files (as web form, files will be hosted by this flask server)
@@ -183,19 +172,41 @@ def api_import():
         # TODO: import specific exception handler
         return make_response(jsonify(e.msg_to_list()), status.HTTP_400_BAD_REQUEST)
 
-    # TODO: add condition when import is not immediately applied
-    new_tasks = import_state.apply()
     response = import_state.serialize()
+    new_tasks = import_state.apply()
     duration = time.time() - start
     response['duration'] = duration
     response['new_task_ids'] = [t for t in new_tasks]
     return make_response(jsonify(response), status.HTTP_201_CREATED)
 
 
-@blueprint.route('/api/project/import/<int:import_id>', methods=['GET', 'PATCH'])
+@blueprint.route('/api/project/<int:project_id>/import/prepare', methods=['POST'])
 @requires_auth
 @exception_handler
-def api_import_detail(import_id):
+def api_import_prepare(project_id):
+    """ The main API for task import, supports
+        * json task data
+        * files (as web form, files will be hosted by this flask server)
+        * url links to images, audio, csv (if you use TimeSeries in labeling config)
+    """
+
+    start = time.time()
+    try:
+        import_state = _create_import_state(request, g)
+    except ValidationError as e:
+        # TODO: import specific exception handler
+        return make_response(jsonify(e.msg_to_list()), status.HTTP_400_BAD_REQUEST)
+
+    response = import_state.serialize()
+    duration = time.time() - start
+    response['duration'] = duration
+    return make_response(jsonify(response), status.HTTP_201_CREATED)
+
+
+@blueprint.route('/api/project/<int:project_id>/import/<int:import_id>', methods=['GET', 'PATCH'])
+@requires_auth
+@exception_handler
+def api_import_detail(project_id, import_id):
     import_state = ImportState.get_by_id(id=import_id)
     if request.method == 'GET':
         return import_state.serialize()
@@ -205,10 +216,10 @@ def api_import_detail(import_id):
         return make_response({}, status.HTTP_200_OK)
 
 
-@blueprint.route('/api/project/import/<int:import_id>/apply', methods=['POST'])
+@blueprint.route('/api/project/<int:project_id>/import/<int:import_id>/apply', methods=['POST'])
 @requires_auth
 @exception_handler
-def api_import_apply(import_id):
+def api_import_apply(project_id, import_id):
     import_state = ImportState.get_by_id(id=import_id)
     new_tasks = import_state.apply()
     response = {'new_task_ids': [t for t in new_tasks]}

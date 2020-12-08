@@ -21,7 +21,6 @@ from label_studio.utils.models import ProjectObj, MLBackend
 from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.io import find_file, delete_dir_content, json_load
 from label_studio.utils.validation import is_url
-from label_studio.utils.functions import get_external_hostname
 from label_studio.tasks import Tasks
 from label_studio.storage import create_storage, get_available_storage_names
 
@@ -108,11 +107,15 @@ class Project(object):
 
     @property
     def export_dir(self):
-        return os.path.join(self.path, 'export')
+        export_dir = os.path.join(self.path, 'export')
+        os.makedirs(export_dir, exist_ok=True)
+        return export_dir
 
     @property
     def upload_dir(self):
-        return os.path.join(self.path, 'upload')
+        upload_dir = os.path.join(self.path, 'upload')
+        os.makedirs(upload_dir, exist_ok=True)
+        return upload_dir
 
     def get_storage(self, storage_for):
         if storage_for == 'source':
@@ -731,23 +734,26 @@ class Project(object):
         :return:
         """
         dir = cls.get_project_dir(project_name, args)
-        if args.force:
+        if hasattr(args, 'force') and args.force:
             delete_dir_content(dir)
         os.makedirs(dir, exist_ok=True)
 
-        config = json_load(args.config_path) if args.config_path else json_load(find_file('default_config.json'))
+        if hasattr(args, 'config_path') and args.config_path:
+            config = json_load(args.config_path)
+        else:
+            config = json_load(find_file('default_config.json'))
 
         def already_exists_error(what, path):
             raise RuntimeError('{path} {what} already exists. Use "--force" option to recreate it.'.format(
                 path=path, what=what
             ))
 
-        input_path = args.input_path or config.get('input_path')
+        input_path = hasattr(args, 'input_path') and args.input_path or config.get('input_path')
 
         # save label config
         config_xml = 'config.xml'
         config_xml_path = os.path.join(dir, config_xml)
-        label_config_file = args.label_config or config.get('label_config')
+        label_config_file = hasattr(args, 'label_config') and args.label_config or config.get('label_config')
         if label_config_file:
             copy2(label_config_file, config_xml_path)
             print(label_config_file + ' label config copied to ' + config_xml_path)
@@ -766,7 +772,7 @@ class Project(object):
 
         config['label_config'] = config_xml
 
-        if args.source:
+        if hasattr(args, 'source') and args.source:
             config['source'] = {
                 'type': args.source,
                 'path': args.source_path,
@@ -791,7 +797,7 @@ class Project(object):
             logger.debug('{tasks_json_path} input file with {n} tasks has been created from {input_path}'.format(
                 tasks_json_path=tasks_json_path, n=len(tasks), input_path=input_path))
 
-        if args.target:
+        if hasattr(args, 'target') and args.target:
             config['target'] = {
                 'type': args.target,
                 'path': args.target_path,
@@ -816,23 +822,24 @@ class Project(object):
 
         if 'ml_backends' not in config or not isinstance(config['ml_backends'], list):
             config['ml_backends'] = []
-        if args.ml_backends:
+        if hasattr(args, 'ml_backends') and args.ml_backends:
             for url in args.ml_backends:
                 config['ml_backends'].append(cls._create_ml_backend_params(url, project_name))
 
-        if args.sampling:
+        if hasattr(args, 'sampling') and args.sampling:
             config['sampling'] = args.sampling
-        if args.port:
+        if hasattr(args, 'port') and args.port:
             config['port'] = args.port
-        if args.host:
+        if hasattr(args, 'host') and args.host:
             config['host'] = args.host
-        if args.allow_serving_local_files:
+        if hasattr(args, 'allow_serving_local_files') and args.allow_serving_local_files:
             config['allow_serving_local_files'] = True
-        if args.key_file and args.cert_file:
+        if hasattr(args, 'key_file') and args.key_file and args.cert_file:
             config['protocol'] = 'https://'
             config['cert'] = args.cert_file
             config['key'] = args.key_file
-        if (hasattr(args, 'web_gui_project_desc') and args.web_gui_project_desc) or args.project_desc:
+        if (hasattr(args, 'web_gui_project_desc') and args.web_gui_project_desc) or \
+            (hasattr(args, 'project_desc') and args.project_desc):
             config['description'] = args.web_gui_project_desc or args.project_desc
 
         # create config.json
