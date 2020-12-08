@@ -77,7 +77,7 @@ def make_request(client, url, params):
     elif method == 'PATCH':
         return client.patch(url, **request_params)
     elif method == 'DELETE':
-        return client.patch(url, **request_params)
+        return client.delete(url, **request_params)
 
 
 def compare_response_values(client_value, expected_value):

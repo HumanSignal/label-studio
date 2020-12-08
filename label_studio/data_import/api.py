@@ -184,22 +184,13 @@ def api_import(project_id):
 @requires_auth
 @exception_handler
 def api_import_prepare(project_id):
-    """ The main API for task import, supports
-        * json task data
-        * files (as web form, files will be hosted by this flask server)
-        * url links to images, audio, csv (if you use TimeSeries in labeling config)
-    """
-
-    start = time.time()
+    """Create ImportState object and returns it's ID"""
     try:
         import_state = _create_import_state(request, g)
     except ValidationError as e:
         # TODO: import specific exception handler
         return make_response(jsonify(e.msg_to_list()), status.HTTP_400_BAD_REQUEST)
-
-    response = import_state.serialize()
-    duration = time.time() - start
-    response['duration'] = duration
+    response = {'id': import_state.id}
     return make_response(jsonify(response), status.HTTP_201_CREATED)
 
 
@@ -208,12 +199,12 @@ def api_import_prepare(project_id):
 @exception_handler
 def api_import_detail(project_id, import_id):
     import_state = ImportState.get_by_id(id=import_id)
-    if request.method == 'GET':
-        return import_state.serialize()
-    elif request.method == 'PATCH':
-        import_state_params = dict(request.data)
+    if request.method == 'PATCH':
+        # Update ImportState fields
+        import_state_params = dict(request.json)
         import_state.update(**import_state_params)
-        return make_response({}, status.HTTP_200_OK)
+    response = import_state.serialize()
+    return make_response(response, status.HTTP_200_OK)
 
 
 @blueprint.route('/api/project/<int:project_id>/import/<int:import_id>/apply', methods=['POST'])
