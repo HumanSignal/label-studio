@@ -241,9 +241,8 @@ def operator(op, a, b):
     """ Filter operators
     """
     if op == 'empty':  # TODO: check it
-        return (b is None or not b) and a
-    if op == 'not_empty':  # TODO: check it
-        return (b is not None or not b) and a
+        value = b is None or (hasattr(b, '__len__') and len(b) == 0)
+        return value if a else not value
 
     if a is None:
         return False

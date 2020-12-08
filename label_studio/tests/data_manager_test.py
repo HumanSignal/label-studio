@@ -111,18 +111,19 @@ class TestTabs:
         assert response.json == {'all': True, 'excluded': [1, 2, 3]}
 
         # patch
-        response = test_client.patch('/api/project/tabs/1/selected-items', json={"all": True, "excluded": [4, 5]})
+        response = test_client.patch('/api/project/tabs/1/selected-items',
+                                     json={"all": True, "excluded": [1, 2]})
         assert response.status_code == 201
         response = test_client.get('/api/project/tabs/1/selected-items')
         assert response.status_code == 200
-        assert response.json == {'all': True, 'excluded': [1, 2, 3, 4, 5]}
+        assert response.json == {'all': True, 'excluded': [3]}
 
         # delete
-        response = test_client.delete('/api/project/tabs/1/selected-items', json={"all": True, "excluded": [3]})
+        response = test_client.delete('/api/project/tabs/1/selected-items', json={"all": True, "excluded": [4, 5]})
         assert response.status_code == 204
         response = test_client.get('/api/project/tabs/1/selected-items')
         assert response.status_code == 200
-        assert response.json == {'all': True, 'excluded': [1, 2, 4, 5]}
+        assert response.json == {'all': True, 'excluded': [3, 4, 5]}
 
 
 class TestActions:

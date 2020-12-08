@@ -116,13 +116,15 @@ def api_project_tabs_selected_items(tab_id):
     # PATCH: set particular with union
     if request.method == 'PATCH':
         # make union, sorting is needed for the frontend
-        tab['selectedItems'][key] = sorted(list(left.union(right)))
+        result = (left - right) if key == 'excluded' else (left | right)
+        tab['selectedItems'][key] = sorted(list(result))
         save_tab(tab_id, tab, g.project)
         return make_response(jsonify(tab), 201)
 
     # DELETE: delete specified items
     if request.method == 'DELETE':
-        tab['selectedItems'][key] = sorted(list(left - right))
+        result = (left | right) if key == 'excluded' else (left - right)
+        tab['selectedItems'][key] = sorted(list(result))
         save_tab(tab_id, tab, g.project)
         return make_response(jsonify(tab), 204)
 
