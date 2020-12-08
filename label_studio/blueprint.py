@@ -662,7 +662,7 @@ def api_all_tasks():
     if request.method == 'GET':
         tab = {
             'ordering': [request.values.get('order', 'id')],
-            'filters': request.values.get('filters', None),
+            'filters': request.json.get('filters', None) if request.json is not None else None,
             'fields': request.values.get('fields', 'all').split(',')
         }
 

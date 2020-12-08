@@ -35,6 +35,11 @@ def get_all_columns(project):
     # frontend uses MST data model, so we need two directional referencing parent <-> child
     task_data_children = []
     i = 0
+
+    # data types from config + data found while import
+    data_types = dict(project.data_types.items())
+    data_types.update({key: 'String' for key in project.derived_input_schema})
+
     for key, data_type in project.data_types.items():
         column = {
             'id': key,
@@ -77,6 +82,13 @@ def get_all_columns(project):
             'type': "Number",
             'target': 'tasks',
             'help': 'Number of cancelled (skipped) completions'
+        },
+        {
+            'id': 'total_predictions',
+            'title': "Predictions",
+            'type': "Number",
+            'target': 'tasks',
+            'help': 'Total predictions per task'
         },
         {
             'id': 'data',
@@ -201,8 +213,9 @@ def preload_task(project, task_id, resolve_uri=False):
         # cancelled completions number
         task['has_cancelled_completions'] = get_cancelled_number(task)
 
-        # total completions
+        # total completions and predictions
         task['total_completions'] = len(task['completions'])
+        task['total_predictions'] = len(task['predictions'])
 
     # don't resolve data (s3/gcs is slow) if it's not necessary (it's very slow)
     if resolve_uri:
@@ -263,6 +276,8 @@ def operator(op, a, b):
         a, c = a['min'], a['max']
         return not (a <= b <= c)
 
+    raise DataManagerException('Incorrect operator name in filters: ' + str(op))
+
 
 def resolve_task_field(task, field):
     """ Get task field from root or 'data' sub-dict
@@ -322,6 +337,9 @@ def filter_tasks(tasks, params):
     # go over all the filters
     for f in filters['items']:
         parts = f['filter'].split(':')  # filters:<tasks|annotations>:field_name
+        if len(parts) < 3:
+            raise DataManagerException('Filter name must be "filters:tasks:<field>" or "filters:tasks:data.<value>"'
+                                       'but "' + f['filter'] + '" found')
         target = parts[1]  # 'tasks | annotations'
         field = parts[2]  # field name
         op, value = f['operator'], f['value']
@@ -354,6 +372,12 @@ def prepare_tasks(project, params):
     tasks = order_tasks(params, tasks)
     total = len(tasks)
 
+    # aggregations
+    total_completions, total_predictions = 0, 0
+    for task in tasks:
+        total_completions += task.get('total_completions', 0)
+        total_predictions += task.get('total_predictions', 0)
+
     # pagination
     page, page_size = params.page, params.page_size
     if page > 0 and page_size > 0:
@@ -369,7 +393,8 @@ def prepare_tasks(project, params):
         for i, task in enumerate(tasks):
             tasks[i] = resolve_task_data_uri(task, project=project)
 
-    return {'tasks': tasks, 'total': total}
+    return {'tasks': tasks,
+            'total': total, 'total_completions': total_completions, 'total_predictions': total_predictions}
 
 
 def prepare_annotations(tasks, params):

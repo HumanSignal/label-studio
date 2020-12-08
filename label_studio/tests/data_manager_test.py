@@ -18,7 +18,7 @@ def default_project(monkeypatch):
 def project_init_source():
     project = goc_project()
     ids = range(0, 16)
-    values = [{'data': {'image': '123', 'text': '123'}, 'id': i} for i in range(0, 16)]
+    values = [{'data': {'image': '123', 'text': '123' + str(i)}, 'id': i} for i in range(0, 16)]
     project.source_storage.remove_all()
     project.source_storage.set_many(ids, values)
     return project
@@ -184,8 +184,30 @@ class TestTasksAndAnnotations:
     """ Test tasks on tabs
     """
     def test_tasks(self, test_client, captured_templates):
-        response = test_client.get('/api/project/tabs/1/tasks')
+        project = project_init_source()
+        project.target_storage.remove_all()
+        data = {
+            'filters': {
+                'conjunction': 'and',
+                'items': [{
+                    'filter': 'filters:tasks:id',
+                    'operator': 'in',
+                    'value': {'min': 2, 'max': 5}
+                    },
+                    {
+                    'filter': 'filters:tasks:data.text',
+                    'operator': 'contains',
+                    'value': '123'
+                    }]
+            }
+        }
+        response = test_client.get('/api/tasks', json=data)
         assert response.status_code == 200
+        assert response.json == {'tasks': [{'data': {'image': '123', 'text': '1232'}, 'id': 2},
+                                           {'data': {'image': '123', 'text': '1233'}, 'id': 3},
+                                           {'data': {'image': '123', 'text': '1234'}, 'id': 4},
+                                           {'data': {'image': '123', 'text': '1235'}, 'id': 5}],
+                                 'total': 4, 'total_completions': 0, 'total_predictions': 0}
 
     def test_annotations(self, test_client, captured_templates):
         response = test_client.get('/api/project/tabs/1/annotations')

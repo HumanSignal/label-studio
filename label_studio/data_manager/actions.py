@@ -68,14 +68,16 @@ def delete_tasks(project, params, items):
     """ Delete tasks by ids
     """
     project.delete_tasks(items)
-    return {'processed_items': len(items)}
+    return {'processed_items': len(items),
+            'detail': 'Deleted ' + str(len(items)) + ' tasks'}
 
 
 def delete_tasks_completions(project, params, items):
     """ Delete all completions by tasks ids
     """
     project.delete_tasks_completions(items)
-    return {'processed_items': len(items)}
+    return {'processed_items': len(items),
+            'detail': 'Deleted ' + str(len(items)) + ' completions'}
 
 
 def next_task(project, params, items):
