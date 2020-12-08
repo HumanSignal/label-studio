@@ -13,6 +13,17 @@ logger = logging.getLogger(__name__)
 _actions = {}
 
 
+def check_permissions(project, action):
+    """ Some actions might have a permissions to perform
+    """
+    if 'permissions' in action:
+        if action['permissions'].startswith('project.'):
+            field = action['permissions'].replace('project.', '')
+            return getattr(project, field)
+    else:
+        return True
+
+
 def get_all_actions(project):
     """ Return dict with registered actions
     """
@@ -22,6 +33,7 @@ def get_all_actions(project):
     actions = [
         {key: action[key] for key in action if key != 'entry_point'}
         for action in actions if not action.get('hidden', False)
+        and check_permissions(project, action)
     ]
     return actions
 
@@ -93,6 +105,6 @@ def next_task(project, params, items):
     return task
 
 
-register_action(delete_tasks, 'Delete tasks', 100)
-register_action(delete_tasks_completions, 'Delete completions', 101)
+register_action(delete_tasks, 'Delete tasks', 100, permissions='project.can_delete_tasks')
+register_action(delete_tasks_completions, 'Delete completions', 101, permissions='project.can_manage_completions')
 register_action(next_task, 'Generate next task', 0, hidden=True)
