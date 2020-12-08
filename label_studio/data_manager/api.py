@@ -4,9 +4,11 @@ from label_studio.utils.auth import requires_auth
 from label_studio.utils.misc import exception_handler
 from label_studio.data_manager.functions import (
     prepare_tasks, prepare_annotations, get_all_columns, load_tab, save_tab, delete_tab, load_all_tabs,
+    get_all_tasks_ids
 )
 from label_studio.data_manager.actions import get_all_actions, perform_action
 from label_studio.data_manager import blueprint
+from label_studio.data_manager.functions import DataManagerException
 
 
 @blueprint.route('/api/project/columns', methods=['GET'])
@@ -90,9 +92,8 @@ def api_project_tabs_selected_items(tab_id):
     if request.method == 'POST':
         # get all tasks from tab filters
         if items == 'all':
-            # load all tasks from db with some aggregations over completions and filter them
-            data = prepare_tasks(g.project, params=SimpleNamespace(page=-1, page_size=-1, tab=tab, fields=['id']))
-            items = [t['id'] for t in data['tasks']]
+            # get all tasks from tab filters
+            items = get_all_tasks_ids()
 
         tab['selectedItems'] = sorted(items)  # we need to use sorting because of frontend limitations
         save_tab(tab_id, tab, g.project)
@@ -169,28 +170,43 @@ def api_project_tab_annotations(tab_id):
 @requires_auth
 @exception_handler
 def api_project_tab_action(tab_id):
-    """ Perform actions with selected items from tab
+    """ Perform actions with selected items from tab,
+        also it could be used by POST /api/project/actions
     """
-    # try to get params from request
-    if tab_id is None:
-        items = request.values.get('selected-items', [])
+    # use filters and selected items from request
+    items = request.values.get('selectedItems', None)
+    if tab_id is None or items is not None:
         tab = None
-    # use tab
+        if isinstance(items, list):
+            pass
+        elif isinstance(items, dict):
+            # TODO: selectedItems == all, filters
+            raise DataManagerException('selectedItems as dict are not supported yet')
+        else:
+            raise DataManagerException('selectedItems must be list (task ids) or dict: {"all": [true|false], '
+                                       '"excluded": [...task_ids...], "included":[...task_ids...]}')
+
+    # use filters and selected items from tab
     else:
         tab_id = int(tab_id)
         tab = load_tab(tab_id, g.project, raise_if_not_exists=True)
         items = tab.get('selectedItems', None)
+
+    # make advanced params for actions
+    params = SimpleNamespace(tab=tab, values=request.values)
 
     # no selected items on tab
     if not items:
         response = {'detail': 'no selected items on tab with id ' + str(tab_id)}
         return make_response(jsonify(response), 404)
 
-    # empty action id
+    # wrong action id
     action_id = request.values.get('id', None)
     if action_id is None:
         response = {'detail': 'No action id "' + str(action_id) + '", use ?id=<action-id>'}
         return make_response(jsonify(response), 422)
 
-    result = perform_action(action_id, g.project, tab, items)
-    return make_response(jsonify(result), 200)
+    # perform action and return the result dict
+    result = perform_action(action_id, g.project, params, items)
+    code = result.pop('response_code', 200)
+    return make_response(jsonify(result), code)

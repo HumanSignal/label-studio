@@ -21,7 +21,6 @@ from label_studio.utils.models import ProjectObj, MLBackend
 from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.io import find_file, delete_dir_content, json_load
 from label_studio.utils.validation import is_url
-from label_studio.utils.functions import get_external_hostname
 from label_studio.tasks import Tasks
 from label_studio.storage import create_storage, get_available_storage_names
 
@@ -108,7 +107,15 @@ class Project(object):
 
     @property
     def export_dir(self):
-        return os.path.join(self.path, 'export')
+        export_dir = os.path.join(self.path, 'export')
+        os.makedirs(export_dir, exist_ok=True)
+        return export_dir
+
+    @property
+    def upload_dir(self):
+        upload_dir = os.path.join(self.path, 'upload')
+        os.makedirs(upload_dir, exist_ok=True)
+        return upload_dir
 
     def get_storage(self, storage_for):
         if storage_for == 'source':
@@ -440,19 +447,27 @@ class Project(object):
             for m in self.ml_backends:
                 m.clear(self)
 
-    def next_task(self, completed_tasks_ids):
-        completed_tasks_ids = set(completed_tasks_ids)
-        sampling = self.config.get('sampling', 'sequential')
+    def next_task(self, completed_tasks_ids, task_ids=None, sampling=None):
+        """ Generate next task for labeling
 
-        # Tasks are ordered ascending by their "id" fields. This is default mode.
-        task_iter = filter(lambda i: i not in completed_tasks_ids, sorted(self.source_storage.ids()))
+            :param completed_tasks_ids: ids of tasks that have completions
+            :param task_ids: array of dicts with tasks (dict.items())
+            :param sampling: string with sampling names: sequential, random-uniform,
+                             prediction-score-max, prediction-score-min
+        """
+        completed_tasks_ids = set(completed_tasks_ids)
+        task_ids = self.source_storage.ids() if task_ids is None else task_ids
+        sampling = self.config.get('sampling', 'sequential') if sampling is None else sampling
+
+        # Tasks are ordered ascending by their "id" fields. This is default mode
+        task_iter = filter(lambda i: i not in completed_tasks_ids, task_ids)
         if sampling == 'sequential':
             task_id = next(task_iter, None)
             if task_id is not None:
                 return self.source_storage.get(task_id)
 
         # Tasks are sampled with equal probabilities
-        elif sampling == 'uniform':
+        elif sampling == 'uniform' or sampling == 'random-uniform':
             actual_tasks_ids = list(task_iter)
             if not actual_tasks_ids:
                 return None
@@ -462,20 +477,27 @@ class Project(object):
         # Task with minimum / maximum average prediction score is taken
         elif sampling.startswith('prediction-score'):
             id_score_map = {}
-            for task_id, task in self.source_storage.items():
-                if task_id in completed_tasks_ids:
+
+            for task_id, task in task_ids:
+                # get task from storage and check it has completions
+                task = self.source_storage.get(task_id)
+                if task_id in completed_tasks_ids or task is None:
                     continue
+                # average all predictions and save score
                 if 'predictions' in task and len(task['predictions']) > 0:
                     score = sum((p['score'] for p in task['predictions']), 0) / len(task['predictions'])
                     id_score_map[task_id] = score
+
             if not id_score_map:
                 return None
+
             if sampling.endswith('-min'):
                 best_idx = min(id_score_map, key=id_score_map.get)
             elif sampling.endswith('-max'):
                 best_idx = max(id_score_map, key=id_score_map.get)
             else:
                 raise NotImplementedError('Unknown sampling method ' + sampling)
+
             return self.source_storage.get(best_idx)
         else:
             raise NotImplementedError('Unknown sampling method ' + sampling)
@@ -504,7 +526,7 @@ class Project(object):
 
         if data:
             logger.debug('Get predictions ' + str(task_id) + ' from source storage')
-            # tasks can hold the newest version of predictions, so task it from tasks
+            # tasks can hold the newest version of predictions, so get it from tasks
             data['predictions'] = self.source_storage.get(task_id).get('predictions', [])
         return data
 
@@ -712,23 +734,26 @@ class Project(object):
         :return:
         """
         dir = cls.get_project_dir(project_name, args)
-        if args.force:
+        if hasattr(args, 'force') and args.force:
             delete_dir_content(dir)
         os.makedirs(dir, exist_ok=True)
 
-        config = json_load(args.config_path) if args.config_path else json_load(find_file('default_config.json'))
+        if hasattr(args, 'config_path') and args.config_path:
+            config = json_load(args.config_path)
+        else:
+            config = json_load(find_file('default_config.json'))
 
         def already_exists_error(what, path):
             raise RuntimeError('{path} {what} already exists. Use "--force" option to recreate it.'.format(
                 path=path, what=what
             ))
 
-        input_path = args.input_path or config.get('input_path')
+        input_path = hasattr(args, 'input_path') and args.input_path or config.get('input_path')
 
         # save label config
         config_xml = 'config.xml'
         config_xml_path = os.path.join(dir, config_xml)
-        label_config_file = args.label_config or config.get('label_config')
+        label_config_file = hasattr(args, 'label_config') and args.label_config or config.get('label_config')
         if label_config_file:
             copy2(label_config_file, config_xml_path)
             print(label_config_file + ' label config copied to ' + config_xml_path)
@@ -747,7 +772,7 @@ class Project(object):
 
         config['label_config'] = config_xml
 
-        if args.source:
+        if hasattr(args, 'source') and args.source:
             config['source'] = {
                 'type': args.source,
                 'path': args.source_path,
@@ -772,7 +797,7 @@ class Project(object):
             logger.debug('{tasks_json_path} input file with {n} tasks has been created from {input_path}'.format(
                 tasks_json_path=tasks_json_path, n=len(tasks), input_path=input_path))
 
-        if args.target:
+        if hasattr(args, 'target') and args.target:
             config['target'] = {
                 'type': args.target,
                 'path': args.target_path,
@@ -797,23 +822,24 @@ class Project(object):
 
         if 'ml_backends' not in config or not isinstance(config['ml_backends'], list):
             config['ml_backends'] = []
-        if args.ml_backends:
+        if hasattr(args, 'ml_backends') and args.ml_backends:
             for url in args.ml_backends:
                 config['ml_backends'].append(cls._create_ml_backend_params(url, project_name))
 
-        if args.sampling:
+        if hasattr(args, 'sampling') and args.sampling:
             config['sampling'] = args.sampling
-        if args.port:
+        if hasattr(args, 'port') and args.port:
             config['port'] = args.port
-        if args.host:
+        if hasattr(args, 'host') and args.host:
             config['host'] = args.host
-        if args.allow_serving_local_files:
+        if hasattr(args, 'allow_serving_local_files') and args.allow_serving_local_files:
             config['allow_serving_local_files'] = True
-        if args.key_file and args.cert_file:
+        if hasattr(args, 'key_file') and args.key_file and args.cert_file:
             config['protocol'] = 'https://'
             config['cert'] = args.cert_file
             config['key'] = args.key_file
-        if (hasattr(args, 'web_gui_project_desc') and args.web_gui_project_desc) or args.project_desc:
+        if (hasattr(args, 'web_gui_project_desc') and args.web_gui_project_desc) or \
+            (hasattr(args, 'project_desc') and args.project_desc):
             config['description'] = args.web_gui_project_desc or args.project_desc
 
         # create config.json

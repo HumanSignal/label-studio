@@ -1,7 +1,15 @@
+import ssl
+import os
+from urllib.request import urlopen
+
 import lxml
 import time
 import pandas as pd
 import lxml.etree
+
+from label_studio.data_import.uploader import check_file_sizes_and_number
+from werkzeug.utils import secure_filename
+
 try:
     import ujson as json
 except ModuleNotFoundError:
@@ -11,16 +19,14 @@ from datetime import datetime
 from flask import request, jsonify, make_response, Response as HttpResponse, g
 from flask_api import status
 
-from label_studio.utils import uploader
-from label_studio.utils.validation import TaskValidator
 from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.functions import (
     generate_sample_task, get_sample_task
 )
-from label_studio.tasks import Tasks
 from label_studio.utils.auth import requires_auth
 from label_studio.utils.misc import exception_handler
 from label_studio.data_import.views import blueprint
+from .models import ImportState
 
 
 @blueprint.route('/api/import-example', methods=['GET', 'POST'])
@@ -93,60 +99,128 @@ def api_import_example_file():
     return response
 
 
-@blueprint.route('/api/project/import', methods=['POST'])
+def _is_allowed_file(filename):
+    """Secured mode allows only certain file extensions being uploaded on server"""
+    return True
+
+
+def _upload_files(request_files, project):
+    filelist = []
+    for _, file in request_files.items():
+        if file and file.filename and _is_allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            filepath = os.path.join(project.upload_dir, filename)
+            filelist.append(filepath)
+            file.save(filepath)
+    return filelist
+
+
+def _create_import_state(request, g):
+
+    # Files import
+    if len(request.files):
+        uploaded_files = _upload_files(request.files, g.project)
+        import_state = ImportState.create_from_filelist(filelist=uploaded_files, project=g.project)
+
+    # URL import
+    elif 'application/x-www-form-urlencoded' in request.content_type:
+        try:
+            ctx = ssl.create_default_context()
+            ctx.check_hostname = False
+            ctx.verify_mode = ssl.CERT_NONE
+
+            url = request.data['url']
+            with urlopen(url, context=ctx) as file:
+                # check size
+                meta = file.info()
+                file.size = int(meta.get("Content-Length"))
+                file.urlopen = True
+                request_files = {url: file}
+                check_file_sizes_and_number(request_files)
+                uploaded_files = _upload_files(request.FILES, g.project)
+                import_state = ImportState.create_from_filelist(filelist=uploaded_files, project=g.project)
+
+        except ValidationError as e:
+            raise e
+        except Exception as e:
+            raise ValidationError(str(e))
+
+    # API import
+    elif 'application/json' in request.content_type:
+        import_state = ImportState.create_from_data(request.data, project=g.project)
+
+    # incorrect data source
+    else:
+        raise ValidationError('load_tasks: No data found in DATA or in FILES')
+    return import_state
+
+
+@blueprint.route('/api/project/<int:project_id>/import', methods=['POST'])
 @requires_auth
 @exception_handler
-def api_import():
+def api_import(project_id):
     """ The main API for task import, supports
         * json task data
         * files (as web form, files will be hosted by this flask server)
         * url links to images, audio, csv (if you use TimeSeries in labeling config)
     """
-    # make django compatibility for uploader module
-    class DjangoRequest:
-        def __init__(self): pass
-        POST = request.form
-        GET = request.args
-        FILES = request.files
-        data = request.json if request.json else request.form
-        content_type = request.content_type
 
     start = time.time()
-    # get tasks from request
-    parsed_data, formats = uploader.load_tasks(DjangoRequest(), g.project)
-    # validate tasks
-    validator = TaskValidator(g.project)
     try:
-        new_tasks = validator.to_internal_value(parsed_data)
+        import_state = _create_import_state(request, g)
     except ValidationError as e:
+        # TODO: import specific exception handler
         return make_response(jsonify(e.msg_to_list()), status.HTTP_400_BAD_REQUEST)
 
-    # get the last task id
-    max_id_in_old_tasks = -1
-    if not g.project.no_tasks():
-        max_id_in_old_tasks = g.project.source_storage.max_id()
-
-    new_tasks = Tasks().from_list_of_dicts(new_tasks, max_id_in_old_tasks + 1)
-    try:
-        g.project.source_storage.set_many(new_tasks.keys(), new_tasks.values())
-    except NotImplementedError:
-        raise NotImplementedError('Import is not supported for the current storage ' + str(g.project.source_storage))
-
-    # if tasks have completion - we need to implicitly save it to target
-    for i in new_tasks.keys():
-        for completion in new_tasks[i].get('completions', []):
-            g.project.save_completion(int(i), completion)
-
-    # update schemas based on newly uploaded tasks
-    g.project.update_derived_input_schema()
-    g.project.update_derived_output_schema()
-
+    response = import_state.serialize()
+    new_tasks = import_state.apply()
     duration = time.time() - start
-    return make_response(jsonify({
-        'task_count': len(new_tasks),
-        'completion_count': validator.completion_count,
-        'prediction_count': validator.prediction_count,
-        'duration': duration,
-        'formats': formats,
-        'new_task_ids': [t for t in new_tasks]
-    }), status.HTTP_201_CREATED)
+    response['duration'] = duration
+    response['new_task_ids'] = [t for t in new_tasks]
+    return make_response(jsonify(response), status.HTTP_201_CREATED)
+
+
+@blueprint.route('/api/project/<int:project_id>/import/prepare', methods=['POST'])
+@requires_auth
+@exception_handler
+def api_import_prepare(project_id):
+    """ The main API for task import, supports
+        * json task data
+        * files (as web form, files will be hosted by this flask server)
+        * url links to images, audio, csv (if you use TimeSeries in labeling config)
+    """
+
+    start = time.time()
+    try:
+        import_state = _create_import_state(request, g)
+    except ValidationError as e:
+        # TODO: import specific exception handler
+        return make_response(jsonify(e.msg_to_list()), status.HTTP_400_BAD_REQUEST)
+
+    response = import_state.serialize()
+    duration = time.time() - start
+    response['duration'] = duration
+    return make_response(jsonify(response), status.HTTP_201_CREATED)
+
+
+@blueprint.route('/api/project/<int:project_id>/import/<int:import_id>', methods=['GET', 'PATCH'])
+@requires_auth
+@exception_handler
+def api_import_detail(project_id, import_id):
+    import_state = ImportState.get_by_id(id=import_id)
+    if request.method == 'GET':
+        return import_state.serialize()
+    elif request.method == 'PATCH':
+        import_state_params = dict(request.data)
+        import_state.update(**import_state_params)
+        return make_response({}, status.HTTP_200_OK)
+
+
+@blueprint.route('/api/project/<int:project_id>/import/<int:import_id>/apply', methods=['POST'])
+@requires_auth
+@exception_handler
+def api_import_apply(project_id, import_id):
+    import_state = ImportState.get_by_id(id=import_id)
+    new_tasks = import_state.apply()
+    response = {'new_task_ids': [t for t in new_tasks]}
+    return make_response(jsonify(response), status.HTTP_201_CREATED)

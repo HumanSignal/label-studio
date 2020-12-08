@@ -9,9 +9,7 @@ from label_studio import blueprint as server
 from label_studio.blueprint import (
     validation_error_handler,
 )
-from label_studio.tests.base import (
-    test_client, captured_templates, goc_project,
-)
+from label_studio.tests.base import goc_project
 
 
 @pytest.fixture(autouse=True)

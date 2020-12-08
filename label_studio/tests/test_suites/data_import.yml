@@ -1,0 +1,112 @@
+- Test entire /api/import in one call:
+    - /api/project/1/import:
+        method: POST
+        content_type: multipart/form-data
+        data:
+          image_0: samples/test_image.jpg
+          image_1: samples/test_image.png
+        status_code: 201
+        response:
+          columns_to_draw: []
+          duration:
+            {"__test_object": true, "interval": [0, 0.1]}
+          file_tasks_as_list: false
+          formats:
+            {".jpg": 1, ".png": 1}
+          id: 1
+          new_task_ids: [0, 1]
+          project: my_project
+          task_preview:
+            - {"__test_object": true, "regexp": '^\{"image":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
+            - {"__test_object": true, "regexp": '^\{"image":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
+          total_tasks: 2
+          total_completions: 0
+          total_predictions: 0
+
+- Test api preview available after preimport with /api/import:
+    - /api/project/1/import/prepare:
+        method: POST
+        content_type: multipart/form-data
+        data:
+          image_0: samples/test_image.jpg
+          image_1: samples/test_image.png
+        status_code: 201
+        response:
+          columns_to_draw: []
+          duration:
+            {"__test_object": true, "interval": [0, 0.1]}
+          file_tasks_as_list: false
+          formats:
+            {".jpg": 1, ".png": 1}
+          id: 1
+          project: my_project
+          task_preview:
+            - {"__test_object": true, "regexp": '^\{"image":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
+            - {"__test_object": true, "regexp": '^\{"image":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
+          total_tasks: 2
+          total_completions: 0
+          total_predictions: 0
+
+    - /api/project/1/import/1:
+        method: GET
+        status_code: 200
+        response:
+          columns_to_draw: []
+          file_tasks_as_list: false
+          formats:
+            {".jpg": 1, ".png": 1}
+          id: 1
+          project: my_project
+          task_preview:
+            - {"__test_object": true, "regexp": '^\{"image":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
+            - {"__test_object": true, "regexp": '^\{"image":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
+          total_tasks: 2
+          total_completions: 0
+          total_predictions: 0
+
+- Prepare import, check preview and apply...:
+    - /api/project/1/import/prepare:
+        method: POST
+        content_type: multipart/form-data
+        data:
+          image_0: samples/test_image.jpg
+          image_1: samples/test_image.png
+        status_code: 201
+        response:
+          columns_to_draw: []
+          duration:
+            {"__test_object": true, "interval": [0, 0.1]}
+          file_tasks_as_list: false
+          formats:
+            {".jpg": 1, ".png": 1}
+          id: 1
+          project: my_project
+          task_preview:
+            - {"__test_object": true, "regexp": '^\{"image":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
+            - {"__test_object": true, "regexp": '^\{"image":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
+          total_tasks: 2
+          total_completions: 0
+          total_predictions: 0
+
+    - /api/project/1/import/1:
+        method: GET
+        status_code: 200
+        response:
+          columns_to_draw: []
+          file_tasks_as_list: false
+          formats:
+            {".jpg": 1, ".png": 1}
+          id: 1
+          project: my_project
+          task_preview:
+            - {"__test_object": true, "regexp": '^\{"image":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
+            - {"__test_object": true, "regexp": '^\{"image":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
+          total_tasks: 2
+          total_completions: 0
+          total_predictions: 0
+
+    - /api/project/1/import/1/apply:
+        method: POST
+        status_code: 201
+        response:
+          new_task_ids: [0, 1]

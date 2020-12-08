@@ -57,6 +57,12 @@ if (dmRoot) {
           path: "/project/tabs/:tabID/selected-items",
           method: "delete",
         },
+
+        actions: "/project/actions",
+        invokeAction: {
+          path: "/project/tabs/:tabID/actions",
+          method: "post",
+        },
       },
     },
   });
