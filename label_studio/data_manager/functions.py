@@ -27,17 +27,6 @@ def create_default_tabs():
     }
 
 
-def column_type(key):
-    if key == 'image':
-        return 'Image'
-    elif key == 'audio':
-        return 'Audio'
-    elif key == 'audioplus':
-        return 'AudioPlus'
-    else:
-        return 'String'
-
-
 def get_all_columns(project):
     """ Make columns info for the frontend data manager
     """
@@ -50,7 +39,7 @@ def get_all_columns(project):
         column = {
             'id': key,
             'title': key,
-            'type': column_type(key),  # data_type,
+            'type': data_type if data_type in ['Image', 'Audio', 'AudioPlus'] else 'String',
             'target': 'tasks',
             'parent': 'data',
             'show_in_quickview_default': i == 0
