@@ -12,14 +12,14 @@ _db = {}
 
 class ImportState(object):
 
-    def __init__(self, filelist=(), project=None, **kwargs):
+    def __init__(self, filelist=(), tasks=(), project=None, **kwargs):
         super(ImportState, self).__init__(**kwargs)
 
         # these are actual db columns
         self.id = 0
         self.project = project
         self.filelist = filelist
-        self.tasks = []
+        self.tasks = tasks
         self.formats = {}
         self.columns_to_draw = []
         self.files_as_tasks_list = False
@@ -29,7 +29,8 @@ class ImportState(object):
 
     def _update(self):
         if self.filelist:
-            request_files = {filename: open(filename, mode='rb') for filename in self.filelist}
+            request_files = {filename: open(self.project.upload_dir + '/' + filename, mode='rb')
+                             for filename in self.filelist}
             with get_temp_dir() as tmpdir:
                 files = aggregate_files(request_files, tmpdir)
                 self.tasks, self.formats = aggregate_tasks(files, self.project)
@@ -101,13 +102,14 @@ class ImportState(object):
 
     @classmethod
     def create_from_data(cls, data, project):
-        import_state = ImportState(project=project)
         if isinstance(data, dict):
-            import_state.tasks = [data]
+            tasks = [data]
         elif isinstance(data, list):
-            import_state.tasks = data
+            tasks = data
         else:
-            raise ValidationError()
+            raise ValidationError('Incorrect input data type, it must be JSON dict or list')
+
+        import_state = ImportState(tasks=tasks, project=project)
 
         global _db
         import_state.id = 1

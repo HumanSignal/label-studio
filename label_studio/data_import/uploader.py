@@ -1,9 +1,7 @@
 # Import tasks from json, csv, zip, txt and more
-
 import os
-import io
 import csv
-import hashlib
+
 import shutil
 import zipfile
 import rarfile
@@ -75,16 +73,7 @@ def tasks_from_file(filename, file, project):
             file_format = os.path.splitext(filename)[-1]
         # hosting for file
         else:
-            # read as text or binary file
-            data = open(filename, 'rb').read() if isinstance(file, io.TextIOWrapper) else file.read()
-
-            upload_dir = os.path.join(project.path, 'upload')
-            os.makedirs(upload_dir, exist_ok=True)
-            filename = hashlib.md5(data).hexdigest() + '-' + os.path.basename(filename)
-            path = os.path.join(upload_dir, filename)
-            open(path, 'wb').write(data)
             # prepare task
-
             path = get_external_hostname() + '/data/upload/' + filename
             tasks = [{'data': {settings.UPLOAD_DATA_UNDEFINED_NAME: path}}]
             file_format = os.path.splitext(filename)[-1]

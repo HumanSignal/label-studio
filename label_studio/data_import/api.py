@@ -1,31 +1,29 @@
-import ssl
+import io
 import os
-from urllib.request import urlopen
-
+import ssl
+import hashlib
 import lxml
 import time
 import pandas as pd
 import lxml.etree
-
-from label_studio.data_import.uploader import check_file_sizes_and_number
-from werkzeug.utils import secure_filename
 
 try:
     import ujson as json
 except ModuleNotFoundError:
     import json
 
+from urllib.request import urlopen
+from label_studio.data_import.uploader import check_file_sizes_and_number
+from werkzeug.utils import secure_filename
 from datetime import datetime
 from flask import request, jsonify, make_response, Response as HttpResponse, g
 from flask_api import status
 
-from label_studio.utils.exceptions import ValidationError
-from label_studio.utils.functions import (
-    generate_sample_task, get_sample_task
-)
 from label_studio.utils.auth import requires_auth
 from label_studio.utils.misc import exception_handler
 from label_studio.data_import.views import blueprint
+from label_studio.utils.exceptions import ValidationError
+from label_studio.utils.functions import generate_sample_task, get_sample_task
 from .models import ImportState
 
 
@@ -100,7 +98,7 @@ def api_import_example_file():
 
 
 def _is_allowed_file(filename):
-    """Secured mode allows only certain file extensions being uploaded on server"""
+    """ Secured mode allows only certain file extensions being uploaded on server """
     return True
 
 
@@ -109,13 +107,24 @@ def _upload_files(request_files, project):
     for _, file in request_files.items():
         if file and file.filename and _is_allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            filepath = os.path.join(project.upload_dir, filename)
-            filelist.append(filepath)
-            file.save(filepath)
+
+            # read as text or binary file
+            data = open(filename, 'rb').read() if isinstance(file, io.TextIOWrapper) else file.read()
+
+            os.makedirs(project.upload_dir, exist_ok=True)
+            filename = hashlib.md5(data).hexdigest() + '-' + os.path.basename(filename)
+
+            # save file to path on disk
+            path = os.path.join(project.upload_dir, filename)
+            open(path, 'wb').write(data)
+
+            filelist.append(filename)
+
     return filelist
 
 
 def _create_import_state(request, g):
+    data = request.json if request.json else request.form
 
     # Files import
     if len(request.files):
@@ -129,15 +138,17 @@ def _create_import_state(request, g):
             ctx.check_hostname = False
             ctx.verify_mode = ssl.CERT_NONE
 
-            url = request.data['url']
+            url = data['url']
             with urlopen(url, context=ctx) as file:
                 # check size
                 meta = file.info()
                 file.size = int(meta.get("Content-Length"))
                 file.urlopen = True
+                file.filename = url
                 request_files = {url: file}
+
                 check_file_sizes_and_number(request_files)
-                uploaded_files = _upload_files(request.FILES, g.project)
+                uploaded_files = _upload_files(request_files, g.project)
                 import_state = ImportState.create_from_filelist(filelist=uploaded_files, project=g.project)
 
         except ValidationError as e:
@@ -147,18 +158,18 @@ def _create_import_state(request, g):
 
     # API import
     elif 'application/json' in request.content_type:
-        import_state = ImportState.create_from_data(request.data, project=g.project)
+        import_state = ImportState.create_from_data(data, project=g.project)
 
     # incorrect data source
     else:
-        raise ValidationError('load_tasks: No data found in DATA or in FILES')
+        raise ValidationError('load_tasks: No data found in values or in files')
     return import_state
 
 
-@blueprint.route('/api/project/<int:project_id>/import', methods=['POST'])
+@blueprint.route('/api/project/import', methods=['POST'])
 @requires_auth
 @exception_handler
-def api_import(project_id):
+def api_import():
     """ The main API for task import, supports
         * json task data
         * files (as web form, files will be hosted by this flask server)
@@ -170,7 +181,7 @@ def api_import(project_id):
         import_state = _create_import_state(request, g)
     except ValidationError as e:
         # TODO: import specific exception handler
-        return make_response(jsonify(e.msg_to_list()), status.HTTP_400_BAD_REQUEST)
+        return make_response(jsonify(e.msg_to_list()), 422)
 
     response = import_state.serialize()
     new_tasks = import_state.apply()
@@ -180,11 +191,12 @@ def api_import(project_id):
     return make_response(jsonify(response), status.HTTP_201_CREATED)
 
 
-@blueprint.route('/api/project/<int:project_id>/import/prepare', methods=['POST'])
+@blueprint.route('/api/project/import/prepare', methods=['POST'])
 @requires_auth
 @exception_handler
-def api_import_prepare(project_id):
-    """Create ImportState object and returns it's ID"""
+def api_import_prepare():
+    """ Create ImportState object and returns it's ID
+    """
     try:
         import_state = _create_import_state(request, g)
     except ValidationError as e:
@@ -194,10 +206,10 @@ def api_import_prepare(project_id):
     return make_response(jsonify(response), status.HTTP_201_CREATED)
 
 
-@blueprint.route('/api/project/<int:project_id>/import/<int:import_id>', methods=['GET', 'PATCH'])
+@blueprint.route('/api/project/import/<int:import_id>', methods=['GET', 'PATCH'])
 @requires_auth
 @exception_handler
-def api_import_detail(project_id, import_id):
+def api_import_detail(import_id):
     import_state = ImportState.get_by_id(id=import_id)
     if request.method == 'PATCH':
         # Update ImportState fields
@@ -207,10 +219,10 @@ def api_import_detail(project_id, import_id):
     return make_response(response, status.HTTP_200_OK)
 
 
-@blueprint.route('/api/project/<int:project_id>/import/<int:import_id>/apply', methods=['POST'])
+@blueprint.route('/api/project/import/<int:import_id>/apply', methods=['POST'])
 @requires_auth
 @exception_handler
-def api_import_apply(project_id, import_id):
+def api_import_apply(import_id):
     import_state = ImportState.get_by_id(id=import_id)
     new_tasks = import_state.apply()
     response = {'new_task_ids': [t for t in new_tasks]}

@@ -112,7 +112,7 @@
         finish: function(id) {
           this.id = id;
           $.ajax({
-            url: "api/project/1/import/" + id,
+            url: "api/project/import/" + id,
             processData: false,
             contentType: false
           })
@@ -151,7 +151,7 @@
         apply() {
           this.loading = true;
           $.ajax({
-            url: "api/project/1/import/" + this.id + "/apply",
+            url: "api/project/import/" + this.id + "/apply",
             method: "POST",
             processData: false,
             contentType: false
