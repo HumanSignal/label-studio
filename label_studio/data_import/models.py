@@ -71,7 +71,7 @@ class ImportState(object):
                     self.selected_formats, self.selected_objects = [], []
                     for format in sorted(found_formats.keys()):
                         self.selected_formats.append(format)
-                        self.selected_objects.append(self._get_object_from_format(format))
+                self.selected_objects = [self._get_object_from_format(f) for f in self.selected_formats]
                 check_max_task_number(self.tasks)
 
         # validate tasks
