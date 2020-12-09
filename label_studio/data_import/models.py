@@ -23,7 +23,7 @@ class ImportState(object):
         self.formats = {}
         self.selected_formats = []
         self.columns_to_draw = []
-        self.files_as_tasks_list = False
+        self.files_as_tasks_list = {'type': None, 'selected': False}
         self._validator = TaskValidator(self.project)
 
         self._update()

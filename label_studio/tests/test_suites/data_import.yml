@@ -10,9 +10,12 @@
           columns_to_draw: []
           duration:
             {"__test_object": true, "interval": [0, 0.1]}
-          files_as_tasks_list: false
+          files_as_tasks_list:
+            selected: false
+            type: null
           formats:
             {".jpg": 1, ".png": 1}
+          selected_formats: []
           id: 1
           new_task_ids: [0, 1]
           project: my_project
@@ -39,9 +42,12 @@
         status_code: 200
         response:
           columns_to_draw: []
-          files_as_tasks_list: false
+          files_as_tasks_list:
+            selected: false
+            type: null
           formats:
             {".jpg": 1, ".png": 1}
+          selected_formats: []
           id: 1
           project: my_project
           task_preview:
@@ -67,9 +73,12 @@
         status_code: 200
         response:
           columns_to_draw: []
-          files_as_tasks_list: false
+          files_as_tasks_list:
+            selected: false
+            type: null
           formats:
             {".jpg": 1, ".png": 1}
+          selected_formats: []
           id: 1
           project: my_project
           task_preview:
@@ -83,12 +92,17 @@
         method: PATCH
         status_code: 200
         json:
-          files_as_tasks_list: true
+          files_as_tasks_list:
+            selected: true
+            type: null
         response:
           columns_to_draw: []
-          files_as_tasks_list: true
+          files_as_tasks_list:
+            selected: true
+            type: null
           formats:
             {".jpg": 1, ".png": 1}
+          selected_formats: []
           id: 1
           project: my_project
           task_preview:
