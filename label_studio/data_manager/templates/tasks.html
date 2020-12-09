@@ -29,7 +29,7 @@
                 </center>
                 <!-- Number -->
                 <span class="value" v-else  style="display: inline!important;white-space:nowrap!important;">
-                  <animated-number :number="project.task_count"></animated-number>
+                  {{ project.task_count }}
                 </span>
                 <span class="label">Tasks</span>
                 <br>
@@ -70,7 +70,7 @@
                 </center>
                 <!-- Number -->
                 <span class="value" v-else>
-                  <animated-number :number="project.completion_count"></animated-number>
+                  {{ project.completion_count }}
                 </span>
                 <span class="label">Completions</span>
                 <br>
@@ -131,9 +131,6 @@
   <!-- DataManager -->
   <div class="datamanager"></div>
 
-
-  <script src="static/js/components/animatedNumber.js"></script>
-  <script src="static/js/components/imageWithFadeIn.js"></script>
   <script src="static/js/components/vue-tippy.min.js"></script>
   <script src="static/semantic/semantic-ui-vue.min.js"></script>
 
@@ -183,11 +180,6 @@
 
         data.columns = data.full_columns;
         return data;
-      },
-
-      // components
-      components: {
-        'animated-number': animatedNumber
       },
 
       computed: {

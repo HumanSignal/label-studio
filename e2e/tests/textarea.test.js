@@ -39,7 +39,7 @@ Scenario("Use classification config with textarea", async (I) => {
   I.click("input[value=Save]");
   I.waitForText("Import Tasks", 6);
   I.click("Import Tasks");
-  I.amOnPage("/import");
+  I.amOnPage("/import-old");
   I.click("Add Sample Task");
   // empty table cell in the first row of data table
   /* TODO: Fix for new data manager

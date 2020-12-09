@@ -1,4 +1,5 @@
 import os
+import logging
 import ujson as json
 from operator import itemgetter
 from types import SimpleNamespace
@@ -7,6 +8,7 @@ from label_studio.utils.uri_resolver import resolve_task_data_uri
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 TASKS = 'tasks:'
+logger = logging.getLogger(__name__)
 
 
 class DataManagerException(Exception):
@@ -27,17 +29,6 @@ def create_default_tabs():
     }
 
 
-def column_type(key):
-    if key == 'image':
-        return 'Image'
-    elif key == 'audio':
-        return 'Audio'
-    elif key == 'audioplus':
-        return 'AudioPlus'
-    else:
-        return 'String'
-
-
 def get_all_columns(project):
     """ Make columns info for the frontend data manager
     """
@@ -46,11 +37,16 @@ def get_all_columns(project):
     # frontend uses MST data model, so we need two directional referencing parent <-> child
     task_data_children = []
     i = 0
+
+    # data types from config + data found while import
+    data_types = dict(project.data_types.items())
+    data_types.update({key: 'String' for key in project.derived_input_schema})
+
     for key, data_type in project.data_types.items():
         column = {
             'id': key,
             'title': key,
-            'type': column_type(key),  # data_type,
+            'type': data_type if data_type in ['Image', 'Audio', 'AudioPlus'] else 'String',
             'target': 'tasks',
             'parent': 'data',
             'show_in_quickview_default': i == 0
@@ -90,6 +86,13 @@ def get_all_columns(project):
             'help': 'Number of cancelled (skipped) completions'
         },
         {
+            'id': 'total_predictions',
+            'title': "Predictions",
+            'type': "Number",
+            'target': 'tasks',
+            'help': 'Total predictions per task'
+        },
+        {
             'id': 'data',
             'title': "data",
             'type': "List",
@@ -98,6 +101,14 @@ def get_all_columns(project):
         }
     ]
     return result
+
+
+def remove_tabs(project):
+    tab_path = os.path.join(project.path, 'tabs.json')
+    try:
+        os.remove(tab_path)
+    except Exception as e:
+        logger.error("Can't remove tabs " + str(e) + ": " + tab_path)
 
 
 def load_all_tabs(project) -> dict:
@@ -212,8 +223,9 @@ def preload_task(project, task_id, resolve_uri=False):
         # cancelled completions number
         task['has_cancelled_completions'] = get_cancelled_number(task)
 
-        # total completions
+        # total completions and predictions
         task['total_completions'] = len(task['completions'])
+        task['total_predictions'] = len(task['predictions'])
 
     # don't resolve data (s3/gcs is slow) if it's not necessary (it's very slow)
     if resolve_uri:
@@ -241,9 +253,8 @@ def operator(op, a, b):
     """ Filter operators
     """
     if op == 'empty':  # TODO: check it
-        return (b is None or not b) and a
-    if op == 'not_empty':  # TODO: check it
-        return (b is not None or not b) and a
+        value = b is None or (hasattr(b, '__len__') and len(b) == 0)
+        return value if a else not value
 
     if a is None:
         return False
@@ -274,6 +285,8 @@ def operator(op, a, b):
     if op == 'not_in':
         a, c = a['min'], a['max']
         return not (a <= b <= c)
+
+    raise DataManagerException('Incorrect operator name in filters: ' + str(op))
 
 
 def resolve_task_field(task, field):
@@ -334,6 +347,9 @@ def filter_tasks(tasks, params):
     # go over all the filters
     for f in filters['items']:
         parts = f['filter'].split(':')  # filters:<tasks|annotations>:field_name
+        if len(parts) < 3:
+            raise DataManagerException('Filter name must be "filters:tasks:<field>" or "filters:tasks:data.<value>"'
+                                       'but "' + f['filter'] + '" found')
         target = parts[1]  # 'tasks | annotations'
         field = parts[2]  # field name
         op, value = f['operator'], f['value']
@@ -366,6 +382,12 @@ def prepare_tasks(project, params):
     tasks = order_tasks(params, tasks)
     total = len(tasks)
 
+    # aggregations
+    total_completions, total_predictions = 0, 0
+    for task in tasks:
+        total_completions += task.get('total_completions', 0)
+        total_predictions += task.get('total_predictions', 0)
+
     # pagination
     page, page_size = params.page, params.page_size
     if page > 0 and page_size > 0:
@@ -381,7 +403,8 @@ def prepare_tasks(project, params):
         for i, task in enumerate(tasks):
             tasks[i] = resolve_task_data_uri(task, project=project)
 
-    return {'tasks': tasks, 'total': total}
+    return {'tasks': tasks,
+            'total': total, 'total_completions': total_completions, 'total_predictions': total_predictions}
 
 
 def prepare_annotations(tasks, params):
@@ -414,10 +437,28 @@ def prepare_annotations(tasks, params):
     return {'annotations': items, 'total': total}
 
 
-def get_all_tasks_ids(filters, ordering):
+def eval_task_ids(project, filters, ordering):
     """ Apply filter and ordering to all tasks
     """
     tab = {'filters': filters, 'ordering': ordering}
-    # load all tasks from db with some aggregations over completions and filter them
-    data = prepare_tasks(g.project, params=SimpleNamespace(page=-1, page_size=-1, tab=tab, fields=['id']))
+    data = prepare_tasks(project, params=SimpleNamespace(page=-1, page_size=-1, tab=tab, fields=['id']))
     return [t['id'] for t in data['tasks']]
+
+
+def get_selected_items(project, selected, filters, ordering):
+    """ Get selected items
+
+        :param project: LS project
+        :param selected: dict {'all': true|false, 'included|excluded': [...task_ids...]}
+        :param filters: filters as on tab
+        :param ordering: ordering as on tab
+    """
+    # all_tasks - excluded
+    if selected.get('all', False):
+        items = eval_task_ids(project, filters=filters, ordering=ordering)  # get tasks from tab filters
+        for value in selected.get('excluded', []):
+            items.remove(value)
+    # included only
+    else:
+        items = selected.get('included', [])
+    return items

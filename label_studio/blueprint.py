@@ -46,6 +46,7 @@ from label_studio.utils.uri_resolver import resolve_task_data_uri
 from label_studio.utils.auth import requires_auth
 from label_studio.storage import get_storage_form
 from label_studio.project import Project
+from label_studio.data_manager.functions import remove_tabs
 
 from label_studio.data_manager.views import blueprint as data_manager_blueprint
 from label_studio.data_import.views import blueprint as data_import_blueprint
@@ -524,7 +525,11 @@ def api_save_config():
 
     # update config states
     try:
+        schema_before = g.project.input_data_scheme
         g.project.update_label_config(label_config)
+        schema_after = g.project.input_data_scheme
+        if not schema_before.issubset(schema_after):
+            remove_tabs(g.project)
     except Exception as e:
         return make_response(jsonify({'label_config': [str(e)]}), status.HTTP_400_BAD_REQUEST)
 
@@ -552,28 +557,6 @@ def api_export():
     response = send_file(zip_dir_full_path, as_attachment=True)
     response.headers['filename'] = os.path.basename(zip_dir_full_path)
     return response
-
-
-@blueprint.route('/api/project/next', methods=['GET'])
-@requires_auth
-@exception_handler
-def api_generate_next_task():
-    """ Generate next task for labeling page (label stream)
-    """
-    # try to find task is not presented in completions
-    completed_tasks_ids = g.project.get_completions_ids()
-    task = g.project.next_task(completed_tasks_ids, tasks=None, sampling=None)
-    if task is None:
-        # no tasks found
-        return make_response('', 404)
-
-    task = resolve_task_data_uri(task, project=g.project)
-
-    # collect prediction from multiple ml backends
-    if g.project.ml_backends_connected:
-        task = g.project.make_predictions(task)
-    logger.debug('Next task:\n' + str(task.get('id', None)))
-    return make_response(jsonify(task), 200)
 
 
 @blueprint.route('/api/project/storage-settings', methods=['GET', 'POST'])
@@ -676,7 +659,7 @@ def api_all_tasks():
     if request.method == 'GET':
         tab = {
             'ordering': [request.values.get('order', 'id')],
-            'filters': request.values.get('filters', None),
+            'filters': request.json.get('filters', None) if request.json is not None else None,
             'fields': request.values.get('fields', 'all').split(',')
         }
 
@@ -920,7 +903,7 @@ def json_filter(s):
 
 def main():
     # this will avoid looped imports and will register deprecated endpoints in the blueprint
-    # import label_studio.deprecated
+    import label_studio.deprecated
 
     input_args = parse_input_args()
     app = create_app(LabelStudioConfig(input_args=input_args))

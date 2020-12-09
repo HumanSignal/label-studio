@@ -13,17 +13,28 @@ logger = logging.getLogger(__name__)
 _actions = {}
 
 
+def check_permissions(project, action):
+    """ Some actions might have a permissions to perform
+    """
+    if 'permissions' in action:
+        if action['permissions'].startswith('project.'):
+            field = action['permissions'].replace('project.', '')
+            return getattr(project, field)
+    else:
+        return True
+
+
 def get_all_actions(project):
     """ Return dict with registered actions
     """
     # copy and sort by order key
     actions = list(_actions.values())
     actions = sorted(actions, key=lambda x: x['order'])
-    actions = [copy(action) for action in actions]
-    for i, _ in enumerate(actions):
-        if actions[i].get('hidden', False):
-            continue
-        actions[i].pop('entry_point')  # exclude entry points
+    actions = [
+        {key: action[key] for key in action if key != 'entry_point'}
+        for action in actions if not action.get('hidden', False)
+        and check_permissions(project, action)
+    ]
     return actions
 
 
@@ -57,23 +68,30 @@ def delete_tasks(project, params, items):
     """ Delete tasks by ids
     """
     project.delete_tasks(items)
-    return {'processed_items': len(items)}
+    return {'processed_items': len(items),
+            'detail': 'Deleted ' + str(len(items)) + ' tasks'}
 
 
 def delete_tasks_completions(project, params, items):
     """ Delete all completions by tasks ids
     """
     project.delete_tasks_completions(items)
-    return {'processed_items': len(items)}
+    return {'processed_items': len(items),
+            'detail': 'Deleted ' + str(len(items)) + ' completions'}
 
 
 def next_task(project, params, items):
     """ Generate next task for labeling stream
+
+        :param project: project
+        :param params.values['sampling'] = sequential | random-uniform | prediction-score-min | prediction-score-max
+        :param items: task ids to sample from
     """
     # try to find task is not presented in completions
+    sampling = None if params is None else params.values.get('sampling', None)
     completed_tasks_ids = project.get_completions_ids()
-    task = project.next_task(completed_tasks_ids, task_ids=items,
-                             sampling=params.values.get('sampling', None))
+    task = project.next_task(completed_tasks_ids, task_ids=items, sampling=sampling)
+
     if task is None:
         # no tasks found
         return {'response_code': 404}
@@ -89,6 +107,6 @@ def next_task(project, params, items):
     return task
 
 
-register_action(delete_tasks, 'Delete tasks', 100)
-register_action(delete_tasks_completions, 'Delete completions', 101)
+register_action(delete_tasks, 'Delete tasks', 100, permissions='project.can_delete_tasks')
+register_action(delete_tasks_completions, 'Delete completions', 101, permissions='project.can_manage_completions')
 register_action(next_task, 'Generate next task', 0, hidden=True)
