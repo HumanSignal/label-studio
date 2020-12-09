@@ -21,6 +21,7 @@ class ImportState(object):
         self.filelist = filelist
         self.tasks = []
         self.formats = {}
+        self.selected_formats = []
         self.columns_to_draw = []
         self.files_as_tasks_list = False
         self._validator = TaskValidator(self.project)
@@ -71,6 +72,7 @@ class ImportState(object):
             'total_completions': self.total_completions,
             'total_predictions': self.total_predictions,
             'formats': self.formats,
+            'selected_formats': self.selected_formats,
             'files_as_tasks_list': self.files_as_tasks_list
         }
 
