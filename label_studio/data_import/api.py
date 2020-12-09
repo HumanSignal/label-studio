@@ -1,14 +1,14 @@
 import ssl
 import os
-from urllib.request import urlopen
-
+import logging
 import lxml
 import time
 import pandas as pd
 import lxml.etree
 
-from label_studio.data_import.uploader import check_file_sizes_and_number
 from werkzeug.utils import secure_filename
+from urllib.request import urlopen
+from label_studio.data_import.uploader import check_file_sizes_and_number
 
 try:
     import ujson as json
@@ -27,6 +27,9 @@ from label_studio.utils.auth import requires_auth
 from label_studio.utils.misc import exception_handler
 from label_studio.data_import.views import blueprint
 from .models import ImportState
+
+
+logger = logging.getLogger(__name__)
 
 
 @blueprint.route('/api/import-example', methods=['GET', 'POST'])
@@ -191,6 +194,7 @@ def api_import_prepare(project_id):
         # TODO: import specific exception handler
         return make_response(jsonify(e.msg_to_list()), status.HTTP_400_BAD_REQUEST)
     response = {'id': import_state.id}
+    logger.debug(response)
     return make_response(jsonify(response), status.HTTP_201_CREATED)
 
 
@@ -204,6 +208,7 @@ def api_import_detail(project_id, import_id):
         import_state_params = dict(request.json)
         import_state.update(**import_state_params)
     response = import_state.serialize()
+    logger.debug(response)
     return make_response(response, status.HTTP_200_OK)
 
 
