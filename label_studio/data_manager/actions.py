@@ -94,7 +94,7 @@ def next_task(project, params, items):
 
     if task is None:
         # no tasks found
-        return {'response_code': 404}
+        return {'response_code': 404, 'id': None}
 
     task = resolve_task_data_uri(task, project=project)
 
