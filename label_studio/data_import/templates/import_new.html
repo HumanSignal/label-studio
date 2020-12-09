@@ -21,6 +21,13 @@
   <div class="ui" id="import-tasks" :class="{ hidden: !vueLoaded }">
     <div v-if="preview && !errors.length">
       <h1>Files loaded</h1>
+      <p>You can import them to the task manager.</p>
+      <p><button class="ui primary button" @click="apply">Import to Data Manager</button></p>
+      <ul class="stats" v-if="stats">
+        <li><span class="num">{{stats.total_completions}}</span> items loaded</li>
+        <li><span class="num">{{stats.total_predictions}}</span> completions</li>
+        <li><span class="num">{{stats.total_tasks}}</span> predictions</li>
+      </ul>
       <table class="preview">
         <thead>
           <tr>
@@ -86,12 +93,14 @@
       data: function () {
 
         return {
+          id: null,
           errors: [],
           loading: false,
           preview: null,
           vueLoaded: false, 
           source: 'files',
           sources: {'files': 'Files', 'url': 'URL', 'cloud': 'Cloud'},
+          stats: null,
         };
       },
 
@@ -100,10 +109,32 @@
           this.loading = true;
         },
 
-        finish: function(data) {
-          this.loading = false;
-          this.preview = ["config.xml", "index.js", "tasks.json"]
-            .map((filename, i) => ({ id: i + 1, filename: '/usr/heartex/examples/' + filename }));
+        finish: function(id) {
+          this.id = id;
+          $.ajax({
+            url: "api/project/1/import/" + id,
+            processData: false,
+            contentType: false
+          })
+          .fail((res) => {
+            let text = res.responseText;
+            if (res.responseJSON && res.responseJSON.length) {
+              text = res.responseJSON.join("\n\n");
+            }
+            const message = res.status + " " + res.statusText + "\n" + text;
+            const error = new Error(message);
+            error.code = res.status;
+            self.$emit('error', error);
+          })
+          .done(res => {
+            this.preview = res.task_preview;
+            this.stats = {
+              total_completions: res.total_completions,
+              total_predictions: res.total_predictions,
+              total_tasks: res.total_tasks,
+            };
+            this.loading = false;
+          })
         },
 
         error: function(error) {
@@ -116,6 +147,21 @@
           this.errors = [];
           this.preview = null;
         },
+
+        apply() {
+          this.loading = true;
+          $.ajax({
+            url: "api/project/1/import/" + this.id + "/apply",
+            method: "POST",
+            processData: false,
+            contentType: false
+          })
+          .done(() => {
+            window.location.href = "/tasks";
+            // this.loading = false;
+            // this.preview = null;
+          });
+        }
       },
 
       watch: {

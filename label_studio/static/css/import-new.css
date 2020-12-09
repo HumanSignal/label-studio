@@ -137,6 +137,17 @@
 
 /* Preview */
 
+.stats {
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 32px;
+}
+
+.stats .num {
+  font-weight: 800;
+}
+
 table.preview {
   text-align: left;
   width: 100%;
@@ -146,6 +157,7 @@ table.preview {
 table.preview td,
 table.preview th {
   border: none;
+  padding: 0.4em 1.6em 0.4em 0;
 }
 
 /* fade out */
@@ -158,4 +170,5 @@ table.preview::after {
   bottom: 0;
   height: 30%;
   max-height: 100px;
+  pointer-events: none;
 }
