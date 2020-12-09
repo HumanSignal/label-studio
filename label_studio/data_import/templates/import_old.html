@@ -275,9 +275,9 @@
 
     $.ajax(request)
       .done(answer => {
-        let msg = '<h2>Tasks created: ' + answer['task_count'] + '</h2>' +
-          'Completions created: ' + answer['completion_count'] +
-          '<br>Predictions created: ' + answer['prediction_count'] +
+        let msg = '<h2>Tasks created: ' + answer['total_tasks'] + '</h2>' +
+          'Completions created: ' + answer['total_completions'] +
+          '<br>Predictions created: ' + answer['total_predictions'] +
           '<br><br>Duration: ' + answer['duration'].toFixed(2) + ' sec';
         stop_wait(msg, true);
       })

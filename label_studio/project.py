@@ -77,8 +77,9 @@ class Project(object):
         self.target_storage = None
         self.create_storages()
 
-        self.label_config_line, self.label_config_full, self.parsed_label_config, self.input_data_tags = None, None, None, None  # noqa
-        self.derived_input_schema, self.derived_output_schema = None, None
+        self.label_config_line, self.label_config_full, self.parsed_label_config = None, None, None  # noqa
+        self.derived_input_schema, self.derived_output_schema, self.derived_all_input_schema = None, None, None
+        self.config_input_tags = None
 
         self.load_label_config()
         self.load_project_and_ml_backends()
@@ -208,13 +209,13 @@ class Project(object):
         self.label_config_full = config_comments_free(open(self.label_config_path, encoding='utf8').read())
         self.label_config_line = config_line_stripped(self.label_config_full)
         self.parsed_label_config = parse_config(self.label_config_line)
-        self.input_data_tags = self.get_input_data_tags(self.label_config_line)
+        self.config_input_tags = self.get_config_input_tags(self.label_config_line)
 
     @property
     def input_data_scheme(self):
         return {
             (x.attrib.get('name', ''), x.attrib.get('value', ''))
-            for x in self.input_data_tags
+            for x in self.config_input_tags
         }
 
     def update_derived_input_schema(self):
@@ -223,9 +224,12 @@ class Project(object):
             data_keys = set(task['data'].keys())
             if not self.derived_input_schema:
                 self.derived_input_schema = data_keys
+                self.derived_all_input_schema = data_keys
             else:
                 self.derived_input_schema &= data_keys
+                self.derived_all_input_schema = self.derived_all_input_schema | data_keys   # ! don't try a |= b
         logger.debug('Derived input schema: ' + str(self.derived_input_schema))
+        logger.debug('Derived all input schema: ' + str(self.derived_all_input_schema))
 
     def update_derived_output_schema(self):
         self.derived_output_schema = {
@@ -392,7 +396,7 @@ class Project(object):
             if item not in self.derived_input_schema:
                 raise ValidationError(
                     'You have already imported tasks and they are incompatible with a new config. '
-                    'You\'ve specified value=${item}, but imported tasks contain only keys: {input_schema_values}'
+                    'You\'ve specified value=${item}, but all imported tasks contain only keys: {input_schema_values}'
                         .format(item=item, input_schema_values=list(self.derived_input_schema)))
 
     def validate_label_config_on_derived_output_schema(self, config_string_or_parsed_config):
@@ -677,7 +681,7 @@ class Project(object):
         return os.path.join(args.root_dir, project_name)
 
     @classmethod
-    def get_input_data_tags(cls, label_config):
+    def get_config_input_tags(cls, label_config):
         tag_iter = ElementTree.fromstring(label_config).iter()
         return [
             tag for tag in tag_iter
@@ -694,19 +698,19 @@ class Project(object):
             return task_loader.from_json_file(input_path)
         if args.input_format == 'json-dir':
             return task_loader.from_dir_with_json_files(input_path)
-        input_data_tags = cls.get_input_data_tags(label_config)
+        config_input_tags = cls.get_config_input_tags(label_config)
 
-        if len(input_data_tags) > 1:
-            val = ",".join(tag.attrib.get("name") for tag in input_data_tags)
+        if len(config_input_tags) > 1:
+            val = ",".join(tag.attrib.get("name") for tag in config_input_tags)
             print('Warning! Multiple input data tags found: ' +
                   val + '. Only first one is used.')
-        elif len(input_data_tags) == 0:
+        elif len(config_input_tags) == 0:
             raise ValueError(
                 'You\'ve specified input format "{fmt}" which requires label config being explicitly defined. '
                 'Please specify --label-config=path/to/config.xml or use --format=json or format=json_dir'.format(
                     fmt=args.input_format)
             )
-        input_data_tag = input_data_tags[0]
+        input_data_tag = config_input_tags[0]
         data_key = input_data_tag.attrib.get('value').lstrip('$')
 
         if args.input_format == 'text':

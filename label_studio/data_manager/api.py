@@ -9,7 +9,7 @@ from label_studio.data_manager import blueprint
 from label_studio.data_manager.functions import DataManagerException
 from label_studio.data_manager.functions import (
     prepare_tasks, prepare_annotations, get_all_columns, load_tab, save_tab, delete_tab, load_all_tabs,
-    eval_task_ids, get_selected_items, remove_tabs
+    get_selected_items, remove_tabs
 )
 
 
@@ -148,7 +148,7 @@ def api_project_tab_tasks(tab_id):
     if page < 1 or page_size < 1:
         return make_response(jsonify({'detail': 'Incorrect page or page_size'}), 422)
 
-    params = SimpleNamespace(page=page, page_size=page_size, tab=tab)
+    params = SimpleNamespace(page=page, page_size=page_size, tab=tab, resolve_uri=True)
     tasks = prepare_tasks(g.project, params)
     return make_response(jsonify(tasks), 200)
 

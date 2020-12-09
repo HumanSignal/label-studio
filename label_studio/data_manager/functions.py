@@ -40,9 +40,10 @@ def get_all_columns(project):
 
     # data types from config + data found while import
     data_types = dict(project.data_types.items())
-    data_types.update({key: 'String' for key in project.derived_input_schema})
+    if project.derived_all_input_schema:
+        data_types.update({key: 'String' for key in project.derived_all_input_schema})
 
-    for key, data_type in project.data_types.items():
+    for key, data_type in data_types.items():
         column = {
             'id': key,
             'title': key,
@@ -373,7 +374,7 @@ def prepare_tasks(project, params):
     """ Main function to get tasks
     """
     # load all tasks from db with some aggregations over completions
-    tasks = preload_tasks(project, resolve_uri=False)
+    tasks = preload_tasks(project, resolve_uri=getattr(params, 'resolve_uri', False))
 
     # filter
     tasks = filter_tasks(tasks, params)

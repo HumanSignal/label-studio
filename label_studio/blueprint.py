@@ -668,7 +668,7 @@ def api_all_tasks():
         if page < 1 or page_size < 1:
             return make_response({'detail': 'Incorrect page or page_size'}, 422)
 
-        params = SimpleNamespace(page=page, page_size=page_size, tab=tab)
+        params = SimpleNamespace(page=page, page_size=page_size, tab=tab, resolve_uri=True)
         tasks = prepare_tasks(g.project, params)
         return make_response(jsonify(tasks), 200)
 
