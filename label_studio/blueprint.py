@@ -624,7 +624,7 @@ def api_project_switch():
     input_args = current_app.label_studio.input_args
 
     if request.args.get('uuid') is None:
-        return make_response("Not a valid UUID", 400)
+        return make_response({'detail': "Not a valid UUID"}, 400)
 
     uuid = request.args.get('uuid')
     user = Project.get_user_by_project(uuid, input_args.root_dir)
@@ -666,7 +666,7 @@ def api_all_tasks():
         # get filter parameters from request
         page, page_size = int(request.values.get('page', 1)), int(request.values.get('page_size', 10))
         if page < 1 or page_size < 1:
-            return make_response(jsonify({'detail': 'Incorrect page or page_size'}), 422)
+            return make_response({'detail': 'Incorrect page or page_size'}, 422)
 
         params = SimpleNamespace(page=page, page_size=page_size, tab=tab)
         tasks = prepare_tasks(g.project, params)
@@ -705,7 +705,7 @@ def api_task_by_id(task_id):
     # delete task
     elif request.method == 'DELETE':
         g.project.delete_task(task_id)
-        return make_response(jsonify('Task deleted.'), 204)
+        return make_response(jsonify({'detal': 'Task deleted'}), 204)
 
 
 @blueprint.route('/api/tasks/<task_id>/completions', methods=['POST', 'DELETE'])
@@ -750,7 +750,7 @@ def api_completion_by_id(task_id, completion_id):
     """
     # catch case when completion is not submitted yet, but user tries to act with it
     if completion_id == 'null':
-        return make_response('completion id is null', 200)
+        return make_response({'detail': 'completion id is null'}, 200)
 
     task_id = int(task_id)
     completion_id = int(completion_id)
@@ -763,13 +763,13 @@ def api_completion_by_id(task_id, completion_id):
             completion['was_cancelled'] = False
 
         g.project.save_completion(task_id, completion)
-        return make_response('ok', 201)
+        return make_response({'detail': 'created'}, 201)
 
     # delete completion
     elif request.method == 'DELETE':
         if g.project.config.get('allow_delete_completions', False):
             g.project.delete_task_completion(task_id, completion_id)
-            return make_response('deleted', 204)
+            return make_response({'detail': 'deleted'}, 204)
         else:
             return make_response({'detail': 'Completion removing is not allowed in server config'}, 422)
 
@@ -784,7 +784,7 @@ def api_all_completions():
     # delete all completions
     if request.method == 'DELETE':
         g.project.delete_all_completions()
-        return make_response('done', 201)
+        return make_response({'detail': 'done'}, 201)
 
     # get all completions ids
     elif request.method == 'GET':
@@ -792,7 +792,7 @@ def api_all_completions():
         return make_response(jsonify({'ids': ids}), 200)
 
     else:
-        return make_response('Incorrect request method', 500)
+        return make_response({'detail': 'Incorrect request method'}, 500)
 
 
 @blueprint.route('/api/models', methods=['GET', 'DELETE'])
@@ -810,7 +810,7 @@ def api_models():
     if request.method == 'DELETE':
         ml_backend_name = request.json['name']
         g.project.remove_ml_backend(ml_backend_name)
-        return make_response(jsonify('ML backend deleted'), 204)
+        return make_response({'detail': 'ML backend deleted'}, 204)
 
 
 @blueprint.route('/api/models/train', methods=['POST'])
@@ -823,13 +823,13 @@ def api_train():
         training_started = g.project.train()
         if training_started:
             logger.debug('Training started.')
-            return make_response(jsonify({'details': 'Training started'}), 200)
+            return make_response(jsonify({'detail': 'Training started'}), 200)
         else:
             logger.debug('Training failed.')
             return make_response(
-                jsonify('Training is not started: seems that you don\'t have any ML backend connected'), 400)
+                jsonify({'detail': 'Training is not started: seems that you don\'t have any ML backend connected'}), 400)
     else:
-        return make_response(jsonify("No ML backend"), 400)
+        return make_response(jsonify({'detail': "No ML backend"}), 400)
 
 
 @blueprint.route('/api/models/predictions', methods=['GET', 'POST'])
@@ -869,7 +869,7 @@ def api_predictions():
         else:
             return make_response(jsonify({'detail': 'unknown mode'}), 422)
     else:
-        return make_response(jsonify("No ML backend"), 400)
+        return make_response(jsonify({'detail': "No ML backend"}), 400)
 
 
 @blueprint.route('/api/states', methods=['GET'])
