@@ -132,4 +132,6 @@ def deprecated_api_train():
 def api_generate_next_task():
     from label_studio.data_manager.actions import next_task
     deprecated_message('/api/project/next', '/api/project/actions?id=next_task')
-    return next_task(g.project, None, None)
+    result = next_task(g.project, None, None)
+    code = result.pop('response_code', 200)
+    return make_response(result, code)
