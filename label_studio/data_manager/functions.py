@@ -41,13 +41,13 @@ def get_all_columns(project):
     # data types from config + data found while import
     data_types = dict(project.data_types.items())
     if project.derived_all_input_schema:
-        data_types.update({key: 'String' for key in project.derived_all_input_schema})
+        data_types.update({key: 'Unknown' for key in project.derived_all_input_schema})
 
     for key, data_type in data_types.items():
         column = {
             'id': key,
             'title': key,
-            'type': data_type if data_type in ['Image', 'Audio', 'AudioPlus'] else 'String',
+            'type': data_type if data_type in ['Image', 'Audio', 'AudioPlus', 'Unknown'] else 'String',
             'target': 'tasks',
             'parent': 'data',
             'show_in_quickview_default': i == 0
