@@ -19,23 +19,23 @@
 
   <!-- Vue app -->
   <div class="ui" id="import-tasks" :class="{ hidden: !vueLoaded }">
-    <div v-if="preview && !errors.length">
+    <div v-if="preview && !errors.length && !loading">
       <h1>Files loaded</h1>
       <p>You can import them to the task manager.</p>
-      <p><button class="ui primary button" @click="apply">Import to Data Manager</button></p>
+      <p><button class="ui primary button" @click="apply">Import</button></p>
       <ul class="stats" v-if="stats">
-        <li><span class="num">{{stats.total_completions}}</span> items loaded</li>
-        <li><span class="num">{{stats.total_predictions}}</span> completions</li>
-        <li><span class="num">{{stats.total_tasks}}</span> predictions</li>
+        <li><span class="num">{{stats.total_tasks}}</span> items loaded</li>
+        <li><span class="num">{{stats.total_completions}}</span> completions</li>
+        <li><span class="num">{{stats.total_predictions}}</span> predictions</li>
       </ul>
       <table class="preview">
-        <thead>
+        <thead v-if="Object.keys(preview[0]).length > 1">
           <tr>
             <th v-for="_, title in preview[0]">{{title}}</th>
           </tr>
         </thead>
         <tr v-for="row in preview">
-          <td v-for="value in row">{{value}}</td>
+          <td v-for="value in row">{{get_short_text(value)}}</td>
         </tr>
       </table>
     </div>
@@ -53,7 +53,7 @@
       </p>
     </div>
 
-    <div :class="{ hidden: loading || preview }">
+    <div :class="{ hidden: loading || preview || errors.length }">
       <h1>Import data</h1>
 
       <div class="source-switch">
@@ -105,6 +105,11 @@
       },
 
       methods: {
+        get_short_text: function(text) {
+          const max_len = 40;
+          return (text.length <= max_len ? text: ('...' + text.slice(text.length-max_len, text.length)));
+        },
+
         start: function() {
           this.loading = true;
         },
