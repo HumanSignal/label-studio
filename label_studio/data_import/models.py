@@ -71,7 +71,7 @@ class ImportState(object):
             'total_completions': self.total_completions,
             'total_predictions': self.total_predictions,
             'formats': self.formats,
-            'file_tasks_as_list': self.files_as_tasks_list
+            'files_as_tasks_list': self.files_as_tasks_list
         }
 
     @property
