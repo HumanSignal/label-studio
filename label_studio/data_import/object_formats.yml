@@ -1,0 +1,30 @@
+Text:
+  - txt
+  - csv
+  - tsv
+
+Image:
+  - png
+  - jpg
+  - jpeg
+  - tiff
+  - tif
+  - bmp
+  - gif
+
+Audio:
+  - wav
+  - aiff
+  - mp3
+  - au
+  - flac
+
+TimeSeries:
+  - csv
+  - tsv
+
+HyperText:
+  - txt
+  - xml
+  - htm
+  - html

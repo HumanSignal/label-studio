@@ -13,9 +13,10 @@
           files_as_tasks_list:
             selected: false
             type: null
-          formats:
+          found_formats:
             {".jpg": 1, ".png": 1}
-          selected_formats: []
+          selected_formats: [".jpg", ".png"]
+          selected_objects: ["Image", "Image"]
           id: 1
           new_task_ids: [0, 1]
           project: my_project
@@ -45,9 +46,10 @@
           files_as_tasks_list:
             selected: false
             type: null
-          formats:
+          found_formats:
             {".jpg": 1, ".png": 1}
-          selected_formats: []
+          selected_formats: [".jpg", ".png"]
+          selected_objects: ["Image", "Image"]
           id: 1
           project: my_project
           task_preview:
@@ -76,9 +78,10 @@
           files_as_tasks_list:
             selected: false
             type: null
-          formats:
+          found_formats:
             {".jpg": 1, ".png": 1}
-          selected_formats: []
+          selected_formats: [".jpg", ".png"]
+          selected_objects: ["Image", "Image"]
           id: 1
           project: my_project
           task_preview:
@@ -100,9 +103,10 @@
           files_as_tasks_list:
             selected: true
             type: null
-          formats:
+          found_formats:
             {".jpg": 1, ".png": 1}
-          selected_formats: []
+          selected_formats: [".jpg", ".png"]
+          selected_objects: ["Image", "Image"]
           id: 1
           project: my_project
           task_preview:
