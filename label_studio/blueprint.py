@@ -53,7 +53,7 @@ from label_studio.utils.uri_resolver import resolve_task_data_uri
 from label_studio.utils.auth import requires_auth
 from label_studio.storage import get_storage_form
 from label_studio.project import Project
-from label_studio.tasks import Tasks
+from label_studio.data_manager.functions import remove_tabs
 
 from label_studio.data_manager.views import blueprint as data_manager_blueprint
 from label_studio.data_import.views import blueprint as data_import_blueprint
@@ -532,7 +532,11 @@ def api_save_config():
 
     # update config states
     try:
+        schema_before = g.project.input_data_scheme
         g.project.update_label_config(label_config)
+        schema_after = g.project.input_data_scheme
+        if not schema_before.issubset(schema_after):
+            remove_tabs(g.project)
     except Exception as e:
         return make_response(jsonify({'label_config': [str(e)]}), status.HTTP_400_BAD_REQUEST)
 

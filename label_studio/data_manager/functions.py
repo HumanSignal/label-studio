@@ -1,4 +1,5 @@
 import os
+import logging
 import ujson as json
 from operator import itemgetter
 from types import SimpleNamespace
@@ -7,6 +8,7 @@ from label_studio.utils.uri_resolver import resolve_task_data_uri
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 TASKS = 'tasks:'
+logger = logging.getLogger(__name__)
 
 
 class DataManagerException(Exception):
@@ -99,6 +101,14 @@ def get_all_columns(project):
         }
     ]
     return result
+
+
+def remove_tabs(project):
+    tab_path = os.path.join(project.path, 'tabs.json')
+    try:
+        os.remove(tab_path)
+    except Exception as e:
+        logger.error("Can't remove tabs " + str(e) + ": " + tab_path)
 
 
 def load_all_tabs(project) -> dict:

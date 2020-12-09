@@ -233,7 +233,7 @@
       // send url as task data
       if (IsJsonString(upload_url)) {
         request = {
-          url: "api/project/import",
+          url: "api/project/import?json_string=1",
           data: upload_url,
           contentType: 'application/json',
           method: 'post'
@@ -242,7 +242,7 @@
       // send url as regular url
       else {
         request = {
-          url: "api/project/import",
+          url: "api/project/import?upload_url=1",
           data: {url: upload_url},
           method: 'post'
         }

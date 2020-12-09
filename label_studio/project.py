@@ -203,6 +203,13 @@ class Project(object):
         self.parsed_label_config = parse_config(self.label_config_line)
         self.input_data_tags = self.get_input_data_tags(self.label_config_line)
 
+    @property
+    def input_data_scheme(self):
+        return {
+            (x.attrib.get('name', ''), x.attrib.get('value', ''))
+            for x in self.input_data_tags
+        }
+
     def update_derived_input_schema(self):
         self.derived_input_schema = set()
         for task_id, task in self.source_storage.items():

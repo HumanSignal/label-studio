@@ -9,7 +9,7 @@ from label_studio.data_manager import blueprint
 from label_studio.data_manager.functions import DataManagerException
 from label_studio.data_manager.functions import (
     prepare_tasks, prepare_annotations, get_all_columns, load_tab, save_tab, delete_tab, load_all_tabs,
-    eval_task_ids, get_selected_items
+    eval_task_ids, get_selected_items, remove_tabs
 )
 
 
@@ -48,6 +48,11 @@ def api_project_tabs():
     if request.method == 'GET':
         data = load_all_tabs(g.project)
         return make_response(jsonify(data), 200)
+
+    if request.method == 'DELETE':
+        remove_tabs(g.project)
+        data = load_all_tabs(g.project)
+        return make_response(jsonify(data), 204)
 
 
 @blueprint.route('/api/project/tabs/<tab_id>', methods=['GET', 'POST', 'DELETE'])
