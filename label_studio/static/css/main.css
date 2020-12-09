@@ -365,6 +365,16 @@ div[class*="App_editor"] {
     background: rgb(54, 162, 255) !important;
     transition: background-color ease-in-out 0.25s;
 }
+.ui .button.primary {
+    background: rgb(24, 144, 255) !important;
+    color: #fff !important;
+    border-color: rgb(24, 144, 255) !important;
+    transition: background-color ease-in-out 0.25s;
+}
+.ui .button.primary:hover {
+    background: rgb(54, 162, 255) !important;
+    transition: background-color ease-in-out 0.25s;
+}
 .ui .button {
     transition: 0.3s;
 }
