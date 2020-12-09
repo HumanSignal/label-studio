@@ -7,6 +7,7 @@ import json
 
 from types import SimpleNamespace
 from label_studio.project import Project
+from label_studio.utils.io import read_yaml
 
 
 def goc_project():
@@ -38,9 +39,7 @@ def load_test_suite_from_file(test_suite_file):
     assert test_suite_file.endswith('.yml'), 'Test suite file should be in YAML format'
     test_suites_dir = os.path.join(os.path.dirname(__file__), 'test_suites')
     assert os.path.exists(test_suites_dir)
-    with io.open(os.path.join(test_suites_dir, test_suite_file)) as f:
-        test_suites = yaml.load(f)
-    return test_suites
+    return read_yaml(os.path.join(test_suites_dir, test_suite_file))
 
 
 def get_test_ids(test_val):

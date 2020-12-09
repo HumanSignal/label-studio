@@ -6,6 +6,7 @@ import lxml
 import time
 import pandas as pd
 import lxml.etree
+import logging
 
 try:
     import ujson as json
@@ -13,7 +14,6 @@ except ModuleNotFoundError:
     import json
 
 from urllib.request import urlopen
-from label_studio.data_import.uploader import check_file_sizes_and_number
 from werkzeug.utils import secure_filename
 from datetime import datetime
 from flask import request, jsonify, make_response, Response as HttpResponse, g
@@ -24,7 +24,12 @@ from label_studio.utils.misc import exception_handler
 from label_studio.data_import.views import blueprint
 from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.functions import generate_sample_task, get_sample_task
+
+from label_studio.data_import.uploader import check_file_sizes_and_number
 from .models import ImportState
+
+
+logger = logging.getLogger(__name__)
 
 
 @blueprint.route('/api/import-example', methods=['GET', 'POST'])
@@ -203,6 +208,7 @@ def api_import_prepare():
         # TODO: import specific exception handler
         return make_response(jsonify(e.msg_to_list()), status.HTTP_400_BAD_REQUEST)
     response = {'id': import_state.id}
+    logger.debug(response)
     return make_response(jsonify(response), status.HTTP_201_CREATED)
 
 
@@ -216,6 +222,7 @@ def api_import_detail(import_id):
         import_state_params = dict(request.json)
         import_state.update(**import_state_params)
     response = import_state.serialize()
+    logger.debug(response)
     return make_response(response, status.HTTP_200_OK)
 
 

@@ -176,7 +176,7 @@ def aggregate_files(request_files, temp_dir):
     return files
 
 
-def aggregate_tasks(files, project):
+def aggregate_tasks(files, project, formats=None):
     tasks = []
     fileformats = []
     # scan all files
@@ -185,11 +185,17 @@ def aggregate_tasks(files, project):
         if file == 'archive':
             with open(filename) as f:
                 new_tasks, fileformat = tasks_from_file(filename, f, project)
+                if formats and fileformat not in formats:
+                    # TODO: not so effective to read all file content before checking format
+                    continue
                 tasks += new_tasks
                 fileformats.append(fileformat)
         # file from request
         else:
             new_tasks, fileformat = tasks_from_file(filename, file, project)
+            if formats and fileformat not in formats:
+                # TODO: not so effective to read all file content before checking format
+                continue
             tasks += new_tasks
             fileformats.append(fileformat)
 

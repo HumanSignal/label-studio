@@ -1,5 +1,6 @@
+from collections import defaultdict
 
-from label_studio.utils.io import get_temp_dir
+from label_studio.utils.io import get_temp_dir, read_yaml
 from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.validation import TaskValidator
 from label_studio.tasks import Tasks
@@ -10,7 +11,16 @@ from .uploader import aggregate_files, aggregate_tasks, check_max_task_number
 _db = {}
 
 
+def read_object_formats():
+    data = read_yaml('object_formats.yml')
+    o2fs = data
+    f2o = {f: o for o, fs in data.items() for f in fs}
+    return o2fs, f2o
+
+
 class ImportState(object):
+
+    object_to_formats, format_to_object = read_object_formats()
 
     def __init__(self, filelist=(), tasks=(), project=None, **kwargs):
         super(ImportState, self).__init__(**kwargs)
@@ -20,12 +30,32 @@ class ImportState(object):
         self.project = project
         self.filelist = filelist
         self.tasks = tasks
-        self.formats = {}
+        self.found_formats = {}
+        self.selected_formats = None
+        self.selected_objects = None
         self.columns_to_draw = []
-        self.files_as_tasks_list = False
+        self.files_as_tasks_list = {'type': None, 'selected': False}
         self._validator = TaskValidator(self.project)
 
         self._update()
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'project': self.project.name,
+            'task_preview': self.tasks_preview,
+            'columns_to_draw': self.columns_to_draw,
+            'total_tasks': self.total_tasks,
+            'total_completions': self.total_completions,
+            'total_predictions': self.total_predictions,
+            'found_formats': self.found_formats,
+            'selected_formats': self.selected_formats,
+            'selected_objects': self.selected_objects,
+            'files_as_tasks_list': self.files_as_tasks_list
+        }
+
+    def _get_object_from_format(self, f):
+        return self.format_to_object.get(f.lower().lstrip('.'))
 
     def _update(self):
         if self.filelist:
@@ -33,7 +63,16 @@ class ImportState(object):
                              for filename in self.filelist}
             with get_temp_dir() as tmpdir:
                 files = aggregate_files(request_files, tmpdir)
-                self.tasks, self.formats = aggregate_tasks(files, self.project)
+                self.tasks, found_formats = aggregate_tasks(files, self.project, self.selected_formats)
+                if not self.found_formats:
+                    # It's a first time we get all formats
+                    self.found_formats = found_formats
+                if self.selected_formats is None:
+                    # It's a first time we get all formats
+                    self.selected_formats, self.selected_objects = [], []
+                    for format in sorted(found_formats.keys()):
+                        self.selected_formats.append(format)
+                self.selected_objects = [self._get_object_from_format(f) for f in self.selected_formats]
                 check_max_task_number(self.tasks)
 
         # validate tasks
@@ -61,19 +100,6 @@ class ImportState(object):
         self.project.update_derived_input_schema()
         self.project.update_derived_output_schema()
         return new_tasks
-
-    def serialize(self):
-        return {
-            'id': self.id,
-            'project': self.project.name,
-            'task_preview': self.tasks_preview,
-            'columns_to_draw': self.columns_to_draw,
-            'total_tasks': self.total_tasks,
-            'total_completions': self.total_completions,
-            'total_predictions': self.total_predictions,
-            'formats': self.formats,
-            'files_as_tasks_list': self.files_as_tasks_list
-        }
 
     @property
     def tasks_preview(self):
