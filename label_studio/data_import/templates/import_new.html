@@ -18,7 +18,7 @@
   <div id="vue_loader" class="ui large text loader loading active">Loading ...</div>
 
   <!-- Vue app -->
-  <div class="ui" id="import-tasks" :class="{ hidden: !vueLoaded }">
+  <div class="ui hidden" id="import-tasks" :class="{ loaded: vueLoaded }">
     <div v-if="preview && !errors.length && !loading">
       <h1>Files loaded</h1>
       <p>You can import them to the task manager.</p>
@@ -94,15 +94,13 @@
       </div>
 
       <div class="ui form tab-url" v-if="source === 'url'" ref="url">
-        <div class="ui fluid action input">
+        <form class="ui fluid action input" @submit="url">
           <input type="text" ref="url" placeholder="Dataset URL">
-          <button class="ui primary button" @click="url">Load</button>
+          <button class="ui primary button">Load</button>
         </div>
         <p class="example">
-          You can drop in the link to
-          <a href="https://labelstud.io/guide/tasks.html" target="_blank">tasks list in our format</a>
-          <br/>
-          or you can point out to some dataset with links to assets and other meta info in csv
+          To learn about supported formats check out the
+          <a href="https://labelstud.io/guide/tasks.html" target="_blank">Documentation</a>
         </p>
       </div>
 
@@ -208,7 +206,8 @@
           });
         },
 
-        url: function() {
+        url: function(e) {
+          e.preventDefault();
           const url = this.$refs.url.value;
           $.ajax({
             url: "api/project/import/prepare",
