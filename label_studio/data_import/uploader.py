@@ -81,7 +81,7 @@ class TasksFromFileReader(object):
             file_format = None
         finally:
             logger.debug('Get file format ' + file_format)
-            
+
         try:
             # file as tasks list
             if file_format == '.csv' and self.file_as_tasks_list:

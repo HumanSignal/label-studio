@@ -19,12 +19,7 @@ Audio:
   - au
   - flac
 
-TimeSeries:
-  - csv
-  - tsv
-
 HyperText:
-  - txt
   - xml
   - htm
   - html
