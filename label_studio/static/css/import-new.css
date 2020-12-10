@@ -151,6 +151,43 @@
   color: #797979;
 }
 
+/* Loading */
+
+.loading {
+  color: #1890FF;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 50vh;
+  max-height: 200px;
+}
+
+#import-tasks .loading p {
+  margin-bottom: 24px;
+}
+
+.spinner {
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.spinner::before {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 4px solid rgba(24, 144, 255, 0.1);
+  border-radius: 50%;
+  border-top-color: #1890FF;
+  animation: loader 1s infinite linear; /* from semantic-ui */
+}
+
 /* Preview */
 
 #import-tasks p {

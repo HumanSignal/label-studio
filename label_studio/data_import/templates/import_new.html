@@ -58,7 +58,12 @@
 
     <div v-if="loading">
       <h1 class="fade">Import data</h1>
-      <p>Loading...</p>
+      <div class="loading">
+        <p>Loading files...</p>
+        <div class="spinner">
+          <img src="static/images/opossum_looking.png" width="60px">
+        </div>
+      </div>
     </div>
 
     <div v-if="errors.length">
