@@ -27,77 +27,112 @@ logger = logging.getLogger(__name__)
 csv.field_size_limit(131072 * 10)
 
 
-def is_time_series_only(project):
-    """ Check whether project config has only one TimeSeries object
-    """
-    return len(project.data_types) == 1 and 'TimeSeries' in project.data_types.values()
+class TasksFromFileReader(object):
 
+    def __init__(self, project, file_as_tasks_list):
+        self.project = project
+        self.file_as_tasks_list = file_as_tasks_list
+        self.is_time_series_only = len(project.data_types) == 1 and 'TimeSeries' in project.data_types.values()
 
-def tasks_from_file(filename, file, project):
-    file_format = None
-    try:
-        if filename.endswith('.csv') and not is_time_series_only(project):
-            tasks = pd.read_csv(file).fillna('').to_dict('records')
-            tasks = [{'data': task} for task in tasks]
+    def read_tasks_list_from_csv(self, filename, file, sep=','):
+        logger.debug('Read tasks list from CSV file {}'.format(filename))
+        tasks = pd.read_csv(file, sep=sep).fillna('').to_dict('records')
+        tasks = [{'data': task} for task in tasks]
+        return tasks
+
+    def read_tasks_list_from_tsv(self, filename, file):
+        logger.debug('Read tasks list from TSV file {}'.format(filename))
+        tasks = pd.read_csv(file, sep='\t').fillna('').to_dict('records')
+        tasks = [{'data': task} for task in tasks]
+        return tasks
+
+    def read_tasks_list_from_txt(self, filename, file):
+        logger.debug('Read tasks list from text file {}'.format(filename))
+        lines = file.read().splitlines()
+        tasks = [{'data': {settings.UPLOAD_DATA_UNDEFINED_NAME: line.decode('utf-8')}} for line in lines]
+        return tasks
+
+    def read_tasks_list_from_json(self, filename, file):
+        logger.debug('Read tasks list from JSON file {}'.format(filename))
+        raw_data = file.read()
+        # Python 3.5 compatibility fix https://docs.python.org/3/whatsnew/3.6.html#json
+        try:
+            tasks = json.loads(raw_data)
+        except TypeError:
+            tasks = json.loads(raw_data.decode('utf8'))
+        return tasks
+
+    def read_task_from_json(self, filename, file):
+        logger.debug('Read 1 task from JSON file {}'.format(filename))
+        raw_data = file.read()
+        # Python 3.5 compatibility fix https://docs.python.org/3/whatsnew/3.6.html#json
+        try:
+            task = json.loads(raw_data)
+        except TypeError:
+            task = json.loads(raw_data.decode('utf8'))
+        assert isinstance(task, dict)
+        return [task]
+
+    def read_task_from_hypertext_body(self, filename, file):
+        logger.debug('Read 1 task from hypertext file {}'.format(filename))
+        data = file.read()
+        body = htmlmin.minify(data.decode('utf8'), remove_all_empty_space=True)
+        tasks = [{'data': {settings.UPLOAD_DATA_UNDEFINED_NAME: body}}]
+        return tasks
+
+    def read_task_from_uploaded_file(self, filename, file):
+        logger.debug('Read 1 task from uploaded file {}'.format(filename))
+        path = get_external_hostname() + '/data/upload/' + filename
+        tasks = [{'data': {settings.UPLOAD_DATA_UNDEFINED_NAME: path}}]
+        return tasks
+
+    def read(self, filename, file):
+        try:
             file_format = os.path.splitext(filename)[-1]
-        elif filename.endswith('.tsv') and not is_time_series_only(project):
-            tasks = pd.read_csv(file, sep='\t').fillna('').to_dict('records')
-            tasks = [{'data': task} for task in tasks]
-            file_format = os.path.splitext(filename)[-1]
-        elif filename.endswith('.txt'):
-            lines = file.read().splitlines()
-            tasks = [{'data': {settings.UPLOAD_DATA_UNDEFINED_NAME: line.decode('utf-8')}} for line in lines]
-            file_format = os.path.splitext(filename)[-1]
-        elif filename.endswith('.json'):
-            raw_data = file.read()
-            # Python 3.5 compatibility fix https://docs.python.org/3/whatsnew/3.6.html#json
+        except:
+            file_format = None
+        tasks = None
+
+        if self.file_as_tasks_list:
             try:
-                tasks = json.loads(raw_data)
-            except TypeError:
-                tasks = json.loads(raw_data.decode('utf8'))
-            file_format = os.path.splitext(filename)[-1]
-
-        # no drag & drop support
-        elif project is None:
-            raise ValidationError('No tasks found in: ' + filename)
+                if file_format == '.csv':
+                    tasks = self.read_tasks_list_from_csv(filename, file)
+                elif file_format == '.tsv':
+                    tasks = self.read_tasks_list_from_tsv(filename, file)
+                elif file_format == '.txt':
+                    tasks = self.read_tasks_list_from_txt(filename, file)
+                elif file_format == '.json':
+                    tasks = self.read_tasks_list_from_json(filename, file)
+            except Exception as exc:
+                raise ValidationError('Failed to parse input file ' + filename + ': ' + str(exc) + ' into tasks list')
 
         # upload file via drag & drop
-        elif len(project.data_types) > 1 and not is_time_series_only(project):
-            raise ValidationError('Your label config has more than one data keys, direct file upload supports only'
-                                  ' one data key. To import data with multiple data keys use JSON or CSV')
-        # convert html file to json task
-        elif filename.endswith('.html') or filename.endswith('.htm') or filename.endswith('.xml'):
-            data = file.read()
-            body = htmlmin.minify(data.decode('utf8'), remove_all_empty_space=True)
-            tasks = [{'data': {settings.UPLOAD_DATA_UNDEFINED_NAME: body}}]
-            file_format = os.path.splitext(filename)[-1]
-        # hosting for file
-        else:
-            # prepare task
-            path = get_external_hostname() + '/data/upload/' + filename
-            tasks = [{'data': {settings.UPLOAD_DATA_UNDEFINED_NAME: path}}]
-            file_format = os.path.splitext(filename)[-1]
+        elif len(self.project.data_types) > 1:
+            raise ValidationError(
+                'Your label config has more than one data keys, direct file upload supports only '
+                'one data key. To import data with multiple data keys use JSON or CSV')
 
-    except Exception as exc:
-        raise ValidationError('Failed to parse input file ' + filename + ': ' + str(exc))
+        elif not se:
+            try:
+                if file_format in ('.html', '.htm', '.xml'):
+                    tasks = self.read_task_from_hypertext_body(filename, file)
+                elif file_format == '.json':
+                    tasks = self.read_task_from_json(filename, file)
+                else:
+                    tasks = self.read_task_from_uploaded_file(filename, file)
+            except Exception as exc:
+                raise ValidationError('Failed to create task from input file ' + filename + ': ' + str(exc))
 
-    # null in file
-    if tasks is None:
-        raise ValidationError('null in ' + filename + ' is not allowed')
+        if tasks is None:
+            raise ValidationError(
+                'Incorrect task type in ' + filename + ': "' + str(str(tasks)[0:100]) +
+                '". It is allowed "dict" or "list of dicts" only')
+        return tasks, file_format
 
-    # one task as dict
-    elif isinstance(tasks, dict):
-        tasks = [tasks]
 
-    # list
-    elif isinstance(tasks, list):
-        pass
-
-    # something strange
-    else:
-        raise ValidationError('Incorrect task type in ' + filename + ': "' + str(str(tasks)[0:100]) + '". '
-                              'It is allowed "dict" or "list of dicts" only')
-
+def tasks_from_file(filename, file, project, file_as_tasks_list):
+    reader = TasksFromFileReader(project, file_as_tasks_list)
+    tasks, file_format = reader.read(filename, file)
     return tasks, file_format
 
 
@@ -176,7 +211,7 @@ def aggregate_files(request_files, temp_dir):
     return files
 
 
-def aggregate_tasks(files, project, formats=None):
+def aggregate_tasks(files, project, formats=None, files_as_tasks_list=None):
     tasks = []
     fileformats = []
     # scan all files
@@ -188,7 +223,7 @@ def aggregate_tasks(files, project, formats=None):
                 logger.error('Found directory {} in archive: recursive scan is not implemented.'.format(filename))
                 continue
             with open(filename) as f:
-                new_tasks, fileformat = tasks_from_file(filename, f, project)
+                new_tasks, fileformat = tasks_from_file(filename, f, project, files_as_tasks_list)
                 if formats and fileformat not in formats:
                     # TODO: not so effective to read all file content before checking format
                     continue
@@ -196,7 +231,7 @@ def aggregate_tasks(files, project, formats=None):
                 fileformats.append(fileformat)
         # file from request
         else:
-            new_tasks, fileformat = tasks_from_file(filename, file, project)
+            new_tasks, fileformat = tasks_from_file(filename, file, project, files_as_tasks_list)
             if formats and fileformat not in formats:
                 # TODO: not so effective to read all file content before checking format
                 continue
