@@ -18,8 +18,8 @@
   <div id="vue_loader" class="ui large text loader loading active">Loading ...</div>
 
   <!-- Vue app -->
-  <div class="ui" id="import-tasks" :class="{ hidden: !vueLoaded }">
-    <div v-if="preview && !errors.length && !loading">
+  <div class="ui hidden" id="import-tasks" :class="{ loaded: vueLoaded }">
+    <div v-if="preview">
       <h1>Files loaded</h1>
       <p>You can import them to the task manager.</p>
       <div v-if="formats.length > 1" ref="formats" class="formats" :class="{ last: selected_formats.length < 2 }">
@@ -44,7 +44,26 @@
         <li><span class="num">{{stats.total_completions}}</span> completions</li>
         <li><span class="num">{{stats.total_predictions}}</span> predictions</li>
       </ul>
-      <table class="preview" :class="{ fade: stats && preview.length < stats.total_tasks}">
+
+      <div class="spinner" v-if="loading">
+        <img src="static/images/opossum_looking.png" width="60px">
+      </div>
+
+      <div class="error" v-for="error in errors" v-if="errors.length">
+        <details v-if="error.details">
+          <summary>
+            <h3>{{error.header}}</h3>
+            <p>{{error.text}}</p>
+          </summary>
+          <div>{{error.details}}</div>
+        </details>
+        <div v-if="!error.details">
+          <h3>{{error.header}}</h3>
+          <p>{{error.text}}</p>
+        </div>
+      </div>
+
+      <table class="preview" v-if="!errors.length" :class="{ fade: stats && preview.length < stats.total_tasks}">
         <thead v-if="Object.keys(preview[0]).length > 1">
           <tr>
             <th v-for="_, title in preview[0]">{{title}}</th>
@@ -56,7 +75,7 @@
       </table>
     </div>
 
-    <div v-if="loading">
+    <div v-if="loading && !preview">
       <h1 class="fade">Import data</h1>
       <div class="loading">
         <p>Loading files...</p>
@@ -66,9 +85,21 @@
       </div>
     </div>
 
-    <div v-if="errors.length">
+    <div v-if="errors.length && !preview">
       <h1>Errors</h1>
-      <div class="error" v-for="error in errors">{{error}}</div>
+      <div class="error" v-for="error in errors">
+        <details v-if="error.details">
+          <summary>
+            <h3>{{error.header}}</h3>
+            <p>{{error.text}}</p>
+          </summary>
+          <div>{{error.details}}</div>
+        </details>
+        <div v-if="!error.details">
+          <h3>{{error.header}}</h3>
+          <p>{{error.text}}</p>
+        </div>
+      </div>
       <p class="center">
         <button class="ui primary button" @click="reset">Try another input</button>
       </p>
@@ -94,15 +125,13 @@
       </div>
 
       <div class="ui form tab-url" v-if="source === 'url'" ref="url">
-        <div class="ui fluid action input">
+        <form class="ui fluid action input" @submit="url">
           <input type="text" ref="url" placeholder="Dataset URL">
-          <button class="ui primary button" @click="url">Load</button>
+          <button class="ui primary button">Load</button>
         </div>
         <p class="example">
-          You can drop in the link to
-          <a href="https://labelstud.io/guide/tasks.html" target="_blank">tasks list in our format</a>
-          <br/>
-          or you can point out to some dataset with links to assets and other meta info in csv
+          To learn about supported formats check out the
+          <a href="https://labelstud.io/guide/tasks.html" target="_blank">Documentation</a>
         </p>
       </div>
 
@@ -149,17 +178,9 @@
         },
 
         loadPreview: function(params) {
+          this.errors = [];
           $.ajax(params)
-          .fail((res) => {
-            let text = res.responseText;
-            if (res.responseJSON && res.responseJSON.length) {
-              text = res.responseJSON.join("\n\n");
-            }
-            const message = res.status + " " + res.statusText + "\n" + text;
-            const error = new Error(message);
-            error.code = res.status;
-            self.$emit('error', error);
-          })
+          .fail(res => this.errorFromResult(res))
           .done(res => {
             this.preview = res.task_preview.slice(0, 10);
             this.files_as_tasks_list = res.files_as_tasks_list;
@@ -197,6 +218,7 @@
         },
 
         toggle_type: function() {
+          this.loading = true;
           const selected = this.$refs.files_type.checked;
           this.loadPreview({
             url: "api/project/import/" + this.id,
@@ -208,16 +230,34 @@
           });
         },
 
-        url: function() {
+        url: function(e) {
+          e.preventDefault();
           const url = this.$refs.url.value;
           $.ajax({
             url: "api/project/import/prepare",
             data: {url},
             method: 'POST',
           })
+          .fail(res => this.errorFromResult(res))
           .done(res => {
             this.finish(res.id);
           });
+        },
+
+        errorFromResult(res) {
+          let header = res.status + " " + res.statusText;
+          let text = res.responseText;
+          if (res.responseJSON && res.responseJSON.length) {
+            text = res.responseJSON.join("\n\n");
+          }
+          const parts = text.split("::", 2);
+          text = parts[0];
+          details = parts[1];
+          if (text.includes("is expected in task data")) {
+            header = "Your config and imported data are inconsistent";
+          }
+          const error = { header, text, details };
+          this.error(error);
         },
 
         error: function(error) {

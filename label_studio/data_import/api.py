@@ -25,7 +25,6 @@ from label_studio.data_import.views import blueprint
 from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.functions import generate_sample_task, get_sample_task
 
-from label_studio.data_import.uploader import check_file_sizes_and_number
 from .models import ImportState
 
 
@@ -149,19 +148,14 @@ def _create_import_state(request, g):
 
             url = data['url']
             with urlopen(url, context=ctx) as file:
-                # check size
-                meta = file.info()
-                file.size = int(meta.get("Content-Length"))
-                file.urlopen = True
                 file.filename = url
                 request_files = {url: file}
 
-                check_file_sizes_and_number(request_files)
                 uploaded_files = _upload_files(request_files, g.project)
                 import_state = ImportState.create_from_filelist(filelist=uploaded_files, project=g.project)
 
-        except ValidationError as e:
-            raise e
+        except ValidationError:
+            raise
         except Exception as e:
             raise ValidationError(str(e))
 
@@ -210,7 +204,9 @@ def api_import_prepare():
         import_state = _create_import_state(request, g)
     except ValidationError as e:
         # TODO: import specific exception handler
-        return make_response(jsonify(e.msg_to_list()), status.HTTP_400_BAD_REQUEST)
+        error_message = e.msg_to_list()
+        logger.error(error_message)
+        return make_response(jsonify(error_message), status.HTTP_400_BAD_REQUEST)
     response = {'id': import_state.id}
     logger.debug(response)
     return make_response(jsonify(response), status.HTTP_201_CREATED)

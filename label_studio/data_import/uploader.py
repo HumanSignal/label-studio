@@ -59,7 +59,15 @@ class TasksFromFileReader(object):
             tasks = json.loads(raw_data.decode('utf8'))
         if isinstance(tasks, dict):
             tasks = [tasks]
-        return tasks
+        tasks_formatted = []
+        for task in tasks:
+            if not isinstance(task, dict):
+                raise ValidationError('Task item should be dict')
+            if not task.get('data'):
+                tasks_formatted.append({'data': task})
+            else:
+                tasks_formatted.append(task)
+        return tasks_formatted
 
     def read_task_from_hypertext_body(self, filename, file):
         logger.debug('Read 1 task from hypertext file {}'.format(filename))
@@ -113,7 +121,8 @@ class TasksFromFileReader(object):
 def tasks_from_file(filename, file, project, file_as_tasks_list):
     reader = TasksFromFileReader(project, file_as_tasks_list)
     tasks, file_format = reader.read(filename, file)
-    return tasks, file_format
+    data_keys = set(iter(tasks[0]['data'].keys())) if len(tasks) > 0 else set()
+    return tasks, file_format, data_keys
 
 
 def create_and_release_temp_dir(func):
@@ -194,6 +203,7 @@ def aggregate_files(request_files, temp_dir):
 def aggregate_tasks(files, project, formats=None, files_as_tasks_list=None):
     tasks = []
     fileformats = []
+    data_keys = set()
     # scan all files
     for filename, file in files.items():
         # extracted file from archive
@@ -203,21 +213,34 @@ def aggregate_tasks(files, project, formats=None, files_as_tasks_list=None):
                 logger.error('Found directory {} in archive: recursive scan is not implemented.'.format(filename))
                 continue
             with open(filename) as f:
-                new_tasks, fileformat = tasks_from_file(filename, f, project, files_as_tasks_list)
-                if formats and fileformat not in formats:
-                    # TODO: not so effective to read all file content before checking format
-                    continue
-                tasks += new_tasks
-                fileformats.append(fileformat)
-        # file from request
-        else:
-            new_tasks, fileformat = tasks_from_file(filename, file, project, files_as_tasks_list)
+                new_tasks, fileformat, new_data_keys = tasks_from_file(filename, f, project, files_as_tasks_list)
+
             if formats and fileformat not in formats:
                 # TODO: not so effective to read all file content before checking format
                 continue
+
+            if not data_keys:
+                data_keys = new_data_keys
+            if data_keys != new_data_keys:
+                raise ValidationError('New data keys {0} found when scanning file {1}: expected {2}'.format(
+                    ','.join(new_data_keys), filename, ','.join(data_keys)))
+
+            tasks += new_tasks
+            fileformats.append(fileformat)
+        # file from request
+        else:
+            new_tasks, fileformat, new_data_keys = tasks_from_file(filename, file, project, files_as_tasks_list)
+            if formats and fileformat not in formats:
+                # TODO: not so effective to read all file content before checking format
+                continue
+            if not data_keys:
+                data_keys = new_data_keys
+            if data_keys != new_data_keys:
+                raise ValidationError('New data keys {0} found when scanning file {1}: expected {2}'.format(
+                    ','.join(new_data_keys), filename, ','.join(data_keys)))
             tasks += new_tasks
             fileformats.append(fileformat)
 
         check_max_task_number(tasks)
 
-    return tasks, dict(Counter(fileformats))
+    return tasks, dict(Counter(fileformats)), data_keys
