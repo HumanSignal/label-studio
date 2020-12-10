@@ -615,3 +615,17 @@ pre {
     white-space: -o-pre-wrap;
     word-wrap:  break-word !important;
 }
+
+.accordion-button {
+    height: 28px;
+    padding-top: 7px !important;
+}
+
+.accordion-content {
+    margin-left: 25px;
+    margin-top: -3px!important;
+}
+
+.invisible-borders td {
+    border: none;
+}

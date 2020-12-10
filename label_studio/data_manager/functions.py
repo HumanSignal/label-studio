@@ -1,5 +1,4 @@
 import os
-import copy
 import logging
 import ujson as json
 from operator import itemgetter
@@ -8,6 +7,7 @@ from label_studio.utils.misc import DirectionSwitch, timestamp_to_local_datetime
 from label_studio.utils.uri_resolver import resolve_task_data_uri
 from label_studio.utils.misc import Settings
 from collections import OrderedDict
+from datetime import datetime
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 TASKS = 'tasks:'

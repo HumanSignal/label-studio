@@ -42,7 +42,7 @@
 
 <div class="ui container">
   <div class="ui max-width-wrapper">
-    {% include 'includes/setup_help.html' %}
+    {% include 'includes/setup_menu.html' %}
 
     <form action="api/project/config" method="post" class="ui form">
 
@@ -312,9 +312,12 @@
       let iframe = document.getElementById('render-editor');
       if (iframe !== null) {
         let Htx = iframe.contentWindow.Htx;
-        if (typeof Htx !== 'undefined') {
+        if (typeof Htx !== 'undefined' && Htx.completionStore && Htx.completionStore.selected) {
           var completion = JSON.stringify(Htx.completionStore.selected.serializeCompletion(), null, 4);
           if (prev_completion !== completion) {
+            if (completion.length > 3000) {
+              completion = completion.slice(0, 3000) + ' ...';
+            }
             $('#data-results').text(completion);
             prev_completion = completion;
           }

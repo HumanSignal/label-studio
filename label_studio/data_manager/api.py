@@ -39,7 +39,7 @@ def api_project_actions():
         return make_response(jsonify(result), 200)
 
 
-@blueprint.route('/api/project/tabs', methods=['GET'])
+@blueprint.route('/api/project/tabs', methods=['GET', 'DELETE'])
 @requires_auth
 @exception_handler
 def api_project_tabs():

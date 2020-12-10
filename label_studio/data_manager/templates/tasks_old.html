@@ -778,7 +778,7 @@
         deleteAllTasks: function () {
           var deletion_confirmed = confirm(
             'You are going to delete all existing tasks.\n' +
-            'Warning! this operation cannot be undone.\nPlease confirm your action.');
+            'Warning! This operation cannot be undone.\nPlease confirm your action.');
           if (deletion_confirmed) {
             var request = new XMLHttpRequest();
             request.open("DELETE", "api/tasks/delete", true);
@@ -791,7 +791,7 @@
         deleteAllCompletions: function () {
           var deletion_confirmed = confirm(
             'You are going to delete all existing completions.\n' +
-            'Warning! this operation cannot be undone.\nPlease confirm your action.');
+            'Warning! This operation cannot be undone.\nPlease confirm your action.');
           if (deletion_confirmed) {
             var request = new XMLHttpRequest();
             request.open("DELETE", "api/project/completions", true);
