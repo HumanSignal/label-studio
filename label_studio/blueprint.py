@@ -315,6 +315,7 @@ def welcome_page():
 
 
 @blueprint.route('/setup')
+@blueprint.route('/settings')
 @requires_auth
 @exception_handler_page
 def setup_page():
