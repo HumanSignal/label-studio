@@ -235,7 +235,8 @@ def get_config_templates(config):
     template_dir = config.get('templates_dir', 'examples')
     for i, path in enumerate(iter_config_templates(template_dir)):
         # open and check xml
-        code = open(path).read()
+        with open(path) as f:
+            code = f.read()
         try:
             objectify.fromstring(code)
         except Exception as e:

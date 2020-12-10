@@ -1,4 +1,5 @@
 import os
+import copy
 import logging
 import ujson as json
 from operator import itemgetter
@@ -6,6 +7,7 @@ from types import SimpleNamespace
 from label_studio.utils.misc import DirectionSwitch, timestamp_to_local_datetime
 from label_studio.utils.uri_resolver import resolve_task_data_uri
 from label_studio.utils.misc import Settings
+from collections import OrderedDict
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 TASKS = 'tasks:'
@@ -40,14 +42,14 @@ def get_all_columns(project):
     task_data_children = []
     i = 0
 
-    data_types = {}
+    data_types = OrderedDict()
     # all data types from import data
     if project.derived_all_input_schema:
         data_types.update({key: 'Unknown' for key in project.derived_all_input_schema})
     # data types from config
     data_types.update(project.data_types.items())
 
-    for key, data_type in data_types.items():
+    for key, data_type in list(data_types.items())[::-1]:  # make data types from labeling config first
         column = {
             'id': key,
             'title': key if key != settings.UPLOAD_DATA_UNDEFINED_NAME else 'data',
@@ -120,14 +122,20 @@ def load_all_tabs(project) -> dict:
     """ Load all tabs from disk
     """
     tab_path = os.path.join(project.path, 'tabs.json')
-    return json.load(open(tab_path, encoding='utf-8')) if os.path.exists(tab_path) else create_default_tabs()
+    if os.path.exists(tab_path):
+        with open(tab_path, encoding='utf-8') as f:
+            data = json.load(f)
+    else:
+        data = create_default_tabs()
+    return data
 
 
 def save_all_tabs(project, data: dict):
     """ Save all tabs to disk
     """
     tab_path = os.path.join(project.path, 'tabs.json')
-    json.dump(data, open(tab_path, 'w', encoding='utf-8'))
+    with open(tab_path, 'w', encoding='utf-8') as f:
+        json.dump(data, f)
 
 
 def load_tab(tab_id, project=None, raise_if_not_exists=False):
@@ -275,6 +283,10 @@ def operator(op, a, b):
         return False
     if b is None:
         return False
+
+    # convert complex types to string (it could be unknown data columns)
+    if isinstance(b, (list, dict, set)):
+        b = str(b)
 
     if op == 'equal':
         return a == b
