@@ -9,7 +9,7 @@ from label_studio.utils.misc import Settings
 from collections import OrderedDict
 from datetime import datetime
 
-DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
+DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 TASKS = 'tasks:'
 logger = logging.getLogger(__name__)
 settings = Settings()
@@ -48,6 +48,10 @@ def get_all_columns(project):
         data_types.update({key: 'Unknown' for key in project.derived_all_input_schema})
     # data types from config
     data_types.update(project.data_types.items())
+
+    # remove $ndefined$ if there is one type at least in labeling config, because it will be resolved automatically
+    if len(project.data_types) > 0:
+        data_types.pop(settings.UPLOAD_DATA_UNDEFINED_NAME, None)
 
     for key, data_type in list(data_types.items())[::-1]:  # make data types from labeling config first
         column = {
@@ -272,8 +276,41 @@ def preload_tasks(project, resolve_uri=False):
     return tasks
 
 
-def operator(op, a, b):
+def task_value_converter(x, data_type):
+    """ Convert task value to selected type, because user data could be noisy
+    """
+    if x is None:
+        return None
+
+    if data_type == 'Number' and (not isinstance(x, int) or not isinstance(x, float)):
+        return float(x)
+    if data_type == 'Datetime' and isinstance(x, str):
+        return datetime.strptime(x, DATETIME_FORMAT)
+
+    # list, dict, set, ...
+    if not isinstance(x, str):
+        return str(x)
+
+    return x
+
+
+def filter_value_converter(x, data_type):
+    """ Convert filter value, from Datetime commonly
+    """
+    if x is None:
+        return None
+    if data_type == 'Datetime' and isinstance(x, str):
+        return datetime.strptime(x, DATETIME_FORMAT)
+    return x
+
+
+def operator(op, a, b, data_type):
     """ Filter operators
+
+        :param op: operation type
+        :param a: value from filter
+        :param b: value from task
+        :param data_type: type of task value
     """
     if op == 'empty':  # TODO: check it
         value = b is None or (hasattr(b, '__len__') and len(b) == 0)
@@ -284,9 +321,8 @@ def operator(op, a, b):
     if b is None:
         return False
 
-    # convert complex types to string (it could be unknown data columns)
-    if isinstance(b, (list, dict, set)):
-        b = str(b)
+    a = filter_value_converter(a, data_type)
+    b = task_value_converter(b, data_type)
 
     if op == 'equal':
         return a == b
@@ -379,16 +415,16 @@ def filter_tasks(tasks, params):
                                        'but "' + f['filter'] + '" found')
         target = parts[1]  # 'tasks | annotations'
         field = parts[2]  # field name
-        op, value = f['operator'], f['value']
+        op, value, data_type = f['operator'], f['value'], f['type']
 
         if target != 'tasks':
             raise DataManagerException('Filtering target ' + target + ' is not yet supported')
 
         if conjunction == 'and':
-            new_tasks = [task for task in new_tasks if operator(op, value, resolve_task_field(task, field))]
+            new_tasks = [task for task in new_tasks if operator(op, value, resolve_task_field(task, field), data_type)]
 
         elif conjunction == 'or':
-            new_tasks += [task for task in tasks if operator(op, value, resolve_task_field(task, field))]
+            new_tasks += [task for task in tasks if operator(op, value, resolve_task_field(task, field), data_type)]
 
         else:
             raise DataManagerException('Filtering conjunction "' + op + '" is not supported')

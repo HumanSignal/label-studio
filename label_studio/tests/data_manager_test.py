@@ -192,12 +192,14 @@ class TestTasksAndAnnotations:
                 'items': [{
                     'filter': 'filters:tasks:id',
                     'operator': 'in',
-                    'value': {'min': 2, 'max': 5}
+                    'value': {'min': 2, 'max': 5},
+                    'type': 'Number'
                     },
                     {
                     'filter': 'filters:tasks:data.text',
                     'operator': 'contains',
-                    'value': '123'
+                    'value': '123',
+                    'type': 'String'
                     }]
             }
         }
