@@ -2,6 +2,7 @@ Text:
   - txt
   - csv
   - tsv
+  - json
 
 Image:
   - png
