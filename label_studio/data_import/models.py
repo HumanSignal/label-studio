@@ -37,6 +37,7 @@ class ImportState(object):
         self.selected_formats = None
         self.selected_objects = None
         self.columns_to_draw = []
+        self.data_keys = []
         self.files_as_tasks_list = {'type': None, 'selected': False}
         self._validator = TaskValidator(self.project)
 
@@ -60,6 +61,21 @@ class ImportState(object):
     def _get_object_from_format(self, f):
         return self.format_to_object.get(f.lower().lstrip('.'))
 
+    def _generate_label_config(self):
+        # TODO: this is a temp workaround to guess initial config
+        data_keys = list(self.data_keys)
+        if len(data_keys) > 1:
+            # better to use Table here
+            return '<View></View>'
+        if len(data_keys) == 1:
+            data_key = data_keys[0]
+            objects = set([self._get_object_from_format(f) for f in self.selected_formats])
+            if len(objects) > 1:
+                raise ValidationError('More than one data type is presented')
+            object_tag = list(objects)[0]
+            data_key = object_tag.lower() if data_key == '$undefined$' else data_key
+            return '<View><{0} name="{1}" value="${2}"/></View>'.format(object_tag, object_tag.lower(), data_key)
+
     def _update(self):
         if self.filelist:
             request_files = {}
@@ -67,18 +83,20 @@ class ImportState(object):
                 request_files[filename] = open(self.project.upload_dir + '/' + filename, mode='rb')
             with get_temp_dir() as tmpdir:
                 files = aggregate_files(request_files, tmpdir)
-                self.tasks, found_formats = aggregate_tasks(
+                self.tasks, found_formats, self.data_keys = aggregate_tasks(
                     files, self.project, self.selected_formats, self.files_as_tasks_list['selected'])
-                if not self.found_formats:
-                    # It's a first time we get all formats
-                    self.found_formats = found_formats
-                if self.selected_formats is None:
-                    # It's a first time we get all formats
-                    self.selected_formats, self.selected_objects = [], []
-                    for format in sorted(found_formats.keys()):
-                        self.selected_formats.append(format)
-                self.selected_objects = [self._get_object_from_format(f) for f in self.selected_formats]
-                check_max_task_number(self.tasks)
+
+            if not self.found_formats:
+                # It's a first time we get all formats
+                self.found_formats = found_formats
+            if self.selected_formats is None:
+                # It's a first time we get all formats
+                self.selected_formats, self.selected_objects = [], []
+                for format in sorted(found_formats.keys()):
+                    self.selected_formats.append(format)
+
+            self.selected_objects = [self._get_object_from_format(f) for f in self.selected_formats]
+            check_max_task_number(self.tasks)
 
         # validate tasks
         self.tasks = self._validator.to_internal_value(self.tasks)
@@ -106,7 +124,8 @@ class ImportState(object):
         self.project.update_derived_output_schema()
 
         if self.project.label_config_is_empty:
-            self.project.create_label_config_from_object_tags(set(self.selected_objects))
+            generated_label_config = self._generate_label_config()
+            self.project.update_label_config(generated_label_config)
         return new_tasks
 
     @property
