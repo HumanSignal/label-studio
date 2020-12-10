@@ -22,13 +22,16 @@
     <div v-if="preview && !errors.length && !loading">
       <h1>Files loaded</h1>
       <p>You can import them to the task manager.</p>
-      <p><button class="ui primary button" @click="apply">Import</button></p>
+      <p>
+        <button class="ui grey button" @click="reset">Cancel</button>
+        <button class="ui primary button" @click="apply">Import</button>
+      </p>
       <ul class="stats" v-if="stats">
         <li><span class="num">{{stats.total_tasks}}</span> items loaded</li>
         <li><span class="num">{{stats.total_completions}}</span> completions</li>
         <li><span class="num">{{stats.total_predictions}}</span> predictions</li>
       </ul>
-      <table class="preview">
+      <table class="preview" :class="{ fade: stats && preview.length < stats.total_tasks}">
         <thead v-if="Object.keys(preview[0]).length > 1">
           <tr>
             <th v-for="_, title in preview[0]">{{title}}</th>
@@ -111,6 +114,7 @@
       methods: {
         get_short_text: function(text) {
           const max_len = 40;
+          text = String(text);
           return (text.length <= max_len ? text: ('...' + text.slice(text.length-max_len, text.length)));
         },
 
@@ -136,7 +140,7 @@
             self.$emit('error', error);
           })
           .done(res => {
-            this.preview = res.task_preview;
+            this.preview = res.task_preview.slice(0, 10);
             this.stats = {
               total_completions: res.total_completions,
               total_predictions: res.total_predictions,
