@@ -63,6 +63,7 @@ function traverseFileTree(item, path) {
 }
 
 function getFiles(files) {
+  // @todo this can be not a files, but text or any other draggable shit
   return new Promise(resolve => {
     if (!files.length) return resolve([]);
     if (!files[0].webkitGetAsEntry) return resolve(files);
