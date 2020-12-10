@@ -127,5 +127,5 @@ def read_yaml(filepath):
     if not os.path.exists(filepath):
         filepath = find_file(filepath)
     with io.open(filepath) as f:
-        data = yaml.load(f)
+        data = yaml.load(f, Loader=yaml.FullLoader)
     return data
