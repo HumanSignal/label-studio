@@ -8,13 +8,47 @@
   display: none;
 }
 
+/* Rewrite hidden class after loading */
+#import-tasks.loaded {
+  display: block;
+}
+
+/* Errors */
+
 #import-tasks .error {
-  white-space: pre-wrap;
+  /* white-space: pre-wrap; */
   word-break: break-word;
   max-height: 50vh;
   overflow: auto;
   margin-bottom: 32px;
 }
+
+#import-tasks .error > * {
+  background: 100% 6px / 16px no-repeat url(/static/images/error.png);
+  margin-bottom: 32px;
+}
+
+#import-tasks .error summary {
+  cursor: pointer;
+  margin-bottom: 16px;
+  padding-right: 16px;
+}
+
+#import-tasks .error h3 {
+  color: #F5222D;
+  font-size: 16px;
+  display: inline-block;
+}
+
+#import-tasks .error p {
+  margin: 0;
+}
+
+#import-tasks .error details p {
+  padding-left: 16px;
+}
+
+/* Common */
 
 #import-tasks .center {
   text-align: center;
@@ -173,6 +207,7 @@
   align-items: center;
   justify-content: center;
   position: relative;
+  margin: 0 auto;
 }
 
 .spinner::before {
