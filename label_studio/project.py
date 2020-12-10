@@ -207,8 +207,24 @@ class Project(object):
     def data_types_json(self):
         return self.project_obj.data_types_json
 
+    @property
+    def label_config_is_empty(self):
+        return not self.parsed_label_config or self.parsed_label_config == {'View': {}}
+
+    def create_label_config_from_object_tags(self, object_tags):
+        assert object_tags, 'Object tags should contain at least one element'
+        logger.debug('Creating new label config for project {} with object tags: {}'.format(
+            self.name, ','.join(object_tags)))
+        with io.StringIO() as f:
+            f.write('<View>\n')
+            for object_tag in object_tags:
+                f.write('<{0} name="{1}" value="${1}"/>\n'.format(object_tag, object_tag.lower()))
+            f.write('</View>\n')
+            self.update_label_config(f.getvalue())
+
     def load_label_config(self):
-        self.label_config_full = config_comments_free(open(self.label_config_path, encoding='utf8').read())
+        with open(self.label_config_path, encoding='utf8') as f:
+            self.label_config_full = config_comments_free(f.read())
         self.label_config_line = config_line_stripped(self.label_config_full)
         self.parsed_label_config = parse_config(self.label_config_line)
         self.config_input_tags = self.get_config_input_tags(self.label_config_line)

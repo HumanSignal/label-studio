@@ -183,6 +183,10 @@ def aggregate_tasks(files, project, formats=None):
     for filename, file in files.items():
         # extracted file from archive
         if file == 'archive':
+            if os.path.isdir(filename):
+                # TODO: recursive scan
+                logger.error('Found directory {} in archive: recursive scan is not implemented.'.format(filename))
+                continue
             with open(filename) as f:
                 new_tasks, fileformat = tasks_from_file(filename, f, project)
                 if formats and fileformat not in formats:

@@ -1,5 +1,5 @@
 - Test entire /api/import in one call:
-    - /api/project/1/import:
+    - /api/project/import:
         method: POST
         content_type: multipart/form-data
         data:
@@ -21,14 +21,14 @@
           new_task_ids: [0, 1]
           project: my_project
           task_preview:
-            - {"__test_object": true, "regexp": '^\{"image":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
-            - {"__test_object": true, "regexp": '^\{"image":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
+            - {"__test_object": true, "regexp": '^\{"\$undefined\$":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
+            - {"__test_object": true, "regexp": '^\{"\$undefined\$":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
           total_tasks: 2
           total_completions: 0
           total_predictions: 0
 
 - Test api preview available after preimport with /api/import:
-    - /api/project/1/import/prepare:
+    - /api/project/import/prepare:
         method: POST
         content_type: multipart/form-data
         data:
@@ -38,7 +38,7 @@
         response:
           id: 1
 
-    - /api/project/1/import/1:
+    - /api/project/import/1:
         method: GET
         status_code: 200
         response:
@@ -53,14 +53,14 @@
           id: 1
           project: my_project
           task_preview:
-            - {"__test_object": true, "regexp": '^\{"image":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
-            - {"__test_object": true, "regexp": '^\{"image":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
+            - {"__test_object": true, "regexp": '^\{"\$undefined\$":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
+            - {"__test_object": true, "regexp": '^\{"\$undefined\$":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
           total_tasks: 2
           total_completions: 0
           total_predictions: 0
 
 - Prepare import, check preview and apply...:
-    - /api/project/1/import/prepare:
+    - /api/project/import/prepare:
         method: POST
         content_type: multipart/form-data
         data:
@@ -70,7 +70,7 @@
         response:
           id: 1
 
-    - /api/project/1/import/1:
+    - /api/project/import/1:
         method: GET
         status_code: 200
         response:
@@ -85,13 +85,13 @@
           id: 1
           project: my_project
           task_preview:
-            - {"__test_object": true, "regexp": '^\{"image":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
-            - {"__test_object": true, "regexp": '^\{"image":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
+            - {"__test_object": true, "regexp": '^\{"\$undefined\$":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
+            - {"__test_object": true, "regexp": '^\{"\$undefined\$":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
           total_tasks: 2
           total_completions: 0
           total_predictions: 0
 
-    - /api/project/1/import/1:
+    - /api/project/import/1:
         method: PATCH
         status_code: 200
         json:
@@ -110,13 +110,13 @@
           id: 1
           project: my_project
           task_preview:
-            - {"__test_object": true, "regexp": '^\{"image":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
-            - {"__test_object": true, "regexp": '^\{"image":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
+            - {"__test_object": true, "regexp": '^\{"\$undefined\$":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
+            - {"__test_object": true, "regexp": '^\{"\$undefined\$":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
           total_tasks: 2
           total_completions: 0
           total_predictions: 0
 
-    - /api/project/1/import/1/apply:
+    - /api/project/import/1/apply:
         method: POST
         status_code: 201
         response:

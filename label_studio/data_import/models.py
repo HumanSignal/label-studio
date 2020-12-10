@@ -1,10 +1,13 @@
-from collections import defaultdict
+import logging
 
 from label_studio.utils.io import get_temp_dir, read_yaml
 from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.validation import TaskValidator
 from label_studio.tasks import Tasks
 from .uploader import aggregate_files, aggregate_tasks, check_max_task_number
+
+
+logger = logging.getLogger(__name__)
 
 
 # TODO: define SQLAlchemy declarative_base()
@@ -100,6 +103,9 @@ class ImportState(object):
         # update schemas based on newly uploaded tasks
         self.project.update_derived_input_schema()
         self.project.update_derived_output_schema()
+
+        if self.project.label_config_is_empty:
+            self.project.create_label_config_from_object_tags(set(self.selected_objects))
         return new_tasks
 
     @property
