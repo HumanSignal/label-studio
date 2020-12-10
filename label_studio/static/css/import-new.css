@@ -145,13 +145,86 @@
 
 /* Import by URL */
 
-.ui.form > p.example {
-  margin-top: 0;
-  line-height: 30px;
+#import-tasks p.example {
+  margin-top: 12px;
   color: #797979;
 }
 
+/* Loading */
+
+.loading {
+  color: #1890FF;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 50vh;
+  max-height: 200px;
+}
+
+#import-tasks .loading p {
+  margin-bottom: 24px;
+}
+
+.spinner {
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.spinner::before {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 4px solid rgba(24, 144, 255, 0.1);
+  border-radius: 50%;
+  border-top-color: #1890FF;
+  animation: loader 1s infinite linear; /* from semantic-ui */
+}
+
 /* Preview */
+
+#import-tasks p {
+  margin: 32px 0;
+}
+
+#import-tasks ul {
+  display: flex;
+  margin-top: 16px;
+}
+
+#import-tasks li {
+  margin-right: 32px;
+}
+
+#import-tasks .ui.checkbox {
+  display: block;
+}
+
+.formats {
+  margin-bottom: 32px;
+}
+
+.formats > .checkbox {
+  margin-right: 32px;
+}
+
+.formats .checkbox label,
+.ui.checkbox label {
+  cursor: pointer;
+}
+
+/* disable last checkbox so it can not be unselected */
+.last.formats input:checked,
+.last.formats input:checked + label {
+  opacity: 0.5;
+  pointer-events: none;
+}
 
 .stats {
   list-style: none;

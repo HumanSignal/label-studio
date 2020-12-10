@@ -22,6 +22,19 @@
     <div v-if="preview && !errors.length && !loading">
       <h1>Files loaded</h1>
       <p>You can import them to the task manager.</p>
+      <div v-if="formats.length > 1" ref="formats" class="formats" :class="{ last: selected_formats.length < 2 }">
+        <div>You have files of different formats, that might be a problem; choose the correct ones</div>
+        <ul>
+          <li class="ui checkbox" v-for="format in formats">
+            <input type="checkbox" :name="format" :id="format" @change="update_formats" checked />
+            <label :for="format">{{format}}</label>
+          </li>
+        </ul>
+      </div>
+      <p class="ui checkbox" v-if="files_as_tasks_list">
+        <input type="checkbox" id="files_type" @change="toggle_type" ref="files_type" />
+        <label for="files_type">Treat this file not as plain file with data, but as tasks list</label>
+      </p>
       <p>
         <button class="ui grey button" @click="reset">Cancel</button>
         <button class="ui primary button" @click="apply">Import</button>
@@ -45,7 +58,12 @@
 
     <div v-if="loading">
       <h1 class="fade">Import data</h1>
-      <p>Loading...</p>
+      <div class="loading">
+        <p>Loading files...</p>
+        <div class="spinner">
+          <img src="static/images/opossum_looking.png" width="60px">
+        </div>
+      </div>
     </div>
 
     <div v-if="errors.length">
@@ -80,7 +98,12 @@
           <input type="text" ref="url" placeholder="Dataset URL">
           <button class="ui primary button" @click="url">Load</button>
         </div>
-        <p class="example>http://example.com/tasks.json"></p>
+        <p class="example">
+          You can drop in the link to
+          <a href="https://labelstud.io/guide/tasks.html" target="_blank">tasks list in our format</a>
+          <br/>
+          or you can point out to some dataset with links to assets and other meta info in csv
+        </p>
       </div>
 
       <div class="ui form tab-cloud" v-if="source === 'cloud'" ref="cloud">
@@ -103,8 +126,11 @@
           id: null,
           errors: [],
           loading: false,
+          files_as_tasks_list: {selected: false, type: null},
+          formats: [],
           preview: null,
           vueLoaded: false, 
+          selectedFormats: [],
           source: 'files',
           sources: {'files': 'Files', 'url': 'URL', 'cloud': 'Cloud'},
           stats: null,
@@ -122,13 +148,8 @@
           this.loading = true;
         },
 
-        finish: function(id) {
-          this.id = id;
-          $.ajax({
-            url: "api/project/import/" + id,
-            processData: false,
-            contentType: false
-          })
+        loadPreview: function(params) {
+          $.ajax(params)
           .fail((res) => {
             let text = res.responseText;
             if (res.responseJSON && res.responseJSON.length) {
@@ -141,6 +162,9 @@
           })
           .done(res => {
             this.preview = res.task_preview.slice(0, 10);
+            this.files_as_tasks_list = res.files_as_tasks_list;
+            this.formats = Object.keys(res.found_formats);
+            this.selected_formats = Object.keys(res.selected_formats);
             this.stats = {
               total_completions: res.total_completions,
               total_predictions: res.total_predictions,
@@ -148,6 +172,40 @@
             };
             this.loading = false;
           })
+        },
+
+        finish: function(id) {
+          this.id = id;
+          this.loadPreview({
+            url: "api/project/import/" + id,
+            processData: false,
+            contentType: false
+          });
+        },
+
+        update_formats: function() {
+          const formats = [];
+          this.$refs.formats.querySelectorAll("input").forEach(i => i.checked && formats.push(i.name))
+          this.loadPreview({
+            url: "api/project/import/" + this.id,
+            data: JSON.stringify({selected_formats: formats}),
+            method: 'PATCH',
+            processData: false,
+            contentType: 'application/json',
+            dataType: 'json',
+          });
+        },
+
+        toggle_type: function() {
+          const selected = this.$refs.files_type.checked;
+          this.loadPreview({
+            url: "api/project/import/" + this.id,
+            data: JSON.stringify({files_as_tasks_list: {selected, type: null}}),
+            method: 'PATCH',
+            processData: false,
+            contentType: 'application/json',
+            dataType: 'json',
+          });
         },
 
         url: function() {
