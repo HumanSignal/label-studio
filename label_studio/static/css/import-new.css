@@ -135,6 +135,14 @@
   margin-top: 20px;
 }
 
+/* Import by URL */
+
+.ui.form > p.example {
+  margin-top: 0;
+  line-height: 30px;
+  color: #797979;
+}
+
 /* Preview */
 
 .stats {

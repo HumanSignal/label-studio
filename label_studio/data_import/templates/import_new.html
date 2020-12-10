@@ -73,7 +73,11 @@
       </div>
 
       <div class="ui form tab-url" v-if="source === 'url'" ref="url">
-        <h2>By URL</h2>
+        <div class="ui fluid action input">
+          <input type="text" ref="url" placeholder="Dataset URL">
+          <button class="ui primary button" @click="url">Load</button>
+        </div>
+        <p class="example>http://example.com/tasks.json</p>
       </div>
 
       <div class="ui form tab-cloud" v-if="source === 'cloud'" ref="cloud">
@@ -140,6 +144,18 @@
             };
             this.loading = false;
           })
+        },
+
+        url: function() {
+          const url = this.$refs.url.value;
+          $.ajax({
+            url: "api/project/import/prepare",
+            data: {url},
+            method: 'POST',
+          })
+          .done(res => {
+            this.finish(res.id);
+          });
         },
 
         error: function(error) {
