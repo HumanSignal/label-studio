@@ -153,6 +153,35 @@
 
 /* Preview */
 
+#import-tasks p {
+  margin: 32px 0;
+}
+
+#import-tasks ul {
+  display: flex;
+  margin-top: 16px;
+}
+
+#import-tasks li {
+  margin-right: 32px;
+}
+
+#import-tasks .ui.checkbox {
+  display: block;
+}
+
+.formats {
+  margin-bottom: 32px;
+}
+
+.formats > .checkbox {
+  margin-right: 32px;
+}
+
+.formats label {
+  cursor: pointer;
+}
+
 .stats {
   list-style: none;
   display: inline-flex;

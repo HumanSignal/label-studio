@@ -22,11 +22,14 @@
     <div v-if="preview && !errors.length && !loading">
       <h1>Files loaded</h1>
       <p>You can import them to the task manager.</p>
-      <div v-if="formats.length > 1" ref="formats">
-        <p class="ui checkbox" v-for="format in formats">
-          <input type="checkbox" :name="format" @change="update_formats" checked />
-          <label>{{format}}</label>
-        </p>
+      <div v-if="formats.length > 1" ref="formats" class="formats">
+        <div>You have files of different formats, that might be a problem; choose the correct ones</div>
+        <ul>
+          <li class="ui checkbox" v-for="format in formats">
+            <input type="checkbox" :name="format" :id="format" @change="update_formats" checked />
+            <label :for="format">{{format}}</label>
+          </li>
+        </ul>
       </div>
       <p class="ui checkbox" v-if="files_as_tasks_list">
         <input type="checkbox" id="files_type" @change="toggle_type" ref="files_type" />
@@ -149,7 +152,7 @@
           .done(res => {
             this.preview = res.task_preview.slice(0, 10);
             this.files_as_tasks_list = res.files_as_tasks_list;
-            this.formats = res.selected_formats;
+            this.formats = Object.keys(res.found_formats);
             this.stats = {
               total_completions: res.total_completions,
               total_predictions: res.total_predictions,
