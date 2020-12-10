@@ -68,7 +68,7 @@ class ImportState(object):
             with get_temp_dir() as tmpdir:
                 files = aggregate_files(request_files, tmpdir)
                 self.tasks, found_formats = aggregate_tasks(
-                    files, self.project, self.selected_formats, self.files_as_tasks_list)
+                    files, self.project, self.selected_formats, self.files_as_tasks_list['selected'])
                 if not self.found_formats:
                     # It's a first time we get all formats
                     self.found_formats = found_formats

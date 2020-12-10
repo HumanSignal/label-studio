@@ -211,6 +211,10 @@ class Project(object):
     def label_config_is_empty(self):
         return not self.parsed_label_config or self.parsed_label_config == {'View': {}}
 
+    @property
+    def one_object_in_label_config(self):
+        return len(self.data_types) <= 1
+
     def create_label_config_from_object_tags(self, object_tags):
         assert object_tags, 'Object tags should contain at least one element'
         logger.debug('Creating new label config for project {} with object tags: {}'.format(

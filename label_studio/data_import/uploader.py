@@ -41,10 +41,7 @@ class TasksFromFileReader(object):
         return tasks
 
     def read_tasks_list_from_tsv(self, filename, file):
-        logger.debug('Read tasks list from TSV file {}'.format(filename))
-        tasks = pd.read_csv(file, sep='\t').fillna('').to_dict('records')
-        tasks = [{'data': task} for task in tasks]
-        return tasks
+        return self.read_tasks_list_from_csv(filename, file, '\t')
 
     def read_tasks_list_from_txt(self, filename, file):
         logger.debug('Read tasks list from text file {}'.format(filename))
@@ -60,18 +57,9 @@ class TasksFromFileReader(object):
             tasks = json.loads(raw_data)
         except TypeError:
             tasks = json.loads(raw_data.decode('utf8'))
+        if isinstance(tasks, dict):
+            tasks = [tasks]
         return tasks
-
-    def read_task_from_json(self, filename, file):
-        logger.debug('Read 1 task from JSON file {}'.format(filename))
-        raw_data = file.read()
-        # Python 3.5 compatibility fix https://docs.python.org/3/whatsnew/3.6.html#json
-        try:
-            task = json.loads(raw_data)
-        except TypeError:
-            task = json.loads(raw_data.decode('utf8'))
-        assert isinstance(task, dict)
-        return [task]
 
     def read_task_from_hypertext_body(self, filename, file):
         logger.debug('Read 1 task from hypertext file {}'.format(filename))
@@ -91,42 +79,34 @@ class TasksFromFileReader(object):
             file_format = os.path.splitext(filename)[-1]
         except:
             file_format = None
-        tasks = None
+        finally:
+            logger.debug('Get file format ' + file_format)
+            
+        try:
+            # file as tasks list
+            if file_format == '.csv' and self.file_as_tasks_list:
+                tasks = self.read_tasks_list_from_csv(filename, file)
+            elif file_format == '.tsv' and self.file_as_tasks_list:
+                tasks = self.read_tasks_list_from_tsv(filename, file)
+            elif file_format == '.txt' and self.file_as_tasks_list:
+                tasks = self.read_tasks_list_from_txt(filename, file)
+            elif file_format == '.json':
+                tasks = self.read_tasks_list_from_json(filename, file)
 
-        if self.file_as_tasks_list:
-            try:
-                if file_format == '.csv':
-                    tasks = self.read_tasks_list_from_csv(filename, file)
-                elif file_format == '.tsv':
-                    tasks = self.read_tasks_list_from_tsv(filename, file)
-                elif file_format == '.txt':
-                    tasks = self.read_tasks_list_from_txt(filename, file)
-                elif file_format == '.json':
-                    tasks = self.read_tasks_list_from_json(filename, file)
-            except Exception as exc:
-                raise ValidationError('Failed to parse input file ' + filename + ': ' + str(exc) + ' into tasks list')
+            # otherwise - only one object tag should be presented in label config
+            elif not self.project.one_object_in_label_config:
+                raise ValidationError(
+                    'Your label config has more than one data keys, direct file upload supports only '
+                    'one data key. To import data with multiple data keys use JSON or CSV')
 
-        # upload file via drag & drop
-        elif len(self.project.data_types) > 1:
-            raise ValidationError(
-                'Your label config has more than one data keys, direct file upload supports only '
-                'one data key. To import data with multiple data keys use JSON or CSV')
+            # file as a single asset
+            elif file_format in ('.html', '.htm', '.xml'):
+                tasks = self.read_task_from_hypertext_body(filename, file)
+            else:
+                tasks = self.read_task_from_uploaded_file(filename, file)
 
-        elif not se:
-            try:
-                if file_format in ('.html', '.htm', '.xml'):
-                    tasks = self.read_task_from_hypertext_body(filename, file)
-                elif file_format == '.json':
-                    tasks = self.read_task_from_json(filename, file)
-                else:
-                    tasks = self.read_task_from_uploaded_file(filename, file)
-            except Exception as exc:
-                raise ValidationError('Failed to create task from input file ' + filename + ': ' + str(exc))
-
-        if tasks is None:
-            raise ValidationError(
-                'Incorrect task type in ' + filename + ': "' + str(str(tasks)[0:100]) +
-                '". It is allowed "dict" or "list of dicts" only')
+        except Exception as exc:
+            raise ValidationError('Failed to parse input file ' + filename + ': ' + str(exc))
         return tasks, file_format
 
 
