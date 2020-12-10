@@ -114,14 +114,18 @@ def _upload_files(request_files, project):
             filename = secure_filename(file.filename)
 
             # read as text or binary file
-            data = open(filename, 'rb').read() if isinstance(file, io.TextIOWrapper) else file.read()
+            if isinstance(file, io.TextIOWrapper):
+                with open(filename, mode='rb') as f:
+                    data = f.read()
+            else:
+                data = file.read()
 
-            os.makedirs(project.upload_dir, exist_ok=True)
+            # assign unique filename
             filename = hashlib.md5(data).hexdigest() + '-' + os.path.basename(filename)
 
             # save file to path on disk
-            path = os.path.join(project.upload_dir, filename)
-            open(path, 'wb').write(data)
+            with open(os.path.join(project.upload_dir, filename), mode='wb') as f:
+                f.write(data)
 
             filelist.append(filename)
 

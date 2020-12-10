@@ -59,8 +59,9 @@ class ImportState(object):
 
     def _update(self):
         if self.filelist:
-            request_files = {filename: open(self.project.upload_dir + '/' + filename, mode='rb')
-                             for filename in self.filelist}
+            request_files = {}
+            for filename in self.filelist:
+                request_files[filename] = open(self.project.upload_dir + '/' + filename, mode='rb')
             with get_temp_dir() as tmpdir:
                 files = aggregate_files(request_files, tmpdir)
                 self.tasks, found_formats = aggregate_tasks(files, self.project, self.selected_formats)
