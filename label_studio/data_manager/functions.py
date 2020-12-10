@@ -5,10 +5,12 @@ from operator import itemgetter
 from types import SimpleNamespace
 from label_studio.utils.misc import DirectionSwitch, timestamp_to_local_datetime
 from label_studio.utils.uri_resolver import resolve_task_data_uri
+from label_studio.utils.misc import Settings
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
 TASKS = 'tasks:'
 logger = logging.getLogger(__name__)
+settings = Settings()
 
 
 class DataManagerException(Exception):
@@ -41,13 +43,13 @@ def get_all_columns(project):
     # data types from config + data found while import
     data_types = dict(project.data_types.items())
     if project.derived_all_input_schema:
-        data_types.update({key: 'Unknown' for key in project.derived_all_input_schema})
+        data_types.update({key: 'String' for key in project.derived_all_input_schema})
 
     for key, data_type in data_types.items():
         column = {
             'id': key,
-            'title': key,
-            'type': data_type if data_type in ['Image', 'Audio', 'AudioPlus', 'Unknown'] else 'String',
+            'title': key if key != settings.UPLOAD_DATA_UNDEFINED_NAME else 'data',
+            'type': data_type if data_type in ['Image', 'Audio', 'AudioPlus'] else 'String',
             'target': 'tasks',
             'parent': 'data',
             'show_in_quickview_default': i == 0
@@ -207,6 +209,9 @@ def get_cancelled_number(task):
 
 
 def preload_task(project, task_id, resolve_uri=False):
+    """ Preload task: get completed_at, has_cancelled_completions,
+        evaluate pre-signed urls for storages, aggregate over completion data, etc.
+    """
     task = project.get_task_with_completions(task_id)
 
     # no completions at task, get task without completions
@@ -232,12 +237,19 @@ def preload_task(project, task_id, resolve_uri=False):
     if resolve_uri:
         task = resolve_task_data_uri(task, project=project)
 
+    # resolve special reserved undefined key
+    if project.data_types:
+        new_key = next(iter(project.data_types))
+        for key, value in task['data'].items():
+            if key == settings.UPLOAD_DATA_UNDEFINED_NAME:
+                task['data'][new_key] = value
+                task['data'].pop(key)
+
     return task
 
 
 def preload_tasks(project, resolve_uri=False):
-    """ Preload tasks: get completed_at, has_cancelled_completions,
-        evaluate pre-signed urls for storages, aggregate over completion data, etc.
+    """ Preload many tasks
     """
     task_ids = project.source_storage.ids()  # get task ids for all tasks in DB
 

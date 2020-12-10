@@ -5,15 +5,11 @@ except:
     import json
 from .exceptions import ValidationError
 from urllib.parse import urlparse
+from label_studio.utils.misc import Settings
 
 
 class SkipField(Exception):
     pass
-
-
-# django backend settings compatibility
-class Settings:
-    UPLOAD_DATA_UNDEFINED_NAME = '$undefined$'
 
 
 _DATA_TYPES = {

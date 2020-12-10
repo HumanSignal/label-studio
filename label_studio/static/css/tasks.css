@@ -199,3 +199,6 @@ tr {
   height: 90vh;
   padding: 1rem 0;
 }
+.th-content {
+  font-weight: 500;
+}

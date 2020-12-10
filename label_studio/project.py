@@ -23,8 +23,10 @@ from label_studio.utils.io import find_file, delete_dir_content, json_load
 from label_studio.utils.validation import is_url
 from label_studio.tasks import Tasks
 from label_studio.storage import create_storage, get_available_storage_names
+from label_studio.utils.misc import Settings
 
 logger = logging.getLogger(__name__)
+settings = Settings()
 
 
 class ProjectNotFound(KeyError):
@@ -379,7 +381,9 @@ class Project(object):
         """
 
         # check if schema exists, i.e. at least one task has been uploaded
-        if not self.derived_input_schema:
+        if not self.derived_input_schema or \
+                (len(self.derived_input_schema) == 1 and
+                 next(iter(self.derived_input_schema)) == settings.UPLOAD_DATA_UNDEFINED_NAME):
             return
 
         config = config_string_or_parsed_config
@@ -773,7 +777,7 @@ class Project(object):
                 already_exists_error('label config', config_xml_path)
             if not input_path:
                 # create default config with polygons only if input data is not set
-                default_label_config = find_file('examples/image_polygons/config.xml')
+                default_label_config = find_file('examples/starter.xml')
                 copy2(default_label_config, config_xml_path)
                 print(default_label_config + ' label config copied to ' + config_xml_path)
             else:
