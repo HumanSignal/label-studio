@@ -145,9 +145,8 @@
 
 /* Import by URL */
 
-.ui.form > p.example {
-  margin-top: 0;
-  line-height: 30px;
+#import-tasks p.example {
+  margin-top: 12px;
   color: #797979;
 }
 
@@ -215,8 +214,16 @@
   margin-right: 32px;
 }
 
-.formats label {
+.formats .checkbox label,
+.ui.checkbox label {
   cursor: pointer;
+}
+
+/* disable last checkbox so it can not be unselected */
+.last.formats input:checked,
+.last.formats input:checked + label {
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 .stats {

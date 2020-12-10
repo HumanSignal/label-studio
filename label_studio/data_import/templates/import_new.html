@@ -22,7 +22,7 @@
     <div v-if="preview && !errors.length && !loading">
       <h1>Files loaded</h1>
       <p>You can import them to the task manager.</p>
-      <div v-if="formats.length > 1" ref="formats" class="formats">
+      <div v-if="formats.length > 1" ref="formats" class="formats" :class="{ last: selected_formats.length < 2 }">
         <div>You have files of different formats, that might be a problem; choose the correct ones</div>
         <ul>
           <li class="ui checkbox" v-for="format in formats">
@@ -33,7 +33,7 @@
       </div>
       <p class="ui checkbox" v-if="files_as_tasks_list">
         <input type="checkbox" id="files_type" @change="toggle_type" ref="files_type" />
-        <label for="files_type">This .csv is time series</label>
+        <label for="files_type">Treat this file not as plain file with data, but as tasks list</label>
       </p>
       <p>
         <button class="ui grey button" @click="reset">Cancel</button>
@@ -98,7 +98,12 @@
           <input type="text" ref="url" placeholder="Dataset URL">
           <button class="ui primary button" @click="url">Load</button>
         </div>
-        <p class="example">http://example.com/tasks.json</p>
+        <p class="example">
+          You can drop in the link to
+          <a href="https://labelstud.io/guide/tasks.html" target="_blank">tasks list in our format</a>
+          <br/>
+          or you can point out to some dataset with links to assets and other meta info in csv
+        </p>
       </div>
 
       <div class="ui form tab-cloud" v-if="source === 'cloud'" ref="cloud">
@@ -125,6 +130,7 @@
           formats: [],
           preview: null,
           vueLoaded: false, 
+          selectedFormats: [],
           source: 'files',
           sources: {'files': 'Files', 'url': 'URL', 'cloud': 'Cloud'},
           stats: null,
@@ -158,6 +164,7 @@
             this.preview = res.task_preview.slice(0, 10);
             this.files_as_tasks_list = res.files_as_tasks_list;
             this.formats = Object.keys(res.found_formats);
+            this.selected_formats = Object.keys(res.selected_formats);
             this.stats = {
               total_completions: res.total_completions,
               total_predictions: res.total_predictions,
