@@ -277,7 +277,7 @@ def get_config_templates(config):
 
 
 def convert_string_to_hash(string, trim=None):
-    return hashlib.md5(string.encode()).hexdigest()[:trim]
+    return hashlib.md5(string).hexdigest()[:trim]
 
 
 def datetime_to_timestamp(dt):
