@@ -588,6 +588,9 @@ class Project(object):
         if 'id' in completion:
             for i, item in enumerate(task['completions']):
                 if item['id'] == completion['id']:
+                    # we don't want to explicitly make "was_cancelled" key if it's not presented in storage
+                    if 'was_cancelled' in task['completions'][i] and not completion.get('was_cancelled', False):
+                        task['completions'][i]['was_cancelled'] = False
                     task['completions'][i].update(completion)
                     updated = True
         # write new completion

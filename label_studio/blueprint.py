@@ -761,8 +761,8 @@ def api_completion_by_id(task_id, completion_id):
     if request.method == 'PATCH' or request.method == 'POST':
         completion = request.json
         completion['id'] = completion_id
-        if 'was_cancelled' in completion:
-            completion['was_cancelled'] = False
+        if 'was_cancelled' in request.values:
+            completion['was_cancelled'] = bool(request.values['was_cancelled'])
 
         g.project.save_completion(task_id, completion)
         return make_response({'detail': 'created'}, 201)
