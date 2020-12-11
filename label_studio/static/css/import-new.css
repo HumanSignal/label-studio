@@ -102,6 +102,7 @@
 #import-tasks {
   width: 560px;
   margin: 0 auto;
+  position: relative;
 }
 
 #import-tasks > header {
@@ -198,6 +199,14 @@
 
 #import-tasks .loading p {
   margin-bottom: 24px;
+}
+
+.loading.splash {
+  position: absolute;
+  width: 100%;
+  background: white;
+  opacity: 0.5;
+  z-index: 1;
 }
 
 .spinner {
