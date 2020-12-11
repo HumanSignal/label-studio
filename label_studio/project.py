@@ -647,11 +647,15 @@ class Project(object):
             if item['id'] == completion_id:
                 del task['completions'][i]
 
-        self.update_derived_output_schema()
+        # remove task from completions storage if there are no completions at all
+        if len(task['completions']) == 0:
+            self.target_storage.remove(task_id)
+        # write task to completions storage
+        else:
+            self.target_storage.set(task_id, task)
 
-        # write task + completions to file
-        self.target_storage.set(task_id, task)
         logger.debug('Completion ' + str(completion_id) + ' removed:\n')
+        self.update_derived_output_schema()
         return True
 
     def delete_task_completions(self, task_id):

@@ -262,7 +262,7 @@ def preload_task(project, task_id, resolve_uri=False):
     return task
 
 
-def preload_tasks(project, resolve_uri=False):
+def preload_tasks(project, resolve_uri=False, max_count=None):
     """ Preload many tasks
     """
     task_ids = project.source_storage.ids()  # get task ids for all tasks in DB
@@ -272,6 +272,8 @@ def preload_tasks(project, resolve_uri=False):
     for i in task_ids:
         task = preload_task(project, i, resolve_uri)
         tasks.append(task)
+        if max_count is not None and len(tasks) >= max_count:
+            break
 
     return tasks
 
@@ -363,11 +365,18 @@ def resolve_task_field(task, field):
     return result
 
 
+def check_order_enabled(params):
+    ordering = params.tab.get('ordering', [])  # ordering = ['id', 'completed_at', ...]
+    if ordering is None:
+        return False
+    return True
+
+
 def order_tasks(params, tasks):
     """ Apply ordering to tasks
     """
     ordering = params.tab.get('ordering', [])  # ordering = ['id', 'completed_at', ...]
-    if ordering is None:
+    if not check_order_enabled(params):
         return tasks
 
     # remove 'tasks:' prefix for tasks api, for annotations it will be 'annotations:'
@@ -394,15 +403,25 @@ def order_tasks(params, tasks):
     return ordered
 
 
+def check_filters_enabled(params):
+    """ Check if filters are enabled
+    """
+    tab = params.tab
+    filters = tab.get('filters', None)
+    if tab is None:
+        return False
+    if not filters or not filters.get('items', None) or not filters.get('conjunction', None):
+        return False
+    return True
+    
+
 def filter_tasks(tasks, params):
     """ Filter tasks using
     """
     # check for filtering params
     tab = params.tab
-    if tab is None:
-        return tasks
     filters = tab.get('filters', None)
-    if not filters or not filters.get('items', None) or not filters.get('conjunction', None):
+    if not check_filters_enabled(params):
         return tasks
 
     conjunction = filters['conjunction']
@@ -437,8 +456,11 @@ def filter_tasks(tasks, params):
 def prepare_tasks(project, params):
     """ Main function to get tasks
     """
+    page, page_size = params.page, params.page_size
+    max_count = (page * page_size) if check_filters_enabled(params) or check_order_enabled(params) else None
+
     # load all tasks from db with some aggregations over completions
-    tasks = preload_tasks(project, resolve_uri=getattr(params, 'resolve_uri', False))
+    tasks = preload_tasks(project, resolve_uri=getattr(params, 'resolve_uri', False), max_count=max_count)
 
     # filter
     tasks = filter_tasks(tasks, params)
@@ -454,7 +476,6 @@ def prepare_tasks(project, params):
         total_predictions += task.get('total_predictions', 0)
 
     # pagination
-    page, page_size = params.page, params.page_size
     if page > 0 and page_size > 0:
         tasks = tasks[(page - 1) * page_size:page * page_size]
 
