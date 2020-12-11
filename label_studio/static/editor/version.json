@@ -1,6 +1,6 @@
 {
-  "message": "iAllow to delete non-perRegion TextArea items",
-  "commit": "8f89391a106a99498158c2bd727a306b29327fda",
-  "branch": "release/0.8.2",
-  "date": "2020-12-01T16:07:37Z"
+  "message": "Fix empty <View></View> config",
+  "commit": "1494896a1f5d3762bc4928bf570f7431cfb627ca",
+  "branch": "master",
+  "date": "2020-12-11T00:43:12Z"
 }
