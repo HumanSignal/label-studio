@@ -457,7 +457,7 @@ def prepare_tasks(project, params):
     """ Main function to get tasks
     """
     page, page_size = params.page, params.page_size
-    max_count = (page * page_size) if check_filters_enabled(params) or check_order_enabled(params) else None
+    max_count = None if check_filters_enabled(params) or check_order_enabled(params) else page * page_size
 
     # load all tasks from db with some aggregations over completions
     tasks = preload_tasks(project, resolve_uri=getattr(params, 'resolve_uri', False), max_count=max_count)
