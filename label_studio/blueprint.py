@@ -362,7 +362,8 @@ def setup_page():
         multi_session=input_args.command == 'start-multi-session',
         own_projects=own_projects,
         shared_projects=shared_projects,
-        template_mode=template_mode
+        template_mode=template_mode,
+        serialized_project=g.project.serialize()
     )
 
 

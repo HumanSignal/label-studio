@@ -14,13 +14,10 @@ import label_studio.data_manager.api  # !: we need to import it here to register
 def tasks_page():
     """ Tasks and completions page
     """
-    serialized_project = g.project.serialize()
-    serialized_project['multi_session_mode'] = current_app.label_studio.input_args.command != 'start-multi-session'
     return flask.render_template(
         'tasks.html',
         config=g.project.config,
-        project=g.project,
-        serialized_project=serialized_project
+        project=g.project
     )
 
 

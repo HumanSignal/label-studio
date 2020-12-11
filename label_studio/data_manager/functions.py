@@ -301,6 +301,10 @@ def filter_value_converter(x, data_type):
         return None
     if data_type == 'Datetime' and isinstance(x, str):
         return datetime.strptime(x, DATETIME_FORMAT)
+    if data_type == 'Datetime' and isinstance(x, dict) and 'min' in x and 'max' in x:
+        mini = datetime.strptime(x['min'], DATETIME_FORMAT)
+        maxi = datetime.strptime(x['max'], DATETIME_FORMAT)
+        return {'min': mini, 'max': maxi}
     return x
 
 
@@ -321,7 +325,6 @@ def operator(op, a, b, data_type):
     if b is None:
         return False
 
-    a = filter_value_converter(a, data_type)
     b = task_value_converter(b, data_type)
 
     if op == 'equal':
@@ -343,11 +346,9 @@ def operator(op, a, b, data_type):
         return b >= a
 
     if op == 'in':
-        a, c = a['min'], a['max']
-        return a <= b <= c
+        return a['min'] <= b <= a['max']
     if op == 'not_in':
-        a, c = a['min'], a['max']
-        return not (a <= b <= c)
+        return not (a['min'] <= b <= a['max'])
 
     raise DataManagerException('Incorrect operator name in filters: ' + str(op))
 
@@ -416,6 +417,7 @@ def filter_tasks(tasks, params):
         target = parts[1]  # 'tasks | annotations'
         field = parts[2]  # field name
         op, value, data_type = f['operator'], f['value'], f['type']
+        value = filter_value_converter(value, data_type)
 
         if target != 'tasks':
             raise DataManagerException('Filtering target ' + target + ' is not yet supported')
