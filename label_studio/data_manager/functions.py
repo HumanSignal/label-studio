@@ -49,7 +49,7 @@ def get_all_columns(project):
     # data types from config
     data_types.update(project.data_types.items())
 
-    # remove $ndefined$ if there is one type at least in labeling config, because it will be resolved automatically
+    # remove $undefined$ if there is one type at least in labeling config, because it will be resolved automatically
     if len(project.data_types) > 0:
         data_types.pop(settings.UPLOAD_DATA_UNDEFINED_NAME, None)
 
@@ -457,10 +457,13 @@ def prepare_tasks(project, params):
     """ Main function to get tasks
     """
     page, page_size = params.page, params.page_size
-    max_count = None if check_filters_enabled(params) or check_order_enabled(params) else page * page_size
+
+    # use max count to speed up evaluation of tasks
+    max_count = None if check_filters_enabled(params) or check_order_enabled(params) or page <= 0 or page_size <= 0 \
+        else page * page_size
 
     # load all tasks from db with some aggregations over completions
-    tasks = preload_tasks(project, resolve_uri=getattr(params, 'resolve_uri', False), max_count=max_count)
+    tasks = preload_tasks(project, resolve_uri=False, max_count=max_count)
 
     # filter
     tasks = filter_tasks(tasks, params)
