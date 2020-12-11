@@ -37,16 +37,13 @@
       </p>
       <p>
         <button class="ui grey button" @click="reset">Cancel</button>
-        <button class="ui primary button" @click="apply">Import</button>
+        <button class="ui primary button" @click="apply" :disabled="errors.length > 0">Import</button>
       </p>
-      <ul class="stats" v-if="stats">
-        <li><span class="num">{{stats.total_tasks}}</span> items loaded</li>
-        <li><span class="num">{{stats.total_completions}}</span> completions</li>
-        <li><span class="num">{{stats.total_predictions}}</span> predictions</li>
-      </ul>
 
-      <div class="spinner" v-if="loading">
-        <img src="static/images/opossum_looking.png" width="60px">
+      <div class="loading splash" v-if="loading">
+        <div class="spinner">
+          <img src="static/images/opossum_looking.png" width="60px">
+        </div>
       </div>
 
       <div class="error" v-for="error in errors" v-if="errors.length">
@@ -63,6 +60,11 @@
         </div>
       </div>
 
+      <ul class="stats" v-if="stats && !errors.length">
+        <li><span class="num">{{stats.total_tasks}}</span> items loaded</li>
+        <li><span class="num">{{stats.total_completions}}</span> completions</li>
+        <li><span class="num">{{stats.total_predictions}}</span> predictions</li>
+      </ul>
       <table class="preview" v-if="!errors.length" :class="{ fade: stats && preview.length < stats.total_tasks}">
         <thead v-if="Object.keys(preview[0]).length > 1">
           <tr>
@@ -175,10 +177,11 @@
 
         start: function() {
           this.loading = true;
+          this.errors = [];
         },
 
         loadPreview: function(params) {
-          this.errors = [];
+          this.start();
           $.ajax(params)
           .fail(res => this.errorFromResult(res))
           .done(res => {
@@ -205,6 +208,7 @@
         },
 
         update_formats: function() {
+          this.start();
           const formats = [];
           this.$refs.formats.querySelectorAll("input").forEach(i => i.checked && formats.push(i.name))
           this.loadPreview({
@@ -218,7 +222,7 @@
         },
 
         toggle_type: function() {
-          this.loading = true;
+          this.start();
           const selected = this.$refs.files_type.checked;
           this.loadPreview({
             url: "api/project/import/" + this.id,
@@ -232,6 +236,7 @@
 
         url: function(e) {
           e.preventDefault();
+          this.start();
           const url = this.$refs.url.value;
           $.ajax({
             url: "api/project/import/prepare",
@@ -272,13 +277,14 @@
         },
 
         apply() {
-          this.loading = true;
+          this.start();
           $.ajax({
             url: "api/project/import/" + this.id + "/apply",
             method: "POST",
             processData: false,
             contentType: false
           })
+          .fail(res => this.errorFromResult(res))
           .done(() => {
             window.location.href = "/tasks";
             // this.loading = false;
