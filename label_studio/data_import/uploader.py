@@ -175,7 +175,7 @@ def aggregate_files(request_files, temp_dir, upload_dir):
     return files
 
 
-def aggregate_tasks(files, project, formats=None, files_as_tasks_list=None):
+def aggregate_tasks(files, project, formats=None, files_as_tasks_list=None, trim_size=None):
     tasks = []
     fileformats = []
     data_keys = set()
@@ -192,5 +192,9 @@ def aggregate_tasks(files, project, formats=None, files_as_tasks_list=None):
                 ','.join(new_data_keys), filename, ','.join(data_keys)))
         tasks += new_tasks
         fileformats.append(fileformat)
+
+        if trim_size is not None:
+            if len(tasks) > trim_size:
+                break
 
     return tasks, dict(Counter(fileformats)), data_keys
