@@ -19,6 +19,7 @@ from collections import Counter
 
 from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.misc import Settings
+from label_studio.utils.io import get_temp_dir
 from label_studio.utils.functions import get_external_hostname
 
 
@@ -132,66 +133,40 @@ def create_and_release_temp_dir(func):
     return wrapper
 
 
-def extract_archive(archive, filename, temp_dir):
+def extract_archive(archive, output_dir):
     """ Extract all files from archive and returns extracted file names
 
     :param archive: ZipFile or similar interface instance
-    :param filename: zip filename
-    :param temp_dir: temporary dir
+    :param output: Directory where to extract the content
     :return: extracted file names
     """
-    final_dir = join(temp_dir, filename)
-    names = {join(final_dir, name): 'archive' for name in archive.namelist()}
+    names = archive.namelist()
     logger.info('ZIP archive {filename} found with {names} files inside, extracting to {final_dir}'
-                .format(filename=filename, names=len(names), final_dir=final_dir))
-
-    archive.extractall(final_dir)
-    logger.info('ZIP archive {filename} extracted successfully')
+                .format(filename=archive.filename, names=len(names), final_dir=output_dir))
+    archive.extractall(output_dir)
     return names
 
 
-def check_max_task_number(tasks):
-    # max tasks
-    if len(tasks) > settings.TASKS_MAX_NUMBER:
-        raise ValidationError('Maximum task number is {TASKS_MAX_NUMBER}, '
-                              'current task number is {num_tasks}'
-                              .format(TASKS_MAX_NUMBER=settings.TASKS_MAX_NUMBER, num_tasks=len(tasks)))
-
-
-def check_file_sizes_and_number(files):
-    total = sum([file.size for _, file in files.items()])
-
-    if total >= settings.TASKS_MAX_FILE_SIZE:
-        raise ValidationError('Maximum total size of all files is {TASKS_MAX_FILE_SIZE} bytes, '
-                              'current size is {total} bytes'
-                              .format(TASKS_MAX_FILE_SIZE=settings.TASKS_MAX_FILE_SIZE, total=total))
-
-
-def aggregate_files(request_files, temp_dir):
+def aggregate_files(request_files, temp_dir, upload_dir):
     files = {}
 
     # extract all files from archives to temp dir
     for filename, file in request_files.items():
 
         # read urlopen till end and save this file
-        if hasattr(file, 'urlopen') and (filename.endswith('.zip') or filename.endswith('.rar')):
+        if hasattr(file, 'urlopen') and filename.endswith(('.zip', '.rar')):
             path = os.path.join(temp_dir, 'current_file')
             with open(path, 'wb') as current_file:
                 shutil.copyfileobj(file, current_file)
                 current_file.close()
                 file = path  # rewrite file as path
 
-        # zip
-        if filename.endswith('.zip'):
-            with zipfile.ZipFile(file, 'r') as archive:
-                names = extract_archive(archive, filename, temp_dir)
-                files.update(names)
-
-        # rar
-        elif filename.endswith('.rar'):
-            with rarfile.RarFile(file, 'r') as archive:
-                names = extract_archive(archive, filename, temp_dir)
-                files.update(names)
+        # zip, rar
+        if filename.endswith(('.zip', '.rar')):
+            archive_class = zipfile.ZipFile if filename.endswith('.zip') else rarfile.RarFile
+            with archive_class(file, 'r') as archive:
+                names = extract_archive(archive, upload_dir)
+                files.update({name: open(os.path.join(upload_dir, name), mode='rb') for name in names})
 
         # other
         else:
@@ -206,41 +181,16 @@ def aggregate_tasks(files, project, formats=None, files_as_tasks_list=None):
     data_keys = set()
     # scan all files
     for filename, file in files.items():
-        # extracted file from archive
-        if file == 'archive':
-            if os.path.isdir(filename):
-                # TODO: recursive scan
-                logger.error('Found directory {} in archive: recursive scan is not implemented.'.format(filename))
-                continue
-            with open(filename) as f:
-                new_tasks, fileformat, new_data_keys = tasks_from_file(filename, f, project, files_as_tasks_list)
-
-            if formats and fileformat not in formats:
-                # TODO: not so effective to read all file content before checking format
-                continue
-
-            if not data_keys:
-                data_keys = new_data_keys
-            if data_keys != new_data_keys:
-                raise ValidationError('New data keys {0} found when scanning file {1}: expected {2}'.format(
-                    ','.join(new_data_keys), filename, ','.join(data_keys)))
-
-            tasks += new_tasks
-            fileformats.append(fileformat)
-        # file from request
-        else:
-            new_tasks, fileformat, new_data_keys = tasks_from_file(filename, file, project, files_as_tasks_list)
-            if formats and fileformat not in formats:
-                # TODO: not so effective to read all file content before checking format
-                continue
-            if not data_keys:
-                data_keys = new_data_keys
-            if data_keys != new_data_keys:
-                raise ValidationError('New data keys {0} found when scanning file {1}: expected {2}'.format(
-                    ','.join(new_data_keys), filename, ','.join(data_keys)))
-            tasks += new_tasks
-            fileformats.append(fileformat)
-
-        check_max_task_number(tasks)
+        new_tasks, fileformat, new_data_keys = tasks_from_file(filename, file, project, files_as_tasks_list)
+        if formats and fileformat not in formats:
+            # TODO: not so effective to read all file content before checking format
+            continue
+        if not data_keys:
+            data_keys = new_data_keys
+        if data_keys != new_data_keys:
+            raise ValidationError('New data keys {0} found when scanning file {1}: expected {2}'.format(
+                ','.join(new_data_keys), filename, ','.join(data_keys)))
+        tasks += new_tasks
+        fileformats.append(fileformat)
 
     return tasks, dict(Counter(fileformats)), data_keys

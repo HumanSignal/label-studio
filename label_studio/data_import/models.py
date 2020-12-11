@@ -4,7 +4,7 @@ from label_studio.utils.io import get_temp_dir, read_yaml
 from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.validation import TaskValidator
 from label_studio.tasks import Tasks
-from .uploader import aggregate_files, aggregate_tasks, check_max_task_number
+from .uploader import aggregate_files, aggregate_tasks
 
 
 logger = logging.getLogger(__name__)
@@ -82,9 +82,14 @@ class ImportState(object):
             for filename in self.filelist:
                 request_files[filename] = open(self.project.upload_dir + '/' + filename, mode='rb')
             with get_temp_dir() as tmpdir:
-                files = aggregate_files(request_files, tmpdir)
+                files = aggregate_files(request_files, tmpdir, self.project.upload_dir)
                 self.tasks, found_formats, self.data_keys = aggregate_tasks(
                     files, self.project, self.selected_formats, self.files_as_tasks_list['selected'])
+                for file in files.values():
+                    try:
+                        file.close()
+                    except:
+                        pass
 
             if not self.found_formats:
                 # It's a first time we get all formats
@@ -96,7 +101,6 @@ class ImportState(object):
                     self.selected_formats.append(format)
 
             self.selected_objects = [self._get_object_from_format(f) for f in self.selected_formats]
-            check_max_task_number(self.tasks)
 
         # validate tasks
         self.tasks = self._validator.to_internal_value(self.tasks)

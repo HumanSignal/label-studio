@@ -33,7 +33,7 @@
       </div>
       <p class="ui checkbox" v-if="files_as_tasks_list">
         <input type="checkbox" id="files_type" @change="toggle_type" ref="files_type" />
-        <label for="files_type">Treat this file not as plain file with data, but as tasks list</label>
+        <label for="files_type">Interpret each line in file as a single task</label>
       </p>
       <p>
         <button class="ui grey button" @click="reset">Cancel</button>
