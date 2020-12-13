@@ -267,6 +267,7 @@ def samples_time_series():
 
 
 @blueprint.route('/')
+@blueprint.route('/label-old')
 @requires_auth
 @exception_handler_page
 def labeling_page():
@@ -276,9 +277,10 @@ def labeling_page():
         return redirect(url_for('label_studio.welcome_page'))
 
     # task data: load task or task with completions if it exists
-    task_data = None
     task_id = request.args.get('task_id', None)
+    task_data = None
 
+    # open separated LSF for task
     if task_id is not None:
         task_id = int(task_id)
         # Task explore mode
@@ -287,6 +289,10 @@ def labeling_page():
 
         if g.project.ml_backends_connected:
             task_data = g.project.make_predictions(task_data)
+
+    # data manager if no task id to open
+    elif 'label-old' not in request.url:
+        return redirect(url_for('data_manager_blueprint.tasks_page'))
 
     return flask.render_template(
         'labeling.html',

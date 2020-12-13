@@ -1017,6 +1017,7 @@ class Project(object):
             'source_syncing': self.source_storage.is_syncing,
             'target_syncing': self.target_storage.is_syncing,
             'data_types': self.data_types,
-            'label_config_line': self.label_config_line
+            'label_config_line': self.label_config_line,
+            'config_has_control_tags': len(self.parsed_label_config) > 0
         }
         return output
