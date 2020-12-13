@@ -107,6 +107,10 @@ def next_task(project, params, items):
     return task
 
 
-register_action(delete_tasks, 'Delete tasks', 100, permissions='project.can_delete_tasks')
-register_action(delete_tasks_completions, 'Delete completions', 101, permissions='project.can_manage_completions')
+register_action(delete_tasks, 'Delete tasks', 100, permissions='project.can_delete_tasks',
+                dialog={'text': 'You are going to delete selected tasks. '
+                                'Please, confirm your action.', 'type': 'confirm'})
+register_action(delete_tasks_completions, 'Delete completions', 101, permissions='project.can_manage_completions',
+                dialog={'text': 'You are going to delete all completions from selected tasks. '
+                                'Please, confirm your action.', 'type': 'confirm'})
 register_action(next_task, 'Generate next task', 0, hidden=True)
