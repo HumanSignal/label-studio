@@ -130,7 +130,7 @@
       </div>
 
       <div class="ui form tab-files" v-if="source === 'files'" ref="files">
-        <import-files @start="start" @finish="finish" @error="error"></import-files>
+        <import-files @start="start" @finish="finish" @error="errorFromResult"></import-files>
       </div>
 
       <div class="ui form tab-url" v-if="source === 'url'" ref="url">
