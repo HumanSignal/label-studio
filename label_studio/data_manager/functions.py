@@ -399,9 +399,7 @@ def resolve_task_field(task, field):
 
 def check_order_enabled(params):
     ordering = params.tab.get('ordering', [])  # ordering = ['id', 'completed_at', ...]
-    if ordering is None:
-        return False
-    return True
+    return True if ordering else False
 
 
 def order_tasks(params, tasks):
