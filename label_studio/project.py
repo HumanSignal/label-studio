@@ -208,8 +208,12 @@ class Project(object):
         return self.project_obj.data_types_json
 
     @property
+    def no_control_tags(self):
+        return not self.parsed_label_config
+
+    @property
     def label_config_is_empty(self):
-        return not self.parsed_label_config and not self.data_types
+        return self.no_control_tags and not self.data_types
 
     @property
     def one_object_in_label_config(self):
@@ -636,8 +640,8 @@ class Project(object):
         self.update_derived_input_schema()
         self.update_derived_output_schema()
 
-        if self.empty_derived_input_schema:
-            # after removing all input tasks, reset config for future uploads
+        if self.empty_derived_input_schema and self.no_control_tags:
+            # after removing all input tasks, reset config consisted of object tags only for future uploads
             self.reset_label_config()
 
     def delete_task_completion(self, task_id, completion_id):
