@@ -40,7 +40,7 @@ class ImportState(object):
         self.selected_objects = None
         self.columns_to_draw = []
         self.data_keys = []
-        self.files_as_tasks_list = {'type': None, 'selected': False}
+        self.files_as_tasks_list = {'type': None, 'selected': True}
         self.show_files_as_tasks_list = False
         self.preview_size = 10
 
@@ -82,7 +82,7 @@ class ImportState(object):
         return False
 
     def _generate_label_config(self):
-        # TODO: this is a temp workaround to guess initial config
+        # TODO: this is a temp workaround to guess initial config - we should make it prettier
         data_keys = list(self.data_keys)
         if len(data_keys) > 1:
             # better to use Table here

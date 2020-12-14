@@ -36,7 +36,7 @@
         </ul>
       </div>
       <div class="ui checkbox" v-if="show_files_as_tasks_list">
-        <input type="checkbox" id="files_type" @change="toggle_type" ref="files_type" />
+        <input type="checkbox" id="files_type" @change="toggle_type" ref="files_type" checked/>
         <label for="files_type">
           Interpret each line in files as a single item
           <p class="rtfm"><a href="https://labelstud.io/guide/tasks.html#CSV-TSV" target="_blank">Read Documentation</a> for details</a></p>
@@ -164,7 +164,7 @@
           id: null,
           errors: [],
           loading: false,
-          files_as_tasks_list: {selected: false, type: null},
+          files_as_tasks_list: {selected: true, type: null},
           show_files_as_tasks_list: false,
           formats: null,
           preview: null,
