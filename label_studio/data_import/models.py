@@ -3,6 +3,7 @@ import logging
 from label_studio.utils.io import get_temp_dir, read_yaml
 from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.validation import TaskValidator
+from label_studio.utils.misc import Settings
 from label_studio.tasks import Tasks
 from .uploader import aggregate_files, aggregate_tasks
 
@@ -92,7 +93,7 @@ class ImportState(object):
             if len(objects) > 1:
                 raise ValidationError('More than one data type is presented')
             object_tag = list(objects)[0]
-            data_key = object_tag.lower() if data_key == '$undefined$' else data_key
+            data_key = object_tag.lower() if data_key == Settings.UPLOAD_DATA_UNDEFINED_NAME else data_key
             return '<View><{0} name="{1}" value="${2}"/></View>'.format(object_tag, object_tag.lower(), data_key)
 
     def _read_tasks(self, num_tasks=None):
@@ -110,9 +111,21 @@ class ImportState(object):
                     pass
         return tasks, found_formats, data_keys
 
+    def _raise_if_inconsistent_with_current_project(self):
+        project_data_keys = self.project.data_keys
+        if project_data_keys:
+            import_data_keys = set(filter(lambda k: k != Settings.UPLOAD_DATA_UNDEFINED_NAME, self.data_keys))
+            if import_data_keys and import_data_keys != project_data_keys:
+                raise ValidationError(
+                    "Import data inconsistent with current project:\n"
+                    "You're trying to load data keys: {}\nbut project tasks already have {}".format(
+                        ','.join(import_data_keys), ','.join(project_data_keys)))
+
     def _update(self):
         if self.filelist:
             self.tasks, found_formats, self.data_keys = self._read_tasks()
+
+            self._raise_if_inconsistent_with_current_project()
 
             if not self.found_formats:
                 # It's a first time we get all formats

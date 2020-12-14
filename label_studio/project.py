@@ -239,6 +239,10 @@ class Project(object):
         return self.project_obj.data_types
 
     @property
+    def data_keys(self):
+        return list([key for key in self.derived_input_schema if key != Settings.UPLOAD_DATA_UNDEFINED_NAME])
+
+    @property
     def label_config(self):
         return self.project_obj.label_config
 
