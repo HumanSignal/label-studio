@@ -117,6 +117,7 @@ Vue.component('import-files', {
 
     drop(e) {
       e.preventDefault();
+      this.leave(e);
       this.$emit('start');
       getFiles(e.dataTransfer.items).then(files => this.sendFiles(files));
     },
