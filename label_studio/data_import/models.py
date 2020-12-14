@@ -24,6 +24,7 @@ def read_object_formats():
 class ImportState(object):
 
     object_to_formats, format_to_object = read_object_formats()
+    TASKS_LIST_FORMATS = {'txt', 'csv', 'tsv', 'json'}
 
     def __init__(self, filelist=(), tasks=(), project=None, **kwargs):
         super(ImportState, self).__init__(**kwargs)
@@ -39,6 +40,7 @@ class ImportState(object):
         self.columns_to_draw = []
         self.data_keys = []
         self.files_as_tasks_list = {'type': None, 'selected': False}
+        self.show_files_as_tasks_list = False
         self.preview_size = 10
 
         self._validator = TaskValidator(self.project)
@@ -57,11 +59,26 @@ class ImportState(object):
             'found_formats': self.found_formats,
             'selected_formats': self.selected_formats,
             'selected_objects': self.selected_objects,
-            'files_as_tasks_list': self.files_as_tasks_list
+            'files_as_tasks_list': self.files_as_tasks_list,
+            'show_files_as_tasks_list': self.show_files_as_tasks_list
         }
 
-    def _get_object_from_format(self, f):
-        return self.format_to_object.get(f.lower().lstrip('.'))
+    def _get_selected_objects(self):
+        objects = []
+        for format in self.selected_formats:
+            normalized_format = format.lower().lstrip('.')
+            if self.files_as_tasks_list['selected'] and normalized_format in self.TASKS_LIST_FORMATS:
+                objects.append('Tasks list')
+            else:
+                objects.append(self.format_to_object.get(normalized_format))
+        return objects
+
+    def _show_files_as_tasks_list(self):
+        for format in self.selected_formats:
+            norm_format = format.lower().lstrip('.')
+            if norm_format in self.TASKS_LIST_FORMATS:
+                return True
+        return False
 
     def _generate_label_config(self):
         # TODO: this is a temp workaround to guess initial config
@@ -71,7 +88,7 @@ class ImportState(object):
             return '<View></View>'
         if len(data_keys) == 1:
             data_key = data_keys[0]
-            objects = set([self._get_object_from_format(f) for f in self.selected_formats])
+            objects = set(self.selected_objects)
             if len(objects) > 1:
                 raise ValidationError('More than one data type is presented')
             object_tag = list(objects)[0]
@@ -106,7 +123,8 @@ class ImportState(object):
                 for format in sorted(found_formats.keys()):
                     self.selected_formats.append(format)
 
-            self.selected_objects = [self._get_object_from_format(f) for f in self.selected_formats]
+            self.selected_objects = self._get_selected_objects()
+            self.show_files_as_tasks_list = self._show_files_as_tasks_list()
 
         # validate tasks
         self.tasks = self._validator.to_internal_value(self.tasks)

@@ -35,10 +35,10 @@
           </li>
         </ul>
       </div>
-      <div class="ui checkbox" v-if="files_as_tasks_list">
+      <div class="ui checkbox" v-if="show_files_as_tasks_list">
         <input type="checkbox" id="files_type" @change="toggle_type" ref="files_type" />
         <label for="files_type">
-          Treat csv/tsv files as a single task
+          Interpret each line in files as a single item
           <p class="rtfm"><a href="https://labelstud.io/guide/tasks.html#CSV-TSV" target="_blank">Read Documentation</a> for details</a></p>
         </label>
       </div>
@@ -165,6 +165,7 @@
           errors: [],
           loading: false,
           files_as_tasks_list: {selected: false, type: null},
+          show_files_as_tasks_list: false,
           formats: null,
           preview: null,
           vueLoaded: false, 
@@ -177,9 +178,14 @@
 
       methods: {
         get_short_text: function(text) {
-          const max_len = 40;
-          text = String(text);
-          return (text.length <= max_len ? text: ('...' + text.slice(text.length-max_len, text.length)));
+          const max_len = 20;
+          if (typeof text === 'object') {
+            text = JSON.stringify(text);
+          } else {
+            text = String(text);
+          }
+          return (text.length <= 2 * max_len ? text: (
+            text.slice(0, max_len) + '...' + text.slice(text.length-max_len, text.length)));
         },
 
         start: function() {
@@ -194,6 +200,7 @@
           .done(res => {
             this.preview = res.task_preview.slice(0, 10);
             this.files_as_tasks_list = res.files_as_tasks_list;
+            this.show_files_as_tasks_list = res.show_files_as_tasks_list;
             if (!this.formats) {
               const object = {};
               res.selected_objects.forEach((f, i) => {
