@@ -69,7 +69,7 @@ class ImportState(object):
         for format in self.selected_formats:
             normalized_format = format.lower().lstrip('.')
             if self.files_as_tasks_list['selected'] and normalized_format in self.TASKS_LIST_FORMATS:
-                objects.append('Tasks list')
+                objects.append(None)
             else:
                 objects.append(self.format_to_object.get(normalized_format))
         return objects
@@ -93,6 +93,8 @@ class ImportState(object):
             if len(objects) > 1:
                 raise ValidationError('More than one data type is presented')
             object_tag = list(objects)[0]
+            if not object_tag:
+                return '<View></View>'
             data_key = object_tag.lower() if data_key == Settings.UPLOAD_DATA_UNDEFINED_NAME else data_key
             return '<View><{0} name="{1}" value="${2}"/></View>'.format(object_tag, object_tag.lower(), data_key)
 
@@ -114,7 +116,7 @@ class ImportState(object):
     def _raise_if_inconsistent_with_current_project(self):
         project_data_keys = self.project.data_keys
         if project_data_keys:
-            import_data_keys = set(filter(lambda k: k != Settings.UPLOAD_DATA_UNDEFINED_NAME, self.data_keys))
+            import_data_keys = list(filter(lambda k: k != Settings.UPLOAD_DATA_UNDEFINED_NAME, self.data_keys))
             if import_data_keys and import_data_keys != project_data_keys:
                 raise ValidationError(
                     "Import data inconsistent with current project:\n"
