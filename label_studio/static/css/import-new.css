@@ -16,7 +16,6 @@
 /* Errors */
 
 #import-tasks .error {
-  /* white-space: pre-wrap; */
   word-break: break-word;
   max-height: 50vh;
   overflow: auto;
@@ -42,6 +41,7 @@
 
 #import-tasks .error p {
   margin: 0;
+  white-space: pre-wrap;
 }
 
 #import-tasks .error details p {
