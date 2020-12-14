@@ -95,7 +95,7 @@ class ImportState(object):
 
     def _update(self):
         if self.filelist:
-            self.tasks, found_formats, self.data_keys = self._read_tasks(self.preview_size)
+            self.tasks, found_formats, self.data_keys = self._read_tasks()
 
             if not self.found_formats:
                 # It's a first time we get all formats
