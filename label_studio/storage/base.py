@@ -416,7 +416,7 @@ class CloudStorage(BaseStorage):
     def _get_new_id(self, key, new_id):
         idx = self._extract_task_id(key)
         if idx is not None:
-            return idx
+            return idx, new_id
         idx = new_id
         new_id += 1
         return idx, new_id
