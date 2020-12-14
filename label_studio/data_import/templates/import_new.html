@@ -72,16 +72,19 @@
         <li><span class="num">{{stats.total_completions}}</span> completions</li>
         <li><span class="num">{{stats.total_predictions}}</span> predictions</li>
       </ul>
-      <table class="preview" v-if="!errors.length" :class="{ fade: stats && preview.length < stats.total_tasks}">
-        <thead v-if="Object.keys(preview[0]).length > 1">
-          <tr>
-            <th v-for="_, title in preview[0]">{{title}}</th>
+      <div class="preview" v-if="!errors.length" :class="{ fade: stats && preview.length < stats.total_tasks}">
+        <h4>Data preview</h4>
+        <table>
+          <thead v-if="Object.keys(preview[0]).length > 1">
+            <tr>
+              <th v-for="_, title in preview[0]">{{title}}</th>
+            </tr>
+          </thead>
+          <tr v-for="row in preview">
+            <td v-for="value in row">{{get_short_text(value)}}</td>
           </tr>
-        </thead>
-        <tr v-for="row in preview">
-          <td v-for="value in row">{{get_short_text(value)}}</td>
-        </tr>
-      </table>
+        </table>
+      </div>
     </div>
 
     <div v-if="loading && !preview">

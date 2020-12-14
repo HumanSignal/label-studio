@@ -299,20 +299,31 @@
   font-weight: 800;
 }
 
-table.preview {
+div.preview {
+  overflow-x: auto;
+}
+
+div.preview table {
   text-align: left;
   width: 100%;
   position: relative;
 }
 
-table.preview td,
-table.preview th {
+div.preview table td,
+div.preview table th {
   border: none;
   padding: 0.4em 1.6em 0.4em 0;
 }
 
+div.preview table th {
+  border-bottom: 1px solid #ddd;
+  font-weight: 600;
+  color: #8b8b8c;
+  -webkit-font-smoothing: antialiased;
+}
+
 /* fade out */
-table.preview.fade::after {
+div.preview.fade table::after {
   content: "";
   background: linear-gradient(0deg, white, transparent);
   width: 100%;
