@@ -20,7 +20,7 @@ from flask import request, jsonify, make_response, Response as HttpResponse, g
 from flask_api import status
 
 from label_studio.utils.auth import requires_auth
-from label_studio.utils.misc import exception_handler
+from label_studio.utils.misc import exception_handler, convert_string_to_hash
 from label_studio.data_import.views import blueprint
 from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.functions import generate_sample_task, get_sample_task
@@ -120,7 +120,7 @@ def _upload_files(request_files, project):
                 data = file.read()
 
             # assign unique filename
-            filename = hashlib.md5(data).hexdigest() + '-' + os.path.basename(filename)
+            filename = convert_string_to_hash(data, trim=6) + '-' + os.path.basename(filename)
 
             # save file to path on disk
             with open(os.path.join(project.upload_dir, filename), mode='wb') as f:

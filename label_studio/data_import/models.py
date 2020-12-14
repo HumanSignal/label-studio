@@ -4,7 +4,7 @@ from label_studio.utils.io import get_temp_dir, read_yaml
 from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.validation import TaskValidator
 from label_studio.tasks import Tasks
-from .uploader import aggregate_files, aggregate_tasks, check_max_task_number
+from .uploader import aggregate_files, aggregate_tasks
 
 
 logger = logging.getLogger(__name__)
@@ -39,6 +39,8 @@ class ImportState(object):
         self.columns_to_draw = []
         self.data_keys = []
         self.files_as_tasks_list = {'type': None, 'selected': False}
+        self.preview_size = 10
+
         self._validator = TaskValidator(self.project)
 
         self._update()
@@ -76,15 +78,24 @@ class ImportState(object):
             data_key = object_tag.lower() if data_key == '$undefined$' else data_key
             return '<View><{0} name="{1}" value="${2}"/></View>'.format(object_tag, object_tag.lower(), data_key)
 
+    def _read_tasks(self, num_tasks=None):
+        request_files = {}
+        for filename in self.filelist:
+            request_files[filename] = open(self.project.upload_dir + '/' + filename, mode='rb')
+        with get_temp_dir() as tmpdir:
+            files = aggregate_files(request_files, tmpdir, self.project.upload_dir)
+            tasks, found_formats, data_keys = aggregate_tasks(
+                files, self.project, self.selected_formats, self.files_as_tasks_list['selected'], num_tasks)
+            for file in files.values():
+                try:
+                    file.close()
+                except:
+                    pass
+        return tasks, found_formats, data_keys
+
     def _update(self):
         if self.filelist:
-            request_files = {}
-            for filename in self.filelist:
-                request_files[filename] = open(self.project.upload_dir + '/' + filename, mode='rb')
-            with get_temp_dir() as tmpdir:
-                files = aggregate_files(request_files, tmpdir)
-                self.tasks, found_formats, self.data_keys = aggregate_tasks(
-                    files, self.project, self.selected_formats, self.files_as_tasks_list['selected'])
+            self.tasks, found_formats, self.data_keys = self._read_tasks(self.preview_size)
 
             if not self.found_formats:
                 # It's a first time we get all formats
@@ -96,7 +107,6 @@ class ImportState(object):
                     self.selected_formats.append(format)
 
             self.selected_objects = [self._get_object_from_format(f) for f in self.selected_formats]
-            check_max_task_number(self.tasks)
 
         # validate tasks
         self.tasks = self._validator.to_internal_value(self.tasks)
@@ -107,7 +117,10 @@ class ImportState(object):
         if not self.project.no_tasks():
             max_id_in_old_tasks = self.project.source_storage.max_id()
 
-        new_tasks = Tasks().from_list_of_dicts(self.tasks, max_id_in_old_tasks + 1)
+        # now read all tasks
+        all_tasks, _, _ = self._read_tasks()
+
+        new_tasks = Tasks().from_list_of_dicts(all_tasks, max_id_in_old_tasks + 1)
         try:
             self.project.source_storage.set_many(new_tasks.keys(), new_tasks.values())
         except NotImplementedError:
@@ -130,7 +143,7 @@ class ImportState(object):
 
     @property
     def tasks_preview(self):
-        return [task['data'] for task in self.tasks]
+        return [task['data'] for task in self.tasks[:self.preview_size]]
 
     @property
     def total_tasks(self):
