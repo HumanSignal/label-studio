@@ -239,6 +239,8 @@ def get_completed_at(task):
 def get_cancelled_completions(task):
     """ Get was_cancelled (skipped) status for task: returns cancelled completion number for task
     """
+    if 'completions' not in task:
+        return 0
     try:
         # note: skipped will be deprecated
         return sum([completion.get('skipped', False) or completion.get('was_cancelled', False)
@@ -256,9 +258,6 @@ def preload_task(project, task_id, resolve_uri=False):
     # no completions at task, get task without completions
     if task is None:
         task = project.source_storage.get(task_id)
-        task['total_completions'] = 0
-        task['total_predictions'] = 0
-        task['cancelled_completions'] = 0
 
     # with completions
     else:
@@ -268,14 +267,17 @@ def preload_task(project, task_id, resolve_uri=False):
             completed_at = timestamp_to_local_datetime(completed_at).strftime(DATETIME_FORMAT)
         task['completed_at'] = completed_at
 
-        # prediction score
-        if 'predictions' in task and len(task['predictions']) > 0:
-            task['prediction_score'] = sum((p['score'] for p in task['predictions']), 0) / len(task['predictions'])
+    # prediction score
+    predictions = task.get('predictions', [])
+    if len(predictions) > 0:
+        scores = [p['score'] for p in predictions if 'score' in p]
+        if scores:
+            task['prediction_scores'] = sum(scores) / len(scores)
 
-        # aggregations
-        task['total_completions'] = len(task['completions'])
-        task['total_predictions'] = len(task['predictions'])
-        task['cancelled_completions'] = get_cancelled_completions(task)
+    # aggregations
+    task['total_completions'] = len(task.get('completions', []))
+    task['total_predictions'] = len(task.get('predictions', []))
+    task['cancelled_completions'] = get_cancelled_completions(task)
 
     # don't resolve data (s3/gcs is slow) if it's not necessary (it's very slow)
     if resolve_uri:
