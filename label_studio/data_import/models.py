@@ -136,7 +136,9 @@ class ImportState(object):
             max_id_in_old_tasks = self.project.source_storage.max_id()
 
         # now read all tasks
-        all_tasks, _, _ = self._read_tasks()
+        # currently self._update() reads all tasks - uncomment this on change
+        # all_tasks, _, _ = self._read_tasks()
+        all_tasks = self.tasks
 
         new_tasks = Tasks().from_list_of_dicts(all_tasks, max_id_in_old_tasks + 1)
         try:
