@@ -22,19 +22,26 @@
     <div v-if="preview">
       <h1>Files loaded</h1>
       <p>You can import them to the task manager.</p>
-      <div v-if="formats.length > 1" ref="formats" class="formats" :class="{ last: selected_formats.length < 2 }">
-        <div>You have files of different formats, that might be a problem; choose the correct ones</div>
+      <div v-if="formats && Object.keys(formats).length > 1" ref="formats" class="formats">
+        <div>Found different types of files loaded. Chose which you wish to import.</div>
         <ul>
-          <li class="ui checkbox" v-for="format in formats">
-            <input type="checkbox" :name="format" :id="format" @change="update_formats" checked />
-            <label :for="format">{{format}}</label>
+          <li class="ui radio checkbox" v-for="object in formats">
+            <input type="radio" name="format" :value="object.type" :id="object.type" @change="update_formats" />
+            <label :for="object.type">
+              <span class="type">{{object.type}}</span>
+              <span class="count">{{object.count}}</span>
+              <span class="ext">{{object.display}}</span>
+            </label>
           </li>
         </ul>
       </div>
-      <p class="ui checkbox" v-if="files_as_tasks_list">
+      <div class="ui checkbox" v-if="files_as_tasks_list">
         <input type="checkbox" id="files_type" @change="toggle_type" ref="files_type" />
-        <label for="files_type">Interpret each line in file as a single task</label>
-      </p>
+        <label for="files_type">
+          Treat csv/tsv files as a single task
+          <p class="rtfm"><a href="https://labelstud.io/guide/tasks.html#CSV-TSV" target="_blank">Read Documentation</a> for details</a></p>
+        </label>
+      </div>
       <p>
         <button class="ui grey button" @click="reset">Cancel</button>
         <button class="ui primary button" @click="apply" :disabled="errors.length > 0">Import</button>
@@ -123,15 +130,15 @@
       </div>
 
       <div class="ui form tab-files" v-if="source === 'files'" ref="files">
-        <import-files @start="start" @finish="finish" @error="error"></import-files>
+        <import-files @start="start" @finish="finish" @error="errorFromResult"></import-files>
       </div>
 
       <div class="ui form tab-url" v-if="source === 'url'" ref="url">
         <form class="ui fluid action input" @submit="url">
           <input type="text" ref="url" placeholder="Dataset URL">
           <button class="ui primary button">Load</button>
-        </div>
-        <p class="example">
+        </form>
+        <p class="rtfm">
           To learn about supported formats check out the
           <a href="https://labelstud.io/guide/tasks.html" target="_blank">Documentation</a>
         </p>
@@ -158,7 +165,7 @@
           errors: [],
           loading: false,
           files_as_tasks_list: {selected: false, type: null},
-          formats: [],
+          formats: null,
           preview: null,
           vueLoaded: false, 
           selectedFormats: [],
@@ -187,8 +194,18 @@
           .done(res => {
             this.preview = res.task_preview.slice(0, 10);
             this.files_as_tasks_list = res.files_as_tasks_list;
-            this.formats = Object.keys(res.found_formats);
-            this.selected_formats = Object.keys(res.selected_formats);
+            if (!this.formats) {
+              const object = {};
+              res.selected_objects.forEach((f, i) => {
+                if (!f) f = "Other";
+                if (!object[f]) object[f] = { type: f, count: 0, formats: [], display: "" };
+                const format = res.selected_formats[i];
+                object[f].formats.push(format);
+                object[f].display += (object[f].display ? ", " : "") + format.substr(1);
+                object[f].count += res.found_formats[res.selected_formats[i]];
+              });
+              this.formats = object;
+            }
             this.stats = {
               total_completions: res.total_completions,
               total_predictions: res.total_predictions,
@@ -208,9 +225,11 @@
         },
 
         update_formats: function() {
+          const inputs = Array.from(this.$refs.formats.querySelectorAll("input"));
+          const checkbox = inputs.find(i => i.checked);
+          if (!checkbox) return;
+          const formats = this.formats[checkbox.value].formats;
           this.start();
-          const formats = [];
-          this.$refs.formats.querySelectorAll("input").forEach(i => i.checked && formats.push(i.name))
           this.loadPreview({
             url: "api/project/import/" + this.id,
             data: JSON.stringify({selected_formats: formats}),
@@ -272,6 +291,7 @@
 
         reset() {
           this.loading = false;
+          this.formats = null;
           this.errors = [];
           this.preview = null;
         },

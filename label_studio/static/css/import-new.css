@@ -180,9 +180,11 @@
 
 /* Import by URL */
 
-#import-tasks p.example {
+#import-tasks p.rtfm {
   margin-top: 12px;
   color: #797979;
+  font-size: small;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* Loading */
@@ -243,7 +245,8 @@
 }
 
 #import-tasks li {
-  margin-right: 32px;
+  margin-right: 48px;
+  -webkit-font-smoothing: antialiased;
 }
 
 #import-tasks .ui.checkbox {
@@ -268,6 +271,18 @@
 .last.formats input:checked + label {
   opacity: 0.5;
   pointer-events: none;
+}
+
+.formats .count {
+  padding-left: 16px;
+  font-weight: bold;
+  color: #8b8b8c;
+}
+
+.formats .ext {
+  display: block;
+  margin-top: 8px;
+  color: #8b8b8c;
 }
 
 .stats {

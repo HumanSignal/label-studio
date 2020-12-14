@@ -140,14 +140,7 @@ Vue.component('import-files', {
         contentType: false
       })
       .fail((res) => {
-        let text = res.responseText;
-        if (res.responseJSON && res.responseJSON.length) {
-          text = res.responseJSON.join("\n\n");
-        }
-        const message = res.status + " " + res.statusText + "\n" + text;
-        const error = new Error(message);
-        error.code = res.status;
-        self.$emit('error', error);
+        self.$emit('error', res);
       })
       .done((res) => {
         self.$emit('finish', res.id);
