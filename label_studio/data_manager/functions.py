@@ -60,7 +60,10 @@ def get_all_columns(project):
             'type': data_type if data_type in ['Image', 'Audio', 'AudioPlus', 'Unknown'] else 'String',
             'target': 'tasks',
             'parent': 'data',
-            'show_in_quickview_default': i == 0
+            'visibility_defaults': {
+                'explore': True,
+                'labeling': i == 0
+            }
         }
         result['columns'].append(column)
         task_data_children.append(column['id'])
@@ -72,8 +75,7 @@ def get_all_columns(project):
             'id': 'id',
             'title': "Task ID",
             'type': "Number",
-            'target': 'tasks',
-            'show_in_quickview_default': True
+            'target': 'tasks'
         },
         {
             'id': 'completed_at',
@@ -87,21 +89,44 @@ def get_all_columns(project):
             'title': "Completions",
             'type': "Number",
             'target': 'tasks',
-            'help': 'Total completions per task'
+            'help': 'Total completions per task',
+            'visibility_defaults': {
+                'explore': True,
+                'labeling': False
+            }
         },
         {
-            'id': 'has_cancelled_completions',
+            'id': 'cancelled_completions',
             'title': "Cancelled",
             'type': "Number",
             'target': 'tasks',
-            'help': 'Number of cancelled (skipped) completions'
+            'help': 'Number of cancelled (skipped) completions',
+            'visibility_defaults': {
+                'explore': True,
+                'labeling': False
+            }
         },
         {
             'id': 'total_predictions',
             'title': "Predictions",
             'type': "Number",
             'target': 'tasks',
-            'help': 'Total predictions per task'
+            'help': 'Total predictions per task',
+            'visibility_defaults': {
+                'explore': True,
+                'labeling': False
+            }
+        },
+        {
+            'id': 'prediction_scores',
+            'title': "Prediction scores",
+            'type': "Number",
+            'target': 'tasks',
+            'help': 'Average prediction score over all task predictions',
+            'visibility_defaults': {
+                'explore': False,
+                'labeling': False
+            }
         },
         {
             'id': 'data',
@@ -211,7 +236,7 @@ def get_completed_at(task):
         return 0
 
 
-def get_cancelled_number(task):
+def get_cancelled_completions(task):
     """ Get was_cancelled (skipped) status for task: returns cancelled completion number for task
     """
     try:
@@ -223,7 +248,7 @@ def get_cancelled_number(task):
 
 
 def preload_task(project, task_id, resolve_uri=False):
-    """ Preload task: get completed_at, has_cancelled_completions,
+    """ Preload task: get completed_at, cancelled_completions,
         evaluate pre-signed urls for storages, aggregate over completion data, etc.
     """
     task = project.get_task_with_completions(task_id)
@@ -231,6 +256,9 @@ def preload_task(project, task_id, resolve_uri=False):
     # no completions at task, get task without completions
     if task is None:
         task = project.source_storage.get(task_id)
+        task['total_completions'] = 0
+        task['total_predictions'] = 0
+        task['cancelled_completions'] = 0
 
     # with completions
     else:
@@ -240,12 +268,14 @@ def preload_task(project, task_id, resolve_uri=False):
             completed_at = timestamp_to_local_datetime(completed_at).strftime(DATETIME_FORMAT)
         task['completed_at'] = completed_at
 
-        # cancelled completions number
-        task['has_cancelled_completions'] = get_cancelled_number(task)
+        # prediction score
+        if 'predictions' in task and len(task['predictions']) > 0:
+            task['prediction_score'] = sum((p['score'] for p in task['predictions']), 0) / len(task['predictions'])
 
-        # total completions and predictions
+        # aggregations
         task['total_completions'] = len(task['completions'])
         task['total_predictions'] = len(task['predictions'])
+        task['cancelled_completions'] = get_cancelled_completions(task)
 
     # don't resolve data (s3/gcs is slow) if it's not necessary (it's very slow)
     if resolve_uri:
@@ -391,10 +421,10 @@ def order_tasks(params, tasks):
     if order == 'id':
         ordered = sorted(tasks, key=lambda x: x['id'], reverse=ascending)
 
-    # cancelled: for has_cancelled_completions use two keys ordering
-    elif order == 'has_cancelled_completions':
+    # cancelled: for cancelled_completions use two keys ordering
+    elif order == 'cancelled_completions':
         ordered = sorted(tasks,
-                         key=lambda x: (DirectionSwitch(x.get('has_cancelled_completions', None), not ascending),
+                         key=lambda x: (DirectionSwitch(x.get('cancelled_completions', None), not ascending),
                                         DirectionSwitch(x.get('completed_at', None), False)))
     # another orderings
     else:
