@@ -209,22 +209,56 @@ class Project(object):
 
     @property
     def label_config_is_empty(self):
-        return not self.parsed_label_config or self.parsed_label_config == {'View': {}}
+        return not self.parsed_label_config and not self.data_types
 
     @property
     def one_object_in_label_config(self):
         return len(self.data_types) <= 1
 
-    def create_label_config_from_object_tags(self, object_tags):
-        assert object_tags, 'Object tags should contain at least one element'
-        logger.debug('Creating new label config for project {} with object tags: {}'.format(
-            self.name, ','.join(object_tags)))
-        with io.StringIO() as f:
-            f.write('<View>\n')
-            for object_tag in object_tags:
-                f.write('<{0} name="{1}" value="${1}"/>\n'.format(object_tag, object_tag.lower()))
-            f.write('</View>\n')
-            self.update_label_config(f.getvalue())
+    @property
+    def empty_derived_input_schema(self):
+        return not self.derived_input_schema
+
+    @property
+    def input_data_scheme(self):
+        return {
+            (x.attrib.get('name', ''), x.attrib.get('value', ''))
+            for x in self.config_input_tags
+        }
+
+    @property
+    def id(self):
+        return self.project_obj.id
+
+    @property
+    def uuid(self):
+        return os.path.basename(self.path)
+
+    @property
+    def data_types(self):
+        return self.project_obj.data_types
+
+    @property
+    def data_keys(self):
+        return list([key for key in self.derived_input_schema if key != Settings.UPLOAD_DATA_UNDEFINED_NAME])
+
+    @property
+    def label_config(self):
+        return self.project_obj.label_config
+
+    @property
+    def ml_backends_connected(self):
+        return len(self.ml_backends) > 0
+
+    @property
+    def task_data_login(self):
+        return self.project_obj.task_data_login
+
+    @property
+    def task_data_password(self):
+        return self.project_obj.task_data_password
+
+    # ============= BEGIN LABEL CONFIG MANAGEMENT SECTION ================
 
     def load_label_config(self):
         with open(self.label_config_path, encoding='utf8') as f:
@@ -233,12 +267,40 @@ class Project(object):
         self.parsed_label_config = parse_config(self.label_config_line)
         self.config_input_tags = self.get_config_input_tags(self.label_config_line)
 
-    @property
-    def input_data_scheme(self):
-        return {
-            (x.attrib.get('name', ''), x.attrib.get('value', ''))
-            for x in self.config_input_tags
-        }
+    def update_label_config(self, new_label_config):
+        # save xml label config to file
+        new_label_config = new_label_config.replace('\r\n', '\n')
+        with io.open(self.label_config_path, mode='w', encoding='utf8') as f:
+            f.write(new_label_config)
+
+        # reload everything that depends on label config
+        self.load_label_config()
+        self.update_derived_output_schema()
+        self.load_project_and_ml_backends()
+        self.load_converter()
+
+        # save project config state
+        self.config['label_config_updated'] = True
+        with io.open(self.config_path, mode='w', encoding='utf8') as f:
+            json.dump(self.config, f)
+        logger.info('Label config saved to: {path}'.format(path=self.label_config_path))
+
+    def reset_label_config(self):
+        logger.debug('Reset label config')
+        return self.update_label_config('<View></View>')
+
+    def validate_label_config(self, config_string):
+        logger.debug('Validate label config')
+        self.project_obj.validate_label_config(config_string)
+
+        logger.debug('Get parsed config')
+        parsed_config = parse_config(config_string)
+
+        logger.debug('Validate label config on derived input schema')
+        self.validate_label_config_on_derived_input_schema(parsed_config)
+
+        logger.debug('Validate label config on derived output schema')
+        self.validate_label_config_on_derived_output_schema(parsed_config)
 
     def update_derived_input_schema(self):
         self.derived_input_schema = set()
@@ -264,113 +326,6 @@ class Project(object):
             for completion in c['completions']:
                 self._update_derived_output_schema(completion)
         logger.debug('Derived output schema: ' + str(self.derived_output_schema))
-
-    def add_ml_backend(self, params, raise_on_error=True):
-        ml_backend = MLBackend.from_params(params)
-        if not ml_backend.connected and raise_on_error:
-            raise ValueError('ML backend with URL: "' + str(params['url']) + '" is not connected.')
-        self.ml_backends.append(ml_backend)
-
-    def remove_ml_backend(self, name):
-        # remove from memory
-        remove_idx = next((i for i, b in enumerate(self.ml_backends) if b.model_name == name), None)
-        if remove_idx is None:
-            raise KeyError('Can\'t remove ML backend with name "' + name + '": not found.')
-        self.ml_backends.pop(remove_idx)
-
-        # remove from config
-        config_params = self.config.get('ml_backends', [])
-        remove_idx = next((i for i, b in enumerate(config_params) if b['name'] == name), None)
-        if remove_idx is not None:
-            config_params.pop(remove_idx)
-        self.config['ml_backends'] = config_params
-        self._save_config()
-
-    def load_project_and_ml_backends(self):
-        # configure project
-        self.project_obj = ProjectObj(label_config=self.label_config_line, label_config_full=self.label_config_full)
-
-        # configure multiple machine learning backends
-        self.ml_backends = []
-        ml_backends_params = self.config.get('ml_backends', [])
-        for ml_backend_params in ml_backends_params:
-            self.add_ml_backend(ml_backend_params, raise_on_error=False)
-
-    def load_converter(self):
-        self.converter = Converter(self.parsed_label_config)
-
-    @property
-    def id(self):
-        return self.project_obj.id
-
-    @property
-    def uuid(self):
-        return os.path.basename(self.path)
-
-    @property
-    def data_types(self):
-        return self.project_obj.data_types
-
-    @property
-    def label_config(self):
-        return self.project_obj.label_config
-
-    @property
-    def ml_backends_connected(self):
-        return len(self.ml_backends) > 0
-
-    @property
-    def task_data_login(self):
-        return self.project_obj.task_data_login
-
-    @property
-    def task_data_password(self):
-        return self.project_obj.task_data_password
-
-    def extract_data_types(self, config):
-        return self.project_obj.extract_data_types(config)
-
-    def validate_label_config(self, config_string):
-        logger.debug('Validate label config')
-        self.project_obj.validate_label_config(config_string)
-
-        logger.debug('Get parsed config')
-        parsed_config = parse_config(config_string)
-
-        logger.debug('Validate label config on derived input schema')
-        self.validate_label_config_on_derived_input_schema(parsed_config)
-
-        logger.debug('Validate label config on derived output schema')
-        self.validate_label_config_on_derived_output_schema(parsed_config)
-
-    def _save_config(self):
-        with io.open(self.config_path, mode='w') as f:
-            json.dump(self.config, f, indent=2)
-
-    def update_params(self, params):
-        if 'ml_backend' in params:
-            ml_backend_params = self._create_ml_backend_params(params['ml_backend'], self.name)
-            self.add_ml_backend(ml_backend_params)
-            self.config['ml_backends'].append(ml_backend_params)
-            self._save_config()
-
-    def update_label_config(self, new_label_config):
-        # save xml label config to file
-        new_label_config = new_label_config.replace('\r\n', '\n')
-        with io.open(self.label_config_path, mode='w', encoding='utf8') as f:
-            f.write(new_label_config)
-
-        # reload everything that depends on label config
-        self.load_label_config()
-        self.update_derived_output_schema()
-        self.load_project_and_ml_backends()
-        self.load_converter()
-
-        # save project config state
-        self.config['label_config_updated'] = True
-        with io.open(self.config_path, mode='w', encoding='utf8') as f:
-            json.dump(self.config, f)
-        logger.info('Label config saved to: {path}'.format(path=self.label_config_path))
 
     def _update_derived_output_schema(self, completion):
         """
@@ -463,6 +418,56 @@ class Project(object):
                     'there are labels already created for "{from_name}":\n{extra_labels}'
                     .format(from_name=from_name, extra_labels=extra_labels)
                 )
+
+    # ============= END LABEL CONFIG MANAGEMENT SECTION ================
+
+    def add_ml_backend(self, params, raise_on_error=True):
+        ml_backend = MLBackend.from_params(params)
+        if not ml_backend.connected and raise_on_error:
+            raise ValueError('ML backend with URL: "' + str(params['url']) + '" is not connected.')
+        self.ml_backends.append(ml_backend)
+
+    def remove_ml_backend(self, name):
+        # remove from memory
+        remove_idx = next((i for i, b in enumerate(self.ml_backends) if b.model_name == name), None)
+        if remove_idx is None:
+            raise KeyError('Can\'t remove ML backend with name "' + name + '": not found.')
+        self.ml_backends.pop(remove_idx)
+
+        # remove from config
+        config_params = self.config.get('ml_backends', [])
+        remove_idx = next((i for i, b in enumerate(config_params) if b['name'] == name), None)
+        if remove_idx is not None:
+            config_params.pop(remove_idx)
+        self.config['ml_backends'] = config_params
+        self._save_config()
+
+    def load_project_and_ml_backends(self):
+        # configure project
+        self.project_obj = ProjectObj(label_config=self.label_config_line, label_config_full=self.label_config_full)
+
+        # configure multiple machine learning backends
+        self.ml_backends = []
+        ml_backends_params = self.config.get('ml_backends', [])
+        for ml_backend_params in ml_backends_params:
+            self.add_ml_backend(ml_backend_params, raise_on_error=False)
+
+    def load_converter(self):
+        self.converter = Converter(self.parsed_label_config)
+
+    def extract_data_types(self, config):
+        return self.project_obj.extract_data_types(config)
+
+    def _save_config(self):
+        with io.open(self.config_path, mode='w') as f:
+            json.dump(self.config, f, indent=2)
+
+    def update_params(self, params):
+        if 'ml_backend' in params:
+            ml_backend_params = self._create_ml_backend_params(params['ml_backend'], self.name)
+            self.add_ml_backend(ml_backend_params)
+            self.config['ml_backends'].append(ml_backend_params)
+            self._save_config()
 
     def no_tasks(self):
         return self.source_storage.empty()
@@ -630,6 +635,10 @@ class Project(object):
 
         self.update_derived_input_schema()
         self.update_derived_output_schema()
+
+        if self.empty_derived_input_schema:
+            # after removing all input tasks, reset config for future uploads
+            self.reset_label_config()
 
     def delete_task_completion(self, task_id, completion_id):
         """ Delete one completion by id

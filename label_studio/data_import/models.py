@@ -3,6 +3,7 @@ import logging
 from label_studio.utils.io import get_temp_dir, read_yaml
 from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.validation import TaskValidator
+from label_studio.utils.misc import Settings
 from label_studio.tasks import Tasks
 from .uploader import aggregate_files, aggregate_tasks
 
@@ -24,6 +25,7 @@ def read_object_formats():
 class ImportState(object):
 
     object_to_formats, format_to_object = read_object_formats()
+    TASKS_LIST_FORMATS = {'txt', 'csv', 'tsv', 'json'}
 
     def __init__(self, filelist=(), tasks=(), project=None, **kwargs):
         super(ImportState, self).__init__(**kwargs)
@@ -38,7 +40,8 @@ class ImportState(object):
         self.selected_objects = None
         self.columns_to_draw = []
         self.data_keys = []
-        self.files_as_tasks_list = {'type': None, 'selected': False}
+        self.files_as_tasks_list = {'type': None, 'selected': True}
+        self.show_files_as_tasks_list = False
         self.preview_size = 10
 
         self._validator = TaskValidator(self.project)
@@ -57,25 +60,40 @@ class ImportState(object):
             'found_formats': self.found_formats,
             'selected_formats': self.selected_formats,
             'selected_objects': self.selected_objects,
-            'files_as_tasks_list': self.files_as_tasks_list
+            'files_as_tasks_list': self.files_as_tasks_list,
+            'show_files_as_tasks_list': self.show_files_as_tasks_list
         }
 
-    def _get_object_from_format(self, f):
-        return self.format_to_object.get(f.lower().lstrip('.'))
+    def _get_selected_objects(self):
+        objects = []
+        for format in self.selected_formats:
+            normalized_format = format.lower().lstrip('.')
+            if self.files_as_tasks_list['selected'] and normalized_format in self.TASKS_LIST_FORMATS:
+                objects.append('Tasks list')
+            else:
+                objects.append(self.format_to_object.get(normalized_format))
+        return objects
+
+    def _show_files_as_tasks_list(self):
+        for format in self.selected_formats:
+            norm_format = format.lower().lstrip('.')
+            if norm_format in self.TASKS_LIST_FORMATS:
+                return True
+        return False
 
     def _generate_label_config(self):
-        # TODO: this is a temp workaround to guess initial config
+        # TODO: this is a temp workaround to guess initial config - we should make it prettier
         data_keys = list(self.data_keys)
         if len(data_keys) > 1:
             # better to use Table here
             return '<View></View>'
         if len(data_keys) == 1:
             data_key = data_keys[0]
-            objects = set([self._get_object_from_format(f) for f in self.selected_formats])
+            objects = set(self.selected_objects)
             if len(objects) > 1:
                 raise ValidationError('More than one data type is presented')
             object_tag = list(objects)[0]
-            data_key = object_tag.lower() if data_key == '$undefined$' else data_key
+            data_key = object_tag.lower() if data_key == Settings.UPLOAD_DATA_UNDEFINED_NAME else data_key
             return '<View><{0} name="{1}" value="${2}"/></View>'.format(object_tag, object_tag.lower(), data_key)
 
     def _read_tasks(self, num_tasks=None):
@@ -93,9 +111,21 @@ class ImportState(object):
                     pass
         return tasks, found_formats, data_keys
 
+    def _raise_if_inconsistent_with_current_project(self):
+        project_data_keys = self.project.data_keys
+        if project_data_keys:
+            import_data_keys = set(filter(lambda k: k != Settings.UPLOAD_DATA_UNDEFINED_NAME, self.data_keys))
+            if import_data_keys and import_data_keys != project_data_keys:
+                raise ValidationError(
+                    "Import data inconsistent with current project:\n"
+                    "You're trying to load data keys: {}\nbut project tasks already have {}".format(
+                        ','.join(import_data_keys), ','.join(project_data_keys)))
+
     def _update(self):
         if self.filelist:
             self.tasks, found_formats, self.data_keys = self._read_tasks()
+
+            self._raise_if_inconsistent_with_current_project()
 
             if not self.found_formats:
                 # It's a first time we get all formats
@@ -106,7 +136,8 @@ class ImportState(object):
                 for format in sorted(found_formats.keys()):
                     self.selected_formats.append(format)
 
-            self.selected_objects = [self._get_object_from_format(f) for f in self.selected_formats]
+            self.selected_objects = self._get_selected_objects()
+            self.show_files_as_tasks_list = self._show_files_as_tasks_list()
 
         # validate tasks
         self.tasks = self._validator.to_internal_value(self.tasks)
@@ -118,7 +149,9 @@ class ImportState(object):
             max_id_in_old_tasks = self.project.source_storage.max_id()
 
         # now read all tasks
-        all_tasks, _, _ = self._read_tasks()
+        # currently self._update() reads all tasks - uncomment this on change
+        # all_tasks, _, _ = self._read_tasks()
+        all_tasks = self.tasks
 
         new_tasks = Tasks().from_list_of_dicts(all_tasks, max_id_in_old_tasks + 1)
         try:

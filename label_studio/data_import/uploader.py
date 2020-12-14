@@ -62,12 +62,11 @@ class TasksFromFileReader(object):
             tasks = [tasks]
         tasks_formatted = []
         for task in tasks:
-            if not isinstance(task, dict):
-                raise ValidationError('Task item should be dict')
             if not task.get('data'):
-                tasks_formatted.append({'data': task})
-            else:
-                tasks_formatted.append(task)
+                task = {'data': task}
+            if not isinstance(task['data'], dict):
+                raise ValidationError('Task item should be dict')
+            tasks_formatted.append(task)
         return tasks_formatted
 
     def read_task_from_hypertext_body(self, filename, file):

@@ -1,8 +1,5 @@
 Text:
   - txt
-  - csv
-  - tsv
-  - json
 
 Image:
   - png
@@ -12,6 +9,8 @@ Image:
   - tif
   - bmp
   - gif
+  - svg
+  - webp
 
 Audio:
   - wav
@@ -19,8 +18,14 @@ Audio:
   - mp3
   - au
   - flac
+  - m4a
+  - ogg
 
 HyperText:
   - xml
   - htm
   - html
+
+TimeSeries:
+  - csv
+  - tsv
