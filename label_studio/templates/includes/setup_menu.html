@@ -2,38 +2,137 @@
 <div class="ui secondary menu stackable">
   <a class="item active" data-tab="labeling-config">Labeling config</a>
   <a class="item" data-tab="project-settings">Project settings</a>
-  <a class="item" data-tab="data-settings">Data settings</a>
+  <a class="item" data-tab="data-settings">Data storage</a>
 </div>
 
-<div class="ui tab message active" data-tab="labeling-config">
-  <i class="close icon"></i>
+<div class="ui tab active" data-tab="labeling-config">
+  <div class="ui message">
+    <i class="close icon"></i>
 
-  <!-- Label config -->
-  <div class="ui accordion" id="first-help">
-    <div class="title"><i class="dropdown icon"></i>Labeling config help</div>
-    <div class="content" style="margin-top:0; margin-left: 10px;">
-      <ul class="ui list">
-        <li><p>Labeling interface is based on html-like tags, read more in our
-          <a href="https://labelstud.io/tags" target="_blank">documentation</a>.</p>
-        </li>
-        <li><p>You can fully customize the appearance and workflow by modifying Labeling Config.</p></li>
-        <li><p>Tag values can use variables that start with "$" sign,
-          and those correspond to the fields in imported tasks from JSON or CSV files.</p>
-        </li>
-      </ul>
-      <div style="margin: 0.25em"></div>
+    <!-- Label config -->
+    <div class="ui accordion" id="first-help">
+      <div class="title"><i class="dropdown icon"></i>Labeling config help</div>
+      <div class="content" style="margin-top:0; margin-left: 10px;">
+        <ul class="ui list">
+          <li><p>Labeling interface is based on html-like tags, read more in our
+            <a href="https://labelstud.io/tags" target="_blank">documentation</a>.</p>
+          </li>
+          <li><p>You can fully customize the appearance and workflow by modifying Labeling Config.</p></li>
+          <li><p>Tag values can use variables that start with "$" sign,
+            and those correspond to the fields in imported tasks from JSON or CSV files.</p>
+          </li>
+        </ul>
+        <div style="margin: 0.25em"></div>
+      </div>
+    </div>
+
+    {% with template_mode="titles" %}
+      {% include 'includes/setup_templates.html' %}
+    {% endwith %}
+  </div>
+
+  <br/>
+
+  <!-- Labeling setup UI -->
+  <form action="api/project/config" method="post" class="ui form">
+
+    <!-- Textarea & Preview in two cols -->
+    <div class="ui two column grid zero-margin step2 stackable">
+      <div class="column" id="left-column">
+
+        <h3>Labeling Config</h3>
+
+        <!-- Code -->
+        <textarea name="label_config" cols="40" rows="10" class="project-form htx-html-editor"
+                  id="id_label_config">{{ label_config_full }}</textarea>
+        <br>
+
+        <!-- Input values from imported data -->
+        {% if input_values %}
+          <div class="ui">
+            {% for key in input_values %}
+              <a class="ui label basic">{{key}}</a>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <!-- Submit button -->
+        <input type="submit" disabled id="submit_form"
+               class="project-form field ui button positive centered" value="Save"
+               onclick="create_project(event)"/>
+
+        <div style="margin-top: 2em"></div>
+
+      </div>
+      <div class="column" style="padding-left: 0;">
+
+        <h3>Interface Preview</h3>
+
+        <!--Validation message -->
+        <div class="ui error message validation"></div>
+
+        <div id="editor-wrap"></div>
+        <pre id="preload-editor">...</pre>
+
+        <h3>Input Task Preview</h3>
+        <pre class="segment" id="upload-data-example" style="word-wrap: break-word">...</pre>
+
+        <h3>Output Result Preview</h3>
+        <div class="segment">
+          <pre class="segment" id="data-results" style="word-wrap: break-word ">...</pre>
+        </div>
+      </div>
+    </div>
+
+    <br/>
+  </form>
+
+  <!-- Error dialog -->
+  <div class="ui basic modal" id="error-message" onclick="$('#error-message').modal('hide')">
+    <div class="ui icon header">
+      <i id="error-message-icon" class="exclamation triangle icon"></i>
+    </div>
+    <div class="ui content text" style="text-align: center; font-size: 120%">
+      <p id="error-message-text">Error message here</p>
     </div>
   </div>
 
-  {% with template_mode="titles" %}
+  <!-- Dimmer and loader --->
+  <div class="ui dimmer" id="dimmer" style="position: fixed !important;">
+    <div class="ui text active orange loader big slow">
+      Saving label config ...<br/>
+    </div>
+  </div>
+
+  {% with template_mode="codes" %}
     {% include 'includes/setup_templates.html' %}
   {% endwith %}
+
+  <!-- Change template dialog -->
+  <div class="ui basic modal" id="confirm-config-template-dialog">
+    <i class="close icon"></i>
+    <div class="ui icon header">
+      <i class="exclamation triangle icon"></i>
+    </div>
+    <div class="content">
+      <p style="text-align: center;font-size:120%">Data that you've put into textarea will be replaced,
+        proceed?</p>
+    </div>
+    <div class="actions">
+      <div class="ui deny button red basic inverted" id="abort-button">
+        <i class="remove icon"></i>
+        Abort
+      </div>
+      <div class="ui green ok inverted button" id="proceed" role="button" tabindex="0">
+        <i class="checkmark icon"></i>
+        Proceed
+      </div>
+    </div>
+  </div>
 </div>
 
 {% include "includes/setup_project.html" %}
 {% include "includes/setup_data.html" %}
-
-<br/>
 
 <script>
   function new_project() {

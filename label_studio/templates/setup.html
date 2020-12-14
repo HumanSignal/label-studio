@@ -43,103 +43,6 @@
 <div class="ui container">
   <div class="ui max-width-wrapper">
     {% include 'includes/setup_menu.html' %}
-
-    <form action="api/project/config" method="post" class="ui form">
-
-      <!-- Textarea & Preview in two cols -->
-      <div class="ui two column grid zero-margin step2 stackable">
-        <div class="column" id="left-column">
-
-          <h3>Labeling Config</h3>
-
-          <!-- Code -->
-          <textarea name="label_config" cols="40" rows="10" class="project-form htx-html-editor"
-                    id="id_label_config">{{ label_config_full }}</textarea>
-          <br>
-
-          <!-- Input values from imported data -->
-          {% if input_values %}
-            <div class="ui">
-              {% for key in input_values %}
-                <a class="ui label basic">{{key}}</a>
-              {% endfor %}
-            </div>
-          {% endif %}
-
-          <!-- Submit button -->
-          <input type="submit" disabled id="submit_form"
-                 class="project-form field ui button positive centered" value="Save"
-                 onclick="create_project(event)"/>
-
-          <div style="margin-top: 2em"></div>
-
-        </div>
-        <div class="column" style="padding-left: 0;">
-
-          <h3>Interface Preview</h3>
-
-          <!--Validation message -->
-          <div class="ui error message validation"></div>
-
-          <div id="editor-wrap"></div>
-          <pre id="preload-editor">...</pre>
-
-          <h3>Input Task Preview</h3>
-          <pre class="segment" id="upload-data-example" style="word-wrap: break-word">...</pre>
-
-          <h3>Output Result Preview</h3>
-          <div class="segment">
-            <pre class="segment" id="data-results" style="word-wrap: break-word ">...</pre>
-          </div>
-        </div>
-      </div>
-
-      <br/>
-    </form>
-
-    <!-- Error dialog -->
-    <div class="ui basic modal" id="error-message" onclick="$('#error-message').modal('hide')">
-      <div class="ui icon header">
-        <i id="error-message-icon" class="exclamation triangle icon"></i>
-      </div>
-      <div class="ui content text" style="text-align: center; font-size: 120%">
-        <p id="error-message-text">Error message here</p>
-      </div>
-    </div>
-
-    <!-- Dimmer and loader --->
-    <div class="ui dimmer" id="dimmer" style="position: fixed !important;">
-      <div class="ui text active orange loader big slow">
-        Saving label config ...<br/>
-      </div>
-    </div>
-
-    {% with template_mode="codes" %}
-      {% include 'includes/setup_templates.html' %}
-    {% endwith %}
-
-    <!-- Change template dialog -->
-    <div class="ui basic modal" id="confirm-config-template-dialog">
-      <i class="close icon"></i>
-      <div class="ui icon header">
-        <i class="exclamation triangle icon"></i>
-      </div>
-      <div class="content">
-        <p style="text-align: center;font-size:120%">Data that you've put into textarea will be replaced,
-          proceed?</p>
-      </div>
-      <div class="actions">
-        <div class="ui deny button red basic inverted" id="abort-button">
-          <i class="remove icon"></i>
-          Abort
-        </div>
-        <div class="ui green ok inverted button" id="proceed" role="button" tabindex="0">
-          <i class="checkmark icon"></i>
-          Proceed
-        </div>
-      </div>
-    </div>
-
   </div>
 </div>
 
@@ -172,10 +75,8 @@
       $('#dimmer').removeClass('active');
       $('#error-message-icon').attr('class', 'green check icon');
       $('#error-message-text').html(
-          "Label config saved! <br><br> " +
-          "<a style='margin-bottom: 15px; min-width: 150px' class='ui positive button' href='import'>Import Tasks</a><br/>"
+          "Label config saved! <br><br> "
           {% if not project.no_tasks %} +
-          "<a style='margin-bottom: 15px; min-width: 150px' class='ui positive button' href='.'>Start Labeling</a><br/>" +
           "<a class='ui positive button' style='min-width: 150px' href='tasks'>Explore Tasks</a><br/>"
           {% endif %}
       );
