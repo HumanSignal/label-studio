@@ -174,6 +174,26 @@ def aggregate_files(request_files, temp_dir, upload_dir):
     return files
 
 
+def _old_vs_new_data_keys_inconsistency_message(new_data_keys, old_data_keys, current_file):
+    new_data_keys_list = ','.join(new_data_keys)
+    old_data_keys_list = ','.join(old_data_keys)
+    common_prefix = "You're trying to import inconsistent data:\n"
+    if new_data_keys_list == old_data_keys_list:
+        return ''
+    elif new_data_keys_list == Settings.UPLOAD_DATA_UNDEFINED_NAME:
+        return common_prefix + "uploading a single file {0} " \
+                               "clashes with data key(s) found from other files:\n\"{1}\"".format(
+                                current_file, old_data_keys_list)
+    elif old_data_keys_list == Settings.UPLOAD_DATA_UNDEFINED_NAME:
+        return common_prefix + "uploading tabular data from {0} with data key(s) {1}, " \
+                               "clashes with other raw binary files (images, audios, etc.)".format(
+                                current_file, new_data_keys_list)
+    else:
+        return common_prefix + "uploading tabular data from \"{0}\" with data key(s) \"{1}\", " \
+                               "clashes with data key(s) found from other files:\n\"{2}\"".format(
+                                current_file, new_data_keys_list, old_data_keys_list)
+
+
 def aggregate_tasks(files, project, formats=None, files_as_tasks_list=None, trim_size=None):
     tasks = []
     fileformats = []
@@ -187,8 +207,7 @@ def aggregate_tasks(files, project, formats=None, files_as_tasks_list=None, trim
         if not data_keys:
             data_keys = new_data_keys
         if data_keys != new_data_keys:
-            raise ValidationError('New data keys {0} found when scanning file {1}: expected {2}'.format(
-                ','.join(new_data_keys), filename, ','.join(data_keys)))
+            raise ValidationError(_old_vs_new_data_keys_inconsistency_message(new_data_keys, data_keys, filename))
         tasks += new_tasks
         fileformats.append(fileformat)
 
