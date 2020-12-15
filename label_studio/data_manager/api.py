@@ -73,8 +73,8 @@ def api_project_tabs_id(tab_id):
         new_data = request.json
 
         # reset selected items if filters are changed
-        if tab_data.get('filters') != request.json.get('filters'):
-            new_data['selectedItems'] = {'all': False, 'items': []}
+        if tab_data.get('filters', {}) != request.json.get('filters', {}):
+            new_data['selectedItems'] = {'all': False, 'included': []}
 
         tab_data.update(new_data)
         save_tab(tab_id, tab_data, g.project)

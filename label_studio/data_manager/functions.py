@@ -314,7 +314,7 @@ def load_tasks(project, resolve_uri=False, max_count=None):
         if max_count is not None and len(tasks) >= max_count:
             break
 
-    return tasks
+    return tasks, len(task_ids)
 
 
 def task_value_converter(x, data_type):
@@ -495,19 +495,19 @@ def prepare_tasks(project, params):
     """
     page, page_size = params.page, params.page_size
 
-    # use max count to speed up evaluation of tasks
-    max_count = None if check_filters_enabled(params) or check_order_enabled(params) or page <= 0 or page_size <= 0 \
-        else page * page_size
+    # use max count to speed up evaluation of tasks without filters and ordering
+    max_count = None if check_filters_enabled(params) or check_order_enabled(params) \
+        or page <= 0 or page_size <= 0 else page * page_size
 
     # load all tasks from db with some aggregations over completions
-    tasks = load_tasks(project, resolve_uri=False, max_count=max_count)
+    tasks, total_tasks = load_tasks(project, resolve_uri=False, max_count=max_count)
 
     # filter
     tasks = filter_tasks(tasks, params)
 
     # order
     tasks = order_tasks(params, tasks)
-    total = len(tasks)
+    total_tasks = len(tasks)
 
     # aggregations
     total_completions, total_predictions = 0, 0
@@ -530,7 +530,7 @@ def prepare_tasks(project, params):
             tasks[i] = resolve_task_data_uri(task, project=project)
 
     return {'tasks': tasks,
-            'total': total, 'total_completions': total_completions, 'total_predictions': total_predictions}
+            'total': total_tasks, 'total_completions': total_completions, 'total_predictions': total_predictions}
 
 
 def prepare_annotations(tasks, params):
