@@ -70,7 +70,13 @@ def api_project_tabs_id(tab_id):
 
     # set tab data
     if request.method == 'POST':
-        tab_data.update(request.json)
+        new_data = request.json
+
+        # reset selected items if filters are changed
+        if tab_data.get('filters') != request.json.get('filters'):
+            new_data['selectedItems'] = {'all': False, 'items': []}
+
+        tab_data.update(new_data)
         save_tab(tab_id, tab_data, g.project)
         return make_response(jsonify(tab_data), 201)
 

@@ -6,7 +6,10 @@
 {% for complexity in templates %}
 <div class="ui accordion" id="{{ 'basic-templates' if complexity == 'basic' else 'adv-templates' }}">
   <div class="title">
-    <i class="dropdown icon"></i> {{complexity|capitalize}} config examples
+    <i class="dropdown icon"></i>
+    {% if complexity == 'basic'%}Choose annotation type from {{complexity}} templates{% else %}
+    {{complexity|capitalize}} templates
+    {% endif %}
   </div>
   <div class="content" style="margin-top:-8px">
     <!-- Templates categories -->
