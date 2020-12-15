@@ -22,7 +22,7 @@
     <div v-if="preview">
       <h1>Files loaded</h1>
       <p>You can import them to the task manager.</p>
-      <div v-if="formats && Object.keys(formats).length > 1" ref="formats" class="formats">
+      <div v-if="formats" ref="formats" class="formats">
         <div>Found different types of files loaded. Chose which you wish to import.</div>
         <ul>
           <li class="ui radio checkbox" v-for="object in formats">
@@ -44,7 +44,13 @@
       </div>
       <p>
         <button class="ui grey button" @click="reset">Cancel</button>
-        <button class="ui primary button" @click="apply" :disabled="errors.length > 0">Import</button>
+        <button
+          class="ui primary button"
+          @click="apply"
+          :disabled="errors.length > 0 || (formats && !selectedFormat)"
+        >
+          Import
+        </button>
       </p>
 
       <div class="loading splash" v-if="loading">
@@ -149,7 +155,7 @@
       </div>
 
       <div class="ui form tab-cloud" v-if="source === 'cloud'" ref="cloud">
-        <cloud-storages @finish="finish"></cloud-storages>
+        <cloud-storages @finish="dm"></cloud-storages>
       </div>
     </div>
   </div>
@@ -173,7 +179,7 @@
           formats: null,
           preview: null,
           vueLoaded: false, 
-          selectedFormats: [],
+          selectedFormat: null,
           source: 'files',
           sources: {'files': 'Files', 'url': 'URL', 'cloud': 'Cloud'},
           stats: null,
@@ -215,7 +221,14 @@
                 object[f].display += (object[f].display ? ", " : "") + format.substr(1);
                 object[f].count += res.found_formats[res.selected_formats[i]];
               });
-              this.formats = object;
+              if (Object.keys(object).length > 1) {
+                this.formats = object;
+              }
+            }
+            if (this.formats) {
+              const selected = res.selected_objects;
+              const onlyOne = !selected.find(f => f !== selected[0]);
+              this.selectedFormat = onlyOne ? (selected[0] || "Other") : null;
             }
             this.stats = {
               total_completions: res.total_completions,
@@ -303,8 +316,13 @@
         reset() {
           this.loading = false;
           this.formats = null;
+          this.selectedFormat = null;
           this.errors = [];
           this.preview = null;
+        },
+
+        dm() {
+          window.location.href = "/tasks";
         },
 
         apply() {
@@ -317,7 +335,7 @@
           })
           .fail(res => this.errorFromResult(res))
           .done(() => {
-            window.location.href = "/tasks";
+            this.dm();
             // this.loading = false;
             // this.preview = null;
           });
