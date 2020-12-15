@@ -315,7 +315,7 @@ div.preview {
 }
 
 div.preview table {
-  text-align: center;
+  text-align: left;
   width: 100%;
   position: relative;
 }
