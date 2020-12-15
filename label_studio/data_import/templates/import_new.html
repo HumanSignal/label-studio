@@ -172,6 +172,7 @@
 
         return {
           id: null,
+          cached_preview: [],
           errors: [],
           loading: false,
           files_as_tasks_list: {selected: true, type: null},
@@ -204,6 +205,22 @@
         },
 
         loadPreview: function(params) {
+          if (params.data) {
+            const asTasks = params.data.files_as_tasks_list;
+            if (asTasks) {
+              const cached = this.cached_preview[+asTasks.selected];
+              if (cached) {
+                this.preview = cached.preview;
+                this.files_as_tasks_list.selected = cached.selected;
+                this.stats = cached.stats;
+                this.loading = false;
+                return;
+              }
+            }
+            if (typeof params.data === "object") {
+              params.data = JSON.stringify(params.data);
+            }
+          }
           this.start();
           $.ajax(params)
           .fail(res => this.errorFromResult(res))
@@ -235,6 +252,13 @@
               total_predictions: res.total_predictions,
               total_tasks: res.total_tasks,
             };
+            if (res.show_files_as_tasks_list) {
+              this.cached_preview[+res.files_as_tasks_list.selected] = {
+                preview: this.preview,
+                stats: this.stats,
+                selected: res.files_as_tasks_list.selected,
+              }
+            }
             this.loading = false;
           })
         },
@@ -256,7 +280,7 @@
           this.start();
           this.loadPreview({
             url: "api/project/import/" + this.id,
-            data: JSON.stringify({selected_formats: formats}),
+            data: {selected_formats: formats},
             method: 'PATCH',
             processData: false,
             contentType: 'application/json',
@@ -269,7 +293,7 @@
           const selected = this.$refs.files_type.checked;
           this.loadPreview({
             url: "api/project/import/" + this.id,
-            data: JSON.stringify({files_as_tasks_list: {selected, type: null}}),
+            data: {files_as_tasks_list: {selected, type: null}},
             method: 'PATCH',
             processData: false,
             contentType: 'application/json',
@@ -319,6 +343,7 @@
           this.selectedFormat = null;
           this.errors = [];
           this.preview = null;
+          this.cached_preview = [];
         },
 
         apply() {
