@@ -41,6 +41,7 @@ def project_init_target():
 class TestColumns:
     """ Table Columns
     """
+
     def test_import_page(self, test_client, captured_templates):
         response = test_client.get('/api/project/columns')
         assert response.status_code == 200
@@ -49,6 +50,7 @@ class TestColumns:
 class TestTabs:
     """ Table Tabs
     """
+
     def test_tabs(self, test_client, captured_templates):
         response = test_client.get('/api/project/tabs')
         assert response.status_code == 200
@@ -116,7 +118,7 @@ class TestTabs:
         assert response.status_code == 201
         response = test_client.get('/api/project/tabs/1/selected-items')
         assert response.status_code == 200
-        assert response.json == {'all': True, 'excluded':  [1, 2, 3]}
+        assert response.json == {'all': True, 'excluded': [1, 2, 3]}
 
         # delete
         response = test_client.delete('/api/project/tabs/1/selected-items', json={"all": True, "excluded": [4, 5]})
@@ -133,10 +135,27 @@ class TestActions:
         response = test_client.get('/api/project/actions')
         assert response.status_code == 200
         assert response.json == [
-            {'id': 'delete_tasks', 'order': 100, 'title': 'Delete tasks',
-             'permissions': 'project.can_delete_tasks'},
-            {'id': 'delete_tasks_completions', 'order': 101, 'title': 'Delete completions',
-             'permissions': 'project.can_manage_completions'}]
+            {
+                "dialog": {
+                    "text": "You are going to delete selected tasks. Please, confirm your action.",
+                    "type": "confirm"
+                },
+                "id": "delete_tasks",
+                "order": 100,
+                "permissions": "project.can_delete_tasks",
+                "title": "Delete tasks"
+            },
+            {
+                "dialog": {
+                    "text": "You are going to delete all completions from selected tasks. Please, confirm your action.",
+                    "type": "confirm"
+                },
+                "id": "delete_tasks_completions",
+                "order": 101,
+                "permissions": "project.can_manage_completions",
+                "title": "Delete completions"
+            }
+        ]
 
     @staticmethod
     def action_tasks_delete(test_client, captured_templates, key):
@@ -183,6 +202,7 @@ class TestActions:
 class TestTasksAndAnnotations:
     """ Test tasks on tabs
     """
+
     def test_tasks(self, test_client, captured_templates):
         project = project_init_source()
         project.target_storage.remove_all()
@@ -194,22 +214,30 @@ class TestTasksAndAnnotations:
                     'operator': 'in',
                     'value': {'min': 2, 'max': 5},
                     'type': 'Number'
-                    },
+                },
                     {
-                    'filter': 'filters:tasks:data.text',
-                    'operator': 'contains',
-                    'value': '123',
-                    'type': 'String'
+                        'filter': 'filters:tasks:data.text',
+                        'operator': 'contains',
+                        'value': '123',
+                        'type': 'String'
                     }]
             }
         }
         response = test_client.get('/api/tasks', json=data)
         assert response.status_code == 200
-        assert response.json == {'tasks': [{'data': {'image': '123', 'text': '1232'}, 'id': 2},
-                                           {'data': {'image': '123', 'text': '1233'}, 'id': 3},
-                                           {'data': {'image': '123', 'text': '1234'}, 'id': 4},
-                                           {'data': {'image': '123', 'text': '1235'}, 'id': 5}],
-                                 'total': 4, 'total_completions': 0, 'total_predictions': 0}
+        assert response.json == {
+            'tasks': [{'cancelled_completions': 0, 'completed_at': None, 'completions_results': '',
+                       'data': {'image': '123', 'text': '1232'}, 'id': 2, 'total_completions': 0,
+                       'total_predictions': 0},
+                      {'cancelled_completions': 0, 'completed_at': None, 'completions_results': '',
+                       'data': {'image': '123', 'text': '1233'}, 'id': 3, 'total_completions': 0,
+                       'total_predictions': 0},
+                      {'cancelled_completions': 0, 'completed_at': None, 'completions_results': '',
+                       'data': {'image': '123', 'text': '1234'}, 'id': 4, 'total_completions': 0,
+                       'total_predictions': 0},
+                      {'cancelled_completions': 0, 'completed_at': None, 'completions_results': '',
+                       'data': {'image': '123', 'text': '1235'}, 'id': 5, 'total_completions': 0,
+                       'total_predictions': 0}], 'total': 4, 'total_completions': 0, 'total_predictions': 0}
 
     def test_annotations(self, test_client, captured_templates):
         response = test_client.get('/api/project/tabs/1/annotations')
