@@ -342,7 +342,7 @@ def operator(op, a, b, data_type):
         :param b: value from task
         :param data_type: type of task value
     """
-    if op == 'empty':  # TODO: check it
+    if op == 'empty':
         value = b is None or (hasattr(b, '__len__') and len(b) == 0)
         return value if a else not value
 
