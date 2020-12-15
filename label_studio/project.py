@@ -605,7 +605,8 @@ class Project(object):
         # write a new completion
         if not updated:
             # start completion id from task_id * 1000
-            completion['id'] = max([c['id'] for c in task.get('completions', [{'id': task_id*1000}])]) + 1
+            completions = task.get('completions', None) or [{'id': task_id * 1000}]
+            completion['id'] = max([c['id'] for c in completions]) + 1
             task['completions'].append(completion)
 
         try:
