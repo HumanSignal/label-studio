@@ -86,15 +86,21 @@ class DirJSONsStorage(BaseStorage):
     def __init__(self, **kwargs):
         super(DirJSONsStorage, self).__init__(**kwargs)
         os.makedirs(self.path, exist_ok=True)
+        self.cache = {}
 
     @property
     def readable_path(self):
         return self.path
 
     def get(self, id):
-        filename = os.path.join(self.path, str(id) + '.json')
-        if os.path.exists(filename):
-            return json_load(filename)
+        if id in self.cache:
+            return self.cache[id]
+        else:
+            filename = os.path.join(self.path, str(id) + '.json')
+            if os.path.exists(filename):
+                data = json_load(filename)
+                self.cache[id] = data
+                return data
 
     def __contains__(self, id):
         return id in set(self.ids())
@@ -103,8 +109,10 @@ class DirJSONsStorage(BaseStorage):
         filename = os.path.join(self.path, str(id) + '.json')
         with open(filename, 'w', encoding='utf8') as fout:
             json.dump(value, fout, indent=2, sort_keys=True)
+        self.cache[id] = value
 
     def set_many(self, keys, values):
+        self.cache.clear()
         raise NotImplementedError
 
     def ids(self):
@@ -118,16 +126,18 @@ class DirJSONsStorage(BaseStorage):
         pass
 
     def items(self):
-        for key in self.ids():
-            filename = os.path.join(self.path, str(key) + '.json')
-            yield key, json_load(filename)
+        for id in self.ids():
+            filename = os.path.join(self.path, str(id) + '.json')
+            yield id, self.cache[id] if id in self.cache else json_load(filename)
 
-    def remove(self, key):
-        filename = os.path.join(self.path, str(key) + '.json')
+    def remove(self, id):
+        filename = os.path.join(self.path, str(id) + '.json')
         if os.path.exists(filename):
             os.remove(filename)
+            self.cache.pop(id, None)
 
     def remove_all(self):
+        self.cache.clear()
         delete_dir_content(self.path)
 
     def empty(self):
