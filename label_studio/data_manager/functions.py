@@ -566,11 +566,15 @@ def get_selected_items(project, selected, filters, ordering):
         :param ordering: ordering as on tab
     """
     # all_tasks - excluded
+    ids = eval_task_ids(project, filters=filters, ordering=ordering)  # get tasks from tab filters
     if selected.get('all', False):
-        items = eval_task_ids(project, filters=filters, ordering=ordering)  # get tasks from tab filters
-        for value in selected.get('excluded', []):
-            items.remove(value)
+        for item in selected.get('excluded', []):
+            try:  # ids could include not all selected items, when filter is more narrow than selected items
+                ids.remove(item)
+            except ValueError:
+                pass
     # included only
     else:
         items = selected.get('included', [])
-    return items
+        ids = set(items) & set(ids)
+    return ids

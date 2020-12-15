@@ -1,4 +1,4 @@
-import json
+import ujson as json
 import os
 import logging
 from copy import deepcopy
