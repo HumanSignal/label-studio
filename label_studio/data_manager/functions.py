@@ -496,9 +496,8 @@ def prepare_tasks(project, params):
     page, page_size = params.page, params.page_size
 
     # use max count to speed up evaluation of tasks
-    max_count = None
-    # if check_filters_enabled(params) or check_order_enabled(params) or page <= 0 or page_size <= 0 \
-    # else page * page_size
+    max_count = None if check_filters_enabled(params) or check_order_enabled(params) or page <= 0 or page_size <= 0 \
+        else page * page_size
 
     # load all tasks from db with some aggregations over completions
     tasks = load_tasks(project, resolve_uri=False, max_count=max_count)
