@@ -7,7 +7,6 @@ import ujson as json
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
 
-from shutil import copy2
 from flask_wtf import FlaskForm
 from wtforms import StringField, BooleanField
 from wtforms.validators import InputRequired, Optional, ValidationError
@@ -16,6 +15,7 @@ from ordered_set import OrderedSet
 
 from label_studio.utils.io import json_load
 from label_studio.utils.validation import TaskValidator, ValidationError as TaskValidationError
+from label_studio.utils.misc import Settings
 
 logger = logging.getLogger(__name__)
 
@@ -151,7 +151,7 @@ class CloudStorageForm(BaseStorageForm):
 
     prefix = StringField('Prefix', [Optional()], description='File prefix')
     regex = StringField('Regex', [IsValidRegex()], description='File filter by regex, example: .* (If not specified, all files will be skipped)')  # noqa
-    data_key = StringField('Data key', [Optional()], description='Task tag key from your label config', default='$undefined$')
+    # data_key = StringField('Data key', [Optional()], description='Task tag key from your label config')
     use_blob_urls = BooleanField('Use BLOBs URLs', default=True,
                                  description='Generate task data with URLs pointed to your bucket objects '
                                              '(for resources like jpg, mp3 & other BLOBs). This could be used for '
@@ -163,7 +163,7 @@ class CloudStorageForm(BaseStorageForm):
         prefix='prefix',
         regex='regex',
         use_blob_urls='use_blob_urls',
-        data_key='data_key',
+        # data_key='data_key',
         **BaseStorageForm.bound_params
     )
 
@@ -190,7 +190,7 @@ class CloudStorage(BaseStorage):
 
         self.create_local_copy = create_local_copy
         self.use_blob_urls = use_blob_urls
-        self.data_key = data_key
+        self.data_key = data_key or Settings.UPLOAD_DATA_UNDEFINED_NAME
         self.sync_in_thread = sync_in_thread
 
         self.client = self._get_client()

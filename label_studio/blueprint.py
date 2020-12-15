@@ -312,6 +312,8 @@ def welcome_page():
     """ On-boarding page
     """
     g.project.update_on_boarding_state()
+    if g.project.on_boarding['import']:
+        return redirect(url_for('data_manager_blueprint.tasks_page'))
     return flask.render_template(
         'welcome.html',
         config=g.project.config,
