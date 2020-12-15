@@ -275,10 +275,10 @@ var cloudStorages = Vue.component('cloud-storages', {
         setTimeout(function () {
           self.loadAll();
         }, 4000);
+        self.$emit('finish');
       })
       .always(function () {
         self.storage_settings[storage_for].loading = false;
-        self.$emit('finish');
       });
       return false;
     },

@@ -155,7 +155,7 @@
       </div>
 
       <div class="ui form tab-cloud" v-if="source === 'cloud'" ref="cloud">
-        <cloud-storages @finish="finish"></cloud-storages>
+        <cloud-storages @finish="dm"></cloud-storages>
       </div>
     </div>
   </div>
@@ -321,6 +321,10 @@
           this.preview = null;
         },
 
+        dm() {
+          window.location.href = "/tasks";
+        },
+
         apply() {
           this.start();
           $.ajax({
@@ -331,7 +335,7 @@
           })
           .fail(res => this.errorFromResult(res))
           .done(() => {
-            window.location.href = "/tasks";
+            this.dm();
             // this.loading = false;
             // this.preview = null;
           });
