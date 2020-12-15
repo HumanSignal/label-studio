@@ -68,7 +68,10 @@ class ImportState(object):
         objects = []
         for format in self.selected_formats:
             normalized_format = format.lower().lstrip('.')
-            if self.files_as_tasks_list['selected'] and normalized_format in self.TASKS_LIST_FORMATS:
+            if normalized_format in ('txt',):
+                # we can derive object tags from these extensions even they are used for tasks lists
+                objects.append(self.format_to_object.get(normalized_format))
+            elif self.files_as_tasks_list['selected'] and normalized_format in self.TASKS_LIST_FORMATS:
                 objects.append(None)
             else:
                 objects.append(self.format_to_object.get(normalized_format))
