@@ -42,6 +42,7 @@ def get_all_columns(project):
     task_data_children = []
     i = 0
 
+    # TODO: make this part with data types from project working
     data_types = OrderedDict()
     # all data types from import data
     if project.derived_all_input_schema:
@@ -249,7 +250,7 @@ def get_cancelled_completions(task):
         return None
 
 
-def preload_task(project, task_id, resolve_uri=False):
+def load_task(project, task_id, resolve_uri=False):
     """ Preload task: get completed_at, cancelled_completions,
         evaluate pre-signed urls for storages, aggregate over completion data, etc.
     """
@@ -259,13 +260,11 @@ def preload_task(project, task_id, resolve_uri=False):
     if task is None:
         task = project.source_storage.get(task_id)
 
-    # with completions
-    else:
-        # completed_at
-        completed_at = get_completed_at(task)
-        if completed_at != 0 and isinstance(completed_at, int):
-            completed_at = timestamp_to_local_datetime(completed_at).strftime(DATETIME_FORMAT)
-        task['completed_at'] = completed_at
+    # completed_at
+    completed_at = get_completed_at(task)
+    if completed_at != 0 and isinstance(completed_at, int):
+        completed_at = timestamp_to_local_datetime(completed_at).strftime(DATETIME_FORMAT)
+    task['completed_at'] = completed_at
 
     # prediction score
     predictions = task.get('predictions', [])
@@ -283,18 +282,11 @@ def preload_task(project, task_id, resolve_uri=False):
     if resolve_uri:
         task = resolve_task_data_uri(task, project=project)
 
-    # resolve special reserved undefined key
-    if project.data_types:
-        new_key = next(iter(project.data_types))
-        for key, value in task['data'].items():
-            if key == settings.UPLOAD_DATA_UNDEFINED_NAME:
-                task['data'][new_key] = value
-                task['data'].pop(key)
-
+    task = project.resolve_undefined_task_data(task)
     return task
 
 
-def preload_tasks(project, resolve_uri=False, max_count=None):
+def load_tasks(project, resolve_uri=False, max_count=None):
     """ Preload many tasks
     """
     task_ids = project.source_storage.ids()  # get task ids for all tasks in DB
@@ -302,7 +294,7 @@ def preload_tasks(project, resolve_uri=False, max_count=None):
     # get tasks with completions
     tasks = []
     for i in task_ids:
-        task = preload_task(project, i, resolve_uri)
+        task = load_task(project, i, resolve_uri)
         tasks.append(task)
         if max_count is not None and len(tasks) >= max_count:
             break
@@ -489,11 +481,12 @@ def prepare_tasks(project, params):
     page, page_size = params.page, params.page_size
 
     # use max count to speed up evaluation of tasks
-    max_count = None if check_filters_enabled(params) or check_order_enabled(params) or page <= 0 or page_size <= 0 \
-        else page * page_size
+    max_count = None
+    # if check_filters_enabled(params) or check_order_enabled(params) or page <= 0 or page_size <= 0 \
+    # else page * page_size
 
     # load all tasks from db with some aggregations over completions
-    tasks = preload_tasks(project, resolve_uri=False, max_count=max_count)
+    tasks = load_tasks(project, resolve_uri=False, max_count=max_count)
 
     # filter
     tasks = filter_tasks(tasks, params)

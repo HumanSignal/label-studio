@@ -151,7 +151,7 @@ class CloudStorageForm(BaseStorageForm):
 
     prefix = StringField('Prefix', [Optional()], description='File prefix')
     regex = StringField('Regex', [IsValidRegex()], description='File filter by regex, example: .* (If not specified, all files will be skipped)')  # noqa
-    data_key = StringField('Data key', [Optional()], description='Task tag key from your label config')
+    data_key = StringField('Data key', [Optional()], description='Task tag key from your label config', default='$undefined$')
     use_blob_urls = BooleanField('Use BLOBs URLs', default=True,
                                  description='Generate task data with URLs pointed to your bucket objects '
                                              '(for resources like jpg, mp3 & other BLOBs). This could be used for '

@@ -97,6 +97,7 @@ def next_task(project, params, items):
         return {'response_code': 404, 'id': None}
 
     task = resolve_task_data_uri(task, project=project)
+    task = project.resolve_undefined_task_data(task)
 
     # collect prediction from multiple ml backends
     if project.ml_backends_connected:

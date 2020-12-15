@@ -602,9 +602,10 @@ class Project(object):
                         task['completions'][i]['was_cancelled'] = False
                     task['completions'][i].update(completion)
                     updated = True
-        # write new completion
+        # write a new completion
         if not updated:
-            completion['id'] = task['id'] * 1000 + len(task['completions']) + 1
+            # start completion id from task_id * 1000
+            completion['id'] = max([c['id'] for c in task.get('completions', [{'id': task_id*1000}])]) + 1
             task['completions'].append(completion)
 
         try:
@@ -1008,6 +1009,21 @@ class Project(object):
     @property
     def supported_formats(self):
         return self.project_obj.supported_formats
+
+    def resolve_undefined_task_data(self, task):
+        """ Resolve task data with $undefined$ inplace
+        """
+        # resolve special reserved $undefined$ key
+        if self.data_types:
+            new_data = {}
+            new_key = next(iter(self.data_types))
+            for key, value in task['data'].items():
+                if key == settings.UPLOAD_DATA_UNDEFINED_NAME:
+                    new_data[new_key] = value
+                else:
+                    new_data[key] = value
+            task['data'] = new_data
+        return task
 
     def serialize(self):
         """ Serialize project to json dict
