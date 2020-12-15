@@ -76,7 +76,7 @@
       $('#error-message-icon').attr('class', 'green check icon');
       $('#error-message-text').html(
           "Label config saved! <br><br> "
-          {% if not project.no_tasks %} +
+          {% if not project.no_tasks() %} +
           "<a class='ui positive button' style='min-width: 150px' href='tasks'>Explore Tasks</a><br/>"
           {% endif %}
       );

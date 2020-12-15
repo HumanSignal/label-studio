@@ -1,6 +1,6 @@
 {
-  "message": "Fix empty <View></View> config",
-  "commit": "1494896a1f5d3762bc4928bf570f7431cfb627ca",
-  "branch": "master",
-  "date": "2020-12-11T00:43:12Z"
+  "message": "Fix appearance for View All, predictions and Panel",
+  "commit": "97bdfe92e8f33aa31c7d0c53e9376dc26e049c9f",
+  "branch": "feature/view-all",
+  "date": "2020-12-15T01:46:59Z"
 }

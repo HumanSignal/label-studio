@@ -74,20 +74,21 @@ def get_all_columns(project):
         # --- Tasks ---
         {
             'id': 'id',
-            'title': "Task ID",
-            'type': "Number",
+            'title': "ID",
+            'type': 'Number',
+            'help': 'Task ID',
             'target': 'tasks'
         },
         {
             'id': 'completed_at',
-            'title': "Completed at",
-            'type': "Datetime",
+            'title': 'Completed at',
+            'type': 'Datetime',
             'target': 'tasks',
             'help': 'Last completion date'
         },
         {
             'id': 'total_completions',
-            'title': "Completions",
+            'title': 'Completions',
             'type': "Number",
             'target': 'tasks',
             'help': 'Total completions per task',
@@ -124,6 +125,17 @@ def get_all_columns(project):
             'type': "Number",
             'target': 'tasks',
             'help': 'Average prediction score over all task predictions',
+            'visibility_defaults': {
+                'explore': False,
+                'labeling': False
+            }
+        },
+        {
+            'id': 'completions_results',
+            'title': "Results",
+            'type': "String",
+            'target': 'tasks',
+            'help': 'Completion results stacked over all completions',
             'visibility_defaults': {
                 'explore': False,
                 'labeling': False
@@ -265,6 +277,9 @@ def load_task(project, task_id, resolve_uri=False):
     if completed_at != 0 and isinstance(completed_at, int):
         completed_at = timestamp_to_local_datetime(completed_at).strftime(DATETIME_FORMAT)
     task['completed_at'] = completed_at
+
+    task['completions_results'] = ";\n".join([str(completion.get('result', []))
+                                              for completion in task.get('completions', [])])
 
     # prediction score
     predictions = task.get('predictions', [])
