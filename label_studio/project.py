@@ -378,9 +378,8 @@ class Project(object):
         for item in input_values:
             if item not in self.derived_input_schema:
                 raise ValidationError(
-                    'You have already imported tasks and they are incompatible with a new config. '
-                    'You\'ve specified value=${item}, but all imported tasks contain only keys: {input_schema_values}'
-                        .format(item=item, input_schema_values=list(self.derived_input_schema)))
+                    'Please replace "{0}" in value=${0} with one of the following columns:\n- {1}'.format(
+                        item, '\n- '.join(sorted(self.derived_input_schema))))
 
     def validate_label_config_on_derived_output_schema(self, config_string_or_parsed_config):
         """
