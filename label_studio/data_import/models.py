@@ -1,5 +1,7 @@
 import logging
 
+from copy import deepcopy
+
 from label_studio.utils.io import get_temp_dir, read_yaml
 from label_studio.utils.exceptions import ValidationError
 from label_studio.utils.validation import TaskValidator
@@ -178,7 +180,15 @@ class ImportState(object):
 
     @property
     def tasks_preview(self):
-        return [task['data'] for task in self.tasks[:self.preview_size]]
+        preview = []
+        for task in self.tasks[:self.preview_size]:
+            t = deepcopy(task['data'])
+            if 'completions' in task:
+                t['completions'] = task['completions']
+            if 'predictions' in task:
+                t['predictions'] = task['predictions']
+            preview.append(t)
+        return preview
 
     @property
     def total_tasks(self):
