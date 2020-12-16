@@ -8,6 +8,7 @@ from label_studio.utils.uri_resolver import resolve_task_data_uri
 from label_studio.utils.misc import Settings
 from collections import OrderedDict
 from datetime import datetime
+from copy import copy
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 TASKS = 'tasks:'
@@ -278,6 +279,9 @@ def load_task(project, task_id, params, resolve_uri=False):
     # no completions at task, get task without completions
     if task is None:
         task = project.source_storage.get(task_id)
+
+    # we need to modify the root of task
+    task = copy(task)
 
     # completed_at
     completed_at = get_completed_at(task)
