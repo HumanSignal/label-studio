@@ -699,7 +699,7 @@ def api_task_by_id(task_id):
     # try to get task with completions first
     if request.method == 'GET':
         from label_studio.data_manager.functions import load_task
-        task = load_task(g.project, task_id, resolve_uri=True)
+        task = load_task(g.project, task_id, None, resolve_uri=True)
 
         if g.project.ml_backends_connected:
             task = g.project.make_predictions(task)

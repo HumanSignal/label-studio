@@ -547,7 +547,7 @@ class Project(object):
             raise NotImplementedError('Unknown sampling method ' + sampling)
 
     def get_completions_ids(self):
-        """ List completion ids from output_dir directory
+        """ List completion files with ids from output_dir directory
 
         :return: filenames without extensions and directories
         """

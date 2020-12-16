@@ -78,7 +78,7 @@ def api_project_tabs_id(tab_id):
 
         tab_data.update(new_data)
         save_tab(tab_id, tab_data, g.project)
-        return make_response(jsonify(tab_data), 201)
+        return make_response(jsonify(tab_data), 200)
 
     # delete tab data
     if request.method == 'DELETE':

@@ -262,10 +262,17 @@ def get_cancelled_completions(task):
         return None
 
 
-def load_task(project, task_id, resolve_uri=False):
+def load_task(project, task_id, params, resolve_uri=False):
     """ Preload task: get completed_at, cancelled_completions,
         evaluate pre-signed urls for storages, aggregate over completion data, etc.
     """
+    # TODO: make this clear and more flexible
+    # make some tricky optimizations if filters are disabled and ordering == ['id']
+    if params is not None and hasattr(params, 'fields') and params.fields == ['tasks:id']:
+        if not check_filters_enabled(params):
+            if not check_order_enabled(params) or params.tab.get('ordering') in [['tasks:id'], ['-tasks:id']]:
+                return {'id': task_id}
+
     task = project.get_task_with_completions(task_id)
 
     # no completions at task, get task without completions
@@ -301,20 +308,24 @@ def load_task(project, task_id, resolve_uri=False):
     return task
 
 
-def load_tasks(project, resolve_uri=False, max_count=None):
+def load_tasks(project, params, resolve_uri=False, task_range=None):
     """ Preload many tasks
     """
     task_ids = project.source_storage.ids()  # get task ids for all tasks in DB
+    total_tasks = len(task_ids)
+
+    # use range for speed up if need
+    if task_range is not None:
+        start, end = task_range
+        task_ids = task_ids[start:end]
 
     # get tasks with completions
     tasks = []
     for i in task_ids:
-        task = load_task(project, i, resolve_uri)
+        task = load_task(project, i, params, resolve_uri)
         tasks.append(task)
-        if max_count is not None and len(tasks) >= max_count:
-            break
 
-    return tasks, len(task_ids)
+    return tasks, total_tasks
 
 
 def task_value_converter(x, data_type):
@@ -496,28 +507,30 @@ def prepare_tasks(project, params):
     page, page_size = params.page, params.page_size
 
     # use max count to speed up evaluation of tasks without filters and ordering
-    max_count = None if check_filters_enabled(params) or check_order_enabled(params) \
-        or page <= 0 or page_size <= 0 else page * page_size
+    full_render = check_filters_enabled(params) or check_order_enabled(params) or page <= 1 or page_size <= 0
+    task_range = None if full_render else ((page-1) * page_size, page * page_size)
 
     # load all tasks from db with some aggregations over completions
-    tasks, total_tasks = load_tasks(project, resolve_uri=False, max_count=max_count)
+    tasks, total_tasks = load_tasks(project, params, resolve_uri=False, task_range=task_range)
+    total_completions, total_predictions = None, None
 
-    # filter
-    tasks = filter_tasks(tasks, params)
+    if full_render:
+        # filter
+        tasks = filter_tasks(tasks, params)
 
-    # order
-    tasks = order_tasks(params, tasks)
-    total_tasks = len(tasks)
+        # order
+        tasks = order_tasks(params, tasks)
+        total_tasks = len(tasks)
 
-    # aggregations
-    total_completions, total_predictions = 0, 0
-    for task in tasks:
-        total_completions += task.get('total_completions', 0)
-        total_predictions += task.get('total_predictions', 0)
+        # aggregations
+        total_completions, total_predictions = 0, 0
+        for task in tasks:
+            total_completions += task.get('total_completions', 0)
+            total_predictions += task.get('total_predictions', 0)
 
-    # pagination
-    if page > 0 and page_size > 0:
-        tasks = tasks[(page - 1) * page_size:page * page_size]
+        # pagination
+        if page > 0 and page_size > 0:
+            tasks = tasks[(page - 1) * page_size:page * page_size]
 
     # use only necessary fields to avoid storage (s3/gcs/etc) overloading
     need_uri_resolving = True
@@ -567,7 +580,7 @@ def eval_task_ids(project, filters, ordering):
     """ Apply filter and ordering to all tasks
     """
     tab = {'filters': filters, 'ordering': ordering}
-    data = prepare_tasks(project, params=SimpleNamespace(page=-1, page_size=-1, tab=tab, fields=['id']))
+    data = prepare_tasks(project, params=SimpleNamespace(page=-1, page_size=-1, tab=tab, fields=['tasks:id']))
     return [t['id'] for t in data['tasks']]
 
 
