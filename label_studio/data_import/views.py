@@ -27,7 +27,7 @@ def import_page():
     """ Import tasks from JSON, CSV, ZIP and more
     """
     serialized_project = g.project.serialize()
-    serialized_project['multi_session_mode'] = current_app.label_studio.input_args.command != 'start-multi-session'
+    serialized_project['multi_session_mode'] = current_app.label_studio.input_args.command == 'start-multi-session'
     return flask.render_template(
         'import_new.html',
         project=g.project,

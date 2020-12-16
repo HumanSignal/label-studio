@@ -42,23 +42,17 @@
           <div class="column center aligned align-grid">
             <div class="ui">
               <div class="ui statistic mini" style="display: inline">
-                <!-- Project loading -->
-                <center v-if="!project_loaded" style="margin-bottom: 3px">
-                  <div class="ui loader loading active inline"></div>
-                </center>
                 <!-- Number -->
-                <span class="value" v-else  style="display: inline!important;white-space:nowrap!important;">
+                <span class="value"
+                      data-tippy-content="Tasks"
+                      style="display: inline!important;white-space:nowrap!important;">
                   {{ project.task_count }}
-                </span>
-                <span class="label">Tasks</span>
-                <br>
+                </span><br>
+                <span class="label">Source storage</span><br/>
                 <span class="sub-label">
-                  <i class="word-break" v-if="project.multi_session_mode"
+                  <i class="word-break" v-if="!project.multi_session_mode"
                      :data-tippy-content="project.source_storage.readable_path">{{
                     get_short_text(project.source_storage.readable_path) }}</i>
-                  <span data-tooltip="Source storage sync in progress">
-                    <i class="ui loader loading active inline mini" v-if="project.source_syncing"></i>
-                  </span>
 
                 <!-- Controls -->
 
@@ -67,7 +61,7 @@
                   <span data-tooltip="Change source storage filter">
                     <i class="fas fa-cog sup-button big"
                        @click="loadStorageSettings(); storage_settings.source.show=true"></i>
-                  </span>
+                  </span>&nbsp;
                   <!-- Delete tasks -->
                   <span v-if="project.can_delete_tasks">
                     <span @click="deleteAllTasks()"
@@ -80,35 +74,29 @@
             </div>
           </div>
 
-          <!-- Total completions -->
+          <!-- Total completion files -->
           <div class="column center aligned align-grid">
             <div class="ui">
               <div class="ui statistic mini" style="display: inline">
-                <!-- Project loading -->
-                <center v-if="!project_loaded" style="margin-bottom: 3px">
-                  <div class="ui loader loading active inline"></div>
-                </center>
                 <!-- Number -->
-                <span class="value" v-else>
+                <span class="value"
+                      data-tippy-content="Files with completions">
                   {{ project.completion_count }}
-                </span>
-                <span class="label">Completions</span>
+                </span><br>
+                <span class="label">Target storage</span>
                 <br>
                 <span class="sub-label">
-                  <i class="word-break" v-if="project.multi_session_mode"
+                  <i class="word-break" v-if="!project.multi_session_mode"
                      :data-tippy-content="project.target_storage.readable_path"
-                  >{{
-                    get_short_text(project.target_storage.readable_path) }}</i>
-                  <span data-tooltip="Target storage sync in progress">
-                    <i class="ui loader loading active inline mini" v-if="project.target_syncing"></i>
-                  </span>
+                  >{{ get_short_text(project.target_storage.readable_path) }}</i>
+
                   <!-- Controls -->
                   <!-- Target storage settings -->
                   <br>
                   <span data-tooltip="Change target storage">
                     <i class="fas fa-cog sup-button big"
                        @click="loadStorageSettings(); storage_settings.target.show=true"></i>
-                  </span>
+                  </span>&nbsp;
                   <!-- Delete completions -->
                   <span v-if="project.can_manage_completions">
                     <span @click="deleteAllCompletions()"

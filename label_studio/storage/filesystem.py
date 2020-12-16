@@ -3,7 +3,7 @@ import os
 import logging
 from copy import deepcopy
 
-from label_studio.utils.io import json_load, delete_dir_content, iter_files
+from label_studio.utils.io import json_load, delete_dir_content, iter_files, remove_file_or_dir
 from .base import BaseStorage, BaseForm, CloudStorage
 
 
@@ -63,8 +63,11 @@ class JSONStorage(BaseStorage):
         self.data.pop(int(key), None)
         self._save()
 
-    def remove_all(self):
-        self.data = {}
+    def remove_all(self, ids=None):
+        if ids is None:
+            self.data = {}
+        else:
+            [self.data.pop(i, None) for i in ids]
         self._save()
 
     def empty(self):
@@ -136,9 +139,18 @@ class DirJSONsStorage(BaseStorage):
             os.remove(filename)
             self.cache.pop(id, None)
 
-    def remove_all(self):
-        self.cache.clear()
-        delete_dir_content(self.path)
+    def remove_all(self, ids=None):
+        if ids is None:
+            self.cache.clear()
+            delete_dir_content(self.path)
+        else:
+            for i in ids:
+                self.cache.pop(i, None)
+                path = os.path.join(self.path, str(i) + '.json')
+                try:
+                    remove_file_or_dir(path)
+                except OSError:
+                    logger.warning('Storage file already removed: ' + path)
 
     def empty(self):
         return next(self.ids(), None) is None
@@ -200,14 +212,16 @@ class ExternalTasksJSONStorage(CloudStorage):
         self.data[int(key)] = value
 
     def set(self, id, value):
-        super(ExternalTasksJSONStorage, self).set(id, value)
-        self._save()
+        with self.thread_lock:
+            super(ExternalTasksJSONStorage, self).set(id, value)
+            self._save()
 
     def set_many(self, ids, values):
-        for id, value in zip(ids, values):
-            super(ExternalTasksJSONStorage, self)._pre_set(id, value)
-        self._save_ids()
-        self._save()
+        with self.thread_lock:
+            for id, value in zip(ids, values):
+                super(ExternalTasksJSONStorage, self)._pre_set(id, value)
+            self._save_ids()
+            self._save()
 
     def _extract_task_id(self, full_key):
         return int(full_key.split(self.key_prefix, 1)[-1])
@@ -228,27 +242,34 @@ class ExternalTasksJSONStorage(CloudStorage):
         self._keys_ids_map.pop(full_key)
 
     def remove(self, id):
-        id = int(id)
+        with self.thread_lock:
+            id = int(id)
 
-        logger.debug('Remove id=' + str(id) + ' from ids.json')
-        self._remove_id_from_keys_map(id)
-        self._save_ids()
-
-        logger.debug('Remove id=' + str(id) + ' from tasks.json')
-        self.data.pop(id, None)
-        self._save()
-
-    def remove_all(self):
-
-        logger.debug('Remove ' + str(len(self.data)) + ' records from ids.json')
-        for id in self.data:
+            logger.debug('Remove id=' + str(id) + ' from ids.json')
             self._remove_id_from_keys_map(id)
-        self._save_ids()
+            self._save_ids()
 
-        logger.debug('Remove all data from tasks.json')
-        # remove record from tasks.json
-        self.data = {}
-        self._save()
+            logger.debug('Remove id=' + str(id) + ' from tasks.json')
+            self.data.pop(id, None)
+            self._save()
+
+    def remove_all(self, ids=None):
+        with self.thread_lock:
+            remove_ids = self.data if ids is None else ids
+
+            logger.debug('Remove ' + str(len(remove_ids)) + ' records from ids.json')
+            for id in remove_ids:
+                self._remove_id_from_keys_map(id)
+            self._save_ids()
+
+            logger.debug('Remove all data from tasks.json')
+            # remove record from tasks.json
+            if ids is None:
+                self.data = {}
+            else:
+                for id in remove_ids:
+                    self.data.pop(id, None)
+            self._save()
 
 
 class CompletionsDirStorage(DirJSONsStorage):

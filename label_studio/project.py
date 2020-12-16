@@ -545,15 +545,16 @@ class Project(object):
         else:
             raise NotImplementedError('Unknown sampling method ' + sampling)
 
-    def get_completions_ids(self):
+    def get_completions_ids(self, task_ids=None):
         """ List completion files with ids from output_dir directory
 
         :return: filenames without extensions and directories
         """
-        task_ids = set(self.source_storage.ids())
+        if task_ids is None:
+            task_ids = set(self.source_storage.ids())
         completion_ids = set(self.target_storage.ids())
         completions = completion_ids.intersection(task_ids)
-        #completions = list(self.target_storage.ids())
+
         logger.debug('{num} completions found in {output_dir}'.format(
             num=len(completions), output_dir=self.config["output_dir"]))
         return sorted(completions)
@@ -634,9 +635,8 @@ class Project(object):
     def delete_tasks(self, task_ids):
         """ Delete by list of task ids
         """
-        for task_id in task_ids:
-            self.source_storage.remove(task_id)
-            self.delete_task_completions(task_id)
+        self.source_storage.remove_all(task_ids)
+        self.target_storage.remove_all(task_ids)
 
         self.update_derived_input_schema()
         self.update_derived_output_schema()
@@ -1030,11 +1030,11 @@ class Project(object):
         """
         ban_list = ('json', 'dir-jsons')
         available_storages = list(filter(lambda i: i[0] not in ban_list, get_available_storage_names().items()))
-
+        task_ids = self.source_storage.ids()
         output = {
             'project_name': self.name,
-            'task_count': len(self.source_storage.ids()),
-            'completion_count': len(self.get_completions_ids()),
+            'task_count': len(task_ids),
+            'completion_count': len(self.get_completions_ids(task_ids)),
             'config': self.config,
             'instruction': self.config['instruction'],
             'can_manage_tasks': self.can_manage_tasks,

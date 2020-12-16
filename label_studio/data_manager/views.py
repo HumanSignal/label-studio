@@ -28,7 +28,7 @@ def tasks_old_page():
     """ Tasks and completions page
     """
     serialized_project = g.project.serialize()
-    serialized_project['multi_session_mode'] = current_app.label_studio.input_args.command != 'start-multi-session'
+    serialized_project['multi_session_mode'] = current_app.label_studio.input_args.command == 'start-multi-session'
     return flask.render_template(
         'tasks_old.html',
         config=g.project.config,

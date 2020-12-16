@@ -510,7 +510,7 @@ def api_project():
         code = 201
 
     output = g.project.serialize()
-    output['multi_session_mode'] = input_args.command != 'start-multi-session'
+    output['multi_session_mode'] = input_args.command == 'start-multi-session'
     return make_response(jsonify(output), code)
 
 

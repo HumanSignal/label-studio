@@ -130,7 +130,7 @@ class BaseStorage(ABC):
         pass
 
     @abstractmethod
-    def remove_all(self):
+    def remove_all(self, ids=None):
         pass
 
     @abstractmethod
@@ -423,35 +423,34 @@ class CloudStorage(BaseStorage):
 
     def _sync(self):
         with self.thread_lock:
-            self.last_sync_time = datetime.now()
             self.is_syncing = True
 
-        new_id = self.max_id() + 1
-        new_ids_keys_map = {}
-        new_keys_ids_map = {}
+            new_id = self.max_id() + 1
+            new_ids_keys_map = {}
+            new_keys_ids_map = {}
 
-        full = OrderedSet(self.iter_full_keys())
-        intersect = full & OrderedSet(self._keys_ids_map)
-        exclusion = full - intersect
+            full = set(self.iter_full_keys())
+            intersect = full & set(self._keys_ids_map)
+            exclusion = full - intersect
 
-        # new tasks
-        for key in exclusion:
-            id, new_id = self._get_new_id(key, new_id)
-            new_ids_keys_map[id] = {'key': key, 'exists': True}
-            new_keys_ids_map[key] = id
+            # new tasks
+            for key in exclusion:
+                id, new_id = self._get_new_id(key, new_id)
+                new_ids_keys_map[id] = {'key': key, 'exists': True}
+                new_keys_ids_map[key] = id
 
-        # old existed tasks
-        for key in intersect:
-            id = self._keys_ids_map[key]
-            new_ids_keys_map[id] = {'key': key, 'exists': True}
-            new_keys_ids_map[key] = id
+            # old existed tasks
+            for key in intersect:
+                id = self._keys_ids_map[key]
+                new_ids_keys_map[id] = {'key': key, 'exists': True}
+                new_keys_ids_map[key] = id
 
-        with self.thread_lock:
             self._selected_ids = list(new_ids_keys_map.keys())
             self._ids_keys_map.update(new_ids_keys_map)
             self._keys_ids_map.update(new_keys_ids_map)
             self._save_ids()
             self.is_syncing = False
+            self.last_sync_time = datetime.now()
 
     @abstractmethod
     def _get_objects(self):
@@ -474,5 +473,5 @@ class CloudStorage(BaseStorage):
     def remove(self, key):
         raise NotImplementedError
 
-    def remove_all(self):
+    def remove_all(self, ids=None):
         raise NotImplementedError
