@@ -78,6 +78,8 @@
           "Label config saved! <br><br> "
           {% if not project.no_tasks() %} +
           "<a class='ui positive button' style='min-width: 150px' href='tasks'>Explore Tasks</a><br/>"
+          {% else %} +
+          "<a class='ui positive button' style='min-width: 150px' href='import'>Import Tasks</a><br/>"
           {% endif %}
       );
       $('#error-message').modal('show');
