@@ -45,7 +45,7 @@
 
     <!-- Object tag for time series data source -->
     <TimeSeries name="ts" valueType="url" value="$csv"
-                sep="," timeColumn="time">
+                sep=",">
         <Channel column="signal_1"
                  strokeColor="#17b" legend="Signal 1"/>
         <Channel column="signal_2"

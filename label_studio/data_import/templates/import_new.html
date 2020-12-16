@@ -232,7 +232,7 @@
             }
             if (this.formats) {
               const selected = res.selected_objects;
-              const onlyOne = !selected.find(f => f !== selected[0]);
+              const onlyOne = !selected.some(f => f !== selected[0]);
               this.selectedFormat = onlyOne ? (selected[0] || "Other") : null;
             }
             this.stats = {
