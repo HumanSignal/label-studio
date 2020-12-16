@@ -25,7 +25,7 @@ def read_object_formats():
 class ImportState(object):
 
     object_to_formats, format_to_object = read_object_formats()
-    TASKS_LIST_FORMATS = {'txt', 'csv', 'tsv', 'json'}
+    AMBIGUOUS_TASKS_LIST_FORMATS = {'csv', 'tsv'}
 
     def __init__(self, filelist=(), tasks=(), project=None, **kwargs):
         super(ImportState, self).__init__(**kwargs)
@@ -68,10 +68,7 @@ class ImportState(object):
         objects = []
         for format in self.selected_formats:
             normalized_format = format.lower().lstrip('.')
-            if normalized_format in ('txt',):
-                # we can derive object tags from these extensions even they are used for tasks lists
-                objects.append(self.format_to_object.get(normalized_format))
-            elif self.files_as_tasks_list['selected'] and normalized_format in self.TASKS_LIST_FORMATS:
+            if self.files_as_tasks_list['selected'] and normalized_format in self.AMBIGUOUS_TASKS_LIST_FORMATS:
                 objects.append(None)
             else:
                 objects.append(self.format_to_object.get(normalized_format))
@@ -80,7 +77,7 @@ class ImportState(object):
     def _show_files_as_tasks_list(self):
         for format in self.selected_formats:
             norm_format = format.lower().lstrip('.')
-            if norm_format in self.TASKS_LIST_FORMATS:
+            if norm_format in self.AMBIGUOUS_TASKS_LIST_FORMATS:
                 return True
         return False
 
