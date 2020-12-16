@@ -324,6 +324,7 @@ div.preview table td,
 div.preview table th {
   border: none;
   padding: 0.4em 1.6em 0.4em 0;
+  white-space: nowrap;
 }
 
 div.preview table th {
