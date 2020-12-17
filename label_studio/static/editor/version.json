@@ -1,6 +1,6 @@
 {
-  "message": "Fix appearance for View All, predictions and Panel",
-  "commit": "97bdfe92e8f33aa31c7d0c53e9376dc26e049c9f",
-  "branch": "feature/view-all",
-  "date": "2020-12-15T01:46:59Z"
+  "message": "Merge pull request #158 from heartexlabs/feature/view-all\n\nView them All again",
+  "commit": "9c7c6a9da73619eb843027c5b263f8fcf0fde5b9",
+  "branch": "master",
+  "date": "2020-12-16T15:54:25Z"
 }
