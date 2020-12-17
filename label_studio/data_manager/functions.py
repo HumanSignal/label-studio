@@ -274,11 +274,15 @@ def load_task(project, task_id, params, resolve_uri=False):
             if not check_order_enabled(params) or params.tab.get('ordering') in [['tasks:id'], ['-tasks:id']]:
                 return {'id': task_id}
 
-    task = project.get_task_with_completions(task_id)
+    target_task = project.target_storage.get(task_id)
+    source_task = project.source_storage.get(task_id, inplace=True, validate=False)
 
-    # no completions at task, get task without completions
-    if task is None:
-        task = project.source_storage.get(task_id)
+    if target_task is None:
+        task = copy(source_task)
+    else:
+        task = copy(target_task)
+        # tasks can hold the newest version of predictions, so get it from tasks
+        task['predictions'] = source_task.get('predictions', [])
 
     # we need to modify the root of task
     task = copy(task)
@@ -289,7 +293,7 @@ def load_task(project, task_id, params, resolve_uri=False):
         completed_at = timestamp_to_local_datetime(completed_at).strftime(DATETIME_FORMAT)
     task['completed_at'] = completed_at
 
-    task['completions_results'] = ";\n".join([str(completion.get('result', []))
+    task['completions_results'] = json.dumps([completion.get('result', [])
                                               for completion in task.get('completions', [])])
 
     # prediction score
@@ -508,6 +512,9 @@ def filter_tasks(tasks, params):
 def prepare_tasks(project, params):
     """ Main function to get tasks
     """
+    import time
+    points = [(time.time(), 'start')]
+
     page, page_size = params.page, params.page_size
 
     # use max count to speed up evaluation of tasks without filters and ordering
@@ -517,24 +524,28 @@ def prepare_tasks(project, params):
     # load all tasks from db with some aggregations over completions
     tasks, total_tasks = load_tasks(project, params, resolve_uri=False, task_range=task_range)
     total_completions, total_predictions = None, None
+    points += [(time.time(), 'load tasks')]
 
     if full_render:
         # filter
         tasks = filter_tasks(tasks, params)
+        points += [(time.time(), 'filers')]
 
         # order
         tasks = order_tasks(params, tasks)
         total_tasks = len(tasks)
+        points += [(time.time(), 'order')]
 
         # aggregations
         total_completions, total_predictions = 0, 0
         for task in tasks:
-            total_completions += task.get('total_completions', 0)
-            total_predictions += task.get('total_predictions', 0)
+            total_completions += task['total_completions']
+            total_predictions += task['total_predictions']
 
         # pagination
         if page > 0 and page_size > 0:
             tasks = tasks[(page - 1) * page_size:page * page_size]
+        points += [(time.time(), 'pagi')]
 
     # use only necessary fields to avoid storage (s3/gcs/etc) overloading
     need_uri_resolving = True
@@ -545,6 +556,19 @@ def prepare_tasks(project, params):
     if need_uri_resolving:
         for i, task in enumerate(tasks):
             tasks[i] = resolve_task_data_uri(task, project=project)
+
+    points += [(time.time(), 'resolve')]
+
+    """ time profile: 
+    out = {}
+    prev = 0
+    for p in points:
+        name, value = p[1], p[0]
+        if name in out:
+            out[name] += value-prev
+        else:
+            out[name] = value-prev
+        prev = p[0]"""
 
     return {'tasks': tasks,
             'total': total_tasks, 'total_completions': total_completions, 'total_predictions': total_predictions}

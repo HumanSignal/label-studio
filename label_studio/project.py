@@ -571,7 +571,7 @@ class Project(object):
         if data:
             logger.debug('Get predictions ' + str(task_id) + ' from source storage')
             # tasks can hold the newest version of predictions, so get it from tasks
-            data['predictions'] = self.source_storage.get(task_id).get('predictions', [])
+            data['predictions'] = self.source_storage.get(task_id, inplace=True, validate=False).get('predictions', [])
         return data
 
     def save_completion(self, task_id, completion):
@@ -1015,13 +1015,11 @@ class Project(object):
         """
         # resolve special reserved $undefined$ key
         if self.data_types:
-            new_data = {}
+            new_data = dict(task['data'])
             new_key = next(iter(self.data_types))
-            for key, value in task['data'].items():
-                if key == settings.UPLOAD_DATA_UNDEFINED_NAME:
-                    new_data[new_key] = value
-                else:
-                    new_data[key] = value
+            value = new_data.pop(settings.UPLOAD_DATA_UNDEFINED_NAME, None)
+            if value is not None:
+                new_data[new_key] = value
             task['data'] = new_data
         return task
 

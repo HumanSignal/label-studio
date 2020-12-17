@@ -37,7 +37,7 @@ class GCSStorage(CloudStorage):
         files = bucket.list_blobs(prefix=self.prefix)
         return (f.name for f in files if f.name != (self.prefix.rstrip('/') + '/'))
 
-    def _get_value(self, key):
+    def _get_value(self, key, inplace=False, validate=True):
         bucket = self.client['bucket']
         blob = bucket.blob(key)
         blob_str = blob.download_as_string()

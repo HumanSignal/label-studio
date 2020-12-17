@@ -253,7 +253,7 @@ class CloudStorage(BaseStorage):
                 json.dump(self._ids_keys_map, fout)
 
     @abstractmethod
-    def _get_value(self, key):
+    def _get_value(self, key, inplace=False):
         pass
 
     def _get_value_url(self, key):
@@ -283,16 +283,21 @@ class CloudStorage(BaseStorage):
 
         return new_tasks[0]
 
-    def get_data(self, key):
+    def get_data(self, key, inplace=False, validate=True):
+        """ :param key: task key
+            :param inplace: return inplace data instead of deepcopy, it's for speedup
+            :param validate: validate a task, set False for speed up
+        """
         if self.use_blob_urls:
             return self._get_value_url(key)
         else:
             # read task json from bucket and validate it
             try:
-                parsed_data = self._get_value(key)
+                parsed_data = self._get_value(key, inplace)
             except Exception as e:
                 raise Exception(key + ' :: ' + str(e))
-            return self._validate_task(key, parsed_data)
+
+            return self._validate_task(key, parsed_data) if validate else parsed_data
 
     def _get_key_by_id(self, id):
         item = self._ids_keys_map.get(id)
@@ -305,13 +310,13 @@ class CloudStorage(BaseStorage):
             return
         return item_key
 
-    def get(self, id):
+    def get(self, id, inplace=False, validate=True):
         item_key = self._get_key_by_id(id)
         if not item_key:
             return
         try:
             key = item_key.split(self.key_prefix, 1)[-1]
-            data = self.get_data(key)
+            data = self.get_data(key, inplace=inplace, validate=validate)
         except Exception as exc:
             # return {'error': True, 'message': str(exc)}
             logger.error(str(exc), exc_info=True)

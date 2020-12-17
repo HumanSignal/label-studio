@@ -6,6 +6,36 @@ from copy import deepcopy
 from label_studio.utils.io import json_load, delete_dir_content, iter_files, remove_file_or_dir
 from .base import BaseStorage, BaseForm, CloudStorage
 
+import collections
+
+
+class ReadOnlyDict(collections.Mapping):
+
+    def __init__(self, data):
+        self._data = data
+        self._id = None
+
+    def __setitem__(self, key, value):
+        if key == 'id':
+            self._id = value
+        else:
+            raise ValueError("Can't change read-only only dict: " + key + ' = ' + str(value))
+
+    def __getitem__(self, key):
+        if key == 'id':
+            return self._id
+        return self._data[key]
+
+    def __len__(self):
+        return len(self._data)
+
+    def __iter__(self):
+        return iter(self._data)
+
+    @property
+    def __class__(self):
+        return dict
+
 
 logger = logging.getLogger(__name__)
 
@@ -205,8 +235,8 @@ class ExternalTasksJSONStorage(CloudStorage):
     def readable_path(self):
         return self.path
 
-    def _get_value(self, key):
-        return deepcopy(self.data[int(key)])
+    def _get_value(self, key, inplace=False):
+        return self.data[int(key)] if inplace else deepcopy(self.data[int(key)])
 
     def _set_value(self, key, value):
         self.data[int(key)] = value
