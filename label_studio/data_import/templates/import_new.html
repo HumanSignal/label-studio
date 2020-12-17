@@ -87,7 +87,7 @@
             </tr>
           </thead>
           <tr v-for="row in preview">
-            <td v-for="value in row">{{get_short_text(value)}}</td>
+            <td v-for="key in Object.keys(preview[0])">{{get_short_text(row[key])}}</td>
           </tr>
         </table>
       </div>
@@ -194,6 +194,7 @@
       methods: {
         get_short_text: function(text) {
           const max_len = 20;
+          if (text === undefined) return "";
           if (typeof text === 'object') {
             text = JSON.stringify(text);
           } else {

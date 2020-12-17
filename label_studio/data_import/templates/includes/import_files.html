@@ -124,6 +124,7 @@ Vue.component('import-files', {
 
     upload(e) {
       this.sendFiles(e.target.files);
+      e.target.value = "";
     },
 
     sendFiles(files) {
