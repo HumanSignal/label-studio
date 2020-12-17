@@ -189,7 +189,7 @@ class TaskValidator:
         if data is None:
             raise ValidationError('All tasks are empty (None)')
 
-        if not isinstance(data, list):
+        if not isinstance(data, (list, tuple)):
             raise ValidationError('data is not a list')
 
         if len(data) == 0:

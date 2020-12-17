@@ -36,7 +36,7 @@
         </ul>
       </div>
       <div class="ui checkbox" v-if="show_files_as_tasks_list">
-        <input type="checkbox" id="files_type" @change="toggle_type" ref="files_type" checked/>
+        <input type="checkbox" id="files_type" @change="toggle_type" ref="files_type" :checked="files_as_tasks_list.selected"/>
         <label for="files_type">
           Interpret each line in files as a single item
           <p class="rtfm"><a href="https://labelstud.io/guide/tasks.html#CSV-TSV" target="_blank">Read Documentation</a> for details</a></p>

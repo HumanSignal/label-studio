@@ -43,12 +43,13 @@ class ImportState(object):
         self.columns_to_draw = []
         self.data_keys = []
         self.files_as_tasks_list = {'type': None, 'selected': True}
-        self.show_files_as_tasks_list = False
+        self.show_files_as_tasks_list = None
         self.preview_size = 10
 
-        self._validator = TaskValidator(self.project)
+        self._validator = None
 
-        self._update()
+        if project and (filelist or tasks):
+            self._update()
 
     def serialize(self):
         return {
@@ -144,6 +145,8 @@ class ImportState(object):
             self.show_files_as_tasks_list = self._show_files_as_tasks_list()
 
         # validate tasks
+        if not self._validator:
+            self._validator = TaskValidator(self.project)
         self.tasks = self._validator.to_internal_value(self.tasks)
 
     def apply(self):
@@ -204,11 +207,17 @@ class ImportState(object):
 
     @classmethod
     def create_from_filelist(cls, filelist, project):
-        import_state = ImportState(filelist=filelist, project=project)
-
         global _db
-        import_state.id = 1
-        _db[import_state.id] = import_state
+        _id = 1
+        if _id not in _db:
+            i = ImportState()
+            i.id = _id
+            _db[_id] = i
+        import_state = _db[_id]
+        import_state.filelist = filelist
+        import_state.project = project
+        import_state._update()
+
         return import_state
 
     @classmethod
@@ -220,11 +229,16 @@ class ImportState(object):
         else:
             raise ValidationError('Incorrect input data type, it must be JSON dict or list')
 
-        import_state = ImportState(tasks=tasks, project=project)
-
         global _db
-        import_state.id = 1
-        _db[import_state.id] = import_state
+        _id = 1
+        if _id not in _db:
+            i = ImportState()
+            i.id = _id
+            _db[_id] = i
+        import_state = _db[_id]
+        import_state.tasks = tasks
+        import_state.project = project
+        import_state._update()
         return import_state
 
     @classmethod
