@@ -17,7 +17,8 @@ def tasks_page():
     return flask.render_template(
         'tasks.html',
         config=g.project.config,
-        project=g.project
+        project=g.project,
+        **find_editor_files()
     )
 
 
