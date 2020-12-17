@@ -9,6 +9,8 @@ from label_studio.utils.misc import Settings
 from collections import OrderedDict
 from datetime import datetime
 from copy import copy
+import threading
+
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 TASKS = 'tasks:'
@@ -164,21 +166,29 @@ def remove_tabs(project):
 def load_all_tabs(project) -> dict:
     """ Load all tabs from disk
     """
-    tab_path = os.path.join(project.path, 'tabs.json')
-    if os.path.exists(tab_path):
-        with open(tab_path, encoding='utf-8') as f:
-            data = json.load(f)
-    else:
-        data = create_default_tabs()
-    return data
+    if not hasattr(project, 'tab_lock'):
+        project.tab_lock = threading.Lock()
+
+    with project.tab_lock:
+        tab_path = os.path.join(project.path, 'tabs.json')
+        if os.path.exists(tab_path):
+            with open(tab_path, encoding='utf-8') as f:
+                data = json.load(f)
+        else:
+            data = create_default_tabs()
+        return data
 
 
 def save_all_tabs(project, data: dict):
     """ Save all tabs to disk
     """
-    tab_path = os.path.join(project.path, 'tabs.json')
-    with open(tab_path, 'w', encoding='utf-8') as f:
-        json.dump(data, f)
+    if not hasattr(project, 'tab_lock'):
+        project.tab_lock = threading.Lock()
+
+    with project.tab_lock:
+        tab_path = os.path.join(project.path, 'tabs.json')
+        with open(tab_path, 'w', encoding='utf-8') as f:
+            json.dump(data, f)
 
 
 def load_tab(tab_id, project=None, raise_if_not_exists=False):
