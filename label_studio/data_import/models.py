@@ -51,6 +51,12 @@ class ImportState(object):
         if project and (filelist or tasks):
             self._update()
 
+    def reset(self):
+        self.found_formats = {}
+        self.selected_formats = None
+        self.selected_objects = None
+        self.data_keys = []
+
     def serialize(self):
         return {
             'id': self.id,
@@ -214,6 +220,7 @@ class ImportState(object):
             i.id = _id
             _db[_id] = i
         import_state = _db[_id]
+        import_state.reset()
         import_state.filelist = filelist
         import_state.project = project
         import_state._update()
@@ -236,6 +243,7 @@ class ImportState(object):
             i.id = _id
             _db[_id] = i
         import_state = _db[_id]
+        import_state.reset()
         import_state.tasks = tasks
         import_state.project = project
         import_state._update()
