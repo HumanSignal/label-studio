@@ -18,6 +18,7 @@ def tasks_page():
         'tasks.html',
         config=g.project.config,
         project=g.project,
+        version=label_studio.__version__,
         **find_editor_files()
     )
 

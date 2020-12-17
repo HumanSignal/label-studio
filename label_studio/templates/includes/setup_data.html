@@ -322,6 +322,8 @@
             'You are going to delete all existing tasks.\n' +
             'Warning! this operation cannot be undone.\nPlease confirm your action.');
           if (deletion_confirmed) {
+            this.project_loaded = false;
+
             var request = new XMLHttpRequest();
             request.open("DELETE", "api/tasks", true);
             request.onload = this.loadProjectAndTasks;
