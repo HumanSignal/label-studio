@@ -13,10 +13,6 @@ from .uploader import aggregate_files, aggregate_tasks
 logger = logging.getLogger(__name__)
 
 
-# TODO: define SQLAlchemy declarative_base()
-_db = {}
-
-
 def read_object_formats():
     data = read_yaml('object_formats.yml')
     o2fs = data
@@ -25,6 +21,9 @@ def read_object_formats():
 
 
 class ImportState(object):
+
+    # TODO: define SQLAlchemy declarative_base()
+    _db = {}
 
     object_to_formats, format_to_object = read_object_formats()
     AMBIGUOUS_TASKS_LIST_FORMATS = {'csv', 'tsv', 'txt'}
@@ -213,13 +212,12 @@ class ImportState(object):
 
     @classmethod
     def create_from_filelist(cls, filelist, project):
-        global _db
         _id = 1
-        if _id not in _db:
+        if _id not in cls._db:
             i = ImportState()
             i.id = _id
-            _db[_id] = i
-        import_state = _db[_id]
+            cls._db[_id] = i
+        import_state = cls._db[_id]
         import_state.reset()
         import_state.filelist = filelist
         import_state.project = project
@@ -236,13 +234,12 @@ class ImportState(object):
         else:
             raise ValidationError('Incorrect input data type, it must be JSON dict or list')
 
-        global _db
         _id = 1
-        if _id not in _db:
+        if _id not in cls._db:
             i = ImportState()
             i.id = _id
-            _db[_id] = i
-        import_state = _db[_id]
+            cls._db[_id] = i
+        import_state = cls._db[_id]
         import_state.reset()
         import_state.tasks = tasks
         import_state.project = project
@@ -251,7 +248,7 @@ class ImportState(object):
 
     @classmethod
     def get_by_id(cls, id):
-        return _db[id]
+        return cls._db[id]
 
     def update(self, **import_state_interface):
         [setattr(self, name, value) for name, value in import_state_interface.items()]

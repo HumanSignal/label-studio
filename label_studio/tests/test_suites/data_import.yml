@@ -55,8 +55,8 @@
           id: 1
           project: my_project
           task_preview:
-            - {"__test_object": true, "regexp": '^\{"image":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
-            - {"__test_object": true, "regexp": '^\{"image":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
+            - {"__test_object": true, "regexp": '^\{"\$undefined\$":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
+            - {"__test_object": true, "regexp": '^\{"\$undefined\$":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
           total_tasks: 2
           total_completions: 0
           total_predictions: 0
@@ -88,8 +88,8 @@
           id: 1
           project: my_project
           task_preview:
-            - {"__test_object": true, "regexp": '^\{"image":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
-            - {"__test_object": true, "regexp": '^\{"image":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
+            - {"__test_object": true, "regexp": '^\{"\$undefined\$":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
+            - {"__test_object": true, "regexp": '^\{"\$undefined\$":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
           total_tasks: 2
           total_completions: 0
           total_predictions: 0
@@ -114,8 +114,8 @@
           id: 1
           project: my_project
           task_preview:
-            - {"__test_object": true, "regexp": '^\{"image":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
-            - {"__test_object": true, "regexp": '^\{"image":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
+            - {"__test_object": true, "regexp": '^\{"\$undefined\$":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
+            - {"__test_object": true, "regexp": '^\{"\$undefined\$":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
           total_tasks: 2
           total_completions: 0
           total_predictions: 0

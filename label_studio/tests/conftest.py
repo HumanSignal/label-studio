@@ -12,21 +12,27 @@ from .base import goc_project
 
 @pytest.fixture
 def app(tmpdir):
+    # teardown project
+    from label_studio.project import Project
+    Project._storage = {}
+    from label_studio.data_import.models import ImportState
+    ImportState._db = {}
+
     root_dir = str(tmpdir.mkdir('label-studio-app'))
     input_args = SimpleNamespace(command='start', project_name='my_project', root_dir=root_dir, init=True)
     app = create_app(LabelStudioConfig(input_args=input_args))
+    app.args = input_args
     ctx = app.app_context()
     ctx.push()
     yield app
     ctx.pop()
-    # teardown project
-    from label_studio.project import Project
-    Project._storage = {}
 
 
 @pytest.fixture
 def client(app):
-    return app.test_client()
+    c = app.test_client()
+    c.app = app
+    return c
 
 
 @pytest.fixture(scope="module")
