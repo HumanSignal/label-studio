@@ -11,8 +11,9 @@
           duration:
             {"__test_object": true, "interval": [0, 0.1]}
           files_as_tasks_list:
-            selected: false
+            selected: true
             type: null
+          show_files_as_tasks_list: false
           found_formats:
             {".jpg": 1, ".png": 1}
           selected_formats: [".jpg", ".png"]
@@ -44,8 +45,9 @@
         response:
           columns_to_draw: []
           files_as_tasks_list:
-            selected: false
+            selected: true
             type: null
+          show_files_as_tasks_list: false
           found_formats:
             {".jpg": 1, ".png": 1}
           selected_formats: [".jpg", ".png"]
@@ -53,8 +55,8 @@
           id: 1
           project: my_project
           task_preview:
-            - {"__test_object": true, "regexp": '^\{"\$undefined\$":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
-            - {"__test_object": true, "regexp": '^\{"\$undefined\$":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
+            - {"__test_object": true, "regexp": '^\{"image":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
+            - {"__test_object": true, "regexp": '^\{"image":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
           total_tasks: 2
           total_completions: 0
           total_predictions: 0
@@ -76,8 +78,9 @@
         response:
           columns_to_draw: []
           files_as_tasks_list:
-            selected: false
+            selected: true
             type: null
+          show_files_as_tasks_list: false
           found_formats:
             {".jpg": 1, ".png": 1}
           selected_formats: [".jpg", ".png"]
@@ -85,8 +88,8 @@
           id: 1
           project: my_project
           task_preview:
-            - {"__test_object": true, "regexp": '^\{"\$undefined\$":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
-            - {"__test_object": true, "regexp": '^\{"\$undefined\$":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
+            - {"__test_object": true, "regexp": '^\{"image":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
+            - {"__test_object": true, "regexp": '^\{"image":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
           total_tasks: 2
           total_completions: 0
           total_predictions: 0
@@ -103,6 +106,7 @@
           files_as_tasks_list:
             selected: true
             type: null
+          show_files_as_tasks_list: false
           found_formats:
             {".jpg": 1, ".png": 1}
           selected_formats: [".jpg", ".png"]
@@ -110,8 +114,8 @@
           id: 1
           project: my_project
           task_preview:
-            - {"__test_object": true, "regexp": '^\{"\$undefined\$":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
-            - {"__test_object": true, "regexp": '^\{"\$undefined\$":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
+            - {"__test_object": true, "regexp": '^\{"image":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
+            - {"__test_object": true, "regexp": '^\{"image":\s"/data/upload/\w+\-samples_test_image.(jpg|png)'}
           total_tasks: 2
           total_completions: 0
           total_predictions: 0
