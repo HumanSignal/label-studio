@@ -82,7 +82,7 @@ def get_all_columns(project):
         },
         {
             'id': 'completed_at',
-            'title': 'Completed at',
+            'title': 'Completed',
             'type': 'Datetime',
             'target': 'tasks',
             'help': 'Last completion date'
@@ -293,8 +293,12 @@ def load_task(project, task_id, params, resolve_uri=False):
         completed_at = timestamp_to_local_datetime(completed_at).strftime(DATETIME_FORMAT)
     task['completed_at'] = completed_at
 
-    task['completions_results'] = json.dumps([completion.get('result', [])
-                                              for completion in task.get('completions', [])])
+    # completion results aggregations over all completions
+    completions = task.get('completions', None)
+    if completions:
+        task['completions_results'] = json.dumps([completion.get('result', []) for completion in completions])
+    else:
+        task['completions_results'] = ''
 
     # prediction score
     predictions = task.get('predictions', [])
@@ -539,8 +543,8 @@ def prepare_tasks(project, params):
         # aggregations
         total_completions, total_predictions = 0, 0
         for task in tasks:
-            total_completions += task['total_completions']
-            total_predictions += task['total_predictions']
+            total_completions += task.get('total_completions', 0)
+            total_predictions += task.get('total_predictions', 0)
 
         # pagination
         if page > 0 and page_size > 0:
