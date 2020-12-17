@@ -27,7 +27,7 @@ def read_object_formats():
 class ImportState(object):
 
     object_to_formats, format_to_object = read_object_formats()
-    AMBIGUOUS_TASKS_LIST_FORMATS = {'csv', 'tsv'}
+    AMBIGUOUS_TASKS_LIST_FORMATS = {'csv', 'tsv', 'txt'}
 
     def __init__(self, filelist=(), tasks=(), project=None, **kwargs):
         super(ImportState, self).__init__(**kwargs)

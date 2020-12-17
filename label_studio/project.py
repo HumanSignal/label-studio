@@ -350,7 +350,10 @@ class Project(object):
                 result['from_name'], result['to_name'], result_type
             ))
             for label in result['value'].get(result_type, []):
-                self.derived_output_schema['labels'][result['from_name']].add(label)
+                if not isinstance(label, list):
+                    label = [label]
+                for l in label:
+                    self.derived_output_schema['labels'][result['from_name']].add(l)
 
     def validate_label_config_on_derived_input_schema(self, config_string_or_parsed_config):
         """
