@@ -1,5 +1,7 @@
+@import "./theme.css";
+
 .db-card {
-  background: #fafafa;
+  background: var(--theme-bg);
   border-radius: 5px;
   padding: 1em 2em 1em 2em !important;
 }
@@ -34,7 +36,7 @@
 }
 
 #import-tasks .error h3 {
-  color: #F5222D;
+  color: var(--theme-error);
   font-size: 16px;
   display: inline-block;
 }
@@ -49,6 +51,52 @@
 }
 
 /* Common */
+
+body {
+  background: var(--theme-bg);
+}
+
+#import-tasks {
+  max-width: 560px;
+  margin: 0 auto 64px;
+  position: relative;
+  color: var(--theme-text);
+}
+
+#import-tasks button {
+  background: var(--theme-white);
+  color: var(--theme-text);
+}
+
+#import-tasks button:hover {
+  opacity: 0.9;
+}
+
+#import-tasks button.primary {
+  background-color: var(--theme-accent) !important;
+}
+
+#import-tasks button.secondary {
+  background-color: var(--gray-6);
+  color: var(--theme-white);
+}
+
+#import-tasks > header {
+  position: relative;
+  margin-bottom: 32px;
+}
+
+#import-tasks > header h1 {
+  font-size: 24px;
+  line-height: 40px;
+  font-weight: 900 !important;
+}
+
+#import-tasks > header img {
+  position: absolute;
+  left: -132px;
+  width: 100px;
+}
 
 #import-tasks .center {
   text-align: center;
@@ -99,39 +147,16 @@
 
 /* Import files via dropzone */
 
-#import-tasks {
-  width: 560px;
-  margin: 0 auto;
-  position: relative;
-}
-
-#import-tasks > header {
-  position: relative;
-  margin-bottom: 32px;
-}
-
-#import-tasks > header h1 {
-  font-size: 24px;
-  line-height: 40px;
-  font-weight: 900 !important;
-}
-
-#import-tasks > header img {
-  position: absolute;
-  left: -132px;
-  width: 100px;
-}
-
 #holder.dropzone {
-  background: rgba(24, 144, 255, 0.05);
-  border: 1px dashed rgba(24, 144, 255, 0.5);
+  background: var(--blue-6-15);
+  border: 1px dashed var(--theme-accent);
   border-radius: 4px;
   padding: 32px;
   margin-bottom: 32px;
 }
 
 #holder.dropzone.hover {
-  opacity: 0.7;
+  opacity: 0.5;
 }
 
 #holder.dropzone * {
@@ -142,8 +167,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: #003C74;
-  opacity: 0.5;
+  color: var(--blue-10);
+  opacity: 0.7;
+}
+
+#holder.dropzone.hover .content {
+  opacity: 1;
 }
 
 #holder.dropzone .content > *:not(:first-child) {
@@ -154,10 +183,11 @@
   font-size: 24px;
   line-height: 32px;
   font-weight: 800;
+  color: var(--blue-9);
 }
 
 #holder.dropzone .content .icon {
-  height: 100px;
+  height: 64px;
 }
 
 #holder.dropzone .content dl {
@@ -182,7 +212,7 @@
 
 #import-tasks p.rtfm {
   margin-top: 12px;
-  color: #797979;
+  color: var(--gray-9);
   font-size: small;
   -webkit-font-smoothing: antialiased;
 }
@@ -216,7 +246,7 @@
 .loading.splash {
   position: absolute;
   width: 100%;
-  background: white;
+  background: var(--theme-bg);
   opacity: 0.5;
   z-index: 1;
 }
@@ -238,9 +268,9 @@
   position: absolute;
   width: 100%;
   height: 100%;
-  border: 4px solid rgba(24, 144, 255, 0.1);
+  border: 4px solid var(--blue-1);
   border-radius: 50%;
-  border-top-color: #1890FF;
+  border-top-color: var(--theme-accent);
   animation: loader 1s infinite linear; /* from semantic-ui */
 }
 
@@ -287,13 +317,13 @@
 .formats .count {
   padding-left: 16px;
   font-weight: bold;
-  color: #8b8b8c;
+  color: var(--gray-9);
 }
 
 .formats .ext {
   display: block;
   margin-top: 8px;
-  color: #8b8b8c;
+  color: var(--gray-9);
 }
 
 .stats {
@@ -328,16 +358,16 @@ div.preview table th {
 }
 
 div.preview table th {
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--gray-6);
   font-weight: 600;
-  color: #8b8b8c;
+  color: var(--gray-9);
   -webkit-font-smoothing: antialiased;
 }
 
 /* fade out */
 div.preview.fade table::after {
   content: "";
-  background: linear-gradient(0deg, white, transparent);
+  background: linear-gradient(0deg, var(--gray-2), var(--gray-2-0));
   width: 100%;
   display: block;
   position: absolute;

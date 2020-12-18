@@ -43,7 +43,7 @@
         </label>
       </div>
       <p>
-        <button class="ui grey button" @click="reset">Cancel</button>
+        <button class="ui secondary button" @click="reset">Cancel</button>
         <button
           class="ui primary button"
           @click="apply"
@@ -122,7 +122,7 @@
       <p class="center">
         <button class="ui primary button" @click="reset">Try another input</button>
         <button
-          class="ui button"
+          class="ui secondary button"
           @click="config"
           v-if="!!errors.find(error => (error.header + error.text).includes('inconsistent'))"
         >Edit config</button>

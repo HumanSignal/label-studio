@@ -1,0 +1,22 @@
+body {
+  --blue-1: #E6F7FF;
+  --blue-6: #1890FF;
+  --blue-9: #003A8C;
+  --blue-10: #002766;
+  --blue-6-15: rgba(24, 144, 255, 0.15);
+
+  --red-6: #F5222D;
+
+  --gray-2: #FAFAFA;
+  --gray-2-0: rgba(250, 250, 250, 0); /* for correct gradient */
+  --gray-5: #D9D9D9;
+  --gray-6: #BFBFBF;
+  --gray-8: #9D9D9D;
+  --gray-9: #8C8C8C;
+
+  --theme-error: var(--red-6);
+  --theme-text: #171819;
+  --theme-white: white;
+  --theme-accent: var(--blue-6);
+  --theme-bg: var(--gray-2);
+}
