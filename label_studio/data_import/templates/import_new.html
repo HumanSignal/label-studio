@@ -42,6 +42,13 @@
           <p class="rtfm"><a href="https://labelstud.io/guide/tasks.html#CSV-TSV" target="_blank">Read Documentation</a> for details</a></p>
         </label>
       </div>
+
+      <ul class="stats" v-if="stats && !errors.length">
+        <li><span class="num">{{stats.total_tasks}}</span> tasks loaded</li>
+        <li><span class="num">{{stats.total_completions}}</span> completions</li>
+        <li><span class="num">{{stats.total_predictions}}</span> predictions</li>
+      </ul>
+
       <p>
         <button class="ui secondary button" @click="reset">Cancel</button>
         <button
@@ -73,11 +80,6 @@
         </div>
       </div>
 
-      <ul class="stats" v-if="stats && !errors.length">
-        <li><span class="num">{{stats.total_tasks}}</span> items loaded</li>
-        <li><span class="num">{{stats.total_completions}}</span> completions</li>
-        <li><span class="num">{{stats.total_predictions}}</span> predictions</li>
-      </ul>
       <div class="preview" v-if="!errors.length" :class="{ fade: stats && preview.length < stats.total_tasks}">
         <h4>Data preview</h4>
         <table>
