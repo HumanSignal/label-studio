@@ -116,7 +116,7 @@ body {
 
 #import-tasks h1::before {
   content: "";
-  background-image: url(/static/images/heartex_icon_opossum_green@2x.png);
+  background-image: url(/static/images/opossum_hanging.svg);
   background-size: 100px;
   position: absolute;
   left: -132px;
