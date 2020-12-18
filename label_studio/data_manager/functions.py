@@ -123,8 +123,8 @@ def get_all_columns(project):
             }
         },
         {
-            'id': 'prediction_scores',
-            'title': "Prediction scores",
+            'id': 'predictions_score',
+            'title': "Predictions score",
             'type': "Number",
             'target': 'tasks',
             'help': 'Average prediction score over all task predictions',

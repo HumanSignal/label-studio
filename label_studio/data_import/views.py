@@ -15,8 +15,8 @@ def import_old_page():
     """
     return flask.render_template(
         'import_old.html',
-        config=g.project.config,
-        project=g.project
+        project=g.project,
+        config=g.project.config
     )
 
 
@@ -31,5 +31,6 @@ def import_page():
     return flask.render_template(
         'import_new.html',
         project=g.project,
+        config=g.project.config,
         serialized_project=serialized_project
     )
