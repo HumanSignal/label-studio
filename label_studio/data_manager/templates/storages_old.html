@@ -4,7 +4,7 @@
 <sui-modal v-model="storage.show" v-bind:class="{inverted: 1, small: 1, scrollable: 1}" size="small"
            :id="storage_for + '-storage-settings-dialog'" style="z-index: 1000"
            v-for="(storage, storage_for) in storage_settings" v-bind:key="storage_for">
-  <i class="icon close" @click="storage.show=false"></i>
+
 
   <!-- Header -->
   <div class="header">
@@ -85,6 +85,9 @@
 
   <!-- Actions -->
   <div class="actions">
+    <span class="ui text">{{ project.task_count }} tasks, {{ project.completion_count }} completion files</span>
+    <span style="margin-right: 2em"></span>
+
     <span class="ui green text" v-if="storage.save_success"><i class="fas fa-check"></i> Success</span>
 
     <!-- Apply & Sync / Save tasks for Source -->
