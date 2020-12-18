@@ -1,6 +1,6 @@
 Feature("textarea");
 
-Scenario("Use classification config with textarea", async (I) => {
+xScenario("Use classification config with textarea", async (I) => {
   I.amOnPage("/");
   // const text = await I.grabTextFrom(".title");
   // pause();
