@@ -1,7 +1,7 @@
-include label_studio/examples/*/*.xml
+include label_studio/examples/*.xml
 recursive-include label_studio/static *
-include label_studio/templates/includes/*.html
-include label_studio/templates/*.html
+recursive-include label_studio *.yml
+recursive-include label_studio *.html
 include label_studio/utils/schema/*.json
 include label_studio/logger.json
 include label_studio/config.json
