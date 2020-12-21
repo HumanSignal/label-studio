@@ -8,13 +8,10 @@ import json
 import werkzeug
 
 from datetime import datetime
-from mixpanel import Mixpanel, MixpanelException
-from copy import deepcopy
-from operator import itemgetter
-from collections import defaultdict
+from mixpanel import Mixpanel
 
 from uuid import uuid4
-from .misc import get_app_version, parse_config, convert_string_to_hash
+from .misc import get_app_version
 from .io import get_config_dir
 
 logger = logging.getLogger(__name__)

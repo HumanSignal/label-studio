@@ -177,7 +177,7 @@ def project_get_or_create(multi_session_force_recreate=False):
         project_name = user + '/' + project
         return Project.get_or_create(project_name, input_args, context={
             'multi_session': True,
-            'user': convert_string_to_hash(user)
+            'user': convert_string_to_hash(user.encode())
         })
     else:
         if multi_session_force_recreate:
