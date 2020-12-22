@@ -176,7 +176,7 @@ class CloudStorage(BaseStorage):
 
     def __init__(
         self, prefix=None, regex=None, create_local_copy=True, use_blob_urls=True, data_key=None,
-        sync_in_thread=True, **kwargs
+        sync_in_thread=True, presign=True, **kwargs
     ):
         super(CloudStorage, self).__init__(**kwargs)
         self.prefix = prefix or ''
@@ -192,6 +192,7 @@ class CloudStorage(BaseStorage):
         self.use_blob_urls = use_blob_urls
         self.data_key = data_key
         self.sync_in_thread = sync_in_thread
+        self.presign = presign
 
         self.client = self._get_client()
         self.validate_connection()

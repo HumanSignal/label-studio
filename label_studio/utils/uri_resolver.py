@@ -1,17 +1,18 @@
-import boto3
+import base64
 import logging
+import re
 import socket
-import google.auth
-
-from botocore.exceptions import ClientError
-from urllib.parse import urlparse
-from google.cloud import storage as gs
-from google.auth.transport import requests
-from google.auth import compute_engine
 from datetime import datetime, timedelta
+from urllib.parse import urlparse
+
+import boto3
+import google.auth
+from botocore.exceptions import ClientError
+from google.auth import compute_engine
+from google.auth.transport import requests
+from google.cloud import storage as gs
 
 from label_studio.storage.s3 import get_client_and_resource
-
 
 logger = logging.getLogger(__name__)
 
@@ -27,10 +28,27 @@ def resolve_task_data_uri(task, **kwargs):
             out[key] = resolve_s3(data, **kwargs)
         elif data.startswith('gs://'):
             out[key] = resolve_gs(data, **kwargs)
+        # Can be simplified with := for python version >= 3.8
+        elif _get_uri_via_regex(data):
+            uri, storage = _get_uri_via_regex(data)
+            logger.debug("Found matching storage uri in task data value: {uri}".format(uri=uri))
+            if storage == "s3":
+                out[key] = data.replace(uri, resolve_s3(uri, **kwargs))
+            if storage == "gs":
+                out[key] = data.replace(uri, resolve_gs(uri, **kwargs))
         else:
             out[key] = data
     task['data'] = out
     return task
+
+
+def _get_uri_via_regex(data):
+    uri_regex = r"[\s\'\"]?(?P<uri>(?P<storage>s3|gs)://([^/\s]+)/(.*?[^/\s]+/?[^\s\'\">]+))[\s\'\"]?"
+    r_match = re.search(uri_regex, data)
+    if r_match is None:
+        logger.warning("{data} does not match uri regex {uri_regex}".format(data=data, uri_regex=uri_regex))
+        return
+    return r_match.group("uri"), r_match.group("storage")
 
 
 def _get_s3_params_from_project(project):
@@ -46,6 +64,8 @@ def _get_s3_params_from_project(project):
         params['aws_session_token'] = storage.aws_session_token
     if hasattr(storage, 'region'):
         params['region'] = storage.region
+    if hasattr(storage, 'presign'):
+        params['presign'] = storage.presign
     return params
 
 
@@ -59,13 +79,28 @@ def resolve_s3(url, s3_client=None, **kwargs):
         else:
             params = kwargs
         s3_client, _ = get_client_and_resource(**params)
+
+    presign = True
+    if 'project' in kwargs:
+        params = _get_s3_params_from_project(kwargs['project'])
+        if 'presign' in params:
+            presign = params['presign']
+
+    # Return blob as base64 encoded string if presigned urls are disabled
+    if not presign:
+        object = s3_client.get_object(Bucket=bucket_name, Key=key)
+        content_type = object['ResponseMetadata']['HTTPHeaders']['content-type']
+        object_b64 = "data:" + content_type + ";base64," + base64.b64encode(object['Body'].read()).decode('utf-8')
+        return object_b64
+
+    # Otherwise try to generate presigned url
     try:
         presigned_url = s3_client.generate_presigned_url(
             ClientMethod='get_object',
             Params={'Bucket': bucket_name, 'Key': key}
         )
     except ClientError as exc:
-        logger.warning('Can\'t generate presigned URL from ' + url)
+        logger.warning('Can\'t generate presigned URL for {url}'.format(url=url))
         return url
     else:
         logger.debug('Presigned URL {presigned_url} generated for {url}'.format(

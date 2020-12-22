@@ -13,7 +13,7 @@ S3_REGION = os.environ.get('S3_REGION', 'us-east-1')
 
 
 def get_client_and_resource(
-    aws_access_key_id=None, aws_secret_access_key=None, aws_session_token=None, region=None
+    aws_access_key_id=None, aws_secret_access_key=None, aws_session_token=None, region=None, **kwargs
 ):
     session = boto3.Session(
         aws_access_key_id=aws_access_key_id,
@@ -49,7 +49,7 @@ class S3Storage(CloudStorage):
         self.aws_session_token = aws_session_token
         self.region = region
 
-        super(S3Storage, self).__init__(region=region, **kwargs)
+        super(S3Storage, self).__init__(region=region,  **kwargs)
 
     def _get_client(self):
         client, s3 = get_client_and_resource(
