@@ -85,7 +85,7 @@ def config_from_file():
 
 def app_before_request_callback():
     # skip endpoints where no project is needed
-    if request.endpoint in ('static', 'send_static'):
+    if request.endpoint in ('label_studio.static', 'label_studio.send_static'):
         return
 
     # prepare global variables
