@@ -62,8 +62,6 @@
     <a id="menu-import" href="import" class="{% if url_for(request.endpoint) == '/import' %}active{% endif %}"
        style="display:{{'block' if project and project.can_manage_tasks else 'none'}}">Import</a>
 
-    <a href="export" class="{% if url_for(request.endpoint) == '/export' %}active{% endif %}">Export</a>
-
 
     <a href="model" class="{% if url_for(request.endpoint) == '/model' %}active{% endif %}">Model</a>
 

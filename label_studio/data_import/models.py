@@ -170,7 +170,8 @@ class ImportState(object):
             self.project.source_storage.set_many(new_tasks.keys(), new_tasks.values())
         except NotImplementedError:
             raise NotImplementedError(
-                'Import is not supported for the current storage ' + str(self.project.source_storage))
+                'Import is not supported for the current storage, change storage type in project settings'
+                + str(self.project.source_storage))
 
         # if tasks have completion - we need to implicitly save it to target
         for i in new_tasks.keys():

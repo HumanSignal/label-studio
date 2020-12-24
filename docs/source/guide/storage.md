@@ -48,11 +48,13 @@ Check the browser console (Ctrl + Shift + i in Chromium) for errors if you have 
 
 * You must specify the `region` when you create a new bucket. Don't forget to change it in your `.aws/config` file. Otherwise your bucket objects will have problems with access.
 
-    E.g.: `~/.aws/config` 
+    E.g.: `~/.aws/config`
+     
     ```
     [default]
     region=us-east-2  # change to the region of your bucket
-    ```  
+    ```
+  
 
 * Use LS version >= 0.7.5, it has a signature version s3v4 to support more aws regions.
 
