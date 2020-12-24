@@ -4,6 +4,7 @@ Feature("Import by URL")
 
 Scenario("Import single image by URL", async (I) => {
   I.amOnPage('/')
+  I.waitForVisible(locate("a").withText("Import"))
   I.see("Welcome to")
   I.seeNumberOfElements(locate("a").withText("Import"), 2)
   // top menu item is hidden during onboarding
