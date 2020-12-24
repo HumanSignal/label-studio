@@ -1,4 +1,5 @@
 <script type="text/x-template" id="import-files-template">
+  <div>
   <label>
     <input id="file-input" type="file" name="file" multiple @change="upload" style="display: none"/>
 
@@ -24,14 +25,15 @@
         </div>
       </div>
     </div>
+  </label>
 
     <p class="center">
       To import already preannoted data check out the
-      <a href="https://labelstud.io/guide/tasks.html">Documentation</a>
+      <a href="https://labelstud.io/guide/tasks.html" target="_blank">Documentation</a>
     </p>
 
     <p class="center"><a href="import-old">Switch to old import page</a></p>
-  </label>
+  </div>
 </script> <!-- template -->
 
 <script>
