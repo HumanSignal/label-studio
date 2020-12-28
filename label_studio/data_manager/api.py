@@ -1,5 +1,6 @@
 from types import SimpleNamespace
 from flask import make_response, request, jsonify, g
+from ordered_set import OrderedSet
 
 from label_studio.utils.auth import requires_auth
 from label_studio.utils.misc import exception_handler
@@ -121,21 +122,21 @@ def api_project_tabs_selected_items(tab_id):
     tab_data = tab['selectedItems']
     assert tab_data['all'] == data['all'], 'Unsupported operands: tab_data["all"] != data["all"]'
     key = 'excluded' if data['all'] else 'included'
-    left = set(tab_data[key])
-    right = set(data.get(key, []))
+    left = OrderedSet(tab_data[key])
+    right = OrderedSet(data.get(key, []))
 
     # PATCH: set particular with union
     if request.method == 'PATCH':
-        # make union, sorting is needed for the frontend
+        # make union
         result = left | right
-        tab['selectedItems'][key] = sorted(list(result))
+        tab['selectedItems'][key] = list(result)
         save_tab(tab_id, tab, g.project)
         return make_response(jsonify(tab), 201)
 
     # DELETE: delete specified items
     if request.method == 'DELETE':
         result = (left - right)
-        tab['selectedItems'][key] = sorted(list(result))
+        tab['selectedItems'][key] = list(result)
         save_tab(tab_id, tab, g.project)
         return make_response(jsonify(tab), 204)
 

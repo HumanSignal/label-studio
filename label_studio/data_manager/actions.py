@@ -5,9 +5,10 @@
 """
 import logging
 
-from copy import copy
+from copy import copy, deepcopy
 from label_studio.data_manager.functions import DataManagerException
 from label_studio.utils.uri_resolver import resolve_task_data_uri
+from label_studio.utils.misc import timestamp_now
 
 logger = logging.getLogger(__name__)
 _actions = {}
@@ -35,6 +36,9 @@ def get_all_actions(project):
         for action in actions if not action.get('hidden', False)
         and check_permissions(project, action)
     ]
+    # remove experimental features if they are disabled
+    if not project.config.get('experimental_features', False):
+        actions = [action for action in actions if not action.get('experimental', False)]
     return actions
 
 
@@ -80,6 +84,40 @@ def delete_tasks_completions(project, params, items):
             'detail': 'Deleted ' + str(len(items)) + ' completions'}
 
 
+def propagate_completions(project, params, items):
+    if len(items) < 2:
+        raise DataManagerException('Select more than two tasks, the first task completion will be picked as source')
+
+    # check first completion
+    completed_task = items[0]
+    task = project.target_storage.get(completed_task)
+    if task is None or len(task.get('completions', [])) == 0:
+        raise DataManagerException('The first selected task should have at least one completion to propagate')
+
+    # get first completion
+    source_completion = task['completions'][0]
+
+    # copy first completion to new completions for each task
+    for i in items[1:]:
+        task = project.target_storage.get(i)
+        if task is None:
+            task = project.source_storage.get(i)
+        completion = deepcopy(source_completion)
+
+        # start completion id from task_id * 9000
+        completions = task.get('completions', None) or [{'id': i * 9000}]
+        completion['id'] = max([c['id'] for c in completions]) + 1
+        completion['created_at'] = timestamp_now()
+
+        if 'completions' not in task:
+            task['completions'] = []
+        task['completions'].append(completion)
+
+        project.target_storage.set(i, task)
+
+    return {'response_code': 200}
+
+
 def next_task(project, params, items):
     """ Generate next task for labeling stream
 
@@ -114,4 +152,18 @@ register_action(delete_tasks, 'Delete tasks', 100, permissions='project.can_dele
 register_action(delete_tasks_completions, 'Delete completions', 101, permissions='project.can_manage_completions',
                 dialog={'text': 'You are going to delete all completions from selected tasks. '
                                 'Please, confirm your action.', 'type': 'confirm'})
+register_action(propagate_completions, 'Propagate completions', 1, experimental=True,
+                dialog={'text': 'This action will pick the first completion from the first selected task, '
+                                'create new completions for all selected tasks, '
+                                'and propagate the first completion to others. ' +
+                                '.' * 80 +
+                                '1. Create the first completion for task A. '
+                                '2. Select task A with checkbox as first selected item. '
+                                '3. Select other tasks where you want to copy the first completion from task A. '
+                                '4. Click Propagate completions. ' +
+                                '.' * 80 +
+                                '! Warning: it is an experimental feature! It could work well with Choices, '
+                                'but other annotation types (RectangleLabels, Text Labels, etc) '
+                                'will have a lot of issues.',
+                        'type': 'confirm'})
 register_action(next_task, 'Generate next task', 0, hidden=True)

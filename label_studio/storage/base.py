@@ -11,7 +11,6 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, BooleanField
 from wtforms.validators import InputRequired, Optional, ValidationError
 from collections import OrderedDict
-from ordered_set import OrderedSet
 
 from label_studio.utils.io import json_load
 from label_studio.utils.validation import TaskValidator, ValidationError as TaskValidationError

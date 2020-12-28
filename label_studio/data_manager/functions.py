@@ -9,6 +9,7 @@ from label_studio.utils.misc import Settings
 from collections import OrderedDict
 from datetime import datetime
 from copy import copy
+from ordered_set import OrderedSet
 import threading
 
 
@@ -645,5 +646,5 @@ def get_selected_items(project, selected, filters, ordering):
     # included only
     else:
         items = selected.get('included', [])
-        ids = set(items) & set(ids)
+        ids = OrderedSet(items) & OrderedSet(ids)
     return ids
