@@ -55,3 +55,4 @@ label-studio-projects
 dist/
 venv/
 tmp/
+scripts/build-tmp
