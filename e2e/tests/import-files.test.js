@@ -1,10 +1,10 @@
 const assert = require("assert")
 
-Feature("Import by URL")
+Feature("Import by upload")
 
 Before(I => I.reset())
 
-Scenario("Import single image by URL", async (I) => {
+Scenario("Import images from list.txt", async (I) => {
   I.amOnPage("/")
   I.see("Welcome to")
   I.seeNumberOfElements(locate("a").withText("Import"), 2)
@@ -13,17 +13,20 @@ Scenario("Import single image by URL", async (I) => {
   I.click(locate("a.button").withText("Import"))
   I.waitInUrl("/import")
 
-  I.say("Import file by url")
-  I.click("URL")
-  I.fillField("Dataset URL", "https://app.heartex.ai/static/samples/sample.jpg")
-  I.click("Load")
+  I.say("Upload list of files")
+  I.attachFile("#file-input", "assets/list.txt")
+  I.see("4 tasks loaded")
+  I.click("Interpret each line")
+  I.see("1 tasks loaded")
+  I.click("Interpret each line")
+  I.click(locate("button").withText("Import"))
 
   I.say("Redirect to DM with imported tasks")
-  I.see("1 tasks loaded")
-  I.click(locate("button").withText("Import"))
+  I.see("Tab 1")
   // table with imported items — should be only one already
-  I.seeNumberOfElements("img[alt=Data]", 1)
-  I.click("img[alt=Data]")
+  I.see("Tasks: 4 / 4")
+  // images have no type yet, so no thumbnails are displayed, click just somewhere
+  I.click(".select-row + div")
   I.see("Labeling is not configured")
   I.click("Go to setup")
 
@@ -46,15 +49,17 @@ Scenario("Import single image by URL", async (I) => {
   I.seeElement("[aria-label=forward]")
   // completion date are filled in
   const completed = await I.grabTextFrom(".table-row > div:nth-child(3)")
-  assert.notEqual(completed, "")
+  // there are 4 rows so array is returned
+  assert.notEqual(completed[0], "")
   I.click("Back")
 
   I.say("Check task status and remove all the tasks")
   // both completions and skipped counts are equal to 1
-  I.seeTextEquals("1", ".table-row > div:nth-child(4)")
-  I.seeTextEquals("1", ".table-row > div:nth-child(5)")
+  // check only the first row (2nd after header)
+  I.seeTextEquals("1", ".row-wrapper:nth-child(2) .table-row > div:nth-child(4)")
+  I.seeTextEquals("1", ".row-wrapper:nth-child(2) .table-row > div:nth-child(5)")
   // select task
-  I.click(".select-row input[type=checkbox]")
+  I.click(".select-all input[type=checkbox]")
   I.click("Delete tasks")
   I.click("OK")
   // empty state
