@@ -92,7 +92,8 @@ def propagate_completions(project, params, items):
     completed_task = items[0]
     task = project.target_storage.get(completed_task)
     if task is None or len(task.get('completions', [])) == 0:
-        raise DataManagerException('The first selected task should have at least one completion to propagate')
+        raise DataManagerException('The first selected task with ID = ' + str(completed_task) +
+                                   ' should have at least one completion to propagate')
 
     # get first completion
     source_completion = task['completions'][0]
