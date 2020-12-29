@@ -1,6 +1,6 @@
 {
-  "message": "Use LSF from npm (as it fails to build on GH with local dependency)",
-  "commit": "da9c7fc424586368c4047e714a2987adf618edd4",
+  "message": "Update README.md",
+  "commit": "7bd44a3122928ec3017d1a92af80a93f96e4292d",
   "branch": "feature/dm-sdk",
-  "date": "2020-12-28T15:51:53Z"
+  "date": "2020-12-29T16:02:58Z"
 }
