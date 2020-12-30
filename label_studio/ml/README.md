@@ -17,7 +17,7 @@ Here is a quick example tutorial on how to run the ML backend with a simple text
    
 2. Create new ML backend
    ```bash
-   label-studio-ml init my_ml_backend --script label-studio/ml/examples/simple_text_classifier.py
+   label-studio-ml init my_ml_backend --script label_studio/ml/examples/simple_text_classifier.py
    ```
    
 3. Start ML backend server
