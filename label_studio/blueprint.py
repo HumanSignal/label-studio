@@ -586,6 +586,7 @@ def api_project():
     if request.method == 'POST' and request.args.get('new', False):
         input_args.web_gui_project_desc = request.args.get('desc')
         g.project = project_get_or_create(multi_session_force_recreate=True)
+        delattr(input_args, 'web_gui_project_desc')  # remove it to avoid other users affecting
         code = 201
 
     # update project params, ml backend settings
