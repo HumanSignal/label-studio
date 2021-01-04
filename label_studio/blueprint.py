@@ -431,9 +431,13 @@ def model_page():
 def version():
     """ Show LS backend and LS frontend versions
     """
-    lsf = json.load(open(find_dir('static/editor') + '/version.json'))
+    with open(find_dir('static/editor') + '/version.json') as f:
+        lsf = json.load(f)
+    with open(find_dir('static/dm') + '/version.json') as f:
+        dm = json.load(f)
     ver = {
         'label-studio-frontend': lsf,
+        'label-studio-datamanager': dm,
         'label-studio-backend': label_studio.__version__
     }
     return make_response(jsonify(ver), 200)
