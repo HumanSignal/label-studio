@@ -1,7 +1,7 @@
 /* Install: npm install node-fetch
- * Run: node get-lsf-build.js
- * This script automatically takes the latest Label Studio Frontend build from master branch of LSF repo
- * and places it to label_studio/static/js/editor
+ * Run: node get-build.js [REPO] [BRANCH]
+ * This script automatically takes the latest build from given repo and branch
+ * and places it to label_studio/static/<REPO>
 */
 const fetch = require('node-fetch');
 
@@ -11,6 +11,11 @@ const path = require('path');
 
 const dir = path.resolve(__dirname, 'build-tmp');
 const TOKEN = process.env.GITHUB_TOKEN;
+
+// coloring for console output
+const GREEN = "\033[0;32m";
+const RED = "\033[0;31m";
+const NC = "\033[0m"; // NO COLOR to reset coloring
 
 const PROJECTS = {
   'editor': 'heartexlabs/label-studio-frontend',
@@ -25,6 +30,12 @@ async function get(projectName, ref = 'master') {
 
   const REPO = PROJECTS[projectName || 'lsf'];
 
+  if (!REPO) {
+    const repos = Object.entries(PROJECTS).map(a => "\t" + a.join("\t")).join("\n");
+    console.error(`\n${RED}Cannot fetch from repo ${REPO}.${NC}\nOnly available:\n${repos}`);
+    return;
+  }
+
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir);
   }
@@ -34,6 +45,13 @@ async function get(projectName, ref = 'master') {
     console.info(`Fetching ${commitUrl}`);
     res = await fetch(commitUrl, { headers: { Authorization: `token ${TOKEN}` }});
     json = await res.json();
+
+    if (!json || !json.object) {
+      console.log(`\n${RED}Wrong response from GitHub. Check that you use correct GITHUB_TOKEN.${NC}`);
+      console.log(json);
+      return;
+    }
+
     sha = json.object.sha;
     console.info(`Last commit in ${ref}:`, sha);
     branch = ref;
@@ -84,9 +102,9 @@ async function get(projectName, ref = 'master') {
   fs.rmdirSync(newPath, {recursive: true});
   fs.rename(oldPath, newPath, function (err) {
     if (err) throw err;
-    console.log('Successfully renamed - AKA moved!')
+    console.log(`Successfully renamed - AKA moved into ${newPath}`)
   });
 }
 
-// branch name as the first parameter, optional
+// repo name and branch name
 get(process.argv[2], process.argv[3]);
