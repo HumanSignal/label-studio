@@ -1021,7 +1021,7 @@ def api_predictions():
 
         # make prediction for all tasks
         elif mode == 'all_tasks':
-            # get tasks ids without predictionsss
+            # get tasks ids without predictions
             tasks_with_predictions = {}
             for task_id, task in g.project.source_storage.items():
                 task_pred = g.project.make_predictions(task)

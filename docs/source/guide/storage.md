@@ -155,8 +155,10 @@ Generate task data with URLs pointed to your bucket objects(for resources like j
 
 ## Redis database
 
-You can also store your tasks and completions on a locally-hosted Redis database. Currently, this is only supported if the redis database is hosted in the default mode, with the default IP address.
+File-based cloud storage connections can be slow for large amount of labelling tasks. 
 
-Note that you have to host the Redis database separately, it is not handled by LabelStudio. Redis is an in-memory database, so data saved there is not persistent! Make sure to enable Redis' persistance options to ensure you do not lose data when shutting down the database.
+You can also store your tasks and completions in a Redis database. Currently, this is only supported if the redis database is hosted in the default mode, with the default IP address. 
 
-Hosting a redis database is easy. See https://redis.io/topics/quickstart for an intro.
+Note that you have to host the Redis database separately, it is not handled by LabelStudio. Redis is an in-memory database, so data saved there is not persistent! Make sure to enable Redis' persistence options to ensure you do not lose data when shutting down the database, or have your own method to sync the database, e.g. by using Redis in the cloud (e.g. Azure: https://azure.microsoft.com/en-us/services/cache/, AWS: https://aws.amazon.com/redis/ )
+
+Hosting a redis database yourself is also easy. See https://redis.io/topics/quickstart for an intro.
