@@ -18,5 +18,6 @@
   "ml_backends": [],
   "task_page_auto_update_timer": 10000,
   "show_project_links_in_multisession": true,
-  "experimental_features": false
+  "experimental_features": false,
+  "first_page_full_render": true
 }
