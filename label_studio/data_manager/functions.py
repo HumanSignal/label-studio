@@ -529,11 +529,11 @@ def prepare_tasks(project, params):
     """
     import time
     points = [(time.time(), 'start')]
-
     page, page_size = params.page, params.page_size
 
     # use max count to speed up evaluation of tasks without filters and ordering
-    full_render = check_filters_enabled(params) or check_order_enabled(params) or page <= 1 or page_size <= 0
+    full_render = check_filters_enabled(params) or check_order_enabled(params)
+    full_render |= page <= 1 or page_size <= 0
     task_range = None if full_render else ((page-1) * page_size, page * page_size)
 
     # load all tasks from db with some aggregations over completions
