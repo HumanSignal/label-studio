@@ -49,7 +49,7 @@ class S3Storage(CloudStorage):
         self.aws_session_token = aws_session_token
         self.region = region
 
-        super(S3Storage, self).__init__(region=region,  **kwargs)
+        super(S3Storage, self).__init__(region=region, **kwargs)
 
     def _get_client(self):
         client, s3 = get_client_and_resource(
