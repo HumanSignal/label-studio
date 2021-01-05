@@ -1146,7 +1146,7 @@ def main():
 
     # On `start-multi-session` command, server creates one project per each browser sessions
     elif input_args.command == 'start-multi-session':
-        server_host = input_args.host or '127.0.0.1'
+        server_host = input_args.host or '0.0.0.0'
         port = input_args.port or 8080
 
         if input_args.use_gevent:

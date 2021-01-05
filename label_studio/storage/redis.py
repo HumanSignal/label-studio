@@ -1,12 +1,9 @@
 import json
 import os
 import logging
-from copy import deepcopy
 import redis
-from pathlib import PurePath
 
-from label_studio.utils.io import json_load, delete_dir_content, iter_files
-from .base import BaseStorage, BaseForm, CloudStorage, StringField, Optional
+from .base import BaseStorage, BaseForm, StringField
 
 
 logger = logging.getLogger(__name__)
@@ -16,13 +13,12 @@ def get_redis_connection(db = None):
         # This should never happen, but better to check than to accidentally 
         # overwrite an existing database by choosing a wrong default:
         logger.error("No redis db id passed!")
-    # Since tasks are always text, we use StrictRedis with utf decoding.
+    # Since tasks are always text, we use StrictRedis with utf-8 decoding.
     return redis.StrictRedis(db=db, charset="utf-8", decode_responses=True)
 
-class RedisStorageForm(BaseForm):
-    path = StringField('Path', description='Storage prefix')
 
-    # Bind here form fields to storage fields {"form field": "storage_field"}
+class RedisStorageForm(BaseForm):
+    path = StringField('Path', description='Storage prefix (optional)')
     bound_params = dict(path='path')
 
 
@@ -32,7 +28,7 @@ class RedisStorage(BaseStorage):
     Inherits from BaseStorage.
 
     Conventions:
-    A redis server hosts multiple, enumerated databases (0,1,2...)
+    A redis server hosts multiple, enumerated databases (0,1,2...).
     The database used for storage should ONLY contain tasks. Any data already
     in there might be lost / overwritten at any point in time and / or break
     the functionality.
@@ -48,7 +44,7 @@ class RedisStorage(BaseStorage):
     Values are python dicts encoded as utf-8 strings.
     """
 
-    description = 'Redis task database'
+    description = 'Redis database connection'
     
     form = RedisStorageForm
 
@@ -58,12 +54,13 @@ class RedisStorage(BaseStorage):
         If no path is provided manually (None or empty string), the 
         project_path is instead used.
 
-        By default, redis db 1 is used, expect if this is overwritten manually
+        By default, db 1 is used for tasks.
 
         Args:
             project_path (str): Labelstudio project path
             path (str or None, optional): The path that is used as a prefix. 
                                           Defaults to None.
+            db (int): The Redis database to use.
         """        
         
         # Check if a path was manually provided as an input parameter:
@@ -76,16 +73,14 @@ class RedisStorage(BaseStorage):
         super().__init__(path=path, project_path=project_path, **kwargs)
 
         # Get redis database object and test connection:
-        # database 0 is used by default and might contain other stuff,
-        # so we use 1 instead to add an extra layer of safety.
         self.r = get_redis_connection(db=db)
         if not self.r.ping():
-            logger.error("Redis connection could not be established")
+            logger.error("Redis connection could not be established.")
 
 
     def fullkey(self, key):
         # Convert a key (which can be an int or a string containing one) to 
-        # the full path in redis, e.g. username/projectid/key
+        # the full key in redis, e.g. "username/projectid/key"
         return self.path + str(key)
 
     def fullkey_to_key(self, fullkey):
@@ -104,7 +99,6 @@ class RedisStorage(BaseStorage):
 
     def set(self, key, value):
         self.r.set(self.fullkey(key), json.dumps(value))
-        #TODO Raise flag to save async?
 
     def __contains__(self, key):
         return self.r.exists(self.fullkey(key))
@@ -112,11 +106,10 @@ class RedisStorage(BaseStorage):
     def set_many(self, keys, values):
         for key, value in zip(keys, values):
             self.r.set(self.fullkey(key), json.dumps(value))
-        #TODO: Maybe save async?
 
     def ids(self):
         # We find all keys for this project by filtering the path, even though
-        # it is just part of the name. Similar to blob storage.
+        # it is just part of the name.
         fullkeys = self.r.keys(self.path+"*")
         keys = [self.fullkey_to_key(fk) for fk in fullkeys]
         return keys
@@ -132,12 +125,10 @@ class RedisStorage(BaseStorage):
 
     def remove(self, key):
         self.r.delete(self.fullkey(key))
-        #TODO: Sync ?self._save()
 
     def remove_all(self):
         for key in self.ids():
             self.remove(key)
-        # Sync?
 
     def empty(self):
         return len(self.ids()) == 0

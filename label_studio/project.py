@@ -128,7 +128,7 @@ class Project(object):
 
     @classmethod
     def get_available_target_storages(cls):
-        return ['completions-dir', 's3-completions', 'redis-completions']
+        return ['completions-dir', 's3-completions', 'gcs-completions', 'redis-completions']
 
     def get_available_source_storage_names(self):
         names = OrderedDict()
