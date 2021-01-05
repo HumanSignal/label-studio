@@ -1021,7 +1021,7 @@ def api_predictions():
 
         # make prediction for all tasks
         elif mode == 'all_tasks':
-            # get tasks ids without predictions
+            # get tasks ids without predictionsss
             tasks_with_predictions = {}
             for task_id, task in g.project.source_storage.items():
                 task_pred = g.project.make_predictions(task)
@@ -1146,7 +1146,7 @@ def main():
 
     # On `start-multi-session` command, server creates one project per each browser sessions
     elif input_args.command == 'start-multi-session':
-        server_host = input_args.host or '0.0.0.0'
+        server_host = input_args.host or '127.0.0.1'
         port = input_args.port or 8080
 
         if input_args.use_gevent:

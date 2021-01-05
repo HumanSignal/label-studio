@@ -151,3 +151,12 @@ If set true, the local copy of the remote storage will be created.
 #### use_blob_urls
 
 Generate task data with URLs pointed to your bucket objects(for resources like jpg, mp3, etc). If not selected, bucket objects will be interpreted as tasks in Label Studio JSON format, one object per task.
+
+
+## Redis database
+
+You can also store your tasks and completions on a locally-hosted Redis database. Currently, this is only supported if the redis database is hosted in the default mode, with the default IP address.
+
+Note that you have to host the Redis database separately, it is not handled by LabelStudio. Redis is an in-memory database, so data saved there is not persistent! Make sure to enable Redis' persistance options to ensure you do not lose data when shutting down the database.
+
+Hosting a redis database is easy. See https://redis.io/topics/quickstart for an intro.
