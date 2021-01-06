@@ -42,15 +42,15 @@ class myTestCase(unittest.TestCase):
         self.welcome_Start  = '//a[contains(text(), "Start")]'
         self.welcome_Export = '//a[contains(text(), "Export")]'
         #
-        #self.setup_label_car = '//span[contains(text(), "Car")]'
         #self.setup_label_car = '//span[@class="ant-tag"][contains(text(), "Car")]'
         self.setup_label_car = 'ant-tag'
+        self.setup_save_btn = 'submit_form'
+        self.setup_afterSave = '//p[contains(text(), "Label config saved!")]'
         #
         self.import_img_draganddrop_id = 'file-input'
         # self.import_img_draganddrop_text = '//p[contains(text(), "Drag and drop your files here or click for import")]'
         self.import_img_src = 'img/imgForDragAndDrop.jpg'
         #
-        # self.start_label_car = '//span[contains(text(), "Car")]'
         self.start_label_car = 'ant-tag'
         self.start_submit_btn = '//button/span[contains(text(), "Submit ")]'
         #
@@ -65,14 +65,14 @@ class myTestCase(unittest.TestCase):
         self.driver.get(self.site_url)
         print("..... Executing Test-Cases .....\n")
         #
-        # self.step1('Setup your label config')
-        # self.goToWelcomePage()
+        self.step1('Setup your label config')
+        self.goToWelcomePage()
         self.step2('Import tasks to project')
         self.goToWelcomePage()
         self.step3('Start labeling tasks')
         self.goToWelcomePage()
-        # self.step4('Export completions')
-        # self.goToWelcomePage()
+        self.step4('Export completions')
+        self.goToWelcomePage()
 
 
     #Checks element existance by xpath
@@ -89,33 +89,40 @@ class myTestCase(unittest.TestCase):
         print("..... Going to page Setup .....")
         self.driver.find_element_by_xpath(self.welcome_Setup).click()
         #
-        # # #self.driver.switch_to.frame(self.driver.find_element_by_id('editor-iframe'))
-        # #iframe_ = self.driver.find_element_by_xpath('//iframe[contains(@srcdoc, "<html><head><!--EditorCSS--><linkhref=&quot;static/editor/css/main.a1b00718.css&quot;rel=&quot;stylesheet&quot;><!--EditorJS--><scriptsrc=&quot;static/editor/js/main.12760629.js&quot;></script><style>body::-webkit-scrollbar-track{-webkit-box-shadow:inset002pxrgba(178,178,178,0.3)!important;background-color:#F5F5F5!important;}body::-webkit-scrollbar{width:2px!important;height:2px!important;background-color:#F5F5F5!important;}body::-webkit-scrollbar-thumb{background-color:#c3c3c3!important;border:2pxsolid#b4b4b4!important;}#label-studiodiv[class^=&quot;App_editor&quot;],div[class*=&quot;App_editor&quot;]{width:98%!important;min-width:98%!important;max-width:98%!important;}#label-studio.ls-menu{width:100%;}#label-studio.ls-segment{top:0;}</style></head><body><scriptsrc=&quot;static/js/jquery.min.js&quot;></script><scriptsrc=&quot;static/js/lsf-sdk.js&quot;></script><!--Editor--><divclass=&quot;uicontent&quot;><divid=&quot;label-studio&quot;style=&quot;width:100%;&quot;><divclass=&quot;uiloaderactiveinlinecentered&quot;></div></div></div><script>window.onload=function(){vartask={&quot;id&quot;:42,&quot;data&quot;:{&quot;image&quot;:&quot;static\/samples\/sample.jpg&quot;},&quot;completions&quot;:null,&quot;predictions&quot;:null,&quot;project&quot;:1,&quot;created_at&quot;:&quot;2019-02-06T14:06:42.000420Z&quot;,&quot;updated_at&quot;:&quot;2019-02-06T14:06:42.000420Z&quot;};varLS=newLabelStudio(&quot;label-studio&quot;,{config:`<View><Headervalue=&quot;Selectlabelandstarttoclickonimage&quot;></Header><Imagename=&quot;image&quot;value=&quot;$image&quot;></Image><PolygonLabelsname=&quot;label&quot;toName=&quot;image&quot;strokeWidth=&quot;3&quot;pointSize=&quot;small&quot;opacity=&quot;0.9&quot;><Labelvalue=&quot;Airplane&quot;background=&quot;red&quot;></Label><Labelvalue=&quot;Car&quot;background=&quot;blue&quot;></Label></PolygonLabels></View>`,user:{pk:1,firstName:&quot;Awesome&quot;,lastName:&quot;User&quot;},task:_convertTask(task),interfaces:[&quot;basic&quot;,&quot;side-column&quot;,&quot;predictions&quot;],onLabelStudioLoad:function(LS){varc=LS.completionStore.addCompletion({userGenerate:true});LS.completionStore.selectCompletion(c.id);}});};</script></body></html>")]')
-        # iframe_ = self.driver.find_element_by_xpath(r'//iframe[@srcdoc, "<html><head><!--EditorCSS--><linkhref=&quot;static/editor/css/main.a1b00718.css&quot;rel=&quot;stylesheet&quot;><!--EditorJS--><scriptsrc=&quot;static/editor/js/main.12760629.js&quot;></script><style>body::-webkit-scrollbar-track{-webkit-box-shadow:inset002pxrgba(178,178,178,0.3)!important;background-color:#F5F5F5!important;}body::-webkit-scrollbar{width:2px!important;height:2px!important;background-color:#F5F5F5!important;}body::-webkit-scrollbar-thumb{background-color:#c3c3c3!important;border:2pxsolid#b4b4b4!important;}#label-studiodiv[class^=&quot;App_editor&quot;],div[class*=&quot;App_editor&quot;]{width:98%!important;min-width:98%!important;max-width:98%!important;}#label-studio.ls-menu{width:100%;}#label-studio.ls-segment{top:0;}</style></head><body><scriptsrc=&quot;static/js/jquery.min.js&quot;></script><scriptsrc=&quot;static/js/lsf-sdk.js&quot;></script><!--Editor--><divclass=&quot;uicontent&quot;><divid=&quot;label-studio&quot;style=&quot;width:100%;&quot;><divclass=&quot;uiloaderactiveinlinecentered&quot;></div></div></div><script>window.onload=function(){vartask={&quot;id&quot;:42,&quot;data&quot;:{&quot;image&quot;:&quot;static\/samples\/sample.jpg&quot;},&quot;completions&quot;:null,&quot;predictions&quot;:null,&quot;project&quot;:1,&quot;created_at&quot;:&quot;2019-02-06T14:06:42.000420Z&quot;,&quot;updated_at&quot;:&quot;2019-02-06T14:06:42.000420Z&quot;};varLS=newLabelStudio(&quot;label-studio&quot;,{config:`<View><Headervalue=&quot;Selectlabelandstarttoclickonimage&quot;></Header><Imagename=&quot;image&quot;value=&quot;$image&quot;></Image><PolygonLabelsname=&quot;label&quot;toName=&quot;image&quot;strokeWidth=&quot;3&quot;pointSize=&quot;small&quot;opacity=&quot;0.9&quot;><Labelvalue=&quot;Airplane&quot;background=&quot;red&quot;></Label><Labelvalue=&quot;Car&quot;background=&quot;blue&quot;></Label></PolygonLabels></View>`,user:{pk:1,firstName:&quot;Awesome&quot;,lastName:&quot;User&quot;},task:_convertTask(task),interfaces:[&quot;basic&quot;,&quot;side-column&quot;,&quot;predictions&quot;],onLabelStudioLoad:function(LS){varc=LS.completionStore.addCompletion({userGenerate:true});LS.completionStore.selectCompletion(c.id);}});};</script></body></html>"]')
-        # self.driver.switch_to.frame(iframe_)
-        # self.driver.find_element_by_xpath(self.setup_label_car)
-        # time.sleep(5)
+        print("Clicking on Save button")
+        save_btn = self.wait.until(EC.element_to_be_clickable((By.ID, self.setup_save_btn)))
+        save_btn.click()
+        print("Clicking on popuped text 'Label config saved! '")
+        setup_afterSave_msg = self.wait.until(EC.element_to_be_clickable((By.XPATH, self.setup_afterSave)))
+        setup_afterSave_msg.click()
         #
-        # Click on Label Airplane
-        label_car_btn = self.wait.until(EC.element_to_be_clickable((By.CLASS_NAME, self.setup_label_car)))
-        label_car_btn.click()
-        #
-        # Doing 4 clicks for create area
-        actions = ActionChains(self.driver)
-        x = 50
-        y = 150
-        actions.move_to_element_with_offset(self.driver.find_element_by_tag_name('body'), 0,0)
-        actions.move_by_offset(x, y).click().perform()
-        actions.move_to_element_with_offset(self.driver.find_element_by_tag_name('body'), 0,0)
-        actions.move_by_offset(x, y+50).click().perform()
-        actions.move_to_element_with_offset(self.driver.find_element_by_tag_name('body'), 0,0)
-        actions.move_by_offset(x+30, y+30).click().perform()
-        actions.move_to_element_with_offset(self.driver.find_element_by_tag_name('body'), 0,0)
-        actions.move_by_offset(x, y).click().perform()
-        print("Triangle were created via 4 time clicking on the picture")
-        #
-        # Go to outsite from iframe
-        self.driver.switch_to_default_content()
+        # # # #self.driver.switch_to.frame(self.driver.find_element_by_id('editor-iframe'))
+        # # #iframe_ = self.driver.find_element_by_xpath('//iframe[contains(@srcdoc, "<html><head><!--EditorCSS--><linkhref=&quot;static/editor/css/main.a1b00718.css&quot;rel=&quot;stylesheet&quot;><!--EditorJS--><scriptsrc=&quot;static/editor/js/main.12760629.js&quot;></script><style>body::-webkit-scrollbar-track{-webkit-box-shadow:inset002pxrgba(178,178,178,0.3)!important;background-color:#F5F5F5!important;}body::-webkit-scrollbar{width:2px!important;height:2px!important;background-color:#F5F5F5!important;}body::-webkit-scrollbar-thumb{background-color:#c3c3c3!important;border:2pxsolid#b4b4b4!important;}#label-studiodiv[class^=&quot;App_editor&quot;],div[class*=&quot;App_editor&quot;]{width:98%!important;min-width:98%!important;max-width:98%!important;}#label-studio.ls-menu{width:100%;}#label-studio.ls-segment{top:0;}</style></head><body><scriptsrc=&quot;static/js/jquery.min.js&quot;></script><scriptsrc=&quot;static/js/lsf-sdk.js&quot;></script><!--Editor--><divclass=&quot;uicontent&quot;><divid=&quot;label-studio&quot;style=&quot;width:100%;&quot;><divclass=&quot;uiloaderactiveinlinecentered&quot;></div></div></div><script>window.onload=function(){vartask={&quot;id&quot;:42,&quot;data&quot;:{&quot;image&quot;:&quot;static\/samples\/sample.jpg&quot;},&quot;completions&quot;:null,&quot;predictions&quot;:null,&quot;project&quot;:1,&quot;created_at&quot;:&quot;2019-02-06T14:06:42.000420Z&quot;,&quot;updated_at&quot;:&quot;2019-02-06T14:06:42.000420Z&quot;};varLS=newLabelStudio(&quot;label-studio&quot;,{config:`<View><Headervalue=&quot;Selectlabelandstarttoclickonimage&quot;></Header><Imagename=&quot;image&quot;value=&quot;$image&quot;></Image><PolygonLabelsname=&quot;label&quot;toName=&quot;image&quot;strokeWidth=&quot;3&quot;pointSize=&quot;small&quot;opacity=&quot;0.9&quot;><Labelvalue=&quot;Airplane&quot;background=&quot;red&quot;></Label><Labelvalue=&quot;Car&quot;background=&quot;blue&quot;></Label></PolygonLabels></View>`,user:{pk:1,firstName:&quot;Awesome&quot;,lastName:&quot;User&quot;},task:_convertTask(task),interfaces:[&quot;basic&quot;,&quot;side-column&quot;,&quot;predictions&quot;],onLabelStudioLoad:function(LS){varc=LS.completionStore.addCompletion({userGenerate:true});LS.completionStore.selectCompletion(c.id);}});};</script></body></html>")]')
+        # # iframe_ = self.driver.find_element_by_xpath(r'//iframe[@srcdoc, "<html><head><!--EditorCSS--><linkhref=&quot;static/editor/css/main.a1b00718.css&quot;rel=&quot;stylesheet&quot;><!--EditorJS--><scriptsrc=&quot;static/editor/js/main.12760629.js&quot;></script><style>body::-webkit-scrollbar-track{-webkit-box-shadow:inset002pxrgba(178,178,178,0.3)!important;background-color:#F5F5F5!important;}body::-webkit-scrollbar{width:2px!important;height:2px!important;background-color:#F5F5F5!important;}body::-webkit-scrollbar-thumb{background-color:#c3c3c3!important;border:2pxsolid#b4b4b4!important;}#label-studiodiv[class^=&quot;App_editor&quot;],div[class*=&quot;App_editor&quot;]{width:98%!important;min-width:98%!important;max-width:98%!important;}#label-studio.ls-menu{width:100%;}#label-studio.ls-segment{top:0;}</style></head><body><scriptsrc=&quot;static/js/jquery.min.js&quot;></script><scriptsrc=&quot;static/js/lsf-sdk.js&quot;></script><!--Editor--><divclass=&quot;uicontent&quot;><divid=&quot;label-studio&quot;style=&quot;width:100%;&quot;><divclass=&quot;uiloaderactiveinlinecentered&quot;></div></div></div><script>window.onload=function(){vartask={&quot;id&quot;:42,&quot;data&quot;:{&quot;image&quot;:&quot;static\/samples\/sample.jpg&quot;},&quot;completions&quot;:null,&quot;predictions&quot;:null,&quot;project&quot;:1,&quot;created_at&quot;:&quot;2019-02-06T14:06:42.000420Z&quot;,&quot;updated_at&quot;:&quot;2019-02-06T14:06:42.000420Z&quot;};varLS=newLabelStudio(&quot;label-studio&quot;,{config:`<View><Headervalue=&quot;Selectlabelandstarttoclickonimage&quot;></Header><Imagename=&quot;image&quot;value=&quot;$image&quot;></Image><PolygonLabelsname=&quot;label&quot;toName=&quot;image&quot;strokeWidth=&quot;3&quot;pointSize=&quot;small&quot;opacity=&quot;0.9&quot;><Labelvalue=&quot;Airplane&quot;background=&quot;red&quot;></Label><Labelvalue=&quot;Car&quot;background=&quot;blue&quot;></Label></PolygonLabels></View>`,user:{pk:1,firstName:&quot;Awesome&quot;,lastName:&quot;User&quot;},task:_convertTask(task),interfaces:[&quot;basic&quot;,&quot;side-column&quot;,&quot;predictions&quot;],onLabelStudioLoad:function(LS){varc=LS.completionStore.addCompletion({userGenerate:true});LS.completionStore.selectCompletion(c.id);}});};</script></body></html>"]')
+        # # self.driver.switch_to.frame(iframe_)
+        # # self.driver.find_element_by_xpath(self.setup_label_car)
+        # # time.sleep(5)
+        # #
+        # # Click on Label Airplane
+        # label_car_btn = self.wait.until(EC.element_to_be_clickable((By.CLASS_NAME, self.setup_label_car)))
+        # label_car_btn.click()
+        # #
+        # # Doing 4 clicks for create area
+        # actions = ActionChains(self.driver)
+        # x = 50
+        # y = 150
+        # actions.move_to_element_with_offset(self.driver.find_element_by_tag_name('body'), 0,0)
+        # actions.move_by_offset(x, y).click().perform()
+        # actions.move_to_element_with_offset(self.driver.find_element_by_tag_name('body'), 0,0)
+        # actions.move_by_offset(x, y+50).click().perform()
+        # actions.move_to_element_with_offset(self.driver.find_element_by_tag_name('body'), 0,0)
+        # actions.move_by_offset(x+30, y+30).click().perform()
+        # actions.move_to_element_with_offset(self.driver.find_element_by_tag_name('body'), 0,0)
+        # actions.move_by_offset(x, y).click().perform()
+        # print("Triangle were created via 4 time clicking on the picture")
+        # #
+        # # Go to outsite from iframe
+        # self.driver.switch_to_default_content()
 
 
     #Step2 - Import tasks to project
