@@ -589,6 +589,7 @@ class Project(object):
         # init task if completions with task not exists
         if not task:
             task = deepcopy(self.source_storage.get(task_id))
+            task = self.resolve_undefined_task_data(task)
             task['completions'] = []
         else:
             task = deepcopy(task)
