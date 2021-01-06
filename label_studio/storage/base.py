@@ -49,7 +49,7 @@ class BaseForm(FlaskForm):
 
 
 class BaseStorageForm(BaseForm):
-    path = StringField('Path', [InputRequired()], description='Storage path (e.g. bucket name)')
+    path = StringField('Path', [InputRequired()], description='Storage path (e.g. bucket/container name)')
 
     # Bind here form fields to storage fields {"form field": "storage_field"}
     bound_params = dict(path='path')
@@ -152,8 +152,8 @@ class CloudStorageForm(BaseStorageForm):
     regex = StringField('Regex', [IsValidRegex()], description='File filter by regex, example: .* (If not specified, all files will be skipped)')  # noqa
     # data_key = StringField('Data key', [Optional()], description='Task tag key from your label config')
     use_blob_urls = BooleanField('Use BLOBs URLs', default=True,
-                                 description='Interpret each bucket object as resource file (jpg, mp3, txt, etc).<br>'
-                                             'Otherwise bucket objects will be interpreted as tasks '
+                                 description='Interpret each bucket/container object as resource file (jpg, mp3, txt, etc).<br>'
+                                             'Otherwise bucket/container objects will be interpreted as tasks '
                                              'in Label Studio JSON format')
     bound_params = dict(
         prefix='prefix',

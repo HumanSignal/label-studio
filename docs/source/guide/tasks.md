@@ -28,7 +28,7 @@ Open the Label Studio app. On the **Setup** page, choose any of Audio annotation
 
 ### Cloud storage
 
-Assume you have GCP or S3 bucket you want to connect to stream your images from there. Read more [here](/guide/storage.html) how to connect common cloud storages.
+Assume you have GCP, S3 or Azure Blob bucket/container you want to connect to stream your images from there. Read more [here](/guide/storage.html) how to connect common cloud storages.
 
 
 ## Text files
@@ -70,7 +70,7 @@ Open the Label Studio app. On the **Setup** page, choose any of Audio annotation
 
 ### Cloud storage
 
-Assume you have GCP or S3 bucket you want to connect to stream your images from there. Read more [here](/guide/storage.html) how to connect common cloud storages.
+Assume you have GCP, S3 or Azure Blob bucket/container you want to connect to stream your images from there. Read more [here](/guide/storage.html) how to connect common cloud storages.
 
 
 
@@ -106,7 +106,7 @@ Go to the **Import** page. Drag-n-drop `time-series.txt` or select it via import
 
 ### Cloud storage
 
-Assume you have GCP or S3 bucket you want to connect to stream your images from there. Read more [here](/guide/storage.html) how to connect common cloud storages.
+Assume you have GCP, S3 or Azure Blob bucket/container you want to connect to stream your images from there. Read more [here](/guide/storage.html) how to connect common cloud storages.
 
 
 ## How to import preannotations

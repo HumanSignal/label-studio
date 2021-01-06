@@ -1,10 +1,12 @@
 import base64
 import logging
+import os
 import re
 import socket
 from datetime import datetime, timedelta
 from urllib.parse import urlparse
 
+from azure.storage.blob import BlobClient, generate_blob_sas, BlobSasPermissions
 import boto3
 import google.auth
 from botocore.exceptions import ClientError
@@ -17,6 +19,8 @@ from label_studio.storage.s3 import get_client_and_resource
 logger = logging.getLogger(__name__)
 
 PRESIGNED_URL_TTL_MINUTES = 1
+AZURE_BLOB_ACCOUNT_NAME = os.getenv('AZURE_BLOB_ACCOUNT_NAME') 
+AZURE_BLOB_ACCOUNT_KEY = os.getenv('AZURE_BLOB_ACCOUNT_KEY') 
 
 
 def resolve_task_data_uri(task, **kwargs):
@@ -28,6 +32,8 @@ def resolve_task_data_uri(task, **kwargs):
             out[key] = resolve_s3(data, **kwargs)
         elif data.startswith('gs://'):
             out[key] = resolve_gs(data, **kwargs)
+        elif data.startswith('azure-blob://'):
+            out[key] = resolve_azure_blob(data, **kwargs)
         # Can be simplified with := for python version >= 3.8
         elif _get_uri_via_regex(data):
             uri, storage = _get_uri_via_regex(data)
@@ -36,6 +42,8 @@ def resolve_task_data_uri(task, **kwargs):
                 out[key] = data.replace(uri, resolve_s3(uri, **kwargs))
             if storage == "gs":
                 out[key] = data.replace(uri, resolve_gs(uri, **kwargs))
+            if storage == "azure-blob":
+                out[key] = data.replace(uri, resolve_azure_blob(uri, **kwargs))
         else:
             out[key] = data
     task['data'] = out
@@ -174,3 +182,39 @@ def python_cloud_function_get_signed_url(bucket_name, blob_name):
     signing_credentials = compute_engine.IDTokenCredentials(auth_request, "", service_account_email=credentials.service_account_email)
     signed_url = signed_blob_path.generate_signed_url(expires_at_ms, credentials=signing_credentials, version="v4")
     return signed_url
+
+
+def _get_s3_params_from_project(project):
+    params = {}
+    if not hasattr(project, 'source_storage'):
+        return params
+    storage = project.source_storage
+    if hasattr(storage, 'aws_access_key_id'):
+        params['aws_access_key_id'] = storage.aws_access_key_id
+    if hasattr(storage, 'aws_secret_access_key'):
+        params['aws_secret_access_key'] = storage.aws_secret_access_key
+    if hasattr(storage, 'aws_session_token'):
+        params['aws_session_token'] = storage.aws_session_token
+    if hasattr(storage, 'region'):
+        params['region'] = storage.region
+    if hasattr(storage, 'presign'):
+        params['presign'] = storage.presign
+    return params
+
+def resolve_azure_blob(url, **kwargs):
+    r = urlparse(url, allow_fragments=False) 
+         
+    container = r.netloc
+    blob = r.path.lstrip('/')
+
+    expiry= datetime.utcnow() + timedelta(minutes=PRESIGNED_URL_TTL_MINUTES)
+
+    sas_token = generate_blob_sas(account_name=AZURE_BLOB_ACCOUNT_NAME, 
+                                container_name=container,
+                                blob_name=blob,
+                                account_key=AZURE_BLOB_ACCOUNT_KEY,
+                                permission=BlobSasPermissions(read=True),
+                                expiry=expiry) 
+
+    url = 'https://'+AZURE_BLOB_ACCOUNT_NAME+'.blob.core.windows.net/'+container+'/'+blob+'?'+sas_token
+    return url
