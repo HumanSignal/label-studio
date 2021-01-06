@@ -123,6 +123,7 @@ a {
     padding: 5px 20px 5px 40px;
     position: relative;
     box-shadow: 0 4px 3px -2px rgba(0, 0, 0, 0.0774);
+    z-index: 1; /* drop the shadow over all other elements below */
     margin-bottom: 3em;
     height: 50px;
 }
