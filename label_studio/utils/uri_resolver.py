@@ -184,23 +184,6 @@ def python_cloud_function_get_signed_url(bucket_name, blob_name):
     return signed_url
 
 
-def _get_s3_params_from_project(project):
-    params = {}
-    if not hasattr(project, 'source_storage'):
-        return params
-    storage = project.source_storage
-    if hasattr(storage, 'aws_access_key_id'):
-        params['aws_access_key_id'] = storage.aws_access_key_id
-    if hasattr(storage, 'aws_secret_access_key'):
-        params['aws_secret_access_key'] = storage.aws_secret_access_key
-    if hasattr(storage, 'aws_session_token'):
-        params['aws_session_token'] = storage.aws_session_token
-    if hasattr(storage, 'region'):
-        params['region'] = storage.region
-    if hasattr(storage, 'presign'):
-        params['presign'] = storage.presign
-    return params
-
 def resolve_azure_blob(url, **kwargs):
     r = urlparse(url, allow_fragments=False) 
          
