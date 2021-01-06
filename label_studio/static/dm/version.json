@@ -1,6 +1,6 @@
 {
-  "message": "Fix completion submission bug",
-  "commit": "9611d892ad06fbf16cca7aae648b3788fcba7119",
+  "message": "Fix styles in table header; fix LSF on list resize\n\n- fix buttons in table header on smaller screen/with Filters docked\n- trigger resize event for LSF to fix image regions and relation arrows",
+  "commit": "5085cc7d1643d60466f99e6b4d6c16e7836b14b6",
   "branch": "feature/dm-sdk",
-  "date": "2020-12-30T16:29:25Z"
+  "date": "2021-01-06T15:19:53Z"
 }

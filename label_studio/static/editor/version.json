@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'fix/paragraph-relations-overlay'",
-  "commit": "8b92bb65aa77487ca5e2e09b16264257ca00f928",
+  "message": "Merge pull request #162 from heartexlabs/fix/ny-fixes\n\nNY fixes\r\n- Smoke tests for all examples\r\n- Get TextArea classifications back to Results list\r\n- Get Normalization back as meta value",
+  "commit": "894b58dd7f2661203b4b177ceca6ed9462f83817",
   "branch": "master",
-  "date": "2020-12-18T19:16:34Z"
+  "date": "2021-01-06T15:23:08Z"
 }
