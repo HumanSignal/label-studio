@@ -6,7 +6,7 @@ import socket
 from datetime import datetime, timedelta
 from urllib.parse import urlparse
 
-from azure.storage.blob import BlobClient, generate_blob_sas, BlobSasPermissions
+from azure.storage.blob import generate_blob_sas, BlobSasPermissions
 import boto3
 import google.auth
 from botocore.exceptions import ClientError
@@ -199,5 +199,4 @@ def resolve_azure_blob(url, **kwargs):
                                 permission=BlobSasPermissions(read=True),
                                 expiry=expiry) 
 
-    url = 'https://'+AZURE_BLOB_ACCOUNT_NAME+'.blob.core.windows.net/'+container+'/'+blob+'?'+sas_token
-    return url
+    return 'https://' + AZURE_BLOB_ACCOUNT_NAME + '.blob.core.windows.net/' + container + '/' + blob + '?' + sas_token
