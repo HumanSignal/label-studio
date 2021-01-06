@@ -41,14 +41,12 @@ class AzureBlobStorage(CloudStorage):
         pass
 
     def _get_objects(self):
-        logger.debug('Getting Az blobs from ' + self.path + " with prefix " + self.prefix)
         container = self.client['container']
         files = container.list_blobs(name_starts_with=self.prefix)
         return (f.name for f in files if f.name != (self.prefix.rstrip('/') + '/'))
 
     def _get_value(self, key, inplace=False, validate=True):
         container = self.client['container']
-        logger.debug('Getting Az blob with key ' + key + " container: "+ self.path + " with prefix " + self.prefix)
         blob = container.download_blob(key)
         blob_str = blob.content_as_text()
         return json.loads(blob_str)
