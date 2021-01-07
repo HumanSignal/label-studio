@@ -228,16 +228,16 @@ class TestTasksAndAnnotations:
         assert response.json == {
             'tasks': [{'cancelled_completions': 0, 'completed_at': None, 'completions_results': '',
                        'data': {'image': '123', 'text': '1232'}, 'id': 2, 'total_completions': 0,
-                       'total_predictions': 0},
+                       'total_predictions': 0, 'predictions_results': ''},
                       {'cancelled_completions': 0, 'completed_at': None, 'completions_results': '',
                        'data': {'image': '123', 'text': '1233'}, 'id': 3, 'total_completions': 0,
-                       'total_predictions': 0},
+                       'total_predictions': 0, 'predictions_results': ''},
                       {'cancelled_completions': 0, 'completed_at': None, 'completions_results': '',
                        'data': {'image': '123', 'text': '1234'}, 'id': 4, 'total_completions': 0,
-                       'total_predictions': 0},
+                       'total_predictions': 0, 'predictions_results': ''},
                       {'cancelled_completions': 0, 'completed_at': None, 'completions_results': '',
                        'data': {'image': '123', 'text': '1235'}, 'id': 5, 'total_completions': 0,
-                       'total_predictions': 0}], 'total': 4, 'total_completions': 0, 'total_predictions': 0}
+                       'total_predictions': 0, 'predictions_results': ''}], 'total': 4, 'total_completions': 0, 'total_predictions': 0}
 
     def test_annotations(self, test_client, captured_templates):
         response = test_client.get('/api/project/tabs/1/annotations')

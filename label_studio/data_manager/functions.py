@@ -125,7 +125,7 @@ def get_all_columns(project):
         },
         {
             'id': 'completions_results',
-            'title': "Completion results",
+            'title': "Completions results",
             'type': "String",
             'target': 'tasks',
             'help': 'Completion results stacked over all completions',
@@ -147,7 +147,7 @@ def get_all_columns(project):
         },
         {
             'id': 'predictions_results',
-            'title': "Prediction results",
+            'title': "Predictions results",
             'type': "String",
             'target': 'tasks',
             'help': 'Prediction results stacked over all predictions',
