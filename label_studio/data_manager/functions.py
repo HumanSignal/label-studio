@@ -124,6 +124,17 @@ def get_all_columns(project):
             }
         },
         {
+            'id': 'completions_results',
+            'title': "Completion results",
+            'type': "String",
+            'target': 'tasks',
+            'help': 'Completion results stacked over all completions',
+            'visibility_defaults': {
+                'explore': False,
+                'labeling': False
+            }
+        },
+        {
             'id': 'predictions_score',
             'title': "Predictions score",
             'type': "Number",
@@ -135,11 +146,11 @@ def get_all_columns(project):
             }
         },
         {
-            'id': 'completions_results',
-            'title': "Results",
+            'id': 'predictions_results',
+            'title': "Prediction results",
             'type': "String",
             'target': 'tasks',
-            'help': 'Completion results stacked over all completions',
+            'help': 'Prediction results stacked over all predictions',
             'visibility_defaults': {
                 'explore': False,
                 'labeling': False
@@ -305,18 +316,21 @@ def load_task(project, task_id, params, resolve_uri=False):
     task['completed_at'] = completed_at
 
     # completion results aggregations over all completions
-    completions = task.get('completions', None)
-    if completions:
-        task['completions_results'] = json.dumps([completion.get('result', []) for completion in completions])
+    completions = task.get('completions', [])
+    if len(completions) > 0:
+        task['completions_results'] = json.dumps([item.get('result', []) for item in completions])
     else:
         task['completions_results'] = ''
 
     # prediction score
     predictions = task.get('predictions', [])
     if len(predictions) > 0:
+        task['predictions_results'] = json.dumps([item.get('result', []) for item in predictions])
         scores = [p['score'] for p in predictions if 'score' in p]
         if scores:
             task['prediction_scores'] = sum(scores) / len(scores)
+    else:
+        task['predictions_results'] = ''
 
     # aggregations
     task['total_completions'] = len(task.get('completions', []))
