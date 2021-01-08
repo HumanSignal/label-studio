@@ -4,7 +4,7 @@ attrs==19.1.0
 blis==0.4.1
 certifi==2019.11.28
 chardet==3.0.4
-Click==7.0
+click~=7.0
 cymem==2.0.3
 Flask==1.1.1
 idna==2.8
