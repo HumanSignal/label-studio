@@ -1,6 +1,6 @@
 {
-  "message": "Fix highlighted bug on switching tabs",
-  "commit": "f80376ad56f1ff5f941d290880442a19e77d39d9",
+  "message": "Fix zIndex for label stream. Add icon for skip",
+  "commit": "810689c46c103559eb51683c7cbcfa90c8ac14bc",
   "branch": "feature/dm-sdk",
-  "date": "2021-01-08T17:41:17Z"
+  "date": "2021-01-09T00:04:05Z"
 }

@@ -128,7 +128,10 @@ def predictions_to_completions(project, params, items):
 
         prediction = predictions[-1]
 
-        # start completion id from task_id * 9000
+        # load task with completion from target storage
+        task_with_completions = project.target_storage.get(i)
+        task = copy(task if task_with_completions is None else task_with_completions)
+
         completions = task.get('completions', None) or [{'id': i * 9000}]
         completion = {
             'id': max([c['id'] for c in completions]) + 1,
