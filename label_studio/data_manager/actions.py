@@ -131,7 +131,7 @@ def predictions_to_completions(project, params, items):
         # start completion id from task_id * 9000
         completions = task.get('completions', None) or [{'id': i * 9000}]
         completion = {
-            'id': max([c['id'] for c in completions]) + 1
+            'id': max([c['id'] for c in completions]) + 1,
             'created_at': timestamp_now(),
             'lead_time': 0,
             'result': prediction.get('result', [])
