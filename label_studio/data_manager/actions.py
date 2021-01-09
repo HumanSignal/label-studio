@@ -119,6 +119,34 @@ def propagate_completions(project, params, items):
     return {'response_code': 200}
 
 
+def predictions_to_completions(project, params, items):
+    for i in items:
+        task = project.source_storage.get(i)
+        predictions = task.get('predictions', [])
+        if len(predictions) == 0:
+            continue
+
+        prediction = predictions[-1]
+
+        # start completion id from task_id * 9000
+        completions = task.get('completions', None) or [{'id': i * 9000}]
+        completion = {
+            'id': max([c['id'] for c in completions]) + 1
+            'created_at': timestamp_now(),
+            'lead_time': 0,
+            'result': prediction.get('result', [])
+        }
+
+        if 'completions' not in task:
+            task['completions'] = []
+        task['completions'].append(completion)
+
+        project.target_storage.set(i, task)
+
+    return {'response_code': 200}
+
+
+
 def next_task(project, params, items):
     """ Generate next task for labeling stream
 
@@ -167,4 +195,8 @@ register_action(propagate_completions, 'Propagate completions', 1, experimental=
                                 'but other annotation types (RectangleLabels, Text Labels, etc) '
                                 'will have a lot of issues.',
                         'type': 'confirm'})
+register_action(predictions_to_completions, 'Predictions => completions', 1, experimental=True,
+                dialog={'text': 'This action will create a new completion from the last task prediction',
+                        'type': 'confirm'})
+
 register_action(next_task, 'Generate next task', 0, hidden=True)
