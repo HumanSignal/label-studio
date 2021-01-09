@@ -196,7 +196,8 @@ register_action(propagate_completions, 'Propagate completions', 1, experimental=
                                 'will have a lot of issues.',
                         'type': 'confirm'})
 register_action(predictions_to_completions, 'Predictions => completions', 1, experimental=True,
-                dialog={'text': 'This action will create a new completion from the last task prediction',
+                dialog={'text': 'This action will create a new completion from the last task prediction '
+                                'for each selected task.',
                         'type': 'confirm'})
 
 register_action(next_task, 'Generate next task', 0, hidden=True)
