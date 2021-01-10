@@ -6,7 +6,7 @@
 const fetch = require('node-fetch');
 
 const fs = require('fs');
-const { spawn } = require('child_process');
+const { spawn, execSync } = require('child_process');
 const path = require('path');
 
 const dir = path.resolve(__dirname, 'build-tmp');
@@ -103,6 +103,9 @@ async function get(projectName, ref = 'master') {
   fs.rename(oldPath, newPath, function (err) {
     if (err) throw err;
     console.log(`Successfully renamed - AKA moved into ${newPath}`)
+    fs.rmdirSync(dir, {recursive: true});
+    console.log(`Cleaned up tmp directory [${dir}]`);
+    execSync('npx webpack', {stdio: 'inherit'});
   });
 }
 
