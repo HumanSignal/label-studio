@@ -20,10 +20,10 @@
   <!-- Vue app -->
   <div class="ui hidden" id="import-tasks" :class="{ loaded: vueLoaded }">
     <div v-if="preview">
-      <h1>Files loaded</h1>
-      <p>You can import them to the task manager.</p>
+      <h1>Files uploaded</h1>
+      <p>Import them to the task manager to start labeling</p>
       <div v-if="formats" ref="formats" class="formats">
-        <div>Found different types of files loaded. Chose which you wish to import.</div>
+        <div>Multiple file types uploaded. Choose which to import:</div>
         <ul>
           <li class="ui radio checkbox" v-for="object in formats">
             <input type="radio" name="format" :value="object.type" :id="object.type" @change="update_formats" />
