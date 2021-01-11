@@ -1,6 +1,6 @@
 {
-  "message": "Fix grid view calculation",
-  "commit": "909f958f014025133022305734865c9708353772",
+  "message": "Fix property path resolving",
+  "commit": "a42b2c44b850fdb93cfc0baee48b0a51dfd3a379",
   "branch": "feature/dm-sdk",
-  "date": "2021-01-11T10:50:12Z"
+  "date": "2021-01-11T17:27:08Z"
 }
