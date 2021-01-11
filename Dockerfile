@@ -3,6 +3,8 @@ FROM python:3.6-slim
 
 WORKDIR /label-studio
 
+RUN apt-get update && apt-get install -y build-essential
+
 # Copy and install requirements.txt first for caching
 COPY requirements.txt /label-studio
 RUN pip install --upgrade pip
