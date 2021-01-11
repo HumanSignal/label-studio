@@ -1,6 +1,6 @@
 {
-  "message": "Fix labeling crash on scroll",
-  "commit": "209c3a85521f34870eae2dbd14c85fb3d65e23ec",
+  "message": "Fix displaying non-string values in Grid View",
+  "commit": "6a22401de9364dd3048f8148235007d0ac96f76d",
   "branch": "feature/dm-sdk",
-  "date": "2021-01-10T16:17:55Z"
+  "date": "2021-01-11T09:56:57Z"
 }
