@@ -1,6 +1,6 @@
 {
-  "message": "Fix displaying non-string values in Grid View",
-  "commit": "6a22401de9364dd3048f8148235007d0ac96f76d",
+  "message": "Fix grid view calculation",
+  "commit": "909f958f014025133022305734865c9708353772",
   "branch": "feature/dm-sdk",
-  "date": "2021-01-11T09:56:57Z"
+  "date": "2021-01-11T10:50:12Z"
 }
