@@ -1,0 +1,372 @@
+{% extends 'base.html' %}
+{% block head %}
+<script src="static/js/polyfill.min.js"></script>
+<script src="static/js/vue.js"></script>
+<script src="static/js/components/vue-tippy.min.js"></script>
+<script src="static/semantic/semantic-ui-vue.min.js"></script>
+
+<link rel="stylesheet" href="static/css/import-new.css">
+{% endblock %}
+
+{% block body %}
+
+{% include 'includes/import_storages.html' %}
+{% include 'includes/import_files.html' %}
+{% raw %}
+
+  <!-- Spinner while vue loading -->
+  <div id="vue_loader" class="ui large text loader loading active">Loading ...</div>
+
+  <!-- Vue app -->
+  <div class="ui hidden" id="import-tasks" :class="{ loaded: vueLoaded }">
+    <div v-if="preview">
+      <h1>Files uploaded</h1>
+      <p>Import them to the task manager to start labeling</p>
+      <div v-if="formats" ref="formats" class="formats">
+        <div>Multiple file types uploaded. Choose which to import:</div>
+        <ul>
+          <li class="ui radio checkbox" v-for="object in formats">
+            <input type="radio" name="format" :value="object.type" :id="object.type" @change="update_formats" />
+            <label :for="object.type">
+              <span class="type">{{object.type}}</span>
+              <span class="count">{{object.count}}</span>
+              <span class="ext">{{object.display}}</span>
+            </label>
+          </li>
+        </ul>
+      </div>
+      <div class="ui checkbox" v-if="show_files_as_tasks_list">
+        <input type="checkbox" id="files_type" @change="toggle_type" ref="files_type" :checked="files_as_tasks_list.selected"/>
+        <label for="files_type">
+          Interpret each line in files as a single item
+          <p class="rtfm"><a href="https://labelstud.io/guide/tasks.html#CSV-TSV" target="_blank">Read Documentation</a> for details</a></p>
+        </label>
+      </div>
+
+      <ul class="stats" v-if="stats && !errors.length">
+        <li><span class="num">{{stats.total_tasks}}</span> tasks loaded</li>
+        <li><span class="num">{{stats.total_completions}}</span> completions</li>
+        <li><span class="num">{{stats.total_predictions}}</span> predictions</li>
+      </ul>
+
+      <p>
+        <button class="ui secondary button" @click="reset">Cancel</button>
+        <button
+          class="ui primary button"
+          @click="apply"
+          :disabled="errors.length > 0 || (formats && !selectedFormat)"
+        >
+          Import
+        </button>
+      </p>
+
+      <div class="loading splash" v-if="loading">
+        <div class="spinner">
+          <img src="static/images/opossum_looking.png" width="60px">
+        </div>
+      </div>
+
+      <div class="error" v-for="error in errors" v-if="errors.length">
+        <details v-if="error.details">
+          <summary>
+            <h3>{{error.header}}</h3>
+            <p>{{error.text}}</p>
+          </summary>
+          <div>{{error.details}}</div>
+        </details>
+        <div v-if="!error.details">
+          <h3>{{error.header}}</h3>
+          <p>{{error.text}}</p>
+        </div>
+      </div>
+
+      <div class="preview" v-if="!errors.length" :class="{ fade: stats && preview.length < stats.total_tasks}">
+        <h4>Data preview</h4>
+        <table>
+          <thead v-if="Object.keys(preview[0]).length > 1">
+            <tr>
+              <th v-for="_, title in preview[0]">{{title}}</th>
+            </tr>
+          </thead>
+          <tr v-for="row in preview">
+            <td v-for="key in Object.keys(preview[0])">{{get_short_text(row[key])}}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div v-if="loading && !preview">
+      <h1 class="fade">Import data</h1>
+      <div class="loading">
+        <h4>Loading files...</h4>
+        <div class="spinner">
+          <img src="static/images/opossum_looking.png" width="60px">
+        </div>
+        <p>Depending on size it may take several minutes</p>
+      </div>
+    </div>
+
+    <div v-if="errors.length && !preview">
+      <h1>Errors</h1>
+      <div class="error" v-for="error in errors">
+        <details v-if="error.details">
+          <summary>
+            <h3>{{error.header}}</h3>
+            <p>{{error.text}}</p>
+          </summary>
+          <div>{{error.details}}</div>
+        </details>
+        <div v-if="!error.details">
+          <h3>{{error.header}}</h3>
+          <p>{{error.text}}</p>
+        </div>
+      </div>
+      <p class="center">
+        <button class="ui primary button" @click="reset">Try another input</button>
+        <button
+          class="ui secondary button"
+          @click="config"
+          v-if="!!errors.find(error => (error.header + error.text).includes('inconsistent'))"
+        >Edit config</button>
+      </p>
+    </div>
+
+    <div :class="{ hidden: loading || preview || errors.length }">
+      <h1>Import data</h1>
+
+      <div class="source-switch">
+        <span>Source</span>
+        <div class="ui buttons">
+          <button
+            v-for="title, name in sources"
+            class="ui basic button"
+            :class="{ primary: source === name, ['state-' + name]: true }"
+            @click="source=name"
+          >{{title}}</button>
+        </div>
+      </div>
+
+      <div class="ui form tab-files" v-if="source === 'files'" ref="files">
+        <import-files @start="start" @finish="finish" @error="errorFromResult"></import-files>
+      </div>
+
+      <div class="ui form tab-url" v-if="source === 'url'" ref="url">
+        <form class="ui fluid action input" @submit="url">
+          <input type="text" name="url" ref="url" placeholder="Dataset URL">
+          <button class="ui primary button">Load</button>
+        </form>
+        <p class="rtfm">
+          To learn about supported formats check out the
+          <a href="https://labelstud.io/guide/tasks.html" target="_blank">Documentation</a>
+        </p>
+      </div>
+
+      <div class="ui form tab-cloud" v-if="source === 'cloud'" ref="cloud">
+        <cloud-storages @finish="dm"></cloud-storages>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    Vue.use(SemanticUIVue);
+    Vue.use(VueTippy);
+
+    var app = new Vue({
+      el: '#import-tasks',
+      components: ["cloud-storages"],
+
+      data: function () {
+
+        return {
+          id: null,
+          errors: [],
+          loading: false,
+          files_as_tasks_list: {selected: true, type: null},
+          show_files_as_tasks_list: false,
+          formats: null,
+          preview: null,
+          vueLoaded: false, 
+          selectedFormat: null,
+          source: 'files',
+          sources: {'files': 'Files', 'url': 'URL', 'cloud': 'Cloud'},
+          stats: null,
+        };
+      },
+
+      methods: {
+        get_short_text: function(text) {
+          const max_len = 20;
+          if (text === undefined) return "";
+          if (typeof text === 'object') {
+            text = JSON.stringify(text);
+          } else {
+            text = String(text);
+          }
+          return (text.length <= 2 * max_len ? text: (
+            text.slice(0, max_len) + '...' + text.slice(text.length-max_len, text.length)));
+        },
+
+        start: function() {
+          this.loading = true;
+          this.errors = [];
+        },
+
+        loadPreview: function(params) {
+          this.start();
+          $.ajax(params)
+          .fail(res => this.errorFromResult(res))
+          .done(res => {
+            this.preview = res.task_preview.slice(0, 10);
+            this.files_as_tasks_list = res.files_as_tasks_list;
+            this.show_files_as_tasks_list = res.show_files_as_tasks_list;
+            if (!this.formats) {
+              const object = {};
+              res.selected_objects.forEach((f, i) => {
+                if (!f) f = "Other";
+                if (!object[f]) object[f] = { type: f, count: 0, formats: [], display: "" };
+                const format = res.selected_formats[i];
+                object[f].formats.push(format);
+                object[f].display += (object[f].display ? ", " : "") + format.substr(1);
+                object[f].count += res.found_formats[res.selected_formats[i]];
+              });
+              if (Object.keys(object).length > 1) {
+                this.formats = object;
+              }
+            }
+            if (this.formats) {
+              const selected = res.selected_objects;
+              const onlyOne = !selected.some(f => f !== selected[0]);
+              this.selectedFormat = onlyOne ? (selected[0] || "Other") : null;
+            }
+            this.stats = {
+              total_completions: res.total_completions,
+              total_predictions: res.total_predictions,
+              total_tasks: res.total_tasks,
+            };
+            this.loading = false;
+          })
+        },
+
+        finish: function(id) {
+          this.id = id;
+          this.loadPreview({
+            url: "api/project/import/" + id,
+            processData: false,
+            contentType: false
+          });
+        },
+
+        update_formats: function() {
+          const inputs = Array.from(this.$refs.formats.querySelectorAll("input"));
+          const checkbox = inputs.find(i => i.checked);
+          if (!checkbox) return;
+          const formats = this.formats[checkbox.value].formats;
+          this.start();
+          this.loadPreview({
+            url: "api/project/import/" + this.id,
+            data: JSON.stringify({selected_formats: formats}),
+            method: 'PATCH',
+            processData: false,
+            contentType: 'application/json',
+            dataType: 'json',
+          });
+        },
+
+        toggle_type: function() {
+          this.start();
+          const selected = this.$refs.files_type.checked;
+          this.loadPreview({
+            url: "api/project/import/" + this.id,
+            data: JSON.stringify({files_as_tasks_list: {selected, type: null}}),
+            method: 'PATCH',
+            processData: false,
+            contentType: 'application/json',
+            dataType: 'json',
+          });
+        },
+
+        url: function(e) {
+          e.preventDefault();
+          this.start();
+          const url = this.$refs.url.value;
+          $.ajax({
+            url: "api/project/import/prepare",
+            data: {url},
+            method: 'POST',
+          })
+          .fail(res => this.errorFromResult(res))
+          .done(res => {
+            this.finish(res.id);
+          });
+        },
+
+        errorFromResult(res) {
+          let header = res.status + " " + res.statusText;
+          let text = res.responseText;
+          if (res.responseJSON && res.responseJSON.length) {
+            text = res.responseJSON.join("\n\n");
+          }
+          const parts = text.split("::", 2);
+          text = parts[0];
+          details = parts[1];
+          if (text.includes("is expected in task data")) {
+            header = "Your config and imported data are inconsistent";
+          }
+          const error = { header, text, details };
+          this.error(error);
+        },
+
+        error: function(error) {
+          this.loading = false;
+          this.errors.push(error);
+        },
+
+        reset() {
+          this.loading = false;
+          this.formats = null;
+          this.selectedFormat = null;
+          this.errors = [];
+          this.preview = null;
+        },
+
+        dm() {
+          window.location.href = "/tasks";
+        },
+
+        config() {
+          window.location.href = "/settings";
+        },
+
+        apply() {
+          this.start();
+          $.ajax({
+            url: "api/project/import/" + this.id + "/apply",
+            method: "POST",
+            processData: false,
+            contentType: false
+          })
+          .fail(res => this.errorFromResult(res))
+          .done(() => {
+            this.dm();
+            // this.loading = false;
+            // this.preview = null;
+          });
+        }
+      },
+
+      watch: {
+
+      },
+
+      // vue mounting of page
+      mounted: function () {
+        this.vueLoaded = true;
+
+        $('#vue_loader').hide();
+        console.log('Vue mounting success');
+      }
+    });
+  </script>
+
+{% endraw %}
+{% endblock %}

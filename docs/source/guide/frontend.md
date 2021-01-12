@@ -37,10 +37,10 @@ You can include `main.<hash>.css` and `main.<hash>.js` files from CDN directly. 
 
 ```xhtml
 <!-- Theme included stylesheets -->
-<link href="https://unpkg.com/browse/label-studio@0.7.3/build/static/css/main.14acfaa5.css" rel="stylesheet">
+<link href="https://unpkg.com/label-studio@0.7.3/build/static/css/main.14acfaa5.css" rel="stylesheet">
 
 <!-- Main Label Studio library -->
-<script src="https://unpkg.com/browse/label-studio@0.7.3/build/static/js/main.0249ea16.js"></script>
+<script src="https://unpkg.com/label-studio@0.7.3/build/static/js/main.0249ea16.js"></script>
 ```
 
 
@@ -49,61 +49,61 @@ You can include `main.<hash>.css` and `main.<hash>.js` files from CDN directly. 
 You can use Label Studio Frontend separately in your own projects: just include it in your HTML page. Instantiate a new Label Studio object with a selector for the div that should become the editor. To see all the available options for the initialization of LabelStudio object, please check the [Reference](frontend_reference.html).
     
   ``` xhtml
-    <!-- Include Label Studio stylesheet -->
-    <link href="https://unpkg.com/browse/label-studio@0.7.3/build/static/css/main.09b8161e.css" rel="stylesheet">
-    
-    <!-- Create the Label Studio container -->
-    <div id="label-studio"></div>
-    
-    <!-- Include the Label Studio library -->
-    <script src="https://unpkg.com/browse/label-studio@0.7.3/build/static/js/main.e963e015.js"></script>
-    
-    <!-- Initialize Label Studio -->
-    <script>
-      var labelStudio = new LabelStudio('editor', {
-        config: `
-          <View>
-            <Image name="img" value="$image"></Image>
-            <RectangleLabels name="tag" toName="img">
-              <Label value="Hello"></Label>
-              <Label value="World"></Label>  
-            </RectangleLabels>
-          </View>
-        `,
-    
-        interfaces: [
-          "panel",
-          "update",
-          "controls",
-          "side-column",
-          "completions:menu",
-          "completions:add-new",
-          "completions:delete",
-          "predictions:menu"
-        ],
-    
-        user: {
-          pk: 1,
-          firstName: "James",
-          lastName: "Dean"
-        },
-        task: {
-          completions: [],
-          predictions: [],
-          id: 1,
-          data: {
-            image: "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg"
-          }
-        },
-        
-        onLabelStudioLoad: function(LS) {
-          var c = LS.completionStore.addCompletion({
-            userGenerate: true
-          });
-          LS.completionStore.selectCompletion(c.id);
-        }
+<!-- Include Label Studio stylesheet -->
+<link href="https://unpkg.com/label-studio@0.7.3/build/static/css/main.09b8161e.css" rel="stylesheet">
+
+<!-- Create the Label Studio container -->
+<div id="label-studio"></div>
+
+<!-- Include the Label Studio library -->
+<script src="https://unpkg.com/label-studio@0.7.3/build/static/js/main.e963e015.js"></script>
+
+<!-- Initialize Label Studio -->
+<script>
+  var labelStudio = new LabelStudio('label-studio', {
+    config: `
+      <View>
+        <Image name="img" value="$image"></Image>
+        <RectangleLabels name="tag" toName="img">
+          <Label value="Hello"></Label>
+          <Label value="World"></Label>
+        </RectangleLabels>
+      </View>
+    `,
+
+    interfaces: [
+      "panel",
+      "update",
+      "controls",
+      "side-column",
+      "completions:menu",
+      "completions:add-new",
+      "completions:delete",
+      "predictions:menu"
+    ],
+
+    user: {
+      pk: 1,
+      firstName: "James",
+      lastName: "Dean"
+    },
+    task: {
+      completions: [],
+      predictions: [],
+      id: 1,
+      data: {
+        image: "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg"
+      }
+    },
+
+    onLabelStudioLoad: function(LS) {
+      var c = LS.completionStore.addCompletion({
+        userGenerate: true
       });
-    </script>
+      LS.completionStore.selectCompletion(c.id);
+    }
+  });
+</script>
   ```
 
 ## Custom LSF + LSB integration

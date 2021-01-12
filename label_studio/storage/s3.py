@@ -1,7 +1,7 @@
 import logging
 import boto3
 from botocore.client import Config
-import json
+import ujson as json
 import os
 
 from .base import CloudStorage, CloudStorageForm, BaseStorageForm, BooleanField, Optional, StringField
@@ -79,7 +79,7 @@ class S3Storage(CloudStorage):
     def readable_path(self):
         return self.url_prefix + self.path + '/' + self.prefix
 
-    def _get_value(self, key):
+    def _get_value(self, key, inplace=False, validate=True):
         s3 = self.client['s3']
         bucket = self.client['bucket']
         obj = s3.Object(bucket.name, key).get()['Body'].read().decode('utf-8')

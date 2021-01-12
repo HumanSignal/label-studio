@@ -2,7 +2,7 @@
 
 <View>
     <Header value="Common Objects in Context"/>
-    <Image name="image" value="$image_url"/>
+    <Image name="image" value="$image"/>
     <Filter name="filter" toName="object"
       hotkey="shift+f" minlength="0"
       placeholder="Type object name here..." />

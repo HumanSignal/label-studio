@@ -62,7 +62,7 @@ def deprecated_api_generate_next_task():
 @requires_auth
 def deprecated_api_tasks_delete():
     deprecated_message('/api/tasks/delete', 'DELETE /api/tasks')
-    g.project.delete_tasks()
+    g.project.delete_all_tasks()
     return make_response(jsonify({}), 204)
 
 
@@ -125,3 +125,13 @@ def deprecated_api_predict():
 def deprecated_api_train():
     deprecated_message('/api/train', '/api/models/train')
     return api_train()
+
+
+@blueprint.route('/api/project/next', methods=['GET'])
+@requires_auth
+def api_generate_next_task():
+    from label_studio.data_manager.actions import next_task
+    deprecated_message('/api/project/next', '/api/project/actions?id=next_task')
+    result = next_task(g.project, None, None)
+    code = result.pop('response_code', 200)
+    return make_response(result, code)

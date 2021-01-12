@@ -1,0 +1,112 @@
+<div class="ui message accordion">
+  <div class="header active title"><i class="dropdown icon"></i>Import formats and examples</div>
+  <div class="content active">
+    <div class="ui labels">
+      {% if 'json' in project.supported_formats %}
+        <a class="use-template ui label basic" data-tippy-content="The most flexible format. Download file example"
+           href="api/import-example-file?q=json">JSON</a>
+      {% endif %}
+      {% if 'csv' in project.supported_formats %}
+        <a class="use-template ui label basic" data-tippy-content="Download file example"
+           href="api/import-example-file?q=csv">CSV</a>
+
+      {% endif %}
+      {% if 'tsv' in project.supported_formats %}
+        <a class="use-template ui label basic"
+           data-tippy-content="The same as CSV, but TABs are instead of commas. Download file example"
+           href="api/import-example-file?q=tsv">TSV</a>
+      {% endif %}
+
+      {% if 'txt' in project.supported_formats %}
+        <a class="use-template ui label basic" data-tippy-content="One task per one line. Download file example"
+           href="api/import-example-file?q=txt">TXT</a>
+      {% endif %}
+      <br/>
+
+      <div class="ui label basic"
+           data-tippy-content="Make ZIP archive with large or multiple:<div class='ui mini grey labels'>
+                                {% if 'json' in project.supported_formats %}<div class='ui label'>JSON</div>{% endif %}
+                                {% if 'csv' in project.supported_formats %}<div class='ui label'>CSV</div>{% endif %}
+                                {% if 'tsv' in project.supported_formats %}<div class='ui label'>TSV</div>{% endif %}
+                                {% if 'txt' in project.supported_formats %}<div class='ui label'>TXT</div>{% endif %}
+                               </div>">ZIP</div>
+      <div class="ui label basic"
+           data-tippy-content="Make RAR archive with large or multiple: <div class='ui mini grey labels'>
+                                {% if 'json' in project.supported_formats %}<div class='ui label'>JSON</div>{% endif %}
+                                {% if 'csv' in project.supported_formats %}<div class='ui label'>CSV</div>{% endif %}
+                                {% if 'tsv' in project.supported_formats %}<div class='ui label'>TSV</div>{% endif %}
+                                {% if 'txt' in project.supported_formats %}<div class='ui label'>TXT</div>{% endif %}
+                               </div>">RAR</div>
+      <div class="ui label basic"
+           data-tippy-content="Import multiple files at once: <div class='ui mini grey labels'>
+                                {% if 'json' in project.supported_formats %}<div class='ui label'>JSON</div>{% endif %}
+                                {% if 'csv' in project.supported_formats %}<div class='ui label'>CSV</div>{% endif %}
+                                {% if 'tsv' in project.supported_formats %}<div class='ui label'>TSV</div>{% endif %}
+                                {% if 'txt' in project.supported_formats %}<div class='ui label'>TXT</div>{% endif %}
+                               </div>">Multiple Files At Once</div>
+
+      <div style="margin-top:0.75em"></div>
+
+      <a class="ui label basic" target="_blank"
+         data-tippy-content="Quickly generate dataset by keywords"
+         href='https://data.heartex.net/?data_types={{ project.data_types_json }}'>
+         Add Sample Dataset
+      </a>
+
+      <a onclick="add_sample_task()" class="use-template ui small label basic primary"
+         data-tippy-content="Import sample task in one click" data-delay="[2000, 0]"
+         href="javascript:void(0)">Add Sample Task</a>
+
+      <div style="margin-top:0.9em"></div>
+
+      <a href="https://labelstud.io/guide/tasks.html">
+        Read more</a> about import in our documentation
+    </div>
+
+    <script>
+      // add sample task to data manager
+      function add_sample_task() {
+        const url = "api/project/import?sample_task=1";
+        {% autoescape off %}
+        const sample = '{{ project.generate_sample_task_escape }}';
+        {% endautoescape %}
+        $.post({url: url, data: sample, contentType: 'application/json'})
+          .fail(function (e) {
+            alert('Error: see more in browser console');
+            console.log(e)
+          })
+          .done(function () {
+            window.location = "tasks"
+          })
+      }
+    </script>
+
+  </div> <!-- content -->
+
+
+  <!-- Import my resources-->
+  <div class="header title"><i class="dropdown icon"></i>How to import my resource files (audio, images, video, etc)?</div>
+  <div class="content">
+  <ul class="list top-margin-none ui">
+      <li>Text sources: just import JSON/CSV/TSV/TXT with your texts.
+      </li>
+      <br>
+
+      <li>Label configs with one source: drag&drop your files into placeholder above.
+      </li>
+      <br>
+
+      <li>Images, audio, video and other external files may be hosted on external servers with http/https access.<br/>
+        Your JSON/CSV/TSV/TXT must contain http/https URLs to them.
+      </li>
+      <br>
+
+      <li>If you run Label Studio Backend locally
+        you may use local path to resources as input and LS Backend will serve it, e.g.:
+        <pre style="font-size: 90%">> label-studio init -i /my/dataset/images --input-format image-dir</pre>
+      </li>
+      <br/>
+    </ul>
+  </div> <!-- content -->
+
+</div>

@@ -1,0 +1,313 @@
+{% extends 'base.html' %}
+{% block body %}
+
+<!-- Import Data Dialog with Wait for Add more data -->
+
+<div class="ui container" id="import-tasks">
+
+  <!-- Dimmer and loader -->
+  <div class="ui page dimmer">
+    <div class="ui large text loader orange">Importing in progress ...</div>
+  </div>
+
+  <!-- Input file form -->
+  <div class="ui form">
+    <input id="file-input" type="file" name="file" multiple onchange="send_data(event)" style="display: none"/>
+
+    <div class="ui content">
+      <div id="holder">
+        <div class="text">
+          <i class="ui icon huge upload"></i>
+          <p>Drag and drop your files here or click for import</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <br>
+
+  <!-- URL: Use iframe and form to enable autocomplete for URL input -->
+  <iframe name="my_iframe" src="about:blank" hidden></iframe>
+  <form target="my_iframe" action="about:blank" method="get">
+
+    <div class="ui form">
+      <label for="url-input" class="description">Or paste a file URL or task in JSON format here</label><br/>
+      <div class="ui action input fluid">
+        <input id="url-input" type="text" name="url" autofocus autocomplete="on"
+               placeholder='http://example.com/tasks.json OR {"image_url": "http://my.image.jpg"}'/>
+        <button style="display: inline-block !important; width: 14%; min-width: 80px !important;"
+                class="ui positive button" id="url-button" onclick="send_data(event, $('#url-input').val())">Import
+        </button>
+      </div>
+    </div>
+
+  </form>
+
+  <!-- Help message -->
+  <div class="ui divider hidden"></div>
+  <div class="ui" style="display: block !important;">
+    {% include "includes/import_help.html" %}
+  </div>
+
+
+  <!-- Dialog: Add more data WAIT  -->
+  <div class="ui modal" id="upload-dialog">
+    <!--suppress CheckTagEmptyBody -->
+    <i class="close icon"></i>
+    <div class="header red">
+      Import status
+    </div>
+    <div class="content">
+      <div class="description" id="upload-dialog-msg"></div>
+    </div>
+    <div class="actions">
+      <span id="success-actions" hidden>
+        <a data-tooltip="You can start the labeling right now" class="ui button positive" href="./label-old">Start Labeling</a>
+        <a data-tooltip="Explore all imported tasks" class="ui button positive" href="tasks">Explore Tasks</a>
+      </span>
+
+      <!-- Done button -->
+      <button class="ui icon button" id="upload-done-button"
+              hidden onclick="location.reload()" autofocus>Close
+      </button>
+    </div>
+  </div>
+
+</div> <!-- container -->
+
+<script>
+  const fileUploader = ({ root, onHover, onLeave, onGetFiles }) => {
+  const dropZone = root;
+
+  const hover = (e) => {
+    e.preventDefault();
+    onHover(dropZone);
+  };
+
+  const leave = (e) => {
+    e.preventDefault();
+    onLeave(dropZone);
+  };
+
+  dropZone.addEventListener("dragstart", hover);
+  dropZone.addEventListener("dragenter", hover);
+  dropZone.addEventListener("dragover", hover);
+  dropZone.addEventListener("dragleave", leave);
+
+  function traverseFileTree(item, path) {
+    return new Promise((resolve) => {
+      path = path || "";
+      if (item.isFile) {
+        // Avoid hidden files
+        if (item.name[0] === ".") return resolve([]);
+
+        resolve([item]);
+      } else if (item.isDirectory) {
+        // Get folder contents
+        const result = [];
+        const dirReader = item.createReader();
+        const dirPath = path + item.name + "/";
+
+        dirReader.readEntries(async function (entries) {
+          for (let i = 0; i < entries.length; i++) {
+            const entry = entries[i];
+            const files = await traverseFileTree(entry, dirPath);
+            result.push(...files);
+          }
+
+          resolve(result);
+        });
+      }
+    });
+  }
+
+  const getFiles = async (e) => {
+    const result = [];
+    const files = e.dataTransfer.items;
+
+    if (files.length) {
+      // Use DataTransferItemList interface to access the file(s)
+      for (let i = 0, l = files.length; i < l; i++) {
+        // If dropped items aren't files, reject them
+        const item = files[i].webkitGetAsEntry();
+        const dir = await traverseFileTree(item);
+        result.push(...dir);
+      }
+    }
+
+    return result;
+  };
+
+  dropZone.addEventListener(
+    "drop",
+    async (e) => {
+      leave(e);
+      const fileEntries = await getFiles(e);
+
+      const files = await Promise.all(
+        fileEntries.map(
+          (fileEntry) => new Promise((resolve) => fileEntry.file(resolve))
+        )
+      );
+
+      window.holder_usage = true;
+      onGetFiles(files);
+    },
+    false
+  );
+};
+</script>
+
+<script>
+  $('.upload-data').on('click', function () {
+    $("#start-upload-dialog").modal({
+      closable: false
+    }).modal('show');
+  });
+
+  $('#holder').on('click', function () {
+    $('#file-input').trigger('click');
+  });
+
+  // drag & drop files
+  $(document).ready(function () {
+    let holder = $('#holder');
+
+    fileUploader({
+      root: holder.get(0),
+      onHover(holder) {
+        holder.classList.add('hover')
+      },
+      onLeave(holder) {
+        holder.classList.remove('hover')
+      },
+      onGetFiles(files) {
+        send_data({
+          target: {files}
+        });
+      }
+    });
+  });
+
+  // show upload wait
+  function start_wait() {
+    $('#start-upload-dialog').modal('hide');
+    $('.ui.page.dimmer').addClass('active');
+  }
+
+  // stop upload wait
+  function stop_wait(msg, success) {
+    $('.ui.page.dimmer').removeClass('active');
+    $('#upload-dialog-msg').html(msg);
+    $('#upload-dialog').modal({
+      closable: false, // protect closing of uploading dialog
+      onDeny() {
+        return false;
+      },
+      onHide() {
+        return false;
+      }
+    }).modal('show');
+
+    if (success) {
+      $('#upload-done-button').addClass('positive');
+      $('#success-actions').show();
+    } else {
+      $('#upload-done-button').addClass('red')
+    }
+  }
+
+  // send data with tasks to server (add more data)
+  function send_data(event, upload_url = '') {
+    if (upload_url === '' && typeof event.target.files === 'undefined') {
+      return;
+    }
+
+    // show upload wait dialog
+    start_wait();
+    let fd = null;
+    let request = {};
+
+    // send url to file
+    if (upload_url !== '') {
+      // send url as task data
+      if (IsJsonString(upload_url)) {
+        request = {
+          url: "api/project/import?json_string=1",
+          data: upload_url,
+          contentType: 'application/json',
+          method: 'post'
+        }
+      }
+      // send url as regular url
+      else {
+        request = {
+          url: "api/project/import?upload_url=1",
+          data: {url: upload_url},
+          method: 'post'
+        }
+      }
+    }
+
+    // files from disk
+    else {
+      fd = new FormData;
+      for (let i = 0; i < event.target.files.length; i++) {
+        const f = event.target.files[i];
+        let max_size_mb = {{ project.max_tasks_file_size }};
+        if (f.size / 1024.0 / 1024.0 > max_size_mb) {
+          stop_wait('Sorry, but file size is too big (more ' + max_size_mb + ' mb).\n<br/>' +
+            'Try to split your file by chunks or zip it', false);
+        }
+
+        // make form and attach file to it
+        fd.append(f.name, f);
+      }
+
+      request = {
+        url: "api/project/import" + (window.holder_usage ? "?drag=1": ""),
+        data: fd,
+        method: 'POST',
+        processData: false,
+        contentType: false
+      }
+    }
+
+    $.ajax(request)
+      .done(answer => {
+        let msg = '<h2>Tasks created: ' + answer['total_tasks'] + '</h2>' +
+          'Completions created: ' + answer['total_completions'] +
+          '<br>Predictions created: ' + answer['total_predictions'] +
+          '<br><br>Duration: ' + answer['duration'].toFixed(2) + ' sec';
+        stop_wait(msg, true);
+      })
+      .fail(answer => {
+        let msg = "Error: can't upload/process file on server side. Reasons:<br><br>";
+
+        if (answer.responseJSON != null) {
+          let rows = answer.responseJSON;
+          for (let i in rows) {
+            const escaped = $('<div>').text(rows[i]).html();
+            const split = escaped.split('::');
+            msg += '<div class="upload-row-error">' +
+              '<div class=desc>' + split[0] + '</div>' +
+              (split.length > 1 ? '<div class=code>' + split[1] + '</div>' : '') +
+              '</div><br/>\n';
+          }
+        } else {
+          msg += 'Critical error, see console for more description';
+          console.log(answer);
+        }
+
+        stop_wait(msg, false);
+      });
+
+    window.holder_usage = false;
+  }
+
+  $(function () {
+    $('.ui.accordion').accordion();
+  });
+</script>
+
+{% endblock %}

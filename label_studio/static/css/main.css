@@ -54,7 +54,7 @@ hotkey i {
     display: inline-block;
 }
 
-.wrapper {
+.max-width-wrapper {
     max-width: 1400px;
 }
 
@@ -123,6 +123,7 @@ a {
     padding: 5px 20px 5px 40px;
     position: relative;
     box-shadow: 0 4px 3px -2px rgba(0, 0, 0, 0.0774);
+    z-index: 1; /* drop the shadow over all other elements below */
     margin-bottom: 3em;
     height: 50px;
 }
@@ -365,6 +366,16 @@ div[class*="App_editor"] {
     background: rgb(54, 162, 255) !important;
     transition: background-color ease-in-out 0.25s;
 }
+.ui .button.primary {
+    background: rgb(24, 144, 255) !important;
+    color: #fff !important;
+    border-color: rgb(24, 144, 255) !important;
+    transition: background-color ease-in-out 0.25s;
+}
+.ui .button.primary:hover {
+    background: rgb(54, 162, 255) !important;
+    transition: background-color ease-in-out 0.25s;
+}
 .ui .button {
     transition: 0.3s;
 }
@@ -497,8 +508,9 @@ pre {
     font-size: 65%;
 }
 .statistic .sub-label {
-    margin-top:7px;
+    margin-top:2px;
     color: #555;
+    font-size:90%
 }
 
 .sup-button {
@@ -603,4 +615,18 @@ pre {
     white-space: -pre-wrap;
     white-space: -o-pre-wrap;
     word-wrap:  break-word !important;
+}
+
+.accordion-button {
+    height: 28px;
+    padding-top: 7px !important;
+}
+
+.accordion-content {
+    margin-left: 25px;
+    margin-top: -3px!important;
+}
+
+.invisible-borders td {
+    border: none;
 }

@@ -7,15 +7,14 @@ import ujson as json
 from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
 
-from shutil import copy2
 from flask_wtf import FlaskForm
 from wtforms import StringField, BooleanField
 from wtforms.validators import InputRequired, Optional, ValidationError
 from collections import OrderedDict
-from ordered_set import OrderedSet
 
 from label_studio.utils.io import json_load
 from label_studio.utils.validation import TaskValidator, ValidationError as TaskValidationError
+from label_studio.utils.misc import Settings
 
 logger = logging.getLogger(__name__)
 
@@ -130,7 +129,7 @@ class BaseStorage(ABC):
         pass
 
     @abstractmethod
-    def remove_all(self):
+    def remove_all(self, ids=None):
         pass
 
     @abstractmethod
@@ -151,19 +150,14 @@ class CloudStorageForm(BaseStorageForm):
 
     prefix = StringField('Prefix', [Optional()], description='File prefix')
     regex = StringField('Regex', [IsValidRegex()], description='File filter by regex, example: .* (If not specified, all files will be skipped)')  # noqa
-    data_key = StringField('Data key', [Optional()], description='Task tag key from your label config')
+    # data_key = StringField('Data key', [Optional()], description='Task tag key from your label config')
     use_blob_urls = BooleanField('Use BLOBs URLs', default=True,
-                                 description='Generate task data with URLs pointed to your bucket objects '
-                                             '(for resources like jpg, mp3 & other BLOBs). This could be used for '
-                                             'label configs with <b>one data key only</b>. '
-                                             'If not selected, bucket objects will be interpreted as '
-                                             "tasks in Label Studio JSON format and it's suitable "
-                                             "for <b>multiple data keys</b>")
+                                 description='Treat every bucket object as a source file. If unchecked, Label Studio treats every bucket object as a JSON-formatted task.')
     bound_params = dict(
         prefix='prefix',
         regex='regex',
         use_blob_urls='use_blob_urls',
-        data_key='data_key',
+        # data_key='data_key',
         **BaseStorageForm.bound_params
     )
 
@@ -190,7 +184,7 @@ class CloudStorage(BaseStorage):
 
         self.create_local_copy = create_local_copy
         self.use_blob_urls = use_blob_urls
-        self.data_key = data_key
+        self.data_key = data_key or Settings.UPLOAD_DATA_UNDEFINED_NAME
         self.sync_in_thread = sync_in_thread
         self.presign = presign
 
@@ -254,7 +248,7 @@ class CloudStorage(BaseStorage):
                 json.dump(self._ids_keys_map, fout)
 
     @abstractmethod
-    def _get_value(self, key):
+    def _get_value(self, key, inplace=False):
         pass
 
     def _get_value_url(self, key):
@@ -284,16 +278,21 @@ class CloudStorage(BaseStorage):
 
         return new_tasks[0]
 
-    def get_data(self, key):
+    def get_data(self, key, inplace=False, validate=True):
+        """ :param key: task key
+            :param inplace: return inplace data instead of deepcopy, it's for speedup
+            :param validate: validate a task, set False for speed up
+        """
         if self.use_blob_urls:
             return self._get_value_url(key)
         else:
             # read task json from bucket and validate it
             try:
-                parsed_data = self._get_value(key)
+                parsed_data = self._get_value(key, inplace)
             except Exception as e:
                 raise Exception(key + ' :: ' + str(e))
-            return self._validate_task(key, parsed_data)
+
+            return self._validate_task(key, parsed_data) if validate else parsed_data
 
     def _get_key_by_id(self, id):
         item = self._ids_keys_map.get(id)
@@ -306,13 +305,13 @@ class CloudStorage(BaseStorage):
             return
         return item_key
 
-    def get(self, id):
+    def get(self, id, inplace=False, validate=True):
         item_key = self._get_key_by_id(id)
         if not item_key:
             return
         try:
             key = item_key.split(self.key_prefix, 1)[-1]
-            data = self.get_data(key)
+            data = self.get_data(key, inplace=inplace, validate=validate)
         except Exception as exc:
             # return {'error': True, 'message': str(exc)}
             logger.error(str(exc), exc_info=True)
@@ -424,35 +423,34 @@ class CloudStorage(BaseStorage):
 
     def _sync(self):
         with self.thread_lock:
-            self.last_sync_time = datetime.now()
             self.is_syncing = True
 
-        new_id = self.max_id() + 1
-        new_ids_keys_map = {}
-        new_keys_ids_map = {}
+            new_id = self.max_id() + 1
+            new_ids_keys_map = {}
+            new_keys_ids_map = {}
 
-        full = OrderedSet(self.iter_full_keys())
-        intersect = full & OrderedSet(self._keys_ids_map)
-        exclusion = full - intersect
+            full = set(self.iter_full_keys())
+            intersect = full & set(self._keys_ids_map)
+            exclusion = full - intersect
 
-        # new tasks
-        for key in exclusion:
-            id, new_id = self._get_new_id(key, new_id)
-            new_ids_keys_map[id] = {'key': key, 'exists': True}
-            new_keys_ids_map[key] = id
+            # new tasks
+            for key in exclusion:
+                id, new_id = self._get_new_id(key, new_id)
+                new_ids_keys_map[id] = {'key': key, 'exists': True}
+                new_keys_ids_map[key] = id
 
-        # old existed tasks
-        for key in intersect:
-            id = self._keys_ids_map[key]
-            new_ids_keys_map[id] = {'key': key, 'exists': True}
-            new_keys_ids_map[key] = id
+            # old existed tasks
+            for key in intersect:
+                id = self._keys_ids_map[key]
+                new_ids_keys_map[id] = {'key': key, 'exists': True}
+                new_keys_ids_map[key] = id
 
-        with self.thread_lock:
             self._selected_ids = list(new_ids_keys_map.keys())
             self._ids_keys_map.update(new_ids_keys_map)
             self._keys_ids_map.update(new_keys_ids_map)
             self._save_ids()
             self.is_syncing = False
+            self.last_sync_time = datetime.now()
 
     @abstractmethod
     def _get_objects(self):
@@ -475,5 +473,5 @@ class CloudStorage(BaseStorage):
     def remove(self, key):
         raise NotImplementedError
 
-    def remove_all(self):
+    def remove_all(self, ids=None):
         raise NotImplementedError

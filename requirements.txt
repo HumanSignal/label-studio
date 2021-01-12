@@ -40,3 +40,4 @@ gevent>=20.6.2
 ujson==3.0.0
 Colorama==0.4.4
 boxing==0.1.4
+pyyaml>=5.3.1
