@@ -22,7 +22,7 @@ Scenario("Import single image by URL", async (I) => {
   // table with imported items — should be only one already
   I.seeNumberOfElements("img[alt=Data]", 1)
   I.click("img[alt=Data]")
-  I.see("Labeling is not configured")
+  I.see("Labeling is not yet fully configured")
   I.click("Go to setup")
 
   I.say("Config setup")
@@ -41,7 +41,7 @@ Scenario("Import single image by URL", async (I) => {
   I.see("Regions (0)")
   I.click("Skip")
   // skipped icon in completions list
-  I.seeElement("[aria-label=forward]")
+  I.seeElement("[aria-label=stop]")
   // completion date are filled in
   const completed = await I.grabTextFrom(".table-row > div:nth-child(3)")
   assert.notEqual(completed, "")
