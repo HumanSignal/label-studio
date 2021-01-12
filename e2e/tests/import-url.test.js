@@ -7,8 +7,6 @@ Before(I => I.reset())
 Scenario("Import single image by URL", async (I) => {
   I.amOnPage("/")
   I.see("Welcome to")
-  I.seeNumberOfElements(locate("a").withText("Import"), 2)
-  // top menu item is hidden during onboarding
   I.seeNumberOfVisibleElements(locate("a").withText("Import"), 1)
   I.click(locate("a.button").withText("Import"))
   I.waitInUrl("/import")
