@@ -46,19 +46,18 @@ def get_all_columns(project):
     task_data_children = []
     i = 0
 
-    # TODO: make this part with data types from project working
     data_types = OrderedDict()
+    # add data types from config again
+    data_types.update(project.data_types.items())
     # all data types from import data
     if project.derived_all_input_schema:
         data_types.update({key: 'Unknown' for key in project.derived_all_input_schema})
-    # data types from config
-    data_types.update(project.data_types.items())
 
     # remove $undefined$ if there is one type at least in labeling config, because it will be resolved automatically
     if len(project.data_types) > 0:
         data_types.pop(settings.UPLOAD_DATA_UNDEFINED_NAME, None)
 
-    for key, data_type in list(data_types.items())[::-1]:  # make data types from labeling config first
+    for key, data_type in list(data_types.items()):  # make data types from labeling config first
         column = {
             'id': key,
             'title': key if key != settings.UPLOAD_DATA_UNDEFINED_NAME else 'data',
@@ -483,7 +482,7 @@ def order_tasks(params, tasks):
                                         DirectionSwitch(x.get('completed_at', None), False)))
     # another orderings
     else:
-        ordered = sorted(tasks, key=lambda x: (DirectionSwitch(resolve_task_field(x, order), not ascending)))
+        ordered = sorted(tasks, key=lambda x: DirectionSwitch(resolve_task_field(x, order), not ascending))
 
     return ordered
 

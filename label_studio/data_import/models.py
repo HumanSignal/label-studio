@@ -128,7 +128,7 @@ class ImportState(object):
             if import_data_keys and import_data_keys != project_data_keys:
                 raise ValidationError(
                     "Import data inconsistent with current project:\n"
-                    "You're trying to load data keys: {}\nbut project tasks already have {}".format(
+                    "Imported column names {}\nare inconsistent with common columns found in dataset: {}".format(
                         ','.join(import_data_keys), ','.join(project_data_keys)))
 
     def _update(self):
