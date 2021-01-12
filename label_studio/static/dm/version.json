@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'feature/dm-sdk' of github.com:heartexlabs/dm2 into feature/dm-sdk",
-  "commit": "c272a5c8db28f992f8faba6607021c5ff35b7804",
+  "message": "Icons on the right in the ordering menu, cursor for type selection",
+  "commit": "82aca9e91e1cfd3699e87ac8222a6969aa934013",
   "branch": "feature/dm-sdk",
-  "date": "2021-01-12T12:40:36Z"
+  "date": "2021-01-12T19:40:24Z"
 }
