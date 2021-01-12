@@ -1,6 +1,6 @@
 {
-  "message": "Fix View All: 4+ items width; hidden 1st item gap",
-  "commit": "7cfd33750ed92770bed137d0f9cd2796b9b98198",
+  "message": "Change skipped icon to Stop like in Data Manager",
+  "commit": "72ae28d31eac8e2551185c6c88421e9fe775bde1",
   "branch": "master",
-  "date": "2021-01-08T19:34:06Z"
+  "date": "2021-01-11T22:10:22Z"
 }
