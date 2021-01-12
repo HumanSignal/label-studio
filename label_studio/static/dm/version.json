@@ -1,6 +1,6 @@
 {
-  "message": "Opossum gif",
-  "commit": "b0078c529dbcc0cba1b322dc0884c9c8a48295ba",
+  "message": "Remove unnecessary opossum",
+  "commit": "0e81fc869dcb4111db8e1ef588f29a73293657ff",
   "branch": "feature/dm-sdk",
-  "date": "2021-01-12T21:45:51Z"
+  "date": "2021-01-12T22:00:51Z"
 }
