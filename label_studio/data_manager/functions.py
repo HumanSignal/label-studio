@@ -106,7 +106,7 @@ def get_all_columns(project):
             'title': "Cancelled",
             'type': "Number",
             'target': 'tasks',
-            'help': 'Number of cancelled (skipped) completions',
+            'help': 'Total cancelled (skipped) completions',
             'visibility_defaults': {
                 'explore': True,
                 'labeling': False
