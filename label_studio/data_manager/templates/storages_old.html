@@ -21,7 +21,7 @@
     <form class="ui form" :id="storage.storage_for + '-storage-form'">
       <input hidden name="storage_for" :value="storage_for">
 
-      <span v-if="storage.type=='tasks-json'">To add new tasks go to <a href="./import">Import page</a>.<br/><br/></span>
+      <span v-if="storage.type=='tasks-json'">To upload data directly go to <a href="./import">Import page</a>.<br/><br/></span>
 
       <!-- Storage Type - form needs it to correctly be processed -->
       <div class="ui field" :class="{disabled: storage.type_loading}">
@@ -66,9 +66,8 @@
     <div class="ui icon message" v-if="storage_for=='source'">
       <i class="ui icon fas fa-info-circle" style="opacity: 0.1 !important;"></i>
       <div class="content">
-        Here you can filter task files from Amazon S3 or Google Cloud.<br/>
-        The each filter generates a new portion of tasks which will be added to Label Studio DB.<br/>
-        When you enter the previous filter settings all the tasks and completions will be loaded back.<br/>
+          Sync task files from Amazon S3 or Google Cloud.<br/>
+          Continuously retrieve the contents of a storage bucket with a regex filter to create tasks in Label Studio.</br/>         
         <a href="http://labelstud.io/guide/storage.html">Read more in documentation</a>
       </div>
     </div>
