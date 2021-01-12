@@ -1,6 +1,6 @@
 {
-  "message": "Fix property path resolving",
-  "commit": "a42b2c44b850fdb93cfc0baee48b0a51dfd3a379",
+  "message": "Merge branch 'feature/dm-sdk' of github.com:heartexlabs/dm2 into feature/dm-sdk",
+  "commit": "c272a5c8db28f992f8faba6607021c5ff35b7804",
   "branch": "feature/dm-sdk",
-  "date": "2021-01-11T17:27:08Z"
+  "date": "2021-01-12T12:40:36Z"
 }
