@@ -524,7 +524,7 @@ class Project(object):
         elif sampling.startswith('prediction-score'):
             id_score_map = {}
 
-            for task_id, task in task_ids:
+            for task_id in task_ids:
                 # get task from storage and check it has completions
                 task = self.source_storage.get(task_id)
                 if task_id in completed_tasks_ids or task is None:
