@@ -1,6 +1,6 @@
 {
-  "message": "Fix grid view infinite loading",
-  "commit": "e1201f8df1a99e54cacf155708a78e67347977d6",
+  "message": "Make grid react to type selection",
+  "commit": "e5892f67e2894b508859b48f1a86d484bae4fece",
   "branch": "feature/dm-sdk",
-  "date": "2021-01-14T13:32:44Z"
+  "date": "2021-01-14T14:41:49Z"
 }
