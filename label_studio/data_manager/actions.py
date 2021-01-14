@@ -149,7 +149,6 @@ def predictions_to_completions(project, params, items):
     return {'response_code': 200}
 
 
-
 def next_task(project, params, items):
     """ Generate next task for labeling stream
 
