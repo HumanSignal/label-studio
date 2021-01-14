@@ -1,6 +1,6 @@
 {
-  "message": "Remove unnecessary opossum",
-  "commit": "0e81fc869dcb4111db8e1ef588f29a73293657ff",
+  "message": "Fix grid view with back code",
+  "commit": "c113e5e55d32d67e459fad6a083a785bc1ce33f1",
   "branch": "feature/dm-sdk",
-  "date": "2021-01-12T22:00:51Z"
+  "date": "2021-01-14T02:25:32Z"
 }
