@@ -1,6 +1,6 @@
 {
-  "message": "Fix grid view with back code",
-  "commit": "c113e5e55d32d67e459fad6a083a785bc1ce33f1",
+  "message": "Fix grid view infinite loading",
+  "commit": "e1201f8df1a99e54cacf155708a78e67347977d6",
   "branch": "feature/dm-sdk",
-  "date": "2021-01-14T02:25:32Z"
+  "date": "2021-01-14T13:32:44Z"
 }
