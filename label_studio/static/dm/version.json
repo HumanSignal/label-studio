@@ -1,6 +1,6 @@
 {
-  "message": "Make grid react to type selection",
-  "commit": "e5892f67e2894b508859b48f1a86d484bae4fece",
+  "message": "Fix grid items height with custom DisplayType",
+  "commit": "d62ee7e4952238782935272e9953a7db95137722",
   "branch": "feature/dm-sdk",
-  "date": "2021-01-14T14:41:49Z"
+  "date": "2021-01-14T15:32:26Z"
 }
