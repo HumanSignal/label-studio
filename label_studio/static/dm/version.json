@@ -1,6 +1,6 @@
 {
-  "message": "Fix grid items height with custom DisplayType",
-  "commit": "d62ee7e4952238782935272e9953a7db95137722",
+  "message": "Exclude AudioPlus from cell views as userSelectable = false",
+  "commit": "d7b7536042d52fa7cb6611db03633131784bf36a",
   "branch": "feature/dm-sdk",
-  "date": "2021-01-14T15:32:26Z"
+  "date": "2021-01-14T20:21:24Z"
 }
