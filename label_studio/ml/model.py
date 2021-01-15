@@ -39,9 +39,8 @@ class LabelStudioMLBase(ABC):
     def predict(self, tasks, **kwargs):
         pass
 
-    @abstractmethod
     def fit(self, completions, workdir=None, **kwargs):
-        pass
+        return {}
 
 
 class LabelStudioMLManager(object):
