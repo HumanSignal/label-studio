@@ -37,7 +37,7 @@
 
       <!-- Fields -->
       <div class="ui field"
-           :class="{disabled: storage.type_loading, error: field.name in storage.errors}"
+           :class="{disabled: storage.type_loading}"
            v-for="field in storage.fields"
            :style="{display: showStorageField(field.name, storage) ? 'block': 'none'}"> <!-- TODO: back create_local_copy in next releases -->
 
@@ -48,7 +48,7 @@
 
         <!-- Errors -->
         <div class="ui bulleted list" v-if="field.name in storage.errors">
-          <div class="ui item error" v-for="error in storage.errors[field.name]">
+          <div class="ui item" style="color: #AA0000" v-for="error in storage.errors[field.name]">
             <span class="ui text">{{ error }}</span>
           </div>
         </div>

@@ -33,16 +33,10 @@ class ImportState(object):
 
         # these are actual db columns
         self.id = 0
+        self.reset()
         self.project = project
         self.filelist = filelist
         self.tasks = tasks
-        self.found_formats = {}
-        self.selected_formats = None
-        self.selected_objects = None
-        self.columns_to_draw = []
-        self.data_keys = []
-        self.files_as_tasks_list = {'type': None, 'selected': True}
-        self.show_files_as_tasks_list = None
         self.preview_size = 10
 
         self._validator = None
@@ -51,10 +45,16 @@ class ImportState(object):
             self._update()
 
     def reset(self):
+        self.project = None
+        self.filelist = ()
+        self.tasks = ()
         self.found_formats = {}
         self.selected_formats = None
         self.selected_objects = None
+        self.columns_to_draw = []
         self.data_keys = []
+        self.files_as_tasks_list = {'type': None, 'selected': True}
+        self.show_files_as_tasks_list = None
 
     def serialize(self):
         return {

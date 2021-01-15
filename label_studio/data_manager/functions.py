@@ -51,7 +51,7 @@ def get_all_columns(project):
     data_types.update(project.data_types.items())
     # all data types from import data
     if project.derived_all_input_schema:
-        data_types.update({key: 'Unknown' for key in project.derived_all_input_schema})
+        data_types.update({key: 'Unknown' for key in project.derived_all_input_schema if key not in data_types})
 
     # remove $undefined$ if there is one type at least in labeling config, because it will be resolved automatically
     if len(project.data_types) > 0:

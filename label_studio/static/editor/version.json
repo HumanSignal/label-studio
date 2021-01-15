@@ -1,6 +1,6 @@
 {
-  "message": "Change skipped icon to Stop like in Data Manager",
-  "commit": "72ae28d31eac8e2551185c6c88421e9fe775bde1",
+  "message": "Fix color of skipped icon",
+  "commit": "e477248be151a06006ed7790eda6ed6d36af089f",
   "branch": "master",
-  "date": "2021-01-11T22:10:22Z"
+  "date": "2021-01-12T20:07:36Z"
 }
