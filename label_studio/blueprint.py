@@ -562,7 +562,7 @@ def api_export():
 
     os.makedirs(g.project.export_dir, exist_ok=True)
 
-    zip_dir = os.path.join(g.project.export_dir, now.strftime('%Y-%m-%d-%H-%M-%S'))
+    zip_dir = os.path.join(g.project.export_dir, now.strftime('%Y-%m-%d-%H-%M-%S') + '-' + export_format)
     os.makedirs(zip_dir, exist_ok=True)
     g.project.converter.convert(g.project.output_dir, zip_dir, format=export_format)
     shutil.make_archive(zip_dir, 'zip', zip_dir)
