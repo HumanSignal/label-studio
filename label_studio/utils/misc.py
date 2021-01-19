@@ -383,7 +383,7 @@ def start_browser(ls_url, no_browser):
 def get_latest_version():
     pypi_url = 'https://pypi.org/pypi/%s/json' % label_studio.package_name
     try:
-        response = requests.get(pypi_url).text
+        response = requests.get(pypi_url, timeout=10).text
         latest_version = json.loads(response)['info']['version']
     except Exception as exc:
         logger.error("Can't get latest version.", exc_info=True)
