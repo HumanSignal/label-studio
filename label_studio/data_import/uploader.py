@@ -78,7 +78,12 @@ class TasksFromFileReader(object):
 
     def read_task_from_uploaded_file(self, filename, file):
         logger.debug('Read 1 task from uploaded file {}'.format(filename))
-        path = get_external_hostname() + '/data/upload/' + filename
+        # remove hostname if it's localhost and use absolute path
+        hostname = get_external_hostname()
+        if 'localhost' in hostname:
+            hostname = ''
+        # make path with hostname
+        path = hostname + '/data/upload/' + filename
         tasks = [{'data': {settings.UPLOAD_DATA_UNDEFINED_NAME: path}}]
         return tasks
 
