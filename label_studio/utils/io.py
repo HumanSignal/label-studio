@@ -4,6 +4,7 @@ import shutil
 import glob
 import io
 import ujson as json
+import yaml
 
 from contextlib import contextmanager
 from tempfile import mkstemp, mkdtemp
@@ -120,3 +121,11 @@ def json_load(file, int_keys=False):
             return {int(k): v for k, v in data.items()}
         else:
             return data
+
+
+def read_yaml(filepath):
+    if not os.path.exists(filepath):
+        filepath = find_file(filepath)
+    with io.open(filepath) as f:
+        data = yaml.load(f, Loader=yaml.FullLoader)
+    return data

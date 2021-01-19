@@ -6,7 +6,10 @@
 {% for complexity in templates %}
 <div class="ui accordion" id="{{ 'basic-templates' if complexity == 'basic' else 'adv-templates' }}">
   <div class="title">
-    <i class="dropdown icon"></i> {{complexity|capitalize}} config examples
+    <i class="dropdown icon"></i>
+    {% if complexity == 'basic'%}Choose annotation type from {{complexity}} templates{% else %}
+    {{complexity|capitalize}} templates
+    {% endif %}
   </div>
   <div class="content" style="margin-top:-8px">
     <!-- Templates categories -->
@@ -28,7 +31,9 @@
           {% for t in templates[complexity][category] %}<div class="ui item">
               <a class="use-template no-go" href="#" data-value="{{ t.pk }}">{{ t.title }}</a>
               {%  if t.new %}
-                <i class="ui icon orange tiny circle" style="opacity:0.55; position: relative; top:-2px"></i>
+                <span data-tippy-content="New template!">
+                  <i class="ui icon orange tiny circle" style="opacity:0.55; position: relative; top:-2px"></i>
+                </span>
               {% endif %}
             </div>{% endfor %}
         </div>

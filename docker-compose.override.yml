@@ -1,0 +1,8 @@
+version: "3"
+
+services:
+  label-studio:
+    volumes:
+      - .:/label-studio
+      - ./my_project:/label-studio/my_project
+    command: "label-studio start -d my_project ${INIT_COMMAND} --host 0.0.0.0"

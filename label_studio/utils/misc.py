@@ -65,20 +65,22 @@ def exception_handler(f):
 
         except AnswerException as e:
             traceback = tb.format_exc()
-
+            logger.error(traceback)
             if 'traceback' not in e.result:
                 e.result['traceback'] = traceback
             if hasattr(exception_f, 'request_id') and not e.result['request_id']:
                 e.result['request_id'] = exception_f.request_id
+
             return answer(e.status, e.msg, e.result)
 
         except Exception as e:
             traceback = tb.format_exc()
-            logger.debug(traceback)
+            logger.error(traceback)
+            print(traceback)
             body = {'traceback': traceback}
             if hasattr(exception_f, 'request_id'):
                 body['request_id'] = exception_f.request_id
-            return answer(500, str(e), body)
+            return answer(500, e.__class__.__name__ + ': ' + str(e), body)
 
     exception_f.__name__ = f.__name__
     return exception_f
@@ -233,7 +235,8 @@ def get_config_templates(config):
     template_dir = config.get('templates_dir', 'examples')
     for i, path in enumerate(iter_config_templates(template_dir)):
         # open and check xml
-        code = open(path).read()
+        with open(path) as f:
+            code = f.read()
         try:
             objectify.fromstring(code)
         except Exception as e:
@@ -273,8 +276,8 @@ def get_config_templates(config):
     return ordered_templates
 
 
-def convert_string_to_hash(string):
-    return hashlib.md5(string.encode()).hexdigest()
+def convert_string_to_hash(string, trim=None):
+    return hashlib.md5(string).hexdigest()[:trim]
 
 
 def datetime_to_timestamp(dt):
@@ -320,7 +323,7 @@ def serialize_class(class_instance, keys=None):
 
 class DirectionSwitch:
     def __init__(self, obj, inverted):
-        self.obj = obj
+        self.obj = str(obj) if isinstance(obj, dict) or isinstance(obj, list) else obj
         self.inverted = inverted
 
     def __eq__(self, other):

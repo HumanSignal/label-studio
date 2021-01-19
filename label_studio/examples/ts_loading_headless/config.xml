@@ -37,7 +37,7 @@ upload your CSV to your hosting (e.g.: `https://my.domain.com/time-series.csv`) 
 
     <!-- Object tag for time series data source -->
     <TimeSeries name="ts" valueType="url"
-                timeColumn="0" value="$csv"
+                value="$csv"
                 sep="," overviewChannels="1,2">
         <Channel column="1"
                  strokeColor="#1f77b4"/>

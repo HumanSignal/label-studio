@@ -1,0 +1,123 @@
+{% raw %}
+
+<!-- Two dialogs: source and target -->
+<sui-modal v-model="storage.show" v-bind:class="{inverted: 1, small: 1, scrollable: 1}" size="small"
+           :id="storage_for + '-storage-settings-dialog'" style="z-index: 1000"
+           v-for="(storage, storage_for) in storage_settings" v-bind:key="storage_for">
+
+
+  <!-- Header -->
+  <div class="header">
+    <i class="fas" style="opacity: 0.65"
+       :class="{'fa-cloud-download-alt': storage_for=='source', 'fa-cloud-upload-alt': storage_for=='target'}"
+       v-if="!storage.type_loading"
+    ></i>
+    <i :class="{active: storage.type_loading}" class="ui loader inline mini grey"></i>
+    &nbsp;{{ capitalizeFirstLetter(storage_for) }} storage: {{ storage.description }}
+  </div>
+
+  <!-- Content -->
+  <div class="scrolling content">
+    <form class="ui form" :id="storage.storage_for + '-storage-form'">
+      <input hidden name="storage_for" :value="storage_for">
+
+      <span v-if="storage.type=='tasks-json'">To upload data directly go to <a href="./import">Import page</a>.<br/><br/></span>
+
+      <!-- Storage Type - form needs it to correctly be processed -->
+      <div class="ui field" :class="{disabled: storage.type_loading}">
+        <label>Storage type</label>
+        <select class="ui dropdown" name="type" v-model="storage.type">
+          <option v-for="(item, name) in storage_settings_all[storage_for]" :value="name">
+            {{ item.description }}
+          </option>
+        </select>
+      </div>
+
+      <div class="ui divider hidden"></div>
+
+      <!-- Fields -->
+      <div class="ui field"
+           :class="{disabled: storage.type_loading}"
+           v-for="field in storage.fields"
+           :style="{display: showStorageField(field.name, storage) ? 'block': 'none'}"> <!-- TODO: back create_local_copy in next releases -->
+
+        <label :for="field.name" v-html="field.description"></label>
+        <sui-checkbox v-model="field.data" :name="field.name" v-if="field.type=='BooleanField'"></sui-checkbox>
+        <input type="text" :placeholder="field.name" :name="field.name" v-model="field.data"
+               v-if="field.type!='BooleanField'">
+
+        <!-- Errors -->
+        <div class="ui bulleted list" v-if="field.name in storage.errors">
+          <div class="ui item" style="color: #AA0000" v-for="error in storage.errors[field.name]">
+            <span class="ui text">{{ error }}</span>
+          </div>
+        </div>
+
+      </div>
+    </form>
+
+    <!-- Errors -->
+    <div class="ui divider hidden" v-if="'common' in storage.errors"></div>
+    <div class="ui message error" v-if="'common' in storage.errors">
+      {{ storage.errors.common }}
+    </div>
+
+    <!-- Source help -->
+    <div class="ui icon message" v-if="storage_for=='source'">
+      <i class="ui icon fas fa-info-circle" style="opacity: 0.1 !important;"></i>
+      <div class="content">
+          Sync task files from Amazon S3 or Google Cloud.<br/>
+          Continuously retrieve the contents of a storage bucket with a regex filter to create tasks in Label Studio.</br/>         
+        <a href="http://labelstud.io/guide/storage.html">Read more in documentation</a>
+      </div>
+    </div>
+
+    <!-- Target help -->
+    <div class="ui icon message" v-if="storage_for=='target'">
+      <i class="ui icon fas fa-info-circle" style="opacity: 0.1 !important;"></i>
+      <div class="content">
+        Save completion files to Amazon S3 or Google Cloud.<br/>
+        <a href="http://labelstud.io/guide/storage.html#Create-connection-on-startup">Read more in documentation</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="actions">
+    <span class="ui text">{{ project.task_count }} tasks, {{ project.completion_count }} completion files</span>
+    <span style="margin-right: 2em"></span>
+
+    <span class="ui green text" v-if="storage.save_success"><i class="fas fa-check"></i> Success</span>
+
+    <!-- Apply & Sync / Save tasks for Source -->
+    <button class="ui button positive approve"
+            :class="{disabled: storage.loading || storage.type_loading}"
+            @click="saveStorageSettings(storage_for)"
+            v-if="storage_for=='source'">
+      <!-- don't show button in Local storage for Source -->
+      <span class="ui active mini inline loader" v-if="storage.loading"></span>
+      <span v-if="!storage.loading">{{
+        storage.type!='tasks-json' ? 'Apply & Sync Tasks': 'Save'
+      }}</span>
+    </button>
+
+    <!-- Save for Target -->
+    <button class="ui button positive approve"
+            :class="{disabled: storage.loading || storage.type_loading}"
+            @click="saveStorageSettings(storage_for)"
+            v-if="storage_for=='target'">
+      <!-- don't show button in Local storage for Source -->
+      <span class="ui active mini inline loader" v-if="storage.loading"></span>
+      <span v-if="!storage.loading">Save</span>
+    </button>
+
+    <!-- Close -->
+    <button class="ui button basic cancel"
+            :class="{disabled: storage.loading}"
+            @click="storage.show=false">Close
+    </button>
+  </div>
+
+</sui-modal>
+
+{% endraw %}

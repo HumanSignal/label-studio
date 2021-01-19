@@ -45,8 +45,7 @@ if you try to build Text + TimeSeries configuration.
         <Label value="Ordinary" background="#aa4"/>
     </TimeSeriesLabels>
 
-    <TimeSeries timeColumn="time"
-                name="ts" value="$ts" valueType="json">
+    <TimeSeries name="ts" value="$ts" valueType="json">
         <Channel column="first_column"
                  strokeColor="#1f77b4"/>
         <Channel column="second_column"

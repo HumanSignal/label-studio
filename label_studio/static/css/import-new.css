@@ -1,0 +1,378 @@
+@import "./theme.css";
+
+.db-card {
+  background: var(--theme-bg);
+  border-radius: 5px;
+  padding: 1em 2em 1em 2em !important;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Rewrite hidden class after loading */
+#import-tasks.loaded {
+  display: block;
+}
+
+/* Errors */
+
+#import-tasks .error {
+  word-break: break-word;
+  max-height: 50vh;
+  overflow: auto;
+  margin-bottom: 32px;
+}
+
+#import-tasks .error > * {
+  background: 100% 6px / 16px no-repeat url(/static/images/error.png);
+  margin-bottom: 32px;
+}
+
+#import-tasks .error summary {
+  cursor: pointer;
+  margin-bottom: 16px;
+  padding-right: 16px;
+}
+
+#import-tasks .error h3 {
+  color: var(--theme-error);
+  font-size: 16px;
+  display: inline-block;
+}
+
+#import-tasks .error p {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+#import-tasks .error details p {
+  padding-left: 16px;
+}
+
+/* Common */
+
+body {
+  background: var(--theme-bg);
+}
+
+#import-tasks {
+  max-width: 560px;
+  margin: 0 auto 64px;
+  position: relative;
+  color: var(--theme-text);
+}
+
+#import-tasks button {
+  background: var(--theme-white);
+  color: var(--theme-text);
+}
+
+#import-tasks button:hover {
+  opacity: 0.9;
+}
+
+#import-tasks button.primary {
+  background-color: var(--theme-accent) !important;
+}
+
+#import-tasks button.secondary {
+  background-color: var(--gray-6);
+  color: var(--theme-white);
+}
+
+#import-tasks > header {
+  position: relative;
+  margin-bottom: 32px;
+}
+
+#import-tasks > header h1 {
+  font-size: 24px;
+  line-height: 40px;
+  font-weight: 900 !important;
+}
+
+#import-tasks > header img {
+  position: absolute;
+  left: -132px;
+  width: 100px;
+}
+
+#import-tasks .center {
+  text-align: center;
+}
+
+#import-tasks h1 {
+  position: relative;
+  margin-bottom: 32px;
+  font-size: 24px;
+  line-height: 40px;
+  font-weight: 900 !important;
+}
+
+#import-tasks h1.fade {
+  opacity: 0.3;
+}
+
+#import-tasks h1::before {
+  content: "";
+  background-image: url(/static/images/opossum_hanging.svg);
+  background-size: 100px;
+  position: absolute;
+  left: -132px;
+  width: 100px;
+  height: 100px;
+}
+
+/* Source switch */
+
+.source-switch {
+  display: flex;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.source-switch > span {
+  margin-right: 32px;
+  font-weight: 800;
+}
+
+.source-switch .ui.buttons .button:not(:first-child) {
+  margin-left: -1px;
+}
+
+.source-switch .ui.buttons .button {
+  padding: 9px 18px;
+}
+
+/* Import files via dropzone */
+
+#holder.dropzone {
+  background: var(--blue-6-15);
+  border: 1px dashed var(--theme-accent);
+  border-radius: 4px;
+  padding: 32px;
+  margin-bottom: 32px;
+}
+
+#holder.dropzone.hover {
+  opacity: 0.5;
+}
+
+#holder.dropzone * {
+  pointer-events: none;
+}
+
+#holder.dropzone .content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--blue-10);
+  opacity: 0.7;
+}
+
+#holder.dropzone.hover .content {
+  opacity: 1;
+}
+
+#holder.dropzone .content > *:not(:first-child) {
+  margin-top: 32px;
+}
+
+#holder.dropzone .content header {
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 800;
+  color: var(--blue-9);
+}
+
+#holder.dropzone .content .icon {
+  height: 64px;
+}
+
+#holder.dropzone .content dl {
+  display: grid;
+  grid-template: auto / auto auto;
+  font-size: 12px;
+  line-height: 20px;
+  gap: 0 30px;
+}
+
+
+#holder.dropzone .content dl dd {
+  font-weight: 900;
+}
+
+#holder.dropzone .content dl dt:last-of-type,
+#holder.dropzone .content dl dd:last-of-type {
+  margin-top: 20px;
+}
+
+/* Import by URL */
+
+#import-tasks p.rtfm {
+  margin-top: 12px;
+  color: var(--gray-9);
+  font-size: small;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Loading */
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 50vh;
+  max-height: 300px;
+}
+
+#import-tasks .loading h4,
+#import-tasks .loading p {
+  margin-bottom: 24px;
+}
+
+@keyframes reveal {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+#import-tasks .loading p {
+  /* display hidden, wait for 3s and reveal it */
+  animation: reveal 0.3s 3s 1 both;
+}
+
+.loading.splash {
+  position: absolute;
+  width: 100%;
+  background: var(--theme-bg);
+  opacity: 0.5;
+  z-index: 1;
+}
+
+.spinner {
+  width: 72px;
+  height: 72px;
+  display: flex;
+  flex: 0 0 72px;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin: 0 auto;
+}
+
+.spinner::before {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 4px solid var(--blue-1);
+  border-radius: 50%;
+  border-top-color: var(--theme-accent);
+  animation: loader 1s infinite linear; /* from semantic-ui */
+}
+
+/* Preview */
+
+#import-tasks p {
+  margin: 32px 0;
+}
+
+#import-tasks ul {
+  display: flex;
+  margin-top: 16px;
+}
+
+#import-tasks li {
+  margin-right: 48px;
+  -webkit-font-smoothing: antialiased;
+}
+
+#import-tasks .ui.checkbox {
+  display: block;
+}
+
+.formats {
+  margin-bottom: 32px;
+}
+
+.formats > .checkbox {
+  margin-right: 32px;
+}
+
+.formats .checkbox label,
+.ui.checkbox label {
+  cursor: pointer;
+}
+
+/* disable last checkbox so it can not be unselected */
+.last.formats input:checked,
+.last.formats input:checked + label {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.formats .count {
+  padding-left: 16px;
+  font-weight: bold;
+  color: var(--gray-9);
+}
+
+.formats .ext {
+  display: block;
+  margin-top: 8px;
+  color: var(--gray-9);
+}
+
+.stats {
+  list-style: none;
+  display: inline-flex;
+  margin-bottom: 32px;
+}
+
+.stats > li:not(:first-child) {
+  margin-left: 32px;
+}
+
+.stats .num {
+  font-weight: 800;
+}
+
+div.preview {
+  overflow-x: auto;
+}
+
+div.preview table {
+  text-align: left;
+  width: 100%;
+  position: relative;
+}
+
+div.preview table td,
+div.preview table th {
+  border: none;
+  padding: 0.4em 1.6em 0.4em 0;
+  white-space: nowrap;
+}
+
+div.preview table th {
+  border-bottom: 1px solid var(--gray-6);
+  font-weight: 600;
+  color: var(--gray-9);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* fade out */
+div.preview.fade table::after {
+  content: "";
+  background: linear-gradient(0deg, var(--gray-2), var(--gray-2-0));
+  width: 100%;
+  display: block;
+  position: absolute;
+  bottom: 0;
+  height: 30%;
+  max-height: 100px;
+  pointer-events: none;
+}

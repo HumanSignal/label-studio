@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block body %}
+  <style>
+    html, body {
+      overflow: hidden;
+    }
+
+    .datamanager {
+      height: calc(100vh - 50px);
+    }
+
+    .th-content {
+      font-weight: 500;
+    }
+
+    #header {
+      margin-bottom: 0;
+    }
+  </style>
+
+  <!-- DataManager -->
+  <div class="datamanager">
+    <center><br><br><br>Loading ...<br></center>
+  </div>
+
+  <script src="static/js/build/index.js?version="{{ version }}></script>
+
+{% endblock %}

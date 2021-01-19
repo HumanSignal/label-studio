@@ -1,0 +1,457 @@
+<div class="ui tab message" data-tab="data-settings" style="background: #fafafa!important;">
+
+  <!-- Source Storage -->
+  <div class="ui" id="source-storage">
+
+
+
+
+
+
+
+
+
+
+
+
+{% raw %}
+  <script src="static/js/polyfill.min.js"></script>
+  <script src="static/js/vue.js"></script>
+  <script src="static/js/mousetrap.min.js"></script>
+
+  <link rel="stylesheet" href="static/css/tasks.css">
+
+
+
+
+
+
+  <div id="vue_loader" class="ui large text loader loading active">Loading ...</div>
+
+  <div class="ui " id="app" :class="{'visible-app': vue_loaded}" style="display: none;">
+
+    <!-- Main content -->
+
+    <div class="ui">
+
+      <!-- Statistics -->
+      <div class="ui three column centered grid stackable">
+        <div class="row">
+
+          <!-- Total tasks -->
+          <div class="column center aligned align-grid">
+            <div class="ui">
+              <div class="ui statistic mini" style="display: inline">
+                <!-- Number -->
+                <span class="value"
+                      data-tippy-content="Tasks"
+                      style="display: inline!important;white-space:nowrap!important;">
+                  {{ project.task_count }}
+                </span><br>
+                <span class="label">Source storage</span><br/>
+                <span class="sub-label">
+                  <i class="word-break" v-if="!project.multi_session_mode"
+                     :data-tippy-content="project.source_storage.readable_path">{{
+                    get_short_text(project.source_storage.readable_path) }}</i>
+
+                <!-- Controls -->
+
+                  <!-- Storage settings -->
+                  <br>
+                  <span data-tooltip="Change source storage filter">
+                    <i class="fas fa-cog sup-button big"
+                       @click="loadStorageSettings(); storage_settings.source.show=true"></i>
+                  </span>&nbsp;
+                  <!-- Delete tasks -->
+                  <span v-if="project.can_delete_tasks">
+                    <span @click="deleteAllTasks()"
+                          data-tooltip="Delete all tasks">
+                      <i class="fas fa-trash-alt trash remove-task">&nbsp;&nbsp;</i>
+                    </span>
+                  </span>
+                </span>
+              </div> <!-- statistic -->
+            </div>
+          </div>
+
+          <!-- Total completion files -->
+          <div class="column center aligned align-grid">
+            <div class="ui">
+              <div class="ui statistic mini" style="display: inline">
+                <!-- Number -->
+                <span class="value"
+                      data-tippy-content="Files with completions">
+                  {{ project.completion_count }}
+                </span><br>
+                <span class="label">Target storage</span>
+                <br>
+                <span class="sub-label">
+                  <i class="word-break" v-if="!project.multi_session_mode"
+                     :data-tippy-content="project.target_storage.readable_path"
+                  >{{ get_short_text(project.target_storage.readable_path) }}</i>
+
+                  <!-- Controls -->
+                  <!-- Target storage settings -->
+                  <br>
+                  <span data-tooltip="Change target storage">
+                    <i class="fas fa-cog sup-button big"
+                       @click="loadStorageSettings(); storage_settings.target.show=true"></i>
+                  </span>&nbsp;
+                  <!-- Delete completions -->
+                  <span v-if="project.can_manage_completions">
+                    <span @click="deleteAllCompletions()"
+                          data-tooltip="Delete all completions">
+                      <i class="far fa-trash-alt trash remove-completion">&nbsp;&nbsp;</i>
+                    </span>
+                  </span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+
+        </div>
+
+        <!-- Critical error -->
+        <div v-if="error">
+          <div class="ui hidden divider"></div>
+          <div class="ui error message">
+            <div class="header">{{ error.header }}</div>
+            <div class="content">{{ error.message }}</div>
+          </div>
+          <div class="ui hidden divier"></div>
+        </div>
+
+      </div>
+      <div class="ui divider hidden"></div>
+    </div> <!-- container -->
+
+    {% endraw %}
+    {% include 'storages_old.html' %}
+    {% raw %}
+
+  </div>
+
+  <script src="static/js/components/vue-tippy.min.js"></script>
+  <script src="static/semantic/semantic-ui-vue.min.js"></script>
+
+  <script>
+    var PAGINATION_MAX_WIDTH = 400;
+
+    Vue.use(SemanticUIVue);
+    Vue.use(VueTippy);
+
+    var app = new Vue({
+      el: '#app',
+
+      data: function () {
+        var data = {
+          // internal variables
+          vue_loaded: false,
+          project_loaded: false,
+          tasks_loaded: false,
+          page: Cookies.get('page', 1),
+          page_size: Cookies.get('page_size', 10),
+          order: Cookies.get('order', 'id'),
+          auto_update_timer: null,
+          show_settings: false,
+          timer_interval: 5000,
+          text_preview_limit: Cookies.get('text_preview_limit', 400),
+          error: null,
+
+          // provided by api/project
+          project: {% endraw %}{{ serialized_project|json|safe }}{% raw %},
+
+          // provided by api/tasks
+          tasks: [],
+
+          // provided by api/project/storage-settings
+          storage_settings: {
+            source: {
+              fields: [], errors: [], type: 'json', storage_for: 'source',
+              show: false, loading: false, type_loading: false, save_success: false
+            },
+            target: {
+              fields: [], errors: [], type: 'json', storage_for: 'target',
+              show: false, loading: false, type_loading: false, save_success: false
+            }
+          },
+          storage_settings_all: {}
+        };
+
+        data.columns = data.full_columns;
+        return data;
+      },
+
+      computed: {
+        currentTasks: function () {
+          return this.tasks;
+        },
+        totalPages: function () {
+          var total = Math.ceil(this.project.task_count / parseInt(this.page_size));
+          if (this.page > total)
+            this.page = total;
+          return total;
+        }
+      },
+
+      methods: {
+        getApi: function (dst, url, always, fail, done) {
+          /* this api call will do vue.data['dst'] = get(url) */
+
+          var self = this;
+          $.get(url + (url.includes('?') ? '&' : '?') + 'rnd=' + randomInteger(0, 100000))
+            .done(function (data) {
+              setValue(self, dst, data);
+              if (done) done(data);
+              if (always) always(data);
+              // console.log(dst + ' loaded');
+            })
+            .fail(function (data) {
+              if (fail) fail(data);
+              else {
+                self.showError('Error while get api for <' + dst + '>:', message_from_response(data));
+              }
+              if (always) always(data);
+              console.log('error: no ' + dst + ' loaded')
+            })
+        },
+
+        // get project info from api
+        loadProject: function (polling) {
+          var self = this;
+          this.getApi('project', 'api/project/' + (polling ? '?polling=true': ''),
+            // always
+            function () {
+              self.project_loaded = true;
+            },
+            // fail
+            function (data) {
+              self.showError('Project loading error', message_from_response(data));
+            }
+          );
+        },
+
+        // get tasks from api
+        loadStorageSettings: function () {
+          var self = this;
+          self.storage_settings.source.type_loading = self.storage_settings.target.type_loading = true;
+          this.getApi('storage_settings_all', 'api/project/storage-settings/',
+            function () {
+              self.storage_settings.source.type_loading = self.storage_settings.target.type_loading = false;
+              self.changeStorageSettings('source', 'current');
+              self.changeStorageSettings('target', 'current');
+            });
+        },
+
+        // get settings from storage_settings_all
+        changeStorageSettings: function (storage_for, storage_type) {
+          // change to current on backend
+          if (storage_type === 'current') {
+            var storages = this.storage_settings_all[storage_for];
+            for (var type in storages) {
+              var value = storages[type];
+              if (value.current) {
+                storage_type = type;
+                setValue(this, 'storage_settings.' + storage_for, value);
+                break;
+              }
+            }
+          }
+          // change to new type
+          else {
+            var value = this.storage_settings_all[storage_for][storage_type];
+            setValue(this, 'storage_settings.' + storage_for, value);
+          }
+
+          // hide/show link to import page
+          if (storage_for === 'source') {
+            $('#menu-import').css("display", storage_type === 'tasks-json' ? 'block' : 'none');
+          }
+        },
+
+        saveStorageSettings: function (storage_for) {
+          var self = this;
+          self.storage_settings[storage_for].loading = true;
+          self.storage_settings[storage_for].save_success = false;
+          self.$set(self.storage_settings[storage_for], 'errors', []);
+          $.ajax({
+            type: 'POST',
+            url: 'api/project/storage-settings/' +
+              '?type=' + this.storage_settings[storage_for].type +
+              '&storage_for=' + storage_for,
+            contentType: 'application/json',
+            dataType: 'json',
+            data: JSON.stringify(getFormData($('#' + storage_for + '-storage-form')))
+          }).fail(function (data) {
+            if (data.hasOwnProperty('responseJSON') && data.responseJSON.hasOwnProperty('errors'))
+              self.$set(self.storage_settings[storage_for], 'errors', data.responseJSON.errors);
+            else {
+              var msg = message_from_response(data);
+              self.storage_settings[storage_for].errors = {common: msg};
+              self.showError('Storage settings error', msg)
+            }
+            console.log('save storage settings error:');
+            console.log(data);
+          }).done(function () {
+            self.storage_settings[storage_for].save_success = true;
+            self.project_loaded = false;
+            setTimeout(function () {
+              self.loadAll();
+            }, 4000);
+          }).always(function () {
+            self.storage_settings[storage_for].loading = false;
+          });
+          return false;
+        },
+
+        // update all objects via api
+        loadAll: function () {
+          this.loadProject();
+          this.loadStorageSettings();
+        },
+
+        // update all objects via api
+        loadProjectAndTasks: function () {
+          this.loadProject();
+        },
+
+        // delete all tasks from project
+        deleteAllTasks: function () {
+          var deletion_confirmed = confirm(
+            'You are going to delete all existing tasks.\n' +
+            'Warning! this operation cannot be undone.\nPlease confirm your action.');
+          if (deletion_confirmed) {
+            this.project_loaded = false;
+
+            var request = new XMLHttpRequest();
+            request.open("DELETE", "api/tasks", true);
+            request.onload = this.loadProjectAndTasks;
+            request.send();
+          }
+        },
+
+        // delete all completions from project
+        deleteAllCompletions: function () {
+          var deletion_confirmed = confirm(
+            'You are going to delete all existing completions.\n' +
+            'Warning! this operation cannot be undone.\nPlease confirm your action.');
+          if (deletion_confirmed) {
+            var request = new XMLHttpRequest();
+            request.open("DELETE", "api/completions", true);
+            request.onload = this.loadProjectAndTasks;
+            request.send();
+          }
+        },
+
+        // start/stop timer with project & task api loading
+        capitalizeFirstLetter: capitalizeFirstLetter,  // from helpers.js
+
+        getCurrentStorage: function (storage_for) {
+          var all = this.storage_settings_all[storage_for];
+          for (var key in all)
+            if (all[key].current)
+              return all[key];
+          return {description: '[No storage defined]', name: '[No storage defined]'}
+        },
+
+        showStorageField: function (field_name, storage) {
+          if (field_name !== 'create_local_copy') {
+            // find field use_blob_urls inside of list
+            var use_blob_urls = null;
+            for (var i in storage.fields) {
+              if (storage.fields[i].name === 'use_blob_urls') {
+                use_blob_urls = storage.fields[i];
+                break;
+              }
+            }
+            if (field_name === 'data_key' && !use_blob_urls.data) {
+              return false;
+            }
+            return true;
+          }
+        },
+
+        showError: function (title, message) {
+          $('body').toast({
+            class: 'error',
+            title: title,
+            message: '<pre>' + message + '</pre>',
+            displayTime: this.timer_interval * 2,
+            position: 'bottom center'
+          })
+        },
+
+        evalPanelWidth: function() {},
+
+        // audio player play / stop
+        audioToggle: function(target, task) {},
+        audioStopAll: function() {},
+
+        copyValue: function(text) {
+          copyToClipboard(text);
+          $('body').toast({
+            class: 'orange center',
+            message: '<center>Copied to clipboard!</center>',
+            position: 'bottom center'
+          })
+        },
+
+        get_short_text: function(text) {
+          const max_len = 40;
+          return (text.length <= max_len ? text: ('...' + text.slice(text.length-max_len, text.length)));
+        },
+
+        // start/stop timer with project & task api loading
+        stopAutoUpdateTimer: function () {
+          clearInterval(this.auto_update_timer);
+          this.auto_update_timer = null;
+        },
+        startAutoUpdateTimer: function () {
+          if (this.timer_interval > 0) {
+            var self = this;
+            this.auto_update_timer = setInterval(function() {
+              self.loadProject(true); // run with polling = true to distinct request from timer
+            }, this.timer_interval);
+          }
+        },
+        toggleAutoUpdateTimer: function () {
+          if (this.auto_update_timer) {
+            this.stopAutoUpdateTimer();
+          } else {
+            this.startAutoUpdateTimer();
+          }
+        },
+      },
+
+      watch: {
+        'storage_settings.source.type': function () {
+          this.changeStorageSettings('source', this.storage_settings.source.type)
+        },
+        'storage_settings.target.type': function () {
+          this.changeStorageSettings('target', this.storage_settings.target.type)
+        }
+      },
+
+      // vue mounting of page
+      mounted: function () {
+        this.vue_loaded = true;
+        this.project_loaded = true;
+        this.loadAll();
+        this.startAutoUpdateTimer();
+
+        $('#vue_loader').hide();
+        $('.ui.checkbox').checkbox();
+        console.log('Vue mounting success');
+      }
+    });
+
+  </script>
+
+{% endraw %}
+
+
+
+  </div>
+
+</div>

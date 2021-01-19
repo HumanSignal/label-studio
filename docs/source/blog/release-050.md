@@ -141,4 +141,4 @@ Now Label Studio is also maintained and distributed as Docker container - [run o
 
 ### Multisession mode
 
-You can launch Label Studio in [multisession mode](/guide/multiuser/#Multisession-mode) - then each browser session dynamically creates its own project. 
+You can launch Label Studio in [multisession mode](/guide/#Multisession-mode) - then each browser session dynamically creates its own project. 

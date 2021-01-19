@@ -28,7 +28,8 @@ order: 201
   }
   
   h3 {
-    margin: 1em !important;
+    margin: 1em 0 !important;
+    font-weight: normal;
     width: unset;
     height: unset;
   }
@@ -36,56 +37,55 @@ order: 201
   iframe {
      border: 0;
      margin: 0 !important;
+     padding: 0 !important;
   }
-  
+
   #render-editor {
      width: 100%;
   }
-  
+
   #editor-wrap {
-     background-color: rgb(252,252,252);
      padding: 0;
      margin: 0;
      display: none;
   }
-  
+
   .preview {
      padding: 5px;
      overflow: auto;
   }
- 
+
   .editor-row {
-      display: flex; 
-      margin-bottom: 1em; 
+      display: flex;
+      margin-bottom: 1em;
       width: 100% !important;
   }
-  
+
    .data-row {
       display: flex;
    }
-   
+
   .preview-col {
-      width: 60%; 
-      flex: 1; 
-      background: rgb(252,252,252);
+      width: 60%;
+      flex: 1;
    }
-  
+
   .editor-area {
-      border: 1px solid #f48a4259;
+      border: 1px solid rgba(34,36,38,.15);
+      border-radius: 0.28571429rem;
   }
-   
+
   .config-col {
-      color: rgba(0,0,0,.6); 
-      background: rgb(252,252,252); 
-      margin-right: 2em; 
-      width: 40%; 
+      color: rgba(0,0,0,.6);
+      margin-right: 2em;
+      width: 40%;
   }
-  
+
   .input-col {
       width: 49%;
       padding-right: 2%;
   }
-  
+
   .output-col {
       width: 49%;
   }
@@ -97,12 +97,12 @@ order: 201
   #basic-templates>.title {
     display: none;
   }
-  #adv-templates>.title>.icon.dropdown {
-    display: none;
-  }
   #adv-templates>.title {
-    text-align: center;
     margin-bottom: 1em;
+    cursor: pointer;
+  }
+  #adv-templates>.content {
+    display: none
   }
 
   .message, .accordion {
@@ -110,7 +110,7 @@ order: 201
     max-width: 1000px;
     margin: 1em auto 1.75em auto;
   }
-  .grid { 
+  .grid {
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
@@ -125,7 +125,7 @@ order: 201
             align-items: stretch;
     padding: 0;
   }
-  
+
   .column {
     width: 20% !important;
   }
@@ -202,6 +202,12 @@ order: 201
   i.icon.wave.square:before {
     content: "\f83e"
   }
+  i.icon.dropdown:before {
+    content: "\f0da";
+  }
+  i.icon.dropdown.active:before {
+    content: "\f0d7";
+  }
 
   .share-buttons {
     float:right;
@@ -218,9 +224,9 @@ order: 201
     transition: 0.25s;
   }
 
-  .intro { 
-    max-width: 700px; 
-    margin: 0 auto;  
+  .intro {
+    max-width: 700px;
+    margin: 0 auto;
     margin-top: 1.5em;
   }
 
@@ -258,9 +264,10 @@ order: 201
     .config-col {
         width: 100%;
     }
-    .input-col, .output-col { 
-        width: 100%; 
+    .input-col, .output-col {
+        width: 100%;
     }
+
 }
 </style>
 
@@ -269,8 +276,7 @@ order: 201
 <!-- html -->
 
 <div class="intro">
-    <h1>Click on any annotation type and check the Interface Preview </h1>
-    Start typing in the config, and you can quickly preview the labeling interface. At the bottom of the page, you have live serialization updates of what Label Studio expects as an input and what it gives you as a result of your labeling work.
+    <h3 style="text-align: center">1. Choose annotation template</h3>
 </div>
 
 
@@ -280,7 +286,7 @@ order: 201
   <div class="editor-row">
     <div class="config-col">
       <div>
-        <h3 style="display: inline-block">Labeling config</h3>
+        <h3 style="display: inline-block">2. Edit Labeling config</h3>
         <span class="share-buttons">
           <i class="icon copy outline" style="cursor: pointer" title="Copy labeling config"></i>
           <i class="icon share" style="cursor: pointer" title="Copy link to this playground"></i>
@@ -291,9 +297,16 @@ order: 201
       <textarea name="label_config" cols="40" rows="10" class="project-form htx-html-editor"
                 id="id_label_config"></textarea>
       </div>
+
+      <div style="margin-top: 1em">
+        Start typing in the config, and you can quickly preview the labeling interface.
+        At the bottom of the page, you have live serialization updates
+        of what Label Studio expects as an input and what it gives you as a result of your labeling work.
+      </div>
     </div>
+
     <div class="preview-col">
-      <h3>Interface Preview</h3>
+      <h3>3. Inspect Interface preview</h3>
       <div class="validation"></div>
       <div id="editor-wrap">
       </div>
@@ -398,6 +411,7 @@ order: 201
       }
 
       labelEditor.setValue(value);
+      first_render = true;
     }
 
     $('.use-template').on('click', function () {
@@ -462,6 +476,9 @@ order: 201
         if (typeof Htx !== 'undefined') {
           var completion = JSON.stringify(Htx.completionStore.selected.serializeCompletion(), null, 4);
           if (prev_completion !== completion) {
+            if (completion.length > 3000) {
+              completion = completion.slice(0, 3000) + ' ...';
+            }
             $('#data-results').text(completion);
             prev_completion = completion;
           }
@@ -539,7 +556,8 @@ order: 201
         // assign id to new iframe
         iframe.attr('id', 'render-editor');
         // force to hide undo / redo / reset buttons
-        $('#render-editor').contents().find('head').append('<style>.ls-panel{display:none;}</style>');
+        $('#render-editor').contents().find('head').append('<style>.ls-panel{display:none;}' +
+          '.ls-editor { margin-left: 3px!important;}</style>');
         iframe.show();
         let obj = document.getElementById('render-editor');
 

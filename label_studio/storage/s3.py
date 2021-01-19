@@ -1,7 +1,7 @@
 import logging
 import boto3
 from botocore.client import Config
-import json
+import ujson as json
 import os
 
 from .base import CloudStorage, CloudStorageForm, BaseStorageForm, BooleanField, Optional, StringField
@@ -13,7 +13,7 @@ S3_REGION = os.environ.get('S3_REGION', 'us-east-1')
 
 
 def get_client_and_resource(
-    aws_access_key_id=None, aws_secret_access_key=None, aws_session_token=None, region=None
+    aws_access_key_id=None, aws_secret_access_key=None, aws_session_token=None, region=None, **kwargs
 ):
     session = boto3.Session(
         aws_access_key_id=aws_access_key_id,
@@ -79,7 +79,7 @@ class S3Storage(CloudStorage):
     def readable_path(self):
         return self.url_prefix + self.path + '/' + self.prefix
 
-    def _get_value(self, key):
+    def _get_value(self, key, inplace=False, validate=True):
         s3 = self.client['s3']
         bucket = self.client['bucket']
         obj = s3.Object(bucket.name, key).get()['Body'].read().decode('utf-8')

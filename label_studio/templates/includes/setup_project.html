@@ -1,0 +1,142 @@
+<div class="ui tab message" data-tab="project-settings">
+
+  <!-- Tabs -->
+  <div class="ui accordion" id="tab-settings">
+    <div class="title"><i class="dropdown icon"></i>Data manager</div>
+    <div class="content accordion-content">
+      <p>If the Data Manager (Tasks table) does not load or loads slowly, you can reset the filters, sort order, and remove additional tabs.</p>
+      <button onclick="reset_all_tabs()" class="ui button negative basic accordion-button">
+        Reset
+      </button>
+    </div>
+  </div>
+  <div style="margin: 1em"></div>
+
+  <!-- Project switching -->
+  {% if multi_session %}
+    <div class="ui accordion" id="project-management">
+      <div class="title"><i class="dropdown icon"></i>Project management</div>
+      <div class="content accordion-content">
+        <div> Current project: {{ project.description }}</div>
+        <div style="margin-bottom: 15px!important;"></div>
+
+        <p>You can create multiple projects within one browser session.
+          If you don't want to loose your project, just save the shared link in the safety place.
+          If you want to share the project with somebody, send him or her a shared link.</p>
+
+        <button onclick="new_project()" id="new-project-button" class="ui button negative basic accordion-button">
+          Start new project
+        </button>
+
+        <div style="margin-top: 10px!important;"></div>
+        <div style="padding-left: 10px">
+          <style>.ui.item:hover i {
+            color: darkorange !important;
+          }</style>
+
+          {% for uuid, desc in own_projects.items() %}
+            <div class="ui item">
+              <i class="share alternate icon blue small hover-button"
+                 data-tippy-content="Copy shared link to project with uuid<br>{{ uuid }}"
+                 onclick="copy_share_link('{{ uuid }}')"></i>
+              <a id="myLink" href="#" onclick="switch_project('{{ uuid }}', '{{ desc }}')" data-value="{{ uuid }}"
+                 style="font-weight: {% if uuid == project.uuid %}bold{% else %}normal{% endif %}">
+                {{ desc }}</a>
+            </div>
+          {% endfor %}
+
+        </div>
+
+        <div style="margin-bottom: 15px!important;"></div>
+        <div>Shared projects with you</div>
+
+        <div style="margin-bottom: 15px!important;"></div>
+        <div style="padding-left: 10px">
+          {% if shared_projects %}
+
+            {% for uuid, desc in shared_projects.items() %}
+              <td class="ui item">
+                <i class="share alternate icon blue small hover-button"
+                   data-tippy-content="Copy shared link to project with uuid<br>{{ uuid }}"
+                   onclick="copy_share_link('{{ uuid }}')"></i>
+                <a id="myLink" href="#" onclick="switch_project('{{ uuid }}', '{{ desc }}')" data-value="{{ uuid }}"
+                   style="font-weight: {% if uuid == project.uuid %}bold{% else %}normal{% endif %}">
+                  {{ desc }}</a>
+              </td>
+            {% endfor %}
+
+          {% else %}
+            <p>You can add a shared project here if you open a shared link from the other user</p>
+          {% endif %}
+        </div>
+        <div style="margin-top: 10px!important;"></div>
+      </div>
+    </div> <!-- Project switching accordion -->
+  {% endif %}
+
+<!-- Tabs -->
+  <div style="margin: 1em"></div>
+  <div class="ui accordion">
+    <div class="title active"><i class="dropdown icon"></i>Deprecated pages</div>
+    <div class="content active accordion-content">
+      <p>These pages are deprecated but still are working:</p>
+      <ul style="margin-left: 1.5em">
+        <li><a href="./import-old">Import</a></li>
+        <li><a href="./label-old">Labeling</a></li>
+        <li><a href="./tasks-old">Tasks</a></li>
+      </ul>
+
+    </div>
+  </div>
+
+
+</div> <!-- tab -->
+
+
+<script>
+  function reset_all_tabs() {
+    var deletion_confirmed = confirm(
+      'You are going to delete all tabs with filters, selected items, ordering, etc.\n' +
+      'Warning! This operation cannot be undone.\nPlease confirm your action.');
+    if (deletion_confirmed) {
+      var request = new XMLHttpRequest();
+      request.open("DELETE", "api/project/tabs", true);
+      request.onload = function () {
+        alert('Tabs were deleted!')
+      };
+      request.send();
+    }
+  }
+
+  function new_project() {
+    var project_desc = prompt("Do you want to create a new project?\n\n" +
+      "If yes, please enter a new project title", "default");
+    if (project_desc) {
+      var request = new XMLHttpRequest();
+      request.open("POST", 'api/project/?new=true&desc=' + project_desc, true);
+      request.onload = function () {
+        window.location.reload();
+      };
+      request.send(null);
+    }
+  }
+
+  function switch_project(uuid, desc) {
+    var request = new XMLHttpRequest();
+    request.open("POST", '/api/project-switch?uuid=' + uuid, true);
+    request.onload = function () {
+      window.location = "/setup"
+    };
+    request.send(null);
+  }
+
+  function copy_share_link(uuid) {
+    copyToClipboard(window.location.origin + '/api/project-switch?uuid=' + uuid);
+    $('body').toast({
+      class: 'orange',
+      title: 'Copied!',
+      message: '<pre>Link to the project is copied to clipboard<br><br>Project uuid:<br>' + uuid + '</pre>',
+      position: 'bottom center'
+    })
+  }
+</script>
