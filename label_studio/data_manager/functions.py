@@ -327,7 +327,7 @@ def load_task(project, task_id, params, resolve_uri=False):
         task['predictions_results'] = json.dumps([item.get('result', []) for item in predictions])
         scores = [p['score'] for p in predictions if 'score' in p]
         if scores:
-            task['prediction_scores'] = sum(scores) / len(scores)
+            task['predictions_score'] = sum(scores) / len(scores)
     else:
         task['predictions_results'] = ''
 
