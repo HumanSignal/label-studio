@@ -693,7 +693,7 @@ def api_all_tasks():
         return make_response(jsonify({'detail': 'deleted'}), 204)
 
 
-@blueprint.route('/api/tasks/<task_id>', methods=['GET', 'DELETE'])
+@blueprint.route('/api/tasks/<task_id>', methods=['GET', 'DELETE', 'PATCH', 'POST'])
 @requires_auth
 @exception_handler
 def api_task_by_id(task_id):
@@ -717,10 +717,16 @@ def api_task_by_id(task_id):
         )
         return make_response(response, 200)
 
+    if request.method == 'PATCH' or request.method == 'POST':
+        data = request.json
+        g.project.source_storage._validate_task(task_id, data)
+        g.project.source_storage.set(task_id, data)
+        return make_response({'detail': 'Task patched', 'data': data}, 200)
+
     # delete task
     elif request.method == 'DELETE':
         g.project.delete_task(task_id)
-        return make_response(jsonify({'detal': 'Task deleted'}), 204)
+        return make_response(jsonify({'detail': 'Task deleted'}), 204)
 
 
 @blueprint.route('/api/tasks/<task_id>/completions', methods=['POST', 'DELETE'])
