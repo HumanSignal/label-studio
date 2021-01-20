@@ -31,7 +31,7 @@ Its purpose is to help you label different types of data using a simple interfac
 
 ```bash
 # Requires >=Python3.5, Python 3.9 is not supported
-pip install label-studio
+pip install -U label-studio
 
 # Initialize the project in labeling_project path
 label-studio init labeling_project
