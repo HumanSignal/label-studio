@@ -459,13 +459,13 @@ div.container{
 .outer__label>.left__overlay{
   position: absolute;
   left:-15px;
-  bottom:-15px;
+  bottom:-40px;
   z-index: 5;
 }
 .outer__label>.right__overlay{
   position: absolute;
   right:-15px;
-  bottom:-15px;
+  bottom:-40px;
   z-index: 5;
 }
 .author__image>img{
@@ -612,7 +612,7 @@ div.container{
 }
 .community__block{
   margin-bottom:0px;
-  margin-top:-90px;
+  margin-top:-60px;
   position: relative;
   background-color:#FAFAF9;
 }
@@ -651,14 +651,14 @@ div.container{
 .lf__overlay{
   position: absolute;
     left: 0px;
-    bottom: 150px;
+    bottom: 130px;
     z-index: 3;
     height:150px;
 }
 .rg__overlay{
   position: absolute;
     right: 0px;
-    bottom: 150px;
+    bottom: 130px;
     z-index: 3;
     height:150px;
 }
@@ -1119,7 +1119,15 @@ footer{
   .inner__articles{
     grid-template-columns:repeat(3 , minmax(300px , 300px));
     overflow-x: auto;
-    width:calc(100% + 15px);
+    width:calc(100% + 30px);
+    margin-left:-15px;
+    padding-left:15px;
+  }
+  /* padding-right doesn't work in scrollable flex block */
+  .inner__articles::after{
+    content:"";
+    flex: 1px 0 0;
+    margin-left: -1px;
   }
   .inner__articles::-webkit-scrollbar {
       width: 0px;  /* Remove scrollbar space */
@@ -1313,8 +1321,7 @@ footer{
     z-index: 6;
   }
   .lf__overlay{
-    width:120px;
-    bottom:120px;
+    bottom:100px;
   }
   .community__spacer{
     min-width:50px;
@@ -1323,9 +1330,7 @@ footer{
     padding-left:35px;
   }
   .rg__overlay{
-    right: -30px;
-    width:120px;
-    bottom:120px;
+    bottom:100px;
   }
   .inner__community{
     width:calc(100% + 30px);
@@ -1350,6 +1355,9 @@ footer{
   .inner__community .info__community{
     margin-bottom:20px;
   }
+  .community__block{
+    margin-top: 0;
+  }
   .community__block .head__community>h2{
     text-align:left;
     font-size:20px;
@@ -1358,8 +1366,11 @@ footer{
   .community__block .head__community{
     margin-bottom:15px;
   }
+  .community__block .outer__community{
+    top:60px;
+  }
   .community__block .opossum__image{
-    top:90px;
+    top:60px;
     right: 15px;
     max-width:115px;
   }
@@ -1398,7 +1409,7 @@ footer{
     line-height:28px;
   }
   .date__type .head__date--type .switcher__inner{
-    width:calc(100% + 20px);
+    width:100%;
   }
   .main__content .left__content>p{
     font-size:16px;
@@ -1437,11 +1448,11 @@ footer{
   }
   .outer__label>.left__overlay{
     max-width:100px;
-    bottom:-20px;
+    bottom:-30px;
   }
   .outer__label>.right__overlay{
     max-width:100px;
-    bottom:-20px;
+    bottom:-30px;
   }
   .date__type{
     margin-bottom:-250px;
