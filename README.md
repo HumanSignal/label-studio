@@ -56,7 +56,7 @@ pip install -U pip
 pip install lxml‑4.5.0‑cp38‑cp38‑win_amd64.whl
 
 # Install label studio
-pip install label-studio
+pip install -U label-studio
 ```
 
 #### Install from Anaconda
@@ -64,7 +64,7 @@ pip install label-studio
 ```bash
 conda create --name label-studio python=3.8
 conda activate label-studio
-pip install label-studio
+pip install -U label-studio
 ```
 
 If you see any errors during installation, try to rerun installation
