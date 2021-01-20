@@ -1,6 +1,6 @@
 pip>=20.2.3
 appdirs==1.4.3
-attrs==19.1.0
+attrs>=19.1.0
 blis==0.4.1
 certifi==2019.11.28
 chardet==3.0.4
