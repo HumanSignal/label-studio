@@ -1,6 +1,6 @@
 {
-  "message": "Exclude AudioPlus from cell views as userSelectable = false",
-  "commit": "d7b7536042d52fa7cb6611db03633131784bf36a",
-  "branch": "feature/dm-sdk",
-  "date": "2021-01-14T20:21:24Z"
+  "message": "Version bump",
+  "commit": "0cced1c5ff08092cba758665a706ebed2129a933",
+  "branch": "master",
+  "date": "2021-01-21T16:25:30Z"
 }
