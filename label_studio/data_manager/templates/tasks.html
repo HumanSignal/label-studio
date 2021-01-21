@@ -23,6 +23,17 @@
     <center><br><br><br>Loading ...<br></center>
   </div>
 
-  <script src="static/js/build/index.js?version="{{ version }}></script>
+  <!-- Editor CSS -->
+  {% for css in editor_css %}
+    <link href="{{ css }}?version={{ version }}" rel="stylesheet">
+  {% endfor %}
+
+  <!-- Editor JS -->
+  {% for js in editor_js %}
+    <script src="{{ js }}?version={{ version }}"></script>
+  {% endfor %}
+
+  <!-- Data manager JS -->
+  <script src="static/js/build/index.js?version={{ version }}"></script>
 
 {% endblock %}

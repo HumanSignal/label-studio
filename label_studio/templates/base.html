@@ -29,16 +29,6 @@
     }
   </script>
 
-  <!-- Editor CSS -->
-  {% for css in editor_css %}
-    <link href="{{ css }}" rel="stylesheet">
-  {% endfor %}
-
-  <!-- Editor JS -->
-  {% for js in editor_js %}
-    <script src="{{ js }}"></script>
-  {% endfor %}
-
   {% block head %}{% endblock %}
 
 </head>

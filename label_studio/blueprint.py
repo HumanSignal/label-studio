@@ -301,6 +301,7 @@ def labeling_page():
         label_config_line=g.project.label_config_line,
         task_id=task_id,
         task_data=task_data,
+        version=label_studio.__version__,
         **find_editor_files()
     )
 
