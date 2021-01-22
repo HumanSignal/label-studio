@@ -32,9 +32,10 @@ menu && menu.classList.add('main__page__header')
           function nice_format(n) {
             const prefixes = ['', 'k', 'M']
             const level = Math.floor(Math.floor(Math.log10(n)) / 3)
-            const short = (n / Math.pow(10, 3 * level))
-              .toPrecision(3)
-              .replace(/\.?0+$|(\.\d)\d+$/g, '$1') // leave max one digit after dot
+            const thousands = n / Math.pow(10, 3 * level)
+            const short = thousands
+              .toPrecision(thousands > 99 ? 3 : 2)
+              .replace(/\.0+$|(\.\d)\d+$/g, '$1') // leave max one digit after dot
             return short + prefixes[level]
           }
           const star_counter = document.querySelector('.star__counter')

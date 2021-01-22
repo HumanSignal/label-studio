@@ -1,5 +1,16 @@
 {% extends 'base.html' %}
 {% block body %}
+
+<!-- Editor JS -->
+{% for js in editor_js %}
+  <script src="{{ js }}?version={{ version }}"></script>
+{% endfor %}
+
+<!-- Editor CSS -->
+{% for css in editor_css %}
+  <link href="{{ css }}?version={{ version }}" rel="stylesheet">
+{% endfor %}
+
 {% raw %}
   <script src="static/js/polyfill.min.js"></script>
   <script src="static/js/vue.js"></script>
@@ -113,7 +124,7 @@
                     </span>
                   </span>
                   <!-- Start labeling -->
-                  <a class="ui button positive" href=".">Start Labeling</a>
+                  <a class="ui button positive" href="./label-old">Start Labeling</a>
                 </div>
               </div>
             </div>
@@ -122,7 +133,7 @@
 
         <!-- Critical error -->
         <div v-if="error">
-          <div class="ui hidden divier"></div>
+          <div class="ui hidden divider"></div>
           <div class="ui error message">
             <div class="header">{{ error.header }}</div>
             <div class="content">{{ error.message }}</div>

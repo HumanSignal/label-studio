@@ -129,9 +129,9 @@ After the project setup is finished you can import this task (just copy this rig
       },
       {
         "id": "result3",
-      "type": "choices",
+        "type": "choices",
         "from_name": "choice", "to_name": "image",
-      "value": {
+        "value": {
           "choices": ["Airbus"]
         }
       }

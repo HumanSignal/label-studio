@@ -117,7 +117,7 @@ The `format` parameters could be found on the Export page in the dropdown (`JSON
 | /api/project-switch               | `GET` switch to specified project by project UUID in multi-session mode |
 | **Tasks** |
 | /api/tasks                        | `GET` retrieve all tasks from project <br> `DELETE` delete all tasks from project |
-| /api/tasks/\<task_id>              | `GET` retrieve specific task <br> `DELETE` delete specific task  |
+| /api/tasks/\<task_id>              | `GET` retrieve specific task <br> `DELETE` delete specific task <br> `PATCH \| POST` rewrite task with data, completions and predictions (it's very helpful for changing data in time and prediction updates) |
 | /api/tasks/\<task_id>/completions  | `POST` create a new completion <br> `DELETE` delete all task completions |
 | /api/tasks/\<task_id>/completions/\<completion_id> | `PATCH` update completion <br> `DELETE` delete completion |
 | /api/completions                  | `GET` returns all completion ids <br> `DELETE` delete all project completions |
