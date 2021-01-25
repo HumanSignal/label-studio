@@ -213,9 +213,14 @@ def get_data_file(filename):
     """
     # support for upload via GUI
     if filename.startswith('upload/'):
-        path = os.path.join(g.project.path, filename)
+        upload_dir = os.environ.get('LS_UPLOAD_DIR', '')
+        if os.path.exists(upload_dir):
+            path = os.path.join(upload_dir, filename[7:])
+        else:
+            path = os.path.join(g.project.path, filename)
         directory = os.path.abspath(os.path.dirname(path))
         filename = os.path.basename(path)
+        logger.debug('get_data_file::upload: ' + str(directory) + ' :: ' + filename)
         return flask.send_from_directory(directory, filename, as_attachment=True)
 
     # serving files from local storage
