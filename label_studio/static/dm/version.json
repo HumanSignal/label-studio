@@ -1,6 +1,6 @@
 {
-  "message": "Version bump",
-  "commit": "0cced1c5ff08092cba758665a706ebed2129a933",
+  "message": "Fix checkboxes",
+  "commit": "048512fca48496f6b62f47e24606659a7fbf738e",
   "branch": "master",
-  "date": "2021-01-21T16:25:30Z"
+  "date": "2021-01-25T15:42:04Z"
 }
