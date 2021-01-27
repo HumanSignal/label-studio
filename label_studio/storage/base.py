@@ -456,9 +456,9 @@ class CloudStorage(BaseStorage):
     def _get_objects(self):
         pass
 
-    def items(self):
+    def items(self, validate=True):
         for id in self.ids():
-            obj = self.get(id)
+            obj = self.get(id, validate=validate)
             if obj:
                 yield id, obj
 
