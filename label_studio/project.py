@@ -308,6 +308,7 @@ class Project(object):
 
     def update_derived_input_schema(self):
         self.derived_input_schema = set()
+        self.derived_all_input_schema = set()
         for task_id, task in self.source_storage.items():
             data_keys = set(task['data'].keys())
             if not self.derived_input_schema:
