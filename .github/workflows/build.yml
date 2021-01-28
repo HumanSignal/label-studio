@@ -2,8 +2,10 @@ name: label-studio:build
 
 on:
   workflow_run:
-  workflows: ["label-studio:tests"]
-    branches: ['*', '*/*', master]
+    workflows:
+      - label-studio:tests
+    types:
+      - completed 
 
 jobs:
   tests:
