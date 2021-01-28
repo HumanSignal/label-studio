@@ -4,6 +4,7 @@ on:
   workflow_run:
     workflows:
       - 'label-studio:tests'
+    branches: ['*', '*/*', master]
     types:
       - completed 
 
