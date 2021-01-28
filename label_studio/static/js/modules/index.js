@@ -6,8 +6,7 @@ const dmRoot = document.querySelector(".datamanager");
 if (dmRoot) {
   const dm = new DataManager({
     root: dmRoot,
-    apiGateway: "/api/dm",
-    apiVersion: 2
+    apiGateway: "../api"
   });
 
   console.log(dm);

@@ -1,6 +1,6 @@
 {
-  "message": "Rename API handlers, support shared paramenters",
-  "commit": "0df58c56ba11eefb71bbf395dd56937ef57f525c",
-  "branch": "feature/ls-api2-support",
-  "date": "2021-01-28T16:35:50Z"
+  "message": "Fix completions submit/update",
+  "commit": "338d5867e16f035389f5de034a669654b0f646d7",
+  "branch": "master",
+  "date": "2021-01-28T17:40:20Z"
 }
