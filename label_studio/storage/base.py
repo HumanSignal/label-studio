@@ -49,7 +49,7 @@ class BaseForm(FlaskForm):
 
 
 class BaseStorageForm(BaseForm):
-    path = StringField('Path', [InputRequired()], description='Storage path (e.g. bucket name)')
+    path = StringField('Path', [InputRequired()], description='Storage path (e.g. bucket/container name)')
 
     # Bind here form fields to storage fields {"form field": "storage_field"}
     bound_params = dict(path='path')
