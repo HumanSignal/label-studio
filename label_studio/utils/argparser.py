@@ -61,7 +61,7 @@ def parse_input_args():
         help='Source data storage type')
     root_parser.add_argument(
         '--source-path', dest='source_path',
-        help='Source bucket name')
+        help='Source bucket/container name')
     root_parser.add_argument(
         '--source-params', dest='source_params', type=json.loads, default={},
         help='JSON string representing source parameters')
@@ -70,7 +70,7 @@ def parse_input_args():
         help='Target data storage type')
     root_parser.add_argument(
         '--target-path', dest='target_path',
-        help='Target bucket name')
+        help='Target bucket/container name')
     root_parser.add_argument(
         '--target-params', dest='target_params', type=json.loads, default={},
         help='JSON string representing target parameters')
