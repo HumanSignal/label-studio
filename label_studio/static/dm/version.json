@@ -1,6 +1,6 @@
 {
-  "message": "Fix checkboxes",
-  "commit": "048512fca48496f6b62f47e24606659a7fbf738e",
-  "branch": "master",
-  "date": "2021-01-25T15:42:04Z"
+  "message": "Rename API handlers, support shared paramenters",
+  "commit": "0df58c56ba11eefb71bbf395dd56937ef57f525c",
+  "branch": "feature/ls-api2-support",
+  "date": "2021-01-28T16:35:50Z"
 }

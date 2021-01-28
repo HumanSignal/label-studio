@@ -66,6 +66,8 @@
 
     <!-- this needs to be loaded before guide's inline scripts -->
 
+    <%- partial('partials/google_analytics') %>
+    
   </head>
   <body >
     <div id="mobile-bar" <%- isBlog ? 'style="display: none"' : '' %>>
@@ -86,7 +88,5 @@
     <% } else { %>
         <%- partial('partials/index') %>
     <% } %>
-
-    <%- partial('partials/google_analytics') %>
   </body>
 </html>
