@@ -1,6 +1,6 @@
 {
-  "message": "Fix color of skipped icon",
-  "commit": "e477248be151a06006ed7790eda6ed6d36af089f",
+  "message": "Fix errors in Paragraphs with valueType=url",
+  "commit": "559d3de713dbc249a516def663135deccf7ec628",
   "branch": "master",
-  "date": "2021-01-12T20:07:36Z"
+  "date": "2021-01-25T15:23:01Z"
 }
