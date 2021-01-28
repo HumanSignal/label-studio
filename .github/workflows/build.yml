@@ -3,7 +3,7 @@ name: label-studio:build
 on:
   workflow_run:
     workflows:
-      - label-studio:tests
+      - 'label-studio:tests'
     types:
       - completed 
 
