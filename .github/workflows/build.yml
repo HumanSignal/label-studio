@@ -1,0 +1,14 @@
+name: label-studio:build
+
+on:
+  workflow_run:
+  workflows: ["label-studio:tests"]
+    branches: ['*', '*/*', master]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout current commit
+      uses: actions/checkout@v2
