@@ -35,6 +35,7 @@ Desktop.ini
 .env.development.local
 .env.test.local
 .env.production.local
+htx-env
 
 # Testing
 coverage/

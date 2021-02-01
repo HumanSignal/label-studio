@@ -1,161 +1,8 @@
 ---
-title: Import data
+title: Tasks
 type: guide
-order: 101
+order: 102
 ---
-
-## Images
-
-### Local storage
-
-Assume you have a folder `path/to/my/images` with images on your local machine. To annotate them, simply run:
-
-```bash
-label-studio start my-project --init --input-path=path/to/my/images --input-format=image-dir --allow-serving-local-files --template image_bbox 
-```
-
-### Remote storage
-
-Assume you have a list of image URLs. First place them in a single file `images.txt`:
-
-```txt
-https://my.domain.com/image1.jpg
-https://my.domain.com/image2.jpg
-https://my.domain.com/image3.jpg
-```
-
-Open the Label Studio app. On the **Setup** page, choose any of Audio annotation projects. Go to the **Import** page. Drag-n-drop `images.txt` or select it via import dialog.
-
-### Cloud storage
-
-Assume you have GCP or S3 bucket you want to connect to stream your images from there. Read more [here](/guide/storage.html) how to connect common cloud storages.
-
-
-## Text files
-
-Create file `texts.json`: 
-
-```json
-[
-{"text":  "1st text"},
-{"text":  "2nd text"},
-{"text":  "3rd text"}
-]
-```
-
-Then import that file via Label Studio UI on **Import** page.
-
-
-## Audios
-
-### Local storage
-
-Assume you have a folder `path/to/my/audios` with audio files on your local machine. To annotate them, simply run:
-
-```bash
-label-studio start my-project --init --input-path=path/to/my/audios --input-format=audio-dir --allow-serving-local-files --template audio_transcribe
-```
-
-### Remote storage
-
-Assume you have a list of audio URLs. First place them in a single file `audios.txt`:
-
-```txt
-https://my.domain.com/audio1.jpg
-https://my.domain.com/audio2.jpg
-https://my.domain.com/audio3.jpg
-```
-
-Open the Label Studio app. On the **Setup** page, choose any of Audio annotation projects. Go to the **Import** page. Drag-n-drop `audios.txt` or select it via import dialog.
-
-### Cloud storage
-
-Assume you have GCP or S3 bucket you want to connect to stream your images from there. Read more [here](/guide/storage.html) how to connect common cloud storages.
-
-
-
-## Time Series
-
-### Local storage
-
-Assume you have a folder `path/to/my/timeseries` on your local machine, containing multiple `.csv` files (one [CSV formatted file](/templates/time_series.html) per each time series excerpt). 
-
-To annotate all of them, run Label Studio app and choose any of Time Series annotation projects on **Setup** page.
-
-Make sure that label config attributes match existed column names and formats in your CSV files (read more [here](/templates/time_series.html)).
-
-Drag-n-drop or select all your CSV files via UI import dialog on **Import** page.
-
-### Remote storage
-
-Assume you have a list of time series data stored in a separate CSV files on a remote host. First place them in a single file `time-series.txt`:
-
-```txt
-https://my.domain.com/time-series1.csv
-https://my.domain.com/time-series2.csv
-https://my.domain.com/time-series3.csv
-```
-
-Open the Label Studio app. 
-
-On the **Setup** page, choose any of Time Series annotation projects. 
-
-Make sure that label config attributes match existed column names and formats in your CSV files (read more [here](/templates/time_series.html)).
-
-Go to the **Import** page. Drag-n-drop `time-series.txt` or select it via import dialog.
-
-### Cloud storage
-
-Assume you have GCP or S3 bucket you want to connect to stream your images from there. Read more [here](/guide/storage.html) how to connect common cloud storages.
-
-
-## How to import preannotations
-
-Besides raw data like images, texts, audios or time series, you can also import _preannotations_ - prebuilt annotations typically coming from machine learning model predictions.
-To do this, you need to create import data using the [Label Studio input JSON format](#Basic-format).
-
-For example, if you're going to use image annotation with bounding boxes (e.g. by selecting `--template image_bbox`), here how the `input.json` file with a single image looks like:
-
-```yaml
-# here only one task is presented - you can expand the list
-[{
-  "data": {
-    # "image_url" follows label config's attribute <Image value="$image_url" ...
-    "image_url": "https://my.domain.com/image1.jpg",
-  },
-  # "predictions" contain list of different preannotations for the current task
-  "predictions": [{
-    # "result" contains list of bounding boxes
-    "result": [{
-        # "from_name" follows label config's attribute <RectangleLabels name="label" ...
-        "from_name": "label",
-        # "to_name" follows label config's attribute <Image name="image" ...
-        "to_name": "image",
-        "type": "rectanglelabels",
-        "original_width": 600,
-        "original_height": 403,
-        "image_rotation": 0,
-        "value": {
-            # Bounding box data - values are in percentages of image width/height!
-            "x": 16.09,
-            "y": 27.71,
-            "width": 33.90,
-            "height": 42.28,
-            "rotation": 0,
-            "rectanglelabels": [
-                "Airplane"
-            ]
-        },
-        # "score" per one bounding box is used to sort them in UI
-        "score": 0.87
-    }],
-    # overall score could be used to make active-learning style data sampling
-    "score": 0.95
-  }]
-}]
-```
-
-For the wide range of different data types / formats, please address [Label Studio input JSON format section.](#Basic-format)
 
 ## Basic format
 
@@ -195,9 +42,6 @@ Here is an example of a config and tasks list composed of one element, for text 
 
 ```yaml
 [{
-  # "id" is a reserved field, avoid using it when importing tasks
-  "id": 123,
-
   # "data" requires to contain "my_text" field defined by labeling config,
   # and can optionally include other fields
   "data": {
@@ -238,13 +82,13 @@ Here is an example of a config and tasks list composed of one element, for text 
 }]
 ```
 
-## Other supported formats
+## Import formats
 
 There are a few possible ways to import data files to your labeling project:
 
  - Start Label Studio without specifying input path and then import through the web interfaces available at [http://localhost:8080/import](http://localhost:8080/import)
 
- - Initialize Label Studio project and directly specify the paths, e.g. `label-studio init my_project --input-path my_tasks.json --input-format json`
+ - Initialize Label Studio project and directly specify the paths, e.g. `label-studio init --input-path my_tasks.json --input-format json`
 
 The `--input-path` argument points to a file or a directory where your labeling tasks reside. By default it expects [JSON-formatted tasks](tasks.html#JSON), but you can also specify all other formats listed bellow by using `--input-format` option.
 
@@ -259,7 +103,7 @@ label-studio init --input-path=my_tasks.json
 ### Directory with JSON files
 
 ```bash
-label-studio init my_project --input-path=dir/with/json/files --input-format=json-dir
+label-studio init --input-path=dir/with/json/files --input-format=json-dir
 ```
 
 Instead of putting all tasks into one file, you can split your input data into several _tasks.json_, and specify the directory path. Each JSON file contains tasks in a [basic Label Studio JSON format](tasks.html#Basic-format).
@@ -341,3 +185,23 @@ For label configs with one data key (e.g.: one input image) Label Studio support
 
 Import your data using server API. Check [API page](api.html) for more details.
 
+
+## Sampling
+
+You can define the way of how your imported tasks are exposed to annotators. Several options are available. To enable one of them, specify `--sampling=<option>` as command line option.
+
+#### sequential
+
+Tasks are ordered ascending by their `"id"` fields. This is default mode.
+
+#### uniform
+
+Tasks are sampled with equal probabilities.
+
+#### prediction-score-min
+
+Task with minimum average prediction score is taken. When this option is set, `task["predictions"]` list should be presented along with `"score"` field within each prediction.
+
+#### prediction-score-max
+
+Task with maximum average prediction score is taken. When this option is set, `task["predictions"]` list should be presented along with `"score"` field within each prediction.

@@ -261,7 +261,7 @@ class CloudStorage(BaseStorage):
         is_list = isinstance(parsed_data, list)
         # we support only one task per JSON file
         if not (is_list and len(parsed_data) == 1 or isinstance(parsed_data, dict)):
-            raise TaskValidationError('Error at ' + key + ':\n'
+            raise TaskValidationError('Error at ' + str(key) + ':\n'
                                       'Cloud storages support one task per one JSON file only. '
                                       'Task must be {} or [{}] with length = 1')
 
@@ -272,7 +272,7 @@ class CloudStorage(BaseStorage):
         except TaskValidationError as e:
             # pretty format of errors
             messages = e.msg_to_list()
-            out = [(key + ' :: ' + msg) for msg in messages]
+            out = [(str(key) + ' :: ' + msg) for msg in messages]
             out = "\n".join(out)
             raise TaskValidationError(out)
 

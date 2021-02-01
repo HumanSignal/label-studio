@@ -213,9 +213,14 @@ def get_data_file(filename):
     """
     # support for upload via GUI
     if filename.startswith('upload/'):
-        path = os.path.join(g.project.path, filename)
+        upload_dir = os.environ.get('LS_UPLOAD_DIR', '')
+        if os.path.exists(upload_dir):
+            path = os.path.join(upload_dir, filename[7:])
+        else:
+            path = os.path.join(g.project.path, filename)
         directory = os.path.abspath(os.path.dirname(path))
         filename = os.path.basename(path)
+        logger.debug('get_data_file::upload: ' + str(directory) + ' :: ' + filename)
         return flask.send_from_directory(directory, filename, as_attachment=True)
 
     # serving files from local storage
@@ -301,6 +306,7 @@ def labeling_page():
         label_config_line=g.project.label_config_line,
         task_id=task_id,
         task_data=task_data,
+        version=label_studio.__version__,
         **find_editor_files()
     )
 
@@ -562,7 +568,7 @@ def api_export():
 
     os.makedirs(g.project.export_dir, exist_ok=True)
 
-    zip_dir = os.path.join(g.project.export_dir, now.strftime('%Y-%m-%d-%H-%M-%S'))
+    zip_dir = os.path.join(g.project.export_dir, now.strftime('%Y-%m-%d-%H-%M-%S') + '-' + export_format)
     os.makedirs(zip_dir, exist_ok=True)
     g.project.converter.convert(g.project.output_dir, zip_dir, format=export_format)
     shutil.make_archive(zip_dir, 'zip', zip_dir)
@@ -693,7 +699,7 @@ def api_all_tasks():
         return make_response(jsonify({'detail': 'deleted'}), 204)
 
 
-@blueprint.route('/api/tasks/<task_id>', methods=['GET', 'DELETE'])
+@blueprint.route('/api/tasks/<task_id>', methods=['GET', 'DELETE', 'PATCH', 'POST'])
 @requires_auth
 @exception_handler
 def api_task_by_id(task_id):
@@ -717,10 +723,16 @@ def api_task_by_id(task_id):
         )
         return make_response(response, 200)
 
+    if request.method == 'PATCH' or request.method == 'POST':
+        data = request.json
+        g.project.source_storage._validate_task(task_id, data)
+        g.project.source_storage.set(task_id, data)
+        return make_response({'detail': 'Task patched', 'data': data}, 200)
+
     # delete task
     elif request.method == 'DELETE':
         g.project.delete_task(task_id)
-        return make_response(jsonify({'detal': 'Task deleted'}), 204)
+        return make_response(jsonify({'detail': 'Task deleted'}), 204)
 
 
 @blueprint.route('/api/tasks/<task_id>/completions', methods=['POST', 'DELETE'])

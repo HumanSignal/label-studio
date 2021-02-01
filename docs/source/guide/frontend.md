@@ -1,7 +1,7 @@
 ---
 title: Frontend library
 type: guide
-order: 706
+order: 705
 ---
 
 Frontend, as its name suggests, is the frontend library called [«Label Studio Frontend»](https://github.com/heartexlabs/label-studio-frontend) (**LSF**) based on React and mobx-state-tree, distributed as an NPM package. You can include it in your applications without «Label Studio Backend» (**LSB**) part and provide data annotation support to your users. It can be customized and extended.
@@ -33,7 +33,7 @@ node get-lsf-build.js <branch-name-from-official-lsf-repo>
 
 ### CDN 
 
-You can include `main.<hash>.css` and `main.<hash>.js` files from CDN directly. Explore `https://unpkg.com/browse/label-studio@<LS_version>/build/static/` (e.g. [0.7.3](https://unpkg.com/browse/label-studio@0.7.3/build/static/) to find correct filenames of js/css. 
+You can include `main.<hash>.css` and `main.<hash>.js` files from CDN directly. Explore `https://unpkg.com/label-studio@<LS_version>/build/static/` (e.g. [0.7.3](https://unpkg.com/label-studio@0.7.3/build/static/) to find correct filenames of js/css. 
 
 ```xhtml
 <!-- Theme included stylesheets -->

@@ -4,7 +4,7 @@ type: guide
 order: 105
 ---
 
-Your annotations are stored in [raw completion format](#Export-formats) inside `my_project_name/completions` directory, one file per labeled task named as `task_id.json`.
+Your annotations are stored in [raw completion format](#Completion-format) inside `my_project_name/completions` directory, one file per labeled task named as `task_id.json`.
 
 You can optionally convert and export raw completions to a more common format by doing one of the following:
 

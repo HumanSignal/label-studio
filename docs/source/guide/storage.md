@@ -1,7 +1,7 @@
 ---
-title: Connecting Cloud storages
+title: Cloud storages
 type: guide
-order: 706
+order: 103
 ---
 
 You can integrate the popular cloud storage with Label Studio, collect new tasks uploaded to your buckets, and sync back annotation results to use them in your machine learning pipelines.
@@ -49,12 +49,11 @@ Check the browser console (Ctrl + Shift + i in Chromium) for errors if you have 
 * You must specify the `region` when you create a new bucket. Don't forget to change it in your `.aws/config` file. Otherwise your bucket objects will have problems with access.
 
     E.g.: `~/.aws/config`
-     
+    
     ```
     [default]
     region=us-east-2  # change to the region of your bucket
     ```
-  
 
 * Use LS version >= 0.7.5, it has a signature version s3v4 to support more aws regions.
 

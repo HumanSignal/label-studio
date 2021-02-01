@@ -25,7 +25,7 @@ Scenario("Import images from list.txt", async (I) => {
   I.see("Tasks: 4 / 4")
   // images have no type yet, so no thumbnails are displayed, click just somewhere
   I.click(".select-row + div")
-  I.see("Labeling is not yet fully configured")
+  I.see("You're almost there!")
   I.click("Go to setup")
 
   I.say("Config setup")

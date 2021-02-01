@@ -4,21 +4,31 @@
   margin-right: 1em;
   margin-left: 1em;
 
-#local-search-input
-  padding: 5px;
-  border-radius: 3px;
-  border: solid 1px #d67500 !important;
-  opacity: 0.7;
-
 #local-search-result-wrapper
   margin-bottom: 3em;
   position: fixed;
   background: white;
   z-index: 1000;
-  top: 70px;
-  right: 0;
-  margin-right: 1em;
-  margin-left: 1em;
+  top: 60px;
+  right: 36px;
+  margin-top: 1.5em;
+  // adjustment of much bolder font
+  font-size: 14px;
+  letter-spacing: 0.1px;
+  -webkit-font-smoothing: antialiased;
+
+.head__main #local-search-result-wrapper
+  position: absolute;
+  top: 65px;
+  right: 15px;
+
+  h3
+    margin-top: 1em;
+
+// on a fixed header
+.head__main.active__head #local-search-result-wrapper
+  // main block 1200/2 - padding 15
+  right: calc(50vw - 585px);
 
 #local-search-result
   min-width: 400px;
@@ -32,6 +42,9 @@
 
   h3
     margin-top: 1.5em;
+  p.search-result
+    color: #555;
+    margin-top: 0;
 
 ul.search-result-list
   padding-left: 20px;
@@ -43,12 +56,9 @@ ul.search-result-list
 
 a.search-result-title
   margin-top: 2em !important;
-  font-weight: bold;
+  font-weight: 600;
   color: #f58a48;
-
-p.search-result
-  color: #555;
-  margin-top: 0;
+  text-decoration: none;
 
 em.search-keyword
   border-bottom: 1px dashed #4088b8;

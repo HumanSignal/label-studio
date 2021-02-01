@@ -36,5 +36,6 @@ def tasks_old_page():
         config=g.project.config,
         project=g.project,
         serialized_project=serialized_project,
+        version=label_studio.__version__,
         **find_editor_files()
     )
