@@ -4,7 +4,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-      <title><%- page.title ? page.title + ' — ' : '' %>Label Studio</title>
+      <title><%- page.title ? page.title + ' — ' : '' %>Label Studio — Data Labeling</title>
       <meta charset="utf-8">
       <meta name="description" content="<%- theme.site_description %>">
       <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -66,13 +66,15 @@
 
     <!-- this needs to be loaded before guide's inline scripts -->
 
+    <%- partial('partials/google_analytics') %>
+
   </head>
   <body >
     <div id="mobile-bar" <%- isBlog ? 'style="display: none"' : '' %>>
         <a class="menu-button"></a>
     </div>
 
-    <%# partial('partials/heartex_header') %>
+    <%- partial('partials/heartex_header') %>
 
     <% if (!isIndex) { %>
       <%- partial('partials/header') %>
@@ -86,7 +88,5 @@
     <% } else { %>
         <%- partial('partials/index') %>
     <% } %>
-
-    <%- partial('partials/google_analytics') %>
   </body>
 </html>
