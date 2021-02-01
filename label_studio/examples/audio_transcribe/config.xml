@@ -1,4 +1,4 @@
-<!-- {"title": "Transcription whole audio", "category": "audio", "complexity": "basic"} -->
+<!-- {"title": "Speech Transcription", "category": "audio", "complexity": "basic"} -->
 <View>
   <Header value="Listen to the audio" />
   <Audio name="audio" value="$audio" />
