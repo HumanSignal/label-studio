@@ -22,6 +22,7 @@ Have a custom dataset? You can customize Label Studio to fit your needs. Read an
 Try out Label Studio in a **[running app](https://app.labelstud.io)**, install it locally, or deploy it in a cloud instance. 
 
 - [Install locally with Docker](#install-locally-with-docker)
+- [Run with Docker Compose](#run-with-docker-compose)
 - [Install locally with pip](#install-locally-with-pip)
 - [Install locally with Anaconda](#install-locally-with-anaconda)
 - [Install for local development](#install-for-local-development)
