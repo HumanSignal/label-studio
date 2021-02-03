@@ -1,3 +1,8 @@
+---
+title: Label Studio Release Notes 0.8.0 - Time Series Data Labeling
+type: blog
+order: 99
+---
 
 # Time Series Data Labeling
 
