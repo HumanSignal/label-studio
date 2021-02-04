@@ -163,26 +163,26 @@ Label Studio includes a variety of templates to help you label your data, or you
 | [Classification](https://labelstud.io/templates/sentiment_analysis.html) | Categorize the content or sentiment of text |
 | Summarization | Create a summary that represents the most relevant information within the original content |
 | HTML Tagging | Annotate things like webpages, as well as resumes, research, legal papers, and spreadsheets converted to HTML | 
-| Named Entity Recognition | Annotate specific portions of text |
+| [Named Entity Recognition](https://labelstud.io/templates/named_entity.html) | Annotate specific portions of text |
 | **Audio** | |
 | [Classification](https://labelstud.io/templates/audio_classification.html) | Categorize audio content |
 | Speaker Diarisation | Partition an audio stream into homogeneous segments according to the speaker identity | 
 | Emotion Recognition | Tag and identify the emotion in the audio |
-| Transcription | Convert the speech in the audio to text |
+| [Transcription](https://labelstud.io/templates/transcribe_audio.html) | Convert the speech in the audio to text |
 | **Video** | |
 | [Classification](https://labelstud.io/templates/video_classification.html) | Put videos into categories | 
 | **Comparison** | |
-| Pairwise | Comparing entities in pairs to judge which of each entity is preferred | 
+| [Pairwise](https://labelstud.io/templates/pairwise_comparison.html) | Comparing entities in pairs to judge which of each entity is preferred | 
 | Ranking | Sort items in the list according to some property |
 | **Time Series** | |
-| Classification | Categorize the types of events occurring over time |
+| [Classification](https://labelstud.io/templates/time_series.html) | Categorize the types of events occurring over time |
 | Segmentation | Separate the portions of a time series event in a useful way |
 
 
 ## Integrate with machine learning models
 
 Connect your favorite machine learning framework using the Label Studio Machine Learning SDK. Follow these steps:
-1. Start your own machine learning backend server. See [more detailed instructions](label_studio/ml/README.md)),
+1. Start your own machine learning backend server. See [more detailed instructions](label_studio/ml/README.md),
 2. Connect Label Studio to the running machine learning backend on the [/model](http://localhost:8080/model.html) page in Label Studio.
 
 - **Pre-label** your data using model predictions. 
@@ -196,7 +196,7 @@ Connect your favorite machine learning framework using the Label Studio Machine 
 
 You can use Label Studio as an independent part of your machine learning workflow or integrate the frontend or backend into your existing tools.  
 
-* Use the [Label Studio Frontend](https://github.com/heartexlabs/label-studio-frontend) as a separate React library. See more in the [Frontend Library documentation]](https://labelstud.io/guide/frontend.html). 
+* Use the [Label Studio Frontend](https://github.com/heartexlabs/label-studio-frontend) as a separate React library. See more in the [Frontend Library documentation](https://labelstud.io/guide/frontend.html). 
 * Use Flask Blueprints to integrate the Label Studio Backend (this repo) into your app. See [an example of this integration](https://github.com/heartexlabs/label-studio/blob/master/blueprint_usage_example.py).
 
 ## Ecosystem
