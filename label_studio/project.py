@@ -134,11 +134,11 @@ class Project(object):
 
     @classmethod
     def get_available_source_storages(cls):
-        return ['tasks-json', 's3', 'gcs']
+        return ['tasks-json', 's3', 'gcs', 'azure-blob']
 
     @classmethod
     def get_available_target_storages(cls):
-        return ['completions-dir', 's3-completions', 'gcs-completions']
+        return ['completions-dir', 's3-completions', 'gcs-completions', 'azure-blob-completions']
 
     def get_available_source_storage_names(self):
         names = OrderedDict()
@@ -308,7 +308,8 @@ class Project(object):
 
     def update_derived_input_schema(self):
         self.derived_input_schema = set()
-        for task_id, task in self.source_storage.items():
+        self.derived_all_input_schema = set()
+        for task_id, task in self.source_storage.items(validate=False):
             data_keys = set(task['data'].keys())
             if not self.derived_input_schema:
                 self.derived_input_schema = data_keys

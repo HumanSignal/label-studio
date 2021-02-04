@@ -84,6 +84,7 @@ class S3Storage(CloudStorage):
         bucket = self.client['bucket']
         obj = s3.Object(bucket.name, key).get()['Body'].read().decode('utf-8')
         value = json.loads(obj)
+        assert isinstance(value, dict), "For cloud storage it's allowed to use dict (one task) per json file only"
         return value
 
     def _set_value(self, key, value):

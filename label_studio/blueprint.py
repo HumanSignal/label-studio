@@ -213,10 +213,11 @@ def get_data_file(filename):
     """
     # support for upload via GUI
     if filename.startswith('upload/'):
+        path = None
         upload_dir = os.environ.get('LS_UPLOAD_DIR', '')
         if os.path.exists(upload_dir):
             path = os.path.join(upload_dir, filename[7:])
-        else:
+        if path is None or not os.path.exists(path):
             path = os.path.join(g.project.path, filename)
         directory = os.path.abspath(os.path.dirname(path))
         filename = os.path.basename(path)

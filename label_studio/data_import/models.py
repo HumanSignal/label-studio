@@ -150,8 +150,7 @@ class ImportState(object):
             self.show_files_as_tasks_list = self._show_files_as_tasks_list()
 
         # validate tasks
-        if not self._validator:
-            self._validator = TaskValidator(self.project)
+        self._validator = TaskValidator(self.project)
         self.tasks = self._validator.to_internal_value(self.tasks)
 
     def apply(self):

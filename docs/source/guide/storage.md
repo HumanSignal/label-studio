@@ -152,3 +152,43 @@ If set true, the local copy of the remote storage will be created.
 #### use_blob_urls
 
 Generate task data with URLs pointed to your bucket objects(for resources like jpg, mp3, etc). If not selected, bucket objects will be interpreted as tasks in Label Studio JSON format, one object per task.
+
+
+## Azure Blob Storage
+
+To connect your [Azure Blob Storage](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blobs-introduction) container with Label Studio. For the integration to work, two Environment Variables have to be set:
+
+- AZURE_BLOB_ACCOUNT_NAME - The name of the storage account
+- AZURE_BLOB_ACCOUNT_KEY - The secret key to the storage account
+
+Which container is used will be configured using the UI or via the parameters.
+
+When you are storing BLOBs in your Azure Storage Container (like images or audio files), you might want to use then as is, by generating URLs pointing to those objects (e.g. `azure-blob://container-name/image.jpg`)
+Label Studio allows you to generate input tasks with corresponding URLs automatically on-the-fly. You can to this either specifying `--source-params` when launching app:
+
+```bash
+label-studio start my_project --init --source azure-blob --source-path my-az-container-name --source-params "{\"data_key\": \"my-object-tag-$value\", \"use_blob_urls\": true, \"regex\": ".*"}"
+```
+
+You can leave `"data_key"` empty (or skip it at all) then LS generates it automatically with the first task key from label config (it's useful when you have only one object tag exposed).
+
+
+### Optional parameters
+
+You can specify additional parameters with the command line escaped JSON string via `--source-params` / `--target-params` or from UI.
+
+#### prefix
+
+Prefix for finding/storing the files in the container, for example when working from a subfolder
+
+#### regex
+
+A regular expression for filtering bucket objects. Default is skipping all bucket objects (Use ".*" explicitly to collect all objects)
+
+#### create_local_copy
+
+If set true, the local copy of the remote storage will be created.
+
+#### use_blob_urls
+
+Generate task data with URLs pointed to your bucket objects(for resources like jpg, mp3, etc). If not selected, bucket objects will be interpreted as tasks in Label Studio JSON format, one object per task.

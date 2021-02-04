@@ -36,9 +36,9 @@
         </ul>
       </div>
       <div class="ui checkbox" v-if="show_files_as_tasks_list">
-        <input type="checkbox" id="files_type" @change="toggle_type" ref="files_type" :checked="files_as_tasks_list.selected"/>
+        <input type="checkbox" id="files_type" @change="toggle_type" ref="files_type" :checked="!files_as_tasks_list.selected"/>
         <label for="files_type">
-          Interpret each line in files as a single item
+          <span>Imported files are <b>Time-Series</b> or <b>Text</b></span>
           <p class="rtfm"><a href="https://labelstud.io/guide/tasks.html#CSV-TSV" target="_blank">Read Documentation</a> for details</a></p>
         </label>
       </div>
@@ -124,7 +124,7 @@
       <p class="center">
         <button class="ui primary button" @click="reset">Try another input</button>
         <button
-          class="ui secondary button"
+          class="ui basic button"
           @click="config"
           v-if="!!errors.find(error => (error.header + error.text).includes('inconsistent'))"
         >Edit config</button>
@@ -274,7 +274,7 @@
 
         toggle_type: function() {
           this.start();
-          const selected = this.$refs.files_type.checked;
+          const selected = !this.$refs.files_type.checked;
           this.loadPreview({
             url: "api/project/import/" + this.id,
             data: JSON.stringify({files_as_tasks_list: {selected, type: null}}),

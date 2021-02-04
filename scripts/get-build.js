@@ -102,7 +102,7 @@ async function get(projectName, ref = 'master') {
   fs.rmdirSync(newPath, {recursive: true});
   fs.rename(oldPath, newPath, function (err) {
     if (err) throw err;
-    console.log(`Successfully renamed - AKA moved into ${newPath}`)
+    console.log(`Successfully renamed - AKA moved into ${newPath}`);
     fs.rmdirSync(dir, {recursive: true});
     console.log(`Cleaned up tmp directory [${dir}]`);
     execSync('npx webpack', {stdio: 'inherit'});
