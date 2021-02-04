@@ -152,7 +152,9 @@ class CloudStorageForm(BaseStorageForm):
     regex = StringField('Regex', [IsValidRegex()], description='File filter by regex, example: .* (If not specified, all files will be skipped)')  # noqa
     # data_key = StringField('Data key', [Optional()], description='Task tag key from your label config')
     use_blob_urls = BooleanField('Use BLOBs URLs', default=True,
-                                 description='Treat every bucket object as a source file. If unchecked, Label Studio treats every bucket object as a JSON-formatted task.')
+                                 description='Treat every bucket object as a resource file '
+                                             '(jpg, txt, time-series, etc). If unchecked, Label Studio treats'
+                                             ' every bucket object as a JSON-formatted task.')
     bound_params = dict(
         prefix='prefix',
         regex='regex',
