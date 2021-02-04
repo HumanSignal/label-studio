@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 import io
 import requests
 import calendar
@@ -132,7 +133,8 @@ class Analytics(object):
                 'content_length': request.content_length,
                 'env': self.env,
                 'version': self.version,
-                'project_name': self.input_args.project_name if self.input_args else None
+                'project_name': self.input_args.project_name if self.input_args else None,
+                'python': sys.version_info[0] + '.' + sys.version_info[1]
             }
         except:
             pass
