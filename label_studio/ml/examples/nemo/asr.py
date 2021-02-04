@@ -1,3 +1,4 @@
+import os
 import logging
 import nemo
 import nemo.collections.asr as nemo_asr
@@ -53,3 +54,11 @@ class NemoASR(LabelStudioMLBase):
         if from_name is None:
             raise ValueError('ASR model expects <TextArea> tag to be presented in a label config.')
         return from_name, to_name, value
+
+    def fit(self, completions, workdir=None, **kwargs):
+        project_path = kwargs.get('project_full_path')
+        if os.path.exists(project_path):
+            logger.info('Found project in local path ' + project_path)
+        else:
+            logger.error('Project not found in local path ' + project_path + '. Serving uploaded data will fail.')
+        return {'project_path': project_path}
