@@ -16,6 +16,13 @@ curl -X POST -H Content-Type:application/json http://localhost:8080/api/project/
 --data "{\"label_config\": \"<View>[...]</View>\"}"
 ```
 
+Or by reading from a local config.xml file:
+
+```
+curl -X POST -H Content-Type:application/xml http://localhost:8080/api/project/config \
+--data @config.xml
+```
+
 The backend should return status 201 if the config is valid and saved. 
 If errors occur the backend returns status 400 and the response body will be JSON dict: 
 ```
