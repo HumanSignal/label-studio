@@ -22,7 +22,7 @@ Scenario("Import single image by URL", async (I) => {
   // table with imported items — should be only one already
   I.seeNumberOfElements("img[alt=Data]", 1)
   I.click("img[alt=Data]")
-  I.see("Labeling is not yet fully configured")
+  I.see("You're almost there!")
   I.click("Go to setup")
 
   I.say("Config setup")

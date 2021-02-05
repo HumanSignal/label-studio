@@ -14,9 +14,9 @@ Scenario("Import images from list.txt", async (I) => {
   I.say("Upload list of files")
   I.attachFile("#file-input", "assets/list.txt")
   I.see("4 tasks loaded")
-  I.click("Interpret each line")
+  I.click("Imported files are")
   I.see("1 tasks loaded")
-  I.click("Interpret each line")
+  I.click("Imported files are")
   I.click(locate("button").withText("Import"))
 
   I.say("Redirect to DM with imported tasks")
@@ -25,7 +25,7 @@ Scenario("Import images from list.txt", async (I) => {
   I.see("Tasks: 4 / 4")
   // images have no type yet, so no thumbnails are displayed, click just somewhere
   I.click(".select-row + div")
-  I.see("Labeling is not yet fully configured")
+  I.see("You're almost there!")
   I.click("Go to setup")
 
   I.say("Config setup")

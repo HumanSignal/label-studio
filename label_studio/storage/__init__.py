@@ -3,6 +3,7 @@ from .filesystem import JSONStorage, DirJSONsStorage, TasksJSONStorage, Completi
 from .s3 import S3Storage, S3CompletionsStorage
 from .gcs import GCSStorage, GCSCompletionsStorage
 from .redis import RedisStorage, RedisCompletionsStorage
+from .azure_blob import AzureBlobStorage, AzureBlobCompletionsStorage
 
 register_storage('json', JSONStorage)
 register_storage('dir-jsons', DirJSONsStorage)
@@ -14,3 +15,5 @@ register_storage('gcs', GCSStorage)
 register_storage('gcs-completions', GCSCompletionsStorage)
 register_storage('redis', RedisStorage)
 register_storage('redis-completions', RedisCompletionsStorage)
+register_storage('azure-blob', AzureBlobStorage)
+register_storage('azure-blob-completions', AzureBlobCompletionsStorage)

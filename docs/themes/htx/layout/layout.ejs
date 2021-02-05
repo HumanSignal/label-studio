@@ -4,7 +4,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-      <title><%- page.title ? page.title + ' — ' : '' %>Label Studio</title>
+      <title><%- page.title ? page.title + ' — ' : '' %>Label Studio — Data Labeling</title>
       <meta charset="utf-8">
       <meta name="description" content="<%- theme.site_description %>">
       <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,15 +12,21 @@
       <meta property="og:type" content="article">
       <meta property="og:title" content="<%- page.title ? page.title + ' — ' : '' %>Label Studio">
       <meta property="og:description" content="<%- theme.site_description %>">
-      <meta property="og:image" content="https://repository-images.githubusercontent.com/192640529/6b34d180-dd95-11e9-8016-fddd7751cb2c">
-      <meta name="thumbnail" content="https://<%- theme.root_domain %>/images/opossum/heartex_icon_opossum_green@2x.png"/>
-
 
       <meta name="twitter:card" content="summary">
       <meta name="twitter:title" content="<%- page.title ? page.title + ' — ' : '' %>Label Studio">
       <meta name="twitter:description" content="<%- theme.site_description %>">
-      <meta name="twitter:image" content="https://<%- theme.root_domain %>/images/opossum/heartex_icon_opossum_green@2x.png">
 
+      <% if (page.image) { %>
+        <meta property="og:image" content="https://<%- theme.root_domain %><%- page.image %>" />
+        <meta name="thumbnail" content="https://<%- theme.root_domain %><%- page.image %>"/>
+        <meta name="twitter:image" content="https://<%- theme.root_domain %><%- page.image %>"/>
+      <% } else { %>
+        <meta name="twitter:image" content="https://<%- theme.root_domain %>/images/opossum/heartex_icon_opossum_green@2x.png"/>
+        <meta name="thumbnail" content="https://<%- theme.root_domain %>/images/opossum/heartex_icon_opossum_green@2x.png"/>
+        <meta property="og:image" content="https://repository-images.githubusercontent.com/192640529/6b34d180-dd95-11e9-8016-fddd7751cb2c" />
+      <% } %>      
+      
       <meta name="msapplication-TileColor" content="#4fc08d">
       <meta name="theme-color" content="#4fc08d">
 
@@ -60,13 +66,15 @@
 
     <!-- this needs to be loaded before guide's inline scripts -->
 
+    <%- partial('partials/google_analytics') %>
+
   </head>
   <body >
     <div id="mobile-bar" <%- isBlog ? 'style="display: none"' : '' %>>
         <a class="menu-button"></a>
     </div>
 
-    <%# partial('partials/heartex_header') %>
+    <%- partial('partials/heartex_header') %>
 
     <% if (!isIndex) { %>
       <%- partial('partials/header') %>
@@ -80,7 +88,5 @@
     <% } else { %>
         <%- partial('partials/index') %>
     <% } %>
-
-    <%- partial('partials/google_analytics') %>
   </body>
 </html>

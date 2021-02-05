@@ -2,4 +2,4 @@
 package_name = 'label-studio'
 
 # Package version
-__version__ = '0.9.0.post4'
+__version__ = '0.9.0.post5' 

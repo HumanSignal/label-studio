@@ -129,9 +129,9 @@ After the project setup is finished you can import this task (just copy this rig
       },
       {
         "id": "result3",
-      "type": "choices",
+        "type": "choices",
         "from_name": "choice", "to_name": "image",
-      "value": {
+        "value": {
           "choices": ["Airbus"]
         }
       }
@@ -165,6 +165,8 @@ There are several possible ways to do it:
 3. For docker usage: specify environment variables `HOST`, `PROTOCOL`, `PORT` while docker setup. 
 
 LSB web server always use `0.0.0.0` address for start. But if you really need to change it to `localhost` just set Host as `localhost` and web server will start at `localhost`.  
+
+> If your external host has a port, e.g.: `77.77.77.77:1234` then you have to specify HOST with the port together `HOST=77.77.77.77:1234`.
 
 <br/>
 <center>

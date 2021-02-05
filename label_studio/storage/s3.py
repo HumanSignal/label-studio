@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 logging.getLogger('botocore').setLevel(logging.CRITICAL)
 boto3.set_stream_logger(level=logging.INFO)
 S3_REGION = os.environ.get('S3_REGION', 'us-east-1')
-
+S3_ENDPOINT = os.environ.get('S3_ENDPOINT')
 
 def get_client_and_resource(
     aws_access_key_id=None, aws_secret_access_key=None, aws_session_token=None, region=None, **kwargs
@@ -23,8 +23,10 @@ def get_client_and_resource(
     region = region or S3_REGION
     if region:
         settings['region_name'] = region
+    if S3_ENDPOINT:
+        settings['endpoint_url'] = S3_ENDPOINT
     client = session.client('s3', config=boto3.session.Config(signature_version='s3v4'), **settings)
-    resource = session.resource('s3')
+    resource = session.resource('s3', config=boto3.session.Config(signature_version='s3v4'), **settings)
     return client, resource
 
 
@@ -84,6 +86,7 @@ class S3Storage(CloudStorage):
         bucket = self.client['bucket']
         obj = s3.Object(bucket.name, key).get()['Body'].read().decode('utf-8')
         value = json.loads(obj)
+        assert isinstance(value, dict), "For cloud storage it's allowed to use dict (one task) per json file only"
         return value
 
     def _set_value(self, key, value):

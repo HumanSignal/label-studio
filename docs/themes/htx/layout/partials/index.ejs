@@ -15,11 +15,11 @@ menu && menu.classList.add('main__page__header')
           <p>Data Science starts with data. <br>
           Label Studio removes the pain labeling it.</p>
           <div class="release__info">
-            <a href="/blog/release-080-time-series-labeling.html" class="release__info--inner">
+            <a href="/blog/release-090-data-management-improvements.html" class="release__info--inner">
               <span>New</span>
-              <p>Release <span>0.8.0</span></p>
+              <p>Release <span>0.9.0</span></p>
             </a>
-            <p>Time Series is Everywhere!</p>
+            <p>Explore and improve your datasets!</p>
           </div>
           <div class="commit__info">
             <a href="https://github.com/heartexlabs/label-studio" class="commit--inner" target="_blank">
@@ -32,9 +32,10 @@ menu && menu.classList.add('main__page__header')
           function nice_format(n) {
             const prefixes = ['', 'k', 'M']
             const level = Math.floor(Math.floor(Math.log10(n)) / 3)
-            const short = (n / Math.pow(10, 3 * level))
-              .toPrecision(3)
-              .replace(/\.?0+$|(\.\d)\d+$/g, '$1') // leave max one digit after dot
+            const thousands = n / Math.pow(10, 3 * level)
+            const short = thousands
+              .toPrecision(thousands > 99 ? 3 : 2)
+              .replace(/\.0+$|(\.\d)\d+$/g, '$1') // leave max one digit after dot
             return short + prefixes[level]
           }
           const star_counter = document.querySelector('.star__counter')
@@ -538,6 +539,7 @@ menu && menu.classList.add('main__page__header')
         <div class="elem__footer">
           <p>Resources</p>
           <ul>
+            <li><a href="https://app.labelstud.io">Demo App</a></li>
             <li><a href="/blog">Blog</a></li>
             <li><a href="/guide">Guide</a></li>
             <li><a href="#">What's New</a></li>

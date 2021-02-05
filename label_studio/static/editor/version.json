@@ -1,6 +1,6 @@
 {
-  "message": "Fix color of skipped icon",
-  "commit": "e477248be151a06006ed7790eda6ed6d36af089f",
-  "branch": "master",
-  "date": "2021-01-12T20:07:36Z"
+  "message": "shift+space to play, ctrl+b to 1 sec back in Audio",
+  "commit": "b5094ee2f3cedc42b9472cf70036cc5e98de3386",
+  "branch": "feature/audio-transcription",
+  "date": "2021-02-02T01:35:06Z"
 }

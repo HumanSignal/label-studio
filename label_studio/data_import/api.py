@@ -122,6 +122,14 @@ def _upload_files(request_files, project):
             # assign unique filename
             filename = convert_string_to_hash(data, trim=6) + '-' + os.path.basename(filename)
 
+            # external upload dir for everywhere access without user/project uuids
+            ext_upload_dir = os.environ.get('LS_UPLOAD_DIR', '')
+            if ext_upload_dir:
+                os.makedirs(ext_upload_dir, exist_ok=True)
+                # save file to path on disk
+                with open(os.path.join(ext_upload_dir, filename), mode='wb') as f:
+                    f.write(data)
+
             # save file to path on disk
             with open(os.path.join(project.upload_dir, filename), mode='wb') as f:
                 f.write(data)

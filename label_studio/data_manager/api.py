@@ -113,7 +113,7 @@ def api_project_tabs_selected_items(tab_id):
     if request.method == 'POST':
         tab['selectedItems'] = data
         save_tab(tab_id, tab, g.project)
-        return make_response(jsonify(tab), 201)
+        return make_response(jsonify(tab['selectedItems']), 201)
 
     # init selectedItems, we need to read it in PATCH and DELETE
     if 'selectedItems' not in tab:
@@ -131,14 +131,14 @@ def api_project_tabs_selected_items(tab_id):
         result = left | right
         tab['selectedItems'][key] = list(result)
         save_tab(tab_id, tab, g.project)
-        return make_response(jsonify(tab), 201)
+        return make_response(jsonify(tab['selectedItems']), 201)
 
     # DELETE: delete specified items
     if request.method == 'DELETE':
         result = (left - right)
         tab['selectedItems'][key] = list(result)
         save_tab(tab_id, tab, g.project)
-        return make_response(jsonify(tab), 204)
+        return make_response(jsonify(tab['selectedItems']), 204)
 
 
 @blueprint.route('/api/project/tabs/<tab_id>/tasks', methods=['GET'])

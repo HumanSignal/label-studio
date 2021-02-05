@@ -49,7 +49,7 @@ class BaseForm(FlaskForm):
 
 
 class BaseStorageForm(BaseForm):
-    path = StringField('Path', [InputRequired()], description='Storage path (e.g. bucket name)')
+    path = StringField('Path', [InputRequired()], description='Storage path (e.g. bucket/container name)')
 
     # Bind here form fields to storage fields {"form field": "storage_field"}
     bound_params = dict(path='path')
@@ -152,7 +152,9 @@ class CloudStorageForm(BaseStorageForm):
     regex = StringField('Regex', [IsValidRegex()], description='File filter by regex, example: .* (If not specified, all files will be skipped)')  # noqa
     # data_key = StringField('Data key', [Optional()], description='Task tag key from your label config')
     use_blob_urls = BooleanField('Use BLOBs URLs', default=True,
-                                 description='Treat every bucket object as a source file. If unchecked, Label Studio treats every bucket object as a JSON-formatted task.')
+                                 description='Treat every bucket object as a resource file '
+                                             '(jpg, txt, time-series, etc). If unchecked, Label Studio treats'
+                                             ' every bucket object as a JSON-formatted task.')
     bound_params = dict(
         prefix='prefix',
         regex='regex',
@@ -261,7 +263,7 @@ class CloudStorage(BaseStorage):
         is_list = isinstance(parsed_data, list)
         # we support only one task per JSON file
         if not (is_list and len(parsed_data) == 1 or isinstance(parsed_data, dict)):
-            raise TaskValidationError('Error at ' + key + ':\n'
+            raise TaskValidationError('Error at ' + str(key) + ':\n'
                                       'Cloud storages support one task per one JSON file only. '
                                       'Task must be {} or [{}] with length = 1')
 
@@ -272,7 +274,7 @@ class CloudStorage(BaseStorage):
         except TaskValidationError as e:
             # pretty format of errors
             messages = e.msg_to_list()
-            out = [(key + ' :: ' + msg) for msg in messages]
+            out = [(str(key) + ' :: ' + msg) for msg in messages]
             out = "\n".join(out)
             raise TaskValidationError(out)
 
@@ -456,9 +458,9 @@ class CloudStorage(BaseStorage):
     def _get_objects(self):
         pass
 
-    def items(self):
+    def items(self, validate=True):
         for id in self.ids():
-            obj = self.get(id)
+            obj = self.get(id, validate=validate)
             if obj:
                 yield id, obj
 

@@ -42,9 +42,6 @@ Here is an example of a config and tasks list composed of one element, for text 
 
 ```yaml
 [{
-  # "id" is a reserved field, avoid using it when importing tasks
-  "id": 123,
-
   # "data" requires to contain "my_text" field defined by labeling config,
   # and can optionally include other fields
   "data": {
