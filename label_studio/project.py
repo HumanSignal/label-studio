@@ -460,7 +460,7 @@ class Project(object):
             self.add_ml_backend(ml_backend_params, raise_on_error=False)
 
     def load_converter(self):
-        self.converter = Converter(self.parsed_label_config)
+        self.converter = Converter(self.parsed_label_config, project_dir=self.path)
 
     def extract_data_types(self, config):
         return self.project_obj.extract_data_types(config)
