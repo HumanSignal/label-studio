@@ -41,4 +41,4 @@ ujson==3.0.0
 Colorama==0.4.4
 boxing==0.1.4
 redis>=3.5
-yaml>=5.3.1
+pyyaml>=5.3.1
