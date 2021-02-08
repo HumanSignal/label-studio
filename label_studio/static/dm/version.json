@@ -1,6 +1,6 @@
 {
-  "message": "Fix completions submit/update",
-  "commit": "338d5867e16f035389f5de034a669654b0f646d7",
+  "message": "Use label_config if label_config_line is undefined",
+  "commit": "969db38541030d59509614c4366331d86a59ce64",
   "branch": "master",
-  "date": "2021-01-28T17:40:20Z"
+  "date": "2021-02-05T01:26:40Z"
 }

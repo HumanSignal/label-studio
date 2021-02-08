@@ -1,6 +1,6 @@
 {
-  "message": "shift+space to play, ctrl+b to 1 sec back in Audio",
-  "commit": "b5094ee2f3cedc42b9472cf70036cc5e98de3386",
-  "branch": "feature/audio-transcription",
-  "date": "2021-02-02T01:35:06Z"
+  "message": "Fix errors in Paragraphs with valueType=url",
+  "commit": "559d3de713dbc249a516def663135deccf7ec628",
+  "branch": "master",
+  "date": "2021-01-25T15:23:01Z"
 }
