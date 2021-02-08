@@ -1,6 +1,4 @@
-# Label Studio 
-
-&middot; ![GitHub](https://img.shields.io/github/license/heartexlabs/label-studio?logo=heartex) ![label-studio:build](https://github.com/heartexlabs/label-studio/workflows/label-studio:build/badge.svg) ![code-coverage](https://github.com/heartexlabs/label-studio/blob/master/.github/test-coverage.svg) ![GitHub release](https://img.shields.io/github/v/release/heartexlabs/label-studio?include_prereleases) &middot;
+# Label Studio &middot; ![GitHub](https://img.shields.io/github/license/heartexlabs/label-studio?logo=heartex) ![label-studio:build](https://github.com/heartexlabs/label-studio/workflows/label-studio:build/badge.svg) ![code-coverage](https://github.com/heartexlabs/label-studio/blob/master/.github/test-coverage.svg) ![GitHub release](https://img.shields.io/github/v/release/heartexlabs/label-studio?include_prereleases) &middot;
 
 [Website](https://labelstud.io/) • [Docs](https://labelstud.io/guide/) • [Twitter](https://twitter.com/heartexlabs) • [Join Slack Community <img src="https://app.heartex.ai/docs/images/slack-mini.png" width="18px"/>](https://join.slack.com/t/label-studio/shared_invite/zt-cr8b7ygm-6L45z7biEBw4HXa5A2b5pw)
 
@@ -15,7 +13,7 @@ Label Studio lets you label data types like audio, text, images, videos, and tim
 - [Integrate with machine learning models](#integrate-with-machine-learning-models)
 - [Integrate Label Studio with your machine learning tools](#integrate-label-studio-with-your-machine-learning-tools)
 
-![Gif of Label Studio annotating different types of data](https://raw.githubusercontent.com/heartexlabs/label-studio/master/images/new_annotation_examples.gif)
+![Gif of Label Studio annotating different types of data](https://raw.githubusercontent.com/heartexlabs/label-studio/master/images/annotation_examples.gif)
 
 Have a custom dataset? You can customize Label Studio to fit your needs. Read an [introductory blog post](https://towardsdatascience.com/introducing-label-studio-a-swiss-army-knife-of-data-labeling-140c1be92881#3907-fd502dc24c8d) to learn more. 
 
@@ -36,8 +34,8 @@ Run Label Studio in a Docker container and access it at `http://localhost:8080`.
 ```bash
 docker run --rm -p 8080:8080 -v `pwd`/my_project:/label-studio/my_project --name label-studio heartexlabs/label-studio:latest label-studio start my_project --init
 ```
-
-By default, this command creates a blank project in a `./my_project` directory. If the `./my_project` folder already exists, Label Studio fails to start. Rename or delete the folder, or use the `--force` argument to force Label Studio to start: 
+#### Override default Docker install
+By default, the default Docker install command creates a blank project in a `./my_project` directory. If the `./my_project` folder already exists, Label Studio fails to start. Rename or delete the folder, or use the `--force` argument to force Label Studio to start: 
 
 ```bash
 docker run -p 8080:8080 -v `pwd`/my_project:/label-studio/my_project --name label-studio heartexlabs/label-studio:latest label-studio start my_project --init --force --template text_classification
@@ -146,7 +144,7 @@ When you use Label Studio to annotate and label your data, you get a lot of func
 - **Integration with machine learning models** so that you can visualize and compare predictions from different models and perform pre-labeling.
 - **Embed it in your existing tools** so that you don't have to change your workflow to start using Label Studio. The frontend is available as an [NPM package](https://github.com/heartexlabs/label-studio-frontend).
 
-![Screenshot of Label Studio data manager](https://raw.githubusercontent.com/heartexlabs/label-studio/master/images/data_manager.png)
+![Screenshot of Label Studio data manager grid view with images](https://raw.githubusercontent.com/heartexlabs/label-studio/master/images/aerial_training_data_management.png)
 
 ## Included templates for labeling data in Label Studio 
 
