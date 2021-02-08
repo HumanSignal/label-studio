@@ -317,14 +317,14 @@ def load_task(project, task_id, params, resolve_uri=False):
     # completion results aggregations over all completions
     completions = task.get('completions', [])
     if len(completions) > 0:
-        task['completions_results'] = json.dumps([item.get('result', []) for item in completions])
+        task['completions_results'] = json.dumps([item.get('result', []) for item in completions], ensure_ascii=False)
     else:
         task['completions_results'] = ''
 
     # prediction score
     predictions = task.get('predictions', [])
     if len(predictions) > 0:
-        task['predictions_results'] = json.dumps([item.get('result', []) for item in predictions])
+        task['predictions_results'] = json.dumps([item.get('result', []) for item in predictions], ensure_ascii=False)
         scores = [p['score'] for p in predictions if 'score' in p]
         if scores:
             task['predictions_score'] = sum(scores) / len(scores)
