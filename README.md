@@ -10,8 +10,8 @@ Label Studio lets you label data types like audio, text, images, videos, and tim
 - [Try out Label Studio](#try-out-label-studio)
 - [What you get from Label Studio](#what-you-get-from-label-studio)
 - [Included templates for labeling data in Label Studio](#included-templates-for-labeling-data-in-label-studio)
-- [Integrate with machine learning models](#integrate-with-machine-learning-models)
-- [Integrate Label Studio with your machine learning tools](#integrate-label-studio-with-your-machine-learning-tools)
+- [Set up machine learning models with Label Studio](#set-up-machine-learning-models-with-Label-Studio)
+- [Integrate Label Studio with your existing tools](#integrate-label-studio-with-your-existing-tools)
 
 ![Gif of Label Studio annotating different types of data](https://raw.githubusercontent.com/heartexlabs/label-studio/master/images/annotation_examples.gif)
 
@@ -177,7 +177,7 @@ Label Studio includes a variety of templates to help you label your data, or you
 | Segmentation | Separate the portions of a time series event in a useful way |
 
 
-## Integrate with machine learning models
+## Set up machine learning models with Label Studio
 
 Connect your favorite machine learning framework using the Label Studio Machine Learning SDK. Follow these steps:
 1. Start your own machine learning backend server. See [more detailed instructions](label_studio/ml/README.md),
@@ -190,7 +190,7 @@ Connect your favorite machine learning framework using the Label Studio Machine 
 - Set up a **prediction service** that is ready for production. 
 
 
-## Integrate Label Studio with your machine learning tools
+## Integrate Label Studio with your existing tools
 
 You can use Label Studio as an independent part of your machine learning workflow or integrate the frontend or backend into your existing tools.  
 
