@@ -9,34 +9,6 @@ from .base import BaseStorage, BaseForm, CloudStorage
 import collections
 
 
-class ReadOnlyDict(collections.Mapping):
-
-    def __init__(self, data):
-        self._data = data
-        self._id = None
-
-    def __setitem__(self, key, value):
-        if key == 'id':
-            self._id = value
-        else:
-            raise ValueError("Can't change read-only only dict: " + key + ' = ' + str(value))
-
-    def __getitem__(self, key):
-        if key == 'id':
-            return self._id
-        return self._data[key]
-
-    def __len__(self):
-        return len(self._data)
-
-    def __iter__(self):
-        return iter(self._data)
-
-    @property
-    def __class__(self):
-        return dict
-
-
 logger = logging.getLogger(__name__)
 
 
