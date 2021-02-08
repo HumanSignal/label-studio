@@ -1,10 +1,33 @@
+<style>
+  .project-management td {
+    border: none;
+    padding: 5px 5px;
+  }
+  .project-management .uuid {
+    padding-left: 15px;
+  }
+
+  .ui.item button i {
+    opacity: 0.75 !important;
+  }
+  .ui.item button:hover i {
+    color: darkorange !important;
+  }
+
+  .manage-button {
+    height: 21px!important;
+    padding: 4px!important;
+  }
+</style>
+
 <div class="ui tab message" data-tab="project-settings">
 
   <!-- Tabs -->
   <div class="ui accordion" id="tab-settings">
     <div class="title"><i class="dropdown icon"></i>Data manager</div>
     <div class="content accordion-content">
-      <p>If the Data Manager (Tasks table) does not load or loads slowly, you can reset the filters, sort order, and remove additional tabs.</p>
+      <p>If the Data Manager (Tasks table) does not load or loads slowly, you can reset the filters, sort order, and
+        remove additional tabs.</p>
       <button onclick="reset_all_tabs()" class="ui button negative basic accordion-button">
         Reset
       </button>
@@ -17,53 +40,84 @@
     <div class="ui accordion" id="project-management">
       <div class="title"><i class="dropdown icon"></i>Project management</div>
       <div class="content accordion-content">
-        <div> Current project: {{ project.description }}</div>
+        <button onclick="new_project()" id="new-project-button" class="ui button negative basic accordion-button">
+          Start new project
+        </button>
         <div style="margin-bottom: 15px!important;"></div>
+        <div> Current project: {{ project.description }}</div>
 
         <p>You can create multiple projects within one browser session.
           If you don't want to loose your project, just save the shared link in the safety place.
           If you want to share the project with somebody, send him or her a shared link.</p>
 
-        <button onclick="new_project()" id="new-project-button" class="ui button negative basic accordion-button">
-          Start new project
-        </button>
-
         <div style="margin-top: 10px!important;"></div>
-        <div style="padding-left: 10px">
-          <style>.ui.item:hover i {
-            color: darkorange !important;
-          }</style>
 
-          {% for uuid, desc in own_projects.items() %}
-            <div class="ui item">
-              <i class="share alternate icon blue small hover-button"
-                 data-tippy-content="Copy shared link to project with uuid<br>{{ uuid }}"
-                 onclick="copy_share_link('{{ uuid }}')"></i>
-              <a id="myLink" href="#" onclick="switch_project('{{ uuid }}', '{{ desc }}')" data-value="{{ uuid }}"
-                 style="font-weight: {% if uuid == project.uuid %}bold{% else %}normal{% endif %}">
-                {{ desc }}</a>
-            </div>
-          {% endfor %}
+        <div>Your projects:</div>
+        <div style="padding-left: 10px; margin-top: 10px;">
 
+          <table class="project-management">
+            {% for uuid, desc in own_projects.items() %}
+              <tr class="ui item">
+                <td>
+                  <button class="ui tiny blue basic button icon manage-button"
+                          data-tippy-content="Copy shared link to project '{{ desc }}'"
+                          onclick="copy_share_link('{{ uuid }}')">
+                    <i class="share alternate icon"></i>
+                  </button>
+
+                  <button class="ui tiny blue basic button icon manage-button"
+                          data-tippy-content="Switch to project '{{ desc }}'"
+                          onclick="switch_project('{{ uuid }}', '{{ desc }}')" data-value="{{ uuid }}">
+                    <i class="share icon"></i>
+                  </button>
+
+                  <a id="myLink" href="#" onclick="switch_project('{{ uuid }}', '{{ desc }}')" data-value="{{ uuid }}"
+                     style="font-weight: {% if uuid == project.uuid %}bold{% else %}normal{% endif %}">
+                    {{ desc }}
+                  </a>
+                </td>
+                <td class="uuid">
+                  <span class="ui text small" data-tippy-content="Project UUID">{{ uuid }}</span>
+                </td>
+              </tr>
+            {% endfor %}
+          </table>
         </div>
 
         <div style="margin-bottom: 15px!important;"></div>
-        <div>Shared projects with you</div>
+        <div>Shared projects with you:</div>
 
-        <div style="margin-bottom: 15px!important;"></div>
+        <div style="margin-bottom: 10px!important;"></div>
         <div style="padding-left: 10px">
           {% if shared_projects %}
-
+            <table class="project-management">
             {% for uuid, desc in shared_projects.items() %}
-              <td class="ui item">
-                <i class="share alternate icon blue small hover-button"
-                   data-tippy-content="Copy shared link to project with uuid<br>{{ uuid }}"
-                   onclick="copy_share_link('{{ uuid }}')"></i>
-                <a id="myLink" href="#" onclick="switch_project('{{ uuid }}', '{{ desc }}')" data-value="{{ uuid }}"
-                   style="font-weight: {% if uuid == project.uuid %}bold{% else %}normal{% endif %}">
-                  {{ desc }}</a>
-              </td>
+              <tr class="ui item">
+                <td style="alignment: left">
+
+                  <button class="ui tiny blue basic button icon manage-button"
+                          data-tippy-content="Copy shared link to project '{{ desc }}'"
+                          onclick="copy_share_link('{{ uuid }}')">
+                    <i class="share alternate icon"></i>
+                  </button>
+
+                  <button class="ui tiny blue basic button icon manage-button"
+                          data-tippy-content="Switch to project '{{ desc }}'"
+                          onclick="switch_project('{{ uuid }}', '{{ desc }}')" data-value="{{ uuid }}">
+                    <i class="share icon"></i>
+                  </button>
+
+                  <a id="myLink" href="#" onclick="switch_project('{{ uuid }}', '{{ desc }}')" data-value="{{ uuid }}"
+                     style="font-weight: {% if uuid == project.uuid %}bold{% else %}normal{% endif %}">
+                    {{ desc }}
+                  </a>
+                </td>
+                <td class="uuid">
+                  <span class="ui text small" data-tippy-content="Project UUID">{{ uuid }}</span>
+                </td>
+              </tr>
             {% endfor %}
+            </table>
 
           {% else %}
             <p>You can add a shared project here if you open a shared link from the other user</p>
@@ -74,7 +128,7 @@
     </div> <!-- Project switching accordion -->
   {% endif %}
 
-<!-- Tabs -->
+  <!-- Tabs -->
   <div style="margin: 1em"></div>
   <div class="ui accordion">
     <div class="title active"><i class="dropdown icon"></i>Deprecated pages</div>
