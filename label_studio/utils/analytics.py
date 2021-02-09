@@ -103,6 +103,8 @@ class Analytics(object):
             return True
         if request.args.get('polling', False):
             return True
+        if request.args.get('interaction', None) == 'timer':
+            return True
 
     def send(self, request=None, session=None, response=None, **kwargs):
         if not self.collect_analytics:
