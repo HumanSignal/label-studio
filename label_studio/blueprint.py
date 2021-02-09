@@ -981,12 +981,13 @@ def main():
             ssl_context = (cert_file, key_file)
 
         # check port is busy
-        if not input_args.debug and check_port_in_use('localhost', port):
-            old_port = port
-            port = int(port) + 1
-            print('\n*** WARNING! ***\n* Port ' + str(old_port) + ' is in use.\n' +
-                  '* Trying to start at ' + str(port) +
-                  '\n****************\n')
+        if not input_args.debug:
+            while check_port_in_use('localhost', port):
+                old_port = port
+                port = int(port) + 1
+                print('\n*** WARNING! ***\n* Port ' + str(old_port) + ' is in use.\n' +
+                    '* Trying to start at ' + str(port) +
+                    '\n****************\n')
 
         # external hostname is used for data import paths, they must be absolute always,
         # otherwise machine learning backends couldn't access them
