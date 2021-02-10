@@ -536,8 +536,8 @@ def api_save_config():
         label_config = request.form['label_config']
     elif request.json and 'label_config' in request.json:
         label_config = request.json['label_config']
-    elif request.content_type == "application/xml":
-        label_config = request.data.decode("utf-8")
+    elif request.data and request.content_type == "application/xml":
+        label_config = request.get_data(as_text=True)
 
     # check config before save
     try:
