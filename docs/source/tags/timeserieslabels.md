@@ -12,6 +12,9 @@ TimeSeriesLabels tag creates labeled time range
 | --- | --- | --- | --- |
 | name | <code>string</code> |  | name of the element |
 | toname | <code>string</code> |  | name of the timeseries to label |
+| [choice] | <code>single</code> \| <code>multiple</code> | <code>single</code> | configure if you can select just one or multiple labels |
+| [maxUsages] | <code>number</code> |  | maximum available usages |
+| [showInline] | <code>boolean</code> | <code>true</code> | show items in the same visual line |
 | [opacity] | <code>float</code> | <code>0.9</code> | opacity of range |
 | [fillColor] | <code>string</code> |  | range fill color, default is transparent |
 | [strokeWidth] | <code>number</code> | <code>1</code> | width of the stroke |
