@@ -990,10 +990,10 @@ def main():
                 if port - original_port >= 1000:
                     raise ConnectionError(
                         '\n*** WARNING! ***\n Could not find an available port\n' + 
-                        f' to launch label studio. \n Last tested port was {str(port)}' +
+                        ' to launch label studio. \n Last tested port was ' + str(port) +
                         '\n****************\n')
-                print(f'\n*** WARNING! ***\n* Port {str(old_port)} is in use.\n' +
-                    f'* Trying to start at {str(port)}' +
+                print('\n*** WARNING! ***\n* Port ' + str(old_port) + ' is in use.\n' +
+                    f'* Trying to start at ' + str(port) +
                     '\n****************\n')
 
         # external hostname is used for data import paths, they must be absolute always,
