@@ -982,11 +982,18 @@ def main():
 
         # check port is busy
         if not input_args.debug:
+            original_port = port
+            # try up to 1000 new ports
             while check_port_in_use('localhost', port):
                 old_port = port
                 port = int(port) + 1
-                print('\n*** WARNING! ***\n* Port ' + str(old_port) + ' is in use.\n' +
-                    '* Trying to start at ' + str(port) +
+                if port - original_port >= 1000:
+                    raise ConnectionError(
+                        '\n*** WARNING! ***\n Could not find an available port\n' + 
+                        f' to launch label studio. \n Last tested port was {port}' +
+                        '\n****************\n')
+                print(f'\n*** WARNING! ***\n* Port {str(old_port)} is in use.\n' +
+                    f'* Trying to start at {str(port)}' +
                     '\n****************\n')
 
         # external hostname is used for data import paths, they must be absolute always,
