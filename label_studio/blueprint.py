@@ -993,7 +993,7 @@ def main():
                         ' to launch label studio. \n Last tested port was ' + str(port) +
                         '\n****************\n')
                 print('\n*** WARNING! ***\n* Port ' + str(old_port) + ' is in use.\n' +
-                    f'* Trying to start at ' + str(port) +
+                    '* Trying to start at ' + str(port) +
                     '\n****************\n')
 
         # external hostname is used for data import paths, they must be absolute always,
