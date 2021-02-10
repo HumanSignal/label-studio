@@ -984,12 +984,20 @@ def main():
             ssl_context = (cert_file, key_file)
 
         # check port is busy
-        if not input_args.debug and check_port_in_use('localhost', port):
-            old_port = port
-            port = int(port) + 1
-            print('\n*** WARNING! ***\n* Port ' + str(old_port) + ' is in use.\n' +
-                  '* Trying to start at ' + str(port) +
-                  '\n****************\n')
+        if not input_args.debug:
+            original_port = port
+            # try up to 1000 new ports
+            while check_port_in_use('localhost', port):
+                old_port = port
+                port = int(port) + 1
+                if port - original_port >= 1000:
+                    raise ConnectionError(
+                        '\n*** WARNING! ***\n Could not find an available port\n' + 
+                        ' to launch label studio. \n Last tested port was ' + str(port) +
+                        '\n****************\n')
+                print('\n*** WARNING! ***\n* Port ' + str(old_port) + ' is in use.\n' +
+                    '* Trying to start at ' + str(port) +
+                    '\n****************\n')
 
         # external hostname is used for data import paths, they must be absolute always,
         # otherwise machine learning backends couldn't access them
