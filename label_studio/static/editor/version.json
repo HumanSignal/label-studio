@@ -1,6 +1,6 @@
 {
-  "message": "Fix errors in Paragraphs with valueType=url",
-  "commit": "559d3de713dbc249a516def663135deccf7ec628",
+  "message": "Merge pull request #168 from heartexlabs/feature/timeseries-fixedscale\n\nAdd `fixedScale` param to TimeSeries, default off",
+  "commit": "808858fe9cc17d372a89b1031c3e2e12e06ba1f3",
   "branch": "master",
-  "date": "2021-01-25T15:23:01Z"
+  "date": "2021-02-11T20:40:38Z"
 }
