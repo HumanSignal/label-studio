@@ -41,7 +41,7 @@
                 <div class="extra content">
                   <div>
                     {% if ml_backend.is_error %}
-                      <a class="log-link"
+                      <a class="log-link" style="text-decoration: underline"
                          onclick="show_logs(`{{ ml_backend.error.detail }}`, `{{ ml_backend.error.result.traceback }}`, {{ ml_backend.error.status }})">
                         <i class="x icon" style="color: #ff2733"></i>
                         Error. Click here for details.
