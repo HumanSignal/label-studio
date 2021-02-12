@@ -80,7 +80,7 @@ jobs:
         task-definition: ${{ steps.task-def.outputs.task-definition }}
         cluster: docker-test
 
-    - name: Deploy Amazon ECS task definition
+    - name: Deploy Amazon ECS task
       run: |
         REV=`aws ecs describe-task-definition --task-definition docker-test --query taskDefinition  | grep revision | awk '{print $2}' | sed 's/,//g'`
         aws ecs run-task --cluster docker-test --task-definition docker-test:$REV --launch-type FARGATE --network-configuration "awsvpcConfiguration={subnets=[subnet-038a27a87413ebf05],securityGroups=[sg-07c555815f2b1f1ed],assignPublicIp=ENABLED}"
