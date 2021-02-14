@@ -31,7 +31,7 @@ If errors occur the backend returns status 400 and the response body will be JSO
 }
 ```
 
-### Import data and tasks 
+### Import data, files and tasks 
 
 `POST /api/project/import`
 
@@ -40,6 +40,12 @@ Use API to import tasks in [Label Studio basic format](tasks.html#Basic-format) 
 ```bash
 curl -X POST -H Content-Type:application/json http://localhost:8080/api/project/import \
 --data "[{\"my_key\": \"my_value_1\"}, {\"my_key\": \"my_value_2\"}]"
+```
+
+Or you can import a file and make an LS task automatically:
+
+```bash
+curl -X POST -F "FileUpload=@test.jpg" http://localhost:8080/api/project/import
 ```
 
 ### Retrieve project
