@@ -1,4 +1,4 @@
-# Label Studio 
+<img src="https://raw.githubusercontent.com/heartexlabs/label-studio/readme-logo-update/images/github.png"/>
 
 ![GitHub](https://img.shields.io/github/license/heartexlabs/label-studio?logo=heartex) ![label-studio:build](https://github.com/heartexlabs/label-studio/workflows/label-studio:build/badge.svg) ![code-coverage](https://github.com/heartexlabs/label-studio/blob/master/.github/test-coverage.svg) ![GitHub release](https://img.shields.io/github/v/release/heartexlabs/label-studio?include_prereleases)
 
