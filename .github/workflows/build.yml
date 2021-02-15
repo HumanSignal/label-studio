@@ -15,8 +15,7 @@ on:
         description: 'editor branch'
         required: true
         default: 'master'
-      tags:
-        description: 'Build, Push and Deploy'
+
 
 jobs:
   tests:
