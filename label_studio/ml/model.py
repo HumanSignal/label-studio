@@ -16,7 +16,6 @@ from rq.job import Job
 
 from label_studio.utils.misc import parse_config
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -34,14 +33,18 @@ class LabelStudioMLBase(ABC):
         self.label_config = label_config
         self.parsed_label_config = parse_config(self.label_config)
         self.train_output = train_output or {}
+        self.hostname = kwargs.get('hostname', '')
 
     @abstractmethod
     def predict(self, tasks, **kwargs):
         pass
 
-    @abstractmethod
     def fit(self, completions, workdir=None, **kwargs):
-        pass
+        return {}
+
+    def get_local_path(self, url, project_dir=None):
+        from label_studio.ml.utils import get_local_path
+        return get_local_path(url, project_dir=project_dir, hostname=self.hostname)
 
 
 class LabelStudioMLManager(object):

@@ -317,14 +317,14 @@ def load_task(project, task_id, params, resolve_uri=False):
     # completion results aggregations over all completions
     completions = task.get('completions', [])
     if len(completions) > 0:
-        task['completions_results'] = json.dumps([item.get('result', []) for item in completions])
+        task['completions_results'] = json.dumps([item.get('result', []) for item in completions], ensure_ascii=False)
     else:
         task['completions_results'] = ''
 
     # prediction score
     predictions = task.get('predictions', [])
     if len(predictions) > 0:
-        task['predictions_results'] = json.dumps([item.get('result', []) for item in predictions])
+        task['predictions_results'] = json.dumps([item.get('result', []) for item in predictions], ensure_ascii=False)
         scores = [p['score'] for p in predictions if 'score' in p]
         if scores:
             task['predictions_score'] = sum(scores) / len(scores)
@@ -541,7 +541,6 @@ def prepare_tasks(project, params):
     """ Main function to get tasks
     """
     import time
-    points = [(time.time(), 'start')]
     # this option helps to avoid a total request for tasks and completions from storage (huge speed up for s3/gcs)
     first_page_full_render = project.config.get('first_page_full_render', True)
     page, page_size = params.page, params.page_size
@@ -554,17 +553,14 @@ def prepare_tasks(project, params):
     # load all tasks from db with some aggregations over completions
     tasks, total_tasks = load_tasks(project, params, resolve_uri=False, task_range=task_range)
     total_completions, total_predictions = None, None
-    points += [(time.time(), 'load tasks')]
 
     if full_render:
         # filter
         tasks = filter_tasks(tasks, params)
-        points += [(time.time(), 'filers')]
 
         # order
         tasks = order_tasks(params, tasks)
         total_tasks = len(tasks)
-        points += [(time.time(), 'order')]
 
         # aggregations
         total_completions, total_predictions = 0, 0
@@ -575,7 +571,6 @@ def prepare_tasks(project, params):
         # pagination
         if page > 0 and page_size > 0:
             tasks = tasks[(page - 1) * page_size:page * page_size]
-        points += [(time.time(), 'pagi')]
 
     # use only necessary fields to avoid storage (s3/gcs/etc) overloading
     need_uri_resolving = True
@@ -586,19 +581,6 @@ def prepare_tasks(project, params):
     if need_uri_resolving:
         for i, task in enumerate(tasks):
             tasks[i] = resolve_task_data_uri(task, project=project)
-
-    points += [(time.time(), 'resolve')]
-
-    """ time profile: 
-    out = {}
-    prev = 0
-    for p in points:
-        name, value = p[1], p[0]
-        if name in out:
-            out[name] += value-prev
-        else:
-            out[name] = value-prev
-        prev = p[0]"""
 
     return {'tasks': tasks,
             'total': total_tasks, 'total_completions': total_completions, 'total_predictions': total_predictions}

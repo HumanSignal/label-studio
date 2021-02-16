@@ -1,6 +1,6 @@
 {
-  "message": "Fix checkboxes",
-  "commit": "048512fca48496f6b62f47e24606659a7fbf738e",
+  "message": "Use label_config if label_config_line is undefined",
+  "commit": "969db38541030d59509614c4366331d86a59ce64",
   "branch": "master",
-  "date": "2021-01-25T15:42:04Z"
+  "date": "2021-02-05T01:26:40Z"
 }

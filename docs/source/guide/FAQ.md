@@ -166,6 +166,8 @@ There are several possible ways to do it:
 
 LSB web server always use `0.0.0.0` address for start. But if you really need to change it to `localhost` just set Host as `localhost` and web server will start at `localhost`.  
 
+> If your external host has a port, e.g.: `77.77.77.77:1234` then you have to specify HOST with the port together `HOST=77.77.77.77:1234`.
+
 <br/>
 <center>
   <img style="opacity: 0.75" src='../images/host-protocol-port.png'>

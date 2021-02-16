@@ -213,10 +213,11 @@ def get_data_file(filename):
     """
     # support for upload via GUI
     if filename.startswith('upload/'):
+        path = None
         upload_dir = os.environ.get('LS_UPLOAD_DIR', '')
         if os.path.exists(upload_dir):
             path = os.path.join(upload_dir, filename[7:])
-        else:
+        if path is None or not os.path.exists(path):
             path = os.path.join(g.project.path, filename)
         directory = os.path.abspath(os.path.dirname(path))
         filename = os.path.basename(path)
@@ -531,10 +532,12 @@ def api_save_config():
     """ Save labeling config
     """
     label_config = None
-    if 'label_config' in request.form:
+    if request.form and 'label_config' in request.form:
         label_config = request.form['label_config']
-    elif 'label_config' in request.json:
+    elif request.json and 'label_config' in request.json:
         label_config = request.json['label_config']
+    elif request.content_type == "application/xml":
+        label_config = request.get_data(as_text=True)
 
     # check config before save
     try:
@@ -890,7 +893,26 @@ def api_predictions():
 
             # save tasks with predictions to storage
             g.project.source_storage.set_many(tasks_with_predictions.keys(), tasks_with_predictions.values())
-            return make_response(jsonify({'details': 'predictions are ready'}), 200)
+            return make_response(jsonify({'detail': 'predictions are ready'}), 200)
+
+        # make prediction for all tasks
+        elif mode == 'specific_tasks':
+            # get tasks ids from request
+            task_ids = request.values.get('task_ids', '').split(',')
+            if task_ids is None:
+                task_ids = request.json.get('task_ids', None)
+            if not isinstance(task_ids, list):
+                raise Exception('Request JSON data must have "task_ids": [1, 2, ...]')
+
+            tasks_with_predictions = {}
+            for task_id in task_ids:
+                task = g.project.source_storage.get(int(task_id))
+                task_pred = g.project.make_predictions(task)
+                tasks_with_predictions[task_pred['id']] = task_pred
+
+            # save tasks with predictions to storage
+            g.project.source_storage.set_many(tasks_with_predictions.keys(), tasks_with_predictions.values())
+            return make_response(jsonify({'detail': 'predictions are ready'}), 200)
 
         # unknown mode
         else:
@@ -981,12 +1003,20 @@ def main():
             ssl_context = (cert_file, key_file)
 
         # check port is busy
-        if not input_args.debug and check_port_in_use('localhost', port):
-            old_port = port
-            port = int(port) + 1
-            print('\n*** WARNING! ***\n* Port ' + str(old_port) + ' is in use.\n' +
-                  '* Trying to start at ' + str(port) +
-                  '\n****************\n')
+        if not input_args.debug:
+            original_port = port
+            # try up to 1000 new ports
+            while check_port_in_use('localhost', port):
+                old_port = port
+                port = int(port) + 1
+                if port - original_port >= 1000:
+                    raise ConnectionError(
+                        '\n*** WARNING! ***\n Could not find an available port\n' + 
+                        ' to launch label studio. \n Last tested port was ' + str(port) +
+                        '\n****************\n')
+                print('\n*** WARNING! ***\n* Port ' + str(old_port) + ' is in use.\n' +
+                    '* Trying to start at ' + str(port) +
+                    '\n****************\n')
 
         # external hostname is used for data import paths, they must be absolute always,
         # otherwise machine learning backends couldn't access them

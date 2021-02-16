@@ -9,7 +9,7 @@
         response:
           columns_to_draw: []
           duration:
-            {"__test_object": true, "interval": [0, 0.1]}
+            {"__test_object": true, "interval": [0, 5.0]}
           files_as_tasks_list:
             selected: true
             type: null

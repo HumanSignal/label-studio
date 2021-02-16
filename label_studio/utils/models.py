@@ -17,7 +17,7 @@ from datetime import datetime
 from requests.adapters import HTTPAdapter
 from .io import get_data_dir
 from .exceptions import ValidationError
-from .functions import _LABEL_CONFIG_SCHEMA_DATA
+from .functions import _LABEL_CONFIG_SCHEMA_DATA, get_external_hostname
 
 DEFAULT_PROJECT_ID = 1
 logger = logging.getLogger(__name__)
@@ -376,7 +376,8 @@ class MLApi(BaseHTTPAPI):
         """
         return self._post('setup', request={
             'project': self._create_project_uid(project),
-            'schema': project.label_config_line
+            'schema': project.label_config_line,
+            'hostname': get_external_hostname()
         })
 
     def delete(self, project):

@@ -1,6 +1,6 @@
 {
-  "message": "Fix color of skipped icon",
-  "commit": "e477248be151a06006ed7790eda6ed6d36af089f",
+  "message": "Merge pull request #168 from heartexlabs/feature/timeseries-fixedscale\n\nAdd `fixedScale` param to TimeSeries, default off",
+  "commit": "808858fe9cc17d372a89b1031c3e2e12e06ba1f3",
   "branch": "master",
-  "date": "2021-01-12T20:07:36Z"
+  "date": "2021-02-11T20:40:38Z"
 }

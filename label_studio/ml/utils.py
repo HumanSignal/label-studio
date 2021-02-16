@@ -11,6 +11,7 @@ import io
 
 from urllib.parse import urlparse
 from PIL import Image
+from colorama import Fore
 
 from .model import LabelStudioMLBase
 from label_studio.utils.io import get_cache_dir
@@ -24,7 +25,15 @@ def get_all_classes_inherited_LabelStudioMLBase(script_file):
     abs_path = os.path.abspath(script_file)
     module_name = os.path.splitext(os.path.basename(script_file))[0]
     sys.path.append(os.path.dirname(abs_path))
-    module = importlib.import_module(module_name)
+    try:
+        module = importlib.import_module(module_name)
+    except ModuleNotFoundError as e:
+        print(Fore.YELLOW + 'File ' + module_name + '.py not found.\n'
+              'If you are looking for examples, you can find a dummy model.py here:\n' +
+              Fore.LIGHTYELLOW_EX + 'https://labelstud.io/tutorials/dummy_model.html')
+        module = None
+        exit(-1)
+
     for name, obj in inspect.getmembers(module, inspect.isclass):
         if name == LabelStudioMLBase.__name__:
             continue
@@ -67,6 +76,10 @@ def get_choice(completion):
 
 
 def get_image_local_path(url, image_cache_dir=None, project_dir=None):
+    return get_local_path(url, image_cache_dir, project_dir)
+
+
+def get_local_path(url, cache_dir=None, project_dir=None, hostname=None):
     is_local_file = url.startswith('/data/') and '?d=' in url
     is_uploaded_file = url.startswith('/data/upload')
 
@@ -77,27 +90,32 @@ def get_image_local_path(url, image_cache_dir=None, project_dir=None):
         filepath = os.path.join(dir_path, filename)
         if not os.path.exists(filepath):
             raise FileNotFoundError(filepath)
+        return filepath
 
     # File uploaded via import UI
-    elif is_uploaded_file:
-        if not project_dir or not os.path.exists(project_dir):
+    elif is_uploaded_file and project_dir is not None:
+        if not os.path.exists(project_dir):
             raise FileNotFoundError(
                 "Can't find uploaded file by URL {url}: you need to pass a valid project_dir".format(url=url))
         filepath = os.path.join(project_dir, 'upload', os.path.basename(url))
+        return filepath
+
+    elif is_uploaded_file and hostname:
+        url = hostname + url
+        logger.info('Resolving url using hostname [' + hostname + '] from LSB: ' + url)
 
     # File specified by remote URL - download and cache it
-    else:
-        image_cache_dir = image_cache_dir or get_cache_dir()
-        parsed_url = urlparse(url)
-        url_filename = os.path.basename(parsed_url.path)
-        url_hash = hashlib.md5(url.encode()).hexdigest()[:6]
-        filepath = os.path.join(image_cache_dir, url_hash + '__' + url_filename)
-        if not os.path.exists(filepath):
-            logger.info('Download {url} to {filepath}'.format(url=url, filepath=filepath))
-            r = requests.get(url, stream=True)
-            r.raise_for_status()
-            with io.open(filepath, mode='wb') as fout:
-                fout.write(r.content)
+    cache_dir = cache_dir or get_cache_dir()
+    parsed_url = urlparse(url)
+    url_filename = os.path.basename(parsed_url.path)
+    url_hash = hashlib.md5(url.encode()).hexdigest()[:6]
+    filepath = os.path.join(cache_dir, url_hash + '__' + url_filename)
+    if not os.path.exists(filepath):
+        logger.info('Download {url} to {filepath}'.format(url=url, filepath=filepath))
+        r = requests.get(url, stream=True)
+        r.raise_for_status()
+        with io.open(filepath, mode='wb') as fout:
+            fout.write(r.content)
     return filepath
 
 

@@ -91,13 +91,13 @@ class ImportState(object):
 
     def _generate_label_config(self):
         # TODO: this is a temp workaround to guess initial config - we should make it prettier
-        data_keys = list(self.data_keys)
+        data_keys = list(self.project.derived_input_schema)
         if len(data_keys) > 1:
             # better to use Table here
             return '<View></View>'
         if len(data_keys) == 1:
             data_key = data_keys[0]
-            objects = set(self.selected_objects)
+            objects = set(self.selected_objects) if self.selected_objects else [None]
             if len(objects) > 1:
                 raise ValidationError('More than one data type is presented')
             object_tag = list(objects)[0]
@@ -150,8 +150,7 @@ class ImportState(object):
             self.show_files_as_tasks_list = self._show_files_as_tasks_list()
 
         # validate tasks
-        if not self._validator:
-            self._validator = TaskValidator(self.project)
+        self._validator = TaskValidator(self.project)
         self.tasks = self._validator.to_internal_value(self.tasks)
 
     def apply(self):

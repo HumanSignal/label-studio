@@ -1,8 +1,12 @@
-<!-- {"title": "Transcription whole audio", "category": "audio", "complexity": "basic"} -->
+<!-- {"title": "Speech Transcription", "category": "audio", "complexity": "basic"} -->
 <View>
-  <Header value="Listen to the audio" />
-  <Audio name="audio" value="$audio" />
-  <Header value="Write the transcription" />
-  <TextArea name="transcription" toName="audio"
-            rows="4" editable="true" maxSubmissions="1" />
+  <Header value="Listen to the audio and write the transcription" />
+  <AudioPlus name="audio" value="$audio" />
+  <TextArea name="transcription" toName="audio" editable="true"
+            rows="4" transcription="true" maxSubmissions="1" />
+
+  <Style>
+  [dataneedsupdate]>div:first-child{flex-grow:1;order:2}
+  [dataneedsupdate]>div:last-child{margin-top:0 !important;margin-right:1em}
+  </Style>
 </View>

@@ -114,7 +114,9 @@ The default browser will open automatically at [http://localhost:8080](http://lo
 
 ### Multisession mode
 
-You can start Label Studio in _multisession mode_ - each browser session creates it's own project with associated session ID as a name.
+You can start Label Studio in _multisession mode_. The each browser session will create a new project and associate it with session ID.
+
+You can switch between multiple projects and share them to other users. All this functionality can be found on `Settings` page in `Project Management` section. 
 
 In order to launch Label Studio in multisession mode and keep all projects in a separate directory `session_projects`, run
 

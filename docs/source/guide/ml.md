@@ -21,6 +21,7 @@ That gives you the opportunities to use:
 - [Transfer learning for images with PyTorch](/tutorials/pytorch-image-transfer-learning.html)
 - [Image Object Detector](/tutorials/object-detector.html)
 - [Chatbot response generation with HuggingFace's GPT2 model](/tutorials/gpt.html)
+- [Automatic Speech Recognition with Nvidia's NeMo](/tutorials/nemo_asr.html)
 
 #### Create ML backend
 
