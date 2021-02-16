@@ -4,7 +4,6 @@ import nemo
 import nemo.collections.asr as nemo_asr
 
 from label_studio.ml import LabelStudioMLBase
-from label_studio.ml.utils import get_image_local_path
 
 
 logger = logging.getLogger(__name__)
@@ -22,7 +21,7 @@ class NemoASR(LabelStudioMLBase):
         self.model = nemo_asr.models.EncDecCTCModel.from_pretrained(model_name=model_name)
 
     def predict(self, tasks, **kwargs):
-        audio_path = get_image_local_path(tasks[0]['data'][self.value])
+        audio_path = self.get_local_path(tasks[0]['data'][self.value])
         transcription = self.model.transcribe(paths2audio_files=[audio_path])[0]
         return [{
             'result': [{
