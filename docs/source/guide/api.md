@@ -137,7 +137,7 @@ The `format` parameters could be found on the Export page in the dropdown (`JSON
 | **Machine Learning Models** | 
 | /api/models                       | `GET` list all models <br> `DELETE` remove model with `name` field from request json body |  
 | /api/models/train                 | `POST` send training signal to ML backend | 
-| /api/models/predictions?mode={data\|all_tasks} | `GET \| POST`<br> `mode=data`: generate ML model predictions for one task from `data` field of request json body<br> `mode=all_tasks`: generate ML model predictions for all LS DB tasks | 
+| /api/models/predictions?mode={data\|all_tasks\|specific_tasks} | `GET \| POST`<br> `mode=data`: generate ML model predictions for one task from `data` field of request json body<br> `mode=all_tasks`: generate ML model predictions for all LS DB tasks <br> `mode=specific_tasks`: generate predictions for tasks specified in "task_ids" JSON data or in path arguments, e.g.: <nobr><i>?mode=specific_tasks&task_ids=1,2,3</i></nobr> | 
 | **Helpers** |
 | /api/validate-config              | `POST` check labeling config for errors |
 | /api/import-example               | `GET \| POST` generate example for import by given labeling config |
