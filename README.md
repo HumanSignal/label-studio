@@ -7,7 +7,7 @@
 
 ## What is Label Studio?
 
-Label Studio lets you label data types like audio, text, images, videos, and time series with a straightforward interface and standardized output formats. 
+Label Studio is an open source data labeling tool. It lets you label data types like audio, text, images, videos, and time series with a straightforward interface and standardized output formats. 
 
 - [Try out Label Studio](#try-out-label-studio)
 - [What you get from Label Studio](#what-you-get-from-label-studio)
