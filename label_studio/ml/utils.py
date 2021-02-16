@@ -11,6 +11,7 @@ import io
 
 from urllib.parse import urlparse
 from PIL import Image
+from colorama import Fore
 
 from .model import LabelStudioMLBase
 from label_studio.utils.io import get_cache_dir
@@ -24,7 +25,15 @@ def get_all_classes_inherited_LabelStudioMLBase(script_file):
     abs_path = os.path.abspath(script_file)
     module_name = os.path.splitext(os.path.basename(script_file))[0]
     sys.path.append(os.path.dirname(abs_path))
-    module = importlib.import_module(module_name)
+    try:
+        module = importlib.import_module(module_name)
+    except ModuleNotFoundError as e:
+        print(Fore.YELLOW + 'File ' + module_name + '.py not found.\n'
+              'If you are looking for examples, you can find a dummy model.py here:\n' +
+              Fore.LIGHTYELLOW_EX + 'https://labelstud.io/tutorials/dummy_model.html')
+        module = None
+        exit(-1)
+
     for name, obj in inspect.getmembers(module, inspect.isclass):
         if name == LabelStudioMLBase.__name__:
             continue

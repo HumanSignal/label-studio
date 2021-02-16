@@ -88,7 +88,7 @@
         {% if project.ml_backends_connected %}
           <!-- Start train -->
           <div class="row centered aligned">
-            <div class="ui positive big button" onclick="start_train()">Start Training</div>
+            <button class="ui positive big button" onclick="start_train()">Start Training</button>
             {% if project.config['enable_predictions_button'] %}
               <div class="ui positive big button" onclick="start_predictions()">Start Predictions</div>
             {% endif %}

@@ -893,7 +893,26 @@ def api_predictions():
 
             # save tasks with predictions to storage
             g.project.source_storage.set_many(tasks_with_predictions.keys(), tasks_with_predictions.values())
-            return make_response(jsonify({'details': 'predictions are ready'}), 200)
+            return make_response(jsonify({'detail': 'predictions are ready'}), 200)
+
+        # make prediction for all tasks
+        elif mode == 'specific_tasks':
+            # get tasks ids from request
+            task_ids = request.values.get('task_ids', '').split(',')
+            if task_ids is None:
+                task_ids = request.json.get('task_ids', None)
+            if not isinstance(task_ids, list):
+                raise Exception('Request JSON data must have "task_ids": [1, 2, ...]')
+
+            tasks_with_predictions = {}
+            for task_id in task_ids:
+                task = g.project.source_storage.get(int(task_id))
+                task_pred = g.project.make_predictions(task)
+                tasks_with_predictions[task_pred['id']] = task_pred
+
+            # save tasks with predictions to storage
+            g.project.source_storage.set_many(tasks_with_predictions.keys(), tasks_with_predictions.values())
+            return make_response(jsonify({'detail': 'predictions are ready'}), 200)
 
         # unknown mode
         else:
