@@ -2,9 +2,8 @@
 <View>
   <Header value="Listen to the audio and write the transcription" />
   <AudioPlus name="audio" value="$audio" />
-  <TextArea name="transcription" toName="audio"
+  <TextArea name="transcription" toName="audio" editable="true"
             rows="4" transcription="true" maxSubmissions="1" />
-
 
   <Style>
   [dataneedsupdate]>div:first-child{flex-grow:1;order:2}

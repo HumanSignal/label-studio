@@ -43,7 +43,8 @@ def _setup():
     project = data.get('project')
     schema = data.get('schema')
     force_reload = data.get('force_reload', False)
-    model = _manager.fetch(project, schema, force_reload)
+    hostname = data.get('hostname', '')  # host name for uploaded files and building urls
+    model = _manager.fetch(project, schema, force_reload, hostname=hostname)
     logger.debug('Fetch model version: {}'.format(model.model_version))
     return jsonify({'model_version': model.model_version})
 

@@ -120,3 +120,7 @@ def main():
         create_dir(args)
     elif args.command == 'start':
         start_server(args, subargs)
+
+
+if __name__ == '__main__':
+    main()
