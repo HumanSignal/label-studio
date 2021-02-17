@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'master' into feature/audio-transcription",
-  "commit": "795938f97c06ab236f5e81c44d3eccaab695b2af",
-  "branch": "feature/audio-transcription",
-  "date": "2021-02-17T10:19:01Z"
+  "message": "Merge pull request #169 from heartexlabs/feature/audio-transcription\n\nBetter audio transcription",
+  "commit": "7350e8c800c4d531d0a2b52a03217c7e6998789b",
+  "branch": "master",
+  "date": "2021-02-17T12:49:10Z"
 }
