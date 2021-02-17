@@ -1,3 +1,8 @@
+---
+title:
+type: blog
+order: 20
+---
 
 ## Text classification with Scikit-Learn
 

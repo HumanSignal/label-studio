@@ -1,3 +1,8 @@
+---
+title:
+type: blog
+order: 10
+---
 
 ## Create the simplest Machine Learning backend
 

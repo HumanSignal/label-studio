@@ -1,3 +1,8 @@
+---
+title:
+type: blog
+order: 30
+---
 
 ## Transfer learning for images with PyTorch
 

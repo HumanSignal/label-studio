@@ -1,10 +1,10 @@
 <!-- {"title": "Dialogs & conversations", "category": "html", "complexity": "basic", "order": "1", "new": true} -->
 <View>
   <ParagraphLabels name="actions" toName="dialogue">
-      <Label value="Inform"></Label>
-      <Label value="Request"></Label>
-      <Label value="Negate"></Label>
-      <Label value="Affirm"></Label>
+      <Label value="Inform"/>
+      <Label value="Request"/>
+      <Label value="Negate"/>
+      <Label value="Affirm"/>
   </ParagraphLabels>
 
   <Paragraphs
