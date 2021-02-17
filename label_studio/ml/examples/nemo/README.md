@@ -26,15 +26,17 @@ With ASR models, you can do audio pre-annotations drawn within a text area, aka 
 5. From the template list, select `Speech Transcription`. You can also create your own with `<TextArea>` and `<Audio>` tags. Or copy this labeling config into LS: 
     ```xml
     <View>
-      <Header value="Listen to the audio and write the transcription" />
-      <AudioPlus name="audio" value="$audio" />
-      <TextArea name="transcription" toName="audio" editable="true"
-                rows="4" transcription="true" maxSubmissions="1" />
-    
+      <Header value="Audio transcription:"/>
+      <Audio name="audio" value="$url" height="46"/>
+      <TextArea name="answer" transcription="true"
+                toName="audio" rows="3" maxSubmissions="1"/>
     
       <Style>
+      [dataneedsupdate]{display:flex;align-items:center}
       [dataneedsupdate]>div:first-child{flex-grow:1;order:2}
       [dataneedsupdate]>div:last-child{margin-top:0 !important;margin-right:1em}
+      [dataneedsupdate] button{height:46px}
+      [dataneedsupdate] button span:nth-child(2){display:none}
       </Style>
     </View>
     ```

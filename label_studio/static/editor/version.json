@@ -1,6 +1,6 @@
 {
-  "message": "Merge pull request #168 from heartexlabs/feature/timeseries-fixedscale\n\nAdd `fixedScale` param to TimeSeries, default off",
-  "commit": "808858fe9cc17d372a89b1031c3e2e12e06ba1f3",
-  "branch": "master",
-  "date": "2021-02-11T20:40:38Z"
+  "message": "Merge branch 'master' into feature/audio-transcription",
+  "commit": "795938f97c06ab236f5e81c44d3eccaab695b2af",
+  "branch": "feature/audio-transcription",
+  "date": "2021-02-17T10:19:01Z"
 }
