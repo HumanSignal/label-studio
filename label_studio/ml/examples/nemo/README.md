@@ -1,3 +1,9 @@
+---
+title:
+type: blog
+order: 60
+---
+
 ## Automatic Speech Recognition
 
 This an example of using [Nvidia's NeMo toolkit](https://github.com/NVIDIA/NeMo) for creating ASR/NLU/TTS pre-labels.
