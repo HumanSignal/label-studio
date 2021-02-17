@@ -1,3 +1,9 @@
+---
+title:
+type: blog
+order: 40
+---
+
 This [Machine Learning backend](https://labelstud.io/guide/ml.html) allows you to automatically prelabel your images with bounding boxes. It is powered by amazing [OpenMMLab MMDetection library](https://github.com/open-mmlab/mmdetection), which gives you access to many existing state-of-the-art models like FasterRCNN, RetinaNet, YOLO and others. 
 
 Check this installation guide and then play around them, pick up the best model that suits your current dataset!
