@@ -101,7 +101,13 @@ You can use Label Studio Frontend separately in your own projects: just include 
         userGenerate: true
       });
       LS.completionStore.selectCompletion(c.id);
+    }, 
+
+    onSubmitCompletion: function(LS, completion) {
+      // retrive a completion 
+      console.log(completion.serializeCompletion())
     }
+
   });
 </script>
   ```
