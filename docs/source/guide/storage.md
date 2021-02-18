@@ -1,5 +1,5 @@
 ---
-title: Cloud storages
+title: Sync data from cloud or database storage
 type: guide
 order: 103
 ---
