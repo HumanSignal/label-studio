@@ -136,7 +136,7 @@ class Analytics(object):
                 'env': self.env,
                 'version': self.version,
                 'project_name': self.input_args.project_name if self.input_args else None,
-                'python': sys.version_info[0] + '.' + sys.version_info[1]
+                'python': str(sys.version_info[0]) + '.' + str(sys.version_info[1])
             }
         except:
             pass
