@@ -1,7 +1,7 @@
 ---
-title: FAQ
+title: Troubleshoot Label Studio
 type: guide
-order: 101
+order: 109
 ---
 
 Frequently asked questions about setup and usage.
