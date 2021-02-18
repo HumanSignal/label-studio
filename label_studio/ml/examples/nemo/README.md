@@ -26,6 +26,7 @@ With ASR models, you can do audio pre-annotations drawn within a text area, aka 
     ```
    
 5. Start the machine learning backend:
+
    ```bash
    label-studio-ml start my_model
    ```
