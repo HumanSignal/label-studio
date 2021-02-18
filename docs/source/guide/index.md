@@ -8,7 +8,7 @@ order: 100
 
 Label Studio is an open source data labeling tool for labeling and exploring multiple types of data. You can perform many different types of labeling for many different data formats. 
 
-You can also integrate Label Studio with machine learning models to supply predictions for labels (pre-labels), or perform continuous active learning. See [Set up machine learning with your labeling process](https://labelstud.io/guide/ml.html). 
+You can also integrate Label Studio with machine learning models to supply predictions for labels (pre-labels), or perform continuous active learning. See [Set up machine learning with your labeling process](ml.html). 
 
 Label Studio is also available as Enterprise and Cloud editions with additional features. See [What you get from Label Studio]() for more. 
 
@@ -17,12 +17,12 @@ Label Studio is also available as Enterprise and Cloud editions with additional 
 
 Follow these steps to start labeling your data with Label Studio: 
 
-1. [Install Label Studio](https://labelstud.io/guide/install.html).
-2. [Import data as labeling tasks](https://labelstud.io/guide/tasks.html). 
-3. [Set up the labeling project](https://labelstud.io/guide/setup.html). Define the type of labeling to perform on the dataset, and add the labels that you want annotators to apply. 
-4. [Label and annotate the data](https://labelstud.io/guide/labeling.html).
+1. [Install Label Studio](install.html).
+2. [Import data as labeling tasks](tasks.html). 
+3. [Set up the labeling project](setup.html). Define the type of labeling to perform on the dataset, and add the labels that you want annotators to apply. 
+4. [Label and annotate the data](labeling.html).
 5. [Review the completed labeling tasks]().
-6. [Export the labeled data or the annotations](https://labelstud.io/guide/export.html).
+6. [Export the labeled data or the annotations](export.html).
 
 By default, Label Studio supports 1 project and 1 labeling configuration for the dataset in that project. To label multiple different types of data with different types of labeling configurations in different projects, start Label Studio in multi-session mode, or use Label Studio Enterprise Edition. 
 
