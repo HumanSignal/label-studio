@@ -1,7 +1,7 @@
 ---
 title: Get data into Label Studio
 type: guide
-order: 104
+order: 102
 ---
 
 Get data into Label Studio by importing files, referencing URLs, or syncing with cloud or database storage. 
