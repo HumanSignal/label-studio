@@ -1,7 +1,7 @@
 ---
-title: Labeling Interface
+title: Label and annotate data in Label Studio
 type: guide
-order: 104
+order: 105
 ---
 
 Let's explore the complex example of multi-task labeling which includes text + image + audio data objects:
