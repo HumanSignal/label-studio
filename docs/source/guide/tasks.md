@@ -1,8 +1,15 @@
 ---
-title: Tasks
+title: Get data into Label Studio
 type: guide
-order: 102
+order: 104
 ---
+
+Get data into Label Studio by importing files, referencing URLs, or syncing with cloud or database storage. 
+
+Here's some information about why to choose each type of import, and some links.
+
+
+## How to format your data for import
 
 ## Basic format
 
