@@ -21,7 +21,7 @@ six>=1.13.0
 srsly>=0.2.0
 tqdm>=4.40.2
 urllib3==1.25.7
-wasabi==0.4.2
+wasabi>=0.4.2
 Werkzeug==0.16.0
 ordered-set==4.0.2
 orjson>=2.0.11
