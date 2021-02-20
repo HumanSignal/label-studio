@@ -6,12 +6,60 @@ order: 102
 
 Get data into Label Studio by importing files, referencing URLs, or syncing with cloud or database storage. 
 
-Here's some information about why to choose each type of import, and some links.
+## How to import data into Label Studio
+
+How you import data depends on where your data is stored.
+
+- Stored in a cloud storage bucket? See [Sync data from cloud or database storage](storage.html).
+- Stored in a Redis database? See [Sync data from cloud or database storage](storage.html).
+- Stored at internet-accessible URLs? 
+- Stored locally?  
+
+### Import from URL
+
+### Import from a file or directory
+
+### Import from the CLI 
+
+### Import using API
+
+Import your data using server API. Check [API page](api.html) for more details.
 
 
-## How to format your data for import
+There are a few possible ways to import data files to your labeling project:
 
-## Basic format
+ - Start Label Studio without specifying input path and then import through the web interfaces available at [http://localhost:8080/import](http://localhost:8080/import)
+
+ - Initialize Label Studio project and directly specify the paths, e.g. `label-studio init --input-path my_tasks.json --input-format json`
+
+The `--input-path` argument points to a file or a directory where your labeling tasks reside. By default it expects [JSON-formatted tasks](tasks.html#JSON), but you can also specify all other formats listed bellow by using `--input-format` option.
+
+
+## What kinds of data you can import into Label Studio
+
+You can import many different types of data, including text, timeseries, audio, and image data. The file types supported depend on the type of data. 
+
+| Data type | Supported file types |
+| --- | --- |
+| Audio | .aiff, .au, .flac, .m4a, .mp3, .ogg, .wav |
+| HTML | .html, .htm, .xml |
+| Images | .bmp, .gif, .jpg, .png, .svg, .tiff, .webp |
+| Structured data | .csv, .tsv, .json |
+| Text | .txt |
+| Time series | .csv, .tsv |
+
+If you don't see a supported file type that you want to import, reach out in the [Label Studio Slack community](https://join.slack.com/t/label-studio/shared_invite/zt-cr8b7ygm-6L45z7biEBw4HXa5A2b5pw). 
+
+
+## How to format your data to import it
+
+Label Studio treats different file types different ways. 
+
+
+
+
+
+### Basic format
 
 Label Studio expects the JSON-formatted list of _tasks_ as input. Each _task_ is a dictionary-like structure, with some specific keys reserved for internal use:
 
@@ -89,15 +137,9 @@ Here is an example of a config and tasks list composed of one element, for text 
 }]
 ```
 
-## Import formats
 
-There are a few possible ways to import data files to your labeling project:
 
- - Start Label Studio without specifying input path and then import through the web interfaces available at [http://localhost:8080/import](http://localhost:8080/import)
 
- - Initialize Label Studio project and directly specify the paths, e.g. `label-studio init --input-path my_tasks.json --input-format json`
-
-The `--input-path` argument points to a file or a directory where your labeling tasks reside. By default it expects [JSON-formatted tasks](tasks.html#JSON), but you can also specify all other formats listed bellow by using `--input-format` option.
 
 ### JSON
 
@@ -188,14 +230,12 @@ Supported formats are: `.wav` `.aiff` `.mp3` `.au` `.flac`
 For label configs with one data key (e.g.: one input image) Label Studio supports a file uploading via GUI, just drag & drop your files (or select them from file dialog) on "Import" page. This option is suitable for limited file number.     
 
 
-## Import using API
-
-Import your data using server API. Check [API page](api.html) for more details.
 
 
-## Sampling
 
-You can define the way of how your imported tasks are exposed to annotators. Several options are available. To enable one of them, specify `--sampling=<option>` as command line option.
+## Sampling --> move to project setup page 
+
+You can define the way of how your imported tasks are exposed to annotators. Several options are available. To enable one of them, specify `--sampling=<option>` as command line option. <!--is there a way to do this from the UI?--> 
 
 #### sequential
 
