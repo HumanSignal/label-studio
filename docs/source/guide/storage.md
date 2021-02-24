@@ -20,10 +20,10 @@ You can change parameters like the prefix or matching filename regex at any time
 > Note: Choose your target storage carefully. When you start the labeling project, it must be empty or contain completions that match previously created or imported tasks from source storage. Tasks are synced with completions based on internal IDs (keys in `source.json`/`target.json` files in your project directory), so if you accidentally connect to the target storage with existing completions with the same IDs, the connection might fail with undefined behavior.  
 
 Set up the following cloud and other storage systems with Label Studio:
-- [Amazon S3](#amazon-s3)
-- [Google Cloud Storage](#google-cloud-storage)
-- [Microsoft Azure Blob storage](#microsoft-azure-blob-storage)
-- [Redis database](#redis-database)
+- [Amazon S3](#Amazon-S3)
+- [Google Cloud Storage](#Google-Cloud-Storage)
+- [Microsoft Azure Blob storage](#Microsoft-Azure-Blob-storage)
+- [Redis database](#Redis-database)
 
 ## Amazon S3
 
@@ -92,7 +92,7 @@ You can also skip or leave the `"data_key"` parameter empty and Label Studio aut
 
 ### Optional parameters
 
-You can specify additional parameters with a command line escaped JSON string via `--source-params` / `--target-params` or from the UI.
+You can specify additional parameters with a command line escaped JSON string with `--source-params` / `--target-params` or from Label Studio UI.
 
 | Parameter | Description | Default |
 | --- | --- | --- |
@@ -156,7 +156,7 @@ You can also skip or leave the `"data_key"` parameter empty and Label Studio aut
 
 ### Optional parameters
 
-You can specify additional parameters with a command line escaped JSON string via `--source-params` / `--target-params` or from the UI.
+You can specify additional parameters with a command line escaped JSON string with `--source-params` / `--target-params` or from Label Studio UI.
 
 | Parameter | Description | Default |
 | --- | --- | --- |
@@ -219,7 +219,7 @@ You can also skip or leave the `"data_key"` parameter empty and Label Studio aut
 
 ### Optional parameters
 
-You can specify additional parameters with the command line escaped JSON string via `--source-params` / `--target-params` or from the UI.
+You can specify additional parameters with a command line escaped JSON string with `--source-params` / `--target-params` or from Label Studio UI.
 
 | Parameter | Description | Default |
 | --- | --- | --- |
@@ -272,7 +272,7 @@ label-studio start my_project --init --target db --redis-config "{\"project_path
 
 ### Optional Redis configuration parameters
 
-You can specify additional parameters with the command line escaped JSON string via `--redis-config` or from the UI.
+You can specify additional parameters with a command line escaped JSON string with `--redis-config` or from Label Studio UI.
 
 | Parameter | Description | Default |
 | --- | --- | --- |
