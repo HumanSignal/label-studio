@@ -1,5 +1,5 @@
 ---
-title: Machine learning backend
+title: Set up machine learning with your labeling process
 type: guide
 order: 906
 ---
@@ -25,7 +25,7 @@ That gives you the opportunities to use:
 
 #### Create ML backend
 
-Check examples in [`label-studio/ml/examples`](https://github.com/heartexlabs/label-studio/tree/master/label_studio/ml/examples) directory.
+See the examples in [`label-studio/ml/examples`](https://github.com/heartexlabs/label-studio/tree/master/label_studio/ml/examples) directory.
 
 ## Quickstart
 
@@ -56,30 +56,38 @@ Here is a quick example tutorial on how to run the ML backend with a simple text
    
 4. Run Label Studio connecting it to the running ML backend:
     ```bash
-    label-studio start text_classification_project --init --template text_sentiment --ml-backends http://localhost:9090
+    label-studio start text_classification_project --init --template text_classification --ml-backends http://localhost:9090
     ```
-    To confirm that the model was properly connected go to `/model` page in the Label Studio webapp.
+
+5. On the Label Studio UI, open the `/model` page and validate that the model was successfully connected.
 
 ### Getting predictions
 
-   You should see model predictions in the labeling interface and Tasks page (/tasks). For example in an image classification task: the model will pre-select an image class for you to verify.
-   
-   Also you can obtain a prediction via Label Studio Backend working on `http://localhost:8080`:
-    
+After connecting a model as a machine learning backend, you see model predictions in the labeling interface and on the Tasks page that you use to manage your data.
+
+For example, for an image classification task, the model pre-selects an image class for data labelers to verify. 
+
+You can also get a prediction for specific data using the API. For example, to get a prediction for task data of `{"text":"some text"}` and a Label Studio installation accessible at `http://localhost:8080`, run the following cURL command: 
+
    ```
     curl -X POST -d '{"text":"some text"}' -H "Content-Type: application/json" http://localhost:8080/api/models/predictions
    ```
 
-   where `{"text":"some text"}` is your task data. 
    
-### Model training
+### Train a model with Label Studio 
 
-   Model training can be triggered manually by pushing the Start Training button on the `/model` page, or by using an API call:
+You can start model training manually from the UI or using the API. 
+
+- On the Label Studio UI, click the **Start Training** button on the `/model` page.
+- cURL the API from the command line: 
    ```
    curl -X POST http://localhost:8080/api/models/train
    ```
-   In development mode, training logs show up in the console. In production mode, runtime logs are available in    
-   `my_backend/logs/uwsgi.log` and RQ training logs in `my_backend/logs/rq.log`
+
+In development mode, training logs appear in the web browser console. 
+In production mode, you can find runtime logs in `my_backend/logs/uwsgi.log` and RQ training logs in `my_backend/logs/rq.log`. 
+<!--what do these particular modes represent? add more information here-->
+
    
 ## Start with docker compose
 Label Studio ML scripts include everything you need to create a production ready ML backend server, powered by docker. It uses [uWSGI](https://uwsgi-docs.readthedocs.io/en/latest/) + [supervisord](http://supervisord.org/) stack, and handles background training jobs using [RQ](https://python-rq.org/).
@@ -142,3 +150,94 @@ If you can't resolve them by yourself, <a href="https://join.slack.com/t/label-s
 **My predictions are wrong / I can't see the model prediction result on the labeling page**
 
 ML backend predictions format follows the same structure as [predictions in imported preannotations](/guide/tasks.html#How-to-import-preannotations)
+
+## How to make pre-annotations & pre-labeling & predictions
+You can import pre-annotated tasks into LS. Pre-annotations will be automatically shown on Labeling page. Prepare your tasks with `predictions` field which is very similar to `completions` and then import your tasks to LS. [Read more](tasks.html#Basic-format) about task format and predictions. The same format of predictions is used for the ML backend output. 
+<br>
+
+<center><img src="../images/completions-predictions-scheme.png" style="width: 100%; max-width: 481px; opacity: 0.9"></center>
+
+> Check completion format on Setup page or on Tasks page at `</>` (Show task data) button. Then make `result` field in your prediction is similar to the completion. 
+
+> You need to use different ids within any task elements, completions, predictions and thier `result` items. It's our LSF requirement.
+
+Let's use the following labeling config: 
+
+```xml
+<View>
+  <Choices name="choice" toName="image" showInLine="true">
+    <Choice value="Boeing" background="blue"/>
+    <Choice value="Airbus" background="green" />
+  </Choices>
+
+  <RectangleLabels name="label" toName="image">
+    <Label value="Airplane" background="green"/>
+    <Label value="Car" background="blue"/>
+  </RectangleLabels>
+
+  <Image name="image" value="$image"/>
+</View>
+```
+
+After the project setup is finished you can import this task (just copy this right into the input field on the Import page):  
+
+```json
+{
+  "data": {
+    "image": "http://localhost:8080/static/samples/sample.jpg" 
+  },
+
+  "predictions": [{
+    "result": [
+      {
+        "id": "result1",
+        "type": "rectanglelabels",        
+        "from_name": "label", "to_name": "image",
+        "original_width": 600, "original_height": 403,
+        "image_rotation": 0,
+        "value": {
+          "rotation": 0,          
+          "x": 4.98, "y": 12.82,
+          "width": 32.52, "height": 44.91,
+          "rectanglelabels": ["Airplane"]
+        }
+      },
+      {
+        "id": "result2",
+        "type": "rectanglelabels",        
+        "from_name": "label", "to_name": "image",
+        "original_width": 600, "original_height": 403,
+        "image_rotation": 0,
+        "value": {
+          "rotation": 0,          
+          "x": 75.47, "y": 82.33,
+          "width": 5.74, "height": 7.40,
+          "rectanglelabels": ["Car"]
+        }
+      },
+      {
+        "id": "result3",
+        "type": "choices",
+        "from_name": "choice", "to_name": "image",
+        "value": {
+          "choices": ["Airbus"]
+        }
+      }
+    ]
+  }]
+}
+```
+
+In this example there are 3 results inside of 1 prediction: 
+ * `result1` - the first bounding box
+ * `result2` - the second bounding box
+ * `result3` - choice selection 
+ 
+And the result will look as the following: 
+
+<center><img src="../images/predictions-loaded.jpg" style="width: 100%; max-width: 700px"></center>
+
+## How to display labels on bounding boxes, polygons and other regions
+<center>
+  <img src='../images/lsf-settings.png'>
+</center>
