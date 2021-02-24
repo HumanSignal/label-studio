@@ -237,7 +237,7 @@ You might want to use a Redis database if you find that relying on a file-based 
 
 Currently, this is only supported if the Redis database is hosted in the default mode, with the default IP address. 
 
-You can integrate Label Studio with Redis, but Label Studio does not manage the Redis database for you. See the [Redis Quick Start](Redis Quick Start) for details about hosting and managing your own Redis database.
+You can integrate Label Studio with Redis, but Label Studio does not manage the Redis database for you. See the [Redis Quick Start](https://redis.io/topics/quickstart) for details about hosting and managing your own Redis database.
 
 Because Redis is an in-memory database, data saved in Redis does not persist. To make sure you don't lose data, set up [Redis persistence](https://redis.io/topics/persistence) or use another method to persist the data, such as using Redis in the cloud with [Microsoft Azure](https://azure.microsoft.com/en-us/services/cache/) or [Amazon AWS](https://aws.amazon.com/redis/).
 
