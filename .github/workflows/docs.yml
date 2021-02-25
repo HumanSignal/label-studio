@@ -1,0 +1,45 @@
+name: label-studio:docs
+
+on:
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+      buildbranch:
+        description: 'choose branch to have docs from'
+        required: true
+        default: 'master'
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: Create EC2 instance
+      id: instance-ip
+      run: |
+        aws ec2 run-instances --region us-east-1 --image-id ami-0333c119f48892675 --count 1 --instance-type t2.micro --key-name antonht --security-group-ids sg-0850ca0db82046a01 --subnet-id subnet-06aa4adfb6ce27f1f > info
+        echo "::set-output name=ip::$(aws ec2 describe-instances --instance-ids `grep InstanceId info | awk -F ':' '{print $2}' | tr -cd '[:alnum:]._-'` --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)"
+        sleep 60
+
+
+
+    - name: Deploy EC2 instance
+      uses: fifsky/ssh-action@master
+      with:
+        command: |
+          bash deploy.sh ${{ github.event.inputs.buildbranch }}
+          wget -q -O - http://169.254.169.254/latest/meta-data/instance-id
+        host: ${{ steps.instance-ip.outputs.ip }}
+        user: ubuntu
+        key: ${{ secrets.PRIVATE_KEY}}
