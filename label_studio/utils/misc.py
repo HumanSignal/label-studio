@@ -362,10 +362,11 @@ def compare_with_none(field, inverted):
     return compare_with_none_func
 
 
-def check_port_in_use(host, port):
+def check_port_in_use(host, port, timeout=10):
     logger.info('Checking if host & port is available :: ' + str(host) + ':' + str(port))
     host = host.replace('https://', '').replace('http://', '')
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.settimeout(timeout)
         return s.connect_ex((host, port)) == 0
 
 
