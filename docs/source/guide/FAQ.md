@@ -63,96 +63,11 @@ The most common mistake while resource loading is <b>CORS</b> (Cross-Origin Reso
 
 <br/> 
 
-## How to make pre-annotations & pre-labeling & predictions
-You can import pre-annotated tasks into LS. Pre-annotations will be automatically shown on Labeling page. Prepare your tasks with `predictions` field which is very similar to `completions` and then import your tasks to LS. [Read more](tasks.html#Basic-format) about task format and predictions. The same format of predictions is used for the ML backend output. 
-<br>
-
-<center><img src="../images/completions-predictions-scheme.png" style="width: 100%; max-width: 481px; opacity: 0.9"></center>
-
-> Check completion format on Setup page or on Tasks page at `</>` (Show task data) button. Then make `result` field in your prediction is similar to the completion. 
-
-> You need to use different ids within any task elements, completions, predictions and thier `result` items. It's our LSF requirement.
-
-Let's use the following labeling config: 
-
-```xml
-<View>
-  <Choices name="choice" toName="image" showInLine="true">
-    <Choice value="Boeing" background="blue"/>
-    <Choice value="Airbus" background="green" />
-  </Choices>
-
-  <RectangleLabels name="label" toName="image">
-    <Label value="Airplane" background="green"/>
-    <Label value="Car" background="blue"/>
-  </RectangleLabels>
-
-  <Image name="image" value="$image"/>
-</View>
-```
-
-After the project setup is finished you can import this task (just copy this right into the input field on the Import page):  
-
-```json
-{
-  "data": {
-    "image": "http://localhost:8080/static/samples/sample.jpg" 
-  },
-
-  "predictions": [{
-    "result": [
-      {
-        "id": "result1",
-        "type": "rectanglelabels",        
-        "from_name": "label", "to_name": "image",
-        "original_width": 600, "original_height": 403,
-        "image_rotation": 0,
-        "value": {
-          "rotation": 0,          
-          "x": 4.98, "y": 12.82,
-          "width": 32.52, "height": 44.91,
-          "rectanglelabels": ["Airplane"]
-        }
-      },
-      {
-        "id": "result2",
-        "type": "rectanglelabels",        
-        "from_name": "label", "to_name": "image",
-        "original_width": 600, "original_height": 403,
-        "image_rotation": 0,
-        "value": {
-          "rotation": 0,          
-          "x": 75.47, "y": 82.33,
-          "width": 5.74, "height": 7.40,
-          "rectanglelabels": ["Car"]
-        }
-      },
-      {
-        "id": "result3",
-        "type": "choices",
-        "from_name": "choice", "to_name": "image",
-        "value": {
-          "choices": ["Airbus"]
-        }
-      }
-    ]
-  }]
-}
-```
-
-In this example there are 3 results inside of 1 prediction: 
- * `result1` - the first bounding box
- * `result2` - the second bounding box
- * `result3` - choice selection 
- 
-And the result will look as the following: 
-
-<center><img src="../images/predictions-loaded.jpg" style="width: 100%; max-width: 700px"></center>
-
 ## How to display labels on bounding boxes, polygons and other regions
 <center>
   <img src='../images/lsf-settings.png'>
 </center>
+
 
 ## How to run LSB with external domain name
  
@@ -246,3 +161,5 @@ print(pixel_x, pixel_y, pixel_width, pixel_height)
 x, y, width, height = convert_to_ls(pixel_x, pixel_y, pixel_width, pixel_height, 600, 403)
 print(x, y, width, height)
 ```
+
+
