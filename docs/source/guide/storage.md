@@ -92,7 +92,7 @@ You can also skip or leave the `"data_key"` parameter empty and Label Studio aut
 
 ### Optional parameters
 
-You can specify additional parameters with a command line escaped JSON string with `--source-params` / `--target-params` or from Label Studio UI.
+You can specify additional parameters with a command line escaped JSON string with `--source-params` or `--target-params` or from Label Studio UI.
 
 | Parameter | Description | Default |
 | --- | --- | --- |
@@ -156,7 +156,7 @@ You can also skip or leave the `"data_key"` parameter empty and Label Studio aut
 
 ### Optional parameters
 
-You can specify additional parameters with a command line escaped JSON string with `--source-params` / `--target-params` or from Label Studio UI.
+You can specify additional parameters with a command line escaped JSON string with `--source-params` or `--target-params` or from Label Studio UI.
 
 | Parameter | Description | Default |
 | --- | --- | --- |
@@ -219,7 +219,7 @@ You can also skip or leave the `"data_key"` parameter empty and Label Studio aut
 
 ### Optional parameters
 
-You can specify additional parameters with a command line escaped JSON string with `--source-params` / `--target-params` or from Label Studio UI.
+You can specify additional parameters with a command line escaped JSON string with `--source-params` or `--target-params` or from Label Studio UI.
 
 | Parameter | Description | Default |
 | --- | --- | --- |
@@ -261,18 +261,18 @@ The following commands launch Label Studio, configure the connection to your Red
 #### Read a Redis database with JSON-formatted tasks
 
 ```bash
-label-studio start my_project --init --source db --redis-config "{\"project_path\": \"my_project\"}"
+label-studio start my_project --init --source redis
 ```
 
 #### Write completions to a Redis database
 
 ```bash
-label-studio start my_project --init --target db --redis-config "{\"project_path\": \"my_project\", \"db\":\"2\"}"
+label-studio start my_project --init --target redis 
 ```
 
 ### Optional Redis configuration parameters
 
-You can specify additional parameters with a command line escaped JSON string with `--redis-config` or from Label Studio UI.
+You can specify additional parameters with a command line escaped JSON string with `--source-params` or `--target-params` or from Label Studio UI.
 
 | Parameter | Description | Default |
 | --- | --- | --- |
