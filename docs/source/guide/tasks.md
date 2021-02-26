@@ -229,7 +229,8 @@ label-studio init my-project --input-path=my/audios/dir --input-format=audio-dir
 > WARNING: the "--allow-serving-local-files" argument is intended for use only with locally-running instances of Label Studio. Avoid using it for remote servers unless you are sure what you're doing.
 
 
-## Set up task sampling for your project --> move to project setup page 
+## Set up task sampling for your project 
+<!--move to project setup page-->
 
 When you start Label Studio, you can define the way of how your imported tasks are exposed to annotators by setting up task sampling. To enable task sampling, specify one of the sampling option with the `--sampling=<option>` command line argument when you start Label Studio. <!--is there a way to do this from the UI?--> 
 
