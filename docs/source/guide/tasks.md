@@ -14,7 +14,7 @@ How you import data can depend on where your data is stored.
 - If your data is stored in a Redis database, see [Sync data from cloud or database storage](storage.html).
 - If your data is stored at internet-accessible URLs, [import it from the Label Studio UI](#Import-data-from-the-Label-Studio-UI).
 - If your data is stored locally in a directory, [import it from the command line](#Import-data-from-the-command-line).
-- If your data is stored locally as individual files, [import it from the Label Studio UI](#Import-data-from-the-Label-Studio-UI). 
+- If your data is stored locally as individual files, [import it from the Label Studio UI](#Import-data-from-the-Label-Studio-UI) or [import it from the command line](#Import-data-from-the-command-line). 
 
 ### Import data from the Label Studio UI
 
@@ -41,7 +41,6 @@ Import your data using the Label Studio server API. See the [API documentation](
 
 You can import many different types of data, including text, timeseries, audio, and image data. The file types supported depend on the type of data. 
 
-
 | Data type | Supported file types |
 | --- | --- |
 | Audio | .aiff, .au, .flac, .m4a, .mp3, .ogg, .wav |
@@ -52,7 +51,6 @@ You can import many different types of data, including text, timeseries, audio, 
 | Time series | .csv, .tsv |
 
 If you don't see a supported data or file type that you want to import, reach out in the [Label Studio Slack community](https://join.slack.com/t/label-studio/shared_invite/zt-cr8b7ygm-6L45z7biEBw4HXa5A2b5pw). 
-
 
 ## How to format your data to import it
 
@@ -74,6 +72,7 @@ Depending on the type of object tag, Label Studio interprets field values differ
 - `<TimeSeries value="$key">`: `value` is interpreted as a valid URL to a CSV/TSV file if `valueType="url"`, otherwise it is interpreted as a JSON dictionary with column arrays: `"value": {"first_column": [...], ...}` if `valueType="json"`. 
     
 You can add other, optional keys to the JSON file.
+
 | JSON key | Description |
 | --- | --- | 
 | id | Optional. Integer to use as the task ID. |
@@ -181,7 +180,6 @@ label-studio init my-project --input-path=my_tasks.txt --input-format=text --lab
 
 You might use plain text for labeling tasks if you have only one stream of input data, and only one [object tag](/tags) specified in your label config. 
 
-
 ```text
 this is a first task
 this is a second task
@@ -209,7 +207,7 @@ Run the following command to start Label Studio and import image files from a lo
 label-studio init my-project --input-path=dir/with/images --input-format=image-dir --label-config=config.xml --allow-serving-local-files
 ```
 
-> WARNING: the "--allow-serving-local-files" argument is intended for use only with locally-running instances of Label Studio. Avoid using it for remote servers unless you are sure what you're doing.
+> WARNING: the `--allow-serving-local-files` argument is intended for use only with locally-running instances of Label Studio. Avoid using it for remote servers unless you are sure what you're doing.
 
 
 ### Directory with audio files
@@ -228,7 +226,7 @@ Run the following command to start Label Studio and import audio files from a lo
 label-studio init my-project --input-path=my/audios/dir --input-format=audio-dir --label-config=config.xml --allow-serving-local-files
 ```
 
-> WARNING: the "--allow-serving-local-files" argument is intended for use only with locally-running instances of Label Studio. Avoid using it for remote servers unless you are sure what you're doing.
+> WARNING: the `--allow-serving-local-files` argument is intended for use only with locally-running instances of Label Studio. Avoid using it for remote servers unless you are sure what you're doing.
 
 
 ## Set up task sampling for your project 
@@ -237,6 +235,7 @@ label-studio init my-project --input-path=my/audios/dir --input-format=audio-dir
 When you start Label Studio, you can define the way of how your imported tasks are exposed to annotators by setting up task sampling. To enable task sampling, specify one of the sampling option with the `--sampling=<option>` command line argument when you start Label Studio. <!--is there a way to do this from the UI?--> 
 
 The following table lists the available sampling options: 
+
 | Option | Description |
 | --- | --- | 
 | sequential | Default. Tasks are shown to annotators in ascending order by the `id` field. |
