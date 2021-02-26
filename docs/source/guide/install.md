@@ -46,26 +46,47 @@ docker run --rm -p 8080:8080 -v `pwd`/my_project:/label-studio/my_project --name
 ```
 
 ### Install with Docker on Windows
-Or for Windows,
-TYPE THE COMMAND AGAIN BUT WINDOWSIFIED
+Or for Windows, run the following: 
 ```bash
-docker run --rm -p 8080:8080 -v `pwd`/my_project:/label-studio/my_project --name label-studio heartexlabs/label-studio:latest
+docker run --rm -p 8080:8080 -v `pwd`\my_project:\label-studio\my_project --name label-studio heartexlabs/label-studio:latest
 ```
-> Note: for Windows, you have to modify the volumes paths set by `-v` option
+<!--> Note: for Windows, you have to modify the volumes paths set by `-v` option-->
 
-### Troubleshoot Docker install
-> Note: if `./my_project` the folder exists, you see an error and Label Studio fails to start. Rename or delete this folder or use the `--force` option.
-
-You can override the default startup command by appending any of [available command line arguments]():
+#### Override the default Docker install
+By default, the default Docker install command creates a blank project in a `./my_project` directory. If the `./my_project` folder already exists, Label Studio fails to start. Rename or delete the folder, or use the `--force` argument to force Label Studio to start: 
 
 ```bash
-docker run -p 8080:8080 -v `pwd`/my_project:/label-studio/my_project --name label-studio heartexlabs/label-studio:latest label-studio start my_project --init --force --template image_mixedlabel
+docker run -p 8080:8080 -v `pwd`/my_project:/label-studio/my_project --name label-studio heartexlabs/label-studio:latest label-studio start my_project --init --force --template text_classification
 ```
 
-### Build a local image of Label Studio in Docker
+### Build a local image with Docker
 If you want to build a local image, run:
 ```bash
 docker build -t heartexlabs/label-studio:latest .
+```
+
+### Run with Docker Compose
+Use Docker Compose to serve Label Studio at `http://localhost:8080`.
+
+Run this command the first time you run Label Studio:
+```bash
+INIT_COMMAND='--init' docker-compose up -d
+```
+
+Start Label Studio after you have an existing project:
+```bash
+docker-compose up -d
+```
+
+Start Label Studio and reset all project data: 
+```bash
+INIT_COMMAND='--init --force' docker-compose up -d
+```
+You can also set environment variables in the .env file instead of specifying `INIT_COMMAND`. 
+
+For example, add the following line to have the option to reset all project data when starting Label Studio:
+```bash
+INIT_COMMAND=--init --force
 ```
 
 ## Install from source
@@ -86,19 +107,50 @@ label-studio start my_project --init
 The default web browser opens automatically at [http://localhost:8080](http://localhost:8080).
 
 
+## Install locally with Anaconda
 
-## MISCELLANEOUS STARTING AND RUNNING STUFF IS BELOW THIS HEADER
+```bash
+conda create --name label-studio python=3.8
+conda activate label-studio
+pip install label-studio
+```
 
+## Install for local development
+
+You can run the latest Label Studio version locally without installing the package with pip. 
+
+```bash
+# Install all package dependencies
+pip install -e .
+```
+```bash
+# Start the server at http://localhost:8080
+python label_studio/server.py start labeling_project --init
+```
+
+## Troubleshoot installation
+If you see any errors during installation, try to rerun the installation
+
+```bash
+pip install --ignore-installed label-studio
+```
+
+
+
+## Advanced options for starting and running Label Studio
+
+Additional options for starting and running Label Studio after you install. 
 
 ### Multisession mode
 
-You can start Label Studio in _multisession mode_ - each browser session creates its own project with associated session ID as a name.
+You can start Label Studio in **multisession mode**. In this mode, each browser session creates its own project with the associated session ID as a name.
 
-In order to launch Label Studio in multisession mode and keep all projects in a separate directory `session_projects`, run
+In order to launch Label Studio in multisession mode and keep all projects in a separate directory `session_projects`, run the following:
 
 ```bash
 label-studio start-multi-session --root-dir ./session_projects
 ```
+Additional command line arguments are not supported in multisession mode. 
 
 
 ## Command line arguments
@@ -113,7 +165,7 @@ You can restrict access to Label Studio with basic HTTP authentication.
 label-studio start my_project --username user --password pwd 
 ```
 
-Or put `username` and `password` in the project config.json.
+Or place `username` and `password` in the project config.json.
  
 ```
 { 
@@ -124,12 +176,12 @@ Or put `username` and `password` in the project config.json.
 }
 ```
 
-> For docker you need to set up environment variables `USERNAME` and `PASSWORD`
+> For Docker, you must set up `USERNAME` and `PASSWORD` environment variables .
 
-It will be the same username and password for all the users.
+Label Studio uses the same username and password for all users.
 
 
-### WSGIServer instead of Flask
+### Use WSGIServer instead of Flask
 
 Use `--use-gevent` option on start to enable WSGI server. It wraps around app.run with gevent's WSGIServer to enable the server to better handle concurrent requests.
 
@@ -139,22 +191,24 @@ label-studio start test --use-gevent
 
 ### HTTPS & SSL
 
-You can enable https protocol for Flask or WSGIServer. You need to generate SSL certificate and key for it, e.g.: 
+You can enable the HTTPS protocol for Flask or WSGIServer. You must generate an SSL certificate and key for it. 
+
+For example, run the following to generate a certificate and key file: 
 
 ```
 openssl req -newkey rsa:2048 -nodes -keyout key.pem -x509 -days 365 -out certificate.pem
 ```
 
-Than you need to use `--cert` and `--key` option on start:
+Then, use the `--cert` and `--key` options to start Label Studio:
 
 ```
 label-studio start test --cert certificate.pem --key key.pem
 ```
 
 
-### Health check
+## Health check for Label Studio
 
-LS has a special endpoint for health checks: 
+LS has a special endpoint to run health checks: 
   
 ```
 /api/health
