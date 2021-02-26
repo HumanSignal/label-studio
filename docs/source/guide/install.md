@@ -5,9 +5,11 @@ order: 101
 ---
 
 Install Label Studio on-premises or in the cloud. Choose the install method that works best for your environment:
-- [Install with pip](#install-with-pip)
-- [Install with Docker](#install-with-docker)
-- [Install from source](#install-from-source)
+- [Install with pip](#Install-with-pip)
+- [Install with Docker](#Install-with-docker)
+- [Install from source](#Install-from-source)
+- [Install with Anaconda](#Install-with-Anaconda)
+- [Install for local development](#Install-for-local-development)
 <!--add anaconda and info from README here, make sure they match-->
 
 
@@ -33,6 +35,12 @@ label-studio start my_project --init
 ```
 The default web browser opens automatically at [http://localhost:8080](http://localhost:8080) with Label Studio.
 
+### Troubleshoot installation
+If you see any errors during installation, try to rerun the installation.
+
+```bash
+pip install --ignore-installed label-studio
+```
 
 ## Install with Docker
 
@@ -107,7 +115,7 @@ label-studio start my_project --init
 The default web browser opens automatically at [http://localhost:8080](http://localhost:8080).
 
 
-## Install locally with Anaconda
+## Install with Anaconda
 
 ```bash
 conda create --name label-studio python=3.8
@@ -128,14 +136,6 @@ pip install -e .
 python label_studio/server.py start labeling_project --init
 ```
 
-## Troubleshoot installation
-If you see any errors during installation, try to rerun the installation
-
-```bash
-pip install --ignore-installed label-studio
-```
-
-
 
 ## Advanced options for starting and running Label Studio
 
@@ -145,7 +145,7 @@ Additional options for starting and running Label Studio after you install.
 
 You can start Label Studio in **multisession mode**. In this mode, each browser session creates its own project with the associated session ID as a name.
 
-In order to launch Label Studio in multisession mode and keep all projects in a separate directory `session_projects`, run the following:
+In order to launch Label Studio in multisession mode and keep all projects in a separate directory called `session_projects`, run the following:
 
 ```bash
 label-studio start-multi-session --root-dir ./session_projects
@@ -159,13 +159,14 @@ You can specify input tasks, project config, machine learning backend and other 
 
 
 ### Authenticate with login and password
-You can restrict access to Label Studio with basic HTTP authentication.
+You can restrict access to Label Studio using basic HTTP authentication. You can specify a username and password to use when starting Label Studio, or use the project `config.json` file. 
 
-```
+Start Label Studio with HTTP authentication from the command line:
+```bash
 label-studio start my_project --username user --password pwd 
 ```
 
-Or place `username` and `password` in the project config.json.
+Require HTTP authentication when starting Label Studio by placing `username` and `password` in the project config.json as follows:
  
 ```
 { 
@@ -176,7 +177,7 @@ Or place `username` and `password` in the project config.json.
 }
 ```
 
-> For Docker, you must set up `USERNAME` and `PASSWORD` environment variables .
+Use HTTP authentication with Label Studio in Docker, by setting up `USERNAME` and `PASSWORD` environment variables. 
 
 Label Studio uses the same username and password for all users.
 
@@ -207,6 +208,7 @@ label-studio start test --cert certificate.pem --key key.pem
 
 
 ## Health check for Label Studio
+<!--move to troubleshooting-->
 
 LS has a special endpoint to run health checks: 
   

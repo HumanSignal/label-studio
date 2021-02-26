@@ -24,7 +24,7 @@ Follow these steps to start labeling your data with Label Studio:
 5. [Review the completed labeling tasks]().
 6. [Export the labeled data or the annotations](export.html).
 
-By default, Label Studio supports 1 project and 1 labeling configuration for the dataset in that project. To label multiple different types of data with different types of labeling configurations in different projects, start Label Studio in multi-session mode, or use Label Studio Enterprise Edition. 
+By default, Label Studio supports 1 project and 1 labeling configuration for the dataset in that project. To label multiple different types of data with different types of labeling configurations in different projects, [start Label Studio in multi-session mode](install.html#Multisession-mode), or use Label Studio Enterprise Edition. 
 
 After you finish labeling your data, you can review the results and export the annotated data in a variety of formats. 
 
@@ -52,7 +52,7 @@ The component parts of Label Studio are available as modular extensible packages
 
 <br>
 <div style="margin:auto; text-align:center;"><img src="/images/ls-modules-scheme.png" style="opacity: 0.8"/></div>
-
+<!--update to include data manager--> 
 
 ## Information collected by Label Studio
 
