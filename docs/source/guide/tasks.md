@@ -10,17 +10,18 @@ Get data into Label Studio by importing files, referencing URLs, or syncing with
 
 How you import data can depend on where your data is stored.
 
-- Stored in a cloud storage bucket? See [Sync data from cloud or database storage](storage.html).
-- Stored in a Redis database? See [Sync data from cloud or database storage](storage.html).
-- Stored at internet-accessible URLs or stored locally? Import from the UI or using the command line.
-- Stored locally?  
+- If your data is stored in a cloud storage bucket, see [Sync data from cloud or database storage](storage.html).
+- If your data is stored in a Redis database, see [Sync data from cloud or database storage](storage.html).
+- If your data is stored at internet-accessible URLs, [import it from the Label Studio UI](#Import-data-from-the-Label-Studio-UI).
+- If your data is stored locally in a directory, [import it from the command line](#Import-data-from-the-command-line).
+- If your data is stored locally as individual files, [import it from the Label Studio UI](#Import-data-from-the-Label-Studio-UI). 
 
 ### Import data from the Label Studio UI
 
 To import data from the Label Studio UI, do the following:
 1. Start Label Studio from the command line.
 2. On the Label Studio UI, open the import page available at [http://localhost:8080/import](http://localhost:8080/import).
-3. Import your data as files or URLs. 
+3. Import your data from files or URLs. 
 
 ### Import data from the command line
 
@@ -29,7 +30,7 @@ To import data from the command line, do the following:
 1. Start Label Studio and use command line arguments to specify the path to the data and format of the data. <br/>For example: <br/>`label-studio init --input-path my_tasks.json --input-format json`
 2. Open the Label Studio UI and confirm that your data was properly imported. 
 
-You can use the `--input-path` argument to specify a file or directory with the data that you want to label. By default, Label Studio expects JSON-formatted tasks using the [Basic Label Studio JSON format](tasks.html#Basic-Label-Studio-JSON-format). You can specify other data formats using the `--input-format` argument. 
+You can use the `--input-path` argument to specify a file or directory with the data that you want to label. By default, Label Studio expects JSON-formatted tasks using the [Basic Label Studio JSON format](tasks.html#Basic-Label-Studio-JSON-format). You can specify other data formats using the `--input-format` argument. For examples, see [Types of data you can import into Label Studio](#Types-of-data-you-can-import-into-Label-Studio) on this page.
 
 ### Import data using the API
 
@@ -39,6 +40,7 @@ Import your data using the Label Studio server API. See the [API documentation](
 ## Types of data you can import into Label Studio
 
 You can import many different types of data, including text, timeseries, audio, and image data. The file types supported depend on the type of data. 
+
 
 | Data type | Supported file types |
 | --- | --- |
