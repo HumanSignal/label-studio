@@ -12,11 +12,12 @@ For example, multi-task labeling that includes text, image, and audio data objec
 <br>
 
 <img src="/images/labeling.png">
+<!--replace screenshot, it's out of date-->
 
 
 ## Label and annotate your data 
 
-Most of the actions described in this section are similar for all the data objects (images, audio, text, etc.).
+Most of the actions described in this section are similar for all the data object tags (images, audio, text, and so on).
 
 ### Choices, TextArea and other basic tags
 These tags create straightforward labeling interfaces that don't require detailed instructions. 
@@ -47,12 +48,13 @@ After labeling a region, you can delete the annotation.
 
 You can create relations between two results with both directions and labels. To add labels to directions, you must set up a labeling config with the relations tag. See more about [relations with labels](/tags/relations.html) in the Tags documentation.
 
-<br>
-<img src="/images/screens/relations.png">
-
 1. Select the region for the annotation that you want to relate to another annotation. If you're creating a direction-based relation, select the first one first. 
 2. In the **Regions** section of the **Results** sidebar, click the **Create Relation** button that looks like a hyperlink icon.
 3. Select the second region for the annotation to complete the relation.
+
+<br>
+<img src="/images/screens/relations.png">
+<!--relations look a little bit different now, update this-->
 
 After you relate two annotation regions, you can modify the relation in the **Relations** section of the **Results** sidebar. 
 - To change the direction of the relation, click the direction button between the two related regions.
