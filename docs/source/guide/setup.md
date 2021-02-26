@@ -89,7 +89,7 @@ You can also use Label Studio in multi-session mode. See [Install Label Studio](
 ### Project directory structure
 
 The project directory is structured as follows: 
-```bash
+```
 ├── my_project
 │   ├── config.json     // project settings
 │   ├── tasks.json      // all imported tasks in a JSON dictionary: {task_id: task}
