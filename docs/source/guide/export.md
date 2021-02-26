@@ -5,7 +5,7 @@ order: 107
 ---
 
 ## What to export from Label Studio
-You can export either the dataset that you labeled including the completed annotations or just the annotations from Label Studio. 
+You can export the dataset that you labeled, including the completed annotations, or just export the annotations from Label Studio. 
 
 Label Studio stores your annotations in a raw JSON format in the `my_project_name/completions` directory, or whichever cloud or database storage you specify as target storage, with one file per labeled task named as `task_id.json`.
 
@@ -18,7 +18,7 @@ You can convert the raw JSON completed annotations stored by Label Studio into a
 - Run the relevant [converter tool](https://github.com/heartexlabs/label-studio-converter) on the directory of completed annotations using the command line or Python.
 - Call the API to export data. See the Label Studio [API documentation](api.html).
 
-## Raw JSON format of completed labeled tasks 
+## Raw JSON format of completed tasks 
 
 When you annotate data, Label Studio stores the output in JSON-formatted files, with one file for each completed data labeling task. 
 
@@ -129,7 +129,7 @@ The raw JSON structure of each completed task follows this example:
 
 ## Export formats supported by Label Studio
 
-Label Studio supports many common and standard formats for exporting completed labeling tasks. If you don't see a format that works for you, you can contribute one. See the [Github repository for the Label Studio Converter too](https://github.com/heartexlabs/label-studio-converter).
+Label Studio supports many common and standard formats for exporting completed labeling tasks. If you don't see a format that works for you, you can contribute one. See the [Github repository for the Label Studio Converter tool](https://github.com/heartexlabs/label-studio-converter).
 
 ### JSON
 
