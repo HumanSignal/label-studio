@@ -64,36 +64,41 @@ The most common mistake while resource loading is <b>CORS</b> (Cross-Origin Reso
 <br/> 
 
 ## How to display labels on bounding boxes, polygons and other regions
+
+Click the gear icon when labeling to configure the labeling interface to suit your labeling use case.
+
 <center>
   <img src='../images/lsf-settings.png'>
 </center>
 
 
-## How to run LSB with external domain name
+## How to run Label Studio with external domain name
  
-If you want to run LSB with some domain name you need to use Host, Protocol, Port parameters at LS run. They are responsible for correct URLs while a resource files import (images, audio, etc) and sample tasks generation.   
+If you want to run LSB with a domain name, you need to use the Host, Protocol, Port parameters when you start Label Studio. These parameters ensure that the correct URLs are created when importing resource files (images, audio, etc) and generating sample tasks.   
 
-There are several possible ways to do it:
+There are several possible ways run Label Studio with an external domain name.
  
-1. Replace these parameters inside of your `project/config.json` (or `label_studio/utils/schema/default_config.json` from LSB package directory).
-2. Specify these parameters at start: `label-studio start --host label-studio.example.com --protocol http:// --port 8080`.
-3. For docker usage: specify environment variables `HOST`, `PROTOCOL`, `PORT` while docker setup. 
+- Replace the host, protocol, and port parameters in the `project/config.json` file, or or `label_studio/utils/schema/default_config.json` in the Label Studio package directory.
+- Specify the parameters when you start Label Studio: `label-studio start --host label-studio.example.com --protocol http:// --port 8080`.
+- For Docker installations, specify the parameters as environment variables `HOST`, `PROTOCOL`, `PORT` when setting up Docker.
 
-LSB web server always use `0.0.0.0` address for start. But if you really need to change it to `localhost` just set Host as `localhost` and web server will start at `localhost`.  
+The Label Studio web server always uses the `0.0.0.0` address to start. If you really need to change it to `localhost`, set Host to `localhost` and the web server starts at `localhost`.  
 
 > If your external host has a port, e.g.: `77.77.77.77:1234` then you have to specify HOST with the port together `HOST=77.77.77.77:1234`.
+<!--then what is the port parameter for?-->
 
 <br/>
 <center>
   <img style="opacity: 0.75" src='../images/host-protocol-port.png'>
 </center>
+<!--add alt text-->
 
 
-## What units are x, y, width and height for image results?
+## What units are the x, y, width and height for image results?
 
-x, y, width and height are in percents of image dimensions.
+x, y, width and height are in percentages of image dimensions.
 
-Convertation formulas for `x, y, width, height` to pixel units:
+To convert those percentages to pixels, use the following conversion formulas for `x, y, width, height`:
 
 ```
 pixel_x = x / 100.0 * original_width
@@ -102,7 +107,7 @@ pixel_width = width / 100.0 * original_width
 pixel_height = height / 100.0 * original_height
 ```
 
-Example: 
+For example: 
 
 ```python
 task = {
