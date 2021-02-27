@@ -1,7 +1,7 @@
 ---
 title: Set up machine learning with your labeling process
 type: guide
-order: 906
+order: 606
 ---
 
 Set up machine learning with your labeling process by setting up a machine learning backend for Label Studio. 

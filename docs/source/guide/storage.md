@@ -37,7 +37,7 @@ In the Label Studio UI, do the following to set up the connection:
 3. For **Source Storage**, click the gear icon. 
 4. In the dialog box that appears, select **Amazon S3** as the storage type.
 5. Specify the path to the S3 bucket.
-6. (Optional) Adjust the remaining parameters. See [Optional parameters](#optional-parameters) on this page for more details.
+6. (Optional) Adjust the remaining parameters. See [Optional parameters](#Optional-parameters) on this page for more details.
 7. Click **Apply & Sync Tasks**.
 8. Repeat these steps for **Target Storage** to sync completed data annotations to a bucket.
 
@@ -114,7 +114,7 @@ In the Label Studio UI, do the following to set up the connection:
 3. For **Source Storage**, click the gear icon. 
 4. In the dialog box that appears, select **Google Cloud Storage** as the storage type.
 5. Specify the path to the GCS bucket.
-6. (Optional) Adjust the remaining parameters. See [Optional parameters](#optional-parameters) on this page for more details.
+6. (Optional) Adjust the remaining parameters. See [Optional parameters](#Optional-parameters-1) on this page for more details.
 7. Click **Apply & Sync Tasks**.
 8. Repeat these steps for **Target Storage** to sync completed data annotations to a bucket.
 
@@ -185,7 +185,7 @@ In the Label Studio UI, do the following to set up the connection:
 3. For **Source Storage**, click the gear icon. 
 4. In the dialog box that appears, select **Azure Blob Storage** as the storage type.
 5. Specify the name of the Azure Blob container.
-6. (Optional) Adjust the remaining parameters. See [Optional parameters](#optional-parameters) on this page for more details.
+6. (Optional) Adjust the remaining parameters. See [Optional parameters](#Optional-parameters-2) on this page for more details.
 7. Click **Apply & Sync Tasks**.
 8. Repeat these steps for **Target Storage** to sync completed data annotations to a container.
 
@@ -249,7 +249,7 @@ In the Label Studio UI, do the following to set up the connection:
 2. Open **Settings > Cloud storage sync**.
 3. For **Source Storage**, click the gear icon. 
 4. In the dialog box that appears, select **Redis Database** as the storage type.
-5. (Optional) Update Redis configuration parameters.
+5. (Optional) Update Redis configuration parameters. See [Optional Redis configuration parameters](#Optional-Redis-configuration-parameters) on this page for the list.
 7. Click **Apply & Sync Tasks**.
 8. Repeat these steps for **Target Storage** to sync completed data annotations to the Redis database.
 

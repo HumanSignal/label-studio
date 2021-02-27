@@ -10,9 +10,6 @@ Label Studio is an open source data labeling tool for labeling and exploring mul
 
 You can also integrate Label Studio with machine learning models to supply predictions for labels (pre-labels), or perform continuous active learning. See [Set up machine learning with your labeling process](ml.html). 
 
-Label Studio is also available as Enterprise and Cloud editions with additional features. See [What you get from Label Studio]() for more. 
-
-
 ## Get started labeling your data
 
 Follow these steps to start labeling your data with Label Studio: 
@@ -20,21 +17,10 @@ Follow these steps to start labeling your data with Label Studio:
 1. [Install Label Studio](install.html).
 2. [Import data as labeling tasks](tasks.html). 
 3. [Set up the labeling project](setup.html). Define the type of labeling to perform on the dataset, and add the labels that you want annotators to apply. 
-4. [Label and annotate the data](labeling.html).
-5. [Review the completed labeling tasks]().
-6. [Export the labeled data or the annotations](export.html).
+4. [Label and annotate the data](labeling.html). 
+5. [Export the labeled data or the annotations](export.html).
 
-By default, Label Studio supports 1 project and 1 labeling configuration for the dataset in that project. To label multiple different types of data with different types of labeling configurations in different projects, [start Label Studio in multi-session mode](install.html#Multisession-mode), or use Label Studio Enterprise Edition. 
-
-After you finish labeling your data, you can review the results and export the annotated data in a variety of formats. 
-
-## Label Studio terminology
-
-
-
-
-
-
+By default, Label Studio supports 1 project and 1 labeling configuration for the dataset in that project. To label multiple different types of data with different types of labeling configurations in different projects, [start Label Studio in multi-session mode](install.html#Multisession-mode). 
 
 ## About Label Studio components and architecture
 You can use any of the Label Studio components in your own tools, or customize them to suit your needs. Before customizing Label Studio extensively, you might want to review Label Studio Enterprise Edition to see if it already contains the relevant functionality you want to build. See [What you get from Label Studio]() for more. 
