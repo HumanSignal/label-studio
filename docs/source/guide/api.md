@@ -4,13 +4,13 @@ type: guide
 order: 907
 ---
 
-> These API endpoints were introduced in Label Studio version 0.8.1. Subject to change before version 1.0.0
+> These API endpoints were introduced in Label Studio version 0.8.1. They are subject to change before version 1.0.0
 
-### Setup project configuration
+### Set up project configuration
 
 `POST /api/project/config`
 
-Save labeling config for the project using API: 
+Save labeling config for a project using API: 
 ```
 curl -X POST -H Content-Type:application/json http://localhost:8080/api/project/config \
 --data "{\"label_config\": \"<View>[...]</View>\"}"
@@ -23,8 +23,8 @@ curl -X POST -H Content-Type:application/xml http://localhost:8080/api/project/c
 --data @config.xml
 ```
 
-The backend should return status 201 if the config is valid and saved. 
-If errors occur the backend returns status 400 and the response body will be JSON dict: 
+The backend returns status 201 if the config is valid and saved. 
+If errors occur, the backend returns status 400 and the response body is a JSON dict like the following: 
 ```
 {
   "label_config": ["error 1 description", " error 2 description", ...]
@@ -35,14 +35,14 @@ If errors occur the backend returns status 400 and the response body will be JSO
 
 `POST /api/project/import`
 
-Use API to import tasks in [Label Studio basic format](tasks.html#Basic-format) useful when you are creating a data stream.
+Use the API to import tasks in [Label Studio basic format](tasks.html#Basic-format), which can be useful when you are creating a data stream.
 
 ```bash
 curl -X POST -H Content-Type:application/json http://localhost:8080/api/project/import \
 --data "[{\"my_key\": \"my_value_1\"}, {\"my_key\": \"my_value_2\"}]"
 ```
 
-Or you can import a file and make an LS task automatically:
+Or you can import a file and make a Label Studio task automatically:
 
 ```bash
 curl -X POST -F "FileUpload=@test.jpg" http://localhost:8080/api/project/import
@@ -52,7 +52,7 @@ curl -X POST -F "FileUpload=@test.jpg" http://localhost:8080/api/project/import
 
 `GET /api/project`
 
-You can retrieve project settings including total task count using API in JSON format: 
+You can retrieve project settings, including the total task count, using the API in JSON format: 
 
 ```json
 curl http://localhost:8080/api/project/
@@ -107,16 +107,18 @@ Response example:
 
 `GET /api/project/export`
 
-You can use an API to request a file with all annotations, e.g.
+You can use the API to request a file with all annotations, for example:
 
 ```bash
 curl http://localhost:8080/api/project/export?format=JSON > exported_results.json
 ```
 
-The formats descriptions are presented [above](#Export-formats). 
-The `format` parameters could be found on the Export page in the dropdown (`JSON`, `JSON_MIN`, `COCO`, `VOC`, etc).
+The format descriptions are presented [in the export documentation](export.html). 
+The `format` parameters can be found on the Export page in the dropdown (`JSON`, `JSON_MIN`, `COCO`, `VOC`, etc).
 
 ### Reference
+Label Studio API endpoint reference.
+
 
 | URL | Description |
 | --- | --- |

@@ -1,5 +1,5 @@
 ---
-title: Cloud storages
+title: Sync data from cloud or database storage
 type: guide
 order: 103
 ---
@@ -20,10 +20,10 @@ You can change parameters like the prefix or matching filename regex at any time
 > Note: Choose your target storage carefully. When you start the labeling project, it must be empty or contain completions that match previously created or imported tasks from source storage. Tasks are synced with completions based on internal IDs (keys in `source.json`/`target.json` files in your project directory), so if you accidentally connect to the target storage with existing completions with the same IDs, the connection might fail with undefined behavior.  
 
 Set up the following cloud and other storage systems with Label Studio:
-- [Amazon S3](#amazon-s3)
-- [Google Cloud Storage](#google-cloud-storage)
-- [Microsoft Azure Blob storage](#microsoft-azure-blob-storage)
-- [Redis database](#redis-database)
+- [Amazon S3](#Amazon-S3)
+- [Google Cloud Storage](#Google-Cloud-Storage)
+- [Microsoft Azure Blob storage](#Microsoft-Azure-Blob-storage)
+- [Redis database](#Redis-database)
 
 ## Amazon S3
 
@@ -37,7 +37,7 @@ In the Label Studio UI, do the following to set up the connection:
 3. For **Source Storage**, click the gear icon. 
 4. In the dialog box that appears, select **Amazon S3** as the storage type.
 5. Specify the path to the S3 bucket.
-6. (Optional) Adjust the remaining parameters. See [Optional parameters](#optional-parameters) on this page for more details.
+6. (Optional) Adjust the remaining parameters. See [Optional parameters](#Optional-parameters) on this page for more details.
 7. Click **Apply & Sync Tasks**.
 8. Repeat these steps for **Target Storage** to sync completed data annotations to a bucket.
 
@@ -92,7 +92,7 @@ You can also skip or leave the `"data_key"` parameter empty and Label Studio aut
 
 ### Optional parameters
 
-You can specify additional parameters with a command line escaped JSON string via `--source-params` / `--target-params` or from the UI.
+You can specify additional parameters with a command line escaped JSON string with `--source-params` or `--target-params` or from Label Studio UI.
 
 | Parameter | Description | Default |
 | --- | --- | --- |
@@ -114,7 +114,7 @@ In the Label Studio UI, do the following to set up the connection:
 3. For **Source Storage**, click the gear icon. 
 4. In the dialog box that appears, select **Google Cloud Storage** as the storage type.
 5. Specify the path to the GCS bucket.
-6. (Optional) Adjust the remaining parameters. See [Optional parameters](#optional-parameters) on this page for more details.
+6. (Optional) Adjust the remaining parameters. See [Optional parameters](#Optional-parameters-1) on this page for more details.
 7. Click **Apply & Sync Tasks**.
 8. Repeat these steps for **Target Storage** to sync completed data annotations to a bucket.
 
@@ -156,7 +156,7 @@ You can also skip or leave the `"data_key"` parameter empty and Label Studio aut
 
 ### Optional parameters
 
-You can specify additional parameters with a command line escaped JSON string via `--source-params` / `--target-params` or from the UI.
+You can specify additional parameters with a command line escaped JSON string with `--source-params` or `--target-params` or from Label Studio UI.
 
 | Parameter | Description | Default |
 | --- | --- | --- |
@@ -185,7 +185,7 @@ In the Label Studio UI, do the following to set up the connection:
 3. For **Source Storage**, click the gear icon. 
 4. In the dialog box that appears, select **Azure Blob Storage** as the storage type.
 5. Specify the name of the Azure Blob container.
-6. (Optional) Adjust the remaining parameters. See [Optional parameters](#optional-parameters) on this page for more details.
+6. (Optional) Adjust the remaining parameters. See [Optional parameters](#Optional-parameters-2) on this page for more details.
 7. Click **Apply & Sync Tasks**.
 8. Repeat these steps for **Target Storage** to sync completed data annotations to a container.
 
@@ -219,7 +219,7 @@ You can also skip or leave the `"data_key"` parameter empty and Label Studio aut
 
 ### Optional parameters
 
-You can specify additional parameters with the command line escaped JSON string via `--source-params` / `--target-params` or from the UI.
+You can specify additional parameters with a command line escaped JSON string with `--source-params` or `--target-params` or from Label Studio UI.
 
 | Parameter | Description | Default |
 | --- | --- | --- |
@@ -237,7 +237,7 @@ You might want to use a Redis database if you find that relying on a file-based 
 
 Currently, this is only supported if the Redis database is hosted in the default mode, with the default IP address. 
 
-You can integrate Label Studio with Redis, but Label Studio does not manage the Redis database for you. See the [Redis Quick Start](Redis Quick Start) for details about hosting and managing your own Redis database.
+You can integrate Label Studio with Redis, but Label Studio does not manage the Redis database for you. See the [Redis Quick Start](https://redis.io/topics/quickstart) for details about hosting and managing your own Redis database.
 
 Because Redis is an in-memory database, data saved in Redis does not persist. To make sure you don't lose data, set up [Redis persistence](https://redis.io/topics/persistence) or use another method to persist the data, such as using Redis in the cloud with [Microsoft Azure](https://azure.microsoft.com/en-us/services/cache/) or [Amazon AWS](https://aws.amazon.com/redis/).
 
@@ -249,7 +249,7 @@ In the Label Studio UI, do the following to set up the connection:
 2. Open **Settings > Cloud storage sync**.
 3. For **Source Storage**, click the gear icon. 
 4. In the dialog box that appears, select **Redis Database** as the storage type.
-5. (Optional) Update Redis configuration parameters.
+5. (Optional) Update Redis configuration parameters. See [Optional Redis configuration parameters](#Optional-Redis-configuration-parameters) on this page for the list.
 7. Click **Apply & Sync Tasks**.
 8. Repeat these steps for **Target Storage** to sync completed data annotations to the Redis database.
 
@@ -261,18 +261,18 @@ The following commands launch Label Studio, configure the connection to your Red
 #### Read a Redis database with JSON-formatted tasks
 
 ```bash
-label-studio start my_project --init --source db --redis-config "{\"project_path\": \"my_project\"}"
+label-studio start my_project --init --source redis
 ```
 
 #### Write completions to a Redis database
 
 ```bash
-label-studio start my_project --init --target db --redis-config "{\"project_path\": \"my_project\", \"db\":\"2\"}"
+label-studio start my_project --init --target redis 
 ```
 
 ### Optional Redis configuration parameters
 
-You can specify additional parameters with the command line escaped JSON string via `--redis-config` or from the UI.
+You can specify additional parameters with a command line escaped JSON string with `--source-params` or `--target-params` or from Label Studio UI.
 
 | Parameter | Description | Default |
 | --- | --- | --- |

@@ -1,45 +1,34 @@
 ---
-title: Project setup
+title: Set up your labeling project
 type: guide
-order: 101
+order: 104
 ---
 
-**Project** is a directory where all annotation assets are located. It is a self-contained entity: when you start Label Studio for the first time e.g. `label-studio start ./my_project --init`,
-it creates a directory `./my_project` from where its launched.
+All labeling activities in Label Studio occur in the context of a project. 
 
-If you want to start another project, just remove `./my_project` directory, or create a new one by running `label-studio start /path/to/new/project --init`.
+## Customize the labeling interface for your project
 
-## Structure
+Configure the labels and task type for annotators using the templates included with Label Studio or by defining your own combination of tags to customize the labeling interface for your project. 
 
-**Project directory** is structured as follows:
+### Select one of the available templates or customize one
 
-```bash
-├── my_project
-│   ├── config.json     // project settings
-│   ├── tasks.json      // all imported tasks in a dict like {task_id: task}
-│   ├── config.xml      // current project labeling config
-│   ├── completions     // directory with one completion per task_id stored in one file
-│   │   ├── <task_id>.json
-│   ├── export          // stores archives with all results exported form web UI 
-│   │   ├── 2020-03-06-15-23-47.zip
-```
+You can select or customize a [labeling config template](https://labelstud.io/templates/) or use a custom configuration that you create. If you create a custom configuration that might be useful to other Label Studio users, consider [contributing the configuration as a template](https://github.com/heartexlabs/label-studio/tree/master/label_studio/examples).
 
-> Warning: It is not recommended to modify any of the internal project files. For importing tasks, exporting completions or changing label config please use web UI or command line arguments (see `label-studio start --help` for details)
+The labeling configuration for a project is an XML file that contains three types of tags specific to Label Studio.
 
-## Labeling config
+| Tag type | When to use |
+| --- | --- |
+| Object | Specify the data type and input data sources from your dataset. |
+| Control | Configure how the annotation results appear. |
+| Visual | Define how the user interface looks for labeling. | 
 
-Project labeling config is an XML file that consists of:
+Combine these tags to create a custom label configuration for your dataset. 
 
-- **object tags** specifying input data sources from imported tasks,
-- **control tags** for configuring labeling schema (how annotation result looks like),
-- **visual tags** applying different user interface styles.
+<a class="button" href="/tags">See All Available Tags</a>
 
-<a class="button" href="/tags">Check Available Tags</a>
+### Example labeling config
 
-#### Example
-
-Here an example config for classifying images provided by `image_url` key into two classes:
-
+For example, to classify images that are referenced in your data as URLs into one of two classes, Cat or Dog, use this example labeling config: 
 ```html
 <View>
   <Image name="image_object" value="$image_url"/>
@@ -50,20 +39,67 @@ Here an example config for classifying images provided by `image_url` key into t
 </View>
 ```
 
-### Setup labeling config from file
+This labeling config references the image resource in the [Image](https://labelstud.io/tags/image.html) object tag, and specifies the available labels to select in the [Choices](https://labelstud.io/tags/choices.html) control tag.
 
-It is possible to initialize a new project with predefined `config.xml`:
+If you want to customize this example, such as to allow labelers to select both Cat and Dog labels for a single image, modify the parameters used with the [Choices](https://labelstud.io/tags/choices.html) control tag:
+
+```html
+
+<View>
+  <Image name="image_object" value="$image_url"/>
+  <Choices name="image_classes" toName="image_object" choice="multiple">
+    <Choice value="Cat"/>
+    <Choice value="Dog"/>
+  </Choices>
+</View>
+```
+
+### Set up labeling config from file
+You can define the labeling configuration in a `config.xml` file and initialize a project in Label Studio with that file. 
 
 ```bash
 label-studio my_new_project start --init --label-config config.xml
 ```
 
-### Setup labeling config from UI
+### Set up labeling config in the Label Studio UI 
 
-You can also use the web interface at [`/setup`](http://localhost:8080/setup) to paste your labeling config. Using web UI you also get a live update while you're editting the config.
+Set up the labeling config on the [`/settings`](http://localhost:8080/settings) page of the Label Studio UI. As you update the configuration, a live preview displays how your configuration looks to labelers. 
+
+### Set up labeling config with the API
+
+You can configure your labeling configuration with the server API. See the [Backend API](api.html) documentation for more details.
 
 
+## Where Label Studio stores your project data and configurations
 
-### Setup labeling config from API
 
-You can configure your labeling config via server API. Check [Backend API page](api.html) for more details.
+All labeling activities in Label Studio occur in the context of a project. 
+
+When you start Label Studio for the first time, it launches from a project directory that Label Studio creates, called `./my_project` by default.
+
+`label-studio start ./my_project --init`
+
+
+## Set up multiple projects
+
+To start another project in Label Studio, remove the `./my_project` directory and start over, or create an additional project with a different directory by running `label-studio start /path/to/new/project --init` from the command line. 
+
+You can also use Label Studio in multi-session mode. See [Install Label Studio](tasks.html) for more. 
+
+### Project directory structure
+
+The project directory is structured as follows: 
+```
+├── my_project
+│   ├── config.json     // project settings
+│   ├── tasks.json      // all imported tasks in a JSON dictionary: {task_id: task}
+│   ├── config.xml      // labeling config for the current project
+│   ├── completions     // directory with all completed annotations stored in one file for each task_id 
+│   │   ├── <task_id>.json
+│   ├── export          // stores archives with all results exported from Label Studio UI 
+│   │   ├── 2020-03-06-15-23-47.zip
+```
+
+> Warning: Modifying any of the internal project files is not recommended and can lead to unexpected behavior. Use the Label Studio UI or command line arguments (run `label-studio start --help`) to import tasks, export completed annotations, or to change label configurations. 
+
+
