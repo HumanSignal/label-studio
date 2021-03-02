@@ -75,7 +75,7 @@ def config_from_file():
     try:
         config_file = INPUT_ARGUMENTS_PATH.open(encoding='utf8')
     except OSError:
-        raise LabelStudioError("Can't open input_args file: " + str(INPUT_ARGUMENTS_PATH) + ", " 
+        raise LabelStudioError("Can't open input_args file: " + str(INPUT_ARGUMENTS_PATH) + ", "
                                "use set_input_arguments_path() to setup it")
 
     with config_file:
@@ -929,9 +929,9 @@ def stats():
     """
     return make_response('{"status": "done"}', 200)
 
-
+# Stop authentication to the health endpoint
+# @requires_auth
 @blueprint.route('/api/health', methods=['GET'])
-@requires_auth
 @exception_handler
 def health():
     """ Health check
@@ -1011,7 +1011,7 @@ def main():
                 port = int(port) + 1
                 if port - original_port >= 1000:
                     raise ConnectionError(
-                        '\n*** WARNING! ***\n Could not find an available port\n' + 
+                        '\n*** WARNING! ***\n Could not find an available port\n' +
                         ' to launch label studio. \n Last tested port was ' + str(port) +
                         '\n****************\n')
                 print('\n*** WARNING! ***\n* Port ' + str(old_port) + ' is in use.\n' +
