@@ -24,4 +24,4 @@ COPY . /label-studio
 
 RUN python setup.py develop
 
-CMD ["./tools/run.sh"]
+CMD ["./tools/start-existing-project.sh"]
