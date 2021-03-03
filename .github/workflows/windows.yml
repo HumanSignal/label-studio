@@ -30,7 +30,6 @@ jobs:
         {pip install -r label_studio/tests/requirements.txt}
     - name: Init project
       run: |
-        shell: cmd
         set PYTHONIOENCODING=utf-8
         set PYTHONLEGACYWINDOWSSTDIO=utf-8
         label-studio init my_project
