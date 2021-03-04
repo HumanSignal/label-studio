@@ -2,7 +2,7 @@ name: label-studio:windows
 
 on:
   push:
-    branches: [ master ]
+    branches: ['*', '*/*', master]
   pull_request:
 
 jobs:
