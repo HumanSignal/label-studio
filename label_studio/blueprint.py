@@ -114,7 +114,7 @@ def app_after_request_callback(response):
 
     if request.method != 'GET':
         response.headers.add('Allow', 'GET, POST, PATCH, PUT, DELETE')
-        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization')
 
     return response
 
