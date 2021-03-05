@@ -1,7 +1,7 @@
 
-# Dialogue Analysis
+# Dialog Analysis
 
-![Dialogue Analysis](/images/screenshots/chatbot_analysis.png "Dialogue Analysis")
+![Dialog Analysis](/images/screenshots/chatbot_analysis.png "Dialog Analysis")
 
 # Install
 

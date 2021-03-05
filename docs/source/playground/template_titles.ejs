@@ -1,0 +1,211 @@
+<%#
+  1 run label-studio start my_project,
+  2 go to /setup?template_mode=titles
+  3 copy page source code here
+%>
+
+<!-- ---------------------------------------------- --->
+<!-- Templates titles --->
+<!-- ---------------------------------------------- --->
+
+<div class="ui accordion" id="basic-templates">
+  <div class="title">
+    <i class="dropdown icon"></i> Basic config examples
+  </div>
+  <div class="content" style="margin-top:-8px">
+    <!-- Templates categories -->
+    <div class="ui grid stackable" style="margin: 0 auto;">
+      
+        <!-- Template basic: audio -->
+        <div class="three wide column category">
+          <i class="icon sound" title="Audio sources"></i>
+          
+          <div class="ui item">
+              <a class="use-template no-go" href="#" data-value="48">Audio classification</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="30">Emotion segmentation</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="47">Speaker diarization</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="32">Transcription per region</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="15">Transcription whole audio</a>
+            </div>
+        </div>
+      
+        <!-- Template basic: image -->
+        <div class="three wide column category">
+          <i class="icon image" title="Image sources"></i>
+          
+          <div class="ui item">
+              <a class="use-template no-go" href="#" data-value="25">Image classification</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="41">Bbox object detection</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="9">Brush segmentation</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="33">Circular object detector</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="14">Keypoints and landmarks</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="34">Polygon segmentation</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="27">Multi-image classification</a>
+            </div>
+        </div>
+      
+        <!-- Template basic: text -->
+        <div class="three wide column category">
+          <i class="icon font" title="Text sources"></i>
+          
+          <div class="ui item">
+              <a class="use-template no-go" href="#" data-value="39">Text classification</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="20">Multi classification</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="10">Named entity recognition</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="17">Text summarization</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="50">Word alignment</a>
+            </div>
+        </div>
+      
+        <!-- Template basic: html -->
+        <div class="three wide column category">
+          <i class="icon code" title="HTML sources"></i>
+          
+          <div class="ui item">
+              <a class="use-template no-go" href="#" data-value="6">HTML classification</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="46">HTML NER tagging</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="43">Dialogs &amp; conversations</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="1">Rate PDF</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="4">Rate website</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="13">Video classifier</a>
+            </div>
+        </div>
+      
+        <!-- Template basic: time-series -->
+        <div class="three wide column category">
+          <i class="icon wave square" title="Time series"></i>
+          
+          <div class="ui item">
+              <a class="use-template no-go" href="#" data-value="16">Time Series classification</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="8">Import CSV</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="2">Import JSON</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="21">Segmentation extended</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="23">Multi-step annotation</a>
+            </div>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+<div class="ui accordion" id="adv-templates">
+  <div class="title" onclick="$(this).next().toggle('fast'); $(this).find('.dropdown').toggleClass('active')">
+    <i class="dropdown icon"></i> Advanced config templates
+  </div>
+  <div class="content" style="margin-top:-8px">
+    <!-- Templates categories -->
+    <div class="ui grid stackable" style="margin: 0 auto;">
+      
+        <!-- Template advanced: layouts -->
+        <div class="three wide column category">
+          <i class="icon eye" title="View layout examples"></i>
+          
+          <div class="ui item">
+              <a class="use-template no-go" href="#" data-value="35">Filtering long labels list</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="45">Long text with scrollbar</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="40">Pretty choices</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="3">Sticky header</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="28">Sticky left column</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="5">Three columns</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="37">Two columns</a>
+            </div>
+        </div>
+      
+        <!-- Template advanced: nested -->
+        <div class="three wide column category">
+          <i class="icon bullseye" title="Nested examples with conditional behavior"></i>
+          
+          <div class="ui item">
+              <a class="use-template no-go" href="#" data-value="11">Conditional classification</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="19">Three level classification</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="44">Two level classification</a>
+            </div>
+        </div>
+      
+        <!-- Template advanced: per-region -->
+        <div class="three wide column category">
+          <i class="icon vector square" title="Per region examples"></i>
+          
+          <div class="ui item">
+              <a class="use-template no-go" href="#" data-value="29">Audio regions labeling</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="38">Image bboxes labeling</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="7">Text spans labeling</a>
+            </div>
+        </div>
+      
+        <!-- Template advanced: other -->
+        <div class="three wide column category">
+          <i class="icon archive" title="Other sources"></i>
+          
+          <div class="ui item">
+              <a class="use-template no-go" href="#" data-value="24">Image &amp; Audio &amp; Text</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="26">Pairwise comparison</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="22">Relations among entities</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="42">Table with key-value</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="18">Table with text fields</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="49">Video timeline segmentation</a>
+            </div>
+        </div>
+      
+        <!-- Template advanced: time-series -->
+        <div class="three wide column category">
+          <i class="icon wave square" title="Time series"></i>
+          
+          <div class="ui item">
+              <a class="use-template no-go" href="#" data-value="31">Import CSV no time</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="12">Import CSV headless</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="0">Relations between channels</a>
+            </div><div class="ui item">
+              <a class="use-template no-go" href="#" data-value="36">Relations with text</a>
+            </div>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+

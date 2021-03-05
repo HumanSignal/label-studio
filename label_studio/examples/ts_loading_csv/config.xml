@@ -1,0 +1,48 @@
+<!-- {"title": "Import CSV", "category": "time-series", "complexity": "basic", "order": "1"} -->
+
+<!-- readme
+### Quickstart
+
+1. Prepare `time-series.csv` in tabular CSV format:
+    ```
+    time,velocity,acceleration
+    0,12.34,56.78
+    2,43.21,87.65
+    ```
+
+2. Set column names from CSV in the labeling config below:
+    - `timeColumn="time"`
+    - `column="velocity"`, `column="acceleration"`
+
+3. Add `<Channel>` tags for more columns if needed.
+
+4. After setup you can import your CSV files on Import page and Label Studio will host them OR
+upload your CSV to your hosting (e.g.: `https://my.domain.com/time-series.csv`) and
+<a target="_blank" href="https://labelstud.io/guide/tasks.html">prepare LS tasks for them.</a>
+
+    Read more about
+<a href="https://labelstud.io/tags/timeseries.html" target="_blank">TimeSeries</a>,
+<a href="https://labelstud.io/tags/timeserieslabels.html" target="_blank">TimeSeriesLabels</a>,
+<a href="https://labelstud.io/tags/timeseries.html#Channel" target="_blank">Channel</a>.
+-->
+
+<View>
+    <Header value="Time Series from CSV"
+            style="font-weight: normal"/>
+
+    <!-- Control tag for region labels -->
+    <TimeSeriesLabels name="label" toName="ts">
+        <Label value="Run" background="#5b5"/>
+        <Label value="Walk" background="#55f"/>
+    </TimeSeriesLabels>
+
+    <!-- Object tag for time series data source -->
+    <TimeSeries name="ts" valueType="url"
+                value="$csv"
+                sep="," overviewChannels="velocity">
+        <Channel column="velocity"
+                 strokeColor="#1f77b4"/>
+        <Channel column="acceleration"
+                 strokeColor="#ff7f0e"/>
+    </TimeSeries>
+</View>

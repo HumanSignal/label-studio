@@ -5,23 +5,22 @@ except:
     import json
 from .exceptions import ValidationError
 from urllib.parse import urlparse
+from label_studio.utils.misc import Settings
 
 
 class SkipField(Exception):
     pass
 
 
-# django backend settings compatibility
-class Settings:
-    UPLOAD_DATA_UNDEFINED_NAME = '$undefined$'
-
-
 _DATA_TYPES = {
-    'Text': [str, int],
+    'Text': [str, int, float],
+    'Header': [str, int, float],
     'HyperText': [str],
-    'Image': [str],
-    'List': [list],
-    'Dialog': [list]
+    'Image': [str, list],
+    'Paragraphs': [list],
+    'Table': [dict],
+    'TimeSeries': [dict, list, str],
+    'TimeSeriesChannel': [dict, list, str]
 }
 logger = logging.getLogger(__name__)
 settings = Settings()
@@ -55,11 +54,13 @@ class TaskValidator:
 
             expected_types = _DATA_TYPES.get(data_type, (str, ))
             if not isinstance(data[data_key], tuple(expected_types)):
+                joined = "or ".join([('"' + t.__name__ + '"') for t in expected_types])
                 raise ValidationError('data["{data_key}"]={data_value} '
-                                      'is of type "{type}", '
-                                      'but types "{expected_types}" are expected'
+                                      'is a "{type}" type, '
+                                      'but expect {expected_types}'
                                       .format(data_key=data_key, data_value=data[data_key],
-                                              type=type(data[data_key]), expected_types=expected_types))
+                                              type=type(data[data_key]).__name__,
+                                              expected_types=joined))
 
             if data_type == 'List':
                 for item in data[data_key]:
@@ -82,9 +83,9 @@ class TaskValidator:
             TaskValidator.check_data(project, data)
         except ValidationError as e:
             if dict_is_root:
-                raise ValidationError(e.detail[0] + ' [assume: item = {...}, item is task root] ')
+                raise ValidationError(e.detail[0] + ' [assume: item = task root with values] ')
             else:
-                raise ValidationError(e.detail[0] + ' [assume: item = {"data": {...}}, item["data"] is task root]')
+                raise ValidationError(e.detail[0] + ' [assume: item["data"] = task root with values]')
 
     def project(self):
         """ Take the project from context
@@ -93,13 +94,6 @@ class TaskValidator:
 
     @staticmethod
     def check_allowed(task):
-        allowed = ['data', 'completions', 'predictions', 'meta', 'id']
-
-        # check each task filled
-        for key in task.keys():
-            if key not in allowed:
-                return False
-
         # task is required
         if 'data' not in task:
             return False
@@ -195,7 +189,7 @@ class TaskValidator:
         if data is None:
             raise ValidationError('All tasks are empty (None)')
 
-        if not isinstance(data, list):
+        if not isinstance(data, (list, tuple)):
             raise ValidationError('data is not a list')
 
         if len(data) == 0:

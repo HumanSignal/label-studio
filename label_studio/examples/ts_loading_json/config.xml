@@ -1,0 +1,54 @@
+<!-- {"title": "Import JSON", "category": "time-series", "complexity": "basic", "order": "3"} -->
+
+<!-- readme
+### Notes
+
+* JSON is a native format for Label Studio and it allows to store time series data right in LS task.
+<a target="_blank" href="https://labelstud.io/guide/tasks.html">Read more about LS tasks in documentation.</a>
+
+* JSON is necessary when you need to combine multiple data source in one task.
+For example, you mix two CSV files for time series into one labeling task or
+if you try to build Text + TimeSeries configuration.
+
+### Quickstart
+
+1. Prepare JSON-formatted input:
+
+    ```json
+    {
+      "ts": {
+        "time": [0,1,2],
+        "first_column": [3,4,5],
+        "second_column": [6,7,8]
+      }
+    }
+    ```
+
+2. Set your data keys in the following attributes:
+    * `timeColumn="time"`
+    * `column="first_column"` and `column="second_column"`
+
+3. Add more `<Channel>` tags for more columns if needed
+
+    Read more about
+<a href="https://labelstud.io/tags/timeseries.html" target="_blank">TimeSeries</a>,
+<a href="https://labelstud.io/tags/timeserieslabels.html" target="_blank">TimeSeriesLabels</a>,
+<a href="https://labelstud.io/tags/timeseries.html#Channel" target="_blank">Channel</a>.
+-->
+
+<View>
+    <Header value="Time Series from JSON"
+            style="font-weight: normal"/>
+
+    <TimeSeriesLabels name="label" toName="ts">
+        <Label value="Anomaly" background="#a4a"/>
+        <Label value="Ordinary" background="#aa4"/>
+    </TimeSeriesLabels>
+
+    <TimeSeries name="ts" value="$ts" valueType="json">
+        <Channel column="first_column"
+                 strokeColor="#1f77b4"/>
+        <Channel column="second_column"
+                 strokeColor="#ff7f0e"/>
+    </TimeSeries>
+</View>

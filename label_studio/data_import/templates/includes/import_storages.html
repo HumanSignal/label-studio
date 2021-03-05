@@ -1,0 +1,390 @@
+{% raw %}
+<script type="text/x-template" id="cloud-storages-template">
+
+  <div v-for="(storage, storage_for) in storage_settings">
+
+    <!-- Header -->
+    <h4 class="header">
+      <i class="fas fa-cloud-download-alt" style="opacity: 0.65"
+         v-if="!storage.type_loading"></i>
+      <i :class="{active: storage.type_loading}" class="ui loader inline mini grey"></i>
+      &nbsp;{{ capitalizeFirstLetter(storage_for) }} storage: {{ storage.description }}
+    </h4>
+
+    <!-- Errors -->
+    <div class="ui message error" v-if="'common' in storage.errors">
+      {{ storage.errors.common }}
+    </div>
+    <div class="ui divider hidden" v-if="'common' in storage.errors"></div>
+
+    <!-- <div>Final path:
+      <i class="word-break" :data-tippy-content="project.source_storage.readable_path">{{
+        get_short_text(project.source_storage.readable_path)
+      }}</i>
+    </div>
+    <br> -->
+
+    <!-- Content -->
+    <div class="scrolling content">
+      <form class="ui form" :id="storage.storage_for + '-storage-form'">
+        <input hidden name="storage_for" :value="storage_for">
+
+        <span v-if="storage.type=='tasks-json'">To add new tasks go to <a href="./import">Import page</a>.<br/><br/></span>
+
+        <!-- Storage Type - form needs it to correctly be processed -->
+        <div class="ui field" :class="{disabled: storage.type_loading}">
+          <label>Choose storage</label>
+          <select class="ui dropdown" name="type" v-model="storage.type">
+            <option v-for="(item, name) in storage_settings_all[storage_for]" :value="name">
+              {{ item.description }}
+            </option>
+          </select>
+        </div>
+
+        <div class="ui divider hidden"></div>
+
+        <!-- Fields -->
+        <div class="ui field"
+             :class="{disabled: storage.type_loading}"
+             v-for="field in storage.fields"
+             :style="{display: showStorageField(field.name, storage) ? 'block': 'none'}"> <!-- TODO: back create_local_copy in next releases -->
+
+          <label :for="field.name" v-html="field.description"></label>
+
+          <sui-checkbox v-model="field.data" :name="field.name"
+                        v-if="field.type=='BooleanField'"></sui-checkbox>
+
+          <input type="text" :placeholder="field.name" :name="field.name" v-model="field.data"
+                 v-if="field.type!='BooleanField'">
+
+          <!-- Errors -->
+          <div class="ui bulleted list" v-if="field.name in storage.errors">
+            <div class="ui item error" v-for="error in storage.errors[field.name]">
+              <span class="ui text">{{ error }}</span>
+            </div>
+          </div>
+
+        </div>
+      </form>
+
+      <!-- Source help -->
+      <div class="ui icon message">
+        <i class="ui icon fas fa-info-circle" style="opacity: 0.1 !important;"></i>
+        <div class="content">
+          Read more about Amazon S3 or Google Cloud in
+          <a href="http://labelstud.io/guide/storage.html" target="_blank">documentation</a>
+        </div>
+      </div>
+
+    </div>
+
+    <br>
+    <br>
+
+
+    <!-- Tasks & Completions statistics -->
+    <div class="ui two column centered grid">
+      <div class="row db-card">
+
+        <!-- Total tasks -->
+        <div class="column center aligned align-grid">
+          <div class="ui statistic mini" style="display: inline">
+            <!-- Project loading spinner instead of task number -->
+            <div v-if="!project_loaded" class="ui loader loading active inline"></div>
+
+            <!-- Number -->
+            <span class="value" v-else>{{ project.task_count }}</span>
+            <span class="label">Tasks</span>
+
+            <!-- Storage loading spinner -->
+            <span data-tooltip="Source storage sync in progress">
+              <i class="ui loader loading active inline mini" v-if="project.source_syncing"></i>
+            </span>
+
+          </div> <!-- statistic -->
+        </div>
+
+        <!-- Total completions -->
+        <div class="column center aligned align-grid">
+          <div class="ui statistic mini" style="display: inline">
+              <!-- Project loading spinner instead of task number -->
+              <div v-if="!project_loaded" class="ui loader loading active inline"></div>
+
+              <!-- Number -->
+              <span class="value" v-else>
+                {{ project.completion_count }}
+              </span>
+
+              <span class="label">Completions</span>
+          </div>
+        </div>
+
+      </div>
+    </div> <!-- Statistics -->
+
+    <br>
+    <br>
+
+    <!-- Actions -->
+    <div class="actions">
+      <!-- Scan -->
+      <button class="ui button basic approve"
+              :class="{disabled: storage.loading || storage.type_loading}"
+              @click="saveStorageSettings(storage_for, false)"
+              v-if="storage_for=='source'">
+        <!-- don't show button in Local storage for Source -->
+        Scan
+      </button>
+
+      <!-- Import -->
+      <button class="ui button positive approve"
+              :class="{disabled: storage.loading || storage.type_loading}"
+              @click="saveStorageSettings(storage_for, true)"
+              v-if="storage_for=='source'">
+        <!-- don't show button in Local storage for Source -->
+        Import
+      </button>
+
+      <span class="ui active mini inline loader" v-if="storage.loading" style="margin: 0 1em"></span>
+
+      <!-- Success -->
+      <span class="ui green text" v-if="storage.save_success"><i class="fas fa-check"></i> Saved</span>
+    </div>
+
+  </div>
+
+</script> <!-- template -->
+
+
+
+
+<script>
+var cloudStorages = Vue.component('cloud-storages', {
+  template: "#cloud-storages-template",
+  props: [],
+
+  data: function () {
+    return {
+      // internal variables
+      project_loaded: false,
+      tasks_loaded: false,
+      auto_update_timer: null,
+      timer_interval: 5000,
+
+      // provided by api/project
+      project: {% endraw %}{{ serialized_project|json|safe }}{% raw %},
+
+      // provided by api/project/storage-settings
+      storage_settings: {
+        source: {
+          fields: [], errors: [], type: 'json', storage_for: 'source',
+          show: true, loading: false, type_loading: false, save_success: false
+        }
+      },
+      storage_settings_all: {}
+    };
+  },
+
+  methods: {
+    getApi: function (dst, url, always, fail, done) {
+      /* this api call will do vue.data['dst'] = get(url) */
+
+      var self = this;
+      $.get(url + (url.includes('?') ? '&' : '?') + 'rnd=' + randomInteger(0, 100000))
+        .done(function (data) {
+          setValue(self, dst, data);
+          if (done) done(data);
+          if (always) always(data);
+          // console.log(dst + ' loaded');
+        })
+        .fail(function (data) {
+          if (fail) fail(data);
+          else {
+            self.showError('Error while get api for <' + dst + '>:', message_from_response(data));
+          }
+          if (always) always(data);
+          console.log('error: no ' + dst + ' loaded')
+        })
+    },
+
+    // get project info from api
+    loadProject: function (polling) {
+      var self = this;
+      this.getApi('project', 'api/project/' + (polling ? '?polling=true': ''),
+        // always
+        function () {
+          self.project_loaded = true;
+        },
+        // fail
+        function (data) {
+          self.showError('Project loading error', message_from_response(data));
+        }
+      );
+    },
+
+    // get tasks from api
+    loadStorageSettings: function () {
+      var self = this;
+      self.storage_settings.source.type_loading = true;
+      this.getApi('storage_settings_all', 'api/project/storage-settings/',
+        function () {
+          delete self.storage_settings_all.source['tasks-json'];
+          self.storage_settings.source.type_loading = false;
+          self.changeStorageSettings('source', 's3');
+
+        });
+    },
+
+    // get settings from storage_settings_all
+    changeStorageSettings: function (storage_for, storage_type) {
+      // change to current on backend
+      if (storage_type === 'current') {
+        var storages = this.storage_settings_all[storage_for];
+        for (var type in storages) {
+          var value = storages[type];
+          if (value.current) {
+            storage_type = type;
+            setValue(this, 'storage_settings.' + storage_for, value);
+            break;
+          }
+        }
+      }
+      // change to new type
+      else {
+        var value = this.storage_settings_all[storage_for][storage_type];
+        setValue(this, 'storage_settings.' + storage_for, value);
+      }
+    },
+
+    saveStorageSettings: function (storage_for, finish) {
+      var self = this;
+      self.storage_settings[storage_for].loading = true;
+      self.storage_settings[storage_for].save_success = false;
+      self.$set(self.storage_settings[storage_for], 'errors', []);
+      $.ajax({
+        type: 'POST',
+        url: 'api/project/storage-settings/' +
+          '?type=' + this.storage_settings[storage_for].type +
+          '&storage_for=' + storage_for,
+        contentType: 'application/json',
+        dataType: 'json',
+        data: JSON.stringify(getFormData($('#' + storage_for + '-storage-form')))
+      })
+      .fail(function (data) {
+        if (data.hasOwnProperty('responseJSON') && data.responseJSON.hasOwnProperty('errors'))
+          self.$set(self.storage_settings[storage_for], 'errors', data.responseJSON.errors);
+        else {
+          var msg = message_from_response(data);
+          self.storage_settings[storage_for].errors = {common: msg};
+          self.showError('Storage settings error', msg)
+        }
+        console.log('save storage settings error:');
+        console.log(data);
+      })
+      .done(function () {
+        self.storage_settings[storage_for].save_success = true;
+        self.project_loaded = false;
+        setTimeout(function () {
+          self.loadAll();
+        }, 4000);
+        // go to import finish
+        if (finish) {
+          self.$emit('finish');
+        }
+      })
+      .always(function () {
+        self.storage_settings[storage_for].loading = false;
+      });
+      return false;
+    },
+
+    // update all objects via api
+    loadAll: function () {
+      this.loadProject();
+      this.loadStorageSettings();
+    },
+
+    // start/stop timer with project & task api loading
+    capitalizeFirstLetter: capitalizeFirstLetter,  // from helpers.js
+
+    getCurrentStorage: function (storage_for) {
+      var all = this.storage_settings_all[storage_for];
+      for (var key in all)
+        if (all[key].current)
+          return all[key];
+      return {description: '[No storage defined]', name: '[No storage defined]'}
+    },
+
+    showStorageField: function (field_name, storage) {
+      if (field_name !== 'create_local_copy') {
+        // find field use_blob_urls inside of list
+        var use_blob_urls = null;
+        for (var i in storage.fields) {
+          if (storage.fields[i].name === 'use_blob_urls') {
+            use_blob_urls = storage.fields[i];
+            break;
+          }
+        }
+        if (field_name === 'data_key' && !use_blob_urls.data) {
+          return false;
+        }
+        return true;
+      }
+    },
+
+    showError: function (title, message) {
+      $('body').toast({
+        class: 'error',
+        title: title,
+        message: '<pre>' + message + '</pre>',
+        displayTime: this.timer_interval * 2,
+        position: 'bottom center'
+      })
+    },
+
+    get_short_text: function(text) {
+      const max_len = 40;
+      return (text.length <= max_len ? text: ('...' + text.slice(text.length-max_len, text.length)));
+    },
+
+    // start/stop timer with project & task api loading
+    stopAutoUpdateTimer: function () {
+      clearInterval(this.auto_update_timer);
+      this.auto_update_timer = null;
+    },
+    startAutoUpdateTimer: function () {
+      if (this.timer_interval > 0) {
+        var self = this;
+        this.auto_update_timer = setInterval(function() {
+          self.loadProject(true); // run with polling = true to distinct request from timer
+        }, this.timer_interval);
+      }
+    },
+    toggleAutoUpdateTimer: function () {
+      if (this.auto_update_timer) {
+        this.stopAutoUpdateTimer();
+      } else {
+        this.startAutoUpdateTimer();
+      }
+    },
+  },
+
+  watch: {
+    'storage_settings.source.type': function () {
+      this.changeStorageSettings('source', this.storage_settings.source.type)
+    }
+  },
+
+  // vue mounting of page
+  mounted: function () {
+    this.project_loaded = true;
+    this.loadAll();
+
+    this.startAutoUpdateTimer();
+    $('.ui.checkbox').checkbox();
+    console.log('Vue mounting success');
+  }
+});
+</script>
+
+{% endraw %}

@@ -1,0 +1,1139 @@
+{% extends 'base.html' %}
+{% block body %}
+
+<!-- Editor JS -->
+{% for js in editor_js %}
+  <script src="{{ js }}?version={{ version }}"></script>
+{% endfor %}
+
+<!-- Editor CSS -->
+{% for css in editor_css %}
+  <link href="{{ css }}?version={{ version }}" rel="stylesheet">
+{% endfor %}
+
+{% raw %}
+  <script src="static/js/polyfill.min.js"></script>
+  <script src="static/js/vue.js"></script>
+  <script src="static/js/lsf-sdk.js"></script>
+  <script src="static/js/mousetrap.min.js"></script>
+
+  <link rel="stylesheet" href="static/css/tasks.css">
+
+  <div id="vue_loader" class="ui large text loader loading active">Loading ...</div>
+
+  <div class="ui " id="app" :class="{'visible-app': vue_loaded}" style="display: none">
+
+    <!-- Main content -->
+
+    <div class="ui container wrapper" v-if="!quick_view">
+
+      <!-- Statistics -->
+      <div class="ui three column centered grid stackable">
+        <div class="row">
+
+          <!-- Total tasks -->
+          <div class="column center aligned align-grid">
+            <div class="ui db-card">
+              <div class="ui statistic small">
+                <!-- Project loading -->
+                <center v-if="!project_loaded" style="margin-bottom: 3px">
+                  <div class="ui loader loading active inline"></div>
+                </center>
+                <!-- Number -->
+                <span class="value" v-else>
+                  <animated-number :number="project.task_count"></animated-number>
+                </span>
+                <span class="label">Tasks</span>
+                <span class="sub-label">
+                  <i class="word-break" v-if="!project.multi_session_mode">{{ project.source_storage.readable_path }}</i>
+                  <span data-tooltip="Source storage sync in progress">
+                    <i class="ui loader loading active inline mini" v-if="project.source_syncing"></i>
+                  </span>
+                </span>
+                <!-- Controls -->
+                <div style="margin-top: 7px">
+                  <!-- Storage settings -->
+                  <span data-tooltip="Change source storage">
+                  <i class="fas fa-cog sup-button big"
+                     @click="loadStorageSettings(); storage_settings.source.show=true"></i>
+                  </span>
+                  <!-- Delete tasks -->
+                  <span v-if="project.can_delete_tasks">
+                    <span style="margin-right: 15px"></span>
+                    <span @click="deleteAllTasks()"
+                          data-tooltip="Delete all tasks">
+                      <i class="fas fa-trash-alt trash remove-task">&nbsp;&nbsp;</i>
+                    </span>
+                  </span>
+                </div>
+              </div> <!-- statistic -->
+            </div>
+          </div>
+
+          <!-- Total completions -->
+          <div class="column center aligned align-grid">
+            <div class="ui db-card">
+              <div class="ui statistic small">
+                <!-- Project loading -->
+                <center v-if="!project_loaded" style="margin-bottom: 3px">
+                  <div class="ui loader loading active inline"></div>
+                </center>
+                <!-- Number -->
+                <span class="value" v-else>
+                  <animated-number :number="project.completion_count"></animated-number>
+                </span>
+                <span class="label">Completions</span>
+                <span class="sub-label">
+                  <i class="word-break" v-if="!project.multi_session_mode">{{ project.target_storage.readable_path }}</i>
+                  <span data-tooltip="Target storage sync in progress">
+                    <i class="ui loader loading active inline mini" v-if="project.target_syncing"></i>
+                  </span>
+                </span>
+                <!-- Controls -->
+                <div style="margin-top: 7px">
+                  <!-- Target storage settings -->
+                  <span data-tooltip="Change target storage">
+                    <i class="fas fa-cog sup-button big"
+                       @click="loadStorageSettings(); storage_settings.target.show=true"></i>
+                  </span>
+                  <!-- Delete completions -->
+                  <span v-if="project.can_manage_completions">
+                    <span style="margin-right: 15px"></span>
+                    <span @click="deleteAllCompletions()"
+                          data-tooltip="Delete all completions">
+                      <i class="far fa-trash-alt trash remove-completion">&nbsp;&nbsp;</i>
+                    </span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="column center aligned align-grid">
+            <div class="ui db-card">
+              <!-- Control buttons -->
+              <div class="ui row stackable" v-if="project.task_count > 0">
+                <div class="center aligned action-buttons">
+                  <!-- Sampling -->
+                  <span style="padding-top: 8px; padding-bottom: 11px;"
+                        data-tooltip="Method for consecutive tasks sampling: modify 'sampling' option in project_dir/config.json">
+                    <span class="ui icon label">
+                      <i class="ui icon far shuffle"></i>
+                      {{ project.config['sampling'] }}
+                    </span>
+                  </span>
+                  <!-- Start labeling -->
+                  <a class="ui button positive" href="./label-old">Start Labeling</a>
+                </div>
+              </div>
+            </div>
+          </div> <!-- Action buttons -->
+        </div>
+
+        <!-- Critical error -->
+        <div v-if="error">
+          <div class="ui hidden divider"></div>
+          <div class="ui error message">
+            <div class="header">{{ error.header }}</div>
+            <div class="content">{{ error.message }}</div>
+          </div>
+          <div class="ui hidden divier"></div>
+        </div>
+
+        <!-- Import tasks -->
+        <div class="row" v-if="project.task_count == 0">
+          <a class="ui button positive" href="./import" v-if="project.can_manage_tasks">Import Tasks</a>
+        </div>
+
+      </div>
+      <div class="ui divider hidden"></div>
+    </div> <!-- container -->
+
+
+
+
+
+
+    <div class="ui task-container">
+
+      <div class="ui grid stackable" ref="grid">
+        <div class="column" id="left-panel"
+             ref="left_panel"
+             v-if="!(quick_view_show_table === false && quick_view)"
+             :class="quick_view ? '' : 'sixteen wide'">
+          <!-- Table -->
+          <div class="table-wrapper">
+            <table v-if="project.task_count > 0" ref="task_table"
+                   class="task-table" :class="{'center-margin': !quick_view}">
+              <thead>
+
+              <!-- Header -->
+              <tr>
+                <th class="order" @click="changeOrder('id')" v-if="columns.includes('id')">Task ID
+                  <i class="fas" :class="{'fa-sort-up': this.order=='id', 'fa-sort-down': this.order=='-id'}"></i>
+                </th>
+                <th class="order" @click="changeOrder('completed_at')" v-if="columns.includes('completed_at')">
+                  Completed at
+                  <i class="fas"
+                     :class="{'fa-sort-up': this.order=='completed_at', 'fa-sort-down': this.order=='-completed_at'}"></i>
+                </th>
+                <th class="order" @click="changeOrder('has_skipped_completions')" v-if="columns.includes('skipped')">
+                  Skipped
+                  <i class="fas"
+                     :class="{'fa-sort-up': this.order=='has_skipped_completions', 'fa-sort-down': this.order=='-has_skipped_completions'}"></i>
+                </th>
+                <th v-if="columns.includes('actions')">
+                  Actions
+                </th>
+
+                <!-- Label config fields -->
+                <th v-for="(value, key) in project.data_types"
+                    v-if="(value === 'Image' || value === 'Text' || value === 'Audio' || value === 'AudioPlus') && columns.includes('previews')">
+                  ${{ key }}
+                </th>
+                <!-- Audio urls -->
+                <th v-for="(value, key) in project.data_types"
+                    v-if="(value === 'Audio' || value === 'AudioPlus') && columns.includes('audio_urls')">
+                  ${{ key }} url
+                </th>
+                <!-- Image urls -->
+                <th v-for="(value, key) in project.data_types"
+                    v-if="value === 'Image' && columns.includes('image_urls')">
+                  ${{ key }} url
+                </th>
+              </tr>
+
+              </thead>
+
+              <!-- Task row -->
+
+              <tbody>
+
+              <!-- Broken task -->
+              <tr v-if="task == null" class="text-center" v-for="task in tasks">
+                <td colspan="3"><small>broken task [backend returns null, check storage settings,
+                  may be you forgot "Generate task data with URLs ..." checkbox on source storage settings?]</small>
+                </td>
+              </tr>
+
+              <!-- Correct task -->
+              <tr v-if="task != null" class="text-center"
+                  v-for="task, index in tasks"
+                  :class="{selected: current_task && current_task.id===task.id}"
+                  @click.exact="toggleTaskPreview(index)" @click.ctrl.exact="window.open('.?task_id=' + task.id)">
+                <!-- Task ID -->
+                <td class="text-center" v-if="columns.includes('id')">
+                  <span class="ui mini blue loader inline active" v-if="task.processing"></span>
+                  <i class="icon small outline eye"></i>
+                  <span class="hidden-items">{{ task.id }}</span>
+                </td>
+                <!-- Completed at -->
+                <td v-if="columns.includes('completed_at')">
+                  {{ task.completed_at }}
+                </td>
+                <!-- Skipped -->
+                <td v-if="columns.includes('skipped')">
+                  <i class="ui icon forward grey" v-if="task.has_skipped_completions"></i>
+                </td>
+                <!-- Actions -->
+                <td class="text-center" v-if="columns.includes('actions')" @click.stop="/* stop click propagation */">
+                  <div class="actions-card">
+                    <!-- Show task code -->
+                    <span data-tooltip="Show task code" class="action-button">
+                      <i @click.stop="window.open('api/tasks/' + task.id)" class="icon code" style="opacity: 0.75"></i>
+                    </span>
+                    <!-- Delete task -->
+                    <span v-if="project.can_delete_tasks" class="action-button">
+                      <a class="trash" @click.stop="deleteTask(task)" data-tooltip="Delete task">
+                        <i class="fas fa-trash-alt trash remove-task"></i>
+                      </a>
+                    </span>
+                    <!-- Delete completions -->
+                    <span v-if="project.can_manage_completions" class="action-button">
+                      <span v-if="task.completions">
+                        <a class="trash" @click.stop="deleteCompletion(task, task.completions[0])"
+                           data-tooltip="Delete all completions of this task">
+                          <i class="far fa-trash-alt trash remove-completion"></i>
+                        </a>
+                      </span>
+                    </span>
+                  </div>
+                </td>
+
+                <!-- Values from label config -->
+
+                <!-- Image -->
+                <td v-for="(value, key) in project.data_types" v-if="value === 'Image' && columns.includes('previews')">
+                  <image-with-fade-in :src="task.data[key]"></image-with-fade-in>
+                </td>
+
+                <!-- Text -->
+                <td class="text-preview-td"
+                    v-for="(value, key) in project.data_types" v-if="value === 'Text' && columns.includes('previews')">
+                  <div class="text-preview"><i class="icon outline copy" @click.stop="copyValue(task.data[key])"></i>{{
+                    text_preview(task.data[key]) }}</div>
+                </td>
+
+                <!-- Audio -->
+                <td v-for="(value, key) in project.data_types"
+                    v-if="(value === 'Audio' || value === 'AudioPlus') && columns.includes('previews')"
+                    @click.stop="audioToggle($event.target, task)">
+
+                  <audio preload="metadata"
+                         :src="task.data[key]"
+                         @ended="Vue.set(task, 'playing', false)"
+                         @timeupdate="Vue.set(task, 'playing', !$event.target.paused)">
+                  </audio>
+                  <i class="icon audio-button"
+                     :class="task.playing ? 'pause': 'play'"></i>
+                </td>
+
+                <!-- Audio URLs -->
+                <td v-for="(value, key) in project.data_types" class="text-preview-td"
+                    v-if="(value === 'Audio' || value === 'AudioPlus') && columns.includes('audio_urls')">
+                  <div class="text-preview"><i class="icon outline copy" @click.stop="copyValue(task.data[key])"></i>{{
+                    task.data[key] }}</div>
+                </td>
+
+                <!-- Image URLs -->
+                <td v-for="(value, key) in project.data_types" class="text-preview-td"
+                    v-if="value === 'Image' && columns.includes('image_urls')">
+                  <div class="text-preview"><i class="icon outline copy" @click.stop="copyValue(task.data[key])"></i>{{
+                    task.data[key] }}</div>
+                </td>
+
+              </tr>
+
+              </tbody>
+            </table>
+          </div>
+          <div class="ui divider hidden"></div>
+
+          <!-- Pagination -->
+
+          <!-- this element is needed for pretty symmetrical alignment with loader on the right side -->
+          <div :class="{'center-flex': !quick_view}">
+            <div ref="pagination" class="ui pagination menu"
+                 v-if="project.task_count > 0">
+              <a class="item" :class="{'active': page>1, 'disabled': page<=1}" @click="prevPage()">Prev</a>
+
+              <div class="item">
+                <input v-model="page"
+                       :max="totalPages" min="1"
+                       :style="quick_view && page < 100000 ? 'max-width: 60px': 'max-width: 80px'"
+                       style="border:none" type="number">
+                <span style="cursor:pointer" @click="page=totalPages" v-if="full_pagination">&nbsp; of &nbsp;&nbsp;
+                  {{ totalPages }}
+                </span>
+              </div>
+
+              <div class="item" v-if="full_pagination">
+                <select class="pagination-size" v-model="page_size">
+                  <option>1</option>
+                  <option>5</option>
+                  <option selected="selected">10</option>
+                  <option>50</option>
+                  <option>100</option>
+                </select>
+              </div>
+
+              <div id="full-pagination-settings"
+                   class="item action-item" @click="show_settings=!show_settings" v-if="full_pagination">
+                <i class="fa fa-cog"></i>
+              </div>
+
+              <a class="item" :class="{'active': page<totalPages, 'disabled': page>=totalPages}"
+                 @click="nextPage()">Next</a>
+            </div> <!-- pagination -->
+
+            <div style="margin-top: 1em" v-if="!full_pagination"></div>
+            &nbsp;
+
+            <!-- Settings while hidden left panel -->
+            <i class="icon grey cog settings-cog" style="cursor: pointer; opacity: 0.75"
+               @click="show_settings=!show_settings" v-if="!full_pagination"></i>
+
+            <!-- Loader -->
+            <i class="ui loader active blue tiny inline"
+               :style="{opacity: tasks_loaded ? 0: 0.5, 'margin-left': '10px', 'margin-top': quick_view ? '0' : '13px'}"></i>
+
+          </div>
+
+          <div class="mobile-divider"></div>
+        </div> <!-- left column -->
+
+        <div class="column"
+             id="right-panel"
+             ref="right_panel"
+             :style="{display: quick_view ? 'inherit': 'none'}">
+          <!-- LS Frontend -->
+          <div id="label-studio">
+            <div class="ui loader active inline centered"></div>
+          </div>
+        </div>
+
+      </div> <!-- right column -->
+
+      <br/>
+      <!-- settings button -->
+      <center>
+        <i class="icon grey large cog settings-cog"
+           @click="show_settings=!show_settings" v-if="quick_view_show_table === false && quick_view"></i>
+      </center>
+      <br/>
+
+    </div>
+
+
+
+
+
+
+    <!-- Table Settings -->
+    <sui-modal v-model="show_settings" v-bind:class="{inverted: 1, small: 1, scrollable: 1}"
+               size="small" style="z-index: 1000">
+      <i class="icon close" @click="show_settings=false"></i>
+
+      <!-- Header -->
+      <div class="header">Settings</div>
+
+      <!-- Content -->
+      <div class="scrolling content">
+
+        <h4>Columns to show</h4>
+        <div class="section">
+          <div class="ui list horizontal">
+            <div class="item ui checkbox" :class="item==='id' && quick_view ? 'disabled': ''"
+                 v-for="item in all_columns">
+              <input type="checkbox" class="ui checkbox" v-model="columns" :value="item">
+              <label class="cap-first-letter">{{ item.replaceAll('_', ' ') }}</label>
+            </div>
+          </div>
+          <br/><br/>
+
+          Text preview limit &nbsp;
+          <div class="ui input">
+            <input style="height: 30px" type="number" min="10" max="5000" v-model="text_preview_limit">
+          </div>&nbsp; characters
+        </div>
+
+        <h4>Quick view</h4>
+        <div class="section">
+          <p>
+            Quick view combines the task table and the labeling interface on left and right panels into one window.
+            To start quick view click on the table row near Task ID.
+            You can move over tasks using hotkeys.
+            Press <hotkey style='color:#777;font-size:80%;padding: 0.05em 0.35em;'>`</hotkey> or
+            <i class="icon cog" style="opacity: 0.75"></i>on the page bottom to show settings again.
+          </p>
+          <div class="ui form">
+            <a class="ui button icon" @click="quick_view_show_table=!quick_view_show_table">
+              <i class="fa" :class="quick_view_show_table ? 'fa-border-all': 'fa-border-none'"></i>
+              {{ quick_view_show_table ? 'Hide': 'Show' }} Task Table
+            </a>
+          </div>
+        </div>
+
+        <h4>Auto update timer</h4>
+        <div class="section">
+          <p>Auto update project info and tasks by 5 sec timer</p>
+          <a class="ui button" @click="toggleAutoUpdateTimer()">
+            <i class="fa-clock" :class="auto_update_timer ? 'fas': 'far'"></i>
+            {{ 'Timer ' + (auto_update_timer ? 'Enabled': 'Disabled') }}
+          </a>
+        </div>
+
+        <!-- Hotkeys -->
+        <h4>Hotkeys</h4>
+        <div class="section">
+          <div class="hotkey-helper">
+            <div class="keys">
+              <hotkey style="font-weight: bold">`</hotkey>
+              <small>[gravis key]</small></div>
+            <span class="description">toggle settings</span>
+          </div>
+
+          <div class="hotkey-helper">
+            <div class="keys"><hotkey>q</hotkey></div>
+            <span class="description">toggle quick view</span>
+          </div>
+
+          <div class="hotkey-helper">
+            <div class="keys"><hotkey>e</hotkey></div>
+            <span class="description">toggle task table in quick view</span>
+          </div>
+
+          <div class="hotkey-helper">
+            <div class="keys"><hotkey>click on row</hotkey></div>
+            <span class="description">open task in Quick mode, <br>click again on selected task to exit</span>
+          </div>
+
+          <div class="hotkey-helper">
+            <div class="keys"><hotkey>shift</hotkey> + <hotkey>←</hotkey> or <hotkey>a</hotkey></div>
+            <span class="description">previous page</span>
+          </div>
+
+          <div class="hotkey-helper">
+            <div class="keys"><hotkey>shift</hotkey> + <hotkey>→</hotkey> or <hotkey>d</hotkey></div>
+            <span class="description">next page</span>
+          </div>
+
+          <div class="hotkey-helper">
+            <div class="keys"><hotkey>shift</hotkey> + <hotkey>↑</hotkey> or <hotkey>w</hotkey></div>
+            <span class="description">previous item</span>
+          </div>
+
+          <div class="hotkey-helper">
+            <div class="keys"><hotkey>shift</hotkey> + <hotkey>↓</hotkey> or <hotkey>s</hotkey></div>
+            <span class="description">next item</span>
+          </div>
+
+          <div class="hotkey-helper">
+            <div class="keys"><hotkey>ctrl</hotkey> + <hotkey>click on row</hotkey></div>
+            <span class="description">open task explore in new window</span>
+          </div>
+
+        </div>
+      </div>
+    </sui-modal>
+
+
+
+    {% endraw %}
+    {% include 'storages_old.html' %}
+    {% raw %}
+
+  </div>
+
+  <script src="static/js/components/animatedNumber.js"></script>
+  <script src="static/js/components/vue-tippy.min.js"></script>
+  <script src="static/semantic/semantic-ui-vue.min.js"></script>
+
+  <script>
+    var PAGINATION_MAX_WIDTH = 400;
+
+    Vue.use(SemanticUIVue);
+    Vue.use(VueTippy);
+
+    var app = new Vue({
+      el: '#app',
+
+      data: function () {
+        var data = {
+          // internal variables
+          vue_loaded: false,
+          project_loaded: false,
+          tasks_loaded: false,
+          page: Cookies.get('page', 1),
+          page_size: Cookies.get('page_size', 10),
+          order: Cookies.get('order', 'id'),
+          auto_update_timer: null,
+          show_settings: false,
+          timer_interval: 5000,
+          text_preview_limit: Cookies.get('text_preview_limit', 400),
+          error: null,
+
+          // quick task preview
+          all_columns: ['id', 'completed_at', 'skipped', 'actions', 'previews', 'audio_urls', 'image_urls'],
+          full_columns: JSON.parse(Cookies.get('full_columns', '["id", "completed_at", "skipped", "actions", "previews"]')),
+          quick_columns: JSON.parse(Cookies.get('quick_columns', '["id"]')),
+          quick_view: false,
+          quick_view_show_table: true,
+          current_task: null,
+          current_task_index: -10,
+          full_pagination: true,
+
+          // provided by api/project
+          project: {% endraw %}{{ serialized_project|json|safe }}{% raw %},
+
+          // provided by api/tasks
+          tasks: [],
+
+          // provided by api/project/storage-settings
+          storage_settings: {
+            source: {
+              fields: [], errors: [], type: 'json', storage_for: 'source',
+              show: false, loading: false, type_loading: false, save_success: false
+            },
+            target: {
+              fields: [], errors: [], type: 'json', storage_for: 'target',
+              show: false, loading: false, type_loading: false, save_success: false
+            }
+          },
+          storage_settings_all: {}
+        };
+
+        data.columns = data.full_columns;
+        return data;
+      },
+
+      // components
+      components: {
+        'animated-number': animatedNumber
+      },
+
+      computed: {
+        currentTasks: function () {
+          return this.tasks;
+        },
+        totalPages: function () {
+          var total = Math.ceil(this.project.task_count / parseInt(this.page_size));
+          if (this.page > total)
+            this.page = total;
+          return total;
+        }
+      },
+
+      methods: {
+        getApi: function (dst, url, always, fail, done) {
+          /* this api call will do vue.data['dst'] = get(url) */
+
+          var self = this;
+          $.get(url + (url.includes('?') ? '&' : '?') + 'rnd=' + randomInteger(0, 100000))
+            .done(function (data) {
+              setValue(self, dst, data);
+              if (done) done(data);
+              if (always) always(data);
+              // console.log(dst + ' loaded');
+            })
+            .fail(function (data) {
+              if (fail) fail(data);
+              else {
+                self.showError('Error while get api for <' + dst + '>:', message_from_response(data));
+              }
+              if (always) always(data);
+              console.log('error: no ' + dst + ' loaded')
+            })
+        },
+
+        // get tasks from api
+        loadTasks: function (polling) {
+          var self = this;
+          self.tasks_loaded = false;
+          this.getApi('tasks', 'api/tasks/' +
+            '?page=' + this.page +
+            '&page_size=' + parseInt(this.page_size) +
+            '&order=tasks:' + this.order +
+            (polling ? '&polling=true': ''),
+            // always
+            function (data) {
+              self.tasks_loaded = true;
+            },
+            // fail
+            function (data) {
+              self.showError('Tasks loading error', message_from_response(data))
+            },
+            // done
+            function () {
+              setValue(self, 'tasks', self.tasks.tasks);
+
+              // set task position to the first task
+              if (self.current_task_index === -1) {
+                self.current_task_index = 0;
+                self.openTaskPreview(self.tasks[self.current_task_index]);
+              }
+              // set task position to the last task
+              else if (self.current_task_index === -2) {
+                self.current_task_index = self.tasks.length - 1;
+                self.openTaskPreview(self.tasks[self.current_task_index]);
+              }
+            }
+
+          );
+        },
+
+        // get project info from api
+        loadProject: function (polling) {
+          var self = this;
+          this.getApi('project', 'api/project/' + (polling ? '?polling=true': ''),
+            // always
+            function () {
+              self.project_loaded = true;
+            },
+            // fail
+            function (data) {
+              self.showError('Project loading error', message_from_response(data));
+            }
+          );
+        },
+
+        // get tasks from api
+        loadStorageSettings: function () {
+          var self = this;
+          self.storage_settings.source.type_loading = self.storage_settings.target.type_loading = true;
+          this.getApi('storage_settings_all', 'api/project/storage-settings/',
+            function () {
+              self.storage_settings.source.type_loading = self.storage_settings.target.type_loading = false;
+              self.changeStorageSettings('source', 'current');
+              self.changeStorageSettings('target', 'current');
+            });
+        },
+
+        // get settings from storage_settings_all
+        changeStorageSettings: function (storage_for, storage_type) {
+          // change to current on backend
+          if (storage_type === 'current') {
+            var storages = this.storage_settings_all[storage_for];
+            for (var type in storages) {
+              var value = storages[type];
+              if (value.current) {
+                storage_type = type;
+                setValue(this, 'storage_settings.' + storage_for, value);
+                break;
+              }
+            }
+          }
+          // change to new type
+          else {
+            var value = this.storage_settings_all[storage_for][storage_type];
+            setValue(this, 'storage_settings.' + storage_for, value);
+          }
+
+          // hide/show link to import page
+          if (storage_for === 'source') {
+            $('#menu-import').css("display", storage_type === 'tasks-json' ? 'block' : 'none');
+          }
+        },
+
+        saveStorageSettings: function (storage_for) {
+          var self = this;
+          self.storage_settings[storage_for].loading = true;
+          self.storage_settings[storage_for].save_success = false;
+          self.$set(self.storage_settings[storage_for], 'errors', []);
+          $.ajax({
+            type: 'POST',
+            url: 'api/project/storage-settings/' +
+              '?type=' + this.storage_settings[storage_for].type +
+              '&storage_for=' + storage_for,
+            contentType: 'application/json',
+            dataType: 'json',
+            data: JSON.stringify(getFormData($('#' + storage_for + '-storage-form')))
+          }).fail(function (data) {
+            if (data.hasOwnProperty('responseJSON') && data.responseJSON.hasOwnProperty('errors'))
+              self.$set(self.storage_settings[storage_for], 'errors', data.responseJSON.errors);
+            else {
+              var msg = message_from_response(data);
+              self.storage_settings[storage_for].errors = {common: msg};
+              self.showError('Storage settings error', msg)
+            }
+            console.log('save storage settings error:');
+            console.log(data);
+          }).done(function () {
+            self.storage_settings[storage_for].save_success = true;
+            self.project_loaded = false;
+            setTimeout(function () {
+              self.loadAll();
+            }, 4000);
+          }).always(function () {
+            self.storage_settings[storage_for].loading = false;
+          });
+          return false;
+        },
+
+        // update all objects via api
+        loadAll: function () {
+          this.loadProject();
+          this.loadTasks();
+          this.loadStorageSettings();
+        },
+
+        // update all objects via api
+        loadProjectAndTasks: function () {
+          this.loadProject();
+          this.loadTasks();
+        },
+
+        // update all objects via api
+        loadProjectAndTasksByTimer: function (polling) {
+          if (this.project_loaded && this.tasks_loaded) {
+            this.loadProject(polling);
+            this.loadTasks(polling);
+          }
+        },
+
+        // change order of sorting in table
+        changeOrder: function (name) {
+          console.log('order changed to ' + name);
+          var old = getUrlArg('order', 'id');
+          if (old === name) {
+            name = '-' + name;
+          }
+          this.order = name;
+          Cookies.set('order', name);
+          refreshHistoryArg('order', name);
+          this.loadTasks();
+        },
+
+        // delete completion with trash button
+        deleteCompletion: function (task, completion) {
+          task.processing = true;
+          this.$forceUpdate();
+          var request = new XMLHttpRequest();
+          request.open("DELETE", "api/tasks/" + task.id + "/completions/" + completion.id + "/", true);
+          request.onload = this.loadProjectAndTasks;
+          request.send();
+        },
+
+        // delete completion with trash button
+        deleteTask: function (task) {
+          task.processing = true;
+          this.$forceUpdate();
+          var request = new XMLHttpRequest();
+          request.open("DELETE", "api/tasks/" + task.id + "/", true);
+          request.onload = this.loadProjectAndTasks;
+          request.send();
+        },
+
+        // delete all tasks from project
+        deleteAllTasks: function () {
+          var deletion_confirmed = confirm(
+            'You are going to delete all existing tasks.\n' +
+            'Warning! This operation cannot be undone.\nPlease confirm your action.');
+          if (deletion_confirmed) {
+            var request = new XMLHttpRequest();
+            request.open("DELETE", "api/tasks/delete", true);
+            request.onload = this.loadProjectAndTasks;
+            request.send();
+          }
+        },
+
+        // delete all completions from project
+        deleteAllCompletions: function () {
+          var deletion_confirmed = confirm(
+            'You are going to delete all existing completions.\n' +
+            'Warning! This operation cannot be undone.\nPlease confirm your action.');
+          if (deletion_confirmed) {
+            var request = new XMLHttpRequest();
+            request.open("DELETE", "api/project/completions", true);
+            request.onload = this.loadProjectAndTasks;
+            request.send();
+          }
+        },
+
+        // start/stop timer with project & task api loading
+        stopAutoUpdateTimer: function () {
+          clearInterval(this.auto_update_timer);
+          this.auto_update_timer = null;
+        },
+        startAutoUpdateTimer: function () {
+          if (this.timer_interval > 0) {
+            var self = this;
+            this.auto_update_timer = setInterval(function() {
+              self.loadProjectAndTasksByTimer(true); // run with polling = true to distinct request from timer
+            }, this.timer_interval);
+          }
+        },
+        toggleAutoUpdateTimer: function () {
+          if (this.auto_update_timer) {
+            this.stopAutoUpdateTimer();
+          } else {
+            this.startAutoUpdateTimer();
+          }
+        },
+
+        capitalizeFirstLetter: capitalizeFirstLetter,  // from helpers.js
+
+        getCurrentStorage: function (storage_for) {
+          var all = this.storage_settings_all[storage_for];
+          for (var key in all)
+            if (all[key].current)
+              return all[key];
+          return {description: '[No storage defined]', name: '[No storage defined]'}
+        },
+
+        showStorageField: function (field_name, storage) {
+          if (field_name !== 'create_local_copy') {
+            // find field use_blob_urls inside of list
+            var use_blob_urls = null;
+            for (var i in storage.fields) {
+              if (storage.fields[i].name === 'use_blob_urls') {
+                use_blob_urls = storage.fields[i];
+                break;
+              }
+            }
+            if (field_name === 'data_key' && !use_blob_urls.data) {
+              return false;
+            }
+            return true;
+          }
+        },
+
+        showError: function (title, message) {
+          $('body').toast({
+            class: 'error',
+            title: title,
+            message: '<pre>' + message + '</pre>',
+            displayTime: this.timer_interval * 2,
+            position: 'bottom center'
+          })
+        },
+
+        openTaskPreview: function (task) {
+          if (!task) task = this.current_task;
+          this.quick_view = true;
+          this.current_task = task;
+          this.columns = this.quick_columns;
+          var self = this;
+
+          setTimeout(function () {
+            if (self.labelStudio) {
+              // use already created instance
+              self.labelStudio._sdk.loadTask(task.id, 'auto');
+            } else {
+              // init new instance
+              self.labelStudio = LSF_SDK("label-studio", self.project.label_config_line, task, true);
+            }
+          }, 100);
+        },
+        closeTaskPreview: function () {
+          this.quick_view = false;
+          this.columns = this.full_columns;
+          this.current_task_index = -10;
+        },
+        toggleTaskPreview: function (index) {
+          if (typeof index === 'undefined') {
+            index = this.findCurrentTaskIndex();
+            index = index < 0 ? 0 : index;
+          }
+          this.current_task_index = index;
+          var task = this.tasks[index];
+          this.current_task && this.current_task.id === task.id && this.quick_view
+            ? this.closeTaskPreview() : this.openTaskPreview(task);
+        },
+
+        nextPage: function () {
+          if (this.page < this.totalPages) {
+            this.page++;
+            if (this.current_task_index !== -10)
+              this.current_task_index = -1;
+            this.audioStopAll();
+          }
+        },
+        prevPage: function () {
+          if (this.page > 1) {
+            this.page--;
+            if (this.current_task_index !== -10)
+              this.current_task_index = -2;
+            this.audioStopAll();
+          }
+        },
+        findCurrentTaskIndex: function() {
+          if (!this.current_task) return -1;
+
+          // find task index for current task
+          for (var i=0; i<this.tasks.length; i++) {
+            if (this.tasks[i].id === this.current_task.id)
+              return i;
+          }
+          return -1;
+        },
+        nextTask: function() {
+          if (this.current_task_index === -10) {
+            this.current_task_index = this.findCurrentTaskIndex();
+            this.current_task_index = this.current_task_index === -1 ? 0: this.current_task_index;
+            this.openTaskPreview(this.tasks[this.current_task_index]);
+          }
+          else if (0 <= this.current_task_index && this.current_task_index < this.tasks.length-1) {
+            this.current_task_index++;
+            this.openTaskPreview(this.tasks[this.current_task_index]);
+          }
+          else if (this.current_task_index === this.tasks.length-1) {
+            this.nextPage();
+          }
+        },
+        prevTask: function() {
+          if (this.current_task_index === -10) {
+            this.current_task_index = this.findCurrentTaskIndex();
+            this.current_task_index = this.current_task_index === -1 ? 0: this.current_task_index;
+            this.openTaskPreview(this.tasks[this.current_task_index]);
+          }
+          else if (0 < this.current_task_index && this.current_task_index < this.tasks.length) {
+            this.current_task_index--;
+            this.openTaskPreview(this.tasks[this.current_task_index]);
+          }
+          else if (this.current_task_index === 0) {
+            this.prevPage();
+          }
+        },
+
+        evalPanelWidth: function() {
+          // check that task table width > left panel size
+          var grid_width = this.$refs.grid.getBoundingClientRect().width;
+
+          var table_width = 0;
+          var right_width;
+          if (this.quick_view_show_table) {
+            table_width = this.$refs.task_table.getBoundingClientRect().width;
+            this.$refs.left_panel.style.width = (table_width + 28) + 'px';
+            right_width = (grid_width - 28 - table_width - 10);
+          }
+          else {
+            right_width = grid_width;
+          }
+          right_width = right_width < 500 ? 900: right_width;
+          this.$refs.right_panel.style.width = right_width + 'px';
+
+          // select ful pagination or small
+          this.full_pagination = (table_width > PAGINATION_MAX_WIDTH) || !this.quick_view;
+          // console.log(grid_width, table_width);
+        },
+
+        // audio player play / stop
+        audioToggle: function(target, task) {
+          if (target.nodeName === 'I') {
+            target = target.parentElement;
+          }
+          if (!task.playing) {
+            // stop all
+            $('audio').each(function(i, o) { if (o !== self) o.pause(); });
+            // start audio for current task
+            $(target).children('audio').each(function(i, o){ o.play() });
+            //Vue.set(task, 'playing', true);
+          }
+          else {
+            // stop current task audio
+            $(target).children('audio').each(function(i, o){ o.pause() });
+            //Vue.set(task, 'playing', false);
+          }
+        },
+        audioStopAll: function() {
+          $('audio').each(function(i, o) { o.pause(); o.currentTime = 0; });
+        },
+
+        copyValue: function(text) {
+          copyToClipboard(text);
+          $('body').toast({
+            class: 'orange center',
+            message: '<center>Copied to clipboard!</center>',
+            position: 'bottom center'
+          })
+        },
+
+        text_preview: function(text) {
+          return text.slice(0, this.text_preview_limit) +
+            (text.length <= this.text_preview_limit ? '': ' ...');
+        }
+      },
+
+      watch: {
+        // watch for page variable changes
+        page: function () {
+          this.loadTasks();
+          Cookies.set('page', this.page);
+          refreshHistoryArg('page', this.page);
+        },
+        page_size: function () {
+          this.loadTasks();
+          Cookies.set('page_size', this.page_size);
+          refreshHistoryArg('page_size', this.page_size);
+        },
+        'storage_settings.source.type': function () {
+          this.changeStorageSettings('source', this.storage_settings.source.type)
+        },
+        'storage_settings.target.type': function () {
+          this.changeStorageSettings('target', this.storage_settings.target.type)
+        },
+
+        columns: function (values) {
+          if (this.quick_view) {
+            this.quick_columns = values;
+            this.evalPanelWidth()
+          } else {
+            this.full_columns = values;
+          }
+        },
+
+        quick_columns: function () {
+          this.evalPanelWidth();
+          Cookies.set('quick_columns', this.quick_columns);
+        },
+        full_columns: function () {
+          Cookies.set('full_columns', this.full_columns);
+        },
+
+        quick_view: function () {
+          this.evalPanelWidth();
+        },
+
+        text_preview_limit: function () {
+          Cookies.set('text_preview_limit', this.text_preview_limit);
+        }
+      },
+
+      // vue mounting of page
+      mounted: function () {
+        // replace deprecated version 'others'
+        function remove_deprecated_others(array) {
+          var index = array.indexOf('others');
+          if (index >= 0) {
+            array.splice(index, 1);
+            array.push('previews')
+          }
+        }
+        remove_deprecated_others(this.full_columns);
+        remove_deprecated_others(this.quick_columns);
+
+        this.vue_loaded = true;
+        this.project_loaded = true;
+
+        this.order = getUrlArg('order', this.order);
+        this.page = getUrlArg('page', this.page);
+        this.page_size = getUrlArg('page_size', this.page_size);
+        this.loadAll();
+
+        // project and tasks auto update timer
+        var project_timer_interval = this.project.config.task_page_auto_update_timer ?
+          this.project.config.task_page_auto_update_timer.toString(): '10000';
+        this.timer_interval = parseInt(getUrlArg('timer', project_timer_interval));
+        this.startAutoUpdateTimer();
+        if (this.timer_interval > 0) {
+          console.log('auto update enabled, use ?timer=0 to disable it on this page')
+        }
+
+        $('#vue_loader').hide();
+        $('.ui.checkbox').checkbox();
+
+        // hotkeys mapping
+        var self = this;
+        Mousetrap.addKeycodes({
+          119: 'w',
+          115: 's',
+          100: 'd',
+          97:  'a',
+          113: 'q',
+          69: 'e',
+          96: '`'
+        });
+
+        Mousetrap.bind(['shift+left', 'a'], this.prevPage);
+        Mousetrap.bind(['shift+right', 'd'], this.nextPage);
+        Mousetrap.bind(['shift+up', 'w'], this.prevTask);
+        Mousetrap.bind(['shift+down', 's'], this.nextTask);
+        Mousetrap.bind(['`'], function() { self.show_settings = !self.show_settings });
+        Mousetrap.bind(['e'], function() { self.quick_view_show_table = !self.quick_view_show_table });
+        Mousetrap.bind(['q'], function() { self.toggleTaskPreview() });
+        Mousetrap.bind(['q'], function() { self.toggleTaskPreview() });
+
+        $(window).resize(this.evalPanelWidth);
+        console.log('Vue mounting success');
+      },
+
+      updated: function() {
+        this.evalPanelWidth();
+
+        // set uniform height for all tr-s in table
+        var max = 20;
+        var trs = $('tbody').find('tr');
+        trs.height(max);
+        trs.each(function(i, o) { if (max < $(o).height()) { max = $(o).height(); } });
+        trs.height(max);
+
+        this.$nextTick(function() {});
+      }
+    });
+
+  </script>
+
+{% endraw %}
+{% endblock %}

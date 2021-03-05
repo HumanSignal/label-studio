@@ -1,0 +1,65 @@
+{% if template_mode == "titles" or not template_mode %}
+
+<!-- ---------------------------------------------- --->
+<!-- Templates titles --->
+<!-- ---------------------------------------------- --->
+{% for complexity in templates %}
+<div class="ui accordion" id="{{ 'basic-templates' if complexity == 'basic' else 'adv-templates' }}">
+  <div class="title">
+    <i class="dropdown icon"></i>
+    {% if complexity == 'basic'%}Choose annotation type from {{complexity}} templates{% else %}
+    {{complexity|capitalize}} templates
+    {% endif %}
+  </div>
+  <div class="content" style="margin-top:-8px">
+    <!-- Templates categories -->
+    <div class="ui grid stackable" style="margin: 0 auto;">
+      {% for category in templates[complexity] %}
+        <!-- Template {{ complexity }}: {{ category }} -->
+        <div class="three wide column category">
+          {% if category == 'audio' %}<i class="icon sound" title="Audio sources"></i>
+          {% elif category == 'text' %}<i class="icon font" title="Text sources"></i>
+          {% elif category == 'html' %}<i class="icon code" title="HTML sources"></i>
+          {% elif category == 'image' %}<i class="icon image" title="Image sources"></i>
+          {% elif category == 'other' %}<i class="icon archive" title="Other sources"></i>
+          {% elif category == 'other2' %}<i class="icon archive" title="Yet more other sources"></i>
+          {% elif category == 'time-series' %}<i class="icon wave square" title="Time series"></i>
+          {% elif category == 'layouts' %}<i class="icon eye" title="View layout examples"></i>
+          {% elif category == 'per-region' %}<i class="icon vector square" title="Per region examples"></i>
+          {% elif category == 'nested' %}<i class="icon bullseye" title="Nested examples with conditional behavior"></i>
+          {% endif %}
+          {% for t in templates[complexity][category] %}<div class="ui item">
+              <a class="use-template no-go" href="#" data-value="{{ t.pk }}">{{ t.title }}</a>
+              {%  if t.new %}
+                <span data-tippy-content="New template!">
+                  <i class="ui icon orange tiny circle" style="opacity:0.55; position: relative; top:-2px"></i>
+                </span>
+              {% endif %}
+            </div>{% endfor %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+{% endif %}
+
+
+
+{% if template_mode == "codes" or not template_mode %}
+
+<!-- ---------------------------------------------- --->
+<!-- Templates codes -->
+<!-- ---------------------------------------------- --->
+  {% for complexity in templates %}
+    {% for category in templates[complexity] %}
+      {% for t in templates[complexity][category] %}
+        {% autoescape off %}
+<script data-template-pk="{{ t.pk }}" type="text">{{ t.label_config }}</script>
+        {% endautoescape %}
+      {% endfor %}
+    {% endfor %}
+  {% endfor %}
+
+{% endif %}

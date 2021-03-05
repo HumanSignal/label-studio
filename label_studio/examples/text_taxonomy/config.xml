@@ -1,0 +1,13 @@
+<!-- {"title": "Text taxonomy", "category": "text", "complexity": "basic", "new": true} -->
+<View>
+  <Text name="text" value="$text"/>
+  <Taxonomy name="taxonomy" toName="text">
+    <Choice value="Archaea" />
+    <Choice value="Bacteria" />
+    <Choice value="Eukarya">
+      <Choice value="Human" />
+      <Choice value="Oppossum" />
+      <Choice value="Extraterrestial" />
+    </Choice>
+  </Taxonomy>
+</View>

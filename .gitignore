@@ -35,9 +35,11 @@ Desktop.ini
 .env.development.local
 .env.test.local
 .env.production.local
+htx-env
 
 # Testing
 coverage/
+.coverage
 
 # Examples of local env
 src/examples
@@ -48,4 +50,10 @@ build/static/media/config.*.xml
 #project files
 label_studio.egg-info/
 my_project/
+my_project1/
 label-studio-projects
+./build/
+dist/
+venv/
+tmp/
+scripts/build-tmp

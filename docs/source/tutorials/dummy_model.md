@@ -1,8 +1,24 @@
+---
+title:
+type: blog
+order: 10
+---
 
 ## Create the simplest Machine Learning backend
 
 It explains the basics of Machine Learning (ML) backend usage within Label Studio. For the sake of simplicity, a _dummy model_ is served and actually does nothing but produces the random predictions.
 It is compatible with any classication task, i.e. where `<Choices>` tag is used.
+
+For example, let's consider this labeling config: 
+```
+<View>
+  <Image name="image" value="$image"/>
+  <Choices name="choice" toName="image" showInLine="true">
+    <Choice value="Boeing" background="blue"/>
+    <Choice value="Airbus" background="green" />
+  </Choices>
+</View>
+```
 
 ### Create dummy model script
 
@@ -10,8 +26,8 @@ If you create ML backend by using Label Studio's ML SDK, you have to follow the 
 
 - created model class should be inherited from `label_studio.ml.LabelStudioMLBase`
 - 2 methods should be overrided:
-    - `predict()` takes [input tasks](/guide/tasks.html#Basic-format) and outputs [predictions](/guide/completions.html#predictions) in a Label Studio format
-    - `train()` receives [completions](/guide/completions.html#Basic-format) iterable and returns dictionary with created links and resources. This dictionary will be later used for model loading via `self.train_output` field.
+    - `predict()` takes [input tasks](/guide/tasks.html#Basic-format) and outputs [predictions](/guide/export.html#predictions) in a Label Studio format
+    - `fit()` receives [completions](/guide/export.html#Basic-format) iterable and returns dictionary with created links and resources. This dictionary will be later used for model loading via `self.train_output` field.
 
 Create a file `model.py` with the following content:
 
@@ -66,9 +82,9 @@ Let's call ML backend `my_backend` and initialize ML backend directory `./my_bac
 label-studio-ml init my_backend
 ```
 
-The later command takes your script `./model.py` then creates `./my_backend` directory at the same level and copies configs and scripts needed for launching ML backend either in development or production modes.
+The last command takes your script `./model.py` then creates `./my_backend` directory at the same level and copies configs and scripts needed for launching ML backend either in development or production modes.
 
-> Note: You can specify different location for your model script, e.g. `label-studio init my_backend --script /path/to/my/script.py`
+> Note: You can specify different location for your model script, e.g. `label-studio-ml init my_backend --script /path/to/my/script.py`
 
 ### Launch ML backend server
 
@@ -103,7 +119,7 @@ Now you can explore runtime logs in `my_backend/logs/uwsgi.log` and RQ training 
 Initialize and start new Label Studio project connecting to the running ML backend:
 
 ```bash
-label-studio start --init --ml-backend-url http://localhost:9090
+label-studio start my_project --init --ml-backends http://localhost:9090
 ```
 
 #### Getting predictions
@@ -115,5 +131,5 @@ You should see model predictions in a labeling interface.
 Model training is triggered manually by pushing `Start training` button on [/model](http://localhost:8080/model) page, or by using an API call:
 
 ```bash
-curl -X POST http://localhost:8080/api/train
+curl -X POST http://localhost:8080/api/models/train
 ```

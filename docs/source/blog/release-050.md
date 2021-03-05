@@ -66,7 +66,7 @@ That enables you to build more complex interfaces. Here is an example that puts 
         <Choice value="Politics" />
       </View>
       <View style="padding: 1em 4em; background: rgba(255,255,0,0.1)">
-        <Header size="4" value="Speach Type" />
+        <Header size="4" value="Speech Type" />
         <Choice value="Legible" />
         <Choice value="Slurred" />
       </View>
@@ -127,7 +127,7 @@ Previously changing a config after importing or labeling tasks could be dangerou
 
 ### Exporting with automatic converters
 
-When finishing your project - go to the [export page](http://localhost:8080/export) and choose in between the [common export formats](/guide/completions.html#Export-formats) valid for your current project configuration.
+When finishing your project - go to the [export page](http://localhost:8080/export) and choose in between the [common export formats](/guide/export.html#Export-formats) valid for your current project configuration.
 
 ### Connection to running Machine Learning backend
 

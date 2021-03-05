@@ -1,0 +1,91 @@
+<!-- {"title": "COCO annotation", "category": "image", "complexity": "basic", "new": true} -->
+
+<View>
+    <Header value="Common Objects in Context"/>
+    <Image name="image" value="$image"/>
+    <Filter name="filter" toName="object"
+      hotkey="shift+f" minlength="0"
+      placeholder="Type object name here..." />
+    <RectangleLabels name="object" toName="image">
+        <Label value="airplane"/>
+        <Label value="apple"/>
+        <Label value="backpack"/>
+        <Label value="banana"/>
+        <Label value="baseball_bat"/>
+        <Label value="baseball_glove"/>
+        <Label value="bear"/>
+        <Label value="bed"/>
+        <Label value="bench"/>
+        <Label value="bicycle"/>
+        <Label value="bird"/>
+        <Label value="boat"/>
+        <Label value="book"/>
+        <Label value="bottle"/>
+        <Label value="bowl"/>
+        <Label value="broccoli"/>
+        <Label value="bus"/>
+        <Label value="cake"/>
+        <Label value="car"/>
+        <Label value="carrot"/>
+        <Label value="cat"/>
+        <Label value="cell_phone"/>
+        <Label value="chair"/>
+        <Label value="clock"/>
+        <Label value="couch"/>
+        <Label value="cow"/>
+        <Label value="cup"/>
+        <Label value="dining_table"/>
+        <Label value="dog"/>
+        <Label value="donut"/>
+        <Label value="elephant"/>
+        <Label value="fire_hydrant"/>
+        <Label value="fork"/>
+        <Label value="frisbee"/>
+        <Label value="giraffe"/>
+        <Label value="hair_drier"/>
+        <Label value="handbag"/>
+        <Label value="horse"/>
+        <Label value="hot_dog"/>
+        <Label value="keyboard"/>
+        <Label value="kite"/>
+        <Label value="knife"/>
+        <Label value="laptop"/>
+        <Label value="microwave"/>
+        <Label value="motorcycle"/>
+        <Label value="mouse"/>
+        <Label value="orange"/>
+        <Label value="oven"/>
+        <Label value="parking_meter"/>
+        <Label value="person"/>
+        <Label value="pizza"/>
+        <Label value="potted_plant"/>
+        <Label value="refrigerator"/>
+        <Label value="remote"/>
+        <Label value="sandwich"/>
+        <Label value="scissors"/>
+        <Label value="sheep"/>
+        <Label value="sink"/>
+        <Label value="skateboard"/>
+        <Label value="skis"/>
+        <Label value="snowboard"/>
+        <Label value="spoon"/>
+        <Label value="sports_ball"/>
+        <Label value="stop_sign"/>
+        <Label value="suitcase"/>
+        <Label value="surfboard"/>
+        <Label value="teddy_bear"/>
+        <Label value="tennis_racket"/>
+        <Label value="tie"/>
+        <Label value="toaster"/>
+        <Label value="toilet"/>
+        <Label value="toothbrush"/>
+        <Label value="traffic_light"/>
+        <Label value="train"/>
+        <Label value="truck"/>
+        <Label value="tv"/>
+        <Label value="umbrella"/>
+        <Label value="vase"/>
+        <Label value="wine_glass"/>
+        <Label value="zebra"/>
+    </RectangleLabels>
+</View>

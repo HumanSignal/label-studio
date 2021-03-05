@@ -61,7 +61,7 @@ def parse_input_args():
         help='Source data storage type')
     root_parser.add_argument(
         '--source-path', dest='source_path',
-        help='Source bucket name')
+        help='Source bucket/container name')
     root_parser.add_argument(
         '--source-params', dest='source_params', type=json.loads, default={},
         help='JSON string representing source parameters')
@@ -70,7 +70,7 @@ def parse_input_args():
         help='Target data storage type')
     root_parser.add_argument(
         '--target-path', dest='target_path',
-        help='Target bucket name')
+        help='Target bucket/container name')
     root_parser.add_argument(
         '--target-params', dest='target_params', type=json.loads, default={},
         help='JSON string representing target parameters')
@@ -94,13 +94,32 @@ def parse_input_args():
     )
     root_parser.add_argument(
         '--host', dest='host', type=str,
-        help='Server port')
+        help='Server hostname for LS internal usage like import task urls generation, sample task urls, etc. '
+             'If you need to start server on localhost instead of 0.0.0.0, just make it "localhost". '
+             'Otherwise web-server host will be 0.0.0.0 always independent of this parameter.')
+    root_parser.add_argument(
+        '--protocol', dest='protocol', type=str,
+        help='Web protocol http:// or https://')
     root_parser.add_argument(
         '-p', '--port', dest='port', type=int,
         help='Server port')
     root_parser.add_argument(
+        '--cert', dest='cert_file', type=valid_filepath,
+        help='Certificate file for HTTPS (in PEM format)'
+    )
+    root_parser.add_argument(
+        '--key', dest='key_file', type=valid_filepath,
+        help='Private key file for HTTPS (in PEM format)'
+    )
+    root_parser.add_argument(
         '--allow-serving-local-files', dest='allow_serving_local_files', action='store_true',
         help='Allow serving local files (Warning! use this option only for your local runs)')
+    root_parser.add_argument(
+        '--use-gevent', dest='use_gevent', action='store_true',
+        help='Use gevent for better concurrency', default=False)
+    root_parser.add_argument(
+        '--initial-project-description', dest='project_desc',
+        help='Project description to identify project')
 
     parser = argparse.ArgumentParser(description='Label studio')
 
@@ -125,6 +144,12 @@ def parse_input_args():
     parser_start.add_argument(
         '--init', dest='init', action='store_true',
         help='Initialize if project is not initialized yet')
+    parser_start.add_argument(
+        '--password', dest='password', default='',
+        help='Password for web access')
+    parser_start.add_argument(
+        '--username', dest='username', default='',
+        help='Username for web access')
 
     # start-multi-session sub-command parser
 

@@ -1,32 +1,11 @@
-node_modules
-npm-debug.log
-Dockerfile
-.dockerignore
-build
-dist
-docs
-tests
-tox.ini
-public
-label_studio.egg-info
-.git
-.github
-.vscode
-.editorconfig
-.gitignore
-*.md
-!README.md
-*.txt
+# Ignore everything:
+**
+
+# Except:
+!images
+!label_studio
+!scripts
+!tools
+!setup.py
 !requirements.txt
-*.yml
-*.json
-*.pem
-.python-version
-
-# shell scripts
-update_pypi.sh
-
-# misc folders
-tmp
-etc
-my_*
+!README.md

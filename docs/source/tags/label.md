@@ -1,7 +1,7 @@
 ---
 title: Label
 type: tags
-order: 404
+order: 410
 ---
 
 Label tag represents a single label
@@ -12,6 +12,7 @@ Label tag represents a single label
 | --- | --- | --- | --- |
 | value | <code>string</code> |  | value of the label |
 | [selected] | <code>boolean</code> | <code>false</code> | if this label should be preselected |
+| [maxUsages] | <code>number</code> |  | maximum available usages |
 | [hotkey] | <code>string</code> |  | hotkey, if not specified then will be automatically generated |
 | [alias] | <code>string</code> |  | label alias |
 | [showAlias] | <code>boolean</code> | <code>false</code> | show alias inside label text |
@@ -19,8 +20,9 @@ Label tag represents a single label
 | [size] | <code>string</code> | <code>&quot;medium&quot;</code> | size of text in the label |
 | [background] | <code>string</code> |  | background color of an active label |
 | [selectedColor] | <code>string</code> |  | color of text in an active label |
+| [granularity] | <code>symbol</code> \| <code>word</code> |  | control per symbol or word selection (only for Text) |
 
-### Example  
+### Example
 ```html
 <View>
   <Labels name="type" toName="txt-1">

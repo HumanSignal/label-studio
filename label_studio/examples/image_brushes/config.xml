@@ -1,0 +1,8 @@
+<!-- {"title": "Brush segmentation", "category": "image", "complexity": "basic"} -->
+<View>
+  <Image name="image" value="$image"/>
+  <BrushLabels name="tag" toName="image">
+    <Label value="Planet" background="rgba(0, 0, 255, 0.7)"/>
+    <Label value="Moonwalker" background="rgba(255, 0, 0, 0.7)"/>
+  </BrushLabels>
+</View>

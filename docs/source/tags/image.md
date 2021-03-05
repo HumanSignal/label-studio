@@ -1,10 +1,11 @@
 ---
 title: Image
 type: tags
-order: 303
+order: 304
 ---
 
-Image tag shows an image on the page
+Image tag shows an image on the page.
+All the region numbers are percents of image original sizes — [0, 100]
 
 ### Parameters
 
@@ -25,14 +26,14 @@ Image tag shows an image on the page
 | [contrastControl] | <code>boolean</code> | <code>false</code> | show contrast control in toolbar |
 | [rotateControl] | <code>boolean</code> | <code>false</code> | show rotate control in toolbar |
 
-### Example  
+### Example
 ```html
 <View>
-  <!-- Take the image url from the url column in HTML/CSV -->
+  <!-- Take the image url from the url column in JSON/CSV -->
   <Image value="$url"></Image>
 </View>
 ```
-### Example  
+### Example
 ```html
 <View>
   <Image value="https://imgflip.com/s/meme/Leonardo-Dicaprio-Cheers.jpg" width="100%" maxWidth="750px" />

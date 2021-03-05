@@ -1,0 +1,37 @@
+<!-- {"title": "Time Series classification", "category": "time-series", "complexity": "basic", "order": "!"} -->
+
+<!-- readme
+### Quickstart
+
+It's the simplest example of TimeSeries usage.
+Read more about tags in the documentation:
+<a href="https://labelstud.io/tags/timeseries.html" target="_blank">TimeSeries</a>,
+<a href="https://labelstud.io/tags/timeserieslabels.html" target="_blank">TimeSeriesLabels</a>,
+<a href="https://labelstud.io/tags/timeseries.html#Channel" target="_blank">Channel</a>.
+
+This config allows to do:
+  * whole signal classification: use choice checkboxes for it
+  * per region classification (segmentation): select label and start to draw regions
+
+-->
+
+<View>
+    <Header value="Time Series classification"
+            style="font-weight: normal"/>
+    <!-- Choices (whole signal classification) -->
+    <Choices name="pattern" toName="ts">
+        <Choice value="Growth"/>
+        <Choice value="Decay"/>
+    </Choices>
+
+    <!-- Labels (per region classification) -->
+    <TimeSeriesLabels name="label" toName="ts">
+        <Label value="Run"/>
+        <Label value="Walk"/>
+    </TimeSeriesLabels>
+
+    <!-- Object (source) tag for plot -->
+    <TimeSeries name="ts" value="$csv" valueType="url">
+        <Channel column="first_column"/>
+    </TimeSeries>
+</View>

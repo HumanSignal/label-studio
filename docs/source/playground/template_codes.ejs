@@ -1,0 +1,1445 @@
+<%#
+  1 run label-studio start my_project,
+  2 go to /setup?template_mode=codes
+  3 copy page source code here
+%>
+
+<!-- ---------------------------------------------- --->
+<!-- Templates codes -->
+<!-- ---------------------------------------------- --->
+
+
+<script data-template-pk="48" type="text"><View>
+  <Header value="Listen to the audio"/>
+  <Audio name="audio" value="$audio"/>
+  <Header value="Select its topic"/>
+  <Choices name="topic" toName="audio"
+           choice="single-radio" showInline="true">
+    <Choice value="Politics"/>
+    <Choice value="Business"/>
+    <Choice value="Education"/>
+    <Choice value="Other"/>
+  </Choices>
+</View>
+</script>
+
+
+
+<script data-template-pk="30" type="text"><View>
+  <Labels name="emotion" toName="audio" choice="multiple">
+    <Label value="Fear" background="#ff0000" />
+    <Label value="Anger" background="#d50000" />
+    <Label value="Sadness" background="#5050ff" />
+    <Label value="Joy" background="#ffff53" />
+    <Label value="Disgust" background="#ff53ff" />
+    <Label value="Surprise" background="#58beff" />
+    <Label value="Trust" background="#009700" />
+    <Label value="Anticipation" background="#ffa953" />
+  </Labels>
+
+  <AudioPlus name="audio" value="$audio"/>
+</View>
+</script>
+
+
+
+<script data-template-pk="47" type="text"><View>
+  <Labels name="label" toName="audio" choice="multiple">
+    <Label value="Speaker 1" />
+    <Label value="Speaker 2" />
+  </Labels>
+  <AudioPlus name="audio" value="$audio"/>
+</View>
+</script>
+
+
+
+<script data-template-pk="32" type="text"><View>
+  <Labels name="labels" toName="audio">
+    <Label value="Speaker 1" />
+    <Label value="Speaker 2" />
+  </Labels>
+  <AudioPlus name="audio" value="$audio"/>
+
+  <View visibleWhen="region-selected">
+    <Header value="Provide Transcription" />
+  </View>
+
+  <TextArea name="transcription" toName="audio"
+            rows="2" editable="true"
+            perRegion="true" required="true" />
+</View>
+</script>
+
+
+
+<script data-template-pk="15" type="text"><View>
+  <Header value="Listen to the audio" />
+  <Audio name="audio" value="$audio" />
+  <Header value="Write the transcription" />
+  <TextArea name="transcription" toName="audio"
+            rows="4" editable="true" maxSubmissions="1" />
+</View>
+</script>
+
+
+
+
+
+<script data-template-pk="25" type="text"><View>
+  <Image name="image" value="$image"/>
+  <Choices name="choice" toName="image" showInLine="true">
+    <Choice value="Boeing" background="blue"/>
+    <Choice value="Airbus" background="green" />
+  </Choices>
+</View>
+</script>
+
+
+
+<script data-template-pk="41" type="text"><View>
+  <Image name="image" value="$image"/>
+  <RectangleLabels name="label" toName="image">
+    <Label value="Airplane" background="green"/>
+    <Label value="Car" background="blue"/>
+  </RectangleLabels>
+</View>
+</script>
+
+
+
+<script data-template-pk="9" type="text"><View>
+  <Image name="image" value="$image"/>
+  <BrushLabels name="tag" toName="image">
+    <Label value="Planet" background="rgba(0, 0, 255, 0.7)"/>
+    <Label value="Moonwalker" background="rgba(255, 0, 0, 0.7)"/>
+  </BrushLabels>
+</View></script>
+
+
+
+<script data-template-pk="33" type="text"><View>
+  <Image name="image" value="$image"/>
+  <EllipseLabels name="tag" toName="image">
+    <Label value="Airplane" background="green"/>
+    <Label value="Car" background="blue"/>
+  </EllipseLabels>
+</View>
+</script>
+
+
+
+<script data-template-pk="14" type="text"><View>
+  <Image name="image" value="$image" zoom="true" zoomControl="true"/>
+  <KeyPointLabels name="label" toName="image"
+                  strokewidth="2" opacity="1" >
+      <Label value="Engine" background="red"/>
+      <Label value="Tail" background="blue"/>
+  </KeyPointLabels>
+</View>
+</script>
+
+
+
+<script data-template-pk="34" type="text"><View>
+
+  <Header value="Select label and start to click on image"/>
+  <Image name="image" value="$image"/>
+
+  <PolygonLabels name="label" toName="image"
+                 strokeWidth="3" pointSize="small"
+                 opacity="0.9">
+    <Label value="Airplane" background="red"/>
+    <Label value="Car" background="blue"/>
+  </PolygonLabels>
+
+</View>
+</script>
+
+
+
+<script data-template-pk="27" type="text"><View>
+  <Header value="Please select everything you see on the image" />
+
+  <View style="display: flex;">
+    <View style="width: 49%; margin-right: 1.99%">
+      <Image name="img-left" value="$image1"/>
+      <Choices name="class-left" toName="img-left" choice="multiple">
+        <Choice value="People" />
+        <Choice value="Trees" />
+        <Choice value="Animals" />
+      </Choices>
+    </View>
+
+    <View style="width: 49%;">
+      <Image name="img-right" value="$image2"/>
+      <Choices name="class-right" toName="img-right" choice="multiple">
+        <Choice value="Food" />
+        <Choice value="Cars" />
+        <Choice value="Buildings" />
+      </Choices>
+    </View>
+  </View>
+
+  <View>
+    <Header value="Which one is clearer to you?" />
+    <Choices name="comparison" toName="img-left" showInline="true">
+      <Choice value="Left" />
+      <Choice value="Right" />
+    </Choices>
+  </View>
+</View>
+</script>
+
+
+
+
+
+<script data-template-pk="39" type="text"><View>
+  <Text name="text" value="$text"/>
+  <Choices name="sentiment" toName="text" choice="single">
+    <Choice value="Positive"/>
+    <Choice value="Negative"/>
+    <Choice value="Neutral"/>
+  </Choices>
+</View>
+</script>
+
+
+
+<script data-template-pk="20" type="text"><View>
+  <Text name="text" value="$text" />
+
+  <Choices name="sentiment" toName="text" choice="multiple">
+    <View style="display: flex; justify-content: space-between">
+      <View style="width: 50%">
+        <Header value="Select Topics" />
+        <Choice value="Politics"/>
+    	<Choice value="Business"/>
+    	<Choice value="Sport"/>
+      </View>
+      <View>
+        <Header value="Select Moods" />
+        <Choice value="Cheerful"/>
+    	<Choice value="Melancholy"/>
+    	<Choice value="Romantic"/>
+      </View>
+    </View>
+  </Choices>
+
+</View>
+</script>
+
+
+
+<script data-template-pk="10" type="text"><View>
+  <Labels name="label" toName="text">
+    <Label value="Person" background="red"/>
+    <Label value="Organization" background="darkorange"/>
+    <Label value="Fact" background="orange"/>
+    <Label value="Money" background="green"/>
+    <Label value="Date" background="darkblue"/>
+    <Label value="Time" background="blue"/>
+    <Label value="Ordinal" background="purple"/>
+    <Label value="Percent" background="#842"/>
+    <Label value="Product" background="#428"/>
+    <Label value="Language" background="#482"/>
+    <Label value="Location" background="rgba(0,0,0,0.8)"/>
+  </Labels>
+
+  <Text name="text" value="$text"/>
+</View>
+</script>
+
+
+
+<script data-template-pk="17" type="text"><View>
+  <Header value="Please read the text" />
+  <Text name="text" value="$text" />
+
+  <Header value="Provide one sentence summary" />
+  <TextArea name="answer" toName="text"
+            showSubmitButton="true" maxSubmissions="1" editable="true"
+            required="true" />
+</View>
+</script>
+
+
+
+<script data-template-pk="50" type="text"><View>
+  <Labels name="label" toName="text">
+    <Label value="Person" />
+    <Label value="Organization" />
+  </Labels>
+  <Text name="text" value="$text" granularity="word" />
+</View>
+</script>
+
+
+
+
+
+<script data-template-pk="6" type="text"><View>
+  <Choices name="toxicity" toName="web_page" choice="multiple" showInline="true">
+    <Choice value="Toxic" background="red"/>
+    <Choice value="Severe Toxic" background="brown"/>
+    <Choice value="Obsene" background="green"/>
+    <Choice value="Threat" background="blue"/>
+    <Choice value="Insult" background="orange"/>
+    <Choice value="Identity Hate" background="grey"/>
+  </Choices>
+
+  <View style="border: 1px solid #CCC;
+               border-radius: 10px;
+               padding: 5px">
+    <HyperText name="web_page" value="$text"/>
+  </View>
+</View>
+</script>
+
+
+
+<script data-template-pk="46" type="text"><View>
+  <HyperTextLabels name="ner" toName="text">
+    <Label value="Person" background="green"/>
+    <Label value="Organization" background="blue"/>
+  </HyperTextLabels>
+
+  <View style="border: 1px solid #CCC;
+               border-radius: 10px;
+               padding: 5px">
+    <HyperText name="text" value="$text"/>
+  </View>
+</View>
+</script>
+
+
+
+<script data-template-pk="43" type="text"><View>
+  <HyperText name="dialog" value="$dialogs"/>
+
+  <Header value="Rate last answer"/>
+  <Choices name="rating" choice="single-radio" toName="dialog" showInline="true">
+    <Choice value="Bad answer"/>
+    <Choice value="Neutral answer"/>
+    <Choice value="Good answer"/>
+  </Choices>
+
+  <Header value="Write your answer and press Enter"/>
+  <TextArea toName="dialog" name="answer"/>
+</View>
+</script>
+
+
+
+<script data-template-pk="1" type="text"><View>
+  <HyperText name="pdf" value="$pdf"/>
+
+  <Header value="Rate this article"/>
+  <Rating name="rating" toName="pdf" maxRating="10" icon="star" size="medium" />
+
+  <Choices name="choices" choice="single-radio" toName="pdf" showInline="true">
+    <Choice value="Important article"/>
+    <Choice value="Yellow press"/>
+  </Choices>
+</View>
+</script>
+
+
+
+<script data-template-pk="4" type="text"><View>
+  <HyperText name="website" value="$website"/>
+
+  <Header value="Rate this website"/>
+  <Rating name="rating" toName="website" maxRating="10" icon="star" size="medium" />
+
+  <Choices name="choices" choice="single-radio" toName="website" showInline="true">
+    <Choice value="Important article"/>
+    <Choice value="Yellow press"/>
+  </Choices>
+</View>
+</script>
+
+
+
+<script data-template-pk="13" type="text"><View>
+  <HyperText name="video" value="$video"/>
+  <Choices name="type" toName="video" choice="single-radio">
+    <Choice value="Awesome" />
+    <Choice value="Groove" />
+  </Choices>
+</View></script>
+
+
+
+
+
+<script data-template-pk="16" type="text">
+<!-- readme
+### Quickstart
+
+It's the simplest example of TimeSeries usage.
+Read more about tags in the documentation:
+<a href="https://labelstud.io/tags/timeseries.html" target="_blank">TimeSeries</a>,
+<a href="https://labelstud.io/tags/timeserieslabels.html" target="_blank">TimeSeriesLabels</a>,
+<a href="https://labelstud.io/tags/timeseries.html#Channel" target="_blank">Channel</a>.
+
+This config allows to do:
+  * whole signal classification: use choice checkboxes for it
+  * per region classification (segmentation): select label and start to draw regions
+
+-->
+
+<View>
+    <Header value="Time Series classification"
+            style="font-weight: normal"/>
+    <!-- Choices (whole signal classification) -->
+    <Choices name="pattern" toName="ts">
+        <Choice value="Growth"/>
+        <Choice value="Decay"/>
+    </Choices>
+
+    <!-- Labels (per region classification) -->
+    <TimeSeriesLabels name="label" toName="ts">
+        <Label value="Run"/>
+        <Label value="Walk"/>
+    </TimeSeriesLabels>
+
+    <!-- Object (source) tag for plot -->
+    <TimeSeries name="ts" value="$csv" valueType="url">
+        <Channel column="first_column"/>
+    </TimeSeries>
+</View>
+</script>
+
+
+
+<script data-template-pk="8" type="text">
+<!-- readme
+### Quickstart
+
+1. Prepare `time-series.csv` in tabular CSV format:
+    ```
+    time,velocity,acceleration
+    0,12.34,56.78
+    2,43.21,87.65
+    ```
+
+2. Set column names from CSV in the labeling config below:
+    - `timeColumn="time"`
+    - `column="velocity"`, `column="acceleration"`
+
+3. Add `<Channel>` tags for more columns if needed.
+
+4. After setup you can import your CSV files on Import page and Label Studio will host them OR
+upload your CSV to your hosting (e.g.: `https://my.domain.com/time-series.csv`) and
+<a target="_blank" href="https://labelstud.io/guide/tasks.html">prepare LS tasks for them.</a>
+
+    Read more about
+<a href="https://labelstud.io/tags/timeseries.html" target="_blank">TimeSeries</a>,
+<a href="https://labelstud.io/tags/timeserieslabels.html" target="_blank">TimeSeriesLabels</a>,
+<a href="https://labelstud.io/tags/timeseries.html#Channel" target="_blank">Channel</a>.
+-->
+
+<View>
+    <Header value="Time Series from CSV"
+            style="font-weight: normal"/>
+
+    <!-- Control tag for region labels -->
+    <TimeSeriesLabels name="label" toName="ts">
+        <Label value="Run" background="#5b5"/>
+        <Label value="Walk" background="#55f"/>
+    </TimeSeriesLabels>
+
+    <!-- Object tag for time series data source -->
+    <TimeSeries name="ts" valueType="url"
+                timeColumn="time" value="$csv"
+                sep="," overviewChannels="velocity">
+        <Channel column="velocity"
+                 strokeColor="#1f77b4"/>
+        <Channel column="acceleration"
+                 strokeColor="#ff7f0e"/>
+    </TimeSeries>
+</View></script>
+
+
+
+<script data-template-pk="2" type="text">
+<!-- readme
+### Notes
+
+* JSON is a native format for Label Studio and it allows to store time series data right in LS task.
+<a target="_blank" href="https://labelstud.io/guide/tasks.html">Read more about LS tasks in documentation.</a>
+
+* JSON is necessary when you need to combine multiple data source in one task.
+For example, you mix two CSV files for time series into one labeling task or
+if you try to build Text + TimeSeries configuration.
+
+### Quickstart
+
+1. Prepare JSON-formatted input:
+
+    ```json
+    {
+      "ts": {
+        "time": [0,1,2],
+        "first_column": [3,4,5],
+        "second_column": [6,7,8]
+      }
+    }
+    ```
+
+2. Set your data keys in the following attributes:
+    * `timeColumn="time"`
+    * `column="first_column"` and `column="second_column"`
+
+3. Add more `<Channel>` tags for more columns if needed
+
+    Read more about
+<a href="https://labelstud.io/tags/timeseries.html" target="_blank">TimeSeries</a>,
+<a href="https://labelstud.io/tags/timeserieslabels.html" target="_blank">TimeSeriesLabels</a>,
+<a href="https://labelstud.io/tags/timeseries.html#Channel" target="_blank">Channel</a>.
+-->
+
+<View>
+    <Header value="Time Series from JSON"
+            style="font-weight: normal"/>
+
+    <TimeSeriesLabels name="label" toName="ts">
+        <Label value="Anomaly" background="#a4a"/>
+        <Label value="Ordinary" background="#aa4"/>
+    </TimeSeriesLabels>
+
+    <TimeSeries timeColumn="time"
+                name="ts" value="$ts" valueType="json">
+        <Channel column="first_column"
+                 strokeColor="#1f77b4"/>
+        <Channel column="second_column"
+                 strokeColor="#ff7f0e"/>
+    </TimeSeries>
+</View>
+</script>
+
+
+
+<script data-template-pk="21" type="text">
+<!-- readme
+### Tips
+* Almost all parameters of Time Series are presented in this template.
+* One-point region addition: select label and add one-point region by double click on the plot,
+it will be marked as `"instant": true` in the results.
+* To read time from input and display it on plot use `timeFormat` and `timeDisplayFormat` as in `strftime` format.
+* To display signal values use `displayFormat` as in <a href="https://github.com/d3/d3-format#locale_format" target="_blank">D3 formats</a>.
+* Read more about Time Series in the documentation:
+
+    * <a href="https://labelstud.io/tags/timeseries.html" target="_blank">TimeSeries tag</a>
+    * <a href="https://labelstud.io/tags/timeserieslabels.html" target="_blank">TimeSeriesLabels tag</a>
+    * <a href="https://labelstud.io/tags/timeseries.html#Channel" target="_blank">Channel tag</a>
+-->
+
+<View>
+    <Header value="Time Series Segmentation"/>
+
+    <!-- Control tag for region labels -->
+    <TimeSeriesLabels name="label" toName="ts">
+        <Label value="Run" background="red"/>
+        <Label value="Walk" background="green"/>
+        <Label value="Fly" background="blue"/>
+        <Label value="Swim" background="#f6a"/>
+        <Label value="Ride" background="#351"/>
+    </TimeSeriesLabels>
+
+    <!-- Object tag for time series data source -->
+    <TimeSeries name="ts" valueType="url" value="$csv"
+                sep=","
+                timeColumn="time"
+                timeFormat="%Y-%m-%d %H:%M:%S.%f"
+                timeDisplayFormat="%Y-%m-%d"
+                overviewChannels="velocity">
+
+        <Channel column="velocity"
+                 units="miles/h"
+                 displayFormat=",.1f"
+                 strokeColor="#1f77b4"
+                 legend="Velocity"/>
+
+        <Channel column="acceleration"
+                 units="miles/h^2"
+                 displayFormat=",.1f"
+                 strokeColor="#ff7f0e"
+                 legend="Acceleration"/>
+    </TimeSeries>
+</View></script>
+
+
+
+<script data-template-pk="23" type="text">
+<!-- readme
+### Notes
+* Select region to show the next step with classification and rating.
+* You can label regions with
+  <a href="https://labelstud.io/tags/choices.html" target="_blank">choices</a>,
+  <a href="https://labelstud.io/tags/textarea.html" target="_blank">text descriptions</a>,
+  <a href="https://labelstud.io/tags/rating.html" target="_blank">ratings</a> (and more) per the each region individually.
+
+-->
+
+<View>
+    <!-- No region selected section -->
+    <View visibleWhen="no-region-selected"
+          style="height:120px">
+
+        <Header value="Create and select
+                       region to classify it"/>
+
+        <!-- Control tag for region labels -->
+        <TimeSeriesLabels name="label" toName="ts">
+            <Label value="Region" background="#5b5"/>
+        </TimeSeriesLabels>
+    </View>
+
+    <!-- Region selected section with choices and rating -->
+    <View visibleWhen="region-selected" style="height:120px">
+
+        <Header value="Now select the signal quality"/>
+
+        <!-- Per region Rating -->
+        <Rating name="rating" toName="ts"
+                maxRating="10" icon="star"
+                perRegion="true"/>
+        <!-- Per region Choices  -->
+        <Choices name="choices" toName="ts"
+                 showInline="true" required="true"
+                 perRegion="true">
+            <Choice value="Good"/>
+            <Choice value="Medium"/>
+            <Choice value="Poor"/>
+        </Choices>
+    </View>
+
+    <!-- Object tag for time series data source -->
+    <TimeSeries name="ts" valueType="url" value="$csv"
+                sep="," timeColumn="time">
+        <Channel column="signal_1"
+                 strokeColor="#17b" legend="Signal 1"/>
+        <Channel column="signal_2"
+                 strokeColor="#f70" legend="Signal 2"/>
+    </TimeSeries>
+</View></script>
+
+
+
+
+
+
+
+<script data-template-pk="35" type="text"><View style="display: flex;">
+  <View style="width: 350px; padding-right: 1em; height: 400px; overflow-y: auto">
+    <Filter name="fl" toName="ner" hotkey="shift+f" minlength="1" />
+    <Labels name="ner" toName="text" showInline="false">
+      <Label value="Person" />
+      <Label value="Organization" />
+    </Labels>
+  </View>
+
+  <View style="height: 400px; overflow: auto">
+    <Text name="text" value="$text" />
+  </View>
+</View></script>
+
+
+
+<script data-template-pk="45" type="text"><View style="display: flex;">
+  <View style="padding: 0em 1em; background: #f1f1f1; margin-right: 1em; border-radius: 3px">
+    <View style="position: sticky; top: 0">
+      <Labels name="label" toName="text">
+        <Label value="Person" />
+        <Label value="Organization" />
+      </Labels>
+    </View>
+  </View>
+
+  <View style="height: 300px; overflow: auto;">
+    <Text name="text" value="$longText" />
+  </View>
+</View></script>
+
+
+
+<script data-template-pk="40" type="text"><View>
+  <Text name="text" value="$text"/>
+  <View style="box-shadow: 2px 2px 5px #999;
+               padding: 20px; margin-top: 2em;
+               border-radius: 5px;">
+    <Header value="Choose text sentiment"/>
+    <Choices name="sentiment" toName="text"
+             choice="single" showInLine="true">
+      <Choice value="Positive"/>
+      <Choice value="Negative"/>
+      <Choice value="Neutral"/>
+    </Choices>
+  </View>
+</View>
+</script>
+
+
+
+<script data-template-pk="3" type="text"><View>
+  <View style="padding: 0 1em; margin: 1em 0; background: #f1f1f1; position: sticky; top: 0; border-radius: 3px">
+    <Labels name="label" toName="text" showInline="true">
+      <Label value="Person" />
+      <Label value="Organization" />
+    </Labels>
+  </View>
+
+  <View>
+    <Text name="text" value="$text" />
+  </View>
+</View>
+</script>
+
+
+
+<script data-template-pk="28" type="text"><View style="display: flex;">
+  <View style="padding: 0em 1em; background: #f1f1f1; margin-right: 1em; border-radius: 3px">
+    <View style="position: sticky; top: 0">
+      <Labels name="label" toName="text">
+        <Label value="Person" />
+        <Label value="Organization" />
+      </Labels>
+    </View>
+  </View>
+
+  <View>
+    <Text name="text" value="$text" />
+  </View>
+</View>
+</script>
+
+
+
+<script data-template-pk="5" type="text"><View style="display: flex;">
+  <View style="width: 150px; padding: 0 1em; margin-right: 0.5em; background: #f1f1f1; border-radius: 3px">
+    <Labels name="label" toName="text">
+      <Label value="Person" />
+      <Label value="Organization" />
+    </Labels>
+  </View>
+
+  <View>
+    <Text name="text" value="$text" />
+  </View>
+
+  <View style="padding: 0 1em; margin-left: 0.5em; background: #f1f1f1; border-radius: 3px">
+    <Choices name="importance" toName="text">
+      <Header value="Text Importance" />
+      <Choice value="High" />
+      <Choice value="Medium" />
+      <Choice value="Low" />
+    </Choices>
+  </View>
+</View>
+</script>
+
+
+
+<script data-template-pk="37" type="text"><View style="display: flex;">
+  <View style="width: 150px; padding-left: 2em; margin-right: 2em; background: #f1f1f1; border-radius: 3px">
+    <Labels name="label" toName="text">
+      <Label value="Person" />
+      <Label value="Organization" />
+    </Labels>
+  </View>
+
+  <View>
+    <Text name="text" value="$text" />
+  </View>
+</View>
+</script>
+
+
+
+
+
+<script data-template-pk="11" type="text"><View>
+  <Text name="text1" value="$text1" />
+  <Choices name="sentiment" toName="text1" showInLine="true">
+    <Choice value="Positive" />
+    <Choice value="Negative" />
+    <Choice value="Neutral" />
+  </Choices>
+
+  <View visibleWhen="choice-selected"
+        whenTagName="sentiment" whenChoiceValue="Positive">
+    <Header value="What about this text?" />
+    <Text name="text2" value="$text2" />
+  </View>
+
+  <Choices name="sentiment2" toName="text2"
+  	   choice="single" showInLine="true"
+           visibleWhen="choice-selected"
+           whenTagName="sentiment"
+           whenChoiceValue="Positive">
+    <Choice value="Positive" />
+    <Choice value="Negative" />
+    <Choice value="Neutral" />
+  </Choices>
+</View>
+</script>
+
+
+
+<script data-template-pk="19" type="text"><View>
+  <Text name="text" value="$text" />
+
+  <Choices name="sentiment" toName="text" showInLine="true">
+    <Choice value="Positive" />
+    <Choice value="Negative" />
+    <Choice value="Neutral" />
+  </Choices>
+
+  <Choices name="other-props" toName="text"
+  	   choice="single" showInLine="true"
+           visibleWhen="choice-selected"
+           whenTagName="sentiment">
+    <View style="width: 100%">
+      <Header value="Other properties of the text" />
+    </View>
+    <Choice value="Descriptive" />
+    <Choice value="Emotional" />
+  </Choices>
+
+  <Choices name="emotion" toName="text"
+  	   choice="single" showInLine="true"
+           visibleWhen="choice-selected"
+           whenTagName="other-props"
+           whenChoiceValue="Emotional">
+    <View style="width: 100%">
+      <Header value="What emotion?" />
+    </View>
+    <Choice value="Sadness" />
+    <Choice value="Disgust" />
+    <Choice value="Fear" />
+    <Choice value="Surprise" />
+  </Choices>
+</View>
+</script>
+
+
+
+<script data-template-pk="44" type="text"><View>
+
+  <Text name="text" value="$text" />
+  <Choices name="sentiment" toName="text" showInLine="true">
+    <Choice value="Positive" />
+    <Choice value="Negative" />
+    <Choice value="Neutral" />
+  </Choices>
+
+  <Choices name="other-props" toName="text"
+  	   choice="single" showInLine="true"
+           visibleWhen="choice-selected"
+           whenTagName="sentiment">
+    <View style="width:100%">
+      <Header value="Other properties of the text" />
+    </View>
+    <Choice value="Descriptive" />
+    <Choice value="Emotional" />
+  </Choices>
+
+</View></script>
+
+
+
+
+
+<script data-template-pk="29" type="text"><View style="display: flex;">
+  <View style="width: 100%; margin-left: 1em;">
+    <Labels name="label" toName="audio">
+      <Label value="Speaker 1" />
+      <Label value="Speaker 2" />
+    </Labels>
+
+    <AudioPlus name="audio" value="$audio"/>
+    <View style="padding: 10px 20px; margin-top: 2em; box-shadow: 2px 2px 8px #AAA; margin-right: 1em;"
+          visibleWhen="region-selected">
+      <Header value="Provide Transcription" />
+      <TextArea name="transcription" toName="audio"
+                rows="2" editable="true" perRegion="true"
+                required="true" />
+    </View>
+    <View style="padding: 10px 20px; margin-top: 2em; box-shadow: 2px 2px 8px #AAA; margin-right: 1em;"
+          visibleWhen="region-selected">
+      <Header value="Select Gender" />
+      <Choices name="gender" toName="audio"
+               perRegion="true" required="true">
+        <Choice value="Male" />
+        <Choice value="Female" />
+      </Choices>
+    </View>
+
+    <View style="width: 100%; display: block">
+      <Header value="Select region after creation to go next"/>
+    </View>
+
+  </View>
+</View></script>
+
+
+
+<script data-template-pk="38" type="text"><View>
+  <Image name="image" value="$image"/>
+
+  <RectangleLabels name="label" toName="image">
+    <Label value="Airplane" background="green"/>
+    <Label value="Car" background="blue"/>
+  </RectangleLabels>
+
+  <View visibleWhen="region-selected">
+    <Header value="Describe object" />
+    <TextArea name="answer" toName="image" editable="true"
+              perRegion="true" required="true" />
+    <Choices name="choices" toName="image"
+             perRegion="true">
+      <Choice value="Correct"/>
+      <Choice value="Broken"/>
+    </Choices>
+  </View>
+
+  <View style="width: 100%; display: block">
+    <Header value="Select bbox after creation to go next"/>
+  </View>
+</View>
+</script>
+
+
+
+<script data-template-pk="7" type="text"><View style="display: flex;">
+  <View style="width: 150px; padding-left: 2em; margin-right: 2em; background: #f1f1f1; border-radius: 3px">
+    <Labels name="ner" toName="text">
+      <Label value="Person" />
+      <Label value="Organization" />
+    </Labels>
+  </View>
+
+  <View>
+    <View style="height: 200px; overflow-y: auto">
+      <Text name="text" value="$text" />
+    </View>
+
+    <View>
+      <Choices name="relevance" toName="text" perRegion="true">
+      	<Choice value="Relevant" />
+        <Choice value="Non Relevant" />
+      </Choices>
+
+      <View visibleWhen="region-selected">
+      	<Header value="Your confidence" />
+      </View>
+      <Rating name="confidence" toName="text" perRegion="true" />
+    </View>
+
+    <View style="width: 100%; display: block">
+      <Header value="Select span after creation to go next"/>
+    </View>
+  </View>
+
+</View>
+</script>
+
+
+
+
+
+<script data-template-pk="24" type="text"><View>
+
+  <!-- Image with bounding boxes -->
+  <View style="padding: 25px;
+             box-shadow: 2px 2px 8px #AAA">
+    <Header value="Label the image with bounding boxes"/>
+    <Image name="img" value="$image"/>
+    <Text name="text1"
+          value="Select label, click and drag on image"/>
+
+    <RectangleLabels name="tag" toName="img"
+                     canRotate="false">
+      <Label value="Airplane" background="red"/>
+      <Label value="Car" background="blue"/>
+    </RectangleLabels>
+  </View>
+
+  <!-- Audio with single choice -->
+  <View style="margin-top: 20px; padding: 25px;
+             box-shadow: 2px 2px 8px #AAA;">
+    <Header value="Do you like this music?"/>
+    <Audio name="audio" value="$url"/>
+    <Choices name="choices1" toName="audio"
+             choice="single">
+      <Choice alias="yes" value="Yes"/>
+      <Choice alias="no" value="No"/>
+      <Choice alias="unknown" value="Don't know"/>
+    </Choices>
+  </View>
+
+  <!-- Text with multi-choices -->
+  <View style="margin-top: 20px; padding: 25px;
+             box-shadow: 2px 2px 8px #AAA;">
+    <Header value="Classify the text"/>
+    <Text name="text2" value="$text"/>
+
+    <Choices name="choices2" toName="text2"
+             choice="multiple">
+      <Choice alias="wisdom" value="Wisdom"/>
+      <Choice alias="long" value="Long"/>
+    </Choices>
+  </View>
+
+</View>
+</script>
+
+
+
+<script data-template-pk="26" type="text"><View>
+  <Header>Select one of two items</Header>
+  <Pairwise name="pw" toName="text1,text2" />
+  <Text name="text1" value="$text1" />
+  <Text name="text2" value="$text2" />
+</View>
+</script>
+
+
+
+<script data-template-pk="22" type="text"><View>
+  <Header value="Note: To manage relations you need Label Studio entity panel to be shown" />
+
+  <Relations>
+    <Relation value="Is A" />
+    <Relation value="Has Function" />
+    <Relation value="Involved In" />
+    <Relation value="Related To" />
+  </Relations>
+
+  <Labels name="label" toName="text">
+    <Label value="Subject" />
+    <Label value="Object" />
+  </Labels>
+
+  <Text name="text" value="$text" />
+</View>
+</script>
+
+
+
+<script data-template-pk="42" type="text"><View>
+    <Header value="Table with {key: value} pairs"/>
+    <Table name="table" value="$item"/>
+</View></script>
+
+
+
+<script data-template-pk="18" type="text"><View>
+  <Style>
+    input[type="text"][name^="table"] { border-radius: 0px; border-right: none;}
+    input[type="text"][name^="table_metric"] { border-right: 1px solid #ddd; }
+    div[class*=" TextAreaRegion_mark"] {background: none; height: 33px; border-radius: 0; min-width: 135px;}
+  </Style>
+
+  <Image value="$image" name="image"/>
+
+  <Header value="Trick to build a table"/>
+
+  <View style="display: grid;  grid-template-columns: 1fr 1fr 1fr; max-height: 300px; width: 400px">
+    <TextArea name="table_name_1" toName="image" placeholder="name" editable="true" maxSubmissions="1"/>
+    <TextArea name="table_value_1" toName="image" placeholder="value" editable="true" maxSubmissions="1"/>
+    <TextArea name="table_metric_1" toName="image" placeholder="metric" editable="true" maxSubmissions="1"/>
+    <TextArea name="table_name_2" toName="image" placeholder="name" editable="true" maxSubmissions="1"/>
+    <TextArea name="table_value_2" toName="image" placeholder="value" editable="true" maxSubmissions="1"/>
+    <TextArea name="table_metric_2" toName="image" placeholder="metric" editable="true" maxSubmissions="1"/>
+    <TextArea name="table_name_3" toName="image" placeholder="name" editable="true" maxSubmissions="1"/>
+    <TextArea name="table_value_3" toName="image" placeholder="value" editable="true" maxSubmissions="1"/>
+    <TextArea name="table_metric_3" toName="image" placeholder="metric" editable="true" maxSubmissions="1"/>
+  </View>
+</View></script>
+
+
+
+<script data-template-pk="49" type="text"><View>
+  <Header value="Video timeline segmentation via AudioPlus sync trick"/>
+  <HyperText name="video" value="$video"/>
+  <Labels name="tricks" toName="audio" choice="multiple">
+    <Label value="Kickflip" background="#1BB500" />
+    <Label value="360 Flip" background="#FFA91D" />
+    <Label value="Trick" background="#358EF3" />
+  </Labels>
+  <AudioPlus name="audio" value="$videoSource" speed="false"/>
+</View>
+
+<!--
+  It's very important to prepare task data correctly,
+  it includes HyperText $video and
+  it must be like this example below:
+-->
+
+<!-- {
+ "video": "<video src='https://app.heartex.ai/static/samples/opossum_snow.mp4' width=100% muted /><img src onerror=\"$=n=>document.getElementsByTagName(n)[0];a=$('audio');v=$('video');a.onseeked=()=>{v.currentTime=a.currentTime};a.onplay=()=>v.play();a.onpause=()=>v.pause()\" />",
+ "videoSource": "https://app.heartex.ai/static/samples/opossum_snow.mp4"
+} -->
+</script>
+
+
+
+
+
+<script data-template-pk="31" type="text">
+<!-- readme
+### Quickstart
+
+1. Prepare `time-series.csv` in tabular CSV format:
+    ```
+    velocity,acceleration
+    12.34,56.78
+    43.21,87.65
+    ```
+
+2. Set column names from CSV in the labeling config below:
+    - Just drop `timeColumn` attribute out of TimeSeries tag to fill X axis
+    with incremental integer values: `1, 2, 3 ...`
+    - `column="velocity"`, `column="acceleration"`.
+
+3. Add `<Channel>` tags for more columns if needed.
+
+4. After setup you can import your CSV files on Import page and Label Studio will host them OR
+upload your CSV to your hosting (e.g.: `https://my.domain.com/time-series.csv`) and
+<a target="_blank" href="https://labelstud.io/guide/tasks.html">prepare LS tasks for them.</a>
+
+    Read more about
+<a href="https://labelstud.io/tags/timeseries.html" target="_blank">TimeSeries</a>,
+<a href="https://labelstud.io/tags/timeserieslabels.html" target="_blank">TimeSeriesLabels</a>,
+<a href="https://labelstud.io/tags/timeseries.html#Channel" target="_blank">Channel</a>.
+-->
+
+<View>
+    <Header value="Time Series from CSV without time column"
+            style="font-weight: normal"/>
+
+    <!-- Control tag for region labels -->
+    <TimeSeriesLabels name="label" toName="ts">
+        <Label value="Run" background="#5b5"/>
+        <Label value="Walk" background="#55f"/>
+    </TimeSeriesLabels>
+
+    <!-- Object tag for time series data source -->
+    <TimeSeries name="ts" valueType="url" value="$csv">
+        <Channel column="velocity"
+                 strokeColor="#1f77b4"/>
+    </TimeSeries>
+</View></script>
+
+
+
+<script data-template-pk="12" type="text">
+<!-- readme
+### Quickstart
+
+1. Prepare `time-series.csv` in tabular CSV format without column headers:
+    ```
+    0,12.34,56.78
+    2,43.21,87.65
+    ```
+
+2. Set column names from CSV in the labeling config below:
+    - `timeColumn="0"`
+    - `column="1"`, `column="2"`
+
+3. Add `<Channel>` tags for more columns if needed.
+
+4. After setup you can import your CSV files on Import page and Label Studio will host them OR
+upload your CSV to your hosting (e.g.: `https://my.domain.com/time-series.csv`) and
+<a target="_blank" href="https://labelstud.io/guide/tasks.html">prepare LS tasks for them.</a>
+
+    Read more about
+<a href="https://labelstud.io/tags/timeseries.html" target="_blank">TimeSeries</a>,
+<a href="https://labelstud.io/tags/timeserieslabels.html" target="_blank">TimeSeriesLabels</a>,
+<a href="https://labelstud.io/tags/timeseries.html#Channel" target="_blank">Channel</a>.
+-->
+
+<View>
+    <Header value="Time Series from headless CSV"
+            style="font-weight: normal"/>
+
+    <!-- Control tag for region labels -->
+    <TimeSeriesLabels name="label" toName="ts">
+        <Label value="Run" background="#5b5"/>
+        <Label value="Walk" background="#55f"/>
+    </TimeSeriesLabels>
+
+    <!-- Object tag for time series data source -->
+    <TimeSeries name="ts" valueType="url"
+                timeColumn="0" value="$csv"
+                sep="," overviewChannels="1,2">
+        <Channel column="1"
+                 strokeColor="#1f77b4"/>
+        <Channel column="2"
+                 strokeColor="#ff7f0e"/>
+    </TimeSeries>
+</View></script>
+
+
+
+<script data-template-pk="0" type="text">
+<!-- readme
+### Notes
+ * To disable region syncing between channels we need to use
+ two different TimeSeries instances for Signal 1 and Signal 2.
+ * Select region first and add a relation to other region using [+]
+ button on Results panel at the bottom.
+ <a target="_blank" href="https://labelstud.io/guide/labeling.html#Add-relation">Read more about relations</a>
+-->
+
+<View>
+    <Header value="Build relations among regions
+                   from different channels" size="6"/>
+
+    <!-- First TimeSeries with Sensor 1 -->
+    <Header value="Sensor 1 labels" size="6"/>
+    <TimeSeriesLabels name="labels1" toName="ts1">
+        <Label value="Run" background="#a4a"/>
+        <Label value="Walk" background="#aa4"/>
+    </TimeSeriesLabels>
+
+    <TimeSeries name="ts1" valueType="url" value="$csv1"
+                sep="," timeColumn="time"
+                overviewChannels="sensor1">
+        <Channel column="sensor1"
+                 displayName="Sensor 1"
+                 strokeColor="#27b"/>
+    </TimeSeries>
+
+    <!-- Second TimeSeries with Sensor 2 -->
+    <Header value="Sensor 2 labels" size="6"/>
+    <TimeSeriesLabels name="labels2" toName="ts2">
+        <Label value="On" background="green"/>
+        <Label value="Off" background="red"/>
+    </TimeSeriesLabels>
+
+    <TimeSeries name="ts2" valueType="url" value="$csv2"
+                timeColumn="0" separator=","
+                overviewChannels="1">
+        <Channel column="2"
+                 displayName="Sensor 2"
+                 strokeColor="#f80"/>
+    </TimeSeries>
+</View>
+
+
+<!--
+    This is the completion
+    for the result preview
+    on Setup page only
+-->
+
+
+<!-- {
+  "completions": [
+    {
+
+      "result": [
+        {
+          "from_name": "labels2",
+          "id": "5b6brspcdS",
+          "to_name": "ts2",
+          "type": "timeserieslabels",
+          "value": {
+            "end": 6,
+            "instant": false,
+            "start": 2,
+            "timeserieslabels": [
+              "On"
+            ]
+          }
+        },
+        {
+          "from_name": "labels1",
+          "id": "jX-vuDiFf5",
+          "to_name": "ts1",
+          "type": "timeserieslabels",
+          "value": {
+            "end": 12,
+            "instant": false,
+            "start": 7,
+            "timeserieslabels": [
+              "Run"
+            ]
+          }
+        },
+        {
+          "from_name": "labels2",
+          "id": "dhTSo03_2_",
+          "to_name": "ts2",
+          "type": "timeserieslabels",
+          "value": {
+            "end": 17,
+            "instant": false,
+            "start": 13,
+            "timeserieslabels": [
+              "Off"
+            ]
+          }
+        },
+        {
+          "from_name": "labels1",
+          "id": "fjIgsxMM4Y",
+          "to_name": "ts1",
+          "type": "timeserieslabels",
+          "value": {
+            "end": 25,
+            "instant": false,
+            "start": 21,
+            "timeserieslabels": [
+              "Walk"
+            ]
+          }
+        },
+        {
+          "direction": "right",
+          "from_id": "5b6brspcdS",
+          "to_id": "jX-vuDiFf5",
+          "type": "relation"
+        },
+        {
+          "direction": "right",
+          "from_id": "dhTSo03_2_",
+          "to_id": "fjIgsxMM4Y",
+          "type": "relation"
+        }
+      ]
+    }
+  ]
+} --></script>
+
+
+
+<script data-template-pk="36" type="text">
+<!-- readme
+### Notes
+ * Link text pieces with time-series events using this template.
+ * Select region first and add a relation to other region using [+]
+ button on Results panel at the bottom.
+ <a target="_blank" href="https://labelstud.io/guide/labeling.html#Add-relation">Read more about relations</a>
+-->
+
+<View>
+    <Header value="Link logger events with
+                   monitoring signals using relations"/>
+
+    <!-- Text setup -->
+    <Header value="Mark actions in text" size="6"/>
+    <Labels name="logger_label" toName="logger">
+        <Label value="Error" background="red"/>
+        <Label value="Success" background="orange"/>
+    </Labels>
+
+    <Text name="logger" value="$event"/>
+
+    <!-- Time series setup -->
+    <Header value="Mark regions in time series" size="6"/>
+    <TimeSeriesLabels name="ts_label" toName="ts">
+        <Label value="Error" background="red"/>
+        <Label value="High load" background="darkorange"/>
+    </TimeSeriesLabels>
+
+    <TimeSeries name="ts" valueType="url" value="$csv"
+                sep="," timeColumn="time">
+        <Channel column="temperature" units="°C"
+                 strokeColor="#17b" legend="Temperature"/>
+    </TimeSeries>
+
+</View>
+
+
+<!--
+    Sample task data and completion
+    are for preview only
+-->
+
+
+<!-- {
+  "data": {
+    "event": "Authorization success\nError requesting auth: Authorization check failed"
+  },
+  "completions": [{
+
+    "result": [
+        {
+            "value": {
+                "start": 22,
+                "end": 71,
+                "text": "Error requesting auth: Authorization check failed",
+                "labels": [
+                    "Error"
+                ]
+            },
+            "id": "ohdmBWCbqB",
+            "from_name": "logger_label",
+            "to_name": "logger",
+            "type": "labels"
+        },
+        {
+            "value": {
+                "start": 6,
+                "end": 17,
+                "instant": false,
+                "timeserieslabels": [
+                    "High load"
+                ]
+            },
+            "id": "JlujfAED9-",
+            "from_name": "ts_label",
+            "to_name": "ts",
+            "type": "timeserieslabels"
+        },
+        {
+            "value": {
+                "start": 0,
+                "end": 21,
+                "text": "Authorization success",
+                "labels": [
+                    "Success"
+                ]
+            },
+            "id": "pA0JwD5dAF",
+            "from_name": "logger_label",
+            "to_name": "logger",
+            "type": "labels"
+        },
+        {
+            "value": {
+                "start": 13,
+                "end": 22,
+                "instant": false,
+                "timeserieslabels": [
+                    "Error"
+                ]
+            },
+            "id": "G4m2fkQAb4",
+            "from_name": "ts_label",
+            "to_name": "ts",
+            "type": "timeserieslabels"
+        },
+        {
+            "from_id": "JlujfAED9-",
+            "to_id": "pA0JwD5dAF",
+            "type": "relation",
+            "direction": "right"
+        },
+        {
+            "from_id": "G4m2fkQAb4",
+            "to_id": "ohdmBWCbqB",
+            "type": "relation",
+            "direction": "right"
+        }
+    ]
+  }]
+}
+-->
+</script>

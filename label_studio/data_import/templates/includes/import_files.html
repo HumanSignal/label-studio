@@ -1,0 +1,155 @@
+<script type="text/x-template" id="import-files-template">
+  <div>
+  <label>
+    <input id="file-input" type="file" name="file" multiple @change="upload" style="display: none"/>
+
+    <div class="ui content">
+      <div id="holder" class="dropzone" ref="dropzone"
+        @dragstart="hover"
+        @dragenter="hover"
+        @dragover="hover"
+        @dragleave="leave"
+        @drop="drop"
+      >
+        <div class="content">
+          <header>Drag & drop files here<br/>or click to browse</header>
+          <img src="static/images/upload.svg" height="64" class="icon" />
+          <dl>
+            <dt>Text</dt><dd>txt</dd>
+            <dt>Audio</dt><dd>wav, aiff, mp3, au, flac, m4a, ogg</dd>
+            <dt>Images</dt><dd>jpg, png, gif, bmp, tiff, svg, webp</dd>
+            <dt>HTML</dt><dd>html, htm, xml</dd>
+            <dt>Time Series</dt><dd>csv, tsv</dd>
+            <dt>Common Formats</dt><dd>csv, tsv, txt, json</dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </label>
+
+    <p class="center">
+      Learn how to import pre-labeled data in the
+      <a href="https://labelstud.io/guide/tasks.html" target="_blank">Documentation</a>
+    </p>
+
+    <p class="center"><a href="import-old">Switch to old import page</a></p>
+  </div>
+</script> <!-- template -->
+
+<script>
+const serialized_project = {{ serialized_project|json|safe }};
+
+function flatten(nested) {
+  return [].concat(...nested);
+}
+
+function traverseFileTree(item, path) {
+  return new Promise((resolve) => {
+    path = path || "";
+    if (item.isFile) {
+      // Avoid hidden files
+      if (item.name[0] === ".") return resolve([]);
+
+      resolve([item]);
+    } else if (item.isDirectory) {
+      // Get folder contents
+      const result = [];
+      const dirReader = item.createReader();
+      const dirPath = path + item.name + "/";
+
+      dirReader.readEntries(function (entries) {
+        Promise.all(entries.map(entry => traverseFileTree(entry, dirPath)))
+          .then(flatten)
+          .then(resolve);
+      });
+    }
+  });
+}
+
+function getFiles(files) {
+  // @todo this can be not a files, but text or any other draggable shit
+  return new Promise(resolve => {
+    if (!files.length) return resolve([]);
+    if (!files[0].webkitGetAsEntry) return resolve(files);
+
+    // Use DataTransferItemList interface to access the file(s)
+    const entries = Array.from(files).map(file => file.webkitGetAsEntry());
+    Promise.all(entries.map(traverseFileTree))
+      .then(flatten)
+      .then(fileEntries => fileEntries.map(fileEntry => new Promise(res => fileEntry.file(res))))
+      .then(filePromises => Promise.all(filePromises))
+      .then(resolve);
+  });
+}
+
+Vue.component('import-files', {
+  template: "#import-files-template",
+  props: [],
+
+  data: function () {
+    return {
+      // internal variables
+      project_loaded: false,
+      tasks_loaded: false,
+
+      // provided by api/project
+      project: serialized_project,
+
+      // provided by api/project/storage-settings
+      storage_settings: {
+        source: {
+          fields: [], errors: [], type: 'json', storage_for: 'source',
+          show: true, loading: false, type_loading: false, save_success: false
+        }
+      },
+      storage_settings_all: {}
+    };
+  },
+
+  methods: {
+    hover(e) {
+      e.preventDefault();
+      this.$refs.dropzone.classList.add('hover');
+    },
+
+    leave(e) {
+      e.preventDefault();
+      this.$refs.dropzone.classList.remove('hover');
+    },
+
+    drop(e) {
+      e.preventDefault();
+      this.leave(e);
+      this.$emit('start');
+      getFiles(e.dataTransfer.items).then(files => this.sendFiles(files));
+    },
+
+    upload(e) {
+      this.sendFiles(e.target.files);
+      e.target.value = "";
+    },
+
+    sendFiles(files) {
+      const self = this;
+      console.log({ files });
+      this.$emit('start');
+      const fd = new FormData;
+      for (let f of files) fd.append(f.name, f);
+      $.ajax({
+        url: "api/project/import/prepare",
+        // @todo window.holder_usage ? "?drag=1": ""
+        data: fd,
+        method: 'POST',
+        processData: false,
+        contentType: false
+      })
+      .fail((res) => {
+        self.$emit('error', res);
+      })
+      .done((res) => {
+        self.$emit('finish', res.id);
+      })
+    },
+  },
+});
+</script>

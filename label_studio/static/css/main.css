@@ -5,7 +5,7 @@ html {
 body {
     background: #fcfcfc;
     font-family: Rubik, sans-serif;
-    color: #333;
+    color: #444 !important;
 }
 
 table {
@@ -15,16 +15,10 @@ table {
 table.responsive {
 
 }
-
-@media screen and (max-width: 768px) {
-    table.responsive tbody th,
-    table.responsive tbody td {
-        display: block;
-        border: none;
-    }
-    table tr {
-        border-top: 1px solid #ddd;
-    }
+td,
+th {
+    padding: 0.4em 2em;
+    border: 1px solid #ccc;
 }
 
 h1 {
@@ -36,14 +30,31 @@ h2 {
     font-weight: normal !important;
 }
 
-td,
-th {
-    padding: 0.4em 2em;
+hotkey {
+    display: inline-block;
     border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 0.1em 0.5em;
+    margin: 0 0.2em;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 2px #fff inset;
+    background-color: #f7f7f7;
+}
+hotkey i {
+    color: #777 !important;
+}
+.hotkey-helper {
+    margin-bottom: 1.0em;
+}
+.hotkey-helper .keys {
+    min-width: 15em;
+    display: inline-block;
+}
+.hotkey-helper .description {
+    margin-left: 1.5em;
+    display: inline-block;
 }
 
-
-.wrapper {
+.max-width-wrapper {
     max-width: 1400px;
 }
 
@@ -109,11 +120,12 @@ a {
     background-color: #fff;
     display: flex;
     align-items: center;
-    padding: 10px 20px 10px 40px;
+    padding: 5px 20px 5px 40px;
     position: relative;
-    z-index: 100;
-    box-shadow: rgba(0, 0, 0, 0.15) 0 2px 3px 0;
+    box-shadow: 0 4px 3px -2px rgba(0, 0, 0, 0.0774);
+    z-index: 1; /* drop the shadow over all other elements below */
     margin-bottom: 3em;
+    height: 50px;
 }
 
 #logo {
@@ -127,13 +139,15 @@ a {
 
 .img-logo {
     vertical-align: middle;
-    margin-right: 6px;
-    width: 40px;
-    height: 40px;
+    margin-right: 5px;
+    margin-top: 5px;
+    width: 30px;
+    height: 30px;
 }
 
 .img-text {
-    font-size: 1.4em;
+    font-size: 24px;
+    margin-left: 0.25em
 }
 
 #nav {
@@ -148,18 +162,43 @@ a {
 }
 
 #nav a {
-    color: #304455;
+    color: #797979;
     font-family: "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
-    margin-right: 1em;
+    margin-right: 2em;
     font-size: 14px;
+
+    transition: border-bottom-color 0.25s ease-in-out;
+    border-bottom: 3px rgba(74, 251, 130, 0) solid;
+    padding: 7px 0.4em 4px;
 }
 
 #nav a:hover {
-    text-decoration: underline;
+    transition: border-bottom-color 0.25s ease-in-out;
+    border-bottom: 3px #2493FB solid;
 }
 
 #nav a.active {
-    font-weight: bold;
+    color: #2493FB;
+    transition: border-bottom-color 0.25s ease-in-out;
+    border-bottom: 3px #2493FB solid;
+}
+
+#nav .outside-links, #nav .outside-links:hover {
+    border-bottom-color: rgba(0,0,0,0.0);
+    padding-left: unset;
+    padding-right: unset;
+}
+.outside-links {
+    transition: opacity 0.25s ease-in-out !important;
+    color: #444 !important;
+    opacity: 0.7;
+}
+.outside-links:hover {
+    transition: opacity 0.25s ease-in-out !important;
+    opacity: 1.0;
+}
+.outside-links.first {
+    margin-left: 3em;
 }
 
 #new-project-button:hover {
@@ -251,6 +290,14 @@ div[class*="App_editor"] {
     padding: 0.80571429em 0.7em 0.80571429em !important;
 }
 
+.hover-button {
+    cursor: pointer;
+    opacity: 0.75 !important;
+}
+.hover-button:hover {
+    opacity: 1.0 !important;
+}
+
 #holder {
     display: table;
     border: 1px dashed #a2a2a2;
@@ -280,11 +327,11 @@ div[class*="App_editor"] {
 }
 
 #holder.hover .text {
-    color: #1f7834;
+    color: rgb(24, 144, 255);
 }
 
 #holder.hover .text i {
-    color: #1F7834;
+    color: rgb(24, 144, 255);
     opacity: 1;
 }
 
@@ -319,6 +366,16 @@ div[class*="App_editor"] {
     background: rgb(54, 162, 255) !important;
     transition: background-color ease-in-out 0.25s;
 }
+.ui .button.primary {
+    background: rgb(24, 144, 255) !important;
+    color: #fff !important;
+    border-color: rgb(24, 144, 255) !important;
+    transition: background-color ease-in-out 0.25s;
+}
+.ui .button.primary:hover {
+    background: rgb(54, 162, 255) !important;
+    transition: background-color ease-in-out 0.25s;
+}
 .ui .button {
     transition: 0.3s;
 }
@@ -350,22 +407,18 @@ div[class*="App_editor"] {
     margin-top: 0.7em;
 }
 
-.ui ul, ol {
+.ui ul.list, .ui .list ol {
     list-style: none !important;
     margin: 1em 0 0 2em;
 }
 
-.ui ul li::before {
+.ui ul.list li::before {
     content: "\2022";
     color: rgba(0, 0, 0, 0.4) !important;
-    font-weight: normal;
-    display: inline-block;
-    width: 1em;
-    margin-left: -1em;
 }
 
 .ui .label.basic {
-    color: #999 !important;
+    font-weight: normal;
 }
 
 .ui .x.icon {
@@ -391,6 +444,21 @@ div[class*="App_editor"] {
 }
 .ui.modal>.icon.close {
     color: #555;
+}
+
+.ui.modal h4:not(:first-child) {
+    margin-top: 2.5em;
+    margin-bottom: 1em;
+}
+
+.ui.modal .section {
+    margin-left: 1em;
+}
+.ui.modal .section p {
+    margin-top: 1em;
+}
+.ui.modal .section p:not(:last-child) {
+    margin-bottom: 1em;
 }
 
 .ui.form label {
@@ -440,19 +508,45 @@ pre {
     font-size: 65%;
 }
 .statistic .sub-label {
-    margin-top:7px;
+    margin-top:2px;
     color: #555;
+    font-size:90%
+}
+
+.sup-button {
+    position: relative;
+    top: 2px;
+    cursor: pointer;
+    font-size: 0.75em;
+    color: rgb(24, 144, 255);
+    transition: background-color ease-in-out 0.25s;
+}
+.sup-button.big {
+    font-size: 1.25em !important;
+}
+
+.sup-button:hover {
+    color: rgb(54, 162, 255);
+    transition: background-color ease-in-out 0.25s;
+}
+
+.cap-first-letter:first-letter  {
+    text-transform: capitalize;
 }
 
 
-@media only screen and (max-width: 890px) {
+@media only screen and (max-width: 940px) {
     #logo {
         font-size: 1.5em;
         line-height: 40px;
         color: #273849;
         font-family: "Dosis", "Source Sans Pro", "Helvetica Neue", Arial, sans-serif;
         font-weight: 500;
-        display: flex;
+        display: inline-flex;
+        margin-left: 10px;
+    }
+    .img-logo {
+        margin-top: 0 !important;
     }
 
     .img-text {
@@ -471,38 +565,68 @@ pre {
         flex-direction: row;
         right: 1px;
     }
-
-    #logo {
-        display: inline-flex;
-    }
-
 }
 
-@media only screen and (max-width: 650px) {
+@media screen and (max-width: 768px) {
+    table.responsive tbody th,
+    table.responsive tbody td {
+        text-align: left;
+        display: block;
+        border: none;
+    }
+    table tr {
+        border-top: 1px solid #ddd;
+    }
+
     #logo {
         display: none;
     }
 
     #header {
-        height: 80px;
         display: flex;
         justify-content: center;
+        height: 80px;
+    }
+
+    #nav a {
+        padding-top: 0;
+        padding-bottom: 0;
+        line-height: 25px;
+        margin: 0 0.5em;
+    }
+    #nav a.outside-links.first {
+        margin-left: 2em;
     }
 }
 
-.sup-button {
-    position: relative;
-    top: 2px;
-    cursor: pointer;
-    font-size: 0.75em;
-    color: rgb(24, 144, 255);
-    transition: background-color ease-in-out 0.25s;
-}
-.sup-button.big {
-    font-size: 1.25em !important;
+@media screen and (max-width: 558px) {
+    #nav a.outside-links.last {
+        margin-right: 2em;
+    }
 }
 
-.sup-button:hover {
-    color: rgb(54, 162, 255);
-    transition: background-color ease-in-out 0.25s;
+.toast .content {
+    max-width: 600px;
+}
+.toast pre {
+    font-family: Rubik, sans-serif;
+    white-space: pre-wrap; /* css-3 */
+    white-space: -moz-pre-wrap;
+    white-space: -pre-wrap;
+    white-space: -o-pre-wrap;
+    word-wrap:  break-word !important;
+}
+
+.accordion-button {
+    height: 28px;
+    padding-top: 7px !important;
+}
+
+.accordion-content {
+    margin-left: 25px;
+    margin-top: -3px!important;
+}
+
+.invisible-borders td {
+    border: none;
 }

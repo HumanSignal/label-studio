@@ -34,13 +34,20 @@
       min-width: 98% !important;
       max-width: 98% !important;
     }
+
+    #label-studio .ls-menu {
+      width: 100%;
+    }
+    #label-studio .ls-segment {
+      top: 0;
+    }
   </style>
 
 </head>
 <body>
 
 <script src="static/js/jquery.min.js"></script>
-<script src="static/js/lsb.js"></script>
+<script src="static/js/lsf-sdk.js"></script>
 
 <!-- Editor -->
 <div class="ui content">
@@ -61,7 +68,8 @@
 
       interfaces: [
         "basic",
-        // "side-column"
+        "side-column",
+        "predictions"
       ],
 
       onLabelStudioLoad: function (LS) {

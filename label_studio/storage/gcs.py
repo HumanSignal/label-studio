@@ -3,7 +3,7 @@ import logging
 
 from google.cloud import storage
 
-from .base import CloudStorage, BaseForm, StringField, BooleanField, Optional
+from .base import CloudStorage, BaseStorageForm, StringField, BooleanField, Optional
 
 
 logger = logging.getLogger(__name__)
@@ -14,8 +14,12 @@ class GCSStorage(CloudStorage):
     description = 'Google Cloud Storage'
 
     @property
+    def url_prefix(self):
+        return 'gs://'
+
+    @property
     def readable_path(self):
-        return 'gs://' + self.path + '/' + self.prefix
+        return self.url_prefix + self.path + '/' + self.prefix
 
     def _get_client(self):
         client = storage.Client()
@@ -31,17 +35,15 @@ class GCSStorage(CloudStorage):
         logger.debug('Getting GCS blobs from ' + self.path)
         bucket = self.client['bucket']
         files = bucket.list_blobs(prefix=self.prefix)
-        return (f.name for f in files if f.name != (self.prefix + '/'))
+        return (f.name for f in files if f.name != (self.prefix.rstrip('/') + '/'))
 
-    def _get_value(self, key):
+    def _get_value(self, key, inplace=False, validate=True):
         bucket = self.client['bucket']
         blob = bucket.blob(key)
         blob_str = blob.download_as_string()
-        return json.loads(blob_str)
-
-    def _get_value_url(self, key):
-        data_key = self.data_key if self.data_key else self.default_data_key
-        return {data_key: 'gs://' + self.path + '/' + key}
+        value = json.loads(blob_str)
+        assert isinstance(value, dict), "For cloud storage it's allowed to use dict (one task) per json file only"
+        return value
 
     def _set_value(self, key, value):
         if not isinstance(value, str):
@@ -51,19 +53,24 @@ class GCSStorage(CloudStorage):
         blob.upload_from_string(value)
 
 
-class GCSCompletionsStorageForm(BaseForm):
+class GCSCompletionsStorageForm(BaseStorageForm):
     prefix = StringField('Prefix', [Optional()], description='GCS Bucket prefix')
     create_local_copy = BooleanField('Create local copy', description='Create a local copy on your disk', default=True)
 
     bound_params = dict(
         prefix='prefix',
-        create_local_copy='create_local_copy'
+        create_local_copy='create_local_copy',
+        **BaseStorageForm.bound_params
     )
 
 
 class GCSCompletionsStorage(GCSStorage):
 
     form = GCSCompletionsStorageForm
+
+    def __init__(self, use_blob_urls=False, regex='.*', **kwargs):
+        """Completion Storages are unfiltered JSON storages"""
+        super(GCSCompletionsStorage, self).__init__(use_blob_urls=False, regex='.*', **kwargs)
 
     def _validate_object(self, key):
         value = self._get_value(key)

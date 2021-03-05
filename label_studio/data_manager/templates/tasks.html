@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block body %}
+  <style>
+    html, body {
+      overflow: hidden;
+    }
+
+    .datamanager {
+      height: calc(100vh - 50px);
+    }
+
+    .th-content {
+      font-weight: 500;
+    }
+
+    #header {
+      margin-bottom: 0;
+    }
+  </style>
+
+  <!-- DataManager -->
+  <div class="datamanager">
+    <center><br><br><br>Loading ...<br></center>
+  </div>
+
+  <!-- Editor CSS -->
+  {% for css in editor_css %}
+    <link href="{{ css }}?version={{ version }}" rel="stylesheet">
+  {% endfor %}
+
+  <!-- Editor JS -->
+  {% for js in editor_js %}
+    <script src="{{ js }}?version={{ version }}"></script>
+  {% endfor %}
+
+  <!-- Data manager JS -->
+  <script src="static/js/build/index.js?version={{ version }}"></script>
+
+{% endblock %}

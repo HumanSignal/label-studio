@@ -122,13 +122,13 @@ Default: `null`
 
 Type data: `array`
 
-Array of completions. See [Completions Documentation](format.html#Input) for more information.
+Array of completions. See [Completions Documentation](/guide/export.html#Basic-format) for more information.
 
 #### predictions
 
 Type data: `array`
 
-Array of predictions. Every object as completion. See [Completions Documentation](https://labelstud.io/guide/format.html#Input) for more information.
+Array of predictions. Every object as completion. See [Completions Documentation](/guide/export.html#Basic-format) for more information.
 
 ### user
 

@@ -16,7 +16,7 @@
         }
     ],
     "data": {
-        "url": "https://go.heartex.net/static/samples/game.wav"
+        "url": "https://app.heartex.ai/static/samples/game.wav"
     },
     "id": 1,
     "task_path": "../examples/transcribe_audio/tasks.json"

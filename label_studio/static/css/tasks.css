@@ -1,0 +1,196 @@
+.table-wrapper {
+  overflow-x: auto;
+  padding-bottom: 1em;
+  min-width: 210px;
+}
+.task-container {
+  margin: 0 1em;
+}
+.task-table {
+  min-width: 210px;
+}
+table.task-table td {
+  height: 30px !important;
+}
+
+tr.selected {
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+tr {
+  cursor: pointer;
+}
+
+::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 8px rgba(178, 178, 178, 0.3) !important;
+  background-color: #F5F5F5 !important;
+}
+
+::-webkit-scrollbar {
+  width: 8px !important;
+  height: 8px !important;
+  background-color: #F5F5F5 !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #c3c3c3 !important;
+  border: 8px solid #b4b4b4 !important;
+}
+
+.visible-app {
+  display: block !important;
+}
+
+.preview-image {
+  border-radius: 5px;
+  height: 50px;
+  cursor: pointer;
+}
+
+.full-preview-image {
+  max-height: 400px;
+  max-width: 400px;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s ease-in-out;
+}
+
+.fade-enter-to {
+  opacity: 1;
+  height: 50px;
+}
+
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+  height: 0;
+}
+
+.pagination {
+  height: 10px !important;
+  background-color: rgba(0,0,0,.05)
+}
+
+.pagination-size {
+  border: none;
+  background: none;
+}
+
+.order {
+  cursor: pointer;
+}
+
+.order.up, .order.down {
+  font-weight: bold;
+}
+
+.db-card {
+  background: #fafafa;
+  border-radius: 5px;
+  padding: 1em 2em 1em 2em !important;
+}
+
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+}
+
+.action-button:not(:last-child) {
+  margin-right: 5px;
+}
+
+.action-item {
+  opacity: 0.5;
+  transition: 0.1s ease-in-out opacity;
+  cursor: pointer;
+}
+
+.action-item:hover {
+  opacity: 0.8;
+  transition: 0.1s ease-in-out opacity;
+}
+
+.align-grid {
+  display: grid !important;
+}
+
+.trash:hover {
+  color: rgb(255, 13, 23);
+}
+
+.center-margin {
+  margin: 0 auto !important;
+}
+
+.center-flex {
+  align-content: center;
+  justify-content: center;
+  display: flex;
+}
+
+.hidden-items:hover {
+  color: #0c85d0;
+  transition: 0.2s color ease-in-out;
+}
+
+.label-studio, #label-studio {
+  max-width: unset;
+  padding-left: unset;
+  padding-right: unset;
+  margin: unset;
+}
+
+/* hide full screen mode for LSF because it's not working correctly */
+.ant-btn.ls-fs {
+  display: none;
+}
+
+.audio-button {
+  color: rgba(0,0,0, 0.25);
+}
+.audio-button:hover {
+  color: rgba(0,0,0, 0.5);
+}
+
+.text-preview-td {
+   vertical-align: top;
+}
+
+.text-preview i.icon {
+  display: inline;
+  color: rgba(0,0,0, 0.25);
+}
+.text-preview i.icon:hover {
+  color: rgba(0,0,0, 0.5);
+}
+
+.text-preview {
+  text-align: left;
+  max-width: 200px !important;
+  font-size: 80%;
+  word-wrap:  break-word !important;
+  white-space: pre-wrap !important; /* css-3 */
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+}
+
+
+@media screen and (max-width: 768px) {
+  .full-preview-image {
+    max-height: 250px;
+    max-width: 330px;
+  }
+  .task-container {
+    margin: unset;
+  }
+  .task-table {
+    width: 100%;
+  }
+  .pagination {
+    min-width: unset;
+  }
+  .mobile-divider {
+    height: 50px;
+  }
+}

@@ -1,0 +1,476 @@
+<!-- Labeling config setup -->
+<div class="ui tab active" data-tab="labeling-config">
+  <div class="ui message">
+    <i class="close icon"></i>
+
+    <!-- Label config -->
+    <div class="ui accordion" id="first-help">
+      <div class="title"><i class="dropdown icon"></i>Labeling config help</div>
+      <div class="content" style="margin-top:0; margin-left: 10px;">
+        <ul class="ui list">
+          <li><p>Labeling interface is based on html-like tags, read more in our
+            <a href="https://labelstud.io/tags" target="_blank">documentation</a>.</p>
+          </li>
+          <li><p>You can fully customize the appearance and workflow by modifying Labeling Config.</p></li>
+          <li><p>Tag values can use variables that start with "$" sign,
+            and those correspond to the fields in imported tasks from JSON or CSV files.</p>
+          </li>
+        </ul>
+        <div style="margin: 0.25em"></div>
+      </div>
+    </div>
+
+    {% with template_mode="titles" %}
+      {% include 'includes/setup_templates.html' %}
+    {% endwith %}
+  </div>
+
+  <br/>
+
+  <!-- Labeling setup UI -->
+  <form action="api/project/config" method="post" class="ui form">
+
+    <!-- Textarea & Preview in two cols -->
+    <div class="ui two column grid zero-margin step2 stackable">
+      <div class="column" id="left-column">
+
+        <h3>Edit labels and classes in Labeling Config</h3>
+
+        <!-- Code -->
+        <textarea name="label_config" cols="40" rows="10" class="project-form htx-html-editor"
+                  id="id_label_config">{{ label_config_full }}</textarea>
+        <br>
+
+        <!-- Input values from imported data -->
+        {% if input_values %}
+          <div class="ui">
+            {% for key in input_values %}
+              <a class="ui label basic">{{key}}</a>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <!-- Reset button -->
+        <button type="button" id="reset"
+             style="margin-right: 10px"
+             class="ui button red basic centered"
+             data-value="reset-config"
+             onclick="reset_config()">Reset</button>
+
+
+        <!-- Submit button -->
+        <input type="submit" disabled id="submit_form"
+               class="project-form field ui button positive centered" value="Save"
+               onclick="create_project(event)"/>
+
+        <div style="margin-top: 2em"></div>
+
+      </div>
+      <div class="column" style="padding-left: 0;">
+
+        <h3>Interface Preview</h3>
+
+        <!--Validation message -->
+        <div class="ui error message validation"></div>
+
+        <div id="editor-wrap"></div>
+        <pre id="preload-editor">...</pre>
+
+        <h3>Input Task Preview</h3>
+        <pre class="segment" id="upload-data-example" style="word-wrap: break-word">...</pre>
+
+        <h3>Output Result Preview</h3>
+        <div class="segment">
+          <pre class="segment" id="data-results" style="word-wrap: break-word ">...</pre>
+        </div>
+      </div>
+    </div>
+
+    <br/>
+  </form>
+
+  <!-- Error dialog -->
+  <div class="ui basic modal" id="error-message" onclick="$('#error-message').modal('hide')">
+    <div class="ui icon header">
+      <i id="error-message-icon" class="exclamation triangle icon"></i>
+    </div>
+    <div class="ui content text" style="text-align: center; font-size: 120%">
+      <p id="error-message-text">Error message here</p>
+    </div>
+  </div>
+
+  <!-- Dimmer and loader --->
+  <div class="ui dimmer" id="dimmer" style="position: fixed !important;">
+    <div class="ui text active orange loader big slow">
+      Saving label config ...<br/>
+    </div>
+  </div>
+
+  {% with template_mode="codes" %}
+    {% include 'includes/setup_templates.html' %}
+  {% endwith %}
+
+  <!-- Change template dialog -->
+  <div class="ui basic modal" id="confirm-config-template-dialog">
+    <i class="close icon"></i>
+    <div class="ui icon header">
+      <i class="exclamation triangle icon"></i>
+    </div>
+    <div class="content">
+      <p style="text-align: center;font-size:120%">Data that you've put into textarea will be replaced,
+        proceed?</p>
+    </div>
+    <div class="actions">
+      <div class="ui deny button red basic inverted" id="abort-button">
+        <i class="remove icon"></i>
+        Abort
+      </div>
+      <div class="ui green ok inverted button" id="proceed" role="button" tabindex="0">
+        <i class="checkmark icon"></i>
+        Proceed
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Labeling config logic -->
+
+
+<script data-template-pk="reset-config" type="text"><View>
+
+</View>
+</script>
+
+<script>
+  var confirm_already_shown = false;
+  var iframeTimer = null;
+  var edit_count = 0;
+  var current_template_name = 0;
+  var current_template_category = 0;
+  var first_render = true;
+
+  // process create request
+  function process_request(result) {
+    // error
+    if (result.status !== 201) {
+      console.log(result);
+      var msg = message_from_response(result);
+
+      $('#dimmer').removeClass('active');
+      $('#error-message-text').text(msg);
+      $('#error-message-icon').attr('class', 'red exclamation triangle icon');
+      $('#error-message').modal('show');
+    }
+
+    // success
+    else {
+      $('#dimmer').removeClass('active');
+      $('#error-message-icon').attr('class', 'green check icon');
+      $('#error-message-text').html(
+          "Label config saved! <br><br> "
+          {% if not project.no_tasks() %} +
+          "<a class='ui positive button' style='min-width: 150px' href='tasks'>Explore Tasks</a><br/>"
+          {% else %} +
+          "<a class='ui positive button' style='min-width: 150px' href='import'>Import Tasks</a><br/>"
+          {% endif %}
+      );
+      $('#error-message').modal('show');
+    }
+  }
+
+  // final action for create project
+  function create_project(event) {
+    $('#dimmer').addClass('active');
+    smart_submit(process_request);
+    event.preventDefault();
+    return false;
+  }
+
+  function toggle_readme(user_action) {
+    var icon = $('.close-icon');
+    if (icon.hasClass('down')) {
+      $('#markdown-body').find('*:not(:first-child)').hide();
+      icon.addClass('right');
+      icon.removeClass('down');
+      Cookies.set('show-readme', false);
+      if (user_action)
+        $.ajax('/api/states?show-readme=0')
+    }
+    else {
+      $('#markdown-body').find('*').show();
+      icon.addClass('down');
+      icon.removeClass('right');
+      Cookies.set('show-readme', true);
+      if (user_action)
+        $.ajax('/api/states?show-readme=1')
+    }
+  }
+
+  function reset_config() {
+    if (confirm("Do you really want to reset the labeling config?")) {
+      addTemplateConfig($(event.target));
+    }
+  }
+
+  function addTemplateConfig($el) {
+    var template_pk = $el.data('value');
+    var value = $('[data-template-pk="' + template_pk + '"]').html();
+
+    // remove old readme
+    $('#readme-body').remove();
+
+    // extract readme from config
+    var starter = '<!-- readme', terminator = '-->';
+    var start = value.indexOf(starter);
+    if (start >= 0) {
+      var body_length = value.indexOf(terminator, start) - start - starter.length;
+      var readme = value.substr(start + starter.length, body_length);
+      var readme_body = $(
+        '<div id="readme-body">' +
+          '<i class="icon caret down close-icon" onclick="toggle_readme()"></i>' +
+          '<div class="markdown-body" id="markdown-body"></div>' +
+        '</div>'
+      );
+      readme_body.find('.markdown-body').html(marked(readme));
+
+      $('#left-column').prepend(readme_body);
+      if (Cookies.get('show-readme', false) !== "true") {
+        toggle_readme(false);
+      }
+
+      // make collapsible first header of readme
+      $('#markdown-body').find('*:first-child').css('cursor', 'pointer').on('click', function() {
+        toggle_readme(true);
+      });
+
+      // find first XML tag (<View> as usual) and start from it
+      value = value.slice(value.indexOf('<', start + starter.length + body_length + terminator.length))
+    }
+
+    labelEditor.setValue(value);
+    first_render = true;
+  }
+
+  $(function () {
+
+    // switch template by click
+    $('.use-template').on('click', function () {
+      var $el = $(this);
+      edit_count = 0;
+      current_template_name = $el.text();
+      current_template_category = $($el.parent().parent().find('i')[0]).attr('title');
+
+      if (labelEditor.getValue() !== '' && !confirm_already_shown) {
+        var dialog = $('#confirm-config-template-dialog');
+        dialog.modal({
+          closable: true,
+          keyboardShortcuts: true,
+          onApprove: function () {
+            addTemplateConfig($el);
+          }
+        }).modal('show');
+
+        // close on enter, unfortunately keyboardShortcuts doesn't work
+        dialog.on('keypress', function () {
+          if (event.keyCode === 13) {
+            dialog.modal('hide');
+            addTemplateConfig($el);
+          }
+        });
+
+        confirm_already_shown = true;
+
+      } else {
+        addTemplateConfig($el);
+      }
+
+      return false;
+    });
+  });
+
+  function debounce(func, wait, immediate) {
+    let timeout;
+
+    return function () {
+      const context = this, args = arguments;
+      const later = () => {
+        timeout = null;
+        if (!immediate) func.apply(context, args);
+      };
+      const callNow = immediate && !timeout;
+
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+      if (callNow) func.apply(context, args);
+    };
+  }
+
+  $(function () {
+    var prev_completion = null;
+
+    // serialize editor output by timer
+    setInterval(function () {
+      let iframe = document.getElementById('render-editor');
+      if (iframe !== null) {
+        let Htx = iframe.contentWindow.Htx;
+        if (typeof Htx !== 'undefined' && Htx.completionStore && Htx.completionStore.selected) {
+          var completion = JSON.stringify(Htx.completionStore.selected.serializeCompletion(), null, 4);
+          if (prev_completion !== completion) {
+            if (completion.length > 3000) {
+              completion = completion.slice(0, 3000) + ' ...';
+            }
+            $('#data-results').text(completion);
+            prev_completion = completion;
+          }
+        }
+      }
+    }, 500);
+
+    function validation_message(msg, status) {
+      let o = $('.validation');
+      o.text(msg);
+
+      if (status === -1) {
+        o.removeClass('hidden');
+        o.addClass('visible');
+      }
+      if (status === 0) {
+        o.removeClass('visible');
+        o.addClass('hidden');
+      }
+    }
+
+    // storage of validation results
+    // let is_collection_ok = false;
+    let is_label_ok = false;
+
+    function check_submit_button() {
+      // Create new project behavior
+      if (is_label_ok && labelEditor.getValue() !== '') {
+        $('#submit_form').prop('disabled', false);
+      } else {
+        $('#submit_form').prop('disabled', true);
+      }
+    }
+
+    function editor_iframe(res) {
+      // generate new iframe
+      let iframe = $('<iframe class="editor-iframe"><iframe>');
+      // add iframe to wrapper div
+      $('#editor-wrap').append(iframe);
+
+      iframe.on('load', function () {
+        // remove old iframe
+        $('#render-editor').hide();
+        $('#render-editor').remove();
+        // assign id to new iframe
+        iframe.attr('id', 'render-editor');
+        iframe.show();
+        // set height for iframe
+        let obj = document.getElementById('render-editor');
+
+        // wait until all images and resources from iframe loading
+        clearTimeout(iframeTimer);
+        iframeTimer = setInterval(function() {
+          obj.style.height = (obj.contentWindow.document.body.scrollHeight) + 'px';
+        }, 200);
+
+        // hide "..."
+        $('#preload-editor').hide();
+        $('#preload-editor').text('');
+      });
+
+      // load new data into iframe
+      iframe.attr('srcdoc', res);
+    }
+
+    function show_render_editor(editor) {
+      let config = labelEditor.getValue();
+      $.ajax({
+        url: 'render-label-studio',
+        method: 'POST',
+        data: {
+          config: config,
+          current_template_name : current_template_name,
+          current_template_category: current_template_category
+        },
+        success: editor_iframe,
+        error: function () {
+          $('#preload-editor').show();
+        }
+      })
+    }
+
+    // send request to server with configs to validate
+    function validate_config(editor) {
+      // get current scheme type from current editor
+      let url = 'api/validate-config';
+      var val = labelEditor.getValue();
+
+      if (!val.length)
+        return;
+
+      // label config validation
+      $.ajax({
+        url: url,
+        method: 'POST',
+        data: {label_config: val, edit_count: edit_count},
+        success: function (res) {
+          is_label_ok = true;
+          validation_message('', 0);
+          show_render_editor(editor);
+          check_submit_button();
+          first_render = false;
+        },
+        error: function (res) {
+          is_label_ok = false;
+          validation_message(res.responseJSON['label_config'][0], -1);
+          $('#render-editor').hide();
+          $('#preload-editor').show();
+          check_submit_button();
+
+          first_render = false;
+        }
+      });
+
+      // load sample task
+      $.post({
+        url: 'api/import-example',
+        data: {label_config: val}
+      })
+        .fail(o => {
+          $('#upload-data-example').text('...')
+        })
+        .done(o => {
+          $('#upload-data-example').text(JSON.stringify(JSON.parse(o), null, 4))
+        })
+    }
+
+    // Label code mirror
+    let labelEditor = CodeMirror.fromTextArea(document.getElementById('id_label_config'), {
+      lineNumbers: true,
+      mode: "text/html"
+    });
+    // refresh for proper line numbers drawing
+    labelEditor.refresh();
+    // add validation
+    labelEditor.on('change', debounce(function (editor) {
+      validate_config(editor);
+      edit_count++;
+      $('#id_label_config').val(editor.getValue());
+
+    }, 500));
+
+    window.labelEditor = labelEditor;
+
+    // validate config on start
+    validate_config(window.labelEditor);
+
+    // click on close icon of messages
+    $('.message .close')
+      .on('click', function () {
+        $(this).closest('.message').transition('fade');
+      });
+  });
+</script>

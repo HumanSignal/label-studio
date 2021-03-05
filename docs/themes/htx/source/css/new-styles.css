@@ -1,0 +1,98 @@
+/* paddings for old design; rewritten in new-index.css */
+div.container{
+  padding-left:40px;
+  padding-right:40px;
+}
+
+header{
+  font-family:"Inter",sans-serif;
+  background: #FFFFFF;
+  position: relative;
+  z-index: 21;
+  box-shadow: 0px 0px 0px 1px rgba(0, 0, 0, 0.08);
+}
+.outer__header{
+  display: flex;
+  align-items:center;
+  justify-content:center;
+  position: relative;
+  min-height:70px;
+}
+.outer__header>.left__header{
+  position: absolute;
+  left: 0px;
+}
+.outer__header .center__header ul{
+  padding:0px;
+  list-style-type: none;
+  margin:0px;
+  display: flex;
+  align-items:center;
+  justify-content:center;
+}
+.outer__header .center__header ul li{
+  margin:0px;
+  display: flex;
+  align-items:center;
+  justify-content:center;
+}
+.outer__header .center__header ul li{
+  margin-right:5px;
+}
+.outer__header .center__header ul li.active__menu a{
+  background: rgba(0, 0, 0, 0.05);
+  color:#000;
+  border-radius: 6px;
+}
+.outer__header .center__header ul li a{
+  padding:3px 15px;
+  text-decoration:none;
+  font-size:14px;
+  line-height:28px;
+  color:rgba(0,0,0,.5);
+  transition:.3s ease all;
+  border-radius: 6px;
+}
+.outer__header .center__header ul li a:hover{
+  background: rgba(0, 0, 0, 0.05);
+  color:#000;
+}
+.left__header>a{
+  display: flex;
+  align-items:center;
+  justify-content:center;
+  transition:.4s ease all;
+}
+.left__header>a:hover{
+  opacity:.7;
+}
+
+header .join__slack {
+  color: rgba(0, 0, 0, .5);
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  position: absolute;
+  right: 0;
+  padding: 8px 10px;
+  display: flex;
+  text-decoration: none;
+  color: #5c1751;
+}
+header .join__slack img {
+  max-height: 16px;
+  margin-right: 6px;
+}
+header .join__slack:active {
+  background: white;
+}
+header .join__slack:hover {
+  border-color: #ddd;
+  color: #5c1751cc;
+}
+
+@media (max-width: 991px){
+  header{
+    display: none;
+  }
+}

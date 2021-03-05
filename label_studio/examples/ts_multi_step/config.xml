@@ -1,0 +1,54 @@
+<!-- {"title": "Multi-step annotation", "category": "time-series", "complexity": "basic", "order": "a"} -->
+
+<!-- readme
+### Notes
+* Select region to show the next step with classification and rating.
+* You can label regions with
+  <a href="https://labelstud.io/tags/choices.html" target="_blank">choices</a>,
+  <a href="https://labelstud.io/tags/textarea.html" target="_blank">text descriptions</a>,
+  <a href="https://labelstud.io/tags/rating.html" target="_blank">ratings</a> (and more) per the each region individually.
+
+-->
+
+<View>
+    <!-- No region selected section -->
+    <View visibleWhen="no-region-selected"
+          style="height:120px">
+
+        <Header value="Create and select
+                       region to classify it"/>
+
+        <!-- Control tag for region labels -->
+        <TimeSeriesLabels name="label" toName="ts">
+            <Label value="Region" background="#5b5"/>
+        </TimeSeriesLabels>
+    </View>
+
+    <!-- Region selected section with choices and rating -->
+    <View visibleWhen="region-selected" style="height:120px">
+
+        <Header value="Now select the signal quality"/>
+
+        <!-- Per region Rating -->
+        <Rating name="rating" toName="ts"
+                maxRating="10" icon="star"
+                perRegion="true"/>
+        <!-- Per region Choices  -->
+        <Choices name="choices" toName="ts"
+                 showInline="true" required="true"
+                 perRegion="true">
+            <Choice value="Good"/>
+            <Choice value="Medium"/>
+            <Choice value="Poor"/>
+        </Choices>
+    </View>
+
+    <!-- Object tag for time series data source -->
+    <TimeSeries name="ts" valueType="url" value="$csv"
+                sep=",">
+        <Channel column="signal_1"
+                 strokeColor="#17b" legend="Signal 1"/>
+        <Channel column="signal_2"
+                 strokeColor="#f70" legend="Signal 2"/>
+    </TimeSeries>
+</View>

@@ -1,0 +1,5 @@
+<!-- {"title": "Table with key-value", "category": "other", "complexity": "advanced"} -->
+<View>
+    <Header value="Table with {key: value} pairs"/>
+    <Table name="table" value="$item"/>
+</View>

@@ -1,9 +1,46 @@
 import os
 import argparse
 import logging
+import logging.config
+
+logging.config.dictConfig({{
+  "version": 1,
+  "formatters": {{
+    "standard": {{
+      "format": "[%(asctime)s] [%(levelname)s] [%(name)s::%(funcName)s::%(lineno)d] %(message)s"
+    }}
+  }},
+  "handlers": {{
+    "console": {{
+      "class": "logging.StreamHandler",
+      "level": "DEBUG",
+      "stream": "ext://sys.stdout",
+      "formatter": "standard"
+    }}
+  }},
+  "root": {{
+    "level": "ERROR",
+    "handlers": [
+      "console"
+    ],
+    "propagate": True
+  }}
+}})
 
 from label_studio.ml import init_app
 from {script} import {model_class}
+
+
+_DEFAULT_CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'config.json')
+
+
+def get_kwargs_from_config(config_path=_DEFAULT_CONFIG_PATH):
+    if not os.path.exists(config_path):
+        return dict()
+    with open(config_path) as f:
+        config = json.load(f)
+    assert isinstance(config, dict)
+    return config
 
 
 if __name__ == "__main__":
@@ -15,7 +52,7 @@ if __name__ == "__main__":
         '--host', dest='host', type=str, default='0.0.0.0',
         help='Server host')
     parser.add_argument(
-        '--kwargs', dest='kwargs', metavar='KEY=VAL', nargs='+', type=lambda kv: kv.split('='),
+        '--kwargs', '--with', dest='kwargs', metavar='KEY=VAL', nargs='+', type=lambda kv: kv.split('='),
         help='Additional LabelStudioMLBase model initialization kwargs')
     parser.add_argument(
         '-d', '--debug', dest='debug', action='store_true',
@@ -58,7 +95,10 @@ if __name__ == "__main__":
                 param[k] = v
         return param
 
-    kwargs = parse_kwargs() if args.kwargs else dict()
+    kwargs = get_kwargs_from_config()
+
+    if args.kwargs:
+        kwargs.update(parse_kwargs())
 
     if args.check:
         print('Check "' + {model_class}.__name__ + '" instance creation..')
@@ -74,3 +114,13 @@ if __name__ == "__main__":
     )
 
     app.run(host=args.host, port=args.port, debug=args.debug)
+
+else:
+    # for uWSGI use
+    app = init_app(
+        model_class={model_class},
+        model_dir=os.environ.get('MODEL_DIR', os.path.dirname(__file__)),
+        redis_queue=os.environ.get('RQ_QUEUE_NAME', 'default'),
+        redis_host=os.environ.get('REDIS_HOST', 'localhost'),
+        redis_port=os.environ.get('REDIS_PORT', 6379)
+    )

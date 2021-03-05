@@ -1,0 +1,12 @@
+<!-- {"title": "Rate website", "category": "html", "complexity": "basic"} -->
+<View>
+  <HyperText name="website" value="$website"/>
+
+  <Header value="Rate this website"/>
+  <Rating name="rating" toName="website" maxRating="10" icon="star" size="medium" />
+
+  <Choices name="choices" choice="single-radio" toName="website" showInline="true">
+    <Choice value="Important article"/>
+    <Choice value="Yellow press"/>
+  </Choices>
+</View>

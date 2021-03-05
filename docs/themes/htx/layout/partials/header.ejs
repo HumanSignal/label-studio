@@ -1,16 +1,59 @@
-<div id="header">
-  <div class="header">
-  <a id="logo" href="<%- url_for("/") %>">
-    <!-- <img src="<%- url_for("/images/opossum/heartex_icon_opossum_green.svg") %>" alt="label studio logo" -->
-    <!--                  height="180"/> -->
+<%- css('css/new-header') %>
 
-    <img src="<%- url_for("/images/ls_logo.png") %>" alt="label studio logo" />
-    <span style="font-size: 1.2em;">Label Studio</span>
-  </a>
-  <ul id="nav" style="display: flex; align-items: center">
-    <%- partial('partials/main_menu', { context: 'nav' }) %>
-  </ul>
+<div class="head__main">
+  <div class="small__head">
+    <a href="/">
+      <img src="<%- url_for("/images/new/logofirst.svg") %>" alt="logofirst">
+    </a>
+    <div class="menu__icon">
+      <a>
+        <span></span>
+        <span></span>
+        <span></span>
+      </a>
+    </div>
   </div>
+  <div class="container__head">
+    <a href="/">
+      <img src="<%- url_for("/images/new/logofirst.svg") %>" alt="logofirst">
+    </a>
+    <div class="head__menu--wrapper">
+      <ul>
+        <li><a href="<%- url_for("/guide/") %>">Guide</a></li>
+        <li><a href="<%- url_for("/tags/") %>">Tags</a></li>
+        <li><a href="<%- url_for("/templates/") %>">Templates</a></li>
+        <li><a href="<%- url_for("/playground/") %>">Playground</a></li>
+        <li><a href="<%- url_for("/blog/") %>">Blog</a></li>
+      </ul>
+    </div>
+    <div class="search__head">
+      <input type="text" placeholder="Search" id="local-search-input">
+      <input type="submit" value="">
+    </div>
+  </div>
+
+  <div id="local-search-result-wrapper"></div>
+  <script>
+  var search_path = "<%= config.search.path %>";
+  if (search_path.length === 0) {
+    search_path = "search.xml";
+  }
+  var path = "<%= config.root %>" + search_path;
+  searchFunc(path, 'local-search-input', 'local-search-result-wrapper');
+
+  document.querySelector(".menu__icon>a").addEventListener("click", function(e){
+    e.preventDefault();
+    if (document.querySelector(".menu__icon>a").classList.contains("active__menu")) {
+      document.querySelector(".menu__icon>a").classList.remove("active__menu");
+      document.querySelector(".container__head").style.top = "-100vh";
+      document.querySelector("body , html").style.overflow = "auto";
+    } else {
+      document.querySelector(".menu__icon>a").classList.add("active__menu");
+      document.querySelector(".container__head").style.top = "0px";
+      document.querySelector("body , html").style.overflow = "hidden";
+    }
+  });
+  </script>
 </div>
 
 

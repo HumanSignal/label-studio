@@ -17,7 +17,7 @@ from datetime import datetime
 from requests.adapters import HTTPAdapter
 from .io import get_data_dir
 from .exceptions import ValidationError
-from .functions import _LABEL_CONFIG_SCHEMA_DATA
+from .functions import _LABEL_CONFIG_SCHEMA_DATA, get_external_hostname
 
 DEFAULT_PROJECT_ID = 1
 logger = logging.getLogger(__name__)
@@ -47,7 +47,7 @@ class ProjectObj(object):
     max_tasks_file_size = attr.ib(default=250)
 
     def __attrs_post_init__(self):
-        """ Init analogue for attr class
+        """ Init analog for attr class
         """
         self.data_types = self.extract_data_types(self.label_config)
 
@@ -156,7 +156,7 @@ class ProjectObj(object):
         all_names = re.findall(r'name="([^"]*)"', config_string)
         if len(set(all_names)) != len(all_names):
             logger.debug(all_names)
-            raise ValidationError('Label config contains non-unique names')
+            raise ValidationError('Label config contains non-unique names ' + str(all_names))
 
         # toName points to existent name
         names = set(all_names)
@@ -333,7 +333,8 @@ class MLApi(BaseHTTPAPI):
             'label_config': project.label_config_line,
             'params': {
                 'login': project.task_data_login,
-                'password': project.task_data_password
+                'password': project.task_data_password,
+                'project_full_path': os.path.abspath(project.path)
             }
         }
         return self._post('train', request)
@@ -375,7 +376,8 @@ class MLApi(BaseHTTPAPI):
         """
         return self._post('setup', request={
             'project': self._create_project_uid(project),
-            'schema': project.label_config_line
+            'schema': project.label_config_line,
+            'hostname': get_external_hostname()
         })
 
     def delete(self, project):
@@ -534,6 +536,7 @@ class MLBackend(object):
             response = self.api.is_training(project)
             if response.is_error:
                 raise CantValidateIsTraining('Can\'t validate whether model is training for project ' + project.name)
+            logger.debug(response.response)
             return response.response
 
     def train(self, completions, project):

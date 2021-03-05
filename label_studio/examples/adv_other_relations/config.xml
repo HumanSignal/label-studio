@@ -1,0 +1,18 @@
+<!-- {"title": "Relations among entities", "category": "other", "complexity": "advanced"} -->
+<View>
+  <Header value="Note: To manage relations you need Label Studio entity panel to be shown" />
+
+  <Relations>
+    <Relation value="Is A" />
+    <Relation value="Has Function" />
+    <Relation value="Involved In" />
+    <Relation value="Related To" />
+  </Relations>
+
+  <Labels name="label" toName="text">
+    <Label value="Subject" />
+    <Label value="Object" />
+  </Labels>
+
+  <Text name="text" value="$text" />
+</View>

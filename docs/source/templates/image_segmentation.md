@@ -2,7 +2,6 @@
 title: Image Segmentation
 type: templates
 order: 103
-is_new: t
 ---
 
 Image segmentation using a brush and producing a mask
@@ -20,7 +19,7 @@ label-studio start image_segmentation_project
 <View>
   <BrushLabels name="tag" toName="img">
     <Label value="Planet" />
-    <Label value="Moonwalker" background="blue" />
+    <Label value="Moonwalker" background="rgba(255,0,0,0.5)" />
   </BrushLabels>
   <Image name="img" value="$image" zoom="true" zoomControl="true" />
 </View>
