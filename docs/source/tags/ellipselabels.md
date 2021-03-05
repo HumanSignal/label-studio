@@ -1,7 +1,7 @@
 ---
 title: EllipseLabels
 type: tags
-order: 406
+order: 405
 ---
 
 EllipseLabels tag creates labeled ellipses

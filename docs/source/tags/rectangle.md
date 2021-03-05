@@ -1,7 +1,7 @@
 ---
 title: Rectangle
 type: tags
-order: 419
+order: 418
 ---
 
 Rectangle is used to add rectangle (Bounding Box) to an image without label selection. It's useful when you have
