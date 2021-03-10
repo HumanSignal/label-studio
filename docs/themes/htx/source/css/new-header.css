@@ -25,7 +25,7 @@ div.container__head{
   display: flex;
   align-items:center;
   justify-content:space-between;
-  min-height:80px;
+  min-height:60px;
   font-family:"Inter",sans-serif;
 }
 .head__main>.container__head>.head__menu--wrapper ul{
@@ -50,6 +50,13 @@ div.container__head{
 }
 .head__main>.container__head>.head__menu--wrapper ul li a:hover{
   color:#000;
+}
+.head__main>.container__head>.head__menu--wrapper ul li.current a{
+  padding: 3px 15px;
+  line-height: 28px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.05);
+  color: #000;
 }
 .head__main .search__head{
   display: flex;
