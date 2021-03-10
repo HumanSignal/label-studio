@@ -1,29 +1,20 @@
 ---
 title: Sync data from cloud or database storage
 type: guide
-order: 103
+order: 301
 ---
 
 Integrate popular cloud storage systems with Label Studio to collect new items uploaded to the buckets and return the annotation results so that you can use them in your machine learning pipelines.
-
-You can configure the storage type, bucket, and prefixes when you start the Label Studio server, or while Label Studio is running on the **Settings** page.
-
-You can configure one or both:
-
-- _source storage_ (where tasks are stored)
-- _target storage_ (where completions are stored)
-
-The connection to both storage buckets is synced, so you can see new tasks after uploading them to the bucket without restarting Label Studio.
-
-You can change parameters like the prefix or matching filename regex at any time from the Label Studio UI.
-
-> Note: Choose your target storage carefully. When you start the labeling project, it must be empty or contain completions that match previously created or imported tasks from source storage. Tasks are synced with completions based on internal IDs (keys in `source.json`/`target.json` files in your project directory), so if you accidentally connect to the target storage with existing completions with the same IDs, the connection might fail with undefined behavior.  
 
 Set up the following cloud and other storage systems with Label Studio:
 - [Amazon S3](#Amazon-S3)
 - [Google Cloud Storage](#Google-Cloud-Storage)
 - [Microsoft Azure Blob storage](#Microsoft-Azure-Blob-storage)
 - [Redis database](#Redis-database)
+
+Each source and target storage setup is project-specific. The connection to both source and target storage buckets is synced, so you can see new tasks after uploading them to the bucket without restarting Label Studio.
+
+> Note: Choose your target storage carefully. When you start the labeling project, it must be empty or contain annotations that match previously created or imported tasks from source storage. Tasks are synced with annotations based on internal IDs, so if you accidentally connect to target storage with existing annotations with the same IDs, the connection might fail with undefined behavior.  
 
 ## Amazon S3
 
@@ -33,17 +24,31 @@ To connect your [S3](https://aws.amazon.com/s3) bucket with Label Studio, make s
 In the Label Studio UI, do the following to set up the connection:
 
 1. Open Label Studio in your web browser.
-2. Open **Settings > Cloud storage sync**.
-3. For **Source Storage**, click the gear icon. 
+2. For a specific project, open **Settings > Cloud Storage**.
+3. Click **Add Source Storage**.  
 4. In the dialog box that appears, select **Amazon S3** as the storage type.
 5. Specify the path to the S3 bucket.
 6. (Optional) Adjust the remaining parameters. See [Optional parameters](#Optional-parameters) on this page for more details.
-7. Click **Apply & Sync Tasks**.
+7. Click **Add Storage**.
 8. Repeat these steps for **Target Storage** to sync completed data annotations to a bucket.
+
+### Optional parameters
+
+You can specify additional parameters with a command line escaped JSON string with `--source-params` or `--target-params` or from the Label Studio UI.
+
+| Parameter | Description | Default |
+| --- | --- | --- |
+| prefix | Specify an internal folder or container | empty | 
+| regex | Specify a regular expression to filter bucket objects. Use ".*" to collect all objects. | Skips all bucket objects. |
+| create_local_copy | If true, creates a local copy of the remote storage. | true |
+| use_blob_urls | If true, generate task data with URLs pointed to your bucket objects. Use for resources like JPG, MP3, or similar file types. If false, bucket objects are interpreted as tasks in Label Studio JSON format with one object per task. | false |
+
 
 ### Create connection on startup
 
-The following commands launch Label Studio, configure the connection to your S3 bucket, scan for existing tasks, and load them into the labeling app.
+For Label Studio versions earlier than 1.0.0, you can use command line arguments to start Label Studio and configure the connection to your S3 bucket, scan for existing tasks, and load them into the labeling app. 
+
+> Starting in Label Studio 1.0.0 you can only configure cloud storage from the Label Studio UI because the settings are per-project. 
 
 #### Read a bucket with JSON-formatted tasks
 
@@ -51,7 +56,7 @@ The following commands launch Label Studio, configure the connection to your S3 
 label-studio start my_project --init --source s3 --source-path my-s3-bucket
 ```
 
-#### Write completions to the bucket
+#### Write annotations to the bucket
 
 ```bash
 label-studio start my_project --init --target s3-completions --target-path my-s3-bucket
@@ -59,12 +64,12 @@ label-studio start my_project --init --target s3-completions --target-path my-s3
 
 ### Troubleshoot CORS and access problems
 
-If you have trouble accessing bucket objects in Label Studio, check your web browser console (Ctrl + Shift + i in Chromium) for errors.
+If you have trouble accessing bucket objects in Label Studio, check your web browser console for errors.
 
 * If you see CORS problems, see [Configuring and using cross-origin resource sharing (CORS)](https://docs.aws.amazon.com/AmazonS3/latest/userguide/cors.html) in the Amazon S3 User Guide.
  <img src='/images/cors-error-2.png' style="opacity: 0.9; max-width: 500px">
 
-* Make sure you specified the region when creating a new bucket. Don't forget to change it in your `.aws/config` file, otherwise you will have problems accessing your bucket objects.
+* Make sure you specified the region when creating a new bucket. Don't forget to change it in your source or target storage settings or the `.aws/config` file, otherwise you might have problems accessing your bucket objects.
 
     E.g.: `~/.aws/config`
     
@@ -80,6 +85,8 @@ If you have trouble accessing bucket objects in Label Studio, check your web bro
 
 ### Working with Binary Large OBjects (BLOBs)
 
+> Starting in Label Studio 1.0.0 you can only configure cloud storage from the Label Studio UI because the settings are per-project. 
+
 When you store BLOBs in your S3 bucket (like images or audio files), you might want to use them as is, by generating URLs pointing to those objects (e.g. `gs://my-s3-bucket/image.jpg`)
 Label Studio lets you generate input tasks with corresponding URLs automatically. You can do this by specifying `--source-params` when launching the app:
 
@@ -90,9 +97,25 @@ label-studio start my_project --init --source s3 --source-path my-s3-bucket --so
 You can also skip or leave the `"data_key"` parameter empty and Label Studio automatically generates input tasks from the first task key in the label config, which can be useful when you only have one object tag exposed.
 
 
+## Google Cloud Storage
+
+To connect your [GCS](https://cloud.google.com/storage) bucket with Label Studio, make sure you have programmatic access enabled. See [Cloud Storage Client Libraries](https://cloud.google.com/storage/docs/reference/libraries) in the Google Cloud Storage documentation for how to set up access to your GCS bucket.
+
+### Set up connection in the Label Studio UI
+In the Label Studio UI, do the following to set up the connection:
+
+1. Open Label Studio in your web browser.
+2. For a specific project, open **Settings > Cloud Storage**.
+3. Click **Add Source Storage**.  
+4. In the dialog box that appears, select **Google Cloud Storage** as the storage type.
+5. Specify the path to the GCS bucket.
+6. (Optional) Adjust the remaining parameters. See [Optional parameters](#Optional-parameters-1) on this page for more details.
+7. Click **Add Storage**.
+8. Repeat these steps for **Target Storage** to sync completed data annotations to a bucket.
+
 ### Optional parameters
 
-You can specify additional parameters with a command line escaped JSON string with `--source-params` or `--target-params` or from Label Studio UI.
+You can specify additional parameters with a command line escaped JSON string with `--source-params` or `--target-params` or from the Label Studio UI.
 
 | Parameter | Description | Default |
 | --- | --- | --- |
@@ -102,25 +125,11 @@ You can specify additional parameters with a command line escaped JSON string wi
 | use_blob_urls | If true, generate task data with URLs pointed to your bucket objects. Use for resources like JPG, MP3, or similar file types. If false, bucket objects are interpreted as tasks in Label Studio JSON format with one object per task. | false |
 
 
-## Google Cloud Storage
-
-To connect your [GCS](https://cloud.google.com/storage) bucket with Label Studio, make sure you have programmatic access enabled. See [Cloud Storage Client Libraries](https://cloud.google.com/storage/docs/reference/libraries) in the Google Cloud Storage documentation for how to set up access to your GCS bucket.
-
-### Set up connection in the Label Studio UI
-In the Label Studio UI, do the following to set up the connection:
-
-1. Open Label Studio in your web browser.
-2. Open **Settings > Cloud storage sync**.
-3. For **Source Storage**, click the gear icon. 
-4. In the dialog box that appears, select **Google Cloud Storage** as the storage type.
-5. Specify the path to the GCS bucket.
-6. (Optional) Adjust the remaining parameters. See [Optional parameters](#Optional-parameters-1) on this page for more details.
-7. Click **Apply & Sync Tasks**.
-8. Repeat these steps for **Target Storage** to sync completed data annotations to a bucket.
-
 ### Create connection on startup
 
-The following commands launch Label Studio, configure the connection to your GCS bucket, scan for existing tasks, and load them into the app for labeling.
+For Label Studio versions earlier than 1.0.0, you can use command line arguments to start Label Studio, configure the connection to your GCS bucket, scan for existing tasks, and load them into the app for labeling.
+
+> Starting in Label Studio 1.0.0 you can only configure cloud storage from the Label Studio UI because the settings are per-project. 
 
 #### Read a bucket with JSON-formatted tasks
 
@@ -136,7 +145,7 @@ label-studio start my_project --init --target gcs-completions --source-path my-g
 
 ### Troubleshoot CORS and access problems
 
-If you have trouble accessing bucket objects in Label Studio, check your web browser console (Ctrl + Shift + i in Chromium) for errors.
+If you have trouble accessing bucket objects in Label Studio, check your web browser console for errors.
 
 * If you see CORS problems, see [Configuring cross-origin resource sharing (CORS)](https://cloud.google.com/storage/docs/configuring-cors) in the Google Cloud Storage documentation.
  <img src='/images/cors-error-2.png' style="opacity: 0.9; max-width: 500px">
@@ -144,26 +153,17 @@ If you have trouble accessing bucket objects in Label Studio, check your web bro
 
 ### Working with Binary Large OBjects (BLOBs)
 
-When you store BLOBs in your GCS bucket (like images or audio files), you might want to use them as is, by generating URLs pointing to those objects (e.g. `gs://my-gcs-bucket/image.jpg`)
-Label Studio lets you generate input tasks with corresponding URLs automatically. You can do this by specifying `--source-params` when launching the app:
+> Starting in Label Studio 1.0.0 you can only configure cloud storage from the Label Studio UI because the settings are per-project. 
+
+When you store BLOBs in your GCS bucket, like images or audio files, you might want to use them as is and generate URLs pointing to those objects. For example, `gs://my-gcs-bucket/image.jpg`. 
+
+Label Studio lets you generate input tasks with corresponding URLs automatically.  You can do this by specifying `--source-params` when launching the app:
 
 ```bash
 label-studio start my_project --init --source gcs --source-path my-gcs-bucket --source-params "{\"data_key\": \"my-object-tag-$value\", \"use_blob_urls\": true, \"regex\": ".*"}"
 ```
 
 You can also skip or leave the `"data_key"` parameter empty and Label Studio automatically generates input tasks from the first task key in the label config, which can be useful when you only have one object tag exposed.
-
-
-### Optional parameters
-
-You can specify additional parameters with a command line escaped JSON string with `--source-params` or `--target-params` or from Label Studio UI.
-
-| Parameter | Description | Default |
-| --- | --- | --- |
-| prefix | Specify an internal folder or container | empty | 
-| regex | Specify a regular expression to filter bucket objects. Use ".*" to collect all objects. | Skips all bucket objects. |
-| create_local_copy | If true, creates a local copy of the remote storage. | true |
-| use_blob_urls | If true, generate task data with URLs pointed to your bucket objects. Use for resources like JPG, MP3, or similar file types. If false, bucket objects are interpreted as tasks in Label Studio JSON format with one object per task. | false |
 
 
 ##  Microsoft Azure Blob storage
@@ -181,17 +181,31 @@ Configure the specific Azure Blob container that you want Label Studio to use in
 In the Label Studio UI, do the following to set up the connection:
 
 1. Open Label Studio in your web browser.
-2. Open **Settings > Cloud storage sync**.
-3. For **Source Storage**, click the gear icon. 
-4. In the dialog box that appears, select **Azure Blob Storage** as the storage type.
+2. For a specific project, open **Settings > Cloud Storage**.
+3. Click **Add Source Storage**.  
+4. In the dialog box that appears, select **Microsoft Azure** as the storage type.
 5. Specify the name of the Azure Blob container.
 6. (Optional) Adjust the remaining parameters. See [Optional parameters](#Optional-parameters-2) on this page for more details.
-7. Click **Apply & Sync Tasks**.
-8. Repeat these steps for **Target Storage** to sync completed data annotations to a container.
+7. Click **Add Storage**.
+8. Repeat these steps for **Target Storage** to sync completed data annotations to a bucket.
+
+### Optional parameters
+
+You can specify additional parameters with a command line escaped JSON string with `--source-params` or `--target-params` or from the Label Studio UI.
+
+| Parameter | Description | Default |
+| --- | --- | --- |
+| prefix | Specify an internal folder or container | empty | 
+| regex | Specify a regular expression to filter bucket objects. Use ".*" to collect all objects. | Skips all bucket objects. |
+| create_local_copy | If true, creates a local copy of the remote storage. | true |
+| use_blob_urls | If true, generate task data with URLs pointed to your bucket objects. Use for resources like JPG, MP3, or similar file types. If false, bucket objects are interpreted as tasks in Label Studio JSON format with one object per task. | false |
+
 
 ### Create connection on startup
 
-The following commands launch Label Studio, configure the connection to your Azure Blob storage, scan for existing tasks, and load them into the app for labeling.
+For Label Studio versions earlier than 1.0.0, you can use command line arguments to start Label Studio, configure the connection to your Azure Blob storage, scan for existing tasks, and load them into the app for labeling.
+
+> Starting in Label Studio 1.0.0 you can only configure cloud storage from the Label Studio UI because the settings are per-project. 
 
 #### Read an Azure storage container with JSON-formatted tasks
 
@@ -207,6 +221,8 @@ label-studio start my_project --init --target azure-blob --source-path my-az-con
 
 ### Working with Binary Large OBjects (BLOBs)
 
+> Starting in Label Studio 1.0.0 you can only configure cloud storage from the Label Studio UI because the settings are per-project. 
+
 When you store BLOBs in your Azure Storage Container (like images or audio files), you might want to use them as is, by generating URLs pointing to those objects (e.g. `azure-blob://container-name/image.jpg`)
 Label Studio lets you generate input tasks with corresponding URLs automatically. You can do this by specifying `--source-params` when launching the app:
 
@@ -215,18 +231,6 @@ label-studio start my_project --init --source azure-blob --source-path my-az-con
 ```
 
 You can also skip or leave the `"data_key"` parameter empty and Label Studio automatically generates input tasks from the first task key in the label config, which can be useful when you only have one object tag exposed.
-
-
-### Optional parameters
-
-You can specify additional parameters with a command line escaped JSON string with `--source-params` or `--target-params` or from Label Studio UI.
-
-| Parameter | Description | Default |
-| --- | --- | --- |
-| prefix | Specify an internal folder or container | empty | 
-| regex | Specify a regular expression to filter bucket objects. Use ".*" to collect all objects. | Skips all bucket objects. |
-| create_local_copy | If true, creates a local copy of the remote storage. | true |
-| use_blob_urls | If true, generate task data with URLs pointed to your bucket objects. Use for resources like JPG, MP3, or similar file types. If false, bucket objects are interpreted as tasks in Label Studio JSON format with one object per task. | false |
 
 
 ## Redis database
@@ -246,33 +250,16 @@ Because Redis is an in-memory database, data saved in Redis does not persist. To
 In the Label Studio UI, do the following to set up the connection:
 
 1. Open Label Studio in your web browser.
-2. Open **Settings > Cloud storage sync**.
-3. For **Source Storage**, click the gear icon. 
+2. For a specific project, open **Settings > Cloud Storage**.
+3. Click **Add Source Storage**.   
 4. In the dialog box that appears, select **Redis Database** as the storage type.
 5. (Optional) Update Redis configuration parameters. See [Optional Redis configuration parameters](#Optional-Redis-configuration-parameters) on this page for the list.
-7. Click **Apply & Sync Tasks**.
-8. Repeat these steps for **Target Storage** to sync completed data annotations to the Redis database.
-
-
-### Create connection on startup
-
-The following commands launch Label Studio, configure the connection to your Redis database, scan for existing tasks, and load them into the app for labeling.
-
-#### Read a Redis database with JSON-formatted tasks
-
-```bash
-label-studio start my_project --init --source redis
-```
-
-#### Write completions to a Redis database
-
-```bash
-label-studio start my_project --init --target redis 
-```
+7. Click **Add Storage**.
+8. Repeat these steps for **Target Storage** to sync completed data annotations to a bucket.
 
 ### Optional Redis configuration parameters
 
-You can specify additional parameters with a command line escaped JSON string with `--source-params` or `--target-params` or from Label Studio UI.
+You can specify additional parameters with a command line escaped JSON string with `--redis_config` or from the Label Studio UI.
 
 | Parameter | Description | Default |
 | --- | --- | --- |
@@ -282,3 +269,21 @@ You can specify additional parameters with a command line escaped JSON string wi
 | host | IP of the server hosting the database | None |
 | port | Port of the server hosting the database | None |
 | password | Server password | None |
+
+### Create connection on startup
+
+The following commands launch Label Studio, configure the connection to your Redis database, scan for existing tasks, and load them into the app for labeling.
+
+#### Read a Redis database with JSON-formatted tasks
+
+```bash
+label-studio start my_project --init --db redis 
+```
+
+#### Write completions to a Redis database
+
+```bash
+label-studio start my_project --init --db redis 
+```
+
+

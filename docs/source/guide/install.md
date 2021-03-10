@@ -1,25 +1,22 @@
 ---
-title: Install Label Studio
+title: Install and upgrade Label Studio
 type: guide
-order: 101
+order: 200
 ---
 
-Install Label Studio on-premises or in the cloud. Choose the install method that works best for your environment:
+Install Label Studio on premises or in the cloud. Choose the install method that works best for your environment:
 - [Install with pip](#Install-with-pip)
 - [Install with Docker](#Install-with-docker)
 - [Install from source](#Install-from-source)
 - [Install with Anaconda](#Install-with-Anaconda)
 - [Install for local development](#Install-for-local-development)
-<!--add anaconda and info from README here, make sure they match-->
+- [Upgrade Label Studio](#Upgrade-Label-Studio)
 
 
 ## System requirements
 You can install Label Studio on a Linux, Windows, or MacOSX machine running Python 3.5 – 3.8. Python 3.9 is not yet supported. 
-<!--any OS version restrictions?--> 
-
 
 > Note: for Windows users the default installation may fail to build `lxml` package. Consider manually installing it from [the unofficial Windows binaries](https://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml). If you are running Windows 64-bit with Python 3.8, run `pip install lxml‑4.5.0‑cp38‑cp38‑win_amd64.whl`.
-
 
 ## Install with pip
 
@@ -133,85 +130,21 @@ pip install -e .
 ```
 ```bash
 # Start the server at http://localhost:8080
-python label_studio/server.py start labeling_project --init
+python label_studio/server.py start my_project --init
 ```
 
+## Upgrade Label Studio
+To upgrade to the latest version of Label Studio, reinstall or upgrade using pip. 
 
-## Advanced options for starting and running Label Studio
-
-Additional options for starting and running Label Studio after you install. 
-
-### Multisession mode
-
-You can start Label Studio in **multisession mode**. In this mode, each browser session creates its own project with the associated session ID as a name.
-
-In order to launch Label Studio in multisession mode and keep all projects in a separate directory called `session_projects`, run the following:
 
 ```bash
-label-studio start-multi-session --root-dir ./session_projects
-```
-Additional command line arguments are not supported in multisession mode. 
-
-
-## Command line arguments
-
-You can specify input tasks, project config, machine learning backend and other options using the command line interface. Run `label-studio start --help` to see all available options.
-
-
-### Authenticate with login and password
-You can restrict access to Label Studio using basic HTTP authentication. You can specify a username and password to use when starting Label Studio, or use the project `config.json` file. 
-
-Start Label Studio with HTTP authentication from the command line:
-```bash
-label-studio start my_project --username user --password pwd 
+pip install --upgrade label-studio
 ```
 
-Require HTTP authentication when starting Label Studio by placing `username` and `password` in the project config.json as follows:
- 
-```
-{ 
- ...
- "username": "user", 
- "password": "pwd",
- ...
-}
-```
-
-Use HTTP authentication with Label Studio in Docker, by setting up `USERNAME` and `PASSWORD` environment variables. 
-
-Label Studio uses the same username and password for all users.
+Migration scripts run when you upgrade to version 1.0.0 from version 0.9.1 or earlier. 
 
 
-### Use WSGIServer instead of Flask
-
-Use `--use-gevent` option on start to enable WSGI server. It wraps around app.run with gevent's WSGIServer to enable the server to better handle concurrent requests.
-
-```
-label-studio start test --use-gevent
-```
-
-### HTTPS & SSL
-
-You can enable the HTTPS protocol for Flask or WSGIServer. You must generate an SSL certificate and key for it. 
-
-For example, run the following to generate a certificate and key file: 
-
-```
-openssl req -newkey rsa:2048 -nodes -keyout key.pem -x509 -days 365 -out certificate.pem
-```
-
-Then, use the `--cert` and `--key` options to start Label Studio:
-
-```
-label-studio start test --cert certificate.pem --key key.pem
-```
 
 
-## Health check for Label Studio
-<!--move to troubleshooting-->
 
-LS has a special endpoint to run health checks: 
-  
-```
-/api/health
-```
+
