@@ -40,7 +40,7 @@ def action_config_test(test_client, case_config):
     """
     project = goc_project()
 
-    with open(project.config.get('label_config', None), 'r') as file:
+    with open(project.config.get('label_config', None), 'r', encoding='utf-8') as file:
         data = file.read()
         assert data == case_config['label_config']
 
@@ -82,7 +82,7 @@ def action_import_test(test_client, case_config):
         and tasks r created
     """
     project = goc_project()
-    with open(project.config.get('input_path', None), 'r') as file:
+    with open(project.config.get('input_path', None), 'r', encoding='utf-8') as file:
         data = file.read()
 
 
