@@ -1,0 +1,2 @@
+txtForDragAndDrop.txt
+This is text file

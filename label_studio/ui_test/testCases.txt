@@ -1,0 +1,13 @@
+=====image=====
++jpg
++png
+-gif
+----------
+=====font=====
++txt
+----------
+=====common formats=====
++csv
+-tsv
+-txt
++json
