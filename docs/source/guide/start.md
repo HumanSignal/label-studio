@@ -10,13 +10,17 @@ After you install Label Studio, start the server to start using it.
 label-studio start
 ```
 
-By default, Label Studio starts with a SQLite database to store labeling tasks and annotations. You can specify different source and target storage for labeling tasks and annotations using Label Studio UI or other command line arguments. See [Sync data from cloud or database storage](storage.html) for more.
+By default, Label Studio starts with a SQLite database to store labeling tasks and annotations. You can specify different source and target storage for labeling tasks and annotations using Label Studio UI or the API. See [Sync data from cloud or database storage](storage.html) for more.
 
+## Labeling performance 
+
+The SQLite database works well for projects with tens of thousands of labeling tasks. If you want to annotate millions of tasks or anticipate a lot of concurrent users, use a PostgreSQL database. See [Sync data from cloud or database storage](storage.html) for more.  
+
+For example, if you import data while labeling is being performed, labeling tasks can take more than 10 seconds to load and annotations can take more than 10 seconds to perform.
 
 ## Command line arguments for starting Label Studio
 
-You can specify input tasks, project config, machine learning backend and other options using the command line interface. Run `label-studio start --help` to see all available options.
-
+You can specify project config, machine learning backend and other options using the command line interface. Run `label-studio start --help` to see all available options. Many command line arguments are deprecated and removed in version 1.0.0. 
 
 ## Run Label Studio with an external domain name
 

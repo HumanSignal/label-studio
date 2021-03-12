@@ -18,6 +18,8 @@ You can install Label Studio on a Linux, Windows, or MacOSX machine running Pyth
 
 > Note: for Windows users the default installation may fail to build `lxml` package. Consider manually installing it from [the unofficial Windows binaries](https://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml). If you are running Windows 64-bit with Python 3.8, run `pip install lxml‑4.5.0‑cp38‑cp38‑win_amd64.whl`.
 
+Allocate disk space according to the amount of data you plan to label. As a benchmark, 1 million labeling tasks take up approximately 2.3GB on disk when using the SQLite database. For more on using Label Studio at scale and labeling performance, see [Start Label Studio](start.html). 
+
 ## Install with pip
 
 To install Label Studio via pip, you need Python>=3.5 and <3.9 and run:
@@ -142,6 +144,10 @@ pip install --upgrade label-studio
 ```
 
 Migration scripts run when you upgrade to version 1.0.0 from version 0.9.1 or earlier. 
+
+
+
+
 
 
 

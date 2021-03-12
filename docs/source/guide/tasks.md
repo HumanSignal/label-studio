@@ -140,6 +140,8 @@ this is a first task
 this is a second task
 ```
 
+If you want to import entire plain text files without each line becoming a new labeling task, customize the labeling configuration to specify valueType="url" in the Text tag. See the [Text tag documentation](tags/text.html)
+
 ## Import data from the Label Studio UI
 
 To import data from the Label Studio UI, do the following:

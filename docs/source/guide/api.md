@@ -4,6 +4,7 @@ type: guide
 order: 907
 ---
 
+You can use the Label Studio API to import data for labeling, export annotations, set up machine learning with Label Studio, and sync tasks with cloud storage. See the API documentation linked inside Label Studio for further guidance and interactive examples. 
 
 ## Authenticate to the API
 
@@ -16,12 +17,10 @@ In your first API call, specify the access token.
 curl -X <method> <Label Studio URL>/api/<endpoint> -H 'Authorization: Token <token>'
 ```
 
-For example,
+For example, for a Label Studio instance hosted at localhost:
 ```bash
-curl -X GET https://localhost:8000/api/projects/?organization_id=1 -H 'Authorization: Token 123456789abcdefghijklmnop123456789'
+curl -X GET https://localhost:8000/api/projects/ -H 'Authorization: Token 123456789abcdefghijklmnop123456789'
 ```
-
-See the API documentation linked inside Label Studio for further guidance and interactive examples. 
 
 
 ## API endpoint reference for older Label Studio versions
