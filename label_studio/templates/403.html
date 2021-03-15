@@ -1,0 +1,25 @@
+{% extends 'simple.html' %}
+{% load static %}
+
+{% block head %}
+    <title>403 | Label Studio</title>
+    <style>
+        body::after {
+            background: white;
+        }
+    </style>
+{% endblock %}
+
+
+{% block content %}
+    <div class="masthead error segment">
+        <div class="container">
+            <h1 class="ui dividing header">Forbidden</h1>
+            <p>You don't have permission to access this page.</p>
+            {% autoescape off  %}
+            <p>{{ exception }}</p>
+            {% endautoescape %}
+            <a href="{% url 'logout' %}">Logout</a>
+        </div>
+    </div>
+{% endblock %}

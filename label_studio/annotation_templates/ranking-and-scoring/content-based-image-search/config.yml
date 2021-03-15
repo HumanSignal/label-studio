@@ -1,0 +1,25 @@
+title: Content-based Image Retrieval
+type: community
+group: Ranking & Scoring
+image: /static/templates/content-based-image-search.png
+details: <h1>Select images related to the query image</h1>
+config: '
+<View>
+  <Image name="query" value="$query_image" />
+  <Header value="Choose similar images:" />
+  <View style="display: flex">
+    <View>
+    <Image name="image1" value="$image1" />
+    <Image name="image2" value="$image2" />
+    <Image name="image3" value="$image3" />
+    </View>
+    <View>
+    <Choices name="similar" toName="query" required="true" choice="multiple">
+      <Choice value="One" />
+      <Choice value="Two" />
+  	  <Choice value="Two" />
+    </Choices>
+    </View>
+  </View>
+</View>
+'

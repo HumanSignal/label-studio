@@ -1,0 +1,27 @@
+title: Optical Character Recognition
+type: community
+group: Computer Vision
+image: /static/templates/optical-character-recognition.png
+details: <h1>Draw a bounding box around region and write down the text found inside</h1>
+config: '
+<View>
+  <Image name="image" value="$ocr"/>
+
+  <RectangleLabels name="label" toName="image">
+    <Label value="Text" background="green"/>
+    <Label value="Handwriting" background="blue"/>
+  </RectangleLabels>
+
+  <View visibleWhen="region-selected" style="width: 100%; display: block">
+    <Header value="Write transcription:" />
+    <TextArea name="transcription" toName="image"
+              editable="true"
+              perRegion="true"
+              required="true"
+              maxSubmissions="1"
+              rows="5"
+              />
+  </View>
+
+</View>
+'

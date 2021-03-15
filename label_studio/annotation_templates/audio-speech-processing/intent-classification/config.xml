@@ -1,0 +1,50 @@
+<View>
+  <Labels name="labels" toName="audio">
+    <Label value="Segment" />
+  </Labels>
+
+  <AudioPlus name="audio" value="$audio"/>
+
+  <Choices name="intent" toName="audio" perRegion="true" required="true">
+    <Choice value="Question" />
+    <Choice value="Request" />
+    <Choice value="Satisfied" />
+    <Choice value="Interested" />
+    <Choice value="Unsatisfied" />
+  </Choices>
+</View>
+
+<!-- { "data": {"audio": "https://app.heartex.ai/static/samples/game.wav"},
+ "completions": [{
+"result": [
+    {
+        "original_length": 3.77437641723356,
+        "value": {
+            "start": 0.9230468290051922,
+            "end": 3.255952855737493,
+            "labels": [
+                "Segment"
+            ]
+        },
+        "id": "wavesurfer_ehuml5fu82",
+        "from_name": "labels",
+        "to_name": "audio",
+        "type": "labels"
+    },
+    {
+        "original_length": 3.77437641723356,
+        "value": {
+            "start": 0.9230468290051922,
+            "end": 3.255952855737493,
+            "choices": [
+                "Question"
+            ]
+        },
+        "id": "wavesurfer_ehuml5fu82",
+        "from_name": "intent",
+        "to_name": "audio",
+        "type": "choices"
+    }
+]
+}]
+} -->

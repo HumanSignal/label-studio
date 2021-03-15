@@ -1,0 +1,7 @@
+<View>
+  <Image name="image" value="$image" zoom="true"/>
+  <BrushLabels name="tag" toName="image">
+    <Label value="Airplane" background="rgba(255, 0, 0, 0.7)"/>
+    <Label value="Car" background="rgba(0, 0, 255, 0.7)"/>
+  </BrushLabels>
+</View>

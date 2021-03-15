@@ -1,9 +1,6 @@
-include label_studio/examples/*.xml
-recursive-include label_studio/static *
-recursive-include label_studio *.yml
-recursive-include label_studio *.html
-include label_studio/utils/schema/*.json
-include label_studio/logger.json
-include label_studio/config.json
-include label_studio/ml/default_configs/*
-include requirements.txt
+include deploy/requirements.txt
+include label_studio/core/settings/*.txt
+include label_studio/core/utils/schema/*.json
+recursive-include label_studio/annotation_templates/* *.yml
+recursive-include label_studio/core/static *
+include label_studio/core/templatetags/*.py

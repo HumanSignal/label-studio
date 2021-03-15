@@ -1,244 +1,456 @@
-import io
-import os
-import ssl
-import hashlib
-import lxml
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
+"""
 import time
-import pandas as pd
-import lxml.etree
 import logging
+import drf_yasg.openapi as openapi
+import json
 
-try:
-    import ujson as json
-except ModuleNotFoundError:
-    import json
+from django.db import transaction
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import generics, status
+from rest_framework.response import Response
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 
-from urllib.request import urlopen
-from werkzeug.utils import secure_filename
-from datetime import datetime
-from flask import request, jsonify, make_response, Response as HttpResponse, g
-from flask_api import status
-
-from label_studio.utils.auth import requires_auth
-from label_studio.utils.misc import exception_handler, convert_string_to_hash
-from label_studio.data_import.views import blueprint
-from label_studio.utils.exceptions import ValidationError
-from label_studio.utils.functions import generate_sample_task, get_sample_task
-
-from .models import ImportState
-
+from core.permissions import IsBusiness, get_object_with_permissions
+from core.utils.common import bool_from_request, conditional_atomic, retry_database_locked
+from projects.models import Project
+from tasks.models import Task
+from .uploader import load_tasks
+from .serializers import ImportApiSerializer, FileUploadSerializer
+from .models import FileUpload
 
 logger = logging.getLogger(__name__)
 
 
-@blueprint.route('/api/import-example', methods=['GET', 'POST'])
-@requires_auth
-def api_import_example():
-    """ Generate upload data example by config only
+task_create_response_scheme = {
+    201: openapi.Schema(
+        title='Task creation response',
+        description='Task creation response',
+        type=openapi.TYPE_OBJECT,
+        properies={
+            'task_count': openapi.Schema(
+                title='task count',
+                description='Number of tasks added',
+                type=openapi.TYPE_INTEGER
+            ),
+            'annotation_count': openapi.Schema(
+                title='annotation count',
+                description='Number of annotations added',
+                type=openapi.TYPE_INTEGER
+            ),
+            'predictions_count': openapi.Schema(
+                title='predictions count',
+                description='Number of predictions added',
+                type=openapi.TYPE_INTEGER
+            ),
+            'duration': openapi.Schema(
+                title='duration',
+                description='Time in seconds to create',
+                type=openapi.TYPE_NUMBER
+            ),
+            'file_upload_ids': openapi.Schema(
+                title='file_upload_ids',
+                description='Database IDs of uploaded files',
+                type=openapi.TYPE_ARRAY,
+                items=openapi.Schema(title="File Upload IDs", type=openapi.TYPE_INTEGER)
+            ),
+            'could_be_tasks_list': openapi.Schema(
+                title='could_be_tasks_list',
+                description='Whether uploaded files can contain lists of tasks, like CSV/TSV files',
+                type=openapi.TYPE_BOOLEAN
+            )
+        },
+        example={
+            'task_count': 50,
+            'annotation_count': 200,
+            'predictions_count': 100,
+            'duration': 3.5,
+            'file_upload_ids': [1, 2, 3]
+        }
+    ),
+    400: openapi.Schema(title='Incorrect task data', type=openapi.TYPE_ARRAY,
+                        items=openapi.Schema(title="String with error description", type=openapi.TYPE_STRING))
+}
+
+
+# Import
+class ImportAPI(generics.CreateAPIView):
+    """post:
+    Import tasks
+
+    Importing data as labeling tasks in bulk using this API endpoint works the same as using the Import button on the 
+    Data Manager page. You can use this API endpoint for importing multiple tasks. One POST request is limited at 250K tasks and 200 MB.
+
+    **Note:** Imported data is verified against a project *label_config* and must
+    include all variables that were used in the *label_config*. For example,
+    if the label configuration has a *$text* variable, then each item in a data object
+    must include a "text" field.
+
+
+    <br>
+
+    ## POST requests
+
+    <hr style="opacity:0.3">
+
+    There are three possible ways to import tasks with this endpoint:
+
+    1\. **POST with data**: Send JSON tasks as POST data. Only JSON is supported for POSTing files directly.
+
+    ```bash
+    curl -H 'Content-Type: application/json' -H 'Authorization: Token abc123' \\
+    -X POST 'https://app.heartex.ai/api/projects/1/tasks/bulk/' --data '[{"text": "Some text 1"}, {"text": "Some text 2"}]'
+    ```
+
+     2\. **POST with files**: Send tasks as files. You can attach multiple files with different names. 
+
+
+    - **JSON**: text files in javascript object notation format
+    - **CSV**: text files with tables in Comma Separated Values format
+    - **TSV**: text files with tables in Tab Separated Value format
+    - **TXT**: simple text files are similar to CSV with one column and no header, supported for projects with one source only
+    - **ZIP / RAR** with one or multiple files inside from the list below, e.g.: "zip archive.zip *.json"
+
+    ```bash
+    curl -H 'Content-Type: application/json' -H 'Authorization: Token abc123' \\
+    -X POST 'https://app.heartex.ai/api/projects/1/tasks/bulk/' --data @my_file.csv
+    ```
+
+    3\. **POST with URL**: You can also provide a URL to a file with labeling tasks. Supported file formats are the same as in option 2.
+
+    ```bash
+    curl -H 'Content-Type: application/json' -H 'Authorization: Token abc123' \\
+    -X POST 'https://app.heartex.ai/api/projects/1/tasks/bulk/' \\
+    --data '[{"url": "http://example.com/test1.csv"}, {"url": "http://example.com/test2.csv"}]'
+    ```
+
+
+    <br>
+
+    ## Import annotations: import already-labeled tasks and ground truths
+
+    <hr style="opacity:0.3">
+
+    1\. You can import already-labeled tasks and mark them as ground truths:
+    **combine task data with annotations**.
+
+    - The annotation is a JSON dict
+    - You can find descriptions of all annotation fields in the request body schema below,
+    - We recommend specifying only the "result" field.
+    - Empty annotation example:
+          { "ground_truth": true, "result": [] }
+    - Empty task and annotation example:
+          {
+            "data": {"image": "https://app.heartex.ai/static/samples/kittens2.jpg"},
+            "annotations": [{"ground_truth": true, "result": [] }]
+          }
+    - More complex examples are below.
+
+    2\. "result"
+
+    - A JSON array that depends on the labeling configuration for a project. Each array item contains a labeled region
+    (single bounding box, a segment of audio, part of the text).
+    - To quickly get the result format, open your Project -> Data Manager -> Click the pencil icon for a specific
+    task and create a new annotation. Click the "Result" button in the top right corner to get the result in JSON format.
+
+    3\. "ground_truth" (optional)
+
+    - It's **true by default**.
+    - To import existing labels as regular annotations, then set "ground_truth": false.
+
+
+    <br>
+
+    ## Import predictions: pre-labeling, statistics and machine learning
+
+    <hr style="opacity:0.3">
+
+    1\. Predictions are very similar to annotations in structure, so **learn about annotations first**.
+    You can use predictions in the labeling workflow as pre-labels, for Active Learning to evaluate Machine Learning 
+    statistics and more.
+
+    - You can find descriptions of all of the prediction fields in the request body scheme below.
+    - We recommend specifying only the "result", "model_version" and "score" fields.
+    - Empty task and prediction example:
+          {
+            "data": {"image": "https://app.heartex.ai/static/samples/kittens2.jpg"},
+            "prediction": [{"model_version": "version 1", "score": 1.0, "result": [] }]
+          }
+
+    2\. "result"
+
+    - The same as "result" in annotations.
+
+    3\. "model_version"
+
+    - Must be a string with text.
+
+    <br>
+
+    ## Examples
+
+    <hr style="opacity:0.3">
+
+    - my_file.json (with 2 tasks)
+    ```json
+    [{ "text": "Some text 1", "image": "https://app.heartex.ai/static/samples/kittens1.jpg" },
+     { "text": "Some text 2", "image": "https://app.heartex.ai/static/samples/kittens2.jpg" }]
+    ```
+
+    - my_file.csv (with 2 tasks)
+    ```csv
+    text,image
+    Some text 1,https://app.heartex.ai/static/samples/kittens1.jpg
+    Some text 2,https://app.heartex.ai/static/samples/kittens2.jpg
+    ```
+
+
+    - task_with_annotation.json (image classification project)
+    ```
+    [{
+        "data": {
+            "image": "https://app.heartex.ai/static/samples/kittens.jpg"
+        },
+        "annotations": [{
+            "ground_truth": true,
+
+            "result": [{
+                "id": "1",
+                "from_name": "my_image_class",
+                "to_name": "my_image",
+                "type": "choices",
+                "value": {
+                    "choices": [
+                        "Dog"
+                    ]
+                }
+            }]
+        }]
+    }]
+
+    - task_with_prediction.json (image classification project)
+    ```
+    [{
+        "data": {
+            "image": "https://app.heartex.ai/static/samples/kittens.jpg"
+        },
+        "predictions": [{
+            "model_version": "version_1",
+            "score": 1.0,
+
+            "result": [{
+                "id": "1",
+                "from_name": "my_image_class",
+                "to_name": "my_image",
+                "type": "choices",
+                "value": {
+                    "choices": [
+                        "Cat"
+                    ]
+                }
+            }]
+        }]
+    }]
+    ```
+
+    <br/>
+
     """
-    # django compatibility
-    request.GET = request.args
-    request.POST = request.form
-    config = request.GET.get('label_config', '')
-    if not config:
-        config = request.POST.get('label_config', '')
-    try:
-        g.project.validate_label_config(config)
-        task_data, _, _ = get_sample_task(config)
-    except (ValueError, ValidationError, lxml.etree.Error, KeyError):
-        response = HttpResponse('error while example generating', status=status.HTTP_400_BAD_REQUEST)
-    else:
-        response = HttpResponse(json.dumps(task_data))
-    return response
+
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    permission_classes = (IsBusiness, )
+    serializer_class = ImportApiSerializer
+    queryset = Task.objects.all()
+
+    def get_serializer_context(self):
+        project_id = self.kwargs.get('pk')
+        if project_id:
+            project = get_object_with_permissions(self.request, Project, project_id, 'projects.change_project')
+        else:
+            project = None
+        return {'project': project, 'user': self.request.user}
+
+    @swagger_auto_schema(tags=['Import'], responses=task_create_response_scheme)
+    def post(self, *args, **kwargs):
+        return super(ImportAPI, self).post(*args, **kwargs)
+
+    def _save(self, tasks):
+        serializer = self.get_serializer(data=tasks, many=True)
+        serializer.is_valid(raise_exception=True)
+        return serializer.save(project_id=self.kwargs['pk']), serializer
+
+    def create(self, request, *args, **kwargs):
+        start = time.time()
+        commit_to_project = bool_from_request(request.query_params, 'commit_to_project', True)
+
+        # check project permissions
+        project = get_object_with_permissions(self.request, Project, self.kwargs['pk'], 'projects.change_project')
+
+        # upload files from request, and parse all tasks
+        parsed_data, file_upload_ids, could_be_tasks_lists, found_formats, data_columns = load_tasks(request, project)
+
+        if commit_to_project:
+            # Immediately create project tasks and update project states and counters
+            tasks, serializer = self._save(parsed_data)
+            task_count = len(tasks)
+            annotation_count = len(serializer.db_annotations)
+            prediction_count = len(serializer.db_predictions)
+            # Update tasks states if there are related settings in project
+            # after bulk create we can bulk update tasks stats with
+            # flag_update_stats=True but they are already updated with signal in same transaction
+            # so just update tasks_number_changed
+            project.update_tasks_states(
+                maximum_annotations_changed=False,
+                overlap_cohort_percentage_changed=False,
+                tasks_number_changed=True
+            )
+            logger.info('Tasks bulk_update finished')
+
+            project.summary.update_data_columns(parsed_data)
+            # TODO: project.summary.update_created_annotations_and_labels
+        else:
+            # Do nothing - just output file upload ids for further use
+            task_count = len(parsed_data)
+            annotation_count = None
+            prediction_count = None
+
+        duration = time.time() - start
+
+        return Response({
+            'task_count': task_count,
+            'annotation_count': annotation_count,
+            'prediction_count': prediction_count,
+            'duration': duration,
+            'file_upload_ids': file_upload_ids,
+            'could_be_tasks_list': could_be_tasks_lists,
+            'found_formats': found_formats,
+            'data_columns': data_columns
+        }, status=status.HTTP_201_CREATED)
 
 
-@blueprint.route('/api/import-example-file')
-@requires_auth
-def api_import_example_file():
-    """ Task examples for import
+class TasksBulkCreateAPI(ImportAPI):
+    # just for compatibility - can be safely removed
+    swagger_schema = None
+
+
+class ReImportAPI(ImportAPI):
+    """post:
+    Re-import tasks
+
+    Re-import tasks using the specified file upload IDs for a specific project.
     """
-    request.GET = request.args  # django compatibility
+    @retry_database_locked()
+    def create(self, request, *args, **kwargs):
+        start = time.time()
+        files_as_tasks_list = bool_from_request(request.data, 'files_as_tasks_list', True)
 
-    q = request.GET.get('q', 'json')
-    filename = 'sample-' + datetime.now().strftime('%Y-%m-%d-%H-%M')
-    try:
-        task = generate_sample_task(g.project)
-    except (ValueError, ValidationError, lxml.etree.Error):
-        return HttpResponse('error while example generating', status=status.HTTP_400_BAD_REQUEST)
+        # check project permissions
+        project = get_object_with_permissions(self.request, Project, self.kwargs['pk'], 'projects.change_project')
+        file_upload_ids = self.request.data.get('file_upload_ids')
+        tasks, found_formats, data_columns = FileUpload.load_tasks_from_uploaded_files(
+            project, file_upload_ids,  files_as_tasks_list=files_as_tasks_list)
 
-    tasks = [task, task]
+        with transaction.atomic():
+            project.remove_tasks_by_file_uploads(file_upload_ids)
+            tasks, serializer = self._save(tasks)
+        duration = time.time() - start
 
-    if q == 'json':
-        filename += '.json'
-        output = json.dumps(tasks)
+        # Update task states if there are related settings in project
+        # after bulk create we can bulk update task stats with
+        # flag_update_stats=True but they are already updated with signal in same transaction
+        # so just update tasks_number_changed
+        project.update_tasks_states(
+            maximum_annotations_changed=False,
+            overlap_cohort_percentage_changed=False,
+            tasks_number_changed=True
+        )
+        logger.info('Tasks bulk_update finished')
 
-    elif q == 'csv':
-        filename += '.csv'
-        output = pd.read_json(json.dumps(tasks), orient='records').to_csv(index=False)
+        project.summary.update_data_columns(tasks)
+        # TODO: project.summary.update_created_annotations_and_labels
 
-    elif q == 'tsv':
-        filename += '.tsv'
-        output = pd.read_json(json.dumps(tasks), orient='records').to_csv(index=False, sep='\t')
+        return Response({
+            'task_count': len(tasks),
+            'annotation_count': len(serializer.db_annotations),
+            'prediction_count': len(serializer.db_predictions),
+            'duration': duration,
+            'file_upload_ids': file_upload_ids,
+            'found_formats': found_formats,
+            'data_columns': data_columns
+        }, status=status.HTTP_201_CREATED)
 
-    elif q == 'txt':
-        if len(g.project.data_types.keys()) > 1:
-            raise ValueError('TXT is unsupported for projects with multiple sources in config')
-
-        filename += '.txt'
-        output = ''
-        for t in tasks:
-            output += list(t.values())[0] + '\n'
-
-    else:
-        raise ValueError('Incorrect format ("q") in request')
-
-    if request.GET.get('raw', '0') == '1':
-        return HttpResponse(output)
-
-    response = HttpResponse(output)
-    response.headers['Content-Disposition'] = 'attachment; filename=%s' % filename
-    response.headers['filename'] = filename
-    return response
-
-
-def _is_allowed_file(filename):
-    """ Secured mode allows only certain file extensions being uploaded on server """
-    return True
+    @swagger_auto_schema(tags=['Import'], responses=task_create_response_scheme)
+    def post(self, *args, **kwargs):
+        return super(ReImportAPI, self).post(*args, **kwargs)
 
 
-def _upload_files(request_files, project):
-    filelist = []
-    for _, file in request_files.items():
-        if file and file.filename and _is_allowed_file(file.filename):
-            filename = secure_filename(file.filename)
+class FileUploadListAPI(generics.mixins.ListModelMixin,
+                        generics.mixins.DestroyModelMixin,
+                        generics.GenericAPIView):
+    """
+    get:
+    Get files list
 
-            # read as text or binary file
-            if isinstance(file, io.TextIOWrapper):
-                with open(filename, mode='rb') as f:
-                    data = f.read()
-            else:
-                data = file.read()
+    Retrieve the list of uploaded files used to create labeling tasks for a specific project.
 
-            # assign unique filename
-            filename = convert_string_to_hash(data, trim=6) + '-' + os.path.basename(filename)
+    delete:
+    Delete files
 
-            # external upload dir for everywhere access without user/project uuids
-            ext_upload_dir = os.environ.get('LS_UPLOAD_DIR', '')
-            if ext_upload_dir:
-                os.makedirs(ext_upload_dir, exist_ok=True)
-                # save file to path on disk
-                with open(os.path.join(ext_upload_dir, filename), mode='wb') as f:
-                    f.write(data)
-
-            # save file to path on disk
-            with open(os.path.join(project.upload_dir, filename), mode='wb') as f:
-                f.write(data)
-
-            filelist.append(filename)
-
-    return filelist
-
-
-def _create_import_state(request, g):
-    data = request.json if request.json else request.form
-
-    # Files import
-    if len(request.files):
-        uploaded_files = _upload_files(request.files, g.project)
-        import_state = ImportState.create_from_filelist(filelist=uploaded_files, project=g.project)
-
-    # URL import
-    elif 'application/x-www-form-urlencoded' in request.content_type:
-        try:
-            ctx = ssl.create_default_context()
-            ctx.check_hostname = False
-            ctx.verify_mode = ssl.CERT_NONE
-
-            url = data['url']
-            with urlopen(url, context=ctx) as file:
-                file.filename = url
-                request_files = {url: file}
-
-                uploaded_files = _upload_files(request_files, g.project)
-                import_state = ImportState.create_from_filelist(filelist=uploaded_files, project=g.project)
-
-        except ValidationError:
-            raise
-        except Exception as e:
-            raise ValidationError(str(e))
-
-    # API import
-    elif 'application/json' in request.content_type:
-        import_state = ImportState.create_from_data(data, project=g.project)
-
-    # incorrect data source
-    else:
-        raise ValidationError('load_tasks: No data found in values or in files')
-    return import_state
-
-
-@blueprint.route('/api/project/import', methods=['POST'])
-@requires_auth
-@exception_handler
-def api_import():
-    """ The main API for task import, supports
-        * json task data
-        * files (as web form, files will be hosted by this flask server)
-        * url links to images, audio, csv (if you use TimeSeries in labeling config)
+    Delete uploaded files for a specific project.
     """
 
-    start = time.time()
-    try:
-        import_state = _create_import_state(request, g)
-    except ValidationError as e:
-        # TODO: import specific exception handler
-        return make_response(jsonify(e.msg_to_list()), 422)
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    permission_classes = (IsBusiness, )
+    serializer_class = FileUploadSerializer
+    queryset = FileUpload.objects.all()
 
-    response = import_state.serialize()
-    new_tasks = import_state.apply()
-    duration = time.time() - start
-    response['duration'] = duration
-    response['new_task_ids'] = [t for t in new_tasks]
-    return make_response(jsonify(response), status.HTTP_201_CREATED)
+    def get_queryset(self):
+        project = get_object_with_permissions(self.request, Project, self.kwargs.get('pk', 0), 'projects.view_project')
+        if project.is_draft:
+            # If project is in draft state, we return all uploaded files, ignoring queried ids
+            logger.debug(f'Return all uploaded files for draft project {project}')
+            return FileUpload.objects.filter(project_id=project.id, user=self.request.user)
 
+        # If requested in regular import, only queried IDs are returned to avoid showing previously imported
+        ids = json.loads(self.request.query_params.get('ids', '[]'))
+        logger.debug(f'File Upload IDs found: {ids}')
+        return FileUpload.objects.filter(project_id=project.id, id__in=ids, user=self.request.user)
 
-@blueprint.route('/api/project/import/prepare', methods=['POST'])
-@requires_auth
-@exception_handler
-def api_import_prepare():
-    """ Create ImportState object and returns it's ID
-    """
-    try:
-        import_state = _create_import_state(request, g)
-    except ValidationError as e:
-        # TODO: import specific exception handler
-        error_message = e.msg_to_list()
-        logger.error(error_message)
-        return make_response(jsonify(error_message), status.HTTP_400_BAD_REQUEST)
-    response = {'id': import_state.id}
-    logger.debug(response)
-    return make_response(jsonify(response), status.HTTP_201_CREATED)
+    @swagger_auto_schema(tags=['Import'])
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
 
-
-@blueprint.route('/api/project/import/<int:import_id>', methods=['GET', 'PATCH'])
-@requires_auth
-@exception_handler
-def api_import_detail(import_id):
-    import_state = ImportState.get_by_id(id=import_id)
-    if request.method == 'PATCH':
-        # Update ImportState fields
-        import_state_params = dict(request.json)
-        import_state.update(**import_state_params)
-    response = import_state.serialize()
-    logger.debug(response)
-    return make_response(response, status.HTTP_200_OK)
+    @swagger_auto_schema(tags=['Import'])
+    def delete(self, request, *args, **kwargs):
+        project = get_object_with_permissions(self.request, Project, self.kwargs['pk'], 'projects.view_project')
+        ids = self.request.data.get('file_upload_ids')
+        if ids is None:
+            deleted, _ = FileUpload.objects.filter(project=project).delete()
+        elif isinstance(ids, list):
+            deleted, _ = FileUpload.objects.filter(project=project, id__in=ids).delete()
+        else:
+            raise ValueError('"file_upload_ids" parameter must be a list of integers')
+        return Response({'deleted': deleted}, status=status.HTTP_200_OK)
 
 
-@blueprint.route('/api/project/import/<int:import_id>/apply', methods=['POST'])
-@requires_auth
-@exception_handler
-def api_import_apply(import_id):
-    import_state = ImportState.get_by_id(id=import_id)
-    new_tasks = import_state.apply()
-    response = {'new_task_ids': [t for t in new_tasks]}
-    return make_response(jsonify(response), status.HTTP_201_CREATED)
+class FileUploadAPI(generics.RetrieveUpdateDestroyAPIView):
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    permission_classes = (IsBusiness, )
+    serializer_class = FileUploadSerializer
+    queryset = FileUpload.objects.all()
+
+    @swagger_auto_schema(tags=['Import'], operation_summary='Get file upload', operation_description='Retrieve details about a specific uploaded file.')
+    def get(self, *args, **kwargs):
+        return super(FileUploadAPI, self).get(*args, **kwargs)
+
+    @swagger_auto_schema(tags=['Import'], operation_summary='Update file upload', operation_description='Update a specific uploaded file.', request_body=FileUploadSerializer)
+    def patch(self, *args, **kwargs):
+        return super(FileUploadAPI, self).patch(*args, **kwargs)
+
+    @swagger_auto_schema(tags=['Import'], operation_summary='Delete file upload', operation_description='Delete a specific uploaded file.')
+    def delete(self, *args, **kwargs):
+        return super(FileUploadAPI, self).delete(*args, **kwargs)
+
+    @swagger_auto_schema(auto_schema=None)
+    def put(self, *args, **kwargs):
+        return super(FileUploadAPI, self).put(*args, **kwargs)

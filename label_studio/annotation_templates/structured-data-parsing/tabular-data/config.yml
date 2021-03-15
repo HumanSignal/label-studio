@@ -1,0 +1,11 @@
+title: Tabular Data
+type: community
+group: Structured Data Parsing
+image: /static/templates/tabular-data.png
+details: <h1>Annotate data in tables</h1>
+config: '
+<View>
+    <Header value="Table with {key: value} pairs"/>
+    <Table name="table" value="$item"/>
+</View>
+'

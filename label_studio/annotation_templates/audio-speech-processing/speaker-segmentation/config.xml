@@ -1,0 +1,42 @@
+<View>
+  <Labels name="label" toName="audio" zoom="true" hotkey="ctrl+enter">
+    <Label value="Speaker one" background="#00FF00"/>
+    <Label value="Speaker two" background="#12ad59"/>
+  </Labels>
+  <AudioPlus name="audio" value="$audio" />
+</View>
+
+<!-- { "data": {"audio": "https://app.heartex.ai/static/samples/game.wav"},
+"completions": [{"result":
+[
+    {
+        "original_length": 3.77437641723356,
+        "value": {
+            "start": 0.012644477109660168,
+            "end": 0.613257139818518,
+            "labels": [
+                "Speaker one"
+            ]
+        },
+        "id": "wavesurfer_ataavlr3krg",
+        "from_name": "label",
+        "to_name": "audio",
+        "type": "labels"
+    },
+    {
+        "original_length": 3.77437641723356,
+        "value": {
+            "start": 0.910402351895532,
+            "end": 3.6099982148079777,
+            "labels": [
+                "Speaker two"
+            ]
+        },
+        "id": "wavesurfer_vplr4hk60d8",
+        "from_name": "label",
+        "to_name": "audio",
+        "type": "labels"
+    }
+]
+}]
+} -->

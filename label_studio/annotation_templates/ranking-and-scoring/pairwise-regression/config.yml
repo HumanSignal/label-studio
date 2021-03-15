@@ -1,0 +1,13 @@
+title: Pairwise regression
+type: community
+group: Ranking & Scoring
+image: /static/templates/pairwise-regression.png
+details: <h1>Select how likely it is that two items occur together</h1>
+config: '
+<View>
+  <Header>Set how likely it is that these images represent the same thing:</Header>
+    <Image name="image1" value="$image1" />
+    <Image name="image2" value="$image2" />
+    <Rating name="rating" toName="image1,image2"/>
+</View>
+'

@@ -1,230 +1,326 @@
-from types import SimpleNamespace
-from flask import make_response, request, jsonify, g
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
+"""
+import logging
+
+from django_filters.rest_framework import DjangoFilterBackend
+from django.utils.decorators import method_decorator
+from rest_framework import viewsets
+from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from drf_yasg.utils import swagger_auto_schema
+from django.db.models import Sum
 from ordered_set import OrderedSet
 
-from label_studio.utils.auth import requires_auth
-from label_studio.utils.misc import exception_handler
+from core.utils.common import get_object_with_check_and_log, int_from_request, bool_from_request
+from core.permissions import CanViewTask, CanChangeTask, IsBusiness, CanViewProject, CanChangeProject
+from projects.models import Project
+from projects.serializers import ProjectSerializer
+from tasks.models import Task, Annotation
 
-from label_studio.data_manager.actions import get_all_actions, perform_action
-from label_studio.data_manager import blueprint
-from label_studio.data_manager.functions import DataManagerException
-from label_studio.data_manager.functions import (
-    prepare_tasks, prepare_annotations, get_all_columns, load_tab, save_tab, delete_tab, load_all_tabs,
-    get_selected_items, remove_tabs
-)
-
-
-@blueprint.route('/api/project/columns', methods=['GET'])
-@requires_auth
-@exception_handler
-def api_project_columns():
-    """ Project columns for data manager tabs
-    """
-    result = get_all_columns(g.project)
-    return make_response(jsonify(result), 200)
+from data_manager.functions import get_all_columns, get_prepared_queryset
+from data_manager.models import View
+from data_manager.serializers import ViewSerializer, TaskSerializer, SelectedItemsSerializer
+from data_manager.actions import get_all_actions, perform_action
 
 
-@blueprint.route('/api/project/actions', methods=['GET', 'POST'])
-@requires_auth
-@exception_handler
-def api_project_actions():
-    """ Project actions for data manager tabs
-    """
-    # POST or GET with action id: perform action
-    if request.method == 'POST' or (request.method == 'GET' and request.values.get('id', None)):
-        return api_project_tab_action(None)
-
-    # GET: return all action descriptions
-    elif request.method == 'GET':
-        result = get_all_actions(g.project)
-        return make_response(jsonify(result), 200)
+logger = logging.getLogger(__name__)
 
 
-@blueprint.route('/api/project/tabs', methods=['GET', 'DELETE'])
-@requires_auth
-@exception_handler
-def api_project_tabs():
-    """ Project tabs for data manager
-    """
-    if request.method == 'GET':
-        data = load_all_tabs(g.project)
-        return make_response(jsonify(data), 200)
+class TaskPagination(PageNumberPagination):
+    page_size = 100
+    page_size_query_param = "page_size"
+    total_annotations = 0
+    total_predictions = 0
 
-    if request.method == 'DELETE':
-        remove_tabs(g.project)
-        data = load_all_tabs(g.project)
-        return make_response(jsonify(data), 204)
+    def paginate_queryset(self, queryset, request, view=None):
+        self.total_annotations = queryset.aggregate(all_annotations=Sum("total_annotations"))["all_annotations"] or 0
+        self.total_predictions = queryset.aggregate(all_predictions=Sum("total_predictions"))["all_predictions"] or 0
+        return super().paginate_queryset(queryset, request, view)
 
-
-@blueprint.route('/api/project/tabs/<tab_id>', methods=['GET', 'POST', 'DELETE'])
-@requires_auth
-@exception_handler
-def api_project_tabs_id(tab_id):
-    """ Specified tab for data manager
-    """
-    tab_id = int(tab_id)
-    tab_data = load_tab(tab_id, g.project, raise_if_not_exists=request.method == 'GET')
-
-    # get tab data
-    if request.method == 'GET':
-        return make_response(jsonify(tab_data), 200)
-
-    # set tab data
-    if request.method == 'POST':
-        new_data = request.json
-
-        # reset selected items if filters are changed
-        if tab_data.get('filters', {}) != request.json.get('filters', {}):
-            new_data['selectedItems'] = {'all': False, 'included': []}
-
-        tab_data.update(new_data)
-        save_tab(tab_id, tab_data, g.project)
-        return make_response(jsonify(tab_data), 200)
-
-    # delete tab data
-    if request.method == 'DELETE':
-        delete_tab(tab_id, g.project)
-        return make_response(jsonify(tab_data), 204)
+    def get_paginated_response(self, data):
+        return Response(
+            {
+                "total_annotations": self.total_annotations,
+                "total_predictions": self.total_predictions,
+                "total": self.page.paginator.count,
+                "tasks": data,
+            }
+        )
 
 
-@blueprint.route('/api/project/tabs/<tab_id>/selected-items', methods=['GET', 'POST', 'PATCH', 'DELETE'])
-@requires_auth
-@exception_handler
-def api_project_tabs_selected_items(tab_id):
-    """ Selected items (checkboxes for tasks/annotations)
-    """
-    tab_id = int(tab_id)
-    tab = load_tab(tab_id, g.project, raise_if_not_exists=request.method == 'GET')
+@method_decorator(name='list', decorator=swagger_auto_schema(
+    tags=['Data Manager'], operation_summary="List views",
+    operation_description="List all views for a specific project."))
+@method_decorator(name='create', decorator=swagger_auto_schema(
+    tags=['Data Manager'], operation_summary="Create view",
+    operation_description="Create a view for a speicfic project."))
+@method_decorator(name='retrieve', decorator=swagger_auto_schema(
+    tags=['Data Manager'], operation_summary="Get view",
+    operation_description="Get all views for a specific project."))
+@method_decorator(name='update', decorator=swagger_auto_schema(
+    tags=['Data Manager'], operation_summary="Put view",
+    operation_description="Overwrite view data with updated filters and other information for a specific project."))
+@method_decorator(name='partial_update', decorator=swagger_auto_schema(
+    tags=['Data Manager'], operation_summary="Update view",
+    operation_description="Update view data with additional filters and other information for a specific project."))
+@method_decorator(name='destroy', decorator=swagger_auto_schema(
+    tags=['Data Manager'], operation_summary="Delete view",
+    operation_description="Delete a view for a specific project."))
+class ViewAPI(viewsets.ModelViewSet):
+    queryset = View.objects.all()
+    serializer_class = ViewSerializer
+    filter_backends = [DjangoFilterBackend]
+    my_tags = ["Data Manager"]
+    filterset_fields = ["project"]
 
-    # GET: get selected items from tab
-    if request.method == 'GET':
-        return make_response(jsonify(tab.get('selectedItems', None)), 200)
+    def get_permissions(self):
+        permission_classes = [IsBusiness]
+        # if self.action in ['update', 'partial_update', 'destroy']:
+        #     permission_classes = [IsBusiness, CanChangeTask]
+        # else:
+        #     permission_classes = [IsBusiness, CanViewTask]
+        return [permission() for permission in permission_classes]
 
-    # check json body for list or str "all"
-    data = request.json
-    assert isinstance(data, dict) and 'all' in data and (
-        (data['all'] and 'excluded' in data) or
-        (not data['all'] and 'included' in data)), \
-        'JSON body must be dict: ' \
-        '{"all": true, "excluded": [..task_ids..]} or ' \
-        '{"all": false, "included": [..task_ids..]}'
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
-    # POST: set whole
-    if request.method == 'POST':
-        tab['selectedItems'] = data
-        save_tab(tab_id, tab, g.project)
-        return make_response(jsonify(tab['selectedItems']), 201)
+    @swagger_auto_schema(tags=['Data Manager'])
+    @action(detail=False, methods=['delete'])
+    def reset(self, _request):
+        """
+        delete:
+        Reset project views
 
-    # init selectedItems, we need to read it in PATCH and DELETE
-    if 'selectedItems' not in tab:
-        tab['selectedItems'] = {'all': False, 'included': []}
+        Reset all views for a specific project.
+        """
+        queryset = self.filter_queryset(self.get_queryset())
+        queryset.all().delete()
+        return Response(status=204)
 
-    tab_data = tab['selectedItems']
-    assert tab_data['all'] == data['all'], 'Unsupported operands: tab_data["all"] != data["all"]'
-    key = 'excluded' if data['all'] else 'included'
-    left = OrderedSet(tab_data[key])
-    right = OrderedSet(data.get(key, []))
+    @swagger_auto_schema(tags=['Data Manager'], responses={200: TaskSerializer(many=True)})
+    @action(detail=True, methods=["get"])
+    def tasks(self, request, pk=None):
+        """
+        get:
+        Get task list for view
 
-    # PATCH: set particular with union
-    if request.method == 'PATCH':
-        # make union
-        result = left | right
-        tab['selectedItems'][key] = list(result)
-        save_tab(tab_id, tab, g.project)
-        return make_response(jsonify(tab['selectedItems']), 201)
+        Retrieve a list of tasks with pagination for a specific view using filters and ordering.
+        """
+        view = self.get_object()
+        queryset = Task.prepared.all(prepare_params=view.get_prepare_tasks_params())
+        context = {'proxy': bool_from_request(request.GET, 'proxy', True), 'resolve_uri': True}
 
-    # DELETE: delete specified items
-    if request.method == 'DELETE':
-        result = (left - right)
-        tab['selectedItems'][key] = list(result)
-        save_tab(tab_id, tab, g.project)
-        return make_response(jsonify(tab['selectedItems']), 204)
+        self.pagination_class = TaskPagination
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = TaskSerializer(page, many=True, context=context)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = TaskSerializer(queryset, many=True, context=context)
+        return Response(serializer.data)
+
+    @swagger_auto_schema(tags=['Data Manager'], methods=["get", "post", "delete", "patch"])
+    @action(detail=True, url_path="selected-items", methods=["get", "post", "delete", "patch"])
+    def selected_items(self, request, pk=None):
+        """
+        get:
+        Get selected items
+
+        Retrieve selected tasks for a specified view.
+
+        post:
+        Overwrite selected items
+
+        Overwrite the selected items with new data.
+
+        patch:
+        Add selected items
+
+        Add selected items to a specific view.
+
+        delete:
+        Delete selected items
+
+        Delete selected items from a specific view.
+        """
+        view = self.get_object()
+
+        # GET: get selected items from tab
+        if request.method == "GET":
+            serializer = SelectedItemsSerializer(view.selected_items)
+            return Response(serializer.data)
+
+        data = request.data
+        serializer = SelectedItemsSerializer(data=data, context={"view": view, "request": request})
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+
+        # POST: set whole
+        if request.method == "POST":
+            view.selected_items = data
+            view.save()
+            return Response(serializer.validated_data, status=201)
+
+        selected_items = view.selected_items
+        if selected_items is None:
+            selected_items = {"all": False, "included": []}
+
+        key = "excluded" if data["all"] else "included"
+        left = OrderedSet(selected_items.get(key, []))
+        right = OrderedSet(data.get(key, []))
+
+        # PATCH: set particular with union
+        if request.method == "PATCH":
+            # make union
+            result = left | right
+            view.selected_items = selected_items
+            view.selected_items[key] = list(result)
+            view.save(update_fields=["selected_items"])
+            return Response(view.selected_items, status=201)
+
+        # DELETE: delete specified items
+        if request.method == "DELETE":
+            result = left - right
+            view.selected_items[key] = list(result)
+            view.save(update_fields=["selected_items"])
+            return Response(view.selected_items, status=204)
 
 
-@blueprint.route('/api/project/tabs/<tab_id>/tasks', methods=['GET'])
-@requires_auth
-@exception_handler
-def api_project_tab_tasks(tab_id):
-    """ Get tasks for specified tab
-    """
-    tab_id = int(tab_id)
-    tab = load_tab(tab_id, g.project, raise_if_not_exists=True)
+class TaskAPI(APIView):
+    # permission_classes = [IsBusiness, CanViewTask]
+    permission_classes = [IsBusiness]
+    serializer_class = TaskSerializer
 
-    # get pagination
-    page, page_size = int(request.values.get('page', 1)), int(request.values.get('page_size', 10))
-    if page < 1 or page_size < 1:
-        return make_response(jsonify({'detail': 'Incorrect page or page_size'}), 422)
+    @swagger_auto_schema(tags=["Data Manager"])
+    def get(self, request, pk):
+        """
+        get:
+        Task by ID
 
-    params = SimpleNamespace(page=page, page_size=page_size, tab=tab, resolve_uri=True)
-    tasks = prepare_tasks(g.project, params)
-    return make_response(jsonify(tasks), 200)
-
-
-@blueprint.route('/api/project/tabs/<tab_id>/annotations', methods=['GET'])
-@requires_auth
-@exception_handler
-def api_project_tab_annotations(tab_id):
-    """ Get annotations for specified tab
-    """
-    tab_id = int(tab_id)
-    tab = load_tab(tab_id, g.project, raise_if_not_exists=True)
-
-    page, page_size = int(request.values.get('page', 1)), int(request.values.get('page_size', 10))
-    if page < 1 or page_size < 1:
-        return make_response(jsonify({'detail': 'Incorrect page or page_size'}), 422)
-
-    # get tasks first
-    task_params = SimpleNamespace(page=0, page_size=0, tab=tab)  # take all tasks from tab
-    tasks = prepare_tasks(g.project, task_params)
-
-    # pass tasks to get annotation over them
-    annotation_params = SimpleNamespace(page=page, page_size=page_size, tab=tab)
-    annotations = prepare_annotations(tasks['tasks'], annotation_params)
-    return make_response(jsonify(annotations), 200)
+        Retrieve a specific task by ID.
+        """
+        queryset = Task.prepared.get(id=pk)
+        context = {
+            'proxy': bool_from_request(request.GET, 'proxy', True),
+            'resolve_uri': True,
+            'completed_by': 'full'
+        }
+        serializer = TaskSerializer(queryset, many=False, context=context)
+        return Response(serializer.data)
 
 
-@blueprint.route('/api/project/tabs/<tab_id>/actions', methods=['POST'])
-@requires_auth
-@exception_handler
-def api_project_tab_action(tab_id):
-    """ Perform actions with selected items from tab,
-        also it could be used by POST /api/project/actions
-    """
-    # use filters and selected items from tab
-    if tab_id is not None:
-        tab_id = int(tab_id)
-        tab = load_tab(tab_id, g.project, raise_if_not_exists=True)
-        selected = tab.get('selectedItems', None)
-    else:
-        tab = {}
-        selected = None
+class ProjectColumnsAPI(APIView):
+    # permission_classes = [IsBusiness, CanViewProject]
+    permission_classes = [IsBusiness, ]
 
-    # use filters and selected items from request if it's specified
-    if request.json is not None:
-        selected = request.json.get('selectedItems', selected)
-        if not selected or not isinstance(selected, dict):
-            raise DataManagerException('selectedItems must be dict: {"all": [true|false], '
-                                       '"excluded | included": [...task_ids...]}')
+    @swagger_auto_schema(tags=["Data Manager"])
+    def get(self, request):
+        """
+        get:
+        Get data manager columns
 
-    filters = request.values.get('filters') or tab.get('filters', None)
-    ordering = request.values.get('ordering') or tab.get('ordering', None)
-    items = get_selected_items(g.project, selected, filters, ordering)
+        Retrieve the data manager columns available for the tasks in a specific project.
+        """
+        pk = int_from_request(request.GET, "project", 1)
+        project = get_object_with_check_and_log(request, Project, pk=pk)
+        self.check_object_permissions(request, project)
+        data = get_all_columns(project)
+        return Response(data)
 
-    # make advanced params for actions
-    params = SimpleNamespace(tab=tab, values=request.values)
 
-    # no selected items on tab
-    if not items:
-        response = {'detail': 'no selected items on tab with id ' + str(tab_id)}
-        return make_response(jsonify(response), 404)
+class ProjectStateAPI(APIView):
+    # permission_classes = [IsBusiness, CanViewProject]
+    permission_classes = [IsBusiness, ]
 
-    # wrong action id
-    action_id = request.values.get('id', None)
-    if action_id is None:
-        response = {'detail': 'No action id "' + str(action_id) + '", use ?id=<action-id>'}
-        return make_response(jsonify(response), 422)
+    @swagger_auto_schema(tags=["Data Manager"])
+    def get(self, request):
+        """
+        get:
+        Project state
 
-    # perform action and return the result dict
-    result = perform_action(action_id, g.project, params, items)
-    code = result.pop('response_code', 200)
-    return make_response(jsonify(result), code)
+        Retrieve the project state for data manager.
+        """
+        pk = int_from_request(request.GET, "project", 1)  # replace 1 to None, it's for debug only
+        project = get_object_with_check_and_log(request, Project, pk=pk)
+        self.check_object_permissions(request, project)
+        data = ProjectSerializer(project).data
+        data.update(
+            {
+                "can_delete_tasks": True,
+                "can_manage_annotations": True,
+                "can_manage_tasks": True,
+                "source_syncing": False,
+                "target_syncing": False,
+                "task_count": project.tasks.count(),
+                "annotation_count": Annotation.objects.filter(task__project=project).count(),
+                'config_has_control_tags': len(project.get_control_tags_from_config()) > 0
+            }
+        )
+        return Response(data)
+
+
+class ProjectActionsAPI(APIView):
+    # permission_classes = [IsBusiness, CanChangeProject]
+    permission_classes = [IsBusiness, ]
+
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            permission_classes = [IsBusiness, CanChangeProject]
+        else:
+            permission_classes = [IsBusiness, CanViewProject]
+        return [permission() for permission in permission_classes]
+
+    @swagger_auto_schema(tags=["Data Manager"])
+    def get(self, request):
+        """
+        get:
+        Get actions
+
+        Retrieve all the registered actions with descriptions that data manager can use.
+        """
+        pk = int_from_request(request.GET, "project", 1)  # replace 1 to None, it's for debug only
+        project = get_object_with_check_and_log(request, Project, pk=pk)
+        self.check_object_permissions(request, project)
+
+        params = {
+            'can_delete_tasks': True,
+            'can_manage_annotations': True,
+            'experimental_feature': False
+        }
+
+        return Response(get_all_actions(params))
+
+    @swagger_auto_schema(tags=["Data Manager"])
+    def post(self, request):
+        """
+        post:
+        Post actions
+
+        Perform an action with the selected items from a specific view.
+        """
+
+        pk = int_from_request(request.GET, "project", None)
+        project = get_object_with_check_and_log(request, Project, pk=pk)
+        self.check_object_permissions(request, project)
+
+        queryset = get_prepared_queryset(request, project)
+
+        # no selected items on tab
+        if not queryset.exists():
+            response = {'detail': 'No selected items for specified view'}
+            return Response(response, status=404)
+
+        # wrong action id
+        action_id = request.GET.get('id', None)
+        if action_id is None:
+            response = {'detail': 'No action id "' + str(action_id) + '", use ?id=<action-id>'}
+            return Response(response, status=422)
+
+        # perform action and return the result dict
+        kwargs = {'request': request}  # pass advanced params to actions
+        result = perform_action(action_id, project, queryset, **kwargs)
+        code = result.pop('response_code', 200)
+
+        return Response(result, status=code)

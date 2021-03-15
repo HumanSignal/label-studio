@@ -1,0 +1,26 @@
+{% extends 'simple.html' %}
+{% load static %}
+
+{% block head %}
+  <title>404 | Label Studio</title>
+  <link rel="stylesheet" href="{% static 'css/error.css' %}"/>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="ls-global-error">
+  <h1>Server error</h1>
+  <img class="ls-global-error__heidi" src="/static/images/opossum_broken.svg" height="111" alt="Heidi's down" />
+  <h2>404 Not Found</h2>
+{#  <div class="ls-global-error__details">{{ exception }}</div>#}
+  <p class="ls-global-error__actions">
+    <a class="ls-global-error__slack button" target="_blank" href="https://join.slack.com/t/label-studio/shared_invite/zt-cr8b7ygm-6L45z7biEBw4HXa5A2b5pw">
+      <img src="/static/images/slack.png" width="16" />
+      Ask on Slack
+    </a>
+    <button onClick="history.back()">Go Back</button>
+    <button onClick="location.reload()">Reload</button>
+  </p>
+</div>
+{% endblock %}

@@ -1,0 +1,8 @@
+<!-- {"title": "Transcription whole audio", "category": "audio", "complexity": "basic"} -->
+<View>
+  <Header value="Listen to the audio" />
+  <Audio name="audio" value="$audio" />
+  <Header value="Write the transcription" />
+  <TextArea name="transcription" toName="audio"
+            rows="4" editable="true" maxSubmissions="1" />
+</View>
