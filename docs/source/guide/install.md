@@ -14,15 +14,15 @@ Install Label Studio on premises or in the cloud. Choose the install method that
 
 
 ## System requirements
-You can install Label Studio on a Linux, Windows, or MacOSX machine running Python 3.5 – 3.8. Python 3.9 is not yet supported. 
+You can install Label Studio on a Linux, Windows, or MacOSX machine running Python 3.6 or later. 
 
-> Note: for Windows users the default installation may fail to build `lxml` package. Consider manually installing it from [the unofficial Windows binaries](https://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml). If you are running Windows 64-bit with Python 3.8, run `pip install lxml‑4.5.0‑cp38‑cp38‑win_amd64.whl`.
+> Note: for Windows users the default installation may fail to build `lxml` package. Consider manually installing it from [the unofficial Windows binaries](https://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml). If you are running Windows 64-bit with Python 3.8 or later, run `pip install lxml‑4.5.0‑cp38‑cp38‑win_amd64.whl`.
 
 Allocate disk space according to the amount of data you plan to label. As a benchmark, 1 million labeling tasks take up approximately 2.3GB on disk when using the SQLite database. For more on using Label Studio at scale and labeling performance, see [Start Label Studio](start.html). 
 
 ## Install with pip
 
-To install Label Studio via pip, you need Python>=3.5 and <3.9 and run:
+To install Label Studio via pip, you need Python>=3.6 and run:
 ```bash
 pip install label-studio
 ```
@@ -43,21 +43,17 @@ pip install --ignore-installed label-studio
 
 ## Install with Docker
 
-Label Studio is also available as a docker container. Make sure you have [Docker](https://www.docker.com/) installed on your machine.
+Label Studio is also available as a Docker container. Make sure you have [Docker](https://www.docker.com/) installed on your machine.
 
 
 ### Install with Docker on *nix
 To install and start Label Studio at [http://localhost:8080](http://localhost:8080), storing all labeling data in `./my_project` directory, run the following:
 ```bash
-docker run --rm -p 8080:8080 -v `pwd`/my_project:/label-studio/my_project --name label-studio heartexlabs/label-studio:latest
+docker run -p 8080:8080 -v `pwd`/mydata:/root/.local/share/label-studio/ heartexlabs/label-studio:latest
 ```
 
 ### Install with Docker on Windows
-Or for Windows, run the following: 
-```bash
-docker run --rm -p 8080:8080 -v `pwd`\my_project:\label-studio\my_project --name label-studio heartexlabs/label-studio:latest
-```
-<!-- Note: for Windows, you have to modify the volumes paths set by `-v` option-->
+Or for Windows, you have to modify the volumes paths set by `-v` option.
 
 #### Override the default Docker install
 By default, the default Docker install command creates a blank project in a `./my_project` directory. If the `./my_project` folder already exists, Label Studio fails to start. Rename or delete the folder, or use the `--force` argument to force Label Studio to start: 
@@ -132,7 +128,7 @@ pip install -e .
 ```
 ```bash
 # Start the server at http://localhost:8080
-python label_studio/server.py start my_project --init
+python label_studio/server.py start --init
 ```
 
 ## Upgrade Label Studio
