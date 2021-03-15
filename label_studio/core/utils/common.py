@@ -120,6 +120,7 @@ def custom_exception_handler(exc, context):
         response_data['exc_info'] = exc_tb
         response = Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data=response_data)
 
+    print('!!!!!', response.data)
     return response
 
 
