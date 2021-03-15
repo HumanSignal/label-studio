@@ -1,6 +1,15 @@
 include deploy/requirements.txt
-include label_studio/core/settings/*.txt
-include label_studio/core/utils/schema/*.json
-recursive-include label_studio/annotation_templates/* *.yml
+
+include frontend/dist/lsf/*
+include frontend/dist/react-app/*
+include frontend/lib/dm/version.json
+
+recursive-include label_studio/annotation_templates *
+
 recursive-include label_studio/core/static *
+include label_studio/core/utils/schema/*.json
 include label_studio/core/templatetags/*.py
+
+
+
+
