@@ -223,7 +223,10 @@ class TaskSerializer(TaskWithAnnotationsAndLazyPredictionsSerializer):
 
     @staticmethod
     def get_annotators(obj):
-        return obj.annotations.values_list('completed_by', flat=True).distinct()
+        result = obj.annotations.values_list('completed_by', flat=True).distinct()
+        if result is None:
+            result = []
+        return result
 
 
 class SelectedItemsSerializer(serializers.Serializer):
