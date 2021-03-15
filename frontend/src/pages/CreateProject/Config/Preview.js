@@ -80,8 +80,9 @@ export const Preview = ({ config, data, error }) => {
       <h3>UI Preview</h3>
       {error && <div className={configClass.elem("preview-error")}>
         <h2>{error.detail} {error.id}</h2>
-        {error.validation_errors?.label_config?.map(err => <p key={err}>{err}</p>)}
-        {error.validation_errors?.map(err => <p key={err}>{err}</p>)}
+        {error.validation_errors?.non_field_errors?.map?.(err => <p key={err}>{err}</p>)}
+        {error.validation_errors?.label_config?.map?.(err => <p key={err}>{err}</p>)}
+        {error.validation_errors?.map?.(err => <p key={err}>{err}</p>)}
       </div>}
       {!data && <Spinner style={{ width: "100%", height: "50vh" }} />}
       <div id="label-studio"></div>
