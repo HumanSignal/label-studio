@@ -10,7 +10,6 @@ import threading
 import json
 
 from datetime import datetime
-from mixpanel import Mixpanel
 from django.conf import settings
 
 from uuid import uuid4
@@ -18,8 +17,6 @@ from .common import get_app_version, get_bool_env, get_client_ip
 from .io import get_config_dir
 
 logger = logging.getLogger(__name__)
-
-mp = Mixpanel('269cd4e25e97cc15bdca5b401e429892')
 
 
 class ContextLog(object):
@@ -89,20 +86,6 @@ class ContextLog(object):
         ) and payload['status_code'] in (200, 201):
             payload['response'] = None
 
-        # endpoint = payload['endpoint']
-        # if endpoint == 'api_import' and response.status_code == 201:
-        #     data = json.loads(response.get_data(True))
-        #     data.pop('new_task_ids')
-        #     r['data'] = data
-        # elif endpoint == 'api_project' and response.status_code == 200:
-        #     data = json.loads(response.get_data(True))
-        #     r['data'] = {'tasks_count': data['task_count'], 'annotations_count': data['annotation_count']}
-        # elif endpoint == 'api_generate_next_task' and response.status_code == 200:
-        #     r['data'] = {'predictions': len(json.loads(response.get_data(True)).get('predictions', []))}
-        # else:
-        #     r['data'] = None
-        # payload['response'] = r
-
     def _exclude_endpoint(self, request):
         if request.resolver_match and request.resolver_match.view_name in [
             'django.views.static.serve',
@@ -111,13 +94,6 @@ class ContextLog(object):
             return True
         if request.GET.get('interaction', None) == 'timer':
             return True
-        
-        # if request.endpoint in ('static', 'send_static', 'get_data_file'):
-        #     return True
-        # if request.args.get('polling', False):
-        #     return True
-        # if request.args.get('interaction', None) == 'timer':
-        #     return True
 
     def send(self, request=None, response=None, body=None):
         if settings.DEBUG:
@@ -181,19 +157,11 @@ class ContextLog(object):
     def send_job(self, request, response, body):
         try:
             payload = self.create_payload(request, response, body)
-            # self._prepare_response(payload)
-            event_name = payload['view_name']
         except:
             pass
-        # else:
-
-        # try:
-        #     mp.track(self.server_id, event_name, payload)
-        # except:
-        #     pass
-
-        # try:
-        #    url = 'https://analytics.labelstud.io/prod'
-        #    requests.post(url=url, json=payload)
-        # except:
-        #    pass
+        else:
+            try:
+               url = 'https://analytics.labelstud.io'
+               requests.post(url=url, json=payload)
+            except:
+                pass

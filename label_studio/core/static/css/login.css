@@ -49,9 +49,10 @@
   border-color: #69C0FF;
 }
 .login_page form {
-  display: flex;
+  display: grid;
   flex-direction: column;
-  gap: 24px;
+  grid-auto-flow: rows;
+  grid-gap: 24px;
 }
 .login_page form > * {
   position: relative;

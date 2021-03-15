@@ -6,7 +6,7 @@ import { ConfigPage } from '../CreateProject/Config/Config';
 
 export const LabelingSettings = () => {
   const history = useHistory();
-  const {project} = useProject();
+  const {project, fetchProject} = useProject();
   const [config, setConfig] = useState("");
   const api = useAPI();
 
@@ -26,12 +26,18 @@ export const LabelingSettings = () => {
     }
 
     const error = await res.json();
+    fetchProject();
     return error;
   }, [project, config]);
 
+  const onUpdate = useCallback((config) => {
+    setConfig(config);
+    fetchProject();
+  });
+
   if (!project.id) return null;
 
-  return <ConfigPage config={project.label_config} project={project} onUpdate={setConfig} onSaveClick={onSave} />;
+  return <ConfigPage config={project.label_config} project={project} onUpdate={onUpdate} onSaveClick={onSave} />;
 };
 
 LabelingSettings.title = "Labeling Interface";

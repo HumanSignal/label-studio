@@ -19,10 +19,13 @@ body {
   row-gap: 4px;
 }
 .field--wide {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  row-gap: 10px;
+  display: block;
+}
+.field--wide > *:not(:first-child) {
+  display: block;
+  margin-top: 10px;
+  width: 100%;
+  box-sizing: border-box;
 }
 .field > * {
   grid-column: 2;
@@ -43,6 +46,12 @@ body {
 span.error {
   background: unset;
   color: var(--color-error);
+}
+
+input,
+button,
+textarea {
+  font: inherit;
 }
 
 a.button,

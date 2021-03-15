@@ -89,7 +89,6 @@ def custom_exception_handler(exc, context):
         'detail': 'Unknown error',  # default value
         'exc_info': None,
     }
-
     # try rest framework handler
     response = exception_handler(exc, context)
     if response is not None:
@@ -101,7 +100,7 @@ def custom_exception_handler(exc, context):
         # move validation errors to separate namespace
         else:
             response_data['detail'] = 'Validation error'
-            response_data['validation_errors'] = response.data
+            response_data['validation_errors'] = response.data if isinstance(response.data, dict) else {'non_field_errors': response.data}
             response.data = response_data
 
     # non-standard exception
@@ -116,6 +115,7 @@ def custom_exception_handler(exc, context):
         response_data['exc_info'] = exc_tb
         response = Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data=response_data)
 
+    print('!!!!!', response.data)
     return response
 
 
