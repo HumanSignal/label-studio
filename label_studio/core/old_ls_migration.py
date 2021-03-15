@@ -5,9 +5,13 @@ import os
 import io
 import json
 
+
 from tasks.models import Task, Annotation, Prediction
 from projects.models import Project
+from data_import.models import FileUpload
+from core.utils.io import get_data_dir
 from data_manager.models import View, FilterGroup, Filter
+from django.core.files.base import File
 from io_storages.gcs.models import GCSImportStorage, GCSExportStorage
 from io_storages.azure_blob.models import AzureBlobImportStorage, AzureBlobExportStorage
 from io_storages.s3.models import S3ImportStorage, S3ExportStorage
@@ -213,6 +217,20 @@ def _migrate_ml_backends(project, config):
         MLBackend.objects.create(project=project, url=ml_backend.get('url'), title=ml_backend.get('name'))
 
 
+def _migrate_uploaded_files(project, project_path):
+    """Migrate files uploaded by user"""
+    source_upload_path = project_path / 'upload'
+    target_upload_path = pathlib.Path(os.environ.get('LABEL_STUDIO_BASE_DATA_DIR', get_data_dir())) / 'upload'
+    if not target_upload_path.exists():
+        os.makedirs(str(target_upload_path), exist_ok=True)
+
+    src_files = os.listdir(str(source_upload_path))
+    for file_name in src_files:
+        full_file_name = os.path.join(str(source_upload_path), file_name)
+        with open(full_file_name, 'rb') as f:
+            FileUpload.objects.create(user=project.created_by, project=project, file=File(f, name=file_name))
+
+
 def migrate_existing_project(project_path, project, config):
     """Migration projects from previous version of Label Studio"""
 
@@ -220,4 +238,5 @@ def migrate_existing_project(project_path, project, config):
     _migrate_tabs(project_path, project)
     _migrate_storages(project, config)
     _migrate_ml_backends(project, config)
+    _migrate_uploaded_files(project, project_path)
 
