@@ -61,7 +61,7 @@ docker-compose up -d
 ### Install locally with pip
 
 ```bash
-# Requires >=Python3.6, Python 3.9 is not yet supported
+# Requires >=Python3.6 
 pip install label-studio
 
 # Start the server at http://localhost:8080
@@ -105,7 +105,7 @@ pip install --ignore-installed label-studio
 ```
 
 #### Install dependencies on Windows 
-To run Label Studio on Windows, download and install the following wheel packages from [Gohlke builds](https://www.lfd.uci.edu/~gohlke/pythonlibs) to ensure you're using the correct version of python:
+To run Label Studio on Windows, download and install the following wheel packages from [Gohlke builds](https://www.lfd.uci.edu/~gohlke/pythonlibs) to ensure you're using the correct version of Python:
 - [lxml](https://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml)
 
 ```bash
