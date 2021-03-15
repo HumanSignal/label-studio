@@ -67,7 +67,7 @@ const Labels = {
       param: ($control, value) => {
         let $container = $control.parentNode;
         let $labels = $control;
-        if ($container.firstChild?.tagName.toUpperCase() === "FILTER") {
+        if ($container.firstChild?.tagName?.toUpperCase() === "FILTER") {
           $labels = $container;
           $container = $labels.parentNode;
         }
