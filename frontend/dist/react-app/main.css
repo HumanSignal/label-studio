@@ -2022,11 +2022,13 @@ span.CodeMirror-selectedtext { background: none; }
   height: 100%;
 }
 .ls-templates-list main ul {
-  display: flex;
+  display: grid;
   flex-wrap: wrap;
-  gap: 16px;
   padding: 0;
   margin: 16px 8px;
+  grid-template-columns: repeat(auto-fill, 276px);
+  grid-auto-columns: 276px;
+  grid-gap: 16px;
 }
 .ls-templates-list__template {
   display: flex;
@@ -2394,6 +2396,7 @@ div[class^=App_menu]>div {
   width: 216px;
   margin-right: auto;
   margin-bottom: 0;
+  margin-top: 0;
   font-size: 20px;
 }
 .ls-create-project > .ls-modal__header button {

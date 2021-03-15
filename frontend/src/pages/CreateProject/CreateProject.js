@@ -2,6 +2,7 @@ import React from 'react';
 import { useHistory } from 'react-router';
 import { Button, ToggleItems } from '../../components';
 import { Modal } from '../../components/Modal/Modal';
+import { Space } from '../../components/Space/Space';
 import { useAPI } from '../../providers/ApiProvider';
 import { cn } from '../../utils/bem';
 import { ConfigPage } from './Config/Config';
@@ -118,8 +119,11 @@ export const CreateProject = ({ onClose }) => {
         <Modal.Header>
           <h1>Create Project</h1>
           <ToggleItems items={steps} active={step} onSelect={setStep} />
-          <Button look="danger" size="compact" onClick={onDelete} waiting={waiting}>Delete</Button>
-          <Button look="primary" size="compact" onClick={onCreate} waiting={waiting || uploading} disabled={!project || uploadDisabled || error}>Save</Button>
+
+          <Space>
+            <Button look="danger" size="compact" onClick={onDelete} waiting={waiting}>Delete</Button>
+            <Button look="primary" size="compact" onClick={onCreate} waiting={waiting || uploading} disabled={!project || uploadDisabled || error}>Save</Button>
+          </Space>
         </Modal.Header>
         <ProjectName
           name={name}

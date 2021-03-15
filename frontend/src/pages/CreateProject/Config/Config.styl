@@ -95,11 +95,14 @@ styled_scroll()
     overflow-y: auto
     height: 100%
     ul
-      display: flex
-      flex-wrap: wrap
-      gap: 16px
-      padding: 0
-      margin: 16px 8px
+      display grid
+      flex-wrap wrap
+      padding 0
+      margin 16px 8px
+      grid-template-columns repeat(auto-fill, 276px)
+      grid-auto-columns 276px
+      grid-gap 16px
+
   &__template
     display: flex
     flex-direction: column
