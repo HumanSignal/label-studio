@@ -11,8 +11,8 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 import os
 
-from core.utils.params import get_bool_env
 from core.utils.io import get_data_dir
+from core.utils.params import get_bool_env
 
 # Hostname is used for proper path generation to the resources, pages, etc
 HOSTNAME = os.environ.get('LABEL_STUDIO_HOSTNAME', '')
@@ -297,11 +297,11 @@ EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
 
 """ React Libraries: do not forget to change this dir in /etc/nginx/nginx.conf """
 # EDITOR = label-studio-frontend repository
-EDITOR_ROOT = os.path.join(BASE_DIR, '../../frontend/dist/lsf')
+EDITOR_ROOT = os.path.join(BASE_DIR, '../frontend/dist/lsf')
 # FRONTEND = GUI for django backend
-REACT_APP_ROOT = os.path.join(BASE_DIR, '../../frontend/dist/react-app')
+REACT_APP_ROOT = os.path.join(BASE_DIR, '../frontend/dist/react-app')
 # DM = data manager (included into FRONTEND due npm building, we need only version.json file from there)
-DM_ROOT = os.path.join(BASE_DIR, '../../frontend/lib/dm')
+DM_ROOT = os.path.join(BASE_DIR, '../frontend/lib/dm')
 
 # per project settings
 BATCH_SIZE = 1000
