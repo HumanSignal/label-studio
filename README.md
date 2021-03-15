@@ -62,7 +62,7 @@ INIT_COMMAND='--log-level=DEBUG' docker-compose up -d
 ```
 You can also set environment variables in the .env file instead of specifying INIT_COMMAND. For example, add this line have the option to reset all project data when starting Label Studio:
 ```bash
-INIT_COMMAND=--log-level=DEBUG
+INIT_COMMAND='--log-level=DEBUG'
 ```
 
 ### Install locally with pip
