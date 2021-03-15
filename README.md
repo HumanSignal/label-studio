@@ -7,7 +7,7 @@
 
 ## What is Label Studio?
 
-Label Studio is an open source data labeling tool. It lets you label data types like audio, text, images, videos, and time series using simple and straightforward UI and export into various model formats. It can be used to prepare raw data or improve existing training data to get more accurate ML models.
+Label Studio is an open source data labeling tool. It lets you label data types like audio, text, images, videos, and time series with a simple and straightforward UI and export to various model formats. It can be used to prepare raw data or improve existing training data to get more accurate ML models.
 
 - [Try out Label Studio](#try-out-label-studio)
 - [What you get from Label Studio](#what-you-get-from-label-studio)
@@ -36,7 +36,7 @@ Run Label Studio in a Docker container and access it at `http://localhost:8080`.
 ```bash
 docker run -p 8080:8080 -v `pwd`/mydata:/root/.local/share/label-studio/ heartexlabs/label-studio:latest
 ```
-All generated assets including SQLite3 database storage `label_studio.sqlite3` and uploaded files can be found in `./mydata` directory.
+You can find all the generated assets, including SQLite3 database storage `label_studio.sqlite3` and uploaded files, in the `./mydata` directory.
 
 #### Override default Docker install
 You can override the default launch command by appending the new arguments:
@@ -57,7 +57,6 @@ Run this command the first time you run Label Studio:
 ```bash
 docker-compose up -d
 ```
-
 
 ### Install locally with pip
 
@@ -125,7 +124,7 @@ pip install label-studio
 ![Screenshot of Label Studio data manager grid view with images](https://raw.githubusercontent.com/heartexlabs/label-studio/master/images/labelstudio-ui.gif)
 
 - **Multi-user labeling** sign up and login, when you create an annotation it's tied to your account.
-- **Multiple projects** to work on all your datasets in one place.
+- **Multiple projects** to work on all your datasets in one instance.
 - **Streamlined design** helps you focus on your task, not how to use the software.
 - **Configurable label formats** let you customize the visual interface to meet your specific labeling needs.
 - **Support for multiple data types** including images, audio, text, HTML, time-series, and video. 
@@ -146,7 +145,7 @@ Connect your favorite machine learning model using the Label Studio Machine Lear
 1. Start your own machine learning backend server. See [more detailed instructions](https://github.com/heartexlabs/label-studio-ml-backend).
 2. Connect Label Studio to the server on the model page found in project settings.
 
-This will enable you to:
+This lets you:
 
 - **Pre-label** your data using model predictions. 
 - Do **online learning** and retrain your model while new annotations are being created. 
