@@ -27,9 +27,11 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install virtualenv libsasl2-dev python-dev libldap2-dev libssl-dev libxml2 libxslt
+          sudo apt-get install virtualenv libsasl2-dev python-dev libldap2-dev libssl-dev
           sh ./deploy/install_npm.sh
           pip install -U pip==20.2
+          pip --upgrade pip setuptools
+          pip install --upgrade cython
           pip install -r deploy/requirements.txt -r deploy/requirements-test.txt
           pip install -e .
 
