@@ -1,5 +1,5 @@
-[branch]: release/1.0.0
-<img src="https://raw.githubusercontent.com/heartexlabs/label-studio/[branch]/images/ls_github_header.png"/>
+master: release/1.0.0
+<img src="https://raw.githubusercontent.com/heartexlabs/label-studio/master/images/ls_github_header.png"/>
 
 ![GitHub](https://img.shields.io/github/license/heartexlabs/label-studio?logo=heartex) ![label-studio:build](https://github.com/heartexlabs/label-studio/workflows/label-studio:build/badge.svg) ![code-coverage](https://github.com/heartexlabs/label-studio/blob/master/.github/test-coverage.svg) ![GitHub release](https://img.shields.io/github/v/release/heartexlabs/label-studio?include_prereleases)
 
@@ -16,7 +16,7 @@ Label Studio is an open source data labeling tool. It lets you label data types 
 - [Set up machine learning models with Label Studio](#set-up-machine-learning-models-with-Label-Studio)
 - [Integrate Label Studio with your existing tools](#integrate-label-studio-with-your-existing-tools)
 
-![Gif of Label Studio annotating different types of data](https://raw.githubusercontent.com/heartexlabs/label-studio/[branch]/images/annotation_examples.gif)
+![Gif of Label Studio annotating different types of data](https://raw.githubusercontent.com/heartexlabs/label-studio/master/images/annotation_examples.gif)
 
 Have a custom dataset? You can customize Label Studio to fit your needs. Read an [introductory blog post](https://towardsdatascience.com/introducing-label-studio-a-swiss-army-knife-of-data-labeling-140c1be92881#3907-fd502dc24c8d) to learn more. 
 
@@ -129,7 +129,7 @@ pip install label-studio
 
 ## What you get from Label Studio
 
-![Screenshot of Label Studio data manager grid view with images](https://raw.githubusercontent.com/heartexlabs/label-studio/[branch]/images/labelstudio-ui.gif)
+![Screenshot of Label Studio data manager grid view with images](https://raw.githubusercontent.com/heartexlabs/label-studio/master/images/labelstudio-ui.gif)
 
 - **Multi-user labeling** sign up and login, when you create an annotation it's tied to your account.
 - **Multiple projects** to work on all your datasets in one place.
@@ -144,7 +144,7 @@ pip install label-studio
 
 Label Studio includes a variety of templates to help you label your data, or you can create your own using specifically designed configuration language. The most common templates and use cases for labeling include the following cases:
 
-<img src="https://raw.githubusercontent.com/heartexlabs/label-studio/[branch]/images/templates-categories.jpg" />
+<img src="https://raw.githubusercontent.com/heartexlabs/label-studio/master/images/templates-categories.jpg" />
 
 ## Set up machine learning models with Label Studio
 
