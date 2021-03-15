@@ -238,6 +238,10 @@ def main():
         _reset_password(input_args)
         return
 
+    if input_args.command == 'shell':
+        call_command('shell_plus')
+        return
+
     # print version
     if input_args.command == 'version':
         from label_studio import __version__

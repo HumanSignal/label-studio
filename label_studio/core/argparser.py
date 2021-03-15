@@ -117,6 +117,8 @@ def parse_input_args():
 
     parser_reset_password = subparsers.add_parser('reset_password', help='Reset password for a specific username', parents=[root_parser])
 
+    parser_shell = subparsers.add_parser('shell', help='Run django shell', parents=[root_parser])
+
     args = parser.parse_args()
 
     if not hasattr(args, 'label_config'):
