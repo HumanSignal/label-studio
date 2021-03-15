@@ -1,5 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+import logging
+
 from django.db import models
 from django.db.models import Aggregate, Count, Exists, OuterRef, Subquery, Avg, Q, F, Value
 from django.contrib.postgres.aggregates import ArrayAgg
@@ -8,6 +10,7 @@ from django.conf import settings
 
 from data_manager.prepare_params import ConjunctionEnum
 
+logger = logging.getLogger(__name__)
 
 operators = {
     "equal": "",
@@ -24,11 +27,16 @@ operators = {
 }
 
 
-def preprocess_field_name(raw_field_name, operator):
-    field_name = "{}{}".format(raw_field_name.replace("filter:tasks:", ""), operators.get(operator, ""))
-
+def preprocess_field_name(raw_field_name, operator, only_undefined_field=False):
+    field_name = raw_field_name.replace("filter:tasks:", "")
     if field_name.startswith("data."):
-        field_name = field_name.replace("data.", "data__")
+        if only_undefined_field:
+            field_name = f'data__{settings.DATA_UNDEFINED_NAME}'
+        else:
+            field_name = field_name.replace("data.", "data__")
+
+    # append operator
+    field_name = "{}{}".format(field_name, operators.get(operator, ""))
 
     return field_name
 
@@ -93,13 +101,17 @@ def apply_filters(queryset, filters):
     else:
         conjunction = Q.AND
 
+    only_undefined_field = False
+    if queryset.exists() and queryset.first().project.only_undefined_field:
+        only_undefined_field = True
+
     for _filter in filters.items:
         # we can also have annotations filters
         if not _filter.filter.startswith("filter:tasks:"):
             continue
 
         # django orm loop expression attached to column name
-        field_name = preprocess_field_name(_filter.filter, _filter.operator)
+        field_name = preprocess_field_name(_filter.filter, _filter.operator, only_undefined_field)
 
         if _filter.operator == "in":
             filter_expression.add(
@@ -130,7 +142,7 @@ def apply_filters(queryset, filters):
             filter_expression.add(~Q(**{field_name: _filter.value}), conjunction)
         else:
             filter_expression.add(Q(**{field_name: _filter.value}), conjunction)
-
+    logger.debug(f'Apply filter: {filter_expression}')
     queryset = queryset.filter(filter_expression)
     return queryset
 
