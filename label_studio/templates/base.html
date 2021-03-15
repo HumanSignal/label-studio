@@ -83,6 +83,7 @@
       avatar: "{{user.avatar.url}}",
       {% endif %}
     },
+    debug: {{settings.DEBUG|yesno:"true,false"}},
     hostname: "{{settings.HOSTNAME}}",
     ...{% block frontend_settings %}{}{% endblock %}
   };
