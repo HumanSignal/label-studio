@@ -36,7 +36,6 @@ from rest_framework.views import Response, exception_handler
 from rest_framework import status
 from rest_framework.exceptions import ErrorDetail
 
-from sentry_sdk import capture_exception, set_tag
 from lxml import objectify
 from base64 import b64encode
 from lockfile import LockFile
@@ -47,6 +46,12 @@ from requests.auth import HTTPBasicAuth
 from pkg_resources import parse_version
 from colorama import Fore
 from boxing import boxing
+
+try:
+    from sentry_sdk import capture_exception, set_tag
+    sentry_sdk_loaded = True
+except ImportError:
+    sentry_sdk_loaded = False
 
 from core import version
 from core.utils.exceptions import LabelStudioDatabaseLockedException
@@ -104,7 +109,7 @@ def custom_exception_handler(exc, context):
             response.data = response_data
 
     # non-standard exception
-    else:
+    elif sentry_sdk_loaded:
         # pass exception to sentry
         set_tag('exception_id', exception_id)
         capture_exception(exc)
@@ -115,7 +120,6 @@ def custom_exception_handler(exc, context):
         response_data['exc_info'] = exc_tb
         response = Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR, data=response_data)
 
-    print('!!!!!', response.data)
     return response
 
 
