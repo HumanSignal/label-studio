@@ -68,9 +68,8 @@ styled_scroll()
       list-style: none
       display: flex
       flex-direction: column
-      gap: 4px
   &__group
-    margin: 0
+    margin: 0 0 4px
     padding: 4px 8px
     border-radius: 4px
     cursor: pointer
@@ -185,7 +184,6 @@ styled_scroll()
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 12px;
   margin-bottom: 16px;
 }
 
@@ -217,11 +215,11 @@ styled_scroll()
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 16px;
 .wizard .configure__visual
   > *
     border-top: 1px solid $black_10
     padding-top: 16px
+    margin-bottom: 16px
 .wizard .configure__object
   h4
     margin-bottom: 8px
@@ -281,7 +279,6 @@ styled_scroll()
   min-width: 140px
   display: flex
   flex-direction: column
-  gap: 8px
   align-items: stretch
   flex: 1
   styled_scroll()
@@ -289,6 +286,8 @@ styled_scroll()
     display: flex
     align-items: stretch
     position: relative
+    &:not(:first-child)
+      margin-top: 8px
     &_choice
       label
         display: none
