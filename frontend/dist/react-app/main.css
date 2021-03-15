@@ -318,6 +318,8 @@
   padding: 0;
   margin: 16px 0;
   list-style-type: none;
+  max-height: 300px;
+  overflow-y: auto;
 }
 .ls-error-message__message {
   margin: 5px 0;

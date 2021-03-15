@@ -30,13 +30,13 @@ const findMacthingComponents = (path, routesMap, parentPath = "") => {
   return result;
 };
 
-const logRoutes = (routes, parentPath = "") => {
-  routes?.forEach?.(({routes, ...route}) => {
-    const fullPath = `${parentPath}${route.path}`;
-    console.log({...route, path: fullPath});
-    logRoutes(routes, fullPath);
-  });
-};
+// const logRoutes = (routes, parentPath = "") => {
+//   routes?.forEach?.(({routes, ...route}) => {
+//     const fullPath = `${parentPath}${route.path}`;
+//     console.log({...route, path: fullPath});
+//     logRoutes(routes, fullPath);
+//   });
+// };
 
 export const RoutesProvider = ({children}) => {
   const history = useHistory();
@@ -90,7 +90,6 @@ export const RoutesProvider = ({children}) => {
 
       setBreadcrumbs(crumbs);
     } catch (err) {
-      console.log('Failed to build crumbs');
       console.log(err);
     }
   }, [location, routesMap, currentContextProps]);

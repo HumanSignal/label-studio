@@ -23,11 +23,11 @@ export const DangerZone = () => {
       onOk: async () => {
         setProcessing(type);
         if(type === 'annotations') {
-          console.log('delete annotations');
+          // console.log('delete annotations');
         } else if(type === 'tasks') {
-          console.log('delete tasks');
+          // console.log('delete tasks');
         } else if(type === 'predictions') {
-          console.log('delete predictions');
+          // console.log('delete predictions');
         } else if(type === 'tabs') {
           await api.callApi('deleteTabs', {
             body: {

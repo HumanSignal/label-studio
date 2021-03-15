@@ -89,7 +89,7 @@ export const resolveRoutes = (routes, props) => {
           children.push(processRoutes([{
             path,
             modal, ...rest,
-            component: Component
+            component: Component,
           }], parentPath));
         }
 

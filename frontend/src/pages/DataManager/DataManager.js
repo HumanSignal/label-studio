@@ -208,7 +208,6 @@ DataManager.context = ({dmRef}) => {
     }
 
     return () => {
-      console.log("Destroyed");
       dmRef?.off?.('ready', onDMReady);
       dmRef?.off?.('modeChanged', onDMModeChanged);
       dmRef?.off?.('dataFetched', onDMDataFetched);

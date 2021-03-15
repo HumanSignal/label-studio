@@ -119,7 +119,7 @@ export const CreateProject = ({ onClose }) => {
           <h1>Create Project</h1>
           <ToggleItems items={steps} active={step} onSelect={setStep} />
           <Button look="danger" size="compact" onClick={onDelete} waiting={waiting}>Delete</Button>
-          <Button look="primary" size="compact" onClick={onCreate} waiting={waiting || uploading} disabled={uploadDisabled || error}>Save</Button>
+          <Button look="primary" size="compact" onClick={onCreate} waiting={waiting || uploading} disabled={!project || uploadDisabled || error}>Save</Button>
         </Modal.Header>
         <ProjectName
           name={name}

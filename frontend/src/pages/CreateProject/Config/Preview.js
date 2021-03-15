@@ -1,9 +1,9 @@
 import React from 'react';
-import { useLabelStudio } from '../../../providers/LabelStudioProvider';
 import { Spinner } from '../../../components';
+import { useLabelStudio } from '../../../providers/LabelStudioProvider';
 import { cn } from '../../../utils/bem';
-import { EMPTY_CONFIG } from './Template';
 import './Config.styl';
+import { EMPTY_CONFIG } from './Template';
 
 const configClass = cn("configure");
 
@@ -34,10 +34,10 @@ export const Preview = ({ config, data, error }) => {
           onLabelStudioLoad: function(LS) {
             LS.settings.bottomSidePanel = true;
             var c = LS.annotationStore.addAnnotation({
-              userGenerate: true
+              userGenerate: true,
             });
             LS.annotationStore.selectAnnotation(c.id);
-          }
+          },
         });
       } catch(e) {
         console.error(e);
@@ -47,7 +47,6 @@ export const Preview = ({ config, data, error }) => {
         <div id="ls"></div>
         <script>
         const LSF = window.parent.LabelStudio;
-        console.log(document, { LSF })
         new LSF('ls', {
           config: '<View><Image value="$image" /></View>',
           interfaces: [

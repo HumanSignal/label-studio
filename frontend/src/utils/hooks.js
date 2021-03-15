@@ -36,8 +36,6 @@ export const useRefresh = () => {
 
 
   const refresh = useCallback((redirectPath) => {
-    console.log({pathname, redirectPath});
-
     history.replace("/");
 
     setTimeout(() => {
@@ -46,13 +44,6 @@ export const useRefresh = () => {
 
     return pathname;
   }, [pathname]);
-
-  // useEffect(() => {
-  //   return () => {
-  //     handler && clearTimeout(handler);
-  //     console.log('refresh destroyed');
-  //   };
-  // }, [handler]);
 
   return refresh;
 };

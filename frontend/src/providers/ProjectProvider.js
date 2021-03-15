@@ -29,7 +29,6 @@ export const ProjectProvider = ({children}) => {
       const projectInfo = await api.callApi('project', {
         params: { pk: finalProjectId },
         errorFilter(result) {
-          console.log(result);
           return false;
         },
       });
@@ -41,7 +40,6 @@ export const ProjectProvider = ({children}) => {
   }, [params]);
 
   useEffect(() => {
-    console.log(params.id);
     fetchProject();
   }, [params]);
 

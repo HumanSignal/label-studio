@@ -1,6 +1,6 @@
 {
-  "message": "Fix error reporting",
-  "commit": "9ac86889c2691f8b26181f1a30225585b0e1af26",
+  "message": "Set waiting only when force refresh",
+  "commit": "62820e05a26a7ef224a2e313d3a8bd2dbe83111b",
   "branch": "master",
-  "date": "2021-03-15T01:07:36Z"
+  "date": "2021-03-15T02:15:02Z"
 }

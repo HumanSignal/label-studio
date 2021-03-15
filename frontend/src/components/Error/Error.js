@@ -59,8 +59,9 @@ export const ErrorWrapper = ({title, message, errorId, stacktrace, validation, v
         <Elem tag="ul" name="validation">
           {validation.map(([field, errors]) => (
             <Fragment key={field}>
-              {errors.map((err, i) => (
+              {[].concat(errors).map((err, i) => (
                 <Elem
+                  tag="li"
                   key={i}
                   name="message"
                   dangerouslySetInnerHTML={{__html: err}}

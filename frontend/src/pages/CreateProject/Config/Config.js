@@ -125,34 +125,41 @@ const ConfigureSettings = ({ template }) => {
             const options = settings[key];
             const type = Array.isArray(options.type) ? Array : options.type;
             const $object = template.objects[0];
+            const $tag = options.control ? $object.$controls[0] : $object;
+            if (options.when && !options.when($tag)) return;
+            let value = false;
+            if (options.value) value = options.value($tag);
+            else if (typeof options.param === "string") value = $tag.getAttribute(options.param);
+            if (value === "true") value = true;
+            if (value === "false") value = false;
             let onChange;
             let size;
             switch (type) {
               case Array:
                 onChange = e => {
                   if (typeof options.param === "function") {
-                    options.param(options.control ? $object.$controls[0] : $object, e.target.value);
+                    options.param($tag, e.target.value);
                   } else {
                     $object.setAttribute(options.param, e.target.value);
                   }
                   template.render();
                 };
                 return (
-                  <li key={key}><label>{options.title} <select onChange={onChange}>{options.type.map(option => (
+                  <li key={key}><label>{options.title} <select value={value} onChange={onChange}>{options.type.map(option => (
                     <option key={option} value={option}>{option}</option>
                   ))}</select></label></li>
                 );
               case Boolean:
                 onChange = e => {
                   if (typeof options.param === "function") {
-                    options.param(options.control ? $object.$controls[0] : $object, e.target.checked);
+                    options.param($tag, e.target.checked);
                   } else {
                     $object.setAttribute(options.param, e.target.checked ? 'true' : 'false');
                   }
                   template.render();
                 };
                 return (
-                  <li key={key}><label><input type="checkbox" onChange={onChange} /> {options.title}</label></li>
+                  <li key={key}><label><input type="checkbox" checked={value} onChange={onChange} /> {options.title}</label></li>
                 );
               case String:
               case Number:
@@ -166,7 +173,7 @@ const ConfigureSettings = ({ template }) => {
                   template.render();
                 };
                 return (
-                  <li key={key}><label>{options.title} <input type="text" onInput={onChange} size={size} /></label></li>
+                  <li key={key}><label>{options.title} <input type="text" onInput={onChange} value={value} size={size} /></label></li>
                 );
             }
           })}
