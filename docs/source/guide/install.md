@@ -57,7 +57,7 @@ Or for Windows, run the following:
 ```bash
 docker run --rm -p 8080:8080 -v `pwd`\my_project:\label-studio\my_project --name label-studio heartexlabs/label-studio:latest
 ```
-<!--> Note: for Windows, you have to modify the volumes paths set by `-v` option-->
+<!-- Note: for Windows, you have to modify the volumes paths set by `-v` option-->
 
 #### Override the default Docker install
 By default, the default Docker install command creates a blank project in a `./my_project` directory. If the `./my_project` folder already exists, Label Studio fails to start. Rename or delete the folder, or use the `--force` argument to force Label Studio to start: 

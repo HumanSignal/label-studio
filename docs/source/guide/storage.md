@@ -322,10 +322,10 @@ label-studio start my_project --init --db postgresql
 You must set the following environment variables to connect Label Studio to PostgreSQL:
 
 ```
-POSTGRE_NAME=postgres
-POSTGRE_USER=postgres
+POSTGRE_NAME=
+POSTGRE_USER=
 POSTGRE_PASSWORD=
-POSTGRE_PORT=5432
-POSTGRE_HOST=db
+POSTGRE_PORT=
+POSTGRE_HOST=
 ```
 

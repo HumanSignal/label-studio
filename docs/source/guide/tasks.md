@@ -114,7 +114,53 @@ You can then import tasks to label that match the following JSON format:
   }]
 }]
 ```
-In this example, import tasks from several JSON files stored in one directory, `files`. Each JSON file in this case must match the [Basic Label Studio JSON format](tasks.html#Basic-Label-Studio-JSON-format). 
+
+> Note: For versions of Label Studio earlier than 1.0.0, use the following JSON format example. 
+
+If you're using a version of Label Studio earlier than version 1.0.0, import tasks that match the following JSON format: 
+
+```yaml
+[{
+  # "data" must contain the "my_text" field defined by labeling config,
+  # and can optionally include other fields
+  "data": {
+    "my_text": "Opossums are great",
+    "ref_id": 456,
+    "meta_info": {
+      "timestamp": "2020-03-09 18:15:28.212882",
+      "location": "North Pole"
+    } 
+  },
+
+  # completions are the list of annotation results matching the labeling config schema
+  "completions": [{
+    "result": [{
+      "from_name": "sentiment_class",
+      "to_name": "message",
+      "type": "choices",
+      "value": {
+        "choices": ["Positive"]
+      }
+    }]
+  }],
+
+  # "predictions" are pretty similar to "completions" 
+  # except that they also include some ML-related fields like a prediction "score"
+  "predictions": [{
+    "result": [{
+      "from_name": "sentiment_class",
+      "to_name": "message",
+      "type": "choices",
+      "value": {
+        "choices": ["Neutral"]
+      }
+    }],
+  # score is used for active learning sampling mode
+    "score": 0.95
+  }]
+}]
+```
+
 
 ### Import CSV or TSV data
 

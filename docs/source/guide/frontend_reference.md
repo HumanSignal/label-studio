@@ -8,7 +8,7 @@ order: 905
 var labelStudio = new LabelStudio('editor', options);
 ```
 
-The following options are recognized when initializing a **Label Studio** instance:
+The following options are recognized when initializing a **Label Studio** instance version earlier than 1.0.0. 
 
 ## Options
 
@@ -30,9 +30,9 @@ Collection of UI elements to show:
 
 ```javascript
 [
-    "annotations:add-new",
-    "annotations:delete",
-    "annotations:menu",
+    "completions:add-new",
+    "completions:delete",
+    "completions:menu",
     "controls",
     "panel",
     "predictions:menu",
@@ -43,9 +43,9 @@ Collection of UI elements to show:
 ]
 ```
 
-- `annotations:add-new` - show add new annotations button
-- `annotations:delete` - show delete current annotation button
-- `annotations:menu` - show annotations menu
+- `completions:add-new` - show add new annotations button
+- `completions:delete` - show delete current annotation button
+- `completions:menu` - show annotations menu
 - `controls` - enable panel with controls (submit, update, skip)
 - `panel` - navigation panel for current task with buttons: undo, redo and reset
 - `predictions:menu` - show predictions menu
@@ -100,7 +100,7 @@ Type data: `object`
   data: {
     text: "Labeling text..."
   },
-  annotations: [],
+  completions: [],
   predictions: [],
 }
 ```
@@ -113,7 +113,7 @@ Default: `null`
 
 #### data
 
-#### annotations
+#### completions
 
 Type data: `array`
 
@@ -123,7 +123,7 @@ Array of annotations. See the [annotation documentation](/guide/export.html#Raw-
 
 Type data: `array`
 
-Array of predictions. Similar structure as annotations. See the [annotation documentation](/guide/export.html#Raw-JSON-format-of-completed-tasks) for more information.
+Array of predictions. Similar structure as completions or annotations. See the [annotation documentation](/guide/export.html#Raw-JSON-format-of-completed-tasks) for more information.
 
 ### user
 
