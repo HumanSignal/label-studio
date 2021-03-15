@@ -1,6 +1,6 @@
 {
-  "message": "Set waiting only when force refresh",
-  "commit": "62820e05a26a7ef224a2e313d3a8bd2dbe83111b",
+  "message": "Fix fonts",
+  "commit": "343d46abe34c532cdca493a1002e7c52b71b180f",
   "branch": "master",
-  "date": "2021-03-15T02:15:02Z"
+  "date": "2021-03-15T11:27:04Z"
 }
