@@ -1,15 +1,30 @@
 include deploy/requirements.txt
 
+# react LSF / react-app with dm
 include frontend/dist/lsf/*
 include frontend/dist/react-app/*
 include frontend/lib/dm/version.json
 
+# html template files
+recursive-include label_studio *.html
+
+# annotation templates
 recursive-include label_studio/annotation_templates *
 
+# core
 recursive-include label_studio/core/static *
 include label_studio/core/utils/schema/*.json
 include label_studio/core/templatetags/*.py
+include label_studio/core/templatetags/version_.py
 
+# io storages
+recursive-include label_studio/io_storages *.yml
 
+# tests
+recursive-include label_studio/tests *.sh
+recursive-include label_studio/tests/loadtests *.txt
+recursive-include label_studio/tests/test_data *.yml
+recursive-include label_studio/tests/test_suites/samples *
+recursive-include label_studio/tests/test_suites *.yml
 
-
+include label_studio/pytest.ini

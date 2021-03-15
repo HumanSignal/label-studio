@@ -5,9 +5,13 @@ on:
 
 jobs:
   
-  run_pytest:
-    name: Run pytest for Label Studio
+  run_pytest_sqlite:
+    name: Run pytest for Label Studio SQLite
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8]
+
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
       LOG_DIR: pytest_logs
@@ -15,10 +19,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
-          python-version: '3.7'
+          python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
         run: |
@@ -50,8 +54,8 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           files: label_studio/report.xml
 
-  run_pytest_enterprise:
-    name: Run pytest for Label Studio Enterprise
+  run_pytest_postgresql:
+    name: Run pytest for Label Studio PostgreSQL
     runs-on: ubuntu-latest
     env:
       DJANGO_SETTINGS_MODULE: core.settings.pytest

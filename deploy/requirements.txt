@@ -20,7 +20,7 @@ django-redis-cache==3.0.0
 drf_dynamic_fields==0.3.0
 drf_yasg==1.20.0
 drf-generators==0.3.0
-label-studio-converter==0.0.25
+label-studio-converter>=0.0.25
 htmlmin==0.1.12
 jsonschema==3.2.0
 lockfile==0.12.2
@@ -38,7 +38,6 @@ PyYAML==5.1.1
 requests>=2.22.0,<3
 rq==1.7.0
 rules==2.2
-sentry_sdk==0.20.2
 ujson>=3.0.0
 xmljson==0.2.0
 colorama>=0.4.4
