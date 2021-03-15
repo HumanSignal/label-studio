@@ -1991,10 +1991,9 @@ span.CodeMirror-selectedtext { background: none; }
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 4px;
 }
 .ls-templates-list__group {
-  margin: 0;
+  margin: 0 0 4px;
   padding: 4px 8px;
   border-radius: 4px;
   cursor: pointer;
@@ -2116,7 +2115,6 @@ span.CodeMirror-selectedtext { background: none; }
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 12px;
   margin-bottom: 16px;
 }
 .ls-configure__editor {
@@ -2154,11 +2152,11 @@ span.CodeMirror-selectedtext { background: none; }
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 16px;
 }
 .ls-wizard .ls-configure__visual > * {
   border-top: 1px solid rgba(0,0,0,0.1);
   padding-top: 16px;
+  margin-bottom: 16px;
 }
 .ls-wizard .ls-configure__object h4 {
   margin-bottom: 8px;
@@ -2229,7 +2227,6 @@ span.CodeMirror-selectedtext { background: none; }
   min-width: 140px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
   align-items: stretch;
   flex: 1;
 }
@@ -2245,6 +2242,9 @@ span.CodeMirror-selectedtext { background: none; }
   display: flex;
   align-items: stretch;
   position: relative;
+}
+.ls-wizard .ls-configure__labels ul .ls-configure__label:not(:first-child) {
+  margin-top: 8px;
 }
 .ls-wizard .ls-configure__labels ul .ls-configure__label_choice label {
   display: none;
@@ -2390,11 +2390,10 @@ div[class^=App_menu]>div {
   flex-direction: column;
 }
 .ls-create-project > .ls-modal__header {
-  gap: 16px;
   border-bottom: 1px solid rgba(0,0,0,0.1);
 }
 .ls-create-project > .ls-modal__header h1 {
-  width: 216px;
+  width: 224px;
   margin-right: auto;
   margin-bottom: 0;
   margin-top: 0;
@@ -2407,6 +2406,7 @@ div[class^=App_menu]>div {
 .ls-create-project > .ls-modal__header .ls-toggle-items {
   width: 500px;
   margin-right: auto;
+  box-sizing: border-box;
 }
 .ls-create-project__tab_disabled {
   display: flex;
@@ -2425,9 +2425,9 @@ div[class^=App_menu]>div {
 .ls-create-project form.ls-project-name {
   width: 500px;
   margin: 32px auto;
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
+}
+.ls-create-project form.ls-project-name > *:not(:first-child) {
+  margin-top: 32px;
 }
 
 body {
@@ -2504,15 +2504,6 @@ body {
   background-size: 100% 20px, 100% 5px;
   background-attachment: local, scroll;
 }
-.ls-upload_page main form.inline {
-  display: flex;
-  gap: 16px;
-  padding: 20px 32px;
-}
-.ls-upload_page main form.inline input,
-.ls-upload_page main form.inline button {
-  line-height: 1em;
-}
 .ls-upload_page table td {
   padding: 8px 32px 8px 0;
 }
@@ -2545,12 +2536,12 @@ body {
 .ls-upload_page__upload-button {
   display: flex;
   align-items: center;
-  gap: 8px;
   padding: 8px;
 }
 .ls-upload_page__upload-icon {
   opacity: 0.5;
   height: 16px;
+  margin-right: 8px;
 }
 .ls-upload_page__info-icon {
   margin-right: 8px;
