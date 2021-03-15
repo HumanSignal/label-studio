@@ -1,6 +1,6 @@
 {
-  "message": "Update tag size",
-  "commit": "a1b028a5db8c9bf0e57cdf740df08f3b5137bc10",
+  "message": "Fix isExplorer",
+  "commit": "01f691004a7cb243724e4b5d00e1112ca9c72157",
   "branch": "master",
-  "date": "2021-03-15T11:34:14Z"
+  "date": "2021-03-15T23:06:26Z"
 }
