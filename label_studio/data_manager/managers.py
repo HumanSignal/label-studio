@@ -1,6 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import logging
+import re
 
 from django.db import models
 from django.db.models import Aggregate, Count, Exists, OuterRef, Subquery, Avg, Q, F, Value
@@ -78,6 +79,9 @@ def apply_ordering(queryset, ordering):
         field_name = ordering[0].replace("tasks:", "")
         if "data." in field_name:
             field_name = field_name.replace(".", "__", 1)
+            only_undefined_field = queryset.exists() and queryset.first().project.only_undefined_field
+            if only_undefined_field:
+                field_name = re.sub('data__\w+', f'data__{settings.DATA_UNDEFINED_NAME}', field_name)
 
         ascending = False if field_name[0] == '-' else True  # detect direction
         field_name = field_name[1:] if field_name[0] == '-' else field_name  # remove direction
@@ -101,9 +105,7 @@ def apply_filters(queryset, filters):
     else:
         conjunction = Q.AND
 
-    only_undefined_field = False
-    if queryset.exists() and queryset.first().project.only_undefined_field:
-        only_undefined_field = True
+    only_undefined_field = queryset.exists() and queryset.first().project.only_undefined_field
 
     for _filter in filters.items:
         # we can also have annotations filters
