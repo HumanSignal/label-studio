@@ -77,7 +77,9 @@ You can start labeling quickly by using a template to configure the labeling int
 
 We migrated to a more robust backend from our enterprise version based on Django. We also transitioned from a filesystem-based to SQL-based data storage for tasks and annotations. While a filesystem is probably the simplest approach for storage, it doesn’t scale well when you work on datasets with more than 10,000 items. With SQLite as a storage backend, we can now easily upload datasets of hundreds of thousands of items.
 
-<center style="font-style: italic"><GIF showing how quickly I can search through 100K> Here is filtering performance on dataset with 100K items</center>
+<br/>
+<img src="/images/release-100/data-manager-filtering.gif"  class="gif-border" />
+<center style="font-style: italic">Here is filtering performance on dataset with 250K items</center>
 
 > For production deployments, we recommend using PostgreSQL instead of SQLite, especially if you expect to create a large number of users or projects in parallel, because SQLite doesn’t support parallel writes.
 
