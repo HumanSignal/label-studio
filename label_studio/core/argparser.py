@@ -88,6 +88,8 @@ def parse_input_args():
     )
     root_parser.add_argument('--password', dest='password', default='', help='Password for default user')
     root_parser.add_argument('--username', dest='username', default='', help='Username for default user')
+    root_parser.add_argument('--agree-fix-sqlite', dest='agree_fix_sqlite', action='store_true',
+                             help='Agree to fix SQLite issues on python 3.6-3.8 on Windows automatically')
 
     parser = argparse.ArgumentParser(description='Label studio', parents=[root_parser])
 

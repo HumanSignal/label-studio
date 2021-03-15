@@ -7,9 +7,14 @@ import pathlib
 import os
 import io
 import json
-import datetime
-import contextlib
 import getpass
+
+from colorama import init
+init(convert=True)
+
+# on windows there will be problems with sqlite and json1 support, so fix it
+from label_studio.core.utils.windows_sqlite_fix import windows_dll_fix
+windows_dll_fix()
 
 from django.core.management import call_command
 from django.db import IntegrityError
