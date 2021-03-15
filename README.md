@@ -34,12 +34,14 @@ Try out Label Studio in a **[running app](https://app.labelstud.io)**, install i
 Run Label Studio in a Docker container and access it at `http://localhost:8080`.
 
 ```bash
-docker run --rm -p 8080:8080 heartexlabs/label-studio:latest
+docker run -p 8080:8080 -v `pwd`/mydata:/root/.local/share/label-studio/ heartexlabs/label-studio:latest
 ```
+All generated assets including SQLite3 database storage `label_studio.sqlite3` and uploaded files can be found in `./mydata` directory.
+
 #### Override default Docker install
-You can override the default launch command with new arguments:
+You can override the default launch command by appending the new arguments:
 ```bash
-docker run -p 8080:8080 heartexlabs/label-studio:latest label-studio --log-level DEBUG
+docker run -p 8080:8080 -v `pwd`/mydata:/root/.local/share/label-studio/ heartexlabs/label-studio:latest label-studio --log-level DEBUG
 ```
 
 #### Build a local image with Docker
@@ -56,14 +58,6 @@ Run this command the first time you run Label Studio:
 docker-compose up -d
 ```
 
-Start Label Studio and reset all project data: 
-```bash
-INIT_COMMAND='--log-level=DEBUG' docker-compose up -d
-```
-You can also set environment variables in the .env file instead of specifying INIT_COMMAND. For example, add this line have the option to reset all project data when starting Label Studio:
-```bash
-INIT_COMMAND='--log-level=DEBUG'
-```
 
 ### Install locally with pip
 
@@ -92,7 +86,7 @@ You can run the latest Label Studio version locally without installing the packa
 pip install -e .
 ```
 ```bash
-# Start the server in development mode at http://localhost:8080 
+# Start the server in development mode at http://localhost:8000
 python label_studio/manage.py runserver
 ```
 
@@ -149,7 +143,7 @@ Label Studio includes a variety of templates to help you label your data, or you
 
 Connect your favorite machine learning model using the Label Studio Machine Learning SDK. Follow these steps:
 
-1. Start your own machine learning backend server. See [more detailed instructions](label_studio/ml/README.md).
+1. Start your own machine learning backend server. See [more detailed instructions](https://github.com/heartexlabs/label-studio-ml-backend).
 2. Connect Label Studio to the server on the model page found in project settings.
 
 This will enable you to:

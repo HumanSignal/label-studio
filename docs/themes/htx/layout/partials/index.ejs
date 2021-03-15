@@ -79,37 +79,29 @@ menu && menu.classList.add('main__page__header')
               <div class="desktop__code">	      
                 <p class="title__code"><span class="counter">1</span># Install the Package</p>
                 <p class="code__content"><span class="counter">2</span>pip install -U label-studio</p>
-                <p class="spacer"><span class="counter">3</span></p>
-                <p class="title__code"><span class="counter">4</span># Create a New Project</p>
-                <p class="code__content"><span class="counter">5</span>label-studio init my_project</p>
                 <p class="spacer"><span class="counter">6</span></p>
                 <p class="title__code"><span class="counter">7</span># Launch It!</p>
-                <p class="code__content"><span class="counter">8</span>label-studio start my_project</p>
+                <p class="code__content"><span class="counter">8</span>label-studio</p>
               </div>
               <div class="mobile__code">
                 <p class="title__code"><span class="counter">1</span># Install the Package</p>
-                <p class="code__content"><span class="counter">2</span>pip install label-studio</p>
-                <p class="spacer"><span class="counter">3</span></p>
-                <p class="title__code"><span class="counter">4</span># Create a New Project</p>
-                <p class="code__content"><span class="counter">5</span>label-studio init</p>
-                <p class="code__content"><span class="counter">6</span>my_project</p>
+                <p class="code__content"><span class="counter">2</span>pip install -U label-studio</p>
                 <p class="spacer"><span class="counter">7</span></p>
                 <p class="title__code"><span class="counter">8</span># Launch It!</p>
-                <p class="code__content"><span class="counter">9</span>label-studio start</p>
-                <p class="code__content"><span class="counter">10</span>my_project</p>
+                <p class="code__content"><span class="counter">9</span>label-studio</p>
               </div>
             </div>
 
             <div class="content__elem content2" style="display:none;">
               <div class="desktop__code">
                 <p class="title__code"><span class="counter">1</span># Running latest docker version </p>
-                <p class="code__content"><span class="counter">2</span>docker run --rm -p 8080:8080 -v `pwd`/my_project:/label-studio/my_project --name label-studio heartexlabs/label-studio:latest label-studio start my_project --init</p>
+                <p class="code__content"><span class="counter">2</span>docker run -p 8080:8080 -v `pwd`/mydata:/root/.local/share/label-studio heartexlabs/label-studio:latest</p>
                 <p class="spacer"><span class="counter">3</span></p>
                 <p class="title__code"><span class="counter">4</span># Now visit http://localhost:8080/</p>
               </div>
               <div class="mobile__code">
 	      	<p class="title__code"><span class="counter">1</span># Running latest docker version </p>
-                <p class="code__content"><span class="counter">2</span>docker run --rm -p 8080:8080 -v `pwd`/my_project:/label-studio/my_project --name label-studio heartexlabs/label-studio:latest label-studio start my_project --init</p>
+                <p class="code__content"><span class="counter">2</span>docker run -p 8080:8080 -v `pwd`/mydata:/root/.local/share/label-studio heartexlabs/label-studio:latest</p>
                 <p class="spacer"><span class="counter">3</span></p>
                 <p class="title__code"><span class="counter">4</span># Now visit http://localhost:8080/</p>
               </div>
@@ -125,7 +117,7 @@ menu && menu.classList.add('main__page__header')
                 <p class="code__content"><span class="counter">6</span>pip install -e .</p>
                 <p class="spacer"><span class="counter">7</span></p>
                 <p class="title__code"><span class="counter">8</span># Launch</p>
-                <p class="code__content"><span class="counter">9</span>python label_studio/server.py start labeling_project --init</p>
+                <p class="code__content"><span class="counter">9</span>python label_studio/manage.py runserver</p>
               </div>
               <div class="mobile__code">
                 <p class="title__code"><span class="counter">1</span># Clone repo</p>
@@ -136,7 +128,7 @@ menu && menu.classList.add('main__page__header')
                 <p class="code__content"><span class="counter">6</span>pip install -e .</p>
                 <p class="spacer"><span class="counter">7</span></p>
                 <p class="title__code"><span class="counter">8</span># Launch</p>
-                <p class="code__content"><span class="counter">9</span>python label_studio/server.py start labeling_project --init</p>
+                <p class="code__content"><span class="counter">9</span>python label_studio/manage.py runserver</p>
               </div>
             </div>
           </div>
