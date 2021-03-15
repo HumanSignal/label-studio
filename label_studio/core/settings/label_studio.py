@@ -13,12 +13,7 @@ ADD_DEFAULT_ML_BACKENDS = False
 
 LOGGING['root']['level'] = os.environ.get('LOG_LEVEL', 'DEBUG')
 
-if DEBUG:
-    MIDDLEWARE_BASE = MIDDLEWARE
-    MIDDLEWARE = [
-        # 'debug_toolbar.middleware.DebugToolbarMiddleware',
-    ]
-    MIDDLEWARE.extend(MIDDLEWARE_BASE)
+DEBUG = get_bool_env('DEBUG', False)
 
 DEBUG_PROPAGATE_EXCEPTIONS = get_bool_env('DEBUG_PROPAGATE_EXCEPTIONS', False)
 

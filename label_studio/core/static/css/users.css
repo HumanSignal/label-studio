@@ -232,6 +232,11 @@ body {
 .roles-details li p {
   grid-column: span 2;
 }
+
+.access_token__info button {
+  padding-right: 32px;
+  padding-left: 32px;
+}
 textarea.example_code {
   font-size: 16px;
   font-family: monospace;
