@@ -105,7 +105,7 @@ def _create_user(input_args, config):
         if not username:
             username = DEFAULT_USERNAME
     if not password:
-        password = input('Default user password: ')
+        password = getpass.getpass('Default user password: ')
 
     try:
         user = User.objects.create_user(email=username, password=password)
