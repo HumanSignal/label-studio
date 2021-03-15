@@ -113,6 +113,12 @@
 
   <script>
     (() => {
+      {% if settings.HOSTNAME %}
+      const CURL_TEMPLATE = "curl -X GET {{ settings.HOSTNAME }}/api/projects/ -H 'Authorization: Token'"
+      {% else %}
+      const CURL_TEMPLATE = "curl -X GET http://localhost:8080/api/projects/ -H 'Authorization: Token'"
+      {% endif %}
+
       document.querySelectorAll('[data-copy]').forEach(button => {
         button.onclick = e => {
           const input = document.getElementById(e.target.dataset.copy);
@@ -134,7 +140,7 @@
           .then(res => res.json())
           .then(res => {
             input.value = res.token;
-            example.value = `curl -X GET https://{{ settings.HOSTNAME }}/api/projects/?organization_id=1 -H 'Authorization: Token ${res.token}`
+            example.value = `${CURL_TEMPLATE} ${res.token}`
             button.classList.add('blink');
             setTimeout(() => button.classList.remove('blink'))
           });
