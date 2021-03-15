@@ -1,4 +1,4 @@
-name: tests
+name: pytest:ubuntu
 on:
   push:
     branches: ['*', '*/*', master]
@@ -6,7 +6,7 @@ on:
 jobs:
   
   run_pytest_sqlite:
-    name: Run pytest for LS SQLite
+    name: LS SQLite
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -56,7 +56,7 @@ jobs:
           files: label_studio/report.xml
 
   run_pytest_postgresql:
-    name: Run pytest for LS PostgreSQL
+    name: LS PostgreSQL
     runs-on: ubuntu-latest
     env:
       DJANGO_SETTINGS_MODULE: core.settings.pytest
