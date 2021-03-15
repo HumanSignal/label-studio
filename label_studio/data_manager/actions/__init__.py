@@ -73,7 +73,7 @@ def register_all_actions():
 
             for action in module_actions:
                 register_action(**action)
-                logger.info('Action registered: ' + str(action['entry_point'].__name__))
+                logger.debug('Action registered: ' + str(action['entry_point'].__name__))
 
 
 def perform_action(action_id, project, queryset, **kwargs):
