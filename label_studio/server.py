@@ -211,9 +211,14 @@ def main():
     if input_args.log_level:
         os.environ.setdefault("LOG_LEVEL", input_args.log_level)
 
-    if not os.environ.get('DATABASE_NAME'):
+    if input_args.database:
         database_path = pathlib.Path(input_args.database)
         os.environ.setdefault("DATABASE_NAME", str(database_path.absolute()))
+
+    if input_args.data_dir:
+        data_dir_path = pathlib.Path(input_args.data_dir)
+        print(data_dir_path)
+        os.environ.setdefault("LABEL_STUDIO_BASE_DATA_DIR", str(data_dir_path.absolute()))
 
     config = _get_config(input_args.config_path)
 

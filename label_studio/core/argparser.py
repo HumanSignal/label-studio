@@ -30,7 +30,10 @@ def parse_input_args():
         '-b', '--no-browser', dest='no_browser', action='store_true', help='Do not open browser when starting Label Studio'
     )
     root_parser.add_argument(
-        '-db', '--database', dest='database', default='label_studio.sqlite3', help='Database file path for storing tasks and annotations'
+        '-db', '--database', dest='database', help='Database file path for storing tasks and annotations'
+    )
+    root_parser.add_argument(
+        '--data-dir', dest='data_dir', help='Directory for storing all application related data'
     )
     root_parser.add_argument('-d', '--debug', dest='debug', action='store_true', help='Debug mode', default=False)
     default_config_path = find_file('default_config.json')

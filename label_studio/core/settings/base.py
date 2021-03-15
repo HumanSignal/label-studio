@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 import os
 
 from core.utils.params import get_bool_env
+from core.utils.io import get_data_dir
 
 # Hostname is used for proper path generation to the resources, pages, etc
 HOSTNAME = os.environ.get('LABEL_STUDIO_HOSTNAME', '')
@@ -25,10 +26,15 @@ DEBUG = get_bool_env('DEBUG', True)
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# Base path for media root and other uploaded files
+BASE_DATA_DIR = os.environ.get('LABEL_STUDIO_BASE_DATA_DIR', get_data_dir())
+
 # Databases
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 DJANGO_DB_SQLITE = 'sqlite'
 DJANGO_DB = 'default'
+DATABASE_NAME_DEFAULT = os.path.join(BASE_DATA_DIR, 'label_studio.sqlite3')
+DATABASE_NAME = os.environ.get('DATABASE_NAME', DATABASE_NAME_DEFAULT)
 DATABASES_ALL = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -40,7 +46,7 @@ DATABASES_ALL = {
     },
     DJANGO_DB_SQLITE: {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.environ.get('DATABASE_NAME', 'label_studio.sqlite3'),
+        'NAME': DATABASE_NAME,
         'OPTIONS': {
             # 'timeout': 20,
         }
@@ -267,13 +273,13 @@ CSRF_COOKIE_SECURE = bool(int(os.environ.get('CSRF_COOKIE_SECURE', SESSION_COOKI
 CSRF_COOKIE_HTTPONLY = bool(int(os.environ.get('CSRF_COOKIE_HTTPONLY', SESSION_COOKIE_SECURE)))
 
 # user media files
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DATA_DIR, 'media')
 UPLOAD_DIR = 'upload'
 MEDIA_URL = '/data/'
 AVATAR_PATH = 'avatars/'
 
 # project exports
-EXPORT_DIR = os.path.join(BASE_DIR, 'export')
+EXPORT_DIR = os.path.join(BASE_DATA_DIR, 'export')
 EXPORT_URL_ROOT = '/export/'
 os.makedirs(EXPORT_DIR, exist_ok=True)
 
