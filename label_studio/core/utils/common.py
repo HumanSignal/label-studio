@@ -50,7 +50,7 @@ from boxing import boxing
 try:
     from sentry_sdk import capture_exception, set_tag
     sentry_sdk_loaded = True
-except ImportError:
+except (ModuleNotFoundError, ImportError):
     sentry_sdk_loaded = False
 
 from core import version
