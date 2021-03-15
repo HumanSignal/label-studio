@@ -6,6 +6,7 @@ import logging
 
 logger = logging.getLogger('main')
 
+
 def start_fix():
     import zipfile
     import platform
@@ -21,6 +22,8 @@ def start_fix():
         zip_ref.extractall('.')
 
     print('Copying finished')
+    print(colorama.Fore.LIGHTRED_EX + '\nPlease, restart Label Studio again to load the updated sqlite.dll\n')
+    exit()
 
 
 def windows_dll_fix():

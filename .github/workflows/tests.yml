@@ -1,4 +1,4 @@
-name: pytest:ubuntu
+name: pytest:ubnt
 on:
   push:
     branches: ['*', '*/*', master]
