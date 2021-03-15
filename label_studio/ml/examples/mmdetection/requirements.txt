@@ -1,0 +1,4 @@
+torch==1.7.0
+torchvision==0.8.1
+mmcv-full==1.1.6
+git+git://github.com/open-mmlab/mmdetection.git@d3cf38d91c454b1a6881e8c36c1e4a66dc5521b8#egg=mmdet
