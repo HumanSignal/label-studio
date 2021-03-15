@@ -208,7 +208,7 @@
           field_last_activity_render(user) {
             const diff = new Date() - new Date(user.last_activity);
             const interval = INTERVALS.find(i => diff > i[0]);
-            return interval[1]
+            return interval ? interval[1] : 'just now';
           },
           field_name_render(user) {
             return user.first_name + " " + user.last_name
