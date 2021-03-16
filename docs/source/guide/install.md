@@ -70,25 +70,9 @@ docker build -t heartexlabs/label-studio:latest .
 ### Run with Docker Compose
 Use Docker Compose to serve Label Studio at `http://localhost:8080`.
 
-Run this command the first time you run Label Studio:
-```bash
-INIT_COMMAND='--init' docker-compose up -d
-```
-
-Start Label Studio after you have an existing project:
+Start Label Studio:
 ```bash
 docker-compose up -d
-```
-
-Start Label Studio and reset all project data: 
-```bash
-INIT_COMMAND='--init --force' docker-compose up -d
-```
-You can also set environment variables in the .env file instead of specifying `INIT_COMMAND`. 
-
-For example, add the following line to have the option to reset all project data when starting Label Studio:
-```bash
-INIT_COMMAND=--init --force
 ```
 
 ## Install from source
@@ -101,10 +85,10 @@ cd label-studio
 python setup.py develop
 ```
 
-Then, create a new project that stores all labeling data in a local directory `my_project`:
+Then, start Label Studio:
 
 ```bash
-label-studio start my_project --init
+label-studio 
 ```
 The default web browser opens automatically at [http://localhost:8080](http://localhost:8080).
 
