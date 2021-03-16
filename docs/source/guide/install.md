@@ -101,18 +101,6 @@ conda activate label-studio
 pip install label-studio
 ```
 
-## Install for local development
-
-You can run the latest Label Studio version locally without installing the package with pip. 
-
-```bash
-# Install all package dependencies
-pip install -e .
-```
-```bash
-# Start the server at http://localhost:8080
-python label_studio/server.py start --init
-```
 
 ## Upgrade Label Studio
 To upgrade to the latest version of Label Studio, reinstall or upgrade using pip. 
