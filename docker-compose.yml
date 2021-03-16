@@ -28,7 +28,7 @@ services:
       - POSTGRE_HOST=db
     volumes:
       - static:/label-studio/label_studio:rw
-      - ./nginx/:/etc/nginx/conf.d/:ro
+      - ./files:/root/.local/share/label-studio:rw
     command: [ "/label-studio/wait-for-it.sh", "db", "/usr/local/bin/label-studio" ]
     
   db:
@@ -37,6 +37,8 @@ services:
     restart: always
     environment:
       - POSTGRES_HOST_AUTH_METHOD=trust
+    volumes:
+      - ${POSTGRES_DATA_DIR:-./postgres-data}:/var/lib/postgresql/data
     ports:
       - 5432:5432
 
