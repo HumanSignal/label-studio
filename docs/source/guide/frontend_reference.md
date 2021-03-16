@@ -155,44 +155,44 @@ Type data: `string`
 
 Callbacks can be used to execute actions based on user interaction with the interface. For example, label-studio server uses it to communicate with an API. Pass them along with other options when initiating the instance.
 
-### onSubmitAnnotation
+### onSubmitCompletion
 
 Type data: `function`
 
-Called when a button `submit` is pressed. `ls` is label studio instance, `annotation` is value of current annotation.
+Called when a button `submit` is pressed. `ls` is label studio instance, `completion` is the value of the current annotation.
 
 #### Example
 
 ```javascript
-onSubmitAnnotation: function(ls, annotation) {
+onSubmitCompletion: function(ls, annotation) {
   console.log(annotation)
 }
 ```
 
-### onUpdateAnnotation
+### onUpdateCompletion
 
 Type data: `function`
 
-Called when the `update` button is pressed. `ls` is label studio instance, `annotation` is value of current annotation.
+Called when the `update` button is pressed. `ls` is label studio instance, `completion` is the value of the current annotation.
 
 #### Example
 
 ```javascript
-updateAnnotation: function(ls, annotation) {
+updateCompletion: function(ls, annotation) {
   console.log(result)
 }
 ```
 
-### onDeleteAnnotation
+### onDeleteCompletion
 
 Type data: `function`
 
-Called when the `delete` button is pressed. `ls` is label studio instance, `annotation` is value of current annotation.
+Called when the `delete` button is pressed. `ls` is label studio instance, `completion` is value of current annotation.
 
 #### Example
 
 ```javascript
-onDeleteAnnotation: function(ls, annotation) {
+onDeleteCompletion: function(ls, annotation) {
   console.log(result)
 }
 ```

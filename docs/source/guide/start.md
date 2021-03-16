@@ -16,7 +16,7 @@ By default, Label Studio starts with a SQLite database to store labeling tasks a
 
 The SQLite database works well for projects with tens of thousands of labeling tasks. If you want to annotate millions of tasks or anticipate a lot of concurrent users, use a PostgreSQL database. See [Sync data from cloud or database storage](storage.html) for more.  
 
-For example, if you import data while labeling is being performed, labeling tasks can take more than 10 seconds to load and annotations can take more than 10 seconds to perform.
+For example, if you import data while labeling is being performed, labeling tasks can take more than 10 seconds to load and annotations can take more than 10 seconds to perform. If you want to label more than 100,000 tasks with 5 or more concurrent users, consider using PostgreSQL or another database with Label Studio. 
 
 ## Command line arguments for starting Label Studio
 

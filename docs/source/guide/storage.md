@@ -1,7 +1,7 @@
 ---
 title: Sync data from cloud or database storage
 type: guide
-order: 301
+order: 302
 ---
 
 Integrate popular cloud storage systems with Label Studio to collect new items uploaded to the buckets and return the annotation results so that you can use them in your machine learning pipelines.
