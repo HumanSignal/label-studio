@@ -47,7 +47,8 @@ jobs:
     - name: Test with pytest
       env:
         collect_analytics: 0
-        PYTHONPATH: ../..
+        # PYTHONPATH: ../..
       run: |
-        coverage run -m --source=label_studio pytest
+        cd label_studio/
+        coverage run -m pytest
         coverage report -m --fail-under=40
