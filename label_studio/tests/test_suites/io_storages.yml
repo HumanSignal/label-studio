@@ -149,7 +149,7 @@
         data:
           # we expect GCS presigned URL here
           __test_object: true
-          regexp: '^\{"str_field":\s"test_blob_\w\w\w\",\s"int_field":\s123,\s"dict_field":\s\{"one":\s"wow",\s"two":\s456\}\}$'
+          regexp: '^\{"(str_field|int_field|dict_field)":.+$'
 
 
 - get_import_export_storage_types:
