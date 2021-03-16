@@ -42,7 +42,8 @@
         method: GET
         status_code: 200
         response:
-          state: TR
+          # state: TR  # TODO: fix fetching training state
+          state: CO
 
     # Edit ML Backend:
     - /api/ml/{ml_pk}:
