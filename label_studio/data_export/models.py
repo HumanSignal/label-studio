@@ -86,7 +86,7 @@ class DataExport(object):
                 ext = os.path.splitext(output_file)[-1]
                 content_type = f'application/{ext}'
                 out = read_bytes_stream(output_file)
-                filename = name + '.' + os.path.splitext(output_file)[-1]
+                filename = name + os.path.splitext(output_file)[-1]
                 return out, content_type, filename
 
             # otherwise pack output directory into archive
