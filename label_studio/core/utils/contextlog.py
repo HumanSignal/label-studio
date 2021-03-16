@@ -8,6 +8,7 @@ import requests
 import calendar
 import threading
 import json
+import platform
 
 from datetime import datetime
 from django.conf import settings
@@ -147,7 +148,8 @@ class ContextLog(object):
                 'browser': request.user_agent.browser.family,
                 'browser_version': request.user_agent.browser.version_string,
                 'os': request.user_agent.os.family,
-                'server_os': sys.platform,
+                'platform_system': platform.system(),
+                'platform_release': platform.release(),
                 'os_version': request.user_agent.os.version_string,
                 'device': request.user_agent.device.family,
             })
