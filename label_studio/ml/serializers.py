@@ -16,8 +16,11 @@ class MLBackendSerializer(serializers.ModelSerializer):
         project = attrs['project']
         setup_response = MLBackend.setup_(url, project)
         if setup_response.is_error:
-            raise serializers.ValidationError(f'Successfully connected to {url} but it doesn\'t look like a valid ML backend. '
-                                              f'Reason: {setup_response.error_message}')
+            raise serializers.ValidationError(
+                f'Successfully connected to {url} but it doesn\'t look like a valid ML backend. '
+                f'Reason: {setup_response.error_message}.\n'
+                f'Perhaps it\'s better to check ML backend server console logs to see what\'s going on there\n'
+                f'(may be something wrong with your model or it is incompatible with current labeling configuration?)')
         return attrs
 
     class Meta:

@@ -33,8 +33,8 @@ export const API_CONFIG = {
     addMLBackend: "POST:/ml",
     updateMLBackend: "PATCH:/ml/:pk",
     deleteMLBackend: "DELETE:/ml/:pk",
-    trainMLBackend: "POST:/ml/train/:pk",
-    predictWithML: "POST:/ml/predict/:pk",
+    trainMLBackend: "POST:/ml/:pk/train",
+    predictWithML: "POST:/ml/:pk/predict",
 
     // Export
     export: "/projects/:pk/export",
