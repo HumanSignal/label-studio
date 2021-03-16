@@ -42,7 +42,7 @@ jobs:
         set PYTHONLEGACYWINDOWSSTDIO=utf-8
         label-studio init my_project --agree-fix-sqlite  # just install sqlite3.dll
         label-studio init my_project --username test@test.com --password testpwd
-        copy /Y sqlite3.dll %pythonLocation%/DLLs/sqlite3.dll
+        cp sqlite3.dll %pythonLocation%/DLLs/sqlite3.dll
       shell: cmd
 
     - name: Test with pytest
