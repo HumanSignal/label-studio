@@ -41,7 +41,7 @@ jobs:
         set PYTHONIOENCODING=utf-8
         set PYTHONLEGACYWINDOWSSTDIO=utf-8
         label-studio init my_project --agree-fix-sqlite  # just install sqlite3.dll
-        label-studio init my_project
+        label-studio init my_project --username test@test.com --password testpwd
       shell: cmd
 
     - name: Test with pytest
