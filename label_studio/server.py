@@ -134,7 +134,6 @@ def _init(input_args, config):
             title=input_args.project_name,
             user=user,
             label_config=input_args.label_config,
-            sampling=input_args.sampling,
             description=input_args.project_desc,
         )
     else:
