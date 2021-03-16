@@ -293,6 +293,7 @@
   font-weight: bold;
   color: var(--red-6);
   margin: 16px 0;
+  white-space: pre-line;
   word-break: break-word;
 }
 .ls-error-message__exception {
@@ -325,6 +326,7 @@
   margin: 5px 0;
   color: #333;
   padding: 0;
+  white-space: pre-line;
   word-break: break-word;
 }
 .ls-error-message__actions {
@@ -521,6 +523,7 @@
   font-family: Roboto;
   white-space: nowrap;
   text-decoration: none;
+  cursor: pointer;
 }
 .ls-main-menu__item-icon {
   margin-right: 10px;

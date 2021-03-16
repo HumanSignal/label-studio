@@ -47,7 +47,7 @@ export const MenuItem = ({
   };
 
   const activeClassName = rootClass.mod({active: true}).toClassName();
-  const finalHref = to ?? href ?? "#";
+  const finalHref = to ?? href;
 
   if (forceReload) {
     linkAttributes.onClick = () => location.href = to ?? href;
@@ -64,10 +64,14 @@ export const MenuItem = ({
         >
           {linkContent}
         </NavLink>
-      ) :  (
+      ) : finalHref ?  (
         <a href={absoluteURL(finalHref)} {...linkAttributes}>
           {linkContent}
         </a>
+      ) : (
+        <span {...linkAttributes}>
+          {linkContent}
+        </span>
       )}
     </li>
   );

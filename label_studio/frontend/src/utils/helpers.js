@@ -49,7 +49,7 @@ export const humanReadableNumber = (n) => {
   return result || null;
 };
 
-export const absoluteURL = (path) => {
+export const absoluteURL = (path = "") => {
   if (path.match(/^http/) || path.match(/^\/\//)) {
     return path;
   } else {
