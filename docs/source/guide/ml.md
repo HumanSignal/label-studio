@@ -27,7 +27,7 @@ Follow these steps to set up an example text classifier ML backend with Label St
    
 1. Set up the environment.
    ```bash
-   cd label-studio
+   cd label-studio-ml-backend
    pip install -e .
    cd label_studio_ml/examples
    pip install -r requirements.txt
@@ -43,12 +43,8 @@ Follow these steps to set up an example text classifier ML backend with Label St
    label-studio-ml start my_ml_backend
    ```
    
-4. Start Label Studio and connect it to the running ML backend. 
-    ```bash
-    label-studio --ml-backends http://localhost:9090
-    ```
+4. Start Label Studio and connect your project to the running ML backend using the Label Studio UI. 
 
-5. Open the Label Studio UI at `http://localhost:8080` and view the `/model` page to validate that the model was successfully connected.
 
 ## Tutorials
 
