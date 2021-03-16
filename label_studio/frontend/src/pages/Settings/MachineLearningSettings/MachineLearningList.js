@@ -1,18 +1,16 @@
 import { format } from 'date-fns';
-import { useCallback, useContext, useEffect } from 'react';
+import { useCallback, useContext } from 'react';
 import { FaEllipsisV } from 'react-icons/fa';
 import { Button, Card, Dropdown, Menu } from '../../../components';
 import { DescriptionList } from '../../../components/DescriptionList/DescriptionList';
 import { confirm } from '../../../components/Modal/Modal';
 import { Oneof } from '../../../components/Oneof/Oneof';
 import { ApiContext } from '../../../providers/ApiProvider';
-import { useProject } from '../../../providers/ProjectProvider';
 import { cn } from '../../../utils/bem';
 
 export const MachineLearningList = ({ backends, fetchBackends, onEdit }) => {
   const rootClass = cn('ml');
   const api = useContext(ApiContext);
-  const {project} = useProject();
 
   const onDeleteModel = useCallback(async (backend) => {
     await api.callApi('deleteMLBackend', {
@@ -31,10 +29,6 @@ export const MachineLearningList = ({ backends, fetchBackends, onEdit }) => {
     });
     await fetchBackends();
   }, [fetchBackends, api]);
-
-  useEffect(() => {
-    if (project.id) fetchBackends();
-  }, [project]);
 
   return (
     <div className={rootClass}>

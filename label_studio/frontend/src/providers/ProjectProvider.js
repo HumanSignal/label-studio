@@ -1,12 +1,11 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { shallowEqualObjects } from 'shallow-equal';
 import { useAPI } from './ApiProvider';
 import { useAppStore } from './AppStoreProvider';
 import { useParams } from './RoutesProvider';
 
 export const ProjectContext = createContext();
 ProjectContext.displayName = 'ProjectContext';
-
-let lastProjectId;
 
 const projectCache = new Map();
 
@@ -33,9 +32,11 @@ export const ProjectProvider = ({children}) => {
         },
       });
 
-      setProjectData({...projectInfo});
-      updateStore({project: projectInfo});
-      projectCache.set(finalProjectId, projectInfo);
+      if (shallowEqualObjects(projectData, projectInfo) === false) {
+        setProjectData({...projectInfo});
+        updateStore({project: projectInfo});
+        projectCache.set(finalProjectId, projectInfo);
+      }
     }
   }, [params]);
 
