@@ -62,7 +62,7 @@ class UserLastActivityMixin(models.Model):
         _('last activity'), default=timezone.now, editable=False)
 
     def update_last_activity(self):
-        self.last_activity = datetime.datetime.now()
+        self.last_activity = timezone.now()
         self.save(update_fields=["last_activity"])
 
     class Meta:
