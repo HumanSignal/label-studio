@@ -1,32 +1,26 @@
 ---
 title: Label and annotate data in Label Studio
 type: guide
-order: 105
+order: 401
 ---
 
 Label and annotate your data with the open source data labeling tool, Label Studio. After you [set up your project](setup.hmtl) and [import your data](tasks.html), you can start labeling and annotating your data.  
 
-Most labeling tasks are straightforward to perform, with basic labeling configs outlining the labeling interface, but other labeling tasks are more complex. 
+1. Inside a project, click **Label** to start labeling.
+2. Use keyboard shortcuts or your mouse to label the data and submit your annotations.
+3. Follow the project instructions for labeling and deciding whether or not to skip tasks. 
+4. Click the project name to return to the data manager. 
 
-For example, multi-task labeling that includes text, image, and audio data objects as part of one dataset and labeling task. 
-<br>
+When collaborating with other users, tasks are locked so that you don't accidentally overwrite the annotations of another annotator. After the other annotator finishes with the task, it can appear in your queue for labeling. 
 
-<img src="/images/labeling.png">
-<!--replace screenshot, it's out of date-->
+## Complex annotation actions 
+Some labeling tasks can be complicated to perform, for example, labeling that includes text, image, and audio data objects as part of one dataset and labeling task, or creating relations between annotations on a labeling task. 
 
-
-## Label and annotate your data 
-
-Most of the actions described in this section are similar for all the data object tags (images, audio, text, and so on).
-
-### Choices, TextArea and other basic tags
-These tags create straightforward labeling interfaces that don't require detailed instructions. 
-
-### Add a region
+### Label a region in the data
 Annotate a section of the data by adding a region. 
 
-1. Select the label you want to apply to the region. For some tags, such as adding polygons, you can skip this step.
-2. Click the data object to apply the label to the region. 
+1. Select the label you want to apply to the region. For some configurations, you can skip this step.
+2. Click the text, image, audio, or other data object to apply the label to the region. 
 
 Your changes save automatically. 
 
@@ -37,7 +31,6 @@ You can change the label of the existing region.
 2. Select a new label.
 
 Your changes save automatically. 
-
 
 ### Delete an annotation
 After labeling a region, you can delete the annotation. 
@@ -61,10 +54,10 @@ After you relate two annotation regions, you can modify the relation in the **Re
 - To add labels to the direction arrow indicating the relation between two annotations, click the vertical ellipsis button next to the two related regions to add your predefined labels. You must have a [label configuration that includes relations](/tags/relations.html) to do this.
 
 
-## Accelerate your labeling workflow
+## Use keyboard shortcuts to label regions faster
 Use keyboard shortcuts (hotkeys) to improve your labeling performance. When performing a labeling task, click the gear icon to see more details about hotkeys or to enable or disable hotkeys. 
 
-This table describes the hotkeys for a standard keyboard. For a Mac keyboard, use cmd, return, and delete instead of ctrl, enter, and backspace.
+This table describes the hotkeys for a standard keyboard. For a Mac keyboard, use return and delete instead of enter and backspace.
 
 | Key | Description |
 | --- | --- | 
@@ -75,4 +68,16 @@ This table describes the hotkeys for a standard keyboard. For a Mac keyboard, us
 | alt+shift+$n | For $n region, select a region |
 
 
-Click the gear icon when labeling to configure the labeling interface to suit your labeling use case. You can modify the layout of the screen, hide or show the predictions, completions, or results panel, and hide or show various controls and buttons.
+## Customize the labeling interface 
+
+Click the gear icon when labeling to configure the labeling interface to suit your labeling use case. 
+
+For example, to display labels on bounding boxes, polygons and other regions while labeling:
+
+<center>
+  <img src='../images/lsf-settings.png'>
+</center>
+
+You can modify the layout of the screen, hide or show predictions, annotations, or the results panel, and hide or show various controls and buttons.
+
+

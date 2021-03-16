@@ -1,10 +1,17 @@
 ---
 title: Troubleshoot Label Studio
 type: guide
-order: 109
+order: 203
 ---
 
-Frequently asked questions about setup and usage.
+If you encounter an issue using Label Studio, use this page to troubleshoot it. 
+
+## Slowness while labeling
+
+If you're using the SQLite database and another user imports a large volume of data, labeling might slow down for other users on the server due to the database load. 
+
+If you want to upload a large volume of data (thousands of items), consider doing that at a time when people are not labeling or use a different database backend such as PostgreSQL or Redis. You can run Docker Compose from the root directory of Label Studio to use PostgreSQL `docker-compose up -d`, or see [Sync data from cloud or database storage](storage.html). 
+
 
 ## Image/audio/resource loading error while labeling
 
@@ -63,108 +70,13 @@ The most common mistake while resource loading is <b>CORS</b> (Cross-Origin Reso
 
 <br/> 
 
-## How to display labels on bounding boxes, polygons and other regions
+## Audio wave doesn't match annotations
 
-Click the gear icon when labeling to configure the labeling interface to suit your labeling use case.
+If you find that, after annotating audio data, the visible audio wave doesn't match the timestamps and the sound, try converting the audio to a different format. For example, if you are annotating mp3 files, try converting them to wav files.
 
-<center>
-  <img src='../images/lsf-settings.png'>
-</center>
-
-
-## How to run Label Studio with external domain name
- 
-If you want to run LSB with a domain name, you need to use the Host, Protocol, Port parameters when you start Label Studio. These parameters ensure that the correct URLs are created when importing resource files (images, audio, etc) and generating sample tasks.   
-
-There are several possible ways run Label Studio with an external domain name.
- 
-- Replace the host, protocol, and port parameters in the `project/config.json` file, or or `label_studio/utils/schema/default_config.json` in the Label Studio package directory.
-- Specify the parameters when you start Label Studio: `label-studio start --host label-studio.example.com --protocol http:// --port 8080`.
-- For Docker installations, specify the parameters as environment variables `HOST`, `PROTOCOL`, `PORT` when setting up Docker.
-
-The Label Studio web server always uses the `0.0.0.0` address to start. If you really need to change it to `localhost`, set Host to `localhost` and the web server starts at `localhost`.  
-
-> If your external host has a port, e.g.: `77.77.77.77:1234` then you have to specify HOST with the port together `HOST=77.77.77.77:1234`.
-<!--then what is the port parameter for?-->
-
-<br/>
-<center>
-  <img style="opacity: 0.75" src='../images/host-protocol-port.png'>
-</center>
-<!--add alt text-->
-
-
-## What units are the x, y, width and height for image results?
-
-x, y, width and height are in percentages of image dimensions.
-
-To convert those percentages to pixels, use the following conversion formulas for `x, y, width, height`:
-
-```
-pixel_x = x / 100.0 * original_width
-pixel_y = y / 100.0 * original_height
-pixel_width = width / 100.0 * original_width
-pixel_height = height / 100.0 * original_height
+```bash
+ffmpeg -y -i audio.mp3 -ar 8k -ac 1 audio.wav
 ```
 
-For example: 
-
-```python
-task = {
-    "completions": [{
-        "result": [
-            {
-                "...": "...",
-
-                "original_width": 600,
-                "original_height": 403,
-                "image_rotation": 0,
-
-                "value": {
-                    "x": 5.33,
-                    "y": 23.57,
-                    "width": 29.16,
-                    "height": 31.26,
-                    "rotation": 0,
-                    "rectanglelabels": [
-                        "Airplane"
-                    ]
-                }
-            }
-        ]
-    }]
-}
-
-# convert from LS percent units to pixels 
-def convert_from_ls(result):
-    if 'original_width' not in result or 'original_height' not in result:
-        return None
-
-    value = result['value']
-    w, h = result['original_width'], result['original_height']
-
-    if all([key in value for key in ['x', 'y', 'width', 'height']]):
-        return w * value['x'] / 100.0, \
-               h * value['y'] / 100.0, \
-               w * value['width'] / 100.0, \
-               h * value['height'] / 100.0
-
-# convert from pixels to LS percent units 
-def convert_to_ls(x, y, width, height, original_width, original_height):
-    return x / original_width * 100.0, y / original_height * 100.0, \
-           width / original_width * 100.0, height / original_height * 100
-
-
-# convert from LS
-output = convert_from_ls(task['completions'][0]['result'][0])
-if output is None:
-    raise Exception('Wrong convert') 
-pixel_x, pixel_y, pixel_width, pixel_height = output
-print(pixel_x, pixel_y, pixel_width, pixel_height)
-
-# convert back to LS 
-x, y, width, height = convert_to_ls(pixel_x, pixel_y, pixel_width, pixel_height, 600, 403)
-print(x, y, width, height)
-```
 
 
