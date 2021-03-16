@@ -61,7 +61,7 @@ docker-compose up -d
 ### Install locally with pip
 
 ```bash
-# Requires >=Python3.6 
+# Requires >=Python3.6, <3.9
 pip install label-studio
 
 # Start the server at http://localhost:8080
