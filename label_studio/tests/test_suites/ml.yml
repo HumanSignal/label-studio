@@ -1,0 +1,60 @@
+- test_ml_backend_creation:
+    # Sign up
+    - /user/signup:
+        method: POST
+        data:
+          email: test_ml_backend_creation@test.com
+          password: 12345678
+          title: test_ml_backend_creation
+        status_code: 302
+
+    # Create project
+    - /api/projects:
+        method: POST
+        data:
+          title: test_ml_backend_creation
+          label_config: <View><Image name="image" value="$image_url"/><Choices name="label" toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+          is_published: true
+        status_code: 201
+        response:
+          id: '{project_pk}'
+
+    # Create ML backend
+    - /api/ml:
+        method: POST
+        data:
+          project: '{project_pk}'
+          url: https://test.heartex.mlbackend.com:9090
+          title: My Testing ML backend
+        status_code: 201
+        response:
+          id: '{ml_pk}'
+          state: CO
+          model_version: Fri Feb 19 17:10:44 2021
+
+    # Start training
+    - /api/ml/{ml_pk}/train:
+        method: POST
+        status_code: 200
+
+    # Get ML backend state
+    - /api/ml/{ml_pk}:
+        method: GET
+        status_code: 200
+        response:
+          # state: TR  # TODO: fix fetching training state
+          state: CO
+
+    # Edit ML Backend:
+    - /api/ml/{ml_pk}:
+        method: PATCH
+        content_type: application/json
+        data:
+          # Unexisted URL - should raise connection error
+          url: https://test.heartex.mlbackend.com:9091
+        status_code: 400
+
+    # Delete ML Backend:
+    - /api/ml/{ml_pk}:
+        method: DELETE
+        status_code: 204

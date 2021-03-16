@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block frontend_settings %}
+  {
+    project: "{{project.title}}",
+    projectId: {{project.pk}},
+  }
+{% endblock %}
+

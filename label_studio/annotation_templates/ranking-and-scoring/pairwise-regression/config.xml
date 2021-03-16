@@ -1,0 +1,29 @@
+<View>
+  <Header>Set how likely these images represent the same thing:</Header>
+    <View style="display: grid; column-gap: 8px; grid-template: auto/1fr 1fr">
+  	<Image name="image1" value="$image1" />
+    <Image name="image2" value="$image2" />
+  </View>
+  <View style="margin-left: auto; margin-right: auto; width: 16em">
+    <Rating name="rating" toName="image1,image2"/>
+    </View>
+</View>
+
+<!-- {"data": {
+    "image1": "https://app.heartex.ai/static/samples/sample.jpg",
+    "image2": "https://app.heartex.ai/static/samples/sample.jpg"
+},
+"completions: [{"result":
+[
+    {
+        "value": {
+            "rating": 4
+        },
+        "id": "FRS2itzlbZ",
+        "from_name": "rating",
+        "to_name": "image1,image2",
+        "type": "rating"
+    }
+]
+}]}
+-->

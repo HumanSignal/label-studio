@@ -1,0 +1,41 @@
+<View>
+  <Image name="query" value="$query_image" />
+  <Header value="Choose similar images:" />
+  <View style="display: grid; column-gap: 8px; grid-template: auto/1fr 1fr 1fr">
+    <Image name="image1" value="$image1" />
+    <Image name="image2" value="$image2" />
+    <Image name="image3" value="$image3" />
+  </View>
+  <Choices name="similar" toName="query" required="true" choice="multiple">
+    <Choice value="One" />
+    <Choice value="Two" />
+    <Choice value="Three" />
+  </Choices>
+  <Style>
+    [dataneedsupdate]~div form {display: flex}
+    [dataneedsupdate]~div form>* {flex-grow:1;margin-left:8px}
+  </Style>
+</View>
+
+<!-- {"data": {
+    "query_image": "https://app.heartex.ai/static/samples/sample.jpg",
+    "image1": "https://app.heartex.ai/static/samples/sample.jpg",
+    "image2": "https://app.heartex.ai/static/samples/sample.jpg",
+    "image3": "https://app.heartex.ai/static/samples/sample.jpg"
+},
+"completions": [{"result":
+[
+    {
+        "value": {
+            "choices": [
+                "Two"
+            ]
+        },
+        "id": "5MQmDIhX6-",
+        "from_name": "similar",
+        "to_name": "query",
+        "type": "choices"
+    }
+]
+}]}
+-->

@@ -1,7 +1,7 @@
 ---
 title: Label
 type: tags
-order: 410
+order: 409
 ---
 
 Label tag represents a single label

@@ -1,0 +1,50 @@
+- get_paragraphs_sample_task:
+    - /projects/upload-example:
+        method: POST
+        content_type: application/x-www-form-urlencoded
+        data:
+          label_config: >
+            <View>
+              <ParagraphLabels name="actions" toName="dialogue">
+                  <Label value="Inform"></Label>
+                  <Label value="Request"></Label>
+                  <Label value="Negate"></Label>
+                  <Label value="Affirm"></Label>
+              </ParagraphLabels>
+
+              <Paragraphs
+                      audioUrl="$audio"
+                      name="dialogue"
+                      value="$dialogue"
+                      layout="dialogue"
+                      savetextresult="yes"
+                      nameKey="speaker"
+                      textKey="phrase"
+              />
+            </View>
+        status_code: 200
+        response:
+          {
+            "dialogue": [
+            {
+              "speaker": "Alice",
+              "phrase": "Hi, Bob."
+            },
+            {
+              "speaker": "Bob",
+              "phrase": "Hello, Alice!"
+            },
+            {
+              "speaker": "Alice",
+              "phrase": "What's up?"
+            },
+            {
+              "speaker": "Bob",
+              "phrase": "Good. Ciao!"
+            },
+            {
+              "speaker": "Alice",
+              "phrase": "Bye, Bob."
+            }
+            ]
+          }

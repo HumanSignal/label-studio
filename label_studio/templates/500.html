@@ -1,0 +1,22 @@
+{% extends 'simple.html' %}
+{% load static %}
+{% load filters %}
+
+{% block head %}
+    <title>500 | Label Studio</title>
+{% endblock %}
+
+
+{% block content %}
+<div class="masthead error segment">
+    <div class="container">
+        <h1 class="ui dividing header">Something's wrong, we're on it!</h1>
+        <p>Try again later</p>
+        <p>
+          {% var_exists 'exception' as exception %}
+          {{ exception }}
+        </p>
+
+    </div>
+</div>
+{% endblock %}

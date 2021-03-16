@@ -1,7 +1,7 @@
 ---
 title: TimeSeriesLabels
 type: tags
-order: 426
+order: 425
 ---
 
 TimeSeriesLabels tag creates labeled time range

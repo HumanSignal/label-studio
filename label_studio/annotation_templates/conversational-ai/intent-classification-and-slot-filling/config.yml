@@ -1,0 +1,23 @@
+title: Intent Classification and Slot Filling
+type: community
+group: Conversational AI
+image: /static/templates/intent-classification-and-slot-filling.png
+details: <h1>Build task-oriented dialogue system by selecting dialogue intents and extracting slot entities</h1>
+config: '
+<View>
+  <ParagraphLabels name="entity_slot" toName="dialogue">
+    <Label value="Person" />
+    <Label value="Organization" />
+    <Label value="Location" />
+    <Label value="Datetime" />
+    <Label value="Quantity" />
+  </ParagraphLabels>
+  <Paragraphs name="dialogue" value="$humanMachineDialogue" layout="dialogue" />
+    <Choices name="intent" toName="dialogue"
+         choice="single" showInLine="true">
+        <Choice value="Greeting"/>
+        <Choice value="Customer request"/>
+        <Choice value="Small talk"/>
+    </Choices>
+</View>
+'

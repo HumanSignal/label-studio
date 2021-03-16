@@ -26,6 +26,7 @@ With ASR models, you can do audio pre-annotations drawn within a text area, aka 
     ```
    
 5. Start the machine learning backend:
+
    ```bash
    label-studio-ml start my_model
    ```
@@ -61,3 +62,4 @@ With ASR models, you can do audio pre-annotations drawn within a text area, aka 
 10. Add the ML backend using this address: `http://localhost:9090`
 
 11. Import audio data and start reviewing pre-labels.
+

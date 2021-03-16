@@ -1,59 +1,49 @@
-*~
-__pycache__/
+node_modules
+*.lock
+*.pyc
+__pycache__
 
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 
-# Dependency directory
-node_modules/
+# docs
+__generated__
+\#$
+data/
+etc/
+/src/
+yarn-error.log
 
-# Backend
-backend/env3/
-backend/__pycache__
-
-# IDEA
-.idea
-*.iml
-
-# VSCODE
-.vscode/
-
-# Window
-Thumbs.db
-Desktop.ini
-
-# MAC
-.DS_Store
-
-# Env
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-htx-env
-
-# Testing
-coverage/
-.coverage
-
-# Examples of local env
-src/examples
-
-# XML configs
-build/static/media/config.*.xml
-
-#project files
-label_studio.egg-info/
-my_project/
-my_project1/
-label-studio-projects
-./build/
-dist/
+# mobile/builds
+db/
+logfile
+env/
 venv/
-tmp/
-scripts/build-tmp
+.venv
+.vscode
+# web/static
+
+deploy/license.txt
+deploy/logs/
+deploy/redis-data/
+
+label_studio/core/media
+label_studio/core/downloads
+label_studio/core/export
+
+label_studio/core/static_build
+label_studio/core/version_.py
+label_studio/core/core
+
+archive
+
+*.rtl.css
+*.rtl.min.css
+*.idea/*
+.vscode/*
+tags
+tags.temp
+mydatabase
+label_studio.sqlite3
+*.egg-info
+tmp
+.DS_Store
+*.sqlite3

@@ -10,13 +10,14 @@ header{
   position: relative;
   z-index: 21;
   box-shadow: 0px 0px 0px 1px rgba(0, 0, 0, 0.08);
+  background: #F4F4F4;
 }
 .outer__header{
   display: flex;
   align-items:center;
   justify-content:center;
   position: relative;
-  min-height:70px;
+  min-height:50px;
 }
 .outer__header>.left__header{
   position: absolute;
@@ -89,6 +90,7 @@ header .join__slack:active {
 header .join__slack:hover {
   border-color: #ddd;
   color: #5c1751cc;
+  background: white;
 }
 
 @media (max-width: 991px){

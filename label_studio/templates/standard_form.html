@@ -1,0 +1,16 @@
+{% load i18n %}
+
+<div class="ui grid">
+  <div class="eight wide column">
+    <form action="{{ form_url }}" method="post" class="ui form">
+      {% csrf_token %}
+      {% render_form form %}
+
+      <div class="actions">
+        <input type="submit" id="submit_form" class="project-form field ui mini button positive"
+               value="{{ btn_text|default:_("Create") }}"/>
+      </div>
+
+    </form>
+  </div>
+</div>

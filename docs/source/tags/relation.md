@@ -1,7 +1,7 @@
 ---
 title: Relation
 type: tags
-order: 421
+order: 420
 ---
 
 Relation tag represents a single relation label

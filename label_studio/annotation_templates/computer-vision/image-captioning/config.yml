@@ -1,0 +1,12 @@
+title: Image Captioning
+type: community
+group: Computer Vision
+image: /static/templates/image-captioning.png
+details: <h1>Write text describing the image</h1>
+config: '
+<View>
+  <Image name="image" value="$captioning"/>
+  <Header value="Describe the image:"/>
+  <TextArea name="caption" toName="image" placeholder="Enter description here..." rows="5" maxSubmissions="1"/>
+</View>
+'

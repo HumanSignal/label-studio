@@ -1,7 +1,7 @@
 ---
 title: Choices
 type: tags
-order: 404
+order: 403
 ---
 
 Choices tag, create a group of choices, radio, or checkboxes. Shall

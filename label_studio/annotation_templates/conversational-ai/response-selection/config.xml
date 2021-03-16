@@ -1,0 +1,49 @@
+<View>  
+  <Paragraphs name="prg" value="$dialogue" layout="dialogue" />
+  <Header value="Choose a response" />
+  <View style="display: flex">
+    <View>
+    <Text name="resp1" value="$respone" />
+    <Text name="resp2" value="$resptwo" />
+    <Text name="resp3" value="$respthree" />
+    </View>
+    <View style="padding: 50px;">
+    <Choices name="resp" toName="prg" required="true">
+      <Choice value="One" />
+      <Choice value="Two" />
+  	  <Choice value="Three" />
+    </Choices>
+    </View>
+  </View>
+</View>
+
+<!-- {
+"data": {
+"respone": "Sure, no problem!",
+"resptwo": "Sorry, it's too early. Maybe we can change the time?",
+"respthree": "Don't eat junk food man, it's bad for you...",
+ "dialogue": [
+{"author": "Human", "text": "Hi, Robot!"},
+{"author": "Robot", "text": "Nice to meet you, man! Tell me what you want."},
+{"author": "Human", "text": "Order me a pizza from Golden Boy on Green Street "},
+{"author": "Robot", "text": "Done. When do you want to get the order?"},
+{"author": "Human", "text": "At 3am in the morning, please"}]
+
+},
+"completions": [{"result":
+[
+    {
+        "value": {
+            "choices": [
+                "Two"
+            ]
+        },
+        "id": "XXqheNKaU_",
+        "from_name": "resp",
+        "to_name": "prg",
+        "type": "choices"
+    }
+]
+}]
+}
+-->

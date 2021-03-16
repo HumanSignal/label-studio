@@ -1,13 +1,47 @@
-version: "3"
+version: '3.3'
 
-services: 
-  label-studio:
-    container_name: label-studio
-    build: .
-    working_dir: /label-studio
-    volumes:
-      - ./my_project:/label-studio/my_project
-    command: "label-studio start my_project ${INIT_COMMAND} --host 0.0.0.0"
+services:
+
+  nginx:
+    image: nginx:latest
     ports:
-      - "8080:8080"
+      - 80:80
+    depends_on:
+      - app
+    volumes:
+      - static:/label-studio/label_studio:rw
+      - ./nginx/:/etc/nginx/conf.d/:ro
+    command: nginx -g "daemon off;"
+
+  app:
+    build: ./
+    expose:
+      - "8080"
+    depends_on:
+      - db
+    environment:
+      - DJANGO_DB=default
+      - POSTGRE_NAME=postgres
+      - POSTGRE_USER=postgres
+      - POSTGRE_PASSWORD=
+      - POSTGRE_PORT=5432
+      - POSTGRE_HOST=db
+    volumes:
+      - static:/label-studio/label_studio:rw
+      - ./files:/root/.local/share/label-studio:rw
+    command: [ "/label-studio/wait-for-it.sh", "db", "/usr/local/bin/label-studio" ]
+    
+  db:
+    image: postgres:11.5
+    hostname: db
     restart: always
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    volumes:
+      - ${POSTGRES_DATA_DIR:-./postgres-data}:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+
+volumes:
+  static: {} 

@@ -1,7 +1,7 @@
 ---
 title: Labels
 type: tags
-order: 411
+order: 410
 ---
 
 Labels tag, create a group of labels

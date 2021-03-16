@@ -1,7 +1,7 @@
 ---
 title: Taxonomy
 type: tags
-order: 424
+order: 423
 ---
 
 Taxonomy tag allows to select one or more hierarchical labels
