@@ -1,0 +1,116 @@
+title: Visual Question Answering
+type: community
+group: Computer Vision
+image: /static/templates/visual-question-answering.png
+details: <h1>Answer the questions related to what you see on the picture</h1>
+config: '
+<View>
+  <Image name="image" value="$image"/>
+  <Labels name="aspect" toName="q1">
+    <Label value="attribute identification" background="#F39C12"/>
+    <Label value="counting" background="#E74C3C"/>
+    <Label value="comparison" background="#3498DB"/>
+    <Label value="multiple attention" background="#2ECC71"/>
+    <Label value="logical operations" background="#8E44AD"/>
+  </Labels>
+  <Header value="Please answer these questions:"/>
+
+  <View style="display: grid; grid-template-columns: 1fr 10fr 1fr 3fr; column-gap: 1em">
+    <Header value="Q1:"/>
+  <Text name="q1" value="$q1"/>
+   <Header value="A1:"/>
+    <TextArea name="answer1" toName="q1" rows="1" maxSubmissions="1"/>
+  </View>
+
+  <View style="display: grid; grid-template-columns: 1fr 10fr 1fr 3fr; column-gap: 1em">
+    <Header value="Q2:"/>
+  <Text name="q2" value="$q2"/>
+   <Header value="A2:"/>
+    <TextArea name="answer2" toName="q2" rows="1" maxSubmissions="1"/>
+  </View>
+  <View style="display: grid; grid-template-columns: 1fr 10fr 1fr 3fr; column-gap: 1em">
+    <Header value="Q3:"/>
+  <Text name="q3" value="$q3"/>
+   <Header value="A3:"/>
+    <TextArea name="answer3" toName="q3" rows="1" maxSubmissions="1"/>
+    </View>
+  <View style="display: grid; grid-template-columns: 1fr 10fr 1fr 3fr; column-gap: 1em">
+    <Header value="Q4:"/>
+  <Text name="q4" value="$q4"/>
+   <Header value="A4:"/>
+    <TextArea name="answer4" toName="q4" rows="1" maxSubmissions="1"/>
+    </View>
+</View>
+
+
+<!-- {"data": {
+"image": "https://htx-pub.s3.amazonaws.com/samples/clevr.jpg",
+"q1": "Are there an equal number of large things and metal spheres?",
+"q2": "What size is the cylinder that is to the left of the brown metal thing that
+and is to the left of the big sphere?",
+"q3": "There is a sphere with the same size as the
+metal cube; is it made of the same material as the small red sphere?",
+"q4": "How many objects are either small cylinders or metal things?"
+},
+"completions": [{"result":
+[
+    {
+        "value": {
+            "start": 13,
+            "end": 18,
+            "text": "equal",
+            "labels": [
+                "comparison"
+            ]
+        },
+        "id": "F2t50uanga",
+        "from_name": "aspect",
+        "to_name": "q1",
+        "type": "labels"
+    },
+    {
+        "value": {
+            "start": 19,
+            "end": 25,
+            "text": "number",
+            "labels": [
+                "counting"
+            ]
+        },
+        "id": "4XCh8ZjeYj",
+        "from_name": "aspect",
+        "to_name": "q1",
+        "type": "labels"
+    },
+    {
+        "value": {
+            "start": 29,
+            "end": 34,
+            "text": "large",
+            "labels": [
+                "attribute identification"
+            ]
+        },
+        "id": "6XyL1eioSa",
+        "from_name": "aspect",
+        "to_name": "q1",
+        "type": "labels"
+    },
+    {
+        "value": {
+            "start": 46,
+            "end": 59,
+            "text": "metal spheres",
+            "labels": [
+                "attribute identification"
+            ]
+        },
+        "id": "rIJrtpPaLW",
+        "from_name": "aspect",
+        "to_name": "q1",
+        "type": "labels"
+    }
+]
+}]}
+-->
+'

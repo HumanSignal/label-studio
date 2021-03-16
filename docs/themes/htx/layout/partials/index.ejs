@@ -15,11 +15,11 @@ menu && menu.classList.add('main__page__header')
           <p>Data Science starts with data. <br>
           Label Studio removes the pain labeling it.</p>
           <div class="release__info">
-            <a href="/blog/release-090-data-management-improvements.html" class="release__info--inner">
+            <a href="/blog/release-100.html" class="release__info--inner">
               <span>New</span>
-              <p>Release <span>0.9.1</span></p>
+              <p>Release <span>1.0</span></p>
             </a>
-            <p>Explore and improve your datasets!</p>
+            <p>Label Studio Hits v1.0!</p>
           </div>
           <div class="commit__info">
             <a href="https://github.com/heartexlabs/label-studio" class="commit--inner" target="_blank">
@@ -79,37 +79,29 @@ menu && menu.classList.add('main__page__header')
               <div class="desktop__code">	      
                 <p class="title__code"><span class="counter">1</span># Install the Package</p>
                 <p class="code__content"><span class="counter">2</span>pip install -U label-studio</p>
-                <p class="spacer"><span class="counter">3</span></p>
-                <p class="title__code"><span class="counter">4</span># Create a New Project</p>
-                <p class="code__content"><span class="counter">5</span>label-studio init my_project</p>
                 <p class="spacer"><span class="counter">6</span></p>
                 <p class="title__code"><span class="counter">7</span># Launch It!</p>
-                <p class="code__content"><span class="counter">8</span>label-studio start my_project</p>
+                <p class="code__content"><span class="counter">8</span>label-studio</p>
               </div>
               <div class="mobile__code">
                 <p class="title__code"><span class="counter">1</span># Install the Package</p>
-                <p class="code__content"><span class="counter">2</span>pip install label-studio</p>
-                <p class="spacer"><span class="counter">3</span></p>
-                <p class="title__code"><span class="counter">4</span># Create a New Project</p>
-                <p class="code__content"><span class="counter">5</span>label-studio init</p>
-                <p class="code__content"><span class="counter">6</span>my_project</p>
+                <p class="code__content"><span class="counter">2</span>pip install -U label-studio</p>
                 <p class="spacer"><span class="counter">7</span></p>
                 <p class="title__code"><span class="counter">8</span># Launch It!</p>
-                <p class="code__content"><span class="counter">9</span>label-studio start</p>
-                <p class="code__content"><span class="counter">10</span>my_project</p>
+                <p class="code__content"><span class="counter">9</span>label-studio</p>
               </div>
             </div>
 
             <div class="content__elem content2" style="display:none;">
               <div class="desktop__code">
                 <p class="title__code"><span class="counter">1</span># Running latest docker version </p>
-                <p class="code__content"><span class="counter">2</span>docker run --rm -p 8080:8080 -v `pwd`/my_project:/label-studio/my_project --name label-studio heartexlabs/label-studio:latest label-studio start my_project --init</p>
+                <p class="code__content"><span class="counter">2</span>docker run -p 8080:8080 -v `pwd`/mydata:/root/.local/share/label-studio heartexlabs/label-studio:latest</p>
                 <p class="spacer"><span class="counter">3</span></p>
                 <p class="title__code"><span class="counter">4</span># Now visit http://localhost:8080/</p>
               </div>
               <div class="mobile__code">
 	      	<p class="title__code"><span class="counter">1</span># Running latest docker version </p>
-                <p class="code__content"><span class="counter">2</span>docker run --rm -p 8080:8080 -v `pwd`/my_project:/label-studio/my_project --name label-studio heartexlabs/label-studio:latest label-studio start my_project --init</p>
+                <p class="code__content"><span class="counter">2</span>docker run -p 8080:8080 -v `pwd`/mydata:/root/.local/share/label-studio heartexlabs/label-studio:latest</p>
                 <p class="spacer"><span class="counter">3</span></p>
                 <p class="title__code"><span class="counter">4</span># Now visit http://localhost:8080/</p>
               </div>
@@ -125,7 +117,7 @@ menu && menu.classList.add('main__page__header')
                 <p class="code__content"><span class="counter">6</span>pip install -e .</p>
                 <p class="spacer"><span class="counter">7</span></p>
                 <p class="title__code"><span class="counter">8</span># Launch</p>
-                <p class="code__content"><span class="counter">9</span>python label_studio/server.py start labeling_project --init</p>
+                <p class="code__content"><span class="counter">9</span>python label_studio/manage.py runserver</p>
               </div>
               <div class="mobile__code">
                 <p class="title__code"><span class="counter">1</span># Clone repo</p>
@@ -136,7 +128,7 @@ menu && menu.classList.add('main__page__header')
                 <p class="code__content"><span class="counter">6</span>pip install -e .</p>
                 <p class="spacer"><span class="counter">7</span></p>
                 <p class="title__code"><span class="counter">8</span># Launch</p>
-                <p class="code__content"><span class="counter">9</span>python label_studio/server.py start labeling_project --init</p>
+                <p class="code__content"><span class="counter">9</span>python label_studio/manage.py runserver</p>
               </div>
             </div>
           </div>
@@ -145,6 +137,27 @@ menu && menu.classList.add('main__page__header')
     </div>
   </div>
 </div>
+
+<div class="announcement">
+  <div class="announcement__block">
+    <div style="text-align: center">
+      <h2><a href="/blog/release-100.html" alt="Label Studio Hits v1.0" style="color: black; text-decoration: none;">Label Studio Hits v1.0!</a></h2>
+      <h4><a href="/blog/release-100.html" alt="Label Studio Hits v1.0" style="color: #E68F52; text-decoration: none;">Read the Announcment</a></h4>
+    </div>
+    <div class="announcement__block-images">
+      <div>
+        <img src="<%- url_for("/images/release-100/data-labeling-templates-for-computer-vision.png") %>">
+      </div>
+      <div>
+        <a href="/blog/release-100.html" alt="Label Studio Hits v1.0"><img src="<%- url_for("/images/release-100/data-labeling-projects-list.png") %>"></a>
+      </div>
+      <div>
+        <img src="<%- url_for("/images/release-100/announcement-inside-data-labeling-project.png") %>">
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="date__type">
   <div class="container">
     <div class="outer__date">

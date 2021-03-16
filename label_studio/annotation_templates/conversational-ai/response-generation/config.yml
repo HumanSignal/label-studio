@@ -1,0 +1,12 @@
+title: Response Generation
+type: community
+group: Conversational AI
+image: /static/templates/response-generation.png
+details: <h1>Collect chatbot training data by generating next dialogue response</h1>
+config: '
+<View>
+  <Paragraphs name="chat" value="$dialogue" layout="dialogue" />
+  <Header value="Provide response" />
+  <TextArea name="response" toName="chat" rows="4" editable="true" maxSubmissions="1" />
+</View>
+'

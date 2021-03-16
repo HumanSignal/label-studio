@@ -1,108 +1,134 @@
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
+"""
 import logging
+import drf_yasg.openapi as openapi
 
-from flask import Flask, request, jsonify, send_file
-from rq.exceptions import NoSuchJobError
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework import generics, status
+from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
+from rest_framework.views import APIView
+from rest_framework.response import Response
 
-from label_studio.ml.model import LabelStudioMLManager
-from label_studio.utils.misc import exception_handler
+from core.permissions import BaseRulesPermission, IsBusiness, get_object_with_permissions
+from core.utils.common import get_object_with_check_and_log
+from projects.models import Project
+from ml.serializers import MLBackendSerializer
+from ml.models import MLBackend
+from core.utils.common import bool_from_request
 
 logger = logging.getLogger(__name__)
 
-_server = Flask(__name__)
-_manager = LabelStudioMLManager()
+
+class MLBackendAPIBasePermission(BaseRulesPermission):
+    perm = 'projects.change_project'
 
 
-def init_app(model_class, **kwargs):
-    global _manager
-    _manager.initialize(model_class, **kwargs)
-    return _server
+class MLBackendListAPI(generics.ListCreateAPIView):
+    parser_classes = (JSONParser, FormParser, MultiPartParser)
+    permission_classes = (IsBusiness, MLBackendAPIBasePermission)
+    serializer_class = MLBackendSerializer
+    swagger_schema = None
+
+    def get_queryset(self):
+        project_pk = self.request.query_params.get('project')
+        project = get_object_with_check_and_log(self.request, Project, pk=project_pk)
+        self.check_object_permissions(self.request, project)
+        ml_backends = MLBackend.objects.filter(project_id=project.id)
+        for mlb in ml_backends:
+            mlb.update_state()
+        return ml_backends
+
+    def perform_create(self, serializer):
+        ml_backend = serializer.save()
+        ml_backend.update_state()
 
 
-@_server.route('/predict', methods=['POST'])
-@exception_handler
-def _predict():
-    data = request.json
-    tasks = data['tasks']
-    project = data.get('project')
-    label_config = data.get('label_config')
-    force_reload = data.get('force_reload', False)
-    try_fetch = data.get('try_fetch', True)
-    params = data.get('params') or {}
-    predictions, model = _manager.predict(tasks, project, label_config, force_reload, try_fetch, **params)
-    response = {
-        'results': predictions,
-        'model_version': model.model_version
-    }
-    return jsonify(response)
+class MLBackendDetailAPI(generics.RetrieveUpdateDestroyAPIView):
+    """RUD storage by pk specified in URL"""
+    parser_classes = (JSONParser, FormParser, MultiPartParser)
+    serializer_class = MLBackendSerializer
+    permission_classes = (IsBusiness, MLBackendAPIBasePermission)
+    queryset = MLBackend.objects.all()
+    swagger_schema = None
+
+    def get_object(self):
+        ml_backend = super(MLBackendDetailAPI, self).get_object()
+        ml_backend.update_state()
+        return ml_backend
+
+    def perform_update(self, serializer):
+        ml_backend = serializer.save()
+        ml_backend.update_state()
 
 
-@_server.route('/setup', methods=['POST'])
-@exception_handler
-def _setup():
-    data = request.json
-    project = data.get('project')
-    schema = data.get('schema')
-    force_reload = data.get('force_reload', False)
-    hostname = data.get('hostname', '')  # host name for uploaded files and building urls
-    model = _manager.fetch(project, schema, force_reload, hostname=hostname)
-    logger.debug('Fetch model version: {}'.format(model.model_version))
-    return jsonify({'model_version': model.model_version})
+class MLBackendTrainAPI(APIView):
+    """Train
+
+    After you've activated an ML backend, call this API to start training with the already-labeled tasks.
+    """
+    permission_classes = (IsBusiness, MLBackendAPIBasePermission)
+
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={'use_ground_truth': openapi.Schema(type=openapi.TYPE_BOOLEAN,
+                                                        description='Whether to include ground truth annotations in training')}
+        ),
+        responses={
+            200: openapi.Response(
+                title='Training OK',
+                description='Training has successfully started.'
+            ),
+            500: openapi.Response(
+                description='Training error',
+                schema=openapi.Schema(
+                    title='Error message',
+                    desciption='Error message',
+                    type=openapi.TYPE_STRING,
+                    example='Server responded with an error.'
+                )
+            )
+        },
+        tags=['Machine Learning']
+    )
+    def post(self, request, *args, **kwargs):
+        ml_backend = get_object_with_check_and_log(request, MLBackend, pk=self.kwargs['pk'])
+        self.check_object_permissions(self.request, ml_backend)
+
+        ml_backend.train()
+        return Response(status=status.HTTP_200_OK)
 
 
-@_server.route('/train', methods=['POST'])
-@exception_handler
-def _train():
-    data = request.json
-    completions = data['completions']
-    project = data.get('project')
-    label_config = data.get('label_config')
-    params = data.get('params', {})
-    if len(completions) == 0:
-        return jsonify('No completions found.'), 400
-    job = _manager.train(completions, project, label_config, **params)
-    response = {'job': job.id} if job else {}
-    return jsonify(response), 201
+class MLBackendPredictAPI(APIView):
+    """
+    post:
+    Create predictions
 
+    Create predictions for all tasks in a project to build statistics and an active learning strategy.
+    """
+    permission_classes = (IsBusiness, MLBackendAPIBasePermission)
 
-@_server.route('/is_training', methods=['GET'])
-@exception_handler
-def _is_training():
-    project = request.args.get('project')
-    output = _manager.is_training(project)
-    return jsonify(output)
+    @swagger_auto_schema(
+        responses={
+            200: openapi.Response(
+                title='Predictions OK',
+                description='Predictions have successfully started.'
+            ),
+            500: openapi.Response(
+                description='Error',
+                schema=openapi.Schema(
+                    title='Error message',
+                    desciption='Error message',
+                    type=openapi.TYPE_STRING,
+                    example='Server responded with an error.'
+                )
+            )
+        },
+        tags=['Machine Learning']
+    )
+    def post(self, request, *args, **kwargs):
+        ml_backend = get_object_with_check_and_log(request, MLBackend, pk=self.kwargs['pk'])
+        self.check_object_permissions(self.request, ml_backend)
 
-
-@_server.route('/health', methods=['GET'])
-@exception_handler
-def health():
-    return jsonify({'status': 'UP', 'model_dir': _manager.model_dir})
-
-
-@_server.route('/metrics', methods=['GET'])
-@exception_handler
-def metrics():
-    return jsonify({})
-
-
-@_server.errorhandler(NoSuchJobError)
-def no_such_job_error_handler(error):
-    logger.warning('Got error: ' + str(error))
-    return str(error), 410
-
-
-@_server.errorhandler(FileNotFoundError)
-def file_not_found_error_handler(error):
-    logger.warning('Got error: ' + str(error))
-    return str(error), 404
-
-
-@_server.errorhandler(AssertionError)
-def assertion_error(error):
-    logger.error(str(error), exc_info=True)
-    return str(error), 500
-
-
-@_server.errorhandler(IndexError)
-def index_error(error):
-    logger.error(str(error), exc_info=True)
-    return str(error), 500
+        ml_backend.predict_all_tasks()
+        return Response(status=status.HTTP_200_OK)

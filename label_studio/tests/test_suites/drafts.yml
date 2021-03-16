@@ -1,0 +1,230 @@
+- no_annotation_no_drafts:
+
+  # Create project
+  - /api/projects:
+      method: POST
+      data:
+        title: Test Draft 1
+        label_config: <View><Text name="text" value="$text"/><Choices name="label" toName="text"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+      status_code: 201
+      response:
+        id: '{project_pk}'
+
+  # Import task
+  - /api/projects/{project_pk}/tasks:
+      method: POST
+      content_type: application/json
+      data:
+        data:
+          text: Test example phrase
+      status_code: 201
+      response:
+        id: '{task_pk}'
+
+  # emulate onSubmitDraft call from Heartex js sdk
+  - /api/tasks/{task_pk}/drafts:
+      method: POST
+      content_type: application/json
+      data:
+        result: [{'value': {'choices': ['class_A']}, 'from_name': 'text_class', 'to_name': 'text', 'type': 'choices'}]
+        lead_time: 12.34
+      status_code: 201
+      response:
+        id: '{draft_id}'
+
+  # Verify draft
+  - /api/drafts/{draft_id}/:
+      method: GET
+      status_code: 200
+      response:
+        result: [{'value': {'choices': ['class_A']}, 'from_name': 'text_class', 'to_name': 'text', 'type': 'choices'}]
+        lead_time: 12.34
+        task: '{task_pk}'
+        annotation: null
+        user: 'test_suites_user@heartex.com'
+        created_ago:
+          __test_object: true
+          regexp: '0.+minutes'
+
+- No annotation, draft exists:
+
+  # Create project
+  - /api/projects:
+      method: POST
+      data:
+        title: Test Draft 2
+        label_config: <View><Text name="text" value="$text"/><Choices name="label" toName="text"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+      status_code: 201
+      response:
+        id: '{project_pk}'
+
+  # Import task
+  - /api/projects/{project_pk}/tasks:
+      method: POST
+      content_type: application/json
+      data:
+        data:
+          text: Test example phrase
+      status_code: 201
+      response:
+        id: '{task_pk}'
+
+  # emulate onSubmitDraft call from Heartex js sdk
+  - /api/tasks/{task_pk}/drafts:
+      method: POST
+      content_type: application/json
+      data:
+        result: [{'value': {'choices': ['class_A']}, 'from_name': 'text_class', 'to_name': 'text', 'type': 'choices'}]
+        lead_time: 12.34
+      status_code: 201
+      response:
+        id: '{draft_id}'
+
+    # emulate onSubmitDraft call from Heartex js sdk
+  - /api/drafts/{draft_id}:
+      method: PATCH
+      content_type: application/json
+      data:
+        result: [{'value': {'choices': ['class_B']}, 'from_name': 'text_class', 'to_name': 'text', 'type': 'choices'}]
+        lead_time: 12.34
+      status_code: 200
+
+  # Verify draft
+  - /api/drafts/{draft_id}/:
+      method: GET
+      status_code: 200
+      response:
+        result: [{'value': {'choices': ['class_B']}, 'from_name': 'text_class', 'to_name': 'text', 'type': 'choices'}]
+        lead_time: 12.34
+        task: '{task_pk}'
+        annotation: null
+        user: 'test_suites_user@heartex.com'
+        created_ago:
+          __test_object: true
+          regexp: '0.+minutes'
+
+- Completion exists, no drafts:
+
+  # Create project
+  - /api/projects:
+      method: POST
+      data:
+        title: Test Draft 3
+        label_config: <View><Text name="text" value="$text"/><Choices name="label" toName="text"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+      status_code: 201
+      response:
+        id: '{project_pk}'
+
+  # Import task
+  - /api/projects/{project_pk}/tasks:
+      method: POST
+      content_type: application/json
+      data:
+        data:
+          text: Test example phrase
+      status_code: 201
+      response:
+        id: '{task_pk}'
+
+  # Create annotation
+  - /api/tasks/{task_pk}/annotations:
+      method: POST
+      content_type: application/json
+      data:
+        result: [{'value': {'choices': ['class_B']}, 'from_name': 'text_class', 'to_name': 'text', 'type': 'choices'}]
+        lead_time: 34.56
+      status_code: 201
+      response:
+        id: '{annotation_pk}'
+
+  # emulate onSubmitDraft call from Heartex js sdk
+  - /api/tasks/{task_pk}/annotations/{annotation_pk}/drafts:
+      method: POST
+      content_type: application/json
+      data:
+        result: [{'value': {'choices': ['class_A']}, 'from_name': 'text_class', 'to_name': 'text', 'type': 'choices'}]
+        lead_time: 56.78
+      status_code: 201
+      response:
+        id: '{draft_id}'
+
+  # Verify draft
+  - /api/drafts/{draft_id}:
+      method: GET
+      status_code: 200
+      response:
+        result: [{'value': {'choices': ['class_A']}, 'from_name': 'text_class', 'to_name': 'text', 'type': 'choices'}]
+        lead_time: 56.78
+        task: '{task_pk}'
+        annotation: '{annotation_pk}'
+        user: 'test_suites_user@heartex.com'
+        created_ago:
+          __test_object: true
+          regexp: '0.+minutes'
+
+- Completion exists, draft exists:
+  # Create project
+  - /api/projects:
+      method: POST
+      data:
+        title: Test Draft 4
+        label_config: <View><Text name="text" value="$text"/><Choices name="label" toName="text"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+      status_code: 201
+      response:
+        id: '{project_pk}'
+
+  # Import task
+  - /api/projects/{project_pk}/tasks:
+      method: POST
+      content_type: application/json
+      data:
+        data:
+          text: Test example phrase
+      status_code: 201
+      response:
+        id: '{task_pk}'
+
+  # Create annotation
+  - /api/tasks/{task_pk}/annotations:
+      method: POST
+      content_type: application/json
+      data:
+        result: [{'value': {'choices': ['class_B']}, 'from_name': 'text_class', 'to_name': 'text', 'type': 'choices'}]
+        lead_time: 34.56
+      status_code: 201
+      response:
+        id: '{annotation_pk}'
+
+  # emulate onSubmitDraft call from Heartex js sdk
+  - /api/tasks/{task_pk}/annotations/{annotation_pk}/drafts:
+      method: POST
+      content_type: application/json
+      data:
+        result: [{'value': {'choices': ['class_A']}, 'from_name': 'text_class', 'to_name': 'text', 'type': 'choices'}]
+        lead_time: 56.78
+      status_code: 201
+      response:
+        id: '{draft_id}'
+
+    # emulate onSubmitDraft call from Heartex js sdk - patch existed draft
+  - /api/drafts/{draft_id}:
+      method: PATCH
+      content_type: application/json
+      data:
+        result: [{'value': {'choices': ['class_B']}, 'from_name': 'text_class', 'to_name': 'text', 'type': 'choices'}]
+        lead_time: 99.99
+      status_code: 200
+
+  # Verify draft
+  - /api/drafts/{draft_id}:
+      method: GET
+      status_code: 200
+      response:
+        result: [{'value': {'choices': ['class_B']}, 'from_name': 'text_class', 'to_name': 'text', 'type': 'choices'}]
+        lead_time: 99.99
+        task: '{task_pk}'
+        annotation: '{annotation_pk}'
+        user: test_suites_user@heartex.com
+        created_ago:
+          __test_object: true
+          regexp: '0.+minutes'

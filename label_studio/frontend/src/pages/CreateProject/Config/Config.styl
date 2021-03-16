@@ -1,0 +1,401 @@
+$scroll_width = 5px
+
+styled_scroll()
+  &::-webkit-scrollbar
+    width: 6px
+    height: 6px // for horizontal scroll
+    background-color: $grey_3
+  &::-webkit-scrollbar-thumb
+    background-color: $grey_6
+
+.ls-panel {
+  display: none;
+}
+.wizard
+  flex: 1
+  min-height: 0
+  height: 100%
+  display: flex
+  flex-direction: column
+
+// hack for settings embedding
+.sidebar-menu__content > .wizard
+  height: calc(100% + 64px)
+  margin: -32px -40px
+
+.wizard > .configure
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: stretch;
+  > *
+    flex: 50%
+
+.wizard .configure__container
+  display: flex;
+  flex-direction: column;
+  // 20px from header's breadcrumbs
+  padding: 16px (16px - $scroll_width) 16px 20px;
+  overflow-y: scroll;
+  background-color #fff
+
+  &::-webkit-scrollbar
+    width: $scroll_width
+  &::-webkit-scrollbar-track
+    background: none;
+
+.templates-list
+  display: grid
+  height: 100%
+  grid-template: 1fr auto / 224px auto
+
+  &__sidebar
+    padding: 16px 8px 16px 32px
+
+    h3:not(:first-child)
+      margin-top: 2em
+    .templates-list__custom-template
+      margin-top: 20px
+      padding-left: 8px
+      font-weight: 500
+      border: none
+      color: #1890FF
+      background: none
+      width: 100%
+      text-align: left
+    ul
+      padding: 0
+      list-style: none
+      display: flex
+      flex-direction: column
+  &__group
+    margin: 0 0 4px
+    padding: 4px 8px
+    border-radius: 4px
+    cursor: pointer
+    color: #595959
+    font-weight: 500
+    line-height: 24px
+    display: flex
+    align-items: center
+    &:hover
+      background-color: #F4F4F4
+    &_active
+      color: #000
+      background-color: #F0F0F0
+    svg // arrow
+      margin-left: auto
+      padding-left: 16px
+      width: 24px
+
+  main
+    position: relative
+    flex-grow: 1
+    overflow-y: auto
+    height: 100%
+    ul
+      display grid
+      flex-wrap wrap
+      padding 0
+      margin 16px 8px
+      grid-template-columns repeat(auto-fill, 276px)
+      grid-auto-columns 276px
+      grid-gap 16px
+
+  &__template
+    display: flex
+    flex-direction: column
+    border-radius: 4px
+    cursor: pointer
+    position: relative
+    width: 276px
+    border: 1px solid $grey_5
+    box-sizing: content-box
+    &_active
+    &:hover
+      box-shadow: 0px 0px 0 2px #1890ff
+    &:hover
+      opacity: 0.9
+
+    h3
+      margin: 0
+      padding: 12px
+      font-size: 14px
+      font-weight: 500
+      border-top: 1px solid $grey_5
+    img
+      width: 276px
+      height: 204px
+      object-fit: cover
+      border-radius: 4px 4px 0 0
+  footer
+  .modal__footer
+    grid-column: 1 / span 2
+    padding: 16px 40px
+    font-size: 14px
+    background: rgba(0, 0, 0, 0.03)
+    box-shadow: inset 0px 1px 0px rgba(0, 0, 0, 0.05)
+    text-align: center
+  &__info-icon
+    margin-right: 8px
+    vertical-align: -5px
+    height: 20px
+
+.wizard a.back { // @todo ?
+  align-self: center;
+  width: 220px;
+  height: 30px;
+}
+.wizard a.back::before {
+  content: '\2190';
+  margin-right: 8px;
+}
+.wizard .project__create { // @todo ?
+  display: none;
+}
+.wizard .project__create p {
+  margin: 0;
+}
+.wizard h1 {
+  font-size: 1.4rem;
+  width: 100%;
+  display: flex;
+}
+.wizard h1 a[name=config] {
+  margin-left: auto;
+  font-size: 1rem;
+  font-weight: 400;
+  background: #ccc;
+}
+.wizard h1 a[name=config]:hover {
+  background: #2593fc;
+}
+.wizard h1 a[name=config]:hover::before {
+  content: "Advanced! ";
+}
+.wizard a.button,
+.wizard button,
+.wizard input[type=button] {
+  line-height: 1;
+}
+
+
+.configure__container > header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.configure__editor
+  display flex
+  flex 1
+  overflow-y: auto
+  styled_scroll()
+
+.configure__tags-link
+  margin: 0
+  // to keep this block at 36px height as the Save button
+  // to prevent blinking on mode switching
+  line-height: 21px
+  margin-top: -6px
+
+.configure__container > header .toggle-items {
+  margin-left: auto;
+}
+.wizard .configure__code
+  textarea
+  :global(.react-codemirror2)
+    flex: 1
+    font-family: monospace
+    :global(.CodeMirror)
+      height: 100%
+.wizard .configure__code
+.wizard .configure__visual
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+.wizard .configure__visual
+  > *
+    border-top: 1px solid $black_10
+    padding-top: 16px
+    margin-bottom: 16px
+.wizard .configure__object
+  h4
+    margin-bottom: 8px
+  > p
+    line-height: 32px
+  > p.configure__object-error
+    line-height: 22px
+    margin-top: 8px
+    color: #771b04
+  input
+    margin-left: 8px
+    padding: 4px 8px
+    line-height: 1.4em
+  select
+    padding: 4px 8px
+    font: inherit
+    border-color: #dededf
+.wizard .configure__enable_manual_columns
+  border-bottom: 1px dashed #888
+  width: fit-content
+  cursor: pointer
+  &:hover
+    opacity: 0.8
+
+.wizard .configure__labels
+  display: flex
+  max-height: 200px
+.wizard .configure__add-labels
+  display: flex
+  flex-direction: column
+  align-items: flex-start
+  flex: 1
+  textarea
+    flex-grow: 1
+    margin: 8px 0
+    border-color: #dededf
+    font: inherit
+.wizard .configure__visual h4
+  margin: 0
+  font-weight: 500
+
+/*** Configure Labels ***/
+.wizard .configure__current-labels
+  flex: 1
+  display: flex
+  flex-direction: column
+  overflow-x: hidden
+  margin-right: 8px
+  h3
+    font-size: 16px
+    margin: 0 32px 7px
+.wizard .configure__labels ul
+  overflow-y: scroll
+  padding: 0 2em
+  margin: 0
+  list-style: none
+  min-width: 140px
+  display: flex
+  flex-direction: column
+  align-items: stretch
+  flex: 1
+  styled_scroll()
+  .configure__label
+    display: flex
+    align-items: stretch
+    position: relative
+    &:not(:first-child)
+      margin-top: 8px
+    &_choice
+      label
+        display: none
+      span
+        background: rgba(0, 0, 0, 0.05)
+    label
+      width: 0px
+      cursor: pointer
+      &::before
+        content: ""
+        position: absolute
+        width: 100%
+        height: 100%
+        background: inherit
+        opacity: 0.2
+        left: 0
+        right: 0
+        // pointer-events: none // disable if you want label to react, like to edit text
+        border-radius: 0 4px 4px 0
+      &::after
+        position: absolute
+        left: -4px
+        width: 4px
+        content: ""
+        height: 100%
+        background: inherit
+        border-radius: 3px 0 0 3px
+        transition: 0.1s all
+        will-change: width, left
+    .configure__label-color
+      width: 1px
+      padding: 0
+      border: 0
+      position: absolute
+      opacity: 0
+    span
+      padding: 0 8px
+      overflow-x: hidden
+      word-break: break-word
+    .configure__delete-label
+      min-width: 0
+      border: 0
+      border-radius: 0 4px 4px 0
+      background: none
+      cursor: pointer
+      padding: 2px 6px
+      font-size: 12px
+      position: absolute
+      top: 0
+      left: 100%
+      height: 100%
+      opacity: 0.3
+      &:hover
+        background: rgba(255,0,0,0.133)
+        opacity: 1
+    &:hover
+      background: rgba(0,0,0,0.05);
+      label::before
+        border-radius: 0
+      label::after
+        width: 12px
+        left: -12px
+
+.wizard ul.configure__settings
+  padding: 0
+  ul
+    padding: 0
+  li
+    list-style: none
+    margin: 12px 0
+  label
+    cursor: pointer
+  input[type=checkbox]
+    margin-right: 8px
+  input[type=text]
+  select
+    font: inherit
+    line-height: 1.2em
+    padding: 4px 8px
+    border-radius: 4px
+    border: 1px solid $black_10
+
+.wizard .configure__preview
+  flex-grow: 10
+  min-width: 500px
+  padding: 16px 16px 0
+  overflow-y: auto
+  border-left: 1px solid $black_10
+  background-color: $grey_2
+  styled_scroll()
+  h3
+    margin: 8px 0 16px
+    font-size: 16px
+  iframe
+    display: block
+    width: 100%
+    height: 100%
+  &-error
+    color: #771b04
+    border: 1px solid #e68a6e
+    background-color: #ffc1ae
+    padding: 10px 15px
+    border-radius: 3px
+    margin-bottom: 16px
+    white-space: pre-line
+    h2
+      font-size: 16px
+
+// super hack for LSF regions width on sideBottom layout
+div[class^=App_menu]>div
+  width: 100%

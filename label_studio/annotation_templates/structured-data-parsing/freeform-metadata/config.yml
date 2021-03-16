@@ -1,0 +1,32 @@
+title: Freeform Metadata
+type: community
+group: Structured Data Parsing
+image: /static/templates/freeform-metadata.png
+details: <h1>Specify your own metadata in table</h1>
+config: '
+<View>
+  <Style>
+    input[type="text"][name^="table"] { border-radius: 0px; border-right: none;}
+    input[type="text"][name^="table_metric"] { border-right: 1px solid #ddd; }
+    div[class*=" TextAreaRegion_mark"] {background: none; height: 33px; border-radius: 0; min-width: 135px;}
+  </Style>
+
+  <Text value="$text" name="text"/>
+
+  <View style="display: grid;  grid-template-columns: 1fr 1fr; max-height: 300px; width: 400px">
+    <TextArea name="table_name_1" toName="text" placeholder="name" editable="true" maxSubmissions="1"/>
+    <TextArea name="table_value_1" toName="text" placeholder="value" editable="true" maxSubmissions="1"/>
+    <TextArea name="table_name_2" toName="text" placeholder="name" editable="true" maxSubmissions="1"/>
+    <TextArea name="table_value_2" toName="text" placeholder="value" editable="true" maxSubmissions="1"/>
+    <TextArea name="table_name_3" toName="text" placeholder="name" editable="true" maxSubmissions="1"/>
+    <TextArea name="table_value_3" toName="text" placeholder="value" editable="true" maxSubmissions="1"/>
+  </View>
+</View>
+
+<!-- {
+"data": {"text": "This is a great 3D movie that delivers everything almost right in your face."}
+
+}
+-->
+
+'

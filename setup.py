@@ -1,3 +1,5 @@
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
+"""
 import setuptools
 import label_studio
 
@@ -8,8 +10,8 @@ with open('README.md', 'r', encoding='utf-8') as f:
     long_description = f.read()
 
 # Module dependencies
-with open('requirements.txt') as f:
-    requirements = f.read().splitlines()
+with open('deploy/requirements.txt') as f:
+    requirements = [line for line in f.read().splitlines() if not line.startswith('-e git+')]
 
 setuptools.setup(
     name=label_studio.package_name,
@@ -28,11 +30,10 @@ setuptools.setup(
         'Operating System :: OS Independent',
     ],
     install_requires=requirements,
-    python_requires='>=3.5, <3.9',
+    python_requires='>=3.6',
     entry_points={
         'console_scripts': [
             'label-studio=label_studio.server:main',
-            'label-studio-ml=label_studio.ml.server:main'
         ],
     }
 )

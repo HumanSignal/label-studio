@@ -2,10 +2,16 @@
 **
 
 # Except:
-!images
+!deploy
 !label_studio
-!scripts
-!tools
 !setup.py
 !requirements.txt
 !README.md
+!wait-for-it.sh
+
+# but ignore:
+label_studio/frontend
+
+# except
+!label_studio/frontend/dist
+!label_studio/frontend/lib/dm/version.json

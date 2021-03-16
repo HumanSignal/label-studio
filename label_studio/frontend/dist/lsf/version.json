@@ -1,0 +1,6 @@
+{
+  "message": "Show loading errors in dedicated block, not modal",
+  "commit": "63c59e2fe6e06940af3eeda7967d6a5c7c0fb53e",
+  "branch": "feature/rename-completions",
+  "date": "2021-03-15T13:31:40Z"
+}

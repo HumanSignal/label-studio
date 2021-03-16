@@ -1,0 +1,12 @@
+{
+  title: "Projects",
+  submenu: [
+    {% for p in projects %}
+      {
+        id: {{project.pk}},
+        title: "{{p.title}}",
+        href: "",
+      },
+    {% endfor %}
+  ]
+}

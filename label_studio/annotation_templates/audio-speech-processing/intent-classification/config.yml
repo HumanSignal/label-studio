@@ -1,0 +1,25 @@
+title: Intent Classification
+type: community
+group: Audio/Speech Processing
+image: /static/templates/intent-classification.png
+details: <h1>Do voice activity segmentation and choose spoken intent</h1>
+config: '
+<View>
+  <Labels name="labels" toName="audio">
+    <Label value="Segment" />
+  </Labels>
+
+  <AudioPlus name="audio" value="$audio"/>
+
+  <Choices name="intent" toName="audio" perRegion="true" required="true">
+    <Choice value="Question" />
+    <Choice value="Request" />
+    <Choice value="Satisfied" />
+    <Choice value="Interested" />
+    <Choice value="Unsatisfied" />
+  </Choices>
+</View>
+
+<!-- { "data": {"audio": "https://app.heartex.ai/static/samples/game.wav"} } -->
+
+'

@@ -1,0 +1,292 @@
+- test_import_from_s3_storage:
+
+  # Create project
+  - /api/projects:
+      method: POST
+      data:
+        title: test_s3_storage
+        label_config: <View><Image name="image" value="$image_url"/><Choices name="label" toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+        is_published: true
+      status_code: 201
+      response:
+        id: '{project_pk}'
+
+  # Create storage
+  - /api/storages/s3:
+      method: POST
+      data:
+        project: '{project_pk}'
+        title: Testing S3 storage (bucket from conftest.py)
+        bucket: pytest-s3-images
+        use_blob_urls: true
+      status_code: 201
+      response:
+        id: '{storage_pk}'
+
+  # Sync storage
+  - /api/storages/s3/{storage_pk}/sync:
+      method: POST
+      status_code: 200
+      response:
+        last_sync_count: 3
+
+  # Get next task
+  - /api/projects/{project_pk}/next:
+      method: GET
+      status_code: 200
+      response:
+        data:
+          # we expect AWS presigned URL here
+          __test_object: true
+          regexp: '^\{"image_url":\s"https://pytest-s3-images\.s3\.amazonaws\.com.+X-Amz-Security-Token=testing'
+
+  - /api/storages:
+      method: GET
+      data:
+        project: '{project_pk}'
+      status_code: 200
+      response:
+        - title: 'Testing S3 storage (bucket from conftest.py)'
+          presign: true
+          type: s3
+
+  - /api/storages/s3/{storage_pk}:
+      method: PATCH
+      content_type: application/json
+      data:
+        presign: false
+      status_code: 200
+
+  - /api/storages:
+      method: GET
+      data:
+        project: '{project_pk}'
+      status_code: 200
+      response:
+        - presign: false
+
+
+- test_import_from_gcs_storage:
+
+  # Create project
+  - /api/projects:
+      method: POST
+      data:
+        title: test_import_from_gcs_storage
+        label_config: <View><Image name="image" value="$image_url"/><Choices name="label" toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+        is_published: true
+      status_code: 201
+      response:
+        id: '{project_pk}'
+
+  # Create storage
+  - /api/storages/gcs:
+      method: POST
+      data:
+        project: '{project_pk}'
+        title: Test GCS storage import (mocked GCS client from conftest.py)
+        bucket: test-gs-bucket
+        use_blob_urls: true
+      status_code: 201
+      response:
+        id: '{storage_pk}'
+
+  # Sync storage
+  - /api/storages/gcs/{storage_pk}/sync:
+      method: POST
+      status_code: 200
+      response:
+        last_sync_count: 3
+
+  # Get next task
+  - /api/projects/{project_pk}/next:
+      method: GET
+      status_code: 200
+      response:
+        data:
+          # we expect GCS presigned URL here
+          __test_object: true
+          regexp: '^\{"image_url":\s"https://storage.googleapis.com/test-gs-bucket/.+'
+
+
+- get_import_export_storage_types:
+
+  - /api/storages/types:
+      method: GET
+      status_code: 200
+      response:
+        - name: s3
+          title: AWS S3
+        - name: gcs
+          title: Google Cloud Storage
+        - name: azure
+          title: Microsoft Azure
+        - name: redis
+          title: Redis
+
+  - /api/storages/export/types:
+      method: GET
+      status_code: 200
+      response:
+        - name: s3
+          title: AWS S3
+        - name: gcs
+          title: Google Cloud Storage
+        - name: azure
+          title: Microsoft Azure
+        - name: redis
+          title: Redis
+
+- test_export_s3_storage:
+    # Create project
+    - /api/projects:
+        method: POST
+        data:
+          title: test_s3_storage
+          label_config: <View><Image name="image" value="$image_url"/><Choices name="label" toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+          is_published: true
+        status_code: 201
+        response:
+          id: '{project_pk}'
+
+    # Create storage
+    - /api/storages/export/s3:
+        method: POST
+        data:
+          project: '{project_pk}'
+          title: Testing Export S3 storage (bucket from conftest.py)
+          bucket: pytest-export-s3-bucket
+        status_code: 201
+        response:
+          id: '{storage_pk}'
+
+    # Import task
+    - /api/projects/{project_pk}/tasks:
+        method: POST
+        content_type: application/json
+        data:
+          data:
+            image_url: http://test.heartex.com/my_super_image.jpg
+        status_code: 201
+        response:
+          id: '{task_pk}'
+
+    # Create annotation
+    - /api/tasks/{task_pk}/annotations:
+        method: POST
+        content_type: application/json
+        data:
+          result: [{'value': {'choices': ['pos']}, 'from_name': 'label', 'to_name': 'image', 'type': 'choices'}]
+          lead_time: 12.34
+        status_code: 201
+        response:
+          id: '{annotation_pk}'
+
+- test_export_gcs_storage:
+
+    # Create project
+    - /api/projects:
+        method: POST
+        data:
+          title: test_export_gcs_storage
+          label_config: <View><Image name="image" value="$image_url"/><Choices name="label" toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+          is_published: true
+        status_code: 201
+        response:
+          id: '{project_pk}'
+
+    # Create storage
+    - /api/storages/export/gcs:
+        method: POST
+        data:
+          project: '{project_pk}'
+          title: Testing Export S3 storage (bucket from conftest.py)
+          bucket: pytest-export-gcs-bucket
+        status_code: 201
+        response:
+          id: '{storage_pk}'
+
+    # Patch storage
+    - /api/storages/export/gcs/{storage_pk}:
+        method: PATCH
+        content_type: application/json
+        data:
+          title: New title
+        status_code: 200
+
+    # Import task
+    - /api/projects/{project_pk}/tasks:
+        method: POST
+        content_type: application/json
+        data:
+          data:
+            image_url: http://test.heartex.com/my_super_image.jpg
+        status_code: 201
+        response:
+          id: '{task_pk}'
+
+    # Create annotation
+    - /api/tasks/{task_pk}/annotations:
+        method: POST
+        content_type: application/json
+        data:
+          result: [{'value': {'choices': ['pos']}, 'from_name': 'label', 'to_name': 'image', 'type': 'choices'}]
+          lead_time: 12.34
+        status_code: 201
+        response:
+          id: '{annotation_pk}'
+
+- test_empty_storage_list:
+    # Sign up
+    - /user/signup:
+        method: POST
+        data:
+          email: test_export_gcs_storage@test.com
+          password: 12345678
+          title: test_export_gcs_storage
+        status_code: 302
+
+    - /api/storages:
+        method: GET
+        status_code: 200
+        response: []
+
+
+- test_validate_s3_connection:
+
+    # Create project
+    - /api/projects:
+        method: POST
+        data:
+          title: test_validate_s3_connection
+          label_config: <View><Image name="image" value="$image_url"/><Choices name="label" toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+          is_published: true
+        status_code: 201
+        response:
+          id: '{project_pk}'
+
+    # Validate storage connection
+    - /api/storages/s3/validate:
+        method: POST
+        data:
+          project: '{project_pk}'
+          title: Testing S3 storage (bucket from conftest.py)
+          bucket: pytest-s3-images
+          use_blob_urls: true
+        status_code: 200
+
+    # Validate wrong bucket storage connection
+    - /api/storages/s3/validate:
+        method: POST
+        data:
+          project: '{project_pk}'
+          title: Testing Invalid S3 storage (bucket from conftest.py)
+          bucket: unexisted-s3-bucket
+        status_code: 400
+        response:
+          status_code: 400
+          detail: Validation error
+          exc_info: null
+          validation_errors:
+            non_field_errors:
+              - Cannot find bucket unexisted-s3-bucket in S3

@@ -1,0 +1,67 @@
+/* Compiled from App.styl */
+.ls-global-error {
+  padding: 32px;
+}
+.ls-global-error__heidi {
+  display: block;
+  margin: 32px auto;
+}
+.ls-global-error h1 {
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 20px;
+}
+.ls-global-error h2 {
+  font-size: 20px;
+  color: var(--red-6);
+}
+.ls-global-error__details {
+  background: #f5f5f5;
+  max-height: 320px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  margin: 16px 0;
+  padding: 16px;
+}
+.ls-global-error__actions {
+  display: flex;
+  gap: 8px;
+}
+.ls-global-error__actions > * {
+  line-height: 1em;
+}
+.ls-global-error__slack {
+  margin-right: auto;
+  display: flex;
+  align-items: center;
+}
+.ls-global-error__slack img {
+  height: 16px;
+  width: 16px;
+  margin-right: 8px;
+}
+
+/* Styles for dedicated error page */
+body > .ls-global-error {
+  font: 16px Roboto;
+  max-width: 600px;
+  margin: 0 auto;
+}
+/* Compiled from Button.styl */
+body > .ls-global-error button,
+body > .ls-global-error .button {
+  height: 40px;
+  border: none;
+  cursor: pointer;
+  padding: 0 16px;
+  display: inline-flex;
+  background-color: #fff;
+  align-items: center;
+  border-radius: 5px;
+  text-align: center;
+  text-decoration: none;
+  justify-content: center;
+  color: #333;
+  box-shadow: inset 0px -1px 0px rgba(0,0,0,0.1), inset 0px 0px 0px 1px rgba(0,0,0,0.15);
+  font-weight: 500;
+}

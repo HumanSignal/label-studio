@@ -1,0 +1,14 @@
+title: Speaker Segmentation
+type: community
+group: Audio/Speech Processing
+image: /static/templates/speaker-segmentation.png
+details: <h1>Perform speaker segmentation / diarization task</h1>
+config: '
+<View>
+  <Labels name="label" toName="audio" zoom="true" hotkey="ctrl+enter">
+    <Label value="Speaker one" background="#00FF00"/>
+    <Label value="Speaker two" background="#12ad59"/>
+  </Labels>
+  <AudioPlus name="audio" value="$audio" />
+</View>
+'

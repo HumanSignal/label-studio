@@ -1,0 +1,29 @@
+<View>
+  <HyperText name="video" value="$video"/>
+  <Choices name="choice" toName="video" showInLine="true">
+    <Choice value="Blurry" />
+    <Choice value="Sharp" />
+  </Choices>
+</View>
+
+<!-- {"data": {
+ "video": "<video src='/static/samples/opossum_snow.mp4' width=100% muted /><img src onerror=\"$=n=>document.getElementsByTagName(n)[0];a=$('audio');v=$('video');a.onseeked=()=>{v.currentTime=a.currentTime};a.onplay=()=>v.play();a.onpause=()=>v.pause()\" />",
+ "videoSource": "/static/samples/opossum_snow.mp4"
+},
+"completions": [{"result":
+[
+    {
+        "value": {
+            "choices": [
+                "Blurry"
+            ]
+        },
+        "id": "vB3U85jSU4",
+        "from_name": "choice",
+        "to_name": "video",
+        "type": "choices"
+    }
+]
+}]
+ }
+-->

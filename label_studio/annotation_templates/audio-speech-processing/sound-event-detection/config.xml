@@ -1,0 +1,42 @@
+<View>
+  <Labels name="label" toName="audio" zoom="true" hotkey="ctrl+enter">
+    <Label value="Event A" background="red"/>
+    <Label value="Event B" background="green"/>
+  </Labels>
+  <AudioPlus name="audio" value="$audio"/>
+</View>
+
+<!-- { "data": {"audio": "https://app.heartex.ai/static/samples/game.wav"},
+"completions": [{"result":
+[
+    {
+        "original_length": 3.77437641723356,
+        "value": {
+            "start": 0.01896671566449025,
+            "end": 0.17070044098041226,
+            "labels": [
+                "Event A"
+            ]
+        },
+        "id": "wavesurfer_vtkg888sg18",
+        "from_name": "label",
+        "to_name": "audio",
+        "type": "labels"
+    },
+    {
+        "original_length": 3.77437641723356,
+        "value": {
+            "start": 0.4615234145025961,
+            "end": 0.613257139818518,
+            "labels": [
+                "Event B"
+            ]
+        },
+        "id": "wavesurfer_hvf0tkm0oao",
+        "from_name": "label",
+        "to_name": "audio",
+        "type": "labels"
+    }
+]
+}]
+} -->

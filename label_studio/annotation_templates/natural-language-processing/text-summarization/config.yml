@@ -1,0 +1,38 @@
+title: Text Summarization
+type: community
+group: Natural Language Processing
+image: /static/templates/text-summarization.png
+details: <h1>Provide one sentence summary</h1>
+config: '
+<View>
+  <Header value="Please read the text" />
+  <Text name="text" value="$text" />
+
+  <Header value="Provide one sentence summary" />
+  <TextArea name="answer" toName="text"
+            showSubmitButton="true" maxSubmissions="1" editable="true"
+            required="true" />
+</View>
+
+
+<!-- {"data": {
+  "text": "There are two general approaches to automatic summarization: extraction and abstraction. Extraction-based summarization: Here, content is extracted from the original data, but the extracted content is not modified in any way. Examples of extracted content include key-phrases that can be used to \"tag\" or index a text document, or key sentences (including headings) that collectively comprise an abstract, and representative images or video segments, as stated above. For text, extraction is analogous to the process of skimming, where the summary (if available), headings and subheadings, figures, the first and last paragraphs of a section, and optionally the first and last sentences in a paragraph are read before one chooses to read the entire document in detail.[3] Other examples of extraction that include key sequences of text in terms of clinical relevance (including patient/problem, intervention, and outcome).[4] Abstraction-based summarization: This has been applied mainly for text. Abstractive methods build an internal semantic representation of the original content, and then use this representation to create a summary that is closer to what a human might express. Abstraction may transform the extracted content by paraphrasing sections of the source document, to condense a text more strongly than extraction. Such transformation, however, is computationally much more challenging than extraction, involving both natural language processing and often a deep understanding of the domain of the original text in cases where the original document relates to a special field of knowledge. \"Paraphrasing\" is even more difficult to apply to image and video, which is why most summarization systems are extractive."
+},
+"completions": [{"result":
+[
+    {
+        "value": {
+            "text": [
+                "There are two approaches to automatic summarization: extraction and abstraction. In extraction summarization content is extracted from the original data, whereas Abstraction may transform the extracted content by paraphrasing sections of the source document."
+            ]
+        },
+        "id": "Zc_Rb6Bszp",
+        "from_name": "answer",
+        "to_name": "text",
+        "type": "textarea"
+    }
+]
+}]
+}
+-->
+'

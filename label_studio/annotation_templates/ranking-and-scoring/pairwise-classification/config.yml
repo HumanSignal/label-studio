@@ -1,0 +1,14 @@
+title: Pairwise classification
+type: community
+group: Ranking & Scoring
+image: /static/templates/pairwise-classification.png
+details: <h1>Select one of two items</h1>
+config: '
+<View>
+  <Header>Select one of two items</Header>
+  <Pairwise name="pw" toName="text1,text2" />
+  <Text name="text1" value="$pairText1" />
+  <Text name="text2" value="$pairText2" />
+</View>
+'
+

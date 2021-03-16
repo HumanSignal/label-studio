@@ -1,0 +1,231 @@
+body {
+  --border-color: rgba(0, 0, 0, 0.15);
+  --color-error: #d00;
+}
+
+.full_content {
+  padding: 20px;
+}
+.full_content > header {
+  font-size: 1.5em;
+  margin-bottom: 20px;
+}
+
+.field {
+  display: grid;
+  grid-template-columns: 92px auto;
+  align-items: center;
+  gap: 16px;
+  row-gap: 4px;
+}
+.field--wide {
+  display: block;
+}
+.field--wide > *:not(:first-child) {
+  display: block;
+  margin-top: 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.field > * {
+  grid-column: 2;
+}
+.field > label {
+  grid-column: 1;
+}
+.field .actions {
+  display: flex;
+  gap: 10px;
+}
+.field.error {
+  background: unset;
+}
+.field.error input {
+  color: var(--color-error);
+}
+span.error {
+  background: unset;
+  color: var(--color-error);
+}
+
+input,
+button,
+textarea {
+  font: inherit;
+}
+
+a.button,
+input,
+button,
+textarea {
+  border: 1px solid var(--border-color);
+  padding: 9px 16px;
+}
+
+input[type=text][disabled] {
+  background: rgba(0, 0, 0, 0.03);
+  color: rgba(0, 0, 0, 0.4)
+}
+
+a.button,
+input[type=button],
+input[type=submit],
+input[type=reset],
+button {
+  background: white;
+  border-radius: 5px;
+  /* min-width: 140px; */
+  text-align: center;
+  line-height: 1;
+  font-weight: 500;
+  color: #555;
+  cursor: pointer;
+}
+a.button:hover,
+input[type=button]:hover,
+input[type=submit]:hover,
+input[type=reset]:hover,
+button:hover {
+  filter: brightness(0.98);
+}
+a.button.primary,
+input[type=button].primary,
+input[type=submit].primary,
+input[type=reset].primary,
+button.primary {
+  background: #1890FF;
+  border: 1px solid #1890FF;
+  color: white;
+}
+
+input[type=button].danger,
+input[type=submit].danger,
+input[type=reset].danger,
+button.danger {
+  color: var(--color-error);
+}
+
+input[type=button][disabled],
+input[type=submit][disabled],
+input[type=reset][disabled],
+button[disabled] {
+  background: rgba(0, 0, 0, 0.2);
+  border-color: transparent;
+  cursor: not-allowed;
+}
+
+ul.toggle {
+  display: flex;
+  justify-content: stretch;
+  list-style: none;
+  padding: 4px;
+  margin: 0;
+  background: rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0px 1px 0px rgb(0 0 0 / 5%), inset 0px 0px 0px 1px rgb(0 0 0 / 5%);
+  border-radius: 8px;
+  font-weight: 500;
+}
+ul.toggle--big {
+  font-size: 16px;
+}
+ul.toggle--big li {
+  padding: 4px 20px;
+}
+ul.toggle li {
+  cursor: pointer;
+  color: rgba(0,0,0,0.6);
+  border-radius: 4px;
+  padding: 2px 16px;
+  flex-grow: 1;
+  text-align: center;
+}
+ul.toggle li.active {
+  color: black;
+  background: white;
+  box-shadow: 0px 1px 0px rgb(0 0 0 / 10%), 0px 0px 0px 1px rgb(0 0 0 / 2%), 0px 5px 10px rgb(0 0 0 / 15%);
+}
+
+
+.userpic {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  overflow: hidden;
+  position: relative;
+  align-items: center;
+  border-radius: 50%;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.04);
+  box-shadow: inset 0px 0px 0px 1px rgba(0, 0, 0, 0.1);
+
+  font-size: 12px;
+  font-weight: bold;
+  font-family: Roboto;
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.userpic--medium {
+  width: 64px;
+  height: 64px;
+  font-size: 28px;
+}
+
+.userpic--big {
+  width: 92px;
+  height: 92px;
+  font-size: 32px;
+}
+
+.userpic--small {
+  width: 28px;
+  height: 28px;
+  font-size: 14px;
+}
+
+.userpic img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+
+/* file upload button */
+.file-input {
+  border: none;
+  padding-left: 0;
+  overflow: hidden;
+  width: 100%;
+}
+.file-input::-webkit-file-upload-button {
+  visibility: hidden;
+}
+.file-input::before {
+  content: 'Choose file';
+  display: inline-block;
+  background: none;
+  border: 1px solid #CCC;
+  border-radius: 3px;
+  padding: 5px 8px;
+  outline: none;
+  white-space: nowrap;
+  -webkit-user-select: none;
+  cursor: pointer;
+  text-shadow: 1px 1px #fff;
+  font-weight: 400;
+  font-size: 1em;
+}
+.file-input:hover::before {
+  border-color: #333;
+}
+.file-input:active::before {
+  background: #e3e3e3;
+}
+.file-input:active {
+  border: none;
+  box-shadow: none;
+  outline: none;
+}
+
