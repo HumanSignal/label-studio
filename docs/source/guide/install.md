@@ -27,10 +27,10 @@ To install Label Studio via pip, you need Python>=3.6 and run:
 pip install label-studio
 ```
 
-Then, launch a new project that stores all labeling data in a local directory called `my_project`:
+Then, start Label Studio:
 
 ```bash
-label-studio start my_project --init
+label-studio
 ```
 The default web browser opens automatically at [http://localhost:8080](http://localhost:8080) with Label Studio.
 
@@ -56,10 +56,9 @@ docker run -p 8080:8080 -v `pwd`/mydata:/root/.local/share/label-studio/ heartex
 Or for Windows, you have to modify the volumes paths set by `-v` option.
 
 #### Override the default Docker install
-By default, the default Docker install command creates a blank project in a `./my_project` directory. If the `./my_project` folder already exists, Label Studio fails to start. Rename or delete the folder, or use the `--force` argument to force Label Studio to start: 
-
+You can override the default Docker install by appending new arguments: 
 ```bash
-docker run -p 8080:8080 -v `pwd`/my_project:/label-studio/my_project --name label-studio heartexlabs/label-studio:latest label-studio start my_project --init --force --template text_classification
+docker run -p 8080:8080 -v `pwd`/mydata:/root/.local/share/label-studio/ heartexlabs/label-studio:latest label-studio --log-level DEBUG
 ```
 
 ### Build a local image with Docker

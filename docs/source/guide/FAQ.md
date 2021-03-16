@@ -10,7 +10,7 @@ If you encounter an issue using Label Studio, use this page to troubleshoot it.
 
 If you're using the SQLite database and another user imports a large volume of data, labeling might slow down for other users on the server due to the database load. 
 
-If you want to upload a large volume of data (thousands of items), consider doing that at a time when people are not labeling or use a different database backend such as PostgreSQL or Redis. See [Sync data from cloud or database storage](storage.html). 
+If you want to upload a large volume of data (thousands of items), consider doing that at a time when people are not labeling or use a different database backend such as PostgreSQL or Redis. You can run Docker Compose from the root directory of Label Studio to use PostgreSQL `docker-compose up -d`, or see [Sync data from cloud or database storage](storage.html). 
 
 
 ## Image/audio/resource loading error while labeling
