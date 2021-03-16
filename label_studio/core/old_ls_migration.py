@@ -57,6 +57,7 @@ def _migrate_tasks(project_path, project):
                             task=task,
                             lead_time=annotation['lead_time'],
                             was_cancelled=annotation.get('was_cancelled', False),
+                            completed_by=project.created_by,
                         )
                         with suppress_autotime(task_annotation, ['created_at']):
                             task_annotation.created_at = datetime.datetime.fromtimestamp(
