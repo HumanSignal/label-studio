@@ -21,8 +21,9 @@ def start_fix():
     with zipfile.ZipFile(src, 'r') as zip_ref:
         zip_ref.extractall('.')
 
-    print('Copying finished')
-    print(colorama.Fore.LIGHTRED_EX + '\nPlease, restart Label Studio again to load the updated sqlite.dll\n')
+    print('finished')
+    print(colorama.Fore.LIGHTRED_EX + '\nPlease restart Label Studio to load the updated sqlite.dll\n')
+    print(colorama.Fore.WHITE)
     exit()
 
 
@@ -41,7 +42,7 @@ def windows_dll_fix():
         ctypes.CDLL(os.path.join(path_to_dll, 'sqlite3.dll'))
         logger.debug('Add current directory to PATH for DLL search: ' + path_to_dll)
     except OSError:
-        logger.debug("Can't load sqlite.dll from current directory")
+        logger.debug("Can't load sqlite3.dll from current directory")
 
     # check sqlite version
     import sqlite3

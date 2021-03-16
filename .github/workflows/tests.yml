@@ -46,8 +46,10 @@ jobs:
         run: |
           cd label_studio/
           pytest --junitxml report.xml --cov=. -m "not integration_tests"
+
       - name: Comment coverage
         uses: coroo/pytest-coverage-commentator@v1.0.2
+
       - name: Publish Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action@v1.6
         if: always()
