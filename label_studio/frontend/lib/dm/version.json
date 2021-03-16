@@ -1,6 +1,6 @@
 {
-  "message": "Fix isExplorer",
-  "commit": "01f691004a7cb243724e4b5d00e1112ca9c72157",
+  "message": "Drop unresolved filters",
+  "commit": "24a11e554f026df6d5756c55e9e1ce870775e4ad",
   "branch": "master",
-  "date": "2021-03-15T23:06:26Z"
+  "date": "2021-03-16T14:14:31Z"
 }
