@@ -33,7 +33,10 @@ class MLBackendListAPI(generics.ListCreateAPIView):
         project_pk = self.request.query_params.get('project')
         project = get_object_with_check_and_log(self.request, Project, pk=project_pk)
         self.check_object_permissions(self.request, project)
-        return MLBackend.objects.filter(project_id=project.id)
+        ml_backends = MLBackend.objects.filter(project_id=project.id)
+        for mlb in ml_backends:
+            mlb.update_state()
+        return ml_backends
 
     def perform_create(self, serializer):
         ml_backend = serializer.save()
@@ -47,6 +50,11 @@ class MLBackendDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (IsBusiness, MLBackendAPIBasePermission)
     queryset = MLBackend.objects.all()
     swagger_schema = None
+
+    def get_object(self):
+        ml_backend = super(MLBackendDetailAPI, self).get_object()
+        ml_backend.update_state()
+        return ml_backend
 
     def perform_update(self, serializer):
         ml_backend = serializer.save()
