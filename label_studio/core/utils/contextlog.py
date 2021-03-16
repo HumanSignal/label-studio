@@ -147,6 +147,7 @@ class ContextLog(object):
                 'browser': request.user_agent.browser.family,
                 'browser_version': request.user_agent.browser.version_string,
                 'os': request.user_agent.os.family,
+                'server_os': sys.platform,
                 'os_version': request.user_agent.os.version_string,
                 'device': request.user_agent.device.family,
             })
