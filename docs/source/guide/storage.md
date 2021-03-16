@@ -287,6 +287,12 @@ label-studio start my_project --init --db redis
 
 You can also store your tasks and completions in a [PostgreSQL database](https://www.postgresql.org/) instead of the default SQLite database. This is recommended if you intend to frequently import new labeling tasks, or plan to label hundreds of thousands of tasks or more across projects. 
 
+When you start Label Studio using Docker Compose, you start it using a PostgreSQL database:
+```bash
+docker-compose up -d
+```
+
+
 <!--### Set up connection in the Label Studio UI
 In the Label Studio UI, do the following to set up the connection:
 
