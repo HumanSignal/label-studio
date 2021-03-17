@@ -9,8 +9,9 @@ import io
 import json
 import getpass
 
-from colorama import init
-init(convert=True)
+from colorama import init, Fore
+if sys.platform == 'win32':
+    init(convert=True)
 
 # on windows there will be problems with sqlite and json1 support, so fix it
 from label_studio.core.utils.windows_sqlite_fix import windows_dll_fix
@@ -290,10 +291,12 @@ def main():
                 migrated = True
 
                 print(
+                    Fore.LIGHTYELLOW_EX +
                     '\n*** WARNING! ***\n'
-                    + 'PROJECT {} MIGRATED TO LABEL STUDIO DATABASE\n'.format(input_args.project_name)
+                    + f'Project {input_args.project_name} migrated to Label Studio Database\n'
                     + "YOU DON'T NEED THIS FOLDER ANYMORE"
-                    + '\n****************\n'
+                    + '\n****************\n' +
+                    Fore.WHITE
                 )
             if not migrated:
                 print(
