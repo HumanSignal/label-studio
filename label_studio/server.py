@@ -229,8 +229,8 @@ def main():
 
     # set host name
     host = input_args.host or config.get('host', '')
-    if not os.environ.get('LABEL_STUDIO_HOSTNAME'):
-        os.environ.setdefault('LABEL_STUDIO_HOSTNAME', host)  # it will be passed to settings.HOSTNAME as env var
+    if not os.environ.get('HOST'):
+        os.environ.setdefault('HOST', host)  # it will be passed to settings.HOSTNAME as env var
 
     _setup_env()
     _apply_database_migrations()
@@ -321,7 +321,8 @@ def main():
 
         # internal port and internal host for server start
         internal_host = input_args.internal_host or config.get('internal_host', '0.0.0.0')
-        internal_port = input_args.port or config.get('port', 8080)
+        internal_port = os.environ.get('PORT') or input_args.port or config.get('port', 8080)
+        internal_port = int(internal_port)
         internal_port = _get_free_port(internal_port, input_args.debug)
 
         # browser

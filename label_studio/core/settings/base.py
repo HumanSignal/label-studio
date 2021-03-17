@@ -15,7 +15,7 @@ from core.utils.io import get_data_dir
 from core.utils.params import get_bool_env
 
 # Hostname is used for proper path generation to the resources, pages, etc
-HOSTNAME = os.environ.get('LABEL_STUDIO_HOSTNAME', '')
+HOSTNAME = os.environ.get('HOST', '')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '$(fefwefwef13;LFK{P!)@#*!)kdsjfWF2l+i5e3t(8a1n'
