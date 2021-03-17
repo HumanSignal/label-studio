@@ -46,7 +46,7 @@ You can create relations between two results with both directions and labels. To
 3. Select the second region for the annotation to complete the relation.
 
 <br>
-<img src="/images/screens/relations.png">
+<img src="/images/screens/relation.png">
 <!--relations look a little bit different now, update this-->
 
 After you relate two annotation regions, you can modify the relation in the **Relations** section of the **Results** sidebar. 

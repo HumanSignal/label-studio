@@ -1,7 +1,7 @@
 ---
 title: Sync data from cloud or database storage
 type: guide
-order: 301
+order: 302
 ---
 
 Integrate popular cloud storage systems with Label Studio to collect new items uploaded to the buckets and return the annotation results so that you can use them in your machine learning pipelines.
@@ -292,7 +292,6 @@ When you start Label Studio using Docker Compose, you start it using a PostgreSQ
 docker-compose up -d
 ```
 
-
 <!--### Set up connection in the Label Studio UI
 In the Label Studio UI, do the following to set up the connection:
 
@@ -319,7 +318,7 @@ You can specify additional parameters from the Label Studio UI.
 
 ### Create connection on startup
 
-Run the following command to launch Label Studio, configure the connection to your Redis database, scan for existing tasks, and load them into the app for labeling for a specific project.
+Run the following command to launch Label Studio, configure the connection to your PostgreSQL database, scan for existing tasks, and load them into the app for labeling for a specific project.
 
 ```bash
 label-studio start my_project --init --db postgresql 
@@ -328,10 +327,11 @@ label-studio start my_project --init --db postgresql
 You must set the following environment variables to connect Label Studio to PostgreSQL:
 
 ```
-POSTGRE_NAME=
-POSTGRE_USER=
+DJANGO_DB=default
+POSTGRE_NAME=postgres
+POSTGRE_USER=postgres
 POSTGRE_PASSWORD=
-POSTGRE_PORT=
-POSTGRE_HOST=
+POSTGRE_PORT=5432
+POSTGRE_HOST=db
 ```
 

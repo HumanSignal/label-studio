@@ -101,7 +101,6 @@ conda activate label-studio
 pip install label-studio
 ```
 
-
 ## Upgrade Label Studio
 To upgrade to the latest version of Label Studio, reinstall or upgrade using pip. 
 
@@ -112,12 +111,6 @@ pip install --upgrade label-studio
 
 Migration scripts run when you upgrade to version 1.0.0 from version 0.9.1 or earlier. 
 
+The most important change to be aware of is changes to rename "completions" to "annotations". See the [updated JSON format for completed tasks](export.html#Raw_JSON_format_of_completed_tasks). 
 
-
-
-
-
-
-
-
-
+If you customized the Label Studio Frontend, see the [Frontend reference guide](frontend_reference.html) for required updates to maintain compatibility with version 1.0.0.  
