@@ -26,13 +26,15 @@ You can specify project config, machine learning backend and other options using
 
 If you want multiple people to collaborate on a project, you might want to run Label Studio with an external domain name. 
 
-To do that, use the `host`, `protocol`, `port` parameters when you start Label Studio. These parameters ensure that the correct URLs are created when importing resource files (images, audio, etc) and generating labeling tasks.   
+To do that, use the `host` parameter when you start Label Studio. These parameters ensure that the correct URLs are created when importing resource files (images, audio, etc) and generating labeling tasks.   
 
 There are several possible ways to run Label Studio with an external domain name.
  
-- Replace the host, protocol, and port parameters in the `project/config.json` file, or or `label_studio/utils/schema/default_config.json` in the Label Studio package directory.
-- Specify the parameters when you start Label Studio: `label-studio start --host label-studio.example.com --protocol http:// --port 8080`.
-- For Docker installations, specify the parameters as environment variables `HOST`, `PROTOCOL`, `PORT` when setting up Docker. If your external host has a port, e.g.: `77.77.77.77:1234` then you have to specify HOST with the port together `HOST=77.77.77.77:1234`. 
+- Replace the `host` parameter in the file which you specified with `--config` option. If you don't use `--config` then edit `label_studio/utils/schema/default_config.json` in the Label Studio package directory.
+- Specify the parameters when you start Label Studio: `label-studio start --host <hostname>`.
+- For Docker installations, specify the parameters as environment variables `HOST` when setting up Docker. 
+
+> If your external host has a port, e.g.: `http://77.77.77.77:1234` then you have to specify HOST with the port together `HOST=http://77.77.77.77:1234`. 
 
 > The Label Studio web server always uses the `0.0.0.0` address to start. If you need to change it to `localhost`, set host to `localhost` and the web server starts at `localhost`.  
 
