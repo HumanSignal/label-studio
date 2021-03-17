@@ -32,7 +32,6 @@
 
 
       <% if (fileName === 'audio') { %>
-          <!-- <div style="margin-top: 20px; margin-right: 40px; background: url(<%- url_for("/images/wave.png") %>) repeat-x; opacity: 0.4; background-size: 20px; height: 20px;"></div> -->
           <li><h4>Object Tags</h4></li>
       <% } %>
 
@@ -56,15 +55,7 @@
       <% } %>
     <li>
       <a href="<%- url_for(p.path) %>" class="sidebar-link<%- page.title === p.title ? ' current' : '' %><%- p.is_new ? ' new' : '' %>">
-        <%- p.title
-          .replace(/into Label Studio/g, '')
-          .replace(/in Label Studio/g, '')
-          .replace(/with Label Studio/g, '')
-          .replace(/by Label Studio/g, '')
-          .replace(/for Label Studio/g, '')
-          .replace(/from Label Studio/g, '')
-          .replace(/Label Studio/g, '')
-        %>
+        <%- removeLabelStudioMention(p.title) %>
       </a>
     </li>
     <% }) %>
