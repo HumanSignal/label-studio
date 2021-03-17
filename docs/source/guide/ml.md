@@ -35,7 +35,7 @@ Follow these steps to set up an example text classifier ML backend with Label St
    
 2. Create a new ML backend using the example simple text classifier included in the repository. 
    ```bash
-   label-studio-ml init my_ml_backend --script label_studio/ml/examples/simple_text_classifier.py
+   label-studio-ml init my_ml_backend --script label_studio-ml/examples/simple_text_classifier.py
    ```
    
 3. Start the ML backend server.
@@ -101,7 +101,7 @@ Perform these prerequisites to make sure your server starts successfully.
 
 1. Start the machine learning backend with an example model, or your custom machine learning backend.
     ```bash
-    label-studio-ml init my-ml-backend --script label_studio/ml/examples/simple_text_classifier.py
+    label-studio-ml init my-ml-backend --script label_studio-ml/examples/simple_text_classifier.py
     ```
     You see configurations in the `my-ml-backend/` directory that you need to build and run a Docker image using Docker Compose.
 
