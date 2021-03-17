@@ -84,7 +84,7 @@ export class APIProxy {
 
     try {
       return new URL(url).toString();
-    } catch {
+    } catch (e) {
       const gateway = new URL(window.location.href);
       gateway.search = "";
       gateway.hash = "";
@@ -413,7 +413,7 @@ export class APIProxy {
       const text = await fetchResponse.text();
       try {
         return JSON.parse(text);
-      } catch {
+      } catch (e) {
         return text;
       }
     })();
@@ -435,7 +435,7 @@ export class APIProxy {
     const parsedDetails = () => {
       try {
         return JSON.parse(details);
-      } catch {
+      } catch (e) {
         return details;
       }
     };
