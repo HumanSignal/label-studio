@@ -114,3 +114,41 @@ Migration scripts run when you upgrade to version 1.0.0 from version 0.9.1 or ea
 The most important change to be aware of is changes to rename "completions" to "annotations". See the [updated JSON format for completed tasks](export.html#Raw_JSON_format_of_completed_tasks). 
 
 If you customized the Label Studio Frontend, see the [Frontend reference guide](frontend_reference.html) for required updates to maintain compatibility with version 1.0.0.  
+
+
+
+## Database
+
+### SQLite database
+
+Label Studio uses SQLite by default. You don't need to configure anything. Label Studio stores all data in a single file in the specified directory of the admin user. 
+
+
+### PostgreSQL database
+
+You can also store your tasks and completions in a [PostgreSQL database](https://www.postgresql.org/) instead of the default SQLite database. This is recommended if you intend to frequently import new labeling tasks, or plan to label hundreds of thousands of tasks or more across projects. 
+
+When you start Label Studio using Docker Compose, you start it using a PostgreSQL database:
+```bash
+docker-compose up -d
+```
+
+#### Create connection on startup
+
+Run the following command to launch Label Studio, configure the connection to your PostgreSQL database, scan for existing tasks, and load them into the app for labeling for a specific project.
+
+```bash
+label-studio start my_project --init --db postgresql 
+```
+
+You must set the following environment variables to connect Label Studio to PostgreSQL:
+
+```
+DJANGO_DB=default
+POSTGRE_NAME=postgres
+POSTGRE_USER=postgres
+POSTGRE_PASSWORD=
+POSTGRE_PORT=5432
+POSTGRE_HOST=db
+```
+

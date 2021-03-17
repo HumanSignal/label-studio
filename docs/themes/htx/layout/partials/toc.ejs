@@ -55,7 +55,17 @@
          <% } %>
       <% } %>
     <li>
-      <a href="<%- url_for(p.path) %>" class="sidebar-link<%- page.title === p.title ? ' current' : '' %><%- p.is_new ? ' new' : '' %>"><%- p.title %></a>
+      <a href="<%- url_for(p.path) %>" class="sidebar-link<%- page.title === p.title ? ' current' : '' %><%- p.is_new ? ' new' : '' %>">
+        <%- p.title
+          .replace(/into Label Studio/g, '')
+          .replace(/in Label Studio/g, '')
+          .replace(/with Label Studio/g, '')
+          .replace(/by Label Studio/g, '')
+          .replace(/for Label Studio/g, '')
+          .replace(/from Label Studio/g, '')
+          .replace(/Label Studio/g, '')
+        %>
+      </a>
     </li>
     <% }) %>
 </ul>

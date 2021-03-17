@@ -22,6 +22,10 @@ For example, if you import data while labeling is being performed, labeling task
 
 You can specify project config, machine learning backend and other options using the command line interface. Run `label-studio start --help` to see all available options. Many command line arguments are deprecated and removed in version 1.0.0. 
 
+* The Label Studio web server always uses the `0.0.0.0` address to start. If you need to change it to `localhost`, set `--internal-host` from console arguments to `localhost` and the web server starts at `localhost`.
+
+* You can use `--port` or `PORT` environment var to set port for Label Studio web server. 
+
 ## Run Label Studio with an external domain name
 
 If you want multiple people to collaborate on a project, you might want to run Label Studio with an external domain name. 
@@ -31,13 +35,12 @@ To do that, use the `host` parameter when you start Label Studio. These paramete
 There are several possible ways to run Label Studio with an external domain name.
  
 - Replace the `host` parameter in the file which you specified with `--config` option. If you don't use `--config` then edit `label_studio/utils/schema/default_config.json` in the Label Studio package directory.
-- Specify the parameters when you start Label Studio: `label-studio start --host <hostname>`.
-- For Docker installations, specify the parameters as environment variables `HOST` when setting up Docker. 
+- Specify the parameters when you start Label Studio: `label-studio start --host http://your.domain.com/ls-root`.
+- Specify the parameters as environment variables `HOST` especially when setting up Docker: `HOST=https://your.domain.com:7777`. 
+
+> Don't forget to specify protocol: `http://` or `https://`
 
 > If your external host has a port, e.g.: `http://77.77.77.77:1234` then you have to specify HOST with the port together `HOST=http://77.77.77.77:1234`. 
-
-> The Label Studio web server always uses the `0.0.0.0` address to start. If you need to change it to `localhost`, set host to `localhost` and the web server starts at `localhost`.  
-
 
 ## Set up task sampling for your project 
 
