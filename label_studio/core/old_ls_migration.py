@@ -86,6 +86,8 @@ def _migrate_tabs(project_path, project):
         with io.open(os.path.abspath(tabs_path)) as t:
             tabs_data = json.load(t)
             for tab in tabs_data['tabs']:
+                view = View.objects.create(project=project)
+                tab['id'] = view.id
                 ordering = tab.pop('ordering', None)
                 selected_items = tab.pop('selectedItems', None)
 
@@ -115,13 +117,11 @@ def _migrate_tabs(project_path, project):
                     for c in hidden_columns_data.get('labeling', []):
                         hidden_columns['labeling'].append(c.replace('completion', 'annotation'))
                     tab['hiddenColumns'] = hidden_columns
-                view = View.objects.create(
-                    data=tab,
-                    ordering=ordering,
-                    selected_items=selected_items,
-                    project=project,
-                    filter_group=filter_group,
-                )
+                view.data = tab
+                view.ordering = ordering
+                view.selected_items = selected_items
+                view.filter_group = filter_group
+                view.save()
 
 
 def _migrate_storages(project, config):
