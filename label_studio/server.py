@@ -272,23 +272,29 @@ def main():
             project_path = pathlib.Path(input_args.project_name)
             if project_path.exists():
                 print('Project directory from previous verion of label-studio found')
-                need_migrate = input('Do you want to migrate it? [y/n] ')
-                if need_migrate == 'y':
-                    config_path = project_path / 'config.json'
-                    config = _get_config(config_path)
-                    user = _create_user(input_args, config)
-                    label_config_path = project_path / 'config.xml'
-                    choices = (['sequential', 'uniform'],)
-                    sampling_map = {'sequential': Project.SEQUENCE, 'uniform': Project.UNIFORM}
-                    project = _create_project(
-                        title=input_args.project_name,
-                        user=user,
-                        label_config=label_config_path,
-                        sampling=sampling_map.get(config.get('sampling', 'sequential'), Project.UNIFORM),
-                        description=config.get('description', ''),
-                    )
-                    migrate_existing_project(project_path, project, config)
-                    migrated = True
+                print('Start migrating..')
+                config_path = project_path / 'config.json'
+                config = _get_config(config_path)
+                user = _create_user(input_args, config)
+                label_config_path = project_path / 'config.xml'
+                choices = (['sequential', 'uniform'],)
+                sampling_map = {'sequential': Project.SEQUENCE, 'uniform': Project.UNIFORM}
+                project = _create_project(
+                    title=input_args.project_name,
+                    user=user,
+                    label_config=label_config_path,
+                    sampling=sampling_map.get(config.get('sampling', 'sequential'), Project.UNIFORM),
+                    description=config.get('description', ''),
+                )
+                migrate_existing_project(project_path, project, config)
+                migrated = True
+
+                print(
+                    '\n*** WARNING! ***\n'
+                    + 'PROJECT {} MIGRATED TO LABEL STUDIO DATABASE\n'.format(input_args.project_name)
+                    + "YOU DON'T NEED THIS FOLDER ANYMORE"
+                    + '\n****************\n'
+                )
             if not migrated:
                 print(
                     'Project "{project_name}" not found. '
