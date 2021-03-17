@@ -23,6 +23,7 @@ If you rely on specific formatting of Label Studio completed tasks, [Label Studi
 ```javascript
 var labelStudio = new LabelStudio('editor', options);
 ```
+
 The following options are recognized when initializing a Label Studio instance version 1.0.0.
 
 ## Options

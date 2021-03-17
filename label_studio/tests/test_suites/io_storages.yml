@@ -109,6 +109,49 @@
           regexp: '^\{"image_url":\s"https://storage.googleapis.com/test-gs-bucket/.+'
 
 
+- test_import_from_gcs_storage_json:
+
+  # Create project
+  - /api/projects:
+      method: POST
+      data:
+        title: test_import_from_gcs_storage
+        label_config: <View><Image name="image" value="$image_url"/><Choices name="label" toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+        is_published: true
+      status_code: 201
+      response:
+        id: '{project_pk}'
+
+  # Create storage
+  - /api/storages/gcs:
+      method: POST
+      data:
+        project: '{project_pk}'
+        title: Test GCS storage import (mocked GCS client from conftest.py)
+        bucket: test-gs-bucket_JSON
+        use_blob_urls: false
+      status_code: 201
+      response:
+        id: '{storage_pk}'
+
+  # Sync storage
+  - /api/storages/gcs/{storage_pk}/sync:
+      method: POST
+      status_code: 200
+      response:
+        last_sync_count: 3
+
+  # Get next task
+  - /api/projects/{project_pk}/next:
+      method: GET
+      status_code: 200
+      response:
+        data:
+          # we expect GCS presigned URL here
+          __test_object: true
+          regexp: '^\{"(str_field|int_field|dict_field)":.+$'
+
+
 - get_import_export_storage_types:
 
   - /api/storages/types:

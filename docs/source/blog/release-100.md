@@ -1,7 +1,7 @@
 ---
 title: Announcing Label Studio v1.0
 type: blog
-image: /images/release-100/announcment.png
+image: /images/release-100/announcement.png
 order: 97
 ---
 

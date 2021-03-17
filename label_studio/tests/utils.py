@@ -67,27 +67,33 @@ def gcs_client_mock():
     File = namedtuple('File', ['name'])
 
     class DummyGCSBlob:
-        def __init__(self, bucket_name, key):
+        def __init__(self, bucket_name, key, is_json):
             self.key = key
             self.bucket_name = bucket_name
+            self.is_json = is_json
         def download_as_string(self):
-            return f'test_blob_{self.key}'
+            data = f'test_blob_{self.key}'
+            if self.is_json:
+                return json.dumps({'str_field': data, 'int_field': 123, 'dict_field': {'one': 'wow', 'two': 456}})
+            return data
         def upload_from_string(self, string):
             print(f'String {string} uploaded to bucket {self.bucket_name}')
         def generate_signed_url(self, **kwargs):
             return f'https://storage.googleapis.com/{self.bucket_name}/{self.key}'
 
     class DummyGCSBucket:
-        def __init__(self, bucket_name, **kwargs):
+        def __init__(self, bucket_name, is_json, **kwargs):
             self.name = bucket_name
+            self.is_json = is_json
         def list_blobs(self, prefix):
             return [File('abc'), File('def'), File('ghi')]
         def blob(self, key):
-            return DummyGCSBlob(self.name, key)
+            return DummyGCSBlob(self.name, key, self.is_json)
 
     class DummyGCSClient():
         def get_bucket(self, bucket_name):
-            return DummyGCSBucket(bucket_name)
+            is_json = bucket_name.endswith('_JSON')
+            return DummyGCSBucket(bucket_name, is_json)
 
     with mock.patch.object(google_storage, 'Client', return_value=DummyGCSClient()):
         yield
