@@ -4,6 +4,7 @@ import logging
 import json
 import socket
 import google.auth
+import re
 
 from google.auth import compute_engine
 from google.cloud import storage as google_storage
@@ -58,9 +59,15 @@ class GCSImportStorage(ImportStorage, GCSStorageMixin):
         bucket = self.get_bucket()
         files = bucket.list_blobs(prefix=self.prefix)
         prefix = str(self.prefix) if self.prefix else ''
+        regex = re.compile(str(self.regex_filter)) if self.regex_filter else None
+
         for file in files:
             if file.name != (prefix.rstrip('/') + '/'):
-                yield file.name
+                key = file.name
+                if regex and not regex.match(key):
+                    logger.debug(key + ' is skipped by regex filter')
+                    continue
+                yield key
 
     def get_data(self, key):
         if self.use_blob_urls:
