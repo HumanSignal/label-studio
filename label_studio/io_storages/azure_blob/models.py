@@ -84,7 +84,7 @@ class AzureBlobImportStorage(ImportStorage, AzureBlobStorageMixin):
     def get_data(self, key):
         if self.use_blob_urls:
             data_key = settings.DATA_UNDEFINED_NAME
-            return {data_key: f'{url_scheme}://{self.container}/{key}'}
+            return {data_key: f'{url_scheme}://{self.container}/{key["name"]}'}
 
         container = self.get_container()
         blob = container.download_blob(key)
