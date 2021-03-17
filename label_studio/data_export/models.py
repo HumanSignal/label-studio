@@ -81,7 +81,7 @@ class DataExport(object):
             converter.convert(input_json, tmp_dir, output_format, is_dir=False)
             files = get_all_files_from_dir(tmp_dir)
             # if only one file is exported - no need to create archive
-            if len(files) == 1:
+            if len(os.listdir(tmp_dir)) == 1:
                 output_file = files[0]
                 ext = os.path.splitext(output_file)[-1]
                 content_type = f'application/{ext}'
