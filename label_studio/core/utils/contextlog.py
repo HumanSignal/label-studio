@@ -40,11 +40,6 @@ class ContextLog(object):
             user_id = str(uuid4())
             with io.open(user_id_file, mode='w') as fout:
                 fout.write(user_id)
-            if self.collect_analytics:
-                try:
-                    mp.people_set(user_id, {'$name': user_id, 'app': 'label-studio', 'version': self.version})
-                except:
-                    pass
         else:
             with io.open(user_id_file) as f:
                 user_id = f.read()

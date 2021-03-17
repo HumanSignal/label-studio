@@ -56,6 +56,8 @@ class ImportStorage(Storage):
     def resolve_task_data_uri(self, task_data):
         out = {}
         for key, data in task_data.items():
+            if not isinstance(data, str):
+                out[key] = data
             resolved_uri = self.resolve_uri(data)
             if resolved_uri:
                 out[key] = resolved_uri
