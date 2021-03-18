@@ -136,7 +136,7 @@ class AzureBlobExportStorage(ExportStorage, AzureBlobStorageMixin):
             link = AzureBlobExportStorageLink.create(annotation, self)
             try:
                 blob = container.get_blob_client(link.key)
-                blob.upload_blob(json.dumps(ser_annotation))
+                blob.upload_blob(json.dumps(ser_annotation), overwrite=True)
             except Exception as exc:
                 logger.error(f"Can't export annotation {annotation} to Azure storage {self}. Reason: {exc}", exc_info=True)
 
