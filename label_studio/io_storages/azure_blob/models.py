@@ -8,12 +8,16 @@ from urllib.parse import urlparse
 from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
+from django.dispatch import receiver
+from django.db.models.signals import post_save
 
 from azure.storage.blob import BlobServiceClient, generate_blob_sas, BlobSasPermissions
+from django.dispatch import receiver
 from core.utils.common import get_env
 from io_storages.base_models import ImportStorage, ImportStorageLink, ExportStorage, ExportStorageLink
 from io_storages.utils import get_uri_via_regex
 from tasks.serializers import AnnotationSerializer
+from tasks.models import Annotation
 
 
 logger = logging.getLogger(__name__)
@@ -135,6 +139,15 @@ class AzureBlobExportStorage(ExportStorage, AzureBlobStorageMixin):
                 blob.upload_blob(json.dumps(ser_annotation))
             except Exception as exc:
                 logger.error(f"Can't export annotation {annotation} to Azure storage {self}. Reason: {exc}", exc_info=True)
+
+
+@receiver(post_save, sender=Annotation)
+def export_annotation_to_azure_storages(sender, instance, **kwargs):
+    project = instance.task.project
+    if hasattr(project, 'io_storages_azureblobexportstorages'):
+        for storage in project.io_storages_azureblobexportstorages.all():
+            logger.debug(f'Export {instance} to Azure Blob storage {storage}')
+            storage.save_annotation(instance)
 
 
 class AzureBlobImportStorageLink(ImportStorageLink):
