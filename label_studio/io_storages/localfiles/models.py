@@ -44,7 +44,8 @@ class LocalFilesImportStorage(ImportStorage, LocalFilesMixin):
     def get_data(self, key):
         if self.use_blob_urls:
             # include self-hosted links pointed to local resources via /data/filename?d=<path/to/local/dir>
-            return {settings.DATA_UNDEFINED_NAME: f'/data?d={key}'}
+            path = str(Path(self.path) / key)
+            return {settings.DATA_UNDEFINED_NAME: f'/data?d={path}'}
         with open(key) as f:
             value = json.load(f)
         if not isinstance(value, dict):
