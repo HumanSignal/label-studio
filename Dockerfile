@@ -17,7 +17,7 @@ RUN pip3 install --upgrade pip
 RUN pip3 install -r requirements.txt
 
 ENV DJANGO_SETTINGS_MODULE=core.settings.label_studio
-ENV LABEL_STUDIO_BASE_DATA_DIR=/label-studio/xxx
+# ENV BASE_DATA_DIR=/label-studio/
 
 docker run -v outside:/some
 
