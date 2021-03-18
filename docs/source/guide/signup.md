@@ -6,6 +6,7 @@ order: 103
 
 Sign up and create an account for Label Studio to start labeling data and setting up projects. 
 
+Everyone with an account in Label Studio has access to the same functionality. 
 
 ## Create an account
 

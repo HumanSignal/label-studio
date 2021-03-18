@@ -9,7 +9,7 @@ Get data into Label Studio by importing files, referencing URLs, or syncing with
 - If your data is stored in a cloud storage bucket, see [Sync data from cloud or database storage](storage.html).
 - If your data is stored in a Redis database, see [Sync data from cloud or database storage](storage.html).
 - If your data is stored at internet-accessible URLs, in files, or directories, [import it from the Label Studio UI](#Import-data-from-the-Label-Studio-UI).
-- If your data contains predictions or pre-annotations, see [Import predicted labels into Label Studio](predictions.html).
+- If your data contains predictions or pre-annotations, see [Import pre-annotated data into Label Studio](predictions.html).
 
 ## Types of data you can import into Label Studio
 

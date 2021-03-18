@@ -1,5 +1,5 @@
 ---
-title: Sync data from cloud or redis
+title: Sync data from cloud or Redis storage
 type: guide
 order: 302
 ---
@@ -11,11 +11,10 @@ Set up the following cloud and other storage systems with Label Studio:
 - [Google Cloud Storage](#Google-Cloud-Storage)
 - [Microsoft Azure Blob storage](#Microsoft-Azure-Blob-storage)
 - [Redis database](#Redis-database)
-- [PostgreSQL database](#PostgreSQL-database)
 
 Each source and target storage setup is project-specific. You can connect multiple buckets as source or target storage for a project. 
 
-The connection to both source and target storage buckets is synced, so you can see new tasks after uploading them to the bucket without restarting Label Studio. 
+If you upload new data to a connected cloud storage bucket, sync the storage connection to add the new labeling tasks to Label Studio without restarting. 
 
 > Note: Choose your target storage carefully. When you start the labeling project, it must be empty or contain annotations that match previously created or imported tasks from source storage. Tasks are synced with annotations based on internal IDs, so if you accidentally connect to target storage with existing annotations with the same IDs, the connection might fail with undefined behavior.  
 

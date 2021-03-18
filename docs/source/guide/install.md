@@ -117,12 +117,12 @@ If you customized the Label Studio Frontend, see the [Frontend reference guide](
 
 
 
-## Database
+## Database storage
+Label Studio uses a database to store project data and configuration information. 
 
 ### SQLite database
 
-Label Studio uses SQLite by default. You don't need to configure anything. Label Studio stores all data in a single file in the specified directory of the admin user. 
-
+Label Studio uses SQLite by default. You don't need to configure anything. Label Studio stores all data in a single file in the specified directory of the admin user. After you [start Label Studio](start.html), the directory used is printed in the terminal. 
 
 ### PostgreSQL database
 
