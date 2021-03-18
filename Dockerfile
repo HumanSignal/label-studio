@@ -19,8 +19,6 @@ RUN pip3 install -r requirements.txt
 ENV DJANGO_SETTINGS_MODULE=core.settings.label_studio
 # ENV BASE_DATA_DIR=/label-studio/
 
-docker run -v outside:/some
-
 COPY . /label-studio
 RUN python3.8 setup.py develop
 RUN cd label_studio && python3.8 manage.py migrate
