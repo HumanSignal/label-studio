@@ -17,7 +17,7 @@ RUN pip3 install --upgrade pip
 RUN pip3 install -r requirements.txt
 
 ENV DJANGO_SETTINGS_MODULE=core.settings.label_studio
-# ENV BASE_DATA_DIR=/label-studio/
+ENV LABEL_STUDIO_BASE_DATA_DIR=/label-studio/data
 
 COPY . /label-studio
 RUN python3.8 setup.py develop

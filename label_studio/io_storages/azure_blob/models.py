@@ -14,7 +14,7 @@ from django.db.models.signals import post_save
 
 from azure.storage.blob import BlobServiceClient, generate_blob_sas, BlobSasPermissions
 from django.dispatch import receiver
-from core.utils.common import get_env
+from core.utils.params import get_env
 from io_storages.base_models import ImportStorage, ImportStorageLink, ExportStorage, ExportStorageLink
 from io_storages.utils import get_uri_via_regex
 from tasks.serializers import AnnotationSerializer

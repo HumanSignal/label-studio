@@ -465,16 +465,6 @@ def get_attr_or_item(obj, key):
         raise KeyError(f"Can't get attribute or dict key '{key}' from {obj}")
 
 
-def get_env(name, default=None, is_bool=False):
-    for env_key in ['HEARTEX_' + name, 'LABEL_STUDIO_' + name, name]:
-        value = os.environ.get(name)
-        if value is not None:
-            if is_bool:
-                return get_bool_env(env_key, default)
-            else:
-                return value
-
-
 def datetime_to_timestamp(dt):
     if dt.tzinfo:
         dt = dt.astimezone(pytz.UTC)

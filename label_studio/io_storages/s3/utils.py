@@ -6,7 +6,7 @@ import boto3
 
 from botocore.exceptions import ClientError
 from urllib.parse import urlparse
-from core.utils.common import get_env
+from core.utils.params import get_env
 
 
 logger = logging.getLogger(__name__)

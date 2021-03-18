@@ -22,8 +22,9 @@ from django.dispatch import receiver, Signal
 
 from model_utils import FieldTracker
 
-from core.utils.common import get_env, find_first_one_to_one_related_field_by_prefix
+from core.utils.common import find_first_one_to_one_related_field_by_prefix
 from core.utils.common import string_is_url
+from core.utils.params import get_env
 from data_manager.managers import PreparedTaskManager
 
 logger = logging.getLogger(__name__)

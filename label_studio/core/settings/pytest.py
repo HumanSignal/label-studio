@@ -3,7 +3,7 @@
 # blog/ci.py
 from core.settings.base import *
 
-DJANGO_DB = os.environ.get('DJANGO_DB', 'default')
+DJANGO_DB = get_env('DJANGO_DB', 'default')
 DATABASES = {'default': DATABASES_ALL[DJANGO_DB]}
 
 ADD_DEFAULT_ML_BACKENDS = False
@@ -11,9 +11,9 @@ ADD_DEFAULT_ML_BACKENDS = False
 CACHES = {
     'default': {
         'BACKEND': 'redis_cache.RedisCache',
-        'LOCATION': os.environ.get('REDIS_LOCATION', 'localhost:6379'),
+        'LOCATION': get_env('REDIS_LOCATION', 'localhost:6379'),
         'OPTIONS': {
-            'SOCKET_TIMEOUT': int(os.environ.get('REDIS_SOCKET_TIMEOUT', '36000')),
+            'SOCKET_TIMEOUT': int(get_env('REDIS_SOCKET_TIMEOUT', '36000')),
             'CONNECTION_POOL_CLASS': 'redis.ConnectionPool',
             'CONNECTION_POOL_CLASS_KWARGS': {}
         }

@@ -12,10 +12,10 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 import os
 
 from core.utils.io import get_data_dir
-from core.utils.params import get_bool_env
+from core.utils.params import get_bool_env, get_env
 
 # Hostname is used for proper path generation to the resources, pages, etc
-HOSTNAME = os.environ.get('HOST', '')
+HOSTNAME = get_env('HOST', '')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '$(fefwefwef13;LFK{P!)@#*!)kdsjfWF2l+i5e3t(8a1n'
@@ -27,23 +27,24 @@ DEBUG = get_bool_env('DEBUG', True)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Base path for media root and other uploaded files
-BASE_DATA_DIR = os.environ.get('BASE_DATA_DIR', get_data_dir())
-print('Data base and media directory: ', BASE_DATA_DIR)
+BASE_DATA_DIR = get_env('BASE_DATA_DIR', get_data_dir())
+os.makedirs(BASE_DATA_DIR, exist_ok=True)
+print('=> Database and media directory: ', BASE_DATA_DIR, '\n')
 
 # Databases
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 DJANGO_DB_SQLITE = 'sqlite'
 DJANGO_DB = 'default'
 DATABASE_NAME_DEFAULT = os.path.join(BASE_DATA_DIR, 'label_studio.sqlite3')
-DATABASE_NAME = os.environ.get('DATABASE_NAME', DATABASE_NAME_DEFAULT)
+DATABASE_NAME = get_env('DATABASE_NAME', DATABASE_NAME_DEFAULT)
 DATABASES_ALL = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'USER': os.environ.get('POSTGRE_USER', 'postgres'),
-        'PASSWORD': os.environ.get('POSTGRE_PASSWORD', 'postgres'),
-        'NAME': os.environ.get('POSTGRE_NAME', 'postgres'),
-        'HOST': os.environ.get('POSTGRE_HOST', 'localhost'),
-        'PORT': int(os.environ.get('POSTGRE_PORT', '5432')),
+        'USER': get_env('POSTGRE_USER', 'postgres'),
+        'PASSWORD': get_env('POSTGRE_PASSWORD', 'postgres'),
+        'NAME': get_env('POSTGRE_NAME', 'postgres'),
+        'HOST': get_env('POSTGRE_HOST', 'localhost'),
+        'PORT': int(get_env('POSTGRE_PORT', '5432')),
     },
     DJANGO_DB_SQLITE: {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -53,7 +54,7 @@ DATABASES_ALL = {
         }
     }
 }
-DATABASES = {'default': DATABASES_ALL.get(os.environ.get('DJANGO_DB', 'default'))}
+DATABASES = {'default': DATABASES_ALL.get(get_env('DJANGO_DB', 'default'))}
 
 LOGGING = {
     'version': 1,
@@ -72,11 +73,11 @@ LOGGING = {
     },
     'handlers': {
         'console_raw': {
-            'level': os.environ.get('LOG_LEVEL', 'DEBUG'),
+            'level': get_env('LOG_LEVEL', 'DEBUG'),
             'class': 'logging.StreamHandler',
         },
         'console': {
-            'level': os.environ.get('LOG_LEVEL', 'DEBUG'),
+            'level': get_env('LOG_LEVEL', 'DEBUG'),
             'class': 'logging.StreamHandler',
             'formatter': 'standard'
         },
@@ -243,7 +244,6 @@ SWAGGER_SETTINGS = {
 }
 
 SENTRY_FE = None
-MIXPANEL_TOKEN = None
 
 ROOT_URLCONF = 'core.urls'
 WSGI_APPLICATION = 'core.wsgi.application'
@@ -269,9 +269,9 @@ STATICFILES_FINDERS = (
 STATICFILES_STORAGE = 'core.storage.SkipMissedManifestStaticFilesStorage'
 
 # Sessions and CSRF
-SESSION_COOKIE_SECURE = bool(int(os.environ.get('SESSION_COOKIE_SECURE', True)))
-CSRF_COOKIE_SECURE = bool(int(os.environ.get('CSRF_COOKIE_SECURE', SESSION_COOKIE_SECURE)))
-CSRF_COOKIE_HTTPONLY = bool(int(os.environ.get('CSRF_COOKIE_HTTPONLY', SESSION_COOKIE_SECURE)))
+SESSION_COOKIE_SECURE = bool(int(get_env('SESSION_COOKIE_SECURE', True)))
+CSRF_COOKIE_SECURE = bool(int(get_env('CSRF_COOKIE_SECURE', SESSION_COOKIE_SECURE)))
+CSRF_COOKIE_HTTPONLY = bool(int(get_env('CSRF_COOKIE_HTTPONLY', SESSION_COOKIE_SECURE)))
 
 # user media files
 MEDIA_ROOT = os.path.join(BASE_DATA_DIR, 'media')
@@ -285,12 +285,12 @@ EXPORT_URL_ROOT = '/export/'
 os.makedirs(EXPORT_DIR, exist_ok=True)
 
 # file / task size limits
-DATA_UPLOAD_MAX_MEMORY_SIZE = int(os.environ.get('DATA_UPLOAD_MAX_MEMORY_SIZE', 50 * 1024 * 1024))
+DATA_UPLOAD_MAX_MEMORY_SIZE = int(get_env('DATA_UPLOAD_MAX_MEMORY_SIZE', 50 * 1024 * 1024))
 TASKS_MAX_NUMBER = 250000
 TASKS_MAX_FILE_SIZE = DATA_UPLOAD_MAX_MEMORY_SIZE
 
-TASK_LOCK_TTL = int(os.environ.get('TASK_LOCK_TTL')) if os.environ.get('TASK_LOCK_TTL') else None
-TASK_LOCK_DEFAULT_TTL = int(os.environ.get('TASK_LOCK_DEFAULT_TTL', 3600))
+TASK_LOCK_TTL = int(get_env('TASK_LOCK_TTL')) if get_env('TASK_LOCK_TTL') else None
+TASK_LOCK_DEFAULT_TTL = int(get_env('TASK_LOCK_DEFAULT_TTL', 3600))
 
 # Email backend
 FROM_EMAIL = 'Label Studio <hello@labelstud.io>'
