@@ -46,13 +46,6 @@ class _TestJob(object):
 
 
 @contextmanager
-def mixpanel_mock():
-    from mixpanel import Mixpanel, MixpanelException
-    with mock.patch.object(Mixpanel, 'people_set'):
-        yield
-
-
-@contextmanager
 def email_mock():
     from django.core.mail import EmailMultiAlternatives
     with mock.patch.object(EmailMultiAlternatives, 'send'):
@@ -121,11 +114,7 @@ def make_task(config, project):
 
 
 def create_business(user):
-    if Business:
-        with mixpanel_mock(), email_mock():
-            business = Business.objects.create(admin=user, is_approved=True, is_active=True)
-            business.plan = BillingPlan.objects.get(ptype=BillingPlan.ENTERPRISE_V1)
-            business.save()
+    return None
 
 
 def make_annotation(config, task_id):

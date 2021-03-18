@@ -17,6 +17,7 @@ from io_storages.azure_blob.models import AzureBlobImportStorage, AzureBlobExpor
 from io_storages.s3.models import S3ImportStorage, S3ExportStorage
 from io_storages.redis.models import RedisImportStorage, RedisExportStorage
 from ml.models import MLBackend
+from core.utils.params import get_env
 
 
 @contextlib.contextmanager
@@ -221,7 +222,7 @@ def _migrate_ml_backends(project, config):
 def _migrate_uploaded_files(project, project_path):
     """Migrate files uploaded by user"""
     source_upload_path = project_path / 'upload'
-    target_upload_path = pathlib.Path(os.environ.get('LABEL_STUDIO_BASE_DATA_DIR', get_data_dir())) / 'upload'
+    target_upload_path = pathlib.Path(get_env('LABEL_STUDIO_BASE_DATA_DIR', get_data_dir())) / 'upload'
     if not target_upload_path.exists():
         os.makedirs(str(target_upload_path), exist_ok=True)
 

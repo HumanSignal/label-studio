@@ -182,8 +182,9 @@ class S3ExportStorage(S3StorageMixin, ExportStorage):
         with transaction.atomic():
             # Create export storage link
             link = S3ExportStorageLink.create(annotation, self)
+            key = str(self.prefix) + '/' + link.key if self.prefix else link.key
             try:
-                s3.Object(self.bucket, link.key).put(Body=ser_annotation)
+                s3.Object(self.bucket, key).put(Body=json.dumps(ser_annotation))
             except Exception as exc:
                 logger.error(f"Can't export annotation {annotation} to S3 storage {self}. Reason: {exc}", exc_info=True)
 
@@ -191,8 +192,8 @@ class S3ExportStorage(S3StorageMixin, ExportStorage):
 @receiver(post_save, sender=Annotation)
 def export_annotation_to_s3_storages(sender, instance, **kwargs):
     project = instance.task.project
-    if hasattr(project, 'storages_s3exportstorages'):
-        for storage in project.storages_s3exportstorages.all():
+    if hasattr(project, 'io_storages_s3exportstorages'):
+        for storage in project.io_storages_s3exportstorages.all():
             logger.debug(f'Export {instance} to S3 storage {storage}')
             storage.save_annotation(instance)
 

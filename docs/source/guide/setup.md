@@ -109,7 +109,7 @@ If you want to specify a labeling configuration for your project without using t
 You can define the labeling configuration in a `config.xml` file and initialize a specific project in Label Studio with that file. 
 
 ```bash
-label-studio my_new_project start --init --label-config config.xml
+label-studio my_new_project start --label-config config.xml
 ```
 
 ### Add a labeling config with the API

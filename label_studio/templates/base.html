@@ -72,7 +72,7 @@
 </template>
 
 <script id="app-settings">
-  window.APP_SETTINGS = {
+  window.APP_SETTINGS = Object.assign({
     user: {
       username: "{{user.username}}",
       firstName: "{{user.first_name}}",
@@ -85,8 +85,7 @@
     },
     debug: {{settings.DEBUG|yesno:"true,false"}},
     hostname: "{{settings.HOSTNAME}}",
-    ...{% block frontend_settings %}{}{% endblock %}
-  };
+  }, {% block frontend_settings %}{}{% endblock %});
 </script>
 
 <script src="{{settings.HOSTNAME}}/react-app/index.js?v={{ versions.backend.commit }}"></script>

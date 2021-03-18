@@ -488,9 +488,9 @@ class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
     serializer_class = ProjectLabelConfigSerializer
     queryset = Project.objects.all()
 
-    @swagger_auto_schema(tags=['Projects'], operation_summary='Validate a label config for a project.', manual_parameters=[
-        openapi.Parameter(name='label_config', type=openapi.TYPE_STRING, in_=openapi.IN_QUERY,
-                          description='labeling config')])
+    @swagger_auto_schema(tags=['Projects'], operation_summary='Validate a label config', manual_parameters=[
+                            openapi.Parameter(name='label_config', type=openapi.TYPE_STRING, in_=openapi.IN_QUERY,
+                                              description='labeling config')])
     def get(self, request, *args, **kwargs):
         project = self.get_object()
         label_config = self.request.query_params.get('label_config')

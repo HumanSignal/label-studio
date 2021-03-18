@@ -1,5 +1,5 @@
 ---
-title: Create accounts for Label Studio
+title: Create user accounts for Label Studio
 type: guide
 order: 103
 ---
@@ -18,7 +18,7 @@ Accounts that you create are stored locally on the Label Studio server, and allo
 
 If you want, you can create an account from the command line when you start Label Studio.
 ```bash
-label-studio start <project-name> --init --username <username> --password <password>
+label-studio start --username <username> --password <password>
 ```
 
 ## Invite collaborators to a project
