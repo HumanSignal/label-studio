@@ -3071,11 +3071,9 @@ body {
 .ls-storage-settings__info_valid {
   color: rgba(0,0,0,0.4);
 }
-.ls-storage-settings__summary {
-  margin-bottom: 16px;
-}
 .ls-storage-settings__sync {
   display: flex;
+  margin-top: 16px;
   justify-content: flex-start;
   align-items: center;
 }

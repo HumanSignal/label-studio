@@ -1,4 +1,4 @@
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { FaEllipsisV } from "react-icons/fa";
 import { Button, Card, Dropdown, Menu } from "../../../components";
 import { Space } from "../../../components/Space/Space";
@@ -31,6 +31,10 @@ export const StorageCard = ({rootClass, target, storage, onEditStorage, onDelete
     setSyncing(false);
   }, [storage]);
 
+  useEffect(() => {
+    setStorageData(storage);
+  }, [storage]);
+
   return (
     <Card
       header={storageData.title ?? `Untitled ${storageData.type}`}
@@ -45,20 +49,27 @@ export const StorageCard = ({rootClass, target, storage, onEditStorage, onDelete
         </Dropdown.Trigger>
       )}
     >
-      <StorageSummary storage={storageData} className={rootClass.elem('summary')}/>
-      <div className={rootClass.elem('sync')}>
-        <Space size="small">
-          <Button waiting={syncing} onClick={startSync}>
-            Sync Storage
-          </Button>
+      <StorageSummary
+        storage={storageData}
+        enableLastSync={target !== 'export'}
+        className={rootClass.elem('summary')}
+      />
 
-          {synced !== null ? (
-            <div className={rootClass.elem('sync-count')}>
-              Synced {synced} task(s)
-            </div>
-          ) : null}
-        </Space>
-      </div>
+      {target !== 'export' && (
+        <div className={rootClass.elem('sync')}>
+          <Space size="small">
+            <Button waiting={syncing} onClick={startSync}>
+              Sync Storage
+            </Button>
+
+            {synced !== null ? (
+              <div className={rootClass.elem('sync-count')}>
+                Synced {synced} task(s)
+              </div>
+            ) : null}
+          </Space>
+        </div>
+      )}
     </Card>
   );
 };
