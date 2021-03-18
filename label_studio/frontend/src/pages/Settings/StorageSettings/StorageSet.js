@@ -37,9 +37,9 @@ export const StorageSet = ({title, target, rootClass, buttonLabel}) => {
     }
 
     setLoading(false);
-  }, [project.id]);
+  }, [project]);
 
-  const onAddStoragePress = useCallback((storage) => {
+  const showStorageFormModal = useCallback((storage) => {
     const action = storage ? "Edit" : "Add";
     const actionTarget = target === 'export' ? 'Target' : 'Source';
     const title = `${action} ${actionTarget} Storage`;
@@ -55,8 +55,9 @@ export const StorageSet = ({title, target, rootClass, buttonLabel}) => {
           storage={storage}
           project={project.id}
           rootClass={rootClass}
-          onSubmit={() => {
-            fetchStorages().then(() => modalRef.close());
+          onSubmit={async () => {
+            await fetchStorages();
+            modalRef.close();
           }}
         />
       ),
@@ -68,11 +69,11 @@ export const StorageSet = ({title, target, rootClass, buttonLabel}) => {
         </>
       ),
     });
-  }, [project.id]);
+  }, [project, fetchStorages, target, formRef, rootClass]);
 
   const onEditStorage = useCallback(async (storage) => {
-    onAddStoragePress(storage);
-  }, []);
+    showStorageFormModal(storage);
+  }, [showStorageFormModal]);
 
   const onDeleteStorage = useCallback(async (storage) => {
     confirm({
@@ -100,7 +101,7 @@ export const StorageSet = ({title, target, rootClass, buttonLabel}) => {
   return (
     <Columns.Column title={title}>
       <div className={rootClass.elem("controls")}>
-        <Button onClick={() => onAddStoragePress()}>
+        <Button onClick={() => showStorageFormModal()}>
           {buttonLabel}
         </Button>
       </div>

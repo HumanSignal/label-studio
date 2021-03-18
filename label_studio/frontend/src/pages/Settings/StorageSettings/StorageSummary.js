@@ -3,16 +3,18 @@ import React from 'react';
 import { DescriptionList } from '../../../components/DescriptionList/DescriptionList';
 import { Oneof } from '../../../components/Oneof/Oneof';
 
-export const StorageSummary = ({storage, className}) => {
+export const StorageSummary = ({storage, className, enableLastSync = false}) => {
   return (
     <div className={className}>
       <DescriptionList>
         <Oneof value={storage.type}>
           <SummaryS3 case="s3" storage={storage}/>
         </Oneof>
-        <DescriptionList.Item term="Last Sync">
-          {storage.last_sync ? format(new Date(storage.last_sync), 'MMMM dd, yyyy ∙ HH:mm:ss') : "Never synced"}
-        </DescriptionList.Item>
+        {enableLastSync && (
+          <DescriptionList.Item term="Last Sync">
+            {storage.last_sync ? format(new Date(storage.last_sync), 'MMMM dd, yyyy ∙ HH:mm:ss') : "Never synced"}
+          </DescriptionList.Item>
+        )}
       </DescriptionList>
     </div>
   );

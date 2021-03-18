@@ -6,6 +6,7 @@ redis_params: &redis_params
   - type: password
     name: password
     label: Password
+    autoComplete: "new-password"
   - type: text
     name: host
     label: Host

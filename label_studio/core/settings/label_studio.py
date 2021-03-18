@@ -2,7 +2,7 @@
 """
 from core.settings.base import *
 
-DJANGO_DB = os.environ.get('DJANGO_DB', DJANGO_DB_SQLITE)
+DJANGO_DB = get_env('DJANGO_DB', DJANGO_DB_SQLITE)
 DATABASES = {'default': DATABASES_ALL[DJANGO_DB]}
 
 MIDDLEWARE.remove('organizations.middleware.GetSessionMiddleware')
@@ -11,7 +11,7 @@ MIDDLEWARE.append('core.middleware.UpdateLastActivityMiddleware')
 
 ADD_DEFAULT_ML_BACKENDS = False
 
-LOGGING['root']['level'] = os.environ.get('LOG_LEVEL', 'DEBUG')
+LOGGING['root']['level'] = get_env('LOG_LEVEL', 'DEBUG')
 
 DEBUG = get_bool_env('DEBUG', False)
 

@@ -1,8 +1,9 @@
 import React from 'react';
 import { ApiContext } from '../../providers/ApiProvider';
+import { Block } from '../../utils/bem';
 import { ErrorWrapper } from './Error';
 
-export const InlineError = ({children, includeValidation}) => {
+export const InlineError = ({children, includeValidation, className, style}) => {
   const context = React.useContext(ApiContext);
 
   React.useEffect(() => {
@@ -10,12 +11,12 @@ export const InlineError = ({children, includeValidation}) => {
   }, [context]);
 
   return context.error ? (
-    <div className="inline-error">
+    <Block name="inline-error" mix={className} style={style}>
       <ErrorWrapper
         possum={false}
         {...context.errorFormatter(context.error, {includeValidation})}
       />
       {children}
-    </div>
+    </Block>
   ) : null;
 };

@@ -16,7 +16,7 @@ You can convert the raw JSON completed annotations stored by Label Studio into a
 
 ## Export formats supported by Label Studio
 
-Label Studio supports many common and standard formats for exporting completed labeling tasks. If you don't see a format that works for you, you can contribute one. See the [Github repository for the Label Studio Converter tool](https://github.com/heartexlabs/label-studio-converter).
+Label Studio supports many common and standard formats for exporting completed labeling tasks. If you don't see a format that works for you, you can contribute one. See the [GitHub repository for the Label Studio Converter tool](https://github.com/heartexlabs/label-studio-converter).
 
 ### JSON
 

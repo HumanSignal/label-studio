@@ -465,16 +465,6 @@ def get_attr_or_item(obj, key):
         raise KeyError(f"Can't get attribute or dict key '{key}' from {obj}")
 
 
-def get_env(name, default=None, is_bool=False):
-    for env_key in [name, 'HEARTEX_' + name, 'LABEL_STUDIO_' + name]:
-        value = os.environ.get(name)
-        if value is not None:
-            if is_bool:
-                return get_bool_env(env_key, default)
-            else:
-                return value
-
-
 def datetime_to_timestamp(dt):
     if dt.tzinfo:
         dt = dt.astimezone(pytz.UTC)
@@ -611,6 +601,7 @@ def collect_versions(force=False):
     result = {
         'package': {
             'version': label_studio.__version__,
+            'short_version': '.'.join(label_studio.__version__.split('.')[:2]),
             'latest_version_from_pypi': label_studio.__latest_version__,
             'latest_version_upload_time': label_studio.__latest_version_upload_time__,
             'current_version_is_outdated': label_studio.__current_version_is_outdated__

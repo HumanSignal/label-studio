@@ -4,11 +4,27 @@ type: guide
 order: 905
 ---
 
+Label Studio Frontend (LSF) includes a number of UI options and callbacks that you can use when implementing the frontend with a custom labeling backend, or when customizing the Label Studio interface.
+
+## Updates to LSF in version 1.0.0 
+LSF version 1.0.0 is not compatible with earlier versions of Label Studio. If you use LSF with a custom backend, you must make changes to the API callbacks that you use as follows:
+
+| Callback in 0.9.1 and earlier | Renamed callback in 1.0.0 |
+| --- | --- |
+| onSubmitCompletion | onSubmitAnnotation |
+| onUpdateCompletion | onUpdateAnnotation |
+| onDeleteCompletion | onDeleteAnnotation | 
+
+If you rely on specific formatting of Label Studio completed tasks, [Label Studio's annotation format](/guide/export.html#Raw-JSON-format-of-completed-tasks) has also been updated. 
+
+## Implement the Label Studio Frontend
+
+
 ```javascript
 var labelStudio = new LabelStudio('editor', options);
 ```
 
-The following options are recognized when initializing a **Label Studio** instance version earlier than 1.0.0. 
+The following options are recognized when initializing a Label Studio instance version 1.0.0.
 
 ## Options
 
@@ -30,9 +46,9 @@ Collection of UI elements to show:
 
 ```javascript
 [
-    "completions:add-new",
-    "completions:delete",
-    "completions:menu",
+    "annotations:add-new",
+    "annotations:delete",
+    "annotations:menu",
     "controls",
     "panel",
     "predictions:menu",
@@ -43,9 +59,9 @@ Collection of UI elements to show:
 ]
 ```
 
-- `completions:add-new` - show add new annotations button
-- `completions:delete` - show delete current annotation button
-- `completions:menu` - show annotations menu
+- `annotations:add-new` - show add new annotations button
+- `annotations:delete` - show delete current annotation button
+- `annotations:menu` - show annotations menu
 - `controls` - enable panel with controls (submit, update, skip)
 - `panel` - navigation panel for current task with buttons: undo, redo and reset
 - `predictions:menu` - show predictions menu
@@ -100,7 +116,7 @@ Type data: `object`
   data: {
     text: "Labeling text..."
   },
-  completions: [],
+  annotations: [],
   predictions: [],
 }
 ```
@@ -113,7 +129,7 @@ Default: `null`
 
 #### data
 
-#### completions
+#### annotations
 
 Type data: `array`
 
@@ -123,7 +139,7 @@ Array of annotations. See the [annotation documentation](/guide/export.html#Raw-
 
 Type data: `array`
 
-Array of predictions. Similar structure as completions or annotations. See the [annotation documentation](/guide/export.html#Raw-JSON-format-of-completed-tasks) for more information.
+Array of predictions. Similar structure as completions or annotations. See the [annotation documentation](/guide/export.html#Raw-JSON-format-of-completed-tasks) and [guidance for importing predicted labels](predictions.html) for more information.
 
 ### user
 
@@ -153,13 +169,13 @@ Type data: `string`
 
 ## Callbacks
 
-Callbacks can be used to execute actions based on user interaction with the interface. For example, label-studio server uses it to communicate with an API. Pass them along with other options when initiating the instance.
+Callbacks can be used to execute actions based on user interaction with the interface. For example, label-studio server uses callbacks to communicate with an API. Pass them along with other options when initiating the instance.
 
 ### onSubmitAnnotation
 
 Type data: `function`
 
-Called when a button `submit` is pressed. `ls` is label studio instance, `annotation` is value of current annotation.
+Called when the `submit` button is pressed. `ls` is label studio instance, `annotation` is the value of the current annotation.
 
 #### Example
 
@@ -173,12 +189,12 @@ onSubmitAnnotation: function(ls, annotation) {
 
 Type data: `function`
 
-Called when the `update` button is pressed. `ls` is label studio instance, `annotation` is value of current annotation.
+Called when the `update` button is pressed. `ls` is label studio instance, `annotation` is the value of the current annotation.
 
 #### Example
 
 ```javascript
-updateAnnotation: function(ls, annotation) {
+onUpdateAnnotation: function(ls, annotation) {
   console.log(result)
 }
 ```
