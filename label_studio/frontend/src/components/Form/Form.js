@@ -59,6 +59,8 @@ export default class Form extends React.Component {
           action={this.props.action}
           onSubmit={this.onFormSubmitted}
           onChange={this.onFormChanged}
+          autoComplete={this.props.autoComplete}
+          autoSave={this.props.autoSave}
         >
           {this.props.children}
 
