@@ -1,5 +1,5 @@
 ---
-title: Create accounts for Label Studio
+title: Create user accounts for Label Studio
 type: guide
 order: 103
 ---

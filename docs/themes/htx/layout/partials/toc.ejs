@@ -1,5 +1,4 @@
 <ul class="menu-root">
-    <li><h3 class="root"><%- type %></h3></li>
 
   <% site.pages.find({ type: type }).sort('order').each(function (p) { %>
     <% var fileName = p.path.replace(/^.+?\/([\w-]+)\.html/, '$1') %>
