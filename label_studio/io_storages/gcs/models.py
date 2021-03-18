@@ -3,6 +3,7 @@
 import logging
 import json
 import socket
+import re
 import google.auth
 
 from google.auth import compute_engine
@@ -13,10 +14,13 @@ from datetime import datetime, timedelta
 from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
+from django.dispatch import receiver
+from django.db.models.signals import post_save
 
 from io_storages.utils import get_uri_via_regex
 from io_storages.base_models import ImportStorage, ImportStorageLink, ExportStorage, ExportStorageLink
 from tasks.serializers import AnnotationSerializer
+from tasks.models import Annotation
 
 logger = logging.getLogger(__name__)
 url_scheme = 'gs'
@@ -58,9 +62,15 @@ class GCSImportStorage(ImportStorage, GCSStorageMixin):
         bucket = self.get_bucket()
         files = bucket.list_blobs(prefix=self.prefix)
         prefix = str(self.prefix) if self.prefix else ''
+        regex = re.compile(str(self.regex_filter)) if self.regex_filter else None
         for file in files:
-            if file.name != (prefix.rstrip('/') + '/'):
-                yield file.name
+            if file.name == (prefix.rstrip('/') + '/'):
+                continue
+            # check regex pattern filter
+            if regex and not regex.match(file.name):
+                logger.debug(file.name + ' is skipped by regex filter')
+                continue
+            yield file.name
 
     def get_data(self, key):
         if self.use_blob_urls:
@@ -165,6 +175,15 @@ class GCSExportStorage(ExportStorage, GCSStorageMixin):
                 blob.upload_from_string(json.dumps(ser_annotation))
             except Exception as exc:
                 logger.error(f"Can't export annotation {annotation} to GCS storage {self}. Reason: {exc}", exc_info=True)
+
+
+@receiver(post_save, sender=Annotation)
+def export_annotation_to_gcs_storages(sender, instance, **kwargs):
+    project = instance.task.project
+    if hasattr(project, 'io_storages_gcsexportstorages'):
+        for storage in project.io_storages_gcsexportstorages.all():
+            logger.debug(f'Export {instance} to GCS storage {storage}')
+            storage.save_annotation(instance)
 
 
 class GCSImportStorageLink(ImportStorageLink):

@@ -19,10 +19,17 @@ def get_client_and_resource(
     region_name=None,
     s3_endpoint=None
 ):
+    aws_access_key_id = aws_access_key_id or get_env('AWS_ACCESS_KEY_ID')
+    aws_secret_access_key = aws_secret_access_key or get_env('AWS_SECRET_ACCESS_KEY')
+    aws_session_token = aws_session_token or get_env('AWS_SESSION_TOKEN')
+    logger.debug(f'Create boto3 session with '
+                 f'access key id={aws_access_key_id}, '
+                 f'secret key={aws_secret_access_key[:4] + "..." if aws_secret_access_key else None}, '
+                 f'session token={aws_session_token}')
     session = boto3.Session(
-        aws_access_key_id=aws_access_key_id or get_env('AWS_ACCESS_KEY_ID'),
-        aws_secret_access_key=aws_secret_access_key or get_env('AWS_SECRET_ACCESS_KEY'),
-        aws_session_token=aws_session_token or get_env('AWS_SESSION_TOKEN')
+        aws_access_key_id=aws_access_key_id,
+        aws_secret_access_key=aws_secret_access_key,
+        aws_session_token=aws_session_token
     )
     settings = {
         'region_name': region_name or get_env('S3_region') or 'us-east-1'

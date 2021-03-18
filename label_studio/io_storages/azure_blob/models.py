@@ -2,18 +2,23 @@
 """
 import logging
 import json
+import re
 
 from datetime import datetime, timedelta
 from urllib.parse import urlparse
 from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
+from django.dispatch import receiver
+from django.db.models.signals import post_save
 
 from azure.storage.blob import BlobServiceClient, generate_blob_sas, BlobSasPermissions
+from django.dispatch import receiver
 from core.utils.common import get_env
 from io_storages.base_models import ImportStorage, ImportStorageLink, ExportStorage, ExportStorageLink
 from io_storages.utils import get_uri_via_regex
 from tasks.serializers import AnnotationSerializer
+from tasks.models import Annotation
 
 
 logger = logging.getLogger(__name__)
@@ -77,9 +82,17 @@ class AzureBlobImportStorage(ImportStorage, AzureBlobStorageMixin):
         container = self.get_container()
         prefix = str(self.prefix) if self.prefix else ''
         files = container.list_blobs(name_starts_with=prefix)
+        regex = re.compile(str(self.regex_filter)) if self.regex_filter else None
         for file in files:
-            if file.name != (prefix.rstrip('/') + '/'):
-                yield file
+            # skip folder
+            if file.name == (prefix.rstrip('/') + '/'):
+                continue
+            # check regex pattern filter
+            if regex and not regex.match(file.name):
+                logger.debug(file.name + ' is skipped by regex filter')
+                continue
+
+            yield file
 
     def get_data(self, key):
         if self.use_blob_urls:
@@ -132,9 +145,18 @@ class AzureBlobExportStorage(ExportStorage, AzureBlobStorageMixin):
             link = AzureBlobExportStorageLink.create(annotation, self)
             try:
                 blob = container.get_blob_client(link.key)
-                blob.upload_blob(json.dumps(ser_annotation))
+                blob.upload_blob(json.dumps(ser_annotation), overwrite=True)
             except Exception as exc:
                 logger.error(f"Can't export annotation {annotation} to Azure storage {self}. Reason: {exc}", exc_info=True)
+
+
+@receiver(post_save, sender=Annotation)
+def export_annotation_to_azure_storages(sender, instance, **kwargs):
+    project = instance.task.project
+    if hasattr(project, 'io_storages_azureblobexportstorages'):
+        for storage in project.io_storages_azureblobexportstorages.all():
+            logger.debug(f'Export {instance} to Azure Blob storage {storage}')
+            storage.save_annotation(instance)
 
 
 class AzureBlobImportStorageLink(ImportStorageLink):
@@ -143,3 +165,11 @@ class AzureBlobImportStorageLink(ImportStorageLink):
 
 class AzureBlobExportStorageLink(ExportStorageLink):
     storage = models.ForeignKey(AzureBlobExportStorage, on_delete=models.CASCADE, related_name='links')
+
+    @property
+    def key(self):
+        prefix = self.storage.prefix or ''
+        key = str(self.annotation.id)
+        if self.storage.prefix:
+            key = f'{self.storage.prefix}/{key}'
+        return key

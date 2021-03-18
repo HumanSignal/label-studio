@@ -6,8 +6,11 @@ import json
 
 from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
+from django.dispatch import receiver
+from django.db.models.signals import post_save
 from io_storages.base_models import ImportStorage, ImportStorageLink, ExportStorage, ExportStorageLink
 from tasks.serializers import AnnotationSerializer
+from tasks.models import Annotation
 
 logger = logging.getLogger(__name__)
 
@@ -102,6 +105,15 @@ class RedisExportStorage(ExportStorage, RedisStorageMixin):
             # Create export storage link
             link = RedisExportStorageLink.create(annotation, self)
             client.set(link.key, json.dumps(ser_annotation))
+
+
+@receiver(post_save, sender=Annotation)
+def export_annotation_to_s3_storages(sender, instance, **kwargs):
+    project = instance.task.project
+    if hasattr(project, 'io_storages_redisexportstorages'):
+        for storage in project.io_storages_redisexportstorages.all():
+            logger.debug(f'Export {instance} to Redis storage {storage}')
+            storage.save_annotation(instance)
 
 
 class RedisImportStorageLink(ImportStorageLink):
