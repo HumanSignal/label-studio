@@ -75,6 +75,8 @@ Start Label Studio:
 docker-compose up -d
 ```
 
+This starts Label Studio with a PostgreSQL database backend. 
+
 ## Install from source
 
 If you want to use nightly builds or extend the functionality, consider downloading the source code using Git and running Label Studio locally:
@@ -110,6 +112,12 @@ pip install --upgrade label-studio
 ```
 
 Migration scripts run when you upgrade to version 1.0.0 from version 0.9.1 or earlier. 
+
+To make sure an existing project gets migrated, when you [start Label Studio](start.html), run the following command:
+
+```bash
+label-studio start path/to/old/project 
+```
 
 The most important change to be aware of is changes to rename "completions" to "annotations". See the [updated JSON format for completed tasks](export.html#Raw_JSON_format_of_completed_tasks). 
 

@@ -28,7 +28,9 @@ If you don't see a supported data or file type that you want to import, reach ou
 
 ## How to format your data to import it
 
-Label Studio treats different file types different ways. If you want to import multiple types of data to label at the same time, for example, images with captions or audio recordings with transcripts, you must use the [basic Label Studio JSON format](#Basic-Label-Studio-JSON-format). 
+Label Studio treats different file types different ways. 
+
+If you want to import multiple types of data to label at the same time, for example, images with captions or audio recordings with transcripts, you must use the [basic Label Studio JSON format](#Basic-Label-Studio-JSON-format). 
 
 You can also use a CSV file or a JSON list of tasks to point to URLs with the data, rather than directly importing the data if you need to import thousands of files.
 
