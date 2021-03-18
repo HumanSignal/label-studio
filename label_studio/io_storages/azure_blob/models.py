@@ -82,12 +82,14 @@ class AzureBlobImportStorage(ImportStorage, AzureBlobStorageMixin):
         container = self.get_container()
         prefix = str(self.prefix) if self.prefix else ''
         files = container.list_blobs(name_starts_with=prefix)
+        regex = re.compile(str(self.regex_filter)) if self.regex_filter else None
         for file in files:
             # skip folder
             if file.name == (prefix.rstrip('/') + '/'):
                 continue
             # check regex pattern filter
-            if self.regex_filter and not re.match(self.regex_filter, file.name):
+            if regex and not regex.match(file.name):
+                logger.debug(file.name + ' is skipped by regex filter')
                 continue
 
             yield file
