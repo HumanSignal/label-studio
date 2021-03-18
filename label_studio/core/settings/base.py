@@ -27,7 +27,7 @@ DEBUG = get_bool_env('DEBUG', True)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Base path for media root and other uploaded files
-BASE_DATA_DIR = os.environ.get('LABEL_STUDIO_BASE_DATA_DIR', get_data_dir())
+BASE_DATA_DIR = os.environ.get('BASE_DATA_DIR', get_data_dir())
 print('Data base and media directory: ', BASE_DATA_DIR)
 
 # Databases

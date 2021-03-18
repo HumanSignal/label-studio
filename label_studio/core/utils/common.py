@@ -466,7 +466,7 @@ def get_attr_or_item(obj, key):
 
 
 def get_env(name, default=None, is_bool=False):
-    for env_key in [name, 'HEARTEX_' + name, 'LABEL_STUDIO_' + name]:
+    for env_key in ['HEARTEX_' + name, 'LABEL_STUDIO_' + name, name]:
         value = os.environ.get(name)
         if value is not None:
             if is_bool:
