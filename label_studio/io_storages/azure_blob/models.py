@@ -2,6 +2,7 @@
 """
 import logging
 import json
+import re
 
 from datetime import datetime, timedelta
 from urllib.parse import urlparse
@@ -82,8 +83,14 @@ class AzureBlobImportStorage(ImportStorage, AzureBlobStorageMixin):
         prefix = str(self.prefix) if self.prefix else ''
         files = container.list_blobs(name_starts_with=prefix)
         for file in files:
-            if file.name != (prefix.rstrip('/') + '/'):
-                yield file
+            # skip folder
+            if file.name == (prefix.rstrip('/') + '/'):
+                continue
+            # check regex pattern filter
+            if self.regex_filter and not re.match(self.regex_filter, file.name):
+                continue
+
+            yield file
 
     def get_data(self, key):
         if self.use_blob_urls:
@@ -156,3 +163,11 @@ class AzureBlobImportStorageLink(ImportStorageLink):
 
 class AzureBlobExportStorageLink(ExportStorageLink):
     storage = models.ForeignKey(AzureBlobExportStorage, on_delete=models.CASCADE, related_name='links')
+
+    @property
+    def key(self):
+        prefix = self.storage.prefix or ''
+        key = str(self.annotation.id)
+        if self.storage.prefix:
+            key = f'{self.storage.prefix}/{key}'
+        return key
