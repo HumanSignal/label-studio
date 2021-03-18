@@ -2,6 +2,7 @@ wheel
 appdirs==1.4.3
 attr==0.3.1
 attrs>=19.1.0
+pyyaml>=5.3.1
 azure-storage-blob>=12.6.0
 boto==2.49.0
 boto3==1.16.28
@@ -35,7 +36,6 @@ psycopg2-binary==2.8.4
 pydantic==1.7.3
 python_dateutil==2.8.1
 pytz==2019.3
-pyyaml>=5.3.1
 requests>=2.22.0,<3
 rq==1.7.0
 rules==2.2
