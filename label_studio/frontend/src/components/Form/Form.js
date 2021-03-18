@@ -59,6 +59,8 @@ export default class Form extends React.Component {
           action={this.props.action}
           onSubmit={this.onFormSubmitted}
           onChange={this.onFormChanged}
+          autoComplete={this.props.autoComplete}
+          autoSave={this.props.autoSave}
         >
           {this.props.children}
 
@@ -328,19 +330,22 @@ Form.Row = ({columnCount, rowGap, children, style}) => {
   );
 };
 
-Form.Builder = React.forwardRef(({fields, children, ...props}, ref) => {
+Form.Builder = React.forwardRef(({fields, children, formData, ...props}, ref) => {
   const renderFields = (fields) => {
+
     return fields.map((field, index) => {
       if (!field) return <div key={`spacer-${index}`}/>;
 
+      const defaultValue = formData?.[field.name] || undefined;
+
       if (field.type === 'select') {
-        return <Select key={field.name ?? index} {...field}/>;
+        return <Select key={field.name ?? index} {...field} value={field.value ?? defaultValue}/>;
       } else if (field.type === 'counter') {
-        return <Counter key={field.name ?? index} {...field}/>;
+        return <Counter key={field.name ?? index} {...field} value={field.value ?? defaultValue}/>;
       } else if (field.type === 'toggle') {
-        return <Toggle key={field.name ?? index} {...field}/>;
+        return <Toggle key={field.name ?? index} {...field} checked={field.value ?? defaultValue}/>;
       } else {
-        return <Input key={field.name ?? index} {...field}/>;
+        return <Input key={field.name ?? index} {...field} defaultValue={field.value ?? defaultValue}/>;
       }
     });
   };

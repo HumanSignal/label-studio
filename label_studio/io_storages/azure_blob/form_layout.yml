@@ -20,6 +20,7 @@ azure_params: &azure_params
   - type: password
     name: account_key
     label: Account Key
+    autoComplete: "new-password"
   - null
 
 ImportStorage:

@@ -274,7 +274,8 @@
   width: 100%;
   padding: 16px;
   border-radius: 5px;
-  background-color: #efefef;
+  box-sizing: border-box;
+  background-color: #f8f8f8;
 }
 .ls-error-message {
   max-width: 100%;
@@ -3071,11 +3072,9 @@ body {
 .ls-storage-settings__info_valid {
   color: rgba(0,0,0,0.4);
 }
-.ls-storage-settings__summary {
-  margin-bottom: 16px;
-}
 .ls-storage-settings__sync {
   display: flex;
+  margin-top: 16px;
   justify-content: flex-start;
   align-items: center;
 }
