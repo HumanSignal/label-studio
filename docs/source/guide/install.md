@@ -75,7 +75,7 @@ Start Label Studio:
 docker-compose up -d
 ```
 
-This starts Label Studio with a PostgreSQL database backend. 
+This starts Label Studio with a PostgreSQL database backend and and NGINX proxy web server used to load uploaded data. 
 
 ## Install from source
 
