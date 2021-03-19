@@ -63,20 +63,31 @@
   },
   "babel": {
     "presets": [
-      ["@babel/preset-react", {
-        "runtime": "automatic"
-      }],
-      "@babel/preset-typescript",
-      ["@babel/preset-env", {
-        "targets": {
-          "browsers": ["last 2 Chrome versions"]
+      [
+        "@babel/preset-react",
+        {
+          "runtime": "automatic"
         }
-      }]
+      ],
+      "@babel/preset-typescript",
+      [
+        "@babel/preset-env",
+        {
+          "targets": {
+            "browsers": [
+              "last 2 Chrome versions"
+            ]
+          }
+        }
+      ]
     ],
     "plugins": [
       "@babel/plugin-proposal-class-properties",
       "@babel/plugin-proposal-optional-chaining",
       "@babel/plugin-proposal-nullish-coalescing-operator"
     ]
+  },
+  "dependencies": {
+    "un": "0.0.0"
   }
 }

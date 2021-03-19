@@ -1,7 +1,6 @@
 import React from 'react';
 import { render } from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
-import "../../lib/dm/css/main.css";
 import { ApiProvider } from '../providers/ApiProvider';
 import { AppStoreProvider } from '../providers/AppStoreProvider';
 import { ConfigProvider } from '../providers/ConfigProvider';
