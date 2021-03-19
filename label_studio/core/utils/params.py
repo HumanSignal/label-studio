@@ -1,10 +1,6 @@
 import os
 
 
-def get_bool_env(key, default):
-    return bool_from_request(os.environ, key, default)
-
-
 def bool_from_request(params, key, default):
     """ Get boolean value from request GET, POST, etc
 
@@ -73,3 +69,18 @@ def float_from_request(params, key, default):
     # other
     else:
         raise ValueError(f'Incorrect value type in key "{key}" = "{value}". It should be digit string or float.')
+
+
+def get_env(name, default=None, is_bool=False):
+    for env_key in ['LABEL_STUDIO_' + name, 'HEARTEX_' + name, name]:
+        value = os.environ.get(env_key)
+        if value is not None:
+            if is_bool:
+                return bool_from_request(os.environ, env_key, default)
+            else:
+                return value
+    return default
+
+
+def get_bool_env(key, default):
+    return get_env(key, default, is_bool=True)

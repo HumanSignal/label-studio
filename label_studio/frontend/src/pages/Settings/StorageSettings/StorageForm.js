@@ -96,6 +96,8 @@ export const StorageForm = forwardRef(({
       formData={{...(storage ?? {})}}
       skipEmpty={true}
       onSubmit={onSubmit}
+      autoFill="off"
+      autoComplete="off"
     >
       <Input type="hidden" name="project" value={project}/>
       <Form.Actions valid={connectionValid} extra={(connectionValid !== null) && (

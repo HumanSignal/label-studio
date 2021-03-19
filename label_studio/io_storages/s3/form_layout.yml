@@ -24,9 +24,11 @@ aws_params: &aws_params
   - type: text
     name: aws_access_key_id
     label: Access Key ID
+    autoComplete: "off"
   - type: password
     name: aws_secret_access_key
     label: Secret Access Key
+    autoComplete: "new-password"
   - type: text
     name: aws_session_token
     label: Session Token

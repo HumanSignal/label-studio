@@ -22,7 +22,9 @@ from django.db import IntegrityError
 from django.core.wsgi import get_wsgi_application
 from django.db.migrations.executor import MigrationExecutor
 from django.db import connections, DEFAULT_DB_ALIAS
+
 from label_studio.core.argparser import parse_input_args
+from label_studio.core.utils.params import get_env
 
 logger = logging.getLogger(__name__)
 
@@ -229,8 +231,8 @@ def main():
 
     # set host name
     host = input_args.host or config.get('host', '')
-    if not os.environ.get('LABEL_STUDIO_HOSTNAME'):
-        os.environ.setdefault('LABEL_STUDIO_HOSTNAME', host)  # it will be passed to settings.HOSTNAME as env var
+    if not get_env('HOST'):
+        os.environ.setdefault('HOST', host)  # it will be passed to settings.HOSTNAME as env var
 
     _setup_env()
     _apply_database_migrations()
@@ -321,7 +323,8 @@ def main():
 
         # internal port and internal host for server start
         internal_host = input_args.internal_host or config.get('internal_host', '0.0.0.0')
-        internal_port = input_args.port or config.get('port', 8080)
+        internal_port = get_env('PORT') or input_args.port or config.get('port', 8080)
+        internal_port = int(internal_port)
         internal_port = _get_free_port(internal_port, input_args.debug)
 
         # browser

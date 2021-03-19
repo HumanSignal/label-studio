@@ -1,7 +1,7 @@
 ---
-title: Sync data from cloud or database storage
+title: Sync data from cloud or redis
 type: guide
-order: 301
+order: 302
 ---
 
 Integrate popular cloud storage systems with Label Studio to collect new items uploaded to the buckets and return the annotation results so that you can use them in your machine learning pipelines.
@@ -282,56 +282,3 @@ Run the following command to launch Label Studio, configure the connection to yo
 ```bash
 label-studio start my_project --init --db redis 
 ```
-
-## PostgreSQL database
-
-You can also store your tasks and completions in a [PostgreSQL database](https://www.postgresql.org/) instead of the default SQLite database. This is recommended if you intend to frequently import new labeling tasks, or plan to label hundreds of thousands of tasks or more across projects. 
-
-When you start Label Studio using Docker Compose, you start it using a PostgreSQL database:
-```bash
-docker-compose up -d
-```
-
-
-<!--### Set up connection in the Label Studio UI
-In the Label Studio UI, do the following to set up the connection:
-
-1. Open Label Studio in your web browser.
-2. For a specific project, open **Settings > Cloud Storage**.
-3. Click **Add Source Storage**.   
-4. In the dialog box that appears, select **PostgreSQL Database** as the storage type.
-5. (Optional) Update PostgreSQL configuration parameters. See [Optional PostgreSQL configuration parameters](#Optional-PostgreSQL-configuration-parameters) on this page for the list.
-7. Click **Add Storage**.
-8. Repeat these steps for **Target Storage** to sync completed data annotations to a bucket.
-
-### Optional PostgreSQL configuration parameters
-
-You can specify additional parameters from the Label Studio UI.
-
-| Parameter | Description | Default |
-| --- | --- | --- |
-| project_path | Path to the Label Studio project
-| path | Specify the path to the database | None | 
-| host | IP of the server hosting the database | None |
-| port | Port of the server hosting the database | None |
-| password | Server password | None |
--->
-
-### Create connection on startup
-
-Run the following command to launch Label Studio, configure the connection to your Redis database, scan for existing tasks, and load them into the app for labeling for a specific project.
-
-```bash
-label-studio start my_project --init --db postgresql 
-```
-
-You must set the following environment variables to connect Label Studio to PostgreSQL:
-
-```
-POSTGRE_NAME=
-POSTGRE_USER=
-POSTGRE_PASSWORD=
-POSTGRE_PORT=
-POSTGRE_HOST=
-```
-

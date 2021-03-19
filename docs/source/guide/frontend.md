@@ -6,7 +6,7 @@ order: 705
 
 The [Label Studio Frontend](https://github.com/heartexlabs/label-studio-frontend) (LSF) is the frontend library for Label Studio, based on React and mobx-state-tree and distributed as an NPM package. You can include it in your applications without using the Label Studio Backend (LSB) to provide data annotation support to your users. You can customize and extend the frontend library. 
 
-LSF is located as a separated GitHub repository: 
+LSF is located as a separate GitHub repository: 
 https://github.com/heartexlabs/label-studio-frontend
 
 <br>
@@ -15,10 +15,11 @@ https://github.com/heartexlabs/label-studio-frontend
 
 ## Frontend development 
 
+Refer to the [Frontend reference guide](frontend_reference.html) when developing with Label Studio Frontend. 
+
 ### Manual builds
 
 If you want to build a new tag or change the behaviour of default components inside of LSF, then you need to go into the LSF repo and review the [Development part](https://github.com/heartexlabs/label-studio-frontend#development) of the README file. Making any changes requires that you have a good knowledge of React and Javascript.build.js <branch-name-from-official-lsf-repo>
-
 
 ### GitHub Artifacts
 
@@ -80,9 +81,9 @@ To see all the available options for the initialization of LabelStudio object, s
       "update",
       "controls",
       "side-column",
-      "completions:menu",
-      "completions:add-new",
-      "completions:delete",
+      "annotations:menu",
+      "annotations:add-new",
+      "annotations:delete",
       "predictions:menu"
     ],
 
@@ -92,7 +93,7 @@ To see all the available options for the initialization of LabelStudio object, s
       lastName: "Dean"
     },
     task: {
-      completions: [],
+      annotations: [],
       predictions: [],
       id: 1,
       data: {
@@ -101,15 +102,15 @@ To see all the available options for the initialization of LabelStudio object, s
     },
 
     onLabelStudioLoad: function(LS) {
-      var c = LS.completionStore.addCompletion({
+      var c = LS.annotationStore.addAnnotation({
         userGenerate: true
       });
-      LS.completionStore.selectCompletion(c.id);
+      LS.annotationStore.selectAnnotation(c.id);
     }, 
 
-    onSubmitCompletion: function(LS, completion) {
-      // retrive a completion 
-      console.log(completion.serializeCompletion())
+    onSubmitAnnotation: function(LS, annotation) {
+      // retrive an annotation 
+      console.log(annotation.serializeAnnotation())
     }
 
   });
