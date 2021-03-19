@@ -16,6 +16,11 @@ from core.utils.params import get_bool_env, get_env
 
 # Hostname is used for proper path generation to the resources, pages, etc
 HOSTNAME = get_env('HOST', '')
+if HOSTNAME:
+    if not HOSTNAME.startswith('http://') and not HOSTNAME.startswith('https://'):
+        print("! HOST variable found in environment, but it must start with http:// or https://, ignore it:", HOSTNAME)
+    else:
+        print("=> HOSTNAME correctly set to:", HOSTNAME)
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '$(fefwefwef13;LFK{P!)@#*!)kdsjfWF2l+i5e3t(8a1n'
