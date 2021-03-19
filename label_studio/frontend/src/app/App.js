@@ -5,7 +5,7 @@ import "../../lib/dm/css/main.css";
 import { ApiProvider } from '../providers/ApiProvider';
 import { AppStoreProvider } from '../providers/AppStoreProvider';
 import { ConfigProvider } from '../providers/ConfigProvider';
-import { LabelStudioProvider } from '../providers/LabelStudioProvider';
+import { LibraryProvider } from '../providers/LibraryProvider';
 import { MultiProvider } from '../providers/MultiProvider';
 import { ProjectProvider } from '../providers/ProjectProvider';
 import { RoutesProvider } from '../providers/RoutesProvider';
@@ -17,6 +17,19 @@ import { RootPage } from './RootPage';
 const App = ({content}) => {
   const url = new URL(APP_SETTINGS.hostname || location.origin);
 
+  const libraries = {
+    lsf: {
+      scriptSrc: window.EDITOR_JS,
+      cssSrc: window.EDITOR_CSS,
+      checkAvailability: () => !!window.LabelStudio,
+    },
+    dm: {
+      scriptSrc: window.DM_JS,
+      cssSrc: window.DM_CSS,
+      checkAvailability: () => !!window.DataManager,
+    },
+  };
+
   return (
     <ErrorBoundary>
       <BrowserRouter basename={url.pathname || undefined}>
@@ -24,7 +37,7 @@ const App = ({content}) => {
           <AppStoreProvider key="app-store"/>,
           <ApiProvider key="api"/>,
           <ConfigProvider key="config"/>,
-          <LabelStudioProvider key="lsf"/>,
+          <LibraryProvider key="lsf" libraries={libraries}/>,
           <RoutesProvider key="rotes"/>,
           <ProjectProvider key="project"/>,
         ]}>

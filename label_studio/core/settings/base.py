@@ -299,10 +299,10 @@ EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
 """ React Libraries: do not forget to change this dir in /etc/nginx/nginx.conf """
 # EDITOR = label-studio-frontend repository
 EDITOR_ROOT = os.path.join(BASE_DIR, '../frontend/dist/lsf')
+# DM = data manager (included into FRONTEND due npm building, we need only version.json file from there)
+DM_ROOT = os.path.join(BASE_DIR, '../frontend/dist/dm')
 # FRONTEND = GUI for django backend
 REACT_APP_ROOT = os.path.join(BASE_DIR, '../frontend/dist/react-app')
-# DM = data manager (included into FRONTEND due npm building, we need only version.json file from there)
-DM_ROOT = os.path.join(BASE_DIR, '../frontend/lib/dm')
 
 # per project settings
 BATCH_SIZE = 1000
