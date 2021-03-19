@@ -7,28 +7,6 @@ const LOCAL_ENV = {
   CSS_PREFIX: "ls-",
 };
 
-const babelLoader = {
-  loader: 'babel-loader',
-  options: {
-    presets: [
-      ['@babel/preset-react', {
-        "runtime": "automatic",
-      }],
-      '@babel/preset-typescript',
-      ['@babel/preset-env', {
-        "targets": {
-          "browsers": ["last 2 Chrome versions"],
-        },
-      }],
-    ],
-    plugins: [
-      '@babel/plugin-proposal-class-properties',
-      '@babel/plugin-proposal-optional-chaining',
-      '@babel/plugin-proposal-nullish-coalescing-operator',
-    ],
-  },
-};
-
 module.exports = {
   mode: process.env.NODE_ENV || "development",
   devtool: "cheap-module-source-map",
@@ -51,7 +29,7 @@ module.exports = {
         enforce: "pre",
         exclude: /node_modules/,
         use: [
-          babelLoader,
+          'babel-loader',
           'source-map-loader',
         ],
       },
@@ -60,7 +38,7 @@ module.exports = {
         enforce: "pre",
         exclude: /node_modules/,
         use: [
-          babelLoader,
+          'babel-loader',
           'source-map-loader',
         ],
       },
