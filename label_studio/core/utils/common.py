@@ -588,6 +588,10 @@ def check_for_the_latest_version(print_message):
     label_studio.__current_version_is_outdated__ = outdated
 
 
+# check version ASAP while package loading
+check_for_the_latest_version(print_message=True)
+
+
 def collect_versions(force=False):
     """ Collect versions for all modules
 
@@ -626,3 +630,5 @@ def collect_versions(force=False):
 
     settings.VERSIONS = result
     return result
+
+
