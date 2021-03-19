@@ -1,6 +1,6 @@
 {
-  "message": "Show loading errors in dedicated block, not modal",
-  "commit": "63c59e2fe6e06940af3eeda7967d6a5c7c0fb53e",
-  "branch": "feature/rename-completions",
-  "date": "2021-03-15T13:31:40Z"
+  "message": "Fix brushes to always get the current stage",
+  "commit": "099282da1bab181f02c92107af1a260481f16d32",
+  "branch": "master",
+  "date": "2021-03-19T16:20:46Z"
 }

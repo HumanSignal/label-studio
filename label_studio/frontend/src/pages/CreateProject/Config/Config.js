@@ -1,6 +1,6 @@
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/xml/xml';
-import React, { useState } from 'react';
+import React from 'react';
 import { UnControlled as CodeMirror } from 'react-codemirror2';
 import { Button, ToggleItems } from '../../../components';
 import { Form } from '../../../components/Form';
@@ -225,7 +225,7 @@ const ConfigureColumns = ({ columns, template }) => {
   );
 };
 
-const Configurator = ({ columns, config, project, template, setTemplate, onBrowse, onSaveClick, disableSaveButton }) => {
+const Configurator = ({ columns, config, project, template, setTemplate, onBrowse, onSaveClick, onValidate, disableSaveButton }) => {
   const [configure, setConfigure] = React.useState(isEmptyConfig(config) ? "code" : "visual");
   const [visualLoaded, loadVisual] = React.useState(configure === "visual");
   const [waiting, setWaiting] = React.useState(false);
@@ -251,6 +251,7 @@ const Configurator = ({ columns, config, project, template, setTemplate, onBrows
       return;
     } else {
       setError(null);
+      onValidate?.(await res.json());
     }
 
     res = await fetch(`/api/projects/${project.id}/sample-task?label_config=${c}`);
@@ -336,7 +337,7 @@ const Configurator = ({ columns, config, project, template, setTemplate, onBrows
   );
 };
 
-export const ConfigPage = ({ config: initialConfig = "", columns: externalColumns, project, onUpdate, onSaveClick, disableSaveButton, show = true }) => {
+export const ConfigPage = ({ config: initialConfig = "", columns: externalColumns, project, onUpdate, onSaveClick, onValidate, disableSaveButton, show = true }) => {
   const [config, _setConfig] = React.useState("");
   const [mode, setMode] = React.useState("list"); // view | list
   const [selectedGroup, setSelectedGroup] = React.useState(null);
@@ -420,6 +421,7 @@ export const ConfigPage = ({ config: initialConfig = "", columns: externalColumn
           template={template}
           setTemplate={setTemplate}
           onBrowse={setMode.bind(null, "list")}
+          onValidate={onValidate}
           disableSaveButton={disableSaveButton}
           onSaveClick={onSaveClick}
         />
