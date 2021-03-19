@@ -15,7 +15,7 @@ from django.views.static import serve
 from django.http import JsonResponse
 
 from core import utils, version
-from core.utils.params import get_bool_env
+from core.utils.params import get_bool_env, get_env
 from core.label_config import generate_time_series_json
 from core.utils.common import directory_index, collect_versions
 
@@ -128,7 +128,8 @@ def localfiles_data(request):
     """Serving files for LocalFilesImportStorage"""
     path = request.GET.get('d')
     local_serving_allowed = get_bool_env('LOCAL_FILES_SERVING_ENABLED', default=False)
+    local_serving_document_root = get_env('LOCAL_FILES_DOCUMENT_ROOT', default='/')
     if local_serving_allowed and path and request.user.is_authenticated:
-        return serve(request, path, document_root='/')
+        return serve(request, path, document_root=local_serving_document_root)
 
     return HttpResponseForbidden()
