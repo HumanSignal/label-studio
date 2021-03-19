@@ -17,6 +17,7 @@ from io_storages.azure_blob.models import AzureBlobImportStorage, AzureBlobExpor
 from io_storages.s3.models import S3ImportStorage, S3ExportStorage
 from io_storages.redis.models import RedisImportStorage, RedisExportStorage
 from ml.models import MLBackend
+from core.utils.params import get_env
 
 
 @contextlib.contextmanager
@@ -86,6 +87,8 @@ def _migrate_tabs(project_path, project):
         with io.open(os.path.abspath(tabs_path)) as t:
             tabs_data = json.load(t)
             for tab in tabs_data['tabs']:
+                view = View.objects.create(project=project)
+                tab['id'] = view.id
                 ordering = tab.pop('ordering', None)
                 selected_items = tab.pop('selectedItems', None)
 
@@ -115,13 +118,11 @@ def _migrate_tabs(project_path, project):
                     for c in hidden_columns_data.get('labeling', []):
                         hidden_columns['labeling'].append(c.replace('completion', 'annotation'))
                     tab['hiddenColumns'] = hidden_columns
-                view = View.objects.create(
-                    data=tab,
-                    ordering=ordering,
-                    selected_items=selected_items,
-                    project=project,
-                    filter_group=filter_group,
-                )
+                view.data = tab
+                view.ordering = ordering
+                view.selected_items = selected_items
+                view.filter_group = filter_group
+                view.save()
 
 
 def _migrate_storages(project, config):
@@ -221,7 +222,7 @@ def _migrate_ml_backends(project, config):
 def _migrate_uploaded_files(project, project_path):
     """Migrate files uploaded by user"""
     source_upload_path = project_path / 'upload'
-    target_upload_path = pathlib.Path(os.environ.get('LABEL_STUDIO_BASE_DATA_DIR', get_data_dir())) / 'upload'
+    target_upload_path = pathlib.Path(get_env('LABEL_STUDIO_BASE_DATA_DIR', get_data_dir())) / 'upload'
     if not target_upload_path.exists():
         os.makedirs(str(target_upload_path), exist_ok=True)
 

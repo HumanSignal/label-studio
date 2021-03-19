@@ -9,8 +9,9 @@ import io
 import json
 import getpass
 
-from colorama import init
-init(convert=True)
+from colorama import init, Fore
+if sys.platform == 'win32':
+    init(convert=True)
 
 # on windows there will be problems with sqlite and json1 support, so fix it
 from label_studio.core.utils.windows_sqlite_fix import windows_dll_fix
@@ -21,7 +22,9 @@ from django.db import IntegrityError
 from django.core.wsgi import get_wsgi_application
 from django.db.migrations.executor import MigrationExecutor
 from django.db import connections, DEFAULT_DB_ALIAS
+
 from label_studio.core.argparser import parse_input_args
+from label_studio.core.utils.params import get_env
 
 logger = logging.getLogger(__name__)
 
@@ -228,8 +231,8 @@ def main():
 
     # set host name
     host = input_args.host or config.get('host', '')
-    if not os.environ.get('LABEL_STUDIO_HOSTNAME'):
-        os.environ.setdefault('LABEL_STUDIO_HOSTNAME', host)  # it will be passed to settings.HOSTNAME as env var
+    if not get_env('HOST'):
+        os.environ.setdefault('HOST', host)  # it will be passed to settings.HOSTNAME as env var
 
     _setup_env()
     _apply_database_migrations()
@@ -272,23 +275,31 @@ def main():
             project_path = pathlib.Path(input_args.project_name)
             if project_path.exists():
                 print('Project directory from previous verion of label-studio found')
-                need_migrate = input('Do you want to migrate it? [y/n] ')
-                if need_migrate == 'y':
-                    config_path = project_path / 'config.json'
-                    config = _get_config(config_path)
-                    user = _create_user(input_args, config)
-                    label_config_path = project_path / 'config.xml'
-                    choices = (['sequential', 'uniform'],)
-                    sampling_map = {'sequential': Project.SEQUENCE, 'uniform': Project.UNIFORM}
-                    project = _create_project(
-                        title=input_args.project_name,
-                        user=user,
-                        label_config=label_config_path,
-                        sampling=sampling_map.get(config.get('sampling', 'sequential'), Project.UNIFORM),
-                        description=config.get('description', ''),
-                    )
-                    migrate_existing_project(project_path, project, config)
-                    migrated = True
+                print('Start migrating..')
+                config_path = project_path / 'config.json'
+                config = _get_config(config_path)
+                user = _create_user(input_args, config)
+                label_config_path = project_path / 'config.xml'
+                choices = (['sequential', 'uniform'],)
+                sampling_map = {'sequential': Project.SEQUENCE, 'uniform': Project.UNIFORM}
+                project = _create_project(
+                    title=input_args.project_name,
+                    user=user,
+                    label_config=label_config_path,
+                    sampling=sampling_map.get(config.get('sampling', 'sequential'), Project.UNIFORM),
+                    description=config.get('description', ''),
+                )
+                migrate_existing_project(project_path, project, config)
+                migrated = True
+
+                print(
+                    Fore.LIGHTYELLOW_EX +
+                    '\n*** WARNING! ***\n'
+                    + f'Project {input_args.project_name} migrated to Label Studio Database\n'
+                    + "YOU DON'T NEED THIS FOLDER ANYMORE"
+                    + '\n****************\n' +
+                    Fore.WHITE
+                )
             if not migrated:
                 print(
                     'Project "{project_name}" not found. '
@@ -312,7 +323,8 @@ def main():
 
         # internal port and internal host for server start
         internal_host = input_args.internal_host or config.get('internal_host', '0.0.0.0')
-        internal_port = input_args.port or config.get('port', 8080)
+        internal_port = get_env('PORT') or input_args.port or config.get('port', 8080)
+        internal_port = int(internal_port)
         internal_port = _get_free_port(internal_port, input_args.debug)
 
         # browser

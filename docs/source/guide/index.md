@@ -63,10 +63,8 @@ When you upload data to Label Studio, each item in the dataset becomes a labelin
 | Tags | Configuration options to customize the labeling interface. See [more about tags](tags.html). |
 
 
-## About Label Studio components and architecture
+## Components and architecture
 You can use any of the Label Studio components in your own tools, or customize them to suit your needs. <!--Before customizing Label Studio extensively, you might want to review Label Studio Enterprise Edition to see if it already contains the relevant functionality you want to build. See [What you get from Label Studio](benefits.html) for more.--> 
-
-### Main modules
 
 The component parts of Label Studio are available as modular extensible packages that you can integrate into your existing machine learning processes and tools. 
 

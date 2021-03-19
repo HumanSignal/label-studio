@@ -411,6 +411,17 @@
       if (last) setActive(last.id, !hoveredOverSidebar);
     }
 
+    function removeLabelStudioMention(text) {
+      return text
+        .replace(/into Label Studio$/g, '')
+        .replace(/in Label Studio$/g, '')
+        .replace(/with Label Studio$/g, '')
+        .replace(/by Label Studio$/g, '')
+        .replace(/for Label Studio$/g, '')
+        .replace(/from Label Studio$/g, '')
+        .replace(/Label Studio$/g, '')
+    };
+
     function makeLink(h) {
       var link = document.createElement("li");
       window.arst = h;
@@ -428,7 +439,7 @@
         })
         .join("")
         .replace(/\(.*\)$/, "");
-      link.innerHTML = '<a class="section-link" data-scroll href="#' + h.id + '">' + htmlEscape(text) + "</a>";
+      link.innerHTML = '<a class="section-link" data-scroll href="#' + h.id + '">' + removeLabelStudioMention(htmlEscape(text)) + "</a>";
       return link;
     }
 

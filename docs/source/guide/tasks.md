@@ -9,7 +9,7 @@ Get data into Label Studio by importing files, referencing URLs, or syncing with
 - If your data is stored in a cloud storage bucket, see [Sync data from cloud or database storage](storage.html).
 - If your data is stored in a Redis database, see [Sync data from cloud or database storage](storage.html).
 - If your data is stored at internet-accessible URLs, in files, or directories, [import it from the Label Studio UI](#Import-data-from-the-Label-Studio-UI).
-- If your data contains predictions, see [Import predicted labels into Label Studio](predictions.html).
+- If your data contains predictions or pre-annotations, see [Import predicted labels into Label Studio](predictions.html).
 
 ## Types of data you can import into Label Studio
 
@@ -53,8 +53,8 @@ You can add other, optional keys to the JSON file.
 | JSON key | Description |
 | --- | --- | 
 | id | Optional. Integer to use as the task ID. |
-| completions | Optional. List of annotations exported from Label Studio. [Label Studio's completion format](/guide/export.html#completions) allows you to import annotation results in order to use them in subsequent labeling tasks. |
-| predictions | Optional. List of model prediction results, where each result is saved using [Label Studio's prediction format](/guide/export.html#predictions). Import predictions for automatic task pre-labeling and active learning. See [Import predicted labels into Label Studio](#Import-predicted-labels-into-Label-Studio) |
+| annotations | Optional. List of annotations exported from Label Studio. [Label Studio's annotation format](/guide/export.html#Raw-JSON-format-of-completed-tasks) allows you to import annotation results in order to use them in subsequent labeling tasks. |
+| predictions | Optional. List of model prediction results, where each result is saved using [Label Studio's prediction format](/guide/export.html#Raw-JSON-format-of-completed-tasks). Import predictions for automatic task pre-labeling and active learning. See [Import predicted labels into Label Studio](/guide/predictions.html) |
 
 #### Example JSON format
 
@@ -171,8 +171,6 @@ this is a first task,123
 this is a second task,456
 ```
 
-> Note: You can only import CSV / TSV files on the Label Studio UI.
-
 > Note: If your labeling config has a TimeSeries tag, Label Studio interprets the CSV/TSV as time series data when you import it. This CSV/TSV is hosted as a resource file and Label Studio automatically creates a task with a link to the uploaded CSV/TSV.
 
 ### Plain text
@@ -186,7 +184,7 @@ this is a first task
 this is a second task
 ```
 
-If you want to import entire plain text files without each line becoming a new labeling task, customize the labeling configuration to specify valueType="url" in the Text tag. See the [Text tag documentation](tags/text.html)
+If you want to import entire plain text files without each line becoming a new labeling task, customize the labeling configuration to specify `valueType="url"` in the Text tag. See the [Text tag documentation](tags/text.html)
 
 ## Import data from the Label Studio UI
 

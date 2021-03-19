@@ -131,7 +131,8 @@ class ImportStorageLink(models.Model):
 
     @classmethod
     def create(cls, task, key, storage):
-        return cls.objects.create(task_id=task.id, key=key, storage=storage, object_exists=True)
+        link, created = cls.objects.get_or_create(task_id=task.id, key=key, storage=storage, object_exists=True)
+        return link
 
     class Meta:
         abstract = True
@@ -155,7 +156,8 @@ class ExportStorageLink(models.Model):
 
     @classmethod
     def create(cls, annotation, storage):
-        return cls.objects.create(annotation=annotation, storage=storage, object_exists=True)
+        link, created = cls.objects.get_or_create(annotation=annotation, storage=storage, object_exists=True)
+        return link
 
     class Meta:
         abstract = True

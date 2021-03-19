@@ -16,7 +16,7 @@ With these capabilities, you can use Label Studio as part of a production-ready 
 
 ## Quickstart
 
-Get started with a machine learning (ML) backend with Label Studio. You need to start both the machine learning backend and Label Studio to start labeling. You can review examples in the [`label-studio/ml/examples` section of the repository](https://github.com/heartexlabs/label-studio/tree/master/label_studio/ml/examples).
+Get started with a machine learning (ML) backend with Label Studio. You need to start both the machine learning backend and Label Studio to start labeling. You can review examples in the [`label-studio-ml/examples` section of the repository](https://github.com/heartexlabs/label-studio-ml/examples).
 
 Follow these steps to set up an example text classifier ML backend with Label Studio:
 
@@ -35,7 +35,7 @@ Follow these steps to set up an example text classifier ML backend with Label St
    
 2. Create a new ML backend using the example simple text classifier included in the repository. 
    ```bash
-   label-studio-ml init my_ml_backend --script label_studio/ml/examples/simple_text_classifier.py
+   label-studio-ml init my_ml_backend --script label_studio-ml/examples/simple_text_classifier.py
    ```
    
 3. Start the ML backend server.
@@ -101,7 +101,7 @@ Perform these prerequisites to make sure your server starts successfully.
 
 1. Start the machine learning backend with an example model, or your custom machine learning backend.
     ```bash
-    label-studio-ml init my-ml-backend --script             label_studio/ml/examples/simple_text_classifier.py
+    label-studio-ml init my-ml-backend --script label_studio-ml/examples/simple_text_classifier.py
     ```
     You see configurations in the `my-ml-backend/` directory that you need to build and run a Docker image using Docker Compose.
 
@@ -124,7 +124,7 @@ Depending on score types you can select a sampling strategy:
 * prediction-score-min (min is the best score) 
 * prediction-score-max (max is the best score)
  
-See more about active learning sampling in [Set up task sampling for your project](https://labelstud.io/guide/tasks.html#Set-up-task-sampling-for-your-project). 
+See more about active learning sampling in [Set up task sampling for your project](guide/start.html#Set-up-task-sampling-for-your-project). 
  
 
 ## Troubleshooting
