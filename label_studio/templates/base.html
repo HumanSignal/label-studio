@@ -28,6 +28,12 @@
   <script>
     EDITOR_JS = "{{settings.HOSTNAME}}/label-studio-frontend/js/main.js?v={{ versions.lsf.commit }}";
     EDITOR_CSS = "{{settings.HOSTNAME}}/label-studio-frontend/css/main.css?v={{ versions.lsf.commit }}";
+    DM_JS = "{{settings.HOSTNAME}}/dm/js/main.js?v={{ versions.lsf.commit }}";
+    DM_CSS = "{{settings.HOSTNAME}}/dm/css/main.js?v={{ versions.lsf.commit }}";
+  </script>
+
+  <script>
+    window.exports = () => {};
   </script>
 
   {% block head %}
