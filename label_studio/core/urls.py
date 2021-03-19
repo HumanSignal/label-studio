@@ -59,6 +59,8 @@ urlpatterns = [
     re_path(r'^', include('io_storages.urls')),
     re_path(r'^', include('ml.urls')),
 
+    re_path(r'data/local-files/', views.localfiles_data, name="localfiles_data"),
+
     re_path(r'version/', views.version_page, name="version"),  # html page
     re_path(r'api/version/', views.version_page, name="api-version"),  # json response
 

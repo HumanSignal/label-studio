@@ -66,12 +66,13 @@ class GCSImportStorage(ImportStorage, GCSStorageMixin):
         regex = re.compile(str(self.regex_filter)) if self.regex_filter else None
 
         for file in files:
-            if file.name != (prefix.rstrip('/') + '/'):
-                key = file.name
-                if regex and not regex.match(key):
-                    logger.debug(key + ' is skipped by regex filter')
-                    continue
-                yield key
+            if file.name == (prefix.rstrip('/') + '/'):
+                continue
+            # check regex pattern filter
+            if regex and not regex.match(file.name):
+                logger.debug(file.name + ' is skipped by regex filter')
+                continue
+            yield file.name
 
     def get_data(self, key):
         if self.use_blob_urls:

@@ -7,7 +7,7 @@ from io_storages.serializers import ImportStorageSerializer, ExportStorageSerial
 from io_storages.localfiles.models import LocalFilesImportStorage, LocalFilesExportStorage
 
 
-class LocalFilesImportStorageSerializer(ImportStorageSerializer):
+class LocalFilesImportStorageSerializer(serializers.ModelSerializer):
     type = serializers.ReadOnlyField(default=os.path.basename(os.path.dirname(__file__)))
 
     class Meta:
