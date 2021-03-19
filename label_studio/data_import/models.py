@@ -85,7 +85,7 @@ class FileUpload(models.Model):
     def read_task_from_hypertext_body(self):
         logger.debug('Read 1 task from hypertext file {}'.format(self.filepath))
         data = self.content
-        body = htmlmin.minify(data.decode('utf8'), remove_all_empty_space=True)
+        body = htmlmin.minify(data, remove_all_empty_space=True)
         tasks = [{'data': {settings.DATA_UNDEFINED_NAME: body}}]
         return tasks
 

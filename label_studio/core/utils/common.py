@@ -601,6 +601,7 @@ def collect_versions(force=False):
     result = {
         'package': {
             'version': label_studio.__version__,
+            'short_version': '.'.join(label_studio.__version__.split('.')[:2]),
             'latest_version_from_pypi': label_studio.__latest_version__,
             'latest_version_upload_time': label_studio.__latest_version_upload_time__,
             'current_version_is_outdated': label_studio.__current_version_is_outdated__
