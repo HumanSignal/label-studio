@@ -222,6 +222,8 @@ def _migrate_ml_backends(project, config):
 def _migrate_uploaded_files(project, project_path):
     """Migrate files uploaded by user"""
     source_upload_path = project_path / 'upload'
+    if not source_upload_path.exists():
+        return
     target_upload_path = pathlib.Path(get_env('LABEL_STUDIO_BASE_DATA_DIR', get_data_dir())) / 'upload'
     if not target_upload_path.exists():
         os.makedirs(str(target_upload_path), exist_ok=True)
