@@ -166,6 +166,8 @@
           title: Microsoft Azure
         - name: redis
           title: Redis
+        - name: localfiles
+          title: Local files
 
   - /api/storages/export/types:
       method: GET
@@ -333,3 +335,123 @@
           validation_errors:
             non_field_errors:
               - Cannot find bucket unexisted-s3-bucket in S3
+
+- test_import_from_azure_storage:
+  # Create project
+  - /api/projects:
+      method: POST
+      data:
+        title: test_azure_storage
+        label_config: <View><Image name="image" value="$image_url"/><Choices name="label" toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+        is_published: true
+      status_code: 201
+      response:
+        id: '{project_pk}'
+
+  # Create storage
+  - /api/storages/azure:
+      method: POST
+      data:
+        project: '{project_pk}'
+        title: Testing Azure storage (bucket from conftest.py)
+        container: pytest-azure-images
+        use_blob_urls: true
+      status_code: 201
+      response:
+        id: '{storage_pk}'
+
+  # Sync storage
+  - /api/storages/azure/{storage_pk}/sync:
+      method: POST
+      status_code: 200
+      response:
+        last_sync_count: 3
+
+  # Get next task
+  - /api/projects/{project_pk}/next:
+      method: GET
+      status_code: 200
+      response:
+        data:
+          # we expect Azure presigned URL here
+          __test_object: true
+          regexp: '^\{"image_url":\s"https://testing.blob.core.windows.net/pytest-azure-images/.+'
+
+  - /api/storages:
+      method: GET
+      data:
+        project: '{project_pk}'
+      status_code: 200
+      response:
+        - title: 'Testing Azure storage (bucket from conftest.py)'
+          presign: true
+          type: azure
+
+  - /api/storages/azure/{storage_pk}:
+      method: PATCH
+      content_type: application/json
+      data:
+        presign: false
+      status_code: 200
+
+  - /api/storages:
+      method: GET
+      data:
+        project: '{project_pk}'
+      status_code: 200
+      response:
+        - presign: false
+
+- test_export_azure_storage:
+
+    # Create project
+    - /api/projects:
+        method: POST
+        data:
+          title: test_export_azure_storage
+          label_config: <View><Image name="image" value="$image_url"/><Choices name="label" toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+          is_published: true
+        status_code: 201
+        response:
+          id: '{project_pk}'
+
+    # Create storage
+    - /api/storages/export/azure:
+        method: POST
+        data:
+          project: '{project_pk}'
+          title: Testing Export azure storage (bucket from conftest.py)
+          bucket: pytest-export-azure-bucket
+        status_code: 201
+        response:
+          id: '{storage_pk}'
+
+    # Patch storage
+    - /api/storages/export/azure/{storage_pk}:
+        method: PATCH
+        content_type: application/json
+        data:
+          title: New title
+        status_code: 200
+
+    # Import task
+    - /api/projects/{project_pk}/tasks:
+        method: POST
+        content_type: application/json
+        data:
+          data:
+            image_url: http://test.heartex.com/my_super_image.jpg
+        status_code: 201
+        response:
+          id: '{task_pk}'
+
+    # Create annotation
+    - /api/tasks/{task_pk}/annotations:
+        method: POST
+        content_type: application/json
+        data:
+          result: [{'value': {'choices': ['pos']}, 'from_name': 'label', 'to_name': 'image', 'type': 'choices'}]
+          lead_time: 12.34
+        status_code: 201
+        response:
+          id: '{annotation_pk}'
