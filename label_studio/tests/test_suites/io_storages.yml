@@ -166,6 +166,8 @@
           title: Microsoft Azure
         - name: redis
           title: Redis
+        - name: localfiles
+          title: Local files
 
   - /api/storages/export/types:
       method: GET
