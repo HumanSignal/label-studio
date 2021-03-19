@@ -1,6 +1,6 @@
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/xml/xml';
-import React, { useState } from 'react';
+import React from 'react';
 import { UnControlled as CodeMirror } from 'react-codemirror2';
 import { Button, ToggleItems } from '../../../components';
 import { Form } from '../../../components/Form';
@@ -183,17 +183,12 @@ const ConfigureSettings = ({ template }) => {
   );
 };
 
-const ConfigureColumns = ({ columns, template, project }) => {
-  const defaultValue = project.parsed_label_config?.label?.inputs?.[0]?.value;
-  const [selectedValue, setSelectedValue] = useState(defaultValue);
-
+const ConfigureColumns = ({ columns, template }) => {
   const updateValue = obj => e => {
     const attrName = e.target.value.replace(/^\$/, "");
     obj.setAttribute("value", "$" + attrName);
-    setSelectedValue(attrName);
     template.render();
   };
-
 
   if (!template.objects.length) return null;
 
@@ -214,14 +209,14 @@ const ConfigureColumns = ({ columns, template, project }) => {
           {template.objects > 1 && ` for ${obj.getAttribute("name")}`}
           {" from "}
           {columns?.length > 0 && columns[0] !== DEFAULT_COLUMN && "field "}
-          <select onChange={updateValue(obj)} value={selectedValue}>
+          <select onChange={updateValue(obj)} value={obj.getAttribute("value")?.replace(/^\$/, "")}>
             {columns?.map(column => (
               <option key={column} value={column}>
                 {column === DEFAULT_COLUMN ? "<imported file>" : `$${column}`}
               </option>
             ))}
             {!columns?.length && (
-              <option value={obj.getAttribute("value")}>{"<imported file>"}</option>
+              <option value={obj.getAttribute("value")?.replace(/^\$/, "")}>{"<imported file>"}</option>
             )}
           </select>
         </p>
