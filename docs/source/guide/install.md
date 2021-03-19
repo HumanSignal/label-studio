@@ -49,7 +49,7 @@ Label Studio is also available as a Docker container. Make sure you have [Docker
 ### Install with Docker on *nix
 To install and start Label Studio at [http://localhost:8080](http://localhost:8080), storing all labeling data in `./my_project` directory, run the following:
 ```bash
-docker run -p 8080:8080 -v `pwd`/mydata:/root/.local/share/label-studio/ heartexlabs/label-studio:latest
+docker run -it -p 8080:8080 -v `pwd`/mydata:/root/.local/share/label-studio/ heartexlabs/label-studio:latest
 ```
 
 ### Install with Docker on Windows
@@ -58,7 +58,7 @@ Or for Windows, you have to modify the volumes paths set by `-v` option.
 #### Override the default Docker install
 You can override the default Docker install by appending new arguments: 
 ```bash
-docker run -p 8080:8080 -v `pwd`/mydata:/root/.local/share/label-studio/ heartexlabs/label-studio:latest label-studio --log-level DEBUG
+docker run -it -p 8080:8080 -v `pwd`/mydata:/root/.local/share/label-studio/ heartexlabs/label-studio:latest label-studio --log-level DEBUG
 ```
 
 ### Build a local image with Docker

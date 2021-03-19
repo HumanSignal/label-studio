@@ -6,6 +6,7 @@ import hashlib
 import json
 import os
 from datetime import datetime
+from copy import deepcopy
 
 from django.conf import settings
 from django.db import models
@@ -58,6 +59,7 @@ class DataExport(object):
         formats = []
         supported_formats = set(converter.supported_formats)
         for format, format_info in converter.all_formats().items():
+            format_info = deepcopy(format_info)
             format_info['name'] = format.name
             if format.name not in supported_formats:
                 format_info['disabled'] = True

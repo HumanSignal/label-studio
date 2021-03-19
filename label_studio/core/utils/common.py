@@ -542,7 +542,7 @@ def get_latest_version():
         latest_version = data['info']['version']
         upload_time = data.get('releases', {}).get(latest_version, [{}])[-1].get('upload_time', None)
     except Exception as exc:
-        logger.error("Can't get latest version", exc_info=True)
+        logger.warning("Can't get latest version", exc_info=True)
     else:
         return {'latest_version': latest_version, 'upload_time': upload_time}
 
@@ -588,6 +588,10 @@ def check_for_the_latest_version(print_message):
     label_studio.__current_version_is_outdated__ = outdated
 
 
+# check version ASAP while package loading
+check_for_the_latest_version(print_message=True)
+
+
 def collect_versions(force=False):
     """ Collect versions for all modules
 
@@ -626,3 +630,5 @@ def collect_versions(force=False):
 
     settings.VERSIONS = result
     return result
+
+

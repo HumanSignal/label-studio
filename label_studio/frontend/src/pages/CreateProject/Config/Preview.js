@@ -1,6 +1,6 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
 import { Spinner } from '../../../components';
-import { useLabelStudio } from '../../../providers/LabelStudioProvider';
+import { useLibrary } from '../../../providers/LibraryProvider';
 import { cn } from '../../../utils/bem';
 import './Config.styl';
 import { EMPTY_CONFIG } from './Template';
@@ -8,10 +8,10 @@ import { EMPTY_CONFIG } from './Template';
 const configClass = cn("configure");
 
 export const Preview = ({ config, data, error }) => {
-  const [page, setPage] = React.useState("");
-  const LabelStudio = useLabelStudio();
+  const [page, setPage] = useState("");
+  const LabelStudio = useLibrary('lsf');
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!LabelStudio) return;
     if (error) return;
     if (!data) return;

@@ -7,7 +7,7 @@ import { ApiContext } from '../../providers/ApiProvider';
 import { useContextProps } from '../../providers/RoutesProvider';
 import { Block, Elem } from '../../utils/bem';
 import { CreateProject } from '../CreateProject/CreateProject';
-import { DataManager } from '../DataManager/DataManager';
+import { DataManagerPage } from '../DataManager/DataManager';
 import { SettingsPage } from '../Settings';
 import './Projects.styl';
 import { EmptyProjectsList, ProjectsList } from './ProjectsList';
@@ -70,7 +70,7 @@ ProjectsPage.routes = ({config, store}) => [
       return <Redirect to={`/projects/${config.projectId}/data`}/>;
     },
     pages: {
-      DataManager,
+      DataManagerPage,
       SettingsPage,
     },
   },
