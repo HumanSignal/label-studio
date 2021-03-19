@@ -10,12 +10,11 @@ After you install Label Studio, start the server to start using it.
 label-studio start
 ```
 
-By default, Label Studio starts with a SQLite database to store labeling tasks and annotations. You can specify different source and target storage for labeling tasks and annotations using Label Studio UI or the API. See [Sync data from cloud or database storage](storage.html) for more.
+By default, Label Studio starts with a SQLite database to store labeling tasks and annotations. You can specify different source and target storage for labeling tasks and annotations using Label Studio UI or the API. See [Database storage](install.html#Database-storage) for more.
 
 ## Labeling performance 
 
-The SQLite database works well for projects with tens of thousands of labeling tasks. If you want to annotate millions of tasks or anticipate a lot of concurrent users, use a PostgreSQL database. See [Install and upgrade Label Studio
-](install.html#PostgreSQL-database) for more.  
+The SQLite database works well for projects with tens of thousands of labeling tasks. If you want to annotate millions of tasks or anticipate a lot of concurrent users, use a PostgreSQL database. See [Install and upgrade Label Studio](install.html#PostgreSQL-database) for more.  
 
 For example, if you import data while labeling is being performed, labeling tasks can take more than 10 seconds to load and annotations can take more than 10 seconds to perform. If you want to label more than 100,000 tasks with 5 or more concurrent users, consider using PostgreSQL or another database with Label Studio. 
 
@@ -25,7 +24,7 @@ You can specify project config, machine learning backend and other options using
 
 * The Label Studio web server always uses the `0.0.0.0` address to start. If you need to change it to `localhost`, set `--internal-host` from console arguments to `localhost` and the web server starts at `localhost`.
 
-* You can use `--port` or `PORT` environment var to set port for Label Studio web server. 
+* You can use the `--port` or `PORT` environment var to set port for Label Studio web server. 
 
 ## Run Label Studio with an external domain name
 
