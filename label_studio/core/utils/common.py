@@ -542,7 +542,7 @@ def get_latest_version():
         latest_version = data['info']['version']
         upload_time = data.get('releases', {}).get(latest_version, [{}])[-1].get('upload_time', None)
     except Exception as exc:
-        logger.error("Can't get latest version", exc_info=True)
+        logger.warning("Can't get latest version", exc_info=True)
     else:
         return {'latest_version': latest_version, 'upload_time': upload_time}
 
