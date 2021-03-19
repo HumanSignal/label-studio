@@ -124,7 +124,7 @@ Depending on score types you can select a sampling strategy:
 * prediction-score-min (min is the best score) 
 * prediction-score-max (max is the best score)
  
-See more about active learning sampling in [Set up task sampling for your project](guide/start.html#Set-up-task-sampling-for-your-project). 
+See more about active learning sampling in [Set up task sampling for your project](start.html#Set-up-task-sampling-for-your-project). 
  
 
 ## Troubleshooting
