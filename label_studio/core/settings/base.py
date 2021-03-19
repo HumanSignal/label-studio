@@ -12,8 +12,8 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 import os
 import mimetypes
 
-mimetypes.add_type("image/png", ".png", True)
-mimetypes.add_type("text/javascript", ".js", True)
+# fix problem with Windows mimetypes for JS 
+mimetypes.add_type("application/javascript", ".js", True)
 
 from core.utils.io import get_data_dir
 from core.utils.params import get_bool_env, get_env
