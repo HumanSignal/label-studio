@@ -43,7 +43,7 @@ const requestLabelStudio = (libraries) => async (library) => {
           link.onload = () => {
             resolve();
           };
-          link.href = window.EDITOR_CSS;
+          link.href = cssSrc;
           link.dataset.replaced = true;
           document.head.appendChild(link);
         }));
