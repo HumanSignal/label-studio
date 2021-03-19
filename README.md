@@ -26,7 +26,7 @@ Have a custom dataset? You can customize Label Studio to fit your needs. Read an
 Try out Label Studio in a **[running app](https://app.labelstud.io)**, install it locally, or deploy it in a cloud instance. 
 
 - [Install locally with Docker](#install-locally-with-docker)
-- [Run with Docker Compose](#run-with-docker-compose)
+- [Run with Docker Compose (Label Studio + Nginx + PostgreSQL)](#run-with-docker-compose)
 - [Install locally with pip](#install-locally-with-pip)
 - [Install locally with Anaconda](#install-locally-with-anaconda)
 - [Install for local development](#install-for-local-development)
@@ -36,14 +36,14 @@ Try out Label Studio in a **[running app](https://app.labelstud.io)**, install i
 Run Label Studio in a Docker container and access it at `http://localhost:8080`.
 
 ```bash
-docker run -p 8080:8080 -v `pwd`/mydata:/root/.local/share/label-studio/ heartexlabs/label-studio:latest
+docker run -p 8080:8080 -v `pwd`/mydata:/label-studio/data heartexlabs/label-studio:latest
 ```
 You can find all the generated assets, including SQLite3 database storage `label_studio.sqlite3` and uploaded files, in the `./mydata` directory.
 
 #### Override default Docker install
 You can override the default launch command by appending the new arguments:
 ```bash
-docker run -p 8080:8080 -v `pwd`/mydata:/root/.local/share/label-studio/ heartexlabs/label-studio:latest label-studio --log-level DEBUG
+docker run -p 8080:8080 -v `pwd`/mydata:/label-studio/data heartexlabs/label-studio:latest label-studio --log-level DEBUG
 ```
 
 #### Build a local image with Docker
@@ -53,7 +53,11 @@ docker build -t heartexlabs/label-studio:latest .
 ```
 
 ### Run with Docker Compose
-Use Docker Compose to serve Label Studio at `http://localhost:8080`.
+Docker compose script provides production-ready stack consisting of the following components:
+
+- Label Studio
+- [Nginx](https://www.nginx.com/) - proxy web server used to load various static data, including uploaded audio, images, etc.
+- [PostgreSQL](https://www.postgresql.org/) - production-ready database that replaces less performant SQLite3.
 
 Run this command the first time you run Label Studio:
 ```bash
