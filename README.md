@@ -59,9 +59,9 @@ Docker compose script provides production-ready stack consisting of the followin
 - [Nginx](https://www.nginx.com/) - proxy web server used to load various static data, including uploaded audio, images, etc.
 - [PostgreSQL](https://www.postgresql.org/) - production-ready database that replaces less performant SQLite3.
 
-Run this command the first time you run Label Studio:
+To start using the app from `http://localhost` run this command:
 ```bash
-docker-compose up -d
+docker-compose up
 ```
 
 ### Install locally with pip
