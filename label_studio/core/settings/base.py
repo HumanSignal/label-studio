@@ -1,13 +1,13 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 """
-Django settings for Label Studio.
+Django Base settings for Label Studio.
 
 For more information on this file, see
-https://docs.djangoproject.com/en/2.1/topics/settings/
+https://docs.djangoproject.com/en/3.1/topics/settings/
 
 For the full list of settings and their values, see
-https://docs.djangoproject.com/en/2.1/ref/settings/
+https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 import os
 
@@ -260,7 +260,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static_build/')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static_build')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -331,3 +331,7 @@ from core.utils.get_object import get_object_with_check_and_log
 
 GET_OBJECT_WITH_CHECK_AND_LOG = get_object_with_check_and_log
 
+# fix a problem with Windows mimetypes for JS and PNG
+import mimetypes
+mimetypes.add_type("application/javascript", ".js", True)
+mimetypes.add_type("image/png", ".png", True)
