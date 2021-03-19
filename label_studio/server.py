@@ -237,8 +237,7 @@ def main():
     _setup_env()
     _apply_database_migrations()
 
-    from label_studio.core.utils.common import check_for_the_latest_version, collect_versions
-    check_for_the_latest_version(print_message=True)
+    from label_studio.core.utils.common import collect_versions
     versions = collect_versions()
 
     if input_args.command == 'reset_password':
