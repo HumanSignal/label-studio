@@ -36,14 +36,14 @@ Try out Label Studio in a **[running app](https://app.labelstud.io)**, install i
 Run Label Studio in a Docker container and access it at `http://localhost:8080`.
 
 ```bash
-docker run -p 8080:8080 -v `pwd`/mydata:/root/.local/share/label-studio/ heartexlabs/label-studio:latest
+docker run -p 8080:8080 -v `pwd`/mydata:/label-studio/data heartexlabs/label-studio:latest
 ```
 You can find all the generated assets, including SQLite3 database storage `label_studio.sqlite3` and uploaded files, in the `./mydata` directory.
 
 #### Override default Docker install
 You can override the default launch command by appending the new arguments:
 ```bash
-docker run -p 8080:8080 -v `pwd`/mydata:/root/.local/share/label-studio/ heartexlabs/label-studio:latest label-studio --log-level DEBUG
+docker run -p 8080:8080 -v `pwd`/mydata:/label-studio/data heartexlabs/label-studio:latest label-studio --log-level DEBUG
 ```
 
 #### Build a local image with Docker
@@ -53,7 +53,7 @@ docker build -t heartexlabs/label-studio:latest .
 ```
 
 ### Run with Docker Compose
-Use Docker Compose to serve Label Studio at `http://localhost:8080`.
+Use Docker Compose to serve Label Studio at `http://localhost`.
 
 Run this command the first time you run Label Studio:
 ```bash
