@@ -11,7 +11,7 @@ services:
     volumes:
       - static:/label-studio/label_studio:rw
       - ./mydata:/label-studio/data:rw
-      - ./nginx/:/etc/nginx/conf.d/:ro
+      - ./deploy/nginx/:/etc/nginx/conf.d/:ro
     command: nginx -g "daemon off;"
 
   app:
