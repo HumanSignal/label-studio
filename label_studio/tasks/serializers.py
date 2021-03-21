@@ -130,11 +130,9 @@ class TaskSerializer(ModelSerializer):
             project = self.context['project']
         elif 'view' in self.context and 'project_id' in self.context['view'].kwargs:
             kwargs = self.context['view'].kwargs
-            project = kwargs['project_id']
+            project = get_object_with_check_and_log(Project, kwargs['project_id'])
         else:
             project = None
-        if isinstance(project, int):
-            project = Project.objects.get(id=project)
         return project
 
     def validate(self, task):

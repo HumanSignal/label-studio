@@ -25,6 +25,7 @@ from core.utils.common import bool_from_request
 from tasks.serializers import (
     TaskSerializer, AnnotationSerializer, TaskSimpleSerializer, PredictionSerializer,
     TaskWithAnnotationsAndPredictionsAndDraftsSerializer, AnnotationDraftSerializer)
+from projects.models import Project
 
 logger = logging.getLogger(__name__)
 
@@ -55,7 +56,10 @@ class TaskListAPI(generics.ListCreateAPIView):
 
     def get_serializer_context(self):
         context = super(TaskListAPI, self).get_serializer_context()
-        context['project'] = self.request.data.get('project')
+        project_id = self.request.data.get('project')
+        if project_id:
+            context['project'] = get_object_with_permissions(
+                self.request, Project, project_id, TaskAPIChangeProjectPermission.perm)
         return context
 
     @swagger_auto_schema(tags=['Tasks'], request_body=TaskSerializer)
