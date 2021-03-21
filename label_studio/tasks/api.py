@@ -53,6 +53,11 @@ class TaskListAPI(generics.ListCreateAPIView):
     def get(self, request, *args, **kwargs):
         return super(TaskListAPI, self).get(request, *args, **kwargs)
 
+    def get_serializer_context(self):
+        context = super(TaskListAPI, self).get_serializer_context()
+        context['project'] = self.request.data.get('project')
+        return context
+
     @swagger_auto_schema(tags=['Tasks'], request_body=TaskSerializer)
     def post(self, request, *args, **kwargs):
         return super(TaskListAPI, self).post(request, *args, **kwargs)
