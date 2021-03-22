@@ -6,7 +6,7 @@ order: 907
 
 You can use the Label Studio API to import data for labeling, export annotations, set up machine learning with Label Studio, and sync tasks with cloud storage. 
 
-See the API documentation linked inside Label Studio for further guidance and interactive examples. 
+See the [API reference documentation](/api) for further guidance and interactive examples. 
 
 ## Authenticate to the API
 
