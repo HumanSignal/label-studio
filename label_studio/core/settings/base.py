@@ -16,6 +16,11 @@ from core.utils.params import get_bool_env, get_env
 
 # Hostname is used for proper path generation to the resources, pages, etc
 HOSTNAME = get_env('HOST', '')
+if HOSTNAME:
+    if not HOSTNAME.startswith('http://') and not HOSTNAME.startswith('https://'):
+        print("! HOST variable found in environment, but it must start with http:// or https://, ignore it:", HOSTNAME)
+    else:
+        print("=> HOSTNAME correctly set to:", HOSTNAME)
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '$(fefwefwef13;LFK{P!)@#*!)kdsjfWF2l+i5e3t(8a1n'
@@ -299,10 +304,10 @@ EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
 """ React Libraries: do not forget to change this dir in /etc/nginx/nginx.conf """
 # EDITOR = label-studio-frontend repository
 EDITOR_ROOT = os.path.join(BASE_DIR, '../frontend/dist/lsf')
+# DM = data manager (included into FRONTEND due npm building, we need only version.json file from there)
+DM_ROOT = os.path.join(BASE_DIR, '../frontend/dist/dm')
 # FRONTEND = GUI for django backend
 REACT_APP_ROOT = os.path.join(BASE_DIR, '../frontend/dist/react-app')
-# DM = data manager (included into FRONTEND due npm building, we need only version.json file from there)
-DM_ROOT = os.path.join(BASE_DIR, '../frontend/lib/dm')
 
 # per project settings
 BATCH_SIZE = 1000

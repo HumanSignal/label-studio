@@ -1,1 +1,1 @@
-export { DataManager } from './DataManager';
+export { DataManagerPage } from './DataManager';
