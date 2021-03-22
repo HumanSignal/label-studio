@@ -1,11 +1,38 @@
-import { useCallback, useMemo, useState } from "react";
-import { Block } from "../../utils/bem";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { LsCheck, LsPlus } from "../../assets/icons";
+import { Button } from "../../components";
+import { Description } from "../../components/Description/Description";
+import { Input } from "../../components/Form";
+import { modal } from "../../components/Modal/Modal";
+import { Space } from "../../components/Space/Space";
+import { Block, Elem } from "../../utils/bem";
+import { copyText } from "../../utils/helpers";
+import "./PeopleInvitation.styl";
 import { PeopleList } from "./PeopleList";
 import "./PeoplePage.styl";
 import { SelectedUser } from "./SelectedUser";
 
+const InvitationModal = ({link}) => {
+  return (
+    <Block name="invite">
+      <Input
+        value={link}
+        style={{width: '100%'}}
+        readOnly
+      />
+
+      <Description style={{width: '70%', marginTop: 16}}>
+        Invited members have private accounts. They can register and join to the organization using this link.
+      </Description>
+    </Block>
+  );
+};
+
 export const PeoplePage = () => {
+  const inviteModal = useRef();
   const [selectedUser, setSelectedUser] = useState(null);
+
+  const [link, setLink] = useState("https://labelstud.io/organizations/welcome/1232312");
 
   const selectUser = useCallback((user) => {
     console.log({user});
@@ -14,24 +41,84 @@ export const PeoplePage = () => {
     localStorage.setItem('selectedUser', user?.id);
   }, [setSelectedUser]);
 
+  const updateLink = useCallback((link) => {
+    setLink(link);
+  }, [link]);
+
+  const inviteModalProps = useCallback((link) => ({
+    title: "Invite people",
+    style: { width: 640, height: 472 },
+    body: () => (
+      <InvitationModal link={link}/>
+    ),
+    footer: () => {
+      const [copied, setCopied] = useState(false);
+
+      const copyLink = useCallback(() => {
+        setCopied(true);
+        copyText(link);
+        setTimeout(() => setCopied(false), 1500);
+      }, []);
+
+      return (
+        <Space spread>
+          <Space>
+            <Button style={{width: 170}} onClick={() => updateLink("hello world")}>
+              Reset Link
+            </Button>
+          </Space>
+          <Space>
+            <Button primary style={{width: 170}} onClick={copyLink}>
+              Copy Link
+              {copied && (<LsCheck style={{marginLeft: 10}}/>)}
+            </Button>
+          </Space>
+        </Space>
+      );
+    },
+    bareFooter: true,
+  }), []);
+
+  const showInvitationModal = useCallback(() => {
+    inviteModal.current = modal(inviteModalProps(link));
+  }, [inviteModalProps, link]);
+
   const defaultSelected = useMemo(() => {
     return localStorage.getItem('selectedUser');
   }, []);
 
+  useEffect(() => {
+    console.log({link});
+    inviteModal.current?.update(inviteModalProps(link));
+  }, [link]);
+
   return (
     <Block name="people">
-      <PeopleList
-        selectedUser={selectedUser}
-        defaultSelected={defaultSelected}
-        onSelect={(user) => selectUser(user)}
-      />
+      <Elem name="controls">
+        <Space spread>
+          <Space></Space>
 
-      {selectedUser && (
-        <SelectedUser
-          user={selectedUser}
-          onClose={() => selectUser(null)}
+          <Space>
+            <Button icon={<LsPlus/>} primary onClick={showInvitationModal}>
+              Add People
+            </Button>
+          </Space>
+        </Space>
+      </Elem>
+      <Elem name="content">
+        <PeopleList
+          selectedUser={selectedUser}
+          defaultSelected={defaultSelected}
+          onSelect={(user) => selectUser(user)}
         />
-      )}
+
+        {selectedUser && (
+          <SelectedUser
+            user={selectedUser}
+            onClose={() => selectUser(null)}
+          />
+        )}
+      </Elem>
     </Block>
   );
 };

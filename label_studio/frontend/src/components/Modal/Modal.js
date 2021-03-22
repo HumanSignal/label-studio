@@ -1,5 +1,5 @@
 import React, { createRef } from "react";
-import { render } from "react-dom";
+import { render, unmountComponentAtNode } from "react-dom";
 import { ApiProvider } from "../../providers/ApiProvider";
 import { ConfigProvider } from "../../providers/ConfigProvider";
 import { MultiProvider } from "../../providers/MultiProvider";
@@ -11,13 +11,16 @@ import { Modal } from "./ModalPopup";
 const standaloneModal = (props) => {
   const modalRef = createRef();
   const rootDiv = document.createElement("div");
+  let renderCount = 0;
   rootDiv.className = cn("modal-holder").toClassName();
 
   document.body.appendChild(rootDiv);
 
   const renderModal = (props, animate) => {
+    renderCount++;
+
     render((
-      <MultiProvider providers={[
+      <MultiProvider key={`modal-${renderCount}`} providers={[
         <ConfigProvider key="config"/>,
         <ApiProvider key="api"/>,
       ]}>
@@ -26,6 +29,7 @@ const standaloneModal = (props) => {
           {...props}
           onHide={() => {
             props.onHidden?.();
+            unmountComponentAtNode(rootDiv);
             rootDiv.remove();
           }}
           animateAppearance={animate}
@@ -38,7 +42,7 @@ const standaloneModal = (props) => {
 
   return {
     update(newProps) {
-      renderModal({...props, ...(newProps ?? {})}, false);
+      renderModal({...props, ...(newProps ?? {}), visible: true}, false);
     },
     close() {
       modalRef.current.hide();

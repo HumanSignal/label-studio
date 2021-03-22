@@ -1,6 +1,7 @@
 import React, { Fragment, useCallback, useMemo, useState } from 'react';
 import { LsSlack } from '../../assets/icons';
 import { Block, Elem } from '../../utils/bem';
+import { copyText } from '../../utils/helpers';
 import { Button } from '../Button/Button';
 import { Space } from '../Space/Space';
 import "./Error.styl";
@@ -16,15 +17,7 @@ export const ErrorWrapper = ({title, message, errorId, stacktrace, validation, v
 
   const copyStacktrace = useCallback(() => {
     setCopied(true);
-    const input = document.createElement('textarea');
-    document.body.appendChild(input);
-
-    input.value = preparedStackTrace;
-    input.focus();
-    input.select();
-
-    document.execCommand('copy');
-    input.remove();
+    copyText(preparedStackTrace);
     setTimeout(() => setCopied(false), 1200);
   }, [preparedStackTrace]);
 
