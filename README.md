@@ -99,6 +99,19 @@ You can deploy Label Studio with one click in Heroku, Microsoft Azure, or Google
 [<img src="https://aka.ms/deploytoazurebutton" height="30px">](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fheartexlabs%2Flabel-studio%2Fmaster%2Fazuredeploy.json)
 [<img src="https://deploy.cloud.run/button.svg" height="30px">](https://deploy.cloud.run)
 
+
+#### Apply frontend changes
+
+The frontend part of Label Studio app lies in the `frontend/` folder and written in React JSX. In case you've made some changes there, the following commands should be run before building / starting the instance:
+
+```
+cd frontend/
+npm ci
+npx webpack
+cd ..
+python label_studio/manage.py collectstatic --no-input
+```
+
 ### Troubleshoot installation
 If you see any errors during installation, try to rerun the installation
 
