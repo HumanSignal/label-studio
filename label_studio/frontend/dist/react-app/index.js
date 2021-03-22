@@ -5062,7 +5062,9 @@ const VersionProvider = ({
       }
     });
   }, [api]);
-  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(fetchVersion, [fetchVersion]);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    fetchVersion();
+  }, []);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(VersionContext.Provider, {
     value: state,
     children: children
@@ -7597,10 +7599,6 @@ const DataManagerPage = ({ ...props
     }
   }, [dataManagerRef]);
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    console.log({
-      DataManager,
-      LabelStudio
-    });
     init();
     return () => destroyDM();
   }, [root, init]);

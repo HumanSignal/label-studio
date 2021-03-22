@@ -97,7 +97,6 @@ export const DataManagerPage = ({...props}) => {
   }, [dataManagerRef]);
 
   useEffect(() => {
-    console.log({DataManager, LabelStudio});
     init();
 
     return () => destroyDM();
