@@ -2,8 +2,8 @@ include deploy/requirements.txt
 
 # react LSF / react-app with dm
 recursive-include label_studio/frontend/dist/lsf *
-include label_studio/frontend/dist/react-app/*
-include label_studio/frontend/dist/dm/*
+recursive-include label_studio/frontend/dist/react-app/*
+recursive-include label_studio/frontend/dist/dm/*
 
 # html template files
 recursive-include label_studio *.html
