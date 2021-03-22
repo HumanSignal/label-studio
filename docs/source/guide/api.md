@@ -4,11 +4,7 @@ type: guide
 order: 907
 ---
 
-## API Reference for Label Studio 1.0
-
-[Check this link](https://labelstud.io/api) for API Reference starting from Label Studio 1.0.
-
-## API Reference for old versions (before 1.0)
+## API reference for Label Studio 1.0.0
 
 You can use the Label Studio API to import data for labeling, export annotations, set up machine learning with Label Studio, and sync tasks with cloud storage. 
 
