@@ -2,6 +2,9 @@
 export const API_CONFIG = {
   gateway: `${window.APP_SETTINGS.hostname}/api`,
   endpoints: {
+    // Organization
+    memberships: "/organizations/:pk/memberships",
+
     // Project
     projects: "/projects",
     project: "/projects/:pk",

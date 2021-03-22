@@ -1,0 +1,57 @@
+.people-list
+  width 100%
+  min-width 650px
+  font-size 16px
+  overflow hidden
+  border-radius 4px
+  border 1px solid rgba(0, 0, 0, 0.15)
+
+  &__loading
+    width 100%
+    display flex
+    min-height 250px
+    justify-content center
+    align-items center
+
+  &__users
+    width 100%
+    text-align left
+    border-collapse collapse
+
+  &__header
+    font-weight 500
+
+  &__column,
+  &__field
+    height 48px
+    padding 0 10px
+    border none
+    font 16px/normal 'Roboto'
+    color black
+
+    &.last-activity
+      color rgba(#000, 0.4)
+
+  &__column
+    font-weight 500
+    background none
+
+  &__field
+    &.avatar
+      width 28px
+
+    &.email
+      width 200px
+
+    &.last-activity
+      width 160px
+
+  &__user
+    cursor pointer
+
+    &:nth-child(odd):not(&_active)
+      background-color rgba(0, 0, 0, 0.03)
+
+    &_active
+      background-color #fff
+      box-shadow 0 0 10px rgba(#000, 0.15)

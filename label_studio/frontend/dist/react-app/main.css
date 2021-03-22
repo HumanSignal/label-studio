@@ -860,10 +860,11 @@
   width: 28px;
   height: 28px;
   display: flex;
+  font-size: 12px;
   overflow: hidden;
   position: relative;
   align-items: center;
-  border-radius: 13.5px;
+  border-radius: 100%;
   color: rgba(0,0,0,0.8);
   justify-content: center;
   background: rgba(0,0,0,0.04);
@@ -880,7 +881,6 @@
 }
 .ls-userpic__username {
   display: block;
-  font-size: 12px;
   line-height: 22px;
   font-weight: bold;
   font-family: Roboto;
@@ -1280,6 +1280,141 @@
   color: #000;
   background: #fff;
   box-shadow: 0px 1px 0px rgba(0,0,0,0.1), 0px 0px 0px 1px rgba(0,0,0,0.02), 0px 5px 10px rgba(0,0,0,0.15);
+}
+
+.ls-people-list {
+  width: 100%;
+  min-width: 650px;
+  font-size: 16px;
+  overflow: hidden;
+  border-radius: 4px;
+  border: 1px solid rgba(0,0,0,0.15);
+}
+.ls-people-list__loading {
+  width: 100%;
+  display: flex;
+  min-height: 250px;
+  justify-content: center;
+  align-items: center;
+}
+.ls-people-list__users {
+  width: 100%;
+  text-align: left;
+  border-collapse: collapse;
+}
+.ls-people-list__header {
+  font-weight: 500;
+}
+.ls-people-list__column,
+.ls-people-list__field {
+  height: 48px;
+  padding: 0 10px;
+  border: none;
+  font: 16px/normal 'Roboto';
+  color: #000;
+}
+.ls-people-list__column.ls-last-activity,
+.ls-people-list__field.ls-last-activity {
+  color: rgba(0,0,0,0.4);
+}
+.ls-people-list__column {
+  font-weight: 500;
+  background: none;
+}
+.ls-people-list__field.ls-avatar {
+  width: 28px;
+}
+.ls-people-list__field.ls-email {
+  width: 200px;
+}
+.ls-people-list__field.ls-last-activity {
+  width: 160px;
+}
+.ls-people-list__user {
+  cursor: pointer;
+}
+.ls-people-list__user:nth-child(odd):not(.ls-people-list__user_active) {
+  background-color: rgba(0,0,0,0.03);
+}
+.ls-people-list__user_active {
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0,0,0,0.15);
+}
+
+.ls-people {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: min-content;
+  align-items: flex-start;
+  grid-gap: 20px;
+  padding: 40px;
+}
+
+.ls-user-info {
+  padding: 20px 24px;
+  border: 1px solid rgba(0,0,0,0.15);
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  border-radius: 4px;
+}
+.ls-user-info__close {
+  top: 20px;
+  right: 24px;
+  width: 32px;
+  height: 32px;
+  position: absolute;
+  --button-color: #09f;
+}
+.ls-user-info__header {
+  display: grid;
+  grid-template: auto/64px auto;
+  column-gap: 16px;
+  line-height: 1.5;
+  color: rgba(0,0,0,0.6);
+  margin-bottom: 16px;
+  align-items: center;
+}
+.ls-user-info__email {
+  margin: 0;
+}
+.ls-user-info__full-name {
+  font-size: 1.5em;
+  margin: 0;
+  color: #000;
+  margin-bottom: 16px;
+}
+.ls-user-info__section + .ls-user-info__section {
+  margin-top: 16px;
+}
+.ls-user-info__section-title {
+  margin-top: 1em;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+.ls-user-info__last-active {
+  color: #808080;
+  margin-top: 32px;
+  margin-bottom: 0;
+}
+.ls-user-info__links-list {
+  display: flex;
+  flex-direction: column;
+  max-width: 350px;
+}
+.ls-user-info__project-link {
+  height: 36px;
+  display: flex;
+  padding: 0 10px;
+  font-size: 16px;
+  margin-left: -10px;
+  align-items: center;
+  border-radius: 4px;
+  color: #09f;
+}
+.ls-user-info__project-link:hover {
+  background-color: #f1f1f1;
 }
 
 /* BASICS */
