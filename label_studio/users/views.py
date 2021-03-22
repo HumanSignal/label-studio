@@ -66,8 +66,8 @@ def proceed_registration(request, user_form, organization_form, next_page):
         org.add_user(user)
     else:
         org = Organization.create_organization(created_by=user, title='Label Studio')
-    request.session['organization_pk'] = org.pk
-    request.session.modified = True
+    user.active_organization = org
+    user.save(update_fields=['active_organization'])
 
     return redirect(redirect_url)
 
@@ -120,8 +120,8 @@ def user_login(request):
 
             # user is organization member
             org_pk = Organization.find_by_user(user).pk
-            request.session['organization_pk'] = org_pk
-            request.session.modified = True
+            user.active_organization_id = org_pk
+            user.save(update_fields=['active_organization'])
             return redirect(next_page)
 
     return render(request, 'users/user_login.html', {
@@ -134,7 +134,7 @@ def user_login(request):
 def user_account(request):
     user = request.user
 
-    if 'organization_pk' not in request.session:
+    if user.active_organization is None and 'organization_pk' not in request.session:
         return redirect(reverse('main'))
 
     form = forms.UserProfileForm(instance=user)

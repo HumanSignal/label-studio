@@ -5,7 +5,6 @@ from core.settings.base import *
 DJANGO_DB = get_env('DJANGO_DB', DJANGO_DB_SQLITE)
 DATABASES = {'default': DATABASES_ALL[DJANGO_DB]}
 
-MIDDLEWARE.remove('organizations.middleware.GetSessionMiddleware')
 MIDDLEWARE.append('organizations.middleware.DummyGetSessionMiddleware')
 MIDDLEWARE.append('core.middleware.UpdateLastActivityMiddleware')
 

@@ -632,3 +632,17 @@ def collect_versions(force=False):
     return result
 
 
+def get_organization_from_request(request):
+    """Helper for backward compatability with org_pk in session """
+    # TODO remove session logic in next release
+    user = request.user
+    if user and user.is_authenticated:
+        if user.active_organization is None:
+            organization_pk = request.session.get('organization_pk')
+            if organization_pk:
+                user.active_organization_id = organization_pk
+                user.save()
+                request.session.pop('organization_pk', None)
+                request.session.modified = True
+        return user.active_organization_id
+
