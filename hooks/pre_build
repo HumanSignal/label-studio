@@ -11,7 +11,7 @@ apt update
 apt -y install software-properties-common
 add-apt-repository ppa:deadsnakes/ppa
 apt update
-apt -y install python3.7
+apt -y install python3.7 python3-pip
 
 echo "=> Environmental setup:"
 which python3
@@ -23,10 +23,11 @@ env
 echo "=> Update links"
 update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.7 2
 python3 --version
-python3.7 -m pip install pip
-pip --version
-pip install --upgrade pip
-pip --version
+
+echo "=> Upgrade pip"
+pip3 --version
+pip3 install --upgrade pip
+pip3 --version
 
 echo "=> Install prerequisites..."
 curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.1/install.sh | bash
