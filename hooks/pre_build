@@ -8,7 +8,7 @@ echo $PWD
 
 echo "=> Environmental setup:"
 env
-python --version
+python3 --version
 
 echo "=> Install prerequisites..."
 curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.1/install.sh | bash
@@ -31,8 +31,8 @@ echo "=> Installing npm packages..."
 npm i node-fetch
 
 echo "=> Installing environment..."
-pip install --upgrade pip
-pip install -e .
+pip3 install --upgrade pip
+pip3 install -e .
 
 echo "=> Run image prebuild..."
 ./deploy/prebuild.sh
