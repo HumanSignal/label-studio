@@ -6,6 +6,8 @@ lsb_release -a
 echo "=> Current dir:"
 echo $PWD
 
+apt-get update && apt-get install -y python3.8
+
 echo "=> Environmental setup:"
 env
 python3 --version
