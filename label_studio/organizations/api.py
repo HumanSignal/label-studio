@@ -16,7 +16,7 @@ from core.utils.common import get_object_with_check_and_log
 
 from organizations.models import Organization
 from organizations.serializers import (
-    OrganizationSerializer, OrganizationIdSerializer, OrganizationMemberUserSerializer
+    OrganizationSerializer, OrganizationIdSerializer, OrganizationMemberUserSerializer, OrganizationInviteSerializer
 )
 
 
@@ -122,35 +122,39 @@ class OrganizationAPI(APIViewVirtualRedirectMixin,
 
 
 class OrganizationInviteAPI(APIView):
-    """
-    """
-    parser_classes = (JSONParser, FormParser, MultiPartParser)
-    queryset = Organization.objects.all()
-    permission_classes = (IsAuthenticated, OrganizationAPIPermissions)
-    serializer_class = OrganizationIdSerializer
-    swagger_schema = None
+    parser_classes = (JSONParser,)
+    permission_classes = (IsAuthenticated,)
 
+    @swagger_auto_schema(
+        tags=["Invites"],
+        operation_summary='Get organization invite link',
+        responses={200: OrganizationInviteSerializer()}
+    )
     def get(self, request, *args, **kwargs):
         org = get_object_with_check_and_log(self.request, Organization, pk=request.user.active_organization_id)
         self.check_object_permissions(self.request, org)
         invite_url = '{}?token={}'.format(reverse('user-signup'), org.token)
-        return Response({'invite_url': invite_url}, status=200)
+        serializer = OrganizationInviteSerializer(data={'invite_url': invite_url, 'token': org.token})
+        serializer.is_valid()
+        return Response(serializer.data, status=200)
 
 
 class OrganizationResetTokenAPI(APIView):
-    """
-    """
-    parser_classes = (JSONParser, FormParser, MultiPartParser)
-    queryset = Organization.objects.all()
-    permission_classes = (IsAuthenticated, OrganizationAPIPermissions)
-    serializer_class = OrganizationIdSerializer
-    swagger_schema = None
+    parser_classes = (JSONParser,)
+    permission_classes = (IsAuthenticated,)
 
+    @swagger_auto_schema(
+        tags=["Invites"],
+        operation_summary='Reset organization token',
+        responses={200: OrganizationInviteSerializer()}
+    )
     def post(self, request, *args, **kwargs):
         org = get_object_with_check_and_log(self.request, Organization, pk=request.user.active_organization_id)
         self.check_object_permissions(self.request, org)
         org.reset_token()
         logger.debug(f'New token for organization {org.pk} is {org.token}')
         invite_url = '{}?token={}'.format(reverse('user-signup'), org.token)
-        return Response({'token': org.token, 'invite_url': invite_url}, status=201)
+        serializer = OrganizationInviteSerializer(data={'invite_url': invite_url, 'token': org.token})
+        serializer.is_valid()
+        return Response(serializer.data, status=201)
 
