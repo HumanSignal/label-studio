@@ -6,6 +6,9 @@ lsb_release -a
 echo "=> Current dir:"
 echo $PWD
 
+echo "=> Environmental setup:"
+env
+
 echo "=> Install prerequisites..."
 curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.1/install.sh | bash
 source ~/.bashrc
@@ -28,6 +31,7 @@ npm i node-fetch
 
 echo "=> Installing environment..."
 pip install -e .
+export DJANGO_
 
 echo "=> Run image prebuild..."
 ./deploy/prebuild.sh
