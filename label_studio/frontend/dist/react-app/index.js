@@ -5251,6 +5251,8 @@ const API_CONFIG = {
   endpoints: {
     // Organization
     memberships: "/organizations/:pk/memberships",
+    inviteLink: "/invite",
+    resetInviteLink: "POST:/invite/reset-token",
     // Project
     projects: "/projects",
     project: "/projects/:pk",
@@ -8348,13 +8350,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_Form__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../components/Form */ "./src/components/Form/index.js");
 /* harmony import */ var _components_Modal_Modal__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../components/Modal/Modal */ "./src/components/Modal/Modal.js");
 /* harmony import */ var _components_Space_Space__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../components/Space/Space */ "./src/components/Space/Space.js");
-/* harmony import */ var _utils_bem__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../utils/bem */ "./src/utils/bem.tsx");
-/* harmony import */ var _utils_helpers__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../utils/helpers */ "./src/utils/helpers.js");
-/* harmony import */ var _PeopleInvitation_styl__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./PeopleInvitation.styl */ "./src/pages/PeoplePage/PeopleInvitation.styl");
-/* harmony import */ var _PeopleList__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./PeopleList */ "./src/pages/PeoplePage/PeopleList.js");
-/* harmony import */ var _PeoplePage_styl__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./PeoplePage.styl */ "./src/pages/PeoplePage/PeoplePage.styl");
-/* harmony import */ var _SelectedUser__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./SelectedUser */ "./src/pages/PeoplePage/SelectedUser.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+/* harmony import */ var _providers_ApiProvider__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../providers/ApiProvider */ "./src/providers/ApiProvider.js");
+/* harmony import */ var _providers_ConfigProvider__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../providers/ConfigProvider */ "./src/providers/ConfigProvider.js");
+/* harmony import */ var _utils_bem__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../utils/bem */ "./src/utils/bem.tsx");
+/* harmony import */ var _utils_helpers__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../utils/helpers */ "./src/utils/helpers.js");
+/* harmony import */ var _PeopleInvitation_styl__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./PeopleInvitation.styl */ "./src/pages/PeoplePage/PeopleInvitation.styl");
+/* harmony import */ var _PeopleList__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./PeopleList */ "./src/pages/PeoplePage/PeopleList.js");
+/* harmony import */ var _PeoplePage_styl__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./PeoplePage.styl */ "./src/pages/PeoplePage/PeoplePage.styl");
+/* harmony import */ var _SelectedUser__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./SelectedUser */ "./src/pages/PeoplePage/SelectedUser.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+
+
 
 
 
@@ -8374,15 +8380,15 @@ __webpack_require__.r(__webpack_exports__);
 const InvitationModal = ({
   link
 }) => {
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_utils_bem__WEBPACK_IMPORTED_MODULE_7__.Block, {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_utils_bem__WEBPACK_IMPORTED_MODULE_9__.Block, {
     name: "invite",
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_components_Form__WEBPACK_IMPORTED_MODULE_4__.Input, {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_components_Form__WEBPACK_IMPORTED_MODULE_4__.Input, {
       value: link,
       style: {
         width: '100%'
       },
       readOnly: true
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_components_Description_Description__WEBPACK_IMPORTED_MODULE_3__.Description, {
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_components_Description_Description__WEBPACK_IMPORTED_MODULE_3__.Description, {
       style: {
         width: '70%',
         marginTop: 16
@@ -8393,9 +8399,11 @@ const InvitationModal = ({
 };
 
 const PeoplePage = () => {
+  const api = (0,_providers_ApiProvider__WEBPACK_IMPORTED_MODULE_7__.useAPI)();
   const inviteModal = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
+  const config = (0,_providers_ConfigProvider__WEBPACK_IMPORTED_MODULE_8__.useConfig)();
   const [selectedUser, setSelectedUser] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
-  const [link, setLink] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)("https://labelstud.io/organizations/welcome/1232312");
+  const [link, setLink] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)();
   const selectUser = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(user => {
     console.log({
       user
@@ -8403,43 +8411,51 @@ const PeoplePage = () => {
     setSelectedUser(user);
     localStorage.setItem('selectedUser', user === null || user === void 0 ? void 0 : user.id);
   }, [setSelectedUser]);
-  const updateLink = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(link => {
-    setLink(link);
-  }, [link]);
+  const setInviteLink = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(link => {
+    const hostname = config.hostname || location.origin;
+    setLink(`${hostname}${link}`);
+  }, [config, setLink]);
+  const updateLink = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(() => {
+    api.callApi('resetInviteLink').then(({
+      invite_url
+    }) => {
+      setInviteLink(invite_url);
+    });
+  }, [setInviteLink]);
   const inviteModalProps = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(link => ({
     title: "Invite people",
     style: {
       width: 640,
       height: 472
     },
-    body: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(InvitationModal, {
+    body: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(InvitationModal, {
       link: link
     }),
     footer: () => {
       const [copied, setCopied] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
       const copyLink = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(() => {
         setCopied(true);
-        (0,_utils_helpers__WEBPACK_IMPORTED_MODULE_8__.copyText)(link);
+        (0,_utils_helpers__WEBPACK_IMPORTED_MODULE_10__.copyText)(link);
         setTimeout(() => setCopied(false), 1500);
       }, []);
-      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_components_Space_Space__WEBPACK_IMPORTED_MODULE_6__.Space, {
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_components_Space_Space__WEBPACK_IMPORTED_MODULE_6__.Space, {
         spread: true,
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_components_Space_Space__WEBPACK_IMPORTED_MODULE_6__.Space, {
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_components__WEBPACK_IMPORTED_MODULE_2__.Button, {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_components_Space_Space__WEBPACK_IMPORTED_MODULE_6__.Space, {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_components__WEBPACK_IMPORTED_MODULE_2__.Button, {
             style: {
               width: 170
             },
-            onClick: () => updateLink("hello world"),
+            onClick: () => updateLink(),
             children: "Reset Link"
           })
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_components_Space_Space__WEBPACK_IMPORTED_MODULE_6__.Space, {
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_components__WEBPACK_IMPORTED_MODULE_2__.Button, {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_components_Space_Space__WEBPACK_IMPORTED_MODULE_6__.Space, {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_components__WEBPACK_IMPORTED_MODULE_2__.Button, {
             primary: true,
             style: {
               width: 170
             },
             onClick: copyLink,
-            children: ["Copy Link", copied && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_assets_icons__WEBPACK_IMPORTED_MODULE_1__.LsCheck, {
+            children: ["Copy Link", copied && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_assets_icons__WEBPACK_IMPORTED_MODULE_1__.LsCheck, {
               style: {
                 marginLeft: 10
               }
@@ -8457,35 +8473,39 @@ const PeoplePage = () => {
     return localStorage.getItem('selectedUser');
   }, []);
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    api.callApi("inviteLink").then(({
+      invite_url
+    }) => {
+      setInviteLink(invite_url);
+    });
+  }, []);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     var _inviteModal$current;
 
-    console.log({
-      link
-    });
     (_inviteModal$current = inviteModal.current) === null || _inviteModal$current === void 0 ? void 0 : _inviteModal$current.update(inviteModalProps(link));
   }, [link]);
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_utils_bem__WEBPACK_IMPORTED_MODULE_7__.Block, {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_utils_bem__WEBPACK_IMPORTED_MODULE_9__.Block, {
     name: "people",
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_7__.Elem, {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_9__.Elem, {
       name: "controls",
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_components_Space_Space__WEBPACK_IMPORTED_MODULE_6__.Space, {
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_components_Space_Space__WEBPACK_IMPORTED_MODULE_6__.Space, {
         spread: true,
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_components_Space_Space__WEBPACK_IMPORTED_MODULE_6__.Space, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_components_Space_Space__WEBPACK_IMPORTED_MODULE_6__.Space, {
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_components__WEBPACK_IMPORTED_MODULE_2__.Button, {
-            icon: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_assets_icons__WEBPACK_IMPORTED_MODULE_1__.LsPlus, {}),
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_components_Space_Space__WEBPACK_IMPORTED_MODULE_6__.Space, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_components_Space_Space__WEBPACK_IMPORTED_MODULE_6__.Space, {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_components__WEBPACK_IMPORTED_MODULE_2__.Button, {
+            icon: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_assets_icons__WEBPACK_IMPORTED_MODULE_1__.LsPlus, {}),
             primary: true,
             onClick: showInvitationModal,
             children: "Add People"
           })
         })]
       })
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_utils_bem__WEBPACK_IMPORTED_MODULE_7__.Elem, {
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_utils_bem__WEBPACK_IMPORTED_MODULE_9__.Elem, {
       name: "content",
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_PeopleList__WEBPACK_IMPORTED_MODULE_10__.PeopleList, {
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_PeopleList__WEBPACK_IMPORTED_MODULE_12__.PeopleList, {
         selectedUser: selectedUser,
         defaultSelected: defaultSelected,
         onSelect: user => selectUser(user)
-      }), selectedUser && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_SelectedUser__WEBPACK_IMPORTED_MODULE_12__.SelectedUser, {
+      }), selectedUser && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_SelectedUser__WEBPACK_IMPORTED_MODULE_14__.SelectedUser, {
         user: selectedUser,
         onClose: () => selectUser(null)
       })]

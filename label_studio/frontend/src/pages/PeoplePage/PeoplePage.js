@@ -5,6 +5,8 @@ import { Description } from "../../components/Description/Description";
 import { Input } from "../../components/Form";
 import { modal } from "../../components/Modal/Modal";
 import { Space } from "../../components/Space/Space";
+import { useAPI } from "../../providers/ApiProvider";
+import { useConfig } from "../../providers/ConfigProvider";
 import { Block, Elem } from "../../utils/bem";
 import { copyText } from "../../utils/helpers";
 import "./PeopleInvitation.styl";
@@ -29,10 +31,12 @@ const InvitationModal = ({link}) => {
 };
 
 export const PeoplePage = () => {
+  const api = useAPI();
   const inviteModal = useRef();
+  const config = useConfig();
   const [selectedUser, setSelectedUser] = useState(null);
 
-  const [link, setLink] = useState("https://labelstud.io/organizations/welcome/1232312");
+  const [link, setLink] = useState();
 
   const selectUser = useCallback((user) => {
     console.log({user});
@@ -41,9 +45,16 @@ export const PeoplePage = () => {
     localStorage.setItem('selectedUser', user?.id);
   }, [setSelectedUser]);
 
-  const updateLink = useCallback((link) => {
-    setLink(link);
-  }, [link]);
+  const setInviteLink = useCallback((link) => {
+    const hostname = config.hostname || location.origin;
+    setLink(`${hostname}${link}`);
+  }, [config, setLink]);
+
+  const updateLink = useCallback(() => {
+    api.callApi('resetInviteLink').then(({invite_url}) => {
+      setInviteLink(invite_url);
+    });
+  }, [setInviteLink]);
 
   const inviteModalProps = useCallback((link) => ({
     title: "Invite people",
@@ -63,7 +74,7 @@ export const PeoplePage = () => {
       return (
         <Space spread>
           <Space>
-            <Button style={{width: 170}} onClick={() => updateLink("hello world")}>
+            <Button style={{width: 170}} onClick={() => updateLink()}>
               Reset Link
             </Button>
           </Space>
@@ -88,7 +99,12 @@ export const PeoplePage = () => {
   }, []);
 
   useEffect(() => {
-    console.log({link});
+    api.callApi("inviteLink").then(({invite_url}) => {
+      setInviteLink(invite_url);
+    });
+  }, []);
+
+  useEffect(() => {
     inviteModal.current?.update(inviteModalProps(link));
   }, [link]);
 
