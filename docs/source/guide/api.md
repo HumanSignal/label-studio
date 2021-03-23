@@ -4,11 +4,17 @@ type: guide
 order: 907
 ---
 
+## API Reference for Label Studio 1.0
+
+[Check this link](https://labelstud.io/api) for API Reference starting from Label Studio 1.0.
+
+## API Reference for old versions (before 1.0)
+
 You can use the Label Studio API to import data for labeling, export annotations, set up machine learning with Label Studio, and sync tasks with cloud storage. 
 
 See the API documentation linked inside Label Studio for further guidance and interactive examples. 
 
-## Authenticate to the API
+### Authenticate to the API
 
 1. In the Label Studio UI, click the user icon in the upper right.
 2. Click **Account & Settings**.
@@ -25,7 +31,7 @@ curl -X GET https://localhost:8000/api/projects/ -H 'Authorization: Token 123456
 ```
 
 
-## API endpoint reference for older Label Studio versions
+### API endpoint reference for older Label Studio versions
 
 These API endpoints were introduced in Label Studio version 0.8.1 and are only valid until version 0.9.1. Use the API documentation linked inside Label Studio for guidance when working with version 1.0.0. 
 

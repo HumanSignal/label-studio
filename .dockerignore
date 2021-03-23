@@ -14,4 +14,3 @@ label_studio/frontend
 
 # except
 !label_studio/frontend/dist
-!label_studio/frontend/lib/dm/version.json

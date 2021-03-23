@@ -98,15 +98,10 @@ async function get(projectName, ref = 'master') {
   fs.writeFileSync(`${dir}/static/version.json`, JSON.stringify(info, null, 2));
   console.info('Version info written to static/version.json');
 
-
-  const needsBuild = ['dm'].includes(projectName);
-
   // move build to target folder
   var oldPath = path.join(dir, 'static');
 
-  var newPath = needsBuild
-    ? path.join(__dirname, TARGET_DIR, projectName)
-    : path.join(__dirname, DIST_DIR, projectName);
+  var newPath = path.join(__dirname, DIST_DIR, projectName);
 
   fs.rmdirSync(newPath, { recursive: true });
   fs.mkdirSync(newPath, { recursive: true });
@@ -116,10 +111,6 @@ async function get(projectName, ref = 'master') {
     console.log(`Successfully renamed - AKA moved into ${newPath}`);
     fs.rmdirSync(dir, {recursive: true});
     console.log(`Cleaned up tmp directory [${dir}]`);
-
-    if (needsBuild && !process.env.NO_BUILD) {
-      execSync(`npx webpack`, {stdio: 'inherit'});
-    }
   });
 }
 

@@ -1,46 +1,59 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { EnvironmentPlugin } = require('webpack');
+const TerserPlugin = require("terser-webpack-plugin");
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 
 const LOCAL_ENV = {
   NODE_ENV: "development",
   CSS_PREFIX: "ls-",
 };
 
-const babelLoader = {
-  loader: 'babel-loader',
-  options: {
-    presets: [
-      ['@babel/preset-react', {
-        "runtime": "automatic",
-      }],
-      '@babel/preset-typescript',
-      ['@babel/preset-env', {
-        "targets": {
-          "browsers": ["last 2 Chrome versions"],
-        },
-      }],
-    ],
-    plugins: [
-      '@babel/plugin-proposal-class-properties',
-      '@babel/plugin-proposal-optional-chaining',
-      '@babel/plugin-proposal-nullish-coalescing-operator',
-    ],
-  },
+const babelOptimizeOptions = () => {
+  return process.env.NODE_ENV === 'production'
+    ? {
+      compact: true,
+      cacheCompression: true,
+    } : {};
 };
 
+const babelLoader = {
+  loader: 'babel-loader',
+  options: babelOptimizeOptions(),
+};
+
+const devtool = process.env.NODE_ENV === 'production' ? "source-map" : "cheap-module-source-map";
+
+const output = {
+  path: path.resolve(__dirname, "dist", "react-app"),
+  filename: 'index.js',
+};
+
+const plugins = [
+  new MiniCssExtractPlugin(),
+  new EnvironmentPlugin(LOCAL_ENV),
+];
+
+const optimizer = {};
+
+if (process.env.NODE_ENV === 'production') {
+  optimizer.minimize = true;
+  optimizer.minimizer = [new TerserPlugin(), new CssMinimizerPlugin()];
+  optimizer.runtimeChunk = false,
+  optimizer.splitChunks = {
+    cacheGroups: {
+      default: false,
+    },
+  };
+}
+
 module.exports = {
+  devtool: devtool,
   mode: process.env.NODE_ENV || "development",
-  devtool: "cheap-module-source-map",
   entry: "./src/index.js",
-  output: {
-    path: path.resolve(__dirname, "dist", "react-app"),
-    filename: 'index.js',
-  },
-  plugins: [
-    new MiniCssExtractPlugin(),
-    new EnvironmentPlugin(LOCAL_ENV),
-  ],
+  output: output,
+  plugins: plugins,
+  optimization: optimizer,
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
   },
