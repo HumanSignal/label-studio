@@ -3,17 +3,7 @@
 import pytest
 import json
 
-
-@pytest.fixture
-@pytest.mark.django_db
-def project_id(business_client):
-    payload = dict(title="test_project")
-    response = business_client.post(
-        "/api/projects/",
-        data=json.dumps(payload),
-        content_type="application/json",
-    )
-    return response.json()["id"]
+from tests.utils import project_id
 
 
 @pytest.mark.django_db

@@ -7,6 +7,7 @@ from django.contrib.auth import views as auth_views
 from django.shortcuts import render, redirect, reverse
 from django.contrib import auth
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 from rest_framework.authtoken.models import Token
 
 from users import forms
@@ -66,8 +67,8 @@ def proceed_registration(request, user_form, organization_form, next_page):
         org.add_user(user)
     else:
         org = Organization.create_organization(created_by=user, title='Label Studio')
-    request.session['organization_pk'] = org.pk
-    request.session.modified = True
+    user.active_organization = org
+    user.save(update_fields=['active_organization'])
 
     return redirect(redirect_url)
 
@@ -77,12 +78,18 @@ def user_signup(request):
     """
     user = request.user
     next_page = request.GET.get('next')
+    token = request.GET.get('token')
     next_page = next_page if next_page else reverse('projects:project-index')
     user_form = forms.UserSignupForm()
     organization_form = OrganizationSignupForm()
 
     if user.is_authenticated:
         return redirect(next_page)
+
+    organization = Organization.objects.first()
+    if settings.DISABLE_SIGNUP_WITHOUT_LINK is True:
+        if not(token and organization and token == organization.token):
+            raise PermissionDenied()
 
     # make a new user
     if request.method == 'POST':
@@ -120,8 +127,8 @@ def user_login(request):
 
             # user is organization member
             org_pk = Organization.find_by_user(user).pk
-            request.session['organization_pk'] = org_pk
-            request.session.modified = True
+            user.active_organization_id = org_pk
+            user.save(update_fields=['active_organization'])
             return redirect(next_page)
 
     return render(request, 'users/user_login.html', {
@@ -134,7 +141,7 @@ def user_login(request):
 def user_account(request):
     user = request.user
 
-    if 'organization_pk' not in request.session:
+    if user.active_organization is None and 'organization_pk' not in request.session:
         return redirect(reverse('main'))
 
     form = forms.UserProfileForm(instance=user)
