@@ -8,6 +8,7 @@ echo $PWD
 
 echo "=> Environmental setup:"
 env
+python --version
 
 echo "=> Install prerequisites..."
 curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.1/install.sh | bash
@@ -30,8 +31,8 @@ echo "=> Installing npm packages..."
 npm i node-fetch
 
 echo "=> Installing environment..."
+pip install --upgrade pip
 pip install -e .
-export DJANGO_
 
 echo "=> Run image prebuild..."
 ./deploy/prebuild.sh
