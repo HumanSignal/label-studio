@@ -34,7 +34,7 @@ jobs:
           pip install -e .
 
       - name: Install LSF & set version.py
-        run: sh ./deploy/run_image_prebuild.sh
+        run: ./deploy/prebuild.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -117,7 +117,7 @@ jobs:
           pip install -e .
 
       - name: Install LSF & set version.py
-        run: sh ./deploy/run_image_prebuild.sh
+        run: ./deploy/prebuild.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

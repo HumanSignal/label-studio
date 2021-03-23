@@ -10,13 +10,15 @@ services:
       - app
     volumes:
       - static:/label-studio/label_studio:rw
-      - ./nginx/:/etc/nginx/conf.d/:ro
+      - ./mydata:/label-studio/data:rw
+      - ./deploy/nginx/:/etc/nginx/conf.d/:ro
     command: nginx -g "daemon off;"
 
   app:
-    build: ./
-    expose:
-      - "8080"
+#    build: ./
+    image: heartexlabs/label-studio:latest
+    ports:
+      - 8080:8080
     depends_on:
       - db
     environment:
@@ -28,8 +30,8 @@ services:
       - POSTGRE_HOST=db
     volumes:
       - static:/label-studio/label_studio:rw
-      - ./files:/root/.local/share/label-studio:rw
-    command: [ "/label-studio/wait-for-it.sh", "db", "/usr/local/bin/label-studio" ]
+      - ./mydata:/label-studio/data:rw
+    command: [ "./deploy/wait-for-postgres.sh", "db", "label-studio" ]
     
   db:
     image: postgres:11.5
