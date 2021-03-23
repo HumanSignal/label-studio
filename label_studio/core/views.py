@@ -27,7 +27,7 @@ def main(request):
 
     if user.is_authenticated:
 
-        if 'organization_pk' not in request.session:
+        if user.active_organization is None and 'organization_pk' not in request.session:
             logout(request)
             return redirect(reverse('user-login'))
 
