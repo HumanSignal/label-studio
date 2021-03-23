@@ -70,7 +70,7 @@ def load_tasks(request, project):
     file_upload_ids, found_formats, data_keys = [], [], set()
     could_be_tasks_lists = False
     # take tasks from request FILES
-    if len(request.FILES):
+    if request.FILES:
         check_file_sizes_and_number(request.FILES)
         for filename, file in request.FILES.items():
             file_upload = create_file_upload(request, project, file)

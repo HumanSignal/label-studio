@@ -113,7 +113,7 @@ def validate_label_config(config_string):
     except (etree.XMLSyntaxError, etree.XMLSchemaParseError, ValueError) as exc:
         raise ValidationError(str(exc))
     except jsonschema.exceptions.ValidationError as exc:
-        error_message = exc.context[-1].message if len(exc.context) else exc.message
+        error_message = exc.context[-1].message if exc.context else exc.message
         error_message = 'Validation failed on {}: {}'.format('/'.join(exc.path), error_message.replace('@', ''))
         raise ValidationError(error_message)
 

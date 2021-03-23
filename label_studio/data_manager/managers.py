@@ -83,7 +83,7 @@ def apply_ordering(queryset, ordering):
             if only_undefined_field:
                 field_name = re.sub('data__\w+', f'data__{settings.DATA_UNDEFINED_NAME}', field_name)
 
-        ascending = False if field_name[0] == '-' else True  # detect direction
+        ascending = not field_name[0] == '-'  # detect direction
         field_name = field_name[1:] if field_name[0] == '-' else field_name  # remove direction
 
         f = F(field_name).asc(nulls_last=True) if ascending else F(field_name).desc(nulls_last=True)

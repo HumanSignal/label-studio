@@ -64,7 +64,7 @@ def float_from_request(params, key, default):
         except ValueError:
             raise ValueError(f'Incorrect value in key "{key}" = "{value}". It should be digit string.')
     # float
-    elif isinstance(value, float) or isinstance(value, int):
+    elif isinstance(value, (float, int)):
         return float(value)
     # other
     else:

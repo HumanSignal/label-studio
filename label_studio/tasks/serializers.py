@@ -82,7 +82,7 @@ class AnnotationSerializer(DynamicFieldsMixin, ModelSerializer):
             return ""
             
         name = user.first_name
-        if len(user.last_name):
+        if user.last_name:
             name = name + " " + user.last_name
 
         name += f' ({user.email}, {user.id})'
@@ -414,7 +414,7 @@ class AnnotationDraftSerializer(ModelSerializer):
         user = draft.user
 
         name = user.first_name
-        if len(user.last_name):
+        if user.last_name:
             name = name + " " + user.last_name
 
         name += f' ({user.email}, {user.id})'

@@ -80,7 +80,7 @@ class Organization(models.Model):
     @classmethod
     def find_by_invite_url(cls, url):
         token = url.strip('/').split('/')[-1]
-        if len(token):
+        if token:
             return Organization.objects.get(token=token)
         else:
             raise KeyError(f'Can\'t find Organization by welcome URL: {url}')

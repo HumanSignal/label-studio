@@ -130,7 +130,6 @@ def make_prediction(config, task_id):
 
 
 def make_annotator(config, project, login=False, client=None):
-    from users.models import User
 
     user = User.objects.create(**config)
     user.set_password('12345')
