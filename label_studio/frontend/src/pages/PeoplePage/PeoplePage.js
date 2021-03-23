@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { LsCheck, LsPlus } from "../../assets/icons";
+import { LsPlus } from "../../assets/icons";
 import { Button } from "../../components";
 import { Description } from "../../components/Description/Description";
 import { Input } from "../../components/Form";
@@ -80,8 +80,7 @@ export const PeoplePage = () => {
           </Space>
           <Space>
             <Button primary style={{width: 170}} onClick={copyLink}>
-              Copy Link
-              {copied && (<LsCheck style={{marginLeft: 10}}/>)}
+              {copied ? "Copied!" : "Copy link"}
             </Button>
           </Space>
         </Space>

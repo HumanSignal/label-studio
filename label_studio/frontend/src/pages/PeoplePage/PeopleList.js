@@ -40,31 +40,29 @@ export const PeopleList = ({onSelect, selectedUser, defaultSelected}) => {
   return (
     <Block name="people-list">
       {usersList ? (
-        <Elem tag="table" name="users">
-          <Elem tag="thead" name="header">
-            <tr>
-              <Elem tag="th" name="column" mix="avatar"/>
-              <Elem tag="th" name="column" mix="email">Email</Elem>
-              <Elem tag="th" name="column" mix="name">Name</Elem>
-              <Elem tag="th" name="column" mix="last-activity">Last Activity</Elem>
-            </tr>
+        <Elem name="users">
+          <Elem name="header">
+            <Elem name="column" mix="avatar"/>
+            <Elem name="column" mix="email">Email</Elem>
+            <Elem name="column" mix="name">Name</Elem>
+            <Elem name="column" mix="last-activity">Last Activity</Elem>
           </Elem>
-          <Elem tag="tbody" name="body">
+          <Elem name="body">
             {usersList.map(({user}) => {
               const active = user.id === selectedUser?.id;
 
               return (
-                <Elem key={`user-${user.id}`} tag="tr" name="user" mod={{active}} onClick={() => selectUser(user)}>
-                  <Elem tag="td" name="field" mix="avatar">
+                <Elem key={`user-${user.id}`} name="user" mod={{active}} onClick={() => selectUser(user)}>
+                  <Elem name="field" mix="avatar">
                     <Userpic user={user} style={{ width: 28, height: 28 }}/>
                   </Elem>
-                  <Elem tag="td" name="field" mix="email">
+                  <Elem name="field" mix="email">
                     {user.email}
                   </Elem>
-                  <Elem tag="td" name="field" mix="name">
+                  <Elem name="field" mix="name">
                     {user.first_name} {user.last_name}
                   </Elem>
-                  <Elem tag="td" name="field" mix="last-activity">
+                  <Elem name="field" mix="last-activity">
                     {formatDistance(new Date(user.last_activity), new Date(), {addSuffix: true})}
                   </Elem>
                 </Elem>

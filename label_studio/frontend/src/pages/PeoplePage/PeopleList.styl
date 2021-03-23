@@ -2,9 +2,8 @@
   width 100%
   min-width 650px
   font-size 16px
-  overflow hidden
   border-radius 4px
-  border 1px solid rgba(0, 0, 0, 0.15)
+  box-shadow 0 0 0 1px rgba(0, 0, 0, 0.15) inset
 
   &__loading
     width 100%
@@ -20,14 +19,19 @@
 
   &__header
     font-weight 500
+    display flex
 
   &__column,
   &__field
+    z-index 2
     height 48px
     padding 0 10px
     border none
-    font 16px/normal 'Roboto'
     color black
+    display flex
+    position relative
+    align-items center
+    font 16px/normal 'Roboto'
 
     &.last-activity
       color rgba(#000, 0.4)
@@ -36,9 +40,13 @@
     font-weight 500
     background none
 
-  &__field
+  &__field,
+  &__column
     &.avatar
       width 28px
+
+    &.name
+      flex 1
 
     &.email
       width 200px
@@ -48,10 +56,31 @@
 
   &__user
     cursor pointer
+    display flex
 
     &:nth-child(odd):not(&_active)
       background-color rgba(0, 0, 0, 0.03)
 
     &_active
+      position relative
       background-color #fff
-      box-shadow 0 0 10px rgba(#000, 0.15)
+
+      &::before,
+      &::after
+        top 0
+        bottom 0
+        left -1px
+        content ''
+        display block
+        position absolute
+
+      &::after
+        z-index 1
+        background-color #fff
+        width calc(100% + 22px)
+        box-shadow inset 2px 0 0 #000, 1px 0 0 1px rgba(0, 0, 0, 0.15) inset
+
+      &::before
+        z-index 0
+        height 100%
+        width calc(100% + 22px)

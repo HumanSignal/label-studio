@@ -8248,49 +8248,38 @@ const PeopleList = ({
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_3__.Block, {
     name: "people-list",
     children: usersList ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_utils_bem__WEBPACK_IMPORTED_MODULE_3__.Elem, {
-      tag: "table",
       name: "users",
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_3__.Elem, {
-        tag: "thead",
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_utils_bem__WEBPACK_IMPORTED_MODULE_3__.Elem, {
         name: "header",
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("tr", {
-          children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_3__.Elem, {
-            tag: "th",
-            name: "column",
-            mix: "avatar"
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_3__.Elem, {
-            tag: "th",
-            name: "column",
-            mix: "email",
-            children: "Email"
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_3__.Elem, {
-            tag: "th",
-            name: "column",
-            mix: "name",
-            children: "Name"
-          }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_3__.Elem, {
-            tag: "th",
-            name: "column",
-            mix: "last-activity",
-            children: "Last Activity"
-          })]
-        })
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_3__.Elem, {
+          name: "column",
+          mix: "avatar"
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_3__.Elem, {
+          name: "column",
+          mix: "email",
+          children: "Email"
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_3__.Elem, {
+          name: "column",
+          mix: "name",
+          children: "Name"
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_3__.Elem, {
+          name: "column",
+          mix: "last-activity",
+          children: "Last Activity"
+        })]
       }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_3__.Elem, {
-        tag: "tbody",
         name: "body",
         children: usersList.map(({
           user
         }) => {
           const active = user.id === (selectedUser === null || selectedUser === void 0 ? void 0 : selectedUser.id);
           return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_utils_bem__WEBPACK_IMPORTED_MODULE_3__.Elem, {
-            tag: "tr",
             name: "user",
             mod: {
               active
             },
             onClick: () => selectUser(user),
             children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_3__.Elem, {
-              tag: "td",
               name: "field",
               mix: "avatar",
               children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_components__WEBPACK_IMPORTED_MODULE_1__.Userpic, {
@@ -8301,17 +8290,14 @@ const PeopleList = ({
                 }
               })
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_3__.Elem, {
-              tag: "td",
               name: "field",
               mix: "email",
               children: user.email
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_utils_bem__WEBPACK_IMPORTED_MODULE_3__.Elem, {
-              tag: "td",
               name: "field",
               mix: "name",
               children: [user.first_name, " ", user.last_name]
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_3__.Elem, {
-              tag: "td",
               name: "field",
               mix: "last-activity",
               children: (0,date_fns__WEBPACK_IMPORTED_MODULE_7__.default)(new Date(user.last_activity), new Date(), {
@@ -8449,17 +8435,13 @@ const PeoplePage = () => {
             children: "Reset Link"
           })
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_components_Space_Space__WEBPACK_IMPORTED_MODULE_6__.Space, {
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_components__WEBPACK_IMPORTED_MODULE_2__.Button, {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_components__WEBPACK_IMPORTED_MODULE_2__.Button, {
             primary: true,
             style: {
               width: 170
             },
             onClick: copyLink,
-            children: ["Copy Link", copied && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_assets_icons__WEBPACK_IMPORTED_MODULE_1__.LsCheck, {
-              style: {
-                marginLeft: 10
-              }
-            })]
+            children: copied ? "Copied!" : "Copy link"
           })
         })]
       });
@@ -33049,7 +33031,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 // extracted by mini-css-extract-plugin
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({"people-list":"ls-people-list","people-list__loading":"ls-people-list__loading","people-list__users":"ls-people-list__users","people-list__header":"ls-people-list__header","people-list__column":"ls-people-list__column","people-list__field":"ls-people-list__field","last-activity":"ls-last-activity","avatar":"ls-avatar","email":"ls-email","people-list__user":"ls-people-list__user","people-list__user_active":"ls-people-list__user_active"});
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({"people-list":"ls-people-list","people-list__loading":"ls-people-list__loading","people-list__users":"ls-people-list__users","people-list__header":"ls-people-list__header","people-list__column":"ls-people-list__column","people-list__field":"ls-people-list__field","last-activity":"ls-last-activity","avatar":"ls-avatar","name":"ls-name","email":"ls-email","people-list__user":"ls-people-list__user","people-list__user_active":"ls-people-list__user_active"});
 
 /***/ }),
 
