@@ -27,4 +27,4 @@ echo "=> Installing npm packages..."
 npm i node-fetch
 
 echo "=> Run image prebuild..."
-./run_image_prebuild.sh
+./prebuild.sh
