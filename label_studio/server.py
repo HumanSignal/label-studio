@@ -224,7 +224,6 @@ def main():
 
     if input_args.data_dir:
         data_dir_path = pathlib.Path(input_args.data_dir)
-        print(data_dir_path)
         os.environ.setdefault("LABEL_STUDIO_BASE_DATA_DIR", str(data_dir_path.absolute()))
 
     config = _get_config(input_args.config_path)
