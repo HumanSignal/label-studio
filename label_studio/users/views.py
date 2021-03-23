@@ -104,7 +104,8 @@ def user_signup(request):
     return render(request, 'users/user_signup.html', {
         'user_form': user_form,
         'organization_form': organization_form,
-        'next': next_page
+        'next': next_page,
+        'token': token,
     })
 
 
