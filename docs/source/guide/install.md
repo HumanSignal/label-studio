@@ -115,6 +115,9 @@ pip install label-studio
 
 You might see errors when installing Label Studio. Follow these steps to resolve them.
 
+### Run the latest version of Label Studio
+Many bugs might be fixed in patch releases or maintenance releases. Make sure you're running the latest version of Label Studio by upgrading your installation before you start Label Studio. 
+
 ### Errors about missing packages
 
 If you see errors about missing packages, install those packages and try to install Label Studio again. Make sure that you run Label Studio in a clean Python environment, such as a virtual environment. 
@@ -124,7 +127,7 @@ For example, you might need to run the following in an Anaconda environment:
 conda install ruamel.yaml
 ```
 
-Or the following in a python virtual environment:
+Or the following in a Python virtual environment:
 ```bash
 pip install wheel
 ```
