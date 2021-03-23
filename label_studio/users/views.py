@@ -86,13 +86,13 @@ def user_signup(request):
     if user.is_authenticated:
         return redirect(next_page)
 
-    organization = Organization.objects.first()
-    if settings.DISABLE_SIGNUP_WITHOUT_LINK is True:
-        if not(token and organization and token == organization.token):
-            raise PermissionDenied()
-
     # make a new user
     if request.method == 'POST':
+        organization = Organization.objects.first()
+        if settings.DISABLE_SIGNUP_WITHOUT_LINK is True:
+            if not(token and organization and token == organization.token):
+                raise PermissionDenied()
+
         user_form = forms.UserSignupForm(request.POST)
         organization_form = OrganizationSignupForm(request.POST)
 

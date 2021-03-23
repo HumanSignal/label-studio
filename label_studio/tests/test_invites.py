@@ -9,15 +9,15 @@ from tests.utils import project_id
 @pytest.mark.django_db
 def test_signup_setting(business_client, client, settings):
     settings.DISABLE_SIGNUP_WITHOUT_LINK = True
-    response = client.get('/user/signup')
+    response = client.post('/user/signup', data={'email': 'test_user@example.com', 'password': 'test_password'})
     assert response.status_code == 403
 
     response = business_client.get('/api/invite')
 
     invite_url = response.json()['invite_url']
 
-    response = client.get(invite_url)
-    assert response.status_code == 200
+    response = client.post(invite_url, data={'email': 'test_user@example.com', 'password': 'test_password'})
+    assert response.status_code == 302
 
 
 @pytest.mark.django_db
@@ -27,16 +27,17 @@ def test_reset_token(business_client, client, settings):
     # get invite_url link and check it works
     response = business_client.get('/api/invite')
     invite_url = response.json()['invite_url']
-    response = client.get(invite_url)
-    assert response.status_code == 200
+    response = client.post(invite_url, data={'email': 'test_user@example.com', 'password': 'test_password'})
+    assert response.status_code == 302
 
     response = business_client.post('/api/invite/reset-token')
     new_invite_url = response.json()['invite_url']
 
     # after reset old link returns permission denied
-    response = client.get(invite_url)
-    assert response.status_code == 403
+    client.logout()
+    response = client.post(invite_url, data={'email': 'test_user1@example.com', 'password': 'test_password'})
+    assert response.status_code == 403, response.content
     
     # but new one works fine
-    response = client.get(new_invite_url)
-    assert response.status_code == 200
+    response = client.post(new_invite_url, data={'email': 'test_user2@example.com', 'password': 'test_password'})
+    assert response.status_code == 302
