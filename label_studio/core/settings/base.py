@@ -144,8 +144,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'core.middleware.CommonMiddlewareAppendSlashWithoutRedirect',  # instead of 'CommonMiddleware'
-    'organizations.middleware.GetSessionMiddleware',
-    'core.middleware.DRFResponseFormatter',  # auto formatter for DRF responses, it must be after GetSessionMiddleware!
+    'core.middleware.DRFResponseFormatter',
     'django_user_agents.middleware.UserAgentMiddleware',
     'core.middleware.SetSessionUIDMiddleware',
     'core.middleware.ContextLogMiddleware',

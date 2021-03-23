@@ -6,6 +6,7 @@ from .s3.api import *
 from .azure_blob.api import *
 from .gcs.api import *
 from .redis.api import *
+from .localfiles.api import *
 from .all_api import *
 
 app_name = 'storages'
@@ -62,6 +63,13 @@ _api_urlpatterns = [
     path('export/redis/<int:pk>', RedisExportStorageDetailAPI.as_view(), name='export-storage-redis-detail'),
     path('export/redis/validate', RedisExportStorageValidateAPI.as_view(), name='export-storage-redis-validate'),
     path('export/redis/form', RedisExportStorageFormLayoutAPI.as_view(), name='export-storage-redis-form'),
+
+    # Local files
+    path('localfiles', LocalFilesImportStorageListAPI.as_view(), name='storage-localfiles-list'),
+    path('localfiles/<int:pk>', LocalFilesImportStorageDetailAPI.as_view(), name='storage-localfiles-detail'),
+    path('localfiles/<int:pk>/sync', LocalFilesImportStorageSyncAPI.as_view(), name='storage-localfiles-sync'),
+    path('localfiles/validate', LocalFilesImportStorageValidateAPI.as_view(), name='storage-localfiles-validate'),
+    path('localfiles/form', LocalFilesImportStorageFormLayoutAPI.as_view(), name='storage-localfiles-form'),
 ]
 
 urlpatterns = [
