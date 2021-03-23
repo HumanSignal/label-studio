@@ -26,5 +26,8 @@ unzip -v
 echo "=> Installing npm packages..."
 npm i node-fetch
 
+echo "=> Installing environment..."
+pip install -e .
+
 echo "=> Run image prebuild..."
 ./deploy/prebuild.sh
