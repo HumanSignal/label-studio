@@ -426,9 +426,16 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
                 raise NotFound(f'There are no tasks remaining to be annotated by the user={user}')
             logger.debug(f'{not_solved_tasks_count} tasks that still need to be annotated for user={user}')
 
+            # ordered by data manager
+            if external_prepared_tasks_used:
+                next_task = not_solved_tasks.first()
+                if not next_task:
+                    raise NotFound('No more tasks found')
+                return self._make_response(next_task, request)
+
             # If current user has already lock one task - return it (without setting the lock again)
             next_task = Task.get_locked_by(user, project)
-            if next_task and not external_prepared_tasks_used:  # skip if it's queryset from data manager
+            if next_task:
                 return self._make_response(next_task, request, use_task_lock=False)
 
             if project.show_ground_truth_first:
@@ -448,10 +455,7 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
             if next_task:
                 return self._make_response(next_task, request)
 
-            if external_prepared_tasks_used:  # ordered by data manager
-                next_task = not_solved_tasks.first()
-
-            elif project.sampling == project.UNCERTAINTY:
+            if project.sampling == project.UNCERTAINTY:
                 logger.debug(f'User={request.user} tries uncertainty sampling from {not_solved_tasks_count} tasks')
                 next_task = self._try_uncertainty_sampling(not_solved_tasks, project, user_solved_tasks_array)
 
