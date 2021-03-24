@@ -1,13 +1,13 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 """
-Django settings for Label Studio.
+Django Base settings for Label Studio.
 
 For more information on this file, see
-https://docs.djangoproject.com/en/2.1/topics/settings/
+https://docs.djangoproject.com/en/3.1/topics/settings/
 
 For the full list of settings and their values, see
-https://docs.djangoproject.com/en/2.1/ref/settings/
+https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 import os
 
@@ -16,6 +16,11 @@ from core.utils.params import get_bool_env, get_env
 
 # Hostname is used for proper path generation to the resources, pages, etc
 HOSTNAME = get_env('HOST', '')
+if HOSTNAME:
+    if not HOSTNAME.startswith('http://') and not HOSTNAME.startswith('https://'):
+        print("! HOST variable found in environment, but it must start with http:// or https://, ignore it:", HOSTNAME)
+    else:
+        print("=> HOSTNAME correctly set to:", HOSTNAME)
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '$(fefwefwef13;LFK{P!)@#*!)kdsjfWF2l+i5e3t(8a1n'
@@ -260,7 +265,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static_build/')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static_build')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -299,10 +304,10 @@ EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
 """ React Libraries: do not forget to change this dir in /etc/nginx/nginx.conf """
 # EDITOR = label-studio-frontend repository
 EDITOR_ROOT = os.path.join(BASE_DIR, '../frontend/dist/lsf')
+# DM = data manager (included into FRONTEND due npm building, we need only version.json file from there)
+DM_ROOT = os.path.join(BASE_DIR, '../frontend/dist/dm')
 # FRONTEND = GUI for django backend
 REACT_APP_ROOT = os.path.join(BASE_DIR, '../frontend/dist/react-app')
-# DM = data manager (included into FRONTEND due npm building, we need only version.json file from there)
-DM_ROOT = os.path.join(BASE_DIR, '../frontend/lib/dm')
 
 # per project settings
 BATCH_SIZE = 1000
@@ -331,3 +336,7 @@ from core.utils.get_object import get_object_with_check_and_log
 
 GET_OBJECT_WITH_CHECK_AND_LOG = get_object_with_check_and_log
 
+# fix a problem with Windows mimetypes for JS and PNG
+import mimetypes
+mimetypes.add_type("application/javascript", ".js", True)
+mimetypes.add_type("image/png", ".png", True)

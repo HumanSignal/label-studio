@@ -1,15 +1,11 @@
-import React from 'react';
-import {UnControlled as CodeMirror} from 'react-codemirror2';
-import 'codemirror/mode/xml/xml';
 import 'codemirror/lib/codemirror.css';
-
+import 'codemirror/mode/xml/xml';
+import React from 'react';
 import { Spinner } from '../../../components';
-import { useLabelStudio } from '../../../providers/LabelStudioProvider';
-import { cn } from '../../../utils/bem';
-import { colorNames } from './colors';
-import { Template } from './Template';
-import './Config.styl';
 import { useAPI } from '../../../providers/ApiProvider';
+import { cn } from '../../../utils/bem';
+import './Config.styl';
+
 
 const listClass = cn("templates-list");
 

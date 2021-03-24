@@ -22,6 +22,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView, exception_handler
 
 from core.utils.common import conditional_atomic
+from core.label_config import parse_config
 from organizations.models import Organization
 from organizations.permissions import *
 from projects.functions import (generate_unique_title, duplicate_project)
@@ -43,6 +44,7 @@ from core.utils.exceptions import ProjectExistException, LabelStudioDatabaseExce
 from core.utils.io import find_dir, find_file, read_yaml
 
 from data_manager.functions import get_prepared_queryset
+from data_manager.models import View
 
 logger = logging.getLogger(__name__)
 
@@ -190,6 +192,13 @@ class ProjectAPI(APIViewVirtualRedirectMixin,
 
     @swagger_auto_schema(tags=['Projects'], request_body=ProjectSerializer)
     def patch(self, request, *args, **kwargs):
+        project = self.get_object()
+        label_config = self.request.query_params.get('label_config')
+
+        # config changes can break view, so we need to reset them
+        if parse_config(label_config) != parse_config(project.label_config):
+            View.objects.filter(project=project).all().delete()
+
         return super(ProjectAPI, self).patch(request, *args, **kwargs)
 
     def perform_destroy(self, instance):
@@ -494,8 +503,14 @@ class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
     def get(self, request, *args, **kwargs):
         project = self.get_object()
         label_config = self.request.query_params.get('label_config')
+
+        # check new config includes meaningful changes
+        config_essential_data_has_changed = False
+        if parse_config(label_config) != parse_config(project.label_config):
+            config_essential_data_has_changed = True
+
         project.validate_config(label_config)
-        return Response(status=status.HTTP_200_OK)
+        return Response({'config_essential_data_has_changed': config_essential_data_has_changed}, status=status.HTTP_200_OK)
 
 
 class ProjectDuplicateAPI(APIView):

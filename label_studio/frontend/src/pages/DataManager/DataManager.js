@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { generatePath, useHistory, useLocation } from 'react-router';
 import { NavLink } from 'react-router-dom';
-import { default as DM } from '../../../lib/dm/js/main';
 import { Button } from '../../components/Button/Button';
 import { modal } from '../../components/Modal/Modal';
 import { Space } from '../../components/Space/Space';
-import { useLabelStudio } from '../../providers/LabelStudioProvider';
+import { useLibrary } from '../../providers/LibraryProvider';
 import { useProject } from '../../providers/ProjectProvider';
 import { useContextProps, useParams } from '../../providers/RoutesProvider';
 import { addAction, addCrumb, deleteAction, deleteCrumb } from '../../services/breadrumbs';
@@ -42,24 +41,26 @@ const initializeDataManager = async (root, props, params) => {
     ...settings,
   };
 
-  return new DM.DataManager(dmConfig);
+  return new window.DataManager(dmConfig);
 };
 
 const buildLink = (path, params) => {
   return generatePath(`/projects/:id${path}`, params);
 };
 
-export const DataManager = ({...props}) => {
+export const DataManagerPage = ({...props}) => {
   const root = useRef();
   const params = useParams();
   const history = useHistory();
-  const LabelStudio = useLabelStudio();
+  const LabelStudio = useLibrary('lsf');
+  const DataManager = useLibrary('dm');
   const setContextProps = useContextProps();
   const [crashed, setCrashed] = useState(false);
   const dataManagerRef = useRef();
 
   const init = useCallback(async () => {
     if (!LabelStudio) return;
+    if (!DataManager) return;
     if (!root.current) return;
     if (dataManagerRef.current) return;
 
@@ -86,7 +87,7 @@ export const DataManager = ({...props}) => {
     });
 
     setContextProps({dmRef: dataManager});
-  }, [LabelStudio]);
+  }, [LabelStudio, DataManager]);
 
   const destroyDM = useCallback(() => {
     if (dataManagerRef.current) {
@@ -96,10 +97,11 @@ export const DataManager = ({...props}) => {
   }, [dataManagerRef]);
 
   useEffect(() => {
+    console.log({DataManager, LabelStudio});
     init();
 
     return () => destroyDM();
-  }, [root, LabelStudio]);
+  }, [root, init]);
 
   return crashed ? (
     <Block name="crash">
@@ -114,12 +116,12 @@ export const DataManager = ({...props}) => {
   );
 };
 
-DataManager.path = "/data";
-DataManager.pages = {
+DataManagerPage.path = "/data";
+DataManagerPage.pages = {
   ExportPage,
   ImportModal,
 };
-DataManager.context = ({dmRef}) => {
+DataManagerPage.context = ({dmRef}) => {
   const location = useLocation();
   const {project} = useProject();
   const [counter, setCounter] = useState(0);
@@ -151,7 +153,7 @@ DataManager.context = ({dmRef}) => {
 
   const updateCrumbs = (currentMode) => {
     const isExplorer = currentMode === 'explorer';
-    const dmPath = location.pathname.replace(DataManager.path, '');
+    const dmPath = location.pathname.replace(DataManagerPage.path, '');
 
     if (isExplorer) {
       deleteAction(dmPath);

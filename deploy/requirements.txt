@@ -1,5 +1,5 @@
 wheel
-appdirs==1.4.3
+appdirs>=1.4.3
 attr==0.3.1
 attrs>=19.1.0
 pyyaml>=5.3.1

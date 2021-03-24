@@ -49,7 +49,7 @@ Label Studio is also available as a Docker container. Make sure you have [Docker
 ### Install with Docker on *nix
 To install and start Label Studio at [http://localhost:8080](http://localhost:8080), storing all labeling data in `./my_project` directory, run the following:
 ```bash
-docker run -p 8080:8080 -v `pwd`/mydata:/root/.local/share/label-studio/ heartexlabs/label-studio:latest
+docker run -it -p 8080:8080 -v `pwd`/mydata:/root/.local/share/label-studio/ heartexlabs/label-studio:latest
 ```
 
 ### Install with Docker on Windows
@@ -58,7 +58,7 @@ Or for Windows, you have to modify the volumes paths set by `-v` option.
 #### Override the default Docker install
 You can override the default Docker install by appending new arguments: 
 ```bash
-docker run -p 8080:8080 -v `pwd`/mydata:/root/.local/share/label-studio/ heartexlabs/label-studio:latest label-studio --log-level DEBUG
+docker run -it -p 8080:8080 -v `pwd`/mydata:/root/.local/share/label-studio/ heartexlabs/label-studio:latest label-studio --log-level DEBUG
 ```
 
 ### Build a local image with Docker
@@ -74,6 +74,8 @@ Start Label Studio:
 ```bash
 docker-compose up -d
 ```
+
+This starts Label Studio with a PostgreSQL database backend. 
 
 ## Install from source
 
@@ -111,18 +113,24 @@ pip install --upgrade label-studio
 
 Migration scripts run when you upgrade to version 1.0.0 from version 0.9.1 or earlier. 
 
+To make sure an existing project gets migrated, when you [start Label Studio](start.html), run the following command:
+
+```bash
+label-studio start path/to/old/project 
+```
+
 The most important change to be aware of is changes to rename "completions" to "annotations". See the [updated JSON format for completed tasks](export.html#Raw_JSON_format_of_completed_tasks). 
 
 If you customized the Label Studio Frontend, see the [Frontend reference guide](frontend_reference.html) for required updates to maintain compatibility with version 1.0.0.  
 
 
 
-## Database
+## Database storage
+Label Studio uses a database to store project data and configuration information. 
 
 ### SQLite database
 
-Label Studio uses SQLite by default. You don't need to configure anything. Label Studio stores all data in a single file in the specified directory of the admin user. 
-
+Label Studio uses SQLite by default. You don't need to configure anything. Label Studio stores all data in a single file in the specified directory of the admin user. After you [start Label Studio](start.html), the directory used is printed in the terminal. 
 
 ### PostgreSQL database
 

@@ -16,18 +16,17 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.apps import apps
-from django.contrib import admin
-from django.urls import path, re_path
 from django.conf import settings
 from django.conf.urls import include
+from django.contrib import admin
+from django.urls import path, re_path
 from django.views.generic.base import RedirectView
 from django.views.static import serve
-from rest_framework.permissions import AllowAny
-from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
+from rest_framework.permissions import AllowAny
 
 from core import views
-
 
 handler500 = 'core.views.custom_500'
 
@@ -46,6 +45,7 @@ urlpatterns = [
     re_path(r'^$', views.main, name='main'),
     re_path(r'^favicon\.ico$', RedirectView.as_view(url='/static/images/favicon.ico', permanent=True)),
     re_path(r'^label-studio-frontend/(?P<path>.*)$', serve, kwargs={'document_root': settings.EDITOR_ROOT, 'show_indexes': True}),
+    re_path(r'^dm/(?P<path>.*)$', serve, kwargs={'document_root': settings.DM_ROOT, 'show_indexes': True}),
     re_path(r'^react-app/(?P<path>.*)$', serve, kwargs={'document_root': settings.REACT_APP_ROOT, 'show_indexes': True}),
     re_path(r'^static/(?P<path>.*)$', serve, kwargs={'document_root': settings.STATIC_ROOT, 'show_indexes': True}),
 

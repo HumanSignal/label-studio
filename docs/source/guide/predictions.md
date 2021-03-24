@@ -1,5 +1,5 @@
 ---
-title: Import predicted labels into Label Studio
+title: Import pre-annotated data into Label Studio
 type: guide
 order: 301
 ---
