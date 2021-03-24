@@ -8,7 +8,7 @@ from django.db.models import Q, Count
 
 from django.utils.translation import gettext_lazy as _
 
-from core.utils.common import create_hash, get_object_with_check_and_log, get_organization_from_request
+from core.utils.common import create_hash, get_object_with_check_and_log, get_organization_from_request, load_func
 
 logger = logging.getLogger(__name__)
 
@@ -65,10 +65,8 @@ class Organization(models.Model):
 
     @classmethod
     def create_organization(cls, created_by=None, title='Your Organization'):
-        with transaction.atomic():
-            org = Organization.objects.create(title=title, created_by=created_by)
-            OrganizationMember.objects.create(user=created_by, organization=org)
-            return org
+        _create_organization = load_func(settings.CREATE_ORGANIZATION)
+        return _create_organization(title=title, created_by=created_by)
     
     @classmethod
     def find_by_user(cls, user):
