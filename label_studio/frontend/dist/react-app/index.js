@@ -4756,51 +4756,6 @@ const Spinner = ({
 
 /***/ }),
 
-/***/ "./src/components/ToggleItems/ToggleItems.tsx":
-/*!****************************************************!*\
-  !*** ./src/components/ToggleItems/ToggleItems.tsx ***!
-  \****************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "ToggleItems": () => (/* binding */ ToggleItems)
-/* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var _utils_bem__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils/bem */ "./src/utils/bem.tsx");
-/* harmony import */ var _ToggleItems_styl__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ToggleItems.styl */ "./src/components/ToggleItems/ToggleItems.styl");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
-
-
-
-
-const ToggleItems = ({
-  className,
-  style,
-  big,
-  items,
-  active,
-  onSelect
-}) => {
-  const rootClass = (0,_utils_bem__WEBPACK_IMPORTED_MODULE_1__.cn)('toggle-items');
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("ul", {
-    className: rootClass.mod({
-      big
-    }).mix(className).toString(),
-    style: style,
-    children: Object.keys(items).map(item => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("li", {
-      className: rootClass.elem("item").mod({
-        active: item === active
-      }).toString(),
-      onClick: () => onSelect(item),
-      children: items[item]
-    }, item))
-  });
-};
-
-/***/ }),
-
 /***/ "./src/components/Tooltip/Tooltip.js":
 /*!*******************************************!*\
   !*** ./src/components/Tooltip/Tooltip.js ***!
@@ -11247,207 +11202,6 @@ class APIProxy {
 
 /***/ }),
 
-/***/ "./src/utils/bem.tsx":
-/*!***************************!*\
-  !*** ./src/utils/bem.tsx ***!
-  \***************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "cn": () => (/* binding */ cn),
-/* harmony export */   "BemWithSpecifiContext": () => (/* binding */ BemWithSpecifiContext),
-/* harmony export */   "Block": () => (/* binding */ Block),
-/* harmony export */   "Elem": () => (/* binding */ Elem)
-/* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
-var _process$env$CSS_PREF;
-
-
-
-const CSS_PREFIX = (_process$env$CSS_PREF = "ls-") !== null && _process$env$CSS_PREF !== void 0 ? _process$env$CSS_PREF : 'dm-';
-
-const assembleClass = (block, elem, mix, mod) => {
-  const rootName = block;
-  const elemName = elem ? `${rootName}__${elem}` : null;
-  const stateName = Object.entries(mod !== null && mod !== void 0 ? mod : {}).reduce((res, [key, value]) => {
-    const stateClass = [elemName !== null && elemName !== void 0 ? elemName : rootName];
-    if (value === null || value === undefined) return res;
-
-    if (value !== false) {
-      stateClass.push(key);
-      if (value !== true) stateClass.push(value);
-      res.push(stateClass.join('_'));
-    }
-
-    return res;
-  }, []);
-  const finalClass = [];
-  finalClass.push(elemName !== null && elemName !== void 0 ? elemName : rootName);
-  finalClass.push(...stateName);
-
-  if (mix) {
-    const mixes = Array.isArray(mix) ? mix : [mix];
-    const mixMap = [].concat(...mixes).filter(m => m !== undefined && m !== null && m !== "").map(m => {
-      if (typeof m === 'string') {
-        return m;
-      } else {
-        var _m$toClassName;
-
-        return m === null || m === void 0 ? void 0 : (_m$toClassName = m.toClassName) === null || _m$toClassName === void 0 ? void 0 : _m$toClassName.call(m);
-      }
-    }).reduce((res, cls) => [...res, ...cls.split(/\s+/)], []);
-    finalClass.push(...mixMap);
-  }
-
-  const attachNamespace = cls => {
-    if (new RegExp(CSS_PREFIX).test(cls)) return cls;else return `${CSS_PREFIX}${cls}`;
-  };
-
-  return finalClass.map(attachNamespace).join(" ");
-};
-
-const BlockContext = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createContext(null);
-const cn = (block, options = {}) => {
-  const {
-    elem,
-    mix,
-    mod
-  } = options !== null && options !== void 0 ? options : {};
-  const blockName = block;
-  const classNameBuilder = {
-    block(name) {
-      return cn(name, {
-        elem,
-        mix,
-        mod
-      });
-    },
-
-    elem(name) {
-      return cn(block, {
-        elem: name,
-        mix,
-        mod
-      });
-    },
-
-    mod(newMod = {}) {
-      const stateOverride = Object.assign({}, mod !== null && mod !== void 0 ? mod : {}, newMod);
-      return cn(block !== null && block !== void 0 ? block : blockName, {
-        elem,
-        mix,
-        mod: stateOverride
-      });
-    },
-
-    mix(...mix) {
-      return cn(block, {
-        elem,
-        mix,
-        mod
-      });
-    },
-
-    select(root = document) {
-      return root.querySelector(this.toCSSSelector());
-    },
-
-    selectAll(root = document) {
-      return root.querySelectorAll(this.toCSSSelector());
-    },
-
-    closest(root) {
-      return root.closest(this.toCSSSelector());
-    },
-
-    toString() {
-      return assembleClass(block, elem, mix, mod);
-    },
-
-    toClassName() {
-      return this.toString();
-    },
-
-    toCSSSelector() {
-      return `.${this.toClassName().replace(/(\s+)/g, '.')}`;
-    }
-
-  };
-  Object.defineProperty(classNameBuilder, 'Block', {
-    value: Block
-  });
-  Object.defineProperty(classNameBuilder, 'Elem', {
-    value: Elem
-  });
-  Object.defineProperty(classNameBuilder, '__class', {
-    value: {
-      block,
-      elem,
-      mix,
-      mod
-    }
-  });
-  return classNameBuilder;
-};
-const BemWithSpecifiContext = context => {
-  const Context = context !== null && context !== void 0 ? context : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createContext(null);
-  const Block = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(({
-    tag = 'div',
-    name,
-    mod,
-    mix,
-    ...rest
-  }, ref) => {
-    const rootClass = cn(name);
-    const finalMix = [].concat(mix).filter(cn => !!cn);
-    const className = rootClass.mod(mod).mix(...finalMix, rest.className).toClassName();
-    const finalProps = { ...rest,
-      ref,
-      className
-    };
-    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)(Context.Provider, {
-      value: rootClass,
-      children: /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(tag, finalProps)
-    });
-  });
-  Block.displayName = 'Block';
-  const Elem = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(({
-    tag = 'div',
-    component,
-    block,
-    name,
-    mod,
-    mix,
-    ...rest
-  }, ref) => {
-    const blockCtx = react__WEBPACK_IMPORTED_MODULE_0__.useContext(Context);
-    const finalMix = [].concat(mix).filter(cn => !!cn);
-    const className = (block ? cn(block) : blockCtx).elem(name).mod(mod).mix(...finalMix, rest.className).toClassName();
-    const finalProps = { ...rest,
-      ref,
-      className
-    };
-    if (typeof tag !== 'string') finalProps.block = blockCtx;
-    if (component) finalProps.tag = tag;
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(component !== null && component !== void 0 ? component : tag, finalProps);
-  });
-  Elem.displayName = 'Elem';
-  return {
-    Block,
-    Elem,
-    Context
-  };
-};
-const {
-  Block,
-  Elem
-} = BemWithSpecifiContext(BlockContext);
-
-/***/ }),
-
 /***/ "./src/utils/colors.js":
 /*!*****************************!*\
   !*** ./src/utils/colors.js ***!
@@ -12075,6 +11829,252 @@ const aroundTransition = (element, {
     setTimeout(() => transition(element), 30);
   });
 };
+
+/***/ }),
+
+/***/ "./src/components/ToggleItems/ToggleItems.tsx":
+/*!****************************************************!*\
+  !*** ./src/components/ToggleItems/ToggleItems.tsx ***!
+  \****************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "ToggleItems": () => (/* binding */ ToggleItems)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var _utils_bem__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils/bem */ "./src/utils/bem.tsx");
+/* harmony import */ var _ToggleItems_styl__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ToggleItems.styl */ "./src/components/ToggleItems/ToggleItems.styl");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+
+
+
+
+const ToggleItems = ({
+  className,
+  style,
+  big,
+  items,
+  active,
+  onSelect
+}) => {
+  const rootClass = (0,_utils_bem__WEBPACK_IMPORTED_MODULE_1__.cn)('toggle-items');
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("ul", {
+    className: rootClass.mod({
+      big
+    }).mix(className).toString(),
+    style: style,
+    children: Object.keys(items).map(item => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("li", {
+      className: rootClass.elem("item").mod({
+        active: item === active
+      }).toString(),
+      onClick: () => onSelect(item),
+      children: items[item]
+    }, item))
+  });
+};
+
+/***/ }),
+
+/***/ "./src/utils/bem.tsx":
+/*!***************************!*\
+  !*** ./src/utils/bem.tsx ***!
+  \***************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "cn": () => (/* binding */ cn),
+/* harmony export */   "BemWithSpecifiContext": () => (/* binding */ BemWithSpecifiContext),
+/* harmony export */   "Block": () => (/* binding */ Block),
+/* harmony export */   "Elem": () => (/* binding */ Elem)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+var _process$env$CSS_PREF;
+
+
+
+const CSS_PREFIX = (_process$env$CSS_PREF = "ls-") !== null && _process$env$CSS_PREF !== void 0 ? _process$env$CSS_PREF : 'dm-';
+
+const assembleClass = (block, elem, mix, mod) => {
+  const rootName = block;
+  const elemName = elem ? `${rootName}__${elem}` : null;
+  const stateName = Object.entries(mod !== null && mod !== void 0 ? mod : {}).reduce((res, [key, value]) => {
+    const stateClass = [elemName !== null && elemName !== void 0 ? elemName : rootName];
+    if (value === null || value === undefined) return res;
+
+    if (value !== false) {
+      stateClass.push(key);
+      if (value !== true) stateClass.push(value);
+      res.push(stateClass.join('_'));
+    }
+
+    return res;
+  }, []);
+  const finalClass = [];
+  finalClass.push(elemName !== null && elemName !== void 0 ? elemName : rootName);
+  finalClass.push(...stateName);
+
+  if (mix) {
+    const mixes = Array.isArray(mix) ? mix : [mix];
+    const mixMap = [].concat(...mixes).filter(m => m !== undefined && m !== null && m !== "").map(m => {
+      if (typeof m === 'string') {
+        return m;
+      } else {
+        var _m$toClassName;
+
+        return m === null || m === void 0 ? void 0 : (_m$toClassName = m.toClassName) === null || _m$toClassName === void 0 ? void 0 : _m$toClassName.call(m);
+      }
+    }).reduce((res, cls) => [...res, ...cls.split(/\s+/)], []);
+    finalClass.push(...mixMap);
+  }
+
+  const attachNamespace = cls => {
+    if (new RegExp(CSS_PREFIX).test(cls)) return cls;else return `${CSS_PREFIX}${cls}`;
+  };
+
+  return finalClass.map(attachNamespace).join(" ");
+};
+
+const BlockContext = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createContext(null);
+const cn = (block, options = {}) => {
+  const {
+    elem,
+    mix,
+    mod
+  } = options !== null && options !== void 0 ? options : {};
+  const blockName = block;
+  const classNameBuilder = {
+    block(name) {
+      return cn(name, {
+        elem,
+        mix,
+        mod
+      });
+    },
+
+    elem(name) {
+      return cn(block, {
+        elem: name,
+        mix,
+        mod
+      });
+    },
+
+    mod(newMod = {}) {
+      const stateOverride = Object.assign({}, mod !== null && mod !== void 0 ? mod : {}, newMod);
+      return cn(block !== null && block !== void 0 ? block : blockName, {
+        elem,
+        mix,
+        mod: stateOverride
+      });
+    },
+
+    mix(...mix) {
+      return cn(block, {
+        elem,
+        mix,
+        mod
+      });
+    },
+
+    select(root = document) {
+      return root.querySelector(this.toCSSSelector());
+    },
+
+    selectAll(root = document) {
+      return root.querySelectorAll(this.toCSSSelector());
+    },
+
+    closest(root) {
+      return root.closest(this.toCSSSelector());
+    },
+
+    toString() {
+      return assembleClass(block, elem, mix, mod);
+    },
+
+    toClassName() {
+      return this.toString();
+    },
+
+    toCSSSelector() {
+      return `.${this.toClassName().replace(/(\s+)/g, '.')}`;
+    }
+
+  };
+  Object.defineProperty(classNameBuilder, 'Block', {
+    value: Block
+  });
+  Object.defineProperty(classNameBuilder, 'Elem', {
+    value: Elem
+  });
+  Object.defineProperty(classNameBuilder, '__class', {
+    value: {
+      block,
+      elem,
+      mix,
+      mod
+    }
+  });
+  return classNameBuilder;
+};
+const BemWithSpecifiContext = context => {
+  const Context = context !== null && context !== void 0 ? context : /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createContext(null);
+  const Block = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(({
+    tag = 'div',
+    name,
+    mod,
+    mix,
+    ...rest
+  }, ref) => {
+    const rootClass = cn(name);
+    const finalMix = [].concat(mix).filter(cn => !!cn);
+    const className = rootClass.mod(mod).mix(...finalMix, rest.className).toClassName();
+    const finalProps = { ...rest,
+      ref,
+      className
+    };
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)(Context.Provider, {
+      value: rootClass,
+      children: /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(tag, finalProps)
+    });
+  });
+  Block.displayName = 'Block';
+  const Elem = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(({
+    tag = 'div',
+    component,
+    block,
+    name,
+    mod,
+    mix,
+    ...rest
+  }, ref) => {
+    const blockCtx = react__WEBPACK_IMPORTED_MODULE_0__.useContext(Context);
+    const finalMix = [].concat(mix).filter(cn => !!cn);
+    const className = (block ? cn(block) : blockCtx).elem(name).mod(mod).mix(...finalMix, rest.className).toClassName();
+    const finalProps = { ...rest,
+      ref,
+      className
+    };
+    if (typeof tag !== 'string') finalProps.block = blockCtx;
+    if (component) finalProps.tag = tag;
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(component !== null && component !== void 0 ? component : tag, finalProps);
+  });
+  Elem.displayName = 'Elem';
+  return {
+    Block,
+    Elem,
+    Context
+  };
+};
+const {
+  Block,
+  Elem
+} = BemWithSpecifiContext(BlockContext);
 
 /***/ }),
 

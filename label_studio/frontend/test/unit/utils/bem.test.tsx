@@ -1,5 +1,6 @@
 import { mount, shallow } from "enzyme";
-import { Block, Elem } from "../../src/utils/bem";
+import React from "react";
+import { Block, Elem } from "../../../src/utils/bem";
 
 describe('BEM', () => {
   test('Block renders without fail', () => {
