@@ -1,6 +1,5 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-import drf_yasg.openapi as openapi
 import logging
 import numpy as np
 import pathlib
@@ -500,9 +499,10 @@ class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
     @swagger_auto_schema(tags=['Projects'], operation_summary='Validate a label config', manual_parameters=[
                             openapi.Parameter(name='label_config', type=openapi.TYPE_STRING, in_=openapi.IN_QUERY,
                                               description='labeling config')])
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         project = self.get_object()
-        label_config = self.request.query_params.get('label_config')
+        json_data = json.loads(request.body)
+        label_config = json_data['label_config']
 
         # check new config includes meaningful changes
         config_essential_data_has_changed = False
@@ -645,7 +645,9 @@ class ProjectSampleTask(generics.RetrieveAPIView):
     serializer_class = ProjectSerializer
     swagger_schema = None
 
-    def retrieve(self, request, *args, **kwargs):
-        config = request.GET.get('label_config')
+    def post(self, request, *args, **kwargs):
+        json_data = json.loads(request.body)
+        label_config = json_data['label_config']
+
         project = self.get_object()
-        return Response({'sample_task': project.get_sample_task(config)}, status=200)
+        return Response({'sample_task': project.get_sample_task(label_config)}, status=200)
