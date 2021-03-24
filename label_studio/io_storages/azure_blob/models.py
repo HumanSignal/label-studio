@@ -92,12 +92,12 @@ class AzureBlobImportStorage(ImportStorage, AzureBlobStorageMixin):
                 logger.debug(file.name + ' is skipped by regex filter')
                 continue
 
-            yield file
+            yield file.name
 
     def get_data(self, key):
         if self.use_blob_urls:
             data_key = settings.DATA_UNDEFINED_NAME
-            return {data_key: f'{url_scheme}://{self.container}/{key["name"]}'}
+            return {data_key: f'{url_scheme}://{self.container}/{key}'}
 
         container = self.get_container()
         blob = container.download_blob(key)

@@ -18,7 +18,7 @@ from users.models import User
 from organizations.models import Organization
 from types import SimpleNamespace
 
-from .utils import create_business, signin, gcs_client_mock, ml_backend_mock, register_ml_backend_mock
+from .utils import create_business, signin, gcs_client_mock, ml_backend_mock, register_ml_backend_mock, azure_client_mock
 
 
 boto3.set_stream_logger('botocore.credentials', logging.DEBUG)
@@ -31,6 +31,13 @@ def aws_credentials():
     os.environ['AWS_SECRET_ACCESS_KEY'] = 'testing'
     os.environ['AWS_SECURITY_TOKEN'] = 'testing'
     os.environ['AWS_SESSION_TOKEN'] = 'testing'
+
+
+@pytest.fixture(autouse=True)
+def azure_credentials():
+    """Mocked Azure credentials"""
+    os.environ['AZURE_BLOB_ACCOUNT_NAME'] = 'testing'
+    os.environ['AZURE_BLOB_ACCOUNT_KEY'] = 'testing'
 
 
 @pytest.fixture(scope='function')
@@ -67,6 +74,12 @@ def s3_export_bucket(s3):
 @pytest.fixture(autouse=True)
 def gcs_client():
     with gcs_client_mock():
+        yield
+
+
+@pytest.fixture(autouse=True)
+def azure_client():
+    with azure_client_mock():
         yield
 
 

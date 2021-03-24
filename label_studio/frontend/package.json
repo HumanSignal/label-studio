@@ -8,9 +8,11 @@
     "build": "webpack",
     "build:production": "NODE_ENV=production webpack",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "download": "npm run download-editor && npm run download-dm && npm run build",
-    "download-editor": "NO_BUILD=true node get-build.js lsf feature/rename-completions",
-    "download-dm": "NO_BUILD=true node get-build.js dm master"
+    "download": "npm run download:editor && npm run download:dm && npm run build",
+    "download:editor": "NO_BUILD=true node get-build.js lsf",
+    "download:dm": "NO_BUILD=true node get-build.js dm master",
+    "copy:dm": "rm -rf dist/dm/js && rm -rf dist/dm/css && cp -r ../../../dm2/build/static/** dist/dm",
+    "copy:editor": "rm -rf dist/lsf/js && rm -rf dist/lsf/css && cp -r ../../../label-studio-frontend/build/static/** dist/lsf"
   },
   "keywords": [],
   "browser": {},
@@ -30,6 +32,7 @@
     "@types/chroma-js": "^2.1.3",
     "@types/react": "^17.0.2",
     "@types/react-dom": "^17.0.1",
+    "@types/react-router-dom": "^5.1.7",
     "@typescript-eslint/eslint-plugin": "^4.15.2",
     "@typescript-eslint/parser": "^4.15.2",
     "babel-loader": "^8.2.2",

@@ -19,6 +19,10 @@ export const isDefined = (value) => {
   return value !== null && value !== undefined;
 };
 
+export const isEmptyString = (value) => {
+  return typeof value === 'string' && value.trim() === "";
+};
+
 export const objectClean = (source) => {
   const cleanObject = Object.entries(source).filter((pair) => {
     return isDefined(pair[1]) && pair[1] !== "";
@@ -58,4 +62,16 @@ export const absoluteURL = (path = "") => {
       path.replace(/^([/]+)/, ''),
     ].join("/");
   }
+};
+
+export const copyText = (text) => {
+  const input = document.createElement('textarea');
+  document.body.appendChild(input);
+
+  input.value = text;
+  input.focus();
+  input.select();
+
+  document.execCommand('copy');
+  input.remove();
 };

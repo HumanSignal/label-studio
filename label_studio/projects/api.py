@@ -22,7 +22,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView, exception_handler
 
-from core.utils.common import conditional_atomic
+from core.utils.common import conditional_atomic, get_organization_from_request
 from core.label_config import parse_config
 from organizations.models import Organization
 from organizations.permissions import *
@@ -118,7 +118,7 @@ class ProjectListAPI(generics.ListCreateAPIView):
     ordering = ['-created_at']
 
     def get_queryset(self):
-        org_pk = self.request.session.get('organization_pk')
+        org_pk = get_organization_from_request(self.request)
         org = get_object_with_check_and_log(self.request, Organization, pk=org_pk)
         self.check_object_permissions(self.request, org)
         return Project.objects.all()
@@ -130,7 +130,7 @@ class ProjectListAPI(generics.ListCreateAPIView):
 
     def perform_create(self, ser):
         # get organization
-        org_pk = self.request.session.get('organization_pk')
+        org_pk = get_organization_from_request(self.request)
         org = get_object_with_check_and_log(self.request, Organization, pk=org_pk)
         self.check_object_permissions(self.request, org)
 

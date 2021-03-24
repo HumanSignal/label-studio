@@ -12,6 +12,7 @@ from .s3.api import S3ImportStorageListAPI, S3ExportStorageListAPI
 from .gcs.api import GCSImportStorageListAPI, GCSExportStorageListAPI
 from .azure_blob.api import AzureBlobImportStorageListAPI, AzureBlobExportStorageListAPI
 from .redis.api import RedisImportStorageListAPI, RedisExportStorageListAPI
+from .localfiles.api import LocalFilesImportStorageListAPI
 
 logger = logging.getLogger(__name__)
 # TODO: replace hardcoded apps lists with search over included storage apps
@@ -31,6 +32,7 @@ class AllImportStorageTypesAPI(APIView):
             {'name': 'gcs', 'title': 'Google Cloud Storage'},
             {'name': 'azure', 'title': 'Microsoft Azure'},
             {'name': 'redis', 'title': 'Redis'},
+            {'name': 'localfiles', 'title': 'Local files'},
         ])
 
 
@@ -70,7 +72,8 @@ class AllImportStorageListAPI(generics.ListAPIView):
             self._get_response(S3ImportStorageListAPI, request, *args, **kwargs),
             self._get_response(GCSImportStorageListAPI, request, *args, **kwargs),
             self._get_response(AzureBlobImportStorageListAPI, request, *args, **kwargs),
-            self._get_response(RedisImportStorageListAPI, request, *args, **kwargs)
+            self._get_response(RedisImportStorageListAPI, request, *args, **kwargs),
+            self._get_response(LocalFilesImportStorageListAPI, request, *args, **kwargs),
         ], []))
 
 

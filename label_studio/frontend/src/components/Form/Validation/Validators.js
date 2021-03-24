@@ -1,12 +1,6 @@
+import { isDefined, isEmptyString } from '../../../utils/helpers';
 import './Validation.styl';
 
-const isEmptyString = (value) => {
-  return typeof value === 'string' && value.trim() === "";
-};
-
-const isDefined = (value) => {
-  return value !== undefined && value !== null;
-};
 
 export const required = (fieldName, value) => {
   if (!isDefined(value) || isEmptyString(value)) {
