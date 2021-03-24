@@ -19,6 +19,7 @@ HOSTNAME = get_env('HOST', '')
 if HOSTNAME:
     if not HOSTNAME.startswith('http://') and not HOSTNAME.startswith('https://'):
         print("! HOST variable found in environment, but it must start with http:// or https://, ignore it:", HOSTNAME)
+        HOSTNAME = ''
     else:
         print("=> HOSTNAME correctly set to:", HOSTNAME)
 
