@@ -332,6 +332,7 @@ def user_auth(user_model, email, password):
 
 PROJECT_DELETE = project_delete
 USER_AUTH = user_auth
+CREATE_ORGANIZATION = 'organizations.functions.create_organization'
 
 from core.utils.get_object import get_object_with_check_and_log
 

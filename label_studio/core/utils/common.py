@@ -26,6 +26,7 @@ from django.template import loader
 from django.http import HttpResponse
 from django.utils.timezone import now
 from django.utils.crypto import get_random_string
+from django.utils.module_loading import import_string
 from django.core.paginator import Paginator
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
@@ -645,4 +646,27 @@ def get_organization_from_request(request):
                 request.session.pop('organization_pk', None)
                 request.session.modified = True
         return user.active_organization_id
+
+
+def load_func(func_string):
+    """
+    If the given setting is a string import notation,
+    then perform the necessary import or imports.
+    """
+    if func_string is None:
+        return None
+    elif isinstance(func_string, str):
+        return import_from_string(func_string)
+    return func_string
+
+
+def import_from_string(func_string):
+    """
+    Attempt to import a class from a string representation.
+    """
+    try:
+        return import_string(func_string)
+    except ImportError:
+        msg = f"Could not import {func_string} from settings"
+        raise ImportError(msg)
 
