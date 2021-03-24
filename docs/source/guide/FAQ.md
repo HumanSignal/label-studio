@@ -6,6 +6,33 @@ order: 203
 
 If you encounter an issue using Label Studio, use this page to troubleshoot it. 
 
+## Blank page when loading a project
+
+After starting Label Studio and opening a project, you see a blank page. Several possible issues could be the cause. 
+
+### Cause: Windows 10 fails to recognize JavaScript files
+If you use Label Studio on a Windows 10 machine, operating system settings might fail to recognize JavaScript files. 
+
+To verify whether this is affecting you, check the web browser console for messages about `Strict MIME checking` and `Refused to apply style from <address> because its MIME type is not a supported stylesheet MIME type`. 
+
+To resolve this issue, you might need to edit the registry. 
+
+> Use caution if you choose to edit the registry, because errors can cause your computer to fail to start. 
+
+1. On your Windows computer, open the Registry Editor. 
+2. Locate the registry keys for `HKEY_LOCAL_MACHINE\Software\Classes`.
+3. Locate the `.js` registry and select it.
+4. Update the **Content Type** value to `application/javascript`. <br/>If that registry key already had a value of `application/javascript`, another issue might be causing the problem.
+
+Try to access the Label Studio project page again. 
+
+### Cause: Host not recognized
+
+If you specify a host without a protocol such as `http://` or `https://` when starting Label Studio, Label Studio can fail to locate the correct files to load the project page. 
+
+To resolve this issue, update the host specified as an environment variable or when starting Label Studio. See [Start Label Studio](start.html)
+
+
 ## Slowness while labeling
 
 If you're using the SQLite database and another user imports a large volume of data, labeling might slow down for other users on the server due to the database load. 
