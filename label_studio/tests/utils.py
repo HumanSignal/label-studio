@@ -3,6 +3,7 @@
 import ujson as json
 
 import json
+import pytest
 import requests_mock
 import requests
 
@@ -143,6 +144,18 @@ def make_project(config, user, use_ml_backend=True, team_id=None):
         MLBackend.objects.create(project=project, url='http://localhost:8999')
 
     return project
+
+
+@pytest.fixture
+@pytest.mark.django_db
+def project_id(business_client):
+    payload = dict(title="test_project")
+    response = business_client.post(
+        "/api/projects/",
+        data=json.dumps(payload),
+        content_type="application/json",
+    )
+    return response.json()["id"]
 
 
 def make_task(config, project):

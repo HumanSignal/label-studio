@@ -6,14 +6,13 @@
 const fetch = require('node-fetch');
 
 const fs = require('fs');
-const { spawn, execSync } = require('child_process');
+const { spawn } = require('child_process');
 const path = require('path');
 
 const dir = path.resolve(__dirname, 'build-tmp');
 const TOKEN = process.env.GITHUB_TOKEN;
 
 // coloring for console output
-const GREEN = "\033[0;32m";
 const RED = "\033[0;31m";
 const NC = "\033[0m"; // NO COLOR to reset coloring
 
@@ -22,7 +21,6 @@ const PROJECTS = {
   'dm': 'heartexlabs/dm2',
 };
 
-const TARGET_DIR = "/lib";
 const DIST_DIR = "/dist";
 
 /**

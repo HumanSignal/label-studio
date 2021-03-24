@@ -7,6 +7,7 @@ from django.contrib.auth import views as auth_views
 from django.shortcuts import render, redirect, reverse
 from django.contrib import auth
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 from rest_framework.authtoken.models import Token
 
 from users import forms
@@ -77,6 +78,7 @@ def user_signup(request):
     """
     user = request.user
     next_page = request.GET.get('next')
+    token = request.GET.get('token')
     next_page = next_page if next_page else reverse('projects:project-index')
     user_form = forms.UserSignupForm()
     organization_form = OrganizationSignupForm()
@@ -86,6 +88,11 @@ def user_signup(request):
 
     # make a new user
     if request.method == 'POST':
+        organization = Organization.objects.first()
+        if settings.DISABLE_SIGNUP_WITHOUT_LINK is True:
+            if not(token and organization and token == organization.token):
+                raise PermissionDenied()
+
         user_form = forms.UserSignupForm(request.POST)
         organization_form = OrganizationSignupForm(request.POST)
 
@@ -97,7 +104,8 @@ def user_signup(request):
     return render(request, 'users/user_signup.html', {
         'user_form': user_form,
         'organization_form': organization_form,
-        'next': next_page
+        'next': next_page,
+        'token': token,
     })
 
 
