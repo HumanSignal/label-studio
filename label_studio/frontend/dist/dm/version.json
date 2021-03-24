@@ -1,6 +1,6 @@
 {
-  "message": "Build for UMD",
-  "commit": "4966e206259ce8c5d43ff82c2d0ed6bfa5f712e6",
+  "message": "Fix hotkeys mapping",
+  "commit": "b33e3cc23652823a9e83dd2b378694119125d186",
   "branch": "master",
-  "date": "2021-03-19T13:25:47Z"
+  "date": "2021-03-23T17:13:41Z"
 }
