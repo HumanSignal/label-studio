@@ -217,12 +217,19 @@ def annotate_predictions_results(queryset):
         return queryset.annotate(predictions_results=ArrayAgg("predictions__result"))
 
 
-def dummy(queryset):
-    return queryset
+def annotate_annotators(queryset):
+    if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
+        return queryset.annotate(annotators=Coalesce(GroupConcat("annotations__completed_by"), Value(None)))
+    else:
+        return queryset.annotate(annotators=ArrayAgg("annotations__completed_by"))
 
 
 def annotate_predictions_score(queryset):
     return queryset.annotate(predictions_score=Avg("predictions__score"))
+
+
+def dummy(queryset):
+    return queryset
 
 
 annotations_map = {
@@ -233,15 +240,16 @@ annotations_map = {
     "total_annotations": dummy,
     "total_predictions": dummy,
     "predictions_score": annotate_predictions_score,
+    "annotators": annotate_annotators
 }
 
 
 class PreparedTaskManager(models.Manager):
-    def get_queryset(self, fields_for_annotation=None):
+    def get_queryset(self, fields_for_evaluation=None):
         queryset = TaskQuerySet(self.model)
 
-        if fields_for_annotation is None:
-            fields_for_annotation = []
+        if fields_for_evaluation is None:
+            fields_for_evaluation = []
 
         # default annotations for calculating total values in pagination output
         queryset = queryset.annotate(
@@ -249,8 +257,8 @@ class PreparedTaskManager(models.Manager):
             total_predictions=Count("predictions", distinct=True),
         )
 
-        # annotations applied only if we need them in ordering or filters
-        for field in fields_for_annotation:
+        # db annotations applied only if we need them in ordering or filters
+        for field in fields_for_evaluation:
             function = annotations_map[field]
             queryset = function(queryset)
 

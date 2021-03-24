@@ -34,7 +34,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Base path for media root and other uploaded files
 BASE_DATA_DIR = get_env('BASE_DATA_DIR', get_data_dir())
 os.makedirs(BASE_DATA_DIR, exist_ok=True)
-print('=> Database and media directory: ', BASE_DATA_DIR, '\n')
+print('=> Database and media directory:', BASE_DATA_DIR, '\n')
 
 # Databases
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
