@@ -237,10 +237,10 @@ annotations_map = {
     "cancelled_annotations": annotate_cancelled_annotations,
     "annotations_results": annotate_annotations_results,
     "predictions_results": annotate_predictions_results,
-    "total_annotations": dummy,
-    "total_predictions": dummy,
     "predictions_score": annotate_predictions_score,
-    "annotators": annotate_annotators
+    "annotators": annotate_annotators,
+    "total_annotations": dummy,
+    "total_predictions": dummy
 }
 
 

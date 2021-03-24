@@ -8,6 +8,7 @@ from django.db import transaction
 from data_manager.models import View, Filter, FilterGroup
 from tasks.models import Task
 from tasks.serializers import TaskWithAnnotationsAndLazyPredictionsSerializer
+from django.db.models import Avg
 
 
 class FilterSerializer(serializers.ModelSerializer):
@@ -160,6 +161,7 @@ class TaskSerializer(TaskWithAnnotationsAndLazyPredictionsSerializer):
     completed_at = serializers.SerializerMethodField()
     annotations_results = serializers.SerializerMethodField()
     predictions_results = serializers.SerializerMethodField()
+    predictions_score = serializers.SerializerMethodField()
     total_annotations = serializers.SerializerMethodField()
     total_predictions = serializers.SerializerMethodField()
     file_upload = serializers.ReadOnlyField(source='file_upload_name')
@@ -177,6 +179,7 @@ class TaskSerializer(TaskWithAnnotationsAndLazyPredictionsSerializer):
             "data",
             "id",
             "predictions_results",
+            "predictions_score",
             "total_annotations",
             "total_predictions",
             "annotations",
@@ -212,6 +215,15 @@ class TaskSerializer(TaskWithAnnotationsAndLazyPredictionsSerializer):
             return json.dumps([item.result for item in predictions])
         else:
             return ""
+
+    @staticmethod
+    def get_predictions_score(obj):
+        predictions = obj.predictions.all()
+        if predictions:
+            values = [item.score for item in predictions if isinstance(item.score, (float, int))]
+            if values:
+                return sum(values) / float(len(values))
+        return None
 
     @staticmethod
     def get_total_predictions(obj):

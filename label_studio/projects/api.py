@@ -406,9 +406,11 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
         # support actions api call from actions/next_task.py
         if hasattr(self, 'prepared_tasks'):
             project.prepared_tasks = self.prepared_tasks
+            external_prepared_tasks_used = True
         # get prepared tasks from request params (filters, selected items)
         else:
             project.prepared_tasks = get_prepared_queryset(self.request, project)
+            external_prepared_tasks_used = False
 
         # detect solved and not solved tasks
         user_solved_tasks_array = user.annotations.filter(ground_truth=False).filter(
@@ -426,7 +428,7 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
 
             # If current user has already lock one task - return it (without setting the lock again)
             next_task = Task.get_locked_by(user, project)
-            if next_task:
+            if next_task and not external_prepared_tasks_used:  # skip if it's queryset from data manager
                 return self._make_response(next_task, request, use_task_lock=False)
 
             if project.show_ground_truth_first:
@@ -446,7 +448,10 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
             if next_task:
                 return self._make_response(next_task, request)
 
-            if project.sampling == project.UNCERTAINTY:
+            if external_prepared_tasks_used:  # ordered by data manager
+                next_task = not_solved_tasks.first()
+
+            elif project.sampling == project.UNCERTAINTY:
                 logger.debug(f'User={request.user} tries uncertainty sampling from {not_solved_tasks_count} tasks')
                 next_task = self._try_uncertainty_sampling(not_solved_tasks, project, user_solved_tasks_array)
 
