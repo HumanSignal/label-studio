@@ -4,7 +4,7 @@ from django.shortcuts import redirect, render, reverse
 from rules.contrib.views import permission_required, objectgetter
 
 from core.permissions import (IsBusiness, get_object_with_permissions, view_with_auth)
-from core.utils.common import get_object_with_check_and_log, find_editor_files
+from core.utils.common import get_object_with_check_and_log, find_editor_files, get_organization_from_request
 from core.version import get_short_version
 from organizations.models import Organization
 from projects.models import Project
@@ -13,8 +13,7 @@ from projects.models import Project
 @view_with_auth(['GET'], (IsBusiness,))
 # @permission_required('tasks.delete_task', fn=objectgetter(Project, 'pk'), raise_exception=True)
 def task_page(request, pk):
-    user = request.user
-    org_pk = request.session['organization_pk']
+    org_pk = get_organization_from_request(request)
     org = get_object_with_permissions(request, Organization, org_pk, 'organizations.view_organization')
     project = get_object_with_check_and_log(request, Project, pk=pk)
 

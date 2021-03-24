@@ -8,7 +8,7 @@ from django.db.models import Q, Count
 
 from django.utils.translation import gettext_lazy as _
 
-from core.utils.common import create_hash, get_object_with_check_and_log
+from core.utils.common import create_hash, get_object_with_check_and_log, get_organization_from_request
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +60,7 @@ class Organization(models.Model):
         if 'organization_pk' not in request.session:
             logger.debug('"organization_pk" is missed in request.session: can\'t get Organization')
             return
-        pk = request.session['organization_pk']
+        pk = get_organization_from_request(request)
         return get_object_with_check_and_log(request, Organization, pk=pk)
 
     @classmethod

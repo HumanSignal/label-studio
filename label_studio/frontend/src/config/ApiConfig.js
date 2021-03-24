@@ -2,6 +2,11 @@
 export const API_CONFIG = {
   gateway: `${window.APP_SETTINGS.hostname}/api`,
   endpoints: {
+    // Organization
+    memberships: "/organizations/:pk/memberships",
+    inviteLink: "/invite",
+    resetInviteLink: "POST:/invite/reset-token",
+
     // Project
     projects: "/projects",
     project: "/projects/:pk",

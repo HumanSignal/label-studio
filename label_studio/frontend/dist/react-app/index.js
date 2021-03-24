@@ -383,6 +383,44 @@ var ForwardRef = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(SvgM
 
 /***/ }),
 
+/***/ "./src/assets/icons/plus.svg":
+/*!***********************************!*\
+  !*** ./src/assets/icons/plus.svg ***!
+  \***********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+function _extends() { _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+
+
+
+var _ref = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("path", {
+  fillRule: "evenodd",
+  clipRule: "evenodd",
+  d: "M8 0v6h6v2H8v6H6V8H0V6h6V0h2z",
+  fill: "currentColor"
+});
+
+function SvgPlus(props, svgRef) {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("svg", _extends({
+    width: 14,
+    height: 14,
+    fill: "none",
+    xmlns: "http://www.w3.org/2000/svg",
+    ref: svgRef
+  }, props), _ref);
+}
+
+var ForwardRef = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(SvgPlus);
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (ForwardRef);
+
+/***/ }),
+
 /***/ "./src/assets/icons/settings.svg":
 /*!***************************************!*\
   !*** ./src/assets/icons/settings.svg ***!
@@ -1081,8 +1119,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "LsEllipsis": () => (/* reexport safe */ _ellipsis_svg__WEBPACK_IMPORTED_MODULE_4__.default),
 /* harmony export */   "LsGitHub": () => (/* reexport safe */ _github_svg__WEBPACK_IMPORTED_MODULE_5__.default),
 /* harmony export */   "LsMinus": () => (/* reexport safe */ _minus_svg__WEBPACK_IMPORTED_MODULE_6__.default),
-/* harmony export */   "LsSettings": () => (/* reexport safe */ _settings_svg__WEBPACK_IMPORTED_MODULE_7__.default),
-/* harmony export */   "LsSlack": () => (/* reexport safe */ _slack_svg__WEBPACK_IMPORTED_MODULE_8__.default)
+/* harmony export */   "LsPlus": () => (/* reexport safe */ _plus_svg__WEBPACK_IMPORTED_MODULE_7__.default),
+/* harmony export */   "LsSettings": () => (/* reexport safe */ _settings_svg__WEBPACK_IMPORTED_MODULE_8__.default),
+/* harmony export */   "LsSlack": () => (/* reexport safe */ _slack_svg__WEBPACK_IMPORTED_MODULE_9__.default)
 /* harmony export */ });
 /* harmony import */ var _bulb_svg__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./bulb.svg */ "./src/assets/icons/bulb.svg");
 /* harmony import */ var _check_svg__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./check.svg */ "./src/assets/icons/check.svg");
@@ -1091,8 +1130,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _ellipsis_svg__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ellipsis.svg */ "./src/assets/icons/ellipsis.svg");
 /* harmony import */ var _github_svg__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./github.svg */ "./src/assets/icons/github.svg");
 /* harmony import */ var _minus_svg__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./minus.svg */ "./src/assets/icons/minus.svg");
-/* harmony import */ var _settings_svg__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./settings.svg */ "./src/assets/icons/settings.svg");
-/* harmony import */ var _slack_svg__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./slack.svg */ "./src/assets/icons/slack.svg");
+/* harmony import */ var _plus_svg__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./plus.svg */ "./src/assets/icons/plus.svg");
+/* harmony import */ var _settings_svg__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./settings.svg */ "./src/assets/icons/settings.svg");
+/* harmony import */ var _slack_svg__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./slack.svg */ "./src/assets/icons/slack.svg");
+
 
 
 
@@ -1982,10 +2023,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var _assets_icons__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../assets/icons */ "./src/assets/icons/index.js");
 /* harmony import */ var _utils_bem__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../utils/bem */ "./src/utils/bem.tsx");
-/* harmony import */ var _Button_Button__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../Button/Button */ "./src/components/Button/Button.js");
-/* harmony import */ var _Space_Space__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../Space/Space */ "./src/components/Space/Space.js");
-/* harmony import */ var _Error_styl__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Error.styl */ "./src/components/Error/Error.styl");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+/* harmony import */ var _utils_helpers__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../utils/helpers */ "./src/utils/helpers.js");
+/* harmony import */ var _Button_Button__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../Button/Button */ "./src/components/Button/Button.js");
+/* harmony import */ var _Space_Space__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../Space/Space */ "./src/components/Space/Space.js");
+/* harmony import */ var _Error_styl__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./Error.styl */ "./src/components/Error/Error.styl");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+
 
 
 
@@ -2012,41 +2055,35 @@ const ErrorWrapper = ({
   const [copied, setCopied] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const copyStacktrace = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(() => {
     setCopied(true);
-    const input = document.createElement('textarea');
-    document.body.appendChild(input);
-    input.value = preparedStackTrace;
-    input.focus();
-    input.select();
-    document.execCommand('copy');
-    input.remove();
+    (0,_utils_helpers__WEBPACK_IMPORTED_MODULE_3__.copyText)(preparedStackTrace);
     setTimeout(() => setCopied(false), 1200);
   }, [preparedStackTrace]);
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_utils_bem__WEBPACK_IMPORTED_MODULE_2__.Block, {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_utils_bem__WEBPACK_IMPORTED_MODULE_2__.Block, {
     name: "error-message",
-    children: [possum !== false && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_2__.Elem, {
+    children: [possum !== false && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_2__.Elem, {
       tag: "img",
       name: "heidi",
       src: "/static/images/opossum_broken.svg",
       height: "111",
       alt: "Heidi's down"
-    }), title && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_2__.Elem, {
+    }), title && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_2__.Elem, {
       name: "title",
       children: title
-    }), message && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_2__.Elem, {
+    }), message && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_2__.Elem, {
       name: "detail",
       dangerouslySetInnerHTML: {
         __html: String(message)
       }
-    }), preparedStackTrace && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_2__.Elem, {
+    }), preparedStackTrace && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_2__.Elem, {
       name: "stracktrace",
       dangerouslySetInnerHTML: {
         __html: preparedStackTrace.replace(/(\n)/g, '<br>')
       }
-    }), (validation === null || validation === void 0 ? void 0 : validation.length) && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_2__.Elem, {
+    }), (validation === null || validation === void 0 ? void 0 : validation.length) && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_2__.Elem, {
       tag: "ul",
       name: "validation",
-      children: validation.map(([field, errors]) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-        children: [].concat(errors).map((err, i) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_2__.Elem, {
+      children: validation.map(([field, errors]) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+        children: [].concat(errors).map((err, i) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_2__.Elem, {
           tag: "li",
           name: "message",
           dangerouslySetInnerHTML: {
@@ -2054,35 +2091,35 @@ const ErrorWrapper = ({
           }
         }, i))
       }, field))
-    }), (version || errorId) && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_2__.Elem, {
+    }), (version || errorId) && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_2__.Elem, {
       name: "version",
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_Space_Space__WEBPACK_IMPORTED_MODULE_4__.Space, {
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_Space_Space__WEBPACK_IMPORTED_MODULE_5__.Space, {
         children: [version && `Version: ${version}`, errorId && `Error ID: ${errorId}`]
       })
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_2__.Elem, {
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_2__.Elem, {
       name: "actions",
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_Space_Space__WEBPACK_IMPORTED_MODULE_4__.Space, {
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_Space_Space__WEBPACK_IMPORTED_MODULE_5__.Space, {
         spread: true,
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_2__.Elem, {
-          tag: _Button_Button__WEBPACK_IMPORTED_MODULE_3__.Button,
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_2__.Elem, {
+          tag: _Button_Button__WEBPACK_IMPORTED_MODULE_4__.Button,
           name: "action-slack",
           target: "_blank",
-          icon: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_assets_icons__WEBPACK_IMPORTED_MODULE_1__.LsSlack, {}),
+          icon: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_assets_icons__WEBPACK_IMPORTED_MODULE_1__.LsSlack, {}),
           href: SLACK_INVITE_URL,
           children: "Ask on Slack"
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_Space_Space__WEBPACK_IMPORTED_MODULE_4__.Space, {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_Space_Space__WEBPACK_IMPORTED_MODULE_5__.Space, {
           size: "small",
-          children: [preparedStackTrace && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_Button_Button__WEBPACK_IMPORTED_MODULE_3__.Button, {
+          children: [preparedStackTrace && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_Button_Button__WEBPACK_IMPORTED_MODULE_4__.Button, {
             disabled: copied,
             onClick: copyStacktrace,
             style: {
               width: 180
             },
             children: copied ? "Copied" : "Copy Stacktrace"
-          }), onGoBack && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_Button_Button__WEBPACK_IMPORTED_MODULE_3__.Button, {
+          }), onGoBack && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_Button_Button__WEBPACK_IMPORTED_MODULE_4__.Button, {
             onClick: onGoBack,
             children: "Go Back"
-          }), onReload && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_Button_Button__WEBPACK_IMPORTED_MODULE_3__.Button, {
+          }), onReload && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_Button_Button__WEBPACK_IMPORTED_MODULE_4__.Button, {
             onClick: onReload,
             children: "Reload"
           })]
@@ -4233,10 +4270,12 @@ __webpack_require__.r(__webpack_exports__);
 const standaloneModal = props => {
   const modalRef = /*#__PURE__*/(0,react__WEBPACK_IMPORTED_MODULE_0__.createRef)();
   const rootDiv = document.createElement("div");
+  let renderCount = 0;
   rootDiv.className = (0,_utils_bem__WEBPACK_IMPORTED_MODULE_5__.cn)("modal-holder").toClassName();
   document.body.appendChild(rootDiv);
 
   const renderModal = (props, animate) => {
+    renderCount++;
     (0,react_dom__WEBPACK_IMPORTED_MODULE_1__.render)( /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_providers_MultiProvider__WEBPACK_IMPORTED_MODULE_4__.MultiProvider, {
       providers: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_providers_ConfigProvider__WEBPACK_IMPORTED_MODULE_3__.ConfigProvider, {}, "config"), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_providers_ApiProvider__WEBPACK_IMPORTED_MODULE_2__.ApiProvider, {}, "api")],
       children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_9__.jsx)(_ModalPopup__WEBPACK_IMPORTED_MODULE_8__.Modal, {
@@ -4246,18 +4285,20 @@ const standaloneModal = props => {
           var _props$onHidden;
 
           (_props$onHidden = props.onHidden) === null || _props$onHidden === void 0 ? void 0 : _props$onHidden.call(props);
+          (0,react_dom__WEBPACK_IMPORTED_MODULE_1__.unmountComponentAtNode)(rootDiv);
           rootDiv.remove();
         },
         animateAppearance: animate
       })
-    }), rootDiv);
+    }, `modal-${renderCount}`), rootDiv);
   };
 
   renderModal(props, true);
   return {
     update(newProps) {
       renderModal({ ...props,
-        ...(newProps !== null && newProps !== void 0 ? newProps : {})
+        ...(newProps !== null && newProps !== void 0 ? newProps : {}),
+        visible: true
       }, false);
     },
 
@@ -4421,6 +4462,12 @@ class Modal extends react__WEBPACK_IMPORTED_MODULE_0__.Component {
     });
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.visible !== this.state.visible) {
+      document.body.style.overflow = this.state.visible ? 'hidden' : '';
+    }
+  }
+
   setBody(body) {
     this.setState({
       body
@@ -4495,7 +4542,8 @@ class Modal extends react__WEBPACK_IMPORTED_MODULE_0__.Component {
             },
             children: this.body
           }), this.state.footer && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(Modal.Footer, {
-            children: this.state.footer
+            bare: this.props.bareFooter,
+            children: this.footer
           })]
         })
       })
@@ -4561,6 +4609,15 @@ class Modal extends react__WEBPACK_IMPORTED_MODULE_0__.Component {
     }
   }
 
+  get footer() {
+    if (this.state.footer) {
+      const Content = this.state.footer;
+      return Content instanceof Function ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(Content, {}) : Content;
+    }
+
+    return null;
+  }
+
 }
 
 Modal.Header = ({
@@ -4575,9 +4632,13 @@ Modal.Header = ({
 });
 
 Modal.Footer = ({
-  children
+  children,
+  bare
 }) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(Elem, {
   name: "footer",
+  mod: {
+    bare
+  },
   children: children
 });
 
@@ -5183,6 +5244,10 @@ __webpack_require__.r(__webpack_exports__);
 const API_CONFIG = {
   gateway: `${window.APP_SETTINGS.hostname}/api`,
   endpoints: {
+    // Organization
+    memberships: "/organizations/:pk/memberships",
+    inviteLink: "/invite",
+    resetInviteLink: "POST:/invite/reset-token",
     // Project
     projects: "/projects",
     project: "/projects/:pk",
@@ -8110,6 +8175,424 @@ ExportPage.modal = true;
 
 /***/ }),
 
+/***/ "./src/pages/PeoplePage/PeopleList.js":
+/*!********************************************!*\
+  !*** ./src/pages/PeoplePage/PeopleList.js ***!
+  \********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "PeopleList": () => (/* binding */ PeopleList)
+/* harmony export */ });
+/* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! date-fns */ "./node_modules/date-fns/esm/formatDistance/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var _components__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../components */ "./src/components/index.js");
+/* harmony import */ var _providers_ApiProvider__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../providers/ApiProvider */ "./src/providers/ApiProvider.js");
+/* harmony import */ var _utils_bem__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../utils/bem */ "./src/utils/bem.tsx");
+/* harmony import */ var _utils_helpers__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../utils/helpers */ "./src/utils/helpers.js");
+/* harmony import */ var _PeopleList_styl__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./PeopleList.styl */ "./src/pages/PeoplePage/PeopleList.styl");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+
+
+
+
+
+
+
+
+
+const PeopleList = ({
+  onSelect,
+  selectedUser,
+  defaultSelected
+}) => {
+  const api = (0,_providers_ApiProvider__WEBPACK_IMPORTED_MODULE_2__.useAPI)();
+  const [usersList, setUsersList] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)();
+  const fetchUsers = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(async () => {
+    const result = await api.callApi('memberships', {
+      params: {
+        pk: 1
+      }
+    });
+    setUsersList(result);
+  }, [api]);
+  const selectUser = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(user => {
+    if ((selectedUser === null || selectedUser === void 0 ? void 0 : selectedUser.id) === user.id) {
+      onSelect === null || onSelect === void 0 ? void 0 : onSelect(null);
+    } else {
+      onSelect === null || onSelect === void 0 ? void 0 : onSelect(user);
+    }
+  }, [selectedUser]);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    fetchUsers();
+  }, []);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    if ((0,_utils_helpers__WEBPACK_IMPORTED_MODULE_4__.isDefined)(defaultSelected) && usersList) {
+      const selected = usersList.find(({
+        user
+      }) => user.id === Number(defaultSelected));
+      if (selected) selectUser(selected.user);
+    }
+  }, [usersList, defaultSelected]);
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_3__.Block, {
+    name: "people-list",
+    children: usersList ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_utils_bem__WEBPACK_IMPORTED_MODULE_3__.Elem, {
+      name: "users",
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_utils_bem__WEBPACK_IMPORTED_MODULE_3__.Elem, {
+        name: "header",
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_3__.Elem, {
+          name: "column",
+          mix: "avatar"
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_3__.Elem, {
+          name: "column",
+          mix: "email",
+          children: "Email"
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_3__.Elem, {
+          name: "column",
+          mix: "name",
+          children: "Name"
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_3__.Elem, {
+          name: "column",
+          mix: "last-activity",
+          children: "Last Activity"
+        })]
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_3__.Elem, {
+        name: "body",
+        children: usersList.map(({
+          user
+        }) => {
+          const active = user.id === (selectedUser === null || selectedUser === void 0 ? void 0 : selectedUser.id);
+          return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_utils_bem__WEBPACK_IMPORTED_MODULE_3__.Elem, {
+            name: "user",
+            mod: {
+              active
+            },
+            onClick: () => selectUser(user),
+            children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_3__.Elem, {
+              name: "field",
+              mix: "avatar",
+              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_components__WEBPACK_IMPORTED_MODULE_1__.Userpic, {
+                user: user,
+                style: {
+                  width: 28,
+                  height: 28
+                }
+              })
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_3__.Elem, {
+              name: "field",
+              mix: "email",
+              children: user.email
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_utils_bem__WEBPACK_IMPORTED_MODULE_3__.Elem, {
+              name: "field",
+              mix: "name",
+              children: [user.first_name, " ", user.last_name]
+            }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_3__.Elem, {
+              name: "field",
+              mix: "last-activity",
+              children: (0,date_fns__WEBPACK_IMPORTED_MODULE_7__.default)(new Date(user.last_activity), new Date(), {
+                addSuffix: true
+              })
+            })]
+          }, `user-${user.id}`);
+        })
+      })]
+    }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_3__.Elem, {
+      name: "loading",
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_components__WEBPACK_IMPORTED_MODULE_1__.Spinner, {
+        size: 36
+      })
+    })
+  });
+};
+
+/***/ }),
+
+/***/ "./src/pages/PeoplePage/PeoplePage.js":
+/*!********************************************!*\
+  !*** ./src/pages/PeoplePage/PeoplePage.js ***!
+  \********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "PeoplePage": () => (/* binding */ PeoplePage)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var _assets_icons__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../assets/icons */ "./src/assets/icons/index.js");
+/* harmony import */ var _components__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../components */ "./src/components/index.js");
+/* harmony import */ var _components_Description_Description__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../components/Description/Description */ "./src/components/Description/Description.js");
+/* harmony import */ var _components_Form__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../components/Form */ "./src/components/Form/index.js");
+/* harmony import */ var _components_Modal_Modal__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../components/Modal/Modal */ "./src/components/Modal/Modal.js");
+/* harmony import */ var _components_Space_Space__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../components/Space/Space */ "./src/components/Space/Space.js");
+/* harmony import */ var _providers_ApiProvider__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../providers/ApiProvider */ "./src/providers/ApiProvider.js");
+/* harmony import */ var _providers_ConfigProvider__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../providers/ConfigProvider */ "./src/providers/ConfigProvider.js");
+/* harmony import */ var _utils_bem__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../utils/bem */ "./src/utils/bem.tsx");
+/* harmony import */ var _utils_helpers__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../utils/helpers */ "./src/utils/helpers.js");
+/* harmony import */ var _PeopleInvitation_styl__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./PeopleInvitation.styl */ "./src/pages/PeoplePage/PeopleInvitation.styl");
+/* harmony import */ var _PeopleList__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./PeopleList */ "./src/pages/PeoplePage/PeopleList.js");
+/* harmony import */ var _PeoplePage_styl__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./PeoplePage.styl */ "./src/pages/PeoplePage/PeoplePage.styl");
+/* harmony import */ var _SelectedUser__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./SelectedUser */ "./src/pages/PeoplePage/SelectedUser.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const InvitationModal = ({
+  link
+}) => {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_utils_bem__WEBPACK_IMPORTED_MODULE_9__.Block, {
+    name: "invite",
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_components_Form__WEBPACK_IMPORTED_MODULE_4__.Input, {
+      value: link,
+      style: {
+        width: '100%'
+      },
+      readOnly: true
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_components_Description_Description__WEBPACK_IMPORTED_MODULE_3__.Description, {
+      style: {
+        width: '70%',
+        marginTop: 16
+      },
+      children: "Invited members have private accounts. They can register and join to the organization using this link."
+    })]
+  });
+};
+
+const PeoplePage = () => {
+  const api = (0,_providers_ApiProvider__WEBPACK_IMPORTED_MODULE_7__.useAPI)();
+  const inviteModal = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
+  const config = (0,_providers_ConfigProvider__WEBPACK_IMPORTED_MODULE_8__.useConfig)();
+  const [selectedUser, setSelectedUser] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
+  const [link, setLink] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)();
+  const selectUser = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(user => {
+    console.log({
+      user
+    });
+    setSelectedUser(user);
+    localStorage.setItem('selectedUser', user === null || user === void 0 ? void 0 : user.id);
+  }, [setSelectedUser]);
+  const setInviteLink = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(link => {
+    const hostname = config.hostname || location.origin;
+    setLink(`${hostname}${link}`);
+  }, [config, setLink]);
+  const updateLink = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(() => {
+    api.callApi('resetInviteLink').then(({
+      invite_url
+    }) => {
+      setInviteLink(invite_url);
+    });
+  }, [setInviteLink]);
+  const inviteModalProps = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(link => ({
+    title: "Invite people",
+    style: {
+      width: 640,
+      height: 472
+    },
+    body: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(InvitationModal, {
+      link: link
+    }),
+    footer: () => {
+      const [copied, setCopied] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+      const copyLink = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(() => {
+        setCopied(true);
+        (0,_utils_helpers__WEBPACK_IMPORTED_MODULE_10__.copyText)(link);
+        setTimeout(() => setCopied(false), 1500);
+      }, []);
+      return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_components_Space_Space__WEBPACK_IMPORTED_MODULE_6__.Space, {
+        spread: true,
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_components_Space_Space__WEBPACK_IMPORTED_MODULE_6__.Space, {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_components__WEBPACK_IMPORTED_MODULE_2__.Button, {
+            style: {
+              width: 170
+            },
+            onClick: () => updateLink(),
+            children: "Reset Link"
+          })
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_components_Space_Space__WEBPACK_IMPORTED_MODULE_6__.Space, {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_components__WEBPACK_IMPORTED_MODULE_2__.Button, {
+            primary: true,
+            style: {
+              width: 170
+            },
+            onClick: copyLink,
+            children: copied ? "Copied!" : "Copy link"
+          })
+        })]
+      });
+    },
+    bareFooter: true
+  }), []);
+  const showInvitationModal = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(() => {
+    inviteModal.current = (0,_components_Modal_Modal__WEBPACK_IMPORTED_MODULE_5__.modal)(inviteModalProps(link));
+  }, [inviteModalProps, link]);
+  const defaultSelected = (0,react__WEBPACK_IMPORTED_MODULE_0__.useMemo)(() => {
+    return localStorage.getItem('selectedUser');
+  }, []);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    api.callApi("inviteLink").then(({
+      invite_url
+    }) => {
+      setInviteLink(invite_url);
+    });
+  }, []);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    var _inviteModal$current;
+
+    (_inviteModal$current = inviteModal.current) === null || _inviteModal$current === void 0 ? void 0 : _inviteModal$current.update(inviteModalProps(link));
+  }, [link]);
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_utils_bem__WEBPACK_IMPORTED_MODULE_9__.Block, {
+    name: "people",
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_9__.Elem, {
+      name: "controls",
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_components_Space_Space__WEBPACK_IMPORTED_MODULE_6__.Space, {
+        spread: true,
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_components_Space_Space__WEBPACK_IMPORTED_MODULE_6__.Space, {}), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_components_Space_Space__WEBPACK_IMPORTED_MODULE_6__.Space, {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_components__WEBPACK_IMPORTED_MODULE_2__.Button, {
+            icon: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_assets_icons__WEBPACK_IMPORTED_MODULE_1__.LsPlus, {}),
+            primary: true,
+            onClick: showInvitationModal,
+            children: "Add People"
+          })
+        })]
+      })
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_utils_bem__WEBPACK_IMPORTED_MODULE_9__.Elem, {
+      name: "content",
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_PeopleList__WEBPACK_IMPORTED_MODULE_12__.PeopleList, {
+        selectedUser: selectedUser,
+        defaultSelected: defaultSelected,
+        onSelect: user => selectUser(user)
+      }), selectedUser && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_SelectedUser__WEBPACK_IMPORTED_MODULE_14__.SelectedUser, {
+        user: selectedUser,
+        onClose: () => selectUser(null)
+      })]
+    })]
+  });
+};
+PeoplePage.title = "People";
+PeoplePage.path = "/people";
+
+/***/ }),
+
+/***/ "./src/pages/PeoplePage/SelectedUser.js":
+/*!**********************************************!*\
+  !*** ./src/pages/PeoplePage/SelectedUser.js ***!
+  \**********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "SelectedUser": () => (/* binding */ SelectedUser)
+/* harmony export */ });
+/* harmony import */ var date_fns__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! date-fns */ "./node_modules/date-fns/esm/format/index.js");
+/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/esm/react-router-dom.js");
+/* harmony import */ var _assets_icons__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../assets/icons */ "./src/assets/icons/index.js");
+/* harmony import */ var _components__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../components */ "./src/components/index.js");
+/* harmony import */ var _utils_bem__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../utils/bem */ "./src/utils/bem.tsx");
+/* harmony import */ var _SelectedUser_styl__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./SelectedUser.styl */ "./src/pages/PeoplePage/SelectedUser.styl");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+
+
+
+
+
+
+
+
+
+const UserProjectsLinks = ({
+  projects
+}) => {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_2__.Elem, {
+    name: "links-list",
+    children: projects.map(project => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_2__.Elem, {
+      tag: react_router_dom__WEBPACK_IMPORTED_MODULE_5__.NavLink,
+      name: "project-link",
+      to: `/projects/${project.id}`,
+      children: project.title
+    }, `project-${project.id}`))
+  });
+};
+
+const SelectedUser = ({
+  user,
+  onClose
+}) => {
+  const fullName = [user.first_name, user.last_name].filter(n => !!n).join(" ").trim();
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)(_utils_bem__WEBPACK_IMPORTED_MODULE_2__.Block, {
+    name: "user-info",
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_2__.Elem, {
+      name: "close",
+      tag: _components__WEBPACK_IMPORTED_MODULE_1__.Button,
+      type: "link",
+      onClick: onClose,
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_assets_icons__WEBPACK_IMPORTED_MODULE_0__.LsCross, {})
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)(_utils_bem__WEBPACK_IMPORTED_MODULE_2__.Elem, {
+      name: "header",
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_components__WEBPACK_IMPORTED_MODULE_1__.Userpic, {
+        user: user,
+        style: {
+          width: 64,
+          height: 64,
+          fontSize: 28
+        }
+      }), fullName && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_2__.Elem, {
+        name: "full-name",
+        children: fullName
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_2__.Elem, {
+        tag: "p",
+        name: "email",
+        children: user.email
+      })]
+    }), user.phone && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_2__.Elem, {
+      name: "section",
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("a", {
+        href: `tel:${user.phone}`,
+        children: user.phone
+      })
+    }), !!user.created_projects.length && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)(_utils_bem__WEBPACK_IMPORTED_MODULE_2__.Elem, {
+      name: "section",
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_2__.Elem, {
+        name: "section-title",
+        children: "Created Projects"
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(UserProjectsLinks, {
+        projects: user.created_projects
+      })]
+    }), !!user.contributed_to_projects.length && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)(_utils_bem__WEBPACK_IMPORTED_MODULE_2__.Elem, {
+      name: "section",
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_2__.Elem, {
+        name: "section-title",
+        children: "Contributed to"
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)(UserProjectsLinks, {
+        projects: user.contributed_to_projects
+      })]
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)(_utils_bem__WEBPACK_IMPORTED_MODULE_2__.Elem, {
+      tag: "p",
+      name: "last-active",
+      children: ["Last activity on: ", (0,date_fns__WEBPACK_IMPORTED_MODULE_6__.default)(new Date(user.last_activity), 'dd MMM yyyy, KK:mm a')]
+    })]
+  });
+};
+
+/***/ }),
+
 /***/ "./src/pages/Projects/Projects.js":
 /*!****************************************!*\
   !*** ./src/pages/Projects/Projects.js ***!
@@ -9855,9 +10338,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "Pages": () => (/* binding */ Pages)
 /* harmony export */ });
-/* harmony import */ var _Projects_Projects__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Projects/Projects */ "./src/pages/Projects/Projects.js");
+/* harmony import */ var _PeoplePage_PeoplePage__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./PeoplePage/PeoplePage */ "./src/pages/PeoplePage/PeoplePage.js");
+/* harmony import */ var _Projects_Projects__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Projects/Projects */ "./src/pages/Projects/Projects.js");
 
-const Pages = [_Projects_Projects__WEBPACK_IMPORTED_MODULE_0__.ProjectsPage];
+
+const Pages = [_PeoplePage_PeoplePage__WEBPACK_IMPORTED_MODULE_0__.PeoplePage, _Projects_Projects__WEBPACK_IMPORTED_MODULE_1__.ProjectsPage];
 
 /***/ }),
 
@@ -11363,7 +11848,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "isEmptyString": () => (/* binding */ isEmptyString),
 /* harmony export */   "objectClean": () => (/* binding */ objectClean),
 /* harmony export */   "humanReadableNumber": () => (/* binding */ humanReadableNumber),
-/* harmony export */   "absoluteURL": () => (/* binding */ absoluteURL)
+/* harmony export */   "absoluteURL": () => (/* binding */ absoluteURL),
+/* harmony export */   "copyText": () => (/* binding */ copyText)
 /* harmony export */ });
 const formDataToJPO = formData => {
   if (formData instanceof FormData === false) return formData;
@@ -11419,6 +11905,15 @@ const absoluteURL = (path = "") => {
   } else {
     return [APP_SETTINGS.hostname.replace(/([/]+)$/, ''), path.replace(/^([/]+)/, '')].join("/");
   }
+};
+const copyText = text => {
+  const input = document.createElement('textarea');
+  document.body.appendChild(input);
+  input.value = text;
+  input.focus();
+  input.select();
+  document.execCommand('copy');
+  input.remove();
 };
 
 /***/ }),
@@ -25578,6 +26073,54 @@ function addLeadingZeros(number, targetLength) {
 
 /***/ }),
 
+/***/ "./node_modules/date-fns/esm/_lib/assign/index.js":
+/*!********************************************************!*\
+  !*** ./node_modules/date-fns/esm/_lib/assign/index.js ***!
+  \********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ assign)
+/* harmony export */ });
+function assign(target, dirtyObject) {
+  if (target == null) {
+    throw new TypeError('assign requires that input parameter not be null or undefined');
+  }
+
+  dirtyObject = dirtyObject || {};
+
+  for (var property in dirtyObject) {
+    if (dirtyObject.hasOwnProperty(property)) {
+      target[property] = dirtyObject[property];
+    }
+  }
+
+  return target;
+}
+
+/***/ }),
+
+/***/ "./node_modules/date-fns/esm/_lib/cloneObject/index.js":
+/*!*************************************************************!*\
+  !*** ./node_modules/date-fns/esm/_lib/cloneObject/index.js ***!
+  \*************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ cloneObject)
+/* harmony export */ });
+/* harmony import */ var _assign_index_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../assign/index.js */ "./node_modules/date-fns/esm/_lib/assign/index.js");
+
+function cloneObject(dirtyObject) {
+  return (0,_assign_index_js__WEBPACK_IMPORTED_MODULE_0__.default)({}, dirtyObject);
+}
+
+/***/ }),
+
 /***/ "./node_modules/date-fns/esm/_lib/format/formatters/index.js":
 /*!*******************************************************************!*\
   !*** ./node_modules/date-fns/esm/_lib/format/formatters/index.js ***!
@@ -27181,6 +27724,396 @@ function addMilliseconds(dirtyDate, dirtyAmount) {
 
 /***/ }),
 
+/***/ "./node_modules/date-fns/esm/compareAsc/index.js":
+/*!*******************************************************!*\
+  !*** ./node_modules/date-fns/esm/compareAsc/index.js ***!
+  \*******************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ compareAsc)
+/* harmony export */ });
+/* harmony import */ var _toDate_index_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../toDate/index.js */ "./node_modules/date-fns/esm/toDate/index.js");
+/* harmony import */ var _lib_requiredArgs_index_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../_lib/requiredArgs/index.js */ "./node_modules/date-fns/esm/_lib/requiredArgs/index.js");
+
+
+/**
+ * @name compareAsc
+ * @category Common Helpers
+ * @summary Compare the two dates and return -1, 0 or 1.
+ *
+ * @description
+ * Compare the two dates and return 1 if the first date is after the second,
+ * -1 if the first date is before the second or 0 if dates are equal.
+ *
+ * ### v2.0.0 breaking changes:
+ *
+ * - [Changes that are common for the whole library](https://github.com/date-fns/date-fns/blob/master/docs/upgradeGuide.md#Common-Changes).
+ *
+ * @param {Date|Number} dateLeft - the first date to compare
+ * @param {Date|Number} dateRight - the second date to compare
+ * @returns {Number} the result of the comparison
+ * @throws {TypeError} 2 arguments required
+ *
+ * @example
+ * // Compare 11 February 1987 and 10 July 1989:
+ * const result = compareAsc(new Date(1987, 1, 11), new Date(1989, 6, 10))
+ * //=> -1
+ *
+ * @example
+ * // Sort the array of dates:
+ * const result = [
+ *   new Date(1995, 6, 2),
+ *   new Date(1987, 1, 11),
+ *   new Date(1989, 6, 10)
+ * ].sort(compareAsc)
+ * //=> [
+ * //   Wed Feb 11 1987 00:00:00,
+ * //   Mon Jul 10 1989 00:00:00,
+ * //   Sun Jul 02 1995 00:00:00
+ * // ]
+ */
+
+function compareAsc(dirtyDateLeft, dirtyDateRight) {
+  (0,_lib_requiredArgs_index_js__WEBPACK_IMPORTED_MODULE_0__.default)(2, arguments);
+  var dateLeft = (0,_toDate_index_js__WEBPACK_IMPORTED_MODULE_1__.default)(dirtyDateLeft);
+  var dateRight = (0,_toDate_index_js__WEBPACK_IMPORTED_MODULE_1__.default)(dirtyDateRight);
+  var diff = dateLeft.getTime() - dateRight.getTime();
+
+  if (diff < 0) {
+    return -1;
+  } else if (diff > 0) {
+    return 1; // Return 0 if diff is 0; return NaN if diff is NaN
+  } else {
+    return diff;
+  }
+}
+
+/***/ }),
+
+/***/ "./node_modules/date-fns/esm/differenceInCalendarMonths/index.js":
+/*!***********************************************************************!*\
+  !*** ./node_modules/date-fns/esm/differenceInCalendarMonths/index.js ***!
+  \***********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ differenceInCalendarMonths)
+/* harmony export */ });
+/* harmony import */ var _toDate_index_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../toDate/index.js */ "./node_modules/date-fns/esm/toDate/index.js");
+/* harmony import */ var _lib_requiredArgs_index_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../_lib/requiredArgs/index.js */ "./node_modules/date-fns/esm/_lib/requiredArgs/index.js");
+
+
+/**
+ * @name differenceInCalendarMonths
+ * @category Month Helpers
+ * @summary Get the number of calendar months between the given dates.
+ *
+ * @description
+ * Get the number of calendar months between the given dates.
+ *
+ * ### v2.0.0 breaking changes:
+ *
+ * - [Changes that are common for the whole library](https://github.com/date-fns/date-fns/blob/master/docs/upgradeGuide.md#Common-Changes).
+ *
+ * @param {Date|Number} dateLeft - the later date
+ * @param {Date|Number} dateRight - the earlier date
+ * @returns {Number} the number of calendar months
+ * @throws {TypeError} 2 arguments required
+ *
+ * @example
+ * // How many calendar months are between 31 January 2014 and 1 September 2014?
+ * var result = differenceInCalendarMonths(
+ *   new Date(2014, 8, 1),
+ *   new Date(2014, 0, 31)
+ * )
+ * //=> 8
+ */
+
+function differenceInCalendarMonths(dirtyDateLeft, dirtyDateRight) {
+  (0,_lib_requiredArgs_index_js__WEBPACK_IMPORTED_MODULE_0__.default)(2, arguments);
+  var dateLeft = (0,_toDate_index_js__WEBPACK_IMPORTED_MODULE_1__.default)(dirtyDateLeft);
+  var dateRight = (0,_toDate_index_js__WEBPACK_IMPORTED_MODULE_1__.default)(dirtyDateRight);
+  var yearDiff = dateLeft.getFullYear() - dateRight.getFullYear();
+  var monthDiff = dateLeft.getMonth() - dateRight.getMonth();
+  return yearDiff * 12 + monthDiff;
+}
+
+/***/ }),
+
+/***/ "./node_modules/date-fns/esm/differenceInMilliseconds/index.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/date-fns/esm/differenceInMilliseconds/index.js ***!
+  \*********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ differenceInMilliseconds)
+/* harmony export */ });
+/* harmony import */ var _toDate_index_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../toDate/index.js */ "./node_modules/date-fns/esm/toDate/index.js");
+/* harmony import */ var _lib_requiredArgs_index_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../_lib/requiredArgs/index.js */ "./node_modules/date-fns/esm/_lib/requiredArgs/index.js");
+
+
+/**
+ * @name differenceInMilliseconds
+ * @category Millisecond Helpers
+ * @summary Get the number of milliseconds between the given dates.
+ *
+ * @description
+ * Get the number of milliseconds between the given dates.
+ *
+ * ### v2.0.0 breaking changes:
+ *
+ * - [Changes that are common for the whole library](https://github.com/date-fns/date-fns/blob/master/docs/upgradeGuide.md#Common-Changes).
+ *
+ * @param {Date|Number} dateLeft - the later date
+ * @param {Date|Number} dateRight - the earlier date
+ * @returns {Number} the number of milliseconds
+ * @throws {TypeError} 2 arguments required
+ *
+ * @example
+ * // How many milliseconds are between
+ * // 2 July 2014 12:30:20.600 and 2 July 2014 12:30:21.700?
+ * var result = differenceInMilliseconds(
+ *   new Date(2014, 6, 2, 12, 30, 21, 700),
+ *   new Date(2014, 6, 2, 12, 30, 20, 600)
+ * )
+ * //=> 1100
+ */
+
+function differenceInMilliseconds(dirtyDateLeft, dirtyDateRight) {
+  (0,_lib_requiredArgs_index_js__WEBPACK_IMPORTED_MODULE_0__.default)(2, arguments);
+  var dateLeft = (0,_toDate_index_js__WEBPACK_IMPORTED_MODULE_1__.default)(dirtyDateLeft);
+  var dateRight = (0,_toDate_index_js__WEBPACK_IMPORTED_MODULE_1__.default)(dirtyDateRight);
+  return dateLeft.getTime() - dateRight.getTime();
+}
+
+/***/ }),
+
+/***/ "./node_modules/date-fns/esm/differenceInMonths/index.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/date-fns/esm/differenceInMonths/index.js ***!
+  \***************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ differenceInMonths)
+/* harmony export */ });
+/* harmony import */ var _toDate_index_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../toDate/index.js */ "./node_modules/date-fns/esm/toDate/index.js");
+/* harmony import */ var _differenceInCalendarMonths_index_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../differenceInCalendarMonths/index.js */ "./node_modules/date-fns/esm/differenceInCalendarMonths/index.js");
+/* harmony import */ var _compareAsc_index_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../compareAsc/index.js */ "./node_modules/date-fns/esm/compareAsc/index.js");
+/* harmony import */ var _lib_requiredArgs_index_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../_lib/requiredArgs/index.js */ "./node_modules/date-fns/esm/_lib/requiredArgs/index.js");
+/* harmony import */ var _isLastDayOfMonth_index_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../isLastDayOfMonth/index.js */ "./node_modules/date-fns/esm/isLastDayOfMonth/index.js");
+
+
+
+
+
+/**
+ * @name differenceInMonths
+ * @category Month Helpers
+ * @summary Get the number of full months between the given dates.
+ *
+ * @description
+ * Get the number of full months between the given dates.
+ *
+ * ### v2.0.0 breaking changes:
+ *
+ * - [Changes that are common for the whole library](https://github.com/date-fns/date-fns/blob/master/docs/upgradeGuide.md#Common-Changes).
+ *
+ * @param {Date|Number} dateLeft - the later date
+ * @param {Date|Number} dateRight - the earlier date
+ * @returns {Number} the number of full months
+ * @throws {TypeError} 2 arguments required
+ *
+ * @example
+ * // How many full months are between 31 January 2014 and 1 September 2014?
+ * var result = differenceInMonths(new Date(2014, 8, 1), new Date(2014, 0, 31))
+ * //=> 7
+ */
+
+function differenceInMonths(dirtyDateLeft, dirtyDateRight) {
+  (0,_lib_requiredArgs_index_js__WEBPACK_IMPORTED_MODULE_0__.default)(2, arguments);
+  var dateLeft = (0,_toDate_index_js__WEBPACK_IMPORTED_MODULE_1__.default)(dirtyDateLeft);
+  var dateRight = (0,_toDate_index_js__WEBPACK_IMPORTED_MODULE_1__.default)(dirtyDateRight);
+  var sign = (0,_compareAsc_index_js__WEBPACK_IMPORTED_MODULE_2__.default)(dateLeft, dateRight);
+  var difference = Math.abs((0,_differenceInCalendarMonths_index_js__WEBPACK_IMPORTED_MODULE_3__.default)(dateLeft, dateRight)); // This will check if the date is end of Feb and assign a higher end of month date
+  // to compare it with Jan
+
+  if (dateLeft.getMonth() === 1 && dateLeft.getDate() > 27) {
+    dateLeft.setDate(30);
+  }
+
+  dateLeft.setMonth(dateLeft.getMonth() - sign * difference); // Math.abs(diff in full months - diff in calendar months) === 1 if last calendar month is not full
+  // If so, result must be decreased by 1 in absolute value
+
+  var isLastMonthNotFull = (0,_compareAsc_index_js__WEBPACK_IMPORTED_MODULE_2__.default)(dateLeft, dateRight) === -sign; // Check for cases of one full calendar month
+
+  if ((0,_isLastDayOfMonth_index_js__WEBPACK_IMPORTED_MODULE_4__.default)((0,_toDate_index_js__WEBPACK_IMPORTED_MODULE_1__.default)(dirtyDateLeft)) && difference === 1 && (0,_compareAsc_index_js__WEBPACK_IMPORTED_MODULE_2__.default)(dirtyDateLeft, dateRight) === 1) {
+    isLastMonthNotFull = false;
+  }
+
+  var result = sign * (difference - isLastMonthNotFull); // Prevent negative zero
+
+  return result === 0 ? 0 : result;
+}
+
+/***/ }),
+
+/***/ "./node_modules/date-fns/esm/differenceInSeconds/index.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/date-fns/esm/differenceInSeconds/index.js ***!
+  \****************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ differenceInSeconds)
+/* harmony export */ });
+/* harmony import */ var _differenceInMilliseconds_index_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../differenceInMilliseconds/index.js */ "./node_modules/date-fns/esm/differenceInMilliseconds/index.js");
+/* harmony import */ var _lib_requiredArgs_index_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../_lib/requiredArgs/index.js */ "./node_modules/date-fns/esm/_lib/requiredArgs/index.js");
+
+
+/**
+ * @name differenceInSeconds
+ * @category Second Helpers
+ * @summary Get the number of seconds between the given dates.
+ *
+ * @description
+ * Get the number of seconds between the given dates.
+ *
+ * ### v2.0.0 breaking changes:
+ *
+ * - [Changes that are common for the whole library](https://github.com/date-fns/date-fns/blob/master/docs/upgradeGuide.md#Common-Changes).
+ *
+ * @param {Date|Number} dateLeft - the later date
+ * @param {Date|Number} dateRight - the earlier date
+ * @returns {Number} the number of seconds
+ * @throws {TypeError} 2 arguments required
+ *
+ * @example
+ * // How many seconds are between
+ * // 2 July 2014 12:30:07.999 and 2 July 2014 12:30:20.000?
+ * var result = differenceInSeconds(
+ *   new Date(2014, 6, 2, 12, 30, 20, 0),
+ *   new Date(2014, 6, 2, 12, 30, 7, 999)
+ * )
+ * //=> 12
+ */
+
+function differenceInSeconds(dirtyDateLeft, dirtyDateRight) {
+  (0,_lib_requiredArgs_index_js__WEBPACK_IMPORTED_MODULE_0__.default)(2, arguments);
+  var diff = (0,_differenceInMilliseconds_index_js__WEBPACK_IMPORTED_MODULE_1__.default)(dirtyDateLeft, dirtyDateRight) / 1000;
+  return diff > 0 ? Math.floor(diff) : Math.ceil(diff);
+}
+
+/***/ }),
+
+/***/ "./node_modules/date-fns/esm/endOfDay/index.js":
+/*!*****************************************************!*\
+  !*** ./node_modules/date-fns/esm/endOfDay/index.js ***!
+  \*****************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ endOfDay)
+/* harmony export */ });
+/* harmony import */ var _toDate_index_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../toDate/index.js */ "./node_modules/date-fns/esm/toDate/index.js");
+/* harmony import */ var _lib_requiredArgs_index_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../_lib/requiredArgs/index.js */ "./node_modules/date-fns/esm/_lib/requiredArgs/index.js");
+
+
+/**
+ * @name endOfDay
+ * @category Day Helpers
+ * @summary Return the end of a day for the given date.
+ *
+ * @description
+ * Return the end of a day for the given date.
+ * The result will be in the local timezone.
+ *
+ * ### v2.0.0 breaking changes:
+ *
+ * - [Changes that are common for the whole library](https://github.com/date-fns/date-fns/blob/master/docs/upgradeGuide.md#Common-Changes).
+ *
+ * @param {Date|Number} date - the original date
+ * @returns {Date} the end of a day
+ * @throws {TypeError} 1 argument required
+ *
+ * @example
+ * // The end of a day for 2 September 2014 11:55:00:
+ * const result = endOfDay(new Date(2014, 8, 2, 11, 55, 0))
+ * //=> Tue Sep 02 2014 23:59:59.999
+ */
+
+function endOfDay(dirtyDate) {
+  (0,_lib_requiredArgs_index_js__WEBPACK_IMPORTED_MODULE_0__.default)(1, arguments);
+  var date = (0,_toDate_index_js__WEBPACK_IMPORTED_MODULE_1__.default)(dirtyDate);
+  date.setHours(23, 59, 59, 999);
+  return date;
+}
+
+/***/ }),
+
+/***/ "./node_modules/date-fns/esm/endOfMonth/index.js":
+/*!*******************************************************!*\
+  !*** ./node_modules/date-fns/esm/endOfMonth/index.js ***!
+  \*******************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ endOfMonth)
+/* harmony export */ });
+/* harmony import */ var _toDate_index_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../toDate/index.js */ "./node_modules/date-fns/esm/toDate/index.js");
+/* harmony import */ var _lib_requiredArgs_index_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../_lib/requiredArgs/index.js */ "./node_modules/date-fns/esm/_lib/requiredArgs/index.js");
+
+
+/**
+ * @name endOfMonth
+ * @category Month Helpers
+ * @summary Return the end of a month for the given date.
+ *
+ * @description
+ * Return the end of a month for the given date.
+ * The result will be in the local timezone.
+ *
+ * ### v2.0.0 breaking changes:
+ *
+ * - [Changes that are common for the whole library](https://github.com/date-fns/date-fns/blob/master/docs/upgradeGuide.md#Common-Changes).
+ *
+ * @param {Date|Number} date - the original date
+ * @returns {Date} the end of a month
+ * @throws {TypeError} 1 argument required
+ *
+ * @example
+ * // The end of a month for 2 September 2014 11:55:00:
+ * const result = endOfMonth(new Date(2014, 8, 2, 11, 55, 0))
+ * //=> Tue Sep 30 2014 23:59:59.999
+ */
+
+function endOfMonth(dirtyDate) {
+  (0,_lib_requiredArgs_index_js__WEBPACK_IMPORTED_MODULE_0__.default)(1, arguments);
+  var date = (0,_toDate_index_js__WEBPACK_IMPORTED_MODULE_1__.default)(dirtyDate);
+  var month = date.getMonth();
+  date.setFullYear(date.getFullYear(), month + 1, 0);
+  date.setHours(23, 59, 59, 999);
+  return date;
+}
+
+/***/ }),
+
 /***/ "./node_modules/date-fns/esm/format/index.js":
 /*!***************************************************!*\
   !*** ./node_modules/date-fns/esm/format/index.js ***!
@@ -27634,6 +28567,290 @@ function format(dirtyDate, dirtyFormatStr, dirtyOptions) {
 
 function cleanEscapedString(input) {
   return input.match(escapedStringRegExp)[1].replace(doubleQuoteRegExp, "'");
+}
+
+/***/ }),
+
+/***/ "./node_modules/date-fns/esm/formatDistance/index.js":
+/*!***********************************************************!*\
+  !*** ./node_modules/date-fns/esm/formatDistance/index.js ***!
+  \***********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ formatDistance)
+/* harmony export */ });
+/* harmony import */ var _compareAsc_index_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../compareAsc/index.js */ "./node_modules/date-fns/esm/compareAsc/index.js");
+/* harmony import */ var _differenceInMonths_index_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../differenceInMonths/index.js */ "./node_modules/date-fns/esm/differenceInMonths/index.js");
+/* harmony import */ var _differenceInSeconds_index_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../differenceInSeconds/index.js */ "./node_modules/date-fns/esm/differenceInSeconds/index.js");
+/* harmony import */ var _locale_en_US_index_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../locale/en-US/index.js */ "./node_modules/date-fns/esm/locale/en-US/index.js");
+/* harmony import */ var _toDate_index_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../toDate/index.js */ "./node_modules/date-fns/esm/toDate/index.js");
+/* harmony import */ var _lib_cloneObject_index_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../_lib/cloneObject/index.js */ "./node_modules/date-fns/esm/_lib/cloneObject/index.js");
+/* harmony import */ var _lib_getTimezoneOffsetInMilliseconds_index_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../_lib/getTimezoneOffsetInMilliseconds/index.js */ "./node_modules/date-fns/esm/_lib/getTimezoneOffsetInMilliseconds/index.js");
+/* harmony import */ var _lib_requiredArgs_index_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../_lib/requiredArgs/index.js */ "./node_modules/date-fns/esm/_lib/requiredArgs/index.js");
+
+
+
+
+
+
+
+
+var MINUTES_IN_DAY = 1440;
+var MINUTES_IN_ALMOST_TWO_DAYS = 2520;
+var MINUTES_IN_MONTH = 43200;
+var MINUTES_IN_TWO_MONTHS = 86400;
+/**
+ * @name formatDistance
+ * @category Common Helpers
+ * @summary Return the distance between the given dates in words.
+ *
+ * @description
+ * Return the distance between the given dates in words.
+ *
+ * | Distance between dates                                            | Result              |
+ * |-------------------------------------------------------------------|---------------------|
+ * | 0 ... 30 secs                                                     | less than a minute  |
+ * | 30 secs ... 1 min 30 secs                                         | 1 minute            |
+ * | 1 min 30 secs ... 44 mins 30 secs                                 | [2..44] minutes     |
+ * | 44 mins ... 30 secs ... 89 mins 30 secs                           | about 1 hour        |
+ * | 89 mins 30 secs ... 23 hrs 59 mins 30 secs                        | about [2..24] hours |
+ * | 23 hrs 59 mins 30 secs ... 41 hrs 59 mins 30 secs                 | 1 day               |
+ * | 41 hrs 59 mins 30 secs ... 29 days 23 hrs 59 mins 30 secs         | [2..30] days        |
+ * | 29 days 23 hrs 59 mins 30 secs ... 44 days 23 hrs 59 mins 30 secs | about 1 month       |
+ * | 44 days 23 hrs 59 mins 30 secs ... 59 days 23 hrs 59 mins 30 secs | about 2 months      |
+ * | 59 days 23 hrs 59 mins 30 secs ... 1 yr                           | [2..12] months      |
+ * | 1 yr ... 1 yr 3 months                                            | about 1 year        |
+ * | 1 yr 3 months ... 1 yr 9 month s                                  | over 1 year         |
+ * | 1 yr 9 months ... 2 yrs                                           | almost 2 years      |
+ * | N yrs ... N yrs 3 months                                          | about N years       |
+ * | N yrs 3 months ... N yrs 9 months                                 | over N years        |
+ * | N yrs 9 months ... N+1 yrs                                        | almost N+1 years    |
+ *
+ * With `options.includeSeconds == true`:
+ * | Distance between dates | Result               |
+ * |------------------------|----------------------|
+ * | 0 secs ... 5 secs      | less than 5 seconds  |
+ * | 5 secs ... 10 secs     | less than 10 seconds |
+ * | 10 secs ... 20 secs    | less than 20 seconds |
+ * | 20 secs ... 40 secs    | half a minute        |
+ * | 40 secs ... 60 secs    | less than a minute   |
+ * | 60 secs ... 90 secs    | 1 minute             |
+ *
+ * ### v2.0.0 breaking changes:
+ *
+ * - [Changes that are common for the whole library](https://github.com/date-fns/date-fns/blob/master/docs/upgradeGuide.md#Common-Changes).
+ *
+ * - The function was renamed from `distanceInWords ` to `formatDistance`
+ *   to make its name consistent with `format` and `formatRelative`.
+ *
+ * - The order of arguments is swapped to make the function
+ *   consistent with `differenceIn...` functions.
+ *
+ *   ```javascript
+ *   // Before v2.0.0
+ *
+ *   distanceInWords(
+ *     new Date(1986, 3, 4, 10, 32, 0),
+ *     new Date(1986, 3, 4, 11, 32, 0),
+ *     { addSuffix: true }
+ *   ) //=> 'in about 1 hour'
+ *
+ *   // v2.0.0 onward
+ *
+ *   formatDistance(
+ *     new Date(1986, 3, 4, 11, 32, 0),
+ *     new Date(1986, 3, 4, 10, 32, 0),
+ *     { addSuffix: true }
+ *   ) //=> 'in about 1 hour'
+ *   ```
+ *
+ * @param {Date|Number} date - the date
+ * @param {Date|Number} baseDate - the date to compare with
+ * @param {Object} [options] - an object with options.
+ * @param {Boolean} [options.includeSeconds=false] - distances less than a minute are more detailed
+ * @param {Boolean} [options.addSuffix=false] - result indicates if the second date is earlier or later than the first
+ * @param {Locale} [options.locale=defaultLocale] - the locale object. See [Locale]{@link https://date-fns.org/docs/Locale}
+ * @returns {String} the distance in words
+ * @throws {TypeError} 2 arguments required
+ * @throws {RangeError} `date` must not be Invalid Date
+ * @throws {RangeError} `baseDate` must not be Invalid Date
+ * @throws {RangeError} `options.locale` must contain `formatDistance` property
+ *
+ * @example
+ * // What is the distance between 2 July 2014 and 1 January 2015?
+ * var result = formatDistance(new Date(2014, 6, 2), new Date(2015, 0, 1))
+ * //=> '6 months'
+ *
+ * @example
+ * // What is the distance between 1 January 2015 00:00:15
+ * // and 1 January 2015 00:00:00, including seconds?
+ * var result = formatDistance(
+ *   new Date(2015, 0, 1, 0, 0, 15),
+ *   new Date(2015, 0, 1, 0, 0, 0),
+ *   { includeSeconds: true }
+ * )
+ * //=> 'less than 20 seconds'
+ *
+ * @example
+ * // What is the distance from 1 January 2016
+ * // to 1 January 2015, with a suffix?
+ * var result = formatDistance(new Date(2015, 0, 1), new Date(2016, 0, 1), {
+ *   addSuffix: true
+ * })
+ * //=> 'about 1 year ago'
+ *
+ * @example
+ * // What is the distance between 1 August 2016 and 1 January 2015 in Esperanto?
+ * import { eoLocale } from 'date-fns/locale/eo'
+ * var result = formatDistance(new Date(2016, 7, 1), new Date(2015, 0, 1), {
+ *   locale: eoLocale
+ * })
+ * //=> 'pli ol 1 jaro'
+ */
+
+function formatDistance(dirtyDate, dirtyBaseDate, dirtyOptions) {
+  (0,_lib_requiredArgs_index_js__WEBPACK_IMPORTED_MODULE_0__.default)(2, arguments);
+  var options = dirtyOptions || {};
+  var locale = options.locale || _locale_en_US_index_js__WEBPACK_IMPORTED_MODULE_1__.default;
+
+  if (!locale.formatDistance) {
+    throw new RangeError('locale must contain formatDistance property');
+  }
+
+  var comparison = (0,_compareAsc_index_js__WEBPACK_IMPORTED_MODULE_2__.default)(dirtyDate, dirtyBaseDate);
+
+  if (isNaN(comparison)) {
+    throw new RangeError('Invalid time value');
+  }
+
+  var localizeOptions = (0,_lib_cloneObject_index_js__WEBPACK_IMPORTED_MODULE_3__.default)(options);
+  localizeOptions.addSuffix = Boolean(options.addSuffix);
+  localizeOptions.comparison = comparison;
+  var dateLeft;
+  var dateRight;
+
+  if (comparison > 0) {
+    dateLeft = (0,_toDate_index_js__WEBPACK_IMPORTED_MODULE_4__.default)(dirtyBaseDate);
+    dateRight = (0,_toDate_index_js__WEBPACK_IMPORTED_MODULE_4__.default)(dirtyDate);
+  } else {
+    dateLeft = (0,_toDate_index_js__WEBPACK_IMPORTED_MODULE_4__.default)(dirtyDate);
+    dateRight = (0,_toDate_index_js__WEBPACK_IMPORTED_MODULE_4__.default)(dirtyBaseDate);
+  }
+
+  var seconds = (0,_differenceInSeconds_index_js__WEBPACK_IMPORTED_MODULE_5__.default)(dateRight, dateLeft);
+  var offsetInSeconds = ((0,_lib_getTimezoneOffsetInMilliseconds_index_js__WEBPACK_IMPORTED_MODULE_6__.default)(dateRight) - (0,_lib_getTimezoneOffsetInMilliseconds_index_js__WEBPACK_IMPORTED_MODULE_6__.default)(dateLeft)) / 1000;
+  var minutes = Math.round((seconds - offsetInSeconds) / 60);
+  var months; // 0 up to 2 mins
+
+  if (minutes < 2) {
+    if (options.includeSeconds) {
+      if (seconds < 5) {
+        return locale.formatDistance('lessThanXSeconds', 5, localizeOptions);
+      } else if (seconds < 10) {
+        return locale.formatDistance('lessThanXSeconds', 10, localizeOptions);
+      } else if (seconds < 20) {
+        return locale.formatDistance('lessThanXSeconds', 20, localizeOptions);
+      } else if (seconds < 40) {
+        return locale.formatDistance('halfAMinute', null, localizeOptions);
+      } else if (seconds < 60) {
+        return locale.formatDistance('lessThanXMinutes', 1, localizeOptions);
+      } else {
+        return locale.formatDistance('xMinutes', 1, localizeOptions);
+      }
+    } else {
+      if (minutes === 0) {
+        return locale.formatDistance('lessThanXMinutes', 1, localizeOptions);
+      } else {
+        return locale.formatDistance('xMinutes', minutes, localizeOptions);
+      }
+    } // 2 mins up to 0.75 hrs
+
+  } else if (minutes < 45) {
+    return locale.formatDistance('xMinutes', minutes, localizeOptions); // 0.75 hrs up to 1.5 hrs
+  } else if (minutes < 90) {
+    return locale.formatDistance('aboutXHours', 1, localizeOptions); // 1.5 hrs up to 24 hrs
+  } else if (minutes < MINUTES_IN_DAY) {
+    var hours = Math.round(minutes / 60);
+    return locale.formatDistance('aboutXHours', hours, localizeOptions); // 1 day up to 1.75 days
+  } else if (minutes < MINUTES_IN_ALMOST_TWO_DAYS) {
+    return locale.formatDistance('xDays', 1, localizeOptions); // 1.75 days up to 30 days
+  } else if (minutes < MINUTES_IN_MONTH) {
+    var days = Math.round(minutes / MINUTES_IN_DAY);
+    return locale.formatDistance('xDays', days, localizeOptions); // 1 month up to 2 months
+  } else if (minutes < MINUTES_IN_TWO_MONTHS) {
+    months = Math.round(minutes / MINUTES_IN_MONTH);
+    return locale.formatDistance('aboutXMonths', months, localizeOptions);
+  }
+
+  months = (0,_differenceInMonths_index_js__WEBPACK_IMPORTED_MODULE_7__.default)(dateRight, dateLeft); // 2 months up to 12 months
+
+  if (months < 12) {
+    var nearestMonth = Math.round(minutes / MINUTES_IN_MONTH);
+    return locale.formatDistance('xMonths', nearestMonth, localizeOptions); // 1 year up to max Date
+  } else {
+    var monthsSinceStartOfYear = months % 12;
+    var years = Math.floor(months / 12); // N years up to 1 years 3 months
+
+    if (monthsSinceStartOfYear < 3) {
+      return locale.formatDistance('aboutXYears', years, localizeOptions); // N years 3 months up to N years 9 months
+    } else if (monthsSinceStartOfYear < 9) {
+      return locale.formatDistance('overXYears', years, localizeOptions); // N years 9 months up to N year 12 months
+    } else {
+      return locale.formatDistance('almostXYears', years + 1, localizeOptions);
+    }
+  }
+}
+
+/***/ }),
+
+/***/ "./node_modules/date-fns/esm/isLastDayOfMonth/index.js":
+/*!*************************************************************!*\
+  !*** ./node_modules/date-fns/esm/isLastDayOfMonth/index.js ***!
+  \*************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ isLastDayOfMonth)
+/* harmony export */ });
+/* harmony import */ var _toDate_index_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../toDate/index.js */ "./node_modules/date-fns/esm/toDate/index.js");
+/* harmony import */ var _endOfDay_index_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../endOfDay/index.js */ "./node_modules/date-fns/esm/endOfDay/index.js");
+/* harmony import */ var _endOfMonth_index_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../endOfMonth/index.js */ "./node_modules/date-fns/esm/endOfMonth/index.js");
+/* harmony import */ var _lib_requiredArgs_index_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../_lib/requiredArgs/index.js */ "./node_modules/date-fns/esm/_lib/requiredArgs/index.js");
+
+
+
+
+/**
+ * @name isLastDayOfMonth
+ * @category Month Helpers
+ * @summary Is the given date the last day of a month?
+ *
+ * @description
+ * Is the given date the last day of a month?
+ *
+ * ### v2.0.0 breaking changes:
+ *
+ * - [Changes that are common for the whole library](https://github.com/date-fns/date-fns/blob/master/docs/upgradeGuide.md#Common-Changes).
+ *
+ * @param {Date|Number} date - the date to check
+ * @returns {Boolean} the date is the last day of a month
+ * @throws {TypeError} 1 argument required
+ *
+ * @example
+ * // Is 28 February 2014 the last day of a month?
+ * var result = isLastDayOfMonth(new Date(2014, 1, 28))
+ * //=> true
+ */
+
+function isLastDayOfMonth(dirtyDate) {
+  (0,_lib_requiredArgs_index_js__WEBPACK_IMPORTED_MODULE_0__.default)(1, arguments);
+  var date = (0,_toDate_index_js__WEBPACK_IMPORTED_MODULE_1__.default)(dirtyDate);
+  return (0,_endOfDay_index_js__WEBPACK_IMPORTED_MODULE_2__.default)(date).getTime() === (0,_endOfMonth_index_js__WEBPACK_IMPORTED_MODULE_3__.default)(date).getTime();
 }
 
 /***/ }),
@@ -31603,7 +32820,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 // extracted by mini-css-extract-plugin
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({"modal":"ls-modal","modal__wrapper":"ls-modal__wrapper","modal__content":"ls-modal__content","modal__header":"ls-modal__header","modal__header_divided":"ls-modal__header_divided","modal__title":"ls-modal__title","modal__body":"ls-modal__body","modal__body_bare":"ls-modal__body_bare","modal__footer":"ls-modal__footer","modal__close":"ls-modal__close","modal_fullscreen":"ls-modal_fullscreen","modal_visible":"ls-modal_visible","visible":"ls-visible","before-appear":"ls-before-appear","appear":"ls-appear","before-disappear":"ls-before-disappear","disappear":"ls-disappear"});
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({"modal":"ls-modal","modal__wrapper":"ls-modal__wrapper","modal__content":"ls-modal__content","modal__header":"ls-modal__header","modal__header_divided":"ls-modal__header_divided","modal__title":"ls-modal__title","modal__body":"ls-modal__body","modal__body_bare":"ls-modal__body_bare","modal__footer":"ls-modal__footer","modal__footer_bare":"ls-modal__footer_bare","modal__close":"ls-modal__close","modal_fullscreen":"ls-modal_fullscreen","modal_visible":"ls-modal_visible","visible":"ls-visible","before-appear":"ls-before-appear","appear":"ls-appear","before-disappear":"ls-before-disappear","disappear":"ls-disappear"});
 
 /***/ }),
 
@@ -31796,6 +33013,70 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 // extracted by mini-css-extract-plugin
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({"export-page__finish":"ls-export-page__finish","export-page__recent":"ls-export-page__recent","export-page__footer":"ls-export-page__footer","formats":"ls-formats","formats__list":"ls-formats__list","formats__item":"ls-formats__item","formats__item_active":"ls-formats__item_active","formats__item_selected":"ls-formats__item_selected","formats__name":"ls-formats__name","formats__tag":"ls-formats__tag","formats__description":"ls-formats__description"});
+
+/***/ }),
+
+/***/ "./src/pages/PeoplePage/PeopleInvitation.styl":
+/*!****************************************************!*\
+  !*** ./src/pages/PeoplePage/PeopleInvitation.styl ***!
+  \****************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+// extracted by mini-css-extract-plugin
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({"invite":"ls-invite"});
+
+/***/ }),
+
+/***/ "./src/pages/PeoplePage/PeopleList.styl":
+/*!**********************************************!*\
+  !*** ./src/pages/PeoplePage/PeopleList.styl ***!
+  \**********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+// extracted by mini-css-extract-plugin
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({"people-list":"ls-people-list","people-list__loading":"ls-people-list__loading","people-list__users":"ls-people-list__users","people-list__header":"ls-people-list__header","people-list__column":"ls-people-list__column","people-list__field":"ls-people-list__field","last-activity":"ls-last-activity","avatar":"ls-avatar","name":"ls-name","email":"ls-email","people-list__user":"ls-people-list__user","people-list__user_active":"ls-people-list__user_active"});
+
+/***/ }),
+
+/***/ "./src/pages/PeoplePage/PeoplePage.styl":
+/*!**********************************************!*\
+  !*** ./src/pages/PeoplePage/PeoplePage.styl ***!
+  \**********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+// extracted by mini-css-extract-plugin
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({"people":"ls-people","people__controls":"ls-people__controls","people__content":"ls-people__content"});
+
+/***/ }),
+
+/***/ "./src/pages/PeoplePage/SelectedUser.styl":
+/*!************************************************!*\
+  !*** ./src/pages/PeoplePage/SelectedUser.styl ***!
+  \************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+// extracted by mini-css-extract-plugin
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({"user-info":"ls-user-info","user-info__close":"ls-user-info__close","user-info__header":"ls-user-info__header","user-info__email":"ls-user-info__email","user-info__full-name":"ls-user-info__full-name","user-info__section":"ls-user-info__section","user-info__section-title":"ls-user-info__section-title","user-info__last-active":"ls-user-info__last-active","user-info__links-list":"ls-user-info__links-list","user-info__project-link":"ls-user-info__project-link"});
 
 /***/ }),
 

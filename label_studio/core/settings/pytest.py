@@ -6,6 +6,8 @@ from core.settings.base import *
 DJANGO_DB = get_env('DJANGO_DB', 'default')
 DATABASES = {'default': DATABASES_ALL[DJANGO_DB]}
 
+MIDDLEWARE.append('organizations.middleware.DummyGetSessionMiddleware')
+
 ADD_DEFAULT_ML_BACKENDS = False
 
 CACHES = {
