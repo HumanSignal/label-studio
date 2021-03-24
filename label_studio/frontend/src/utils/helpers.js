@@ -19,6 +19,10 @@ export const isDefined = (value) => {
   return value !== null && value !== undefined;
 };
 
+export const isEmptyString = (value) => {
+  return typeof value === 'string' && value.trim() === "";
+};
+
 export const objectClean = (source) => {
   const cleanObject = Object.entries(source).filter((pair) => {
     return isDefined(pair[1]) && pair[1] !== "";

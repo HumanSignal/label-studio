@@ -3570,24 +3570,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "required": () => (/* binding */ required),
 /* harmony export */   "matchPattern": () => (/* binding */ matchPattern)
 /* harmony export */ });
-/* harmony import */ var _Validation_styl__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Validation.styl */ "./src/components/Form/Validation/Validation.styl");
+/* harmony import */ var _utils_helpers__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../utils/helpers */ "./src/utils/helpers.js");
+/* harmony import */ var _Validation_styl__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Validation.styl */ "./src/components/Form/Validation/Validation.styl");
 
-
-const isEmptyString = value => {
-  return typeof value === 'string' && value.trim() === "";
-};
-
-const isDefined = value => {
-  return value !== undefined && value !== null;
-};
 
 const required = (fieldName, value) => {
-  if (!isDefined(value) || isEmptyString(value)) {
+  if (!(0,_utils_helpers__WEBPACK_IMPORTED_MODULE_0__.isDefined)(value) || (0,_utils_helpers__WEBPACK_IMPORTED_MODULE_0__.isEmptyString)(value)) {
     return `${fieldName} is required`;
   }
 };
 const matchPattern = pattern => (fieldName, value) => {
-  if (!isEmptyString(value) && value.match(pattern) === null) {
+  if (!(0,_utils_helpers__WEBPACK_IMPORTED_MODULE_0__.isEmptyString)(value) && value.match(pattern) === null) {
     return `${fieldName} should match pattern ${pattern}`;
   }
 };
@@ -5123,7 +5116,9 @@ const VersionProvider = ({
       }
     });
   }, [api]);
-  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(fetchVersion, [fetchVersion]);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    fetchVersion();
+  }, []);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(VersionContext.Provider, {
     value: state,
     children: children
@@ -7662,10 +7657,6 @@ const DataManagerPage = ({ ...props
     }
   }, [dataManagerRef]);
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    console.log({
-      DataManager,
-      LabelStudio
-    });
     init();
     return () => destroyDM();
   }, [root, init]);
@@ -9289,12 +9280,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "LabelingSettings": () => (/* binding */ LabelingSettings)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react_router__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react-router */ "./node_modules/react-router/esm/react-router.js");
+/* harmony import */ var react_router__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! react-router */ "./node_modules/react-router/esm/react-router.js");
 /* harmony import */ var _components_Modal_Modal__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../components/Modal/Modal */ "./src/components/Modal/Modal.js");
 /* harmony import */ var _providers_ApiProvider__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../providers/ApiProvider */ "./src/providers/ApiProvider.js");
 /* harmony import */ var _providers_ProjectProvider__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../providers/ProjectProvider */ "./src/providers/ProjectProvider.js");
-/* harmony import */ var _CreateProject_Config_Config__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../CreateProject/Config/Config */ "./src/pages/CreateProject/Config/Config.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+/* harmony import */ var _utils_helpers__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../utils/helpers */ "./src/utils/helpers.js");
+/* harmony import */ var _CreateProject_Config_Config__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../CreateProject/Config/Config */ "./src/pages/CreateProject/Config/Config.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+
 
 
 
@@ -9303,7 +9296,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const LabelingSettings = () => {
-  const history = (0,react_router__WEBPACK_IMPORTED_MODULE_6__.useHistory)();
+  const history = (0,react_router__WEBPACK_IMPORTED_MODULE_7__.useHistory)();
   const {
     project,
     fetchProject
@@ -9330,8 +9323,24 @@ const LabelingSettings = () => {
     fetchProject();
     return error;
   }, [project, config]);
+  const projectAlreadySetUp = (0,react__WEBPACK_IMPORTED_MODULE_0__.useMemo)(() => {
+    if (project.label_config) {
+      const hasConfig = !(0,_utils_helpers__WEBPACK_IMPORTED_MODULE_4__.isEmptyString)(project.label_config);
+      const configIsEmpty = project.label_config.replace(/\s/g, '') === '<View></View>';
+      const hasTasks = project.task_number > 0;
+      console.log({
+        hasConfig,
+        configIsEmpty,
+        hasTasks,
+        project
+      });
+      return hasConfig && !configIsEmpty && hasTasks;
+    }
+
+    return false;
+  }, [project]);
   const onSave = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(async () => {
-    if (essentialDataChanged) {
+    if (essentialDataChanged && projectAlreadySetUp) {
       (0,_components_Modal_Modal__WEBPACK_IMPORTED_MODULE_1__.confirm)({
         title: "Config data changed",
         body: "Labeling config has essential changes that affect data displaying. Saving the config may lead to deleting all tabs previously created in the Data Manager.",
@@ -9351,7 +9360,7 @@ const LabelingSettings = () => {
     setEssentialDataChanged(validation.config_essential_data_has_changed);
   }, []);
   if (!project.id) return null;
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_CreateProject_Config_Config__WEBPACK_IMPORTED_MODULE_4__.ConfigPage, {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_CreateProject_Config_Config__WEBPACK_IMPORTED_MODULE_5__.ConfigPage, {
     config: project.label_config,
     project: project,
     onUpdate: onUpdate,
@@ -11836,6 +11845,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "formDataToJPO": () => (/* binding */ formDataToJPO),
 /* harmony export */   "unique": () => (/* binding */ unique),
 /* harmony export */   "isDefined": () => (/* binding */ isDefined),
+/* harmony export */   "isEmptyString": () => (/* binding */ isEmptyString),
 /* harmony export */   "objectClean": () => (/* binding */ objectClean),
 /* harmony export */   "humanReadableNumber": () => (/* binding */ humanReadableNumber),
 /* harmony export */   "absoluteURL": () => (/* binding */ absoluteURL),
@@ -11858,6 +11868,9 @@ const unique = (list, expression = (a, b) => a === b) => {
 };
 const isDefined = value => {
   return value !== null && value !== undefined;
+};
+const isEmptyString = value => {
+  return typeof value === 'string' && value.trim() === "";
 };
 const objectClean = source => {
   const cleanObject = Object.entries(source).filter(pair => {
