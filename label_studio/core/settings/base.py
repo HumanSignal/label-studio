@@ -333,10 +333,7 @@ def user_auth(user_model, email, password):
 PROJECT_DELETE = project_delete
 USER_AUTH = user_auth
 CREATE_ORGANIZATION = 'organizations.functions.create_organization'
-
-from core.utils.get_object import get_object_with_check_and_log
-
-GET_OBJECT_WITH_CHECK_AND_LOG = get_object_with_check_and_log
+GET_OBJECT_WITH_CHECK_AND_LOG = 'core.utils.get_object.get_object_with_check_and_log'
 
 # fix a problem with Windows mimetypes for JS and PNG
 import mimetypes
