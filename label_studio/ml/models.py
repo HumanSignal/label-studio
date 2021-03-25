@@ -93,6 +93,10 @@ class MLBackend(models.Model):
     def api(self):
         return MLApi(url=self.url)
 
+    @property
+    def not_ready(self):
+        return self.state in (MLBackendState.DISCONNECTED, MLBackendState.ERROR)
+
     def update_state(self):
         if self.healthcheck().is_error:
             self.state = MLBackendState.DISCONNECTED
@@ -131,6 +135,9 @@ class MLBackend(models.Model):
             ml_backend=self, job_id=job.id, model_version=self.model_version, batch_size=batch_size)
 
     def predict_one_task(self, task):
+        if self.not_ready:
+            logger.debug(f'ML backend {self} is not ready to predict {task}')
+            return
         if task.predictions.filter(model_version=self.model_version).exists():
             # prediction already exists
             logger.info(f'Skip creating prediction with ML backend {self} for task {task}: model version is up-to-date')

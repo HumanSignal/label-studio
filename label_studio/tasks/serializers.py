@@ -85,7 +85,7 @@ class AnnotationSerializer(DynamicFieldsMixin, ModelSerializer):
         if len(user.last_name):
             name = name + " " + user.last_name
 
-        name += f' ({user.email}, {user.id})'
+        name += f' {user.email}, {user.id}'
         return name
 
     def get_ground_truth(self, annotation):

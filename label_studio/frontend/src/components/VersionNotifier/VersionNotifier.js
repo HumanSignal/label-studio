@@ -32,7 +32,9 @@ export const VersionProvider = ({children}) => {
     });
   }, [api]);
 
-  useEffect(fetchVersion, [fetchVersion]);
+  useEffect(() => {
+    fetchVersion();
+  }, []);
 
   return (
     <VersionContext.Provider value={state}>

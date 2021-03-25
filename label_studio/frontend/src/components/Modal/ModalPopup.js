@@ -37,6 +37,12 @@ export class Modal extends React.Component {
     document.removeEventListener('keydown', this.closeOnEscape, {capture: true});
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.visible !== this.state.visible) {
+      document.body.style.overflow = this.state.visible ? 'hidden' : '';
+    }
+  }
+
   setBody(body) {
     this.setState({ body });
   }
@@ -76,7 +82,7 @@ export class Modal extends React.Component {
 
     const mixes = [
       this.transitionClass,
-      this.props.className
+      this.props.className,
     ];
 
     const modalContent = (
@@ -94,9 +100,10 @@ export class Modal extends React.Component {
             <Elem name="body" mod={{bare}}>
               {this.body}
             </Elem>
+
             {this.state.footer && (
-              <Modal.Footer>
-                {this.state.footer}
+              <Modal.Footer bare={this.props.bareFooter}>
+                {this.footer}
               </Modal.Footer>
             )}
           </Elem>
@@ -145,7 +152,7 @@ export class Modal extends React.Component {
           onFinish?.();
           resolve();
         });
-      })
+      }),
     });
   }
 
@@ -168,6 +175,15 @@ export class Modal extends React.Component {
       return this.props.children;
     }
   }
+
+  get footer() {
+    if (this.state.footer) {
+      const Content = this.state.footer;
+      return Content instanceof Function ? <Content/> : Content;
+    }
+
+    return null;
+  }
 }
 
 Modal.Header = ({ children, divided }) => (
@@ -176,8 +192,8 @@ Modal.Header = ({ children, divided }) => (
   </Elem>
 );
 
-Modal.Footer = ({ children }) => (
-  <Elem name="footer">
+Modal.Footer = ({ children, bare }) => (
+  <Elem name="footer" mod={{bare}}>
     {children}
   </Elem>
 );

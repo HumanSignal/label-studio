@@ -54,4 +54,3 @@ The following table lists the available sampling options:
 | uniform | Tasks are sampled with equal probabilities. |
 | prediction-score-min | Tasks with the minimum average prediction score are shown to annotators. To use this option, you must also include predictions data in the task data that you import into Label Studio. |
 | prediction-score-max | Tasks with the maximum average prediction score are shown to annotators. To use this option, you must also include predictions data in the task data that you import into Label Studio. |
-

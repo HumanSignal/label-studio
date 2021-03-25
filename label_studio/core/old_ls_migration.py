@@ -67,17 +67,14 @@ def _migrate_tasks(project_path, project):
                             task_annotation.save()
 
             # migrate predictions
-            predictions_path = project_path / 'predictions' / '{}.json'.format(task_id)
-            if predictions_path.exists():
-                with io.open(os.path.abspath(predictions_path)) as c:
-                    predictions_data = json.load(c)
-                    for prediction in predictions_data['predictions']:
-                        task_prediction = Prediction(result=prediction['result'], task=task)
-                        with suppress_autotime(task_prediction, ['created_at']):
-                            task_prediction.created_at = datetime.datetime.fromtimestamp(
-                                prediction['created_at'], tz=datetime.datetime.now().astimezone().tzinfo
-                            )
-                            task_prediction.save()
+            predictions_data = task_data.get('predictions', [])
+            for prediction in predictions_data:
+                task_prediction = Prediction(result=prediction['result'], task=task, score=prediction.get('score'))
+                with suppress_autotime(task_prediction, ['created_at']):
+                    task_prediction.created_at = datetime.datetime.fromtimestamp(
+                        prediction['created_at'], tz=datetime.datetime.now().astimezone().tzinfo
+                    )
+                    task_prediction.save()
 
 
 def _migrate_tabs(project_path, project):

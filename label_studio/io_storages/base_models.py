@@ -3,7 +3,7 @@
 import logging
 import django_rq
 
-from datetime import datetime
+from django.utils import timezone
 from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 from django_rq import job
@@ -80,7 +80,7 @@ class ImportStorage(Storage):
                 logger.debug(f'Create {self.__class__.__name__} link with key={key} for task={task}')
                 tasks_created += 1
 
-        self.last_sync = datetime.now()
+        self.last_sync = timezone.now()
         self.last_sync_count = tasks_created
         self.save()
 

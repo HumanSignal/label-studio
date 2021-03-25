@@ -14,6 +14,7 @@ from projects.models import Project
 from core.utils.common import get_object_with_check_and_log
 from core.permissions import IsBusiness, view_with_auth
 from core.label_config import get_sample_task
+from core.utils.common import get_organization_from_request
 
 from organizations.models import Organization
 
@@ -60,7 +61,7 @@ def upload_example_using_config(request):
     if not config:
         config = request.POST.get('label_config', '')
 
-    org_pk = request.session.get('organization_pk', None)
+    org_pk = get_organization_from_request(request)
     secure_mode = False
     if org_pk is not None:
         org = get_object_with_check_and_log(request, Organization, pk=org_pk)
