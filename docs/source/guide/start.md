@@ -20,8 +20,6 @@ The SQLite database works well for projects with tens of thousands of labeling t
 For example, if you import data while labeling is being performed, labeling tasks can take more than 10 seconds to load and annotations can take more than 10 seconds to perform. If you want to label more than 100,000 tasks with 5 or more concurrent users, consider using PostgreSQL or another database with Label Studio. 
 
 ## Command line arguments for starting Label Studio
-<!--make this a table of options with links-->
-
 You can specify a machine learning backend and other options using the command line interface. Run `label-studio --help` to see all available options, or refer to the following tables.
 
 Some available arguments for Label Studio provide information or start the Label Studio server:
@@ -109,11 +107,31 @@ app:
 
 <!--UPDATE internal host PARAMS? -->
 
+To run Label Studio on a remote server, use the internal-host argument when starting Label Studio. For example, to start Label Studio on a remote server located at `INTERNALHOST`, run the following:
+```bash
+label-studio start --internal-host INTERNALHOST
+```
+
+Or, specify the remote server address in an environment variable:
+```
+INTERNAL_HOST = INTERNALHOST
+```
 
 ## Run Label Studio on a remote server with an external domain name
 
 <!--UPDATE HOST, PORT, AND INTERNAL_HOST PARAMS? -->
 
+To run Label Studio on a remote server, use the internal-host argument when starting Label Studio. For example, to start Label Studio on a remote server located at `INTERNALHOST` with an external domain name of `example.com` and a port of `9001`, run the following:
+```bash
+label-studio start --internal-host INTERNALHOST --host https://example.com --port 9001
+```
+
+Or, specify the values in environment variables:
+```
+INTERNAL_HOST = INTERNALHOST
+HOST = https://example.com
+PORT = 9001
+```
 
 ## Run Label Studio with HTTPS
 To run Label Studio with HTTPS and access the web server using HTTPS in the browser, specify a certificate and private key when starting Label Studio. 
