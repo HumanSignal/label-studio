@@ -10086,16 +10086,20 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
 
 
-const queueSet = new Set();
+const libraryQueue = new Map();
 const libRequest = new Map();
 
 const requestLabelStudio = libraries => async library => {
+  var _libraryQueue$get;
+
   const {
     scriptSrc,
     cssSrc,
     checkAvailability
   } = libraries[library];
   const availableLibrary = checkAvailability();
+  const queueSet = (_libraryQueue$get = libraryQueue.get(library)) !== null && _libraryQueue$get !== void 0 ? _libraryQueue$get : new Set();
+  libraryQueue.set(library, queueSet);
   if (availableLibrary) return availableLibrary;
   const requestResolver = new Promise(resolve => {
     queueSet.add(() => {
@@ -10154,6 +10158,9 @@ const LibraryProvider = ({
   children
 }) => {
   const requestLibrary = (0,react__WEBPACK_IMPORTED_MODULE_0__.useMemo)(() => {
+    console.log({
+      libraries
+    });
     return requestLabelStudio(libraries);
   }, [libraries]);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)(LibraryContext.Provider, {
@@ -10166,9 +10173,17 @@ const LibraryProvider = ({
 const useLibrary = libraryName => {
   const ctx = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(LibraryContext);
   const [library, setLibrary] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)();
-  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    ctx.requestLibrary(libraryName).then(lib => setLibrary(!!lib));
+  const fetchLibrary = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(async () => {
+    const libLoaded = await ctx.requestLibrary(libraryName);
+    console.log({
+      libraryName,
+      libLoaded
+    });
+    setLibrary(!!libLoaded);
   }, [ctx, libraryName]);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    fetchLibrary();
+  }, [fetchLibrary]);
   return library;
 };
 
