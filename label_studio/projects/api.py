@@ -406,9 +406,11 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
         # support actions api call from actions/next_task.py
         if hasattr(self, 'prepared_tasks'):
             project.prepared_tasks = self.prepared_tasks
+            external_prepared_tasks_used = True
         # get prepared tasks from request params (filters, selected items)
         else:
             project.prepared_tasks = get_prepared_queryset(self.request, project)
+            external_prepared_tasks_used = False
 
         # detect solved and not solved tasks
         user_solved_tasks_array = user.annotations.filter(ground_truth=False).filter(
@@ -423,6 +425,13 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
             if not_solved_tasks_count == 0:
                 raise NotFound(f'There are no tasks remaining to be annotated by the user={user}')
             logger.debug(f'{not_solved_tasks_count} tasks that still need to be annotated for user={user}')
+
+            # ordered by data manager
+            if external_prepared_tasks_used:
+                next_task = not_solved_tasks.first()
+                if not next_task:
+                    raise NotFound('No more tasks found')
+                return self._make_response(next_task, request)
 
             # If current user has already lock one task - return it (without setting the lock again)
             next_task = Task.get_locked_by(user, project)
