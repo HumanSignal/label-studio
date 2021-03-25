@@ -30,7 +30,7 @@ gtag('config', 'UA-129877673-1');
     <a href="/user/login">Login</a>
   </div>
 
-  <form action="{% url 'user-signup' %}{% if next %}?next={{ next }}{% endif %}" method="post">
+  <form  id="signup-form" action="{% url 'user-signup' %}{% if next %}?next={{ next }}{% endif %}" method="post">
     {% csrf_token %}
     <div>
       <input type="text" class="ls-input" name="email" id="email" placeholder="Email" value="{{ form.data.email }}">
@@ -59,7 +59,7 @@ gtag('config', 'UA-129877673-1');
         </p>
       {% endfor %}
     {% endif %}
-    <p><button type="submit" class="ls-button ls-button_look_primary">Create Account</button></p>
+    <p><button type="submit" aria-label="Create Account" class="ls-button ls-button_look_primary">Create Account</button></p>
   </form>
 </div>
 {% endblock %}
