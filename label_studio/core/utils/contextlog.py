@@ -38,10 +38,10 @@ class ContextLog(object):
         user_id_file = os.path.join(get_config_dir(), 'user_id')
         if not os.path.exists(user_id_file):
             user_id = str(uuid4())
-            with io.open(user_id_file, mode='w') as fout:
+            with io.open(user_id_file, mode='w', encoding='utf-8') as fout:
                 fout.write(user_id)
         else:
-            with io.open(user_id_file) as f:
+            with io.open(user_id_file, encoding='utf-8') as f:
                 user_id = f.read()
         return user_id
 
@@ -49,7 +49,7 @@ class ContextLog(object):
         path = '/proc/self/cgroup'
         return (
             os.path.exists('/.dockerenv') or
-            os.path.isfile(path) and any('docker' in line for line in open(path))
+            os.path.isfile(path) and any('docker' in line for line in open(path, encoding='utf-8'))
         )
 
     def _get_timestamp_now(self):
