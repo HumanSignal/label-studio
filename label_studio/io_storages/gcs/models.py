@@ -20,7 +20,7 @@ from django.db.models.signals import post_save
 
 from io_storages.utils import get_uri_via_regex
 from io_storages.base_models import ImportStorage, ImportStorageLink, ExportStorage, ExportStorageLink
-from tasks.serializers import AnnotationSerializer
+from io_storages.serializers import StorageAnnotationSerializer
 from tasks.models import Annotation
 
 logger = logging.getLogger(__name__)
@@ -168,7 +168,7 @@ class GCSExportStorage(ExportStorage, GCSStorageMixin):
     def save_annotation(self, annotation):
         bucket = self.get_bucket()
         logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
-        ser_annotation = AnnotationSerializer(annotation).data
+        ser_annotation = StorageAnnotationSerializer(annotation).data
         with transaction.atomic():
             # Create export storage link
             link = GCSExportStorageLink.create(annotation, self)
