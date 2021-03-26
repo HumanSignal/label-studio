@@ -47,9 +47,9 @@ class DataExport(object):
             }
         }
 
-        with open(filename_results, 'w') as f:
+        with open(filename_results, 'w', encoding='utf-8') as f:
             f.write(data)
-        with open(filename_info, 'w') as f:
+        with open(filename_info, 'w', encoding='utf-8') as f:
             json.dump(info, f, ensure_ascii=False)
         return filename_results
 

@@ -44,7 +44,7 @@ class FileUpload(models.Model):
 
     @property
     def content(self):
-        with io.open(self.filepath) as f:
+        with io.open(self.filepath, encoding='utf-8') as f:
             return f.read()
 
     def read_tasks_list_from_csv(self, sep=','):
