@@ -641,7 +641,7 @@ class TemplateListAPI(generics.ListAPIView):
             config = read_yaml(config_file)
             configs.append(config)
         template_groups_file = find_file(os.path.join('annotation_templates', 'groups.txt'))
-        with open(template_groups_file) as f:
+        with open(template_groups_file, encoding='utf-8') as f:
             groups = f.read().splitlines()
         logger.debug(f'{len(configs)} templates found.')
         return Response({'templates': configs, 'groups': groups})
