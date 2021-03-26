@@ -148,19 +148,37 @@ def _get_placeholder(value, client_value=None):
 
 def try_replace_placeholders(params, placeholders):
 
-    def _replace_in_dict(prms):
-        out = {}
-        for key, value in prms.items():
-            placeholder, _ = _get_placeholder(value)
-            if placeholder in placeholders:
-                value = placeholders[placeholder]
-            out[key] = value
+    def _replace_in_str(value):
+        placeholder, _ = _get_placeholder(value)
+        if placeholder in placeholders:
+            value = placeholders[placeholder]
+        return value
+
+    def _replace_in_dict_or_list(prms):
+        if isinstance(prms, dict):
+            out = {}
+            for key, value in prms.items():
+                if isinstance(value, str):
+                    value = _replace_in_str(value)
+                elif isinstance(value, (dict, list)):
+                    value = try_replace_placeholders(value, placeholders)
+                out[key] = value
+        elif isinstance(prms, list):
+            out = []
+            for value in prms:
+                if isinstance(value, str):
+                    value = _replace_in_str(value)
+                elif isinstance(value, (dict, list)):
+                    value = try_replace_placeholders(value, placeholders)
+                out.append(value)
+        else:
+            out = _replace_in_str(prms)
         return out
 
     if isinstance(params, dict):
-        return _replace_in_dict(params)
+        return _replace_in_dict_or_list(params)
     elif isinstance(params, list):
-        return [_replace_in_dict(p) for p in params]
+        return [_replace_in_dict_or_list(p) for p in params]
     else:
         return params
 
