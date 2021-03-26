@@ -12,6 +12,7 @@ from rest_framework.authtoken.models import Token
 
 from users import forms
 from core.permissions import view_with_auth, IsBusiness
+from users.functions import proceed_registration
 from organizations.models import Organization
 from organizations.forms import OrganizationSignupForm
 
@@ -40,37 +41,6 @@ class FPasswordResetCompleteView(auth_views.PasswordResetCompleteView):
 def logout(request):
     auth.logout(request)
     return redirect('/')
-
-
-def save_user(request, *args):
-    """ Save user instance to DB
-    """
-    next_page, user_form, organization_form = args
-
-    user = user_form.save()
-    user.username = user.email.split('@')[0]
-    user.save()
-
-    redirect_url = next_page if next_page else reverse('projects:project-index')
-    auth.login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-    return user, redirect_url
-
-
-def proceed_registration(request, user_form, organization_form, next_page):
-    """ Register a new user for POST user_signup
-    """
-    # save user to db
-    user, redirect_url = save_user(request, next_page, user_form, organization_form)
-
-    if Organization.objects.exists():
-        org = Organization.objects.first()
-        org.add_user(user)
-    else:
-        org = Organization.create_organization(created_by=user, title='Label Studio')
-    user.active_organization = org
-    user.save(update_fields=['active_organization'])
-
-    return redirect(redirect_url)
 
 
 def user_signup(request):
