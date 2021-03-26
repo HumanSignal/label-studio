@@ -15,17 +15,17 @@ By default, Label Studio starts with a SQLite database to store labeling tasks a
 ## Command line arguments for starting Label Studio
 You can specify a machine learning backend and other options using the command line interface. Run `label-studio --help` to see all available options, or refer to the following tables.
 
-Some available arguments for Label Studio provide information or start the Label Studio server:
+Some available commands for Label Studio provide information or start the Label Studio server:
 
-| Command line argument |  Description |
+| Command |  Description |
 | --- | ---- |
-| `-h` `--help` | Display available command line arguments. |
-| `--version` | Show the Label Studio version. |
-| `--init` | Initialize Label Studio. |
-| `start` | Start the Label Studio server. |
-| `reset_password` | Reset the password for a specific Label Studio username. See [Create user accounts for Label Studio](signup.html). |
-| `shell` | Run a Django shell. |
-
+| `label-studio` | Start the Label Studio server. |
+| `label-studio -h` `label-studio --help` | Display available command line arguments. |
+| `label-studio init <project_name> <optional_arguments>` | Initialize a specific project in Label Studio. |
+| `label-studio start <project_name> --init <optional_arguments>` | Start the Label Studio server and initiliaze a specific project. |
+| `label-studio reset_password` | Reset the password for a specific Label Studio username. See [Create user accounts for Label Studio](signup.html). |
+| `label-studio shell` | Get access to a database shell for Label Studio to manipulate data directly. |
+| `label-studio version` | Show the version of Label Studio and then terminates.
 
 The following command line arguments are optional and must be specified with `label-studio start <argument> <value>` or as an environment variable when you set up the environment to host Label Studio:
 
@@ -35,7 +35,7 @@ The following command line arguments are optional and must be specified with `la
 | `-db` `--database` | `DATABASE` | Specify the database file path for storing labeling tasks and annotations. See [Database storage](install.html#Database_storage). |
 | `--data-dir` | `DATA_DIR` | Directory to use to store all application-related data. |
 | `-d` `--debug` | N/A | Enable debug mode for troubleshooting Label Studio. |
-| `-c` `--config` | `CONFIG_PATH` | Path to the server configuration for Label Studio. |
+| `-c` `--config` | `CONFIG_PATH` | Deprecated, do not use. Specify the path to the server configuration for Label Studio. |
 | `-l` `--label-config` | `LABEL_CONFIG` | Path to the label configuration file for a specific Label Studio project. See [Set up your labeling project](setup.html). |
 | `--ml-backends` | `ML_BACKENDS` | Specify the URLs for one or more machine learning backends. See [Set up machine learning with your labeling process](ml.html). |
 | `--sampling` | N/A | Specify one of sequential or uniform to define the order for labeling tasks. See [Set up task sampling for your project](start.html#Set_up_task_sampling_for_your_project) on this page. |
@@ -82,7 +82,7 @@ PORT = 9001
 
 To run Label Studio on Docker with a port other than the default of 8080, use the port argument when starting Label Studio on Docker. For example, to start Label Studio in a Docker container accessible with port 9001, run the following: 
 ```bash
-docker run -it -p 8080:8080 -v `pwd`/mydata:/root/.local/share/label-studio/ heartexlabs/label-studio:latest label-studio --port 9001
+docker run -it -p 9001:8080 -v `pwd`/mydata:/root/.local/share/label-studio/ heartexlabs/label-studio:latest label-studio
 ```
 
 Or, if you're using Docker Compose, update the `docker-compose.yml` file that you're using to expose a different port for the app. For example, this portion of the `docker-compose.yml` file exposes port 9001 instead of port 8080 for running Label Studio:
