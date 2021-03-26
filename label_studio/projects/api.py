@@ -503,8 +503,9 @@ class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
                                               description='labeling config')])
     def post(self, request, *args, **kwargs):
         project = self.get_object()
-        json_data = json.loads(request.body)
-        label_config = json_data['label_config']
+        label_config = self.request.data.get('label_config')
+        if not label_config:
+            raise RestValidationError('Label config is not set or empty')
 
         # check new config includes meaningful changes
         config_essential_data_has_changed = False
@@ -648,8 +649,9 @@ class ProjectSampleTask(generics.RetrieveAPIView):
     swagger_schema = None
 
     def post(self, request, *args, **kwargs):
-        json_data = json.loads(request.body)
-        label_config = json_data['label_config']
+        label_config = self.request.data.get('label_config')
+        if not label_config:
+            raise RestValidationError('Label config is not set or empty')
 
         project = self.get_object()
         return Response({'sample_task': project.get_sample_task(label_config)}, status=200)
