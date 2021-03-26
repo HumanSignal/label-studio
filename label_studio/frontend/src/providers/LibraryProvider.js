@@ -1,12 +1,15 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-const queueSet = new Set;
+const libraryQueue = new Map;
 
 const libRequest = new Map;
 
 const requestLabelStudio = (libraries) => async (library) => {
   const {scriptSrc, cssSrc, checkAvailability} = libraries[library];
   const availableLibrary = checkAvailability();
+
+  const queueSet = libraryQueue.get(library) ?? new Set();
+  libraryQueue.set(library, queueSet);
 
   if (availableLibrary) return availableLibrary;
 
@@ -62,6 +65,7 @@ export const LibraryContext = createContext({});
 
 export const LibraryProvider = ({libraries, children}) => {
   const requestLibrary = useMemo(() => {
+    console.log({libraries});
     return requestLabelStudio(libraries);
   }, [libraries]);
 
@@ -76,11 +80,16 @@ export const useLibrary = (libraryName) => {
   const ctx = useContext(LibraryContext);
   const [library, setLibrary] = useState();
 
-  useEffect(() => {
-    ctx
-      .requestLibrary(libraryName)
-      .then((lib) => setLibrary(!!lib));
+  const fetchLibrary = useCallback(async () => {
+    const libLoaded = await ctx.requestLibrary(libraryName);
+
+    console.log({libraryName, libLoaded});
+    setLibrary(!!libLoaded);
   }, [ctx, libraryName]);
+
+  useEffect(() => {
+    fetchLibrary();
+  }, [fetchLibrary]);
 
   return library;
 };

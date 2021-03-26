@@ -85,7 +85,7 @@ class AnnotationSerializer(DynamicFieldsMixin, ModelSerializer):
         if len(user.last_name):
             name = name + " " + user.last_name
 
-        name += f' ({user.email}, {user.id})'
+        name += f' {user.email}, {user.id}'
         return name
 
     def get_ground_truth(self, annotation):
@@ -120,8 +120,9 @@ class TaskSerializer(ModelSerializer):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['annotations'] = AnnotationSerializer(many=True, read_only=False, required=False,
-                                                          context=self.context)
+        if self.context.get('include_annotations', True):
+            self.fields['annotations'] = AnnotationSerializer(many=True, read_only=False, required=False,
+                                                              context=self.context)
 
     def project(self):
         """ Take the project from context

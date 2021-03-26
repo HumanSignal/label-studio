@@ -41,6 +41,7 @@ actions = [
         'entry_point': delete_tasks,
         'title': 'Delete tasks', 'order': 100,
         'permissions': 'can_delete_tasks',
+        'reload': True,
         'dialog': {
             'text': 'You are going to delete the selected tasks. Please confirm your action.',
             'type': 'confirm'
