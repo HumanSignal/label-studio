@@ -125,7 +125,7 @@ export const runTestServer = async () => {
   const serverCmd = [
     `cd ${LS_ROOT}`,
     `source ${path.join(LS_ROOT, 'venv/htx/bin/activate')}`,
-    `label-studio --no-browser --host http://${host} --port ${port} --data-dir ${SERVER_TMP}`,
+    `label-studio --no-browser --host http://${host} --port ${port} --data-dir ${SERVER_TMP} --username admin@heartex.com --password myCorrectPassword123`,
   ].join(' && ');
 
   const serverOptions: any = {
