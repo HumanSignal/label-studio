@@ -4,6 +4,7 @@ import os
 from rest_framework import serializers
 
 from io_storages.base_models import ImportStorage, ExportStorage
+from users.models import User
 from tasks.serializers import AnnotationSerializer, TaskSerializer
 from tasks.models import Task
 
@@ -39,5 +40,12 @@ class StorageTaskSerializer(TaskSerializer):
         fields = '__all__'
 
 
+class StorageUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'first_name', 'last_name', 'email')
+
+
 class StorageAnnotationSerializer(AnnotationSerializer):
     task = StorageTaskSerializer(read_only=True)
+    completed_by = StorageUserSerializer(read_only=True)
