@@ -3,7 +3,7 @@ import { bootTestServer } from "../helpers/boot_test_server";
 const server = bootTestServer();
 
 describe("User authentication", () => {
-  it("should visit LS and see the title", async () => {
+  it("Should register and log in", async () => {
     await page.goto(`${server.hostname}/user/signup`);
 
     expect(await page.title()).toBe("Label Studio");
@@ -13,10 +13,12 @@ describe("User authentication", () => {
       password: '12345678',
     });
 
-    await page.click('button[aria-label="Create Account"]');
+    await expect(page).toClick('button', {
+      text: "Create Account",
+    });
 
-    await page.waitForNavigation({ waitUntil: "domcontentloaded" });
+    await page.waitForNavigation({ timeout: 3000 });
 
-    expect(page.url()).toBe(`${server.hostname}/projects`);
+    expect(page.url()).toBe(`${server.hostname}/projects/`);
   });
 });

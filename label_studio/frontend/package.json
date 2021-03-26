@@ -111,10 +111,12 @@
       {
         "displayName": "integration",
         "preset": "jest-puppeteer",
+        "testTimeout": 25000,
         "testMatch": [
           "<rootDir>/test/integration/**/*.test.ts",
           "<rootDir>/test/integration/**/*.test.tsx"
-        ]
+        ],
+        "setupFilesAfterEnv": ["expect-puppeteer"]
       },
       {
         "displayName": "unit",
