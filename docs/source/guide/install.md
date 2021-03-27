@@ -17,7 +17,7 @@ Install Label Studio on premises or in the cloud. Choose the install method that
 You can install Label Studio on a Linux, Windows, or MacOSX machine running Python 3.6 or later. 
 
 ### Install prerequisite
-Install Label Studio in a clean Python environment. You might want to use a virtual environment (venv or conda) to reduce the likelihood of package conflicts or missing packages. 
+Install Label Studio in a clean Python environment. We highly recommend using a virtual environment (venv or conda) to reduce the likelihood of package conflicts or missing packages. 
 
 ### Port requirements
 Label Studio expects port 8080 to be open by default. To use a different port, specify it when starting Label Studio. See [Start Label Studio](start.html). 
@@ -83,8 +83,6 @@ Start Label Studio:
 docker-compose up -d
 ```
 
-This starts Label Studio with a PostgreSQL database backend and and NGINX proxy web server used to load uploaded data. 
-
 ## Install from source
 
 If you want to use nightly builds or extend the functionality, consider downloading the source code using Git and running Label Studio locally:
@@ -120,17 +118,7 @@ Many bugs might be fixed in patch releases or maintenance releases. Make sure yo
 
 ### Errors about missing packages
 
-If you see errors about missing packages, install those packages and try to install Label Studio again. Make sure that you run Label Studio in a clean Python environment, such as a virtual environment. 
-
-For example, you might need to run the following in an Anaconda environment:
-```bash
-conda install ruamel.yaml
-```
-
-Or the following in a Python virtual environment:
-```bash
-pip install wheel
-```
+If you see errors about missing packages, install those packages and try to install Label Studio again. Make sure that you run Label Studio in a clean Python environment, such as a virtual environment.
 
 For Windows users the default installation might fail to build the `lxml` package. Consider manually installing it from [the unofficial Windows binaries](https://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml). If you are running Windows 64-bit with Python 3.8 or later, run `pip install lxml‑4.5.0‑cp38‑cp38‑win_amd64.whl` to install it. 
 
@@ -172,7 +160,7 @@ Label Studio uses a database to store project data and configuration information
 
 Label Studio uses SQLite by default. Label Studio expects version 3.35.x or later of SQLite, so if you have another version installed, you might see unexpected behavior. 
 
-Label Studio stores all data in a single file in the specified directory of the admin user. After you [start Label Studio](start.html), the directory used is printed in the terminal. 
+Label Studio stores all data in a single file in the default application data directory. After you [start Label Studio](start.html), the directory used is printed in the terminal. You can use the environment variable `LABEL_STUDIO_BASE_DATA_DIR` to specify a different directory. 
 
 ### PostgreSQL database
 

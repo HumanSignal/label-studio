@@ -24,7 +24,7 @@ List of items in [raw JSON format](#Raw-JSON-format-of-completed-labeled-tasks) 
 
 ### JSON_MIN
 
-List of items where only `"from_name", "to_name"` values from the [raw JSON format](#Raw-JSON-format-of-completed-labeled-tasks) are exported. Use to export only the annotations for a dataset. 
+List of items where only `"from_name", "to_name"` values from the [raw JSON format](#Raw-JSON-format-of-completed-labeled-tasks) are exported. Use to export only the annotations and the data for a dataset, and no Label-Studio-specific fields. 
 
 ```json
 {
