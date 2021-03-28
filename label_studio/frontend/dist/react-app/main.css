@@ -678,6 +678,12 @@
 }
 
 .ls-checkbox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #000;
+}
+.ls-checkbox__box {
   overflow: hidden;
   position: relative;
   white-space: nowrap;
@@ -705,29 +711,55 @@
   background: #fff;
   will-change: all;
   border-radius: 4px;
+  position: relative;
   display: inline-block;
   transition: all 80ms ease;
   box-shadow: inset 0px -1px 0px rgba(0,0,0,0.1), inset 0px 0px 0px 1px rgba(0,0,0,0.15);
 }
-.ls-checkbox__check::before {
+.ls-checkbox__check::before,
+.ls-checkbox__check::after {
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
   display: block;
   content: '';
-  width: 100%;
-  height: 100%;
   opacity: 0;
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg%20width=%2713%27%20height=%2710%27%20viewBox=%270%200%2013%2010%27%20fill=%27none%27%20xmlns=%27http://www.w3.org/2000/svg%27%3e%3cpath%20d=%27M1.5%204.5L5%208L11%202%27%20stroke=%27black%27%20stroke-width=%272%27%20stroke-linecap=%27square%27/%3e%3c/svg%3e");
+  position: absolute;
+}
+.ls-checkbox__check::before {
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg%20width=%2713%27%20height=%2710%27%20viewBox=%270%200%2013%2010%27%20fill=%27none%27%20xmlns=%27http://www.w3.org/2000/svg%27%3e%3cpath%20d=%27M1.5%204.5L5%208L11%202%27%20stroke=%27currentColor%27%20stroke-width=%272%27%20stroke-linecap=%27square%27/%3e%3c/svg%3e");
   background-repeat: no-repeat;
   background-position: center;
   transition: all 120ms ease;
 }
+.ls-checkbox__check::after {
+  top: 4px;
+  left: 4px;
+  bottom: 4px;
+  right: 4px;
+  border-radius: 2px;
+  background-color: #000;
+}
 .ls-checkbox__check_checked::before {
   opacity: 1;
+}
+.ls-checkbox__check_indeterminate::after {
+  opacity: 1;
+}
+.ls-checkbox__label {
+  width: 100%;
+  display: flex;
+  align-items: center;
 }
 .ls-checkbox:hover .ls-checkbox__check {
   background-color: #efefef;
 }
 .ls-checkbox__input:checked + .ls-checkbox__check::before {
   opacity: 1;
+}
+.ls-checkbox_withLabel .ls-checkbox__box {
+  margin-right: 5px;
 }
 
 .ls-columns {
