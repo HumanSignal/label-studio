@@ -2,24 +2,52 @@ import React from 'react';
 import { cn } from '../../utils/bem';
 import './Checkbox.styl';
 
-export const Checkbox = ({checked, style, onChange, ...props}) => {
+export const Checkbox = ({
+  checked,
+  indeterminate,
+  style,
+  onChange,
+  children,
+  ...props
+}) => {
   const rootClass = cn("checkbox");
-  const className = [rootClass, props.className].join(" ");
+  const checkboxRef = React.createRef();
+  const withLabel = !!children;
 
-  return (
-    <span className={className} style={style}>
+  React.useEffect(() => {
+    checkboxRef.current.indeterminate = indeterminate;
+  }, [checkboxRef, indeterminate]);
+
+  const checkboxContent = (
+    <span className={rootClass.elem("box")}>
       <input
         {...props}
-        checked={checked && "checked"}
-        className={rootClass.elem('input')}
+        ref={checkboxRef}
+        checked={!!checked}
+        className={rootClass.elem("input")}
         type="checkbox"
-        onChange={(e) => onChange?.(e)}
+        onChange={(e) => {
+          onChange?.(e);
+        }}
       />
       <span
-        className={[
-          rootClass.elem('check'),
-          rootClass.elem("check").mod({checked})
-        ].join(" ")}></span>
+        className={rootClass.elem("check").mod({ checked, indeterminate })}
+      ></span>
     </span>
+  );
+
+  return (
+    <div
+      className={rootClass.mod({ withLabel }).mix(props.className)}
+      style={style}
+    >
+      {children ? (
+        <label className={rootClass.elem("label")}>
+          {checkboxContent} {children}
+        </label>
+      ) : (
+        checkboxContent
+      )}
+    </div>
   );
 };

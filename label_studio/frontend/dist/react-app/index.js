@@ -1427,25 +1427,46 @@ __webpack_require__.r(__webpack_exports__);
 
 const Checkbox = ({
   checked,
+  indeterminate,
   style,
   onChange,
+  children,
   ...props
 }) => {
   const rootClass = (0,_utils_bem__WEBPACK_IMPORTED_MODULE_1__.cn)("checkbox");
-  const className = [rootClass, props.className].join(" ");
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("span", {
-    className: className,
-    style: style,
+  const checkboxRef = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createRef();
+  const withLabel = !!children;
+  react__WEBPACK_IMPORTED_MODULE_0__.useEffect(() => {
+    checkboxRef.current.indeterminate = indeterminate;
+  }, [checkboxRef, indeterminate]);
+
+  const checkboxContent = /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("span", {
+    className: rootClass.elem("box"),
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("input", { ...props,
-      checked: checked && "checked",
-      className: rootClass.elem('input'),
+      ref: checkboxRef,
+      checked: !!checked,
+      className: rootClass.elem("input"),
       type: "checkbox",
-      onChange: e => onChange === null || onChange === void 0 ? void 0 : onChange(e)
+      onChange: e => {
+        onChange === null || onChange === void 0 ? void 0 : onChange(e);
+      }
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("span", {
-      className: [rootClass.elem('check'), rootClass.elem("check").mod({
-        checked
-      })].join(" ")
+      className: rootClass.elem("check").mod({
+        checked,
+        indeterminate
+      })
     })]
+  });
+
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
+    className: rootClass.mod({
+      withLabel
+    }).mix(props.className),
+    style: style,
+    children: children ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("label", {
+      className: rootClass.elem("label"),
+      children: [checkboxContent, " ", children]
+    }) : checkboxContent
   });
 };
 
@@ -31286,7 +31307,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 // extracted by mini-css-extract-plugin
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({"checkbox":"ls-checkbox","checkbox__input":"ls-checkbox__input","checkbox__check":"ls-checkbox__check","checkbox__check_checked":"ls-checkbox__check_checked"});
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({"checkbox":"ls-checkbox","checkbox__box":"ls-checkbox__box","checkbox__input":"ls-checkbox__input","checkbox__check":"ls-checkbox__check","checkbox__check_checked":"ls-checkbox__check_checked","checkbox__check_indeterminate":"ls-checkbox__check_indeterminate","checkbox__label":"ls-checkbox__label","checkbox_withLabel":"ls-checkbox_withLabel"});
 
 /***/ }),
 
