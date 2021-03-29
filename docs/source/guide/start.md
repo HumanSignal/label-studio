@@ -94,7 +94,6 @@ app:
 ...
 ```
 
-
 ## Run Label Studio with HTTPS
 To run Label Studio with HTTPS and access the web server using HTTPS in the browser, specify a certificate and private key when starting Label Studio. 
 
@@ -126,21 +125,21 @@ DATABASE_URL = postgres://username:password@hostname.compute.amazonaws.com:5432/
 ```
 Then you can specify the required environment variables for a PostgreSQL connection as config variables. See [Database storage](install.html#Database_storage).
 
-
+<!--
 ## Run Label Studio on the cloud using a different cloud provider
 To run Label Studio on the cloud using a cloud provider such as Google Cloud Services (GCS), Amazon Web Services (AWS), or Microsoft Azure, 
-
-
+-->
 ## Run Label Studio with an external domain name
 
 If you want multiple people to collaborate on a project, you might want to run Label Studio with an external domain name. 
 
-To do that, specify the `host` parameter when you start Label Studio to ensure that the correct URLs are created when importing resource files (images, audio, etc) and generating labeling tasks.   
+To do that, use the `host` parameter when you start Label Studio. These parameters ensure that the correct URLs are created when importing resource files (images, audio, etc) and generating labeling tasks.   
 
-You can specify the external domain name when you start Label Studio from the command line. 
-```bash
-label-studio start --host http://subdomain.example.com/ls-root
-```
+There are several possible ways to run Label Studio with an external domain name.
+ 
+- Replace the `host` parameter in the file which you specified with `--config` option. If you don't use `--config` then edit `label_studio/utils/schema/default_config.json` in the Label Studio package directory.
+- Specify the parameters when you start Label Studio: `label-studio start --host http://your.domain.com/ls-root`.
+- Specify the parameters as environment variables `HOST` especially when setting up Docker: `HOST=https://your.domain.com:7777`. 
 
 Or, you can use environment variables:
 ```
@@ -151,7 +150,6 @@ You must specify the protocol for the domain name: `http://` or `https://`
 
 If your external host has a port, specify the port as part of the host name. 
 
-
 ## Set up task sampling for your project 
 
 When you start Label Studio, you can control the order in which tasks are exposed to annotators for a specific project.  
@@ -161,7 +159,7 @@ For example, to create a project with sequential task ordering for annotators:
 label-studio start <project_name> --sampling sequential
 ```
 
-The following table lists the available sampling options from the command line: 
+The following table lists the available sampling options: 
 
 | Option | Description |
 | --- | --- | 

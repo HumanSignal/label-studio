@@ -65,7 +65,6 @@ from core.utils.params import (
 
 logger = logging.getLogger(__name__)
 url_validator = URLValidator()
-get_object_with_check_and_log = settings.GET_OBJECT_WITH_CHECK_AND_LOG
 
 
 def _override_exceptions(exc):
@@ -670,3 +669,5 @@ def import_from_string(func_string):
         msg = f"Could not import {func_string} from settings"
         raise ImportError(msg)
 
+
+get_object_with_check_and_log = load_func(settings.GET_OBJECT_WITH_CHECK_AND_LOG)

@@ -10,8 +10,13 @@ with open('README.md', 'r', encoding='utf-8') as f:
     long_description = f.read()
 
 # Module dependencies
+requirements, dependency_links = [], []
 with open('deploy/requirements.txt') as f:
-    requirements = [line for line in f.read().splitlines() if not line.startswith('-e git+')]
+    for line in f.read().splitlines():
+        if line.startswith('-e git+'):
+            dependency_links.append(line.replace('-e ', ''))
+        else:
+            requirements.append(line)
 
 setuptools.setup(
     name=label_studio.package_name,
@@ -30,6 +35,7 @@ setuptools.setup(
         'Operating System :: OS Independent',
     ],
     install_requires=requirements,
+    dependency_links=dependency_links,
     python_requires='>=3.6',
     entry_points={
         'console_scripts': [

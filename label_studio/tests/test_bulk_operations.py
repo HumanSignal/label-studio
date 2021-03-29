@@ -35,6 +35,7 @@ def test_load_tasks_and_annotations(business_client, annotator_client, configure
     project_id = configured_project.id
 
     user = User.objects.get(email='annotator@pytest.net')
+    p.created_by.active_organization.add_user(user)
     p.add_collaborator(user)
 
     gen_tasks(user.id)

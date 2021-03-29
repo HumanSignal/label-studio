@@ -26,7 +26,7 @@ def client_and_token(business_client):
 @pytest.mark.django_db
 def pytest_generate_tests(metafunc):
     if 'test_suite' in metafunc.fixturenames:
-        with io.open(os.path.join(os.path.dirname(__file__), 'test_data/full_steps.yml')) as f:
+        with io.open(os.path.join(os.path.dirname(__file__), 'test_data/full_steps.yml'), encoding='utf-8') as f:
             test_suites = yaml.load(f)
             metafunc.parametrize('test_name, test_suite', list(test_suites.items()))
 

@@ -47,9 +47,9 @@ class DataExport(object):
             }
         }
 
-        with open(filename_results, 'w') as f:
+        with open(filename_results, 'w', encoding='utf-8') as f:
             f.write(data)
-        with open(filename_info, 'w') as f:
+        with open(filename_info, 'w', encoding='utf-8') as f:
             json.dump(info, f, ensure_ascii=False)
         return filename_results
 
@@ -72,7 +72,7 @@ class DataExport(object):
         now = datetime.now()
         data = json.dumps(tasks, ensure_ascii=False)
         md5 = hashlib.md5(json.dumps(data).encode('utf-8')).hexdigest()
-        name = 'project-' + str(project.title) + '-at-' + now.strftime('%Y-%m-%d-%H-%M') + f'-{md5[0:8]}'
+        name = 'project-' + str(project.id) + '-at-' + now.strftime('%Y-%m-%d-%H-%M') + f'-{md5[0:8]}'
 
         input_json = DataExport.save_export_files(project, now, get_args, data, md5, name)
         converter = Converter(

@@ -4,7 +4,13 @@ import uuid
 
 from django import forms
 from django.conf import settings
+from django.shortcuts import redirect
+from django.contrib import auth
+from django.urls import reverse
 from django.core.files.images import get_image_dimensions
+
+from organizations.models import Organization
+from core.utils.common import load_func
 
 
 def hash_upload(instance, filename):
@@ -39,3 +45,35 @@ def check_avatar(files):
         raise forms.ValidationError('Avatar file size may not exceed ' + str(max_size/1024) + ' kb')
 
     return avatar
+
+
+def save_user(request, *args):
+    """ Save user instance to DB
+    """
+    next_page, user_form, _ = args
+
+    user = user_form.save()
+    user.username = user.email.split('@')[0]
+    user.save()
+
+    redirect_url = next_page if next_page else reverse('projects:project-index')
+    auth.login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+    return user, redirect_url
+
+
+def proceed_registration(request, user_form, organization_form, next_page):
+    """ Register a new user for POST user_signup
+    """
+    # save user to db
+    save_user = load_func(settings.SAVE_USER)
+    user, redirect_url = save_user(request, next_page, user_form, organization_form)
+
+    if Organization.objects.exists():
+        org = Organization.objects.first()
+        org.add_user(user)
+    else:
+        org = Organization.create_organization(created_by=user, title='Label Studio')
+    user.active_organization = org
+    user.save(update_fields=['active_organization'])
+
+    return redirect(redirect_url)

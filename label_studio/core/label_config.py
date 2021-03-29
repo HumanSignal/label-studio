@@ -224,7 +224,7 @@ def data_examples(mode):
     global _DATA_EXAMPLES
 
     if _DATA_EXAMPLES is None:
-        with open(find_file('data_examples.json')) as f:
+        with open(find_file('data_examples.json'), encoding='utf-8') as f:
             _DATA_EXAMPLES = json.load(f)
 
         roots = ['editor_preview', 'upload']
