@@ -236,9 +236,6 @@ class TaskSerializerBulk(serializers.ListSerializer):
     def create(self, validated_data):
         """ Create Tasks and Annotations in bulk
         """
-        if not validated_data:
-            return []
-
         db_tasks, db_annotations, db_predictions, validated_tasks = [], [], [], validated_data
         logging.info(f'Try to serialize tasks with annotations, data len = {len(validated_data)}')
         user = self.context.get('user', None)

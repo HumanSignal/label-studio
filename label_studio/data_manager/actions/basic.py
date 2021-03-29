@@ -1,6 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 from tasks.models import Annotation
+# from tasks
 
 
 def delete_tasks(project, queryset, **kwargs):
@@ -10,6 +11,8 @@ def delete_tasks(project, queryset, **kwargs):
     :param queryset: filtered tasks db queryset
     """
     count = queryset.count()
+    # ids = queryset.values_list(flat=True)
+    # Task
     queryset.delete()
 
     # remove all tabs if there are no tasks in project
