@@ -224,6 +224,9 @@ class TaskSerializerBulk(serializers.ListSerializer):
     def create(self, validated_data):
         """ Create Tasks and Annotations in bulk
         """
+        if not validated_data:
+            return []
+
         db_tasks, db_annotations, db_predictions, validated_tasks = [], [], [], validated_data
         logging.info(f'Try to serialize tasks with annotations, data len = {len(validated_data)}')
         user = self.context.get('user', None)
@@ -239,11 +242,20 @@ class TaskSerializerBulk(serializers.ListSerializer):
                 task_predictions.append(task.pop('predictions', []))
 
             # check annotator permissions for completed by
-            project_annotator_ids = project.annotators().values_list('id', flat=True)
-            annotator_ids = set([annotation.get('completed_by')
-                                 for annotations in task_annotations for annotation in annotations])
+            project_user_ids = project.created_by.active_organization.members.values_list('user__id', flat=True)
+            annotator_ids = set()
+            for annotations in task_annotations:
+                for annotation in annotations:
+                    completed_by = annotation.get('completed_by', None)
+                    # user id as is
+                    if completed_by and isinstance(completed_by, int):
+                        annotator_ids.add(completed_by)
+                    # user dict
+                    if completed_by and isinstance(completed_by, dict):
+                        annotator_ids.add(completed_by.get('id'))
+
             for i in annotator_ids:
-                if i not in project_annotator_ids and i is not None:
+                if i not in project_user_ids and i is not None:
                     raise ValidationError(f'Annotations with "completed_by"={i} are produced by annotator '
                                           f'who is not allowed for this project as invited annotator or team member')
 
@@ -278,8 +290,11 @@ class TaskSerializerBulk(serializers.ListSerializer):
                     if 'ground_truth' in annotation:
                         ground_truth = annotation.pop('ground_truth', True)
 
-                    completed_by_id = annotation.pop('completed_by', user.id if user else None)
-                    completed_by_id = int(completed_by_id) if completed_by_id is not None else None
+                    completed_by = annotation.pop('completed_by', user.id if user else None)
+                    if completed_by and isinstance(completed_by, int):
+                        completed_by_id = int(completed_by_id)
+                    if completed_by and isinstance(completed_by, dict):
+                        completed_by_id = completed_by.get('id')
 
                     db_annotations.append(Annotation(task=self.db_tasks[i],
                                                      ground_truth=ground_truth,
