@@ -50,17 +50,6 @@ The following command line arguments are optional and must be specified with `la
 | `--agree-fix-sqlite` | N/A | Automatically agree to let Label Studio fix SQLite issues when using Python 3.6–3.8 on Windows operating systems. | 
 
 
-## Run Label Studio on localhost with default settings
-By default, Label Studio uses the `0.0.0.0` address to start. If you want to use `localhost` instead, use the following command:
-```bash
-label-studio start --internal-host localhost
-```
-
-Or, set the following environment variable:
-```
-LABEL_STUDIO_INTERNAL_HOST = localhost
-```
-
 ## Run Label Studio on localhost with a different port
 By default, Label Studio runs on port 8080. If that port is already in use or if you want to specify a different port, start Label Studio with the following command:
 ```bash
