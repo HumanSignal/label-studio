@@ -188,6 +188,19 @@ this is a second task
 
 If you want to import entire plain text files without each line becoming a new labeling task, customize the labeling configuration to specify `valueType="url"` in the Text tag. See the [Text tag documentation](tags/text.html)
 
+## Import data from a local directory
+To import data from a local directory, you can add the file directory as a source or target [local storage](storage.html#Local-storage) connection in the Label Studio UI, or run a web server to generate URLs for the files, then upload a file that references the URLs to Label Studio. 
+
+To start a web server and create URLs to the files in the directory, do the following:
+1. On the machine with the file directory that you want Label Studio to import, start an HTTP server locally. For example, to generate file URLs in a format `http://localhost:8081/<filename>`, run the following: 
+   ```bash
+   python -m http.server 8081
+   ```
+2. Collect the links to the files provided by that HTTP server and save them to a TXT file with one URL per line. Refer to this [helper shell script in the Label Studio repository](https://github.com/heartexlabs/label-studio/blob/master/scripts/serve_local_files.sh) for one example of how to do this.
+3. Import the file with URLs into Label Studio using the Label Studio UI. 
+
+To import tasks from a file directory on a remote server, make sure the remote server is accessible to the server running Label Studio and set up the directory as a [local storage](storage.html#Local-storage) connection. 
+
 ## Import data from the Label Studio UI
 
 To import data from the Label Studio UI, do the following:
