@@ -220,6 +220,18 @@ class TaskSerializerBulk(serializers.ListSerializer):
 
         return ret
 
+    @staticmethod
+    def get_completed_by_id(annotation, default=None):
+        completed_by = annotation.get('completed_by', None)
+        # user id as is
+        if completed_by and isinstance(completed_by, int):
+            return completed_by
+        # user dict
+        if completed_by and isinstance(completed_by, dict):
+            return completed_by.get('id')
+
+        return default
+
     @retry_database_locked()
     def create(self, validated_data):
         """ Create Tasks and Annotations in bulk
@@ -246,13 +258,7 @@ class TaskSerializerBulk(serializers.ListSerializer):
             annotator_ids = set()
             for annotations in task_annotations:
                 for annotation in annotations:
-                    completed_by = annotation.get('completed_by', None)
-                    # user id as is
-                    if completed_by and isinstance(completed_by, int):
-                        annotator_ids.add(completed_by)
-                    # user dict
-                    if completed_by and isinstance(completed_by, dict):
-                        annotator_ids.add(completed_by.get('id'))
+                    annotator_ids.add(self.get_completed_by_id(annotation))
 
             for i in annotator_ids:
                 if i not in project_user_ids and i is not None:
@@ -290,11 +296,9 @@ class TaskSerializerBulk(serializers.ListSerializer):
                     if 'ground_truth' in annotation:
                         ground_truth = annotation.pop('ground_truth', True)
 
-                    completed_by = annotation.pop('completed_by', user.id if user else None)
-                    if completed_by and isinstance(completed_by, int):
-                        completed_by_id = int(completed_by_id)
-                    if completed_by and isinstance(completed_by, dict):
-                        completed_by_id = completed_by.get('id')
+                    # get user id
+                    completed_by_id = self.get_completed_by_id(annotation, default=user.id if user else None)
+                    annotation.pop('completed_by', None)
 
                     db_annotations.append(Annotation(task=self.db_tasks[i],
                                                      ground_truth=ground_truth,
