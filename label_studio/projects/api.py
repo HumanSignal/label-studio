@@ -1,6 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import drf_yasg.openapi as openapi
+import json
 import logging
 import numpy as np
 import pathlib
@@ -104,11 +105,11 @@ class ProjectListAPI(generics.ListCreateAPIView):
     List your projects
 
     Return a list of the projects that you've created.
-    
+
     post:
     Create new project
 
-    Create a labeling project.  
+    Create a labeling project.
     """
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_classes = (IsBusiness, ProjectAPIOrganizationPermission)
@@ -406,9 +407,11 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
         # support actions api call from actions/next_task.py
         if hasattr(self, 'prepared_tasks'):
             project.prepared_tasks = self.prepared_tasks
+            external_prepared_tasks_used = True
         # get prepared tasks from request params (filters, selected items)
         else:
             project.prepared_tasks = get_prepared_queryset(self.request, project)
+            external_prepared_tasks_used = False
 
         # detect solved and not solved tasks
         user_solved_tasks_array = user.annotations.filter(ground_truth=False).filter(
@@ -423,6 +426,13 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
             if not_solved_tasks_count == 0:
                 raise NotFound(f'There are no tasks remaining to be annotated by the user={user}')
             logger.debug(f'{not_solved_tasks_count} tasks that still need to be annotated for user={user}')
+
+            # ordered by data manager
+            if external_prepared_tasks_used:
+                next_task = not_solved_tasks.first()
+                if not next_task:
+                    raise NotFound('No more tasks found')
+                return self._make_response(next_task, request)
 
             # If current user has already lock one task - return it (without setting the lock again)
             next_task = Task.get_locked_by(user, project)
@@ -500,9 +510,11 @@ class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
     @swagger_auto_schema(tags=['Projects'], operation_summary='Validate a label config', manual_parameters=[
                             openapi.Parameter(name='label_config', type=openapi.TYPE_STRING, in_=openapi.IN_QUERY,
                                               description='labeling config')])
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         project = self.get_object()
-        label_config = self.request.query_params.get('label_config')
+        label_config = self.request.data.get('label_config')
+        if not label_config:
+            raise RestValidationError('Label config is not set or empty')
 
         # check new config includes meaningful changes
         config_essential_data_has_changed = False
@@ -632,7 +644,7 @@ class TemplateListAPI(generics.ListAPIView):
             config = read_yaml(config_file)
             configs.append(config)
         template_groups_file = find_file(os.path.join('annotation_templates', 'groups.txt'))
-        with open(template_groups_file) as f:
+        with open(template_groups_file, encoding='utf-8') as f:
             groups = f.read().splitlines()
         logger.debug(f'{len(configs)} templates found.')
         return Response({'templates': configs, 'groups': groups})
@@ -645,7 +657,10 @@ class ProjectSampleTask(generics.RetrieveAPIView):
     serializer_class = ProjectSerializer
     swagger_schema = None
 
-    def retrieve(self, request, *args, **kwargs):
-        config = request.GET.get('label_config')
+    def post(self, request, *args, **kwargs):
+        label_config = self.request.data.get('label_config')
+        if not label_config:
+            raise RestValidationError('Label config is not set or empty')
+
         project = self.get_object()
-        return Response({'sample_task': project.get_sample_task(config)}, status=200)
+        return Response({'sample_task': project.get_sample_task(label_config)}, status=200)

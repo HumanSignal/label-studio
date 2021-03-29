@@ -19,6 +19,7 @@ HOSTNAME = get_env('HOST', '')
 if HOSTNAME:
     if not HOSTNAME.startswith('http://') and not HOSTNAME.startswith('https://'):
         print("! HOST variable found in environment, but it must start with http:// or https://, ignore it:", HOSTNAME)
+        HOSTNAME = ''
     else:
         print("=> HOSTNAME correctly set to:", HOSTNAME)
 
@@ -34,7 +35,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Base path for media root and other uploaded files
 BASE_DATA_DIR = get_env('BASE_DATA_DIR', get_data_dir())
 os.makedirs(BASE_DATA_DIR, exist_ok=True)
-print('=> Database and media directory: ', BASE_DATA_DIR, '\n')
+print('=> Database and media directory:', BASE_DATA_DIR, '\n')
 
 # Databases
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
@@ -333,10 +334,9 @@ def user_auth(user_model, email, password):
 PROJECT_DELETE = project_delete
 USER_AUTH = user_auth
 CREATE_ORGANIZATION = 'organizations.functions.create_organization'
+GET_OBJECT_WITH_CHECK_AND_LOG = 'core.utils.get_object.get_object_with_check_and_log'
+SAVE_USER = 'users.functions.save_user'
 
-from core.utils.get_object import get_object_with_check_and_log
-
-GET_OBJECT_WITH_CHECK_AND_LOG = get_object_with_check_and_log
 
 # fix a problem with Windows mimetypes for JS and PNG
 import mimetypes

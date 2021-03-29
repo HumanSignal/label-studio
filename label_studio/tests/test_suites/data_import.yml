@@ -10,7 +10,7 @@
           id: '{project_pk}'
 
     # Import files
-    - /api/projects/{project_pk}/tasks/bulk:
+    - /api/projects/{project_pk}/import:
         method: POST
         content_type: multipart/form-data
         data:

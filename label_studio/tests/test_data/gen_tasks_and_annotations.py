@@ -41,7 +41,7 @@ def gen_tasks(user_id):
             tasks.append(',')
         i += 1
 
-    with open(os.path.join(os.path.dirname(__file__), 'tasks_and_annotations.json'), 'w+') as f:
+    with open(os.path.join(os.path.dirname(__file__), 'tasks_and_annotations.json'), 'w+', encoding='utf-8') as f:
         f.write('[' + ''.join(tasks) + ']')
 
 

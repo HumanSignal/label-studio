@@ -58,7 +58,7 @@ def _apply_database_migrations():
 
 
 def _get_config(config_path):
-    with io.open(os.path.abspath(config_path)) as c:
+    with io.open(os.path.abspath(config_path), encoding='utf-8') as c:
         config = json.load(c)
     return config
 

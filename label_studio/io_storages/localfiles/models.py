@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 
 from io_storages.base_models import ImportStorage, ImportStorageLink, ExportStorage, ExportStorageLink
-from tasks.serializers import AnnotationSerializer
+from io_storages.serializers import StorageAnnotationSerializer
 from core.utils.params import get_env
 
 logger = logging.getLogger(__name__)
@@ -63,7 +63,7 @@ class LocalFilesExportStorage(ExportStorage, LocalFilesMixin):
 
     def save_annotation(self, annotation):
         logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
-        ser_annotation = AnnotationSerializer(annotation).data
+        ser_annotation = StorageAnnotationSerializer(annotation).data
         with transaction.atomic():
             # Create export storage link
             link = LocalFilesExportStorageLink.create(annotation, self)
