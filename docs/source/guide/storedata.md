@@ -57,7 +57,7 @@ If you're starting a Docker container from the command line, use volumes to pers
 docker run -it -p 8080:8080 -v <yourvolume>:/label-studio/data heartexlabs/label-studio:latest
 ```
 
-If you're using Docker Compose, you can set up Docker volumes in the `docker-compose.yml` file for Label Studio:
+If you're using Docker Compose with the [config included in the Label Studio repository](https://github.com/heartexlabs/label-studio/blob/master/docker-compose.yml), you can set up Docker volumes in the `docker-compose.yml` file for Label Studio:
 ```
 version: "3.3"
 services:

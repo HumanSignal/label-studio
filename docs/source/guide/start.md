@@ -70,16 +70,18 @@ LABEL_STUDIO_PORT = 9001
 
 To run Label Studio on Docker with a port other than the default of 8080, use the port argument when starting Label Studio on Docker. For example, to start Label Studio in a Docker container accessible with port 9001, run the following: 
 ```bash
-docker run -it -p 9001:8080 -v `pwd`/mydata:/root/.local/share/label-studio/ heartexlabs/label-studio:latest label-studio
+docker run -it -p 9001:8080 -v `pwd`/mydata:/label-studio/data heartexlabs/label-studio:latest label-studio
 ```
 
-Or, if you're using Docker Compose, update the `docker-compose.yml` file that you're using to expose a different port for the app. For example, this portion of the `docker-compose.yml` file exposes port 9001 instead of port 8080 for running Label Studio:
+Or, if you're using Docker Compose, update the `docker-compose.yml` file that you're using to expose a different port for the NGINX server used to proxy the connection to Label Studio. For example, this portion of the [`docker-compose.yml`](https://github.com/heartexlabs/label-studio/blob/master/docker-compose.yml) file exposes port 9001 instead of port 80 for proxying Label Studio:
 ```
 ...
-app:
-  build: ./
-  expose:
-    - "9001"
+nginx:
+    image: nginx:latest
+    ports:
+      - 9001:80
+    depends_on:
+      - app
 ...
 ```
 
@@ -103,7 +105,7 @@ The certificate and private key files must both be provided as PEM files.
 To run Label Studio on the cloud using Heroku, specify an environment variable so that Label Studio loads. 
 
 ```
-LABEL_STUDIO_HOSTNAME
+LABEL_STUDIO_HOST
 ```
 
 If you want, you can specify a different hostname for Label Studio, but you don't need to.
@@ -154,6 +156,7 @@ The following table lists the available sampling options:
 | --- | --- | 
 | sequential | Default. Tasks are shown to annotators in ascending order by the `id` field. |
 | uniform | Tasks are sampled with equal probabilities. |
+| prediction-score-min | Tasks with the minimum average prediction score are shown to annotators. To use this option, you must also include predictions data in the task data that you import into Label Studio. |
 
 You can also use the API to set up sampling for a specific project. Send a PATCH request to the `/api/projects/<project_id>` endpoint to set sampling for the specified project. See the [API reference for projects](https://labelstud.io/api#operation/projects_partial_update). 
 
