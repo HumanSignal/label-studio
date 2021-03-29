@@ -54,12 +54,12 @@ Mount Docker volumes on your machine to persist the internal SQLite database and
 
 If you're starting a Docker container from the command line, use volumes to persist the data. See the Docker documentation for [Use volumes](https://docs.docker.com/storage/volumes/). For example, replace the existing volume flag in the Docker command with a volume that you specify:
 ```bash
-docker run -it -p 8080:8080 -v <yourvolume>:/root/.local/share/label-studio/ heartexlabs/label-studio:latest
+docker run -it -p 8080:8080 -v <yourvolume>:/label-studio/data heartexlabs/label-studio:latest
 ```
 
 If you're using Docker Compose, you can set up Docker volumes in the `docker-compose.yml` file for Label Studio:
 ```
-version: "<python-version>"
+version: "3.3"
 services:
   label_studio:
     image: heartexlabs/label-studio:latest

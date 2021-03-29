@@ -24,7 +24,7 @@ Some available commands for Label Studio provide information or start the Label 
 | `label-studio init <project_name> <optional_arguments>` | Initialize a specific project in Label Studio. |
 | `label-studio start <project_name> --init <optional_arguments>` | Start the Label Studio server and initiliaze a specific project. |
 | `label-studio reset_password` | Reset the password for a specific Label Studio username. See [Create user accounts for Label Studio](signup.html). |
-| `label-studio shell` | Get access to a database shell for Label Studio to manipulate data directly. |
+| `label-studio shell` | Get access to a shell for Label Studio to manipulate data directly. See documentation for the Django [shell-plus command](https://django-extensions.readthedocs.io/en/latest/shell_plus.html). |
 | `label-studio version` | Show the version of Label Studio and then terminates.
 
 The following command line arguments are optional and must be specified with `label-studio start <argument> <value>` or as an environment variable when you set up the environment to host Label Studio:
@@ -32,22 +32,21 @@ The following command line arguments are optional and must be specified with `la
 | Command line argument | Environment variable | Description |
 | --- | ---- | ---- |
 | `-b`, `--no-browser` | N/A | Do not automatically open a web browser when starting Label Studio. |
-| `-db` `--database` | `DATABASE` | Specify the database file path for storing labeling tasks and annotations. See [Database storage](install.html#Database_storage). |
-| `--data-dir` | `DATA_DIR` | Directory to use to store all application-related data. |
+| `-db` `--database` | `LABEL_STUDIO_DATABASE` | Specify the database file path for storing labeling tasks and annotations. See [Database storage](install.html#Database_storage). |
+| `--data-dir` | `LABEL_STUDIO_DATA_DIR` | Directory to use to store all application-related data. |
 | `-d` `--debug` | N/A | Enable debug mode for troubleshooting Label Studio. |
 | `-c` `--config` | `CONFIG_PATH` | Deprecated, do not use. Specify the path to the server configuration for Label Studio. |
-| `-l` `--label-config` | `LABEL_CONFIG` | Path to the label configuration file for a specific Label Studio project. See [Set up your labeling project](setup.html). |
-| `--ml-backends` | `ML_BACKENDS` | Specify the URLs for one or more machine learning backends. See [Set up machine learning with your labeling process](ml.html). |
+| `-l` `--label-config` | `LABEL_STUDIO_LABEL_CONFIG` | Path to the label configuration file for a specific Label Studio project. See [Set up your labeling project](setup.html). |
+| `--ml-backends` | `LABEL_STUDIO_ML_BACKENDS` | Specify the URLs for one or more machine learning backends. See [Set up machine learning with your labeling process](ml.html). |
 | `--sampling` | N/A | Specify one of sequential or uniform to define the order for labeling tasks. See [Set up task sampling for your project](start.html#Set_up_task_sampling_for_your_project) on this page. |
 | `--log-level` | N/A | One of DEBUG, INFO, WARNING, or ERROR. Use to specify the logging level for the Label Studio server. |
-| `--internal-host` | `INTERNAL_HOST` | Web server address to make Label Studio available at. See [Run Label Studio on localhost with default settings](start.html#Run-Label-Studio-on-localhost-with-default-settings) on this page. |
-| `-p` `--port` | `PORT` | Specify the web server port for Label Studio. Defaults to 8080. See [Run Label Studio on localhost with a different port](start.html#Run-Label-Studio-on-localhost-with-a-different-port) on this page. |
-| `--host` | `HOST` | Specify the hostname to use to generate links for imported labeling tasks or static loading requirements. Leave empty to make all paths relative to the root domain. For example, specify `"https://77.42.77.42:1234"` or `"http://ls.example.com/subdomain/"`. See [Run Label Studio with an external domain name](start.html#Run-Label-Studio-with-an-external-domain-name) on this page. |
-| `--cert` | `CERT_FILE` | Certificate file to use to access Label Studio over HTTPS. Must be in PEM format. See [Run Label Studio with HTTPS](start.html#Run-Label-Studio-with-HTTPS) on this page. | 
-| `--key` | `KEY_FILE` | Private key file for HTTPS connection. Must be in PEM format. See [Run Label Studio with HTTPS](start.html#Run-Label-Studio-with-HTTPS) on this page. |
-| `--initial-project-description` | `PROJECT_DESC` | Specify a project description for a Label Studio project. See [Set up your labeling project](setup.html). |
-| `--password` | `PASSWORD` | Password to use for the default user. |
-| `--username` | `USERNAME` | Username to use for the default user. |
+| `-p` `--port` | `LABEL_STUDIO_PORT` | Specify the web server port for Label Studio. Defaults to 8080. See [Run Label Studio on localhost with a different port](start.html#Run-Label-Studio-on-localhost-with-a-different-port) on this page. |
+| `--host` | `LABEL_STUDIO_HOST` | Specify the hostname to use to generate links for imported labeling tasks or static loading requirements. Leave empty to make all paths relative to the root domain. For example, specify `"https://77.42.77.42:1234"` or `"http://ls.example.com/subdomain/"`. See [Run Label Studio with an external domain name](start.html#Run-Label-Studio-with-an-external-domain-name) on this page. |
+| `--cert` | `LABEL_STUDIO_CERT_FILE` | Certificate file to use to access Label Studio over HTTPS. Must be in PEM format. See [Run Label Studio with HTTPS](start.html#Run-Label-Studio-with-HTTPS) on this page. | 
+| `--key` | `LABEL_STUDIO_KEY_FILE` | Private key file for HTTPS connection. Must be in PEM format. See [Run Label Studio with HTTPS](start.html#Run-Label-Studio-with-HTTPS) on this page. |
+| `--initial-project-description` | `LABEL_STUDIO_PROJECT_DESC` | Specify a project description for a Label Studio project. See [Set up your labeling project](setup.html). |
+| `--password` | `LABEL_STUDIO_PASSWORD` | Password to use for the default user. |
+| `--username` | `LABEL_STUDIO_USERNAME` | Username to use for the default user. |
 | `--agree-fix-sqlite` | N/A | Automatically agree to let Label Studio fix SQLite issues when using Python 3.6–3.8 on Windows operating systems. | 
 
 
@@ -59,7 +58,7 @@ label-studio start --internal-host localhost
 
 Or, set the following environment variable:
 ```
-INTERNAL_HOST = localhost
+LABEL_STUDIO_INTERNAL_HOST = localhost
 ```
 
 ## Run Label Studio on localhost with a different port
@@ -75,7 +74,7 @@ label-studio start --port 9001
 
 Or, set the following environment variable:
 ```
-PORT = 9001
+LABEL_STUDIO_PORT = 9001
 ```
 
 ## Run Label Studio on Docker with a different port
@@ -96,36 +95,6 @@ app:
 ```
 
 
-## Run Label Studio on a remote server
-
-<!--UPDATE internal host PARAMS? -->
-
-To run Label Studio on a remote server, use the internal-host argument when starting Label Studio. For example, to start Label Studio on a remote server located at `INTERNALHOST`, run the following:
-```bash
-label-studio start --internal-host INTERNALHOST
-```
-
-Or, specify the remote server address in an environment variable:
-```
-INTERNAL_HOST = INTERNALHOST
-```
-
-## Run Label Studio on a remote server with an external domain name
-
-<!--UPDATE HOST, PORT, AND INTERNAL_HOST PARAMS? -->
-
-To run Label Studio on a remote server, use the internal-host argument when starting Label Studio. For example, to start Label Studio on a remote server located at `INTERNALHOST` with an external domain name of `example.com` and a port of `9001`, run the following:
-```bash
-label-studio start --internal-host INTERNALHOST --host https://example.com --port 9001
-```
-
-Or, specify the values in environment variables:
-```
-INTERNAL_HOST = INTERNALHOST
-HOST = https://example.com
-PORT = 9001
-```
-
 ## Run Label Studio with HTTPS
 To run Label Studio with HTTPS and access the web server using HTTPS in the browser, specify a certificate and private key when starting Label Studio. 
 
@@ -136,8 +105,8 @@ label-studio start --cert <certificate.pem> --key <keyfile.pem>
 
 Or, set the following environment variables:
 ```
-CERT_FILE = <certificate.pem>
-KEY_FILE =  <keyfile.pem>
+LABEL_STUDIO_CERT_FILE = <certificate.pem>
+LABEL_STUDIO_KEY_FILE =  <keyfile.pem>
 ```
 
 The certificate and private key files must both be provided as PEM files. 
@@ -175,7 +144,7 @@ label-studio start --host http://subdomain.example.com/ls-root
 
 Or, you can use environment variables:
 ```
-HOST = https://subdomain.example.com:7777
+LABEL_STUDIO_HOST = https://subdomain.example.com:7777
 ```
 
 You must specify the protocol for the domain name: `http://` or `https://`
@@ -185,11 +154,11 @@ If your external host has a port, specify the port as part of the host name.
 
 ## Set up task sampling for your project 
 
-When you start Label Studio, one way that you can order the way your imported tasks are exposed to annotators is to specify task sampling when you start Label Studio. 
+When you start Label Studio, you can control the order in which tasks are exposed to annotators for a specific project.  
 
-For example, to specify sequential task ordering for annotators:
+For example, to create a project with sequential task ordering for annotators:
 ```bash
-label-studio start --sampling sequential
+label-studio start <project_name> --sampling sequential
 ```
 
 The following table lists the available sampling options from the command line: 
@@ -199,4 +168,6 @@ The following table lists the available sampling options from the command line:
 | sequential | Default. Tasks are shown to annotators in ascending order by the `id` field. |
 | uniform | Tasks are sampled with equal probabilities. |
 
-For more flexible task sampling and ordering options, see [Set up your labeling project](setup.html).
+You can also use the API to set up sampling for a specific project. Send a PATCH request to the `/api/projects/<project_id>` endpoint to set sampling for the specified project. See the [API reference for projects](https://labelstud.io/api#operation/projects_partial_update). 
+
+Individual annotators can also control the order in which they label tasks by adjusting the filtering and ordering of labeling tasks in the Label Studio UI. See [Set up your labeling project](setup.html).
