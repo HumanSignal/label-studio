@@ -671,3 +671,26 @@ def import_from_string(func_string):
 
 
 get_object_with_check_and_log = load_func(settings.GET_OBJECT_WITH_CHECK_AND_LOG)
+
+
+class temporary_disconnect_signal:
+    """ Temporarily disconnect a model from a signal """
+    def __init__(self, signal, receiver, sender, dispatch_uid=None):
+        self.signal = signal
+        self.receiver = receiver
+        self.sender = sender
+        self.dispatch_uid = dispatch_uid
+
+    def __enter__(self):
+        self.signal.disconnect(
+            receiver=self.receiver,
+            sender=self.sender,
+            dispatch_uid=self.dispatch_uid
+        )
+
+    def __exit__(self, type_, value, traceback):
+        self.signal.connect(
+            receiver=self.receiver,
+            sender=self.sender,
+            dispatch_uid=self.dispatch_uid
+        )

@@ -1,7 +1,9 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-from tasks.models import Annotation
-# from tasks
+from django.db.models import signals
+
+from tasks.models import Annotation, update_is_labeled_after_removing_annotation
+from core.utils.common import temporary_disconnect_signal
 
 
 def delete_tasks(project, queryset, **kwargs):
@@ -11,9 +13,9 @@ def delete_tasks(project, queryset, **kwargs):
     :param queryset: filtered tasks db queryset
     """
     count = queryset.count()
-    # ids = queryset.values_list(flat=True)
-    # Task
-    queryset.delete()
+    # this signal re-save the task back
+    with temporary_disconnect_signal(signals.post_delete, update_is_labeled_after_removing_annotation, Annotation):
+        queryset.delete()
 
     # remove all tabs if there are no tasks in project
     reload = False
