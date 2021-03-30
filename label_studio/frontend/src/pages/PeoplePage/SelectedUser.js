@@ -9,7 +9,7 @@ const UserProjectsLinks = ({projects}) => {
   return (
     <Elem name="links-list">
       {projects.map((project) => (
-        <Elem tag={NavLink} name="project-link" key={`project-${project.id}`} to={`/projects/${project.id}`}>
+        <Elem tag={NavLink} name="project-link" key={`project-${project.id}`} to={`/projects/${project.id}`} data-external>
           {project.title}
         </Elem>
       ))}

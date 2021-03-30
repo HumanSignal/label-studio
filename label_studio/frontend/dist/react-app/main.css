@@ -1655,6 +1655,7 @@
 .ls-people-list__field.ls-avatar,
 .ls-people-list__column.ls-avatar {
   width: 28px;
+  box-sizing: content-box;
 }
 .ls-people-list__field.ls-name,
 .ls-people-list__column.ls-name {

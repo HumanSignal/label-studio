@@ -5,6 +5,7 @@ import { LsDoor, LsGitHub, LsSettings, LsSlack } from '../../assets/icons';
 import { useConfig } from '../../providers/ConfigProvider';
 import { useContextComponent } from '../../providers/RoutesProvider';
 import { cn } from '../../utils/bem';
+import { absoluteURL } from '../../utils/helpers';
 import { Breadcrumbs } from '../Breadcrumbs/Breadcrumbs';
 import { Dropdown } from "../Dropdown/Dropdown";
 import { Hamburger } from "../Hamburger/Hamburger";
@@ -138,15 +139,15 @@ export const Menubar = ({
               <Menu.Item
                 icon={<LsSettings/>}
                 label="Account & Settings"
-                href="/user/account"
-                external={false}
+                to="/user/account"
+                data-external
               />
               {/* <Menu.Item label="Dark Mode"/> */}
               <Menu.Item
                 icon={<LsDoor/>}
                 label="Log Out"
-                href="/logout"
-                data-no-async
+                href={absoluteURL("/logout")}
+                data-external
               />
             </Menu>
           )}>
@@ -171,15 +172,16 @@ export const Menubar = ({
               <Menu>
                 <Menu.Item
                   label="Projects"
-                  href="/projects"
+                  to="/projects"
                   icon={<Icon name="folder"/>}
+                  data-external
                   exact
                 />
                 <Menu.Item
                   label="People"
-                  href="/people"
+                  to="/people"
                   icon={<Icon name="person-circle"/>}
-                  external={false}
+                  data-external
                   exact
                 />
 
@@ -187,8 +189,18 @@ export const Menubar = ({
 
                 <VersionNotifier showNewVersion/>
 
-                <Menu.Item label="API" href="/docs/api" icon={<Icon name="terminal"/>} target="_blank"/>
-                <Menu.Item label="Docs" href="https://labelstud.io/guide" icon={<Icon name="book"/>} target="_blank"/>
+                <Menu.Item
+                  label="API"
+                  href="/docs/api"
+                  icon={<Icon name="terminal"/>}
+                  target="_blank"
+                />
+                <Menu.Item
+                  label="Docs"
+                  href="https://labelstud.io/guide"
+                  icon={<Icon name="book"/>}
+                  target="_blank"
+                />
                 <Menu.Item
                   label="GitHub"
                   href="https://github.com/heartexlabs/label-studio"
