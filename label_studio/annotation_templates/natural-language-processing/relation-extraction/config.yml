@@ -1,6 +1,7 @@
 title: Relation Extraction
 type: community
 group: Natural Language Processing
+order: 5
 image: /static/templates/relation-extraction.png
 details: <h1>Predict attributes and relations for entities in a sentence</h1>
 config: '

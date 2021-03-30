@@ -73,7 +73,14 @@ class S3StorageMixin(models.Model):
     def validate_connection(self, client=None):
         if client is None:
             client = self.get_client()
-        client.head_bucket(Bucket=self.bucket)
+        if self.prefix:
+            logger.debug(f'Test connection to bucket {self.bucket} with prefix {self.prefix}')
+            result = client.list_objects_v2(Bucket=self.bucket, Prefix=self.prefix, MaxKeys=1)
+            if not result.get('KeyCount'):
+                raise KeyError(f's3://{self.bucket}/{self.prefix} not found.')
+        else:
+            logger.debug(f'Test connection to bucket {self.bucket}')
+            client.head_bucket(Bucket=self.bucket)
 
     @property
     def path_full(self):

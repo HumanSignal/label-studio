@@ -1,6 +1,7 @@
 title: Named Entity Recognition
 type: community
 group: Natural Language Processing
+order: 3
 image: /static/templates/named-entity-recognition.png
 details: <h1>Extract named entities from text</h1>
 config: '

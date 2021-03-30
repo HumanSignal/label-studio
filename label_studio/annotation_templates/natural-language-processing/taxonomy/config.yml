@@ -1,6 +1,7 @@
 title: Taxonomy
 type: community
 group: Natural Language Processing
+order: 4
 image: /static/templates/taxonomy.png
 details: <h1>Do multilabel hierarchical classification</h1>
 config: '
