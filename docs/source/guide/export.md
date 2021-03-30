@@ -20,11 +20,11 @@ Label Studio supports many common and standard formats for exporting completed l
 
 ### JSON
 
-List of items in [raw JSON format](#raw-json-format-of-completed-labeled-tasks) stored in one JSON file. Use to export both the data and the annotations for a dataset. 
+List of items in [raw JSON format](#Raw-JSON-format-of-completed-labeled-tasks) stored in one JSON file. Use to export both the data and the annotations for a dataset. 
 
 ### JSON_MIN
 
-List of items where only `"from_name", "to_name"` values from the [raw JSON format](#raw-json-format-of-completed-labeled-tasks) are exported. Use to export only the annotations for a dataset. 
+List of items where only `"from_name", "to_name"` values from the [raw JSON format](#Raw-JSON-format-of-completed-labeled-tasks) are exported. Use to export only the annotations and the data for a dataset, and no Label-Studio-specific fields. 
 
 ```json
 {
@@ -183,7 +183,7 @@ Review the full list of JSON properties in the [API documentation](api.html).
 | JSON property name | Description |
 | --- | --- | 
 | id | Identifier for the labeling task from the dataset. |
-| data | Data copied from the input data task format. See the documentation for [Task Format](tasks.html#Basic-format). |
+| data | Data copied from the input data task format. See the documentation for [Task Format](tasks.html#Basic-Label-Studio-JSON-format). |
 | project | Identifier for a specific project in Label Studio. |
 | annotations | Array containing the labeling results for the task. |
 | annotations.id | Identifier for the completed task. |
