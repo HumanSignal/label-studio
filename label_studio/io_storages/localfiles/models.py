@@ -43,13 +43,13 @@ class LocalFilesImportStorage(ImportStorage, LocalFilesMixin):
                 yield file.name
 
     def get_data(self, key):
+        path = Path(self.path) / key
         if self.use_blob_urls:
             # include self-hosted links pointed to local resources via /data/filename?d=<path/to/local/dir>
-            path = Path(self.path) / key
             document_root = Path(get_env('LOCAL_FILES_DOCUMENT_ROOT', default='/'))
             relative_path = str(path.relative_to(document_root))
             return {settings.DATA_UNDEFINED_NAME: f'/data/local-files/?d={relative_path}'}
-        with open(key) as f:
+        with open(path) as f:
             value = json.load(f)
         if not isinstance(value, dict):
             raise ValueError(f"Error on key {key}: For {self.__class__.__name__} your JSON file must be a dictionary with one task.")  # noqa
