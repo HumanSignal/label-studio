@@ -100,7 +100,7 @@ class ViewAPI(viewsets.ModelViewSet):
         queryset.all().delete()
         return Response(status=204)
 
-    @swagger_auto_schema(tags=['Data Manager'], responses={200: ViewAPI.task_serializer_class(many=True)})
+    @swagger_auto_schema(tags=['Data Manager'], responses={200: task_serializer_class(many=True)})
     @action(detail=True, methods=["get"])
     def tasks(self, request, pk=None):
         """
