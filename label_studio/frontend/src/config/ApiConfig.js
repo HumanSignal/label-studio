@@ -16,8 +16,11 @@ export const API_CONFIG = {
 
     // Config and Import
     configTemplates: "/templates",
+    validateConfig: "POST:/projects/:pk/validate",
+    createSampleTask: "POST:/projects/:pk/sample-task",
     deleteFileUploads: "DELETE:/projects/:pk/file-uploads",
     reimportFiles: "POST:/projects/:pk/reimport",
+    dataSummary: "/projects/:pk/summary",
 
     // DM
     deleteTabs: 'DELETE:/dm/views/reset',
