@@ -518,12 +518,26 @@ class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
             raise RestValidationError('Label config is not set or empty')
 
         # check new config includes meaningful changes
-        config_essential_data_has_changed = False
-        if parse_config(label_config) != parse_config(project.label_config):
-            config_essential_data_has_changed = True
+        config_essential_data_has_changed = self.config_essential_data_has_changed(label_config, project.label_config)
 
         project.validate_config(label_config)
         return Response({'config_essential_data_has_changed': config_essential_data_has_changed}, status=status.HTTP_200_OK)
+
+    @classmethod
+    def config_essential_data_has_changed(cls, new_config_str, old_config_str):
+        new_config = parse_config(new_config_str)
+        old_config = parse_config(old_config_str)
+
+        for tag, new_info in new_config.items():
+            if tag not in old_config:
+                return True
+            old_info = old_config[tag]
+            if new_info['type'] != old_info['type']:
+                return True
+            if new_info['inputs'] != old_info['inputs']:
+                return True
+            if not set(old_info['labels']).issubset(new_info['labels']):
+                return True
 
 
 class ProjectDuplicateAPI(APIView):
