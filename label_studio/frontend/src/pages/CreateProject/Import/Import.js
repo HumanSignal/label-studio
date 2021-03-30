@@ -3,6 +3,7 @@ import { Modal } from '../../../components/Modal/Modal';
 import { cn } from '../../../utils/bem';
 import { unique } from '../../../utils/helpers';
 import "./Import.styl";
+import { IconUpload, IconInfo } from '../../../assets/icons';
 
 
 const importClass = cn("upload_page");
@@ -53,7 +54,7 @@ function getFiles(files) {
 const Footer = () => {
   return (
     <Modal.Footer>
-      <img className={importClass.elem("info-icon")} src="/static/icons/info.svg" height="20" />
+      <IconInfo className={importClass.elem("info-icon")} width="20" height="20" />
       See the&nbsp;documentation to <a target="_blank" href="https://labelstud.io/guide/predictions.html">import preannotated data</a>{" "}
       or&nbsp;to <a target="_blank" href="https://labelstud.io/guide/storage.html">sync data from a&nbsp;database or&nbsp;cloud storage</a>.
     </Modal.Footer>
@@ -249,7 +250,7 @@ export const ImportPage = ({
         </form>
         <span>or</span>
         <button onClick={() => document.getElementById('file-input').click()} className={importClass.elem("upload-button")}>
-          <img src="/static/images/upload.svg" height="16" className={importClass.elem("upload-icon")} />
+          <IconUpload width="16" height="16" className={importClass.elem("upload-icon")} />
           Upload {files.uploaded.length ? "More " : ""}Files
         </button>
         <div className={importClass.elem("csv-handling").mod({ highlighted: highlightCsvHandling, hidden: !csvHandling })}>
@@ -278,7 +279,7 @@ export const ImportPage = ({
             <label htmlFor="file-input">
               <div className={dropzoneClass.elem("content")}>
                 <header>Drag & drop files here<br/>or click to browse</header>
-                <img src="/static/images/upload.svg" height="64" className={dropzoneClass.elem("icon")} />
+                <IconUpload height="64" className={dropzoneClass.elem("icon")} />
                 <dl>
                   <dt>Text</dt><dd>txt</dd>
                   <dt>Audio</dt><dd>wav, aiff, mp3, au, flac, m4a, ogg</dd>
