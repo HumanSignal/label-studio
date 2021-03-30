@@ -11,7 +11,7 @@ Set up the following cloud and other storage systems with Label Studio:
 - [Google Cloud Storage](#Google-Cloud-Storage)
 - [Microsoft Azure Blob storage](#Microsoft-Azure-Blob-storage)
 - [Redis database](#Redis-database)
-<!--- [Local storage](#Local-storage)-->
+- [Local storage](#Local-storage)
 
 Each source and target storage setup is project-specific. You can connect multiple buckets as source or target storage for a project. 
 
@@ -283,7 +283,6 @@ Run the following command to launch Label Studio, configure the connection to yo
 label-studio start my_project --init --db redis 
 ```
 
-<!--
 ## Local storage
 If you have local files that you want to add to Label Studio from a specific directory, you can set up a specific local directory as source or target storage. 
 
@@ -308,6 +307,6 @@ You can specify additional parameters from the Label Studio UI.
 | prefix | Specify an internal folder or container | empty | 
 | regex | Specify a regular expression to filter directory objects. Use ".*" to collect all objects. | Skips all directory objects. |
 | use_blob_urls | If true, treat every directory object as a source file. Use for resources like JPG, MP3, or similar file types. If false, directory objects are interpreted as tasks in Label Studio JSON format with one object per task. | false |
--->
+
 
 
