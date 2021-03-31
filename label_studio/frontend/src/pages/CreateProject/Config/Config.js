@@ -372,6 +372,8 @@ export const ConfigPage = ({ config: initialConfig = "", columns: externalColumn
     if (!project || columns) return;
     const res = await api.callApi("dataSummary", {
       params: { pk: project.id },
+      // 404 is ok, and errors here don't matter
+      errorFilter: () => true,
     });
     if (res?.common_data_columns) {
       setColumns(res.common_data_columns);
