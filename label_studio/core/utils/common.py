@@ -26,6 +26,7 @@ from django.template import loader
 from django.http import HttpResponse
 from django.utils.timezone import now
 from django.utils.crypto import get_random_string
+from django.utils.module_loading import import_string
 from django.core.paginator import Paginator
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
@@ -64,7 +65,6 @@ from core.utils.params import (
 
 logger = logging.getLogger(__name__)
 url_validator = URLValidator()
-get_object_with_check_and_log = settings.GET_OBJECT_WITH_CHECK_AND_LOG
 
 
 def _override_exceptions(exc):
@@ -632,3 +632,65 @@ def collect_versions(force=False):
     return result
 
 
+def get_organization_from_request(request):
+    """Helper for backward compatability with org_pk in session """
+    # TODO remove session logic in next release
+    user = request.user
+    if user and user.is_authenticated:
+        if user.active_organization is None:
+            organization_pk = request.session.get('organization_pk')
+            if organization_pk:
+                user.active_organization_id = organization_pk
+                user.save()
+                request.session.pop('organization_pk', None)
+                request.session.modified = True
+        return user.active_organization_id
+
+
+def load_func(func_string):
+    """
+    If the given setting is a string import notation,
+    then perform the necessary import or imports.
+    """
+    if func_string is None:
+        return None
+    elif isinstance(func_string, str):
+        return import_from_string(func_string)
+    return func_string
+
+
+def import_from_string(func_string):
+    """
+    Attempt to import a class from a string representation.
+    """
+    try:
+        return import_string(func_string)
+    except ImportError:
+        msg = f"Could not import {func_string} from settings"
+        raise ImportError(msg)
+
+
+get_object_with_check_and_log = load_func(settings.GET_OBJECT_WITH_CHECK_AND_LOG)
+
+
+class temporary_disconnect_signal:
+    """ Temporarily disconnect a model from a signal """
+    def __init__(self, signal, receiver, sender, dispatch_uid=None):
+        self.signal = signal
+        self.receiver = receiver
+        self.sender = sender
+        self.dispatch_uid = dispatch_uid
+
+    def __enter__(self):
+        self.signal.disconnect(
+            receiver=self.receiver,
+            sender=self.sender,
+            dispatch_uid=self.dispatch_uid
+        )
+
+    def __exit__(self, type_, value, traceback):
+        self.signal.connect(
+            receiver=self.receiver,
+            sender=self.sender,
+            dispatch_uid=self.dispatch_uid
+        )

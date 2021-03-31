@@ -65,7 +65,6 @@ def _get_config(config_path):
 
 def _create_project(title, user, label_config=None, sampling=None, description=None):
     from projects.models import Project
-    from users.models import User
     from organizations.models import Organization
 
     project = Project.objects.filter(title=title).first()
@@ -132,12 +131,16 @@ def _create_user(input_args, config):
 
 def _init(input_args, config):
     if not _project_exists(input_args.project_name):
+        from projects.models import Project
+        sampling_map = {'sequential': Project.SEQUENCE, 'uniform': Project.UNIFORM,
+                        'prediction-score-min': Project.UNCERTAINTY}
         user = _create_user(input_args, config)
         _create_project(
             title=input_args.project_name,
             user=user,
             label_config=input_args.label_config,
             description=input_args.project_desc,
+            sampling=sampling_map.get(input_args.sampling, 'sequential')
         )
     else:
         print('Project "{0}" already exists'.format(input_args.project_name))
@@ -224,7 +227,6 @@ def main():
 
     if input_args.data_dir:
         data_dir_path = pathlib.Path(input_args.data_dir)
-        print(data_dir_path)
         os.environ.setdefault("LABEL_STUDIO_BASE_DATA_DIR", str(data_dir_path.absolute()))
 
     config = _get_config(input_args.config_path)
@@ -268,6 +270,8 @@ def main():
     elif input_args.command == 'start' and input_args.project_name != '.':
         from label_studio.core.old_ls_migration import migrate_existing_project
         from projects.models import Project
+        sampling_map = {'sequential': Project.SEQUENCE, 'uniform': Project.UNIFORM,
+                        'prediction-score-min': Project.UNCERTAINTY}
 
         if not _project_exists(input_args.project_name):
             migrated = False
@@ -279,8 +283,6 @@ def main():
                 config = _get_config(config_path)
                 user = _create_user(input_args, config)
                 label_config_path = project_path / 'config.xml'
-                choices = (['sequential', 'uniform'],)
-                sampling_map = {'sequential': Project.SEQUENCE, 'uniform': Project.UNIFORM}
                 project = _create_project(
                     title=input_args.project_name,
                     user=user,

@@ -1,6 +1,6 @@
 {
-  "message": "Fix hotkeys mapping",
-  "commit": "b33e3cc23652823a9e83dd2b378694119125d186",
+  "message": "Fix task loading by url",
+  "commit": "96e368243462b749416853c3d7bc9945935c26cc",
   "branch": "master",
-  "date": "2021-03-23T17:13:41Z"
+  "date": "2021-03-25T22:50:11Z"
 }

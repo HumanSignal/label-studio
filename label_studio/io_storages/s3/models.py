@@ -16,7 +16,8 @@ from io_storages.base_models import ImportStorage, ImportStorageLink, ExportStor
 from io_storages.utils import get_uri_via_regex
 from io_storages.s3.utils import get_client_and_resource, resolve_s3_url
 from tasks.validation import ValidationError as TaskValidationError
-from tasks.serializers import AnnotationSerializer, TaskSerializerBulk
+from io_storages.serializers import StorageAnnotationSerializer
+from tasks.serializers import TaskSerializerBulk
 from tasks.models import Annotation
 
 logger = logging.getLogger(__name__)
@@ -72,7 +73,14 @@ class S3StorageMixin(models.Model):
     def validate_connection(self, client=None):
         if client is None:
             client = self.get_client()
-        client.head_bucket(Bucket=self.bucket)
+        if self.prefix:
+            logger.debug(f'Test connection to bucket {self.bucket} with prefix {self.prefix}')
+            result = client.list_objects_v2(Bucket=self.bucket, Prefix=self.prefix, MaxKeys=1)
+            if not result.get('KeyCount'):
+                raise KeyError(f's3://{self.bucket}/{self.prefix} not found.')
+        else:
+            logger.debug(f'Test connection to bucket {self.bucket}')
+            client.head_bucket(Bucket=self.bucket)
 
     @property
     def path_full(self):
@@ -178,7 +186,7 @@ class S3ExportStorage(S3StorageMixin, ExportStorage):
     def save_annotation(self, annotation):
         client, s3 = self.get_client_and_resource()
         logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
-        ser_annotation = AnnotationSerializer(annotation).data
+        ser_annotation = StorageAnnotationSerializer(annotation).data
         with transaction.atomic():
             # Create export storage link
             link = S3ExportStorageLink.create(annotation, self)

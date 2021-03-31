@@ -106,6 +106,12 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
     
     def retrieve(self, request, *args, **kwargs):
         task = self.get_object()
+
+        # call machine learning api and format response
+        if task.project.show_collab_predictions:
+            for ml_backend in task.project.ml_backends.all():
+                ml_backend.predict_one_task(task)
+
         result = self.get_serializer(task).data
 
         # use proxy inlining to task data (for credential access)

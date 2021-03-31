@@ -47,7 +47,7 @@ def parse_input_args():
     root_parser.add_argument(
         '--sampling',
         dest='sampling',
-        choices=['sequential', 'uniform'],
+        choices=['sequential', 'uniform', 'prediction-score-min'],
         default='sequential',
         help='Sampling type that defines order for labeling tasks',
     )

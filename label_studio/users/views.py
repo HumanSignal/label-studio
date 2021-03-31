@@ -7,10 +7,12 @@ from django.contrib.auth import views as auth_views
 from django.shortcuts import render, redirect, reverse
 from django.contrib import auth
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 from rest_framework.authtoken.models import Token
 
 from users import forms
 from core.permissions import view_with_auth, IsBusiness
+from users.functions import proceed_registration
 from organizations.models import Organization
 from organizations.forms import OrganizationSignupForm
 
@@ -41,42 +43,12 @@ def logout(request):
     return redirect('/')
 
 
-def save_user(request, *args):
-    """ Save user instance to DB
-    """
-    next_page, user_form, organization_form = args
-
-    user = user_form.save()
-    user.username = user.email.split('@')[0]
-    user.save()
-
-    redirect_url = next_page if next_page else reverse('projects:project-index')
-    auth.login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-    return user, redirect_url
-
-
-def proceed_registration(request, user_form, organization_form, next_page):
-    """ Register a new user for POST user_signup
-    """
-    # save user to db
-    user, redirect_url = save_user(request, next_page, user_form, organization_form)
-
-    if Organization.objects.exists():
-        org = Organization.objects.first()
-        org.add_user(user)
-    else:
-        org = Organization.create_organization(created_by=user, title='Label Studio')
-    request.session['organization_pk'] = org.pk
-    request.session.modified = True
-
-    return redirect(redirect_url)
-
-
 def user_signup(request):
     """ Sign up page
     """
     user = request.user
     next_page = request.GET.get('next')
+    token = request.GET.get('token')
     next_page = next_page if next_page else reverse('projects:project-index')
     user_form = forms.UserSignupForm()
     organization_form = OrganizationSignupForm()
@@ -86,6 +58,11 @@ def user_signup(request):
 
     # make a new user
     if request.method == 'POST':
+        organization = Organization.objects.first()
+        if settings.DISABLE_SIGNUP_WITHOUT_LINK is True:
+            if not(token and organization and token == organization.token):
+                raise PermissionDenied()
+
         user_form = forms.UserSignupForm(request.POST)
         organization_form = OrganizationSignupForm(request.POST)
 
@@ -97,7 +74,8 @@ def user_signup(request):
     return render(request, 'users/user_signup.html', {
         'user_form': user_form,
         'organization_form': organization_form,
-        'next': next_page
+        'next': next_page,
+        'token': token,
     })
 
 
@@ -120,8 +98,8 @@ def user_login(request):
 
             # user is organization member
             org_pk = Organization.find_by_user(user).pk
-            request.session['organization_pk'] = org_pk
-            request.session.modified = True
+            user.active_organization_id = org_pk
+            user.save(update_fields=['active_organization'])
             return redirect(next_page)
 
     return render(request, 'users/user_login.html', {
@@ -134,7 +112,7 @@ def user_login(request):
 def user_account(request):
     user = request.user
 
-    if 'organization_pk' not in request.session:
+    if user.active_organization is None and 'organization_pk' not in request.session:
         return redirect(reverse('main'))
 
     form = forms.UserProfileForm(instance=user)

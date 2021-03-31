@@ -3,6 +3,7 @@
 import ujson as json
 
 import json
+import pytest
 import requests_mock
 import requests
 
@@ -92,6 +93,44 @@ def gcs_client_mock():
         yield
 
 
+@contextmanager
+def azure_client_mock():
+    from io_storages.azure_blob import models 
+    from collections import namedtuple
+
+    File = namedtuple('File', ['name'])
+
+    class DummyAzureBlob:
+        def __init__(self, container_name, key):
+            self.key = key
+            self.container_name = container_name
+        def download_as_string(self):
+            return f'test_blob_{self.key}'
+        def upload_from_string(self, string):
+            print(f'String {string} uploaded to bucket {self.container_name}')
+        def generate_signed_url(self, **kwargs):
+            return f'https://storage.googleapis.com/{self.container_name}/{self.key}'
+
+    class DummyAzureContainer:
+        def __init__(self, container_name, **kwargs):
+            self.name = container_name
+        def list_blobs(self, name_starts_with):
+            return [File('abc'), File('def'), File('ghi')]
+        def blob(self, key):
+            return DummyAzureBlob(self.name, key)
+
+    class DummyAzureClient():
+        def get_container_client(self, container_name):
+            return DummyAzureContainer(container_name)
+
+    # def dummy_generate_blob_sas(*args, **kwargs):
+    #     return 'token'
+
+    with mock.patch.object(models.BlobServiceClient, 'from_connection_string', return_value=DummyAzureClient()):
+        with mock.patch.object(models, 'generate_blob_sas', return_value='token'):
+            yield
+
+
 def upload_data(client, project, tasks):
     tasks = TaskWithAnnotationsSerializer(tasks, many=True).data
     data = [{'data': task['data'], 'annotations': task['annotations']} for task in tasks]
@@ -105,6 +144,18 @@ def make_project(config, user, use_ml_backend=True, team_id=None):
         MLBackend.objects.create(project=project, url='http://localhost:8999')
 
     return project
+
+
+@pytest.fixture
+@pytest.mark.django_db
+def project_id(business_client):
+    payload = dict(title="test_project")
+    response = business_client.post(
+        "/api/projects/",
+        data=json.dumps(payload),
+        content_type="application/json",
+    )
+    return response.json()["id"]
 
 
 def make_task(config, project):

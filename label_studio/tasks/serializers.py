@@ -85,7 +85,7 @@ class AnnotationSerializer(DynamicFieldsMixin, ModelSerializer):
         if len(user.last_name):
             name = name + " " + user.last_name
 
-        name += f' ({user.email}, {user.id})'
+        name += f' {user.email}, {user.id}'
         return name
 
     def get_ground_truth(self, annotation):
@@ -120,8 +120,9 @@ class TaskSerializer(ModelSerializer):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['annotations'] = AnnotationSerializer(many=True, read_only=False, required=False,
-                                                          context=self.context)
+        if self.context.get('include_annotations', True):
+            self.fields['annotations'] = AnnotationSerializer(many=True, read_only=False, required=False,
+                                                              context=self.context)
 
     def project(self):
         """ Take the project from context
@@ -219,6 +220,18 @@ class TaskSerializerBulk(serializers.ListSerializer):
 
         return ret
 
+    @staticmethod
+    def get_completed_by_id(annotation, default=None):
+        completed_by = annotation.get('completed_by', None)
+        # user id as is
+        if completed_by and isinstance(completed_by, int):
+            return completed_by
+        # user dict
+        if completed_by and isinstance(completed_by, dict):
+            return completed_by.get('id')
+
+        return default
+
     @retry_database_locked()
     def create(self, validated_data):
         """ Create Tasks and Annotations in bulk
@@ -238,11 +251,16 @@ class TaskSerializerBulk(serializers.ListSerializer):
                 task_predictions.append(task.pop('predictions', []))
 
             # check annotator permissions for completed by
-            project_annotator_ids = project.annotators().values_list('id', flat=True)
-            annotator_ids = set([annotation.get('completed_by')
-                                 for annotations in task_annotations for annotation in annotations])
+            organization = user.active_organization \
+                if not project.created_by.active_organization else project.created_by.active_organization
+            project_user_ids = organization.members.values_list('user__id', flat=True)
+            annotator_ids = set()
+            for annotations in task_annotations:
+                for annotation in annotations:
+                    annotator_ids.add(self.get_completed_by_id(annotation))
+
             for i in annotator_ids:
-                if i not in project_annotator_ids and i is not None:
+                if i not in project_user_ids and i is not None:
                     raise ValidationError(f'Annotations with "completed_by"={i} are produced by annotator '
                                           f'who is not allowed for this project as invited annotator or team member')
 
@@ -277,8 +295,9 @@ class TaskSerializerBulk(serializers.ListSerializer):
                     if 'ground_truth' in annotation:
                         ground_truth = annotation.pop('ground_truth', True)
 
-                    completed_by_id = annotation.pop('completed_by', user.id if user else None)
-                    completed_by_id = int(completed_by_id) if completed_by_id is not None else None
+                    # get user id
+                    completed_by_id = self.get_completed_by_id(annotation, default=user.id if user else None)
+                    annotation.pop('completed_by', None)
 
                     db_annotations.append(Annotation(task=self.db_tasks[i],
                                                      ground_truth=ground_truth,

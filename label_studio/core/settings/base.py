@@ -145,8 +145,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'core.middleware.CommonMiddlewareAppendSlashWithoutRedirect',  # instead of 'CommonMiddleware'
-    'organizations.middleware.GetSessionMiddleware',
-    'core.middleware.DRFResponseFormatter',  # auto formatter for DRF responses, it must be after GetSessionMiddleware!
+    'core.middleware.DRFResponseFormatter',
     'django_user_agents.middleware.UserAgentMiddleware',
     'core.middleware.SetSessionUIDMiddleware',
     'core.middleware.ContextLogMiddleware',
@@ -195,6 +194,8 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend'
 ]
 USE_USERNAME_FOR_LOGIN = False
+
+DISABLE_SIGNUP_WITHOUT_LINK = get_bool_env('DISABLE_SIGNUP_WITHOUT_LINK', False)
 
 # Password validation:
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
@@ -332,10 +333,10 @@ def user_auth(user_model, email, password):
 
 PROJECT_DELETE = project_delete
 USER_AUTH = user_auth
+CREATE_ORGANIZATION = 'organizations.functions.create_organization'
+GET_OBJECT_WITH_CHECK_AND_LOG = 'core.utils.get_object.get_object_with_check_and_log'
+SAVE_USER = 'users.functions.save_user'
 
-from core.utils.get_object import get_object_with_check_and_log
-
-GET_OBJECT_WITH_CHECK_AND_LOG = get_object_with_check_and_log
 
 # fix a problem with Windows mimetypes for JS and PNG
 import mimetypes

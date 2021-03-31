@@ -17,7 +17,7 @@ from django.dispatch import receiver
 from core.utils.params import get_env
 from io_storages.base_models import ImportStorage, ImportStorageLink, ExportStorage, ExportStorageLink
 from io_storages.utils import get_uri_via_regex
-from tasks.serializers import AnnotationSerializer
+from io_storages.serializers import StorageAnnotationSerializer
 from tasks.models import Annotation
 
 
@@ -92,12 +92,12 @@ class AzureBlobImportStorage(ImportStorage, AzureBlobStorageMixin):
                 logger.debug(file.name + ' is skipped by regex filter')
                 continue
 
-            yield file
+            yield file.name
 
     def get_data(self, key):
         if self.use_blob_urls:
             data_key = settings.DATA_UNDEFINED_NAME
-            return {data_key: f'{url_scheme}://{self.container}/{key["name"]}'}
+            return {data_key: f'{url_scheme}://{self.container}/{key}'}
 
         container = self.get_container()
         blob = container.download_blob(key)
@@ -139,7 +139,7 @@ class AzureBlobExportStorage(ExportStorage, AzureBlobStorageMixin):
     def save_annotation(self, annotation):
         container = self.get_container()
         logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
-        ser_annotation = AnnotationSerializer(annotation).data
+        ser_annotation = StorageAnnotationSerializer(annotation).data
         with transaction.atomic():
             # Create export storage link
             link = AzureBlobExportStorageLink.create(annotation, self)

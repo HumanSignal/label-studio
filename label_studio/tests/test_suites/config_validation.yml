@@ -18,20 +18,28 @@
       status_code: 201
 
   # validate unexisted field - ERROR
-  - /api/projects/{pk}/validate?label_config=<View>%20<Text%20name="text"%20value="$text"/>%20</View>:
-      method: GET
+  - /api/projects/{pk}/validate:
+      method: POST
+      content_type: application/json
       status_code: 400
+      data:
+        label_config: <View> <Text name="text" value="$text"/></View>
 
   # validate "keyA" field which is uncommon across all imported tasks - ERROR
-  - /api/projects/{pk}/validate?label_config=<View>%20<Text%20name="text"%20value="$keyA"/>%20</View>:
-      method: GET
+  - /api/projects/{pk}/validate:
+      method: POST
+      content_type: application/json
       status_code: 400
+      data:
+        label_config: <View> <Text name="text" value="$text"/></View>
 
   # validate common "keyB" field - OK!
-  - /api/projects/{pk}/validate?label_config=<View>%20<Text%20name="text"%20value="$keyB"/>%20</View>:
-      method: GET
+  - /api/projects/{pk}/validate:
+      method: POST
+      content_type: application/json
       status_code: 200
-
+      data:
+        label_config: <View> <Text name="text" value="$keyB"/> </View>
 
 - try_removing_created_labels:
     - /api/projects:

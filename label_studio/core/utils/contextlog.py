@@ -98,7 +98,9 @@ class ContextLog(object):
             except Exception as exc:
                 logger.error(exc, exc_info=True)
             else:
-                pass  # logger.debug(json.dumps(payload, indent=2))
+                if get_bool_env('DEBUG_CONTEXTLOG', False):
+                    logger.debug(json.dumps(payload, indent=2))
+                pass
         else:
             # ignore specific events
             if not self.collect_analytics or self._exclude_endpoint(request):

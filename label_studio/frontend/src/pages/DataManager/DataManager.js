@@ -97,7 +97,6 @@ export const DataManagerPage = ({...props}) => {
   }, [dataManagerRef]);
 
   useEffect(() => {
-    console.log({DataManager, LabelStudio});
     init();
 
     return () => destroyDM();
@@ -223,7 +222,7 @@ DataManagerPage.context = ({dmRef}) => {
           key={path}
           tag={NavLink}
           size="compact"
-          to={generatePath(`/projects/:id${path}`, {id: project.id})}
+          to={`/projects/${project.id}${path}`}
           data-external
         >
           {label}

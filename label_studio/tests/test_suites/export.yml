@@ -1,0 +1,44 @@
+- simple_export:
+    - /api/projects:
+        method: POST
+        content_type: application/json
+        data:
+          label_config: <View><Text name="text" value="$text"/><Choices name="label" toName="text"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+        status_code: 201
+        response:
+          id: '{pk}'
+
+    # Import files
+    - /api/projects/{pk}/import:
+        method: POST
+        content_type: multipart/form-data
+        data:
+          file: samples/lines.txt
+        status_code: 201
+        response:
+          task_count: 3
+          annotation_count: 0
+          prediction_count: 0
+
+    # Get next task
+    - /api/projects/{pk}/next:
+        method: GET
+        status_code: 200
+        response:
+          id: '{task_pk}'
+
+    # Annotate this task
+    - /api/tasks/{task_pk}/annotations:
+        method: POST
+        content_type: application/json
+        data:
+          result: [{'value': {'choices': ['pos']}, 'from_name': 'label', 'to_name': 'text', 'type': 'choices'}]
+          lead_time: 34.56
+        status_code: 201
+        response:
+          id: '{annotation_pk}'
+
+    # Export data
+    - /api/projects/{pk}/export:
+        method: GET
+        status_code: 200

@@ -1,6 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import drf_yasg.openapi as openapi
+import json
 import logging
 import numpy as np
 import pathlib
@@ -21,7 +22,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView, exception_handler
 
-from core.utils.common import conditional_atomic
+from core.utils.common import conditional_atomic, get_organization_from_request
 from core.label_config import parse_config
 from organizations.models import Organization
 from organizations.permissions import *
@@ -104,11 +105,11 @@ class ProjectListAPI(generics.ListCreateAPIView):
     List your projects
 
     Return a list of the projects that you've created.
-    
+
     post:
     Create new project
 
-    Create a labeling project.  
+    Create a labeling project.
     """
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_classes = (IsBusiness, ProjectAPIOrganizationPermission)
@@ -117,7 +118,7 @@ class ProjectListAPI(generics.ListCreateAPIView):
     ordering = ['-created_at']
 
     def get_queryset(self):
-        org_pk = self.request.session.get('organization_pk')
+        org_pk = get_organization_from_request(self.request)
         org = get_object_with_check_and_log(self.request, Organization, pk=org_pk)
         self.check_object_permissions(self.request, org)
         return Project.objects.all()
@@ -129,7 +130,7 @@ class ProjectListAPI(generics.ListCreateAPIView):
 
     def perform_create(self, ser):
         # get organization
-        org_pk = self.request.session.get('organization_pk')
+        org_pk = get_organization_from_request(self.request)
         org = get_object_with_check_and_log(self.request, Organization, pk=org_pk)
         self.check_object_permissions(self.request, org)
 
@@ -375,8 +376,9 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
             next_task.set_lock(request.user)
 
         # call machine learning api and format response
-        for ml_backend in project.ml_backends.all():
-            ml_backend.predict_one_task(next_task)
+        if project.show_collab_predictions:
+            for ml_backend in project.ml_backends.all():
+                ml_backend.predict_one_task(next_task)
 
         # serialize task
         context = {'request': request, 'project': project, 'resolve_uri': True,
@@ -509,17 +511,33 @@ class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
     @swagger_auto_schema(tags=['Projects'], operation_summary='Validate a label config', manual_parameters=[
                             openapi.Parameter(name='label_config', type=openapi.TYPE_STRING, in_=openapi.IN_QUERY,
                                               description='labeling config')])
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         project = self.get_object()
-        label_config = self.request.query_params.get('label_config')
+        label_config = self.request.data.get('label_config')
+        if not label_config:
+            raise RestValidationError('Label config is not set or empty')
 
         # check new config includes meaningful changes
-        config_essential_data_has_changed = False
-        if parse_config(label_config) != parse_config(project.label_config):
-            config_essential_data_has_changed = True
+        config_essential_data_has_changed = self.config_essential_data_has_changed(label_config, project.label_config)
 
         project.validate_config(label_config)
         return Response({'config_essential_data_has_changed': config_essential_data_has_changed}, status=status.HTTP_200_OK)
+
+    @classmethod
+    def config_essential_data_has_changed(cls, new_config_str, old_config_str):
+        new_config = parse_config(new_config_str)
+        old_config = parse_config(old_config_str)
+
+        for tag, new_info in new_config.items():
+            if tag not in old_config:
+                return True
+            old_info = old_config[tag]
+            if new_info['type'] != old_info['type']:
+                return True
+            if new_info['inputs'] != old_info['inputs']:
+                return True
+            if not set(old_info['labels']).issubset(new_info['labels']):
+                return True
 
 
 class ProjectDuplicateAPI(APIView):
@@ -654,7 +672,10 @@ class ProjectSampleTask(generics.RetrieveAPIView):
     serializer_class = ProjectSerializer
     swagger_schema = None
 
-    def retrieve(self, request, *args, **kwargs):
-        config = request.GET.get('label_config')
+    def post(self, request, *args, **kwargs):
+        label_config = self.request.data.get('label_config')
+        if not label_config:
+            raise RestValidationError('Label config is not set or empty')
+
         project = self.get_object()
-        return Response({'sample_task': project.get_sample_task(config)}, status=200)
+        return Response({'sample_task': project.get_sample_task(label_config)}, status=200)

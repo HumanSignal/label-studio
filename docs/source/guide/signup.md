@@ -22,11 +22,17 @@ If you want, you can create an account from the command line when you start Labe
 label-studio start --username <username> --password <password>
 ```
 
+To restrict who has access to your Label Studio instance, you can invite collaborators directly. 
+
 ## Invite collaborators to a project
 
-After you [set up a labeling project](setup.html), invite annotators to the project to start collaborating on the dataset and the labeling tasks. 
+After you [set up a labeling project](setup.html), invite annotators to the project to start collaborating on labeling tasks. 
 
-## Manage created accounts in Label Studio
+1. In the Label Studio UI, click the hamburger icon and click **People**.
+2. 
+
+
+## Manage your account in Label Studio
 After you create an account in Label Studio, you can make changes to it as needed.
 
 1. From the Label Studio UI, click the user icon in the upper right.
@@ -34,6 +40,12 @@ After you create an account in Label Studio, you can make changes to it as neede
 3. Update your display name and add a profile picture no larger than 512 x 512 pixels. 
 4. Click **Save**. 
 
+## Review existing accounts in Label Studio
+You can review the existing accounts in Label Studio to see which people created which projects, and to which projects they contributed annotations. 
+
+1. From the Label Studio UI, click the hamburger icon and click **People**.
+2. Review the list of users by email address and name. You can see the last time a user was active in Label Studio.
+3. Click a row to see additional detail about a specific user, including the projects that they created or contributed annotations to.
 
 ### Reset password
 If you forget your password or change passwords regularly for security reasons, you can change it from the command line.

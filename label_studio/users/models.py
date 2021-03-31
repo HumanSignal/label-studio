@@ -95,6 +95,8 @@ class User(AbstractBaseUser, PermissionsMixin, UserLastActivityMixin):
 
     activity_at = models.DateTimeField(_('last annotation activity'), auto_now=True)
 
+    active_organization = models.ForeignKey('organizations.Organization', on_delete=models.SET_NULL, related_name='active_users', null=True)
+
     objects = UserManager()
 
     EMAIL_FIELD = 'email'

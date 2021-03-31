@@ -1,6 +1,7 @@
 title: Question Answering
 type: community
 group: Natural Language Processing
+order: 1
 image: /static/templates/question-answering.png
 details: <h1>Select an answer from text</h1>
 config: '

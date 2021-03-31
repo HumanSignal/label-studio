@@ -244,7 +244,12 @@ const Configurator = ({ columns, config, project, template, setTemplate, onBrows
     if (!configToCheck) return;
     const c = encodeURIComponent(configToCheck);
     let res;
-    res = await fetch(`/api/projects/${project.id}/validate?label_config=${c}`);
+    res = await fetch(`/api/projects/${project.id}/validate`, {
+      method: "post",
+      body: JSON.stringify({label_config: configToCheck}),
+      headers: { "Content-Type": "application/json" },
+    });
+
     if (!res.ok) {
       res = await res.json();
       setError(res);
@@ -254,7 +259,12 @@ const Configurator = ({ columns, config, project, template, setTemplate, onBrows
       onValidate?.(await res.json());
     }
 
-    res = await fetch(`/api/projects/${project.id}/sample-task?label_config=${c}`);
+    res = await fetch(`/api/projects/${project.id}/sample-task`, {
+      method: "post",
+      body: JSON.stringify({label_config: configToCheck}),
+      headers: { "Content-Type": "application/json" },
+    });
+
     const ok = res.ok;
     res = await res.json();
     if (ok) {
