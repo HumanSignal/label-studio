@@ -36,7 +36,7 @@ If using other web browsers, or older versions of supported web browsers, unexpe
 
 ## Install with pip
 
-To install Label Studio via pip, you need Python>=3.6 and run:
+To install Label Studio using pip, you need Python>=3.6 and run:
 ```bash
 pip install label-studio
 ```
@@ -57,7 +57,7 @@ Label Studio is also available as a Docker container. Make sure you have [Docker
 ### Install with Docker on *nix
 To install and start Label Studio at [http://localhost:8080](http://localhost:8080), storing all labeling data in `./my_project` directory, run the following:
 ```bash
-docker run -it -p 8080:8080 -v `pwd`/mydata:/root/.local/share/label-studio/ heartexlabs/label-studio:latest
+docker run -it -p 8080:8080 -v `pwd`/mydata:/label-studio/data heartexlabs/label-studio:latest
 ```
 
 ### Install with Docker on Windows
@@ -66,7 +66,7 @@ Or for Windows, you have to modify the volumes paths set by `-v` option.
 #### Override the default Docker install
 You can override the default Docker install by appending new arguments: 
 ```bash
-docker run -it -p 8080:8080 -v `pwd`/mydata:/root/.local/share/label-studio/ heartexlabs/label-studio:latest label-studio --log-level DEBUG
+docker run -it -p 8080:8080 -v `pwd`/mydata:/label-studio/data heartexlabs/label-studio:latest label-studio --log-level DEBUG
 ```
 
 ### Build a local image with Docker
@@ -82,6 +82,8 @@ Start Label Studio:
 ```bash
 docker-compose up -d
 ```
+
+This starts Label Studio with a PostgreSQL database backend. You can also use a PostgreSQL database without Docker Compose. See [Set up database storage](storedata.html).
 
 ## Install from source
 
@@ -153,6 +155,7 @@ The most important change to be aware of is changes to rename "completions" to "
 If you customized the Label Studio Frontend, see the [Frontend reference guide](frontend_reference.html) for required updates to maintain compatibility with version 1.0.0.  
 
 
+<<<<<<< HEAD
 ## Database storage
 Label Studio uses a database to store project data and configuration information. 
 
@@ -190,3 +193,5 @@ POSTGRE_PORT=5432
 POSTGRE_HOST=db
 ```
 
+=======
+>>>>>>> a9188a99231d9a8893f3ec57feb8618492ad1307

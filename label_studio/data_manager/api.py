@@ -100,6 +100,17 @@ class ViewAPI(viewsets.ModelViewSet):
         queryset.all().delete()
         return Response(status=204)
 
+    @staticmethod
+    def evaluate_predictions(tasks):
+        # call machine learning api and format response
+        for task in tasks:
+            project = task.project
+            if not project.show_collab_predictions:
+                return
+
+            for ml_backend in project.ml_backends.all():
+                ml_backend.predict_one_task(task)
+
     @swagger_auto_schema(tags=['Data Manager'], responses={200: task_serializer_class(many=True)})
     @action(detail=True, methods=["get"])
     def tasks(self, request, pk=None):
@@ -113,12 +124,16 @@ class ViewAPI(viewsets.ModelViewSet):
         queryset = Task.prepared.all(prepare_params=view.get_prepare_tasks_params())
         context = {'proxy': bool_from_request(request.GET, 'proxy', True), 'resolve_uri': True}
 
+        # paginated tasks
         self.pagination_class = TaskPagination
         page = self.paginate_queryset(queryset)
         if page is not None:
+            self.evaluate_predictions(page)
             serializer = self.task_serializer_class(page, many=True, context=context)
             return self.get_paginated_response(serializer.data)
 
+        # all tasks
+        self.evaluate_predictions(queryset)
         serializer = self.task_serializer_class(queryset, many=True, context=context)
         return Response(serializer.data)
 
