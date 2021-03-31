@@ -251,7 +251,9 @@ class TaskSerializerBulk(serializers.ListSerializer):
                 task_predictions.append(task.pop('predictions', []))
 
             # check annotator permissions for completed by
-            project_user_ids = project.created_by.active_organization.members.values_list('user__id', flat=True)
+            organization = user.active_organization \
+                if not project.created_by.active_organization else project.created_by.active_organization
+            project_user_ids = organization.members.values_list('user__id', flat=True)
             annotator_ids = set()
             for annotations in task_annotations:
                 for annotation in annotations:
