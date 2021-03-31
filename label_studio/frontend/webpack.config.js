@@ -64,7 +64,7 @@ module.exports = {
         enforce: "pre",
         exclude: /node_modules/,
         use: [
-          babelLoader,
+          'babel-loader',
           'source-map-loader',
         ],
       },
@@ -73,7 +73,7 @@ module.exports = {
         enforce: "pre",
         exclude: /node_modules/,
         use: [
-          babelLoader,
+          'babel-loader',
           'source-map-loader',
         ],
       },

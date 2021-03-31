@@ -86,4 +86,4 @@ In this example there are 3 results inside of 1 prediction:
 - `result3` - choice selection 
  
 In the Label Studio UI, the imported prediction for this task looks like the following: 
-<center><img src="../images/predictions-loaded.png" style="width: 100%; max-width: 700px"></center>
+<center><img src="../images/predictions_loaded.png" style="width: 100%; max-width: 700px"></center>

@@ -6,6 +6,17 @@ order: 203
 
 If you encounter an issue using Label Studio, use this page to troubleshoot it. 
 
+## Blank page when loading a project
+
+After starting Label Studio and opening a project, you see a blank page. Several possible issues could be the cause.
+
+### Cause: Host not recognized
+
+If you specify a host without a protocol such as `http://` or `https://` when starting Label Studio, Label Studio can fail to locate the correct files to load the project page. 
+
+To resolve this issue, update the host specified as an environment variable or when starting Label Studio. See [Start Label Studio](start.html)
+
+
 ## Slowness while labeling
 
 If you're using the SQLite database and another user imports a large volume of data, labeling might slow down for other users on the server due to the database load. 

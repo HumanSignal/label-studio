@@ -81,7 +81,6 @@ After you connect a model to Label Studio as a machine learning backend, you can
 
 In development mode, training logs appear in the web browser console. 
 In production mode, you can find runtime logs in `my_backend/logs/uwsgi.log` and RQ training logs in `my_backend/logs/rq.log`. 
-<!--what do these particular modes represent? add more information here-->
 
    
 ## Set up a machine learning backend for Label Studio with Docker Compose
@@ -122,10 +121,8 @@ The process of creating annotated training data for supervised machine learning 
 
 Depending on score types you can select a sampling strategy: 
 * prediction-score-min (min is the best score) 
-* prediction-score-max (max is the best score)
  
 See more about active learning sampling in [Set up task sampling for your project](guide/start.html#Set-up-task-sampling-for-your-project). 
- 
 
 ## Troubleshooting
 
@@ -139,8 +136,8 @@ When you encounter any error, there are several hints to get more insights. You 
 
 Your ML backend server might not have started properly. 
 
-1. First, try to do a healthcheck by running the following:<br/> `curl -X GET http://localhost:9090/health`
-2. If the health check doesn't respond or you see errors, check the server logs. 
+1. First, try to do a health check by running the following:<br/> `curl -X GET http://localhost:9090/health`
+2. If the health check doesn't respond, or you see errors, check the server logs. 
 3. If you used Docker Compose to start the ML backend, check for requirements missing from the `requirements.txt` file used to set up the environment inside Docker.
 
 ### The ML backend seems to be connected, but after I click "Start Training", I see "Error. Click here for details." message
