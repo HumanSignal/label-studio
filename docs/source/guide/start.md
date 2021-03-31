@@ -110,11 +110,11 @@ LABEL_STUDIO_HOST
 
 If you want, you can specify a different hostname for Label Studio, but you don't need to.
 
-To run Label Studio with Heroku and use PostgreSQL as the [database storage](install.html#Database_storage), specify the PostgreSQL environment variables required as part of the Heroku environment variable `DATABASE_URL`. For example, to specify a PostgreSQL database hosted on Amazon:
+To run Label Studio with Heroku and use PostgreSQL as the [database storage](storedata.html), specify the PostgreSQL environment variables required as part of the Heroku environment variable `DATABASE_URL`. For example, to specify a PostgreSQL database hosted on Amazon:
 ```
 DATABASE_URL = postgres://username:password@hostname.compute.amazonaws.com:5432/dbname
 ```
-Then you can specify the required environment variables for a PostgreSQL connection as config variables. See [Database storage](install.html#Database_storage).
+Then you can specify the required environment variables for a PostgreSQL connection as config variables. See [Database storage](storedata.html).
 
 <!--
 ## Run Label Studio on the cloud using a different cloud provider
@@ -158,6 +158,6 @@ The following table lists the available sampling options:
 | uniform | Tasks are sampled with equal probabilities. |
 | prediction-score-min | Tasks with the minimum average prediction score are shown to annotators. To use this option, you must also include predictions data in the task data that you import into Label Studio. |
 
-You can also use the API to set up sampling for a specific project. Send a PATCH request to the `/api/projects/<project_id>` endpoint to set sampling for the specified project. See the [API reference for projects](https://labelstud.io/api#operation/projects_partial_update). 
+You can also use the API to set up sampling for a specific project. Send a PATCH request to the `/api/projects/<project_id>` endpoint to set sampling for the specified project. See the [API reference for projects](/api#operation/projects_partial_update). 
 
 Individual annotators can also control the order in which they label tasks by adjusting the filtering and ordering of labeling tasks in the Label Studio UI. See [Set up your labeling project](setup.html).

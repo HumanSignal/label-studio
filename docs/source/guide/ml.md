@@ -122,7 +122,7 @@ The process of creating annotated training data for supervised machine learning 
 Depending on score types you can select a sampling strategy: 
 * prediction-score-min (min is the best score) 
  
-See more about active learning sampling in [Set up task sampling for your project](guide/start.html#Set-up-task-sampling-for-your-project). 
+See more about active learning sampling in [Set up task sampling for your project](start.html#Set-up-task-sampling-for-your-project). 
 
 ## Troubleshooting
 
@@ -147,7 +147,7 @@ If you can't resolve them by yourself, <a href="https://join.slack.com/t/label-s
 
 ### My predictions are wrong or I can't see the model prediction results on the labeling page
 
-Most likely, the format of the predictions you're trying to view are incorrect. The ML backend predictions format follows the same structure as [predictions in imported preannotations](/guide/tasks.html#Import-predicted-labels-into-Label-Studio).
+Most likely, the format of the predictions you're trying to view are incorrect. The ML backend predictions format follows the same structure as [predictions in imported preannotations](predictions.html).
 
 
 
