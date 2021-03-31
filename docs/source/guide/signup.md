@@ -29,8 +29,13 @@ To restrict who has access to your Label Studio instance, you can invite collabo
 After you [set up a labeling project](setup.html), invite annotators to the project to start collaborating on labeling tasks. 
 
 1. In the Label Studio UI, click the hamburger icon and click **People**.
-2. 
+2. Click **+ Add People**.
+3. Copy the invitation link and share it with those that you want to invite to Label Studio. If you need to update the link and deactivate the old one, return to this page and click **Reset Link**. 
 
+If you want to deactivate the signup page and use only the invitation link, set the following environment variable when you start Label Studio:
+```
+LABEL_STUDIO_DISABLE_SIGNUP_WITHOUT_LINK=true
+```
 
 ## Manage your account in Label Studio
 After you create an account in Label Studio, you can make changes to it as needed.
