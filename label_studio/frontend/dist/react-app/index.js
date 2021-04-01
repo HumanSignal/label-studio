@@ -8159,7 +8159,7 @@ DataManagerPage.context = ({
   const startLabeling = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(() => {
     var _dmRef$store, _dmRef$store$startLab;
 
-    dmRef === null || dmRef === void 0 ? void 0 : (_dmRef$store = dmRef.store) === null || _dmRef$store === void 0 ? void 0 : (_dmRef$store$startLab = _dmRef$store.startLabeling) === null || _dmRef$store$startLab === void 0 ? void 0 : _dmRef$store$startLab.call(_dmRef$store);
+    dmRef === null || dmRef === void 0 ? void 0 : (_dmRef$store = dmRef.store) === null || _dmRef$store === void 0 ? void 0 : (_dmRef$store$startLab = _dmRef$store.startLabelStream) === null || _dmRef$store$startLab === void 0 ? void 0 : _dmRef$store$startLab.call(_dmRef$store);
   }, [dmRef]);
 
   const updateLabelingButton = currentMode => {

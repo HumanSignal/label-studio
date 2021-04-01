@@ -28,7 +28,7 @@ After you save a project, any other collaborator with access to the Label Studio
 
 Configure the labels and task type for annotators using the templates included with Label Studio or by defining your own combination of tags to set up the labeling interface for your project. 
 
-1. Select a template from the [available templates](https://labelstud.io/templates/) or customize one.
+1. Select a template from the [available templates](/templates) or customize one.
 2. Label Studio automatically selects the field to label based on your data. If needed, modify the selected field. 
 3. Add label names on new lines. 
 4. (Optional) Choose new colors for the labels by clicking the label name and choosing a new color using the color selector.
@@ -59,7 +59,7 @@ If you want to make changes to the labeling interface or perform a different typ
 
 ## Customize a template
 
-You can customize a [labeling config template](https://labelstud.io/templates/) or use a custom configuration that you create from scratch. If you create a custom configuration that might be useful to other Label Studio users, consider [contributing the configuration as a template](https://github.com/heartexlabs/label-studio/tree/master/label_studio/examples).
+You can customize a [labeling config template](/templates) or use a custom configuration that you create from scratch. If you create a custom configuration that might be useful to other Label Studio users, consider [contributing the configuration as a template](https://github.com/heartexlabs/label-studio/tree/master/label_studio/examples).
 
 The labeling configuration for a project is an XML file that contains three types of tags specific to Label Studio.
 
@@ -86,9 +86,9 @@ For example, to classify images that are referenced in your data as URLs (`$imag
 </View>
 ```
 
-This labeling config references the image resource in the [Image](https://labelstud.io/tags/image.html) object tag, and specifies the available labels to select in the [Choices](https://labelstud.io/tags/choices.html) control tag.
+This labeling config references the image resource in the [Image](/tags/image.html) object tag, and specifies the available labels to select in the [Choices](/tags/choices.html) control tag.
 
-If you want to customize this example, such as to allow labelers to select both Cat and Dog labels for a single image, modify the parameters used with the [Choices](https://labelstud.io/tags/choices.html) control tag:
+If you want to customize this example, such as to allow labelers to select both Cat and Dog labels for a single image, modify the parameters used with the [Choices](/tags/choices.html) control tag:
 
 ```html
 

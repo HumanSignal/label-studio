@@ -59,8 +59,8 @@ When you upload data to Label Studio, each item in the dataset becomes a labelin
 | Relation | A defined relationship between two labeled regions. 
 | Pre-labeling | What machine learning models perform in Label Studio or separate from Label Studio. The result of predicting labels for items in a dataset are predicted labels, or pre-labels. |
 | Annotations | The output of a labeling task. Previously called "completions". |
-| Templates | Example labeling configurations that you can use to specify the type of labeling that you're performing with your dataset. See [all available templates](/templates.html) |
-| Tags | Configuration options to customize the labeling interface. See [more about tags](/tags.html). |
+| Templates | Example labeling configurations that you can use to specify the type of labeling that you're performing with your dataset. See [all available templates](/templates) |
+| Tags | Configuration options to customize the labeling interface. See [more about tags](/tags). |
 
 
 ## Components and architecture
