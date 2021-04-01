@@ -96,8 +96,8 @@ def _create_user(input_args, config):
 
     DEFAULT_USERNAME = 'default_user@localhost'
 
-    username = input_args.username or config.get('username')
-    password = input_args.password or config.get('password')
+    username = input_args.username or config.get('username') or get_env('USERNAME')
+    password = input_args.password or config.get('password') or get_env('PASSWORD')
 
     if not username:
         user = User.objects.filter(email=DEFAULT_USERNAME).first()
