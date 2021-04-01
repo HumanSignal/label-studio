@@ -2,6 +2,8 @@
 title: Image Segmentation
 type: templates
 order: 103
+meta_title: Image Segmentation Data Labeling Template
+meta_description: Label Studio Image Segmentation Template for machine learning and data science data labeling projects.
 ---
 
 Image segmentation using a brush and producing a mask

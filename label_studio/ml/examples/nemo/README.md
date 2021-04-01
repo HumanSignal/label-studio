@@ -2,6 +2,8 @@
 title:
 type: blog
 order: 60
+meta_title: Automatic Speech Recognition with NVIDIA NeMO Tutorial
+meta_description: Label Studio tutorial for automatic speech recognition using NVIDIA NeMo toolkit and Label Studio. 
 ---
 
 ## Automatic Speech Recognition
