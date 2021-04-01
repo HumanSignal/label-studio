@@ -137,7 +137,7 @@ Perform these prerequisites to make sure your server starts successfully.
 
 The process of creating annotated training data for supervised machine learning models is often expensive and time-consuming. Active Learning is a branch of machine learning that seeks to **minimize the total amount of data required for labeling by strategically sampling observations** that provide new insight into the problem. In particular, Active Learning algorithms aim to select diverse and informative data for annotation, rather than random observations, from a pool of unlabeled data using **prediction scores**. 
 
-You can select a sampling strategy like `prediction-score-min`, where min is the best score. See more about active learning sampling in [Set up task sampling for your project](guide/start.html#Set-up-task-sampling-for-your-project). You can also sort and manage the labeling order on an ad hoc basis by predictions. See [Label and annotate data in Label Studio](labeling.html). 
+You can select a sampling strategy like `prediction-score-min`, where min is the best score. See more about active learning sampling in [Set up task sampling for your project](guide/start.html#Set-up-task-sampling-for-your-project). You can also sort and manage the labeling order on an ad hoc basis by predictions. See [Label and annotate data in Label Studio](labeling.html).
 
 ## Troubleshooting
 
@@ -176,6 +176,7 @@ Your ML backend might be producing predictions in the wrong format.
 
 - Check to see whether the ML backend predictions format follows the same structure as [predictions in imported preannotations](predictions.html).
 - Confirm that your project's label configuration matches the output produced by your ML backend. 
+
 
 
 

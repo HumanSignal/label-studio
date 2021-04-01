@@ -15,7 +15,7 @@ LSF version 1.0.0 is not compatible with earlier versions of Label Studio. If yo
 | onUpdateCompletion | onUpdateAnnotation |
 | onDeleteCompletion | onDeleteAnnotation | 
 
-If you rely on specific formatting of Label Studio completed tasks, [Label Studio's annotation format](/guide/export.html#Raw-JSON-format-of-completed-tasks) has also been updated. 
+If you rely on specific formatting of Label Studio completed tasks, [Label Studio's annotation format](export.html#Raw-JSON-format-of-completed-tasks) has also been updated. 
 
 ## Implement the Label Studio Frontend
 
@@ -133,13 +133,13 @@ Default: `null`
 
 Type data: `array`
 
-Array of annotations. See the [annotation documentation](/guide/export.html#Raw-JSON-format-of-completed-tasks) for more information.
+Array of annotations. See the [annotation documentation](export.html#Raw-JSON-format-of-completed-tasks) for more information.
 
 #### predictions
 
 Type data: `array`
 
-Array of predictions. Similar structure as completions or annotations. See the [annotation documentation](/guide/export.html#Raw-JSON-format-of-completed-tasks) and [guidance for importing predicted labels](predictions.html) for more information.
+Array of predictions. Similar structure as completions or annotations. See the [annotation documentation](export.html#Raw-JSON-format-of-completed-tasks) and [guidance for importing predicted labels](predictions.html) for more information.
 
 ### user
 

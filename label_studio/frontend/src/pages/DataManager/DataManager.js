@@ -142,7 +142,7 @@ DataManagerPage.context = ({dmRef}) => {
   }, []);
 
   const startLabeling = useCallback(() => {
-    dmRef?.store?.startLabeling?.();
+    dmRef?.store?.startLabelStream?.();
   }, [dmRef]);
 
   const updateLabelingButton = (currentMode) => {

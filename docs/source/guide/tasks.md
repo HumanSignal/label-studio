@@ -39,7 +39,7 @@ You can also use a CSV file or a JSON list of tasks to point to URLs with the da
 
 One way to import data into Label Studio is using a JSON-formatted list of tasks. The `data` key of the JSON file references each task as an entry in a JSON dictionary. If there is no `data` key, Label Studio interprets the entire JSON file as one task. 
 
-In the `data` JSON dictionary, use key-value pairs that correspond to the source key expected by the object tag in the [label config](/guide/setup.html#Customize-the-labeling-interface-for-your-project) that you set up for your dataset. 
+In the `data` JSON dictionary, use key-value pairs that correspond to the source key expected by the object tag in the [label config](setup.html#Customize-the-labeling-interface-for-your-project) that you set up for your dataset. 
 
 Depending on the type of object tag, Label Studio interprets field values differently:
 - `<Text value="$key">`: `value` is interpreted as plain text.
@@ -55,8 +55,8 @@ You can add other, optional keys to the JSON file.
 | JSON key | Description |
 | --- | --- | 
 | id | Optional. Integer to use as the task ID. |
-| annotations | Optional. List of annotations exported from Label Studio. [Label Studio's annotation format](/guide/export.html#Raw-JSON-format-of-completed-tasks) allows you to import annotation results in order to use them in subsequent labeling tasks. |
-| predictions | Optional. List of model prediction results, where each result is saved using [Label Studio's prediction format](/guide/export.html#Raw-JSON-format-of-completed-tasks). Import predictions for automatic task pre-labeling and active learning. See [Import predicted labels into Label Studio](/guide/predictions.html) |
+| annotations | Optional. List of annotations exported from Label Studio. [Label Studio's annotation format](export.html#Raw-JSON-format-of-completed-tasks) allows you to import annotation results in order to use them in subsequent labeling tasks. |
+| predictions | Optional. List of model prediction results, where each result is saved using [Label Studio's prediction format](export.html#Raw-JSON-format-of-completed-tasks). Import predictions for automatic task pre-labeling and active learning. See [Import predicted labels into Label Studio](predictions.html) |
 
 #### Example JSON format
 
