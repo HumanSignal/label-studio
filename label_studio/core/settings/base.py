@@ -26,10 +26,11 @@ if HOSTNAME:
             HOSTNAME = HOSTNAME[0:-1]
 
         # for django url resolver
-        # FORCE_SCRIPT_NAME = '/label-studio'
-        # if FORCE_SCRIPT_NAME:
-        #    print("=> Django URL prefix set to:", FORCE_SCRIPT_NAME)
-
+        if HOSTNAME:
+            FORCE_SCRIPT_NAME = HOSTNAME
+            if FORCE_SCRIPT_NAME:
+               print("=> Django URL prefix set to:", FORCE_SCRIPT_NAME)
+APPEND_SLASH = True
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '$(fefwefwef13;LFK{P!)@#*!)kdsjfWF2l+i5e3t(8a1n'
@@ -152,7 +153,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'core.middleware.CommonMiddlewareAppendSlashWithoutRedirect',  # instead of 'CommonMiddleware'
+    # 'core.middleware.CommonMiddlewareAppendSlashWithoutRedirect',  # instead of 'CommonMiddleware'
+    'core.middleware.CommonMiddleware',
     'core.middleware.DRFResponseFormatter',
     'django_user_agents.middleware.UserAgentMiddleware',
     'core.middleware.SetSessionUIDMiddleware',
@@ -193,7 +195,6 @@ CORS_ALLOW_METHODS = [
     'PUT',
 ]
 ALLOWED_HOSTS = ['*']
-APPEND_SLASH = True
 
 # Auth modules
 AUTH_USER_MODEL = 'users.User'
@@ -274,7 +275,9 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
-STATIC_URL = HOSTNAME + '/static/'
+if HOSTNAME:
+    STATIC_URL = HOSTNAME + '/static/'
+print(f'Static URL is set to {STATIC_URL}')
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_build')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATICFILES_FINDERS = (
