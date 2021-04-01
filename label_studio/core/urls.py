@@ -86,3 +86,6 @@ if settings.DEBUG:
         urlpatterns = [path('__debug__/', include(debug_toolbar.urls))] + urlpatterns
     except ImportError:
         pass
+
+# apply host prefix for all urls
+# urlpatterns = [path(r'^' + settings.FORCE_SCRIPT_NAME + '/', include(urlpatterns))]

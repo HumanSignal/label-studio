@@ -21,7 +21,15 @@ if HOSTNAME:
         print("! HOST variable found in environment, but it must start with http:// or https://, ignore it:", HOSTNAME)
         HOSTNAME = ''
     else:
-        print("=> HOSTNAME correctly set to:", HOSTNAME)
+        print("=> Hostname correctly set to:", HOSTNAME)
+        if HOSTNAME.endswith('/'):
+            HOSTNAME = HOSTNAME[0:-1]
+
+        # for django url resolver
+        # FORCE_SCRIPT_NAME = '/label-studio'
+        # if FORCE_SCRIPT_NAME:
+        #    print("=> Django URL prefix set to:", FORCE_SCRIPT_NAME)
+
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '$(fefwefwef13;LFK{P!)@#*!)kdsjfWF2l+i5e3t(8a1n'
@@ -266,7 +274,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
-STATIC_URL = '/static/'
+STATIC_URL = HOSTNAME + '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_build')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATICFILES_FINDERS = (
