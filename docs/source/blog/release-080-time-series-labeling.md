@@ -2,6 +2,8 @@
 title: Label Studio Release Notes 0.8.0 - Time Series Data Labeling
 type: blog
 order: 99
+meta_title: Label Studio Release Notes 0.8.0 - Time Series Data Labeling
+meta_description: Label Studio Release 0.8.0 includes updates to support data labeling for time series data.
 ---
 
 # Time Series Data Labeling

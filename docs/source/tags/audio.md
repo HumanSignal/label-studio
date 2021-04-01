@@ -2,6 +2,8 @@
 title: Audio
 type: tags
 order: 301
+meta_title: Audio Tags for Labeling Audio
+meta_description: Label Studio Audio Tags customize Label Studio for labeling audio for machine learning and data science projects.
 ---
 
 Audio tag plays a simple audio file

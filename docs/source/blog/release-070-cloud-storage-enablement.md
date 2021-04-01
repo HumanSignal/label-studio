@@ -2,6 +2,8 @@
 title: Label Studio Release Notes 0.7.0 - Cloud Storage Enablement
 type: blog
 order: 100
+meta_title: Label Studio Release Notes 0.7.0 - Cloud Storage
+meta_description: Label Studio Release 0.7.0 includes new connectors to integrate Label Studio with cloud storage, including Amazon AWS S3 and Google Cloud Storage.
 ---
 
 Just a couple of weeks after our 0.6.0 release, we’re happy to announce a new big release. We’ve started the discussion about the cloud months ago, and as the first step in simplifying the integration, we’re happy to introduce cloud storage connectors, like AWS S3. 
