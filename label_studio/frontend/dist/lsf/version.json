@@ -1,6 +1,6 @@
 {
-  "message": "Hotfix",
-  "commit": "ed104bfb148d6f40460ace666650dda7307b87c4",
+  "message": "Fix Text spans if label's missing for any reason",
+  "commit": "5164462ced2fe8a0bbdd7cd9c4a5bec3772577ab",
   "branch": "master",
-  "date": "2021-03-23T17:24:07Z"
+  "date": "2021-03-31T10:57:00Z"
 }

@@ -7629,8 +7629,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "DataManagerPage": () => (/* binding */ DataManagerPage)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react_router__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! react-router */ "./node_modules/react-router/esm/react-router.js");
-/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/esm/react-router-dom.js");
+/* harmony import */ var react_router__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! react-router */ "./node_modules/react-router/esm/react-router.js");
+/* harmony import */ var react_router_dom__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! react-router-dom */ "./node_modules/react-router-dom/esm/react-router-dom.js");
 /* harmony import */ var _components_Button_Button__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../components/Button/Button */ "./src/components/Button/Button.js");
 /* harmony import */ var _components_Modal_Modal__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../components/Modal/Modal */ "./src/components/Modal/Modal.js");
 /* harmony import */ var _components_Space_Space__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../components/Space/Space */ "./src/components/Space/Space.js");
@@ -7639,13 +7639,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _providers_RoutesProvider__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../providers/RoutesProvider */ "./src/providers/RoutesProvider.js");
 /* harmony import */ var _services_breadrumbs__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../services/breadrumbs */ "./src/services/breadrumbs.js");
 /* harmony import */ var _utils_bem__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../utils/bem */ "./src/utils/bem.tsx");
-/* harmony import */ var _utils_helpers__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../utils/helpers */ "./src/utils/helpers.js");
-/* harmony import */ var _CreateProject_Import_ImportModal__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../CreateProject/Import/ImportModal */ "./src/pages/CreateProject/Import/ImportModal.js");
-/* harmony import */ var _ExportPage_ExportPage__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../ExportPage/ExportPage */ "./src/pages/ExportPage/ExportPage.js");
-/* harmony import */ var _api_config__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./api-config */ "./src/pages/DataManager/api-config.js");
-/* harmony import */ var _DataManager_styl__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./DataManager.styl */ "./src/pages/DataManager/DataManager.styl");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
-
+/* harmony import */ var _CreateProject_Import_ImportModal__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../CreateProject/Import/ImportModal */ "./src/pages/CreateProject/Import/ImportModal.js");
+/* harmony import */ var _ExportPage_ExportPage__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../ExportPage/ExportPage */ "./src/pages/ExportPage/ExportPage.js");
+/* harmony import */ var _api_config__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./api-config */ "./src/pages/DataManager/api-config.js");
+/* harmony import */ var _DataManager_styl__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./DataManager.styl */ "./src/pages/DataManager/DataManager.styl");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
 
 
 
@@ -7677,12 +7675,11 @@ const initializeDataManager = async (root, props, params) => {
     apiVersion: 2,
     polling: !window.APP_SETTINGS,
     showPreviews: false,
-    apiEndpoints: _api_config__WEBPACK_IMPORTED_MODULE_12__.APIConfig.endpoints,
+    apiEndpoints: _api_config__WEBPACK_IMPORTED_MODULE_11__.APIConfig.endpoints,
     interfaces: {
       import: false,
       export: false,
-      backButton: false,
-      labelButton: false
+      backButton: false
     },
     ...props,
     ...settings
@@ -7691,14 +7688,14 @@ const initializeDataManager = async (root, props, params) => {
 };
 
 const buildLink = (path, params) => {
-  return (0,react_router__WEBPACK_IMPORTED_MODULE_15__.generatePath)(`/projects/:id${path}`, params);
+  return (0,react_router__WEBPACK_IMPORTED_MODULE_14__.generatePath)(`/projects/:id${path}`, params);
 };
 
 const DataManagerPage = ({ ...props
 }) => {
   const root = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
   const params = (0,_providers_RoutesProvider__WEBPACK_IMPORTED_MODULE_6__.useParams)();
-  const history = (0,react_router__WEBPACK_IMPORTED_MODULE_15__.useHistory)();
+  const history = (0,react_router__WEBPACK_IMPORTED_MODULE_14__.useHistory)();
   const LabelStudio = (0,_providers_LibraryProvider__WEBPACK_IMPORTED_MODULE_4__.useLibrary)('lsf');
   const DataManager = (0,_providers_LibraryProvider__WEBPACK_IMPORTED_MODULE_4__.useLibrary)('dm');
   const setContextProps = (0,_providers_RoutesProvider__WEBPACK_IMPORTED_MODULE_6__.useContextProps)();
@@ -7745,56 +7742,37 @@ const DataManagerPage = ({ ...props
     init();
     return () => destroyDM();
   }, [root, init]);
-  return crashed ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsxs)(_utils_bem__WEBPACK_IMPORTED_MODULE_8__.Block, {
+  return crashed ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_utils_bem__WEBPACK_IMPORTED_MODULE_8__.Block, {
     name: "crash",
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_8__.Elem, {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_8__.Elem, {
       name: "info",
       children: "Project was deleted or not yet created"
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_components_Button_Button__WEBPACK_IMPORTED_MODULE_1__.Button, {
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_components_Button_Button__WEBPACK_IMPORTED_MODULE_1__.Button, {
       to: "/projects",
       children: "Back to projects"
     })]
-  }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_8__.Block, {
+  }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_8__.Block, {
     ref: root,
     name: "datamanager"
   });
 };
 DataManagerPage.path = "/data";
 DataManagerPage.pages = {
-  ExportPage: _ExportPage_ExportPage__WEBPACK_IMPORTED_MODULE_11__.ExportPage,
-  ImportModal: _CreateProject_Import_ImportModal__WEBPACK_IMPORTED_MODULE_10__.ImportModal
+  ExportPage: _ExportPage_ExportPage__WEBPACK_IMPORTED_MODULE_10__.ExportPage,
+  ImportModal: _CreateProject_Import_ImportModal__WEBPACK_IMPORTED_MODULE_9__.ImportModal
 };
 
 DataManagerPage.context = ({
   dmRef
 }) => {
-  const location = (0,react_router__WEBPACK_IMPORTED_MODULE_15__.useLocation)();
+  const location = (0,react_router__WEBPACK_IMPORTED_MODULE_14__.useLocation)();
   const {
     project
   } = (0,_providers_ProjectProvider__WEBPACK_IMPORTED_MODULE_5__.useProject)();
-  const [counter, setCounter] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(0);
-  const [canLabel, setCanLabel] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)((dmRef === null || dmRef === void 0 ? void 0 : dmRef.mode) === 'explorer');
-  const [hasLabelingData, setHasLabelingData] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const links = {
     '/settings': 'Settings',
     '/data/import': "Import",
     '/data/export': 'Export'
-  };
-  const labelButtonText = (0,react__WEBPACK_IMPORTED_MODULE_0__.useMemo)(() => {
-    return counter ? `Label (${(0,_utils_helpers__WEBPACK_IMPORTED_MODULE_9__.humanReadableNumber)(counter)})` : 'Label';
-  }, [counter]);
-  const updateCounter = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(selected => {
-    setCounter(selected.total);
-  }, []);
-  const startLabeling = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(() => {
-    var _dmRef$store, _dmRef$store$startLab;
-
-    dmRef === null || dmRef === void 0 ? void 0 : (_dmRef$store = dmRef.store) === null || _dmRef$store === void 0 ? void 0 : (_dmRef$store$startLab = _dmRef$store.startLabelStream) === null || _dmRef$store$startLab === void 0 ? void 0 : _dmRef$store$startLab.call(_dmRef$store);
-  }, [dmRef]);
-
-  const updateLabelingButton = currentMode => {
-    const isExplorer = currentMode === 'explorer';
-    setCanLabel(isExplorer);
   };
 
   const updateCrumbs = currentMode => {
@@ -7806,11 +7784,11 @@ DataManagerPage.context = ({
       (0,_services_breadrumbs__WEBPACK_IMPORTED_MODULE_7__.deleteCrumb)('dm-crumb');
     } else {
       (0,_services_breadrumbs__WEBPACK_IMPORTED_MODULE_7__.addAction)(dmPath, e => {
-        var _dmRef$store2, _dmRef$store2$closeLa;
+        var _dmRef$store, _dmRef$store$closeLab;
 
         e.preventDefault();
         e.stopPropagation();
-        dmRef === null || dmRef === void 0 ? void 0 : (_dmRef$store2 = dmRef.store) === null || _dmRef$store2 === void 0 ? void 0 : (_dmRef$store2$closeLa = _dmRef$store2.closeLabeling) === null || _dmRef$store2$closeLa === void 0 ? void 0 : _dmRef$store2$closeLa.call(_dmRef$store2);
+        dmRef === null || dmRef === void 0 ? void 0 : (_dmRef$store = dmRef.store) === null || _dmRef$store === void 0 ? void 0 : (_dmRef$store$closeLab = _dmRef$store.closeLabeling) === null || _dmRef$store$closeLab === void 0 ? void 0 : _dmRef$store$closeLab.call(_dmRef$store);
       });
       (0,_services_breadrumbs__WEBPACK_IMPORTED_MODULE_7__.addCrumb)({
         key: "dm-crumb",
@@ -7829,7 +7807,7 @@ DataManagerPage.context = ({
     if (isLabelStream && show_instruction && expert_instruction) {
       (0,_components_Modal_Modal__WEBPACK_IMPORTED_MODULE_2__.modal)({
         title: "Labeling Instructions",
-        body: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)("div", {
+        body: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)("div", {
           dangerouslySetInnerHTML: {
             __html: expert_instruction
           }
@@ -7841,55 +7819,31 @@ DataManagerPage.context = ({
     }
   };
 
-  const onDMReady = () => {
-    var _dmRef$store$currentV, _dmRef$store$currentV2, _dmRef$store$currentV3;
-
-    dmRef.on("taskSelectionChanged", updateCounter);
-    setCounter((_dmRef$store$currentV = (_dmRef$store$currentV2 = dmRef.store.currentView) === null || _dmRef$store$currentV2 === void 0 ? void 0 : (_dmRef$store$currentV3 = _dmRef$store$currentV2.selected) === null || _dmRef$store$currentV3 === void 0 ? void 0 : _dmRef$store$currentV3.total) !== null && _dmRef$store$currentV !== void 0 ? _dmRef$store$currentV : 0);
-    updateLabelingButton(dmRef === null || dmRef === void 0 ? void 0 : dmRef.mode);
-  };
-
   const onDMModeChanged = currentMode => {
-    updateLabelingButton(currentMode);
     updateCrumbs(currentMode);
     showLabelingInstruction(currentMode);
   };
 
-  const onDMDataFetched = store => {
-    setHasLabelingData(store.length !== 0);
-  };
-
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     if (dmRef) {
-      dmRef.on('ready', onDMReady);
       dmRef.on('modeChanged', onDMModeChanged);
-      dmRef.on('dataFetched', onDMDataFetched);
-      updateLabelingButton(dmRef === null || dmRef === void 0 ? void 0 : dmRef.mode);
     }
 
     return () => {
-      var _dmRef$off, _dmRef$off2, _dmRef$off3;
+      var _dmRef$off;
 
-      dmRef === null || dmRef === void 0 ? void 0 : (_dmRef$off = dmRef.off) === null || _dmRef$off === void 0 ? void 0 : _dmRef$off.call(dmRef, 'ready', onDMReady);
-      dmRef === null || dmRef === void 0 ? void 0 : (_dmRef$off2 = dmRef.off) === null || _dmRef$off2 === void 0 ? void 0 : _dmRef$off2.call(dmRef, 'modeChanged', onDMModeChanged);
-      dmRef === null || dmRef === void 0 ? void 0 : (_dmRef$off3 = dmRef.off) === null || _dmRef$off3 === void 0 ? void 0 : _dmRef$off3.call(dmRef, 'dataFetched', onDMDataFetched);
+      dmRef === null || dmRef === void 0 ? void 0 : (_dmRef$off = dmRef.off) === null || _dmRef$off === void 0 ? void 0 : _dmRef$off.call(dmRef, 'modeChanged', onDMModeChanged);
     };
   }, [dmRef, project]);
-  return project && project.id ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsxs)(_components_Space_Space__WEBPACK_IMPORTED_MODULE_3__.Space, {
+  return project && project.id ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_components_Space_Space__WEBPACK_IMPORTED_MODULE_3__.Space, {
     size: "small",
-    children: [Object.entries(links).map(([path, label]) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_components_Button_Button__WEBPACK_IMPORTED_MODULE_1__.Button, {
-      tag: react_router_dom__WEBPACK_IMPORTED_MODULE_16__.NavLink,
+    children: Object.entries(links).map(([path, label]) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_components_Button_Button__WEBPACK_IMPORTED_MODULE_1__.Button, {
+      tag: react_router_dom__WEBPACK_IMPORTED_MODULE_15__.NavLink,
       size: "compact",
       to: `/projects/${project.id}${path}`,
       "data-external": true,
       children: label
-    }, path)), canLabel && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_14__.jsx)(_components_Button_Button__WEBPACK_IMPORTED_MODULE_1__.Button, {
-      size: "compact",
-      look: "primary",
-      disabled: !hasLabelingData,
-      onClick: startLabeling,
-      children: labelButtonText
-    })]
+    }, path))
   }) : null;
 };
 
