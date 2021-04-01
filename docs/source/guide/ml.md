@@ -14,18 +14,34 @@ With Label Studio, you can set up your favorite machine learning models to do th
 
 With these capabilities, you can use Label Studio as part of a production-ready **Prediction Service**. 
 
+## What is the Label Studio ML backend?
+
+The Label Studio ML backend is an SDK that you can use to wrap your machine learning code and turn it into a web server. You can then connect that server to a Label Studio instance to perform 2 tasks:
+- Dynamically pre-annotate data based on model inference results
+- Retrain or fine-tune a model based on recently annotated data
+
+The overall steps of setting up a Label Studio ML backend are as follows:
+1. Get your model code.
+2. Wrap it with the Label Studio SDK
+3. Create a running server script
+4. Launch the script
+5. Connect Label Studio to ML backend on the UI
+Follow the [Quickstart](#Quickstart) for an example. For assistance with steps 1-3, see how to [create your own machine learning backend](mlbackend.html).
+
+If you need to load static pre-annotated data into Label Studio, running an ML backend might be more than you need. Instead, you can [import pre-annotated data](predictions.html).
+
 ## Quickstart
 
 Get started with a machine learning (ML) backend with Label Studio. You need to start both the machine learning backend and Label Studio to start labeling. You can review examples in the [`label-studio-ml/examples` section of the repository](https://github.com/heartexlabs/label-studio-ml/examples).
 
 Follow these steps to set up an example text classifier ML backend with Label Studio:
 
-0. Clone the Label Studio Machine Learning Backend git repository.
-   ```bash
-   git clone https://github.com/heartexlabs/label-studio-ml-backend 
+1. Clone the Label Studio Machine Learning Backend git repository.
+  ```bash
+   git clone https://github.com/heartexlabs/label-studio-ml-backend  
    ```
    
-1. Set up the environment.
+2. Set up the environment.
    ```bash
    cd label-studio-ml-backend
    pip install -e .
@@ -33,40 +49,42 @@ Follow these steps to set up an example text classifier ML backend with Label St
    pip install -r requirements.txt
    ```
    
-2. Create a new ML backend using the example simple text classifier included in the repository. 
+3. Initialize an ML backend based on an example script:
    ```bash
-   label-studio-ml init my_ml_backend --script label_studio-ml/examples/simple_text_classifier.py
+   label-studio-ml init my_ml_backend --script label_studio_ml/examples/simple_text_classifier.py
    ```
+   This ML backend is an example provided by Label Studio. See [how to create your own ML backend](mlbackend.html).
    
 3. Start the ML backend server.
    ```bash
    label-studio-ml start my_ml_backend
    ```
    
-4. Start Label Studio and connect your project to the running ML backend using the Label Studio UI. 
+4. Start Label Studio and connect it to the running ML backend on the project settings page.
 
-
-## Tutorials
-
-For other example machine learning model setups with Label Studio, see the following tutorials:
-- [Create a simple ML backend](/tutorials/dummy_model.html)
-- [Text classification with Scikit-Learn](/tutorials/sklearn-text-classifier.html)
-- [Transfer learning for images with PyTorch](/tutorials/pytorch-image-transfer-learning.html)
-- [Image Object Detector](/tutorials/object-detector.html)
-- [Chatbot response generation with HuggingFace's GPT2 model](/tutorials/gpt.html)
-- [Automatic Speech Recognition with Nvidia's NeMo](/tutorials/nemo_asr.html)
 
 ## Getting predictions from a machine learning model
+After you connect a model to Label Studio as a machine learning backend, you can see model predictions in the labeling interface if the model is pre-trained. 
 
-After connecting a model as a machine learning backend, you see model predictions in the labeling interface and on the Tasks page that you use to manage your data.
+If the model has not been trained yet, do the following to get predictions to appear:
+1. Start labeling data in Label Studio. 
+2. Return to the machine learning settings for your project and **Start Training** the model.
+3. After training starts, predictions appear in the labeling interface. 
 
-For example, for an image classification task, the model pre-selects an image class for data labelers to verify. 
+<!-- This isn't actually a valid API endpoint as of 1.0.0++
+Predictions only appear while labeling tasks. If you want to see predictions on the list of tasks and when previewing tasks, make a call to the API to retrieve the predictions for all tasks:
+```
+curl -X GET http://localhost:8080/api/models/predictions?mode=all_tasks
+```
+-->
 
-You can also get a prediction for specific data using the API. For example, to get a prediction for task data of `{"text":"some text"}` from a Label Studio installation accessible at `http://localhost:8080`, run the following cURL command: 
+For example, for an image classification task, the model pre-selects an image class for data annotators to verify. For audio transcriptions, the model displays a transcription that data annotators can modify.
 
+You can also get a prediction for specific labeling tasks using the API. For example, to get a prediction for a labeling task `{"text":"some text"}` from a Label Studio installation accessible at `http://localhost:8080`, run the following cURL command:
    ```
     curl -X POST -d '{"text":"some text"}' -H "Content-Type: application/json" http://localhost:8080/api/models/predictions
    ```
+<!--check with Max, my guess is that this needs to be updated--> 
 
    
 ### Train a model with Label Studio 
@@ -80,8 +98,7 @@ After you connect a model to Label Studio as a machine learning backend, you can
    ```
 
 In development mode, training logs appear in the web browser console. 
-In production mode, you can find runtime logs in `my_backend/logs/uwsgi.log` and RQ training logs in `my_backend/logs/rq.log`. 
-
+In production mode, you can find runtime logs in `my_backend/logs/uwsgi.log` and RQ training logs in `my_backend/logs/rq.log` on the server running the ML backend, which might be different from the Label Studio server. To see more detailed logs, start the ML backend server with the `--debug` option. 
    
 ## Set up a machine learning backend for Label Studio with Docker Compose
 Label Studio includes everything you need to set up a production-ready ML backend server powered by Docker. 
@@ -98,7 +115,7 @@ Perform these prerequisites to make sure your server starts successfully.
 
 ### Start a machine learning backend with Docker Compose
 
-1. Start the machine learning backend with an example model, or your custom machine learning backend.
+1. Start the machine learning backend with an example model, or your [custom machine learning backend](mlbackend.html).
     ```bash
     label-studio-ml init my-ml-backend --script label_studio-ml/examples/simple_text_classifier.py
     ```
@@ -110,44 +127,55 @@ Perform these prerequisites to make sure your server starts successfully.
     ```
     The machine learning backend server starts listening on port 9090.
 
-3. Connect the machine learning backend to Label Studio on the **Model** page in Label Studio UI, or use the following command on the command line:
+3. Connect the machine learning backend to Label Studio on the **Machine Learning** settings for your project in Label Studio UI, or use the following command on the command line:
     ```bash
     label-studio start text_classification_project --init --template text_classification --ml-backends http://localhost:9090
     ```
 
 ## Active Learning
+<!--make this its own page--> 
 
 The process of creating annotated training data for supervised machine learning models is often expensive and time-consuming. Active Learning is a branch of machine learning that seeks to **minimize the total amount of data required for labeling by strategically sampling observations** that provide new insight into the problem. In particular, Active Learning algorithms aim to select diverse and informative data for annotation, rather than random observations, from a pool of unlabeled data using **prediction scores**. 
 
-Depending on score types you can select a sampling strategy: 
-* prediction-score-min (min is the best score) 
- 
-See more about active learning sampling in [Set up task sampling for your project](guide/start.html#Set-up-task-sampling-for-your-project). 
+You can select a sampling strategy like `prediction-score-min`, where min is the best score. See more about active learning sampling in [Set up task sampling for your project](guide/start.html#Set-up-task-sampling-for-your-project). You can also sort and manage the labeling order on an ad hoc basis by predictions. See [Label and annotate data in Label Studio](labeling.html). 
 
 ## Troubleshooting
 
-When you encounter any error, there are several hints to get more insights. You can investigate most problems using the server console log. The machine learning backend runs as a separate server from Label Studio, so make sure you check the correct server console logs while troubleshooting.
+If you encounter any errors, review these potential causes. 
 
-> Note: When you start an ML backend using Docker Compose, the logs are located in:
-> - main process / inference logs: logs/uwsgi.log
-> - training logs: logs/rq.log
+### Review the ML server logs
+You can investigate most problems using the server console log. The machine learning backend runs as a separate server from Label Studio, so make sure you check the correct server console logs while troubleshooting. To see more detailed logs, start the ML backend server with the `--debug` option. 
+
+If you're running an ML backend: 
+- Production training logs are located in `my_backend/logs/rq.log`
+- Production runtime logs are located in `my_backend/logs/uwsgi.log`
+In development mode, training logs appear in the web browser console. 
+
+If you're running an ML backend using Docker Compose:
+- Training logs are located in `logs/rq.log`
+- Main process and inference logs are located in `logs/uwsgi.log`
 
 ### I launched the ML backend, but it appears as **Disconnected** after adding it in the Label Studio UI
 
 Your ML backend server might not have started properly. 
 
-1. First, try to do a health check by running the following:<br/> `curl -X GET http://localhost:9090/health`
-2. If the health check doesn't respond, or you see errors, check the server logs. 
+1. Check whether the ML backend server is running. Run the following health check:<br/> `curl -X GET http://localhost:9090/health`
+2. If the health check doesn't respond, or you see errors, check the server logs.
 3. If you used Docker Compose to start the ML backend, check for requirements missing from the `requirements.txt` file used to set up the environment inside Docker.
 
 ### The ML backend seems to be connected, but after I click "Start Training", I see "Error. Click here for details." message
 
-Check for the traceback after you click on the error message. Some common errors are an insufficient amount of annotations made or memory issues.
-If you can't resolve them by yourself, <a href="https://join.slack.com/t/label-studio/shared_invite/zt-cr8b7ygm-6L45z7biEBw4HXa5A2b5pw">contact us on Slack</a>.
+Click the error message to review the traceback. Common errors that you might see include:
+- Insufficient number of annotations completed for training to begin.
+- Memory issues on the server. 
+If you can't resolve the traceback issues by yourself, <a href="https://join.slack.com/t/label-studio/shared_invite/zt-cr8b7ygm-6L45z7biEBw4HXa5A2b5pw">contact us on Slack</a>.
 
-### My predictions are wrong or I can't see the model prediction results on the labeling page
+### My predictions are wrong or I don't see the model prediction results on the labeling page
 
-Most likely, the format of the predictions you're trying to view are incorrect. The ML backend predictions format follows the same structure as [predictions in imported preannotations](/guide/tasks.html#Import-predicted-labels-into-Label-Studio).
+Your ML backend might be producing predictions in the wrong format. 
+
+- Check to see whether the ML backend predictions format follows the same structure as [predictions in imported preannotations](predictions.html).
+- Confirm that your project's label configuration matches the output produced by your ML backend. 
 
 
 
