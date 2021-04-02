@@ -2,6 +2,8 @@
 title: Table
 type: tags
 order: 504
+meta_title: Table Tags to Display Keys & Values in Tables
+meta_description: Label Studio Table Tags customize Label Studio by Displaying Keys & Values in Tables for machine learning and data science projects.
 ---
 
 Table tag, show object keys and values in a table
@@ -14,5 +16,7 @@ Table tag, show object keys and values in a table
 
 ### Example
 ```html
-<Table name="text-1" value="$text"></Table>
+<View>
+  <Table name="text-1" value="$text"></Table>
+</View>
 ```

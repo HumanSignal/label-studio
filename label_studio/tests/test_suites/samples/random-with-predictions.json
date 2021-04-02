@@ -1,0 +1,42 @@
+[
+  {
+    "predictions": [
+      {
+        "result": [
+          {
+            "type": "timeserieslabels",
+            "value": {
+              "end": 40,
+              "start": 0,
+              "instant": false,
+              "timeserieslabels": [
+                "Run"
+              ]
+            },
+            "to_name": "ts",
+            "from_name": "label",
+            "score": 0.95
+          },
+          {
+            "type": "timeserieslabels",
+            "value": {
+              "end": 91,
+              "start": 60,
+              "instant": false,
+              "timeserieslabels": [
+                "Walk"
+              ]
+            },
+            "to_name": "ts",
+            "from_name": "label",
+            "score": 0.85
+          }
+        ],
+        "score": 0.9
+      }
+    ],
+    "data": {
+      "csv": "https://htx-pub.s3.amazonaws.com/samples/time-series-random.csv"
+    }
+  }
+]

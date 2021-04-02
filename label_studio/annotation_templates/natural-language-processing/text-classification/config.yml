@@ -1,0 +1,30 @@
+title: Text Classification
+type: community
+group: Natural Language Processing
+order: 2
+image: /static/templates/text-classification.png
+details: <h1>Classify text document</h1>
+config: '
+<View>
+  <Text name="text" value="$text"/>
+  <View style="box-shadow: 2px 2px 5px #999;
+               padding: 20px; margin-top: 2em;
+               border-radius: 5px;">
+    <Header value="Choose text sentiment"/>
+    <Choices name="sentiment" toName="text"
+             choice="single" showInLine="true">
+      <Choice value="Positive"/>
+      <Choice value="Negative"/>
+      <Choice value="Neutral"/>
+    </Choices>
+  </View>
+</View>
+
+
+<!-- {
+"data": {"text": "This is a great 3D movie that delivers everything almost right in your face."}
+
+}
+-->
+
+'

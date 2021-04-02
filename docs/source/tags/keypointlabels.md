@@ -1,7 +1,9 @@
 ---
 title: KeyPointLabels
 type: tags
-order: 409
+order: 408
+meta_title: Keypoint Label Tags for Labeling Keypoints
+meta_description: Label Studio Keypoint Label Tags customize Label Studio for labeling keypoints for machine learning and data science projects.
 ---
 
 KeyPointLabels tag
@@ -13,6 +15,9 @@ KeyPointLabels tag creates labeled keypoints
 | --- | --- | --- | --- |
 | name | <code>string</code> |  | name of the element |
 | toName | <code>string</code> |  | name of the image to label |
+| [choice] | <code>single</code> \| <code>multiple</code> | <code>single</code> | configure if you can select just one or multiple labels |
+| [maxUsages] | <code>number</code> |  | maximum available usages |
+| [showInline] | <code>boolean</code> | <code>true</code> | show items in the same visual line |
 | [opacity] | <code>float</code> | <code>0.9</code> | opacity of keypoint |
 | [fillColor] | <code>string</code> |  | keypoint fill color, default is transparent |
 | [strokeWidth] | <code>number</code> | <code>1</code> | width of the stroke |

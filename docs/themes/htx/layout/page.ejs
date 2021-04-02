@@ -1,3 +1,16 @@
+<%
+ removeLabelStudioMention = function(text) {
+  return text
+    .replace(/into Label Studio$/g, '')
+    .replace(/in Label Studio$/g, '')
+    .replace(/with Label Studio$/g, '')
+    .replace(/by Label Studio$/g, '')
+    .replace(/for Label Studio$/g, '')
+    .replace(/from Label Studio$/g, '')
+    .replace(/Label Studio$/g, '')
+  }
+%>
+
 <% if (page.type) { %>
   <%- partial('partials/sidebar', { type: page.type === 'menu' ? 'guide' : page.type, index: page.index }) %>
 <% } else { %>
@@ -46,8 +59,10 @@
 
   <div class="footer-slack">
     <a href="https://join.slack.com/t/label-studio/shared_invite/zt-cr8b7ygm-6L45z7biEBw4HXa5A2b5pw">
-      Could not find what you were looking for or have found an error? Please drop us a note on
+      Couldn't find what you were looking for or found an error? Please let us know on
       Slack&nbsp;<img style="height: 18px; position: absolute" src="/images/slack.png" />
     </a>
   </div>
 </div>
+
+<div class="sub-toc"></div>

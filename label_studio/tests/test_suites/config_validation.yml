@@ -1,0 +1,165 @@
+- invalidate_fields_in_label_config:
+  - /api/projects:
+      method: POST
+      status_code: 201
+      response:
+        id: '{pk}'
+
+  - /api/projects/{pk}/import:
+      method: POST
+      content_type: application/json
+      data:
+        - keyA: 123
+          keyB: 345
+          keyC: 456
+        - keyB: qwe
+          keyC: wer
+          keyD: ert
+      status_code: 201
+
+  # validate unexisted field - ERROR
+  - /api/projects/{pk}/validate:
+      method: POST
+      content_type: application/json
+      status_code: 400
+      data:
+        label_config: <View> <Text name="text" value="$text"/></View>
+
+  # validate "keyA" field which is uncommon across all imported tasks - ERROR
+  - /api/projects/{pk}/validate:
+      method: POST
+      content_type: application/json
+      status_code: 400
+      data:
+        label_config: <View> <Text name="text" value="$text"/></View>
+
+  # validate common "keyB" field - OK!
+  - /api/projects/{pk}/validate:
+      method: POST
+      content_type: application/json
+      status_code: 200
+      data:
+        label_config: <View> <Text name="text" value="$keyB"/> </View>
+
+- try_removing_created_labels:
+    - /api/projects:
+        method: POST
+        data:
+          label_config: '
+          <View>
+            <Text name="text" value="$text"/>
+            <Choices name="label" toName="text">
+              <Choice value="1"/>
+              <Choice value="2"/>
+            </Choices>
+          </View>
+          '
+        status_code: 201
+        response:
+          id: '{pk}'
+
+    - /api/projects/{pk}/import:
+        method: POST
+        content_type: application/json
+        data:
+          - text: Example task sentence
+        status_code: 201
+
+    - /api/projects/{pk}/next:
+        method: GET
+        status_code: 200
+        response:
+          id: '{task_id}'
+
+    - /api/tasks/{task_id}/annotations:
+        method: POST
+        content_type: application/json
+        data:
+          result:
+            - from_name: label
+              to_name: text
+              type: choices
+              value:
+                choices:
+                  - 1
+        status_code: 201
+
+    - /projects/{pk}/settings/labeling:
+        method: GET
+        status_code: 200
+
+    - /api/projects/{pk}:
+        method: PATCH
+        content_type: application/json
+        data:
+          # Trying to remove "1" label from labeling config results to failure
+          label_config: '
+          <View>
+            <Text name="text" value="$text"/>
+            <Choices name="label" toName="text">
+              <Choice value="2"/>
+              <Choice value="3"/>
+            </Choices>
+          </View>'
+        status_code: 400
+        response:
+          detail: Validation error
+          validation_errors:
+            label_config:
+              - "These labels still exist in annotations:\n1 (1 annotations)"
+
+    - /api/projects/{pk}:
+        method: PATCH
+        content_type: application/json
+        data:
+          # Trying to set another control tag results to failure
+          label_config: '
+          <View>
+            <Text name="text" value="$text"/>
+            <Labels name="label" toName="text">
+              <Label value="1"/>
+              <Label value="2"/>
+            </Labels>
+          </View>'
+        status_code: 400
+        response:
+          detail: Validation error
+          validation_errors:
+            label_config:
+              - "Created annotations are incompatible with provided labeling schema, we found:\n1 with from_name=label, to_name=text, type=choices"
+
+    - /api/projects/{pk}:
+        method: PATCH
+        content_type: application/json
+        data:
+          # Trying to remove "1" label from labeling config results to failure
+          label_config: '
+          <View>
+            <Text name="text" value="$text"/>
+            <Choices name="label" toName="text">
+              <Choice value="2"/>
+              <Choice value="3"/>
+              <Choice value="1"/>
+            </Choices>
+          </View>'
+        status_code: 200
+
+    # now delete all tasks
+    - /api/projects/{pk}/tasks:
+        method: DELETE
+        status_code: 204
+
+    - /api/projects/{pk}:
+        method: PATCH
+        content_type: application/json
+        data:
+          # Trying to set another control tag results to failure
+          label_config: '
+          <View>
+            <Text name="text" value="$text"/>
+            <Labels name="label" toName="text">
+              <Label value="1"/>
+              <Label value="2"/>
+            </Labels>
+          </View>'
+        status_code: 200

@@ -1,0 +1,7 @@
+<h1>Logs</h1>
+
+<ul>
+{% for file in files %}
+    <li><a href="{{prefix}}{{file}}">{{file}}</a></li>
+{% endfor %}
+</ul>

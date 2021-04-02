@@ -1,7 +1,9 @@
 ---
 title: KeyPoint
 type: tags
-order: 408
+order: 407
+meta_title: Keypoint Tags for Adding Keypoints to Images
+meta_description: Label Studio Keypoint Tags customize Label Studio for adding keypoints to images for machine learning and data science projects.
 ---
 
 KeyPoint is used to add a keypoint to an image without label selection. It's useful when you have only one label.

@@ -1,183 +1,88 @@
 ---
-title: Getting started
+title: Get started with Label Studio
 type: guide
 order: 100
+meta_title: Getting Started Guide
+meta_description: Label Studio getting started guide for multi-typed data labeling, annotation, and exploration for machine learning and data science projects.
 ---
 
-## Overview
+## What is Label Studio?
 
-Label Studio is a self-contained Web application for multi-typed data labeling and exploration. The _backend_ is written in pure Python powered by [Flask](https://github.com/pallets/flask). The _frontend_ part is a backend-agnostic [React](https://reactjs.org/) + [MST](https://github.com/mobxjs/mobx-state-tree) app, included as a precompiled script.
+Label Studio is an open source data labeling tool for labeling and exploring multiple types of data. You can perform many different types of labeling for many different data formats. 
 
-Here are the main concepts behind Label Studio's workflow:
+You can also integrate Label Studio with machine learning models to supply predictions for labels (pre-labels), or perform continuous active learning. See [Set up machine learning with your labeling process](ml.html). 
 
-<div style="margin:auto; text-align:center; width:100%"><img src="/images/label-studio-ov.jpg" style="opacity: 0.7"/></div>
+<!--Label Studio is also available as Enterprise and Cloud editions with additional features. See [What you get from Label Studio]() for more. -->
 
-- **Tasks** represent an individual dataset items. Label Studio is a multi-type labeling tool - you can [import](tasks.html) either text, image, audio URL, HTML text or any number and combination of these data resources.
-- **Completions** are the labeling results in [JSON format](export.html#Completion-fields). They could be [exported](export.html) in various common formats, ready to use in machine learning pipelines.
-- **Predictions** are the optional labeling results in [the same format](export.html#Completion-fields), but unlike completions they are used for generating pre-labeling during the annotation process, or validating the model predictions.
-- [**Machine learning backend** connects](ml.html) popular machine learning frameworks to Label Studio for active learning & generating model predictions on-the-fly.
-- **Labeling config** is a simple [XML tree with **tags**](setup.html#Labeling-config) used to configure UI elements, connect input data to output labeling scheme.
-- **Project** encompasses tasks, config, predictions and completions all-in-one in an isolated directory
-- **Frontend Labeling UI** is accessible from any browser, distributed as precompiled js/css scripts and could be [easily extendable with new labeling tags](frontend.html). You can also [embed Label Studio UI into your applications](frontend.html#Quickstart).
+## Quick start
 
-
-### Main modules
-
-The main modules of LS are 
-* [Label Studio Backend](https://github.com/heartexlabs/label-studio/) (LSB, main repository)
-* [Label Studio Frontend](https://github.com/heartexlabs/label-studio-frontend) (LSF, editor)
-* [Machine Learning Backends](https://github.com/heartexlabs/label-studio/tree/master/label_studio/ml) (MLB)
-
-<br>
-<div style="margin:auto; text-align:center;"><img src="/images/ls-modules-scheme.png" style="opacity: 0.8"/></div>
-
-### Relations among tasks, completions and results 
-
-Here you can see relations among labeling objects: tasks, completions, results, etc.
-
-One user provides one completion, it’s atomic, and it consists of the result items. Result items can have relations between themselves with the specified direction of three types: left-right, right-left, or bidirectional. Normalizations are additional information in the custom string format about the current result item.
- 
-<br>
-<center><img src="/images/labeling-scheme.png" style="width: 100%; opacity: 0.6"></center>
-<br>
-Completions and Predictions are very similar. But predictions must be generated automatically by ML models.   
-
-**Usage statistics**
-
-Label Studio collects anonymous usage statistics without any sensitive info about page request number and data types from the labeling config. It helps us to improve the labeling quality and gives a better understanding about the next development.
-
-
-## Quickstart
-
-### Prerequisites
-
-Label Studio is supported for Python 3.5 or greater, running on Linux, Windows and MacOSX.
-
-> Note: for Windows users the default installation may fail to build `lxml` package. Consider manually installing it from [unofficial Windows binaries](https://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml) e.g. if you are running on x64 with Python 3.8, run `pip install lxml‑4.5.0‑cp38‑cp38‑win_amd64.whl`.
-
-
-### Running with pip
-
-To install Label Studio via pip, you need Python>=3.5 and run:
+1. Install Label Studio:
 ```bash
 pip install label-studio
 ```
-
-Then launch a new project which stores all labeling data in a local directory `my_project`:
-
+2. Start Label Studio
 ```bash
-label-studio start my_project --init
+label-studio start
 ```
-The default browser opens automatically at [http://localhost:8080](http://localhost:8080).
+3. Open the Label Studio UI at http://localhost:8080. 
+4. Sign up with an email address and password that you create.
+5. Click **Create** to create a project and start labeling data.
+6. Name the project, and if you want, type a description and select a color.
+7. Click **Data Import** and upload the data files that you want to use. If you want to use data from a cloud storage bucket or database, skip this step for now.
+8. Click **Labeling Setup** and choose a template and customize the label names for your use case. 
+9. Click **Save** to save your project. 
+
+You're ready to start [labeling and annotating your data](labeling.html)!
+
+## Labeling workflow with Label Studio
+
+All the steps required to start and finish a labeling project with Label Studio:
+
+1. [Install Label Studio](install.html).
+2. [Start Label Studio](start.html).
+2. [Create accounts for Label Studio](signup.html). Create an account to manage and set up labeling projects. 
+3. [Set up the labeling project](setup.html). Define the type of labeling to perform on the dataset, and add the labels that you want annotators to apply. 
+4. [Import data as labeling tasks](tasks.html).
+5. [Label and annotate the data](labeling.html). 
+<!--6. [Review the completed labeling tasks](quality.html).-->
+7. [Export the labeled data or the annotations](export.html).
 
 
-### Running with Docker
+## Label Studio terminology
 
-Label Studio is also distributed as a docker container. Make sure you have [Docker](https://www.docker.com/) installed on your local machine.
+When you upload data to Label Studio, each item in the dataset becomes a labeling task. The following table describes some terms you might encounter as you use Label Studio.
 
-Install and start Label Studio at [http://localhost:8080](http://localhost:8080) storing all labeling data in `./my_project` directory:
-```bash
-docker run --rm -p 8080:8080 -v `pwd`/my_project:/label-studio/my_project --name label-studio heartexlabs/label-studio:latest
-```
-
-> Note: if `./my_project` the folder exists, an exception will be thrown. Please delete this folder or use `--force` option.
-> Note: for Windows, you have to modify the volumes paths set by `-v` option
-
-You can override the default startup command by appending any of [available command line arguments]():
-
-```bash
-docker run -p 8080:8080 -v `pwd`/my_project:/label-studio/my_project --name label-studio heartexlabs/label-studio:latest label-studio start my_project --init --force --template image_mixedlabel
-```
-
-If you want to build a local image, run:
-```bash
-docker build -t heartexlabs/label-studio:latest .
-```
-
-### Running from source
-
-If you want to use nightly builds, or extend the functionality, consider to download the source code using Git and run Label Studio locally:
-
-```bash
-git clone https://github.com/heartexlabs/label-studio.git
-cd label-studio
-python setup.py develop
-```
-
-Then create a new project, it stores all labeling data in a local directory `my_project`:
-
-```bash
-label-studio start my_project --init
-```
-The default browser will open automatically at [http://localhost:8080](http://localhost:8080).
+| Term | Description |
+| --- | --- |
+| Dataset | What you upload to Label Studio, comprised of individual items. |
+| Task | What Label Studio transforms your individual dataset items into. |
+| Labels | What you add to each dataset item while performing a labeling task in Label Studio. |
+| Region | The portion of the dataset item that has a label assigned to it. | 
+| Relation | A defined relationship between two labeled regions. 
+| Pre-labeling | What machine learning models perform in Label Studio or separate from Label Studio. The result of predicting labels for items in a dataset are predicted labels, or pre-labels. |
+| Annotations | The output of a labeling task. Previously called "completions". |
+| Templates | Example labeling configurations that you can use to specify the type of labeling that you're performing with your dataset. See [all available templates](/templates) |
+| Tags | Configuration options to customize the labeling interface. See [more about tags](/tags). |
 
 
-### Multisession mode
+## Components and architecture
+You can use any of the Label Studio components in your own tools, or customize them to suit your needs. <!--Before customizing Label Studio extensively, you might want to review Label Studio Enterprise Edition to see if it already contains the relevant functionality you want to build. See [What you get from Label Studio](benefits.html) for more.--> 
 
-You can start Label Studio in _multisession mode_ - each browser session creates it's own project with associated session ID as a name.
+The component parts of Label Studio are available as modular extensible packages that you can integrate into your existing machine learning processes and tools. 
 
-In order to launch Label Studio in multisession mode and keep all projects in a separate directory `session_projects`, run
+| Module | Technology | Description |
+| --- | --- | --- | 
+| [Label Studio Backend](https://github.com/heartexlabs/label-studio/) | Python and [Django](https://www.djangoproject.com/) | Use to perform data labeling. | 
+| [Label Studio Frontend](https://github.com/heartexlabs/label-studio-frontend) | JavaScript web app using [React](https://reactjs.org/) and [MST](https://github.com/mobxjs/mobx-state-tree) | Perform data labeling in a user interface. |
+| [Data Manager](https://github.com/heartexlabs/dm2) | JavaScript web app using [React](https://reactjs.org/) | Manage data and tasks for labeling. |
+| [Machine Learning Backends](https://github.com/heartexlabs/label-studio-ml-backend) | Python | Predict data labels at various parts of the labeling process. |
 
-```bash
-label-studio start-multi-session --root-dir ./session_projects
-```
+<br>
+<div style="margin:auto; text-align:center;"><img src="/images/ls-modules-scheme.png" style="opacity: 0.8"/></div>
+<!--update to include data manager--> 
 
+## Information collected by Label Studio
 
-## Command line arguments
-
-You can specify input tasks, project config, machine learning backend and other options via the command line interface. Run `label-studio start --help` to see all available options.
-
-
-### Auth with login and password
-You can restrict the access for LS instance with the basic HTTP auth.
-
-```
-label-studio start my_project --username user --password pwd 
-```
-
-Or put `username` and `password` in the project config.json.
- 
-```
-{ 
- ...
- "username": "user", 
- "password": "pwd",
- ...
-}
-```
-
-> For docker you need to setup environment variables `USERNAME` and `PASSWORD`
-
-It will be the same username and password for all the users.
+Label Studio collects anonymous usage statistics about the number of page visits and data types being used in labeling configurations that you set up. No sensitive information is included in the information we collect. The information we collect helps us improve the experience of labeling data in Label Studio and helps us plan future data types and labeling configurations to support.
 
 
-### WSGIServer instead of Flask
-
-Use `--use-gevent` option on start to enable WSGI server. It wraps around app.run with gevent's WSGIServer to enable the server to better handle concurrent requests.
-
-```
-label-studio start test --use-gevent
-```
-
-### HTTPS & SSL
-
-You can enable https protocol for Flask or WSGIServer. You need to generate SSL certificate and key for it, e.g.: 
-
-```
-openssl req -newkey rsa:2048 -nodes -keyout key.pem -x509 -days 365 -out certificate.pem
-```
-
-Than you need to use `--cert` and `--key` option on start:
-
-```
-label-studio start test --cert certificate.pem --key key.pem
-```
-
-
-### Health check
-
-LS has a special endpoint for health checks: 
-  
-```
-/api/health
-```

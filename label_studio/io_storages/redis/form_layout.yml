@@ -1,0 +1,52 @@
+# 2x2 grid
+redis_params: &redis_params
+  - type: text
+    name: path
+    label: Path
+  - type: password
+    name: password
+    label: Password
+    autoComplete: "new-password"
+  - type: text
+    name: host
+    label: Host
+    placeholder: localhost
+  - type: text
+    name: port
+    label: Port
+
+ImportStorage:
+  # Title, Bucket, Prefix
+  - columnCount: 2
+    fields: *redis_params
+  # Regex filter
+  - columnCount: 1
+    fields:
+      - type: text
+        name: regex_filter
+        label: File Filter Regex
+        placeholder: '.*csv or .*(jpe?g|png|tiff) or .\w+-\d+.text'
+
+  # 2 columns grid
+  - columnCount: 2
+    columns:
+      - width: 371
+        fields:
+          - type: toggle
+            name: use_blob_urls
+            label: Treat every bucket object as a source file
+            description: If unchecked, treat every bucket object as a JSON-formatted task. Optional
+      - fields:
+          - type: toggle
+            name: presign
+            label: Use pre-signed URLs
+            value: true
+          - type: counter
+            name: presign_ttl
+            value: 1
+            min: 1
+            dependency: presign
+
+ExportStorage:
+  - columnCount: 2
+    fields: *redis_params

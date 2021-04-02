@@ -1,0 +1,105 @@
+<View>
+  <ParagraphLabels name="entity_slot" toName="dialogue">
+    <Label value="Person" background="#ff0012"/>
+    <Label value="Organization" background="#2311de" />
+    <Label value="Location" background="#00ff01"/>
+    <Label value="Datetime" />
+    <Label value="Quantity" />
+  </ParagraphLabels>
+  <Paragraphs name="dialogue" value="$dialogue" layout="dialogue" />
+    <Choices name="intent" toName="dialogue"
+         choice="single" showInLine="true">
+        <Choice value="Greeting"/>
+        <Choice value="Customer request"/>
+        <Choice value="Small talk"/>
+    </Choices>
+</View>
+
+<!-- {"data": {
+"dialogue": [
+{"author": "Human", "text": "Hi, Robot!"},
+{"author": "Robot", "text": "Nice to meet you, man! Tell me what you want."},
+{"author": "Human", "text": "Order me a pizza from Golden Boy on Green Street "},
+{"author": "Robot", "text": "Done. When do you want to get the order?"},
+{"author": "Human", "text": "At 3am in the morning, please"}]},
+"completions": [{"result":
+[
+    {
+        "value": {
+            "start": "0",
+            "end": "0",
+            "startOffset": 4,
+            "endOffset": 9,
+            "text": "Robot",
+            "paragraphlabels": [
+                "Person"
+            ]
+        },
+        "id": "g55qAdy6_r",
+        "from_name": "entity_slot",
+        "to_name": "dialogue",
+        "type": "paragraphlabels"
+    },
+    {
+        "value": {
+            "start": "2",
+            "end": "2",
+            "startOffset": 22,
+            "endOffset": 32,
+            "text": "Golden Boy",
+            "paragraphlabels": [
+                "Organization"
+            ]
+        },
+        "id": "yTpkKPqlse",
+        "from_name": "entity_slot",
+        "to_name": "dialogue",
+        "type": "paragraphlabels"
+    },
+    {
+        "value": {
+            "start": "2",
+            "end": "2",
+            "startOffset": 36,
+            "endOffset": 48,
+            "text": "Green Street",
+            "paragraphlabels": [
+                "Location"
+            ]
+        },
+        "id": "UytHv0Lupw",
+        "from_name": "entity_slot",
+        "to_name": "dialogue",
+        "type": "paragraphlabels"
+    },
+    {
+        "value": {
+            "start": "4",
+            "end": "4",
+            "startOffset": 3,
+            "endOffset": 19,
+            "text": "At 3am in the morning, please",
+            "paragraphlabels": [
+                "Datetime"
+            ]
+        },
+        "id": "krJKrRSxp-",
+        "from_name": "entity_slot",
+        "to_name": "dialogue",
+        "type": "paragraphlabels"
+    },
+    {
+        "value": {
+            "choices": [
+                "Customer request"
+            ]
+        },
+        "id": "XswhdjSiqQ",
+        "from_name": "intent",
+        "to_name": "dialogue",
+        "type": "choices"
+    }
+]
+}]
+}
+-->

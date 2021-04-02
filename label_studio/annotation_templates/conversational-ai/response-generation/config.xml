@@ -1,0 +1,24 @@
+<View>  
+  <Paragraphs name="chat" value="$dialogue" layout="dialogue" />
+  <Header value="Provide response" />
+  <TextArea name="response" toName="chat" rows="4" editable="true" maxSubmissions="1" />
+</View>
+
+<!-- {
+"completions": [{"result":
+[
+    {
+        "value": {
+            "text": [
+                "So let me know when you've found the answer..."
+            ]
+        },
+        "id": "FS_-CrnXdK",
+        "from_name": "response",
+        "to_name": "chat",
+        "type": "textarea"
+    }
+]
+}]
+}
+-->

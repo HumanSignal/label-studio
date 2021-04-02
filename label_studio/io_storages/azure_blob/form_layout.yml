@@ -1,0 +1,65 @@
+# 1x3 grid
+title_container_prefix: &title_container_prefix
+  - type: text
+    name: title
+    label: Storage Title
+  - type: text
+    name: container
+    label: Container Name
+    required: true
+  - type: text
+    name: prefix
+    label: Container Prefix
+
+# 1x3 grid
+azure_params: &azure_params
+  - type: text
+    name: account_name
+    label: Account Name
+    placeholder: us-east-1
+  - type: password
+    name: account_key
+    label: Account Key
+    autoComplete: "new-password"
+  - null
+
+ImportStorage:
+  # Title, Bucket, Prefix
+  - columnCount: 3
+    fields: *title_container_prefix
+  # Regex filter
+  - columnCount: 1
+    fields:
+      - type: text
+        name: regex_filter
+        label: File Filter Regex
+        placeholder: '.*csv or .*(jpe?g|png|tiff) or .\w+-\d+.text'
+  # AWS specific params
+  - columnCount: 3
+    fields: *azure_params
+
+  # 2 columns grid
+  - columnCount: 2
+    columns:
+      - width: 371
+        fields:
+          - type: toggle
+            name: use_blob_urls
+            label: Treat every bucket object as a source file
+            description: If unchecked, treat every bucket object as a JSON-formatted task. Optional
+      - fields:
+          - type: toggle
+            name: presign
+            label: Use pre-signed URLs
+            value: true
+          - type: counter
+            name: presign_ttl
+            value: 1
+            min: 1
+            dependency: presign
+
+ExportStorage:
+  - columnCount: 3
+    fields: *title_container_prefix
+  - columnCount: 2
+    fields: *azure_params

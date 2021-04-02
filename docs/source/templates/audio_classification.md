@@ -2,6 +2,8 @@
 title: Audio Classification
 type: templates
 order: 401
+meta_title: Audio Classification Data Labeling Template
+meta_description: Label Studio Audio Classification Template for machine learning and data science data labeling projects.
 ---
 
 Listen to the audio file and classify

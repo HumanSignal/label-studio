@@ -1,0 +1,25 @@
+title: Response Selection
+type: community
+group: Conversational AI
+image: /static/templates/response-selection.png
+details: <h1>Collect chatbot training data by selecting next dialogue response</h1>
+config: '
+<View>
+  <Paragraphs name="prg" value="$humanMachineDialogue" layout="dialogue" />
+  <Header value="Choose response" />
+  <View style="display: flex;">
+    <View>
+    <Text name="resp1" value="$respone" />
+    <Text name="resp2" value="$resptwo" />
+    <Text name="resp3" value="$respthree" />
+    </View>
+    <View style="padding: 50px;">
+    <Choices name="resp" toName="prg" required="true">
+      <Choice value="One" />
+      <Choice value="Two" />
+  	  <Choice value="Three" />
+    </Choices>
+    </View>
+  </View>
+</View>
+'

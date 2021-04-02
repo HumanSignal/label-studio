@@ -1,0 +1,317 @@
+tutorial_with_text_classifier_generic:
+
+  project_config:
+    title: Project with generic text classifier
+    label_config: '
+    <View>
+      <Text name="my_text" value="$text"/>
+      <Choices name="my_class" toName="my_text">
+        <Choice value="pos"/>
+        <Choice value="neg"/>
+      </Choices>
+    </View>
+    '
+    min_completions_to_start_training: 2
+
+  ml_backend: text_classifier_generic
+
+  upload_tasks:
+    - text: some positive review
+    - text: some negative review
+
+  completions:
+    - result:
+        - from_name: my_class
+          to_name: my_text
+          value:
+            choices:
+              - pos
+    - result:
+        - from_name: my_class
+          to_name: my_text
+          value:
+            choices:
+              - neg
+
+  prediction_tasks:
+    - text: another positive review
+    - text: another negative review
+
+  wait_model: 20
+
+  expected_predictions:
+    - result:
+        - from_name: my_class
+          to_name: my_text
+          type: choices
+          value:
+            choices:
+              - pos
+            nbest:
+              - pos
+              - neg
+      score_above: 0.9
+
+    - result:
+        - from_name: my_class
+          to_name: my_text
+          type: choices
+          value:
+            choices:
+              - neg
+            nbest:
+              - neg
+              - pos
+      score_above: 0.9
+
+#tutorial_with_text_classifier_en:
+#
+#  project_config:
+#    title: Project with Text classifier EN
+#    label_config: '
+#    <View>
+#      <Text name="my_text" value="$text"/>
+#      <Choices name="my_class" toName="my_text">
+#        <Choice value="pos"/>
+#        <Choice value="neg"/>
+#      </Choices>
+#    </View>
+#    '
+#    min_completions_to_start_training: 2
+#
+#  ml_backend: textclassifier_en
+#
+#  upload_tasks:
+#    - text: some positive review
+#    - text: some negative review
+#
+#  completions:
+#    - result:
+#        - from_name: my_class
+#          to_name: my_text
+#          type: choices
+#          value:
+#            choices:
+#              - pos
+#    - result:
+#        - from_name: my_class
+#          to_name: my_text
+#          type: choices
+#          value:
+#            choices:
+#              - neg
+#
+#  prediction_tasks:
+#    - text: another positive review
+#    - text: another negative review
+#
+#  wait_model: 120
+#
+#  expected_predictions:
+#    - result:
+#        - from_name: my_class
+#          to_name: my_text
+#          type: choices
+#          value:
+#            choices:
+#              - pos
+#      score_above: 0.9
+#
+#    - result:
+#        - from_name: my_class
+#          to_name: my_text
+#          type: choices
+#          value:
+#            choices:
+#              - neg
+#      score_above: 0.9
+
+tutorial_with_text_taggger_generic:
+
+  project_config:
+    title: Project with Text tagger
+    label_config: '
+    <View>
+      <Text name="my_text" value="$text"/>
+      <Labels name="my_tag" toName="my_text">
+        <Label value="pos"/>
+        <Label value="neg"/>
+      </Labels>
+    </View>
+    '
+    min_completions_to_start_training: 2
+
+  ml_backend: text_tagger_generic
+
+  upload_tasks:
+    - text: some positive review
+    - text: some negative review
+
+  completions:
+    - result:
+        - from_name: my_tag
+          to_name: my_text
+          type: labels
+          value:
+            start: 5
+            end: 13
+            text: positive
+            labels:
+              - pos
+    - result:
+        - from_name: my_tag
+          to_name: my_text
+          type: labels
+          value:
+            start: 5
+            end: 13
+            text: negative
+            labels:
+              - neg
+
+  prediction_tasks:
+    - text: another positive review
+    - text: another negative review
+
+  wait_model: 10
+
+  expected_predictions:
+    - result:
+        - from_name: my_tag
+          to_name: my_text
+          type: labels
+          value:
+            start: 8
+            end: 16
+            text: positive
+            labels:
+              - pos
+      score_above: 0.9
+
+    - result:
+        - from_name: my_tag
+          to_name: my_text
+          type: labels
+          value:
+            start: 8
+            end: 16
+            text: negative
+            labels:
+              - neg
+      score_above: 0.9
+
+tutorial_with_cats_and_dogs_image_classifier:
+
+  project_config:
+    title: Cats and Dogs
+    label_config: '
+    <View>
+      <Image name="my_image" value="$image"/>
+      <Choices name="my_class" toName="my_image">
+        <Choice value="cat"/>
+        <Choice value="dog"/>
+      </Choices>
+    </View>
+    '
+    min_completions_to_start_training: 10
+
+  ml_backend: imageclassifier
+
+  upload_tasks:
+    - image: http://s3.amazonaws.com/heartex-private/cats_n_dogs/training_set/dogs/dog.1753.jpg
+    - image: http://s3.amazonaws.com/heartex-private/cats_n_dogs/training_set/dogs/dog.3144.jpg
+    - image: http://s3.amazonaws.com/heartex-private/cats_n_dogs/training_set/dogs/dog.775.jpg
+    - image: http://s3.amazonaws.com/heartex-private/cats_n_dogs/training_set/dogs/dog.3622.jpg
+    - image: http://s3.amazonaws.com/heartex-private/cats_n_dogs/training_set/dogs/dog.1035.jpg
+    - image: http://s3.amazonaws.com/heartex-private/cats_n_dogs/test_set/cats/cat.4358.jpg
+    - image: http://s3.amazonaws.com/heartex-private/cats_n_dogs/test_set/cats/cat.4364.jpg
+    - image: http://s3.amazonaws.com/heartex-private/cats_n_dogs/test_set/cats/cat.4402.jpg
+    - image: http://s3.amazonaws.com/heartex-private/cats_n_dogs/test_set/cats/cat.4416.jpg
+    - image: http://s3.amazonaws.com/heartex-private/cats_n_dogs/test_set/cats/cat.4370.jpg
+
+  completions:
+    - result:
+        - from_name: my_class
+          to_name: my_image
+          value:
+            choices:
+              - dog
+    - result:
+        - from_name: my_class
+          to_name: my_image
+          value:
+            choices:
+              - dog
+    - result:
+        - from_name: my_class
+          to_name: my_image
+          value:
+            choices:
+              - dog
+    - result:
+        - from_name: my_class
+          to_name: my_image
+          value:
+            choices:
+              - dog
+    - result:
+        - from_name: my_class
+          to_name: my_image
+          value:
+            choices:
+              - dog
+    - result:
+        - from_name: my_class
+          to_name: my_image
+          value:
+            choices:
+              - cat
+    - result:
+        - from_name: my_class
+          to_name: my_image
+          value:
+            choices:
+              - cat
+    - result:
+        - from_name: my_class
+          to_name: my_image
+          value:
+            choices:
+              - cat
+    - result:
+        - from_name: my_class
+          to_name: my_image
+          value:
+            choices:
+              - cat
+    - result:
+        - from_name: my_class
+          to_name: my_image
+          value:
+            choices:
+              - cat
+
+  prediction_tasks:
+    - image: http://s3.amazonaws.com/heartex-private/cats_n_dogs/training_set/dogs/dog.3953.jpg
+    - image: http://s3.amazonaws.com/heartex-private/cats_n_dogs/test_set/cats/cat.4415.jpg
+
+  wait_model: 10
+
+  expected_predictions:
+    - result:
+        - from_name: my_class
+          to_name: my_image
+          type: choices
+          value:
+            choices:
+              - dog
+      score_above: 0.9
+
+    - result:
+        - from_name: my_class
+          to_name: my_image
+          type: choices
+          value:
+            choices:
+              - cat
+      score_above: 0.9

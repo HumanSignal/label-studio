@@ -1,0 +1,287 @@
+/* Account page */
+
+body {
+  --border-color: rgba(0, 0, 0, 0.15);
+  --color-error: #d00;
+}
+.account-page {
+  display: grid;
+  grid-template: auto / 1fr 1fr;
+  gap: 24px;
+}
+.account-page > * {
+  border: 1px solid var(--border-color);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+.account-page header {
+  font-size: 1.5em;
+}
+.account-page form ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template: auto / auto;
+  gap: 12px;
+}
+.account-page .user-some-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+}
+.user-pic {
+  display: grid;
+  grid-template: auto / 92px auto;
+  align-items: start;
+  column-gap: 16px;
+}
+.userpic > span {
+  text-transform: uppercase;
+}
+.user-pic > *:first-child {
+  grid-row: span 2;
+}
+.user-pic > *:last-child {
+  align-self: end;
+}
+.user-pic input,
+.user-pic button {
+  display: none;
+}
+
+.user-pic.can_delete button {
+  display: initial;
+}
+
+.user-pic.can_upload input {
+  display: initial;
+}
+
+.user-activity {
+  text-align: right;
+}
+.user-activity p {
+  margin-bottom: 10px;
+  color: rgba(0, 0, 0, 0.6);
+}
+.account-page footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.account-page footer p {
+  color: rgba(0, 0, 0, 0.2);
+  margin: 0;
+}
+
+/* Users page */
+
+#users {
+  display: grid;
+  grid-template: auto / 1fr 1fr;
+  gap: 20px;
+}
+#users table {
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  text-align: left;
+}
+#users table thead {
+  font-weight: 500;
+}
+#users table td, #users table th {
+  border: none;
+}
+#users table tbody tr {
+  cursor: pointer;
+}
+#users table tr {
+  background: rgba(0, 0, 0, 0.0001);
+}
+#users table tr.active {
+  box-shadow: 0 0 10px rgb(0 0 0 / 15%);
+}
+#users table tr:nth-child(2n + 1) {
+  background: rgba(0, 0, 0, 0.03);
+}
+#users table thead tr:nth-child(1) {
+  background: transparent;
+}
+#users table td, #users table th {
+  padding: 0 10px;
+  height: 48px;
+}
+
+.user-info {
+  padding: 20px 24px;
+  border: 1px solid rgba(0,0,0,0.15);
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  position: relative;
+}
+.user-info__header {
+  display: grid;
+  grid-template: auto / 64px auto;
+  column-gap: 16px;
+  line-height: 1.5;
+  color: rgba(0, 0, 0, 0.6);
+}
+.user-info__header > .email {
+  margin-top: 0 !important;
+}
+.user-info__header > *:first-child {
+  grid-row: span 2;
+}
+.user-info__header h2 {
+  font-size: 1.5em;
+  margin: 0;
+  color: #000;
+}
+.user-info__section h3 {
+  margin-top: 1em;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+.user-info__section a {
+  display: block;
+  color: rgb(16, 125, 235);
+  font-size: 14px;
+  line-height: 22px;
+}
+.user-info__section a:hover {
+  color: #40a9ff;
+}
+.user-info button.danger {
+  border: none;
+  background: none;
+  text-align: left;
+  padding-left: 0;
+  font-weight: normal;
+}
+.user-info button.close {
+  position: absolute;
+  right: 0;
+  top: 0;
+  border: 0;
+  padding: 20px;
+  background: 0;
+  min-width: 0;
+}
+
+.user-info .last-active {
+  color: gray;
+  margin-top: 1.75em;
+  margin-bottom: 0;
+}
+
+#users .roles-details {
+  padding: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  align-self: start;
+  color: rgba(0, 0, 0, 0.6);
+  line-height: 1.5em;
+}
+#users .roles-details summary {
+  display: flex;
+  cursor: pointer;
+  align-items: start;
+}
+#users .roles-details summary::-webkit-details-marker {
+  display: none;
+}
+#users .roles-details summary button {
+  border: none;
+  background: none;
+  flex-shrink: 0;
+  min-width: 0;
+  padding: 0;
+  pointer-events: none;
+}
+#users .roles-details summary:hover {
+  opacity: 0.9;
+}
+#users .roles-details summary:hover button {
+  opacity: 0.6;
+}
+#users .roles-details details[open] summary button {
+  transform: rotate(180deg);
+}
+.roles-details li {
+  border-top: 1px solid rgba(0,0,0,0.15);
+  list-style: none;
+  margin-top: 15px;
+  padding-top: 15px;
+
+  display: grid;
+  grid-template: auto / 1fr 1fr;
+  justify-content: space-between;
+}
+.roles-details li header {
+  font-weight: 500;
+  color: #000;
+}
+.roles-details li .access {
+  margin-left: auto;
+  font-size: 14px;
+  color: #000;
+}
+.roles-details li p {
+  grid-column: span 2;
+}
+
+.access_token__info button {
+  padding-right: 32px;
+  padding-left: 32px;
+}
+textarea.example_code {
+  font-size: 16px;
+  font-family: monospace;
+  font-weight: 100;
+  white-space: normal;
+}
+.access_token__info label {
+  opacity: 0.6;
+}
+
+button.blinking-status::after {
+  content: "✓";
+  opacity: 0;
+  margin-right: -2em;
+  width: 2em;
+  display: inline-block;
+  transition: 0.3s 1s opacity;
+}
+button.blinking-status.blink::after {
+  opacity: 1;
+  transition: none;
+}
+
+.users {
+  border-collapse: collapse;
+}
+
+.users th,
+.users td {
+  font: 16px/normal 'Roboto';
+  color: black;
+}
+
+.users th {
+  font-weight: 500;
+}
+
+.users .users__column.avatar,
+.users .users__field.avatar {
+  width: 28px;
+}
+
+.users .users__column.last_activity,
+.users .users__field.last_activity {
+  opacity: 0.4;
+  min-width: 90px;
+}
+

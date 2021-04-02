@@ -2,6 +2,8 @@
 title: Text
 type: tags
 order: 306
+meta_title: Text Tags for Text Objects
+meta_description: Label Studio Text Tags customize Label Studio for Text for machine learning and data science projects.
 ---
 
 Text tag shows an Text markup that can be labeled.
@@ -13,7 +15,9 @@ In any case every space counts for result offsets.
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | name | <code>string</code> |  | name of the element |
-| value | <code>string</code> |  | value of the element |
+| value | <code>string</code> |  | data field with text or url |
+| [valueType] | <code>url</code> \| <code>text</code> |  | where is the text stored — directly in task or should be loaded by url |
+| [saveTextResult] | <code>yes</code> \| <code>no</code> |  | store labeled text along with result or not; by default doesn't store text for `valueType=url` |
 | [selectionEnabled] | <code>boolean</code> | <code>true</code> | enable or disable selection |
 | [highlightColor] | <code>string</code> |  | hex string with highlight color, if not provided uses the labels color |
 | [granularity] | <code>symbol</code> \| <code>word</code> | <code>symbol</code> | control per symbol or word selection |

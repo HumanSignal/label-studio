@@ -1,0 +1,14 @@
+title: Sound Event Detection
+type: community
+group: Audio/Speech Processing
+image: /static/templates/sound-event-detection.png
+details: <h1>Select audio span and classify sound event</h1>
+config: '
+<View>
+  <Labels name="label" toName="audio" zoom="true" hotkey="ctrl+enter">
+    <Label value="Event A" background="red"/>
+    <Label value="Event B" background="green"/>
+  </Labels>
+  <AudioPlus name="audio" value="$audio"/>
+</View>
+'

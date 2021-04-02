@@ -1,0 +1,48 @@
+<View>
+  <Labels name="labels" toName="audio">
+    <Label value="Speech" />
+    <Label value="Noise" />
+  </Labels>
+
+  <AudioPlus name="audio" value="$audio"/>
+
+  <TextArea name="transcription" toName="audio"
+            rows="2" editable="true"
+            perRegion="true" required="true" />
+</View>
+
+<!-- { "data":
+{"audio": "https://app.heartex.ai/static/samples/game.wav"},
+"completions": [{
+"result": [
+    {
+        "original_length": 3.77437641723356,
+        "value": {
+            "start": 0.9167245904503621,
+            "end": 2.4340618436095824,
+            "labels": [
+                "Speech"
+            ]
+        },
+        "id": "wavesurfer_8q3en87p138",
+        "from_name": "labels",
+        "to_name": "audio",
+        "type": "labels"
+    },
+    {
+        "original_length": 3.77437641723356,
+        "value": {
+            "start": 0.9167245904503621,
+            "end": 2.4340618436095824,
+            "text": [
+                "Wow wow wow!!!...."
+            ]
+        },
+        "id": "wavesurfer_8q3en87p138",
+        "from_name": "transcription",
+        "to_name": "audio",
+        "type": "textarea"
+    }
+]
+}]
+} -->

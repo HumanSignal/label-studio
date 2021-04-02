@@ -1,0 +1,12 @@
+title: Automatic Speech Recognition
+type: community
+group: Audio/Speech Processing
+image: /static/templates/automatic-speech-recognition.png
+details: <h1>Provide transcript for the audio</h1>
+config: '
+<View>
+  <Audio name="audio" value="$audio" zoom="true" hotkey="ctrl+enter" />
+  <Header value="Provide Transcription" />
+  <TextArea name="transcription" toName="audio" rows="4" editable="true" maxSubmissions="1" />
+</View>
+'

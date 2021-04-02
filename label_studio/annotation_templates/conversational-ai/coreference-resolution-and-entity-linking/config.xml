@@ -1,0 +1,52 @@
+<View>
+  <Labels name="label" toName="text">
+    <Label value="Noun" background="red"/>
+    <Label value="Pronoun" background="darkorange"/>
+  </Labels>
+
+  <Text name="text" value="$text"/>
+</View>
+
+
+<!-- {
+"data": {"text": "I voted for Obama because he was most aligned with my values, she said."},
+"completions": [{"result":
+[
+    {
+        "value": {
+            "start": 12,
+            "end": 17,
+            "text": "Obama",
+            "labels": [
+                "Noun"
+            ]
+        },
+        "id": "kxKxpzC_LL",
+        "from_name": "label",
+        "to_name": "text",
+        "type": "labels"
+    },
+    {
+        "value": {
+            "start": 26,
+            "end": 28,
+            "text": "he",
+            "labels": [
+                "Pronoun"
+            ]
+        },
+        "id": "WX54Df3tTB",
+        "from_name": "label",
+        "to_name": "text",
+        "type": "labels"
+    },
+    {
+        "from_id": "WX54Df3tTB",
+        "to_id": "kxKxpzC_LL",
+        "type": "relation",
+        "direction": "right"
+    }
+]
+}]
+}
+-->

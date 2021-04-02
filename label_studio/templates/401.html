@@ -1,0 +1,17 @@
+{% extends 'simple.html' %}
+{% load static %}
+
+{% block head %}
+    <title>401 | Label Studio</title>
+{% endblock %}
+
+
+{% block content %}
+<div class="masthead error segment">
+    <div class="container">
+        <h1 class="ui dividing header">Authentication Error</h1>
+        <p>Authentication credentials were not provided</p>
+        <p>{{ exception }}</p>
+    </div>
+</div>
+{% endblock %}

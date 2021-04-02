@@ -1,0 +1,59 @@
+- create_project_with_label_config_then_import:
+
+    - /api/projects:
+        method: POST
+        status_code: 201
+        response:
+          id: '{pk}'
+
+    - /api/projects/{pk}:
+        method: PATCH
+        content_type: application/json
+        data:
+          label_config: '<View>
+            <Image name="image" value="$image"/>
+            <Header value="Describe the image:"/>
+            <TextArea name="caption" toName="image" placeholder="Enter description here..." rows="5" maxSubmissions="1"/>
+            </View>
+          '
+        status_code: 200
+
+    - /api/projects/{pk}/import:
+        method: POST
+        content_type: application/json
+        data:
+          - wrong_field: http://pytest.heartex.com/image1.jpg
+          - wrong_field: http://pytest.heartex.com/image2.jpg
+        status_code: 400
+
+    - /api/projects/{pk}/import?commit_to_project=false:
+        method: POST
+        content_type: multipart/form-data
+        data:
+          file: samples/image_urls.csv # 3 image urls in tabular format with "image" data column
+        status_code: 201
+        response:
+          file_upload_ids: '{file_upload_ids}'
+          could_be_tasks_list: true
+
+    - /api/projects/{pk}/reimport:
+        method: POST
+        content_type: application/json
+        data:
+          file_upload_ids: '{file_upload_ids}'
+          files_as_tasks_list: true
+        status_code: 201
+        response:
+          task_count: 3
+
+    - /projects/{pk}/data:
+        method: GET
+        status_code: 200
+
+    - /api/projects/{pk}/summary:
+        method: GET
+        status_code: 200
+        response:
+          all_data_columns:
+            id: 3
+            image: 3
