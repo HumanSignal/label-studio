@@ -1,6 +1,6 @@
 {
-  "message": "Fixing issues with always calling next_task for no reason",
-  "commit": "0ec820ee1044835e2d76bde4fbcbe9b2c48429ca",
+  "message": "Annotation generation logic fix",
+  "commit": "7751a996682f145d651123af27286f4f392c293c",
   "branch": "master",
-  "date": "2021-04-01T00:33:31Z"
+  "date": "2021-04-02T13:15:22Z"
 }
