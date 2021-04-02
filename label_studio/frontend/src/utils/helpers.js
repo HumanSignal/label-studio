@@ -64,6 +64,16 @@ export const absoluteURL = (path = "") => {
   }
 };
 
+export const removePrefix = (path) => {
+  if (APP_SETTINGS.hostname) {
+    const hostname = APP_SETTINGS.hostname;
+    const prefix = (new URL(hostname.replace(/([/]+)$/, ''))).pathname;
+    return path.replace(new RegExp(`^${prefix}`), '');
+  }
+
+  return path;
+};
+
 export const copyText = (text) => {
   const input = document.createElement('textarea');
   document.body.appendChild(input);

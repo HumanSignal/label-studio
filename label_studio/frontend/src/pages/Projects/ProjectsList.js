@@ -6,6 +6,7 @@ import { NavLink } from 'react-router-dom';
 import { LsBulb, LsCheck, LsEllipsis, LsMinus } from '../../assets/icons';
 import { Button, Dropdown, Menu, Userpic } from '../../components';
 import { Block, Elem } from '../../utils/bem';
+import { absoluteURL } from '../../utils/helpers';
 
 export const ProjectsList = ({projects}) => {
   const history = useHistory();
@@ -21,7 +22,7 @@ export const ProjectsList = ({projects}) => {
 export const EmptyProjectsList = ({ openModal }) => {
   return (
     <Block name="empty-projects-page">
-      <Elem name="heidi" tag="img" src="/static/images/opossum_looking.png" />
+      <Elem name="heidi" tag="img" src={absoluteURL("/static/images/opossum_looking.png")} />
       <Elem name="header" tag="h1">Heidi doesn’t see any projects here</Elem>
       <p>Create one and start labeling your data</p>
       <Elem name="action" tag={Button} onClick={openModal} look="primary">Create Project</Elem>

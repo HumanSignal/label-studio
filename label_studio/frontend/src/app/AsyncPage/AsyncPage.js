@@ -3,6 +3,7 @@ import { useHistory } from 'react-router';
 import { ErrorWrapper } from '../../components/Error/Error';
 import { modal } from '../../components/Modal/Modal';
 import { ConfigContext } from '../../providers/ConfigProvider';
+import { removePrefix } from '../../utils/helpers';
 import { clearScriptsCache, isScriptValid, reInsertScripts, replaceScript } from '../../utils/scripts';
 
 const pageCache = new Map();
@@ -222,13 +223,15 @@ export const AsyncPage = ({children}) => {
     const target = e.target.closest('a[href]:not([target]):not([download])');
 
     if (!isVisitable(target)) return;
-    if (target.matches('[data-no-async]')) return;
+    if (target.matches('[data-external]')) return;
     if (e.metaKey || e.ctrlKey) return;
 
     e.preventDefault();
     const fetched = await fetchStatic(target.href);
 
-    if (fetched) history.push(`${target.pathname}${target.search}`);
+    if (fetched) {
+      history.push(`${removePrefix(target.pathname)}${target.search}`);
+    }
   }, []);
 
   const onPopState = useCallback(() => {

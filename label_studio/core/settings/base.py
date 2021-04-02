@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 import os
+import re
 
 from core.utils.io import get_data_dir
 from core.utils.params import get_bool_env, get_env
@@ -21,7 +22,18 @@ if HOSTNAME:
         print("! HOST variable found in environment, but it must start with http:// or https://, ignore it:", HOSTNAME)
         HOSTNAME = ''
     else:
-        print("=> HOSTNAME correctly set to:", HOSTNAME)
+        print("=> Hostname correctly is set to:", HOSTNAME)
+        if HOSTNAME.endswith('/'):
+            HOSTNAME = HOSTNAME[0:-1]
+
+        # for django url resolver
+        if HOSTNAME:
+            # http[s]://domain.com:8080/script_name => /script_name
+            pattern = re.compile(r'^http[s]?:\/\/([^:\/\s]+(:\d*)?)(.*)?')
+            match = pattern.match(HOSTNAME)
+            FORCE_SCRIPT_NAME = match.group(3)
+            if FORCE_SCRIPT_NAME:
+                print("=> Django URL prefix is set to:", FORCE_SCRIPT_NAME)
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '$(fefwefwef13;LFK{P!)@#*!)kdsjfWF2l+i5e3t(8a1n'
@@ -35,7 +47,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Base path for media root and other uploaded files
 BASE_DATA_DIR = get_env('BASE_DATA_DIR', get_data_dir())
 os.makedirs(BASE_DATA_DIR, exist_ok=True)
-print('=> Database and media directory:', BASE_DATA_DIR, '\n')
+print('=> Database and media directory:', BASE_DATA_DIR)
 
 # Databases
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
@@ -145,6 +157,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'core.middleware.CommonMiddlewareAppendSlashWithoutRedirect',  # instead of 'CommonMiddleware'
+    'core.middleware.CommonMiddleware',
     'core.middleware.DRFResponseFormatter',
     'django_user_agents.middleware.UserAgentMiddleware',
     'core.middleware.SetSessionUIDMiddleware',
@@ -185,7 +198,6 @@ CORS_ALLOW_METHODS = [
     'PUT',
 ]
 ALLOWED_HOSTS = ['*']
-APPEND_SLASH = True
 
 # Auth modules
 AUTH_USER_MODEL = 'users.User'
@@ -267,6 +279,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 STATIC_URL = '/static/'
+if HOSTNAME:
+    STATIC_URL = HOSTNAME + STATIC_URL
+print(f'=> Static URL is set to: {STATIC_URL}')
+
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_build')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATICFILES_FINDERS = (
@@ -282,9 +298,9 @@ CSRF_COOKIE_HTTPONLY = bool(int(get_env('CSRF_COOKIE_HTTPONLY', SESSION_COOKIE_S
 
 # user media files
 MEDIA_ROOT = os.path.join(BASE_DATA_DIR, 'media')
-UPLOAD_DIR = 'upload'
 MEDIA_URL = '/data/'
-AVATAR_PATH = 'avatars/'
+UPLOAD_DIR = 'upload'
+AVATAR_PATH = 'avatars'
 
 # project exports
 EXPORT_DIR = os.path.join(BASE_DATA_DIR, 'export')
@@ -342,3 +358,5 @@ SAVE_USER = 'users.functions.save_user'
 import mimetypes
 mimetypes.add_type("application/javascript", ".js", True)
 mimetypes.add_type("image/png", ".png", True)
+
+print()  # just empty line

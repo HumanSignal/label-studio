@@ -204,6 +204,12 @@ export class APIProxy {
           } else {
             requestParams.body = extendedBody;
           }
+
+          // @todo better check for files maybe?
+          if (contentType === "multipart/form-data") {
+            // fetch will set correct header with boundaries
+            requestHeaders.delete('Content-Type');
+          }
         }
 
         /** @type {Response} */
@@ -340,8 +346,8 @@ export class APIProxy {
     });
 
     url.pathname += processedPath
-      .replace(/([/]+)/g, "/")
-      .replace(/([/]+)$/g, "");
+      .replace(/\/+/g, "/")
+      .replace(/\/+$/g, "");
 
     if (data && typeof data === "object") {
       Object.entries(data).forEach(([key, value]) => {
