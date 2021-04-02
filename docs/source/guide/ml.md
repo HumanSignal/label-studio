@@ -2,6 +2,8 @@
 title: Set up machine learning with your labeling process
 type: guide
 order: 606
+meta_title: Machine Learning SDK
+meta_description: Label Studio Documentation for connecting Label Studio to machine learning frameworks using the Label Studio machine learning SDK for machine learning and data science projects.
 ---
 
 Set up machine learning with your labeling process by setting up a machine learning backend for Label Studio. 

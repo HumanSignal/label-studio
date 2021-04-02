@@ -17,7 +17,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="#272727">  <!-- iOS Safari -->
 
   <link href="{{settings.HOSTNAME}}{% static 'images/favicon.ico' rel="shortcut icon" %}"/>
-  <link href="{{settings.HOSTNAME}}{% static 'fonts/roboto/roboto.css' %}" rel="stylesheet">
+  <link href="{{settings.HOSTNAME}}/static/fonts/roboto/roboto.css" rel="stylesheet">
   <link href="{{settings.HOSTNAME}}{% static 'css/uikit.css' %}" rel="stylesheet">
   <link href="{{settings.HOSTNAME}}{% static 'css/main.css' %}" rel="stylesheet">
   <link href="{{settings.HOSTNAME}}/react-app/main.css?v={{ versions.backend.commit }}" rel="stylesheet">
@@ -86,7 +86,7 @@
       initials: "{{user.get_initials}}",
       email: "{{user.email}}",
       {% if user.avatar %}
-      avatar: "{{user.avatar.url}}",
+      avatar: "{{user.avatar_url}}",
       {% endif %}
     },
     debug: {{settings.DEBUG|yesno:"true,false"}},

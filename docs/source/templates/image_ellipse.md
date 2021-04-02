@@ -2,6 +2,8 @@
 title: Image Ellipse
 type: templates
 order: 104
+meta_title: Image Ellipse Data Labeling Template
+meta_description: Label Studio Image Ellipse Template for machine learning and data science data labeling projects.
 ---
 
 Put ellipses on the image

@@ -11,12 +11,14 @@ services:
     volumes:
       - static:/label-studio/label_studio:rw
       - ./mydata:/label-studio/data:rw
-      - ./deploy/nginx/:/etc/nginx/conf.d/:ro
+      - ./deploy/nginx/${NGINX_FILE:-default.conf}:/etc/nginx/conf.d/default.conf:ro
     command: nginx -g "daemon off;"
 
   app:
-#    build: ./
-    image: heartexlabs/label-studio:latest
+    stdin_open: true
+    tty: true
+    build: .
+    # image: heartexlabs/label-studio:latest
     ports:
       - 8080:8080
     depends_on:
@@ -28,11 +30,11 @@ services:
       - POSTGRE_PASSWORD=
       - POSTGRE_PORT=5432
       - POSTGRE_HOST=db
+      - LABEL_STUDIO_HOST=${LABEL_STUDIO_HOST:-http://localhost/label-studio}
     volumes:
-      - static:/label-studio/label_studio:rw
       - ./mydata:/label-studio/data:rw
-    command: [ "./deploy/wait-for-postgres.sh", "db", "label-studio" ]
-    
+    command: [ "./deploy/wait-for-postgres.sh", "db", "bash", "/label-studio/deploy/start_label_studio.sh" ]
+
   db:
     image: postgres:11.5
     hostname: db

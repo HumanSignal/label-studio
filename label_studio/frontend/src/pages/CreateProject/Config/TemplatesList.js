@@ -5,6 +5,7 @@ import { Spinner } from '../../../components';
 import { useAPI } from '../../../providers/ApiProvider';
 import { cn } from '../../../utils/bem';
 import './Config.styl';
+import { IconInfo } from '../../../assets/icons';
 
 
 const listClass = cn("templates-list");
@@ -76,7 +77,7 @@ export const TemplatesList = ({ selectedGroup, selectedRecipe, onCustomTemplate,
         <TemplatesInGroup templates={templates || []} group={selected} onSelectRecipe={onSelectRecipe} />
       </main>
       <footer>
-        <img className={listClass.elem("info-icon")} src="/static/icons/info.svg" height="20" />
+        <IconInfo className={listClass.elem("info-icon")} width="20" height="20" />
         See the documentation to <a href="https://labelstud.io/guide" target="_blank">contribute a template</a>.
       </footer>
     </div>

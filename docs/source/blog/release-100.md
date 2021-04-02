@@ -3,6 +3,8 @@ title: Announcing Label Studio v1.0
 type: blog
 image: /images/release-100/announcement.png
 order: 97
+meta_title: Label Studio Release Notes 1.0.0
+meta_description: Label Studio Release 1.0.0 rewrites Label Studio to support multiple users, projects, and scalable data labeling and annotation for machine learning and data science projects. 
 ---
 
 Hooray! The day is finally here. After almost a year and a half of development, 1000+ commits, 40 releases, and 50+ developers contributing minor and major parts, we’re happy to announce a big milestone – **Label Studio v1.0!**

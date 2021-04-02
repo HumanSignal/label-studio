@@ -2,6 +2,8 @@
 title: Relation
 type: tags
 order: 420
+meta_title: Relation Tags for a Single Relation
+meta_description: Label Studio Relation Tags customize Label Studio for a single relation for machine learning and data science projects.
 ---
 
 Relation tag represents a single relation label

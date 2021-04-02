@@ -1,6 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import os
+import io
 import sys
 import logging
 
@@ -13,6 +14,7 @@ from django.shortcuts import redirect, reverse
 from django.template import loader
 from django.views.static import serve
 from django.http import JsonResponse
+from wsgiref.util import FileWrapper
 
 from core import utils, version
 from core.utils.params import get_bool_env, get_env
@@ -137,3 +139,25 @@ def localfiles_data(request):
         return serve(request, path, document_root=local_serving_document_root)
 
     return HttpResponseForbidden()
+
+
+def static_file_with_host_resolver(path_on_disk, content_type):
+    """ Load any file, replace {{HOSTNAME}} => settings.HOSTNAME, send it as http response
+    """
+    path_on_disk = os.path.join(os.path.dirname(__file__), path_on_disk)
+
+    def serve_file(request):
+        with open(path_on_disk, 'r') as f:
+            body = f.read()
+            body = body.replace('{{HOSTNAME}}', settings.HOSTNAME)
+
+            out = io.StringIO()
+            out.write(body)
+            out.seek(0)
+
+            wrapper = FileWrapper(out)
+            response = HttpResponse(wrapper, content_type=content_type)
+            response['Content-Length'] = len(body)
+            return response
+
+    return serve_file

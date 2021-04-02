@@ -15,7 +15,7 @@ from core.utils.common import load_func
 
 def hash_upload(instance, filename):
     filename = str(uuid.uuid4())[0:8] + '-' + filename
-    return settings.AVATAR_PATH + filename
+    return settings.AVATAR_PATH + '/' + filename
 
 
 def check_avatar(files):

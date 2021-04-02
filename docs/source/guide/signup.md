@@ -2,6 +2,8 @@
 title: Create user accounts for Label Studio
 type: guide
 order: 103
+meta_title: User Access
+meta_description: Label Studio Documentation for signing up, inviting users, and managing access to your data labeling, machine learning, and data science projects.
 ---
 
 Sign up and create an account for Label Studio to start labeling data and setting up projects. 

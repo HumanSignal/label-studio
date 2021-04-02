@@ -2,6 +2,8 @@
 title: Troubleshoot Label Studio
 type: guide
 order: 203
+meta_title: Troubleshooting
+meta_description: Label Studio Documentation for troubleshooting your machine learning or data science data labeling project.
 ---
 
 If you encounter an issue using Label Studio, use this page to troubleshoot it. 

@@ -53,7 +53,7 @@
         <div class="user-pic {{ user.avatar|yesno:'can_delete,can_upload' }}">
           <div class="userpic userpic--big">
             {% if user.avatar %}
-              <img src="{{user.avatar.url}}" alt="User photo" width="92" />
+              <img src="{{user.avatar_url}}" alt="User photo" width="92" />
             {% endif %}
 
             {% if user.get_initials %}
@@ -147,15 +147,15 @@
       };
 
       $('[name=avatar]').on('change', async (e) => {
-        const formData = new FormData
+        const formData = new FormData;
 
-        formData.append(e.target.name, e.target.files[0])
+        formData.append(e.target.name, e.target.files[0]);
 
         try {
-          const response = await fetch("{% url 'user-detail' pk=user.pk %}", {
-            method: "patch",
+          const response = await fetch("{% url 'user-avatar' pk=user.pk %}", {
+            method: "post",
             body: formData
-          })
+          });
 
           if (!response.ok) {
             handleResponseError(response)
@@ -165,7 +165,7 @@
         } catch (err) {
           console.error(err)
         }
-      })
+      });
 
       $('[name=delete-avatar]').on('click', async (e) => {
         try {

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { generatePath, useHistory, useLocation } from 'react-router';
 import { NavLink } from 'react-router-dom';
 import { Button } from '../../components/Button/Button';
@@ -9,7 +9,6 @@ import { useProject } from '../../providers/ProjectProvider';
 import { useContextProps, useParams } from '../../providers/RoutesProvider';
 import { addAction, addCrumb, deleteAction, deleteCrumb } from '../../services/breadrumbs';
 import { Block, Elem } from '../../utils/bem';
-import { humanReadableNumber } from '../../utils/helpers';
 import { ImportModal } from '../CreateProject/Import/ImportModal';
 import { ExportPage } from '../ExportPage/ExportPage';
 import { APIConfig } from './api-config';
@@ -35,7 +34,6 @@ const initializeDataManager = async (root, props, params) => {
       import: false,
       export: false,
       backButton: false,
-      labelButton: false,
     },
     ...props,
     ...settings,
@@ -123,31 +121,11 @@ DataManagerPage.pages = {
 DataManagerPage.context = ({dmRef}) => {
   const location = useLocation();
   const {project} = useProject();
-  const [counter, setCounter] = useState(0);
-  const [canLabel, setCanLabel] = useState(dmRef?.mode === 'explorer');
-  const [hasLabelingData, setHasLabelingData] = useState(false);
 
   const links = {
     '/settings': 'Settings',
     '/data/import': "Import",
     '/data/export': 'Export',
-  };
-
-  const labelButtonText = useMemo(() => {
-    return counter ? `Label (${humanReadableNumber(counter)})` : 'Label';
-  }, [counter]);
-
-  const updateCounter = useCallback((selected) => {
-    setCounter(selected.total);
-  }, []);
-
-  const startLabeling = useCallback(() => {
-    dmRef?.store?.startLabelStream?.();
-  }, [dmRef]);
-
-  const updateLabelingButton = (currentMode) => {
-    const isExplorer = currentMode === 'explorer';
-    setCanLabel(isExplorer);
   };
 
   const updateCrumbs = (currentMode) => {
@@ -183,35 +161,18 @@ DataManagerPage.context = ({dmRef}) => {
     }
   };
 
-  const onDMReady = () => {
-    dmRef.on("taskSelectionChanged", updateCounter);
-    setCounter(dmRef.store.currentView?.selected?.total ?? 0);
-    updateLabelingButton(dmRef?.mode);
-  };
-
   const onDMModeChanged = (currentMode) => {
-    updateLabelingButton(currentMode);
     updateCrumbs(currentMode);
     showLabelingInstruction(currentMode);
   };
 
-  const onDMDataFetched = (store) => {
-    setHasLabelingData(store.length !== 0);
-  };
-
   useEffect(() => {
     if (dmRef) {
-      dmRef.on('ready', onDMReady);
       dmRef.on('modeChanged', onDMModeChanged);
-      dmRef.on('dataFetched', onDMDataFetched);
-
-      updateLabelingButton(dmRef?.mode);
     }
 
     return () => {
-      dmRef?.off?.('ready', onDMReady);
       dmRef?.off?.('modeChanged', onDMModeChanged);
-      dmRef?.off?.('dataFetched', onDMDataFetched);
     };
   }, [dmRef, project]);
 
@@ -228,12 +189,6 @@ DataManagerPage.context = ({dmRef}) => {
           {label}
         </Button>
       ))}
-
-      {canLabel && (
-        <Button size="compact" look="primary" disabled={!hasLabelingData} onClick={startLabeling}>
-          {labelButtonText}
-        </Button>
-      )}
     </Space>
   ) : null;
 };
