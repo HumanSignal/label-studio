@@ -109,10 +109,11 @@ def custom_exception_handler(exc, context):
             response.data = response_data
 
     # non-standard exception
-    elif sentry_sdk_loaded:
-        # pass exception to sentry
-        set_tag('exception_id', exception_id)
-        capture_exception(exc)
+    else:
+        if sentry_sdk_loaded:
+            # pass exception to sentry
+            set_tag('exception_id', exception_id)
+            capture_exception(exc)
 
         exc_tb = tb.format_exc()
         logger.debug(exc_tb)
