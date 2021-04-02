@@ -3,6 +3,8 @@ title: Label Studio Release Notes 0.9.0
 type: blog
 image: /images/release-090/improve_your_datasets_with_labeling.jpg
 order: 98
+meta_title: Label Studio Release Notes 0.9.0
+meta_description: Label Studio Release 0.9.0 includes improvements to data management to help you explore and improve your datasets for machine learning projects.
 ---
 
 <div style="position: relative; padding-bottom: 62.5%; height: 0;"><iframe src="https://www.loom.com/embed/73b5122859d8478ab5ccb03fb6036208" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe></div>

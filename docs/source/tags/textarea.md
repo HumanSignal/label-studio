@@ -2,6 +2,8 @@
 title: TextArea
 type: tags
 order: 424
+meta_title: Textarea Tags for Text areas
+meta_description: Label Studio Textarea Tags customize Label Studio for text areas and transcriptions for machine learning and data science projects.
 ---
 
 TextArea tag shows the textarea for user input

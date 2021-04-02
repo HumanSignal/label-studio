@@ -2,6 +2,8 @@
 title: Audio Regions
 type: templates
 order: 402
+meta_title: Audio Regions Data Labeling Template
+meta_description: Label Studio Audio Regions Template for machine learning and data science data labeling projects.
 ---
 
 Listen to the audio file and classify

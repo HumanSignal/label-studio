@@ -2,6 +2,8 @@
 title: Filter
 type: tags
 order: 501
+meta_title: Filter Tags for Filter Search
+meta_description: Label Studio Filter Tags customize Label Studio with filter search for machine learning and data science projects.
 ---
 
 Filter search for large amount of labels

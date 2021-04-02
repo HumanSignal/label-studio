@@ -2,6 +2,8 @@
 title: View
 type: tags
 order: 505
+meta_title: View Tags for Defining How Blocks are Displayed
+meta_description: Label Studio View Tags customize how blocks are displayed in Label Studio for machine learning and data science projects.
 ---
 
 View element. It's analogous to div element in html and can be used to visual configure display of blocks

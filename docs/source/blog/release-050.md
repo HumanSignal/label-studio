@@ -2,6 +2,8 @@
 title: Label Studio Release Notes 0.5.0
 type: blog
 order: 102
+meta_title: Label Studio Release Notes 0.5.0
+meta_description: Label Studio Release 0.5.0 includes image segmentation, relations labeling, named entity recognition performance, image ellipses labeling, and more.
 ---
 
 A month in the making, this new release brings a lot of bugfixes, updated documentation, and of course, a set of new features that have been requested. 

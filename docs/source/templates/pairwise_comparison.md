@@ -2,6 +2,8 @@
 title: Pairwise Comparison
 type: templates
 order: 10001
+meta_title: Pairwise Comparison Data Labeling Template
+meta_description: Label Studio Pairwise Comparison Template for machine learning and data science data labeling projects.
 ---
 
 Pairwise comparison of different objects

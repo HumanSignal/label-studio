@@ -2,6 +2,8 @@
 title:
 type: blog
 order: 40
+meta_title: Prelabel Images with Bounding Boxes Tutorial
+meta_description: Label Studio tutorial for automatically pre-labeling or pre-annotating images with bounding boxes using OpenMMLab MMDetection library and Label Studio.
 ---
 
 This [Machine Learning backend](https://labelstud.io/guide/ml.html) allows you to automatically prelabel your images with bounding boxes. It is powered by amazing [OpenMMLab MMDetection library](https://github.com/open-mmlab/mmdetection), which gives you access to many existing state-of-the-art models like FasterRCNN, RetinaNet, YOLO and others. 

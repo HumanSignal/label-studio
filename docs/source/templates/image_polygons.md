@@ -2,6 +2,8 @@
 title: Image Polygons
 type: templates
 order: 104
+meta_title: Image Polygons Data Labeling Template
+meta_description: Label Studio Image Polygons Template for machine learning and data science data labeling projects.
 ---
 
 Image polygons labeling

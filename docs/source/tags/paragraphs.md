@@ -2,6 +2,8 @@
 title: Paragraphs
 type: tags
 order: 305
+meta_title: Paragraph Tags for Paragraphs
+meta_description: Label Studio Paragraph Tags customize Label Studio for paragraphs for machine learning and data science projects.
 ---
 
 Paragraphs tag shows an Paragraphs markup that can be labeled
