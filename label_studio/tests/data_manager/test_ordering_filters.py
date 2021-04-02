@@ -33,6 +33,7 @@ from django.utils.timezone import now
         [["tasks:-data.text"], -1, False],
         [["tasks:data.data"], 0, True],
         [["-tasks:data.data"], 1, True],
+        [["tasks:file_upload"], 1, False],
     ],
 )
 @pytest.mark.django_db

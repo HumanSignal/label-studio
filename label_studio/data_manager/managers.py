@@ -68,6 +68,7 @@ def get_fields_for_annotation(prepare_params):
     # we don't need to annotate regular model fields, so we skip them
     skipped_fields = [field.attname for field in Task._meta.fields]
     skipped_fields.append("id")
+    skipped_fields.append("file_upload")
     result = [f for f in result if f not in skipped_fields]
     result = [f for f in result if not f.startswith("data.")]
 
