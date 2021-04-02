@@ -13,6 +13,7 @@ from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError
 from django.db.models.fields import DecimalField
+from django.conf import settings
 from drf_yasg.utils import swagger_auto_schema
 from django.db.models import Q, When, Count, Case, OuterRef, Max, Exists, Value, BooleanField
 from rest_framework import generics, status, filters
@@ -657,6 +658,9 @@ class TemplateListAPI(generics.ListAPIView):
         configs = []
         for config_file in pathlib.Path(annotation_templates_dir).glob('**/*.yml'):
             config = read_yaml(config_file)
+            if config.get('image', '').startswith('/static') and settings.HOSTNAME:
+                # if hostname set manually, create full image urls
+                config['image'] = settings.HOSTNAME + config['image']
             configs.append(config)
         template_groups_file = find_file(os.path.join('annotation_templates', 'groups.txt'))
         with open(template_groups_file, encoding='utf-8') as f:
