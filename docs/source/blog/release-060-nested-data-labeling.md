@@ -2,6 +2,8 @@
 title: Label Studio Release Notes 0.6.0 - Nested Data Labeling
 type: blog
 order: 101
+meta_title: Label Studio Release Notes 0.6.0 - Nested Data Labeling
+meta_description: Label Studio Release 0.6.0 includes nested data labeling, per-region labeling, updates to machine learning backend integration, filtering, and more.
 ---
 
 Two months in the baking, this release features the evolution of the labeling interface into supporting not only multiple data types and labeling scenarios, but also exploring the path of bringing additional dimensions into the labeling task. Along with that purely UI work a major update to the model assisted labeling.

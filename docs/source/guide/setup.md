@@ -2,6 +2,8 @@
 title: Set up your labeling project
 type: guide
 order: 400
+meta_title: Project Setup
+meta_description: Label Studio Documentation for setting up and customizing data labeling and annotation projects in Label Studio for machine learning and data science projects. 
 ---
 
 All labeling activities in Label Studio occur in the context of a project. 

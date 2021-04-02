@@ -2,6 +2,8 @@
 title: Get data into Label Studio
 type: guide
 order: 300
+meta_title: Import Data
+meta_description: Label Studio Documentation for importing and uploading data labeling tasks for machine learning or data science projects. 
 ---
 
 Get data into Label Studio by importing files, referencing URLs, or syncing with cloud or database storage. 

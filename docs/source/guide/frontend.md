@@ -2,6 +2,8 @@
 title: Frontend library
 type: guide
 order: 705
+meta_title: Customize User Interface
+meta_description: Label Studio Documentation for integrating the Label Studio frontend interface into your own machine learning or data labeling application workflow.
 ---
 
 The [Label Studio Frontend](https://github.com/heartexlabs/label-studio-frontend) (LSF) is the frontend library for Label Studio, based on React and mobx-state-tree and distributed as an NPM package. You can include it in your applications without using the Label Studio Backend (LSB) to provide data annotation support to your users. You can customize and extend the frontend library. 

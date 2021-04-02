@@ -2,6 +2,8 @@
 title: Taxonomy
 type: tags
 order: 423
+meta_title: Taxonomy Tags for Hierarchical Labels
+meta_description: Label Studio Taxonomy Tags customize Label Studio by using hierarchical labels for machine learning and data science projects.
 ---
 
 Taxonomy tag allows to select one or more hierarchical labels

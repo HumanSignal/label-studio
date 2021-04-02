@@ -2,6 +2,8 @@
 title: Text Named Entity Recognition
 type: templates
 order: 201
+meta_title: Text Named Entity Recognition Data Labeling Template
+meta_description: Label Studio Text Named Entity Template for machine learning and data science data labeling projects.
 ---
 
 Named entity recognition for a piece of text. It supports overlapping spans and works with huge documents.

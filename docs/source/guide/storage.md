@@ -2,6 +2,8 @@
 title: Sync data from cloud or Redis storage
 type: guide
 order: 302
+meta_title: Cloud Storage Integration
+meta_description: Label Studio Documentation for integrating Amazon AWS S3, Google Cloud Storage, Microsoft Azure, and Redis with Label Studio to collect data labeling tasks and sync annotation results into your machine learning pipelines for machine learning and data science projects.
 ---
 
 Integrate popular cloud storage systems with Label Studio to collect new items uploaded to the buckets and return the annotation results so that you can use them in your machine learning pipelines.

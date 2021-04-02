@@ -2,6 +2,8 @@
 title: HTML Documents NER
 type: templates
 order: 302
+meta_title: HTML Document Data Labeling Template
+meta_description: Label Studio HTML Document Template for named entity recognition in machine learning and data science data labeling projects.
 ---
 
 Named entity for the HTML Documents

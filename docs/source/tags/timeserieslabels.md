@@ -2,6 +2,8 @@
 title: TimeSeriesLabels
 type: tags
 order: 425
+meta_title: Time Series Label Tags for Labeling Time Series Data
+meta_description: Label Studio Time Series Label Tags customize Label Studio for Labeling Time Series Data for machine learning and data science projects.
 ---
 
 TimeSeriesLabels tag creates labeled time range
