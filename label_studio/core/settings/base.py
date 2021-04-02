@@ -298,9 +298,9 @@ CSRF_COOKIE_HTTPONLY = bool(int(get_env('CSRF_COOKIE_HTTPONLY', SESSION_COOKIE_S
 
 # user media files
 MEDIA_ROOT = os.path.join(BASE_DATA_DIR, 'media')
-UPLOAD_DIR = 'upload'
 MEDIA_URL = '/data/'
-AVATAR_PATH = 'avatars/'
+UPLOAD_DIR = 'upload'
+AVATAR_PATH = 'avatars'
 
 # project exports
 EXPORT_DIR = os.path.join(BASE_DATA_DIR, 'export')

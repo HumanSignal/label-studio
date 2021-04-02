@@ -32,7 +32,7 @@ services:
       - LABEL_STUDIO_HOST=http://localhost/foo
     volumes:
       - ./mydata:/label-studio/data:rw
-    command: [ "./deploy/wait-for-postgres.sh", "db", "label-studio" ]
+    command: [ "./deploy/wait-for-postgres.sh", "db", "bash", "/label-studio/deploy/start_label_studio.sh" ]
 
   db:
     image: postgres:11.5

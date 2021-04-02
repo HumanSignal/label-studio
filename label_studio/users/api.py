@@ -31,30 +31,26 @@ class UserAPI(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     parser_classes = (JSONParser, MultiPartParser, FormParser)
 
-    @swagger_auto_schema(auto_schema=None)
-    @action(detail=True, methods=["delete"])
+    @swagger_auto_schema(auto_schema=None, methods=['delete', 'post'])
+    @action(detail=True, methods=['delete', 'post'])
     def avatar(self, request, pk):
-        request.user.avatar = None
-        request.user.save()
-        return Response(status=204)
-
-    @swagger_auto_schema(tags=['Users'], operation_summary='Save user details')
-    def update(self, request, *args, **kwargs):
-        # save avatar
-        if request.FILES:
+        if request.method == 'POST':
             avatar = check_avatar(request.FILES)
             request.user.avatar = avatar
             request.user.save()
             return Response({'detail': 'avatar saved'}, status=200)
 
-        # save user details
-        else:
-            form = UserProfileForm(data=request.data, files=request.FILES, instance=request.user)
-            if form.is_valid():
-                form.save()
-                return Response({'detail': 'user details saved'}, status=200)
+        elif request.method == 'DELETE':
+            request.user.avatar = None
+            request.user.save()
+            return Response(status=204)
 
-        return Response({'detail': 'Incorrect request'}, status=422)
+    @swagger_auto_schema(tags=['Users'], operation_summary='Save user details')
+    def update(self, request, *args, **kwargs):
+        form = UserProfileForm(data=request.data, files=request.FILES, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return Response({'detail': 'user details saved'}, status=200)
 
     @swagger_auto_schema(auto_schema=None)
     def list(self, request, *args, **kwargs):
@@ -131,7 +127,7 @@ class UserWhoAmIAPI(generics.RetrieveAPIView):
     serializer_class = UserSerializer
 
     def get_object(self):
-        return self.request.user
+        return User.objects.get(id=self.request.user.id)
 
     @swagger_auto_schema(tags=['Users'], operation_summary='Retrieve my user')
     def get(self, request, *args, **kwargs):
