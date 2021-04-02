@@ -111,7 +111,8 @@ class User(AbstractBaseUser, PermissionsMixin, UserLastActivityMixin):
 
     @property
     def avatar_url(self):
-        return settings.HOSTNAME + self.avatar.url
+        if self.avatar:
+            return settings.HOSTNAME + self.avatar.url
 
     def is_organization_admin(self, org_pk):
         return True
