@@ -13,15 +13,24 @@ except:
 
 from django.db import models
 from django.conf import settings
+from django.core.files.storage import FileSystemStorage
 from rest_framework.exceptions import ValidationError
 
 logger = logging.getLogger(__name__)
 
 
+class CanOverwriteStorage(FileSystemStorage):
+
+    def get_available_name(self, name, max_length=None):
+        if settings.OVERWRITE_UPLOAD_FILES:
+            self.delete(name)
+        return name
+
+
 class FileUpload(models.Model):
     user = models.ForeignKey('users.User', related_name='file_uploads', on_delete=models.CASCADE)
     project = models.ForeignKey('projects.Project', related_name='file_uploads', on_delete=models.CASCADE)
-    file = models.FileField(upload_to=settings.UPLOAD_DIR)
+    file = models.FileField(upload_to=settings.UPLOAD_DIR, storage=CanOverwriteStorage())
 
     @property
     def filepath(self):

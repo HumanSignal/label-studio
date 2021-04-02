@@ -283,6 +283,7 @@ CSRF_COOKIE_HTTPONLY = bool(int(get_env('CSRF_COOKIE_HTTPONLY', SESSION_COOKIE_S
 # user media files
 MEDIA_ROOT = os.path.join(BASE_DATA_DIR, 'media')
 UPLOAD_DIR = 'upload'
+OVERWRITE_UPLOAD_FILES = get_bool_env('OVERWRITE_UPLOAD_FILES', default=False)
 MEDIA_URL = '/data/'
 AVATAR_PATH = 'avatars/'
 
