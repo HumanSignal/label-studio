@@ -998,12 +998,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "AsyncPage": () => (/* binding */ AsyncPage)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react_router__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react-router */ "./node_modules/react-router/esm/react-router.js");
+/* harmony import */ var react_router__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! react-router */ "./node_modules/react-router/esm/react-router.js");
 /* harmony import */ var _components_Error_Error__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../components/Error/Error */ "./src/components/Error/Error.js");
 /* harmony import */ var _components_Modal_Modal__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../components/Modal/Modal */ "./src/components/Modal/Modal.js");
 /* harmony import */ var _providers_ConfigProvider__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../providers/ConfigProvider */ "./src/providers/ConfigProvider.js");
-/* harmony import */ var _utils_scripts__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../utils/scripts */ "./src/utils/scripts.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+/* harmony import */ var _utils_helpers__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../utils/helpers */ "./src/utils/helpers.js");
+/* harmony import */ var _utils_scripts__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../utils/scripts */ "./src/utils/scripts.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+
 
 
 
@@ -1029,7 +1031,7 @@ const loadAsyncPage = async url => {
 
       if (!response.ok) {
         (0,_components_Modal_Modal__WEBPACK_IMPORTED_MODULE_2__.modal)({
-          body: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_components_Error_Error__WEBPACK_IMPORTED_MODULE_1__.ErrorWrapper, {
+          body: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_components_Error_Error__WEBPACK_IMPORTED_MODULE_1__.ErrorWrapper, {
             title: `Error ${response.status}: ${response.statusText}`,
             errorId: response.status,
             stacktrace: `Cannot load url ${url}\n\n${html}`
@@ -1047,7 +1049,7 @@ const loadAsyncPage = async url => {
     }
   } catch (err) {
     (0,_components_Modal_Modal__WEBPACK_IMPORTED_MODULE_2__.modal)({
-      body: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_components_Error_Error__WEBPACK_IMPORTED_MODULE_1__.ErrorWrapper, {
+      body: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_components_Error_Error__WEBPACK_IMPORTED_MODULE_1__.ErrorWrapper, {
         possum: false,
         title: "Connection refused",
         message: "Server not responding. Is it still running?"
@@ -1069,7 +1071,7 @@ const loadAsyncPage = async url => {
 const swapNodes = async (oldNode, newNode) => {
   if (oldNode && newNode) {
     oldNode.replaceWith(newNode);
-    await (0,_utils_scripts__WEBPACK_IMPORTED_MODULE_4__.reInsertScripts)(newNode);
+    await (0,_utils_scripts__WEBPACK_IMPORTED_MODULE_5__.reInsertScripts)(newNode);
   }
 };
 /**
@@ -1083,7 +1085,7 @@ const swapAppSettings = async (oldPage, newPage) => {
   const newSettings = newPage.querySelector('script#app-settings');
 
   if (oldSettings && newSettings) {
-    await (0,_utils_scripts__WEBPACK_IMPORTED_MODULE_4__.replaceScript)(oldSettings, {
+    await (0,_utils_scripts__WEBPACK_IMPORTED_MODULE_5__.replaceScript)(oldSettings, {
       sourceScript: newSettings,
       forceUpdate: true
     });
@@ -1122,10 +1124,10 @@ const nodesToSignatures = nodes => {
 const swapHeadScripts = async (oldHead, newHead) => {
   swapNodes(oldHead.querySelector('title'), newHead.querySelector('title'));
   const fragment = document.createDocumentFragment();
-  Array.from(newHead.querySelectorAll('script')).filter(script => (0,_utils_scripts__WEBPACK_IMPORTED_MODULE_4__.isScriptValid)(script)).forEach(script => fragment.appendChild(script));
-  Array.from(oldHead.querySelectorAll('script')).filter(script => (0,_utils_scripts__WEBPACK_IMPORTED_MODULE_4__.isScriptValid)(script)).forEach(script => script.remove());
+  Array.from(newHead.querySelectorAll('script')).filter(script => (0,_utils_scripts__WEBPACK_IMPORTED_MODULE_5__.isScriptValid)(script)).forEach(script => fragment.appendChild(script));
+  Array.from(oldHead.querySelectorAll('script')).filter(script => (0,_utils_scripts__WEBPACK_IMPORTED_MODULE_5__.isScriptValid)(script)).forEach(script => script.remove());
   oldHead.appendChild(fragment);
-  await (0,_utils_scripts__WEBPACK_IMPORTED_MODULE_4__.reInsertScripts)(oldHead);
+  await (0,_utils_scripts__WEBPACK_IMPORTED_MODULE_5__.reInsertScripts)(oldHead);
 };
 /**
  * @param {Document} oldPage
@@ -1183,7 +1185,7 @@ const useStaticContent = (initialContent, onContentLoad) => {
   const [staticContent, setStaticContent] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(initialContent);
   const fetchCallback = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(async locationUrl => {
     currentLocation = locationUrl;
-    (0,_utils_scripts__WEBPACK_IMPORTED_MODULE_4__.clearScriptsCache)();
+    (0,_utils_scripts__WEBPACK_IMPORTED_MODULE_5__.clearScriptsCache)();
     const result = await fetchPage(locationUrl);
 
     if (result) {
@@ -1203,7 +1205,7 @@ const AsyncPage = ({
   children
 }) => {
   const initialContent = document;
-  const history = (0,react_router__WEBPACK_IMPORTED_MODULE_6__.useHistory)();
+  const history = (0,react_router__WEBPACK_IMPORTED_MODULE_7__.useHistory)();
   const config = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(_providers_ConfigProvider__WEBPACK_IMPORTED_MODULE_3__.ConfigContext);
   const onLoadCallback = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(() => {
     config.update(window.APP_SETTINGS);
@@ -1213,11 +1215,14 @@ const AsyncPage = ({
     /**@type {HTMLAnchorElement} */
     const target = e.target.closest('a[href]:not([target]):not([download])');
     if (!isVisitable(target)) return;
-    if (target.matches('[data-no-async]')) return;
+    if (target.matches('[data-external]')) return;
     if (e.metaKey || e.ctrlKey) return;
     e.preventDefault();
     const fetched = await fetchStatic(target.href);
-    if (fetched) history.push(`${target.pathname}${target.search}`);
+
+    if (fetched) {
+      history.push(`${(0,_utils_helpers__WEBPACK_IMPORTED_MODULE_4__.removePrefix)(target.pathname)}${target.search}`);
+    }
   }, []);
   const onPopState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(() => {
     const newLocation = locationWithoutHash();
@@ -1241,7 +1246,7 @@ const AsyncPage = ({
       window.removeEventListener('popstate', onPopState);
     };
   }, []);
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(AsyncPageContext.Provider, {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(AsyncPageContext.Provider, {
     value: staticContent,
     children: children
   });
@@ -1602,10 +1607,10 @@ const Breadcrumbs = () => {
   const reactBreadcrumbs = (0,_providers_RoutesProvider__WEBPACK_IMPORTED_MODULE_2__.useBreadcrumbs)();
   const [breadcrumbs, setBreadcrumbs] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(reactBreadcrumbs);
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    if (config.breadcrumbs) {
-      setBreadcrumbs(config.breadcrumbs);
-    } else {
+    if (reactBreadcrumbs.length) {
       setBreadcrumbs(reactBreadcrumbs);
+    } else if (config.breadcrumbs) {
+      setBreadcrumbs(config.breadcrumbs);
     }
   }, [reactBreadcrumbs, config]);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(Block, {
@@ -4389,7 +4394,6 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-
 const MenubarContext = /*#__PURE__*/(0,react__WEBPACK_IMPORTED_MODULE_0__.createContext)();
 
 const LeftContextMenu = ({
@@ -4525,8 +4529,7 @@ const Menubar = ({
           children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_Menu_Menu__WEBPACK_IMPORTED_MODULE_10__.Menu.Item, {
             icon: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_assets_icons__WEBPACK_IMPORTED_MODULE_2__.LsSettings, {}),
             label: "Account & Settings",
-            to: "/user/account",
-            "data-external": true
+            href: (0,_utils_helpers__WEBPACK_IMPORTED_MODULE_6__.absoluteURL)("/user/account")
           }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_Menu_Menu__WEBPACK_IMPORTED_MODULE_10__.Menu.Item, {
             icon: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_assets_icons__WEBPACK_IMPORTED_MODULE_2__.LsDoor, {}),
             label: "Log Out",
@@ -11360,8 +11363,12 @@ const RoutesProvider = ({
       store
     });
   }, [location, config, store, history]);
-  const routesChain = findMacthingComponents(location.pathname, routesMap);
-  const lastRoute = routesChain.filter(r => !r.modal).slice(-1)[0];
+  const routesChain = (0,react__WEBPACK_IMPORTED_MODULE_0__.useMemo)(() => {
+    return findMacthingComponents(location.pathname, routesMap);
+  }, [location, routesMap]);
+  const lastRoute = (0,react__WEBPACK_IMPORTED_MODULE_0__.useMemo)(() => {
+    return routesChain.filter(r => !r.modal).slice(-1)[0];
+  }, [routesChain]);
   const [currentPath, setCurrentPath] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(lastRoute === null || lastRoute === void 0 ? void 0 : lastRoute.path);
   const contextValue = (0,react__WEBPACK_IMPORTED_MODULE_0__.useMemo)(() => ({
     routesMap,
@@ -11371,6 +11378,7 @@ const RoutesProvider = ({
     path: currentPath
   }), [breadcrumbs, routesMap, currentContext, currentPath, setCurrentContext]);
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    console.log("Location changed");
     const ContextComponent = lastRoute === null || lastRoute === void 0 ? void 0 : lastRoute.context;
     setCurrentContext({
       component: ContextComponent !== null && ContextComponent !== void 0 ? ContextComponent : null,
@@ -11395,10 +11403,11 @@ const RoutesProvider = ({
         };
       }).filter(c => !!c.title);
       (0,_services_breadrumbs__WEBPACK_IMPORTED_MODULE_2__.setBreadcrumbs)(crumbs);
+      console.log(crumbs);
     } catch (err) {
       console.log(err);
     }
-  }, [location, routesMap, currentContextProps]);
+  }, [location, routesMap, currentContextProps, routesChain, lastRoute]);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(RoutesContext.Provider, {
     value: contextValue,
     children: children
@@ -12527,6 +12536,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "objectClean": () => (/* binding */ objectClean),
 /* harmony export */   "humanReadableNumber": () => (/* binding */ humanReadableNumber),
 /* harmony export */   "absoluteURL": () => (/* binding */ absoluteURL),
+/* harmony export */   "removePrefix": () => (/* binding */ removePrefix),
 /* harmony export */   "copyText": () => (/* binding */ copyText)
 /* harmony export */ });
 const formDataToJPO = formData => {
@@ -12583,6 +12593,15 @@ const absoluteURL = (path = "") => {
   } else {
     return [APP_SETTINGS.hostname.replace(/([/]+)$/, ''), path.replace(/^([/]+)/, '')].join("/");
   }
+};
+const removePrefix = path => {
+  if (APP_SETTINGS.hostname) {
+    const hostname = APP_SETTINGS.hostname;
+    const prefix = new URL(hostname.replace(/([/]+)$/, '')).pathname;
+    return path.replace(new RegExp(`^${prefix}`), '');
+  }
+
+  return path;
 };
 const copyText = text => {
   const input = document.createElement('textarea');
