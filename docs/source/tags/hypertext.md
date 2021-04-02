@@ -2,6 +2,8 @@
 title: HyperText
 type: tags
 order: 303
+meta_title: Hypertext Tags for Hypertext Markup (HTML)
+meta_description: Label Studio Hypertext Tags customize Label Studio for hypertext markup (HTML) for machine learning and data science projects.
 ---
 
 HyperText tag shows an HyperText markup that can be labeled

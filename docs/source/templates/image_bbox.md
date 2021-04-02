@@ -2,6 +2,8 @@
 title: Image Object Detection
 type: templates
 order: 102
+meta_title: Image Object Detection Data Labeling Template
+meta_description: Label Studio Image Object Detection Template for machine learning and data science data labeling projects.
 ---
 
 Image bounding box labeling

@@ -2,6 +2,8 @@
 title: Ellipse
 type: tags
 order: 404
+meta_title: Ellipse Tags for Adding Elliptical Bounding Box to Images
+meta_description: Label Studio Ellipse Tags customize Label Studio to add elliptical bounding boxes to images for machine learning and data science projects.
 ---
 
 Ellipse
