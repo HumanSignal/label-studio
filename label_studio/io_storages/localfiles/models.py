@@ -8,6 +8,7 @@ from pathlib import Path
 from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
+from rest_framework.exceptions import ValidationError
 
 from io_storages.base_models import ImportStorage, ImportStorageLink, ExportStorage, ExportStorageLink
 from io_storages.serializers import StorageAnnotationSerializer
@@ -28,8 +29,16 @@ class LocalFilesMixin(models.Model):
         _('use_blob_urls'), default=False,
         help_text='Interpret objects as BLOBs and generate URLs')
 
+    def validate_connection(self):
+        path = Path(self.path)
+        if not path.exists():
+            raise ValidationError(f'Path {self.path} does not exist')
+        if settings.LOCAL_FILES_SERVING_ENABLED is False:
+            raise ValidationError("Serving local files can be dangerous, so it's disabled by default. "
+                                  'You can enable it with LOCAL_FILES_SERVING_ENABLED environment variable')
 
-class LocalFilesImportStorage(ImportStorage, LocalFilesMixin):
+
+class LocalFilesImportStorage(LocalFilesMixin, ImportStorage):
 
     def iterkeys(self):
         path = Path(self.path)

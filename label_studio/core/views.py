@@ -127,8 +127,7 @@ def samples_time_series(request):
 def localfiles_data(request):
     """Serving files for LocalFilesImportStorage"""
     path = request.GET.get('d')
-    local_serving_allowed = get_bool_env('LOCAL_FILES_SERVING_ENABLED', default=False)
-    if local_serving_allowed is False:
+    if settings.LOCAL_FILES_SERVING_ENABLED is False:
         return HttpResponseForbidden("Serving local files can be dangerous, so it's disabled by default. "
                                      'You can enable it with LOCAL_FILES_SERVING_ENABLED environment variable')
 

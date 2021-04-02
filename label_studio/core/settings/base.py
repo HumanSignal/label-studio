@@ -303,6 +303,8 @@ TASK_LOCK_DEFAULT_TTL = int(get_env('TASK_LOCK_DEFAULT_TTL', 3600))
 FROM_EMAIL = 'Label Studio <hello@labelstud.io>'
 EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
 
+LOCAL_FILES_SERVING_ENABLED = get_bool_env('LOCAL_FILES_SERVING_ENABLED', default=False)
+
 """ React Libraries: do not forget to change this dir in /etc/nginx/nginx.conf """
 # EDITOR = label-studio-frontend repository
 EDITOR_ROOT = os.path.join(BASE_DIR, '../frontend/dist/lsf')
