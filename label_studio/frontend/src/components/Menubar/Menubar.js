@@ -1,8 +1,7 @@
 import { createContext, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'react-router';
 import { StaticContent } from '../../app/StaticContent/StaticContent';
-import { LsDoor, LsGitHub, LsSettings, LsSlack } from '../../assets/icons';
-import { IconFolder, IconTerminal, IconPersonInCircle, IconBook, IconPin } from '../../assets/icons';
+import { IconBook, IconFolder, IconPersonInCircle, IconPin, IconTerminal, LsDoor, LsGitHub, LsSettings, LsSlack } from '../../assets/icons';
 import { useConfig } from '../../providers/ConfigProvider';
 import { useContextComponent } from '../../providers/RoutesProvider';
 import { cn } from '../../utils/bem';
@@ -139,8 +138,7 @@ export const Menubar = ({
               <Menu.Item
                 icon={<LsSettings/>}
                 label="Account & Settings"
-                to="/user/account"
-                data-external
+                href={absoluteURL("/user/account")}
               />
               {/* <Menu.Item label="Dark Mode"/> */}
               <Menu.Item

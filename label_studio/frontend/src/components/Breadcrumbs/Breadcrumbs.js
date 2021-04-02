@@ -15,10 +15,10 @@ export const Breadcrumbs = () => {
   const [breadcrumbs, setBreadcrumbs] = useState(reactBreadcrumbs);
 
   useEffect(() => {
-    if (config.breadcrumbs) {
-      setBreadcrumbs(config.breadcrumbs);
-    } else {
+    if (reactBreadcrumbs.length) {
       setBreadcrumbs(reactBreadcrumbs);
+    } else if (config.breadcrumbs) {
+      setBreadcrumbs(config.breadcrumbs);
     }
   }, [reactBreadcrumbs, config]);
 
