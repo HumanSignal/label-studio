@@ -29,7 +29,10 @@ class FileUpload(models.Model):
 
     @property
     def url(self):
-        return self.file.url
+        if settings.HOSTNAME:
+            return settings.HOSTNAME + self.file.url
+        else:
+            return self.file.url
 
     @property
     def format(self):
