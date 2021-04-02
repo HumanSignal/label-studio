@@ -1,7 +1,9 @@
 ---
-title: Set up machine learning with your labeling process
+title: Set up a machine learning backend with the Label Studio SDK
 type: guide
 order: 607
+meta_title: Machine Learning SDK
+meta_description: Label Studio Documentation for setting up your machine learning model to output and consume predictions in your machine learning and data science data labeling projects. 
 ---
 
 

@@ -2,7 +2,7 @@
 title: Set up machine learning with your labeling process
 type: guide
 order: 606
-meta_title: Machine Learning SDK
+meta_title: Machine Learning Integration
 meta_description: Label Studio Documentation for connecting Label Studio to machine learning frameworks using the Label Studio machine learning SDK for machine learning and data science projects.
 ---
 
@@ -176,7 +176,7 @@ If you can't resolve the traceback issues by yourself, <a href="https://join.sla
 
 Your ML backend might be producing predictions in the wrong format. 
 
-- Check to see whether the ML backend predictions format follows the same structure as [predictions in imported preannotations](predictions.html).
+- Check to see whether the ML backend predictions format follows the same structure as [predictions in imported pre-annotations](predictions.html).
 - Confirm that your project's label configuration matches the output produced by your ML backend. 
 
 
