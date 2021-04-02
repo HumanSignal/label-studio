@@ -15,9 +15,8 @@ logger = logging.getLogger(__name__)
 
 @view_with_auth(['GET'], (IsBusiness,))
 def get_uploaded_file(request, filename):
-    file = settings.UPLOAD_DIR + ('/' if not settings.UPLOAD_DIR.endswith('/') else '') + filename
-    logger.debug(f'Fetch uploaded file by user {request.user} => {file}')
-    file_upload = FileUpload.objects.get(file=file)
+    logger.debug(f'Fetch uploaded file by user {request.user} => {filename}')
+    file_upload = FileUpload.get_by_filename(filename)
 
     with open(file_upload.file.path, mode='rb') as f:
         content = f.read()

@@ -58,10 +58,21 @@ def check_file_sizes_and_number(files):
                               f'current size is {total} bytes')
 
 
-def create_file_upload(request, project, file):
-    instance = FileUpload(user=request.user, project=project, file=file)
-    instance.save()
-    return instance
+def get_or_create_file_upload(request, project, file):
+    if FileUpload.exists(file) and settings.OVERWRITE_UPLOAD_FILES:
+        logger.warning(
+            f'File {file} already exists and will be overwritten. Set LABEL_STUDIO_OVERWRITE_UPLOAD_FILES=false '
+            f'to avoid this and generate unique name on each file upload')
+        instance = FileUpload.get_by_filename(file.name)
+        instance.user = request.user
+        instance.project = project
+        instance.save()
+        created = False
+    else:
+        instance = FileUpload(user=request.user, project=project, file=file)
+        instance.save()
+        created = True
+    return instance, created
 
 
 def load_tasks(request, project):
@@ -73,7 +84,12 @@ def load_tasks(request, project):
     if len(request.FILES):
         check_file_sizes_and_number(request.FILES)
         for filename, file in request.FILES.items():
-            file_upload = create_file_upload(request, project, file)
+            file_upload, created = get_or_create_file_upload(request, project, file)
+            if not created and settings.OVERWRITE_UPLOAD_FILES:
+                logger.warning(f'Skip creating task from {filename} since already exists:'
+                               f' disable this with LABEL_STUDIO_OVERWRITE_UPLOAD_FILES=false')
+                # when overwriting file uploads, we don't create new tasks
+                continue
             if file_upload.format_could_be_tasks_list:
                 could_be_tasks_lists = True
             file_upload_ids.append(file_upload.id)
@@ -97,7 +113,7 @@ def load_tasks(request, project):
                 file_content = file.read()
                 if isinstance(file_content, str):
                     file_content = file_content.encode()
-                file_upload = create_file_upload(request, project, SimpleUploadedFile(filename, file_content))
+                file_upload, created = get_or_create_file_upload(request, project, SimpleUploadedFile(filename, file_content))
                 file_upload_ids.append(file_upload.id)
                 tasks, found_formats, data_keys = FileUpload.load_tasks_from_uploaded_files(project, file_upload_ids)
 

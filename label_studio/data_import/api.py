@@ -6,6 +6,7 @@ import drf_yasg.openapi as openapi
 import json
 
 from django.db import transaction
+from django.conf import settings
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics, status
 from rest_framework.response import Response
