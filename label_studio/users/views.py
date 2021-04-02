@@ -40,6 +40,11 @@ class FPasswordResetCompleteView(auth_views.PasswordResetCompleteView):
 @login_required
 def logout(request):
     auth.logout(request)
+    if settings.HOSTNAME:
+        redirect_url = settings.HOSTNAME
+        if not redirect_url.endswith('/'):
+            redirect_url += '/'
+        return redirect(redirect_url)
     return redirect('/')
 
 
