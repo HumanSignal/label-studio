@@ -117,67 +117,73 @@ const ConfigureSettings = ({ template }) => {
   if (!settings) return null;
   const keys = Object.keys(settings);
 
+  const items = keys.map(key => {
+    const options = settings[key];
+    const type = Array.isArray(options.type) ? Array : options.type;
+    const $object = template.objects[0];
+    const $tag = options.control ? $object.$controls[0] : $object;
+    if (!$tag) return null;
+    if (options.when && !options.when($tag)) return;
+    let value = false;
+    if (options.value) value = options.value($tag);
+    else if (typeof options.param === "string") value = $tag.getAttribute(options.param);
+    if (value === "true") value = true;
+    if (value === "false") value = false;
+    let onChange;
+    let size;
+    switch (type) {
+      case Array:
+        onChange = e => {
+          if (typeof options.param === "function") {
+            options.param($tag, e.target.value);
+          } else {
+            $object.setAttribute(options.param, e.target.value);
+          }
+          template.render();
+        };
+        return (
+          <li key={key}><label>{options.title} <select value={value} onChange={onChange}>{options.type.map(option => (
+            <option key={option} value={option}>{option}</option>
+          ))}</select></label></li>
+        );
+      case Boolean:
+        onChange = e => {
+          if (typeof options.param === "function") {
+            options.param($tag, e.target.checked);
+          } else {
+            $object.setAttribute(options.param, e.target.checked ? 'true' : 'false');
+          }
+          template.render();
+        };
+        return (
+          <li key={key}><label><input type="checkbox" checked={value} onChange={onChange} /> {options.title}</label></li>
+        );
+      case String:
+      case Number:
+        size = options.type === Number ? 5 : undefined;
+        onChange = e => {
+          if (typeof options.param === "function") {
+            options.param($object, e.target.value);
+          } else {
+            $object.setAttribute(options.param, e.target.value);
+          }
+          template.render();
+        };
+        return (
+          <li key={key}><label>{options.title} <input type="text" onInput={onChange} value={value} size={size} /></label></li>
+        );
+    }
+  });
+
+  // check for active settings
+  if (!items.filter(Boolean).length) return null;
+
   return (
     <ul className={configClass.elem("settings")}>
       <li>
         <h4>Configure settings</h4>
         <ul className={configClass.elem("object-settings")}>
-          {keys.map(key => {
-            const options = settings[key];
-            const type = Array.isArray(options.type) ? Array : options.type;
-            const $object = template.objects[0];
-            const $tag = options.control ? $object.$controls[0] : $object;
-            if (options.when && !options.when($tag)) return;
-            let value = false;
-            if (options.value) value = options.value($tag);
-            else if (typeof options.param === "string") value = $tag.getAttribute(options.param);
-            if (value === "true") value = true;
-            if (value === "false") value = false;
-            let onChange;
-            let size;
-            switch (type) {
-              case Array:
-                onChange = e => {
-                  if (typeof options.param === "function") {
-                    options.param($tag, e.target.value);
-                  } else {
-                    $object.setAttribute(options.param, e.target.value);
-                  }
-                  template.render();
-                };
-                return (
-                  <li key={key}><label>{options.title} <select value={value} onChange={onChange}>{options.type.map(option => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}</select></label></li>
-                );
-              case Boolean:
-                onChange = e => {
-                  if (typeof options.param === "function") {
-                    options.param($tag, e.target.checked);
-                  } else {
-                    $object.setAttribute(options.param, e.target.checked ? 'true' : 'false');
-                  }
-                  template.render();
-                };
-                return (
-                  <li key={key}><label><input type="checkbox" checked={value} onChange={onChange} /> {options.title}</label></li>
-                );
-              case String:
-              case Number:
-                size = options.type === Number ? 5 : undefined;
-                onChange = e => {
-                  if (typeof options.param === "function") {
-                    options.param($object, e.target.value);
-                  } else {
-                    $object.setAttribute(options.param, e.target.value);
-                  }
-                  template.render();
-                };
-                return (
-                  <li key={key}><label>{options.title} <input type="text" onInput={onChange} value={value} size={size} /></label></li>
-                );
-            }
-          })}
+          {items}
         </ul>
       </li>
     </ul>
