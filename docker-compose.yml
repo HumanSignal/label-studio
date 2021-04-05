@@ -30,7 +30,7 @@ services:
       - POSTGRE_PASSWORD=
       - POSTGRE_PORT=5432
       - POSTGRE_HOST=db
-      - LABEL_STUDIO_HOST=${LABEL_STUDIO_HOST:-http://localhost/label-studio}
+      - LABEL_STUDIO_HOST=${LABEL_STUDIO_HOST:-http://localhost}
     volumes:
       - ./mydata:/label-studio/data:rw
     command: [ "./deploy/wait-for-postgres.sh", "db", "bash", "/label-studio/deploy/start_label_studio.sh" ]
