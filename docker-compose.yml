@@ -18,7 +18,7 @@ services:
     stdin_open: true
     tty: true
     build: .
-    # image: heartexlabs/label-studio:latest
+    image: heartexlabs/label-studio:latest
     ports:
       - 8080:8080
     depends_on:
