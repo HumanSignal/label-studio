@@ -64,6 +64,20 @@ def s3_with_images(s3):
 
 
 @pytest.fixture(autouse=True)
+def s3_with_jsons(s3):
+    """
+    Bucket structure:
+    s3://pytest-s3-images/image1.jpg
+    s3://pytest-s3-images/subdir/image1.jpg
+    s3://pytest-s3-images/subdir/image2.jpg
+    """
+    with mock_s3():
+        bucket_name = 'pytest-s3-jsons'
+        s3.create_bucket(Bucket=bucket_name)
+        s3.put_object(Bucket=bucket_name, Key='test.json', Body=json.dumps({'image_url': 'http://ggg.com/image.jpg'}))
+        yield s3
+
+@pytest.fixture(autouse=True)
 def s3_export_bucket(s3):
     with mock_s3():
         bucket_name = 'pytest-export-s3-bucket'
