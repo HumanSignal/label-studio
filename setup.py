@@ -10,8 +10,8 @@ if sys.version_info[0] == 3 and sys.version_info[1] >= 9:
     print('~========================================================~')
     print('| Your python version is %i.%i and Label Studio has a      |' % (sys.version_info[0], sys.version_info[1]))
     print('| lot of installation problems with this Python version. |')
-    print('| Please, switch to Python 3.6 - 3.8 to avoid problems   |')
-    print('| with installation.                                     |')
+    print('| Please use Python 3.6 - 3.8 to avoid problems with     |')
+    print('| your installation.                                     |')
     print('~========================================================~')
     print()
 

@@ -1,4 +1,4 @@
-# this file distributed as an example of serving LS under proxy with subpath http://localhost/foo/ without any warranties. If you need to adjust it to your deployment scenario, manually modify subdomain.example.simple.conf nginx config, Label Studio env vars and postgres DB settings
+# this file is distributed as an example of serving Label Studio under proxy with subpath http://localhost/foo/ without any warranties. If you need to adjust it to your deployment scenario, manually modify the subdomain.example.simple.conf nginx config, Label Studio env vars and postgres DB settings
 version: '3.3'
 
 services:
