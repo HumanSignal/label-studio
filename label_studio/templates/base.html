@@ -17,13 +17,13 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="#272727">  <!-- iOS Safari -->
 
   <link href="{{settings.HOSTNAME}}{% static 'images/favicon.ico' rel="shortcut icon" %}"/>
-  <link href="{{settings.HOSTNAME}}/static/fonts/roboto/roboto.css" rel="stylesheet">
   <link href="{{settings.HOSTNAME}}{% static 'css/uikit.css' %}" rel="stylesheet">
   <link href="{{settings.HOSTNAME}}{% static 'css/main.css' %}" rel="stylesheet">
+  <link href="{{settings.HOSTNAME}}/static/fonts/roboto/roboto.css" rel="stylesheet">
   <link href="{{settings.HOSTNAME}}/react-app/main.css?v={{ versions.backend.commit }}" rel="stylesheet">
 
-  <script src="{% static 'js/jquery.min.js' %}"></script>
-  <script src="{% static 'js/helpers.js' %}"></script>
+  <script src="{{settings.HOSTNAME}}{% static 'js/jquery.min.js' %}"></script>
+  <script src="{{settings.HOSTNAME}}{% static 'js/helpers.js' %}"></script>
 
   <script>
     EDITOR_JS = "{{settings.HOSTNAME}}/label-studio-frontend/js/main.js?v={{ versions.lsf.commit }}";
