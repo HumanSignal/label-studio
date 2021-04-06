@@ -27,4 +27,3 @@ RUN ./deploy/prebuild_wo_frontend.sh
 
 ENTRYPOINT ["./deploy/docker-entrypoint.sh"]
 CMD bash /label-studio/deploy/start_label_studio.sh
-# CMD ./deploy/heroku_run.sh
