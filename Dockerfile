@@ -18,12 +18,12 @@ RUN pip3 install -r requirements.txt && pip install uwsgi
 
 ENV DJANGO_SETTINGS_MODULE=core.settings.label_studio
 ENV LABEL_STUDIO_BASE_DATA_DIR=/label-studio/data
-ENV LABEL_STUDIO_PORT="8080"
 
 COPY . /label-studio
 RUN python3.8 setup.py develop
 
-EXPOSE ${LABEL_STUDIO_PORT}
+EXPOSE 8080
+RUN ./deploy/prebuild_wo_frontend.sh
 
 ENTRYPOINT ["./deploy/docker-entrypoint.sh"]
 CMD bash /label-studio/deploy/start_label_studio.sh
