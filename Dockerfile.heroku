@@ -1,2 +1,2 @@
-FROM heartexlabs/label-studio:latest
+FROM heartexlabs/label-studio:test
 CMD ./deploy/heroku_run.sh

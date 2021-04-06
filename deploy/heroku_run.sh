@@ -1,3 +1,3 @@
 #!/bin/bash
 
-label-studio --host ${HOST:-0.0.0.0} --port ${PORT}
+label-studio --host ${HOST:-""} --port ${PORT}
