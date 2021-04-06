@@ -1,2 +1,0 @@
-FROM heartexlabs/label-studio:latest
-CMD ./deploy/heroku_run.sh
