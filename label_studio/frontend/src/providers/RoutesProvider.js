@@ -51,8 +51,14 @@ export const RoutesProvider = ({children}) => {
     return pageSetToRoutes(Pages, {config, store});
   }, [location, config, store, history]);
 
-  const routesChain = findMacthingComponents(location.pathname, routesMap);
-  const lastRoute = routesChain.filter(r => !r.modal).slice(-1)[0];
+  const routesChain = useMemo(() => {
+    return findMacthingComponents(location.pathname, routesMap);
+  }, [location, routesMap]);
+
+  const lastRoute = useMemo(() => {
+    return routesChain.filter(r => !r.modal).slice(-1)[0];
+  }, [routesChain]);
+
   const [currentPath, setCurrentPath] = useState(lastRoute?.path);
 
   const contextValue = useMemo(() => ({
@@ -70,12 +76,14 @@ export const RoutesProvider = ({children}) => {
   ]);
 
   useEffect(() => {
+    console.log("Location changed");
     const ContextComponent = lastRoute?.context;
 
     setCurrentContext({
       component: ContextComponent ?? null,
       props: currentContextProps,
     });
+
     setCurrentPath(lastRoute?.path);
 
     try {
@@ -89,10 +97,11 @@ export const RoutesProvider = ({children}) => {
       }).filter(c => !!c.title);
 
       setBreadcrumbs(crumbs);
+      console.log(crumbs);
     } catch (err) {
       console.log(err);
     }
-  }, [location, routesMap, currentContextProps]);
+  }, [location, routesMap, currentContextProps, routesChain, lastRoute]);
 
   return (
     <RoutesContext.Provider value={contextValue}>

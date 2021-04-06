@@ -1,22 +1,27 @@
 {% extends 'simple.html' %}
 {% load static %}
-{% load filters %}
 
 {% block head %}
-    <title>500 | Label Studio</title>
+  <title>500 | Label Studio</title>
+  <link rel="stylesheet" href="{% static 'css/error.css' %}"/>
 {% endblock %}
 
 
 {% block content %}
-<div class="masthead error segment">
-    <div class="container">
-        <h1 class="ui dividing header">Something's wrong, we're on it!</h1>
-        <p>Try again later</p>
-        <p>
-          {% var_exists 'exception' as exception %}
-          {{ exception }}
-        </p>
-
-    </div>
+<div class="ls-global-error">
+  <h1>Server error</h1>
+  <img class="ls-global-error__heidi" src="{% static 'images/opossum_broken.svg' %}" height="111" alt="Heidi's down" />
+  <h2>500 Something went wrong</h2>
+  {% autoescape off %}
+  <div class="ls-global-error__details">{{ exception }}</div>
+  {% endautoescape  %}
+  <p class="ls-global-error__actions">
+    <a class="ls-global-error__slack button" target="_blank" href="https://join.slack.com/t/label-studio/shared_invite/zt-cr8b7ygm-6L45z7biEBw4HXa5A2b5pw">
+      <img src="{% static 'images/slack.png' %}" width="16" />
+      Ask on Slack
+    </a>
+    <button onClick="history.back()">Go Back</button>
+    <button onClick="location.reload()">Reload</button>
+  </p>
 </div>
 {% endblock %}

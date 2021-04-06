@@ -455,3 +455,44 @@
         status_code: 201
         response:
           id: '{annotation_pk}'
+
+
+# s3 storage with JSON data
+- test_import_jsons_from_s3:
+    # Create project
+    - /api/projects:
+        method: POST
+        data:
+          title: test_s3_storage_with_json
+          label_config: <View><Image name="image" value="$image_url"/><Choices name="label" toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+          is_published: true
+        status_code: 201
+        response:
+          id: '{project_pk}'
+
+    # Create storage
+    - /api/storages/s3:
+        method: POST
+        data:
+          project: '{project_pk}'
+          title: Testing S3 storage 2 (bucket from conftest.py)
+          bucket: pytest-s3-jsons
+          use_blob_urls: false
+        status_code: 201
+        response:
+          id: '{storage_pk}'
+
+    # Sync storage
+    - /api/storages/s3/{storage_pk}/sync:
+        method: POST
+        status_code: 200
+        response:
+          last_sync_count: 1
+
+    # Get all tasks
+    - /api/projects/{project_pk}/tasks:
+        method: GET
+        status_code: 200
+        response:
+          - data:
+              image_url: http://ggg.com/image.jpg

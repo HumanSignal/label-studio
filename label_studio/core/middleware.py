@@ -62,7 +62,10 @@ class CommonMiddlewareAppendSlashWithoutRedirect(CommonMiddleware):
 
         if isinstance(response, HttpSmartRedirectResponse):
             if not request.path.endswith('/'):
-                request.path = request.path + '/'
+                # remove prefix SCRIPT_NAME
+                path = request.path[len(settings.FORCE_SCRIPT_NAME):] if settings.FORCE_SCRIPT_NAME \
+                    else request.path
+                request.path = path + '/'
             # we don't need query string in path_info because it's in request.GET already
             request.path_info = request.path
             response = self.handler.get_response(request)
