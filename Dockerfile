@@ -23,6 +23,7 @@ COPY . /label-studio
 RUN python3.8 setup.py develop
 
 EXPOSE 8080
+RUN ./deploy/prebuild_wo_frontend.sh
 
 ENTRYPOINT ["./deploy/docker-entrypoint.sh"]
 CMD bash /label-studio/deploy/start_label_studio.sh
