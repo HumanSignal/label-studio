@@ -1,5 +1,3 @@
 build:
   docker:
-    web: Dockerfile
-run:
-  web: ./deploy/heroku_run.sh
+    web: Dockerfile.heroku
