@@ -8,14 +8,14 @@ from tasks.serializers import PredictionSerializer
 from users.models import User
 
 
-class UserSerializer(serializers.ModelSerializer):
+class CompletedBySerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'email', 'first_name', 'last_name']
 
 
 class AnnotationSerializer(serializers.ModelSerializer):
-    completed_by = UserSerializer(read_only=True)
+    completed_by = CompletedBySerializer(read_only=True)
 
     class Meta:
         model = Annotation
