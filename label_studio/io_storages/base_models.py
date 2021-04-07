@@ -76,7 +76,7 @@ class ImportStorage(Storage):
             data = self.get_data(key)
 
             # predictions
-            predictions = data.get('predictions')
+            predictions = data.get('predictions', [])
             if predictions:
                 if 'data' not in data:
                     raise ValueError('If you use "predictions" field in the task, '
