@@ -31,25 +31,25 @@ Some available commands for Label Studio provide information or start the Label 
 
 The following command line arguments are optional and must be specified with `label-studio start <argument> <value>` or as an environment variable when you set up the environment to host Label Studio:
 
-| Command line argument | Environment variable | Description |
-| --- | ---- | ---- |
-| `-b`, `--no-browser` | N/A | Do not automatically open a web browser when starting Label Studio. |
-| `-db` `--database` | `LABEL_STUDIO_DATABASE` | Specify the database file path for storing labeling tasks and annotations. See [Database storage](install.html#Database_storage). |
-| `--data-dir` | `LABEL_STUDIO_DATA_DIR` | Directory to use to store all application-related data. |
-| `-d` `--debug` | N/A | Enable debug mode for troubleshooting Label Studio. |
-| `-c` `--config` | `CONFIG_PATH` | Deprecated, do not use. Specify the path to the server configuration for Label Studio. |
-| `-l` `--label-config` | `LABEL_STUDIO_LABEL_CONFIG` | Path to the label configuration file for a specific Label Studio project. See [Set up your labeling project](setup.html). |
-| `--ml-backends` | `LABEL_STUDIO_ML_BACKENDS` | Specify the URLs for one or more machine learning backends. See [Set up machine learning with your labeling process](ml.html). |
-| `--sampling` | N/A | Specify one of sequential or uniform to define the order for labeling tasks. See [Set up task sampling for your project](start.html#Set_up_task_sampling_for_your_project) on this page. |
-| `--log-level` | N/A | One of DEBUG, INFO, WARNING, or ERROR. Use to specify the logging level for the Label Studio server. |
-| `-p` `--port` | `LABEL_STUDIO_PORT` | Specify the web server port for Label Studio. Defaults to 8080. See [Run Label Studio on localhost with a different port](start.html#Run-Label-Studio-on-localhost-with-a-different-port) on this page. |
-| `--host` | `LABEL_STUDIO_HOST` | Specify the hostname to use to generate links for imported labeling tasks or static loading requirements. Leave empty to make all paths relative to the root domain. For example, specify `"https://77.42.77.42:1234"` or `"http://ls.example.com/subdomain/"`. See [Run Label Studio with an external domain name](start.html#Run-Label-Studio-with-an-external-domain-name) on this page. |
-| `--cert` | `LABEL_STUDIO_CERT_FILE` | Certificate file to use to access Label Studio over HTTPS. Must be in PEM format. See [Run Label Studio with HTTPS](start.html#Run-Label-Studio-with-HTTPS) on this page. | 
-| `--key` | `LABEL_STUDIO_KEY_FILE` | Private key file for HTTPS connection. Must be in PEM format. See [Run Label Studio with HTTPS](start.html#Run-Label-Studio-with-HTTPS) on this page. |
-| `--initial-project-description` | `LABEL_STUDIO_PROJECT_DESC` | Specify a project description for a Label Studio project. See [Set up your labeling project](setup.html). |
-| `--password` | `LABEL_STUDIO_PASSWORD` | Password to use for the default user. |
-| `--username` | `LABEL_STUDIO_USERNAME` | Username to use for the default user. |
-| `--agree-fix-sqlite` | N/A | Automatically agree to let Label Studio fix SQLite issues when using Python 3.6–3.8 on Windows operating systems. | 
+| Command line argument | Environment variable | Default | Description |
+| --- | ---- | --- | ---- |
+| `-b`, `--no-browser` | N/A | `False` | Do not automatically open a web browser when starting Label Studio. |
+| `-db` `--database` | `LABEL_STUDIO_DATABASE` | `label_studio.sqlite3` | Specify the database file path for storing labeling tasks and annotations. See [Database storage](install.html#Database_storage). |
+| `--data-dir` | `LABEL_STUDIO_DATA_DIR` | OS-specific | Directory to use to store all application-related data. |
+| `-d` `--debug` | N/A | `False` | Enable debug mode for troubleshooting Label Studio. |
+| `-c` `--config` | `CONFIG_PATH` | `default_config.json` | Deprecated, do not use. Specify the path to the server configuration for Label Studio. |
+| `-l` `--label-config` | `LABEL_STUDIO_LABEL_CONFIG` | `None` | Path to the label configuration file for a specific Label Studio project. See [Set up your labeling project](setup.html). |
+| `--ml-backends` | `LABEL_STUDIO_ML_BACKENDS` | `None` | Specify the URLs for one or more machine learning backends. See [Set up machine learning with your labeling process](ml.html). |
+| `--sampling` | N/A | `sequential` | Specify one of sequential or uniform to define the order for labeling tasks. See [Set up task sampling for your project](start.html#Set_up_task_sampling_for_your_project) on this page. |
+| `--log-level` | N/A | `ERROR` | One of DEBUG, INFO, WARNING, or ERROR. Use to specify the logging level for the Label Studio server. |
+| `-p` `--port` | `LABEL_STUDIO_PORT` | `8080` | Specify the web server port for Label Studio. Defaults to 8080. See [Run Label Studio on localhost with a different port](start.html#Run-Label-Studio-on-localhost-with-a-different-port) on this page. |
+| `--host` | `LABEL_STUDIO_HOST` | `''` | Specify the hostname to use to generate links for imported labeling tasks or static loading requirements. Leave empty to make all paths relative to the root domain. For example, specify `"https://77.42.77.42:1234"` or `"http://ls.example.com/subdomain/"`. See [Run Label Studio with an external domain name](start.html#Run-Label-Studio-with-an-external-domain-name) on this page. |
+| `--cert` | `LABEL_STUDIO_CERT_FILE` | `None` | Certificate file to use to access Label Studio over HTTPS. Must be in PEM format. See [Run Label Studio with HTTPS](start.html#Run-Label-Studio-with-HTTPS) on this page. | 
+| `--key` | `LABEL_STUDIO_KEY_FILE` | `None` | Private key file for HTTPS connection. Must be in PEM format. See [Run Label Studio with HTTPS](start.html#Run-Label-Studio-with-HTTPS) on this page. |
+| `--initial-project-description` | `LABEL_STUDIO_PROJECT_DESC` | `''` | Specify a project description for a Label Studio project. See [Set up your labeling project](setup.html). |
+| `--password` | `LABEL_STUDIO_PASSWORD` | `None` | Password to use for the default user. |
+| `--username` | `LABEL_STUDIO_USERNAME` | `default_user@localhost` | Username to use for the default user. |
+| `--agree-fix-sqlite` | N/A | `False` | Automatically agree to let Label Studio fix SQLite issues when using Python 3.6–3.8 on Windows operating systems. | 
 
 
 ## Run Label Studio on localhost with a different port
