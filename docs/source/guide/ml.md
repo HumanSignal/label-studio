@@ -73,27 +73,15 @@ If the model has not been trained yet, do the following to get predictions to ap
 2. Return to the machine learning settings for your project and **Start Training** the model.
 3. After training starts, predictions appear in the labeling interface. 
 
-<!-- This isn't actually a valid API endpoint as of 1.0.0++
-Predictions only appear while labeling tasks. If you want to see predictions on the list of tasks and when previewing tasks, make a call to the API to retrieve the predictions for all tasks:
-```
-curl -X GET http://localhost:8080/api/models/predictions?mode=all_tasks
-```
--->
+Predictions only appear while labeling tasks. For example, for an image classification task, the model pre-selects an image class for data annotators to verify. For audio transcriptions, the model displays a transcription that data annotators can modify.
 
-For example, for an image classification task, the model pre-selects an image class for data annotators to verify. For audio transcriptions, the model displays a transcription that data annotators can modify.
-
-You can also get a prediction for specific labeling tasks using the API. For example, to get a prediction for a labeling task `{"text":"some text"}` from a Label Studio installation accessible at `http://localhost:8080`, run the following cURL command:
-   ```
-    curl -X POST -d '{"text":"some text"}' -H "Content-Type: application/json" http://localhost:8080/api/models/predictions
-   ```
-<!--check with Max, my guess is that this needs to be updated--> 
-
+If you want to see predictions on the list of tasks and when previewing tasks, make a GET request to the `/predict` URL of your ML backend with a payload of the tasks that you want to see predictions for, formatted like the following example: `{"tasks": [{"data": {"text":"some text"}}]}`.
    
 ### Train a model with Label Studio 
 
 After you connect a model to Label Studio as a machine learning backend, you can start model training from the UI or using the API. 
 
-- On the Label Studio UI, click the **Start Training** button on the `/model` page.
+- On the Label Studio UI, click the **Start Training** button on the **Machine Learning** settings for your project.
 - cURL the API from the command line: 
    ```
    curl -X POST http://localhost:8080/api/models/train
@@ -143,9 +131,9 @@ You can select a sampling strategy like `prediction-score-min`, where min is the
 
 ## Troubleshooting
 
-If you encounter any errors, review these potential causes. 
+If you encounter any errors, review these troubleshooting steps and possible causes. 
 
-### Review the ML server logs
+### Troubleshoot by reviewing the ML server logs
 You can investigate most problems using the server console log. The machine learning backend runs as a separate server from Label Studio, so make sure you check the correct server console logs while troubleshooting. To see more detailed logs, start the ML backend server with the `--debug` option. 
 
 If you're running an ML backend: 
@@ -179,7 +167,8 @@ Your ML backend might be producing predictions in the wrong format.
 - Check to see whether the ML backend predictions format follows the same structure as [predictions in imported pre-annotations](predictions.html).
 - Confirm that your project's label configuration matches the output produced by your ML backend. 
 
-
+### The model backend fails to start or run properly
+If you see errors about missing packages in the terminal after starting your ML backend server, or in the logs, you might need to specify additional packages in the `requirements.txt` file for your ML backend.
 
 
 
