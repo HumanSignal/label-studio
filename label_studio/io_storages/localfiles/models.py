@@ -49,8 +49,15 @@ class LocalFilesImportStorage(ImportStorage, LocalFilesMixin):
             document_root = Path(get_env('LOCAL_FILES_DOCUMENT_ROOT', default='/'))
             relative_path = str(path.relative_to(document_root))
             return {settings.DATA_UNDEFINED_NAME: f'/data/local-files/?d={relative_path}'}
-        with open(path) as f:
-            value = json.load(f)
+
+        try:
+            with open(path, encoding='utf8') as f:
+                value = json.load(f)
+        except (UnicodeDecodeError, json.decoder.JSONDecodeError):
+            raise ValueError(
+                f"Can\'t import JSON-formatted tasks from {uri}. If you're trying to import binary objects, "
+                f"perhaps you've forgot to enable \"Treat every bucket object as a source file\" option?")
+
         if not isinstance(value, dict):
             raise ValueError(f"Error on key {key}: For {self.__class__.__name__} your JSON file must be a dictionary with one task.")  # noqa
         return value

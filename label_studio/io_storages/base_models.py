@@ -8,7 +8,7 @@ from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 from django_rq import job
 
-from tasks.models import Task, Prediction
+from tasks.models import Task, Prediction, Annotation
 
 from core.redis import redis_connected
 
@@ -83,20 +83,35 @@ class ImportStorage(Storage):
                                      'you must put "data" field in the task too')
                 data = data['data']
 
+            # predictions
+            annotations = data.get('annotations')
+            if annotations:
+                if 'data' not in data:
+                    raise ValueError('If you use "annotations" field in the task, '
+                                     'you must put "data" field in the task too')
+                data = data['data']
+
             with transaction.atomic():
                 task = Task.objects.create(data=data, project=self.project)
                 link_class.create(task, key, self)
                 logger.debug(f'Create {self.__class__.__name__} link with key={key} for task={task}')
                 tasks_created += 1
 
+                # add predictions
                 if not task.predictions.exists():
+                    logger.debug(f'Create {len(predictions)} predictions for task={task}')
                     for p in predictions:
                         prediction = Prediction(result=p['result'], score=p.get('score'),
                                                 model_version=p.get('model_version'),
                                                 task=task)
                         prediction.save()
-                    if predictions:
-                        logger.debug(f'Create {len(predictions)} predictions for task={task}')
+
+                # add annotations
+                if not task.annotations.exists():
+                    logger.debug(f'Create {len(annotations)} annotations for task={task}')
+                    for a in annotations:
+                        annotation = Annotation(result=a['result'], task=task)
+                        annotation.save()
 
         self.last_sync = timezone.now()
         self.last_sync_count = tasks_created
