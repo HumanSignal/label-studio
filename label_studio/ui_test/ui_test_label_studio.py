@@ -44,24 +44,24 @@ class myTestCase(unittest.TestCase):
         self.menu_settings = '//a[contains(text(), "Settings")]'
         # WELCOME PAGE
         self.welcome_import_btn = '//a[contains(text(), "Import")]'
-        # self.welcome_Setup  = '//a[contains(text(), "Setup")]'
-        # self.welcome_Import = '//a[contains(text(), "Import")]'
-        # self.welcome_Start  = '//a[contains(text(), "Start")]'
-        # self.welcome_Export = '//a[contains(text(), "Export")]'
+        self.welcome_Setup  = '//a[contains(text(), "Setup")]'
+        self.welcome_Import = '//a[contains(text(), "Import")]'
+        self.welcome_Start  = '//a[contains(text(), "Start")]'
+        self.welcome_Export = '//a[contains(text(), "Export")]'
         #
         # IMPORT PAGE 
         self.import_img_draganddrop_id = 'file-input'
-        # self.import_img_draganddrop_text = '//p[contains(text(), "Drag and drop your files here or click for import")]'
         self.import_file_src = ''
         self.import_img_src = 'img/imgForDragAndDrop.jpg'
         self.import_txt_src = 'text/txtForDragAndDrop.txt'
         self.import_csv_src  = 'commonFormats/csv/csvForDragAndDrop.csv'
         self.import_json_src = 'commonFormats/json/jsonForDragAndDrop.json'
         self.importPage_import_btn = '//button[@class="ui primary button"]'
-        # self.importPage_import_txt = '//h1[contains(text(), "Import data")]'
         self.importPage_fileUploaded = '//h1[contains(text(), "Files uploaded")]'
         #
         # TASKS PAGE
+        self.page_tasks_afterSave_url = 'http://localhost:8080/tasks?tab=1'
+        self.page_tasks_afterSaveSubmit_url = 'http://localhost:8080/tasks?tab=1&labeling=1'
         self.tasks_label_btn = '//button[@class="ant-btn ant-btn-primary"]'
         self.tasks_goToSetup_btn = '//span[contains(text(), "Go to setup")]'
         self.tasks_no_data_for_labeling_txt = '//div[contains(text(), "No more data available for labeling")]'
@@ -70,9 +70,10 @@ class myTestCase(unittest.TestCase):
         self.tasks_afterSaveSubmit_btn = '//button[@class="ant-btn ant-btn-primary"]/span[contains(text(), "Submit")]'
         self.tasks_import_btn = '//button[@class="ant-btn flex-button"]/span[contains(text(), "Import")]'
         #
-        self.page_tasks_afterSave_url = 'http://localhost:8080/tasks?tab=1'
-        self.page_tasks_afterSaveSubmit_url = 'http://localhost:8080/tasks?tab=1&labeling=1'
-
+        self.tasks_allTasks_checkbox = '//label[@class="ant-checkbox-wrapper sc-jrsJCI emsrNO"]/span/input[@class="ant-checkbox-input"]'
+        self.tasks_deleteTasks_btn = '//button[@class="ant-btn ant-btn-sm ant-btn-dangerous flex-button"]/span[contains(text(), "Delete tasks")]'
+        self.tasks_deleteTasks_popupOk_btn = '//button[@class="ant-btn ant-btn-primary"]/span[contains(text(), "OK")]'
+        self.tasks_afterDeleteTasks_import_btn = '//a/span[contains(text(), "Go to import")]'
         #
         # SETTINGS PAGE
         self.settings_bacic_templates_div = '//div[@id="basic-templates"]'
@@ -83,7 +84,7 @@ class myTestCase(unittest.TestCase):
         self.settings_selectedTypeDiv = '//div[@class="three wide column category"]'
         self.settings_save_btn = '//input[@id="submit_form"]'
         self.settings_exploreTasks_btn = '//a[contains(text(), "Explore Tasks")]'
-
+        self.settings_importTasks_btn = '//a[contains(text(), "Import Tasks")]'
         self.settings_selectedTypeNameFromDivi_arr = '' #All div/i elements containing file-format type names from the page (like: audio, image, font,...)
         self.settings_selectedTypeDiv_arr = ''          #All DIV elements containing name and links for that file-format type (like: jpg, png, gif,...)
         self.availableTemplatesForChoosedType_arr = ''
@@ -92,10 +93,8 @@ class myTestCase(unittest.TestCase):
         self.setup_label_car = 'ant-tag'
         self.setup_save_btn = 'submit_form'
         self.setup_afterSave = '//p[contains(text(), "Label config saved!")]'
-        #
         self.start_label_car = 'ant-tag'
         self.start_submit_btn = '//button/span[contains(text(), "Submit ")]'
-        #
         self.export_submit_btn = '//a[contains(text(), "Export Completions")]'
         #
 
@@ -117,25 +116,23 @@ class myTestCase(unittest.TestCase):
 
         print('\n..... Start testing for all choosed types (image, font, common formats, audio, html, time series) .....')
         for testTypeWithItsFormats in testTypes_arr:
-            # print(testTypeWithItsFormats)
             print('')
             print('----- Begin test chain for format '+testTypeWithItsFormats[0]+' -----')
             self.choosedFileType = testTypeWithItsFormats[0]
             #
-            print('1#####'+str(self.driver.current_url))
+            print('1##### Current_url is: '+str(self.driver.current_url))
             # Get all templates for first time
             if self.driver.current_url == self.site_url: #if we are on welcome page
                 self.page_welcome()
             self.go_to_page(self.menu_settings)
-            print('1#####1'+str(self.driver.current_url))
+            print('2##### Current_url is: '+str(self.driver.current_url))
             #
             # Get avaliable templates for choosed file-type from the site
             print('Geting all avaliable templates for choosed file-type "'+self.choosedFileType+'" from the site')
             availableTemplatesForChoosedType_arr = self.get_available_templates_for_choosed_type(self.choosedFileType)
-            # print('2#####'+str(availableTemplatesForChoosedType_arr)) # !!!!!!!
             availableTemplatesForChoosedType_arr2 = [link.text for link in availableTemplatesForChoosedType_arr]
             #
-            # print('3#####'+str(availableTemplatesForChoosedType_arr2))
+            print('3##### availableTemplatesForChoosedType_arr2 is: '+str(availableTemplatesForChoosedType_arr2))
             #
             for i in range(1, len(testTypeWithItsFormats)):
                 print('')
@@ -144,12 +141,11 @@ class myTestCase(unittest.TestCase):
                 #
                 # if (self.choosedFormat == 'jpg') or (self.choosedFormat == 'txt'):
                 if (self.choosedFormat == 'jpg'):
-                    #
-                    hhh = 0 #!!!!!!! must be deleted
-                    howTemplatesToTake = 2 #!!!!!!! must be deleted
+                    hhh = 0                #!!!!!!! must be deleted
+                    howTemplatesToTake = 5 #!!!!!!! must be deleted
                     for tplName in availableTemplatesForChoosedType_arr2:
-                        if hhh >= howTemplatesToTake:
-                            break
+                        if hhh >= howTemplatesToTake: #!!!!!!! must be deleted
+                            break                     #!!!!!!! must be deleted
 
                         print('')
                         print('----------==========----------')
@@ -173,15 +169,12 @@ class myTestCase(unittest.TestCase):
                         tasks_deleteAllTasks = True
                         self.page_tasks(tasks_deleteAllTasks) #Delete all tasks and click on Tasks->Import, if we are on page 'http://localhost:8080/tasks?tab=1'
 
-                        hhh = hhh + 1
+                        hhh = hhh + 1 #!!!!!!! must be deleted
                         print('----------==========----------')
                 else:
                     print(' ... ')
                 print('-- End testing for test format: '+str(testTypeWithItsFormats[i])+' --')
             print('----- End test chain for format '+testTypeWithItsFormats[0]+' -----')
-
-
-
 
     # Checks element existance by xpath
     def check_exists_by_xpath(self, xpath):
@@ -254,12 +247,6 @@ class myTestCase(unittest.TestCase):
     # TASKS PAGE
     def page_tasks(self, tasks_deleteAllTasks):
         print("..... Going to page Tasks .....")
-        self.tasks_allTasks_checkbox = '//label[@class="ant-checkbox-wrapper sc-jrsJCI emsrNO"]/span/input[@class="ant-checkbox-input"]'
-        self.tasks_deleteTasks_btn = '//button[@class="ant-btn ant-btn-sm ant-btn-dangerous flex-button"]/span[contains(text(), "Delete tasks")]'
-        self.tasks_deleteTasks_popupOk_btn = '//button[@class="ant-btn ant-btn-primary"]/span[contains(text(), "OK")]'
-        self.tasks_afterDeleteTasks_import_btn = '//a/span[contains(text(), "Go to import")]'
-
-
         if tasks_deleteAllTasks:
             # Deleting tasks
             print('###Task_page: Deleting all complated tasks')
@@ -279,11 +266,9 @@ class myTestCase(unittest.TestCase):
             tasks_afterDeleteTasks_import_btn.click()
             # self.driver.find_element_by_xpath(self.tasks_import_btn).click()
         else:
-            # self.page_tasks_afterSave_url       = 'http://localhost:8080/tasks?tab=1'
-            # self.page_tasks_afterSaveSubmit_url = 'http://localhost:8080/tasks?tab=1&labeling=1'
+            # Page Tasks, After Save
             if self.driver.current_url == self.page_tasks_afterSave_url:
                 # Label and then Submit
-                print('Task_page: ************')
                 print('Task_page: Clicking on Tasks->Label button for Labeling')
                 self.driver.find_element_by_xpath(self.tasks_submitAfterLabeling).click()
                 # We will redirect to page: self.page_tasks_afterSaveSubmit_url = 'http://localhost:8080/tasks?tab=1&labeling=1'
@@ -293,52 +278,22 @@ class myTestCase(unittest.TestCase):
                     print('Task_page: No more data available for labeling... so clicking on Back link')
                     self.driver.find_element_by_xpath(self.tasks_go_back_link).click()
                 else:
-                    print('Task_page: &&&&&&&&&&&&&&&&&&&')
+                    print('Task_page: 2@@@@@@@@@@')
                     print('Task_page: Clicking on Tasks->Submit button')
                     self.driver.find_element_by_xpath(self.tasks_afterSaveSubmit_btn).click()
                 # We will redirect to page: 'No more data available for labeling' , self.page_tasks_afterSaveSubmit_url = 'http://localhost:8080/tasks?tab=1&labeling=1'
             elif self.driver.current_url == self.page_tasks_afterSaveSubmit_url:
                 # Go Back, due to No data in page
-                print('Task_page: 2@@@@@@@@@@')
+                print('Task_page: 3@@@@@@@@@@')
                 print('Task_page: No more data available for labeling... so clicking on Back link')
-                self.driver.find_element_by_xpath(self.tasks_go_back_link).click()
+                self.driver.find_element_by_xpath(self.tasks_go_back_link).click()                
+            else:
+                print('*****ERROR: Current url is: ' + str(self.driver.current_url))
 
-
-        # if self.driver.current_url == self.page_tasks_afterSaveSubmit_url:
-        #     print('Task_page: No more data available for labeling... so clicking on Back link')
-        #     self.driver.find_element_by_xpath(self.tasks_go_back_link).click()
-        #     print('Task_page: Clicking on Import button for import the file')
-        #     self.driver.find_element_by_xpath(self.tasks_import_btn).click()
-        # else:
-        #     # Click on Label button
-        #     print("Task_page: Clicking on Label button")
-        #     tasks_label_btn = self.wait.until(EC.element_to_be_clickable((By.XPATH, self.tasks_label_btn))) !!!!!!!
-        #     tasks_label_btn.click()
-        #     #
-        #     if self.check_exists_by_xpath(self.tasks_no_data_for_labeling_txt):
-        #         print('Task_page: No more data available for labeling... so clicking on Back link')
-        #         self.driver.find_element_by_xpath(self.tasks_go_back_link).click()
-        #         # Click on Menu->Settings
-        #         print('Task_page: Clicking on Menu->Settings')
-        #         self.driver.find_element_by_xpath(self.menu_settings).click()
-        #         #
-        #         ##
-        #         if self.driver.current_url == self.page_tasks_afterSave_url:
-        #             print('Task_page: ************')
-        #             print('Task_page: Clicking on Tasks->Import button for importing new file')
-        #             self.driver.find_element_by_xpath(self.tasks_import_btn).click()
-        #             # After click user is on page: Import
-        #     else:
-        #         #
-        #         if self.driver.current_url == self.page_tasks_afterSaveSubmit_url:
-        #             print('Task_page: &&&&&&&&&&&&&&&&&&&')
-        #             print('Task_page: Clicking on Tasks->Submit button')
-        #             self.driver.find_element_by_xpath(self.tasks_afterSaveSubmit_btn).click()
-        #         else:
-        #             # Clicking on popup's submit button
-        #             print('Task_page: Clicking on "Go to setup" button on the opened popup window "Labeling is not yet fully configured"')
-        #             tasks_goToSetup_btn = self.wait.until(EC.element_to_be_clickable((By.XPATH, self.tasks_goToSetup_btn))) !!!!!!!
-        #             tasks_goToSetup_btn.click() 
+            # Clicking on popup's submit button case
+            # print('Task_page: Clicking on "Go to setup" button on the opened popup window "Labeling is not yet fully configured"')
+            # tasks_goToSetup_btn = self.wait.until(EC.element_to_be_clickable((By.XPATH, self.tasks_goToSetup_btn))) !!!!!!!
+            # tasks_goToSetup_btn.click()
 
 
     # SETTINGS PAGE
@@ -347,20 +302,9 @@ class myTestCase(unittest.TestCase):
         # Click for show "Advanced templates" section
         self.driver.find_element_by_xpath(self.settings_advanced_templates_div).click()
         #
-        # choosedTemplateName = 'Image classification'
         # Click on choosed format (choosed format from choosed file type)
         print('Settings_page: Clicking on choosed template-name: "'+str(choosedTemplateName)+'"')
         self.driver.find_element_by_xpath('//a[contains(text(), "'+choosedTemplateName+'")]').click()
-
-        # template_a = self.wait.until(EC.element_to_be_clickable((By.XPATH, '//a[contains(text(), "'+choosedTemplateName+'")]')))
-        # template_a.click()
-        #
-        # # Get all formats for given file type
-        # self.availableTemplatesForChoosedType_arr = self.get_available_templates_for_choosed_type('image')
-        # print('Settings_page: Doing click on all available templates for choosed type')
-        # for a in self.availableTemplatesForChoosedType_arr:
-        #     print('Settings_page: -clicking on '+self.choosedFileType+' template: '+str(a.text))
-        #     a.click()
 
         # Clicking on popup's submit button
         time.sleep(2)
@@ -372,11 +316,13 @@ class myTestCase(unittest.TestCase):
         # Click on Save button
         print("Settings_page: Clicking on Save button")
         self.driver.find_element_by_xpath(self.settings_save_btn).click()
-        #
+
         print('Settings_page: Clicking on "Explore Tasks" button on the opened popup "Label config saved!"')
         settings_exploreTasks_btn = self.wait.until(EC.element_to_be_clickable((By.XPATH, self.settings_exploreTasks_btn)))
         settings_exploreTasks_btn.click()
         time.sleep(2) # Waiting for popup window closing proces finished
+
+        # self.settings_importTasks_btn
 
 
     # Get all formats for given file type
@@ -414,22 +360,8 @@ class myTestCase(unittest.TestCase):
         return availableTemplatesForChoosedType_arr
 
 
-        #
-        # print('*** all_templates_links:')
-        # all_templates_links = self.driver.find_elements_by_css_selector('a.use-template')
-        # # for link in all_templates_links:
-        # #     print(link)
-        # #     link.click()
-        # #
-        # for i in range(int(len(all_templates_links)/5)):
-        #     print(str(i)+'-->'+str(all_templates_links[i]))
-        #     if self.choosed_template == i:
-        #         all_templates_links[i].click()
-        #         break
-        # time.sleep(5)
-
-
-
 if __name__ == "__main__":
     unittest.main()
+
+
 
