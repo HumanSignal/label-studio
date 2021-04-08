@@ -31,3 +31,14 @@ class LocalFilesExportStorageSerializer(ExportStorageSerializer):
     class Meta:
         model = LocalFilesExportStorage
         fields = '__all__'
+    
+    def validate(self, data):
+        # Validate local file path
+        data = super(LocalFilesExportStorageSerializer, self).validate(data)
+        storage = LocalFilesExportStorage(**data)
+        try:
+            storage.validate_connection()
+        except Exception as exc:
+            raise ValidationError(exc)
+        return data
+
