@@ -2,6 +2,8 @@ name: pytest:ubnt
 on:
   push:
     branches: ['*', '*/*', master]
+    paths:
+      - 'label_studio/**'
 
 jobs:
   
