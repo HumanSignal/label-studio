@@ -6,9 +6,6 @@ meta_title: Machine Learning SDK
 meta_description: Label Studio Documentation for setting up your machine learning model to output and consume predictions in your machine learning and data science data labeling projects. 
 ---
 
-
-## Create your own ML backend
-
 Follow this tutorial to wrap existing machine learning model code with the Label Studio ML SDK to use it as an ML backend with Label Studio. 
 
 Before you start, determine the following:

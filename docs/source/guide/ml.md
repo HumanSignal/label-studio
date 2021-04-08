@@ -24,7 +24,7 @@ The Label Studio ML backend is an SDK that you can use to wrap your machine lear
 
 The overall steps of setting up a Label Studio ML backend are as follows:
 1. Get your model code.
-2. Wrap it with the Label Studio SDK
+2. Wrap it with the [Label Studio SDK](mlbackend.html).
 3. Create a running server script
 4. Launch the script
 5. Connect Label Studio to ML backend on the UI
