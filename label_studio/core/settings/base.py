@@ -353,7 +353,7 @@ CREATE_ORGANIZATION = 'organizations.functions.create_organization'
 GET_OBJECT_WITH_CHECK_AND_LOG = 'core.utils.get_object.get_object_with_check_and_log'
 SAVE_USER = 'users.functions.save_user'
 USER_SERIALIZER = 'users.serializers.BaseUserSerializer'
-
+DATA_MANAGER_ANNOTATIONS_MAP = {}
 
 # fix a problem with Windows mimetypes for JS and PNG
 import mimetypes

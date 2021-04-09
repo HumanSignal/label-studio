@@ -232,7 +232,7 @@ def dummy(queryset):
     return queryset
 
 
-annotations_map = {
+settings.DATA_MANAGER_ANNOTATIONS_MAP = {
     "completed_at": annotate_completed_at,
     "cancelled_annotations": annotate_cancelled_annotations,
     "annotations_results": annotate_annotations_results,
@@ -244,9 +244,18 @@ annotations_map = {
 }
 
 
+def get_annotations_map():
+    return settings.DATA_MANAGER_ANNOTATIONS_MAP
+
+
+def update_annotation_map(obj):
+    settings.DATA_MANAGER_ANNOTATIONS_MAP.update(obj)
+
+
 class PreparedTaskManager(models.Manager):
     def get_queryset(self, fields_for_evaluation=None):
         queryset = TaskQuerySet(self.model)
+        annotations_map = get_annotations_map()
 
         if fields_for_evaluation is None:
             fields_for_evaluation = []

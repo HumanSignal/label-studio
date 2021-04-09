@@ -57,16 +57,16 @@ def get_all_columns(project):
         task_data_children.append(column['id'])
         i += 1
 
-    result['columns'] += [
-        # --- Data root ---
-        {
-            'id': 'data',
-            'title': "data",
-            'type': "List",
-            'target': 'tasks',
-            'children': task_data_children
-        },
+    # --- Data root ---
+    data_root = {
+        'id': 'data',
+        'title': "data",
+        'type': "List",
+        'target': 'tasks',
+        'children': task_data_children
+    }
 
+    result['columns'] += [
         # --- Tasks ---
         {
             'id': 'id',
@@ -190,6 +190,9 @@ def get_all_columns(project):
             }
         }
     ]
+
+    result['columns'].append(data_root)
+
     return result
 
 
