@@ -66,9 +66,6 @@ def get_all_columns(project):
         'children': task_data_children
     }
 
-    if len(data_types) == 1:
-        result['columns'].append(data_root)
-
     result['columns'] += [
         # --- Tasks ---
         {
@@ -194,8 +191,7 @@ def get_all_columns(project):
         }
     ]
 
-    if len(data_types) > 1:
-        result['columns'].append(data_root)
+    result['columns'].append(data_root)
 
     return result
 
