@@ -299,7 +299,7 @@ In the Label Studio UI, do the following to set up the connection:
 6. (Optional) Adjust the remaining parameters. See [Optional parameters](#Optional-parameters-5) on this page for more details.
 7. Click **Add Storage**.
 
-> Warning: Serving data from the local file system is unsafe. If you're sure what are you doing, set `LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true` in your environmental setup. Otherwise URLs pointed to local files won't work.
+> Warning: Serving data from the local file system can be a security risk. If you're sure you know what you're doing, set `LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true` in your environment setup. Without this setting, URLs pointed to local files won't work.
 
 ### Optional parameters
 
