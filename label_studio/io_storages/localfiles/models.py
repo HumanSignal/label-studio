@@ -40,10 +40,10 @@ class LocalFilesImportStorage(ImportStorage, LocalFilesMixin):
                 if regex and not regex.match(key):
                     logger.debug(key + ' is skipped by regex filter')
                     continue
-                yield file.name
+                yield str(file)
 
     def get_data(self, key):
-        path = Path(self.path) / key
+        path = Path(key)
         if self.use_blob_urls:
             # include self-hosted links pointed to local resources via /data/filename?d=<path/to/local/dir>
             document_root = Path(get_env('LOCAL_FILES_DOCUMENT_ROOT', default='/'))
