@@ -58,6 +58,15 @@ def get_all_columns(project):
         i += 1
 
     result['columns'] += [
+        # --- Data root ---
+        {
+            'id': 'data',
+            'title': "data",
+            'type': "List",
+            'target': 'tasks',
+            'children': task_data_children
+        },
+
         # --- Tasks ---
         {
             'id': 'id',
@@ -179,13 +188,6 @@ def get_all_columns(project):
                 'explore': True,
                 'labeling': False
             }
-        },
-        {
-            'id': 'data',
-            'title': "data",
-            'type': "List",
-            'target': 'tasks',
-            'children': task_data_children
         }
     ]
     return result
