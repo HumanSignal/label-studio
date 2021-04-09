@@ -206,6 +206,15 @@ Use that script to do the following:
 
 To import tasks from a file directory on a remote server, make sure the remote server is accessible to the server running Label Studio and set up the directory as a [local storage](storage.html#Local-storage) connection. 
 
+Reference tasks in a local directory using the following syntax in the Label Studio JSON format. For example, to reference an image file `1.png`: 
+```
+{
+ "data": {
+    "image": "/data/local-files/?d=1.png"
+  }
+}
+```
+
 ## Import data from the Label Studio UI
 
 To import data from the Label Studio UI, do the following:

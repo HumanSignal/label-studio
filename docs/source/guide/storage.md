@@ -310,5 +310,13 @@ You can specify additional parameters from the Label Studio UI.
 | regex | Specify a regular expression to filter directory objects. Use ".*" to collect all objects. | Skips all directory objects. |
 | use_blob_urls | If true, treat every directory object as a source file. Use for resources like JPG, MP3, or similar file types. If false, directory objects are interpreted as tasks in Label Studio JSON format with one object per task. | false |
 
+### Set up local storage with Docker
+If you're using Label Studio in Docker, you need to mount the local directory that you want to access as a volume when you start the Docker container.
 
+
+For example, use the following command to start the latest Label Studio version and be able to access data from the `/home/documents/`
+docker run -it -p 8080:8080 -v /home/documents/label-studio/data heartexlabs/label-studio:latest label-studio
+
+
+When running from docker, local file storage couldn’t point to external file system paths. You should mount directory when starting docker container -v path/to/external/dir:/label-studio/my-files then specify /label-studio/my-files path in Local FIles storage modal
 
