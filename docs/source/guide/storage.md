@@ -298,7 +298,8 @@ In the Label Studio UI, do the following to set up the connection:
 5. Specify the name of the local directory.
 6. (Optional) Adjust the remaining parameters. See [Optional parameters](#Optional-parameters-5) on this page for more details.
 7. Click **Add Storage**.
-8. Repeat these steps for **Target Storage** to sync completed data annotations to a local directory.
+
+> Warning: Serving data from the local file system is unsafe. If you're sure what are you doing, set `LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true` in your environmental setup. Otherwise URLs pointed to local files won't work.
 
 ### Optional parameters
 
