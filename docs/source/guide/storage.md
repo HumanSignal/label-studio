@@ -1,9 +1,9 @@
 ---
-title: Sync data from cloud or Redis storage
+title: Sync data from external storage
 type: guide
 order: 302
-meta_title: Cloud Storage Integration
-meta_description: Label Studio Documentation for integrating Amazon AWS S3, Google Cloud Storage, Microsoft Azure, and Redis with Label Studio to collect data labeling tasks and sync annotation results into your machine learning pipelines for machine learning and data science projects.
+meta_title: External Storage Integration
+meta_description: Label Studio Documentation for integrating Amazon AWS S3, Google Cloud Storage, Microsoft Azure, Redis, and local file directories with Label Studio to collect data labeling tasks and sync annotation results into your machine learning pipelines for machine learning and data science projects.
 ---
 
 Integrate popular cloud storage systems with Label Studio to collect new items uploaded to the buckets and return the annotation results so that you can use them in your machine learning pipelines.
@@ -286,7 +286,16 @@ label-studio start my_project --init --db redis
 ```
 
 ## Local storage
-If you have local files that you want to add to Label Studio from a specific directory, you can set up a specific local directory as source or target storage. 
+If you have local files that you want to add to Label Studio from a specific directory, you can set up a specific local directory as source or target storage.
+
+Reference tasks in a local directory using the following syntax in the Label Studio JSON format. For example, to reference an image file `1.png`: 
+```
+{
+ "data": {
+    "image": "/data/local-files/?d=1.png"
+  }
+}
+```
 
 ### Set up connection in the Label Studio UI
 In the Label Studio UI, do the following to set up the connection:
@@ -295,10 +304,11 @@ In the Label Studio UI, do the following to set up the connection:
 2. For a specific project, open **Settings > Cloud Storage**.
 3. Click **Add Source Storage**.  
 4. In the dialog box that appears, select **Local Files** as the storage type.
-5. Specify the name of the local directory.
+5. Specify the name of the local directory. Label Studio assumes a root directory of `\`. To specify a different directory, see [Run Label Studio on Docker and use local storage](start.html#Run_Label_Studio_on_Docker_and_use_local_storage).
 6. (Optional) Adjust the remaining parameters. See [Optional parameters](#Optional-parameters-5) on this page for more details.
 7. Click **Add Storage**.
-8. Repeat these steps for **Target Storage** to sync completed data annotations to a local directory.
+
+> Warning: Serving data from the local file system can be a security risk. If you're sure you know what you're doing, set `LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true` in your environment setup. Without this setting, URLs in tasks that point to local files won't work.
 
 ### Optional parameters
 

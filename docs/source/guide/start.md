@@ -50,6 +50,8 @@ The following command line arguments are optional and must be specified with `la
 | `--password` | `LABEL_STUDIO_PASSWORD` | `None` | Password to use for the default user. |
 | `--username` | `LABEL_STUDIO_USERNAME` | `default_user@localhost` | Username to use for the default user. |
 | `--agree-fix-sqlite` | N/A | `False` | Automatically agree to let Label Studio fix SQLite issues when using Python 3.6–3.8 on Windows operating systems. | 
+| N/A | LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED | `False` | Allow Label Studio to access local file directories to import storage. See [Run Label Studio on Docker and use local storage](start.html#Run_Label_Studio_on_Docker_and_use_local_storage). |
+| N/A | LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT | `\` | Specify the root directory for Label Studio to use when accessing local file directories. See [Run Label Studio on Docker and use local storage](start.html#Run_Label_Studio_on_Docker_and_use_local_storage). |
 
 
 ## Run Label Studio on localhost with a different port
@@ -90,6 +92,17 @@ nginx:
 ## Run Label Studio on Docker with a host and subdomain
 
 To run Label Studio on Docker with a host and subdomain, you can refer to the example `deploy/dockerfiles/subpath.example.yml` Docker YAML file. To customize it for your environment, manually modify the `nginx/subdomain.example.simple.conf` NGINX configuration file, the relevant Label Studio environment variables, and the PostgreSQL database settings for your environment. 
+
+## Run Label Studio on Docker and use local storage
+To run Label Studio on Docker and reference persistent local storage directories, mount those directories as volumes when you start Label Studio and specify any environment variables you need.
+
+```bash
+docker run -it -p 8080:8080 --env LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true -v <path/to/local/file/directory>:/label-studio/my-files heartexlabs/label-studio:latest label-studio
+```
+
+Then when you set up [local storage](storage.html#Local_storage), specify the same /label-studio/my-files path. Label Studio assumes the root of the local file directory path is `/`. To specify a different file directory root, use the `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT` environment variable. 
+
+If you're using Docker Compose, specify the volumes in the Docker Compose YAML file and add the relevant environment variables to the app container. 
 
 ## Run Label Studio with HTTPS
 To run Label Studio with HTTPS and access the web server using HTTPS in the browser, specify a certificate and private key when starting Label Studio. 
