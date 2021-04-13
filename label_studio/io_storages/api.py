@@ -37,17 +37,11 @@ class ImportStorageListAPI(generics.ListCreateAPIView):
         ImportStorageClass = self.serializer_class.Meta.model
         return ImportStorageClass.objects.filter(project_id=project.id)
 
-    @swagger_auto_schema(tags=['Storage'], operation_summary='Get import storage', 
-                         operation_description='Retrieve storage details for configured source storage. '
-                                               'Use the relevant endpoint for the type of storage details you want to '
-                                               'retrieve.')
+    @swagger_auto_schema(tags=['Storage'])
     def get(self, request, *args, **kwargs):
         return super(ImportStorageListAPI, self).get(request, *args, **kwargs)
 
-    @swagger_auto_schema(tags=['Storage'], operation_summary='Create import storage', 
-                         operation_description='Create a cloud or database storage connection to use as a source for '
-                                               'labeling tasks. Use the relevant endpoint for the type of storage you '
-                                               'want to create.')
+    @swagger_auto_schema(tags=['Storage'])
     def post(self, request, *args, **kwargs):
         return super(ImportStorageListAPI, self).post(request, *args, **kwargs)
 
@@ -87,15 +81,11 @@ class ExportStorageListAPI(generics.ListCreateAPIView):
         ImportStorageClass = self.serializer_class.Meta.model
         return ImportStorageClass.objects.filter(project_id=project.id)
 
-    @swagger_auto_schema(tags=['Storage'], operation_summary='Get export storage', 
-                         operation_description='Retrieve storage details for configured target storage. Use the '
-                                               'relevant endpoint for the type of storage you want to retrieve.')
+    @swagger_auto_schema(tags=['Storage'])
     def get(self, request, *args, **kwargs):
         return super(ExportStorageListAPI, self).get(request, *args, **kwargs)
 
-    @swagger_auto_schema(tags=['Storage'], operation_summary='Create export storage',
-                         operation_description='Create a cloud connection to store annotations. Use the relevant '
-                                               'endpoint for the type of storage you want to create.')
+    @swagger_auto_schema(tags=['Storage'])
     def post(self, request, *args, **kwargs):
         return super(ExportStorageListAPI, self).post(request, *args, **kwargs)
 
@@ -164,6 +154,7 @@ class StorageFormLayoutAPI(generics.RetrieveAPIView):
     swagger_schema = None
     storage_type = None
 
+    @swagger_auto_schema(auto_schema=None)
     def get(self, request, *args, **kwargs):
         form_layout_file = os.path.join(os.path.dirname(inspect.getfile(self.__class__)), 'form_layout.yml')
         if not os.path.exists(form_layout_file):

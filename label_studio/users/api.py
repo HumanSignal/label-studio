@@ -57,15 +57,28 @@ class UserAPI(viewsets.ModelViewSet):
             form.save()
             return Response({'detail': 'user details saved'}, status=200)
 
-    @swagger_auto_schema(tags=['Users'], operation_summary='List users')
+    @swagger_auto_schema(
+        tags=['Users'],
+        operation_summary='List users',
+        operation_description='List users'
+    )
     def list(self, request, *args, **kwargs):
         return super(UserAPI, self).list(request, *args, **kwargs)
 
-    @swagger_auto_schema(tags=['Users'], operation_summary='Create new user', request_body=UserSerializer)
+    @swagger_auto_schema(
+        tags=['Users'],
+        operation_summary='Create new user',
+        operation_description='Create new user',
+        request_body=UserSerializer
+    )
     def create(self, request, *args, **kwargs):
         return super(UserAPI, self).create(request, *args, **kwargs)
 
-    @swagger_auto_schema(tags=['Users'], operation_summary='Get user info')
+    @swagger_auto_schema(
+        tags=['Users'],
+        operation_summary='Get user info',
+        operation_description='Get user info'
+    )
     def retrieve(self, request, *args, **kwargs):
         return super(UserAPI, self).retrieve(request, *args, **kwargs)
 
@@ -73,7 +86,11 @@ class UserAPI(viewsets.ModelViewSet):
     def partial_update(self, request, *args, **kwargs):
         return super(UserAPI, self).partial_update(request, *args, **kwargs)
 
-    @swagger_auto_schema(tags=['Users'], operation_summary='Delete user')
+    @swagger_auto_schema(
+        tags=['Users'],
+        operation_summary='Delete user',
+        operation_description='Delete user',
+    )
     def destroy(self, request, *args, **kwargs):
         return super(UserAPI, self).destroy(request, *args, **kwargs)
 
@@ -86,6 +103,7 @@ class UserResetTokenAPI(APIView):
     @swagger_auto_schema(
         tags=['Users'],
         operation_summary='Reset user token',
+        operation_description='Reset user token',
         responses={
             201: openapi.Response(
                 description='User token response',
@@ -114,6 +132,7 @@ class UserGetTokenAPI(APIView):
     @swagger_auto_schema(
         tags=['Users'],
         operation_summary='Get user token',
+        operation_description='Get user token',
         responses={
             200: openapi.Response(
                 description='User token response',
@@ -134,6 +153,10 @@ class UserWhoAmIAPI(generics.RetrieveAPIView):
     def get_object(self):
         return User.objects.get(id=self.request.user.id)
 
-    @swagger_auto_schema(tags=['Users'], operation_summary='Retrieve my user')
+    @swagger_auto_schema(
+        tags=['Users'],
+        operation_summary='Retrieve my user',
+        operation_description='Retrieve my user'
+    )
     def get(self, request, *args, **kwargs):
         return super(UserWhoAmIAPI, self).get(request, *args, **kwargs)

@@ -478,13 +478,15 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
 
 
 class LabelConfigValidateAPI(generics.CreateAPIView):
-    """ Validate label config
-    """
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_classes = (AllowAny,)
     serializer_class = ProjectLabelConfigSerializer
 
-    @swagger_auto_schema(responses={200: 'Validation success'}, tags=['Projects'], operation_summary='Validate label config')
+    @swagger_auto_schema(
+        tags=['Projects'],
+        operation_summary='Validate label config',
+        responses={200: 'Validation success'}
+    )
     def post(self, request, *args, **kwargs):
         return super(LabelConfigValidateAPI, self).post(request, *args, **kwargs)
 
@@ -509,9 +511,16 @@ class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
     serializer_class = ProjectLabelConfigSerializer
     queryset = Project.objects.all()
 
-    @swagger_auto_schema(tags=['Projects'], operation_summary='Validate a label config', manual_parameters=[
-                            openapi.Parameter(name='label_config', type=openapi.TYPE_STRING, in_=openapi.IN_QUERY,
-                                              description='labeling config')])
+    @swagger_auto_schema(
+        tags=['Projects'],
+        operation_summary='Validate a label config',
+        manual_parameters=[
+            openapi.Parameter(
+                name='label_config',
+                type=openapi.TYPE_STRING,
+                in_=openapi.IN_QUERY,
+                description='labeling config')
+        ])
     def post(self, request, *args, **kwargs):
         project = self.get_object()
         label_config = self.request.data.get('label_config')
@@ -539,6 +548,10 @@ class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
                 return True
             if not set(old_info['labels']).issubset(new_info['labels']):
                 return True
+
+    @swagger_auto_schema(auto_schema=None)
+    def get(self, request, *args, **kwargs):
+        return super(ProjectLabelConfigValidateAPI, self).get(request, *args, **kwargs)
 
 
 class ProjectDuplicateAPI(APIView):

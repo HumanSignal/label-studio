@@ -190,6 +190,7 @@ class AnnotationAPI(RequestDebugLogMixin, generics.RetrieveUpdateDestroyAPIView)
     """
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_classes = (IsAuthenticated, )
+    queryset = Annotation.objects.all()
     serializer_class = AnnotationSerializer
 
     def get_object(self):
