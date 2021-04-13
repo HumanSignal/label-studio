@@ -11,6 +11,7 @@ from django.core.exceptions import PermissionDenied
 from rest_framework.authtoken.models import Token
 
 from users import forms
+from core.utils.common import load_func
 from core.permissions import view_with_auth, IsBusiness
 from users.functions import proceed_registration
 from organizations.models import Organization
@@ -90,13 +91,14 @@ def user_login(request):
     user = request.user
     next_page = request.GET.get('next')
     next_page = next_page if next_page else reverse('projects:project-index')
-    form = forms.LoginForm()
+    login_form = load_func(settings.USER_LOGIN_FORM)
+    form = login_form()
 
     if user.is_authenticated:
         return redirect(next_page)
 
     if request.method == 'POST':
-        form = forms.LoginForm(request.POST)
+        form = login_form(request.POST)
         if form.is_valid():
             user = form.cleaned_data['user']
             auth.login(request, user, backend='django.contrib.auth.backends.ModelBackend')

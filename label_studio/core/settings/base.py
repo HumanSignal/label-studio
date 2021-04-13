@@ -354,6 +354,7 @@ GET_OBJECT_WITH_CHECK_AND_LOG = 'core.utils.get_object.get_object_with_check_and
 SAVE_USER = 'users.functions.save_user'
 USER_SERIALIZER = 'users.serializers.BaseUserSerializer'
 DATA_MANAGER_ANNOTATIONS_MAP = {}
+USER_LOGIN_FORM = 'users.forms.LoginForm'
 
 # fix a problem with Windows mimetypes for JS and PNG
 import mimetypes
