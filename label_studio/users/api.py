@@ -45,22 +45,27 @@ class UserAPI(viewsets.ModelViewSet):
             request.user.save()
             return Response(status=204)
 
-    @swagger_auto_schema(tags=['Users'], operation_summary='Save user details')
+    @swagger_auto_schema(
+        tags=['Users'],
+        operation_summary='Save user details',
+        operation_description='Save user details',
+        request_body=UserSerializer
+    )
     def update(self, request, *args, **kwargs):
         form = UserProfileForm(data=request.data, files=request.FILES, instance=request.user)
         if form.is_valid():
             form.save()
             return Response({'detail': 'user details saved'}, status=200)
 
-    @swagger_auto_schema(auto_schema=None)
+    @swagger_auto_schema(tags=['Users'], operation_summary='List users')
     def list(self, request, *args, **kwargs):
         return super(UserAPI, self).list(request, *args, **kwargs)
 
-    @swagger_auto_schema(auto_schema=None)
+    @swagger_auto_schema(tags=['Users'], operation_summary='Create new user', request_body=UserSerializer)
     def create(self, request, *args, **kwargs):
         return super(UserAPI, self).create(request, *args, **kwargs)
 
-    @swagger_auto_schema(auto_schema=None)
+    @swagger_auto_schema(tags=['Users'], operation_summary='Get user info')
     def retrieve(self, request, *args, **kwargs):
         return super(UserAPI, self).retrieve(request, *args, **kwargs)
 
@@ -68,7 +73,7 @@ class UserAPI(viewsets.ModelViewSet):
     def partial_update(self, request, *args, **kwargs):
         return super(UserAPI, self).partial_update(request, *args, **kwargs)
 
-    @swagger_auto_schema(auto_schema=None)
+    @swagger_auto_schema(tags=['Users'], operation_summary='Delete user')
     def destroy(self, request, *args, **kwargs):
         return super(UserAPI, self).destroy(request, *args, **kwargs)
 
