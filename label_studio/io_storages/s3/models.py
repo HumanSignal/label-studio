@@ -143,8 +143,8 @@ class S3ImportStorage(S3StorageMixin, ImportStorage):
         # read task json from bucket and validate it
         _, s3 = self.get_client_and_resource()
         bucket = s3.Bucket(self.bucket)
-        obj = s3.Object(bucket.name, key).get()['Body'].read().decode('utf-8')
         try:
+            obj = s3.Object(bucket.name, key).get()['Body'].read().decode('utf-8')
             value = json.loads(obj)
         except (UnicodeDecodeError, json.decoder.JSONDecodeError):
             raise ValueError(
