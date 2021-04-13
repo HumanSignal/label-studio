@@ -2,7 +2,7 @@
 title: Sync data from external storage
 type: guide
 order: 302
-meta_title: External Storage Integration
+meta_title: Cloud Storage Integration
 meta_description: Label Studio Documentation for integrating Amazon AWS S3, Google Cloud Storage, Microsoft Azure, Redis, and local file directories with Label Studio to collect data labeling tasks and sync annotation results into your machine learning pipelines for machine learning and data science projects.
 ---
 
@@ -304,7 +304,7 @@ In the Label Studio UI, do the following to set up the connection:
 2. For a specific project, open **Settings > Cloud Storage**.
 3. Click **Add Source Storage**.  
 4. In the dialog box that appears, select **Local Files** as the storage type.
-5. Specify the name of the local directory. Label Studio assumes a root directory of `\`. To specify a different directory, see [Run Label Studio on Docker and use local storage](start.html#Run_Label_Studio_on_Docker_and_use_local_storage).
+5. Specify the name of the local directory, relative to the root directory. Label Studio assumes a root directory of `/`. To specify a different directory, see [Run Label Studio on Docker and use local storage](start.html#Run_Label_Studio_on_Docker_and_use_local_storage).
 6. (Optional) Adjust the remaining parameters. See [Optional parameters](#Optional-parameters-5) on this page for more details.
 7. Click **Add Storage**.
 
@@ -321,12 +321,7 @@ You can specify additional parameters from the Label Studio UI.
 | use_blob_urls | If true, treat every directory object as a source file. Use for resources like JPG, MP3, or similar file types. If false, directory objects are interpreted as tasks in Label Studio JSON format with one object per task. | false |
 
 ### Set up local storage with Docker
-If you're using Label Studio in Docker, you need to mount the local directory that you want to access as a volume when you start the Docker container.
+If you're using Label Studio in Docker, you need to mount the local directory that you want to access as a volume when you start the Docker container. See [Run Label Studio on Docker and use local storage](start.html#Run Label Studio on Docker and use local storage).
 
 
-For example, use the following command to start the latest Label Studio version and be able to access data from the `/home/documents/`
-docker run -it -p 8080:8080 -v /home/documents/label-studio/data heartexlabs/label-studio:latest label-studio
-
-
-When running from docker, local file storage couldn’t point to external file system paths. You should mount directory when starting docker container -v path/to/external/dir:/label-studio/my-files then specify /label-studio/my-files path in Local FIles storage modal
 

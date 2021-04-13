@@ -51,7 +51,7 @@ The following command line arguments are optional and must be specified with `la
 | `--username` | `LABEL_STUDIO_USERNAME` | `default_user@localhost` | Username to use for the default user. |
 | `--agree-fix-sqlite` | N/A | `False` | Automatically agree to let Label Studio fix SQLite issues when using Python 3.6–3.8 on Windows operating systems. | 
 | N/A | LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED | `False` | Allow Label Studio to access local file directories to import storage. See [Run Label Studio on Docker and use local storage](start.html#Run_Label_Studio_on_Docker_and_use_local_storage). |
-| N/A | LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT | `\` | Specify the root directory for Label Studio to use when accessing local file directories. See [Run Label Studio on Docker and use local storage](start.html#Run_Label_Studio_on_Docker_and_use_local_storage). |
+| N/A | LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT | `/` | Specify the root directory for Label Studio to use when accessing local file directories. See [Run Label Studio on Docker and use local storage](start.html#Run_Label_Studio_on_Docker_and_use_local_storage). |
 
 
 ## Run Label Studio on localhost with a different port
@@ -96,13 +96,20 @@ To run Label Studio on Docker with a host and subdomain, you can refer to the ex
 ## Run Label Studio on Docker and use local storage
 To run Label Studio on Docker and reference persistent local storage directories, mount those directories as volumes when you start Label Studio and specify any environment variables you need.
 
+The following command starts a Docker container with the latest image of Label Studio with port 8080 and an environment variable that allows Label Studio to access local files. It also mounts a source directory to use for data files, in this example, a Docker volume at `/var/lib/docker/volumes/ls-data-files`, and a target directory to persist Label Studio data such as annotations, at `/label-studio/data-store` on the machine running Docker.
 ```bash
-docker run -it -p 8080:8080 --env LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true -v <path/to/local/file/directory>:/label-studio/my-files heartexlabs/label-studio:latest label-studio
+docker run -it -p 8080:8080 --env LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true,LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT="/var/lib/docker/volumes/" --mount type=volume,source=ls-task-files,target=/label-studio/data-store heartexlabs/label-studio:latest label-studio
+```
+Label Studio assumes the root of the local file directory path is `/`. To specify a different file directory root, use the `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT` environment variable. In this example, the root is updated to specify the path to where Docker stores volumes. 
+
+You can also reference a local file directory of `/etc/apps/label-studio/task-files` with the source argument like this example, assuming you are in the `opt` directory when you run the following command:
+```bash
+docker run -it -p 8080:8080 --env LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true --mount type=bind,source="$(pwd)/etc/apps/label-studio/task-files",target=/label-studio/data-store heartexlabs/label-studio:latest label-studio
 ```
 
-Then when you set up [local storage](storage.html#Local_storage), specify the same /label-studio/my-files path. Label Studio assumes the root of the local file directory path is `/`. To specify a different file directory root, use the `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT` environment variable. 
+Place files in the specified source directory and reference that directory when you set up [local storage](storage.html#Local_storage). In this example, you'd specify `ls-task-files` as the local directory for the first example, or `/etc/apps/label-studio/task-files` as the local directory if you allow Docker to access a directory in your local filesystem with a bind mount as in the second example. For more information about using volume mounts in Docker, see the [Docker documentation on volumes](https://docs.docker.com/storage/volumes/).  
 
-If you're using Docker Compose, specify the volumes in the Docker Compose YAML file and add the relevant environment variables to the app container. 
+If you're using Docker Compose, specify the volumes in the Docker Compose YAML file and add the relevant environment variables to the app container. For more about specifying volumes in Docker Compose, see the volumes section of the [Docker Compose file documentation](https://docs.docker.com/compose/compose-file/compose-file-v3/#volumes).
 
 ## Run Label Studio with HTTPS
 To run Label Studio with HTTPS and access the web server using HTTPS in the browser, specify a certificate and private key when starting Label Studio. 
