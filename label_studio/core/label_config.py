@@ -68,7 +68,19 @@ def parse_config(config_string):
     inputs, outputs, labels = {}, {}, defaultdict(dict)
     for tag in xml_tree.iter():
         if _is_output_tag(tag):
-            outputs[tag.attrib['name']] = {'type': tag.tag, 'to_name': tag.attrib['toName'].split(',')}
+            tag_info = {'type': tag.tag, 'to_name': tag.attrib['toName'].split(',')}
+            # Grab conditionals if any
+            conditionals = {}
+            if tag.attrib.get('perRegion') == 'true':
+                if tag.attrib.get('whenTagName'):
+                    conditionals = {'type': 'tag', 'name': tag.attrib['whenTagName']}
+                elif tag.attrib.get('whenLabelValue'):
+                    conditionals = {'type': 'label', 'name': tag.attrib['whenLabelValue']}
+                elif tag.attrib.get('whenChoiceValue'):
+                    conditionals = {'type': 'choice', 'name': tag.attrib['whenChoiceValue']}
+            if conditionals:
+                tag_info['conditionals'] = conditionals
+            outputs[tag.attrib['name']] = tag_info
         elif _is_input_tag(tag):
             inputs[tag.attrib['name']] = {'type': tag.tag, 'value': tag.attrib['value'].lstrip('$')}
         if tag.tag not in _LABEL_TAGS:

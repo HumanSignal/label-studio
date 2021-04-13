@@ -2,13 +2,15 @@
 """
 import logging
 import django_rq
+import json
 
 from django.utils import timezone
 from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 from django_rq import job
 
-from tasks.models import Task, Prediction, Annotation
+from tasks.models import Task
+from tasks.serializers import PredictionSerializer, AnnotationSerializer
 
 from core.redis import redis_connected
 
@@ -76,7 +78,14 @@ class ImportStorage(Storage):
                 continue
 
             logger.debug(f'{self}: found new key {key}')
-            data = self.get_data(key)
+            try:
+                data = self.get_data(key)
+            except (UnicodeDecodeError, json.decoder.JSONDecodeError) as exc:
+                logger.error(exc, exc_info=True)
+                raise ValueError(
+                    f'Error loading JSON from file "{key}".\nIf you\'re trying to import non-JSON data '
+                    f'(images, audio, text, etc.), edit storage settings and enable '
+                    f'"Treat every bucket object as a source file"')
 
             # predictions
             predictions = data.get('predictions', [])
@@ -102,17 +111,19 @@ class ImportStorage(Storage):
 
                 # add predictions
                 logger.debug(f'Create {len(predictions)} predictions for task={task}')
-                for p in predictions:
-                    prediction = Prediction(result=p['result'], score=p.get('score'),
-                                            model_version=p.get('model_version'),
-                                            task=task)
-                    prediction.save()
+                for prediction in predictions:
+                    prediction['task'] = task.id
+                prediction_ser = PredictionSerializer(data=predictions, many=True)
+                prediction_ser.is_valid(raise_exception=True)
+                prediction_ser.save()
 
                 # add annotations
                 logger.debug(f'Create {len(annotations)} annotations for task={task}')
-                for a in annotations:
-                    annotation = Annotation(result=a['result'], task=task)
-                    annotation.save()
+                for annotation in annotations:
+                    annotation['task'] = task.id
+                annotation_ser = AnnotationSerializer(data=annotations, many=True)
+                annotation_ser.is_valid(raise_exception=True)
+                annotation_ser.save()
 
         self.last_sync = timezone.now()
         self.last_sync_count = tasks_created
