@@ -1,6 +1,6 @@
 {
-  "message": "Fix Text spans if label's missing for any reason",
-  "commit": "5164462ced2fe8a0bbdd7cd9c4a5bec3772577ab",
+  "message": "Merge pull request #183 from heartexlabs/fix/nested-required\n\nFix `required` for nested `Choices`",
+  "commit": "1dd1b31dfdc9368849c65dff728a551f30ab2c86",
   "branch": "master",
-  "date": "2021-03-31T10:57:00Z"
+  "date": "2021-04-12T09:15:53Z"
 }
