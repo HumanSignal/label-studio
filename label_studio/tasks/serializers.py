@@ -102,12 +102,29 @@ class AnnotationSerializer(DynamicFieldsMixin, ModelSerializer):
         exclude = ['state', 'prediction', 'result_count']
 
 
+class PredictionSimpleSerializer(ModelSerializer):
+    class Meta:
+        model = Prediction
+        fields = '__all__'
+
+
+class AnnotationSimpleSerializer(DynamicFieldsMixin, ModelSerializer):
+    @classmethod
+    def many_init(cls, *args, **kwargs):
+        kwargs['child'] = cls(*args, **kwargs)
+        return ListAnnotationSerializer(*args, **kwargs)
+
+    class Meta:
+        model = Annotation
+        fields = '__all__'
+
+
 class TaskSimpleSerializer(ModelSerializer):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['annotations'] = AnnotationSerializer(many=True, default=[], context=self.context)
-        self.fields['predictions'] = PredictionSerializer(many=True, default=[], context=self.context)
+        self.fields['annotations'] = AnnotationSimpleSerializer(many=True, default=[], context=self.context)
+        self.fields['predictions'] = PredictionSimpleSerializer(many=True, default=[], context=self.context)
 
     class Meta:
         model = Task

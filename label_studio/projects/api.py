@@ -540,6 +540,10 @@ class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
             if not set(old_info['labels']).issubset(new_info['labels']):
                 return True
 
+    @swagger_auto_schema(auto_schema=None)
+    def get(self, *args, **kwargs):
+        return super(ProjectLabelConfigValidateAPI, self).get(*args, **kwargs)
+
 
 class ProjectDuplicateAPI(APIView):
     """Duplicate project
