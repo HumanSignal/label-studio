@@ -143,13 +143,8 @@ class S3ImportStorage(S3StorageMixin, ImportStorage):
         # read task json from bucket and validate it
         _, s3 = self.get_client_and_resource()
         bucket = s3.Bucket(self.bucket)
-        try:
-            obj = s3.Object(bucket.name, key).get()['Body'].read().decode('utf-8')
-            value = json.loads(obj)
-        except (UnicodeDecodeError, json.decoder.JSONDecodeError):
-            raise ValueError(
-                f"Can\'t import JSON-formatted tasks from {uri}. If you're trying to import binary objects, "
-                f"perhaps you've forgot to enable \"Treat every bucket object as a source file\" option?")
+        obj = s3.Object(bucket.name, key).get()['Body'].read().decode('utf-8')
+        value = json.loads(obj)
         if not isinstance(value, dict):
             raise ValueError(f"Error on key {key}: For S3 your JSON file must be a dictionary with one task")
 
