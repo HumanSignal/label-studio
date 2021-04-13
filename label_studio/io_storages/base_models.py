@@ -79,7 +79,7 @@ class ImportStorage(Storage):
             except (UnicodeDecodeError, json.decoder.JSONDecodeError) as exc:
                 logger.error(exc, exc_info=True)
                 raise ValueError(
-                    f'Get error loading JSON from file "{key}".\nIf you\'re trying to import non-JSON data '
+                    f'Error loading JSON from file "{key}".\nIf you\'re trying to import non-JSON data '
                     f'(images, audios, texts, etc.), go to Edit storage settings and enable '
                     f'"Treat every bucket object as a source file"')
             with transaction.atomic():
