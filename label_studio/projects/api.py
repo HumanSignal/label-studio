@@ -195,7 +195,7 @@ class ProjectAPI(APIViewVirtualRedirectMixin,
     @swagger_auto_schema(tags=['Projects'], request_body=ProjectSerializer)
     def patch(self, request, *args, **kwargs):
         project = self.get_object()
-        label_config = self.request.query_params.get('label_config')
+        label_config = self.request.data.get('label_config')
 
         # config changes can break view, so we need to reset them
         if label_config and parse_config(label_config) != parse_config(project.label_config):
