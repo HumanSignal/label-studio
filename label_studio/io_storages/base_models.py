@@ -2,6 +2,7 @@
 """
 import logging
 import django_rq
+import json
 
 from django.utils import timezone
 from django.db import models, transaction
@@ -73,7 +74,14 @@ class ImportStorage(Storage):
                 logger.debug(f'{self.__class__.__name__} link {key} already exists')
                 continue
             logger.debug(f'{self}: found new key {key}')
-            data = self.get_data(key)
+            try:
+                data = self.get_data(key)
+            except (UnicodeDecodeError, json.decoder.JSONDecodeError) as exc:
+                logger.error(exc, exc_info=True)
+                raise ValueError(
+                    f'Error loading JSON from file "{key}".\nIf you\'re trying to import non-JSON data '
+                    f'(images, audio, text, etc.), edit storage settings and enable '
+                    f'"Treat every bucket object as a source file"')
             with transaction.atomic():
                 task = Task.objects.create(data=data, project=self.project)
                 link_class.create(task, key, self)
