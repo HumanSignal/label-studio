@@ -86,8 +86,8 @@ class ImportStorage(Storage):
                                      'you must put "data" field in the task too')
                 data = data['data']
 
-            # predictions
-            annotations = data.get('annotations')
+            # annotations
+            annotations = data.get('annotations', [])
             if annotations:
                 if 'data' not in data:
                     raise ValueError('If you use "annotations" field in the task, '
