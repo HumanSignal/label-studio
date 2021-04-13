@@ -95,3 +95,4 @@ def export_annotation_to_local_files(sender, instance, **kwargs):
         for storage in project.io_storages_localfilesexportstorages.all():
             logger.debug(f'Export {instance} to Local Storage {storage}')
             storage.save_annotation(instance)
+            
