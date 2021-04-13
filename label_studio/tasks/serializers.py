@@ -106,8 +106,8 @@ class TaskSimpleSerializer(ModelSerializer):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['annotations'] = AnnotationSerializer(many=True, default=[], context=self.context, read_only=True)
-        self.fields['predictions'] = PredictionSerializer(many=True, default=[], context=self.context, read_only=True)
+        self.fields['annotations'] = AnnotationSerializer(many=True, default=[], context=self.context)
+        self.fields['predictions'] = PredictionSerializer(many=True, default=[], context=self.context)
 
     class Meta:
         model = Task

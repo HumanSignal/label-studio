@@ -69,9 +69,12 @@ class ImportStorage(Storage):
         tasks_created = 0
         for key in self.iterkeys():
             logger.debug(f'Scanning key {key}')
+
+            # skip if task already exists
             if link_class.exists(key, self):
                 logger.debug(f'{self.__class__.__name__} link {key} already exists')
                 continue
+
             logger.debug(f'{self}: found new key {key}')
             data = self.get_data(key)
 
@@ -98,20 +101,18 @@ class ImportStorage(Storage):
                 tasks_created += 1
 
                 # add predictions
-                if not task.predictions.exists():
-                    logger.debug(f'Create {len(predictions)} predictions for task={task}')
-                    for p in predictions:
-                        prediction = Prediction(result=p['result'], score=p.get('score'),
-                                                model_version=p.get('model_version'),
-                                                task=task)
-                        prediction.save()
+                logger.debug(f'Create {len(predictions)} predictions for task={task}')
+                for p in predictions:
+                    prediction = Prediction(result=p['result'], score=p.get('score'),
+                                            model_version=p.get('model_version'),
+                                            task=task)
+                    prediction.save()
 
                 # add annotations
-                if not task.annotations.exists():
-                    logger.debug(f'Create {len(annotations)} annotations for task={task}')
-                    for a in annotations:
-                        annotation = Annotation(result=a['result'], task=task)
-                        annotation.save()
+                logger.debug(f'Create {len(annotations)} annotations for task={task}')
+                for a in annotations:
+                    annotation = Annotation(result=a['result'], task=task)
+                    annotation.save()
 
         self.last_sync = timezone.now()
         self.last_sync_count = tasks_created
