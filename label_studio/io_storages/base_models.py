@@ -80,7 +80,7 @@ class ImportStorage(Storage):
                 logger.error(exc, exc_info=True)
                 raise ValueError(
                     f'Error loading JSON from file "{key}".\nIf you\'re trying to import non-JSON data '
-                    f'(images, audios, texts, etc.), go to Edit storage settings and enable '
+                    f'(images, audio, text, etc.), edit storage settings and enable '
                     f'"Treat every bucket object as a source file"')
             with transaction.atomic():
                 task = Task.objects.create(data=data, project=self.project)
