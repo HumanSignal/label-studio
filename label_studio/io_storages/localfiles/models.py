@@ -87,6 +87,7 @@ class LocalFilesImportStorageLink(ImportStorageLink):
 class LocalFilesExportStorageLink(ExportStorageLink):
     storage = models.ForeignKey(LocalFilesExportStorage, on_delete=models.CASCADE, related_name='links')
 
+
 @receiver(post_save, sender=Annotation)
 def export_annotation_to_local_files(sender, instance, **kwargs):
     project = instance.task.project
