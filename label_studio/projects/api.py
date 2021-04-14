@@ -198,8 +198,14 @@ class ProjectAPI(APIViewVirtualRedirectMixin,
         label_config = self.request.data.get('label_config')
 
         # config changes can break view, so we need to reset them
-        if label_config and config_essential_data_has_changed(label_config, project.label_config):
-            View.objects.filter(project=project).all().delete()
+        if label_config:
+            try:
+                has_changes = config_essential_data_has_changed(label_config, project.label_config)
+            except KeyError:
+                pass
+            else:
+                if has_changes:
+                    View.objects.filter(project=project).all().delete()
 
         return super(ProjectAPI, self).patch(request, *args, **kwargs)
 
