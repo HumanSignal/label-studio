@@ -771,7 +771,8 @@ class ProjectSummary(models.Model):
         created_annotations = dict(self.created_annotations)
         labels = dict(self.created_labels)
         for annotation in annotations:
-            for result in get_attr_or_item(annotation, 'result'):
+            results = get_attr_or_item(annotation, 'result') or []
+            for result in results:
 
                 # aggregate annotation types
                 key = self._get_annotation_key(result)
@@ -795,7 +796,8 @@ class ProjectSummary(models.Model):
         created_annotations = dict(self.created_annotations)
         labels = dict(self.created_labels)
         for annotation in annotations:
-            for result in get_attr_or_item(annotation, 'result'):
+            results = get_attr_or_item(annotation, 'result') or []
+            for result in results:
 
                 # reduce annotation counters
                 key = self._get_annotation_key(result)
