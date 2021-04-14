@@ -474,7 +474,7 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
                 return self._make_response(next_task, request)
             else:
                 raise NotFound(
-                    f'There exist some unsolved tasks for the user={user}, but they seem to be locked by another users')
+                    f'There are still some tasks to complete for the user={user}, but they seem to be locked by another user.')
 
 
 class LabelConfigValidateAPI(generics.CreateAPIView):
@@ -485,6 +485,7 @@ class LabelConfigValidateAPI(generics.CreateAPIView):
     @swagger_auto_schema(
         tags=['Projects'],
         operation_summary='Validate label config',
+        operation_description='Validate a labeling configuration for a project.',
         responses={200: 'Validation success'}
     )
     def post(self, request, *args, **kwargs):
@@ -525,7 +526,7 @@ class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
         project = self.get_object()
         label_config = self.request.data.get('label_config')
         if not label_config:
-            raise RestValidationError('Label config is not set or empty')
+            raise RestValidationError('Label config is not set or is empty')
 
         # check new config includes meaningful changes
         config_essential_data_has_changed = self.config_essential_data_has_changed(label_config, project.label_config)
@@ -692,7 +693,7 @@ class ProjectSampleTask(generics.RetrieveAPIView):
     def post(self, request, *args, **kwargs):
         label_config = self.request.data.get('label_config')
         if not label_config:
-            raise RestValidationError('Label config is not set or empty')
+            raise RestValidationError('Label config is not set or is empty')
 
         project = self.get_object()
         return Response({'sample_task': project.get_sample_task(label_config)}, status=200)
