@@ -48,7 +48,8 @@ class UserAPI(viewsets.ModelViewSet):
     @swagger_auto_schema(
         tags=['Users'],
         operation_summary='Save user details',
-        operation_description='Save user details',
+        operation_description='Save details for a specific user, such as their name, contact information, '
+                              'or organization in Label Studio.',
         request_body=UserSerializer
     )
     def update(self, request, *args, **kwargs):
@@ -60,7 +61,7 @@ class UserAPI(viewsets.ModelViewSet):
     @swagger_auto_schema(
         tags=['Users'],
         operation_summary='List users',
-        operation_description='List users'
+        operation_description='List the users that exist on the Label Studio server.'
     )
     def list(self, request, *args, **kwargs):
         return super(UserAPI, self).list(request, *args, **kwargs)
@@ -68,7 +69,7 @@ class UserAPI(viewsets.ModelViewSet):
     @swagger_auto_schema(
         tags=['Users'],
         operation_summary='Create new user',
-        operation_description='Create new user',
+        operation_description='Create a new user for Label Studio.',
         request_body=UserSerializer
     )
     def create(self, request, *args, **kwargs):
@@ -77,7 +78,7 @@ class UserAPI(viewsets.ModelViewSet):
     @swagger_auto_schema(
         tags=['Users'],
         operation_summary='Get user info',
-        operation_description='Get user info'
+        operation_description='Get info about a specific Label Studio user.'
     )
     def retrieve(self, request, *args, **kwargs):
         return super(UserAPI, self).retrieve(request, *args, **kwargs)
@@ -89,7 +90,7 @@ class UserAPI(viewsets.ModelViewSet):
     @swagger_auto_schema(
         tags=['Users'],
         operation_summary='Delete user',
-        operation_description='Delete user',
+        operation_description='Delete a specific Label Studio user.',
     )
     def destroy(self, request, *args, **kwargs):
         return super(UserAPI, self).destroy(request, *args, **kwargs)
@@ -103,7 +104,7 @@ class UserResetTokenAPI(APIView):
     @swagger_auto_schema(
         tags=['Users'],
         operation_summary='Reset user token',
-        operation_description='Reset user token',
+        operation_description='Reset a specific user token.',
         responses={
             201: openapi.Response(
                 description='User token response',
@@ -132,7 +133,7 @@ class UserGetTokenAPI(APIView):
     @swagger_auto_schema(
         tags=['Users'],
         operation_summary='Get user token',
-        operation_description='Get user token',
+        operation_description='Get a user token to authenticate to the API as a specific user.',
         responses={
             200: openapi.Response(
                 description='User token response',
@@ -156,7 +157,7 @@ class UserWhoAmIAPI(generics.RetrieveAPIView):
     @swagger_auto_schema(
         tags=['Users'],
         operation_summary='Retrieve my user',
-        operation_description='Retrieve my user'
+        operation_description='Retrieve details the account that you are using to access the API.'
     )
     def get(self, request, *args, **kwargs):
         return super(UserWhoAmIAPI, self).get(request, *args, **kwargs)
