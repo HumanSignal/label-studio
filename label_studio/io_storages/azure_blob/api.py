@@ -11,14 +11,14 @@ from io_storages.api import (
 class AzureBlobImportStorageListAPI(ImportStorageListAPI):
     """
     get:
-    Get all Azure import storages
+    Azure: Get all import storage
 
-    Get list of all Azure import storages
+    Get list of all Azure import storage connections.
 
     post:
-    Create Azure import storage
+    Azure: Create import storage
 
-    Create a new Azure import storage
+    Create a new Azure import storage connection.
     """
     queryset = AzureBlobImportStorage.objects.all()
     serializer_class = AzureBlobImportStorageSerializer
@@ -27,19 +27,19 @@ class AzureBlobImportStorageListAPI(ImportStorageListAPI):
 class AzureBlobImportStorageDetailAPI(ImportStorageDetailAPI):
     """
     get:
-    Get Azure import storage
+    Azure: Get import storage
 
-    Get Azure import storage
+    Get a specific Azure import storage connection.
 
     patch:
-    Update Azure import storage
+    Azure: Update import storage
 
-    Update Azure import storage
+    Update a specific Azure import storage connection.
 
     delete:
-    Delete Azure import storage
+    Azure: Delete import storage
 
-    Delete Azure import storage
+    Delete a specific Azure import storage connection.
     """
     queryset = AzureBlobImportStorage.objects.all()
     serializer_class = AzureBlobImportStorageSerializer
@@ -48,9 +48,9 @@ class AzureBlobImportStorageDetailAPI(ImportStorageDetailAPI):
 class AzureBlobImportStorageSyncAPI(ImportStorageSyncAPI):
     """
     post:
-    Sync Azure import storage
+    Azure: Sync import storage
 
-    Sync with Azure import storage
+    Sync tasks from an Azure import storage connection.
     """
     serializer_class = AzureBlobImportStorageSerializer
 
@@ -58,9 +58,9 @@ class AzureBlobImportStorageSyncAPI(ImportStorageSyncAPI):
 class AzureBlobImportStorageValidateAPI(ImportStorageValidateAPI):
     """
     post:
-    Validate Azure import storage
+    Azure: Validate import storage
 
-    Validate Azure import storage
+    Validate a specific Azure import storage connection.
     """
     serializer_class = AzureBlobImportStorageSerializer
 
@@ -68,9 +68,9 @@ class AzureBlobImportStorageValidateAPI(ImportStorageValidateAPI):
 class AzureBlobExportStorageValidateAPI(ExportStorageValidateAPI):
     """
     post:
-    Validate Azure export storage
+    Azure: Validate export storage
 
-    Validate Azure export storage
+    Validate a specific Azure export storage connection.
     """
     serializer_class = AzureBlobExportStorageSerializer
 
@@ -78,14 +78,14 @@ class AzureBlobExportStorageValidateAPI(ExportStorageValidateAPI):
 class AzureBlobExportStorageListAPI(ExportStorageListAPI):
     """
     get:
-    Get all Azure export storages
+    Azure: Get all export storage
 
-    Get list of all Azure export storages
+    Get a list of all Azure export storage connections.
 
     post:
-    Create Azure export storage
+    Azure: Create export storage
 
-    Create a new Azure export storage
+    Create a new Azure export storage connection to store annotations.
     """
     queryset = AzureBlobExportStorage.objects.all()
     serializer_class = AzureBlobExportStorageSerializer
@@ -94,19 +94,19 @@ class AzureBlobExportStorageListAPI(ExportStorageListAPI):
 class AzureBlobExportStorageDetailAPI(ExportStorageDetailAPI):
     """
     get:
-    Get Azure export storage
+    Azure: Get export storage
 
-    Get Azure export storage
+    Get a specific Azure export storage connection.
 
     patch:
-    Update Azure export storage
+    Azure: Update export storage
 
-    Update Azure export storage
+    Update a specific Azure export storage connection.
 
     delete:
-    Delete Azure export storage
+    Azure: Delete export storage
 
-    Delete Azure export storage
+    Delete a specific Azure export storage connection.
     """
     queryset = AzureBlobExportStorage.objects.all()
     serializer_class = AzureBlobExportStorageSerializer

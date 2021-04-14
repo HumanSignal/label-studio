@@ -16,16 +16,13 @@ class S3ImportStorageListAPI(ImportStorageListAPI):
 
     @swagger_auto_schema(
         tags=['Storage'],
-        operation_summary='Get S3 import storage',
-        operation_description='Retrieve storage details for configured source storage. Use the relevant endpoint for '
-                              'the type of storage details you want to retrieve.')
+        operation_summary='S3: Get import storage',
+        operation_description='Retrieve storage details for all configured S3 source storage connections.')
     def get(self, request, *args, **kwargs):
         return super(S3ImportStorageListAPI, self).get(request, *args, **kwargs)
 
-    @swagger_auto_schema(tags=['Storage'], operation_summary='Create S3 import storage',
-                         operation_description='Create a cloud or database storage connection to use as a source for '
-                                               'labeling tasks. Use the relevant endpoint for the type of storage you '
-                                               'want to create.')
+    @swagger_auto_schema(tags=['Storage'], operation_summary='S3: Create import storage',
+                         operation_description='Create a new Amazon S3 import storage connection.')
     def post(self, request, *args, **kwargs):
         return super(S3ImportStorageListAPI, self).post(request, *args, **kwargs)
 
@@ -34,15 +31,18 @@ class S3ImportStorageDetailAPI(ImportStorageDetailAPI):
     queryset = S3ImportStorage.objects.all()
     serializer_class = S3ImportStorageSerializer
 
-    @swagger_auto_schema(tags=['Storage'], operation_summary='Get S3 storage')
+    @swagger_auto_schema(tags=['Storage'], operation_summary='S3: Get import storage',
+                         operation_description='Get a specific Amazon S3 import storage connection.')
     def get(self, request, *args, **kwargs):
         return super(S3ImportStorageDetailAPI, self).get(request, *args, **kwargs)
 
-    @swagger_auto_schema(tags=['Storage'], operation_summary='Update S3 storage')
+    @swagger_auto_schema(tags=['Storage'], operation_summary='S3: Update import storage',
+                         operation_description='Update a specific Amazon S3 import storage connection.')
     def patch(self, request, *args, **kwargs):
         return super(S3ImportStorageDetailAPI, self).patch(request, *args, **kwargs)
 
-    @swagger_auto_schema(tags=['Storage'], operation_summary='Delete S3 storage')
+    @swagger_auto_schema(tags=['Storage'], operation_summary='S3: Delete import storage',
+                         operation_description='Delete a specific Amazon S3 import storage connection.')
     def delete(self, request, *args, **kwargs):
         return super(S3ImportStorageDetailAPI, self).delete(request, *args, **kwargs)
 
@@ -54,7 +54,8 @@ class S3ImportStorageDetailAPI(ImportStorageDetailAPI):
 class S3ImportStorageSyncAPI(ImportStorageSyncAPI):
     serializer_class = S3ImportStorageSerializer
 
-    @swagger_auto_schema(tags=['Storage'], operation_summary='Sync with S3 import storage')
+    @swagger_auto_schema(tags=['Storage'], operation_summary='S3: Sync import storage',
+                         operation_description='Sync tasks from an Amazon S3 import storage connection.')
     def post(self, request, *args, **kwargs):
         return super(S3ImportStorageSyncAPI, self).post(request, *args, **kwargs)
 
@@ -62,7 +63,8 @@ class S3ImportStorageSyncAPI(ImportStorageSyncAPI):
 class S3ImportStorageValidateAPI(ImportStorageValidateAPI):
     serializer_class = S3ImportStorageSerializer
 
-    @swagger_auto_schema(tags=['Storage'], operation_summary='Validate S3 import storage')
+    @swagger_auto_schema(tags=['Storage'], operation_summary='S3: Validate import storage',
+                         operation_description='Validate a specific Amazon S3 import storage connection.')
     def post(self, request, *args, **kwargs):
         return super(S3ImportStorageValidateAPI, self).post(request, *args, **kwargs)
 
@@ -70,7 +72,8 @@ class S3ImportStorageValidateAPI(ImportStorageValidateAPI):
 class S3ExportStorageValidateAPI(ExportStorageValidateAPI):
     serializer_class = S3ExportStorageSerializer
 
-    @swagger_auto_schema(tags=['Storage'], operation_summary='Validate S3 export storage')
+    @swagger_auto_schema(tags=['Storage'], operation_summary='S3: Validate export storage',
+                         operation_description='Validate a specific Amazon S3 export storage connection.')
     def post(self, request, *args, **kwargs):
         return super(S3ExportStorageValidateAPI, self).post(request, *args, **kwargs)
 
@@ -79,15 +82,13 @@ class S3ExportStorageListAPI(ExportStorageListAPI):
     queryset = S3ExportStorage.objects.all()
     serializer_class = S3ExportStorageSerializer
 
-    @swagger_auto_schema(tags=['Storage'], operation_summary='Get S3 export storage list',
-                         operation_description='Retrieve storage details for configured target storage. Use the '
-                                               'relevant endpoint for the type of storage you want to retrieve.')
+    @swagger_auto_schema(tags=['Storage'], operation_summary='S3: Get export storage',
+                         operation_description='Get a list of all Amazon S3 export storage connections.')
     def get(self, request, *args, **kwargs):
         return super(S3ExportStorageListAPI, self).get(request, *args, **kwargs)
 
-    @swagger_auto_schema(tags=['Storage'], operation_summary='Create S3 export storage',
-                         operation_description='Create a cloud connection to store annotations. Use the relevant '
-                                               'endpoint for the type of storage you want to create.')
+    @swagger_auto_schema(tags=['Storage'], operation_summary='S3: Create export storage',
+                         operation_description='Create an Amazon S3 export storage connection to store annotations.')
     def post(self, request, *args, **kwargs):
         return super(S3ExportStorageListAPI, self).post(request, *args, **kwargs)
 
@@ -96,15 +97,18 @@ class S3ExportStorageDetailAPI(ExportStorageDetailAPI):
     queryset = S3ExportStorage.objects.all()
     serializer_class = S3ExportStorageSerializer
 
-    @swagger_auto_schema(tags=['Storage'], operation_summary='Get S3 export storage')
+    @swagger_auto_schema(tags=['Storage'], operation_summary='S3: Get export storage',
+                         operation_description='Get a specific Amazon S3 export storage connection.')
     def get(self, request, *args, **kwargs):
         return super(S3ExportStorageDetailAPI, self).get(request, *args, **kwargs)
 
-    @swagger_auto_schema(tags=['Storage'], operation_summary='Update S3 export storage')
+    @swagger_auto_schema(tags=['Storage'], operation_summary='S3: Update export storage',
+                         operation_description='Update a specific Amazon S3 export storage connection.')
     def patch(self, request, *args, **kwargs):
         return super(S3ExportStorageDetailAPI, self).patch(request, *args, **kwargs)
 
-    @swagger_auto_schema(tags=['Storage'], operation_summary='Delete S3 export storage')
+    @swagger_auto_schema(tags=['Storage'], operation_summary='S3: Delete export storage',
+                         operation_description='Delete a specific Amazon S3 export storage connection.')
     def delete(self, request, *args, **kwargs):
         return super(S3ExportStorageDetailAPI, self).delete(request, *args, **kwargs)
 

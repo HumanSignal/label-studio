@@ -11,14 +11,14 @@ from io_storages.api import (
 class LocalFilesImportStorageListAPI(ImportStorageListAPI):
     """
     get:
-    Get all Local import storages
+    Local: Get all import storage
 
-    Get list of all Local import storages
+    Get a list of all local file import storage connections.
 
     post:
-    Create Local import storage
+    Local: Create import storage
 
-    Create a new Local import storage
+    Create a new local file import storage connection.
     """
     queryset = LocalFilesImportStorage.objects.all()
     serializer_class = LocalFilesImportStorageSerializer
@@ -27,19 +27,19 @@ class LocalFilesImportStorageListAPI(ImportStorageListAPI):
 class LocalFilesImportStorageDetailAPI(ImportStorageDetailAPI):
     """
     get:
-    Get Local import storage
+    Local: Get import storage
 
-    Get Local import storage
+    Get a specific local file import storage connection.
 
     patch:
-    Update Local import storage
+    Local: Update import storage
 
-    Update Local import storage
+    Update a specific local file import storage connection.
 
     delete:
-    Delete Local import storage
+    Local: Delete import storage
 
-    Delete Local import storage
+    Delete a specific local import storage connection.
     """
     queryset = LocalFilesImportStorage.objects.all()
     serializer_class = LocalFilesImportStorageSerializer
@@ -48,9 +48,9 @@ class LocalFilesImportStorageDetailAPI(ImportStorageDetailAPI):
 class LocalFilesImportStorageSyncAPI(ImportStorageSyncAPI):
     """
     post:
-    Sync Local import storage
+    Local: Sync import storage
 
-    Sync with Local import storage
+    Sync tasks from a local file import storage connection.
     """
     serializer_class = LocalFilesImportStorageSerializer
 
@@ -58,9 +58,9 @@ class LocalFilesImportStorageSyncAPI(ImportStorageSyncAPI):
 class LocalFilesImportStorageValidateAPI(ImportStorageValidateAPI):
     """
     post:
-    Validate Local import storage
+    Local: Validate import storage
 
-    Validate Local import storage
+    Validate a specific local file import storage connection.
     """
     serializer_class = LocalFilesImportStorageSerializer
 
@@ -68,9 +68,9 @@ class LocalFilesImportStorageValidateAPI(ImportStorageValidateAPI):
 class LocalFilesExportStorageValidateAPI(ExportStorageValidateAPI):
     """
     post:
-    Validate Local export storage
+    Local: Validate export storage
 
-    Validate Local export storage
+    Validate a specific local file export storage connection.
     """
     serializer_class = LocalFilesExportStorageSerializer
 
@@ -78,14 +78,14 @@ class LocalFilesExportStorageValidateAPI(ExportStorageValidateAPI):
 class LocalFilesExportStorageListAPI(ExportStorageListAPI):
     """
     get:
-    Get all Local export storages
+    Local: Get all export storage
 
-    Get list of all Local export storages
+    Get a list of all Local export storage connections.
 
     post:
-    Create Local export storage
+    Local: Create export storage
 
-    Create a new Local export storage
+    Create a new local file export storage connection to store annotations.
     """
     queryset = LocalFilesExportStorage.objects.all()
     serializer_class = LocalFilesExportStorageSerializer
@@ -94,19 +94,19 @@ class LocalFilesExportStorageListAPI(ExportStorageListAPI):
 class LocalFilesExportStorageDetailAPI(ExportStorageDetailAPI):
     """
     get:
-    Get Local export storage
+    Local: Get export storage
 
-    Get Local export storage
+    Get a specific local file export storage connection.
 
     patch:
-    Update Local export storage
+    Local: Update export storage
 
-    Update Local export storage
+    Update a specific local file export storage connection.
 
     delete:
-    Delete Local export storage
+    Local: Delete export storage
 
-    Delete Local export storage
+    Delete a specific local file export storage connection.
     """
     queryset = LocalFilesExportStorage.objects.all()
     serializer_class = LocalFilesExportStorageSerializer

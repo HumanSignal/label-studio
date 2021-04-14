@@ -11,14 +11,14 @@ from io_storages.api import (
 class RedisImportStorageListAPI(ImportStorageListAPI):
     """
     get:
-    Get all Redis import storages
+    Redis: Get all import storage
 
-    Get list of all Redis import storages
+    Get a list of all Redis import storage connections.
 
     post:
-    Create Redis import storage
+    Redis: Create import storage
 
-    Create a new Redis import storage
+    Create a new Redis import storage connection.
     """
     queryset = RedisImportStorage.objects.all()
     serializer_class = RedisImportStorageSerializer
@@ -27,19 +27,19 @@ class RedisImportStorageListAPI(ImportStorageListAPI):
 class RedisImportStorageDetailAPI(ImportStorageDetailAPI):
     """
     get:
-    Get Redis import storage
+    Redis: Get import storage
 
-    Get Redis import storage
+    Get a specific Redis import storage connection.
 
     patch:
-    Update Redis import storage
+    Redis: Update import storage
 
-    Update Redis import storage
+    Update a specific Redis import storage connection.
 
     delete:
-    Delete Redis import storage
+    Redis: Delete import storage
 
-    Delete Redis import storage
+    Delete a specific Redis import storage connection.
     """
     queryset = RedisImportStorage.objects.all()
     serializer_class = RedisImportStorageSerializer
@@ -48,9 +48,9 @@ class RedisImportStorageDetailAPI(ImportStorageDetailAPI):
 class RedisImportStorageSyncAPI(ImportStorageSyncAPI):
     """
     post:
-    Sync Redis import storage
+    Redis: Sync import storage
 
-    Sync with Redis import storage
+    Sync tasks from a specific Redis import storage connection.
     """
     serializer_class = RedisImportStorageSerializer
 
@@ -58,9 +58,9 @@ class RedisImportStorageSyncAPI(ImportStorageSyncAPI):
 class RedisImportStorageValidateAPI(ImportStorageValidateAPI):
     """
     post:
-    Validate Redis import storage
+    Redis: Validate import storage
 
-    Validate Redis import storage
+    Validate a specific Redis import storage connection.
     """
     serializer_class = RedisImportStorageSerializer
 
@@ -68,9 +68,9 @@ class RedisImportStorageValidateAPI(ImportStorageValidateAPI):
 class RedisExportStorageValidateAPI(ExportStorageValidateAPI):
     """
     post:
-    Validate Redis export storage
+    Redis: Validate export storage
 
-    Validate Redis export storage
+    Validate a specific Redis export storage connection.
     """
     serializer_class = RedisExportStorageSerializer
 
@@ -78,14 +78,14 @@ class RedisExportStorageValidateAPI(ExportStorageValidateAPI):
 class RedisExportStorageListAPI(ExportStorageListAPI):
     """
     get:
-    Get all Redis export storages
+    Redis: Get all export storage
 
-    Get list of all Redis export storages
+    Get a list of all Redis export storage connections.
 
     post:
-    Create Redis export storage
+    Redis: Create export storage
 
-    Create a new Redis export storage
+    Create a new Redis export storage connection to store annotations.
     """
     queryset = RedisExportStorage.objects.all()
     serializer_class = RedisExportStorageSerializer
@@ -94,19 +94,19 @@ class RedisExportStorageListAPI(ExportStorageListAPI):
 class RedisExportStorageDetailAPI(ExportStorageDetailAPI):
     """
     get:
-    Get Redis export storage
+    Redis: Get export storage
 
-    Get Redis export storage
+    Get a specific Redis export storage connection.
 
     patch:
-    Update Redis export storage
+    Redis: Update export storage
 
-    Update Redis export storage
+    Update a specific Redis export storage connection.
 
     delete:
-    Delete Redis export storage
+    Redis: Delete export storage
 
-    Delete Redis export storage
+    Delete a specific Redis export storage connection.
     """
     queryset = RedisExportStorage.objects.all()
     serializer_class = RedisExportStorageSerializer

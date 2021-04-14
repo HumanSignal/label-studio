@@ -11,14 +11,14 @@ from io_storages.api import (
 class GCSImportStorageListAPI(ImportStorageListAPI):
     """
     get:
-    Get all GCS import storages
+    GCS: Get all import storage
 
-    Get list of GCS import storages
+    Get a list of all GCS import storage connections.
 
     post:
-    Create GCS import storage
+    GCS: Create import storage
 
-    Create a new GCS import storage
+    Create a new GCS import storage connection.
     """
     queryset = GCSImportStorage.objects.all()
     serializer_class = GCSImportStorageSerializer
@@ -27,19 +27,19 @@ class GCSImportStorageListAPI(ImportStorageListAPI):
 class GCSImportStorageDetailAPI(ImportStorageDetailAPI):
     """
     get:
-    Get GCS import storage
+    GCS: Get import storage
 
-    Get GCS import storage
+    Get a specific GCS import storage connection.
 
     patch:
-    Update GCS import storage
+    GCS: Update import storage
 
-    Update GCS import storage
+    Update a specific GCS import storage connection.
 
     delete:
-    Delete GCS import storage
+    GCS: Delete import storage
 
-    Delete GCS import storage
+    Delete a specific GCS import storage connection.
     """
     queryset = GCSImportStorage.objects.all()
     serializer_class = GCSImportStorageSerializer
@@ -48,9 +48,9 @@ class GCSImportStorageDetailAPI(ImportStorageDetailAPI):
 class GCSImportStorageSyncAPI(ImportStorageSyncAPI):
     """
     post:
-    Sync GCS import storage
+    GCS: Sync import storage
 
-    Sync with GCS import storage
+    Sync tasks from an GCS import storage connection.
     """
     serializer_class = GCSImportStorageSerializer
 
@@ -58,9 +58,9 @@ class GCSImportStorageSyncAPI(ImportStorageSyncAPI):
 class GCSImportStorageValidateAPI(ImportStorageValidateAPI):
     """
     post:
-    Validate GCS import storage
+    GCS: Validate import storage
 
-    Validate GCS import storage
+    Validate a specific GCS import storage connection.
     """
     serializer_class = GCSImportStorageSerializer
 
@@ -68,9 +68,9 @@ class GCSImportStorageValidateAPI(ImportStorageValidateAPI):
 class GCSExportStorageValidateAPI(ExportStorageValidateAPI):
     """
     post:
-    Validate GCS export storage
+    GCS: Validate export storage
 
-    Validate GCS export storage
+    Validate a specific GCS export storage connection.
     """
     serializer_class = GCSExportStorageSerializer
 
@@ -78,14 +78,14 @@ class GCSExportStorageValidateAPI(ExportStorageValidateAPI):
 class GCSExportStorageListAPI(ExportStorageListAPI):
     """
     get:
-    Get all GCS export storages
+    GCS: Get all export storage
 
-    Get list of all GCS export storages
+    Get a list of all GCS export storage connections.
 
     post:
-    Create GCS export storage
+    GCS: Create export storage
 
-    Create a new GCS export storage
+    Create a new GCS export storage connection to store annotations.
     """
     queryset = GCSExportStorage.objects.all()
     serializer_class = GCSExportStorageSerializer
@@ -94,19 +94,19 @@ class GCSExportStorageListAPI(ExportStorageListAPI):
 class GCSExportStorageDetailAPI(ExportStorageDetailAPI):
     """
     get:
-    Get GCS export storage
+    GCS: Get export storage
 
-    Get GCS export storage
+    Get a specific GCS export storage connection.
 
     patch:
-    Update GCS export storage
+    GCS: Update export storage
 
-    Update GCS export storage
+    Update a specific GCS export storage connection.
 
     delete:
-    Delete GCS export storage
+    GCS: Delete export storage
 
-    Delete GCS export storage
+    Delete a specific GCS export storage connection.
     """
     queryset = GCSExportStorage.objects.all()
     serializer_class = GCSExportStorageSerializer
