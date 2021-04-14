@@ -122,7 +122,7 @@ class ImportAPI(generics.CreateAPIView):
 
     ```bash
     curl -H 'Content-Type: application/json' -H 'Authorization: Token abc123' \\
-    -X POST 'http://localhost/api/projects/1/import' --data @my_file.csv
+    -X POST 'http://localhost/api/projects/1/import' -F ‘file=@path/to/my_file.csv’
     ```
 
     3\. **POST with URL**: You can also provide a URL to a file with labeling tasks. Supported file formats are the same as in option 2.
