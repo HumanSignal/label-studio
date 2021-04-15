@@ -9,6 +9,7 @@ from django.conf import settings
 from core.permissions import IsBusiness, view_with_auth
 
 from .models import FileUpload
+from ranged_fileresponse import RangedFileResponse
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +20,4 @@ def get_uploaded_file(request, filename):
     logger.debug(f'Fetch uploaded file by user {request.user} => {file}')
     file_upload = FileUpload.objects.get(file=file)
 
-    with open(file_upload.file.path, mode='rb') as f:
-        content = f.read()
-    return FileResponse(io.BytesIO(content), as_attachment=True)
+    return RangedFileResponse(request, open(file_upload.file.path, mode='rb'))
