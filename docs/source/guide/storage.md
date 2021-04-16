@@ -307,6 +307,7 @@ In the Label Studio UI, do the following to set up the connection:
 5. Specify the name of the local directory, relative to the root directory. Label Studio assumes a root directory of `/`. To specify a different directory, see [Run Label Studio on Docker and use local storage](start.html#Run_Label_Studio_on_Docker_and_use_local_storage).
 6. (Optional) Adjust the remaining parameters. See [Optional parameters](#Optional-parameters-5) on this page for more details.
 7. Click **Add Storage**.
+8. Repeat these steps for **Add Target Storage** to use a local file directory for exporting. 
 
 > Warning: Serving data from the local file system can be a security risk. If you're sure you know what you're doing, set `LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true` in your environment setup. Without this setting, URLs in tasks that point to local files won't work.
 
