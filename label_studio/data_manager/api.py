@@ -103,13 +103,13 @@ class ViewAPI(viewsets.ModelViewSet):
     @staticmethod
     def evaluate_predictions(tasks):
         # call machine learning api and format response
-        for task in tasks:
-            project = task.project
-            if not project.show_collab_predictions:
-                return
 
-            for ml_backend in project.ml_backends.all():
-                ml_backend.predict_one_task(task)
+        project = tasks[0].project
+        if not project.show_collab_predictions:
+            return
+
+        for ml_backend in project.ml_backends.all():
+            ml_backend.predict_many_tasks(tasks)
 
     @swagger_auto_schema(tags=['Data Manager'], responses={200: task_serializer_class(many=True)})
     @action(detail=True, methods=["get"])

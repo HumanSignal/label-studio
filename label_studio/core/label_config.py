@@ -104,7 +104,6 @@ def parse_config(config_string):
             tag_info['inputs'].append(inputs[input_tag_name])
         tag_info['labels'] = list(labels[output_tag])
         tag_info['labels_attrs'] = labels[output_tag]
-    logger.debug('Parsed config:\n' + json.dumps(outputs, indent=2))
     return outputs
 
 

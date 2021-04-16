@@ -9,6 +9,7 @@ import attr
 from django.db.models import Q, F, Count
 from requests.adapters import HTTPAdapter
 from core.version import get_git_version
+from data_export.serializers import ExportDataSerializer
 
 version = get_git_version()
 logger = logging.getLogger(__name__)
@@ -144,13 +145,11 @@ class MLApi(BaseHTTPAPI):
         return f'{project.id}.{time_id}'
 
     def train(self, project, use_ground_truth=False):
-        from tasks.serializers import TaskWithAnnotationsSerializer
         # get only tasks with annotations
         tasks = project.tasks.annotate(num_annotations=Count('annotations')).filter(num_annotations__gt=0)
 
-        # create serialized tasks with annotations: {"data": .., "annotations": [{...}]}
-        tasks_ser = TaskWithAnnotationsSerializer(
-            tasks, many=True, context={'export_mode': True, 'aggregator_type': 'no_aggregation'}).data
+        # create serialized tasks with annotations: {"data": {...}, "annotations": [{...}], "predictions": [{...}]}
+        tasks_ser = ExportDataSerializer(tasks, many=True).data
         logger.debug(f'{len(tasks_ser)} tasks with annotations are sent to ML backend for training.')
         request = {
             'annotations': tasks_ser,

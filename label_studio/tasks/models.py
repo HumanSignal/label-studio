@@ -432,6 +432,15 @@ def delete_draft(sender, instance, **kwargs):
     logger.debug(f'{num_drafts} drafts removed from task {task} after saving annotation {instance}')
 
 
+@receiver(post_save, sender=Annotation)
+def update_ml_backend(sender, instance, **kwargs):
+    project = instance.task.project
+    if hasattr(project, 'ml_backends'):
+        # TODO: add option to enable continuous model updates
+        for ml_backend in project.ml_backends.all():
+            ml_backend.train()
+
+
 Q_finished_annotations = Q(was_cancelled=False) & Q(result__isnull=False)
 Q_task_finished_annotations = Q(annotations__was_cancelled=False) & \
                               Q(annotations__result__isnull=False)
