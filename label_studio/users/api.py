@@ -83,7 +83,13 @@ class UserAPI(viewsets.ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         return super(UserAPI, self).retrieve(request, *args, **kwargs)
 
-    @swagger_auto_schema(auto_schema=None)
+    @swagger_auto_schema(
+        tags=['Users'],
+        operation_summary='Update user details',
+        operation_description='Update details for a specific user, such as their name, contact information, '
+                              'or organization in Label Studio.',
+        request_body=UserSerializer
+    )
     def partial_update(self, request, *args, **kwargs):
         return super(UserAPI, self).partial_update(request, *args, **kwargs)
 
