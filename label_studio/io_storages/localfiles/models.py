@@ -3,11 +3,16 @@
 import logging
 import json
 import re
+import os
 
 from pathlib import Path
 from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
+from django.dispatch import receiver
+from django.db.models.signals import post_save
+
+from tasks.models import Annotation
 
 from io_storages.base_models import ImportStorage, ImportStorageLink, ExportStorage, ExportStorageLink
 from io_storages.serializers import StorageAnnotationSerializer
@@ -67,8 +72,9 @@ class LocalFilesExportStorage(ExportStorage, LocalFilesMixin):
         with transaction.atomic():
             # Create export storage link
             link = LocalFilesExportStorageLink.create(annotation, self)
+            key = os.path.join(self.path, f"{link.key}.json")
             try:
-                with open(link.key, mode='w') as f:
+                with open(key, mode='w') as f:
                     json.dump(ser_annotation, f, indent=2)
             except Exception as exc:
                 logger.error(f"Can't export annotation {annotation} to local storage {self}. Reason: {exc}", exc_info=True)
@@ -80,3 +86,13 @@ class LocalFilesImportStorageLink(ImportStorageLink):
 
 class LocalFilesExportStorageLink(ExportStorageLink):
     storage = models.ForeignKey(LocalFilesExportStorage, on_delete=models.CASCADE, related_name='links')
+
+
+@receiver(post_save, sender=Annotation)
+def export_annotation_to_local_files(sender, instance, **kwargs):
+    project = instance.task.project
+    if hasattr(project, 'io_storages_localfilesexportstorages'):
+        for storage in project.io_storages_localfilesexportstorages.all():
+            logger.debug(f'Export {instance} to Local Storage {storage}')
+            storage.save_annotation(instance)
+            
