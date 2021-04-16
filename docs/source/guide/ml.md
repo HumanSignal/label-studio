@@ -1,5 +1,5 @@
 ---
-title: Set up machine learning with your labeling process
+title: Set up machine learning with Label Studio
 type: guide
 order: 606
 meta_title: Machine Learning Integration
@@ -59,12 +59,12 @@ Follow these steps to set up an example text classifier ML backend with Label St
    
 3. Start the ML backend server.
    ```bash
-   label-studio-ml start my_ml_backend
+   label-studio start text_classification_project --init --template text_classification --ml-backends http://localhost:9090
    ```
    
 4. Start Label Studio and add the link to your machine learning model backend in the **Machine Learning** section of the project settings page.
 
-## Getting predictions from a machine learning model
+## Get predictions from a machine learning model
 After you connect a model to Label Studio as a machine learning backend, you can see model predictions in the labeling interface if the model is pre-trained. 
 
 If the model has not been trained yet, do the following to get predictions to appear:
@@ -76,7 +76,7 @@ Predictions only appear while labeling tasks. For example, for an image classifi
 
 If you want to see predictions on the list of tasks and when previewing tasks, make a GET request to the `/predict` URL of your ML backend with a payload of the tasks that you want to see predictions for, formatted like the following example: `{"tasks": [{"data": {"text":"some text"}}]}`.
    
-### Train a model with Label Studio 
+## Train a model with Label Studio 
 
 After you connect a model to Label Studio as a machine learning backend, you can start model training from the UI or using the API. 
 

@@ -1,5 +1,5 @@
 ---
-title: Set up a machine learning backend with the Label Studio SDK
+title: Create a machine learning backend
 type: guide
 order: 607
 meta_title: Machine Learning SDK
@@ -87,9 +87,9 @@ def fit(self, completions, workdir=None, **kwargs):
 
 After you wrap your model code with the class, define the loaders, and define the methods, you're ready to run your model as an ML backend with Label Studio. See the [Quickstart](ml.html#Quickstart). 
 
-## ML backend tutorials
+## Example ML backend tutorials
 
-For example machine learning models set up with Label Studio, review the following tutorials:
+For examples of machine learning models set up as ML backends with the Label Studio SDK, review the following tutorials:
 - [Create a simple ML backend](/tutorials/dummy_model.html)
 - [Text classification with Scikit-Learn](/tutorials/sklearn-text-classifier.html)
 - [Transfer learning for images with PyTorch](/tutorials/pytorch-image-transfer-learning.html)
