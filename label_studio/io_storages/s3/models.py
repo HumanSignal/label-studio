@@ -19,6 +19,7 @@ from tasks.validation import ValidationError as TaskValidationError
 from io_storages.serializers import StorageAnnotationSerializer
 from tasks.serializers import TaskSerializerBulk
 from tasks.models import Annotation
+from data_import.serializers import ImportApiSerializer
 
 logger = logging.getLogger(__name__)
 logging.getLogger('botocore').setLevel(logging.CRITICAL)
@@ -128,25 +129,10 @@ class S3ImportStorage(S3StorageMixin, ImportStorage):
     def _get_validated_task(self, parsed_data, key):
         """ Validate parsed data with labeling config and task structure
         """
-        is_list = isinstance(parsed_data, list)
-        # we support only one task per JSON file
-        if not (is_list and len(parsed_data) == 1 or isinstance(parsed_data, dict)):
+        if not isinstance(parsed_data, dict):
             raise TaskValidationError('Error at ' + str(key) + ':\n'
-                                      'Cloud storage supports one task per JSON file only. '
-                                      'Task must be {} or [{}] with length = 1')
-
-        # classic validation for one task
-        serializer = TaskSerializerBulk(context={'project': self.project})
-        try:
-            new_tasks = serializer.to_internal_value(parsed_data if is_list else [parsed_data])
-        except TaskValidationError as e:
-            # pretty format of errors
-            messages = e.msg_to_list()
-            out = [(str(key) + ' :: ' + msg) for msg in messages]
-            out = "\n".join(out)
-            raise TaskValidationError(out)
-
-        return new_tasks[0]
+                                      'Cloud storage supports one task (one dict object) per JSON file only. ')
+        return parsed_data
 
     def get_data(self, key):
         uri = f's3://{self.bucket}/{key}'
@@ -157,13 +143,8 @@ class S3ImportStorage(S3StorageMixin, ImportStorage):
         # read task json from bucket and validate it
         _, s3 = self.get_client_and_resource()
         bucket = s3.Bucket(self.bucket)
-        try:
-            obj = s3.Object(bucket.name, key).get()['Body'].read().decode('utf-8')
-            value = json.loads(obj)
-        except (UnicodeDecodeError, json.decoder.JSONDecodeError):
-            raise ValueError(
-                f"Can\'t import JSON-formatted tasks from {uri}. If you're trying to import binary objects, "
-                f"perhaps you've forgot to enable \"Treat every bucket object as a source file\" option?")
+        obj = s3.Object(bucket.name, key).get()['Body'].read().decode('utf-8')
+        value = json.loads(obj)
         if not isinstance(value, dict):
             raise ValueError(f"Error on key {key}: For S3 your JSON file must be a dictionary with one task")
 

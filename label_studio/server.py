@@ -324,7 +324,7 @@ def main():
 
         # internal port and internal host for server start
         internal_host = input_args.internal_host or config.get('internal_host', '0.0.0.0')
-        internal_port = get_env('PORT') or input_args.port or config.get('port', 8080)
+        internal_port = input_args.port or get_env('PORT') or config.get('port', 8080)
         internal_port = int(internal_port)
         internal_port = _get_free_port(internal_port, input_args.debug)
 

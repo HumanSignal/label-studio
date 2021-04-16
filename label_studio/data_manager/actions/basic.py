@@ -37,7 +37,7 @@ def delete_tasks_annotations(project, queryset, **kwargs):
     annotations = Annotation.objects.filter(task__id__in=task_ids)
     count = annotations.count()
     annotations.delete()
-    return {'processed_items': count,
+    return {'processed_items': count, 'reload': True,
             'detail': 'Deleted ' + str(count) + ' annotations'}
 
 

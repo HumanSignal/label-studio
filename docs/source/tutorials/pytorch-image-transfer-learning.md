@@ -152,7 +152,7 @@ class ImageClassifier(object):
 Finally override API methods
 
 ```python
-from label_studio.ml import LabelStudioMLBase
+from label_studio_ml.model import LabelStudioMLBase
 
 class ImageClassifierAPI(LabelStudioMLBase):
     

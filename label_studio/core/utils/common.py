@@ -418,11 +418,12 @@ def sample_query(q, sample_size):
 def get_project(obj):
     from projects.models import Project, ProjectSummary
     from tasks.models import Task, Annotation, AnnotationDraft
+    from io_storages.base_models import ImportStorage
     from data_manager.models import View
 
     if isinstance(obj, Project):
         return obj
-    elif isinstance(obj, (Task, ProjectSummary, View)):
+    elif isinstance(obj, (Task, ProjectSummary, View, ImportStorage)):
         return obj.project
     elif isinstance(obj, (Annotation, AnnotationDraft)):
         return obj.task.project
@@ -626,6 +627,12 @@ def collect_versions(force=False):
     try:
         dm = json.load(open(os.path.join(settings.DM_ROOT, 'version.json')))
         result['dm2'] = dm
+    except:
+        pass
+
+    try:
+        import label_studio_converter
+        result['label-studio-converter'] = {'version': label_studio_converter.__version__}
     except:
         pass
 

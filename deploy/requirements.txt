@@ -18,6 +18,7 @@ django-cors-headers==3.6.0
 django-extensions==3.1.0
 django-rest-swagger==2.2.0
 django-user-agents==0.4.0
+django-ranged-fileresponse==0.1.2
 django-redis-cache==3.0.0
 drf_dynamic_fields==0.3.0
 drf_yasg==1.20.0
