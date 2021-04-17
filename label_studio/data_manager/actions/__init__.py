@@ -1,9 +1,9 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 """ Actions for tasks and annotations provided by data manager.
-    All actions are stored in _actions dict.
-    Data manager uses _actions to know the list of available actions,
-    they are called by entry_points from _actions dict items.
+    All actions are stored in settings.DATA_MANAGER_ACTIONS dict.
+    Data manager uses settings.DATA_MANAGER_ACTIONS to know the list of available actions,
+    they are called by entry_points from settings.DATA_MANAGER_ACTIONS dict items.
 """
 import os
 import logging
@@ -11,10 +11,11 @@ import traceback as tb
 
 from importlib import import_module
 
+from django.conf import settings
+
 from data_manager.functions import DataManagerException
 
 logger = logging.getLogger('django')
-_actions = {}
 
 
 def check_permissions(params, action):
@@ -33,7 +34,7 @@ def get_all_actions(params):
     :param params: dict with permissions and other flags
     """
     # copy and sort by order key
-    actions = list(_actions.values())
+    actions = list(settings.DATA_MANAGER_ACTIONS.values())
     actions = sorted(actions, key=lambda x: x['order'])
     actions = [
         {key: action[key] for key in action if key != 'entry_point'}
@@ -51,10 +52,11 @@ def register_action(entry_point, title, order, **kwargs):
         action_id will be automatically extracted from entry_point function name
     """
     action_id = entry_point.__name__
-    if action_id in _actions:
-        raise IndexError('Action with id "' + action_id + '" already exists')
+    if action_id in settings.DATA_MANAGER_ACTIONS:
+        logger.debug('Action with id "' + action_id + '" already exists, skipping registration')
+        return
 
-    _actions[action_id] = {
+    settings.DATA_MANAGER_ACTIONS[action_id] = {
         'id': action_id,
         'title': title,
         'order': order,
@@ -63,13 +65,13 @@ def register_action(entry_point, title, order, **kwargs):
     }
 
 
-def register_all_actions():
+def register_actions_from_dir(base_module, action_dir):
     """ Find all python files nearby this file and try to load 'actions' from them
     """
-    for path in os.listdir(os.path.dirname(__file__)):
+    for path in os.listdir(action_dir):
         if '.py' in path and '__init__' not in path:
             name = path[0:path.find('.py')]  # get only module name to read *.py and *.pyc
-            module_actions = import_module('data_manager.actions.' + name).actions
+            module_actions = import_module(base_module + '.' + name).actions
 
             for action in module_actions:
                 register_action(**action)
@@ -79,11 +81,11 @@ def register_all_actions():
 def perform_action(action_id, project, queryset, **kwargs):
     """ Perform action using entry point from actions
     """
-    if action_id not in _actions:
+    if action_id not in settings.DATA_MANAGER_ACTIONS:
         raise DataManagerException("Can't find '" + action_id + "' in registered actions")
 
     try:
-        result = _actions[action_id]['entry_point'](project, queryset, **kwargs)
+        result = settings.DATA_MANAGER_ACTIONS[action_id]['entry_point'](project, queryset, **kwargs)
     except Exception as e:
         text = 'Error while perform action: ' + action_id + '\n' + tb.format_exc()
         logger.error(text)
@@ -92,4 +94,4 @@ def perform_action(action_id, project, queryset, **kwargs):
     return result
 
 
-register_all_actions()
+register_actions_from_dir('data_manager.actions', os.path.dirname(__file__))

@@ -99,7 +99,7 @@ class AnnotationSerializer(DynamicFieldsMixin, ModelSerializer):
 
     class Meta:
         model = Annotation
-        exclude = ['state', 'prediction', 'result_count']
+        exclude = ['prediction', 'result_count']
 
 
 class TaskSimpleSerializer(ModelSerializer):

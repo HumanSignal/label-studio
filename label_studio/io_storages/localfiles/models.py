@@ -54,7 +54,7 @@ class LocalFilesImportStorage(ImportStorage, LocalFilesMixin):
             document_root = Path(get_env('LOCAL_FILES_DOCUMENT_ROOT', default='/'))
             relative_path = str(path.relative_to(document_root))
             return {settings.DATA_UNDEFINED_NAME: f'/data/local-files/?d={relative_path}'}
-        with open(path) as f:
+        with open(path, encoding='utf8') as f:
             value = json.load(f)
         if not isinstance(value, dict):
             raise ValueError(f"Error on key {key}: For {self.__class__.__name__} your JSON file must be a dictionary with one task.")  # noqa

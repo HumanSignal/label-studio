@@ -111,6 +111,9 @@ class ViewAPI(viewsets.ModelViewSet):
             for ml_backend in project.ml_backends.all():
                 ml_backend.predict_one_task(task)
 
+    def get_task_queryset(self, request, view):
+        return Task.prepared.all(prepare_params=view.get_prepare_tasks_params())
+
     @swagger_auto_schema(tags=['Data Manager'], responses={200: task_serializer_class(many=True)})
     @action(detail=True, methods=["get"])
     def tasks(self, request, pk=None):
@@ -121,7 +124,7 @@ class ViewAPI(viewsets.ModelViewSet):
         Retrieve a list of tasks with pagination for a specific view using filters and ordering.
         """
         view = self.get_object()
-        queryset = Task.prepared.all(prepare_params=view.get_prepare_tasks_params())
+        queryset = self.get_task_queryset(request, view)
         context = {'proxy': bool_from_request(request.GET, 'proxy', True), 'resolve_uri': True}
 
         # paginated tasks
