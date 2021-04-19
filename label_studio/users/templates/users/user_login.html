@@ -5,7 +5,7 @@
 
 {% block head %}
 <title>Login | Label Studio</title>
-<link rel="stylesheet" href="{% static 'css/login.css' %}"/>
+<link rel="stylesheet" href="{{ settings.HOSTNAME }}{% static 'css/login.css' %}"/>
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-129877673-1"></script>
 <script>
 window.dataLayer = window.dataLayer || [];
