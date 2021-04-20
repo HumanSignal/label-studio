@@ -288,6 +288,9 @@ label-studio start my_project --init --db redis
 ## Local storage
 If you have local files that you want to add to Label Studio from a specific directory, you can set up a specific local directory as source or target storage.
 
+### Prerequisites
+Set `LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true` in your environment setup. Without this setting, URLs in tasks that point to local files won't work. Keep in mind that serving data from the local file system can be a security risk. See [Set environment variables](start.html#Set_environment_variables) for more about using environment variables.
+
 Reference tasks in a local directory using the following syntax in the Label Studio JSON format. For example, to reference an image file `1.png`: 
 ```
 {
@@ -308,8 +311,6 @@ In the Label Studio UI, do the following to set up the connection:
 6. (Optional) Adjust the remaining parameters. See [Optional parameters](#Optional-parameters-5) on this page for more details.
 7. Click **Add Storage**.
 8. Repeat these steps for **Add Target Storage** to use a local file directory for exporting. 
-
-> Warning: Serving data from the local file system can be a security risk. If you're sure you know what you're doing, set `LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true` in your environment setup. Without this setting, URLs in tasks that point to local files won't work.
 
 ### Optional parameters
 

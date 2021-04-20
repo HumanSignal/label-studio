@@ -50,9 +50,17 @@ The following command line arguments are optional and must be specified with `la
 | `--password` | `LABEL_STUDIO_PASSWORD` | `None` | Password to use for the default user. |
 | `--username` | `LABEL_STUDIO_USERNAME` | `default_user@localhost` | Username to use for the default user. |
 | `--agree-fix-sqlite` | N/A | `False` | Automatically agree to let Label Studio fix SQLite issues when using Python 3.6–3.8 on Windows operating systems. | 
-| N/A | LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED | `False` | Allow Label Studio to access local file directories to import storage. See [Run Label Studio on Docker and use local storage](start.html#Run_Label_Studio_on_Docker_and_use_local_storage). |
-| N/A | LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT | `/` | Specify the root directory for Label Studio to use when accessing local file directories. See [Run Label Studio on Docker and use local storage](start.html#Run_Label_Studio_on_Docker_and_use_local_storage). |
+| N/A | `LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED` | `False` | Allow Label Studio to access local file directories to import storage. See [Run Label Studio on Docker and use local storage](start.html#Run_Label_Studio_on_Docker_and_use_local_storage). |
+| N/A | `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT` | `/` | Specify the root directory for Label Studio to use when accessing local file directories. See [Run Label Studio on Docker and use local storage](start.html#Run_Label_Studio_on_Docker_and_use_local_storage). |
 
+### Set environment variables
+How you set environment variables depends on the operating system and the environment in which you deploy Label Studio. 
+
+In *nix operating systems, you can set environment variables from the command line or with an environment setup file. For example:
+```bash
+export LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true
+```
+You can also use an `.env` file. 
 
 ## Run Label Studio on localhost with a different port
 By default, Label Studio runs on port 8080. If that port is already in use or if you want to specify a different port, start Label Studio with the following command:
