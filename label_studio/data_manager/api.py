@@ -125,7 +125,7 @@ class ViewAPI(viewsets.ModelViewSet):
         """
         view = self.get_object()
         queryset = self.get_task_queryset(request, view)
-        context = {'proxy': bool_from_request(request.GET, 'proxy', True), 'resolve_uri': True}
+        context = {'proxy': bool_from_request(request.GET, 'proxy', True), 'resolve_uri': True, 'request': request}
 
         # paginated tasks
         self.pagination_class = TaskPagination
@@ -210,7 +210,9 @@ class ViewAPI(viewsets.ModelViewSet):
 class TaskAPI(APIView):
     # permission_classes = [IsBusiness, CanViewTask]
     permission_classes = [IsBusiness]
-    serializer_class = TaskSerializer
+
+    def get_serializer_class(self):
+        return TaskSerializer
 
     @swagger_auto_schema(tags=["Data Manager"])
     def get(self, request, pk):
@@ -224,9 +226,10 @@ class TaskAPI(APIView):
         context = {
             'proxy': bool_from_request(request.GET, 'proxy', True),
             'resolve_uri': True,
-            'completed_by': 'full'
+            'completed_by': 'full',
+            'request': request
         }
-        serializer = self.serializer_class(queryset, many=False, context=context)
+        serializer = self.get_serializer_class()(queryset, many=False, context=context)
         return Response(serializer.data)
 
 
