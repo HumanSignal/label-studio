@@ -120,7 +120,7 @@ class TaskSerializer(ModelSerializer):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.context.get('include_annotations', False):
+        if self.context.get('include_annotations', True):
             self.fields['annotations'] = AnnotationSerializer(many=True, read_only=False, required=False,
                                                               context=self.context)
 
