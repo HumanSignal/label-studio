@@ -1,7 +1,7 @@
 ---
-title: Set up database storage
+title: Database setup
 type: guide
-order: 204
+order: 202
 meta_title: Database Storage
 meta_description: Label Studio Documentation for configuring database storage for data labeling and machine learning projects.
 ---
