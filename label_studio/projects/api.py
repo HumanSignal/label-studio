@@ -24,7 +24,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView, exception_handler
 
 from core.utils.common import conditional_atomic, get_organization_from_request
-from core.label_config import parse_config
+from core.label_config import parse_config, config_essential_data_has_changed
 from organizations.models import Organization
 from organizations.permissions import *
 from projects.functions import (generate_unique_title, duplicate_project)
@@ -195,11 +195,17 @@ class ProjectAPI(APIViewVirtualRedirectMixin,
     @swagger_auto_schema(tags=['Projects'], request_body=ProjectSerializer)
     def patch(self, request, *args, **kwargs):
         project = self.get_object()
-        label_config = self.request.query_params.get('label_config')
+        label_config = self.request.data.get('label_config')
 
         # config changes can break view, so we need to reset them
-        if parse_config(label_config) != parse_config(project.label_config):
-            View.objects.filter(project=project).all().delete()
+        if label_config:
+            try:
+                has_changes = config_essential_data_has_changed(label_config, project.label_config)
+            except KeyError:
+                pass
+            else:
+                if has_changes:
+                    View.objects.filter(project=project).all().delete()
 
         return super(ProjectAPI, self).patch(request, *args, **kwargs)
 
@@ -519,26 +525,10 @@ class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
             raise RestValidationError('Label config is not set or empty')
 
         # check new config includes meaningful changes
-        config_essential_data_has_changed = self.config_essential_data_has_changed(label_config, project.label_config)
+        has_changed = config_essential_data_has_changed(label_config, project.label_config)
 
         project.validate_config(label_config)
-        return Response({'config_essential_data_has_changed': config_essential_data_has_changed}, status=status.HTTP_200_OK)
-
-    @classmethod
-    def config_essential_data_has_changed(cls, new_config_str, old_config_str):
-        new_config = parse_config(new_config_str)
-        old_config = parse_config(old_config_str)
-
-        for tag, new_info in new_config.items():
-            if tag not in old_config:
-                return True
-            old_info = old_config[tag]
-            if new_info['type'] != old_info['type']:
-                return True
-            if new_info['inputs'] != old_info['inputs']:
-                return True
-            if not set(old_info['labels']).issubset(new_info['labels']):
-                return True
+        return Response({'config_essential_data_has_changed': has_changed}, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(auto_schema=None)
     def get(self, *args, **kwargs):

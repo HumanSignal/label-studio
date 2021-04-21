@@ -618,14 +618,16 @@ def collect_versions(force=False):
 
     # label studio frontend
     try:
-        lsf = json.load(open(os.path.join(settings.EDITOR_ROOT, 'version.json')))
+        with open(os.path.join(settings.EDITOR_ROOT, 'version.json')) as f:
+            lsf = json.load(f)
         result['label-studio-frontend'] = lsf
     except:
         pass
 
     # data manager
     try:
-        dm = json.load(open(os.path.join(settings.DM_ROOT, 'version.json')))
+        with open(os.path.join(settings.DM_ROOT, 'version.json')) as f:
+            dm = json.load(f)
         result['dm2'] = dm
     except:
         pass

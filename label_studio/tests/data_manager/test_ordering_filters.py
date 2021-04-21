@@ -6,7 +6,9 @@ import json
 from tests.utils import make_task, make_annotation, make_prediction, project_id
 from projects.models import Project
 from data_manager.models import View
+from data_import.models import FileUpload
 from django.conf import settings
+from django.core.files.base import ContentFile
 from django.utils.timezone import now
 
 
@@ -33,6 +35,8 @@ from django.utils.timezone import now
         [["tasks:-data.text"], -1, False],
         [["tasks:data.data"], 0, True],
         [["-tasks:data.data"], 1, True],
+        [["tasks:file_upload"], 0, False],
+        [["-tasks:file_upload"], 1, False],
     ],
 )
 @pytest.mark.django_db
@@ -58,11 +62,14 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
     else:
         task_field_name = 'text'
 
-    task_id_1 = make_task({"data": {task_field_name: 1}}, project).id
+    file_upload1 = FileUpload.objects.create(user=project.created_by, project=project, file=ContentFile('', name='file_upload1'))
+
+    task_id_1 = make_task({"data": {task_field_name: 1}, 'file_upload': file_upload1}, project).id
     make_annotation({"result": [{"1": True}]}, task_id_1)
     make_prediction({"result": [{"1": True}], "score": 1}, task_id_1)
 
-    task_id_2 = make_task({"data": {task_field_name: 2}}, project).id
+    file_upload2 = FileUpload.objects.create(user=project.created_by, project=project, file=ContentFile('', name='file_upload2'))
+    task_id_2 = make_task({"data": {task_field_name: 2}, 'file_upload': file_upload2}, project).id
     for _ in range(0, 2):
         make_annotation({"result": [{"2": True}], "was_cancelled": True}, task_id_2)
     for _ in range(0, 2):

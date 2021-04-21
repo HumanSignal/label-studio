@@ -49,8 +49,8 @@ def _read_py():
         version_module = __import__(os.path.splitext(VERSION_FILE)[0])
         return version_module.info
     except ImportError as e:
-        logging.error("Can't read version file: " + VERSION_FILE)
-        logging.error(e)
+        logging.warning("Can't read version file: " + VERSION_FILE)
+        logging.warning(e)
         return {}
     finally:
         os.chdir(cwd)  # back current dir

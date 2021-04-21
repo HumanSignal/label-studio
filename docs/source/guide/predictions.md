@@ -75,17 +75,18 @@ After you set up an example project, import this task into Label Studio. Save it
         "from_name": "choice", "to_name": "image",
         "value": {
           "choices": ["Airbus"]
-        }
       }
-    ]
+    }],
+    "score": 0.95
   }]
-}
+}]
 ```
 
-In this example there are 3 results inside of 1 prediction: 
+In this example there are 3 results inside 1 prediction, or pre-annotation: 
 - `result1` - the first bounding box
 - `result2` - the second bounding box
-- `result3` - choice selection 
+- `result3` - choice selection
+The prediction score applies to the entire prediction. 
  
 In the Label Studio UI, the imported prediction for this task looks like the following: 
 <center><img src="../images/predictions_loaded.png" style="width: 100%; max-width: 700px"></center>
