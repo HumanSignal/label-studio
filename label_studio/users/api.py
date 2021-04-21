@@ -47,10 +47,7 @@ class UserAPI(viewsets.ModelViewSet):
 
     @swagger_auto_schema(tags=['Users'], operation_summary='Save user details')
     def update(self, request, *args, **kwargs):
-        form = UserProfileForm(data=request.data, files=request.FILES, instance=request.user)
-        if form.is_valid():
-            form.save()
-            return Response({'detail': 'user details saved'}, status=200)
+        return super(UserAPI, self).update(request, *args, **kwargs)
 
     @swagger_auto_schema(auto_schema=None)
     def list(self, request, *args, **kwargs):

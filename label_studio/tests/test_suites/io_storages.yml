@@ -181,6 +181,8 @@
           title: Microsoft Azure
         - name: redis
           title: Redis
+        - name: localfiles
+          title: Local files
 
 - test_export_s3_storage:
     # Create project

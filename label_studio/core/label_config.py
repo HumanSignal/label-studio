@@ -99,7 +99,7 @@ def parse_config(config_string):
         for input_tag_name in tag_info['to_name']:
             if input_tag_name not in inputs:
                 raise KeyError('to_name={input_tag_name} is specified for output tag name={output_tag}, '
-                               'but we can\'t find it among input tags'
+                               "but we can't find it among input tags"
                                .format(input_tag_name=input_tag_name, output_tag=output_tag))
             tag_info['inputs'].append(inputs[input_tag_name])
         tag_info['labels'] = list(labels[output_tag])
@@ -353,3 +353,21 @@ def get_sample_task(label_config, secure_mode=False):
     if predefined_task is not None:
         generated_task.update(predefined_task)
     return generated_task, annotations, predictions
+
+
+def config_essential_data_has_changed(new_config_str, old_config_str):
+    """ Detect essential changes of the labeling config
+    """
+    new_config = parse_config(new_config_str)
+    old_config = parse_config(old_config_str)
+
+    for tag, new_info in new_config.items():
+        if tag not in old_config:
+            return True
+        old_info = old_config[tag]
+        if new_info['type'] != old_info['type']:
+            return True
+        if new_info['inputs'] != old_info['inputs']:
+            return True
+        if not set(old_info['labels']).issubset(new_info['labels']):
+            return True
