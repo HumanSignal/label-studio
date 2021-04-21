@@ -201,7 +201,7 @@ Review the full list of JSON properties in the [API documentation](api.html).
 | predictions.score | The overall score of the result, based on the probabilistic output, confidence level, or other. | 
 
 
-## Units of exported image annotations
+## Units for image annotations
 
 The units the x, y, width and height of exported image annotations are provided in percentages of overall image dimension. To convert those percentages to pixels, multiply the values by 100. 
 
