@@ -1,5 +1,5 @@
 ---
-title: Database setup
+title: Database setup for Label Studio
 type: guide
 order: 202
 meta_title: Database Storage
