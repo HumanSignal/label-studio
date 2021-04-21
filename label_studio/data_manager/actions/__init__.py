@@ -53,8 +53,7 @@ def register_action(entry_point, title, order, **kwargs):
     """
     action_id = entry_point.__name__
     if action_id in settings.DATA_MANAGER_ACTIONS:
-        logger.debug('Action with id "' + action_id + '" already exists, skipping registration')
-        return
+        logger.debug('Action with id "' + action_id + '" already exists, rewriting registration')
 
     settings.DATA_MANAGER_ACTIONS[action_id] = {
         'id': action_id,
