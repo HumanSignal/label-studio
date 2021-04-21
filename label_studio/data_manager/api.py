@@ -265,7 +265,7 @@ class ProjectStateAPI(APIView):
         Retrieve the project state for data manager.
         """
         pk = int_from_request(request.GET, "project", 1)  # replace 1 to None, it's for debug only
-        project = get_object_with_check_and_log(request, Project, pk=pk)
+        project = get_object_with_check_and_log(request, Project.objects.with_counts(), pk=pk)
         self.check_object_permissions(request, project)
         data = ProjectSerializer(project).data
         data.update(
