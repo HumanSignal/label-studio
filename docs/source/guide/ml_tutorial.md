@@ -6,10 +6,20 @@ meta_title: Machine Learning SDK
 meta_description: Label Studio Documentation for setting up your machine learning model to output and consume predictions in your machine learning and data science data labeling projects. 
 ---
 
-Follow this tutorial to wrap existing machine learning model code with the Label Studio ML SDK to use it as an ML backend with Label Studio. 
+Set up a machine learning model as a backend to Label Studio so that you can dynamically output and consume predictions as labeling occurs. You can follow this tutorial to wrap custom machine learning model code with the Label Studio ML SDK, or refer to example ML backend tutorials for integrating with popular machine learning frameworks such as PyTorch, GPT2, and others. 
+
+## Example ML backend tutorials
+
+For examples of machine learning models set up as ML backends with the Label Studio SDK, review the following tutorials:
+- [Create a simple ML backend](/tutorials/dummy_model.html)
+- [Text classification with Scikit-Learn](/tutorials/sklearn-text-classifier.html)
+- [Transfer learning for images with PyTorch](/tutorials/pytorch-image-transfer-learning.html)
+- [Image Object Detector](/tutorials/object-detector.html)
+- [Chatbot response generation with HuggingFace's GPT2 model](/tutorials/gpt.html)
+- [Automatic Speech Recognition with Nvidia's NeMo](/tutorials/nemo_asr.html)
 
 ## Prerequisites 
-Before you start, determine the following:
+Before you start integrating your custom model code with the Label Studio ML SDK to use it as an ML backend with Label Studio, determine the following:
 1. The expected inputs and outputs for your model. In other words, the type of labeling that your model supports in Label Studio, which informs the [Label Studio labeling config](setup.html#Set-up-the-labeling-interface-for-your-project). For example, text classification labels of "Dog", "Cat", or "Opossum" could be possible inputs and outputs. 
 2. The [prediction format](predictions.html) returned by your ML backend server.
 3. The required packages and dependencies necessary to run your machine learning model. 
@@ -87,12 +97,3 @@ def fit(self, completions, workdir=None, **kwargs):
 
 After you wrap your model code with the class, define the loaders, and define the methods, you're ready to run your model as an ML backend with Label Studio. See the [Quickstart](ml.html#Quickstart). 
 
-## Example ML backend tutorials
-
-For examples of machine learning models set up as ML backends with the Label Studio SDK, review the following tutorials:
-- [Create a simple ML backend](/tutorials/dummy_model.html)
-- [Text classification with Scikit-Learn](/tutorials/sklearn-text-classifier.html)
-- [Transfer learning for images with PyTorch](/tutorials/pytorch-image-transfer-learning.html)
-- [Image Object Detector](/tutorials/object-detector.html)
-- [Chatbot response generation with HuggingFace's GPT2 model](/tutorials/gpt.html)
-- [Automatic Speech Recognition with Nvidia's NeMo](/tutorials/nemo_asr.html)
