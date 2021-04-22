@@ -427,7 +427,12 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
 
         with conditional_atomic():
             not_solved_tasks = project.prepared_tasks.\
-                exclude(pk__in=user_solved_tasks_array).filter(is_labeled=False)
+                exclude(pk__in=user_solved_tasks_array)
+
+            # if annotator is assigned for tasks, he must to solve it regardless of is_labeled=True
+            if not (hasattr(self, 'assignee_flag') and self.assignee_flag):
+                not_solved_tasks = not_solved_tasks.filter(is_labeled=False)
+
             not_solved_tasks_count = not_solved_tasks.count()
 
             # return nothing if there are no tasks remain
