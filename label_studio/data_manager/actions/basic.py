@@ -2,7 +2,7 @@
 """
 from django.db.models import signals
 
-from tasks.models import Annotation, update_is_labeled_after_removing_annotation
+from tasks.models import Annotation, Prediction, update_is_labeled_after_removing_annotation
 from core.utils.common import temporary_disconnect_signal
 
 
@@ -37,8 +37,22 @@ def delete_tasks_annotations(project, queryset, **kwargs):
     annotations = Annotation.objects.filter(task__id__in=task_ids)
     count = annotations.count()
     annotations.delete()
-    return {'processed_items': count, 'reload': True,
+    return {'processed_items': count,
             'detail': 'Deleted ' + str(count) + ' annotations'}
+
+
+def delete_tasks_predictions(project, queryset, **kwargs):
+    """ Delete all predictions by tasks ids
+
+    :param project: project instance
+    :param queryset: filtered tasks db queryset
+    """
+    task_ids = queryset.values_list('id', flat=True)
+    predictions = Prediction.objects.filter(task__id__in=task_ids)
+    count = predictions.count()
+    predictions.delete()
+    return {'processed_items': count,
+            'detail': 'Deleted ' + str(count) + ' predictions'}
 
 
 actions = [
@@ -59,6 +73,16 @@ actions = [
         'permissions': 'can_manage_annotations',
         'dialog': {
             'text': 'You are going to delete all annotations from the selected tasks. Please confirm your action.',
+            'type': 'confirm'
+        }
+    },
+    {
+        'entry_point': delete_tasks_predictions,
+        'title': 'Delete predictions',
+        'order': 101,
+        'permissions': 'can_manage_annotations',
+        'dialog': {
+            'text': 'You are going to delete all predictions from the selected tasks. Please confirm your action.',
             'type': 'confirm'
         }
     }

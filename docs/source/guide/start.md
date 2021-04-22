@@ -35,7 +35,7 @@ The following command line arguments are optional and must be specified with `la
 | --- | ---- | --- | ---- |
 | `-b`, `--no-browser` | N/A | `False` | Do not automatically open a web browser when starting Label Studio. |
 | `-db` `--database` | `LABEL_STUDIO_DATABASE` | `label_studio.sqlite3` | Specify the database file path for storing labeling tasks and annotations. See [Database storage](install.html#Database_storage). |
-| `--data-dir` | `LABEL_STUDIO_DATA_DIR` | OS-specific | Directory to use to store all application-related data. |
+| `--data-dir` | `LABEL_STUDIO_BASE_DATA_DIR` | OS-specific | Directory to use to store all application-related data. |
 | `-d` `--debug` | N/A | `False` | Enable debug mode for troubleshooting Label Studio. |
 | `-c` `--config` | `CONFIG_PATH` | `default_config.json` | Deprecated, do not use. Specify the path to the server configuration for Label Studio. |
 | `-l` `--label-config` | `LABEL_STUDIO_LABEL_CONFIG` | `None` | Path to the label configuration file for a specific Label Studio project. See [Set up your labeling project](setup.html). |
