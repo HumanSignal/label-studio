@@ -203,7 +203,7 @@ Review the full list of JSON properties in the [API documentation](api.html).
 
 ## Units for image annotations
 
-The units the x, y, width and height of exported image annotations are provided in percentages of overall image dimension. To convert those percentages to pixels, multiply the values by 100. 
+The units the x, y, width and height of exported image annotations are provided in percentages of overall image dimension. To convert those percentages to pixels, multiply the values by 100. The x-axis corresponds to data columns, and the y-axis to data rows. 
 
 You can use the following conversion formulas for `x, y, width, height`:
 
