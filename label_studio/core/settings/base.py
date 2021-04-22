@@ -337,6 +337,7 @@ MIN_GROUND_TRUTH = 10
 DATA_UNDEFINED_NAME = '$undefined$'
 LICENSE = {}
 VERSIONS = {}
+VERSION_EDITION = 'Community Edition'
 
 
 def project_delete(project):
