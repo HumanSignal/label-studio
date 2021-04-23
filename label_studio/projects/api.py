@@ -122,7 +122,7 @@ class ProjectListAPI(generics.ListCreateAPIView):
         org_pk = get_organization_from_request(self.request)
         org = get_object_with_check_and_log(self.request, Organization, pk=org_pk)
         self.check_object_permissions(self.request, org)
-        return Project.objects.all()
+        return Project.objects.with_counts()
 
     def get_serializer_context(self):
         context = super(ProjectListAPI, self).get_serializer_context()
@@ -172,7 +172,7 @@ class ProjectAPI(APIViewVirtualRedirectMixin,
     Delete a project by specified project ID.
     """
     parser_classes = (JSONParser, FormParser, MultiPartParser)
-    queryset = Project.objects.all()
+    queryset = Project.objects.with_counts()
     permission_classes = (IsAuthenticated, ProjectAPIBasePermission)
     serializer_class = ProjectSerializer
 
@@ -180,7 +180,7 @@ class ProjectAPI(APIViewVirtualRedirectMixin,
     redirect_kwarg = 'pk'
 
     def get_object(self):
-        obj = get_object_with_check_and_log(self.request, Project, pk=self.kwargs['pk'])
+        obj = get_object_with_check_and_log(self.request, Project.objects.with_counts(), pk=self.kwargs['pk'])
         self.check_object_permissions(self.request, obj)
         return obj
 
