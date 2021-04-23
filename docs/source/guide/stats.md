@@ -1,5 +1,5 @@
 ---
-title: Statistics
+title: Task agreement and annotator consensus in Label Studio
 type: guide
 order: 405
 meta_title: Data Labeling Statistics
