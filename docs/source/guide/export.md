@@ -1,7 +1,7 @@
 ---
 title: Export results from Label Studio
 type: guide
-order: 402
+order: 401
 meta_title: Export Annotations
 meta_description: Label Studio Documentation for exporting data labeling annotations for machine learning and data science projects.
 ---

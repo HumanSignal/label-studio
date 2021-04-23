@@ -1,7 +1,7 @@
 ---
 title: Label and annotate data in Label Studio
 type: guide
-order: 401
+order: 450
 meta_title: Labeling Interface
 meta_description: Label Studio Documentation for labeling and annotating various types of data and labeling tasks for machine learning and data science projects.
 ---
