@@ -1,7 +1,7 @@
 ---
 title: Manage annotation quality in Label Studio
 type: guide
-order: 408
+order: 402
 meta_title: 
 meta_description: 
 ---
