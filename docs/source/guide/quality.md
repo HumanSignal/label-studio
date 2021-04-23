@@ -26,6 +26,8 @@ You can start reviewing tasks randomly, or order tasks in the project data manag
 After you choose what to review, from inside a project click the blue **Review** button. 
 
 
+How to re-queue a task: “You can choose to delete a completion and put back the task into the labeling queue by removing one or more completions and making it non-finished.”
+
 
 
 ## ? Automatically identify mislabeled results from machine learning models

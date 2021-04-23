@@ -9,7 +9,11 @@ meta_description: Label Studio Documentation for managing access, creating works
 Manage access to projects, organizations, and workspaces in Label Studio to restrict who can view data, annotations, and predictions in your data labeling projects. Role-based access control, organizations, and workspaces are available only in Label Studio Enterprise Edition. CONTACT US TO LEARN MORE AND STUFF. For information about user roles in the open source Label Studio Community Edition, see [Create user accounts for Label Studio](signup.html). 
 
 ## Set up role-based access control (RBAC) with Label Studio
-## Assign users to roles 
+## Roles in Label Studio Enterprise
+
+what are the roles, how to control/configure, 
+
+how to restrict who can sign up and what role people get, etc.
 
 ## Create organizations to blah
 

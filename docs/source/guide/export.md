@@ -1,5 +1,5 @@
 ---
-title: Export results from Label Studio
+title: Export annotations from Label Studio
 type: guide
 order: 410
 meta_title: Export Annotations
