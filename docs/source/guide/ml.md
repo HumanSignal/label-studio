@@ -43,9 +43,9 @@ Follow these steps to set up an example text classifier ML backend with Label St
    git clone https://github.com/heartexlabs/label-studio-ml-backend  
    ```
    
-2. Setup environment
+2. Set up the environment.
     
-   It is highly recommended to use `venv`, `virtualenv` or `conda` python environments. You can use the same environment as Label Studio does. [Read more](https://docs.python.org/3/tutorial/venv.html#creating-virtual-environments) about creating virtual environments via `venv`.
+   It is highly recommended to use `venv`, `virtualenv` or `conda` python environments. You can use the same environment as Label Studio. [Read more in the Python documentation](https://docs.python.org/3/tutorial/venv.html#creating-virtual-environments) about creating virtual environments via `venv`.
    
    ```bash
    cd label-studio-ml-backend
