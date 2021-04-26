@@ -68,8 +68,7 @@ class OrganizationMemberListAPI(generics.ListAPIView):
     serializer_class = OrganizationMemberUserSerializer
 
     def get_queryset(self):
-        org = get_object_with_check_and_log(self.request, Organization, pk=self.kwargs[self.lookup_field])
-        self.check_object_permissions(self.request, org)
+        org = generics.get_object_or_404(self.request.user.organizations, pk=self.kwargs[self.lookup_field])
         return org.members
 
     @swagger_auto_schema(tags=['Organizations'])
@@ -100,7 +99,7 @@ class OrganizationAPI(APIViewVirtualRedirectMixin,
     redirect_kwarg = 'pk'
 
     def get_object(self):
-        org = get_object_with_check_and_log(self.request, Organization, pk=self.kwargs[self.lookup_field])
+        org = generics.get_object_or_404(self.request.user.organizations, pk=self.kwargs[self.lookup_field])
         self.check_object_permissions(self.request, org)
         return org
 
