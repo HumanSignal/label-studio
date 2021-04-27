@@ -3,7 +3,6 @@
 import json
 import logging
 
-from django.apps import apps
 from django.db.models import Q, Avg, Count, Sum, Value, BooleanField, Case, When
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
@@ -24,9 +23,36 @@ from core.label_config import (
 logger = logging.getLogger(__name__)
 
 
+class ProjectManager(models.Manager):
+    def with_counts(self):
+        return self.annotate(
+            task_number=Count('tasks'),
+            total_predictions_number=Count('tasks__predictions'),
+            total_annotations_number=Count(
+                'tasks__annotations__id',
+                filter=Q(tasks__annotations__was_cancelled=False)
+            ),
+            useful_annotation_number=Count(
+                'tasks__annotations__id',
+                filter=Q(tasks__annotations__was_cancelled=False) &
+                    Q(tasks__annotations__ground_truth=False) &
+                    Q(tasks__annotations__result__isnull=False)
+            ),
+            ground_truth_number=Count(
+                'tasks__annotations__id',
+                filter=Q(tasks__annotations__ground_truth=True)
+            ),
+            skipped_annotations_number=Count(
+                'tasks__annotations__id',
+                filter=Q(tasks__annotations__was_cancelled=True)
+            ),
+        )
+
+
 class Project(models.Model):
     """
     """
+    objects = ProjectManager()
     __original_label_config = None
     
     title = models.CharField(_('title'), null=True, blank=True, default='', max_length=settings.PROJECT_TITLE_MAX_LEN,
