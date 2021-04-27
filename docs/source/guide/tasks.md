@@ -11,6 +11,7 @@ Get data into Label Studio by importing files, referencing URLs, or syncing with
 - If your data is stored in a cloud storage bucket, see [Sync data from cloud or database storage](storage.html).
 - If your data is stored in a Redis database, see [Sync data from cloud or database storage](storage.html).
 - If your data is stored at internet-accessible URLs, in files, or directories, [import it from the Label Studio UI](#Import-data-from-the-Label-Studio-UI).
+- If your data is stored locally, [import it into Label Studio](#Import-data-from-a-local-directory).
 - If your data contains predictions or pre-annotations, see [Import pre-annotated data into Label Studio](predictions.html).
 
 ## Types of data you can import into Label Studio
@@ -191,10 +192,12 @@ this is a second task
 If you want to import entire plain text files without each line becoming a new labeling task, customize the labeling configuration to specify `valueType="url"` in the Text tag. See the [Text tag documentation](tags/text.html)
 
 ## Import data from a local directory
-To import data from a local directory, you have two options:
-- Add the file directory as a source or target [local storage](storage.html#Local-storage) connection in the Label Studio UI. 
-- Run a web server to generate URLs for the files, then upload a file that references the URLs to Label Studio. 
 
+To import data from a local directory, you have two options:
+- Run a web server to generate URLs for the files, then upload a file that references the URLs to Label Studio. 
+- Add the file directory as a source or target [local storage](storage.html#Local-storage) connection in the Label Studio UI.
+
+### Run a web server to generate URLs to local files
 To run a web server to generate URLs for the files, you can refer to this provided [helper shell script in the Label Studio repository](https://github.com/heartexlabs/label-studio/blob/master/scripts/serve_local_files.sh) or write your own script. 
 Use that script to do the following:
 1. On the machine with the file directory that you want Label Studio to import, call the helper script and specify a regex pattern to match the files that you want to import. In this example, the script identifies files with the JPG file extension:
@@ -204,7 +207,8 @@ Use that script to do the following:
    The script collects the links to the files provided by that HTTP server and saves them to a `files.txt` file with one URL per line. 
 3. Import the file with URLs into Label Studio using the Label Studio UI. 
 
-To import tasks from a file directory on a remote server, make sure the remote server is accessible to the server running Label Studio and set up the directory as a [local storage](storage.html#Local-storage) connection. 
+### Add the file directory as source storage in the Label Studio UI
+If you're running Label Studio on Docker and want to add local file storage, you need to mount the file directory and set up environment variables. See [Run Label Studio on Docker and use local storage](start.html#Run_Label_Studio_on_Docker_and_use_local_storage).
 
 ## Import data from the Label Studio UI
 
