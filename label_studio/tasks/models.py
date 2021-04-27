@@ -25,7 +25,7 @@ from model_utils import FieldTracker
 from core.utils.common import find_first_one_to_one_related_field_by_prefix
 from core.utils.common import string_is_url
 from core.utils.params import get_env
-from data_manager.managers import PreparedTaskManager
+from data_manager.managers import PreparedTaskManager, TaskManager
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +56,7 @@ class Task(models.Model):
     )
     updates = ['is_labeled']
 
-    objects = models.Manager()  # task manager by default
+    objects = TaskManager()  # task manager by default
     prepared = PreparedTaskManager()  # task manager with filters, ordering, etc for data_manager app
 
     @property
@@ -234,6 +234,8 @@ post_bulk_create = Signal(providing_args=["objs", "batch_size"])
 
 
 class AnnotationManager(models.Manager):
+    def for_user(self, user):
+        return self.filter(task__project__organization=user.active_organization)
 
     def bulk_create(self, objs, batch_size=None):
         pre_bulk_create.send(sender=self.model, objs=objs, batch_size=batch_size)
@@ -291,6 +293,11 @@ class Annotation(models.Model):
             res = []
 
         return len(res)
+
+    def has_permission(self, user):
+        if self.task.project.organization == user.active_organization:
+            return True
+        return False
 
 
 class TaskLock(models.Model):

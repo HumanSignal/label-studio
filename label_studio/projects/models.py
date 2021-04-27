@@ -24,6 +24,9 @@ logger = logging.getLogger(__name__)
 
 
 class ProjectManager(models.Manager):
+    def for_user(self, user):
+        return self.filter(organization=user.active_organization)
+
     def with_counts(self):
         return self.annotate(
             task_number=Count('tasks'),
@@ -161,6 +164,11 @@ class Project(models.Model):
     @property
     def has_predictions(self):
         return self.get_current_predictions().exists()
+
+    def has_permission(self, user):
+        if user.active_organization == self.organization:
+            return True
+        return False
 
     @property
     def has_any_predictions(self):

@@ -3,56 +3,56 @@
 import logging
 import rules
 
+from pydantic import BaseModel
+
 from django.shortcuts import redirect, reverse
 from django.core.exceptions import PermissionDenied as HTMLPermissionDenied
 from django.views.decorators.http import require_http_methods
 from django.conf import settings
 from django.apps import apps
 
-from rest_framework.permissions import IsAuthenticated, SAFE_METHODS
+from rest_framework.permissions import IsAuthenticated, SAFE_METHODS, BasePermission
 from rest_framework.exceptions import PermissionDenied as DRFPermissionDenied
 
-from core.utils.common import get_object_with_check_and_log, request_permissions_add, get_project
+from core.utils.common import get_object_with_check_and_log, request_permissions_add, get_project, load_func
 from projects.models import Project, ProjectTemplate
 from tasks.models import Task, Annotation
 from users.models import User
 logger = logging.getLogger(__name__)
 
 
-@rules.predicate
-def is_project_owner(user, obj):
-    return get_project(obj).created_by == user
+class AllPermissions(BaseModel):
+    organizations_create = 'organizations.create'
+    organizations_view = 'organizations.view'
+    organizations_change = 'organizations.change'
+    organizations_delete = 'organizations.delete'
+    projects_create = 'projects.create'
+    projects_view = 'projects.view'
+    projects_change = 'projects.change'
+    projects_delete = 'projects.delete'
+    tasks_create = 'tasks.create'
+    tasks_view = 'tasks.view'
+    tasks_change = 'tasks.change'
+    tasks_delete = 'tasks.delete'
+    annotations_create = 'annotations.create'
+    annotations_view = 'annotations.view'
+    annotations_change = 'annotations.change'
+    annotations_delete = 'annotations.delete'
 
-
-@rules.predicate
-def is_annotation_creator(user, obj):
-    if isinstance(obj, Annotation):
-        if not obj.task.project.show_annotation_history:
-            return False
-        return obj.completed_by == user
-    return False
-
+all_permissions = AllPermissions()
 
 def make_perm(name, pred):
     if rules.perm_exists(name):
         rules.remove_perm(name)
     rules.add_perm(name, pred)
 
+for _, permission_name in all_permissions:
+    make_perm(permission_name, rules.is_authenticated)
 
-make_perm('projects.add_project', rules.is_authenticated)
-make_perm('projects.view_project', rules.is_authenticated)
-make_perm('projects.change_project', rules.is_authenticated)
-make_perm('projects.delete_project', rules.is_authenticated)
 
-make_perm('tasks.view_task', rules.is_authenticated)
-make_perm('tasks.change_task', rules.is_authenticated)
-make_perm('tasks.delete_task', rules.is_authenticated)
-
-make_perm('annotations.view_annotation', rules.is_authenticated)
-make_perm('annotations.change_annotation', rules.is_authenticated)
-make_perm('annotations.delete_annotation', rules.is_authenticated)
-
-make_perm('projects_nav', rules.is_authenticated)
+class HasObjectPermission(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.has_permission(request.user)
 
 
 class PermissionException(Exception):
@@ -231,33 +231,3 @@ def raise_auth_denied(msg, request, redirect_path=''):
     # DRF request
     else:
         raise DRFPermissionDenied(msg)
-
-
-def raise_business_not_approved(request):
-    msg = 'Your account is not allowed by administrator. ' \
-          'Write us an email to approve your account: ' \
-          '<a href="mailto:hi@heartex.net">hi@heartex.ai</a>'
-    return raise_auth_denied(msg, request)
-
-
-def project_from_obj(obj, request):
-    """ Get project from task, annotation or other objects
-
-    :param obj: task, annotation
-    :param request: request to store project
-    :return: Project, None or False
-    """
-    # detect object type and get project
-    if isinstance(obj, Project):
-        project = obj
-    elif isinstance(obj, Task):
-        project = obj.project
-    elif isinstance(obj, Annotation):
-        project = obj.task.project
-    elif not obj:
-        return False
-    else:
-        raise PermissionError(f'Incorrect obj passed to project_from_obj: {str(obj)}')
-
-    request_permissions_add(request, 'project', project)
-    return project

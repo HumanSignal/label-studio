@@ -40,6 +40,11 @@ class Storage(models.Model):
     def validate_connection(self, client=None):
         pass
 
+    def has_permission(self, user):
+        if self.project.has_permission(user):
+            return True
+        return False
+
     class Meta:
         abstract = True
 
@@ -180,6 +185,11 @@ class ImportStorageLink(models.Model):
         link, created = cls.objects.get_or_create(task_id=task.id, key=key, storage=storage, object_exists=True)
         return link
 
+    def has_permission(self, user):
+        if self.task.has_permission(user):
+            return True
+        return False
+
     class Meta:
         abstract = True
 
@@ -204,6 +214,11 @@ class ExportStorageLink(models.Model):
     def create(cls, annotation, storage):
         link, created = cls.objects.get_or_create(annotation=annotation, storage=storage, object_exists=True)
         return link
+
+    def has_permission(self, user):
+        if self.annotation.has_permission(user):
+            return True
+        return False
 
     class Meta:
         abstract = True
