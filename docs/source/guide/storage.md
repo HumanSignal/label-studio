@@ -286,7 +286,7 @@ label-studio start my_project --init --db redis
 ```
 
 ## Local storage
-If you have local files that you want to add to Label Studio from a specific directory, you can set up a specific local directory (on the machine where LS is running) as source or target storage. Label Studio will walk into the directory recursively.
+If you have local files that you want to add to Label Studio from a specific directory, you can set up a specific local directory on the machine where LS is running as source or target storage. Label Studio steps through the directory recursively to read tasks.
 
 ### Prerequisites
 Add these variables to your environment setup:
