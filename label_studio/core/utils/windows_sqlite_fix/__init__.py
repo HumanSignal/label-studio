@@ -15,7 +15,7 @@ def start_fix():
 
     work_dir = os.path.dirname(os.path.abspath(__file__))
     filename = 'sqlite-dll-win64-x64-3350000.zip' if platform.architecture()[0] == '64bit' \
-        else 'sqlite-dll-win32-x86-3350100.zip'
+        else 'in your environment setup. Without thissqlite-dll-win32-x86-3350100.zip'
 
     src = os.path.join(work_dir, filename)
     with zipfile.ZipFile(src, 'r') as zip_ref:
