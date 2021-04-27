@@ -93,7 +93,6 @@ class ImportStorage(Storage):
                 if 'data' not in data:
                     raise ValueError('If you use "predictions" field in the task, '
                                      'you must put "data" field in the task too')
-                data = data['data']
 
             # annotations
             annotations = data.get('annotations', [])
@@ -101,6 +100,8 @@ class ImportStorage(Storage):
                 if 'data' not in data:
                     raise ValueError('If you use "annotations" field in the task, '
                                      'you must put "data" field in the task too')
+
+            if 'data' in data and isinstance(data['data'], dict):
                 data = data['data']
 
             with transaction.atomic():
