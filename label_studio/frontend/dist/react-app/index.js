@@ -6796,6 +6796,7 @@ const Preview = ({
 
   const [page, setPage] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)("");
   const LabelStudio = (0,_providers_LibraryProvider__WEBPACK_IMPORTED_MODULE_2__.useLibrary)('lsf');
+  const lsf = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     if (!LabelStudio) return;
     if (error) return;
@@ -6806,7 +6807,10 @@ const Preview = ({
       const LSF = window.LabelStudio;
 
       try {
-        new LSF('label-studio', {
+        var _lsf$current;
+
+        (_lsf$current = lsf.current) === null || _lsf$current === void 0 ? void 0 : _lsf$current.destroy();
+        lsf.current = new LSF('label-studio', {
           config: config || _Template__WEBPACK_IMPORTED_MODULE_5__.EMPTY_CONFIG,
           // empty string causes error in LSF
           interfaces: ["side-column"],
@@ -8474,7 +8478,8 @@ const initializeDataManager = async (root, props, params) => {
     interfaces: {
       import: false,
       export: false,
-      backButton: false
+      backButton: false,
+      labelingHeader: false
     },
     ...props,
     ...settings
@@ -8560,10 +8565,13 @@ DataManagerPage.pages = {
 DataManagerPage.context = ({
   dmRef
 }) => {
+  var _dmRef$mode;
+
   const location = (0,react_router__WEBPACK_IMPORTED_MODULE_14__.useLocation)();
   const {
     project
   } = (0,_providers_ProjectProvider__WEBPACK_IMPORTED_MODULE_5__.useProject)();
+  const [mode, setMode] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)((_dmRef$mode = dmRef === null || dmRef === void 0 ? void 0 : dmRef.mode) !== null && _dmRef$mode !== void 0 ? _dmRef$mode : "explorer");
   const links = {
     '/settings': 'Settings',
     '/data/import': "Import",
@@ -8615,6 +8623,7 @@ DataManagerPage.context = ({
   };
 
   const onDMModeChanged = currentMode => {
+    setMode(currentMode);
     updateCrumbs(currentMode);
     showLabelingInstruction(currentMode);
   };
@@ -8630,15 +8639,28 @@ DataManagerPage.context = ({
       dmRef === null || dmRef === void 0 ? void 0 : (_dmRef$off = dmRef.off) === null || _dmRef$off === void 0 ? void 0 : _dmRef$off.call(dmRef, 'modeChanged', onDMModeChanged);
     };
   }, [dmRef, project]);
-  return project && project.id ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_components_Space_Space__WEBPACK_IMPORTED_MODULE_3__.Space, {
+  return project && project.id ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(_components_Space_Space__WEBPACK_IMPORTED_MODULE_3__.Space, {
     size: "small",
-    children: Object.entries(links).map(([path, label]) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_components_Button_Button__WEBPACK_IMPORTED_MODULE_1__.Button, {
+    children: [project.expert_instruction && mode !== 'explorer' && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_components_Button_Button__WEBPACK_IMPORTED_MODULE_1__.Button, {
+      size: "compact",
+      onClick: () => {
+        (0,_components_Modal_Modal__WEBPACK_IMPORTED_MODULE_2__.modal)({
+          title: "Instructions",
+          body: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)("div", {
+            dangerouslySetInnerHTML: {
+              __html: project.expert_instruction
+            }
+          })
+        });
+      },
+      children: "Instructions"
+    }), Object.entries(links).map(([path, label]) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_components_Button_Button__WEBPACK_IMPORTED_MODULE_1__.Button, {
       tag: react_router_dom__WEBPACK_IMPORTED_MODULE_15__.NavLink,
       size: "compact",
       to: `/projects/${project.id}${path}`,
       "data-external": true,
       children: label
-    }, path))
+    }, path))]
   }) : null;
 };
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Spinner } from '../../../components';
 import { useLibrary } from '../../../providers/LibraryProvider';
 import { cn } from '../../../utils/bem';
@@ -10,6 +10,7 @@ const configClass = cn("configure");
 export const Preview = ({ config, data, error }) => {
   const [page, setPage] = useState("");
   const LabelStudio = useLibrary('lsf');
+  const lsf = useRef();
 
   useEffect(() => {
     if (!LabelStudio) return;
@@ -20,7 +21,8 @@ export const Preview = ({ config, data, error }) => {
     if (inPlace) {
       const LSF = window.LabelStudio;
       try {
-        new LSF('label-studio', {
+        lsf.current?.destroy();
+        lsf.current = new LSF('label-studio', {
           config: config || EMPTY_CONFIG, // empty string causes error in LSF
           interfaces: [
             "side-column",

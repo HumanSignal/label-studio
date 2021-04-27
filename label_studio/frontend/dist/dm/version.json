@@ -1,6 +1,6 @@
 {
-  "message": "Annotation generation logic fix",
-  "commit": "7751a996682f145d651123af27286f4f392c293c",
-  "branch": "master",
-  "date": "2021-04-02T13:15:22Z"
+  "message": "Fix issue when filter operator remained unchanged after changing a field",
+  "commit": "892ff170d9ca2a94ab88f168e56934fd6183375d",
+  "branch": "feature/lsf-ui",
+  "date": "2021-04-27T10:24:04Z"
 }

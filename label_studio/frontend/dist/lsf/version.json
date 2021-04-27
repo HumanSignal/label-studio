@@ -1,6 +1,6 @@
 {
-  "message": "Merge pull request #183 from heartexlabs/fix/nested-required\n\nFix `required` for nested `Choices`",
-  "commit": "1dd1b31dfdc9368849c65dff728a551f30ab2c86",
-  "branch": "master",
-  "date": "2021-04-12T09:15:53Z"
+  "message": "Fix tooltips",
+  "commit": "020b8e4af21cd708c1a1e92a0c3a850e426b7e64",
+  "branch": "feature/ui-update",
+  "date": "2021-04-23T15:11:59Z"
 }
