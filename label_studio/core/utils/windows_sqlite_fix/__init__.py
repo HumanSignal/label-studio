@@ -2,6 +2,7 @@ import os
 import sys
 import colorama
 import logging
+import urllib.request
 
 
 logger = logging.getLogger('main')
@@ -17,7 +18,13 @@ def start_fix():
     filename = 'sqlite-dll-win64-x64-3350500.zip' if platform.architecture()[0] == '64bit' \
         else 'sqlite-dll-win32-x86-3350500.zip'
 
-    src = os.path.join(work_dir, filename)
+    url = 'https://www.sqlite.org/2021/' + filename
+
+    src = os.path.join(work_dir, 'sqlite.zip')
+    with urllib.request.urlopen(url) as f:
+        with open(src, 'wb') as f_out:
+            f_out.write(f.read())
+
     with zipfile.ZipFile(src, 'r') as zip_ref:
         zip_ref.extractall('.')
 
