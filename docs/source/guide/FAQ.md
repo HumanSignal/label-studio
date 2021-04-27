@@ -41,8 +41,7 @@ The most common mistake while resource loading is <b>CORS</b> (Cross-Origin Reso
 
 * If you have an access to the hosting server as admin then you need to allow CORS for the web server. For nginx you can try to add <a href="javascript:void(0)" onclick="$('#nginx-cors-code').toggle()">these lines</a> to `/etc/nginx/nginx.conf` into your `location` section: 
 
-  <span id="nginx-cors-code" style="display: none"> 
-  ```
+ ```
   location <YOUR_LOCATION> {
        if ($request_method = 'OPTIONS') {
           add_header 'Access-Control-Allow-Origin' '*';
@@ -73,7 +72,6 @@ The most common mistake while resource loading is <b>CORS</b> (Cross-Origin Reso
        }
   }
   ```
-  </span>
   
 * If you use Amazon S3 with LS [read this manual](storage.html#CORS-and-access-problems).
 
