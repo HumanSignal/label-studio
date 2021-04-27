@@ -34,7 +34,7 @@ If you need to load static pre-annotated data into Label Studio, running an ML b
 
 ## Quickstart
 
-Get started with a machine learning (ML) backend with Label Studio. You need to start both the machine learning backend and Label Studio to start labeling. You can review examples in the [`label-studio-ml/examples` section of the repository](https://github.com/heartexlabs/label-studio-ml/examples).
+Get started with a machine learning (ML) backend with Label Studio. You need to start both the machine learning backend and Label Studio to start labeling. You can review examples in the [`label-studio-ml/examples` section of the repository](https://github.com/heartexlabs/label-studio-ml-backend/tree/master/label_studio_ml/examples).
 
 Follow these steps to set up an example text classifier ML backend with Label Studio:
 
