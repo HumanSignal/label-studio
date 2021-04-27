@@ -197,15 +197,6 @@ To import data from a local directory, you have two options:
 - Run a web server to generate URLs for the files, then upload a file that references the URLs to Label Studio. 
 - Add the file directory as a source or target [local storage](storage.html#Local-storage) connection in the Label Studio UI.
 
-Reference tasks in a local directory using the following syntax in the Label Studio JSON format. For example, to reference an image file `1.png`: 
-```
-{
- "data": {
-    "image": "/data/local-files/?d=1.png"
-  }
-}
-```
-
 ### Run a web server to generate URLs to local files
 To run a web server to generate URLs for the files, you can refer to this provided [helper shell script in the Label Studio repository](https://github.com/heartexlabs/label-studio/blob/master/scripts/serve_local_files.sh) or write your own script. 
 Use that script to do the following:
@@ -216,10 +207,7 @@ Use that script to do the following:
    The script collects the links to the files provided by that HTTP server and saves them to a `files.txt` file with one URL per line. 
 3. Import the file with URLs into Label Studio using the Label Studio UI. 
 
-
 ### Add the file directory as source storage in the Label Studio UI
-To import tasks from a file directory on a remote or local server, make sure the remote server is accessible to the server running Label Studio and set up the directory as a [local storage](storage.html#Local-storage) connection. See [local storage](storage.html#Local-storage).
-
 If you're running Label Studio on Docker and want to add local file storage, you need to mount the file directory and set up environment variables. See [Run Label Studio on Docker and use local storage](start.html#Run_Label_Studio_on_Docker_and_use_local_storage).
 
 ## Import data from the Label Studio UI
