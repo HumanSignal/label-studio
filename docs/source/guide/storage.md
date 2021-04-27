@@ -288,15 +288,8 @@ label-studio start my_project --init --db redis
 ## Local storage
 If you have local files that you want to add to Label Studio from a specific directory, you can set up a specific local directory on the machine where LS is running as source or target storage. Label Studio steps through the directory recursively to read tasks.
 
-### Prerequisites
-Add these variables to your environment setup:
-- `LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true`
-- `LOCAL_FILES_DOCUMENT_ROOT=/home/user` (or `LOCAL_FILES_DOCUMENT_ROOT=C:\\data\\media` for Windows).
-
-Without these settings, Local storage and URLs in tasks that point to local files won't work. Keep in mind that serving data from the local file system can be a **security risk**. See [Set environment variables](start.html#Set_environment_variables) for more about using environment variables.
-
-#### Tasks with local storage file references 
-In cases where your tasks have multiple or complex input sources, such as multiple object tags in the labeling config or a HyperText tag with custom data values, you must prepare and import tasks manually. 
+### Tasks with local storage file references 
+In cases where your tasks have multiple or complex input sources, such as multiple object tags in the labeling config or a HyperText tag with custom data values, you must prepare tasks manually. 
 
 In those cases, you can add local storage without syncing (to avoid automatic task creation from storage files) and specify the local files in your data values. For example, to specify multiple data types in the Label Studio JSON format, specifically an audio file `1.wav` and an image file `1.jpg`:
 ```
@@ -307,6 +300,15 @@ In those cases, you can add local storage without syncing (to avoid automatic ta
   }
 }
 ```
+
+### Prerequisites
+Add these variables to your environment setup:
+- `LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true`
+- `LOCAL_FILES_DOCUMENT_ROOT=/home/user` (or `LOCAL_FILES_DOCUMENT_ROOT=C:\\data\\media` for Windows).
+
+Without these settings, Local storage and URLs in tasks that point to local files won't work. Keep in mind that serving data from the local file system can be a **security risk**. See [Set environment variables](start.html#Set_environment_variables) for more about using environment variables.
+
+
 
 ### Set up connection in the Label Studio UI
 In the Label Studio UI, do the following to set up the connection:
