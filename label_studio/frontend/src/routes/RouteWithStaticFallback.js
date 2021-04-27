@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Children } from 'react';
 import { Route, Switch } from "react-router";
 import { StaticContent } from '../app/StaticContent/StaticContent';
 import { MenubarContext } from '../components/Menubar/Menubar';
@@ -8,12 +8,13 @@ const extractModalRoutes = (children) => {
   const regularRoutes = [];
 
   try {
-    children.forEach((child) => {
+    Children.toArray(children).forEach((child) => {
       if (child?.props?.modal) modalRoutes.push(child);
       else regularRoutes.push(child);
     });
   } catch (err) {
     console.log(err);
+    console.log({children});
   }
 
   return [modalRoutes, regularRoutes];
@@ -42,10 +43,23 @@ export const RouteWithStaticFallback = ({children, render, route, component, sta
       return staticComponent ?? <StaticContent id="main-content"/>;
     };
 
+    const exactRoutes = modalRoutes.reduce((res, route) => {
+      if (route.props.exact) {
+        res.exact.push(route);
+      } else {
+        res.modal.push(route);
+      }
+      return res;
+    }, {
+      exact: [],
+      modal: [],
+    });
+
     return (
       <>
-        {modalRoutes}
+        {exactRoutes.modal}
         <Switch>
+          {exactRoutes.exact}
           {children}
 
           <Route exact><Static/></Route>

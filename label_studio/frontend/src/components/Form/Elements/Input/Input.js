@@ -4,10 +4,10 @@ import { FormField } from '../../FormField';
 import { default as Label } from '../Label/Label';
 import './Input.styl';
 
-const Input = ({label, className, validate, required, skip, labelProps, ...props}) => {
+const Input = ({label, className, validate, required, skip, labelProps, ghost, ...props}) => {
   const classList = [
-    cn('input'),
-    className
+    cn('input').mod({ghost}),
+    className,
   ].join(" ").trim();
 
   const input = (

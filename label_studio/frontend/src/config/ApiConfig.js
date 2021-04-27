@@ -2,6 +2,10 @@
 export const API_CONFIG = {
   gateway: `${window.APP_SETTINGS.hostname}/api`,
   endpoints: {
+    // Users
+    users: "/users",
+    me: "/current-user/whoami",
+
     // Organization
     memberships: "/organizations/:pk/memberships",
     inviteLink: "/invite",
