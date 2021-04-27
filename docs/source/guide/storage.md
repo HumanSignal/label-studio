@@ -289,18 +289,16 @@ label-studio start my_project --init --db redis
 If you have local files that you want to add to Label Studio from a specific directory, you can set up a specific local directory (on the machine where LS is running) as source or target storage. Label Studio will walk into the directory recursively.
 
 ### Prerequisites
-Add to your environment setup:
-* `LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true`
-* `LOCAL_FILES_DOCUMENT_ROOT=/home/user` 
-(or `LOCAL_FILES_DOCUMENT_ROOT=C:\\data\\media` for Windows).
+Add these variables to your environment setup:
+- `LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true`
+- `LOCAL_FILES_DOCUMENT_ROOT=/home/user` (or `LOCAL_FILES_DOCUMENT_ROOT=C:\\data\\media` for Windows).
 
 Without these settings, Local storage and URLs in tasks that point to local files won't work. Keep in mind that serving data from the local file system can be a **security risk**. See [Set environment variables](start.html#Set_environment_variables) for more about using environment variables.
 
-### Tasks with local storage file references 
-In cases when your tasks have multiple or complex input sources (e.g. multiple object tags in the labeling config or HyperText tag with custom data values), you need the ability to prepare and import tasks manually. 
+#### Tasks with local storage file references 
+In cases where your tasks have multiple or complex input sources, such as multiple object tags in the labeling config or a HyperText tag with custom data values, you must prepare and import tasks manually. 
 
-You can add Local storage without syncing (to avoid automatic task creation from storage files) and use `/data/local-files/?d=` in your data values. Let's look to the example in the Label Studio JSON format, to reference an audio and an image files `1.wav` & `1.jpg` :
- 
+In those cases, you can add local storage without syncing (to avoid automatic task creation from storage files) and specify the local files in your data values. For example, to specify multiple data types in the Label Studio JSON format, specifically an audio file `1.wav` and an image file `1.jpg`:
 ```
 {
  "data": {
@@ -317,11 +315,10 @@ In the Label Studio UI, do the following to set up the connection:
 2. For a specific project, open **Settings > Cloud Storage**.
 3. Click **Add Source Storage**.  
 4. In the dialog box that appears, select **Local Files** as the storage type. 
-5. Specify **Local path** directory with your files. 
-> Note: Local path must include LOCAL_FILES_DOCUMENT_ROOT in the beginning, e.g.: if `LOCAL_FILES_DOCUMENT_ROOT=/home/user`, then Local path will be `/home/user/dataset1`
+5. Specify **Local path** directory with your files. The local path must include the LOCAL_FILES_DOCUMENT_ROOT in the beginning. For example, if `LOCAL_FILES_DOCUMENT_ROOT=/home/user`, then your local path must be `/home/user/dataset1`.
 6. Toggle **Treat every bucket object as a source file**. 
-   * Enable this option, if you want to create Label Studio tasks from media files  automatically, It fits for the labeling configuration with one source tag.
-   * Disable this option, if you want to import tasks in Label Studio JSON format directly from your storage. It fits for the complex labeling configuration with HyperText or more than one source tag.    
+   - Enable this option if you want to create Label Studio tasks from media files automatically. Use this option for labeling configurations with one source tag.
+   - Disable this option if you want to import tasks in Label Studio JSON format directly from your storage. Use this option for complex labeling configurations with HyperText or multiple source tags.    
 7. (Optional) Adjust the remaining parameters. See [Optional parameters](#Optional-parameters-3) on this page for more details.
 8. Click **Save**.
 9. Repeat these steps for **Add Target Storage** to use a local file directory for exporting.
