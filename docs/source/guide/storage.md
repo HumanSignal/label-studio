@@ -44,7 +44,7 @@ You can specify additional parameters from the Label Studio UI.
 | Parameter | Description | Default |
 | --- | --- | --- |
 | prefix | Specify an internal folder or container | empty | 
-| regex | Specify a regular expression to filter bucket objects. Use ".*" to collect all objects. | Skips all bucket objects. |
+| regex | Specify a regular expression to filter bucket objects. Use `.*` to collect all objects. | Skips all bucket objects. |
 | use_blob_urls | If true, treat every bucket object as a source file. Use for resources like JPG, MP3, or similar file types. If false, bucket objects are interpreted as tasks in Label Studio JSON format with one object per task. | false |
 
 
@@ -125,7 +125,7 @@ You can specify additional parameters from the Label Studio UI.
 | Parameter | Description | Default |
 | --- | --- | --- |
 | prefix | Specify an internal folder or container | empty | 
-| regex | Specify a regular expression to filter bucket objects. Use ".*" to collect all objects. | Skips all bucket objects. |
+| regex | Specify a regular expression to filter bucket objects. Use `.*` to collect all objects. | Skips all bucket objects. |
 | create_local_copy | If true, creates a local copy of the remote storage. | true |
 | use_blob_urls | If true, treat every bucket object as a source file. Use for resources like JPG, MP3, or similar file types. If false, bucket objects are interpreted as tasks in Label Studio JSON format with one object per task. | false |
 
@@ -202,7 +202,7 @@ You can specify additional parameters from the Label Studio UI.
 | Parameter | Description | Default |
 | --- | --- | --- |
 | prefix | Specify an internal folder or container | empty | 
-| regex | Specify a regular expression to filter bucket objects. Use ".*" to collect all objects. | Skips all bucket objects. |
+| regex | Specify a regular expression to filter bucket objects. Use `.*` to collect all objects. | Skips all bucket objects. |
 | create_local_copy | If true, creates a local copy of the remote storage. | true |
 | use_blob_urls | If true, treat every bucket object as a source file. Use for resources like JPG, MP3, or similar file types. If false, bucket objects are interpreted as tasks in Label Studio JSON format with one object per task. | false |
 
@@ -286,20 +286,26 @@ label-studio start my_project --init --db redis
 ```
 
 ## Local storage
-If you have local files that you want to add to Label Studio from a specific directory, you can set up a specific local directory as source or target storage.
+If you have local files that you want to add to Label Studio from a specific directory, you can set up a specific local directory (on the machine where LS is running) as source or target storage. Label Studio will walk into the directory recursively.
 
 ### Prerequisites
 Add to your environment setup:
 * `LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true`
-* `LOCAL_FILES_DOCUMENT_ROOT=/absolute/path/to/media/root` (or `LOCAL_FILES_DOCUMENT_ROOT=C:\\absolute\\path\\for\\windows`)
+* `LOCAL_FILES_DOCUMENT_ROOT=/home/user` 
+(or `LOCAL_FILES_DOCUMENT_ROOT=C:\\data\\media` for Windows).
 
-Without these settings, URLs in tasks for Local storage that point to local files won't work. Keep in mind that serving data from the local file system can be a security risk. See [Set environment variables](start.html#Set_environment_variables) for more about using environment variables.
+Without these settings, Local storage and URLs in tasks that point to local files won't work. Keep in mind that serving data from the local file system can be a **security risk**. See [Set environment variables](start.html#Set_environment_variables) for more about using environment variables.
 
-Reference tasks in a local directory using the following syntax in the Label Studio JSON format. For example, to reference an image file `1.png`: 
+### Tasks with local storage file references 
+In cases when your tasks have multiple or complex input sources (e.g. multiple object tags in the labeling config or HyperText tag with custom data values), you need the ability to prepare and import tasks manually. 
+
+You can add Local storage without syncing (to avoid automatic task creation from storage files) and use `/data/local-files/?d=` in your data values. Let's look to the example in the Label Studio JSON format, to reference an audio and an image files `1.wav` & `1.jpg` :
+ 
 ```
 {
  "data": {
-    "image": "/data/local-files/?d=1.png"
+    "audio": "/data/local-files/?d=dataset1/1.wav",
+    "image": "/data/local-files/?d=dataset1/1.jpg"
   }
 }
 ```
@@ -310,24 +316,31 @@ In the Label Studio UI, do the following to set up the connection:
 1. Open Label Studio in your web browser.
 2. For a specific project, open **Settings > Cloud Storage**.
 3. Click **Add Source Storage**.  
-4. In the dialog box that appears, select **Local Files** as the storage type.
-5. Specify the name of the local directory, relative to the root directory. Label Studio assumes a root directory of `/`. To specify a different directory, see [Run Label Studio on Docker and use local storage](start.html#Run_Label_Studio_on_Docker_and_use_local_storage).
-6. (Optional) Adjust the remaining parameters. See [Optional parameters](#Optional-parameters-5) on this page for more details.
-7. Click **Add Storage**.
-8. Repeat these steps for **Add Target Storage** to use a local file directory for exporting. 
+4. In the dialog box that appears, select **Local Files** as the storage type. 
+5. Specify **Local path** directory with your files. 
+> Note: Local path must include LOCAL_FILES_DOCUMENT_ROOT in the beginning, e.g.: if `LOCAL_FILES_DOCUMENT_ROOT=/home/user`, then Local path will be `/home/user/dataset1`
+6. Toggle **Treat every bucket object as a source file**. 
+   * Enable this option, if you want to create Label Studio tasks from media files  automatically, It fits for the labeling configuration with one source tag.
+   * Disable this option, if you want to import tasks in Label Studio JSON format directly from your storage. It fits for the complex labeling configuration with HyperText or more than one source tag.    
+7. (Optional) Adjust the remaining parameters. See [Optional parameters](#Optional-parameters-3) on this page for more details.
+8. Click **Save**.
+9. Repeat these steps for **Add Target Storage** to use a local file directory for exporting.
+ 
+<br>
+<img src="/images/local-storage-settings.png" style="border: 1px solid #eee">
 
 ### Optional parameters
 
 You can specify additional parameters from the Label Studio UI.
 
 | Parameter | Description | Default |
-| --- | --- | --- |
-| prefix | Specify an internal folder or container | empty | 
-| regex | Specify a regular expression to filter directory objects. Use ".*" to collect all objects. | Skips all directory objects. |
+| --- | --- | --- | 
+| regex | Specify a regular expression to filter directory objects. Use `.*` to collect all objects. | Skips all directory objects. |
 | use_blob_urls | If true, treat every directory object as a source file. Use for resources like JPG, MP3, or similar file types. If false, directory objects are interpreted as tasks in Label Studio JSON format with one object per task. | false |
 
 ### Set up local storage with Docker
-If you're using Label Studio in Docker, you need to mount the local directory that you want to access as a volume when you start the Docker container. See [Run Label Studio on Docker and use local storage](start.html#Run Label Studio on Docker and use local storage).
+If you're using Label Studio in Docker, you need to mount the local directory that you want to access as a volume when you start the Docker container. See [Run Label Studio on Docker and use local storage](start.html#Run-Label-Studio-on-Docker-and-use-local-storage).
+
 
 
 

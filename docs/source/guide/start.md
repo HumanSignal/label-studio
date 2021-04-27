@@ -107,7 +107,9 @@ To run Label Studio on Docker and reference persistent local storage directories
 The following command starts a Docker container with the latest image of Label Studio with port 8080 and an environment variable that allows Label Studio to access local files. In this example, a local directory `./myfiles` is mounted to the `/label-studio/files` location. 
 ```bash
 docker run -it -p 8080:8080 -v `pwd`/mydata:/label-studio/data \
- --env LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true --env LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT=/label-studio/files -v `pwd`/myfiles:/label-studio/files \
+--env LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true \ 
+--env LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT=/label-studio/files \ 
+-v `pwd`/myfiles:/label-studio/files \
 heartexlabs/label-studio:latest label-studio
 ```
 
