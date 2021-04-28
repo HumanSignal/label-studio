@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import { shallowEqualObjects } from 'shallow-equal';
 import { ApiProvider } from '../../providers/ApiProvider';
 import { MultiProvider } from '../../providers/MultiProvider';
 import { Block, cn, Elem } from '../../utils/bem';
@@ -37,7 +38,9 @@ export default class Form extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.formData && prevProps.formData !== this.props.formData) {
+    const equal = shallowEqualObjects(prevProps.formData ?? {}, this.props.formData ?? {});
+
+    if (!equal) {
       this.fillFormData();
     }
   }
@@ -52,18 +55,16 @@ export default class Form extends React.Component {
       <ApiProvider key="form-api" ref={this.apiRef}/>,
     ];
 
-    console.log('form render');
-
     return (
       <MultiProvider providers={providers}>
         <form
           ref={this.formElement}
           className={cn('form')}
           action={this.props.action}
-          // onSubmit={this.onFormSubmitted}
-          // onChange={this.onFormChanged}
-          // autoComplete={this.props.autoComplete}
-          // autoSave={this.props.autoSave}
+          onSubmit={this.onFormSubmitted}
+          onChange={this.onFormChanged}
+          autoComplete={this.props.autoComplete}
+          autoSave={this.props.autoSave}
         >
           {this.props.children}
 
@@ -302,7 +303,7 @@ export default class Form extends React.Component {
     Object.entries(this.props.formData).forEach(([key, value]) => {
       const field = this.getFieldContext(key);
 
-      if (field) {
+      if (field && field.value !== value) {
         field.setValue(value);
       }
     });

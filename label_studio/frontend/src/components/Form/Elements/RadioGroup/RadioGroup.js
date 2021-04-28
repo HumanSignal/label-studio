@@ -15,8 +15,6 @@ export const RadioGroup = ({label, className, validate, required, skip, simple, 
     onChange?.(value);
   };
 
-  console.log('render radio');
-
   const field = (
     <FormField
       name={props.name}
