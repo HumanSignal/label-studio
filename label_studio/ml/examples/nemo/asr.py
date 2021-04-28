@@ -3,7 +3,7 @@ import logging
 import nemo
 import nemo.collections.asr as nemo_asr
 
-from label_studio.ml import LabelStudioMLBase
+from label_studio_ml.model import LabelStudioMLBase
 
 
 logger = logging.getLogger(__name__)

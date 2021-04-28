@@ -1,8 +1,8 @@
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from lxml import etree
 
-from label_studio.ml import LabelStudioMLBase
-from label_studio.ml.utils import get_single_tag_keys
+from label_studio_ml.model import LabelStudioMLBase
+from label_studio_ml.utils import get_single_tag_keys
 
 
 class DialoGPTSimpleGenerator(LabelStudioMLBase):

@@ -3,9 +3,9 @@ import logging
 
 from mmdet.apis import init_detector, inference_detector
 
-from label_studio.ml import LabelStudioMLBase
-from label_studio.ml.utils import get_image_local_path, get_image_size, get_single_tag_keys
-from label_studio.utils.io import json_load
+from label_studio_ml.model import LabelStudioMLBase
+from label_studio_ml.utils import get_image_local_path, get_image_size, get_single_tag_keys
+from label_studio_utils.io import json_load
 
 
 logger = logging.getLogger(__name__)
