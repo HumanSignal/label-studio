@@ -6794,75 +6794,42 @@ const Preview = ({
 }) => {
   var _error$validation_err, _error$validation_err2, _error$validation_err3, _error$validation_err4, _error$validation_err5, _error$validation_err6, _error$validation_err7, _error$validation_err8;
 
-  const [page, setPage] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)("");
   const LabelStudio = (0,_providers_LibraryProvider__WEBPACK_IMPORTED_MODULE_2__.useLibrary)('lsf');
+  const lsfRoot = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
   const lsf = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     if (!LabelStudio) return;
+    if (!lsfRoot.current) return;
     if (error) return;
     if (!data) return;
-    const inPlace = true;
+    const LSF = window.LabelStudio;
 
-    if (inPlace) {
-      const LSF = window.LabelStudio;
+    try {
+      var _lsf$current;
 
-      try {
-        var _lsf$current;
-
-        (_lsf$current = lsf.current) === null || _lsf$current === void 0 ? void 0 : _lsf$current.destroy();
-        lsf.current = new LSF('label-studio', {
-          config: config || _Template__WEBPACK_IMPORTED_MODULE_5__.EMPTY_CONFIG,
-          // empty string causes error in LSF
-          interfaces: ["side-column"],
-          task: {
-            annotations: [],
-            predictions: [],
-            id: 1,
-            data
-          },
-          onLabelStudioLoad: function (LS) {
-            LS.settings.bottomSidePanel = true;
-            var c = LS.annotationStore.addAnnotation({
-              userGenerate: true
-            });
-            LS.annotationStore.selectAnnotation(c.id);
-          }
-        });
-      } catch (e) {
-        console.error(e);
-      }
-    } else {
-      const page = `
-        <div id="ls"></div>
-        <script>
-        const LSF = window.parent.LabelStudio;
-        new LSF('ls', {
-          config: '<View><Image value="$image" /></View>',
-          interfaces: [
-            "panel",
-            "controls",
-            "side-column",
-          ],
-          task: {
-            annotations: [],
-            predictions: [],
-            id: 1,
-            data: {
-              image: "https://htx-misc.s3.amazonaws.com/opensource/label-studio/examples/images/nick-owuor-astro-nic-visuals-wDifg5xc9Z4-unsplash.jpg"
-            }
-          },
-          onLabelStudioLoad: function(LS) {
-            var c = LS.annotationStore.addAnnotation({
-              userGenerate: true
-            });
-            LS.annotationStore.selectAnnotation(c.id);
-          }
-        });
-        </script>
-        `;
-      setPage(page);
+      (_lsf$current = lsf.current) === null || _lsf$current === void 0 ? void 0 : _lsf$current.destroy();
+      lsf.current = new LSF(lsfRoot.current, {
+        config: config || _Template__WEBPACK_IMPORTED_MODULE_5__.EMPTY_CONFIG,
+        // empty string causes error in LSF
+        interfaces: ["side-column"],
+        task: {
+          annotations: [],
+          predictions: [],
+          id: 1,
+          data
+        },
+        onLabelStudioLoad: function (LS) {
+          LS.settings.bottomSidePanel = true;
+          var c = LS.annotationStore.addAnnotation({
+            userGenerate: true
+          });
+          LS.annotationStore.selectAnnotation(c.id);
+        }
+      });
+    } catch (e) {
+      console.error(e);
     }
-  }, [config, data, LabelStudio]);
+  }, [config, data, LabelStudio, lsfRoot]);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)("div", {
     className: configClass.elem("preview"),
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("h3", {
@@ -6884,7 +6851,8 @@ const Preview = ({
         height: "50vh"
       }
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("div", {
-      id: "label-studio"
+      id: "label-studio",
+      ref: lsfRoot
     })]
   });
 };
