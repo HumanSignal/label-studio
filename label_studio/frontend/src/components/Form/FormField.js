@@ -77,5 +77,5 @@ export const FormField = React.forwardRef(({
     return () => context?.unregisterField(name);
   }, [field, setValueCallback]);
 
-  return children(field, dependencyField);
+  return children(field, dependencyField, context);
 });
