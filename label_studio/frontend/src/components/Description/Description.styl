@@ -6,12 +6,19 @@
   &_size
     &_small
       font-size 12px
-      margin 16px 0
 
     &_medium
       font-size 16px
-      margin 32px 0
 
     &_large
       font-size 22px
+
+  &:not(&_noOffset)&_size
+    &_small
+      margin 16px 0
+
+    &_medium
+      margin 32px 0
+
+    &_large
       margin 40px 0

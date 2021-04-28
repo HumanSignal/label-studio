@@ -9,6 +9,7 @@ import { Counter, Input, Select, Toggle } from './Elements';
 import './Form.styl';
 import { FormContext, FormResponseContext, FormStateContext, FormSubmissionContext, FormValidationContext } from './FormContext';
 import * as Validators from './Validation/Validators';
+import { debounce } from '../../utils/debounce';
 
 export default class Form extends React.Component {
   state = {
@@ -116,15 +117,21 @@ export default class Form extends React.Component {
     }
   }
 
+  _onAutoSubmit = () => {
+    this.validateFields();
+
+    if (!this.validation.size) {
+      this.submit();
+    }
+  }
+
+  onAutoSubmit = this.props.debounce ? debounce(this._onAutoSubmit, this.props.debounce) : this._onAutoSubmit
+
   onFormChanged = async (e) => {
     this.props.onChange?.(e);
 
     if (this.props.autosubmit) {
-      this.validateFields();
-
-      if (!this.validation.size) {
-        this.submit();
-      }
+      this.onAutoSubmit();
     }
   }
 

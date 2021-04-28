@@ -8,9 +8,10 @@
     "test": "CSS_PREFIX='ls-' jest",
     "build": "webpack",
     "build:production": "NODE_ENV=production webpack",
-    "download": "npm run download-editor && npm run download-dm && npm run build",
-    "download-editor": "NO_BUILD=true node get-build.js lsf feature/rename-completions",
-    "download-dm": "NO_BUILD=true node get-build.js dm master"
+    "download:all": "npm run download:editor && npm run download:dm && npm run build",
+    "download:editor": "npm run download -- lsf feature/ui-update",
+    "download:dm": "npm run download -- dm feature/lsf-ui",
+    "download": "NO_BUILD=true node get-build.js"
   },
   "keywords": [],
   "browser": {},
