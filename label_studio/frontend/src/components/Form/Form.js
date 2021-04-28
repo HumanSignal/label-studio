@@ -1,7 +1,9 @@
 import React, { useContext } from 'react';
+import { shallowEqualObjects } from 'shallow-equal';
 import { ApiProvider } from '../../providers/ApiProvider';
 import { MultiProvider } from '../../providers/MultiProvider';
 import { Block, cn, Elem } from '../../utils/bem';
+import { debounce } from '../../utils/debounce';
 import { objectClean } from '../../utils/helpers';
 import { Oneof } from '../Oneof/Oneof';
 import { Space } from '../Space/Space';
@@ -9,7 +11,6 @@ import { Counter, Input, Select, Toggle } from './Elements';
 import './Form.styl';
 import { FormContext, FormResponseContext, FormStateContext, FormSubmissionContext, FormValidationContext } from './FormContext';
 import * as Validators from './Validation/Validators';
-import { debounce } from '../../utils/debounce';
 
 export default class Form extends React.Component {
   state = {
@@ -37,7 +38,9 @@ export default class Form extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.formData && prevProps.formData !== this.props.formData) {
+    const equal = shallowEqualObjects(prevProps.formData ?? {}, this.props.formData ?? {});
+
+    if (!equal) {
       this.fillFormData();
     }
   }
@@ -130,8 +133,14 @@ export default class Form extends React.Component {
   onFormChanged = async (e) => {
     this.props.onChange?.(e);
 
+    this.autosubmit();
+  }
+
+  autosubmit() {
     if (this.props.autosubmit) {
-      this.onAutoSubmit();
+      setTimeout(() => {
+        this.onAutoSubmit();
+      }, 100);
     }
   }
 
@@ -176,11 +185,12 @@ export default class Form extends React.Component {
 
     const rawAction = this.formElement.current.getAttribute("action");
     const useApi = this.api.isValidMethod(rawAction);
-    const body = this.assembleFormData({ asJSON: useApi });
+    const data = this.assembleFormData({ asJSON: useApi });
+    const body = this.props.prepareData?.(data) ?? data;
     let success = false;
 
     if (useApi) {
-      success = await this.sumbmitWithAPI(rawAction, body);
+      success = await this.submitWithAPI(rawAction, body);
     } else {
       success = await this.submitWithFetch(body);
     }
@@ -195,7 +205,7 @@ export default class Form extends React.Component {
     });
   }
 
-  async sumbmitWithAPI(action, body) {
+  async submitWithAPI(action, body) {
     const urlParams = objectClean(this.props.params ?? {});
     const response = await this.api.callApi(action, {
       params: urlParams,
@@ -216,9 +226,7 @@ export default class Form extends React.Component {
   async submitWithFetch(body) {
     const action = this.formElement.current.action;
     const method = (this.props.method ?? 'POST').toUpperCase();
-    const response = await fetch(action, {
-      method, body: body,
-    });
+    const response = await fetch(action, { method, body });
 
     try {
       const result = await response.json();
@@ -295,7 +303,7 @@ export default class Form extends React.Component {
     Object.entries(this.props.formData).forEach(([key, value]) => {
       const field = this.getFieldContext(key);
 
-      if (field) {
+      if (field && field.value !== value) {
         field.setValue(value);
       }
     });

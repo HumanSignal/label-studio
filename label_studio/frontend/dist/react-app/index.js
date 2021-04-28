@@ -3355,7 +3355,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const RadioContext = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createContext();
+const RadioContext = /*#__PURE__*/(0,react__WEBPACK_IMPORTED_MODULE_0__.createContext)();
 const {
   Block,
   Elem
@@ -3366,6 +3366,7 @@ const RadioGroup = ({
   validate,
   required,
   skip,
+  simple,
   labelProps,
   size,
   value,
@@ -3373,7 +3374,7 @@ const RadioGroup = ({
   children,
   ...props
 }) => {
-  const [currentValue, setCurrentValue] = react__WEBPACK_IMPORTED_MODULE_0__.useState(value);
+  const [currentValue, setCurrentValue] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(value);
 
   const onRadioChange = value => {
     setCurrentValue(value);
@@ -3388,16 +3389,21 @@ const RadioGroup = ({
     skip: skip,
     setValue: value => setCurrentValue(value),
     ...props,
-    children: ref => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(RadioContext.Provider, {
+    children: (ref, dep, form) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(RadioContext.Provider, {
       value: {
         value: currentValue,
-        onChange: onRadioChange,
-        setValue: setCurrentValue
+        onChange: value => {
+          onRadioChange(value);
+          form.autosubmit();
+        },
+        setValue: setCurrentValue,
+        isSimple: simple === true
       },
       children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsxs)(Block, {
         name: "radio-group",
         mod: {
-          size
+          size,
+          simple
         },
         mix: className,
         children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("input", {
@@ -3424,18 +3430,23 @@ const RadioButton = ({
   value,
   disabled,
   children,
+  label,
+  description,
   ...props
 }) => {
   const {
     onChange,
     setValue,
-    value: currentValue
-  } = react__WEBPACK_IMPORTED_MODULE_0__.useContext(RadioContext);
+    value: currentValue,
+    isSimple
+  } = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(RadioContext);
   const checked = value === currentValue;
-  const clickHandler = react__WEBPACK_IMPORTED_MODULE_0__.useCallback(() => {
+  const clickHandler = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(e => {
+    e.preventDefault();
+    e.stopPropagation();
     onChange(value);
   }, [value]);
-  react__WEBPACK_IMPORTED_MODULE_0__.useEffect(() => {
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     if (props.checked) setValue(value);
   }, [props.checked]);
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(Elem, {
@@ -3444,8 +3455,18 @@ const RadioButton = ({
       checked,
       disabled
     },
-    onClick: clickHandler,
-    children: children
+    onClickCapture: clickHandler,
+    children: isSimple ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(___WEBPACK_IMPORTED_MODULE_1__.Label, {
+      placement: "right",
+      text: label,
+      description: description,
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("input", {
+        type: "radio",
+        value: value,
+        checked: checked,
+        readOnly: true
+      })
+    }) : children
   });
 };
 
@@ -3716,19 +3737,21 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ Form)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var _providers_ApiProvider__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../providers/ApiProvider */ "./src/providers/ApiProvider.js");
-/* harmony import */ var _providers_MultiProvider__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../providers/MultiProvider */ "./src/providers/MultiProvider.js");
-/* harmony import */ var _utils_bem__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../utils/bem */ "./src/utils/bem.tsx");
-/* harmony import */ var _utils_helpers__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../utils/helpers */ "./src/utils/helpers.js");
-/* harmony import */ var _Oneof_Oneof__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../Oneof/Oneof */ "./src/components/Oneof/Oneof.js");
-/* harmony import */ var _Space_Space__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../Space/Space */ "./src/components/Space/Space.js");
-/* harmony import */ var _Elements__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./Elements */ "./src/components/Form/Elements/index.js");
-/* harmony import */ var _Form_styl__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./Form.styl */ "./src/components/Form/Form.styl");
-/* harmony import */ var _FormContext__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./FormContext */ "./src/components/Form/FormContext.js");
-/* harmony import */ var _Validation_Validators__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./Validation/Validators */ "./src/components/Form/Validation/Validators.js");
-/* harmony import */ var _utils_debounce__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../../utils/debounce */ "./src/utils/debounce.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+/* harmony import */ var shallow_equal__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! shallow-equal */ "./node_modules/shallow-equal/dist/index.esm.js");
+/* harmony import */ var _providers_ApiProvider__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../providers/ApiProvider */ "./src/providers/ApiProvider.js");
+/* harmony import */ var _providers_MultiProvider__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../providers/MultiProvider */ "./src/providers/MultiProvider.js");
+/* harmony import */ var _utils_bem__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../utils/bem */ "./src/utils/bem.tsx");
+/* harmony import */ var _utils_debounce__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../utils/debounce */ "./src/utils/debounce.js");
+/* harmony import */ var _utils_helpers__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../utils/helpers */ "./src/utils/helpers.js");
+/* harmony import */ var _Oneof_Oneof__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../Oneof/Oneof */ "./src/components/Oneof/Oneof.js");
+/* harmony import */ var _Space_Space__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../Space/Space */ "./src/components/Space/Space.js");
+/* harmony import */ var _Elements__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./Elements */ "./src/components/Form/Elements/index.js");
+/* harmony import */ var _Form_styl__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./Form.styl */ "./src/components/Form/Form.styl");
+/* harmony import */ var _FormContext__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./FormContext */ "./src/components/Form/FormContext.js");
+/* harmony import */ var _Validation_Validators__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./Validation/Validators */ "./src/components/Form/Validation/Validators.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 
@@ -3787,16 +3810,13 @@ class Form extends react__WEBPACK_IMPORTED_MODULE_0__.Component {
       }
     });
 
-    _defineProperty(this, "onAutoSubmit", this.props.debounce ? (0,_utils_debounce__WEBPACK_IMPORTED_MODULE_11__.debounce)(this._onAutoSubmit, this.props.debounce) : this._onAutoSubmit);
+    _defineProperty(this, "onAutoSubmit", this.props.debounce ? (0,_utils_debounce__WEBPACK_IMPORTED_MODULE_5__.debounce)(this._onAutoSubmit, this.props.debounce) : this._onAutoSubmit);
 
     _defineProperty(this, "onFormChanged", async e => {
       var _this$props$onChange, _this$props;
 
       (_this$props$onChange = (_this$props = this.props).onChange) === null || _this$props$onChange === void 0 ? void 0 : _this$props$onChange.call(_this$props, e);
-
-      if (this.props.autosubmit) {
-        this.onAutoSubmit();
-      }
+      this.autosubmit();
     });
   }
 
@@ -3811,36 +3831,40 @@ class Form extends react__WEBPACK_IMPORTED_MODULE_0__.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.formData && prevProps.formData !== this.props.formData) {
+    var _prevProps$formData, _this$props$formData;
+
+    const equal = (0,shallow_equal__WEBPACK_IMPORTED_MODULE_1__.shallowEqualObjects)((_prevProps$formData = prevProps.formData) !== null && _prevProps$formData !== void 0 ? _prevProps$formData : {}, (_this$props$formData = this.props.formData) !== null && _this$props$formData !== void 0 ? _this$props$formData : {});
+
+    if (!equal) {
       this.fillFormData();
     }
   }
 
   render() {
-    const providers = [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_FormContext__WEBPACK_IMPORTED_MODULE_9__.FormContext.Provider, {
+    const providers = [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_FormContext__WEBPACK_IMPORTED_MODULE_11__.FormContext.Provider, {
       value: this
-    }, "form-ctx"), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_FormContext__WEBPACK_IMPORTED_MODULE_9__.FormValidationContext.Provider, {
+    }, "form-ctx"), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_FormContext__WEBPACK_IMPORTED_MODULE_11__.FormValidationContext.Provider, {
       value: this.state.validation
-    }, "form-validation-ctx"), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_FormContext__WEBPACK_IMPORTED_MODULE_9__.FormSubmissionContext.Provider, {
+    }, "form-validation-ctx"), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_FormContext__WEBPACK_IMPORTED_MODULE_11__.FormSubmissionContext.Provider, {
       value: this.state.submitting
-    }, "form-submission-ctx"), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_FormContext__WEBPACK_IMPORTED_MODULE_9__.FormStateContext.Provider, {
+    }, "form-submission-ctx"), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_FormContext__WEBPACK_IMPORTED_MODULE_11__.FormStateContext.Provider, {
       value: this.state.state
-    }, "form-state-ctx"), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_FormContext__WEBPACK_IMPORTED_MODULE_9__.FormResponseContext.Provider, {
+    }, "form-state-ctx"), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_FormContext__WEBPACK_IMPORTED_MODULE_11__.FormResponseContext.Provider, {
       value: this.state.lastResponse
-    }, "form-response"), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_providers_ApiProvider__WEBPACK_IMPORTED_MODULE_1__.ApiProvider, {
+    }, "form-response"), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_providers_ApiProvider__WEBPACK_IMPORTED_MODULE_2__.ApiProvider, {
       ref: this.apiRef
     }, "form-api")];
-    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_providers_MultiProvider__WEBPACK_IMPORTED_MODULE_2__.MultiProvider, {
+    return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_providers_MultiProvider__WEBPACK_IMPORTED_MODULE_3__.MultiProvider, {
       providers: providers,
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)("form", {
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)("form", {
         ref: this.formElement,
-        className: (0,_utils_bem__WEBPACK_IMPORTED_MODULE_3__.cn)('form'),
+        className: (0,_utils_bem__WEBPACK_IMPORTED_MODULE_4__.cn)('form'),
         action: this.props.action,
         onSubmit: this.onFormSubmitted,
         onChange: this.onFormChanged,
         autoComplete: this.props.autoComplete,
         autoSave: this.props.autoSave,
-        children: [this.props.children, this.state.validation && this.state.showValidation && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(ValidationRenderer, {
+        children: [this.props.children, this.state.validation && this.state.showValidation && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(ValidationRenderer, {
           validation: this.state.validation
         })]
       })
@@ -3883,6 +3907,14 @@ class Form extends react__WEBPACK_IMPORTED_MODULE_0__.Component {
     this.setState({
       showValidation: true
     });
+  }
+
+  autosubmit() {
+    if (this.props.autosubmit) {
+      setTimeout(() => {
+        this.onAutoSubmit();
+      }, 100);
+    }
   }
 
   assembleFormData({
@@ -3930,19 +3962,22 @@ class Form extends react__WEBPACK_IMPORTED_MODULE_0__.Component {
   }
 
   async submit() {
+    var _this$props$prepareDa, _this$props$prepareDa2, _this$props2;
+
     this.setState({
       submitting: true,
       lastResponse: null
     });
     const rawAction = this.formElement.current.getAttribute("action");
     const useApi = this.api.isValidMethod(rawAction);
-    const body = this.assembleFormData({
+    const data = this.assembleFormData({
       asJSON: useApi
     });
+    const body = (_this$props$prepareDa = (_this$props$prepareDa2 = (_this$props2 = this.props).prepareData) === null || _this$props$prepareDa2 === void 0 ? void 0 : _this$props$prepareDa2.call(_this$props2, data)) !== null && _this$props$prepareDa !== void 0 ? _this$props$prepareDa : data;
     let success = false;
 
     if (useApi) {
-      success = await this.sumbmitWithAPI(rawAction, body);
+      success = await this.submitWithAPI(rawAction, body);
     } else {
       success = await this.submitWithFetch(body);
     }
@@ -3959,10 +3994,10 @@ class Form extends react__WEBPACK_IMPORTED_MODULE_0__.Component {
     });
   }
 
-  async sumbmitWithAPI(action, body) {
+  async submitWithAPI(action, body) {
     var _this$props$params;
 
-    const urlParams = (0,_utils_helpers__WEBPACK_IMPORTED_MODULE_4__.objectClean)((_this$props$params = this.props.params) !== null && _this$props$params !== void 0 ? _this$props$params : {});
+    const urlParams = (0,_utils_helpers__WEBPACK_IMPORTED_MODULE_6__.objectClean)((_this$props$params = this.props.params) !== null && _this$props$params !== void 0 ? _this$props$params : {});
     const response = await this.api.callApi(action, {
       params: urlParams,
       body
@@ -3972,14 +4007,14 @@ class Form extends react__WEBPACK_IMPORTED_MODULE_0__.Component {
     });
 
     if (response === null) {
-      var _this$props$onError, _this$props2;
+      var _this$props$onError, _this$props3;
 
-      (_this$props$onError = (_this$props2 = this.props).onError) === null || _this$props$onError === void 0 ? void 0 : _this$props$onError.call(_this$props2);
+      (_this$props$onError = (_this$props3 = this.props).onError) === null || _this$props$onError === void 0 ? void 0 : _this$props$onError.call(_this$props3);
       return false;
     } else {
-      var _this$props$onSubmit, _this$props3;
+      var _this$props$onSubmit, _this$props4;
 
-      (_this$props$onSubmit = (_this$props3 = this.props).onSubmit) === null || _this$props$onSubmit === void 0 ? void 0 : _this$props$onSubmit.call(_this$props3, response);
+      (_this$props$onSubmit = (_this$props4 = this.props).onSubmit) === null || _this$props$onSubmit === void 0 ? void 0 : _this$props$onSubmit.call(_this$props4, response);
       return true;
     }
   }
@@ -3991,7 +4026,7 @@ class Form extends react__WEBPACK_IMPORTED_MODULE_0__.Component {
     const method = ((_this$props$method = this.props.method) !== null && _this$props$method !== void 0 ? _this$props$method : 'POST').toUpperCase();
     const response = await fetch(action, {
       method,
-      body: body
+      body
     });
 
     try {
@@ -4015,20 +4050,20 @@ class Form extends react__WEBPACK_IMPORTED_MODULE_0__.Component {
       }
 
       if (response.ok) {
-        var _this$props$onSubmit2, _this$props4;
+        var _this$props$onSubmit2, _this$props5;
 
-        (_this$props$onSubmit2 = (_this$props4 = this.props).onSubmit) === null || _this$props$onSubmit2 === void 0 ? void 0 : _this$props$onSubmit2.call(_this$props4, result);
+        (_this$props$onSubmit2 = (_this$props5 = this.props).onSubmit) === null || _this$props$onSubmit2 === void 0 ? void 0 : _this$props$onSubmit2.call(_this$props5, result);
         return true;
       } else {
-        var _this$props$onError2, _this$props5;
+        var _this$props$onError2, _this$props6;
 
-        (_this$props$onError2 = (_this$props5 = this.props).onError) === null || _this$props$onError2 === void 0 ? void 0 : _this$props$onError2.call(_this$props5, result);
+        (_this$props$onError2 = (_this$props6 = this.props).onError) === null || _this$props$onError2 === void 0 ? void 0 : _this$props$onError2.call(_this$props6, result);
       }
     } catch (err) {
-      var _this$props$onError3, _this$props6;
+      var _this$props$onError3, _this$props7;
 
       console.log(err);
-      (_this$props$onError3 = (_this$props6 = this.props).onError) === null || _this$props$onError3 === void 0 ? void 0 : _this$props$onError3.call(_this$props6, err);
+      (_this$props$onError3 = (_this$props7 = this.props).onError) === null || _this$props$onError3 === void 0 ? void 0 : _this$props$onError3.call(_this$props7, err);
     }
 
     return false;
@@ -4084,7 +4119,7 @@ class Form extends react__WEBPACK_IMPORTED_MODULE_0__.Component {
     Object.entries(this.props.formData).forEach(([key, value]) => {
       const field = this.getFieldContext(key);
 
-      if (field) {
+      if (field && field.value !== value) {
         field.setValue(value);
       }
     });
@@ -4095,18 +4130,18 @@ class Form extends react__WEBPACK_IMPORTED_MODULE_0__.Component {
 const ValidationRenderer = ({
   validation
 }) => {
-  const rootClass = (0,_utils_bem__WEBPACK_IMPORTED_MODULE_3__.cn)('form-validation');
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("div", {
+  const rootClass = (0,_utils_bem__WEBPACK_IMPORTED_MODULE_4__.cn)('form-validation');
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)("div", {
     className: rootClass,
-    children: Array.from(validation).map(([name, result]) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)("div", {
+    children: Array.from(validation).map(([name, result]) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)("div", {
       className: rootClass.elem('group'),
       onClick: () => result.field.focus(),
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("div", {
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)("div", {
         className: rootClass.elem('field'),
         children: result.label
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("div", {
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)("div", {
         className: rootClass.elem('messages'),
-        children: result.messages.map((message, i) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("div", {
+        children: result.messages.map((message, i) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)("div", {
           className: rootClass.elem('message'),
           children: message
         }, `${name}-${i}`))
@@ -4115,7 +4150,7 @@ const ValidationRenderer = ({
   });
 };
 
-Form.Validator = _Validation_Validators__WEBPACK_IMPORTED_MODULE_10__;
+Form.Validator = _Validation_Validators__WEBPACK_IMPORTED_MODULE_12__;
 
 Form.Row = ({
   columnCount,
@@ -4126,8 +4161,8 @@ Form.Row = ({
   const styles = {};
   if (columnCount) styles['--column-count'] = columnCount;
   if (rowGap) styles['--row-gap'] = rowGap;
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("div", {
-    className: (0,_utils_bem__WEBPACK_IMPORTED_MODULE_3__.cn)('form').elem('row'),
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)("div", {
+    className: (0,_utils_bem__WEBPACK_IMPORTED_MODULE_4__.cn)('form').elem('row'),
     style: { ...(style !== null && style !== void 0 ? style : {}),
       ...styles
     },
@@ -4143,31 +4178,31 @@ Form.Builder = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(({
 }, ref) => {
   const renderFields = fields => {
     return fields.map((field, index) => {
-      if (!field) return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("div", {}, `spacer-${index}`);
+      if (!field) return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)("div", {}, `spacer-${index}`);
       const defaultValue = (formData === null || formData === void 0 ? void 0 : formData[field.name]) || undefined;
 
       if (field.type === 'select') {
         var _field$name, _field$value;
 
-        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_Elements__WEBPACK_IMPORTED_MODULE_7__.Select, { ...field,
+        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_Elements__WEBPACK_IMPORTED_MODULE_9__.Select, { ...field,
           value: (_field$value = field.value) !== null && _field$value !== void 0 ? _field$value : defaultValue
         }, (_field$name = field.name) !== null && _field$name !== void 0 ? _field$name : index);
       } else if (field.type === 'counter') {
         var _field$name2, _field$value2;
 
-        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_Elements__WEBPACK_IMPORTED_MODULE_7__.Counter, { ...field,
+        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_Elements__WEBPACK_IMPORTED_MODULE_9__.Counter, { ...field,
           value: (_field$value2 = field.value) !== null && _field$value2 !== void 0 ? _field$value2 : defaultValue
         }, (_field$name2 = field.name) !== null && _field$name2 !== void 0 ? _field$name2 : index);
       } else if (field.type === 'toggle') {
         var _field$name3, _field$value3;
 
-        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_Elements__WEBPACK_IMPORTED_MODULE_7__.Toggle, { ...field,
+        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_Elements__WEBPACK_IMPORTED_MODULE_9__.Toggle, { ...field,
           checked: (_field$value3 = field.value) !== null && _field$value3 !== void 0 ? _field$value3 : defaultValue
         }, (_field$name3 = field.name) !== null && _field$name3 !== void 0 ? _field$name3 : index);
       } else {
         var _field$name4, _field$value4;
 
-        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_Elements__WEBPACK_IMPORTED_MODULE_7__.Input, { ...field,
+        return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_Elements__WEBPACK_IMPORTED_MODULE_9__.Input, { ...field,
           defaultValue: (_field$value4 = field.value) !== null && _field$value4 !== void 0 ? _field$value4 : defaultValue
         }, (_field$name4 = field.name) !== null && _field$name4 !== void 0 ? _field$name4 : index);
       }
@@ -4175,8 +4210,8 @@ Form.Builder = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(({
   };
 
   const renderColumns = columns => {
-    return columns.map((col, index) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("div", {
-      className: (0,_utils_bem__WEBPACK_IMPORTED_MODULE_3__.cn)('form').elem('column'),
+    return columns.map((col, index) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)("div", {
+      className: (0,_utils_bem__WEBPACK_IMPORTED_MODULE_4__.cn)('form').elem('column'),
       style: {
         width: col.width
       },
@@ -4184,13 +4219,13 @@ Form.Builder = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(({
     }, index));
   };
 
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)(Form, { ...props,
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)(Form, { ...props,
     ref: ref,
     children: [fields.map(({
       columnCount,
       fields,
       columns
-    }, index) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(Form.Row, {
+    }, index) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(Form.Row, {
       columnCount: columnCount,
       children: columns ? renderColumns(columns) : renderFields(fields)
     }, index)), children]
@@ -4203,29 +4238,29 @@ Form.Actions = ({
   extra,
   size
 }) => {
-  const rootClass = (0,_utils_bem__WEBPACK_IMPORTED_MODULE_3__.cn)('form');
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsxs)("div", {
+  const rootClass = (0,_utils_bem__WEBPACK_IMPORTED_MODULE_4__.cn)('form');
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsxs)("div", {
     className: rootClass.elem('submit').mod({
       size
     }),
-    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("div", {
+    children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)("div", {
       className: rootClass.elem('info').mod({
         valid
       }),
       children: extra
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_Space_Space__WEBPACK_IMPORTED_MODULE_6__.Space, {
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_Space_Space__WEBPACK_IMPORTED_MODULE_8__.Space, {
       children: children
     })]
   });
 };
 
 Form.Indicator = () => {
-  const state = react__WEBPACK_IMPORTED_MODULE_0__.useContext(_FormContext__WEBPACK_IMPORTED_MODULE_9__.FormStateContext);
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_3__.Block, {
+  const state = react__WEBPACK_IMPORTED_MODULE_0__.useContext(_FormContext__WEBPACK_IMPORTED_MODULE_11__.FormStateContext);
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_4__.Block, {
     name: "form-indicator",
-    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_Oneof_Oneof__WEBPACK_IMPORTED_MODULE_5__.Oneof, {
+    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_Oneof_Oneof__WEBPACK_IMPORTED_MODULE_7__.Oneof, {
       value: state,
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_3__.Elem, {
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_4__.Elem, {
         tag: "span",
         mod: {
           type: state
@@ -4247,8 +4282,8 @@ Form.ResponseParser = ({
     throw new Error("Response Parser only accepts function as a child");
   }
 
-  const response = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(_FormContext__WEBPACK_IMPORTED_MODULE_9__.FormResponseContext);
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.Fragment, {
+  const response = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(_FormContext__WEBPACK_IMPORTED_MODULE_11__.FormResponseContext);
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.jsx)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_13__.Fragment, {
     children: response ? callback(response) : null
   });
 };
@@ -4302,7 +4337,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const FormField = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(({
+const FormField = /*#__PURE__*/(0,react__WEBPACK_IMPORTED_MODULE_0__.forwardRef)(({
   label,
   name,
   children,
@@ -4314,12 +4349,12 @@ const FormField = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(({
   ...props
 }, ref) => {
   /**@type {Form} */
-  const context = react__WEBPACK_IMPORTED_MODULE_0__.useContext(_FormContext__WEBPACK_IMPORTED_MODULE_1__.FormContext);
-  const [dependencyField, setDependencyField] = react__WEBPACK_IMPORTED_MODULE_0__.useState(null);
-  const field = ref !== null && ref !== void 0 ? ref : react__WEBPACK_IMPORTED_MODULE_0__.useRef();
+  const context = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(_FormContext__WEBPACK_IMPORTED_MODULE_1__.FormContext);
+  const [dependencyField, setDependencyField] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null);
+  const field = ref !== null && ref !== void 0 ? ref : (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
   const validation = [...(validate !== null && validate !== void 0 ? validate : [])];
   if (required) validation.push(_Validation_Validators__WEBPACK_IMPORTED_MODULE_2__.required);
-  react__WEBPACK_IMPORTED_MODULE_0__.useEffect(() => {
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     if (!context || !dependency) return;
     let field = null;
     const dep = context.getFieldContext(dependency);
@@ -4340,7 +4375,7 @@ const FormField = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(({
     setDependencyField(field);
     return () => dep.field.removeEventListener('change', handler);
   }, [context, field, dependency]);
-  const setValueCallback = react__WEBPACK_IMPORTED_MODULE_0__.useCallback(value => {
+  const setValueCallback = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(value => {
     if (!field || !field.current) return;
     /**@type {HTMLInputElement|HTMLTextAreaElement} */
 
@@ -4358,7 +4393,7 @@ const FormField = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(({
     evt.initEvent("change", false, true);
     input.dispatchEvent(evt);
   }, [field]);
-  react__WEBPACK_IMPORTED_MODULE_0__.useEffect(() => {
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
     context === null || context === void 0 ? void 0 : context.registerField({
       label,
       name,
@@ -4369,7 +4404,7 @@ const FormField = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(({
     });
     return () => context === null || context === void 0 ? void 0 : context.unregisterField(name);
   }, [field, setValueCallback]);
-  return children(field, dependencyField);
+  return children(field, dependencyField, context);
 });
 
 /***/ }),
@@ -9892,11 +9927,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../components */ "./src/components/index.js");
 /* harmony import */ var _components_Form__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../components/Form */ "./src/components/Form/index.js");
 /* harmony import */ var _components_Form_Elements_RadioGroup_RadioGroup__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../components/Form/Elements/RadioGroup/RadioGroup */ "./src/components/Form/Elements/RadioGroup/RadioGroup.js");
-/* harmony import */ var _components_Menubar_Menubar__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../components/Menubar/Menubar */ "./src/components/Menubar/Menubar.js");
-/* harmony import */ var _providers_ProjectProvider__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../providers/ProjectProvider */ "./src/providers/ProjectProvider.js");
-/* harmony import */ var _utils_bem__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../utils/bem */ "./src/utils/bem.tsx");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
-
+/* harmony import */ var _providers_ProjectProvider__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../providers/ProjectProvider */ "./src/providers/ProjectProvider.js");
+/* harmony import */ var _utils_bem__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../utils/bem */ "./src/utils/bem.tsx");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
 
 
 
@@ -9909,38 +9942,42 @@ const GeneralSettings = () => {
   const {
     project,
     fetchProject
-  } = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(_providers_ProjectProvider__WEBPACK_IMPORTED_MODULE_5__.ProjectContext);
-  const pageContext = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(_components_Menubar_Menubar__WEBPACK_IMPORTED_MODULE_4__.MenubarContext);
-  const formRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
-  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    pageContext.setProps({
-      formRef
-    });
-  }, [formRef]);
+  } = (0,react__WEBPACK_IMPORTED_MODULE_0__.useContext)(_providers_ProjectProvider__WEBPACK_IMPORTED_MODULE_4__.ProjectContext);
+  const updateProject = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(() => {
+    if (project.id) fetchProject(project.id, true);
+  }, [project]);
   const colors = ['#FFFFFF', '#F52B4F', '#FA8C16', '#F6C549', '#9ACA4F', '#51AAFD', '#7F64FF', '#D55C9D'];
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("div", {
+  const samplings = [{
+    value: "Sequential",
+    label: "Sequential",
+    description: "Tasks are ordered by Data manager ordering"
+  }, {
+    value: "Uniform",
+    label: "Uniform",
+    description: "Tasks are chosen randomly"
+  }];
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("div", {
     style: {
       width: 480
     },
-    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_components_Form__WEBPACK_IMPORTED_MODULE_2__.Form, {
-      ref: formRef,
+    children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_components_Form__WEBPACK_IMPORTED_MODULE_2__.Form, {
       action: "updateProject",
       formData: { ...project
       },
       params: {
         pk: project.id
       },
-      onSubmit: () => fetchProject(project.id, true),
-      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_components_Form__WEBPACK_IMPORTED_MODULE_2__.Form.Row, {
+      onSubmit: updateProject,
+      children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_components_Form__WEBPACK_IMPORTED_MODULE_2__.Form.Row, {
         columnCount: 1,
         rowGap: "32px",
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_components_Form__WEBPACK_IMPORTED_MODULE_2__.Input, {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_components_Form__WEBPACK_IMPORTED_MODULE_2__.Input, {
           name: "title",
           label: "Project Name",
           labelProps: {
             large: true
           }
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_components_Form__WEBPACK_IMPORTED_MODULE_2__.TextArea, {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_components_Form__WEBPACK_IMPORTED_MODULE_2__.TextArea, {
           name: "description",
           label: "Description",
           labelProps: {
@@ -9949,30 +9986,46 @@ const GeneralSettings = () => {
           style: {
             minHeight: 128
           }
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_components_Form_Elements_RadioGroup_RadioGroup__WEBPACK_IMPORTED_MODULE_3__.RadioGroup, {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_components_Form_Elements_RadioGroup_RadioGroup__WEBPACK_IMPORTED_MODULE_3__.RadioGroup, {
           name: "color",
           label: "Color",
           size: "large",
           labelProps: {
             size: "large"
           },
-          children: colors.map(color => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_components_Form_Elements_RadioGroup_RadioGroup__WEBPACK_IMPORTED_MODULE_3__.RadioGroup.Button, {
+          children: colors.map(color => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_components_Form_Elements_RadioGroup_RadioGroup__WEBPACK_IMPORTED_MODULE_3__.RadioGroup.Button, {
             value: color,
-            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_6__.Block, {
+            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_utils_bem__WEBPACK_IMPORTED_MODULE_5__.Block, {
               name: "color",
               style: {
                 '--background': color
               }
             })
           }, color))
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_components_Form_Elements_RadioGroup_RadioGroup__WEBPACK_IMPORTED_MODULE_3__.RadioGroup, {
+          label: "Task Sampling",
+          labelProps: {
+            size: "large"
+          },
+          name: "sampling",
+          simple: true,
+          children: samplings.map(({
+            value,
+            label,
+            description
+          }) => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_components_Form_Elements_RadioGroup_RadioGroup__WEBPACK_IMPORTED_MODULE_3__.RadioGroup.Button, {
+            value: `${value} sampling`,
+            label: `${label} sampling`,
+            description: description
+          }, value))
         })]
-      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsxs)(_components_Form__WEBPACK_IMPORTED_MODULE_2__.Form.Actions, {
-        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_components_Form__WEBPACK_IMPORTED_MODULE_2__.Form.Indicator, {
-          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)("span", {
+      }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsxs)(_components_Form__WEBPACK_IMPORTED_MODULE_2__.Form.Actions, {
+        children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_components_Form__WEBPACK_IMPORTED_MODULE_2__.Form.Indicator, {
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("span", {
             case: "success",
             children: "Saved!"
           })
-        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_7__.jsx)(_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_components__WEBPACK_IMPORTED_MODULE_1__.Button, {
           type: "submit",
           look: "primary",
           style: {
@@ -33579,7 +33632,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 // extracted by mini-css-extract-plugin
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({"radio-group":"ls-radio-group","radio-group__buttons":"ls-radio-group__buttons","radio-group__button":"ls-radio-group__button","radio-group__button_checked":"ls-radio-group__button_checked","radio-group__button_disabled":"ls-radio-group__button_disabled","radio-group__input":"ls-radio-group__input","radio-group_size_large":"ls-radio-group_size_large","radio-group_size_compact":"ls-radio-group_size_compact","radio-group_size_small":"ls-radio-group_size_small"});
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({"radio-group":"ls-radio-group","radio-group__buttons":"ls-radio-group__buttons","radio-group__button":"ls-radio-group__button","radio-group__button_checked":"ls-radio-group__button_checked","radio-group__button_disabled":"ls-radio-group__button_disabled","radio-group__input":"ls-radio-group__input","radio-group_size_large":"ls-radio-group_size_large","radio-group_size_compact":"ls-radio-group_size_compact","radio-group_size_small":"ls-radio-group_size_small","radio-group_simple":"ls-radio-group_simple"});
 
 /***/ }),
 
