@@ -1,7 +1,7 @@
 import React, { Fragment, useCallback, useMemo, useState } from 'react';
 import { LsSlack } from '../../assets/icons';
 import { Block, Elem } from '../../utils/bem';
-import { copyText } from '../../utils/helpers';
+import { copyText, absoluteURL } from '../../utils/helpers';
 import { Button } from '../Button/Button';
 import { Space } from '../Space/Space';
 import "./Error.styl";
@@ -27,7 +27,7 @@ export const ErrorWrapper = ({title, message, errorId, stacktrace, validation, v
         <Elem
           tag="img"
           name="heidi"
-          src="/static/images/opossum_broken.svg"
+          src={absoluteURL("/static/images/opossum_broken.svg")}
           height="111"
           alt="Heidi's down"
         />

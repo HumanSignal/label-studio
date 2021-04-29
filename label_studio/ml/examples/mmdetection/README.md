@@ -13,7 +13,7 @@ Check this installation guide and then play around them, pick up the best model 
 
 ## Start using it
 
-1. [Install the model locally](#Installation) or just copy paste this URL: `https://app.labelstud.io/coco-detector`
+1. [Install the model locally](#Installation)
 
 2. Run Label Studio, then go to the **Model** page. Paste the selected ML backend URL then click on **Add Backend**.
 

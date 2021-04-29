@@ -24,6 +24,7 @@ venv/
 deploy/license.txt
 deploy/logs/
 deploy/redis-data/
+deploy/dockerfiles/postgres-data
 
 label_studio/core/media
 label_studio/core/downloads
@@ -40,6 +41,7 @@ archive
 *.rtl.min.css
 *.idea/*
 .vscode/*
+pyrightconfig.json
 tags
 tags.temp
 mydatabase

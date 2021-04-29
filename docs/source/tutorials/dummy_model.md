@@ -34,9 +34,7 @@ If you create ML backend by using Label Studio's ML SDK, you have to follow the 
 Create a file `model.py` with the following content:
 
 ```python
-import random
-
-from label_studio.ml import LabelStudioMLBase
+from label_studio_ml.model import LabelStudioMLBase
 
 
 class DummyModel(LabelStudioMLBase):
@@ -50,7 +48,6 @@ class DummyModel(LabelStudioMLBase):
         self.from_name = from_name
         self.to_name = schema['to_name'][0]
         self.labels = schema['labels']
-        self.model_score = self.train_output['score']
 
     def predict(self, tasks, **kwargs):
         """This is where inference happens: model returns the list of predictions based on input list of tasks"""
@@ -62,16 +59,16 @@ class DummyModel(LabelStudioMLBase):
                     'to_name': self.to_name,
                     'type': 'choices',
                     'value': {
-                        'choices': [random.choice(self.labels)]
+                        'choices': [self.labels[0]]
                     }
                 }],
-                'score': self.model_score
+                'score': 0.987
             })
         return results
 
     def fit(self, completions, **kwargs):
         """This is where training happens: train your model given list of completions, then returns dict with created links and resources"""
-        return {'score': random.uniform(0, 1)}
+        return {'path/to/created/model': 'my/model.bin'}
 ```
 
 ### Create ML backend configs & scripts

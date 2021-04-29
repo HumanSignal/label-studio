@@ -5,7 +5,6 @@ export { Checkbox } from "./Checkbox/Checkbox";
 export { Columns } from "./Columns/Columns";
 export { Dropdown } from "./Dropdown/Dropdown";
 export { Hamburger } from "./Hamburger/Hamburger";
-export { Icon } from "./Icon/Icon";
 export { Menu } from "./Menu/Menu";
 export { Menubar } from "./Menubar/Menubar";
 export { SidebarMenu } from "./SidebarMenu/SidebarMenu";

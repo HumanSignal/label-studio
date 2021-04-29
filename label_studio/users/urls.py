@@ -29,7 +29,7 @@ urlpatterns = [
     url(r'^password-reset/complete/$', views.FPasswordResetCompleteView.as_view(), name='password_reset_complete'),
 
     # avatars
-    re_path(r'^data/' + settings.AVATAR_PATH + '(?P<path>.*)$', serve,
+    re_path(r'^data/' + settings.AVATAR_PATH + '/(?P<path>.*)$', serve,
             kwargs={'document_root': join(settings.MEDIA_ROOT, settings.AVATAR_PATH)}),
 
     # Token

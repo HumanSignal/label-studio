@@ -29,7 +29,7 @@
 
 {% block favicon %}
 {# -- Maybe replace the favicon -- #}
-<link rel="icon" type="image/png" href="{% static 'drf-yasg/redoc/redoc-logo.png' %}"/>
+<link rel="icon" type="image/png" href="{{ settings.HOSTNAME }}{% static 'drf-yasg/redoc/redoc-logo.png' %}"/>
 {% endblock %}
 
 

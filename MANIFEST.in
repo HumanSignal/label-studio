@@ -17,8 +17,6 @@ recursive-include label_studio/core/static_build *
 include label_studio/core/utils/schema/*.json
 include label_studio/core/templatetags/*.py
 include label_studio/core/version_.py
-include label_studio/core/utils/windows_sqlite_fix/sqlite-dll-win64-x64-3350000.zip
-include label_studio/core/utils/windows_sqlite_fix/sqlite-dll-win32-x86-3350100.zip
 
 # io storages
 recursive-include label_studio/io_storages *.yml

@@ -8,3 +8,12 @@ export { default as LsMinus } from './minus.svg';
 export { default as LsPlus } from './plus.svg';
 export { default as LsSettings } from './settings.svg';
 export { default as LsSlack } from './slack.svg';
+
+export { default as IconBell } from './bell.svg';
+export { default as IconBook } from './book.svg';
+export { default as IconFolder } from './folder.svg';
+export { default as IconInfo } from './info.svg';
+export { default as IconPersonInCircle } from './person-circle.svg';
+export { default as IconPin } from './pin.svg';
+export { default as IconTerminal } from './terminal.svg';
+export { default as IconUpload } from './upload.svg';

@@ -13,6 +13,7 @@ from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError
 from django.db.models.fields import DecimalField
+from django.conf import settings
 from drf_yasg.utils import swagger_auto_schema
 from django.db.models import Q, When, Count, Case, OuterRef, Max, Exists, Value, BooleanField
 from rest_framework import generics, status, filters
@@ -23,7 +24,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView, exception_handler
 
 from core.utils.common import conditional_atomic, get_organization_from_request
-from core.label_config import parse_config
+from core.label_config import parse_config, config_essential_data_has_changed
 from organizations.models import Organization
 from organizations.permissions import *
 from projects.functions import (generate_unique_title, duplicate_project)
@@ -121,7 +122,7 @@ class ProjectListAPI(generics.ListCreateAPIView):
         org_pk = get_organization_from_request(self.request)
         org = get_object_with_check_and_log(self.request, Organization, pk=org_pk)
         self.check_object_permissions(self.request, org)
-        return Project.objects.all()
+        return Project.objects.with_counts()
 
     def get_serializer_context(self):
         context = super(ProjectListAPI, self).get_serializer_context()
@@ -171,7 +172,7 @@ class ProjectAPI(APIViewVirtualRedirectMixin,
     Delete a project by specified project ID.
     """
     parser_classes = (JSONParser, FormParser, MultiPartParser)
-    queryset = Project.objects.all()
+    queryset = Project.objects.with_counts()
     permission_classes = (IsAuthenticated, ProjectAPIBasePermission)
     serializer_class = ProjectSerializer
 
@@ -179,7 +180,7 @@ class ProjectAPI(APIViewVirtualRedirectMixin,
     redirect_kwarg = 'pk'
 
     def get_object(self):
-        obj = get_object_with_check_and_log(self.request, Project, pk=self.kwargs['pk'])
+        obj = get_object_with_check_and_log(self.request, Project.objects.with_counts(), pk=self.kwargs['pk'])
         self.check_object_permissions(self.request, obj)
         return obj
 
@@ -194,11 +195,17 @@ class ProjectAPI(APIViewVirtualRedirectMixin,
     @swagger_auto_schema(tags=['Projects'], request_body=ProjectSerializer)
     def patch(self, request, *args, **kwargs):
         project = self.get_object()
-        label_config = self.request.query_params.get('label_config')
+        label_config = self.request.data.get('label_config')
 
         # config changes can break view, so we need to reset them
-        if parse_config(label_config) != parse_config(project.label_config):
-            View.objects.filter(project=project).all().delete()
+        if label_config:
+            try:
+                has_changes = config_essential_data_has_changed(label_config, project.label_config)
+            except KeyError:
+                pass
+            else:
+                if has_changes:
+                    View.objects.filter(project=project).all().delete()
 
         return super(ProjectAPI, self).patch(request, *args, **kwargs)
 
@@ -278,6 +285,20 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
                     return task
             except Task.DoesNotExist:
                 logger.debug('Task with id {} locked'.format(task.id))
+
+    def _get_first_locked_by(self, user, tasks_query):
+        def match(task):
+            # Match task locked by user and discard expired tasks
+            return (
+                task.has_lock()
+                and task.locks.filter(user=user).count() > 0
+            )
+
+        lookup = (
+            task for task in tasks_query.all()
+            if match(task)
+        )
+        return next(lookup, None)
 
     def _try_ground_truth(self, tasks, project):
         """Returns task from ground truth set"""
@@ -420,7 +441,12 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
 
         with conditional_atomic():
             not_solved_tasks = project.prepared_tasks.\
-                exclude(pk__in=user_solved_tasks_array).filter(is_labeled=False)
+                exclude(pk__in=user_solved_tasks_array)
+
+            # if annotator is assigned for tasks, he must to solve it regardless of is_labeled=True
+            if not (hasattr(self, 'assignee_flag') and self.assignee_flag):
+                not_solved_tasks = not_solved_tasks.filter(is_labeled=False)
+
             not_solved_tasks_count = not_solved_tasks.count()
 
             # return nothing if there are no tasks remain
@@ -430,10 +456,14 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
 
             # ordered by data manager
             if external_prepared_tasks_used:
-                next_task = not_solved_tasks.first()
+                use_task_lock = False
+                next_task = self._get_first_locked_by(user, not_solved_tasks)
+                if not next_task:
+                    use_task_lock = True
+                    next_task = self._get_first_unlocked(not_solved_tasks)
                 if not next_task:
                     raise NotFound('No more tasks found')
-                return self._make_response(next_task, request)
+                return self._make_response(next_task, request, use_task_lock=use_task_lock)
 
             # If current user has already lock one task - return it (without setting the lock again)
             next_task = Task.get_locked_by(user, project)
@@ -518,26 +548,14 @@ class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
             raise RestValidationError('Label config is not set or empty')
 
         # check new config includes meaningful changes
-        config_essential_data_has_changed = self.config_essential_data_has_changed(label_config, project.label_config)
+        has_changed = config_essential_data_has_changed(label_config, project.label_config)
 
         project.validate_config(label_config)
-        return Response({'config_essential_data_has_changed': config_essential_data_has_changed}, status=status.HTTP_200_OK)
+        return Response({'config_essential_data_has_changed': has_changed}, status=status.HTTP_200_OK)
 
-    @classmethod
-    def config_essential_data_has_changed(cls, new_config_str, old_config_str):
-        new_config = parse_config(new_config_str)
-        old_config = parse_config(old_config_str)
-
-        for tag, new_info in new_config.items():
-            if tag not in old_config:
-                return True
-            old_info = old_config[tag]
-            if new_info['type'] != old_info['type']:
-                return True
-            if new_info['inputs'] != old_info['inputs']:
-                return True
-            if not set(old_info['labels']).issubset(new_info['labels']):
-                return True
+    @swagger_auto_schema(auto_schema=None)
+    def get(self, *args, **kwargs):
+        return super(ProjectLabelConfigValidateAPI, self).get(*args, **kwargs)
 
 
 class ProjectDuplicateAPI(APIView):
@@ -657,6 +675,9 @@ class TemplateListAPI(generics.ListAPIView):
         configs = []
         for config_file in pathlib.Path(annotation_templates_dir).glob('**/*.yml'):
             config = read_yaml(config_file)
+            if config.get('image', '').startswith('/static') and settings.HOSTNAME:
+                # if hostname set manually, create full image urls
+                config['image'] = settings.HOSTNAME + config['image']
             configs.append(config)
         template_groups_file = find_file(os.path.join('annotation_templates', 'groups.txt'))
         with open(template_groups_file, encoding='utf-8') as f:

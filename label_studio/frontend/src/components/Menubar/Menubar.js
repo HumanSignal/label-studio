@@ -1,7 +1,7 @@
 import { createContext, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'react-router';
 import { StaticContent } from '../../app/StaticContent/StaticContent';
-import { LsDoor, LsGitHub, LsSettings, LsSlack } from '../../assets/icons';
+import { IconBook, IconFolder, IconPersonInCircle, IconPin, IconTerminal, LsDoor, LsGitHub, LsSettings, LsSlack } from '../../assets/icons';
 import { useConfig } from '../../providers/ConfigProvider';
 import { useContextComponent } from '../../providers/RoutesProvider';
 import { cn } from '../../utils/bem';
@@ -9,7 +9,6 @@ import { absoluteURL } from '../../utils/helpers';
 import { Breadcrumbs } from '../Breadcrumbs/Breadcrumbs';
 import { Dropdown } from "../Dropdown/Dropdown";
 import { Hamburger } from "../Hamburger/Hamburger";
-import { Icon } from '../Icon/Icon';
 import { Menu } from '../Menu/Menu';
 import { Userpic } from '../Userpic/Userpic';
 import { VersionNotifier, VersionProvider } from '../VersionNotifier/VersionNotifier';
@@ -123,7 +122,7 @@ export const Menubar = ({
             closeOnClickOutside={!sidebarPinned}
           >
             <div className={`${menubarClass.elem('trigger')} main-menu-trigger`}>
-              <img src="/static/icons/logo-black.svg" alt="Label Studio Logo" height="22"/>
+              <img src={absoluteURL("/static/icons/logo-black.svg")} alt="Label Studio Logo" height="22"/>
               <Hamburger opened={sidebarOpened}/>
             </div>
           </Dropdown.Trigger>
@@ -139,8 +138,7 @@ export const Menubar = ({
               <Menu.Item
                 icon={<LsSettings/>}
                 label="Account & Settings"
-                to="/user/account"
-                data-external
+                href={absoluteURL("/user/account")}
               />
               {/* <Menu.Item label="Dark Mode"/> */}
               <Menu.Item
@@ -173,14 +171,14 @@ export const Menubar = ({
                 <Menu.Item
                   label="Projects"
                   to="/projects"
-                  icon={<Icon name="folder"/>}
+                  icon={<IconFolder/>}
                   data-external
                   exact
                 />
                 <Menu.Item
                   label="People"
                   to="/people"
-                  icon={<Icon name="person-circle"/>}
+                  icon={<IconPersonInCircle/>}
                   data-external
                   exact
                 />
@@ -192,13 +190,13 @@ export const Menubar = ({
                 <Menu.Item
                   label="API"
                   href="/docs/api"
-                  icon={<Icon name="terminal"/>}
+                  icon={<IconTerminal/>}
                   target="_blank"
                 />
                 <Menu.Item
                   label="Docs"
                   href="https://labelstud.io/guide"
-                  icon={<Icon name="book"/>}
+                  icon={<IconBook/>}
                   target="_blank"
                 />
                 <Menu.Item
@@ -219,7 +217,7 @@ export const Menubar = ({
                 <Menu.Divider/>
 
                 <Menu.Item
-                  icon={<Icon name="pin"/>}
+                  icon={<IconPin/>}
                   className={sidebarClass.elem('pin')}
                   onClick={sidebarPin}
                   active={sidebarPinned}
