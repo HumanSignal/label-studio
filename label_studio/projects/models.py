@@ -116,7 +116,7 @@ class Project(models.Model):
     UNCERTAINTY = 'Uncertainty sampling'
 
     SAMPLING_CHOICES = (
-        (SEQUENCE, 'Tasks are ordered by their IDs'),
+        (SEQUENCE, 'Tasks are ordered by Data manager ordering'),
         (UNIFORM, 'Tasks are chosen randomly'),
         (UNCERTAINTY, 'Tasks are chosen according to model uncertainty scores (active learning mode)')
     )

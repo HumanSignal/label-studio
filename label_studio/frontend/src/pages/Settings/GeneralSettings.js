@@ -25,7 +25,7 @@ export const GeneralSettings = () => {
 
   const samplings = [
     {value: "Sequential", label: "Sequential", description: "Tasks are ordered by Data manager ordering"},
-    {value: "Uniform", label: "Uniform", description: "Tasks are chosen randomly"},
+    {value: "Uniform", label: "Random", description: "Tasks are chosen with uniform random"},
   ];
 
   return (
