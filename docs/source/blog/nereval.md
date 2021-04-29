@@ -70,6 +70,7 @@ In order to evaluate and correct the spaCy model performance for the keyword "Ea
 
 Run the following script to parse the dataset and output the spaCy model predictions as Label Studio tasks in JSON format:
 
+
 ```python
 import spacy
 import pandas as pd
@@ -177,10 +178,11 @@ Open the `ner-tagging` project and do the following:
 
 Next, set up the labeling interface with the spaCy NER labels to create a gold standard dataset.
 1. From the project in Label Studio, click **Settings** and click **Labeling Interface**.
-2. Choose **Named Entity Recognition** template and paste the contents of the `named_entities.txt` as the labels for the template. 
+2. Select the **Named Entity Recognition** template and paste the contents of the `named_entities.txt` as the labels for the template. 
 3. Click **Save** to save the configuration and return to the project data.
 
 <img src="/images/ner-blog/setupNERtemplate.gif" alt="Gif of the process of adding the named entity labels to Label Studio described in the preceding steps." class="gif-border" />
+
 
 ### Label your gold standard dataset in Label Studio
 
