@@ -23,8 +23,10 @@ gtag('config', 'UA-129877673-1');
   <img src="{{ settings.HOSTNAME }}{% static 'images/opossum_hanging.svg' %}" height="128px" />
 
   <div class="toggle">
-    <a href="{{ settings.HOSTNAME }}/user/signup">Sign up</a>
-    <a href="{{ settings.HOSTNAME }}/user/login" class="active">Log in</a>
+    {% if not settings.DISABLE_SIGNUP_WITHOUT_LINK %}
+        <a href="{{ settings.HOSTNAME }}/user/signup">Sign up</a>
+        <a href="{{ settings.HOSTNAME }}/user/login" class="active">Log in</a>
+    {% endif %}
   </div>
 
   <form id="login-form" action="{% url 'user-login' %}{% if next %}?next={{ next }}{% endif %}" method="post">
