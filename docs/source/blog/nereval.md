@@ -73,6 +73,8 @@ Let's import Spacy models predictions into Label Studio.
 
 Here the simple script to create Label Studio tasks in JSON format:
 
+<!-- @smoreface maybe we can split this code by blocks by comments -->
+
 ```python
 import spacy
 import pandas as pd
@@ -184,11 +186,11 @@ Open the `ner-tagging` project and do the following:
 
 Next, set up the labeling interface with the spaCy NER labels to create a gold standard dataset.
 1. From the project in Label Studio, click **Settings** and click **Labeling Interface**.
-2. Choose **Named Entity Recognition** template and paste the content of `named_entities.txt` inside the textarea <pic>
-3. Click **Save** to save the configuration and return to the project data.
-4. Filter the project data so that you can focus on only the lines that contain the word "Easter". Click **Filters** and select the field `line_text`. For **contains**, type `Easter ` with a trailing space.  
+2. Choose **Named Entity Recognition** template and paste the content of `named_entities.txt` inside the textarea
 
-![CleanShot 2021-03-19 at 14 42 47@2x](https://user-images.githubusercontent.com/2641205/111789496-7fda2300-88c1-11eb-8308-ddd6156290a6.png)
+<!-- @smoreface screenshot with labeling config page -->
+
+3. Click **Save** to save the configuration and return to the project data.
 
 ### Label your gold standard dataset in Label Studio
 
