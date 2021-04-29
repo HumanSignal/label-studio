@@ -11,7 +11,7 @@ Check this installation guide and then play around them, pick up the best model 
 
 ## Start using it
 
-1. [Install the model locally](#Installation) or just copy paste this URL: `https://app.labelstud.io/coco-detector`
+1. [Install the model locally](#Installation)
 
 2. Run Label Studio, then go to the **Model** page. Paste the selected ML backend URL then click on **Add Backend**.
 
@@ -39,7 +39,7 @@ means that
 2. Create and initialize directory `./coco-detector`:
 
     ```bash
-    label-studio-ml init coco-detector --from label_studio/ml/examples/mmdetection.py
+    label-studio-ml init coco-detector --from label_studio_ml/examples/mmdetection/mmdetection.py
     ```
 
 3. Download `config_file` and `checkpoint_file` from MMDetection model zoo (use [recommended Faster RCNN for quickstarting](https://mmdetection.readthedocs.io/en/latest/1_exist_data_model.html#inference-with-existing-models)).

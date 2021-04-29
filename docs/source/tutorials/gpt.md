@@ -19,8 +19,8 @@ Collect your next superpower chatbot dataset by edit, remove or add new phrases!
 
 1. Install ML backend:
     ```bash
-    pip install -r label_studio/ml/examples/huggingface/requirements.txt
-    label-studio-ml init my-ml-backend --from label_studio/ml/examples/huggingface/gpt.py
+    pip install -r label_studio_ml/examples/huggingface/requirements.txt
+    label-studio-ml init my-ml-backend --from label_studio_ml/examples/huggingface/gpt.py
     label-studio-ml start my-ml-backend
     ```
 

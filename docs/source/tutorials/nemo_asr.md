@@ -18,7 +18,7 @@ With ASR models, you can do audio pre-annotations drawn within a text area, aka 
 
 2. On the same server or Docker container as NeMo, [install Label Studio](https://labelstud.io/guide/#Quickstart). 
 
-3. Create or download <a href="https://github.com/heartexlabs/label-studio-ml-backend/blob/master/label_studio_ml/examples/nemo/asr.py">asr.py</a> from Github into the current directory (or use `label_studio_ml/examples/nemo/asr.py` from the Label Studio ML Backend package).
+3. Create or download <a href="https://github.com/heartexlabs/label-studio/tree/master/label_studio_ml/examples/nemo/asr.py">asr.py</a> from Github into the current directory (or use `label_studio_ml/examples/nemo/asr.py` from the Label Studio package).
 
 4. Initialize the Label Studio machine learning backend with the ASR example: 
     ```bash
