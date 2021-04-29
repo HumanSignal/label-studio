@@ -231,10 +231,10 @@ for model_name, num_hits in model_hits.items():
 
 The script produces something like the following output:
 ```bash
-Accuracy for en_core_web_sm: 79.4%
-Accuracy for en_core_web_lg: 87.8%
+Accuracy for en_core_web_sm: 0.03%
+Accuracy for en_core_web_lg: 0.41%
 ```
-The accuracy for both models is imperfect, but it's expected that the larger spaCy convolutional neural network (CNN) model performed significantly better than the smaller spaCy model. 
+Both models rarely predicted the `Easter` keyword correctly, so the accuracy percentage is quite low. However, it's still clear that the larger spaCy convolutional neural network (CNN) model performed significantly better than the smaller spaCy model. 
 
 With these steps, it's clear that you can easily evaluate the performance results of two different models with just a few minutes of annotation, without spending too much time building complex evaluation pipelines with static datasets.
 
@@ -245,4 +245,3 @@ This is a simple example using only one specific corner case based on the `Easte
 You could also use the gold standard dataset to evaluate changes to models and determine the optimal parameters to use for a specific model to fine tune accuracy for a specific type of data. For example, evaluate and correct the predictions for one model against the gold standard dataset, then create a second model with a different set of parameters and evaluate that one against the gold standard dataset. Whichever model performs better is likely the better model for your data and use case.
 
 Review the [tutorial for creating a machine learning backend with Label Studio](/guide/ml_tutorial.html) to see how you can go further with automating model retraining and using Label Studio in your model development pipeline.
-
