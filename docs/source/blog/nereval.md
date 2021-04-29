@@ -68,306 +68,88 @@ You also need to install [pandas](https://pandas.pydata.org), which provides met
 pip install pandas
 ```
 
-### Install spaCy models
+### Import preannotated data
+Let's import Spacy models predictions into Label Studio.
 
-After you install spaCy and pandas, install specific models from spaCy. SpaCy includes multiple pre-trained models in 64 languages. In this case, let's evaluate the smaller English language core model `en_core_web_sm` and the larger English language core model `en_core_web_lg`. 
-
-In general, the smaller model might be more efficient but less accurate while the larger model might be more accurate, but less efficient.
-
-Download both models by running the following commands from the command line:
-
-```bash
-python -m spacy download en_core_web_sm
-python -m spacy download en_core_web_lg
-```
-
-### Prepare to evaluate the models
-
-This tutorial has you write code to run from the command line. 
-
-Using your desired Python editor, create a file called `ner-evaluation.py` to update according to the code examples discussed in this tutorial. 
-
-If you're more comfortable using a Jupyter Notebook to implement the code in this tutorial, that is possible but is outside the scope of this tutorial.
-
-## Load the data for evaluation
-
-You now need to do the following:
-
-- Load both spaCy models
-- Read in the CSV corpus as a source for analysis
-- Extract text lines containing the keyword "Easter".
-
-This tutorial uses the word Easter to test the accuracy of the NER tagger.
-
-Place the following code in your `ner-evaluation.py` file:
-
-```python 
-1  import spacy
-2  import pandas as pd
-3
-4  # Imported both libraries needed to read and process our CSV corpus
-5
-6  nlp_sm = spacy.load("en_core_web_sm")
-7  nlp_lg = spacy.load("en_core_web_lg")
-8
-9  # Loaded both models and saved both to their own language objects.
-10
-11 df = pd.read_csv('lines_clean.csv')
-12
-13 # Loaded the CSV file into its own dataframe.
-14
-15 df = df[df['line_text'].str.contains("Easter ", na=False)]
-16
-17 # Extracted all occurrences of the word "Easter" from the line text 
-18 # column in the dataframe. The 'na' parameter lets missing
-19 # parameters be renamed as False, rather than as NaN
-20 # parameters.
-21
-22 print(df.head(20))
-23
-24 # prints the first 20 lines of the dataframe
-```
-
-Run the program from the command line:
-
-```bash
- python ner-evaluation.py
-```
-
-With this code, you successfully set up the Python libraries and spaCy models and loaded in the cleaned corpus. To check whether the corpus has been saved correctly to the dataframe, the code retrieved occurrences of the word "Easter" to set up a simple test case. 
-
-## Parse and evaluate the corpus
-
-You can now start parsing and tagging the corpus to start evaluating the NER tagging results.
-
-Because the cleaned and formatted text lines are available in a column of the dataset, you can iterate through the column to find and tag lines containing the "Easter" token. 
-
-Your code needs to do the following:
-1. Save the first ten lines of the `line_text` column saved in the dataframe to a variable called `texts`. 
-2. Apply the pre-trained pipeline package to the `texts` object. 
-3. Save the results to the new variable `doc_sm`. 
-4. Create another nested `for` loops to iterate through the corpus, the lines and the tokens, classifying the relevant tokens according to their NER entity categories. 
-5. Then, print the tokens and their entity type.
-
-To accomplish these steps, add the following lines to your `ner-evaluation.py` file in the editor and run the program.
+Here the simple script to create Label Studio tasks in JSON format:
 
 ```python
-1  texts = df['line_text'][:10]
-2 
-3  # Save the first 10 lines of the  line_text portion of the dataframe
-4  # to the texts object
-5 
-6  docs = nlp_sm.pipe(texts)
-7
-8  # Now apply the complete spaCy NLP pipeline, including the NER
-9  # tagger, to the texts object. Use the small model ("nlp_sm"). The resulting corpus 
-10 # contains parsing and NER tags, but results for each tag category
-11 # have to be read out separately.
-12 
-13 for doc in docs:   
-14 
-15 # Iterate through all parsed and tagged lines in the texts object.
-16 
-17     for token in doc:
-18 
-19 # Iterate through all individual tagged tokens in each line inside the texts 
-20 # object.
-21 
-22         print(token.text, token.ent_type_)
-23
-24 # Print out the token, plus its NER entity type tag
-25 
-26     print("----------")
-```
-
-The following is an excerpt from the printed output: 
-
-```
-And 
-then 
-, 
-we 
-had 
-Easter ORG
-dinner 
-at 
-John 
-'s 
-house 
-on 
-Irving ORG
-. 
-```
-
-The spaCy model tagged 'Easter' with the `ORG` (Organization) tag instead of the EVT (Event) tag.  
-
-To see whether the results improve when using the large spaCy model, update your script with the code below, replacing `nlp_sm` with `nlp_lg` to specify the large model. 
-
-```python
-1 docs = nlp_lg.pipe(texts)
-2 
-3 # Note the large `nlp_lg` model.
-4 
-5 for doc in docs:    
-6     for token in doc:
-7         print(token.text, token.ent_type_)
-8    print("----------") 
-```
-
-Run the program again and review the same excerpt as before:
-```
-And 
-then 
-, 
-we 
-had 
-Easter GPE
-dinner 
-at 
-John 
-'s 
-house 
-on 
-Irving ORG
-. 
-
-```
-The large model makes different predictions for two entity labels.  It labels the first instance of 'Easter' as `GPE` (Geopolitical Entity) and Irving as an ORG (Organization). Although the prediction is different from that of the small model, it's still wrong.  
-
-
-## Automatically evaluate NER of small and large spaCy models
-
-Based on the small-scale parsing output from the small and large spaCY models, it's unclear which model will perform better at correctly labeling "Easter" across the entire transcript corpus. 
-
-To more fully evaluate the model accuracy for this token, replace the code in your `ner-evaluation.py` script with the following code sample. This code sets up spaCy and pandas and reads in the transcript corpus, loading both the small and large models, and placing the labeled text segments into a list.
-
-```python
-import pandas as pd
 import spacy
+import pandas as pd
+import json
+from itertools import groupby
 
-KEYWORD = "Easter"
+# Download SpaCy models:
+models = {
+    'en_core_web_sm': spacy.load("en_core_web_sm"),
+    'en_core_web_lg': spacy.load("en_core_web_lg")
+}
 
-# A literal that can be passed to the functions below. 
- 
-df = pd.read_csv("lines_clean.csv")
-df = df[df["line_text"].str.contains(f"{KEYWORD} ", na=False)]
+# This function converts SpaCy docs to the list of named entity spans, in Label Studio compatible JSON format:
+def doc_to_spans(doc):
+    tokens = [(tok.text, tok.idx, tok.ent_type_) for tok in doc]
+    results = []
+    entities = set()
+    for entity, group in groupby(tokens, key=lambda t: t[-1]):
+        if not entity:
+            continue
+        group = list(group)
+        _, start, _ = group[0]
+        word, last, _ = group[-1]
+        text = ' '.join(item[0] for item in group)
+        end = last + len(word)
+        results.append({
+            'from_name': 'label',
+            'to_name': 'text',
+            'type': 'labels',
+            'value': {
+                'start': start,
+                'end': end,
+                'text': text,
+                'labels': [entity]
+            }
+        })
+        entities.add(entity)
 
-# This passes the KEYWORD literal to the 'contains' function, 
-# asking whether the KEYWORD, i.e. "Easter", is part of the line.
+    return results, entities
 
-texts = df["line_text"]
-
+# Now load our data:
+df = pd.read_csv('data/lines_clean.csv')
+df = df[df['line_text'].str.contains("Easter ", na=False)]
 print(df.head())
-print(df.shape)
+texts = df['line_test']
 
-# The head() function defaults to a line count of 5, while the shape
-# parameter contains the number of columns and rows. Useful for
-# testing.
+# Prepare Label Studio tasks in import JSON format
+entities = set()
+tasks = []
+for text in texts:
+    predictions = []
+    for model_name, nlp in models.items():
+        doc = nlp(text)
+        spans, ents = doc_to_spans(doc)
+        entities |= ents
+        predictions.append({'model_version': model_name, 'result': spans})
+    tasks.append({
+        'data': {'text': text},
+        'predictions': predictions
+    })
 
-nlp_sm = spacy.load("en_core_web_sm")
-nlp_lg = spacy.load("en_core_web_lg")
-
-docs_sm = list(nlp_sm.pipe(texts))
-docs_lg = list(nlp_lg.pipe(texts))
-
+# Save Label Studio tasks.json
+print(f'Save {len(tasks)} tasks to "tasks.json"')
+with open('tasks.json', mode='w') as f:
+    json.dump(tasks, f, indent=2)
+    
+# Save class labels 
+print('Named entities are saved to "named_entities.txt"')
+with open('named_entities.txt', mode='w') as f:
+    f.write('\n'.join(sorted(entities)))
 ```
 
-As an additional step, your code can automatically compare the NER tagging results for both models. To do that, append the following code to your `ner-evaluation.py` script: 
-```python
-total_tokens = 0
-# Add up the number of tokens in the text to the number total_tokens 
-# in order to determine the percentage of tokens recognized as 
-# named entities that both models can find and tag.
-
-agreed_tokens = 0
-# Indicates the number of tokens both models have in common.
-
-total_matches = 0
-# Shows the number of properly tagged named entities per model.
-
-agreed_matches = 0
-# Shows the number of named entities both models share.
-
-for i in range(len(texts)):
-  # Iterates through each line of text. Note that both models are
-  # iterating through their own copy of the text lines
-   doc_sm = docs_sm[i]
-   doc_lg = docs_lg[i]
-   for i in range(len(doc_sm)):
-      # Iterates through each token in each line.
-       total_tokens += 1
-      # Adds up the number of tokens analyzed by the small model. 
-      # The number can be used for the large and the small model.
-      if doc_sm[i].text == f"{KEYWORD}" and doc_lg[i].text == f"{KEYWORD}":
-          total_matches += 1
-          # Adds up the number of keyword matches between models. In 
-          # this case there is only 1 keyword.
-          print(doc_sm[i - 5 : i + 5])
-          print(
-               f"spacy_sm: {doc_sm[i].ent_type_} {doc_sm[i].text}
-                 spacy_lg: {doc_lg[i].ent_type_} {doc_lg[i].text} "
-                 )
-                print("---")
-          # This prints out matching keywords and their NER entity types
-          # and the context words and their entity types. The prediction 
-          # results from both models are being compared.
-          if doc_sm[i].ent_type == doc_lg[i].ent_type:
-             agreed_matches += 1
-               # If the keyword NER entity types found in both models 
-               # match, you can assume that the NER tag is correct and 
-               # they are added to the sum total of the agreed_matches 
-               # number. 
-       if doc_sm[i].ent_type is not None:
-           if doc_sm[i].ent_type == doc_lg[i].ent_type:
-               agreed_tokens += 1
-              # If the NER entity types match, add each token matching a 
-              # keyword tagged by an NER tag to the agreed_tokens total.
-```
-
-The script now runs the transcript through both the large and small spaCy models, analyzes whether or not the NER tag for the "Easter" keyword matches for the models, and gathers the predictions and 10 additional words of context from the transcript to use for quality checking.
-
-Append the following code sample to your script to see the results of the analysis:
-```python
-print(f"""{total_tokens}
-        Total tokens processed              
-         {agreed_tokens} ({(agreed_tokens/total_tokens):.2f}%)
-         Proportion of agreed tokens when using both models to collect the total number of tokens.
-         Keywords ({KEYWORD}) processed: {total_matches}
-         Small and large model agree on {agreed_matches} ({(agreed_matches/
-         total_matches):.2f}%)""")  
-```
-
-Run the script, and review the output. 
-
-For example, the following output is what you might see, showing 10 words of context for the "Easter" keyword as well as the predicted labels from the small and large models that don't agree.
-```
-And then, we had Easter dinner at John's
-spacy_sm: ORG Easter spacy_lg: GPE Easter 
----
-When? 11:30 PM, Easter eve. Where?
-spacy_sm: PERSON Easter spacy_lg: DATE Easter 
----
-Super Sport, night before Easter, Route 11.
-spacy_sm: GPE Easter spacy_lg: DATE Easter 
----
-Our viewers saw art last Easter with a two-
-spacy_sm:  Easter spacy_lg:  Easter 
----
-. We went back for Easter and then Thanksgiving and
-spacy_sm: PERSON Easter spacy_lg:  Easter 
-
-<...>
-
-Total tokens processed: 3286
-Small and large model agreed on 3182 (0.97%)
-Keywords (Easter) processed: 39
-Small and large model agreed on 6 (0.15%)
-```
-
-This allows you to assess which model is more effective for your use case, as well as identify where the NER tagger might have applied the wrong tags. 
-
-The accuracy of entity class predictions in widely-available models can vary for niche use cases like this Easter keyword. To improve the spaCy model accuracy for accurately labeling Easter, label a small corpus of data to serve as a gold standard for the model that you can use to train the machine learning model. 
-
+Now we get 
+- `tasks.json` to import in Label Studio
+- `named_entities.txt` file to copy list of entities and paste them into project configuration
+ 
+ 
 ## Label Named Entities in Label Studio
 
 To classify named entities, you need to create a dataset with gold standard labels that are accurate for your use case. To do that, use the open source data labeling tool, [Label Studio](https://labelstud.io). 
@@ -398,42 +180,11 @@ Open Label Studio in your web browser and create an account to sign up.
 
 Open the `ner-tagging` project and do the following:
 1. Click **Import** to add data. 
-2. Upload the `lines_clean.csv` file.
-3. Specify that `lines_clean.csv` is a `List of tasks`. 
-4. Click **Import** to add the data.
+2. Upload the `tasks.json` file
 
 Next, set up the labeling interface with the spaCy NER labels to create a gold standard dataset.
 1. From the project in Label Studio, click **Settings** and click **Labeling Interface**.
-2. Click **Code** to use the XML editor and paste the following configuration:
-```xml
-<View>
-  <Labels name="label" toName="text">
-    <Label value="ORG" background="darkorange"/>
-    <Label value="LOC" background="orange"/>
-    <Label value="MISC" background="green"/>
-    <Label value="PER" background="#FFA39E"/>
-    <Label value="EVT" background="#D4380D"/>
-    <Label value="PROD" background="#FFC069"/>
-    <Label value="DRV" background="#AD8B00"/>
-    <Label value="GPE_LOC" background="#D3F261"/>
-    <Label value="GPE_ORG" background="#389E0D"/>
-    <Label value="NORP" background="#5CDBD3"/>
-    <Label value="FACILITY" background="#096DD9"/>
-    <Label value="PRODUCT" background="#F759AB"/>
-    <Label value="WORK_OF_ART" background="#D4380D"/>
-    <Label value="LAW" background="#FFC069"/>
-    <Label value="LANGUAGE" background="#AD8B00"/>
-    <Label value="DATE" background="#D3F261"/>
-    <Label value="TIME" background="#389E0D"/>
-    <Label value="PERCENT" background="#5CDBD3"/>
-    <Label value="MONEY" background="#096DD9"/>
-    <Label value="QUANTITY" background="#ADC6FF"/>
-    <Label value="ORDINAL" background="#9254DE"/>
-    <Label value="CARDINAL" background="#F759AB"/>
-  </Labels>
-  <Text name="text" value="$line_text" granularity="word"/>
-</View>
-```
+2. Choose **Named Entity Recognition** template and paste the content of `named_entities.txt` inside the textarea <pic>
 3. Click **Save** to save the configuration and return to the project data.
 4. Filter the project data so that you can focus on only the lines that contain the word "Easter". Click **Filters** and select the field `line_text`. For **contains**, type `Easter ` with a trailing space.  
 
@@ -448,7 +199,7 @@ From the filtered list of data, click **Label** to start labeling the instances 
 
 After you finish labeling the instances of Easter in the dataset manually, export the annotated data so that you can retrain the spaCy model to be more accurate when recognizing this keyword. 
 1. From your Label Studio project, click **Export**.
-2. Select the **CSV** file format to match the dataset used earlier. 
+2. Select the **JSON** file format and download `annotations.json`
 
 ![CleanShot 2021-03-19 at 14 52 09@2x](https://user-images.githubusercontent.com/2641205/111790696-c3815c80-88c2-11eb-96b1-afd57a65cf36.png)
 
@@ -456,50 +207,38 @@ As with all human-in-the-loop data labeling projects, the correct tag for "Easte
 
 ## Compare the spaCy model with the gold standard dataset
 
-Now, evaluate the gold standard annotations against the results produced by spaCy. This tutorial shows the evaluation based on eight manually-created labels, but you'd want to label many more samples to meaningfully retrain the model.  
+Run this script to evaluate exported data:
 
-1. Rename the file you downloaded from Label Studio to `manual-easter-labels.csv`.
-2. Place the file in the same directory as your `ner-evaluation.py` script. 
-3. Remove the existing code in the `ner-evaluation.py` file and replace it with the following:
 ```python
-import pandas as pd
 import json
-# This is a new library import
-import spacy
+from collections import defaultdict
 
-nlp = spacy.load('en_core_web_lg')
+tasks = json.load(open('annotations.json'))
+model_hits = defaultdict(int)
 
-manual_labels = pd.read_csv('manual-easter-labels.csv')
-manual_labels.head()
-# Mark the CSV file as the manually tagged corpus.
+for task in tasks:
+    annotation_result = task['annotations'][0]['result']
+    for r in annotation_result:
+        r.pop('id')
+    for prediction in task['predictions']:
+        model_hits[prediction['model_version']] += int(prediction['result'] == annotation_result)
 
-l = manual_labels[['line_text', 'ner']]
-
-for i, text in enumerate(manual_labels['line_text']):
-    gold_labels = set(json.loads(manual_labels['ner'][i])[0]['labels'])
-   
-   doc = nlp(text)
-   spacy_labels = {token.ent_type_ for token in doc if token.ent_type_}
-   print(f"""
-   {text} ...
-    spaCy labels: {spacy_labels}
-    gold_labels: {gold_labels}
-    """)
+num_task = len(tasks)
+for model_name, num_hits in model_hits.items():
+    acc = num_hits / num_task
+    print(f'Accuracy for {model_name}: {acc:.2f}%')
 ```
 
-After you run this script, you see output similar to the following excerpt:
-
+It gives the following output:
+```bash
+Accuracy for en_core_web_sm: 79.4%
+Accuracy for en_core_web_lg: 87.8%
 ```
-
-I slept there until early morning, when the activity started to increase, and people started coming in. And I went out and followed the crowd where it was going when they were going out to the tombs area in Jerusalem. And I went out. And there were some folding chairs set up in front of this tomb area. And as the sun was coming up on that Easter morning, I was staring at empty tombs. And for a reason that I can not comprehend, as I sat on that chair contemplating this view of the early sun morning coming into the empty tombs, all that I had been wrestling with for the past many, many years in thinking about religion sort of became resolved in my mind. And at that very moment, I believed that Jesus Christ had, indeed, risen from those tombs. ...
-spaCy labels: {'GPE', 'TIME'}
-gold_labels: {'Date'}
-```
-
-If you invest the time and effort into labeling each example by hand, you can compare the two sets of labels and see how often spaCy gets them correct.
+So, as you can see, the result are not perfect for both models, but large CNN model performs significantly better then small one. 
+And that's how we can easily evaluate the performance results of two models in just few minutes of annotation, without spending too much time in building complex evaluation pipelines with static datasets. 
 
 ## What's next?
 
 You've seen how to do basic NER tagging, both by coding your own approach and by adding NER tags manually with the help of the Label Studio data labeling software. For a real-world use case, manually label a large amount of data specific to your project, and then [retrain spaCy's models](https://spacy.io/usage/training) based on this new data set.
 
-The code in this tutorial uses some shortcuts, like using `Easter ` as a crude filter, skipping examples where "Easter" is followed by a punctuation mark. As a result, the script only calculates very crude accuracy metrics, but you can adapt and extend these code samples to your specific needs.
+This is a simple demo of using only one specific corner case based on `Easter` keyword, but of course it could be easily extended to monitore more complex semantics, and assessing more than 2 models at once.
