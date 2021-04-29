@@ -36,8 +36,12 @@ class LocalFilesMixin(models.Model):
 
 class LocalFilesImportStorage(ImportStorage, LocalFilesMixin):
 
+    @property
+    def document_root(self):
+        return Path(get_env('LOCAL_FILES_DOCUMENT_ROOT', default='/'))
+
     def iterkeys(self):
-        path = Path(self.path)
+        path = self.document_root / Path(self.path)
         regex = re.compile(str(self.regex_filter)) if self.regex_filter else None
         for file in path.rglob('*'):
             if file.is_file():
@@ -51,8 +55,7 @@ class LocalFilesImportStorage(ImportStorage, LocalFilesMixin):
         path = Path(key)
         if self.use_blob_urls:
             # include self-hosted links pointed to local resources via {settings.HOSTNAME}/data/local-files?d=<path/to/local/dir>
-            document_root = Path(get_env('LOCAL_FILES_DOCUMENT_ROOT', default='/'))
-            relative_path = str(path.relative_to(document_root))
+            relative_path = str(path.relative_to(self.document_root))
             return {settings.DATA_UNDEFINED_NAME: f'{settings.HOSTNAME}/data/local-files/?d={relative_path}'}
         with open(path, encoding='utf8') as f:
             value = json.load(f)
