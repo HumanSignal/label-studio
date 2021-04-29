@@ -3,7 +3,8 @@ import { Modal } from '../../../components/Modal/Modal';
 import { cn } from '../../../utils/bem';
 import { unique } from '../../../utils/helpers';
 import "./Import.styl";
-
+import { IconUpload, IconInfo } from '../../../assets/icons';
+import { useAPI } from '../../../providers/ApiProvider';
 
 const importClass = cn("upload_page");
 const dropzoneClass = cn("dropzone");
@@ -53,7 +54,7 @@ function getFiles(files) {
 const Footer = () => {
   return (
     <Modal.Footer>
-      <img className={importClass.elem("info-icon")} src="/static/icons/info.svg" height="20" />
+      <IconInfo className={importClass.elem("info-icon")} width="20" height="20" />
       See the&nbsp;documentation to <a target="_blank" href="https://labelstud.io/guide/predictions.html">import preannotated data</a>{" "}
       or&nbsp;to <a target="_blank" href="https://labelstud.io/guide/storage.html">sync data from a&nbsp;database or&nbsp;cloud storage</a>.
     </Modal.Footer>
@@ -102,6 +103,7 @@ export const ImportPage = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState();
   const [ids, _setIds] = useState([]);
+  const api = useAPI();
 
   const processFiles = (state, action) => {
     if (action.sending) {
@@ -129,21 +131,14 @@ export const ImportPage = ({
   };
 
   const loadFilesList = useCallback(async (file_upload_ids) => {
-    let url = `/api/projects/${project.id}/file-uploads`;
+    const query = {};
     if (file_upload_ids) {
       // should be stringified array "[1,2]"
-      const idsQuery = JSON.stringify(file_upload_ids);
-      url += `?ids=${idsQuery}`;
+      query.ids = JSON.stringify(file_upload_ids);
     }
-    let res;
-    try {
-      res = await fetch(url);
-    } catch(e) {
-      console.error(e, url);
-      return onError(e);
-    }
-    if (!res.ok) return onError(await res.json());
-    const files = await res.json();
+    const files = await api.callApi("fileUploads", {
+      params: { pk: project.id, ...query },
+    });
     dispatch({ uploaded: files ?? [] });
     if (files?.length) {
       setIds(unique([...ids, ...files.map(f => f.id)]));
@@ -172,18 +167,21 @@ export const ImportPage = ({
     return loadFilesList(file_ids).then(() => setLoading(false));
   }, [addColumns, loadFilesList, setIds, ids, setLoading]);
 
-  const importFiles = useCallback((files, body) => {
+  const importFiles = useCallback(async (files, body) => {
     dispatch({ sending: files });
-    const commitParam = dontCommitToProject ? '?commit_to_project=false' : '';
-    fetch(`/api/projects/${project.id}/import${commitParam}`, {
-      // @todo can be useless if server always respond with json
-      headers: { Accept: 'application/json' }, // try to get nice json error on huge files
+
+    const query = dontCommitToProject ? { commit_to_project: "false" } : {};
+    const res = await api.callApi("importFiles", {
+      params: { pk: project.id, ...query },
+      headers: { 'Content-Type': 'multipart/form-data' },
       body,
-      method: 'POST',
-    })
-      .then(res => res.json().then(res.ok ? onFinish : onError))
-      .catch(onError)
-      .then(() => dispatch({ sent: files }));
+      errorFilter: () => true,
+    });
+
+    if (res && !res.error) onFinish?.(res);
+    else onError?.(res?.response);
+
+    dispatch({ sent: files });
   }, [project]);
 
   const sendFiles = useCallback(files => {
@@ -249,7 +247,7 @@ export const ImportPage = ({
         </form>
         <span>or</span>
         <button onClick={() => document.getElementById('file-input').click()} className={importClass.elem("upload-button")}>
-          <img src="/static/images/upload.svg" height="16" className={importClass.elem("upload-icon")} />
+          <IconUpload width="16" height="16" className={importClass.elem("upload-icon")} />
           Upload {files.uploaded.length ? "More " : ""}Files
         </button>
         <div className={importClass.elem("csv-handling").mod({ highlighted: highlightCsvHandling, hidden: !csvHandling })}>
@@ -278,7 +276,7 @@ export const ImportPage = ({
             <label htmlFor="file-input">
               <div className={dropzoneClass.elem("content")}>
                 <header>Drag & drop files here<br/>or click to browse</header>
-                <img src="/static/images/upload.svg" height="64" className={dropzoneClass.elem("icon")} />
+                <IconUpload height="64" className={dropzoneClass.elem("icon")} />
                 <dl>
                   <dt>Text</dt><dd>txt</dd>
                   <dt>Audio</dt><dd>wav, aiff, mp3, au, flac, m4a, ogg</dd>

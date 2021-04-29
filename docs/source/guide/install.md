@@ -9,6 +9,7 @@ meta_description: Label Studio Documentation for installing and upgrading Label 
 Install Label Studio on premises or in the cloud. Choose the install method that works best for your environment:
 - [Install with pip](#Install-with-pip)
 - [Install with Docker](#Install-with-Docker)
+- [Install on Ubuntu](#Install-on-Ubuntu)
 - [Install from source](#Install-from-source)
 - [Install with Anaconda](#Install-with-Anaconda)
 - [Install for local development](#Install-for-local-development)
@@ -35,21 +36,25 @@ Label Studio is tested with the latest version of Google Chrome and is expected 
 
 If using other web browsers, or older versions of supported web browsers, unexpected behavior could occur. 
 
-
 ## Install with pip
 
-To install Label Studio using pip, you need Python>=3.6 and run:
+To install Label Studio with pip and a virtual environment, you need Python version 3.6 or later. Run the following:
+```bash
+python3 -m venv env
+source env/bin/activate
+python -m pip install label-studio
+```
+
+To install Label Studio with pip, you need Python version 3.6 or later. Run the following:
 ```bash
 pip install label-studio
 ```
 
-Then, start Label Studio:
-
+After you install Label Studio, start the server with the following command: 
 ```bash
 label-studio
 ```
-The default web browser opens automatically at [http://localhost:8080](http://localhost:8080) with Label Studio.
-
+The default web browser opens automatically at [http://localhost:8080](http://localhost:8080) with Label Studio. See [start Label Studio](start.html) for more options when starting Label Studio.
 
 ## Install with Docker
 
@@ -86,6 +91,17 @@ docker-compose up -d
 ```
 
 This starts Label Studio with a PostgreSQL database backend. You can also use a PostgreSQL database without Docker Compose. See [Set up database storage](storedata.html).
+
+## Install on Ubuntu
+
+To install Label Studio on Ubuntu and run it in a virtual environment, run the following command:
+
+```bash
+python3 -m venv env
+source env/bin/activate
+sudo apt install python3.9-dev
+python -m pip install label-studio
+```
 
 ## Install from source
 
@@ -155,45 +171,3 @@ label-studio start path/to/old/project
 The most important change to be aware of is changes to rename "completions" to "annotations". See the [updated JSON format for completed tasks](export.html#Raw_JSON_format_of_completed_tasks). 
 
 If you customized the Label Studio Frontend, see the [Frontend reference guide](frontend_reference.html) for required updates to maintain compatibility with version 1.0.0.  
-
-
-<<<<<<< HEAD
-## Database storage
-Label Studio uses a database to store project data and configuration information. 
-
-### SQLite database
-
-Label Studio uses SQLite by default. Label Studio expects version 3.35.x or later of SQLite, so if you have another version installed, you might see unexpected behavior. 
-
-Label Studio stores all data in a single file in the default application data directory. After you [start Label Studio](start.html), the directory used is printed in the terminal. You can use the environment variable `LABEL_STUDIO_BASE_DATA_DIR` to specify a different directory. 
-
-### PostgreSQL database
-
-You can also store your tasks and completions in a [PostgreSQL database](https://www.postgresql.org/) instead of the default SQLite database. This is recommended if you intend to frequently import new labeling tasks, or plan to label hundreds of thousands of tasks or more across projects. 
-
-When you start Label Studio using Docker Compose, you start it using a PostgreSQL database:
-```bash
-docker-compose up -d
-```
-
-#### Create connection on startup
-
-Run the following command to launch Label Studio, configure the connection to your PostgreSQL database, scan for existing tasks, and load them into the app for labeling for a specific project.
-
-```bash
-label-studio start my_project --init -db postgresql 
-```
-
-You must set the following environment variables to connect Label Studio to PostgreSQL:
-
-```
-DJANGO_DB=default
-POSTGRE_NAME=postgres
-POSTGRE_USER=postgres
-POSTGRE_PASSWORD=
-POSTGRE_PORT=5432
-POSTGRE_HOST=db
-```
-
-=======
->>>>>>> a9188a99231d9a8893f3ec57feb8618492ad1307

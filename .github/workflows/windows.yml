@@ -1,9 +1,9 @@
 name: pytest:win
-
 on:
   push:
     branches: ['*', '*/*', master]
-  pull_request:
+    paths:
+      - 'label_studio/**'
 
 jobs:
 

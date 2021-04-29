@@ -3,8 +3,8 @@ import React, { createContext, useCallback, useContext, useEffect, useReducer } 
 import { Link } from 'react-router-dom';
 import { useAPI } from "../../providers/ApiProvider";
 import { Block, Elem } from '../../utils/bem';
-import { Icon } from "../Icon/Icon";
 import './VersionNotifier.styl';
+import { IconBell } from '../../assets/icons';
 
 const VersionContext = createContext();
 
@@ -51,7 +51,7 @@ export const VersionNotifier = ({showNewVersion, showCurrentVersion}) => {
     <Block tag="li" name="version-notifier">
       <a href={url} target="_blank">
         <Elem name="icon">
-          <Icon name="bell" size="18"/>
+          <IconBell/>
         </Elem>
         <Elem name="content">
           <Elem name="title" data-date={updateTime}>

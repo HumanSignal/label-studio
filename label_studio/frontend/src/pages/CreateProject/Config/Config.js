@@ -12,6 +12,7 @@ import './Config.styl';
 import { Preview } from './Preview';
 import { DEFAULT_COLUMN, EMPTY_CONFIG, isEmptyConfig, Template } from './Template';
 import { TemplatesList } from './TemplatesList';
+import { useAPI } from '../../../providers/ApiProvider';
 
 // don't do this, kids
 const formatXML = (xml) => {
@@ -116,67 +117,73 @@ const ConfigureSettings = ({ template }) => {
   if (!settings) return null;
   const keys = Object.keys(settings);
 
+  const items = keys.map(key => {
+    const options = settings[key];
+    const type = Array.isArray(options.type) ? Array : options.type;
+    const $object = template.objects[0];
+    const $tag = options.control ? $object.$controls[0] : $object;
+    if (!$tag) return null;
+    if (options.when && !options.when($tag)) return;
+    let value = false;
+    if (options.value) value = options.value($tag);
+    else if (typeof options.param === "string") value = $tag.getAttribute(options.param);
+    if (value === "true") value = true;
+    if (value === "false") value = false;
+    let onChange;
+    let size;
+    switch (type) {
+      case Array:
+        onChange = e => {
+          if (typeof options.param === "function") {
+            options.param($tag, e.target.value);
+          } else {
+            $object.setAttribute(options.param, e.target.value);
+          }
+          template.render();
+        };
+        return (
+          <li key={key}><label>{options.title} <select value={value} onChange={onChange}>{options.type.map(option => (
+            <option key={option} value={option}>{option}</option>
+          ))}</select></label></li>
+        );
+      case Boolean:
+        onChange = e => {
+          if (typeof options.param === "function") {
+            options.param($tag, e.target.checked);
+          } else {
+            $object.setAttribute(options.param, e.target.checked ? 'true' : 'false');
+          }
+          template.render();
+        };
+        return (
+          <li key={key}><label><input type="checkbox" checked={value} onChange={onChange} /> {options.title}</label></li>
+        );
+      case String:
+      case Number:
+        size = options.type === Number ? 5 : undefined;
+        onChange = e => {
+          if (typeof options.param === "function") {
+            options.param($object, e.target.value);
+          } else {
+            $object.setAttribute(options.param, e.target.value);
+          }
+          template.render();
+        };
+        return (
+          <li key={key}><label>{options.title} <input type="text" onInput={onChange} value={value} size={size} /></label></li>
+        );
+    }
+  });
+
+  // check for active settings
+  if (!items.filter(Boolean).length) return null;
+
   return (
     <ul className={configClass.elem("settings")}>
       <li>
         <h4>Configure settings</h4>
         <ul className={configClass.elem("object-settings")}>
-          {keys.map(key => {
-            const options = settings[key];
-            const type = Array.isArray(options.type) ? Array : options.type;
-            const $object = template.objects[0];
-            const $tag = options.control ? $object.$controls[0] : $object;
-            if (options.when && !options.when($tag)) return;
-            let value = false;
-            if (options.value) value = options.value($tag);
-            else if (typeof options.param === "string") value = $tag.getAttribute(options.param);
-            if (value === "true") value = true;
-            if (value === "false") value = false;
-            let onChange;
-            let size;
-            switch (type) {
-              case Array:
-                onChange = e => {
-                  if (typeof options.param === "function") {
-                    options.param($tag, e.target.value);
-                  } else {
-                    $object.setAttribute(options.param, e.target.value);
-                  }
-                  template.render();
-                };
-                return (
-                  <li key={key}><label>{options.title} <select value={value} onChange={onChange}>{options.type.map(option => (
-                    <option key={option} value={option}>{option}</option>
-                  ))}</select></label></li>
-                );
-              case Boolean:
-                onChange = e => {
-                  if (typeof options.param === "function") {
-                    options.param($tag, e.target.checked);
-                  } else {
-                    $object.setAttribute(options.param, e.target.checked ? 'true' : 'false');
-                  }
-                  template.render();
-                };
-                return (
-                  <li key={key}><label><input type="checkbox" checked={value} onChange={onChange} /> {options.title}</label></li>
-                );
-              case String:
-              case Number:
-                size = options.type === Number ? 5 : undefined;
-                onChange = e => {
-                  if (typeof options.param === "function") {
-                    options.param($object, e.target.value);
-                  } else {
-                    $object.setAttribute(options.param, e.target.value);
-                  }
-                  template.render();
-                };
-                return (
-                  <li key={key}><label>{options.title} <input type="text" onInput={onChange} value={value} size={size} /></label></li>
-                );
-            }
-          })}
+          {items}
         </ul>
       </li>
     </ul>
@@ -233,6 +240,7 @@ const Configurator = ({ columns, config, project, template, setTemplate, onBrows
   const [configToCheck, setConfigToCheck] = React.useState();
   const [data, setData] = React.useState();
   const debounceTimer = React.useRef();
+  const api = useAPI();
 
   React.useEffect(() => {
     // config may change during init, so wait for that, but for a very short time only
@@ -242,37 +250,33 @@ const Configurator = ({ columns, config, project, template, setTemplate, onBrows
 
   React.useEffect(async () => {
     if (!configToCheck) return;
-    const c = encodeURIComponent(configToCheck);
-    let res;
-    res = await fetch(`/api/projects/${project.id}/validate`, {
-      method: "post",
-      body: JSON.stringify({label_config: configToCheck}),
-      headers: { "Content-Type": "application/json" },
+
+    const validation = await api.callApi(`validateConfig`, {
+      params: { pk: project.id },
+      body: { label_config: configToCheck },
+      errorFilter: () => true,
     });
 
-    if (!res.ok) {
-      res = await res.json();
-      setError(res);
+    if (validation?.error) {
+      setError(validation.response);
       return;
-    } else {
-      setError(null);
-      onValidate?.(await res.json());
     }
 
-    res = await fetch(`/api/projects/${project.id}/sample-task`, {
-      method: "post",
-      body: JSON.stringify({label_config: configToCheck}),
-      headers: { "Content-Type": "application/json" },
+    setError(null);
+    onValidate?.(validation);
+
+    const sample = await api.callApi("createSampleTask", {
+      params: {pk: project.id },
+      body: { label_config: configToCheck },
+      errorFilter: () => true,
     });
 
-    const ok = res.ok;
-    res = await res.json();
-    if (ok) {
-      setData(res.sample_task);
+    if (sample && !sample.error) {
+      setData(sample.sample_task);
     } else {
       // @todo validation can be done in this place,
       // @todo but for now it's extremely slow in /sample-task endpoint
-      setError(res);
+      setError(sample?.response);
     }
   }, [configToCheck]);
 
@@ -353,6 +357,7 @@ export const ConfigPage = ({ config: initialConfig = "", columns: externalColumn
   const [selectedGroup, setSelectedGroup] = React.useState(null);
   const [selectedRecipe, setSelectedRecipe] = React.useState(null);
   const [template, setCurrentTemplate] = React.useState(null);
+  const api = useAPI();
 
   const setConfig = React.useCallback(config => {
     _setConfig(config);
@@ -369,15 +374,16 @@ export const ConfigPage = ({ config: initialConfig = "", columns: externalColumn
   const [columns, setColumns] = React.useState();
   React.useEffect(() => { if (externalColumns?.length) setColumns(externalColumns); }, [externalColumns]);
 
-  React.useEffect(() => {
+  React.useEffect(async () => {
     if (!project || columns) return;
-    fetch(`/api/projects/${project.id}/summary`)
-      .then(res => res.json())
-      .then(res => {
-        if (res.common_data_columns) {
-          setColumns(res.common_data_columns);
-        }
-      });
+    const res = await api.callApi("dataSummary", {
+      params: { pk: project.id },
+      // 404 is ok, and errors here don't matter
+      errorFilter: () => true,
+    });
+    if (res?.common_data_columns) {
+      setColumns(res.common_data_columns);
+    }
   }, [columns, project]);
 
   React.useEffect(() => {

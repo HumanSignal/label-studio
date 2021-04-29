@@ -2,7 +2,6 @@
 """
 import logging
 
-from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 
@@ -11,8 +10,6 @@ from drf_yasg.utils import swagger_auto_schema
 
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework import generics
-from rest_framework import status
-from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from core.utils.common import get_object_with_check_and_log
@@ -137,38 +134,6 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
     @swagger_auto_schema(auto_schema=None)
     def put(self, request, *args, **kwargs):
         return super(TaskAPI, self).put(request, *args, **kwargs)
-
-
-class TaskCancelAPI(APIView):
-    """
-    post:
-    Cancel Task
-
-    Set a labeling task as cancelled or skipped. 
-    """
-    swagger_schema = None
-    parser_classes = (JSONParser, FormParser, MultiPartParser)
-    permission_classes = (IsAuthenticated,)
-    serializer_class = TaskSerializer
-
-    def post(self, request, *args, **kwargs):
-        # get the cancelled task
-        task = get_object_with_permissions(self.request, Task, self.kwargs['pk'], 'tasks.change_task')
-
-        # validate data from annotation
-        annotation = AnnotationSerializer(data=request.data)
-        annotation.is_valid(raise_exception=True)
-
-        # set annotator last activity
-        user = request.user
-        user.activity_at = timezone.now()
-        user.save()
-
-        # serialize annotation, update task and save
-        com = annotation.save(completed_by=user, was_cancelled=True, task=task)
-        task.annotations.add(com)
-        task.save()
-        return Response(annotation.data, status=status.HTTP_200_OK)
 
 
 class AnnotationAPI(RequestDebugLogMixin, generics.RetrieveUpdateDestroyAPIView):

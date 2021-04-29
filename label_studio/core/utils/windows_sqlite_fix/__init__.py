@@ -2,6 +2,7 @@ import os
 import sys
 import colorama
 import logging
+import urllib.request
 
 
 logger = logging.getLogger('main')
@@ -14,15 +15,26 @@ def start_fix():
     print(f'Copying sqlite3.dll to the current directory: {os.getcwd()} ... ', end='')
 
     work_dir = os.path.dirname(os.path.abspath(__file__))
-    filename = 'sqlite-dll-win64-x64-3350000.zip' if platform.architecture()[0] == '64bit' \
-        else 'sqlite-dll-win32-x86-3350100.zip'
+    filename = 'sqlite-dll-win64-x64-3350500.zip' if platform.architecture()[0] == '64bit' \
+        else 'sqlite-dll-win32-x86-3350500.zip'
 
-    src = os.path.join(work_dir, filename)
+    url = 'https://www.sqlite.org/2021/' + filename
+
+    src = os.path.join(work_dir, 'sqlite.zip')
+    try:
+        with urllib.request.urlopen(url) as f:
+            with open(src, 'wb') as f_out:
+                f_out.write(f.read())
+    except:
+        print(colorama.Fore.LIGHTRED_EX + "\nCan't download sqlite.zip. Please, download it manually:\n" + url)
+        print(colorama.Fore.WHITE)
+        exit()
+
     with zipfile.ZipFile(src, 'r') as zip_ref:
         zip_ref.extractall('.')
 
     print('finished')
-    print(colorama.Fore.LIGHTRED_EX + '\nPlease restart Label Studio to load the updated sqlite.dll\n')
+    print(colorama.Fore.LIGHTGREEN_EX + '\nPlease restart Label Studio to load the updated sqlite.dll\n')
     print(colorama.Fore.WHITE)
     exit()
 
@@ -60,16 +72,17 @@ def windows_dll_fix():
               f"This Python version uses SQLite "
               f"{colorama.Fore.LIGHTRED_EX}{v[0]}.{v[1]}.{v[2]} " +
               colorama.Fore.LIGHTYELLOW_EX +
-              f"which doesn't support JSON1.\n" +
+              f"which does not support JSON Field.\n" +
               'Read more about this issue: ' +
-              colorama.Fore.LIGHTWHITE_EX  +
+              colorama.Fore.LIGHTWHITE_EX +
               'https://code.djangoproject.com/wiki/JSON1Extension [Windows section]\n')
 
         auto_agree = any([a == '--agree-fix-sqlite' for a in sys.argv])
         agree = 'n'
         if not auto_agree:
             print(colorama.Fore.WHITE +
-                  'Label Studio can try to resolve this issue by adding the correct sqlite.dll in the current directory, '
+                  'Label Studio can try to resolve this issue by downloading the correct '
+                  'sqlite.dll from https://sqlite.org in the current directory, '
                   'do you want to proceed? \n [y/n] > ', end='')
             agree = input()
 

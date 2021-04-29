@@ -3,6 +3,7 @@
 import datetime
 
 from django.utils import timezone
+from django.conf import settings
 from django.db import models
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
@@ -107,6 +108,11 @@ class User(AbstractBaseUser, PermissionsMixin, UserLastActivityMixin):
         db_table = 'htx_user'
         verbose_name = _('user')
         verbose_name_plural = _('users')
+
+    @property
+    def avatar_url(self):
+        if self.avatar:
+            return settings.HOSTNAME + self.avatar.url
 
     def is_organization_admin(self, org_pk):
         return True

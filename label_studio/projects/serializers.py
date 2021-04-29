@@ -21,51 +21,30 @@ class CreatedByFromContext:
 
 
 class ProjectSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
-    task_number = SerializerMethodField(default=None, read_only=True,
+    '''Serializer get numbers from project queryset annotation,
+    make sure, that you use correct one(Project.objects.with_counts())'''
+
+    task_number = serializers.IntegerField(default=None, read_only=True,
                                         help_text='Total task number in project')
-    total_annotations_number = SerializerMethodField(default=None, read_only=True,
+    total_annotations_number = serializers.IntegerField(default=None, read_only=True,
                                                     help_text='Total annotations number in project including '
                                                               'skipped_annotations_number and ground_truth_number.')
-    total_predictions_number = SerializerMethodField(default=None, read_only=True,
+    total_predictions_number = serializers.IntegerField(default=None, read_only=True,
                                                     help_text='Total predictions number in project including '
-                                                              'skipped_annotations_number and ground_truth_number.')
-    useful_annotation_number = SerializerMethodField(default=None, read_only=True,
+                                                              'skipped_annotations_number and ground_truth_numberuseful_annotation_numbeo.')
+    useful_annotation_number = serializers.IntegerField(default=None, read_only=True,
                                                      help_text='Useful annotation number in project not including '
                                                                'skipped_annotations_number and ground_truth_number. '
                                                                'Total annotations = annotation_number + '
                                                                'skipped_annotations_number + ground_truth_number')
-    ground_truth_number = SerializerMethodField(default=None, read_only=True,
+    ground_truth_number = serializers.IntegerField(default=None, read_only=True,
                                             help_text='Honeypot annotation number in project')
-    skipped_annotations_number = SerializerMethodField(default=None, read_only=True,
+    skipped_annotations_number = serializers.IntegerField(default=None, read_only=True,
                                                       help_text='Skipped by collaborators annotation number in project')
     created_by = UserSimpleSerializer(default=CreatedByFromContext())
 
     parsed_label_config = SerializerMethodField(default=None, read_only=True,
                                                 help_text='JSON-formatted labeling configuration')
-
-    @staticmethod
-    def get_task_number(project):
-        return Task.objects.filter(project=project).count()
-
-    @staticmethod
-    def get_total_annotations_number(project):
-        return Annotation.objects.filter(task__project=project, was_cancelled=False).count()
-
-    @staticmethod
-    def get_total_predictions_number(project):
-        return Prediction.objects.filter(task__project=project).count()
-
-    @staticmethod
-    def get_useful_annotation_number(project):
-        return Annotation.objects.filter(Q(task__project=project, ground_truth=False) & Q_finished_annotations).count()
-
-    @staticmethod
-    def get_ground_truth_number(project):
-        return Annotation.objects.filter(task__project=project, ground_truth=True).count()
-
-    @staticmethod
-    def get_skipped_annotations_number(project):
-        return Annotation.objects.filter(task__project=project, was_cancelled=True).count()
 
     @staticmethod
     def get_parsed_label_config(project):

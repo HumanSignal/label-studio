@@ -1,0 +1,51 @@
+# this file is distributed as an example of serving Label Studio under proxy with subpath http://localhost/foo/ without any warranties. If you need to adjust it to your deployment scenario, manually modify the subdomain.example.simple.conf nginx config, Label Studio env vars and postgres DB settings
+version: '3.3'
+
+services:
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - 80:80
+    depends_on:
+      - app
+    volumes:
+      - static:/label-studio/label_studio:rw
+      - ./mydata:/label-studio/data:rw
+      - ../nginx/subdomain.example.simple.conf:/etc/nginx/conf.d/default.conf:ro
+    command: nginx -g "daemon off;"
+
+  app:
+    stdin_open: true
+    tty: true
+    image: heartexlabs/label-studio:latest
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
+    environment:
+      - DJANGO_DB=default
+      - POSTGRE_NAME=postgres
+      - POSTGRE_USER=postgres
+      - POSTGRE_PASSWORD=
+      - POSTGRE_PORT=5432
+      - POSTGRE_HOST=db
+      - LABEL_STUDIO_HOST=http://localhost/foo
+    volumes:
+      - ./mydata:/label-studio/data:rw
+    command: [ "./deploy/wait-for-postgres.sh", "db", "bash", "/label-studio/deploy/start_label_studio.sh" ]
+
+  db:
+    image: postgres:11.5
+    hostname: db
+    restart: always
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    volumes:
+      - ${POSTGRES_DATA_DIR:-./postgres-data}:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+
+volumes:
+  static: {} 
