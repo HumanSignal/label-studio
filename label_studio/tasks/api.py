@@ -15,7 +15,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from core.utils.common import get_object_with_check_and_log
 from core.decorators import permission_required
-from core.permissions import all_permissions, HasObjectPermission
+from core.permissions import all_permissions, HasObjectPermission, ViewClassPermission
 
 from tasks.models import Task, Annotation, Prediction, AnnotationDraft
 from core.permissions import (get_object_with_permissions, check_object_permissions)
@@ -138,7 +138,13 @@ class AnnotationAPI(RequestDebugLogMixin, generics.RetrieveUpdateDestroyAPIView)
     Delete an annotation. This action can't be undone! 
     """
     parser_classes = (JSONParser, FormParser, MultiPartParser)
-    permission_classes = (IsAuthenticated, HasObjectPermission)
+    permission_required = ViewClassPermission(
+        GET=all_permissions.annotations_view,
+        PUT=all_permissions.annotations_change,
+        PATCH=all_permissions.annotations_change,
+        DELETE=all_permissions.annotations_delete,
+    )
+
     serializer_class = AnnotationSerializer
     queryset = Annotation.objects.all()
 
@@ -157,22 +163,18 @@ class AnnotationAPI(RequestDebugLogMixin, generics.RetrieveUpdateDestroyAPIView)
         return super(AnnotationAPI, self).update(request, *args, **kwargs)
 
     @swagger_auto_schema(tags=['Annotations'])
-    @permission_required(all_permissions.annotations_view)
     def get(self, request, *args, **kwargs):
         return super(AnnotationAPI, self).get(request, *args, **kwargs)
 
     @swagger_auto_schema(tags=['Annotations'], auto_schema=None)
-    @permission_required(all_permissions.annotations_change)
     def put(self, request, *args, **kwargs):
         return super(AnnotationAPI, self).put(request, *args, **kwargs)
 
     @swagger_auto_schema(tags=['Annotations'], request_body=AnnotationSerializer)
-    @permission_required(all_permissions.annotations_change)
     def patch(self, request, *args, **kwargs):
         return super(AnnotationAPI, self).patch(request, *args, **kwargs)
 
     @swagger_auto_schema(tags=['Annotations'])
-    @permission_required(all_permissions.annotations_delete)
     def delete(self, request, *args, **kwargs):
         return super(AnnotationAPI, self).delete(request, *args, **kwargs)
 
@@ -190,15 +192,18 @@ class AnnotationsListAPI(RequestDebugLogMixin, generics.ListCreateAPIView):
     Add annotations to a task like an annotator does.
     """
     parser_classes = (JSONParser, FormParser, MultiPartParser)
+    permission_required = ViewClassPermission(
+        GET=all_permissions.annotations_view,
+        POST=all_permissions.annotations_create,
+    )
+
     serializer_class = AnnotationSerializer
 
     @swagger_auto_schema(tags=['Annotations'])
-    @permission_required(all_permissions.annotations_view)
     def get(self, request, *args, **kwargs):
         return super(AnnotationsListAPI, self).get(request, *args, **kwargs)
 
     @swagger_auto_schema(tags=['Annotations'], request_body=AnnotationSerializer)
-    @permission_required(all_permissions.annotations_create)
     def post(self, request, *args, **kwargs):
         return super(AnnotationsListAPI, self).post(request, *args, **kwargs)
 

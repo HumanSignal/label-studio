@@ -34,7 +34,7 @@ from tasks.serializers import TaskSerializer, TaskWithAnnotationsAndPredictionsA
 
 from core.mixins import APIViewVirtualRedirectMixin, APIViewVirtualMethodMixin
 from core.decorators import permission_required
-from core.permissions import all_permissions
+from core.permissions import all_permissions, ViewClassPermission
 from core.utils.common import (
     get_object_with_check_and_log, bool_from_request, paginator, paginator_help)
 from core.utils.exceptions import ProjectExistException, LabelStudioDatabaseException
@@ -103,7 +103,10 @@ class ProjectListAPI(generics.ListCreateAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ProjectSerializer
     filter_backends = [filters.OrderingFilter]
-    permission_classes = ()
+    permission_required = ViewClassPermission(
+        GET=all_permissions.projects_view,
+        POST=all_permissions.projects_create,
+    )
     ordering = ['-created_at']
 
     def get_queryset(self):
@@ -124,12 +127,10 @@ class ProjectListAPI(generics.ListCreateAPIView):
             raise LabelStudioDatabaseException('Database error during project creation. Try again.')
 
     @swagger_auto_schema(tags=['Projects'])
-    @permission_required(all_permissions.projects_view)
     def get(self, request, *args, **kwargs):
         return super(ProjectListAPI, self).get(request, *args, **kwargs)
 
     @swagger_auto_schema(tags=['Projects'], request_body=ProjectSerializer)
-    @permission_required(all_permissions.projects_create)
     def post(self, request, *args, **kwargs):
         return super(ProjectListAPI, self).post(request, *args, **kwargs)
 
@@ -155,7 +156,13 @@ class ProjectAPI(APIViewVirtualRedirectMixin,
     """
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     queryset = Project.objects.with_counts()
-    permission_classes = (IsAuthenticated, )
+    permission_required = ViewClassPermission(
+        GET=all_permissions.projects_view,
+        DELETE=all_permissions.projects_delete,
+        PATCH=all_permissions.projects_change,
+        PUT=all_permissions.projects_change,
+        POST=all_permissions.projects_create,
+    )
     serializer_class = ProjectSerializer
 
     redirect_route = 'projects:project-detail'
@@ -165,17 +172,14 @@ class ProjectAPI(APIViewVirtualRedirectMixin,
         return Project.objects.with_counts().filter(organization=self.request.user.active_organization)
 
     @swagger_auto_schema(tags=['Projects'])
-    @permission_required(all_permissions.projects_view)
     def get(self, request, *args, **kwargs):
         return super(ProjectAPI, self).get(request, *args, **kwargs)
 
     @swagger_auto_schema(tags=['Projects'])
-    @permission_required(all_permissions.projects_delete)
     def delete(self, request, *args, **kwargs):
         return super(ProjectAPI, self).delete(request, *args, **kwargs)
 
     @swagger_auto_schema(tags=['Projects'], request_body=ProjectSerializer)
-    @permission_required(all_permissions.projects_change)
     def patch(self, request, *args, **kwargs):
         project = self.get_object()
         label_config = self.request.data.get('label_config')
@@ -210,12 +214,10 @@ class ProjectAPI(APIViewVirtualRedirectMixin,
             instance.delete()
 
     @swagger_auto_schema(auto_schema=None)
-    @permission_required(all_permissions.projects_create)
     def post(self, request, *args, **kwargs):
         return super(ProjectAPI, self).post(request, *args, **kwargs)
 
     @swagger_auto_schema(auto_schema=None)
-    @permission_required(all_permissions.projects_change)
     def put(self, request, *args, **kwargs):
         return super(ProjectAPI, self).put(request, *args, **kwargs)
 

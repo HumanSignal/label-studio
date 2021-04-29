@@ -118,6 +118,7 @@ class OrganizationAPI(APIViewVirtualRedirectMixin,
 
 class OrganizationInviteAPI(APIView):
     parser_classes = (JSONParser,)
+    permission_required = all_permissions.organizations_change
 
     @swagger_auto_schema(
         tags=["Invites"],
@@ -134,6 +135,7 @@ class OrganizationInviteAPI(APIView):
 
 
 class OrganizationResetTokenAPI(APIView):
+    permission_required = all_permissions.organizations_invite
     parser_classes = (JSONParser,)
 
     @swagger_auto_schema(
@@ -142,8 +144,7 @@ class OrganizationResetTokenAPI(APIView):
         responses={200: OrganizationInviteSerializer()}
     )
     def post(self, request, *args, **kwargs):
-        org = get_object_with_check_and_log(self.request, Organization, pk=request.user.active_organization_id)
-        self.check_object_permissions(self.request, org)
+        org = request.user.active_organization
         org.reset_token()
         logger.debug(f'New token for organization {org.pk} is {org.token}')
         invite_url = '{}?token={}'.format(reverse('user-signup'), org.token)

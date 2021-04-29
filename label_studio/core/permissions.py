@@ -4,6 +4,7 @@ import logging
 import rules
 
 from pydantic import BaseModel
+from typing import Optional
 
 from django.shortcuts import redirect, reverse
 from django.core.exceptions import PermissionDenied as HTMLPermissionDenied
@@ -14,9 +15,7 @@ from django.apps import apps
 from rest_framework.permissions import IsAuthenticated, SAFE_METHODS, BasePermission
 from rest_framework.exceptions import PermissionDenied as DRFPermissionDenied
 
-from core.utils.common import get_object_with_check_and_log, request_permissions_add, get_project, load_func
-from projects.models import Project, ProjectTemplate
-from tasks.models import Task, Annotation
+from core.utils.common import get_object_with_check_and_log
 from users.models import User
 logger = logging.getLogger(__name__)
 
@@ -26,6 +25,7 @@ class AllPermissions(BaseModel):
     organizations_view = 'organizations.view'
     organizations_change = 'organizations.change'
     organizations_delete = 'organizations.delete'
+    organizations_invite = 'organizations.invite'
     projects_create = 'projects.create'
     projects_view = 'projects.view'
     projects_change = 'projects.change'
@@ -40,6 +40,15 @@ class AllPermissions(BaseModel):
     annotations_delete = 'annotations.delete'
 
 all_permissions = AllPermissions()
+
+
+class ViewClassPermission(BaseModel):
+    GET: Optional[str] = None
+    PATCH: Optional[str] = None
+    PUT: Optional[str] = None
+    DELETE: Optional[str] = None
+    POST: Optional[str] = None
+
 
 def make_perm(name, pred):
     if rules.perm_exists(name):

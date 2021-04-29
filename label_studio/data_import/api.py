@@ -12,9 +12,8 @@ from rest_framework.response import Response
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 
-from core.permissions import IsBusiness, get_object_with_permissions, all_permissions, HasObjectPermission
+from core.permissions import all_permissions, ViewClassPermission
 from core.utils.common import bool_from_request, retry_database_locked
-from core.decorators import permission_required
 from projects.models import Project
 from tasks.models import Task
 from .uploader import load_tasks
@@ -405,7 +404,10 @@ class FileUploadListAPI(generics.mixins.ListModelMixin,
 
     parser_classes = (JSONParser, MultiPartParser, FormParser)
     serializer_class = FileUploadSerializer
-    permission_classes = (IsAuthenticated, HasObjectPermission)
+    permission_required = ViewClassPermission(
+        GET=all_permissions.projects_view,
+        DELETE=all_permissions.projects_change,
+    )
     queryset = FileUpload.objects.all()
 
     def get_queryset(self):
@@ -421,12 +423,10 @@ class FileUploadListAPI(generics.mixins.ListModelMixin,
         return FileUpload.objects.filter(project_id=project.id, id__in=ids, user=self.request.user)
 
     @swagger_auto_schema(tags=['Import'])
-    @permission_required(all_permissions.projects_view)
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
 
     @swagger_auto_schema(tags=['Import'])
-    @permission_required(all_permissions.projects_change)
     def delete(self, request, *args, **kwargs):
         project = generics.get_object_or_404(Project.objects.for_user(self.request.user),  pk=self.kwargs['pk'])
         ids = self.request.data.get('file_upload_ids')
@@ -441,7 +441,7 @@ class FileUploadListAPI(generics.mixins.ListModelMixin,
 
 class FileUploadAPI(generics.RetrieveUpdateDestroyAPIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
-    permission_classes = (IsBusiness, )
+    permission_classes = (IsAuthenticated, )
     serializer_class = FileUploadSerializer
     queryset = FileUpload.objects.all()
 

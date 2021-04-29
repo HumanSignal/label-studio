@@ -89,6 +89,11 @@ class Organization(models.Model):
     def has_project_member(self, user):
         return self.projects.filter(members__user=user).exists()
 
+    def has_permission(self, user):
+        if self in user.organizations.all():
+            return True
+        return False
+
     def add_user(self, user):
         if self.users.filter(pk=user.pk).exists():
             logger.debug('User already exists in organization.')
