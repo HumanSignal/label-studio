@@ -3285,6 +3285,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
 const Label = ({
   text,
   children,
@@ -3294,10 +3295,12 @@ const Label = ({
   size,
   large,
   style,
+  simple,
   flat
 }) => {
   const rootClass = (0,_utils_bem__WEBPACK_IMPORTED_MODULE_1__.cn)('label');
   const classList = [rootClass];
+  const tagName = simple ? 'div' : 'label';
   const mods = {
     size,
     large,
@@ -3307,10 +3310,11 @@ const Label = ({
     empty: !children
   };
   classList.push(rootClass.mod(mods));
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("label", {
-    className: classList.join(" "),
-    "data-required": required,
-    style: style,
+  return /*#__PURE__*/(0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(tagName, {
+    'className': classList.join(" "),
+    'data-required': required,
+    'style': style
+  }, /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.Fragment, {
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsx)("div", {
       className: rootClass.elem('text'),
       children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_3__.jsxs)("div", {
@@ -3324,7 +3328,7 @@ const Label = ({
       className: rootClass.elem('field'),
       children: children
     })]
-  });
+  }));
 };
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Label);
@@ -3421,6 +3425,7 @@ const RadioGroup = ({
 
   return label ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(___WEBPACK_IMPORTED_MODULE_1__.Label, { ...(labelProps !== null && labelProps !== void 0 ? labelProps : {}),
     text: label,
+    simple: simple,
     required: required,
     children: field
   }) : field;
@@ -3464,7 +3469,10 @@ const RadioButton = ({
         type: "radio",
         value: value,
         checked: checked,
-        readOnly: true
+        readOnly: true,
+        style: {
+          pointerEvents: 'none'
+        }
       })
     }) : children
   });

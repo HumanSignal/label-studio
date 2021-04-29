@@ -48,7 +48,7 @@ export const RadioGroup = ({label, className, validate, required, skip, simple, 
     </FormField>
   );
 
-  return label ? <Label {...(labelProps ?? {})} text={label} required={required}>{field}</Label> : field;
+  return label ? <Label {...(labelProps ?? {})} text={label} simple={simple} required={required}>{field}</Label> : field;
 };
 
 const RadioButton = ({ value, disabled, children, label, description, ...props }) => {
@@ -69,7 +69,7 @@ const RadioButton = ({ value, disabled, children, label, description, ...props }
     <Elem name="button" mod={{ checked, disabled }} onClickCapture={clickHandler}>
       {isSimple ? (
         <Label placement="right" text={label} description={description}>
-          <input type="radio" value={value} checked={checked} readOnly/>
+          <input type="radio" value={value} checked={checked} readOnly style={{pointerEvents: 'none'}}/>
         </Label>
       ) : children}
     </Elem>
