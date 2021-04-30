@@ -9,13 +9,11 @@ meta_description: Use Label Studio to evaluate named entity recognition parsers 
 
 ![image](https://user-images.githubusercontent.com/2641205/112475305-f5863900-8d70-11eb-9eb8-9da879f61708.png)
 
-You can use Named Entity Recognition (NER) parsers to turn unstructured text into structured content by classifying information like organizations, dates, countries, professions, and others in the text. After a model detects those entities, they can be tagged and classified to allow for further analysis. In order to choose the best NER parser for your data analysis, you want to evaluate model performance against a relevant dataset. 
+This tutorial helps you evaluate accuracy of Named Entity Recognition (NER) taggers using Label Studio. Gather predictions from standard [spaCY](https://spacy.io/) language models for a dataset based on transcripts from the podcast This American Life, then use Label Studio to correct the transcripts and determine which model performed better to focus future retraining efforts.
+
+Named Entity Recognition (NER) parsers turn unstructured text into structured content by classifying information like organizations, dates, countries, professions, and others in the text. After a model detects those entities, they can be tagged and classified to allow for further analysis. In order to choose the best NER parser for your data analysis, you want to evaluate model performance against a relevant dataset. 
 
 You can use off-the-shelf parsers and NER taggers to handle named entity parsing and tagging, but the tagging accuracy of these for a specialized or small text corpus can often be low. Because of that, in many real-world settings you need to evaluate the accuracy of various NER taggers and fine tune the most promising one for better accuracy for your data.
-
-This tutorial helps you evaluate accuracy of NER taggers from standard spaCY language models for a dataset based on transcripts from the podcast This American Life, then you can use Label Studio to correct the transcripts to prepare you to fine tune a specific tagger. 
-
-Use the NLP library spaCy to process and analyze the text corpus, then import the predictions into Label Studio. You can then correct the predictions in Label Studio and export them as a gold standard dataset that you can use to re-evaluate the model accuracy or retrain the spaCy model. 
 
 ## Before you start
 This tutorial assumes that you're comfortable with basic natural language processing (NLP) and machine learning (ML) terminology, such as the technical meaning of evaluation and the basic function and results provided by NER taggers. 
@@ -44,8 +42,6 @@ An excerpt of the file looks like the following:
 
 <img width="1137" alt="The columns of the dataset" src="https://user-images.githubusercontent.com/2641205/111653437-34b00980-8808-11eb-9514-eeabdd9556a7.png">
 
-You need to analyze the `line_text` column found in the `lines_clean.csv` file, which contains clean textual data.
-
 ### Install spaCy and pandas
 
 Before you install spaCy, make sure that `pip` is installed and has been updated recently. Type the following in the command line: 
@@ -66,10 +62,11 @@ pip install pandas
 
 ### Import pre-annotated data
 
-In order to evaluate and correct the spaCy model performance for the keyword "Easter", import the spaCy model predictions into Label Studio.
+In order to evaluate and correct spaCy model performance for the keyword "Easter", generate and import spaCy model predictions into Label Studio.
+
+This tutorial compares the prediction quality of the small and large English NER spaCy models, trained on written text from the web, for the podcast transcript dataset.
 
 Run the following script to parse the dataset and output the spaCy model predictions as Label Studio tasks in JSON format:
-
 
 ```python
 import spacy
@@ -145,15 +142,14 @@ with open('named_entities.txt', mode='w') as f:
 
 After running the script, you have two files:
 - A `tasks.json` file with predictions from the large and small spaCy models to import into Label Studio.
-- A `named_entities.txt` file that contains the list of entities to use as labels. 
-
+- A `named_entities.txt` file that contains the list of entities to use as labels.
  
 ## Correct the predicted Named Entities in Label Studio
 
 To classify named entities, you need to create a dataset with gold standard labels that are accurate for your use case. To do that, use the open source data labeling tool, [Label Studio](https://labelstud.io). 
 
 ### Install and start Label Studio
-Install Label Studio in a virtual environment with `pip` using the following command:
+Install Label Studio in a virtual environment with `pip` using the following commands:
 ```bash
 python3 -m venv env
 source env/bin/activate
@@ -165,8 +161,7 @@ After you install Label Studio, start the server and specify a project name:
 label-studio start ner-tagging
 ```
 
-Open Label Studio in your web browser and create an account to sign up.
-<img width="1122" alt="CleanShot 2021-03-19 at 14 36 23@2x" src="https://user-images.githubusercontent.com/2641205/111788581-8ae08380-88c0-11eb-91ad-fd169e72c864.png">
+Open Label Studio in your web browser at http://localhost:8080/ and create an account.
 
 ### Set up your Label Studio project
 
@@ -192,7 +187,7 @@ Click **Label** to start correcting the labeled instances of "Easter" in your da
 2. Click **Submit** to save the new annotation and label the next task. 
 3. Continue until you've labeled all the tasks. 
 
-<img src="/images/ner-blog/spaCyModelPredictionsCorrected.gif" alt="Gif of the process reviewing predictions and updating an annotation described in the preceding steps." class="gif-border" />
+<img src="/images/ner-blog/spaCyModelPredictionsCorrected.gif" alt="Gif of the process of reviewing predictions and updating an annotation described in the preceding steps." class="gif-border" />
 
 ### Export your data to prepare to evaluate model accuracy
 
@@ -234,9 +229,9 @@ The script produces something like the following output:
 Accuracy for en_core_web_sm: 0.03%
 Accuracy for en_core_web_lg: 0.41%
 ```
-Both models rarely predicted the `Easter` keyword correctly, so the accuracy percentage is quite low. However, it's still clear that the larger spaCy convolutional neural network (CNN) model performed significantly better than the smaller spaCy model. 
+Both models rarely predicted the `Easter` keyword correctly, so the accuracy percentage is quite low. However, it's still clear that the larger spaCy convolutional neural network (CNN) model performed significantly better than the smaller spaCy model in this case. 
 
-With these steps, it's clear that you can easily evaluate the performance results of two different models with just a few minutes of annotation, without spending too much time building complex evaluation pipelines with static datasets.
+With these steps, it's clear that you can evaluate the performance results of two different models with just a few minutes of annotation, without spending too much time building complex evaluation pipelines with static datasets.
 
 ## What's next?
 
@@ -244,4 +239,4 @@ This is a simple example using only one specific corner case based on the `Easte
 
 You could also use the gold standard dataset to evaluate changes to models and determine the optimal parameters to use for a specific model to fine tune accuracy for a specific type of data. For example, evaluate and correct the predictions for one model against the gold standard dataset, then create a second model with a different set of parameters and evaluate that one against the gold standard dataset. Whichever model performs better is likely the better model for your data and use case.
 
-Review the [tutorial for creating a machine learning backend with Label Studio](/guide/ml_tutorial.html) to see how you can go further with automating model retraining and using Label Studio in your model development pipeline.
+Review the [example tutorials for creating a machine learning backend with Label Studio](/guide/ml_tutorials.html) to see how you can go further with automating model retraining and using Label Studio in your model development pipeline.
