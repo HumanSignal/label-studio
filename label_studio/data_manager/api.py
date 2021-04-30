@@ -103,6 +103,8 @@ class ViewAPI(viewsets.ModelViewSet):
     @staticmethod
     def evaluate_predictions(tasks):
         # call machine learning api and format response
+        if not tasks.exists():
+            return
 
         project = tasks[0].project
         if not project.show_collab_predictions:
