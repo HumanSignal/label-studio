@@ -150,10 +150,16 @@ class MLBackend(models.Model):
         if ml_api_result.is_error:
             logger.error(f'Prediction not created for project {self}: {ml_api_result.error_message}')
             return
+
         responses = ml_api_result.response['results']
+
         if len(responses) == 0:
             logger.error(f'ML backend returned empty prediction for project {self}')
             return
+
+        if len(responses) != len(tasks_ser):
+            logger.error(f'ML backend returned response number {len(responses)} != task number {len(tasks_ser)}')
+
         predictions = []
         for task, response in zip(tasks_ser, responses):
             predictions.append({
@@ -163,7 +169,6 @@ class MLBackend(models.Model):
                 'model_version': self.model_version
             })
         with conditional_atomic():
-            Prediction.objects.filter(task_id__in=tasks.values_list('id', flat=True)).delete()
             prediction_ser = PredictionSerializer(data=predictions, many=True)
             prediction_ser.is_valid(raise_exception=True)
             prediction_ser.save()
