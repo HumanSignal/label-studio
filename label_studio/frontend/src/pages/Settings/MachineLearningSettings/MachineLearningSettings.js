@@ -116,6 +116,10 @@ export const MachineLearningSettings = () => {
               label="Display ML-predicted annotations when labeling"
               name="show_collab_predictions"
             />
+            <Toggle
+              label="Display ML-predicted annotations when labeling"
+              name="show_collab_predictions"
+            />
           </div>
         </Form.Row>
       </Form>
