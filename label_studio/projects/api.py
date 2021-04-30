@@ -614,6 +614,11 @@ class TasksListAPI(generics.ListCreateAPIView,
     Delete all tasks from a specific project.
     """
     parser_classes = (JSONParser, FormParser)
+    permission_required = ViewClassPermission(
+        GET=all_permissions.tasks_view,
+        POST=all_permissions.tasks_change,
+        DELETE=all_permissions.tasks_delete,
+    )
     serializer_class = TaskSerializer
     redirect_route = 'projects:project-settings'
     redirect_kwarg = 'pk'
