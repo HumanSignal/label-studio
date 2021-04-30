@@ -75,6 +75,7 @@ h1 {
   font-size: 130%;
   font-weight: bold;
   color: #555;
+  line-height: 1.4em;
 }
 .card .desc {
   float: right;
