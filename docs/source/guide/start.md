@@ -47,8 +47,8 @@ The following command line arguments are optional and must be specified with `la
 | `--cert` | `LABEL_STUDIO_CERT_FILE` | `None` | Deprecated, do not use. Certificate file to use to access Label Studio over HTTPS. Must be in PEM format. See [Run Label Studio with HTTPS](start.html#Run-Label-Studio-with-HTTPS) on this page. | 
 | `--key` | `LABEL_STUDIO_KEY_FILE` | `None` | Deprecated, do not use. Private key file for HTTPS connection. Must be in PEM format. See [Run Label Studio with HTTPS](start.html#Run-Label-Studio-with-HTTPS) on this page. |
 | `--initial-project-description` | `LABEL_STUDIO_PROJECT_DESC` | `''` | Specify a project description for a Label Studio project. See [Set up your labeling project](setup.html). |
-| `--password` | `LABEL_STUDIO_PASSWORD` | `None` | Password to use for the default user. |
-| `--username` | `LABEL_STUDIO_USERNAME` | `default_user@localhost` | Username to use for the default user. |
+| `--password` | `LABEL_STUDIO_PASSWORD` | `None` | Password to use for the default user. See [Create user accounts for Label Studio](signup.html). |
+| `--username` | `LABEL_STUDIO_USERNAME` | `default_user@localhost` | Username to use for the default user. See [Create user accounts for Label Studio](signup.html). |
 | `--agree-fix-sqlite` | N/A | `False` | Automatically agree to let Label Studio fix SQLite issues when using Python 3.6–3.8 on Windows operating systems. | 
 | N/A | `LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED` | `False` | Allow Label Studio to access local file directories to import storage. See [Run Label Studio on Docker and use local storage](start.html#Run_Label_Studio_on_Docker_and_use_local_storage). |
 | N/A | `LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT` | `/` | Specify the root directory for Label Studio to use when accessing local file directories. See [Run Label Studio on Docker and use local storage](start.html#Run_Label_Studio_on_Docker_and_use_local_storage). |
@@ -107,7 +107,9 @@ To run Label Studio on Docker and reference persistent local storage directories
 The following command starts a Docker container with the latest image of Label Studio with port 8080 and an environment variable that allows Label Studio to access local files. In this example, a local directory `./myfiles` is mounted to the `/label-studio/files` location. 
 ```bash
 docker run -it -p 8080:8080 -v `pwd`/mydata:/label-studio/data \
- --env LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true --env LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT=/label-studio/files -v `pwd`/myfiles:/label-studio/files \
+--env LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true \ 
+--env LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT=/label-studio/files \ 
+-v `pwd`/myfiles:/label-studio/files \
 heartexlabs/label-studio:latest label-studio
 ```
 

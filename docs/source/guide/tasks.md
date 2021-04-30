@@ -189,7 +189,7 @@ this is a first task
 this is a second task
 ```
 
-If you want to import entire plain text files without each line becoming a new labeling task, customize the labeling configuration to specify `valueType="url"` in the Text tag. See the [Text tag documentation](tags/text.html)
+If you want to import entire plain text files without each line becoming a new labeling task, customize the labeling configuration to specify `valueType="url"` in the Text tag. See the [Text tag documentation](/tags/text.html)
 
 ## Import data from a local directory
 
@@ -207,8 +207,10 @@ Use that script to do the following:
    The script collects the links to the files provided by that HTTP server and saves them to a `files.txt` file with one URL per line. 
 3. Import the file with URLs into Label Studio using the Label Studio UI. 
 
+If your labeling configuration supports HyperText or multiple data types, use the Label Studio JSON format to specify the local file locations instead of a `txt` file. See [an example of this format](storage.html#Tasks-with-local-storage-file-references).
+
 ### Add the file directory as source storage in the Label Studio UI
-If you're running Label Studio on Docker and want to add local file storage, you need to mount the file directory and set up environment variables. See [Run Label Studio on Docker and use local storage](start.html#Run_Label_Studio_on_Docker_and_use_local_storage).
+If you're running Label Studio on Docker and want to add local file storage, you need to mount the file directory and set up environment variables. See [Run Label Studio on Docker and use local storage](start.html#Run-Label-Studio-on-Docker-and-use-local-storage).
 
 ## Import data from the Label Studio UI
 

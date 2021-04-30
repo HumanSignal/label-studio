@@ -286,6 +286,20 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
             except Task.DoesNotExist:
                 logger.debug('Task with id {} locked'.format(task.id))
 
+    def _get_first_locked_by(self, user, tasks_query):
+        def match(task):
+            # Match task locked by user and discard expired tasks
+            return (
+                task.has_lock()
+                and task.locks.filter(user=user).count() > 0
+            )
+
+        lookup = (
+            task for task in tasks_query.all()
+            if match(task)
+        )
+        return next(lookup, None)
+
     def _try_ground_truth(self, tasks, project):
         """Returns task from ground truth set"""
         ground_truth = Annotation.objects.filter(task=OuterRef('pk'), ground_truth=True)
@@ -442,10 +456,14 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
 
             # ordered by data manager
             if external_prepared_tasks_used:
-                next_task = not_solved_tasks.first()
+                use_task_lock = False
+                next_task = self._get_first_locked_by(user, not_solved_tasks)
+                if not next_task:
+                    use_task_lock = True
+                    next_task = self._get_first_unlocked(not_solved_tasks)
                 if not next_task:
                     raise NotFound('No more tasks found')
-                return self._make_response(next_task, request)
+                return self._make_response(next_task, request, use_task_lock=use_task_lock)
 
             # If current user has already lock one task - return it (without setting the lock again)
             next_task = Task.get_locked_by(user, project)
