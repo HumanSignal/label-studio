@@ -1,5 +1,5 @@
 ---
-title: Create a machine learning backend
+title: Write your own machine learning backend
 type: guide
 order: 607
 meta_title: Machine Learning SDK
@@ -14,7 +14,7 @@ Before you start integrating your custom model code with the Label Studio ML SDK
 2. The [prediction format](predictions.html) returned by your ML backend server.
 3. The required packages and dependencies necessary to run your machine learning model. 
 
-## Create a machine learning backend 
+## Step by step tutorial 
 This example tutorial outlines how to wrap a simple text classifier based on the [scikit-learn](https://scikit-learn.org/) framework with the Label Studio ML SDK.
 
 Start by creating a class declaration. You can create a Label Studio-compatible ML backend server in one command by inheriting it from `LabelStudioMLBase`. 
@@ -76,7 +76,9 @@ def predict(self, tasks, **kwargs):
 ### Training call
 Use the training call to update your model with new annotations. You don't need to use this call in your code, for example if you just want to pre-annotate tasks without retraining the model. If you do want to retrain the model based on annotations from Label Studio, use this method. 
 
-Write your own code to override the `fit(annotations, **kwargs)` method, which takes [JSON-formatted Label Studio annotations](https://labelstud.io/guide/export.html#Raw-JSON-format-of-completed-labeled-tasks) and returns an arbitrary dict where some information about the created model can be stored.
+Write your own code to override the `fit(completions, **kwargs)` method, which takes [JSON-formatted Label Studio annotations](https://labelstud.io/guide/export.html#Raw-JSON-format-of-completed-labeled-tasks) and returns an arbitrary dict where some information about the created model can be stored.
+
+> Note: Since LS 1.0 `completions` field is deprecated and will be replaced with `annotations` soon.  
 
 **Example**
 ```python

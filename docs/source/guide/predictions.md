@@ -90,3 +90,5 @@ The prediction score applies to the entire prediction.
  
 In the Label Studio UI, the imported prediction for this task looks like the following: 
 <center><img src="../images/predictions_loaded.png" style="width: 100%; max-width: 700px"></center>
+
+<!-- md image_units.md -->
