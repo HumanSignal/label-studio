@@ -119,7 +119,7 @@ export const MachineLearningSettings = () => {
 
           <div style={{paddingLeft: 16}}>
             <Toggle
-              label="Evaluate and display predictions automatically on the task loading"
+              label="Retrieve and display predictions when loading a task"
               name="evaluate_predictions_automatically"
             />
           </div>

@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='project',
             name='evaluate_predictions_automatically',
-            field=models.BooleanField(default=True, help_text='Evaluate predictions automatically on task loading',
+            field=models.BooleanField(default=True, help_text='Retrieve and display predictions when loading a task',
                                       verbose_name='evaluate predictions automatically'),
         ),
     ]

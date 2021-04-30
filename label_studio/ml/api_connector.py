@@ -7,9 +7,12 @@ import urllib
 import attr
 
 from django.db.models import Q, F, Count
+from django.conf import settings
 from requests.adapters import HTTPAdapter
 from core.version import get_git_version
 from data_export.serializers import ExportDataSerializer
+from users.models import Token
+
 
 version = get_git_version()
 logger = logging.getLogger(__name__)
@@ -184,7 +187,9 @@ class MLApi(BaseHTTPAPI):
     def setup(self, project):
         return self._request('setup', request={
             'project': self._create_project_uid(project),
-            'schema': project.label_config
+            'schema': project.label_config,
+            'hostname': settings.HOSTNAME if settings.HOSTNAME else ('http://localhost:' + settings.INTERNAL_PORT),
+            'access_token': project.created_by.auth_token.key
         })
 
     def duplicate_model(self, project_src, project_dst):
