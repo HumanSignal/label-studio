@@ -19,7 +19,7 @@ from projects.models import Project
 from projects.serializers import ProjectSerializer
 from tasks.models import Task, Annotation
 
-from data_manager.functions import get_all_columns, get_prepared_queryset
+from data_manager.functions import get_all_columns, get_prepared_queryset, evaluate_predictions
 from data_manager.models import View
 from data_manager.serializers import ViewSerializer, TaskSerializer, SelectedItemsSerializer
 from data_manager.actions import get_all_actions, perform_action
@@ -100,19 +100,6 @@ class ViewAPI(viewsets.ModelViewSet):
         queryset.all().delete()
         return Response(status=204)
 
-    @staticmethod
-    def evaluate_predictions(tasks):
-        # call machine learning api and format response
-        if not tasks.exists():
-            return
-
-        project = tasks[0].project
-        if not project.show_collab_predictions:
-            return
-
-        for ml_backend in project.ml_backends.all():
-            ml_backend.predict_many_tasks(tasks)
-
     def get_task_queryset(self, request, view):
         return Task.prepared.all(prepare_params=view.get_prepare_tasks_params())
 
@@ -133,12 +120,12 @@ class ViewAPI(viewsets.ModelViewSet):
         self.pagination_class = TaskPagination
         page = self.paginate_queryset(queryset)
         if page is not None:
-            self.evaluate_predictions(page)
+            evaluate_predictions(page)
             serializer = self.task_serializer_class(page, many=True, context=context)
             return self.get_paginated_response(serializer.data)
 
         # all tasks
-        self.evaluate_predictions(queryset)
+        evaluate_predictions(queryset)
         serializer = self.task_serializer_class(queryset, many=True, context=context)
         return Response(serializer.data)
 

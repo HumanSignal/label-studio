@@ -140,9 +140,10 @@ class MLBackend(models.Model):
         if self.not_ready:
             logger.debug(f'ML backend {self} is not ready')
             return
-        # TODO:
-        from tasks.models import Task
-        tasks = Task.objects.filter(id__in=[task.id for task in tasks])
+
+        if isinstance(tasks, list):
+            from tasks.models import Task
+            tasks = Task.objects.filter(id__in=[task.id for task in tasks])
 
         tasks_ser = TaskSimpleSerializer(tasks, many=True).data
         ml_api_result = self.api.make_predictions(tasks_ser, self.model_version, self.project)

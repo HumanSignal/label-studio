@@ -5,6 +5,18 @@ from django.db.models import signals
 from tasks.models import Annotation, Prediction, update_is_labeled_after_removing_annotation
 from core.utils.common import temporary_disconnect_signal
 
+from data_manager.functions import evaluate_predictions
+
+
+def retrieve_tasks_predictions(project, queryset, **kwargs):
+    """ Retrieve predictions by tasks ids
+
+    :param project: project instance
+    :param queryset: filtered tasks db queryset
+    """
+    evaluate_predictions(queryset)
+    return {'processed_items': queryset.count(), 'detail': 'Retrieved ' + str(queryset.count()) + ' predictions'}
+
 
 def delete_tasks(project, queryset, **kwargs):
     """ Delete tasks by ids
@@ -55,6 +67,20 @@ def delete_tasks_predictions(project, queryset, **kwargs):
 
 
 actions = [
+    {
+        'entry_point': retrieve_tasks_predictions,
+        'title': 'Retrieve predictions',
+        'order': 90,
+        'permissions': 'can_manage_annotations',
+        'dialog': {
+            'text': 'The selected tasks will be sent to all ML backends connected to the project.'
+                    'This operation can be abruptly interrupted due to a timeout. ' 
+                    'The recommended way to get predictions is to update tasks '
+                    'on the ML backend side through Label Studio API. Read more in the documentation.'
+                    'Please confirm your action.',
+            'type': 'confirm'
+        }
+    },
     {
         'entry_point': delete_tasks,
         'title': 'Delete tasks', 'order': 100,
