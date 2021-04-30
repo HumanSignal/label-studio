@@ -40,7 +40,7 @@ There are special variables provided by the inherited class:
 
 After you define the loaders, you can define two methods for your model: an inference call and a training call. 
 
-### Inference call
+## Inference call
 
 Use an inference call to get pre-annotations from your model on-the-fly. You must update the existing predict method in the example ML backend scripts to make them work for your specific use case. 
 
@@ -72,7 +72,7 @@ def predict(self, tasks, **kwargs):
 ```
 
 
-### Training call
+## Training call
 Use the training call to update your model with new annotations. You don't need to use this call in your code, for example if you just want to pre-annotate tasks without retraining the model. If you do want to retrain the model based on annotations from Label Studio, use this method. 
 
 Write your own code to override the `fit(completions, **kwargs)` method, which takes [JSON-formatted Label Studio annotations](https://labelstud.io/guide/export.html#Raw-JSON-format-of-completed-labeled-tasks) and returns an arbitrary dict where some information about the created model can be stored.
