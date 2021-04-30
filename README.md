@@ -187,6 +187,10 @@ You can use Label Studio as an independent part of your machine learning workflo
 | [label-studio-transformers](https://github.com/heartexlabs/label-studio-transformers) | Transformers library connected and configured for use with Label Studio |
 
 
+## Roadmap
+
+Want to use **The Coolest Feature X** but Label Studio doesn't support it? Check out [our public roadmap](roadmap.md)!
+
 ## Citation
 
 ```tex

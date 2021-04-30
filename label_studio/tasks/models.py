@@ -255,7 +255,6 @@ class Annotation(models.Model):
     objects = AnnotationManager()
     tracker = FieldTracker(fields=['ground_truth', 'result'])
 
-    state = JSONField('state', null=True, default=dict, help_text='Editor state (system data)')
     result = JSONField('result', null=True, default=None, help_text='The main value of annotator work - '
                                                                     'labeling result in JSON format')
 

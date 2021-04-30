@@ -39,4 +39,5 @@ class UserSimpleSerializer(BaseUserSerializer):
         model = User
         fields = ('id', 'first_name', 'last_name', 'email', 'avatar')
 
+
 UserSerializer = load_func(settings.USER_SERIALIZER)

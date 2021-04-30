@@ -96,8 +96,8 @@ def _create_user(input_args, config):
 
     DEFAULT_USERNAME = 'default_user@localhost'
 
-    username = input_args.username or config.get('username')
-    password = input_args.password or config.get('password')
+    username = input_args.username or config.get('username') or get_env('USERNAME')
+    password = input_args.password or config.get('password') or get_env('PASSWORD')
 
     if not username:
         user = User.objects.filter(email=DEFAULT_USERNAME).first()
@@ -123,8 +123,11 @@ def _create_user(input_args, config):
         print('User {} already exists'.format(username))
 
     user = User.objects.get(email=username)
-    if not Organization.objects.exists():
+    org = Organization.objects.first()
+    if not org:
         Organization.create_organization(created_by=user, title='Label Studio')
+    else:
+        org.add_user(user)
 
     return user
 
@@ -313,6 +316,9 @@ def main():
     # on `start` command, launch browser if --no-browser is not specified and start label studio server
     if input_args.command == 'start' or input_args.command is None:
         from label_studio.core.utils.common import start_browser
+
+        if get_env('USERNAME') and get_env('PASSWORD'):
+            _create_user(input_args, config)
 
         # ssl not supported from now
         cert_file = input_args.cert_file or config.get('cert')

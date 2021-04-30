@@ -147,7 +147,7 @@ class GCSImportStorage(ImportStorage, GCSStorageMixin):
         expires_at_ms = datetime.now() + timedelta(minutes=self.presign_ttl)
         # This next line is the trick!
         signing_credentials = compute_engine.IDTokenCredentials(auth_request, "",
-                                                                service_account_email=credentials.service_account_email)
+                                                                service_account_email=None)
         signed_url = signed_blob_path.generate_signed_url(expires_at_ms, credentials=signing_credentials, version="v4")
         return signed_url
 

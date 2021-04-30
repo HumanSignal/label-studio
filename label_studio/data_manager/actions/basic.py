@@ -37,7 +37,7 @@ def delete_tasks_annotations(project, queryset, **kwargs):
     annotations = Annotation.objects.filter(task__id__in=task_ids)
     count = annotations.count()
     annotations.delete()
-    return {'processed_items': count, 'reload': True,
+    return {'processed_items': count,
             'detail': 'Deleted ' + str(count) + ' annotations'}
 
 
@@ -51,8 +51,7 @@ def delete_tasks_predictions(project, queryset, **kwargs):
     predictions = Prediction.objects.filter(task__id__in=task_ids)
     count = predictions.count()
     predictions.delete()
-    return {'processed_items': count, 'reload': True,
-            'detail': 'Deleted ' + str(count) + ' predictions'}
+    return {'processed_items': count, 'detail': 'Deleted ' + str(count) + ' predictions'}
 
 
 actions = [

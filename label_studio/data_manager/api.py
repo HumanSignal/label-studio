@@ -111,6 +111,9 @@ class ViewAPI(viewsets.ModelViewSet):
         for ml_backend in project.ml_backends.all():
             ml_backend.predict_many_tasks(tasks)
 
+    def get_task_queryset(self, request, view):
+        return Task.prepared.all(prepare_params=view.get_prepare_tasks_params())
+
     @swagger_auto_schema(tags=['Data Manager'], responses={200: task_serializer_class(many=True)})
     @action(detail=True, methods=["get"])
     def tasks(self, request, pk=None):
@@ -121,8 +124,8 @@ class ViewAPI(viewsets.ModelViewSet):
         Retrieve a list of tasks with pagination for a specific view using filters and ordering.
         """
         view = self.get_object()
-        queryset = Task.prepared.all(prepare_params=view.get_prepare_tasks_params())
-        context = {'proxy': bool_from_request(request.GET, 'proxy', True), 'resolve_uri': True}
+        queryset = self.get_task_queryset(request, view)
+        context = {'proxy': bool_from_request(request.GET, 'proxy', True), 'resolve_uri': True, 'request': request}
 
         # paginated tasks
         self.pagination_class = TaskPagination
@@ -207,7 +210,9 @@ class ViewAPI(viewsets.ModelViewSet):
 class TaskAPI(APIView):
     # permission_classes = [IsBusiness, CanViewTask]
     permission_classes = [IsBusiness]
-    serializer_class = TaskSerializer
+
+    def get_serializer_class(self):
+        return TaskSerializer
 
     @swagger_auto_schema(tags=["Data Manager"])
     def get(self, request, pk):
@@ -221,9 +226,10 @@ class TaskAPI(APIView):
         context = {
             'proxy': bool_from_request(request.GET, 'proxy', True),
             'resolve_uri': True,
-            'completed_by': 'full'
+            'completed_by': 'full',
+            'request': request
         }
-        serializer = self.serializer_class(queryset, many=False, context=context)
+        serializer = self.get_serializer_class()(queryset, many=False, context=context)
         return Response(serializer.data)
 
 
@@ -259,7 +265,7 @@ class ProjectStateAPI(APIView):
         Retrieve the project state for data manager.
         """
         pk = int_from_request(request.GET, "project", 1)  # replace 1 to None, it's for debug only
-        project = get_object_with_check_and_log(request, Project, pk=pk)
+        project = get_object_with_check_and_log(request, Project.objects.with_counts(), pk=pk)
         self.check_object_permissions(request, project)
         data = ProjectSerializer(project).data
         data.update(

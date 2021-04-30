@@ -25,7 +25,7 @@ You can also store your tasks and completions in a [PostgreSQL database](https:/
 Run the following command to launch Label Studio, configure the connection to your PostgreSQL database, scan for existing tasks, and load them into the app for labeling for a specific project.
 
 ```bash
-label-studio start my_project --init --db postgresql 
+label-studio start my_project --init -db postgresql 
 ```
 
 You must set the following environment variables to connect Label Studio to PostgreSQL:
