@@ -356,6 +356,11 @@ USER_SERIALIZER = 'users.serializers.BaseUserSerializer'
 DATA_MANAGER_ANNOTATIONS_MAP = {}
 DATA_MANAGER_ACTIONS = {}
 USER_LOGIN_FORM = 'users.forms.LoginForm'
+PROJECT_MIXIN = 'core.mixins.DummyModelMixin'
+TASK_MIXIN = 'core.mixins.DummyModelMixin'
+ANNOTATION_MIXIN = 'core.mixins.DummyModelMixin'
+ORGANIZATION_MIXIN = 'core.mixins.DummyModelMixin'
+USER_MIXIN = 'core.mixins.DummyModelMixin'
 
 # fix a problem with Windows mimetypes for JS and PNG
 import mimetypes

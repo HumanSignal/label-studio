@@ -14,7 +14,7 @@ from annoying.fields import AutoOneToOneField
 from rest_framework.exceptions import ValidationError
 
 from tasks.models import Task, Prediction, Annotation, Q_task_finished_annotations, Q_finished_annotations
-from core.utils.common import create_hash, pretty_date, sample_query, get_attr_or_item
+from core.utils.common import create_hash, pretty_date, sample_query, get_attr_or_item, load_func
 from core.label_config import (
     parse_config, validate_label_config, extract_data_types, get_all_object_tag_names, config_line_stipped,
     get_sample_task, get_all_labels, get_all_control_tag_tuples, get_annotation_tuple
@@ -51,8 +51,10 @@ class ProjectManager(models.Manager):
             ),
         )
 
+ProjectMixin = load_func(settings.PROJECT_MIXIN)
 
-class Project(models.Model):
+
+class Project(ProjectMixin, models.Model):
     """
     """
     objects = ProjectManager()
@@ -164,11 +166,6 @@ class Project(models.Model):
     @property
     def has_predictions(self):
         return self.get_current_predictions().exists()
-
-    def has_permission(self, user):
-        if user.active_organization == self.organization:
-            return True
-        return False
 
     @property
     def has_any_predictions(self):

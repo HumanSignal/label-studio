@@ -59,3 +59,7 @@ class RequestDebugLogMixin(object):
         except Exception as exc:
             logger.error(exc, exc_info=True)
         super(RequestDebugLogMixin, self).initial(request, *args, **kwargs)
+
+
+class DummyModelMixin():
+    pass
