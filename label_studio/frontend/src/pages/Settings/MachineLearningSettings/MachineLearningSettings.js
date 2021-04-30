@@ -119,9 +119,16 @@ export const MachineLearningSettings = () => {
 
           <div style={{paddingLeft: 16}}>
             <Toggle
-              label="Retrieve and display predictions when loading a task"
+              label="Retrieve predictions when loading a task"
               name="evaluate_predictions_automatically"
             />
+          </div>
+
+          <div style={{paddingLeft: 16, marginBottom: 16}}>
+            <Toggle
+                label="Show predictions to annotators in the Label stream"
+                name="show_collab_predictions"
+              />
           </div>
         </Form.Row>
       </Form>

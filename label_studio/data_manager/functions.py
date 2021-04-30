@@ -227,8 +227,6 @@ def evaluate_predictions(tasks):
         return
 
     project = tasks[0].project
-    if not project.evaluate_predictions_automatically:
-        return
 
     for ml_backend in project.ml_backends.all():
         ml_backend.predict_many_tasks(tasks)
