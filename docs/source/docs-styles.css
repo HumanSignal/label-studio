@@ -30,7 +30,7 @@ h1 {
 }
 
 .column {
-  width: 50% !important;
+  width: 32% !important;
 }
 
 .highlight {
@@ -38,14 +38,13 @@ h1 {
 }
 
 .card {
-  margin: 2em 1em;
+  margin: 2em 2em;
 }
 .card .image-wrap {
   transition: linear 0.25s;
   border-radius: 7px;
   box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
-  padding: 5px;
-  opacity: 0.8;
+  opacity: 0.9;
 }
 .card .image-wrap:hover {
   opacity: 1;
@@ -54,11 +53,12 @@ h1 {
 }
 .card .image-wrap .image {
   margin: 0 auto;
-  width: 95%;
-  height: 250px;
+  width: 100%;
+  height: 190px;
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center center;
+  border-radius: 7px;
 }
 .card .category {
   cursor: pointer;
@@ -71,7 +71,7 @@ h1 {
   text-transform: uppercase;
 }
 .card .title {
-  margin-top: 0.5em;
+  margin-top: 0.3em;
   font-size: 130%;
   font-weight: bold;
   color: #555;
@@ -82,10 +82,6 @@ h1 {
   font-size: 80%;
   font-weight: normal;
   color: #777;
-}
-
-.sidebar {
-  display: none;
 }
 
 @media screen and (max-width: 900px) {
