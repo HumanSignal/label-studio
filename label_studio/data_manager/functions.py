@@ -227,7 +227,7 @@ def evaluate_predictions(tasks):
         return
 
     project = tasks[0].project
-    if not project.show_collab_predictions:
+    if not project.evaluate_predictions_automatically:
         return
 
     for ml_backend in project.ml_backends.all():

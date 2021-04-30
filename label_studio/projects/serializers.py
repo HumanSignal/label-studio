@@ -21,8 +21,9 @@ class CreatedByFromContext:
 
 
 class ProjectSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
-    '''Serializer get numbers from project queryset annotation,
-    make sure, that you use correct one(Project.objects.with_counts())'''
+    """ Serializer get numbers from project queryset annotation,
+        make sure, that you use correct one(Project.objects.with_counts())
+    """
 
     task_number = serializers.IntegerField(default=None, read_only=True,
                                         help_text='Total task number in project')
@@ -60,7 +61,7 @@ class ProjectSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                   'task_number', 'useful_annotation_number', 'ground_truth_number', 'skipped_annotations_number',
                   'total_annotations_number', 'total_predictions_number', 'sampling', 'show_ground_truth_first',
                   'show_overlap_first', 'overlap_cohort_percentage', 'task_data_login', 'task_data_password',
-                  'control_weights', 'parsed_label_config']
+                  'control_weights', 'parsed_label_config', 'evaluate_predictions_automatically']
 
     def validate_label_config(self, value):
         if self.instance is None:
