@@ -24,11 +24,11 @@ The Label Studio ML backend is an SDK that you can use to wrap your machine lear
 
 The overall steps of setting up a Label Studio ML backend are as follows:
 1. Get your model code.
-2. Wrap it with the [Label Studio SDK](mlbackend.html).
+2. Wrap it with the [Label Studio SDK](ml_create.html).
 3. Create a running server script
 4. Launch the script
 5. Connect Label Studio to ML backend on the UI
-Follow the [Quickstart](#Quickstart) for an example. For assistance with steps 1-3, see how to [create your own machine learning backend](mlbackend.html).
+Follow the [Quickstart](#Quickstart) for an example. For assistance with steps 1-3, see how to [create your own machine learning backend](ml_create.html).
 
 If you need to load static pre-annotated data into Label Studio, running an ML backend might be more than you need. Instead, you can [import pre-annotated data](predictions.html).
 
@@ -62,7 +62,7 @@ Follow these steps to set up an example text classifier ML backend with Label St
    label-studio-ml init my_ml_backend \
      --script label_studio_ml/examples/simple_text_classifier.py
    ```
-   This ML backend is an example provided by Label Studio. See [how to create your own ML backend](mlbackend.html).
+   This ML backend is an example provided by Label Studio. See [how to create your own ML backend](ml_create.html).
    
 3. Start the ML backend server.
    ```bash
