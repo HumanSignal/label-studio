@@ -157,7 +157,16 @@ class MLBackend(models.Model):
             logger.error(f'ML backend returned empty prediction for project {self}')
             return
 
-        if len(responses) != len(tasks_ser):
+        # ML Backend doesn't support batch of tasks, do it one by one
+        elif len(responses) == 1:
+            logger.warning(f"'ML backend '{self.title}' doesn't support batch processing of tasks, "
+                           f"switched to one-by-one task retrieving")
+            for task in tasks:
+                self.predict_one_task(task)
+            return
+
+        # wrong result number
+        elif len(responses) != len(tasks_ser):
             logger.error(f'ML backend returned response number {len(responses)} != task number {len(tasks_ser)}')
 
         predictions = []
@@ -199,7 +208,6 @@ class MLBackend(models.Model):
         r = prediction_response['result']
         score = prediction_response.get('score')
         with conditional_atomic():
-            task.predictions.all().delete()
             prediction = Prediction.objects.create(
                 result=r,
                 score=safe_float(score),

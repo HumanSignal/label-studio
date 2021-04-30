@@ -229,4 +229,5 @@ def evaluate_predictions(tasks):
     project = tasks[0].project
 
     for ml_backend in project.ml_backends.all():
+        # tasks = tasks.filter(~Q(predictions__model_version=ml_backend.model_version))
         ml_backend.predict_many_tasks(tasks)
