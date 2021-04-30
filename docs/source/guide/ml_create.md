@@ -1,5 +1,5 @@
 ---
-title: Write your own machine learning backend
+title: Write your own backend
 type: guide
 order: 607
 meta_title: Machine Learning SDK
@@ -14,7 +14,7 @@ Before you start integrating your custom model code with the Label Studio ML SDK
 2. The [prediction format](predictions.html) returned by your ML backend server.
 3. The required packages and dependencies necessary to run your machine learning model. 
 
-## Step by step tutorial 
+## Model initialization 
 This example tutorial outlines how to wrap a simple text classifier based on the [scikit-learn](https://scikit-learn.org/) framework with the Label Studio ML SDK.
 
 Start by creating a class declaration. You can create a Label Studio-compatible ML backend server in one command by inheriting it from `LabelStudioMLBase`. 
