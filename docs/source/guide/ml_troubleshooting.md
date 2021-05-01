@@ -1,5 +1,5 @@
 ---
-title: Troubleshoot machine learning connection
+title: Troubleshoot machine learning
 type: guide
 order: 609
 meta_title: Troubleshoot Machine Learning

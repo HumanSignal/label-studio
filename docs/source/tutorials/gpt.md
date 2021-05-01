@@ -1,8 +1,10 @@
 ---
-title:
+title: 
 type: blog
 order: 50
 ---
+
+## Chatbot response generation with HuggingFace's GPT2 model
 
 If you're going to build a new chatbot, or just want to play with GPT-based text generators, this [Machine Learning backend](https://labelstud.io/guide/ml.html) is for you! Powered by [HuggingFace's Transformers library](https://github.com/huggingface/transformers), 
 it connects GPT2-like language model to Label Studio UI, giving you an opportunity to explore different text responses based on the chat history.
