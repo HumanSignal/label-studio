@@ -93,7 +93,7 @@ After you connect a model to Label Studio as a machine learning backend, you can
    ```
    curl -X POST http://localhost:8080/api/ml/{id}/train
    ```
-You must have some annotated tasks before you can start training. Label Studio can send a train signal to ML Backend automatically on the each `N` annotations submit/update. You can adjust `N` on machine learning page of the project settings or completely disable this feature by setting it to `0`.
+You must have some annotated tasks before you can start training. You can specify the number of annotations required to start and repeat training the ML backend on the machine learning page of the project settings. Label Studio sends a signal to the ML backend to train after that number of annotations have been submitted or updated. If you don't want to re-train automatically, set this number to `0` to disable this functionality.
 
 In development mode, training logs appear in the web browser console. 
 In production mode, you can find runtime logs in `my_backend/logs/uwsgi.log` and RQ training logs in `my_backend/logs/rq.log` on the server running the ML backend, which might be different from the Label Studio server. To see more detailed logs, start the ML backend server with the `--debug` option. 
