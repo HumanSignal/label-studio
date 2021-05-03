@@ -6,7 +6,7 @@ meta_title:
 meta_description: 
 ---
 
-Label Studio is available as a Community Edition open source data labeling tool and as a paid version with extended functionality and support as an Enterprise Edition. Contact us to get started with Label Studio Enterprise Edition! INSERT LINK 
+Label Studio is available as a Community Edition open source data labeling tool and as a paid version with extended functionality and support as an Enterprise Edition. [Contact us to get started with Label Studio Enterprise Edition](https://heartex.com/)! 
 
 
 <table>
@@ -16,7 +16,7 @@ Label Studio is available as a Community Edition open source data labeling tool 
     <th>Enterprise Edition</th>
   </tr>
   <tr>
-    <td colspan="3">User Management</td>
+    <td colspan="3"><b>User Management</b></td>
   </tr>
   <tr>
     <td>User accounts to associate labeling activities to a specific user.</td>
@@ -34,7 +34,7 @@ Label Studio is available as a Community Edition open source data labeling tool 
     <td style="text-align:center">✅</td>
   </tr>
   <tr>
-    <td colspan="3">Project Management</td>
+    <td colspan="3"><b>Project Management</b></td>
   </tr>
   <tr>
     <td>Projects to manage data labeling activities.</td>
@@ -47,7 +47,7 @@ Label Studio is available as a Community Edition open source data labeling tool 
     <td style="text-align:center">✅</td>
   </tr>
   <tr>
-    <td colspan="3">Data Management</td>
+    <td colspan="3"><b>Data Management</b></td>
   </tr>
   <tr>
     <td>Manage your data in a user interface.</td>
@@ -70,7 +70,7 @@ Label Studio is available as a Community Edition open source data labeling tool 
     <td style="text-align:center">✅</td>
   </tr>
   <tr>
-    <td colspan="3">Data Labeling Workflows</td>
+    <td colspan="3"><b>Data Labeling Workflows</b></td>
   </tr>
   <tr>
     <td>Assign specific annotators to specific tasks.</td>
@@ -98,7 +98,7 @@ Label Studio is available as a Community Edition open source data labeling tool 
     <td style="text-align:center">✅</td>
   </tr>
   <tr>
-    <td colspan="3">Annotator Performance</td>
+    <td colspan="3"><b>Annotator Performance</b></td>
   </tr>
   <tr>
     <td>Control label quality by monitoring annotator agreement.</td>
@@ -126,7 +126,7 @@ Label Studio is available as a Community Edition open source data labeling tool 
     <td style="text-align:center">✅</td>
   </tr>
   <tr>
-    <td colspan="3">Machine Learning</td>
+    <td colspan="3"><b>Machine Learning</b></td>
   </tr>
   <tr>
     <td>Connect machine learning models to Label Studio with an SDK.</td>
@@ -144,7 +144,7 @@ Label Studio is available as a Community Edition open source data labeling tool 
     <td style="text-align:center">✅</td>
   </tr>
   <tr>
-    <td colspan="3">Analytics and Reporting</td>
+    <td colspan="3"><b>Analytics and Reporting</b></td>
   </tr>
   <tr>
     <td>Reporting and analytics on labeling and annotation activity.</td>
@@ -157,7 +157,7 @@ Label Studio is available as a Community Edition open source data labeling tool 
     <td style="text-align:center">✅</td>
   </tr>
   <tr>
-    <td colspan="3">Advanced Functionality</td>
+    <td colspan="3"><b>Advanced Functionality</b></td>
   </tr>
   <tr>
     <td>API access to manage Label Studio.</td>
