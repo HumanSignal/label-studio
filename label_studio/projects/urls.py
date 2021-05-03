@@ -2,7 +2,7 @@
 """
 import data_export.api
 from django.shortcuts import redirect
-from django.urls import include, path, re_path
+from django.urls import include, path
 
 from . import api, views
 
