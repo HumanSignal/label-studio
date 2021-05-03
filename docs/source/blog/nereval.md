@@ -2,11 +2,12 @@
 title: Evaluating Named Entity Recognition parsers with spaCy and Label Studio
 type: blog
 order: 96
+image: /images/ner-blog/LS-spacy-ner.png
 meta_title: Evaluate NER parsers with spaCy and Label Studio
 meta_description: Use Label Studio to evaluate named entity recognition parsers like spaCy and revise predictions by annotating a gold standard dataset for your data science and machine learning projects. 
 ---
 
-![image](https://user-images.githubusercontent.com/2641205/112475305-f5863900-8d70-11eb-9eb8-9da879f61708.png)
+<img src="/images/ner-blog/LS-spacy-ner.png" alt="Decorative graphic." class="gif-border" />
 
 This tutorial helps you evaluate accuracy of Named Entity Recognition (NER) taggers using Label Studio. Gather predictions from standard [spaCY](https://spacy.io/) language models for a dataset based on transcripts from the podcast This American Life, then use Label Studio to correct the transcripts and determine which model performed better to focus future retraining efforts.
 
