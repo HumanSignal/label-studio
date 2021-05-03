@@ -91,9 +91,7 @@ class Task(TaskMixin, models.Model):
         return 3 * int(avg_lead_time) if avg_lead_time is not None else settings.TASK_LOCK_DEFAULT_TTL
 
     def has_permission(self, user):
-        if user.active_organization == self.project.organization:
-            return True
-        return False
+        return self.project.has_permission(user)
 
     def clear_expired_locks(self):
         self.locks.filter(expire_at__lt=now()).delete()

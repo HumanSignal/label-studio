@@ -62,4 +62,5 @@ class RequestDebugLogMixin(object):
 
 
 class DummyModelMixin():
-    pass
+    def has_permission(self, user):
+        return True
