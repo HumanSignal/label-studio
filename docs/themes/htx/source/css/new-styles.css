@@ -40,7 +40,7 @@ header{
   margin-right:5px;
 }
 .outer__header .center__header ul li.active__menu a{
-  background: rgba(0, 0, 0, 0.05);
+  background: #4a4846;
   color:white;
   border-radius: 6px;
 }
@@ -54,7 +54,7 @@ header{
   border-radius: 6px;
 }
 .outer__header .center__header ul li a:hover{
-  background: rgba(0, 0, 0, 0.05);
+  background: #4a4846;
   color:white;
 }
 .left__header>a{
