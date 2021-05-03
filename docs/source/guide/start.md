@@ -1,7 +1,7 @@
 ---
 title: Start Label Studio
 type: guide
-order: 202
+order: 203
 meta_title: Start Commands
 meta_description: Label Studio Documentation for starting Label Studio and configuring the environment to use Label Studio with your machine learning or data science project. 
 ---
@@ -44,8 +44,8 @@ The following command line arguments are optional and must be specified with `la
 | `--log-level` | N/A | `ERROR` | One of DEBUG, INFO, WARNING, or ERROR. Use to specify the logging level for the Label Studio server. |
 | `-p` `--port` | `LABEL_STUDIO_PORT` | `8080` | Specify the web server port for Label Studio. Defaults to 8080. See [Run Label Studio on localhost with a different port](start.html#Run-Label-Studio-on-localhost-with-a-different-port) on this page. |
 | `--host` | `LABEL_STUDIO_HOST` | `''` | Specify the hostname to use to generate links for imported labeling tasks or static loading requirements. Leave empty to make all paths relative to the root domain. For example, specify `"https://77.42.77.42:1234"` or `"http://ls.example.com/subdomain/"`. See [Run Label Studio with an external domain name](start.html#Run-Label-Studio-with-an-external-domain-name) on this page. |
-| `--cert` | `LABEL_STUDIO_CERT_FILE` | `None` | Certificate file to use to access Label Studio over HTTPS. Must be in PEM format. See [Run Label Studio with HTTPS](start.html#Run-Label-Studio-with-HTTPS) on this page. | 
-| `--key` | `LABEL_STUDIO_KEY_FILE` | `None` | Private key file for HTTPS connection. Must be in PEM format. See [Run Label Studio with HTTPS](start.html#Run-Label-Studio-with-HTTPS) on this page. |
+| `--cert` | `LABEL_STUDIO_CERT_FILE` | `None` | Deprecated, do not use. Certificate file to use to access Label Studio over HTTPS. Must be in PEM format. See [Run Label Studio with HTTPS](start.html#Run-Label-Studio-with-HTTPS) on this page. | 
+| `--key` | `LABEL_STUDIO_KEY_FILE` | `None` | Deprecated, do not use. Private key file for HTTPS connection. Must be in PEM format. See [Run Label Studio with HTTPS](start.html#Run-Label-Studio-with-HTTPS) on this page. |
 | `--initial-project-description` | `LABEL_STUDIO_PROJECT_DESC` | `''` | Specify a project description for a Label Studio project. See [Set up your labeling project](setup.html). |
 | `--password` | `LABEL_STUDIO_PASSWORD` | `None` | Password to use for the default user. See [Create user accounts for Label Studio](signup.html). |
 | `--username` | `LABEL_STUDIO_USERNAME` | `default_user@localhost` | Username to use for the default user. See [Create user accounts for Label Studio](signup.html). |
@@ -120,20 +120,9 @@ Place files in the specified source directory (`./myfiles` in this example) and 
 If you're using Docker Compose, specify the volumes in the Docker Compose YAML file and add the relevant environment variables to the app container. For more about specifying volumes in Docker Compose, see the volumes section of the [Docker Compose file documentation](https://docs.docker.com/compose/compose-file/compose-file-v3/#volumes).
 
 ## Run Label Studio with HTTPS
-To run Label Studio with HTTPS and access the web server using HTTPS in the browser, specify a certificate and private key when starting Label Studio. 
+To run Label Studio with HTTPS and access the web server using HTTPS in the browser, use NGINX or another web server to run HTTPS for Label Studio.  
 
-You can start Label Studio with the following command:
-```bash
-label-studio start --cert <certificate.pem> --key <keyfile.pem>
-```
 
-Or, set the following environment variables:
-```
-LABEL_STUDIO_CERT_FILE = <certificate.pem>
-LABEL_STUDIO_KEY_FILE =  <keyfile.pem>
-```
-
-The certificate and private key files must both be provided as PEM files. 
 
 ## Run Label Studio on the cloud using Heroku
 To run Label Studio on the cloud using Heroku, specify an environment variable so that Label Studio loads. 
