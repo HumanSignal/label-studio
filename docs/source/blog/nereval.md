@@ -1,7 +1,6 @@
 ---
 title: Evaluating Named Entity Recognition parsers with spaCy and Label Studio
 type: blog
-image: ![image](https://user-images.githubusercontent.com/2641205/112475305-f5863900-8d70-11eb-9eb8-9da879f61708.png)
 order: 96
 meta_title: Evaluate NER parsers with spaCy and Label Studio
 meta_description: Use Label Studio to evaluate named entity recognition parsers like spaCy and revise predictions by annotating a gold standard dataset for your data science and machine learning projects. 
