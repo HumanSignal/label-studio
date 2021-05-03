@@ -145,7 +145,7 @@ After running the script, you have two files:
  
 ## Correct the predicted Named Entities in Label Studio
 
-To classify named entities, you need to create a dataset with gold standard labels that are accurate for your use case. To do that, use the open source data labeling tool, [Label Studio](https://labelstud.io). 
+To classify named entities, you need to create a dataset with gold standard labels that are accurate for your use case. To do that, use the open source data labeling tool, Label Studio. 
 
 ### Install and start Label Studio
 Install Label Studio in a virtual environment with `pip` using the following commands:
