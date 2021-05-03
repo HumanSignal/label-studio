@@ -1,22 +1,12 @@
 ---
-title: Create a machine learning backend
+title: Write your own ML backend
 type: guide
 order: 607
 meta_title: Machine Learning SDK
 meta_description: Label Studio Documentation for setting up your machine learning model to output and consume predictions in your machine learning and data science data labeling projects. 
 ---
 
-Set up a machine learning model as a backend to Label Studio so that you can dynamically output and consume predictions as labeling occurs. You can follow this tutorial to wrap custom machine learning model code with the Label Studio ML SDK, or refer to example ML backend tutorials for integrating with popular machine learning frameworks such as PyTorch, GPT2, and others. 
-
-## Example ML backend tutorials
-
-For examples of machine learning models set up as ML backends with the Label Studio SDK, review the following tutorials:
-- [Create a simple ML backend](/tutorials/dummy_model.html)
-- [Text classification with Scikit-Learn](/tutorials/sklearn-text-classifier.html)
-- [Transfer learning for images with PyTorch](/tutorials/pytorch-image-transfer-learning.html)
-- [Image Object Detector](/tutorials/object-detector.html)
-- [Chatbot response generation with HuggingFace's GPT2 model](/tutorials/gpt.html)
-- [Automatic Speech Recognition with Nvidia's NeMo](/tutorials/nemo_asr.html)
+Set up a machine learning model as a backend to Label Studio so that you can dynamically output and consume predictions as labeling occurs. You can follow this tutorial to wrap custom machine learning model code with the Label Studio ML SDK, or refer to [example ML backend tutorials](ml_tutorials.html) to integrate with popular machine learning frameworks such as PyTorch, GPT2, and others. 
 
 ## Prerequisites 
 Before you start integrating your custom model code with the Label Studio ML SDK to use it as an ML backend with Label Studio, determine the following:
@@ -48,10 +38,9 @@ There are special variables provided by the inherited class:
 - `self.label_config` is a raw labeling config string;
 - `self.train_output` is a Python dict with the results of the previous model training runs (the output of the `fit()` method described bellow) Use this if you want to load the model for the next updates for active learning and model fine-tuning.
 
-
 After you define the loaders, you can define two methods for your model: an inference call and a training call. 
 
-### Inference call
+## Inference call
 
 Use an inference call to get pre-annotations from your model on-the-fly. You must update the existing predict method in the example ML backend scripts to make them work for your specific use case. 
 
@@ -83,10 +72,12 @@ def predict(self, tasks, **kwargs):
 ```
 
 
-### Training call
+## Training call
 Use the training call to update your model with new annotations. You don't need to use this call in your code, for example if you just want to pre-annotate tasks without retraining the model. If you do want to retrain the model based on annotations from Label Studio, use this method. 
 
-Write your own code to override the `fit(annotations, **kwargs)` method, which takes [JSON-formatted Label Studio annotations](https://labelstud.io/guide/export.html#Raw-JSON-format-of-completed-labeled-tasks) and returns an arbitrary dict where some information about the created model can be stored.
+Write your own code to override the `fit(completions, **kwargs)` method, which takes [JSON-formatted Label Studio annotations](https://labelstud.io/guide/export.html#Raw-JSON-format-of-completed-labeled-tasks) and returns an arbitrary dict where some information about the created model can be stored.
+
+> Note: The `completions` field is deprecated as of Label Studio 1.0.x and will be replaced with `annotations` in a future release of this SDK.  
 
 **Example**
 ```python
