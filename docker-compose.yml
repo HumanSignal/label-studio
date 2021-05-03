@@ -47,13 +47,14 @@ services:
           nocopy: true
 
   db:
-    image: postgres:11.5
+    image: postgres:latest
     hostname: db
     restart: always
     environment:
       - POSTGRES_HOST_AUTH_METHOD=trust
     volumes:
-      - ${POSTGRES_DATA_DIR:-./postgres-data}:/var/lib/postgresql/data
+      # https://github.com/docker-library/postgres/issues/435#issuecomment-611613071
+      - ${POSTGRES_DATA_DIR:-./postgres-data}:/var/lib/postgresql
 
 
 volumes:
