@@ -9,12 +9,14 @@ from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 from drf_yasg.utils import swagger_auto_schema
 from django.db.models import Sum
 from ordered_set import OrderedSet
 
 from core.utils.common import get_object_with_check_and_log, int_from_request, bool_from_request
-from core.permissions import CanViewTask, CanChangeTask, IsBusiness, CanViewProject, CanChangeProject
+from core.permissions import all_permissions, HasObjectPermission
+from core.decorators import permission_required
 from projects.models import Project
 from projects.serializers import ProjectSerializer
 from tasks.models import Task, Annotation
@@ -75,14 +77,7 @@ class ViewAPI(viewsets.ModelViewSet):
     my_tags = ["Data Manager"]
     filterset_fields = ["project"]
     task_serializer_class = TaskSerializer
-
-    def get_permissions(self):
-        permission_classes = [IsBusiness]
-        # if self.action in ['update', 'partial_update', 'destroy']:
-        #     permission_classes = [IsBusiness, CanChangeTask]
-        # else:
-        #     permission_classes = [IsBusiness, CanViewTask]
-        return [permission() for permission in permission_classes]
+    permission_required = all_permissions.tasks_change
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -208,8 +203,7 @@ class ViewAPI(viewsets.ModelViewSet):
 
 
 class TaskAPI(APIView):
-    # permission_classes = [IsBusiness, CanViewTask]
-    permission_classes = [IsBusiness]
+    permission_required = all_permissions.projects_view
 
     def get_serializer_class(self):
         return TaskSerializer
@@ -234,8 +228,7 @@ class TaskAPI(APIView):
 
 
 class ProjectColumnsAPI(APIView):
-    # permission_classes = [IsBusiness, CanViewProject]
-    permission_classes = [IsBusiness, ]
+    permission_required = all_permissions.projects_view
 
     @swagger_auto_schema(tags=["Data Manager"])
     def get(self, request):
@@ -253,8 +246,7 @@ class ProjectColumnsAPI(APIView):
 
 
 class ProjectStateAPI(APIView):
-    # permission_classes = [IsBusiness, CanViewProject]
-    permission_classes = [IsBusiness, ]
+    permission_required = all_permissions.projects_view
 
     @swagger_auto_schema(tags=["Data Manager"])
     def get(self, request):
@@ -284,17 +276,9 @@ class ProjectStateAPI(APIView):
 
 
 class ProjectActionsAPI(APIView):
-    # permission_classes = [IsBusiness, CanChangeProject]
-    permission_classes = [IsBusiness, ]
-
-    def get_permissions(self):
-        if self.request.method == 'POST':
-            permission_classes = [IsBusiness, CanChangeProject]
-        else:
-            permission_classes = [IsBusiness, CanViewProject]
-        return [permission() for permission in permission_classes]
-
+    permission_classes = (IsAuthenticated, HasObjectPermission)
     @swagger_auto_schema(tags=["Data Manager"])
+    @permission_required(all_permissions.projects_view)
     def get(self, request):
         """
         get:
@@ -315,6 +299,7 @@ class ProjectActionsAPI(APIView):
         return Response(get_all_actions(params))
 
     @swagger_auto_schema(tags=["Data Manager"])
+    @permission_required(all_permissions.projects_change)
     def post(self, request):
         """
         post:

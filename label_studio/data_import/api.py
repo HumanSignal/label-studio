@@ -10,9 +10,10 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
+from rest_framework.permissions import IsAuthenticated
 
-from core.permissions import IsBusiness, get_object_with_permissions
-from core.utils.common import bool_from_request, conditional_atomic, retry_database_locked
+from core.permissions import all_permissions, ViewClassPermission
+from core.utils.common import bool_from_request, retry_database_locked
 from projects.models import Project
 from tasks.models import Task
 from .uploader import load_tasks
@@ -257,15 +258,15 @@ class ImportAPI(generics.CreateAPIView):
 
     """
 
+    permission_required = all_permissions.projects_change
     parser_classes = (JSONParser, MultiPartParser, FormParser)
-    permission_classes = (IsBusiness, )
     serializer_class = ImportApiSerializer
     queryset = Task.objects.all()
 
     def get_serializer_context(self):
         project_id = self.kwargs.get('pk')
         if project_id:
-            project = get_object_with_permissions(self.request, Project, project_id, 'projects.change_project')
+            project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=project_id)
         else:
             project = None
         return {'project': project, 'user': self.request.user}
@@ -284,7 +285,7 @@ class ImportAPI(generics.CreateAPIView):
         commit_to_project = bool_from_request(request.query_params, 'commit_to_project', True)
 
         # check project permissions
-        project = get_object_with_permissions(self.request, Project, self.kwargs['pk'], 'projects.change_project')
+        project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
 
         # upload files from request, and parse all tasks
         parsed_data, file_upload_ids, could_be_tasks_lists, found_formats, data_columns = load_tasks(request, project)
@@ -339,13 +340,15 @@ class ReImportAPI(ImportAPI):
 
     Re-import tasks using the specified file upload IDs for a specific project.
     """
+    permission_required = all_permissions.projects_change
+
     @retry_database_locked()
     def create(self, request, *args, **kwargs):
         start = time.time()
         files_as_tasks_list = bool_from_request(request.data, 'files_as_tasks_list', True)
 
         # check project permissions
-        project = get_object_with_permissions(self.request, Project, self.kwargs['pk'], 'projects.change_project')
+        project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
         file_upload_ids = self.request.data.get('file_upload_ids')
         tasks, found_formats, data_columns = FileUpload.load_tasks_from_uploaded_files(
             project, file_upload_ids,  files_as_tasks_list=files_as_tasks_list)
@@ -400,12 +403,15 @@ class FileUploadListAPI(generics.mixins.ListModelMixin,
     """
 
     parser_classes = (JSONParser, MultiPartParser, FormParser)
-    permission_classes = (IsBusiness, )
     serializer_class = FileUploadSerializer
+    permission_required = ViewClassPermission(
+        GET=all_permissions.projects_view,
+        DELETE=all_permissions.projects_change,
+    )
     queryset = FileUpload.objects.all()
 
     def get_queryset(self):
-        project = get_object_with_permissions(self.request, Project, self.kwargs.get('pk', 0), 'projects.view_project')
+        project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs.get('pk', 0))
         if project.is_draft:
             # If project is in draft state, we return all uploaded files, ignoring queried ids
             logger.debug(f'Return all uploaded files for draft project {project}')
@@ -422,7 +428,7 @@ class FileUploadListAPI(generics.mixins.ListModelMixin,
 
     @swagger_auto_schema(tags=['Import'])
     def delete(self, request, *args, **kwargs):
-        project = get_object_with_permissions(self.request, Project, self.kwargs['pk'], 'projects.view_project')
+        project = generics.get_object_or_404(Project.objects.for_user(self.request.user),  pk=self.kwargs['pk'])
         ids = self.request.data.get('file_upload_ids')
         if ids is None:
             deleted, _ = FileUpload.objects.filter(project=project).delete()
@@ -435,7 +441,7 @@ class FileUploadListAPI(generics.mixins.ListModelMixin,
 
 class FileUploadAPI(generics.RetrieveUpdateDestroyAPIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
-    permission_classes = (IsBusiness, )
+    permission_classes = (IsAuthenticated, )
     serializer_class = FileUploadSerializer
     queryset = FileUpload.objects.all()
 

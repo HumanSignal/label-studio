@@ -12,7 +12,7 @@ from rules.contrib.views import objectgetter, permission_required
 from projects.models import Project
 
 from core.utils.common import get_object_with_check_and_log
-from core.permissions import IsBusiness, view_with_auth
+from core.permissions import IsBusiness, view_with_auth, all_permissions
 from core.label_config import get_sample_task
 from core.utils.common import get_organization_from_request
 
@@ -27,7 +27,7 @@ def project_list(request):
 
 
 @view_with_auth(['GET', 'POST'], (IsBusiness,))
-@permission_required('projects.add_project', fn=Organization.from_request, raise_exception=True)
+@permission_required(all_permissions.projects_create, fn=Organization.from_request, raise_exception=True)
 def project_create(request):
     """ Create new project
 
@@ -37,7 +37,7 @@ def project_create(request):
 
 
 @view_with_auth(['GET'], (IsBusiness,))
-@permission_required('projects.change_project', fn=objectgetter(Project, 'pk'), raise_exception=True)
+@permission_required(all_permissions.projects_change, fn=objectgetter(Project, 'pk'), raise_exception=True)
 def project_settings(request, pk):
     project = get_object_with_check_and_log(request, Project, pk=pk)
     return render(request, 'projects/settings.html', {

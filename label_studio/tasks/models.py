@@ -22,15 +22,16 @@ from django.dispatch import receiver, Signal
 
 from model_utils import FieldTracker
 
-from core.utils.common import find_first_one_to_one_related_field_by_prefix
-from core.utils.common import string_is_url
+from core.utils.common import find_first_one_to_one_related_field_by_prefix, string_is_url, load_func
 from core.utils.params import get_env
-from data_manager.managers import PreparedTaskManager
+from data_manager.managers import PreparedTaskManager, TaskManager
 
 logger = logging.getLogger(__name__)
 
+TaskMixin = load_func(settings.TASK_MIXIN)
 
-class Task(models.Model):
+
+class Task(TaskMixin, models.Model):
     """ Business tasks from project
     """
     id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID', db_index=True)
@@ -56,7 +57,7 @@ class Task(models.Model):
     )
     updates = ['is_labeled']
 
-    objects = models.Manager()  # task manager by default
+    objects = TaskManager()  # task manager by default
     prepared = PreparedTaskManager()  # task manager with filters, ordering, etc for data_manager app
 
     @property
@@ -88,6 +89,9 @@ class Task(models.Model):
             return settings.TASK_LOCK_TTL
         avg_lead_time = self.project.annotations_lead_time()
         return 3 * int(avg_lead_time) if avg_lead_time is not None else settings.TASK_LOCK_DEFAULT_TTL
+
+    def has_permission(self, user):
+        return self.project.has_permission(user)
 
     def clear_expired_locks(self):
         self.locks.filter(expire_at__lt=now()).delete()
@@ -234,6 +238,8 @@ post_bulk_create = Signal(providing_args=["objs", "batch_size"])
 
 
 class AnnotationManager(models.Manager):
+    def for_user(self, user):
+        return self.filter(task__project__organization=user.active_organization)
 
     def bulk_create(self, objs, batch_size=None):
         pre_bulk_create.send(sender=self.model, objs=objs, batch_size=batch_size)
@@ -248,8 +254,10 @@ with tt as (
     where task=%(t_id)s and task_annotation=%(tc_id)s
 ) select count( distinct tt.item -> 'id') from tt"""
 
+AnnotationMixin = load_func(settings.ANNOTATION_MIXIN)
 
-class Annotation(models.Model):
+
+class Annotation(AnnotationMixin, models.Model):
     """ Annotations & Labeling results
     """
     objects = AnnotationManager()
@@ -291,6 +299,9 @@ class Annotation(models.Model):
             res = []
 
         return len(res)
+
+    def has_permission(self, user):
+        return self.task.project.has_permission(user)
 
 
 class TaskLock(models.Model):
