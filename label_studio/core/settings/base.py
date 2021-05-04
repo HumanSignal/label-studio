@@ -108,7 +108,7 @@ LOGGING = {
     },
     'root': {
         'handlers': ['console'],
-        'level': 'DEBUG',
+        'level': get_env('LOG_LEVEL', 'DEBUG'),
     }
 }
 

@@ -15,7 +15,7 @@ from django.db.models import Sum
 from ordered_set import OrderedSet
 
 from core.utils.common import get_object_with_check_and_log, int_from_request, bool_from_request
-from core.permissions import all_permissions, HasObjectPermission
+from core.permissions import all_permissions, HasObjectPermission, ViewClassPermission
 from core.decorators import permission_required
 from projects.models import Project
 from projects.serializers import ProjectSerializer
@@ -77,7 +77,13 @@ class ViewAPI(viewsets.ModelViewSet):
     my_tags = ["Data Manager"]
     filterset_fields = ["project"]
     task_serializer_class = TaskSerializer
-    permission_required = all_permissions.tasks_change
+    permission_required = ViewClassPermission(
+        GET=all_permissions.tasks_view,
+        POST=all_permissions.tasks_change,
+        PATCH=all_permissions.tasks_change,
+        PUT=all_permissions.tasks_change,
+        DELETE=all_permissions.tasks_delete,
+    )
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -276,9 +282,11 @@ class ProjectStateAPI(APIView):
 
 
 class ProjectActionsAPI(APIView):
-    permission_classes = (IsAuthenticated, HasObjectPermission)
+    permission_required = ViewClassPermission(
+        GET=all_permissions.projects_view,
+        POST=all_permissions.projects_change,
+    )
     @swagger_auto_schema(tags=["Data Manager"])
-    @permission_required(all_permissions.projects_view)
     def get(self, request):
         """
         get:
@@ -299,7 +307,6 @@ class ProjectActionsAPI(APIView):
         return Response(get_all_actions(params))
 
     @swagger_auto_schema(tags=["Data Manager"])
-    @permission_required(all_permissions.projects_change)
     def post(self, request):
         """
         post:
