@@ -465,7 +465,7 @@ class FileUploadAPI(generics.RetrieveUpdateDestroyAPIView):
 
 
 class UploadedFileResponse(generics.RetrieveAPIView):
-    permission_classes = (IsBusiness, )
+    permission_classes = (IsAuthenticated, )
 
     @swagger_auto_schema(auto_schema=None)
     def get(self, *args, **kwargs):
