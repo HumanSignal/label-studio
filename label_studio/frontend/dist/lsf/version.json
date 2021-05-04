@@ -1,6 +1,6 @@
 {
-  "message": "Fix tabs list",
-  "commit": "3015b889b0ba75c0f461ccc48332db040a38dea1",
+  "message": "Fix View All",
+  "commit": "8194c284daf845360cb71a93fdf622fa2151ab06",
   "branch": "feature/ui-update",
-  "date": "2021-05-04T00:14:43Z"
+  "date": "2021-05-04T09:36:23Z"
 }
