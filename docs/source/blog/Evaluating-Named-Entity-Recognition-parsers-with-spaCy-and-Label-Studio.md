@@ -2,12 +2,12 @@
 title: Evaluating Named Entity Recognition parsers with spaCy and Label Studio
 type: blog
 order: 96
-image: /images/ner-blog/LS-spacy-ner.png
+image: /images/ner-blog/label_studio_and_spaCy_named_entity.png
 meta_title: Evaluate NER parsers with spaCy and Label Studio
 meta_description: Use Label Studio to evaluate named entity recognition parsers like spaCy and revise predictions by annotating a gold standard dataset for your data science and machine learning projects. 
 ---
 
-<img src="/images/ner-blog/LS-spacy-ner.png" alt="Decorative graphic." class="gif-border" />
+<img src="/images/ner-blog/label_studio_and_spaCy_named_entity.png" alt="Decorative graphic." class="gif-border" />
 
 This tutorial helps you evaluate accuracy of Named Entity Recognition (NER) taggers using Label Studio. Gather predictions from standard [spaCY](https://spacy.io/) language models for a dataset based on transcripts from the podcast This American Life, then use Label Studio to correct the transcripts and determine which model performed better to focus future retraining efforts.
 
@@ -109,7 +109,7 @@ def doc_to_spans(doc):
     return results, entities
 
 # Now load the dataset and include only lines containing "Easter ":
-df = pd.read_csv('data/lines_clean.csv')
+df = pd.read_csv('lines_clean.csv')
 df = df[df['line_text'].str.contains("Easter ", na=False)]
 print(df.head())
 texts = df['line_test']
