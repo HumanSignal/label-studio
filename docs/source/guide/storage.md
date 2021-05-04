@@ -309,7 +309,6 @@ Add these variables to your environment setup:
 Without these settings, Local storage and URLs in tasks that point to local files won't work. Keep in mind that serving data from the local file system can be a **security risk**. See [Set environment variables](start.html#Set_environment_variables) for more about using environment variables.
 
 
-
 ### Set up connection in the Label Studio UI
 In the Label Studio UI, do the following to set up the connection:
 
@@ -317,7 +316,7 @@ In the Label Studio UI, do the following to set up the connection:
 2. For a specific project, open **Settings > Cloud Storage**.
 3. Click **Add Source Storage**.  
 4. In the dialog box that appears, select **Local Files** as the storage type. 
-5. Specify **Local path** directory with your files. The local path must include the LOCAL_FILES_DOCUMENT_ROOT in the beginning. For example, if `LOCAL_FILES_DOCUMENT_ROOT=/home/user`, then your local path must be `/home/user/dataset1`.
+5. Specify **Local path** directory with your files. The local path must be an absolute path and include the LOCAL_FILES_DOCUMENT_ROOT. For example, if `LOCAL_FILES_DOCUMENT_ROOT=/home/user`, then your local path must be `/home/user/dataset1`. For more about that environment variable, see [Run Label Studio on Docker and use local storage](start.html#Run_Label_Studio_on_Docker_and_use_local_storage)
 6. Toggle **Treat every bucket object as a source file**. 
    - Enable this option if you want to create Label Studio tasks from media files automatically. Use this option for labeling configurations with one source tag.
    - Disable this option if you want to import tasks in Label Studio JSON format directly from your storage. Use this option for complex labeling configurations with HyperText or multiple source tags.    

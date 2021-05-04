@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 
 from core.mixins import APIViewVirtualRedirectMixin, APIViewVirtualMethodMixin
-from core.permissions import IsAuthenticated, BaseRulesPermission
+from core.permissions import all_permissions
 from core.utils.common import get_object_with_check_and_log
 
 from organizations.models import Organization
@@ -23,10 +23,6 @@ from organizations.serializers import (
 logger = logging.getLogger(__name__)
 
 
-class OrganizationAPIPermissions(BaseRulesPermission):
-    perm = 'organizations.change_organization'
-
-
 class OrganizationListAPI(generics.ListCreateAPIView):
     """
     get:
@@ -35,7 +31,7 @@ class OrganizationListAPI(generics.ListCreateAPIView):
     Return a list of the organizations you've created.
     """
     parser_classes = (JSONParser, FormParser, MultiPartParser)
-    permission_classes = (IsAuthenticated, OrganizationAPIPermissions)
+    permission_required = all_permissions.organizations_change
     serializer_class = OrganizationIdSerializer
 
     def get_object(self):
@@ -64,12 +60,11 @@ class OrganizationMemberListAPI(generics.ListAPIView):
     """
 
     parser_classes = (JSONParser, FormParser, MultiPartParser)
-    permission_classes = (IsAuthenticated, OrganizationAPIPermissions)
+    permission_required = all_permissions.organizations_change
     serializer_class = OrganizationMemberUserSerializer
 
     def get_queryset(self):
-        org = get_object_with_check_and_log(self.request, Organization, pk=self.kwargs[self.lookup_field])
-        self.check_object_permissions(self.request, org)
+        org = generics.get_object_or_404(self.request.user.organizations, pk=self.kwargs[self.lookup_field])
         return org.members
 
     @swagger_auto_schema(tags=['Organizations'])
@@ -93,14 +88,14 @@ class OrganizationAPI(APIViewVirtualRedirectMixin,
     """
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     queryset = Organization.objects.all()
-    permission_classes = (IsAuthenticated, OrganizationAPIPermissions)
+    permission_required = all_permissions.organizations_change
     serializer_class = OrganizationSerializer
 
     redirect_route = 'organizations-dashboard'
     redirect_kwarg = 'pk'
 
     def get_object(self):
-        org = get_object_with_check_and_log(self.request, Organization, pk=self.kwargs[self.lookup_field])
+        org = generics.get_object_or_404(self.request.user.organizations, pk=self.kwargs[self.lookup_field])
         self.check_object_permissions(self.request, org)
         return org
 
@@ -123,7 +118,7 @@ class OrganizationAPI(APIViewVirtualRedirectMixin,
 
 class OrganizationInviteAPI(APIView):
     parser_classes = (JSONParser,)
-    permission_classes = (IsAuthenticated,)
+    permission_required = all_permissions.organizations_change
 
     @swagger_auto_schema(
         tags=["Invites"],
@@ -140,8 +135,8 @@ class OrganizationInviteAPI(APIView):
 
 
 class OrganizationResetTokenAPI(APIView):
+    permission_required = all_permissions.organizations_invite
     parser_classes = (JSONParser,)
-    permission_classes = (IsAuthenticated,)
 
     @swagger_auto_schema(
         tags=["Invites"],
@@ -149,8 +144,7 @@ class OrganizationResetTokenAPI(APIView):
         responses={200: OrganizationInviteSerializer()}
     )
     def post(self, request, *args, **kwargs):
-        org = get_object_with_check_and_log(self.request, Organization, pk=request.user.active_organization_id)
-        self.check_object_permissions(self.request, org)
+        org = request.user.active_organization
         org.reset_token()
         logger.debug(f'New token for organization {org.pk} is {org.token}')
         invite_url = '{}?token={}'.format(reverse('user-signup'), org.token)

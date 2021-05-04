@@ -25,6 +25,11 @@ class View(models.Model):
         null=True,
     )
 
+    def has_permission(self, user):
+        if self.project.organization == user.active_organization:
+            return True
+        return False
+
     def get_prepare_tasks_params(self, add_selected_items=False):
         # convert filters to PrepareParams structure
         filters = None

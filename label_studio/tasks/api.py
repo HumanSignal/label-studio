@@ -11,12 +11,14 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework import generics
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
 from core.utils.common import get_object_with_check_and_log
+from core.decorators import permission_required
+from core.permissions import all_permissions, HasObjectPermission, ViewClassPermission
 
 from tasks.models import Task, Annotation, Prediction, AnnotationDraft
-from core.permissions import (IsAuthenticated, IsBusiness, BaseRulesPermission,
-                              get_object_with_permissions, check_object_permissions)
+from core.permissions import (get_object_with_permissions, check_object_permissions)
 from core.mixins import RequestDebugLogMixin
 from core.utils.common import bool_from_request
 from tasks.serializers import (
@@ -27,14 +29,6 @@ from projects.models import Project
 logger = logging.getLogger(__name__)
 
 
-class TaskAPIViewTaskPermission(BaseRulesPermission):
-    perm = 'tasks.view_task'
-
-
-class TaskAPIChangeProjectPermission(BaseRulesPermission):
-    perm = 'projects.change_project'
-
-
 class TaskListAPI(generics.ListCreateAPIView):
     """
     post:
@@ -43,7 +37,6 @@ class TaskListAPI(generics.ListCreateAPIView):
     Create a new labeling task in Label Studio.
     """
     parser_classes = (JSONParser, FormParser, MultiPartParser)
-    permission_classes = (IsAuthenticated, )
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
 
@@ -55,8 +48,7 @@ class TaskListAPI(generics.ListCreateAPIView):
         context = super(TaskListAPI, self).get_serializer_context()
         project_id = self.request.data.get('project')
         if project_id:
-            context['project'] = get_object_with_permissions(
-                self.request, Project, project_id, TaskAPIChangeProjectPermission.perm)
+            context['project'] = generics.get_object_or_404(Project, pk=project_id)
         return context
 
     @swagger_auto_schema(tags=['Tasks'], request_body=TaskSerializer)
@@ -82,7 +74,6 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
     Delete a task in Label Studio. This action cannot be undone!
     """
     parser_classes = (JSONParser, FormParser, MultiPartParser)
-    permission_classes = (IsAuthenticated, )
     queryset = Task.objects.all()
 
     def get_serializer_class(self):
@@ -93,13 +84,6 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         # POST, PATCH, PUT
         else:
             return TaskSimpleSerializer
-    
-    def get_object(self):
-        if self.request.method == 'GET':
-            obj = get_object_with_permissions(self.request, Task, self.kwargs['pk'], 'tasks.view_task')
-        else:
-            obj = get_object_with_permissions(self.request, Task, self.kwargs['pk'], 'projects.view_project')
-        return obj
     
     def retrieve(self, request, *args, **kwargs):
         task = self.get_object()
@@ -154,15 +138,17 @@ class AnnotationAPI(RequestDebugLogMixin, generics.RetrieveUpdateDestroyAPIView)
     Delete an annotation. This action can't be undone! 
     """
     parser_classes = (JSONParser, FormParser, MultiPartParser)
-    permission_classes = (IsAuthenticated, )
-    serializer_class = AnnotationSerializer
+    permission_required = ViewClassPermission(
+        GET=all_permissions.annotations_view,
+        PUT=all_permissions.annotations_change,
+        PATCH=all_permissions.annotations_change,
+        DELETE=all_permissions.annotations_delete,
+    )
 
-    def get_object(self):
-        return get_object_with_permissions(
-            self.request, Annotation, self.kwargs['pk'], 'annotations.view_annotation')
+    serializer_class = AnnotationSerializer
+    queryset = Annotation.objects.all()
 
     def perform_destroy(self, annotation):
-        check_object_permissions(self.request, annotation, 'annotations.delete_annotation')
         annotation.delete()
 
     def update(self, request, *args, **kwargs):
@@ -206,9 +192,11 @@ class AnnotationsListAPI(RequestDebugLogMixin, generics.ListCreateAPIView):
     Add annotations to a task like an annotator does.
     """
     parser_classes = (JSONParser, FormParser, MultiPartParser)
-    # Be careful: order of Permission Classes is important! It's lazy call of them.
-    # If HasAnnotatorProjectAccess is True, no more calls will be done. No raise exception about business.is_approved.
-    permission_classes = (IsBusiness, )
+    permission_required = ViewClassPermission(
+        GET=all_permissions.annotations_view,
+        POST=all_permissions.annotations_create,
+    )
+
     serializer_class = AnnotationSerializer
 
     @swagger_auto_schema(tags=['Annotations'])
@@ -220,13 +208,12 @@ class AnnotationsListAPI(RequestDebugLogMixin, generics.ListCreateAPIView):
         return super(AnnotationsListAPI, self).post(request, *args, **kwargs)
 
     def get_queryset(self):
-        task = get_object_with_permissions(self.request, Task, self.kwargs.get('pk', 0), 'tasks.view_task')
+        task = generics.get_object_or_404(Task.objects.for_user(self.request.user), pk=self.kwargs.get('pk', 0))
         return Annotation.objects.filter(Q(task=task) & Q(was_cancelled=False)).order_by('pk')
 
     def perform_create(self, ser):
         task = get_object_with_check_and_log(self.request, Task, pk=self.kwargs['pk'])
         # annotator has write access only to annotations and it can't be checked it after serializer.save()
-        check_object_permissions(self.request, Annotation(task=task), 'annotations.change_annotation')
         user = self.request.user
         # Release task if it has been taken at work (it should be taken by the same user, or it makes sentry error
         logger.debug(f'User={user} releases task={task}')
@@ -277,7 +264,6 @@ class AnnotationsListAPI(RequestDebugLogMixin, generics.ListCreateAPIView):
 class AnnotationDraftListAPI(RequestDebugLogMixin, generics.ListCreateAPIView):
 
     parser_classes = (JSONParser, MultiPartParser, FormParser)
-    permission_classes = (TaskAPIViewTaskPermission, )
     serializer_class = AnnotationDraftSerializer
     queryset = AnnotationDraft.objects.all()
     swagger_schema = None
@@ -297,7 +283,6 @@ class AnnotationDraftListAPI(RequestDebugLogMixin, generics.ListCreateAPIView):
 class AnnotationDraftAPI(RequestDebugLogMixin, generics.RetrieveUpdateDestroyAPIView):
 
     parser_classes = (JSONParser, MultiPartParser, FormParser)
-    permission_classes = (TaskAPIViewTaskPermission, )
     serializer_class = AnnotationDraftSerializer
     queryset = AnnotationDraft.objects.all()
     swagger_schema = None

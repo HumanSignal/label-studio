@@ -13,11 +13,11 @@ from rest_framework.authtoken.models import Token
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
 
-from core.permissions import IsAuthenticated, CanModifyUserOrReadOnly
+from core.permissions import CanModifyUserOrReadOnly
 from users.models import User
 from users.serializers import UserSerializer
-from users.forms import UserProfileForm
 from users.functions import check_avatar
 
 
@@ -73,7 +73,7 @@ class UserAPI(viewsets.ModelViewSet):
 class UserResetTokenAPI(APIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     queryset = User.objects.all()
-    permission_classes = (CanModifyUserOrReadOnly,)
+    permission_classes = (IsAuthenticated,)
 
     @swagger_auto_schema(
         tags=['Users'],
@@ -120,7 +120,7 @@ class UserGetTokenAPI(APIView):
 class UserWhoAmIAPI(generics.RetrieveAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     queryset = User.objects.all()
-    permission_classes = (CanModifyUserOrReadOnly,)
+    permission_classes = (IsAuthenticated, )
     serializer_class = UserSerializer
 
     def get_object(self):
