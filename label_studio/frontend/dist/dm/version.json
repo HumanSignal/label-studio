@@ -1,6 +1,6 @@
 {
-  "message": "Fix issue when filter operator remained unchanged after changing a field",
-  "commit": "892ff170d9ca2a94ab88f168e56934fd6183375d",
+  "message": "Include task in the event",
+  "commit": "1a3ff1ce39ac52a0772ad796e974b48e32e75ae6",
   "branch": "feature/lsf-ui",
-  "date": "2021-04-27T10:24:04Z"
+  "date": "2021-05-04T00:36:43Z"
 }

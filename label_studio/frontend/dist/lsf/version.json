@@ -1,6 +1,6 @@
 {
-  "message": "Style and typo fixes",
-  "commit": "5e29f060102bb72ef223736bab0e57f60f43ab46",
+  "message": "Fix tabs list",
+  "commit": "3015b889b0ba75c0f461ccc48332db040a38dea1",
   "branch": "feature/ui-update",
-  "date": "2021-04-30T15:08:02Z"
+  "date": "2021-05-04T00:14:43Z"
 }

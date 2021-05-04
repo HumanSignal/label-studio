@@ -9961,8 +9961,8 @@ const GeneralSettings = () => {
     description: "Tasks are ordered by Data manager ordering"
   }, {
     value: "Uniform",
-    label: "Uniform",
-    description: "Tasks are chosen randomly"
+    label: "Random",
+    description: "Tasks are chosen with uniform random"
   }];
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)("div", {
     style: {
