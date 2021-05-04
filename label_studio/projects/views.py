@@ -38,7 +38,7 @@ def project_create(request):
 
 @view_with_auth(['GET'], (IsBusiness,))
 @permission_required(all_permissions.projects_change, fn=objectgetter(Project, 'pk'), raise_exception=True)
-def project_settings(request, pk):
+def project_settings(request, pk, sub_path):
     project = get_object_with_check_and_log(request, Project, pk=pk)
     return render(request, 'projects/settings.html', {
         'project': project,
