@@ -6,9 +6,10 @@ meta_title: RBAC and Organizations
 meta_description: Label Studio Documentation for managing access, creating workspaces and organizations, and setting up permissions for your data labeling, machine learning, and data science projects.
 ---
 
-Manage access to projects, organizations, and workspaces in Label Studio to restrict who can view data, annotations, and predictions in your data labeling projects. Role-based access control, organizations, and workspaces are available only in Label Studio Enterprise Edition. CONTACT US TO LEARN MORE AND STUFF. For information about user roles in the open source Label Studio Community Edition, see [Create user accounts for Label Studio](signup.html). 
+Manage access to projects, organizations, and workspaces in Label Studio to restrict who can view data, annotations, and predictions in your data labeling projects. 
 
-## Set up role-based access control (RBAC) with Label Studio
+Role-based access control, organizations, and workspaces are available only in Label Studio Enterprise Edition. CONTACT US TO LEARN MORE AND STUFF. For information about users in the open source Label Studio Community Edition, see [Set up user accounts for Label Studio](signup.html). 
+
 ## Roles in Label Studio Enterprise
 
 what are the roles, how to control/configure, 
@@ -226,9 +227,20 @@ Who can do what in Label Studio?
 </table>
 
 
-Everyone can sign up, log in, and my actions are tied to my particular account and everyone can be a part of multiple organizations.
+## Set up role-based access control (RBAC) with Label Studio
 
-## Create organizations to organize projects
+## Create organizations to manage data and projects
+
+You can create organizations in Label Studio to correspond to different departments in your company, for example to delineate between completely unrelated departments. If some departments might collaborate with each other on a project, set up an organization for both and use workspaces to organize the projects that they might or might not be collaborating on. 
+
+For example, you can set up one of the following possible configurations:
+- One organization for your company, with one workspace for the support department and another for the development team, with specific projects in each workspace for different types of customer requests. 
+- Multiple organizations, such as one for the customer claims department and another for the customer support department, with specific workspaces in each organization for specific types of insurance, such as home insurance claims and auto insurance claims, and specific projects in each workspace for types of claims, such as Accident Claims, Injury Claims, Natural Disaster Claims. The Customer support organization might have workspaces specific to the types of support queues, with projects for specific types of calls received.  
+
+Users within an organization can see all workspaces, even if they don't have access to them. Use organizations to prevent some users from knowing about the existence of other workspaces and projects.
+
+
+
 
 ## Create workspaces to organize projects
 
