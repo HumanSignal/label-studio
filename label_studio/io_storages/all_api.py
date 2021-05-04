@@ -4,7 +4,7 @@ import logging
 
 from rest_framework import generics
 from rest_framework.views import APIView
-from core.permissions import BaseRulesPermission
+from core.permissions import all_permissions
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 
@@ -18,12 +18,8 @@ logger = logging.getLogger(__name__)
 # TODO: replace hardcoded apps lists with search over included storage apps
 
 
-class StorageAPIBasePermission(BaseRulesPermission):
-    perm = 'projects.change_project'
-
-
 class AllImportStorageTypesAPI(APIView):
-    permission_classes = (StorageAPIBasePermission,)
+    permission_required = all_permissions.projects_change
     swagger_schema = None
 
     def get(self, request, **kwargs):
@@ -37,7 +33,7 @@ class AllImportStorageTypesAPI(APIView):
 
 
 class AllExportStorageTypesAPI(APIView):
-    permission_classes = (StorageAPIBasePermission,)
+    permission_required = all_permissions.projects_change
     swagger_schema = None
 
     def get(self, request, **kwargs):
@@ -53,7 +49,7 @@ class AllExportStorageTypesAPI(APIView):
 class AllImportStorageListAPI(generics.ListAPIView):
 
     parser_classes = (JSONParser, FormParser, MultiPartParser)
-    permission_classes = (StorageAPIBasePermission,)
+    permission_required = all_permissions.projects_change
     swagger_schema = None
 
     def _get_response(self, api, request, *args, **kwargs):
@@ -81,7 +77,7 @@ class AllImportStorageListAPI(generics.ListAPIView):
 class AllExportStorageListAPI(generics.ListAPIView):
 
     parser_classes = (JSONParser, FormParser, MultiPartParser)
-    permission_classes = (StorageAPIBasePermission,)
+    permission_required = all_permissions.projects_change
     swagger_schema = None
 
     def _get_response(self, api, request, *args, **kwargs):
