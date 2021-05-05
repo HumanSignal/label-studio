@@ -73,10 +73,10 @@ actions = [
         'order': 90,
         'permissions': 'can_manage_annotations',
         'dialog': {
-            'text': 'The selected tasks will be sent to all ML backends connected to the project.'
-                    'This operation can be abruptly interrupted due to a timeout. ' 
-                    'The recommended way to get predictions is to update tasks '
-                    'on the ML backend side through Label Studio API. Read more in the documentation.'
+            'text': 'Send the selected tasks to all ML backends connected to the project.'
+                    'This operation migth be abruptly interrupted due to a timeout. ' 
+                    'The recommended way to get predictions is to update tasks using the Label Studio API.'
+                    '<a href="https://labelstud.io/guide/ml.html>See more in the documentation</a>.'
                     'Please confirm your action.',
             'type': 'confirm'
         }
