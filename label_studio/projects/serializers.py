@@ -54,9 +54,11 @@ class ProjectSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         return project.get_parsed_config()
 
     def get_start_training_on_annotation_update(self, instance):
+        # FIXME: remake this logic with start_training_on_annotation_update
         return True if instance.min_annotations_to_start_training else False
 
     def to_internal_value(self, data):
+        # FIXME: remake this logic with start_training_on_annotation_update
         initial_data = data
         data = super().to_internal_value(data)
         if 'start_training_on_annotation_update' in initial_data:
