@@ -113,8 +113,10 @@ export const MachineLearningSettings = () => {
           <Label text="ML-Assisted Labeling" large/>
 
           <div style={{paddingLeft: 16}}>
-            <p>Minimum number of annotated tasks after which model training is started, enter 0 to disable</p>
-            <Input type="number" name="min_annotations_to_start_training" min="0" style={{ width: "100px" }}/>
+            <Toggle
+              label="Start model training after annotations submit or update"
+              name="start_training_on_annotation_update"
+            />
           </div>
 
           <div style={{paddingLeft: 16}}>
@@ -122,13 +124,6 @@ export const MachineLearningSettings = () => {
               label="Retrieve predictions when loading a task"
               name="evaluate_predictions_automatically"
             />
-          </div>
-
-          <div style={{paddingLeft: 16, marginBottom: 16}}>
-            <Toggle
-                label="Show predictions to annotators in the Label stream"
-                name="show_collab_predictions"
-              />
           </div>
         </Form.Row>
       </Form>
