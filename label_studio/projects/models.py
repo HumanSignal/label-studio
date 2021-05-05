@@ -14,7 +14,7 @@ from annoying.fields import AutoOneToOneField
 from rest_framework.exceptions import ValidationError
 
 from tasks.models import Task, Prediction, Annotation, Q_task_finished_annotations, Q_finished_annotations
-from core.utils.common import create_hash, pretty_date, sample_query, get_attr_or_item
+from core.utils.common import create_hash, pretty_date, sample_query, get_attr_or_item, load_func
 from core.label_config import (
     parse_config, validate_label_config, extract_data_types, get_all_object_tag_names, config_line_stipped,
     get_sample_task, get_all_labels, get_all_control_tag_tuples, get_annotation_tuple
@@ -24,6 +24,9 @@ logger = logging.getLogger(__name__)
 
 
 class ProjectManager(models.Manager):
+    def for_user(self, user):
+        return self.filter(organization=user.active_organization)
+
     def with_counts(self):
         return self.annotate(
             task_number=Count('tasks'),
@@ -48,8 +51,10 @@ class ProjectManager(models.Manager):
             ),
         )
 
+ProjectMixin = load_func(settings.PROJECT_MIXIN)
 
-class Project(models.Model):
+
+class Project(ProjectMixin, models.Model):
     """
     """
     objects = ProjectManager()
@@ -71,6 +76,7 @@ class Project(models.Model):
 
     show_annotation_history = models.BooleanField(_('show annotation history'), default=False, help_text='Show annotation history to annotator')
     show_collab_predictions = models.BooleanField(_('show predictions to annotator'), default=True, help_text='If set, the annotator can view model predictions')
+    evaluate_predictions_automatically = models.BooleanField(_('evaluate predictions automatically'), default=False, help_text='Retrieve and display predictions when loading a task')
     token = models.CharField(_('token'), max_length=256, default=create_hash, null=True, blank=True)
     result_count = models.IntegerField(_('result count'), default=0, help_text='Total results inside of annotations counter')
     color = models.CharField(_('color'), max_length=16, default='#FFFFFF', null=True, blank=True)
@@ -626,6 +632,7 @@ class ProjectTemplate(models.Model):
             enable_empty_annotation=self._get_param('enable_empty_annotation'),
             show_annotation_history=self._get_param('show_annotation_history'),
             show_collab_predictions=self._get_param('show_collab_predictions'),
+            evaluate_predictions_automatically=self._get_param('evaluate_predictions_automatically'),
             maximum_annotations=self._get_param('maximum_annotations'),
             batch_size=self._get_param('batch_size'),
             min_annotations_to_start_training=self._get_param('min_annotations_to_start_training'),
@@ -725,6 +732,9 @@ class ProjectSummary(models.Model):
     # { from_name: {label1: task_count_with_label1, label2: task_count_with_label2} }
     created_labels = JSONField(
         _('created labels'), null=True, default=dict, help_text='Unique labels')
+
+    def has_permission(self, user):
+        return self.project.has_permission(user)
 
     def update_data_columns(self, tasks):
         common_data_columns = set()

@@ -47,6 +47,8 @@ highlight:
   line_number: false
   tab_replace:
   hljs: true
+  # auto_detect: true
+  # wrap: true
 
 # Markdown
 ## https://github.com/chjj/marked
@@ -102,3 +104,6 @@ search:
   field: all
   content: true
 
+# plugin to include md into md: https://github.com/tea3/hexo-include-markdown
+include_markdown:
+  dir: source/includes

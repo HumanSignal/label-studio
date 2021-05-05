@@ -191,10 +191,11 @@ def setup_project(client, project_template, do_auth=True):
     # we work in empty database, so let's create business user and login
     user = User.objects.create(email=email)
     user.set_password(password)  # set password without hash
-    user.save()
 
     create_business(user)
     org = Organization.create_organization(created_by=user, title=user.first_name)
+    user.active_organization = org
+    user.save()
 
     if do_auth:
 

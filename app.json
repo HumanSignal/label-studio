@@ -11,6 +11,21 @@
       "description": "Label Studio One Click Deploy Environmental Flag",
       "value": "1",
       "required": false
+    },
+    "DISABLE_SIGNUP_WITHOUT_LINK": {
+      "description": "Disable signup for users without invite link",
+      "value": "0",
+      "required": false
+    },
+    "USERNAME": {
+      "description": "Username(email) for default user",
+      "value": "",
+      "required": false
+    },
+    "PASSWORD": {
+      "description": "Password for default user",
+      "value": "",
+      "required": false
     }
   }
 }

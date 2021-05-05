@@ -21,8 +21,9 @@ class CreatedByFromContext:
 
 
 class ProjectSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
-    '''Serializer get numbers from project queryset annotation,
-    make sure, that you use correct one(Project.objects.with_counts())'''
+    """ Serializer get numbers from project queryset annotation,
+        make sure, that you use correct one(Project.objects.with_counts())
+    """
 
     task_number = serializers.IntegerField(default=None, read_only=True,
                                         help_text='Total task number in project')
@@ -31,7 +32,7 @@ class ProjectSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                                                               'skipped_annotations_number and ground_truth_number.')
     total_predictions_number = serializers.IntegerField(default=None, read_only=True,
                                                     help_text='Total predictions number in project including '
-                                                              'skipped_annotations_number and ground_truth_numberuseful_annotation_numbeo.')
+                                                              'skipped_annotations_number and ground_truth_numberuseful_annotation_number.')
     useful_annotation_number = serializers.IntegerField(default=None, read_only=True,
                                                      help_text='Useful annotation number in project not including '
                                                                'skipped_annotations_number and ground_truth_number. '
@@ -45,10 +46,24 @@ class ProjectSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
     parsed_label_config = SerializerMethodField(default=None, read_only=True,
                                                 help_text='JSON-formatted labeling configuration')
+    start_training_on_annotation_update = SerializerMethodField(default=None, read_only=False,
+                                                                help_text='Start model training after any annotations are submitted or updated')
 
     @staticmethod
     def get_parsed_label_config(project):
         return project.get_parsed_config()
+
+    def get_start_training_on_annotation_update(self, instance):
+        # FIXME: remake this logic with start_training_on_annotation_update
+        return True if instance.min_annotations_to_start_training else False
+
+    def to_internal_value(self, data):
+        # FIXME: remake this logic with start_training_on_annotation_update
+        initial_data = data
+        data = super().to_internal_value(data)
+        if 'start_training_on_annotation_update' in initial_data:
+            data['min_annotations_to_start_training'] = int(initial_data['start_training_on_annotation_update'])
+        return data
 
     class Meta:
         model = Project
@@ -56,11 +71,12 @@ class ProjectSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         fields = ['id', 'title', 'description', 'label_config', 'expert_instruction', 'show_instruction', 'show_skip_button',
                   'enable_empty_annotation', 'show_annotation_history', 'organization', 'color',
                   'maximum_annotations', 'is_published', 'model_version', 'is_draft', 'created_by', 'created_at',
-                  'min_annotations_to_start_training', 'show_collab_predictions', 'num_tasks_with_annotations',
+                  'min_annotations_to_start_training', 'start_training_on_annotation_update',
+                  'show_collab_predictions', 'num_tasks_with_annotations',
                   'task_number', 'useful_annotation_number', 'ground_truth_number', 'skipped_annotations_number',
                   'total_annotations_number', 'total_predictions_number', 'sampling', 'show_ground_truth_first',
                   'show_overlap_first', 'overlap_cohort_percentage', 'task_data_login', 'task_data_password',
-                  'control_weights', 'parsed_label_config']
+                  'control_weights', 'parsed_label_config', 'evaluate_predictions_automatically']
 
     def validate_label_config(self, value):
         if self.instance is None:

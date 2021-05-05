@@ -12,7 +12,7 @@ from rest_framework.exceptions import NotFound
 from drf_yasg import openapi as openapi
 from drf_yasg.utils import swagger_auto_schema
 
-from core.permissions import BaseRulesPermission, IsBusiness, get_object_with_permissions
+from core.permissions import BaseRulesPermission, IsBusiness, get_object_with_permissions, all_permissions
 from core.utils.common import get_object_with_check_and_log
 from core.utils.io import read_yaml
 from io_storages.serializers import ImportStorageSerializer, ExportStorageSerializer
@@ -27,7 +27,7 @@ class StorageAPIBasePermission(BaseRulesPermission):
 
 class ImportStorageListAPI(generics.ListCreateAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
-    permission_classes = (IsBusiness, StorageAPIBasePermission)
+    permission_required = all_permissions.projects_change
     serializer_class = ImportStorageSerializer
 
     def get_queryset(self):
@@ -56,7 +56,7 @@ class ImportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     """RUD storage by pk specified in URL"""
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ImportStorageSerializer
-    permission_classes = (IsBusiness, StorageAPIBasePermission)
+    permission_required = all_permissions.projects_change
 
     @swagger_auto_schema(tags=['Storage'])
     def get(self, request, *args, **kwargs):
@@ -77,7 +77,7 @@ class ImportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
 
 class ExportStorageListAPI(generics.ListCreateAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
-    permission_classes = (IsBusiness, StorageAPIBasePermission)
+    permission_required = all_permissions.projects_change
     serializer_class = ExportStorageSerializer
 
     def get_queryset(self):
@@ -104,7 +104,7 @@ class ExportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     """RUD storage by pk specified in URL"""
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ExportStorageSerializer
-    permission_classes = (IsBusiness, StorageAPIBasePermission)
+    permission_required = all_permissions.projects_change
 
     @swagger_auto_schema(tags=['Storage'])
     def get(self, request, *args, **kwargs):
@@ -123,17 +123,19 @@ class ExportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
         return super(ExportStorageDetailAPI, self).put(request, *args, **kwargs)
 
 
-class ImportStorageSyncAPI(APIView):
+class ImportStorageSyncAPI(generics.RetrieveAPIView):
 
     parser_classes = (JSONParser, FormParser, MultiPartParser)
-    permission_classes = (IsBusiness, StorageAPIBasePermission)
+    permission_required = all_permissions.projects_change
     serializer_class = ImportStorageSerializer
+
+    def get_queryset(self):
+        ImportStorageClass = self.serializer_class.Meta.model
+        return ImportStorageClass.objects.all()
 
     @swagger_auto_schema(tags=['Storage'])
     def post(self, request, *args, **kwargs):
-        ImportStorageClass = self.serializer_class.Meta.model
-        storage = get_object_with_permissions(
-            request, ImportStorageClass, self.kwargs['pk'], StorageAPIBasePermission.perm)
+        storage = self.get_object()
         # check connectivity & access, raise an exception if not satisfied
         storage.validate_connection()
         storage.sync()

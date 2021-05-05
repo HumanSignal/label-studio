@@ -1362,6 +1362,11 @@ const loadAsyncPage = async url => {
       const response = await fetch(url);
       const html = await response.text();
 
+      if (response.status === 401) {
+        location.href = (0,_utils_helpers__WEBPACK_IMPORTED_MODULE_4__.absoluteURL)("/");
+        return;
+      }
+
       if (!response.ok) {
         (0,_components_Modal_Modal__WEBPACK_IMPORTED_MODULE_2__.modal)({
           body: () => /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_components_Error_Error__WEBPACK_IMPORTED_MODULE_1__.ErrorWrapper, {
@@ -10588,8 +10593,16 @@ const MachineLearningSettings = () => {
             paddingLeft: 16
           },
           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_components_Form__WEBPACK_IMPORTED_MODULE_6__.Toggle, {
-            label: "Display ML-predicted annotations when labeling",
-            name: "show_collab_predictions"
+            label: "Start model training after any annotations are submitted or updated",
+            name: "start_training_on_annotation_update"
+          })
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("div", {
+          style: {
+            paddingLeft: 16
+          },
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_components_Form__WEBPACK_IMPORTED_MODULE_6__.Toggle, {
+            label: "Retrieve predictions when loading a task automatically",
+            name: "evaluate_predictions_automatically"
           })
         })]
       })
@@ -11250,7 +11263,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_Modal_Modal__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../components/Modal/Modal */ "./src/components/Modal/Modal.js");
 /* harmony import */ var _config_ApiConfig__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../config/ApiConfig */ "./src/config/ApiConfig.js");
 /* harmony import */ var _utils_api_proxy__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../utils/api-proxy */ "./src/utils/api-proxy.js");
-/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+/* harmony import */ var _utils_helpers__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../utils/helpers */ "./src/utils/helpers.js");
+/* harmony import */ var react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react/jsx-runtime */ "./node_modules/react/jsx-runtime.js");
+
 
 
 
@@ -11285,6 +11300,11 @@ const handleError = async (response, showModal = true) => {
     result = await API.generateError(response);
   }
 
+  if (response.status === 401) {
+    location.href = (0,_utils_helpers__WEBPACK_IMPORTED_MODULE_5__.absoluteURL)("/");
+    return;
+  }
+
   if (showModal) {
     const {
       isShutdown,
@@ -11292,11 +11312,11 @@ const handleError = async (response, showModal = true) => {
     } = errorFormatter(result);
     (0,_components_Modal_Modal__WEBPACK_IMPORTED_MODULE_2__.modal)({
       allowClose: !isShutdown,
-      body: isShutdown ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_components_Error_Error__WEBPACK_IMPORTED_MODULE_1__.ErrorWrapper, {
+      body: isShutdown ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_components_Error_Error__WEBPACK_IMPORTED_MODULE_1__.ErrorWrapper, {
         possum: false,
         title: "Connection refused",
         message: "Server not responding. Is it still running?"
-      }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(_components_Error_Error__WEBPACK_IMPORTED_MODULE_1__.ErrorWrapper, { ...formattedError
+      }) : /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_components_Error_Error__WEBPACK_IMPORTED_MODULE_1__.ErrorWrapper, { ...formattedError
       }),
       style: {
         width: 680
@@ -11347,7 +11367,7 @@ const ApiProvider = /*#__PURE__*/(0,react__WEBPACK_IMPORTED_MODULE_0__.forwardRe
       ref.current = contextValue;
     }
   }, [ref]);
-  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)(ApiContext.Provider, {
+  return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(ApiContext.Provider, {
     value: contextValue,
     children: children
   });
