@@ -35,6 +35,8 @@ if HOSTNAME:
             if FORCE_SCRIPT_NAME:
                 print("=> Django URL prefix is set to:", FORCE_SCRIPT_NAME)
 
+INTERNAL_PORT = '8080'
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '$(fefwefwef13;LFK{P!)@#*!)kdsjfWF2l+i5e3t(8a1n'
 

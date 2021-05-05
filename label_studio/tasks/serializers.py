@@ -41,8 +41,6 @@ class AnnotationSerializer(DynamicFieldsMixin, ModelSerializer):
     created_username = serializers.SerializerMethodField(default='', read_only=True, help_text='User name string')
     created_ago = serializers.CharField(default='', read_only=True, help_text='Delta time from creation time')
     completed_by = serializers.SerializerMethodField()
-    ground_truth = serializers.SerializerMethodField(
-        default=False, read_only=True, help_text='Ground truth annotation (the same as ground_truth)')
 
     @classmethod
     def many_init(cls, *args, **kwargs):
@@ -87,9 +85,6 @@ class AnnotationSerializer(DynamicFieldsMixin, ModelSerializer):
 
         name += f' {user.email}, {user.id}'
         return name
-
-    def get_ground_truth(self, annotation):
-        return annotation.ground_truth
 
     def get_completed_by(self, annotation):
         if self.context.get('completed_by', '') == 'full':

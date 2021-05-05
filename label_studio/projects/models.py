@@ -76,6 +76,7 @@ class Project(ProjectMixin, models.Model):
 
     show_annotation_history = models.BooleanField(_('show annotation history'), default=False, help_text='Show annotation history to annotator')
     show_collab_predictions = models.BooleanField(_('show predictions to annotator'), default=True, help_text='If set, the annotator can view model predictions')
+    evaluate_predictions_automatically = models.BooleanField(_('evaluate predictions automatically'), default=False, help_text='Retrieve and display predictions when loading a task')
     token = models.CharField(_('token'), max_length=256, default=create_hash, null=True, blank=True)
     result_count = models.IntegerField(_('result count'), default=0, help_text='Total results inside of annotations counter')
     color = models.CharField(_('color'), max_length=16, default='#FFFFFF', null=True, blank=True)
@@ -631,6 +632,7 @@ class ProjectTemplate(models.Model):
             enable_empty_annotation=self._get_param('enable_empty_annotation'),
             show_annotation_history=self._get_param('show_annotation_history'),
             show_collab_predictions=self._get_param('show_collab_predictions'),
+            evaluate_predictions_automatically=self._get_param('evaluate_predictions_automatically'),
             maximum_annotations=self._get_param('maximum_annotations'),
             batch_size=self._get_param('batch_size'),
             min_annotations_to_start_training=self._get_param('min_annotations_to_start_training'),
