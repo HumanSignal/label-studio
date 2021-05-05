@@ -380,7 +380,7 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
             next_task.set_lock(request.user)
 
         # call machine learning api and format response
-        if project.show_collab_predictions:
+        if project.show_collab_predictions and not next_task.predictions.exists():
             for ml_backend in project.ml_backends.all():
                 ml_backend.predict_one_task(next_task)
 
@@ -395,6 +395,10 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
             if c.get('completed_by') == user.id and not (c.get('ground_truth') or c.get('honeypot')):
                 annotations.append(c)
         response['annotations'] = annotations
+
+        # remove all predictions if we don't want to show it in the label stream
+        if not project.show_collab_predictions:
+            response['predictions'] = []
 
         return Response(response)
 

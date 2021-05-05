@@ -115,6 +115,7 @@ class ContextLog(object):
 
     def create_payload(self, request, response, body):
         payload = {
+            'url': request.build_absolute_uri(),
             'server_id': self._get_server_id(),
             'server_time': self._get_timestamp_now(),
             'session_id': request.session.get('uid', None),

@@ -89,7 +89,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         task = self.get_object()
 
         # call machine learning api and format response
-        if task.project.show_collab_predictions:
+        if task.project.evaluate_predictions_automatically:
             for ml_backend in task.project.ml_backends.all():
                 ml_backend.predict_one_task(task)
 

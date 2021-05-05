@@ -5,12 +5,14 @@ import logging
 import drf_yasg.openapi as openapi
 import json
 
+from django.conf import settings
 from django.db import transaction
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticated
+from ranged_fileresponse import RangedFileResponse
 
 from core.permissions import all_permissions, ViewClassPermission
 from core.utils.common import bool_from_request, retry_database_locked
@@ -460,3 +462,17 @@ class FileUploadAPI(generics.RetrieveUpdateDestroyAPIView):
     @swagger_auto_schema(auto_schema=None)
     def put(self, *args, **kwargs):
         return super(FileUploadAPI, self).put(*args, **kwargs)
+
+
+class UploadedFileResponse(generics.RetrieveAPIView):
+    permission_classes = (IsAuthenticated, )
+
+    @swagger_auto_schema(auto_schema=None)
+    def get(self, *args, **kwargs):
+        request = self.request
+        filename = kwargs['filename']
+        file = settings.UPLOAD_DIR + ('/' if not settings.UPLOAD_DIR.endswith('/') else '') + filename
+        logger.debug(f'Fetch uploaded file by user {request.user} => {file}')
+        file_upload = FileUpload.objects.get(file=file)
+
+        return RangedFileResponse(request, open(file_upload.file.path, mode='rb'))
