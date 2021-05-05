@@ -1,6 +1,6 @@
 {
-  "message": "Allow copying anno/predictions",
-  "commit": "55c8082a03c198e1e09137147f506fe89b377542",
+  "message": "Allow copying only saved annotations",
+  "commit": "9527fc0577b420a636f784519fd1415106cfc327",
   "branch": "feature/ui-update",
-  "date": "2021-05-05T18:36:14Z"
+  "date": "2021-05-05T18:51:21Z"
 }
