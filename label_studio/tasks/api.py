@@ -265,6 +265,10 @@ class AnnotationDraftListAPI(RequestDebugLogMixin, generics.ListCreateAPIView):
 
     parser_classes = (JSONParser, MultiPartParser, FormParser)
     serializer_class = AnnotationDraftSerializer
+    permission_required = ViewClassPermission(
+        GET=all_permissions.annotations_view,
+        POST=all_permissions.annotations_create,
+    )
     queryset = AnnotationDraft.objects.all()
     swagger_schema = None
 
@@ -285,4 +289,10 @@ class AnnotationDraftAPI(RequestDebugLogMixin, generics.RetrieveUpdateDestroyAPI
     parser_classes = (JSONParser, MultiPartParser, FormParser)
     serializer_class = AnnotationDraftSerializer
     queryset = AnnotationDraft.objects.all()
+    permission_required = ViewClassPermission(
+        GET=all_permissions.annotations_view,
+        PUT=all_permissions.annotations_change,
+        PATCH=all_permissions.annotations_change,
+        DELETE=all_permissions.annotations_delete,
+    )
     swagger_schema = None
