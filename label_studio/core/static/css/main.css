@@ -624,11 +624,6 @@ hotkey i {
     background-color: rgb(24, 144, 255)!important;
 }
 
-/* ant + semantic bugfix */
-span.anticon {
-    padding-top: 3px !important;
-}
-
 .small-breadcrumb {
     padding-top: 2px;
     font-size: 0.5em;

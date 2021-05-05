@@ -14,6 +14,7 @@ from rest_framework.authtoken.models import Token
 
 from organizations.models import OrganizationMember, Organization
 from users.functions import hash_upload
+from core.utils.common import load_func
 
 YEAR_START = 1980
 YEAR_CHOICES = []
@@ -69,8 +70,10 @@ class UserLastActivityMixin(models.Model):
     class Meta:
         abstract = True
 
+UserMixin = load_func(settings.USER_MIXIN)
 
-class User(AbstractBaseUser, PermissionsMixin, UserLastActivityMixin):
+
+class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin):
     """
     An abstract base class implementing a fully featured User model with
     admin-compliant permissions.

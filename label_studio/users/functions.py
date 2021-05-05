@@ -64,7 +64,7 @@ def save_user(request, next_page, user_form):
 
     redirect_url = next_page if next_page else reverse('projects:project-index')
     auth.login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-    return redirect_url
+    return redirect(redirect_url)
 
 
 def proceed_registration(request, user_form, organization_form, next_page):
@@ -72,6 +72,6 @@ def proceed_registration(request, user_form, organization_form, next_page):
     """
     # save user to db
     save_user = load_func(settings.SAVE_USER)
-    redirect_url = save_user(request, next_page, user_form)
+    response = save_user(request, next_page, user_form)
 
-    return redirect(redirect_url)
+    return response

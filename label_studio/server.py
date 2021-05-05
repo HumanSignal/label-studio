@@ -96,8 +96,8 @@ def _create_user(input_args, config):
 
     DEFAULT_USERNAME = 'default_user@localhost'
 
-    username = input_args.username or config.get('username')
-    password = input_args.password or config.get('password')
+    username = input_args.username or config.get('username') or get_env('USERNAME')
+    password = input_args.password or config.get('password') or get_env('PASSWORD')
 
     if not username:
         user = User.objects.filter(email=DEFAULT_USERNAME).first()
@@ -123,8 +123,11 @@ def _create_user(input_args, config):
         print('User {} already exists'.format(username))
 
     user = User.objects.get(email=username)
-    if not Organization.objects.exists():
+    org = Organization.objects.first()
+    if not org:
         Organization.create_organization(created_by=user, title='Label Studio')
+    else:
+        org.add_user(user)
 
     return user
 
@@ -314,6 +317,9 @@ def main():
     if input_args.command == 'start' or input_args.command is None:
         from label_studio.core.utils.common import start_browser
 
+        if get_env('USERNAME') and get_env('PASSWORD'):
+            _create_user(input_args, config)
+
         # ssl not supported from now
         cert_file = input_args.cert_file or config.get('cert')
         key_file = input_args.key_file or config.get('key')
@@ -327,6 +333,10 @@ def main():
         internal_port = input_args.port or get_env('PORT') or config.get('port', 8080)
         internal_port = int(internal_port)
         internal_port = _get_free_port(internal_port, input_args.debug)
+
+        # save selected port to global settings
+        from django.conf import settings
+        settings.INTERNAL_PORT = str(internal_port)
 
         # browser
         url = ('http://localhost:' + str(internal_port)) if not host else host

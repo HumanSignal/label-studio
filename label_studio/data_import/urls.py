@@ -25,7 +25,8 @@ _api_projects_urlpatterns = [
 
 urlpatterns = [
     path('api/import/', include((_api_urlpatterns, app_name), namespace='api')),
+    path('api/projects/', include((_api_projects_urlpatterns, app_name), namespace='api-projects')),
+
     # special endpoints for serving imported files
-    path('data/upload/<str:filename>', views.get_uploaded_file, name='data-upload'),
-    path('api/projects/', include((_api_projects_urlpatterns, app_name), namespace='api-projects'))
+    path('data/upload/<str:filename>', api.UploadedFileResponse.as_view(), name='data-upload'),
 ]

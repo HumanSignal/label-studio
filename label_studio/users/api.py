@@ -13,11 +13,11 @@ from rest_framework.authtoken.models import Token
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework import generics
+from rest_framework.permissions import IsAuthenticated
 
-from core.permissions import IsAuthenticated, CanModifyUserOrReadOnly
+from core.permissions import CanModifyUserOrReadOnly
 from users.models import User
 from users.serializers import UserSerializer
-from users.forms import UserProfileForm
 from users.functions import check_avatar
 
 
@@ -47,10 +47,7 @@ class UserAPI(viewsets.ModelViewSet):
 
     @swagger_auto_schema(tags=['Users'], operation_summary='Save user details')
     def update(self, request, *args, **kwargs):
-        form = UserProfileForm(data=request.data, files=request.FILES, instance=request.user)
-        if form.is_valid():
-            form.save()
-            return Response({'detail': 'user details saved'}, status=200)
+        return super(UserAPI, self).update(request, *args, **kwargs)
 
     @swagger_auto_schema(auto_schema=None)
     def list(self, request, *args, **kwargs):
@@ -76,7 +73,7 @@ class UserAPI(viewsets.ModelViewSet):
 class UserResetTokenAPI(APIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     queryset = User.objects.all()
-    permission_classes = (CanModifyUserOrReadOnly,)
+    permission_classes = (IsAuthenticated,)
 
     @swagger_auto_schema(
         tags=['Users'],
@@ -123,7 +120,7 @@ class UserGetTokenAPI(APIView):
 class UserWhoAmIAPI(generics.RetrieveAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     queryset = User.objects.all()
-    permission_classes = (CanModifyUserOrReadOnly,)
+    permission_classes = (IsAuthenticated, )
     serializer_class = UserSerializer
 
     def get_object(self):

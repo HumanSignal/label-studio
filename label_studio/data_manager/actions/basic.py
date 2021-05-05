@@ -5,6 +5,18 @@ from django.db.models import signals
 from tasks.models import Annotation, Prediction, update_is_labeled_after_removing_annotation
 from core.utils.common import temporary_disconnect_signal
 
+from data_manager.functions import evaluate_predictions
+
+
+def retrieve_tasks_predictions(project, queryset, **kwargs):
+    """ Retrieve predictions by tasks ids
+
+    :param project: project instance
+    :param queryset: filtered tasks db queryset
+    """
+    evaluate_predictions(queryset)
+    return {'processed_items': queryset.count(), 'detail': 'Retrieved ' + str(queryset.count()) + ' predictions'}
+
 
 def delete_tasks(project, queryset, **kwargs):
     """ Delete tasks by ids
@@ -37,7 +49,7 @@ def delete_tasks_annotations(project, queryset, **kwargs):
     annotations = Annotation.objects.filter(task__id__in=task_ids)
     count = annotations.count()
     annotations.delete()
-    return {'processed_items': count, 'reload': True,
+    return {'processed_items': count,
             'detail': 'Deleted ' + str(count) + ' annotations'}
 
 
@@ -51,11 +63,24 @@ def delete_tasks_predictions(project, queryset, **kwargs):
     predictions = Prediction.objects.filter(task__id__in=task_ids)
     count = predictions.count()
     predictions.delete()
-    return {'processed_items': count, 'reload': True,
-            'detail': 'Deleted ' + str(count) + ' predictions'}
+    return {'processed_items': count, 'detail': 'Deleted ' + str(count) + ' predictions'}
 
 
 actions = [
+    {
+        'entry_point': retrieve_tasks_predictions,
+        'title': 'Retrieve predictions',
+        'order': 90,
+        'permissions': 'can_manage_annotations',
+        'dialog': {
+            'text': 'Send the selected tasks to all ML backends connected to the project.'
+                    'This operation migth be abruptly interrupted due to a timeout. ' 
+                    'The recommended way to get predictions is to update tasks using the Label Studio API.'
+                    '<a href="https://labelstud.io/guide/ml.html>See more in the documentation</a>.'
+                    'Please confirm your action.',
+            'type': 'confirm'
+        }
+    },
     {
         'entry_point': delete_tasks,
         'title': 'Delete tasks', 'order': 100,

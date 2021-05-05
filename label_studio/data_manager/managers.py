@@ -68,6 +68,7 @@ def get_fields_for_annotation(prepare_params):
     # we don't need to annotate regular model fields, so we skip them
     skipped_fields = [field.attname for field in Task._meta.fields]
     skipped_fields.append("id")
+    skipped_fields.append("file_upload")
     result = [f for f in result if f not in skipped_fields]
     result = [f for f in result if not f.startswith("data.")]
 
@@ -284,3 +285,8 @@ class PreparedTaskManager(models.Manager):
 
         fields_for_annotation = get_fields_for_annotation(prepare_params)
         return self.get_queryset(fields_for_annotation).prepared(prepare_params=prepare_params)
+
+
+class TaskManager(models.Manager):
+    def for_user(self, user):
+        return self.filter(project__organization=user.active_organization)
