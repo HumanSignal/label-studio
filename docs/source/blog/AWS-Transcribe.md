@@ -34,21 +34,24 @@ In this example tutorial, you can use the AWS Transcribe service to create an au
 Before you start your transcription process, make sure you have the following:
 - An AWS account
 - Audio files stored in Amazon S3
-- The AWS command line interface tool installed
+- The AWS command line interface tool installed ADD A LINK
 - Python version 3.7 or higher installed
 
 ## Configure programmatic access to AWS Transcribe
 
-Set up your Amazon S3 buckets with the audio files to allow the AWS Transcribe service to read the contents programmatically.  
-
+Set up your Amazon S3 buckets with the audio files to allow the AWS Transcribe service to read the contents programmatically.
 
 #### Create IAM user
+
+Use the AWS CLI tool to create an identity to access the bucket on behalf of the AWS Transcribe service. Run the following command:
 
 ```bash
 aws iam create-user --user-name test-transcribe-client
 ```
 
 #### Create AWS credentials for programmatic access
+
+Create the credentials for the username that you just created to allow the transcription service to access the bucket. Run the following command:
 
 ```bash
 aws iam create-access-key --user-name test-transcribe-client
@@ -62,11 +65,13 @@ aws iam create-access-key --user-name test-transcribe-client
     }
 }
 ```
-Set AWS access key ID and AWS secret access key with `aws configure` command. HERE IS A LINK OR SOME MORE INFO ON HOW TO DO THAT.
+Set the AWS access key ID and AWS secret access key using the `aws configure` command. HERE IS A LINK OR SOME MORE INFO ON HOW TO DO THAT.
 
 #### Create policy to access AWS Transcribe
 
-Create file `TranscribePolicy.json`:
+In order to allow the AWS Transcribe service to access your bucket, you must set a policy with your identity and access management STUFF AND THINGS HERE IS ALSO A LINK FOR WHAT THIS IS. 
+
+Create a file with the following contents and name it `TranscribePolicy.json`:
 
 ```json
 {
@@ -83,7 +88,7 @@ Create file `TranscribePolicy.json`:
 }
 ```
 
-Attach policy to the user:
+From the command line, run the following to attach the policy to the user:
 
 ```bash
 aws iam put-user-policy --user-name test-transcribe-client --policy-name TestTranscribePolicy --policy-document file://TranscribePolicy.json
