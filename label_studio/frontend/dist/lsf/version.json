@@ -1,6 +1,6 @@
 {
-  "message": "Fix View All",
-  "commit": "8194c284daf845360cb71a93fdf622fa2151ab06",
+  "message": "Allow copying anno/predictions",
+  "commit": "55c8082a03c198e1e09137147f506fe89b377542",
   "branch": "feature/ui-update",
-  "date": "2021-05-04T09:36:23Z"
+  "date": "2021-05-05T18:36:14Z"
 }
