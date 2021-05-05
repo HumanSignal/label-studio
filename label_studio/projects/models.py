@@ -731,6 +731,9 @@ class ProjectSummary(models.Model):
     created_labels = JSONField(
         _('created labels'), null=True, default=dict, help_text='Unique labels')
 
+    def has_permission(self, user):
+        return self.project.has_permission(user)
+
     def update_data_columns(self, tasks):
         common_data_columns = set()
         all_data_columns = dict(self.all_data_columns)
