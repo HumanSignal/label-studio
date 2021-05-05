@@ -114,14 +114,14 @@ export const MachineLearningSettings = () => {
 
           <div style={{paddingLeft: 16}}>
             <Toggle
-              label="Start model training after annotations submit or update"
+              label="Start model training after any annotations are submitted or updated"
               name="start_training_on_annotation_update"
             />
           </div>
 
           <div style={{paddingLeft: 16}}>
             <Toggle
-              label="Retrieve predictions when loading a task"
+              label="Retrieve predictions when loading a task automatically"
               name="evaluate_predictions_automatically"
             />
           </div>

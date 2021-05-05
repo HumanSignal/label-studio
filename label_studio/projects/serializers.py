@@ -47,7 +47,7 @@ class ProjectSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     parsed_label_config = SerializerMethodField(default=None, read_only=True,
                                                 help_text='JSON-formatted labeling configuration')
     start_training_on_annotation_update = SerializerMethodField(default=None, read_only=False,
-                                                                help_text='Start training on annotation submit or update')
+                                                                help_text='Start model training after any annotations are submitted or updated')
 
     @staticmethod
     def get_parsed_label_config(project):
