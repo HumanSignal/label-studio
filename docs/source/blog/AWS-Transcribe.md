@@ -1,20 +1,46 @@
 ---
-title: Using Label Studio to improve Audio Transcriptions
+title: Improve Audio Transcriptions with Label Studio
 type: blog
 order: 95
-meta_title: Using Label Studio to improve Audio Transcriptions
-meta_description: Using Label Studio to improve Audio Transcriptions 
+meta_title: Improve Audio Transcriptions with Label Studio
+meta_description: Use open source data labeling software Label Studio to improve audio transcriptions of customer support calls, video conference meetings, and other audio recordings.
 ---
+
+Audio transcription quality is important for accessibility, but also to ensure the quality of a service that you provide, such as customer support, or the outcomes of a meeting. 
+
+Types of audio that needs transcribing:
+- A recording from an interview with a journalism source.
+- Customer support call recordings.
+- User research interview recordings.
+- Field interviews being used for academic research projects.
+- Depositions for legal cases.
+- Business meeting recordings. 
+- Arbitration discussions. 
+
+## Why audio transcription quality matters
+
+For many cases where you're using audio transcriptions, they must be completely accurate so that patterns that you search for in the transcribed content can be easily discovered for research purposes, to help you build a stronger legal case, to more easily improve your product, or to ensure high quality customer support interactions. 
+
+When high quality is crucial, having human involvement in the transcript is necessary. An expert transcriber brings field-specific knowledge and vernacular to a transcript, but it's difficult to scale high-quality human transcription at the price point that you might have available in your budget. Rather than shortchange the skills of an expert, you can use automated transcription to provide a shortcut. Then the expert can focus on correcting inaccuracies in the transcript rather than performing the entire transcription manually. 
+
+With Label Studio, you can improve audio transcription quality at scale with an easy-to-use interface.
+
+## How to improve audio transcription quality with Label Studio
+
+In this example tutorial, you can use the AWS Transcribe service to create an automated audio transcript and combine it with human intervention in Label Studio to produce a high quality audio transcript.
 
 ## Before you start
 
-Ensure you have
+Before you start your transcription process, make sure you have the following:
+- An AWS account
+- Audio files stored in Amazon S3
+- The AWS command line interface tool installed
+- Python version 3.7 or higher installed
 
-1. AWS account
-2. AWS cli tool
-3. Python >= 3.7
+## Configure programmatic access to AWS Transcribe
 
-## Configure programmatic access for using AWS Transcribe
+Set up your Amazon S3 buckets with the audio files to allow the AWS Transcribe service to read the contents programmatically.  
+
 
 #### Create IAM user
 
@@ -36,7 +62,7 @@ aws iam create-access-key --user-name test-transcribe-client
     }
 }
 ```
-Set AWS access key Id and AWS secret access key with `aws configure` command.
+Set AWS access key ID and AWS secret access key with `aws configure` command. HERE IS A LINK OR SOME MORE INFO ON HOW TO DO THAT.
 
 #### Create policy to access AWS Transcribe
 
@@ -65,7 +91,11 @@ aws iam put-user-policy --user-name test-transcribe-client --policy-name TestTra
 
 ## Create Label Studio tasks
 
-AWS Transcribe service runs transcription job on each audio file from your S3 bucket. First specify the list of URI to audio files:
+AWS Transcribe service runs transcription job on each audio file from your S3 bucket. HOW/WHEN DOES IT DO THAT
+
+OK IT APPEARS THAT WE'RE WRITING A PYTHON SCRIPT TO DO ALL THESE OPERATIONS, INTRODUCE THIS SECTION ACCORDINGLY. 
+
+First specify the list of URI to audio files: 
 
 ```python
 audio_files = [
@@ -75,7 +105,7 @@ audio_files = [
 ]
 ```
 
-Then create AWS Transcribe client. It will use credentials & IAM role from previous steps:
+Then create AWS Transcribe client. It will use credentials & IAM role from previous steps: 
 
 ```python
 import boto3
@@ -163,7 +193,8 @@ def transcribe_file(job_name, file_uri, transcribe_client, media_format='wav', l
 ```
 
 
-Run all together and create `tasks.json` to import to Label Studio:
+Run all together and create `tasks.json` to import to Label Studio: 
+THIS APPEARS TO BE A SEPARATE PYTHON SCRIPT TO RUN SEPARATELY... WHY IS THAT? WHAT DOES IT RUN ON? THE OUTPUT OF THE LAST STEP?
 
 ```python
 import os
@@ -181,10 +212,13 @@ with open(output_file, mode='w') as f:
 print(f'Congrats! Now import {output_file} into Label Studio.')
 ```
 
-Now you can create Label Studio **Audio Transcription** project and upload `tasks.json`. Since we specify `s3://` URLs to audio files, we need to tell the app use globally installed AWS credentials to create presigned audio URLs. To do this, the following variable should be exposed first:
+Now you can create Label Studio **Audio Transcription** project and upload `tasks.json`. Since we specify `s3://` URLs to audio files, we need to tell the app use globally installed AWS credentials to create presigned audio URLs. To do this, expose the following variable:
 
 ```bash
 export USE_DEFAULT_S3_STORAGE=true
 ```
 
 Now start Label Studio app via `label-studio`, upload created `tasks.json` and choose **Audio Transcription** project.
+
+
+OKAY IT SEEMS AS THOUGH AT SOME POINT WE NEED TO INSTALL LABEL STUDIO 
