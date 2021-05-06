@@ -1,16 +1,12 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 from core.label_config import generate_sample_task_without_check
-from django.db.models import Q
 from drf_dynamic_fields import DynamicFieldsMixin
 from rest_framework import serializers
 from rest_framework.serializers import SerializerMethodField
-from tasks.models import (Prediction, Q_finished_annotations, Task,
-                          Annotation)
 from users.serializers import UserSimpleSerializer
 
-from projects.models import (Project, ProjectOnboarding, ProjectSummary,
-                             ProjectTemplate)
+from projects.models import Project, ProjectOnboarding, ProjectSummary
 
 
 class CreatedByFromContext:
@@ -100,69 +96,6 @@ class ProjectLabelConfigSerializer(serializers.Serializer):
     def validate_label_config(self, config):
         Project.validate_label_config(config)
         return config
-
-
-class ProjectTemplateSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = ProjectTemplate
-        exclude = ('id', 'created_at', 'updated_at', 'created_by', 'organization')
-
-
-class CreateProjectTemplateSerializer(serializers.ModelSerializer):
-    """
-    Serializer for creating new ProjectTemplate
-    """
-    class Meta:
-        model = ProjectTemplate
-        fields = '__all__'
-
-    def create(self, validated_data):
-        user = self.context['user']
-        validated_data['created_by_id'] = user.id
-        project = self.context.get('project')
-        if project:
-            # if template is created from project, get all settings from project
-            validated_data['is_private'] = project.is_private
-            validated_data['project_settings'] = ProjectSerializer(project).data
-            validated_data['organization_id'] = project.organization.id
-
-            sample_task = generate_sample_task_without_check(project.label_config, mode='editor_preview',
-                                                             secure_mode=project.secure_mode)
-            validated_data['input_example'] = 'Generated example'
-            validated_data['input_example_json'] = sample_task
-            validated_data['task_data'] = [sample_task]
-        else:
-            # current organization should be included in the context
-            validated_data['organization_id'] = self.context['organization'].id
-
-        return super(CreateProjectTemplateSerializer, self).create(validated_data)
-
-
-class ProjectTemplateCreateSerializer(serializers.Serializer):
-    """
-    Unlike it's weird name, this serializer handles Project creation from ProjectTemplate
-    """
-    title = serializers.CharField(max_length=2000)
-    template_pk = serializers.IntegerField()
-    include_example_data = serializers.BooleanField()
-    membership_id = serializers.CharField(required=False)
-
-    def to_representation(self, instance):
-        project = ProjectSerializer(instance)
-        return project.data
-
-    def validate(self, data):
-        try:
-            data['template'] = ProjectTemplate.objects.get(pk=data['template_pk'])
-        except ProjectTemplate.DoesNotExist:
-            raise serializers.ValidationError('template with id %d does not exist' % data['template_pk'])
-
-        return data
-
-    def create(self, validated_data):
-        template = validated_data['template']
-        return template.create_project(**validated_data)
 
 
 class ProjectSummarySerializer(serializers.ModelSerializer):
