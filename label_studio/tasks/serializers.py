@@ -397,7 +397,7 @@ class TaskWithAnnotationsAndPredictionsSerializer(TaskSerializer):
 
         if 'request' in self.context:
             user = self.context['request'].user
-            if user.is_annotator(task.project.organization.pk):
+            if user.is_annotator:
                 annotations = annotations.filter(completed_by=user)
 
         return AnnotationSerializer(annotations, many=True, read_only=True, default=True, context=self.context).data
@@ -451,7 +451,7 @@ class TaskWithAnnotationsAndPredictionsAndDraftsSerializer(TaskSerializer):
 
         if 'request' in self.context and hasattr(self.context['request'], 'user'):
             user = self.context['request'].user
-            if user.is_annotator(task.project.organization.pk):
+            if user.is_annotator:
                 annotations = annotations.filter(completed_by=user)
 
         return AnnotationSerializer(annotations, many=True, read_only=True, default=True, context=self.context).data
@@ -466,7 +466,7 @@ class TaskWithAnnotationsAndPredictionsAndDraftsSerializer(TaskSerializer):
         if 'request' in self.context and hasattr(self.context['request'], 'user'):
             user = self.context['request'].user
             # drafts = drafts.filter(user=user)
-            if user.is_annotator(task.project.organization.pk):
+            if user.is_annotator:
                 drafts = drafts.filter(user=user)
 
         return AnnotationDraftSerializer(drafts, many=True, read_only=True, default=True, context=self.context).data
@@ -481,7 +481,7 @@ class TaskWithAnnotationsAndLazyPredictionsSerializer(TaskSerializer):
 
         if 'request' in self.context:
             user = self.context['request'].user
-            if user.is_annotator(task.project.organization.pk):
+            if user.is_annotator:
                 annotations = annotations.filter(completed_by=user)
 
         return AnnotationSerializer(annotations, many=True, read_only=True, default=True, context=self.context).data
