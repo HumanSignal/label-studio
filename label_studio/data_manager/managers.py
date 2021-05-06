@@ -285,3 +285,8 @@ class PreparedTaskManager(models.Manager):
 
         fields_for_annotation = get_fields_for_annotation(prepare_params)
         return self.get_queryset(fields_for_annotation).prepared(prepare_params=prepare_params)
+
+
+class TaskManager(models.Manager):
+    def for_user(self, user):
+        return self.filter(project__organization=user.active_organization)

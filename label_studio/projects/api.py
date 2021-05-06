@@ -1,15 +1,12 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import drf_yasg.openapi as openapi
-import json
 import logging
 import numpy as np
 import pathlib
 import os
 
 from collections import Counter
-from django.apps import apps
-from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError
 from django.db.models.fields import DecimalField
@@ -19,14 +16,12 @@ from django.db.models import Q, When, Count, Case, OuterRef, Max, Exists, Value,
 from rest_framework import generics, status, filters
 from rest_framework.exceptions import NotFound, ValidationError as RestValidationError
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView, exception_handler
 
-from core.utils.common import conditional_atomic, get_organization_from_request
-from core.label_config import parse_config, config_essential_data_has_changed
-from organizations.models import Organization
-from organizations.permissions import *
+from core.utils.common import conditional_atomic
+from core.label_config import config_essential_data_has_changed
 from projects.functions import (generate_unique_title, duplicate_project)
 from projects.models import (
     Project, ProjectSummary
@@ -38,8 +33,8 @@ from tasks.models import Task, Annotation, Prediction, TaskLock
 from tasks.serializers import TaskSerializer, TaskWithAnnotationsAndPredictionsAndDraftsSerializer
 
 from core.mixins import APIViewVirtualRedirectMixin, APIViewVirtualMethodMixin
-from core.permissions import (IsAuthenticated, IsBusiness, BaseRulesPermission,
-                              get_object_with_permissions)
+from core.decorators import permission_required
+from core.permissions import all_permissions, ViewClassPermission
 from core.utils.common import (
     get_object_with_check_and_log, bool_from_request, paginator, paginator_help)
 from core.utils.exceptions import ProjectExistException, LabelStudioDatabaseException
@@ -92,14 +87,6 @@ _task_data_schema = openapi.Schema(
 )
 
 
-class ProjectAPIBasePermission(BaseRulesPermission):
-    perm = 'projects.change_project'
-
-
-class ProjectAPIOrganizationPermission(BaseRulesPermission):
-    perm = 'organizations.view_organization'
-
-
 class ProjectListAPI(generics.ListCreateAPIView):
     """
     get:
@@ -113,16 +100,16 @@ class ProjectListAPI(generics.ListCreateAPIView):
     Create a labeling project.
     """
     parser_classes = (JSONParser, FormParser, MultiPartParser)
-    permission_classes = (IsBusiness, ProjectAPIOrganizationPermission)
     serializer_class = ProjectSerializer
     filter_backends = [filters.OrderingFilter]
+    permission_required = ViewClassPermission(
+        GET=all_permissions.projects_view,
+        POST=all_permissions.projects_create,
+    )
     ordering = ['-created_at']
 
     def get_queryset(self):
-        org_pk = get_organization_from_request(self.request)
-        org = get_object_with_check_and_log(self.request, Organization, pk=org_pk)
-        self.check_object_permissions(self.request, org)
-        return Project.objects.with_counts()
+        return Project.objects.with_counts().filter(organization=self.request.user.active_organization)
 
     def get_serializer_context(self):
         context = super(ProjectListAPI, self).get_serializer_context()
@@ -130,13 +117,8 @@ class ProjectListAPI(generics.ListCreateAPIView):
         return context
 
     def perform_create(self, ser):
-        # get organization
-        org_pk = get_organization_from_request(self.request)
-        org = get_object_with_check_and_log(self.request, Organization, pk=org_pk)
-        self.check_object_permissions(self.request, org)
-
         try:
-            project = ser.save(organization=org)
+            project = ser.save(organization=self.request.user.active_organization)
         except IntegrityError as e:
             if str(e) == 'UNIQUE constraint failed: project.title, project.created_by_id':
                 raise ProjectExistException('Project with the same name already exists: {}'.
@@ -173,16 +155,20 @@ class ProjectAPI(APIViewVirtualRedirectMixin,
     """
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     queryset = Project.objects.with_counts()
-    permission_classes = (IsAuthenticated, ProjectAPIBasePermission)
+    permission_required = ViewClassPermission(
+        GET=all_permissions.projects_view,
+        DELETE=all_permissions.projects_delete,
+        PATCH=all_permissions.projects_change,
+        PUT=all_permissions.projects_change,
+        POST=all_permissions.projects_create,
+    )
     serializer_class = ProjectSerializer
 
     redirect_route = 'projects:project-detail'
     redirect_kwarg = 'pk'
 
-    def get_object(self):
-        obj = get_object_with_check_and_log(self.request, Project.objects.with_counts(), pk=self.kwargs['pk'])
-        self.check_object_permissions(self.request, obj)
-        return obj
+    def get_queryset(self):
+        return Project.objects.with_counts().filter(organization=self.request.user.active_organization)
 
     @swagger_auto_schema(tags=['Projects'])
     def get(self, request, *args, **kwargs):
@@ -235,10 +221,6 @@ class ProjectAPI(APIViewVirtualRedirectMixin,
         return super(ProjectAPI, self).put(request, *args, **kwargs)
 
 
-class ProjectNextTaskAPIPermissions(BaseRulesPermission):
-    perm = 'tasks.view_task'
-
-
 class ProjectNextTaskAPI(generics.RetrieveAPIView):
     """get:
     Get next task to label
@@ -249,7 +231,7 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
     this task.
 
     """
-    permission_classes = (IsAuthenticated, ProjectNextTaskAPIPermissions)
+    permission_required = all_permissions.tasks_view
     serializer_class = TaskWithAnnotationsAndPredictionsAndDraftsSerializer  # using it for swagger API docs
 
     def _get_random_unlocked(self, task_query, upper_limit=None):
@@ -397,7 +379,7 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
             next_task.set_lock(request.user)
 
         # call machine learning api and format response
-        if project.show_collab_predictions:
+        if project.show_collab_predictions and not next_task.predictions.exists():
             for ml_backend in project.ml_backends.all():
                 ml_backend.predict_one_task(next_task)
 
@@ -412,6 +394,10 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
             if c.get('completed_by') == user.id and not (c.get('ground_truth') or c.get('honeypot')):
                 annotations.append(c)
         response['annotations'] = annotations
+
+        # remove all predictions if we don't want to show it in the label stream
+        if not project.show_collab_predictions:
+            response['predictions'] = []
 
         return Response(response)
 
@@ -534,8 +520,8 @@ class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
     """ Validate label config
     """
     parser_classes = (JSONParser, FormParser, MultiPartParser)
-    permission_classes = (IsBusiness, ProjectAPIBasePermission)
     serializer_class = ProjectLabelConfigSerializer
+    permission_required = all_permissions.projects_change
     queryset = Project.objects.all()
 
     @swagger_auto_schema(tags=['Projects'], operation_summary='Validate a label config', manual_parameters=[
@@ -563,7 +549,7 @@ class ProjectDuplicateAPI(APIView):
 
     Create a duplicate project with the same tasks and settings.
     """
-    permission_classes = (IsBusiness, )
+    permission_required = all_permissions.projects_change
 
     @swagger_auto_schema(
         manual_parameters=[
@@ -589,7 +575,7 @@ class ProjectDuplicateAPI(APIView):
         tags=['Projects']
     )
     def get(self, request, *args, **kwargs):
-        project = get_object_with_permissions(request, Project, kwargs['pk'], 'projects.change_project')
+        project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=kwargs['pk'])
         title = request.GET.get('title', '')
         title = project.title if not title else title
         title = generate_unique_title(request.user, title)
@@ -606,8 +592,8 @@ class ProjectDuplicateAPI(APIView):
 
 class ProjectSummaryAPI(generics.RetrieveAPIView):
     parser_classes = (JSONParser,)
-    permission_classes = (IsAuthenticated, ProjectAPIBasePermission)
     serializer_class = ProjectSummarySerializer
+    permission_required = all_permissions.projects_view
     queryset = ProjectSummary.objects.all()
 
     @swagger_auto_schema(tags=['Projects'], operation_summary='Project summary')
@@ -631,19 +617,23 @@ class TasksListAPI(generics.ListCreateAPIView,
     Delete all tasks from a specific project.
     """
     parser_classes = (JSONParser, FormParser)
-    permission_classes = (IsBusiness, ProjectAPIBasePermission)
+    permission_required = ViewClassPermission(
+        GET=all_permissions.tasks_view,
+        POST=all_permissions.tasks_change,
+        DELETE=all_permissions.tasks_delete,
+    )
     serializer_class = TaskSerializer
     redirect_route = 'projects:project-settings'
     redirect_kwarg = 'pk'
 
     def get_queryset(self):
-        project = get_object_with_permissions(self.request, Project, self.kwargs.get('pk', 0), 'projects.view_project')
+        project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs.get('pk', 0))
         tasks = Task.objects.filter(project=project)
         return paginator(tasks, self.request)
 
     @swagger_auto_schema(tags=['Projects'])
     def delete(self, request, *args, **kwargs):
-        project = get_object_with_permissions(self.request, Project, self.kwargs['pk'], 'projects.change_project')
+        project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
         Task.objects.filter(project=project).delete()
         return Response(status=204)
 
@@ -667,7 +657,7 @@ class TasksListAPI(generics.ListCreateAPIView,
 
 class TemplateListAPI(generics.ListAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
-    permission_classes = (IsBusiness, )
+    permission_required = all_permissions.projects_view
     swagger_schema = None
 
     def list(self, request, *args, **kwargs):
@@ -688,8 +678,8 @@ class TemplateListAPI(generics.ListAPIView):
 
 class ProjectSampleTask(generics.RetrieveAPIView):
     parser_classes = (JSONParser,)
-    permission_classes = (IsBusiness, ProjectAPIBasePermission)
     queryset = Project.objects.all()
+    permission_required = all_permissions.projects_view
     serializer_class = ProjectSerializer
     swagger_schema = None
 

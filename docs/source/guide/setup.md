@@ -132,7 +132,7 @@ Annotators can view instructions at any time when labeling by clicking the (i) b
 
 All labeling activities in Label Studio occur in the context of a project.
 
-Starting in version 1.0.0, Label Studio stores your project data and configurations in a SQLite database. You can choose to use PostgreSQL or Redis instead. See [Sync data from cloud or database storage](storage.html). 
+Starting in version 1.0.0, Label Studio stores your project data and configurations in a SQLite database. You can choose to use PostgreSQL instead. See [Database setup](storedata.html). 
 
 In versions of Label Studio earlier than 1.0.0, when you start Label Studio for the first time, it launches from a project directory that Label Studio creates, called `./my_project` by default. 
 

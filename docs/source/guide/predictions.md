@@ -10,7 +10,7 @@ If you have predictions generated for your dataset from a model, either as pre-a
 
 To import predicted labels into Label Studio, you must use the [Basic Label Studio JSON format](tasks.html#Basic-Label-Studio-JSON-format) and set up your tasks with the `predictions` JSON key. The Label Studio ML backend also outputs tasks in this format. 
 
-> You must use different IDs for each task elements, annotations, predictions and their `result` items. 
+For image pre-annotations, Label Studio expects the x, y, width, and height of image annotations to be provided in percentages of overall image dimension. See [Units for image annotations](export.html#Units_for_image_annotations) for more about how to convert formats.
 
 ## Example of importing predicted labels
 
@@ -86,8 +86,9 @@ In this example there are 3 results inside 1 prediction, or pre-annotation:
 - `result1` - the first bounding box
 - `result2` - the second bounding box
 - `result3` - choice selection
-The prediction score applies to the entire prediction. 
- 
+The prediction score applies to the entire prediction.
+  
+
 In the Label Studio UI, the imported prediction for this task looks like the following: 
 <center><img src="../images/predictions_loaded.png" style="width: 100%; max-width: 700px"></center>
 
