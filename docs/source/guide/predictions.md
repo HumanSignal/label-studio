@@ -92,6 +92,8 @@ The prediction score applies to the entire prediction.
 In the Label Studio UI, the imported prediction for this task looks like the following: 
 <center><img src="../images/predictions_loaded.png" alt="screenshot of the Label Studio UI showing an image of airplanes with bounding boxes covering each airplane." style="width: 100%; max-width: 700px"></center>
 
+<!-- md image_units.md -->
+
 ## Import pre-annotations for text 
 
 In this example, import pre-annotations for text using the [named entity recognition template](/templates/named_entity.html):
@@ -114,9 +116,8 @@ In this example, import pre-annotations for text using the [named entity recogni
 </View>
 ```
 
-The `from_name` of the pre-annotation task JSON must match the value of the name in the `<Labels name="label" toName="text">` portion of the labeling configuration. The `to_name` must match the `toName` value. In this example, the JSON includes `"from_name": "label"` to correspond with the `<Labels name="label"` and `"to_name": text` to correspond with the `toName="text` of the labeling configuration. The default template might contain `<Labels name="ner" toName="text">`. To work with this example JSON, you need to update the values to match.
+This example JSON file contains two tasks, each with two sets of pre-annotations from different models. The first task also contains prediction scores for each NER span. After you set up an example project, you can import these tasks into Label Studio after saving it as a file, such as `example_preannotated_ner_tasks.json`.
 
-This example JSON file contains two tasks, each with two sets of pre-annotations from different models. The first task also contains prediction scores for each NER span.
 ```json
 [
   {
@@ -426,11 +427,39 @@ This example JSON file contains two tasks, each with two sets of pre-annotations
 
 ```
 
-
-
 In the Label Studio UI, the imported prediction for the first task looks like the following: 
 <center><img src="../images/predictions_loaded_text.png" alt="screenshot of the Label Studio UI showing the text with highlighted text labels and prediction scores visible." style="width: 100%; max-width: 700px"></center>
 
 You can sort the prediction scores for each labeled region using the **Regions** pane options. 
 
-<!-- md image_units.md -->
+## Troubleshoot pre-annotations
+If you encounter unexpected behavior after you import pre-annotations into Label Studio, review this guidance to resolve the issues.
+
+### Check the configuration values of your labeling configuration and tasks
+The `from_name` of the pre-annotation task JSON must match the value of the name in the `<Labels name="label" toName="text">` portion of the labeling configuration. The `to_name` must match the `toName` value. 
+
+In the text example on this page, the JSON includes `"from_name": "label"` to correspond with the `<Labels name="label"` and `"to_name": text` to correspond with the `toName="text` of the labeling configuration. The default template might contain `<Labels name="ner" toName="text">`. To work with this example JSON, you need to update the values to match.
+
+In the image example on this page, the XML includes
+  ```xml
+  ...
+  <Choices name="choice" toName="image" showInLine="true">`
+  ...
+  <RectangleLabels name="label" toName="image">
+  ...
+  ```
+To correspond with the following portions of the example JSON:
+```json
+...
+"type": "rectanglelabels",        
+"from_name": "label", "to_name": "image",
+...
+type": "choices",
+"from_name": "choice", "to_name": "image",
+...
+```
+
+### Check the labels in your configuration and your tasks
+Make sure that you have a labeling configuration set up for the labeling interface, and that the labels in your JSON file exactly match the labels in your configuration. If you're using a [tool to transform your model output](https://github.com/heartexlabs/label-studio-transformers), make sure that the labels aren't altered by the tool. 
+
+
