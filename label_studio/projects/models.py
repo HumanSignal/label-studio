@@ -80,14 +80,6 @@ class Project(ProjectMixin, models.Model):
     token = models.CharField(_('token'), max_length=256, default=create_hash, null=True, blank=True)
     result_count = models.IntegerField(_('result count'), default=0, help_text='Total results inside of annotations counter')
     color = models.CharField(_('color'), max_length=16, default='#FFFFFF', null=True, blank=True)
-    template_used = models.ForeignKey(
-        'projects.ProjectTemplate',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='projects',
-        verbose_name=_('Project templates')
-    )
     
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -572,92 +564,6 @@ class Project(ProjectMixin, models.Model):
 
     class Meta:
         db_table = 'project'
-
-
-class ProjectTemplate(models.Model):
-    """ Project Template is used to create new projects from templates
-    """
-    title               = models.CharField(_('title'), max_length=1000, null=False)
-    description         = models.TextField(_('description'), null=True, default='')
-    cover_image_url     = models.CharField(_('cover image'), max_length=1000, null=True, blank=True, default='')
-    input_example       = models.TextField(_('input example'), blank=True)
-    input_example_json  = JSONField(_('input example json'), default=list)
-    output_example      = models.TextField(_('output example'), blank=True)
-    output_example_json = JSONField(_('output example json'), default=list)
-    label_config        = models.TextField(_('label config'), blank=False)
-    expert_instruction  = models.TextField(_('annotator instructions'), blank=False, null=False, default='')
-    
-    tags = JSONField(_('tags'), default=list)
-    task_data = JSONField(_('task data'), default=list)
-    
-    is_published = models.BooleanField(_('published'), default=True)
-
-    #  serialized as dict (could be model parameters and other)
-    project_settings = JSONField(
-        _('project settings'), default=dict, help_text='general dict serialized project settings')
-    is_private = models.BooleanField(
-        _('private'), default=True, help_text='If template is private, it is accessible only from private team')
-    created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, related_name='project_templates', on_delete=models.SET_NULL, null=True,
-        verbose_name=_('created by'))
-    organization = models.ForeignKey(
-        'organizations.Organization', related_name='project_templates', on_delete=models.SET_NULL, null=True)
-
-    created_at = models.DateTimeField(_('created at'), auto_now_add=True)
-    updated_at = models.DateTimeField(_('updated at'), auto_now=True)
-
-    def _get_param(self, name):
-        value = self.project_settings.get(name)
-        if value is None:
-            return Project._meta.get_field(name).get_default()
-        return value
-
-    def create_project(self, user, title, team_id, include_example_data=False, membership=None,
-                       *args, **kwargs):
-        """ Create new project instance based on project
-        """
-        if user is None or title is None:
-            raise ValidationError(_('user and title are required'))
-
-        p = Project.objects.create(
-            title=title,
-            created_by=user,
-            template_used=self,
-            label_config=self.label_config,
-            skip_onboarding=True,
-            # extra args
-            expert_instruction=self._get_param('expert_instruction'),
-            show_instruction=self._get_param('show_instruction'),
-            show_skip_button=self._get_param('show_skip_button'),
-            enable_empty_annotation=self._get_param('enable_empty_annotation'),
-            show_annotation_history=self._get_param('show_annotation_history'),
-            show_collab_predictions=self._get_param('show_collab_predictions'),
-            evaluate_predictions_automatically=self._get_param('evaluate_predictions_automatically'),
-            maximum_annotations=self._get_param('maximum_annotations'),
-            batch_size=self._get_param('batch_size'),
-            min_annotations_to_start_training=self._get_param('min_annotations_to_start_training'),
-            agreement_threshold=self._get_param('agreement_threshold'),
-            metric_threshold=self._get_param('metric_threshold'),
-            # agreement_method=self._get_param('agreement_method'),
-            sampling=self._get_param('sampling'),
-            show_ground_truth_first=self._get_param('show_ground_truth_first'),
-            show_overlap_first=self._get_param('show_overlap_first'),
-            overlap_cohort_percentage=self._get_param('overlap_cohort_percentage'),
-            use_kappa=self._get_param('use_kappa'),
-            metric_name=self._get_param('metric_name'),
-            metric_params=self._get_param('metric_params'),
-            control_weights=self._get_param('control_weights')
-        )
-
-        if include_example_data:
-            from projects.functions import add_data_to_project
-            add_data_to_project(p, [generate_sample_task_without_check(p.label_config, secure_mode=p.secure_mode)])
-            p.onboarding_step_finished(ProjectOnboardingSteps.DATA_UPLOAD)
-
-        return p
-
-    def __str__(self):
-        return self.title
     
     
 class ProjectOnboardingSteps(models.Model):

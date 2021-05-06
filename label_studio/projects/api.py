@@ -87,7 +87,6 @@ _task_data_schema = openapi.Schema(
 )
 
 
-
 class ProjectListAPI(generics.ListCreateAPIView):
     """
     get:
