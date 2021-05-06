@@ -116,9 +116,13 @@ In this example, import pre-annotations for text using the [named entity recogni
 </View>
 ```
 
-This example JSON file contains two tasks, each with two sets of pre-annotations from different models. The first task also contains prediction scores for each NER span. After you set up an example project, you can import these tasks into Label Studio after saving it as a file, such as `example_preannotated_ner_tasks.json`.
+### Example JSON
 
-    {% details Click to expand the example NER JSON %}
+This example JSON file contains two tasks, each with two sets of pre-annotations from different models. The first task also contains prediction scores for each NER span. 
+
+<br/>
+{% details <b>Click to expand the example NER JSON</b> %}
+Save this example JSON as a file, for example: `example_preannotated_ner_tasks.json`.
 
 ```json
 [
@@ -428,7 +432,8 @@ This example JSON file contains two tasks, each with two sets of pre-annotations
 ]
 
 ```
-    {% enddetails %}
+
+{% enddetails %}
 
 In the Label Studio UI, the imported prediction for the first task looks like the following: 
 <center><img src="../images/predictions_loaded_text.png" alt="screenshot of the Label Studio UI showing the text with highlighted text labels and prediction scores visible." style="width: 100%; max-width: 700px"></center>
