@@ -10,7 +10,7 @@ If you have predictions generated for your dataset from a model, either as pre-a
 
 To import predicted labels into Label Studio, you must use the [Basic Label Studio JSON format](tasks.html#Basic-Label-Studio-JSON-format) and set up your tasks with the `predictions` JSON key. The Label Studio ML backend also outputs tasks in this format. 
 
-For image pre-annotations, Label Studio expects the x, y, width, and height of image annotations to be provided in percentages of overall image dimension. See [Units for image annotations](export.html#Units_for_image_annotations) for more about how to convert formats.
+For image pre-annotations, Label Studio expects the x, y, width, and height of image annotations to be provided in percentages of overall image dimension. See [Units for image annotations](predictions.html#Units_for_image_annotations) on this page for more about how to convert formats.
 
 ## Example of importing predicted labels
 
@@ -36,7 +36,7 @@ Use the following labeling configuration:
 After you set up an example project, import this task into Label Studio. Save it as a file first, for example, `example_prediction_task.json`.
 
 ```json
-{
+[{
   "data": {
     "image": "http://localhost:8080/static/samples/sample.jpg" 
   },
@@ -90,6 +90,347 @@ The prediction score applies to the entire prediction.
   
 
 In the Label Studio UI, the imported prediction for this task looks like the following: 
-<center><img src="../images/predictions_loaded.png" style="width: 100%; max-width: 700px"></center>
+<center><img src="../images/predictions_loaded.png" alt="screenshot of the Label Studio UI showing an image of airplanes with bounding boxes covering each airplane." style="width: 100%; max-width: 700px"></center>
+
+## Import pre-annotations for text 
+
+In this example, import pre-annotations for text using the [named entity recognition template](/templates/named_entity.html):
+```xml
+<View>
+  <Labels name="label" toName="text">
+    <Label value="Person"></Label>
+    <Label value="Organization"></Label>
+    <Label value="Fact"></Label>
+    <Label value="Money"></Label>
+    <Label value="Date"></Label>
+    <Label value="Time"></Label>
+    <Label value="Ordinal"></Label>
+    <Label value="Percent"></Label>
+    <Label value="Product"></Label>
+    <Label value="Language"></Label>
+    <Label value="Location"></Label>
+  </Labels>
+  <Text name="text" value="$text"></Text>
+</View>
+```
+
+The `from_name` of the pre-annotation task JSON must match the value of the name in the `<Labels name="label" toName="text">` portion of the labeling configuration. The `to_name` must match the `toName` value. In this example, the JSON includes `"from_name": "label"` to correspond with the `<Labels name="label"` and `"to_name": text` to correspond with the `toName="text` of the labeling configuration. The default template might contain `<Labels name="ner" toName="text">`. To work with this example JSON, you need to update the values to match.
+
+This example JSON file contains two tasks, each with two sets of pre-annotations from different models. The first task also contains prediction scores for each NER span.
+```json
+[
+  {
+    "data": {
+      "text": "All that changed when he was 27 and he came to Jerusalem. It was the weekend of both Easter and Passover, and the city was flooded with tourists."
+    },
+    "predictions": [
+      {
+        "model_version": "one",
+        "result": [
+          {
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 29,
+              "end": 31,
+              "score": 0.70,
+              "text": "27",
+              "labels": [
+                "Date"
+              ]
+            }
+          },
+          {
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 47,
+              "end": 56,
+              "score": 0.65,
+              "text": "Jerusalem",
+              "labels": [
+                "Location"
+              ]
+            }
+          },
+          {
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 65,
+              "end": 76,
+              "score": 0.95,
+              "text": "the weekend",
+              "labels": [
+                "Date"
+              ]
+            }
+          },
+          {
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 85,
+              "end": 91,
+              "score": 0.50,
+              "text": "Easter",
+              "labels": [
+                "Date"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "model_version": "two",
+        "result": [
+          {
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 29,
+              "end": 31,
+              "score": 0.55,
+              "text": "27",
+              "labels": [
+                "Date"
+              ]
+            }
+          },
+          {
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 47,
+              "end": 56,
+              "score": 0.40,
+              "text": "Jerusalem",
+              "labels": [
+                "Location"
+              ]
+            }
+          },
+          {
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 65,
+              "end": 76,
+              "score": 0.32,
+              "text": "the weekend",
+              "labels": [
+                "Time"
+              ]
+            }
+          },
+          {
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 85,
+              "end": 91,
+              "score": 0.22,
+              "text": "Easter",
+              "labels": [
+                "Location"
+              ]
+            }
+          },
+          {
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 96,
+              "end": 104,
+              "score": 0.96,
+              "text": "Passover",
+              "labels": [
+                "Date"
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "data": {
+      "text": " Each journal was several inches thick and bound in leather. On one page are drawn portraits of Sunny in a flowery, Easter dress and sun hat. On another page are hundreds of sketches of leaves that Niyati saw in her yard."
+    },
+    "predictions": [
+      {
+        "model_version": "one",
+        "result": [
+          {
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 17,
+              "end": 31,
+              "text": "several inches",
+              "labels": [
+                "Product"
+              ]
+            }
+          },
+          {
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 63,
+              "end": 66,
+              "text": "one",
+              "labels": [
+                "Percent"
+              ]
+            }
+          },
+          {
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 95,
+              "end": 100,
+              "text": "Sunny",
+              "labels": [
+                "Person"
+              ]
+            }
+          },
+          {
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 161,
+              "end": 169,
+              "text": "hundreds",
+              "labels": [
+                "Percent"
+              ]
+            }
+          },
+          {
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 197,
+              "end": 203,
+              "text": "Niyati",
+              "labels": [
+                "Person"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "model_version": "two",
+        "result": [
+          {
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 17,
+              "end": 31,
+              "text": "several inches",
+              "labels": [
+                "Fact"
+              ]
+            }
+          },
+          {
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 63,
+              "end": 66,
+              "text": "one",
+              "labels": [
+                "Percent"
+              ]
+            }
+          },
+          {
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 95,
+              "end": 100,
+              "text": "Sunny",
+              "labels": [
+                "Time"
+              ]
+            }
+          },
+          {
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 115,
+              "end": 121,
+              "text": "Easter",
+              "labels": [
+                "Location"
+              ]
+            }
+          },
+          {
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 161,
+              "end": 169,
+              "text": "hundreds",
+              "labels": [
+                "Money"
+              ]
+            }
+          },
+          {
+            "from_name": "label",
+            "to_name": "text",
+            "type": "labels",
+            "value": {
+              "start": 197,
+              "end": 203,
+              "text": "Niyati",
+              "labels": [
+                "Person"
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+]
+
+```
+
+
+
+In the Label Studio UI, the imported prediction for the first task looks like the following: 
+<center><img src="../images/predictions_loaded_text.png" alt="screenshot of the Label Studio UI showing the text with highlighted text labels and prediction scores visible." style="width: 100%; max-width: 700px"></center>
+
+You can sort the prediction scores for each labeled region using the **Regions** pane options. 
 
 <!-- md image_units.md -->
