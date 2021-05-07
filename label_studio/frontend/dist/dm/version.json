@@ -1,6 +1,6 @@
 {
-  "message": "Fix label button width",
-  "commit": "7fa5eafde23bf887789a35980ad5ad6ecd39d82b",
+  "message": "Fix LSF width - fit to screen even in View All",
+  "commit": "eb12ae2ff0d2eb1440bbf9a4e8ac84dd5c472778",
   "branch": "feature/lsf-ui",
-  "date": "2021-05-05T02:05:50Z"
+  "date": "2021-05-06T21:56:23Z"
 }
