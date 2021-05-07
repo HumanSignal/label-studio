@@ -31,6 +31,7 @@ from projects.serializers import (
 )
 from tasks.models import Task, Annotation, Prediction, TaskLock
 from tasks.serializers import TaskSerializer, TaskWithAnnotationsAndPredictionsAndDraftsSerializer
+from reviews.models import AnnotationReview, AnnotationComment
 
 from core.mixins import APIViewVirtualRedirectMixin, APIViewVirtualMethodMixin
 from core.decorators import permission_required
@@ -199,6 +200,11 @@ class ProjectAPI(APIViewVirtualRedirectMixin,
         """Performance optimization for whole project deletion
         if we catch constraint error fallback to regular .delete() method"""
         try:
+            reviews = AnnotationReview.objects.filter(annotation__task__project_id=instance.id)
+            annotation_comments = AnnotationComment.objects.filter(annotation__task__project_id=instance.id)
+            reviews._raw_delete(reviews.db)
+            annotation_comments._raw_delete(annotation_comments.db)
+
             task_annotation_qs = Annotation.objects.filter(task__project_id=instance.id)
             task_annotation_qs._raw_delete(task_annotation_qs.db)
             task_prediction_qs = Prediction.objects.filter(task__project_id=instance.id)
@@ -430,8 +436,10 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
                 exclude(pk__in=user_solved_tasks_array)
 
             # if annotator is assigned for tasks, he must to solve it regardless of is_labeled=True
-            if not (hasattr(self, 'assignee_flag') and self.assignee_flag):
-                not_solved_tasks = not_solved_tasks.filter(is_labeled=False)
+            assigned_flag = hasattr(self, 'assignee_flag') and self.assignee_flag
+            if not assigned_flag:
+                not_solved_tasks = not_solved_tasks.annotate(
+                    annotation_number=Count('annotations')).filter(annotation_number__lte=project.maximum_annotations)
 
             not_solved_tasks_count = not_solved_tasks.count()
 
@@ -441,18 +449,14 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
             logger.debug(f'{not_solved_tasks_count} tasks that still need to be annotated for user={user}')
 
             # ordered by data manager
-            if external_prepared_tasks_used:
-                use_task_lock = False
-                next_task = self._get_first_locked_by(user, not_solved_tasks)
-                if not next_task:
-                    use_task_lock = True
-                    next_task = self._get_first_unlocked(not_solved_tasks)
+            if assigned_flag:
+                next_task = not_solved_tasks.first()
                 if not next_task:
                     raise NotFound('No more tasks found')
-                return self._make_response(next_task, request, use_task_lock=use_task_lock)
+                return self._make_response(next_task, request, use_task_lock=False)
 
             # If current user has already lock one task - return it (without setting the lock again)
-            next_task = Task.get_locked_by(user, project)
+            next_task = Task.get_locked_by(user, tasks=not_solved_tasks)
             if next_task:
                 return self._make_response(next_task, request, use_task_lock=False)
 
@@ -467,11 +471,13 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
                 logger.debug(f'User={request.user} tries overlap first from {not_solved_tasks_count} tasks')
                 _, not_solved_tasks = self._try_tasks_with_overlap(not_solved_tasks)
 
-            # if there any tasks in progress (with maximum number of annotations), randomly sampling from them
-            logger.debug(f'User={request.user} tries depth first from {not_solved_tasks_count} tasks')
-            next_task = self._try_breadth_first(not_solved_tasks)
-            if next_task:
-                return self._make_response(next_task, request)
+            # don't use this mode for data manager sorting, because the sorting becomes not obvious
+            if project.sampling != project.SEQUENCE:
+                # if there any tasks in progress (with maximum number of annotations), randomly sampling from them
+                logger.debug(f'User={request.user} tries depth first from {not_solved_tasks_count} tasks')
+                next_task = self._try_breadth_first(not_solved_tasks)
+                if next_task:
+                    return self._make_response(next_task, request)
 
             if project.sampling == project.UNCERTAINTY:
                 logger.debug(f'User={request.user} tries uncertainty sampling from {not_solved_tasks_count} tasks')
@@ -483,7 +489,7 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
 
             elif project.sampling == project.SEQUENCE:
                 logger.debug(f'User={request.user} tries sequence sampling from {not_solved_tasks_count} tasks')
-                next_task = self._get_first_unlocked(not_solved_tasks.all().order_by('id'))
+                next_task = self._get_first_unlocked(not_solved_tasks)
 
             if next_task:
                 return self._make_response(next_task, request)
