@@ -749,7 +749,7 @@ class ProjectSummary(models.Model):
                         created_annotations.pop(key)
 
                 # reduce labels counters
-                from_name = result['from_name']
+                from_name = result.get('from_name')
                 if from_name not in labels:
                     continue
                 for label in self._get_labels(result):
