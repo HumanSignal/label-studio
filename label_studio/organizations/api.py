@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 
 from core.mixins import APIViewVirtualRedirectMixin, APIViewVirtualMethodMixin
-from core.permissions import all_permissions
+from core.permissions import all_permissions, ViewClassPermission
 from core.utils.common import get_object_with_check_and_log
 
 from organizations.models import Organization
@@ -60,7 +60,12 @@ class OrganizationMemberListAPI(generics.ListAPIView):
     """
 
     parser_classes = (JSONParser, FormParser, MultiPartParser)
-    permission_required = all_permissions.organizations_change
+    permission_required = ViewClassPermission(
+        GET=all_permissions.organizations_view,
+        PUT=all_permissions.organizations_change,
+        PATCH=all_permissions.organizations_change,
+        DELETE=all_permissions.organizations_change,
+    )
     serializer_class = OrganizationMemberUserSerializer
 
     def get_queryset(self):
