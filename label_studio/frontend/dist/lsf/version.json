@@ -1,6 +1,6 @@
 {
-  "message": "Last View All styles fix",
-  "commit": "3b89a8755d09c0375ada542fc10e50feda5b7652",
+  "message": "Fix \"Create Copy\" button",
+  "commit": "2cb6f511398f43fc3631a21ae2b1fcd0cd3fb0b6",
   "branch": "feature/ui-update",
-  "date": "2021-05-06T22:56:37Z"
+  "date": "2021-05-07T11:30:58Z"
 }

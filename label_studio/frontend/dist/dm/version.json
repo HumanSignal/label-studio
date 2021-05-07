@@ -1,6 +1,6 @@
 {
-  "message": "Fix LSF width - fit to screen even in View All",
-  "commit": "eb12ae2ff0d2eb1440bbf9a4e8ac84dd5c472778",
+  "message": "Merge branch 'feature/lsf-ui' of github.com:heartexlabs/dm2 into feature/lsf-ui",
+  "commit": "bd7353c6a234b578181b246acbaa3c8e7a1131e8",
   "branch": "feature/lsf-ui",
-  "date": "2021-05-06T21:56:23Z"
+  "date": "2021-05-07T11:42:34Z"
 }
