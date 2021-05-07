@@ -1,5 +1,5 @@
 ---
-title: Improve Audio Transcriptions with Label Studio
+title: Improve Amazon Transcribe Audio Transcriptions with Label Studio
 type: blog
 order: 95
 meta_title: Improve Audio Transcriptions with Label Studio
