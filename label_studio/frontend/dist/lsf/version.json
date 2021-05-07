@@ -1,6 +1,6 @@
 {
-  "message": "Merge pull request #183 from heartexlabs/fix/nested-required\n\nFix `required` for nested `Choices`",
-  "commit": "1dd1b31dfdc9368849c65dff728a551f30ab2c86",
-  "branch": "master",
-  "date": "2021-04-12T09:15:53Z"
+  "message": "Fix \"Create Copy\" button",
+  "commit": "2cb6f511398f43fc3631a21ae2b1fcd0cd3fb0b6",
+  "branch": "feature/ui-update",
+  "date": "2021-05-07T11:30:58Z"
 }

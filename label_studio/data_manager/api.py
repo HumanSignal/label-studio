@@ -286,8 +286,9 @@ class ProjectStateAPI(APIView):
 class ProjectActionsAPI(APIView):
     permission_required = ViewClassPermission(
         GET=all_permissions.projects_view,
-        POST=all_permissions.actions_perform,
+        POST=all_permissions.projects_view,
     )
+
     @swagger_auto_schema(tags=["Data Manager"])
     def get(self, request):
         """

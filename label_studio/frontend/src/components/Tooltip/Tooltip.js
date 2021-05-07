@@ -6,7 +6,7 @@ import { aroundTransition } from "../../utils/transition";
 import "./Tooltip.styl";
 
 export const Tooltip = forwardRef(
-  ({ title, children, defaultVisible, style }, ref) => {
+  ({ title, children, defaultVisible, disabled, style }, ref) => {
     if (!children || Array.isArray(children)) {
       throw new Error("Tooltip does accept a single child only");
     }
@@ -15,7 +15,7 @@ export const Tooltip = forwardRef(
     const tooltipElement = useRef();
     const [offset, setOffset] = useState({});
     const [visibility, setVisibility] = useState(
-      defaultVisible ? "visible" : null
+      defaultVisible ? "visible" : null,
     );
     const [injected, setInjected] = useState(false);
     const [align, setAlign] = useState('top-center');
@@ -25,7 +25,7 @@ export const Tooltip = forwardRef(
         triggerElement.current,
         tooltipElement.current,
         align,
-        10
+        10,
       );
 
       setOffset({ left, top });
@@ -50,7 +50,7 @@ export const Tooltip = forwardRef(
           });
         }
       },
-      [injected, calculatePosition, tooltipElement]
+      [injected, calculatePosition, tooltipElement],
     );
 
     const visibilityClasses = useMemo(() => {
@@ -83,7 +83,7 @@ export const Tooltip = forwardRef(
             <Elem name="body">{title}</Elem>
           </Block>
         ) : null,
-      [injected, offset, title, visibilityClasses, tooltipElement]
+      [injected, offset, title, visibilityClasses, tooltipElement],
     );
 
     const child = Children.only(children);
@@ -91,10 +91,12 @@ export const Tooltip = forwardRef(
       ...child.props,
       ref: triggerElement,
       onMouseEnter(e) {
+        if (disabled === true) return;
         setInjected(true);
         child.props.onMouseEnter?.(e);
       },
       onMouseLeave(e) {
+        if (disabled === true) return;
         performAnimation(false);
         child.props.onMouseLeave?.(e);
       },
@@ -110,6 +112,6 @@ export const Tooltip = forwardRef(
         {createPortal(tooltip, document.body)}
       </>
     );
-  }
+  },
 );
 Tooltip.displayName = "Tooltip";

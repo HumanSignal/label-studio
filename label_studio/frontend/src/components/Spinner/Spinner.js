@@ -2,11 +2,13 @@ import React from 'react';
 import { cn } from '../../utils/bem';
 import './Spinner.styl';
 
-export const Spinner = ({ className, style, size, stopped = false }) => {
+export const Spinner = ({ className, style, size = 32, stopped = false }) => {
   const rootClass = cn('spinner');
 
+  const sizeWithUnit = typeof size === 'number' ? `${size}px` : size;
+
   return (
-    <div className={rootClass.mix(className)} style={{...(style ?? {}), '--spinner-size': `${size ?? 32}px`}}>
+    <div className={rootClass.mix(className)} style={{...(style ?? {}), '--spinner-size': sizeWithUnit}}>
       <div className={rootClass.elem('body').mod({stopped})}>
         <span/>
         <span/>

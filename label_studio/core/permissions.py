@@ -40,6 +40,7 @@ class AllPermissions(BaseModel):
     annotations_delete = 'annotations.delete'
     actions_perform = 'actions.perform'
 
+
 all_permissions = AllPermissions()
 
 
@@ -58,6 +59,7 @@ def make_perm(name, pred, overwrite=False):
         else:
             return
     rules.add_perm(name, pred)
+
 
 for _, permission_name in all_permissions:
     make_perm(permission_name, rules.is_authenticated)

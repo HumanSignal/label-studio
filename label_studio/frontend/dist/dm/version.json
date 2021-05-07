@@ -1,6 +1,6 @@
 {
-  "message": "Annotation generation logic fix",
-  "commit": "7751a996682f145d651123af27286f4f392c293c",
-  "branch": "master",
-  "date": "2021-04-02T13:15:22Z"
+  "message": "Fix annotators column",
+  "commit": "672a7c3875e7948499971309fbb630fc48e4cdd6",
+  "branch": "feature/lsf-ui",
+  "date": "2021-05-07T11:47:56Z"
 }

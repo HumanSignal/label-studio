@@ -1,14 +1,14 @@
 import React, { Fragment, useCallback, useMemo, useState } from 'react';
 import { LsSlack } from '../../assets/icons';
 import { Block, Elem } from '../../utils/bem';
-import { copyText, absoluteURL } from '../../utils/helpers';
+import { absoluteURL, copyText } from '../../utils/helpers';
 import { Button } from '../Button/Button';
 import { Space } from '../Space/Space';
 import "./Error.styl";
 
 const SLACK_INVITE_URL = "https://join.slack.com/t/label-studio/shared_invite/zt-cr8b7ygm-6L45z7biEBw4HXa5A2b5pw";
 
-export const ErrorWrapper = ({title, message, errorId, stacktrace, validation, version, onGoBack, onReload, possum}) => {
+export const ErrorWrapper = ({title, message, errorId, stacktrace, validation, version, onGoBack, onReload, possum = false}) => {
   const preparedStackTrace = useMemo(() => {
     return (stacktrace ?? "").trim();
   }, [stacktrace]);
