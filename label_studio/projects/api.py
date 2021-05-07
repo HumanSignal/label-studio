@@ -430,7 +430,8 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
                 exclude(pk__in=user_solved_tasks_array)
 
             # if annotator is assigned for tasks, he must to solve it regardless of is_labeled=True
-            if not (hasattr(self, 'assignee_flag') and self.assignee_flag):
+            assignee_flag = hasattr(self, 'assignee_flag') and self.assignee_flag
+            if not assignee_flag:
                 not_solved_tasks = not_solved_tasks.filter(is_labeled=False)
 
             not_solved_tasks_count = not_solved_tasks.count()
@@ -439,6 +440,10 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
             if not_solved_tasks_count == 0:
                 raise NotFound(f'There are no tasks remaining to be annotated by the user={user}')
             logger.debug(f'{not_solved_tasks_count} tasks that still need to be annotated for user={user}')
+
+            # assigned tasks
+            if assignee_flag:
+                return self._make_response(not_solved_tasks.first(), request, use_task_lock=False)
 
             # ordered by data manager
             if external_prepared_tasks_used:
