@@ -280,12 +280,13 @@
 }
 .ls-error-message__heidi {
   display: block;
-  margin: 32px auto;
+  margin: 32px auto 0;
 }
 .ls-error-message__title {
   text-transform: uppercase;
   text-align: center;
   font-size: 20px;
+  margin: 32px auto;
 }
 .ls-error-message__detail {
   font-size: 24px;
@@ -351,7 +352,7 @@
   height: 100%;
   z-index: 1000;
   display: flex;
-  position: absolute;
+  position: fixed;
   align-items: center;
   justify-content: center;
   background-color: rgba(0,0,0,0.3);
@@ -370,6 +371,8 @@
   min-width: 400px;
   min-height: 100px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
   background-color: #fff;
   border-radius: 5px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.3);
@@ -513,6 +516,8 @@
   display: flex;
   flex-direction: column;
   list-style-type: none;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 .ls-main-menu__item {
   height: 48px;
@@ -830,6 +835,8 @@
   --animation-duration: 100ms;
   --animation-curve: cubic-bezier(0.21, 1.04, 0.68, 1);
   --animation-start: -10px;
+  top: -1000px;
+  left: -1000px;
   color: #fff;
   display: none;
   z-index: 10000;
@@ -1003,9 +1010,10 @@
   z-index: 1000;
   position: sticky;
   display: flex;
+  box-sizing: border-box;
   background-color: #fff;
   justify-content: space-evenly;
-  box-shadow: 0 1px 0 0 rgba(0,0,0,0.1);
+  border-bottom: 1px solid rgba(0,0,0,0.1);
 }
 .ls-menu-header__context {
   flex: 1;
@@ -1326,14 +1334,20 @@
 }
 .ls-description_size_small {
   font-size: 12px;
-  margin: 16px 0;
 }
 .ls-description_size_medium {
   font-size: 16px;
-  margin: 32px 0;
 }
 .ls-description_size_large {
   font-size: 22px;
+}
+.ls-description:not(.ls-description_noOffset).ls-description_size_small {
+  margin: 16px 0;
+}
+.ls-description:not(.ls-description_noOffset).ls-description_size_medium {
+  margin: 32px 0;
+}
+.ls-description:not(.ls-description_noOffset).ls-description_size_large {
   margin: 40px 0;
 }
 
@@ -1408,19 +1422,25 @@
   display: inline-flex;
   flex-direction: row-reverse;
 }
+.ls-label_placement_left {
+  display: inline-flex;
+}
 .ls-label_empty .ls-label__text,
-.ls-label_placement_right .ls-label__text {
+.ls-label_placement_right .ls-label__text,
+.ls-label_placement_left .ls-label__text {
   margin-bottom: 0;
   font-size: 16px;
   line-height: 22px;
   height: auto;
   align-items: center;
 }
-.ls-label_placement_right:not(.ls-label_withDescription) .ls-label__field {
+.ls-label_placement_right:not(.ls-label_withDescription) .ls-label__field,
+.ls-label_placement_left:not(.ls-label_withDescription) .ls-label__field {
   display: flex;
   align-items: center;
 }
-.ls-label_placement_right.ls-label_withDescription .ls-label__field {
+.ls-label_placement_right.ls-label_withDescription .ls-label__field,
+.ls-label_placement_left.ls-label_withDescription .ls-label__field {
   margin-top: 5px;
 }
 
@@ -1495,6 +1515,19 @@
   padding: 0 16px;
   transition: box-shadow 80ms ease;
 }
+.ls-input_ghost,
+.ls-select_ghost,
+.ls-textarea_ghost {
+  border: none;
+  padding: 0;
+  background-color: transparent;
+  outline: none;
+}
+input.ls-input[type=radio] {
+  width: 16px;
+  height: 16px;
+  min-height: 0;
+}
 .ls-textarea {
   padding: 12px 16px;
   min-height: 50px;
@@ -1515,6 +1548,17 @@
   position: absolute;
   background-color: transparent;
   transition: box-shadow 80ms ease;
+  font-size: inherit;
+}
+.ls-select_ghost {
+  margin-left: -10px;
+  border: 1px solid transparent;
+}
+.ls-select_ghost .ls-select__list {
+  padding: 0 5px;
+}
+.ls-select_ghost:hover {
+  border: 1px solid rgba(0,0,0,0.15);
 }
 
 .ls-toggle {
@@ -1617,10 +1661,14 @@
   grid-auto-flow: column;
   align-items: flex-start;
 }
-.ls-input:focus,
-.ls-textarea:focus,
-.ls-select__list:focus,
-.ls-counter_focused {
+.ls-input:not(.ls-input_ghost):focus,
+.ls-textarea:not(.ls-textarea_ghost):focus,
+.ls-counter:not(.ls-counter_ghost):focus,
+.ls-select__list:not(.ls-select__list_ghost):focus,
+.ls-input_focused,
+.ls-textarea_focused,
+.ls-counter_focused,
+.ls-select__list_focused {
   outline: none;
   box-shadow: 0px 0px 0px 6px rgba(0,153,255,0.2), inset 0px -1px 0px rgba(0,0,0,0.1), inset 0px 0px 0px 1px rgba(0,0,0,0.15), inset 0px 0px 0px 1px rgba(0,153,255,0.2);
   border-color: rgba(0,153,255,0.2);
@@ -3114,6 +3162,20 @@ body {
   --font-size: 12px;
   --button-padding: 0 5px;
   --button-checked-shadow: 0px 1px 0px rgba(0,0,0,0.1), 0px 0px 0px 1px rgba(0,0,0,0.02), 0px 2px 4px rgba(0,0,0,0.15);
+}
+.ls-radio-group_simple {
+  all: unset;
+  display: block;
+}
+.ls-radio-group_simple .ls-radio-group__buttons {
+  all: unset;
+  display: block;
+  margin-bottom: 16px;
+}
+.ls-radio-group_simple .ls-radio-group__button {
+  all: unset;
+  display: block;
+  margin-bottom: 16px;
 }
 
 .ls-dl {

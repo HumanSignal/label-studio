@@ -41,13 +41,15 @@
     grid-auto-flow column
     align-items flex-start
 
-.input:focus,
-.textarea:focus,
-.select__list:focus,
-.counter_focused
-  outline none
-  box-shadow 0px 0px 0px 6px rgba($accent_color, 0.2), inset 0px -1px 0px rgba(#000, 0.1), inset 0px 0px 0px 1px rgba(#000, 0.15), inset 0px 0px 0px 1px rgba($accent_color, 0.2)
-  border-color rgba($accent_color, 0.2)
+.input,
+.textarea,
+.counter,
+.select__list
+  &:not(&_ghost):focus,
+  &_focused
+    outline none
+    box-shadow 0px 0px 0px 6px rgba($accent_color, 0.2), inset 0px -1px 0px rgba(#000, 0.1), inset 0px 0px 0px 1px rgba(#000, 0.15), inset 0px 0px 0px 1px rgba($accent_color, 0.2)
+    border-color rgba($accent_color, 0.2)
 
 .form-indicator
   font-weight 500
