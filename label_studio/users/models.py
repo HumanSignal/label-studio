@@ -128,9 +128,6 @@ class User(UserMixin, AbstractBaseUser, PermissionsMixin, UserLastActivityMixin)
     def has_organization(self):
         return Organization.objects.filter(created_by=self).exists()
 
-    def is_annotator(self, organization_pk):
-        return False
-
     def clean(self):
         super().clean()
         self.email = self.__class__.objects.normalize_email(self.email)
