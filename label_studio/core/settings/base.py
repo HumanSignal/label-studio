@@ -340,6 +340,7 @@ DATA_UNDEFINED_NAME = '$undefined$'
 LICENSE = {}
 VERSIONS = {}
 VERSION_EDITION = 'Community Edition'
+EXPERIMENTAL_FEATURES = get_bool_env('EXPERIMENTAL_FEATURES', default=False)
 
 
 def project_delete(project):

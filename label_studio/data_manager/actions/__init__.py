@@ -42,7 +42,7 @@ def get_all_actions(params):
         and check_permissions(params, action)
     ]
     # remove experimental features if they are disabled
-    if not params.get('experimental_features', False):
+    if not settings.EXPERIMENTAL_FEATURES:
         actions = [action for action in actions if not action.get('experimental', False)]
     return actions
 

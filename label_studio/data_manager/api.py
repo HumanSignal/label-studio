@@ -14,7 +14,7 @@ from drf_yasg.utils import swagger_auto_schema
 from django.db.models import Sum
 from ordered_set import OrderedSet
 
-from core.utils.common import get_object_with_check_and_log, int_from_request, bool_from_request
+from core.utils.common import get_object_with_check_and_log, int_from_request, bool_from_request, get_bool_env
 from core.permissions import all_permissions, HasObjectPermission, ViewClassPermission
 from core.decorators import permission_required
 from projects.models import Project
@@ -303,8 +303,7 @@ class ProjectActionsAPI(APIView):
 
         params = {
             'can_delete_tasks': True,
-            'can_manage_annotations': True,
-            'experimental_feature': False
+            'can_manage_annotations': True
         }
 
         return Response(get_all_actions(params))
