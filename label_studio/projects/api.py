@@ -31,7 +31,6 @@ from projects.serializers import (
 )
 from tasks.models import Task, Annotation, Prediction, TaskLock
 from tasks.serializers import TaskSerializer, TaskWithAnnotationsAndPredictionsAndDraftsSerializer
-from reviews.models import AnnotationReview, AnnotationComment
 
 from core.mixins import APIViewVirtualRedirectMixin, APIViewVirtualMethodMixin
 from core.decorators import permission_required
@@ -200,11 +199,6 @@ class ProjectAPI(APIViewVirtualRedirectMixin,
         """Performance optimization for whole project deletion
         if we catch constraint error fallback to regular .delete() method"""
         try:
-            reviews = AnnotationReview.objects.filter(annotation__task__project_id=instance.id)
-            annotation_comments = AnnotationComment.objects.filter(annotation__task__project_id=instance.id)
-            reviews._raw_delete(reviews.db)
-            annotation_comments._raw_delete(annotation_comments.db)
-
             task_annotation_qs = Annotation.objects.filter(task__project_id=instance.id)
             task_annotation_qs._raw_delete(task_annotation_qs.db)
             task_prediction_qs = Prediction.objects.filter(task__project_id=instance.id)
@@ -215,7 +209,7 @@ class ProjectAPI(APIViewVirtualRedirectMixin,
             task_qs._raw_delete(task_qs.db)
             instance.delete()
         except IntegrityError as e:
-            logger.error('Fallback to cascase deleting after integrity_error: {}'.format(str(e)))
+            logger.error('Fallback to cascade deleting after integrity_error: {}'.format(str(e)))
             instance.delete()
 
     @swagger_auto_schema(auto_schema=None)
