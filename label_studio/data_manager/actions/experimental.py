@@ -1,8 +1,14 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import logging
+import ujson as json
 
-from django.db.models import Count
+from collections import Counter
+
+from django.db.models import Count, CharField, F
+from django.db.models.functions import Cast
+from django.db.models.fields.json import KeyTextTransform
+
 
 from data_manager.functions import DataManagerException
 from tasks.models import Annotation
@@ -60,16 +66,25 @@ def predictions_to_annotations(project, queryset, **kwargs):
 
 
 def remove_duplicates(project, queryset, **kwargs):
-    duplicates_data = queryset.annotate(data_count=Count('data')).filter(data_count__gt=1)
-    # iterate by duplicate groups
-    count = 0
-    for item in duplicates_data:
-        dup_tasks = queryset.objects.filter(data=item['data'])
-        to_remove = dup_tasks.exclude(pk=dup_tasks.first().id)
-        count += to_remove.count()
-        to_remove.delete()
+    tasks = queryset.values('data', 'id')
+    for task in tasks:
+        task['data'] = json.dumps(task['data'])
 
-    return {'response_code': 200, 'detail': f'Removed {count} tasks'}
+    counter = Counter([task['data'] for task in tasks])
+
+    removing = []
+    first = set()
+    for task in tasks:
+        if counter[task['data']] > 1 and task['data'] in first:
+            removing.append(task['id'])
+        else:
+            first.add(task['data'])
+
+
+    # iterate by duplicate groups
+    queryset.filter(id__in=removing).delete()
+
+    return {'response_code': 200, 'detail': f'Removed {len(removing)} tasks'}
 
 
 actions = [
@@ -112,7 +127,7 @@ actions = [
         'order': 1,
         'experimental': True,
         'dialog': {
-            'text': 'This action remove duplicated tasks by their data fields (in case of full matches).',
+            'text': 'This action will remove duplicated tasks by their data fields (in case of full matches).',
             'type': 'confirm'
         }
     }
