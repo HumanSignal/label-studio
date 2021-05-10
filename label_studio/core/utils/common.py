@@ -9,7 +9,6 @@ import copy
 import logging
 import hashlib
 import requests
-import socket
 import random
 import calendar
 import uuid
@@ -22,10 +21,6 @@ import contextlib
 import label_studio
 
 from django.db import models, transaction
-from django.template import loader
-from django.http import HttpResponse
-from django.utils.timezone import now
-from django.utils.crypto import get_random_string
 from django.utils.module_loading import import_string
 from django.core.paginator import Paginator
 from django.core.validators import URLValidator
@@ -37,7 +32,6 @@ from rest_framework.views import Response, exception_handler
 from rest_framework import status
 from rest_framework.exceptions import ErrorDetail
 
-from lxml import objectify
 from base64 import b64encode
 from lockfile import LockFile
 from datetime import datetime
@@ -124,157 +118,11 @@ def custom_exception_handler(exc, context):
     return response
 
 
-def directory_index(path, disk_path, prefix):
-    c = {}
-    t = loader.select_template(['log_files.html'])
-    files = []
-
-    for f in disk_path.iterdir():
-        if not f.name.startswith('.'):
-            url = str(f.relative_to(disk_path))
-            if f.is_dir():
-                url += '/'
-            files.append(url)
-
-    c.update({
-        'prefix': prefix + path,
-        'files': sorted(files)
-    })
-    return HttpResponse(t.render(c))
-
-
-def iter_config_templates():
-    templates_dir = os.path.join(os.path.dirname(__file__), '..', 'examples')
-    for d in os.listdir(templates_dir):
-        # check xml config file exists
-        path = os.path.join(templates_dir, d, 'config.xml')
-        if not os.path.exists(path):
-            continue
-        yield path
-
-
-def get_config_templates():
-    """ Get label config templates from directory (as usual 'examples' directory)
-    """
-    from collections import defaultdict, OrderedDict
-    templates = defaultdict(lambda: defaultdict(list))
-
-    for i, path in enumerate(iter_config_templates()):
-        # open and check xml
-        code = open(path).read()
-        try:
-            objectify.fromstring(code)
-        except Exception as e:
-            logger.error("Can't parse XML for label config template from " + path + ':' + str(e))
-            continue
-
-        # extract fields from xml and pass them to template
-        try:
-            json_string = code.split('<!--')[1].split('-->')[0]
-            meta = json.loads(json_string)
-        except Exception as e:
-            logger.error("Can't parse meta info from label config: " + str(e))
-            continue
-
-        meta['pk'] = i
-        meta['label_config'] = '-->\n'.join(code.split('-->\n')[1:])  # remove all comments at the beginning of code
-
-        meta['category'] = meta['category'] if 'category' in meta else 'no category'
-        meta['complexity'] = meta['complexity'] if 'complexity' in meta else 'no complexity'
-        templates[meta['complexity']][meta['category']].append(meta)
-
-    # sort by title
-    ordering = {
-        'basic': ['audio', 'image', 'text', 'html', 'time-series'],
-        'advanced': ['layouts', 'nested', 'per-region', 'other', 'time-series']
-    }
-    ordered_templates = OrderedDict()
-    for complexity in ['basic', 'advanced']:
-        ordered_templates[complexity] = OrderedDict()
-        # add the rest from categories not presented in manual ordering
-        x, y = ordering[complexity], templates[complexity].keys()
-        ordering[complexity] = x + list((set(x) | set(y)) - set(x))
-        for category in ordering[complexity]:
-            sort = sorted(templates[complexity][category], key=lambda z: z.get('order', None) or z['title'])
-            ordered_templates[complexity][category] = sort
-
-    return ordered_templates
-
-
-class SimpleProfiler:
-    def __init__(self):
-        self.times = [('start', 0, time.time())]
-
-    def checkpoint(self, name):
-        self.times += [(name, time.time() - self.times[-1][2], time.time())]
-
-    def print(self):
-        logger.info('\n\n\n--- Simple Profiler ---')
-        for t in self.times:
-            logger.info('%0.4f' % t[1], t[0])
-        logger.info('\n\n\n')
-
-
-def upload_uuid_filename(instance, filename):
-    """Upload filename with convention name
-
-    Convention is to use name of class plus uuid of object, width and
-    height. UUID is used to fix a privacy issue with private objects.
-
-    """
-    __, filename_ext = os.path.splitext(filename)
-    parent = getattr(instance.group, instance.PARENT_ATTR)
-
-    return '%s_%s_%d_%d%s' % (
-        instance.PARENT_ATTR,
-        parent.uuid,
-        instance.width,
-        instance.height,
-        filename_ext.lower()
-    )
-
-
-def upload_random_filename(instance, filename):
-    __, filename_ext = os.path.splitext(filename)
-
-    return '%s_%s%s' % (
-        get_random_string(),
-        now().strftime("%Y%m%d%H%M%S"),
-        filename_ext.lower(),
-    )
-
-
 def create_hash():
     """This function generate 40 character long hash"""
     h = hashlib.sha1()
     h.update(str(time.time()).encode('utf-8'))
     return h.hexdigest()[0:16]
-
-
-def strfdelta(tdelta):
-    hours, rem = divmod(tdelta.seconds, 3600)
-    minutes, seconds = divmod(rem, 60)
-
-    out = ''
-    if tdelta.days > 0:
-        out += str(tdelta.days) + (' days ' if tdelta.days > 1 else ' day ')
-
-    if hours > 0:
-        out += str(hours) + (' hours ' if hours > 1 else ' hour ')
-
-    if minutes > 0:
-        out += str(minutes) + ' min '
-
-    if seconds > 0:
-        out += str(seconds) + ' sec '
-
-    return out
-
-
-def remove_protocol_name(url):
-    """ Remove http, https from url
-    """
-    return url.replace('http://', '').replace('https://', '').replace('ftp://', '')
 
 
 def pretty_date(t):
@@ -380,24 +228,6 @@ def download_base64_uri(url, username, password):
     else:
         encoded_uri = b64encode(r.content).decode('utf-8')
         return f'data:{r.headers["Content-Type"]};base64,{encoded_uri}'
-
-
-def download_base64_uri_with_cache(url, username=None, password=None):
-    cache_dir = user_cache_dir()
-    if not os.path.exists(cache_dir):
-        os.makedirs(cache_dir)
-    filename = hashlib.md5(url.encode()).hexdigest()
-    filepath = os.path.join(cache_dir, filename)
-    if os.path.exists(filepath):
-        with io.open(filepath) as f:
-            return f.read()
-    else:
-        uri = download_base64_uri(url, username, password)
-        if uri:
-            with LockFile(filepath):
-                with io.open(filepath, mode='w') as fout:
-                    fout.write(uri)
-            return uri
 
 
 def safe_float(v, default=0):
