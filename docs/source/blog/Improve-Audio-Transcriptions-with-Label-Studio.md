@@ -68,7 +68,9 @@ Set the AWS access key ID and AWS secret access key using the `aws configure` co
 
 ### Create a policy to access Amazon Transcribe
 
-In order to allow the Amazon Transcribe service to access your bucket, you must set an IAM access policy. Create a file with the following contents and name it `TranscribePolicy.json`:
+In order to allow the Amazon Transcribe service to access your bucket, you must set an IAM access policy. Refer to this policy as an example, as it provides expansive resource access. 
+
+If you're following this example with non-production data, create a file with the following contents, replacing `BUCKET-NAME` with your bucket name, and name it `TranscribePolicy.json`:
 
 ```json
 {
@@ -80,14 +82,21 @@ In order to allow the Amazon Transcribe service to access your bucket, you must 
             ],
             "Resource": "*",
             "Effect": "Allow"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "s3:*",
+            "Resource": [
+              "arn:aws:s3:::BUCKET-NAME",
+              "arn:aws:s3:::BUCKET-NAME/*"
+            ]
         }
     ]
 }
 ```
+Otherwise, set your [existing bucket policy to allow access to the Amazon Transcribe service](https://docs.aws.amazon.com/transcribe/latest/dg/security_iam_id-based-policy-examples.html).
 
-
-
-From the command line, run the following to attach the policy to the user:
+After creating a policy, from the command line, run the following to attach the policy to the user:
 
 ```bash
 aws iam put-user-policy --user-name test-transcribe-client --policy-name TestTranscribePolicy --policy-document file://TranscribePolicy.json
@@ -274,3 +283,5 @@ When you're finished reviewing and correcting transcripts, click **Export** to e
    
 ## What's next 
 By automatically transcribing a radio interview and then manually correcting the transcript using Label Studio, you can perform reliable research and trustworthy analysis on audio recordings. By combining existing automated transcription services like Amazon Transcribe with subject matter experts using Label Studio, you can quickly discover patterns and search for important information in transcribed recordings.
+
+Beyond just this example, fixing transcripts with Label Studio lets you build a robust and reliable machine learning pipeline. AWS Machine Learning provides an example of [analyzing contact center calls using Amazon Transcribe and Amazon Comprehend](https://aws.amazon.com/blogs/machine-learning/analyzing-contact-center-calls-part-1-use-amazon-transcribe-and-amazon-comprehend-to-analyze-customer-sentiment/), and with Label Studio as part of that pipeline, you could have higher quality and more reliable results from the Amazon Comprehend service. 
