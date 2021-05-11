@@ -156,7 +156,7 @@ class ViewSerializer(serializers.ModelSerializer):
 
 
 class DataManagerTaskSerializer(TaskSerializer):
-    annotation_serializer = AnnotationSerializer
+    annotation_serializer_class = AnnotationSerializer
 
     predictions = PredictionSerializer(many=True, default=[], read_only=True)
     annotations = serializers.SerializerMethodField(default=[], read_only=True)
@@ -170,19 +170,6 @@ class DataManagerTaskSerializer(TaskSerializer):
     total_predictions = serializers.SerializerMethodField()
     file_upload = serializers.ReadOnlyField(source='file_upload_name')
     annotators = serializers.SerializerMethodField()
-
-    def get_annotations(self, task):
-        annotations = task.annotations.order_by('pk')
-
-        if 'request' in self.context:
-            user = self.context['request'].user
-            if user.is_annotator:
-                annotations = annotations.filter(completed_by=user)
-
-        return self.annotation_serializer(
-            annotations,
-            many=True, read_only=True, default=True, context=self.context
-        ).data
 
     class Meta:
         model = Task
@@ -255,6 +242,19 @@ class DataManagerTaskSerializer(TaskSerializer):
         result = obj.annotations.values_list('completed_by', flat=True).distinct()
         result = [r for r in result if r is not None]
         return result
+
+    def get_annotations(self, task):
+        annotations = task.annotations.order_by('pk')
+
+        if 'request' in self.context:
+            user = self.context['request'].user
+            if user.is_annotator:
+                annotations = annotations.filter(completed_by=user)
+
+        return self.annotation_serializer_class(
+            annotations,
+            many=True, read_only=True, default=True, context=self.context
+        ).data
 
 
 class SelectedItemsSerializer(serializers.Serializer):
