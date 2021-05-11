@@ -35,6 +35,8 @@ if HOSTNAME:
             if FORCE_SCRIPT_NAME:
                 print("=> Django URL prefix is set to:", FORCE_SCRIPT_NAME)
 
+INTERNAL_PORT = '8080'
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '$(fefwefwef13;LFK{P!)@#*!)kdsjfWF2l+i5e3t(8a1n'
 
@@ -108,7 +110,7 @@ LOGGING = {
     },
     'root': {
         'handlers': ['console'],
-        'level': 'DEBUG',
+        'level': get_env('LOG_LEVEL', 'DEBUG'),
     }
 }
 
@@ -168,13 +170,11 @@ MIDDLEWARE = [
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.TokenAuthentication'
     ),
-
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+        'rest_framework.permissions.IsAuthenticated'
     ],
     'EXCEPTION_HANDLER': 'core.utils.common.custom_exception_handler',
     'DEFAULT_RENDERER_CLASSES': (
@@ -319,6 +319,8 @@ TASK_LOCK_DEFAULT_TTL = int(get_env('TASK_LOCK_DEFAULT_TTL', 3600))
 FROM_EMAIL = 'Label Studio <hello@labelstud.io>'
 EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
 
+LOCAL_FILES_SERVING_ENABLED = get_bool_env('LOCAL_FILES_SERVING_ENABLED', default=False)
+
 """ React Libraries: do not forget to change this dir in /etc/nginx/nginx.conf """
 # EDITOR = label-studio-frontend repository
 EDITOR_ROOT = os.path.join(BASE_DIR, '../frontend/dist/lsf')
@@ -337,6 +339,7 @@ MIN_GROUND_TRUTH = 10
 DATA_UNDEFINED_NAME = '$undefined$'
 LICENSE = {}
 VERSIONS = {}
+VERSION_EDITION = 'Community Edition'
 
 
 def project_delete(project):
@@ -354,7 +357,13 @@ GET_OBJECT_WITH_CHECK_AND_LOG = 'core.utils.get_object.get_object_with_check_and
 SAVE_USER = 'users.functions.save_user'
 USER_SERIALIZER = 'users.serializers.BaseUserSerializer'
 DATA_MANAGER_ANNOTATIONS_MAP = {}
+DATA_MANAGER_ACTIONS = {}
 USER_LOGIN_FORM = 'users.forms.LoginForm'
+PROJECT_MIXIN = 'core.mixins.DummyModelMixin'
+TASK_MIXIN = 'core.mixins.DummyModelMixin'
+ANNOTATION_MIXIN = 'core.mixins.DummyModelMixin'
+ORGANIZATION_MIXIN = 'core.mixins.DummyModelMixin'
+USER_MIXIN = 'users.mixins.UserMixin'
 
 # fix a problem with Windows mimetypes for JS and PNG
 import mimetypes

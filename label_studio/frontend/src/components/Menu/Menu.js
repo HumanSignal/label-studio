@@ -53,6 +53,10 @@ Menu.Builder = (url, menuItems) => {
       pagePath = path;
     }
 
+    if (typeof pagePath === "function") {
+      return <Menu.Item key={index} onClick={pagePath}>{pageLabel}</Menu.Item>;
+    }
+
     const location = `${url}${pagePath}`.replace(/([/]+)/g, '/');
 
     return <Menu.Item key={index} to={location} exact>{pageLabel}</Menu.Item>;

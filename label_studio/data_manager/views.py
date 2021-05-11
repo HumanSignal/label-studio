@@ -13,8 +13,6 @@ from projects.models import Project
 @view_with_auth(['GET'], (IsBusiness,))
 # @permission_required('tasks.delete_task', fn=objectgetter(Project, 'pk'), raise_exception=True)
 def task_page(request, pk):
-    org_pk = get_organization_from_request(request)
-    org = get_object_with_permissions(request, Organization, org_pk, 'organizations.view_organization')
     project = get_object_with_check_and_log(request, Project, pk=pk)
 
     response = {

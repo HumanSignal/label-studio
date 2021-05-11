@@ -1,4 +1,5 @@
 <ul class="menu-root">
+    <li style="margin-top: 45px;"><h3 class="root"><%- type %></h3></li>
 
   <% site.pages.find({ type: type }).sort('order').each(function (p) { %>
     <% var fileName = p.path.replace(/^.+?\/([\w-]+)\.html/, '$1') %>
@@ -6,9 +7,6 @@
 
 
 <% if (type === 'guide') { %>
-      <% if (fileName === 'index') { %>
-          <li><h4>Get Started</h4></li>
-      <% } %>
       <% if (fileName === 'install') { %>
           <li><h4>Install and Upgrade</h4></li>
       <% } %>

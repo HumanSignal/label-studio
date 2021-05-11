@@ -86,6 +86,7 @@ def test_create_annotation_with_ground_truth(caplog, any_client, configured_proj
         # real annotation triggers uploading to ML backend and recalculating accuracy
         r = any_client.post('/api/tasks/{}/annotations/'.format(task.id), data=annotation)
         assert r.status_code == 201
+        assert m.called
         task = Task.objects.get(id=task.id)
         assert task.annotations.count() == 2
 

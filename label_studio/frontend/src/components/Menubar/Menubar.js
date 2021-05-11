@@ -138,7 +138,8 @@ export const Menubar = ({
               <Menu.Item
                 icon={<LsSettings/>}
                 label="Account & Settings"
-                href={absoluteURL("/user/account")}
+                href="/user/account"
+                data-external
               />
               {/* <Menu.Item label="Dark Mode"/> */}
               <Menu.Item
@@ -176,7 +177,7 @@ export const Menubar = ({
                   exact
                 />
                 <Menu.Item
-                  label="People"
+                  label="Organization"
                   to="/people"
                   icon={<IconPersonInCircle/>}
                   data-external

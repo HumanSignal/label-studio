@@ -2,8 +2,8 @@
 {% load static %}
 
 {% block head %}
-<link rel="stylesheet" href="{% static 'css/uikit.css' %}">
-<link rel="stylesheet" href="{% static 'css/users.css' %}">
+<link rel="stylesheet" href="{{ settings.HOSTNAME }}{% static 'css/uikit.css' %}">
+<link rel="stylesheet" href="{{ settings.HOSTNAME }}{% static 'css/users.css' %}">
 {% endblock %}
 
 {% block divider %}

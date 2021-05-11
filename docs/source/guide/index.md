@@ -28,7 +28,7 @@ label-studio start
 4. Sign up with an email address and password that you create.
 5. Click **Create** to create a project and start labeling data.
 6. Name the project, and if you want, type a description and select a color.
-7. Click **Data Import** and upload the data files that you want to use. If you want to use data from a cloud storage bucket or database, skip this step for now.
+7. Click **Data Import** and upload the data files that you want to use. If you want to use data from a local directory, cloud storage bucket, or database, skip this step for now.
 8. Click **Labeling Setup** and choose a template and customize the label names for your use case. 
 9. Click **Save** to save your project. 
 
@@ -54,7 +54,7 @@ When you upload data to Label Studio, each item in the dataset becomes a labelin
 
 | Term | Description |
 | --- | --- |
-| Dataset | What you upload to Label Studio, comprised of individual items. |
+| Dataset | What you import into Label Studio, comprised of individual items. |
 | Task | What Label Studio transforms your individual dataset items into. |
 | Labels | What you add to each dataset item while performing a labeling task in Label Studio. |
 | Region | The portion of the dataset item that has a label assigned to it. | 

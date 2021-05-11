@@ -26,18 +26,36 @@ label-studio start --username <username> --password <password>
 
 To restrict who has access to your Label Studio instance, you can invite collaborators directly. 
 
+### Restrict signup for local deployments
+
+To restrict signup to only those with a link on local deployments, do the following from the command line after installing Label Studio:
+
+```bash
+export LABEL_STUDIO_DISABLE_SIGNUP_WITHOUT_LINK=true
+```
+This sets an environment variable that disables the signup page unless someone uses the invitation link.
+```bash
+label-studio start --username <username> --password <password>
+```
+This starts Label Studio and creates an account for yourself to use to log into Label Studio. After you log into Label Studio you can start [inviting collaborators](#Invite-collaborators-to-a-project).
+
+### Restrict signup for cloud deployments
+
+To restrict signup to only those with a link on cloud deployments, set the following environment variables after you install but before you start Label Studio:
+```
+LABEL_STUDIO_DISABLE_SIGNUP_WITHOUT_LINK=true
+LABEL_STUDIO_USERNAME=<username>
+LABEL_STUDIO_PASSWORD=<password>
+```
+Then, start Label Studio and log in with the username and password that you set as environment variables and start [inviting collaborators](#Invite-collaborators-to-a-project).
+
 ## Invite collaborators to a project
 
-After you [set up a labeling project](setup.html), invite annotators to the project to start collaborating on labeling tasks. 
+After you [set up a labeling project](setup.html), invite annotators to the project to start collaborating on labeling tasks. Inviting people to your Label Studio instance with a link does not restrict access to the signup page unless you also set an environment variable. See how to [Restrict signup for local deployments](#Restrict-signup-for-local-deployments) and [Restrict signup for cloud deployments](#Restrict-signup-for-cloud-deployments) on this page.
 
 1. In the Label Studio UI, click the hamburger icon and click **People**.
 2. Click **+ Add People**.
-3. Copy the invitation link and share it with those that you want to invite to Label Studio. If you need to update the link and deactivate the old one, return to this page and click **Reset Link**. 
-
-If you want to deactivate the signup page and use only the invitation link, set the following environment variable when you start Label Studio:
-```
-LABEL_STUDIO_DISABLE_SIGNUP_WITHOUT_LINK=true
-```
+3. Copy the invitation link and share it with those that you want to invite to Label Studio. If you need to update the link and deactivate the old one, return to this page and click **Reset Link**. The link only resets if the signup page is also disabled.
 
 ## Manage your account in Label Studio
 After you create an account in Label Studio, you can make changes to it as needed.

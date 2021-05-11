@@ -9,11 +9,11 @@ from django.utils.translation import gettext_lazy as _
 from django_rq import job
 from rq import get_current_job
 
-from core.utils.common import safe_float
+from core.utils.common import safe_float, conditional_atomic
 from ml.api_connector import MLApi
 from projects.models import Project
 from tasks.models import Annotation, Prediction
-from tasks.serializers import TaskSerializer
+from tasks.serializers import TaskSerializer, TaskSimpleSerializer, PredictionSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -108,6 +108,7 @@ class MLBackend(models.Model):
             else:
                 self.state = MLBackendState.CONNECTED
                 self.model_version = setup_response.response.get('model_version')
+                self.error_message = None
         self.save()
 
     def train(self):
@@ -134,17 +135,66 @@ class MLBackend(models.Model):
         MLBackendPredictionJob.objects.create(
             ml_backend=self, job_id=job.id, model_version=self.model_version, batch_size=batch_size)
 
+    def predict_many_tasks(self, tasks):
+        self.update_state()
+        if self.not_ready:
+            logger.debug(f'ML backend {self} is not ready')
+            return
+
+        if isinstance(tasks, list):
+            from tasks.models import Task
+            tasks = Task.objects.filter(id__in=[task.id for task in tasks])
+
+        tasks_ser = TaskSimpleSerializer(tasks, many=True).data
+        ml_api_result = self.api.make_predictions(tasks_ser, self.model_version, self.project)
+        if ml_api_result.is_error:
+            logger.error(f'Prediction not created for project {self}: {ml_api_result.error_message}')
+            return
+
+        responses = ml_api_result.response['results']
+
+        if len(responses) == 0:
+            logger.error(f'ML backend returned empty prediction for project {self}')
+            return
+
+        # ML Backend doesn't support batch of tasks, do it one by one
+        elif len(responses) == 1:
+            logger.warning(f"'ML backend '{self.title}' doesn't support batch processing of tasks, "
+                           f"switched to one-by-one task retrieving")
+            for task in tasks:
+                self.predict_one_task(task)
+            return
+
+        # wrong result number
+        elif len(responses) != len(tasks_ser):
+            logger.error(f'ML backend returned response number {len(responses)} != task number {len(tasks_ser)}')
+
+        predictions = []
+        for task, response in zip(tasks_ser, responses):
+            predictions.append({
+                'task': task['id'],
+                'result': response['result'],
+                'score': response.get('score'),
+                'model_version': self.model_version
+            })
+        with conditional_atomic():
+            prediction_ser = PredictionSerializer(data=predictions, many=True)
+            prediction_ser.is_valid(raise_exception=True)
+            prediction_ser.save()
+
     def predict_one_task(self, task):
+        self.update_state()
         if self.not_ready:
             logger.debug(f'ML backend {self} is not ready to predict {task}')
             return
         if task.predictions.filter(model_version=self.model_version).exists():
             # prediction already exists
-            logger.info(f'Skip creating prediction with ML backend {self} for task {task}: model version is up-to-date')
+            logger.info(f'Skip creating prediction with ML backend {self} for task {task}: model version '
+                        f'{self.model_version} is up-to-date')
             return
         ml_api = self.api
 
-        task_ser = TaskSerializer(task).data
+        task_ser = TaskSimpleSerializer(task).data
         ml_api_result = ml_api.make_predictions([task_ser], self.model_version, self.project)
         if ml_api_result.is_error:
             logger.warning(f'Prediction not created for project {self}: {ml_api_result.error_message}')
@@ -157,23 +207,17 @@ class MLBackend(models.Model):
         task_id = task_ser['id']
         r = prediction_response['result']
         score = prediction_response.get('score')
-        matching_score = None
-        prediction = Prediction.objects.create(
-            result=r,
-            score=safe_float(score),
-            model_version=self.model_version,
-            task_id=task_id,
-            cluster=prediction_response.get('cluster'),
-            neighbors=prediction_response.get('neighbors'),
-            mislabeling=safe_float(prediction_response.get('mislabeling', 0))
-        )
-        logger.info(f'Prediction created: result={r}, score={score}, id={prediction.id}')
-
-        model_version = ml_api_result.response.get('model_version')
-        if model_version != self.model_version:
-            self.model_version = model_version
-            self.save()
-            logger.info(f'Project {self} updates model version to {model_version}')
+        with conditional_atomic():
+            prediction = Prediction.objects.create(
+                result=r,
+                score=safe_float(score),
+                model_version=self.model_version,
+                task_id=task_id,
+                cluster=prediction_response.get('cluster'),
+                neighbors=prediction_response.get('neighbors'),
+                mislabeling=safe_float(prediction_response.get('mislabeling', 0))
+            )
+            logger.debug(f'Prediction {prediction} created')
 
         return prediction
 

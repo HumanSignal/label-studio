@@ -9,17 +9,19 @@ from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 from drf_yasg.utils import swagger_auto_schema
 from django.db.models import Sum
 from ordered_set import OrderedSet
 
 from core.utils.common import get_object_with_check_and_log, int_from_request, bool_from_request
-from core.permissions import CanViewTask, CanChangeTask, IsBusiness, CanViewProject, CanChangeProject
+from core.permissions import all_permissions, HasObjectPermission, ViewClassPermission
+from core.decorators import permission_required
 from projects.models import Project
 from projects.serializers import ProjectSerializer
 from tasks.models import Task, Annotation
 
-from data_manager.functions import get_all_columns, get_prepared_queryset
+from data_manager.functions import get_all_columns, get_prepared_queryset, evaluate_predictions
 from data_manager.models import View
 from data_manager.serializers import ViewSerializer, TaskSerializer, SelectedItemsSerializer
 from data_manager.actions import get_all_actions, perform_action
@@ -75,14 +77,13 @@ class ViewAPI(viewsets.ModelViewSet):
     my_tags = ["Data Manager"]
     filterset_fields = ["project"]
     task_serializer_class = TaskSerializer
-
-    def get_permissions(self):
-        permission_classes = [IsBusiness]
-        # if self.action in ['update', 'partial_update', 'destroy']:
-        #     permission_classes = [IsBusiness, CanChangeTask]
-        # else:
-        #     permission_classes = [IsBusiness, CanViewTask]
-        return [permission() for permission in permission_classes]
+    permission_required = ViewClassPermission(
+        GET=all_permissions.tasks_view,
+        POST=all_permissions.tasks_change,
+        PATCH=all_permissions.tasks_change,
+        PUT=all_permissions.tasks_change,
+        DELETE=all_permissions.tasks_delete,
+    )
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -100,16 +101,8 @@ class ViewAPI(viewsets.ModelViewSet):
         queryset.all().delete()
         return Response(status=204)
 
-    @staticmethod
-    def evaluate_predictions(tasks):
-        # call machine learning api and format response
-        for task in tasks:
-            project = task.project
-            if not project.show_collab_predictions:
-                return
-
-            for ml_backend in project.ml_backends.all():
-                ml_backend.predict_one_task(task)
+    def get_task_queryset(self, request, view):
+        return Task.prepared.all(prepare_params=view.get_prepare_tasks_params())
 
     @swagger_auto_schema(tags=['Data Manager'], responses={200: task_serializer_class(many=True)})
     @action(detail=True, methods=["get"])
@@ -121,19 +114,26 @@ class ViewAPI(viewsets.ModelViewSet):
         Retrieve a list of tasks with pagination for a specific view using filters and ordering.
         """
         view = self.get_object()
-        queryset = Task.prepared.all(prepare_params=view.get_prepare_tasks_params())
-        context = {'proxy': bool_from_request(request.GET, 'proxy', True), 'resolve_uri': True}
+        queryset = self.get_task_queryset(request, view)
+        context = {'proxy': bool_from_request(request.GET, 'proxy', True), 'resolve_uri': True, 'request': request}
+        project = view.project
 
         # paginated tasks
         self.pagination_class = TaskPagination
         page = self.paginate_queryset(queryset)
         if page is not None:
-            self.evaluate_predictions(page)
+            # retrieve ML predictions if tasks don't have them
+            if project.evaluate_predictions_automatically:
+                ids = [task.id for task in page]  # page is a list already
+                tasks_for_predictions = Task.objects.filter(id__in=ids, predictions__isnull=True)
+                evaluate_predictions(tasks_for_predictions)
+
             serializer = self.task_serializer_class(page, many=True, context=context)
             return self.get_paginated_response(serializer.data)
 
         # all tasks
-        self.evaluate_predictions(queryset)
+        if project.evaluate_predictions_automatically:
+            evaluate_predictions(queryset.filter(predictions__isnull=True))
         serializer = self.task_serializer_class(queryset, many=True, context=context)
         return Response(serializer.data)
 
@@ -205,9 +205,10 @@ class ViewAPI(viewsets.ModelViewSet):
 
 
 class TaskAPI(APIView):
-    # permission_classes = [IsBusiness, CanViewTask]
-    permission_classes = [IsBusiness]
-    serializer_class = TaskSerializer
+    permission_required = all_permissions.projects_view
+
+    def get_serializer_class(self):
+        return TaskSerializer
 
     @swagger_auto_schema(tags=["Data Manager"])
     def get(self, request, pk):
@@ -217,19 +218,25 @@ class TaskAPI(APIView):
 
         Retrieve a specific task by ID.
         """
-        queryset = Task.prepared.get(id=pk)
+        task = Task.prepared.get(id=pk)
         context = {
             'proxy': bool_from_request(request.GET, 'proxy', True),
             'resolve_uri': True,
-            'completed_by': 'full'
+            'completed_by': 'full',
+            'request': request
         }
-        serializer = self.serializer_class(queryset, many=False, context=context)
-        return Response(serializer.data)
+
+        # get prediction
+        if task.project.evaluate_predictions_automatically and not task.predictions.exists():
+            evaluate_predictions([task])
+
+        serializer = self.get_serializer_class()(task, many=False, context=context)
+        data = serializer.data
+        return Response(data)
 
 
 class ProjectColumnsAPI(APIView):
-    # permission_classes = [IsBusiness, CanViewProject]
-    permission_classes = [IsBusiness, ]
+    permission_required = all_permissions.projects_view
 
     @swagger_auto_schema(tags=["Data Manager"])
     def get(self, request):
@@ -247,8 +254,7 @@ class ProjectColumnsAPI(APIView):
 
 
 class ProjectStateAPI(APIView):
-    # permission_classes = [IsBusiness, CanViewProject]
-    permission_classes = [IsBusiness, ]
+    permission_required = all_permissions.projects_view
 
     @swagger_auto_schema(tags=["Data Manager"])
     def get(self, request):
@@ -259,7 +265,7 @@ class ProjectStateAPI(APIView):
         Retrieve the project state for data manager.
         """
         pk = int_from_request(request.GET, "project", 1)  # replace 1 to None, it's for debug only
-        project = get_object_with_check_and_log(request, Project, pk=pk)
+        project = get_object_with_check_and_log(request, Project.objects.with_counts(), pk=pk)
         self.check_object_permissions(request, project)
         data = ProjectSerializer(project).data
         data.update(
@@ -278,15 +284,10 @@ class ProjectStateAPI(APIView):
 
 
 class ProjectActionsAPI(APIView):
-    # permission_classes = [IsBusiness, CanChangeProject]
-    permission_classes = [IsBusiness, ]
-
-    def get_permissions(self):
-        if self.request.method == 'POST':
-            permission_classes = [IsBusiness, CanChangeProject]
-        else:
-            permission_classes = [IsBusiness, CanViewProject]
-        return [permission() for permission in permission_classes]
+    permission_required = ViewClassPermission(
+        GET=all_permissions.projects_view,
+        POST=all_permissions.projects_view,
+    )
 
     @swagger_auto_schema(tags=["Data Manager"])
     def get(self, request):
