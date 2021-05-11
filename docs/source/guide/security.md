@@ -1,7 +1,7 @@
 ---
-title: Label Studio Security
+title: Secure Label Studio
 type: guide
-order: 110
+order: 220
 meta_title: Label Studio Security
 meta_description: Label Studio Documentation about the security, privacy, hardening, and access control functionality in Label Studio. 
 ---
@@ -13,10 +13,14 @@ All application component interactions are encrypted using the TLS protocol.
 
 The following security-related functionality is only available in Label Studio Enterprise deployments:
 - Role-based access control
-- Single sign-on and SAML support
+- Federated access to cloud storage using SAML 
 Label Studio Enterprise is available as on-premises software that you manage, or as a Software-as-a-Service (SaaS) offering.
+  
+<!--If you need to meet strong privacy regulations, legal requirements, or you want to make a custom installation within your infrastructure or any public cloud (AWS, Google, Azure, etc.), Label Studio Enterprise works on-premises. It is a self-contained version (no Internet connection is required) of the Platform, no data will leave your infrastructure. To make the installation the most accessible, we offer a Docker image.-->
 
-If you're running the open source version in production, restrict access to the Label Studio server. See [Secure your Label Studio deployment](#Secure-your-Label-Studio-deployment) on this page.
+
+
+If you're running the open source version in production, restrict access to the Label Studio server. Label Studio establishes secure connections to the web application by enforcing HTTPS and secured cookies. Restrict access to the server itself by opening only the [required ports](install.html#Port_requirements) on the server.
 
 ## Secure user access to Label Studio
 
@@ -56,7 +60,7 @@ The best way to secure access to cloud storage is to federate access with SAML:
 2. Restrict bucket access in Amazon S3 or other cloud storage providers based on the SAML-asserted roles.
 3. Set up Label Studio Enterprise with the same SAML SSO IdP as the cloud storage provider.
 4. When Label Studio Enterprise accesses cloud storage buckets on behalf of users, it uses the SAML-asserted roles to retrieve temporary access tokens that match the user permissions. 
-See [Set up single-sign-on with Label Studio](SSO_setup.html).
+See [Federate access to data in Label Studio using SAML roles](federate_access.html).
    
 You can provide cloud storage authentication credentials globally for all projects in Label Studio, or use different credentials for access to different buckets on a per-project basis. Label Studio allows you to configure different cloud storage buckets for different projects, making it easier to manage access to the data. See [Sync data from external storage](storage.html).
 
@@ -64,9 +68,6 @@ Label Studio accesses the data stored in remote cloud storage using URLs, so pla
 
 ### Secure acccess to Redis storage
 If you use Redis as an external storage database for data and annotations, the setup supports TLS/SSL and requires the Label Studio client to be authenticated to the database with a valid certificate.
-
-## Secure your Label Studio deployment
-Label Studio establishes secure connections to the web application by enforcing HTTPS and secured cookies. Restrict access to the server itself by opening only the [required ports](install.html#Port_requirements) on the server.
 
 ## Audit logging
 Label Studio Enterprise automatically logs all user activities so that you can monitor the activities being performed in the application.
