@@ -473,6 +473,8 @@ class TaskWithAnnotationsAndPredictionsAndDraftsSerializer(TaskSerializer):
 
 
 class TaskWithAnnotationsAndLazyPredictionsSerializer(TaskSerializer):
+    annotation_serializer = AnnotationSerializer
+
     predictions = PredictionSerializer(many=True, default=[], read_only=True)
     annotations = serializers.SerializerMethodField(default=[], read_only=True)
 
