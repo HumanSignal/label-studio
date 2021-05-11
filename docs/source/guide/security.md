@@ -35,7 +35,8 @@ If you're using Label Studio Enterprise, you can further secure user access in m
 - Assign specific roles to specific user accounts to set up role-based access control. For more about the different roles and permissions in Label Studio Enterprise, see [Manage access to Label Studio](manage_users.html). 
 - Set up organizations, workspaces, and projects to separate projects and data across different groups of users. Users in one organization cannot see the workspaces or projects in other organizations. For more about how to use organizations, workspaces, and projects to secure access, see [Organize projects in Label Studio](organize_projects.html).
 
-Access to the REST API is restricted by user role and also requires an access token that is specific to a user account.
+## Secure API access to Label Studio
+Access to the REST API is restricted by user role and requires an access token that is specific to a user account. Access tokens can be reset at any time from the Label Studio UI or using the API. 
 
 ## Secure access to data in Label Studio
 
@@ -44,7 +45,7 @@ Data in Label Studio is stored in one or two places, depending on your deploymen
 - Project data and annotations can be stored in the SQLite or PostgreSQL database, or stored in a local file directory, a Redis database, or cloud storage buckets on Amazon Web Services (AWS), Google Cloud Platform (GCP), or Microsoft Azure. Data stored in external storage is accessed by Label Studio using URLs, and the data is not stored in Label Studio directly.
 
 ### Secure database access
-Label Studio does not permit direct access to the SQLite or PostgreSQL databases from the app. 
+Label Studio does not permit direct access to the SQLite or PostgreSQL databases from the app to prevent SQL injection attacks and other data exfiltration attempts. 
 
 Instead, the app uses URIs to access the data stored in the database. These URIs can only be accessed by the Label Studio labeling interface and API because the requests to retrieve the data using those URIs are verified and proxied by Basic Authentication headers.
 
@@ -67,7 +68,7 @@ You can provide cloud storage authentication credentials globally for all projec
 
 Label Studio accesses the data stored in remote cloud storage using URLs, so place the data in cloud storage buckets near where your team works, rather than near where you host Label Studio.
 
-### Secure acccess to Redis storage
+### Secure access to Redis storage
 If you use Redis as an external storage database for data and annotations, the setup supports TLS/SSL and requires the Label Studio client to be authenticated to the database with a valid certificate.
 
 ## Audit logging
