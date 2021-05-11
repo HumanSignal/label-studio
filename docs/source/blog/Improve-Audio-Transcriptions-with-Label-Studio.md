@@ -20,7 +20,7 @@ Quality is important, but speed matters too, especially when you need to transcr
 
 ## Why audio transcription quality matters
 
-For many cases where you're using audio transcriptions, they must be completely accurate so that patterns that you search for in the transcribed content can be easily discovered for research purposes, to help you build a stronger legal case, to more easily improve your product, or to ensure high quality customer support interactions. 
+For many cases where you're using audio transcriptions, they must be completely accurate so that patterns that you search for in the transcribed content can be easily discovered for research purposes, to help you build a stronger legal case, to more easily improve your product, to ensure high quality customer support interactions, or to reduce error in automated downstream analysis by machine learning models, such as sentiment analysis.
 
 When high quality is crucial, having human involvement in the transcript is necessary. An expert transcriber brings field-specific knowledge and vernacular to a transcript, but it's difficult to scale high-quality human transcription. It can get expensive and time consuming. Rather than shortchange the skills of an expert, you can use automated transcription to provide a shortcut. Then, the expert can focus on correcting inaccuracies in the transcript rather than performing the entire transcription manually. 
 
@@ -28,7 +28,7 @@ With Label Studio, you can improve audio transcription quality at scale with an 
 
 ## How to improve audio transcription quality with Label Studio
 
-<img src="/images/aws-transcribe-blog/AWS-Audio-Transcription-Scheme.png" alt="Decorative graphic." class="gif-border" />
+<img src="/images/aws-transcribe-blog/AWS-Audio-Transcription-Scheme.png" alt="Diagram showing the flow of information from S3 buckets to Amazon Transcribe service to Label Studio then producing ground truth transcriptions that you can use for a named entity project, sentiment analysis project, or analytics software." class="gif-border" />
 
 In this example tutorial, you can use the [Amazon Transcribe](https://aws.amazon.com/transcribe/) service to create an automated audio transcript of an interview and combine it with human intervention in Label Studio to produce a high quality audio transcript.
 
