@@ -7,8 +7,7 @@ from django.db import transaction
 
 from data_manager.models import View, Filter, FilterGroup
 from tasks.models import Task
-from tasks.serializers import TaskWithAnnotationsAndLazyPredictionsSerializer
-from django.db.models import Avg
+from tasks.serializers import TaskSerializer, AnnotationSerializer, PredictionSerializer
 
 
 class FilterSerializer(serializers.ModelSerializer):
@@ -156,7 +155,12 @@ class ViewSerializer(serializers.ModelSerializer):
             return instance
 
 
-class TaskSerializer(TaskWithAnnotationsAndLazyPredictionsSerializer):
+class DataManagerTaskSerializer(TaskSerializer):
+    annotation_serializer = AnnotationSerializer
+
+    predictions = PredictionSerializer(many=True, default=[], read_only=True)
+    annotations = serializers.SerializerMethodField(default=[], read_only=True)
+
     cancelled_annotations = serializers.SerializerMethodField()
     completed_at = serializers.SerializerMethodField()
     annotations_results = serializers.SerializerMethodField()
@@ -166,6 +170,19 @@ class TaskSerializer(TaskWithAnnotationsAndLazyPredictionsSerializer):
     total_predictions = serializers.SerializerMethodField()
     file_upload = serializers.ReadOnlyField(source='file_upload_name')
     annotators = serializers.SerializerMethodField()
+
+    def get_annotations(self, task):
+        annotations = task.annotations.order_by('pk')
+
+        if 'request' in self.context:
+            user = self.context['request'].user
+            if user.is_annotator:
+                annotations = annotations.filter(completed_by=user)
+
+        return self.annotation_serializer(
+            annotations,
+            many=True, read_only=True, default=True, context=self.context
+        ).data
 
     class Meta:
         model = Task

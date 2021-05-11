@@ -23,7 +23,7 @@ from tasks.models import Task, Annotation
 
 from data_manager.functions import get_all_columns, get_prepared_queryset, evaluate_predictions
 from data_manager.models import View
-from data_manager.serializers import ViewSerializer, TaskSerializer, SelectedItemsSerializer
+from data_manager.serializers import ViewSerializer, DataManagerTaskSerializer, SelectedItemsSerializer
 from data_manager.actions import get_all_actions, perform_action
 
 
@@ -76,7 +76,7 @@ class ViewAPI(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     my_tags = ["Data Manager"]
     filterset_fields = ["project"]
-    task_serializer_class = TaskSerializer
+    task_serializer_class = DataManagerTaskSerializer
     permission_required = ViewClassPermission(
         GET=all_permissions.tasks_view,
         POST=all_permissions.tasks_change,
