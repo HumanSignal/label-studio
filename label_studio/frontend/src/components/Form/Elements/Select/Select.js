@@ -4,13 +4,10 @@ import { FormField } from '../../FormField';
 import { default as Label } from '../Label/Label';
 import './Select.styl';
 
-const Select = ({label, className, options, validate, required, skip, labelProps, ...props}) => {
+const Select = ({label, className, options, validate, required, skip, labelProps, ghost, ...props}) => {
   const rootClass = cn('select');
 
-  const classList = [
-    rootClass,
-    className
-  ].join(" ").trim();
+  const classList = rootClass.mod({ghost}).mix(className);
 
   const selectWrapper = (
     <FormField

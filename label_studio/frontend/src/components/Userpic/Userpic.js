@@ -7,10 +7,12 @@ const FALLBACK_IMAGE = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCA
 
 export const Userpic = forwardRef(({
   username,
+  size,
   src,
   user,
   className,
   showUsername,
+  style,
   ...rest
 }, ref) => {
   const imgRef = useRef();
@@ -18,6 +20,10 @@ export const Userpic = forwardRef(({
   const [finalSrc, setFinalSrc] = useState(user?.avatar ?? src);
   const [imgVisible, setImgVisible] = useState(false);
   const [nameVisible, setNameVisible] = useState(true);
+
+  if (size) {
+    style = Object.assign({ width: size, height: size, fontSize: size * 0.4 }, style);
+  }
 
   useEffect(() => {
     if (user) {
@@ -46,7 +52,7 @@ export const Userpic = forwardRef(({
   }, [finalSrc]);
 
   const userpic = (
-    <Block ref={ref} name="userpic" mix={className} {...rest}>
+    <Block ref={ref} name="userpic" mix={className} style={style} {...rest}>
       <Elem
         tag="img"
         name="avatar"
@@ -81,3 +87,4 @@ export const Userpic = forwardRef(({
     </Tooltip>
   ) : userpic;
 });
+Userpic.displayName = 'Userpic';

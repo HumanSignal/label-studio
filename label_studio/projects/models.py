@@ -114,7 +114,7 @@ class Project(ProjectMixin, models.Model):
     UNCERTAINTY = 'Uncertainty sampling'
 
     SAMPLING_CHOICES = (
-        (SEQUENCE, 'Tasks are ordered by their IDs'),
+        (SEQUENCE, 'Tasks are ordered by Data manager ordering'),
         (UNIFORM, 'Tasks are chosen randomly'),
         (UNCERTAINTY, 'Tasks are chosen according to model uncertainty scores (active learning mode)')
     )
@@ -749,7 +749,7 @@ class ProjectSummary(models.Model):
                         created_annotations.pop(key)
 
                 # reduce labels counters
-                from_name = result['from_name']
+                from_name = result.get('from_name')
                 if from_name not in labels:
                     continue
                 for label in self._get_labels(result):

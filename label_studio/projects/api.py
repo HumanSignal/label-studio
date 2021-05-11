@@ -268,20 +268,6 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
             except Task.DoesNotExist:
                 logger.debug('Task with id {} locked'.format(task.id))
 
-    def _get_first_locked_by(self, user, tasks_query):
-        def match(task):
-            # Match task locked by user and discard expired tasks
-            return (
-                task.has_lock()
-                and task.locks.filter(user=user).count() > 0
-            )
-
-        lookup = (
-            task for task in tasks_query.all()
-            if match(task)
-        )
-        return next(lookup, None)
-
     def _try_ground_truth(self, tasks, project):
         """Returns task from ground truth set"""
         ground_truth = Annotation.objects.filter(task=OuterRef('pk'), ground_truth=True)
@@ -415,7 +401,7 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
         # support actions api call from actions/next_task.py
         if hasattr(self, 'prepared_tasks'):
             project.prepared_tasks = self.prepared_tasks
-            external_prepared_tasks_used = True
+            external_prepared_tasks_used = project.sampling == Project.SEQUENCE
         # get prepared tasks from request params (filters, selected items)
         else:
             project.prepared_tasks = get_prepared_queryset(self.request, project)
@@ -430,7 +416,8 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
                 exclude(pk__in=user_solved_tasks_array)
 
             # if annotator is assigned for tasks, he must to solve it regardless of is_labeled=True
-            if not (hasattr(self, 'assignee_flag') and self.assignee_flag):
+            assignee_flag = hasattr(self, 'assignee_flag') and self.assignee_flag
+            if not assignee_flag:
                 not_solved_tasks = not_solved_tasks.filter(is_labeled=False)
 
             not_solved_tasks_count = not_solved_tasks.count()
@@ -440,10 +427,14 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
                 raise NotFound(f'There are no tasks remaining to be annotated by the user={user}')
             logger.debug(f'{not_solved_tasks_count} tasks that still need to be annotated for user={user}')
 
+            # assigned tasks
+            if assignee_flag:
+                return self._make_response(not_solved_tasks.first(), request, use_task_lock=False)
+
             # ordered by data manager
             if external_prepared_tasks_used:
                 use_task_lock = False
-                next_task = self._get_first_locked_by(user, not_solved_tasks)
+                next_task = Task.get_locked_by(user, not_solved_tasks)
                 if not next_task:
                     use_task_lock = True
                     next_task = self._get_first_unlocked(not_solved_tasks)
@@ -452,7 +443,7 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
                 return self._make_response(next_task, request, use_task_lock=use_task_lock)
 
             # If current user has already lock one task - return it (without setting the lock again)
-            next_task = Task.get_locked_by(user, project)
+            next_task = Task.get_locked_by(user, not_solved_tasks)
             if next_task:
                 return self._make_response(next_task, request, use_task_lock=False)
 

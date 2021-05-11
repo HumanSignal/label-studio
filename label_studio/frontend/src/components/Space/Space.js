@@ -1,6 +1,8 @@
 import React from "react";
-import { Block } from "../../utils/bem";
+import { BemWithSpecifiContext } from "../../utils/bem";
 import "./Space.styl";
+
+const {Block} = BemWithSpecifiContext();
 
 export const Space = ({
   direction = "horizontal",

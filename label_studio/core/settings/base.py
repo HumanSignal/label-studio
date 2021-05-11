@@ -363,7 +363,7 @@ PROJECT_MIXIN = 'core.mixins.DummyModelMixin'
 TASK_MIXIN = 'core.mixins.DummyModelMixin'
 ANNOTATION_MIXIN = 'core.mixins.DummyModelMixin'
 ORGANIZATION_MIXIN = 'core.mixins.DummyModelMixin'
-USER_MIXIN = 'core.mixins.DummyModelMixin'
+USER_MIXIN = 'users.mixins.UserMixin'
 
 # fix a problem with Windows mimetypes for JS and PNG
 import mimetypes
