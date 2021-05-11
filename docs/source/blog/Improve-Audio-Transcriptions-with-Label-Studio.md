@@ -2,9 +2,12 @@
 title: Improve Amazon Transcribe Audio Transcriptions with Label Studio
 type: blog
 order: 95
+image: /images/aws-transcribe-blog/audio-transcription-illustration.png
 meta_title: Improve Audio Transcriptions with Label Studio
 meta_description: Use open source data labeling software Label Studio to improve audio transcriptions of customer support calls, video conference meetings, and other audio recordings.
 ---
+
+<img src="/images/aws-transcribe-blog/audio-transcription-illustration.png" alt="Decorative graphic." class="gif-border" />
 
 Audio transcription quality is important for accessibility, but also to ensure the quality of a service that you provide, such as customer support, or the outcomes of a meeting. You might need to transcribe any of the following types of audio:
 - A recording from a journalism, user research, or radio interview
@@ -24,6 +27,8 @@ When high quality is crucial, having human involvement in the transcript is nece
 With Label Studio, you can improve audio transcription quality at scale with an easy-to-use interface.
 
 ## How to improve audio transcription quality with Label Studio
+
+<img src="/images/aws-transcribe-blog/AWS-Audio-Transcription-Scheme.png" alt="Decorative graphic." class="gif-border" />
 
 In this example tutorial, you can use the [Amazon Transcribe](https://aws.amazon.com/transcribe/) service to create an automated audio transcript of an interview and combine it with human intervention in Label Studio to produce a high quality audio transcript.
 
