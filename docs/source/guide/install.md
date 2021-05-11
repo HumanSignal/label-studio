@@ -25,9 +25,12 @@ Install Label Studio in a clean Python environment. We highly recommend using a 
 ### Port requirements
 Label Studio expects port 8080 to be open by default. To use a different port, specify it when starting Label Studio. See [Start Label Studio](start.html). 
 
-### Disk space requirements
-Allocate disk space according to the amount of data you plan to label. As a benchmark, 1 million labeling tasks take up approximately 2.3GB on disk when using the SQLite database. For more on using Label Studio at scale and labeling performance, see [Start Label Studio](start.html). 
+### Server requirements
+Allocate disk space according to the amount of data you plan to label. As a benchmark, 1 million labeling tasks take up approximately 2.3GB on disk when using the SQLite database. 50GB of disk space is recommended for production instances. 
 
+Use a minimum of 8GB RAM, but 16GB RAM is recommended, for example, t3.large or t3.xlarge on Amazon AWS.
+
+For more on using Label Studio at scale and labeling performance, see [Start Label Studio](start.html). 
 ### Web browser support
 Label Studio is tested with the latest version of Google Chrome and is expected to work in the latest versions of:
 - Google Chrome
