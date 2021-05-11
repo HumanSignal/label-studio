@@ -78,7 +78,8 @@ class ProjectSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                   'task_number', 'useful_annotation_number', 'ground_truth_number', 'skipped_annotations_number',
                   'total_annotations_number', 'total_predictions_number', 'sampling', 'show_ground_truth_first',
                   'show_overlap_first', 'overlap_cohort_percentage', 'task_data_login', 'task_data_password',
-                  'control_weights', 'parsed_label_config', 'evaluate_predictions_automatically']
+                  'control_weights', 'parsed_label_config', 'evaluate_predictions_automatically',
+                  'config_has_control_tags']
 
     def validate_label_config(self, value):
         if self.instance is None:
