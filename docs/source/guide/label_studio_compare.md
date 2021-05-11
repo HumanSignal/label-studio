@@ -1,5 +1,5 @@
 ---
-title: What you get with Label Studio
+title: Features of Label Studio
 type: guide
 order: 108
 meta_title: 
