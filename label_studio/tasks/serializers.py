@@ -486,7 +486,10 @@ class TaskWithAnnotationsAndLazyPredictionsSerializer(TaskSerializer):
             if user.is_annotator:
                 annotations = annotations.filter(completed_by=user)
 
-        return AnnotationSerializer(annotations, many=True, read_only=True, default=True, context=self.context).data
+        return self.annotation_serializer(
+            annotations,
+            many=True, read_only=True, default=True, context=self.context
+        ).data
 
     class Meta:
         model = Task
