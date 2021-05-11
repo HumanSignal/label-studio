@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
 from drf_yasg import openapi as openapi
 from drf_yasg.utils import swagger_auto_schema
+from django.utils.decorators import method_decorator
 
 from core.permissions import BaseRulesPermission, IsBusiness, get_object_with_permissions, all_permissions
 from core.utils.common import get_object_with_check_and_log
@@ -25,6 +26,8 @@ class StorageAPIBasePermission(BaseRulesPermission):
     perm = 'projects.change_project'
 
 
+@method_decorator(name='get', decorator=swagger_auto_schema(tags=['Storage']))
+@method_decorator(name='post', decorator=swagger_auto_schema(tags=['Storage']))
 class ImportStorageListAPI(generics.ListCreateAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = all_permissions.projects_change
@@ -37,13 +40,13 @@ class ImportStorageListAPI(generics.ListCreateAPIView):
         ImportStorageClass = self.serializer_class.Meta.model
         return ImportStorageClass.objects.filter(project_id=project.id)
 
-    @swagger_auto_schema(tags=['Storage'])
-    def get(self, request, *args, **kwargs):
-        return super(ImportStorageListAPI, self).get(request, *args, **kwargs)
-
-    @swagger_auto_schema(tags=['Storage'])
-    def post(self, request, *args, **kwargs):
-        return super(ImportStorageListAPI, self).post(request, *args, **kwargs)
+    # @swagger_auto_schema(tags=['Storage'])
+    # def get(self, request, *args, **kwargs):
+    #     return super(ImportStorageListAPI, self).get(request, *args, **kwargs)
+    #
+    # @swagger_auto_schema(tags=['Storage'])
+    # def post(self, request, *args, **kwargs):
+    #     return super(ImportStorageListAPI, self).post(request, *args, **kwargs)
 
 
 class ImportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
@@ -113,6 +116,9 @@ class ExportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
         return super(ExportStorageDetailAPI, self).put(request, *args, **kwargs)
 
 
+@method_decorator(name='get', decorator=swagger_auto_schema(
+    tags=['Storage'], operation_summary='Sync storage',
+    operation_description='Sync tasks from storage'))
 class ImportStorageSyncAPI(generics.RetrieveAPIView):
 
     parser_classes = (JSONParser, FormParser, MultiPartParser)
