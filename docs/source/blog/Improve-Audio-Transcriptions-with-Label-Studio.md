@@ -235,7 +235,7 @@ When you open the `tasks.json` file, you see something like the following exampl
 ```json
 [{
     "data": {
-      "audio": "s3://<bucket_name>/sportsbyline_hankaaron.mp3"
+      "audio": "s3://BUCKET-NAME/sportsbyline_hankaaron.mp3"
     },
     "predictions": [
       {
@@ -286,4 +286,4 @@ When you're finished reviewing and correcting transcripts, click **Export** to e
 ## What's next 
 By automatically transcribing a radio interview and then manually correcting the transcript using Label Studio, you can perform reliable research and trustworthy analysis on audio recordings. By combining existing automated transcription services like Amazon Transcribe with subject matter experts using Label Studio, you can quickly discover patterns and search for important information in transcribed recordings. 
 
-Beyond this example, when you improve audio transcripts with Label Studio, you can more easily trust the results of your machine learning models. You can reduce error in any automated downstream analysis that you perform, such as sentiment analysis or contextual analysis. AWS Machine Learning provides an example of [analyzing contact center calls using Amazon Transcribe and Amazon Comprehend](https://aws.amazon.com/blogs/machine-learning/analyzing-contact-center-calls-part-1-use-amazon-transcribe-and-amazon-comprehend-to-analyze-customer-sentiment/), and with Label Studio as part of that pipeline, you can get higher quality and robust call center analytics from the Amazon Comprehend service.
+Beyond this example, when you improve audio transcripts with Label Studio, you can more easily trust the results of your machine learning models. You can reduce error in any automated downstream analysis that you perform, such as _sentiment analysis_ or another contextual analysis. AWS Machine Learning provides an example of [analyzing contact center calls using Amazon Transcribe and Amazon Comprehend](https://aws.amazon.com/blogs/machine-learning/analyzing-contact-center-calls-part-1-use-amazon-transcribe-and-amazon-comprehend-to-analyze-customer-sentiment/), and with Label Studio as part of that pipeline, you can get higher quality and robust call center analytics from the Amazon Comprehend service.
