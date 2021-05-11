@@ -44,6 +44,12 @@ class ProjectSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                                                 help_text='JSON-formatted labeling configuration')
     start_training_on_annotation_update = SerializerMethodField(default=None, read_only=False,
                                                                 help_text='Start model training after any annotations are submitted or updated')
+    config_has_control_tags = SerializerMethodField(default=None, read_only=True,
+                                                    help_text='Flag to detect is project ready for labeling')
+
+    @staticmethod
+    def get_config_has_control_tags(project):
+        return len(project.get_control_tags_from_config()) > 0
 
     @staticmethod
     def get_parsed_label_config(project):
