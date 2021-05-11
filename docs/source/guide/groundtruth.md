@@ -6,9 +6,11 @@ meta_title:
 meta_description: 
 ---
 
+> Beta documentation: Label Studio Enterprise v2.0.0 is currently in Beta. As a result, this documentation might not reflect the current functionality of the product.
+
 Define the annotation quality standards for a project by defining ground truth labels for a project. 
 
-> Defining ground truth labels is only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, CONTACT US to learn more about the Enterprise Edition. 
+> Defining ground truth labels is only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see [Features of Label Studio](label_studio_compare.html) to learn more.
 
 
 

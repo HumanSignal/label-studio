@@ -6,7 +6,9 @@ meta_title: Organizations and Workspaces
 meta_description: Label Studio Documentation for creating workspaces and organizations for your data labeling, machine learning, and data science projects.
 ---
 
-Label Studio Enterprise uses organizations and workspaces to let you manage access to data and projects within one Label Studio environment. If you use Label Studio Community Edition, all projects and data are visible to everyone with access to Label Studio. 
+> Beta documentation: Label Studio Enterprise v2.0.0 is currently in Beta. As a result, this documentation might not reflect the current functionality of the product.
+
+Label Studio Enterprise uses organizations and workspaces to let you manage access to data and projects within one Label Studio environment. If you use Label Studio Community Edition, all projects and data are visible to everyone with access to Label Studio. See [Features of Label Studio](label_studio_compare.html) to learn more.
 
 ## Use organizations to manage data and projects
 

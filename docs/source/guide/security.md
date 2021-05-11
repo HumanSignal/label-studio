@@ -5,6 +5,9 @@ order: 220
 meta_title: Label Studio Security
 meta_description: Label Studio Documentation about the security, privacy, hardening, and access control functionality in Label Studio. 
 ---
+
+> Beta documentation: Label Studio Enterprise v2.0.0 is currently in Beta. As a result, this documentation might not reflect the current functionality of the product.
+
 Label Studio provides many ways to secure access to your data and your deployment architecture. 
 
 INSERT ARCHITECTURE DIAGRAM HERE
@@ -17,8 +20,6 @@ The following security-related functionality is only available in Label Studio E
 Label Studio Enterprise is available as on-premises software that you manage, or as a Software-as-a-Service (SaaS) offering.
   
 <!--If you need to meet strong privacy regulations, legal requirements, or you want to make a custom installation within your infrastructure or any public cloud (AWS, Google, Azure, etc.), Label Studio Enterprise works on-premises. It is a self-contained version (no Internet connection is required) of the Platform, no data will leave your infrastructure. To make the installation the most accessible, we offer a Docker image.-->
-
-
 
 If you're running the open source version in production, restrict access to the Label Studio server. Label Studio establishes secure connections to the web application by enforcing HTTPS and secured cookies. Restrict access to the server itself by opening only the [required ports](install.html#Port_requirements) on the server.
 

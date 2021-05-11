@@ -6,9 +6,11 @@ meta_title:
 meta_description:
 ---
 
+> Beta documentation: Label Studio Enterprise v2.0.0 is currently in Beta. As a result, this documentation might not reflect the current functionality of the product.
+
 After multiple labelers have annotated tasks, review their output to validate the quality of the results. You can also perform this task after a model has predicted labels for tasks in your dataset. 
 
-> The annotation review workflow is only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, CONTACT US to learn more about the Enterprise Edition. 
+> The annotation review workflow is only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see [Features of Label Studio](label_studio_compare.html) to learn more.
 
 ## Why review annotations?
 

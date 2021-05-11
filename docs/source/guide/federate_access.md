@@ -6,9 +6,17 @@ meta_title: Federate data access with SAML
 meta_description: Label Studio Documentation for federating access to cloud storage using SAML roles to secure your machine learning and data science projects. 
 ---
 
+> Beta documentation: Label Studio Enterprise v2.0.0 is currently in Beta. As a result, this documentation might not reflect the current functionality of the product.
+
 To further [manage access to data in Label Studio Enterprise](security.html), you can federate access to externally-stored data based on SAML roles. In this way, you can use [roles in Label Studio](manage_users.html) to manage what users can do with the data, and SAML roles to manage what data those users can view within an organization, workspace, or project.
 
+> Federating access to data is only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see [Features of Label Studio](label_studio_compare.html) to learn more.
+
+## Prerequisites
+
 You must be using Label Studio Enterprise Edition and have [set up SSO](SSO_setup.html) to federate access with SAML.
+
+## Set up federated access using SAML
 
 1. Set up identity and access management (IAM) policies with your SAML SSO identity provider (IdP).
 2. Restrict bucket access in Amazon S3 or other cloud storage providers based on the SAML-asserted roles.

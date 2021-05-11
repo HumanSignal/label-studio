@@ -6,7 +6,10 @@ meta_title: Data Labeling Statistics
 meta_description: Label Studio Enterprise Documentation about task agreement and annotator consensus for data labeling and machine learning projects.
 ---
 
-Label Studio Enterprise Edition includes various annotation and labeling statistics. The open source Community Edition of Label Studio does not perform these statistical calculations.
+> Beta documentation: Label Studio Enterprise v2.0.0 is currently in Beta. As a result, this documentation might not reflect the current functionality of the product.
+
+
+Label Studio Enterprise Edition includes various annotation and labeling statistics. The open source Community Edition of Label Studio does not perform these statistical calculations. If you're using Label Studio Community Edition, see [Features of Label Studio](label_studio_compare.html) to learn more.
 
 ## Task agreement
 
@@ -79,7 +82,7 @@ The method used to calculate the matching score depends on what choice you selec
 
 ## Agreement method
 
-_Agreement method_ defines how [matching scores](/docs/guide/stats.html#Matching-score) across all completions for a task are combined to form a single inter-annotator agreement score.
+_Agreement method_ defines how [matching scores](stats.html#Matching-score) across all completions for a task are combined to form a single inter-annotator agreement score.
 
 There are several possible methods you can specify on project settings page:
 
