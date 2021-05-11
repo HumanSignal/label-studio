@@ -38,6 +38,8 @@ class AllPermissions(BaseModel):
     annotations_view = 'annotations.view'
     annotations_change = 'annotations.change'
     annotations_delete = 'annotations.delete'
+    actions_perform = 'actions.perform'
+
 
 all_permissions = AllPermissions()
 
@@ -50,10 +52,14 @@ class ViewClassPermission(BaseModel):
     POST: Optional[str] = None
 
 
-def make_perm(name, pred):
+def make_perm(name, pred, overwrite=False):
     if rules.perm_exists(name):
-        rules.remove_perm(name)
+        if overwrite:
+            rules.remove_perm(name)
+        else:
+            return
     rules.add_perm(name, pred)
+
 
 for _, permission_name in all_permissions:
     make_perm(permission_name, rules.is_authenticated)

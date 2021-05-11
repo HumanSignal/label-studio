@@ -65,9 +65,9 @@ class Task(TaskMixin, models.Model):
         return os.path.basename(self.file_upload.file.name)
 
     @classmethod
-    def get_locked_by(cls, user, project):
+    def get_locked_by(cls, user, queryset):
         """Retrieve the task locked by specified user. Returns None if the specified user didn't lock anything."""
-        lock = TaskLock.objects.filter(user=user, expire_at__gt=now(), task__project=project).first()
+        lock = TaskLock.objects.filter(user=user, expire_at__gt=now(), task__in=queryset).first()
         if lock:
             return lock.task
 
@@ -440,6 +440,22 @@ def delete_draft(sender, instance, **kwargs):
     num_drafts = drafts.count()
     drafts.delete()
     logger.debug(f'{num_drafts} drafts removed from task {task} after saving annotation {instance}')
+
+
+@receiver(post_save, sender=Annotation)
+def update_ml_backend(sender, instance, **kwargs):
+    if instance.ground_truth:
+        return
+
+    project = instance.task.project
+
+    if hasattr(project, 'ml_backends') and project.min_annotations_to_start_training:
+        annotation_count = Annotation.objects.filter(task__project=project).count()
+
+        # start training every N annotation
+        if annotation_count % project.min_annotations_to_start_training == 0:
+            for ml_backend in project.ml_backends.all():
+                ml_backend.train()
 
 
 Q_finished_annotations = Q(was_cancelled=False) & Q(result__isnull=False)

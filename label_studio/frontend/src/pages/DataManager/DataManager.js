@@ -34,6 +34,7 @@ const initializeDataManager = async (root, props, params) => {
       import: false,
       export: false,
       backButton: false,
+      labelingHeader: false,
     },
     ...props,
     ...settings,
@@ -121,6 +122,7 @@ DataManagerPage.pages = {
 DataManagerPage.context = ({dmRef}) => {
   const location = useLocation();
   const {project} = useProject();
+  const [mode, setMode] = useState(dmRef?.mode ?? "explorer");
 
   const links = {
     '/settings': 'Settings',
@@ -162,6 +164,7 @@ DataManagerPage.context = ({dmRef}) => {
   };
 
   const onDMModeChanged = (currentMode) => {
+    setMode(currentMode);
     updateCrumbs(currentMode);
     showLabelingInstruction(currentMode);
   };
@@ -178,6 +181,17 @@ DataManagerPage.context = ({dmRef}) => {
 
   return project && project.id ? (
     <Space size="small">
+      {(project.expert_instruction && mode !== 'explorer') && (
+        <Button size="compact" onClick={() => {
+          modal({
+            title: "Instructions",
+            body: () => <div dangerouslySetInnerHTML={{__html: project.expert_instruction}}/>,
+          });
+        }}>
+          Instructions
+        </Button>
+      )}
+
       {Object.entries(links).map(([path, label]) => (
         <Button
           key={path}

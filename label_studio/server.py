@@ -334,6 +334,10 @@ def main():
         internal_port = int(internal_port)
         internal_port = _get_free_port(internal_port, input_args.debug)
 
+        # save selected port to global settings
+        from django.conf import settings
+        settings.INTERNAL_PORT = str(internal_port)
+
         # browser
         url = ('http://localhost:' + str(internal_port)) if not host else host
         start_browser(url, input_args.no_browser)
