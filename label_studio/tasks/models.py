@@ -65,9 +65,9 @@ class Task(TaskMixin, models.Model):
         return os.path.basename(self.file_upload.file.name)
 
     @classmethod
-    def get_locked_by(cls, user, project):
+    def get_locked_by(cls, user, queryset):
         """Retrieve the task locked by specified user. Returns None if the specified user didn't lock anything."""
-        lock = TaskLock.objects.filter(user=user, expire_at__gt=now(), task__project=project).first()
+        lock = TaskLock.objects.filter(user=user, expire_at__gt=now(), task__in=queryset).first()
         if lock:
             return lock.task
 
@@ -146,7 +146,7 @@ class Task(TaskMixin, models.Model):
             return storage_link.storage
 
         # or try global storage settings (only s3 for now)
-        elif get_env('USE_DEFAULT_STORAGE', default=False, is_bool=True):
+        elif get_env('USE_DEFAULT_S3_STORAGE', default=False, is_bool=True):
             # TODO: this is used to access global environment storage settings.
             # We may use more than one and non-default S3 storage (like GCS, Azure)
             from io_storages.s3.models import S3ImportStorage
@@ -336,6 +336,9 @@ class AnnotationDraft(models.Model):
     def created_ago(self):
         """ Humanize date """
         return timesince(self.created_at)
+
+    def has_permission(self, user):
+        return self.task.project.has_permission(user)
 
 
 class Prediction(models.Model):

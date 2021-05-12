@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { createContext, useContext } from 'react';
 import { createPortal } from 'react-dom';
 import { LsCross } from '../../assets/icons';
 import { BemWithSpecifiContext, cn } from '../../utils/bem';
@@ -8,6 +8,8 @@ import { Button } from '../Button/Button';
 import "./Modal.styl";
 
 const {Block, Elem} = BemWithSpecifiContext();
+
+const ModalContext = createContext();
 
 export class Modal extends React.Component {
 
@@ -57,7 +59,7 @@ export class Modal extends React.Component {
     });
   }
 
-  async hide(onHidden) {
+  hide(onHidden) {
     return new Promise((resolve) => {
       this.transition('disappear', () => {
         this.setState({ visible: false }, () => {
@@ -85,30 +87,36 @@ export class Modal extends React.Component {
       this.props.className,
     ];
 
-    const modalContent = (
-      <Block name="modal" ref={this.modalRef} mod={mods} mix={mixes} onClick={this.onClickOutside}>
-        <Elem name="wrapper">
-          <Elem name="content" style={this.props.style}>
-            {!bare && (
-              <Modal.Header>
-                <Elem name="title">{this.state.title}</Elem>
-                {this.props.allowClose !== false  && (
-                  <Elem tag={Button} name="close" type="text" icon={<LsCross/>}/>
-                )}
-              </Modal.Header>
-            )}
-            <Elem name="body" mod={{bare}}>
-              {this.body}
-            </Elem>
+    const modalSizeStyle = {};
 
-            {this.state.footer && (
-              <Modal.Footer bare={this.props.bareFooter}>
-                {this.footer}
-              </Modal.Footer>
-            )}
+    if (this.props.width) modalSizeStyle.width = this.props.width;
+    if (this.props.height) modalSizeStyle.height = this.props.height;
+
+    const modalContent = (
+      <ModalContext.Provider value={this}>
+        <Block name="modal" ref={this.modalRef} mod={mods} mix={mixes} onClick={this.onClickOutside}>
+          <Elem name="wrapper">
+            <Elem name="content" style={Object.assign({}, this.props.style, modalSizeStyle)}>
+              {!bare && (
+                <Modal.Header>
+                  <Elem name="title">{this.state.title}</Elem>
+                  {this.props.allowClose !== false  && (
+                    <Elem tag={Button} name="close" type="text" icon={<LsCross/>}/>
+                  )}
+                </Modal.Header>
+              )}
+              <Elem name="body" mod={{bare}}>
+                {this.body}
+              </Elem>
+              {this.props.footer && (
+                <Modal.Footer bare={this.props.bareFooter}>
+                  {this.footer}
+                </Modal.Footer>
+              )}
+            </Elem>
           </Elem>
-        </Elem>
-      </Block>
+        </Block>
+      </ModalContext.Provider>
     );
 
     return createPortal(modalContent, document.body);
@@ -116,11 +124,12 @@ export class Modal extends React.Component {
 
   onClickOutside = (e) => {
     const {closeOnClickOutside} = this.props;
+    const allowClose = this.props.allowClose !== false;
     const isInModal = this.modalRef.current.contains(e.target);
     const content = cn('modal').elem('content').closest(e.target);
     const close = cn('modal').elem('close').closest(e.target);
 
-    if ((isInModal && close) || (content === null && closeOnClickOutside !== false)) {
+    if (allowClose && ((isInModal && close) || (content === null && closeOnClickOutside !== false))) {
       this.hide();
     }
   }
@@ -197,3 +206,7 @@ Modal.Footer = ({ children, bare }) => (
     {children}
   </Elem>
 );
+
+export const useModalControls = () => {
+  return useContext(ModalContext);
+};

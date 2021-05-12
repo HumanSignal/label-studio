@@ -1,19 +1,16 @@
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { useCallback, useContext } from 'react';
 import { Button } from '../../components';
 import { Form, Input, TextArea } from '../../components/Form';
 import { RadioGroup } from '../../components/Form/Elements/RadioGroup/RadioGroup';
-import { MenubarContext } from '../../components/Menubar/Menubar';
 import { ProjectContext } from '../../providers/ProjectProvider';
 import { Block } from '../../utils/bem';
 
 export const GeneralSettings = () => {
   const {project, fetchProject} = useContext(ProjectContext);
-  const pageContext = useContext(MenubarContext);
-  const formRef = useRef();
 
-  useEffect(() => {
-    pageContext.setProps({formRef});
-  }, [formRef]);
+  const updateProject = useCallback(() => {
+    if (project.id) fetchProject(project.id, true);
+  }, [project]);
 
   const colors = [
     '#FFFFFF',
@@ -26,9 +23,19 @@ export const GeneralSettings = () => {
     '#D55C9D',
   ];
 
+  const samplings = [
+    {value: "Sequential", label: "Sequential", description: "Tasks are ordered by Data manager ordering"},
+    {value: "Uniform", label: "Random", description: "Tasks are chosen with uniform random"},
+  ];
+
   return (
     <div style={{width: 480}}>
-      <Form ref={formRef} action="updateProject" formData={{...project}} params={{pk: project.id}} onSubmit={() => fetchProject(project.id, true)}>
+      <Form
+        action="updateProject"
+        formData={{...project}}
+        params={{pk: project.id}}
+        onSubmit={updateProject}
+      >
         <Form.Row columnCount={1} rowGap="32px">
           <Input
             name="title"
@@ -48,6 +55,17 @@ export const GeneralSettings = () => {
               <RadioGroup.Button key={color} value={color}>
                 <Block name="color" style={{'--background': color}}/>
               </RadioGroup.Button>
+            ))}
+          </RadioGroup>
+
+          <RadioGroup label="Task Sampling" labelProps={{size: "large"}} name="sampling" simple>
+            {samplings.map(({value, label, description}) => (
+              <RadioGroup.Button
+                key={value}
+                value={`${value} sampling`}
+                label={`${label} sampling`}
+                description={description}
+              />
             ))}
           </RadioGroup>
         </Form.Row>

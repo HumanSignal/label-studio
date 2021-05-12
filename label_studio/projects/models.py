@@ -29,27 +29,28 @@ class ProjectManager(models.Manager):
 
     def with_counts(self):
         return self.annotate(
-            task_number=Count('tasks'),
-            total_predictions_number=Count('tasks__predictions'),
+            task_number=Count('tasks', distinct=True),
+            total_predictions_number=Count('tasks__predictions', distinct=True),
             total_annotations_number=Count(
-                'tasks__annotations__id',
+                'tasks__annotations__id', distinct=True,
                 filter=Q(tasks__annotations__was_cancelled=False)
             ),
             useful_annotation_number=Count(
-                'tasks__annotations__id',
+                'tasks__annotations__id', distinct=True,
                 filter=Q(tasks__annotations__was_cancelled=False) &
                     Q(tasks__annotations__ground_truth=False) &
                     Q(tasks__annotations__result__isnull=False)
             ),
             ground_truth_number=Count(
-                'tasks__annotations__id',
+                'tasks__annotations__id', distinct=True,
                 filter=Q(tasks__annotations__ground_truth=True)
             ),
             skipped_annotations_number=Count(
-                'tasks__annotations__id',
+                'tasks__annotations__id', distinct=True,
                 filter=Q(tasks__annotations__was_cancelled=True)
             ),
         )
+
 
 ProjectMixin = load_func(settings.PROJECT_MIXIN)
 
@@ -114,7 +115,7 @@ class Project(ProjectMixin, models.Model):
     UNCERTAINTY = 'Uncertainty sampling'
 
     SAMPLING_CHOICES = (
-        (SEQUENCE, 'Tasks are ordered by their IDs'),
+        (SEQUENCE, 'Tasks are ordered by Data manager ordering'),
         (UNIFORM, 'Tasks are chosen randomly'),
         (UNCERTAINTY, 'Tasks are chosen according to model uncertainty scores (active learning mode)')
     )
@@ -749,7 +750,7 @@ class ProjectSummary(models.Model):
                         created_annotations.pop(key)
 
                 # reduce labels counters
-                from_name = result['from_name']
+                from_name = result.get('from_name')
                 if from_name not in labels:
                     continue
                 for label in self._get_labels(result):

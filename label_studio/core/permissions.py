@@ -40,6 +40,7 @@ class AllPermissions(BaseModel):
     annotations_delete = 'annotations.delete'
     actions_perform = 'actions.perform'
 
+
 all_permissions = AllPermissions()
 
 
@@ -59,13 +60,9 @@ def make_perm(name, pred, overwrite=False):
             return
     rules.add_perm(name, pred)
 
+
 for _, permission_name in all_permissions:
     make_perm(permission_name, rules.is_authenticated)
-
-
-class HasObjectPermission(BasePermission):
-    def has_object_permission(self, request, view, obj):
-        return obj.has_permission(request.user)
 
 
 class PermissionException(Exception):
@@ -75,6 +72,7 @@ class PermissionException(Exception):
 class BasePermission(IsAuthenticated):
     def __call__(self, *args, **kwargs):
         return self.has_object_permission(*args, **kwargs)
+
 
 
 class BaseRulesPermission(BasePermission):

@@ -15,7 +15,7 @@ from django.db.models import Sum
 from ordered_set import OrderedSet
 
 from core.utils.common import get_object_with_check_and_log, int_from_request, bool_from_request
-from core.permissions import all_permissions, HasObjectPermission, ViewClassPermission
+from core.permissions import all_permissions, ViewClassPermission
 from core.decorators import permission_required
 from projects.models import Project
 from projects.serializers import ProjectSerializer
@@ -23,7 +23,7 @@ from tasks.models import Task, Annotation
 
 from data_manager.functions import get_all_columns, get_prepared_queryset, evaluate_predictions
 from data_manager.models import View
-from data_manager.serializers import ViewSerializer, TaskSerializer, SelectedItemsSerializer
+from data_manager.serializers import ViewSerializer, DataManagerTaskSerializer, SelectedItemsSerializer
 from data_manager.actions import get_all_actions, perform_action
 
 
@@ -76,7 +76,7 @@ class ViewAPI(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     my_tags = ["Data Manager"]
     filterset_fields = ["project"]
-    task_serializer_class = TaskSerializer
+    task_serializer_class = DataManagerTaskSerializer
     permission_required = ViewClassPermission(
         GET=all_permissions.tasks_view,
         POST=all_permissions.tasks_change,
@@ -286,8 +286,9 @@ class ProjectStateAPI(APIView):
 class ProjectActionsAPI(APIView):
     permission_required = ViewClassPermission(
         GET=all_permissions.projects_view,
-        POST=all_permissions.actions_perform,
+        POST=all_permissions.projects_view,
     )
+
     @swagger_auto_schema(tags=["Data Manager"])
     def get(self, request):
         """
