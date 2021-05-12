@@ -33,7 +33,11 @@ Use the following labeling configuration:
 </View>
 ```
 
-After you set up an example project, import this task into Label Studio. Save it as a file first, for example, `example_prediction_task.json`.
+After you set up an example project, import this task into Label Studio. 
+
+{% details <b>Click to expand the example image JSON</b> %}
+
+Save this example JSON as a file to import it into Label Studio, for example, `example_prediction_task.json`.
 
 ```json
 [{
@@ -87,7 +91,8 @@ In this example there are 3 results inside 1 prediction, or pre-annotation:
 - `result2` - the second bounding box
 - `result3` - choice selection
 The prediction score applies to the entire prediction.
-  
+
+{% enddetails %} 
 
 In the Label Studio UI, the imported prediction for this task looks like the following: 
 <center><img src="../images/predictions_loaded.png" alt="screenshot of the Label Studio UI showing an image of airplanes with bounding boxes covering each airplane." style="width: 100%; max-width: 700px"></center>
