@@ -14,7 +14,7 @@ After multiple labelers have annotated tasks, review their output to validate th
 
 ## Why review annotations?
 
-Data labeling is a crucial step for training many machine learning models, and it's essential to review annotations to make sure that only the highest quality data is used to train your machine learning model. If you don't review the quality of labeled data, weak annotations might be used when training your model and degrade overall model performance. READ MORE IN THIS BLOG POST???
+Data labeling is a crucial step for training many machine learning models, and it's essential to review annotations to make sure that only the highest quality data is used to train your machine learning model. If you don't review the quality of labeled data, weak annotations might be used when training your model and degrade overall model performance. 
 
 ## Choose what to review
 
@@ -44,9 +44,12 @@ You can assign reviewers to tasks, or people with access can review tasks on an 
 
 
 ## Verify model and annotator performance 
-
+Use the project dashboard to verify annotator performance. 
 
 ### Review annotations against ground truth labels 
 There isn't a way to set ground truth labels rn I don't think.
 
 ### Review annotator consensus 
+For each project, you can review the project dashboard and review the Annotator Performance and Annotator Agreement Matrix sections to see the overall annotator consensus for the entire project.
+
+To see annotator consensus for each task, you can view the different annotations chosen by each annotator when reviewing a task by selecting the tab of each annotation when in the Review Stream.

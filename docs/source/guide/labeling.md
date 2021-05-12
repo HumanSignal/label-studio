@@ -6,7 +6,7 @@ meta_title: Labeling Interface
 meta_description: Label Studio Documentation for labeling and annotating various types of data and labeling tasks for machine learning and data science projects.
 ---
 
-Label and annotate your data with the open source data labeling tool, Label Studio. After you [set up your project](setup.hmtl) and [import your data](tasks.html), you can start labeling and annotating your data.  
+Label and annotate your data with the open source data labeling tool, Label Studio. After you [set up your project](setup_project.html) and [labeling interface](setup.html) and [import your data](tasks.html), you can start labeling and annotating your data.  
 
 1. Open a project in Label Studio and optionally filter or sort the data.    
 2. Click **Label** to start labeling.
@@ -14,7 +14,7 @@ Label and annotate your data with the open source data labeling tool, Label Stud
 4. Follow the project instructions for labeling and deciding whether or not to skip tasks. 
 5. Click the project name to return to the data manager. 
 
-When collaborating with other users, tasks are locked so that you don't accidentally overwrite the annotations of another annotator. After the other annotator finishes with the task, it can appear in your queue for labeling. 
+When collaborating with other users, tasks are locked so that you don't accidentally overwrite the annotations of another annotator. After the other annotator finishes with the task, it can appear in your queue for labeling. By default, tasks only need to be annotated by one annotator. If you're using Label Studio Enterprise and want more than one annotator to annotate tasks, [update the project settings](setup_project.html). 
 
 ## Filter or sort project data
 
