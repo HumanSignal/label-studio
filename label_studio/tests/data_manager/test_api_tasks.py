@@ -7,11 +7,8 @@ from tests.utils import make_task, make_annotation, make_prediction, project_id
 from projects.models import Project
 
 
-@pytest.mark.parametrize('client_type', ['business', 'annotator'])
 @pytest.mark.django_db
-def test_views_tasks_api(business_client, annotator_client, project_id, client_type):
-    business_client = business_client if client_type == 'business' else annotator_client
-
+def test_views_tasks_api(business_client, project_id):
     # create
     payload = dict(project=project_id, data={"test": 1})
     response = business_client.post(
