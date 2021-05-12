@@ -13,7 +13,8 @@ After you [start Label Studio](start.html) and [create an account](signup.html),
 1. [Create a project](#Create-a-project)
 2. [Import data](tasks.html).
 3. Select a template to configure the labeling interface for your dataset. [Set up the labeling interface for your project](setup.html).
-4. (Optional) [Set up instructions for data labelers](#Set-up-instructions-for-data-labelers). 
+4. (Optional) [Set up annotation settings for your project](#Set-up-annotation-settings-for-your-project). 
+5. (Optional, Label Studio Enterprise only) [Set up review settings for your project](#Set-up-review-settings-for-your-project).
 
 ## Create a project
 
@@ -113,24 +114,19 @@ In the project settings, you can add instructions and choose whether to show the
 
 ### Set reviewing options
 
+Configure the reviewing settings for your project.
 
-
-
-
-
-
-
-
-
-
-
-
+1. Within a project on the Label Studio UI, click **Settings**.
+2. Click **Review Settings**. 
+3. Under **Reviewing Options**, choose whether to mark a task as reviewed if at least one annotation has been reviewed, or only after all annotations for a task have been processed.
+4. Under **Reviewing Options**, choose whether to anonymize annotators when reviewing tasks. 
+Your changes save automatically.
 
 ## Where Label Studio stores your project data and configurations
 
 All labeling activities in Label Studio occur in the context of a project.
 
-Starting in version 1.0.0, Label Studio stores your project data and configurations in a SQLite database. You can choose to use PostgreSQL or Redis instead. See [Sync data from cloud or database storage](storage.html). 
+Starting in version 1.0.0, Label Studio stores your project data and configurations in a SQLite database. You can choose to use PostgreSQL or Redis instead. See [Setup database storage](storedata.html). 
 
 In versions of Label Studio earlier than 1.0.0, when you start Label Studio for the first time, it launches from a project directory that Label Studio creates, called `./my_project` by default. 
 
