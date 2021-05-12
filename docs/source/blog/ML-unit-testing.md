@@ -71,7 +71,7 @@ from label_studio_evalme import matching_score
 
 @pytest.mark.parametrize('test_task', json.load(open('test_tasks.json')))
 def test_suite(test_task):
-    assert matching_score(test_task['annotation'], test_task['prediction'])
+    assert matching_score(test_task['annotation'], test_task['prediction']) > MATCHING_SCORE_THRESHOLD
 ```
 
 ## Create Github Actions CI Workflow
