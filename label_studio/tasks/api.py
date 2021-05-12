@@ -15,7 +15,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from core.utils.common import get_object_with_check_and_log
 from core.decorators import permission_required
-from core.permissions import all_permissions, HasObjectPermission, ViewClassPermission
+from core.permissions import all_permissions, ViewClassPermission
 
 from tasks.models import Task, Annotation, Prediction, AnnotationDraft
 from core.permissions import (get_object_with_permissions, check_object_permissions)
