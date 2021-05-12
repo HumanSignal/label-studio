@@ -37,18 +37,82 @@ If you have duplicate tasks, or want to remove annotations, you can delete tasks
 
 If you want to make changes to the labeling interface or perform a different type of data labeling, first select all the annotations for your dataset and delete the annotations.
 
-## Set up annotation and review settings for your project
+## Set up annotation settings for your project
+
+Set up annotation settings to configure how you want annotators to perform labeling for your project.
+
+> Annotation settings other than instructions for data labelers are only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see [Features of Label Studio](label_studio_compare.html) to learn more.
 
 ### Set up instructions for data labelers 
 
-In the project settings, you can add instructions and choose whether or not to show the instructions to annotators before they perform labeling. 
+In the project settings, you can add instructions and choose whether to show the instructions to annotators before they perform labeling. 
 
 1. Within a project on the Label Studio UI, click **Settings**.
-2. Click **Instructions**.
-3. Type instructions and choose whether or not to show the instructions to annotators before labeling. 
+2. Click **Instructions**, or in Label Studio Enterprise, click **Annotation Settings**. 
+3. Type instructions and choose whether to show the instructions to annotators before labeling. 
 4. Click **Save**. <br/>Click the project name to return to the data manager view. 
 
 Annotators can view instructions at any time when labeling by clicking the (i) button from the labeling interface.
+
+### Set minimum annotations per task
+
+By default, each task only needs to be annotated by one annotator. If you want multiple annotators to be able to annotate tasks, set the Overlap of Annotations for a project in the project settings.
+
+1. Within a project on the Label Studio UI, click **Settings**.
+2. Click **Annotation Settings**.
+3. Under **Overlap of Annotations**, select the number of minimum annotations for a task. 
+4. Choose whether to enforce the overlap for the default of 100% of tasks, or a smaller percentage. 
+5. Choose whether to show tasks that require multiple annotations, **tasks with overlap**, before other tasks that need to be annotated. 
+6. Your changes save automatically. Return to the **Data Manager** and assign annotators to the tasks so that they can annotate the tasks. Unless you assign annotators, multiple people cannot annotate tasks. 
+
+### Set annotating options
+If you want, you can allow empty annotations.
+
+1. Within a project on the Label Studio UI, click **Settings**.
+2. Click **Annotation Settings**.
+3. Under **Annotating Options**, select **Allow empty annotations**. By default, empty annotations are allowed.
+
+### Set up task sampling
+
+If you're using Label Studio Community Edition, you must set up task sampling when you start Label Studio. See [Set up task sampling for your project](start.html#Set-up-task-sampling-for-your-project).
+
+In Label Studio Enterprise, you can set up task sampling in the annotation settings for a project.
+1. Within a project on the Label Studio UI, click **Settings**.
+2. Click **Annotation Settings**.
+3. Select your preferred method of task sampling:
+- Uncertainty sampling, where tasks are shown to annotators according to the model uncertainty, or prediction scores.
+- Sequential sampling, the default, where tasks are shown to annotators in the same order that they appear on the Data Manager.
+- Uniform sampling, where tasks are shown to annotators in a random order.
+4. You can also choose whether to show tasks with ground truth labels first. 
+
+Your changes save automatically. 
+
+### Define the matching function for annotation statistics
+Annotation statistics such as annotator consensus are calculated using a matching score. If you want the matching score to calculate matches by requiring exact matching choices, choose that option in the annotation settings.
+
+1. Within a project on the Label Studio UI, click **Settings**.
+2. Click **Annotation Settings**.
+3. Under **Matching Function**, select **Exact matching choices**.
+
+Your changes save automatically. For more about how annotation statistics are calculated in Label Studio Enterprise, see [Task agreement and annotator consensus in Label Studio](stats.html).
+
+## Set up review settings for your project
+
+Set up review settings to guide reviewers when they review annotated tasks.
+
+> Review settings and the review stream are only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see [Features of Label Studio](label_studio_compare.html) to learn more.
+
+### Set up instructions for task reviewers 
+
+In the project settings, you can add instructions and choose whether to show the instructions to reviewers before they start reviewing annotated tasks. 
+
+1. Within a project on the Label Studio UI, click **Settings**.
+2. Click **Review Settings**. 
+3. Type instructions and choose whether to show the instructions to reviewers before reviewing annotated tasks. 
+4. Click **Save**. <br/>Click **Data Manager** to return to the data manager view. 
+
+### Set reviewing options
+
 
 
 
