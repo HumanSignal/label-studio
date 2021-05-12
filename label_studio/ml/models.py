@@ -76,6 +76,9 @@ class MLBackend(models.Model):
     def healthcheck_(url):
         return MLApi(url=url).health()
 
+    def has_permission(self, user):
+        return self.project.has_permission(user)
+
     @staticmethod
     def setup_(url, project):
         api = MLApi(url=url)
