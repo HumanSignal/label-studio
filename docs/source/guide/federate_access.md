@@ -21,13 +21,14 @@ You must be using Label Studio Enterprise Edition and have [set up SSO](SSO_setu
 1. Set up identity and access management (IAM) policies with your SAML SSO identity provider (IdP).
 2. Restrict bucket access in Amazon S3 or other cloud storage providers based on the SAML-asserted roles.
 3. Set up Label Studio Enterprise with the same SAML SSO IdP as the cloud storage provider.
-4. When Label Studio Enterprise accesses cloud storage buckets on behalf of users, it uses the SAML-asserted roles to retrieve temporary access tokens that match the user permissions. 
+4. When Label Studio Enterprise accesses cloud storage buckets on behalf of users, it uses the SAML-asserted roles to retrieve temporary access tokens that match the user permissions.
 
-INSERT DIAGRAM HERE
+<img src="/images/LSE/LSE-federated-access-diagram.png" alt="Diagram showing Label Studio federated access, duplicated in the following example steps."/>
 
-
-For example, if you federate access to Amazon AWS, that works like the following example:
-1. Set up your AWS account to use your IdP.
-2. Set up Label Studio Enterprise to use SAML SSO with your IdP. The IdP shares the role entitlements for each user to Label Studio Enterprise.
-3. When a user accesses a task stored in Amazon AWS S3 storage, or exports annotations stored in the same, Label Studio Enterprise calls the AWS Security Token Service (STS) with the SAML response from the IdP and is granted a temporary token on behalf of the user.
-4. The user gains access to the tasks or annotations automatically and securely. 
+For example, if you use an AWS Virtual Private Cloud (VPC) to host Label Studio, the following happens when a user accesses a task stored in AWS S3:
+1. The user makes a client authentication request to the SAML IdP when they log in to Label Studio.
+2. The SAML IdP returns a SAML assertion to the Label Studio application.
+3. Label Studio calls the [`AssumeRoleWithSAML` endpoint](https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRoleWithSAML.html) of the Amazon AWS Security Token Service (STS) with the `RoleArn`, `PrincipalArn`, and base64 SAML assertion string from the IdP.
+4. AWS STS returns temporary security credentials to Label Studio on behalf of the user. 
+5. Label Studio uses the temporary security credentials to get federated access to the S3 data, based on the assumed role from the user. 
+6. Label Studio creates presigned URLs for the data in the S3 buckets and displays the requested tasks to the user using those URLs. 
