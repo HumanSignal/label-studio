@@ -14,15 +14,6 @@ class RedisImportStorageSerializer(ImportStorageSerializer):
         model = RedisImportStorage
         fields = '__all__'
 
-    def validate(self, data):
-        data = super(RedisImportStorageSerializer, self).validate(data)
-        storage = RedisImportStorage(**data)
-        try:
-            storage.validate_connection()
-        except Exception as exc:
-            raise ValidationError(exc)
-        return data
-
 
 class RedisExportStorageSerializer(ExportStorageSerializer):
     type = serializers.ReadOnlyField(default=os.path.basename(os.path.dirname(__file__)))
