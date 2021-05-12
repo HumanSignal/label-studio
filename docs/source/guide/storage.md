@@ -270,9 +270,7 @@ You can specify additional parameters from the Label Studio UI.
 
 | Parameter | Description | Default |
 | --- | --- | --- |
-| project_path | Path to the Label Studio project
-| path | Specify the path to the database | None | 
-| db | The Redis database to use | 1 (for source) or 2 (for target) | 
+| path | Specify the path to the database. Used as the keys prefix, values under this path are scanned. | None | 
 | host | IP of the server hosting the database | None |
 | port | Port of the server hosting the database | None |
 | password | Server password | None |
