@@ -8,14 +8,13 @@ meta_description: Label Studio Enterprise Documentation about task agreement and
 
 > Beta documentation: Label Studio Enterprise v2.0.0 is currently in Beta. As a result, this documentation might not reflect the current functionality of the product.
 
-
 Label Studio Enterprise Edition includes various annotation and labeling statistics. The open source Community Edition of Label Studio does not perform these statistical calculations. If you're using Label Studio Community Edition, see [Features of Label Studio](label_studio_compare.html) to learn more.
 
 ## Task agreement
 
-Task agreement shows the consensus between multiple annotators when labeling the same task. There are several types of task agreement in LSE:
-- a per-task agreement score, visible on the Data Manager page. This displays how well the annotations on a particular task match across annotators. 
-- an inter-annotator agreement matrix, visible on the SOMETHING page. This displays how well the annotations from specific annotators agree with each other in general, or for specific tasks.
+Task agreement shows the consensus between multiple annotators when labeling the same task. There are several types of task agreement in Label Studio Enterprise:
+- a per-task agreement score, visible on the Data Manager page for a project. This displays how well the annotations on a particular task match across annotators. 
+- an inter-annotator agreement matrix, visible on the Dashboard for a project. This displays how well the annotations from specific annotators agree with each other in general, or for specific tasks.
 
 You can also see how the annotations from a specific annotator compare to the prediction scores for a task, or how they compare to the ground truth labels for a task.  
 
@@ -23,7 +22,7 @@ You can also see how the annotations from a specific annotator compare to the pr
 
 A matching score assesses the similarity of annotations for a specific task. The matching score is used differently depending on which agreement metrics are being calculated. 
 
-Matching scores are used to determine whether or not two given annotations for a task, represented by `x` and `y` in this example, match. 
+Matching scores are used to determine whether two given annotations for a task, represented by `x` and `y` in this example, match. 
 - If both `x` and `y` are empty annotations for a task, the matching score is `1`.
 - If `x` and `y` share no similar points, the matching score is `0`. 
 - If there are different labeling types used in the annotations in `x` and/or `y`, partial matching scores for each data labeling type are averaged.
