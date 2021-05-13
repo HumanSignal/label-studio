@@ -11,6 +11,15 @@ meta_description: Machine Learning Unit Testing with Label Studio
 
 Label Studio tool lets you write no-code unit tests for your ML models.
 
+A long explanation why it is important besides running classical one-score ML evaluation scenario, which actually boils down to:
+
+
+#### Identify critical errors
+When reviewing a new machine learning model, we'll inspect metrics and plots which summarize model performance over a validation dataset. We're able to compare performance between multiple models and make relative judgements, but we're not immediately able to characterize specific model behaviors. For example, figuring out where the model is failing usually requires additional investigative work; one common practice here is to look through a list of the top most egregious model errors on the validation dataset and manually categorize these failure modes.
+
+#### Set business/product requirements
+Product manager can manually set qualified metrics needed to be achieved before model considered as successful. But it is complicated to specify them in terms of abstract accuracies/recalls numbers, but easy to draw them as specific examples instead.
+
 ## How it works
 <img src="/images/ML-unit-test-scheme.png" alt="Decorative graphic." class="gif-border" />
 
@@ -23,7 +32,7 @@ Label Studio tool lets you write no-code unit tests for your ML models.
 
 ## Create Ground truth annotations
 
-Upload test images, annotate them then export in raw JSON format.
+Upload test images, annotate them then export in raw JSON format `tasks.json`
 
 ## Get ML model predictions
 
