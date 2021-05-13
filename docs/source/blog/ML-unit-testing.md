@@ -97,8 +97,11 @@ Add the following step to your [Github Action workflow]()
     uses: heartexlabs/label-studio-ml-test@master
     with:
       test-data: test_tasks.json
+      metric: mAP
+      threshold: 0.9
 ```
 
+Feel free to select different _metric_ functions to compare annotations, as well as error sensivity defined by _threshold_ parameter. 
 
 #### Example
 
