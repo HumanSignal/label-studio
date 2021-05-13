@@ -47,3 +47,11 @@ If you see errors about missing packages in the terminal after starting your ML 
 
 ## ML backend is unable to access tasks
 Because the ML backend and Label Studio are different services, the assets (images, audio, etc.) that you label must be hosted and be accessible with URLs by the machine learning backend, otherwise it might fail to create predictions.
+
+## I get a validation error when adding the ML backend
+If you get a validation error when adding the ML backend URL to your Label Studio project, check the following:
+- Is the labeling interface set up with a valid configuration?
+- Is the machine learning backend running? Run the following health check:<br/> `curl -X GET http://localhost:9090/health`
+- Is your machine learning backend available from your Label Studio instance? It must be available to the instance running Label Studio.
+  
+If you're running Label Studio in Docker, you must run the machine learning backend inside the same Docker container, or otherwise make it available to the Docker container running Label Studio. You can use the `docker exec` command to run commands inside the Docker container, or use `docker exec -it <container_id> /bin/sh` to start a shell in the context of the container. See the [docker exec documentation](https://docs.docker.com/engine/reference/commandline/exec/). 
