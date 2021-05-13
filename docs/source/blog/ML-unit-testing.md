@@ -6,21 +6,37 @@ meta_title: Machine Learning Unit Testing with Label Studio
 meta_description: Machine Learning Unit Testing with Label Studio 
 ---
 
-## CI Pipeline
 
-1. Annotate images in Label Studio and export ground truth results into `tasks.json`
-2. Run object detection model on ground truth images
-3. Store prediction results in Label Studio JSON format in `test_tasks.json`
-4. Run unit tests with LS JSON by comparing each prediction with each ground truth annotation
-5. Repeat from 2 when the new model version comes
+## Overview
 
-First set initial set of CI parameters:
+Label Studio tool lets you write no-code unit tests for your ML models.
+
+## How it works
+<img src="/images/ML-unit-test-scheme.png" alt="Decorative graphic." class="gif-border" />
+
+
+1. Create Ground Truth annotations with Label Studio
+
+2. Get ML model predictions
+
+3. Trigger CI step to evaluate model predictions on Ground Truth annotations
+
+## Create Ground truth annotations
+
+Upload test images, annotate them then export in raw JSON format.
+
+## Get ML model predictions
+
+Assume you can get raw output tensors from your model predictions. The crucial step here is to convert these tensor into Label Studio predictions.
+You can do it manually by following [Label Studio guide]() or applying converter utility:
+
 ```python
-MODEL = 'COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml'
-MATCHING_SCORE_THRESHOLD = 0.9
+predictions = BboxConverter(bboxes).from_task(task)
 ```
 
-Define model reader:
+#### Example
+
+Get Detectron2 model
 
 ```python
 from detectron2 import model_zoo
@@ -37,7 +53,7 @@ def get_model():
     return DefaultPredictor(cfg)
 ```
 
-## Getting result from object detector
+Then run object detector inference to produce `test_tasks.json` input for the next step
 
 ```python
 import cv2
@@ -63,18 +79,19 @@ def run_model():
         json.dump(tasks, fout)
 ```
 
-## Run unit tests
+## Run ML unit tests with Github Action
 
-```python
-import pytest
-from label_studio_evalme import matching_score
+Add the following step to your [Github Action workflow]()
 
-@pytest.mark.parametrize('test_task', json.load(open('test_tasks.json')))
-def test_suite(test_task):
-    assert matching_score(test_task['annotation'], test_task['prediction']) > MATCHING_SCORE_THRESHOLD
+```yaml
+  - name: Run Label Studio ML Unit tests
+    uses: heartexlabs/label-studio-ml-test@master
+    with:
+      test-data: test_tasks.json
 ```
 
-## Create Github Actions CI Workflow
+
+#### Example
 
 ```yaml
 name: ml-unit-test-example
@@ -88,18 +105,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
+      # first your steps to get ML assets...
+
+      - name: Run Label Studio ML Unit tests
+        uses: heartexlabs/label-studio-ml-test@master
         with:
-          python-version: 3.7
+          test-data: test_tasks.json
+```
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+## Run ML unit tests manually
 
-      - name: Run model
-        run: python run_model.py
+If you don't want to rely on Github actions infrastructure, you can trigger Label Studio ML unit tests manually from any python environment.
 
-      - name: Run unit tests
-        run: pytest
+Install repo:
+
+```bash
+git clone https://github.com/heartexlabs/label-studio-ml-test
+cd label-studio-ml-test
+pip install -r requirements.txt
+```
+
+Then copy prepared `test_tasks.json` in into repo and run:
+
+```bash
+pytest --test-data test_tasks.json
 ```
