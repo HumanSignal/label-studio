@@ -252,6 +252,7 @@ For a given user ID and a given organization ID, POST a request to the `/api/org
 ```
 
 Enumerate a role with one of the following abbreviations:
+
 | Role | Full Role Name |
 | --- | --- |
 | NO | Not Activated |
