@@ -129,16 +129,14 @@ jobs:
 
 If you don't want to rely on Github actions infrastructure, you can trigger Label Studio ML unit tests manually from any python environment.
 
-Install repo:
+Install testing framework:
 
 ```bash
-git clone https://github.com/heartexlabs/label-studio-ml-test
-cd label-studio-ml-test
-pip install -r requirements.txt
+pip install label-studio-ml-test
 ```
 
 Then copy prepared `test_tasks.json` in into repo and run:
 
 ```bash
-pytest --test-data test_tasks.json
+label-studio-ml-test --test-data test_tasks.json
 ```
