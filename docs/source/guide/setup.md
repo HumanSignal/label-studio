@@ -86,6 +86,3 @@ label-studio my_new_project start --label-config config.xml
 
 ### Add a labeling config with the API
 You can configure your labeling configuration with the server API. See the [Backend API](api.html) documentation for more details.
-
-
-

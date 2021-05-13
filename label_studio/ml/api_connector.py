@@ -7,8 +7,12 @@ import urllib
 import attr
 
 from django.db.models import Q, F, Count
+from django.conf import settings
 from requests.adapters import HTTPAdapter
 from core.version import get_git_version
+from data_export.serializers import ExportDataSerializer
+from users.models import Token
+
 
 version = get_git_version()
 logger = logging.getLogger(__name__)
@@ -144,13 +148,11 @@ class MLApi(BaseHTTPAPI):
         return f'{project.id}.{time_id}'
 
     def train(self, project, use_ground_truth=False):
-        from tasks.serializers import TaskWithAnnotationsSerializer
         # get only tasks with annotations
         tasks = project.tasks.annotate(num_annotations=Count('annotations')).filter(num_annotations__gt=0)
 
-        # create serialized tasks with annotations: {"data": .., "annotations": [{...}]}
-        tasks_ser = TaskWithAnnotationsSerializer(
-            tasks, many=True, context={'export_mode': True, 'aggregator_type': 'no_aggregation'}).data
+        # create serialized tasks with annotations: {"data": {...}, "annotations": [{...}], "predictions": [{...}]}
+        tasks_ser = ExportDataSerializer(tasks, many=True).data
         logger.debug(f'{len(tasks_ser)} tasks with annotations are sent to ML backend for training.')
         request = {
             'annotations': tasks_ser,
@@ -185,7 +187,9 @@ class MLApi(BaseHTTPAPI):
     def setup(self, project):
         return self._request('setup', request={
             'project': self._create_project_uid(project),
-            'schema': project.label_config
+            'schema': project.label_config,
+            'hostname': settings.HOSTNAME if settings.HOSTNAME else ('http://localhost:' + settings.INTERNAL_PORT),
+            'access_token': project.created_by.auth_token.key
         })
 
     def duplicate_model(self, project_src, project_dst):

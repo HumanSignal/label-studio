@@ -8,13 +8,12 @@ from django.http import HttpResponse
 from django.core.files import File
 from drf_yasg import openapi as openapi
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import status
+from rest_framework import status, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.permissions import IsBusiness, get_object_with_permissions
+from core.permissions import all_permissions
 from core.utils.common import get_object_with_check_and_log, bool_from_request
-from projects.api import ProjectAPIBasePermission
 from projects.models import Project
 from tasks.models import Task
 from .models import DataExport
@@ -23,8 +22,11 @@ from .serializers import ExportDataSerializer
 logger = logging.getLogger(__name__)
 
 
-class ExportFormatsListAPI(APIView):
-    permission_classes = (IsBusiness, ProjectAPIBasePermission)
+class ExportFormatsListAPI(generics.RetrieveAPIView):
+    permission_required = all_permissions.projects_view
+
+    def get_queryset(self):
+        return Project.objects.filter(organization=self.request.user.active_organization)
 
     @swagger_auto_schema(tags=['Export'], 
                          operation_summary='Get export formats', 
@@ -39,13 +41,16 @@ class ExportFormatsListAPI(APIView):
                              )
                          )})
     def get(self, request, *args, **kwargs):
-        project = get_object_with_permissions(request, Project, kwargs['pk'], ProjectAPIBasePermission.perm)
+        project = self.get_object()
         formats = DataExport.get_export_formats(project)
         return Response(formats)
 
 
-class DownloadResultsAPI(APIView):
-    permission_classes = (IsBusiness, ProjectAPIBasePermission)
+class DownloadResultsAPI(generics.RetrieveAPIView):
+    permission_required = all_permissions.projects_change
+
+    def get_queryset(self):
+        return Project.objects.filter(organization=self.request.user.active_organization)
 
     @swagger_auto_schema(
         manual_parameters=[
@@ -65,7 +70,7 @@ class DownloadResultsAPI(APIView):
         )}
     )
     def get(self, request, *args, **kwargs):
-        project = get_object_with_permissions(request, Project, kwargs['pk'], ProjectAPIBasePermission.perm)
+        project = self.get_object()
         export_type = request.GET.get('exportType')
         is_labeled = not bool_from_request(request.GET, 'download_all_tasks', False)
 
@@ -82,17 +87,21 @@ class DownloadResultsAPI(APIView):
         return response
 
 
-class ProjectExportFiles(APIView):
+class ProjectExportFiles(generics.RetrieveAPIView):
     """
     get:
     Export files
 
     List of files exported from the Label Studio UI using the Export button on the Data Manager page.
     """
-    permission_classes = (IsBusiness, ProjectAPIBasePermission)
+    permission_required = all_permissions.projects_change
+
+    def get_queryset(self):
+        return Project.objects.filter(organization=self.request.user.active_organization)
 
     @swagger_auto_schema(tags=['Export'])
     def get(self, request, *args, **kwargs):
+        project = self.get_object()
         project = get_object_with_check_and_log(request, Project, pk=self.kwargs['pk'])
         self.check_object_permissions(self.request, project)
 
@@ -112,7 +121,7 @@ class ProjectExportFilesAuthCheck(APIView):
     """
     swagger_schema = None
     http_method_names = ['get']
-    permission_classes = (IsBusiness, ProjectAPIBasePermission)
+    permission_required = all_permissions.projects_change
 
     def get(self, request, *args, **kwargs):
         """ Get export files list
@@ -125,6 +134,5 @@ class ProjectExportFilesAuthCheck(APIView):
         except ValueError:
             return Response("Incorrect filename in export", status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
-        project = get_object_with_check_and_log(request, Project, pk=pk)
-        self.check_object_permissions(self.request, project)
+        generics.get_object_or_404(Project.objects.filter(organization=self.request.user.active_organization), pk=pk)
         return Response("auth ok", status=status.HTTP_200_OK)

@@ -86,33 +86,32 @@ If you run into any issues, see [Troubleshoot machine learning](ml_troubleshooti
    
 ## Train a model
 
-After you connect a model to Label Studio as a machine learning backend, you can start model training from the UI or using the API. 
-
-- On the Label Studio UI, click the **Start Training** button on the **Machine Learning** settings for your project.
-- cURL the API from the command line, specifying the ID of your project: 
+After you connect a model to Label Studio as a machine learning backend, you can start training the model: 
+- Manually using the Label Studio UI, click the **Start Training** button on the **Machine Learning** settings for your project.
+- Automatically after any annotations are submitted or updated, enable the option `Start model training after annotations submit or update` on the **Machine Learning** settings for your project.
+- Manually using the API, cURL the API from the command line, specifying the ID of your project: 
    ```
    curl -X POST http://localhost:8080/api/ml/{id}/train
    ```
-You must have some annotated tasks before you can start training. You can specify the number of annotations required to start and repeat training the ML backend on the machine learning page of the project settings. Label Studio sends a signal to the ML backend to train after that number of annotations have been submitted or updated. If you don't want to re-train automatically, set this number to `0` to disable this functionality.
 
-In development mode, training logs appear in the web browser console. 
-In production mode, you can find runtime logs in `my_backend/logs/uwsgi.log` and RQ training logs in `my_backend/logs/rq.log` on the server running the ML backend, which might be different from the Label Studio server. To see more detailed logs, start the ML backend server with the `--debug` option. 
+You must have at least one task annotated before you can start training. 
+
+In development mode, training logs appear in the web browser console. In production mode, you can find runtime logs in `my_backend/logs/uwsgi.log` and RQ training logs in `my_backend/logs/rq.log` on the server running the ML backend, which might be different from the Label Studio server. To see more detailed logs, start the ML backend server with the `--debug` option. 
 
 ## Get predictions from a model
 After you connect a model to Label Studio as a machine learning backend, you can see model predictions in the labeling interface if the model is pre-trained, or right after it finishes training. 
 
 If the model has not been trained yet, do the following to get predictions to appear:
 1. Start labeling data in Label Studio. 
-2. Return to the **machine learning** settings for your project and click **Start Training** the model.
-3. After training finishes, predictions appear in the labeling interface on the Data manager page refresh.
+2. Return to the **Machine Learning** settings for your project and click **Start Training** to start training the model.
+3. In the data manager for your project, select the tasks that you want to get predictions for and select **Retrieve predictions** using the drop-down actions menu. Label Studio sends the selected tasks to your ML backend. 
+4. After retrieving the predictions, they appear in the task preview and Label stream modes for the selected tasks.  
 
-When you scroll through tasks in the data manager for a project, the predictions for those tasks are **automatically retrieved** from the ML backend. Predictions also appear when labeling tasks in the Label stream workflow. To make changes to when and how predictions appear, see the machine learning page in the project settings. 
+You can also retrieve predictions automatically by loading tasks. To do this, enable `Retrieve predictions when loading a task automatically` on the **Machine Learning** settings for your project. When you scroll through tasks in the data manager for a project, the predictions for those tasks are automatically retrieved from the ML backend. Predictions also appear when labeling tasks in the Label stream workflow.  
 
-You can retrieve predictions for selected tasks on the data manager for a project using the drop-down actions menu. 
+> Note: For a large dataset, the HTTP request to retrieve predictions might be interrupted by a timeout. If you want to **get all predictions** for all tasks in a dataset, the recommended way is to make a [PATCH call to the tasks endpoint of the Label Studio API](https://api.labelstud.io/#operation/tasks_partial_update) with `"predictions": [...]` field on the ML backend side for each generated prediction.
 
-If you want to **get all predictions** for all tasks in a dataset, make a [PATCH call to the tasks endpoint of the Label Studio API](https://api.labelstud.io/#operation/tasks_partial_update) with `"predictions": [...]` field on the ML backend side for each generated prediction. Note that for a large dataset, the HTTP request to retrieve predictions might be interrupted by a timeout. 
-
-If you want to retrieve predictions manually for a list of tasks **using an ML backend only**, make a GET request to the `/predict` URL of your ML backend with a payload of the tasks that you want to see predictions for, formatted like the following example: 
+If you want to retrieve predictions manually for a list of tasks **using only an ML backend**, make a GET request to the `/predict` URL of your ML backend with a payload of the tasks that you want to see predictions for, formatted like the following example: 
 
 ```json
 {
@@ -127,6 +126,7 @@ If you want to retrieve predictions manually for a list of tasks **using an ML b
 If you want to delete all predictions from Label Studio, you can do it using the UI or the API:
 - For a specific project, select the tasks that you want to delete predictions for and select **Delete predictions** from the drop-down menu.
 - Using the API, run the following from the command line to delete the predictions for a specific project ID:
+
 ```
 curl -H 'Authorization: Token <user-token-from-account-page>' -X POST \ 
  "http://localhost:8080/api/dm/actions?id=delete_tasks_predictions&project=<id>"
@@ -170,10 +170,10 @@ If you run into any issues, see [Troubleshoot machine learning](ml_troubleshooti
 ## Active Learning
 The process of creating annotated training data for supervised machine learning models is often expensive and time-consuming. Active Learning is a branch of machine learning that seeks to **minimize the total amount of data required for labeling by strategically sampling observations** that provide new insight into the problem. In particular, Active Learning algorithms aim to select diverse and informative data for annotation, rather than random observations, from a pool of unlabeled data using **prediction scores**. For more theory read [our article on Towards data science](https://towardsdatascience.com/learn-faster-with-smarter-data-labeling-15d0272614c4).
 
-You can select a task ordering like `Predictions score` on Data manager and the sampling strategy will fit the active learning scenario. Label Studio will send a train signal to ML Backend automatically on the each `N` annotations submit/update. You can adjust `N` on machine learning page of the project settings. 
+You can select a task ordering like `Predictions score` on Data manager and the sampling strategy will fit the active learning scenario. Label Studio will send a train signal to ML Backend automatically on the each annotation submit/update. You can enable these train signals on the **machine learning** settings page for your project. 
 
 * If you need to retrieve and save predictions for all tasks, check recommendations from a [topic below](ml.html#Get-predictions-from-a-model).
-* If you want to delete all predictions when your model retrained, check [this topic](ml.html#Delete-predictions). 
+* If you want to delete all predictions after your model is retrained, check [this topic](ml.html#Delete-predictions). 
   
 <br>
 <img src="/images/ml-backend-active-learning.png" style="border:1px #eee solid">

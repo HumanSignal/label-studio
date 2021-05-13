@@ -61,7 +61,7 @@ You can add other, optional keys to the JSON file.
 | annotations | Optional. List of annotations exported from Label Studio. [Label Studio's annotation format](export.html#Raw-JSON-format-of-completed-tasks) allows you to import annotation results in order to use them in subsequent labeling tasks. |
 | predictions | Optional. List of model prediction results, where each result is saved using [Label Studio's prediction format](export.html#Raw-JSON-format-of-completed-tasks). Import predictions for automatic task pre-labeling and active learning. See [Import predicted labels into Label Studio](predictions.html) |
 
-#### Example JSON format
+### Example JSON format
 
 For an example text classification project, you can set up a label config like the following:
 ```html

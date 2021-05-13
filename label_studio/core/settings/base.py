@@ -35,6 +35,8 @@ if HOSTNAME:
             if FORCE_SCRIPT_NAME:
                 print("=> Django URL prefix is set to:", FORCE_SCRIPT_NAME)
 
+INTERNAL_PORT = '8080'
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '$(fefwefwef13;LFK{P!)@#*!)kdsjfWF2l+i5e3t(8a1n'
 
@@ -108,7 +110,7 @@ LOGGING = {
     },
     'root': {
         'handlers': ['console'],
-        'level': 'DEBUG',
+        'level': get_env('LOG_LEVEL', 'DEBUG'),
     }
 }
 
@@ -168,13 +170,13 @@ MIDDLEWARE = [
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.TokenAuthentication'
     ),
-
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+        'core.api_permissions.HasObjectPermission',
+        'rest_framework.permissions.IsAuthenticated',
+
     ],
     'EXCEPTION_HANDLER': 'core.utils.common.custom_exception_handler',
     'DEFAULT_RENDERER_CLASSES': (
@@ -359,6 +361,11 @@ USER_SERIALIZER = 'users.serializers.BaseUserSerializer'
 DATA_MANAGER_ANNOTATIONS_MAP = {}
 DATA_MANAGER_ACTIONS = {}
 USER_LOGIN_FORM = 'users.forms.LoginForm'
+PROJECT_MIXIN = 'core.mixins.DummyModelMixin'
+TASK_MIXIN = 'core.mixins.DummyModelMixin'
+ANNOTATION_MIXIN = 'core.mixins.DummyModelMixin'
+ORGANIZATION_MIXIN = 'core.mixins.DummyModelMixin'
+USER_MIXIN = 'users.mixins.UserMixin'
 
 # fix a problem with Windows mimetypes for JS and PNG
 import mimetypes

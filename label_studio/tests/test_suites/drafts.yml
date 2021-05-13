@@ -46,6 +46,21 @@
           __test_object: true
           regexp: '0.+minutes'
 
+  # Submit new annotation from draft
+  - /api/tasks/{task_pk}/annotations:
+      method: POST
+      content_type: application/json
+      data:
+        result: [{'value': {'choices': ['class_A']}, 'from_name': 'text_class', 'to_name': 'text', 'type': 'choices'}]
+        lead_time: 91.01
+        draft_id: '{draft_id}'
+      status_code: 201
+
+  - /api/drafts/{draft_id}/:
+      method: GET
+      status_code: 404
+
+
 - No annotation, draft exists:
 
   # Create project
@@ -228,3 +243,4 @@
         created_ago:
           __test_object: true
           regexp: '0.+minutes'
+

@@ -9,7 +9,7 @@ from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from core.permissions import BaseRulesPermission, IsBusiness, get_object_with_permissions
+from core.permissions import all_permissions
 from core.utils.common import get_object_with_check_and_log
 from projects.models import Project
 from ml.serializers import MLBackendSerializer
@@ -19,13 +19,9 @@ from core.utils.common import bool_from_request
 logger = logging.getLogger(__name__)
 
 
-class MLBackendAPIBasePermission(BaseRulesPermission):
-    perm = 'projects.change_project'
-
-
 class MLBackendListAPI(generics.ListCreateAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
-    permission_classes = (IsBusiness, MLBackendAPIBasePermission)
+    permission_required = all_permissions.projects_change
     serializer_class = MLBackendSerializer
     swagger_schema = None
 
@@ -47,7 +43,7 @@ class MLBackendDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     """RUD storage by pk specified in URL"""
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = MLBackendSerializer
-    permission_classes = (IsBusiness, MLBackendAPIBasePermission)
+    permission_required = all_permissions.projects_change
     queryset = MLBackend.objects.all()
     swagger_schema = None
 
@@ -66,7 +62,7 @@ class MLBackendTrainAPI(APIView):
 
     After you've activated an ML backend, call this API to start training with the already-labeled tasks.
     """
-    permission_classes = (IsBusiness, MLBackendAPIBasePermission)
+    permission_required = all_permissions.projects_change
 
     @swagger_auto_schema(
         request_body=openapi.Schema(
@@ -106,7 +102,7 @@ class MLBackendPredictAPI(APIView):
 
     Create predictions for all tasks in a project to build statistics and an active learning strategy.
     """
-    permission_classes = (IsBusiness, MLBackendAPIBasePermission)
+    permission_required = all_permissions.projects_change
 
     @swagger_auto_schema(
         responses={

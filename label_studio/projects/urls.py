@@ -11,14 +11,8 @@ app_name = 'projects'
 # reverse for projects:name
 _urlpatterns = [
     path('', views.project_list, name='project-index'),
-    path('<int:pk>/settings/', views.project_settings, name='project-settings'),
-
-    # Might be replaced with some sort of regexp /settings/*, but idk how to do that
-    path('<int:pk>/settings/labeling', views.project_settings, name='project-settings-labeling'),
-    path('<int:pk>/settings/instruction', views.project_settings, name='project-settings-instruction'),
-    path('<int:pk>/settings/ml', views.project_settings, name='project-settings-ml'),
-    path('<int:pk>/settings/storage', views.project_settings, name='project-settings-storage'),
-    path('<int:pk>/settings/danger-zone', views.project_settings, name='project-danger-zone'),
+    path('<int:pk>/settings/', views.project_settings, name='project-settings', kwargs={'sub_path': ''}),
+    path('<int:pk>/settings/<sub_path>', views.project_settings, name='project-settings-anything'),
 
     path('upload-example/', views.upload_example_using_config, name='project-upload-example-using-config'),
 ]
