@@ -152,7 +152,7 @@ def apply_filters(queryset, filters):
 
 class TaskQuerySet(models.QuerySet):
     def prepared(self, prepare_params=None):
-        """ Apply filters, ordering and selected items to queryset
+        """ Apply filters, ordering and selected items to queryset 
 
         :param prepare_params: prepare params with project, filters, orderings, etc
         :return: ordered and filtered queryset
