@@ -1,7 +1,7 @@
 INPUT_DIR=$1
 WILDCARD=${2}
 OUTPUT_FILE=${3:-"files.txt"}
-PORT=${3:-8081}
+PORT=${4:-8081}
 
 FIND_CMD="find ${INPUT_DIR} -type f"
 if [ -z "$WILDCARD" ]; then
