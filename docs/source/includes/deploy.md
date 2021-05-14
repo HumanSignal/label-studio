@@ -9,4 +9,7 @@ Allocate disk space according to the amount of data you plan to label. As a benc
 
 Use a minimum of **8GB RAM**, but 16GB RAM is recommended. for example, t3.large or t3.xlarge on Amazon AWS.
 
-For more on using Label Studio at scale and labeling performance, see [Start Label Studio](start.html). 
+For more on using Label Studio at scale and labeling performance, see [Start Label Studio](start.html).
+
+### Software requirements
+PostgreSQL version 11.5 or SQLite version 3.35 or higher.
