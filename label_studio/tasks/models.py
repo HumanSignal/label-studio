@@ -153,7 +153,7 @@ class Task(TaskMixin, models.Model):
             return storage_link.storage
 
         # or try global storage settings (only s3 for now)
-        elif get_env('USE_DEFAULT_STORAGE', default=False, is_bool=True):
+        elif get_env('USE_DEFAULT_S3_STORAGE', default=False, is_bool=True):
             # TODO: this is used to access global environment storage settings.
             # We may use more than one and non-default S3 storage (like GCS, Azure)
             from io_storages.s3.models import S3ImportStorage
@@ -343,6 +343,9 @@ class AnnotationDraft(models.Model):
     def created_ago(self):
         """ Humanize date """
         return timesince(self.created_at)
+
+    def has_permission(self, user):
+        return self.task.project.has_permission(user)
 
 
 class Prediction(models.Model):
