@@ -1,10 +1,12 @@
 ---
-title: Install Label Studio Enterprise on-premises using Docker
+title: ✴️ Install Label Studio Enterprise on-premises using Docker
 type: guide
 order: 201
 meta_title: Install and Upgrade Enterprise
 meta_description: Label Studio Documentation for installing and upgrading Label Studio Enterprise with Docker or on AWS to use for your machine learning and data science projects. 
 ---
+
+> Beta documentation: Label Studio Enterprise v2.0.0 is currently in Beta. As a result, this documentation might not reflect the current functionality of the product.
 
 You can install Label Studio Enterprise on-premises if you need to meet strong privacy regulations, legal requirements, or want to manage a custom installation on your own infrastructure using Docker or public cloud. To deploy Label Studio Enterprise on Amazon AWS in a Virtual Private Cloud (VPC), see [Install Label Studio Enterprise on AWS Private Cloud](install_enterprise_vpc.html). 
 
@@ -54,9 +56,8 @@ cd heartex
 To run Label Studio Enterprise in production, start it using Docker. This configuration allows you to link Label Studio with external databases and services.
 
 1. Create a file, `heartex/env.list` with the required environmental variables:
-
 ```
-# The main server URL (must be full path like protocol://host:port)
+# The main server URL (must be a full path like protocol://host:port)
 HEARTEX_HOSTNAME=http://localhost:8080
 
 # Auxiliary hostname URL: some platform functionality requires URIs generation with specified hostname, 
@@ -78,13 +79,13 @@ POSTGRE_HOST=db
 # PostgreSQL database port
 POSTGRE_PORT=5432
 
-# PostgreSQL SSL mode (https://www.postgresql.org/docs/9.1/libpq-ssl.html)
+# PostgreSQL SSL mode
 POSTGRE_SSL_MODE=require
 
 # Specify Postgre SSL certificate
 POSTGRE_SSLROOTCERT=postgre-ca-bundle.pem
 
-# Redis location e.g. rediss://[:password]@localhost:6379/1
+# Redis location e.g. redis://[:password]@localhost:6379/1
 REDIS_LOCATION=localhost:6379
 
 # Redis database
@@ -106,38 +107,7 @@ REDIS_SSL_CERTS_REQS=required
 REDIS_SSL_CA_CERTS=redis-ca-bundle.pe
 ```
 
-### LDAP authentication setup
-
-You can set up LDAP auth and assign LDAP users to one platform's organization via docker environment variables. Here is an working example: 
-
-```
-AUTH_LDAP_ENABLED=1
-AUTH_LDAP_SERVER_URI=ldap://www.zflexldap.com
-AUTH_LDAP_BIND_DN=cn=ro_admin,ou=sysadmins,dc=zflexsoftware,dc=com
-AUTH_LDAP_BIND_PASSWORD=zflexpass
-AUTH_LDAP_USER_DN_TEMPLATE=uid=%(user)s,ou=users,ou=guests,dc=zflexsoftware,dc=com
-
-# Group parameters
-AUTH_LDAP_GROUP_SEARCH_BASE_DN=ou=users,ou=guests,dc=zflexsoftware,dc=com
-AUTH_LDAP_GROUP_SEARCH_FILTER_STR=(objectClass=groupOfNames)
-AUTH_LDAP_GROUP_TYPE=ou
-
-# Populate the user from the LDAP directory, values below are set by default 
-AUTH_LDAP_USER_ATTR_MAP_FIRST_NAME=givenName
-AUTH_LDAP_USER_ATTR_MAP_LAST_NAME=sn
-AUTH_LDAP_USER_ATTR_MAP_EMAIL=mail
-
-# Specifity organization to assign on the platform 
-AUTH_LDAP_ORGANIZATION_OWNER_EMAIL=heartex@heartex.net
-
-# Advanced options, read more about options and values here: 
-# https://www.python-ldap.org/en/latest/reference/ldap.html#options
-AUTH_LDAP_CONNECTION_OPTIONS=OPT_X_TLS_CACERTFILE=/certificates/ca.crt;OPT_X_TLS_REQUIRE_CERT=OPT_X_TLS_DEMAND
-```
-
-For test login use `guest1` with password `guest1password`.  
-
-4.2. When all variables are set, run docker exposing 8080 port:
+2. After you set all the environment variables, run Docker exposing port 8080:
 
 ```bash
 docker run -d \
@@ -151,11 +121,13 @@ docker run -d \
 heartexlabs/heartex:latest
 ```
 
-> Note: If you expose 80 port, you need to start docker with `sudo`.
+> Note: If you expose port 80, you must start Docker with `sudo`.
 
 ### Start using Docker Compose
 
-To run Label Studio Enterprise in development mode, start Label Studio using Docker Compose and local PostgreSQL and Redis servers to store data and configurations.  
+To run Label Studio Enterprise in development mode, start Label Studio using Docker Compose and local PostgreSQL and Redis servers to store data and configurations. 
+
+> Follow these instructions only if you plan to use Label Studio Enterprise in development mode. Otherwise, see [Start Using Docker](#Start-using-Docker) on this page.
 
 #### Prerequisites
 Make sure [Docker Compose](https://docs.docker.com/compose/install/) is installed on your system.
@@ -213,12 +185,11 @@ If you have existing services running on ports 5432, 6379, or 8080, update the `
 ```bash
 docker-compose -f config.yml up
 ```
-3. Open [http://localhost:8080](http://localhost:8080) in a browser and start using Label Studio Enterprise. 
+3. Open [http://localhost:8080](http://localhost:8080) in a browser and start using Label Studio Enterprise in development mode. 
 
 #### Data persistence
 
 When the Label Studio Enterprise server runs with docker-compose, all essential data is stored inside the container. The following local file storage directories are linked to the container volumes to make sure data persists:
-
 - `./postgres-data` contains PostgreSQL database
 - `./redis-data` contains Redis dumps
 
@@ -226,16 +197,74 @@ The integrity of these folders ensures that your data is not lost even if you co
 
 ## Update Label Studio Enterprise
 
-1. Back up your existing container
+1. [Back up your existing container](#Back-up-Label-Studio-Enterprise).
 2. Pull the latest image
 3. Update the container
 
 ### Get the Docker image version
 
-## Back up Label Studio Enterprise
+To check the version of the Label Studio Enterprise Docker image, run [`docker ps`](https://docs.docker.com/engine/reference/commandline/ps/) on the host.
+
+Run the following command as root or using `sudo` and review the output:
+```bash
+$ docker ps
+CONTAINER ID        IMAGE                        COMMAND                  CREATED             STATUS              PORTS                    NAMES
+b1dd57a685fb        heartexlabs/heartex:latest   "./deploy/start.sh"      36 minutes ago      Up 36 minutes       0.0.0.0:8080->8000/tcp   heartex
+```
+
+The image column displays the Docker image and version number. The image `heartexlabs/heartex:latest` is using the version `latest`.
+
+### Back up Label Studio Enterprise
+
+Back up your Label Studio Enterprise Docker container before you upgrade your version and for disaster recovery purposes. 
+
+1. From the command line, run Docker stop to stop the currently running container with Label Studio Enterprise: 
+```bash
+docker stop heartex
+```
+2. Rename the existing container to avoid name conflicts when updating to the latest version:
+```bash
+docker rename heartex heartex-backup
+```
+
+You can then treat the `heartex-backup` image as a backup.
 
 ### Pull a new image
 
+After backing up your existing container, pull the latest image of Label Studio Enterprise from the Docker registry.
+
+```bash
+docker pull heartexlabs/heartex:latest
+```
+
 ### Update the container
 
+After you pull the latest image, update your Label Studio Enterprise container:
+
+```bash
+docker run -d \
+-p $EXPOSE_PORT:8080 \
+-v `pwd`/license.txt:/heartex/web/htx/settings/license_docker.txt \
+-v `pwd`/logs:/var/log/heartex \
+-v `pwd`/postgre-ca-bundle.pem:/etc/ssl/certs/postgre-ca-bundle.pem \
+-v `pwd`/redis-ca-bundle.pem:/etc/ssl/certs/redis-ca-bundle.pem \
+--name heartex \
+heartexlabs/heartex:latest
+```
+
 ### Restore from a backed up container
+
+If you decide to roll back to the previously backed up version of Label Studio Enterprise, stop and remove the new container and replace it with the backup.
+
+1. From the command line, stop the latest running container and remove it:
+```bash
+docker stop heartex && docker rm heartex
+```
+2. Rename the backup container:
+```bash
+docker rename heartex-backup heartex
+```
+3. Start the backup container: 
+```bash
+docker start heartex
+```
