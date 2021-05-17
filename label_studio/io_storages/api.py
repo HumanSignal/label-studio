@@ -26,8 +26,6 @@ class StorageAPIBasePermission(BaseRulesPermission):
     perm = 'projects.change_project'
 
 
-@method_decorator(name='get', decorator=swagger_auto_schema(tags=['Storage']))
-@method_decorator(name='post', decorator=swagger_auto_schema(tags=['Storage']))
 class ImportStorageListAPI(generics.ListCreateAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = all_permissions.projects_change
@@ -40,32 +38,12 @@ class ImportStorageListAPI(generics.ListCreateAPIView):
         ImportStorageClass = self.serializer_class.Meta.model
         return ImportStorageClass.objects.filter(project_id=project.id)
 
-    # @swagger_auto_schema(tags=['Storage'])
-    # def get(self, request, *args, **kwargs):
-    #     return super(ImportStorageListAPI, self).get(request, *args, **kwargs)
-    #
-    # @swagger_auto_schema(tags=['Storage'])
-    # def post(self, request, *args, **kwargs):
-    #     return super(ImportStorageListAPI, self).post(request, *args, **kwargs)
-
 
 class ImportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     """RUD storage by pk specified in URL"""
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ImportStorageSerializer
     permission_required = all_permissions.projects_change
-
-    @swagger_auto_schema(tags=['Storage'])
-    def get(self, request, *args, **kwargs):
-        return super(ImportStorageDetailAPI, self).get(request, *args, **kwargs)
-
-    @swagger_auto_schema(tags=['Storage'])
-    def patch(self, request, *args, **kwargs):
-        return super(ImportStorageDetailAPI, self).patch(request, *args, **kwargs)
-
-    @swagger_auto_schema(tags=['Storage'])
-    def delete(self, request, *args, **kwargs):
-        return super(ImportStorageDetailAPI, self).delete(request, *args, **kwargs)
 
     @swagger_auto_schema(auto_schema=None)
     def put(self, request, *args, **kwargs):
@@ -84,14 +62,6 @@ class ExportStorageListAPI(generics.ListCreateAPIView):
         ImportStorageClass = self.serializer_class.Meta.model
         return ImportStorageClass.objects.filter(project_id=project.id)
 
-    @swagger_auto_schema(tags=['Storage'])
-    def get(self, request, *args, **kwargs):
-        return super(ExportStorageListAPI, self).get(request, *args, **kwargs)
-
-    @swagger_auto_schema(tags=['Storage'])
-    def post(self, request, *args, **kwargs):
-        return super(ExportStorageListAPI, self).post(request, *args, **kwargs)
-
 
 class ExportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     """RUD storage by pk specified in URL"""
@@ -99,27 +69,12 @@ class ExportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ExportStorageSerializer
     permission_required = all_permissions.projects_change
 
-    @swagger_auto_schema(tags=['Storage'])
-    def get(self, request, *args, **kwargs):
-        return super(ExportStorageDetailAPI, self).get(request, *args, **kwargs)
-
-    @swagger_auto_schema(tags=['Storage'])
-    def patch(self, request, *args, **kwargs):
-        return super(ExportStorageDetailAPI, self).patch(request, *args, **kwargs)
-
-    @swagger_auto_schema(tags=['Storage'])
-    def delete(self, request, *args, **kwargs):
-        return super(ExportStorageDetailAPI, self).delete(request, *args, **kwargs)
-
     @swagger_auto_schema(auto_schema=None)
     def put(self, request, *args, **kwargs):
         return super(ExportStorageDetailAPI, self).put(request, *args, **kwargs)
 
 
-@method_decorator(name='get', decorator=swagger_auto_schema(
-    tags=['Storage'], operation_summary='Sync storage',
-    operation_description='Sync tasks from storage'))
-class ImportStorageSyncAPI(generics.RetrieveAPIView):
+class ImportStorageSyncAPI(generics.GenericAPIView):
 
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = all_permissions.projects_change
@@ -129,7 +84,6 @@ class ImportStorageSyncAPI(generics.RetrieveAPIView):
         ImportStorageClass = self.serializer_class.Meta.model
         return ImportStorageClass.objects.all()
 
-    @swagger_auto_schema(tags=['Storage'])
     def post(self, request, *args, **kwargs):
         storage = self.get_object()
         # check connectivity & access, raise an exception if not satisfied
@@ -149,10 +103,6 @@ class StorageValidateAPI(generics.CreateAPIView):
         storage = self.serializer_class.Meta.model(**serializer.validated_data)
         storage.validate_connection()
         return Response()
-
-    @swagger_auto_schema(tags=['Storage'])
-    def post(self, request, *args, **kwargs):
-        return super(StorageValidateAPI, self).post(request, *args, **kwargs)
 
 
 class StorageFormLayoutAPI(generics.RetrieveAPIView):
