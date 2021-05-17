@@ -35,8 +35,8 @@ Use the following labeling configuration:
 
 After you set up an example project, import this task into Label Studio. 
 
+<br/>
 {% details <b>Click to expand the example image JSON</b> %}
-
 Save this example JSON as a file to import it into Label Studio, for example, `example_prediction_task.json`.
 
 ```json
