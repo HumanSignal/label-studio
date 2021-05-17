@@ -65,9 +65,16 @@ class Task(TaskMixin, models.Model):
         return os.path.basename(self.file_upload.file.name)
 
     @classmethod
-    def get_locked_by(cls, user, queryset):
-        """Retrieve the task locked by specified user. Returns None if the specified user didn't lock anything."""
-        lock = TaskLock.objects.filter(user=user, expire_at__gt=now(), task__in=queryset).first()
+    def get_locked_by(cls, user, project=None, tasks=None):
+        """ Retrieve the task locked by specified user. Returns None if the specified user didn't lock anything.
+        """
+        if project:
+            lock = TaskLock.objects.filter(user=user, expire_at__gt=now(), task__project=project).first()
+        elif tasks:
+            return tasks.filter(locks__user=user, locks__expire_at__gt=now()).first()
+        else:
+            raise Exception('Neither project or tasks passed to get_locked_by')
+
         if lock:
             return lock.task
 
