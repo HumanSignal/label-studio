@@ -91,6 +91,11 @@ class RedisImportStorage(ImportStorage, RedisStorageMixin):
     def scan_and_create_links(self):
         return self._scan_and_create_links(RedisImportStorageLink)
 
+    def validate_connection(self, client=None):
+        if client is None:
+            client = self.get_client()
+        client.ping()
+
 
 class RedisExportStorage(ExportStorage, RedisStorageMixin):
     db = models.PositiveSmallIntegerField(
