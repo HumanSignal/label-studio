@@ -18,7 +18,10 @@ from users.models import User
 from organizations.models import Organization
 from types import SimpleNamespace
 
-from .utils import create_business, signin, gcs_client_mock, ml_backend_mock, register_ml_backend_mock, azure_client_mock
+from .utils import (
+    create_business, signin, gcs_client_mock, ml_backend_mock, register_ml_backend_mock, azure_client_mock,
+    redis_client_mock
+)
 
 
 boto3.set_stream_logger('botocore.credentials', logging.DEBUG)
@@ -92,6 +95,12 @@ def gcs_client():
 @pytest.fixture(autouse=True)
 def azure_client():
     with azure_client_mock():
+        yield
+
+
+@pytest.fixture(autouse=True)
+def redis_client():
+    with redis_client_mock():
         yield
 
 

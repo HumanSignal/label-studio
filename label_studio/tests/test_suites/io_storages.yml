@@ -498,3 +498,41 @@
         response:
           - data:
               image_url: http://ggg.com/image.jpg
+
+
+- test_connection_to_import_redis_storage:
+  # Create project
+  - /api/projects:
+      method: POST
+      data:
+        title: test_redis_storage
+        label_config: <View><Image name="image" value="$image_url"/><Choices name="label" toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+        is_published: true
+      status_code: 201
+      response:
+        id: '{project_pk}'
+
+  # Validate storage
+  - /api/storages/redis/validate:
+      method: POST
+      data:
+        project: '{project_pk}'
+        title: Testing Redis storage
+      status_code: 200
+
+  # Create storage
+  - /api/storages/redis:
+      method: POST
+      data:
+        project: '{project_pk}'
+        title: Testing Redis storage
+      status_code: 201
+      response:
+        id: '{storage_pk}'
+
+  # Sync storage
+  - /api/storages/redis/{storage_pk}/sync:
+      method: POST
+      status_code: 200
+      response:
+        last_sync_count: 0
