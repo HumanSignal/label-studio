@@ -223,7 +223,7 @@ Data that you import is project-specific.
 
 ### Import data using the API
 
-Import your data using the Label Studio server API. See the [API documentation](api.html).
+Import your data using the Label Studio API. See the [API documentation for importing tasks](/api#operation/projects_import_create).
 
 ### Import data from the command line
 
