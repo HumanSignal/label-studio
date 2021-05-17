@@ -464,9 +464,8 @@ def test_next_task_with_active_learning(mocker,
         assert rdata['detail'].startswith('There are no tasks remaining to be annotated')
 
 
-@pytest.mark.parametrize('duplicated_project', (True, False))
 @pytest.mark.django_db
-def test_active_learning_with_uploaded_predictions(business_client, duplicated_project):
+def test_active_learning_with_uploaded_predictions(business_client):
     config = dict(
         title='Test',
         is_published=True,
@@ -481,11 +480,6 @@ def test_active_learning_with_uploaded_predictions(business_client, duplicated_p
             </View>'''
     )
     project = make_project(config, business_client.user, use_ml_backend=False)
-    if duplicated_project:
-        r = business_client.get(f'/api/projects/{project.id}/duplicate', {'duplicate_tasks': 0, 'title': 'duplicated'})
-        project = Project.objects.get(id=json.loads(r.content)['id'])
-        project.is_published = True
-        project.save()
     result = [{
         'from_name': 'text_class',
         'to_name': 'text',
