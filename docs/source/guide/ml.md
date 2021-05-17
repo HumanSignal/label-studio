@@ -71,9 +71,15 @@ Follow these steps to set up an example text classifier ML backend with Label St
    label-studio-ml start my_ml_backend
    ```
    
-4. Start Label Studio. Create a project and import text data. 
-   
-5. In the project settings (or at the project creation step), set up the labeling interface to use the **Text Classification** template. 
+4. Start Label Studio. Run the following:
+```bash
+label-studio start 
+```
+You can also use the [`--ml-backends` parameter](start.html) to specify the ML backend when you start Label Studio. For example: 
+```bash
+label-studio start my-text-project --ml-backends http://localhost:9090
+```
+5. Create a project and import text data. Set up the labeling interface to use the **Text Classification** template. 
 
 6. In the **Machine Learning** section of the project settings page, add the link `http://localhost:9090` to your machine learning model backend. 
 
