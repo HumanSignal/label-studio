@@ -3,7 +3,7 @@ title: Import pre-annotated data into Label Studio
 type: guide
 order: 301
 meta_title: Import Pre-annotations
-meta_description: Label Studio Documentation for importing predicted labels, pre-annotations, or pre-labels into Label Studio for your data labeling, machine learning, or data science projects. 
+meta_description: Label Studio Documentation for importing predicted labels, pre-annotations, or pre-labels into Label Studio for your data labeling, machine learning, or data science projects.
 ---
 
 If you have predictions generated for your dataset from a model, either as pre-annotated tasks or pre-labeled tasks, you can import the predictions with your dataset into Label Studio for review and correction. Label Studio automatically displays the pre-annotations that you import on the Labeling page for each task. 
@@ -41,7 +41,7 @@ After you set up an example project, create example tasks that match the followi
 {% details <b>Click to expand the example image JSON</b> %}
 Save this example JSON as a file to import it into Label Studio, for example, `example_prediction_task.json`.
 
-```json
+{% codeblock lang:json %}
 [{
   "data": {
     "image": "http://localhost:8080/static/samples/sample.jpg" 
@@ -86,7 +86,7 @@ Save this example JSON as a file to import it into Label Studio, for example, `e
     "score": 0.95
   }]
 }]
-```
+{% endcodeblock %}
 
 In this example there are 3 results inside 1 prediction, or pre-annotation: 
 - `result1` - the first bounding box
@@ -94,7 +94,8 @@ In this example there are 3 results inside 1 prediction, or pre-annotation:
 - `result3` - choice selection
 The prediction score applies to the entire prediction.
 
-{% enddetails %} 
+{% enddetails %}
+<br/>
 
 Import pre-annotated tasks into Label Studio [using the UI](tasks.html#Import-data-from-the-Label-Studio-UI) or [using the API](/api#operation/projects_import_create). 
 
@@ -133,7 +134,7 @@ This example JSON file contains two tasks, each with two sets of pre-annotations
 {% details <b>Click to expand the example NER JSON</b> %}
 Save this example JSON as a file, for example: `example_preannotated_ner_tasks.json`.
 
-```json
+{% codeblock lang:json %}
 [
   {
     "data": {
@@ -439,9 +440,7 @@ Save this example JSON as a file, for example: `example_preannotated_ner_tasks.j
     ]
   }
 ]
-
-```
-
+{% endcodeblock %}
 {% enddetails %}
 
 Import pre-annotated tasks into Label Studio [using the UI](tasks.html#Import-data-from-the-Label-Studio-UI) or [using the API](/api#operation/projects_import_create).
