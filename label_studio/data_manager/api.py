@@ -208,7 +208,7 @@ class TaskAPI(APIView):
     permission_required = all_permissions.projects_view
 
     def get_serializer_class(self):
-        return TaskSerializer
+        return DataManagerTaskSerializer
 
     @swagger_auto_schema(tags=["Data Manager"])
     def get(self, request, pk):
