@@ -21,7 +21,7 @@
 	"workspaceFolder": "/workspace",
 	// Set *default* container specific settings.json values on container create.
 	"settings": {
-		"terminal.integrated.shell.linux": "bash",
+		"terminal.integrated.defaultProfile.linux": "bash",
 		"files.eol": "\n",
 		"editor.formatOnSave": true,
 	},
