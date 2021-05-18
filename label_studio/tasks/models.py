@@ -12,7 +12,7 @@ from django.db import models, connection
 from django.db.models import Q, F, When, Count, Case, Subquery, OuterRef, Value
 from django.db.models.functions import Coalesce
 from django.db.models.signals import post_delete, pre_save, post_save, pre_delete
-from django.db.utils import ProgrammingError, OperationalError
+from django.db.utils import ProgrammingError, OperationalError, DatabaseError
 from django.utils.translation import gettext_lazy as _
 from django.db.models import JSONField
 from django.urls import reverse
@@ -422,9 +422,17 @@ def remove_data_columns(sender, instance, **kwargs):
     instance.decrease_project_summary_counters()
 
 
+def _task_data_is_not_updated(update_fields):
+    if update_fields and list(update_fields) == ['is_labeled']:
+        return True
+
+
 @receiver(pre_save, sender=Task)
-def delete_project_summary_data_columns_before_updating_task(sender, instance, **kwargs):
+def delete_project_summary_data_columns_before_updating_task(sender, instance, update_fields, **kwargs):
     """Before updating task fields - ensure previous info removed from project.summary"""
+    if _task_data_is_not_updated(update_fields):
+        # we don't need to update counters when other than task.data fields are updated
+        return
     try:
         old_task = sender.objects.get(id=instance.id)
     except Task.DoesNotExist:
@@ -436,6 +444,9 @@ def delete_project_summary_data_columns_before_updating_task(sender, instance, *
 @receiver(post_save, sender=Task)
 def update_project_summary_data_columns(sender, instance, created, update_fields, **kwargs):
     """Update task counters in project summary in case when new task has been created"""
+    if _task_data_is_not_updated(update_fields):
+        # we don't need to update counters when other than task.data fields are updated
+        return
     instance.increase_project_summary_counters()
 
 
@@ -470,12 +481,22 @@ def remove_project_summary_annotations(sender, instance, **kwargs):
 # =========== END OF PROJECT SUMMARY UPDATES ===========
 
 
+def _task_exists_in_db(task):
+    try:
+        Task.objects.get(id=task.id)
+    except Task.DoesNotExist:
+        return False
+    return True
+
+
 @receiver(post_delete, sender=Annotation)
 def update_is_labeled_after_removing_annotation(sender, instance, **kwargs):
     # Update task.is_labeled state
-    logger.debug(f'Update task stats for task={instance.task}')
-    instance.task.update_is_labeled()
-    instance.task.save()
+    task = instance.task
+    if _task_exists_in_db(task): # To prevent django.db.utils.DatabaseError: Save with update_fields did not affect any rows.
+        logger.debug(f'Update task stats for task={task}')
+        instance.task.update_is_labeled()
+        instance.task.save(update_fields=['is_labeled'])
 
 
 @receiver(post_save, sender=Annotation)

@@ -529,7 +529,6 @@ class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
 
         # check new config includes meaningful changes
         has_changed = config_essential_data_has_changed(label_config, project.label_config)
-
         project.validate_config(label_config)
         return Response({'config_essential_data_has_changed': has_changed}, status=status.HTTP_200_OK)
 

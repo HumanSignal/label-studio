@@ -664,6 +664,8 @@ class ProjectSummary(models.Model):
             self.common_data_columns = list(sorted(common_data_columns))
         else:
             self.common_data_columns = list(sorted(set(self.common_data_columns) & common_data_columns))
+        logger.debug(f'summary.all_data_columns = {self.all_data_columns}')
+        logger.debug(f'summary.common_data_columns = {self.common_data_columns}')
         self.save()
 
     def remove_data_columns(self, tasks):
@@ -686,6 +688,8 @@ class ProjectSummary(models.Model):
                 if key in common_data_columns:
                     common_data_columns.remove(key)
             self.common_data_columns = common_data_columns
+        logger.debug(f'summary.all_data_columns = {self.all_data_columns}')
+        logger.debug(f'summary.common_data_columns = {self.common_data_columns}')
         self.save()
 
     def _get_annotation_key(self, result):
@@ -708,7 +712,7 @@ class ProjectSummary(models.Model):
                 labels.extend(label)
             else:
                 labels.append(label)
-        return labels
+        return [str(l) for l in labels]
 
     def update_created_annotations_and_labels(self, annotations):
         created_annotations = dict(self.created_annotations)
