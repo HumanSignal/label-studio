@@ -470,8 +470,7 @@ def update_project_summary_annotations_and_is_labeled(sender, instance, created,
         # If new annotation created, update task.is_labeled state
         logger.debug(f'Update task stats for task={instance.task}')
         instance.task.update_is_labeled()
-        # instance.task.save(update_fields=['is_labeled'])
-        instance.task.save()
+        instance.task.save(update_fields=['is_labeled'])
 
 
 @receiver(pre_delete, sender=Annotation)
