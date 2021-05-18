@@ -731,6 +731,8 @@ class ProjectSummary(models.Model):
                 for label in self._get_labels(result):
                     labels[from_name][label] = labels[from_name].get(label, 0) + 1
 
+        logger.debug(f'summary.created_annotations = {created_annotations}')
+        logger.debug(f'summary.created_labels = {labels}')
         self.created_annotations = created_annotations
         self.created_labels = labels
         self.save()
@@ -754,14 +756,15 @@ class ProjectSummary(models.Model):
                 if from_name not in labels:
                     continue
                 for label in self._get_labels(result):
+                    label = str(label)
                     if label in labels[from_name]:
                         labels[from_name][label] -= 1
                         if labels[from_name][label] == 0:
                             labels[from_name].pop(label)
                 if not labels[from_name]:
                     labels.pop(from_name)
-
+        logger.debug(f'summary.created_annotations = {created_annotations}')
+        logger.debug(f'summary.created_labels = {labels}')
         self.created_annotations = created_annotations
         self.created_labels = labels
         self.save()
-
