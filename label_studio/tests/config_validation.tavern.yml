@@ -5,8 +5,15 @@ marks:
 - usefixtures:
   - django_live_url
 stages:
-- id: signup
-  type: ref
+- name: Sign up
+  request:
+    url: "{django_live_url}/user/signup"
+    data:
+      email: test_suites_user@heartex.com
+      password: 12345678
+    method: POST
+  response:
+    status_code: 302
 - name: stage
   request:
     method: POST
