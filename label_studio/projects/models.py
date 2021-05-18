@@ -3,7 +3,6 @@
 import json
 import logging
 
-from django.apps import apps
 from django.db.models import Q, Avg, Count, Sum, Value, BooleanField, Case, When
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
@@ -15,7 +14,7 @@ from annoying.fields import AutoOneToOneField
 from rest_framework.exceptions import ValidationError
 
 from tasks.models import Task, Prediction, Annotation, Q_task_finished_annotations, Q_finished_annotations
-from core.utils.common import create_hash, pretty_date, sample_query, get_attr_or_item
+from core.utils.common import create_hash, pretty_date, sample_query, get_attr_or_item, load_func
 from core.label_config import (
     parse_config, validate_label_config, extract_data_types, get_all_object_tag_names, config_line_stipped,
     get_sample_task, get_all_labels, get_all_control_tag_tuples, get_annotation_tuple
@@ -24,9 +23,42 @@ from core.label_config import (
 logger = logging.getLogger(__name__)
 
 
-class Project(models.Model):
+class ProjectManager(models.Manager):
+    def for_user(self, user):
+        return self.filter(organization=user.active_organization)
+
+    def with_counts(self):
+        return self.annotate(
+            task_number=Count('tasks', distinct=True),
+            total_predictions_number=Count('tasks__predictions', distinct=True),
+            total_annotations_number=Count(
+                'tasks__annotations__id', distinct=True,
+                filter=Q(tasks__annotations__was_cancelled=False)
+            ),
+            useful_annotation_number=Count(
+                'tasks__annotations__id', distinct=True,
+                filter=Q(tasks__annotations__was_cancelled=False) &
+                    Q(tasks__annotations__ground_truth=False) &
+                    Q(tasks__annotations__result__isnull=False)
+            ),
+            ground_truth_number=Count(
+                'tasks__annotations__id', distinct=True,
+                filter=Q(tasks__annotations__ground_truth=True)
+            ),
+            skipped_annotations_number=Count(
+                'tasks__annotations__id', distinct=True,
+                filter=Q(tasks__annotations__was_cancelled=True)
+            ),
+        )
+
+
+ProjectMixin = load_func(settings.PROJECT_MIXIN)
+
+
+class Project(ProjectMixin, models.Model):
     """
     """
+    objects = ProjectManager()
     __original_label_config = None
     
     title = models.CharField(_('title'), null=True, blank=True, default='', max_length=settings.PROJECT_TITLE_MAX_LEN,
@@ -45,17 +77,10 @@ class Project(models.Model):
 
     show_annotation_history = models.BooleanField(_('show annotation history'), default=False, help_text='Show annotation history to annotator')
     show_collab_predictions = models.BooleanField(_('show predictions to annotator'), default=True, help_text='If set, the annotator can view model predictions')
+    evaluate_predictions_automatically = models.BooleanField(_('evaluate predictions automatically'), default=False, help_text='Retrieve and display predictions when loading a task')
     token = models.CharField(_('token'), max_length=256, default=create_hash, null=True, blank=True)
     result_count = models.IntegerField(_('result count'), default=0, help_text='Total results inside of annotations counter')
     color = models.CharField(_('color'), max_length=16, default='#FFFFFF', null=True, blank=True)
-    template_used = models.ForeignKey(
-        'projects.ProjectTemplate',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='projects',
-        verbose_name=_('Project templates')
-    )
     
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -90,7 +115,7 @@ class Project(models.Model):
     UNCERTAINTY = 'Uncertainty sampling'
 
     SAMPLING_CHOICES = (
-        (SEQUENCE, 'Tasks are ordered by their IDs'),
+        (SEQUENCE, 'Tasks are ordered by Data manager ordering'),
         (UNIFORM, 'Tasks are chosen randomly'),
         (UNCERTAINTY, 'Tasks are chosen according to model uncertainty scores (active learning mode)')
     )
@@ -540,91 +565,6 @@ class Project(models.Model):
 
     class Meta:
         db_table = 'project'
-
-
-class ProjectTemplate(models.Model):
-    """ Project Template is used to create new projects from templates
-    """
-    title               = models.CharField(_('title'), max_length=1000, null=False)
-    description         = models.TextField(_('description'), null=True, default='')
-    cover_image_url     = models.CharField(_('cover image'), max_length=1000, null=True, blank=True, default='')
-    input_example       = models.TextField(_('input example'), blank=True)
-    input_example_json  = JSONField(_('input example json'), default=list)
-    output_example      = models.TextField(_('output example'), blank=True)
-    output_example_json = JSONField(_('output example json'), default=list)
-    label_config        = models.TextField(_('label config'), blank=False)
-    expert_instruction  = models.TextField(_('annotator instructions'), blank=False, null=False, default='')
-    
-    tags = JSONField(_('tags'), default=list)
-    task_data = JSONField(_('task data'), default=list)
-    
-    is_published = models.BooleanField(_('published'), default=True)
-
-    #  serialized as dict (could be model parameters and other)
-    project_settings = JSONField(
-        _('project settings'), default=dict, help_text='general dict serialized project settings')
-    is_private = models.BooleanField(
-        _('private'), default=True, help_text='If template is private, it is accessible only from private team')
-    created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, related_name='project_templates', on_delete=models.SET_NULL, null=True,
-        verbose_name=_('created by'))
-    organization = models.ForeignKey(
-        'organizations.Organization', related_name='project_templates', on_delete=models.SET_NULL, null=True)
-
-    created_at = models.DateTimeField(_('created at'), auto_now_add=True)
-    updated_at = models.DateTimeField(_('updated at'), auto_now=True)
-
-    def _get_param(self, name):
-        value = self.project_settings.get(name)
-        if value is None:
-            return Project._meta.get_field(name).get_default()
-        return value
-
-    def create_project(self, user, title, team_id, include_example_data=False, membership=None,
-                       *args, **kwargs):
-        """ Create new project instance based on project
-        """
-        if user is None or title is None:
-            raise ValidationError(_('user and title are required'))
-
-        p = Project.objects.create(
-            title=title,
-            created_by=user,
-            template_used=self,
-            label_config=self.label_config,
-            skip_onboarding=True,
-            # extra args
-            expert_instruction=self._get_param('expert_instruction'),
-            show_instruction=self._get_param('show_instruction'),
-            show_skip_button=self._get_param('show_skip_button'),
-            enable_empty_annotation=self._get_param('enable_empty_annotation'),
-            show_annotation_history=self._get_param('show_annotation_history'),
-            show_collab_predictions=self._get_param('show_collab_predictions'),
-            maximum_annotations=self._get_param('maximum_annotations'),
-            batch_size=self._get_param('batch_size'),
-            min_annotations_to_start_training=self._get_param('min_annotations_to_start_training'),
-            agreement_threshold=self._get_param('agreement_threshold'),
-            metric_threshold=self._get_param('metric_threshold'),
-            # agreement_method=self._get_param('agreement_method'),
-            sampling=self._get_param('sampling'),
-            show_ground_truth_first=self._get_param('show_ground_truth_first'),
-            show_overlap_first=self._get_param('show_overlap_first'),
-            overlap_cohort_percentage=self._get_param('overlap_cohort_percentage'),
-            use_kappa=self._get_param('use_kappa'),
-            metric_name=self._get_param('metric_name'),
-            metric_params=self._get_param('metric_params'),
-            control_weights=self._get_param('control_weights')
-        )
-
-        if include_example_data:
-            from projects.functions import add_data_to_project
-            add_data_to_project(p, [generate_sample_task_without_check(p.label_config, secure_mode=p.secure_mode)])
-            p.onboarding_step_finished(ProjectOnboardingSteps.DATA_UPLOAD)
-
-        return p
-
-    def __str__(self):
-        return self.title
     
     
 class ProjectOnboardingSteps(models.Model):
@@ -700,6 +640,9 @@ class ProjectSummary(models.Model):
     created_labels = JSONField(
         _('created labels'), null=True, default=dict, help_text='Unique labels')
 
+    def has_permission(self, user):
+        return self.project.has_permission(user)
+
     def update_data_columns(self, tasks):
         common_data_columns = set()
         all_data_columns = dict(self.all_data_columns)
@@ -771,7 +714,8 @@ class ProjectSummary(models.Model):
         created_annotations = dict(self.created_annotations)
         labels = dict(self.created_labels)
         for annotation in annotations:
-            for result in get_attr_or_item(annotation, 'result'):
+            results = get_attr_or_item(annotation, 'result') or []
+            for result in results:
 
                 # aggregate annotation types
                 key = self._get_annotation_key(result)
@@ -787,6 +731,8 @@ class ProjectSummary(models.Model):
                 for label in self._get_labels(result):
                     labels[from_name][label] = labels[from_name].get(label, 0) + 1
 
+        logger.debug(f'summary.created_annotations = {created_annotations}')
+        logger.debug(f'summary.created_labels = {labels}')
         self.created_annotations = created_annotations
         self.created_labels = labels
         self.save()
@@ -795,7 +741,8 @@ class ProjectSummary(models.Model):
         created_annotations = dict(self.created_annotations)
         labels = dict(self.created_labels)
         for annotation in annotations:
-            for result in get_attr_or_item(annotation, 'result'):
+            results = get_attr_or_item(annotation, 'result') or []
+            for result in results:
 
                 # reduce annotation counters
                 key = self._get_annotation_key(result)
@@ -805,18 +752,19 @@ class ProjectSummary(models.Model):
                         created_annotations.pop(key)
 
                 # reduce labels counters
-                from_name = result['from_name']
+                from_name = result.get('from_name')
                 if from_name not in labels:
                     continue
                 for label in self._get_labels(result):
+                    label = str(label)
                     if label in labels[from_name]:
                         labels[from_name][label] -= 1
                         if labels[from_name][label] == 0:
                             labels[from_name].pop(label)
                 if not labels[from_name]:
                     labels.pop(from_name)
-
+        logger.debug(f'summary.created_annotations = {created_annotations}')
+        logger.debug(f'summary.created_labels = {labels}')
         self.created_annotations = created_annotations
         self.created_labels = labels
         self.save()
-

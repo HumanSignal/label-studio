@@ -2,6 +2,7 @@
 """
 import logging
 import django_rq
+import json
 
 from django.utils import timezone
 from django.db import models, transaction
@@ -9,6 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from django_rq import job
 
 from tasks.models import Task
+from tasks.serializers import PredictionSerializer, AnnotationSerializer
 
 from core.redis import redis_connected
 
@@ -37,6 +39,11 @@ class Storage(models.Model):
 
     def validate_connection(self, client=None):
         pass
+
+    def has_permission(self, user):
+        if self.project.has_permission(user):
+            return True
+        return False
 
     class Meta:
         abstract = True
@@ -69,16 +76,60 @@ class ImportStorage(Storage):
         tasks_created = 0
         for key in self.iterkeys():
             logger.debug(f'Scanning key {key}')
+
+            # skip if task already exists
             if link_class.exists(key, self):
                 logger.debug(f'{self.__class__.__name__} link {key} already exists')
                 continue
+
             logger.debug(f'{self}: found new key {key}')
-            data = self.get_data(key)
+            try:
+                data = self.get_data(key)
+            except (UnicodeDecodeError, json.decoder.JSONDecodeError) as exc:
+                logger.error(exc, exc_info=True)
+                raise ValueError(
+                    f'Error loading JSON from file "{key}".\nIf you\'re trying to import non-JSON data '
+                    f'(images, audio, text, etc.), edit storage settings and enable '
+                    f'"Treat every bucket object as a source file"')
+
+            # predictions
+            predictions = data.get('predictions', [])
+            if predictions:
+                if 'data' not in data:
+                    raise ValueError('If you use "predictions" field in the task, '
+                                     'you must put "data" field in the task too')
+
+            # annotations
+            annotations = data.get('annotations', [])
+            if annotations:
+                if 'data' not in data:
+                    raise ValueError('If you use "annotations" field in the task, '
+                                     'you must put "data" field in the task too')
+
+            if 'data' in data and isinstance(data['data'], dict):
+                data = data['data']
+
             with transaction.atomic():
                 task = Task.objects.create(data=data, project=self.project)
                 link_class.create(task, key, self)
                 logger.debug(f'Create {self.__class__.__name__} link with key={key} for task={task}')
                 tasks_created += 1
+
+                # add predictions
+                logger.debug(f'Create {len(predictions)} predictions for task={task}')
+                for prediction in predictions:
+                    prediction['task'] = task.id
+                prediction_ser = PredictionSerializer(data=predictions, many=True)
+                prediction_ser.is_valid(raise_exception=True)
+                prediction_ser.save()
+
+                # add annotations
+                logger.debug(f'Create {len(annotations)} annotations for task={task}')
+                for annotation in annotations:
+                    annotation['task'] = task.id
+                annotation_ser = AnnotationSerializer(data=annotations, many=True)
+                annotation_ser.is_valid(raise_exception=True)
+                annotation_ser.save()
 
         self.last_sync = timezone.now()
         self.last_sync_count = tasks_created
@@ -134,6 +185,11 @@ class ImportStorageLink(models.Model):
         link, created = cls.objects.get_or_create(task_id=task.id, key=key, storage=storage, object_exists=True)
         return link
 
+    def has_permission(self, user):
+        if self.task.has_permission(user):
+            return True
+        return False
+
     class Meta:
         abstract = True
 
@@ -158,6 +214,11 @@ class ExportStorageLink(models.Model):
     def create(cls, annotation, storage):
         link, created = cls.objects.get_or_create(annotation=annotation, storage=storage, object_exists=True)
         return link
+
+    def has_permission(self, user):
+        if self.annotation.has_permission(user):
+            return True
+        return False
 
     class Meta:
         abstract = True

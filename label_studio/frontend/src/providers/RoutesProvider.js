@@ -30,14 +30,6 @@ const findMacthingComponents = (path, routesMap, parentPath = "") => {
   return result;
 };
 
-// const logRoutes = (routes, parentPath = "") => {
-//   routes?.forEach?.(({routes, ...route}) => {
-//     const fullPath = `${parentPath}${route.path}`;
-//     console.log({...route, path: fullPath});
-//     logRoutes(routes, fullPath);
-//   });
-// };
-
 export const RoutesProvider = ({children}) => {
   const history = useHistory();
   const location = useLocation();
@@ -76,7 +68,6 @@ export const RoutesProvider = ({children}) => {
   ]);
 
   useEffect(() => {
-    console.log("Location changed");
     const ContextComponent = lastRoute?.context;
 
     setCurrentContext({
@@ -97,7 +88,6 @@ export const RoutesProvider = ({children}) => {
       }).filter(c => !!c.title);
 
       setBreadcrumbs(crumbs);
-      console.log(crumbs);
     } catch (err) {
       console.log(err);
     }
@@ -127,10 +117,20 @@ export const useParams = () => {
   const currentPath = useCurrentPath();
 
   const match = useMemo(() => {
-    return matchPath(location.pathname, currentPath ?? "");
+    const search = Object.fromEntries(location.search
+      .replace(/^\?/, '')
+      .split("&")
+      .map(pair => {
+        const [key, value] = pair.split('=').map(p => decodeURIComponent(p));
+        return [key, value];
+      }));
+
+    const urlParams = matchPath(location.pathname, currentPath ?? "");
+
+    return {...search, ...(urlParams?.params ?? {})};
   }, [location, currentPath]);
 
-  return match?.params ?? {};
+  return match ?? {};
 };
 
 export const useContextComponent = () => {

@@ -11,7 +11,6 @@ from tasks.models import Task
 
 class ImportStorageSerializer(serializers.ModelSerializer):
     type = serializers.ReadOnlyField(default=os.path.basename(os.path.dirname(__file__)))
-    presign = serializers.BooleanField(required=False, default=True)
 
     class Meta:
         model = ImportStorage
@@ -40,7 +39,7 @@ class StorageTaskSerializer(TaskSerializer):
         fields = '__all__'
 
 
-class StorageUserSerializer(serializers.ModelSerializer):
+class StorageCompletedBySerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'first_name', 'last_name', 'email')
@@ -48,4 +47,4 @@ class StorageUserSerializer(serializers.ModelSerializer):
 
 class StorageAnnotationSerializer(AnnotationSerializer):
     task = StorageTaskSerializer(read_only=True)
-    completed_by = StorageUserSerializer(read_only=True)
+    completed_by = StorageCompletedBySerializer(read_only=True)

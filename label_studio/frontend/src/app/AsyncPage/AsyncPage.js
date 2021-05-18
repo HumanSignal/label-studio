@@ -3,7 +3,7 @@ import { useHistory } from 'react-router';
 import { ErrorWrapper } from '../../components/Error/Error';
 import { modal } from '../../components/Modal/Modal';
 import { ConfigContext } from '../../providers/ConfigProvider';
-import { removePrefix } from '../../utils/helpers';
+import { absoluteURL, removePrefix } from '../../utils/helpers';
 import { clearScriptsCache, isScriptValid, reInsertScripts, replaceScript } from '../../utils/scripts';
 
 const pageCache = new Map();
@@ -21,6 +21,11 @@ const loadAsyncPage = async (url) => {
     } else {
       const response = await fetch(url);
       const html = await response.text();
+
+      if (response.status === 401) {
+        location.href = absoluteURL("/");
+        return;
+      }
 
       if (!response.ok) {
         modal({

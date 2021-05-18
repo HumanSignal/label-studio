@@ -70,6 +70,10 @@ _api_urlpatterns = [
     path('localfiles/<int:pk>/sync', LocalFilesImportStorageSyncAPI.as_view(), name='storage-localfiles-sync'),
     path('localfiles/validate', LocalFilesImportStorageValidateAPI.as_view(), name='storage-localfiles-validate'),
     path('localfiles/form', LocalFilesImportStorageFormLayoutAPI.as_view(), name='storage-localfiles-form'),
+    path('export/localfiles', LocalFilesExportStorageListAPI.as_view(), name='export-storage-localfiles-list'),
+    path('export/localfiles/<int:pk>', LocalFilesExportStorageDetailAPI.as_view(), name='export-storage-localfiles-detail'),
+    path('export/localfiles/validate', LocalFilesExportStorageValidateAPI.as_view(), name='export-storage-localfiles-validate'),
+    path('export/localfiles/form', LocalFilesExportStorageFormLayoutAPI.as_view(), name='export-storage-localfiles-form'),
 ]
 
 urlpatterns = [

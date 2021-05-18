@@ -3,6 +3,7 @@ import { ErrorWrapper } from '../components/Error/Error';
 import { modal } from '../components/Modal/Modal';
 import { API_CONFIG } from '../config/ApiConfig';
 import { APIProxy } from '../utils/api-proxy';
+import { absoluteURL } from '../utils/helpers';
 
 const API = new APIProxy(API_CONFIG);
 
@@ -28,6 +29,11 @@ const handleError = async (response, showModal = true) => {
 
   if (result instanceof Response) {
     result = await API.generateError(response);
+  }
+
+  if (response.status === 401) {
+    location.href = absoluteURL("/");
+    return;
   }
 
   if (showModal) {

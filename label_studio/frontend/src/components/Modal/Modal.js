@@ -2,6 +2,7 @@ import React, { createRef } from "react";
 import { render, unmountComponentAtNode } from "react-dom";
 import { ApiProvider } from "../../providers/ApiProvider";
 import { ConfigProvider } from "../../providers/ConfigProvider";
+import { CurrentUserProvider } from "../../providers/CurrentUser";
 import { MultiProvider } from "../../providers/MultiProvider";
 import { cn } from "../../utils/bem";
 import { Button } from "../Button/Button";
@@ -23,6 +24,7 @@ const standaloneModal = (props) => {
       <MultiProvider key={`modal-${renderCount}`} providers={[
         <ConfigProvider key="config"/>,
         <ApiProvider key="api"/>,
+        <CurrentUserProvider key="current-user"/>,
       ]}>
         <Modal
           ref={modalRef}
@@ -45,7 +47,7 @@ const standaloneModal = (props) => {
       renderModal({...props, ...(newProps ?? {}), visible: true}, false);
     },
     close() {
-      modalRef.current.hide();
+      return modalRef.current.hide();
     },
   };
 };

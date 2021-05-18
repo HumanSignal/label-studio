@@ -41,8 +41,6 @@ class AnnotationSerializer(DynamicFieldsMixin, ModelSerializer):
     created_username = serializers.SerializerMethodField(default='', read_only=True, help_text='User name string')
     created_ago = serializers.CharField(default='', read_only=True, help_text='Delta time from creation time')
     completed_by = serializers.SerializerMethodField()
-    ground_truth = serializers.SerializerMethodField(
-        default=False, read_only=True, help_text='Ground truth annotation (the same as ground_truth)')
 
     @classmethod
     def many_init(cls, *args, **kwargs):
@@ -88,9 +86,6 @@ class AnnotationSerializer(DynamicFieldsMixin, ModelSerializer):
         name += f' {user.email}, {user.id}'
         return name
 
-    def get_ground_truth(self, annotation):
-        return annotation.ground_truth
-
     def get_completed_by(self, annotation):
         if self.context.get('completed_by', '') == 'full':
             return UserSerializer(annotation.completed_by).data
@@ -99,7 +94,7 @@ class AnnotationSerializer(DynamicFieldsMixin, ModelSerializer):
 
     class Meta:
         model = Annotation
-        exclude = ['state', 'prediction', 'result_count']
+        exclude = ['prediction', 'result_count']
 
 
 class TaskSimpleSerializer(ModelSerializer):
@@ -117,12 +112,12 @@ class TaskSimpleSerializer(ModelSerializer):
 class TaskSerializer(ModelSerializer):
     """ Task Serializer with project scheme configs validation
     """
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.context.get('include_annotations', True):
-            self.fields['annotations'] = AnnotationSerializer(many=True, read_only=False, required=False,
-                                                              context=self.context)
+        if self.context.get('include_annotations', True) and 'annotations' not in self.fields:
+            self.fields['annotations'] = AnnotationSerializer(
+                many=True, read_only=False, required=False, context=self.context
+            )
 
     def project(self):
         """ Take the project from context
@@ -402,7 +397,7 @@ class TaskWithAnnotationsAndPredictionsSerializer(TaskSerializer):
 
         if 'request' in self.context:
             user = self.context['request'].user
-            if user.is_annotator(task.project.organization.pk):
+            if user.is_annotator:
                 annotations = annotations.filter(completed_by=user)
 
         return AnnotationSerializer(annotations, many=True, read_only=True, default=True, context=self.context).data
@@ -456,7 +451,7 @@ class TaskWithAnnotationsAndPredictionsAndDraftsSerializer(TaskSerializer):
 
         if 'request' in self.context and hasattr(self.context['request'], 'user'):
             user = self.context['request'].user
-            if user.is_annotator(task.project.organization.pk):
+            if user.is_annotator:
                 annotations = annotations.filter(completed_by=user)
 
         return AnnotationSerializer(annotations, many=True, read_only=True, default=True, context=self.context).data
@@ -471,29 +466,10 @@ class TaskWithAnnotationsAndPredictionsAndDraftsSerializer(TaskSerializer):
         if 'request' in self.context and hasattr(self.context['request'], 'user'):
             user = self.context['request'].user
             # drafts = drafts.filter(user=user)
-            if user.is_annotator(task.project.organization.pk):
+            if user.is_annotator:
                 drafts = drafts.filter(user=user)
 
         return AnnotationDraftSerializer(drafts, many=True, read_only=True, default=True, context=self.context).data
-
-
-class TaskWithAnnotationsAndLazyPredictionsSerializer(TaskSerializer):
-    predictions = PredictionSerializer(many=True, default=[], read_only=True)
-    annotations = serializers.SerializerMethodField(default=[], read_only=True)
-
-    def get_annotations(self, task):
-        annotations = task.annotations.order_by('pk')
-
-        if 'request' in self.context:
-            user = self.context['request'].user
-            if user.is_annotator(task.project.organization.pk):
-                annotations = annotations.filter(completed_by=user)
-
-        return AnnotationSerializer(annotations, many=True, read_only=True, default=True, context=self.context).data
-
-    class Meta:
-        model = Task
-        exclude = ('taken_at', )
 
 
 class TaskIDWithAnnotationsAndPredictionsSerializer(ModelSerializer):

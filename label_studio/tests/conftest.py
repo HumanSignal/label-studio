@@ -18,7 +18,10 @@ from users.models import User
 from organizations.models import Organization
 from types import SimpleNamespace
 
-from .utils import create_business, signin, gcs_client_mock, ml_backend_mock, register_ml_backend_mock, azure_client_mock
+from .utils import (
+    create_business, signin, gcs_client_mock, ml_backend_mock, register_ml_backend_mock, azure_client_mock,
+    redis_client_mock
+)
 
 
 boto3.set_stream_logger('botocore.credentials', logging.DEBUG)
@@ -92,6 +95,12 @@ def gcs_client():
 @pytest.fixture(autouse=True)
 def azure_client():
     with azure_client_mock():
+        yield
+
+
+@pytest.fixture(autouse=True)
+def redis_client():
+    with redis_client_mock():
         yield
 
 
@@ -191,10 +200,11 @@ def setup_project(client, project_template, do_auth=True):
     # we work in empty database, so let's create business user and login
     user = User.objects.create(email=email)
     user.set_password(password)  # set password without hash
-    user.save()
 
     create_business(user)
     org = Organization.create_organization(created_by=user, title=user.first_name)
+    user.active_organization = org
+    user.save()
 
     if do_auth:
 

@@ -5,12 +5,12 @@ title_bucket_prefix: &title_bucket_prefix
     label: Storage Title
   - type: text
     name: path
-    label: Local path
+    label: Absolute local path
     required: true
 
 ImportStorage:
   # Title, Bucket, Prefix
-  - columnCount: 3
+  - columnCount: 2
     fields: *title_bucket_prefix
   # Regex filter
   - columnCount: 1

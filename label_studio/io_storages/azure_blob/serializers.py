@@ -10,6 +10,7 @@ from io_storages.azure_blob.models import AzureBlobImportStorage, AzureBlobExpor
 
 class AzureBlobImportStorageSerializer(ImportStorageSerializer):
     type = serializers.ReadOnlyField(default='azure')
+    presign = serializers.BooleanField(required=False, default=True)
 
     class Meta:
         model = AzureBlobImportStorage

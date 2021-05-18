@@ -11,7 +11,7 @@ from django.conf import settings
 from django.db import models, connection
 from django.db.models import Q, F, When, Count, Case, Subquery, OuterRef, Value
 from django.db.models.functions import Coalesce
-from django.db.models.signals import post_delete, post_save, pre_delete
+from django.db.models.signals import post_delete, pre_save, post_save, pre_delete
 from django.db.utils import ProgrammingError, OperationalError
 from django.utils.translation import gettext_lazy as _
 from django.db.models import JSONField
@@ -22,15 +22,16 @@ from django.dispatch import receiver, Signal
 
 from model_utils import FieldTracker
 
-from core.utils.common import find_first_one_to_one_related_field_by_prefix
-from core.utils.common import string_is_url
+from core.utils.common import find_first_one_to_one_related_field_by_prefix, string_is_url, load_func
 from core.utils.params import get_env
-from data_manager.managers import PreparedTaskManager
+from data_manager.managers import PreparedTaskManager, TaskManager
 
 logger = logging.getLogger(__name__)
 
+TaskMixin = load_func(settings.TASK_MIXIN)
 
-class Task(models.Model):
+
+class Task(TaskMixin, models.Model):
     """ Business tasks from project
     """
     id = models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID', db_index=True)
@@ -56,7 +57,7 @@ class Task(models.Model):
     )
     updates = ['is_labeled']
 
-    objects = models.Manager()  # task manager by default
+    objects = TaskManager()  # task manager by default
     prepared = PreparedTaskManager()  # task manager with filters, ordering, etc for data_manager app
 
     @property
@@ -64,9 +65,16 @@ class Task(models.Model):
         return os.path.basename(self.file_upload.file.name)
 
     @classmethod
-    def get_locked_by(cls, user, project):
-        """Retrieve the task locked by specified user. Returns None if the specified user didn't lock anything."""
-        lock = TaskLock.objects.filter(user=user, expire_at__gt=now(), task__project=project).first()
+    def get_locked_by(cls, user, project=None, tasks=None):
+        """ Retrieve the task locked by specified user. Returns None if the specified user didn't lock anything.
+        """
+        if project:
+            lock = TaskLock.objects.filter(user=user, expire_at__gt=now(), task__project=project).first()
+        elif tasks:
+            return tasks.filter(locks__user=user, locks__expire_at__gt=now()).first()
+        else:
+            raise Exception('Neither project or tasks passed to get_locked_by')
+
         if lock:
             return lock.task
 
@@ -88,6 +96,9 @@ class Task(models.Model):
             return settings.TASK_LOCK_TTL
         avg_lead_time = self.project.annotations_lead_time()
         return 3 * int(avg_lead_time) if avg_lead_time is not None else settings.TASK_LOCK_DEFAULT_TTL
+
+    def has_permission(self, user):
+        return self.project.has_permission(user)
 
     def clear_expired_locks(self):
         self.locks.filter(expire_at__lt=now()).delete()
@@ -142,7 +153,7 @@ class Task(models.Model):
             return storage_link.storage
 
         # or try global storage settings (only s3 for now)
-        elif get_env('USE_DEFAULT_STORAGE', default=False, is_bool=True):
+        elif get_env('USE_DEFAULT_S3_STORAGE', default=False, is_bool=True):
             # TODO: this is used to access global environment storage settings.
             # We may use more than one and non-default S3 storage (like GCS, Azure)
             from io_storages.s3.models import S3ImportStorage
@@ -220,6 +231,16 @@ class Task(models.Model):
         # annotator annotation
         return self.annotations.first()
 
+    def increase_project_summary_counters(self):
+        if hasattr(self.project, 'summary'):
+            summary = self.project.summary
+            summary.update_data_columns([self])
+
+    def decrease_project_summary_counters(self):
+        if hasattr(self.project, 'summary'):
+            summary = self.project.summary
+            summary.remove_data_columns([self])
+
     class Meta:
         db_table = 'task'
         ordering = ['-updated_at']
@@ -234,6 +255,8 @@ post_bulk_create = Signal(providing_args=["objs", "batch_size"])
 
 
 class AnnotationManager(models.Manager):
+    def for_user(self, user):
+        return self.filter(task__project__organization=user.active_organization)
 
     def bulk_create(self, objs, batch_size=None):
         pre_bulk_create.send(sender=self.model, objs=objs, batch_size=batch_size)
@@ -248,14 +271,15 @@ with tt as (
     where task=%(t_id)s and task_annotation=%(tc_id)s
 ) select count( distinct tt.item -> 'id') from tt"""
 
+AnnotationMixin = load_func(settings.ANNOTATION_MIXIN)
 
-class Annotation(models.Model):
+
+class Annotation(AnnotationMixin, models.Model):
     """ Annotations & Labeling results
     """
     objects = AnnotationManager()
     tracker = FieldTracker(fields=['ground_truth', 'result'])
 
-    state = JSONField('state', null=True, default=dict, help_text='Editor state (system data)')
     result = JSONField('result', null=True, default=None, help_text='The main value of annotator work - '
                                                                     'labeling result in JSON format')
 
@@ -293,6 +317,21 @@ class Annotation(models.Model):
 
         return len(res)
 
+    def has_permission(self, user):
+        return self.task.project.has_permission(user)
+
+    def increase_project_summary_counters(self):
+        if hasattr(self.task.project, 'summary'):
+            logger.debug(f'Increase project.summary counters from {self}')
+            summary = self.task.project.summary
+            summary.update_created_annotations_and_labels([self])
+
+    def decrease_project_summary_counters(self):
+        if hasattr(self.task.project, 'summary'):
+            logger.debug(f'Decrease project.summary counters from {self}')
+            summary = self.task.project.summary
+            summary.remove_created_annotations_and_labels([self])
+
 
 class TaskLock(models.Model):
     task = models.ForeignKey(
@@ -326,6 +365,9 @@ class AnnotationDraft(models.Model):
     def created_ago(self):
         """ Humanize date """
         return timesince(self.created_at)
+
+    def has_permission(self, user):
+        return self.task.project.has_permission(user)
 
 
 class Prediction(models.Model):
@@ -371,45 +413,61 @@ def release_task_lock_before_delete(sender, instance, **kwargs):
     if instance is not None:
         instance.release_lock()
 
+# =========== PROJECT SUMMARY UPDATES ===========
+
 
 @receiver(pre_delete, sender=Task)
 def remove_data_columns(sender, instance, **kwargs):
     """Reduce data column counters afer removing task"""
-    task = instance
-    if hasattr(task.project, 'summary'):
-        summary = task.project.summary
-        summary.remove_data_columns([task])
+    instance.decrease_project_summary_counters()
+
+
+@receiver(pre_save, sender=Task)
+def delete_project_summary_data_columns_before_updating_task(sender, instance, **kwargs):
+    """Before updating task fields - ensure previous info removed from project.summary"""
+    try:
+        old_task = sender.objects.get(id=instance.id)
+    except Task.DoesNotExist:
+        # task just created - do nothing
+        return
+    old_task.decrease_project_summary_counters()
 
 
 @receiver(post_save, sender=Task)
 def update_project_summary_data_columns(sender, instance, created, update_fields, **kwargs):
-    """Update task counters in project summary"""
-    if hasattr(instance.project, 'summary') and (created or (update_fields and 'data' in update_fields)):
-        summary = instance.project.summary
-        summary.update_data_columns([instance])
+    """Update task counters in project summary in case when new task has been created"""
+    instance.increase_project_summary_counters()
+
+
+@receiver(pre_save, sender=Annotation)
+def delete_project_summary_annotations_before_updating_annotation(sender, instance, **kwargs):
+    """Before updating annotation fields - ensure previous info removed from project.summary"""
+    try:
+        old_annotation = sender.objects.get(id=instance.id)
+    except Annotation.DoesNotExist:
+        # annotation just created - do nothing
+        return
+    old_annotation.decrease_project_summary_counters()
 
 
 @receiver(post_save, sender=Annotation)
 def update_project_summary_annotations_and_is_labeled(sender, instance, created, **kwargs):
     """Update annotation counters in project summary"""
-    if hasattr(instance.task.project, 'summary'):
-        summary = instance.task.project.summary
-        summary.update_created_annotations_and_labels([instance])
+    instance.increase_project_summary_counters()
 
-    # If new annotation created, update task.is_labeled state
     if created:
+        # If new annotation created, update task.is_labeled state
         logger.debug(f'Update task stats for task={instance.task}')
         instance.task.update_is_labeled()
         instance.task.save(update_fields=['is_labeled'])
 
 
 @receiver(pre_delete, sender=Annotation)
-def remove_project_summary_annotations_and_is_labeled(sender, instance, **kwargs):
+def remove_project_summary_annotations(sender, instance, **kwargs):
     """Remove annotation counters in project summary followed by deleting an annotation"""
-    if hasattr(instance.task.project, 'summary'):
-        logger.debug(f'Remove created annotations and labels for {instance.task}')
-        summary = instance.task.project.summary
-        summary.remove_created_annotations_and_labels([instance])
+    instance.decrease_project_summary_counters()
+
+# =========== END OF PROJECT SUMMARY UPDATES ===========
 
 
 @receiver(post_delete, sender=Annotation)
@@ -430,6 +488,22 @@ def delete_draft(sender, instance, **kwargs):
     num_drafts = drafts.count()
     drafts.delete()
     logger.debug(f'{num_drafts} drafts removed from task {task} after saving annotation {instance}')
+
+
+@receiver(post_save, sender=Annotation)
+def update_ml_backend(sender, instance, **kwargs):
+    if instance.ground_truth:
+        return
+
+    project = instance.task.project
+
+    if hasattr(project, 'ml_backends') and project.min_annotations_to_start_training:
+        annotation_count = Annotation.objects.filter(task__project=project).count()
+
+        # start training every N annotation
+        if annotation_count % project.min_annotations_to_start_training == 0:
+            for ml_backend in project.ml_backends.all():
+                ml_backend.train()
 
 
 Q_finished_annotations = Q(was_cancelled=False) & Q(result__isnull=False)

@@ -2,13 +2,12 @@
 """
 from django.shortcuts import render
 from rules.contrib.views import permission_required
-from core.permissions import view_with_auth, IsBusiness
+from rest_framework.permissions import IsAuthenticated
+from core.permissions import view_with_auth, all_permissions
 
-from .models import Organization
 
-
-@view_with_auth(['GET'], (IsBusiness,))
-@permission_required('organizations.change_organization', fn=Organization.from_request, raise_exception=True)
+@view_with_auth(['GET'], (IsAuthenticated,))
+@permission_required(all_permissions.organizations_change)
 def organization_people_list(request):
     return render(request, 'organizations/people_list.html', {
         'user': request.user,

@@ -4,7 +4,7 @@ import { FormField } from '../../FormField';
 import { default as Label } from '../Label/Label';
 import './Toggle.styl';
 
-const Toggle = ({className, label, description, checked, defaultChecked, onChange, validate, required, skip, ...props}) => {
+const Toggle = ({className, label, labelProps, description, checked, defaultChecked, onChange, validate, required, skip, ...props}) => {
   const rootClass = cn('toggle');
   const [isChecked, setIsChecked] = React.useState(defaultChecked ?? checked ?? false);
 
@@ -51,6 +51,7 @@ const Toggle = ({className, label, description, checked, defaultChecked, onChang
     text={label}
     children={formField}
     description={description}
+    {...(labelProps ?? {})}
   /> : formField;
 };
 
