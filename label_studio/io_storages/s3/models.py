@@ -16,10 +16,7 @@ from io_storages.base_models import ImportStorage, ImportStorageLink, ExportStor
 from io_storages.utils import get_uri_via_regex
 from io_storages.s3.utils import get_client_and_resource, resolve_s3_url
 from tasks.validation import ValidationError as TaskValidationError
-from io_storages.serializers import StorageAnnotationSerializer
-from tasks.serializers import TaskSerializerBulk
 from tasks.models import Annotation
-from data_import.serializers import ImportApiSerializer
 
 logger = logging.getLogger(__name__)
 logging.getLogger('botocore').setLevel(logging.CRITICAL)
@@ -167,7 +164,7 @@ class S3ExportStorage(S3StorageMixin, ExportStorage):
     def save_annotation(self, annotation):
         client, s3 = self.get_client_and_resource()
         logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
-        ser_annotation = StorageAnnotationSerializer(annotation).data
+        ser_annotation = self._get_serialized_data(annotation)
         with transaction.atomic():
             # Create export storage link
             link = S3ExportStorageLink.create(annotation, self)

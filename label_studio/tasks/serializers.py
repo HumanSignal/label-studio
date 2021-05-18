@@ -17,6 +17,7 @@ from projects.models import Project
 from tasks.models import Task, Annotation, AnnotationDraft, Prediction
 from tasks.validation import TaskValidator
 from core.utils.common import get_object_with_check_and_log, retry_database_locked
+from core.label_config import replace_task_data_undefined_with_config_field
 from users.serializers import UserSerializer
 
 logger = logging.getLogger(__name__)
@@ -145,11 +146,7 @@ class TaskSerializer(ModelSerializer):
 
             # resolve $undefined$ key in task data
             data = instance.data
-            data_types_keys = project.data_types.keys()
-            if settings.DATA_UNDEFINED_NAME in data and data_types_keys:
-                key = list(data_types_keys)[0]
-                data[key] = data[settings.DATA_UNDEFINED_NAME]
-                del data[settings.DATA_UNDEFINED_NAME]
+            replace_task_data_undefined_with_config_field(data, project)
 
         return super().to_representation(instance)
 

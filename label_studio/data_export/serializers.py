@@ -6,6 +6,7 @@ from rest_framework import serializers
 from tasks.models import Task, Annotation
 from tasks.serializers import PredictionSerializer
 from users.models import User
+from core.label_config import replace_task_data_undefined_with_config_field
 
 
 class CompletedBySerializer(serializers.ModelSerializer):
@@ -31,12 +32,8 @@ class ExportDataSerializer(serializers.ModelSerializer):
     def to_representation(self, task):
         project = task.project
         data = task.data
-        data_types_keys = project.data_types.keys()
-
-        if settings.DATA_UNDEFINED_NAME in data and data_types_keys:
-            key = list(data_types_keys)[0]
-            data[key] = data[settings.DATA_UNDEFINED_NAME]
-            del data[settings.DATA_UNDEFINED_NAME]
+        
+        replace_task_data_undefined_with_config_field(data, project)
 
         return super().to_representation(task)
 
