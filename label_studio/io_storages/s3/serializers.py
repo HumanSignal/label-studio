@@ -11,6 +11,7 @@ from io_storages.s3.models import S3ImportStorage, S3ExportStorage
 
 class S3ImportStorageSerializer(ImportStorageSerializer):
     type = serializers.ReadOnlyField(default=os.path.basename(os.path.dirname(__file__)))
+    presign = serializers.BooleanField(required=False, default=True)
 
     class Meta:
         model = S3ImportStorage
