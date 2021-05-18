@@ -436,7 +436,7 @@ def delete_project_summary_data_columns_before_updating_task(sender, instance, *
 @receiver(post_save, sender=Task)
 def update_project_summary_data_columns(sender, instance, created, update_fields, **kwargs):
     """Update task counters in project summary in case when new task has been created"""
-    instance.decrease_project_summary_counters()
+    instance.increase_project_summary_counters()
 
 
 @receiver(pre_save, sender=Annotation)
