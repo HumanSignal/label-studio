@@ -13,8 +13,6 @@ stages:
         password: 12345678
       method: POST
     response:
-      cookies:
-        - sessionid
       status_code: 200
   - id: get_my_user
     name: Get my user
