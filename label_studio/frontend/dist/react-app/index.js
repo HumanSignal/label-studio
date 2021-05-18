@@ -10604,6 +10604,14 @@ const MachineLearningSettings = () => {
             label: "Retrieve predictions when loading a task automatically",
             name: "evaluate_predictions_automatically"
           })
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)("div", {
+          style: {
+            paddingLeft: 16
+          },
+          children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_components_Form__WEBPACK_IMPORTED_MODULE_6__.Toggle, {
+            label: "Show predictions to collaborators",
+            name: "show_collab_predictions"
+          })
         })]
       })
     }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_MachineLearningList__WEBPACK_IMPORTED_MODULE_10__.MachineLearningList, {
