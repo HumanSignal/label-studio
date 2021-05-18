@@ -370,3 +370,11 @@ def config_essential_data_has_changed(new_config_str, old_config_str):
             return True
         if not set(old_info['labels']).issubset(new_info['labels']):
             return True
+
+
+def replace_task_data_undefined_with_config_field(data, project):
+    # assign undefined key name from data to the first key from config, e.g. for txt loading
+    if settings.DATA_UNDEFINED_NAME in data and project.data_types.keys():
+        key = list(project.data_types.keys())[0]
+        data[key] = data[settings.DATA_UNDEFINED_NAME]
+        del data[settings.DATA_UNDEFINED_NAME]
