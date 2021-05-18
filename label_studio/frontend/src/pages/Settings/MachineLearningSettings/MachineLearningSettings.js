@@ -128,7 +128,7 @@ export const MachineLearningSettings = () => {
 
           <div style={{paddingLeft: 16}}>
             <Toggle
-              label="Show predictions to collaborators"
+              label="Show predictions to annotators in the Label Stream and Quick View"
               name="show_collab_predictions"
             />
           </div>
