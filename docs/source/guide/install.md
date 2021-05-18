@@ -112,7 +112,9 @@ git clone https://github.com/heartexlabs/label-studio.git
 cd label-studio
 # Install all package dependencies
 pip install -e .
-# Start the server in development mode at http://localhost:8000
+# Run database migrations
+python label_studio/manage.py migrate
+# Start the server in development mode at http://localhost:8080
 python label_studio/manage.py runserver
 ```
 
