@@ -422,9 +422,17 @@ def remove_data_columns(sender, instance, **kwargs):
     instance.decrease_project_summary_counters()
 
 
+def _task_data_is_not_updated(update_fields):
+    if update_fields and list(update_fields) == ['is_labeled']:
+        return True
+
+
 @receiver(pre_save, sender=Task)
-def delete_project_summary_data_columns_before_updating_task(sender, instance, **kwargs):
+def delete_project_summary_data_columns_before_updating_task(sender, instance, update_fields, **kwargs):
     """Before updating task fields - ensure previous info removed from project.summary"""
+    if _task_data_is_not_updated(update_fields):
+        # we don't need to update counters when other than task.data fields are updated
+        return
     try:
         old_task = sender.objects.get(id=instance.id)
     except Task.DoesNotExist:
@@ -436,6 +444,9 @@ def delete_project_summary_data_columns_before_updating_task(sender, instance, *
 @receiver(post_save, sender=Task)
 def update_project_summary_data_columns(sender, instance, created, update_fields, **kwargs):
     """Update task counters in project summary in case when new task has been created"""
+    if _task_data_is_not_updated(update_fields):
+        # we don't need to update counters when other than task.data fields are updated
+        return
     instance.increase_project_summary_counters()
 
 
@@ -459,7 +470,8 @@ def update_project_summary_annotations_and_is_labeled(sender, instance, created,
         # If new annotation created, update task.is_labeled state
         logger.debug(f'Update task stats for task={instance.task}')
         instance.task.update_is_labeled()
-        instance.task.save(update_fields=['is_labeled'])
+        # instance.task.save(update_fields=['is_labeled'])
+        instance.task.save()
 
 
 @receiver(pre_delete, sender=Annotation)
@@ -475,7 +487,7 @@ def update_is_labeled_after_removing_annotation(sender, instance, **kwargs):
     # Update task.is_labeled state
     logger.debug(f'Update task stats for task={instance.task}')
     instance.task.update_is_labeled()
-    instance.task.save()
+    instance.task.save(update_fields=['is_labeled'])
 
 
 @receiver(post_save, sender=Annotation)

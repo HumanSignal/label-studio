@@ -338,3 +338,116 @@
             </Choices>
           </View>'
         status_code: 200
+
+
+- delete_annotations_from_data_manager:
+    - /api/projects:
+        method: POST
+        data:
+          label_config: '
+          <View>
+            <Text name="text" value="$text"/>
+            <Choices name="label" toName="text">
+              <Choice value="1"/>
+              <Choice value="2"/>
+            </Choices>
+          </View>
+          '
+        status_code: 201
+        response:
+          id: '{pk}'
+
+    - /api/projects/{pk}/import:
+        method: POST
+        content_type: application/json
+        data:
+          - text: Example 1
+          - text: Example 2
+        status_code: 201
+
+    - /api/projects/{pk}/next:
+          method: GET
+          status_code: 200
+          response:
+            id: '{task_id}'
+
+    - /api/tasks/{task_id}/annotations:
+        method: POST
+        content_type: application/json
+        data:
+          result:
+            - from_name: label
+              to_name: text
+              type: choices
+              value:
+                choices:
+                  - "1"
+        status_code: 201
+
+    - /api/projects/{pk}/next:
+        method: GET
+        status_code: 200
+        response:
+          id: '{task_id_2}'
+
+    - /api/tasks/{task_id_2}/annotations:
+        method: POST
+        content_type: application/json
+        data:
+          result:
+            - from_name: label
+              to_name: text
+              type: choices
+              value:
+                choices:
+                  - "1"
+        status_code: 201
+
+    - /api/projects/{pk}/next:
+        method: GET
+        status_code: 404
+
+    # Can't change config due to existed annotations
+    - /api/projects/{pk}/validate:
+        method: POST
+        content_type: application/json
+        data:
+          label_config: '
+          <View>
+            <Text name="text" value="$text"/>
+            <Choices name="label" toName="text">
+              <Choice value="2"/>
+              <Choice value="3"/>
+            </Choices>
+          </View>'
+        status_code: 400
+
+    # Delete all annotations via data manager
+    - /api/dm/actions?id=delete_tasks_annotations&project={pk}:
+        method: POST
+        content_type: application/json
+        data:
+          ordering: []
+          selectedItems:
+            all: true
+            excluded: []
+          filters:
+            conjunction: and
+            items: []
+          project: '{pk}'
+        status_code: 200
+
+    # Now we can change label config since annotations no longer exist
+    - /api/projects/{pk}/validate:
+        method: POST
+        content_type: application/json
+        data:
+          label_config: '
+          <View>
+            <Text name="text" value="$text"/>
+            <Choices name="label" toName="text">
+              <Choice value="2"/>
+              <Choice value="3"/>
+            </Choices>
+          </View>'
+        status_code: 200
