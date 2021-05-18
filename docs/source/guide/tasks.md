@@ -76,12 +76,11 @@ For an example text classification project, you can set up a label config like t
 
 ```
 
-You can then import tasks to label that match the following JSON format:
+You can then import text tasks to label that match the following JSON format:
 
 ```yaml
 [{
-  # "data" must contain the "my_text" field defined by labeling config,
-  # and can optionally include other fields
+  # "data" must contain the "my_text" field defined in the text labeling config as the value and can optionally include other fields
   "data": {
     "my_text": "Opossums are great",
     "ref_id": 456,
@@ -91,7 +90,7 @@ You can then import tasks to label that match the following JSON format:
     } 
   },
 
-  # annotations are the list of annotation results matching the labeling config schema
+  # annotations are not required and are the list of annotation results matching the labeling config schema
   "annotations": [{
     "result": [{
       "from_name": "sentiment_class",
@@ -119,12 +118,43 @@ You can then import tasks to label that match the following JSON format:
   }]
 }]
 ```
+If you're placing JSON files in [cloud storage](storage.html), place 1 task in each JSON file in the storage bucket. If you want to upload a JSON file from your machine directly into Label Studio, you can place multiple tasks in one JSON file. 
 
-> Note: For versions of Label Studio earlier than 1.0.0, use the following JSON format example. 
+<br/>
+{% details <b>To place multiple tasks in one JSON file, use this JSON format example</b> %}
+This example contains multiple text classification tasks with no annotations or predictions.
 
+The "data" parameter must contain the "my_text" field defined in the text labeling config and can optionally include other fields. The "id" parameter is not required.
+
+{% codeblock lang:json %}
+[
+   {
+      "id":1,
+      "data":{
+         "my_text":"Opossums like to be aloft in trees."
+      }
+   },
+   {
+      "id":2,
+      "data":{
+         "my_text":"Opossums are opportunistic."
+      }
+   },
+   {
+      "id":3,
+      "data":{
+         "my_text":"Opossums like to forage for food."
+      }
+   }
+]
+{% endcodeblock %}
+{% enddetails %}
+
+<br/>
+{% details <b>For versions of Label Studio earlier than 1.0.0, use this JSON format example.</b> %}
 If you're using a version of Label Studio earlier than version 1.0.0, import tasks that match the following JSON format: 
 
-```yaml
+{% codeblock lang:json %}
 [{
   # "data" must contain the "my_text" field defined by labeling config,
   # and can optionally include other fields
@@ -164,8 +194,8 @@ If you're using a version of Label Studio earlier than version 1.0.0, import tas
     "score": 0.95
   }]
 }]
-```
-
+{% endcodeblock %}
+{% enddetails %}
 
 ### Import CSV or TSV data
 
