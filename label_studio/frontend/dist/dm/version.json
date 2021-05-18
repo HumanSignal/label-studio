@@ -1,6 +1,6 @@
 {
-  "message": "Fix annotators column",
-  "commit": "672a7c3875e7948499971309fbb630fc48e4cdd6",
+  "message": "Get flag back and check it only in Label Stream",
+  "commit": "df44993280930c720b129b5cf22af95754313afa",
   "branch": "feature/lsf-ui",
-  "date": "2021-05-07T11:47:56Z"
+  "date": "2021-05-18T16:46:48Z"
 }
