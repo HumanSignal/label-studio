@@ -401,11 +401,9 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
         # support actions api call from actions/next_task.py
         if hasattr(self, 'prepared_tasks'):
             project.prepared_tasks = self.prepared_tasks
-            external_prepared_tasks_used = project.sampling == Project.SEQUENCE
         # get prepared tasks from request params (filters, selected items)
         else:
             project.prepared_tasks = get_prepared_queryset(self.request, project)
-            external_prepared_tasks_used = False
 
         # detect solved and not solved tasks
         user_solved_tasks_array = user.annotations.filter(ground_truth=False).filter(
