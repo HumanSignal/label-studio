@@ -10609,7 +10609,7 @@ const MachineLearningSettings = () => {
             paddingLeft: 16
           },
           children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_12__.jsx)(_components_Form__WEBPACK_IMPORTED_MODULE_6__.Toggle, {
-            label: "Show predictions to collaborators",
+            label: "Show predictions to annotators in the Label Stream and Quick View",
             name: "show_collab_predictions"
           })
         })]
