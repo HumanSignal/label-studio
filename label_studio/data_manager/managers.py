@@ -94,6 +94,11 @@ def apply_ordering(queryset, ordering):
 
     return queryset
 
+def cast_value(_filter):
+    if _filter.type == 'Number':
+        _filter.value = float(_filter.value)
+    elif _filter.type == 'Boolean':
+        _filter.value = bool(_filter.value)
 
 def apply_filters(queryset, filters):
     if not filters:
@@ -116,6 +121,7 @@ def apply_filters(queryset, filters):
         # django orm loop expression attached to column name
         field_name = preprocess_field_name(_filter.filter, _filter.operator, only_undefined_field)
 
+        # in
         if _filter.operator == "in":
             filter_expression.add(
                 Q(
@@ -126,6 +132,8 @@ def apply_filters(queryset, filters):
                 ),
                 conjunction,
             )
+
+        # not in
         elif _filter.operator == "not_in":
             filter_expression.add(
                 ~Q(
@@ -136,15 +144,24 @@ def apply_filters(queryset, filters):
                 ),
                 conjunction,
             )
+
+        # empty
         elif _filter.operator == 'empty':
             if _filter.value == 'True':
                 filter_expression.add(Q(**{field_name: True}), conjunction)
             else:
                 filter_expression.add(~Q(**{field_name: True}), conjunction)
+
+        # starting from not_
         elif _filter.operator.startswith("not_"):
+            cast_value(_filter)
             filter_expression.add(~Q(**{field_name: _filter.value}), conjunction)
+
+        # all others
         else:
+            cast_value(_filter)
             filter_expression.add(Q(**{field_name: _filter.value}), conjunction)
+    
     logger.debug(f'Apply filter: {filter_expression}')
     queryset = queryset.filter(filter_expression)
     return queryset
