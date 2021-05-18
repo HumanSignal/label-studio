@@ -1,73 +1,87 @@
 ---
 test_name: invalidate_fields_in_label_config
-strict: false
+strict: False
 marks:
-- usefixtures:
-  - django_live_url
+  - usefixtures:
+    - django_live_url
 stages:
-- name: Sign up
-  request:
-    url: "{django_live_url}/user/signup"
-    data:
-      email: test_suites_user@heartex.com
-      password: 12345678
-    method: POST
-  response:
-    status_code: 302
-- name: stage
-  request:
-    method: POST
-    url: '{django_live_url}/api/projects'
-  response:
-    save:
+  - name: Sign up
+    request:
+      url: "{django_live_url}/user/signup"
+      data:
+        email: test_suites_user@heartex.com
+        password: 12345678
+      method: POST
+    response:
+      cookies:
+        - sessionid
+      status_code: 200
+  - id: get_my_user
+    name: Get my user
+    request:
+      url: "{django_live_url}/api/current-user/whoami"
+      method: GET
+    response:
+      status_code: 200
+      save:
+        json:
+          user_pk: id
+          active_organization_pk: active_organization
+
+  - name: stage
+    request:
+      method: POST
+      url: '{django_live_url}/api/projects'
+    response:
+      save:
+        json:
+          pk: id
+      status_code: 201
+  - name: stage
+    request:
+      headers:
+        content-type: application/json
       json:
-        pk: id
-    status_code: 201
-- name: stage
-  request:
-    headers:
-      content-type: application/json
-    json:
-    - keyA: 123
-      keyB: 345
-      keyC: 456
-    - keyB: qwe
-      keyC: wer
-      keyD: ert
-    method: POST
-    url: '{django_live_url}/api/projects/{pk}/import'
-  response:
-    status_code: 201
-- name: stage
-  request:
-    headers:
-      content-type: application/json
-    json:
-      label_config: <View> <Text name="text" value="$text"/></View>
-    method: POST
-    url: '{django_live_url}/api/projects/{pk}/validate'
-  response:
-    status_code: 400
-- name: stage
-  request:
-    headers:
-      content-type: application/json
-    json:
-      label_config: <View> <Text name="text" value="$text"/></View>
-    method: POST
-    url: '{django_live_url}/api/projects/{pk}/validate'
-  response:
-    status_code: 400
-- name: stage
-  request:
-    headers:
-      content-type: application/json
-    json:
-      label_config: <View> <Text name="text" value="$keyB"/> </View>
-    method: POST
-    url: '{django_live_url}/api/projects/{pk}/validate'
-  response:
-    status_code: 200
+      - keyA: 123
+        keyB: 345
+        keyC: 456
+      - keyB: qwe
+        keyC: wer
+        keyD: ert
+      method: POST
+      url: '{django_live_url}/api/projects/{pk}/import'
+    response:
+      status_code: 201
+  - name: stage
+    request:
+      headers:
+        content-type: application/json
+      json:
+        label_config: <View> <Text name="text" value="$text"/></View>
+      method: POST
+      url: '{django_live_url}/api/projects/{pk}/validate'
+    response:
+      status_code: 400
+  - name: stage
+    request:
+      headers:
+        content-type: application/json
+      json:
+        label_config: <View> <Text name="text" value="$text"/></View>
+      method: POST
+      url: '{django_live_url}/api/projects/{pk}/validate'
+    response:
+      status_code: 400
+  - name: stage
+    request:
+      headers:
+        content-type: application/json
+      json:
+        label_config: <View> <Text name="text" value="$keyB"/> </View>
+      method: POST
+      url: '{django_live_url}/api/projects/{pk}/validate'
+    response:
+      status_code: 200
 
 ---
 test_name: try_removing_created_labels
