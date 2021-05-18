@@ -168,7 +168,7 @@ class GCSExportStorage(ExportStorage, GCSStorageMixin):
     def save_annotation(self, annotation):
         bucket = self.get_bucket()
         logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
-        ser_annotation = StorageAnnotationSerializer(annotation).data
+        ser_annotation = self._get_serialized_data(annotation)
         with transaction.atomic():
             # Create export storage link
             link = GCSExportStorageLink.create(annotation, self)
