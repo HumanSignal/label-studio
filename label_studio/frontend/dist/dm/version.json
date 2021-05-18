@@ -1,6 +1,6 @@
 {
-  "message": "Get flag back and check it only in Label Stream",
-  "commit": "df44993280930c720b129b5cf22af95754313afa",
+  "message": "Number filter fixes",
+  "commit": "0e3807137dfd92deed0d7a4547ca0a7bb0eca2b8",
   "branch": "feature/lsf-ui",
-  "date": "2021-05-18T16:46:48Z"
+  "date": "2021-05-18T19:55:02Z"
 }
