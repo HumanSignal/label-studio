@@ -26,53 +26,63 @@ logger = logging.getLogger(__name__)
 
 
 task_create_response_scheme = {
-    201: openapi.Schema(
-        title='Task creation response',
-        description='Task creation response',
-        type=openapi.TYPE_OBJECT,
-        properies={
-            'task_count': openapi.Schema(
-                title='task count',
-                description='Number of tasks added',
-                type=openapi.TYPE_INTEGER
-            ),
-            'annotation_count': openapi.Schema(
-                title='annotation count',
-                description='Number of annotations added',
-                type=openapi.TYPE_INTEGER
-            ),
-            'predictions_count': openapi.Schema(
-                title='predictions count',
-                description='Number of predictions added',
-                type=openapi.TYPE_INTEGER
-            ),
-            'duration': openapi.Schema(
-                title='duration',
-                description='Time in seconds to create',
-                type=openapi.TYPE_NUMBER
-            ),
-            'file_upload_ids': openapi.Schema(
-                title='file_upload_ids',
-                description='Database IDs of uploaded files',
-                type=openapi.TYPE_ARRAY,
-                items=openapi.Schema(title="File Upload IDs", type=openapi.TYPE_INTEGER)
-            ),
-            'could_be_tasks_list': openapi.Schema(
-                title='could_be_tasks_list',
-                description='Whether uploaded files can contain lists of tasks, like CSV/TSV files',
-                type=openapi.TYPE_BOOLEAN
-            )
-        },
-        example={
-            'task_count': 50,
-            'annotation_count': 200,
-            'predictions_count': 100,
-            'duration': 3.5,
-            'file_upload_ids': [1, 2, 3]
-        }
+    201: openapi.Response(
+        description='Tasks successfully imported',
+        schema=openapi.Schema(
+            title='Task creation response',
+            description='Task creation response',
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'task_count': openapi.Schema(
+                    title='task_count',
+                    description='Number of tasks added',
+                    type=openapi.TYPE_INTEGER
+                ),
+                'annotation_count': openapi.Schema(
+                    title='annotation_count',
+                    description='Number of annotations added',
+                    type=openapi.TYPE_INTEGER
+                ),
+                'predictions_count': openapi.Schema(
+                    title='predictions_count',
+                    description='Number of predictions added',
+                    type=openapi.TYPE_INTEGER
+                ),
+                'duration': openapi.Schema(
+                    title='duration',
+                    description='Time in seconds to create',
+                    type=openapi.TYPE_NUMBER
+                ),
+                'file_upload_ids': openapi.Schema(
+                    title='file_upload_ids',
+                    description='Database IDs of uploaded files',
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Schema(title="File Upload IDs", type=openapi.TYPE_INTEGER)
+                ),
+                'could_be_tasks_list': openapi.Schema(
+                    title='could_be_tasks_list',
+                    description='Whether uploaded files can contain lists of tasks, like CSV/TSV files',
+                    type=openapi.TYPE_BOOLEAN
+                ),
+                'found_formats': openapi.Schema(
+                    title='found_formats',
+                    description='The list of found file formats',
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Schema(title="File format", type=openapi.TYPE_STRING)
+                ),
+                'data_columns': openapi.Schema(
+                    title='data_columns',
+                    description='The list of found data columns',
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Schema(title="Data column name", type=openapi.TYPE_STRING)
+                )
+            })
     ),
-    400: openapi.Schema(title='Incorrect task data', type=openapi.TYPE_ARRAY,
-                        items=openapi.Schema(title="String with error description", type=openapi.TYPE_STRING))
+    400: openapi.Schema(
+        title='Incorrect task data',
+        description="String with error description",
+        type=openapi.TYPE_STRING
+    )
 }
 
 
@@ -102,7 +112,7 @@ class ImportAPI(generics.CreateAPIView):
 
     ```bash
     curl -H 'Content-Type: application/json' -H 'Authorization: Token abc123' \\
-    -X POST 'https://app.heartex.ai/api/projects/1/tasks/bulk/' --data '[{"text": "Some text 1"}, {"text": "Some text 2"}]'
+    -X POST 'http://localhost/api/projects/1/import' --data '[{"text": "Some text 1"}, {"text": "Some text 2"}]'
     ```
 
      2\. **POST with files**: Send tasks as files. You can attach multiple files with different names. 
@@ -112,151 +122,21 @@ class ImportAPI(generics.CreateAPIView):
     - **CSV**: text files with tables in Comma Separated Values format
     - **TSV**: text files with tables in Tab Separated Value format
     - **TXT**: simple text files are similar to CSV with one column and no header, supported for projects with one source only
-    - **ZIP / RAR** with one or multiple files inside from the list below, e.g.: "zip archive.zip *.json"
 
     ```bash
     curl -H 'Content-Type: application/json' -H 'Authorization: Token abc123' \\
-    -X POST 'https://app.heartex.ai/api/projects/1/tasks/bulk/' --data @my_file.csv
+    -X POST 'http://localhost/api/projects/1/import' -F ‘file=@path/to/my_file.csv’
     ```
 
     3\. **POST with URL**: You can also provide a URL to a file with labeling tasks. Supported file formats are the same as in option 2.
 
     ```bash
     curl -H 'Content-Type: application/json' -H 'Authorization: Token abc123' \\
-    -X POST 'https://app.heartex.ai/api/projects/1/tasks/bulk/' \\
+    -X POST 'http://localhost/api/projects/1/import' \\
     --data '[{"url": "http://example.com/test1.csv"}, {"url": "http://example.com/test2.csv"}]'
     ```
 
-
     <br>
-
-    ## Import annotations: import already-labeled tasks and ground truths
-
-    <hr style="opacity:0.3">
-
-    1\. You can import already-labeled tasks and mark them as ground truths:
-    **combine task data with annotations**.
-
-    - The annotation is a JSON dict
-    - You can find descriptions of all annotation fields in the request body schema below,
-    - We recommend specifying only the "result" field.
-    - Empty annotation example:
-          { "ground_truth": true, "result": [] }
-    - Empty task and annotation example:
-          {
-            "data": {"image": "https://app.heartex.ai/static/samples/kittens2.jpg"},
-            "annotations": [{"ground_truth": true, "result": [] }]
-          }
-    - More complex examples are below.
-
-    2\. "result"
-
-    - A JSON array that depends on the labeling configuration for a project. Each array item contains a labeled region
-    (single bounding box, a segment of audio, part of the text).
-    - To quickly get the result format, open your Project -> Data Manager -> Click the pencil icon for a specific
-    task and create a new annotation. Click the "Result" button in the top right corner to get the result in JSON format.
-
-    3\. "ground_truth" (optional)
-
-    - It's **true by default**.
-    - To import existing labels as regular annotations, then set "ground_truth": false.
-
-
-    <br>
-
-    ## Import predictions: pre-labeling, statistics and machine learning
-
-    <hr style="opacity:0.3">
-
-    1\. Predictions are very similar to annotations in structure, so **learn about annotations first**.
-    You can use predictions in the labeling workflow as pre-labels, for Active Learning to evaluate Machine Learning 
-    statistics and more.
-
-    - You can find descriptions of all of the prediction fields in the request body scheme below.
-    - We recommend specifying only the "result", "model_version" and "score" fields.
-    - Empty task and prediction example:
-          {
-            "data": {"image": "https://app.heartex.ai/static/samples/kittens2.jpg"},
-            "prediction": [{"model_version": "version 1", "score": 1.0, "result": [] }]
-          }
-
-    2\. "result"
-
-    - The same as "result" in annotations.
-
-    3\. "model_version"
-
-    - Must be a string with text.
-
-    <br>
-
-    ## Examples
-
-    <hr style="opacity:0.3">
-
-    - my_file.json (with 2 tasks)
-    ```json
-    [{ "text": "Some text 1", "image": "https://app.heartex.ai/static/samples/kittens1.jpg" },
-     { "text": "Some text 2", "image": "https://app.heartex.ai/static/samples/kittens2.jpg" }]
-    ```
-
-    - my_file.csv (with 2 tasks)
-    ```csv
-    text,image
-    Some text 1,https://app.heartex.ai/static/samples/kittens1.jpg
-    Some text 2,https://app.heartex.ai/static/samples/kittens2.jpg
-    ```
-
-
-    - task_with_annotation.json (image classification project)
-    ```
-    [{
-        "data": {
-            "image": "https://app.heartex.ai/static/samples/kittens.jpg"
-        },
-        "annotations": [{
-            "ground_truth": true,
-
-            "result": [{
-                "id": "1",
-                "from_name": "my_image_class",
-                "to_name": "my_image",
-                "type": "choices",
-                "value": {
-                    "choices": [
-                        "Dog"
-                    ]
-                }
-            }]
-        }]
-    }]
-
-    - task_with_prediction.json (image classification project)
-    ```
-    [{
-        "data": {
-            "image": "https://app.heartex.ai/static/samples/kittens.jpg"
-        },
-        "predictions": [{
-            "model_version": "version_1",
-            "score": 1.0,
-
-            "result": [{
-                "id": "1",
-                "from_name": "my_image_class",
-                "to_name": "my_image",
-                "type": "choices",
-                "value": {
-                    "choices": [
-                        "Cat"
-                    ]
-                }
-            }]
-        }]
-    }]
-    ```
-
-    <br/>
 
     """
 
@@ -384,7 +264,7 @@ class ReImportAPI(ImportAPI):
             'data_columns': data_columns
         }, status=status.HTTP_201_CREATED)
 
-    @swagger_auto_schema(tags=['Import'], responses=task_create_response_scheme)
+    @swagger_auto_schema(auto_schema=None)
     def post(self, *args, **kwargs):
         return super(ReImportAPI, self).post(*args, **kwargs)
 

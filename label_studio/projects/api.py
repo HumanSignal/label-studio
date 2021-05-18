@@ -475,17 +475,20 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
                 return self._make_response(next_task, request)
             else:
                 raise NotFound(
-                    f'There exist some unsolved tasks for the user={user}, but they seem to be locked by another users')
+                    f'There are still some tasks to complete for the user={user}, but they seem to be locked by another user.')
 
 
 class LabelConfigValidateAPI(generics.CreateAPIView):
-    """ Validate label config
-    """
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_classes = (AllowAny,)
     serializer_class = ProjectLabelConfigSerializer
 
-    @swagger_auto_schema(responses={200: 'Validation success'}, tags=['Projects'], operation_summary='Validate label config')
+    @swagger_auto_schema(
+        tags=['Projects'],
+        operation_summary='Validate label config',
+        operation_description='Validate a labeling configuration for a project.',
+        responses={200: 'Validation success'}
+    )
     def post(self, request, *args, **kwargs):
         return super(LabelConfigValidateAPI, self).post(request, *args, **kwargs)
 
@@ -510,14 +513,21 @@ class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
     permission_required = all_permissions.projects_change
     queryset = Project.objects.all()
 
-    @swagger_auto_schema(tags=['Projects'], operation_summary='Validate a label config', manual_parameters=[
-                            openapi.Parameter(name='label_config', type=openapi.TYPE_STRING, in_=openapi.IN_QUERY,
-                                              description='labeling config')])
+    @swagger_auto_schema(
+        tags=['Projects'],
+        operation_summary='Validate a label config',
+        manual_parameters=[
+            openapi.Parameter(
+                name='label_config',
+                type=openapi.TYPE_STRING,
+                in_=openapi.IN_QUERY,
+                description='labeling config')
+        ])
     def post(self, request, *args, **kwargs):
         project = self.get_object()
         label_config = self.request.data.get('label_config')
         if not label_config:
-            raise RestValidationError('Label config is not set or empty')
+            raise RestValidationError('Label config is not set or is empty')
 
         # check new config includes meaningful changes
         has_changed = config_essential_data_has_changed(label_config, project.label_config)
@@ -526,8 +536,8 @@ class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
         return Response({'config_essential_data_has_changed': has_changed}, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(auto_schema=None)
-    def get(self, *args, **kwargs):
-        return super(ProjectLabelConfigValidateAPI, self).get(*args, **kwargs)
+    def get(self, request, *args, **kwargs):
+        return super(ProjectLabelConfigValidateAPI, self).get(request, *args, **kwargs)
 
 
 class ProjectDuplicateAPI(APIView):
@@ -672,7 +682,7 @@ class ProjectSampleTask(generics.RetrieveAPIView):
     def post(self, request, *args, **kwargs):
         label_config = self.request.data.get('label_config')
         if not label_config:
-            raise RestValidationError('Label config is not set or empty')
+            raise RestValidationError('Label config is not set or is empty')
 
         project = self.get_object()
         return Response({'sample_task': project.get_sample_task(label_config)}, status=200)
