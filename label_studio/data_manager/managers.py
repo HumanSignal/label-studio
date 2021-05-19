@@ -4,12 +4,11 @@ import logging
 import re
 
 from django.db import models
-from django.db.models import Aggregate, Count, Exists, OuterRef, Subquery, Avg, Q, F, Value, FloatField
-from django.db.models.expressions import RawSQL
+from django.db.models import Aggregate, Count, Exists, OuterRef, Subquery, Avg, Q, F, Value
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.db.models.functions import Coalesce, Cast
+from django.db.models.fields.json import KeyTransform
+from django.db.models.functions import Coalesce
 from django.conf import settings
-from django.contrib.postgres.fields.jsonb import KeyTransform
 
 from data_manager.prepare_params import ConjunctionEnum
 
