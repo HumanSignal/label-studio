@@ -24,7 +24,7 @@ frontend-watch:
 
 # Build production-ready optimized bundle
 frontend-build:
-	cd label_studio/frontend && npm ci && npm build:production
+	cd label_studio/frontend && npm ci && npm run build:production
 
 # Run tests
 test:

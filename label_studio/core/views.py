@@ -3,10 +3,11 @@
 import os
 import io
 import sys
+import json
 import logging
 
 import pandas as pd
-import ujson as json
+
 from django.conf import settings
 from django.contrib.auth import logout
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseForbidden
@@ -50,15 +51,13 @@ def version_page(request):
     result = collect_versions(force=True)
 
     # other settings from backend
-    if not request.user.is_superuser:
-        for root in result:
-            result[root].pop('message', None)
-    else:
+    if request.user.is_superuser:
         result['settings'] = {key: str(getattr(settings, key)) for key in dir(settings) if not key.startswith('_')}
 
     # html / json response
     if request.path == '/version/':
         result = json.dumps(result, indent=2)
+        result = result.replace('},', '},\n').replace('\\n', ' ')
         return HttpResponse('<pre>' + result + '</pre>')
     else:
         return JsonResponse(result)
