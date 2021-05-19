@@ -6,6 +6,7 @@ import re
 from django.db import models
 from django.db.models import Aggregate, Count, Exists, OuterRef, Subquery, Avg, Q, F, Value
 from django.contrib.postgres.aggregates import ArrayAgg
+from django.db.models.fields.json import KeyTransform
 from django.db.models.functions import Coalesce
 from django.conf import settings
 
@@ -78,16 +79,23 @@ def get_fields_for_annotation(prepare_params):
 def apply_ordering(queryset, ordering):
     if ordering:
         field_name = ordering[0].replace("tasks:", "")
+        ascending = False if field_name[0] == '-' else True  # detect direction
+        field_name = field_name[1:] if field_name[0] == '-' else field_name  # remove direction
+
         if "data." in field_name:
             field_name = field_name.replace(".", "__", 1)
             only_undefined_field = queryset.exists() and queryset.first().project.only_undefined_field
             if only_undefined_field:
                 field_name = re.sub('data__\w+', f'data__{settings.DATA_UNDEFINED_NAME}', field_name)
 
-        ascending = False if field_name[0] == '-' else True  # detect direction
-        field_name = field_name[1:] if field_name[0] == '-' else field_name  # remove direction
+            # annotate task with data field for float/int/bool ordering support
+            json_field = field_name.replace('data__', '')
+            queryset = queryset.annotate(ordering_field=KeyTransform(json_field, 'data'))
+            f = F('ordering_field').asc(nulls_last=True) if ascending else F('ordering_field').desc(nulls_last=True)
 
-        f = F(field_name).asc(nulls_last=True) if ascending else F(field_name).desc(nulls_last=True)
+        else:
+            f = F(field_name).asc(nulls_last=True) if ascending else F(field_name).desc(nulls_last=True)
+
         queryset = queryset.order_by(f)
     else:
         queryset = queryset.order_by("id")
