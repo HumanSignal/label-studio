@@ -14,7 +14,7 @@ To further [manage access to data in Label Studio Enterprise](security.html), yo
 
 ## Prerequisites
 
-You must be using Label Studio Enterprise Edition and have [set up SSO](SSO_setup.html) to federate access with SAML.
+You must be using Label Studio Enterprise Edition and have [set up SSO](auth_setup.html) to federate access with SAML.
 
 ## Set up federated access using SAML
 
