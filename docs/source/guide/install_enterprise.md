@@ -1,5 +1,5 @@
 ---
-title: ✴️ Install Label Studio Enterprise on-premises using Docker
+title: Install Label Studio Enterprise on-premises using Docker
 type: guide
 order: 201
 meta_title: Install and Upgrade Enterprise

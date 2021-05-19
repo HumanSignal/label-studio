@@ -45,6 +45,7 @@ def windows_dll_fix():
     # check if it is not on windows
     if sys.platform != 'win32':
         return
+    print(f'Current platform is {sys.platform}, apply sqlite fix')
 
     # set env
     import ctypes
@@ -52,17 +53,19 @@ def windows_dll_fix():
     os.environ['PATH'] = path_to_dll + os.pathsep + os.environ['PATH']
     try:
         ctypes.CDLL(os.path.join(path_to_dll, 'sqlite3.dll'))
-        logger.debug('Add current directory to PATH for DLL search: ' + path_to_dll)
+        print('Add current directory to PATH for DLL search: ' + path_to_dll)
     except OSError:
-        logger.debug("Can't load sqlite3.dll from current directory")
+        print("Can't load sqlite3.dll from current directory")
 
     # check sqlite version
     import sqlite3
     v = sqlite3.sqlite_version_info
-    if v[0] >= 3 and v[1] >= 35:
-        return
+    # if v[0] >= 3 and v[1] >= 35:
+    #     print("sqlite3 version doesn't a fix")
+    #     return
 
     # check python version and warn
+    print('python version: {sys.version_info.major} sqlite minor version: {sys.version_info.minor}')
     if sys.version_info.major == 3 and sys.version_info.minor in [6, 7, 8]:
         print('\n' + colorama.Fore.LIGHTYELLOW_EX +
               'You are on ' +

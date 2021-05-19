@@ -1,6 +1,6 @@
 {
-  "message": "Fix \"Create Copy\" button",
-  "commit": "2cb6f511398f43fc3631a21ae2b1fcd0cd3fb0b6",
+  "message": "Review history divider",
+  "commit": "4d62c226dd8a4aa061bc2943c612b052a6cda895",
   "branch": "feature/ui-update",
-  "date": "2021-05-07T11:30:58Z"
+  "date": "2021-05-13T17:13:23Z"
 }

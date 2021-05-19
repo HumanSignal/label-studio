@@ -6,6 +6,7 @@ import ujson as json
 from urllib.parse import urlparse
 from django.conf import settings
 from rest_framework.exceptions import ValidationError
+from core.label_config import replace_task_data_undefined_with_config_field
 
 
 class SkipField(Exception):
@@ -41,11 +42,7 @@ class TaskValidator:
         if data is None:
             raise ValidationError('Task is empty (None)')
 
-        # assign undefined key name from data to the first key from config, e.g. for txt loading
-        if settings.DATA_UNDEFINED_NAME in data and project.data_types.keys():
-            key = list(project.data_types.keys())[0]
-            data[key] = data[settings.DATA_UNDEFINED_NAME]
-            del data[settings.DATA_UNDEFINED_NAME]
+        replace_task_data_undefined_with_config_field(data, project)
 
         # iterate over data types from project
         for data_key, data_type in project.data_types.items():

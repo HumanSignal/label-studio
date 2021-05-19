@@ -11,8 +11,11 @@ from django_rq import job
 
 from tasks.models import Task
 from tasks.serializers import PredictionSerializer, AnnotationSerializer
+from data_export.serializers import ExportDataSerializer
+
 
 from core.redis import redis_connected
+from core.utils.common import get_bool_env
 
 
 logger = logging.getLogger(__name__)
@@ -161,6 +164,15 @@ def sync_background(storage_class, storage_id):
 
 class ExportStorage(Storage):
 
+    def _get_serialized_data(self, annotation):
+        if get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE', default=False):
+            # export task with annotations
+            return ExportDataSerializer(annotation.task).data
+        else:
+            from io_storages.serializers import StorageAnnotationSerializer
+            # deprecated functionality - save only annotation
+            return StorageAnnotationSerializer(annotation).data
+
     def save_annotation(self, annotation):
         raise NotImplementedError
 
@@ -204,6 +216,8 @@ class ExportStorageLink(models.Model):
 
     @property
     def key(self):
+        if get_bool_env('FUTURE_SAVE_TASK_TO_STORAGE', default=False):
+            return str(self.annotation.task.id)
         return str(self.annotation.id)
 
     @classmethod

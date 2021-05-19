@@ -1,5 +1,5 @@
 ---
-title: ✴️ ️Install Label Studio Enterprise on AWS Private Cloud
+title: ️Install Label Studio Enterprise on AWS Private Cloud
 type: guide
 order: 202
 meta_title: Install and Upgrade Enterprise

@@ -306,14 +306,14 @@ def test_views_filters(filters, ids, business_client, project_id):
     task_data_field_name = settings.DATA_UNDEFINED_NAME
 
     task_id_1 = make_task({"data": {task_data_field_name: "some text1"}}, project).id
-    make_annotation({"result": [{"1_first": True}]}, task_id_1)
-    make_prediction({"result": [{"1_first": True}], "score": 1}, task_id_1)
+    make_annotation({"result": [{"from_name": "1_first", "to_name": "", "value": {}}]}, task_id_1)
+    make_prediction({"result": [{"from_name": "1_first", "to_name": "", "value": {}}], "score": 1}, task_id_1)
 
     task_id_2 = make_task({"data": {task_data_field_name: "some text2"}}, project).id
     for _ in range(0, 2):
-        make_annotation({"result": [{"2_second": True}], "was_cancelled": True}, task_id_2)
+        make_annotation({"result": [{"from_name": "2_second", "to_name": "", "value": {}}], "was_cancelled": True}, task_id_2)
     for _ in range(0, 2):
-        make_prediction({"result": [{"2_second": True}], "score": 2}, task_id_2)
+        make_prediction({"result": [{"from_name": "2_second", "to_name": "", "value": {}}], "score": 2}, task_id_2)
 
     task_ids = [0, task_id_1, task_id_2]
 
@@ -344,4 +344,4 @@ def test_views_filters(filters, ids, business_client, project_id):
     assert 'tasks' in response_data, response_data
     response_ids = [task["id"] for task in response_data["tasks"]]
     correct_ids = [task_ids[i] for i in ids]
-    assert response_ids == correct_ids
+    assert response_ids == correct_ids, (response_ids, correct_ids, filters)
