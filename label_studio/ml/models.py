@@ -126,18 +126,6 @@ class MLBackend(models.Model):
                 MLBackendTrainJob.objects.create(job_id=current_train_job, ml_backend=self)
         self.save()
 
-    def predict_all_tasks(self, batch_size=100):
-        num_prediction_jobs = MLBackendPredictionJob.objects.filter(ml_backend_id=self.id).count()
-        if num_prediction_jobs >= MAX_JOBS_PER_PROJECT:
-            logger.info(
-                f'Can\'t start prediction job for project {self.project}: {num_prediction_jobs} currently running')
-            return {'status': 'ok'}
-        queue = django_rq.get_queue('default')
-        job = queue.enqueue(run_task_predictions, self.id, batch_size)
-        # job_id = run_task_predictions.delay(self.project.id, batch_size)
-        MLBackendPredictionJob.objects.create(
-            ml_backend=self, job_id=job.id, model_version=self.model_version, batch_size=batch_size)
-
     def predict_many_tasks(self, tasks):
         self.update_state()
         if self.not_ready:
@@ -238,69 +226,6 @@ class MLBackendPredictionJob(models.Model):
 
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
-
-
-@job('default', timeout=36000)
-def run_task_predictions(ml_backend_id, batch_size=100):
-    """
-    Run prediction and update db, stats counts and project prerequisites
-    :param project_id:
-    :param batch_size:
-    :return:
-    """
-    ml_backend = MLBackend.objects.get(id=ml_backend_id)
-    response = ml_backend.setup()
-    if response.is_error:
-        raise ValueError(response.error_message)
-    else:
-        if response.response['model_version'] != ml_backend.model_version:
-            ml_backend.model_version = response.response['model_version']
-            ml_backend.save()
-
-    # collect tasks without predictions for current model version
-    tasks_without_predictions = ml_backend.project.tasks.annotate(
-        model_version=F('predictions__model_version'),
-        num_predictions=Count('predictions')
-    ).filter(~Q(model_version=ml_backend.model_version) | Q(num_predictions=0))
-
-    if not tasks_without_predictions.exists():
-        logger.info(f'Predictions for project {ml_backend.project} with version {ml_backend.model_version} already exist, '
-                       f'update is not needed')
-        return {'status': 'ok'}
-    else:
-        logger.info(f'Found {tasks_without_predictions.count()} tasks without predictions '
-                       f'from model version {ml_backend.model_version} in project {ml_backend.project}')
-
-    # TODO: randomize tasks selection so that taken tasks don't clash with each other with high probability
-    tasks = TaskSerializer(tasks_without_predictions[:batch_size], many=True).data
-
-    failed_tasks = []
-    for task in tasks:
-        task_id = task['id']
-        ml_api_result = ml_backend.api.make_predictions([task], ml_backend.model_version, ml_backend.project)
-        if not _validate_ml_api_result(ml_api_result, [task], logger):
-            logger.warning(f'Project {ml_backend.project}: task {task.id} failed')
-            failed_tasks.append(task)
-            continue
-
-        prediction_result = ml_api_result.response['results'][0]
-
-        with transaction.atomic():
-            Prediction.objects.filter(task_id=task_id, model_version=ml_backend.model_version).delete()
-            Prediction.objects.create(
-                task_id=task_id,
-                model_version=ml_backend.model_version,
-                result=prediction_result['result'],
-                score=safe_float(prediction_result.get('score', 0)),
-                cluster=prediction_result.get('cluster'),
-                neighbors=prediction_result.get('neighbors'),
-                mislabeling=safe_float(prediction_result.get('mislabeling', 0))
-            )
-        logger.info(f'Project {ml_backend.project}: task {task_id} processed with model version {ml_backend.model_version}')
-
-    MLBackendPredictionJob.objects.filter(job_id=get_current_job().id).delete()
-    logger.info(f'Total task processes: {len(tasks)}, failed: {len(failed_tasks)}')
-    return {'status': 'ok', 'processed_num': len(tasks), 'failed': failed_tasks}
 
 
 class MLBackendTrainJob(models.Model):
