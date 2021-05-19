@@ -1,78 +1,66 @@
 ---
 test_name: invalidate_fields_in_label_config
-strict: False
+strict: false
 marks:
-  - usefixtures:
-    - django_live_url
+- usefixtures:
+  - django_live_url
 stages:
-  - id: signup
-    type: ref
-  - id: get_my_user
-    name: Get my user
-    request:
-      url: "{django_live_url}/api/current-user/whoami"
-      method: GET
-    response:
-      status_code: 200
-      save:
-        json:
-          user_pk: id
-          active_organization_pk: active_organization
-
-  - name: stage
-    request:
-      method: POST
-      url: '{django_live_url}/api/projects'
-    response:
-      save:
-        json:
-          pk: id
-      status_code: 201
-  - name: stage
-    request:
-      headers:
-        content-type: application/json
+- id: signup
+  type: ref
+- name: stage
+  request:
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
       json:
-      - keyA: 123
-        keyB: 345
-        keyC: 456
-      - keyB: qwe
-        keyC: wer
-        keyD: ert
-      method: POST
-      url: '{django_live_url}/api/projects/{pk}/import'
-    response:
-      status_code: 201
-  - name: stage
-    request:
-      headers:
-        content-type: application/json
-      json:
-        label_config: <View> <Text name="text" value="$text"/></View>
-      method: POST
-      url: '{django_live_url}/api/projects/{pk}/validate'
-    response:
-      status_code: 400
-  - name: stage
-    request:
-      headers:
-        content-type: application/json
-      json:
-        label_config: <View> <Text name="text" value="$text"/></View>
-      method: POST
-      url: '{django_live_url}/api/projects/{pk}/validate'
-    response:
-      status_code: 400
-  - name: stage
-    request:
-      headers:
-        content-type: application/json
-      json:
-        label_config: <View> <Text name="text" value="$keyB"/> </View>
-      method: POST
-      url: '{django_live_url}/api/projects/{pk}/validate'
-    response:
-      status_code: 200
+        pk: id
+    status_code: 201
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+    - keyA: 123
+      keyB: 345
+      keyC: 456
+    - keyB: qwe
+      keyC: wer
+      keyD: ert
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/import'
+  response:
+    status_code: 201
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: <View> <Text name="text" value="$text"/></View>
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/validate'
+  response:
+    status_code: 400
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: <View> <Text name="text" value="$text"/></View>
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/validate'
+  response:
+    status_code: 400
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: <View> <Text name="text" value="$keyB"/> </View>
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/validate'
+  response:
+    status_code: 200
 
 ---
 test_name: try_removing_created_labels
@@ -200,6 +188,327 @@ stages:
         toName="text"> <Label value="1"/> <Label value="2"/> </Labels> </View>'
     method: PATCH
     url: '{django_live_url}/api/projects/{pk}'
+  response:
+    status_code: 200
+
+---
+test_name: update_annotation_twice_should_not_invalidate_after_removing
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    data:
+      label_config: ' <View> <Text name="text" value="$text"/> <Choices name="label"
+        toName="text"> <Choice value="1"/> <Choice value="2"/> </Choices> </View> '
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        pk: id
+    status_code: 201
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+    - text: Example task sentence
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/import'
+  response:
+    status_code: 201
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{pk}/next'
+  response:
+    save:
+      json:
+        task_id: id
+    status_code: 200
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      result:
+      - from_name: label
+        to_name: text
+        type: choices
+        value:
+          choices:
+          - 1
+    method: POST
+    url: '{django_live_url}/api/tasks/{task_id}/annotations'
+  response:
+    save:
+      json:
+        annotation_id: id
+    status_code: 201
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      result:
+      - from_name: label
+        to_name: text
+        type: choices
+        value:
+          choices:
+          - 1
+    method: PATCH
+    url: '{django_live_url}/api/annotations/{annotation_id}'
+  response:
+    status_code: 200
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    method: DELETE
+    url: '{django_live_url}/api/annotations/{annotation_id}'
+  response:
+    status_code: 204
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: ' <View> <Text name="text" value="$text"/> <Choices name="label"
+        toName="text"> <Choice value="2"/> <Choice value="3"/> </Choices> </View>'
+    method: PATCH
+    url: '{django_live_url}/api/projects/{pk}'
+  response:
+    status_code: 200
+
+---
+test_name: update_annotation_twice_should_not_invalidate_after_removing_but_changing_result_values
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    data:
+      label_config: ' <View> <Text name="text" value="$text"/> <Choices name="label"
+        toName="text"> <Choice value="1"/> <Choice value="2"/> </Choices> </View> '
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        pk: id
+    status_code: 201
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+    - text: Example task sentence
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/import'
+  response:
+    status_code: 201
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{pk}/next'
+  response:
+    save:
+      json:
+        task_id: id
+    status_code: 200
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      result:
+      - from_name: label
+        to_name: text
+        type: choices
+        value:
+          choices:
+          - 1
+    method: POST
+    url: '{django_live_url}/api/tasks/{task_id}/annotations'
+  response:
+    save:
+      json:
+        annotation_id: id
+    status_code: 201
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      result:
+      - from_name: label
+        to_name: text
+        type: choices
+        value:
+          choices:
+          - 2
+    method: PATCH
+    url: '{django_live_url}/api/annotations/{annotation_id}'
+  response:
+    status_code: 200
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: ' <View> <Text name="text" value="$text"/> <Choices name="label"
+        toName="text"> <Choice value="1"/> <Choice value="3"/> </Choices> </View>'
+    method: PATCH
+    url: '{django_live_url}/api/projects/{pk}'
+  response:
+    status_code: 400
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: ' <View> <Text name="text" value="$text"/> <Choices name="label"
+        toName="text"> <Choice value="2"/> <Choice value="3"/> </Choices> </View>'
+    method: PATCH
+    url: '{django_live_url}/api/projects/{pk}'
+  response:
+    status_code: 200
+
+---
+test_name: delete_annotations_from_data_manager
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    data:
+      label_config: ' <View> <Text name="text" value="$text"/> <Choices name="label"
+        toName="text"> <Choice value="1"/> <Choice value="2"/> </Choices> </View> '
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        pk: id
+    status_code: 201
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+    - text: Example 1
+    - text: Example 2
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/import'
+  response:
+    status_code: 201
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{pk}/next'
+  response:
+    save:
+      json:
+        task_id: id
+    status_code: 200
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      result:
+      - from_name: label
+        to_name: text
+        type: choices
+        value:
+          choices:
+          - '1'
+    method: POST
+    url: '{django_live_url}/api/tasks/{task_id}/annotations'
+  response:
+    status_code: 201
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{pk}/next'
+  response:
+    save:
+      json:
+        task_id_2: id
+    status_code: 200
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      result:
+      - from_name: label
+        to_name: text
+        type: choices
+        value:
+          choices:
+          - '1'
+    method: POST
+    url: '{django_live_url}/api/tasks/{task_id_2}/annotations'
+  response:
+    status_code: 201
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{pk}/next'
+  response:
+    status_code: 404
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: ' <View> <Text name="text" value="$text"/> <Choices name="label"
+        toName="text"> <Choice value="2"/> <Choice value="3"/> </Choices> </View>'
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/validate'
+  response:
+    status_code: 400
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      filters:
+        conjunction: and
+        items: []
+      ordering: []
+      project: '{pk}'
+      selectedItems:
+        all: true
+        excluded: []
+    method: POST
+    url: '{django_live_url}/api/dm/actions?id=delete_tasks_annotations&project={pk}'
+  response:
+    status_code: 200
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: ' <View> <Text name="text" value="$text"/> <Choices name="label"
+        toName="text"> <Choice value="2"/> <Choice value="3"/> </Choices> </View>'
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/validate'
   response:
     status_code: 200
 

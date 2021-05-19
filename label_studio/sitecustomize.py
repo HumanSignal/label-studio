@@ -1,2 +1,3 @@
-import coverage
-coverage.process_startup()
+import coverage  # pragma: no cover
+coverage.process_startup()  # pragma: no cover
+

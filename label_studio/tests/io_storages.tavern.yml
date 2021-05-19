@@ -50,7 +50,8 @@ stages:
   response:
     json:
       data:
-        image_url: !re_match 'https://pytest-s3-images\.s3\.amazonaws\.com.+X-Amz-Security-Token=testing'
+        __test_object: true
+        regexp: ^\{"image_url":\s"https://pytest-s3-images\.s3\.amazonaws\.com.+X-Amz-Security-Token=testing
     status_code: 200
 - name: stage
   request:
@@ -131,7 +132,8 @@ stages:
   response:
     json:
       data:
-        image_url: !re_match "https://storage.googleapis.com/test-gs-bucket/.+"
+        __test_object: true
+        regexp: ^\{"image_url":\s"https://storage.googleapis.com/test-gs-bucket/.+
     status_code: 200
 
 ---
@@ -184,6 +186,10 @@ stages:
     method: GET
     url: '{django_live_url}/api/projects/{project_pk}/next'
   response:
+    json:
+      data:
+        __test_object: true
+        regexp: ^\{"(str_field|int_field|dict_field)":.+$
     status_code: 200
 
 ---
@@ -490,7 +496,8 @@ stages:
   response:
     json:
       data:
-        image_url: !re_match "https://testing.blob.core.windows.net/pytest-azure-images/.+"
+        __test_object: true
+        regexp: ^\{"image_url":\s"https://testing.blob.core.windows.net/pytest-azure-images/.+
     status_code: 200
 - name: stage
   request:
@@ -650,5 +657,58 @@ stages:
     method: GET
     url: '{django_live_url}/api/projects/{project_pk}/tasks'
   response:
+    status_code: 200
+
+---
+test_name: test_connection_to_import_redis_storage
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    data:
+      is_published: true
+      label_config: <View><Image name="image" value="$image_url"/><Choices name="label"
+        toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+      title: test_redis_storage
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        project_pk: id
+    status_code: 201
+- name: stage
+  request:
+    data:
+      project: '{project_pk}'
+      title: Testing Redis storage
+    method: POST
+    url: '{django_live_url}/api/storages/redis/validate'
+  response:
+    status_code: 200
+- name: stage
+  request:
+    data:
+      project: '{project_pk}'
+      title: Testing Redis storage
+    method: POST
+    url: '{django_live_url}/api/storages/redis'
+  response:
+    save:
+      json:
+        storage_pk: id
+    status_code: 201
+- name: stage
+  request:
+    method: POST
+    url: '{django_live_url}/api/storages/redis/{storage_pk}/sync'
+  response:
+    json:
+      last_sync_count: 0
     status_code: 200
 
