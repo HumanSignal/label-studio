@@ -50,8 +50,7 @@ stages:
   response:
     json:
       data:
-        __test_object: true
-        regexp: ^\{"image_url":\s"https://pytest-s3-images\.s3\.amazonaws\.com.+X-Amz-Security-Token=testing
+        image_url: !re_match "https://pytest-s3-images.s3.amazonaws.com.+X-Amz-Security-Token=testing"
     status_code: 200
 - name: stage
   request:
@@ -132,8 +131,7 @@ stages:
   response:
     json:
       data:
-        __test_object: true
-        regexp: ^\{"image_url":\s"https://storage.googleapis.com/test-gs-bucket/.+
+        image_url: !re_match "https://storage.googleapis.com/test-gs-bucket/.+"
     status_code: 200
 
 ---
@@ -186,10 +184,6 @@ stages:
     method: GET
     url: '{django_live_url}/api/projects/{project_pk}/next'
   response:
-    json:
-      data:
-        __test_object: true
-        regexp: ^\{"(str_field|int_field|dict_field)":.+$
     status_code: 200
 
 ---
@@ -496,8 +490,7 @@ stages:
   response:
     json:
       data:
-        __test_object: true
-        regexp: ^\{"image_url":\s"https://testing.blob.core.windows.net/pytest-azure-images/.+
+        image_url: !re_match "https://testing.blob.core.windows.net/pytest-azure-images/.+"
     status_code: 200
 - name: stage
   request:
