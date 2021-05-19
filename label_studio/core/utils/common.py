@@ -435,7 +435,7 @@ def collect_versions(force=False):
 
     # main pypi package
     result = {
-        'package': {
+        'label-studio-os-package': {
             'version': label_studio.__version__,
             'short_version': '.'.join(label_studio.__version__.split('.')[:2]),
             'latest_version_from_pypi': label_studio.__latest_version__,
@@ -443,7 +443,7 @@ def collect_versions(force=False):
             'current_version_is_outdated': label_studio.__current_version_is_outdated__
         },
         # backend full git info
-        'backend': version.get_git_commit_info()
+        'label-studio-os-backend': version.get_git_commit_info()
     }
 
     # label studio frontend
@@ -462,11 +462,14 @@ def collect_versions(force=False):
     except:
         pass
 
+    # converter
     try:
         import label_studio_converter
         result['label-studio-converter'] = {'version': label_studio_converter.__version__}
     except:
         pass
+
+    result.update(settings.COLLECT_VERSIONS(result=result))
 
     settings.VERSIONS = result
     return result
