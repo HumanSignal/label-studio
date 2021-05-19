@@ -1,0 +1,352 @@
+---
+test_name: image_upload
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    data:
+      label_config: <View></View>
+      title: Image upload
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        project_pk: id
+    status_code: 201
+- name: stage
+  request:
+    files:
+      image_0: tests/test_suites/samples/test_image.jpg
+      image_1: tests/test_suites/samples/test_image.png
+    headers:
+      content-type: multipart/form-data
+    method: POST
+    url: '{django_live_url}/api/projects/{project_pk}/import'
+  response:
+    json:
+      annotation_count: 0
+      prediction_count: 0
+      task_count: 2
+    status_code: 201
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/tasks'
+  response:
+    status_code: 200
+
+---
+test_name: consistency_of_data_columns
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    data:
+      label_config: <View></View>
+      title: Check consistency of imported data columns
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        project_pk: id
+    status_code: 201
+- name: stage
+  request:
+    files:
+      csv_0: tests/test_suites/samples/test_1.csv
+    headers:
+      content-type: multipart/form-data
+    method: POST
+    url: '{django_live_url}/api/projects/{project_pk}/tasks/bulk'
+  response:
+    json:
+      annotation_count: 0
+      prediction_count: 0
+      task_count: 2
+    status_code: 201
+- name: stage
+  request:
+    files:
+      csv_0: tests/test_suites/samples/test_2.csv
+    headers:
+      content-type: multipart/form-data
+    method: POST
+    url: '{django_live_url}/api/projects/{project_pk}/tasks/bulk'
+  response:
+    json:
+      annotation_count: 0
+      prediction_count: 0
+      task_count: 3
+    status_code: 201
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/summary'
+  response:
+    json:
+      all_data_columns:
+        key1: 5
+        key2: 5
+        value1: 5
+        value100: 3
+        value2: 2
+      common_data_columns:
+      - key1
+      - key2
+      - value1
+    status_code: 200
+
+---
+test_name: import_time_series_with_predictions
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    data:
+      label_config: <View></View>
+      title: Check consistency of imported data columns
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        project_pk: id
+    status_code: 201
+- name: stage
+  request:
+    files:
+      csv_0: tests/test_suites/samples/random-with-predictions.json
+    headers:
+      content-type: multipart/form-data
+    method: POST
+    url: '{django_live_url}/api/projects/{project_pk}/tasks/bulk'
+  response:
+    json:
+      annotation_count: 0
+      prediction_count: 1
+      task_count: 1
+    status_code: 201
+
+---
+test_name: import_from_url
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    data:
+      label_config: <View></View>
+      title: Check consistency of imported data columns
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        project_pk: id
+    status_code: 201
+- name: stage
+  request:
+    data:
+      url: https://data.heartex.net/q/fffeaf81f4.json
+    headers:
+      content-type: application/x-www-form-urlencoded
+    method: POST
+    url: '{django_live_url}/api/projects/{project_pk}/tasks/bulk'
+  response:
+    status_code: 201
+- name: stage
+  request:
+    data:
+      url: https://data.heartex.net/q/fffeaf81f4.json
+    headers:
+      content-type: application/x-www-form-urlencoded
+    method: POST
+    url: '{django_live_url}/api/projects/{project_pk}/tasks/bulk'
+  response:
+    status_code: 201
+
+---
+test_name: full_step_project_creation
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    data:
+      is_draft: true
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        project_pk: id
+    status_code: 201
+- name: stage
+  request:
+    files:
+      image_0: tests/test_suites/samples/first.jpg
+      image_1: tests/test_suites/samples/second.jpg
+    headers:
+      content-type: multipart/form-data
+    method: POST
+    url: '{django_live_url}/api/projects/{project_pk}/tasks/bulk'
+  response:
+    json:
+      annotation_count: 0
+      prediction_count: 0
+      task_count: 2
+    status_code: 201
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/file-uploads'
+  response:
+    status_code: 200
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/summary'
+  response:
+    json:
+      all_data_columns:
+        $undefined$: 2
+      common_data_columns:
+      - $undefined$
+    status_code: 200
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      is_draft: false
+    method: PATCH
+    url: '{django_live_url}/api/projects/{project_pk}'
+  response:
+    json:
+      is_draft: false
+    status_code: 200
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects'
+  response:
+    status_code: 200
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}'
+  response:
+    json:
+      created_by:
+        avatar: null
+        email: test_suites_user@heartex.com
+        first_name: ''
+        last_name: ''
+      task_number: 2
+      title: ''
+      total_predictions_number: 0
+    status_code: 200
+- name: stage
+  request:
+    method: DELETE
+    url: '{django_live_url}/api/projects/{project_pk}'
+  response:
+    status_code: 204
+
+---
+test_name: interpert_as_time_series
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    data:
+      label_config: <View></View>
+      title: Interpert as time series
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        project_pk: id
+    status_code: 201
+- name: stage
+  request:
+    files:
+      csv_1: tests/test_suites/samples/test_3.csv
+      csv_2: tests/test_suites/samples/test_4.csv
+    headers:
+      content-type: multipart/form-data
+    method: POST
+    url: '{django_live_url}/api/projects/{project_pk}/import?commit_to_project=false'
+  response:
+    json:
+      annotation_count: null
+      could_be_tasks_list: true
+      prediction_count: null
+      task_count: 5
+    save:
+      json:
+        file_upload_ids: file_upload_ids
+    status_code: 201
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      file_upload_ids: !force_format_include '{file_upload_ids}'
+      files_as_tasks_list: false
+    method: POST
+    url: '{django_live_url}/api/projects/{project_pk}/reimport'
+  response:
+    json:
+      task_count: 2
+    status_code: 201
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/tasks'
+  response:
+    status_code: 200
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      file_upload_ids: !force_format_include '{file_upload_ids}'
+    method: DELETE
+    url: '{django_live_url}/api/projects/{project_pk}/file-uploads'
+  response:
+    json:
+      deleted: 2
+    status_code: 200
+

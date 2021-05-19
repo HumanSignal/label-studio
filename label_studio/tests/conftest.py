@@ -343,3 +343,8 @@ def configured_project(business_client, annotator_client):
 
     Task.objects.bulk_create([Task(data=task, project=project) for task in _2_tasks_with_textA_and_textB])
     return project
+
+
+@pytest.fixture(name="django_live_url")
+def get_server_url(live_server):
+    yield live_server.url

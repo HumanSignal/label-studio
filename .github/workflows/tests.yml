@@ -15,6 +15,7 @@ jobs:
 
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
+      COVERAGE_PROCESS_START: 1
       LOG_DIR: pytest_logs
       collect_analytics: false
 
@@ -51,7 +52,11 @@ jobs:
     name: LS PostgreSQL
     runs-on: ubuntu-latest
     env:
-      DJANGO_SETTINGS_MODULE: core.settings.pytest
+      DJANGO_SETTINGS_MODULE: core.settings.label_studio
+      DJANGO_DB: default
+      COVERAGE_PROCESS_START: .coveragerc
+      PYTHONPATH: .
+      LOG_LEVEL: ERROR
       LOG_DIR: pytest_logs
       collect_analytics: false
 
@@ -134,6 +139,7 @@ jobs:
 
     env:
       DJANGO_SETTINGS_MODULE: core.settings.label_studio
+      COVERAGE_PROCESS_START: 1
       LOG_DIR: pytest_logs
       collect_analytics: false
 

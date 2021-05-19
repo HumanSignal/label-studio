@@ -93,38 +93,3 @@ class MLBackendTrainAPI(APIView):
 
         ml_backend.train()
         return Response(status=status.HTTP_200_OK)
-
-
-class MLBackendPredictAPI(APIView):
-    """
-    post:
-    Create predictions
-
-    Create predictions for all tasks in a project to build statistics and an active learning strategy.
-    """
-    permission_required = all_permissions.projects_change
-
-    @swagger_auto_schema(
-        responses={
-            200: openapi.Response(
-                title='Predictions OK',
-                description='Predictions have successfully started.'
-            ),
-            500: openapi.Response(
-                description='Error',
-                schema=openapi.Schema(
-                    title='Error message',
-                    desciption='Error message',
-                    type=openapi.TYPE_STRING,
-                    example='Server responded with an error.'
-                )
-            )
-        },
-        tags=['Machine Learning']
-    )
-    def post(self, request, *args, **kwargs):
-        ml_backend = get_object_with_check_and_log(request, MLBackend, pk=self.kwargs['pk'])
-        self.check_object_permissions(self.request, ml_backend)
-
-        ml_backend.predict_all_tasks()
-        return Response(status=status.HTTP_200_OK)

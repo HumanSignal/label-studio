@@ -1,0 +1,86 @@
+---
+test_name: create_project_with_label_config_then_import
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        pk: id
+    status_code: 201
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: '<View> <Image name="image" value="$image"/> <Header value="Describe
+        the image:"/> <TextArea name="caption" toName="image" placeholder="Enter description
+        here..." rows="5" maxSubmissions="1"/> </View> '
+    method: PATCH
+    url: '{django_live_url}/api/projects/{pk}'
+  response:
+    status_code: 200
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+    - wrong_field: http://pytest.heartex.com/image1.jpg
+    - wrong_field: http://pytest.heartex.com/image2.jpg
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/import'
+  response:
+    status_code: 400
+- name: stage
+  request:
+    files:
+      file: tests/test_suites/samples/image_urls.csv
+    headers:
+      content-type: multipart/form-data
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/import?commit_to_project=false'
+  response:
+    json:
+      could_be_tasks_list: true
+    save:
+      json:
+        file_upload_ids: file_upload_ids
+    status_code: 201
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      file_upload_ids: !force_format_include '{file_upload_ids}'
+      files_as_tasks_list: true
+    method: POST
+    url: '{django_live_url}/api/projects/{pk}/reimport'
+  response:
+    json:
+      task_count: 3
+    status_code: 201
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/projects/{pk}/data'
+  response:
+    status_code: 200
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{pk}/summary'
+  response:
+    json:
+      all_data_columns:
+        id: 3
+        image: 3
+    status_code: 200
+
