@@ -110,16 +110,13 @@ If you want to use nightly builds or extend the functionality, consider download
 ```bash
 git clone https://github.com/heartexlabs/label-studio.git
 cd label-studio
-python setup.py develop
+# Install all package dependencies
+pip install -e .
+# Run database migrations
+python label_studio/manage.py migrate
+# Start the server in development mode at http://localhost:8080
+python label_studio/manage.py runserver
 ```
-
-Then, start Label Studio:
-
-```bash
-label-studio 
-```
-The default web browser opens automatically at [http://localhost:8080](http://localhost:8080).
-
 
 ## Install with Anaconda
 

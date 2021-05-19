@@ -1,6 +1,6 @@
 {
-  "message": "Fix annotators column",
-  "commit": "672a7c3875e7948499971309fbb630fc48e4cdd6",
+  "message": "Fix number parser",
+  "commit": "a309c34a2bc1a671ef6cecbeb925f05f3dbb728c",
   "branch": "feature/lsf-ui",
-  "date": "2021-05-07T11:47:56Z"
+  "date": "2021-05-18T21:08:46Z"
 }
