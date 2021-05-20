@@ -473,7 +473,6 @@ def collect_versions(force=False):
 
     for key in result:
         if 'message' in result[key] and len(result[key]['message']) > 70:
-            result[key]['message'] = result[key]['message'].replace('},', '},\n').replace('\\n', ' ').replace('\\r', '')
             result[key]['message'] = result[key]['message'][0:70] + ' ...'
 
     settings.VERSIONS = result
