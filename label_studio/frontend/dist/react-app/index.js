@@ -6001,7 +6001,7 @@ const VersionProvider = ({
   });
   const fetchVersion = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(async () => {
     const response = await api.callApi("version");
-    const data = response.package;
+    const data = response['label-studio-package'];
     dispatch({
       type: "fetch-version",
       payload: {
