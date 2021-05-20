@@ -40,16 +40,18 @@ To place the task back in the Label Stream for annotation, you must delete the a
 
 If there are multiple annotations, you can select the tab of each annotation by annotator and result ID. The annotation result ID is different from the task ID visible in the left menu. 
 
+
+
 You can assign reviewers to tasks, or people with access can review tasks on an ad hoc basis. Anyone who is assigned to a task or who completes a review of a task appears in the Reviewers column on the Data Manager. You can assign reviewers to multiple tasks at once, but you cannot remove reviewers from multiple tasks at once. 
 
 
 ## Verify model and annotator performance 
-Use the project dashboard to verify annotator performance. 
-
-### Review annotations against ground truth labels 
-There isn't a way to set ground truth labels rn I don't think.
+Use the project dashboard to verify annotator performance.
 
 ### Review annotator consensus 
 For each project, you can review the project dashboard and review the Annotator Performance and Annotator Agreement Matrix sections to see the overall annotator consensus for the entire project.
 
 To see annotator consensus for each task, you can view the different annotations chosen by each annotator when reviewing a task by selecting the tab of each annotation when in the Review Stream.
+
+### Review annotations against ground truth labels 
+There isn't a way to set ground truth labels rn I don't think.

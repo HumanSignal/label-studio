@@ -1,5 +1,5 @@
 ---
-title: Manage annotation quality in Label Studio
+title: Define ground truth labels in Label Studio
 type: guide
 order: 402
 meta_title: 
@@ -8,17 +8,22 @@ meta_description:
 
 > Beta documentation: Label Studio Enterprise v2.0.0 is currently in Beta. As a result, this documentation might not reflect the current functionality of the product.
 
-Define the annotation quality standards for a project by defining ground truth labels for a project. 
+Define ground truth labels in a Label Studio project. Use ground truth labels as benchmarks when [reviewing annotations](quality.html) and to assess the quality of your annotated dataset. Review ground truths to make sure that annotators are accurately labeling data at the start of the project, and continually throughout the lifecycle of the training dataset creation.
+
+Compare annotations from annotators and model predictions against the ground truth labels for a task to calculate an accuracy score between 0 and 1.
 
 > Defining ground truth labels is only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see [Features of Label Studio](label_studio_compare.html) to learn more.
 
-
-
-Ground Truth items is a quality assurance tool for training data. Training data quality is the measure of accuracy and consistency of the training data. Completions from each annotator and the model are compared against their respective ground truth completion, and an accuracy score between 0 and 1 is calculated. Use Ground Truth to ensure the labeling team is accurately labeling data initially, and throughout the lifecycle of the training data.
-
-To create new Ground Truth items, go into data manager, and open individual tasks. Create a new completion or set an existing one and click on _Ground Truth_ button. You can also directly click on the _Star_ icon in the data manager next to a task. In case there are multiple completions inside a task, only the first one will be set as a ground truth.
-
-
 ## Define ground truth labels for a project
 
+You can create ground truth labels from a project's Data Manager page:
+1. When viewing the data manager for a project, select the checkboxes next to annotated tasks.
+2. In the selected tasks dropdown menu, select **Assign ground truths**. If there are multiple annotations for a task, only the first, or earliest annotation is assigned as a ground truth. 
+
+You can also assign ground truths when you annotate a task.
+1. When labeling a task, create an annotation or select an existing one.
+2. Click **Ground Truth**. 
+
 ## Manage ground truth labels for a project
+
+You can filter the Data Manager to show only the ground truth labels, to review the distribution of annotations set as ground truths. 
