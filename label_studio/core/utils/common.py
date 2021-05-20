@@ -471,6 +471,10 @@ def collect_versions(force=False):
 
     result.update(settings.COLLECT_VERSIONS(result=result))
 
+    for key in result:
+        if 'message' in result[key] and len(result[key]['message']) > 70:
+            result[key]['message'] = result[key]['message'][0:70] + ' ...'
+
     settings.VERSIONS = result
     return result
 
