@@ -1,5 +1,5 @@
 # Building the main container
-FROM ubuntu:20.04
+FROM python:3.8-buster
 
 WORKDIR /label-studio
 
@@ -7,8 +7,8 @@ ENV TZ=Europe/Berlin
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apt-get update && apt-get install -y build-essential postgresql-client libmysqlclient-dev mysql-client python3.8 python3-pip python3.8-dev uwsgi  git libxml2-dev libxslt-dev zlib1g-dev uwsgi
 
-RUN chgrp -R 0 /var/log /var/cache /var/run /run /tmp /etc/uwsgi && \
-    chmod -R g+rwX /var/log /var/cache /var/run /run /tmp /etc/uwsgi
+RUN chgrp -R 0 /var/log /var/cache /var/run /run /tmp && \
+    chmod -R g+rwX /var/log /var/cache /var/run /run /tmp
 
 # Copy and install requirements.txt first for caching
 COPY deploy/requirements.txt /label-studio
