@@ -22,6 +22,8 @@
 	// Set *default* container specific settings.json values on container create.
 	"settings": {
 		"terminal.integrated.defaultProfile.linux": "bash",
+		"python.defaultInterpreterPath": "/usr/bin/python3",
+		"python.pythonPath": "/usr/bin/python3",
 		"files.eol": "\n",
 		"editor.formatOnSave": true,
 	},
@@ -37,6 +39,7 @@
 		"oderwat.indent-rainbow",
 		"medo64.render-crlf",
 		"ms-azuretools.vscode-docker",
+		"ms-vscode-remote.vscode-remote-extensionpack",
 	],
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
