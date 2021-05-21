@@ -29,6 +29,8 @@ You can import many different types of data, including text, timeseries, audio, 
 
 If you don't see a supported data or file type that you want to import, reach out in the [Label Studio Slack community](https://join.slack.com/t/label-studio/shared_invite/zt-cr8b7ygm-6L45z7biEBw4HXa5A2b5pw). 
 
+You can import files containing up to 250,000 tasks or up to 50MB in size into Label Studio.
+
 ## How to format your data to import it
 
 Label Studio treats different file types different ways. 
@@ -219,7 +221,7 @@ this is a first task
 this is a second task
 ```
 
-If you want to import entire plain text files without each line becoming a new labeling task, customize the labeling configuration to specify `valueType="url"` in the Text tag. See the [Text tag documentation](/tags/text.html)
+If you want to import entire plain text files without each line becoming a new labeling task, customize the labeling configuration to specify `valueType="url"` in the Text tag. See the [Text tag documentation](/tags/text.html). Note that using this setting means that when you export your tasks, you export the links to the raw data created by Label Studio, rather than the raw data. If you want to export tasks with data, and label text files with new lines, use the [Label Studio JSON format](#Basic-Label-Studio-JSON-format).
 
 ## Import data from a local directory
 
