@@ -55,6 +55,19 @@ In the project settings, you can add instructions and choose whether to show the
 
 Annotators can view instructions at any time when labeling by clicking the (i) button from the labeling interface.
 
+### Set up task distribution for labeling
+Select how you want to distribute tasks to annotators for labeling. Different from task sampling, use this setting to choose whether you need to assign annotators before they can start labeling.
+
+1. Within a project on the Label Studio UI, click **Settings**.
+2. Click **Annotation Settings**.
+3. Under **Label Stream task distribution**, select one of the following:
+    - Auto, the default option, to distribute tasks automatically to annotators.
+    - Manual, to show tasks only to assigned annotators. Choose this option if you require more than one annotation per task. 
+    
+Your changes save automatically. 
+
+> You can't assign annotators to tasks unless you select the **Manual** option. 
+
 ### Set minimum annotations per task
 
 By default, each task only needs to be annotated by one annotator. If you want multiple annotators to be able to annotate tasks, set the Overlap of Annotations for a project in the project settings.
@@ -64,7 +77,9 @@ By default, each task only needs to be annotated by one annotator. If you want m
 3. Under **Overlap of Annotations**, select the number of minimum annotations for a task. 
 4. Choose whether to enforce the overlap for the default of 100% of tasks, or a smaller percentage. 
 5. Choose whether to show tasks that require multiple annotations, **tasks with overlap**, before other tasks that need to be annotated. 
-6. Your changes save automatically. Return to the **Data Manager** and assign annotators to the tasks so that they can annotate the tasks. Unless you assign annotators, multiple people cannot annotate tasks. 
+6. Your changes save automatically. Return to the **Data Manager** and assign annotators to the tasks so that they can annotate the tasks. 
+   
+> Unless you assign annotators, multiple people cannot annotate tasks. 
 
 ### Set annotating options
 If you want, you can allow empty annotations.
