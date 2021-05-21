@@ -28,7 +28,7 @@ services:
       - POSTGRE_NAME=postgres
       - POSTGRE_USER=postgres
       - POSTGRE_PASSWORD=
-      - POSTGRE_PORT=54321
+      - POSTGRE_PORT=5432
       - POSTGRE_HOST=db
       - LABEL_STUDIO_HOST=http://localhost/foo
     volumes:
