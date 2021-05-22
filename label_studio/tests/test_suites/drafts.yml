@@ -32,6 +32,11 @@
       response:
         id: '{draft_id}'
 
+  # get drafts list per task
+  - /api/tasks/{task_pk}/drafts:
+      method: GET
+      status_code: 200
+
   # Verify draft
   - /api/drafts/{draft_id}/:
       method: GET
