@@ -23,15 +23,78 @@ In your first API call, specify the access token.
 curl -X <method> <Label Studio URL>/api/<endpoint> -H 'Authorization: Token <token>'
 ```
 
-For example, ofor a Label Studio instance hosted at localhost:
+### List all projects
+
+To perform most tasks with the Label Studio API, you must specify the project ID, sometimes referred to as the `pk`. To retrieve a list of your Label Studio projects, update the following command to match your own environment. Replace the domain name, port, and authorization token, then run the following from the command line:
 ```bash
-curl -X GET https://localhost:8000/api/projects/ -H 'Authorization: Token 123456789abcdefghijklmnop123456789'
+curl -X GET https://localhost:8080/api/projects/ -H 'Authorization: Token abc123'
 ```
 
+For more on this endpoint, see the [projects API endpoint documentation](/api#tag/Projects).
+
+### Create and set up a project
+
+Create a project and set up the labeling interface in Label Studio using the API.
+
+```bash
+curl -H Content-Type:application/json -H 'Authorization: Token abc123' -X POST 'http://localhost:8080/api/projects' \
+--data "{\"label_config\": \"<View>[...]</View>\"}"
+```
+
+See detailed options for this API call in the [Create new project API endpoint documentation](/api#operation/projects_create).
+
+If you want to make sure your labeling config is valid before submitting it using the API, you can use the [validate label config](/api#operation/projects_validate_create) API endpoint.
+
+### Import tasks using the API
+
+To import tasks using the API, make sure you know the project ID that you want to add tasks to. 
+
+You can import tasks by specifying the task data as JSON directly in the API call, or by referencing a file.
+
+#### Import task data directly
+
+Update this example to specify your authorization token and Label Studio instance host, then run the following from the command line:
+ ```bash
+curl -H 'Content-Type: application/json' -H 'Authorization: Token abc123' -X POST 'http://localhost/api/projects/1/import' \
+--data '[{"text": "Some text 1"}, {"text": "Some text 2"}]'
+ ```
+
+#### Import task data from file
+Update this example to specify your authorization token, Label Studio instance host, and file name and path, then run the following from the command line:
+```bash
+curl -H 'Content-Type: application/json' -H 'Authorization: Token abc123' -X POST 'http://localhost/api/projects/1/import' \
+-F ‘file=@path/to/my_file.csv’
+```
+
+See additional examples and parameter descriptions in the [import data endpoint documentation](/api#operation/projects_import_create)
+
+### Retrieve tasks
+Retrieve a paginated list of tasks for a specific project with the following API call. 
+
+```bash
+curl -X GET https://localhost:8080/api/projects/{id}/tasks/ -H 'Authorization: Token abc123'
+```
+
+See additional details and parameters in the [list project tasks endpoint documentation](/api#operation/projects_tasks_list).
+
+### Export annotations
+
+To export annotations, first see which formats are available to export for your project.
+
+```bash
+curl -X GET https://localhost:8080/api/projects/{id}/export/formats -H 'Authorization: Token abc123'
+```
+
+Choose your selected format from the response and then call the export endpoint. For example, to export JSON annotations for a project to a file called annotations.json, run the following from the command line:
+```bash
+curl -X GET https://localhost:8080/api/projects/{id}/export?exportType=JSON -H 'Authorization: Token abc123' --output annotations.json
+```
+
+See the [export annotations](/api#operation/projects_export_list) endpoint documentation for more details.
 
 ### API endpoint reference for older Label Studio versions
 
-These API endpoints were introduced in Label Studio version 0.8.1 and are only valid until version 0.9.1. Use the API documentation linked inside Label Studio for guidance when working with version 1.0.0. 
+These API endpoints were introduced in Label Studio version 0.8.1 and are only valid until version 0.9.1. Use the [API documentation](/api) linked inside Label Studio and for guidance when working with version 1.0.0. 
 
 ### Set up project configuration
 

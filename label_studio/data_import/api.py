@@ -118,7 +118,7 @@ class ImportAPI(generics.CreateAPIView):
      2\. **POST with files**: Send tasks as files. You can attach multiple files with different names. 
 
 
-    - **JSON**: text files in javascript object notation format
+    - **JSON**: text files in JavaScript object notation format
     - **CSV**: text files with tables in Comma Separated Values format
     - **TSV**: text files with tables in Tab Separated Value format
     - **TXT**: simple text files are similar to CSV with one column and no header, supported for projects with one source only
