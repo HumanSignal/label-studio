@@ -104,7 +104,7 @@ REDIS_SSL=1
 REDIS_SSL_CERTS_REQS=required
 
 # Specify Redis SSL certificate
-REDIS_SSL_CA_CERTS=redis-ca-bundle.pe
+REDIS_SSL_CA_CERTS=redis-ca-bundle.pem
 ```
 
 2. After you set all the environment variables, run Docker exposing port 8080:
