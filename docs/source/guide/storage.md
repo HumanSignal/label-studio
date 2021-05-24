@@ -155,7 +155,7 @@ If you have trouble accessing bucket objects in Label Studio, check your web bro
 - If you see CORS problems, see [Configuring cross-origin resource sharing (CORS)](https://cloud.google.com/storage/docs/configuring-cors) in the Google Cloud Storage documentation.
  <img src='/images/cors-error-2.png' style="opacity: 0.9; max-width: 500px">
  
-- If you see 403 errors, make sure you have the correct credentials configured. See [Setting up authentication](https://cloud.google.com/storage/docs/reference/libraries#setting_up_authentication) in the Google Cloud Storage documentation. 
+- If you see 403 errors, make sure you have the correct credentials configured. See [Setting up authentication](https://cloud.google.com/storage/docs/reference/libraries#setting_up_authentication) in the Google Cloud Storage documentation. Your account must have the `Service Account Token Creator` role. 
 
 ### Working with Binary Large OBjects (BLOBs)
 
