@@ -74,7 +74,6 @@ class BasePermission(IsAuthenticated):
         return self.has_object_permission(*args, **kwargs)
 
 
-
 class BaseRulesPermission(BasePermission):
     perm = None
 

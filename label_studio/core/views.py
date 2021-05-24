@@ -3,10 +3,11 @@
 import os
 import io
 import sys
+import json
 import logging
 
 import pandas as pd
-import ujson as json
+
 from django.conf import settings
 from django.contrib.auth import logout
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseForbidden
@@ -16,10 +17,10 @@ from django.views.static import serve
 from django.http import JsonResponse
 from wsgiref.util import FileWrapper
 
-from core import utils, version
-from core.utils.params import get_bool_env, get_env
+from core import utils
+from core.utils.params import get_env
 from core.label_config import generate_time_series_json
-from core.utils.common import directory_index, collect_versions
+from core.utils.common import collect_versions
 
 logger = logging.getLogger(__name__)
 
@@ -50,15 +51,13 @@ def version_page(request):
     result = collect_versions(force=True)
 
     # other settings from backend
-    if not request.user.is_superuser:
-        for root in result:
-            result[root].pop('message', None)
-    else:
+    if request.user.is_superuser:
         result['settings'] = {key: str(getattr(settings, key)) for key in dir(settings) if not key.startswith('_')}
 
     # html / json response
     if request.path == '/version/':
         result = json.dumps(result, indent=2)
+        result = result.replace('},', '},\n').replace('\\n', ' ').replace('\\r', '')
         return HttpResponse('<pre>' + result + '</pre>')
     else:
         return JsonResponse(result)

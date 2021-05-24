@@ -7,7 +7,6 @@ import pathlib
 import os
 
 from collections import Counter
-from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError
 from django.db.models.fields import DecimalField
 from django.conf import settings
@@ -16,13 +15,12 @@ from django.db.models import Q, When, Count, Case, OuterRef, Max, Exists, Value,
 from rest_framework import generics, status, filters
 from rest_framework.exceptions import NotFound, ValidationError as RestValidationError
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.views import APIView, exception_handler
+from rest_framework.views import exception_handler
 
 from core.utils.common import conditional_atomic
 from core.label_config import config_essential_data_has_changed
-from projects.functions import (generate_unique_title, duplicate_project)
 from projects.models import (
     Project, ProjectSummary
 )
@@ -33,7 +31,6 @@ from tasks.models import Task, Annotation, Prediction, TaskLock
 from tasks.serializers import TaskSerializer, TaskWithAnnotationsAndPredictionsAndDraftsSerializer
 
 from core.mixins import APIViewVirtualRedirectMixin, APIViewVirtualMethodMixin
-from core.decorators import permission_required
 from core.permissions import all_permissions, ViewClassPermission
 from core.utils.common import (
     get_object_with_check_and_log, bool_from_request, paginator, paginator_help)
@@ -392,9 +389,6 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
     )
     def get(self, request, *args, **kwargs):
         project = get_object_with_check_and_log(request, Project, pk=self.kwargs['pk'])
-        # TODO: LSE option
-        # if not project.is_published:
-        #     raise PermissionDenied('Project is not published.')
         self.check_object_permissions(request, project)
         user = request.user
 
@@ -535,52 +529,6 @@ class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
     @swagger_auto_schema(auto_schema=None)
     def get(self, request, *args, **kwargs):
         return super(ProjectLabelConfigValidateAPI, self).get(request, *args, **kwargs)
-
-
-class ProjectDuplicateAPI(APIView):
-    """Duplicate project
-
-    Create a duplicate project with the same tasks and settings.
-    """
-    permission_required = all_permissions.projects_change
-
-    @swagger_auto_schema(
-        manual_parameters=[
-            openapi.Parameter(name='title', type=openapi.TYPE_STRING, in_=openapi.IN_QUERY,
-                              description='Duplicated project name'),
-            openapi.Parameter(name='duplicate_tasks', type=openapi.TYPE_BOOLEAN, in_=openapi.IN_QUERY,
-                              description='Whether or not to copy tasks from the source project.'),
-        ],
-        responses={
-            200: openapi.Response(description='Success',
-                    schema=openapi.Schema(
-                        title='Project',
-                        desciption='Project ID',
-                        type=openapi.TYPE_OBJECT,
-                        properties={
-                          'id': openapi.Schema(title='Project ID', description='Project ID', type=openapi.TYPE_INTEGER),
-                          'redirect_url': openapi.Schema(description='Redirect URL to project', type=openapi.TYPE_STRING)
-                        }
-                    )
-            ),
-            400: openapi.Response(description="Can't duplicate the project")
-        },
-        tags=['Projects']
-    )
-    def get(self, request, *args, **kwargs):
-        project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=kwargs['pk'])
-        title = request.GET.get('title', '')
-        title = project.title if not title else title
-        title = generate_unique_title(request.user, title)
-
-        duplicate_tasks = bool_from_request(request.GET, 'duplicate_tasks', default=False)
-
-        try:
-            project = duplicate_project(project, title, duplicate_tasks, request.user)
-        except Exception as e:
-            raise ValueError(f"Can't duplicate project: {e}")
-
-        return Response({'id': project.pk}, status=status.HTTP_200_OK)
 
 
 class ProjectSummaryAPI(generics.RetrieveAPIView):
