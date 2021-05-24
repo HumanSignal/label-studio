@@ -42,7 +42,7 @@ If you want to make changes to the labeling interface or perform a different typ
 
 Set up annotation settings to configure how you want annotators to perform labeling for your project.
 
-> <img src="/images/LSE/en.svg" alt="Enterprise" style="vertical-align:middle"/> Annotation settings other than instructions for data labelers are only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see [Features of Label Studio](label_studio_compare.html) to learn more.
+> <img src="/images/LSE/en.svg" alt="Enterprise" style="vertical-align:middle"/> Some annotation settings are only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see [Label Studio Features](label_studio_compare.html) to learn more.
 
 ### Set up instructions for data labelers 
 
@@ -116,7 +116,7 @@ Your changes save automatically. For more about how annotation statistics are ca
 
 Set up review settings to guide reviewers when they review annotated tasks.
 
-> <img src="/images/LSE/en.svg" alt="Enterprise" style="vertical-align:middle"/> Review settings and the review stream are only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see [Label Studio Features](label_studio_compare.html) to learn more.
+> Review settings and the review stream are only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see [Label Studio Features](label_studio_compare.html) to learn more.
 
 ### Set up instructions for task reviewers 
 

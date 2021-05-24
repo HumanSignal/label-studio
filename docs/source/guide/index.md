@@ -41,12 +41,12 @@ All the steps required to start and finish a labeling project with Label Studio:
 1. [Install Label Studio](install.html).
 2. [Start Label Studio](start.html).
 2. [Create accounts for Label Studio](signup.html). Create an account to manage and set up labeling projects.
-3. [Restrict access to the project](manage_users.html). Set up role-based access control. Only available in Label Studio Enterprise Edition.
+3. <img src="/images/LSE/en.svg" alt="Enterprise" style="vertical-align:middle"/> [Restrict access to the project](manage_users.html). Set up role-based access control. Only available in Label Studio Enterprise Edition.
 4. [Set up the labeling project](setup_project.html). Define the type of labeling to perform on the dataset and configure project settings.
 5. [Set up the labeling interface](setup.html). Add the labels that you want annotators to apply and customize the labeling interface. 
 6. [Import data as labeling tasks](tasks.html).
 7. [Label and annotate the data](labeling.html). 
-8. [Review the annotated tasks](quality.html). Only available in Label Studio Enterprise Edition.
+8. <img src="/images/LSE/en.svg" alt="Enterprise" style="vertical-align:middle"/> [Review the annotated tasks](quality.html). Only available in Label Studio Enterprise Edition.
 9. [Export the labeled data or the annotations](export.html).
 
 
@@ -62,7 +62,7 @@ When you upload data to Label Studio, each item in the dataset becomes a labelin
 | Region | The portion of the dataset item that has a label assigned to it. | 
 | Relation | A defined relationship between two labeled regions. |
 | Result | A label applied to a specific region. |
-| Pre-labeling | What machine learning models perform in Label Studio or separate from Label Studio. The result of predicting labels for items in a dataset are predicted labels, or pre-labels. |
+| Pre-labeling | What machine learning models perform in Label Studio or separate from Label Studio. The result of predicting labels for items in a dataset are predicted labels, or pre-annotations. |
 | Annotations | The output of a labeling task. Previously called "completions". |
 | Templates | Example labeling configurations that you can use to specify the type of labeling that you're performing with your dataset. See [all available templates](/templates) |
 | Tags | Configuration options to customize the labeling interface. See [more about tags](/tags). |
@@ -85,6 +85,6 @@ The component parts of Label Studio are available as modular extensible packages
 
 ## Information collected by Label Studio
 
-Label Studio collects anonymous usage statistics about the number of page visits and data types being used in labeling configurations that you set up. No sensitive information is included in the information we collect. The information we collect helps us improve the experience of labeling data in Label Studio and helps us plan future data types and labeling configurations to support.
+Label Studio collects anonymous usage statistics about the number of page visits and data types being used in labeling configurations that you set up. No sensitive information is included in the information we collect. The information we collect helps us improve the experience of labeling data in Label Studio and helps us plan future data types and labeling configurations to support. 
 
 
