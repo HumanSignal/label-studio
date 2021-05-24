@@ -14,7 +14,9 @@ Label and annotate your data with the open source data labeling tool, Label Stud
 4. Follow the project instructions for labeling and deciding whether or not to skip tasks. 
 5. Click the project name to return to the data manager. 
 
-When collaborating with other users, tasks are locked so that you don't accidentally overwrite the annotations of another annotator. After the other annotator finishes with the task, it can appear in your queue for labeling. By default, tasks only need to be annotated by one annotator. If you're using Label Studio Enterprise and want more than one annotator to annotate tasks, [update the project settings](setup_project.html). 
+When collaborating with other users, tasks are locked so that you don't accidentally overwrite the annotations of another annotator. After the other annotator finishes with the task, it can appear in your queue for labeling. By default, tasks only need to be annotated by one annotator. 
+
+> If you're using Label Studio Enterprise and want more than one annotator to annotate tasks, [update the project settings](setup_project.html). 
 
 ## Filter or sort project data
 
@@ -33,7 +35,7 @@ You can sort the data in your project by prediction score if you upload [pre-ann
 1. In a project, update the **Order** of the data from the default to use the **Prediction score** field.
 2. Update the order of the items in either ascending or descending order to label based on higher confidence or lower confidence predictions. 
 3. Click **Label** to start labeling tasks in prediction score order. 
-You can also use [task sampling](start.html#Set_up_task_sampling_for_your_project) to use some prediction score ordering.
+You can also use [task sampling](start.html#Set_up_task_sampling_for_your_project) to use prediction score ordering.
 
 ### Example: Split a dataset using tabs and filters
 If you want to label a large dataset, you might want to use tabs and filters to split it up into smaller sections, and assign different annotators to different tabs. You can't assign annotators to specific tasks in Label Studio Community Edition, but you can rename the tabs after specific annotators as a way to basically assign tasks using tabs.  
