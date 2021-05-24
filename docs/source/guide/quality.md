@@ -1,7 +1,7 @@
 ---
 title: Review annotations in Label Studio
 type: guide
-order: 404
+order: 410
 meta_title: 
 meta_description:
 ---
@@ -53,5 +53,4 @@ For each project, you can review the project dashboard and review the Annotator 
 
 To see annotator consensus for each task, you can view the different annotations chosen by each annotator when reviewing a task by selecting the tab of each annotation when in the Review Stream.
 
-### Review annotations against ground truth labels 
-There isn't a way to set ground truth labels rn I don't think.
+### Review annotations against ground truth annotations 

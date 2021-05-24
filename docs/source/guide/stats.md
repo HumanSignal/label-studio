@@ -1,7 +1,7 @@
 ---
-title: Annotation Statistics
+title: Annotation statistics
 type: guide
-order: 405
+order: 413
 meta_title: Data Labeling Statistics
 meta_description: Label Studio Enterprise Documentation about task agreement and annotator consensus for data labeling and machine learning projects.
 ---

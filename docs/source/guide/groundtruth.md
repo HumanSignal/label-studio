@@ -1,7 +1,7 @@
 ---
 title: Define ground truth annotations in Label Studio
 type: guide
-order: 402
+order: 411
 meta_title: Ground Truth annotations 
 meta_description: Label Studio documentation about ground truth annotations to use for managing quality of datasets for your machine learning and data science projects.
 ---
