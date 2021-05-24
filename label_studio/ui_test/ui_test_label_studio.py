@@ -42,7 +42,8 @@ class myTestCase(unittest.TestCase):
         self.menu_tasks = '//a[contains(text(), "Tasks")]'
         self.menu_model = '//a[contains(text(), "Model")]'
         self.menu_settings = '//a[contains(text(), "Settings")]'
-        # WELCOME PAGE
+        #
+        # PAGES
         self.welcome_import_btn = '//a[contains(text(), "Import")]'
         self.welcome_Setup  = '//a[contains(text(), "Setup")]'
         self.welcome_Import = '//a[contains(text(), "Import")]'

@@ -1,5 +1,31 @@
 UI Automation for Label-studio
 
+----- Preconditions -----
+Install Python
+Install needed packages:
+  pip install selenium
+  pip install unittest
+
+----- Choose tested formats ---
+Open the file testCases.txt
+Set + or - for each file format:
+  the symbol ‘+’ means that current format will be tested
+  the symbol ‘-‘ means that current format will not be tested
+  (set + for each file format if you want to test all formats)
+Save the file testCases.txt
+
+----- Run tests -----
+Run docker (if not running)
+  cd label_studio_project/label-studio
+  docker run --rm -p 8080:8080 -v `pwd`/my_project:/label-studio/my_project --name label-studio heartexlabs/label-studio:latest label-studio start my_project --init --force
+
+Run Test Cases
+  Open new terminal/tab
+  cd label_studio_project/label-studio/label_studio/ui_test
+  python ui_test_label_studio.py
+
+
+----- Description -----
 What we have?
 _Automation script
 _testCases.txt file
