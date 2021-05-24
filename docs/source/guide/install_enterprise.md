@@ -1,5 +1,5 @@
 ---
-title: Install Label Studio Enterprise on-premises using Docker
+title: <img src="/images/LSE/en.svg" alt="Enterprise" style="vertical-align:middle"/> Install Label Studio Enterprise on-premises using Docker 
 type: guide
 order: 201
 meta_title: Install and Upgrade Enterprise

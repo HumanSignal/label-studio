@@ -14,7 +14,7 @@ INSERT ARCHITECTURE DIAGRAM HERE
 
 All application component interactions are encrypted using the TLS protocol. 
 
-The following security-related functionality is only available in Label Studio Enterprise deployments:
+> <img src="/images/LSE/en.svg" alt="Enterprise" style="vertical-align:middle"/> The following security-related functionality is only available in Label Studio Enterprise deployments:
 - Role-based access control
 - Federated access to cloud storage using SAML 
 Label Studio Enterprise is available as on-premises software that you manage, or as a Software-as-a-Service (SaaS) offering.
@@ -31,7 +31,7 @@ Each user must create an account with a password of at least 8 characters, allow
 
 You can restrict signup to only those with a link to the signup page, and the invitation link to the signup page can be reset. See [Set up user accounts for Label Studio](signup.html) for more. 
 
-If you're using Label Studio Enterprise, you can further secure user access in many ways:
+<img src="/images/LSE/en.svg" alt="Enterprise" style="vertical-align:middle"/> If you're using Label Studio Enterprise, you can further secure user access in many ways:
 - Assign specific roles to specific user accounts to set up role-based access control. For more about the different roles and permissions in Label Studio Enterprise, see [Manage access to Label Studio](manage_users.html). 
 - Set up organizations, workspaces, and projects to separate projects and data across different groups of users. Users in one organization cannot see the workspaces or projects in other organizations. For more about how to use organizations, workspaces, and projects to secure access, see [Organize projects in Label Studio](organize_projects.html).
 

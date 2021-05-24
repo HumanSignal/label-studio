@@ -11,7 +11,7 @@ Label and annotate your data with the open source data labeling tool, Label Stud
 1. Open a project in Label Studio and optionally filter or sort the data.    
 2. Click **Label** to start labeling.
 3. Use keyboard shortcuts or your mouse to label the data and submit your annotations.
-4. Follow the project instructions for labeling and deciding whether or not to skip tasks. 
+4. Follow the project instructions for labeling and deciding whether to skip tasks. 
 5. Click the project name to return to the data manager. 
 
 When collaborating with other users, tasks are locked so that you don't accidentally overwrite the annotations of another annotator. After the other annotator finishes with the task, it can appear in your queue for labeling. By default, tasks only need to be annotated by one annotator. 

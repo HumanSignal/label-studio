@@ -1,9 +1,9 @@
 ---
-title: Set up authentication for Label Studio
+title: <img src="/images/LSE/en.svg" alt="Enterprise" style="vertical-align:middle"/> Set up authentication for Label Studio
 type: guide
 order: 221
-meta_title: Authentication for Label Studio
-meta_description: Label Studio Documentation for setting up SSO and LDAP authentication for your data labeling, machine learning, and data science projects.
+meta_title: Authentication for Label Studio Enterprise
+meta_description: Label Studio Enterprise Documentation for setting up SSO and LDAP authentication for your data labeling, machine learning, and data science projects.
 ---
 
 > Beta documentation: Label Studio Enterprise v2.0.0 is currently in Beta. As a result, this documentation might not reflect the current functionality of the product.
@@ -14,7 +14,7 @@ Set up single sign-on using SAML to manage access to Label Studio using your exi
 
 ## Set up SAML SSO
 
-The organization owner for Label Studio can set up SSO & SAML for the Label Studio instance. Label Studio Enterprise supports the following IdPs:
+The organization owner for Label Studio Enterprise can set up SSO & SAML for the instance. Label Studio Enterprise supports the following IdPs:
 - Microsoft Active Directory
 - OneLogin
 - others that use SAML assertions
@@ -53,6 +53,6 @@ AUTH_LDAP_ORGANIZATION_OWNER_EMAIL=heartex@heartex.net
 AUTH_LDAP_CONNECTION_OPTIONS=OPT_X_TLS_CACERTFILE=/certificates/ca.crt;OPT_X_TLS_REQUIRE_CERT=OPT_X_TLS_DEMAND
 ```
 
-After setting up LDAP authentication for your on-premise Label Studio Enterprise instance, you can use the credentials `guest1` and `guest1password` to log in and test the setup. 
+After setting up LDAP authentication for your on-premises Label Studio Enterprise instance, you can use the credentials `guest1` and `guest1password` to log in and test the setup. 
 
 

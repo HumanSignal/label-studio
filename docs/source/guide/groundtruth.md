@@ -1,5 +1,5 @@
 ---
-title: Define ground truth annotations in Label Studio
+title: <img src="/images/LSE/en.svg" alt="Enterprise" style="vertical-align:middle"/> Define ground truth annotations in Label Studio
 type: guide
 order: 411
 meta_title: Ground Truth annotations 
@@ -8,11 +8,11 @@ meta_description: Label Studio documentation about ground truth annotations to u
 
 > Beta documentation: Label Studio Enterprise v2.0.0 is currently in Beta. As a result, this documentation might not reflect the current functionality of the product.
 
-Define ground truth annotations in a Label Studio project. Use ground truth annotations as benchmarks when [reviewing annotations](quality.html) and to assess the quality of your annotated dataset. Review ground truths to make sure that annotators are accurately labeling data at the start of the project, and continually throughout the lifecycle of the training dataset creation.
+Define ground truth annotations in a Label Studio project. Use ground truth annotations to assess the [quality of your annotated dataset](quality.html). Review ground truths to make sure that annotators are accurately labeling data at the start of the project, and continually throughout the lifecycle of the training dataset creation.
 
 Compare annotations from annotators and model predictions against the ground truth annotations for a task to calculate an accuracy score between 0 and 1.
 
-> Ground truth annotations are only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see [Features of Label Studio](label_studio_compare.html) to learn more.
+> Ground truth annotations are only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see [Label Studio Features](label_studio_compare.html) to learn more.
 
 ## Define ground truth annotations for a project
 

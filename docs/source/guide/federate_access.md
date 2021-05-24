@@ -1,8 +1,8 @@
 ---
-title:  Federate access to data in Label Studio using SAML roles
+title: <img src="/images/LSE/en.svg" alt="Enterprise" style="vertical-align:middle"/> Federate access to data in Label Studio using SAML roles
 type: guide
 order: 222
-meta_title: Federate data access with SAML
+meta_title: Federate data access in Label Studio with SAML
 meta_description: Label Studio Documentation for federating access to cloud storage using SAML roles to secure your machine learning and data science projects. 
 ---
 
