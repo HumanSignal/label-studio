@@ -108,27 +108,34 @@ class ImportAPI(generics.CreateAPIView):
 
     There are three possible ways to import tasks with this endpoint:
 
-    1\. **POST with data**: Send JSON tasks as POST data. Only JSON is supported for POSTing files directly.
+    ### 1\. **POST with data**
+    Send JSON tasks as POST data. Only JSON is supported for POSTing files directly.
+    Update this example to specify your authorization token and Label Studio instance host, then run the following from
+    the command line.
 
     ```bash
     curl -H 'Content-Type: application/json' -H 'Authorization: Token abc123' \\
     -X POST 'http://localhost/api/projects/1/import' --data '[{"text": "Some text 1"}, {"text": "Some text 2"}]'
     ```
 
-     2\. **POST with files**: Send tasks as files. You can attach multiple files with different names. 
-
+     ### 2\. **POST with files**
+     Send tasks as files. You can attach multiple files with different names.
 
     - **JSON**: text files in JavaScript object notation format
     - **CSV**: text files with tables in Comma Separated Values format
     - **TSV**: text files with tables in Tab Separated Value format
     - **TXT**: simple text files are similar to CSV with one column and no header, supported for projects with one source only
 
+    Update this example to specify your authorization token, Label Studio instance host, and file name and path,
+    then run the following from the command line:
+
     ```bash
     curl -H 'Content-Type: application/json' -H 'Authorization: Token abc123' \\
     -X POST 'http://localhost/api/projects/1/import' -F ‘file=@path/to/my_file.csv’
     ```
 
-    3\. **POST with URL**: You can also provide a URL to a file with labeling tasks. Supported file formats are the same as in option 2.
+    ### 3\. **POST with URL**
+    You can also provide a URL to a file with labeling tasks. Supported file formats are the same as in option 2.
 
     ```bash
     curl -H 'Content-Type: application/json' -H 'Authorization: Token abc123' \\
