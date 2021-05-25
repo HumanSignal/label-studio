@@ -18,10 +18,12 @@ See the [API reference documentation](/api) for further guidance and interactive
 2. Click **Account & Settings**.
 3. Copy the access token. 
 
-In your first API call, specify the access token. 
+In your first API call, specify the access token in the headers: 
 ```bash
 curl -X <method> <Label Studio URL>/api/<endpoint> -H 'Authorization: Token <token>'
 ```
+
+See [API documentation for authentication](/api#section/Authentication).
 
 ### List all projects
 
@@ -35,26 +37,7 @@ If you want to make sure the configuration for your labeling interface is valid 
 
 ### Import tasks using the API
 
-To import tasks using the API, make sure you know the project ID that you want to add tasks to. 
-
-You can import tasks by specifying the task data as JSON directly in the API call, or by referencing a file.
-
-#### Import task data directly
-
-Update this example to specify your authorization token and Label Studio instance host, then run the following from the command line:
- ```bash
-curl -H 'Content-Type: application/json' -H 'Authorization: Token abc123' -X POST 'http://localhost/api/projects/1/import' \
---data '[{"text": "Some text 1"}, {"text": "Some text 2"}]'
- ```
-
-#### Import task data from file
-Update this example to specify your authorization token, Label Studio instance host, and file name and path, then run the following from the command line:
-```bash
-curl -H 'Content-Type: application/json' -H 'Authorization: Token abc123' -X POST 'http://localhost/api/projects/1/import' \
--F ‘file=@path/to/my_file.csv’
-```
-
-See additional examples and parameter descriptions in the [import data endpoint documentation](/api#operation/projects_import_create)
+To import tasks using the API, make sure you know the project ID that you want to add tasks to. See additional examples and parameter descriptions in the [import data endpoint documentation](/api#operation/projects_import_create)
 
 ### Retrieve tasks
 Retrieve a paginated list of tasks for a specific project. See details and parameters in the [list project tasks endpoint documentation](/api#operation/projects_tasks_list).
