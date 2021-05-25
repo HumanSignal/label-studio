@@ -61,7 +61,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
     get:
     Get task by ID
 
-    Get task data, metadata, annotations and other attributes for a specific labeling task.
+    Get task data, metadata, annotations and other attributes for a specific labeling task by task ID.
 
     patch:
     Update task
@@ -125,7 +125,7 @@ class AnnotationAPI(RequestDebugLogMixin, generics.RetrieveUpdateDestroyAPIView)
     get:
     Get annotation by its ID
 
-    Retrieve a specific annotation for a task.
+    Retrieve a specific annotation for a task using the annotation result ID.
 
     patch:
     Update annotation
