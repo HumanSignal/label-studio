@@ -25,25 +25,13 @@ curl -X <method> <Label Studio URL>/api/<endpoint> -H 'Authorization: Token <tok
 
 ### List all projects
 
-To perform most tasks with the Label Studio API, you must specify the project ID, sometimes referred to as the `pk`. To retrieve a list of your Label Studio projects, update the following command to match your own environment. Replace the domain name, port, and authorization token, then run the following from the command line:
-```bash
-curl -X GET https://localhost:8080/api/projects/ -H 'Authorization: Token abc123'
-```
-
-For more on this endpoint, see the [projects API endpoint documentation](/api#tag/Projects).
+To perform most tasks with the Label Studio API, you must specify the project ID, sometimes referred to as the `pk`. See the [List your projects API endpoint documentation](/api#operation/api_projects_list).
 
 ### Create and set up a project
 
-Create a project and set up the labeling interface in Label Studio using the API.
+Create a project and set up the labeling interface in Label Studio using the API. See the [Create new project API endpoint documentation](/api#operation/projects_create).
 
-```bash
-curl -H Content-Type:application/json -H 'Authorization: Token abc123' -X POST 'http://localhost:8080/api/projects' \
---data "{\"label_config\": \"<View>[...]</View>\"}"
-```
-
-See detailed options for this API call in the [Create new project API endpoint documentation](/api#operation/projects_create).
-
-If you want to make sure your labeling config is valid before submitting it using the API, you can use the [validate label config](/api#operation/projects_validate_create) API endpoint.
+If you want to make sure the configuration for your labeling interface is valid before submitting it using the API, you can use the [validate label config](/api#operation/projects_validate_create) API endpoint.
 
 ### Import tasks using the API
 

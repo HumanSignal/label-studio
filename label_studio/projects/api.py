@@ -91,10 +91,22 @@ class ProjectListAPI(generics.ListCreateAPIView):
 
     Return a list of the projects that you've created.
 
+    To perform most tasks with the Label Studio API, you must specify the project ID, sometimes referred to as the `pk`.
+    To retrieve a list of your Label Studio projects, update the following command to match your own environment.
+    Replace the domain name, port, and authorization token, then run the following from the command line:
+    ```bash
+    curl -X GET https://localhost:8080/api/projects/ -H 'Authorization: Token abc123'
+    ```
+
     post:
     Create new project
 
-    Create a labeling project.
+    Create a project and set up the labeling interface in Label Studio using the API.
+
+    ```bash
+    curl -H Content-Type:application/json -H 'Authorization: Token abc123' -X POST 'http://localhost:8080/api/projects' \
+    --data "{\"label_config\": \"<View>[...]</View>\"}"
+    ```
     """
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ProjectSerializer
@@ -138,12 +150,12 @@ class ProjectAPI(APIViewVirtualRedirectMixin,
     get:
     Get project by ID
 
-    Retrieve information about a project by ID.
+    Retrieve information about a project by project ID.
 
     patch:
     Update project
 
-    Update project settings for a specific project.
+    Update the project settings for a specific project.
 
     delete:
     Delete project
