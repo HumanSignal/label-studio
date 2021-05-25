@@ -44,18 +44,9 @@ Retrieve a paginated list of tasks for a specific project. See details and param
 
 ### Export annotations
 
-To export annotations, first see which formats are available to export for your project.
+To export annotations, first see [which formats are available to export for your project](/api#operation/api_projects_export_formats_read). 
 
-```bash
-curl -X GET https://localhost:8080/api/projects/{id}/export/formats -H 'Authorization: Token abc123'
-```
-
-Choose your selected format from the response and then call the export endpoint. For example, to export JSON annotations for a project to a file called annotations.json, run the following from the command line:
-```bash
-curl -X GET https://localhost:8080/api/projects/{id}/export?exportType=JSON -H 'Authorization: Token abc123' --output annotations.json
-```
-
-See the [export annotations](/api#operation/projects_export_list) endpoint documentation for more details.
+Choose your selected format from the response and then call the export endpoint. See the [export annotations](/api#operation/projects_export_list) endpoint documentation for more details.
 
 ### API endpoint reference for older Label Studio versions
 
