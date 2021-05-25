@@ -48,8 +48,8 @@ class UserAPI(viewsets.ModelViewSet):
     @swagger_auto_schema(
         tags=['Users'],
         operation_summary='Save user details',
-        operation_description='Save details for a specific user, such as their name, contact information, '
-                              'or organization in Label Studio.',
+        operation_description='Save details for a specific user, such as their name or contact information '
+                              'in Label Studio.',
         request_body=UserSerializer
     )
     def update(self, request, *args, **kwargs):
@@ -66,7 +66,7 @@ class UserAPI(viewsets.ModelViewSet):
     @swagger_auto_schema(
         tags=['Users'],
         operation_summary='Create new user',
-        operation_description='Create a new user for Label Studio.',
+        operation_description='Create a user in Label Studio.',
         request_body=UserSerializer
     )
     def create(self, request, *args, **kwargs):
@@ -83,8 +83,8 @@ class UserAPI(viewsets.ModelViewSet):
     @swagger_auto_schema(
         tags=['Users'],
         operation_summary='Update user details',
-        operation_description='Update details for a specific user, such as their name, contact information, '
-                              'or organization in Label Studio.',
+        operation_description='Update details for a specific user, such as their name or contact information '
+                              'in Label Studio.',
         request_body=UserSerializer
     )
     def partial_update(self, request, *args, **kwargs):
