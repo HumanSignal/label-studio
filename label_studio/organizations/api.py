@@ -56,7 +56,7 @@ class OrganizationMemberListAPI(generics.ListAPIView):
     get:
     Get organization members list
 
-    Retrieve a list of the organization members.
+    Retrieve a list of the organization members and their IDs.
     """
 
     parser_classes = (JSONParser, FormParser, MultiPartParser)
@@ -84,12 +84,12 @@ class OrganizationAPI(APIViewVirtualRedirectMixin,
     get:
     Get organization settings
 
-    Retrieve the settings for a specific organization.
+    Retrieve the settings for a specific organization by ID.
 
     patch:
     Update organization settings
 
-    Update the settings for a specific organization.
+    Update the settings for a specific organization by ID.
     """
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     queryset = Organization.objects.all()
