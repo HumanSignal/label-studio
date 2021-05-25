@@ -7,7 +7,7 @@ from django.db import transaction
 
 from data_manager.models import View, Filter, FilterGroup
 from tasks.models import Task
-from tasks.serializers import TaskSerializer, AnnotationSerializer, PredictionSerializer
+from tasks.serializers import TaskSerializer, AnnotationSerializer, PredictionSerializer, AnnotationDraftSerializer
 
 
 class FilterSerializer(serializers.ModelSerializer):
@@ -158,6 +158,7 @@ class ViewSerializer(serializers.ModelSerializer):
 class DataManagerTaskSerializer(TaskSerializer):
     predictions = PredictionSerializer(many=True, default=[], read_only=True)
     annotations = AnnotationSerializer(many=True, default=[], read_only=True)
+    drafts = AnnotationDraftSerializer(many=True, default=[], read_only=True)
 
     cancelled_annotations = serializers.SerializerMethodField()
     completed_at = serializers.SerializerMethodField()
@@ -186,6 +187,7 @@ class DataManagerTaskSerializer(TaskSerializer):
             "total_predictions",
             "annotations",
             "predictions",
+            "drafts",
             "file_upload",
             "annotators",
             "project"
