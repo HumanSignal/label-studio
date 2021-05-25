@@ -75,7 +75,7 @@ class UserAPI(viewsets.ModelViewSet):
     @swagger_auto_schema(
         tags=['Users'],
         operation_summary='Get user info',
-        operation_description='Get info about a specific Label Studio user.'
+        operation_description='Get info about a specific Label Studio user, based on the user ID.'
     )
     def retrieve(self, request, *args, **kwargs):
         return super(UserAPI, self).retrieve(request, *args, **kwargs)
@@ -107,7 +107,7 @@ class UserResetTokenAPI(APIView):
     @swagger_auto_schema(
         tags=['Users'],
         operation_summary='Reset user token',
-        operation_description='Reset a specific user token.',
+        operation_description='Reset the user token for the current user.',
         responses={
             201: openapi.Response(
                 description='User token response',
@@ -136,11 +136,18 @@ class UserGetTokenAPI(APIView):
     @swagger_auto_schema(
         tags=['Users'],
         operation_summary='Get user token',
-        operation_description='Get a user token to authenticate to the API as a specific user.',
+        operation_description='Get a user token to authenticate to the API as the current user.',
         responses={
             200: openapi.Response(
                 description='User token response',
-                schema=openapi.Schema(description='User token', type=openapi.TYPE_STRING))
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'detail': openapi.Schema(
+                        description='Token',
+                        type=openapi.TYPE_STRING
+                    )
+                }
+            )
         })
     def get(self, request, *args, **kwargs):
         user = request.user
