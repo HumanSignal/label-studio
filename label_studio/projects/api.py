@@ -562,7 +562,11 @@ class TasksListAPI(generics.ListCreateAPIView,
     get:
     List project tasks
 
-    Paginated list of tasks for a specific project.
+    Retrieve a paginated list of tasks for a specific project. For example, use the following cURL command:
+
+    ```bash
+    curl -X GET https://localhost:8080/api/projects/{id}/tasks/ -H 'Authorization: Token abc123'
+    ```
 
     delete:
     Delete all tasks

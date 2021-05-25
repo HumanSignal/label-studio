@@ -57,13 +57,7 @@ curl -H 'Content-Type: application/json' -H 'Authorization: Token abc123' -X POS
 See additional examples and parameter descriptions in the [import data endpoint documentation](/api#operation/projects_import_create)
 
 ### Retrieve tasks
-Retrieve a paginated list of tasks for a specific project with the following API call. 
-
-```bash
-curl -X GET https://localhost:8080/api/projects/{id}/tasks/ -H 'Authorization: Token abc123'
-```
-
-See additional details and parameters in the [list project tasks endpoint documentation](/api#operation/projects_tasks_list).
+Retrieve a paginated list of tasks for a specific project. See details and parameters in the [list project tasks endpoint documentation](/api#operation/projects_tasks_list).
 
 ### Export annotations
 
