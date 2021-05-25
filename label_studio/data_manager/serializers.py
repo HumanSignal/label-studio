@@ -158,7 +158,7 @@ class ViewSerializer(serializers.ModelSerializer):
 class DataManagerTaskSerializer(TaskSerializer):
     predictions = PredictionSerializer(many=True, default=[], read_only=True)
     annotations = AnnotationSerializer(many=True, default=[], read_only=True)
-    drafts = AnnotationDraftSerializer(many=True, default=[], read_only=True)
+    drafts = serializers.SerializerMethodField()
 
     cancelled_annotations = serializers.SerializerMethodField()
     completed_at = serializers.SerializerMethodField()
@@ -242,6 +242,19 @@ class DataManagerTaskSerializer(TaskSerializer):
         result = obj.annotations.values_list('completed_by', flat=True).distinct()
         result = [r for r in result if r is not None]
         return result
+
+    def get_drafts(self, task):
+        """Return drafts only for the current user"""
+        # it's for swagger documentation
+        if not isinstance(task, Task):
+            return AnnotationDraftSerializer(many=True)
+
+        drafts = task.drafts
+        if 'request' in self.context and hasattr(self.context['request'], 'user'):
+            user = self.context['request'].user
+            drafts = drafts.filter(user=user)
+
+        return AnnotationDraftSerializer(drafts, many=True, read_only=True, default=True, context=self.context).data
 
 
 class SelectedItemsSerializer(serializers.Serializer):
