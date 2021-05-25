@@ -80,6 +80,11 @@ Label Studio is available as a Community Edition open source data labeling tool 
     <td style="text-align:center">✅</td>
   </tr>
   <tr>
+    <td>Automatic queue management.</td>
+    <td style="text-align:center">❌</td>
+    <td style="text-align:center">✅</td>
+  </tr>
+  <tr>
     <td>Label text, images, audio data, HTML, and time series data.</td>
     <td style="text-align:center">✅</td>
     <td style="text-align:center">✅</td>
