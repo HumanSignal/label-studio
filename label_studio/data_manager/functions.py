@@ -184,7 +184,7 @@ def get_all_columns(project):
             'type': 'List',
             'target': 'tasks',
             'help': 'All users who completed the task',
-            'schema': project.organization.members.values_list('user__id', flat=True),
+            'schema': { 'items': project.organization.members.values_list('user__id', flat=True) },
             'visibility_defaults': {
                 'explore': True,
                 'labeling': False
