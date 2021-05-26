@@ -1,5 +1,5 @@
 ---
-title: <img src="/images/LSE/en.svg" alt="Enterprise" style="vertical-align:middle"/> Manage access to Label Studio 
+title: <img src="/images/LSE/en.svg" alt="Enterprise" width=67 height=18 style="vertical-align:middle"/> Manage access to Label Studio 
 type: guide
 order: 251
 meta_title: Role-Based Access Control in Label Studio
@@ -10,12 +10,9 @@ meta_description: Label Studio Documentation for managing access and setting up 
 
 Manage access to projects, organizations, and workspaces in Label Studio to restrict who can view data, annotations, and predictions in your data labeling projects. 
 
-> Role-based access control, organizations, and workspaces are available only in Label Studio Enterprise Edition. For information about users in the open source Label Studio Community Edition, see [Set up user accounts for Label Studio](signup.html). 
-
-Use a combination of roles, to control what actions users can take, and project workspaces, to control what data and projects users have access to. 
-
-
-
+<div class="enterprise"><p>
+Role-based access control, organizations, and workspaces are available only in Label Studio Enterprise Edition. For information about users in the open source Label Studio Community Edition, see <a href="signup.html">Set up user accounts for Label Studio</a>.
+</p></div>
 
 ## Roles in Label Studio Enterprise
 
@@ -28,6 +25,15 @@ There are five roles available in Label Studio Enterprise Edition. Organization 
 | Manager | Manages projects. Can view any project and has full access to their own projects. |
 | Reviewer | Reviews annotated tasks. Can view projects with tasks assigned to them. Can review and update task annotations. |
 | Annotator | Labels tasks. Can view projects with tasks assigned to them and label tasks in those projects. |
+
+## Roles and workspaces
+Use a combination of roles, to control what actions users can take, and project workspaces, to control what data and projects users have access to. 
+
+For example, a project annotator using Label Studio sees only the projects they have access to:
+<img src="/images/LSE/LSE-annotator-view.jpg" width=400 height=275 alt="Diagram showing that only Label Studio projects that they have been added to are visible to an annotator."/>
+
+A Label Studio administrator sees all projects and workspaces that exist in the Label Studio instance:
+<img src="/images/LSE/LSE-admin-view.jpg" width=600 height=400 alt="Diagram showing that an administrator can view all projects and workspaces in a Label Studio instance."/>
 
 ## Permissions in Label Studio Enterprise 
 
