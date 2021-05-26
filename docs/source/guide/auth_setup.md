@@ -1,5 +1,5 @@
 ---
-title: <img src="/images/LSE/en.svg" alt="Enterprise" style="vertical-align:middle"/> Set up authentication for Label Studio
+title: <img src="/images/LSE/en.svg" width=67 height=18 alt="Enterprise" style="vertical-align:middle"/> Set up authentication for Label Studio
 type: guide
 order: 221
 meta_title: Authentication for Label Studio Enterprise

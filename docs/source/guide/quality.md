@@ -1,5 +1,5 @@
 ---
-title: <img src="/images/LSE/en.svg" alt="Enterprise" style="vertical-align:middle"/> Review annotations in Label Studio
+title: <img src="/images/LSE/en.svg" width=67 height=18 alt="Enterprise" style="vertical-align:middle"/> Review annotations in Label Studio
 type: guide
 order: 410
 meta_title: 

@@ -1,5 +1,5 @@
 ---
-title: <img src="/images/LSE/en.svg" alt="Enterprise" style="vertical-align:middle"/> Federate access to data in Label Studio using SAML roles
+title: <img src="/images/LSE/en.svg" width=67 height=18 alt="Enterprise" style="vertical-align:middle"/> Federate access to data in Label Studio using SAML roles
 type: guide
 order: 222
 meta_title: Federate data access in Label Studio with SAML
