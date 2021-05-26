@@ -12,7 +12,7 @@ Label Studio is an open source data labeling tool for labeling and exploring mul
 
 You can also integrate Label Studio with machine learning models to supply predictions for labels (pre-labels), or perform continuous active learning. See [Set up machine learning with your labeling process](ml.html). 
 
-Label Studio is also available as Enterprise and Cloud editions with additional features. See [Features of Label Studio](label_studio_compare.html) for more.
+Label Studio is also available in Enterprise and Cloud editions with additional features. See [Label Studio features](label_studio_compare.html) for more.
 
 ## Quick start
 
