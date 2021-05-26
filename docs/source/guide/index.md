@@ -8,7 +8,7 @@ meta_description: Label Studio getting started guide for multi-typed data labeli
 
 ## What is Label Studio?
 
-Label Studio is an open source data labeling tool for labeling and exploring multiple types of data. You can perform many different types of labeling for many different data formats. 
+Label Studio is an open source data labeling tool for labeling and exploring multiple types of data. You can perform different types of labeling with many data formats. 
 
 You can also integrate Label Studio with machine learning models to supply predictions for labels (pre-labels), or perform continuous active learning. See [Set up machine learning with your labeling process](ml.html). 
 
@@ -41,12 +41,12 @@ All the steps required to start and finish a labeling project with Label Studio:
 1. [Install Label Studio](install.html).
 2. [Start Label Studio](start.html).
 2. [Create accounts for Label Studio](signup.html). Create an account to manage and set up labeling projects.
-3. <img src="/images/LSE/en.svg" alt="Enterprise" style="vertical-align:middle"/> [Restrict access to the project](manage_users.html). Set up role-based access control. Only available in Label Studio Enterprise Edition.
+3. <img src="/images/LSE/en.svg" width=64 height=16 alt="Enterprise" style="vertical-align:middle"/> [Restrict access to the project](manage_users.html). Set up role-based access control. Only available in Label Studio Enterprise Edition.
 4. [Set up the labeling project](setup_project.html). Define the type of labeling to perform on the dataset and configure project settings.
 5. [Set up the labeling interface](setup.html). Add the labels that you want annotators to apply and customize the labeling interface. 
 6. [Import data as labeling tasks](tasks.html).
 7. [Label and annotate the data](labeling.html). 
-8. <img src="/images/LSE/en.svg" alt="Enterprise" style="vertical-align:middle"/> [Review the annotated tasks](quality.html). Only available in Label Studio Enterprise Edition.
+8. <img src="/images/LSE/en.svg" width=64 height=16 alt="Enterprise" style="vertical-align:middle"/> [Review the annotated tasks](quality.html). Only available in Label Studio Enterprise Edition.
 9. [Export the labeled data or the annotations](export.html).
 
 
@@ -68,7 +68,7 @@ When you upload data to Label Studio, each item in the dataset becomes a labelin
 | Tags | Configuration options to customize the labeling interface. See [more about tags](/tags). |
 
 ## Components and architecture
-You can use any of the Label Studio components in your own tools, or customize them to suit your needs. <!--Before customizing Label Studio extensively, you might want to review Label Studio Enterprise Edition to see if it already contains the relevant functionality you want to build. See [What you get from Label Studio](benefits.html) for more.--> 
+You can use any of the Label Studio components in your own tools, or customize them to suit your needs. Before customizing Label Studio extensively, you might want to review Label Studio Enterprise Edition to see if it already contains the relevant functionality you want to build. See [Label Studio Features](label_studio_compare.html) for more.
 
 The component parts of Label Studio are available as modular extensible packages that you can integrate into your existing machine learning processes and tools. 
 

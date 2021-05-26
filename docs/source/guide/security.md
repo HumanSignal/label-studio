@@ -14,11 +14,10 @@ INSERT ARCHITECTURE DIAGRAM HERE
 
 All application component interactions are encrypted using the TLS protocol. 
 
-> <img src="/images/LSE/en.svg" alt="Enterprise" style="vertical-align:middle"/> The following security-related functionality is only available in Label Studio Enterprise deployments:
-- Role-based access control
-- Federated access to cloud storage using SAML 
-Label Studio Enterprise is available as on-premises software that you manage, or as a Software-as-a-Service (SaaS) offering.
-  
+<div class="enterprise"><p>
+<img src="/images/LSE/en.svg" width=64 height=16 alt="Enterprise" style="vertical-align:middle"/> Role-based access control and federated access to cloud storage using SAML are only available in Label Studio Enterprise deployments. Label Studio Enterprise is available as on-premises software that you manage, or as a Software-as-a-Service (SaaS) offering.
+</p></div>
+
 <!--If you need to meet strong privacy regulations, legal requirements, or you want to make a custom installation within your infrastructure or any public cloud (AWS, Google, Azure, etc.), Label Studio Enterprise works on-premises. It is a self-contained version (no Internet connection is required) of the Platform, no data will leave your infrastructure. To make the installation the most accessible, we offer a Docker image.-->
 
 If you're running the open source version in production, restrict access to the Label Studio server. Label Studio establishes secure connections to the web application by enforcing HTTPS and secured cookies. Restrict access to the server itself by opening only the [required ports](install.html#Port_requirements) on the server.
@@ -31,7 +30,7 @@ Each user must create an account with a password of at least 8 characters, allow
 
 You can restrict signup to only those with a link to the signup page, and the invitation link to the signup page can be reset. See [Set up user accounts for Label Studio](signup.html) for more. 
 
-<img src="/images/LSE/en.svg" alt="Enterprise" style="vertical-align:middle"/> If you're using Label Studio Enterprise, you can further secure user access in many ways:
+<img src="/images/LSE/en.svg" width=64 height=16 alt="Enterprise" style="vertical-align:middle"/> If you're using Label Studio Enterprise, you can further secure user access in many ways:
 - Assign specific roles to specific user accounts to set up role-based access control. For more about the different roles and permissions in Label Studio Enterprise, see [Manage access to Label Studio](manage_users.html). 
 - Set up organizations, workspaces, and projects to separate projects and data across different groups of users. Users in one organization cannot see the workspaces or projects in other organizations. For more about how to use organizations, workspaces, and projects to secure access, see [Organize projects in Label Studio](organize_projects.html).
 

@@ -48,7 +48,7 @@ You can combine these tags to create a custom label configuration for your datas
 ### Example labeling config
 
 For example, to classify images that are referenced in your data as URLs (`$image_url`) into one of two classes, Cat or Dog, use this example labeling config: 
-```html
+```xml
 <View>
   <Image name="image_object" value="$image_url"/>
   <Choices name="image_classes" toName="image_object">
@@ -62,8 +62,7 @@ This labeling config references the image resource in the [Image](/tags/image.ht
 
 If you want to customize this example, such as to allow labelers to select both Cat and Dog labels for a single image, modify the parameters used with the [Choices](/tags/choices.html) control tag:
 
-```html
-
+```xml
 <View>
   <Image name="image_object" value="$image_url"/>
   <Choices name="image_classes" toName="image_object" choice="multiple">

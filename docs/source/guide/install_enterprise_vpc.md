@@ -10,7 +10,9 @@ meta_description: Label Studio Documentation for installing and upgrading Label 
 
 If you want to manage your own Label Studio Enterprise installation in the cloud, follow these steps to install it in AWS Virtual Private Cloud (VPC). You can also [install Label Studio Enterprise on-premises using Docker](install_enterprise.html) if you need to meet strong privacy regulations, legal requirements, or want to manage a custom installation on your own infrastructure.
 
-> To install Label Studio Community Edition, see [Install and Upgrade Label Studio](install.html). This page is specific to the Enterprise version of Label Studio.
+<div class="enterprise"><p>
+To install Label Studio Community Edition, see <a href="install.html">Install and Upgrade Label Studio</a>. This page is specific to the Enterprise version of Label Studio.
+</p></div>
 
 <!-- md deploy.md -->
 

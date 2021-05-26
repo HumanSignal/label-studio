@@ -8,11 +8,13 @@ meta_description: Label Studio Documentation for installing and upgrading Label 
 
 > Beta documentation: Label Studio Enterprise v2.0.0 is currently in Beta. As a result, this documentation might not reflect the current functionality of the product.
 
-You can install Label Studio Enterprise on-premises if you need to meet strong privacy regulations, legal requirements, or want to manage a custom installation on your own infrastructure using Docker or public cloud. To deploy Label Studio Enterprise on Amazon AWS in a Virtual Private Cloud (VPC), see [Install Label Studio Enterprise on AWS Private Cloud](install_enterprise_vpc.html). 
+Install Label Studio Enterprise on-premises if you need to meet strong privacy regulations, legal requirements, or want to manage a custom installation on your own infrastructure using Docker or public cloud. To deploy Label Studio Enterprise on Amazon AWS in a Virtual Private Cloud (VPC), see [Install Label Studio Enterprise on AWS Private Cloud](install_enterprise_vpc.html). 
 
 You can run Label Studio Enterprise in an airgapped environment, and no data leaves your infrastructure. See [Secure Label Studio](security.html) for more details about security and hardening for Label Studio Enterprise.
 
-> To install Label Studio Community Edition, see [Install and Upgrade Label Studio](install.html). This page is specific to the Enterprise version of Label Studio.
+<div class="enterprise"><p>
+To install Label Studio Community Edition, see <a href="install.html">Install and Upgrade Label Studio</a>. This page is specific to the Enterprise version of Label Studio.
+</p></div>
 
 <!-- md deploy.md -->
 

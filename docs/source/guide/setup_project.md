@@ -42,7 +42,9 @@ If you want to make changes to the labeling interface or perform a different typ
 
 Set up annotation settings to configure how you want annotators to perform labeling for your project.
 
-> <img src="/images/LSE/en.svg" alt="Enterprise" style="vertical-align:middle"/> Some annotation settings are only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see [Label Studio Features](label_studio_compare.html) to learn more.
+<div class="enterprise"><p>
+Some annotation settings are only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see <a href="label_studio_compare.html">Label Studio Features</a> to learn more.
+</p></div>
 
 ### Set up instructions for data labelers 
 
@@ -55,7 +57,7 @@ In the project settings, you can add instructions and choose whether to show the
 
 Annotators can view instructions at any time when labeling by clicking the (i) button from the labeling interface.
 
-### <img src="/images/LSE/en.svg" alt="Enterprise" style="vertical-align:middle"/> Set up task distribution for labeling
+### <img src="/images/LSE/en.svg" width=67 height=18 alt="Enterprise" style="vertical-align:middle"/> Set up task distribution for labeling
 Select how you want to distribute tasks to annotators for labeling. Different from task sampling, use this setting to choose whether you need to assign annotators before they can start labeling.
 
 1. Within a project on the Label Studio UI, click **Settings**.
@@ -63,12 +65,12 @@ Select how you want to distribute tasks to annotators for labeling. Different fr
 3. Under **Distribute Labeling Tasks**, select one of the following:
     - Auto, the default option, to distribute tasks automatically to annotators.
     - Manual, to show tasks only to assigned annotators. Choose this option if you require more than one annotation per task. 
-    
+
 Your changes save automatically. 
 
 > You can't assign annotators to tasks unless you select the **Manual** option. 
 
-### <img src="/images/LSE/en.svg" alt="Enterprise" style="vertical-align:middle"/> Set minimum annotations per task
+### <img src="/images/LSE/en.svg" width=67 height=18 alt="Enterprise" style="vertical-align:middle"/> Set minimum annotations per task
 
 By default, each task only needs to be annotated by one annotator. If you want multiple annotators to be able to annotate tasks, set the Overlap of Annotations for a project in the project settings.
 
@@ -92,7 +94,7 @@ If you want, you can allow empty annotations.
 
 If you're using Label Studio Community Edition, you must set up task sampling when you start Label Studio. See [Set up task sampling for your project](start.html#Set-up-task-sampling-for-your-project).
 
-In Label Studio Enterprise, you can set up task sampling in the annotation settings for a project.
+<img src="/images/LSE/en.svg" width=64 height=16 alt="Enterprise" style="vertical-align:middle"/> In Label Studio Enterprise, you can set up task sampling in the annotation settings for a project.
 1. Within a project on the Label Studio UI, click **Settings**.
 2. Click **Annotation Settings**.
 3. Select your preferred method of task sampling:
@@ -103,7 +105,7 @@ In Label Studio Enterprise, you can set up task sampling in the annotation setti
 
 Your changes save automatically. 
 
-### <img src="/images/LSE/en.svg" alt="Enterprise" style="vertical-align:middle"/> Define the matching function for annotation statistics
+### <img src="/images/LSE/en.svg" alt="Enterprise" width=67 height=18 style="vertical-align:middle"/> Define the matching function for annotation statistics
 Annotation statistics such as annotator consensus are calculated using a matching score. If you want the matching score to calculate matches by requiring exact matching choices, choose that option in the annotation settings.
 
 1. Within a project on the Label Studio UI, click **Settings**.
@@ -112,11 +114,13 @@ Annotation statistics such as annotator consensus are calculated using a matchin
 
 Your changes save automatically. For more about how annotation statistics are calculated in Label Studio Enterprise, see [Task agreement and annotator consensus in Label Studio](stats.html).
 
-## <img src="/images/LSE/en.svg" alt="Enterprise" style="vertical-align:middle"/> Set up review settings for your project
+## <img src="/images/LSE/en.svg" alt="Enterprise" width=67 height=18 style="vertical-align:middle"/> Set up review settings for your project
 
 Set up review settings to guide reviewers when they review annotated tasks.
 
-> Review settings and the review stream are only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see [Label Studio Features](label_studio_compare.html) to learn more.
+<div class="enterprise"><p>
+Review settings and the review stream are only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see <a href="label_studio_compare.html">Label Studio Features</a> to learn more.
+</p></div>
 
 ### Set up instructions for task reviewers 
 

@@ -16,7 +16,9 @@ Label and annotate your data with the open source data labeling tool, Label Stud
 
 When collaborating with other users, tasks are locked so that you don't accidentally overwrite the annotations of another annotator. After the other annotator finishes with the task, it can appear in your queue for labeling. By default, tasks only need to be annotated by one annotator. 
 
-> If you're using Label Studio Enterprise and want more than one annotator to annotate tasks, [update the project settings](setup_project.html). 
+<div class="enterprise"><p>
+If you're using Label Studio Enterprise and want more than one annotator to annotate tasks, <a href="setup_project.html">update the project settings</a>. 
+</p></div>
 
 ## Filter or sort project data
 

@@ -10,7 +10,9 @@ meta_description: Label Studio Documentation for federating access to cloud stor
 
 To further [manage access to data in Label Studio Enterprise](security.html), you can federate access to externally-stored data based on SAML roles. In this way, you can use [roles in Label Studio](manage_users.html) to manage what users can do with the data, and SAML roles to manage what data those users can view within an organization, workspace, or project.
 
-> Federating access to data is only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see [Features of Label Studio](label_studio_compare.html) to learn more.
+<div class="enterprise"><p>
+Federating access to data is only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see <a href="label_studio_compare.html">Label Studio Features</a> to learn more.
+</p></div>
 
 ## Prerequisites
 

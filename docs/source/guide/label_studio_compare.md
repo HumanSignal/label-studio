@@ -1,5 +1,5 @@
 ---
-title: Label Studio Features
+title: Label Studio features
 type: guide
 order: 108
 meta_title: 
