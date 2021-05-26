@@ -1,5 +1,5 @@
 ---
-title: <img src="/images/LSE/en.svg" alt="Enterprise" style="vertical-align:middle"/> Annotation statistics
+title: <img src="/images/LSE/en.svg" width=67 height=18 alt="Enterprise" style="vertical-align:middle"/> Annotation statistics
 type: guide
 order: 413
 meta_title: Data Labeling Statistics
@@ -43,7 +43,7 @@ For data labeling where annotators transcribe text in a text area, the resulting
 - The list of text items in each annotation is indexed, such that `x = [x1, x2, ..., xn]` and similarly, `y = [y1, y2, ..., yn]`.  
 - For each aligned pair of text items across the two annotations `(x1, y1)` the similarity of the text is calculated.
 - For each unaligned pair, for example, when one list of text is longer than the other, the similarity is zero. 
-- The similarity scores are averaged across all pairs and the result is the matching score for the task. 
+- The similarity scores are averaged across all pairs, and the result is the matching score for the task. 
 
 The matching score for each aligned pair can be calculated in multiple ways:
 - Using an [edit distance algorithm](https://en.wikipedia.org/wiki/Edit_distance)
@@ -91,28 +91,28 @@ There are several possible methods you can specify on project settings page:
 Complete linkage task agreement groups annotations so that all the matching scores within a given group are higher than the threshold. The agreement score is the maximum group size divided by the total count of annotations. 
 
 Review the diagram for a full explanation:
-<div style="text-align:center"><img alt="Diagram showing annotations are collected for each task, matching scores are computed for each pair, and grouping and agreement score calculation happens as detailed in the surrounding text." src="/docs/images/complete-linkage.png"/></div>
+<div style="text-align:center"><img alt="Diagram showing annotations are collected for each task, matching scores are computed for each pair, and grouping and agreement score calculation happens as detailed in the surrounding text." src="/images/LSE/stats-complete-linkage.png"/></div>
 
 ### Single linkage
 
 Single linkage task agreement groups annotations so that at least one of the matching scores within a given group is higher than the threshold. The agreement score is the maximum group size divided by the total count of annotations. 
 
 Review the diagram for a full explanation:
-<div style="text-align:center"><img alt="Diagram showing annotations are collected for each task, matching scores are computed for each pair, and grouping and agreement score calculation happens as detailed in the surrounding text." src="/docs/images/single-linkage.png"/></div>
+<div style="text-align:center"><img alt="Diagram showing annotations are collected for each task, matching scores are computed for each pair, and grouping and agreement score calculation happens as detailed in the surrounding text." src="/images/LSE/stats-single-linkage.png"/></div>
 
 ### No grouping
 
 No grouping task agreement uses the mean average of all inter-annotation matching scores for each annotation pair as the final task agreement score. 
 
 Review the diagram for a full explanation:
-<div style="text-align:center"><img alt="Diagram showing annotations are collected for each task, matching scores are computed for each pair, the resulting scores are averaged for a task." src="/docs/images/no_grouping.png"/></div>
+<div style="text-align:center"><img alt="Diagram showing annotations are collected for each task, matching scores are computed for each pair, the resulting scores are averaged for a task." src="/images/LSE/stats-no_grouping.png"/></div>
 
 ### Example
 One annotation that labels the text span "Excellent tool" as "positive", a second annotation that labels the span "tool" as "positive", and a third annotation that labels the text span "tool" as "negative".
+<br/><div style="text-align:center"><img alt="diagram showing example labeling scenario duplicated in surrounding text" src="/images/LSE/stats-agreement-example.jpg"/></div>
 
 The matching score for the first two annotations is 50%, based on the intersection of the text spans. The matching score comparing the second annotation with the third annotation is 0%, because the same text span was labeled differently. 
 
 The task agreement conditions use a threshold of 40% to group annotations based on the matching score, so the first and second annotations are matched with each other, and the third annotation is considered mismatched. In this case, task agreement exists for 2 of the 3 annotations, so the overall task agreement score is 67%.  
 
 
-<div style="text-align:center"><img alt="diagram showing example labeling scenario duplicated in surrounding text" src="/docs/images/agreement-example.jpg"/></div>
