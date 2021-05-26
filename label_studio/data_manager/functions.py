@@ -184,6 +184,7 @@ def get_all_columns(project):
             'type': 'List',
             'target': 'tasks',
             'help': 'All users who completed the task',
+            'schema': { 'items': project.organization.members.values_list('user__id', flat=True) },
             'visibility_defaults': {
                 'explore': True,
                 'labeling': False
@@ -213,7 +214,7 @@ def get_prepared_queryset(request, project):
                                        '"excluded | included": [...task_ids...]}')
         filters = request.data.get('filters', None)
         ordering = request.data.get('ordering', [])
-        prepare_params = PrepareParams(project=project.id, selectedItems=selected,
+        prepare_params = PrepareParams(project=project.id, selectedItems=selected, data=request.data,
                                        filters=filters, ordering=ordering)
 
     queryset = Task.prepared.all(prepare_params=prepare_params)

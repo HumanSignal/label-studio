@@ -102,11 +102,13 @@ def apply_ordering(queryset, ordering):
 
     return queryset
 
+
 def cast_value(_filter):
     if _filter.type == 'Number':
         _filter.value = float(_filter.value)
     elif _filter.type == 'Boolean':
         _filter.value = bool(_filter.value)
+
 
 def apply_filters(queryset, filters):
     if not filters:
