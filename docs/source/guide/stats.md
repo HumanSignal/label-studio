@@ -91,25 +91,25 @@ There are several possible methods you can specify on project settings page:
 Complete linkage task agreement groups annotations so that all the matching scores within a given group are higher than the threshold. The agreement score is the maximum group size divided by the total count of annotations. 
 
 Review the diagram for a full explanation:
-<div style="text-align:center"><img alt="Diagram showing annotations are collected for each task, matching scores are computed for each pair, and grouping and agreement score calculation happens as detailed in the surrounding text." src="/images/LSE/stats-complete-linkage.png"/></div>
+<div style="text-align:center"><img alt="Diagram showing annotations are collected for each task, matching scores are computed for each pair, and grouping and agreement score calculation happens as detailed in the surrounding text." width=800 height=375 src="/images/LSE/stats-complete-linkage.png"/></div>
 
 ### Single linkage
 
 Single linkage task agreement groups annotations so that at least one of the matching scores within a given group is higher than the threshold. The agreement score is the maximum group size divided by the total count of annotations. 
 
 Review the diagram for a full explanation:
-<div style="text-align:center"><img alt="Diagram showing annotations are collected for each task, matching scores are computed for each pair, and grouping and agreement score calculation happens as detailed in the surrounding text." src="/images/LSE/stats-single-linkage.png"/></div>
+<div style="text-align:center"><img alt="Diagram showing annotations are collected for each task, matching scores are computed for each pair, and grouping and agreement score calculation happens as detailed in the surrounding text." width=800 height=360 src="/images/LSE/stats-single-linkage.png"/></div>
 
 ### No grouping
 
 No grouping task agreement uses the mean average of all inter-annotation matching scores for each annotation pair as the final task agreement score. 
 
 Review the diagram for a full explanation:
-<div style="text-align:center"><img alt="Diagram showing annotations are collected for each task, matching scores are computed for each pair, the resulting scores are averaged for a task." src="/images/LSE/stats-no_grouping.png"/></div>
+<div style="text-align:center"><img alt="Diagram showing annotations are collected for each task, matching scores are computed for each pair, the resulting scores are averaged for a task." width=800 height=365 src="/images/LSE/stats-no_grouping.png"/></div>
 
 ### Example
 One annotation that labels the text span "Excellent tool" as "positive", a second annotation that labels the span "tool" as "positive", and a third annotation that labels the text span "tool" as "negative".
-<br/><div style="text-align:center"><img alt="diagram showing example labeling scenario duplicated in surrounding text" src="/images/LSE/stats-agreement-example.jpg"/></div>
+<br/><div style="text-align:center"><img alt="diagram showing example labeling scenario duplicated in surrounding text" width=800 height=100 src="/images/LSE/stats-agreement-example.jpg"/></div>
 
 The matching score for the first two annotations is 50%, based on the intersection of the text spans. The matching score comparing the second annotation with the third annotation is 0%, because the same text span was labeled differently. 
 
