@@ -171,9 +171,12 @@ export const ImportPage = ({
     dispatch({ sending: files });
 
     const query = dontCommitToProject ? { commit_to_project: "false" } : {};
+    const contentType = body instanceof FormData
+      ? 'multipart/form-data' // usual multipart for usual files
+      : 'application/x-www-form-urlencoded'; // chad urlencoded for URL uploads
     const res = await api.callApi("importFiles", {
       params: { pk: project.id, ...query },
-      headers: { 'Content-Type': 'multipart/form-data' },
+      headers: { 'Content-Type': contentType },
       body,
       errorFilter: () => true,
     });
