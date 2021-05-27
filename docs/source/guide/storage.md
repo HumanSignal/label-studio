@@ -37,12 +37,12 @@ In the Label Studio UI, do the following to set up the connection:
 7. Adjust the remaining optional parameters:
     - In the **File Filter Regex** field, specify a regular expression to filter bucket objects. Use `.*` to collect all objects.
     - In the **Region Name** field, specify the AWS region name. For example `us-east-1`.
-    - In the **S3 Endpoint** field, specify
+    - In the **S3 Endpoint** field, specify an S3 endpoint.
     - In the **Access Key ID** field, specify the access key ID for your AWS account.
     - In the **Secret Access Key** field, specify the secret key for your AWS account.
-    - In the **Session Token** field, specify
+    - In the **Session Token** field, specify a session token for your AWS account. 
     - Enable **Treat every bucket object as a source file** if your bucket contains BLOB storage files such as JPG, MP3, or similar file types. This setting creates a URL for each bucket object to use for labeling. Leave this option disabled if you have multiple JSON files in the bucket with one task per JSON file. 
-    - Disable **Use pre-signed URLs** and adjust the counter if...
+    - Choose whether to disable **Use pre-signed URLs** and adjust the counter.
 8. Click **Add Storage**.
 9. Repeat these steps for **Target Storage** to sync completed data annotations to a bucket.
 
@@ -78,7 +78,7 @@ In the Label Studio UI, do the following to set up the connection:
 7. Adjust the remaining optional parameters:
     - In the **File Filter Regex** field, specify a regular expression to filter bucket objects. Use `.*` to collect all objects.
     - Enable **Treat every bucket object as a source file** if your bucket contains BLOB storage files such as JPG, MP3, or similar file types. This setting creates a URL for each bucket object to use for labeling, such as `gs://my-gcs-bucket/image.jpg`. Leave this option disabled if you have multiple JSON files in the bucket with one task per JSON file. 
-    - Disable **Use pre-signed URLs** and adjust the counter if...
+    - Choose whether to disable **Use pre-signed URLs** and adjust the counter.
 8. Click **Add Storage**.
 9. Repeat these steps for **Target Storage** to sync completed data annotations to a bucket.
 
@@ -114,7 +114,7 @@ In the Label Studio UI, do the following to set up the connection:
     - In the **Account Name** field, specify the account name for the Azure storage. You can also set this field as an environment variable,`AZURE_BLOB_ACCOUNT_NAME`.
     - In the **Account Key** field, specify the secret key to access the storage account. You can also set this field as an environment variable,`AZURE_BLOB_ACCOUNT_KEY`.
     - Enable **Treat every bucket object as a source file** if your bucket contains BLOB storage files such as JPG, MP3, or similar file types. This setting creates a URL for each bucket object to use for labeling, for example `azure-blob://container-name/image.jpg`. Leave this option disabled if you have multiple JSON files in the bucket with one task per JSON file. 
-    - Disable **Use pre-signed URLs** and adjust the counter if...
+    - Choose whether to disable **Use pre-signed URLs** and adjust the counter.
 8. Click **Add Storage**.
 9. Repeat these steps for **Target Storage** to sync completed data annotations to a container.
 
