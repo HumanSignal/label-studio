@@ -12,7 +12,7 @@ export const StorageSummary = ({storage, className, enableLastSync = false}) => 
           <GSCStorage case="gcs" storage={storage}/>
           <AzureStorage case="azure" storage={storage}/>
           <RedisStorage case="redis" storage={storage}/>
-          <LocalStorage case="redis" storage={storage}/>
+          <LocalFiles case="localfiles" storage={storage}/>
         </Oneof>
         {enableLastSync && (
           <DescriptionList.Item term="Last Sync">
@@ -61,7 +61,7 @@ const RedisStorage = ({storage}) => {
   );
 };
 
-const LocalStorage = ({storage}) => {
+const LocalFiles = ({storage}) => {
   return (
     <DescriptionList.Item term="Path">
       {storage.path}
