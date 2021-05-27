@@ -119,6 +119,9 @@ You can then import text tasks to label that match the following JSON format:
 ```
 If you're placing JSON files in [cloud storage](storage.html), place 1 task in each JSON file in the storage bucket. If you want to upload a JSON file from your machine directly into Label Studio, you can place multiple tasks in one JSON file. 
 
+#### Example JSON with multiple tasks
+You can place multiple tasks in one JSON file if you're uploading the JSON file to Label Studio. 
+
 <br/>
 {% details <b>To place multiple tasks in one JSON file, use this JSON format example</b> %}
 This example contains multiple text classification tasks with no annotations or predictions.
@@ -148,6 +151,9 @@ The "data" parameter must contain the "my_text" field defined in the text labeli
 ]
 {% endcodeblock %}
 {% enddetails %}
+
+#### Example JSON for older versions of Label Studio
+If you're still using a Label Studio version earlier than 1.0.0, refer to this example JSON format. 
 
 <br/>
 {% details <b>For versions of Label Studio earlier than 1.0.0, use this JSON format example.</b> %}
