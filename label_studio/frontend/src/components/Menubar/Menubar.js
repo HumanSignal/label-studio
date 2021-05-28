@@ -208,7 +208,7 @@ export const Menubar = ({
                 />
                 <Menu.Item
                   label="Slack Community"
-                  href="https://join.slack.com/t/label-studio/shared_invite/zt-cr8b7ygm-6L45z7biEBw4HXa5A2b5pw"
+                  href="https://join.slack.com/t/label-studio/shared_invite/zt-qy37y73p-CCfEaEZvDylyQf4oatK40A"
                   icon={<LsSlack/>}
                   target="_blank"
                 />

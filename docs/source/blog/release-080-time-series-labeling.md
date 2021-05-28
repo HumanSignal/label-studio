@@ -120,7 +120,7 @@ It's not always the case that you can label time series just by looking at the p
 <br/>
 <img src="/images/release-080/videosync.png" />
 
-This is an experimental feature right now, and we're working on finalizing the implementation, but if you have use-cases, ping us in [Slack](https://join.slack.com/t/label-studio/shared_invite/zt-cr8b7ygm-6L45z7biEBw4HXa5A2b5pw), we will help you to set it up.
+This is an experimental feature right now, and we're working on finalizing the implementation, but if you have use-cases, ping us in [Slack](https://join.slack.com/t/label-studio/shared_invite/zt-qy37y73p-CCfEaEZvDylyQf4oatK40A), we will help you to set it up.
 
 ## Next
 
