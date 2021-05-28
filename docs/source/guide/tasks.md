@@ -37,6 +37,8 @@ If you want to import multiple types of data to label at the same time, for exam
 
 You can also use a CSV file or a JSON list of tasks to point to URLs with the data, rather than directly importing the data if you need to import thousands of files. You can import files containing up to 250,000 tasks or up to 50MB in size into Label Studio.
 
+If you're specifying data in a cloud storage bucket or container, and you don't want to [sync cloud storage](storage.html), create and specify [presigned URLs for Amazon S3 storage](https://docs.aws.amazon.com/AmazonS3/latest/userguide/ShareObjectPreSignedURL.html), [signed URLs for Google Cloud Storage](https://cloud.google.com/storage/docs/access-control/signed-urls), or [shared access signatures for Microsoft Azure](https://docs.microsoft.com/en-us/azure/storage/common/storage-sas-overview) in a JSON, CSV, or TXT file. 
+
 ### Basic Label Studio JSON format
 
 One way to import data into Label Studio is using a JSON-formatted list of tasks. The `data` key of the JSON file references each task as an entry in a JSON dictionary. If there is no `data` key, Label Studio interprets the entire JSON file as one task. 
