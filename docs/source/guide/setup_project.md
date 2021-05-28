@@ -64,7 +64,7 @@ Select how you want to distribute tasks to annotators for labeling. Different fr
 2. Click **Annotation Settings**.
 3. Under **Distribute Labeling Tasks**, select one of the following:
     - Auto, the default option, to distribute tasks automatically to annotators.
-    - Manual, to show tasks only to assigned annotators. Choose this option if you require more than one annotation per task. 
+    - Manual, to show tasks to assigned annotators first, then automatically distribute unassigned tasks.
 
 Your changes save automatically. 
 
@@ -80,8 +80,18 @@ By default, each task only needs to be annotated by one annotator. If you want m
 4. Choose whether to enforce the overlap for the default of 100% of tasks, or a smaller percentage. 
 5. Choose whether to show tasks that require multiple annotations, **tasks with overlap**, before other tasks that need to be annotated. 
 6. Your changes save automatically. Return to the **Data Manager** and assign annotators to the tasks so that they can annotate the tasks. 
-   
-> Unless you assign annotators, multiple people cannot annotate tasks. 
+
+#### How task overlap works
+
+For example, if you want all tasks to be annotated by at least 2 annotators:
+- Set the minimum number of annotations to **2**
+- Enforce the overlap for 100% of tasks.
+
+If you want at least half of the tasks to be annotated by at least 3 people:
+- Set the minimum number of annotations to **3**
+- Enforce the overlap for 50% of tasks.
+
+If you're using manual distribution of tasks, annotators with tasks assigned to them label those tasks first, then Label Studio automatically distributes the remaining tasks to the project annotators so that the desired overlap and minimum number of annotations per task can be achieved.
 
 ### Set annotating options
 If you want, you can allow empty annotations.
