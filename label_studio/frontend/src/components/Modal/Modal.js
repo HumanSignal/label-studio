@@ -20,8 +20,9 @@ const standaloneModal = (props) => {
   const renderModal = (props, animate) => {
     renderCount++;
 
+    // simple modals don't require any parts of the app and can't cause the loop of death
     render((
-      <MultiProvider key={`modal-${renderCount}`} providers={[
+      <MultiProvider key={`modal-${renderCount}`} providers={props.simple ? [] : [
         <ConfigProvider key="config"/>,
         <ApiProvider key="api"/>,
         <CurrentUserProvider key="current-user"/>,
