@@ -1,6 +1,6 @@
 {
-  "message": "Fix list filter format",
-  "commit": "a3ce6cb4c47b5a11e35d6b8dd3d8067740c96db3",
+  "message": "Remove \"Skip\" button from a QuickView",
+  "commit": "64de04d29e17a86c5130f09186d9c21bfcb47255",
   "branch": "master",
-  "date": "2021-05-26T23:34:36Z"
+  "date": "2021-05-28T17:40:26Z"
 }
