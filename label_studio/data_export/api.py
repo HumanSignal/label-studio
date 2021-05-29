@@ -59,13 +59,14 @@ class DownloadResultsAPI(generics.RetrieveAPIView):
         ],
         tags=['Export'],
         operation_summary='Export annotations',
-        operation_description='Export annotated tasks as a file in a specific format.'
-                              'For example, to export JSON annotations for a project to a file called annotations.json,'
-                              'run the following from the command line:'
-                              '```bash'
-                              'curl -X GET https://localhost:8080/api/projects/{id}/export?exportType=JSON '
-                              '-H \'Authorization: Token abc123\' --output annotations.json'
-                              '```',
+        operation_description="""
+            Export annotated tasks as a file in a specific format.
+            For example, to export JSON annotations for a project to a file called `annotations.json`,
+            run the following from the command line:
+            ```
+            curl -X GET {}/api/projects/{{id}}/export?exportType=JSON -H \'Authorization: Token abc123\' --output annotations.json'
+            ```
+        """.format(settings.HOSTNAME or 'https://localhost:8080'),
         responses={200: openapi.Response(
             description='Exported data',
             schema=openapi.Schema(

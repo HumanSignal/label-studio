@@ -11,6 +11,7 @@ from django.db import IntegrityError
 from django.db.models.fields import DecimalField
 from django.conf import settings
 from drf_yasg.utils import swagger_auto_schema
+from django.utils.decorators import method_decorator
 from django.db.models import Q, When, Count, Case, OuterRef, Max, Exists, Value, BooleanField
 from rest_framework import generics, status, filters
 from rest_framework.exceptions import NotFound, ValidationError as RestValidationError
@@ -84,30 +85,33 @@ _task_data_schema = openapi.Schema(
 )
 
 
-class ProjectListAPI(generics.ListCreateAPIView):
-    """
-    get:
-    List your projects
-
+@method_decorator(name='get', decorator=swagger_auto_schema(
+    tags=['Projects'],
+    operation_summary='List your projects',
+    operation_description="""
     Return a list of the projects that you've created.
 
     To perform most tasks with the Label Studio API, you must specify the project ID, sometimes referred to as the `pk`.
     To retrieve a list of your Label Studio projects, update the following command to match your own environment.
     Replace the domain name, port, and authorization token, then run the following from the command line:
     ```bash
-    curl -X GET https://localhost:8080/api/projects/ -H 'Authorization: Token abc123'
+    curl -X GET {}/api/projects/ -H 'Authorization: Token abc123'
     ```
-
-    post:
-    Create new project
-
+    """.format(settings.HOSTNAME or 'https://localhost:8080')
+))
+@method_decorator(name='post', decorator=swagger_auto_schema(
+    tags=['Projects'],
+    operation_summary='Create new project',
+    operation_description="""
     Create a project and set up the labeling interface in Label Studio using the API.
-
+    
     ```bash
-    curl -H Content-Type:application/json -H 'Authorization: Token abc123' -X POST 'http://localhost:8080/api/projects' \
-    --data "{\"label_config\": \"<View>[...]</View>\"}"
+    curl -H Content-Type:application/json -H 'Authorization: Token abc123' -X POST '{}/api/projects' \
+    --data "{{\"label_config\": \"<View>[...]</View>\"}}"
     ```
-    """
+    """.format(settings.HOSTNAME or 'https://localhost:8080')
+))
+class ProjectListAPI(generics.ListCreateAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ProjectSerializer
     filter_backends = [filters.OrderingFilter]
@@ -133,14 +137,6 @@ class ProjectListAPI(generics.ListCreateAPIView):
                 raise ProjectExistException('Project with the same name already exists: {}'.
                                             format(ser.validated_data.get('title', '')))
             raise LabelStudioDatabaseException('Database error during project creation. Try again.')
-
-    @swagger_auto_schema(tags=['Projects'])
-    def get(self, request, *args, **kwargs):
-        return super(ProjectListAPI, self).get(request, *args, **kwargs)
-
-    @swagger_auto_schema(tags=['Projects'], request_body=ProjectSerializer)
-    def post(self, request, *args, **kwargs):
-        return super(ProjectListAPI, self).post(request, *args, **kwargs)
 
 
 class ProjectAPI(APIViewVirtualRedirectMixin,
