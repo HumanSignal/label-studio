@@ -18,7 +18,7 @@ import ujson as json
 import traceback as tb
 import drf_yasg.openapi as openapi
 import contextlib
-import label_studio
+import label_studio_withoutsignin
 
 from django.db import models, transaction
 from django.utils.module_loading import import_string
@@ -83,7 +83,7 @@ def custom_exception_handler(exc, context):
     response_data = {
         "id": exception_id,
         "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,  # default value
-        "version": label_studio.__version__,
+        "version": label_studio_withoutsignin.__version__,
         "detail": "Unknown error",  # default value
         "exc_info": None,
     }
@@ -384,7 +384,7 @@ def get_app_version():
 
 def get_latest_version():
     """Get version from pypi"""
-    pypi_url = "https://pypi.org/pypi/%s/json" % label_studio.package_name
+    pypi_url = "https://pypi.org/pypi/%s/json" % label_studio_withoutsignin.package_name
     try:
         response = requests.get(pypi_url, timeout=10).text
         data = json.loads(response)
@@ -400,22 +400,22 @@ def get_latest_version():
 
 def current_version_is_outdated(latest_version):
     latest_version = parse_version(latest_version)
-    current_version = parse_version(label_studio.__version__)
+    current_version = parse_version(label_studio_withoutsignin.__version__)
     return current_version < latest_version
 
 
 def check_for_the_latest_version(print_message):
     """Check latest pypi version"""
-    import label_studio
+    import label_studio_withoutsignin
 
     # prevent excess checks by time intervals
     current_time = time.time()
     if (
-        label_studio.__latest_version_check_time__
-        and current_time - label_studio.__latest_version_check_time__ < 60
+        label_studio_withoutsignin.__latest_version_check_time__
+        and current_time - label_studio_withoutsignin.__latest_version_check_time__ < 60
     ):
         return
-    label_studio.__latest_version_check_time__ = current_time
+    label_studio_withoutsignin.__latest_version_check_time__ = current_time
 
     data = get_latest_version()
     if not data:
@@ -424,10 +424,10 @@ def check_for_the_latest_version(print_message):
     outdated = latest_version and current_version_is_outdated(latest_version)
 
     def update_package_message():
-        update_command = Fore.CYAN + "pip install -U " + label_studio.package_name + Fore.RESET
+        update_command = Fore.CYAN + "pip install -U " + label_studio_withoutsignin.package_name + Fore.RESET
         return boxing(
             "Update available {curr_version} → {latest_version}\nRun {command}".format(
-                curr_version=label_studio.__version__,
+                curr_version=label_studio_withoutsignin.__version__,
                 latest_version=latest_version,
                 command=update_command,
             ),
@@ -437,9 +437,9 @@ def check_for_the_latest_version(print_message):
     if outdated and print_message:
         print(update_package_message())
 
-    label_studio.__latest_version__ = latest_version
-    label_studio.__latest_version_upload_time__ = data["upload_time"]
-    label_studio.__current_version_is_outdated__ = outdated
+    label_studio_withoutsignin.__latest_version__ = latest_version
+    label_studio_withoutsignin.__latest_version_upload_time__ = data["upload_time"]
+    label_studio_withoutsignin.__current_version_is_outdated__ = outdated
 
 
 # check version ASAP while package loading
@@ -451,7 +451,7 @@ def collect_versions(force=False):
 
     :return: dict with sub-dicts of version descriptions
     """
-    import label_studio
+    import label_studio_withoutsignin
 
     if settings.VERSIONS and not force:
         return settings.VERSIONS
@@ -459,11 +459,11 @@ def collect_versions(force=False):
     # main pypi package
     result = {
         "label-studio-os-package": {
-            "version": label_studio.__version__,
-            "short_version": ".".join(label_studio.__version__.split(".")[:2]),
-            "latest_version_from_pypi": label_studio.__latest_version__,
-            "latest_version_upload_time": label_studio.__latest_version_upload_time__,
-            "current_version_is_outdated": label_studio.__current_version_is_outdated__,
+            "version": label_studio_withoutsignin.__version__,
+            "short_version": ".".join(label_studio_withoutsignin.__version__.split(".")[:2]),
+            "latest_version_from_pypi": label_studio_withoutsignin.__latest_version__,
+            "latest_version_upload_time": label_studio_withoutsignin.__latest_version_upload_time__,
+            "current_version_is_outdated": label_studio_withoutsignin.__current_version_is_outdated__,
         },
         # backend full git info
         "label-studio-os-backend": version.get_git_commit_info(),

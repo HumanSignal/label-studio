@@ -113,9 +113,9 @@ cd label-studio
 # Install all package dependencies
 pip install -e .
 # Run database migrations
-python label_studio/manage.py migrate
+python label_studio_withoutsignin/manage.py migrate
 # Start the server in development mode at http://localhost:8080
-python label_studio/manage.py runserver
+python label_studio_withoutsignin/manage.py runserver
 ```
 
 ## Install with Anaconda

@@ -15,7 +15,7 @@ if sys.platform == "win32":
     init(convert=True)
 
 # on windows there will be problems with sqlite and json1 support, so fix it
-from label_studio.core.utils.windows_sqlite_fix import windows_dll_fix
+from label_studio_withoutsignin.core.utils.windows_sqlite_fix import windows_dll_fix
 
 windows_dll_fix()
 
@@ -25,8 +25,8 @@ from django.core.wsgi import get_wsgi_application
 from django.db.migrations.executor import MigrationExecutor
 from django.db import connections, DEFAULT_DB_ALIAS
 
-from label_studio.core.argparser import parse_input_args
-from label_studio.core.utils.params import get_env
+from label_studio_withoutsignin.core.argparser import parse_input_args
+from label_studio_withoutsignin.core.utils.params import get_env
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +36,7 @@ LS_PATH = str(pathlib.Path(__file__).parent.absolute())
 
 def _setup_env():
     sys.path.insert(0, LS_PATH)
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "label_studio.core.settings.label_studio")
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "label_studio_withoutsignin.core.settings.label_studio_withoutsignin")
     application = get_wsgi_application()
 
 
@@ -248,7 +248,7 @@ def main():
     _setup_env()
     _apply_database_migrations()
 
-    from label_studio.core.utils.common import collect_versions
+    from label_studio_withoutsignin.core.utils.common import collect_versions
 
     versions = collect_versions()
 
@@ -262,7 +262,7 @@ def main():
 
     # print version
     if input_args.command == "version":
-        from label_studio import __version__
+        from label_studio_withoutsignin import __version__
 
         print("\nLabel Studio version:", __version__, "\n")
         print(json.dumps(versions, indent=4))
@@ -279,7 +279,7 @@ def main():
 
     # start with migrations from old projects, '.' project_name means 'label-studio start' without project name
     elif input_args.command == "start" and input_args.project_name != ".":
-        from label_studio.core.old_ls_migration import migrate_existing_project
+        from label_studio_withoutsignin.core.old_ls_migration import migrate_existing_project
         from projects.models import Project
 
         sampling_map = {
@@ -329,7 +329,7 @@ def main():
 
     # on `start` command, launch browser if --no-browser is not specified and start label studio server
     if input_args.command == "start" or input_args.command is None:
-        from label_studio.core.utils.common import start_browser
+        from label_studio_withoutsignin.core.utils.common import start_browser
 
         if get_env("USERNAME") and get_env("PASSWORD"):
             _create_user(input_args, config)

@@ -9,7 +9,7 @@ services:
     depends_on:
       - app
     volumes:
-      - static:/label-studio/label_studio:rw
+      - static:/label-studio/label_studio_withoutsignin:rw
       - ./mydata:/label-studio/data:rw
       - ./deploy/nginx/${NGINX_FILE:-default.conf}:/etc/nginx/conf.d/default.conf:ro
     command: nginx -g "daemon off;"
@@ -33,7 +33,7 @@ services:
       - LABEL_STUDIO_HOST=${LABEL_STUDIO_HOST:-""}
     volumes:
       - ./mydata:/label-studio/data:rw
-      - static:/label-studio/label_studio:rw
+      - static:/label-studio/label_studio_withoutsignin:rw
     command: [ "./deploy/wait-for-postgres.sh", "bash", "/label-studio/deploy/start_label_studio.sh" ]
 
   db:

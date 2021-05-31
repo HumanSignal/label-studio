@@ -13,7 +13,7 @@ services:
     depends_on:
       - app
     volumes:
-      - static:/label-studio/label_studio:rw
+      - static:/label-studio/label_studio_withoutsignin:rw
       - ./mydata:/label-studio/data:rw
       - ../nginx/subpath.example.simple.conf:/etc/nginx/conf.d/default.conf:ro
     command: nginx -g "daemon off;"

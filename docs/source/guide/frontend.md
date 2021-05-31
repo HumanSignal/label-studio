@@ -127,12 +127,12 @@ LS Frontend (LSF) with Backend (LSB) integration is similar what is described in
 
 2. **Do not forget** to remove the old build from LSB:
 ```bash
-rm -r label-studio/label_studio/static/editor/*
+rm -r label-studio/label_studio_withoutsignin/static/editor/*
 ```
 
 3. Copy build folder from LSF to LSB: 
     ```bash
-    cp -r label-studio-frontend/build/static/{js,css} label-studio/label_studio/static/editor/
+    cp -r label-studio-frontend/build/static/{js,css} label-studio/label_studio_withoutsignin/static/editor/
     ```
 
     If you installed LS as a pip package, replace `<env-path>/lib/python<version>/site-packages/label_studio/static/editor/`

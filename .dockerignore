@@ -3,14 +3,14 @@
 
 # Except:
 !deploy
-!label_studio
+!label_studio_withoutsignin
 !setup.py
 !requirements.txt
 !README.md
 !wait-for-it.sh
 
 # but ignore:
-label_studio/frontend
+label_studio_withoutsignin/frontend
 
 # except
-!label_studio/frontend/dist
+!label_studio_withoutsignin/frontend/dist

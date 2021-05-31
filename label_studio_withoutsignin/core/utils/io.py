@@ -46,11 +46,11 @@ def find_node(package_name, node_path, node_type):
 
 
 def find_file(file):
-    return find_node("label_studio", file, "file")
+    return find_node("label_studio_withoutsignin", file, "file")
 
 
 def find_dir(directory):
-    return find_node("label_studio", directory, "dir")
+    return find_node("label_studio_withoutsignin", directory, "dir")
 
 
 @contextmanager

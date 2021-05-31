@@ -44,7 +44,7 @@ def main(request):
 def version_page(request):
     """Get platform version"""
     # update latest version from pypi response
-    # from label_studio.core.utils.common import check_for_the_latest_version
+    # from label_studio_withoutsignin.core.utils.common import check_for_the_latest_version
     # check_for_the_latest_version(print_message=False)
 
     result = collect_versions(force=True)

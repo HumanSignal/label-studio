@@ -26,14 +26,14 @@ deploy/logs/
 deploy/redis-data/
 deploy/dockerfiles/postgres-data
 
-label_studio/core/media
-label_studio/core/downloads
-label_studio/core/export
+label_studio_withoutsignin/core/media
+label_studio_withoutsignin/core/downloads
+label_studio_withoutsignin/core/export
 
-label_studio/core/static_build
-label_studio/core/version_.py
-label_studio/core/core
-label_studio/tests/test_data/tasks_and_annotations.json
+label_studio_withoutsignin/core/static_build
+label_studio_withoutsignin/core/version_.py
+label_studio_withoutsignin/core/core
+label_studio_withoutsignin/tests/test_data/tasks_and_annotations.json
 
 archive
 

@@ -1,7 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import setuptools
-import label_studio
+import label_studio_withoutsignin
 import sys
 
 # python 3.9 warning
@@ -15,7 +15,7 @@ if sys.version_info[0] == 3 and sys.version_info[1] >= 9:
     print('~========================================================~')
     print()
 
-print(label_studio.package_name, label_studio.__version__)
+print(label_studio_withoutsignin.package_name, label_studio_withoutsignin.__version__)
 
 # Readme
 with open('README.md', 'r', encoding='utf-8') as f:
@@ -31,8 +31,8 @@ with open('deploy/requirements.txt') as f:
             requirements.append(line)
 
 setuptools.setup(
-    name=label_studio.package_name,
-    version=label_studio.__version__,
+    name=label_studio_withoutsignin.package_name,
+    version=label_studio_withoutsignin.__version__,
     author='dmytro.bershov',
     author_email="",
     description='Label Studio without sign in user access',
@@ -51,7 +51,7 @@ setuptools.setup(
     python_requires='>=3.6',
     entry_points={
         'console_scripts': [
-            'label-studio=label_studio.server:main',
+            'label-studio=label_studio_withoutsignin.server:main',
         ],
     }
 )

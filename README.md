@@ -90,9 +90,9 @@ You can run the latest Label Studio version locally without installing the packa
 # Install all package dependencies
 pip install -e .
 # Run database migrations
-python label_studio/manage.py migrate
+python label_studio_withoutsignin/manage.py migrate
 # Start the server in development mode at http://localhost:8080
-python label_studio/manage.py runserver
+python label_studio_withoutsignin/manage.py runserver
 ```
 
 ### Deploy in a cloud instance

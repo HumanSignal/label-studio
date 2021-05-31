@@ -14,7 +14,7 @@ from lxml import etree
 from collections import defaultdict
 from django.conf import settings
 from rest_framework.exceptions import ValidationError
-from label_studio.core.utils.io import find_file
+from label_studio_withoutsignin.core.utils.io import find_file
 
 logger = logging.getLogger(__name__)
 
