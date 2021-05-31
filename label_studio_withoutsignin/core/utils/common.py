@@ -379,7 +379,7 @@ def retry_database_locked():
 
 
 def get_app_version():
-    return pkg_resources.get_distribution("label-studio").version
+    return pkg_resources.get_distribution("label_studio_withoutsignin").version
 
 
 def get_latest_version():
