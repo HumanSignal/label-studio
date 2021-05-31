@@ -33,7 +33,7 @@ gtag('config', 'UA-129877673-1');
   <form id="signup-form" action="{% url 'user-signup' %}?{% if next %}&next={{ next }}{% endif %}{% if token %}&token={{ token }}{% endif %}" method="post">
     {% csrf_token %}
     <div>
-      <input type="text" class="ls-input" name="email" id="email" placeholder="Email" value="{{ form.data.email }}">
+      <input type="text" class="ls-input" name="email" id="email" placeholder="Email" value="{{ form.data.email }}" readonly>
       {% if user_form.errors.email %}
         <ul class="field_errors">
           {% for error in user_form.errors.email %}
@@ -43,7 +43,7 @@ gtag('config', 'UA-129877673-1');
       {% endif %}
       </div>
     <div>
-      <input type="password" class="ls-input" name="password" id="password" placeholder="Password">
+      <input type="password" class="ls-input" name="password" id="password" placeholder="Password" readonly>
       {% if user_form.errors.password %}
         <ul class="field_errors">
           {% for error in user_form.errors.password %}
