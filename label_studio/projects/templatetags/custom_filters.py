@@ -5,23 +5,23 @@ from django import template
 register = template.Library()
 
 
-@register.filter(name='seconds_to_pretty_time')
+@register.filter(name="seconds_to_pretty_time")
 def seconds_to_pretty_time(value, show_seconds=False):
     if value is None:
-        return 'N/A'
+        return "N/A"
     if value < 60:
         value = int(value)
         if show_seconds:
-            return f'{value} second' + ('s' if value > 1 else '')
-        return '< 1 minute'
+            return f"{value} second" + ("s" if value > 1 else "")
+        return "< 1 minute"
     if value < 3600:
-        m = int(value / 60.)
+        m = int(value / 60.0)
         if m == 1:
-            return '1 minute'
+            return "1 minute"
         else:
-            return f'{m} minutes'
+            return f"{m} minutes"
     h = int(value / 3600)
     if h == 1:
-        return '1 hour'
+        return "1 hour"
     else:
-        return f'{h} hours'
+        return f"{h} hours"

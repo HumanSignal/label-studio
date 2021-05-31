@@ -6,9 +6,13 @@ from rest_framework.permissions import IsAuthenticated
 from core.permissions import view_with_auth, all_permissions
 
 
-@view_with_auth(['GET'], (IsAuthenticated,))
+@view_with_auth(["GET"], (IsAuthenticated,))
 @permission_required(all_permissions.organizations_change)
 def organization_people_list(request):
-    return render(request, 'organizations/people_list.html', {
-        'user': request.user,
-    })
+    return render(
+        request,
+        "organizations/people_list.html",
+        {
+            "user": request.user,
+        },
+    )

@@ -31,7 +31,12 @@ def test_views_tasks_api(business_client, project_id):
     task_data = {"text": "bbb"}
     task_id = make_task({"data": task_data}, project).id
 
-    annotation_result = {"from_name": "my_class", "to_name": "text", "type": "choices", "value": {"choices": ["pos"]}}
+    annotation_result = {
+        "from_name": "my_class",
+        "to_name": "text",
+        "type": "choices",
+        "value": {"choices": ["pos"]},
+    }
     make_annotation({"result": [annotation_result]}, task_id)
     make_annotation(
         {
@@ -40,7 +45,12 @@ def test_views_tasks_api(business_client, project_id):
         },
         task_id,
     )
-    prediction_result = {"from_name": "my_class", "to_name": "text", "type": "choices", "value": {"choices": ["pos"]}}
+    prediction_result = {
+        "from_name": "my_class",
+        "to_name": "text",
+        "type": "choices",
+        "value": {"choices": ["pos"]},
+    }
     make_prediction(
         {
             "result": [prediction_result],
@@ -57,7 +67,10 @@ def test_views_tasks_api(business_client, project_id):
     assert response_data["tasks"][0]["id"] == task_id
     assert response_data["tasks"][0]["data"] == task_data
     assert response_data["tasks"][0]["total_annotations"] == 1
-    assert json.loads(response_data["tasks"][0]["annotations_results"]) == [[annotation_result], [annotation_result]]
+    assert json.loads(response_data["tasks"][0]["annotations_results"]) == [
+        [annotation_result],
+        [annotation_result],
+    ]
     assert response_data["tasks"][0]["cancelled_annotations"] == 1
     assert response_data["tasks"][0]["total_predictions"] == 1
     assert json.loads(response_data["tasks"][0]["predictions_results"]) == [[prediction_result]]
@@ -73,7 +86,9 @@ def test_views_tasks_api(business_client, project_id):
     ],
 )
 @pytest.mark.django_db
-def test_views_total_counters(tasks_count, annotations_count, predictions_count, business_client, project_id):
+def test_views_total_counters(
+    tasks_count, annotations_count, predictions_count, business_client, project_id
+):
     # create
     payload = dict(project=project_id, data={"test": 1})
     response = business_client.post(
@@ -88,9 +103,9 @@ def test_views_total_counters(tasks_count, annotations_count, predictions_count,
     project = Project.objects.get(pk=project_id)
     for _ in range(0, tasks_count):
         task_id = make_task({"data": {}}, project).id
-        print('TASK_ID: %s' % task_id)
+        print("TASK_ID: %s" % task_id)
         for _ in range(0, annotations_count):
-            print('COMPLETION')
+            print("COMPLETION")
             make_annotation({"result": []}, task_id)
 
         for _ in range(0, predictions_count):

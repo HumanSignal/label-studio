@@ -12,7 +12,7 @@ from core.label_config import replace_task_data_undefined_with_config_field
 class CompletedBySerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'email', 'first_name', 'last_name']
+        fields = ["id", "email", "first_name", "last_name"]
 
 
 class AnnotationSerializer(serializers.ModelSerializer):
@@ -20,23 +20,23 @@ class AnnotationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Annotation
-        fields = '__all__'
+        fields = "__all__"
 
 
 class ExportDataSerializer(serializers.ModelSerializer):
     annotations = AnnotationSerializer(many=True, read_only=True)
     predictions = PredictionSerializer(many=True, read_only=True)
-    file_upload = serializers.ReadOnlyField(source='file_upload_name')
+    file_upload = serializers.ReadOnlyField(source="file_upload_name")
 
     # resolve $undefined$ key in task data, if any
     def to_representation(self, task):
         project = task.project
         data = task.data
-        
+
         replace_task_data_undefined_with_config_field(data, project)
 
         return super().to_representation(task)
 
     class Meta:
         model = Task
-        exclude = ('overlap', 'is_labeled')
+        exclude = ("overlap", "is_labeled")

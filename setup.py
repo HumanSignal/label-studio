@@ -33,12 +33,12 @@ with open('deploy/requirements.txt') as f:
 setuptools.setup(
     name=label_studio.package_name,
     version=label_studio.__version__,
-    author='Heartex',
-    author_email="hello@heartex.ai",
-    description='Label Studio annotation tool',
+    author='dmytro.bershov',
+    author_email="",
+    description='Label Studio without sign in user access',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url='https://github.com/heartexlabs/label-studio',
+    url='https://github.com/DimaVinnitsa/label-studio',
     packages=setuptools.find_packages(),
     include_package_data=True,
     classifiers=[

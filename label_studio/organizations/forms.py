@@ -4,22 +4,31 @@
 from .models import Organization, OrganizationMember
 
 
-from django.forms import Textarea, ModelForm, TextInput, Form, FileField, Select, HiddenInput, CharField
+from django.forms import (
+    Textarea,
+    ModelForm,
+    TextInput,
+    Form,
+    FileField,
+    Select,
+    HiddenInput,
+    CharField,
+)
 
 
 class OrganizationForm(ModelForm):
-    """
-    """
+    """ """
+
     org_update = CharField(widget=HiddenInput(), required=False)
-    
+
     class Meta:
         model = Organization
-        fields = ('title',)
+        fields = ("title",)
 
 
 class OrganizationSignupForm(ModelForm):
-    """
-    """
+    """ """
+
     class Meta:
         model = Organization
-        fields = ('title',)
+        fields = ("title",)

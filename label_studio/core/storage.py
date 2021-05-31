@@ -6,7 +6,7 @@ from urllib.parse import unquote, urldefrag, urlsplit, urlunsplit
 
 
 class SkipMissedManifestStaticFilesStorage(ManifestStaticFilesStorage):
-    """ We need this class to escape missing files from
+    """We need this class to escape missing files from
     django.contrib.staticfiles.finders.FileSystemFinder:
     this class tries to find js/css/png/jpg/... inside of you js/css/...
     """
@@ -23,7 +23,7 @@ class SkipMissedManifestStaticFilesStorage(ManifestStaticFilesStorage):
         opened = content is None
         if opened:
             if not self.exists(filename):
-                return ''
+                return ""
             try:
                 content = self.open(filename)
             except IOError:
@@ -38,12 +38,11 @@ class SkipMissedManifestStaticFilesStorage(ManifestStaticFilesStorage):
         root, ext = os.path.splitext(filename)
         if file_hash is not None:
             file_hash = ".%s" % file_hash
-        hashed_name = os.path.join(path, "%s%s%s" %
-                                   (root, file_hash, ext))
+        hashed_name = os.path.join(path, "%s%s%s" % (root, file_hash, ext))
         unparsed_name = list(parsed_name)
         unparsed_name[2] = hashed_name
         # Special casing for a @font-face hack, like url(myfont.eot?#iefix")
         # http://www.fontspring.com/blog/the-new-bulletproof-font-face-syntax
-        if '?#' in name and not unparsed_name[3]:
-            unparsed_name[2] += '?'
+        if "?#" in name and not unparsed_name[3]:
+            unparsed_name[2] += "?"
         return urlunsplit(unparsed_name)

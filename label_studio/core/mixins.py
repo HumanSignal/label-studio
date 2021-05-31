@@ -11,21 +11,22 @@ from django.http import HttpResponseNotAllowed
 logger = logging.getLogger(__name__)
 
 
-class APIViewVirtualRedirectMixin(object):        
+class APIViewVirtualRedirectMixin(object):
     def post(self, request, *args, **kwargs):
-        red = self.request.POST.get('_redirect', '').lower()
-        method = self.request.POST.get('_method', '').lower()
+        red = self.request.POST.get("_redirect", "").lower()
+        method = self.request.POST.get("_method", "").lower()
 
         res = super(APIViewVirtualRedirectMixin, self).post(request, *args, **kwargs)
 
-        if red == 'true':
-            if method == "delete" and hasattr(self, 'redirect_delete_route'):
+        if red == "true":
+            if method == "delete" and hasattr(self, "redirect_delete_route"):
                 return redirect(reverse(self.redirect_delete_route))
-            elif hasattr(self, 'redirect_route_callback'):
+            elif hasattr(self, "redirect_route_callback"):
                 return redirect(self.redirect_route_callback(**self.request.POST))
-            elif hasattr(self, 'redirect_kwarg'):
-                return redirect(reverse(self.redirect_route,
-                                        kwargs={'pk': self.kwargs[self.redirect_kwarg]}))
+            elif hasattr(self, "redirect_kwarg"):
+                return redirect(
+                    reverse(self.redirect_route, kwargs={"pk": self.kwargs[self.redirect_kwarg]})
+                )
             else:
                 return redirect(reverse(self.redirect_route))
         else:
@@ -34,16 +35,16 @@ class APIViewVirtualRedirectMixin(object):
 
 class APIViewVirtualMethodMixin(object):
     def post(self, request, *args, **kwargs):
-        method = self.request.POST.get('_method', '').lower()
+        method = self.request.POST.get("_method", "").lower()
 
-        if method == 'put':
+        if method == "put":
             res = self.put(request, *args, **kwargs)
-        elif method == 'delete':
+        elif method == "delete":
             res = self.delete(request, *args, **kwargs)
-        elif method == 'patch':
+        elif method == "patch":
             res = self.patch(request, *args, **kwargs)
         else:
-            if hasattr(super(APIViewVirtualMethodMixin, self), 'post'):
+            if hasattr(super(APIViewVirtualMethodMixin, self), "post"):
                 res = super(APIViewVirtualMethodMixin, self).post(request, *args, **kwargs)
             else:
                 return HttpResponseNotAllowed(permitted_methods=[])
@@ -52,15 +53,14 @@ class APIViewVirtualMethodMixin(object):
 
 
 class RequestDebugLogMixin(object):
-
     def initial(self, request, *args, **kwargs):
         try:
-            logger.debug(f'Request to {request.path}:\n{json.dumps(request.data, indent=2)}')
+            logger.debug(f"Request to {request.path}:\n{json.dumps(request.data, indent=2)}")
         except Exception as exc:
             logger.error(exc, exc_info=True)
         super(RequestDebugLogMixin, self).initial(request, *args, **kwargs)
 
 
-class DummyModelMixin():
+class DummyModelMixin:
     def has_permission(self, user):
         return True

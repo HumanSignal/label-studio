@@ -27,62 +27,63 @@ logger = logging.getLogger(__name__)
 
 task_create_response_scheme = {
     201: openapi.Response(
-        description='Tasks successfully imported',
+        description="Tasks successfully imported",
         schema=openapi.Schema(
-            title='Task creation response',
-            description='Task creation response',
+            title="Task creation response",
+            description="Task creation response",
             type=openapi.TYPE_OBJECT,
             properties={
-                'task_count': openapi.Schema(
-                    title='task_count',
-                    description='Number of tasks added',
-                    type=openapi.TYPE_INTEGER
+                "task_count": openapi.Schema(
+                    title="task_count",
+                    description="Number of tasks added",
+                    type=openapi.TYPE_INTEGER,
                 ),
-                'annotation_count': openapi.Schema(
-                    title='annotation_count',
-                    description='Number of annotations added',
-                    type=openapi.TYPE_INTEGER
+                "annotation_count": openapi.Schema(
+                    title="annotation_count",
+                    description="Number of annotations added",
+                    type=openapi.TYPE_INTEGER,
                 ),
-                'predictions_count': openapi.Schema(
-                    title='predictions_count',
-                    description='Number of predictions added',
-                    type=openapi.TYPE_INTEGER
+                "predictions_count": openapi.Schema(
+                    title="predictions_count",
+                    description="Number of predictions added",
+                    type=openapi.TYPE_INTEGER,
                 ),
-                'duration': openapi.Schema(
-                    title='duration',
-                    description='Time in seconds to create',
-                    type=openapi.TYPE_NUMBER
+                "duration": openapi.Schema(
+                    title="duration",
+                    description="Time in seconds to create",
+                    type=openapi.TYPE_NUMBER,
                 ),
-                'file_upload_ids': openapi.Schema(
-                    title='file_upload_ids',
-                    description='Database IDs of uploaded files',
+                "file_upload_ids": openapi.Schema(
+                    title="file_upload_ids",
+                    description="Database IDs of uploaded files",
                     type=openapi.TYPE_ARRAY,
-                    items=openapi.Schema(title="File Upload IDs", type=openapi.TYPE_INTEGER)
+                    items=openapi.Schema(title="File Upload IDs", type=openapi.TYPE_INTEGER),
                 ),
-                'could_be_tasks_list': openapi.Schema(
-                    title='could_be_tasks_list',
-                    description='Whether uploaded files can contain lists of tasks, like CSV/TSV files',
-                    type=openapi.TYPE_BOOLEAN
+                "could_be_tasks_list": openapi.Schema(
+                    title="could_be_tasks_list",
+                    description="Whether uploaded files can contain lists of tasks, like CSV/TSV files",
+                    type=openapi.TYPE_BOOLEAN,
                 ),
-                'found_formats': openapi.Schema(
-                    title='found_formats',
-                    description='The list of found file formats',
+                "found_formats": openapi.Schema(
+                    title="found_formats",
+                    description="The list of found file formats",
                     type=openapi.TYPE_ARRAY,
-                    items=openapi.Schema(title="File format", type=openapi.TYPE_STRING)
+                    items=openapi.Schema(title="File format", type=openapi.TYPE_STRING),
                 ),
-                'data_columns': openapi.Schema(
-                    title='data_columns',
-                    description='The list of found data columns',
+                "data_columns": openapi.Schema(
+                    title="data_columns",
+                    description="The list of found data columns",
                     type=openapi.TYPE_ARRAY,
-                    items=openapi.Schema(title="Data column name", type=openapi.TYPE_STRING)
-                )
-            })
+                    items=openapi.Schema(title="Data column name", type=openapi.TYPE_STRING),
+                ),
+            },
+        ),
     ),
     400: openapi.Schema(
-        title='Incorrect task data',
+        title="Incorrect task data",
         description="String with error description",
-        type=openapi.TYPE_STRING
-    )
+        type=openapi.TYPE_STRING,
+    ),
 }
 
 
@@ -146,31 +147,41 @@ class ImportAPI(generics.CreateAPIView):
     queryset = Task.objects.all()
 
     def get_serializer_context(self):
-        project_id = self.kwargs.get('pk')
+        project_id = self.kwargs.get("pk")
         if project_id:
-            project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=project_id)
+            project = generics.get_object_or_404(
+                Project.objects.for_user(self.request.user), pk=project_id
+            )
         else:
             project = None
-        return {'project': project, 'user': self.request.user}
+        return {"project": project, "user": self.request.user}
 
-    @swagger_auto_schema(tags=['Import'], responses=task_create_response_scheme)
+    @swagger_auto_schema(tags=["Import"], responses=task_create_response_scheme)
     def post(self, *args, **kwargs):
         return super(ImportAPI, self).post(*args, **kwargs)
 
     def _save(self, tasks):
         serializer = self.get_serializer(data=tasks, many=True)
         serializer.is_valid(raise_exception=True)
-        return serializer.save(project_id=self.kwargs['pk']), serializer
+        return serializer.save(project_id=self.kwargs["pk"]), serializer
 
     def create(self, request, *args, **kwargs):
         start = time.time()
-        commit_to_project = bool_from_request(request.query_params, 'commit_to_project', True)
+        commit_to_project = bool_from_request(request.query_params, "commit_to_project", True)
 
         # check project permissions
-        project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
+        project = generics.get_object_or_404(
+            Project.objects.for_user(self.request.user), pk=self.kwargs["pk"]
+        )
 
         # upload files from request, and parse all tasks
-        parsed_data, file_upload_ids, could_be_tasks_lists, found_formats, data_columns = load_tasks(request, project)
+        (
+            parsed_data,
+            file_upload_ids,
+            could_be_tasks_lists,
+            found_formats,
+            data_columns,
+        ) = load_tasks(request, project)
 
         if commit_to_project:
             # Immediately create project tasks and update project states and counters
@@ -185,9 +196,9 @@ class ImportAPI(generics.CreateAPIView):
             project.update_tasks_states(
                 maximum_annotations_changed=False,
                 overlap_cohort_percentage_changed=False,
-                tasks_number_changed=True
+                tasks_number_changed=True,
             )
-            logger.info('Tasks bulk_update finished')
+            logger.info("Tasks bulk_update finished")
 
             project.summary.update_data_columns(parsed_data)
             # TODO: project.summary.update_created_annotations_and_labels
@@ -199,16 +210,19 @@ class ImportAPI(generics.CreateAPIView):
 
         duration = time.time() - start
 
-        return Response({
-            'task_count': task_count,
-            'annotation_count': annotation_count,
-            'prediction_count': prediction_count,
-            'duration': duration,
-            'file_upload_ids': file_upload_ids,
-            'could_be_tasks_list': could_be_tasks_lists,
-            'found_formats': found_formats,
-            'data_columns': data_columns
-        }, status=status.HTTP_201_CREATED)
+        return Response(
+            {
+                "task_count": task_count,
+                "annotation_count": annotation_count,
+                "prediction_count": prediction_count,
+                "duration": duration,
+                "file_upload_ids": file_upload_ids,
+                "could_be_tasks_list": could_be_tasks_lists,
+                "found_formats": found_formats,
+                "data_columns": data_columns,
+            },
+            status=status.HTTP_201_CREATED,
+        )
 
 
 class TasksBulkCreateAPI(ImportAPI):
@@ -222,18 +236,22 @@ class ReImportAPI(ImportAPI):
 
     Re-import tasks using the specified file upload IDs for a specific project.
     """
+
     permission_required = all_permissions.projects_change
 
     @retry_database_locked()
     def create(self, request, *args, **kwargs):
         start = time.time()
-        files_as_tasks_list = bool_from_request(request.data, 'files_as_tasks_list', True)
+        files_as_tasks_list = bool_from_request(request.data, "files_as_tasks_list", True)
 
         # check project permissions
-        project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
-        file_upload_ids = self.request.data.get('file_upload_ids')
+        project = generics.get_object_or_404(
+            Project.objects.for_user(self.request.user), pk=self.kwargs["pk"]
+        )
+        file_upload_ids = self.request.data.get("file_upload_ids")
         tasks, found_formats, data_columns = FileUpload.load_tasks_from_uploaded_files(
-            project, file_upload_ids,  files_as_tasks_list=files_as_tasks_list)
+            project, file_upload_ids, files_as_tasks_list=files_as_tasks_list
+        )
 
         with transaction.atomic():
             project.remove_tasks_by_file_uploads(file_upload_ids)
@@ -247,31 +265,34 @@ class ReImportAPI(ImportAPI):
         project.update_tasks_states(
             maximum_annotations_changed=False,
             overlap_cohort_percentage_changed=False,
-            tasks_number_changed=True
+            tasks_number_changed=True,
         )
-        logger.info('Tasks bulk_update finished')
+        logger.info("Tasks bulk_update finished")
 
         project.summary.update_data_columns(tasks)
         # TODO: project.summary.update_created_annotations_and_labels
 
-        return Response({
-            'task_count': len(tasks),
-            'annotation_count': len(serializer.db_annotations),
-            'prediction_count': len(serializer.db_predictions),
-            'duration': duration,
-            'file_upload_ids': file_upload_ids,
-            'found_formats': found_formats,
-            'data_columns': data_columns
-        }, status=status.HTTP_201_CREATED)
+        return Response(
+            {
+                "task_count": len(tasks),
+                "annotation_count": len(serializer.db_annotations),
+                "prediction_count": len(serializer.db_predictions),
+                "duration": duration,
+                "file_upload_ids": file_upload_ids,
+                "found_formats": found_formats,
+                "data_columns": data_columns,
+            },
+            status=status.HTTP_201_CREATED,
+        )
 
     @swagger_auto_schema(auto_schema=None)
     def post(self, *args, **kwargs):
         return super(ReImportAPI, self).post(*args, **kwargs)
 
 
-class FileUploadListAPI(generics.mixins.ListModelMixin,
-                        generics.mixins.DestroyModelMixin,
-                        generics.GenericAPIView):
+class FileUploadListAPI(
+    generics.mixins.ListModelMixin, generics.mixins.DestroyModelMixin, generics.GenericAPIView
+):
     """
     get:
     Get files list
@@ -293,49 +314,66 @@ class FileUploadListAPI(generics.mixins.ListModelMixin,
     queryset = FileUpload.objects.all()
 
     def get_queryset(self):
-        project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs.get('pk', 0))
+        project = generics.get_object_or_404(
+            Project.objects.for_user(self.request.user), pk=self.kwargs.get("pk", 0)
+        )
         if project.is_draft:
             # If project is in draft state, we return all uploaded files, ignoring queried ids
-            logger.debug(f'Return all uploaded files for draft project {project}')
+            logger.debug(f"Return all uploaded files for draft project {project}")
             return FileUpload.objects.filter(project_id=project.id, user=self.request.user)
 
         # If requested in regular import, only queried IDs are returned to avoid showing previously imported
-        ids = json.loads(self.request.query_params.get('ids', '[]'))
-        logger.debug(f'File Upload IDs found: {ids}')
+        ids = json.loads(self.request.query_params.get("ids", "[]"))
+        logger.debug(f"File Upload IDs found: {ids}")
         return FileUpload.objects.filter(project_id=project.id, id__in=ids, user=self.request.user)
 
-    @swagger_auto_schema(tags=['Import'])
+    @swagger_auto_schema(tags=["Import"])
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
 
-    @swagger_auto_schema(tags=['Import'])
+    @swagger_auto_schema(tags=["Import"])
     def delete(self, request, *args, **kwargs):
-        project = generics.get_object_or_404(Project.objects.for_user(self.request.user),  pk=self.kwargs['pk'])
-        ids = self.request.data.get('file_upload_ids')
+        project = generics.get_object_or_404(
+            Project.objects.for_user(self.request.user), pk=self.kwargs["pk"]
+        )
+        ids = self.request.data.get("file_upload_ids")
         if ids is None:
             deleted, _ = FileUpload.objects.filter(project=project).delete()
         elif isinstance(ids, list):
             deleted, _ = FileUpload.objects.filter(project=project, id__in=ids).delete()
         else:
             raise ValueError('"file_upload_ids" parameter must be a list of integers')
-        return Response({'deleted': deleted}, status=status.HTTP_200_OK)
+        return Response({"deleted": deleted}, status=status.HTTP_200_OK)
 
 
 class FileUploadAPI(generics.RetrieveUpdateDestroyAPIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated,)
     serializer_class = FileUploadSerializer
     queryset = FileUpload.objects.all()
 
-    @swagger_auto_schema(tags=['Import'], operation_summary='Get file upload', operation_description='Retrieve details about a specific uploaded file.')
+    @swagger_auto_schema(
+        tags=["Import"],
+        operation_summary="Get file upload",
+        operation_description="Retrieve details about a specific uploaded file.",
+    )
     def get(self, *args, **kwargs):
         return super(FileUploadAPI, self).get(*args, **kwargs)
 
-    @swagger_auto_schema(tags=['Import'], operation_summary='Update file upload', operation_description='Update a specific uploaded file.', request_body=FileUploadSerializer)
+    @swagger_auto_schema(
+        tags=["Import"],
+        operation_summary="Update file upload",
+        operation_description="Update a specific uploaded file.",
+        request_body=FileUploadSerializer,
+    )
     def patch(self, *args, **kwargs):
         return super(FileUploadAPI, self).patch(*args, **kwargs)
 
-    @swagger_auto_schema(tags=['Import'], operation_summary='Delete file upload', operation_description='Delete a specific uploaded file.')
+    @swagger_auto_schema(
+        tags=["Import"],
+        operation_summary="Delete file upload",
+        operation_description="Delete a specific uploaded file.",
+    )
     def delete(self, *args, **kwargs):
         return super(FileUploadAPI, self).delete(*args, **kwargs)
 
@@ -345,14 +383,16 @@ class FileUploadAPI(generics.RetrieveUpdateDestroyAPIView):
 
 
 class UploadedFileResponse(generics.RetrieveAPIView):
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated,)
 
     @swagger_auto_schema(auto_schema=None)
     def get(self, *args, **kwargs):
         request = self.request
-        filename = kwargs['filename']
-        file = settings.UPLOAD_DIR + ('/' if not settings.UPLOAD_DIR.endswith('/') else '') + filename
-        logger.debug(f'Fetch uploaded file by user {request.user} => {file}')
+        filename = kwargs["filename"]
+        file = (
+            settings.UPLOAD_DIR + ("/" if not settings.UPLOAD_DIR.endswith("/") else "") + filename
+        )
+        logger.debug(f"Fetch uploaded file by user {request.user} => {file}")
         file_upload = FileUpload.objects.get(file=file)
 
-        return RangedFileResponse(request, open(file_upload.file.path, mode='rb'))
+        return RangedFileResponse(request, open(file_upload.file.path, mode="rb"))

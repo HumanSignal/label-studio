@@ -5,6 +5,6 @@ import pytest
 
 @pytest.mark.django_db
 def test_active_organization_filled(business_client):
-    response = business_client.get('/api/users/')
+    response = business_client.get("/api/users/")
     response_data = response.json()
-    assert response_data[0]['active_organization'] == business_client.organization.id
+    assert response_data[0]["active_organization"] == business_client.organization.id

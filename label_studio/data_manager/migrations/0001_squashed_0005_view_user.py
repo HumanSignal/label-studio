@@ -9,46 +9,148 @@ import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
-    replaces = [('data_manager', '0001_initial'), ('data_manager', '0002_auto_20210201_1316'), ('data_manager', '0003_filter_index'), ('data_manager', '0004_auto_20210204_1231'), ('data_manager', '0005_view_user')]
+    replaces = [
+        ("data_manager", "0001_initial"),
+        ("data_manager", "0002_auto_20210201_1316"),
+        ("data_manager", "0003_filter_index"),
+        ("data_manager", "0004_auto_20210204_1231"),
+        ("data_manager", "0005_view_user"),
+    ]
 
     initial = True
 
     dependencies = [
-        ('projects', '0060_merge_20210126_1328'),
-        ('projects', '0058_remove_projecttemplate_business'),
+        ("projects", "0060_merge_20210126_1328"),
+        ("projects", "0058_remove_projecttemplate_business"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Filter',
+            name="Filter",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('column', models.CharField(help_text='Field name', max_length=1024, verbose_name='column')),
-                ('type', models.CharField(help_text='Field type', max_length=1024, verbose_name='type')),
-                ('operator', models.CharField(help_text='Filter operator', max_length=1024, verbose_name='operator')),
-                ('value', models.JSONField(default=dict, help_text='Filter value', null=True, verbose_name='value')),
-                ('index', models.IntegerField(default=0, help_text='To keep filter order', verbose_name='index')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                (
+                    "column",
+                    models.CharField(
+                        help_text="Field name", max_length=1024, verbose_name="column"
+                    ),
+                ),
+                (
+                    "type",
+                    models.CharField(help_text="Field type", max_length=1024, verbose_name="type"),
+                ),
+                (
+                    "operator",
+                    models.CharField(
+                        help_text="Filter operator", max_length=1024, verbose_name="operator"
+                    ),
+                ),
+                (
+                    "value",
+                    models.JSONField(
+                        default=dict, help_text="Filter value", null=True, verbose_name="value"
+                    ),
+                ),
+                (
+                    "index",
+                    models.IntegerField(
+                        default=0, help_text="To keep filter order", verbose_name="index"
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='FilterGroup',
+            name="FilterGroup",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('conjunction', models.CharField(help_text='Type of conjunction', max_length=1024, verbose_name='conjunction')),
-                ('filters', models.ManyToManyField(help_text='Connected filters', related_name='filter_groups', to='data_manager.Filter')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                (
+                    "conjunction",
+                    models.CharField(
+                        help_text="Type of conjunction", max_length=1024, verbose_name="conjunction"
+                    ),
+                ),
+                (
+                    "filters",
+                    models.ManyToManyField(
+                        help_text="Connected filters",
+                        related_name="filter_groups",
+                        to="data_manager.Filter",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='View',
+            name="View",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('data', models.JSONField(default=dict, help_text='Custom view data', null=True, verbose_name='data')),
-                ('project', models.ForeignKey(help_text='Project ID', on_delete=django.db.models.deletion.CASCADE, related_name='views', to='projects.project')),
-                ('ordering', models.JSONField(default=dict, help_text='Ordering parameters', null=True, verbose_name='ordering')),
-                ('filter_group', models.ForeignKey(help_text='Groups of filters', null=True, on_delete=django.db.models.deletion.SET_NULL, to='data_manager.filtergroup')),
-                ('selected_items', models.JSONField(default=dict, help_text='Selected items', null=True, verbose_name='selected items')),
-                ('user', models.ForeignKey(help_text='User who made this view', null=True, on_delete=django.db.models.deletion.CASCADE, related_name='views', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                (
+                    "data",
+                    models.JSONField(
+                        default=dict, help_text="Custom view data", null=True, verbose_name="data"
+                    ),
+                ),
+                (
+                    "project",
+                    models.ForeignKey(
+                        help_text="Project ID",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="views",
+                        to="projects.project",
+                    ),
+                ),
+                (
+                    "ordering",
+                    models.JSONField(
+                        default=dict,
+                        help_text="Ordering parameters",
+                        null=True,
+                        verbose_name="ordering",
+                    ),
+                ),
+                (
+                    "filter_group",
+                    models.ForeignKey(
+                        help_text="Groups of filters",
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="data_manager.filtergroup",
+                    ),
+                ),
+                (
+                    "selected_items",
+                    models.JSONField(
+                        default=dict,
+                        help_text="Selected items",
+                        null=True,
+                        verbose_name="selected items",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        help_text="User who made this view",
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="views",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
     ]

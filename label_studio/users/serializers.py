@@ -9,7 +9,7 @@ from core.utils.common import load_func
 
 class BaseUserSerializer(serializers.ModelSerializer):
     # short form for user presentation
-    initials = serializers.SerializerMethodField(default='?', read_only=True)
+    initials = serializers.SerializerMethodField(default="?", read_only=True)
     avatar = serializers.SerializerMethodField(read_only=True)
 
     def get_avatar(self, user):
@@ -21,23 +21,23 @@ class BaseUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
-            'id',
-            'first_name',
-            'last_name',
-            'username',
-            'email',
-            'last_activity',
-            'avatar',
-            'initials',
-            'phone',
-            'active_organization',
+            "id",
+            "first_name",
+            "last_name",
+            "username",
+            "email",
+            "last_activity",
+            "avatar",
+            "initials",
+            "phone",
+            "active_organization",
         )
 
 
 class UserSimpleSerializer(BaseUserSerializer):
     class Meta:
         model = User
-        fields = ('id', 'first_name', 'last_name', 'email', 'avatar')
+        fields = ("id", "first_name", "last_name", "email", "avatar")
 
 
 UserSerializer = load_func(settings.USER_SERIALIZER)

@@ -16,7 +16,10 @@ from core.utils.common import get_object_with_check_and_log
 
 from organizations.models import Organization
 from organizations.serializers import (
-    OrganizationSerializer, OrganizationIdSerializer, OrganizationMemberUserSerializer, OrganizationInviteSerializer
+    OrganizationSerializer,
+    OrganizationIdSerializer,
+    OrganizationMemberUserSerializer,
+    OrganizationInviteSerializer,
 )
 
 
@@ -30,19 +33,22 @@ class OrganizationListAPI(generics.ListCreateAPIView):
 
     Return a list of the organizations you've created.
     """
+
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = all_permissions.organizations_change
     serializer_class = OrganizationIdSerializer
 
     def get_object(self):
-        org = get_object_with_check_and_log(self.request, Organization, pk=self.kwargs[self.lookup_field])
+        org = get_object_with_check_and_log(
+            self.request, Organization, pk=self.kwargs[self.lookup_field]
+        )
         self.check_object_permissions(self.request, org)
         return org
 
     def get_queryset(self):
         return Organization.objects.filter(created_by=self.request.user)
 
-    @swagger_auto_schema(tags=['Organizations'])
+    @swagger_auto_schema(tags=["Organizations"])
     def get(self, request, *args, **kwargs):
         return super(OrganizationListAPI, self).get(request, *args, **kwargs)
 
@@ -69,17 +75,19 @@ class OrganizationMemberListAPI(generics.ListAPIView):
     serializer_class = OrganizationMemberUserSerializer
 
     def get_queryset(self):
-        org = generics.get_object_or_404(self.request.user.organizations, pk=self.kwargs[self.lookup_field])
+        org = generics.get_object_or_404(
+            self.request.user.organizations, pk=self.kwargs[self.lookup_field]
+        )
         return org.members
 
-    @swagger_auto_schema(tags=['Organizations'])
+    @swagger_auto_schema(tags=["Organizations"])
     def get(self, request, *args, **kwargs):
         return super(OrganizationMemberListAPI, self).get(request, *args, **kwargs)
 
 
-class OrganizationAPI(APIViewVirtualRedirectMixin,
-                      APIViewVirtualMethodMixin,
-                      generics.RetrieveUpdateAPIView):
+class OrganizationAPI(
+    APIViewVirtualRedirectMixin, APIViewVirtualMethodMixin, generics.RetrieveUpdateAPIView
+):
     """
     get:
     Get organization settings
@@ -91,24 +99,27 @@ class OrganizationAPI(APIViewVirtualRedirectMixin,
 
     Update the settings for a specific organization.
     """
+
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     queryset = Organization.objects.all()
     permission_required = all_permissions.organizations_change
     serializer_class = OrganizationSerializer
 
-    redirect_route = 'organizations-dashboard'
-    redirect_kwarg = 'pk'
+    redirect_route = "organizations-dashboard"
+    redirect_kwarg = "pk"
 
     def get_object(self):
-        org = generics.get_object_or_404(self.request.user.organizations, pk=self.kwargs[self.lookup_field])
+        org = generics.get_object_or_404(
+            self.request.user.organizations, pk=self.kwargs[self.lookup_field]
+        )
         self.check_object_permissions(self.request, org)
         return org
 
-    @swagger_auto_schema(tags=['Organizations'])
+    @swagger_auto_schema(tags=["Organizations"])
     def get(self, request, *args, **kwargs):
         return super(OrganizationAPI, self).get(request, *args, **kwargs)
 
-    @swagger_auto_schema(tags=['Organizations'])
+    @swagger_auto_schema(tags=["Organizations"])
     def patch(self, request, *args, **kwargs):
         return super(OrganizationAPI, self).patch(request, *args, **kwargs)
 
@@ -127,14 +138,18 @@ class OrganizationInviteAPI(APIView):
 
     @swagger_auto_schema(
         tags=["Invites"],
-        operation_summary='Get organization invite link',
-        responses={200: OrganizationInviteSerializer()}
+        operation_summary="Get organization invite link",
+        responses={200: OrganizationInviteSerializer()},
     )
     def get(self, request, *args, **kwargs):
-        org = get_object_with_check_and_log(self.request, Organization, pk=request.user.active_organization_id)
+        org = get_object_with_check_and_log(
+            self.request, Organization, pk=request.user.active_organization_id
+        )
         self.check_object_permissions(self.request, org)
-        invite_url = '{}?token={}'.format(reverse('user-signup'), org.token)
-        serializer = OrganizationInviteSerializer(data={'invite_url': invite_url, 'token': org.token})
+        invite_url = "{}?token={}".format(reverse("user-signup"), org.token)
+        serializer = OrganizationInviteSerializer(
+            data={"invite_url": invite_url, "token": org.token}
+        )
         serializer.is_valid()
         return Response(serializer.data, status=200)
 
@@ -145,15 +160,16 @@ class OrganizationResetTokenAPI(APIView):
 
     @swagger_auto_schema(
         tags=["Invites"],
-        operation_summary='Reset organization token',
-        responses={200: OrganizationInviteSerializer()}
+        operation_summary="Reset organization token",
+        responses={200: OrganizationInviteSerializer()},
     )
     def post(self, request, *args, **kwargs):
         org = request.user.active_organization
         org.reset_token()
-        logger.debug(f'New token for organization {org.pk} is {org.token}')
-        invite_url = '{}?token={}'.format(reverse('user-signup'), org.token)
-        serializer = OrganizationInviteSerializer(data={'invite_url': invite_url, 'token': org.token})
+        logger.debug(f"New token for organization {org.pk} is {org.token}")
+        invite_url = "{}?token={}".format(reverse("user-signup"), org.token)
+        serializer = OrganizationInviteSerializer(
+            data={"invite_url": invite_url, "token": org.token}
+        )
         serializer.is_valid()
         return Response(serializer.data, status=201)
-

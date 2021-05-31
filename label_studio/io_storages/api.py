@@ -13,7 +13,12 @@ from drf_yasg import openapi as openapi
 from drf_yasg.utils import swagger_auto_schema
 from django.utils.decorators import method_decorator
 
-from core.permissions import BaseRulesPermission, IsBusiness, get_object_with_permissions, all_permissions
+from core.permissions import (
+    BaseRulesPermission,
+    IsBusiness,
+    get_object_with_permissions,
+    all_permissions,
+)
 from core.utils.common import get_object_with_check_and_log
 from core.utils.io import read_yaml
 from io_storages.serializers import ImportStorageSerializer, ExportStorageSerializer
@@ -23,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 
 class StorageAPIBasePermission(BaseRulesPermission):
-    perm = 'projects.change_project'
+    perm = "projects.change_project"
 
 
 class ImportStorageListAPI(generics.ListCreateAPIView):
@@ -32,7 +37,7 @@ class ImportStorageListAPI(generics.ListCreateAPIView):
     serializer_class = ImportStorageSerializer
 
     def get_queryset(self):
-        project_pk = self.request.query_params.get('project')
+        project_pk = self.request.query_params.get("project")
         project = get_object_with_check_and_log(self.request, Project, pk=project_pk)
         self.check_object_permissions(self.request, project)
         ImportStorageClass = self.serializer_class.Meta.model
@@ -41,6 +46,7 @@ class ImportStorageListAPI(generics.ListCreateAPIView):
 
 class ImportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     """RUD storage by pk specified in URL"""
+
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ImportStorageSerializer
     permission_required = all_permissions.projects_change
@@ -56,7 +62,7 @@ class ExportStorageListAPI(generics.ListCreateAPIView):
     serializer_class = ExportStorageSerializer
 
     def get_queryset(self):
-        project_pk = self.request.query_params.get('project')
+        project_pk = self.request.query_params.get("project")
         project = get_object_with_check_and_log(self.request, Project, pk=project_pk)
         self.check_object_permissions(self.request, project)
         ImportStorageClass = self.serializer_class.Meta.model
@@ -65,6 +71,7 @@ class ExportStorageListAPI(generics.ListCreateAPIView):
 
 class ExportStorageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     """RUD storage by pk specified in URL"""
+
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ExportStorageSerializer
     permission_required = all_permissions.projects_change
@@ -114,7 +121,9 @@ class StorageFormLayoutAPI(generics.RetrieveAPIView):
 
     @swagger_auto_schema(auto_schema=None)
     def get(self, request, *args, **kwargs):
-        form_layout_file = os.path.join(os.path.dirname(inspect.getfile(self.__class__)), 'form_layout.yml')
+        form_layout_file = os.path.join(
+            os.path.dirname(inspect.getfile(self.__class__)), "form_layout.yml"
+        )
         if not os.path.exists(form_layout_file):
             raise NotFound(f'"form_layout.yml" is not found for {self.__class__.__name__}')
 
@@ -131,8 +140,8 @@ class ExportStorageValidateAPI(StorageValidateAPI):
 
 
 class ImportStorageFormLayoutAPI(StorageFormLayoutAPI):
-    storage_type = 'ImportStorage'
+    storage_type = "ImportStorage"
 
 
 class ExportStorageFormLayoutAPI(StorageFormLayoutAPI):
-    storage_type = 'ExportStorage'
+    storage_type = "ExportStorage"

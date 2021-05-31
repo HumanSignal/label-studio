@@ -34,16 +34,20 @@ def gen_tasks(user_id):
         for c in range(annotations_n):
             tasks.append(tc_template % (j, r.choices(label_choices)[0], user_id))
             if c < annotations_n - 1:
-                tasks.append(',')
+                tasks.append(",")
             j += 1
         tasks.append(task_template_end)
         if t < tasks_n - 1:
-            tasks.append(',')
+            tasks.append(",")
         i += 1
 
-    with open(os.path.join(os.path.dirname(__file__), 'tasks_and_annotations.json'), 'w+', encoding='utf-8') as f:
-        f.write('[' + ''.join(tasks) + ']')
+    with open(
+        os.path.join(os.path.dirname(__file__), "tasks_and_annotations.json"),
+        "w+",
+        encoding="utf-8",
+    ) as f:
+        f.write("[" + "".join(tasks) + "]")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     gen_tasks(3)

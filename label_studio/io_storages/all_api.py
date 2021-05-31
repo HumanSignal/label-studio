@@ -23,13 +23,15 @@ class AllImportStorageTypesAPI(APIView):
     swagger_schema = None
 
     def get(self, request, **kwargs):
-        return Response([
-            {'name': 's3', 'title': 'AWS S3'},
-            {'name': 'gcs', 'title': 'Google Cloud Storage'},
-            {'name': 'azure', 'title': 'Microsoft Azure'},
-            {'name': 'redis', 'title': 'Redis'},
-            {'name': 'localfiles', 'title': 'Local files'},
-        ])
+        return Response(
+            [
+                {"name": "s3", "title": "AWS S3"},
+                {"name": "gcs", "title": "Google Cloud Storage"},
+                {"name": "azure", "title": "Microsoft Azure"},
+                {"name": "redis", "title": "Redis"},
+                {"name": "localfiles", "title": "Local files"},
+            ]
+        )
 
 
 class AllExportStorageTypesAPI(APIView):
@@ -37,13 +39,15 @@ class AllExportStorageTypesAPI(APIView):
     swagger_schema = None
 
     def get(self, request, **kwargs):
-        return Response([
-            {'name': 's3', 'title': 'AWS S3'},
-            {'name': 'gcs', 'title': 'Google Cloud Storage'},
-            {'name': 'azure', 'title': 'Microsoft Azure'},
-            {'name': 'redis', 'title': 'Redis'},
-            {'name': 'localfiles', 'title': 'Local files'},
-        ])
+        return Response(
+            [
+                {"name": "s3", "title": "AWS S3"},
+                {"name": "gcs", "title": "Google Cloud Storage"},
+                {"name": "azure", "title": "Microsoft Azure"},
+                {"name": "redis", "title": "Redis"},
+                {"name": "localfiles", "title": "Local files"},
+            ]
+        )
 
 
 class AllImportStorageListAPI(generics.ListAPIView):
@@ -58,20 +62,25 @@ class AllImportStorageListAPI(generics.ListAPIView):
             response = view(request._request, *args, **kwargs)
             payload = response.data
             if not isinstance(payload, list):
-                raise ValueError(f'Response is not list')
+                raise ValueError(f"Response is not list")
             return response.data
         except Exception as exc:
             logger.error(f"Can't process {api.__class__.__name__}. Reason: {exc}", exc_info=True)
             return []
 
     def list(self, request, *args, **kwargs):
-        return Response(data=sum([
-            self._get_response(S3ImportStorageListAPI, request, *args, **kwargs),
-            self._get_response(GCSImportStorageListAPI, request, *args, **kwargs),
-            self._get_response(AzureBlobImportStorageListAPI, request, *args, **kwargs),
-            self._get_response(RedisImportStorageListAPI, request, *args, **kwargs),
-            self._get_response(LocalFilesImportStorageListAPI, request, *args, **kwargs),
-        ], []))
+        return Response(
+            data=sum(
+                [
+                    self._get_response(S3ImportStorageListAPI, request, *args, **kwargs),
+                    self._get_response(GCSImportStorageListAPI, request, *args, **kwargs),
+                    self._get_response(AzureBlobImportStorageListAPI, request, *args, **kwargs),
+                    self._get_response(RedisImportStorageListAPI, request, *args, **kwargs),
+                    self._get_response(LocalFilesImportStorageListAPI, request, *args, **kwargs),
+                ],
+                [],
+            )
+        )
 
 
 class AllExportStorageListAPI(generics.ListAPIView):
@@ -86,10 +95,15 @@ class AllExportStorageListAPI(generics.ListAPIView):
         return response.data
 
     def list(self, request, *args, **kwargs):
-        return Response(data=sum([
-            self._get_response(S3ExportStorageListAPI, request, *args, **kwargs),
-            self._get_response(GCSExportStorageListAPI, request, *args, **kwargs),
-            self._get_response(AzureBlobExportStorageListAPI, request, *args, **kwargs),
-            self._get_response(RedisExportStorageListAPI, request, *args, **kwargs),
-            self._get_response(LocalFilesExportStorageListAPI, request, *args, **kwargs)
-        ], []))
+        return Response(
+            data=sum(
+                [
+                    self._get_response(S3ExportStorageListAPI, request, *args, **kwargs),
+                    self._get_response(GCSExportStorageListAPI, request, *args, **kwargs),
+                    self._get_response(AzureBlobExportStorageListAPI, request, *args, **kwargs),
+                    self._get_response(RedisExportStorageListAPI, request, *args, **kwargs),
+                    self._get_response(LocalFilesExportStorageListAPI, request, *args, **kwargs),
+                ],
+                [],
+            )
+        )

@@ -11,7 +11,7 @@ try:
     _redis = get_connection()
     _redis.ping()
 except:
-    logger.warning('Redis is not connected.')
+    logger.warning("Redis is not connected.")
     _redis = None
 
 
@@ -21,16 +21,16 @@ def redis_healthcheck():
     try:
         _redis.ping()
     except redis.exceptions.ConnectionError as exc:
-        logger.error(f'Redis healthcheck failed with ConnectionError: {exc}', exc_info=True)
+        logger.error(f"Redis healthcheck failed with ConnectionError: {exc}", exc_info=True)
         return False
     except redis.exceptions.TimeoutError as exc:
-        logger.error(f'Redis healthcheck failed with TimeoutError: {exc}', exc_info=True)
+        logger.error(f"Redis healthcheck failed with TimeoutError: {exc}", exc_info=True)
         return False
     except redis.exceptions.RedisError as exc:
-        logger.error(f'Redis healthcheck failed: {exc}', exc_info=True)
+        logger.error(f"Redis healthcheck failed: {exc}", exc_info=True)
         return False
     else:
-        logger.debug('Redis client is alive!')
+        logger.debug("Redis client is alive!")
         return True
 
 

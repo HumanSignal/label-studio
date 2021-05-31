@@ -13,7 +13,7 @@ class GCSImportStorageSerializer(ImportStorageSerializer):
 
     class Meta:
         model = GCSImportStorage
-        fields = '__all__'
+        fields = "__all__"
 
     def validate(self, data):
         data = super(GCSImportStorageSerializer, self).validate(data)
@@ -30,4 +30,4 @@ class GCSExportStorageSerializer(ExportStorageSerializer):
 
     class Meta:
         model = GCSExportStorage
-        fields = '__all__'
+        fields = "__all__"

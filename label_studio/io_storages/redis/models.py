@@ -8,7 +8,12 @@ from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 from django.dispatch import receiver
 from django.db.models.signals import post_save
-from io_storages.base_models import ImportStorage, ImportStorageLink, ExportStorage, ExportStorageLink
+from io_storages.base_models import (
+    ImportStorage,
+    ImportStorageLink,
+    ExportStorage,
+    ExportStorageLink,
+)
 from io_storages.serializers import StorageAnnotationSerializer
 from tasks.models import Annotation
 
@@ -16,24 +21,18 @@ logger = logging.getLogger(__name__)
 
 
 class RedisStorageMixin(models.Model):
-    path = models.TextField(
-        _('path'), null=True, blank=True,
-        help_text='Storage prefix (optional)')
-    host = models.TextField(
-        _('host'), null=True, blank=True,
-        help_text='Server Host IP (optional)')
-    port = models.TextField(
-        _('port'), null=True, blank=True,
-        help_text='Server Port (optional)')
+    path = models.TextField(_("path"), null=True, blank=True, help_text="Storage prefix (optional)")
+    host = models.TextField(_("host"), null=True, blank=True, help_text="Server Host IP (optional)")
+    port = models.TextField(_("port"), null=True, blank=True, help_text="Server Port (optional)")
     password = models.TextField(
-        _('password'), null=True, blank=True,
-        help_text='Server Password (optional)')
+        _("password"), null=True, blank=True, help_text="Server Password (optional)"
+    )
     regex_filter = models.TextField(
-        _('port'), null=True, blank=True,
-        help_text='Cloud storage regex for filtering objects')
+        _("port"), null=True, blank=True, help_text="Cloud storage regex for filtering objects"
+    )
     use_blob_urls = models.BooleanField(
-        _('use_blob_urls'), default=False,
-        help_text='Interpret objects as BLOBs and generate URLs')
+        _("use_blob_urls"), default=False, help_text="Interpret objects as BLOBs and generate URLs"
+    )
 
     def get_redis_connection(self, db=None, redis_config={}):
         """Get a redis connection from the provided arguments.
@@ -52,7 +51,8 @@ class RedisStorageMixin(models.Model):
             # This should never happen, but better to check than to accidentally
             # overwrite an existing database by choosing a wrong default:
             raise ValueError(
-                "Please explicitely pass a redis db id to prevent accidentally overwriting existing database!")
+                "Please explicitely pass a redis db id to prevent accidentally overwriting existing database!"
+            )
 
         # Since tasks are always text, we use StrictRedis with utf-8 decoding.
         r = redis.StrictRedis(db=db, charset="utf-8", decode_responses=True, **redis_config)
@@ -63,22 +63,23 @@ class RedisStorageMixin(models.Model):
 
     def get_client(self):
         redis_config = {}
-        if self.host: redis_config["host"] = self.host
-        if self.port: redis_config["port"] = self.port
-        if self.password: redis_config["password"] = self.password
+        if self.host:
+            redis_config["host"] = self.host
+        if self.port:
+            redis_config["port"] = self.port
+        if self.password:
+            redis_config["password"] = self.password
 
         return self.get_redis_connection(db=self.db, redis_config=redis_config)
 
 
 class RedisImportStorage(ImportStorage, RedisStorageMixin):
-    db = models.PositiveSmallIntegerField(
-        _('db'), default=1,
-        help_text='Server Database')
+    db = models.PositiveSmallIntegerField(_("db"), default=1, help_text="Server Database")
 
     def iterkeys(self):
         client = self.get_client()
         path = str(self.path)
-        for key in client.keys(path + '*'):
+        for key in client.keys(path + "*"):
             yield key
 
     def get_data(self, key):
@@ -98,13 +99,13 @@ class RedisImportStorage(ImportStorage, RedisStorageMixin):
 
 
 class RedisExportStorage(ExportStorage, RedisStorageMixin):
-    db = models.PositiveSmallIntegerField(
-        _('db'), default=2,
-        help_text='Server Database')
+    db = models.PositiveSmallIntegerField(_("db"), default=2, help_text="Server Database")
 
     def save_annotation(self, annotation):
         client = self.get_client()
-        logger.debug(f'Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}')
+        logger.debug(
+            f"Creating new object on {self.__class__.__name__} Storage {self} for annotation {annotation}"
+        )
         ser_annotation = self._get_serialized_data(annotation)
         with transaction.atomic():
             # Create export storage link
@@ -115,15 +116,15 @@ class RedisExportStorage(ExportStorage, RedisStorageMixin):
 @receiver(post_save, sender=Annotation)
 def export_annotation_to_s3_storages(sender, instance, **kwargs):
     project = instance.task.project
-    if hasattr(project, 'io_storages_redisexportstorages'):
+    if hasattr(project, "io_storages_redisexportstorages"):
         for storage in project.io_storages_redisexportstorages.all():
-            logger.debug(f'Export {instance} to Redis storage {storage}')
+            logger.debug(f"Export {instance} to Redis storage {storage}")
             storage.save_annotation(instance)
 
 
 class RedisImportStorageLink(ImportStorageLink):
-    storage = models.ForeignKey(RedisImportStorage, on_delete=models.CASCADE, related_name='links')
+    storage = models.ForeignKey(RedisImportStorage, on_delete=models.CASCADE, related_name="links")
 
 
 class RedisExportStorageLink(ExportStorageLink):
-    storage = models.ForeignKey(RedisExportStorage, on_delete=models.CASCADE, related_name='links')
+    storage = models.ForeignKey(RedisExportStorage, on_delete=models.CASCADE, related_name="links")

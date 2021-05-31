@@ -26,7 +26,7 @@ class MLBackendListAPI(generics.ListCreateAPIView):
     swagger_schema = None
 
     def get_queryset(self):
-        project_pk = self.request.query_params.get('project')
+        project_pk = self.request.query_params.get("project")
         project = get_object_with_check_and_log(self.request, Project, pk=project_pk)
         self.check_object_permissions(self.request, project)
         ml_backends = MLBackend.objects.filter(project_id=project.id)
@@ -41,6 +41,7 @@ class MLBackendListAPI(generics.ListCreateAPIView):
 
 class MLBackendDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     """RUD storage by pk specified in URL"""
+
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = MLBackendSerializer
     permission_required = all_permissions.projects_change
@@ -62,33 +63,37 @@ class MLBackendTrainAPI(APIView):
 
     After you've activated an ML backend, call this API to start training with the already-labeled tasks.
     """
+
     permission_required = all_permissions.projects_change
 
     @swagger_auto_schema(
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
-            properties={'use_ground_truth': openapi.Schema(type=openapi.TYPE_BOOLEAN,
-                                                        description='Whether to include ground truth annotations in training')}
+            properties={
+                "use_ground_truth": openapi.Schema(
+                    type=openapi.TYPE_BOOLEAN,
+                    description="Whether to include ground truth annotations in training",
+                )
+            },
         ),
         responses={
             200: openapi.Response(
-                title='Training OK',
-                description='Training has successfully started.'
+                title="Training OK", description="Training has successfully started."
             ),
             500: openapi.Response(
-                description='Training error',
+                description="Training error",
                 schema=openapi.Schema(
-                    title='Error message',
-                    desciption='Error message',
+                    title="Error message",
+                    desciption="Error message",
                     type=openapi.TYPE_STRING,
-                    example='Server responded with an error.'
-                )
-            )
+                    example="Server responded with an error.",
+                ),
+            ),
         },
-        tags=['Machine Learning']
+        tags=["Machine Learning"],
     )
     def post(self, request, *args, **kwargs):
-        ml_backend = get_object_with_check_and_log(request, MLBackend, pk=self.kwargs['pk'])
+        ml_backend = get_object_with_check_and_log(request, MLBackend, pk=self.kwargs["pk"])
         self.check_object_permissions(self.request, ml_backend)
 
         ml_backend.train()

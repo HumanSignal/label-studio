@@ -12,9 +12,8 @@ from django.db.models.sql import UpdateQuery
 
 
 def _get_db_type(field, connection):
-    if isinstance(field, (models.PositiveSmallIntegerField,
-                          models.PositiveIntegerField)):
-        return field.db_type(connection).split(' ', 1)[0]
+    if isinstance(field, (models.PositiveSmallIntegerField, models.PositiveIntegerField)):
+        return field.db_type(connection).split(" ", 1)[0]
 
     return field.db_type(connection)
 
@@ -22,17 +21,17 @@ def _get_db_type(field, connection):
 def _as_sql(obj, field, query, compiler, connection):
     value = getattr(obj, field.attname)
 
-    if hasattr(value, 'resolve_expression'):
+    if hasattr(value, "resolve_expression"):
         value = value.resolve_expression(query, allow_joins=False, for_save=True)
     else:
         value = field.get_db_prep_save(value, connection=connection)
 
-    if hasattr(value, 'as_sql'):
+    if hasattr(value, "as_sql"):
         placeholder, value = compiler.compile(value)
         if isinstance(value, list):
             value = tuple(value)
     else:
-        placeholder = '%s'
+        placeholder = "%s"
 
     return value, placeholder
 
@@ -72,7 +71,7 @@ def validate_fields(meta, fields):
     if non_model_fields:
         raise TypeError(
             "These fields are not present in "
-            "current meta: {}".format(', '.join(non_model_fields))
+            "current meta: {}".format(", ".join(non_model_fields))
         )
 
 
@@ -97,14 +96,14 @@ def get_fields(update_fields, exclude_fields, meta, obj=None):
         field
         for field in meta.concrete_fields
         if (
-            not field.primary_key and
-            field.attname not in deferred_fields and
-            field.attname not in exclude_fields and
-            field.name not in exclude_fields and
-            (
-                update_fields is None or
-                field.attname in update_fields or
-                field.name in update_fields
+            not field.primary_key
+            and field.attname not in deferred_fields
+            and field.attname not in exclude_fields
+            and field.name not in exclude_fields
+            and (
+                update_fields is None
+                or field.attname in update_fields
+                or field.name in update_fields
             )
         )
     ]
@@ -112,8 +111,15 @@ def get_fields(update_fields, exclude_fields, meta, obj=None):
     return fields
 
 
-def bulk_update(objs, meta=None, update_fields=None, exclude_fields=None,
-                using='default', batch_size=None, pk_field='pk'):
+def bulk_update(
+    objs,
+    meta=None,
+    update_fields=None,
+    exclude_fields=None,
+    using="default",
+    batch_size=None,
+    pk_field="pk",
+):
     assert batch_size is None or batch_size > 0
 
     # force to retrieve objs from the DB at the beginning,
@@ -135,7 +141,7 @@ def bulk_update(objs, meta=None, update_fields=None, exclude_fields=None,
     if fields is not None and len(fields) == 0:
         return
 
-    if pk_field == 'pk':
+    if pk_field == "pk":
         pk_field = meta.get_field(meta.pk.name)
     else:
         pk_field = meta.get_field(pk_field)
@@ -167,11 +173,11 @@ def bulk_update(objs, meta=None, update_fields=None, exclude_fields=None,
                 parameters[field].extend(flatten([pk_value, value], types=tuple))
                 placeholders[field].append(placeholder)
 
-        values = ', '.join(
+        values = ", ".join(
             template.format(
                 column=field.column,
                 pk_column=pk_field.column,
-                cases=(case_template*len(placeholders[field])).format(*placeholders[field]),
+                cases=(case_template * len(placeholders[field])).format(*placeholders[field]),
                 type=_get_db_type(field, connection=connection),
             )
             for field in parameters.keys()
@@ -187,10 +193,10 @@ def bulk_update(objs, meta=None, update_fields=None, exclude_fields=None,
 
         in_clause = '"{pk_column}" in ({pks})'.format(
             pk_column=pk_field.column,
-            pks=', '.join(itertools.repeat('%s', n_pks)),
+            pks=", ".join(itertools.repeat("%s", n_pks)),
         )
 
-        sql = 'UPDATE {dbtable} SET {values} WHERE {in_clause}'.format(
+        sql = "UPDATE {dbtable} SET {values} WHERE {in_clause}".format(
             dbtable=dbtable,
             values=values,
             in_clause=in_clause,

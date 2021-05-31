@@ -19,7 +19,7 @@ from core.utils.contextlog import ContextLog
 
 class DisableCSRF(MiddlewareMixin):
     def process_request(self, request):
-        setattr(request, '_dont_enforce_csrf_checks', True)
+        setattr(request, "_dont_enforce_csrf_checks", True)
 
 
 class HttpSmartRedirectResponse(HttpResponsePermanentRedirect):
@@ -27,11 +27,12 @@ class HttpSmartRedirectResponse(HttpResponsePermanentRedirect):
 
 
 class CommonMiddlewareAppendSlashWithoutRedirect(CommonMiddleware):
-    """ This class converts HttpSmartRedirectResponse to the common response
-        of Django view, without redirect. This is necessary to match status_codes
-        for urls like /url?q=1 and /url/?q=1. If you don't use it, you will have 302
-        code always on pages without slash.
+    """This class converts HttpSmartRedirectResponse to the common response
+    of Django view, without redirect. This is necessary to match status_codes
+    for urls like /url?q=1 and /url/?q=1. If you don't use it, you will have 302
+    code always on pages without slash.
     """
+
     response_redirect_class = HttpSmartRedirectResponse
 
     def __init__(self, *args, **kwargs):
@@ -40,7 +41,7 @@ class CommonMiddlewareAppendSlashWithoutRedirect(CommonMiddleware):
 
         # prevent recursive includes
         old = settings.MIDDLEWARE
-        name = self.__module__ + '.' + self.__class__.__name__
+        name = self.__module__ + "." + self.__class__.__name__
         settings.MIDDLEWARE = [i for i in settings.MIDDLEWARE if i != name]
 
         self.handler.load_middleware()
@@ -49,8 +50,8 @@ class CommonMiddlewareAppendSlashWithoutRedirect(CommonMiddleware):
         super(CommonMiddlewareAppendSlashWithoutRedirect, self).__init__(*args, **kwargs)
 
     def get_full_path_with_slash(self, request):
-        """ Return the full path of the request with a trailing slash appended
-            without Exception in Debug mode
+        """Return the full path of the request with a trailing slash appended
+        without Exception in Debug mode
         """
         new_path = request.get_full_path(force_append_slash=True)
         # Prevent construction of scheme relative urls.
@@ -58,14 +59,19 @@ class CommonMiddlewareAppendSlashWithoutRedirect(CommonMiddleware):
         return new_path
 
     def process_response(self, request, response):
-        response = super(CommonMiddlewareAppendSlashWithoutRedirect, self).process_response(request, response)
+        response = super(CommonMiddlewareAppendSlashWithoutRedirect, self).process_response(
+            request, response
+        )
 
         if isinstance(response, HttpSmartRedirectResponse):
-            if not request.path.endswith('/'):
+            if not request.path.endswith("/"):
                 # remove prefix SCRIPT_NAME
-                path = request.path[len(settings.FORCE_SCRIPT_NAME):] if settings.FORCE_SCRIPT_NAME \
+                path = (
+                    request.path[len(settings.FORCE_SCRIPT_NAME) :]
+                    if settings.FORCE_SCRIPT_NAME
                     else request.path
-                request.path = path + '/'
+                )
+                request.path = path + "/"
             # we don't need query string in path_info because it's in request.GET already
             request.path_info = request.path
             response = self.handler.get_response(request)
@@ -74,14 +80,12 @@ class CommonMiddlewareAppendSlashWithoutRedirect(CommonMiddleware):
 
 
 class SetSessionUIDMiddleware(CommonMiddleware):
-
     def process_request(self, request):
-        if 'uid' not in request.session:
-            request.session['uid'] = str(uuid4())
+        if "uid" not in request.session:
+            request.session["uid"] = str(uuid4())
 
 
 class ContextLogMiddleware(CommonMiddleware):
-
     def __init__(self, get_response):
         self.get_response = get_response
         self.log = ContextLog()
@@ -97,9 +101,10 @@ class ContextLogMiddleware(CommonMiddleware):
 
 
 class DRFResponseFormatter(CommonMiddleware):
-    """ This class takes DRF Response and formats it to standard presentation.
+    """This class takes DRF Response and formats it to standard presentation.
     For example, if response = "test string" then response will be reformatted to {"detail": "test string"}
     """
+
     def __init__(self, get_response):
         super(DRFResponseFormatter, self).__init__(get_response)
         self.get_response = get_response
@@ -108,7 +113,7 @@ class DRFResponseFormatter(CommonMiddleware):
         # affect only DRF Response
         if isinstance(response, Response):
             if isinstance(response.data, str):
-                response.data = {'detail': response.data}
+                response.data = {"detail": response.data}
                 response._is_rendered = False
                 response.render()
 
@@ -131,8 +136,8 @@ class DatabaseIsLockedRetryMiddleware(CommonMiddleware):
         backoff = 1.5
         while (
             response.status_code == 500
-            and hasattr(response, 'content')
-            and b'database-is-locked-error' in response.content
+            and hasattr(response, "content")
+            and b"database-is-locked-error" in response.content
             and retries_number < 15
         ):
             time.sleep(sleep_time)
@@ -144,6 +149,6 @@ class DatabaseIsLockedRetryMiddleware(CommonMiddleware):
 
 class UpdateLastActivityMiddleware(CommonMiddleware):
     def process_view(self, request, view_func, view_args, view_kwargs):
-        if hasattr(request, 'user') and request.method not in SAFE_METHODS:
+        if hasattr(request, "user") and request.method not in SAFE_METHODS:
             if request.user.is_authenticated:
                 request.user.update_last_activity()

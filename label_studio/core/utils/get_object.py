@@ -6,9 +6,9 @@ logger = logging.getLogger(__name__)
 
 
 def get_object_with_check_and_log(request, queryset, *filter_args, **filter_kwargs):
-    """ Custom get function:
-        - if project is deleted - return 404 instead
-        - activity log payload is created via 'request_permissions_add'
+    """Custom get function:
+    - if project is deleted - return 404 instead
+    - activity log payload is created via 'request_permissions_add'
     """
     from rest_framework.generics import get_object_or_404 as get_object_or_404_rest
     from core.utils.common import get_project, request_permissions_add
@@ -18,9 +18,9 @@ def get_object_with_check_and_log(request, queryset, *filter_args, **filter_kwar
     try:
         project = get_project(obj)
     except AttributeError:
-        logger.debug('Can\'t get Project')
+        logger.debug("Can't get Project")
         pass
     else:
-        request_permissions_add(request, 'project', project)
+        request_permissions_add(request, "project", project)
 
     return obj

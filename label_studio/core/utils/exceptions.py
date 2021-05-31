@@ -10,11 +10,11 @@ class LabelStudioError(Exception):
 
 class LabelStudioAPIException(APIException):
     status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-    default_detail = 'Unknown error'
+    default_detail = "Unknown error"
 
 
 class LabelStudioDatabaseException(LabelStudioAPIException):
-    default_detail = 'Error executing database query'
+    default_detail = "Error executing database query"
 
 
 class LabelStudioDatabaseLockedException(LabelStudioAPIException):
@@ -24,4 +24,4 @@ class LabelStudioDatabaseLockedException(LabelStudioAPIException):
 
 class ProjectExistException(LabelStudioAPIException):
     status_code = status.HTTP_422_UNPROCESSABLE_ENTITY
-    default_detail = 'Project with the same title already exists'
+    default_detail = "Project with the same title already exists"

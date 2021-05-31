@@ -14,7 +14,7 @@ class ImportStorageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ImportStorage
-        fields = '__all__'
+        fields = "__all__"
 
 
 class ExportStorageSerializer(serializers.ModelSerializer):
@@ -22,27 +22,24 @@ class ExportStorageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ExportStorage
-        fields = '__all__'
+        fields = "__all__"
 
 
 class StorageTaskSerializer(TaskSerializer):
     def __init__(self, *args, **kwargs):
         # task is nested into the annotation, we don't need annotations in the task again
-        kwargs['context'] = {
-            'include_annotations': False,
-            'resolve_uri': False
-        }
+        kwargs["context"] = {"include_annotations": False, "resolve_uri": False}
         super().__init__(*args, **kwargs)
 
     class Meta:
         model = Task
-        fields = '__all__'
+        fields = "__all__"
 
 
 class StorageCompletedBySerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'first_name', 'last_name', 'email')
+        fields = ("id", "first_name", "last_name", "email")
 
 
 class StorageAnnotationSerializer(AnnotationSerializer):

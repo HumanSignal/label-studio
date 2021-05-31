@@ -33,7 +33,7 @@ def preprocess_field_name(raw_field_name, operator, only_undefined_field=False):
     field_name = raw_field_name.replace("filter:tasks:", "")
     if field_name.startswith("data."):
         if only_undefined_field:
-            field_name = f'data__{settings.DATA_UNDEFINED_NAME}'
+            field_name = f"data__{settings.DATA_UNDEFINED_NAME}"
         else:
             field_name = field_name.replace("data.", "data__")
 
@@ -44,7 +44,7 @@ def preprocess_field_name(raw_field_name, operator, only_undefined_field=False):
 
 
 def get_fields_for_annotation(prepare_params):
-    """ Collecting field names to annotate them
+    """Collecting field names to annotate them
 
     :param prepare_params: structure with filters and ordering
     :return: list of field names
@@ -79,22 +79,34 @@ def get_fields_for_annotation(prepare_params):
 def apply_ordering(queryset, ordering):
     if ordering:
         field_name = ordering[0].replace("tasks:", "")
-        ascending = False if field_name[0] == '-' else True  # detect direction
-        field_name = field_name[1:] if field_name[0] == '-' else field_name  # remove direction
+        ascending = False if field_name[0] == "-" else True  # detect direction
+        field_name = field_name[1:] if field_name[0] == "-" else field_name  # remove direction
 
         if "data." in field_name:
             field_name = field_name.replace(".", "__", 1)
-            only_undefined_field = queryset.exists() and queryset.first().project.only_undefined_field
+            only_undefined_field = (
+                queryset.exists() and queryset.first().project.only_undefined_field
+            )
             if only_undefined_field:
-                field_name = re.sub('data__\w+', f'data__{settings.DATA_UNDEFINED_NAME}', field_name)
+                field_name = re.sub(
+                    "data__\w+", f"data__{settings.DATA_UNDEFINED_NAME}", field_name
+                )
 
             # annotate task with data field for float/int/bool ordering support
-            json_field = field_name.replace('data__', '')
-            queryset = queryset.annotate(ordering_field=KeyTransform(json_field, 'data'))
-            f = F('ordering_field').asc(nulls_last=True) if ascending else F('ordering_field').desc(nulls_last=True)
+            json_field = field_name.replace("data__", "")
+            queryset = queryset.annotate(ordering_field=KeyTransform(json_field, "data"))
+            f = (
+                F("ordering_field").asc(nulls_last=True)
+                if ascending
+                else F("ordering_field").desc(nulls_last=True)
+            )
 
         else:
-            f = F(field_name).asc(nulls_last=True) if ascending else F(field_name).desc(nulls_last=True)
+            f = (
+                F(field_name).asc(nulls_last=True)
+                if ascending
+                else F(field_name).desc(nulls_last=True)
+            )
 
         queryset = queryset.order_by(f)
     else:
@@ -104,9 +116,9 @@ def apply_ordering(queryset, ordering):
 
 
 def cast_value(_filter):
-    if _filter.type == 'Number':
+    if _filter.type == "Number":
         _filter.value = float(_filter.value)
-    elif _filter.type == 'Boolean':
+    elif _filter.type == "Boolean":
         _filter.value = bool(_filter.value)
 
 
@@ -156,8 +168,8 @@ def apply_filters(queryset, filters):
             )
 
         # empty
-        elif _filter.operator == 'empty':
-            if _filter.value == 'True':
+        elif _filter.operator == "empty":
+            if _filter.value == "True":
                 filter_expression.add(Q(**{field_name: True}), conjunction)
             else:
                 filter_expression.add(~Q(**{field_name: True}), conjunction)
@@ -171,15 +183,15 @@ def apply_filters(queryset, filters):
         else:
             cast_value(_filter)
             filter_expression.add(Q(**{field_name: _filter.value}), conjunction)
-    
-    logger.debug(f'Apply filter: {filter_expression}')
+
+    logger.debug(f"Apply filter: {filter_expression}")
     queryset = queryset.filter(filter_expression)
     return queryset
 
 
 class TaskQuerySet(models.QuerySet):
     def prepared(self, prepare_params=None):
-        """ Apply filters, ordering and selected items to queryset
+        """Apply filters, ordering and selected items to queryset
 
         :param prepare_params: prepare params with project, filters, orderings, etc
         :return: ordered and filtered queryset
@@ -213,7 +225,10 @@ class GroupConcat(Aggregate):
 
     def __init__(self, expression, distinct=False, **extra):
         super().__init__(
-            expression, distinct="DISTINCT " if distinct else "", output_field=models.CharField(), **extra
+            expression,
+            distinct="DISTINCT " if distinct else "",
+            output_field=models.CharField(),
+            **extra,
         )
 
 
@@ -233,21 +248,27 @@ def annotate_cancelled_annotations(queryset):
 
 def annotate_annotations_results(queryset):
     if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
-        return queryset.annotate(annotations_results=Coalesce(GroupConcat("annotations__result"), Value('')))
+        return queryset.annotate(
+            annotations_results=Coalesce(GroupConcat("annotations__result"), Value(""))
+        )
     else:
         return queryset.annotate(annotations_results=ArrayAgg("annotations__result"))
 
 
 def annotate_predictions_results(queryset):
     if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
-        return queryset.annotate(predictions_results=Coalesce(GroupConcat("predictions__result"), Value('')))
+        return queryset.annotate(
+            predictions_results=Coalesce(GroupConcat("predictions__result"), Value(""))
+        )
     else:
         return queryset.annotate(predictions_results=ArrayAgg("predictions__result"))
 
 
 def annotate_annotators(queryset):
     if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
-        return queryset.annotate(annotators=Coalesce(GroupConcat("annotations__completed_by"), Value(None)))
+        return queryset.annotate(
+            annotators=Coalesce(GroupConcat("annotations__completed_by"), Value(None))
+        )
     else:
         return queryset.annotate(annotators=ArrayAgg("annotations__completed_by"))
 
@@ -268,7 +289,7 @@ settings.DATA_MANAGER_ANNOTATIONS_MAP = {
     "predictions_score": annotate_predictions_score,
     "annotators": annotate_annotators,
     "total_annotations": dummy,
-    "total_predictions": dummy
+    "total_predictions": dummy,
 }
 
 
@@ -290,7 +311,9 @@ class PreparedTaskManager(models.Manager):
 
         # default annotations for calculating total values in pagination output
         queryset = queryset.annotate(
-            total_annotations=Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=False)),
+            total_annotations=Count(
+                "annotations", distinct=True, filter=Q(annotations__was_cancelled=False)
+            ),
             total_predictions=Count("predictions", distinct=True),
         )
 
@@ -302,7 +325,7 @@ class PreparedTaskManager(models.Manager):
         return queryset
 
     def all(self, prepare_params=None):
-        """ Make a task queryset with filtering, ordering, annotations
+        """Make a task queryset with filtering, ordering, annotations
 
         :param prepare_params: prepare params with filters, orderings, etc
         :return: TaskQuerySet with filtered, ordered, annotated tasks

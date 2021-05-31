@@ -28,18 +28,22 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
     def get_queryset(self):
         return Project.objects.filter(organization=self.request.user.active_organization)
 
-    @swagger_auto_schema(tags=['Export'], 
-                         operation_summary='Get export formats', 
-                         operation_description='Retrieve the available export formats for the current project.',
-                         responses={200: openapi.Response(
-                             description='Export formats',
-                             schema=openapi.Schema(
-                                 title='Format list',
-                                 description='List of available formats',
-                                 type=openapi.TYPE_ARRAY,
-                                 items=openapi.Schema(title="Export format", type=openapi.TYPE_STRING)
-                             )
-                         )})
+    @swagger_auto_schema(
+        tags=["Export"],
+        operation_summary="Get export formats",
+        operation_description="Retrieve the available export formats for the current project.",
+        responses={
+            200: openapi.Response(
+                description="Export formats",
+                schema=openapi.Schema(
+                    title="Format list",
+                    description="List of available formats",
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Schema(title="Export format", type=openapi.TYPE_STRING),
+                ),
+            )
+        },
+    )
     def get(self, request, *args, **kwargs):
         project = self.get_object()
         formats = DataExport.get_export_formats(project)
@@ -54,39 +58,47 @@ class ExportAPI(generics.RetrieveAPIView):
 
     @swagger_auto_schema(
         manual_parameters=[
-            openapi.Parameter(name='exportType', type=openapi.TYPE_STRING, in_=openapi.IN_QUERY,
-                              description='Selected export format')
-        ],
-        tags=['Export'],
-        operation_summary='Export annotations',
-        operation_description='Export annotated tasks as a file in a specific format.',
-        responses={200: openapi.Response(
-            description='Exported data',
-            schema=openapi.Schema(
-                title='Export file',
-                description='Export file with results',
-                type=openapi.TYPE_FILE
+            openapi.Parameter(
+                name="exportType",
+                type=openapi.TYPE_STRING,
+                in_=openapi.IN_QUERY,
+                description="Selected export format",
             )
-        )}
+        ],
+        tags=["Export"],
+        operation_summary="Export annotations",
+        operation_description="Export annotated tasks as a file in a specific format.",
+        responses={
+            200: openapi.Response(
+                description="Exported data",
+                schema=openapi.Schema(
+                    title="Export file",
+                    description="Export file with results",
+                    type=openapi.TYPE_FILE,
+                ),
+            )
+        },
     )
     def get(self, request, *args, **kwargs):
         project = self.get_object()
-        export_type = request.GET.get('exportType')
-        only_finished = not bool_from_request(request.GET, 'download_all_tasks', False)
+        export_type = request.GET.get("exportType")
+        only_finished = not bool_from_request(request.GET, "download_all_tasks", False)
 
-        logger.debug('Get tasks')
+        logger.debug("Get tasks")
         query = Task.objects.filter(project=project)
         if only_finished:
             query = query.filter(annotations__isnull=False)
 
-        logger.debug('Serialize tasks for export')
+        logger.debug("Serialize tasks for export")
         tasks = ExportDataSerializer(query, many=True).data
-        logger.debug('Prepare export files')
-        export_stream, content_type, filename = DataExport.generate_export_file(project, tasks, export_type, request.GET)
+        logger.debug("Prepare export files")
+        export_stream, content_type, filename = DataExport.generate_export_file(
+            project, tasks, export_type, request.GET
+        )
 
         response = HttpResponse(File(export_stream), content_type=content_type)
-        response['Content-Disposition'] = 'attachment; filename="%s"' % filename
-        response['filename'] = filename
+        response["Content-Disposition"] = 'attachment; filename="%s"' % filename
+        response["filename"] = filename
         return response
 
 
@@ -97,45 +109,49 @@ class ProjectExportFiles(generics.RetrieveAPIView):
 
     List of files exported from the Label Studio UI using the Export button on the Data Manager page.
     """
+
     permission_required = all_permissions.projects_change
 
     def get_queryset(self):
         return Project.objects.filter(organization=self.request.user.active_organization)
 
-    @swagger_auto_schema(tags=['Export'])
+    @swagger_auto_schema(tags=["Export"])
     def get(self, request, *args, **kwargs):
         project = self.get_object()
-        project = get_object_with_check_and_log(request, Project, pk=self.kwargs['pk'])
+        project = get_object_with_check_and_log(request, Project, pk=self.kwargs["pk"])
         self.check_object_permissions(self.request, project)
 
         paths = []
         for name in os.listdir(settings.EXPORT_DIR):
-            if name.endswith('.json') and not name.endswith('-info.json'):
-                project_id = name.split('-')[0]
-                if str(kwargs['pk']) == project_id:
+            if name.endswith(".json") and not name.endswith("-info.json"):
+                project_id = name.split("-")[0]
+                if str(kwargs["pk"]) == project_id:
                     paths.append(settings.EXPORT_URL_ROOT + name)
 
-        items = [{'name': p.split('/')[2].split('.')[0], 'url': p} for p in sorted(paths)[::-1]]
-        return Response({'export_files': items}, status=status.HTTP_200_OK)
+        items = [{"name": p.split("/")[2].split(".")[0], "url": p} for p in sorted(paths)[::-1]]
+        return Response({"export_files": items}, status=status.HTTP_200_OK)
 
 
 class ProjectExportFilesAuthCheck(APIView):
-    """ Check auth for nginx auth_request (/api/auth/export/)
-    """
+    """Check auth for nginx auth_request (/api/auth/export/)"""
+
     swagger_schema = None
-    http_method_names = ['get']
+    http_method_names = ["get"]
     permission_required = all_permissions.projects_change
 
     def get(self, request, *args, **kwargs):
-        """ Get export files list
-        """
-        original_url = request.META['HTTP_X_ORIGINAL_URI']
-        filename = original_url.replace('/export/', '')
-        project_id = filename.split('-')[0]
+        """Get export files list"""
+        original_url = request.META["HTTP_X_ORIGINAL_URI"]
+        filename = original_url.replace("/export/", "")
+        project_id = filename.split("-")[0]
         try:
             pk = int(project_id)
         except ValueError:
-            return Response("Incorrect filename in export", status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+            return Response(
+                "Incorrect filename in export", status=status.HTTP_422_UNPROCESSABLE_ENTITY
+            )
 
-        generics.get_object_or_404(Project.objects.filter(organization=self.request.user.active_organization), pk=pk)
+        generics.get_object_or_404(
+            Project.objects.filter(organization=self.request.user.active_organization), pk=pk
+        )
         return Response("auth ok", status=status.HTTP_200_OK)

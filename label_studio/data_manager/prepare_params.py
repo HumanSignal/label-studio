@@ -18,8 +18,8 @@ class Filter(BaseModel):
 
 
 class ConjunctionEnum(Enum):
-    OR = 'or'
-    AND = 'and'
+    OR = "or"
+    AND = "and"
 
 
 class Filters(BaseModel):

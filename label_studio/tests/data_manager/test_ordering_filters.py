@@ -60,16 +60,20 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
     if undefined:
         task_field_name = settings.DATA_UNDEFINED_NAME
     else:
-        task_field_name = 'text'
+        task_field_name = "text"
 
-    file_upload1 = FileUpload.objects.create(user=project.created_by, project=project, file=ContentFile('', name='file_upload1'))
+    file_upload1 = FileUpload.objects.create(
+        user=project.created_by, project=project, file=ContentFile("", name="file_upload1")
+    )
 
-    task_id_1 = make_task({"data": {task_field_name: 1}, 'file_upload': file_upload1}, project).id
+    task_id_1 = make_task({"data": {task_field_name: 1}, "file_upload": file_upload1}, project).id
     make_annotation({"result": [{"1": True}]}, task_id_1)
     make_prediction({"result": [{"1": True}], "score": 1}, task_id_1)
 
-    file_upload2 = FileUpload.objects.create(user=project.created_by, project=project, file=ContentFile('', name='file_upload2'))
-    task_id_2 = make_task({"data": {task_field_name: 2}, 'file_upload': file_upload2}, project).id
+    file_upload2 = FileUpload.objects.create(
+        user=project.created_by, project=project, file=ContentFile("", name="file_upload2")
+    )
+    task_id_2 = make_task({"data": {task_field_name: 2}, "file_upload": file_upload2}, project).id
     for _ in range(0, 2):
         make_annotation({"result": [{"2": True}], "was_cancelled": True}, task_id_2)
     for _ in range(0, 2):
@@ -89,7 +93,9 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
         [
             {
                 "conjunction": "or",
-                "items": [{"filter": "filter:tasks:id", "operator": "equal", "value": 1, "type": "Number"}],
+                "items": [
+                    {"filter": "filter:tasks:id", "operator": "equal", "value": 1, "type": "Number"}
+                ],
             },
             [1],
         ],
@@ -97,8 +103,18 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
             {
                 "conjunction": "or",
                 "items": [
-                    {"filter": "filter:tasks:id", "operator": "equal", "value": 1, "type": "Number"},
-                    {"filter": "filter:tasks:id", "operator": "equal", "value": 2, "type": "Number"},
+                    {
+                        "filter": "filter:tasks:id",
+                        "operator": "equal",
+                        "value": 1,
+                        "type": "Number",
+                    },
+                    {
+                        "filter": "filter:tasks:id",
+                        "operator": "equal",
+                        "value": 2,
+                        "type": "Number",
+                    },
                 ],
             },
             [1, 2],
@@ -107,8 +123,18 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
             {
                 "conjunction": "or",
                 "items": [
-                    {"filter": "filter:tasks:id", "operator": "not_equal", "value": 1, "type": "Number"},
-                    {"filter": "filter:tasks:id", "operator": "greater", "value": 3, "type": "Number"},
+                    {
+                        "filter": "filter:tasks:id",
+                        "operator": "not_equal",
+                        "value": 1,
+                        "type": "Number",
+                    },
+                    {
+                        "filter": "filter:tasks:id",
+                        "operator": "greater",
+                        "value": 3,
+                        "type": "Number",
+                    },
                 ],
             },
             [2, 3, 4],
@@ -116,35 +142,65 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
         [
             {
                 "conjunction": "or",
-                "items": [{"filter": "filter:tasks:id", "operator": "not_equal", "value": 1, "type": "Number"}],
+                "items": [
+                    {
+                        "filter": "filter:tasks:id",
+                        "operator": "not_equal",
+                        "value": 1,
+                        "type": "Number",
+                    }
+                ],
             },
             [2, 3, 4],
         ],
         [
             {
                 "conjunction": "or",
-                "items": [{"filter": "filter:tasks:id", "operator": "less", "value": 3, "type": "Number"}],
+                "items": [
+                    {"filter": "filter:tasks:id", "operator": "less", "value": 3, "type": "Number"}
+                ],
             },
             [1, 2],
         ],
         [
             {
                 "conjunction": "or",
-                "items": [{"filter": "filter:tasks:id", "operator": "greater", "value": 2, "type": "Number"}],
+                "items": [
+                    {
+                        "filter": "filter:tasks:id",
+                        "operator": "greater",
+                        "value": 2,
+                        "type": "Number",
+                    }
+                ],
             },
             [3, 4],
         ],
         [
             {
                 "conjunction": "or",
-                "items": [{"filter": "filter:tasks:id", "operator": "less_or_equal", "value": 3, "type": "Number"}],
+                "items": [
+                    {
+                        "filter": "filter:tasks:id",
+                        "operator": "less_or_equal",
+                        "value": 3,
+                        "type": "Number",
+                    }
+                ],
             },
             [1, 2, 3],
         ],
         [
             {
                 "conjunction": "or",
-                "items": [{"filter": "filter:tasks:id", "operator": "greater_or_equal", "value": 2, "type": "Number"}],
+                "items": [
+                    {
+                        "filter": "filter:tasks:id",
+                        "operator": "greater_or_equal",
+                        "value": 2,
+                        "type": "Number",
+                    }
+                ],
             },
             [2, 3, 4],
         ],
@@ -152,7 +208,12 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
             {
                 "conjunction": "or",
                 "items": [
-                    {"filter": "filter:tasks:id", "operator": "in", "value": {"min": 2, "max": 3}, "type": "Number"}
+                    {
+                        "filter": "filter:tasks:id",
+                        "operator": "in",
+                        "value": {"min": 2, "max": 3},
+                        "type": "Number",
+                    }
                 ],
             },
             [2, 3],
@@ -239,7 +300,9 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
                     }
                 ],
             },
-            [1, ],
+            [
+                1,
+            ],
         ],
         [
             {
@@ -253,7 +316,9 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
                     }
                 ],
             },
-            [1, ],
+            [
+                1,
+            ],
         ],
         [
             {
@@ -265,10 +330,17 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
                         "type": "String",
                         "value": "text",
                     },
-                    {"filter": "filter:tasks:id", "operator": "equal", "value": 1, "type": "Number"},
+                    {
+                        "filter": "filter:tasks:id",
+                        "operator": "equal",
+                        "value": 1,
+                        "type": "Number",
+                    },
                 ],
             },
-            [1, ],
+            [
+                1,
+            ],
         ],
         [
             {
@@ -307,13 +379,24 @@ def test_views_filters(filters, ids, business_client, project_id):
 
     task_id_1 = make_task({"data": {task_data_field_name: "some text1"}}, project).id
     make_annotation({"result": [{"from_name": "1_first", "to_name": "", "value": {}}]}, task_id_1)
-    make_prediction({"result": [{"from_name": "1_first", "to_name": "", "value": {}}], "score": 1}, task_id_1)
+    make_prediction(
+        {"result": [{"from_name": "1_first", "to_name": "", "value": {}}], "score": 1}, task_id_1
+    )
 
     task_id_2 = make_task({"data": {task_data_field_name: "some text2"}}, project).id
     for _ in range(0, 2):
-        make_annotation({"result": [{"from_name": "2_second", "to_name": "", "value": {}}], "was_cancelled": True}, task_id_2)
+        make_annotation(
+            {
+                "result": [{"from_name": "2_second", "to_name": "", "value": {}}],
+                "was_cancelled": True,
+            },
+            task_id_2,
+        )
     for _ in range(0, 2):
-        make_prediction({"result": [{"from_name": "2_second", "to_name": "", "value": {}}], "score": 2}, task_id_2)
+        make_prediction(
+            {"result": [{"from_name": "2_second", "to_name": "", "value": {}}], "score": 2},
+            task_id_2,
+        )
 
     task_ids = [0, task_id_1, task_id_2]
 
@@ -321,13 +404,13 @@ def test_views_filters(filters, ids, business_client, project_id):
         task_id = make_task({"data": {task_data_field_name: "some text_"}}, project).id
         task_ids.append(task_id)
 
-    for item in filters['items']:
-        if item['type'] == 'Number':
-            if isinstance(item['value'], dict):
-                item['value']['min'] = task_ids[int(item['value']['min'])]
-                item['value']['max'] = task_ids[int(item['value']['max'])]
+    for item in filters["items"]:
+        if item["type"] == "Number":
+            if isinstance(item["value"], dict):
+                item["value"]["min"] = task_ids[int(item["value"]["min"])]
+                item["value"]["max"] = task_ids[int(item["value"]["max"])]
             else:
-                item['value'] = task_ids[int(item['value'])]
+                item["value"] = task_ids[int(item["value"])]
 
     updated_payload = dict(
         data={"filters": filters},
@@ -341,7 +424,7 @@ def test_views_filters(filters, ids, business_client, project_id):
     response = business_client.get(f"/api/dm/views/{view_id}/tasks/")
     response_data = response.json()
 
-    assert 'tasks' in response_data, response_data
+    assert "tasks" in response_data, response_data
     response_ids = [task["id"] for task in response_data["tasks"]]
     correct_ids = [task_ids[i] for i in ids]
     assert response_ids == correct_ids, (response_ids, correct_ids, filters)

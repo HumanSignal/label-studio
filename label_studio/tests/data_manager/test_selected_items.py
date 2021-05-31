@@ -21,7 +21,9 @@ def test_selected_items(business_client, project_id):
 
     # post
     response = business_client.post(
-        api_url, data=json.dumps({"all": False, "included": [1, 2, 3]}), content_type="application/json"
+        api_url,
+        data=json.dumps({"all": False, "included": [1, 2, 3]}),
+        content_type="application/json",
     )
     assert response.status_code == 201, response.content
 
@@ -32,7 +34,9 @@ def test_selected_items(business_client, project_id):
 
     # patch
     response = business_client.patch(
-        api_url, data=json.dumps({"all": False, "included": [4, 5]}), content_type="application/json"
+        api_url,
+        data=json.dumps({"all": False, "included": [4, 5]}),
+        content_type="application/json",
     )
     assert response.status_code == 201, response.content
     response = business_client.get(api_url)
@@ -82,7 +86,9 @@ def test_selected_items_excluded(business_client, project_id):
 
     # post
     response = business_client.post(
-        api_url, data=json.dumps({"all": True, "excluded": [1, 2, 3]}), content_type="application/json"
+        api_url,
+        data=json.dumps({"all": True, "excluded": [1, 2, 3]}),
+        content_type="application/json",
     )
     assert response.status_code == 201
 
@@ -141,12 +147,16 @@ def test_validation(business_client, project_id):
 
     # fill with excluded
     response = business_client.post(
-        api_url, data=json.dumps({"all": True, "excluded": [1, 2, 3]}), content_type="application/json"
+        api_url,
+        data=json.dumps({"all": True, "excluded": [1, 2, 3]}),
+        content_type="application/json",
     )
     assert response.status_code == 201
 
     # only excluded modification allowed
     response = business_client.patch(
-        api_url, data=json.dumps({"all": False, "included": [1, 2]}), content_type="application/json"
+        api_url,
+        data=json.dumps({"all": False, "included": [1, 2]}),
+        content_type="application/json",
     )
     assert response.status_code == 400

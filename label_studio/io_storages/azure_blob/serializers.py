@@ -9,12 +9,12 @@ from io_storages.azure_blob.models import AzureBlobImportStorage, AzureBlobExpor
 
 
 class AzureBlobImportStorageSerializer(ImportStorageSerializer):
-    type = serializers.ReadOnlyField(default='azure')
+    type = serializers.ReadOnlyField(default="azure")
     presign = serializers.BooleanField(required=False, default=True)
 
     class Meta:
         model = AzureBlobImportStorage
-        fields = '__all__'
+        fields = "__all__"
 
     def validate(self, data):
         data = super(AzureBlobImportStorageSerializer, self).validate(data)
@@ -27,8 +27,8 @@ class AzureBlobImportStorageSerializer(ImportStorageSerializer):
 
 
 class AzureBlobExportStorageSerializer(ExportStorageSerializer):
-    type = serializers.ReadOnlyField(default='azure')
+    type = serializers.ReadOnlyField(default="azure")
 
     class Meta:
         model = AzureBlobExportStorage
-        fields = '__all__'
+        fields = "__all__"

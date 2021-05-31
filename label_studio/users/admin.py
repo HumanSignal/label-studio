@@ -2,29 +2,50 @@
 """
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from django.conf import settings
 from django.contrib.auth.models import Group
-
-from users.models import User
-from projects.models import Project
-from ml.models import MLBackend, MLBackendTrainJob
-from tasks.models import Task, Annotation
+from ml.models import MLBackend
+from ml.models import MLBackendTrainJob
 from organizations.models import Organization
+from projects.models import Project
+from tasks.models import Annotation
+from tasks.models import Task
+from users.models import User
 
 
 class UserAdminShort(UserAdmin):
-
     def __init__(self, *args, **kwargs):
         super(UserAdminShort, self).__init__(*args, **kwargs)
 
         # we have empty username - remove it to escape confuse about empty fields in admin web
-        self.list_display = [l for l in self.list_display if l != 'username']
+        # self.list_display = [l for l in self.list_display if l != 'username']
+        self.list_display = ["email", "username", "password"]
 
-        self.fieldsets = ((None, {'fields': ('password', )}),
-                          ('Personal info', {'fields': ('first_name', 'last_name', 'email')}),
-                          ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser',)}),
-                          ('Important dates', {'fields': ('last_login', 'date_joined')}))
-        
+        self.fieldsets = (
+            (None, {"fields": ("password",)}),
+            ("Personal info", {"fields": ("first_name", "last_name", "email")}),
+            (
+                "Permissions",
+                {
+                    "fields": (
+                        "is_active",
+                        "is_staff",
+                        "is_superuser",
+                    )
+                },
+            ),
+            ("Important dates", {"fields": ("last_login", "date_joined")}),
+        )
+
+        self.add_fieldsets = (
+            (
+                None,
+                {
+                    "classes": ("wide",),
+                    "fields": ("email", "username", "password1", "password2"),
+                },
+            ),
+        )
+
 
 admin.site.register(User, UserAdminShort)
 admin.site.register(Project)

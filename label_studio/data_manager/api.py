@@ -23,7 +23,11 @@ from tasks.models import Task, Annotation
 
 from data_manager.functions import get_all_columns, get_prepared_queryset, evaluate_predictions
 from data_manager.models import View
-from data_manager.serializers import ViewSerializer, DataManagerTaskSerializer, SelectedItemsSerializer
+from data_manager.serializers import (
+    ViewSerializer,
+    DataManagerTaskSerializer,
+    SelectedItemsSerializer,
+)
 from data_manager.actions import get_all_actions, perform_action
 
 
@@ -37,8 +41,12 @@ class TaskPagination(PageNumberPagination):
     total_predictions = 0
 
     def paginate_queryset(self, queryset, request, view=None):
-        self.total_annotations = queryset.aggregate(all_annotations=Sum("total_annotations"))["all_annotations"] or 0
-        self.total_predictions = queryset.aggregate(all_predictions=Sum("total_predictions"))["all_predictions"] or 0
+        self.total_annotations = (
+            queryset.aggregate(all_annotations=Sum("total_annotations"))["all_annotations"] or 0
+        )
+        self.total_predictions = (
+            queryset.aggregate(all_predictions=Sum("total_predictions"))["all_predictions"] or 0
+        )
         return super().paginate_queryset(queryset, request, view)
 
     def get_paginated_response(self, data):
@@ -52,24 +60,54 @@ class TaskPagination(PageNumberPagination):
         )
 
 
-@method_decorator(name='list', decorator=swagger_auto_schema(
-    tags=['Data Manager'], operation_summary="List views",
-    operation_description="List all views for a specific project."))
-@method_decorator(name='create', decorator=swagger_auto_schema(
-    tags=['Data Manager'], operation_summary="Create view",
-    operation_description="Create a view for a speicfic project."))
-@method_decorator(name='retrieve', decorator=swagger_auto_schema(
-    tags=['Data Manager'], operation_summary="Get view",
-    operation_description="Get all views for a specific project."))
-@method_decorator(name='update', decorator=swagger_auto_schema(
-    tags=['Data Manager'], operation_summary="Put view",
-    operation_description="Overwrite view data with updated filters and other information for a specific project."))
-@method_decorator(name='partial_update', decorator=swagger_auto_schema(
-    tags=['Data Manager'], operation_summary="Update view",
-    operation_description="Update view data with additional filters and other information for a specific project."))
-@method_decorator(name='destroy', decorator=swagger_auto_schema(
-    tags=['Data Manager'], operation_summary="Delete view",
-    operation_description="Delete a view for a specific project."))
+@method_decorator(
+    name="list",
+    decorator=swagger_auto_schema(
+        tags=["Data Manager"],
+        operation_summary="List views",
+        operation_description="List all views for a specific project.",
+    ),
+)
+@method_decorator(
+    name="create",
+    decorator=swagger_auto_schema(
+        tags=["Data Manager"],
+        operation_summary="Create view",
+        operation_description="Create a view for a speicfic project.",
+    ),
+)
+@method_decorator(
+    name="retrieve",
+    decorator=swagger_auto_schema(
+        tags=["Data Manager"],
+        operation_summary="Get view",
+        operation_description="Get all views for a specific project.",
+    ),
+)
+@method_decorator(
+    name="update",
+    decorator=swagger_auto_schema(
+        tags=["Data Manager"],
+        operation_summary="Put view",
+        operation_description="Overwrite view data with updated filters and other information for a specific project.",
+    ),
+)
+@method_decorator(
+    name="partial_update",
+    decorator=swagger_auto_schema(
+        tags=["Data Manager"],
+        operation_summary="Update view",
+        operation_description="Update view data with additional filters and other information for a specific project.",
+    ),
+)
+@method_decorator(
+    name="destroy",
+    decorator=swagger_auto_schema(
+        tags=["Data Manager"],
+        operation_summary="Delete view",
+        operation_description="Delete a view for a specific project.",
+    ),
+)
 class ViewAPI(viewsets.ModelViewSet):
     queryset = View.objects.all()
     serializer_class = ViewSerializer
@@ -88,8 +126,8 @@ class ViewAPI(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-    @swagger_auto_schema(tags=['Data Manager'])
-    @action(detail=False, methods=['delete'])
+    @swagger_auto_schema(tags=["Data Manager"])
+    @action(detail=False, methods=["delete"])
     def reset(self, _request):
         """
         delete:
@@ -104,7 +142,7 @@ class ViewAPI(viewsets.ModelViewSet):
     def get_task_queryset(self, request, view):
         return Task.prepared.all(prepare_params=view.get_prepare_tasks_params())
 
-    @swagger_auto_schema(tags=['Data Manager'], responses={200: task_serializer_class(many=True)})
+    @swagger_auto_schema(tags=["Data Manager"], responses={200: task_serializer_class(many=True)})
     @action(detail=True, methods=["get"])
     def tasks(self, request, pk=None):
         """
@@ -115,7 +153,11 @@ class ViewAPI(viewsets.ModelViewSet):
         """
         view = self.get_object()
         queryset = self.get_task_queryset(request, view)
-        context = {'proxy': bool_from_request(request.GET, 'proxy', True), 'resolve_uri': True, 'request': request}
+        context = {
+            "proxy": bool_from_request(request.GET, "proxy", True),
+            "resolve_uri": True,
+            "request": request,
+        }
         project = view.project
 
         # paginated tasks
@@ -137,7 +179,7 @@ class ViewAPI(viewsets.ModelViewSet):
         serializer = self.task_serializer_class(queryset, many=True, context=context)
         return Response(serializer.data)
 
-    @swagger_auto_schema(tags=['Data Manager'], methods=["get", "post", "delete", "patch"])
+    @swagger_auto_schema(tags=["Data Manager"], methods=["get", "post", "delete", "patch"])
     @action(detail=True, url_path="selected-items", methods=["get", "post", "delete", "patch"])
     def selected_items(self, request, pk=None):
         """
@@ -220,10 +262,10 @@ class TaskAPI(APIView):
         """
         task = Task.prepared.get(id=pk)
         context = {
-            'proxy': bool_from_request(request.GET, 'proxy', True),
-            'resolve_uri': True,
-            'completed_by': 'full',
-            'request': request
+            "proxy": bool_from_request(request.GET, "proxy", True),
+            "resolve_uri": True,
+            "completed_by": "full",
+            "request": request,
         }
 
         # get prediction
@@ -277,7 +319,7 @@ class ProjectStateAPI(APIView):
                 "target_syncing": False,
                 "task_count": project.tasks.count(),
                 "annotation_count": Annotation.objects.filter(task__project=project).count(),
-                'config_has_control_tags': len(project.get_control_tags_from_config()) > 0
+                "config_has_control_tags": len(project.get_control_tags_from_config()) > 0,
             }
         )
         return Response(data)
@@ -302,9 +344,9 @@ class ProjectActionsAPI(APIView):
         self.check_object_permissions(request, project)
 
         params = {
-            'can_delete_tasks': True,
-            'can_manage_annotations': True,
-            'experimental_feature': False
+            "can_delete_tasks": True,
+            "can_manage_annotations": True,
+            "experimental_feature": False,
         }
 
         return Response(get_all_actions(params))
@@ -325,18 +367,18 @@ class ProjectActionsAPI(APIView):
 
         # no selected items on tab
         if not queryset.exists():
-            response = {'detail': 'No selected items for specified view'}
+            response = {"detail": "No selected items for specified view"}
             return Response(response, status=404)
 
         # wrong action id
-        action_id = request.GET.get('id', None)
+        action_id = request.GET.get("id", None)
         if action_id is None:
-            response = {'detail': 'No action id "' + str(action_id) + '", use ?id=<action-id>'}
+            response = {"detail": 'No action id "' + str(action_id) + '", use ?id=<action-id>'}
             return Response(response, status=422)
 
         # perform action and return the result dict
-        kwargs = {'request': request}  # pass advanced params to actions
+        kwargs = {"request": request}  # pass advanced params to actions
         result = perform_action(action_id, project, queryset, **kwargs)
-        code = result.pop('response_code', 200)
+        code = result.pop("response_code", 200)
 
         return Response(result, status=code)

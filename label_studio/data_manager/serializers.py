@@ -7,7 +7,12 @@ from django.db import transaction
 
 from data_manager.models import View, Filter, FilterGroup
 from tasks.models import Task
-from tasks.serializers import TaskSerializer, AnnotationSerializer, PredictionSerializer, AnnotationDraftSerializer
+from tasks.serializers import (
+    TaskSerializer,
+    AnnotationSerializer,
+    PredictionSerializer,
+    AnnotationDraftSerializer,
+)
 
 
 class FilterSerializer(serializers.ModelSerializer):
@@ -167,12 +172,12 @@ class DataManagerTaskSerializer(TaskSerializer):
     predictions_score = serializers.SerializerMethodField()
     total_annotations = serializers.SerializerMethodField()
     total_predictions = serializers.SerializerMethodField()
-    file_upload = serializers.ReadOnlyField(source='file_upload_name')
+    file_upload = serializers.ReadOnlyField(source="file_upload_name")
     annotators = serializers.SerializerMethodField()
 
     class Meta:
         model = Task
-        ref_name = 'data_manager_task_serializer'
+        ref_name = "data_manager_task_serializer"
 
         fields = [
             "cancelled_annotations",
@@ -190,7 +195,7 @@ class DataManagerTaskSerializer(TaskSerializer):
             "drafts",
             "file_upload",
             "annotators",
-            "project"
+            "project",
         ]
 
     @staticmethod
@@ -239,7 +244,7 @@ class DataManagerTaskSerializer(TaskSerializer):
 
     @staticmethod
     def get_annotators(obj):
-        result = obj.annotations.values_list('completed_by', flat=True).distinct()
+        result = obj.annotations.values_list("completed_by", flat=True).distinct()
         result = [r for r in result if r is not None]
         return result
 
@@ -250,11 +255,13 @@ class DataManagerTaskSerializer(TaskSerializer):
             return AnnotationDraftSerializer(many=True)
 
         drafts = task.drafts
-        if 'request' in self.context and hasattr(self.context['request'], 'user'):
-            user = self.context['request'].user
+        if "request" in self.context and hasattr(self.context["request"], "user"):
+            user = self.context["request"].user
             drafts = drafts.filter(user=user)
 
-        return AnnotationDraftSerializer(drafts, many=True, read_only=True, default=True, context=self.context).data
+        return AnnotationDraftSerializer(
+            drafts, many=True, read_only=True, default=True, context=self.context
+        ).data
 
 
 class SelectedItemsSerializer(serializers.Serializer):
@@ -273,6 +280,8 @@ class SelectedItemsSerializer(serializers.Serializer):
         if view and request and request.method in ("PATCH", "DELETE"):
             all_value = view.selected_items.get("all")
             if all_value and all_value != data["all"]:
-                raise serializers.ValidationError("changing all value possible only with POST method")
+                raise serializers.ValidationError(
+                    "changing all value possible only with POST method"
+                )
 
         return data

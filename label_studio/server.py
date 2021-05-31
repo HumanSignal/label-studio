@@ -10,11 +10,13 @@ import json
 import getpass
 
 from colorama import init, Fore
-if sys.platform == 'win32':
+
+if sys.platform == "win32":
     init(convert=True)
 
 # on windows there will be problems with sqlite and json1 support, so fix it
 from label_studio.core.utils.windows_sqlite_fix import windows_dll_fix
+
 windows_dll_fix()
 
 from django.core.management import call_command
@@ -39,8 +41,8 @@ def _setup_env():
 
 
 def _app_run(host, port):
-    http_socket = '{}:{}'.format(host, port)
-    call_command('runserver', '--noreload', http_socket)
+    http_socket = "{}:{}".format(host, port)
+    call_command("runserver", "--noreload", http_socket)
 
 
 def is_database_synchronized(database):
@@ -53,12 +55,12 @@ def is_database_synchronized(database):
 
 def _apply_database_migrations():
     if not is_database_synchronized(DEFAULT_DB_ALIAS):
-        print('Initializing database..')
-        call_command('migrate', '--no-color', verbosity=0)
+        print("Initializing database..")
+        call_command("migrate", "--no-color", verbosity=0)
 
 
 def _get_config(config_path):
-    with io.open(os.path.abspath(config_path), encoding='utf-8') as c:
+    with io.open(os.path.abspath(config_path), encoding="utf-8") as c:
         config = json.load(c)
     return config
 
@@ -94,10 +96,10 @@ def _create_user(input_args, config):
     from users.models import User
     from organizations.models import Organization
 
-    DEFAULT_USERNAME = 'default_user@localhost'
+    DEFAULT_USERNAME = "default_user@localhost"
 
-    username = input_args.username or config.get('username') or get_env('USERNAME')
-    password = input_args.password or config.get('password') or get_env('PASSWORD')
+    username = input_args.username or config.get("username") or get_env("USERNAME")
+    password = input_args.password or config.get("password") or get_env("PASSWORD")
 
     if not username:
         user = User.objects.filter(email=DEFAULT_USERNAME).first()
@@ -105,14 +107,14 @@ def _create_user(input_args, config):
             if password and not user.check_password(password):
                 user.set_password(password)
                 user.save()
-                print('User password changed')
+                print("User password changed")
             return user
         print('Please enter default user email, or press Enter to use "default_user@localhost"')
-        username = input('Email: ')
+        username = input("Email: ")
         if not username:
             username = DEFAULT_USERNAME
     if not password:
-        password = getpass.getpass('Default user password: ')
+        password = getpass.getpass("Default user password: ")
 
     try:
         user = User.objects.create_user(email=username, password=password)
@@ -120,12 +122,12 @@ def _create_user(input_args, config):
         user.is_superuser = True
         user.save()
     except IntegrityError:
-        print('User {} already exists'.format(username))
+        print("User {} already exists".format(username))
 
     user = User.objects.get(email=username)
     org = Organization.objects.first()
     if not org:
-        Organization.create_organization(created_by=user, title='Label Studio')
+        Organization.create_organization(created_by=user, title="Label Studio")
     else:
         org.add_user(user)
 
@@ -135,15 +137,19 @@ def _create_user(input_args, config):
 def _init(input_args, config):
     if not _project_exists(input_args.project_name):
         from projects.models import Project
-        sampling_map = {'sequential': Project.SEQUENCE, 'uniform': Project.UNIFORM,
-                        'prediction-score-min': Project.UNCERTAINTY}
+
+        sampling_map = {
+            "sequential": Project.SEQUENCE,
+            "uniform": Project.UNIFORM,
+            "prediction-score-min": Project.UNCERTAINTY,
+        }
         user = _create_user(input_args, config)
         _create_project(
             title=input_args.project_name,
             user=user,
             label_config=input_args.label_config,
             description=input_args.project_desc,
-            sampling=sampling_map.get(input_args.sampling, 'sequential')
+            sampling=sampling_map.get(input_args.sampling, "sequential"),
         )
     else:
         print('Project "{0}" already exists'.format(input_args.project_name))
@@ -154,33 +160,33 @@ def _reset_password(input_args):
 
     username = input_args.username
     if not username:
-        username = input('Username: ')
+        username = input("Username: ")
 
     user = User.objects.filter(email=username).first()
     if user is None:
-        print('User with username {} not found'.format(username))
+        print("User with username {} not found".format(username))
         return
 
     password = input_args.password
     if not password:
-        password = getpass.getpass('New password:')
+        password = getpass.getpass("New password:")
 
     if not password:
-        print('Can not set empty password')
+        print("Can not set empty password")
         return
 
     if user.check_password(password):
-        print('Entered password is the same as current')
+        print("Entered password is the same as current")
         return
 
     user.set_password(password)
     user.save()
-    print('Password successfully changed')
+    print("Password successfully changed")
 
 
 def check_port_in_use(host, port):
-    logger.info('Checking if host & port is available :: ' + str(host) + ':' + str(port))
-    host = host.replace('https://', '').replace('http://', '')
+    logger.info("Checking if host & port is available :: " + str(host) + ":" + str(port))
+    host = host.replace("https://", "").replace("http://", "")
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         return s.connect_ex((host, port)) == 0
 
@@ -190,23 +196,23 @@ def _get_free_port(port, debug):
     if not debug:
         original_port = port
         # try up to 1000 new ports
-        while check_port_in_use('localhost', port):
+        while check_port_in_use("localhost", port):
             old_port = port
             port = int(port) + 1
             if port - original_port >= 1000:
                 raise ConnectionError(
-                    '\n*** WARNING! ***\n Could not find an available port\n'
-                    + ' to launch label studio. \n Last tested port was '
+                    "\n*** WARNING! ***\n Could not find an available port\n"
+                    + " to launch label studio. \n Last tested port was "
                     + str(port)
-                    + '\n****************\n'
+                    + "\n****************\n"
                 )
             print(
-                '\n*** WARNING! ***\n* Port '
+                "\n*** WARNING! ***\n* Port "
                 + str(old_port)
-                + ' is in use.\n'
-                + '* Trying to start at '
+                + " is in use.\n"
+                + "* Trying to start at "
                 + str(port)
-                + '\n****************\n'
+                + "\n****************\n"
             )
     return port
 
@@ -235,111 +241,122 @@ def main():
     config = _get_config(input_args.config_path)
 
     # set host name
-    host = input_args.host or config.get('host', '')
-    if not get_env('HOST'):
-        os.environ.setdefault('HOST', host)  # it will be passed to settings.HOSTNAME as env var
+    host = input_args.host or config.get("host", "")
+    if not get_env("HOST"):
+        os.environ.setdefault("HOST", host)  # it will be passed to settings.HOSTNAME as env var
 
     _setup_env()
     _apply_database_migrations()
 
     from label_studio.core.utils.common import collect_versions
+
     versions = collect_versions()
 
-    if input_args.command == 'reset_password':
+    if input_args.command == "reset_password":
         _reset_password(input_args)
         return
 
-    if input_args.command == 'shell':
-        call_command('shell_plus')
+    if input_args.command == "shell":
+        call_command("shell_plus")
         return
 
     # print version
-    if input_args.command == 'version':
+    if input_args.command == "version":
         from label_studio import __version__
-        print('\nLabel Studio version:', __version__, '\n')
+
+        print("\nLabel Studio version:", __version__, "\n")
         print(json.dumps(versions, indent=4))
 
     # init
-    elif input_args.command == 'init' or getattr(input_args, 'init', None):
+    elif input_args.command == "init" or getattr(input_args, "init", None):
         _init(input_args, config)
 
-        print('')
-        print('Label Studio has been successfully initialized.')
-        if input_args.command != 'start':
-            print('Start the server: label-studio start ' + input_args.project_name)
+        print("")
+        print("Label Studio has been successfully initialized.")
+        if input_args.command != "start":
+            print("Start the server: label-studio start " + input_args.project_name)
             return
 
     # start with migrations from old projects, '.' project_name means 'label-studio start' without project name
-    elif input_args.command == 'start' and input_args.project_name != '.':
+    elif input_args.command == "start" and input_args.project_name != ".":
         from label_studio.core.old_ls_migration import migrate_existing_project
         from projects.models import Project
-        sampling_map = {'sequential': Project.SEQUENCE, 'uniform': Project.UNIFORM,
-                        'prediction-score-min': Project.UNCERTAINTY}
+
+        sampling_map = {
+            "sequential": Project.SEQUENCE,
+            "uniform": Project.UNIFORM,
+            "prediction-score-min": Project.UNCERTAINTY,
+        }
 
         if not _project_exists(input_args.project_name):
             migrated = False
             project_path = pathlib.Path(input_args.project_name)
             if project_path.exists():
-                print('Project directory from previous verion of label-studio found')
-                print('Start migrating..')
-                config_path = project_path / 'config.json'
+                print("Project directory from previous verion of label-studio found")
+                print("Start migrating..")
+                config_path = project_path / "config.json"
                 config = _get_config(config_path)
                 user = _create_user(input_args, config)
-                label_config_path = project_path / 'config.xml'
+                label_config_path = project_path / "config.xml"
                 project = _create_project(
                     title=input_args.project_name,
                     user=user,
                     label_config=label_config_path,
-                    sampling=sampling_map.get(config.get('sampling', 'sequential'), Project.UNIFORM),
-                    description=config.get('description', ''),
+                    sampling=sampling_map.get(
+                        config.get("sampling", "sequential"), Project.UNIFORM
+                    ),
+                    description=config.get("description", ""),
                 )
                 migrate_existing_project(project_path, project, config)
                 migrated = True
 
                 print(
-                    Fore.LIGHTYELLOW_EX +
-                    '\n*** WARNING! ***\n'
-                    + f'Project {input_args.project_name} migrated to Label Studio Database\n'
+                    Fore.LIGHTYELLOW_EX
+                    + "\n*** WARNING! ***\n"
+                    + f"Project {input_args.project_name} migrated to Label Studio Database\n"
                     + "YOU DON'T NEED THIS FOLDER ANYMORE"
-                    + '\n****************\n' +
-                    Fore.WHITE
+                    + "\n****************\n"
+                    + Fore.WHITE
                 )
             if not migrated:
                 print(
                     'Project "{project_name}" not found. '
-                    'Did you miss create it first with `label-studio init {project_name}` ?'.format(
+                    "Did you miss create it first with `label-studio init {project_name}` ?".format(
                         project_name=input_args.project_name
                     )
                 )
                 return
 
     # on `start` command, launch browser if --no-browser is not specified and start label studio server
-    if input_args.command == 'start' or input_args.command is None:
+    if input_args.command == "start" or input_args.command is None:
         from label_studio.core.utils.common import start_browser
 
-        if get_env('USERNAME') and get_env('PASSWORD'):
+        if get_env("USERNAME") and get_env("PASSWORD"):
             _create_user(input_args, config)
 
         # ssl not supported from now
-        cert_file = input_args.cert_file or config.get('cert')
-        key_file = input_args.key_file or config.get('key')
+        cert_file = input_args.cert_file or config.get("cert")
+        key_file = input_args.key_file or config.get("key")
         if cert_file or key_file:
-            logger.error("Label Studio doesn't support SSL web server with cert and key.\n"
-                         'Use nginx or other servers for it.')
+            logger.error(
+                "Label Studio doesn't support SSL web server with cert and key.\n"
+                "Use nginx or other servers for it."
+            )
             return
 
         # internal port and internal host for server start
-        internal_host = input_args.internal_host or config.get('internal_host', '0.0.0.0')
-        internal_port = input_args.port or get_env('PORT') or config.get('port', 8080)
+        internal_host = input_args.internal_host or config.get("internal_host", "0.0.0.0")
+        internal_port = input_args.port or get_env("PORT") or config.get("port", 8080)
         internal_port = int(internal_port)
         internal_port = _get_free_port(internal_port, input_args.debug)
 
         # save selected port to global settings
         from django.conf import settings
+
         settings.INTERNAL_PORT = str(internal_port)
 
         # browser
-        url = ('http://localhost:' + str(internal_port)) if not host else host
+        url = ("http://localhost:" + str(internal_port)) if not host else host
         start_browser(url, input_args.no_browser)
 
         _app_run(host=internal_host, port=internal_port)

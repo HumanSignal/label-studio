@@ -12,7 +12,7 @@ class RedisImportStorageSerializer(ImportStorageSerializer):
 
     class Meta:
         model = RedisImportStorage
-        fields = '__all__'
+        fields = "__all__"
 
     def validate(self, data):
         data = super(RedisImportStorageSerializer, self).validate(data)
@@ -24,9 +24,10 @@ class RedisImportStorageSerializer(ImportStorageSerializer):
             raise ValidationError("Can't connect to Redis server.")
         return data
 
+
 class RedisExportStorageSerializer(ExportStorageSerializer):
     type = serializers.ReadOnlyField(default=os.path.basename(os.path.dirname(__file__)))
 
     class Meta:
         model = RedisExportStorage
-        fields = '__all__'
+        fields = "__all__"

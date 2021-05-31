@@ -58,16 +58,28 @@ def test_views_api(business_client, project_id):
 def test_views_api_filter_project(business_client):
     # create project
     response = business_client.post(
-        "/api/projects/", data=json.dumps(dict(title="test_project1")), content_type="application/json"
+        "/api/projects/",
+        data=json.dumps(dict(title="test_project1")),
+        content_type="application/json",
     )
     project1_id = response.json()["id"]
-    business_client.post("/api/dm/views/", data=json.dumps(dict(project=project1_id)), content_type="application/json")
+    business_client.post(
+        "/api/dm/views/",
+        data=json.dumps(dict(project=project1_id)),
+        content_type="application/json",
+    )
 
     response = business_client.post(
-        "/api/projects/", data=json.dumps(dict(title="test_project2")), content_type="application/json"
+        "/api/projects/",
+        data=json.dumps(dict(title="test_project2")),
+        content_type="application/json",
     )
     project2_id = response.json()["id"]
-    business_client.post("/api/dm/views/", data=json.dumps(dict(project=project2_id)), content_type="application/json")
+    business_client.post(
+        "/api/dm/views/",
+        data=json.dumps(dict(project=project2_id)),
+        content_type="application/json",
+    )
 
     # list all
     response = business_client.get("/api/dm/views/")

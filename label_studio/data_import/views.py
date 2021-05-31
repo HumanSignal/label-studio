@@ -14,10 +14,10 @@ from ranged_fileresponse import RangedFileResponse
 logger = logging.getLogger(__name__)
 
 
-@view_with_auth(['GET'], (IsBusiness,))
+@view_with_auth(["GET"], (IsBusiness,))
 def get_uploaded_file(request, filename):
-    file = settings.UPLOAD_DIR + ('/' if not settings.UPLOAD_DIR.endswith('/') else '') + filename
-    logger.debug(f'Fetch uploaded file by user {request.user} => {file}')
+    file = settings.UPLOAD_DIR + ("/" if not settings.UPLOAD_DIR.endswith("/") else "") + filename
+    logger.debug(f"Fetch uploaded file by user {request.user} => {file}")
     file_upload = FileUpload.objects.get(file=file)
 
-    return RangedFileResponse(request, open(file_upload.file.path, mode='rb'))
+    return RangedFileResponse(request, open(file_upload.file.path, mode="rb"))
