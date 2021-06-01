@@ -10,8 +10,6 @@ meta_description: Label Studio Documentation about the security, privacy, harden
 
 Label Studio provides many ways to secure access to your data and your deployment architecture. 
 
-INSERT ARCHITECTURE DIAGRAM HERE
-
 All application component interactions are encrypted using the TLS protocol. 
 
 <div class="enterprise"><p>
