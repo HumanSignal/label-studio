@@ -30,3 +30,4 @@ jobs:
       run: |
         python setup.py sdist bdist_wheel
         twine upload dist/*
+        recursive-include label_studio_withoutsignin/core/static_build
