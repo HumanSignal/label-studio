@@ -30,7 +30,7 @@ jobs:
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
         python setup.py sdist bdist_wheel
-        pip install dist/label_studio_withoutsignin-1.0.11-py3-none-any.whl
+        pip install dist/label_studio_withoutsignin-1.0.12-py3-none-any.whl
         python label_studio_withoutsignin/manage.py collectstatic
         python setup.py sdist bdist_wheel
         twine upload dist/*
