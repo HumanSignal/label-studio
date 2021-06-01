@@ -3,7 +3,7 @@
 import pytest
 import json
 
-from tests.utils import make_task, make_annotation, make_prediction, project_id
+from ..utils import make_task, make_annotation, make_prediction, project_id
 from projects.models import Project
 
 
