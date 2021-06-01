@@ -28,7 +28,6 @@ jobs:
         TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
         TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
       run: |
+        python label_studio_withoutsignin/manage.py collectstatic
         python setup.py sdist bdist_wheel
         twine upload dist/*
-        recursive-include label_studio_withoutsignin/core/static_build
-#        recursive-include label_studio_withoutsignin/core/static_build - was added for collecting css static
