@@ -27,7 +27,7 @@ See [API documentation for authentication](/api#section/Authentication).
 
 ### List all projects
 
-To perform most tasks with the Label Studio API, you must specify the project ID, sometimes referred to as the `pk`. See the [List your projects API endpoint documentation](/api#operation/api_projects_list).
+To perform most tasks with the Label Studio API, you must specify the project ID, sometimes referred to as the `pk`. If you don't know what your project ID is, you might want to get a list of all projects in Label Studio that you can access. See the [List your projects API endpoint documentation](/api#operation/api_projects_list).
 
 ### Create and set up a project
 
@@ -40,7 +40,7 @@ If you want to make sure the configuration for your labeling interface is valid 
 To import tasks using the API, make sure you know the project ID that you want to add tasks to. See additional examples and parameter descriptions in the [import data endpoint documentation](/api#operation/projects_import_create)
 
 ### Retrieve tasks
-Retrieve a paginated list of tasks for a specific project. See details and parameters in the [list project tasks endpoint documentation](/api#operation/projects_tasks_list).
+Retrieve a paginated list of tasks for a specific project. If you want, you can also retrieve tasks and annotations using this API endpoint, as an alternative to exporting annotations. See details and parameters in the [list project tasks endpoint documentation](/api#operation/projects_tasks_list).
 
 ### Export annotations
 

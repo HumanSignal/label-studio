@@ -63,7 +63,7 @@ class DownloadResultsAPI(generics.RetrieveAPIView):
             Export annotated tasks as a file in a specific format.
             For example, to export JSON annotations for a project to a file called `annotations.json`,
             run the following from the command line:
-            ```
+            ```bash
             curl -X GET {}/api/projects/{{id}}/export?exportType=JSON -H \'Authorization: Token abc123\' --output annotations.json'
             ```
         """.format(settings.HOSTNAME or 'https://localhost:8080'),
@@ -95,18 +95,15 @@ class DownloadResultsAPI(generics.RetrieveAPIView):
 
 
 class ProjectExportFiles(generics.RetrieveAPIView):
-    """
-    get:
-    Export files
-
-    List of files exported from the Label Studio UI using the Export button on the Data Manager page.
-    """
     permission_required = all_permissions.projects_change
 
     def get_queryset(self):
         return Project.objects.filter(organization=self.request.user.active_organization)
 
-    @swagger_auto_schema(tags=['Export'])
+    @swagger_auto_schema(
+        tags=['Export'],
+        operation_summary='Export files',
+        operation_description='List of files exported from the Label Studio UI using the Export button on the Data Manager page.')
     def get(self, request, *args, **kwargs):
         project = self.get_object()
         project = get_object_with_check_and_log(request, Project, pk=self.kwargs['pk'])

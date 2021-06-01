@@ -142,22 +142,7 @@ class ProjectListAPI(generics.ListCreateAPIView):
 class ProjectAPI(APIViewVirtualRedirectMixin,
                  APIViewVirtualMethodMixin,
                  generics.RetrieveUpdateDestroyAPIView):
-    """
-    get:
-    Get project by ID
 
-    Retrieve information about a project by project ID.
-
-    patch:
-    Update project
-
-    Update the project settings for a specific project.
-
-    delete:
-    Delete project
-
-    Delete a project by specified project ID.
-    """
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     queryset = Project.objects.with_counts()
     permission_required = ViewClassPermission(
@@ -175,15 +160,28 @@ class ProjectAPI(APIViewVirtualRedirectMixin,
     def get_queryset(self):
         return Project.objects.with_counts().filter(organization=self.request.user.active_organization)
 
-    @swagger_auto_schema(tags=['Projects'])
+    @swagger_auto_schema(
+        tags=['Projects'],
+        operation_summary='Get project by ID',
+        operation_description='Retrieve information about a project by project ID.'
+    )
     def get(self, request, *args, **kwargs):
         return super(ProjectAPI, self).get(request, *args, **kwargs)
 
-    @swagger_auto_schema(tags=['Projects'])
+    @swagger_auto_schema(
+        tags=['Projects'],
+        operation_summary='Delete project',
+        operation_description='Delete a project by specified project ID.'
+    )
     def delete(self, request, *args, **kwargs):
         return super(ProjectAPI, self).delete(request, *args, **kwargs)
 
-    @swagger_auto_schema(tags=['Projects'], request_body=ProjectSerializer)
+    @swagger_auto_schema(
+        tags=['Projects'],
+        operation_summary='Update project',
+        operation_description='Update the project settings for a specific project.',
+        request_body=ProjectSerializer
+    )
     def patch(self, request, *args, **kwargs):
         project = self.get_object()
         label_config = self.request.data.get('label_config')
@@ -227,15 +225,6 @@ class ProjectAPI(APIViewVirtualRedirectMixin,
 
 
 class ProjectNextTaskAPI(generics.RetrieveAPIView):
-    """get:
-    Get next task to label
-
-    Get the next task for labeling. If you enable Machine Learning in
-    your project, the response might include a "predictions"
-    field. It contains a machine learning prediction result for
-    this task.
-
-    """
     permission_required = all_permissions.tasks_view
     serializer_class = TaskWithAnnotationsAndPredictionsAndDraftsSerializer  # using it for swagger API docs
 
@@ -393,7 +382,15 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
         return Response(response)
 
     @swagger_auto_schema(
-        tags=['Projects'], responses={200: TaskWithAnnotationsAndPredictionsAndDraftsSerializer()}
+        tags=['Projects'],
+        operation_summary='Get next task to label',
+        operation_description="""
+            Get the next task for labeling. If you enable Machine Learning in
+            your project, the response might include a "predictions"
+            field. It contains a machine learning prediction result for
+            this task.
+        """,
+        responses={200: TaskWithAnnotationsAndPredictionsAndDraftsSerializer()}
     )
     def get(self, request, *args, **kwargs):
         project = get_object_with_check_and_log(request, Project, pk=self.kwargs['pk'])
@@ -554,21 +551,7 @@ class TasksListAPI(generics.ListCreateAPIView,
                    generics.DestroyAPIView,
                    APIViewVirtualMethodMixin,
                    APIViewVirtualRedirectMixin):
-    """
-    get:
-    List project tasks
 
-    Retrieve a paginated list of tasks for a specific project. For example, use the following cURL command:
-
-    ```bash
-    curl -X GET https://localhost:8080/api/projects/{id}/tasks/ -H 'Authorization: Token abc123'
-    ```
-
-    delete:
-    Delete all tasks
-
-    Delete all tasks from a specific project.
-    """
     parser_classes = (JSONParser, FormParser)
     permission_required = ViewClassPermission(
         GET=all_permissions.tasks_view,
@@ -584,13 +567,26 @@ class TasksListAPI(generics.ListCreateAPIView,
         tasks = Task.objects.filter(project=project)
         return paginator(tasks, self.request)
 
-    @swagger_auto_schema(tags=['Projects'])
+    @swagger_auto_schema(
+        tags=['Projects'],
+        operation_summary='Delete all tasks',
+        operation_description='Delete all tasks from a specific project.'
+    )
     def delete(self, request, *args, **kwargs):
         project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
         Task.objects.filter(project=project).delete()
         return Response(status=204)
 
-    @swagger_auto_schema(**paginator_help('tasks', 'Projects'))
+    @swagger_auto_schema(
+        **paginator_help('tasks', 'Projects'),
+        operation_summary='List project tasks',
+        operation_description="""
+            Retrieve a paginated list of tasks for a specific project. For example, use the following cURL command:
+            ```bash
+            curl -X GET {}/api/projects/{{id}}/tasks/ -H 'Authorization: Token abc123'
+            ```
+        """.format(settings.HOSTNAME or 'https://localhost:8080')
+    )
     def get(self, *args, **kwargs):
         return super(TasksListAPI, self).get(*args, **kwargs)
 

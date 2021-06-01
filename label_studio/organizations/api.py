@@ -24,12 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 class OrganizationListAPI(generics.ListCreateAPIView):
-    """
-    get:
-    List your organizations
 
-    Return a list of the organizations you've created.
-    """
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = all_permissions.organizations_change
     serializer_class = OrganizationIdSerializer
@@ -42,7 +37,13 @@ class OrganizationListAPI(generics.ListCreateAPIView):
     def get_queryset(self):
         return Organization.objects.filter(created_by=self.request.user)
 
-    @swagger_auto_schema(tags=['Organizations'])
+    @swagger_auto_schema(
+        tags=['Organizations'],
+        operation_summary='List your organizations',
+        operation_description="""
+        Return a list of the organizations you've created or that you have access to.
+        """
+    )
     def get(self, request, *args, **kwargs):
         return super(OrganizationListAPI, self).get(request, *args, **kwargs)
 
@@ -52,12 +53,6 @@ class OrganizationListAPI(generics.ListCreateAPIView):
 
 
 class OrganizationMemberListAPI(generics.ListAPIView):
-    """
-    get:
-    Get organization members list
-
-    Retrieve a list of the organization members and their IDs.
-    """
 
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = ViewClassPermission(
@@ -72,7 +67,11 @@ class OrganizationMemberListAPI(generics.ListAPIView):
         org = generics.get_object_or_404(self.request.user.organizations, pk=self.kwargs[self.lookup_field])
         return org.members
 
-    @swagger_auto_schema(tags=['Organizations'])
+    @swagger_auto_schema(
+        tags=['Organizations'],
+        operation_summary='Get organization members list',
+        operation_description='Retrieve a list of the organization members and their IDs.'
+    )
     def get(self, request, *args, **kwargs):
         return super(OrganizationMemberListAPI, self).get(request, *args, **kwargs)
 
@@ -80,17 +79,7 @@ class OrganizationMemberListAPI(generics.ListAPIView):
 class OrganizationAPI(APIViewVirtualRedirectMixin,
                       APIViewVirtualMethodMixin,
                       generics.RetrieveUpdateAPIView):
-    """
-    get:
-    Get organization settings
 
-    Retrieve the settings for a specific organization by ID.
-
-    patch:
-    Update organization settings
-
-    Update the settings for a specific organization by ID.
-    """
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     queryset = Organization.objects.all()
     permission_required = all_permissions.organizations_change
@@ -104,11 +93,19 @@ class OrganizationAPI(APIViewVirtualRedirectMixin,
         self.check_object_permissions(self.request, org)
         return org
 
-    @swagger_auto_schema(tags=['Organizations'])
+    @swagger_auto_schema(
+        tags=['Organizations'],
+        operation_summary=' Get organization settings',
+        operation_description='Retrieve the settings for a specific organization by ID.'
+    )
     def get(self, request, *args, **kwargs):
         return super(OrganizationAPI, self).get(request, *args, **kwargs)
 
-    @swagger_auto_schema(tags=['Organizations'])
+    @swagger_auto_schema(
+        tags=['Organizations'],
+        operation_summary='Update organization settings',
+        operation_description='Update the settings for a specific organization by ID.'
+    )
     def patch(self, request, *args, **kwargs):
         return super(OrganizationAPI, self).patch(request, *args, **kwargs)
 
@@ -128,6 +125,7 @@ class OrganizationInviteAPI(APIView):
     @swagger_auto_schema(
         tags=["Invites"],
         operation_summary='Get organization invite link',
+        operation_description='Get a link to use to invite a new member to an organization in Label Studio Enterprise.',
         responses={200: OrganizationInviteSerializer()}
     )
     def get(self, request, *args, **kwargs):
@@ -146,6 +144,7 @@ class OrganizationResetTokenAPI(APIView):
     @swagger_auto_schema(
         tags=["Invites"],
         operation_summary='Reset organization token',
+        operation_description='Reset the token used in the invitation link to invite someone to an organization.',
         responses={200: OrganizationInviteSerializer()}
     )
     def post(self, request, *args, **kwargs):

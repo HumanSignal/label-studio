@@ -88,65 +88,6 @@ task_create_response_scheme = {
 
 # Import
 class ImportAPI(generics.CreateAPIView):
-    """post:
-    Import tasks
-
-    Importing data as labeling tasks in bulk using this API endpoint works the same as using the Import button on the 
-    Data Manager page. You can use this API endpoint for importing multiple tasks. One POST request is limited at 250K tasks and 200 MB.
-
-    **Note:** Imported data is verified against a project *label_config* and must
-    include all variables that were used in the *label_config*. For example,
-    if the label configuration has a *$text* variable, then each item in a data object
-    must include a "text" field.
-
-
-    <br>
-
-    ## POST requests
-
-    <hr style="opacity:0.3">
-
-    There are three possible ways to import tasks with this endpoint:
-
-    ### 1\. **POST with data**
-    Send JSON tasks as POST data. Only JSON is supported for POSTing files directly.
-    Update this example to specify your authorization token and Label Studio instance host, then run the following from
-    the command line.
-
-    ```bash
-    curl -H 'Content-Type: application/json' -H 'Authorization: Token abc123' \\
-    -X POST 'http://localhost/api/projects/1/import' --data '[{"text": "Some text 1"}, {"text": "Some text 2"}]'
-    ```
-
-     ### 2\. **POST with files**
-     Send tasks as files. You can attach multiple files with different names.
-
-    - **JSON**: text files in JavaScript object notation format
-    - **CSV**: text files with tables in Comma Separated Values format
-    - **TSV**: text files with tables in Tab Separated Value format
-    - **TXT**: simple text files are similar to CSV with one column and no header, supported for projects with one source only
-
-    Update this example to specify your authorization token, Label Studio instance host, and file name and path,
-    then run the following from the command line:
-
-    ```bash
-    curl -H 'Content-Type: application/json' -H 'Authorization: Token abc123' \\
-    -X POST 'http://localhost/api/projects/1/import' -F ‘file=@path/to/my_file.csv’
-    ```
-
-    ### 3\. **POST with URL**
-    You can also provide a URL to a file with labeling tasks. Supported file formats are the same as in option 2.
-
-    ```bash
-    curl -H 'Content-Type: application/json' -H 'Authorization: Token abc123' \\
-    -X POST 'http://localhost/api/projects/1/import' \\
-    --data '[{"url": "http://example.com/test1.csv"}, {"url": "http://example.com/test2.csv"}]'
-    ```
-
-    <br>
-
-    """
-
     permission_required = all_permissions.projects_change
     parser_classes = (JSONParser, MultiPartParser, FormParser)
     serializer_class = ImportApiSerializer
@@ -160,7 +101,63 @@ class ImportAPI(generics.CreateAPIView):
             project = None
         return {'project': project, 'user': self.request.user}
 
-    @swagger_auto_schema(tags=['Import'], responses=task_create_response_scheme)
+    @swagger_auto_schema(
+        tags=['Import'],
+        responses=task_create_response_scheme,
+        operation_summary='Import tasks',
+        operation_description="""
+            Import data as labeling tasks in bulk using this API endpoint. You can use this API endpoint to import multiple tasks. 
+            One POST request is limited at 250K tasks and 200 MB.
+            
+            **Note:** Imported data is verified against a project *label_config* and must
+            include all variables that were used in the *label_config*. For example,
+            if the label configuration has a *$text* variable, then each item in a data object
+            must include a "text" field.
+            <br>
+            
+            ## POST requests
+            <hr style="opacity:0.3">
+            
+            There are three possible ways to import tasks with this endpoint:
+            
+            ### 1\. **POST with data**
+            Send JSON tasks as POST data. Only JSON is supported for POSTing files directly.
+            Update this example to specify your authorization token and Label Studio instance host, then run the following from
+            the command line.
+
+            ```bash
+            curl -H 'Content-Type: application/json' -H 'Authorization: Token abc123' \\
+            -X POST '{host}/api/projects/1/import' --data '[{{"text": "Some text 1"}}, {{"text": "Some text 2"}}]'
+            ```
+            
+            ### 2\. **POST with files**
+            Send tasks as files. You can attach multiple files with different names.
+            
+            - **JSON**: text files in JavaScript object notation format
+            - **CSV**: text files with tables in Comma Separated Values format
+            - **TSV**: text files with tables in Tab Separated Value format
+            - **TXT**: simple text files are similar to CSV with one column and no header, supported for projects with one source only
+            
+            Update this example to specify your authorization token, Label Studio instance host, and file name and path,
+            then run the following from the command line:
+
+            ```bash
+            curl -H 'Content-Type: application/json' -H 'Authorization: Token abc123' \\
+            -X POST '{host}/api/projects/1/import' -F ‘file=@path/to/my_file.csv’
+            ```
+            
+            ### 3\. **POST with URL**
+            You can also provide a URL to a file with labeling tasks. Supported file formats are the same as in option 2.
+            
+            ```bash
+            curl -H 'Content-Type: application/json' -H 'Authorization: Token abc123' \\
+            -X POST '{host}/api/projects/1/import' \\
+            --data '[{{"url": "http://example.com/test1.csv"}}, {{"url": "http://example.com/test2.csv"}}]'
+            ```
+            
+            <br>
+        """.format(host=(settings.HOSTNAME or 'https://localhost:8080'))
+    )
     def post(self, *args, **kwargs):
         return super(ImportAPI, self).post(*args, **kwargs)
 
@@ -224,11 +221,6 @@ class TasksBulkCreateAPI(ImportAPI):
 
 
 class ReImportAPI(ImportAPI):
-    """post:
-    Re-import tasks
-
-    Re-import tasks using the specified file upload IDs for a specific project.
-    """
     permission_required = all_permissions.projects_change
 
     @retry_database_locked()
@@ -271,7 +263,13 @@ class ReImportAPI(ImportAPI):
             'data_columns': data_columns
         }, status=status.HTTP_201_CREATED)
 
-    @swagger_auto_schema(auto_schema=None)
+    @swagger_auto_schema(
+        auto_schema=None,
+        operation_summary='Re-import tasks',
+        operation_description="""
+        Re-import tasks using the specified file upload IDs for a specific project.
+        """
+    )
     def post(self, *args, **kwargs):
         return super(ReImportAPI, self).post(*args, **kwargs)
 
@@ -279,18 +277,6 @@ class ReImportAPI(ImportAPI):
 class FileUploadListAPI(generics.mixins.ListModelMixin,
                         generics.mixins.DestroyModelMixin,
                         generics.GenericAPIView):
-    """
-    get:
-    Get files list
-
-    Retrieve the list of uploaded files used to create labeling tasks for a specific project.
-
-    delete:
-    Delete files
-
-    Delete uploaded files for a specific project.
-    """
-
     parser_classes = (JSONParser, MultiPartParser, FormParser)
     serializer_class = FileUploadSerializer
     permission_required = ViewClassPermission(
@@ -311,11 +297,21 @@ class FileUploadListAPI(generics.mixins.ListModelMixin,
         logger.debug(f'File Upload IDs found: {ids}')
         return FileUpload.objects.filter(project_id=project.id, id__in=ids, user=self.request.user)
 
-    @swagger_auto_schema(tags=['Import'])
+    @swagger_auto_schema(
+        tags=['Import'],
+        operation_summary='Get files list',
+        operation_description="""
+        Retrieve the list of uploaded files used to create labeling tasks for a specific project.
+        """)
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
 
-    @swagger_auto_schema(tags=['Import'])
+    @swagger_auto_schema(
+        tags=['Import'],
+        operation_summary='Delete files',
+        operation_description="""
+        Delete uploaded files for a specific project.
+        """)
     def delete(self, request, *args, **kwargs):
         project = generics.get_object_or_404(Project.objects.for_user(self.request.user),  pk=self.kwargs['pk'])
         ids = self.request.data.get('file_upload_ids')
@@ -334,15 +330,25 @@ class FileUploadAPI(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = FileUploadSerializer
     queryset = FileUpload.objects.all()
 
-    @swagger_auto_schema(tags=['Import'], operation_summary='Get file upload', operation_description='Retrieve details about a specific uploaded file.')
+    @swagger_auto_schema(
+        tags=['Import'],
+        operation_summary='Get file upload',
+        operation_description='Retrieve details about a specific uploaded file.')
     def get(self, *args, **kwargs):
         return super(FileUploadAPI, self).get(*args, **kwargs)
 
-    @swagger_auto_schema(tags=['Import'], operation_summary='Update file upload', operation_description='Update a specific uploaded file.', request_body=FileUploadSerializer)
+    @swagger_auto_schema(
+        tags=['Import'],
+        operation_summary='Update file upload',
+        operation_description='Update a specific uploaded file.',
+        request_body=FileUploadSerializer)
     def patch(self, *args, **kwargs):
         return super(FileUploadAPI, self).patch(*args, **kwargs)
 
-    @swagger_auto_schema(tags=['Import'], operation_summary='Delete file upload', operation_description='Delete a specific uploaded file.')
+    @swagger_auto_schema(
+        tags=['Import'],
+        operation_summary='Delete file upload',
+        operation_description='Delete a specific uploaded file.')
     def delete(self, *args, **kwargs):
         return super(FileUploadAPI, self).delete(*args, **kwargs)
 
