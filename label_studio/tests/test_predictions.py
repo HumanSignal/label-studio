@@ -7,7 +7,7 @@ import json
 from projects.models import Project
 from ml.models import MLBackend
 from tasks.models import Task, Prediction, Annotation
-from tests.utils import make_project
+from .utils import make_project
 from core.redis import redis_healthcheck
 
 _project_for_text_choices_onto_A_B_classes = dict(
