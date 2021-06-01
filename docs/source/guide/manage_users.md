@@ -312,12 +312,12 @@ If you have access to multiple organizations, use the **Organizations** page to 
 ## Create workspaces to organize projects
 Within an organization, owners, administrators, and managers can create and manage workspaces. Workspace managers can only manage workspaces that they create or have been added to. 
 
-Create a workspace to organize projects:
+Create a workspace to organize projects by doing the following:
 1. In the Label Studio UI, click the `+` sign next to **Workspaces** in the menu.
 2. Name the workspace, and if you want, select a color.
 3. Click **Save**
 
-After creating a workspace, you can create projects for that workspace, or use the **Project Settings** page to move a project to the new workspace.
+After creating a workspace, you can create projects for that workspace, or use the **Project Settings** page to move a project to the new workspace. Your private sandbox also functions as a workspace, but only you can see projects in your sandbox. 
 
 ### Add or remove members to a workspace
 

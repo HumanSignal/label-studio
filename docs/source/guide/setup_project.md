@@ -27,6 +27,20 @@ When you're creating a project, you can save your progress at any time. You don'
 
 After you save a project, any other collaborator with access to the Label Studio instance can view your project, perform labeling, and make changes. To use role-based access control, you need to use Label Studio Enterprise Edition.
 
+## <img src="/images/LSE/en.svg" width=67 height=18 alt="Enterprise" style="vertical-align:middle"/> Open a project to annotators
+
+In Label Studio Enterprise, you can hide projects from annotators so that you can fully configure the project before annotators can start labeling. When you're ready for annotators to start labeling, open the project to annotators.
+
+Before you can open a project to annotators, make sure that you've done the following:
+- [Set up the labeling interface](setup.html).
+- [Imported data](tasks.html).
+- [Moved the project to the correct workspace](manage_users.html#Create-workspaces-to-organize-projects), if it was in your private sandbox.
+
+To open the project to annotators, do the following: 
+1. Open a project and navigate to the project **Dashboard**.
+2. Toggle **Open to Annotators** so that the switch is enabled. 
+3. Then annotators can view the project and start being assigned tasks according to the method that you use to [distribute tasks for labeling](#Set-up-task-distribution-for-labeling).
+
 ## Delete tasks or annotations
 If you have duplicate tasks, or want to remove annotations, you can delete tasks and annotations from Label Studio.
 
