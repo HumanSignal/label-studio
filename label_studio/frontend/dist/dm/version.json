@@ -1,6 +1,6 @@
 {
-  "message": "Remove \"Skip\" button from a QuickView",
-  "commit": "64de04d29e17a86c5130f09186d9c21bfcb47255",
+  "message": "Fix range filter not being updated",
+  "commit": "b9b4cf70d8e9db62dc24183eb088e35ebda8da59",
   "branch": "master",
-  "date": "2021-05-28T17:40:26Z"
+  "date": "2021-06-01T20:33:35Z"
 }
