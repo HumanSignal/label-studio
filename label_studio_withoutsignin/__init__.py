@@ -4,7 +4,7 @@
 package_name = "label-studio-withoutsignin"
 
 # Package version
-__version__ = "1.0.6"
+__version__ = "1.0.7"
 
 # pypi info
 __latest_version__ = None
