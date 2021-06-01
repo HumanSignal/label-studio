@@ -2,6 +2,7 @@
 """
 import logging
 
+from django.conf import settings
 from rest_framework import generics
 from rest_framework.views import APIView
 from core.permissions import all_permissions
@@ -18,18 +19,23 @@ logger = logging.getLogger(__name__)
 # TODO: replace hardcoded apps lists with search over included storage apps
 
 
+def _get_common_storage_list():
+    storage_list = [
+        {'name': 's3', 'title': 'AWS S3'},
+        {'name': 'gcs', 'title': 'Google Cloud Storage'},
+        {'name': 'azure', 'title': 'Microsoft Azure'},
+        {'name': 'redis', 'title': 'Redis'}
+    ]
+    if settings.ENABLE_LOCAL_FILES_STORAGE:
+        storage_list += [{'name': 'localfiles', 'title': 'Local files'}]
+
+
 class AllImportStorageTypesAPI(APIView):
     permission_required = all_permissions.projects_change
     swagger_schema = None
 
     def get(self, request, **kwargs):
-        return Response([
-            {'name': 's3', 'title': 'AWS S3'},
-            {'name': 'gcs', 'title': 'Google Cloud Storage'},
-            {'name': 'azure', 'title': 'Microsoft Azure'},
-            {'name': 'redis', 'title': 'Redis'},
-            {'name': 'localfiles', 'title': 'Local files'},
-        ])
+        return Response(_get_common_storage_list())
 
 
 class AllExportStorageTypesAPI(APIView):
@@ -37,13 +43,7 @@ class AllExportStorageTypesAPI(APIView):
     swagger_schema = None
 
     def get(self, request, **kwargs):
-        return Response([
-            {'name': 's3', 'title': 'AWS S3'},
-            {'name': 'gcs', 'title': 'Google Cloud Storage'},
-            {'name': 'azure', 'title': 'Microsoft Azure'},
-            {'name': 'redis', 'title': 'Redis'},
-            {'name': 'localfiles', 'title': 'Local files'},
-        ])
+        return Response(_get_common_storage_list())
 
 
 class AllImportStorageListAPI(generics.ListAPIView):
@@ -70,7 +70,7 @@ class AllImportStorageListAPI(generics.ListAPIView):
             self._get_response(GCSImportStorageListAPI, request, *args, **kwargs),
             self._get_response(AzureBlobImportStorageListAPI, request, *args, **kwargs),
             self._get_response(RedisImportStorageListAPI, request, *args, **kwargs),
-            self._get_response(LocalFilesImportStorageListAPI, request, *args, **kwargs),
+            self._get_response(LocalFilesImportStorageListAPI, request, *args, **kwargs) if settings.ENABLE_LOCAL_FILES_STORAGE else [],
         ], []))
 
 
@@ -91,5 +91,5 @@ class AllExportStorageListAPI(generics.ListAPIView):
             self._get_response(GCSExportStorageListAPI, request, *args, **kwargs),
             self._get_response(AzureBlobExportStorageListAPI, request, *args, **kwargs),
             self._get_response(RedisExportStorageListAPI, request, *args, **kwargs),
-            self._get_response(LocalFilesExportStorageListAPI, request, *args, **kwargs)
+            self._get_response(LocalFilesExportStorageListAPI, request, *args, **kwargs)  if settings.ENABLE_LOCAL_FILES_STORAGE else [],
         ], []))
