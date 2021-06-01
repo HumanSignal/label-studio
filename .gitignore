@@ -50,3 +50,6 @@ label_studio.sqlite3
 tmp
 .DS_Store
 *.sqlite3
+test2venv
+dist/*
+build/*
