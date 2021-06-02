@@ -3,7 +3,7 @@ title: <img src="/images/LSE/en.svg" width=67 height=18 alt="Enterprise" style="
 type: guide
 order: 221
 meta_title: Authentication for Label Studio Enterprise
-meta_description: Label Studio Enterprise Documentation for setting up SSO and LDAP authentication for your data labeling, machine learning, and data science projects.
+meta_description: Label Studio Enterprise documentation for setting up SSO and LDAP authentication for your data labeling, machine learning, and data science projects.
 ---
 
 > Beta documentation: Label Studio Enterprise v2.0.0 is currently in Beta. As a result, this documentation might not reflect the current functionality of the product.

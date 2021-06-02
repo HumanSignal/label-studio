@@ -2,8 +2,8 @@
 title: Get started with Label Studio
 type: guide
 order: 100
-meta_title: Getting Started Guide
-meta_description: Label Studio getting started guide for multi-typed data labeling, annotation, and exploration for machine learning and data science projects.
+meta_title: Get Started with Label Studio
+meta_description: Get started with Label Studio by creating projects to label and annotate data for machine learning and data science models.
 ---
 
 ## What is Label Studio?

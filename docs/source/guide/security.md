@@ -2,8 +2,8 @@
 title: Secure Label Studio
 type: guide
 order: 220
-meta_title: Label Studio Security
-meta_description: Label Studio Documentation about the security, privacy, hardening, and access control functionality in Label Studio. 
+meta_title: Secure Label Studio
+meta_description: About the security and hardening processes used by Label Studio Community and Enterprise Editions, and how you can configure your data labeling project to be more secure. 
 ---
 
 > Beta documentation: Label Studio Enterprise v2.0.0 is currently in Beta. As a result, this documentation might not reflect the current functionality of the product.
