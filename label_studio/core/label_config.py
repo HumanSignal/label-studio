@@ -98,9 +98,10 @@ def parse_config(config_string):
         tag_info['inputs'] = []
         for input_tag_name in tag_info['to_name']:
             if input_tag_name not in inputs:
-                raise KeyError('to_name={input_tag_name} is specified for output tag name={output_tag}, '
-                               "but we can't find it among input tags"
-                               .format(input_tag_name=input_tag_name, output_tag=output_tag))
+                logger.error(
+                    f'to_name={input_tag_name} is specified for output tag name={output_tag}, '
+                    'but we can\'t find it among input tags')
+                continue
             tag_info['inputs'].append(inputs[input_tag_name])
         tag_info['labels'] = list(labels[output_tag])
         tag_info['labels_attrs'] = labels[output_tag]
