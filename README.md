@@ -14,6 +14,14 @@ docker build -t heartexlabs/label-studio:latest .
 docker-compose up
 ```
 
+2) Enable loading data stored locally
+
+The current setup assumes that your data is stored locally in the same instance that is running the app. Set `LABEL_STUDIO_LOCAL_DATA_STORAGE` to mount the data folder to the Docker container running the app, for example:
+```
+export LABEL_STUDIO_LOCAL_STORAGE=$HOME/fluoro_data/
+```
+
+By default `HASHBIN_DIR` will also be mounted in the container.
 <img src="https://raw.githubusercontent.com/heartexlabs/label-studio/master/images/ls_github_header.png"/>
 
 ![GitHub](https://img.shields.io/github/license/heartexlabs/label-studio?logo=heartex) ![label-studio:build](https://github.com/heartexlabs/label-studio/workflows/label-studio:build/badge.svg) ![GitHub release](https://img.shields.io/github/v/release/heartexlabs/label-studio?include_prereleases)

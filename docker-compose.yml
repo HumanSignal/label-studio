@@ -25,9 +25,13 @@ services:
       - "8080"
     environment:
       - LABEL_STUDIO_HOST=${LABEL_STUDIO_HOST:-""}
+      - LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true
+      - LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT=/label-studio/files
     volumes:
       - ./mydata:/label-studio/data:rw
       - static:/label-studio/label_studio:rw
+      - ${LABEL_STUDIO_LOCAL_STORAGE}:/label-studio/files:rw
+      - ${HASHBIN_DIR}:${HASHBIN_DIR}:rw
 
 volumes:
   static: {} 
