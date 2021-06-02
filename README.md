@@ -1,3 +1,19 @@
+## Label Studio - Cydar fork
+This fork customises Label Studio to the labelling needs of ML projects at Cydar. The following features were added:
+
+1) Use https protocol in docker-compose and removed postgres DB.
+
+To get it running first provide some certificate and a key under .ssl.
+You can generate it e.g. with a command:
+`mkdir ssl && openssl req -x509 -nodes -days 365 -subj /C=XX/ST=XX/L=XX/O=generated/CN=generated -newkey rsa:2048 -keyout ./ssl/mykey.key -out ./ssl/mycert.pem`
+
+and the build docker image and run docker compose:
+
+```bash
+docker build -t heartexlabs/label-studio:latest .
+docker-compose up
+```
+
 <img src="https://raw.githubusercontent.com/heartexlabs/label-studio/master/images/ls_github_header.png"/>
 
 ![GitHub](https://img.shields.io/github/license/heartexlabs/label-studio?logo=heartex) ![label-studio:build](https://github.com/heartexlabs/label-studio/workflows/label-studio:build/badge.svg) ![GitHub release](https://img.shields.io/github/v/release/heartexlabs/label-studio?include_prereleases)
@@ -11,11 +27,28 @@
 
 Label Studio is an open source data labeling tool. It lets you label data types like audio, text, images, videos, and time series with a simple and straightforward UI and export to various model formats. It can be used to prepare raw data or improve existing training data to get more accurate ML models.
 
+- [Label Studio - Cydar fork](#label-studio---cydar-fork)
+- [What is Label Studio?](#what-is-label-studio)
 - [Try out Label Studio](#try-out-label-studio)
+  - [Install locally with Docker](#install-locally-with-docker)
+    - [Override default Docker install](#override-default-docker-install)
+    - [Build a local image with Docker](#build-a-local-image-with-docker)
+  - [Run with Docker Compose](#run-with-docker-compose)
+  - [Install locally with pip](#install-locally-with-pip)
+  - [Install locally with Anaconda](#install-locally-with-anaconda)
+  - [Install for local development](#install-for-local-development)
+  - [Deploy in a cloud instance](#deploy-in-a-cloud-instance)
+    - [Apply frontend changes](#apply-frontend-changes)
+  - [Troubleshoot installation](#troubleshoot-installation)
+    - [Install dependencies on Windows](#install-dependencies-on-windows)
 - [What you get from Label Studio](#what-you-get-from-label-studio)
 - [Included templates for labeling data in Label Studio](#included-templates-for-labeling-data-in-label-studio)
-- [Set up machine learning models with Label Studio](#set-up-machine-learning-models-with-Label-Studio)
+- [Set up machine learning models with Label Studio](#set-up-machine-learning-models-with-label-studio)
 - [Integrate Label Studio with your existing tools](#integrate-label-studio-with-your-existing-tools)
+- [Ecosystem](#ecosystem)
+- [Roadmap](#roadmap)
+- [Citation](#citation)
+- [License](#license)
 
 ![Gif of Label Studio annotating different types of data](https://raw.githubusercontent.com/heartexlabs/label-studio/master/images/annotation_examples.gif)
 
