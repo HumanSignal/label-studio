@@ -1,4 +1,49 @@
 ---
+test_name: create_project_with_toname_missed_in_config
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        pk: id
+    status_code: 201
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    json:
+      label_config: '
+      <View>
+      <Image name="image" value="$image"/>
+      <Header value="Describethe image:"/>
+      <TextArea name="caption" toName="image" placeholder="Enter description here..." rows="5" maxSubmissions="1"/>
+
+      <View style="flex: 50%">
+        <Header value="Comments:" size="5"/>
+            <TextArea toName="label"
+                      maxSubmissions="1"
+                      editable="true"
+                      name="none_reason_other"
+                      showSubmit="true"
+                      rows="2" />
+      </View>
+      </View>
+      '
+    method: PATCH
+    url: '{django_live_url}/api/projects/{pk}'
+  response:
+    status_code: 200
+
+---
 test_name: create_project_with_label_config_then_import
 strict: false
 marks:
@@ -83,4 +128,3 @@ stages:
         id: 3
         image: 3
     status_code: 200
-
