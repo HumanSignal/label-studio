@@ -3,7 +3,6 @@
 
 set -e
 
-cmd="$@"
 
 until PGPASSWORD=$POSTGRE_PASSWORD psql -h "$POSTGRE_HOST" -p $POSTGRE_PORT -U "$POSTGRE_USER" -c '\q'; do
   >&2 echo "Postgres is unavailable - sleeping"
@@ -11,4 +10,3 @@ until PGPASSWORD=$POSTGRE_PASSWORD psql -h "$POSTGRE_HOST" -p $POSTGRE_PORT -U "
 done
 
 >&2 echo "Postgres is up - executing command"
-exec $cmd
