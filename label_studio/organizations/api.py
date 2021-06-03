@@ -40,7 +40,7 @@ class OrganizationListAPI(generics.ListCreateAPIView):
         return org
 
     def get_queryset(self):
-        return Organization.objects.filter(created_by=self.request.user)
+        return Organization.objects.filter(users=self.request.user).distinct()
 
     @swagger_auto_schema(tags=['Organizations'])
     def get(self, request, *args, **kwargs):
