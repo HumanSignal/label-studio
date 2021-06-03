@@ -31,7 +31,12 @@ class OrganizationListAPI(generics.ListCreateAPIView):
     Return a list of the organizations you've created.
     """
     parser_classes = (JSONParser, FormParser, MultiPartParser)
-    permission_required = all_permissions.organizations_change
+    permission_required = ViewClassPermission(
+        GET=all_permissions.organizations_view,
+        PUT=all_permissions.organizations_change,
+        PATCH=all_permissions.organizations_change,
+        DELETE=all_permissions.organizations_change,
+    )
     serializer_class = OrganizationIdSerializer
 
     def get_object(self):
