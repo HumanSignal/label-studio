@@ -29,6 +29,8 @@ def _get_common_storage_list():
     if settings.ENABLE_LOCAL_FILES_STORAGE:
         storage_list += [{'name': 'localfiles', 'title': 'Local files'}]
 
+    return storage_list
+
 
 class AllImportStorageTypesAPI(APIView):
     permission_required = all_permissions.projects_change
