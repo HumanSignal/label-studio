@@ -22,7 +22,7 @@ You can import many different types of data, including text, timeseries, audio, 
 | --- | --- |
 | Audio | .aiff, .au, .flac, .m4a, .mp3, .ogg, .wav |
 | HTML | .html, .htm, .xml |
-| Images | .bmp, .gif, .jpg, .png, .svg, .tiff, .webp |
+| Images | .bmp, .gif, .jpg, .png, .svg, .webp |
 | Structured data | .csv, .tsv, .json |
 | Text | .txt |
 | Time series | .csv, .tsv |
