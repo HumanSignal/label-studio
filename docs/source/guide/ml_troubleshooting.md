@@ -33,7 +33,7 @@ Your ML backend server might not have started properly.
 Click the error message to review the traceback. Common errors that you might see include:
 - Insufficient number of annotations completed for training to begin.
 - Memory issues on the server. 
-If you can't resolve the traceback issues by yourself, <a href="https://join.slack.com/t/label-studio/shared_invite/zt-qy37y73p-CCfEaEZvDylyQf4oatK40A">contact us on Slack</a>.
+If you can't resolve the traceback issues by yourself, <a href="http://slack.labelstud.io.s3-website-us-east-1.amazonaws.com?source=docs-ML">contact us on Slack</a>.
 
 ## My predictions are wrong or I don't see the model prediction results on the labeling page
 

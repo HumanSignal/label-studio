@@ -232,7 +232,7 @@ const FormatInfo = ({availableFormats, selected, onClick}) => {
       <Elem name="feedback">
         Can't find an export format?
         <br/>
-        Please let us know in <a className="no-go" href="https://join.slack.com/t/label-studio/shared_invite/zt-qy37y73p-CCfEaEZvDylyQf4oatK40A">Slack</a> or submit an issue to the <a className="no-go" href="https://github.com/heartexlabs/label-studio-converter/issues">Repository</a>
+        Please let us know in <a className="no-go" href="http://slack.labelstud.io.s3-website-us-east-1.amazonaws.com?source=product-export">Slack</a> or submit an issue to the <a className="no-go" href="https://github.com/heartexlabs/label-studio-converter/issues">Repository</a>
       </Elem>
     </Block>
   );

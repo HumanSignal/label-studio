@@ -45,7 +45,7 @@ For examples below we will be using the following configuration:
 </View>
 ```
 
-> If you're new to Label Studio, [learn](https://labelstud.io/tags/) how you can use tags to setup different labeling interfaces for your data
+> If you're new to Label Studio, [learn](https://labelstud.io/tags/) how you can use tags to set up different labeling interfaces for your data
 
 Depending on where your time series data is coming from it can be formatted very differently. Label Studio provides a way to configure how time series parsing is done so you don't have to transform the original file. Let's start with a simple CSV like that:
 
@@ -120,11 +120,11 @@ It's not always the case that you can label time series just by looking at the p
 <br/>
 <img src="/images/release-080/videosync.png" />
 
-This is an experimental feature right now, and we're working on finalizing the implementation, but if you have use-cases, ping us in [Slack](https://join.slack.com/t/label-studio/shared_invite/zt-qy37y73p-CCfEaEZvDylyQf4oatK40A), we will help you to set it up.
+This is an experimental feature right now, and we're working on finalizing the implementation, but if you have use-cases, ping us in [Slack](http://slack.labelstud.io.s3-website-us-east-1.amazonaws.com?source=blog-release), we will help you to set it up.
 
 ## Next
 
-Ready to try? [Install Label Studio](/guide/#Running-with-pip) following our guide and check the [template]() on time series configuration. Also, join the Slack channel if you need any help, have feedback, or feature requests. 
+Ready to try? [Install Label Studio](/guide/#Running-with-pip) following our guide and check the [template](/templates/time_series.html) on time series configuration. Also, join the Slack channel if you need any help, have feedback, or feature requests. 
 
 Cheers!
 
