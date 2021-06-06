@@ -18,7 +18,7 @@ One endpoint has been deprecated and the payload and response have small updates
 
 The endpoint `/api/projects/<int:project_id>/tasks/bulk` still works, but is deprecated and will be removed in the future.
 
-Update calls to that endpoint to use the `/api/projects/<int:pk>/import` endpoint instead. See the [import task data API endpoint documentation](/api#operation/api_projects_import_create).
+Update calls to that endpoint to use the `/api/projects/<project_ID>/import` endpoint instead. See the [import task data API endpoint documentation](/api#operation/api_projects_import_create).
 
 ### Update task import payload for pre-annotations
 
@@ -27,7 +27,6 @@ When you import pre-annotations into Label Studio, the `completions` field is no
 ### Changes to the endpoint response
 The endpoint response returns an `annotation_count` field instead of a `completion_count` field. If your script expects a response with this field, update it to expect a response with the new field. 
 
-
 ## Export data
 
 The export endpoint has changed, and so have the available options for that endpoint and the response parameters.
@@ -35,7 +34,7 @@ The export endpoint has changed, and so have the available options for that endp
 ### Updated export endpoint
 To export annotations from Label Studio Enterprise, you must call a new endpoint.
 
-Requests made to `/api/projects/pk/results` fail. Instead, call `/api/projects/pk/export?exportType=JSON`. See the [export API endpoint documentation](/api#operation/api_projects_export_read).
+Requests made to `/api/projects/pk/results` fail. Instead, call `/api/projects/<project_ID>/export?exportType=JSON`. See the [export API endpoint documentation](/api#operation/api_projects_export_read).
 
 With this change, several arguments are no longer supported:
 
@@ -52,11 +51,11 @@ With this change, several arguments are no longer supported:
 
 In the endpoint response when exporting annotations, the `"completions":` section is renamed to `"annotations"`. 
 
-The content of the response also has some changes. 
-- `aggregated` is deprecated
-- `aggregated_completed_by` is deprecated
-- `aggregated_ids` is deprecated
-- `ground_truth` is deprecated
+The content of the response also has some changes:
+- `aggregated` is removed
+- `aggregated_completed_by` is removed
+- `aggregated_ids` is removed
+- `ground_truth` is removed
 - `result` is no longer a double list `"result": [[... ]]` and is now a single list `“result”: [...] `
 
 #### Previous version response
@@ -64,7 +63,6 @@ The content of the response also has some changes.
 ```json
 "completions": [ 
  {
- “----DEPRECATED SECTION---
    "aggregated": true,
    "aggregated_completed_by": [
      103
@@ -73,7 +71,6 @@ The content of the response also has some changes.
      800955
    ],
    "ground_truth": false,
----- END OF DEPRECATED SECTION
    "result": [
      [ 
        {
@@ -125,11 +122,21 @@ The old tokens are no longer supported. Make a request reset your organization t
 
 See the [reset organization token API endpoint documentation](/api#operation/api_invite_reset-token_create).
 
-### Updated invite to organization endpoint
+### Updated URL to invite people to your organization 
 
-The endpoint that you use to generate invitations to your Label Studio Enterprise organization has changed from `https://app.heartex.ai/organization/welcome/<token>` to `http://localhost:8000/api/invite`.
+The URL that you use to invite people to your Label Studio Enterprise organization has changed from `https://app.heartex.ai/organization/welcome/<token>` to `http://localhost:8000/user/signup/?token=<token>`. 
 
-See the [organization invite link API endpoint documentation](/api#operation/api_invite_list). 
+You can generate the token for that URL using the [organization invite link API endpoint documentation](/api#operation/api_invite_list), then using the response to create the invitation URL.
+
+For example, with the example response:
+```json
+{
+"token": "111a2b3333cd444e",
+"invite_url": "/user/signup/?token=111a2b3333cd444e"
+}
+```
+
+Create an invitation URL of `http://localhost:8000/user/signup/?token=111a2b3333cd444e`.
 
 ### Updated flow for inviting project members
 
@@ -146,17 +153,10 @@ Some endpoints have been updated and some payload parameters are different when 
 
 When you want to retrieve information about a storage configuration, specify the type of storage in the API endpoint. 
 
-Instead of `/api/storages/<int:pk>/`, call `api/storages/s3/` for Amazon S3 storage connections across the organization.
-
-See all the storage API endpoints:
-- [Get Amazon S3 storage](/api#operation/api_storages_s3_list).
-- [Get Microsoft Azure storage](/api#operation/api_storages_azure_list).
-- [Get Google Cloud Storage (GCS)](/api#operation/api_storages_gcs_list).
-- [Get Redis storage](/api#operation/api_storages_redis_list).
-- [Get local file storage](/api#operation/api_storages_localfiles_list).
+Instead of `/api/storages/<int:pk>/`, call `api/storages/s3/` for Amazon S3 storage connections across the organization. See the API documentation to [get Amazon S3 storage](/api#operation/api_storages_s3_list). You can also call `api/storages/s3/<storage_ID>` to get the details of a specific storage connection. See the API documentation to [get a specific Amazon S3 storage connection](/api#operation/api_storages_s3_read). 
 
 The same change applies when syncing storage. 
-Instead of `/api/storages/<int:pk>/sync/`, call `/api/storages/s3/<pk>/sync` to [sync Amazon S3 storage](/api#operation/api_storages_s3_sync_create).
+Instead of `/api/storages/<int:pk>/sync/`, call `/api/storages/s3/<project_ID>/sync` to [sync Amazon S3 storage](/api#operation/api_storages_s3_sync_create).
 
 ### Updates to creating or listing storage payload parameters
 
@@ -166,12 +166,11 @@ Some parameters have changed as listed in the following table:
 | --- | --- |
 | path | bucket |
 | regex | regex_filter |
-| data_key | None. Instead, BLOBs are attached to the first available object tag | 
-
+| data_key | None. Instead, BLOBs are attached to the first available object tag |
 
 ## Create projects
 
-With the change from teams to workspaces, the `Team_id` parameter is no longer supported in the POST payload to create a project using the API. 
+With the change from teams to workspaces, the `team_id` parameter is no longer supported in the POST payload to create a project using the API. 
 
 Instead, do the following:
 1. [Create a project](/api#operation/api_projects_create).
