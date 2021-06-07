@@ -142,7 +142,7 @@ class ImportAPI(generics.CreateAPIView):
             then run the following from the command line:
 
             ```bash
-            curl -H 'Content-Type: application/json' -H 'Authorization: Token abc123' \\
+            curl -H 'Authorization: Token abc123' \\
             -X POST '{host}/api/projects/1/import' -F ‘file=@path/to/my_file.csv’
             ```
             
@@ -150,7 +150,7 @@ class ImportAPI(generics.CreateAPIView):
             You can also provide a URL to a file with labeling tasks. Supported file formats are the same as in option 2.
             
             ```bash
-            curl -H 'Content-Type: application/json' -H 'Authorization: Token abc123' \\
+            curl -H 'Authorization: Token abc123' \\
             -X POST '{host}/api/projects/1/import' \\
             --data '[{{"url": "http://example.com/test1.csv"}}, {{"url": "http://example.com/test2.csv"}}]'
             ```
