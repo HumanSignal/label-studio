@@ -48,10 +48,40 @@ You can assign reviewers to tasks, or people with access can review tasks on an 
 ## Verify model and annotator performance 
 Use the project dashboard to verify annotator performance. For a project, click **Dashboard** to view the dashboard.
 
-### Review annotator consensus and agreement
-For each project, you can review the project dashboard and review the Annotator Performance and Annotator Agreement Matrix sections to see the overall annotator consensus for the entire project.
+If you don't see an annotator's activity reflected on the dashboard, make sure they have been added as a member to the project. 
 
-To see annotator consensus for each task, you can view the different annotations chosen by each annotator when reviewing a task by selecting the tab of each annotation when reviewing tasks, or view them in task preview mode from the Data Manager by clicking the task. 
+### Review dataset progress
+
+The dataset progress displays the number of tasks considered to be fully annotated for the project. If the project requires a minimum annotation per task of more than one, some tasks might not appear as "annotated" because they are not yet fully annotated by the project standards.
+
+You can review how many tasks are left to be completed by annotators, how many tasks have been skipped, and how many tasks have been reviewed.
+
+### Review annotator performance
+For each project, you can review the project dashboard and review the Annotator Performance section to learn more about the annotators and their annotations, as well as overall annotator consensus.
+
+Discover how many annotators have worked on the project, and how many hours they cumulatively spent labeling. You can also see the total number of annotations produced by the annotators, separate from the total number of tasks in the project.
+
+Review a table to see the following for each annotator:
+- The total agreement is for one annotator with all other annotators
+- The number of tasks that they have finished annotating.
+- The number of tasks that they have skipped.
+- The reviewing outcome for the annotations they performed.
+- The total annotation progress across all tasks.
+- The mean time to annotate tasks.
+- The agreement of their annotations with the ground truth annotations, if there are any.
+- The agreement of their annotations with the predicted annotations, if there are any. 
+
+### Review annotator agreement
+
+You can also review the overall annotator agreement on a more individual basis with the annotator agreement matrix.
+
+Review the annotator agreement matrix to understand which annotator's annotations consistently agree with or don't agree with other annotator's annotations. 
+
+To see the specific annotations contributing to the agreement, do the following:
+1. Open the data manager for the project.
+2. Locate a task annotated by the different annotators that you want to compare.
+3. Click the task to open the task preview.
+4. Click each annotation tab to compare how the different annotations differ. The initials of each annotator appears in the tab header with the annotation ID.
 
 ## Review annotations against ground truth annotations 
 

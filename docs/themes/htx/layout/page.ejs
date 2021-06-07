@@ -1,3 +1,4 @@
+
 <% if (page.type) { %>
   <%- partial('partials/sidebar', { type: page.type === 'menu' ? 'guide' : page.type, index: page.index }) %>
 <% } else { %>
@@ -44,9 +45,12 @@
     </div>
     <% } %>
 
-  <div class="footer-slack" >
-      If you couldn't find what you were looking for, <a href="https://join.slack.com/t/label-studio/shared_invite/zt-qy37y73p-CCfEaEZvDylyQf4oatK40A">let us know on
-      Slack</a>! <br/>If you found an error, you can <a href="https://github.com/heartexlabs/label-studio/issues">file an issue on GitHub</a>!
+  <div class="footer-slack">
+    <a href="http://slack.labelstud.io.s3-website-us-east-1.amazonaws.com?source=docs-footer">
+      Couldn't find what you were looking for or found an error? Please let us know on
+      Slack&nbsp;<img style="height: 18px; position: absolute" src="/images/slack.png" />
+    </a>
+    <br/>If you found an error, you can <a href="https://github.com/heartexlabs/label-studio/issues">file an issue on GitHub</a>!
   </div>
 </div>
 

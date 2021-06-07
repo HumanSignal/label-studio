@@ -34,6 +34,7 @@ class OrganizationListAPI(generics.ListCreateAPIView):
     permission_required = ViewClassPermission(
         GET=all_permissions.organizations_view,
         PUT=all_permissions.organizations_change,
+        POST=all_permissions.organizations_create,
         PATCH=all_permissions.organizations_change,
         DELETE=all_permissions.organizations_change,
     )
