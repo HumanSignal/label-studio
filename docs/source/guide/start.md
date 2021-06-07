@@ -1,7 +1,7 @@
 ---
 title: Start Label Studio
 type: guide
-order: 203
+order: 206
 meta_title: Start Commands
 meta_description: Label Studio Documentation for starting Label Studio and configuring the environment to use Label Studio with your machine learning or data science project. 
 ---
@@ -61,6 +61,21 @@ In *nix operating systems, you can set environment variables from the command li
 export LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true
 ```
 You can also use an `.env` file. 
+
+On Windows, you can use the following syntax:
+```bash
+set LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true
+```
+
+To check if you set an environment variable successfully, run the following on *nix operating systems:
+```bash
+echo $LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED
+```
+
+Or the following on Windows operating systems:
+```bash
+echo %LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED%
+```
 
 ## Run Label Studio on localhost with a different port
 By default, Label Studio runs on port 8080. If that port is already in use or if you want to specify a different port, start Label Studio with the following command:

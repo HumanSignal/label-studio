@@ -1,9 +1,10 @@
 <%
  removeLabelStudioMention = function(text) {
   return text
-    .replace(/into Label Studio$/g, '')
+    .replace(/to Label Studio$/g, '')
     .replace(/in Label Studio$/g, '')
     .replace(/with Label Studio$/g, '')
+    .replace(/into Label Studio$/g, '')
     .replace(/by Label Studio$/g, '')
     .replace(/for Label Studio$/g, '')
     .replace(/from Label Studio$/g, '')
@@ -62,6 +63,7 @@
       Couldn't find what you were looking for or found an error? Please let us know on
       Slack&nbsp;<img style="height: 18px; position: absolute" src="/images/slack.png" />
     </a>
+    <br/>If you found an error, you can <a href="https://github.com/heartexlabs/label-studio/issues">file an issue on GitHub</a>!
   </div>
 </div>
 
