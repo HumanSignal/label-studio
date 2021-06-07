@@ -38,3 +38,4 @@ class PrepareParams(BaseModel):
     ordering: List[str] = []
     selectedItems: Optional[SelectedItems] = None
     filters: Optional[Filters] = None
+    data: Optional[dict] = None

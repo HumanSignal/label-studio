@@ -6,7 +6,7 @@ meta_title: Install and Upgrade
 meta_description: Label Studio Documentation for installing and upgrading Label Studio with Docker, pip, and anaconda to use for your machine learning and data science projects. 
 ---
 
-Install Label Studio on premises or in the cloud. Choose the install method that works best for your environment:
+Install Label Studio on premises or in the cloud. Choose the installation method that works best for your environment:
 - [Install with pip](#Install-with-pip)
 - [Install with Docker](#Install-with-Docker)
 - [Install on Ubuntu](#Install-on-Ubuntu)
@@ -15,18 +15,7 @@ Install Label Studio on premises or in the cloud. Choose the install method that
 - [Install for local development](#Install-for-local-development)
 - [Upgrade Label Studio](#Upgrade-Label-Studio)
 
-
-## System requirements
-You can install Label Studio on a Linux, Windows, or MacOSX machine running Python 3.6 or later. 
-
-### Install prerequisite
-Install Label Studio in a clean Python environment. We highly recommend using a virtual environment (venv or conda) to reduce the likelihood of package conflicts or missing packages. 
-
-### Port requirements
-Label Studio expects port 8080 to be open by default. To use a different port, specify it when starting Label Studio. See [Start Label Studio](start.html). 
-
-### Disk space requirements
-Allocate disk space according to the amount of data you plan to label. As a benchmark, 1 million labeling tasks take up approximately 2.3GB on disk when using the SQLite database. For more on using Label Studio at scale and labeling performance, see [Start Label Studio](start.html). 
+<!-- md deploy.md -->
 
 ### Web browser support
 Label Studio is tested with the latest version of Google Chrome and is expected to work in the latest versions of:
@@ -35,6 +24,9 @@ Label Studio is tested with the latest version of Google Chrome and is expected 
 - Mozilla Firefox
 
 If using other web browsers, or older versions of supported web browsers, unexpected behavior could occur. 
+
+## Install prerequisite
+Install Label Studio in a clean Python environment. We highly recommend using a virtual environment (venv or conda) to reduce the likelihood of package conflicts or missing packages.
 
 ## Install with pip
 

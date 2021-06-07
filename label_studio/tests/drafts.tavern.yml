@@ -54,6 +54,16 @@ stages:
       json:
         draft_id: id
     status_code: 201
+
+- name: stage
+  request:
+    headers:
+      content-type: application/json
+    method: GET
+    url: '{django_live_url}/api/tasks/{task_pk}/drafts'
+  response:
+    status_code: 200  
+
 - name: stage
   request:
     method: GET

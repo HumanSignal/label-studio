@@ -32,7 +32,7 @@
   },
   "scripts": {
     "server": "hexo serve",
-    "publish": "hexo generate && hexo deploy",
+    "publish": "hexo clean && hexo generate && hexo deploy",
     "new": "hexo new"
   },
   "devDependencies": {
