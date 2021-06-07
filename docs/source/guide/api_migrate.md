@@ -7,6 +7,7 @@ meta_description: Label Studio Enterprise documentation about updates and change
 ---
  
  With the new version of Label Studio Enterprise, you must update your scripts and API calls to match new API endpoints and formats. Some endpoints are new, some arguments for existing endpoints are deprecated and removed, and some payloads have changed for POST requests.
+ Please note that in case you rely on existing object IDs (like project_id, task_id, annotation_id, etc.), there were more likely changed due to database migration.
  
 > Throughout the new version, `completions` have been renamed `annotations`. In addition, "Teams" are now called "Workspaces", to better reflect the fact that they are a way to organize projects, rather than people. 
 
@@ -34,7 +35,7 @@ The export endpoint has changed, and so have the available options for that endp
 ### Updated export endpoint
 To export annotations from Label Studio Enterprise, you must call a new endpoint.
 
-Requests made to `/api/projects/pk/results` fail. Instead, call `/api/projects/<project_ID>/export?exportType=JSON`. See the [export API endpoint documentation](/api#operation/api_projects_export_read).
+Requests made to `/api/projects/<project_ID>/results` fail. Instead, call `/api/projects/<project_ID>/export?exportType=JSON`. See the [export API endpoint documentation](/api#operation/api_projects_export_read).
 
 With this change, several arguments are no longer supported:
 
@@ -57,6 +58,7 @@ The content of the response also has some changes:
 - `aggregated_ids` is removed
 - `ground_truth` is removed
 - `result` is no longer a double list `"result": [[... ]]` and is now a single list `“result”: [...] `
+- `completed_by` IDs now refer to the actual user IDs (not "expert" IDs as before)
 
 #### Previous version response
 
@@ -153,7 +155,7 @@ Some endpoints have been updated and some payload parameters are different when 
 
 When you want to retrieve information about a storage configuration, specify the type of storage in the API endpoint. 
 
-Instead of `/api/storages/<int:pk>/`, call `api/storages/s3/` for Amazon S3 storage connections across the organization. See the API documentation to [get Amazon S3 storage](/api#operation/api_storages_s3_list). You can also call `api/storages/s3/<storage_ID>` to get the details of a specific storage connection. See the API documentation to [get a specific Amazon S3 storage connection](/api#operation/api_storages_s3_read). 
+Instead of `/api/storages/<int:pk>/`, call `api/storages/s3?project=<project_ID>` for Amazon S3 storage connections for the specific project. See the API documentation to [get Amazon S3 storage](/api#operation/api_storages_s3_list). You can also call `api/storages/s3/<storage_ID>` to get the details of a specific storage connection. See the API documentation to [get a specific Amazon S3 storage connection](/api#operation/api_storages_s3_read). 
 
 The same change applies when syncing storage. 
 Instead of `/api/storages/<int:pk>/sync/`, call `/api/storages/s3/<project_ID>/sync` to [sync Amazon S3 storage](/api#operation/api_storages_s3_sync_create).
