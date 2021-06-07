@@ -222,4 +222,4 @@ Or you can store time series data in tasks directly.
 
 ### Video & audio sync with time series
 
-It's possible to synchronize TimeSeries with video and audio in Label Studio. Right now you can do it using HyperText tag with HTML objects `<audio src="path">`/`<video src="path">` and TimeSeries together. We have some solutions for this in the testing, [ping us](https://join.slack.com/t/label-studio/shared_invite/zt-cr8b7ygm-6L45z7biEBw4HXa5A2b5pw) in Slack to learn more.
+It's possible to synchronize TimeSeries with video and audio in Label Studio. Right now you can do it using HyperText tag with HTML objects `<audio src="path">`/`<video src="path">` and TimeSeries together. We have some solutions for this in the testing, [ping us](https://join.slack.com/t/label-studio/shared_invite/zt-qy37y73p-CCfEaEZvDylyQf4oatK40A) in Slack to learn more.

@@ -46,7 +46,7 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
         return Response(formats)
 
 
-class DownloadResultsAPI(generics.RetrieveAPIView):
+class ExportAPI(generics.RetrieveAPIView):
     permission_required = all_permissions.projects_change
 
     def get_queryset(self):
@@ -72,10 +72,13 @@ class DownloadResultsAPI(generics.RetrieveAPIView):
     def get(self, request, *args, **kwargs):
         project = self.get_object()
         export_type = request.GET.get('exportType')
-        is_labeled = not bool_from_request(request.GET, 'download_all_tasks', False)
+        only_finished = not bool_from_request(request.GET, 'download_all_tasks', False)
 
         logger.debug('Get tasks')
-        query = Task.objects.filter(project=project, is_labeled=is_labeled)
+        query = Task.objects.filter(project=project)
+        if only_finished:
+            query = query.filter(annotations__isnull=False)
+
         logger.debug('Serialize tasks for export')
         tasks = ExportDataSerializer(query, many=True).data
         logger.debug('Prepare export files')

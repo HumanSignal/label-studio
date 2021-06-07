@@ -27,7 +27,7 @@ You can import many different types of data, including text, timeseries, audio, 
 | Text | .txt |
 | Time series | .csv, .tsv |
 
-If you don't see a supported data or file type that you want to import, reach out in the [Label Studio Slack community](https://join.slack.com/t/label-studio/shared_invite/zt-cr8b7ygm-6L45z7biEBw4HXa5A2b5pw). 
+If you don't see a supported data or file type that you want to import, reach out in the [Label Studio Slack community](https://join.slack.com/t/label-studio/shared_invite/zt-qy37y73p-CCfEaEZvDylyQf4oatK40A). 
 
 ## How to format your data to import it
 

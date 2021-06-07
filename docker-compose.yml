@@ -34,7 +34,7 @@ services:
     volumes:
       - ./mydata:/label-studio/data:rw
       - static:/label-studio/label_studio:rw
-    command: [ "./deploy/wait-for-postgres.sh", "db", "bash", "/label-studio/deploy/start_label_studio.sh" ]
+    command: [ "./deploy/wait-for-postgres.sh", "bash", "/label-studio/deploy/start_label_studio.sh" ]
 
   db:
     image: postgres:11.5

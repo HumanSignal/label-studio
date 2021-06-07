@@ -31,7 +31,12 @@ class OrganizationListAPI(generics.ListCreateAPIView):
     Return a list of the organizations you've created.
     """
     parser_classes = (JSONParser, FormParser, MultiPartParser)
-    permission_required = all_permissions.organizations_change
+    permission_required = ViewClassPermission(
+        GET=all_permissions.organizations_view,
+        PUT=all_permissions.organizations_change,
+        PATCH=all_permissions.organizations_change,
+        DELETE=all_permissions.organizations_change,
+    )
     serializer_class = OrganizationIdSerializer
 
     def get_object(self):
@@ -40,7 +45,7 @@ class OrganizationListAPI(generics.ListCreateAPIView):
         return org
 
     def get_queryset(self):
-        return Organization.objects.filter(created_by=self.request.user)
+        return Organization.objects.filter(users=self.request.user).distinct()
 
     @swagger_auto_schema(tags=['Organizations'])
     def get(self, request, *args, **kwargs):
