@@ -188,7 +188,7 @@ stages:
 
 ---
 test_name: get_import_export_storage_types
-strict: false
+strict: true
 marks:
 - usefixtures:
   - django_live_url
@@ -201,12 +201,34 @@ stages:
     url: '{django_live_url}/api/storages/types'
   response:
     status_code: 200
+    json:
+      - name: s3
+        title: AWS S3
+      - name: gcs
+        title: Google Cloud Storage
+      - name: azure
+        title: Microsoft Azure
+      - name: redis
+        title: Redis
+      - name: localfiles
+        title: Local files
 - name: stage
   request:
     method: GET
     url: '{django_live_url}/api/storages/export/types'
   response:
     status_code: 200
+    json:
+      - name: s3
+        title: AWS S3
+      - name: gcs
+        title: Google Cloud Storage
+      - name: azure
+        title: Microsoft Azure
+      - name: redis
+        title: Redis
+      - name: localfiles
+        title: Local files
 
 ---
 test_name: test_export_s3_storage
