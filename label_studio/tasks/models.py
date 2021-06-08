@@ -68,10 +68,13 @@ class Task(TaskMixin, models.Model):
     def get_locked_by(cls, user, project=None, tasks=None):
         """ Retrieve the task locked by specified user. Returns None if the specified user didn't lock anything.
         """
-        if project:
+        lock = None
+        if project is not None:
             lock = TaskLock.objects.filter(user=user, expire_at__gt=now(), task__project=project).first()
-        elif tasks:
-            return tasks.filter(locks__user=user, locks__expire_at__gt=now()).first()
+        elif tasks is not None:
+            locked_tasks = tasks.filter(locks__user=user, locks__expire_at__gt=now())[:1]
+            if locked_tasks:
+                return locked_tasks[0]
         else:
             raise Exception('Neither project or tasks passed to get_locked_by')
 
