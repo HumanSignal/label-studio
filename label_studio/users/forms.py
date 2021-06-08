@@ -116,3 +116,30 @@ class UserProfileForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ('first_name', 'last_name', 'phone')
+
+
+class ForgotPasswordForm(forms.Form):
+    email = forms.EmailField()
+
+    def clean_email(self):
+        email = self.cleaned_data['email'].lower()
+        try:
+            User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise forms.ValidationError('User matching email was not found')
+        return email
+
+
+class BasePasswordForm(forms.Form):
+    password = forms.CharField(max_length=PASS_MAX_LENGTH, error_messages={
+                               'required': PASS_LENGTH_ERR})
+
+    def clean_password(self):
+        password = self.cleaned_data['password']
+        if len(password) < PASS_MIN_LENGTH:
+            raise forms.ValidationError(PASS_LENGTH_ERR)
+        return password
+
+
+class ResetPasswordForm(BasePasswordForm):
+    pass
