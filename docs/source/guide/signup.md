@@ -1,5 +1,5 @@
 ---
-title: Set up user accounts for Label Studio
+title: Set up user accounts
 type: guide
 order: 250
 meta_title: User Accounts

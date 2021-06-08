@@ -1,8 +1,8 @@
 ---
-title: Set up your labeling project
+title: Project Setup
 type: guide
 order: 400
-meta_title: Project Setup
+meta_title: Set up your labeling project
 meta_description: Set up data labeling and annotation projects in Label Studio to produce high-quality data for your machine learning and data science projects. 
 ---
 

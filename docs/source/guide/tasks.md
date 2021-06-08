@@ -1,5 +1,5 @@
 ---
-title: Get data into Label Studio
+title: Get data in
 type: guide
 order: 300
 meta_title: Import Data into Label Studio
