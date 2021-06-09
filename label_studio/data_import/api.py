@@ -8,6 +8,7 @@ import json
 from django.conf import settings
 from django.db import transaction
 from drf_yasg.utils import swagger_auto_schema
+from django.utils.decorators import method_decorator
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
@@ -86,22 +87,7 @@ task_create_response_scheme = {
 }
 
 
-# Import
-class ImportAPI(generics.CreateAPIView):
-    permission_required = all_permissions.projects_change
-    parser_classes = (JSONParser, MultiPartParser, FormParser)
-    serializer_class = ImportApiSerializer
-    queryset = Task.objects.all()
-
-    def get_serializer_context(self):
-        project_id = self.kwargs.get('pk')
-        if project_id:
-            project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=project_id)
-        else:
-            project = None
-        return {'project': project, 'user': self.request.user}
-
-    @swagger_auto_schema(
+@method_decorator(name='post', decorator=swagger_auto_schema(
         tags=['Import'],
         responses=task_create_response_scheme,
         operation_summary='Import tasks',
@@ -157,7 +143,22 @@ class ImportAPI(generics.CreateAPIView):
             
             <br>
         """.format(host=(settings.HOSTNAME or 'https://localhost:8080'))
-    )
+    ))
+# Import
+class ImportAPI(generics.CreateAPIView):
+    permission_required = all_permissions.projects_change
+    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    serializer_class = ImportApiSerializer
+    queryset = Task.objects.all()
+
+    def get_serializer_context(self):
+        project_id = self.kwargs.get('pk')
+        if project_id:
+            project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=project_id)
+        else:
+            project = None
+        return {'project': project, 'user': self.request.user}
+
     def post(self, *args, **kwargs):
         return super(ImportAPI, self).post(*args, **kwargs)
 
@@ -274,6 +275,20 @@ class ReImportAPI(ImportAPI):
         return super(ReImportAPI, self).post(*args, **kwargs)
 
 
+@method_decorator(name='get', decorator=swagger_auto_schema(
+        tags=['Import'],
+        operation_summary='Get files list',
+        operation_description="""
+        Retrieve the list of uploaded files used to create labeling tasks for a specific project.
+        """
+        ))
+@method_decorator(name='delete', decorator=swagger_auto_schema(
+        tags=['Import'],
+        operation_summary='Delete files',
+        operation_description="""
+        Delete uploaded files for a specific project.
+        """
+        ))
 class FileUploadListAPI(generics.mixins.ListModelMixin,
                         generics.mixins.DestroyModelMixin,
                         generics.GenericAPIView):
@@ -297,21 +312,9 @@ class FileUploadListAPI(generics.mixins.ListModelMixin,
         logger.debug(f'File Upload IDs found: {ids}')
         return FileUpload.objects.filter(project_id=project.id, id__in=ids, user=self.request.user)
 
-    @swagger_auto_schema(
-        tags=['Import'],
-        operation_summary='Get files list',
-        operation_description="""
-        Retrieve the list of uploaded files used to create labeling tasks for a specific project.
-        """)
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
 
-    @swagger_auto_schema(
-        tags=['Import'],
-        operation_summary='Delete files',
-        operation_description="""
-        Delete uploaded files for a specific project.
-        """)
     def delete(self, request, *args, **kwargs):
         project = generics.get_object_or_404(Project.objects.for_user(self.request.user),  pk=self.kwargs['pk'])
         ids = self.request.data.get('file_upload_ids')
@@ -323,32 +326,33 @@ class FileUploadListAPI(generics.mixins.ListModelMixin,
             raise ValueError('"file_upload_ids" parameter must be a list of integers')
         return Response({'deleted': deleted}, status=status.HTTP_200_OK)
 
-
+@method_decorator(name='get', decorator=swagger_auto_schema(
+        tags=['Import'],
+        operation_summary='Get file upload',
+        operation_description='Retrieve details about a specific uploaded file.'
+    ))
+@method_decorator(name='patch', decorator=swagger_auto_schema(
+        tags=['Import'],
+        operation_summary='Update file upload',
+        operation_description='Update a specific uploaded file.',
+        request_body=FileUploadSerializer
+    ))
+@method_decorator(name='delete', decorator=swagger_auto_schema(
+        tags=['Import'],
+        operation_summary='Delete file upload',
+        operation_description='Delete a specific uploaded file.'))
 class FileUploadAPI(generics.RetrieveUpdateDestroyAPIView):
     parser_classes = (JSONParser, MultiPartParser, FormParser)
     permission_classes = (IsAuthenticated, )
     serializer_class = FileUploadSerializer
     queryset = FileUpload.objects.all()
 
-    @swagger_auto_schema(
-        tags=['Import'],
-        operation_summary='Get file upload',
-        operation_description='Retrieve details about a specific uploaded file.')
     def get(self, *args, **kwargs):
         return super(FileUploadAPI, self).get(*args, **kwargs)
 
-    @swagger_auto_schema(
-        tags=['Import'],
-        operation_summary='Update file upload',
-        operation_description='Update a specific uploaded file.',
-        request_body=FileUploadSerializer)
     def patch(self, *args, **kwargs):
         return super(FileUploadAPI, self).patch(*args, **kwargs)
 
-    @swagger_auto_schema(
-        tags=['Import'],
-        operation_summary='Delete file upload',
-        operation_description='Delete a specific uploaded file.')
     def delete(self, *args, **kwargs):
         return super(FileUploadAPI, self).delete(*args, **kwargs)
 
