@@ -9,6 +9,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from drf_yasg.utils import swagger_auto_schema
+from django.utils.decorators import method_decorator
 
 from core.mixins import APIViewVirtualRedirectMixin, APIViewVirtualMethodMixin
 from core.permissions import all_permissions, ViewClassPermission
@@ -23,6 +24,13 @@ from organizations.serializers import (
 logger = logging.getLogger(__name__)
 
 
+@method_decorator(name='get', decorator=swagger_auto_schema(
+        tags=['Organizations'],
+        operation_summary='List your organizations',
+        operation_description="""
+        Return a list of the organizations you've created or that you have access to.
+        """
+    ))
 class OrganizationListAPI(generics.ListCreateAPIView):
 
     parser_classes = (JSONParser, FormParser, MultiPartParser)
@@ -43,13 +51,6 @@ class OrganizationListAPI(generics.ListCreateAPIView):
     def get_queryset(self):
         return Organization.objects.filter(users=self.request.user).distinct()
 
-    @swagger_auto_schema(
-        tags=['Organizations'],
-        operation_summary='List your organizations',
-        operation_description="""
-        Return a list of the organizations you've created or that you have access to.
-        """
-    )
     def get(self, request, *args, **kwargs):
         return super(OrganizationListAPI, self).get(request, *args, **kwargs)
 
@@ -58,6 +59,11 @@ class OrganizationListAPI(generics.ListCreateAPIView):
         return super(OrganizationListAPI, self).post(request, *args, **kwargs)
 
 
+@method_decorator(name='get', decorator=swagger_auto_schema(
+        tags=['Organizations'],
+        operation_summary='Get organization members list',
+        operation_description='Retrieve a list of the organization members and their IDs.'
+    ))
 class OrganizationMemberListAPI(generics.ListAPIView):
 
     parser_classes = (JSONParser, FormParser, MultiPartParser)
@@ -73,15 +79,20 @@ class OrganizationMemberListAPI(generics.ListAPIView):
         org = generics.get_object_or_404(self.request.user.organizations, pk=self.kwargs[self.lookup_field])
         return org.members
 
-    @swagger_auto_schema(
-        tags=['Organizations'],
-        operation_summary='Get organization members list',
-        operation_description='Retrieve a list of the organization members and their IDs.'
-    )
     def get(self, request, *args, **kwargs):
         return super(OrganizationMemberListAPI, self).get(request, *args, **kwargs)
 
 
+@method_decorator(name='get', decorator=swagger_auto_schema(
+        tags=['Organizations'],
+        operation_summary=' Get organization settings',
+        operation_description='Retrieve the settings for a specific organization by ID.'
+    ))
+@method_decorator(name='patch', decorator=swagger_auto_schema(
+        tags=['Organizations'],
+        operation_summary='Update organization settings',
+        operation_description='Update the settings for a specific organization by ID.'
+    ))
 class OrganizationAPI(APIViewVirtualRedirectMixin,
                       APIViewVirtualMethodMixin,
                       generics.RetrieveUpdateAPIView):
@@ -99,19 +110,9 @@ class OrganizationAPI(APIViewVirtualRedirectMixin,
         self.check_object_permissions(self.request, org)
         return org
 
-    @swagger_auto_schema(
-        tags=['Organizations'],
-        operation_summary=' Get organization settings',
-        operation_description='Retrieve the settings for a specific organization by ID.'
-    )
     def get(self, request, *args, **kwargs):
         return super(OrganizationAPI, self).get(request, *args, **kwargs)
 
-    @swagger_auto_schema(
-        tags=['Organizations'],
-        operation_summary='Update organization settings',
-        operation_description='Update the settings for a specific organization by ID.'
-    )
     def patch(self, request, *args, **kwargs):
         return super(OrganizationAPI, self).patch(request, *args, **kwargs)
 
@@ -124,16 +125,16 @@ class OrganizationAPI(APIViewVirtualRedirectMixin,
         return super(OrganizationAPI, self).put(request, *args, **kwargs)
 
 
-class OrganizationInviteAPI(APIView):
-    parser_classes = (JSONParser,)
-    permission_required = all_permissions.organizations_change
-
-    @swagger_auto_schema(
+@method_decorator(name='get', decorator=swagger_auto_schema(
         tags=["Invites"],
         operation_summary='Get organization invite link',
         operation_description='Get a link to use to invite a new member to an organization in Label Studio Enterprise.',
         responses={200: OrganizationInviteSerializer()}
-    )
+    ))
+class OrganizationInviteAPI(APIView):
+    parser_classes = (JSONParser,)
+    permission_required = all_permissions.organizations_change
+
     def get(self, request, *args, **kwargs):
         org = get_object_with_check_and_log(self.request, Organization, pk=request.user.active_organization_id)
         self.check_object_permissions(self.request, org)
@@ -143,16 +144,16 @@ class OrganizationInviteAPI(APIView):
         return Response(serializer.data, status=200)
 
 
-class OrganizationResetTokenAPI(APIView):
-    permission_required = all_permissions.organizations_invite
-    parser_classes = (JSONParser,)
-
-    @swagger_auto_schema(
+@method_decorator(name='post', decorator=swagger_auto_schema(
         tags=["Invites"],
         operation_summary='Reset organization token',
         operation_description='Reset the token used in the invitation link to invite someone to an organization.',
         responses={200: OrganizationInviteSerializer()}
-    )
+    ))
+class OrganizationResetTokenAPI(APIView):
+    permission_required = all_permissions.organizations_invite
+    parser_classes = (JSONParser,)
+
     def post(self, request, *args, **kwargs):
         org = request.user.active_organization
         org.reset_token()
@@ -161,4 +162,3 @@ class OrganizationResetTokenAPI(APIView):
         serializer = OrganizationInviteSerializer(data={'invite_url': invite_url, 'token': org.token})
         serializer.is_valid()
         return Response(serializer.data, status=201)
-
