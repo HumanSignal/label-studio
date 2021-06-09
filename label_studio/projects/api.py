@@ -139,6 +139,22 @@ class ProjectListAPI(generics.ListCreateAPIView):
             raise LabelStudioDatabaseException('Database error during project creation. Try again.')
 
 
+@method_decorator(name='get', decorator=swagger_auto_schema(
+        tags=['Projects'],
+        operation_summary='Get project by ID',
+        operation_description='Retrieve information about a project by project ID.'
+    ))
+@method_decorator(name='delete', decorator=swagger_auto_schema(
+        tags=['Projects'],
+        operation_summary='Delete project',
+        operation_description='Delete a project by specified project ID.'
+    ))
+@method_decorator(name='patch', decorator=swagger_auto_schema(
+        tags=['Projects'],
+        operation_summary='Update project',
+        operation_description='Update the project settings for a specific project.',
+        request_body=ProjectSerializer
+    ))
 class ProjectAPI(APIViewVirtualRedirectMixin,
                  APIViewVirtualMethodMixin,
                  generics.RetrieveUpdateDestroyAPIView):
@@ -160,28 +176,12 @@ class ProjectAPI(APIViewVirtualRedirectMixin,
     def get_queryset(self):
         return Project.objects.with_counts().filter(organization=self.request.user.active_organization)
 
-    @swagger_auto_schema(
-        tags=['Projects'],
-        operation_summary='Get project by ID',
-        operation_description='Retrieve information about a project by project ID.'
-    )
     def get(self, request, *args, **kwargs):
         return super(ProjectAPI, self).get(request, *args, **kwargs)
 
-    @swagger_auto_schema(
-        tags=['Projects'],
-        operation_summary='Delete project',
-        operation_description='Delete a project by specified project ID.'
-    )
     def delete(self, request, *args, **kwargs):
         return super(ProjectAPI, self).delete(request, *args, **kwargs)
 
-    @swagger_auto_schema(
-        tags=['Projects'],
-        operation_summary='Update project',
-        operation_description='Update the project settings for a specific project.',
-        request_body=ProjectSerializer
-    )
     def patch(self, request, *args, **kwargs):
         project = self.get_object()
         label_config = self.request.data.get('label_config')
@@ -224,6 +224,17 @@ class ProjectAPI(APIViewVirtualRedirectMixin,
         return super(ProjectAPI, self).put(request, *args, **kwargs)
 
 
+@method_decorator(name='get', decorator=swagger_auto_schema(
+        tags=['Projects'],
+        operation_summary='Get next task to label',
+        operation_description="""
+            Get the next task for labeling. If you enable Machine Learning in
+            your project, the response might include a "predictions"
+            field. It contains a machine learning prediction result for
+            this task.
+        """,
+        responses={200: TaskWithAnnotationsAndPredictionsAndDraftsSerializer()}
+    ))
 class ProjectNextTaskAPI(generics.RetrieveAPIView):
     permission_required = all_permissions.tasks_view
     serializer_class = TaskWithAnnotationsAndPredictionsAndDraftsSerializer  # using it for swagger API docs
@@ -381,17 +392,6 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
 
         return Response(response)
 
-    @swagger_auto_schema(
-        tags=['Projects'],
-        operation_summary='Get next task to label',
-        operation_description="""
-            Get the next task for labeling. If you enable Machine Learning in
-            your project, the response might include a "predictions"
-            field. It contains a machine learning prediction result for
-            this task.
-        """,
-        responses={200: TaskWithAnnotationsAndPredictionsAndDraftsSerializer()}
-    )
     def get(self, request, *args, **kwargs):
         project = get_object_with_check_and_log(request, Project, pk=self.kwargs['pk'])
         self.check_object_permissions(request, project)
@@ -475,17 +475,17 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
                     f'There are still some tasks to complete for the user={user}, but they seem to be locked by another user.')
 
 
+@method_decorator(name='post', decorator=swagger_auto_schema(
+        tags=['Projects'],
+        operation_summary='Validate label config',
+        operation_description='Validate a labeling configuration for a project.',
+        responses={200: 'Validation success'}
+    ))
 class LabelConfigValidateAPI(generics.CreateAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_classes = (AllowAny,)
     serializer_class = ProjectLabelConfigSerializer
 
-    @swagger_auto_schema(
-        tags=['Projects'],
-        operation_summary='Validate label config',
-        operation_description='Validate a labeling configuration for a project.',
-        responses={200: 'Validation success'}
-    )
     def post(self, request, *args, **kwargs):
         return super(LabelConfigValidateAPI, self).post(request, *args, **kwargs)
 
@@ -502,15 +502,7 @@ class LabelConfigValidateAPI(generics.CreateAPIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
-    """ Validate label config
-    """
-    parser_classes = (JSONParser, FormParser, MultiPartParser)
-    serializer_class = ProjectLabelConfigSerializer
-    permission_required = all_permissions.projects_change
-    queryset = Project.objects.all()
-
-    @swagger_auto_schema(
+@method_decorator(name='post', decorator=swagger_auto_schema(
         tags=['Projects'],
         operation_summary='Validate a label config',
         manual_parameters=[
@@ -519,7 +511,16 @@ class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
                 type=openapi.TYPE_STRING,
                 in_=openapi.IN_QUERY,
                 description='labeling config')
-        ])
+        ]
+))
+class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
+    """ Validate label config
+    """
+    parser_classes = (JSONParser, FormParser, MultiPartParser)
+    serializer_class = ProjectLabelConfigSerializer
+    permission_required = all_permissions.projects_change
+    queryset = Project.objects.all()
+
     def post(self, request, *args, **kwargs):
         project = self.get_object()
         label_config = self.request.data.get('label_config')
@@ -547,6 +548,21 @@ class ProjectSummaryAPI(generics.RetrieveAPIView):
         return super(ProjectSummaryAPI, self).get(*args, **kwargs)
 
 
+@method_decorator(name='delete', decorator=swagger_auto_schema(
+        tags=['Projects'],
+        operation_summary='Delete all tasks',
+        operation_description='Delete all tasks from a specific project.'
+))
+@method_decorator(name='get', decorator=swagger_auto_schema(
+        **paginator_help('tasks', 'Projects'),
+        operation_summary='List project tasks',
+        operation_description="""
+            Retrieve a paginated list of tasks for a specific project. For example, use the following cURL command:
+            ```bash
+            curl -X GET {}/api/projects/{{id}}/tasks/ -H 'Authorization: Token abc123'
+            ```
+        """.format(settings.HOSTNAME or 'https://localhost:8080')
+    ))
 class TasksListAPI(generics.ListCreateAPIView,
                    generics.DestroyAPIView,
                    APIViewVirtualMethodMixin,
@@ -567,26 +583,11 @@ class TasksListAPI(generics.ListCreateAPIView,
         tasks = Task.objects.filter(project=project)
         return paginator(tasks, self.request)
 
-    @swagger_auto_schema(
-        tags=['Projects'],
-        operation_summary='Delete all tasks',
-        operation_description='Delete all tasks from a specific project.'
-    )
     def delete(self, request, *args, **kwargs):
         project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
         Task.objects.filter(project=project).delete()
         return Response(status=204)
 
-    @swagger_auto_schema(
-        **paginator_help('tasks', 'Projects'),
-        operation_summary='List project tasks',
-        operation_description="""
-            Retrieve a paginated list of tasks for a specific project. For example, use the following cURL command:
-            ```bash
-            curl -X GET {}/api/projects/{{id}}/tasks/ -H 'Authorization: Token abc123'
-            ```
-        """.format(settings.HOSTNAME or 'https://localhost:8080')
-    )
     def get(self, *args, **kwargs):
         return super(TasksListAPI, self).get(*args, **kwargs)
 
