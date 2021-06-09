@@ -1,0 +1,35 @@
+{% extends "drf-yasg/redoc.html" %}
+
+{% load static %}
+
+{% block extra_styles %}
+<style>
+  body, h1, p {
+      font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,Ubuntu,sans-serif;
+  }
+  
+  h1 {
+      color: #2a2f45 !important;
+      font-size: 24px !important;
+  }
+
+  p {
+      color: #4f566b !important;
+      font-size: 16px !important;
+      line-height: 22px !important;
+  }
+  
+    img[alt="logo"] {
+        margin-left: 0;
+        margin-top: 2.3em;
+        margin-bottom: 2em;
+    }
+  </style>
+{% endblock %}
+
+{% block favicon %}
+{# -- Maybe replace the favicon -- #}
+<link rel="icon" type="image/png" href="{{ settings.HOSTNAME }}{% static 'drf-yasg/redoc/redoc-logo.png' %}"/>
+{% endblock %}
+
+

@@ -1,0 +1,21 @@
+{
+  "title": "Label Studio",
+  "description": "Description",
+  "host": "",
+  "internal_host": "0.0.0.0",
+  "port": 8080,
+  "debug": false,
+  "label_config": null,
+  "input_path": null,
+  "output_dir": "completions",
+  "instruction": "<img src='static/images/ls_logo.png'><br> Type some <b>hypertext</b> for annotators here!<br> <a href='https://labelstud.io/guide/labeling.html'>Read more</a> about the labeling interface.",
+  "allow_delete_completions": true,
+  "templates_dir": "examples",
+  "editor": {
+    "debug": false
+  },
+  "sampling": "sequential",
+  "ml_backends": [],
+  "task_page_auto_update_timer": 10000,
+  "show_project_links_in_multisession": true
+}

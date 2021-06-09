@@ -2,6 +2,8 @@
 title: Introduction
 type: tags
 order: 201
+meta_title: Tags - Customize the Label Studio User Interface
+meta_description: Label Studio Documentation to easily customize the Label Studio user interface using XML-like tags for machine learning and data science projects.
 ---
 
 Editor configuration is based on XML-like tags. Tags can be divided into three categories:

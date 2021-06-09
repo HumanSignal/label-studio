@@ -1,7 +1,9 @@
 ---
 title: TextArea
 type: tags
-order: 425
+order: 424
+meta_title: Textarea Tags for Text areas
+meta_description: Label Studio Textarea Tags customize Label Studio for text areas and transcriptions for machine learning and data science projects.
 ---
 
 TextArea tag shows the textarea for user input
@@ -17,6 +19,7 @@ TextArea tag shows the textarea for user input
 | [placeholder] | <code>string</code> |  | placeholder text |
 | [maxSubmissions] | <code>string</code> |  | maximum number of submissions |
 | [editable] | <code>boolean</code> | <code>false</code> | editable textarea results |
+| [transcription] | <code>boolean</code> | <code>false</code> | always show editor |
 | [rows] | <code>number</code> |  | number of rows in the textarea |
 | [required] | <code>boolean</code> | <code>false</code> | validation if textarea is required |
 | [requiredMessage] | <code>string</code> |  | message to show if validation fails |

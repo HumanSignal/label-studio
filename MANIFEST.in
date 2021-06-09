@@ -1,9 +1,31 @@
-include label_studio/examples/*.xml
-recursive-include label_studio/static *
-recursive-include label_studio *.yml
+include deploy/requirements.txt
+
+# react LSF / react-app with dm
+recursive-include label_studio/frontend/dist/lsf *
+include label_studio/frontend/dist/react-app/*
+recursive-include label_studio/frontend/dist/dm/ *
+
+# html template files
 recursive-include label_studio *.html
-include label_studio/utils/schema/*.json
-include label_studio/logger.json
-include label_studio/config.json
-include label_studio/ml/default_configs/*
-include requirements.txt
+
+# annotation templates
+recursive-include label_studio/annotation_templates *
+
+# core
+recursive-include label_studio/core/static *
+recursive-include label_studio/core/static_build *
+include label_studio/core/utils/schema/*.json
+include label_studio/core/templatetags/*.py
+include label_studio/core/version_.py
+
+# io storages
+recursive-include label_studio/io_storages *.yml
+
+# tests
+recursive-include label_studio/tests *.sh
+recursive-include label_studio/tests/loadtests *.txt
+recursive-include label_studio/tests/test_data *.yml
+recursive-include label_studio/tests/test_suites/samples *
+recursive-include label_studio/tests/test_suites *.yml
+
+include label_studio/pytest.ini

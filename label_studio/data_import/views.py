@@ -1,36 +1,23 @@
-import flask
-from flask import current_app, g
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
+"""
+import os
+import io
+import logging
 
-from label_studio.utils.auth import requires_auth
-from label_studio.utils.misc import exception_handler_page
-from label_studio.data_import import blueprint
-import label_studio.data_import.api  # !: we need to import it here to register endpoints
+from django.http import FileResponse
+from django.conf import settings
+from core.permissions import IsBusiness, view_with_auth
 
+from .models import FileUpload
+from ranged_fileresponse import RangedFileResponse
 
-@blueprint.route('/import-old')
-@requires_auth
-@exception_handler_page
-def import_old_page():
-    """ Import tasks from JSON, CSV, ZIP and more
-    """
-    return flask.render_template(
-        'import_old.html',
-        project=g.project,
-        config=g.project.config
-    )
+logger = logging.getLogger(__name__)
 
 
-@blueprint.route('/import')
-@requires_auth
-@exception_handler_page
-def import_page():
-    """ Import tasks from JSON, CSV, ZIP and more
-    """
-    serialized_project = g.project.serialize()
-    serialized_project['multi_session_mode'] = current_app.label_studio.input_args.command == 'start-multi-session'
-    return flask.render_template(
-        'import_new.html',
-        project=g.project,
-        config=g.project.config,
-        serialized_project=serialized_project
-    )
+@view_with_auth(['GET'], (IsBusiness,))
+def get_uploaded_file(request, filename):
+    file = settings.UPLOAD_DIR + ('/' if not settings.UPLOAD_DIR.endswith('/') else '') + filename
+    logger.debug(f'Fetch uploaded file by user {request.user} => {file}')
+    file_upload = FileUpload.objects.get(file=file)
+
+    return RangedFileResponse(request, open(file_upload.file.path, mode='rb'))

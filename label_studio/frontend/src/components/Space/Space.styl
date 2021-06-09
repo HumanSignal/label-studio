@@ -1,0 +1,42 @@
+.space
+  display grid
+  grid-gap 16px
+  grid-auto-flow column
+  align-items center
+  grid-auto-columns max-content
+
+  &_direction
+    &_horizontal
+      grid-auto-flow column
+      align-items center
+      grid-auto-columns max-content
+
+    &_vertical
+      grid-auto-flow row
+      justify-content center
+      grid-auto-rows max-content
+
+  &_spread
+    width 100%
+    justify-content space-between
+
+  &_align
+    &_start
+      justify-content flex-start
+
+    &_end
+      justify-content flex-end
+
+  &_stretch&_direction
+    &_horizontal
+      grid-auto-columns 1fr
+
+    &_horizontal
+      grid-auto-rows 1fr
+
+  &_size
+    &_large
+      grid-gap 32px
+
+    &_small
+      grid-gap 12px

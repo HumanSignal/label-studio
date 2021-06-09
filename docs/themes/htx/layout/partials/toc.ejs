@@ -1,29 +1,52 @@
 <ul class="menu-root">
-    <li><h3 class="root"><%- type %></h3></li>
+    <li style="margin-top: 45px;"><h3 class="root"><%- type %></h3></li>
 
   <% site.pages.find({ type: type }).sort('order').each(function (p) { %>
     <% var fileName = p.path.replace(/^.+?\/([\w-]+)\.html/, '$1') %>
 
+
+
 <% if (type === 'guide') { %>
-      <% if (fileName === 'concept') { %>
-          <li><h4>Advanced guide</h4></li>
+      <% if (fileName === 'install') { %>
+          <li><h4>Install and Upgrade</h4></li>
       <% } %>
+      <% if (fileName === 'security') { %>
+          <li><h4>Security and Privacy</h4></li>
+      <% } %>
+      <% if (fileName === 'signup') { %>
+          <li><h4>Manage Users</h4></li>
+      <% } %>
+      <% if (fileName === 'tasks') { %>
+          <li><h4>Import Data</h4></li>
+      <% } %>
+       <% if (fileName === 'setup_project') { %>
+          <li><h4>Labeling and Projects</h4></li>
+      <% } %>
+      <% if (fileName === 'quality') { %>
+          <li><h4>Manage Annotations</h4></li>
+      <% } %>
+      <% if (fileName === 'ml') { %>
+          <li><h4>Machine Learning Setup</h4></li>
+      <% } %>
+      <% if (fileName === 'frontend') { %>
+          <li><h4>Advanced Development</h4></li>
+      <% } %> %>
+
 <% } %>
 
       <% if (type === 'tags') { %>
 
-      
+
       <% if (fileName === 'audio') { %>
-          <!-- <div style="margin-top: 20px; margin-right: 40px; background: url(<%- url_for("/images/wave.png") %>) repeat-x; opacity: 0.4; background-size: 20px; height: 20px;"></div> -->
-          <li><h4>Objects</h4></li>
+          <li><h4>Object Tags</h4></li>
       <% } %>
 
       <% if (fileName === 'brushlabels') { %>
-          <li><h4>Controls</h4></li>
+          <li><h4>Control Tags</h4></li>
       <% } %>
 
       <% if (fileName === 'header') { %>
-          <li><h4>Visual & Experience</h4></li>
+          <li><h4>Visual & Experience Tags</h4></li>
       <% } %>
 
       <% } %>
@@ -37,7 +60,9 @@
          <% } %>
       <% } %>
     <li>
-      <a href="<%- url_for(p.path) %>" class="sidebar-link<%- page.title === p.title ? ' current' : '' %><%- p.is_new ? ' new' : '' %>"><%- p.title %></a>
+      <a href="<%- url_for(p.path) %>" class="sidebar-link<%- page.title === p.title ? ' current' : '' %><%- p.is_new ? ' new' : '' %>">
+        <%- removeLabelStudioMention(p.title) %>
+      </a>
     </li>
     <% }) %>
 </ul>

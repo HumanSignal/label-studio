@@ -1,0 +1,21 @@
+title: Automatic Speech Recognition using Segments
+type: community
+group: Audio/Speech Processing
+image: /static/templates/automatic-speech-recognition-using-segments.png
+details: <h1>Do voice activity segmentation and provide a transcript for the audio</h1>
+config: '
+<View>
+  <Labels name="labels" toName="audio">
+    <Label value="Speech" />
+    <Label value="Noise" />
+  </Labels>
+
+  <AudioPlus name="audio" value="$audio"/>
+
+  <TextArea name="transcription" toName="audio"
+            rows="2" editable="true"
+            perRegion="true" required="true" />
+</View>
+
+<!-- { "data": {"audio": "https://app.heartex.ai/static/samples/game.wav"} } -->
+'

@@ -1,0 +1,27 @@
+{% extends 'simple.html' %}
+{% load static %}
+
+{% block head %}
+  <title>401 | Label Studio</title>
+  <link rel="stylesheet" href="{{ settings.HOSTNAME }}{% static 'css/error.css' %}"/>
+{% endblock %}
+
+
+{% block content %}
+<div class="ls-global-error">
+  <h1>Authentication Error</h1>
+  <img class="ls-global-error__heidi" src="{{ settings.HOSTNAME }}{% static 'images/opossum_broken.svg' %}" height="111" alt="Heidi's down" />
+  <h2>Authentication credentials were not provided</h2>
+  {% autoescape off %}
+  <div class="ls-global-error__details">{{ exception }}</div>
+  {% endautoescape %}
+  <p class="ls-global-error__actions">
+    <a class="ls-global-error__slack button" target="_blank" href="http://slack.labelstud.io.s3-website-us-east-1.amazonaws.com?source=product-401-error">
+      <img src="{{ settings.HOSTNAME }}{% static 'images/slack.png' %}" width="16" />
+      Ask on Slack
+    </a>
+    <button onClick="history.back()">Go Back</button>
+    <button onClick="location.reload()">Reload</button>
+  </p>
+</div>
+{% endblock %}

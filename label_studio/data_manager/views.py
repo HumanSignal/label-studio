@@ -1,41 +1,23 @@
-import flask
-from flask import current_app, g
+"""This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
+"""
+from django.shortcuts import redirect, render, reverse
+from rules.contrib.views import permission_required, objectgetter
 
-from label_studio.utils.auth import requires_auth
-from label_studio.utils.misc import exception_handler_page
-from label_studio.utils.io import find_editor_files
-from label_studio.data_manager import blueprint
-import label_studio.data_manager.api  # !: we need to import it here to register api endpoints
-
-
-@blueprint.route('/tasks', methods=['GET', 'POST'])
-@requires_auth
-@exception_handler_page
-def tasks_page():
-    """ Tasks and completions page
-    """
-    return flask.render_template(
-        'tasks.html',
-        config=g.project.config,
-        project=g.project,
-        version=label_studio.__version__,
-        **find_editor_files()
-    )
+from core.permissions import (IsBusiness, get_object_with_permissions, view_with_auth)
+from core.utils.common import get_object_with_check_and_log, find_editor_files, get_organization_from_request
+from core.version import get_short_version
+from organizations.models import Organization
+from projects.models import Project
 
 
-@blueprint.route('/tasks-old', methods=['GET', 'POST'])
-@requires_auth
-@exception_handler_page
-def tasks_old_page():
-    """ Tasks and completions page
-    """
-    serialized_project = g.project.serialize()
-    serialized_project['multi_session_mode'] = current_app.label_studio.input_args.command == 'start-multi-session'
-    return flask.render_template(
-        'tasks_old.html',
-        config=g.project.config,
-        project=g.project,
-        serialized_project=serialized_project,
-        version=label_studio.__version__,
-        **find_editor_files()
-    )
+@view_with_auth(['GET'], (IsBusiness,))
+# @permission_required('tasks.delete_task', fn=objectgetter(Project, 'pk'), raise_exception=True)
+def task_page(request, pk):
+    project = get_object_with_check_and_log(request, Project, pk=pk)
+
+    response = {
+        'project': project,
+        'version': get_short_version()
+    }
+    response.update(find_editor_files())
+    return render(request, 'data_manager/data.html', response)

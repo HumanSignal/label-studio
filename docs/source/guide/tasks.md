@@ -1,41 +1,18 @@
 ---
 title: Get data into Label Studio
 type: guide
-order: 102
+order: 300
+meta_title: Import Data
+meta_description: Label Studio Documentation for importing and uploading data labeling tasks for machine learning or data science projects. 
 ---
 
 Get data into Label Studio by importing files, referencing URLs, or syncing with cloud or database storage. 
 
-## How to import data into Label Studio
-
-How you import data can depend on where your data is stored.
-
 - If your data is stored in a cloud storage bucket, see [Sync data from cloud or database storage](storage.html).
 - If your data is stored in a Redis database, see [Sync data from cloud or database storage](storage.html).
-- If your data is stored at internet-accessible URLs, [import it from the Label Studio UI](#Import-data-from-the-Label-Studio-UI).
-- If your data is stored locally in a directory, [import it from the command line](#Import-data-from-the-command-line).
-- If your data is stored locally as individual files, [import it from the Label Studio UI](#Import-data-from-the-Label-Studio-UI) or [import it from the command line](#Import-data-from-the-command-line). 
-
-### Import data from the Label Studio UI
-
-To import data from the Label Studio UI, do the following:
-1. Start Label Studio from the command line.
-2. On the Label Studio UI, open the import page available at [http://localhost:8080/import](http://localhost:8080/import).
-3. Import your data from files or URLs. 
-
-### Import data from the command line
-
-To import data from the command line, do the following:
-
-1. Start Label Studio and use command line arguments to specify the path to the data and format of the data. <br/>For example: <br/>`label-studio init --input-path my_tasks.json --input-format json`
-2. Open the Label Studio UI and confirm that your data was properly imported. 
-
-You can use the `--input-path` argument to specify a file or directory with the data that you want to label. By default, Label Studio expects JSON-formatted tasks using the [Basic Label Studio JSON format](tasks.html#Basic-Label-Studio-JSON-format). You can specify other data formats using the `--input-format` argument. For examples, see [Types of data you can import into Label Studio](#Types-of-data-you-can-import-into-Label-Studio) on this page.
-
-### Import data using the API
-
-Import your data using the Label Studio server API. See the [API documentation](api.html).
-
+- If your data is stored at internet-accessible URLs, in files, or directories, [import it from the Label Studio UI](#Import-data-from-the-Label-Studio-UI).
+- If your data is stored locally, [import it into Label Studio](#Import-data-from-a-local-directory).
+- If your data contains predictions or pre-annotations, see [Import pre-annotated data into Label Studio](predictions.html).
 
 ## Types of data you can import into Label Studio
 
@@ -45,22 +22,28 @@ You can import many different types of data, including text, timeseries, audio, 
 | --- | --- |
 | Audio | .aiff, .au, .flac, .m4a, .mp3, .ogg, .wav |
 | HTML | .html, .htm, .xml |
-| Images | .bmp, .gif, .jpg, .png, .svg, .tiff, .webp |
+| Images | .bmp, .gif, .jpg, .png, .svg, .webp |
 | Structured data | .csv, .tsv, .json |
 | Text | .txt |
 | Time series | .csv, .tsv |
 
-If you don't see a supported data or file type that you want to import, reach out in the [Label Studio Slack community](https://join.slack.com/t/label-studio/shared_invite/zt-cr8b7ygm-6L45z7biEBw4HXa5A2b5pw). 
+If you don't see a supported data or file type that you want to import, reach out in the [Label Studio Slack community](http://slack.labelstud.io.s3-website-us-east-1.amazonaws.com?source=docs-gdi). 
 
 ## How to format your data to import it
 
 Label Studio treats different file types different ways. 
 
+If you want to import multiple types of data to label at the same time, for example, images with captions or audio recordings with transcripts, you must use the [basic Label Studio JSON format](#Basic-Label-Studio-JSON-format). 
+
+You can also use a CSV file or a JSON list of tasks to point to URLs with the data, rather than directly importing the data if you need to import thousands of files. You can import files containing up to 250,000 tasks or up to 50MB in size into Label Studio.
+
+If you're specifying data in a cloud storage bucket or container, and you don't want to [sync cloud storage](storage.html), create and specify [presigned URLs for Amazon S3 storage](https://docs.aws.amazon.com/AmazonS3/latest/userguide/ShareObjectPreSignedURL.html), [signed URLs for Google Cloud Storage](https://cloud.google.com/storage/docs/access-control/signed-urls), or [shared access signatures for Microsoft Azure](https://docs.microsoft.com/en-us/azure/storage/common/storage-sas-overview) in a JSON, CSV, or TXT file. 
+
 ### Basic Label Studio JSON format
 
 One way to import data into Label Studio is using a JSON-formatted list of tasks. The `data` key of the JSON file references each task as an entry in a JSON dictionary. If there is no `data` key, Label Studio interprets the entire JSON file as one task. 
 
-In the `data` JSON dictionary, use key-value pairs that correspond to the source key expected by the object tag in the [label config](/guide/setup.html#Customize-the-labeling-interface-for-your-project) that you set up for your dataset. 
+In the `data` JSON dictionary, use key-value pairs that correspond to the source key expected by the object tag in the [label config](setup.html#Customize-the-labeling-interface-for-your-project) that you set up for your dataset. 
 
 Depending on the type of object tag, Label Studio interprets field values differently:
 - `<Text value="$key">`: `value` is interpreted as plain text.
@@ -76,10 +59,10 @@ You can add other, optional keys to the JSON file.
 | JSON key | Description |
 | --- | --- | 
 | id | Optional. Integer to use as the task ID. |
-| completions | Optional. List of annotations exported from Label Studio. [Label Studio's completion format](/guide/export.html#completions) allows you to import annotation results in order to use them in subsequent labeling tasks. |
-| predictions | Optional. List of model prediction results, where each result is saved using [Label Studio's prediction format](/guide/export.html#predictions). Import predictions for automatic task pre-labeling and active learning. See [Import predicted labels into Label Studio](#Import-predicted-labels-into-Label-Studio) |
+| annotations | Optional. List of annotations exported from Label Studio. [Label Studio's annotation format](export.html#Raw-JSON-format-of-completed-tasks) allows you to import annotation results in order to use them in subsequent labeling tasks. |
+| predictions | Optional. List of model prediction results, where each result is saved using [Label Studio's prediction format](export.html#Raw-JSON-format-of-completed-tasks). Import predictions for automatic task pre-labeling and active learning. See [Import predicted labels into Label Studio](predictions.html) |
 
-#### Example JSON format
+### Example JSON format
 
 For an example text classification project, you can set up a label config like the following:
 ```html
@@ -94,9 +77,91 @@ For an example text classification project, you can set up a label config like t
 
 ```
 
-You can then import tasks to label that match the following JSON format:
+You can then import text tasks to label that match the following JSON format:
 
 ```yaml
+[{
+  # "data" must contain the "my_text" field defined in the text labeling config as the value and can optionally include other fields
+  "data": {
+    "my_text": "Opossums are great",
+    "ref_id": 456,
+    "meta_info": {
+      "timestamp": "2020-03-09 18:15:28.212882",
+      "location": "North Pole"
+    } 
+  },
+
+  # annotations are not required and are the list of annotation results matching the labeling config schema
+  "annotations": [{
+    "result": [{
+      "from_name": "sentiment_class",
+      "to_name": "message",
+      "type": "choices",
+      "value": {
+        "choices": ["Positive"]
+      }
+    }]
+  }],
+
+  # "predictions" are pretty similar to "annotations" 
+  # except that they also include some ML-related fields like a prediction "score"
+  "predictions": [{
+    "result": [{
+      "from_name": "sentiment_class",
+      "to_name": "message",
+      "type": "choices",
+      "value": {
+        "choices": ["Neutral"]
+      }
+    }],
+  # score is used for active learning sampling mode
+    "score": 0.95
+  }]
+}]
+```
+If you're placing JSON files in [cloud storage](storage.html), place 1 task in each JSON file in the storage bucket. If you want to upload a JSON file from your machine directly into Label Studio, you can place multiple tasks in one JSON file. 
+
+#### Example JSON with multiple tasks
+You can place multiple tasks in one JSON file if you're uploading the JSON file to Label Studio. 
+
+<br/>
+{% details <b>To place multiple tasks in one JSON file, use this JSON format example</b> %}
+This example contains multiple text classification tasks with no annotations or predictions.
+
+The "data" parameter must contain the "my_text" field defined in the text labeling config and can optionally include other fields. The "id" parameter is not required.
+
+{% codeblock lang:json %}
+[
+   {
+      "id":1,
+      "data":{
+         "my_text":"Opossums like to be aloft in trees."
+      }
+   },
+   {
+      "id":2,
+      "data":{
+         "my_text":"Opossums are opportunistic."
+      }
+   },
+   {
+      "id":3,
+      "data":{
+         "my_text":"Opossums like to forage for food."
+      }
+   }
+]
+{% endcodeblock %}
+{% enddetails %}
+
+#### Example JSON for older versions of Label Studio
+If you're still using a Label Studio version earlier than 1.0.0, refer to this example JSON format. 
+
+<br/>
+{% details <b>For versions of Label Studio earlier than 1.0.0, use this JSON format example.</b> %}
+If you're using a version of Label Studio earlier than version 1.0.0, import tasks that match the following JSON format: 
+
+{% codeblock lang:json %}
 [{
   # "data" must contain the "my_text" field defined by labeling config,
   # and can optionally include other fields
@@ -136,26 +201,8 @@ You can then import tasks to label that match the following JSON format:
     "score": 0.95
   }]
 }]
-```
-
-
-### Import JSON tasks
-
-Import JSON-formatted tasks from one file from the command line: 
-```bash
-label-studio init --input-path=my_tasks.json
-```
-
-In this example, `tasks.json` contains tasks in a [Basic Label Studio JSON format](tasks.html#Basic-Label-Studio-JSON-format).
-
-### Import a directory with JSON files
-
-Import JSON-formatted tasks stored in multiple files in one directory from the command line:
-```bash
-label-studio init --input-path=dir/with/json/files --input-format=json-dir
-```
-
-In this example, import tasks from several JSON files stored in one directory, `files`. Each JSON file in this case must match the [Basic Label Studio JSON format](tasks.html#Basic-Label-Studio-JSON-format). If you add more files to this directory after Label Studio starts, you must restart Label Studio to import the tasks in the additional files.
+{% endcodeblock %}
+{% enddetails %}
 
 ### Import CSV or TSV data
 
@@ -166,17 +213,11 @@ this is a first task,123
 this is a second task,456
 ```
 
-> Note: You can only import CSV / TSV files on the Label Studio UI.
-
 > Note: If your labeling config has a TimeSeries tag, Label Studio interprets the CSV/TSV as time series data when you import it. This CSV/TSV is hosted as a resource file and Label Studio automatically creates a task with a link to the uploaded CSV/TSV.
 
 ### Plain text
 
 Import data as plain text. Label Studio interprets each line in a plain text file as a separate data labeling task. 
-
-```bash
-label-studio init my-project --input-path=my_tasks.txt --input-format=text --label-config=config.xml
-```
 
 You might use plain text for labeling tasks if you have only one stream of input data, and only one [object tag](/tags) specified in your label config. 
 
@@ -185,42 +226,52 @@ this is a first task
 this is a second task
 ```
 
-### Directory with plain text files
+If you want to import entire plain text files without each line becoming a new labeling task, customize the labeling configuration to specify `valueType="url"` in the Text tag. See the [Text tag documentation](/tags/text.html). Using this setting means that when you export your tasks, you export the links to the raw data created by Label Studio, rather than the raw data. If you want to export tasks with data, and label text files with new lines, use the [Label Studio JSON format](#Basic-Label-Studio-JSON-format).
 
-Import data stored in multiple plain text files. You can split your input data into several plain text files, and specify the directory path. Then Label Studio scans each file line-by-line, creating one task per line.
+## Import data from a local directory
 
-```bash
-label-studio init my-project --input-path=dir/with/text/files --input-format=text-dir --label-config=config.xml
-```
+To import data from a local directory, you have two options:
+- Run a web server to generate URLs for the files, then upload a file that references the URLs to Label Studio. 
+- Add the file directory as a source or target [local storage](storage.html#Local-storage) connection in the Label Studio UI.
 
-### Directory with image files
+### Run a web server to generate URLs to local files
+To run a web server to generate URLs for the files, you can refer to this provided [helper shell script in the Label Studio repository](https://github.com/heartexlabs/label-studio/blob/master/scripts/serve_local_files.sh) or write your own script. 
+Use that script to do the following:
+1. On the machine with the file directory that you want Label Studio to import, call the helper script and specify a regex pattern to match the files that you want to import. In this example, the script identifies files with the JPG file extension:
+   ```bash
+   ./script/serve_local_files.sh <directory/with/files> *.jpg
+   ```
+   The script collects the links to the files provided by that HTTP server and saves them to a `files.txt` file with one URL per line. 
+3. Import the file with URLs into Label Studio using the Label Studio UI. 
 
-Import tasks from a local directory containing multiple image files. Each file creates one labeling task. Label Studio creates a URL for each task, pointing to your local directory as follows: 
-```
-http://<host:port>/data/filename?d=<path/to/the/local/directory>
-```
+If your labeling configuration supports HyperText or multiple data types, use the Label Studio JSON format to specify the local file locations instead of a `txt` file. See [an example of this format](storage.html#Tasks-with-local-storage-file-references).
 
-The supported image file formats are: `.png` `.jpg` `.jpeg` `.tiff` `.bmp` `.gif`
+### Add the file directory as source storage in the Label Studio UI
+If you're running Label Studio on Docker and want to add local file storage, you need to mount the file directory and set up environment variables. See [Run Label Studio on Docker and use local storage](start.html#Run-Label-Studio-on-Docker-and-use-local-storage).
 
-Run the following command to start Label Studio and import image files from a local directory:
-```bash
-label-studio init my-project --input-path=dir/with/images --input-format=image-dir --label-config=config.xml --allow-serving-local-files
-```
+## Import data from the Label Studio UI
 
-> WARNING: the `--allow-serving-local-files` argument is intended for use only with locally-running instances of Label Studio. Avoid using it for remote servers unless you are sure what you're doing.
+To import data from the Label Studio UI, do the following:
+1. On the Label Studio UI, open a specific project.
+2. Click **Import** to open the import page available at [http://localhost:8080/import](http://localhost:8080/import).
+3. Import your data from files or URLs. 
 
+Data that you import is project-specific. 
 
-### Directory with audio files
+### Import data using the API
 
-Import tasks from a local directory containing multiple audio files. Each file creates one labeling task. Label Studio creates a URL for each task, pointing to your local directory as follows: 
+Import your data using the Label Studio API. See the [API documentation for importing tasks](/api#operation/projects_import_create).
 
-```
-http://<host:port>/data/filename?d=<path/to/the/local/directory>
-```
+### Import data from the command line
 
-The supported audio file formats are: `.wav` `.aiff` `.mp3` `.au` `.flac`
+In versions of Label Studio earlier than 1.0.0, you can import data from a local directory using the command line. 
 
-Run the following command to start Label Studio and import audio files from a local directory:
+To import data from the command line, do the following:
+
+1. Start Label Studio and use command line arguments to specify the path to the data and format of the data. <br/>For example: <br/>`label-studio init --input-path my_tasks.json --input-format json`
+2. Open the Label Studio UI and confirm that your data was properly imported. 
+
+You can use the `--input-path` argument to specify a file or directory with the data that you want to label. You can specify other data formats using the `--input-format` argument. For example run the following command to start Label Studio and import audio files from a local directory:
 
 ```bash
 label-studio init my-project --input-path=my/audios/dir --input-format=audio-dir --label-config=config.xml --allow-serving-local-files
@@ -228,106 +279,8 @@ label-studio init my-project --input-path=my/audios/dir --input-format=audio-dir
 
 > WARNING: the `--allow-serving-local-files` argument is intended for use only with locally-running instances of Label Studio. Avoid using it for remote servers unless you are sure what you're doing.
 
+By default, Label Studio expects JSON-formatted tasks using the [Basic Label Studio JSON format](tasks.html#Basic-Label-Studio-JSON-format). 
 
-## Set up task sampling for your project 
-<!--move to project setup page-->
-
-When you start Label Studio, you can define the way of how your imported tasks are exposed to annotators by setting up task sampling. To enable task sampling, specify one of the sampling option with the `--sampling=<option>` command line argument when you start Label Studio. <!--is there a way to do this from the UI?--> 
-
-The following table lists the available sampling options: 
-
-| Option | Description |
-| --- | --- | 
-| sequential | Default. Tasks are shown to annotators in ascending order by the `id` field. |
-| uniform | Tasks are sampled with equal probabilities. |
-| prediction-score-min | Tasks with the minimum average prediction score are shown to annotators. To use this option, you must also include predictions data in the task data that you import into Label Studio. |
-| prediction-score-max | Tasks with the maximum average prediction score are shown to annotators. To use this option, you must also include predictions data in the task data that you import into Label Studio. |
-
-
-## Import predicted labels into Label Studio 
-
-Import predicted labels, pre-annotated tasks, or pre-labeled tasks into Label Studio. Label Studio automatically displays the pre-labels that you import on the Labeling page for each task. 
-
-To import predicted labels into Label Studio, set up your tasks with the `predictions` JSON key and use the [Basic Label Studio JSON format](tasks.html#Basic-Label-Studio-JSON-format). The Label Studio ML backend also outputs tasks in this format. 
-
-> You must use different IDs for each task elements, completions, predictions and their `result` items. 
-
-### Example of importing predicted labels
-
-For example, import predicted labels for tasks to determine whether an item in an image is an airplane or a car. 
-
-Use the following labeling configuration: 
-```xml
-<View>
-  <Choices name="choice" toName="image" showInLine="true">
-    <Choice value="Boeing" background="blue"/>
-    <Choice value="Airbus" background="green" />
-  </Choices>
-
-  <RectangleLabels name="label" toName="image">
-    <Label value="Airplane" background="green"/>
-    <Label value="Car" background="blue"/>
-  </RectangleLabels>
-
-  <Image name="image" value="$image"/>
-</View>
-```
-
-After you set up an example project, import this task into Label Studio. Save it as a file first, for example, `example_prediction_task.json`.
-
-```json
-{
-  "data": {
-    "image": "http://localhost:8080/static/samples/sample.jpg" 
-  },
-
-  "predictions": [{
-    "result": [
-      {
-        "id": "result1",
-        "type": "rectanglelabels",        
-        "from_name": "label", "to_name": "image",
-        "original_width": 600, "original_height": 403,
-        "image_rotation": 0,
-        "value": {
-          "rotation": 0,          
-          "x": 4.98, "y": 12.82,
-          "width": 32.52, "height": 44.91,
-          "rectanglelabels": ["Airplane"]
-        }
-      },
-      {
-        "id": "result2",
-        "type": "rectanglelabels",        
-        "from_name": "label", "to_name": "image",
-        "original_width": 600, "original_height": 403,
-        "image_rotation": 0,
-        "value": {
-          "rotation": 0,          
-          "x": 75.47, "y": 82.33,
-          "width": 5.74, "height": 7.40,
-          "rectanglelabels": ["Car"]
-        }
-      },
-      {
-        "id": "result3",
-        "type": "choices",
-        "from_name": "choice", "to_name": "image",
-        "value": {
-          "choices": ["Airbus"]
-        }
-      }
-    ]
-  }]
-}
-```
-
-In this example there are 3 results inside of 1 prediction: 
-- `result1` - the first bounding box
-- `result2` - the second bounding box
-- `result3` - choice selection 
- 
-In the Label Studio UI, the imported prediction for this task looks like the following: 
-<center><img src="../images/predictions-loaded.jpg" style="width: 100%; max-width: 700px"></center>
+If you add more files to a local directory after Label Studio starts, you must restart Label Studio to import the tasks in the additional files.
 
 

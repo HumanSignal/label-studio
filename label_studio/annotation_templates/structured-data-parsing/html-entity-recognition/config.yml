@@ -1,0 +1,20 @@
+title: HTML Entity Recognition
+type: community
+group: Structured Data Parsing
+image: /static/templates/html-entity-recognition.png
+details: <h1>Extract entities from hypertext documents</h1>
+config: '
+<View>
+  <HyperTextLabels name="ner" toName="text">
+    <Label value="Title" background="green"/>
+    <Label value="Author" background="blue"/>
+    <Label value="Body" background="yellow"/>
+  </HyperTextLabels>
+
+  <View style="border: 1px solid #CCC;
+               border-radius: 10px;
+               padding: 5px">
+    <HyperText name="text" value="$html"/>
+  </View>
+</View>
+'

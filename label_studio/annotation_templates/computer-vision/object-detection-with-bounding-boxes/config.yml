@@ -1,0 +1,135 @@
+title: Object Detection with Bounding Boxes
+type: community
+group: Computer Vision
+order: 3
+image: /static/templates/object-detection-with-bounding-boxes.png
+details: <h1>Draw a bounding box around the object</h1>
+config: '
+<View>
+  <Image name="image" value="$image"/>
+  <RectangleLabels name="label" toName="image">
+    <Label value="Airplane" background="green"/>
+    <Label value="Car" background="blue"/>
+  </RectangleLabels>
+</View>
+
+<!--{"completions": [{"result":
+[
+    {
+        "original_width": 600,
+        "original_height": 403,
+        "image_rotation": 0,
+        "value": {
+            "x": 4.21455938697318,
+            "y": 11.142857142857142,
+            "width": 32.95019157088122,
+            "height": 46.285714285714285,
+            "rotation": 0,
+            "rectanglelabels": [
+                "Airplane"
+            ]
+        },
+        "id": "PIhJM1YYpH",
+        "from_name": "label",
+        "to_name": "image",
+        "type": "rectanglelabels"
+    },
+    {
+        "original_width": 600,
+        "original_height": 403,
+        "image_rotation": 0,
+        "value": {
+            "x": 30.076628352490417,
+            "y": 44.57142857142857,
+            "width": 32.56704980842912,
+            "height": 46,
+            "rotation": 0,
+            "rectanglelabels": [
+                "Airplane"
+            ]
+        },
+        "id": "lnimBBYxMU",
+        "from_name": "label",
+        "to_name": "image",
+        "type": "rectanglelabels"
+    },
+    {
+        "original_width": 600,
+        "original_height": 403,
+        "image_rotation": 0,
+        "value": {
+            "x": 67.17850287907869,
+            "y": 18,
+            "width": 28.406909788867566,
+            "height": 43.714285714285715,
+            "rotation": 0,
+            "rectanglelabels": [
+                "Airplane"
+            ]
+        },
+        "id": "sBjX3KteGU",
+        "from_name": "label",
+        "to_name": "image",
+        "type": "rectanglelabels"
+    },
+    {
+        "original_width": 600,
+        "original_height": 403,
+        "image_rotation": 0,
+        "value": {
+            "x": 77.01149425287356,
+            "y": 84.57142857142857,
+            "width": 3.4482758620689653,
+            "height": 5.142857142857142,
+            "rotation": 0,
+            "rectanglelabels": [
+                "Car"
+            ]
+        },
+        "id": "TIYiC1Bh67",
+        "from_name": "label",
+        "to_name": "image",
+        "type": "rectanglelabels"
+    },
+    {
+        "original_width": 600,
+        "original_height": 403,
+        "image_rotation": 0,
+        "value": {
+            "x": 85.02879078694816,
+            "y": 83.71428571428572,
+            "width": 2.879078694817658,
+            "height": 4.857142857142856,
+            "rotation": 0,
+            "rectanglelabels": [
+                "Car"
+            ]
+        },
+        "id": "mL8hEBkvJt",
+        "from_name": "label",
+        "to_name": "image",
+        "type": "rectanglelabels"
+    },
+    {
+        "original_width": 600,
+        "original_height": 403,
+        "image_rotation": 0,
+        "value": {
+            "x": 57.08812260536399,
+            "y": 87.42857142857143,
+            "width": 5.363984674329502,
+            "height": 7.142857142857142,
+            "rotation": 0,
+            "rectanglelabels": [
+                "Car"
+            ]
+        },
+        "id": "3gpRfF9MkN",
+        "from_name": "label",
+        "to_name": "image",
+        "type": "rectanglelabels"
+    }
+]
+}]}
+-->
+'

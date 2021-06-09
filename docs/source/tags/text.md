@@ -2,6 +2,8 @@
 title: Text
 type: tags
 order: 306
+meta_title: Text Tags for Text Objects
+meta_description: Label Studio Text Tags customize Label Studio for Text for machine learning and data science projects.
 ---
 
 Text tag shows an Text markup that can be labeled.

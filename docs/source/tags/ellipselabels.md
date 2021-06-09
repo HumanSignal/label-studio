@@ -1,7 +1,9 @@
 ---
 title: EllipseLabels
 type: tags
-order: 406
+order: 405
+meta_title: Ellipse Label Tags for Labeling Images with Elliptical Bounding Boxes
+meta_description: Label Studio Ellipse Label Tags customize Label Studio for labeling images with elliptical bounding boxes for machine learning and data science projects.
 ---
 
 EllipseLabels tag creates labeled ellipses

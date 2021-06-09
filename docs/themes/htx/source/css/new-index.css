@@ -1,6 +1,7 @@
 body , html{
   margin:0px;
   padding:0px;
+  background: #fafaf9;
 }
 body *{
   box-sizing: border-box;
@@ -272,6 +273,49 @@ div.container{
   /* but also don't allow to select any other text as well :( ***/
   pointer-events: none;
 }
+.announcement {
+    position: relative;
+    top: -150px;
+    display: flex;
+    justify-content: center;
+    padding: 0 15px;
+}
+@media (max-width: 991px) {
+  .announcement {
+    margin-bottom: 100px;
+  }
+}
+.announcement__block {
+    background: #FFFFFF;
+    box-shadow: 0px 12px 32px rgb(20 30 41 / 8%);
+    border-radius: 8px;
+    padding: 40px 0;
+    max-width: 1170px;
+    position: relative;
+    overflow: hidden;
+}
+.announcement__block::before, .announcement__block::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100px;
+    background: linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 30%, rgba(255,255,255,0) 100%);
+}
+.announcement__block::before {
+    left: 0;
+}
+.announcement__block::after {
+  right: 0;
+  background: linear-gradient(-90deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 30%, rgba(255,255,255,0) 100%);
+}
+.announcement__block-images {
+  display: flex;
+}
+.announcement__block img {
+  width: 100%;
+}
+
 .content__wrapper .content__elem p.code__content{
   font-family:"JetBrainsBold" , sans-serif;
   color:#fff;
@@ -300,7 +344,7 @@ div.container{
 }
 .outer__date{
   position: relative;
-  top:-150px;
+  top:-50px;
 }
 .date__type .head__date--type>h6{
     color: #000000;
@@ -354,7 +398,7 @@ div.container{
 }
 .date__type{
   padding-bottom:100px;
-  margin-bottom:-150px;
+  margin-bottom:-100px;
   background-color:#FAFAF9;
 }
 .inner__elem--date{

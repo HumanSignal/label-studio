@@ -1,0 +1,32 @@
+<View>
+  <View style="display: grid; grid-template: auto/1fr 1fr; column-gap: 1em">
+    <Header value="Read the text in English" />
+    <Header value="Provide translaton in Spanish" />
+
+  <Text name="english" value="$english" />
+
+  <TextArea name="spanish" toName="english" transcription="true"
+            showSubmitButton="true" maxSubmissions="1" editable="true"
+            required="true"/>
+  </View>
+</View>
+
+<!-- {
+ "data": {
+ "english": "The Sun is the star at the center of the Solar System. It is a nearly perfect sphere of hot plasma,[18][19] heated to incandescence by nuclear fusion reactions in its core, radiating the energy mainly as visible light and infrared radiation. It is by far the most important source of energy for life on Earth. Its diameter is about 1.39 million kilometres (864,000 miles), or 109 times that of Earth. Its mass is about 330,000 times that of Earth, and accounts for about 99.86% of the total mass of the Solar System.[20] Roughly three quarters of the Sun's mass consists of hydrogen (~73%); the rest is mostly helium (~25%), with much smaller quantities of heavier elements, including oxygen, carbon, neon, and iron.[21]"
+},
+"completions": [{"result": [
+    {
+        "value": {
+            "text": [
+                "El Sol es la estrella en el centro del Sistema Solar. Es una esfera casi perfecta de plasma caliente, [18] [19] calentado hasta la incandescencia por reacciones de fusión nuclear en su núcleo, irradiando la energía principalmente como luz visible y radiación infrarroja. Es, con mucho, la fuente de energía más importante para la vida en la Tierra. Su diámetro es de aproximadamente 1,39 millones de kilómetros (864.000 millas), o 109 veces el de la Tierra. Su masa es aproximadamente 330.000 veces la de la Tierra y representa aproximadamente el 99,86% de la masa total del Sistema Solar. [20] Aproximadamente tres cuartas partes de la masa del Sol consisten en hidrógeno (~ 73%); el resto es principalmente helio (~ 25%), con cantidades mucho más pequeñas de elementos más pesados, incluidos oxígeno, carbono, neón y hierro. [21]"
+            ]
+        },
+        "id": "lr57eDkHoa",
+        "from_name": "spanish",
+        "to_name": "english",
+        "type": "textarea"
+    }
+]}]
+}
+-->

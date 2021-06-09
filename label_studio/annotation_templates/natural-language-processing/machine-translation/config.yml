@@ -1,0 +1,19 @@
+title: Machine Translation
+type: community
+group: Natural Language Processing
+image: /static/templates/machine-translation.png
+details: <h1>Translate text from one language to another</h1>
+config: '
+<View>
+  <View style="display: grid; grid-template: auto/1fr 1fr; column-gap: 1em">
+    <Header value="Read the sentence in English" />
+    <Header value="Provide translaton in Spanish" />
+
+  <Text name="english" value="$english" />
+
+  <TextArea name="spanish" toName="english" transcription="true"
+            showSubmitButton="true" maxSubmissions="1" editable="true"
+            required="true"/>
+  </View>
+</View>
+'

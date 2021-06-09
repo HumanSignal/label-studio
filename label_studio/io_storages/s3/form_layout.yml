@@ -1,0 +1,77 @@
+# 1x3 grid
+title_bucket_prefix: &title_bucket_prefix
+  - type: text
+    name: title
+    label: Storage Title
+  - type: text
+    name: bucket
+    label: Bucket Name
+    required: true
+  - type: text
+    name: prefix
+    label: Bucket Prefix
+
+# 2x3 grid
+aws_params: &aws_params
+  - type: text
+    name: region_name
+    label: Region Name
+    placeholder: us-east-1
+  - type: text
+    name: s3_endpoint
+    label: S3 Endpoint
+  - null
+  - type: text
+    name: aws_access_key_id
+    label: Access Key ID
+    autoComplete: "off"
+  - type: password
+    name: aws_secret_access_key
+    label: Secret Access Key
+    autoComplete: "new-password"
+  - type: text
+    name: aws_session_token
+    label: Session Token
+
+
+
+ImportStorage:
+  # Title, Bucket, Prefix
+  - columnCount: 3
+    fields: *title_bucket_prefix
+  # Regex filter
+  - columnCount: 1
+    fields:
+      - type: text
+        name: regex_filter
+        label: File Filter Regex
+        placeholder: '.*csv or .*(jpe?g|png|tiff) or .\w+-\d+.text'
+  # AWS specific params
+  - columnCount: 3
+    fields: *aws_params
+
+  # 2 columns grid
+  - columnCount: 2
+    columns:
+      - width: 371
+        fields:
+          - type: toggle
+            name: use_blob_urls
+            label: Treat every bucket object as a source file
+            description: If unchecked, treat every bucket object as a JSON-formatted task. Optional
+      - fields:
+          - type: toggle
+            name: presign
+            label: Use pre-signed URLs
+            value: true
+          - type: counter
+            name: presign_ttl
+            value: 1
+            min: 1
+            dependency: presign
+
+ExportStorage:
+  - columnCount: 3
+    fields: *title_bucket_prefix
+  - columnCount: 3
+    fields: *aws_params

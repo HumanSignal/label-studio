@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ settings.HOSTNAME }}{% static 'css/uikit.css' %}">
+<link rel="stylesheet" href="{{ settings.HOSTNAME }}{% static 'css/users.css' %}">
+{% endblock %}
+
+{% block divider %}
+{% endblock %}
+
+{% block frontend_settings %}
+  {
+    breadcrumbs: [
+      {
+        title: "Account & Settings"
+      }
+    ],
+  }
+{% endblock %}
+
+{% block content %}
+
+
+<div class="full_content">
+  <div class="account-page">
+    <form action="{% url 'user-detail' pk=user.pk %}" method="patch" class="user__info">
+      <input type="hidden" name="_method" value="patch"/>
+
+      <header>Account info</header>
+      <ul>
+        <li class="field">
+          <label for="">E-mail</label>
+          <input type="text" class="ls-input" value="{{user.email}}" disabled />
+        </li>
+        <li class="field">
+          <label for="">First Name</label>
+          <input type="text" class="ls-input" name="first_name" value="{{user.first_name}}" />
+        </li>
+        <li class="field">
+          <label for="">Last Name</label>
+          <input type="text" class="ls-input" name="last_name" value="{{user.last_name}}" />
+        </li>
+        <li class="field">
+          <label for="">Phone</label>
+          <input type="text" class="ls-input" name="phone" value="{{user.phone}}" />
+          <!-- <span>We'll send you sms with code if you change your number</span>
+          <span class="error">Incorrect phone number!</span> -->
+        </li>
+      </ul>
+      <div class="user-some-actions">
+
+        <div class="user-pic {{ user.avatar|yesno:'can_delete,can_upload' }}">
+          <div class="userpic userpic--big">
+            {% if user.avatar %}
+              <img src="{{user.avatar_url}}" alt="User photo" width="92" />
+            {% endif %}
+
+            {% if user.get_initials %}
+              <span>{{user.get_initials}}</span>
+            {% else %}
+              <span>{{user.username}}</span>
+            {% endif %}
+          </div>
+
+          <button class="ls-button ls-button_look_danger" name="delete-avatar" type="button">
+            Delete
+          </button>
+
+          <input class="file-input" type="file" name="avatar" value="Choose"
+                accept="image/png, image/jpeg, image/jpg"/>
+        </div>
+
+        <!-- <div class="user-activity">
+          <p>Inspect all your actions<br/>performed on the platform</p>
+          <button type="button">Activity Log<img src="" /></button>
+        </div> -->
+      </div>
+      <footer>
+        <p class="secondary">Registered {{ user.date_joined|date:"M j, Y" }}</p>
+        <button class="ls-button ls-button_look_primary" onclick="smart_submit()">Save</button>
+      </footer>
+    </form>
+
+    <!-- Token -->
+    <form action="" class="access_token__info">
+      <header>Access Token</header>
+      <div class="field field--wide">
+        <label for="access_token">Use this token to authenticate with our API:</label>
+        <input id="access_token" class="ls-input" name="access_token" type="text" value="{{token}}" readonly />
+        <p class="actions">
+          <button type="button" class="blinking-status ls-button" data-copy="access_token">Copy</button>
+          <button type="button" class="blinking-status ls-button" name="renew">Renew</button>
+        </p>
+      </div>
+      <!-- Example -->
+      <div class="field field--wide">
+        <label for="example_fetch">Example fetch projects data:</label>
+        <textarea id="example_fetch" class="example_code ls-textarea" type="text" readonly style="height: 92px">
+          {% if settings.HOSTNAME %}
+            curl -X GET {{ settings.HOSTNAME }}/api/projects/ -H 'Authorization: Token {{token}}'
+          {% else %}
+            curl -X GET http://localhost:8080/api/projects/ -H 'Authorization: Token {{token}}'
+          {% endif %}
+        </textarea>
+        <p class="actions">
+          <button type="button" class="blinking-status ls-button" data-copy="example_fetch">Copy</button>
+          <a class="ls-button" href="https://labelstud.io/guide/api.html" target="_blank">Documentation</a>
+        </p>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    (() => {
+      {% if settings.HOSTNAME %}
+      const CURL_TEMPLATE = "curl -X GET {{ settings.HOSTNAME }}/api/projects/ -H 'Authorization: Token'"
+      {% else %}
+      const CURL_TEMPLATE = "curl -X GET http://localhost:8080/api/projects/ -H 'Authorization: Token'"
+      {% endif %}
+
+      document.querySelectorAll('[data-copy]').forEach(button => {
+        button.onclick = e => {
+          const input = document.getElementById(e.target.dataset.copy);
+          input.select();
+          document.execCommand("copy");
+          input.setSelectionRange(0, 0);
+          input.blur();
+          button.classList.add('blink');
+          setTimeout(() => button.classList.remove('blink'))
+        }
+      });
+
+      document.querySelector('[name=renew]').onclick = e => {
+        const button = e.target;
+        const input = document.getElementById("access_token");
+        const example = document.getElementById("example_fetch");
+
+        fetch("{% url 'current-user-reset-token' %}", { method: "POST" })
+          .then(res => res.json())
+          .then(res => {
+            input.value = res.token;
+            example.value = `${CURL_TEMPLATE} ${res.token}`
+            button.classList.add('blink');
+            setTimeout(() => button.classList.remove('blink'))
+          });
+      };
+
+      $('[name=avatar]').on('change', async (e) => {
+        const formData = new FormData;
+
+        formData.append(e.target.name, e.target.files[0]);
+
+        try {
+          const response = await fetch("{% url 'user-avatar' pk=user.pk %}", {
+            method: "post",
+            body: formData
+          });
+
+          if (!response.ok) {
+            handleResponseError(response)
+          } else {
+            updateAvatar(true)
+          }
+        } catch (err) {
+          console.error(err)
+        }
+      });
+
+      $('[name=delete-avatar]').on('click', async (e) => {
+        try {
+          const response = await fetch("{% url 'user-avatar' pk=user.pk %}", {
+            method: "delete"
+          })
+
+          if (!response.ok) {
+            handleResponseError(response)
+          } else {
+            updateAvatar(false)
+          }
+        } catch (err) {
+          console.err(err)
+        }
+      })
+
+      /**
+        * @param {Response} response
+        */
+      const handleResponseError = (response) => {
+        response.json().then(data => {
+          alert(message_from_response(data));
+        })
+      }
+
+      const updateAvatar = async (setAvatar = true) => {
+        if (setAvatar) {
+          const response = await fetch("{% url 'current-user-whoami' %}")
+
+          if (response.ok) {
+            const {avatar} = await response.json()
+            const userpic = document.querySelector('.userpic')
+
+            let userpicImage = userpic.querySelector('img')
+
+            if (!userpicImage) {
+              userpicImage = document.createElement('img')
+              userpic.insertBefore(userpicImage, userpic.firstChild);
+            }
+
+            userpicImage.src = avatar
+
+            const userpicRoot = document.querySelector('.user-pic');
+            userpicRoot.classList.remove('can_delete', 'can_upload')
+            userpicRoot.classList.add('can_delete')
+          }
+        } else {
+          const userpic = document.querySelector('.user-pic')
+          const userpicImage = userpic.querySelector('img')
+          if (userpicImage) userpicImage.remove();
+
+          userpic.classList.remove('can_delete', 'can_upload')
+          userpic.classList.add('can_upload')
+        }
+      }
+    })();
+  </script>
+</div>
+
+{% endblock %}

@@ -1,0 +1,93 @@
+/* Login / Signup pages*/
+
+.login_page h1 {
+  font-size: 24px;
+  font-weight: 400;
+  text-align: center;
+  margin-top: 50px;
+}
+.login_page {
+  font-weight: 400;
+}
+.login_page h2 {
+  font-size: 16px;
+  font-weight: 400;
+  text-align: center;
+  margin-top: 24px;
+  color: #8C8C8C;
+}
+.login_page img {
+  margin: 32px auto 50px;
+  display: block;
+}
+.login_page .toggle, .login_page form {
+  width: 272px;
+  margin: 24px auto;
+}
+.login_page .toggle {
+  padding: 0;
+  list-style: none;
+  display: flex;
+  justify-content: stretch;
+}
+
+.login_page .toggle > * {
+  flex-grow: 1;
+  text-align: center;
+  padding: 10px 0;
+  text-transform: uppercase;
+  font-size: 16px;
+  color: #8C8C8C;
+  border-top: 2px solid transparent;
+}
+.login_page .toggle > *.active {
+  border-color: #1890FF;
+  color: #1890FF;
+}
+.login_page .toggle > *:hover {
+  color: #69C0FF;
+  border-color: #69C0FF;
+}
+.login_page form {
+  display: grid;
+  flex-direction: column;
+  grid-auto-flow: rows;
+  grid-gap: 24px;
+}
+.login_page form > * {
+  position: relative;
+}
+.login_page form p {
+  margin: 0;
+}
+.login_page form .error {
+  color: #F5222D;
+}
+.login_page form input,
+.login_page form button {
+  width: 100%;
+}
+.login_page form input::placeholder {
+  text-transform: uppercase;
+}
+.login_page form button {
+text-transform: uppercase;
+}
+.login_page .field_errors {
+  position: absolute;
+  left: 272px;
+  top: 0;
+  margin: 0;
+  padding: 0;
+  padding-left: 16px;
+  list-style: none;
+  text-align: left;
+  font-size: 14px;
+  line-height: 16px;
+  color: #F5222D;
+  width: 300px;
+  max-width: calc(50vw - 152px); /* 272/2 + 16 right margin */
+}
+.login_page .field_errors li {
+  margin-top: 12px;
+}

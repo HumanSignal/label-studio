@@ -1,0 +1,14 @@
+title: Signal Quality Detection
+type: community
+group: Audio/Speech Processing
+image: /static/templates/signal-quality-detection.png
+details: <h1>Rate signal quality</h1>
+config: '
+<View>
+  <Rating name="rating" toName="audio" maxRating="10" icon="star" size="medium" />
+  <Audio name="audio" value="$audio"/>
+</View>
+
+<!-- { "data": {"audio": "https://app.heartex.ai/static/samples/game.wav"} } -->
+
+'

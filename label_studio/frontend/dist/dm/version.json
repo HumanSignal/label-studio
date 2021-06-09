@@ -1,0 +1,6 @@
+{
+  "message": "Fix range filter not being updated",
+  "commit": "b9b4cf70d8e9db62dc24183eb088e35ebda8da59",
+  "branch": "master",
+  "date": "2021-06-01T20:33:35Z"
+}

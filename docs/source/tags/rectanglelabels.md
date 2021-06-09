@@ -1,7 +1,9 @@
 ---
 title: RectangleLabels
 type: tags
-order: 420
+order: 419
+meta_title:
+meta_description:
 ---
 
 RectangleLabels tag creates labeled rectangles

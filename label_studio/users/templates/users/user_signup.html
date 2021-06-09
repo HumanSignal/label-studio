@@ -1,0 +1,65 @@
+{% extends 'simple.html' %}
+
+{% load i18n %}
+{% load static %}
+{% load filters %}
+
+{% block head %}
+<title>Signup | Label Studio</title>
+<link rel="stylesheet" href="{{ settings.HOSTNAME }}{% static 'css/login.css' %}"/>
+<link href="https://fonts.googleapis.com/css?family=Poppins:400i,500,700,800,900&display=swap" rel="stylesheet">
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-129877673-1"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'UA-129877673-1');
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="login_page">
+  <h1>Welcome to Label Studio {{ settings.VERSION_EDITION }} {{versions.package.short_version}}</h1>
+  <h2>A full-fledged open source solution for data labeling</h2>
+
+  <img src="{{ settings.HOSTNAME }}{% static 'images/opossum_hanging.svg' %}" height="128px" />
+
+  <div class="toggle">
+    <a href="{{ settings.HOSTNAME }}/user/signup" class="active">Sign up</a>
+    <a href="{{ settings.HOSTNAME }}/user/login">Login</a>
+  </div>
+
+  <form id="signup-form" action="{% url 'user-signup' %}?{% if next %}&next={{ next }}{% endif %}{% if token %}&token={{ token }}{% endif %}" method="post">
+    {% csrf_token %}
+    <div>
+      <input type="text" class="ls-input" name="email" id="email" placeholder="Email" value="{{ form.data.email }}">
+      {% if user_form.errors.email %}
+        <ul class="field_errors">
+          {% for error in user_form.errors.email %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+      </div>
+    <div>
+      <input type="password" class="ls-input" name="password" id="password" placeholder="Password">
+      {% if user_form.errors.password %}
+        <ul class="field_errors">
+          {% for error in user_form.errors.password %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+      </div>
+    {% if form.non_field_errors %}
+      {% for error in form.non_field_errors %}
+        <p class="error">
+          {{ error }}
+        </p>
+      {% endfor %}
+    {% endif %}
+    <p><button type="submit" aria-label="Create Account" class="ls-button ls-button_look_primary">Create Account</button></p>
+  </form>
+</div>
+{% endblock %}

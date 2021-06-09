@@ -1,0 +1,24 @@
+.description
+  font-size 16px
+  color #000
+  opacity 0.6
+
+  &_size
+    &_small
+      font-size 12px
+
+    &_medium
+      font-size 16px
+
+    &_large
+      font-size 22px
+
+  &:not(&_noOffset)&_size
+    &_small
+      margin 16px 0
+
+    &_medium
+      margin 32px 0
+
+    &_large
+      margin 40px 0

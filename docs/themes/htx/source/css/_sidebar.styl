@@ -38,10 +38,14 @@
     margin-left: 5px
   .menu-root
     padding-left: 0
+    padding-right: 10px
     font-size: 100%;
     ul
       border-left: 1px solid rgba(255, 140, 0, 0.2);
       font-size: 95%;
+      li:last-child
+        margin-bottom: 20px
+
       ul
         border-left: 1px solid rgba(255, 140, 0, 0.1);
 
@@ -50,6 +54,7 @@
     &.current
       font-weight: 600
       color: $green
+      border-bottom: 1px solid $green
     &.new
       &:after
         content: "NEW"

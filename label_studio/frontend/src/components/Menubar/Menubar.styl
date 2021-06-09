@@ -1,0 +1,51 @@
+.menu-wrapper
+  max-width 100%
+  min-height 100vh
+  min-width 100vw
+  font-family Roboto
+  font-size 16px
+
+.menu-header
+  top 0
+  height var(--header-height)
+  z-index 1000
+  position sticky
+  display flex
+  box-sizing border-box
+  background-color #fff
+  justify-content space-evenly
+  border-bottom 1px solid rgba(0, 0, 0, 0.1)
+
+  &__context
+    flex 1
+    display flex
+    padding 0 20px
+    align-items center
+    justify-content space-between
+
+  &__context-item
+    &_left, &_right
+      height 100%
+      display flex
+      align-items center
+
+  &__trigger
+    display flex
+    padding 0 20px
+    cursor pointer
+    align-items center
+    justify-content space-between
+    min-width 240px
+    max-width 240px
+    box-sizing border-box
+    box-shadow 1px 0 0 0 rgba(0, 0, 0, 0.1)
+
+  &__user
+    display flex
+    min-width 68px
+    max-width 68px
+    cursor pointer
+    position relative
+    align-items center
+    justify-content center
+

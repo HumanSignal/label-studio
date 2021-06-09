@@ -1,0 +1,20 @@
+title: Taxonomy
+type: community
+group: Natural Language Processing
+order: 4
+image: /static/templates/taxonomy.png
+details: <h1>Do multilabel hierarchical classification</h1>
+config: '
+<View>
+  <Text name="text" value="$text"/>
+  <Taxonomy name="taxonomy" toName="text">
+    <Choice value="Archaea" />
+    <Choice value="Bacteria" />
+    <Choice value="Eukarya">
+      <Choice value="Human" />
+      <Choice value="Oppossum" />
+      <Choice value="Extraterrestial" />
+    </Choice>
+  </Taxonomy>
+</View>
+'

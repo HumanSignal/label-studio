@@ -2,11 +2,40 @@
 title: Backend API
 type: guide
 order: 907
+meta_title: API Endpoints
+meta_description: Label Studio Documentation for backend API endpoints and integration with machine learning and data science projects.
 ---
 
-> These API endpoints were introduced in Label Studio version 0.8.1. They are subject to change before version 1.0.0
+## API reference for Label Studio 1.0.0
+
+You can use the Label Studio API to import data for labeling, export annotations, set up machine learning with Label Studio, and sync tasks with cloud storage. 
+
+See the [API reference documentation](/api) for further guidance and interactive examples. 
+
+### Authenticate to the API
+
+1. In the Label Studio UI, click the user icon in the upper right.
+2. Click **Account & Settings**.
+3. Copy the access token. 
+
+In your first API call, specify the access token. 
+```bash
+curl -X <method> <Label Studio URL>/api/<endpoint> -H 'Authorization: Token <token>'
+```
+
+For example, ofor a Label Studio instance hosted at localhost:
+```bash
+curl -X GET https://localhost:8000/api/projects/ -H 'Authorization: Token 123456789abcdefghijklmnop123456789'
+```
+
+
+### API endpoint reference for older Label Studio versions
+
+These API endpoints were introduced in Label Studio version 0.8.1 and are only valid until version 0.9.1. Use the API documentation linked inside Label Studio for guidance when working with version 1.0.0. 
 
 ### Set up project configuration
+
+> These API endpoints were introduced in Label Studio version 0.8.1 and are only valid until version 0.9.1. 
 
 `POST /api/project/config`
 
@@ -33,6 +62,8 @@ If errors occur, the backend returns status 400 and the response body is a JSON 
 
 ### Import data, files and tasks 
 
+> These API endpoints were introduced in Label Studio version 0.8.1 and are only valid until version 0.9.1. 
+
 `POST /api/project/import`
 
 Use the API to import tasks in [Label Studio basic format](tasks.html#Basic-format), which can be useful when you are creating a data stream.
@@ -49,6 +80,8 @@ curl -X POST -F "FileUpload=@test.jpg" http://localhost:8080/api/project/import
 ```
 
 ### Retrieve project
+
+> These API endpoints were introduced in Label Studio version 0.8.1 and are only valid until version 0.9.1. 
 
 `GET /api/project`
 
@@ -69,6 +102,8 @@ Response example:
 ```
 
 ### Retrieve tasks
+
+> These API endpoints were introduced in Label Studio version 0.8.1 and are only valid until version 0.9.1. 
 
 `GET /api/tasks`
 
@@ -105,6 +140,8 @@ Response example:
 
 ### Export annotations
 
+> These API endpoints were introduced in Label Studio version 0.8.1 and are only valid until version 0.9.1. 
+
 `GET /api/project/export`
 
 You can use the API to request a file with all annotations, for example:
@@ -116,8 +153,19 @@ curl http://localhost:8080/api/project/export?format=JSON > exported_results.jso
 The format descriptions are presented [in the export documentation](export.html). 
 The `format` parameters can be found on the Export page in the dropdown (`JSON`, `JSON_MIN`, `COCO`, `VOC`, etc).
 
+
+### Health check for Label Studio
+
+Label Studio has a special endpoint to run health checks: 
+  
+```bash
+GET /api/health
+```
+
 ### Reference
 Label Studio API endpoint reference.
+
+> These API endpoints were introduced in Label Studio version 0.8.1 and are only valid until version 0.9.1. 
 
 
 | URL | Description |

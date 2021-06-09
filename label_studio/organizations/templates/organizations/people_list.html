@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block divider %}
+{% endblock %}
+
+{% block frontend_settings %}
+  {
+    breadcrumbs: [
+      {
+        title: "People"
+      }
+    ],
+  }
+{% endblock %}
+
+{% block content %}
+<div class="full_content">
+  <header>
+    <h1>{{ organization.title }}</h1>
+  </header>
+  {% verbatim %}
+  <div id="users">
+    <div v-if="!users">
+      Loading users...
+    </div>
+    <div v-if="users && !users.length">
+      No users found :(
+    </div>
+
+
+    <table class="users" v-if="users && users.length">
+      <colgroup>
+        <col class="id"/>
+        <col class="id"/>
+        <col class="id"/>
+        <col class="last_activity" />
+      </colgroup>
+      <thead>
+        <tr>
+          <th class="users__column" :class="field.name" v-for="field in fields">{{render_header(field.name)}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="users__item" v-for="user in users" @click="select(user)" :class="{ active: selected === user }">
+          <td class="users__field" :class="field.name" v-for="field in fields">
+            <div v-if="field.type === 'image'" class="userpic userpic--small">
+              <img :src="user.avatar" v-if="user.avatar" alt="" width="64">
+              <span>{{user.initials}}</span>
+            </div>
+            <span v-if="field.type !== 'image'">{{render_field(field.name, user)}}</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+
+    <div v-if="selected" class="user-info">
+      <button class="close" @click="select(null)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M14 2L2 14" stroke="#0077FF" stroke-width="2" stroke-linecap="square"/>
+          <path d="M2 2L14 14" stroke="#0077FF" stroke-width="2" stroke-linecap="square"/>
+        </svg>
+      </button>
+      <div class="user-info__header">
+        <div class="userpic userpic--medium">
+          <img :src="selected.avatar" v-if="selected.avatar" alt="" width="64">
+          <span>{{selected.initials}}</span>
+        </div>
+        <h2>{{selected.name}}</h2>
+        <p class="email">{{selected.email}}</p>
+      </div>
+
+      <!-- Phone -->
+      <div class="user-info__section" v-if="selected.phone">
+        <h3>Phone Number</h3>
+        <a :href="'tel:'+selected.phone">{{selected.phone}}</a>
+      </div>
+
+      <!-- Created projects -->
+      <div class="user-info__section" v-if="selected.created_projects && selected.created_projects.length">
+        <h3>Created Projects</h3>
+        <a :href="'/projects/' + project.id" v-for="project in selected.created_projects">{{project.title}}</a>
+      </div>
+
+      <!-- Contributed to projects -->
+      <div class="user-info__section" v-if="selected.contributed_to_projects && selected.contributed_to_projects.length">
+        <h3>Contributed to</h3>
+        <a :href="'/projects/' + project.id" v-for="project in selected.contributed_to_projects">{{project.title}}</a>
+      </div>
+
+      <p class="last-active" v-if="selected.last_activity">
+        Last activity on {{ print_datetime(selected.last_activity) }}
+      </p>
+    </div>
+
+
+  </div>
+  <script>
+    var app; // vue app
+
+    (function() {
+      console.log("Execute inline script");
+
+      const API = {
+        users: {
+          getAll() {
+            return fetch("/api/organizations/1/memberships")
+              .then(data => data.json())
+              .then(data => data.map(u => Object.assign(u.user, {
+                member_id: u.id,
+                name: (u.user.first_name + " " + u.user.last_name).trim(),
+              })))
+          },
+          getOne(id) {
+            return fetch("/api/users/" + id)
+              .then(data => data.json())
+          },
+        }
+      };
+
+      const MINUTE = 60 * 1000;
+      const HOUR = 60 * MINUTE;
+      const DAY = 24 * HOUR;
+      const INTERVALS = [
+        [13 * 30 * DAY, 'more than year ago'],
+        [10 * 30 * DAY, 'a year ago'],
+        [50 * DAY, 'months ago'],
+        [25 * DAY, 'a month ago'],
+        [8 * DAY, 'weeks ago'],
+        [4 * DAY, 'a week ago'],
+        [2 * DAY, 'three days ago'],
+        [20 * HOUR, 'a day ago'],
+        [6 * HOUR, 'today'],
+        [2 * HOUR, 'hours ago'],
+        [40 * MINUTE, 'a hour ago'],
+        [2 * MINUTE, 'this hour'],
+        [0, 'just now'],
+      ];
+
+      app = new Vue({
+        el: '#users',
+        data: () => ({
+          selected: null,
+          fields: [
+            { name: 'avatar', type: 'image' },
+            { name: 'email', title: 'Email' },
+            { name: 'name', title: 'Name' },
+            { name: 'last_activity', title: 'Last Activity' },
+          ],
+          projects: null,
+          users: null,
+        }),
+        methods: {
+          select(user) {
+            this.selected = this.selected === user ? null : user;
+            this.projects = user && user.projects;
+            if (user && !user.projects) {
+              this.loadUser(user.id)
+            }
+          },
+          //// api
+          loadUsers() {
+            return API.users.getAll()
+              .then((users) => {
+                this.users = users || [];
+                if (this.users.length > 0) {
+                  this.select(this.users[0]);
+                }
+              })
+              .catch(console.error) // @todo deal with errors
+          },
+          loadUser(id) {
+            return API.users.getOne(id)
+              .then(data => {
+                const user = this.users.find(u => u.id === id);
+                if (!user) return;
+                user.projects = data.projects || [];
+                this.projects = data.projects || []
+              })
+              .catch(console.error) // @todo deal with errors
+          },
+          //// columns
+          render_header(field_id) {
+            const method = "field_" + field_id + "_header";
+            if (this[method]) {
+              return this[method]()
+            } else {
+              const field = this.fields.find(f => f.name === field_id);
+              return field ? field.title : ''
+            }
+          },
+          render_field(field, user) {
+            const method = "field_" + field + "_render";
+            if (this[method]) {
+              return this[method](user)
+            } else {
+              return user[field]
+            }
+          },
+          field_last_activity_render(user) {
+            const diff = new Date() - new Date(user.last_activity);
+            const interval = INTERVALS.find(i => diff > i[0]);
+            return interval ? interval[1] : 'just now';
+          },
+          field_name_render(user) {
+            return user.first_name + " " + user.last_name
+          },
+          field_userpic_render(user) {
+            let content = "<div class=\"userpic\">";
+            if (user.avatar) {
+              content += '<img src="' + user.avatar + '" width="28" alt="' + user.name + '" />'
+            } else {
+              // get only the first letters
+              content += "<span>" + user.initials + "</span>"
+            }
+            content += "</div>";
+            return content
+          },
+          print_datetime(dt) {
+            let datetime = luxon.DateTime.fromISO(dt);
+            return datetime.toLocaleString(luxon.DateTime.DATETIME_MED_WITH_SECONDS);
+          }
+        },
+        mounted: function () {
+          this.loadUsers();
+        },
+      })
+    })();
+  </script>
+  {% endverbatim %}
+</div>
+{% endblock %}

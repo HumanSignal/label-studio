@@ -1,0 +1,64 @@
+.version-notifier
+  display flex
+  padding 10px 0
+  color #0077FF
+  margin 8px 0
+  background rgba(0, 119, 255, 0.08)
+  border-radius: 5px
+
+  a
+    display flex
+
+  a:visited
+    color: #0077FF
+
+  &__icon
+    width 46px
+    padding-top 1px
+
+    img
+      width 20px
+      height 20px
+      margin 0 auto
+      display block
+
+  &__content
+    flex 1
+    padding-right 12px
+
+  &__title
+    font-weight 500
+    line-height 22px
+    font-size 16px
+    display flex
+    justify-content space-between
+    align-items flex-end
+
+  &__title::after
+    opacity 0.5
+    line-height 22px
+    font-size 14px
+    content attr(data-date)
+
+  &__description
+    padding-top 8px
+    opacity 0.6
+    font-size 14px
+    line-height 18px
+
+.current-version
+  display flex
+  cursor pointer
+  padding 0 13px
+  margin-top 5px
+  margin-left 5px
+  border-radius 3px
+  box-sizing border-box
+  color #999
+  font-size 12px
+  font-family Roboto
+  white-space nowrap
+  text-decoration none
+
+  &:hover
+    color: #222

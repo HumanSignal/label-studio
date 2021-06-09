@@ -6,7 +6,7 @@ div.container{
 
 header{
   font-family:"Inter",sans-serif;
-  background: #FFFFFF;
+  background: #2b2927;
   position: relative;
   z-index: 21;
   box-shadow: 0px 0px 0px 1px rgba(0, 0, 0, 0.08);
@@ -16,7 +16,7 @@ header{
   align-items:center;
   justify-content:center;
   position: relative;
-  min-height:70px;
+  min-height:50px;
 }
 .outer__header>.left__header{
   position: absolute;
@@ -40,8 +40,8 @@ header{
   margin-right:5px;
 }
 .outer__header .center__header ul li.active__menu a{
-  background: rgba(0, 0, 0, 0.05);
-  color:#000;
+  background: #4a4846;
+  color:white;
   border-radius: 6px;
 }
 .outer__header .center__header ul li a{
@@ -49,13 +49,13 @@ header{
   text-decoration:none;
   font-size:14px;
   line-height:28px;
-  color:rgba(0,0,0,.5);
+  color:white;
   transition:.3s ease all;
   border-radius: 6px;
 }
 .outer__header .center__header ul li a:hover{
-  background: rgba(0, 0, 0, 0.05);
-  color:#000;
+  background: #4a4846;
+  color:white;
 }
 .left__header>a{
   display: flex;
@@ -77,7 +77,7 @@ header .join__slack {
   padding: 8px 10px;
   display: flex;
   text-decoration: none;
-  color: #5c1751;
+  color: white;
 }
 header .join__slack img {
   max-height: 16px;
@@ -89,6 +89,7 @@ header .join__slack:active {
 header .join__slack:hover {
   border-color: #ddd;
   color: #5c1751cc;
+  background: white;
 }
 
 @media (max-width: 991px){
