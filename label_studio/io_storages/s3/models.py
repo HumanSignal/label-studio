@@ -106,7 +106,7 @@ class S3ImportStorage(S3StorageMixin, ImportStorage):
     def iterkeys(self):
         client, bucket = self.get_client_and_bucket()
         if self.prefix:
-            bucket_iter = bucket.objects.filter(Prefix=self.prefix.rstrip('/') + '/').all()
+            bucket_iter = bucket.objects.filter(Prefix=self.prefix.rstrip('/') + '/').all() 
         else:
             bucket_iter = bucket.objects.all()
         regex = re.compile(str(self.regex_filter)) if self.regex_filter else None
