@@ -1,5 +1,6 @@
 ---
-title: ️<img src="/images/LSE/en.svg" width=67 height=18 alt="Enterprise" style="vertical-align:middle"/> Install Label Studio Enterprise on AWS Private Cloud
+title: Install Label Studio Enterprise on AWS Private Cloud
+badge: <i class='ent'></i>
 type: guide
 order: 202
 meta_title: Install Label Studio Enterprise on AWS Private Cloud

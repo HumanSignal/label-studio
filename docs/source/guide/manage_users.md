@@ -1,5 +1,6 @@
 ---
-title: <img src="/images/LSE/en.svg" alt="Enterprise" width=67 height=18 style="vertical-align:middle"/> Manage access to Label Studio 
+title: Manage access to Label Studio
+badge: <i class='ent'></i>
 type: guide
 order: 251
 meta_title: Manage Role-Based Access Control in Label Studio

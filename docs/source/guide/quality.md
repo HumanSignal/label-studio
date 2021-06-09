@@ -1,5 +1,6 @@
 ---
-title: <img src="/images/LSE/en.svg" width=67 height=18 alt="Enterprise" style="vertical-align:middle"/> Review annotations in Label Studio
+title: Review annotations in Label Studio
+badge: <i class='ent'></i>
 type: guide
 order: 410
 meta_title: Review annotation quality in Label Studio

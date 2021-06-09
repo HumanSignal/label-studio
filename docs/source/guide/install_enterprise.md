@@ -1,5 +1,6 @@
 ---
-title: <img src="/images/LSE/en.svg" width=67 height=18 alt="Enterprise" style="vertical-align:middle"/> Install Label Studio Enterprise on-premises using Docker 
+title: Install Label Studio Enterprise on-premises using Docker
+badge: <i class='ent'/></i>
 type: guide
 order: 201
 meta_title: Install Label Studio Enterprise on-premises using Docker

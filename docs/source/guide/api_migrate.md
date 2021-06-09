@@ -1,5 +1,6 @@
 ---
-title: <img src="/images/LSE/en.svg" width=67 height=18 alt="Enterprise" style="vertical-align:middle"/> Update scripts and API calls
+title: Update scripts and API calls
+badge: <i class='ent'></i>
 type: guide
 order: 910
 meta_title: Update scripts and API calls to new version

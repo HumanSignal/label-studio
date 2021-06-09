@@ -29,7 +29,7 @@
     <% } %>
   <% } %>
   <% if (page.title.trim()) { %>
-    <h1><%- page.title %><%- page.type === 'examples' ? ' Example' : '' %></h1>
+    <h1><%- page.title %><%- page.badge %><%- page.type === 'examples' ? ' Example' : '' %></h1>
   <% } %>
   <%- page.content %>
   <% if (page.type === 'guide') { %>

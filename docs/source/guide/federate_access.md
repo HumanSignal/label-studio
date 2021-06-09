@@ -1,5 +1,6 @@
 ---
-title: <img src="/images/LSE/en.svg" width=67 height=18 alt="Enterprise" style="vertical-align:middle"/> Federate access to data using SAML
+title: Federate access to data using SAML
+badge: <i class='ent'></i>
 type: guide
 order: 222
 meta_title: Federate data access in Label Studio with SAML

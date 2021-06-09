@@ -1,5 +1,7 @@
 ---
-title: <img src="/images/LSE/en.svg" width=67 height=18 alt="Enterprise" style="vertical-align:middle"/> Annotation statistics
+title: Annotation statistics
+short: Annotation statistics
+badge: <i class='ent'></i>
 type: guide
 order: 413
 meta_title: Data Labeling Statistics
