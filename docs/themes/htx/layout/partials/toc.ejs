@@ -61,8 +61,7 @@
       <% } %>
     <li>
       <a href="<%- url_for(p.path) %>" class="sidebar-link<%- page.title === p.title ? ' current' : '' %><%- p.is_new ? ' new' : '' %>">
-        <%- removeLabelStudioMention(p.title) %>
-      </a>
+        <%- p.short ? p.short: p.title %></a>&nbsp;<%- (p.badge) %>
     </li>
     <% }) %>
 </ul>

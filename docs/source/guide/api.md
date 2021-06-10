@@ -3,7 +3,7 @@ title: Backend API
 type: guide
 order: 907
 meta_title: API Endpoints
-meta_description: Label Studio Documentation for backend API endpoints and integration with machine learning and data science projects.
+meta_description: API documentation for authenticating, listing data science projects, importing predictions and raw data and exporting annotated data, and user management in Label Studio.
 ---
 
 ## API reference for Label Studio 1.0.0

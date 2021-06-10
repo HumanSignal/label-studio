@@ -1,9 +1,10 @@
 ---
-title: ️<img src="/images/LSE/en.svg" width=67 height=18 alt="Enterprise" style="vertical-align:middle"/> Install Label Studio Enterprise on AWS Private Cloud
+title: Install Label Studio Enterprise on AWS Private Cloud
+badge: <i class='ent'></i>
 type: guide
 order: 202
-meta_title: Install and Upgrade Enterprise
-meta_description: Label Studio Documentation for installing and upgrading Label Studio Enterprise with Docker or on AWS to use for your machine learning and data science projects. 
+meta_title: Install Label Studio Enterprise on AWS Private Cloud
+meta_description: Install and upgrade Label Studio Enterprise on AWS VPC to create machine learning and data science projects. 
 ---
 
 > Beta documentation: Label Studio Enterprise v2.0.0 is currently in Beta. As a result, this documentation might not reflect the current functionality of the product.
