@@ -81,6 +81,10 @@ Export audio transcription labels for automatic speech recognition as the JSON m
 {“audio_filepath”: “/path/to/audio.wav”, “text”: “the transcription”, “offset”: 301.75, “duration”: 0.82, “utt”: “utterance_id”, “ctm_utt”: “en_4156”, “side”: “A”}
 ```
 
+### YOLO
+
+Export object detection annotations in the YOLOv3 format.  
+
 
 ## Label Studio JSON format of annotated tasks 
 
