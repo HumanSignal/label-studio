@@ -1,5 +1,6 @@
 ---
 title: Get started with Label Studio
+short: Get started
 type: guide
 order: 100
 meta_title: Get Started with Label Studio

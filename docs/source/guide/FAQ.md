@@ -1,5 +1,6 @@
 ---
-title: Troubleshooting
+title: Troubleshoot Label Studio
+short: Troubleshooting
 type: guide
 order: 204
 meta_title: Troubleshoot Label Studio

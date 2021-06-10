@@ -1,5 +1,6 @@
 ---
 title: Manage access to Label Studio
+short: Manage access
 badge: <i class='ent'></i>
 type: guide
 order: 251

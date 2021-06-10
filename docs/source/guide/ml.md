@@ -1,5 +1,6 @@
 ---
 title: Set up machine learning
+short: Machine learning setup
 type: guide
 order: 606
 meta_title: Set up machine learning with Label Studio

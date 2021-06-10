@@ -1,5 +1,6 @@
 ---
 title: Review annotations in Label Studio
+short: Review annotations
 badge: <i class='ent'></i>
 type: guide
 order: 410

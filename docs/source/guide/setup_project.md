@@ -1,5 +1,6 @@
 ---
-title: Project Setup
+title: Set up your labeling project
+short: Project setup
 type: guide
 order: 400
 meta_title: Set up your labeling project

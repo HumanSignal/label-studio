@@ -1,5 +1,6 @@
 ---
 title: Set up authentication for Label Studio
+short: Set up authentication
 badge: <i class='ent'></i>
 type: guide
 order: 221
