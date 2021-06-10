@@ -1,16 +1,3 @@
-<%
- removeLabelStudioMention = function(text) {
-  return text
-    .replace(/to Label Studio$/g, '')
-    .replace(/in Label Studio$/g, '')
-    .replace(/with Label Studio$/g, '')
-    .replace(/into Label Studio$/g, '')
-    .replace(/by Label Studio$/g, '')
-    .replace(/for Label Studio$/g, '')
-    .replace(/from Label Studio$/g, '')
-    .replace(/Label Studio$/g, '')
-  }
-%>
 
 <% if (page.type) { %>
   <%- partial('partials/sidebar', { type: page.type === 'menu' ? 'guide' : page.type, index: page.index }) %>
@@ -42,7 +29,7 @@
     <% } %>
   <% } %>
   <% if (page.title.trim()) { %>
-    <h1><%- page.title %><%- page.type === 'examples' ? ' Example' : '' %></h1>
+    <h1><%- page.title %><%- page.badge %><%- page.type === 'examples' ? ' Example' : '' %></h1>
   <% } %>
   <%- page.content %>
   <% if (page.type === 'guide') { %>

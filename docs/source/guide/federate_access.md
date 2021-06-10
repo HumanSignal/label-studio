@@ -1,9 +1,10 @@
 ---
-title: <img src="/images/LSE/en.svg" width=67 height=18 alt="Enterprise" style="vertical-align:middle"/> Federate access to data in Label Studio using SAML roles
+title: Federate access to data using SAML
+badge: <i class='ent'></i>
 type: guide
 order: 222
 meta_title: Federate data access in Label Studio with SAML
-meta_description: Label Studio Documentation for federating access to cloud storage using SAML roles to secure your machine learning and data science projects. 
+meta_description: Federate access to cloud storage using SAML roles to secure your data labeling projects in Label Studio. 
 ---
 
 > Beta documentation: Label Studio Enterprise v2.0.0 is currently in Beta. As a result, this documentation might not reflect the current functionality of the product.
