@@ -3,7 +3,7 @@
 from django.db.models import signals
 
 from tasks.models import Annotation, Prediction, update_is_labeled_after_removing_annotation
-from core.utils.common import temporary_disconnect_signal
+from core.utils.common import temporary_disconnect_signal, temporary_disconnect_all_signals
 
 from data_manager.functions import evaluate_predictions
 
@@ -25,9 +25,24 @@ def delete_tasks(project, queryset, **kwargs):
     :param queryset: filtered tasks db queryset
     """
     count = queryset.count()
-    # this signal re-save the task back
-    with temporary_disconnect_signal(signals.post_delete, update_is_labeled_after_removing_annotation, Annotation):
-        queryset.delete()
+
+    # delete all project tasks
+    if count == project.tasks.count():
+        with temporary_disconnect_all_signals():
+            queryset.delete()
+
+        project.summary.reset()
+        project.update_tasks_states(
+            maximum_annotations_changed=False,
+            overlap_cohort_percentage_changed=False,
+            tasks_number_changed=True
+        )
+
+    # delete only specific tasks
+    else:
+        # this signal re-save the task back
+        with temporary_disconnect_signal(signals.post_delete, update_is_labeled_after_removing_annotation, Annotation):
+            queryset.delete()
 
     # remove all tabs if there are no tasks in project
     reload = False
