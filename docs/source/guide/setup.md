@@ -2,8 +2,8 @@
 title: Set up your labeling interface
 type: guide
 order: 401
-meta_title: Labeling Config Setup
-meta_description: Label Studio Documentation for customizing and configuring data labeling and annotation projects in Label Studio for machine learning and data science projects.
+meta_title: Set up labeling config interface
+meta_description: Customize and configure your data labeling and annotation interface with templates or custom tag combinations in the Label Studio UI for your machine learning and data science projects.
 ---
 
 All labeling activities in Label Studio occur in the context of a project. After you [create a project](setup_project.html#Create-a-project) and [import data](tasks.html), set up the labeling interface and labeling configuration for your project. This setup process is essential to your labeling project. 

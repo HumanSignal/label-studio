@@ -2,8 +2,8 @@
 title: Label Studio features
 type: guide
 order: 108
-meta_title: 
-meta_description: 
+meta_title: Label Studio Community and Enterprise Features
+meta_description: Compare the features of Label Studio Community Edition with the paid Label Studio Enterprise Edition so that you can choose the best option for your data labeling and annotation projects. 
 ---
 
 > Beta documentation: Label Studio Enterprise v2.0.0 is currently in Beta. As a result, this documentation might not reflect the current functionality of the product.

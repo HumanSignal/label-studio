@@ -1,5 +1,7 @@
 ---
-title: <img src="/images/LSE/en.svg" width=67 height=18 alt="Enterprise" style="vertical-align:middle"/> Update scripts and API calls
+title: Update scripts and API calls in Label Studio Enterprise
+short: Update scripts and API calls
+badge: <i class='ent'></i>
 type: guide
 order: 910
 meta_title: Update scripts and API calls to new version
@@ -10,7 +12,7 @@ meta_description: Label Studio Enterprise documentation about updates and change
   
 > Throughout the new version, `completions` have been renamed `annotations`. In addition, "Teams" are now called "Workspaces", to better reflect the fact that they are a way to organize projects, rather than people. 
 
-> Please also note that in case you rely on existing object IDs (like project_id, task_id, annotation_id, etc.), there were more likely changed due to database migration.
+> If you rely on existing object IDs (like project_id, task_id, annotation_id, etc.), these were likely changed due to database migration.
 
 
 ## Import data

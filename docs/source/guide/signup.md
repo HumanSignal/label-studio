@@ -1,9 +1,9 @@
 ---
-title: Set up user accounts for Label Studio
+title: Set up user accounts
 type: guide
 order: 250
 meta_title: User Accounts
-meta_description: Label Studio Documentation for signing up and inviting users to your data labeling, machine learning, and data science projects.
+meta_description: Sign up for Label Studio and invite users to collaborate on your data labeling, machine learning, and data science projects.
 ---
 
 Sign up and create an account for Label Studio to start labeling data and setting up projects. 

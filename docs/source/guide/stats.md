@@ -1,9 +1,11 @@
 ---
-title: <img src="/images/LSE/en.svg" width=67 height=18 alt="Enterprise" style="vertical-align:middle"/> Annotation statistics
+title: Annotation statistics
+short: Annotation statistics
+badge: <i class='ent'></i>
 type: guide
 order: 413
 meta_title: Data Labeling Statistics
-meta_description: Label Studio Enterprise Documentation about task agreement and annotator consensus for data labeling and machine learning projects.
+meta_description: Label Studio Enterprise documentation about task agreement, annotator consensus, and other data annotation statistics for data labeling and machine learning projects.
 ---
 
 > Beta documentation: Label Studio Enterprise v2.0.0 is currently in Beta. As a result, this documentation might not reflect the current functionality of the product.

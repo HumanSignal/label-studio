@@ -356,3 +356,36 @@
       background-color: rgb(255,255,255)
       border: 2px solid #e8e8e8
       border-left: 4px solid $red
+
+i.ent  {
+  display inline
+  margin-left: 0.25em
+  background-image: url("/images/LSE/en.svg")
+  background-size: contain
+  background-position: center
+  background-repeat: no-repeat
+  padding-left: 67px
+  padding-top: 7px
+  vertical-align: middle
+  margin-right: 0.25em
+  width: 67px
+  height 18px
+
+}
+
+li i.ent  {
+  margin-left: 0.25em
+  background-image: url("/images/LSE/en.svg")
+  background-size: contain
+  background-position: center
+  background-repeat: no-repeat
+  padding-left: 60px
+  display inline
+  width: 60px;
+  height 15px;
+  padding-top: 1px
+  vertical-align: middle
+}
+li i.ent::after {
+  content "|\00a0\00a0"
+}
