@@ -320,12 +320,6 @@ TASK_LOCK_DEFAULT_TTL = int(get_env('TASK_LOCK_DEFAULT_TTL', 3600))
 # Email backend
 FROM_EMAIL = get_env('FROM_EMAIL', 'Label Studio <hello@labelstud.io>')
 EMAIL_BACKEND = get_env('EMAIL_BACKEND', 'django.core.mail.backends.dummy.EmailBackend')
-# more about SMTP backend: https://docs.djangoproject.com/en/3.2/topics/email/#smtp-backend
-EMAIL_HOST, EMAIL_PORT = get_env('EMAIL_HOST', ''), get_env('EMAIL_PORT', '')
-EMAIL_HOST_USER, EMAIL_HOST_PASSWORD = get_env('EMAIL_HOST_USER', ''), get_env('EMAIL_HOST_PASSWORD', '')
-EMAIL_USE_TLS, EMAIL_USE_SSL = get_env('EMAIL_USE_TLS', ''), get_env('EMAIL_USE_SSL', '')
-EMAIL_SSL_KEYFILE, EMAIL_SSL_CERTFILE = get_env('EMAIL_SSL_KEYFILE', ''), get_env('EMAIL_SSL_CERTFILE', '')
-EMAIL_TIMEOUT = get_env('EMAIL_TIMEOUT', '')
 
 ENABLE_LOCAL_FILES_STORAGE = get_bool_env('ENABLE_LOCAL_FILES_STORAGE', default=True)
 LOCAL_FILES_SERVING_ENABLED = get_bool_env('LOCAL_FILES_SERVING_ENABLED', default=False)
