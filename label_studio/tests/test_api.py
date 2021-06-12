@@ -200,10 +200,10 @@ def test_get_task(client_and_token, configured_project, response, status_code):
 @pytest.mark.parametrize('payload, response, status_code', [
     # status OK
     (
-        {"annotations": [], 'predictions': [],
+        {"annotations": [{'result': [{'value': ['test']}]}], 'predictions': [],
          "data": {"text": "TEST1", "meta_info": "TEST2"}, "meta": {},
          "created_at": "", "updated_at": "", "is_labeled": False, "project": 0, 'file_upload': None},
-        {"id": 0, "annotations": [], 'predictions': [],
+        {"id": 0, "annotations": [{'result': [{'value': ['test']}]}], 'predictions': [],
          "data": {"text": "TEST1", "meta_info": "TEST2"}, "meta": {},
          "created_at": "", "updated_at": "", "is_labeled": False, "project": 0,
          'overlap': 1, 'file_upload': None},

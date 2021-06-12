@@ -33,7 +33,26 @@ class PredictionSerializer(ModelSerializer):
 
 
 class ListAnnotationSerializer(serializers.ListSerializer):
-    pass
+    def update(self, instance, validated_data):
+        # Maps for id->instance and id->data item.
+        instances_mapping = {book.id: book for book in instance} if instance else {}
+        data_mapping = {item['id']: item for item in validated_data}
+
+        # Perform creations and updates.
+        ret = []
+        for id, data in data_mapping.items():
+            obj = instances_mapping.get(id, None)
+            if obj is None:
+                ret.append(self.child.create(data))
+            else:
+                ret.append(self.child.update(obj, data))
+
+        # Perform deletions.
+        for id, obj in instances_mapping.items():
+            if id not in data_mapping:
+                obj.delete()
+
+        return ret
 
 
 class AnnotationSerializer(DynamicFieldsMixin, ModelSerializer):
@@ -102,10 +121,29 @@ class TaskSimpleSerializer(ModelSerializer):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['annotations'] = AnnotationSerializer(many=True, default=[], context=self.context, read_only=True)
-        self.fields['predictions'] = PredictionSerializer(many=True, default=[], context=self.context, read_only=True)
+        self.fields['annotations'] = AnnotationSerializer(many=True, default=[], context=self.context)
+        self.fields['predictions'] = PredictionSerializer(many=True, default=[], context=self.context)
+
+    def update(self, instance, validated_data):
+        annotations = validated_data.pop('annotations', [])
+        predictions = validated_data.pop('predictions', [])
+        instance = super().update(instance, validated_data)
+
+        for annotation in annotations:
+            annotation['task'] = instance
+
+        annotations_ser = AnnotationSerializer(instance.annotations, data=annotations, many=True)
+        annotations_ser.is_valid()
+        annotations_ser.save()
+        
+        return instance
+
+    def create(self, validated_data):
+        instance = super().create(validated_data)
+        return instance
 
     class Meta:
+        depth = 1
         model = Task
         fields = '__all__'
 

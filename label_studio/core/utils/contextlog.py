@@ -24,6 +24,8 @@ class ContextLog(object):
 
     def __init__(self):
         self.collect_analytics = get_bool_env('collect_analytics', True)
+        if not self.collect_analytics:
+            logger.warning('collect_analytics is off')
         self.version = get_app_version()
         self.server_id = self._get_server_id()
 
