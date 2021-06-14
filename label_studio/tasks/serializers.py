@@ -32,10 +32,10 @@ class PredictionSerializer(ModelSerializer):
         fields = '__all__'
 
 
-class ListAnnotationSerializer(serializers.ListSerializer):
+class AnnotationListSerializer(serializers.ListSerializer):
     def update(self, instance, validated_data):
         # Maps for id->instance and id->data item.
-        instances_mapping = {book.id: book for book in instance} if instance else {}
+        instances_mapping = {book.id: book for book in instance} if instance.exists() else {}
         data_mapping = {item['id']: item for item in validated_data}
 
         # Perform creations and updates.
@@ -65,7 +65,7 @@ class AnnotationSerializer(DynamicFieldsMixin, ModelSerializer):
     @classmethod
     def many_init(cls, *args, **kwargs):
         kwargs['child'] = cls(*args, **kwargs)
-        return ListAnnotationSerializer(*args, **kwargs)
+        return AnnotationListSerializer(*args, **kwargs)
 
     def get_fields(self):
         fields = super(AnnotationSerializer, self).get_fields()
@@ -114,6 +114,7 @@ class AnnotationSerializer(DynamicFieldsMixin, ModelSerializer):
 
     class Meta:
         model = Annotation
+        list_serializer_class = AnnotationListSerializer
         exclude = ['prediction', 'result_count']
 
 
