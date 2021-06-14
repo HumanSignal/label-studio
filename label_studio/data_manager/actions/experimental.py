@@ -114,7 +114,7 @@ actions = [
         'entry_point': predictions_to_annotations,
         'title': 'Predictions => annotations',
         'order': 1,
-        'experimental': True,
+        'experimental': False,
         'dialog': {
             'text': 'This action will create a new annotation from the last task prediction for each selected task.',
             'type': 'confirm'
