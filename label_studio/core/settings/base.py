@@ -12,8 +12,8 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 import os
 import re
 
-from core.utils.io import get_data_dir
-from core.utils.params import get_bool_env, get_env
+from label_studio.core.utils.io import get_data_dir
+from label_studio.core.utils.params import get_bool_env, get_env
 
 # Hostname is used for proper path generation to the resources, pages, etc
 HOSTNAME = get_env('HOST', '')
