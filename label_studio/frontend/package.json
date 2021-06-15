@@ -9,7 +9,7 @@
     "build": "webpack",
     "build:production": "NODE_ENV=production webpack",
     "download:all": "npm run download:editor && npm run download:dm && npm run build",
-    "download:editor": "npm run download -- lsf",
+    "download:editor": "npm run download -- lsf ocr-improvement",
     "download:dm": "npm run download -- dm",
     "download": "NO_BUILD=true node get-build.js"
   },
