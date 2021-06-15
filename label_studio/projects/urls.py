@@ -23,9 +23,6 @@ _api_urlpatterns = [
     path('', api.ProjectListAPI.as_view(), name='project-list'),
     path('<int:pk>/', api.ProjectAPI.as_view(), name='project-detail'),
 
-    # Duplicate project
-    path('<int:pk>/duplicate/', api.ProjectDuplicateAPI.as_view(), name='project-duplicate'),
-
     # Get next task
     path('<int:pk>/next/', api.ProjectNextTaskAPI.as_view(), name='project-next'),
 

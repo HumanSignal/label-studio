@@ -12,8 +12,8 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 import os
 import re
 
-from core.utils.io import get_data_dir
-from core.utils.params import get_bool_env, get_env
+from label_studio.core.utils.io import get_data_dir
+from label_studio.core.utils.params import get_bool_env, get_env
 
 # Hostname is used for proper path generation to the resources, pages, etc
 HOSTNAME = get_env('HOST', '')
@@ -160,7 +160,6 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'core.middleware.CommonMiddlewareAppendSlashWithoutRedirect',  # instead of 'CommonMiddleware'
     'core.middleware.CommonMiddleware',
-    'core.middleware.DRFResponseFormatter',
     'django_user_agents.middleware.UserAgentMiddleware',
     'core.middleware.SetSessionUIDMiddleware',
     'core.middleware.ContextLogMiddleware',
@@ -174,7 +173,9 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated'
+        'core.api_permissions.HasObjectPermission',
+        'rest_framework.permissions.IsAuthenticated',
+
     ],
     'EXCEPTION_HANDLER': 'core.utils.common.custom_exception_handler',
     'DEFAULT_RENDERER_CLASSES': (
@@ -319,6 +320,7 @@ TASK_LOCK_DEFAULT_TTL = int(get_env('TASK_LOCK_DEFAULT_TTL', 3600))
 FROM_EMAIL = 'Label Studio <hello@labelstud.io>'
 EMAIL_BACKEND = 'django.core.mail.backends.dummy.EmailBackend'
 
+ENABLE_LOCAL_FILES_STORAGE = get_bool_env('ENABLE_LOCAL_FILES_STORAGE', default=True)
 LOCAL_FILES_SERVING_ENABLED = get_bool_env('LOCAL_FILES_SERVING_ENABLED', default=False)
 
 """ React Libraries: do not forget to change this dir in /etc/nginx/nginx.conf """
@@ -342,17 +344,6 @@ VERSIONS = {}
 VERSION_EDITION = 'Community Edition'
 EXPERIMENTAL_FEATURES = get_bool_env('EXPERIMENTAL_FEATURES', default=False)
 
-
-def project_delete(project):
-    project.delete()
-
-
-def user_auth(user_model, email, password):
-    return None
-
-
-PROJECT_DELETE = project_delete
-USER_AUTH = user_auth
 CREATE_ORGANIZATION = 'organizations.functions.create_organization'
 GET_OBJECT_WITH_CHECK_AND_LOG = 'core.utils.get_object.get_object_with_check_and_log'
 SAVE_USER = 'users.functions.save_user'
@@ -365,6 +356,23 @@ TASK_MIXIN = 'core.mixins.DummyModelMixin'
 ANNOTATION_MIXIN = 'core.mixins.DummyModelMixin'
 ORGANIZATION_MIXIN = 'core.mixins.DummyModelMixin'
 USER_MIXIN = 'users.mixins.UserMixin'
+
+
+def project_delete(project):
+    project.delete()
+
+
+def user_auth(user_model, email, password):
+    return None
+
+
+def collect_versions(**kwargs):
+    return {}
+
+
+PROJECT_DELETE = project_delete
+USER_AUTH = user_auth
+COLLECT_VERSIONS = collect_versions
 
 # fix a problem with Windows mimetypes for JS and PNG
 import mimetypes

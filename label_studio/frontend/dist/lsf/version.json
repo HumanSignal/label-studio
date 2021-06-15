@@ -1,6 +1,6 @@
 {
-  "message": "Fix \"Create Copy\" button",
-  "commit": "2cb6f511398f43fc3631a21ae2b1fcd0cd3fb0b6",
-  "branch": "feature/ui-update",
-  "date": "2021-05-07T11:30:58Z"
+  "message": "Fix Image regions dimension corruption issue",
+  "commit": "4d267dceb621cd2efe5456edb48ece2fba0903a5",
+  "branch": "master",
+  "date": "2021-06-09T21:42:33Z"
 }

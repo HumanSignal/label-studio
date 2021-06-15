@@ -15,7 +15,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from core.utils.common import get_object_with_check_and_log
 from core.decorators import permission_required
-from core.permissions import all_permissions, HasObjectPermission, ViewClassPermission
+from core.permissions import all_permissions, ViewClassPermission
 
 from tasks.models import Task, Annotation, Prediction, AnnotationDraft
 from core.permissions import (get_object_with_permissions, check_object_permissions)
@@ -153,12 +153,10 @@ class AnnotationAPI(RequestDebugLogMixin, generics.RetrieveUpdateDestroyAPIView)
 
     def update(self, request, *args, **kwargs):
         # save user history with annotator_id, time & annotation result
-        update_id = self.request.user.id
         annotation_id = self.kwargs['pk']
         annotation = get_object_with_check_and_log(request, Annotation, pk=annotation_id)
-        task = annotation.task
 
-        task.save()  # refresh task metrics
+        annotation.task.save()  # refresh task metrics
 
         return super(AnnotationAPI, self).update(request, *args, **kwargs)
 
@@ -271,6 +269,10 @@ class AnnotationDraftListAPI(RequestDebugLogMixin, generics.ListCreateAPIView):
     )
     queryset = AnnotationDraft.objects.all()
     swagger_schema = None
+
+    def filter_queryset(self, queryset):
+        task_id = self.kwargs['pk']
+        return queryset.filter(task_id=task_id)
 
     def perform_create(self, serializer):
         task_id = self.kwargs['pk']

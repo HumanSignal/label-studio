@@ -20,8 +20,14 @@ def settings(request):
     versions['lsf'] = versions.get('label-studio-frontend', {})
     versions['lsf']['commit'] = versions['lsf'].get('commit', 'none')[0:6]
 
-    if 'backend' in versions:
-        versions['backend']['commit'] = versions['backend'].get('commit', 'none')[0:6]
+    versions['backend'] = {}
+    if 'label-studio-os-backend' in versions:
+        versions['backend']['commit'] = versions['label-studio-os-backend'].get('commit', 'none')[0:6]
+    if 'label-studio-enterprise-backend' in versions:
+        versions['backend']['commit'] = versions['label-studio-enterprise-backend'].get('commit', 'none')[0:6]
+
+    if 'dm2' in versions:
+        versions['dm2']['commit'] = versions['dm2'].get('commit', 'none')[0:6]
 
     return {
         'settings': django_settings,

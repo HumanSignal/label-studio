@@ -29,27 +29,28 @@ class ProjectManager(models.Manager):
 
     def with_counts(self):
         return self.annotate(
-            task_number=Count('tasks'),
-            total_predictions_number=Count('tasks__predictions'),
+            task_number=Count('tasks', distinct=True),
+            total_predictions_number=Count('tasks__predictions', distinct=True),
             total_annotations_number=Count(
-                'tasks__annotations__id',
+                'tasks__annotations__id', distinct=True,
                 filter=Q(tasks__annotations__was_cancelled=False)
             ),
             useful_annotation_number=Count(
-                'tasks__annotations__id',
+                'tasks__annotations__id', distinct=True,
                 filter=Q(tasks__annotations__was_cancelled=False) &
                     Q(tasks__annotations__ground_truth=False) &
                     Q(tasks__annotations__result__isnull=False)
             ),
             ground_truth_number=Count(
-                'tasks__annotations__id',
+                'tasks__annotations__id', distinct=True,
                 filter=Q(tasks__annotations__ground_truth=True)
             ),
             skipped_annotations_number=Count(
-                'tasks__annotations__id',
+                'tasks__annotations__id', distinct=True,
                 filter=Q(tasks__annotations__was_cancelled=True)
             ),
         )
+
 
 ProjectMixin = load_func(settings.PROJECT_MIXIN)
 
@@ -663,6 +664,8 @@ class ProjectSummary(models.Model):
             self.common_data_columns = list(sorted(common_data_columns))
         else:
             self.common_data_columns = list(sorted(set(self.common_data_columns) & common_data_columns))
+        logger.debug(f'summary.all_data_columns = {self.all_data_columns}')
+        logger.debug(f'summary.common_data_columns = {self.common_data_columns}')
         self.save()
 
     def remove_data_columns(self, tasks):
@@ -685,6 +688,8 @@ class ProjectSummary(models.Model):
                 if key in common_data_columns:
                     common_data_columns.remove(key)
             self.common_data_columns = common_data_columns
+        logger.debug(f'summary.all_data_columns = {self.all_data_columns}')
+        logger.debug(f'summary.common_data_columns = {self.common_data_columns}')
         self.save()
 
     def _get_annotation_key(self, result):
@@ -707,7 +712,7 @@ class ProjectSummary(models.Model):
                 labels.extend(label)
             else:
                 labels.append(label)
-        return labels
+        return [str(l) for l in labels]
 
     def update_created_annotations_and_labels(self, annotations):
         created_annotations = dict(self.created_annotations)
@@ -730,6 +735,8 @@ class ProjectSummary(models.Model):
                 for label in self._get_labels(result):
                     labels[from_name][label] = labels[from_name].get(label, 0) + 1
 
+        logger.debug(f'summary.created_annotations = {created_annotations}')
+        logger.debug(f'summary.created_labels = {labels}')
         self.created_annotations = created_annotations
         self.created_labels = labels
         self.save()
@@ -753,14 +760,15 @@ class ProjectSummary(models.Model):
                 if from_name not in labels:
                     continue
                 for label in self._get_labels(result):
+                    label = str(label)
                     if label in labels[from_name]:
                         labels[from_name][label] -= 1
                         if labels[from_name][label] == 0:
                             labels[from_name].pop(label)
                 if not labels[from_name]:
                     labels.pop(from_name)
-
+        logger.debug(f'summary.created_annotations = {created_annotations}')
+        logger.debug(f'summary.created_labels = {labels}')
         self.created_annotations = created_annotations
         self.created_labels = labels
         self.save()
-

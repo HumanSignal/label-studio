@@ -54,7 +54,7 @@ export const humanReadableNumber = (n) => {
 };
 
 export const absoluteURL = (path = "") => {
-  if (path.match(/^http/) || path.match(/^\/\//)) {
+  if (path.match(/^https?/) || path.match(/^\/\//)) {
     return path;
   } else {
     return [
@@ -67,11 +67,11 @@ export const absoluteURL = (path = "") => {
 export const removePrefix = (path) => {
   if (APP_SETTINGS.hostname) {
     const hostname = APP_SETTINGS.hostname;
-    const prefix = (new URL(hostname.replace(/([/]+)$/, ''))).pathname;
+    const prefix = new URL(hostname).pathname.replace(/([/]+)$/, '');
     return path.replace(new RegExp(`^${prefix}`), '');
   }
 
-  return path;
+  return path || "/";
 };
 
 export const copyText = (text) => {

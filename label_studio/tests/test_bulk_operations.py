@@ -6,7 +6,7 @@ import datetime
 
 from users.models import User
 from projects.models import Project
-from tests.test_data.gen_tasks_and_annotations import gen_tasks
+from label_studio.tests.test_data.gen_tasks_and_annotations import gen_tasks
 
 
 @pytest.mark.django_db

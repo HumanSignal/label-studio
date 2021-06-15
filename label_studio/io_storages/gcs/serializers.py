@@ -9,6 +9,7 @@ from io_storages.gcs.models import GCSImportStorage, GCSExportStorage
 
 class GCSImportStorageSerializer(ImportStorageSerializer):
     type = serializers.ReadOnlyField(default=os.path.basename(os.path.dirname(__file__)))
+    presign = serializers.BooleanField(required=False, default=True)
 
     class Meta:
         model = GCSImportStorage

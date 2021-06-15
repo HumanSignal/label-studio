@@ -33,7 +33,8 @@ services:
       - LABEL_STUDIO_HOST=${LABEL_STUDIO_HOST:-""}
     volumes:
       - ./mydata:/label-studio/data:rw
-    command: [ "./deploy/wait-for-postgres.sh", "db", "bash", "/label-studio/deploy/start_label_studio.sh" ]
+      - static:/label-studio/label_studio:rw
+    command: [ "./deploy/wait-for-postgres.sh", "bash", "/label-studio/deploy/start_label_studio.sh" ]
 
   db:
     image: postgres:11.5

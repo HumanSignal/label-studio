@@ -1,9 +1,10 @@
 ---
 title: Get data into Label Studio
+short: Get data in
 type: guide
 order: 300
-meta_title: Import Data
-meta_description: Label Studio Documentation for importing and uploading data labeling tasks for machine learning or data science projects. 
+meta_title: Import Data into Label Studio
+meta_description: Import and upload data labeling tasks from audio, HTML, image, CSV, text, and time series datasets using common file formats or the Label Studio JSON format to label and annotate that data for your machine learning and data science projects. 
 ---
 
 Get data into Label Studio by importing files, referencing URLs, or syncing with cloud or database storage. 
@@ -22,12 +23,12 @@ You can import many different types of data, including text, timeseries, audio, 
 | --- | --- |
 | Audio | .aiff, .au, .flac, .m4a, .mp3, .ogg, .wav |
 | HTML | .html, .htm, .xml |
-| Images | .bmp, .gif, .jpg, .png, .svg, .tiff, .webp |
+| Images | .bmp, .gif, .jpg, .png, .svg, .webp |
 | Structured data | .csv, .tsv, .json |
 | Text | .txt |
 | Time series | .csv, .tsv |
 
-If you don't see a supported data or file type that you want to import, reach out in the [Label Studio Slack community](https://join.slack.com/t/label-studio/shared_invite/zt-cr8b7ygm-6L45z7biEBw4HXa5A2b5pw). 
+If you don't see a supported data or file type that you want to import, reach out in the [Label Studio Slack community](http://slack.labelstud.io.s3-website-us-east-1.amazonaws.com?source=docs-gdi). 
 
 ## How to format your data to import it
 
@@ -35,8 +36,9 @@ Label Studio treats different file types different ways.
 
 If you want to import multiple types of data to label at the same time, for example, images with captions or audio recordings with transcripts, you must use the [basic Label Studio JSON format](#Basic-Label-Studio-JSON-format). 
 
-You can also use a CSV file or a JSON list of tasks to point to URLs with the data, rather than directly importing the data if you need to import thousands of files.
+You can also use a CSV file or a JSON list of tasks to point to URLs with the data, rather than directly importing the data if you need to import thousands of files. You can import files containing up to 250,000 tasks or up to 50MB in size into Label Studio.
 
+If you're specifying data in a cloud storage bucket or container, and you don't want to [sync cloud storage](storage.html), create and specify [presigned URLs for Amazon S3 storage](https://docs.aws.amazon.com/AmazonS3/latest/userguide/ShareObjectPreSignedURL.html), [signed URLs for Google Cloud Storage](https://cloud.google.com/storage/docs/access-control/signed-urls), or [shared access signatures for Microsoft Azure](https://docs.microsoft.com/en-us/azure/storage/common/storage-sas-overview) in a JSON, CSV, or TXT file. 
 
 ### Basic Label Studio JSON format
 
@@ -76,12 +78,11 @@ For an example text classification project, you can set up a label config like t
 
 ```
 
-You can then import tasks to label that match the following JSON format:
+You can then import text tasks to label that match the following JSON format:
 
 ```yaml
 [{
-  # "data" must contain the "my_text" field defined by labeling config,
-  # and can optionally include other fields
+  # "data" must contain the "my_text" field defined in the text labeling config as the value and can optionally include other fields
   "data": {
     "my_text": "Opossums are great",
     "ref_id": 456,
@@ -91,7 +92,7 @@ You can then import tasks to label that match the following JSON format:
     } 
   },
 
-  # annotations are the list of annotation results matching the labeling config schema
+  # annotations are not required and are the list of annotation results matching the labeling config schema
   "annotations": [{
     "result": [{
       "from_name": "sentiment_class",
@@ -119,12 +120,49 @@ You can then import tasks to label that match the following JSON format:
   }]
 }]
 ```
+If you're placing JSON files in [cloud storage](storage.html), place 1 task in each JSON file in the storage bucket. If you want to upload a JSON file from your machine directly into Label Studio, you can place multiple tasks in one JSON file. 
 
-> Note: For versions of Label Studio earlier than 1.0.0, use the following JSON format example. 
+#### Example JSON with multiple tasks
+You can place multiple tasks in one JSON file if you're uploading the JSON file to Label Studio. 
 
+<br/>
+{% details <b>To place multiple tasks in one JSON file, use this JSON format example</b> %}
+This example contains multiple text classification tasks with no annotations or predictions.
+
+The "data" parameter must contain the "my_text" field defined in the text labeling config and can optionally include other fields. The "id" parameter is not required.
+
+{% codeblock lang:json %}
+[
+   {
+      "id":1,
+      "data":{
+         "my_text":"Opossums like to be aloft in trees."
+      }
+   },
+   {
+      "id":2,
+      "data":{
+         "my_text":"Opossums are opportunistic."
+      }
+   },
+   {
+      "id":3,
+      "data":{
+         "my_text":"Opossums like to forage for food."
+      }
+   }
+]
+{% endcodeblock %}
+{% enddetails %}
+
+#### Example JSON for older versions of Label Studio
+If you're still using a Label Studio version earlier than 1.0.0, refer to this example JSON format. 
+
+<br/>
+{% details <b>For versions of Label Studio earlier than 1.0.0, use this JSON format example.</b> %}
 If you're using a version of Label Studio earlier than version 1.0.0, import tasks that match the following JSON format: 
 
-```yaml
+{% codeblock lang:json %}
 [{
   # "data" must contain the "my_text" field defined by labeling config,
   # and can optionally include other fields
@@ -164,8 +202,8 @@ If you're using a version of Label Studio earlier than version 1.0.0, import tas
     "score": 0.95
   }]
 }]
-```
-
+{% endcodeblock %}
+{% enddetails %}
 
 ### Import CSV or TSV data
 
@@ -189,7 +227,7 @@ this is a first task
 this is a second task
 ```
 
-If you want to import entire plain text files without each line becoming a new labeling task, customize the labeling configuration to specify `valueType="url"` in the Text tag. See the [Text tag documentation](/tags/text.html)
+If you want to import entire plain text files without each line becoming a new labeling task, customize the labeling configuration to specify `valueType="url"` in the Text tag. See the [Text tag documentation](/tags/text.html). Using this setting means that when you export your tasks, you export the links to the raw data created by Label Studio, rather than the raw data. If you want to export tasks with data, and label text files with new lines, use the [Label Studio JSON format](#Basic-Label-Studio-JSON-format).
 
 ## Import data from a local directory
 
@@ -223,7 +261,7 @@ Data that you import is project-specific.
 
 ### Import data using the API
 
-Import your data using the Label Studio server API. See the [API documentation](api.html).
+Import your data using the Label Studio API. See the [API documentation for importing tasks](/api#operation/projects_import_create).
 
 ### Import data from the command line
 

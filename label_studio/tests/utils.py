@@ -18,6 +18,7 @@ from ml.models import MLBackend
 from tasks.serializers import TaskWithAnnotationsSerializer
 from organizations.models import Organization
 from users.models import User
+
 try:
     from businesses.models import Business, BillingPlan
 except ImportError:
@@ -26,7 +27,7 @@ except ImportError:
 
 @contextmanager
 def ml_backend_mock(**kwargs):
-    with requests_mock.Mocker() as m:
+    with requests_mock.Mocker(real_http=True) as m:
         yield register_ml_backend_mock(m, **kwargs)
 
 
@@ -129,6 +130,18 @@ def azure_client_mock():
     with mock.patch.object(models.BlobServiceClient, 'from_connection_string', return_value=DummyAzureClient()):
         with mock.patch.object(models, 'generate_blob_sas', return_value='token'):
             yield
+
+
+@contextmanager
+def redis_client_mock():
+    from fakeredis import FakeRedis
+    from io_storages.redis.models import RedisStorageMixin
+
+    redis = FakeRedis()
+    # TODO: add mocked redis data
+
+    with mock.patch.object(RedisStorageMixin, 'get_redis_connection', return_value=redis):
+        yield
 
 
 def upload_data(client, project, tasks):

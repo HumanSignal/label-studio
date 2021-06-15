@@ -23,7 +23,7 @@ from tasks.models import Task, Annotation
 
 from data_manager.functions import get_all_columns, get_prepared_queryset, evaluate_predictions
 from data_manager.models import View
-from data_manager.serializers import ViewSerializer, TaskSerializer, SelectedItemsSerializer
+from data_manager.serializers import ViewSerializer, DataManagerTaskSerializer, SelectedItemsSerializer
 from data_manager.actions import get_all_actions, perform_action
 
 
@@ -76,7 +76,7 @@ class ViewAPI(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     my_tags = ["Data Manager"]
     filterset_fields = ["project"]
-    task_serializer_class = TaskSerializer
+    task_serializer_class = DataManagerTaskSerializer
     permission_required = ViewClassPermission(
         GET=all_permissions.tasks_view,
         POST=all_permissions.tasks_change,
@@ -208,7 +208,7 @@ class TaskAPI(APIView):
     permission_required = all_permissions.projects_view
 
     def get_serializer_class(self):
-        return TaskSerializer
+        return DataManagerTaskSerializer
 
     @swagger_auto_schema(tags=["Data Manager"])
     def get(self, request, pk):
@@ -316,7 +316,6 @@ class ProjectActionsAPI(APIView):
 
         Perform an action with the selected items from a specific view.
         """
-
         pk = int_from_request(request.GET, "project", None)
         project = get_object_with_check_and_log(request, Project, pk=pk)
         self.check_object_permissions(request, project)

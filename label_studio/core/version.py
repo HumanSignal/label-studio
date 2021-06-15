@@ -58,31 +58,44 @@ def _read_py():
 
 # get commit info: message, date, hash, branch
 def get_git_commit_info(skip_os=True):
-    # take version from git
-    try:
-        desc = run('git describe --long --tags --always --dirty', stderr=STDOUT, shell=True).decode("utf-8")
-        info = {
-            'message': run('git show -s --format=%s', stderr=STDOUT, shell=True).strip().decode('utf8'),
-            'commit': run('git show -s --format=%H', stderr=STDOUT, shell=True).strip().decode('utf8'),
-            'date': run('git show -s --format=%ai', stderr=STDOUT, shell=True).strip().decode('utf8'),
-            'branch': run('git rev-parse --abbrev-ref HEAD', stderr=STDOUT, shell=True).strip().decode('utf8')
-        }
-    except CalledProcessError:
-        return _read_py()
 
-    # create package version
-    version = desc.lstrip('v').rstrip().replace('-', '+', 1).replace('-', '.')
-    # take OS name
-    if not skip_os:
-        keys = ('ID=', 'VERSION_ID=', 'RELEASE=')
-        with open('/etc/os-release') as f:
-            os_version = ''.join(str(s).split("=", 1)[1].rstrip().strip('"').replace('.', '')
-                                 for s in f if str(s).startswith(keys))
-            version += '.' + os_version
-    info['version'] = version
-    
-    _write_py(info)
-    return info
+    cwd = os.getcwd()
+    d = os.path.dirname(__file__)
+    d = d if d else '.'
+    os.chdir(d)
+
+    try:
+        # take version from git
+        try:
+            desc = run('git describe --long --tags --always --dirty', stderr=STDOUT, shell=True).decode("utf-8")
+            info = {
+                'message': run('git show -s --format=%s', stderr=STDOUT, shell=True).strip().decode('utf8'),
+                'commit': run('git show -s --format=%H', stderr=STDOUT, shell=True).strip().decode('utf8'),
+                'date': run('git show -s --format=%ai', stderr=STDOUT, shell=True).strip().decode('utf8'),
+                'branch': run('git rev-parse --abbrev-ref HEAD', stderr=STDOUT, shell=True).strip().decode('utf8')
+            }
+        except CalledProcessError:
+            return _read_py()
+
+        # create package version
+        version = desc.lstrip('v').rstrip().replace('-', '+', 1).replace('-', '.')
+        # take OS name
+        if not skip_os:
+            keys = ('ID=', 'VERSION_ID=', 'RELEASE=')
+            with open('/etc/os-release') as f:
+                os_version = ''.join(str(s).split("=", 1)[1].rstrip().strip('"').replace('.', '')
+                                     for s in f if str(s).startswith(keys))
+                version += '.' + os_version
+        info['version'] = version
+
+        _write_py(info)
+        return info
+
+    except Exception as e:
+        raise e
+
+    finally:
+        os.chdir(cwd)  # back current dir
 
 
 def get_git_version(skip_os=True):

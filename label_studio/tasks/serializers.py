@@ -17,6 +17,7 @@ from projects.models import Project
 from tasks.models import Task, Annotation, AnnotationDraft, Prediction
 from tasks.validation import TaskValidator
 from core.utils.common import get_object_with_check_and_log, retry_database_locked
+from core.label_config import replace_task_data_undefined_with_config_field
 from users.serializers import UserSerializer
 
 logger = logging.getLogger(__name__)
@@ -112,12 +113,12 @@ class TaskSimpleSerializer(ModelSerializer):
 class TaskSerializer(ModelSerializer):
     """ Task Serializer with project scheme configs validation
     """
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.context.get('include_annotations', True):
-            self.fields['annotations'] = AnnotationSerializer(many=True, read_only=False, required=False,
-                                                              context=self.context)
+        if self.context.get('include_annotations', True) and 'annotations' not in self.fields:
+            self.fields['annotations'] = AnnotationSerializer(
+                many=True, read_only=False, required=False, context=self.context
+            )
 
     def project(self):
         """ Take the project from context
@@ -145,11 +146,7 @@ class TaskSerializer(ModelSerializer):
 
             # resolve $undefined$ key in task data
             data = instance.data
-            data_types_keys = project.data_types.keys()
-            if settings.DATA_UNDEFINED_NAME in data and data_types_keys:
-                key = list(data_types_keys)[0]
-                data[key] = data[settings.DATA_UNDEFINED_NAME]
-                del data[settings.DATA_UNDEFINED_NAME]
+            replace_task_data_undefined_with_config_field(data, project)
 
         return super().to_representation(instance)
 
@@ -465,30 +462,9 @@ class TaskWithAnnotationsAndPredictionsAndDraftsSerializer(TaskSerializer):
         drafts = task.drafts
         if 'request' in self.context and hasattr(self.context['request'], 'user'):
             user = self.context['request'].user
-            # drafts = drafts.filter(user=user)
-            if user.is_annotator:
-                drafts = drafts.filter(user=user)
+            drafts = drafts.filter(user=user)
 
         return AnnotationDraftSerializer(drafts, many=True, read_only=True, default=True, context=self.context).data
-
-
-class TaskWithAnnotationsAndLazyPredictionsSerializer(TaskSerializer):
-    predictions = PredictionSerializer(many=True, default=[], read_only=True)
-    annotations = serializers.SerializerMethodField(default=[], read_only=True)
-
-    def get_annotations(self, task):
-        annotations = task.annotations.order_by('pk')
-
-        if 'request' in self.context:
-            user = self.context['request'].user
-            if user.is_annotator:
-                annotations = annotations.filter(completed_by=user)
-
-        return AnnotationSerializer(annotations, many=True, read_only=True, default=True, context=self.context).data
-
-    class Meta:
-        model = Task
-        exclude = ('taken_at', )
 
 
 class TaskIDWithAnnotationsAndPredictionsSerializer(ModelSerializer):

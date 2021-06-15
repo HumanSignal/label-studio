@@ -11,8 +11,8 @@ from django.conf import settings
 from django.db import models, connection
 from django.db.models import Q, F, When, Count, Case, Subquery, OuterRef, Value
 from django.db.models.functions import Coalesce
-from django.db.models.signals import post_delete, post_save, pre_delete
-from django.db.utils import ProgrammingError, OperationalError
+from django.db.models.signals import post_delete, pre_save, post_save, pre_delete
+from django.db.utils import ProgrammingError, OperationalError, DatabaseError
 from django.utils.translation import gettext_lazy as _
 from django.db.models import JSONField
 from django.urls import reverse
@@ -65,9 +65,19 @@ class Task(TaskMixin, models.Model):
         return os.path.basename(self.file_upload.file.name)
 
     @classmethod
-    def get_locked_by(cls, user, queryset):
-        """Retrieve the task locked by specified user. Returns None if the specified user didn't lock anything."""
-        lock = TaskLock.objects.filter(user=user, expire_at__gt=now(), task__in=queryset).first()
+    def get_locked_by(cls, user, project=None, tasks=None):
+        """ Retrieve the task locked by specified user. Returns None if the specified user didn't lock anything.
+        """
+        lock = None
+        if project is not None:
+            lock = TaskLock.objects.filter(user=user, expire_at__gt=now(), task__project=project).first()
+        elif tasks is not None:
+            locked_tasks = tasks.filter(locks__user=user, locks__expire_at__gt=now())[:1]
+            if locked_tasks:
+                return locked_tasks[0]
+        else:
+            raise Exception('Neither project or tasks passed to get_locked_by')
+
         if lock:
             return lock.task
 
@@ -146,7 +156,7 @@ class Task(TaskMixin, models.Model):
             return storage_link.storage
 
         # or try global storage settings (only s3 for now)
-        elif get_env('USE_DEFAULT_STORAGE', default=False, is_bool=True):
+        elif get_env('USE_DEFAULT_S3_STORAGE', default=False, is_bool=True):
             # TODO: this is used to access global environment storage settings.
             # We may use more than one and non-default S3 storage (like GCS, Azure)
             from io_storages.s3.models import S3ImportStorage
@@ -223,6 +233,16 @@ class Task(TaskMixin, models.Model):
 
         # annotator annotation
         return self.annotations.first()
+
+    def increase_project_summary_counters(self):
+        if hasattr(self.project, 'summary'):
+            summary = self.project.summary
+            summary.update_data_columns([self])
+
+    def decrease_project_summary_counters(self):
+        if hasattr(self.project, 'summary'):
+            summary = self.project.summary
+            summary.remove_data_columns([self])
 
     class Meta:
         db_table = 'task'
@@ -303,6 +323,18 @@ class Annotation(AnnotationMixin, models.Model):
     def has_permission(self, user):
         return self.task.project.has_permission(user)
 
+    def increase_project_summary_counters(self):
+        if hasattr(self.task.project, 'summary'):
+            logger.debug(f'Increase project.summary counters from {self}')
+            summary = self.task.project.summary
+            summary.update_created_annotations_and_labels([self])
+
+    def decrease_project_summary_counters(self):
+        if hasattr(self.task.project, 'summary'):
+            logger.debug(f'Decrease project.summary counters from {self}')
+            summary = self.task.project.summary
+            summary.remove_created_annotations_and_labels([self])
+
 
 class TaskLock(models.Model):
     task = models.ForeignKey(
@@ -336,6 +368,9 @@ class AnnotationDraft(models.Model):
     def created_ago(self):
         """ Humanize date """
         return timesince(self.created_at)
+
+    def has_permission(self, user):
+        return self.task.project.has_permission(user)
 
 
 class Prediction(models.Model):
@@ -381,53 +416,90 @@ def release_task_lock_before_delete(sender, instance, **kwargs):
     if instance is not None:
         instance.release_lock()
 
+# =========== PROJECT SUMMARY UPDATES ===========
+
 
 @receiver(pre_delete, sender=Task)
 def remove_data_columns(sender, instance, **kwargs):
     """Reduce data column counters afer removing task"""
-    task = instance
-    if hasattr(task.project, 'summary'):
-        summary = task.project.summary
-        summary.remove_data_columns([task])
+    instance.decrease_project_summary_counters()
+
+
+def _task_data_is_not_updated(update_fields):
+    if update_fields and list(update_fields) == ['is_labeled']:
+        return True
+
+
+@receiver(pre_save, sender=Task)
+def delete_project_summary_data_columns_before_updating_task(sender, instance, update_fields, **kwargs):
+    """Before updating task fields - ensure previous info removed from project.summary"""
+    if _task_data_is_not_updated(update_fields):
+        # we don't need to update counters when other than task.data fields are updated
+        return
+    try:
+        old_task = sender.objects.get(id=instance.id)
+    except Task.DoesNotExist:
+        # task just created - do nothing
+        return
+    old_task.decrease_project_summary_counters()
 
 
 @receiver(post_save, sender=Task)
 def update_project_summary_data_columns(sender, instance, created, update_fields, **kwargs):
-    """Update task counters in project summary"""
-    if hasattr(instance.project, 'summary') and (created or (update_fields and 'data' in update_fields)):
-        summary = instance.project.summary
-        summary.update_data_columns([instance])
+    """Update task counters in project summary in case when new task has been created"""
+    if _task_data_is_not_updated(update_fields):
+        # we don't need to update counters when other than task.data fields are updated
+        return
+    instance.increase_project_summary_counters()
+
+
+@receiver(pre_save, sender=Annotation)
+def delete_project_summary_annotations_before_updating_annotation(sender, instance, **kwargs):
+    """Before updating annotation fields - ensure previous info removed from project.summary"""
+    try:
+        old_annotation = sender.objects.get(id=instance.id)
+    except Annotation.DoesNotExist:
+        # annotation just created - do nothing
+        return
+    old_annotation.decrease_project_summary_counters()
 
 
 @receiver(post_save, sender=Annotation)
 def update_project_summary_annotations_and_is_labeled(sender, instance, created, **kwargs):
     """Update annotation counters in project summary"""
-    if hasattr(instance.task.project, 'summary'):
-        summary = instance.task.project.summary
-        summary.update_created_annotations_and_labels([instance])
+    instance.increase_project_summary_counters()
 
-    # If new annotation created, update task.is_labeled state
     if created:
+        # If new annotation created, update task.is_labeled state
         logger.debug(f'Update task stats for task={instance.task}')
         instance.task.update_is_labeled()
         instance.task.save(update_fields=['is_labeled'])
 
 
 @receiver(pre_delete, sender=Annotation)
-def remove_project_summary_annotations_and_is_labeled(sender, instance, **kwargs):
+def remove_project_summary_annotations(sender, instance, **kwargs):
     """Remove annotation counters in project summary followed by deleting an annotation"""
-    if hasattr(instance.task.project, 'summary'):
-        logger.debug(f'Remove created annotations and labels for {instance.task}')
-        summary = instance.task.project.summary
-        summary.remove_created_annotations_and_labels([instance])
+    instance.decrease_project_summary_counters()
+
+# =========== END OF PROJECT SUMMARY UPDATES ===========
+
+
+def _task_exists_in_db(task):
+    try:
+        Task.objects.get(id=task.id)
+    except Task.DoesNotExist:
+        return False
+    return True
 
 
 @receiver(post_delete, sender=Annotation)
 def update_is_labeled_after_removing_annotation(sender, instance, **kwargs):
     # Update task.is_labeled state
-    logger.debug(f'Update task stats for task={instance.task}')
-    instance.task.update_is_labeled()
-    instance.task.save()
+    task = instance.task
+    if _task_exists_in_db(task): # To prevent django.db.utils.DatabaseError: Save with update_fields did not affect any rows.
+        logger.debug(f'Update task stats for task={task}')
+        instance.task.update_is_labeled()
+        instance.task.save(update_fields=['is_labeled'])
 
 
 @receiver(post_save, sender=Annotation)

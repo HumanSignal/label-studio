@@ -1,9 +1,9 @@
 ---
 title: Start Label Studio
 type: guide
-order: 203
-meta_title: Start Commands
-meta_description: Label Studio Documentation for starting Label Studio and configuring the environment to use Label Studio with your machine learning or data science project. 
+order: 206
+meta_title: Start Commands for Label Studio
+meta_description: Documentation for starting Label Studio and configuring the environment to use Label Studio with your machine learning or data science project. 
 ---
 
 After you install Label Studio, start the server to start using it. 
@@ -62,6 +62,21 @@ export LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true
 ```
 You can also use an `.env` file. 
 
+On Windows, you can use the following syntax:
+```bash
+set LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true
+```
+
+To check if you set an environment variable successfully, run the following on *nix operating systems:
+```bash
+echo $LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED
+```
+
+Or the following on Windows operating systems:
+```bash
+echo %LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED%
+```
+
 ## Run Label Studio on localhost with a different port
 By default, Label Studio runs on port 8080. If that port is already in use or if you want to specify a different port, start Label Studio with the following command:
 ```bash
@@ -97,9 +112,9 @@ nginx:
 ...
 ```
 
-## Run Label Studio on Docker with a host and subdomain
+## Run Label Studio on Docker with a host and sub-path
 
-To run Label Studio on Docker with a host and subdomain, you can refer to the example `deploy/dockerfiles/subpath.example.yml` Docker YAML file. To customize it for your environment, manually modify the `nginx/subdomain.example.simple.conf` NGINX configuration file, the relevant Label Studio environment variables, and the PostgreSQL database settings for your environment. 
+To run Label Studio on Docker with a host and sub-path, you can refer to the example `deploy/dockerfiles/subpath.example.yml` Docker YAML file. To customize it for your environment, manually modify the `nginx/subpath.example.simple.conf` NGINX configuration file, the relevant Label Studio environment variables, and the PostgreSQL database settings for your environment. 
 
 ## Run Label Studio on Docker and use local storage
 To run Label Studio on Docker and reference persistent local storage directories, mount those directories as volumes when you start Label Studio and specify any environment variables you need.
