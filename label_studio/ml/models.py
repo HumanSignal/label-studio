@@ -142,10 +142,6 @@ class MLBackend(models.Model):
             logger.error(f'Prediction not created for project {self}: {ml_api_result.error_message}')
             return
 
-        if not (isinstance(ml_api_result.response, dict) and 'results' in ml_api_result.response):
-            logger.error(f'ML backend returns an incorrect response: {ml_api_result.response}')
-            return
-
         responses = ml_api_result.response['results']
 
         if len(responses) == 0:
