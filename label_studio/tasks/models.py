@@ -511,7 +511,7 @@ def delete_draft_before_annotation(sender, instance, **kwargs):
     drafts = AnnotationDraft.objects.filter(**query_args)
     num_drafts = drafts.count()
     drafts.delete()
-    logger.debug(f'{num_drafts} drafts removed from task {task} after saving annotation {instance}')
+    logger.debug(f'{num_drafts} drafts removed from task {task} after deleting annotation {instance}')
 
 
 @receiver(post_save, sender=Annotation)
