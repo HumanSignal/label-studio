@@ -502,6 +502,18 @@ def update_is_labeled_after_removing_annotation(sender, instance, **kwargs):
         instance.task.save(update_fields=['is_labeled'])
 
 
+@receiver(pre_delete, sender=Annotation)
+def delete_draft_before_annotation(sender, instance, **kwargs):
+    task = instance.task
+    query_args = {'task': instance.task, 'annotation': instance}
+    if instance.completed_by is not None:
+        query_args['user'] = instance.completed_by
+    drafts = AnnotationDraft.objects.filter(**query_args)
+    num_drafts = drafts.count()
+    drafts.delete()
+    logger.debug(f'{num_drafts} drafts removed from task {task} after saving annotation {instance}')
+
+
 @receiver(post_save, sender=Annotation)
 def delete_draft(sender, instance, **kwargs):
     task = instance.task
