@@ -59,7 +59,7 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
                           description='Selected export format')
         ],
     tags=['Export'],
-    operation_summary='Export annotations',
+    operation_summary='Export tasks and annotations',
     operation_description="""
         Export annotated tasks as a file in a specific format.
         For example, to export JSON annotations for a project to a file called `annotations.json`,
@@ -67,7 +67,11 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
         ```bash
         curl -X GET {}/api/projects/{{id}}/export?exportType=JSON -H \'Authorization: Token abc123\' --output annotations.json'
         ```
-        """.format(settings.HOSTNAME or 'https://localhost:8080'),
+        To export all tasks, including skipped tasks and others without annotations, run the following from the command line:
+        ```bash
+        curl -X GET {}/api/projects/{{id}}/export?exportType=JSON&download_all_tasks=true -H \'Authorization: Token abc123\' --output annotations.json'
+        ```
+        """.format(settings.HOSTNAME or 'https://localhost:8080',settings.HOSTNAME or 'https://localhost:8080'),
     responses={200: openapi.Response(
         description='Exported data',
         schema=openapi.Schema(
