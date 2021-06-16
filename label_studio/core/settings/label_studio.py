@@ -21,3 +21,10 @@ SESSION_COOKIE_SECURE = False
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 
 RQ_QUEUES = {}
+
+from label_studio import __version__
+init_sentry(release_name='label-studio', release_version=__version__)
+
+# we should do it after sentry init
+from label_studio.core.utils.common import collect_versions
+versions = collect_versions()

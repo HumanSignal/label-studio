@@ -265,15 +265,23 @@ SWAGGER_SETTINGS = {
 
 SENTRY_DSN = get_env('SENTRY_DSN', None)
 SENTRY_RATE = float(get_env('SENTRY_RATE', 1.0))
-if SENTRY_DSN:
-    import sentry_sdk
-    from sentry_sdk.integrations.django import DjangoIntegration
-    sentry_sdk.init(
-        dsn=SENTRY_DSN,
-        integrations=[DjangoIntegration()],
-        traces_sample_rate=SENTRY_RATE,
-        send_default_pii=True
-    )
+SENTRY_ENVIRONMENT = get_env('SENTRY_ENVIRONMENT', 'stage.example.com')
+
+
+def init_sentry(release_name, release_version):
+    if SENTRY_DSN:
+        import sentry_sdk
+        from sentry_sdk.integrations.django import DjangoIntegration
+        from sentry_sdk.integrations.redis import RedisIntegration
+        sentry_sdk.init(
+            dsn=SENTRY_DSN,
+            integrations=[DjangoIntegration(), RedisIntegration()],
+            traces_sample_rate=SENTRY_RATE,
+            send_default_pii=True,
+            environment=SENTRY_ENVIRONMENT,
+            release=release_name + '@' + str(release_version)
+        )
+
 
 ROOT_URLCONF = 'core.urls'
 WSGI_APPLICATION = 'core.wsgi.application'
