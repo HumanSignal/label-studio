@@ -263,7 +263,17 @@ SWAGGER_SETTINGS = {
     'OPERATIONS_SORTER': 'alpha'
 }
 
-SENTRY_FE = None
+SENTRY_DSN = get_env('SENTRY_DSN', None)
+SENTRY_RATE = float(get_env('SENTRY_RATE', 1.0))
+if SENTRY_DSN:
+    import sentry_sdk
+    from sentry_sdk.integrations.django import DjangoIntegration
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        integrations=[DjangoIntegration()],
+        traces_sample_rate=SENTRY_RATE,
+        send_default_pii=True
+    )
 
 ROOT_URLCONF = 'core.urls'
 WSGI_APPLICATION = 'core.wsgi.application'
