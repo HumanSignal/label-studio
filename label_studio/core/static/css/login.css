@@ -20,6 +20,14 @@
   margin: 32px auto 50px;
   display: block;
 }
+.login_page .link a {
+  border-color: #1890FF;
+  color: #1890FF;
+}
+.login_page .link a:hover {
+  color: #69C0FF;
+  border-color: #69C0FF;
+}
 .login_page .toggle, .login_page form {
   width: 272px;
   margin: 24px auto;
@@ -90,4 +98,33 @@ text-transform: uppercase;
 }
 .login_page .field_errors li {
   margin-top: 12px;
+}
+
+.auto-generated form {
+  width: 100%;
+}
+.auto-generated form label {
+  display: block;
+}
+.auto-generated form input {
+  height: 40px;
+  min-height: 40px;
+  background: #fafafa;
+  font-size: 16px;
+  line-height: 22px;
+  border: 1px solid rgba(0,0,0,0.15);
+  box-sizing: border-box;
+  border-radius: 5px;
+  padding: 0 16px;
+  transition: box-shadow 80ms ease;
+}
+
+.auto-generated p:empty {
+  display: none;
+}
+.auto-generated form ul li:not(:last-child) {
+  margin-bottom: 0.5em;
+}
+.auto-generated form ul {
+  margin-bottom: 0;
 }
