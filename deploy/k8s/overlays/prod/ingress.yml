@@ -1,0 +1,15 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress
+  annotations:
+    ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: labelstudio.example.com
+    http:
+      paths:
+        - path: /
+          backend:
+            serviceName: nginx
+            servicePort: 80

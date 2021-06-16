@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: postgres
+  template:
+    metadata:
+      labels:
+        component: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:11.5
+          imagePullPolicy: Always
+          env:
+            - name: POSTGRES_HOST_AUTH_METHOD
+              value: trust
+          volumeMounts:
+            - name: postgres-vol
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: postgres-vol
+          persistentVolumeClaim:
+            claimName: postgres-pvc

@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: labelstudio
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: labelstudio
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        component: labelstudio
+    spec:
+      containers:
+        - name: labelstudio
+          image: heartexlabs/label-studio:1.0.2
+          imagePullPolicy: Always
+          stdin: true
+          tty: true
+          command: ["./deploy/wait-for-postgres.sh"]
+          args: ["labelstudio-postgres", "bash", "/label-studio/deploy/start_label_studio.sh"]
+          env:
+            - name: DJANGO_DB
+              value: default
+            - name: POSTGRE_NAME
+              value: postgres
+            - name: POSTGRE_USER
+              value: postgres
+            - name: POSTGRE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: labelstudio
+                  key: pg_password
+            - name: POSTGRE_PORT
+              value: "5432"
+            - name: POSTGRE_HOST
+              value: labelstudio-postgres
+          volumeMounts:
+            - name: labelstudio-data-vol
+              mountPath: /label-studio/data
+      volumes:
+        - name: labelstudio-data-vol
+          persistentVolumeClaim:
+            claimName: labelstudio-data-pvc

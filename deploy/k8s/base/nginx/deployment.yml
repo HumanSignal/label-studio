@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: nginx
+  template:
+    metadata:
+      labels:
+        component: nginx
+    spec:
+      initContainers:
+        - name: labelstudio-static-copy
+          image: heartexlabs/label-studio:1.0.2
+          command:
+            - sh
+            - "-ce"
+            - |
+              set -ex
+              cp -r /label-studio/label_studio/* /tmp/static/
+          volumeMounts:
+            - name: labelstudio-static-vol
+              mountPath: /tmp/static
+        - name: wait-for-labelstudio
+          image: willwill/wait-for-it
+          args:
+          - labelstudio-labelstudio:8080 -- echo "LabelStudio is up"
+      containers:
+        - name: nginx
+          image: nginx:latest
+          imagePullPolicy: Always
+          command: ["nginx"]
+          args: ["-g", "daemon off;"]
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d
+            - name: labelstudio-data-vol
+              mountPath: /label-studio/data
+            - name: labelstudio-static-vol
+              mountPath: /label-studio/label_studio
+      volumes:
+        - name: nginx-config
+          configMap:
+            name: nginx-config
+            items:
+              - key: "default.conf"
+                path: "default.conf"
+        - name: labelstudio-data-vol
+          persistentVolumeClaim:
+            claimName: labelstudio-data-pvc
+        - name: labelstudio-static-vol
+          emptyDir: {}
