@@ -100,6 +100,8 @@ def parse_input_args():
 
     parser_version = subparsers.add_parser('version', help='Print version info', parents=[root_parser])
 
+    parser_user = subparsers.add_parser('user', help='Print user info', parents=[root_parser])
+
     parser_init = subparsers.add_parser('init', help='Initialize Label Studio', parents=[root_parser])
     parser_init.add_argument(
         'project_name', help='Path to directory where project state will be initialized', type=project_name

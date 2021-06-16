@@ -28,6 +28,7 @@ Some available commands for Label Studio provide information or start the Label 
 | `label-studio reset_password` | Reset the password for a specific Label Studio username. See [Create user accounts for Label Studio](signup.html). |
 | `label-studio shell` | Get access to a shell for Label Studio to manipulate data directly. See documentation for the Django [shell-plus command](https://django-extensions.readthedocs.io/en/latest/shell_plus.html). |
 | `label-studio version` | Show the version of Label Studio and then terminates.
+| `label-studio user --username <email>` | Show the user info with token
 
 The following command line arguments are optional and must be specified with `label-studio start <argument> <value>` or as an environment variable when you set up the environment to host Label Studio:
 

@@ -30,6 +30,7 @@ logger = logging.getLogger(__name__)
 
 
 LS_PATH = str(pathlib.Path(__file__).parent.absolute())
+DEFAULT_USERNAME = 'default_user@localhost'
 
 
 def _setup_env():
@@ -90,11 +91,28 @@ def _create_project(title, user, label_config=None, sampling=None, description=N
     return project
 
 
+def _get_user_info(username):
+    from users.models import User
+    from users.serializers import UserSerializer
+    if not username:
+        username = DEFAULT_USERNAME
+
+    user = User.objects.filter(email=username)
+    if not user.exists():
+        print({'status': 'error', 'message': f"user {username} doesn't exist"})
+        return
+
+    user = user.first()
+    user_data = UserSerializer(user).data
+    user_data['token'] = user.auth_token.key
+    user_data['status'] = 'ok'
+    print('=> User info:')
+    print(user_data)
+
+
 def _create_user(input_args, config):
     from users.models import User
     from organizations.models import Organization
-
-    DEFAULT_USERNAME = 'default_user@localhost'
 
     username = input_args.username or config.get('username') or get_env('USERNAME')
     password = input_args.password or config.get('password') or get_env('PASSWORD')
@@ -105,14 +123,14 @@ def _create_user(input_args, config):
             if password and not user.check_password(password):
                 user.set_password(password)
                 user.save()
-                print('User password changed')
+                print(f'User {DEFAULT_USERNAME} password changed')
             return user
-        print('Please enter default user email, or press Enter to use "default_user@localhost"')
+        print(f'Please enter default user email, or press Enter to use {DEFAULT_USERNAME}')
         username = input('Email: ')
         if not username:
             username = DEFAULT_USERNAME
     if not password:
-        password = getpass.getpass('Default user password: ')
+        password = getpass.getpass(f'Default user password {DEFAULT_USERNAME}: ')
 
     try:
         user = User.objects.create_user(email=username, password=password)
@@ -258,6 +276,11 @@ def main():
         from label_studio import __version__
         print('\nLabel Studio version:', __version__, '\n')
         print(json.dumps(versions, indent=4))
+
+    # init
+    elif input_args.command == 'user' or getattr(input_args, 'user', None):
+        _get_user_info(input_args.username)
+        return
 
     # init
     elif input_args.command == 'init' or getattr(input_args, 'init', None):
