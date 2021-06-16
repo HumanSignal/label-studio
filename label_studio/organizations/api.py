@@ -3,6 +3,7 @@
 import logging
 
 from django.urls import reverse
+from django.conf import settings
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework import generics
 from rest_framework.views import APIView
@@ -10,9 +11,9 @@ from rest_framework.response import Response
 
 from drf_yasg.utils import swagger_auto_schema
 
-from core.mixins import APIViewVirtualRedirectMixin, APIViewVirtualMethodMixin
-from core.permissions import all_permissions, ViewClassPermission
-from core.utils.common import get_object_with_check_and_log
+from label_studio.core.mixins import APIViewVirtualRedirectMixin, APIViewVirtualMethodMixin
+from label_studio.core.permissions import all_permissions, ViewClassPermission
+from label_studio.core.utils.common import get_object_with_check_and_log
 
 from organizations.models import Organization
 from organizations.serializers import (
@@ -140,6 +141,8 @@ class OrganizationInviteAPI(APIView):
         org = get_object_with_check_and_log(self.request, Organization, pk=request.user.active_organization_id)
         self.check_object_permissions(self.request, org)
         invite_url = '{}?token={}'.format(reverse('user-signup'), org.token)
+        if hasattr(settings, 'FORCE_SCRIPT_NAME') and settings.FORCE_SCRIPT_NAME:
+            invite_url = invite_url.replace(settings.FORCE_SCRIPT_NAME, '', 1)
         serializer = OrganizationInviteSerializer(data={'invite_url': invite_url, 'token': org.token})
         serializer.is_valid()
         return Response(serializer.data, status=200)
