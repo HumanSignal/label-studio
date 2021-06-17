@@ -265,7 +265,7 @@ SWAGGER_SETTINGS = {
 
 SENTRY_DSN = get_env('SENTRY_DSN', None)
 SENTRY_RATE = float(get_env('SENTRY_RATE', 1.0))
-SENTRY_ENVIRONMENT = get_env('SENTRY_ENVIRONMENT', 'stage.example.com')
+SENTRY_ENVIRONMENT = get_env('SENTRY_ENVIRONMENT', 'stage.opensource')
 
 ROOT_URLCONF = 'core.urls'
 WSGI_APPLICATION = 'core.wsgi.application'
