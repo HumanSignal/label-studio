@@ -1,9 +1,10 @@
 ---
-title: Set up machine learning with Label Studio
+title: Set up machine learning
+short: Machine learning setup
 type: guide
 order: 606
-meta_title: Machine Learning Integration
-meta_description: Label Studio Documentation for connecting Label Studio to machine learning frameworks using the Label Studio machine learning SDK for machine learning and data science projects.
+meta_title: Set up machine learning with Label Studio
+meta_description: Connect Label Studio to machine learning frameworks using the Label Studio ML backend SDK to integrate your model development pipeline seamlessly with your data labeling workflow. 
 ---
 
 Set up machine learning with your labeling process by setting up a machine learning backend for Label Studio. 
@@ -36,7 +37,7 @@ If you need to load static pre-annotated data into Label Studio, running an ML b
 
 ## Quickstart
 
-Get started with a machine learning (ML) backend with Label Studio. You need to start both the machine learning backend and Label Studio to start labeling. You can review examples in the [`label-studio-ml/examples` section of LS ML backend repository](https://github.com/heartexlabs/label-studio-ml-backend/tree/master/label_studio_ml/examples).
+Get started with a machine learning (ML) backend with Label Studio. You need to start both the machine learning backend and Label Studio to start labeling. You can review examples in the [`label-studio-ml/examples` section of the Label Studio ML backend repository](https://github.com/heartexlabs/label-studio-ml-backend/tree/master/label_studio_ml/examples).
 
 Follow these steps to set up an example text classifier ML backend with Label Studio:
 

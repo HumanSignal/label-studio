@@ -6,7 +6,7 @@ order: 40
 
 ## OpenMMLab Image object detector or MMDetection
 
-This [Machine Learning backend](https://labelstud.io/guide/ml.html) allows you to automatically pre-annotate your images with bounding boxes. It's powered by the amazing [OpenMMLab MMDetection library](https://github.com/open-mmlab/mmdetection), which gives you access to many existing state-of-the-art models like FasterRCNN, RetinaNet, YOLO and others. 
+This [Machine Learning backend](/guide/ml.html) lets you to automatically pre-annotate your images with bounding boxes. It's powered by the amazing [OpenMMLab MMDetection library](https://github.com/open-mmlab/mmdetection), which gives you access to many existing state-of-the-art models like FasterRCNN, RetinaNet, YOLO and others. 
 
 Follow this installation guide and then play around with them, picking the best model that suits your current dataset!
 
@@ -14,7 +14,7 @@ Follow this installation guide and then play around with them, picking the best 
 
 1. [Install the model locally](#Installation).
 
-2. Run Label Studio, then go to the **Machine Learning** page in the project settings. Paste the selected ML backend URL, then click **Add Model**.
+2. Run Label Studio, then go to the **Machine Learning** page in the project settings. Click **Add Model**, then paste the selected ML backend URL, by default `http://localhost:9090`.
 
 3. On the **Labeling Interface** page, select the `COCO annotation` or `Bbox object detection` template. 
    Optionally, you can modify the label config with the `predicted_values` attribute. It provides a list of COCO labels separated by comma. If the object detector outputs any of these labels, they are translated to the actual label name from the `value` attribute.

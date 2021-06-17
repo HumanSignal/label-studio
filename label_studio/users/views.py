@@ -3,7 +3,6 @@
 import logging
 
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import views as auth_views
 from django.shortcuts import render, redirect, reverse
 from django.contrib import auth
 from django.conf import settings
@@ -19,23 +18,6 @@ from organizations.forms import OrganizationSignupForm
 
 
 logger = logging.getLogger()
-
-
-class FPasswordResetView(auth_views.PasswordResetView):
-    from_email = 'info@labelstud.io'
-    template_name = 'password/password_reset_form.html'
-
-
-class FPasswordResetDoneView(auth_views.PasswordResetDoneView):
-    template_name = 'password/password_reset_done.html'
-
-
-class FPasswordResetConfirmView(auth_views.PasswordResetConfirmView):
-    template_name = 'password/password_reset_confirm.html'
-
-
-class FPasswordResetCompleteView(auth_views.PasswordResetCompleteView):
-    template_name = 'password/password_reset_complete.html'
 
 
 @login_required

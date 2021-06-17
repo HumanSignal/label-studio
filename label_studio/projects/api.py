@@ -257,13 +257,13 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
 
     def _get_first_unlocked(self, tasks_query):
         # Skip tasks that are locked due to being taken by collaborators
-        for task in tasks_query.all():
+        for task_id in tasks_query.values_list('id', flat=True):
             try:
-                task = Task.objects.select_for_update(skip_locked=True).get(pk=task.id)
+                task = Task.objects.select_for_update(skip_locked=True).get(pk=task_id)
                 if not task.has_lock():
                     return task
             except Task.DoesNotExist:
-                logger.debug('Task with id {} locked'.format(task.id))
+                logger.debug('Task with id {} locked'.format(task_id))
 
     def _try_ground_truth(self, tasks, project):
         """Returns task from ground truth set"""

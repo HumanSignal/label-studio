@@ -41,6 +41,7 @@ const handleError = async (response, showModal = true) => {
 
     modal({
       allowClose: !isShutdown,
+      simple: true,
       body: isShutdown ? (
         <ErrorWrapper
           possum={false}

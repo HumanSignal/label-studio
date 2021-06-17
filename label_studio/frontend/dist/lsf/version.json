@@ -1,6 +1,6 @@
 {
-  "message": "Review history divider",
-  "commit": "4d62c226dd8a4aa061bc2943c612b052a6cda895",
-  "branch": "feature/ui-update",
-  "date": "2021-05-13T17:13:23Z"
+  "message": "Update RichText spans when needed (like in drafts)",
+  "commit": "c1edce69e4573a2ed302165dcef1d4c00e2510c0",
+  "branch": "master",
+  "date": "2021-06-15T21:42:41Z"
 }

@@ -270,6 +270,10 @@ class AnnotationDraftListAPI(RequestDebugLogMixin, generics.ListCreateAPIView):
     queryset = AnnotationDraft.objects.all()
     swagger_schema = None
 
+    def filter_queryset(self, queryset):
+        task_id = self.kwargs['pk']
+        return queryset.filter(task_id=task_id)
+
     def perform_create(self, serializer):
         task_id = self.kwargs['pk']
         annotation_id = self.kwargs.get('annotation_id')

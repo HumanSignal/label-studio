@@ -10,11 +10,20 @@
       <% if (fileName === 'install') { %>
           <li><h4>Install and Upgrade</h4></li>
       <% } %>
+      <% if (fileName === 'security') { %>
+          <li><h4>Security and Privacy</h4></li>
+      <% } %>
+      <% if (fileName === 'signup') { %>
+          <li><h4>Manage Users</h4></li>
+      <% } %>
       <% if (fileName === 'tasks') { %>
           <li><h4>Import Data</h4></li>
       <% } %>
-       <% if (fileName === 'setup') { %>
-          <li><h4>Manage Data & Projects</h4></li>
+       <% if (fileName === 'setup_project') { %>
+          <li><h4>Labeling and Projects</h4></li>
+      <% } %>
+      <% if (fileName === 'quality') { %>
+          <li><h4>Manage Annotations</h4></li>
       <% } %>
       <% if (fileName === 'ml') { %>
           <li><h4>Machine Learning Setup</h4></li>
@@ -52,8 +61,7 @@
       <% } %>
     <li>
       <a href="<%- url_for(p.path) %>" class="sidebar-link<%- page.title === p.title ? ' current' : '' %><%- p.is_new ? ' new' : '' %>">
-        <%- removeLabelStudioMention(p.title) %>
-      </a>
+        <%- p.short ? p.short: p.title %></a>&nbsp;<%- (p.badge) %>
     </li>
     <% }) %>
 </ul>

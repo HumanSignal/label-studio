@@ -6,13 +6,11 @@ order: 50
 
 ## Chatbot response generation with HuggingFace's GPT2 model
 
-If you're going to build a new chatbot, or just want to play with GPT-based text generators, this [Machine Learning backend](https://labelstud.io/guide/ml.html) is for you! Powered by [HuggingFace's Transformers library](https://github.com/huggingface/transformers), 
-it connects GPT2-like language model to Label Studio UI, giving you an opportunity to explore different text responses based on the chat history.
+If you want to build a new chatbot, or just experiment with GPT-based text generators, this [Machine Learning backend](/guide/ml.html) example is for you! Powered by [HuggingFace's Transformers library](https://github.com/huggingface/transformers), 
+it connects a GPT2-like language model to the Label Studio UI, giving you an opportunity to explore different text responses based on the chat history.
 
 
-Check this installation guide and then play around them. 
-
-Collect your next superpower chatbot dataset by edit, remove or add new phrases!
+Follow this installation guide and then play around with the results. Generate your next superpowered chatbot dataset by editing, removing, or adding new phrases!
 
 
 <div style="margin:auto; text-align:center; width:100%"><img src="/images/ml-backend-chatbot.png" style="opacity: 0.7"/></div>
@@ -26,19 +24,26 @@ Collect your next superpower chatbot dataset by edit, remove or add new phrases!
     label-studio-ml start my-ml-backend
     ```
 
-2. Create Dialog generation setup - go to **Setup** page and select _Chatbot_ template
+2. Start Label Studio and create a new project.
+   
+3. In the project **Settings**, set up the **Labeling Interface**.
+   
+4. Select **Browse Templates** and select the Conversational AI **Response Generation** template. 
 
-3. Run Label Studio, then go to the **Model** page. Paste the selected ML backend URL then click on **Add Backend**.
+5. Open the **Machine Learning** settings and click **Add Model**. 
+
+6. Add the URL `http://localhost:9090` and save the model as an ML backend.
 
 
-Now you can import your chat dialogs in the input format of [`<Paragraphs>` object tag](/tags/paragraphs.html), or use sample task import just for give it a try.
+You can import your chat dialogs in the input format of [`<Paragraphs>` object tag](/tags/paragraphs.html), or use a sample task import just to give it a try.
 
-Finally you'll see text boxes with generated answers - 
+After you import data, you'll see text boxes with generated answers. 
 
 ## Tweaking parameters
 
-Additionally you can control some model parameters on starting ML backend
+You can control some model parameters when you start the ML backend:
 
+For example, you can specify the model that you want to use, and the number of responses returned by the model:
 ```bash
 label-studio-ml start my-ml-backend --with \
 model=microsoft/DialoGPT-small \

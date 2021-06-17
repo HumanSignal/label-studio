@@ -57,7 +57,7 @@ def version_page(request):
     # html / json response
     if request.path == '/version/':
         result = json.dumps(result, indent=2)
-        result = result.replace('},', '},\n').replace('\\n', ' ')
+        result = result.replace('},', '},\n').replace('\\n', ' ').replace('\\r', '')
         return HttpResponse('<pre>' + result + '</pre>')
     else:
         return JsonResponse(result)

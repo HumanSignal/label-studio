@@ -1,0 +1,36 @@
+---
+test_name: auth_export_error
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    method: GET
+    headers:
+      X-Original-URI: test
+    url: '{django_live_url}/api/auth/export/'
+  response:
+    status_code: 422
+---
+test_name: auth_export
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- id: create_project
+  type: ref
+- name: stage
+  request:
+    method: GET
+    headers:
+      X-Original-URI: '/export/{project_pk}-test'
+    url: '{django_live_url}/api/auth/export/'
+  response:
+    status_code: 200

@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { Button, Columns } from '../../../components';
 import { confirm, modal } from '../../../components/Modal/Modal';
 import { Spinner } from '../../../components/Spinner/Spinner';
@@ -13,9 +13,6 @@ export const StorageSet = ({title, target, rootClass, buttonLabel}) => {
   const [storages, setStorages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loaded, setLoaded] = useState(false);
-
-  /**@type {import('react').RefObject<Form>} */
-  const formRef = useRef();
 
   const fetchStorages = useCallback(async () => {
     if (!project.id) {
@@ -50,7 +47,6 @@ export const StorageSet = ({title, target, rootClass, buttonLabel}) => {
       style: { width: 760 },
       body: (
         <StorageForm
-          ref={formRef}
           target={target}
           storage={storage}
           project={project.id}
@@ -69,7 +65,7 @@ export const StorageSet = ({title, target, rootClass, buttonLabel}) => {
         </>
       ),
     });
-  }, [project, fetchStorages, target, formRef, rootClass]);
+  }, [project, fetchStorages, target, rootClass]);
 
   const onEditStorage = useCallback(async (storage) => {
     showStorageFormModal(storage);

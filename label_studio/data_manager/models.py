@@ -55,7 +55,7 @@ class View(models.Model):
             selected_items = self.selected_items
 
         return PrepareParams(project=self.project_id, ordering=ordering, filters=filters,
-                             selectedItems=selected_items)
+                             data=self.data, selectedItems=selected_items)
 
 
 class FilterGroup(models.Model):

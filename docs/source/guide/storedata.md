@@ -1,9 +1,9 @@
 ---
-title: Database setup for Label Studio
+title: Database setup 
 type: guide
-order: 202
-meta_title: Database Storage
-meta_description: Label Studio Documentation for configuring database storage for data labeling and machine learning projects.
+order: 205
+meta_title: Database Storage Setup
+meta_description: Configure the database storage used by Label Studio in your data labeling and machine learning projects to ensure performant and scalable data and configuration storage.
 ---
 Label Studio uses a database to store project data and configuration information.
 

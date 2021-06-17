@@ -4,7 +4,7 @@ import mock
 import pytest
 import json
 
-from tests.utils import project_id
+from .utils import project_id
 
 
 @pytest.mark.django_db

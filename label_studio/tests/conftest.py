@@ -13,14 +13,13 @@ from copy import deepcopy
 from django.conf import settings
 from projects.models import Project
 from tasks.models import Task
-from tests.utils import make_project
 from users.models import User
 from organizations.models import Organization
 from types import SimpleNamespace
 
 from .utils import (
     create_business, signin, gcs_client_mock, ml_backend_mock, register_ml_backend_mock, azure_client_mock,
-    redis_client_mock
+    redis_client_mock, make_project
 )
 
 
@@ -270,7 +269,8 @@ def business_client(client):
     client.user = user
     client.organization = org
 
-    assert signin(client, email, password).status_code == 302
+    if signin(client, email, password).status_code != 302:
+        print(f'User {user} failed to login!')
     return client
 
 
@@ -285,7 +285,8 @@ def annotator_client(client):
     user.save()
     business = create_business(user)
     Organization.create_organization(created_by=user, title=user.first_name)
-    assert signin(client, email, password).status_code == 302
+    if signin(client, email, password).status_code != 302:
+        print(f'User {user} failed to login!')
     client.user = user
     client.annotator = user
     return client
@@ -302,7 +303,8 @@ def annotator2_client(client):
     user.save()
     business = create_business(user)
     Organization.create_organization(created_by=user, title=user.first_name)
-    assert signin(client, email, password).status_code == 302
+    if signin(client, email, password).status_code != 302:
+        print(f'User {user} failed to login!')
     client.user = user
     client.annotator = user
     return client

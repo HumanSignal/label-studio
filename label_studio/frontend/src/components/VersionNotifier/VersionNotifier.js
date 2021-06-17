@@ -19,7 +19,7 @@ export const VersionProvider = ({children}) => {
 
   const fetchVersion = useCallback(async () => {
     const response = await api.callApi("version");
-    const data = response['label-studio-package'];
+    const data = response['label-studio-os-package'];
 
     dispatch({
       type: "fetch-version",

@@ -466,10 +466,21 @@ def collect_versions(force=False):
     try:
         import label_studio_converter
         result['label-studio-converter'] = {'version': label_studio_converter.__version__}
-    except:
+    except Exception as e:
+        pass
+
+    # ml
+    try:
+        import label_studio_ml
+        result['label-studio-ml'] = {'version': label_studio_ml.__version__}
+    except Exception as e:
         pass
 
     result.update(settings.COLLECT_VERSIONS(result=result))
+
+    for key in result:
+        if 'message' in result[key] and len(result[key]['message']) > 70:
+            result[key]['message'] = result[key]['message'][0:70] + ' ...'
 
     settings.VERSIONS = result
     return result
