@@ -263,25 +263,9 @@ SWAGGER_SETTINGS = {
     'OPERATIONS_SORTER': 'alpha'
 }
 
-SENTRY_DSN = get_env('SENTRY_DSN', 'https://44f7a50de5ab425ca6bc406ef69b2122@o227124.ingest.sentry.io/5820521')
+SENTRY_DSN = get_env('SENTRY_DSN', None)
 SENTRY_RATE = float(get_env('SENTRY_RATE', 1.0))
 SENTRY_ENVIRONMENT = get_env('SENTRY_ENVIRONMENT', 'stage.example.com')
-
-
-def init_sentry(release_name, release_version):
-    if SENTRY_DSN:
-        import sentry_sdk
-        from sentry_sdk.integrations.django import DjangoIntegration
-        from sentry_sdk.integrations.redis import RedisIntegration
-        sentry_sdk.init(
-            dsn=SENTRY_DSN,
-            integrations=[DjangoIntegration(), RedisIntegration()],
-            traces_sample_rate=SENTRY_RATE,
-            send_default_pii=True,
-            environment=SENTRY_ENVIRONMENT,
-            release=release_name + '@' + str(release_version)
-        )
-
 
 ROOT_URLCONF = 'core.urls'
 WSGI_APPLICATION = 'core.wsgi.application'
@@ -383,13 +367,13 @@ def user_auth(user_model, email, password):
     return None
 
 
-def collect_versions(**kwargs):
+def collect_versions_dummy(**kwargs):
     return {}
 
 
 PROJECT_DELETE = project_delete
 USER_AUTH = user_auth
-COLLECT_VERSIONS = collect_versions
+COLLECT_VERSIONS = collect_versions_dummy
 
 # fix a problem with Windows mimetypes for JS and PNG
 import mimetypes
