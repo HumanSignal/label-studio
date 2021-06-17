@@ -1,15 +1,15 @@
 ---
-title: Top 9 features for NLP labeling
+title: 9 important considerations for NLP labeling
 type: blog
 order: 95
 image: /images/nlp-blog/nlp-labeling-relations-de.png
-meta_title: Top 9 features for NLP labeling
-meta_description: The top 9 most important features to look for when performing NLP labeling and considering NLP labeling tools for natural language processing machine learning projects.   
+meta_title: 9 important considerations for NLP labeling
+meta_description: The top 9 important considerations for NLP labeling and functionality in labeling tools for natural language processing machine learning projects.   
 ---
 
 When you perform natural language processing (NLP) labeling to create machine learning models, you want the data labeling tool you choose to have specific functionality so that you can create a high-quality dataset to train or fine-tune your model. 
 
-Whatever data labeling tool you choose, make sure it has these nine crucial features.
+We’ve identified the nine most important features that you need to consider when starting with an NLP labeling tool.
 
 ## 1. Label text spans
 
@@ -64,5 +64,5 @@ Not all natural language processing happens in English. A tool that can support 
 <br/><img src="/images/nlp-blog/nlp-labeling-relations-de.png" alt="Screenshot of NLP labeling user interface with UI text reading not submitted draft to make it clear that the annotation is still in draft form." class="gif-border" />
 
 ## Conclusion
-There are a lot of data labeling tools available, and it's important to carefully assess the best one to help you perform NLP labeling. Hopefully this list of important features can help you define the requirements for your next NLP labeling project!  
+There are a lot of data labeling tools available. It's important to carefully assess the best one to help you perform NLP labeling. We hope that this list of important functionality can help you define the requirements for your next NLP labeling tool!
 
