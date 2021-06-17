@@ -169,7 +169,6 @@ class ProjectAPI(APIViewVirtualRedirectMixin,
 
     @swagger_auto_schema(tags=['Projects'])
     def get(self, request, *args, **kwargs):
-        hhh
         return super(ProjectAPI, self).get(request, *args, **kwargs)
 
     @swagger_auto_schema(tags=['Projects'])
