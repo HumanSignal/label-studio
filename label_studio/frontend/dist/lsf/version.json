@@ -1,6 +1,6 @@
 {
-  "message": "Fix Image regions dimension corruption issue",
-  "commit": "4d267dceb621cd2efe5456edb48ece2fba0903a5",
+  "message": "Update RichText spans when needed (like in drafts)",
+  "commit": "c1edce69e4573a2ed302165dcef1d4c00e2510c0",
   "branch": "master",
-  "date": "2021-06-09T21:42:33Z"
+  "date": "2021-06-15T21:42:41Z"
 }

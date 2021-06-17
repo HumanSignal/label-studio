@@ -1,6 +1,6 @@
 {
-  "message": "Fix range filter not being updated",
-  "commit": "b9b4cf70d8e9db62dc24183eb088e35ebda8da59",
+  "message": "UI fixes and improvements",
+  "commit": "a9fac1800043c5befd19576b7384eac80840c69a",
   "branch": "master",
-  "date": "2021-06-01T20:33:35Z"
+  "date": "2021-06-16T11:53:24Z"
 }
