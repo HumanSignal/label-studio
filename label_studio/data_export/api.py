@@ -135,7 +135,7 @@ class ProjectExportFilesAuthCheck(APIView):
         try:
             pk = int(project_id)
         except ValueError:
-            return Response("Incorrect filename in export", status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+            return Response({'detail': 'Incorrect filename in export'}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
 
         generics.get_object_or_404(Project.objects.filter(organization=self.request.user.active_organization), pk=pk)
-        return Response("auth ok", status=status.HTTP_200_OK)
+        return Response({'detail': 'auth ok'}, status=status.HTTP_200_OK)

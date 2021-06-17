@@ -96,25 +96,6 @@ class ContextLogMiddleware(CommonMiddleware):
         return response
 
 
-class DRFResponseFormatter(CommonMiddleware):
-    """ This class takes DRF Response and formats it to standard presentation.
-    For example, if response = "test string" then response will be reformatted to {"detail": "test string"}
-    """
-    def __init__(self, get_response):
-        super(DRFResponseFormatter, self).__init__(get_response)
-        self.get_response = get_response
-
-    def process_response(self, request, response):
-        # affect only DRF Response
-        if isinstance(response, Response):
-            if isinstance(response.data, str):
-                response.data = {'detail': response.data}
-                response._is_rendered = False
-                response.render()
-
-        return response
-
-
 class DatabaseIsLockedRetryMiddleware(CommonMiddleware):
     """Workaround for sqlite performance issues
     we wait and retry request if database is locked"""
