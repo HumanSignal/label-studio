@@ -18,6 +18,8 @@ jobs:
       COVERAGE_PROCESS_START: 1
       LOG_DIR: pytest_logs
       collect_analytics: false
+      SENTRY_ENVIRONMENT: tests-ubuntu-sqlite
+      SENTRY_RATE: 0
 
     steps:
       - uses: actions/checkout@v2
@@ -59,6 +61,8 @@ jobs:
       LOG_LEVEL: ERROR
       LOG_DIR: pytest_logs
       collect_analytics: false
+      SENTRY_ENVIRONMENT: tests-ubuntu-postgresql
+      SENTRY_RATE: 0
 
     # Service containers to run with `container-job`
     services:
@@ -142,6 +146,8 @@ jobs:
       COVERAGE_PROCESS_START: 1
       LOG_DIR: pytest_logs
       collect_analytics: false
+      SENTRY_ENVIRONMENT: tests-windows-sqlite
+      SENTRY_RATE: 0
 
     steps:
     - uses: actions/checkout@v2
