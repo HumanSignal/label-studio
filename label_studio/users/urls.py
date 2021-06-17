@@ -21,13 +21,6 @@ urlpatterns = [
     path('user/account/', views.user_account, name='user-account'),
     url(r'^logout/?$', views.logout, name='logout'),
 
-    # Password reset
-    url(r'^password-reset/$', views.FPasswordResetView.as_view(), name='password_reset'),
-    url(r'^password-reset/done/$', views.FPasswordResetDoneView.as_view(), name='password_reset_done'),
-    url(r'^password-reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$',
-        views.FPasswordResetConfirmView.as_view(), name='password_reset_confirm'),
-    url(r'^password-reset/complete/$', views.FPasswordResetCompleteView.as_view(), name='password_reset_complete'),
-
     # avatars
     re_path(r'^data/' + settings.AVATAR_PATH + '/(?P<path>.*)$', serve,
             kwargs={'document_root': join(settings.MEDIA_ROOT, settings.AVATAR_PATH)}),

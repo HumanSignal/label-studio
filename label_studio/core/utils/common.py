@@ -466,7 +466,14 @@ def collect_versions(force=False):
     try:
         import label_studio_converter
         result['label-studio-converter'] = {'version': label_studio_converter.__version__}
-    except:
+    except Exception as e:
+        pass
+
+    # ml
+    try:
+        import label_studio_ml
+        result['label-studio-ml'] = {'version': label_studio_ml.__version__}
+    except Exception as e:
         pass
 
     result.update(settings.COLLECT_VERSIONS(result=result))
