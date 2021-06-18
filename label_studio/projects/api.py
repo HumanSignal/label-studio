@@ -410,11 +410,7 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
             # if annotator is assigned for tasks, he must to solve it regardless of is_labeled=True
             assigned_flag = hasattr(self, 'assignee_flag') and self.assignee_flag
             if not assigned_flag:
-                not_solved_tasks = not_solved_tasks.annotate(
-                    annotation_number=Count('annotations', filter=Q(annotations__ground_truth=False), distinct=True)
-                ).filter(
-                    annotation_number__lt=project.maximum_annotations
-                )
+                not_solved_tasks = not_solved_tasks.filter(is_labeled=False)
 
             not_solved_tasks_count = not_solved_tasks.count()
 
