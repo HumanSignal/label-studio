@@ -411,7 +411,10 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
             assigned_flag = hasattr(self, 'assignee_flag') and self.assignee_flag
             if not assigned_flag:
                 not_solved_tasks = not_solved_tasks.annotate(
-                    annotation_number=Count('annotations')).filter(annotation_number__lte=project.maximum_annotations)
+                    annotation_number=Count('annotations', filter=Q(annotations__ground_truth=False), distinct=True)
+                ).filter(
+                    annotation_number__lt=project.maximum_annotations
+                )
 
             not_solved_tasks_count = not_solved_tasks.count()
 
