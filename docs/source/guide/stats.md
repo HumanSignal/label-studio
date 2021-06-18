@@ -22,6 +22,8 @@ Task agreement shows the consensus between multiple annotators when labeling the
 
 You can also see how the annotations from a specific annotator compare to the prediction scores for a task, or how they compare to the ground truth labels for a task.  
 
+Task agreement is calculated asymmetricaly. For example: if 1 annotator created 2 labels for the task and the other one finds only 1 - they will have different scores in agreement matrixes. 
+
 ## Matching score
 
 A matching score assesses the similarity of annotations for a specific task. The matching score is used differently depending on which agreement metrics are being calculated. 
