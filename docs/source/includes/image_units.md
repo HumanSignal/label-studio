@@ -1,12 +1,12 @@
-<!-- Unfortunately included md files doesn't support code hightlighting, do it manually -->
+<!-- Unfortunately included md files doesn't support code highlighting, do it manually -->
 <script src="/js/highlight.min.js"></script>
 <script>hljs.highlightAll();</script>
 
 ## Units of image annotations
 
-The units the x, y, width and height of image annotations are provided in percentages of overall image dimension. To convert those percentages to pixels, multiply the values by 100. 
+The units the x, y, width and height of image annotations are provided in percentages of overall image dimension. 
 
-You can use the following conversion formulas for `x, y, width, height`:
+Use the following conversion formulas for `x, y, width, height`:
 
 ```python
 pixel_x = x / 100.0 * original_width
