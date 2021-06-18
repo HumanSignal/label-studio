@@ -40,8 +40,7 @@ The most common mistake while resource loading is <b>CORS</b> (Cross-Origin Reso
   <img src='/images/cors-error-2.png' style="max-width:500px; width: 100%; opacity: 0.8">
 </center>
 
-* If you have an access to the hosting server as admin then you need to allow CORS for the web server. For nginx you can try to add <a href="javascript:void(0)" onclick="$('#nginx-cors-code').toggle()">these lines</a> to `/etc/nginx/nginx.conf` into your `location` section: 
-
+- If you have access to the hosting server as admin then you need to allow CORS for the web server. For example, on nginx, you can try to add <a href="javascript:void(0)" onclick="$('#nginx-cors-code').toggle()">these lines</a> to `/etc/nginx/nginx.conf` into your `location` section:
  ```
   location <YOUR_LOCATION> {
        if ($request_method = 'OPTIONS') {
@@ -73,12 +72,15 @@ The most common mistake while resource loading is <b>CORS</b> (Cross-Origin Reso
        }
   }
   ```
-  
-* If you use Amazon S3 with LS [read this manual](storage.html#CORS-and-access-problems).
+- If you use Amazon S3 with Label Studio, see [Troubleshoot CORS and access problems](storage.html#Troubleshoot-CORS-and-access-problems).
+- If you use Google Cloud Storage with Label Studio, see [Troubleshoot CORS and access problems](storage.html#Troubleshoot-CORS-and-access-problems).
+- If you serve your data from an HTTP server created like follows: `python -m http.server 8081 -d`, run the following from the command line:
+```bash
+npm install http-server -g
+http-server -p 3000 --cors
+```
 
-* If you use Google Storage with LS [read this manual](storage.html#CORS-and-access-problems-1).
-
-* Not every host supports CORS setup, but you may to try find these settings in the admin area.      
+Not every host supports CORS setup, but you can to try locate CORS settings in the admin area of your host configuration.      
 
 <br/> 
 

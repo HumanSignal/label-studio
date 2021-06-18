@@ -147,4 +147,4 @@ For example, keep a label selected after creating a region, display labels on bo
 
 You can also modify the layout of the screen, hide or show predictions, annotations, or the results panel, and hide or show various controls and buttons.
 
-
+<!-- md annotation_ids.md -->

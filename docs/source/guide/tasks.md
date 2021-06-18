@@ -1,6 +1,6 @@
 ---
 title: Get data into Label Studio
-short: Get data in
+short: Get data
 type: guide
 order: 300
 meta_title: Import Data into Label Studio
@@ -246,6 +246,12 @@ Use that script to do the following:
 3. Import the file with URLs into Label Studio using the Label Studio UI. 
 
 If your labeling configuration supports HyperText or multiple data types, use the Label Studio JSON format to specify the local file locations instead of a `txt` file. See [an example of this format](storage.html#Tasks-with-local-storage-file-references).
+
+If you serve your data from an HTTP server created like follows: `python -m http.server 8081 -d`, you might need to set up CORS for that server so that Label Studio can access the data files successfully. If needed, run the following from the command line:
+```bash
+npm install http-server -g
+http-server -p 3000 --cors
+```
 
 ### Add the file directory as source storage in the Label Studio UI
 If you're running Label Studio on Docker and want to add local file storage, you need to mount the file directory and set up environment variables. See [Run Label Studio on Docker and use local storage](start.html#Run-Label-Studio-on-Docker-and-use-local-storage).
