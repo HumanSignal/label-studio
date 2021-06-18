@@ -35,6 +35,13 @@ class ProjectManager(models.Manager):
                 'tasks__annotations__id', distinct=True,
                 filter=Q(tasks__annotations__was_cancelled=False)
             ),
+            num_tasks_with_annotations=Count(
+                'tasks__id', distinct=True,
+                filter=Q(tasks__annotations__isnull=False) &
+                    Q(tasks__annotations__ground_truth=False) &
+                    Q(tasks__annotations__was_cancelled=False) &
+                    Q(tasks__annotations__result__isnull=False)
+            ),
             useful_annotation_number=Count(
                 'tasks__annotations__id', distinct=True,
                 filter=Q(tasks__annotations__was_cancelled=False) &
@@ -196,14 +203,6 @@ class Project(ProjectMixin, models.Model):
     @property
     def get_collected_count(self):
         return self.tasks.count()
-
-    @property
-    def num_tasks_with_annotations(self):
-        return self.tasks.filter(
-            Q(annotations__isnull=False) &
-            Q(annotations__ground_truth=False) &
-            Q_task_finished_annotations
-        ).distinct().count()
 
     @property
     def get_total_possible_count(self):
