@@ -21,6 +21,8 @@ If you upload new data to a connected cloud storage bucket, sync the storage con
 
 > Choose your target storage carefully. When you start the labeling project, the target storage must be empty or contain annotations that match previously created or imported tasks from source storage. Tasks are synced with annotations based on internal IDs, so if you accidentally connect to target storage with existing annotations with the same IDs, the connection might fail with undefined behavior.  
 
+For details about how Label Studio secures access to cloud storage using workspaces and cloud storage credentials, see [Secure access to cloud storage](#security.html/#Secure-access-to-cloud-storage).
+
 ## Amazon S3
 
 To connect your [S3](https://aws.amazon.com/s3) bucket with Label Studio, make sure you have programmatic access enabled. [See the Amazon Boto3 configuration documentation](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/quickstart.html#configuration) for more on how to set up access to your S3 bucket.
