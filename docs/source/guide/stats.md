@@ -11,7 +11,7 @@ meta_description: Label Studio Enterprise documentation about task agreement, an
 > Beta documentation: Label Studio Enterprise v2.0.0 is currently in Beta. As a result, this documentation might not reflect the current functionality of the product.
 
 <div class="enterprise"><p>
-Label Studio Enterprise Edition includes various annotation and labeling statistics. The open source Community Edition of Label Studio does not perform these statistical calculations. If you're using Label Studio Community Edition, see <a href="label_studio_compare.html">Label Studio Features</a> to learn more.
+Label Studio Enterprise Edition includes various annotation and labeling statistics. The open source Community Edition of Label Studio does not perform these statistical calculations. If you're using Label Studio Community Edition, see <a href="label_studio_compare.html">Label Studio features</a> to learn more.
 </p></div>
 
 ## Task agreement
@@ -22,7 +22,7 @@ Task agreement shows the consensus between multiple annotators when labeling the
 
 You can also see how the annotations from a specific annotator compare to the prediction scores for a task, or how they compare to the ground truth labels for a task.  
 
-Task agreement is calculated asymmetricaly. For example: if 1 annotator created 2 labels for the task and the other one finds only 1 - they will have different scores in agreement matrixes. 
+Task agreement is calculated asymmetrically. For example, if one annotator adds 2 labels to a specific task, and another annotator only adds 1 label to the task, the annotators and tasks have different scores in the agreement matrices. 
 
 ## Matching score
 
@@ -87,7 +87,7 @@ The method used to calculate the matching score depends on what choice you selec
 
 ## Agreement method
 
-_Agreement method_ defines how [matching scores](stats.html#Matching-score) across all completions for a task are combined to form a single inter-annotator agreement score.
+_Agreement method_ defines how [matching scores](stats.html#Matching-score) across all annotations for a task are combined to form a single inter-annotator agreement score.
 
 There are several possible methods you can specify on project settings page:
 
