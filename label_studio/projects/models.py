@@ -13,7 +13,7 @@ from annoying.fields import AutoOneToOneField
 
 from rest_framework.exceptions import ValidationError
 
-from tasks.models import Task, Prediction, Annotation, Q_task_finished_annotations, Q_finished_annotations
+from tasks.models import Task, Prediction, Annotation, Q_task_finished_annotations, Q_finished_annotations, bulk_update_stats_project_tasks
 from core.utils.common import create_hash, pretty_date, sample_query, get_attr_or_item, load_func
 from core.label_config import (
     parse_config, validate_label_config, extract_data_types, get_all_object_tag_names, config_line_stipped,
@@ -276,6 +276,10 @@ class Project(ProjectMixin, models.Model):
         # if adding/deleting tasks and cohort settings are applied
         elif tasks_number_changed and self.overlap_cohort_percentage < 100 and self.maximum_annotations > 1:
             self._rearrange_overlap_cohort()
+
+        bulk_update_stats_project_tasks(self.tasks.filter(
+            Q(annotations__isnull=False) &
+            Q(annotations__ground_truth=False)))
 
     def _rearrange_overlap_cohort(self):
         tasks_with_overlap = self.tasks.filter(overlap__gt=1)
