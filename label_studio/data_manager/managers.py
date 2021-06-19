@@ -220,7 +220,7 @@ class GroupConcat(Aggregate):
 def annotate_completed_at(queryset):
     from tasks.models import Annotation
 
-    newest = Annotation.objects.filter(task=OuterRef("pk")).order_by("-created_at")
+    newest = Annotation.objects.filter(task=OuterRef("pk"), task__is_labeled=True).distinct().order_by("-created_at")
     return queryset.annotate(completed_at=Subquery(newest.values("created_at")[:1]))
 
 
