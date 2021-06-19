@@ -18,7 +18,7 @@ from django.utils.timezone import now
         [["tasks:id"], 0, False],  # ordered by id ascending, first element api == first created
         [["tasks:-id"], -1, False],  # ordered by id descending, first element api == last created
         [["tasks:completed_at"], 0, False],
-        [["tasks:-completed_at"], -1, False],
+        [["tasks:-completed_at"], 0, False],  # only one task is labeled
         [["tasks:total_annotations"], -1, False],
         [["tasks:-total_annotations"], 0, False],
         [["tasks:total_predictions"], 0, False],
