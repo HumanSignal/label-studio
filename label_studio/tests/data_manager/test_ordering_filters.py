@@ -197,7 +197,7 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
                     }
                 ],
             },
-            [1, 2],
+            [1],  # only first task is labeled, second one is skipped
         ],
         [
             {
@@ -225,7 +225,7 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
                     }
                 ],
             },
-            [1, 2],
+            [1],
         ],
         [
             {
@@ -282,7 +282,7 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
                     }
                 ],
             },
-            [2, 3, 4],
+            [3, 4],
         ],
     ],
 )
@@ -342,6 +342,7 @@ def test_views_filters(filters, ids, business_client, project_id):
     response_data = response.json()
 
     assert 'tasks' in response_data, response_data
+
     response_ids = [task["id"] for task in response_data["tasks"]]
     correct_ids = [task_ids[i] for i in ids]
     assert response_ids == correct_ids, (response_ids, correct_ids, filters)
