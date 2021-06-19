@@ -18,7 +18,7 @@ from django.utils.timezone import now
         [["tasks:id"], 0, False],  # ordered by id ascending, first element api == first created
         [["tasks:-id"], -1, False],  # ordered by id descending, first element api == last created
         [["tasks:completed_at"], 0, False],
-        [["tasks:-completed_at"], -1, False],
+        [["tasks:-completed_at"], 0, False],  # only one task is labeled
         [["tasks:total_annotations"], -1, False],
         [["tasks:-total_annotations"], 0, False],
         [["tasks:total_predictions"], 0, False],
@@ -197,7 +197,7 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
                     }
                 ],
             },
-            [1, 2],
+            [1],  # only first task is labeled, second one is skipped
         ],
         [
             {
@@ -211,7 +211,7 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
                     }
                 ],
             },
-            [3, 4],
+            [2, 3, 4],
         ],
         [
             {
@@ -225,7 +225,7 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
                     }
                 ],
             },
-            [1, 2],
+            [1],
         ],
         [
             {
@@ -342,6 +342,8 @@ def test_views_filters(filters, ids, business_client, project_id):
     response_data = response.json()
 
     assert 'tasks' in response_data, response_data
+    print('!!!!', json.dumps(response_data, indent=2))
+
     response_ids = [task["id"] for task in response_data["tasks"]]
     correct_ids = [task_ids[i] for i in ids]
     assert response_ids == correct_ids, (response_ids, correct_ids, filters)
