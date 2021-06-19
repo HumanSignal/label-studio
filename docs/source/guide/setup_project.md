@@ -21,11 +21,13 @@ After you [start Label Studio](start.html) and [create an account](signup.html),
 ## Create a project
 
 When you're creating a project, you can save your progress at any time. You don't need to import your data and set up the labeling interface all at the same time, but you can.
-1. In the Label Studio UI, click **Create**.
+1. In the Label Studio UI, click **Create Project**.
 2. Type a project name and a description. If you want, choose a color for your project.
 3. If you're ready to import your data, click **Data Import** and import data from the Label Studio UI. For details about import formats and data types, see [Get data into Label Studio](tasks.html).
 4. If you're ready to set up the labeling interface, click **Labeling Setup** and choose a template or create a custom configuration for labeling. See [Set up the labeling interface for your project](setup.html).
 5. When you're done, click **Save** to save your project.
+
+You can also create a project from a template by clicking **Use Template**. See more about [project templates](#Create-a-project-template).
 
 After you save a project, any other collaborator with access to the Label Studio instance can view your project, perform labeling, and make changes. To use role-based access control, you need to use Label Studio Enterprise Edition.
 
@@ -165,6 +167,27 @@ Before you can open a project to annotators, make sure that you've done the foll
 To publish a project, do the following: 
 1. Open a project and navigate to the project **Dashboard**.
 2. Click **Publish**. <br/>After the project is published, annotators can view the project and start being assigned tasks according to the method that you use to [distribute tasks for labeling](#Set-up-task-distribution-for-labeling).
+
+## <i class='ent'></i> Create a project template
+
+If you want to easily create a project with the same labeling interface as an existing project in Label Studio Enterprise, create and use a project template.
+
+1. In the project that you want to use as a template, open the **Settings**.
+2. In the **General** tab for the project settings, click **Save as Template**.
+3. Add a title and description for the project.
+4. Click **Save**.
+
+After you create a project template, you can use the template when you create a project. 
+1. When viewing projects or workspaces, click **Use Template**.
+2. Select a template from the list. 
+3. Type a project name and description for the new project. 
+4. Click **Create**. The project is created and saved in your Sandbox.
+    - Click **Import** to import data.
+    - Click 
+
+
+
+If you want to save a project labeling interface as a project template 
 
 ## Where Label Studio stores your project data and configurations
 
