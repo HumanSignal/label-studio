@@ -145,7 +145,7 @@ class UserGetTokenAPI(APIView):
     def get(self, request, *args, **kwargs):
         user = request.user
         token = Token.objects.get(user=user)
-        return Response(str(token), status=200)
+        return Response({'token': str(token)}, status=200)
 
 
 class UserWhoAmIAPI(generics.RetrieveAPIView):

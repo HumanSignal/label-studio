@@ -8,7 +8,7 @@ import datetime
 from urllib.parse import urljoin
 
 from django.conf import settings
-from django.db import models, connection
+from django.db import models, connection, transaction
 from django.db.models import Q, F, When, Count, Case, Subquery, OuterRef, Value
 from django.db.models.functions import Coalesce
 from django.db.models.signals import post_delete, pre_save, post_save, pre_delete
@@ -25,6 +25,7 @@ from model_utils import FieldTracker
 from core.utils.common import find_first_one_to_one_related_field_by_prefix, string_is_url, load_func
 from core.utils.params import get_env
 from data_manager.managers import PreparedTaskManager, TaskManager
+from core.bulk_update_utils import bulk_update
 
 logger = logging.getLogger(__name__)
 
@@ -290,8 +291,8 @@ class Annotation(AnnotationMixin, models.Model):
                              help_text='Corresponding task for this annotation')
     completed_by = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="annotations", on_delete=models.SET_NULL,
                                      null=True, help_text='User ID of the person who created this annotation')
-    was_cancelled = models.BooleanField(_('was cancelled'), default=False, help_text='User skipped the task')
-    ground_truth = models.BooleanField(_('ground_truth'), default=False, help_text='This annotation is a Ground Truth (ground_truth)')
+    was_cancelled = models.BooleanField(_('was cancelled'), default=False, help_text='User skipped the task', db_index=True)
+    ground_truth = models.BooleanField(_('ground_truth'), default=False, help_text='This annotation is a Ground Truth (ground_truth)', db_index=True)
     created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text='Creation time')
     updated_at = models.DateTimeField(_('updated at'), auto_now=True, help_text='Last updated time')
     lead_time = models.FloatField(_('lead time'), null=True, default=None, help_text='How much time it took to annotate the task')
@@ -524,6 +525,38 @@ def update_ml_backend(sender, instance, **kwargs):
             for ml_backend in project.ml_backends.all():
                 ml_backend.train()
 
+def update_task_stats(task, stats=('is_labeled',), save=True):
+    """Update single task statistics:
+        accuracy
+        is_labeled
+    :param task_id:
+    :param stats: to update separate stats
+    :param save: to skip saving in some cases
+    :return:
+    """
+    logger.debug(f'Update stats {stats} for task {task}')
+    if 'is_labeled' in stats:
+        task.update_is_labeled()
+    if save:
+        task.save()
+
+def bulk_update_stats_project_tasks(tasks):
+    """bulk Task update accuracy
+       ex: after change settings
+       apply several update queries size of batch
+       on updated Task objects
+       in single transaction as execute sql
+    :param tasks:
+    :param batch_size:
+    :return:
+    """
+    # recalc accuracy
+    with transaction.atomic():
+        # update objects without saving
+        for task in tasks:
+            update_task_stats(task, save=False)
+        # start update query batches
+        bulk_update(tasks, update_fields=['is_labeled'], batch_size=settings.BATCH_SIZE)
 
 Q_finished_annotations = Q(was_cancelled=False) & Q(result__isnull=False)
 Q_task_finished_annotations = Q(annotations__was_cancelled=False) & \

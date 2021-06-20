@@ -389,6 +389,9 @@ def current_version_is_outdated(latest_version):
 def check_for_the_latest_version(print_message):
     """ Check latest pypi version
     """
+    if not settings.LATEST_VERSION_CHECK:
+        return
+
     import label_studio
 
     # prevent excess checks by time intervals
@@ -431,7 +434,13 @@ def collect_versions(force=False):
     :return: dict with sub-dicts of version descriptions
     """
     import label_studio
-    if settings.VERSIONS and not force:
+    
+    # prevent excess checks by time intervals
+    current_time = time.time()
+    need_check = current_time - settings.VERSIONS_CHECK_TIME > 300
+    settings.VERSIONS_CHECK_TIME = current_time
+
+    if settings.VERSIONS and not force and not need_check:
         return settings.VERSIONS
 
     # main pypi package
@@ -467,7 +476,14 @@ def collect_versions(force=False):
     try:
         import label_studio_converter
         result['label-studio-converter'] = {'version': label_studio_converter.__version__}
-    except:
+    except Exception as e:
+        pass
+
+    # ml
+    try:
+        import label_studio_ml
+        result['label-studio-ml'] = {'version': label_studio_ml.__version__}
+    except Exception as e:
         pass
 
     result.update(settings.COLLECT_VERSIONS(result=result))
