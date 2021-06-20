@@ -158,6 +158,9 @@ class AnnotationAPI(RequestDebugLogMixin, generics.RetrieveUpdateDestroyAPIView)
 
         annotation.task.save()  # refresh task metrics
 
+        if self.request.data.get('ground_truth'):
+            annotation.task.ensure_unique_groundtruth(annotation_id=annotation.id)
+
         return super(AnnotationAPI, self).update(request, *args, **kwargs)
 
     @swagger_auto_schema(tags=['Annotations'])
@@ -255,6 +258,9 @@ class AnnotationsListAPI(RequestDebugLogMixin, generics.ListCreateAPIView):
         if draft_id is not None:
             logger.debug(f'Remove draft {draft_id} after creating annotation {annotation.id}')
             AnnotationDraft.objects.filter(id=draft_id).delete()
+
+        if self.request.data.get('ground_truth'):
+            annotation.task.ensure_unique_groundtruth(annotation_id=annotation.id)
 
         return annotation
 
