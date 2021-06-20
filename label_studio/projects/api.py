@@ -400,8 +400,9 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
             project.prepared_tasks = get_prepared_queryset(self.request, project)
 
         # detect solved and not solved tasks
-        user_solved_tasks_array = user.annotations.filter(ground_truth=False).filter(
-            Q(task__isnull=False)).values_list('task__pk', flat=True)
+        user_solved_tasks_array = user.annotations.filter(ground_truth=False)\
+            .exclude(was_cancelled=True)\
+            .filter(task__isnull=False).values_list('task__pk', flat=True)
 
         with conditional_atomic():
             not_solved_tasks = project.prepared_tasks.\
