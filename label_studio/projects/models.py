@@ -276,9 +276,10 @@ class Project(ProjectMixin, models.Model):
         elif tasks_number_changed and self.overlap_cohort_percentage < 100 and self.maximum_annotations > 1:
             self._rearrange_overlap_cohort()
 
-        bulk_update_stats_project_tasks(self.tasks.filter(
-            Q(annotations__isnull=False) &
-            Q(annotations__ground_truth=False)))
+        if maximum_annotations_changed or overlap_cohort_percentage_changed:
+            bulk_update_stats_project_tasks(self.tasks.filter(
+                Q(annotations__isnull=False) &
+                Q(annotations__ground_truth=False)))
 
     def _rearrange_overlap_cohort(self):
         tasks_with_overlap = self.tasks.filter(overlap__gt=1)
