@@ -412,11 +412,6 @@ def update_all_task_states_after_deleting_task(sender, instance, **kwargs):
         logger.error('Error in update_all_task_states_after_deleting_task: ' + str(exc))
 
 
-@receiver(pre_delete, sender=Task)
-def release_task_lock_before_delete(sender, instance, **kwargs):
-    if instance is not None:
-        instance.release_lock()
-
 # =========== PROJECT SUMMARY UPDATES ===========
 
 

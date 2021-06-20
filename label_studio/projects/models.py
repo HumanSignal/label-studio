@@ -646,6 +646,13 @@ class ProjectSummary(models.Model):
     def has_permission(self, user):
         return self.project.has_permission(user)
 
+    def reset(self):
+        self.all_data_columns = {}
+        self.common_data_columns = {}
+        self.created_annotations = {}
+        self.created_labels = {}
+        self.save()
+
     def update_data_columns(self, tasks):
         common_data_columns = set()
         all_data_columns = dict(self.all_data_columns)
