@@ -22,7 +22,7 @@ from django.dispatch import receiver, Signal
 
 from model_utils import FieldTracker
 
-from core.utils.common import find_first_one_to_one_related_field_by_prefix, string_is_url, load_func
+from core.utils.common import find_first_one_to_one_related_field_by_prefix, string_is_url, load_func, conditional_atomic
 from core.utils.params import get_env
 from data_manager.managers import PreparedTaskManager, TaskManager
 from core.bulk_update_utils import bulk_update
@@ -244,6 +244,9 @@ class Task(TaskMixin, models.Model):
         if hasattr(self.project, 'summary'):
             summary = self.project.summary
             summary.remove_data_columns([self])
+
+    def ensure_unique_groundtruth(self, annotation_id):
+        self.annotations.exclude(id=annotation_id).update(ground_truth=False)
 
     class Meta:
         db_table = 'task'
