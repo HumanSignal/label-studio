@@ -2,8 +2,9 @@
 """
 import logging
 import drf_yasg.openapi as openapi
-
 from drf_yasg.utils import swagger_auto_schema
+from django.utils.decorators import method_decorator
+
 from rest_framework import generics, status
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.views import APIView
@@ -57,18 +58,17 @@ class MLBackendDetailAPI(generics.RetrieveUpdateDestroyAPIView):
         ml_backend.update_state()
 
 
-class MLBackendTrainAPI(APIView):
-    """Train
-
-    After you've activated an ML backend, call this API to start training with the already-labeled tasks.
-    """
-    permission_required = all_permissions.projects_change
-
-    @swagger_auto_schema(
+@method_decorator(name='post', decorator=swagger_auto_schema(
+        tags=['Machine Learning'],
+        operation_summary='Train',
+        operation_description="""
+        After you activate an ML backend, call this API to start training with the already-labeled tasks.
+        """,
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
-            properties={'use_ground_truth': openapi.Schema(type=openapi.TYPE_BOOLEAN,
-                                                        description='Whether to include ground truth annotations in training')}
+            properties={'use_ground_truth': openapi.Schema(
+                type=openapi.TYPE_BOOLEAN,
+                description='Whether to include ground truth annotations in training')}
         ),
         responses={
             200: openapi.Response(
@@ -85,8 +85,12 @@ class MLBackendTrainAPI(APIView):
                 )
             )
         },
-        tags=['Machine Learning']
     )
+                  )
+class MLBackendTrainAPI(APIView):
+
+    permission_required = all_permissions.projects_change
+
     def post(self, request, *args, **kwargs):
         ml_backend = get_object_with_check_and_log(request, MLBackend, pk=self.kwargs['pk'])
         self.check_object_permissions(self.request, ml_backend)
