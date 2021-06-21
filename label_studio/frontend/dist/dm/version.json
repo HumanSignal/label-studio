@@ -1,6 +1,6 @@
 {
-  "message": "UI fixes and improvements",
-  "commit": "a9fac1800043c5befd19576b7384eac80840c69a",
+  "message": "Control ground truth externally",
+  "commit": "8b41cc989ec30214a1fba9d60ce09b943bc8401d",
   "branch": "master",
-  "date": "2021-06-16T11:53:24Z"
+  "date": "2021-06-21T09:41:35Z"
 }

@@ -219,20 +219,6 @@ and limitations under the License.
 /*!Please JS v0.4.2, Jordan Checkman 2014, Checkman.io, MIT License, Have fun.*/
 
 /**
- * Checks if an event is supported in the current execution environment.
- *
- * NOTE: This will not work correctly for non-generic events such as `change`,
- * `reset`, `load`, `error`, and `select`.
- *
- * Borrows from Modernizr.
- *
- * @param {string} eventNameSuffix Event name, e.g. "click".
- * @return {boolean} True if the event is supported.
- * @internal
- * @license Modernizr 3.0.0pre (Custom Build) | MIT
- */
-
-/**
  * chroma.js - JavaScript library for color conversions
  *
  * Copyright (c) 2011-2019, Gregor Aisch
@@ -290,7 +276,7 @@ and limitations under the License.
  */
 
 /** @license React v0.20.2
- * scheduler-tracing.development.js
+ * scheduler.production.min.js
  *
  * Copyright (c) Facebook, Inc. and its affiliates.
  *
@@ -298,8 +284,8 @@ and limitations under the License.
  * LICENSE file in the root directory of this source tree.
  */
 
-/** @license React v0.20.2
- * scheduler.development.js
+/** @license React v0.26.2
+ * react-reconciler.production.min.js
  *
  * Copyright (c) Facebook, Inc. and its affiliates.
  *
@@ -308,7 +294,7 @@ and limitations under the License.
  */
 
 /** @license React v16.13.1
- * react-is.development.js
+ * react-is.production.min.js
  *
  * Copyright (c) Facebook, Inc. and its affiliates.
  *
@@ -317,7 +303,7 @@ and limitations under the License.
  */
 
 /** @license React v17.0.2
- * react-dom.development.js
+ * react-dom.production.min.js
  *
  * Copyright (c) Facebook, Inc. and its affiliates.
  *
@@ -326,7 +312,7 @@ and limitations under the License.
  */
 
 /** @license React v17.0.2
- * react-jsx-runtime.development.js
+ * react-jsx-runtime.production.min.js
  *
  * Copyright (c) Facebook, Inc. and its affiliates.
  *
@@ -335,7 +321,7 @@ and limitations under the License.
  */
 
 /** @license React v17.0.2
- * react.development.js
+ * react.production.min.js
  *
  * Copyright (c) Facebook, Inc. and its affiliates.
  *
