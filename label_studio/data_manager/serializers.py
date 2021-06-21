@@ -200,7 +200,7 @@ class DataManagerTaskSerializer(TaskSerializer):
     @staticmethod
     def get_completed_at(obj):
         annotations = obj.annotations.all()
-        if annotations:
+        if obj.is_labeled and annotations:
             return max(c.created_at for c in annotations)
         return None
 

@@ -36,13 +36,15 @@ You must be authorized to use Label Studio Enterprise images.
 ```bash
 docker login --username heartexlabs
 ```
-When prompted to enter the password, enter the token here. If Login Succeeded, a `~/.docker/config.json` file is created with the authorization settings.   
+When prompted to enter the password, enter the token. If login succeeds, a `~/.docker/config.json` file is created with the authorization settings.  
+
+> If you have default registries specified when logging into Docker, you might need to explicitly specify the registry: `docker  login --username heartexlabs docker.io`.
+
 2. Pull the latest Label Studio Enterprise image:
 ```bash
 docker pull heartexlabs/heartex:latest
 ```
-
-> Note: In some cases, you might need to use `sudo` to log in or pull images.
+> Note: You might need to use `sudo` to log in or pull images.
 
 ### Add the license file 
 After you retrieve the latest Label Studio Enterprise image, add the license file. You can't start the Docker image without a license file. 
