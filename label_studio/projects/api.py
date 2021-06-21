@@ -11,6 +11,7 @@ from django.db import IntegrityError
 from django.db.models.fields import DecimalField
 from django.conf import settings
 from drf_yasg.utils import swagger_auto_schema
+from django.utils.decorators import method_decorator
 from django.db.models import Q, When, Count, Case, OuterRef, Max, Exists, Value, BooleanField
 from rest_framework import generics, status, filters
 from rest_framework.exceptions import NotFound, ValidationError as RestValidationError
@@ -84,18 +85,17 @@ _task_data_schema = openapi.Schema(
 )
 
 
+@method_decorator(name='get', decorator=swagger_auto_schema(
+    tags=['Projects'],
+    operation_summary='List your projects',
+    operation_description='Return a list of the projects that you have created.'))
+@method_decorator(name='post', decorator=swagger_auto_schema(
+    tags=['Projects'],
+    operation_summary='Create project',
+    operation_description='Create a labeling project.',
+    request_body=ProjectSerializer))
 class ProjectListAPI(generics.ListCreateAPIView):
-    """
-    get:
-    List your projects
 
-    Return a list of the projects that you've created.
-
-    post:
-    Create new project
-
-    Create a labeling project.
-    """
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ProjectSerializer
     filter_backends = [filters.OrderingFilter]
@@ -122,34 +122,30 @@ class ProjectListAPI(generics.ListCreateAPIView):
                                             format(ser.validated_data.get('title', '')))
             raise LabelStudioDatabaseException('Database error during project creation. Try again.')
 
-    @swagger_auto_schema(tags=['Projects'])
     def get(self, request, *args, **kwargs):
         return super(ProjectListAPI, self).get(request, *args, **kwargs)
 
-    @swagger_auto_schema(tags=['Projects'], request_body=ProjectSerializer)
     def post(self, request, *args, **kwargs):
         return super(ProjectListAPI, self).post(request, *args, **kwargs)
 
 
+@method_decorator(name='get', decorator=swagger_auto_schema(
+    tags=['Projects'],
+    operation_summary='Get project by ID',
+    operation_description='Retrieve information about a project by ID.'))
+@method_decorator(name='patch', decorator=swagger_auto_schema(
+    tags=['Projects'],
+    operation_summary='Update project',
+    operation_description='Update project settings for a specific project.',
+    request_body=ProjectSerializer))
+@method_decorator(name='delete', decorator=swagger_auto_schema(
+    tags=['Projects'],
+    operation_summary='Delete project',
+    operation_description='Delete a project by specified project ID.'))
 class ProjectAPI(APIViewVirtualRedirectMixin,
                  APIViewVirtualMethodMixin,
                  generics.RetrieveUpdateDestroyAPIView):
-    """
-    get:
-    Get project by ID
 
-    Retrieve information about a project by ID.
-
-    patch:
-    Update project
-
-    Update project settings for a specific project.
-
-    delete:
-    Delete project
-
-    Delete a project by specified project ID.
-    """
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     queryset = Project.objects.with_counts()
     permission_required = ViewClassPermission(
@@ -167,15 +163,12 @@ class ProjectAPI(APIViewVirtualRedirectMixin,
     def get_queryset(self):
         return Project.objects.with_counts().filter(organization=self.request.user.active_organization)
 
-    @swagger_auto_schema(tags=['Projects'])
     def get(self, request, *args, **kwargs):
         return super(ProjectAPI, self).get(request, *args, **kwargs)
 
-    @swagger_auto_schema(tags=['Projects'])
     def delete(self, request, *args, **kwargs):
         return super(ProjectAPI, self).delete(request, *args, **kwargs)
 
-    @swagger_auto_schema(tags=['Projects'], request_body=ProjectSerializer)
     def patch(self, request, *args, **kwargs):
         project = self.get_object()
         label_config = self.request.data.get('label_config')
@@ -218,18 +211,20 @@ class ProjectAPI(APIViewVirtualRedirectMixin,
         return super(ProjectAPI, self).put(request, *args, **kwargs)
 
 
-class ProjectNextTaskAPI(generics.RetrieveAPIView):
-    """get:
-    Get next task to label
-
+@method_decorator(name='get', decorator=swagger_auto_schema(
+    tags=['Projects'],
+    operation_summary='Get next task to label',
+    operation_description="""
     Get the next task for labeling. If you enable Machine Learning in
     your project, the response might include a "predictions"
     field. It contains a machine learning prediction result for
     this task.
+    """)) # leaving this method decorator info in case we put it back in swagger API docs
+class ProjectNextTaskAPI(generics.RetrieveAPIView):
 
-    """
     permission_required = all_permissions.tasks_view
     serializer_class = TaskWithAnnotationsAndPredictionsAndDraftsSerializer  # using it for swagger API docs
+    swagger_schema = None # this endpoint doesn't need to be in swagger API docs
 
     def _get_random_unlocked(self, task_query, upper_limit=None):
         # get random task from task query, ignoring locked tasks
@@ -469,17 +464,17 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
                     f'There are still some tasks to complete for the user={user}, but they seem to be locked by another user.')
 
 
+@method_decorator(name='post', decorator=swagger_auto_schema(
+        tags=['Projects'],
+        operation_summary='Validate label config',
+        operation_description='Validate a labeling configuration for a project.',
+        responses={200: 'Validation success'}
+    ))
 class LabelConfigValidateAPI(generics.CreateAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_classes = (AllowAny,)
     serializer_class = ProjectLabelConfigSerializer
 
-    @swagger_auto_schema(
-        tags=['Projects'],
-        operation_summary='Validate label config',
-        operation_description='Validate a labeling configuration for a project.',
-        responses={200: 'Validation success'}
-    )
     def post(self, request, *args, **kwargs):
         return super(LabelConfigValidateAPI, self).post(request, *args, **kwargs)
 
@@ -496,6 +491,20 @@ class LabelConfigValidateAPI(generics.CreateAPIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@method_decorator(name='post', decorator=swagger_auto_schema(
+        tags=['Projects'],
+        operation_summary='Validate project label config',
+        operation_description="""
+        Determine whether the label configuration for a specific project is valid.
+        """,
+        manual_parameters=[
+            openapi.Parameter(
+                name='label_config',
+                type=openapi.TYPE_STRING,
+                in_=openapi.IN_QUERY,
+                description='labeling config')
+        ]
+)) # This might be the same endpoint as the previous one for some reason?
 class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
     """ Validate label config
     """
@@ -504,16 +513,6 @@ class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
     permission_required = all_permissions.projects_change
     queryset = Project.objects.all()
 
-    @swagger_auto_schema(
-        tags=['Projects'],
-        operation_summary='Validate a label config',
-        manual_parameters=[
-            openapi.Parameter(
-                name='label_config',
-                type=openapi.TYPE_STRING,
-                in_=openapi.IN_QUERY,
-                description='labeling config')
-        ])
     def post(self, request, *args, **kwargs):
         project = self.get_object()
         label_config = self.request.data.get('label_config')
@@ -536,26 +535,24 @@ class ProjectSummaryAPI(generics.RetrieveAPIView):
     permission_required = all_permissions.projects_view
     queryset = ProjectSummary.objects.all()
 
-    @swagger_auto_schema(tags=['Projects'], operation_summary='Project summary')
+    @swagger_auto_schema(auto_schema=None)
     def get(self, *args, **kwargs):
         return super(ProjectSummaryAPI, self).get(*args, **kwargs)
 
 
+@method_decorator(name='get', decorator=swagger_auto_schema(
+    tags=['Projects'],
+    operation_summary='List project tasks',
+    operation_description='Paginated list of tasks for a specific project.'))
+@method_decorator(name='delete', decorator=swagger_auto_schema(
+    tags=['Projects'],
+    operation_summary='Delete all tasks',
+    operation_description='Delete all tasks from a specific project.'))
 class TasksListAPI(generics.ListCreateAPIView,
                    generics.DestroyAPIView,
                    APIViewVirtualMethodMixin,
                    APIViewVirtualRedirectMixin):
-    """
-    get:
-    List project tasks
 
-    Paginated list of tasks for a specific project.
-
-    delete:
-    Delete all tasks
-
-    Delete all tasks from a specific project.
-    """
     parser_classes = (JSONParser, FormParser)
     permission_required = ViewClassPermission(
         GET=all_permissions.tasks_view,
@@ -571,17 +568,16 @@ class TasksListAPI(generics.ListCreateAPIView,
         tasks = Task.objects.filter(project=project)
         return paginator(tasks, self.request)
 
-    @swagger_auto_schema(tags=['Projects'])
     def delete(self, request, *args, **kwargs):
         project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
         Task.objects.filter(project=project).delete()
         return Response(status=204)
 
-    @swagger_auto_schema(**paginator_help('tasks', 'Projects'))
+    @swagger_auto_schema(**paginator_help('Tasks', 'Projects'))
     def get(self, *args, **kwargs):
         return super(TasksListAPI, self).get(*args, **kwargs)
 
-    @swagger_auto_schema(auto_schema=None, tags=['Projects'])
+    @swagger_auto_schema(auto_schema=None)
     def post(self, *args, **kwargs):
         return super(TasksListAPI, self).post(*args, **kwargs)
 
