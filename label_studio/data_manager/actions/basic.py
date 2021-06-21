@@ -7,6 +7,9 @@ from core.utils.common import temporary_disconnect_signal, temporary_disconnect_
 
 from data_manager.functions import evaluate_predictions
 
+from webhooks.utils import emit_webhooks_for_instanses
+from webhooks.models import WebhookAction
+
 
 def retrieve_tasks_predictions(project, queryset, **kwargs):
     """ Retrieve predictions by tasks ids
@@ -24,7 +27,8 @@ def delete_tasks(project, queryset, **kwargs):
     :param project: project instance
     :param queryset: filtered tasks db queryset
     """
-    count = queryset.count()
+    tasks_ids = list(queryset.values('id'))
+    count = len(tasks_ids)
 
     # delete all project tasks
     if count == project.tasks.count():
@@ -43,6 +47,8 @@ def delete_tasks(project, queryset, **kwargs):
         # this signal re-save the task back
         with temporary_disconnect_signal(signals.post_delete, update_is_labeled_after_removing_annotation, Annotation):
             queryset.delete()
+
+    emit_webhooks_for_instanses(project.organization, WebhookAction.TASK_DELETED, tasks_ids)
 
     # remove all tabs if there are no tasks in project
     reload = False
@@ -63,7 +69,9 @@ def delete_tasks_annotations(project, queryset, **kwargs):
     task_ids = queryset.values_list('id', flat=True)
     annotations = Annotation.objects.filter(task__id__in=task_ids)
     count = annotations.count()
+    annotations_ids = list(annotations.values('id'))
     annotations.delete()
+    emit_webhooks_for_instanses(project.organization, WebhookAction.TASK_DELETED, annotations_ids)
     return {'processed_items': count,
             'detail': 'Deleted ' + str(count) + ' annotations'}
 
@@ -89,7 +97,7 @@ actions = [
         'permissions': 'can_manage_annotations',
         'dialog': {
             'text': 'Send the selected tasks to all ML backends connected to the project.'
-                    'This operation migth be abruptly interrupted due to a timeout. ' 
+                    'This operation migth be abruptly interrupted due to a timeout. '
                     'The recommended way to get predictions is to update tasks using the Label Studio API.'
                     '<a href="https://labelstud.io/guide/ml.html>See more in the documentation</a>.'
                     'Please confirm your action.',

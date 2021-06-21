@@ -25,6 +25,8 @@ from tasks.serializers import (
     TaskSerializer, AnnotationSerializer, TaskSimpleSerializer, PredictionSerializer,
     TaskWithAnnotationsAndPredictionsAndDraftsSerializer, AnnotationDraftSerializer)
 from projects.models import Project
+from webhooks.utils import api_webhook, api_webhook_for_delete
+from webhooks.models import WebhookAction
 
 logger = logging.getLogger(__name__)
 
@@ -52,6 +54,7 @@ class TaskListAPI(generics.ListCreateAPIView):
         return context
 
     @swagger_auto_schema(tags=['Tasks'], request_body=TaskSerializer)
+    @api_webhook(WebhookAction.TASK_CREATED)
     def post(self, request, *args, **kwargs):
         return super(TaskListAPI, self).post(request, *args, **kwargs)
 
@@ -108,14 +111,17 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         return super(TaskAPI, self).get(request, *args, **kwargs)
 
     @swagger_auto_schema(tags=['Tasks'], request_body=TaskSimpleSerializer)
+    @api_webhook(WebhookAction.TASK_UPDATED)
     def patch(self, request, *args, **kwargs):
         return super(TaskAPI, self).patch(request, *args, **kwargs)
 
+    # @api_webhook(WebhookAction.TASK_DELETED, 'task')
     @swagger_auto_schema(tags=['Tasks'])
     def delete(self, request, *args, **kwargs):
         return super(TaskAPI, self).delete(request, *args, **kwargs)
 
     @swagger_auto_schema(auto_schema=None)
+    @api_webhook(WebhookAction.TASK_UPDATED)
     def put(self, request, *args, **kwargs):
         return super(TaskAPI, self).put(request, *args, **kwargs)
 
@@ -168,14 +174,17 @@ class AnnotationAPI(RequestDebugLogMixin, generics.RetrieveUpdateDestroyAPIView)
         return super(AnnotationAPI, self).get(request, *args, **kwargs)
 
     @swagger_auto_schema(tags=['Annotations'], auto_schema=None)
+    @api_webhook(WebhookAction.ANNOTATION_UPDATED)
     def put(self, request, *args, **kwargs):
         return super(AnnotationAPI, self).put(request, *args, **kwargs)
 
     @swagger_auto_schema(tags=['Annotations'], request_body=AnnotationSerializer)
+    @api_webhook(WebhookAction.ANNOTATION_UPDATED)
     def patch(self, request, *args, **kwargs):
         return super(AnnotationAPI, self).patch(request, *args, **kwargs)
 
     @swagger_auto_schema(tags=['Annotations'])
+    @api_webhook_for_delete(WebhookAction.ANNOTATION_DELETED)
     def delete(self, request, *args, **kwargs):
         return super(AnnotationAPI, self).delete(request, *args, **kwargs)
 
@@ -205,6 +214,7 @@ class AnnotationsListAPI(RequestDebugLogMixin, generics.ListCreateAPIView):
         return super(AnnotationsListAPI, self).get(request, *args, **kwargs)
 
     @swagger_auto_schema(tags=['Annotations'], request_body=AnnotationSerializer)
+    @api_webhook(WebhookAction.ANNOTATION_CREATED)
     def post(self, request, *args, **kwargs):
         return super(AnnotationsListAPI, self).post(request, *args, **kwargs)
 
