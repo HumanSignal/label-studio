@@ -250,7 +250,7 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
                 else:
                     try:
                         task = Task.objects.select_for_update(skip_locked=True).get(pk=task.id)
-                        if not task.has_lock():
+                        if not task.has_lock(self.current_user):
                             return task
                     except Task.DoesNotExist:
                         logger.debug('Task with id {} locked'.format(task.id))
@@ -260,7 +260,7 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
         for task_id in tasks_query.values_list('id', flat=True):
             try:
                 task = Task.objects.select_for_update(skip_locked=True).get(pk=task_id)
-                if not task.has_lock():
+                if not task.has_lock(self.current_user):
                     return task
             except Task.DoesNotExist:
                 logger.debug('Task with id {} locked'.format(task_id))
@@ -391,6 +391,7 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
         project = get_object_with_check_and_log(request, Project, pk=self.kwargs['pk'])
         self.check_object_permissions(request, project)
         user = request.user
+        self.current_user = user
 
         # support actions api call from actions/next_task.py
         if hasattr(self, 'prepared_tasks'):
@@ -400,8 +401,9 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
             project.prepared_tasks = get_prepared_queryset(self.request, project)
 
         # detect solved and not solved tasks
-        user_solved_tasks_array = user.annotations.filter(ground_truth=False).filter(
-            Q(task__isnull=False)).values_list('task__pk', flat=True)
+        user_solved_tasks_array = user.annotations.filter(ground_truth=False)\
+            .exclude(was_cancelled=True)\
+            .filter(task__isnull=False).distinct().values_list('task__pk', flat=True)
 
         with conditional_atomic():
             not_solved_tasks = project.prepared_tasks.\
