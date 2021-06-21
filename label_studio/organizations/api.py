@@ -77,7 +77,7 @@ class OrganizationMemberListAPI(generics.ListAPIView):
 
     def get_queryset(self):
         org = generics.get_object_or_404(self.request.user.organizations, pk=self.kwargs[self.lookup_field])
-        return org.members
+        return org.members.order_by('user__username')
 
     @swagger_auto_schema(tags=['Organizations'])
     def get(self, request, *args, **kwargs):
