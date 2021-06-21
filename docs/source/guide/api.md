@@ -18,20 +18,39 @@ See the [API reference documentation](/api) for further guidance and interactive
 2. Click **Account & Settings**.
 3. Copy the access token. 
 
-In your first API call, specify the access token. 
+In your first API call, specify the access token in the headers: 
 ```bash
 curl -X <method> <Label Studio URL>/api/<endpoint> -H 'Authorization: Token <token>'
 ```
 
-For example, ofor a Label Studio instance hosted at localhost:
-```bash
-curl -X GET https://localhost:8000/api/projects/ -H 'Authorization: Token 123456789abcdefghijklmnop123456789'
-```
+See [API documentation for authentication](/api#section/Authentication).
 
+### List all projects
+
+To perform most tasks with the Label Studio API, you must specify the project ID, sometimes referred to as the `pk`. If you don't know what your project ID is, you might want to get a list of all projects in Label Studio that you can access. See the [List your projects API endpoint documentation](/api#operation/api_projects_list).
+
+### Create and set up a project
+
+Create a project and set up the labeling interface in Label Studio using the API. See the [Create new project API endpoint documentation](/api#operation/projects_create).
+
+If you want to make sure the configuration for your labeling interface is valid before submitting it using the API, you can use the [validate label config](/api#operation/projects_validate_create) API endpoint.
+
+### Import tasks using the API
+
+To import tasks using the API, make sure you know the project ID that you want to add tasks to. See additional examples and parameter descriptions in the [import data endpoint documentation](/api#operation/projects_import_create)
+
+### Retrieve tasks
+Retrieve a paginated list of tasks for a specific project. If you want, you can also retrieve tasks and annotations using this API endpoint, as an alternative to exporting annotations. See details and parameters in the [list project tasks endpoint documentation](/api#operation/projects_tasks_list).
+
+### Export annotations
+
+To export annotations, first see [which formats are available to export for your project](/api#operation/api_projects_export_formats_read). 
+
+Choose your selected format from the response and then call the export endpoint. See the [export annotations](/api#operation/projects_export_list) endpoint documentation for more details.
 
 ### API endpoint reference for older Label Studio versions
 
-These API endpoints were introduced in Label Studio version 0.8.1 and are only valid until version 0.9.1. Use the API documentation linked inside Label Studio for guidance when working with version 1.0.0. 
+These API endpoints were introduced in Label Studio version 0.8.1 and are only valid until version 0.9.1. Use the [API documentation](/api) linked inside Label Studio and for guidance when working with version 1.0.0. 
 
 ### Set up project configuration
 
