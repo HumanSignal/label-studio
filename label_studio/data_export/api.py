@@ -98,6 +98,7 @@ class ProjectExportFiles(generics.RetrieveAPIView):
     List of files exported from the Label Studio UI using the Export button on the Data Manager page.
     """
     permission_required = all_permissions.projects_change
+    swagger_schema = None # hide export files endpoint from swagger
 
     def get_queryset(self):
         return Project.objects.filter(organization=self.request.user.active_organization)
