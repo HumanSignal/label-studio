@@ -85,9 +85,8 @@ class Task(TaskMixin, models.Model):
     def has_lock(self, user=None):
         """Check whether current task has been locked by some user"""
         num_locks = self.num_locks
-        num_annotations = self.annotations.filter(
-            Q(ground_truth=False) & ~Q(was_cancelled=True, completed_by=user)
-        ).count()
+        num_annotations = self.annotations.filter(ground_truth=False)\
+            .exclude(Q(was_cancelled=True) & ~Q(completed_by=user)).count()
 
         num = num_locks + num_annotations
         if num > self.overlap:
