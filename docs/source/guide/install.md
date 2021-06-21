@@ -12,7 +12,6 @@ Install Label Studio on premises or in the cloud. Choose the installation method
 - [Install on Ubuntu](#Install-on-Ubuntu)
 - [Install from source](#Install-from-source)
 - [Install with Anaconda](#Install-with-Anaconda)
-- [Install for local development](#Install-for-local-development)
 - [Upgrade Label Studio](#Upgrade-Label-Studio)
 
 <!-- md deploy.md -->
