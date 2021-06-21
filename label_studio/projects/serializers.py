@@ -38,6 +38,7 @@ class ProjectSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                                             help_text='Honeypot annotation number in project')
     skipped_annotations_number = serializers.IntegerField(default=None, read_only=True,
                                                       help_text='Skipped by collaborators annotation number in project')
+    num_tasks_with_annotations = serializers.IntegerField(default=None, read_only=True, help_text='Tasks with annotations count')
     created_by = UserSimpleSerializer(default=CreatedByFromContext())
 
     parsed_label_config = SerializerMethodField(default=None, read_only=True,
