@@ -88,14 +88,30 @@ _task_data_schema = openapi.Schema(
 @method_decorator(name='get', decorator=swagger_auto_schema(
     tags=['Projects'],
     operation_summary='List your projects',
-    operation_description='Return a list of the projects that you have created.'))
+    operation_description="""
+    Return a list of the projects that you've created.
+
+    To perform most tasks with the Label Studio API, you must specify the project ID, sometimes referred to as the `pk`.
+    To retrieve a list of your Label Studio projects, update the following command to match your own environment.
+    Replace the domain name, port, and authorization token, then run the following from the command line:
+    ```bash
+    curl -X GET {}/api/projects/ -H 'Authorization: Token abc123'
+    ```
+    """.format(settings.HOSTNAME or 'https://localhost:8080')
+))
 @method_decorator(name='post', decorator=swagger_auto_schema(
     tags=['Projects'],
-    operation_summary='Create project',
-    operation_description='Create a labeling project.',
-    request_body=ProjectSerializer))
+    operation_summary='Create new project',
+    operation_description="""
+    Create a project and set up the labeling interface in Label Studio using the API.
+    
+    ```bash
+    curl -H Content-Type:application/json -H 'Authorization: Token abc123' -X POST '{}/api/projects' \
+    --data "{{\"label_config\": \"<View>[...]</View>\"}}"
+    ```
+    """.format(settings.HOSTNAME or 'https://localhost:8080')
+))
 class ProjectListAPI(generics.ListCreateAPIView):
-
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = ProjectSerializer
     filter_backends = [filters.OrderingFilter]
@@ -130,18 +146,21 @@ class ProjectListAPI(generics.ListCreateAPIView):
 
 
 @method_decorator(name='get', decorator=swagger_auto_schema(
-    tags=['Projects'],
-    operation_summary='Get project by ID',
-    operation_description='Retrieve information about a project by ID.'))
-@method_decorator(name='patch', decorator=swagger_auto_schema(
-    tags=['Projects'],
-    operation_summary='Update project',
-    operation_description='Update project settings for a specific project.',
-    request_body=ProjectSerializer))
+        tags=['Projects'],
+        operation_summary='Get project by ID',
+        operation_description='Retrieve information about a project by project ID.'
+    ))
 @method_decorator(name='delete', decorator=swagger_auto_schema(
-    tags=['Projects'],
-    operation_summary='Delete project',
-    operation_description='Delete a project by specified project ID.'))
+        tags=['Projects'],
+        operation_summary='Delete project',
+        operation_description='Delete a project by specified project ID.'
+    ))
+@method_decorator(name='patch', decorator=swagger_auto_schema(
+        tags=['Projects'],
+        operation_summary='Update project',
+        operation_description='Update the project settings for a specific project.',
+        request_body=ProjectSerializer
+    ))
 class ProjectAPI(APIViewVirtualRedirectMixin,
                  APIViewVirtualMethodMixin,
                  generics.RetrieveUpdateDestroyAPIView):
@@ -219,7 +238,9 @@ class ProjectAPI(APIViewVirtualRedirectMixin,
     your project, the response might include a "predictions"
     field. It contains a machine learning prediction result for
     this task.
-    """)) # leaving this method decorator info in case we put it back in swagger API docs
+    """,
+    responses={200: TaskWithAnnotationsAndPredictionsAndDraftsSerializer()}
+    )) # leaving this method decorator info in case we put it back in swagger API docs
 class ProjectNextTaskAPI(generics.RetrieveAPIView):
 
     permission_required = all_permissions.tasks_view
@@ -245,7 +266,7 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
                 else:
                     try:
                         task = Task.objects.select_for_update(skip_locked=True).get(pk=task.id)
-                        if not task.has_lock():
+                        if not task.has_lock(self.current_user):
                             return task
                     except Task.DoesNotExist:
                         logger.debug('Task with id {} locked'.format(task.id))
@@ -255,7 +276,7 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
         for task_id in tasks_query.values_list('id', flat=True):
             try:
                 task = Task.objects.select_for_update(skip_locked=True).get(pk=task_id)
-                if not task.has_lock():
+                if not task.has_lock(self.current_user):
                     return task
             except Task.DoesNotExist:
                 logger.debug('Task with id {} locked'.format(task_id))
@@ -379,13 +400,11 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
 
         return Response(response)
 
-    @swagger_auto_schema(
-        tags=['Projects'], responses={200: TaskWithAnnotationsAndPredictionsAndDraftsSerializer()}
-    )
     def get(self, request, *args, **kwargs):
         project = get_object_with_check_and_log(request, Project, pk=self.kwargs['pk'])
         self.check_object_permissions(request, project)
         user = request.user
+        self.current_user = user
 
         # support actions api call from actions/next_task.py
         if hasattr(self, 'prepared_tasks'):
@@ -395,8 +414,9 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
             project.prepared_tasks = get_prepared_queryset(self.request, project)
 
         # detect solved and not solved tasks
-        user_solved_tasks_array = user.annotations.filter(ground_truth=False).filter(
-            Q(task__isnull=False)).values_list('task__pk', flat=True)
+        user_solved_tasks_array = user.annotations.filter(ground_truth=False)\
+            .exclude(was_cancelled=True)\
+            .filter(task__isnull=False).distinct().values_list('task__pk', flat=True)
 
         with conditional_atomic():
             not_solved_tasks = project.prepared_tasks.\
@@ -540,14 +560,22 @@ class ProjectSummaryAPI(generics.RetrieveAPIView):
         return super(ProjectSummaryAPI, self).get(*args, **kwargs)
 
 
-@method_decorator(name='get', decorator=swagger_auto_schema(
-    tags=['Projects'],
-    operation_summary='List project tasks',
-    operation_description='Paginated list of tasks for a specific project.'))
+
 @method_decorator(name='delete', decorator=swagger_auto_schema(
-    tags=['Projects'],
-    operation_summary='Delete all tasks',
-    operation_description='Delete all tasks from a specific project.'))
+        tags=['Projects'],
+        operation_summary='Delete all tasks',
+        operation_description='Delete all tasks from a specific project.'
+))
+@method_decorator(name='get', decorator=swagger_auto_schema(
+        **paginator_help('tasks', 'Projects'),
+        operation_summary='List project tasks',
+        operation_description="""
+            Retrieve a paginated list of tasks for a specific project. For example, use the following cURL command:
+            ```bash
+            curl -X GET {}/api/projects/{{id}}/tasks/ -H 'Authorization: Token abc123'
+            ```
+        """.format(settings.HOSTNAME or 'https://localhost:8080')
+    ))
 class TasksListAPI(generics.ListCreateAPIView,
                    generics.DestroyAPIView,
                    APIViewVirtualMethodMixin,
@@ -573,7 +601,7 @@ class TasksListAPI(generics.ListCreateAPIView,
         Task.objects.filter(project=project).delete()
         return Response(status=204)
 
-    @swagger_auto_schema(**paginator_help('Tasks', 'Projects'))
+
     def get(self, *args, **kwargs):
         return super(TasksListAPI, self).get(*args, **kwargs)
 
