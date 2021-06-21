@@ -35,6 +35,13 @@ class ProjectManager(models.Manager):
                 'tasks__annotations__id', distinct=True,
                 filter=Q(tasks__annotations__was_cancelled=False)
             ),
+            num_tasks_with_annotations=Count(
+                'tasks__id', distinct=True,
+                filter=Q(tasks__annotations__isnull=False) &
+                    Q(tasks__annotations__ground_truth=False) &
+                    Q(tasks__annotations__was_cancelled=False) &
+                    Q(tasks__annotations__result__isnull=False)
+            ),
             useful_annotation_number=Count(
                 'tasks__annotations__id', distinct=True,
                 filter=Q(tasks__annotations__was_cancelled=False) &
@@ -198,14 +205,6 @@ class Project(ProjectMixin, models.Model):
         return self.tasks.count()
 
     @property
-    def num_tasks_with_annotations(self):
-        return self.tasks.filter(
-            Q(annotations__isnull=False) &
-            Q(annotations__ground_truth=False) &
-            Q_task_finished_annotations
-        ).distinct().count()
-
-    @property
     def get_total_possible_count(self):
         """
             Tasks has overlap - how many tc should be accepted
@@ -277,9 +276,10 @@ class Project(ProjectMixin, models.Model):
         elif tasks_number_changed and self.overlap_cohort_percentage < 100 and self.maximum_annotations > 1:
             self._rearrange_overlap_cohort()
 
-        bulk_update_stats_project_tasks(self.tasks.filter(
-            Q(annotations__isnull=False) &
-            Q(annotations__ground_truth=False)))
+        if maximum_annotations_changed or overlap_cohort_percentage_changed:
+            bulk_update_stats_project_tasks(self.tasks.filter(
+                Q(annotations__isnull=False) &
+                Q(annotations__ground_truth=False)))
 
     def _rearrange_overlap_cohort(self):
         tasks_with_overlap = self.tasks.filter(overlap__gt=1)
@@ -646,6 +646,13 @@ class ProjectSummary(models.Model):
 
     def has_permission(self, user):
         return self.project.has_permission(user)
+
+    def reset(self):
+        self.all_data_columns = {}
+        self.common_data_columns = {}
+        self.created_annotations = {}
+        self.created_labels = {}
+        self.save()
 
     def update_data_columns(self, tasks):
         common_data_columns = set()

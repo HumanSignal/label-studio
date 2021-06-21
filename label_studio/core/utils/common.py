@@ -27,10 +27,11 @@ from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.db.utils import OperationalError
-
+from django.db.models.signals import *
 from rest_framework.views import Response, exception_handler
 from rest_framework import status
 from rest_framework.exceptions import ErrorDetail
+from collections import defaultdict
 
 from base64 import b64encode
 from lockfile import LockFile
@@ -537,7 +538,13 @@ get_object_with_check_and_log = load_func(settings.GET_OBJECT_WITH_CHECK_AND_LOG
 
 
 class temporary_disconnect_signal:
-    """ Temporarily disconnect a model from a signal """
+    """ Temporarily disconnect a model from a signal
+
+        Example:
+            with temporary_disconnect_all_signals(
+                signals.post_delete, update_is_labeled_after_removing_annotation, Annotation):
+                do_something()
+    """
     def __init__(self, signal, receiver, sender, dispatch_uid=None):
         self.signal = signal
         self.receiver = receiver
@@ -557,3 +564,30 @@ class temporary_disconnect_signal:
             sender=self.sender,
             dispatch_uid=self.dispatch_uid
         )
+
+
+class temporary_disconnect_all_signals(object):
+    def __init__(self, disabled_signals=None):
+        self.stashed_signals = defaultdict(list)
+        self.disabled_signals = disabled_signals or [
+            pre_init, post_init,
+            pre_save, post_save,
+            pre_delete, post_delete,
+            pre_migrate, post_migrate,
+        ]
+
+    def __enter__(self):
+        for signal in self.disabled_signals:
+            self.disconnect(signal)
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        for signal in list(self.stashed_signals):
+            self.reconnect(signal)
+
+    def disconnect(self, signal):
+        self.stashed_signals[signal] = signal.receivers
+        signal.receivers = []
+
+    def reconnect(self, signal):
+        signal.receivers = self.stashed_signals.get(signal, [])
+        del self.stashed_signals[signal]
