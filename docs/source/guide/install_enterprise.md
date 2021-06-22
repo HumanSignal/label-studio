@@ -135,7 +135,7 @@ To run Label Studio Enterprise in development mode, start Label Studio using Doc
 > Follow these instructions only if you plan to use Label Studio Enterprise in development mode. Otherwise, see [Start Using Docker](#Start-using-Docker) on this page.
 
 #### Prerequisites
-Make sure [Docker Compose](https://docs.docker.com/compose/install/) is installed on your system.
+Make sure [Docker Compose](https://docs.docker.com/compose/install/) version 1.25.0 or higher is installed on your system.
 
 #### Start Label Studio Enterprise in development mode
 
