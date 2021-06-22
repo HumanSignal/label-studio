@@ -39,6 +39,7 @@ class OrganizationMember(models.Model):
     def is_owner(self):
         return self.user.id == self.organization.created_by.id
 
+
 OrganizationMixin = load_func(settings.ORGANIZATION_MIXIN)
 
 
