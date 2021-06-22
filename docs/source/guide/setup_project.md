@@ -155,6 +155,18 @@ Configure the reviewing settings for your project.
 4. Under **Reviewing Options**, choose whether to anonymize annotators when reviewing tasks. 
 Your changes save automatically.
    
+## <i class='ent'></i> Add members to a project
+
+In Label Studio Enterprise, you can [add members to a specific workspace](manage_users.html#Add-or-remove-members-to-a-workspace) or add members to a specific project within a workspace. 
+
+To add members to a specific project, do the following:
+1. Within a project, click **Members** and then click **Manage Members**.
+2. Locate the user that you want to add to the project.
+3. Select the checkbox next to the user's name and click the `>` arrow so that they appear in the list of users that **Belong to the Workspace**.
+4. Click **Save**.
+
+After adding a member to a project, you can [assign them as a reviewer](quality.html#Assign-reviewers-to-tasks) or [assign them as an annotator](labeling.html#Assign-annotators-to-tasks) to tasks in the project. 
+   
 ## <i class='ent'></i> Publish project to annotators
 
 In Label Studio Enterprise, you can hide projects from annotators so that you can fully configure the project before annotators can start labeling. When you're ready for annotators to start labeling, publish the project to annotators.
@@ -183,11 +195,8 @@ After you create a project template, you can use the template when you create a 
 3. Type a project name and description for the new project. 
 4. Click **Create**. The project is created and saved in your Sandbox.
     - Click **Import** to import data.
-    - Click 
-
-
-
-If you want to save a project labeling interface as a project template 
+    - Click **Data Manager** to start annotating.
+    
 
 ## Where Label Studio stores your project data and configurations
 
