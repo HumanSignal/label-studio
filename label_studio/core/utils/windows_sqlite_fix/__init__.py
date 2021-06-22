@@ -65,7 +65,7 @@ def windows_dll_fix():
     #     return
 
     # check python version and warn
-    print('python version: {sys.version_info.major} sqlite minor version: {sys.version_info.minor}')
+    print(f'python version: {sys.version_info.major} sqlite minor version: {sys.version_info.minor}')
     if sys.version_info.major == 3 and sys.version_info.minor in [6, 7, 8]:
         print('\n' + colorama.Fore.LIGHTYELLOW_EX +
               'You are on ' +

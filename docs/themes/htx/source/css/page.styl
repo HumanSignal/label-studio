@@ -69,9 +69,9 @@
 .content
   position: relative
   padding: 2.2em 0
-  max-width: 700px
+  max-width: 800px
   margin: 0 auto
-  padding-left: 50px
+  padding-left: 80px
   &.api
     > a:first-of-type > h2
       margin-top: 0
@@ -84,7 +84,7 @@
         margin: 1.2em 0
   a.button
     font-size: .9em
-    color: #fff
+    color: #000000
     margin: .2em 0
     width: 200px
     text-align: center
@@ -185,7 +185,11 @@
     th
       font-weight: bold
       text-align: left
-    th, tr:nth-child(2n)
+      background-color: #e3e0e0
+      border: 1px solid #c7c7c7
+      code
+        background-color: #efefef
+    tr:nth-child(2n)
       background-color: #f8f8f8
       code
         background-color: #efefef
@@ -237,18 +241,31 @@
   border: rgba(245, 138, 72, 0.4) solid 1px;
   border-radius: 7px;
   align-items: center;
-  max-width: 700px;
+  text-align: center;
+  max-width: 800px;
   margin: 70px auto;
   padding: 1em;
+  font-weight: normal;
 
   a
-    color: $light
-    font-weight: normal;
+    font-weight: bold;
     transition: 0.25s
-
-  a:hover
     color: $green - 25
+
+.enterprise
+  margin: 2em 0
+  padding-left: 20px
+  border-left: 4px solid $purple
+  p
+    font-weight: 600
+    margin-left: 0
+    margin-bottom: 0
+    padding-bottom: 0
+  a
+    font-weight: bold;
     transition: 0.25s
+    color: $green - 25
+
 
 .img-template-example
   filter: drop-shadow(0 0 10px #999);
@@ -339,3 +356,36 @@
       background-color: rgb(255,255,255)
       border: 2px solid #e8e8e8
       border-left: 4px solid $red
+
+i.ent  {
+  display inline
+  margin-left: 0.25em
+  background-image: url("/images/LSE/en.svg")
+  background-size: contain
+  background-position: center
+  background-repeat: no-repeat
+  padding-left: 67px
+  padding-top: 7px
+  vertical-align: middle
+  margin-right: 0.25em
+  width: 67px
+  height 18px
+
+}
+
+li i.ent  {
+  margin-left: 0.25em
+  background-image: url("/images/LSE/en.svg")
+  background-size: contain
+  background-position: center
+  background-repeat: no-repeat
+  padding-left: 60px
+  display inline
+  width: 60px;
+  height 15px;
+  padding-top: 1px
+  vertical-align: middle
+}
+li i.ent::after {
+  content "\00a0\00a0";
+}

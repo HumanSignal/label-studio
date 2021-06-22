@@ -1,27 +1,6 @@
-{% extends 'simple.html' %}
-{% load i18n %}
-{% load static %}
-{% load filters %}
+{% extends 'users/user_base.html' %}
 
-{% block head %}
-<title>Login | Label Studio</title>
-<link rel="stylesheet" href="{{ settings.HOSTNAME }}{% static 'css/login.css' %}"/>
-{% endblock %}
-
-{% block content %}
-<div class="login_page">
-  <h1>Welcome to Label Studio {{ settings.VERSION_EDITION }} {{versions.package.short_version}}</h1>
-  <h2>A full-fledged open source solution for data labeling</h2>
-
-  <img src="{{ settings.HOSTNAME }}{% static 'images/opossum_hanging.svg' %}" height="128px" />
-
-  <div class="toggle">
-    {% if not settings.DISABLE_SIGNUP_WITHOUT_LINK %}
-        <a href="{{ settings.HOSTNAME }}/user/signup">Sign up</a>
-        <a href="{{ settings.HOSTNAME }}/user/login" class="active">Log in</a>
-    {% endif %}
-  </div>
-
+{% block user_content %}
   <form id="login-form" action="{% url 'user-login' %}{% if next %}?next={{ next }}{% endif %}" method="post">
     {% csrf_token %}
     <p><input type="text" class="ls-input" name="email" id="email" placeholder="Email" value="{{ form.data.email }}"></p>
@@ -35,5 +14,5 @@
     {% endif %}
     <p><button type="submit" aria-label="Log In" class="ls-button ls-button_look_primary">Log in</button></p>
   </form>
-</div>
+
 {% endblock %}

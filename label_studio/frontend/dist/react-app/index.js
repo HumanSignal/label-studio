@@ -2842,7 +2842,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const SLACK_INVITE_URL = "https://join.slack.com/t/label-studio/shared_invite/zt-qy37y73p-CCfEaEZvDylyQf4oatK40A";
+const SLACK_INVITE_URL = "http://slack.labelstud.io.s3-website-us-east-1.amazonaws.com?source=product-error-msg";
 const ErrorWrapper = ({
   title,
   message,
@@ -5018,7 +5018,7 @@ const Menubar = ({
               target: "_blank"
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_Menu_Menu__WEBPACK_IMPORTED_MODULE_10__.Menu.Item, {
               label: "Slack Community",
-              href: "https://join.slack.com/t/label-studio/shared_invite/zt-qy37y73p-CCfEaEZvDylyQf4oatK40A",
+              href: "http://slack.labelstud.io.s3-website-us-east-1.amazonaws.com?source=product-menu",
               icon: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_assets_icons__WEBPACK_IMPORTED_MODULE_2__.LsSlack, {}),
               target: "_blank"
             }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_16__.jsx)(_VersionNotifier_VersionNotifier__WEBPACK_IMPORTED_MODULE_12__.VersionNotifier, {
@@ -5093,9 +5093,10 @@ const standaloneModal = props => {
   document.body.appendChild(rootDiv);
 
   const renderModal = (props, animate) => {
-    renderCount++;
+    renderCount++; // simple modals don't require any parts of the app and can't cause the loop of death
+
     (0,react_dom__WEBPACK_IMPORTED_MODULE_1__.render)( /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_providers_MultiProvider__WEBPACK_IMPORTED_MODULE_5__.MultiProvider, {
-      providers: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_providers_ConfigProvider__WEBPACK_IMPORTED_MODULE_3__.ConfigProvider, {}, "config"), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_providers_ApiProvider__WEBPACK_IMPORTED_MODULE_2__.ApiProvider, {}, "api"), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_providers_CurrentUser__WEBPACK_IMPORTED_MODULE_4__.CurrentUserProvider, {}, "current-user")],
+      providers: props.simple ? [] : [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_providers_ConfigProvider__WEBPACK_IMPORTED_MODULE_3__.ConfigProvider, {}, "config"), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_providers_ApiProvider__WEBPACK_IMPORTED_MODULE_2__.ApiProvider, {}, "api"), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_providers_CurrentUser__WEBPACK_IMPORTED_MODULE_4__.CurrentUserProvider, {}, "current-user")],
       children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)(_ModalPopup__WEBPACK_IMPORTED_MODULE_9__.Modal, {
         ref: modalRef,
         ...props,
@@ -5121,7 +5122,10 @@ const standaloneModal = props => {
     },
 
     close() {
-      return modalRef.current.hide();
+      const result = modalRef.current.hide();
+      (0,react_dom__WEBPACK_IMPORTED_MODULE_1__.unmountComponentAtNode)(rootDiv);
+      rootDiv.remove();
+      return result;
     }
 
   };
@@ -9032,7 +9036,7 @@ const FormatInfo = ({
       name: "feedback",
       children: ["Can't find an export format?", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)("br", {}), "Please let us know in ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)("a", {
         className: "no-go",
-        href: "https://join.slack.com/t/label-studio/shared_invite/zt-qy37y73p-CCfEaEZvDylyQf4oatK40A",
+        href: "http://slack.labelstud.io.s3-website-us-east-1.amazonaws.com?source=product-export",
         children: "Slack"
       }), " or submit an issue to the ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_10__.jsx)("a", {
         className: "no-go",
@@ -9238,12 +9242,15 @@ const InvitationModal = ({
         width: '100%'
       },
       readOnly: true
-    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)(_components_Description_Description__WEBPACK_IMPORTED_MODULE_3__.Description, {
+    }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsxs)(_components_Description_Description__WEBPACK_IMPORTED_MODULE_3__.Description, {
       style: {
         width: '70%',
         marginTop: 16
       },
-      children: "Invited members have private accounts. They can register and join to the organization using this link."
+      children: ["Invite people to join your Label Studio instance. People that you invite have full access to all of your projects. ", /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_15__.jsx)("a", {
+        href: "https://labelstud.io/guide/signup.html",
+        children: "Learn more"
+      }), "."]
     })]
   });
 };
@@ -10963,9 +10970,6 @@ const StorageSet = ({
   const [storages, setStorages] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)([]);
   const [loading, setLoading] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   const [loaded, setLoaded] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
-  /**@type {import('react').RefObject<Form>} */
-
-  const formRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
   const fetchStorages = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(async () => {
     if (!project.id) {
       console.warn("Project ID not provided");
@@ -10998,7 +11002,6 @@ const StorageSet = ({
         width: 760
       },
       body: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_8__.jsx)(_StorageForm__WEBPACK_IMPORTED_MODULE_7__.StorageForm, {
-        ref: formRef,
         target: target,
         storage: storage,
         project: project.id,
@@ -11015,7 +11018,7 @@ const StorageSet = ({
         }), "."]
       })
     });
-  }, [project, fetchStorages, target, formRef, rootClass]);
+  }, [project, fetchStorages, target, rootClass]);
   const onEditStorage = (0,react__WEBPACK_IMPORTED_MODULE_0__.useCallback)(async storage => {
     showStorageFormModal(storage);
   }, [showStorageFormModal]);
@@ -11323,6 +11326,7 @@ const handleError = async (response, showModal = true) => {
     } = errorFormatter(result);
     (0,_components_Modal_Modal__WEBPACK_IMPORTED_MODULE_2__.modal)({
       allowClose: !isShutdown,
+      simple: true,
       body: isShutdown ? /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_6__.jsx)(_components_Error_Error__WEBPACK_IMPORTED_MODULE_1__.ErrorWrapper, {
         possum: false,
         title: "Connection refused",

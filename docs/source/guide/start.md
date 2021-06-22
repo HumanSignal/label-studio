@@ -1,9 +1,9 @@
 ---
 title: Start Label Studio
 type: guide
-order: 203
-meta_title: Start Commands
-meta_description: Label Studio Documentation for starting Label Studio and configuring the environment to use Label Studio with your machine learning or data science project. 
+order: 206
+meta_title: Start Commands for Label Studio
+meta_description: Documentation for starting Label Studio and configuring the environment to use Label Studio with your machine learning or data science project. 
 ---
 
 After you install Label Studio, start the server to start using it. 
@@ -39,7 +39,7 @@ The following command line arguments are optional and must be specified with `la
 | `-d` `--debug` | N/A | `False` | Enable debug mode for troubleshooting Label Studio. |
 | `-c` `--config` | `CONFIG_PATH` | `default_config.json` | Deprecated, do not use. Specify the path to the server configuration for Label Studio. |
 | `-l` `--label-config` | `LABEL_STUDIO_LABEL_CONFIG` | `None` | Path to the label configuration file for a specific Label Studio project. See [Set up your labeling project](setup.html). |
-| `--ml-backends` | `LABEL_STUDIO_ML_BACKENDS` | `None` | Specify the URLs for one or more machine learning backends. See [Set up machine learning with your labeling process](ml.html). |
+| `--ml-backends` | `LABEL_STUDIO_ML_BACKENDS` | `None` | Command line argument is deprecated. Specify the URLs for one or more machine learning backends. See [Set up machine learning with your labeling process](ml.html). |
 | `--sampling` | N/A | `sequential` | Specify one of sequential or uniform to define the order for labeling tasks. See [Set up task sampling for your project](start.html#Set_up_task_sampling_for_your_project) on this page. |
 | `--log-level` | N/A | `ERROR` | One of DEBUG, INFO, WARNING, or ERROR. Use to specify the logging level for the Label Studio server. |
 | `-p` `--port` | `LABEL_STUDIO_PORT` | `8080` | Specify the web server port for Label Studio. Defaults to 8080. See [Run Label Studio on localhost with a different port](start.html#Run-Label-Studio-on-localhost-with-a-different-port) on this page. |
@@ -61,6 +61,21 @@ In *nix operating systems, you can set environment variables from the command li
 export LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true
 ```
 You can also use an `.env` file. 
+
+On Windows, you can use the following syntax:
+```bash
+set LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED=true
+```
+
+To check if you set an environment variable successfully, run the following on *nix operating systems:
+```bash
+echo $LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED
+```
+
+Or the following on Windows operating systems:
+```bash
+echo %LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED%
+```
 
 ## Run Label Studio on localhost with a different port
 By default, Label Studio runs on port 8080. If that port is already in use or if you want to specify a different port, start Label Studio with the following command:

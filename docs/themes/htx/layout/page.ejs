@@ -1,15 +1,3 @@
-<%
- removeLabelStudioMention = function(text) {
-  return text
-    .replace(/into Label Studio$/g, '')
-    .replace(/in Label Studio$/g, '')
-    .replace(/with Label Studio$/g, '')
-    .replace(/by Label Studio$/g, '')
-    .replace(/for Label Studio$/g, '')
-    .replace(/from Label Studio$/g, '')
-    .replace(/Label Studio$/g, '')
-  }
-%>
 
 <% if (page.type) { %>
   <%- partial('partials/sidebar', { type: page.type === 'menu' ? 'guide' : page.type, index: page.index }) %>
@@ -41,7 +29,7 @@
     <% } %>
   <% } %>
   <% if (page.title.trim()) { %>
-    <h1><%- page.title %><%- page.type === 'examples' ? ' Example' : '' %></h1>
+    <h1><%- page.title %><%- page.badge %><%- page.type === 'examples' ? ' Example' : '' %></h1>
   <% } %>
   <%- page.content %>
   <% if (page.type === 'guide') { %>
@@ -58,10 +46,10 @@
     <% } %>
 
   <div class="footer-slack">
-    <a href="https://join.slack.com/t/label-studio/shared_invite/zt-qy37y73p-CCfEaEZvDylyQf4oatK40A">
-      Couldn't find what you were looking for or found an error? Please let us know on
+      Couldn't find what you were looking for? Please <a href="http://slack.labelstud.io.s3-website-us-east-1.amazonaws.com?source=docs-footer">let us know on
       Slack&nbsp;<img style="height: 18px; position: absolute" src="/images/slack.png" />
     </a>
+    <br/>If you found an error, you can <a href="https://github.com/heartexlabs/label-studio/issues">file an issue on GitHub</a>!
   </div>
 </div>
 
