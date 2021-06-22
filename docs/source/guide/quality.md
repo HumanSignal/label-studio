@@ -67,7 +67,7 @@ For specific labels, you can see in a donut chart how many labels of each type w
 
 For example, if you're developing a dataset of OCR images, and 90% of your tasks have **Text** labels and 10% have **Handwriting** labels, you might want to increase the number of images of handwriting in your dataset, to improve the eventual accuracy of a machine learning model trained on this dataset. 
 
-## Verify model and annotator performance 
+## Verify model and annotator performance
 
 To verify the performance of specific annotators, review the **Members** section for a specific project. If you don't see an annotator's activity reflected, make sure they have been added as a member to the project.
 
