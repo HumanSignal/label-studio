@@ -4,6 +4,7 @@ import logging
 import drf_yasg.openapi as openapi
 from drf_yasg.utils import swagger_auto_schema
 from django.utils.decorators import method_decorator
+from django.conf import settings
 
 from rest_framework import generics, status
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
@@ -40,14 +41,24 @@ class MLBackendListAPI(generics.ListCreateAPIView):
         ml_backend.update_state()
 
 
+@method_decorator(name='perform_update', decorator=swagger_auto_schema(
+    tags=['Machine Learning'],
+    operation_summary='Add ML Backend',
+    operation_description="""
+    Add an ML backend using the Label Studio UI or by sending a POST request using the following cURL command:
+    ```bash
+    curl -X POST {host}/api/ml -H 'Authorization: Token abc123'\\
+    --data '{"url": "http://localhost:9090", "project": {{project_id}}}' 
+    """.format(host=(settings.HOSTNAME or 'https://localhost:8080')),
+))
 class MLBackendDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     """RUD storage by pk specified in URL"""
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     serializer_class = MLBackendSerializer
     permission_required = all_permissions.projects_change
     queryset = MLBackend.objects.all()
-    swagger_schema = None
 
+    @swagger_auto_schema(auto_schema=None)
     def get_object(self):
         ml_backend = super(MLBackendDetailAPI, self).get_object()
         ml_backend.update_state()
