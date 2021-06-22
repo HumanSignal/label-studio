@@ -22,6 +22,9 @@ from .uploader import load_tasks
 from .serializers import ImportApiSerializer, FileUploadSerializer
 from .models import FileUpload
 
+from webhooks.utils import emit_webhooks_for_instanses
+from webhooks.models import WebhookAction
+
 logger = logging.getLogger(__name__)
 
 
@@ -160,7 +163,9 @@ class ImportAPI(generics.CreateAPIView):
     def _save(self, tasks):
         serializer = self.get_serializer(data=tasks, many=True)
         serializer.is_valid(raise_exception=True)
-        return serializer.save(project_id=self.kwargs['pk']), serializer
+        task_instances = serializer.save(project_id=self.kwargs['pk'])
+        emit_webhooks_for_instanses(self.request.user.active_organization, WebhookAction.TASK_CREATED, task_instances)
+        return task_instances, serializer
 
     def create(self, request, *args, **kwargs):
         start = time.time()

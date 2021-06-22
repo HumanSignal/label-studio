@@ -1,0 +1,77 @@
+---
+test_name: crud for webhooks
+marks:
+  - usefixtures:
+      - django_live_url
+stages:
+  - id: signup
+    type: ref
+  - name: Get webhook info
+    request:
+      url: "{django_live_url}/api/webhooks/info/"
+      method: GET
+    response:
+      status_code: 200
+  - name: Create webhook
+    request:
+      url: "{django_live_url}/api/webhooks/"
+      method: POST
+      json:
+        url: "http://127.0.0.1:6666/webhook"
+        headers:
+          Autorization: "Token 66666666666666666666666"
+          Security: "123123123123123"
+    response:
+      status_code: 201
+      save:
+        json:
+          webhook_id: id
+  - name: Get webhook
+    request:
+      url: "{django_live_url}/api/webhooks/{webhook_id}/"
+      method: GET
+    response:
+      status_code: 200
+  - name: Get webhook list
+    request:
+      url: "{django_live_url}/api/webhooks/"
+      method: GET
+    response:
+      status_code: 200
+  - name: Update webhook
+    request:
+      url: "{django_live_url}/api/webhooks/{webhook_id}/"
+      method: PATCH
+      json:
+        actions:
+          - ANNOTATION_CREATED
+          - ANNOTATION_UPDATED
+          - ANNOTATION_DELETED
+        send_for_all_actions: false
+        send_payload: false
+    response:
+      status_code: 200
+  - name: Second update webhook
+    request:
+      url: "{django_live_url}/api/webhooks/{webhook_id}/"
+      method: PATCH
+      json:
+        actions:
+          - TASK_CREATED
+          - ANNOTATION_UPDATED
+        headers:
+          Autorization: "token 123456789"
+    response:
+      status_code: 200
+  - name: Delete webhook
+    request:
+      url: "{django_live_url}/api/webhooks/{webhook_id}/"
+      method: DELETE
+    response:
+      status_code: 204
+  - name: Get 404 webhook
+    request:
+      url: "{django_live_url}/api/webhooks/{webhook_id}/"
+      method: GET
+    response:
+      status_code: 404

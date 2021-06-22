@@ -1,8 +1,8 @@
 node_modules
 *.lock
 *.pyc
+*.ipynb
 __pycache__
-
 
 # docs
 __generated__
@@ -19,6 +19,7 @@ env/
 venv/
 .venv
 .vscode
+.autoenv
 # web/static
 
 deploy/license.txt
