@@ -6,14 +6,15 @@ meta_title: Label and annotate data
 meta_description: Label and annotate data using the Label Studio UI to create bounding boxes, label text spans, set up relations, and filter and sort project data for your machine learning dataset creation.
 ---
 
-Label and annotate your data with the open source data labeling tool, Label Studio. After you [set up your project](setup_project.html) and [labeling interface](setup.html) and [import your data](tasks.html), you can start labeling and annotating your data.  
-
+Label and annotate your data with the open source data labeling tool, Label Studio. After you [set up your project](setup_project.html) and [labeling interface](setup.html) and [import your data](tasks.html), you can start labeling and annotating your data.
 
 1. Open a project in Label Studio and optionally [filter or sort the data](#Filter-or-sort-project-data).    
 2. Click **Label** to [start labeling](#Start-labeling).
 3. Use [keyboard shortcuts](#Use-keyboard-shortcuts-to-label-regions-faster) or your mouse to label the data and submit your annotations.
 4. Follow the project instructions for labeling and deciding whether to skip tasks. 
 5. Click the project name to return to the data manager.
+
+You can also [collaborate with other annotators](#Label-with-collaborators) to improve the quality of your labeled data. 
 
 ## Filter or sort project data
 
@@ -120,6 +121,14 @@ To label tasks multiple times while the minimum annotations required is set to o
 4. Click **Submit** to save your annotation.
 5. Click the next task in the data manager to open the quick labeling view for that task and repeat steps 2-4.
 
+### <i class='ent'></i> Assign annotators to tasks
+
+In Label Studio Enterprise, if you're an administrator or project manager, you can assign annotators to tasks in a specific project. After you [add the annotator to the project or workspace](setup_project.html#Add-members-to-a-project), assign the annotator to specific tasks.
+
+1. For a specific project, select tasks on the Data Manager.
+2. Select the dropdown and choose **Assign Annotators**.
+3. Select names of annotators and click the `>` arrow to assign them to the selected tasks.
+4. Click **Assign**. 
 
 ## Use keyboard shortcuts to label regions faster
 Use keyboard shortcuts (hotkeys) to improve your labeling performance. When performing a labeling task, click the gear icon to see more details about hotkeys or to enable or disable hotkeys. 
