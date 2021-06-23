@@ -23,7 +23,7 @@ django-redis-cache==3.0.0
 drf_dynamic_fields==0.3.0
 drf_yasg==1.20.0
 drf-generators==0.3.0
--e git+https://github.com/heartexlabs/label-studio-converter@ef8a7f6bb0fee24383e4918588022e28700a5d1a#egg=label-studio-converter
+-e git+https://github.com/heartexlabs/label-studio-converter@5b9651ab6c8d467be5cc45a55575126ff1098f3a#egg=label-studio-converter
 htmlmin==0.1.12
 jsonschema==3.2.0
 lockfile>=0.12.0
