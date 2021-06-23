@@ -1,7 +1,7 @@
 ---
 title: Label Studio v1.1 is now available!
 type: blog
-image: /images/
+image: /images/release-110/HEADERIMAGE.PNG
 order: 93
 meta_title: Label Studio Release Notes 1.1.0
 meta_description: Release notes and information about Label Studio version 1.1.0, with improved data labeling functionality for image annotations and object character recognition (OCR) labeling for machine learning projects.
@@ -10,6 +10,8 @@ meta_description: Release notes and information about Label Studio version 1.1.0
 Label Studio version 1.1 is now available, delivering on our promises in our [public roadmap](https://github.com/heartexlabs/label-studio/blob/master/roadmap.md).
 
 The main focus of this release is on improving the image annotation experience, whether you're adding shapes, bounding boxes, drawing masks, or performing object character recognition (OCR) with images. 
+
+<br/><img src="/images/release-110/EXAMPLE.gif" alt="Gif of adding rectangles, polygons, brushes, and keypoint labels to an image in the Label Studio UI." class="gif-border" />
 
 Read on for the exciting highlights of this release!
 
@@ -56,22 +58,24 @@ While you could previously show or hide regions one by one, now you can toggle t
 
 ## Assign labels after creating regions
 
-If you've ever wanted to assign labels to regions at different times or using different groups of annotators, now you can. 
+If you perform data annotation in stages or with different groups of annotators, you might want to separate creating regions with bounding boxes and brushes, from assigning labels to those regions. With Label Studio 1.1, that's now possible!
 
 Add a label to a region before or after creating the region. Select the region on the image or using the sidebar, then select the label to apply to the region.
 
-INSERTGIFHERE
+<br/><img src="/images/release-110/EXAMPLE2.gif" alt="Gif of adding rectangles and polygons to an image, then labeling them afterward using the Label Studio UI." class="gif-border" />
 
-This workflow is perfect for two-step labeling, where you want one annotator to create regions and another annotator to label the regions, or cases where you want to import predicted bounding boxes or polygons from a machine learning model, then correct the placement of the detected objects and label them.
+This workflow is perfect for two-step labeling, where you want one annotator to create regions and another annotator to label the regions, or cases where you want to import predicted bounding boxes or polygons from a machine learning model, then correct the placement of the detected objects and label them. See more in [Advanced image labeling](labeling.html#Advanced-image-labeling).
 
 ## YOLO export support
-Label Studio now supports exporting annotations in YOLO labeling format, which is especially helpful for image annotations. 
+Label Studio now supports exporting annotations in YOLO labeling format, which is especially helpful for image annotations. Read more in [Export annotations and data from Label Studio](export.html#YOLO).
 
 ## OCR improvements
 
-Separate from expanded image annotation functionality, we've also improved our OCR labeling support for when you're extracting text from images.
+Separate from expanded image annotation functionality, we've also improved our OCR labeling support for when you're extracting text from images. 
 
+<br/><img src="/images/release-110/EXAMPLEOCR.gif" alt="Gif of adding recognized text in the sidebar after adding a rectangle bounding box in the Label Studio UI." class="gif-border" />
 
+Write the text for a selected region in the sidebar, rather than at the bottom of the labeling interface, making it easier to see all the recognized text regions that you've identified and transcribed.
 
 
 
