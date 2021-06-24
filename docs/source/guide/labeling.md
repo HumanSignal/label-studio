@@ -176,13 +176,13 @@ Create a custom template for your labeling interface using the following example
     <Choice value="no"></Choice>
   </Choices>
 <Labels name="labels" toName="image" fillOpacity="0.5" strokeWidth="5">
-  <Label value="cheese" background="green"></Label>
-  <Label value="bun" background="blue"></Label>
+  <Label value="building" background="green"></Label>
+  <Label value="vehicle" background="blue"></Label>
   </Labels>
 </View>
 ```
 
-This example makes rectangles, ellipses, polygons, keypoints, and brush masks available to the annotator. 
+This example makes rectangles, ellipses, polygons, keypoints, and brush masks available to the annotator, along with image classification choices of yes and no, and region labels of building and vehicle. 
 
 ### Faster image labeling
 
@@ -194,15 +194,23 @@ If you accidentally select a point on an image while creating a polygon, just do
 
 When you're annotating images, you can create regions without applying labels. 
 
-1. Create a region by double clicking or clicking and dragging to create a bounding box, or click the points necessary to construct a polygon.
+1. Create a region by double-clicking or clicking and dragging to create a bounding box, or click the points necessary to construct a polygon.
 2. Select the created region in the sidebar or on the image.
 3. Select the label that you want to apply to the region.
 4. Repeat these steps for any regions that you want to create.
 
 This can be helpful for two-step labeling, where you want one annotator to create regions and another annotator to label the regions. 
 
-
 By default, regions without labels appear gray. 
+
+### Erase brush mask labels
+
+If you make a mistake when labeling with the brush mask, you can erase it. You must select a brush region in the sidebar before you can erase any part of it. 
+
+If you want to completely remove a region and start over, delete the region instead of erasing it. Erasing a region does not delete it. 
+
+
+
 
 
 <!-- md annotation_ids.md -->
