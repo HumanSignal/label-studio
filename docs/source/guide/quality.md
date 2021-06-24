@@ -99,7 +99,7 @@ To see the specific annotations contributing to the agreement, do the following:
 4. Click each annotation tab to compare how the different annotations differ. The initials of each annotator appears in the tab header with the annotation ID.
 
 ### Review agreement distribution across tasks
-You can also review the distribution of agreement percentage across project tasks. Clusters of agreement percentages for specific tasks might mean that some tasks are easier to label than others, while other tasks are more confusing and difficult to label consistently.
+You can also review the distribution of agreement percentages across project tasks. A bar chart depicts the number of tasks with a specific agreement percentage. The more tasks with higher agreement, the higher quality your dataset is likely to be. Clusters of agreement percentages for specific tasks might mean that some tasks are easier to label than others, while other tasks are more confusing and difficult to label consistently. 
 
 ## Review annotations against ground truth annotations 
 
