@@ -106,18 +106,22 @@ If you want, you can allow empty annotations.
 
 ### Set up task sampling
 
-If you're using Label Studio Community Edition, you must set up task sampling when you start Label Studio. See [Set up task sampling for your project](start.html#Set-up-task-sampling-for-your-project).
-
+In Label Studio Community Edition, you can set up task sampling from the command line when you start Label Studio or from the Label Studio UI. 
+- To start a project with specific task sampling, see [Set up task sampling for your project](start.html#Set-up-task-sampling-for-your-project).
+- To change task sampling settings from the Label Studio UI, do the following:
+    1. Within a project on the Label Studio UI, click **Settings**.
+    2. On the **General** settings tab, under **Task Sampling**, choose between `Sequential sampling` and `Random sampling`. 
+    3. Click **Save**. 
+    
 <i class='ent'></i> In Label Studio Enterprise, you can set up task sampling in the annotation settings for a project.
 1. Within a project on the Label Studio UI, click **Settings**.
 2. Click **Annotation Settings**.
 3. Select your preferred method of task sampling:
-- Uncertainty sampling, where tasks are shown to annotators according to the model uncertainty, or prediction scores.
-- Sequential sampling, the default, where tasks are shown to annotators in the same order that they appear on the Data Manager.
-- Uniform sampling, where tasks are shown to annotators in a random order.
+    - Uncertainty sampling, where tasks are shown to annotators according to the model uncertainty, or prediction scores.
+    - Sequential sampling, the default, where tasks are shown to annotators in the same order that they appear on the Data Manager.
+    - Uniform sampling, where tasks are shown to annotators in a random order.
 4. You can also choose whether to show tasks with ground truth labels first. 
-
-Your changes save automatically. 
+   Your changes save automatically. 
 
 ### <i class='ent'></i> Define the matching function for annotation statistics
 Annotation statistics such as annotator consensus are calculated using a matching score. If you want the matching score to calculate matches by requiring exact matching choices, choose that option in the annotation settings.
@@ -125,8 +129,9 @@ Annotation statistics such as annotator consensus are calculated using a matchin
 1. Within a project on the Label Studio UI, click **Settings**.
 2. Click **Annotation Settings**.
 3. Under **Matching Function**, select **Exact matching choices**.
+4. For some types of labeling, you can also select a specific matching function. For more about matching functions in Label Studio Enterprise, see [Annotation statistics](stats.html).
 
-Your changes save automatically. For more about how annotation statistics are calculated in Label Studio Enterprise, see [Task agreement and annotator consensus in Label Studio](stats.html).
+Your changes save automatically. 
 
 ## <i class='ent'></i> Set up review settings for your project
 
