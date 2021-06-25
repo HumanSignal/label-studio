@@ -359,6 +359,7 @@ TASK_MIXIN = 'core.mixins.DummyModelMixin'
 ANNOTATION_MIXIN = 'core.mixins.DummyModelMixin'
 ORGANIZATION_MIXIN = 'core.mixins.DummyModelMixin'
 USER_MIXIN = 'users.mixins.UserMixin'
+GET_STORAGE_LIST = 'io_storages.functions.get_storage_list'
 
 
 def project_delete(project):
