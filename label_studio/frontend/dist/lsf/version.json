@@ -1,6 +1,6 @@
 {
-  "message": "Add constraints to applying labels\n\n- preventing of applying region labels to semantically incompatible regions\n- test",
-  "commit": "52e150494f64d4d7b9797ca88d0d9721b7576777",
+  "message": "Merge branch 'fix/area-removing' into feature/ocr-improvements",
+  "commit": "afca4e6bc3d48c56762e2a8834d1795f53779a54",
   "branch": "feature/ocr-improvements",
-  "date": "2021-06-19T02:01:56Z"
+  "date": "2021-06-25T13:18:01Z"
 }
