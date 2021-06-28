@@ -29,3 +29,14 @@ stages:
         json:
           project_pk: id
       status_code: 201
+  - id: get_my_user
+    name: Get my user
+    request:
+      url: "{django_live_url}/api/current-user/whoami"
+      method: GET
+    response:
+      status_code: 200
+      save:
+        json:
+          user_pk: id
+          active_organization_pk: active_organization

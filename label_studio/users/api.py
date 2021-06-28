@@ -16,7 +16,7 @@ from rest_framework.decorators import action
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 
-from core.permissions import CanModifyUserOrReadOnly
+from core.permissions import all_permissions
 from users.models import User
 from users.serializers import UserSerializer
 from users.functions import check_avatar
@@ -63,11 +63,11 @@ logger = logging.getLogger(__name__)
         operation_description='Delete a specific Label Studio user.',
     ))
 class UserAPI(viewsets.ModelViewSet):
-    queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [CanModifyUserOrReadOnly]
-    filter_backends = [DjangoFilterBackend]
-    parser_classes = (JSONParser, MultiPartParser, FormParser)
+    permission_required = all_permissions.organizations_view
+
+    def get_queryset(self):
+        return User.objects.filter(organizations=self.request.user.active_organization)
 
     @swagger_auto_schema(auto_schema=None, methods=['delete', 'post'])
     @action(detail=True, methods=['delete', 'post'])
