@@ -58,3 +58,10 @@ def test_core_int_from_request(param, result):
     # everything ok
     else:
         assert int_from_request(params, 'test', 0) == result
+
+
+@pytest.mark.django_db
+def test_user_info(business_client):
+    from label_studio.server import _get_user_info
+
+    _get_user_info(business_client.admin.email)
