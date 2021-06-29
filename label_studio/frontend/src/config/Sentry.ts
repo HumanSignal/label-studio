@@ -9,5 +9,4 @@ Sentry.init({
   // of transactions for performance monitoring.
   // We recommend adjusting this value in production
   tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.4 : 1.0,
-
 });
