@@ -7,9 +7,9 @@
 
 {% block frontend_settings %}
   {
-    project: "{{project.title}}",
+    project: "{{project.title|escapejs}}",
     projectId: {{project.pk}},
-    projectDescription: "{{project.description}}",
-    projectInstruction: "{{project.expert_instruction}}",
+    projectDescription: "{{project.description|escapejs}}",
+    projectInstruction: "{{project.expert_instruction|escapejs}}",
   }
 {% endblock %}
