@@ -75,6 +75,12 @@ def test_user_info(business_client):
         password = 'passwdx'
         user_token = 'token12345'
 
-    _create_user(DummyArgs(), {})
+    args = DummyArgs()
+    _create_user(args, {})
     user_data = _get_user_info('tester@x.com')
     assert user_data['token'] == 'token12345'
+
+    args.user_token = '123'
+    user = _create_user(DummyArgs(), {})
+    assert user is not None
+
