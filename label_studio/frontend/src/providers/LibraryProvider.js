@@ -65,7 +65,6 @@ export const LibraryContext = createContext({});
 
 export const LibraryProvider = ({libraries, children}) => {
   const requestLibrary = useMemo(() => {
-    console.log({libraries});
     return requestLabelStudio(libraries);
   }, [libraries]);
 
@@ -83,7 +82,6 @@ export const useLibrary = (libraryName) => {
   const fetchLibrary = useCallback(async () => {
     const libLoaded = await ctx.requestLibrary(libraryName);
 
-    console.log({libraryName, libLoaded});
     setLibrary(!!libLoaded);
   }, [ctx, libraryName]);
 
