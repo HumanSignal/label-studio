@@ -254,7 +254,9 @@ SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {
         'token': {
             'type': 'token',
-            'url': '/business/account/#/token'
+            'name': 'Token',
+            'in': 'header',
+            'url': '/user/account'
         }
     },
     'APIS_SORTER': 'alpha',
