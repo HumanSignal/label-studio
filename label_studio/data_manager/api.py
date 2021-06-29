@@ -74,7 +74,6 @@ class ViewAPI(viewsets.ModelViewSet):
     queryset = View.objects.all()
     serializer_class = ViewSerializer
     filter_backends = [DjangoFilterBackend]
-    my_tags = ["Data Manager"]
     filterset_fields = ["project"]
     task_serializer_class = DataManagerTaskSerializer
     permission_required = ViewClassPermission(
