@@ -65,6 +65,4 @@ def test_user_info(business_client):
     from label_studio.server import _get_user_info
 
     user_data = _get_user_info(business_client.admin.email)
-    assert user_data == {'id': 1, 'first_name': '', 'last_name': '', 'username': '', 'email': 'business@pytest.net',
-                         'last_activity': '2021-06-29T09:52:55.774536Z', 'avatar': None, 'initials': 'bu', 'phone': '',
-                         'active_organization': 1, 'token': '7b2226facecf1fd44c65c3b971c034c9103c8afa', 'status': 'ok'}
+    assert 'token' in user_data
