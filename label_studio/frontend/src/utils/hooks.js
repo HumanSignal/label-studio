@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
-import { useHistory, useLocation } from 'react-router';
+import { useHistory } from 'react-router';
+import { useFixedLocation } from '../providers/RoutesProvider';
 
 export const useSet = (initialSet = new Set) => {
   const [set, setSet] = useState(initialSet);
@@ -32,8 +33,7 @@ export const useSet = (initialSet = new Set) => {
 
 export const useRefresh = () => {
   const history = useHistory();
-  const {pathname} = useLocation();
-
+  const {pathname} = useFixedLocation();
 
   const refresh = useCallback((redirectPath) => {
     history.replace("/");

@@ -1,9 +1,8 @@
 import { createContext, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation } from 'react-router';
 import { StaticContent } from '../../app/StaticContent/StaticContent';
 import { IconBook, IconFolder, IconPersonInCircle, IconPin, IconTerminal, LsDoor, LsGitHub, LsSettings, LsSlack } from '../../assets/icons';
 import { useConfig } from '../../providers/ConfigProvider';
-import { useContextComponent } from '../../providers/RoutesProvider';
+import { useContextComponent, useFixedLocation } from '../../providers/RoutesProvider';
 import { cn } from '../../utils/bem';
 import { absoluteURL } from '../../utils/helpers';
 import { Breadcrumbs } from '../Breadcrumbs/Breadcrumbs';
@@ -50,7 +49,7 @@ export const Menubar = ({
 }) => {
   const menuDropdownRef = useRef();
   const useMenuRef = useRef();
-  const location = useLocation();
+  const location = useFixedLocation();
 
   const config = useConfig();
   const [sidebarOpened, setSidebarOpened] = useState(defaultOpened ?? false);
