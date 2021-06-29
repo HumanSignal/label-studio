@@ -1,6 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import pytest
+import sys
 from core.utils.common import bool_from_request, int_from_request
 
 
@@ -84,3 +85,18 @@ def test_user_info(business_client):
     user = _create_user(args, {})
     assert user is not None
 
+
+@pytest.mark.parametrize('command_line, result', [
+    (['label-studio', 'user', '--username', 'test@test.com', '--password', '12345678'], None),
+])
+@pytest.mark.django_db
+def test_main(mocker, command_line, result):
+    from server import main
+
+    mocker.patch(
+        "sys.argv",
+        command_line
+    )
+    output = main()
+
+    assert output == result
