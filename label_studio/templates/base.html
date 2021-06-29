@@ -96,6 +96,7 @@
     },
     debug: {{settings.DEBUG|yesno:"true,false"}},
     hostname: "{{settings.HOSTNAME}}",
+    version: {{ versions|json_dumps_ensure_ascii|safe }},
   }, {% block frontend_settings %}{}{% endblock %});
 </script>
 
