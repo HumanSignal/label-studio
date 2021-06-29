@@ -14,7 +14,7 @@ from annoying.fields import AutoOneToOneField
 from rest_framework.exceptions import ValidationError
 
 from tasks.models import Task, Prediction, Annotation, Q_task_finished_annotations, Q_finished_annotations, bulk_update_stats_project_tasks
-from core.utils.common import create_hash, pretty_date, sample_query, get_attr_or_item, load_func
+from core.utils.common import create_hash, sample_query, get_attr_or_item, load_func
 from core.label_config import (
     parse_config, validate_label_config, extract_data_types, get_all_object_tag_names, config_line_stipped,
     get_sample_task, get_all_labels, get_all_control_tag_tuples, get_annotation_tuple
@@ -506,11 +506,6 @@ class Project(ProjectMixin, models.Model):
         config = label_config or self.label_config
         task, _, _ = get_sample_task(config)
         return task
-
-    def pretty_model_version(self):
-        if not self.model_version:
-            return 'Undefined model version'
-        return pretty_date(self.model_version)
 
     def eta(self):
         """
