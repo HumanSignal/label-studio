@@ -117,6 +117,7 @@ def _create_user(input_args, config):
 
     username = input_args.username or config.get('username') or get_env('USERNAME')
     password = input_args.password or config.get('password') or get_env('PASSWORD')
+    token = input_args.user_token or config.get('user_token') or get_env('USER_TOKEN')
 
     if not username:
         user = User.objects.filter(email=DEFAULT_USERNAME).first()
@@ -125,6 +126,13 @@ def _create_user(input_args, config):
                 user.set_password(password)
                 user.save()
                 print(f'User {DEFAULT_USERNAME} password changed')
+                if token and len(token) > 5:
+                    auth_token = user.auth_token
+                    auth_token.key = token
+                    auth_token.save()
+                else:
+                    print(f"Token {token} is not applied to user {DEFAULT_USERNAME} "
+                          f"because it's empty or len(token) < 5")
             return user
         print(f'Please enter default user email, or press Enter to use {DEFAULT_USERNAME}')
         username = input('Email: ')
