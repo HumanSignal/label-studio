@@ -430,7 +430,7 @@ class AnnotationDraftSerializer(ModelSerializer):
         if len(user.last_name):
             name = name + " " + user.last_name
 
-        name += f' {user.email}, {user.id}'
+        name += (' ' if name else '') + f'{user.email}, {user.id}'
         return name
 
     class Meta:
