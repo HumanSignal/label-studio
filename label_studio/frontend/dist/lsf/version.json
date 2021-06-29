@@ -1,6 +1,6 @@
 {
-  "message": "Merge branch 'fix/area-removing' into feature/ocr-improvements",
-  "commit": "afca4e6bc3d48c56762e2a8834d1795f53779a54",
+  "message": "Fix image rotating in two columns template",
+  "commit": "e00596b372b11a5ac178681368f4c17bca9342fb",
   "branch": "feature/ocr-improvements",
-  "date": "2021-06-25T13:18:01Z"
+  "date": "2021-06-29T10:13:01Z"
 }
