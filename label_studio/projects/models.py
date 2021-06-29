@@ -644,7 +644,7 @@ class ProjectSummary(models.Model):
 
     def reset(self):
         self.all_data_columns = {}
-        self.common_data_columns = {}
+        self.common_data_columns = []
         self.created_annotations = {}
         self.created_labels = {}
         self.save()
