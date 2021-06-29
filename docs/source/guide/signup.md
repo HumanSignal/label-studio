@@ -21,10 +21,29 @@ Accounts that you create are stored locally on the Label Studio server, and allo
 
 If you want, you can create an account from the command line when you start Label Studio.
 ```bash
-label-studio start --username <username> --password <password>
+label-studio start --username <username> --password <password> [--user-token <token-at-least-5-chars>]
 ```
 
-To restrict who has access to your Label Studio instance, you can invite collaborators directly. 
+To restrict who has access to your Label Studio instance, you can invite collaborators directly.
+
+> Note: `--user-token` is optional and could be used for API access. Minimal token length is 5 characters. It will be generated automatically if it's not set. 
+
+### Retrieve user info with the token
+
+This command would be useful to get user token and build automated pipelines: 
+ 
+```bash
+label-studio user --username <username>
+```
+
+Output: 
+```
+=> User info:
+{'id': 1, 'first_name': 'User', 'last_name': 'Somebody', 'username': 'label-studio', 'email': 'label-studio@labelstud.io', 'last_activity': '2021-06-15T19:37:29.594618Z', 'avatar': '/data/avatars/071280b8-48ACD59200000578-5322459-image-m-23_1517162202847.jpg', 'initials': 'll', 'phone': '', 'active_organization': 1, 'token': '3bc6c40cb54e76cb9f1e191238ffb78564675faa', 'status': 'ok'}
+```
+
+You have to parse the last line of the output to get user info. 
+
 
 ### Restrict signup for local deployments
 
@@ -46,6 +65,9 @@ To restrict signup to only those with a link on cloud deployments, set the follo
 LABEL_STUDIO_DISABLE_SIGNUP_WITHOUT_LINK=true
 LABEL_STUDIO_USERNAME=<username>
 LABEL_STUDIO_PASSWORD=<password>
+
+# token is optional, it will be generated automatically otherwise 
+LABEL_STUDIO_USER_TOKEN=<token-at-least-5-chars>
 ```
 Then, start Label Studio and log in with the username and password that you set as environment variables and start [inviting collaborators](#Invite-collaborators-to-a-project).
 

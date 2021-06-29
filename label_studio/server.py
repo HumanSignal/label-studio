@@ -30,6 +30,7 @@ logger = logging.getLogger(__name__)
 
 
 LS_PATH = str(pathlib.Path(__file__).parent.absolute())
+DEFAULT_USERNAME = 'default_user@localhost'
 
 
 def _setup_env():
@@ -90,14 +91,33 @@ def _create_project(title, user, label_config=None, sampling=None, description=N
     return project
 
 
+def _get_user_info(username):
+    from users.models import User
+    from users.serializers import UserSerializer
+    if not username:
+        username = DEFAULT_USERNAME
+
+    user = User.objects.filter(email=username)
+    if not user.exists():
+        print({'status': 'error', 'message': f"user {username} doesn't exist"})
+        return
+
+    user = user.first()
+    user_data = UserSerializer(user).data
+    user_data['token'] = user.auth_token.key
+    user_data['status'] = 'ok'
+    print('=> User info:')
+    print(user_data)
+    return user_data
+
+
 def _create_user(input_args, config):
     from users.models import User
     from organizations.models import Organization
 
-    DEFAULT_USERNAME = 'default_user@localhost'
-
     username = input_args.username or config.get('username') or get_env('USERNAME')
     password = input_args.password or config.get('password') or get_env('PASSWORD')
+    token = input_args.user_token or config.get('user_token') or get_env('USER_TOKEN')
 
     if not username:
         user = User.objects.filter(email=DEFAULT_USERNAME).first()
@@ -105,20 +125,28 @@ def _create_user(input_args, config):
             if password and not user.check_password(password):
                 user.set_password(password)
                 user.save()
-                print('User password changed')
+                print(f'User {DEFAULT_USERNAME} password changed')
             return user
-        print('Please enter default user email, or press Enter to use "default_user@localhost"')
+        print(f'Please enter default user email, or press Enter to use {DEFAULT_USERNAME}')
         username = input('Email: ')
         if not username:
             username = DEFAULT_USERNAME
     if not password:
-        password = getpass.getpass('Default user password: ')
+        password = getpass.getpass(f'Default user password {DEFAULT_USERNAME}: ')
 
     try:
         user = User.objects.create_user(email=username, password=password)
         user.is_staff = True
         user.is_superuser = True
         user.save()
+
+        if token and len(token) > 5:
+            from rest_framework.authtoken.models import Token
+            Token.objects.filter(key=user.auth_token.key).update(key=token)
+        else:
+            print(f"Token {token} is not applied to user {DEFAULT_USERNAME} "
+                  f"because it's empty or len(token) < 5")
+
     except IntegrityError:
         print('User {} already exists'.format(username))
 
@@ -260,6 +288,11 @@ def main():
         print(json.dumps(versions, indent=4))
 
     # init
+    elif input_args.command == 'user' or getattr(input_args, 'user', None):
+        _get_user_info(input_args.username)
+        return
+
+    # init
     elif input_args.command == 'init' or getattr(input_args, 'init', None):
         _init(input_args, config)
 
@@ -317,7 +350,7 @@ def main():
     if input_args.command == 'start' or input_args.command is None:
         from label_studio.core.utils.common import start_browser
 
-        if get_env('USERNAME') and get_env('PASSWORD'):
+        if get_env('USERNAME') and get_env('PASSWORD') or input_args.username:
             _create_user(input_args, config)
 
         # ssl not supported from now
