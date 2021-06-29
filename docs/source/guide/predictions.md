@@ -103,6 +103,91 @@ Import pre-annotated tasks into Label Studio [using the UI](tasks.html#Import-da
 In the Label Studio UI, the imported prediction for this task looks like the following: 
 <center><img src="../images/predictions_loaded.png" alt="screenshot of the Label Studio UI showing an image of airplanes with bounding boxes covering each airplane." style="width: 100%; max-width: 700px"></center>
 
+## Import pre-annotated regions for images 
+
+If you want to import images with pre-annotated regions without labels assigned to them, follow this example.
+
+Use the following labeling configuration: 
+```xml
+<View>
+  <Choices name="choice" toName="image" showInLine="true">
+    <Choice value="Boeing" background="blue"/>
+    <Choice value="Airbus" background="green" />
+  </Choices>
+
+  <RectangleLabels name="label" toName="image">
+    <Label value="Airplane" background="green"/>
+    <Label value="Car" background="blue"/>
+  </RectangleLabels>
+
+  <Image name="image" value="$image"/>
+</View>
+```
+
+After you set up an example project, create example tasks that match the following format. 
+
+<br/>
+{% details <b>Click to expand the example image region JSON</b> %}
+Save this example JSON as a file to import it into Label Studio, for example, `example_prediction_task.json`.
+
+{% codeblock lang:json %}
+[{
+  "data": {
+    "image": "http://localhost:8080/static/samples/sample.jpg" 
+  },
+
+  "predictions": [{
+    "result": [
+      {
+        "id": "result1",
+        "type": "rectanglelabels",        
+        "from_name": "label", "to_name": "image",
+        "original_width": 600, "original_height": 403,
+        "image_rotation": 0,
+        "value": {
+          "rotation": 0,          
+          "x": 4.98, "y": 12.82,
+          "width": 32.52, "height": 44.91,
+          "rectanglelabels": ["Airplane"]
+        }
+      },
+      {
+        "id": "result2",
+        "type": "rectanglelabels",        
+        "from_name": "label", "to_name": "image",
+        "original_width": 600, "original_height": 403,
+        "image_rotation": 0,
+        "value": {
+          "rotation": 0,          
+          "x": 75.47, "y": 82.33,
+          "width": 5.74, "height": 7.40,
+          "rectanglelabels": ["Car"]
+        }
+      },
+      {
+        "id": "result3",
+        "type": "choices",
+        "from_name": "choice", "to_name": "image",
+        "value": {
+          "choices": ["Airbus"]
+      }
+    }],
+    "score": 0.95
+  }]
+}]
+{% endcodeblock %}
+
+In this example there are 3 results inside 1 prediction, or pre-annotation: 
+- `result1` - the first bounding box
+- `result2` - the second bounding box
+- `result3` - choice selection
+The prediction score applies to the entire prediction.
+
+{% enddetails %}
+<br/>
+
+
+
 <!-- md image_units.md -->
 
 ## Import pre-annotations for text 
