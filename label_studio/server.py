@@ -22,7 +22,6 @@ from django.db import IntegrityError
 from django.core.wsgi import get_wsgi_application
 from django.db.migrations.executor import MigrationExecutor
 from django.db import connections, DEFAULT_DB_ALIAS
-from rest_framework.authtoken.models import Token
 
 from label_studio.core.argparser import parse_input_args
 from label_studio.core.utils.params import get_env
@@ -142,6 +141,7 @@ def _create_user(input_args, config):
         user.save()
 
         if token and len(token) > 5:
+            from rest_framework.authtoken.models import Token
             Token.objects.filter(key=user.auth_token.key).update(key=token)
         else:
             print(f"Token {token} is not applied to user {DEFAULT_USERNAME} "
@@ -350,7 +350,7 @@ def main():
     if input_args.command == 'start' or input_args.command is None:
         from label_studio.core.utils.common import start_browser
 
-        if get_env('USERNAME') and get_env('PASSWORD'):
+        if get_env('USERNAME') and get_env('PASSWORD') or input_args.username:
             _create_user(input_args, config)
 
         # ssl not supported from now
