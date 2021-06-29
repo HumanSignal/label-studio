@@ -4,12 +4,3 @@
 {% load static %}
 {% load rules %}
 {% load filters %}
-
-{% block frontend_settings %}
-  {
-    project: "{{project.title|escapejs}}",
-    projectId: {{project.pk}},
-    projectDescription: "{{project.description|escapejs}}",
-    projectInstruction: "{{project.expert_instruction|escapejs}}",
-  }
-{% endblock %}
