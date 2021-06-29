@@ -1,3 +1,5 @@
+/* global Sentry */
+
 import React from 'react';
 import { render } from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
@@ -12,6 +14,7 @@ import './App.styl';
 import { AsyncPage } from './AsyncPage/AsyncPage';
 import ErrorBoundary from './ErrorBoundary';
 import { RootPage } from './RootPage';
+import "../config/Sentry";
 
 const App = ({content}) => {
   const url = new URL(APP_SETTINGS.hostname || location.origin);

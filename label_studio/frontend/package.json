@@ -27,6 +27,8 @@
     "@babel/preset-react": "^7.12.13",
     "@babel/preset-typescript": "^7.13.0",
     "@babel/runtime": "^7.12.13",
+    "@sentry/browser": "^6.8.0",
+    "@sentry/tracing": "^6.8.0",
     "@svgr/webpack": "^5.5.0",
     "@types/chroma-js": "^2.1.3",
     "@types/enzyme": "^3.10.8",
@@ -117,7 +119,9 @@
           "<rootDir>/test/integration/**/*.test.ts",
           "<rootDir>/test/integration/**/*.test.tsx"
         ],
-        "setupFilesAfterEnv": ["expect-puppeteer"]
+        "setupFilesAfterEnv": [
+          "expect-puppeteer"
+        ]
       },
       {
         "displayName": "unit",
