@@ -3,7 +3,7 @@ import { Modal } from '../../../components/Modal/Modal';
 import { cn } from '../../../utils/bem';
 import { unique } from '../../../utils/helpers';
 import "./Import.styl";
-import { IconUpload, IconInfo } from '../../../assets/icons';
+import { IconUpload, IconInfo, IconError } from '../../../assets/icons';
 import { useAPI } from '../../../providers/ApiProvider';
 
 const importClass = cn("upload_page");
@@ -89,6 +89,25 @@ const Upload = ({ children, sendFiles }) => {
   );
 };
 
+const ErrorMessage = ({ error }) => {
+  if (!error) return null;
+  let extra = error.validation_errors ?? error.extra;
+  // support all possible responses
+  if (extra && typeof extra === "object" && !Array.isArray(extra)) {
+    extra = extra.non_field_errors ?? Object.values(extra);
+  }
+  if (Array.isArray(extra)) extra = extra.join("; ");
+
+  return (
+    <div className={importClass.elem("error")}>
+      <IconError style={{ marginRight: 8 }} />
+      {error.id && `[${error.id}] `}
+      {error.detail || error.message}
+      {extra && ` (${extra})`}
+    </div>
+  );
+};
+
 export const ImportPage = ({
   project,
   show = true,
@@ -152,6 +171,12 @@ export const ImportPage = ({
   };
   const onError = err => {
     console.error(err);
+    // @todo workaround for error about input size in a wrong html format
+    if (typeof err === "string" && err.includes("RequestDataTooBig")) {
+      const message = "Imported file is too big";
+      const extra = err.match(/"exception_value">(.*)<\/pre>/)?.[1];
+      err = { message, extra };
+    }
     setError(err);
     setLoading(false);
     onWaiting?.(false);
@@ -171,6 +196,7 @@ export const ImportPage = ({
     dispatch({ sending: files });
 
     const query = dontCommitToProject ? { commit_to_project: "false" } : {};
+    // @todo use json for dataset uploads by URL
     const contentType = body instanceof FormData
       ? 'multipart/form-data' // usual multipart for usual files
       : 'application/x-www-form-urlencoded'; // chad urlencoded for URL uploads
@@ -185,7 +211,7 @@ export const ImportPage = ({
     else onError?.(res?.response);
 
     dispatch({ sent: files });
-  }, [project]);
+  }, [project, onFinish]);
 
   const sendFiles = useCallback(files => {
     onStart();
@@ -265,13 +291,7 @@ export const ImportPage = ({
         </div>
       </header>
 
-      {error && (
-        <div className={importClass.elem("error")}>
-          {error.id && `[${error.id}]`}
-          {error.detail || error.message}
-          {error.validation_errors && `(${error.validation_errors[0]})`}
-        </div>
-      )}
+      <ErrorMessage error={error} />
 
       <main>
         <Upload sendFiles={sendFiles} project={project}>
@@ -283,7 +303,7 @@ export const ImportPage = ({
                 <dl>
                   <dt>Text</dt><dd>txt</dd>
                   <dt>Audio</dt><dd>wav, aiff, mp3, au, flac, m4a, ogg</dd>
-                  <dt>Images</dt><dd>jpg, png, gif, bmp, tiff, svg, webp</dd>
+                  <dt>Images</dt><dd>jpg, png, gif, bmp, svg, webp</dd>
                   <dt>HTML</dt><dd>html, htm, xml</dd>
                   <dt>Time Series</dt><dd>csv, tsv</dd>
                   <dt>Common Formats</dt><dd>csv, tsv, txt, json</dd>
