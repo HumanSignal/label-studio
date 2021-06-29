@@ -58,6 +58,8 @@ Label Studio accesses the data stored in remote cloud storage using URLs, so pla
 
 Use workspaces, projects, and roles to further secure access to cloud storage and data accessed using URLs by setting up cloud storage credentials. You can provide cloud storage authentication credentials globally for all projects in Label Studio, or use different credentials for access to different buckets on a per-project basis. Label Studio allows you to configure different cloud storage buckets for different projects, making it easier to manage access to the data. See [Sync data from external storage](storage.html).
 
+In Label Studio Enterprise, if you're using Amazon S3, Label Studio can use an IAM role configured with an external ID to access S3 bucket contents in a secure fashion. See [Set up an S3 connection with IAM role access](storage.html#Set-up-an-S3-connection-with-IAM-role-access)
+
 
 ### Secure access to Redis storage
 If you use Redis as an external storage database for data and annotations, the setup supports TLS/SSL and requires the Label Studio client to be authenticated to the database with a valid certificate.

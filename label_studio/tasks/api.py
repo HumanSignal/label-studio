@@ -10,16 +10,13 @@ from drf_yasg.utils import swagger_auto_schema
 from django.utils.decorators import method_decorator
 
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
-from rest_framework import generics
+from rest_framework import generics, viewsets
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
 
 from core.utils.common import get_object_with_check_and_log
-from core.decorators import permission_required
 from core.permissions import all_permissions, ViewClassPermission
 
 from tasks.models import Task, Annotation, Prediction, AnnotationDraft
-from core.permissions import (get_object_with_permissions, check_object_permissions)
 from core.mixins import RequestDebugLogMixin
 from core.utils.common import bool_from_request
 from tasks.serializers import (
@@ -298,3 +295,29 @@ class AnnotationDraftAPI(RequestDebugLogMixin, generics.RetrieveUpdateDestroyAPI
         DELETE=all_permissions.annotations_delete,
     )
     swagger_schema = None
+
+
+@method_decorator(name='list', decorator=swagger_auto_schema(
+    tags=['Predictions'], operation_summary="List predictions",
+    operation_description="List all predictions."))
+@method_decorator(name='create', decorator=swagger_auto_schema(
+    tags=['Predictions'], operation_summary="Create prediction",
+    operation_description="Create a prediction."))
+@method_decorator(name='retrieve', decorator=swagger_auto_schema(
+    tags=['Predictions'], operation_summary="Get prediction",
+    operation_description="Get all predictions."))
+@method_decorator(name='update', decorator=swagger_auto_schema(
+    tags=['Predictions'], operation_summary="Put prediction",
+    operation_description="Overwrite prediction data."))
+@method_decorator(name='partial_update', decorator=swagger_auto_schema(
+    tags=['Predictions'], operation_summary="Update prediction",
+    operation_description="Update prediction data."))
+@method_decorator(name='destroy', decorator=swagger_auto_schema(
+    tags=['Predictions'], operation_summary="Delete prediction",
+    operation_description="Delete a prediction."))
+class PredictionAPI(viewsets.ModelViewSet):
+    serializer_class = PredictionSerializer
+    permission_required = all_permissions.predictions_any
+
+    def get_queryset(self):
+        return Prediction.objects.filter(organization=self.request.user.active_organization)
