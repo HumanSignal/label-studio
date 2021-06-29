@@ -80,7 +80,7 @@ def test_user_info(business_client):
     user_data = _get_user_info('tester@x.com')
     assert user_data['token'] == 'token12345'
 
-    args.user_token = '123'
-    user = _create_user(DummyArgs(), {})
+    args.user_token, args.username = '123', 'tester2@x.com'
+    user = _create_user(args, {})
     assert user is not None
 
