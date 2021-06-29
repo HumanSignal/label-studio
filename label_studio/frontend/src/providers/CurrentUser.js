@@ -11,7 +11,7 @@ export const CurrentUserProvider = ({children}) => {
     api.callApi('me').then(user => {
       setUser(user);
     });
-  }, [api]);
+  }, [api.callApi]);
 
   useEffect(() => {
     fetch();
