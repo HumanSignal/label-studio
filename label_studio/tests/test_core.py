@@ -66,3 +66,6 @@ def test_user_info(business_client):
 
     user_data = _get_user_info(business_client.admin.email)
     assert 'token' in user_data
+
+    user_data = _get_user_info(None)
+    assert user_data is None
