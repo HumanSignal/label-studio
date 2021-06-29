@@ -17,46 +17,46 @@ When you first [start Label Studio](start.html), you see the sign up screen.
 1. Create an account with your email address and a password. 
 2. Log in to Label Studio.
 
-Accounts that you create are stored locally on the Label Studio server, and allow multiple annotators to collaborate on a specific data labeling project.
+Accounts that you create are stored locally on the Label Studio server and allow multiple annotators to collaborate on a specific data labeling project. 
 
 If you want, you can create an account from the command line when you start Label Studio.
 ```bash
 label-studio start --username <username> --password <password> [--user-token <token-at-least-5-chars>]
 ```
 
-To restrict who has access to your Label Studio instance, you can invite collaborators directly.
+> Note: The `--user-token` argument is optional. If you don't set the user token, one is automatically generated for the user. Use the user token for API access. The minimum token length is 5 characters. 
 
-> Note: `--user-token` is optional and could be used for API access. Minimal token length is 5 characters. It will be generated automatically if it's not set. 
+### Retrieve user info from the command line
 
-### Retrieve user info with the token
+You can retrieve information about a user, including the API user token for a user, from the command line after starting Label Studio. 
 
-This command would be useful to get user token and build automated pipelines: 
- 
+From the command line, run the following: 
 ```bash
 label-studio user --username <username>
 ```
 
-Output: 
+You can see user info as the last line of the response. For example: 
 ```
 => User info:
-{'id': 1, 'first_name': 'User', 'last_name': 'Somebody', 'username': 'label-studio', 'email': 'label-studio@labelstud.io', 'last_activity': '2021-06-15T19:37:29.594618Z', 'avatar': '/data/avatars/071280b8-48ACD59200000578-5322459-image-m-23_1517162202847.jpg', 'initials': 'll', 'phone': '', 'active_organization': 1, 'token': '3bc6c40cb54e76cb9f1e191238ffb78564675faa', 'status': 'ok'}
+{'id': 1, 'first_name': 'User', 'last_name': 'Somebody', 'username': 'label-studio', 'email': 'example@labelstud.io', 'last_activity': '2021-06-15T19:37:29.594618Z', 'avatar': '/data/avatars/071280b8-48ACD59200000578-5322459-image-m-23_1517162202847.jpg', 'initials': 'el', 'phone': '', 'active_organization': 1, 'token': '1bc2c33cb44e56cb9f1e191238ffb78564675faa', 'status': 'ok'}
 ```
 
-You have to parse the last line of the output to get user info. 
-
+You can use the output to retrieve the token for a user and use the token to call the API. You can also retrieve the user token from the Label Studio UI. See more in the [Label Studio API documentation](api.html).
 
 ### Restrict signup for local deployments
 
-To restrict signup to only those with a link on local deployments, do the following from the command line after installing Label Studio:
+To restrict who has access to your Label Studio instance, invite collaborators directly using an invitation link. 
 
+To disable the signup page unless someone uses the invitation link, do the following from the command line after installing Label Studio:
 ```bash
 export LABEL_STUDIO_DISABLE_SIGNUP_WITHOUT_LINK=true
 ```
-This sets an environment variable that disables the signup page unless someone uses the invitation link.
+
+You can then start Label Studio and create an account for yourself to use to log into Label Studio:
 ```bash
 label-studio start --username <username> --password <password>
 ```
-This starts Label Studio and creates an account for yourself to use to log into Label Studio. After you log into Label Studio you can start [inviting collaborators](#Invite-collaborators-to-a-project).
+ After you log into Label Studio, you can start [inviting collaborators](#Invite-collaborators-to-a-project).
 
 ### Restrict signup for cloud deployments
 
@@ -66,7 +66,7 @@ LABEL_STUDIO_DISABLE_SIGNUP_WITHOUT_LINK=true
 LABEL_STUDIO_USERNAME=<username>
 LABEL_STUDIO_PASSWORD=<password>
 
-# token is optional, it will be generated automatically otherwise 
+# token is optional, it is generated automatically if not set 
 LABEL_STUDIO_USER_TOKEN=<token-at-least-5-chars>
 ```
 Then, start Label Studio and log in with the username and password that you set as environment variables and start [inviting collaborators](#Invite-collaborators-to-a-project).
