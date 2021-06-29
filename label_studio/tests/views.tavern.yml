@@ -1,0 +1,35 @@
+---
+test_name: views_test
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- id: create_project
+  type: ref
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/projects/{project_pk}/data'
+  response:
+    status_code: 200
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/projects/{project_pk}/settings'
+  response:
+    status_code: 200
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/people'
+  response:
+    status_code: 200
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/projects'
+  response:
+    status_code: 200

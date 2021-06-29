@@ -13,7 +13,7 @@ from drf_yasg import openapi as openapi
 from drf_yasg.utils import swagger_auto_schema
 from django.utils.decorators import method_decorator
 
-from core.permissions import BaseRulesPermission, IsBusiness, get_object_with_permissions, all_permissions
+from core.permissions import BaseRulesPermission, IsBusiness, all_permissions
 from core.utils.common import get_object_with_check_and_log
 from core.utils.io import read_yaml
 from io_storages.serializers import ImportStorageSerializer, ExportStorageSerializer

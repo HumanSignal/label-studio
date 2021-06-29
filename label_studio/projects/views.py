@@ -6,13 +6,12 @@ import lxml.etree
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
+from django.contrib.auth.decorators import login_required
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
-from rules.contrib.views import objectgetter, permission_required
 from projects.models import Project
 
 from core.utils.common import get_object_with_check_and_log
-from core.permissions import IsBusiness, view_with_auth, all_permissions
 from core.label_config import get_sample_task
 from core.utils.common import get_organization_from_request
 
@@ -21,28 +20,14 @@ from organizations.models import Organization
 logger = logging.getLogger(__name__)
 
 
-@view_with_auth(['GET'], (IsBusiness,))
+@login_required
 def project_list(request):
-    return render(request, 'projects/list.html', {})
+    return render(request, 'projects/list.html')
 
 
-@view_with_auth(['GET', 'POST'], (IsBusiness,))
-@permission_required(all_permissions.projects_create, fn=Organization.from_request, raise_exception=True)
-def project_create(request):
-    """ Create new project
-
-    Create a new project linked to the business account
-    """
-    return render(request, 'projects/create.html', {})
-
-
-@view_with_auth(['GET'], (IsBusiness,))
-@permission_required(all_permissions.projects_change, fn=objectgetter(Project, 'pk'), raise_exception=True)
+@login_required
 def project_settings(request, pk, sub_path):
-    project = get_object_with_check_and_log(request, Project, pk=pk)
-    return render(request, 'projects/settings.html', {
-        'project': project,
-    })
+    return render(request, 'projects/settings.html')
 
 
 def playground_replacements(request, task_data):
