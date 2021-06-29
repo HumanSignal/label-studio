@@ -51,6 +51,7 @@ const handleError = async (response, showModal = true) => {
       ) : (
         <ErrorWrapper {...formattedError}/>
       ),
+      simple: true,
       style: { width: 680 },
     });
   }

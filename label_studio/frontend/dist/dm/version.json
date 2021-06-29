@@ -1,6 +1,6 @@
 {
-  "message": "Control ground truth externally",
-  "commit": "8b41cc989ec30214a1fba9d60ce09b943bc8401d",
+  "message": "Support multiple images data",
+  "commit": "f182e3fb1bcb8de28dfca994c4f345a87e4d54b8",
   "branch": "master",
-  "date": "2021-06-21T09:41:35Z"
+  "date": "2021-06-29T17:13:19Z"
 }
