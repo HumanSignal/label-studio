@@ -1,7 +1,9 @@
 import React, { Children } from 'react';
-import { Route, Switch } from "react-router";
+import { Switch } from "react-router";
 import { StaticContent } from '../app/StaticContent/StaticContent';
 import { MenubarContext } from '../components/Menubar/Menubar';
+
+import { SentryRoute as Route } from '../config/Sentry';
 
 const extractModalRoutes = (children) => {
   const modalRoutes = [];
