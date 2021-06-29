@@ -8,8 +8,8 @@ def init_sentry(release_name, release_version):
 
         if settings.SENTRY_REDIS_ENABLED:
             from sentry_sdk.integrations.redis import RedisIntegration
-            from sentry_sdk.integrations.rq import RedisIntegration
-            advanced = [RedisIntegration(), RedisIntegration]
+            from sentry_sdk.integrations.rq import RqIntegration
+            advanced = [RedisIntegration(), RqIntegration()]
         else:
             advanced = []
 
