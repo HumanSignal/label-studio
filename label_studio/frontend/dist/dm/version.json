@@ -1,6 +1,6 @@
 {
-  "message": "UI fixes and improvements",
-  "commit": "a9fac1800043c5befd19576b7384eac80840c69a",
+  "message": "Support multiple images data",
+  "commit": "f182e3fb1bcb8de28dfca994c4f345a87e4d54b8",
   "branch": "master",
-  "date": "2021-06-16T11:53:24Z"
+  "date": "2021-06-29T17:13:19Z"
 }
