@@ -141,6 +141,7 @@ def test_get_organization_from_request(business_client):
 
     class Session(dict):
         modified = False
-        
-    get_organization_from_request(types.SimpleNamespace(user=business_client.admin,
-                                                        session=Session({'organization_pk': 1})))
+
+    i = get_organization_from_request(types.SimpleNamespace(user=business_client.admin,
+                                                            session=Session({'organization_pk': 1})))
+    assert i == 1
