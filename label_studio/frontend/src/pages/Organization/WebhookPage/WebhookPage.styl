@@ -1,0 +1,64 @@
+.webhook
+    &__controls
+        display flex
+        justify-content space-between
+        margin-bottom 32px
+    &__content
+        display grid
+        grid-template-columns 1fr 1fr
+        grid-template-rows min-content
+        align-items flex-start
+        grid-gap 20px
+
+
+.webhook-list
+    border 1px solid rgba(0,0,0,0.15)
+    border-radius 3px
+
+    &__item
+        height 48px
+        display flex
+        cursor pointer
+        padding 0
+        border-bottom: 1px solid rgba(0,0,0,0.15)
+        align-items center
+        box-sizing border-box
+        font-size 16px
+        font-family Roboto
+        white-space nowrap
+        text-decoration none
+        cursor pointer
+        &:last-child
+            border-bottom: none
+    &__item-status
+        display flex
+        justify-content center
+        align-items center
+        height 24px
+        width 24px
+        margin 12px
+        border-radius 12px
+        border 1px solid rgba(0,0,0,0.15)
+        background linear-gradient(0deg, rgba(#000, 0.05), rgba(#000, 0.05)), #FFFFFF
+        box-shadow inset 0px 1px 0px rgba(#000, 0.05), inset 0px 0px 0px 1px rgba(#000, 0.05)
+        &::before
+            content ""
+            width 10px
+            height 10px
+            border-radius 100%
+            transition all 120ms ease
+            background rgba(#000, 0.12)
+            box-shadow 0px 5px 10px rgba(#000, 0.15), inset 0px -1px 0px rgba(#000, 0.1), inset 0px 0px 0px 1px rgba(#000, 0.05)
+        &_active
+            &::before
+                width 16px
+                height 16px
+                background $accent_color
+                box-shadow 0px 5px 10px rgba($accent_color, 0.3), inset 0px -1px 0px rgba(0, 0, 0, 0.1)
+
+.webhook-form
+    &__form-row
+        paddingLeft: 16
+
+    &__form-toggle
+        justify-content: flex-end
