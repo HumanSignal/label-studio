@@ -20,6 +20,7 @@ jobs:
       collect_analytics: false
       SENTRY_ENVIRONMENT: tests-ubuntu-sqlite
       SENTRY_RATE: 0
+      SENTRY_DSN:
 
     steps:
       - uses: actions/checkout@v2
@@ -63,6 +64,7 @@ jobs:
       collect_analytics: false
       SENTRY_ENVIRONMENT: tests-ubuntu-postgresql
       SENTRY_RATE: 0
+      SENTRY_DSN:
 
     # Service containers to run with `container-job`
     services:
@@ -148,6 +150,7 @@ jobs:
       collect_analytics: false
       SENTRY_ENVIRONMENT: tests-windows-sqlite
       SENTRY_RATE: 0
+      SENTRY_DSN:
 
     steps:
     - uses: actions/checkout@v2
