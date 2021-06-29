@@ -108,6 +108,7 @@ def _get_user_info(username):
     user_data['status'] = 'ok'
     print('=> User info:')
     print(user_data)
+    return user_data
 
 
 def _create_user(input_args, config):
