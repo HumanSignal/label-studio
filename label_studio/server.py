@@ -22,6 +22,7 @@ from django.db import IntegrityError
 from django.core.wsgi import get_wsgi_application
 from django.db.migrations.executor import MigrationExecutor
 from django.db import connections, DEFAULT_DB_ALIAS
+from rest_framework.authtoken.models import Token
 
 from label_studio.core.argparser import parse_input_args
 from label_studio.core.utils.params import get_env
@@ -126,13 +127,6 @@ def _create_user(input_args, config):
                 user.set_password(password)
                 user.save()
                 print(f'User {DEFAULT_USERNAME} password changed')
-                if token and len(token) > 5:
-                    auth_token = user.auth_token
-                    auth_token.key = token
-                    auth_token.save()
-                else:
-                    print(f"Token {token} is not applied to user {DEFAULT_USERNAME} "
-                          f"because it's empty or len(token) < 5")
             return user
         print(f'Please enter default user email, or press Enter to use {DEFAULT_USERNAME}')
         username = input('Email: ')
@@ -146,6 +140,13 @@ def _create_user(input_args, config):
         user.is_staff = True
         user.is_superuser = True
         user.save()
+
+        if token and len(token) > 5:
+            Token.objects.filter(key=user.auth_token.key).update(key=token)
+        else:
+            print(f"Token {token} is not applied to user {DEFAULT_USERNAME} "
+                  f"because it's empty or len(token) < 5")
+
     except IntegrityError:
         print('User {} already exists'.format(username))
 

@@ -62,10 +62,19 @@ def test_core_int_from_request(param, result):
 
 @pytest.mark.django_db
 def test_user_info(business_client):
-    from label_studio.server import _get_user_info
+    from label_studio.server import _get_user_info, _create_user
 
     user_data = _get_user_info(business_client.admin.email)
     assert 'token' in user_data
 
     user_data = _get_user_info(None)
     assert user_data is None
+
+    class DummyArgs:
+        username = 'tester@x.com'
+        password = 'passwdx'
+        user_token = 'token12345'
+
+    _create_user(DummyArgs(), {})
+    user_data = _get_user_info('tester@x.com')
+    assert user_data['token'] == 'token12345'
