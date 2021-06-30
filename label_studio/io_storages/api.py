@@ -13,7 +13,7 @@ from drf_yasg import openapi as openapi
 from drf_yasg.utils import swagger_auto_schema
 from django.utils.decorators import method_decorator
 
-from core.permissions import BaseRulesPermission, IsBusiness, get_object_with_permissions, all_permissions
+from core.permissions import BaseRulesPermission, IsBusiness, all_permissions
 from core.utils.common import get_object_with_check_and_log
 from core.utils.io import read_yaml
 from io_storages.serializers import ImportStorageSerializer, ExportStorageSerializer
@@ -119,7 +119,11 @@ class StorageFormLayoutAPI(generics.RetrieveAPIView):
             raise NotFound(f'"form_layout.yml" is not found for {self.__class__.__name__}')
 
         form_layout = read_yaml(form_layout_file)
+        form_layout = self.post_process_form(form_layout)
         return Response(form_layout[self.storage_type])
+
+    def post_process_form(self, form_layout):
+        return form_layout
 
 
 class ImportStorageValidateAPI(StorageValidateAPI):

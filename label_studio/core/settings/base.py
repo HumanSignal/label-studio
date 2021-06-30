@@ -266,7 +266,7 @@ SWAGGER_SETTINGS = {
 }
 
 SENTRY_DSN = get_env('SENTRY_DSN', None)
-SENTRY_RATE = float(get_env('SENTRY_RATE', 1.0))
+SENTRY_RATE = float(get_env('SENTRY_RATE', 0.25))
 SENTRY_ENVIRONMENT = get_env('SENTRY_ENVIRONMENT', 'stage.opensource')
 SENTRY_REDIS_ENABLED = False
 
@@ -314,8 +314,8 @@ EXPORT_URL_ROOT = '/export/'
 os.makedirs(EXPORT_DIR, exist_ok=True)
 
 # file / task size limits
-DATA_UPLOAD_MAX_MEMORY_SIZE = int(get_env('DATA_UPLOAD_MAX_MEMORY_SIZE', 50 * 1024 * 1024))
-TASKS_MAX_NUMBER = 250000
+DATA_UPLOAD_MAX_MEMORY_SIZE = int(get_env('DATA_UPLOAD_MAX_MEMORY_SIZE', 250 * 1024 * 1024))
+TASKS_MAX_NUMBER = 1000000
 TASKS_MAX_FILE_SIZE = DATA_UPLOAD_MAX_MEMORY_SIZE
 
 TASK_LOCK_TTL = int(get_env('TASK_LOCK_TTL')) if get_env('TASK_LOCK_TTL') else None
@@ -362,6 +362,7 @@ TASK_MIXIN = 'core.mixins.DummyModelMixin'
 ANNOTATION_MIXIN = 'core.mixins.DummyModelMixin'
 ORGANIZATION_MIXIN = 'core.mixins.DummyModelMixin'
 USER_MIXIN = 'users.mixins.UserMixin'
+GET_STORAGE_LIST = 'io_storages.functions.get_storage_list'
 
 
 def project_delete(project):

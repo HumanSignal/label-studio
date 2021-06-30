@@ -1,6 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 import pytest
+import types
 import sys
 from core.utils.common import bool_from_request, int_from_request
 
@@ -100,3 +101,35 @@ def test_main(mocker, command_line, result):
     output = main()
 
     assert output == result
+
+
+def test_string_is_url():
+    from label_studio.core.utils.common import string_is_url
+
+    assert string_is_url('http://test.com') is True
+    assert string_is_url('https://test.com') is True
+    assert string_is_url('xyz') is False
+
+
+def test_get_client_ip():
+    from label_studio.core.utils.common import get_client_ip
+
+    ip = get_client_ip(types.SimpleNamespace(META={'HTTP_X_FORWARDED_FOR': '127.0.0.1'}))
+    assert ip == '127.0.0.1'
+
+    ip = get_client_ip(types.SimpleNamespace(META={'REMOTE_ADDR': '127.0.0.2'}))
+    assert ip == '127.0.0.2'
+
+
+def test_timestamp_now():
+    from label_studio.core.utils.common import timestamp_now
+
+    t = timestamp_now()
+    assert t is not None
+
+
+def test_start_browser():
+    from label_studio.core.utils.common import start_browser
+
+    assert start_browser('http://localhost:8080', True) is None
+    assert start_browser('http://localhost:8080', False) is None
