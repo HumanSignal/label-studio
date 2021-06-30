@@ -47,12 +47,12 @@ export default class Form extends React.Component {
 
   render() {
     const providers = [
-      <FormContext.Provider key="form-ctx" value={this}/>,
-      <FormValidationContext.Provider key="form-validation-ctx" value={this.state.validation}/>,
-      <FormSubmissionContext.Provider key="form-submission-ctx" value={this.state.submitting}/>,
-      <FormStateContext.Provider key="form-state-ctx" value={this.state.state}/>,
-      <FormResponseContext.Provider key="form-response" value={this.state.lastResponse}/>,
-      <ApiProvider key="form-api" ref={this.apiRef}/>,
+      <FormContext.Provider key="form-ctx" value={this} />,
+      <FormValidationContext.Provider key="form-validation-ctx" value={this.state.validation} />,
+      <FormSubmissionContext.Provider key="form-submission-ctx" value={this.state.submitting} />,
+      <FormStateContext.Provider key="form-state-ctx" value={this.state.state} />,
+      <FormResponseContext.Provider key="form-response" value={this.state.lastResponse} />,
+      <ApiProvider key="form-api" ref={this.apiRef} />,
     ];
 
     return (
@@ -69,7 +69,7 @@ export default class Form extends React.Component {
           {this.props.children}
 
           {this.state.validation && this.state.showValidation && (
-            <ValidationRenderer validation={this.state.validation}/>
+            <ValidationRenderer validation={this.state.validation} />
           )}
         </form>
       </MultiProvider>
@@ -80,7 +80,9 @@ export default class Form extends React.Component {
     const existingField = this.getFieldContext(field.name);
     if (!existingField) {
       this.fields.add(field);
-      this.fillFormData();
+      if (field.name && this.props.formData && field.name in this.props.formData) {
+        field.setValue(this.props.formData[field.name]);
+      }
     } else {
       Object.assign(existingField, field);
     }
@@ -113,10 +115,10 @@ export default class Form extends React.Component {
     this.validateFields();
 
     if (!this.validation.size) {
-      this.setState({step: "submitting"});
+      this.setState({ step: "submitting" });
       this.submit();
     } else {
-      this.setState({step: "invalid"});
+      this.setState({ step: "invalid" });
     }
   }
 
@@ -144,7 +146,7 @@ export default class Form extends React.Component {
     }
   }
 
-  assembleFormData({asJSON = false, full = false, booleansAsNumbers = false} = {}) {
+  assembleFormData({ asJSON = false, full = false, booleansAsNumbers = false } = {}) {
     const requestBody = Array
       .from(this.fields)
       .reduce((res, { name, field, skip }) => {
@@ -155,7 +157,7 @@ export default class Form extends React.Component {
             const inputValue = field.value;
 
             if (['checkbox', 'radio'].includes(field.type)) {
-              if (inputValue !== null &&  inputValue !== 'on') {
+              if (inputValue !== null && inputValue !== 'on') {
                 return field.checked ? inputValue : null;
               }
 
@@ -172,7 +174,7 @@ export default class Form extends React.Component {
       }, []);
 
     if (asJSON) {
-      return requestBody.reduce((res, [key, value]) => ({...res, [key]: value}), {});
+      return requestBody.reduce((res, [key, value]) => ({ ...res, [key]: value }), {});
     } else {
       const formData = new FormData();
       requestBody.forEach(([key, value]) => formData.append(key, value));
@@ -200,7 +202,7 @@ export default class Form extends React.Component {
       state: success ? "success" : "fail",
     }, () => {
       setTimeout(() => {
-        this.setState({state: null});
+        this.setState({ state: null });
       }, 1500);
     });
   }
@@ -212,7 +214,7 @@ export default class Form extends React.Component {
       body,
     });
 
-    this.setState({lastResponse: response});
+    this.setState({ lastResponse: response });
 
     if (response === null) {
       this.props.onError?.();
@@ -230,7 +232,7 @@ export default class Form extends React.Component {
 
     try {
       const result = await response.json();
-      this.setState({lastResponse: result});
+      this.setState({ lastResponse: result });
 
       if (result.validation_errors) {
         Object.entries(result.validation_errors).forEach(([key, messages]) => {
@@ -262,7 +264,7 @@ export default class Form extends React.Component {
   validateFields() {
     this.validation.clear();
 
-    for(const field of this.fields) {
+    for (const field of this.fields) {
       const result = this.validateField(field);
 
       if (result.length) {
@@ -285,7 +287,7 @@ export default class Form extends React.Component {
 
   validateField(field) {
     const messages = [];
-    const {validation, field: element} = field;
+    const { validation, field: element } = field;
     const value = element.value?.trim() || null;
 
     validation.forEach((validator) => {
@@ -310,7 +312,7 @@ export default class Form extends React.Component {
   }
 }
 
-const ValidationRenderer = ({validation}) => {
+const ValidationRenderer = ({ validation }) => {
   const rootClass = cn('form-validation');
 
   return <div className={rootClass}>
@@ -332,42 +334,42 @@ const ValidationRenderer = ({validation}) => {
 
 Form.Validator = Validators;
 
-Form.Row = ({columnCount, rowGap, children, style}) => {
+Form.Row = ({ columnCount, rowGap, children, style }) => {
   const styles = {};
 
   if (columnCount) styles['--column-count'] = columnCount;
   if (rowGap) styles['--row-gap'] = rowGap;
 
   return (
-    <div className={cn('form').elem('row')} style={{...(style ?? {}), ...styles}}>
+    <div className={cn('form').elem('row')} style={{ ...(style ?? {}), ...styles }}>
       {children}
     </div>
   );
 };
 
-Form.Builder = React.forwardRef(({fields, children, formData, ...props}, ref) => {
+Form.Builder = React.forwardRef(({ fields, children, formData, ...props }, ref) => {
   const renderFields = (fields) => {
 
     return fields.map((field, index) => {
-      if (!field) return <div key={`spacer-${index}`}/>;
+      if (!field) return <div key={`spacer-${index}`} />;
 
       const defaultValue = formData?.[field.name] || undefined;
 
       if (field.type === 'select') {
-        return <Select key={field.name ?? index} {...field} value={field.value ?? defaultValue}/>;
+        return <Select key={field.name ?? index} {...field} value={field.value ?? defaultValue} />;
       } else if (field.type === 'counter') {
-        return <Counter key={field.name ?? index} {...field} value={field.value ?? defaultValue}/>;
+        return <Counter key={field.name ?? index} {...field} value={field.value ?? defaultValue} />;
       } else if (field.type === 'toggle') {
-        return <Toggle key={field.name ?? index} {...field} checked={field.value ?? defaultValue}/>;
+        return <Toggle key={field.name ?? index} {...field} checked={field.value ?? defaultValue} />;
       } else {
-        return <Input key={field.name ?? index} {...field} defaultValue={field.value ?? defaultValue}/>;
+        return <Input key={field.name ?? index} {...field} defaultValue={field.value ?? defaultValue} />;
       }
     });
   };
 
   const renderColumns = (columns) => {
     return columns.map((col, index) => (
-      <div className={cn('form').elem('column')} key={index} style={{width: col.width}}>
+      <div className={cn('form').elem('column')} key={index} style={{ width: col.width }}>
         {renderFields(col.fields)}
       </div>
     ));
@@ -375,7 +377,7 @@ Form.Builder = React.forwardRef(({fields, children, formData, ...props}, ref) =>
 
   return (
     <Form {...props} ref={ref}>
-      {fields.map(({columnCount, fields, columns}, index) => (
+      {fields.map(({ columnCount, fields, columns }, index) => (
         <Form.Row key={index} columnCount={columnCount}>
           {columns ? renderColumns(columns) : renderFields(fields)}
         </Form.Row>
@@ -385,11 +387,11 @@ Form.Builder = React.forwardRef(({fields, children, formData, ...props}, ref) =>
   );
 });
 
-Form.Actions = ({children, valid, extra, size}) => {
+Form.Actions = ({ children, valid, extra, size }) => {
   const rootClass = cn('form');
   return (
-    <div className={rootClass.elem('submit').mod({size})}>
-      <div className={rootClass.elem('info').mod({valid})}>
+    <div className={rootClass.elem('submit').mod({ size })}>
+      <div className={rootClass.elem('info').mod({ valid })}>
         {extra}
       </div>
 
@@ -405,13 +407,13 @@ Form.Indicator = () => {
   return (
     <Block name="form-indicator">
       <Oneof value={state}>
-        <Elem tag="span" mod={{type: state}} name="item" case="success">Saved!</Elem>
+        <Elem tag="span" mod={{ type: state }} name="item" case="success">Saved!</Elem>
       </Oneof>
     </Block>
   );
 };
 
-Form.ResponseParser = ({children}) => {
+Form.ResponseParser = ({ children }) => {
   const callback = children;
 
   if (callback instanceof Function === false) {
