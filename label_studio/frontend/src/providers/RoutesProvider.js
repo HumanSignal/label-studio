@@ -59,6 +59,7 @@ export const RoutesProvider = ({children}) => {
     currentContext,
     setContextProps: setCurrentContextProps,
     path: currentPath,
+    findComponent: (path) => findMacthingComponents(path, routesMap),
   }), [
     breadcrumbs,
     routesMap,
@@ -102,6 +103,10 @@ export const RoutesProvider = ({children}) => {
 
 export const useRoutesMap = () => {
   return useContext(RoutesContext)?.routesMap ?? [];
+};
+
+export const useFindRouteComponent = () => {
+  return useContext(RoutesContext)?.findComponent ?? (() => null);
 };
 
 export const useBreadcrumbs = () => {

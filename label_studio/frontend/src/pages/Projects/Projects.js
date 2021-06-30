@@ -1,10 +1,11 @@
 import React from 'react';
+import { useParams as useRouterParams } from 'react-router';
 import { Redirect } from 'react-router-dom';
 import { Button } from '../../components';
 import { Oneof } from '../../components/Oneof/Oneof';
 import { Spinner } from '../../components/Spinner/Spinner';
 import { ApiContext } from '../../providers/ApiProvider';
-import { useContextProps, useParams } from '../../providers/RoutesProvider';
+import { useContextProps } from '../../providers/RoutesProvider';
 import { Block, Elem } from '../../utils/bem';
 import { CreateProject } from '../CreateProject/CreateProject';
 import { DataManagerPage } from '../DataManager/DataManager';
@@ -67,7 +68,7 @@ ProjectsPage.routes = ({store}) => [
     path: "/:id(\\d+)",
     exact: true,
     component: () => {
-      const params = useParams();
+      const params = useRouterParams();
       return <Redirect to={`/projects/${params.id}/data`}/>;
     },
     pages: {
