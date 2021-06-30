@@ -4,7 +4,7 @@ import { Button } from '../../components';
 import { Oneof } from '../../components/Oneof/Oneof';
 import { Spinner } from '../../components/Spinner/Spinner';
 import { ApiContext } from '../../providers/ApiProvider';
-import { useContextProps } from '../../providers/RoutesProvider';
+import { useContextProps, useParams } from '../../providers/RoutesProvider';
 import { Block, Elem } from '../../utils/bem';
 import { CreateProject } from '../CreateProject/CreateProject';
 import { DataManagerPage } from '../DataManager/DataManager';
@@ -61,13 +61,14 @@ export const ProjectsPage = () => {
 ProjectsPage.title = "Projects";
 ProjectsPage.path = "/projects";
 ProjectsPage.exact = true;
-ProjectsPage.routes = ({config, store}) => [
+ProjectsPage.routes = ({store}) => [
   {
     title: () => store.project?.title,
     path: "/:id(\\d+)",
     exact: true,
     component: () => {
-      return <Redirect to={`/projects/${config.projectId}/data`}/>;
+      const params = useParams();
+      return <Redirect to={`/projects/${params.id}/data`}/>;
     },
     pages: {
       DataManagerPage,
