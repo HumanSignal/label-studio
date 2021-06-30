@@ -8,6 +8,7 @@ from django.http import HttpResponse
 from django.core.files import File
 from drf_yasg import openapi as openapi
 from drf_yasg.utils import swagger_auto_schema
+from django.utils.decorators import method_decorator
 from rest_framework import status, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -22,53 +23,70 @@ from .serializers import ExportDataSerializer
 logger = logging.getLogger(__name__)
 
 
+@method_decorator(name='get', decorator=swagger_auto_schema(
+    tags=['Export'],
+    operation_summary='Get export formats',
+    operation_description='Retrieve the available export formats for the current project.',
+    responses={200: openapi.Response(
+                description='Export formats',
+                schema=openapi.Schema(
+                    title='Format list',
+                    description='List of available formats',
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Schema(
+                        title="Export format",
+                        type=openapi.TYPE_STRING)
+                             )
+            )}
+))
 class ExportFormatsListAPI(generics.RetrieveAPIView):
     permission_required = all_permissions.projects_view
 
     def get_queryset(self):
         return Project.objects.filter(organization=self.request.user.active_organization)
 
-    @swagger_auto_schema(tags=['Export'], 
-                         operation_summary='Get export formats', 
-                         operation_description='Retrieve the available export formats for the current project.',
-                         responses={200: openapi.Response(
-                             description='Export formats',
-                             schema=openapi.Schema(
-                                 title='Format list',
-                                 description='List of available formats',
-                                 type=openapi.TYPE_ARRAY,
-                                 items=openapi.Schema(title="Export format", type=openapi.TYPE_STRING)
-                             )
-                         )})
     def get(self, request, *args, **kwargs):
         project = self.get_object()
         formats = DataExport.get_export_formats(project)
         return Response(formats)
 
 
+@method_decorator(name='get', decorator=swagger_auto_schema(
+    manual_parameters=[
+        openapi.Parameter(name='exportType',
+                          type=openapi.TYPE_STRING,
+                          in_=openapi.IN_QUERY,
+                          description='Selected export format')
+        ],
+    tags=['Export'],
+    operation_summary='Export tasks and annotations',
+    operation_description="""
+        Export annotated tasks as a file in a specific format.
+        For example, to export JSON annotations for a project to a file called `annotations.json`,
+        run the following from the command line:
+        ```bash
+        curl -X GET {}/api/projects/{{id}}/export?exportType=JSON -H \'Authorization: Token abc123\' --output annotations.json'
+        ```
+        To export all tasks, including skipped tasks and others without annotations, run the following from the command line:
+        ```bash
+        curl -X GET {}/api/projects/{{id}}/export?exportType=JSON&download_all_tasks=true -H \'Authorization: Token abc123\' --output annotations.json'
+        ```
+        """.format(settings.HOSTNAME or 'https://localhost:8080',settings.HOSTNAME or 'https://localhost:8080'),
+    responses={200: openapi.Response(
+        description='Exported data',
+        schema=openapi.Schema(
+            title='Export file',
+            description='Export file with results',
+            type=openapi.TYPE_FILE
+            )
+        )}
+    ))
 class ExportAPI(generics.RetrieveAPIView):
     permission_required = all_permissions.projects_change
 
     def get_queryset(self):
         return Project.objects.filter(organization=self.request.user.active_organization)
 
-    @swagger_auto_schema(
-        manual_parameters=[
-            openapi.Parameter(name='exportType', type=openapi.TYPE_STRING, in_=openapi.IN_QUERY,
-                              description='Selected export format')
-        ],
-        tags=['Export'],
-        operation_summary='Export annotations',
-        operation_description='Export annotated tasks as a file in a specific format.',
-        responses={200: openapi.Response(
-            description='Exported data',
-            schema=openapi.Schema(
-                title='Export file',
-                description='Export file with results',
-                type=openapi.TYPE_FILE
-            )
-        )}
-    )
     def get(self, request, *args, **kwargs):
         project = self.get_object()
         export_type = request.GET.get('exportType')
@@ -90,19 +108,19 @@ class ExportAPI(generics.RetrieveAPIView):
         return response
 
 
+@method_decorator(name='get', decorator=swagger_auto_schema(
+        tags=['Export'],
+        operation_summary='Export files',
+        operation_description="""
+        List of files exported from the Label Studio UI using the Export button on the Data Manager page.
+        """,
+        ))
 class ProjectExportFiles(generics.RetrieveAPIView):
-    """
-    get:
-    Export files
-
-    List of files exported from the Label Studio UI using the Export button on the Data Manager page.
-    """
     permission_required = all_permissions.projects_change
 
     def get_queryset(self):
         return Project.objects.filter(organization=self.request.user.active_organization)
 
-    @swagger_auto_schema(tags=['Export'])
     def get(self, request, *args, **kwargs):
         project = self.get_object()
         project = get_object_with_check_and_log(request, Project, pk=self.kwargs['pk'])

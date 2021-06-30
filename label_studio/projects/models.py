@@ -13,8 +13,8 @@ from annoying.fields import AutoOneToOneField
 
 from rest_framework.exceptions import ValidationError
 
-from tasks.models import Task, Prediction, Annotation, Q_task_finished_annotations, Q_finished_annotations
-from core.utils.common import create_hash, pretty_date, sample_query, get_attr_or_item, load_func
+from tasks.models import Task, Prediction, Annotation, Q_task_finished_annotations, Q_finished_annotations, bulk_update_stats_project_tasks
+from core.utils.common import create_hash, sample_query, get_attr_or_item, load_func
 from core.label_config import (
     parse_config, validate_label_config, extract_data_types, get_all_object_tag_names, config_line_stipped,
     get_sample_task, get_all_labels, get_all_control_tag_tuples, get_annotation_tuple
@@ -34,6 +34,13 @@ class ProjectManager(models.Manager):
             total_annotations_number=Count(
                 'tasks__annotations__id', distinct=True,
                 filter=Q(tasks__annotations__was_cancelled=False)
+            ),
+            num_tasks_with_annotations=Count(
+                'tasks__id', distinct=True,
+                filter=Q(tasks__annotations__isnull=False) &
+                    Q(tasks__annotations__ground_truth=False) &
+                    Q(tasks__annotations__was_cancelled=False) &
+                    Q(tasks__annotations__result__isnull=False)
             ),
             useful_annotation_number=Count(
                 'tasks__annotations__id', distinct=True,
@@ -198,14 +205,6 @@ class Project(ProjectMixin, models.Model):
         return self.tasks.count()
 
     @property
-    def num_tasks_with_annotations(self):
-        return self.tasks.filter(
-            Q(annotations__isnull=False) &
-            Q(annotations__ground_truth=False) &
-            Q_task_finished_annotations
-        ).distinct().count()
-
-    @property
     def get_total_possible_count(self):
         """
             Tasks has overlap - how many tc should be accepted
@@ -276,6 +275,11 @@ class Project(ProjectMixin, models.Model):
         # if adding/deleting tasks and cohort settings are applied
         elif tasks_number_changed and self.overlap_cohort_percentage < 100 and self.maximum_annotations > 1:
             self._rearrange_overlap_cohort()
+
+        if maximum_annotations_changed or overlap_cohort_percentage_changed:
+            bulk_update_stats_project_tasks(self.tasks.filter(
+                Q(annotations__isnull=False) &
+                Q(annotations__ground_truth=False)))
 
     def _rearrange_overlap_cohort(self):
         tasks_with_overlap = self.tasks.filter(overlap__gt=1)
@@ -503,11 +507,6 @@ class Project(ProjectMixin, models.Model):
         task, _, _ = get_sample_task(config)
         return task
 
-    def pretty_model_version(self):
-        if not self.model_version:
-            return 'Undefined model version'
-        return pretty_date(self.model_version)
-
     def eta(self):
         """
             Show eta for project to be finished
@@ -642,6 +641,13 @@ class ProjectSummary(models.Model):
 
     def has_permission(self, user):
         return self.project.has_permission(user)
+
+    def reset(self):
+        self.all_data_columns = {}
+        self.common_data_columns = []
+        self.created_annotations = {}
+        self.created_labels = {}
+        self.save()
 
     def update_data_columns(self, tasks):
         common_data_columns = set()

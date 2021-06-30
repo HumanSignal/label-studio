@@ -1,6 +1,6 @@
 {
-  "message": "Update RichText spans when needed (like in drafts)",
-  "commit": "c1edce69e4573a2ed302165dcef1d4c00e2510c0",
+  "message": "Improve Labels styles",
+  "commit": "5a34b62e57653484bb5d9924cfd821a7b81de996",
   "branch": "master",
-  "date": "2021-06-15T21:42:41Z"
+  "date": "2021-06-30T20:10:42Z"
 }

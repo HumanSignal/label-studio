@@ -39,7 +39,6 @@ export const PeoplePage = () => {
   const [link, setLink] = useState();
 
   const selectUser = useCallback((user) => {
-    console.log({user});
     setSelectedUser(user);
 
     localStorage.setItem('selectedUser', user?.id);

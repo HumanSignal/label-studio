@@ -11,6 +11,8 @@ from django.db.models.functions import Coalesce
 from django.conf import settings
 
 from data_manager.prepare_params import ConjunctionEnum
+from label_studio.core.utils.params import cast_bool_from_str
+
 
 logger = logging.getLogger(__name__)
 
@@ -107,7 +109,7 @@ def cast_value(_filter):
     if _filter.type == 'Number':
         _filter.value = float(_filter.value)
     elif _filter.type == 'Boolean':
-        _filter.value = bool(_filter.value)
+        _filter.value = cast_bool_from_str(_filter.value)
 
 
 def apply_filters(queryset, filters):
@@ -220,7 +222,7 @@ class GroupConcat(Aggregate):
 def annotate_completed_at(queryset):
     from tasks.models import Annotation
 
-    newest = Annotation.objects.filter(task=OuterRef("pk")).order_by("-created_at")
+    newest = Annotation.objects.filter(task=OuterRef("pk"), task__is_labeled=True).distinct().order_by("-created_at")
     return queryset.annotate(completed_at=Subquery(newest.values("created_at")[:1]))
 
 

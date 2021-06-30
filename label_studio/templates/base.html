@@ -32,6 +32,11 @@
     DM_CSS = "{{settings.HOSTNAME}}/dm/css/main.css?v={{ versions.dm2.commit }}";
   </script>
 
+  <script
+   src="https://browser.sentry-cdn.com/5.17.0/bundle.min.js"
+   integrity="sha384-lowBFC6YTkvMIWPORr7+TERnCkZdo5ab00oH5NkFLeQUAmBTLGwJpFjF6djuxJ/5"
+   crossorigin="anonymous"></script>
+
   <script>
     window.exports = () => {};
   </script>
@@ -91,6 +96,7 @@
     },
     debug: {{settings.DEBUG|yesno:"true,false"}},
     hostname: "{{settings.HOSTNAME}}",
+    version: {{ versions|json_dumps_ensure_ascii|safe }},
   }, {% block frontend_settings %}{}{% endblock %});
 </script>
 

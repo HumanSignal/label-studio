@@ -48,14 +48,16 @@ def version_page(request):
     # from label_studio.core.utils.common import check_for_the_latest_version
     # check_for_the_latest_version(print_message=False)
 
-    result = collect_versions(force=True)
-
-    # other settings from backend
-    if request.user.is_superuser:
-        result['settings'] = {key: str(getattr(settings, key)) for key in dir(settings) if not key.startswith('_')}
+    http_page = request.path == '/version/'
+    result = collect_versions(force=http_page)
 
     # html / json response
     if request.path == '/version/':
+        # other settings from backend
+        if request.user.is_superuser:
+            result['settings'] = {key: str(getattr(settings, key)) for key in dir(settings)
+                                  if not key.startswith('_') and not hasattr(getattr(settings, key), '__call__')}
+
         result = json.dumps(result, indent=2)
         result = result.replace('},', '},\n').replace('\\n', ' ').replace('\\r', '')
         return HttpResponse('<pre>' + result + '</pre>')

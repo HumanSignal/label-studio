@@ -254,7 +254,9 @@ SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {
         'token': {
             'type': 'token',
-            'url': '/business/account/#/token'
+            'name': 'Token',
+            'in': 'header',
+            'url': '/user/account'
         }
     },
     'APIS_SORTER': 'alpha',
@@ -263,7 +265,10 @@ SWAGGER_SETTINGS = {
     'OPERATIONS_SORTER': 'alpha'
 }
 
-SENTRY_FE = None
+SENTRY_DSN = get_env('SENTRY_DSN', None)
+SENTRY_RATE = float(get_env('SENTRY_RATE', 0.25))
+SENTRY_ENVIRONMENT = get_env('SENTRY_ENVIRONMENT', 'stage.opensource')
+SENTRY_REDIS_ENABLED = False
 
 ROOT_URLCONF = 'core.urls'
 WSGI_APPLICATION = 'core.wsgi.application'
@@ -309,8 +314,8 @@ EXPORT_URL_ROOT = '/export/'
 os.makedirs(EXPORT_DIR, exist_ok=True)
 
 # file / task size limits
-DATA_UPLOAD_MAX_MEMORY_SIZE = int(get_env('DATA_UPLOAD_MAX_MEMORY_SIZE', 50 * 1024 * 1024))
-TASKS_MAX_NUMBER = 250000
+DATA_UPLOAD_MAX_MEMORY_SIZE = int(get_env('DATA_UPLOAD_MAX_MEMORY_SIZE', 250 * 1024 * 1024))
+TASKS_MAX_NUMBER = 1000000
 TASKS_MAX_FILE_SIZE = DATA_UPLOAD_MAX_MEMORY_SIZE
 
 TASK_LOCK_TTL = int(get_env('TASK_LOCK_TTL')) if get_env('TASK_LOCK_TTL') else None
@@ -342,6 +347,8 @@ DATA_UNDEFINED_NAME = '$undefined$'
 LICENSE = {}
 VERSIONS = {}
 VERSION_EDITION = 'Community Edition'
+LATEST_VERSION_CHECK = True
+VERSIONS_CHECK_TIME = 0
 
 CREATE_ORGANIZATION = 'organizations.functions.create_organization'
 GET_OBJECT_WITH_CHECK_AND_LOG = 'core.utils.get_object.get_object_with_check_and_log'
@@ -355,6 +362,7 @@ TASK_MIXIN = 'core.mixins.DummyModelMixin'
 ANNOTATION_MIXIN = 'core.mixins.DummyModelMixin'
 ORGANIZATION_MIXIN = 'core.mixins.DummyModelMixin'
 USER_MIXIN = 'users.mixins.UserMixin'
+GET_STORAGE_LIST = 'io_storages.functions.get_storage_list'
 
 
 def project_delete(project):
@@ -365,13 +373,13 @@ def user_auth(user_model, email, password):
     return None
 
 
-def collect_versions(**kwargs):
+def collect_versions_dummy(**kwargs):
     return {}
 
 
 PROJECT_DELETE = project_delete
 USER_AUTH = user_auth
-COLLECT_VERSIONS = collect_versions
+COLLECT_VERSIONS = collect_versions_dummy
 
 # fix a problem with Windows mimetypes for JS and PNG
 import mimetypes

@@ -1,6 +1,6 @@
 {
-  "message": "UI fixes and improvements",
-  "commit": "a9fac1800043c5befd19576b7384eac80840c69a",
+  "message": "Don't close QuickView by Enter",
+  "commit": "d12a691d1e941768c3067ccb15abe5498f8a453b",
   "branch": "master",
-  "date": "2021-06-16T11:53:24Z"
+  "date": "2021-06-30T16:06:22Z"
 }

@@ -3,12 +3,9 @@
 from django.urls import path, include
 
 from . import api
-from . import views
 
 
 app_name = 'data_import'
-
-_urlpatterns = []
 
 _api_urlpatterns = [
     path('file-upload/<int:pk>', api.FileUploadAPI.as_view(), name='file-upload-detail')

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useParams as useRouterParams } from 'react-router';
 import { Redirect } from 'react-router-dom';
 import { Button } from '../../components';
 import { Oneof } from '../../components/Oneof/Oneof';
@@ -61,13 +62,14 @@ export const ProjectsPage = () => {
 ProjectsPage.title = "Projects";
 ProjectsPage.path = "/projects";
 ProjectsPage.exact = true;
-ProjectsPage.routes = ({config, store}) => [
+ProjectsPage.routes = ({store}) => [
   {
     title: () => store.project?.title,
     path: "/:id(\\d+)",
     exact: true,
     component: () => {
-      return <Redirect to={`/projects/${config.projectId}/data`}/>;
+      const params = useRouterParams();
+      return <Redirect to={`/projects/${params.id}/data`}/>;
     },
     pages: {
       DataManagerPage,

@@ -11,7 +11,6 @@ from rest_framework.authtoken.models import Token
 
 from users import forms
 from core.utils.common import load_func
-from core.permissions import view_with_auth, IsBusiness
 from users.functions import proceed_registration
 from organizations.models import Organization
 from organizations.forms import OrganizationSignupForm
@@ -97,7 +96,7 @@ def user_login(request):
     })
 
 
-@view_with_auth(['GET', 'POST'], (IsBusiness,))
+@login_required
 def user_account(request):
     user = request.user
 
