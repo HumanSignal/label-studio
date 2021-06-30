@@ -83,7 +83,7 @@ Export audio transcription labels for automatic speech recognition as the JSON m
 
 ### YOLO
 
-Export object detection annotations in the YOLOv3 format.  
+Export object detection annotations in the YOLOv3 format. You must have at least one `RectangleLabels` or similar object detection annotations present in your labeling configuration to use the YOLO export format.
 
 
 ## Label Studio JSON format of annotated tasks 
