@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { NavLink } from 'react-router-dom';
 import { useConfig } from '../../providers/ConfigProvider';
-import { useBreadcrumbs } from '../../providers/RoutesProvider';
+import { useBreadcrumbs, useFindRouteComponent } from '../../providers/RoutesProvider';
 import { BemWithSpecifiContext } from '../../utils/bem';
 import { absoluteURL } from '../../utils/helpers';
 import { Dropdown } from '../Dropdown/Dropdown';
@@ -12,6 +13,7 @@ const {Block, Elem} = BemWithSpecifiContext();
 export const Breadcrumbs = () => {
   const config = useConfig();
   const reactBreadcrumbs = useBreadcrumbs();
+  const findComponent = useFindRouteComponent();
   const [breadcrumbs, setBreadcrumbs] = useState(reactBreadcrumbs);
 
   useEffect(() => {
@@ -31,6 +33,8 @@ export const Breadcrumbs = () => {
           const key = `item-${index}-${item.title}`;
 
           const href = item.href ?? item.path;
+
+          const isInternal = findComponent(href) !== null;
 
           const title = (
             <Elem tag="span" name="label" mod={{faded: index === item.length - 1}}>
@@ -64,7 +68,11 @@ export const Breadcrumbs = () => {
             </Elem>
           ) : (href && !isLastItem) ? (
             <Elem key={key} tag="li" name="item" mod={{last: isLastItem}}>
-              <a href={absoluteURL(href)}>{title}</a>
+              {isInternal ? (
+                <NavLink to={href} data-external={true}>{title}</NavLink>
+              ) : (
+                <a href={absoluteURL(href)}>{title}</a>
+              )}
             </Elem>
           ) : (
             <Elem key={key} tag="li" name="item" mod={{last: isLastItem}}>
