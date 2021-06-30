@@ -1,6 +1,6 @@
 {
-  "message": "Support multiple images data",
-  "commit": "f182e3fb1bcb8de28dfca994c4f345a87e4d54b8",
+  "message": "Don't close QuickView by Enter",
+  "commit": "d12a691d1e941768c3067ccb15abe5498f8a453b",
   "branch": "master",
-  "date": "2021-06-29T17:13:19Z"
+  "date": "2021-06-30T16:06:22Z"
 }
