@@ -453,7 +453,8 @@ def collect_versions(force=False):
             'current_version_is_outdated': label_studio.__current_version_is_outdated__
         },
         # backend full git info
-        'label-studio-os-backend': version.get_git_commit_info()
+        'label-studio-os-backend': version.get_git_commit_info(),
+        'release': label_studio.__version__
     }
 
     # label studio frontend
@@ -491,6 +492,16 @@ def collect_versions(force=False):
     for key in result:
         if 'message' in result[key] and len(result[key]['message']) > 70:
             result[key]['message'] = result[key]['message'][0:70] + ' ...'
+
+    if settings.SENTRY_DSN:
+        import sentry_sdk
+        sentry_sdk.set_context("versions", copy.deepcopy(result))
+
+        for package in result:
+            if 'version' in result[package]:
+                sentry_sdk.set_tag('version-' + package, result[package]['version'])
+            if 'commit' in result[package]:
+                sentry_sdk.set_tag('commit-' + package, result[package]['commit'])
 
     settings.VERSIONS = result
     return result

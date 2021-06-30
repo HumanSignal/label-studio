@@ -265,7 +265,10 @@ SWAGGER_SETTINGS = {
     'OPERATIONS_SORTER': 'alpha'
 }
 
-SENTRY_FE = None
+SENTRY_DSN = get_env('SENTRY_DSN', None)
+SENTRY_RATE = float(get_env('SENTRY_RATE', 1.0))
+SENTRY_ENVIRONMENT = get_env('SENTRY_ENVIRONMENT', 'stage.opensource')
+SENTRY_REDIS_ENABLED = False
 
 ROOT_URLCONF = 'core.urls'
 WSGI_APPLICATION = 'core.wsgi.application'
@@ -369,13 +372,13 @@ def user_auth(user_model, email, password):
     return None
 
 
-def collect_versions(**kwargs):
+def collect_versions_dummy(**kwargs):
     return {}
 
 
 PROJECT_DELETE = project_delete
 USER_AUTH = user_auth
-COLLECT_VERSIONS = collect_versions
+COLLECT_VERSIONS = collect_versions_dummy
 
 # fix a problem with Windows mimetypes for JS and PNG
 import mimetypes

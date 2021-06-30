@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { generatePath, useHistory, useLocation } from 'react-router';
+import { generatePath, useHistory } from 'react-router';
 import { NavLink } from 'react-router-dom';
 import { Button } from '../../components/Button/Button';
 import { modal } from '../../components/Modal/Modal';
 import { Space } from '../../components/Space/Space';
 import { useLibrary } from '../../providers/LibraryProvider';
 import { useProject } from '../../providers/ProjectProvider';
-import { useContextProps, useParams } from '../../providers/RoutesProvider';
+import { useContextProps, useFixedLocation, useParams } from '../../providers/RoutesProvider';
 import { addAction, addCrumb, deleteAction, deleteCrumb } from '../../services/breadrumbs';
 import { Block, Elem } from '../../utils/bem';
 import { ImportModal } from '../CreateProject/Import/ImportModal';
@@ -120,7 +120,7 @@ DataManagerPage.pages = {
   ImportModal,
 };
 DataManagerPage.context = ({dmRef}) => {
-  const location = useLocation();
+  const location = useFixedLocation();
   const {project} = useProject();
   const [mode, setMode] = useState(dmRef?.mode ?? "explorer");
 

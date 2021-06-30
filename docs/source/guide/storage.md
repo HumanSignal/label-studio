@@ -51,6 +51,44 @@ In the Label Studio UI, do the following to set up the connection:
 
 After adding the storage, click **Sync** to collect tasks from the bucket, or make an API call to [sync import storage](/api#operation/api_storages_s3_sync_create).
 
+### <i class='ent'></i> Set up an S3 connection with IAM role access
+
+If you want to use a revocable method to grant Label Studio access to your Amazon S3 bucket, use an IAM role and its temporary security credentials instead of an access key ID and secret. This added layer of security is only available in Label Studio Enterprise. For more details about security in Label Studio and Label Studio Enterprise, see [Secure Label Studio](security.html).
+
+> Beta documentation: Label Studio Enterprise v2.0.0 is currently in Beta. As a result, this documentation might not reflect the current functionality of the product.
+
+#### Set up an IAM role in Amazon AWS
+Set up an IAM role in Amazon AWS to use with Label Studio.
+
+1. In the Label Studio UI, open the **Organization** page to get an `External ID` to use for the IAM role creation in Amazon AWS. You must be an administrator to view the Organization page.
+2. Follow the [Amazon AWS documentation to create an IAM role](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user.html) in your AWS account. <br/>Make sure to require an external ID and do not require multi-factor authentication when you set up the role. Select an existing permissions policy, or create one that allows programmatic access to the bucket. Use the external ID when you create a trust policy.
+3. After you create the IAM role, note the Amazon Resource Name (ARN) of the role. You need it to set up the S3 source storage in Label Studio.
+
+For more details about using an IAM role with an external ID to provide access to a third party (Label Studio), see the Amazon AWS documentation [How to use an external ID when granting access to your AWS resources to a third party](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-user_externalid.html). 
+
+#### Create the connection to S3 in the Label Studio UI
+In the Label Studio UI, do the following to set up the connection:
+
+1. Open Label Studio in your web browser.
+2. For a specific project, open **Settings > Cloud Storage**.
+3. Click **Add Source Storage**.  
+4. In the dialog box that appears, select **Amazon S3 (IAM role access)** as the storage type.
+5. In the **Storage Title** field, type a name for the storage to appear in the Label Studio UI.
+6. Specify the name of the S3 bucket, and if relevant, the bucket prefix to specify an internal folder or container.
+7. Adjust the remaining parameters:
+    - In the **File Filter Regex** field, specify a regular expression to filter bucket objects. Use `.*` to collect all objects.
+    - In the **Region Name** field, specify the AWS region name. For example `us-east-1`.
+    - In the **S3 Endpoint** field, specify an S3 endpoint.
+    - In the **Role ARN** field, specify the Amazon Resource Name (ARN) of the IAM role that you created to grant access to Label Studio.
+    - In the **External ID** field, specify the external ID that identifies Label Studio to your AWS account. You can find the external ID on your **Organization** page.
+    - Enable **Treat every bucket object as a source file** if your bucket contains BLOB storage files such as JPG, MP3, or similar file types. This setting creates a URL for each bucket object to use for labeling. Leave this option disabled if you have multiple JSON files in the bucket with one task per JSON file. 
+    - Choose whether to disable **Use pre-signed URLs**. For example, if you host Label Studio in the same AWS network as your storage buckets, you can disable presigned URLs and have direct access to the storage using `s3://` links.
+    - Adjust the counter for how many minutes the pre-signed URLs are valid.
+8. Click **Add Storage**.
+9. Repeat these steps for **Target Storage** to sync completed data annotations to a bucket.
+
+After adding the storage, click **Sync** to collect tasks from the bucket, or make an API call to [sync import storage](/api#operation/api_storages_s3_sync_create).
+
 ### Add storage with the Label Studio API
 You can also create a storage connection using the Label Studio API. 
 - See [Create new import storage](/api#operation/api_storages_s3_create). 
