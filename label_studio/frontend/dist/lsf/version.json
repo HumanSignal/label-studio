@@ -1,6 +1,6 @@
 {
-  "message": "Scroll regions list carefully",
-  "commit": "4dc9235ce4f88d98ab87fa3088af011c2018ebbf",
+  "message": "Fix/ocr (#218)\n\n* Add unfocus of resulted perregon textarea by pressing enter\r\n\r\n* Fix deleting textarea result without maxsubmissions attribute\r\n\r\n* Fix gap caused by large text in tree node\r\n\r\n* Fix perregion textarea selection by tab flow",
+  "commit": "b5504cc654d73d19263c00908036f08f65294083",
   "branch": "master",
-  "date": "2021-06-30T16:11:42Z"
+  "date": "2021-06-30T17:06:39Z"
 }

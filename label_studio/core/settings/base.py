@@ -266,7 +266,7 @@ SWAGGER_SETTINGS = {
 }
 
 SENTRY_DSN = get_env('SENTRY_DSN', None)
-SENTRY_RATE = float(get_env('SENTRY_RATE', 1.0))
+SENTRY_RATE = float(get_env('SENTRY_RATE', 0.25))
 SENTRY_ENVIRONMENT = get_env('SENTRY_ENVIRONMENT', 'stage.opensource')
 SENTRY_REDIS_ENABLED = False
 
