@@ -65,7 +65,7 @@ If you perform data annotation in stages or with different groups of annotators,
 
 You can now separate creating regions from assigning labels, which means you can import predicted bounding boxes or polygons from a machine learning model, then correct the placement of the detected objects and finish labeling them in Label Studio. This workflow is perfect for two-step labeling, where you want one annotator, or a machine learning model, to create regions and another annotator to label the regions. 
 
-<br/><img src="/images/release-110/label-unlabeled.gif" alt="Gif of adding ellipses to an image, then labeling them afterward using the Label Studio UI." class="gif-border" />
+<br/><img src="/images/release-110/label-predicted-regions.gif" alt="Gif of labeling unlabeled rectangular, polygonal, and elliptical regions using the Label Studio UI." class="gif-border" />
 
 For example, if you have a machine learning model to perform object detection that identifies regions of interest in images, you can upload those predictions to Label Studio and have human annotators apply labels to those regions of interest. If you're doing that with OCR, you can use a machine learning model to identify which regions in an image have text, and then add those predictions to Label Studio and have human annotators transcribe the recognized text. 
 
