@@ -29,7 +29,7 @@ After you set up SSO, you can no longer use native authentication to access the 
 
 After you set up LDAP authentication, you can no longer use native authentication to log in to the Label Studio UI unless you have the Owner role. 
 
-Set up LDAP authentication and assign LDAP users to your Label Studio Enterprise organization using environment variables in Docker.
+Set up LDAP authentication and assign LDAP users to your Label Studio Enterprise organization using environment variables in Docker. You can also map specific AD groups to specific organization roles in Label Studio Enterprise, making it easier to manage role-based access control (RBAC) in Label Studio Enterprise.
 
 You can refer to this example environment variable file for your own LDAP setup:
 ```
