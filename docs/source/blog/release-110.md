@@ -1,7 +1,7 @@
 ---
 title: Label Studio v1.1 is now available!
 type: blog
-image: /images/release-110/multilabeling.png
+image: /images/release-110/multi-labeling.gif
 order: 93
 meta_title: Label Studio Release Notes 1.1.0
 meta_description: Release notes and information about Label Studio version 1.1.0, with improved data labeling functionality for image annotations and object character recognition (OCR) labeling for machine learning projects.
