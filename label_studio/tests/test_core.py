@@ -133,17 +133,3 @@ def test_start_browser():
 
     assert start_browser('http://localhost:8080', True) is None
     assert start_browser('http://localhost:8080', False) is None
-
-
-"""
-@pytest.mark.django_db
-def test_get_organization_from_request(business_client):
-    from label_studio.core.utils.common import get_organization_from_request
-
-    class Session(dict):
-        modified = False
-
-    i = get_organization_from_request(types.SimpleNamespace(user=business_client.admin,
-                                                            session=Session({'organization_pk': 1})))
-    assert i == 1
-"""
