@@ -48,7 +48,7 @@ async function get(projectName, ref = 'master') {
     json = await res.json();
 
     if (!json || !json.object) {
-      console.log(`\n${RED}Wrong response from GitHub. Check that you use correct GITHUB_TOKEN.${NC}`);
+      console.log(`\n${RED}Wrong response from GitHub. Check that you use correct GITHUB_TOKEN and given branch was successfully built.${NC}`);
       console.log(json);
       return;
     }
