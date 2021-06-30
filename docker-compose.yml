@@ -30,7 +30,7 @@ services:
       - POSTGRE_PASSWORD=
       - POSTGRE_PORT=5432
       - POSTGRE_HOST=db
-      - LABEL_STUDIO_HOST=${LABEL_STUDIO_HOST:-""}
+      - LABEL_STUDIO_HOST=${LABEL_STUDIO_HOST:-}
     volumes:
       - ./mydata:/label-studio/data:rw
       - static:/label-studio/label_studio:rw
