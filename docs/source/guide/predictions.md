@@ -110,17 +110,19 @@ If you want to import images with pre-annotated regions without labels assigned 
 Use the following labeling configuration: 
 ```xml
 <View>
-  <Choices name="choice" toName="image" showInLine="true">
-    <Choice value="Boeing" background="blue"/>
-    <Choice value="Airbus" background="green" />
-  </Choices>
-
-  <RectangleLabels name="label" toName="image">
-    <Label value="Airplane" background="green"/>
-    <Label value="Car" background="blue"/>
-  </RectangleLabels>
-
-  <Image name="image" value="$image"/>
+  <View style="display:flex;align-items:start;gap:8px;flex-direction:row">
+    <Image name="image" value="$image" zoom="true" zoomControl="true" rotateControl="false"/>
+    <Rectangle name="rect" toName="image" showInline="false"/>
+  </View>
+  <Ellipse name="ellipse" toName="image"/>
+  <KeyPoint name="kp" toName="image"/>
+  <Polygon name="polygon" toName="image"/>
+  <Brush name="brush" toName="image"/>
+  <Labels name="labels" toName="image" fillOpacity="0.5" strokeWidth="5">
+    <Label value="Vehicle" background="green"/>
+    <Label value="Building" background="blue"/>
+    <Label value="Pavement" background="red"/>
+  </Labels>
 </View>
 ```
 
@@ -132,61 +134,108 @@ Save this example JSON as a file to import it into Label Studio, for example, `e
 
 {% codeblock lang:json %}
 [{
-  "data": {
-    "image": "http://localhost:8080/static/samples/sample.jpg" 
-  },
-
-  "predictions": [{
-    "result": [
-      {
-        "id": "result1",
-        "type": "rectanglelabels",        
-        "from_name": "label", "to_name": "image",
-        "original_width": 600, "original_height": 403,
-        "image_rotation": 0,
-        "value": {
-          "rotation": 0,          
-          "x": 4.98, "y": 12.82,
-          "width": 32.52, "height": 44.91,
-          "rectanglelabels": ["Airplane"]
+    "id":8,
+    "predictions":[
+        {
+            "id":10,
+            "result":[
+               {
+                  "original_width":800,
+                  "original_height":450,
+                  "image_rotation":0,
+                  "value":{
+                     "x":55.46666666666667,
+                     "y":2.3696682464454977,
+                     "width":35.86666666666667,
+                     "height":46.91943127962085,
+                     "rotation":0
+                  },
+                  "id":"ABC",
+                  "from_name":"rect",
+                  "to_name":"image",
+                  "type":"rectangle"
+               },
+               {
+                  "original_width":800,
+                  "original_height":450,
+                  "image_rotation":0,
+                  "value":{
+                     "x":58.4,
+                     "y":64.21800947867298,
+                     "width":30.533333333333335,
+                     "height":19.90521327014218,
+                     "rotation":0
+                  },
+                  "id":"DEF",
+                  "from_name":"rect",
+                  "to_name":"image",
+                  "type":"rectangle"
+               },
+               {
+                  "original_width":800,
+                  "original_height":450,
+                  "image_rotation":0,
+                  "value":{
+                     "points":[
+                        [
+                           20.933333333333334,
+                           28.90995260663507
+                        ],
+                        [
+                           25.866666666666667,
+                           64.69194312796209
+                        ],
+                        [
+                           38.4,
+                           62.796208530805686
+                        ],
+                        [
+                           34.13333333333333,
+                           27.488151658767773
+                        ]
+                    ]
+                },
+                "id":"GHI",
+                "from_name":"polygon",
+                "to_name":"image",
+                "type":"polygon"
+                },
+                {
+                "original_width":800,
+                "original_height":450,
+                "image_rotation":0,
+                "value":{
+                    "x":8.4,
+                    "y":20.14218009478673,
+                    "radiusX":4,
+                    "radiusY":7.109004739336493,
+                    "rotation":0
+                    },
+                "id":"JKL",
+                "from_name":"ellipse",
+                "to_name":"image",
+                "type":"ellipse"
+                }
+            ],
+            "task":8
         }
-      },
-      {
-        "id": "result2",
-        "type": "rectanglelabels",        
-        "from_name": "label", "to_name": "image",
-        "original_width": 600, "original_height": 403,
-        "image_rotation": 0,
-        "value": {
-          "rotation": 0,          
-          "x": 75.47, "y": 82.33,
-          "width": 5.74, "height": 7.40,
-          "rectanglelabels": ["Car"]
-        }
-      },
-      {
-        "id": "result3",
-        "type": "choices",
-        "from_name": "choice", "to_name": "image",
-        "value": {
-          "choices": ["Airbus"]
-      }
-    }],
-    "score": 0.95
-  }]
+    ],
+    "data":{
+    "image":"/data/upload/31159626248_d0362d027c_c.jpg"
+    },
+    "project":4
 }]
 {% endcodeblock %}
 
-In this example there are 3 results inside 1 prediction, or pre-annotation: 
-- `result1` - the first bounding box
-- `result2` - the second bounding box
-- `result3` - choice selection
-The prediction score applies to the entire prediction.
+In this example there are 3 regions inside 1 result field for a prediction, or pre-annotation: 
+- region `ABC` - a rectangle bounding box
+- region `DEF` - a second rectangle bounding box
+- region `GHI` - a polygonal segmentation
+- region `JKL` - an ellipse
+None of the regions have labels applied. The labeling configuration must use the `Rectangle` tag instead of the `RectangleLabels` tag to support this type of prediction. Even though the labeling configuration for this example has a `Labels` tag, the predictions do not need to specify labels for the regions. 
 
 {% enddetails %}
 <br/>
-
-
 
 <!-- md image_units.md -->
 
