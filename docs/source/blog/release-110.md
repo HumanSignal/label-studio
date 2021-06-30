@@ -82,6 +82,9 @@ Beyond the expanded image annotation functionality, we've also improved support 
 
 Write the text for a selected region in the sidebar, rather than at the bottom of the labeling interface, making it easier to see all the recognized text regions that you've identified and transcribed.
 
+## Stay in touch
+
+Sign up for the [Label Studio Newsletter](https://labelstudio.substack.com/) to find out about new features, tips for using Label Studio, and information about machine learning research and best practices.
 
 
 
