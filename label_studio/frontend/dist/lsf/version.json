@@ -1,6 +1,6 @@
 {
-  "message": "Fix/ocr (#218)\n\n* Add unfocus of resulted perregon textarea by pressing enter\r\n\r\n* Fix deleting textarea result without maxsubmissions attribute\r\n\r\n* Fix gap caused by large text in tree node\r\n\r\n* Fix perregion textarea selection by tab flow",
-  "commit": "b5504cc654d73d19263c00908036f08f65294083",
+  "message": "Draw fewer layers for few regions",
+  "commit": "35285e2ccc50870f90ff1cca55e51837f5ae725e",
   "branch": "master",
-  "date": "2021-06-30T17:06:39Z"
+  "date": "2021-06-30T18:53:19Z"
 }
