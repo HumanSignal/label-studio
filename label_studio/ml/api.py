@@ -55,8 +55,11 @@ class MLBackendListAPI(generics.ListCreateAPIView):
     tags=['Machine Learning'],
     operation_summary='Get ML Backend',
     operation_description="""
-    Get details about existing ML backend connections for a project ID.
-    """
+    Get details about existing ML backend connections for a project ID. For example, make a GET request using the
+    following cURL command:
+    ```bash
+    curl -X POST {host}/api/ml?project={{project_id}} -H 'Authorization: Token abc123'
+    """.format(host=(settings.HOSTNAME or 'https://localhost:8080')),
 ))
 class MLBackendDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     """RUD storage by pk specified in URL"""
@@ -79,7 +82,8 @@ class MLBackendDetailAPI(generics.RetrieveUpdateDestroyAPIView):
         tags=['Machine Learning'],
         operation_summary='Train',
         operation_description="""
-        After you activate an ML backend, call this API with the ML backend ID to start training with already-labeled tasks. 
+        After you activate an ML backend, call this API with the ML backend ID to start training with 
+        already-labeled tasks. 
         """,
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,

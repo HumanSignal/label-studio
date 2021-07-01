@@ -92,10 +92,11 @@ If you run into any issues, see [Troubleshoot machine learning](ml_troubleshooti
 After you connect a model to Label Studio as a machine learning backend, you can start training the model: 
 - Manually using the Label Studio UI, click the **Start Training** button on the **Machine Learning** settings for your project.
 - Automatically after any annotations are submitted or updated, enable the option `Start model training after annotations submit or update` on the **Machine Learning** settings for your project.
-- Manually using the API, cURL the API from the command line, specifying the ID of your project: 
+- Manually using the API, cURL the API from the command line, specifying the ID of the machine learning backend: 
    ```
    curl -X POST http://localhost:8080/api/ml/{id}/train
    ```
+  See [the Train API documentation](/api/#operation/api_ml_train_create) for more.
 
 You must have at least one task annotated before you can start training. 
 
@@ -110,10 +111,9 @@ If the model has not been trained yet, do the following to get predictions to ap
 3. In the data manager for your project, select the tasks that you want to get predictions for and select **Retrieve predictions** using the drop-down actions menu. Label Studio sends the selected tasks to your ML backend. 
 4. After retrieving the predictions, they appear in the task preview and Label stream modes for the selected tasks.  
 
-You can also retrieve predictions automatically by loading tasks. To do this, enable `Retrieve predictions when loading a task automatically` on the **Machine Learning** settings for your project. When you scroll through tasks in the data manager for a project, the predictions for those tasks are automatically retrieved from the ML backend. Predictions also appear when labeling tasks in the Label stream workflow.  
+You can also retrieve predictions automatically by loading tasks. To do this, enable `Retrieve predictions when loading a task automatically` on the **Machine Learning** settings for your project. When you scroll through tasks in the data manager for a project, the predictions for those tasks are automatically retrieved from the ML backend. Predictions also appear when labeling tasks in the Label stream workflow.
 
-
-> Note: For a large dataset, the HTTP request to retrieve predictions might be interrupted by a timeout. If you want to **get all predictions** for all tasks in a dataset, the recommended way is to make a [POST call to the predictions endpoint of the Label Studio API](/api/#operation/api_predictions_create) on the ML backend side for each generated prediction.
+> Note: For a large dataset, the HTTP request to retrieve predictions might be interrupted by a timeout. If you want to **get all predictions** for all tasks in a dataset from connected machine learning backends, make a [POST call to the predictions endpoint of the Label Studio API](/api/#operation/api_predictions_create) to prompt the machine learning backend to create predictions for the tasks. 
 
 If you want to retrieve predictions manually for a list of tasks **using only an ML backend**, make a GET request to the `/predict` URL of your ML backend with a payload of the tasks that you want to see predictions for, formatted like the following example: 
 
@@ -130,10 +130,9 @@ If you want to retrieve predictions manually for a list of tasks **using only an
 If you want to delete all predictions from Label Studio, you can do it using the UI or the API:
 - For a specific project, select the tasks that you want to delete predictions for and select **Delete predictions** from the drop-down menu.
 - Using the API, run the following from the command line to delete the predictions for a specific project ID:
-
 ```
 curl -H 'Authorization: Token <user-token-from-account-page>' -X POST \ 
- "http://localhost:8080/api/dm/actions?id=delete_tasks_predictions&project=<id>"
+ "<host>/api/dm/actions?id=delete_tasks_predictions&project=<id>"
 ```
    
 ## Set up a machine learning backend with Docker Compose
