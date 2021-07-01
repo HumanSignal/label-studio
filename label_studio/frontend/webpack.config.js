@@ -1,3 +1,5 @@
+require('dotenv').config({ debug: true });
+
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { EnvironmentPlugin } = require('webpack');
@@ -17,7 +19,7 @@ const LOCAL_ENV = {
 
 const SENTRY = {
   AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
-  ORG: process.env.SENTRY_AUTH_TOKEN,
+  ORG: process.env.SENTRY_ORG,
   PROJECT: process.env.SENTRY_PROJECT,
   RELEASE: getReleaseName(),
 }
@@ -53,8 +55,11 @@ if (SENTRY.AUTH_TOKEN && SENTRY.RELEASE) {
     org: SENTRY.ORG,
     project: SENTRY.PROJECT,
     release: SENTRY.RELEASE,
-    include: ".",
+    include: "./dist",
     ignore: ["node_modules", "webpack.config.js"],
+    deploy: {
+      env: process.env.NODE_ENV,
+    }
   }))
 }
 
