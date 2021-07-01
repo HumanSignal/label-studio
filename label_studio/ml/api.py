@@ -51,6 +51,13 @@ class MLBackendListAPI(generics.ListCreateAPIView):
     --data '{"url": "http://localhost:9090", "project": {{project_id}}}' 
     """.format(host=(settings.HOSTNAME or 'https://localhost:8080')),
 ))
+@method_decorator(name='get_object', decorator=swagger_auto_schema(
+    tags=['Machine Learning'],
+    operation_summary='Get ML Backend',
+    operation_description="""
+    Get details about existing ML backend connections for a project ID.
+    """
+))
 class MLBackendDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     """RUD storage by pk specified in URL"""
     parser_classes = (JSONParser, FormParser, MultiPartParser)
@@ -58,7 +65,6 @@ class MLBackendDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     permission_required = all_permissions.projects_change
     queryset = MLBackend.objects.all()
 
-    @swagger_auto_schema(auto_schema=None)
     def get_object(self):
         ml_backend = super(MLBackendDetailAPI, self).get_object()
         ml_backend.update_state()
@@ -73,7 +79,7 @@ class MLBackendDetailAPI(generics.RetrieveUpdateDestroyAPIView):
         tags=['Machine Learning'],
         operation_summary='Train',
         operation_description="""
-        After you activate an ML backend, call this API to start training with the already-labeled tasks.
+        After you activate an ML backend, call this API with the ML backend ID to start training with already-labeled tasks. 
         """,
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
