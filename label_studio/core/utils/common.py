@@ -126,31 +126,6 @@ def create_hash():
     return h.hexdigest()[0:16]
 
 
-def pretty_date(t):
-    # check version is datetime
-    is_timestamp = True
-    if isinstance(t, datetime):
-        t = str(int(t.timestamp()))
-
-    # check if version is correct timestamp from string
-    else:
-        try:
-            int(t)
-        except (ValueError, TypeError):
-            is_timestamp = False
-        else:
-            if datetime.fromtimestamp(int(t)) < datetime(1990, 1, 1):
-                is_timestamp = False
-
-    # pretty format if timestamp else print version as is
-    if is_timestamp:
-        timestamp = int(t)
-        dt = datetime.fromtimestamp(timestamp)
-        return dt.strftime(f'%d %b %Y %H:%M:%S.{str(t)[-3:]}')
-    else:
-        return t
-
-
 def paginator(objects, request, default_page=1, default_size=50):
     """ Get from request page and page_size and return paginated objects
 
@@ -215,20 +190,6 @@ def string_is_url(url):
         return False
     else:
         return True
-
-
-def download_base64_uri(url, username, password):
-    try:
-        if username is not None and password is not None:
-            r = requests.get(url, auth=HTTPBasicAuth(username, password))
-        else:
-            r = requests.get(url)
-        r.raise_for_status()
-    except requests.exceptions.RequestException as e:
-        logger.error(f'Failed downloading {url}. Reason: {e}', exc_info=True)
-    else:
-        encoded_uri = b64encode(r.content).decode('utf-8')
-        return f'data:{r.headers["Content-Type"]};base64,{encoded_uri}'
 
 
 def safe_float(v, default=0):

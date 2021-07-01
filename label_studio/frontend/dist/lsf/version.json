@@ -1,6 +1,6 @@
 {
-  "message": "OCR improvements (#214)\n\n* Add sidebar displaying mode for per region textareas\r\n\r\n* Fix label tree groups\r\n\r\n* Fix tests\r\n\r\n* Add tests and fixes\r\n\r\n* Update styles\r\n\r\n* Add rotating of label on rectangle\r\n\r\n* Update entities header\r\n\r\n* Fix tests\r\n\r\n* Add eslint rules for codeceptjs\r\n\r\n* Add constraints to applying labels\r\n\r\n- preventing of applying region labels to semantically incompatible regions\r\n- test\r\n\r\n* Add textarea focusing by dblclick and fixs\r\n\r\n* Hide duplicate text\r\n\r\n* Clean\r\n\r\n* Add autofocus textarea by selectAfterCreate setting\r\n\r\n* Fix text selection in region item\r\n\r\n* Fix autofocus on textarea for different shapes\r\n\r\n* Fix label name computing\r\n\r\n* Add submitting text when collapsing region item\r\n\r\n* Fix tests\r\n\r\n* Fix tests\r\n\r\n* Fix focusing\r\n\r\n* Add focus by enter instead of autofocus\r\n\r\n* Add scrolling selected region item into view\r\n\r\n* Fix tests\r\n\r\n* Fix removing area under cursor\r\n\r\n* Fix brush size at slider\r\n\r\n* Add deserialization test on OCR mode\r\n\r\n* Fix sidebar textarea styles\r\n\r\n* Fix image rotating in two columns template\r\n\r\n* Fix tests\r\n\r\nCo-authored-by: Koshevarov Sergey <Gondragos@gmail.com>",
-  "commit": "1cef63d2a8fd1d345cd21657fced5242ff521994",
+  "message": "Improve Labels styles",
+  "commit": "5a34b62e57653484bb5d9924cfd821a7b81de996",
   "branch": "master",
-  "date": "2021-06-29T20:13:02Z"
+  "date": "2021-06-30T20:10:42Z"
 }
