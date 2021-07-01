@@ -440,9 +440,15 @@ class AnnotationDraftSerializer(ModelSerializer):
 
 class TaskWithAnnotationsAndPredictionsAndDraftsSerializer(TaskSerializer):
 
-    predictions = PredictionSerializer(many=True, default=[], read_only=True)
+    predictions = serializers.SerializerMethodField(default=[], read_only=True)
     annotations = serializers.SerializerMethodField(default=[], read_only=True)
     drafts = serializers.SerializerMethodField(default=[], read_only=True)
+
+    def get_predictions(self, task):
+        predictions = task.predictions
+        if task.project.model_version:
+            predictions = predictions.filter(model_version=task.project.model_version)
+        return PredictionSerializer(predictions, many=True, read_only=True, default=[], context=self.context).data
 
     def get_annotations(self, task):
         """Return annotations only for the current user"""
@@ -453,7 +459,7 @@ class TaskWithAnnotationsAndPredictionsAndDraftsSerializer(TaskSerializer):
             if user.is_annotator:
                 annotations = annotations.filter(completed_by=user)
 
-        return AnnotationSerializer(annotations, many=True, read_only=True, default=True, context=self.context).data
+        return AnnotationSerializer(annotations, many=True, read_only=True, default=[], context=self.context).data
 
     def get_drafts(self, task):
         """Return drafts only for the current user"""
@@ -466,7 +472,7 @@ class TaskWithAnnotationsAndPredictionsAndDraftsSerializer(TaskSerializer):
             user = self.context['request'].user
             drafts = drafts.filter(user=user)
 
-        return AnnotationDraftSerializer(drafts, many=True, read_only=True, default=True, context=self.context).data
+        return AnnotationDraftSerializer(drafts, many=True, read_only=True, default=[], context=self.context).data
 
 
 class TaskIDWithAnnotationsAndPredictionsSerializer(ModelSerializer):

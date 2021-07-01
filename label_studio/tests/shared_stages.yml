@@ -22,6 +22,7 @@ stages:
         label_config: <View><Text name="text" value="$text"/><Choices name="label" toName="text"><Choice
           value="pos"/><Choice value="neg"/></Choices></View>
         title: Test Draft 1
+        show_collab_predictions: true
       method: POST
       url: '{django_live_url}/api/projects'
     response:
