@@ -44,8 +44,10 @@ export const MachineLearningSettings = () => {
       },
     });
 
+    console.log({versions});
+
     setVersions(versions);
-  }, [api]);
+  }, [api, project.id]);
 
   const showMLFormModal = useCallback((backend) => {
     const action = backend ? "updateMLBackend" : "addMLBackend";
