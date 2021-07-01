@@ -49,6 +49,7 @@ export const API_CONFIG = {
     deleteMLBackend: "DELETE:/ml/:pk",
     trainMLBackend: "POST:/ml/:pk/train",
     predictWithML: "POST:/ml/:pk/predict",
+    modelVersions: "/api/projects/:pk/model-versions",
 
     // Export
     export: "/projects/:pk/export",

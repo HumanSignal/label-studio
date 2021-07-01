@@ -56,6 +56,8 @@ export const FormField = forwardRef(({
       setValue(value);
     } else if (input.type === 'checkbox' || input.type === 'radio') {
       input.checked = value ?? input.checked;
+    } else if (value === null) {
+      input.value = "";
     } else {
       input.value = value;
     }
