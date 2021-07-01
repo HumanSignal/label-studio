@@ -56,7 +56,14 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
         openapi.Parameter(name='exportType',
                           type=openapi.TYPE_STRING,
                           in_=openapi.IN_QUERY,
-                          description='Selected export format')
+                          description='Selected export format'),
+        openapi.Parameter(name='download_all_tasks',
+                          type=openapi.TYPE_STRING,
+                          in_=openapi.IN_QUERY,
+                          description="""
+                          If true, download all tasks regardless of status. If false, download only annotated tasks.
+                          """
+                          )
         ],
     tags=['Export'],
     operation_summary='Export tasks and annotations',
