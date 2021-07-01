@@ -25,6 +25,15 @@ stages:
       task_count: 1
     status_code: 201
 
+- name: get_available_model_versions
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/model-versions'
+  response:
+    json:
+      - model_version_A
+      - model_version_B
+
 - name: get_next_task
   request:
     method: GET
