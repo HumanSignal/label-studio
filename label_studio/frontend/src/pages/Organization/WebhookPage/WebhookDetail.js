@@ -6,10 +6,12 @@ import { Elem, Block } from '../../../utils/bem';
 import { cloneDeep } from 'lodash';
 import { LsCross } from '../../../assets/icons';
 import "./WebhookPage.styl";
+import { useAPI } from '../../../providers/ApiProvider';
 
 
 const WebhookDetail = ({ webhook, webhooksInfo, fetchWebhooks, onBack }) => {
 
+  const api = useAPI(); 
   const [headers, setHeaders] = useState(null);
   const [sendForAllActions, setSendForAllActions] = useState(null);
   const [actions, setActions] = useState(null);
@@ -140,6 +142,11 @@ const WebhookDetail = ({ webhook, webhooksInfo, fetchWebhooks, onBack }) => {
             null
         }
         <Form.Actions>
+          <Button look="danger" type='button' onClick={async ()=>{
+            await api.callApi('deleteWebhook', {params:{pk:webhook.id}});
+            onBack();
+            await fetchWebhooks();
+          }}>Delete</Button>
           <Button>Save</Button>
         </Form.Actions>
       </Form>
