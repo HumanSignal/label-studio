@@ -445,8 +445,9 @@ class TaskWithAnnotationsAndPredictionsAndDraftsSerializer(TaskSerializer):
     drafts = serializers.SerializerMethodField(default=[], read_only=True)
 
     def get_predictions(self, task):
+        predictions = task.predictions
         if task.project.model_version:
-            predictions = task.predictions.filter(model_version=task.project.model_version)
+            predictions = predictions.filter(model_version=task.project.model_version)
         return PredictionSerializer(predictions, many=True, read_only=True, default=True, context=self.context).data
 
     def get_annotations(self, task):
