@@ -4,9 +4,6 @@ import { isDefined } from '../../utils/helpers';
 import { FormSubmissionContext } from '../Form/FormContext';
 import "./Button.styl";
 
-let errorSent = false;
-
-
 export const Button = React.forwardRef(
   (
     {
@@ -62,13 +59,6 @@ export const Button = React.forwardRef(
           return icon;
       }
     }, [icon, size]);
-
-    if (!errorSent) {
-      errorSent = true;
-      setTimeout(() => {
-        throw new Error("Try sentry sorucemaps");
-      }, 500);
-    }
 
     return (
       <Block
