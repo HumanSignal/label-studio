@@ -298,23 +298,29 @@ class AnnotationDraftAPI(RequestDebugLogMixin, generics.RetrieveUpdateDestroyAPI
 
 
 @method_decorator(name='list', decorator=swagger_auto_schema(
-    tags=['Predictions'], operation_summary="List predictions",
+    tags=['Predictions'],
+    operation_summary="List predictions",
     operation_description="List all predictions."))
 @method_decorator(name='create', decorator=swagger_auto_schema(
-    tags=['Predictions'], operation_summary="Create prediction",
+    tags=['Predictions'],
+    operation_summary="Create prediction",
     operation_description="Create a prediction."))
 @method_decorator(name='retrieve', decorator=swagger_auto_schema(
-    tags=['Predictions'], operation_summary="Get prediction",
-    operation_description="Get all predictions."))
+    tags=['Predictions'],
+    operation_summary="Get prediction",
+    operation_description="Get all predictions for a specific task ID."))
 @method_decorator(name='update', decorator=swagger_auto_schema(
-    tags=['Predictions'], operation_summary="Put prediction",
-    operation_description="Overwrite prediction data."))
+    tags=['Predictions'],
+    operation_summary="Put prediction",
+    operation_description="Overwrite prediction data for a specific task ID."))
 @method_decorator(name='partial_update', decorator=swagger_auto_schema(
-    tags=['Predictions'], operation_summary="Update prediction",
-    operation_description="Update prediction data."))
+    tags=['Predictions'],
+    operation_summary="Update prediction",
+    operation_description="Update prediction data for a specific task ID."))
 @method_decorator(name='destroy', decorator=swagger_auto_schema(
-    tags=['Predictions'], operation_summary="Delete prediction",
-    operation_description="Delete a prediction."))
+    tags=['Predictions'],
+    operation_summary="Delete prediction",
+    operation_description="Delete a prediction for a specific task ID."))
 class PredictionAPI(viewsets.ModelViewSet):
     serializer_class = PredictionSerializer
     permission_required = all_permissions.predictions_any
