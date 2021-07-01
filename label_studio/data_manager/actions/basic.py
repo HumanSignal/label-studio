@@ -71,7 +71,7 @@ def delete_tasks_annotations(project, queryset, **kwargs):
     count = annotations.count()
     annotations_ids = list(annotations.values('id'))
     annotations.delete()
-    emit_webhooks_for_instanses(project.organization, WebhookAction.TASK_DELETED, annotations_ids)
+    emit_webhooks_for_instanses(project.organization, WebhookAction.ANNOTATION_DELETED, annotations_ids)
     return {'processed_items': count,
             'detail': 'Deleted ' + str(count) + ' annotations'}
 
