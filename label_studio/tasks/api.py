@@ -181,7 +181,22 @@ class AnnotationAPI(RequestDebugLogMixin, generics.RetrieveUpdateDestroyAPIView)
 @method_decorator(name='post', decorator=swagger_auto_schema(
         tags=['Annotations'],
         operation_summary='Create annotation',
-        operation_description='Add annotations to a task like an annotator does.',
+        operation_description="""
+        Add annotations to a task like an annotator does. The content of the result field depends on your 
+        labeling configuration. For example, send the following data as part of your POST 
+        request to send an empty annotation with the ID of the user who completed the task:
+        
+        ```json
+        {
+        "result": {},
+        "was_cancelled": true,
+        "ground_truth": true,
+        "lead_time": 0,
+        "task": 0
+        "completed_by": {"id": 1, "email": "heartex@example.com", "first_name": "", "last_name": ""}
+        } 
+        ```
+        """,
         request_body=AnnotationSerializer
         ))
 class AnnotationsListAPI(RequestDebugLogMixin, generics.ListCreateAPIView):
