@@ -9,7 +9,7 @@ meta_description: Work with webhooks. Set up webhooks. Extend webhooks.
 
 Label Studio has webhooks for doferent cases.
 
-## How does it work?
+## How does it work
 A webhook call is a `POST` request with some payload, for example:
 ```
 {
@@ -24,11 +24,13 @@ A webhook call is a `POST` request with some payload, for example:
 All webhook requests runs synchronously. They are stored in `Webhook` and `WebhookActions` models. They are explicitly called in code points as API controllers and etc.
 
 ## Calling
-To get all active webhooks use `get_active_webhooks()`.
-
 ### Raw calling
+- `get_active_webhooks()`
+  Use it to get all active webhooks.
 - `run_webhook()`
-  To run one webhook use function `run_webhook()` and pass some payload there.
+  Use it to run one and pass some payload here.
+- `emit_webhooks()`
+  Use it to send requests for all webhooks for an action.
 
 ### Calling with instances
 - `emit_webhooks_for_instanses()`
@@ -38,7 +40,7 @@ To get all active webhooks use `get_active_webhooks()`.
 Usually, we have many CRUD methods in API. So There are 2 decorators to make it easier: 
 
 - `@api_webhook()` 
-  It's used for `POST`/`PUT`/`PATCH` requests. The decorator expects that responce will be with `id` field and uses `get_object()` after request to send it.
+  It's used for `POST`/`PUT`/`PATCH` requests. The decorator expects that responce will be with `id` field and uses `.get_object()` after request to send it.
 
 - `@api_webhook_for_delete()`
   Is's used only for `DELETE` and sends only `id` field after successful operation.
@@ -69,13 +71,11 @@ And now you have to add explicitly call in some place where you need it:
 ```
 ...
 result = do_something()
-for wh in get_active_webhooks(organization, WebhookAction.SOMETHING_HAPPENED):
-    run_webhook(wh, WebhookAction.SOMETHING_HAPPENED, result)
+emit_webhooks(organization, WebhookAction.SOMETHING_HAPPENED, {'something': [result]})
 ...
 ```
 
 > Note: In OpenSorce you have only one organization so you can easly get it by following code: `Organization.objects.first()`
-
 
 ## Settings
 
