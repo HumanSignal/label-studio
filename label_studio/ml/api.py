@@ -61,6 +61,16 @@ class MLBackendListAPI(generics.ListCreateAPIView):
     curl -X POST {host}/api/ml?project={{project_id}} -H 'Authorization: Token abc123'
     """.format(host=(settings.HOSTNAME or 'https://localhost:8080')),
 ))
+@method_decorator(name='destroy', decorator=swagger_auto_schema(
+    tags=['Machine Learning'],
+    operation_summary='Remove ML Backend',
+    operation_description="""
+    Remove an existing ML backend connection by ID. For example, use the
+    following cURL command:
+    ```bash
+    curl -X DELETE {host}/api/ml?project={{project_id}}&id={{ml_backend_ID}} -H 'Authorization: Token abc123'
+    """.format(host=(settings.HOSTNAME or 'https://localhost:8080')),
+))
 class MLBackendDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     """RUD storage by pk specified in URL"""
     parser_classes = (JSONParser, FormParser, MultiPartParser)
