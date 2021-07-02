@@ -23,7 +23,7 @@ A webhook call is a `POST` request with some payload, for example:
 
 All webhook requests runs synchronously. They are stored in `Webhook` and `WebhookActions` models. They are explicitly called in code points as API controllers and etc.
 
-## Calling
+## Calling of webhooks
 ### Raw calling
 - `get_active_webhooks()`
   Use it to get all active webhooks.
@@ -36,8 +36,8 @@ All webhook requests runs synchronously. They are stored in `Webhook` and `Webho
 - `emit_webhooks_for_instanses()`
   So as usualy we want to send serialized instances there is function `emit_webhooks_for_instanses()`. Be sure you have `serializer` in `WebhookAction.ACTIONS` field.
 
-### Calling in API
-Usually, we have many CRUD methods in API. So There are 2 decorators to make it easier: 
+### Calling in API views
+Usually, we have many CRUD REST methods in API. So There are 2 decorators to make it easier: 
 
 - `@api_webhook()` 
   It's used for `POST`/`PUT`/`PATCH` requests. The decorator expects that responce will be with `id` field and uses `.get_object()` after request to send it.
