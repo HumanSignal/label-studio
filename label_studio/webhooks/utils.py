@@ -31,12 +31,10 @@ def run_webhook(webhook, action, payload=None):
         return
 
 
-def emit_webhooks_for_instanses(organization, action, instanses=None):
-    """Run all active webhooks for the action using instanses as payload.
-
-    Be sure WebhookAction.ACTIONS contains all required fields.
+def get_active_webhooks(organization, action):
+    """Return all active webhooks for organization by action.
     """
-    webhooks = Webhook.objects.filter(
+    return Webhook.objects.filter(
         Q(organization=organization) &
         Q(is_active=True) &
         (
@@ -47,6 +45,14 @@ def emit_webhooks_for_instanses(organization, action, instanses=None):
             ).values_list('webhook_id', flat=True))
         )
     )
+
+
+def emit_webhooks_for_instanses(organization, action, instanses=None):
+    """Run all active webhooks for the action using instanses as payload.
+
+    Be sure WebhookAction.ACTIONS contains all required fields.
+    """
+    webhooks = get_active_webhooks(organization, action)
     if not webhooks.exists():
         return
     payload = None
