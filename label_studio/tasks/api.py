@@ -8,6 +8,7 @@ from django.utils import timezone
 import drf_yasg.openapi as openapi
 from drf_yasg.utils import swagger_auto_schema
 from django.utils.decorators import method_decorator
+from django_filters.rest_framework import DjangoFilterBackend
 
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework import generics, viewsets
@@ -318,6 +319,8 @@ class AnnotationDraftAPI(RequestDebugLogMixin, generics.RetrieveUpdateDestroyAPI
 class PredictionAPI(viewsets.ModelViewSet):
     serializer_class = PredictionSerializer
     permission_required = all_permissions.predictions_any
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['task', 'task__project']
 
     def get_queryset(self):
-        return Prediction.objects.filter(organization=self.request.user.active_organization)
+        return Prediction.objects.filter(task__project__organization=self.request.user.active_organization)
