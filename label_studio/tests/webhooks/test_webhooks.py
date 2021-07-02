@@ -9,7 +9,7 @@ from organizations.models import Organization
 from projects.models import Project
 
 from webhooks.models import Webhook, WebhookAction
-from webhooks.utils import emit_webhooks_for_instanses, run_webhook
+from webhooks.utils import emit_webhooks, emit_webhooks_for_instanses, run_webhook
 
 
 @pytest.fixture
@@ -23,10 +23,28 @@ def webhook(configured_project):
 
 
 @pytest.mark.django_db
-def test_emit_webhook(setup_project_dialog, webhook):
+def test_run_webhook(setup_project_dialog, webhook):
     with requests_mock.Mocker(real_http=True) as m:
         m.register_uri('POST', webhook.url)
         run_webhook(webhook, WebhookAction.PROJECT_CREATED, {'data': 'test'})
+
+    request_history = m.request_history
+    assert len(request_history) == 1
+    assert request_history[0].method == 'POST'
+    assert request_history[0].url == webhook.url
+    TestCase().assertDictEqual(
+        request_history[0].json(),
+        {
+            'action': WebhookAction.PROJECT_CREATED,
+            'data': 'test'
+        }
+    )
+
+@pytest.mark.django_db
+def test_emit_webhooks(setup_project_dialog, webhook):
+    with requests_mock.Mocker(real_http=True) as m:
+        m.register_uri('POST', webhook.url)
+        emit_webhooks(webhook.organization, WebhookAction.PROJECT_CREATED, {'data': 'test'})
 
     request_history = m.request_history
     assert len(request_history) == 1

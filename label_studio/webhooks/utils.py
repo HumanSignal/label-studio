@@ -47,6 +47,14 @@ def get_active_webhooks(organization, action):
     )
 
 
+def emit_webhooks(organization, action, payload):
+    """Run all active webhooks for the action.
+    """
+    webhooks = get_active_webhooks(organization, action)
+    for wh in webhooks:
+        run_webhook(wh, action, payload)
+
+
 def emit_webhooks_for_instanses(organization, action, instanses=None):
     """Run all active webhooks for the action using instanses as payload.
 
