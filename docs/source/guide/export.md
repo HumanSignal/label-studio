@@ -204,5 +204,3 @@ Review the full list of JSON properties in the [API documentation](api.html).
 
 <!-- md image_units.md -->
 
-
-<!-- md annotation_ids.md -->
