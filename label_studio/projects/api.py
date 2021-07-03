@@ -22,6 +22,7 @@ from rest_framework.response import Response
 from rest_framework.views import exception_handler
 
 from core.utils.common import conditional_atomic
+from core.utils.disable_signals import DisableSignals
 from core.label_config import config_essential_data_has_changed
 from projects.models import (
     Project, ProjectSummary
@@ -200,20 +201,8 @@ class ProjectAPI(APIViewVirtualRedirectMixin,
         return super(ProjectAPI, self).patch(request, *args, **kwargs)
 
     def perform_destroy(self, instance):
-        """Performance optimization for whole project deletion
-        if we catch constraint error fallback to regular .delete() method"""
-        try:
-            task_annotation_qs = Annotation.objects.filter(task__project_id=instance.id)
-            task_annotation_qs._raw_delete(task_annotation_qs.db)
-            task_prediction_qs = Prediction.objects.filter(task__project_id=instance.id)
-            task_prediction_qs._raw_delete(task_prediction_qs.db)
-            task_locks_qs = TaskLock.objects.filter(task__project_id=instance.id)
-            task_locks_qs._raw_delete(task_locks_qs.db)
-            task_qs = Task.objects.filter(project_id=instance.id)
-            task_qs._raw_delete(task_qs.db)
-            instance.delete()
-        except IntegrityError as e:
-            logger.error('Fallback to cascade deleting after integrity_error: {}'.format(str(e)))
+        # we don't need to relaculate counters if we delete whole project
+        with DisableSignals():
             instance.delete()
 
     @swagger_auto_schema(auto_schema=None)
