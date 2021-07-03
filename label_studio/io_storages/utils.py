@@ -10,7 +10,7 @@ uri_regex = r"[\"]?(?P<uri>(?P<storage>{})://([^/]+)/(.*?[^/]+/?[^\">]+))[\"]?"
 
 
 def get_uri_via_regex(data, prefixes=('s3', 'gs')):
-    data = data.strip()
+    data = str(data).strip()
     for prefix in prefixes:
         if data.startswith(prefix):
             return data, prefix
