@@ -34,6 +34,7 @@ export const MachineLearningSettings = () => {
       },
     });
 
+
     if (models) setBackends(models);
   }, [api, project, setBackends]);
 
@@ -43,6 +44,8 @@ export const MachineLearningSettings = () => {
         pk: project.id,
       },
     });
+
+    versions.push("Hello", "World");
 
     setVersions(versions);
   }, [api, project.id]);
@@ -171,7 +174,9 @@ export const MachineLearningSettings = () => {
                 <Select
                   name="model_version"
                   defaultValue={null}
-                  options={versions}
+                  options={[
+                    ...versions,
+                  ]}
                   placeholder="No model version selected"
                 />
               </div>
