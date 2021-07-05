@@ -45,8 +45,6 @@ export const MachineLearningSettings = () => {
       },
     });
 
-    versions.push("Hello", "World");
-
     setVersions(versions);
   }, [api, project.id]);
 
