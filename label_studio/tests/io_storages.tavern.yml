@@ -674,6 +674,82 @@ stages:
   response:
     status_code: 200
 
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/next'
+  response:
+    json:
+      data:
+        image_url: "http://ggg.com/image.jpg"
+    status_code: 200
+
+
+---
+# we check here 2 things:
+# - that json blobs are successfully synced from bucket,
+# - s3:// links inside hypertext (like <a href="s3://.."/> have been resolved)
+test_name: test_import_jsons_from_s3_and_resolve_hypertext
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    data:
+      is_published: true
+      label_config: <View><HyperText name="text" value="$text"/><Choices name="label"
+        toName="text"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+      title: test_s3_storage_with_json_and_hypertext
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        project_pk: id
+    status_code: 201
+- name: stage
+  request:
+    data:
+      bucket: pytest-s3-jsons-hypertext
+      project: '{project_pk}'
+      title: Testing S3 storage 3 (bucket from conftest.py)
+      use_blob_urls: false
+    method: POST
+    url: '{django_live_url}/api/storages/s3'
+  response:
+    save:
+      json:
+        storage_pk: id
+    status_code: 201
+- name: stage
+  request:
+    method: POST
+    url: '{django_live_url}/api/storages/s3/{storage_pk}/sync'
+  response:
+    json:
+      last_sync_count: 1
+    status_code: 200
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/tasks'
+  response:
+    status_code: 200
+
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{project_pk}/next'
+  response:
+    json:
+      data:
+        text: !re_match "<a href=\"https://hypertext-bucket.s3.amazonaws.com/file%20with%20/spaces%20and%27%20/%20%27%20/%20quotes.jpg.+X-Amz-Security-Token=testing"
+    status_code: 200
+
 ---
 test_name: test_connection_to_import_redis_storage
 strict: false
