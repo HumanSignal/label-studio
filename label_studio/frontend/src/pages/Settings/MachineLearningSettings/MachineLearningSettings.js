@@ -159,7 +159,12 @@ export const MachineLearningSettings = () => {
 
         {versions.length > 1 && (
           <Form.Row columnCount={1}>
-            <Label text="Model Version" large/>
+            <Label
+              text="Model Version"
+              description="Model version allows you to specify which prediction will be shown to the annotators."
+              style={{marginTop: 16}}
+              large
+            />
 
             <div style={{display: 'flex', alignItems: 'center', width: 400, paddingLeft: 16}}>
               <div style={{flex: 1, paddingRight: 16}}>
@@ -167,6 +172,7 @@ export const MachineLearningSettings = () => {
                   name="model_version"
                   defaultValue={null}
                   options={versions}
+                  placeholder="No model version selected"
                 />
               </div>
 
@@ -188,4 +194,5 @@ export const MachineLearningSettings = () => {
   );
 };
 
+MachineLearningSettings.title = "Machine Learning";
 MachineLearningSettings.path = "/ml";

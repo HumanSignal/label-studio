@@ -19,7 +19,7 @@ export const initSentry = (history: RouterHistory) => {
     // of transactions for performance monitoring.
     // We recommend adjusting this value in production
     tracesSampleRate: 0.25,
-    release: `label-studio-enterprise@${APP_SETTINGS.version.release}`,
+    release: process.env.RELEASE_NAME,
   });
 };
 
