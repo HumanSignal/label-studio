@@ -3,3 +3,4 @@ webpack.config.js
 get-build.js
 jest-puppeteer.config.js
 *.html
+release.js

@@ -3,6 +3,12 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { EnvironmentPlugin } = require('webpack');
 const TerserPlugin = require("terser-webpack-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const SentryWebpackPlugin = require('@sentry/webpack-plugin');
+
+const getReleaseName = () => {
+  const version = require("./release");
+  return `${version.name}@${version.version}`
+}
 
 const LOCAL_ENV = {
   NODE_ENV: "development",

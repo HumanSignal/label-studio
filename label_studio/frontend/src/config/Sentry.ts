@@ -20,7 +20,8 @@ export const initSentry = (history: RouterHistory) => {
     // Set tracesSampleRate to 1.0 to capture 100%
     // of transactions for performance monitoring.
     // We recommend adjusting this value in production
-    tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
+    tracesSampleRate: 0.25,
+    release: `label-studio-enterprise@${APP_SETTINGS.version.release}`,
   });
 
 };
