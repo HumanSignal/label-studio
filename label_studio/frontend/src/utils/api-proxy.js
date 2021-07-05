@@ -426,7 +426,7 @@ export class APIProxy {
 
     return {
       status: fetchResponse.status,
-      error: exception?.message ?? fetchResponse.statusText,
+      error: (exception?.message ?? fetchResponse.statusText) || "Server Error",
       response: await result,
     };
   }
