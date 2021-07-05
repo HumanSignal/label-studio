@@ -7,10 +7,10 @@
 </View>
 
 <!-- {"data": {
- "video": "<video src='/static/samples/opossum_snow.mp4' width=100% muted /><img src onerror=\"$=n=>document.getElementsByTagName(n)[0];a=$('audio');v=$('video');a.onseeked=()=>{v.currentTime=a.currentTime};a.onplay=()=>v.play();a.onpause=()=>v.pause()\" />",
+ "video": "<video src='static/samples/opossum_snow.mp4' width=100% controls>",
  "videoSource": "/static/samples/opossum_snow.mp4"
 },
-"completions": [{"result":
+"predictions": [{"result":
 [
     {
         "value": {
