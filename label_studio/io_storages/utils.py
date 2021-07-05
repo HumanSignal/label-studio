@@ -6,10 +6,14 @@ import re
 logger = logging.getLogger(__name__)
 
 # Put storage prefixes here
-uri_regex = r"[\s\'\"]?(?P<uri>(?P<storage>{})://([^/\s]+)/(.*?[^/\s]+/?[^\s\'\">]+))[\s\'\"]?"
+uri_regex = r"[\"]?(?P<uri>(?P<storage>{})://([^/]+)/(.*?[^/]+/?[^\">]+))[\"]?"
 
 
 def get_uri_via_regex(data, prefixes=('s3', 'gs')):
+    data = str(data).strip()
+    for prefix in prefixes:
+        if data.startswith(prefix):
+            return data, prefix
     try:
         uri_regex_prepared = uri_regex.format('|'.join(prefixes))
         r_match = re.search(uri_regex_prepared, data)

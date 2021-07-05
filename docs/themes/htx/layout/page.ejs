@@ -31,6 +31,8 @@
   <% if (page.title.trim()) { %>
     <h1><%- page.title %><%- page.badge %><%- page.type === 'examples' ? ' Example' : '' %></h1>
   <% } %>
+
+  <!--Add previous and next page constructors to guide pages-->
   <%- page.content %>
   <% if (page.type === 'guide') { %>
     <div class="guide-links">
@@ -45,6 +47,7 @@
     </div>
     <% } %>
 
+<!--content for all the website pages-->
   <div class="footer-slack">
       Couldn't find what you were looking for? Please <a href="http://slack.labelstud.io.s3-website-us-east-1.amazonaws.com?source=docs-footer">let us know on
       Slack&nbsp;<img style="height: 18px; position: absolute" src="/images/slack.png" />

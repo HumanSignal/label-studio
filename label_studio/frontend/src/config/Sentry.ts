@@ -5,8 +5,6 @@ import { Integrations } from "@sentry/tracing";
 import { Route } from 'react-router-dom';
 
 export const initSentry = (history: RouterHistory) => {
-  if (process.env.NODE_ENV !== 'production') return;
-
   setTags();
 
   Sentry.init({
@@ -23,7 +21,6 @@ export const initSentry = (history: RouterHistory) => {
     tracesSampleRate: 0.25,
     release: `label-studio-enterprise@${APP_SETTINGS.version.release}`,
   });
-
 };
 
 const setTags = () => {
@@ -39,7 +36,6 @@ const setTags = () => {
   if (APP_SETTINGS.version) {
     Object.entries(APP_SETTINGS.version).forEach(([packageName, data]: [string, any]) => {
       const {version, commit} = data ?? {};
-      console.log({packageName, version, commit, data});
 
       if (version) {
         tags['version-' + packageName] = version;
@@ -49,8 +45,6 @@ const setTags = () => {
       }
     });
   }
-
-  console.log(tags);
 
   Sentry.setTags(tags);
 };
