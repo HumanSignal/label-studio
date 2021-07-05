@@ -38,13 +38,11 @@ export const MachineLearningSettings = () => {
   }, [api, project, setBackends]);
 
   const fetchMLVersions = useCallback(async () => {
-    const versions = api.callApi("modelVersions", {
+    const versions = await api.callApi("modelVersions", {
       params: {
         pk: project.id,
       },
     });
-
-    console.log({versions});
 
     setVersions(versions);
   }, [api, project.id]);
@@ -190,5 +188,4 @@ export const MachineLearningSettings = () => {
   );
 };
 
-MachineLearningSettings.title = "Machine Learning";
 MachineLearningSettings.path = "/ml";
