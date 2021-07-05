@@ -1,4 +1,4 @@
-require('dotenv').config({ debug: true });
+require('dotenv').config();
 
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -7,21 +7,19 @@ const TerserPlugin = require("terser-webpack-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const SentryWebpackPlugin = require('@sentry/webpack-plugin');
 
-const getReleaseName = () => {
-  const version = require("./package.json").version;
-  return `label-studio@${version}`
-}
+const RELEASE = require('./release').getReleaseName();
 
 const LOCAL_ENV = {
   NODE_ENV: "development",
   CSS_PREFIX: "ls-",
+  RELEASE_NAME: RELEASE,
 };
 
 const SENTRY = {
   AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
   ORG: process.env.SENTRY_ORG,
   PROJECT: process.env.SENTRY_PROJECT,
-  RELEASE: getReleaseName(),
+  RELEASE,
 }
 
 const devtool = process.env.NODE_ENV === 'production' ? "source-map" : "cheap-module-source-map";
