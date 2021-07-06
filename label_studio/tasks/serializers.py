@@ -24,8 +24,8 @@ logger = logging.getLogger(__name__)
 
 
 class PredictionQuerySerializer(serializers.Serializer):
-    task = serializers.IntegerField(required=False, help_text='Id of task to filter predictions')
-    task__project = serializers.IntegerField(required=False, help_text='Id of project to filter predictions')
+    task = serializers.IntegerField(required=False, help_text='Task ID to filter predictions')
+    task__project = serializers.IntegerField(required=False, help_text='Project ID to filter predictions')
 
 
 class PredictionSerializer(ModelSerializer):
