@@ -22,7 +22,7 @@ from core.mixins import RequestDebugLogMixin
 from core.utils.common import bool_from_request
 from tasks.serializers import (
     TaskSerializer, AnnotationSerializer, TaskSimpleSerializer, PredictionSerializer,
-    TaskWithAnnotationsAndPredictionsAndDraftsSerializer, AnnotationDraftSerializer)
+    TaskWithAnnotationsAndPredictionsAndDraftsSerializer, AnnotationDraftSerializer, PredictionQuerySerializer)
 from projects.models import Project
 
 logger = logging.getLogger(__name__)
@@ -300,7 +300,7 @@ class AnnotationDraftAPI(RequestDebugLogMixin, generics.RetrieveUpdateDestroyAPI
 
 @method_decorator(name='list', decorator=swagger_auto_schema(
     tags=['Predictions'], operation_summary="List predictions",
-    operation_description="List all predictions."))
+    query_serializer=PredictionQuerySerializer, operation_description="List all predictions."))
 @method_decorator(name='create', decorator=swagger_auto_schema(
     tags=['Predictions'], operation_summary="Create prediction",
     operation_description="Create a prediction."))
