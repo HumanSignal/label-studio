@@ -4,7 +4,7 @@ import { Description } from '../../../components/Description/Description';
 import { Divider } from '../../../components/Divider/Divider';
 import { ErrorWrapper } from '../../../components/Error/Error';
 import { InlineError } from '../../../components/Error/InlineError';
-import { Form, Input, Label, TextArea, Toggle } from '../../../components/Form';
+import { Form, Input, Label, Select, TextArea, Toggle } from '../../../components/Form';
 import { modal } from '../../../components/Modal/Modal';
 import { useAPI } from '../../../providers/ApiProvider';
 import { ProjectContext } from '../../../providers/ProjectProvider';
@@ -13,9 +13,19 @@ import './MachineLearningSettings.styl';
 
 export const MachineLearningSettings = () => {
   const api = useAPI();
-  const {project, fetchProject} = useContext(ProjectContext);
+  const {project, fetchProject, updateProject} = useContext(ProjectContext);
   const [mlError, setMLError] = useState();
   const [backends, setBackends] = useState([]);
+  const [versions, setVersions] = useState([]);
+
+  const resetMLVersion = useCallback(async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    await updateProject({
+      model_version: null,
+    });
+  }, [api, project]);
 
   const fetchBackends = useCallback(async () => {
     const models = await api.callApi('mlBackends', {
@@ -24,8 +34,19 @@ export const MachineLearningSettings = () => {
       },
     });
 
+
     if (models) setBackends(models);
   }, [api, project, setBackends]);
+
+  const fetchMLVersions = useCallback(async () => {
+    const versions = await api.callApi("modelVersions", {
+      params: {
+        pk: project.id,
+      },
+    });
+
+    setVersions(versions);
+  }, [api, project.id]);
 
   const showMLFormModal = useCallback((backend) => {
     const action = backend ? "updateMLBackend" : "addMLBackend";
@@ -84,7 +105,10 @@ export const MachineLearningSettings = () => {
   }, [project, fetchBackends, mlError]);
 
   useEffect(() => {
-    if (project.id) fetchBackends();
+    if (project.id) {
+      fetchBackends();
+      fetchMLVersions();
+    }
   }, [project]);
 
   return (
@@ -133,6 +157,35 @@ export const MachineLearningSettings = () => {
             />
           </div>
         </Form.Row>
+
+        {versions.length > 1 && (
+          <Form.Row columnCount={1}>
+            <Label
+              text="Model Version"
+              description="Model version allows you to specify which prediction will be shown to the annotators."
+              style={{marginTop: 16}}
+              large
+            />
+
+            <div style={{display: 'flex', alignItems: 'center', width: 400, paddingLeft: 16}}>
+              <div style={{flex: 1, paddingRight: 16}}>
+                <Select
+                  name="model_version"
+                  defaultValue={null}
+                  options={[
+                    ...versions,
+                  ]}
+                  placeholder="No model version selected"
+                />
+              </div>
+
+              <Button onClick={resetMLVersion}>
+                Reset
+              </Button>
+            </div>
+
+          </Form.Row>
+        )}
       </Form>
 
       <MachineLearningList

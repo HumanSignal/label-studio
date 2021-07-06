@@ -21,11 +21,21 @@ const Select = ({label, className, options, validate, required, skip, labelProps
       {ref => (
         <div className={classList}>
           <select {...props} ref={ref} className={rootClass.elem('list')}>
-            {(options ?? []).map(option => (
-              <option key={option.value} value={option.value}>
-                {option.label ?? option.value}
-              </option>
-            ))}
+            {props.placeholder && (
+              <option value="" disabled hidden selected>{props.placeholder}</option>
+            )}
+
+            {(options ?? []).map(option => {
+              const value = option.value ?? option;
+              const label = option.label ?? value;
+              const disabled = option.disabled ?? false;
+              const hidden = option.hidden ?? false;
+              return (
+                <option key={value} value={value} disabled={disabled} hidden={hidden}>
+                  {label}
+                </option>
+              );
+            })}
           </select>
         </div>
       )}

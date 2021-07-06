@@ -187,6 +187,15 @@ def export_annotation_to_s3_storages(sender, instance, **kwargs):
 class S3ImportStorageLink(ImportStorageLink):
     storage = models.ForeignKey(S3ImportStorage, on_delete=models.CASCADE, related_name='links')
 
+    @classmethod
+    def exists(cls, key, storage):
+        storage_link_exists = super(S3ImportStorageLink, cls).exists(key, storage)
+        # TODO: this is a workaround to be compatible with old keys version - remove it later
+        prefix = str(storage.prefix) or ''
+        return storage_link_exists or \
+            cls.objects.filter(key=prefix + key, storage=storage.id).exists() or \
+            cls.objects.filter(key=prefix + '/' + key, storage=storage.id).exists()
+
 
 class S3ExportStorageLink(ExportStorageLink):
     storage = models.ForeignKey(S3ExportStorage, on_delete=models.CASCADE, related_name='links')

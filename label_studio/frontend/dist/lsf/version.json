@@ -1,6 +1,6 @@
 {
-  "message": "Improve Labels styles",
-  "commit": "5a34b62e57653484bb5d9924cfd821a7b81de996",
+  "message": "Merge pull request #219 from heartexlabs/fix/switching-annotations-with-brushes\n\nFix brushes unmounting and brushes deserialization on remounting",
+  "commit": "6f3fc50a12b8698186917429cca2c3cae743810a",
   "branch": "master",
-  "date": "2021-06-30T20:10:42Z"
+  "date": "2021-07-01T23:31:27Z"
 }

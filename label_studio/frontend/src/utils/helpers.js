@@ -85,3 +85,7 @@ export const copyText = (text) => {
   document.execCommand('copy');
   input.remove();
 };
+
+export const delay = (time = 0) => {
+  return new Promise((resolve) => setTimeout(resolve, time));
+};
