@@ -117,6 +117,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
     def put(self, request, *args, **kwargs):
         return super(TaskAPI, self).put(request, *args, **kwargs)
 
+
 @method_decorator(name='get', decorator=swagger_auto_schema(
         tags=['Annotations'],
         operation_summary='Get annotation by its ID',
@@ -323,19 +324,19 @@ class AnnotationDraftAPI(RequestDebugLogMixin, generics.RetrieveUpdateDestroyAPI
 @method_decorator(name='retrieve', decorator=swagger_auto_schema(
     tags=['Predictions'],
     operation_summary="Get prediction",
-    operation_description="Get all predictions for a specific task ID."))
+    operation_description="Get all predictions in an organization, or for a specific task or project by ID."))
 @method_decorator(name='update', decorator=swagger_auto_schema(
     tags=['Predictions'],
     operation_summary="Put prediction",
-    operation_description="Overwrite prediction data for a specific task ID."))
+    operation_description="Overwrite prediction data by prediction ID."))
 @method_decorator(name='partial_update', decorator=swagger_auto_schema(
     tags=['Predictions'],
     operation_summary="Update prediction",
-    operation_description="Update prediction data for a specific task ID."))
+    operation_description="Update prediction data by prediction ID."))
 @method_decorator(name='destroy', decorator=swagger_auto_schema(
     tags=['Predictions'],
     operation_summary="Delete prediction",
-    operation_description="Delete a prediction for a specific task ID."))
+    operation_description="Delete a prediction by prediction ID."))
 class PredictionAPI(viewsets.ModelViewSet):
     serializer_class = PredictionSerializer
     permission_required = all_permissions.predictions_any
