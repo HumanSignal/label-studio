@@ -15,29 +15,27 @@ With Label Studio, you can set up your favorite machine learning models to do th
 - **Online Learning** by simultaneously updating your model while new annotations are created, letting you retrain your model on-the-fly. 
 - **Active Learning** by selecting example tasks that the model is uncertain how to label for your annotators to label. 
 
-With these capabilities, you can use Label Studio as part of a production-ready **Prediction Service**. 
+With these capabilities, you can use Label Studio as part of a production-ready prediction service. 
 
-## What is the Label Studio ML backend?
+## How to set up machine learning with Label Studio?
 
-The Label Studio ML backend is an SDK that you can use to wrap your machine learning code and turn it into a web server. You can then connect that server to a Label Studio instance to perform 2 tasks:
+Use the Label Studio ML backend to integrate Label Studio with machine learning models. The Label Studio ML backend is an SDK that you can use to wrap your machine learning code and turn it into a web server. You can then connect that server to a Label Studio instance to perform 2 tasks:
 - Dynamically pre-annotate data based on model inference results
 - Retrain or fine-tune a model based on recently annotated data
+For example, for an image classification task, the model pre-selects an image class for data annotators to verify. For audio transcriptions, the model displays a transcription that data annotators can modify. If you need to load static pre-annotated data into Label Studio, running an ML backend might be more than you need. Instead, you can [import pre-annotated data](predictions.html).
+  
 
-For example, for an image classification task, the model pre-selects an image class for data annotators to verify. For audio transcriptions, the model displays a transcription that data annotators can modify.
-
-The overall steps of setting up a Label Studio ML backend are as follows:
-1. Get your model code.
+To set up a Label Studio ML backend, perform the following steps:
+1. Get your model code, either by writing one from scratch or using an existing model.
 2. Wrap it with the [Label Studio SDK](ml_create.html).
-3. Create a running server script
-4. Launch the script
-5. Connect Label Studio to ML backend on the UI
-Follow the [Quickstart](#Quickstart) for an example. For assistance with steps 1-3, see how to [create your own machine learning backend](ml_create.html).
-
-If you need to load static pre-annotated data into Label Studio, running an ML backend might be more than you need. Instead, you can [import pre-annotated data](predictions.html).
+3. Create a running server script.
+4. Launch the script.
+5. Connect Label Studio to the ML backend on the UI.
+For an example, follow the [Quickstart](#Quickstart). For help with steps 1-3, see how to [create your own machine learning backend](ml_create.html).
 
 ## Quickstart
 
-Get started with a machine learning (ML) backend with Label Studio. You need to start both the machine learning backend and Label Studio to start labeling. You can review examples in the [`label-studio-ml/examples` section of the Label Studio ML backend repository](https://github.com/heartexlabs/label-studio-ml-backend/tree/master/label_studio_ml/examples).
+Get started with a machine learning (ML) backend with Label Studio. You need to start both the machine learning backend and Label Studio to start labeling. You can review examples in the [`label-studio-ml/examples` section of the Label Studio ML backend repository](https://github.com/heartexlabs/label-studio-ml-backend/tree/master/label_studio_ml/examples) or in the [machine learning tutorials](ml_tutorials.html).
 
 Follow these steps to set up an example text classifier ML backend with Label Studio:
 
@@ -125,7 +123,7 @@ If you want to retrieve predictions manually for a list of tasks **using only an
 }
 ```
    
-## Delete predictions 
+### Delete predictions 
 
 If you want to delete all predictions from Label Studio, you can do it using the UI or the API:
 - For a specific project, select the tasks that you want to delete predictions for and select **Delete predictions** from the drop-down menu.
@@ -134,6 +132,15 @@ If you want to delete all predictions from Label Studio, you can do it using the
 curl -H 'Authorization: Token <user-token-from-account-page>' -X POST \ 
  "<host>/api/dm/actions?id=delete_tasks_predictions&project=<id>"
 ```
+
+### <i class='ent'></i> Choose which predictions to display to annotators
+
+After setting up an ML backend with Label Studio Enterprise, you can choose which model predictions to display to annotators by default. You must have multiple ML backends configured with Label Studio in order to choose which predictions to display.
+
+1. For a specific project, open the **Settings** and select **Machine Learning**.
+2. Under **Model Version**, select the version of the model that you want to use to display predictions to annotators by default. Your changes save automatically. 
+
+When annotators start labeling, they'll see the predictions from that model version for each task, which they can then modify as needed.
    
 ## Set up a machine learning backend with Docker Compose
 Label Studio includes everything you need to set up a production-ready ML backend server powered by Docker. 
@@ -170,7 +177,7 @@ If you run into any issues, see [Troubleshoot machine learning](ml_troubleshooti
 ## Active Learning
 The process of creating annotated training data for supervised machine learning models is often expensive and time-consuming. Active Learning is a branch of machine learning that seeks to **minimize the total amount of data required for labeling by strategically sampling observations** that provide new insight into the problem. In particular, Active Learning algorithms aim to select diverse and informative data for annotation, rather than random observations, from a pool of unlabeled data using **prediction scores**. For more theory read [our article on Towards data science](https://towardsdatascience.com/learn-faster-with-smarter-data-labeling-15d0272614c4).
 
-You can select a task ordering like `Predictions score` on Data manager and the sampling strategy will fit the active learning scenario. Label Studio will send a train signal to ML Backend automatically on the each annotation submit/update. You can enable these train signals on the **machine learning** settings page for your project. 
+You can select a task ordering like `Predictions score` on Data manager and the sampling strategy will fit the active learning scenario. Label Studio will send a train signal to ML Backend automatically on each annotation submit/update. You can enable these train signals on the **machine learning** settings page for your project. 
 
 * If you need to retrieve and save predictions for all tasks, check recommendations from a [topic below](ml.html#Get-predictions-from-a-model).
 * If you want to delete all predictions after your model is retrained, check [this topic](ml.html#Delete-predictions). 
