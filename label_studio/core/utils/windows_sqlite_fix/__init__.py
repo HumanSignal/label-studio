@@ -41,6 +41,8 @@ def start_fix():
 
 def windows_dll_fix():
     """ Copy sqlite.dll to the current directory and use it """
+    auto_agree = any([a == '--agree-fix-sqlite' for a in sys.argv])
+    force_fix = any([a == '--force-fix-sqlite' for a in sys.argv])
 
     # check if it is not on windows
     if sys.platform != 'win32':
@@ -60,9 +62,8 @@ def windows_dll_fix():
     # check sqlite version
     import sqlite3
     v = sqlite3.sqlite_version_info
-    # if v[0] >= 3 and v[1] >= 35:
-    #     print("sqlite3 version doesn't a fix")
-    #     return
+    if v[0] >= 3 and v[1] >= 35 and not force_fix:
+        return
 
     # check python version and warn
     print(f'python version: {sys.version_info.major} sqlite minor version: {sys.version_info.minor}')
@@ -80,7 +81,6 @@ def windows_dll_fix():
               colorama.Fore.LIGHTWHITE_EX +
               'https://code.djangoproject.com/wiki/JSON1Extension [Windows section]\n')
 
-        auto_agree = any([a == '--agree-fix-sqlite' for a in sys.argv])
         agree = 'n'
         if not auto_agree:
             print(colorama.Fore.WHITE +
