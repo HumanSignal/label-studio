@@ -25,11 +25,16 @@ export const FormField = forwardRef(({
     ...(validate ?? []),
   ];
 
-  validators?.forEach?.(name => {
+  validators?.forEach?.(validator => {
+    const [name, value] = validator.split(':');
     const validatorFunc = Validators[name];
 
     if (isDefined(validatorFunc)) {
-      validation.push(validatorFunc);
+      if (isDefined(value)) {
+        validation.push(validatorFunc(value));
+      } else {
+        validation.push(validatorFunc);
+      }
     }
   });
 

@@ -9,6 +9,8 @@ export const required = (fieldName, value) => {
 };
 
 export const matchPattern = (pattern) => (fieldName, value) => {
+  pattern = (typeof pattern === 'string') ? new RegExp(pattern) : pattern;
+
   if (!isEmptyString(value) && value.match(pattern) === null) {
     return `${fieldName} should match pattern ${pattern}`;
   }
