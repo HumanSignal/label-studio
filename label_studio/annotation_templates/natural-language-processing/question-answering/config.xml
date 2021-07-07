@@ -3,11 +3,11 @@
   <Text name="text" value="$text" granularity="word"/>
   <Header value="Select a text span answering the following question:"/>
   <Text name="question" value="$question"/>
-  <View style="display: none;">
+
   <Labels name="answer" toName="text">
     <Label value="Answer" maxUsage="1" background="red"/>
   </Labels>
-  </View>
+
 </View>
 
 <!-- {"data": {
