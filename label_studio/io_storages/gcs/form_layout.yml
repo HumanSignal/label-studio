@@ -43,6 +43,14 @@ ImportStorage:
             min: 1
             dependency: presign
 
+  # Regex filter
+  - columnCount: 1
+    fields:
+      - type: password
+        name: google_application_credentials
+        label: Google Application Credentials
+        placeholder: Copy and paste here the content of credentials.json...
+
 ExportStorage:
   - columnCount: 3
     fields: *title_bucket_prefix

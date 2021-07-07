@@ -3,13 +3,13 @@
 import logging
 import json
 import socket
-import re
 import google.auth
 import re
 
 from google.auth import compute_engine
 from google.cloud import storage as google_storage
 from google.auth.transport import requests
+from google.oauth2 import service_account
 from urllib.parse import urlparse
 from datetime import datetime, timedelta
 from django.db import models, transaction
@@ -20,7 +20,6 @@ from django.db.models.signals import post_save
 
 from io_storages.utils import get_uri_via_regex
 from io_storages.base_models import ImportStorage, ImportStorageLink, ExportStorage, ExportStorageLink
-from io_storages.serializers import StorageAnnotationSerializer
 from tasks.models import Annotation
 
 logger = logging.getLogger(__name__)
@@ -40,17 +39,36 @@ class GCSStorageMixin(models.Model):
     use_blob_urls = models.BooleanField(
         _('use_blob_urls'), default=False,
         help_text='Interpret objects as BLOBs and generate URLs')
+    google_application_credentials = models.TextField(
+        _('google_application_credentials'), null=True, blank=True,
+        help_text='The content of GOOGLE_APPLICATION_CREDENTIALS json file')
 
-    def get_client(self):
-        return google_storage.Client()
+    def get_client(self, raise_on_error=False):
+        credentials = None
+        if self.google_application_credentials:
+            try:
+                service_account_info = json.loads(self.google_application_credentials)
+                credentials = service_account.Credentials.from_service_account_info(service_account_info)
+            except Exception as exc:
+                if raise_on_error:
+                    raise
+                logger.error(f"Can't create GCS credentials. Reason: {exc}", exc_info=True)
+                credentials = None
+        return google_storage.Client(credentials=credentials)
 
     def get_bucket(self, client=None, bucket_name=None):
         if not client:
             client = self.get_client()
         return client.get_bucket(bucket_name or self.bucket)
 
+    def validate_connection(self):
+        logger.debug('Validating GCS connection')
+        client = self.get_client(raise_on_error=True)
+        logger.debug('Validating GCS bucket')
+        self.get_bucket(client=client)
 
-class GCSImportStorage(ImportStorage, GCSStorageMixin):
+
+class GCSImportStorage(GCSStorageMixin, ImportStorage):
     presign = models.BooleanField(
         _('presign'), default=True,
         help_text='Generate presigned URLs')
@@ -163,7 +181,7 @@ class GCSImportStorage(ImportStorage, GCSStorageMixin):
         return self._scan_and_create_links(GCSImportStorageLink)
 
 
-class GCSExportStorage(ExportStorage, GCSStorageMixin):
+class GCSExportStorage(GCSStorageMixin, ExportStorage):
 
     def save_annotation(self, annotation):
         bucket = self.get_bucket()
