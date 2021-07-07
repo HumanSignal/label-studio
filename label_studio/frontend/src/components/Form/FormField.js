@@ -26,7 +26,7 @@ export const FormField = forwardRef(({
   ];
 
   validators?.forEach?.(validator => {
-    const [name, value] = validator.split(':');
+    const [name, value] = validator.split(/:(.+)/).slice(0, 2);
     const validatorFunc = Validators[name];
 
     if (isDefined(validatorFunc)) {
