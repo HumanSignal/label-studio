@@ -42,72 +42,68 @@ When prompted to enter the password, enter the token. If login succeeds, a `~/.d
 
 2. Pull the latest Label Studio Enterprise image:
 ```bash
-docker pull heartexlabs/heartex:latest
+docker pull heartexlabs/label-studio-enterprise:latest
 ```
 > Note: You might need to use `sudo` to log in or pull images.
 
 ### Add the license file 
 After you retrieve the latest Label Studio Enterprise image, add the license file. You can't start the Docker image without a license file. 
 
-1. Create a working directory called `heartex` and place the license file in it.
+1. Create a working directory called `label-studio-enterprise` and place the license file in it.
 ```bash
-mkdir -p heartex
-cd heartex
+mkdir -p label-studio-enterprise
+cd label-studio-enterprise
 ```
-2. Move the license file, `license.txt`, to the `heartex` directory.
+2. Move the license file, `license.txt`, to the `label-studio-enterprise` directory.
 
 ### Start using Docker
 
 To run Label Studio Enterprise in production, start it using Docker. This configuration allows you to link Label Studio with external databases and services.
 
-1. Create a file, `heartex/env.list` with the required environmental variables:
+1. Create a file, `label-studio-enterprise/env.list` with the required environmental variables:
 ```
 # The main server URL (must be a full path like protocol://host:port)
-HEARTEX_HOSTNAME=http://localhost:8080
+LABEL_STUDIO_HOST=https://my.heartex.domain.com
 
-# Auxiliary hostname URL: some platform functionality requires URIs generation with specified hostname, 
-# in case HEARTEX_HOSTNAME is not accessible from server side, use this variable to specify server host
-HEARTEX_INTERNAL_HOSTNAME=
+# Specify the license file name
+LICENSE=license.txt
+
+DJANGO_DB=default
+DEBUG=false
+LOG_LEVEL=ERROR
+DJANGO_SETTINGS_MODULE=htx.settings.label_studio
+
+# Edit if you used version 1 of the Heartex platform and must migrate data
+V1_DATABASE_DSN=host=v1.prod.database.us-east-1.rds.amazonaws.com password=AbCdE12345678 dbname=v1_db user=v1_user port=5432
+
+# Email server settings
+EMAIL_BACKEND=sendgrid_backend.SendgridBackend
+SENDGRID_API_KEY=
 
 # PostgreSQL database name
-POSTGRE_NAME=postgres
-
+POSTGRE_NAME=prod_db
 # PostgreSQL database user
 POSTGRE_USER=postgres
-
 # PostgreSQL database password
 POSTGRE_PASSWORD=
-
 # PostgreSQL database host
-POSTGRE_HOST=db
-
+POSTGRE_HOST=v2.prod.database.us-east-1.rds.amazonaws.com
 # PostgreSQL database port
 POSTGRE_PORT=5432
 
-# PostgreSQL SSL mode
-POSTGRE_SSL_MODE=require
-
-# Specify Postgre SSL certificate
-POSTGRE_SSLROOTCERT=postgre-ca-bundle.pem
-
+#If you use Redis instead of Postgres, use these options
 # Redis location e.g. redis://[:password]@localhost:6379/1
-REDIS_LOCATION=localhost:6379
-
+REDIS_LOCATION=redis://@v2.prod.redis.cache.amazonaws.com:6379/1
 # Redis database
 REDIS_DB=1
-
 # Redis password
 REDIS_PASSWORD=12345
-
 # Redis socket timeout
 REDIS_SOCKET_TIMEOUT=3600
-
 # Use Redis SSL connection
 REDIS_SSL=1
-
 # Require certificate
 REDIS_SSL_CERTS_REQS=required
-
 # Specify Redis SSL certificate
 REDIS_SSL_CA_CERTS=redis-ca-bundle.pem
 ```
@@ -118,12 +114,12 @@ REDIS_SSL_CA_CERTS=redis-ca-bundle.pem
 docker run -d \
 -p 8080:8080 \
 --env-file env.list \
--v `pwd`/license.txt:/heartex/web/htx/settings/license_docker.txt \
--v `pwd`/logs:/var/log/heartex \
+-v `pwd`/license.txt:/label-studio-enterprise/web/htx/settings/license_docker.txt \
+-v `pwd`/logs:/var/log/label-studio-enterprise \
 -v `pwd`/postgre-ca-bundle.pem:/etc/ssl/certs/postgre-ca-bundle.pem \
 -v `pwd`/redis-ca-bundle.pem:/etc/ssl/certs/redis-ca-bundle.pem \
---name heartex \
-heartexlabs/heartex:latest
+--name label-studio-enterprise \
+heartexlabs/label-studio-enterprise:latest
 ```
 
 > Note: If you expose port 80, you must start Docker with `sudo`.
@@ -139,51 +135,31 @@ Make sure [Docker Compose](https://docs.docker.com/compose/install/) version 1.2
 
 #### Start Label Studio Enterprise in development mode
 
-1. Create a configuration file `heartex/config.yml` with the following content:
+1. Create a Docker Compose configuration file `label-studio-enterprise/config.yml` with the following content:
 
 ```yaml
-version: '3'
+version: '3.3'
 
 services:
-  db:
-    image: postgres:11.5
-    hostname: db
-    restart: always
-    environment:
-      - POSTGRES_HOST_AUTH_METHOD=trust
-    volumes:
-      - ./postgres-data:/var/lib/postgresql/data
-      - ./logs:/var/log/heartex
+  app:
+    image: heartexlabs/label-studio-enterprise:latest
     ports:
-      - 5432:5432
-  heartex:
-    image: heartexlabs/heartex:latest
-    container_name: heartex
+      - 80:8000
+    env_file:
+      - env.example
     volumes:
-      - ./license.txt:/heartex/web/htx/settings/license_docker.txt
-    environment:
-      - HEARTEX_HOSTNAME=http://localhost:8080
-      - POSTGRE_NAME=postgres
-      - POSTGRE_USER=postgres
-      - POSTGRE_PASSWORD=
-      - POSTGRE_PORT=5432
-      - POSTGRE_HOST=db
-      - REDIS_LOCATION=redis:6379
-    command: ["./deploy/wait-for-postgres.sh", "db", "supervisord"]
-    ports:
-      - 8080:8080
-    depends_on:
-      - redis
-    links:
-      - db
-      - redis
-  redis:
-    image: redis:5.0.6-alpine
-    hostname: redis
+      - ./mydata:/label-studio/data:rw
+    working_dir: /label-studio-enterprise
+    command: [ "uwsgi", "--ini", "deploy/uwsgi.ini"]
+
+  rqworkers:
+    image: heartexlabs/label-studio-enterprise:latest
+    env_file:
+      - env.example
     volumes:
-      - "./redis-data:/data"
-    ports:
-      - 6379:6379
+      - ./mydata:/label-studio/data:rw
+    working_dir: /label-studio-enterprise
+    command: [ "python3", "/label-studio-enterprise/label_studio_enterprise/manage.py", "rqworker", "default" ]
 ```
 If you have existing services running on ports 5432, 6379, or 8080, update the `config.yml` file to use different ports. 
 2. Start all servers using docker-compose:
@@ -214,10 +190,10 @@ Run the following command as root or using `sudo` and review the output:
 ```bash
 $ docker ps
 CONTAINER ID        IMAGE                        COMMAND                  CREATED             STATUS              PORTS                    NAMES
-b1dd57a685fb        heartexlabs/heartex:latest   "./deploy/start.sh"      36 minutes ago      Up 36 minutes       0.0.0.0:8080->8000/tcp   heartex
+b1dd57a685fb        heartexlabs/label-studio-enterprise:latest   "./deploy/start.sh"      36 minutes ago      Up 36 minutes       0.0.0.0:8080->8000/tcp   label-studio-enterprise
 ```
 
-The image column displays the Docker image and version number. The image `heartexlabs/heartex:latest` is using the version `latest`.
+The image column displays the Docker image and version number. The image `heartexlabs/label-studio-enterprise:latest` is using the version `latest`.
 
 ### Back up Label Studio Enterprise
 
@@ -225,11 +201,11 @@ Back up your Label Studio Enterprise Docker container before you upgrade your ve
 
 1. From the command line, run Docker stop to stop the currently running container with Label Studio Enterprise: 
 ```bash
-docker stop heartex
+docker stop label-studio-enterprise
 ```
 2. Rename the existing container to avoid name conflicts when updating to the latest version:
 ```bash
-docker rename heartex heartex-backup
+docker rename label-studio-enterprise label-studio-enterprise-backup
 ```
 
 You can then treat the `heartex-backup` image as a backup.
@@ -239,7 +215,7 @@ You can then treat the `heartex-backup` image as a backup.
 After backing up your existing container, pull the latest image of Label Studio Enterprise from the Docker registry.
 
 ```bash
-docker pull heartexlabs/heartex:latest
+docker pull heartexlabs/label-studio-enterprise:latest
 ```
 
 ### Update the container
@@ -249,12 +225,12 @@ After you pull the latest image, update your Label Studio Enterprise container:
 ```bash
 docker run -d \
 -p $EXPOSE_PORT:8080 \
--v `pwd`/license.txt:/heartex/web/htx/settings/license_docker.txt \
--v `pwd`/logs:/var/log/heartex \
+-v `pwd`/license.txt:/label-studio-enterprise/web/htx/settings/license_docker.txt \
+-v `pwd`/logs:/var/log/label-studio-enterprise \
 -v `pwd`/postgre-ca-bundle.pem:/etc/ssl/certs/postgre-ca-bundle.pem \
 -v `pwd`/redis-ca-bundle.pem:/etc/ssl/certs/redis-ca-bundle.pem \
---name heartex \
-heartexlabs/heartex:latest
+--name label-studio-enterprise \
+heartexlabs/label-studio-enterprise:latest
 ```
 
 ### Restore from a backed up container
@@ -263,13 +239,13 @@ If you decide to roll back to the previously backed up version of Label Studio E
 
 1. From the command line, stop the latest running container and remove it:
 ```bash
-docker stop heartex && docker rm heartex
+docker stop label-studio-enterprise && docker rm label-studio-enterprise
 ```
 2. Rename the backup container:
 ```bash
-docker rename heartex-backup heartex
+docker rename label-studio-enterprise-backup label-studio-enterprise
 ```
 3. Start the backup container: 
 ```bash
-docker start heartex
+docker start label-studio-enterprise
 ```
