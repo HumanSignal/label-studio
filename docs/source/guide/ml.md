@@ -140,7 +140,7 @@ After setting up an ML backend with Label Studio Enterprise, you can choose whic
 1. For a specific project, open the **Settings** and select **Machine Learning**.
 2. Under **Model Version**, select the version of the model that you want to use to display predictions to annotators by default. Your changes save automatically. 
 
-When annotators start labeling, they'll see the predictions from that model version for each task, which they can then modify as needed.
+When annotators start labeling, they'll see the predictions from that model version for each task, which they can then modify as needed. If there are no predictions for a task from the model version selected, no predictions display to the annotator even if another model version has predictions for the task. 
    
 ## Set up a machine learning backend with Docker Compose
 Label Studio includes everything you need to set up a production-ready ML backend server powered by Docker. 
