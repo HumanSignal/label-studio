@@ -60,9 +60,8 @@ def windows_dll_fix():
     # check sqlite version
     import sqlite3
     v = sqlite3.sqlite_version_info
-    # if v[0] >= 3 and v[1] >= 35:
-    #     print("sqlite3 version doesn't a fix")
-    #     return
+    if v[0] >= 3 and v[1] >= 35:
+        return
 
     # check python version and warn
     print(f'python version: {sys.version_info.major} sqlite minor version: {sys.version_info.minor}')
