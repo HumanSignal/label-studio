@@ -12,12 +12,12 @@ export const matchPattern = (pattern) => (fieldName, value) => {
   pattern = (typeof pattern === 'string') ? new RegExp(pattern) : pattern;
 
   if (!isEmptyString(value) && value.match(pattern) === null) {
-    return `${fieldName} should match pattern ${pattern}`;
+    return `${fieldName} must match the pattern ${pattern}`;
   }
 };
 
 export const json = (fieldName, value) => {
-  const err = `${fieldName} should be valid JSON string`;
+  const err = `${fieldName} must be valid JSON string`;
 
   if (typeof value !== 'string') {
     console.log("value is not a string", value);
@@ -25,7 +25,6 @@ export const json = (fieldName, value) => {
   }
 
   if (/^(\{|\[)/.test(value) === false || /(\}|\])$/.test(value) === false) {
-    console.log("value does not contain JSON signature", value);
     return err;
   }
 
@@ -33,5 +32,13 @@ export const json = (fieldName, value) => {
     JSON.parse(value);
   } catch (e) {
     return err;
+  }
+};
+
+export const regexp = (fieldName, value) => {
+  try {
+    new RegExp(value);
+  } catch (err) {
+    return `${fieldName} must be a valid regular expression`;
   }
 };
