@@ -17,8 +17,6 @@ class GCSImportStorageSerializer(ImportStorageSerializer):
 
     def validate(self, data):
         data = super(GCSImportStorageSerializer, self).validate(data)
-        if not data.get('bucket', None):
-            return data
         storage = GCSImportStorage(**data)
         try:
             storage.validate_connection()
