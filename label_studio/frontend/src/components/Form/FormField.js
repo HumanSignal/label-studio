@@ -1,4 +1,5 @@
 import { forwardRef, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { isDefined } from '../../utils/helpers';
 import { FormContext } from "./FormContext";
 import * as Validators from './Validation/Validators';
 
@@ -11,6 +12,7 @@ export const FormField = forwardRef(({
   skip,
   setValue,
   dependency,
+  validators,
   ...props
 }, ref) => {
   /**@type {Form} */
@@ -22,6 +24,14 @@ export const FormField = forwardRef(({
   const validation = [
     ...(validate ?? []),
   ];
+
+  validators?.forEach?.(name => {
+    const validatorFunc = Validators[name];
+
+    if (isDefined(validatorFunc)) {
+      validation.push(validatorFunc);
+    }
+  });
 
   if (required) validation.push(Validators.required);
 

@@ -49,7 +49,9 @@ ImportStorage:
       - type: password
         name: google_application_credentials
         label: Google Application Credentials
-        placeholder: Copy and paste here the content of credentials.json...
+        placeholder: Copy and paste here the content of credentials.json
+        validators:
+          - json
 
 ExportStorage:
   - columnCount: 3
