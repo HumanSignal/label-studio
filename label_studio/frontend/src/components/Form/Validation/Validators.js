@@ -18,7 +18,6 @@ export const matchPattern = (pattern) => (fieldName, value) => {
 
 export const json = (fieldName, value) => {
   const err = `${fieldName} must be valid JSON string`;
-  console.log({value});
 
   if (!isDefined(value) || value.trim().length === 0) return;
 
