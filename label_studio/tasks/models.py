@@ -397,6 +397,9 @@ class Prediction(models.Model):
         """ Humanize date """
         return timesince(self.created_at)
 
+    def has_permission(self, user):
+        return self.task.project.has_permission(user)
+
     class Meta:
         db_table = 'prediction'
 

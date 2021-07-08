@@ -31,6 +31,8 @@ from django.db.models.signals import *
 from rest_framework.views import Response, exception_handler
 from rest_framework import status
 from rest_framework.exceptions import ErrorDetail
+from django_filters.rest_framework import DjangoFilterBackend
+from drf_yasg.inspectors import CoreAPICompatInspector, NotHandled
 from collections import defaultdict
 
 from base64 import b64encode
@@ -563,3 +565,22 @@ class temporary_disconnect_all_signals(object):
     def reconnect(self, signal):
         signal.receivers = self.stashed_signals.get(signal, [])
         del self.stashed_signals[signal]
+
+
+class DjangoFilterDescriptionInspector(CoreAPICompatInspector):
+    def get_filter_parameters(self, filter_backend):
+        if isinstance(filter_backend, DjangoFilterBackend):
+            result = super(DjangoFilterDescriptionInspector, self).get_filter_parameters(filter_backend)
+            for param in result:
+                if not param.get('description', ''):
+                    param.description = "Filter the returned list by {field_name}".format(field_name=param.name)
+
+            return result
+
+        return NotHandled
+
+
+def batch(iterable, n=1):
+    l = len(iterable)
+    for ndx in range(0, l, n):
+        yield iterable[ndx : min(ndx + n, l)]

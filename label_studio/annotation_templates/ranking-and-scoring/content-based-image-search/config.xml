@@ -23,7 +23,7 @@
     "image2": "https://app.heartex.ai/static/samples/sample.jpg",
     "image3": "https://app.heartex.ai/static/samples/sample.jpg"
 },
-"completions": [{"result":
+"annotations": [{"result":
 [
     {
         "value": {

@@ -23,6 +23,11 @@ from users.serializers import UserSerializer
 logger = logging.getLogger(__name__)
 
 
+class PredictionQuerySerializer(serializers.Serializer):
+    task = serializers.IntegerField(required=False, help_text='Task ID to filter predictions')
+    task__project = serializers.IntegerField(required=False, help_text='Project ID to filter predictions')
+
+
 class PredictionSerializer(ModelSerializer):
     model_version = serializers.CharField(allow_blank=True)
     created_ago = serializers.CharField(default='', read_only=True, help_text='Delta time from creation time')

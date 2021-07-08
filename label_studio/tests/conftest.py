@@ -22,7 +22,7 @@ from .utils import (
     redis_client_mock, make_project
 )
 
-
+settings.SENTRY_RATE = 0
 boto3.set_stream_logger('botocore.credentials', logging.DEBUG)
 
 

@@ -3,7 +3,7 @@
 import shutil
 import io
 import hashlib
-import json
+import ujson as json
 import os
 from datetime import datetime
 from copy import deepcopy
