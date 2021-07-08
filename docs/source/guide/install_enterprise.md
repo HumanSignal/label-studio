@@ -114,7 +114,7 @@ REDIS_SSL_CA_CERTS=redis-ca-bundle.pem
 docker run -d \
 -p 8080:8080 \
 --env-file env.list \
--v `pwd`/license.txt:/label-studio-enterprise/web/htx/settings/license_docker.txt \
+-v `pwd`/license.txt:/heartex/label-studio-enterprise/htx/settings/license.txt \
 -v `pwd`/logs:/var/log/label-studio-enterprise \
 -v `pwd`/postgre-ca-bundle.pem:/etc/ssl/certs/postgre-ca-bundle.pem \
 -v `pwd`/redis-ca-bundle.pem:/etc/ssl/certs/redis-ca-bundle.pem \
@@ -149,15 +149,17 @@ services:
       - env.example
     volumes:
       - ./mydata:/label-studio/data:rw
+      - ./license.txt:/heartex/label_studio_enterprise/htx/settings/license.txt
     working_dir: /label-studio-enterprise
     command: [ "uwsgi", "--ini", "deploy/uwsgi.ini"]
 
   rqworkers:
     image: heartexlabs/label-studio-enterprise:latest
     env_file:
-      - env.example
+      - env.list
     volumes:
       - ./mydata:/label-studio/data:rw
+      - ./license.txt:/heartex/label_studio_enterprise/htx/settings/license.txt
     working_dir: /label-studio-enterprise
     command: [ "python3", "/label-studio-enterprise/label_studio_enterprise/manage.py", "rqworker", "default" ]
 ```
