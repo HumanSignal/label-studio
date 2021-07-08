@@ -1,6 +1,6 @@
 {
-  "message": "Introduce Video tag, now only for classification\n\nAlso move icons to TypeScript",
-  "commit": "b285bb31964a1efef243c891d96f96428d3922eb",
-  "branch": "feature/video-tag",
-  "date": "2021-07-07T12:26:28Z"
+  "message": "Introduce Video tag (#222)\n\n* Introduce Video tag, now only for classification\r\n\r\nAlso move icons to TypeScript\r\n\r\n* Add simple example with Video\r\n\r\n* Fix icons for frame forward/backward\r\n\r\n* Add tooltips with hotkeys to Video buttons\r\n\r\n* Play/pause Video on click\r\n\r\n* Fix value in Video example",
+  "commit": "c2a1152127a69598f402bd4886b9598982226b77",
+  "branch": "master",
+  "date": "2021-07-08T16:43:56Z"
 }
