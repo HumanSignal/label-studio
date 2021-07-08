@@ -134,6 +134,44 @@ stages:
         image_url: !re_match "https://storage.googleapis.com/test-gs-bucket/.+"
     status_code: 200
 
+
+---
+test_name: test_invalidate_gcs_storage
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    data:
+      is_published: true
+      label_config: <View><Image name="image" value="$image_url"/><Choices name="label"
+        toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+      title: test_invalidate_gcs_storage
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        project_pk: id
+    status_code: 201
+
+- name: stage
+  request:
+    data:
+      bucket: test-gs-bucket
+      project: '{project_pk}'
+      title: Test Invalidate GCS storage (mocked GCS client from conftest.py)
+      use_blob_urls: true
+      google_application_credentials: '{{"wrong": "service account info"}}'
+    method: POST
+    url: '{django_live_url}/api/storages/gcs/validate'
+  response:
+    status_code: 400
+
 ---
 test_name: test_import_from_gcs_storage_json
 strict: false

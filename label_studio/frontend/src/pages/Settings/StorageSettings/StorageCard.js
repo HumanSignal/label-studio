@@ -5,7 +5,14 @@ import { Space } from "../../../components/Space/Space";
 import { ApiContext } from "../../../providers/ApiProvider";
 import { StorageSummary } from "./StorageSummary";
 
-export const StorageCard = ({rootClass, target, storage, onEditStorage, onDeleteStorage}) => {
+export const StorageCard = ({
+  rootClass,
+  target,
+  storage,
+  onEditStorage,
+  onDeleteStorage,
+  storageTypes,
+}) => {
   const [syncing, setSyncing] = useState(false);
   const api = useContext(ApiContext);
   const [storageData, setStorageData] = useState({...storage});
@@ -53,6 +60,7 @@ export const StorageCard = ({rootClass, target, storage, onEditStorage, onDelete
         storage={storageData}
         enableLastSync={target !== 'export'}
         className={rootClass.elem('summary')}
+        storageTypes={storageTypes}
       />
 
       {target !== 'export' && (

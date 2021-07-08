@@ -12,26 +12,15 @@ export const StorageForm = forwardRef(({
   project,
   rootClass,
   storage,
+  storageTypes,
 }, ref) => {
   /**@type {import('react').RefObject<Form>} */
   const api = useContext(ApiContext);
   const formRef = ref ?? useRef();
-  const [type, setType] = useState(storage?.type ?? 's3');
+  const [type, setType] = useState(storage?.type ?? storageTypes?.[0]?.name ?? 's3');
   const [checking, setChecking] = useState(false);
   const [connectionValid, setConnectionValid] = useState(null);
-  const [storageTypes, setStorageTypes] = useState([]);
   const [form, setForm] = useState([]);
-
-  useEffect(() => {
-    api.callApi('storageTypes', {
-      params: {
-        target,
-      },
-    }).then(types => {
-      setStorageTypes(types);
-      if (!storage?.type) setType(types[0].name);
-    });
-  }, []);
 
   useEffect(() => {
     api.callApi('storageForms', {

@@ -12,7 +12,7 @@
 
 <!-- {
 "data": {"text": "<embed src='static/samples/sample.pdf' width='100%' height='600px'/>"},
-"completions": [{
+"annotations": [{
 "result": [
     {
         "value": {

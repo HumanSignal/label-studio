@@ -34,6 +34,8 @@ ImportStorage:
         name: regex_filter
         label: File Filter Regex
         placeholder: '.*csv or .*(jpe?g|png|tiff) or .\w+-\d+.text'
+        validators:
+          - regexp
   # AWS specific params
   - columnCount: 3
     fields: *azure_params

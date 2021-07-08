@@ -22,6 +22,8 @@ ImportStorage:
         name: regex_filter
         label: File Filter Regex
         placeholder: '.*csv or .*(jpe?g|png|tiff) or .\w+-\d+.text'
+        validators:
+          - regexp
 
   # 2 columns grid
   - columnCount: 2
@@ -42,6 +44,16 @@ ImportStorage:
             value: 1
             min: 1
             dependency: presign
+
+  # Regex filter
+  - columnCount: 1
+    fields:
+      - type: password
+        name: google_application_credentials
+        label: Google Application Credentials
+        placeholder: Copy and paste here the content of credentials.json
+        validators:
+          - json
 
 ExportStorage:
   - columnCount: 3
