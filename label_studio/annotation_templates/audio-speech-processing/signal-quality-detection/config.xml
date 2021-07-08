@@ -4,7 +4,7 @@
 </View>
 
 <!-- { "data": {"audio": "https://app.heartex.ai/static/samples/game.wav"},
-"completions": [{"result":[
+"annotations": [{"result":[
     {
         "value": {
             "rating": 8
