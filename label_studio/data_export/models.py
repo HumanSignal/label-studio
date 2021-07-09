@@ -27,6 +27,10 @@ class DataExport(object):
         filename_results = os.path.join(settings.EXPORT_DIR, name + '.json')
         filename_info = os.path.join(settings.EXPORT_DIR, name + '-info.json')
         annotation_number = Annotation.objects.filter(task__project=project).count()
+        try:
+            platform_version = version.get_git_version()
+        except:
+            platform_version = 'none'
         info = {
             'project': {
                 'title': project.title,
@@ -37,7 +41,7 @@ class DataExport(object):
                 'annotation_number': annotation_number
             },
             'platform': {
-                'version': version.get_git_version()
+                'version': platform_version
             },
             'download': {
                 'GET': dict(get_args),
