@@ -18,6 +18,9 @@ from tasks.models import Annotation
 # Create your models here.
 
 
+logger = logging.getLogger(__name__)
+
+
 class DataExport(object):
 
     @staticmethod
@@ -31,6 +34,7 @@ class DataExport(object):
             platform_version = version.get_git_version()
         except:
             platform_version = 'none'
+            logger.error('Version is not detected in save_export_files()')
         info = {
             'project': {
                 'title': project.title,
