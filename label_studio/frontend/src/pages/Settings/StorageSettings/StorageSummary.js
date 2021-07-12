@@ -3,10 +3,13 @@ import React from 'react';
 import { DescriptionList } from '../../../components/DescriptionList/DescriptionList';
 import { Oneof } from '../../../components/Oneof/Oneof';
 
-export const StorageSummary = ({storage, className, enableLastSync = false}) => {
+export const StorageSummary = ({storage, className, enableLastSync = false, storageTypes = []}) => {
   return (
     <div className={className}>
       <DescriptionList>
+        <DescriptionList.Item term="Type">
+          {storageTypes.find(s => s.name === storage.type)?.title ?? storage.type}
+        </DescriptionList.Item>
         <Oneof value={storage.type}>
           <SummaryS3 case="s3" storage={storage}/>
           <GSCStorage case="gcs" storage={storage}/>

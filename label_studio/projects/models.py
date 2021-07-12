@@ -162,7 +162,7 @@ class Project(ProjectMixin, models.Model):
 
     @property
     def num_annotations(self):
-        return Annotation.objects.filter(Q(task__project=self) & Q_finished_annotations & Q(ground_truth=False)).count()
+        return Annotation.objects.filter(task__project=self).count()
 
     @property
     def has_predictions(self):
@@ -346,6 +346,11 @@ class Project(ProjectMixin, models.Model):
         if not hasattr(self, 'summary'):
             return
 
+        if self.num_tasks == 0:
+            logger.debug(f'Project {self} has no tasks: nothing to validate here. Ensure project summary is empty')
+            self.summary.reset()
+            return
+
         # validate data columns consistency
         fields_from_config = get_all_object_tag_names(config_string)
         if not fields_from_config:
@@ -356,6 +361,12 @@ class Project(ProjectMixin, models.Model):
         if fields_from_data and not fields_from_config.issubset(fields_from_data):
             different_fields = list(fields_from_config.difference(fields_from_data))
             raise ValidationError(f'These fields are not present in the data: {",".join(different_fields)}')
+
+        if self.num_annotations == 0:
+            logger.debug(f'Project {self} has no annotations: nothing to validate here. '
+                         f'Ensure annotations-related project summary is empty')
+            self.summary.reset(tasks_data_based=False)
+            return
 
         # validate annotations consistency
         annotations_from_config = set(get_all_control_tag_tuples(config_string))
@@ -441,6 +452,13 @@ class Project(ProjectMixin, models.Model):
             )
             self.__maximum_annotations = self.maximum_annotations
             self.__overlap_cohort_percentage = self.overlap_cohort_percentage
+
+        if hasattr(self, 'summary'):
+            # Ensure project.summary is consistent with current tasks / annotations
+            if self.num_tasks == 0:
+                self.summary.reset()
+            elif self.num_annotations == 0:
+                self.summary.reset(tasks_data_based=False)
 
     def get_member_ids(self):
         if hasattr(self, 'team_link'):
@@ -642,9 +660,10 @@ class ProjectSummary(models.Model):
     def has_permission(self, user):
         return self.project.has_permission(user)
 
-    def reset(self):
-        self.all_data_columns = {}
-        self.common_data_columns = []
+    def reset(self, tasks_data_based=True):
+        if tasks_data_based:
+            self.all_data_columns = {}
+            self.common_data_columns = []
         self.created_annotations = {}
         self.created_labels = {}
         self.save()

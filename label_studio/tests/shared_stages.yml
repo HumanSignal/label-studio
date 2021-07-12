@@ -41,3 +41,17 @@ stages:
         json:
           user_pk: id
           active_organization_pk: active_organization
+  - id: create_task
+    name: create_task
+    request:
+      json:
+        data:
+          text: 'Test text'
+        project: '{project_pk}'
+      method: POST
+      url: '{django_live_url}/api/tasks'
+    response:
+      save:
+        json:
+          task_pk: id
+      status_code: 201

@@ -22,7 +22,7 @@ SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 
 RQ_QUEUES = {}
 
-SENTRY_DSN = get_env('SENTRY_DSN', 'https://44f7a50de5ab425ca6bc406ef69b2122@o227124.ingest.sentry.io/5820521')
+SENTRY_DSN = get_env('SENTRY_DSN', 'https://cd8d59a362944c0abc081d0a8d2103d7@o227124.ingest.sentry.io/5820521')
 SENTRY_ENVIRONMENT = get_env('SENTRY_ENVIRONMENT', 'opensource')
 
 from label_studio import __version__

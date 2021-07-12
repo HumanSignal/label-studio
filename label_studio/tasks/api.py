@@ -14,7 +14,7 @@ from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework import generics, viewsets
 from rest_framework.response import Response
 
-from core.utils.common import get_object_with_check_and_log
+from core.utils.common import get_object_with_check_and_log, DjangoFilterDescriptionInspector
 from core.permissions import all_permissions, ViewClassPermission
 
 from tasks.models import Task, Annotation, Prediction, AnnotationDraft
@@ -299,8 +299,9 @@ class AnnotationDraftAPI(RequestDebugLogMixin, generics.RetrieveUpdateDestroyAPI
 
 
 @method_decorator(name='list', decorator=swagger_auto_schema(
-    tags=['Predictions'], operation_summary="List predictions",
-    query_serializer=PredictionQuerySerializer, operation_description="List all predictions."))
+    tags=['Predictions'], operation_summary="List predictions", 
+    filter_inspectors=[DjangoFilterDescriptionInspector],
+    operation_description="List all predictions."))
 @method_decorator(name='create', decorator=swagger_auto_schema(
     tags=['Predictions'], operation_summary="Create prediction",
     operation_description="Create a prediction."))

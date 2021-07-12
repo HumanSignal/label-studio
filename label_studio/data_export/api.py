@@ -14,7 +14,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from core.permissions import all_permissions
-from core.utils.common import get_object_with_check_and_log, bool_from_request
+from core.utils.common import get_object_with_check_and_log, bool_from_request, batch
 from projects.models import Project
 from tasks.models import Task
 from .models import DataExport
@@ -93,13 +93,18 @@ class ExportAPI(generics.RetrieveAPIView):
         only_finished = not bool_from_request(request.GET, 'download_all_tasks', False)
 
         logger.debug('Get tasks')
-        query = Task.objects.filter(project=project)
+        query = Task.objects.filter(project=project).select_related('project').prefetch_related('annotations', 'predictions')
         if only_finished:
             query = query.filter(annotations__isnull=False)
 
+        task_ids = query.values_list('id', flat=True)
+
         logger.debug('Serialize tasks for export')
-        tasks = ExportDataSerializer(query, many=True).data
+        tasks = []
+        for _task_ids in batch(task_ids, 1000):
+            tasks += ExportDataSerializer(query.filter(id__in=_task_ids), many=True).data
         logger.debug('Prepare export files')
+
         export_stream, content_type, filename = DataExport.generate_export_file(project, tasks, export_type, request.GET)
 
         response = HttpResponse(File(export_stream), content_type=content_type)
