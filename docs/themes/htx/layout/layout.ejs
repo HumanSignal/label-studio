@@ -17,7 +17,7 @@
       <% if (page.meta_title) { %>
       <title><%- titlePrefix + ' — ' + page.meta_title %></title>
       <% } else { %>
-      <title><%- page.title ? page.title + ' — ' : titlePrefix %>Label Studio — Data Labeling</title>
+      <title><%- page.title ? page.title : titlePrefix %> — Data Labeling</title>
       <% } %>
       <meta charset="utf-8">
       <meta name="description" content="<%- page.meta_description ? page.meta_description : theme.site_description %>">

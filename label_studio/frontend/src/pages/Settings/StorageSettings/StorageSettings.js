@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Columns } from '../../../components/Columns/Columns';
 import { Description } from '../../../components/Description/Description';
-import { useAPI } from '../../../providers/ApiProvider';
 import { Block, cn } from '../../../utils/bem';
 import { StorageSet } from './StorageSet';
 import './StorageSettings.styl';
