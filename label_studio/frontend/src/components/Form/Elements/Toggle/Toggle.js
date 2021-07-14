@@ -1,15 +1,20 @@
-import React from 'react';
+import React, { forwardRef, useEffect, useMemo, useState } from 'react';
 import { cn } from '../../../../utils/bem';
 import { FormField } from '../../FormField';
 import { default as Label } from '../Label/Label';
 import './Toggle.styl';
 
-const Toggle = ({className, label, labelProps, description, checked, defaultChecked, onChange, validate, required, skip, ...props}) => {
+const Toggle = forwardRef(({className, label, labelProps, description, checked, defaultChecked, onChange, validate, required, skip, ...props}, ref) => {
   const rootClass = cn('toggle');
-  const [isChecked, setIsChecked] = React.useState(defaultChecked ?? checked ?? false);
+  const initialChecked = useMemo(() => defaultChecked ?? checked ?? false, [defaultChecked, checked]);
+  const [isChecked, setIsChecked] = useState(defaultChecked ?? checked ?? false);
 
   const classList = [rootClass];
   const mods = {};
+
+  useEffect(() => {
+    setIsChecked(initialChecked);
+  }, [initialChecked]);
 
   if (isChecked) mods.checked = isChecked;
   mods.disabled = props.disabled;
@@ -18,6 +23,7 @@ const Toggle = ({className, label, labelProps, description, checked, defaultChec
 
   const formField = (
     <FormField
+      ref={label ? null : ref}
       label={label}
       name={props.name}
       validate={validate}
@@ -46,6 +52,7 @@ const Toggle = ({className, label, labelProps, description, checked, defaultChec
   );
 
   return label ? <Label
+    ref={ref}
     placement="right"
     required={required}
     text={label}
@@ -53,6 +60,6 @@ const Toggle = ({className, label, labelProps, description, checked, defaultChec
     description={description}
     {...(labelProps ?? {})}
   /> : formField;
-};
+});
 
 export default Toggle;
