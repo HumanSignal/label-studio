@@ -350,3 +350,71 @@ stages:
       deleted: 2
     status_code: 200
 
+---
+test_name: import_previous_export
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    data:
+      label_config: <View><Image name="image" value="$image"/><Choices name="label" toName="image"><Choice
+        value="Cat"/><Choice value="Dog"/></Choices></View>
+      title: Image Classification Project
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        project_pk: id
+    status_code: 201
+- name: stage
+  request:
+    files:
+      json: tests/test_suites/samples/previous_export.json
+    headers:
+      content-type: multipart/form-data
+    method: POST
+    url: '{django_live_url}/api/projects/{project_pk}/import'
+  response:
+    status_code: 400
+    json:
+      validation_errors:
+        non_field_errors:
+          - "Unknown annotator's email annotator_from_past@project.com"
+# Now let's create missed user and try again...
+- id: logout
+  type: ref
+- id: signup
+  name: Sign up
+  request:
+    url: "{django_live_url}/user/signup"
+    data:
+      email: annotator_from_past@project.com
+      password: 12345678
+    method: POST
+  response:
+    status_code: 302
+- id: login
+  type: ref
+- name: stage
+  request:
+    files:
+      json: tests/test_suites/samples/previous_export.json
+    headers:
+      content-type: multipart/form-data
+    method: POST
+    url: '{django_live_url}/api/projects/{project_pk}/import'
+  response:
+    status_code: 201
+    json:
+      task_count: 1
+      annotation_count: 1
+      prediction_count: 0
+      could_be_tasks_list: false
+      found_formats: {'.json': 1}
+      data_columns: ['image']
