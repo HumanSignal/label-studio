@@ -47,7 +47,7 @@ if (process.env.NODE_ENV === 'production') {
   };
 }
 
-if (SENTRY.AUTH_TOKEN && SENTRY.RELEASE) {
+if (process.env.BUILD_SENTRY && SENTRY.AUTH_TOKEN && SENTRY.RELEASE) {
   plugins.push(new SentryWebpackPlugin({
     authToken: SENTRY.AUTH_TOKEN,
     org: SENTRY.ORG,

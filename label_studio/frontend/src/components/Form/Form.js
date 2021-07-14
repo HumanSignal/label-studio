@@ -377,7 +377,7 @@ Form.Builder = React.forwardRef(({
     return fields.map((field, index) => {
       if (!field) return <div key={`spacer-${index}`}/>;
 
-      const defaultValue = formData?.[field.name] || undefined;
+      const currentValue = formData?.[field.name] ?? undefined;
       const triggerUpdate = props.autosubmit !== true && field.trigger_form_update === true;
 
       const commonProps = {
@@ -396,13 +396,13 @@ Form.Builder = React.forwardRef(({
       }
 
       if (field.type === 'select') {
-        return <Select {...commonProps} defaultValue={field.value ?? defaultValue}/>;
+        return <Select {...commonProps} defaultValue={currentValue ?? field.value}/>;
       } else if (field.type === 'counter') {
-        return <Counter {...commonProps} defaultValue={field.value ?? defaultValue}/>;
+        return <Counter {...commonProps} defaultValue={currentValue ?? field.value}/>;
       } else if (field.type === 'toggle') {
-        return <Toggle {...commonProps} checked={field.value ?? defaultValue}/>;
+        return <Toggle {...commonProps} checked={currentValue ?? field.value}/>;
       } else {
-        return <Input {...commonProps} defaultValue={field.value ?? defaultValue}/>;
+        return <Input {...commonProps} defaultValue={currentValue ?? field.value}/>;
       }
     });
   };
