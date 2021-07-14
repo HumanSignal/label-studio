@@ -217,30 +217,6 @@ class TaskSerializerBulk(serializers.ListSerializer):
 
         return ret
 
-    @staticmethod
-    def get_completed_by_id(annotation, default=None):
-        completed_by = annotation.get('completed_by', None)
-        # user id as is
-        if completed_by and isinstance(completed_by, int):
-            return completed_by
-        # user dict
-        if completed_by and isinstance(completed_by, dict):
-            return completed_by.get('id')
-
-        return default
-
-    @staticmethod
-    def get_completed_by_email(annotation, default=None):
-        completed_by = annotation.get('completed_by', None)
-        # user id as is
-        if completed_by and isinstance(completed_by, int):
-            return
-        # user dict
-        if isinstance(completed_by, dict):
-            return completed_by.get('email')
-
-        return default
-
     def _insert_valid_completed_by_id_or_raise(self, annotations, members_email_to_id, members_ids, current_user):
         for annotation in annotations:
             completed_by = annotation.get('completed_by')
