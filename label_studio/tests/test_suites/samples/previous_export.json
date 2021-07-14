@@ -1,0 +1,43 @@
+{
+  "id": 1234,
+  "annotations": [
+    {
+      "id": 5678,
+      "completed_by": {
+        "id": 42,
+        "email": "annotator_from_past@project.com",
+        "first_name": "",
+        "last_name": ""
+      },
+      "result": [
+        {
+          "id": "aBcDeF",
+          "type": "choices",
+          "value": {
+            "choices": [
+              "Cat"
+            ]
+          },
+          "to_name": "image",
+          "from_name": "label"
+        }
+      ],
+      "was_cancelled": false,
+      "ground_truth": false,
+      "created_at": "2021-07-06T06:06:25.927570Z",
+      "updated_at": "2021-07-06T06:44:08.446371Z",
+      "lead_time": 346193.271,
+      "prediction": {},
+      "result_count": 0,
+      "task": 1234
+    }
+  ],
+  "predictions": [],
+  "data": {
+    "image": "https://pytest.labelstud.io/mypets.jpg"
+  },
+  "meta": {},
+  "created_at": "2021-05-28T18:56:52.086267Z",
+  "updated_at": "2021-07-06T06:44:08.420891Z",
+  "project": 49
+}

@@ -217,17 +217,29 @@ class TaskSerializerBulk(serializers.ListSerializer):
 
         return ret
 
-    @staticmethod
-    def get_completed_by_id(annotation, default=None):
-        completed_by = annotation.get('completed_by', None)
-        # user id as is
-        if completed_by and isinstance(completed_by, int):
-            return completed_by
-        # user dict
-        if completed_by and isinstance(completed_by, dict):
-            return completed_by.get('id')
+    def _insert_valid_completed_by_id_or_raise(self, annotations, members_email_to_id, members_ids, default_user):
+        for annotation in annotations:
+            completed_by = annotation.get('completed_by')
+            # no completed_by info found - just skip it, will be assigned to the user who imports
+            if completed_by is None:
+                annotation['completed_by_id'] = default_user.id
 
-        return default
+            # resolve annotators by email
+            elif isinstance(completed_by, dict):
+                if 'email' not in completed_by:
+                    raise ValidationError(f"It's expected to have 'email' field in 'completed_by' data in annotations")
+                email = completed_by['email']
+                if email not in members_email_to_id:
+                    raise ValidationError(f"Unknown annotator's email {email}")
+                # overwrite an actual member ID
+                annotation['completed_by_id'] = members_email_to_id[email]
+
+            # old style annotators specification - try to find them by ID
+            elif isinstance(completed_by, int) and completed_by in members_ids:
+                if completed_by not in members_ids:
+                    raise ValidationError(f"Unknown annotator's ID {completed_by}")
+                annotation['completed_by_id'] = completed_by
+            annotation.pop('completed_by', None)
 
     @retry_database_locked()
     def create(self, validated_data):
@@ -238,28 +250,25 @@ class TaskSerializerBulk(serializers.ListSerializer):
         user = self.context.get('user', None)
         project = self.context.get('project')
 
+        organization = user.active_organization \
+            if not project.created_by.active_organization else project.created_by.active_organization
+        members_email_to_id = dict(organization.members.values_list('user__email', 'user__id'))
+        members_ids = set(members_email_to_id.values())
+        logger.debug(f"{len(members_email_to_id)} members found in organization {organization}")
+
         # to be sure we add tasks with annotations at the same time
         with transaction.atomic():
 
             # extract annotations and predictions
             task_annotations, task_predictions = [], []
             for task in validated_tasks:
-                task_annotations.append(task.pop('annotations', []))
-                task_predictions.append(task.pop('predictions', []))
-
-            # check annotator permissions for completed by
-            organization = user.active_organization \
-                if not project.created_by.active_organization else project.created_by.active_organization
-            project_user_ids = organization.members.values_list('user__id', flat=True)
-            annotator_ids = set()
-            for annotations in task_annotations:
-                for annotation in annotations:
-                    annotator_ids.add(self.get_completed_by_id(annotation))
-
-            for i in annotator_ids:
-                if i not in project_user_ids and i is not None:
-                    raise ValidationError(f'Annotations with "completed_by"={i} are produced by annotator '
-                                          f'who is not allowed for this project as invited annotator or team member')
+                annotations = task.pop('annotations', [])
+                # insert a valid "completed_by_id" by existing member
+                self._insert_valid_completed_by_id_or_raise(
+                    annotations, members_email_to_id, members_ids, user or project.created_by)
+                predictions = task.pop('predictions', [])
+                task_annotations.append(annotations)
+                task_predictions.append(predictions)
 
             # add tasks first
             for task in validated_tasks:
@@ -292,13 +301,9 @@ class TaskSerializerBulk(serializers.ListSerializer):
                     if 'ground_truth' in annotation:
                         ground_truth = annotation.pop('ground_truth', True)
 
-                    # get user id
-                    completed_by_id = self.get_completed_by_id(annotation, default=user.id if user else None)
-                    annotation.pop('completed_by', None)
-
                     db_annotations.append(Annotation(task=self.db_tasks[i],
                                                      ground_truth=ground_truth,
-                                                     completed_by_id=completed_by_id,
+                                                     completed_by_id=annotation['completed_by_id'],
                                                      result=annotation['result']))
 
             # add predictions
