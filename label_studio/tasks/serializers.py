@@ -241,12 +241,12 @@ class TaskSerializerBulk(serializers.ListSerializer):
 
         return default
 
-    def _insert_valid_completed_by_id_or_raise(self, annotations, members_email_to_id, members_ids):
+    def _insert_valid_completed_by_id_or_raise(self, annotations, members_email_to_id, members_ids, current_user):
         for annotation in annotations:
             completed_by = annotation.get('completed_by')
             # no completed_by info found - just skip it, will be assigned to the user who imports
             if completed_by is None:
-                continue
+                annotation['completed_by_id'] = current_user.id if current_user else None
 
             # resolve annotators by email
             elif isinstance(completed_by, dict):
@@ -262,6 +262,8 @@ class TaskSerializerBulk(serializers.ListSerializer):
             elif isinstance(completed_by, int) and completed_by in members_ids:
                 if completed_by not in members_ids:
                     raise ValidationError(f"Unknown annotator's ID {completed_by}")
+                annotation['completed_by_id'] = completed_by
+            annotation.pop('completed_by', None)
 
     @retry_database_locked()
     def create(self, validated_data):
@@ -286,7 +288,7 @@ class TaskSerializerBulk(serializers.ListSerializer):
             for task in validated_tasks:
                 annotations = task.pop('annotations', [])
                 # insert a valid "completed_by_id" by existing member
-                self._insert_valid_completed_by_id_or_raise(annotations, members_email_to_id, members_ids)
+                self._insert_valid_completed_by_id_or_raise(annotations, members_email_to_id, members_ids, user)
                 predictions = task.pop('predictions', [])
                 task_annotations.append(annotations)
                 task_predictions.append(predictions)
