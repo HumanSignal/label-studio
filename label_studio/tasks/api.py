@@ -18,7 +18,6 @@ from core.utils.common import get_object_with_check_and_log, DjangoFilterDescrip
 from core.permissions import all_permissions, ViewClassPermission
 
 from tasks.models import Task, Annotation, Prediction, AnnotationDraft
-from core.mixins import RequestDebugLogMixin
 from core.utils.common import bool_from_request
 from tasks.serializers import (
     TaskSerializer, AnnotationSerializer, TaskSimpleSerializer, PredictionSerializer,

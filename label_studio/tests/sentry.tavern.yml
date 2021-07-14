@@ -1,0 +1,18 @@
+---
+test_name: views_test
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+  - enable_sentry
+stages:
+- id: signup
+  type: ref
+- id: create_project
+  type: ref
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/projects/{project_pk}/data'
+  response:
+    status_code: 200

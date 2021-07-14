@@ -4,6 +4,7 @@ strict: false
 marks:
 - usefixtures:
   - django_live_url
+  - testxx
 stages:
 - id: signup
   type: ref
