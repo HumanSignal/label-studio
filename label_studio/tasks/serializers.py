@@ -217,12 +217,12 @@ class TaskSerializerBulk(serializers.ListSerializer):
 
         return ret
 
-    def _insert_valid_completed_by_id_or_raise(self, annotations, members_email_to_id, members_ids, current_user):
+    def _insert_valid_completed_by_id_or_raise(self, annotations, members_email_to_id, members_ids, default_user):
         for annotation in annotations:
             completed_by = annotation.get('completed_by')
             # no completed_by info found - just skip it, will be assigned to the user who imports
             if completed_by is None:
-                annotation['completed_by_id'] = current_user.id if current_user else None
+                annotation['completed_by_id'] = default_user.id
 
             # resolve annotators by email
             elif isinstance(completed_by, dict):
@@ -264,7 +264,8 @@ class TaskSerializerBulk(serializers.ListSerializer):
             for task in validated_tasks:
                 annotations = task.pop('annotations', [])
                 # insert a valid "completed_by_id" by existing member
-                self._insert_valid_completed_by_id_or_raise(annotations, members_email_to_id, members_ids, user)
+                self._insert_valid_completed_by_id_or_raise(
+                    annotations, members_email_to_id, members_ids, user or project.created_by)
                 predictions = task.pop('predictions', [])
                 task_annotations.append(annotations)
                 task_predictions.append(predictions)
