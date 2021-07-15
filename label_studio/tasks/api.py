@@ -133,7 +133,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         operation_summary='Delete annotation',
         operation_description='Delete an annotation. This action can\'t be undone!',
         ))
-class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
+class AnnotationAPI(RequestDebugLogMixin, generics.RetrieveUpdateDestroyAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = ViewClassPermission(
         GET=all_permissions.annotations_view,
@@ -185,7 +185,7 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
         operation_description='Add annotations to a task like an annotator does.',
         request_body=AnnotationSerializer
         ))
-class AnnotationsListAPI(generics.ListCreateAPIView):
+class AnnotationsListAPI(RequestDebugLogMixin, generics.ListCreateAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = ViewClassPermission(
         GET=all_permissions.annotations_view,
@@ -257,7 +257,7 @@ class AnnotationsListAPI(generics.ListCreateAPIView):
         return annotation
 
 
-class AnnotationDraftListAPI(generics.ListCreateAPIView):
+class AnnotationDraftListAPI(RequestDebugLogMixin, generics.ListCreateAPIView):
 
     parser_classes = (JSONParser, MultiPartParser, FormParser)
     serializer_class = AnnotationDraftSerializer
@@ -284,7 +284,7 @@ class AnnotationDraftListAPI(generics.ListCreateAPIView):
         )
 
 
-class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
+class AnnotationDraftAPI(RequestDebugLogMixin, generics.RetrieveUpdateDestroyAPIView):
 
     parser_classes = (JSONParser, MultiPartParser, FormParser)
     serializer_class = AnnotationDraftSerializer
