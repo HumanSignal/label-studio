@@ -5,6 +5,9 @@ def init_sentry(release_name, release_version):
     if settings.SENTRY_DSN:
         import sentry_sdk
         from sentry_sdk.integrations.django import DjangoIntegration
+        from core.utils.exceptions import (
+            LabelStudioErrorSentryIgnored, LabelStudioAPIExceptionSentryIgnored,
+            LabelStudioValidationErrorSentryIgnored)
 
         if settings.SENTRY_REDIS_ENABLED:
             from sentry_sdk.integrations.redis import RedisIntegration
@@ -19,5 +22,9 @@ def init_sentry(release_name, release_version):
             traces_sample_rate=settings.SENTRY_RATE,
             send_default_pii=True,
             environment=settings.SENTRY_ENVIRONMENT,
-            release=release_name + '@' + str(release_version)
+            release=release_name + '@' + str(release_version),
+            ignore_errors=[
+                LabelStudioErrorSentryIgnored,
+                LabelStudioAPIExceptionSentryIgnored,
+                LabelStudioValidationErrorSentryIgnored]
         )

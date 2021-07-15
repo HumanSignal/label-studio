@@ -15,6 +15,23 @@ stages:
       method: POST
     response:
       status_code: 302
+  - id: login
+    name: Login
+    request:
+      url: "{django_live_url}/user/login"
+      data:
+        email: test_suites_user@heartex.com
+        password: 12345678
+      method: POST
+    response:
+      status_code: 302
+  - id: logout
+    name: logout
+    request:
+      url: "{django_live_url}/logout"
+      method: GET
+    response:
+      status_code: 302
   - id: create_project
     name: create_project
     request:
