@@ -3,7 +3,7 @@ test_name: get_paragraphs_sample_task
 strict: false
 marks:
 - usefixtures:
-  - django_live_urlz
+  - django_live_url
 stages:
 - id: signup
   type: ref
