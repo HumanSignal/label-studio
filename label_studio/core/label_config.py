@@ -98,7 +98,7 @@ def parse_config(config_string):
         tag_info['inputs'] = []
         for input_tag_name in tag_info['to_name']:
             if input_tag_name not in inputs:
-                logger.error(
+                logger.warning(
                     f'to_name={input_tag_name} is specified for output tag name={output_tag}, '
                     'but we can\'t find it among input tags')
                 continue
