@@ -2,11 +2,19 @@ from django.conf import *
 
 
 def event_processor(event, hint):
-    # Http 404 errors
-    if event.get('exception', {}).get('values', [{}])[-1].get('type') == 'Http404':
+    # skip specified exceptions
+    if event.get('exception', {}).get('values', [{}])[-1].get('type') in [
+        'Http404', 'NotAuthenticated',
+    ]:
         return None
+
+    # special flag inside of logger.error(..., extra={'sentry_skip': True}) to skip error message
+    if event.get('extra', {}).get('sentry_skip', False):
+        return None
+
+    # skip transactions by urls
     if event.get("transaction") in [
-        '/static/{path}', '/dm/{path}', '/react-app/{path}', '/label-studio-frontend/{path}'
+        '/static/{path}', '/dm/{path}', '/react-app/{path}', '/label-studio-frontend/{path}', '/favicon.ico'
     ]:
         return None
 

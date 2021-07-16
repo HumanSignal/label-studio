@@ -192,7 +192,7 @@ class MLBackend(models.Model):
             return
         results = ml_api_result.response['results']
         if len(results) == 0:
-            logger.error(f'ML backend returned empty prediction for project {self}')
+            logger.error(f'ML backend returned empty prediction for project {self}', extra={'sentry_skip': True})
             return
         prediction_response = results[0]
         task_id = task_ser['id']

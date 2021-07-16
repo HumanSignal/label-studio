@@ -47,7 +47,6 @@ def version_page(request):
     # update latest version from pypi response
     # from label_studio.core.utils.common import check_for_the_latest_version
     # check_for_the_latest_version(print_message=False)
-
     http_page = request.path == '/version/'
     result = collect_versions(force=http_page)
 

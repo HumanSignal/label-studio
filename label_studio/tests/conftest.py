@@ -25,6 +25,10 @@ from .utils import (
 boto3.set_stream_logger('botocore.credentials', logging.DEBUG)
 
 
+settings.SENTRY_RATE = 0
+settings.SENTRY_DSN = ''
+
+
 @pytest.fixture(scope="function", autouse=True)
 def disable_sentry():
     settings.SENTRY_RATE = 0
