@@ -22,8 +22,20 @@ from .utils import (
     redis_client_mock, make_project
 )
 
-settings.SENTRY_RATE = 0
 boto3.set_stream_logger('botocore.credentials', logging.DEBUG)
+
+
+@pytest.fixture(scope="function", autouse=True)
+def disable_sentry():
+    settings.SENTRY_RATE = 0
+    settings.SENTRY_DSN = ''
+
+
+@pytest.fixture(scope="function", autouse=True)
+def enable_sentry():
+    settings.SENTRY_RATE = 0
+    # it's disabled key, but this is correct
+    settings.SENTRY_DSN = 'https://44f7a50de5ab425ca6bc406ef69b2122@o227124.ingest.sentry.io/5820521'
 
 
 @pytest.fixture(scope='function')

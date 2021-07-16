@@ -18,7 +18,6 @@ from core.utils.common import get_object_with_check_and_log, DjangoFilterDescrip
 from core.permissions import all_permissions, ViewClassPermission
 
 from tasks.models import Task, Annotation, Prediction, AnnotationDraft
-from core.mixins import RequestDebugLogMixin
 from core.utils.common import bool_from_request
 from tasks.serializers import (
     TaskSerializer, AnnotationSerializer, TaskSimpleSerializer, PredictionSerializer,
@@ -133,7 +132,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         operation_summary='Delete annotation',
         operation_description='Delete an annotation. This action can\'t be undone!',
         ))
-class AnnotationAPI(RequestDebugLogMixin, generics.RetrieveUpdateDestroyAPIView):
+class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = ViewClassPermission(
         GET=all_permissions.annotations_view,
@@ -185,7 +184,7 @@ class AnnotationAPI(RequestDebugLogMixin, generics.RetrieveUpdateDestroyAPIView)
         operation_description='Add annotations to a task like an annotator does.',
         request_body=AnnotationSerializer
         ))
-class AnnotationsListAPI(RequestDebugLogMixin, generics.ListCreateAPIView):
+class AnnotationsListAPI(generics.ListCreateAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = ViewClassPermission(
         GET=all_permissions.annotations_view,
@@ -257,7 +256,7 @@ class AnnotationsListAPI(RequestDebugLogMixin, generics.ListCreateAPIView):
         return annotation
 
 
-class AnnotationDraftListAPI(RequestDebugLogMixin, generics.ListCreateAPIView):
+class AnnotationDraftListAPI(generics.ListCreateAPIView):
 
     parser_classes = (JSONParser, MultiPartParser, FormParser)
     serializer_class = AnnotationDraftSerializer
@@ -284,7 +283,7 @@ class AnnotationDraftListAPI(RequestDebugLogMixin, generics.ListCreateAPIView):
         )
 
 
-class AnnotationDraftAPI(RequestDebugLogMixin, generics.RetrieveUpdateDestroyAPIView):
+class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
 
     parser_classes = (JSONParser, MultiPartParser, FormParser)
     serializer_class = AnnotationDraftSerializer
