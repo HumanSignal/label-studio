@@ -2,11 +2,12 @@ from django.conf import *
 
 
 def event_processor(event, hint):
-    # static loading
-    if event.get("transaction") == "/react-app/{path}":
-        return None
-    # Http 404 erros
+    # Http 404 errors
     if event.get('exception', {}).get('values', [{}])[-1].get('type') == 'Http404':
+        return None
+    if event.get("transaction") in [
+        '/static/{path}', '/dm/{path}', '/react-app/{path}', '/label-studio-frontend/{path}'
+    ]:
         return None
 
     return event  # to return all other events
