@@ -17,7 +17,8 @@ def event_processor(event, hint):
 
     # skip transactions by urls
     if event.get("transaction") in [
-        '/static/{path}', '/dm/{path}', '/react-app/{path}', '/label-studio-frontend/{path}', '/favicon.ico'
+        '/static/{path}', '/dm/{path}', '/react-app/{path}', '/label-studio-frontend/{path}', '/favicon.ico',
+        '/health'
     ]:
         return None
 
