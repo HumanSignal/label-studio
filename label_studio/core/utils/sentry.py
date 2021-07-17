@@ -4,7 +4,8 @@ from django.conf import *
 def event_processor(event, hint):
     # skip specified exceptions
     if event.get('exception', {}).get('values', [{}])[-1].get('type') in [
-        'Http404', 'NotAuthenticated',
+        'Http404', 'NotAuthenticated', 'AuthenticationFailed', 'NotFound', 'XMLSyntaxError',
+        'FileUpload.DoesNotExist', 'Forbidden', 'KeyboardInterrupt'
     ]:
         return None
 
