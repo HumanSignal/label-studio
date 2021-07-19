@@ -153,9 +153,11 @@ def _create_user(input_args, config):
     user = User.objects.get(email=username)
     org = Organization.objects.first()
     if not org:
-        Organization.create_organization(created_by=user, title='Label Studio')
+        org = Organization.create_organization(created_by=user, title='Label Studio')
     else:
         org.add_user(user)
+    user.active_organization = org
+    user.save(update_fields=['active_organization'])
 
     return user
 
@@ -246,7 +248,7 @@ def _project_exists(project_name):
 
 
 def main():
-    input_args = parse_input_args()
+    input_args = parse_input_args(sys.argv[1:])
 
     # setup logging level
     if input_args.log_level:

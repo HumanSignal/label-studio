@@ -6,7 +6,7 @@ import json
 from .utils.io import find_file
 
 
-def parse_input_args():
+def parse_input_args(input_args):
     """ Combine args with json config
 
     :return: config dict
@@ -124,7 +124,7 @@ def parse_input_args():
 
     parser_shell = subparsers.add_parser('shell', help='Run django shell', parents=[root_parser])
 
-    args = parser.parse_args()
+    args = parser.parse_args(input_args)
 
     if not hasattr(args, 'label_config'):
         args.label_config = None
