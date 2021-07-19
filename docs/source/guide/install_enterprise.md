@@ -21,23 +21,22 @@ To install Label Studio Community Edition, see <a href="install.html">Install an
 
 ## Install Label Studio Enterprise using Docker
 
-1. Pull the latest image
-2. Add the license file
-3. Start using Docker-compose 
+1. Pull the latest image.
+2. Add the license file.
+3. Start the server using Docker Compose.
 
 ### Prerequisites
 Make sure you have an authorization token to retrieve Docker images and a current license file. If you are a Label Studio Enterprise customer and do not have access, [contact us](mailto:hello@heartex.ai) to receive an authorization token and a copy of your license file.
 
 Make sure [Docker Compose](https://docs.docker.com/compose/install/) is installed on your system.
 
-The app is going to be connected to the following running services:
-
+After you install Label Studio Enterprise, the app is automatically connected to the following running services:
 - PostgresSQL (versions 11, 12, 13)
 - Redis (version 5)
 
 ### Pull the latest image
 
-You must be authorized to use Label Studio Enterprise images. 
+You must be authorized to access Label Studio Enterprise images. 
 
 1. Set up the Docker login to retrieve the latest Docker image:
 ```bash
@@ -56,24 +55,24 @@ docker pull heartexlabs/label-studio-enterprise:latest
 ### Add the license file 
 After you retrieve the latest Label Studio Enterprise image, add the license file. You can't start the Docker image without a license file. 
 
-1. Create a working directory called `heartex` and place the license file in it.
+1. Create a working directory called `label-studio-enterprise` and place the license file in it.
 ```bash
-mkdir -p heartex
-cd heartex
+mkdir -p label-studio-enterprise
+cd label-studio-enterprise
 ```
-2. Move the license file, `license.txt`, to the `heartex` directory.
+2. Move the license file, `license.txt`, to the `label-studio-enterprise` directory.
 
-### Start using Docker-compose
+### Start using Docker Compose
 
-To run Label Studio Enterprise in production, start it using [Docker compose](). This configuration allows you to link Label Studio with external databases and services.
+To run Label Studio Enterprise in production, start it using [Docker compose](https://docs.docker.com/compose/). This configuration lets you connect Label Studio to external databases and services.
 
-1. Create a file, `heartex/env.list` with the required environmental variables:
+1. Create a file, `label-studio-enterprise/env.list` with the required environmental variables:
 ```
-# Here you specify the path to the license file. 
-# Alternatively, it could be an URL like LICENSE=https://lic.heartex.ai/db/20210203-1234-ab123456.lic
+# Specify the path to the license file. 
+# Alternatively, it can be a URL like LICENSE=https://lic.heartex.ai/db/20210203-1234-ab123456.lic
 LICENSE=/label-studio-enterprise/license.txt
 
-# Database engine (PostgresSQL by default)
+# Database engine (PostgreSQL by default)
 DJANGO_DB=default
 
 # Default configuration
@@ -156,7 +155,7 @@ volumes:
   static: {} 
 ```
 
-3. Run Docker compose:
+3. Run Docker Compose:
 
 ```bash
 docker-compose up
@@ -164,7 +163,7 @@ docker-compose up
 
 > Note: If you expose port 80, you must start Docker with `sudo`.
 
-4. If you start docker for the first time, you need to run the database migrations (ensuring `postgres` database already exists):
+4. If you're starting Docker for the first time, you must run the database migrations to make sure that the `postgres` database already exists:
 
 ```bash
 docker-compose run app python3 label_studio_enterprise/manage.py migrate
@@ -172,12 +171,11 @@ docker-compose run app python3 label_studio_enterprise/manage.py migrate
 
 ### Get the Docker image version
 
-To check the version of the Label Studio Enterprise Docker image, run [`docker ps`](https://docs.docker.com/engine/reference/commandline/ps/) on the host.
+To check the version of the Label Studio Enterprise Docker image, use the [`docker ps`](https://docs.docker.com/engine/reference/commandline/ps/) command on the host. 
 
-Run the following command as root or using `sudo` and review the output:
+From the command line, run the following as root or using `sudo` and review the output:
 ```bash
 $ docker ps
 03b88eebdb65   heartexlabs/label-studio-enterprise:latest   "uwsgi --ini deploy/…"   36 hours ago   Up 36 hours   0.0.0.0:80->8000/tcp   label-studio-enterprise_app_1
 ```
-
-The image column displays the Docker image and version number. The image `heartexlabs/label-studio-enterprise:latest` is using the version `latest`.
+In this example output, the image column displays the Docker image and version number. The image `heartexlabs/label-studio-enterprise:latest` is using the version `latest`.
