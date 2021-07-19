@@ -58,6 +58,9 @@ class Organization(OrganizationMixin, models.Model):
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
 
+    def __str__(self):
+        return self.title + ', id=' + str(self.pk)
+
     @classmethod
     def from_request(cls, request):
         if 'organization_pk' not in request.session:
