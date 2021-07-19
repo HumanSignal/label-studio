@@ -11,10 +11,9 @@ from django.core.validators import MinLengthValidator, MaxLengthValidator
 from django.db import transaction, models
 from annoying.fields import AutoOneToOneField
 
-from rest_framework.exceptions import ValidationError
-
-from tasks.models import Task, Prediction, Annotation, Q_task_finished_annotations, Q_finished_annotations, bulk_update_stats_project_tasks
+from tasks.models import Task, Prediction, Annotation, Q_task_finished_annotations, bulk_update_stats_project_tasks
 from core.utils.common import create_hash, sample_query, get_attr_or_item, load_func
+from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
 from core.label_config import (
     parse_config, validate_label_config, extract_data_types, get_all_object_tag_names, config_line_stipped,
     get_sample_task, get_all_labels, get_all_control_tag_tuples, get_annotation_tuple
@@ -162,7 +161,7 @@ class Project(ProjectMixin, models.Model):
 
     @property
     def num_annotations(self):
-        return Annotation.objects.filter(Q(task__project=self) & Q_finished_annotations & Q(ground_truth=False)).count()
+        return Annotation.objects.filter(task__project=self).count()
 
     @property
     def has_predictions(self):
@@ -346,6 +345,11 @@ class Project(ProjectMixin, models.Model):
         if not hasattr(self, 'summary'):
             return
 
+        if self.num_tasks == 0:
+            logger.debug(f'Project {self} has no tasks: nothing to validate here. Ensure project summary is empty')
+            self.summary.reset()
+            return
+
         # validate data columns consistency
         fields_from_config = get_all_object_tag_names(config_string)
         if not fields_from_config:
@@ -355,7 +359,13 @@ class Project(ProjectMixin, models.Model):
         fields_from_data.discard(settings.DATA_UNDEFINED_NAME)
         if fields_from_data and not fields_from_config.issubset(fields_from_data):
             different_fields = list(fields_from_config.difference(fields_from_data))
-            raise ValidationError(f'These fields are not present in the data: {",".join(different_fields)}')
+            raise LabelStudioValidationErrorSentryIgnored(f'These fields are not present in the data: {",".join(different_fields)}')
+
+        if self.num_annotations == 0:
+            logger.debug(f'Project {self} has no annotations: nothing to validate here. '
+                         f'Ensure annotations-related project summary is empty')
+            self.summary.reset(tasks_data_based=False)
+            return
 
         # validate annotations consistency
         annotations_from_config = set(get_all_control_tag_tuples(config_string))
@@ -372,8 +382,8 @@ class Project(ProjectMixin, models.Model):
                     f'{self.summary.created_annotations[ann_tuple]} '
                     f'with from_name={from_name}, to_name={to_name}, type={t}')
             diff_str = '\n'.join(diff_str)
-            raise ValidationError(f'Created annotations are incompatible with provided labeling schema, '
-                                  f'we found:\n{diff_str}')
+            raise LabelStudioValidationErrorSentryIgnored(
+                f'Created annotations are incompatible with provided labeling schema, we found:\n{diff_str}')
 
         # validate labels consistency
         labels_from_config = get_all_labels(config_string)
@@ -381,14 +391,14 @@ class Project(ProjectMixin, models.Model):
         for control_tag_from_data, labels_from_data in created_labels.items():
             # Check if labels created in annotations, and their control tag has been removed
             if labels_from_data and control_tag_from_data not in labels_from_config:
-                raise ValidationError(
+                raise LabelStudioValidationErrorSentryIgnored(
                     f'There are {sum(labels_from_data.values(), 0)} annotation(s) created with tag '
                     f'"{control_tag_from_data}", you can\'t remove it')
             labels_from_config_by_tag = set(labels_from_config[control_tag_from_data])
             if not set(labels_from_data).issubset(set(labels_from_config_by_tag)):
                 different_labels = list(set(labels_from_data).difference(labels_from_config_by_tag))
                 diff_str = '\n'.join(f'{l} ({labels_from_data[l]} annotations)' for l in different_labels)
-                raise ValidationError(f'These labels still exist in annotations:\n{diff_str}')
+                raise LabelStudioValidationErrorSentryIgnored(f'These labels still exist in annotations:\n{diff_str}')
 
     def _label_config_has_changed(self):
         return self.label_config != self.__original_label_config
@@ -441,6 +451,13 @@ class Project(ProjectMixin, models.Model):
             )
             self.__maximum_annotations = self.maximum_annotations
             self.__overlap_cohort_percentage = self.overlap_cohort_percentage
+
+        if hasattr(self, 'summary'):
+            # Ensure project.summary is consistent with current tasks / annotations
+            if self.num_tasks == 0:
+                self.summary.reset()
+            elif self.num_annotations == 0:
+                self.summary.reset(tasks_data_based=False)
 
     def get_member_ids(self):
         if hasattr(self, 'team_link'):
@@ -642,9 +659,10 @@ class ProjectSummary(models.Model):
     def has_permission(self, user):
         return self.project.has_permission(user)
 
-    def reset(self):
-        self.all_data_columns = {}
-        self.common_data_columns = []
+    def reset(self, tasks_data_based=True):
+        if tasks_data_based:
+            self.all_data_columns = {}
+            self.common_data_columns = []
         self.created_annotations = {}
         self.created_labels = {}
         self.save()

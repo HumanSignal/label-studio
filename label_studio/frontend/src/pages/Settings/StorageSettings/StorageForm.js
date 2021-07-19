@@ -20,7 +20,7 @@ export const StorageForm = forwardRef(({
   const [type, setType] = useState(storage?.type ?? storageTypes?.[0]?.name ?? 's3');
   const [checking, setChecking] = useState(false);
   const [connectionValid, setConnectionValid] = useState(null);
-  const [form, setForm] = useState([]);
+  const [formFields, setFormFields] = useState([]);
 
   useEffect(() => {
     api.callApi('storageForms', {
@@ -28,7 +28,7 @@ export const StorageForm = forwardRef(({
         target,
         type,
       },
-    }).then(formFields => setForm(formFields));
+    }).then(formFields => setFormFields(formFields ?? []));
   }, [type]);
 
   const storageTypeSelect = {columnCount: 1, fields: [{
@@ -81,7 +81,7 @@ export const StorageForm = forwardRef(({
       ref={formRef}
       action={action}
       params={{ target, type, project, pk: storage?.id }}
-      fields={[storageTypeSelect, ...form]}
+      fields={[storageTypeSelect, ...(formFields ?? [])]}
       formData={{...(storage ?? {})}}
       skipEmpty={true}
       onSubmit={onSubmit}

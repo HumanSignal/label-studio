@@ -139,13 +139,13 @@ class MLBackend(models.Model):
         tasks_ser = TaskSimpleSerializer(tasks, many=True).data
         ml_api_result = self.api.make_predictions(tasks_ser, self.model_version, self.project)
         if ml_api_result.is_error:
-            logger.error(f'Prediction not created for project {self}: {ml_api_result.error_message}')
+            logger.warning(f'Prediction not created for project {self}: {ml_api_result.error_message}')
             return
 
         responses = ml_api_result.response['results']
 
         if len(responses) == 0:
-            logger.error(f'ML backend returned empty prediction for project {self}')
+            logger.warning(f'ML backend returned empty prediction for project {self}')
             return
 
         # ML Backend doesn't support batch of tasks, do it one by one
@@ -158,7 +158,7 @@ class MLBackend(models.Model):
 
         # wrong result number
         elif len(responses) != len(tasks_ser):
-            logger.error(f'ML backend returned response number {len(responses)} != task number {len(tasks_ser)}')
+            logger.warning(f'ML backend returned response number {len(responses)} != task number {len(tasks_ser)}')
 
         predictions = []
         for task, response in zip(tasks_ser, responses):

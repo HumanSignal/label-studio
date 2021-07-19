@@ -13,8 +13,8 @@ from urllib.parse import urlencode
 from lxml import etree
 from collections import defaultdict
 from django.conf import settings
-from rest_framework.exceptions import ValidationError
 from label_studio.core.utils.io import find_file
+from label_studio.core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
 
 logger = logging.getLogger(__name__)
 
@@ -98,7 +98,7 @@ def parse_config(config_string):
         tag_info['inputs'] = []
         for input_tag_name in tag_info['to_name']:
             if input_tag_name not in inputs:
-                logger.error(
+                logger.warning(
                     f'to_name={input_tag_name} is specified for output tag name={output_tag}, '
                     'but we can\'t find it among input tags')
                 continue
@@ -123,16 +123,16 @@ def validate_label_config(config_string):
         config = parse_config_to_json(config_string)
         jsonschema.validate(config, _LABEL_CONFIG_SCHEMA_DATA)
     except (etree.XMLSyntaxError, etree.XMLSchemaParseError, ValueError) as exc:
-        raise ValidationError(str(exc))
+        raise LabelStudioValidationErrorSentryIgnored(str(exc))
     except jsonschema.exceptions.ValidationError as exc:
         error_message = exc.context[-1].message if len(exc.context) else exc.message
         error_message = 'Validation failed on {}: {}'.format('/'.join(exc.path), error_message.replace('@', ''))
-        raise ValidationError(error_message)
+        raise LabelStudioValidationErrorSentryIgnored(error_message)
 
     # unique names in config # FIXME: 'name =' (with spaces) won't work
     all_names = re.findall(r'name="([^"]*)"', config_string)
     if len(set(all_names)) != len(all_names):
-        raise ValidationError('Label config contains non-unique names')
+        raise LabelStudioValidationErrorSentryIgnored('Label config contains non-unique names')
 
     # toName points to existent name
     names = set(all_names)
@@ -140,7 +140,7 @@ def validate_label_config(config_string):
     for toName_ in toNames:
         for toName in toName_.split(','):
             if toName not in names:
-                raise ValidationError(f'toName="{toName}" not found in names: {sorted(names)}')
+                raise LabelStudioValidationErrorSentryIgnored(f'toName="{toName}" not found in names: {sorted(names)}')
 
 
 def extract_data_types(label_config):

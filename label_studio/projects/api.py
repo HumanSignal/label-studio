@@ -13,7 +13,6 @@ from django.conf import settings
 from drf_yasg.utils import swagger_auto_schema
 from django.utils.decorators import method_decorator
 from django.db.models import Q, When, Count, Case, OuterRef, Max, Exists, Value, BooleanField
-from rest_framework.views import APIView
 from rest_framework import generics, status, filters
 from rest_framework.exceptions import NotFound, ValidationError as RestValidationError
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser

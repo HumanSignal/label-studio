@@ -1,6 +1,6 @@
 {
-  "message": "Merge pull request #219 from heartexlabs/fix/switching-annotations-with-brushes\n\nFix brushes unmounting and brushes deserialization on remounting",
-  "commit": "6f3fc50a12b8698186917429cca2c3cae743810a",
+  "message": "Introduce Video tag (#222)\n\n* Introduce Video tag, now only for classification\r\n\r\nAlso move icons to TypeScript\r\n\r\n* Add simple example with Video\r\n\r\n* Fix icons for frame forward/backward\r\n\r\n* Add tooltips with hotkeys to Video buttons\r\n\r\n* Play/pause Video on click\r\n\r\n* Fix value in Video example",
+  "commit": "c2a1152127a69598f402bd4886b9598982226b77",
   "branch": "master",
-  "date": "2021-07-01T23:31:27Z"
+  "date": "2021-07-08T16:43:56Z"
 }

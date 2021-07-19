@@ -6,24 +6,18 @@ import os
 
 from rest_framework import generics
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
 from drf_yasg import openapi as openapi
 from drf_yasg.utils import swagger_auto_schema
-from django.utils.decorators import method_decorator
 
-from core.permissions import BaseRulesPermission, IsBusiness, all_permissions
+from core.permissions import all_permissions
 from core.utils.common import get_object_with_check_and_log
 from core.utils.io import read_yaml
 from io_storages.serializers import ImportStorageSerializer, ExportStorageSerializer
 from projects.models import Project
 
 logger = logging.getLogger(__name__)
-
-
-class StorageAPIBasePermission(BaseRulesPermission):
-    perm = 'projects.change_project'
 
 
 class ImportStorageListAPI(generics.ListCreateAPIView):
@@ -95,7 +89,7 @@ class ImportStorageSyncAPI(generics.GenericAPIView):
 
 class StorageValidateAPI(generics.CreateAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
-    permission_classes = (IsBusiness, StorageAPIBasePermission)
+    permission_required = all_permissions.projects_change
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -108,7 +102,7 @@ class StorageValidateAPI(generics.CreateAPIView):
 class StorageFormLayoutAPI(generics.RetrieveAPIView):
 
     parser_classes = (JSONParser, FormParser, MultiPartParser)
-    permission_classes = (IsBusiness, StorageAPIBasePermission)
+    permission_required = all_permissions.projects_change
     swagger_schema = None
     storage_type = None
 

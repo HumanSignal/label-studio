@@ -51,16 +51,6 @@ class APIViewVirtualMethodMixin(object):
         return res
 
 
-class RequestDebugLogMixin(object):
-
-    def initial(self, request, *args, **kwargs):
-        try:
-            logger.debug(f'Request to {request.path}:\n{json.dumps(request.data, indent=2)}')
-        except Exception as exc:
-            logger.error(exc, exc_info=True)
-        super(RequestDebugLogMixin, self).initial(request, *args, **kwargs)
-
-
 class DummyModelMixin():
     def has_permission(self, user):
         return True
