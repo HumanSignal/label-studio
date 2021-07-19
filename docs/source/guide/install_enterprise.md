@@ -146,6 +146,7 @@ services:
     env_file:
       - env.list
     volumes:
+      - ./license.txt:/label_studio_enterprise/license.txt
       - ./mydata:/label-studio/data:rw
     working_dir: /label-studio-enterprise
     command: [ "python3", "/label-studio-enterprise/label_studio_enterprise/manage.py", "rqworker", "default" ]
