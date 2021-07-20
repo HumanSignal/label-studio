@@ -109,10 +109,10 @@ You can deploy Label Studio with one click in Heroku, Microsoft Azure, or Google
 The frontend part of Label Studio app lies in the `frontend/` folder and written in React JSX. In case you've made some changes there, the following commands should be run before building / starting the instance:
 
 ```
-cd frontend/
+cd label_studio/frontend/
 npm ci
 npx webpack
-cd ..
+cd ../..
 python label_studio/manage.py collectstatic --no-input
 ```
 
