@@ -11,7 +11,7 @@ meta_title: Time series video audio labeling
 ## Step 1: Media hosting
 
 You have to host your CSV and MP4 somewhere (or another video formats supporting by browsers). You can use S3 
-or another clouds. If you want to host data from you hard drive, please use 
+or another clouds. If you want to host data from your hard drive, please use 
 [Label Studio Local Storage](http://localhost:4000/guide/storage.html#Local-storage).
 
 As the result of this step you will have two URLs: one for CSV and one for video, e.g.:

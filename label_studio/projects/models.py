@@ -722,7 +722,9 @@ class ProjectSummary(models.Model):
             return None
         if 'from_name' not in result or 'to_name' not in result:
             logger.error(
-                'Unexpected annotation.result format: "from_name" or "to_name" not found in %r' % result)
+                'Unexpected annotation.result format: "from_name" or "to_name" not found in %r', result,
+                extra={'sentry_skip': True}
+            )
             return None
         result_from_name = result['from_name']
         key = get_annotation_tuple(result_from_name, result['to_name'], result_type or '')

@@ -87,7 +87,7 @@ def perform_action(action_id, project, queryset, **kwargs):
         result = settings.DATA_MANAGER_ACTIONS[action_id]['entry_point'](project, queryset, **kwargs)
     except Exception as e:
         text = 'Error while perform action: ' + action_id + '\n' + tb.format_exc()
-        logger.error(text)
+        logger.error(text, extra={'sentry_skip': True})
         raise e
 
     return result
