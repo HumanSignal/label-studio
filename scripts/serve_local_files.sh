@@ -19,7 +19,6 @@ else
 fi
 
 echo "Replacing ${INPUT_DIR} to http://localhost:${PORT} ..."
-# eval $FIND_CMD | sed 's!.*/!!' | sed -e "s/^/http:\/\/localhost:${PORT}\//" > $OUTPUT_FILE
 INPUT_DIR_ESCAPED=$(printf '%s\n' "$INPUT_DIR" | sed -e 's/[\/&]/\\&/g')
 eval $FIND_CMD | sed "/${INPUT_DIR_ESCAPED}/s//http:\/\/localhost:${PORT}/" > $OUTPUT_FILE
 
