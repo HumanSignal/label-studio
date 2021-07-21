@@ -70,6 +70,7 @@ class UserLastActivityMixin(models.Model):
     class Meta:
         abstract = True
 
+
 UserMixin = load_func(settings.USER_MIXIN)
 
 

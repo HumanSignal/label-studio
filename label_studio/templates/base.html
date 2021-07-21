@@ -100,6 +100,9 @@
     sentry_dsn: {% if settings.FRONTEND_SENTRY_DSN %}"{{ settings.FRONTEND_SENTRY_DSN }}"{% else %}null{% endif %},
     sentry_rate: "{{ settings.FRONTEND_SENTRY_RATE }}",
     sentry_environment: "{{ settings.FRONTEND_SENTRY_ENVIRONMENT }}",
+
+    {% block app_more_settings %}{% endblock %}
+
   }, {% block frontend_settings %}{}{% endblock %});
 </script>
 
