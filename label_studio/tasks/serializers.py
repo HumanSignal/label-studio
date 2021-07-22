@@ -44,9 +44,10 @@ class ListAnnotationSerializer(serializers.ListSerializer):
 class AnnotationSerializer(DynamicFieldsMixin, ModelSerializer):
     """
     """
-    created_username = serializers.SerializerMethodField(default='', read_only=True, help_text='User name string')
-    created_ago = serializers.CharField(default='', read_only=True, help_text='Delta time from creation time')
-    completed_by = serializers.SerializerMethodField()
+    created_username = serializers.SerializerMethodField(default='', read_only=True, help_text='Username string')
+    created_ago = serializers.CharField(default='', read_only=True, help_text='Time delta from creation time')
+    completed_by = serializers.SerializerMethodField(default='Requesting user',
+                                                     help_text='ID of the user who completed the annotation.')
 
     @classmethod
     def many_init(cls, *args, **kwargs):

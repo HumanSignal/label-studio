@@ -15,17 +15,17 @@ Set up the following cloud and other storage systems with Label Studio:
 - [Redis database](#Redis-database)
 - [Local storage](#Local-storage)
 
-Each source and target storage setup is project-specific. You can connect multiple buckets, containers, databases, or directories as source or target storage for a project. 
+Each source and target storage setup is project-specific. You can connect multiple buckets, containers, databases, or directories as source or target storage for a project. If you upload new data to a connected cloud storage bucket, sync the storage connection to add the new labeling tasks to Label Studio without restarting. 
 
-If you upload new data to a connected cloud storage bucket, sync the storage connection to add the new labeling tasks to Label Studio without restarting. 
+> Choose your target storage carefully. When you start the labeling project, the target storage must be empty or contain annotations that match previously created or imported tasks from source storage. Tasks are synced with annotations based on internal IDs, so if you accidentally connect to target storage with existing annotations with the same IDs, the connection might fail with undefined behavior.
 
-> Choose your target storage carefully. When you start the labeling project, the target storage must be empty or contain annotations that match previously created or imported tasks from source storage. Tasks are synced with annotations based on internal IDs, so if you accidentally connect to target storage with existing annotations with the same IDs, the connection might fail with undefined behavior.  
-
-For details about how Label Studio secures access to cloud storage using workspaces and cloud storage credentials, see [Secure access to cloud storage](#security.html/#Secure-access-to-cloud-storage).
+Secure access to cloud storage using workspaces and cloud storage credentials. For details, see [Secure access to cloud storage](security.html/#Secure-access-to-cloud-storage).
 
 ## Amazon S3
 
 To connect your [S3](https://aws.amazon.com/s3) bucket with Label Studio, make sure you have programmatic access enabled. [See the Amazon Boto3 configuration documentation](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/quickstart.html#configuration) for more on how to set up access to your S3 bucket.
+
+For details about how Label Studio secures access to cloud storage, see [Secure access to cloud storage](security.html/#Secure-access-to-cloud-storage).
 
 ### Set up connection in the Label Studio UI
 In the Label Studio UI, do the following to set up the connection:
@@ -96,7 +96,7 @@ You can also create a storage connection using the Label Studio API.
 
 ## Google Cloud Storage
 
-Dynamically import tasks and export annotations to Google Cloud Storage (GCS) buckets in Label Studio. 
+Dynamically import tasks and export annotations to Google Cloud Storage (GCS) buckets in Label Studio. For details about how Label Studio secures access to cloud storage, see [Secure access to cloud storage](security.html/#Secure-access-to-cloud-storage).
 
 ### Prerequisites
 
@@ -133,7 +133,7 @@ You can also create a storage connection using the Label Studio API.
 
 ##  Microsoft Azure Blob storage
 
-Connect your [Microsoft Azure Blob storage](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blobs-introduction) container with Label Studio. 
+Connect your [Microsoft Azure Blob storage](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blobs-introduction) container with Label Studio. For details about how Label Studio secures access to cloud storage, see [Secure access to cloud storage](security.html/#Secure-access-to-cloud-storage).
 
 ### Prerequisites
 You must set two environment variables in Label Studio to connect to Azure Blob storage:
@@ -175,7 +175,6 @@ You can also store your tasks and annotations in a [Redis database](https://redi
 Currently, this configuration is only supported if the Redis database is hosted in the default mode, with the default IP address. 
 
 Label Studio does not manage the Redis database for you. See the [Redis Quick Start](https://redis.io/topics/quickstart) for details about hosting and managing your own Redis database. Because Redis is an in-memory database, data saved in Redis does not persist. To make sure you don't lose data, set up [Redis persistence](https://redis.io/topics/persistence) or use another method to persist the data, such as using Redis in the cloud with [Microsoft Azure](https://azure.microsoft.com/en-us/services/cache/) or [Amazon AWS](https://aws.amazon.com/redis/).
-
 
 ### Set up connection in the Label Studio UI
 In the Label Studio UI, do the following to set up the connection:
