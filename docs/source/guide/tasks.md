@@ -24,9 +24,9 @@ You can import many different types of data, including text, timeseries, audio, 
 | Audio | .aiff, .au, .flac, .m4a, .mp3, .ogg, .wav |
 | HTML | .html, .htm, .xml |
 | Images | .bmp, .gif, .jpg, .png, .svg, .webp |
-| Structured data | .csv, .tsv, .json |
-| Text | .txt |
-| Time series | .csv, .tsv |
+| [Structured data](#Basic-Label-Studio-JSON-format) | .csv, .tsv, .json |
+| [Text](#Plain-text) | .txt |
+| [Time series](#Import-CSV-or-TSV-data) | .csv, .tsv |
 
 If you don't see a supported data or file type that you want to import, reach out in the [Label Studio Slack community](http://slack.labelstud.io.s3-website-us-east-1.amazonaws.com?source=docs-gdi). 
 

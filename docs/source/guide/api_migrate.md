@@ -179,8 +179,62 @@ Some parameters have changed as listed in the following table:
 With the change from teams to workspaces, the `team_id` parameter is no longer supported in the POST payload to create a project using the API. 
 
 Instead, do the following:
-1. [Create a project](/api#operation/api_projects_create).
-2. [Add the project to a workspace](/api_workspaces_projects_create).
-3. [Add the project to a workspace](/api#operation/api_workspaces_post).
-
+1. [Create a workspace](/api#operation/api_workspaces_create)
+   - POST a request to `<host>/api/workspaces/` with the following request body:
+    ```json
+    {
+    "title": "string",
+    "description": "string",
+    "color": "string",
+    "is_personal": true
+    }
+   ```
+   - Or retrieve the details of an existing workspace by making a GET request to `<host>/api/workspaces/`.
+2. [Create a project and add it to a workspace](/api#operation/api_projects_create).
+    - POST a request to `<host>/api/projects/` with the following request body. All fields are optional:
+    ```json
+    {
+    "title": "string",
+    "description": "string",
+    "label_config": "string",
+    "expert_instruction": "string",
+    "show_instruction": true,
+    "show_skip_button": true,
+    "enable_empty_annotation": true,
+    "show_annotation_history": true,
+    "organization": 0,
+    "color": "string",
+    "maximum_annotations": -2147483648,
+    "is_published": true,
+    "model_version": "string",
+    "is_draft": true,
+    "created_by": {
+        "id": 1,
+        "first_name": "",
+        "last_name": "",
+        "email": "heartex@heartex.net"
+    },
+    "min_annotations_to_start_training": -2147483648,
+    "show_collab_predictions": true,
+    "sampling": "Sequential sampling",
+    "show_ground_truth_first": true,
+    "show_overlap_first": true,
+    "overlap_cohort_percentage": -2147483648,
+    "task_data_login": "string",
+    "task_data_password": "string",
+    "control_weights": {},
+    "evaluate_predictions_automatically": true,
+    "workspace": 0
+    }
+    ```
+3. [Add a user to a workspace](/api#operation/api_workspaces_post).
+    - POST a request to `<host>/api/workspaces/{id}/memberships/` with the workspace ID in the path, with the following request body:
+    ```json
+    {
+    "user": 0,
+    "workspace": 0
+    }
+    ```
+    - To retrieve a list of users in your organization, make a GET request to `<host>/api/users/`. 
+    
  

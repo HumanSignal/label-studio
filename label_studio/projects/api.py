@@ -139,6 +139,12 @@ class ProjectListAPI(generics.ListCreateAPIView):
                                             format(ser.validated_data.get('title', '')))
             raise LabelStudioDatabaseException('Database error during project creation. Try again.')
 
+    def get(self, request, *args, **kwargs):
+        return super(ProjectListAPI, self).get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return super(ProjectListAPI, self).post(request, *args, **kwargs)
+
 
 @method_decorator(name='get', decorator=swagger_auto_schema(
         tags=['Projects'],
@@ -214,19 +220,21 @@ class ProjectAPI(APIViewVirtualRedirectMixin,
 
 
 @method_decorator(name='get', decorator=swagger_auto_schema(
-        tags=['Projects'],
-        operation_summary='Get next task to label',
-        operation_description="""
-            Get the next task for labeling. If you enable Machine Learning in
-            your project, the response might include a "predictions"
-            field. It contains a machine learning prediction result for
-            this task.
-        """,
-        responses={200: TaskWithAnnotationsAndPredictionsAndDraftsSerializer()}
-    ))
+    tags=['Projects'],
+    operation_summary='Get next task to label',
+    operation_description="""
+    Get the next task for labeling. If you enable Machine Learning in
+    your project, the response might include a "predictions"
+    field. It contains a machine learning prediction result for
+    this task.
+    """,
+    responses={200: TaskWithAnnotationsAndPredictionsAndDraftsSerializer()}
+    )) # leaving this method decorator info in case we put it back in swagger API docs
 class ProjectNextTaskAPI(generics.RetrieveAPIView):
+
     permission_required = all_permissions.tasks_view
     serializer_class = TaskWithAnnotationsAndPredictionsAndDraftsSerializer  # using it for swagger API docs
+    swagger_schema = None # this endpoint doesn't need to be in swagger API docs
 
     def _get_random_unlocked(self, task_query, upper_limit=None):
         # get random task from task query, ignoring locked tasks
@@ -494,7 +502,10 @@ class LabelConfigValidateAPI(generics.CreateAPIView):
 
 @method_decorator(name='post', decorator=swagger_auto_schema(
         tags=['Projects'],
-        operation_summary='Validate a label config',
+        operation_summary='Validate project label config',
+        operation_description="""
+        Determine whether the label configuration for a specific project is valid.
+        """,
         manual_parameters=[
             openapi.Parameter(
                 name='label_config',
@@ -502,7 +513,7 @@ class LabelConfigValidateAPI(generics.CreateAPIView):
                 in_=openapi.IN_QUERY,
                 description='labeling config')
         ]
-))
+)) # This might be the same endpoint as the previous one for some reason?
 class ProjectLabelConfigValidateAPI(generics.RetrieveAPIView):
     """ Validate label config
     """
@@ -533,9 +544,10 @@ class ProjectSummaryAPI(generics.RetrieveAPIView):
     permission_required = all_permissions.projects_view
     queryset = ProjectSummary.objects.all()
 
-    @swagger_auto_schema(tags=['Projects'], operation_summary='Project summary')
+    @swagger_auto_schema(auto_schema=None)
     def get(self, *args, **kwargs):
         return super(ProjectSummaryAPI, self).get(*args, **kwargs)
+
 
 
 @method_decorator(name='delete', decorator=swagger_auto_schema(
@@ -578,10 +590,11 @@ class TasksListAPI(generics.ListCreateAPIView,
         Task.objects.filter(project=project).delete()
         return Response(status=204)
 
+
     def get(self, *args, **kwargs):
         return super(TasksListAPI, self).get(*args, **kwargs)
 
-    @swagger_auto_schema(auto_schema=None, tags=['Projects'])
+    @swagger_auto_schema(auto_schema=None)
     def post(self, *args, **kwargs):
         return super(TasksListAPI, self).post(*args, **kwargs)
 

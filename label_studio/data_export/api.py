@@ -56,7 +56,14 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
         openapi.Parameter(name='exportType',
                           type=openapi.TYPE_STRING,
                           in_=openapi.IN_QUERY,
-                          description='Selected export format')
+                          description='Selected export format'),
+        openapi.Parameter(name='download_all_tasks',
+                          type=openapi.TYPE_STRING,
+                          in_=openapi.IN_QUERY,
+                          description="""
+                          If true, download all tasks regardless of status. If false, download only annotated tasks.
+                          """
+                          )
         ],
     tags=['Export'],
     operation_summary='Export tasks and annotations',
@@ -122,6 +129,7 @@ class ExportAPI(generics.RetrieveAPIView):
         ))
 class ProjectExportFiles(generics.RetrieveAPIView):
     permission_required = all_permissions.projects_change
+    swagger_schema = None # hide export files endpoint from swagger
 
     def get_queryset(self):
         return Project.objects.filter(organization=self.request.user.active_organization)

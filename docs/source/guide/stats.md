@@ -18,9 +18,11 @@ Label Studio Enterprise Edition includes various annotation and labeling statist
 
 Task agreement shows the consensus between multiple annotators when labeling the same task. There are several types of task agreement in Label Studio Enterprise:
 - a per-task agreement score, visible on the Data Manager page for a project. This displays how well the annotations on a particular task match across annotators. 
-- an inter-annotator agreement matrix, visible on the Dashboard for a project. This displays how well the annotations from specific annotators agree with each other in general, or for specific tasks.
+- an inter-annotator agreement matrix, visible on the Members page for a project. This displays how well the annotations from specific annotators agree with each other in general, or for specific tasks. 
 
-You can also see how the annotations from a specific annotator compare to the prediction scores for a task, or how they compare to the ground truth labels for a task.  
+You can also see how the annotations from a specific annotator compare to the prediction scores for a task, or how they compare to the ground truth labels for a task.
+
+For more about viewing agreement in Label Studio Enterprise, see [Verify model and annotator performance](quality.html#Verify-model-and-annotator-performance)
 
 ## Matching score
 
@@ -69,25 +71,25 @@ The matching score is calculated using the mean average precision (mAP) for the 
 
 ### RectangleLabels
 
-The method used to calculate the matching score depends on what choice you select on the project settings page from the following options: 
-- Intersection over Union (IoU), averaged over all bounding box pairs with the best match.
+The method used to calculate the matching score depends on what you choose as the **Metric name** on the **Annotation Settings** page from the following options: 
+- Intersection over Union (IoU), averaged over all bounding box pairs with the best match. Default.
 - Precision computed for some threshold imposed on IoU.
 - Recall computed for some threshold imposed on IoU.
 - F-score computed for some threshold imposed on IoU.
 
 ### PolygonLabels
 
-The method used to calculate the matching score depends on what choice you select on the project settings page from the following options:
-- Intersection over Union (IoU), averaged over all polygon pairs with the best match.
+The method used to calculate the matching score depends on what you choose as the **Metric name** on the **Annotation Settings** page from the following options:
+- Intersection over Union (IoU), averaged over all polygon pairs with the best match. Default. 
 - Precision computed for some threshold imposed on IoU.
 - Recall computed for some threshold imposed on IoU.
 - F-score computed for some threshold imposed on IoU.
 
 ## Agreement method
 
-_Agreement method_ defines how [matching scores](stats.html#Matching-score) across all completions for a task are combined to form a single inter-annotator agreement score.
+The agreement method defines how [matching scores](stats.html#Matching-score) across all annotations for a task are combined to form a single inter-annotator agreement score.
 
-There are several possible methods you can specify on project settings page:
+There are several possible methods you can specify on the **Annotation Settings** for a project.
 
 ### Complete linkage
 Complete linkage task agreement groups annotations so that all the matching scores within a given group are higher than the threshold. The agreement score is the maximum group size divided by the total count of annotations. 

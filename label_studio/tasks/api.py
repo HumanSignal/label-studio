@@ -117,6 +117,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
     def put(self, request, *args, **kwargs):
         return super(TaskAPI, self).put(request, *args, **kwargs)
 
+
 @method_decorator(name='get', decorator=swagger_auto_schema(
         tags=['Annotations'],
         operation_summary='Get annotation by its ID',
@@ -181,7 +182,22 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
 @method_decorator(name='post', decorator=swagger_auto_schema(
         tags=['Annotations'],
         operation_summary='Create annotation',
-        operation_description='Add annotations to a task like an annotator does.',
+        operation_description="""
+        Add annotations to a task like an annotator does. The content of the result field depends on your 
+        labeling configuration. For example, send the following data as part of your POST 
+        request to send an empty annotation with the ID of the user who completed the task:
+        
+        ```json
+        {
+        "result": {},
+        "was_cancelled": true,
+        "ground_truth": true,
+        "lead_time": 0,
+        "task": 0
+        "completed_by": {"id": 1, "email": "heartex@example.com", "first_name": "", "last_name": ""}
+        } 
+        ```
+        """,
         request_body=AnnotationSerializer
         ))
 class AnnotationsListAPI(generics.ListCreateAPIView):
@@ -302,20 +318,25 @@ class AnnotationDraftAPI(generics.RetrieveUpdateDestroyAPIView):
     filter_inspectors=[DjangoFilterDescriptionInspector],
     operation_description="List all predictions."))
 @method_decorator(name='create', decorator=swagger_auto_schema(
-    tags=['Predictions'], operation_summary="Create prediction",
+    tags=['Predictions'],
+    operation_summary="Create prediction",
     operation_description="Create a prediction."))
 @method_decorator(name='retrieve', decorator=swagger_auto_schema(
-    tags=['Predictions'], operation_summary="Get prediction",
-    operation_description="Get all predictions."))
+    tags=['Predictions'],
+    operation_summary="Get prediction",
+    operation_description="Get all predictions in an organization, or for a specific task or project by ID."))
 @method_decorator(name='update', decorator=swagger_auto_schema(
-    tags=['Predictions'], operation_summary="Put prediction",
-    operation_description="Overwrite prediction data."))
+    tags=['Predictions'],
+    operation_summary="Put prediction",
+    operation_description="Overwrite prediction data by prediction ID."))
 @method_decorator(name='partial_update', decorator=swagger_auto_schema(
-    tags=['Predictions'], operation_summary="Update prediction",
-    operation_description="Update prediction data."))
+    tags=['Predictions'],
+    operation_summary="Update prediction",
+    operation_description="Update prediction data by prediction ID."))
 @method_decorator(name='destroy', decorator=swagger_auto_schema(
-    tags=['Predictions'], operation_summary="Delete prediction",
-    operation_description="Delete a prediction."))
+    tags=['Predictions'],
+    operation_summary="Delete prediction",
+    operation_description="Delete a prediction by prediction ID."))
 class PredictionAPI(viewsets.ModelViewSet):
     serializer_class = PredictionSerializer
     permission_required = all_permissions.predictions_any
