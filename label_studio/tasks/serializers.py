@@ -239,6 +239,11 @@ class TaskSerializerBulk(serializers.ListSerializer):
                 if completed_by not in members_ids:
                     raise ValidationError(f"Unknown annotator's ID {completed_by}")
                 annotation['completed_by_id'] = completed_by
+
+            # in any other cases - import validation error
+            else:
+                raise ValidationError(
+                    f"Import data contains completed_by={completed_by} which is not a valid annotator's email or ID")
             annotation.pop('completed_by', None)
 
     @retry_database_locked()

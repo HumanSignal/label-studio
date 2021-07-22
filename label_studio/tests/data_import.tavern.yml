@@ -418,3 +418,18 @@ stages:
       could_be_tasks_list: false
       found_formats: {'.json': 1}
       data_columns: ['image']
+
+- name: stage
+  request:
+    files:
+      json: tests/test_suites/samples/previous_export_unknown_completed_by.json
+    headers:
+      content-type: multipart/form-data
+    method: POST
+    url: '{django_live_url}/api/projects/{project_pk}/import'
+  response:
+    status_code: 400
+    json:
+      validation_errors:
+        non_field_errors:
+          - "Import data contains completed_by=99999 which is not a valid annotator's email or ID"
