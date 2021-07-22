@@ -303,11 +303,11 @@ class TaskSerializerBulk(serializers.ListSerializer):
                 for annotation in annotations:
                     # support both "ground_truth" and "ground_truth"
                     ground_truth = annotation.pop('ground_truth', True)
-                    if 'ground_truth' in annotation:
-                        ground_truth = annotation.pop('ground_truth', True)
+                    was_cancelled = annotation.pop('was_cancelled', False)
 
                     db_annotations.append(Annotation(task=self.db_tasks[i],
                                                      ground_truth=ground_truth,
+                                                     was_cancelled=was_cancelled,
                                                      completed_by_id=annotation['completed_by_id'],
                                                      result=annotation['result']))
 
