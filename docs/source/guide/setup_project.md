@@ -207,7 +207,7 @@ After you create a project template, you can use the template when you create a 
 
 All labeling activities in Label Studio occur in the context of a project.
 
-Starting in version 1.0.0, Label Studio stores your project data and configurations in a SQLite database. You can choose to use PostgreSQL or Redis instead. See [Set up database storage](storedata.html). 
+Starting in version 1.0.0, Label Studio stores your project data and configurations in a SQLite database. You can choose to use PostgreSQL instead. See [Set up database storage](storedata.html). 
 
 In versions of Label Studio earlier than 1.0.0, when you start Label Studio for the first time, it launches from a project directory that Label Studio creates, called `./my_project` by default. 
 
