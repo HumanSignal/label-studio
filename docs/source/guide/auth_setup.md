@@ -41,26 +41,24 @@ Set up Label Studio Enterprise as a Service Provider (SP) with your Identity Pro
   3. Copy the **logout URL** used to redirect users after successfully logging out of Label Studio Enterprise and paste it into the appropriate location in your IdP configuration options.
 5. In your IdP, generate a metadata XML file, or a URL that specifies the metadata for the IdP. 
 6. In Label Studio Enterprise, upload the metadata XML file or specify the metadata URL. 
-7. Label Studio Enterprise expects specific attribute mappings for user identities. Set up the following SAML attributes in your IdP:
-   
+7. In your IdP, set up or confirm setup of the following SAML attributes. Label Studio Enterprise expects specific attribute mappings for user identities.
    | Data | Required Attribute |
    | --- | --- |
    | Email address | Email |
-   | First name | FirstName |
-   | Last name or family name | LastName |
-   | User group name | Groups |
-8. If you want specific user groups passed as SAML attributes to Label Studio Enterprise to get access to specific workspaces, map the **Workspace name** to a **Group** specified in the SAML authentication response as an attribute.
+   | First or given name | FirstName |
+   | Last or family name | LastName |
+   | Group name | Groups |
+8. If you want users in specific groups to get access to specific workspaces in Label Studio Enterprise, map the **Workspace name** to a **Group** passed as SAML attributes in the SAML authentication response.
     1. In the **Workspaces to Groups Mapping** section, click **+ Add Mapping**.
     2. In the **Workspace** field, type a new workspace name or select a workspace from the drop-down list. Then, type a **Group** that matches a group name sent as an attribute in a SAML authentication response by your IdP. You can map multiple groups to the same workspace. 
     3. Click **+ Add Mapping** to map additional workspaces to groups. 
-9. You can also map specific user groups to specific access roles in Label Studio Enterprise. 
+9. You can also map specific user groups to specific user roles in Label Studio Enterprise. 
    1. In the **Roles to Groups Mapping** section, click **+ Add Mapping**.
    2. Select a **Role** from the drop-down list of options, then type a **Group** that matches a group name sent as an attribute in a SAML authentication response by your IdP. You can map multiple groups to the same role. 
    3. Click **+ Add Mapping** to map additional roles to groups. 
 10. Click **Save** to save your SAML and SSO settings. 
 
-Test the configuration by logging in to Label Studio Enterprise with your SSO account. 
-
+Test the configuration by logging in to Label Studio Enterprise with your SSO account.
 
 ## Set up LDAP authentication 
 
