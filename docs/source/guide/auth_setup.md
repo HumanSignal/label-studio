@@ -3,7 +3,7 @@ title: Set up authentication for Label Studio
 short: Set up authentication
 badge: <i class='ent'></i>
 type: guide
-order: 221
+order: 252
 meta_title: Authentication for Label Studio Enterprise
 meta_description: Label Studio Enterprise documentation for setting up SSO and LDAP authentication for your data labeling, machine learning, and data science projects.
 ---
