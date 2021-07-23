@@ -49,13 +49,13 @@ If you want to make sure the configuration for your labeling interface is valid 
 To import tasks using the API, make sure you know the project ID that you want to add tasks to. See additional examples and parameter descriptions in the [import data endpoint documentation](/api#operation/projects_import_create)
 
 ### Retrieve tasks
-Retrieve a paginated list of tasks for a specific project. If you want, you can also retrieve tasks and annotations using this API endpoint, as an alternative to exporting annotations. See details and parameters in the [list project tasks endpoint documentation](/api#operation/projects_tasks_list).
+Retrieve a paginated list of tasks for a specific project. If you want, you can also retrieve tasks and annotations using this API endpoint, as an alternative to exporting annotations. See details and parameters in the [list project tasks endpoint documentation](/api#operation/api_projects_tasks_list).
 
 ### Export annotations
 
 To export annotations, first see [which formats are available to export for your project](/api#operation/api_projects_export_formats_read). 
 
-Choose your selected format from the response and then call the export endpoint. See the [export annotations](/api#operation/projects_export_list) endpoint documentation for more details.
+Choose your selected format from the response and then call the export endpoint. See the [export annotations](/api#operation/api_projects_export_read) endpoint documentation for more details.
 
 ### API endpoint reference for older Label Studio versions
 
