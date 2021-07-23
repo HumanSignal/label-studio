@@ -17,8 +17,6 @@ Set up the following cloud and other storage systems with Label Studio:
 
 Each source and target storage setup is project-specific. You can connect multiple buckets, containers, databases, or directories as source or target storage for a project. If you upload new data to a connected cloud storage bucket, sync the storage connection to add the new labeling tasks to Label Studio without restarting. 
 
-> Choose your target storage carefully. When you start the labeling project, the target storage must be empty or contain annotations that match previously created or imported tasks from source storage. Tasks are synced with annotations based on internal IDs, so if you accidentally connect to target storage with existing annotations with the same IDs, the connection might fail with undefined behavior.
-
 Secure access to cloud storage using workspaces and cloud storage credentials. For details, see [Secure access to cloud storage](security.html/#Secure-access-to-cloud-storage).
 
 ## Amazon S3
