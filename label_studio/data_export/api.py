@@ -102,7 +102,7 @@ class ExportAPI(generics.RetrieveAPIView):
         logger.debug('Get tasks')
         query = Task.objects.filter(project=project).select_related('project').prefetch_related('annotations', 'predictions')
         if only_finished:
-            query = query.filter(annotations__isnull=False)
+            query = query.filter(annotations__isnull=False).distinct()
 
         task_ids = query.values_list('id', flat=True)
 
