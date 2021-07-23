@@ -56,7 +56,7 @@ In the project settings, you can add instructions and choose whether to show the
 
 1. Within a project on the Label Studio UI, click **Settings**.
 2. Click **Instructions**, or in Label Studio Enterprise, click **Annotation Settings**. 
-3. Type instructions and choose whether to show the instructions to annotators before labeling. 
+3. Type instructions and choose whether to show the instructions to annotators before labeling. If you want to provide additional details or links for reference, instructions support HTML markup.
 4. Click **Save**. <br/>Click the project name to return to the data manager view. 
 
 Annotators can view instructions at any time when labeling by clicking the (i) button from the labeling interface.
@@ -147,7 +147,7 @@ In the project settings, you can add instructions and choose whether to show the
 
 1. Within a project on the Label Studio UI, click **Settings**.
 2. Click **Review Settings**. 
-3. Type instructions and choose whether to show the instructions to reviewers before reviewing annotated tasks. 
+3. Type instructions and choose whether to show the instructions to reviewers before reviewing annotated tasks. If you want to provide additional details or links for reference, instructions support HTML markup.
 4. Click **Save**. <br/>Click **Data Manager** to return to the data manager view. 
 
 ### Set reviewing options
