@@ -71,8 +71,6 @@ class AnnotationSerializer(DynamicFieldsMixin, ModelSerializer):
         if isinstance(value, str):
             try:
                 data = json.loads(value)
-                if isinstance(value, str):
-                    raise ValueError('annotation "result" can\'t be str, it must be dict')
             except:
                 raise ValueError('annotation "result" can\'t be parse from str to JSON')
 
@@ -80,7 +78,7 @@ class AnnotationSerializer(DynamicFieldsMixin, ModelSerializer):
         if not isinstance(data, list):
             raise ValidationError('annotation "result" field in annotation must be list')
 
-        return value
+        return data
 
     def get_created_username(self, annotation):
         user = annotation.completed_by
