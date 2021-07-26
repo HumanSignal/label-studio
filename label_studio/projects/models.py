@@ -180,10 +180,6 @@ class Project(ProjectMixin, models.Model):
         return None
 
     @property
-    def has_storages(self):
-        return hasattr(self, 'storages') and self.storages is not None and self.storages.count() > 0
-
-    @property
     def secure_mode(self):
         return False
 
