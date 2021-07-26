@@ -72,7 +72,7 @@ class AnnotationSerializer(DynamicFieldsMixin, ModelSerializer):
             try:
                 data = json.loads(value)
                 if isinstance(value, str):
-                    raise ValueError('annotation "result" can\'t be string')
+                    raise ValueError('annotation "result" can\'t be str, it must be dict')
             except:
                 raise ValueError('annotation "result" can\'t be parse from str to JSON')
 
