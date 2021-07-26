@@ -717,8 +717,8 @@ class ProjectSummary(models.Model):
         self.save()
 
     def _get_annotation_key(self, result):
-        result_type = result.get('type')
-        if result_type in ('relation', 'rating', 'pairwise'):
+        result_type = result.get('type', None)
+        if result_type in ('relation', 'rating', 'pairwise', None):
             return None
         if 'from_name' not in result or 'to_name' not in result:
             logger.error(
@@ -782,7 +782,7 @@ class ProjectSummary(models.Model):
                         created_annotations.pop(key)
 
                 # reduce labels counters
-                from_name = result.get('from_name')
+                from_name = result.get('from_name', None)
                 if from_name not in labels:
                     continue
                 for label in self._get_labels(result):
