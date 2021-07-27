@@ -133,7 +133,7 @@ class Task(TaskMixin, models.Model):
 
     def get_storage_link(self):
         # TODO: how to get neatly any storage class here?
-        return find_first_one_to_one_related_field_by_prefix(self, 'io_storages_')
+        return find_first_one_to_one_related_field_by_prefix(self, '.*io_storages_')
 
     def resolve_uri(self, task_data, proxy=True):
         if proxy and self.project.task_data_login and self.project.task_data_password:

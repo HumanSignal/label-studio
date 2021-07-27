@@ -19,6 +19,7 @@ import traceback as tb
 import drf_yasg.openapi as openapi
 import contextlib
 import label_studio
+import re
 
 from django.db import models, transaction
 from django.utils.module_loading import import_string
@@ -275,7 +276,7 @@ def find_first_one_to_one_related_field_by_prefix(instance, prefix):
     for field in instance._meta.get_fields():
         if issubclass(type(field), models.fields.related.OneToOneRel):
             attr_name = field.get_accessor_name()
-            if attr_name.startswith(prefix) and hasattr(instance, attr_name):
+            if re.match(prefix, attr_name) and hasattr(instance, attr_name):
                 return getattr(instance, attr_name)
 
 
