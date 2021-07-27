@@ -7,6 +7,8 @@ from .redis.models import RedisImportStorage, RedisImportStorageLink, RedisExpor
 
 
 def get_import_storage_by_url(url):
+    if not isinstance(url, str):
+        return
     if url.startswith('s3'):
         return S3ImportStorage
     elif url.startswith('gs'):
