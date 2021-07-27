@@ -323,6 +323,7 @@ TASKS_MAX_FILE_SIZE = DATA_UPLOAD_MAX_MEMORY_SIZE
 
 TASK_LOCK_TTL = int(get_env('TASK_LOCK_TTL')) if get_env('TASK_LOCK_TTL') else None
 TASK_LOCK_DEFAULT_TTL = int(get_env('TASK_LOCK_DEFAULT_TTL', 3600))
+TASK_LOCK_MIN_TTL = int(get_env('TASK_LOCK_MIN_TTL', 120))
 
 # Email backend
 FROM_EMAIL = get_env('FROM_EMAIL', 'Label Studio <hello@labelstud.io>')

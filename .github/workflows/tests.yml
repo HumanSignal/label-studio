@@ -49,7 +49,7 @@ jobs:
       - name: Run functional tests
         run: |
           cd label_studio/
-          pytest --junitxml report.xml --cov=. -m "not integration_tests"
+          pytest --junitxml report.xml --cov=.
 
   run_pytest_postgresql:
     name: LS PostgreSQL
@@ -129,7 +129,7 @@ jobs:
       - name: Run functional tests
         run: |
           cd label_studio/
-          pytest --junitxml report.xml --cov=. -m "not integration_tests"
+          pytest --junitxml report.xml --cov=.
 
       - name: "Upload coverage to Codecov"
         uses: codecov/codecov-action@v1
