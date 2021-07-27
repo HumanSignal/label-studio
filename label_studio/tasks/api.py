@@ -13,12 +13,13 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework import generics, viewsets
 from rest_framework.response import Response
+from rest_framework.exceptions import PermissionDenied as DRFPermissionDenied
 
 from core.utils.common import get_object_with_check_and_log, DjangoFilterDescriptionInspector
 from core.permissions import all_permissions, ViewClassPermission
 
 from tasks.models import Task, Annotation, Prediction, AnnotationDraft
-from core.utils.common import bool_from_request
+from core.utils.common import bool_from_request, int_from_request
 from tasks.serializers import (
     TaskSerializer, AnnotationSerializer, TaskSimpleSerializer, PredictionSerializer,
     TaskWithAnnotationsAndPredictionsAndDraftsSerializer, AnnotationDraftSerializer, PredictionQuerySerializer)
@@ -35,11 +36,23 @@ logger = logging.getLogger(__name__)
 class TaskListAPI(generics.ListCreateAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     queryset = Task.objects.all()
+    filterset_fields = ['project']
     permission_required = ViewClassPermission(
         GET=all_permissions.tasks_view,
         POST=all_permissions.tasks_create,
     )
     serializer_class = TaskSerializer
+
+    def get_queryset(self):
+        pk = int_from_request(self.request.GET, 'project', 0) or int_from_request(self.request.data, 'project', 0)
+        if not pk:
+            raise ValueError('Project is not set')
+
+        project = get_object_with_check_and_log(self.request, Project, pk=pk)
+        if not project.has_permission(self.request.user):
+            raise DRFPermissionDenied('No project access')
+
+        return Task.objects.filter(project__organization=self.request.user.active_organization)
 
     @swagger_auto_schema(auto_schema=None)
     def get(self, request, *args, **kwargs):
@@ -77,10 +90,6 @@ class TaskListAPI(generics.ListCreateAPIView):
         operation_description='Delete a task in Label Studio. This action cannot be undone!',
         ))
 class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
-    """
-
-
-    """
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = ViewClassPermission(
         GET=all_permissions.tasks_view,
