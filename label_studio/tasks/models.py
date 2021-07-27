@@ -12,7 +12,6 @@ from django.db import models, connection, transaction
 from django.db.models import Q, F, When, Count, Case, Subquery, OuterRef, Value
 from django.db.models.functions import Coalesce
 from django.db.models.signals import post_delete, pre_save, post_save, pre_delete
-from django.db.utils import ProgrammingError, OperationalError, DatabaseError
 from django.utils.translation import gettext_lazy as _
 from django.db.models import JSONField
 from django.urls import reverse
@@ -22,7 +21,7 @@ from django.dispatch import receiver, Signal
 
 from model_utils import FieldTracker
 
-from core.utils.common import find_first_one_to_one_related_field_by_prefix, string_is_url, load_func, conditional_atomic
+from core.utils.common import find_first_one_to_one_related_field_by_prefix, string_is_url, load_func
 from core.utils.params import get_env
 from data_manager.managers import PreparedTaskManager, TaskManager
 from core.bulk_update_utils import bulk_update
@@ -147,12 +146,21 @@ class Task(TaskMixin, models.Model):
             return protected_data
         else:
             # Try resolve URLs via storage associated with that task
-            storage = self._get_task_storage()
+            storage = self._get_task_storage(task_data)
             if storage:
                 return storage.resolve_task_data_uri(task_data)
             return task_data
 
-    def _get_task_storage(self):
+    def _get_storage_by_task_data(self, task_data):
+        from io_storages.models import get_import_storage_by_url
+
+        for url in task_data.values():
+            storage_class = get_import_storage_by_url(url)
+            if storage_class:
+                # Only first matched storage is returned - no way to specify {"url1": "s3://", "url2": "gs://"}
+                return storage_class.objects.filter(project=self.project).first()
+
+    def _get_task_storage(self, task_data):
         # maybe task has storage link
         storage_link = self.get_storage_link()
         if storage_link:
@@ -164,6 +172,10 @@ class Task(TaskMixin, models.Model):
             # We may use more than one and non-default S3 storage (like GCS, Azure)
             from io_storages.s3.models import S3ImportStorage
             return S3ImportStorage()
+
+        storage = self._get_storage_by_task_data(task_data)
+        if storage:
+            return storage
 
     def update_is_labeled(self):
         """Set is_labeled field according to annotations*.count > overlap
