@@ -14,6 +14,8 @@ meta_description: Label Studio Enterprise documentation about task agreement, an
 Label Studio Enterprise Edition includes various annotation and labeling statistics. The open source Community Edition of Label Studio does not perform these statistical calculations. If you're using Label Studio Community Edition, see <a href="label_studio_compare.html">Label Studio Features</a> to learn more.
 </p></div>
 
+Annotation statistics help you determine the quality of your dataset, its readiness to be used to train models, and assess the performance of your annotators. 
+
 ## Task agreement
 
 Task agreement shows the consensus between multiple annotators when labeling the same task. There are several types of task agreement in Label Studio Enterprise:
@@ -22,68 +24,7 @@ Task agreement shows the consensus between multiple annotators when labeling the
 
 You can also see how the annotations from a specific annotator compare to the prediction scores for a task, or how they compare to the ground truth labels for a task.
 
-For more about viewing agreement in Label Studio Enterprise, see [Verify model and annotator performance](quality.html#Verify-model-and-annotator-performance)
-
-## Matching score
-
-A matching score assesses the similarity of annotations for a specific task. The matching score is used differently depending on which agreement metrics are being calculated. 
-
-Matching scores are used to determine whether two given annotations for a task, represented by `x` and `y` in this example, match. 
-- If both `x` and `y` are empty annotations for a task, the matching score is `1`.
-- If `x` and `y` share no similar points, the matching score is `0`. 
-- If there are different labeling types used in the annotations in `x` and/or `y`, partial matching scores for each data labeling type are averaged.
-- For categorical task labeling, such as those using the Choices tag, Cohen's Kappa index is computed if specified in the project settings. 
-
-The type of data labeling being performed affects how the matching score is computed. The following examples describe how the matching scores for various labeling configuration tags are computed. 
-
-### Choices
-For data labeling where annotators select a choice, the matching score for two given task annotations `x` and `y` is computed like follows:
-
-- If `x` and `y` are the same choice, the matching score is `1`. 
-- If `x` and `y` are different choices, the matching score is `0`.
-
-### TextArea
-For data labeling where annotators transcribe text in a text area, the resulting annotations contain a list of text. The matching score for two given task annotations `x` and `y` is computed like follows:
-- The list of text items in each annotation is indexed, such that `x = [x1, x2, ..., xn]` and similarly, `y = [y1, y2, ..., yn]`.  
-- For each aligned pair of text items across the two annotations `(x1, y1)` the similarity of the text is calculated.
-- For each unaligned pair, for example, when one list of text is longer than the other, the similarity is zero. 
-- The similarity scores are averaged across all pairs, and the result is the matching score for the task. 
-
-The matching score for each aligned pair can be calculated in multiple ways:
-- Using an [edit distance algorithm](https://en.wikipedia.org/wiki/Edit_distance)
-- Splitting the list by words
-- Splitting the list by characters
-Decide what method to use to calculate the matching score based on your use case and how important precision is for your data labels.
-### Labels
-
-The matching score is calculated by comparing the intersection of annotations over the result spans, normalized by the length of each span. For two given task annotations `x` and `y`, the matching score formula is `m(x, y) = spans(x) ∩ spans(y)`.
-
-### Rating
-
-For data labeling where annotators select a rating, the matching score for two given task annotations `x` and `y` is computed like follows:
-
-- If `x` and `y` are the same rating, the matching score is `1`. 
-- If `x` and `y` are different ratings, the matching score is `0`.
-
-### Ranker
-
-The matching score is calculated using the mean average precision (mAP) for the annotation results.
-
-### RectangleLabels
-
-The method used to calculate the matching score depends on what you choose as the **Metric name** on the **Annotation Settings** page from the following options: 
-- Intersection over Union (IoU), averaged over all bounding box pairs with the best match. Default.
-- Precision computed for some threshold imposed on IoU.
-- Recall computed for some threshold imposed on IoU.
-- F-score computed for some threshold imposed on IoU.
-
-### PolygonLabels
-
-The method used to calculate the matching score depends on what you choose as the **Metric name** on the **Annotation Settings** page from the following options:
-- Intersection over Union (IoU), averaged over all polygon pairs with the best match. Default. 
-- Precision computed for some threshold imposed on IoU.
-- Recall computed for some threshold imposed on IoU.
-- F-score computed for some threshold imposed on IoU.
+For more about viewing agreement in Label Studio Enterprise, see [Verify model and annotator performance](quality.html#Verify-model-and-annotator-performance).
 
 ## Agreement method
 
@@ -120,3 +61,65 @@ The matching score for the first two annotations is 50%, based on the intersecti
 The task agreement conditions use a threshold of 40% to group annotations based on the matching score, so the first and second annotations are matched with each other, and the third annotation is considered mismatched. In this case, task agreement exists for 2 of the 3 annotations, so the overall task agreement score is 67%.  
 
 
+## Matching score
+
+Depending on the type of labeling that you perform, you can select a different type of matching function to use to calculate the matching score used in task agreement statistics. See [Define the matching function for annotation statistics](setup_project.html#Define-the-matching-function-for-annotation-statistics). 
+
+The matching score assesses the similarity of annotations for a specific task. For example, for two given annotations `x` and `y`, a matching function that performs a naive comparison of the results works like the following:
+- If both `x` and `y` are empty annotations, the matching score is `1`.
+- If `x` and `y` share no similar points, the matching score is `0`. 
+- If different labeling types are used in `x` and `y`, the partial matching scores for each data labeling type are averaged.
+- For categorical or classification labeling tasks, such as those using the Choices tag, Cohen's Kappa index is computed if specified in the project settings. 
+
+The following examples describe how the matching scores for various labeling configuration tags can be computed. 
+
+### Choices
+For data labeling tasks where annotators select a choice, such as image or text classification, multiple matching functions are available to select.
+
+If you select the `Exact matching choices` matching function, the matching score for two given task annotations `x` and `y` is computed like follows:
+- If `x` and `y` are the same choice, the matching score is `1`. 
+- If `x` and `y` are different choices, the matching score is `0`.
+
+### TextArea
+For data labeling tasks where annotators transcribe text in a text area, the resulting annotations contain a list of text. 
+
+You can select matching functions based on the intersection over one-dimensional text spans such as splitting the text area by words or characters, or using an [edit distance algorithm](https://en.wikipedia.org/wiki/Edit_distance). Decide what method to use to calculate the matching score based on your use case and how important precision is for your data labels.
+
+The matching score for two given task annotations `x` and `y` is computed like follows:
+- The list of text items in each annotation is indexed, such that `x = [x1, x2, ..., xn]` and similarly, `y = [y1, y2, ..., yn]`.  
+- For each aligned pair of text items across the two annotations `(x1, y1)` the similarity of the text is calculated.
+- For each unaligned pair, for example, when one list of text is longer than the other, the similarity is zero. 
+- The similarity scores are averaged across all pairs, and the result is the matching score for the task. 
+
+### Labels
+
+For data labeling tasks where annotators assign specific labels to regions or text spans, the matching score is calculated by comparing the intersection of annotations over the result spans, normalized by the length of each span. 
+
+For two given task annotations `x` and `y`, the matching score formula is `m(x, y) = spans(x) ∩ spans(y)`.
+
+### Rating
+
+For data labeling tasks where annotators select a rating, the matching score for two given task annotations `x` and `y` is computed like follows, using an exact matching function:
+
+- If `x` and `y` are the same rating, the matching score is `1`. 
+- If `x` and `y` are different ratings, the matching score is `0`.
+
+### Ranker
+
+For data labeling tasks where annotators perform ranking, the matching score is based on the mean average precision (mAP) of the annotation results.
+
+### RectangleLabels
+
+For data labeling tasks where annotators create bounding boxes of rectangles and label those rectangles, the matching score calculation depends on what you select as the **Metric name** on the **Annotation Settings** page. Select one of the following options: 
+- Intersection over Union (IoU), averaged over all bounding box pairs with the best match. This is the default matching function. 
+- Precision computed for some threshold imposed on IoU.
+- Recall computed for some threshold imposed on IoU.
+- F1 score, or F-score, computed for some threshold imposed on IoU.
+
+### PolygonLabels
+
+For data labeling tasks where annotators create polygons and label those polygonal regions, the matching score calculation depends on what you select as the **Metric name** on the **Annotation Settings** page. Select one of the following options:
+- Intersection over Union (IoU), averaged over all polygon pairs with the best match. This is the default matching function.  
+- Precision computed for some threshold imposed on IoU.
+- Recall computed for some threshold imposed on IoU.
+- F1 score, or F-score, computed for some threshold imposed on IoU.
