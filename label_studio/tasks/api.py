@@ -97,7 +97,10 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         PATCH=all_permissions.tasks_change,
         DELETE=all_permissions.tasks_delete,
     )
-    queryset = Task.objects.all()
+
+    def get_queryset(self):
+        return Task.objects.filter(project__organization=self.request.user.active_organization)
+
 
     def get_serializer_class(self):
         # GET => task + annotations + predictions + drafts

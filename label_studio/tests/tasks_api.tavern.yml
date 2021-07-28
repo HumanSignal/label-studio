@@ -1,0 +1,17 @@
+---
+test_name: tasks_api_test
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- id: create_project
+  type: ref
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/tasks'
+  response:
+    status_code: 200

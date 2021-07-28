@@ -71,7 +71,6 @@ class TaskPagination(PageNumberPagination):
     tags=['Data Manager'], operation_summary="Delete view",
     operation_description="Delete a view for a specific project."))
 class ViewAPI(viewsets.ModelViewSet):
-    queryset = View.objects.all()
     serializer_class = ViewSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["project"]
@@ -102,6 +101,9 @@ class ViewAPI(viewsets.ModelViewSet):
 
     def get_task_queryset(self, request, view):
         return Task.prepared.all(prepare_params=view.get_prepare_tasks_params())
+
+    def get_queryset(self):
+        return View.objects.filter(project__organization=self.request.user.active_organization)
 
     @swagger_auto_schema(tags=['Data Manager'], responses={200: task_serializer_class(many=True)})
     @action(detail=True, methods=["get"])
