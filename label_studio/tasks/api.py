@@ -34,12 +34,14 @@ logger = logging.getLogger(__name__)
         request_body=TaskSerializer))
 class TaskListAPI(generics.ListCreateAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
-    queryset = Task.objects.all()
     permission_required = ViewClassPermission(
         GET=all_permissions.tasks_view,
         POST=all_permissions.tasks_create,
     )
     serializer_class = TaskSerializer
+
+    def get_queryset(self):
+        return Task.objects.filter(project__organization=self.request.user.active_organization)
 
     @swagger_auto_schema(auto_schema=None)
     def get(self, request, *args, **kwargs):
@@ -88,7 +90,10 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
         PATCH=all_permissions.tasks_change,
         DELETE=all_permissions.tasks_delete,
     )
-    queryset = Task.objects.all()
+
+    def get_queryset(self):
+        return Task.objects.filter(project__organization=self.request.user.active_organization)
+
 
     def get_serializer_class(self):
         # GET => task + annotations + predictions + drafts
