@@ -1,6 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
-from django.conf import settings
+import copy
 from rest_framework import serializers
 
 from tasks.models import Task, Annotation
@@ -33,11 +33,11 @@ class ExportDataSerializer(serializers.ModelSerializer):
         project = task.project
         data = task.data
 
+        replace_task_data_undefined_with_config_field(data, project)
+
         # resolve uri for storage (s3/gcs/etc)
         if self.context.get('resolve_uri', False):
-            task.data['$resolved$'] = task.resolve_uri(task.data, proxy=self.context.get('proxy', False))
-
-        replace_task_data_undefined_with_config_field(data, project)
+            task.data['$resolved$'] = copy.copy(task.resolve_uri(task.data, proxy=self.context.get('proxy', False)))
 
         return super().to_representation(task)
 
