@@ -100,19 +100,20 @@ class ExportAPI(generics.RetrieveAPIView):
         only_finished = not bool_from_request(request.GET, 'download_all_tasks', False)
 
         logger.debug('Get tasks')
-        query = Task.objects.filter(project=project).select_related('project').prefetch_related('annotations', 'predictions')
+        query = Task.objects.filter(project=project)\
+            .select_related('project').prefetch_related('annotations', 'predictions')
         if only_finished:
             query = query.filter(annotations__isnull=False).distinct()
 
         # task_ids = query.values_list('id', flat=True)
-
-        logger.debug('Serialize tasks for export')
         tasks = []
+        resolve_uri = export_type in ('COCO', 'YOLO', 'VOC')
+        logger.debug('Serialize tasks for export')
         for sub_query in batch(query, 1000):
-            serializer = ExportDataSerializer(sub_query, many=True, context={'resolve_uri': True})
+            serializer = ExportDataSerializer(sub_query, many=True, context={'resolve_uri': resolve_uri})
             tasks += serializer.data
-        logger.debug('Prepare export files')
 
+        logger.debug('Prepare export files')
         export_stream, content_type, filename = DataExport.generate_export_file(project, tasks, export_type, request.GET)
 
         response = HttpResponse(File(export_stream), content_type=content_type)

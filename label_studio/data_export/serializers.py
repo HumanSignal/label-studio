@@ -29,17 +29,17 @@ class ExportDataSerializer(serializers.ModelSerializer):
     file_upload = serializers.ReadOnlyField(source='file_upload_name')
 
     # resolve $undefined$ key in task data, if any
-    def to_representation(self, instance):
-        project = instance.project
-        data = instance.data
+    def to_representation(self, task):
+        project = task.project
+        data = task.data
 
         # resolve uri for storage (s3/gcs/etc)
         if self.context.get('resolve_uri', False):
-            instance.data = instance.resolve_uri(instance.data, proxy=self.context.get('proxy', False))
+            task.data['$resolved$'] = task.resolve_uri(task.data, proxy=self.context.get('proxy', False))
 
         replace_task_data_undefined_with_config_field(data, project)
 
-        return super().to_representation(instance)
+        return super().to_representation(task)
 
     class Meta:
         model = Task
