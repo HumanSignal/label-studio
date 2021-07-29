@@ -69,7 +69,7 @@ The matching score assesses the similarity of annotations for a specific task. F
 - If both `x` and `y` are empty annotations, the matching score is `1`.
 - If `x` and `y` share no similar points, the matching score is `0`. 
 - If different labeling types are used in `x` and `y`, the partial matching scores for each data labeling type are averaged.
-- For categorical or classification labeling tasks, such as those using the Choices tag, Cohen's Kappa index is computed if specified in the project settings. 
+- For categorical or classification labeling tasks, such as those using the Choices tag, the matching score is calculated using the matching function specified in the project settings. 
 
 The following examples describe how the matching scores for various labeling configuration tags can be computed. 
 
