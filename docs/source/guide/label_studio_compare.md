@@ -14,14 +14,16 @@ Label Studio is available as a Community Edition open source data labeling tool 
 <table>
   <tr>
     <th>Functionality</th>
-    <th>Community Edition</th>
-    <th>Enterprise Edition</th>
+    <th>Community</th>
+    <th>Teams</th>
+    <th>Enterprise</th>
   </tr>
   <tr>
-    <td colspan="3"><b>User Management</b></td>
+    <td colspan="4"><b>User Management</b></td>
   </tr>
   <tr>
     <td>User accounts to associate labeling activities to a specific user.</td>
+    <td style="text-align:center">✔️</td>
     <td style="text-align:center">✔️</td>
     <td style="text-align:center">✔️</td>
   </tr>
