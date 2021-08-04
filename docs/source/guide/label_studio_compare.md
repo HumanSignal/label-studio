@@ -186,7 +186,7 @@ Label Studio is available as a Community Edition open source data labeling tool 
   <tr>
     <td>Activity log to use to audit annotator activity.</td>
     <td style="text-align:center">❌</td>
-    <td style="text-align:center">✔️</td>
+    <td style="text-align:center">❌</td>
     <td style="text-align:center">✔️</td>
   </tr>
   <tr>
