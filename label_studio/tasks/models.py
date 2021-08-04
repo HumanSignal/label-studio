@@ -89,7 +89,14 @@ class Task(TaskMixin, models.Model):
 
         num = num_locks + num_annotations
         if num > self.overlap:
-            logger.error(f"Num takes={num} > overlap={self.overlap} for task={self.id} - it's a bug")
+            logger.error(
+                f"Num takes={num} > overlap={self.overlap} for task={self.id} - it's a bug",
+                extra=dict(
+                    lock_ttl=self.get_lock_ttl(),
+                    num_locks=num_locks,
+                    num_annotations=num_annotations,
+                )
+            )
         return num >= self.overlap
 
     @property
@@ -100,7 +107,10 @@ class Task(TaskMixin, models.Model):
         if settings.TASK_LOCK_TTL is not None:
             return settings.TASK_LOCK_TTL
         avg_lead_time = self.project.annotations_lead_time()
-        return 3 * int(avg_lead_time) if avg_lead_time is not None else settings.TASK_LOCK_DEFAULT_TTL
+        ttl = settings.TASK_LOCK_DEFAULT_TTL
+        if avg_lead_time:
+            ttl = settings.TASK_LOCK_MIN_TTL + 3 * int(avg_lead_time)
+        return ttl
 
     def has_permission(self, user):
         return self.project.has_permission(user)
@@ -114,7 +124,7 @@ class Task(TaskMixin, models.Model):
         if num_locks < self.overlap:
             expire_at = now() + datetime.timedelta(seconds=self.get_lock_ttl())
             TaskLock.objects.create(task=self, user=user, expire_at=expire_at)
-            logger.debug(f'User={user} acquires a lock for the task={self}')
+            logger.debug(f'User={user} acquires a lock for the task={self} ttl: {self.get_lock_ttl()}')
         else:
             logger.error(
                 f"Current number of locks for task {self.id} is {num_locks}, but overlap={self.overlap}: "

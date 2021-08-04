@@ -245,9 +245,6 @@ class AnnotationsListAPI(generics.ListCreateAPIView):
         task = get_object_with_check_and_log(self.request, Task, pk=self.kwargs['pk'])
         # annotator has write access only to annotations and it can't be checked it after serializer.save()
         user = self.request.user
-        # Release task if it has been taken at work (it should be taken by the same user, or it makes sentry error
-        logger.debug(f'User={user} releases task={task}')
-        task.release_lock(user)
 
         # updates history
         update_id = self.request.user.id
@@ -281,6 +278,10 @@ class AnnotationsListAPI(generics.ListCreateAPIView):
         logger.debug(f'Save activity for user={self.request.user}')
         self.request.user.activity_at = timezone.now()
         self.request.user.save()
+
+        # Release task if it has been taken at work (it should be taken by the same user, or it makes sentry error
+        logger.debug(f'User={user} releases task={task}')
+        task.release_lock(user)
 
         # if annotation created from draft - remove this draft
         draft_id = self.request.data.get('draft_id')
