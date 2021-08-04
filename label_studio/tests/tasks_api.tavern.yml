@@ -12,6 +12,6 @@ stages:
 - name: stage
   request:
     method: GET
-    url: '{django_live_url}/api/tasks'
+    url: '{django_live_url}/api/tasks?project={project_pk}'
   response:
     status_code: 200
