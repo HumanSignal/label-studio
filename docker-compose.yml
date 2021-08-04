@@ -37,7 +37,7 @@ services:
     command: [ "./deploy/wait-for-postgres.sh", "bash", "/label-studio/deploy/start_label_studio.sh" ]
 
   db:
-    image: postgres:11.5
+    image: postgres:10.16
     hostname: db
     restart: always
     environment:
