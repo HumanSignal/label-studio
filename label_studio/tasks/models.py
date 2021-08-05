@@ -191,8 +191,12 @@ class Task(TaskMixin, models.Model):
         """Set is_labeled field according to annotations*.count > overlap
         """
         n = self.annotations.filter(Q_finished_annotations & Q(ground_truth=False)).count()
-        # self.is_labeled = n >= self.project.maximum_annotations
-        self.is_labeled = n >= self.overlap
+        finished_tasks = Task.objects.filter(project=self.project, is_labeled=True).count()
+        if finished_tasks < (self.project.tasks.count() * self.project.overlap_cohort_percentage / 100):
+            overlap = self.overlap
+        else:
+            overlap = 1
+        self.is_labeled = n >= overlap
 
     def reset_updates(self):
         """ Reset updates to default from model for one task.
