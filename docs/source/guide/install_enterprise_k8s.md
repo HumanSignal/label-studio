@@ -62,9 +62,15 @@ Before installing Label Studio Enterprise, prepare the Kubernetes cluster with [
 
 ## Configure the Helm chart for Label Studio Enterprise
 
-In order to install the chart, you'll need to pass in additional configuration. This configuration comes in the form of Helm values, which are key/value pairs. 
+To install Label Studio Enterprise using the Helm chart, you must configure specific values for your deployment. Configure these values in a YAML file that you specify when installing using Helm.
 
-A minimal install of LSE requires the following values:
+
+
+Set up a postgreSQL or Redis database to store relevant Label Studio Enterprise configurations and annotations. 
+
+
+
+A minimal installation of LSE requires the following values:
 
 ```yaml
 global:
@@ -382,7 +388,7 @@ rqworker:
     annotations: { }
 ```
 
-### Install Label Studio Enterprise using Helm on a Kubernetes Cluster
+## Install Label Studio Enterprise using Helm on a Kubernetes Cluster
 
 
 
@@ -391,6 +397,10 @@ Run `helm install` with your custom resource definitions  values provided:
 ```shell
 helm install lse . -f lse-values.yaml
 ```
+
+Specify any environment variables that you need to set for your Label Studio Enterprise installation using the `--set` argument with the `helm install` command.
+
+
 
 Check the status of the Kubernetes pod creation:
 ```shell
