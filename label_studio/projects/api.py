@@ -571,6 +571,7 @@ class TasksListAPI(generics.ListCreateAPIView,
                    APIViewVirtualRedirectMixin):
 
     parser_classes = (JSONParser, FormParser)
+    queryset = Task.objects.all()
     permission_required = ViewClassPermission(
         GET=all_permissions.tasks_view,
         POST=all_permissions.tasks_change,
@@ -580,7 +581,7 @@ class TasksListAPI(generics.ListCreateAPIView,
     redirect_route = 'projects:project-settings'
     redirect_kwarg = 'pk'
 
-    def get_queryset(self):
+    def filter_queryset(self, queryset):
         project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs.get('pk', 0))
         tasks = Task.objects.filter(project=project)
         return paginator(tasks, self.request)
