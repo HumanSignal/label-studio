@@ -12,8 +12,8 @@ Relation tag represents a single relation label
 
 | Param | Type | Description |
 | --- | --- | --- |
-| value | <code>string</code> | value of the relation |
-| [background] | <code>string</code> | background color of active label |
+| value | <code>string</code> | Value of the relation |
+| [background] | <code>string</code> | Background color of the active label |
 
 ### Example
 ```html

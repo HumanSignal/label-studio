@@ -6,7 +6,7 @@ meta_title: Style Tags to use CSS Styles
 meta_description: Label Studio Style Tags customize Label Studio with CSS Styles for machine learning and data science projects.
 ---
 
-Style tag, add css styles right through the config
+Style tag, add CSS styles right through the labeling config.
 
 ### Parameters
 ### Example
