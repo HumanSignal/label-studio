@@ -9,25 +9,14 @@ meta_description: Deploy Label Studio Enterprise on Kubernetes, such as on Amazo
 
 Deploy Label Studio Enterprise on a Kubernetes Cluster using Helm 3. 
 
-Use Helm charts to package an application for deployment onto a Kubernetes cluster and install, upgrade, and manage the application. 
+Use this Helm chart to set up Label Studio Enterprise for deployment onto a Kubernetes cluster and install, upgrade, and manage the application. 
 
-
-Use this chart to set up a Label Studio deployment on a Kubernetes cluster. 
-
-
-
-This chart bootstraps a Label Studio deployment on a Kubernetes cluster using the Helm package manager.
-
-This chart has been tested to work with NGINX Ingress, cert-manager.
 
 When installing this chart the release creates the following resources for a runtime node in the Kubernetes cluster:
 
-A Deployment
-A Service
+A Deployment??
+A Service??
 ??
-
-
-This chart has been tested and confirmed to work with the [NGINX Ingress Controller](https://www.nginx.com/products/nginx-ingress-controller/) and [cert-manager](https://cert-manager.io/docs/).
 
 ## Required software prerequisites
 
@@ -35,9 +24,10 @@ This chart has been tested and confirmed to work with the [NGINX Ingress Control
 - Helm version 3.6.3 or higher
 - Redis version 6.0.5 or higher or PostgreSQL version 11.9 or higher
 
-Your Kubernetes cluster can be self-hosted or installed somewhere such as Amazon EKS. See the Amazon tutorial on how to [Deploy a Kubernetes Application with Amazon Elastic Container Service for Kubernetes](https://aws.amazon.com/getting-started/hands-on/deploy-kubernetes-app-amazon-eks/) for more about deploying an app on Amazon EKS. 
+This chart has been tested and confirmed to work with the [NGINX Ingress Controller](https://www.nginx.com/products/nginx-ingress-controller/) and [cert-manager](https://cert-manager.io/docs/).
 
 
+Your Kubernetes cluster can be self-hosted or installed somewhere such as Amazon EKS. See the Amazon tutorial on how to [Deploy a Kubernetes Application with Amazon Elastic Container Service for Kubernetes](https://aws.amazon.com/getting-started/hands-on/deploy-kubernetes-app-amazon-eks/) for more about deploying an app on Amazon EKS.
 
 ## Prepare the Kubernetes cluster
 
@@ -104,13 +94,12 @@ app:
 #      - secretName: ssl-cert
 #        hosts:
 #          - studio.yourdomain.com
+```
 
 
-``` 
+Copy these into a new file and save it as `lse-values.yaml`. 
 
-Copy these into a new file, which we'll call `lse-values.yaml`. 
-
-Adjust the included defaults to reflect your environment. For the ful list of configurables, see the [values.yaml](values.yaml)
+Adjust the included defaults to reflect your environment. For the ful list of configurable options, see the [values.yaml](values.yaml):
 
 ```yaml
 
@@ -390,8 +379,6 @@ rqworker:
 
 ## Install Label Studio Enterprise using Helm on a Kubernetes Cluster
 
-
-
 Run `helm install` with your custom resource definitions  values provided:
 
 ```shell
@@ -400,18 +387,12 @@ helm install lse . -f lse-values.yaml
 
 Specify any environment variables that you need to set for your Label Studio Enterprise installation using the `--set` argument with the `helm install` command.
 
-
-
-Check the status of the Kubernetes pod creation:
+After installing, check the status of the Kubernetes pod creation:
 ```shell
 kubectl get pods
 ```
 
-
 ## Upgrade Label Studio using Helm
-
-
-
 Run `helm upgrade` with your values provided:
 
 ```console
@@ -427,5 +408,3 @@ Run simple `helm delete`:
 ```console
 $ helm delete lse
 ```
-
-
