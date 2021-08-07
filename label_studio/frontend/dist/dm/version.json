@@ -1,6 +1,6 @@
 {
-  "message": "Don't close QuickView by Enter",
-  "commit": "d12a691d1e941768c3067ccb15abe5498f8a453b",
+  "message": "Tune build scripts",
+  "commit": "46956cf9fade0af365867d2f6192d869ad08fd6e",
   "branch": "master",
-  "date": "2021-06-30T16:06:22Z"
+  "date": "2021-07-26T00:23:40Z"
 }

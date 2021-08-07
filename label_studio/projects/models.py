@@ -189,7 +189,8 @@ class Project(ProjectMixin, models.Model):
 
     @property
     def only_undefined_field(self):
-        return self.one_object_in_label_config and self.summary.common_data_columns and self.summary.common_data_columns[0] == settings.DATA_UNDEFINED_NAME
+        return self.one_object_in_label_config and self.summary.common_data_columns \
+               and self.summary.common_data_columns[0] == settings.DATA_UNDEFINED_NAME
 
     @property
     def get_labeled_count(self):

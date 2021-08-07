@@ -9,6 +9,8 @@ from django.contrib.postgres.aggregates import ArrayAgg
 from django.db.models.fields.json import KeyTransform
 from django.db.models.functions import Coalesce
 from django.conf import settings
+from django.db.models.functions import Cast
+from django.db.models import FloatField
 
 from data_manager.prepare_params import ConjunctionEnum
 from label_studio.core.utils.params import cast_bool_from_str
@@ -31,16 +33,13 @@ operators = {
 }
 
 
-def preprocess_field_name(raw_field_name, operator, only_undefined_field=False):
+def preprocess_field_name(raw_field_name, only_undefined_field=False):
     field_name = raw_field_name.replace("filter:tasks:", "")
     if field_name.startswith("data."):
         if only_undefined_field:
             field_name = f'data__{settings.DATA_UNDEFINED_NAME}'
         else:
             field_name = field_name.replace("data.", "data__")
-
-    # append operator
-    field_name = "{}{}".format(field_name, operators.get(operator, ""))
 
     return field_name
 
@@ -127,11 +126,23 @@ def apply_filters(queryset, filters):
 
     for _filter in filters.items:
         # we can also have annotations filters
-        if not _filter.filter.startswith("filter:tasks:"):
+        if not _filter.filter.startswith("filter:tasks:") or not _filter.value:
             continue
 
         # django orm loop expression attached to column name
-        field_name = preprocess_field_name(_filter.filter, _filter.operator, only_undefined_field)
+        field_name = preprocess_field_name(_filter.filter, only_undefined_field)
+
+        # annotate with number if need
+        if _filter.type == 'Number' and field_name.startswith('data__'):
+            json_field = field_name.replace('data__', '')
+            queryset = queryset.annotate(**{f'filter_{json_field.replace("$undefined$", "undefined")}':
+                                                Cast(KeyTransform(json_field, 'data'), output_field=FloatField())})
+            clean_field_name = f'filter_{json_field.replace("$undefined$", "undefined")}'
+        else:
+            clean_field_name = field_name
+
+        # append operator
+        field_name = "{}{}".format(clean_field_name, operators.get(_filter.operator, ""))
 
         # in
         if _filter.operator == "in":
@@ -159,7 +170,7 @@ def apply_filters(queryset, filters):
 
         # empty
         elif _filter.operator == 'empty':
-            if _filter.value == 'True':
+            if _filter.value.lower() == 'true':
                 filter_expression.add(Q(**{field_name: True}), conjunction)
             else:
                 filter_expression.add(~Q(**{field_name: True}), conjunction)
