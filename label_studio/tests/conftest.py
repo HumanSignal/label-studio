@@ -36,7 +36,6 @@ boto3.set_stream_logger('botocore.credentials', logging.DEBUG)
 def disable_sentry():
     settings.SENTRY_RATE = 0
     settings.SENTRY_DSN = None
-    print('\n\n\n\n=======> IM HERE !!!!!!!!!!!!!!!!!!!!\n\n\n\n')
 
 
 @pytest.fixture(scope="function")
