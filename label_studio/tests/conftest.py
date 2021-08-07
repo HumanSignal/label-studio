@@ -17,12 +17,12 @@ from users.models import User
 from organizations.models import Organization
 from types import SimpleNamespace
 
+# if we haven't this package, pytest.ini::env doesn't work
 try:
-    import pytest_env
+    import pytest_env.plugin
 except ImportError:
-    print('Please, make "pip install pytest-env"')
+    print('\n\n !!! Please, pip install pytest-env \n\n')
     exit(-100)
-
 
 from .utils import (
     create_business, signin, gcs_client_mock, ml_backend_mock, register_ml_backend_mock, azure_client_mock,
