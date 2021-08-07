@@ -17,6 +17,13 @@ from users.models import User
 from organizations.models import Organization
 from types import SimpleNamespace
 
+try:
+    import pytest_env
+except ImportError:
+    print('Please, make "pip install pytest-env"')
+    exit(-100)
+
+
 from .utils import (
     create_business, signin, gcs_client_mock, ml_backend_mock, register_ml_backend_mock, azure_client_mock,
     redis_client_mock, make_project
@@ -25,17 +32,14 @@ from .utils import (
 boto3.set_stream_logger('botocore.credentials', logging.DEBUG)
 
 
-settings.SENTRY_RATE = 0
-settings.SENTRY_DSN = ''
-
-
-@pytest.fixture(scope="function", autouse=True)
+@pytest.fixture(autouse=True)
 def disable_sentry():
     settings.SENTRY_RATE = 0
-    settings.SENTRY_DSN = ''
+    settings.SENTRY_DSN = None
+    print('\n\n\n\n=======> IM HERE !!!!!!!!!!!!!!!!!!!!\n\n\n\n')
 
 
-@pytest.fixture(scope="function", autouse=True)
+@pytest.fixture(scope="function")
 def enable_sentry():
     settings.SENTRY_RATE = 0
     # it's disabled key, but this is correct
