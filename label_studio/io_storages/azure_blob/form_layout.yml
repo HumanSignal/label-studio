@@ -43,7 +43,7 @@ ImportStorage:
   # 2 columns grid
   - columnCount: 2
     columns:
-      - width: 371
+      - width: 345
         fields:
           - type: toggle
             name: use_blob_urls
@@ -56,6 +56,7 @@ ImportStorage:
             value: true
           - type: counter
             name: presign_ttl
+            label: Expiration minutes
             value: 1
             min: 1
             dependency: presign
