@@ -36,23 +36,14 @@ logger = logging.getLogger(__name__)
 class TaskListAPI(generics.ListCreateAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     queryset = Task.objects.all()
-    filterset_fields = ['project']
     permission_required = ViewClassPermission(
         GET=all_permissions.tasks_view,
         POST=all_permissions.tasks_create,
     )
     serializer_class = TaskSerializer
 
-    def get_queryset(self):
-        pk = int_from_request(self.request.GET, 'project', 0) or int_from_request(self.request.data, 'project', 0)
-        if not pk:
-            raise ValueError('Project is not set')
-
-        project = get_object_with_check_and_log(self.request, Project, pk=pk)
-        if not project.has_permission(self.request.user):
-            raise DRFPermissionDenied('No project access')
-
-        return Task.objects.filter(project__organization=self.request.user.active_organization)
+    def filter_queryset(self, queryset):
+        return queryset.filter(project__organization=self.request.user.active_organization)
 
     @swagger_auto_schema(auto_schema=None)
     def get(self, request, *args, **kwargs):

@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
         """
     ))
 class OrganizationListAPI(generics.ListCreateAPIView):
-
+    queryset = Organization.objects.all()
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = ViewClassPermission(
         GET=all_permissions.organizations_view,
@@ -49,8 +49,8 @@ class OrganizationListAPI(generics.ListCreateAPIView):
         self.check_object_permissions(self.request, org)
         return org
 
-    def get_queryset(self):
-        return Organization.objects.filter(users=self.request.user).distinct()
+    def filter_queryset(self, queryset):
+        return queryset.filter(users=self.request.user).distinct()
 
     def get(self, request, *args, **kwargs):
         return super(OrganizationListAPI, self).get(request, *args, **kwargs)
