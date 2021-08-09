@@ -238,10 +238,9 @@ def annotate_completed_at(queryset):
 
 
 def annotate_cancelled_annotations(queryset):
-    from tasks.models import Annotation
-
-    cancelled_annotations = Annotation.objects.filter(was_cancelled=True, task=OuterRef("pk"))
-    return queryset.annotate(cancelled_annotations=Exists(cancelled_annotations))
+    return queryset.annotate(
+        cancelled_annotations=Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=False))
+    )
 
 
 def annotate_annotations_results(queryset):
