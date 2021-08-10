@@ -24,7 +24,7 @@ Some available commands for Label Studio provide information or start the Label 
 | `label-studio` | Start the Label Studio server. |
 | `label-studio -h` `label-studio --help` | Display available command line arguments. |
 | `label-studio init <project_name> <optional_arguments>` | Initialize a specific project in Label Studio. |
-| `label-studio start <project_name> --init <optional_arguments>` | Start the Label Studio server and initiliaze a specific project. |
+| `label-studio start <project_name> --init <optional_arguments>` | Start the Label Studio server and initialize a specific project. |
 | `label-studio reset_password` | Reset the password for a specific Label Studio username. See [Create user accounts for Label Studio](signup.html). |
 | `label-studio shell` | Get access to a shell for Label Studio to manipulate data directly. See documentation for the Django [shell-plus command](https://django-extensions.readthedocs.io/en/latest/shell_plus.html). |
 | `label-studio version` | Show the version of Label Studio and then terminates.
