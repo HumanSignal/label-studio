@@ -403,16 +403,19 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
             project.prepared_tasks = get_prepared_queryset(self.request, project)
 
         # detect solved and not solved tasks
-        user_solved_tasks_array = user.annotations.filter(ground_truth=False)\
-            .exclude(was_cancelled=True)\
-            .filter(task__isnull=False).distinct().values_list('task__pk', flat=True)
+        assigned_flag = hasattr(self, 'assignee_flag') and self.assignee_flag
+        user_solved_tasks_array = user.annotations.filter(ground_truth=False)
+        if not assigned_flag:
+            user_solved_tasks_array = user_solved_tasks_array.exclude(was_cancelled=True)
+        user_solved_tasks_array = user_solved_tasks_array.filter(task__isnull=False)\
+            .distinct().values_list('task__pk', flat=True)
 
         with conditional_atomic():
             not_solved_tasks = project.prepared_tasks.\
                 exclude(pk__in=user_solved_tasks_array)
 
             # if annotator is assigned for tasks, he must to solve it regardless of is_labeled=True
-            assigned_flag = hasattr(self, 'assignee_flag') and self.assignee_flag
+
             if not assigned_flag:
                 not_solved_tasks = not_solved_tasks.filter(is_labeled=False)
 
