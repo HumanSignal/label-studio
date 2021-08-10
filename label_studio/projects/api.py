@@ -405,8 +405,6 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
         # detect solved and not solved tasks
         assigned_flag = hasattr(self, 'assignee_flag') and self.assignee_flag
         user_solved_tasks_array = user.annotations.filter(ground_truth=False)
-        if not assigned_flag:
-            user_solved_tasks_array = user_solved_tasks_array.exclude(was_cancelled=True)
         user_solved_tasks_array = user_solved_tasks_array.filter(task__isnull=False)\
             .distinct().values_list('task__pk', flat=True)
 
