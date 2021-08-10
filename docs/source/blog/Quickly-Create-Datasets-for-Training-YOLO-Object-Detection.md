@@ -2,7 +2,7 @@
 title: Quickly Create Datasets for Training YOLO Object Detection with Label Studio
 type: blog
 order: 94
-image: /images/yolo-blog/PLACEHOLDER.GIF
+image: /images/yolo-blog/quick-label.gif
 meta_title: Quickly Create Datasets for Training YOLO Object Detection with Label Studio
 meta_description: Use open source data labeling software Label Studio to quickly create YOLO v3 and v4 compatible datasets for training purposes and ground truth image labels for image object detection data science and machine learning projects.
 ---
@@ -35,12 +35,12 @@ Use Label Studio to label a dataset of home photographs with a set of "known tru
 
 When labeling your ground truth dataset for an object detection model, keep in mind the following best practices:
 - Label an equal number of photographs with the features you want to identify as those without. For example, make sure there is an even distribution of homes with pools as homes without pools if you want the model to detect pools. 
-- Create the bounding boxes to encompass the entire pool, driveway, patio, or relevant components visible in the photos.
+- Create the bounding boxes to encompass the entire pool, driveway, or relevant components visible in the photos.
 - Label at least 50 images of houses to train the model.
 - Label images of the same resolution quality and from the same angles as those that you plan to process with the trained model. 
 - Limit the number of objects that you want to detect to improve model accuracy for detecting those objects. 
 
-<br/><img src="/images/yolo-blog/PLACEHOLDER.png" alt="Screenshot of the best practices added to the instructions for a data labeling project in the Label Studio UI." class="gif-border" width="800px" height="429px" />
+<br/><img src="/images/yolo-blog/label-instructions.png" alt="Screenshot of the best practices added to the instructions for a data labeling project in the Label Studio UI." class="gif-border" width="800px" height="429px" />
 
 ## Label the object detection dataset 
 
@@ -71,7 +71,7 @@ Import your data and set up the labeling interface to start labeling the trainin
 4. Change the default label names to be a list of: Home, Pool, Fence, Driveway, and Other. 	
 5. Save the project. 
 
-<br/><img src="/images/yolo-blog/PLACEHOLDER.png" alt="Screenshot of the project set up in the Label Studio UI." class="gif-border" width="800px" height="429px" />
+<br/><img src="/images/yolo-blog/project-setup.png" alt="Screenshot of the project set up in the Label Studio UI." class="gif-border" width="800px" height="429px" />
 
 If you want, you can update the **Instructions** in the Labeling Settings for your project to include some of the best practices as reminders. 
 
@@ -79,7 +79,7 @@ If you want, you can update the **Instructions** in the Labeling Settings for yo
 
 Use Label Studio to label the dataset with ground truth annotations. To accelerate your data labeling, you can collaborate with a team of annotators to label the dataset.
 
-<br/><img src="/images/yolo-blog/PLACEHOLDER.gif" alt="Gif of quickly labeling an aerial image with bounding boxes for sidewalks and driveways in the Label Studio UI." class="gif-border" width="800px" height="429px" />
+<br/><img src="/images/yolo-blog/quick-label.gif" alt="Gif of quickly labeling an aerial image with bounding boxes for pools, homes, and driveways in the Label Studio UI." class="gif-border" width="800px" height="429px" />
 
 1. Click **Label All Tasks** to start labeling the dataset. 
 2. For each image, use a keyboard shortcut to select the relevant label class, then draw a bounding box around each relevant object in the image. 
@@ -93,28 +93,40 @@ To use a YOLO model to perform future home photo analysis, you'll want to train 
 After you finish labeling the dataset in Label Studio, export it in YOLO v3 format to train your model.
 
 1. In Label Studio, click **Export**.
-2. Select the **YOLO** format. A `txt` file downloads in your web browser. 
+2. Select the **YOLO** format. A `zip` file downloads in your web browser. 
 
-The exported data looks like the following:
-<br/><img src="/images/yolo-blog/PLACEHOLDER.png" alt="Screenshot of the image annotations in YOLO v3 compatible format as text output from Label Studio." class="gif-border" width="800px" height="429px" />
+The exported data has the following structure, after expanding the exported file:
+```
+project-ID-at-YEAR-MONTH-DAY-HOUR-MINUTE-STRING.zip
+    notes.json
+    classes.txt
+    labels
+        image_filename1.txt
+        image_filename2.txt
+        image_filename3.txt
+        ...
+    images
+        image_filename1.jpg
+        image_filename2.jpg
+        image_filename3.jpg
+        ...
+```
 
 ## Train the YOLO model with the dataset
 
 To train your YOLO model with the dataset that you created, you need to specify the class names and the number of classes, as well as a file listing URLs to all of the images that you'll use for training. 
 
+The YOLO export from Label Studio includes a `classes.txt` file that contains the names of the classes that were used when annotating images, as well as directories including the source images and `.txt` files with bounding box details for each image in the format expected by YOLO models. For example:
+```txt
+1 0.8524209136801734 0.6172275218289784 0.016613279671871473 0.007998986508678854
+0 0.8594874169350379 0.6205552384209734 0.0072606185232622624 0.004061023919790841
+1 0.8287479881701304 0.5940571972474851 0.010871468973849227 0.008614293163192694
+```
+
 See the README for the darknet YOLOv3 and YOLOv4 models for [How to train (to detect your custom objects)](https://github.com/AlexeyAB/darknet#how-to-train-to-detect-your-custom-objects).
 
-In this case, there are 5 total label classes identified to train the object detection model:
-1. Home
-2. Pool
-3. Fence
-4. Driveway
-5. Other
-
-Specify the names of those classes in an `obj.names` file. 
-
 Reference the image datasets in two ways:
-- Specify the paths to the labeled images in a `train.txt` file.
+- Specify the paths to the labeled images in a `train.txt` file. Label Studio YOLO export places these images in an `images` directory. 
 - Specify the paths to unlabeled images of similar quality and type in a `test.txt` file.
 
 You also need to create an `obj.data` file with the following lines:
@@ -126,14 +138,11 @@ names = data/obj.names
 backup = backup/
 ```
 
-You'll also need the `.txt` file 
-
 In the yolov3.cfg file, refer to [the guidance in the Darknet GitHub repo](https://github.com/AlexeyAB/darknet#how-to-train-to-detect-your-custom-objects) to update the following:
 - Change `[classes=80]` to `[classes=5]`.
 - Change `[filters=255]` to `[filters=30]`.
 
-After you set up the YOLO model environment for training, you can train your dataset and validate it on future aerial images of homes. 
+After you set up the YOLO model environment for training, you can train your dataset and validate it on future aerial images of homes.
 
 ## Key Takeaways
-
-Training a custom YOLO object detection model can be time consuming and tedious, but with the collaborative labeling powers of Label Studio combined with the keyboard shortcuts and accelerated labeling techniques for creating bounding boxes, you can speed up your labeling process and get to training faster. 
+Training a custom YOLO object detection model can be time-consuming and tedious, but with the collaborative labeling powers of Label Studio combined with the keyboard shortcuts and accelerated labeling techniques for creating bounding boxes, you can speed up your labeling process and get to training faster. Label Studio's native support of the YOLO v3 and v4 format makes it easy to export your custom dataset and start training object detection models quickly after you finish annotating images. 
