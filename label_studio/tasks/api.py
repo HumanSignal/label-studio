@@ -36,23 +36,14 @@ logger = logging.getLogger(__name__)
 class TaskListAPI(generics.ListCreateAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     queryset = Task.objects.all()
-    filterset_fields = ['project']
     permission_required = ViewClassPermission(
         GET=all_permissions.tasks_view,
         POST=all_permissions.tasks_create,
     )
     serializer_class = TaskSerializer
 
-    def get_queryset(self):
-        pk = int_from_request(self.request.GET, 'project', 0) or int_from_request(self.request.data, 'project', 0)
-        if not pk:
-            raise ValueError('Project is not set')
-
-        project = get_object_with_check_and_log(self.request, Project, pk=pk)
-        if not project.has_permission(self.request.user):
-            raise DRFPermissionDenied('No project access')
-
-        return Task.objects.filter(project__organization=self.request.user.active_organization)
+    def filter_queryset(self, queryset):
+        return queryset.filter(project__organization=self.request.user.active_organization)
 
     @swagger_auto_schema(auto_schema=None)
     def get(self, request, *args, **kwargs):
@@ -245,9 +236,6 @@ class AnnotationsListAPI(generics.ListCreateAPIView):
         task = get_object_with_check_and_log(self.request, Task, pk=self.kwargs['pk'])
         # annotator has write access only to annotations and it can't be checked it after serializer.save()
         user = self.request.user
-        # Release task if it has been taken at work (it should be taken by the same user, or it makes sentry error
-        logger.debug(f'User={user} releases task={task}')
-        task.release_lock(user)
 
         # updates history
         update_id = self.request.user.id
@@ -281,6 +269,10 @@ class AnnotationsListAPI(generics.ListCreateAPIView):
         logger.debug(f'Save activity for user={self.request.user}')
         self.request.user.activity_at = timezone.now()
         self.request.user.save()
+
+        # Release task if it has been taken at work (it should be taken by the same user, or it makes sentry error
+        logger.debug(f'User={user} releases task={task}')
+        task.release_lock(user)
 
         # if annotation created from draft - remove this draft
         draft_id = self.request.data.get('draft_id')

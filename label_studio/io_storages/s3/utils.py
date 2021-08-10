@@ -42,7 +42,7 @@ def get_client_and_resource(
     return client, resource
 
 
-def resolve_s3_url(url, client, presign=True):
+def resolve_s3_url(url, client, presign=True, expires_in=3600):
     r = urlparse(url, allow_fragments=False)
     bucket_name = r.netloc
     key = r.path.lstrip('/')
@@ -58,8 +58,8 @@ def resolve_s3_url(url, client, presign=True):
     try:
         presigned_url = client.generate_presigned_url(
             ClientMethod='get_object',
-            Params={'Bucket': bucket_name, 'Key': key}
-        )
+            Params={'Bucket': bucket_name, 'Key': key},
+            ExpiresIn=expires_in)
     except ClientError as exc:
         logger.warning(f'Can\'t generate presigned URL for {url}. Reason: {exc}')
         return url

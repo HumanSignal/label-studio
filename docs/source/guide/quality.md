@@ -10,7 +10,7 @@ meta_description: Review the annotations produced by annotators in your Label St
 
 > Beta documentation: Label Studio Enterprise v2.0.0 is currently in Beta. As a result, this documentation might not reflect the current functionality of the product.
 
-After multiple labelers have annotated tasks, review their output to validate the quality of the results. You can also perform this task after a model has predicted labels for tasks in your dataset. 
+After multiple labelers have annotated tasks, review their output to validate the quality of the results. You can also perform this task after a model has predicted labels for tasks in your dataset. To configure the settings for reviewing annotations, see [Set up review settings for your project](setup_project.html#Set-up-review-settings-for-your-project).
 
 <div class="enterprise"><p>
 The annotation review workflow is only available in Label Studio Enterprise Edition. If you're using Label Studio Community Edition, see <a href="label_studio_compare.html">Label Studio Features</a> to learn more.
@@ -27,7 +27,7 @@ After you [assign reviewers to tasks](#Assign-reviewers-to-tasks), they can revi
 1. Reviewers can click **Review Annotations** for a specific project, then click **Review All Tasks** on the Data Manager to start reviewing tasks. Administrators and project managers can click **Explore All Reviews** from the Data Manager or **Explore Review** from the Dashboard to review tasks.
 2. Review the first task and annotation. By default, you view the tasks in numeric order. If you want to change the order that you review tasks, see [Choose what to review](#Choose-what-to-review). You can see the annotator and their annotation. 
 - If the annotation is correct, click **Accept**.
-- If the annotation is mostly correct, you can correct it by selecting a different option, changing which region is selected, moving the bounding box, or whichever makes sense for the type of label you're reviewing. After correcting the annotation, click **Fix & Accept**. 
+- If the annotation is mostly correct, you can correct it by selecting a different option, changing the selected region, moving the bounding box, or whichever makes sense for the type of label you're reviewing. After correcting the annotation, click **Fix & Accept**. 
 - If the annotation is completely incorrect, or you don't want to attempt to correct it at all, click **Reject** to reject the annotation. To place a rejected task back in the Label Stream for annotation, you must delete the annotation. Rejecting an annotation does not return it to annotators to re-label.
 After you complete a review, the next task appears for your review.
 3. Continue reviewing annotated tasks until you've reviewed all annotated tasks. Click **Data Manager** to return to the list of tasks for the project.
@@ -60,7 +60,7 @@ If you don't see an annotator's activity reflected on the dashboard, make sure t
 
 The dataset progress displays the number of tasks considered to be fully annotated for the project. If the project requires a minimum annotation per task of more than one, some tasks might not appear as "annotated" because they are not yet fully annotated by the project standards.
 
-You can review how many tasks are left to be completed by annotators, how many tasks have been skipped, and how many tasks have been reviewed.
+You can review how many tasks remain to be completed by annotators, how many tasks have been skipped, and how many tasks have been reviewed.
 
 ### Review label distribution
 For specific labels, you can see in a donut chart how many labels of each type were applied to the tasks. Use this chart to identify possible problems with your dataset distribution, if some labels are overrepresented in an annotated dataset compared with others. 
