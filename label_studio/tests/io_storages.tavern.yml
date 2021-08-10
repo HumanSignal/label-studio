@@ -28,6 +28,7 @@ stages:
       project: '{project_pk}'
       title: Testing S3 storage (bucket from conftest.py)
       use_blob_urls: true
+      presign_ttl: 3600
     method: POST
     url: '{django_live_url}/api/storages/s3'
   response:
@@ -430,7 +431,7 @@ stages:
     data:
       bucket: pytest-export-gcs-bucket
       project: '{project_pk}'
-      title: Testing Export S3 storage (bucket from conftest.py)
+      title: Testing Export GCS storage (bucket from conftest.py)
     method: POST
     url: '{django_live_url}/api/storages/export/gcs'
   response:
