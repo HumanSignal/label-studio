@@ -179,7 +179,7 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
                         "filter": "filter:tasks:completed_at",
                         "operator": "less",
                         "type": "Datetime",
-                        "value": now().isoformat(),
+                        "value": now().strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
                     }
                 ],
             },
@@ -193,7 +193,7 @@ def test_views_ordering(ordering, element_index, undefined, business_client, pro
                         "filter": "filter:tasks:completed_at",
                         "operator": "greater",
                         "type": "Datetime",
-                        "value": now().isoformat(),
+                        "value": now().strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
                     }
                 ],
             },
