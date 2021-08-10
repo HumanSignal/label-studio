@@ -153,7 +153,7 @@ class S3ImportStorage(S3StorageMixin, ImportStorage):
             uri, storage = get_uri_via_regex(data, prefixes=(url_scheme,))
             if not storage:
                 return
-            resolved_uri = resolve_s3_url(uri, self.get_client(), self.presign)
+            resolved_uri = resolve_s3_url(uri, self.get_client(), self.presign, expires_in=self.presign_ttl * 60)
             return data.replace(uri, resolved_uri)
         except NoCredentialsError:
             logger.warning(f'No AWS credentials specified for {data}')
