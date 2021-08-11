@@ -9,6 +9,8 @@ stages:
   type: ref
 - id: create_project
   type: ref
+- id: create_task
+  type: ref
 - name: stage
   request:
     method: GET

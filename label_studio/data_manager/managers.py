@@ -9,10 +9,15 @@ from django.contrib.postgres.aggregates import ArrayAgg
 from django.db.models.fields.json import KeyTransform
 from django.db.models.functions import Coalesce
 from django.conf import settings
+from django.db.models.functions import Cast
+from django.db.models import FloatField
+from datetime import datetime
 
 from data_manager.prepare_params import ConjunctionEnum
 from label_studio.core.utils.params import cast_bool_from_str
 
+
+DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 
 logger = logging.getLogger(__name__)
 
@@ -31,16 +36,13 @@ operators = {
 }
 
 
-def preprocess_field_name(raw_field_name, operator, only_undefined_field=False):
+def preprocess_field_name(raw_field_name, only_undefined_field=False):
     field_name = raw_field_name.replace("filter:tasks:", "")
     if field_name.startswith("data."):
         if only_undefined_field:
             field_name = f'data__{settings.DATA_UNDEFINED_NAME}'
         else:
             field_name = field_name.replace("data.", "data__")
-
-    # append operator
-    field_name = "{}{}".format(field_name, operators.get(operator, ""))
 
     return field_name
 
@@ -106,10 +108,22 @@ def apply_ordering(queryset, ordering):
 
 
 def cast_value(_filter):
-    if _filter.type == 'Number':
-        _filter.value = float(_filter.value)
-    elif _filter.type == 'Boolean':
-        _filter.value = cast_bool_from_str(_filter.value)
+    # range (is between)
+    if hasattr(_filter.value, 'max'):
+        if _filter.type == 'Number':
+            _filter.value.min = float(_filter.value.min)
+            _filter.value.max = float(_filter.value.max)
+        elif _filter.type == 'Datetime':
+            _filter.value.min = datetime.strptime(_filter.value.min, DATETIME_FORMAT)
+            _filter.value.max = datetime.strptime(_filter.value.max, DATETIME_FORMAT)
+    # one value
+    else:
+        if _filter.type == 'Number':
+            _filter.value = float(_filter.value)
+        elif _filter.type == 'Datetime':
+            _filter.value = datetime.strptime(_filter.value, DATETIME_FORMAT)
+        elif _filter.type == 'Boolean':
+            _filter.value = cast_bool_from_str(_filter.value)
 
 
 def apply_filters(queryset, filters):
@@ -127,19 +141,40 @@ def apply_filters(queryset, filters):
 
     for _filter in filters.items:
         # we can also have annotations filters
-        if not _filter.filter.startswith("filter:tasks:"):
+        if not _filter.filter.startswith("filter:tasks:") or not _filter.value:
             continue
 
         # django orm loop expression attached to column name
-        field_name = preprocess_field_name(_filter.filter, _filter.operator, only_undefined_field)
+        field_name = preprocess_field_name(_filter.filter, only_undefined_field)
+
+        # annotate with cast to number if need
+        if _filter.type == 'Number' and field_name.startswith('data__'):
+            json_field = field_name.replace('data__', '')
+            queryset = queryset.annotate(**{
+                f'filter_{json_field.replace("$undefined$", "undefined")}':
+                    Cast(KeyTransform(json_field, 'data'), output_field=FloatField())
+            })
+            clean_field_name = f'filter_{json_field.replace("$undefined$", "undefined")}'
+        else:
+            clean_field_name = field_name
+
+        # special case: predictions, annotations, cancelled --- for them 0 is equal to is_empty=True
+        if clean_field_name in ('total_predictions', 'total_annotations', 'cancelled_annotations') and \
+                _filter.operator == 'empty':
+            _filter.operator = 'equal' if cast_bool_from_str(_filter.value) else 'not_equal'
+            _filter.value = 0
+
+        # append operator
+        field_name = f"{clean_field_name}{operators.get(_filter.operator, '')}"
 
         # in
         if _filter.operator == "in":
+            cast_value(_filter)
             filter_expression.add(
                 Q(
                     **{
-                        "{}__gte".format(field_name): _filter.value.min,
-                        "{}__lte".format(field_name): _filter.value.max,
+                        f"{field_name}__gte": _filter.value.min,
+                        f"{field_name}__lte": _filter.value.max,
                     }
                 ),
                 conjunction,
@@ -147,11 +182,12 @@ def apply_filters(queryset, filters):
 
         # not in
         elif _filter.operator == "not_in":
+            cast_value(_filter)
             filter_expression.add(
                 ~Q(
                     **{
-                        "{}__gte".format(field_name): _filter.value.min,
-                        "{}__lte".format(field_name): _filter.value.max,
+                        f"{field_name}__gte": _filter.value.min,
+                        f"{field_name}__lte": _filter.value.max,
                     }
                 ),
                 conjunction,
@@ -159,7 +195,7 @@ def apply_filters(queryset, filters):
 
         # empty
         elif _filter.operator == 'empty':
-            if _filter.value == 'True':
+            if cast_bool_from_str(_filter.value):
                 filter_expression.add(Q(**{field_name: True}), conjunction)
             else:
                 filter_expression.add(~Q(**{field_name: True}), conjunction)
@@ -226,13 +262,6 @@ def annotate_completed_at(queryset):
     return queryset.annotate(completed_at=Subquery(newest.values("created_at")[:1]))
 
 
-def annotate_cancelled_annotations(queryset):
-    from tasks.models import Annotation
-
-    cancelled_annotations = Annotation.objects.filter(was_cancelled=True, task=OuterRef("pk"))
-    return queryset.annotate(cancelled_annotations=Exists(cancelled_annotations))
-
-
 def annotate_annotations_results(queryset):
     if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
         return queryset.annotate(annotations_results=Coalesce(GroupConcat("annotations__result"), Value('')))
@@ -264,11 +293,11 @@ def dummy(queryset):
 
 settings.DATA_MANAGER_ANNOTATIONS_MAP = {
     "completed_at": annotate_completed_at,
-    "cancelled_annotations": annotate_cancelled_annotations,
     "annotations_results": annotate_annotations_results,
     "predictions_results": annotate_predictions_results,
     "predictions_score": annotate_predictions_score,
     "annotators": annotate_annotators,
+    "cancelled_annotations": dummy,
     "total_annotations": dummy,
     "total_predictions": dummy
 }
@@ -293,6 +322,7 @@ class PreparedTaskManager(models.Manager):
         # default annotations for calculating total values in pagination output
         queryset = queryset.annotate(
             total_annotations=Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=False)),
+            cancelled_annotations=Count("annotations", distinct=True, filter=Q(annotations__was_cancelled=True)),
             total_predictions=Count("predictions", distinct=True),
         )
 
