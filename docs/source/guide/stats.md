@@ -28,26 +28,7 @@ For more about viewing agreement in Label Studio Enterprise, see [Verify model a
 
 ## Agreement method
 
-The agreement method defines how [matching scores](stats.html#Matching-score) across all annotations for a task are combined to form a single inter-annotator agreement score.
-
-There are several possible methods you can specify on the **Annotation Settings** for a project.
-
-### Complete linkage
-Complete linkage task agreement groups annotations so that all the matching scores within a given group are higher than the threshold. The agreement score is the maximum group size divided by the total count of annotations. 
-
-Review the diagram for a full explanation:
-<div style="text-align:center"><img alt="Diagram showing annotations are collected for each task, matching scores are computed for each pair, and grouping and agreement score calculation happens as detailed in the surrounding text." width=800 height=375 src="/images/LSE/stats-complete-linkage.png"/></div>
-
-### Single linkage
-
-Single linkage task agreement groups annotations so that at least one of the matching scores within a given group is higher than the threshold. The agreement score is the maximum group size divided by the total count of annotations. 
-
-Review the diagram for a full explanation:
-<div style="text-align:center"><img alt="Diagram showing annotations are collected for each task, matching scores are computed for each pair, and grouping and agreement score calculation happens as detailed in the surrounding text." width=800 height=360 src="/images/LSE/stats-single-linkage.png"/></div>
-
-### No grouping
-
-No grouping task agreement uses the mean average of all inter-annotation matching scores for each annotation pair as the final task agreement score. 
+The agreement method defines how [matching scores](stats.html#Matching-score) across all annotations for a task are combined to form a single inter-annotator agreement score. Label Studio uses the mean average of all inter-annotation matching scores for each annotation pair as the final task agreement score. 
 
 Review the diagram for a full explanation:
 <div style="text-align:center"><img alt="Diagram showing annotations are collected for each task, matching scores are computed for each pair, the resulting scores are averaged for a task." width=800 height=365 src="/images/LSE/stats-no_grouping.png"/></div>
@@ -58,8 +39,7 @@ One annotation that labels the text span "Excellent tool" as "positive", a secon
 
 The matching score for the first two annotations is 50%, based on the intersection of the text spans. The matching score comparing the second annotation with the third annotation is 0%, because the same text span was labeled differently. 
 
-The task agreement conditions use a threshold of 40% to group annotations based on the matching score, so the first and second annotations are matched with each other, and the third annotation is considered mismatched. In this case, task agreement exists for 2 of the 3 annotations, so the overall task agreement score is 67%.  
-
+The task agreement conditions use a threshold of 40% to group annotations based on the matching score, so the first and second annotations are matched with each other, and the third annotation is considered mismatched. In this case, task agreement exists for 2 of the 3 annotations, so the overall task agreement score is 67%.
 
 ## Matching score
 
