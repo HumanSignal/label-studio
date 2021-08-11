@@ -100,13 +100,18 @@ class S3ImportStorage(S3StorageMixin, ImportStorage):
         help_text='Generate presigned URLs')
     presign_ttl = models.PositiveSmallIntegerField(
         _('presign_ttl'), default=1,
-        help_text='Presigned URLs TTL (in minutes)'
-    )
+        help_text='Presigned URLs TTL (in minutes)')
+    recursive_scan = models.BooleanField(
+        _('recursive scan'), default=False,
+        help_text=_('Perform recursive scan over the bucket content'))
 
     def iterkeys(self):
         client, bucket = self.get_client_and_bucket()
         if self.prefix:
-            bucket_iter = bucket.objects.filter(Prefix=self.prefix.rstrip('/') + '/', Delimiter='/').all()
+            list_kwargs = {'Prefix': self.prefix.rstrip('/') + '/'}
+            if not self.recursive_scan:
+                list_kwargs['Delimiter'] = '/'
+            bucket_iter = bucket.objects.filter(**list_kwargs).all()
         else:
             bucket_iter = bucket.objects.all()
         regex = re.compile(str(self.regex_filter)) if self.regex_filter else None

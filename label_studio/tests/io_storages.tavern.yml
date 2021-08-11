@@ -42,7 +42,7 @@ stages:
     url: '{django_live_url}/api/storages/s3/{storage_pk}/sync'
   response:
     json:
-      last_sync_count: 3
+      last_sync_count: 4
     status_code: 200
 - name: stage
   request:
@@ -80,6 +80,122 @@ stages:
   response:
     status_code: 200
 
+---
+test_name: test_import_from_s3_storage_recursive_scan
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    data:
+      is_published: true
+      label_config: <View><Image name="image" value="$image_url"/><Choices name="label"
+        toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+      title: test_s3_storage
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        project_pk: id
+    status_code: 201
+- name: stage
+  request:
+    data:
+      bucket: pytest-s3-images
+      prefix: subdir
+      project: '{project_pk}'
+      title: Testing S3 storage (bucket from conftest.py)
+      use_blob_urls: true
+    method: POST
+    url: '{django_live_url}/api/storages/s3'
+  response:
+    save:
+      json:
+        storage_pk: id
+    status_code: 201
+- name: stage
+  request:
+    method: POST
+    url: '{django_live_url}/api/storages/s3/{storage_pk}/sync'
+  response:
+    json:
+      last_sync_count: 2
+    status_code: 200
+
+# now update storage to do recursive scan
+- name: stage
+  request:
+    method: PATCH
+    url: '{django_live_url}/api/storages/s3/{storage_pk}'
+    json:
+      recursive_scan: true
+  response:
+    status_code: 200
+
+# and sync - the last subdir/another image should be returned
+- name: stage
+  request:
+    method: POST
+    url: '{django_live_url}/api/storages/s3/{storage_pk}/sync'
+  response:
+    json:
+      last_sync_count: 1
+    status_code: 200
+
+
+---
+test_name: test_import_from_s3_storage_recursive_scan_straigtaway
+strict: false
+marks:
+- usefixtures:
+  - django_live_url
+stages:
+- id: signup
+  type: ref
+- name: stage
+  request:
+    data:
+      is_published: true
+      label_config: <View><Image name="image" value="$image_url"/><Choices name="label"
+        toName="image"><Choice value="pos"/><Choice value="neg"/></Choices></View>
+      title: test_s3_storage
+    method: POST
+    url: '{django_live_url}/api/projects'
+  response:
+    save:
+      json:
+        project_pk: id
+    status_code: 201
+- name: stage
+  request:
+    data:
+      bucket: pytest-s3-images
+      prefix: subdir
+      project: '{project_pk}'
+      title: Testing S3 storage (bucket from conftest.py)
+      use_blob_urls: true
+      recursive_scan: true
+    method: POST
+    url: '{django_live_url}/api/storages/s3'
+  response:
+    save:
+      json:
+        storage_pk: id
+    status_code: 201
+- name: stage
+  request:
+    method: POST
+    url: '{django_live_url}/api/storages/s3/{storage_pk}/sync'
+  response:
+    json:
+      last_sync_count: 3
+    status_code: 200
+    
 ---
 test_name: test_import_from_gcs_storage
 strict: false
