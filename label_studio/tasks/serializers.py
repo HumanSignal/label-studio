@@ -79,7 +79,7 @@ class AnnotationSerializer(DynamicFieldsMixin, ModelSerializer):
         if not isinstance(data, list):
             raise ValidationError('annotation "result" field in annotation must be list')
 
-        return value
+        return data
 
     def get_created_username(self, annotation):
         user = annotation.completed_by
