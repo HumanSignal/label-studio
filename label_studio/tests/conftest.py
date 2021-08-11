@@ -80,6 +80,7 @@ def s3_with_images(s3):
     s3.put_object(Bucket=bucket_name, Key='image1.jpg', Body='123')
     s3.put_object(Bucket=bucket_name, Key='subdir/image1.jpg', Body='456')
     s3.put_object(Bucket=bucket_name, Key='subdir/image2.jpg', Body='789')
+    s3.put_object(Bucket=bucket_name, Key='subdir/another/image2.jpg', Body='0ab')
     yield s3
 
 
