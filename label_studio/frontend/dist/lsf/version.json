@@ -1,6 +1,6 @@
 {
-  "message": "Introduce Video tag (#222)\n\n* Introduce Video tag, now only for classification\r\n\r\nAlso move icons to TypeScript\r\n\r\n* Add simple example with Video\r\n\r\n* Fix icons for frame forward/backward\r\n\r\n* Add tooltips with hotkeys to Video buttons\r\n\r\n* Play/pause Video on click\r\n\r\n* Fix value in Video example",
-  "commit": "c2a1152127a69598f402bd4886b9598982226b77",
+  "message": "Adjust Webpack settings",
+  "commit": "6082c430592424ee47f049eec46a26f1bc9e2817",
   "branch": "master",
-  "date": "2021-07-08T16:43:56Z"
+  "date": "2021-08-11T09:11:10Z"
 }

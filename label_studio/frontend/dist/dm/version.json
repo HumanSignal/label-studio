@@ -1,6 +1,6 @@
 {
-  "message": "[fix] Remove is at/not at, it doesn't make sense for Datetime",
-  "commit": "50f665c6614b8a5160bdf9a50fcf8fb1fc6ab732",
+  "message": "Adjust Webpack settings",
+  "commit": "efd5286fa212cc573e15c5091179f9956346d4a3",
   "branch": "master",
-  "date": "2021-08-10T01:16:57Z"
+  "date": "2021-08-11T09:11:22Z"
 }
