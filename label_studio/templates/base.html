@@ -101,7 +101,11 @@
     sentry_rate: "{{ settings.FRONTEND_SENTRY_RATE }}",
     sentry_environment: "{{ settings.FRONTEND_SENTRY_ENVIRONMENT }}",
 
-    {% block app_more_settings %}{% endblock %}
+    {% block app_more_settings %}
+      flags: {
+        allow_organization_webhooks: {{settings.ALLOW_ORGANIZATION_WEBHOOKS|yesno:"true,false"}}
+      }
+    {% endblock %}
 
   }, {% block frontend_settings %}{}{% endblock %});
 </script>
