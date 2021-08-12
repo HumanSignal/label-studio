@@ -229,6 +229,10 @@ class ReImportAPI(ImportAPI):
         start = time.time()
         files_as_tasks_list = bool_from_request(request.data, 'files_as_tasks_list', True)
         file_upload_ids = self.request.data.get('file_upload_ids')
+
+        # check project permissions
+        project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
+        
         if not file_upload_ids:
             return Response({
                 'task_count': 0,
@@ -240,8 +244,6 @@ class ReImportAPI(ImportAPI):
                 'data_columns': []
             }, status=status.HTTP_204_NO_CONTENT)
 
-        # check project permissions
-        project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
         tasks, found_formats, data_columns = FileUpload.load_tasks_from_uploaded_files(
             project, file_upload_ids,  files_as_tasks_list=files_as_tasks_list)
 
