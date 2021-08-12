@@ -151,5 +151,8 @@
       "headless": false
     },
     "browserContext": "default"
+  },
+  "dependencies": {
+    "lodash.clonedeep": "^4.5.0"
   }
 }

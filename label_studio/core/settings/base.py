@@ -145,7 +145,8 @@ INSTALLED_APPS = [
     'tasks',
     'data_manager',
     'io_storages',
-    'ml'
+    'ml',
+    'webhooks',
 ]
 
 MIDDLEWARE = [
@@ -385,6 +386,8 @@ def collect_versions_dummy(**kwargs):
 PROJECT_DELETE = project_delete
 USER_AUTH = user_auth
 COLLECT_VERSIONS = collect_versions_dummy
+
+WEBHOOK_TIMEOUT = 1.0
 
 # fix a problem with Windows mimetypes for JS and PNG
 import mimetypes

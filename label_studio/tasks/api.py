@@ -24,6 +24,8 @@ from tasks.serializers import (
     TaskSerializer, AnnotationSerializer, TaskSimpleSerializer, PredictionSerializer,
     TaskWithAnnotationsAndPredictionsAndDraftsSerializer, AnnotationDraftSerializer, PredictionQuerySerializer)
 from projects.models import Project
+from webhooks.utils import api_webhook, api_webhook_for_delete
+from webhooks.models import WebhookAction
 
 logger = logging.getLogger(__name__)
 
@@ -56,6 +58,7 @@ class TaskListAPI(generics.ListCreateAPIView):
             context['project'] = generics.get_object_or_404(Project, pk=project_id)
         return context
 
+    @api_webhook(WebhookAction.TASKS_CREATED)
     def post(self, request, *args, **kwargs):
         return super(TaskListAPI, self).post(request, *args, **kwargs)
 
@@ -123,6 +126,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
     def patch(self, request, *args, **kwargs):
         return super(TaskAPI, self).patch(request, *args, **kwargs)
 
+    @swagger_auto_schema(tags=['Tasks'])
     def delete(self, request, *args, **kwargs):
         return super(TaskAPI, self).delete(request, *args, **kwargs)
 
@@ -176,13 +180,15 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
     def get(self, request, *args, **kwargs):
         return super(AnnotationAPI, self).get(request, *args, **kwargs)
 
-    @swagger_auto_schema(auto_schema=None)
+    @api_webhook(WebhookAction.ANNOTATION_UPDATED)
     def put(self, request, *args, **kwargs):
         return super(AnnotationAPI, self).put(request, *args, **kwargs)
 
+    @api_webhook(WebhookAction.ANNOTATION_UPDATED)
     def patch(self, request, *args, **kwargs):
         return super(AnnotationAPI, self).patch(request, *args, **kwargs)
 
+    @api_webhook_for_delete(WebhookAction.ANNOTATIONS_DELETED)
     def delete(self, request, *args, **kwargs):
         return super(AnnotationAPI, self).delete(request, *args, **kwargs)
 
@@ -225,6 +231,7 @@ class AnnotationsListAPI(generics.ListCreateAPIView):
     def get(self, request, *args, **kwargs):
         return super(AnnotationsListAPI, self).get(request, *args, **kwargs)
 
+    @api_webhook(WebhookAction.ANNOTATION_CREATED)
     def post(self, request, *args, **kwargs):
         return super(AnnotationsListAPI, self).post(request, *args, **kwargs)
 
