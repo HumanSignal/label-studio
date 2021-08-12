@@ -119,6 +119,11 @@ REDIS_SSL_CERTS_REQS=required
 
 # Optional: Specify Redis SSL certificate
 REDIS_SSL_CA_CERTS=redis-ca-bundle.pem
+
+# Optional: Specify SSL termination certificate & key
+# Files should be placed in the directory "certs" at the same directory as docker-compose.yml file
+NGINX_SSL_CERT=/certs/cert.pem
+NGINX_SSL_CERT_KEY=/certs/cert.key
 ```
 
 2. After you set all the environment variables, create the following `docker-compose.yml`:
@@ -132,14 +137,18 @@ services:
     tty: true
     image: heartexlabs/label-studio-enterprise:latest
     ports:
-      - 80:8000
+      - 80:8085
+      - 443:8086
+    expose:
+      - "80"
+      - "443"
     env_file:
       - env.list
     volumes:
-      - ./license.txt:/label_studio_enterprise/license.txt
+      - ./license.txt:/label_studio_enterprise/license.txt:ro
       - ./mydata:/label-studio/data:rw
+      - ./certs:/certs:ro
     working_dir: /label-studio-enterprise
-    command: [ "uwsgi", "--ini", "deploy/uwsgi.ini"]
 
   rqworkers:
     image: heartexlabs/label-studio-enterprise:latest
@@ -150,7 +159,6 @@ services:
       - ./mydata:/label-studio/data:rw
     working_dir: /label-studio-enterprise
     command: [ "python3", "/label-studio-enterprise/label_studio_enterprise/manage.py", "rqworker", "default" ]
-
 
 volumes:
   static: {} 
