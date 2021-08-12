@@ -42,8 +42,8 @@ ImportStorage:
           - type: counter
             name: presign_ttl
             label: Expiration minutes
-            value: 1
             min: 1
+            value: 1
             dependency: presign
 
   # Regex filter

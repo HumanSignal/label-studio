@@ -112,7 +112,7 @@ def doc_to_spans(doc):
 df = pd.read_csv('lines_clean.csv')
 df = df[df['line_text'].str.contains("Easter ", na=False)]
 print(df.head())
-texts = df['line_test']
+texts = df['line_text']
 
 # Prepare Label Studio tasks in import JSON format with the model predictions:
 entities = set()
