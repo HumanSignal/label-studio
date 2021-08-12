@@ -61,6 +61,10 @@ ImportStorage:
             name: use_blob_urls
             label: Treat every bucket object as a source file
             description: If unchecked, treat every bucket object as a JSON-formatted task. Optional
+          - type: toggle
+            name: recursive_scan
+            label: Recursive scan
+            description: Perform recursive scan over the bucket content
       - fields:
           - type: toggle
             name: presign
