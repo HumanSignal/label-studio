@@ -164,6 +164,11 @@ def apply_filters(queryset, filters):
             _filter.operator = 'equal' if cast_bool_from_str(_filter.value) else 'not_equal'
             _filter.value = 0
 
+        # special case: for strings empty is "", not null=True
+        if _filter.type == 'String' and _filter.operator == 'empty':
+            _filter.operator = 'equal' if cast_bool_from_str(_filter.value) else 'not_equal'
+            _filter.value = ''
+
         # append operator
         field_name = f"{clean_field_name}{operators.get(_filter.operator, '')}"
 
