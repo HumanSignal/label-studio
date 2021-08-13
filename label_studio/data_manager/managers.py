@@ -30,6 +30,7 @@ operators = {
     "greater_or_equal": "__gte",
     "in": "",
     "not_in": "",
+    "empty": "__isnull",
     "contains": "__icontains",
     "not_contains": "__icontains",
 }
@@ -163,6 +164,20 @@ def apply_filters(queryset, filters):
             _filter.operator = 'equal' if cast_bool_from_str(_filter.value) else 'not_equal'
             _filter.value = 0
 
+        # special case: for strings empty is "" or null=True
+        if _filter.type in ('String', 'Unknown') and _filter.operator == 'empty':
+            value = cast_bool_from_str(_filter.value)
+            if value:  # empty = true
+                q = Q(
+                    Q(**{field_name: ''}) | Q(**{field_name: None}) | Q(**{field_name+'__isnull': True})
+                )
+            else:  # empty = false
+                q = Q(
+                    ~Q(**{field_name: ''}) & ~Q(**{field_name: None}) & ~Q(**{field_name+'__isnull': True})
+                )
+            filter_expression.add(q, conjunction)
+            continue
+
         # append operator
         field_name = f"{clean_field_name}{operators.get(_filter.operator, '')}"
 
@@ -194,18 +209,10 @@ def apply_filters(queryset, filters):
 
         # empty
         elif _filter.operator == 'empty':
-            value = cast_bool_from_str(_filter.value)
-            # empty = true
-            if value:
-                q = Q(
-                    Q(**{field_name: ''}) | Q(**{field_name: None}) | Q(**{field_name + '__isnull': True})
-                )
-            # empty = false
+            if cast_bool_from_str(_filter.value):
+                filter_expression.add(Q(**{field_name: True}), conjunction)
             else:
-                q = Q(
-                    ~Q(**{field_name: ''}) & ~Q(**{field_name: None}) & ~Q(**{field_name + '__isnull': True})
-                )
-            filter_expression.add(q, conjunction)
+                filter_expression.add(~Q(**{field_name: True}), conjunction)
 
         # starting from not_
         elif _filter.operator.startswith("not_"):
