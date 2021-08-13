@@ -6,11 +6,12 @@ import re
 from django.db import models
 from django.db.models import Aggregate, Count, Exists, OuterRef, Subquery, Avg, Q, F, Value
 from django.contrib.postgres.aggregates import ArrayAgg
-from django.db.models.fields.json import KeyTransform
+from django.contrib.postgres.fields.jsonb import KeyTextTransform
+# from django.db.models.fields.json import KeyTransform
 from django.db.models.functions import Coalesce
 from django.conf import settings
 from django.db.models.functions import Cast
-from django.db.models import FloatField
+from django.db.models import FloatField, TextField
 from datetime import datetime
 
 from data_manager.prepare_params import ConjunctionEnum
@@ -94,7 +95,7 @@ def apply_ordering(queryset, ordering):
 
             # annotate task with data field for float/int/bool ordering support
             json_field = field_name.replace('data__', '')
-            queryset = queryset.annotate(ordering_field=KeyTransform(json_field, 'data'))
+            queryset = queryset.annotate(ordering_field=KeyTextTransform(json_field, 'data'))
             f = F('ordering_field').asc(nulls_last=True) if ascending else F('ordering_field').desc(nulls_last=True)
 
         else:
@@ -152,7 +153,7 @@ def apply_filters(queryset, filters):
             json_field = field_name.replace('data__', '')
             queryset = queryset.annotate(**{
                 f'filter_{json_field.replace("$undefined$", "undefined")}':
-                    Cast(KeyTransform(json_field, 'data'), output_field=FloatField())
+                    Cast(KeyTextTransform(json_field, 'data'), output_field=FloatField())
             })
             clean_field_name = f'filter_{json_field.replace("$undefined$", "undefined")}'
         else:
