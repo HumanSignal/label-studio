@@ -342,7 +342,6 @@ def test_views_filters(filters, ids, business_client, project_id):
     response_data = response.json()
 
     assert 'tasks' in response_data, response_data
-    print('!!!!', json.dumps(response_data, indent=2))
 
     response_ids = [task["id"] for task in response_data["tasks"]]
     correct_ids = [task_ids[i] for i in ids]
