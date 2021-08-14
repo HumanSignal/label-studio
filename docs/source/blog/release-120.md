@@ -9,3 +9,4 @@ meta_description: Release notes and information about Label Studio version 1.2.0
 
 The latest version of Label Studio introduces webhooks, an oft-requested feature. Now you can subscribe to events such as annotation created, annotation skipped, or task created and trigger changes in your machine learning model pipelines.
 
+It includes the same [fixes and features in version 1.1.1](https://github.com/heartexlabs/label-studio/releases/tag/v1.1.1), and also some other great stuff. 
