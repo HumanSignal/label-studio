@@ -27,8 +27,8 @@ class WebhookFilterSet(django_filters.FilterSet):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Webhooks'],
-        operation_summary='List of webhooks',
-        operation_description="List of webhooks of user's active organization.",
+        operation_summary='List all webhooks',
+        operation_description="List all webhooks set up for your organization.",
     ),
 )
 @method_decorator(
@@ -36,7 +36,7 @@ class WebhookFilterSet(django_filters.FilterSet):
     decorator=swagger_auto_schema(
         tags=['Webhooks'],
         operation_summary='Create a webhook',
-        operation_description="Create a webhook for user's active organization.",
+        operation_description="Create a webhook for your organization.",
     ),
 )
 class WebhookListAPI(generics.ListCreateAPIView):
@@ -87,8 +87,8 @@ class WebhookAPI(generics.RetrieveUpdateDestroyAPIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Webhooks'],
-        operation_summary='Returns description of all webhook actions',
-        operation_description='Use this information to setup webhooks.',
+        operation_summary='Get all webhook actions',
+        operation_description='Get descriptions of all available webhook actions to set up webhooks.',
         responses={"200": "Object with description data."},
         manual_parameters=[
             openapi.Parameter(
