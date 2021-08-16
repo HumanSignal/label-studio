@@ -607,6 +607,7 @@ class TasksListAPI(generics.ListCreateAPIView,
         return super(TasksListAPI, self).get(*args, **kwargs)
 
     @api_webhook(WebhookAction.TASKS_CREATED)
+    @swagger_auto_schema(auto_schema=None)
     def post(self, *args, **kwargs):
         return super(TasksListAPI, self).post(*args, **kwargs)
 

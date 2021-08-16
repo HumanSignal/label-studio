@@ -181,6 +181,7 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
         return super(AnnotationAPI, self).get(request, *args, **kwargs)
 
     @api_webhook(WebhookAction.ANNOTATION_UPDATED)
+    @swagger_auto_schema(auto_schema=None)
     def put(self, request, *args, **kwargs):
         return super(AnnotationAPI, self).put(request, *args, **kwargs)
 
