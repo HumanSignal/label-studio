@@ -7,13 +7,12 @@ meta_title: Create Custom Webhooks in Label Studio
 meta_description: Label Studio documentation for creating custom webhook event triggers to create custom integrations between Label Studio and your machine learning pipeline
 ---
 
-
+If you want to trigger custom events for webhooks in Label Studio, you can extend the webhook event model.
 
 ## Create a custom webhook event
 
-## How to extend webhooks 
+To create a custom webhook event, add your own action to the `WebhookActions` model.
 
-To do that you need to add your own action to `WebhookActions` model. 
 For example:
 
 ```
@@ -31,7 +30,7 @@ class WebhookAction(models.Model):
     ...
 ```
 
-And now you have to add explicitly call in some place where you need it:
+After declaring the action and the associated properties and payload details in the `WebhookAction` class, call the event action in the code where it occurs. For example:
 
 ```
 ...
@@ -40,29 +39,32 @@ emit_webhooks(organization, WebhookAction.SOMETHING_HAPPENED, {'something': [res
 ...
 ```
 
-> Note: In OpenSorce you have only one organization so you can easly get it by following code: `Organization.objects.first()`
+You can retrieve the organization details using `Organization.objects.first()`.
+
+### Call event actions with Python functions
+There are several functions you can use to call event actions. Refer to the following table:
+
+| Python function | When to use | Additional details |
+| --- | --- | --- | 
+| `get_active_webhooks()` | Get all active webhooks. | |
+| `run_webhook()` | Run one webhook and pass some payload. | | 
+| `emit_webhooks()` | Send requests for all webhooks for an action. | | 
+| `emit_webhooks_for_instances()` | Send serialized instances with webhook requests. | You must declare a `serializer` in the `WebhookAction.ACTIONS` model.|
+ 
+
+### Call event actions with decorators in API source code 
+
+You can use decorators with the CRUD REST methods to send event actions to webhooks. You can use the following: 
+
+| Decorator syntax | When to use | Details |
+| --- | --- | --- | 
+| `@api_webhook()` | `POST`/`PUT`/`PATCH` requests | Expects a response with an `id` and uses the `.get_object()` function after the request to send that information. |
+| `@api_webhook_for_delete()` | `DELETE` | Sends only the `id` field after a successfully delete operation. | 
 
 
-## Calling of webhooks
-### Raw calling
-- `get_active_webhooks()`
-  Use it to get all active webhooks.
-- `run_webhook()`
-  Use it to run one and pass some payload here.
-- `emit_webhooks()`
-  Use it to send requests for all webhooks for an action.
 
-### Calling with instances
-- `emit_webhooks_for_instanses()`
-  So as usualy we want to send serialized instances there is function `emit_webhooks_for_instanses()`. Be sure you have `serializer` in `WebhookAction.ACTIONS` field.
 
-### Calling in API views
-Usually, we have many CRUD REST methods in API. So There are 2 decorators to make it easier: 
 
-- `@api_webhook()` 
-  It's used for `POST`/`PUT`/`PATCH` requests. The decorator expects that responce will be with `id` field and uses `.get_object()` after request to send it.
 
-- `@api_webhook_for_delete()`
-  Is's used only for `DELETE` and sends only `id` field after successful operation.
 
 
