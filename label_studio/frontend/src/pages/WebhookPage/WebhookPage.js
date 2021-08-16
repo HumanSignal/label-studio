@@ -112,7 +112,7 @@ const Webhook = () => {
       <Elem name='footer-text'>
         <p>
         Webhooks allow external services to be notified when certain events happen. 
-        When the specified events happen, a POST request is send to each of the URLs you provide. 
+        When the specified events occur, a POST request is sent to each of the URLs you provide. 
         </p>
         <p>
           <a href="#">Read more in Documentation</a>
