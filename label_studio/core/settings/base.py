@@ -11,18 +11,25 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 import os
 import re
+import logging
+
+# for printing messages before main logging config applied
+if not logging.getLogger().hasHandlers():
+    logging.basicConfig(level=logging.DEBUG, format='%(message)s')
 
 from label_studio.core.utils.io import get_data_dir
 from label_studio.core.utils.params import get_bool_env, get_env
+
+logger = logging.getLogger(__name__)
 
 # Hostname is used for proper path generation to the resources, pages, etc
 HOSTNAME = get_env('HOST', '')
 if HOSTNAME:
     if not HOSTNAME.startswith('http://') and not HOSTNAME.startswith('https://'):
-        print("! HOST variable found in environment, but it must start with http:// or https://, ignore it:", HOSTNAME)
+        logger.info("! HOST variable found in environment, but it must start with http:// or https://, ignore it: %s", HOSTNAME)
         HOSTNAME = ''
     else:
-        print("=> Hostname correctly is set to:", HOSTNAME)
+        logger.info("=> Hostname correctly is set to: %s", HOSTNAME)
         if HOSTNAME.endswith('/'):
             HOSTNAME = HOSTNAME[0:-1]
 
@@ -33,7 +40,7 @@ if HOSTNAME:
             match = pattern.match(HOSTNAME)
             FORCE_SCRIPT_NAME = match.group(3)
             if FORCE_SCRIPT_NAME:
-                print("=> Django URL prefix is set to:", FORCE_SCRIPT_NAME)
+                logger.info("=> Django URL prefix is set to: %s", FORCE_SCRIPT_NAME)
 
 INTERNAL_PORT = '8080'
 
@@ -49,7 +56,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Base path for media root and other uploaded files
 BASE_DATA_DIR = get_env('BASE_DATA_DIR', get_data_dir())
 os.makedirs(BASE_DATA_DIR, exist_ok=True)
-print('=> Database and media directory:', BASE_DATA_DIR)
+logger.info('=> Database and media directory: %s', BASE_DATA_DIR)
 
 # Databases
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
@@ -290,7 +297,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 # if FORCE_SCRIPT_NAME:
 #    STATIC_URL = FORCE_SCRIPT_NAME + STATIC_URL
-print(f'=> Static URL is set to: {STATIC_URL}')
+logger.info(f'=> Static URL is set to: {STATIC_URL}')
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_build')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
@@ -390,5 +397,3 @@ COLLECT_VERSIONS = collect_versions_dummy
 import mimetypes
 mimetypes.add_type("application/javascript", ".js", True)
 mimetypes.add_type("image/png", ".png", True)
-
-print()  # just empty line
