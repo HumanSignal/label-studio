@@ -7,10 +7,8 @@ meta_title: Configure Webhooks in Label Studio
 meta_description: Label Studio documentation for setting up and configuring webhooks to integrate Label Studio with your machine learning pipeline
 ---
 
-Webhooks in Label Studio let you set up integrations that subscribe to certain events that occur inside Label Studio. When an event is triggered, Label Studio sends an HTTP POST request to the configured webhook URL. Your application or service can then respond to that event information however you want. 
-
-A `POST` request with some payload, for example:
-```
+Webhooks in Label Studio let you set up integrations that subscribe to certain events that occur inside Label Studio. When an event is triggered, Label Studio sends an HTTP POST request to the configured webhook URL. For example:
+```json
 {
     "action": "TASK_CREATED",
     "tasks": [
@@ -19,6 +17,8 @@ A `POST` request with some payload, for example:
     ]
 }
 ```
+
+Your application or service can then respond to that event information however you want. 
 
 ## What to use Label Studio webhooks for 
 
@@ -82,7 +82,7 @@ Label Studio makes two main types of events available to integrate with webhooks
 
 To integrate with webhooks in Label Studio, you must do the following:
 1. Create a webhook endpoint or URL as part of your application or machine learning model pipeline.
-2. Make sure the webhook endpoint or URL is accessible to your Label Studio instance,  can accept HTTP POST requests.
+2. Make sure the webhook endpoint or URL is accessible to your Label Studio instance and can accept HTTP POST requests.
 3. [Add the webhook to Label Studio](webhooks.html#Add-a-new-webhook-in-Label-Studio).
 
 Set up your webhook endpoint to read the event payload from Label Studio and take action based on the event.
@@ -100,14 +100,14 @@ Add a webhook URL to Label Studio. The webhook URL must be set up to accept HTTP
 3. Click **New Webhook**. 
 4. In the **Payload URL** field, provide the URL to send event payloads to. 
 5. (Optional) Toggle the **Is Active** option to deactivate the webhook until it is ready to use. Otherwise, the webhook becomes active as soon as you save it and events are sent to the URL.
-6. (Optional) Add any headers required by the webhook URL. Specify the header name and the value. MUST BE AN ALPHANUMERIC STRING, CAN'T ADD MORE THAN 10. You can use headers to authenticate a request to your webhook URL.
-7. Select whether to send a payload with the event. HERE'S WHAT HAPPENS IF YOU DON'T SEND A PAYLOAD.
+6. (Optional) Add any headers required by the webhook URL. Specify the header name and the value. You can use headers to authenticate a request to your webhook URL. You can't add more than 10 headers. 
+7. Select whether to send a payload with the event. 
 8. Select whether to send an event for all actions in Label Studio supported by webhooks, or specific events. 
 9. Save the webhook.
 
 ### Add a webhook using the Label Studio API
 
-Make a POST request to the [Create a webhook](ADDLINKHERE) endpoint to add a webhook using the API. If you want to extend webhooks with custom events, see [Create a custom webhook event](webhook_create.html). 
+Make a POST request to the [Create a webhook](/api#tag/Webhooks/) endpoint to add a webhook using the API. If you want to extend webhooks with custom events, see [Create a custom webhook event](webhook_create.html). 
 
 ## Troubleshoot a webhook connection
 
@@ -126,7 +126,7 @@ Traceback (most recent call last):
 ConnectionRefusedError: [Errno 111] Connection refused
 ```
 
-Failed webhook connections are not retried. Successful webhook deliveries can be seen in the logs in DEBUG mode. For example:
+Label Studio does not retry webhook connections that fail. You can see successful webhook deliveries in the logs in DEBUG mode. For example:
 ```
 [2021-08-12 17:02:34,703] [root::run_webhook::24] [DEBUG] Run webhook 1 for action ANNOTATION_UPDATED
 [2021-08-12 17:02:34,704] [urllib3.connectionpool::_new_conn::227] [DEBUG] Starting new HTTP connection (1): localhost:8888
