@@ -12,9 +12,9 @@ Audio tag plays a simple audio file
 
 | Param | Type | Description |
 | --- | --- | --- |
-| name | <code>string</code> | of the element |
-| value | <code>string</code> | of the element |
-| hotkey | <code>string</code> | hotkey used to play/pause audio |
+| name | <code>string</code> | Name of the element |
+| value | <code>string</code> | Value of the element |
+| hotkey | <code>string</code> | Hotkey used to play or pause audio |
 
 ### Example
 ```html

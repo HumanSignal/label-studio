@@ -11,10 +11,14 @@ storing both label and their ancestors.
 
 ### Parameters
 
-| Param | Type | Description |
-| --- | --- | --- |
-| name | <code>string</code> | name of the group |
-| toName | <code>string</code> | name of the element that you want to label |
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| name | <code>string</code> |  | Name of the element |
+| toName | <code>string</code> |  | Name of the element that you want to classify |
+| [leafsOnly] | <code>boolean</code> | <code>false</code> | Allow to select only leaf nodes of taxonomy |
+| [maxUsages] | <code>number</code> |  | Maximum available usages |
+| [required] | <code>boolean</code> | <code>false</code> | Whether taxonomy validation is required |
+| [requiredMessage] | <code>string</code> |  | Message to show if validation fails |
 
 ### Example
 ```html
@@ -30,6 +34,6 @@ storing both label and their ancestors.
     </Choice>
     <Choice value="Offline" />
   </Taxonomy>
-  <Text name="text" value="You never believe what he did to the country" />
+  <Text name="text" value="You'd never believe what he did to the country" />
 </View>
 ```
