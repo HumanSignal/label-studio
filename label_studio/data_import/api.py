@@ -338,6 +338,7 @@ class FileUploadListAPI(generics.mixins.ListModelMixin,
             raise ValueError('"file_upload_ids" parameter must be a list of integers')
         return Response({'deleted': deleted}, status=status.HTTP_200_OK)
 
+
 @method_decorator(name='get', decorator=swagger_auto_schema(
         tags=['Import'],
         operation_summary='Get file upload',
