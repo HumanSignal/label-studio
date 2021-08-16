@@ -87,7 +87,7 @@ class WebhookAPI(generics.RetrieveUpdateDestroyAPIView):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Webhooks'],
-        operation_summary='Returns description of all webhook actions',
+        operation_summary='Get all webhook actions',
         operation_description='Get descriptions of all available webhook actions to set up webhooks.',
         responses={"200": "Object with description data."},
         manual_parameters=[
