@@ -89,6 +89,7 @@ Sent when an annotation is created for a task in Label Studio. See how to [set u
 | created_at | datetime | Date and time that the annotation was created. |
 | updated_at | datetime | Date and time that the annotation was last updated. |
 | prediction | JSON dictionary | Details of the prediction viewed at the time of annotation, if one exists. |
+| project | JSON dictionary | All fields related to the associated project. |
 
 ### Example payload
 
@@ -115,6 +116,7 @@ Sent when an annotation is updated. See how to [set up a webhook for this event]
 | created_at | datetime | Date and time that the annotation was created. |
 | updated_at | datetime | Date and time that the annotation was last updated. |
 | prediction | JSON dictionary | Details of the prediction viewed at the time of annotation, if one exists. |
+| project | JSON dictionary | All fields related to the associated project. |
 
 ### Example payload
 

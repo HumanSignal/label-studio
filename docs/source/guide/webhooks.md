@@ -103,11 +103,11 @@ Add a webhook URL to Label Studio. The webhook URL must be set up to accept HTTP
 1. In the Label Studio UI, open the project that you want to associate with a webhook URL.
 2. Click **Settings** and click **Webhooks**.
 3. Click **New Webhook**. 
-4. In the **Payload URL** field, provide the URL to send event payloads to. 
-5. (Optional) Toggle the **Is Active** option to deactivate the webhook until it is ready to use. Otherwise, the webhook becomes active as soon as you save it and events are sent to the URL.
-6. (Optional) Add any headers required by the webhook URL. Specify the header name and the value. You can use headers to authenticate a request to your webhook URL. You can't add more than 10 headers. 
-7. Select whether to send a payload with the event. 
-8. Select whether to send an event for all actions in Label Studio supported by webhooks, or specific events. 
+4. In the **Payload URL** field, provide the URL to send event payloads to. For example, `https://www.example.com/webhook`.
+5. (Optional) Toggle the **Is Active** option to deactivate the webhook until it is ready to use. Otherwise, the webhook becomes active as soon as you save it and events are sent to the URL. 
+6. (Optional) Add any headers required by the webhook URL. Specify the header name and the value. You can use headers to authenticate a request to your webhook URL. You can't add more than 10 headers. For example, `Authorization` and `Basic bGFiZWxzdHVkaW86ZXhhbXBsZQ==`
+7. Select whether to send a payload with the event. For example, choose to send the payload for `Annotation created` events to update the correct pipeline based on the project ID sent in the payload.  
+8. Select whether to send an event for all actions in Label Studio supported by webhooks, or specific events. For example, select the `Annotation created` event. 
 9. Save the webhook.
 
 ### Add a webhook using the Label Studio API
