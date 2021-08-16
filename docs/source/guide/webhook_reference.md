@@ -22,7 +22,7 @@ If the webhook event is in response to a creation or update event, the full deta
 
 ## Task Created
 
-Sent when a task is created in Label Studio.
+Sent when a task is created in Label Studio. See how to [set up a webhook for this event](webhooks.html). 
 
 ### Webhook payload details
 
@@ -51,7 +51,7 @@ Sent when a task is created in Label Studio.
 
 ## Task Deleted
 
-Sent when a task is deleted from Label Studio. 
+Sent when a task is deleted from Label Studio. See how to [set up a webhook for this event](webhooks.html)
 
 ### Webhook payload details
 
@@ -73,7 +73,7 @@ Sent when a task is deleted from Label Studio.
 ```
 
 ## Annotation Created
-Sent when an annotation is created for a task in Label Studio.
+Sent when an annotation is created for a task in Label Studio. See how to [set up a webhook for this event](webhooks.html)
 
 ### Webhook payload details
 
@@ -99,7 +99,7 @@ Sent when an annotation is created for a task in Label Studio.
 
 ## Annotation Updated
 
-Sent when an annotation is updated.
+Sent when an annotation is updated. See how to [set up a webhook for this event](webhooks.html)
 
 ### Webhook payload details
 
@@ -124,7 +124,7 @@ Sent when an annotation is updated.
 ```
 
 ## Annotation Deleted
-Sent when an annotation is deleted.
+Sent when an annotation is deleted. See how to [set up a webhook for this event](webhooks.html)
 
 ### Webhook payload details
 
@@ -146,7 +146,7 @@ Sent when an annotation is deleted.
 
 ## Project Created
 
-Sent when a project is created.
+Sent when a project is created. See how to [set up a webhook for this event](webhooks.html)
 
 ### Webhook payload details
 
@@ -162,7 +162,7 @@ Sent when a project is created.
 ```
 
 ## Project Updated
-Sent when a project is updated.
+Sent when a project is updated. See how to [set up a webhook for this event](webhooks.html)
 
 ### Webhook payload details
 
@@ -178,7 +178,7 @@ Sent when a project is updated.
 ```
 
 ## Project Deleted
-Sent when a project is deleted. 
+Sent when a project is deleted. See how to [set up a webhook for this event](webhooks.html)
 
 ### Webhook payload details
 
