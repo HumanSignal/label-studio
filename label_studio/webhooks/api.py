@@ -27,7 +27,7 @@ class WebhookFilterSet(django_filters.FilterSet):
     name='get',
     decorator=swagger_auto_schema(
         tags=['Webhooks'],
-        operation_summary='List of webhooks',
+        operation_summary='List all webhooks',
         operation_description="List of webhooks of user's active organization.",
     ),
 )
