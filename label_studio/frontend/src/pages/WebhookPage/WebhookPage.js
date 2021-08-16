@@ -115,7 +115,7 @@ const Webhook = () => {
         When the specified events occur, a POST request is sent to each of the URLs you provide. 
         </p>
         <p>
-          <a href="#">Read more in Documentation</a>
+          <a href="https://labelstud.io/guide/webhooks.html">Read more in the documentation</a>.
         </p>
       </Elem>
     </Elem>
