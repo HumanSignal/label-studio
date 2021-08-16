@@ -179,26 +179,13 @@ def apply_filters(queryset, filters):
             filter_expression.add(q, conjunction)
             continue
 
-        if _filter.operator == 'regex':
+        # regex pattern check
+        elif _filter.operator == 'regex':
             try:
                 re.compile(pattern=str(_filter.value))
             except Exception as e:
                 logger.info('Incorrect regex for filter: %s: %s', _filter.value, str(e))
                 return queryset.none()
-
-        # special case: for strings empty is "" or null=True
-        if _filter.type in ('String', 'Unknown') and _filter.operator == 'empty':
-            value = cast_bool_from_str(_filter.value)
-            if value:  # empty = true
-                q = Q(
-                    Q(**{field_name: ''}) | Q(**{field_name: None}) | Q(**{field_name+'__isnull': True})
-                )
-            else:  # empty = false
-                q = Q(
-                    ~Q(**{field_name: ''}) & ~Q(**{field_name: None}) & ~Q(**{field_name+'__isnull': True})
-                )
-            filter_expression.add(q, conjunction)
-            continue
 
         # append operator
         field_name = f"{clean_field_name}{operators.get(_filter.operator, '')}"
