@@ -26,6 +26,8 @@ Sent when a task is created in Label Studio. See how to [set up a webhook for th
 
 ### Webhook payload details
 
+The webhook payload includes the name of the action and some additional task data. The task-relevant data is the same as is included in the [response when you create a task using the API](/api#operation/api_tasks_create).
+
 | Key | Type | Description |
 | --- | --- | --- | 
 | name | string | Name of the action. In this case, `Task created` | 
@@ -77,13 +79,15 @@ Sent when an annotation is created for a task in Label Studio. See how to [set u
 
 ### Webhook payload details
 
+The webhook payload includes the name of the action and some additional annotation data. The annotation-relevant data is the same as is included in the [response when you create an annotation using the API](/api#operation/api_tasks_annotations_create).
+
 | Key | Type | Description |
 | --- | --- | --- | 
 | name | string | Name of the action. In this case, `Annotation created`. | 
 | id | integer | ID of the created annotation. | 
 | result | JSON | JSON format of the annotation created. |
 | task | JSON | The task that the annotation was created for. |
-| completed_by | JSON | Email address of the user that created the annotation. |
+| completed_by | JSON | ID of the user that created the annotation. |
 | was_cancelled | boolean | Whether or not the annotation is the result of a skipped task, and an empty annotation. |
 | ground_truth | boolean | Enterprise only. Whether or not the annotation is a ground truth. 
 | created_at | datetime | Date and time that the annotation was created. |
@@ -103,6 +107,8 @@ Sent when an annotation is created for a task in Label Studio. See how to [set u
 Sent when an annotation is updated. See how to [set up a webhook for this event](webhooks.html)
 
 ### Webhook payload details
+
+The webhook payload includes the name of the action and some additional annotation data. The annotation-relevant data is the same as is included in the [response when you update an annotation using the API](/api#operation/api_annotations_partial_update).
 
 | Key | Type | Description |
 | --- | --- | --- | 
@@ -152,10 +158,13 @@ Sent when a project is created. See how to [set up a webhook for this event](web
 
 ### Webhook payload details
 
+The webhook payload includes the name of the action and some additional project data. The project-relevant data is the same as is included in the [response when you create a project using the API](/api#operation/api_projects_create).
+
+
 | Key | Type | Description |
 | --- | ---  | --- |
 | name | string  | The action that triggered the event. In this case, `Project created`. |
-| project | JSON dictionary | All fields related to the project that was created. | 
+| project | JSON dictionary | All fields related to the project that was created. See the [API documentation for creating a project](/api#operation/api_projects_create) | 
 
 ### Example payload
 
@@ -168,10 +177,12 @@ Sent when a project is updated. See how to [set up a webhook for this event](web
 
 ### Webhook payload details
 
+The webhook payload includes the name of the action and some additional project data. The project-relevant data is the same as is included in the [response when you update a project using the API](/api#operation/api_projects_partial_update).
+
 | Key | Type | Description |
 | --- | ---  | --- |
 | name | string  | The action that triggered the event. In this case, `Project updated`. |
-| project | JSON dictionary | All fields related to the project that was updated. | 
+| project | JSON dictionary | All fields related to the project that was updated. See the [API documentation for updating a project](/api#operation/api_projects_partial_update) | 
 
 ### Example payload
 
