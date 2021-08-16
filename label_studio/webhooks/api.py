@@ -36,7 +36,7 @@ class WebhookFilterSet(django_filters.FilterSet):
     decorator=swagger_auto_schema(
         tags=['Webhooks'],
         operation_summary='Create a webhook',
-        operation_description="Create a webhook for user's active organization.",
+        operation_description="Create a webhook for your organization.",
     ),
 )
 class WebhookListAPI(generics.ListCreateAPIView):
