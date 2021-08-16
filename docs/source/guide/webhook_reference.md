@@ -1,192 +1,196 @@
 ---
 title: Webhook event format reference 
-short: Webhook Event Reference
+short: Webhooks Event Reference
 type: guide
 order: 653
 meta_title: Label Studio Webhook Event Reference 
 meta_description: Label Studio reference documentation for webhook event fields and payloads sent from Label Studio for integration with your machine learning pipeline. 
 ---
 
+Label Studio includes several types of webhook events that trigger when specific actions occur. Refer to the details on this page to determine what information is included in the payload of each webhook event. For details about how to use webhooks and to set up webhooks in Label Studio, see [Set up webhooks in Label Studio](webhooks.html). To create your own webhooks in Label Studio to trigger events when specific actions happen, see [Create custom events for webhooks in Label Studio](webhook_create.html). 
 
-### Event reference
+Webhooks sent from Label Studio include the following:
 
-It works according to algorithm and uses webhooks serialisers label_studio/webhooks/serializers_for_hooks.py. Also ACTIONS field in model.
+| Key | Details |
+| --- | --- |
+| action | Details the action that the event represents. |
+| project | Included only for task and annotation events. Details about the project. |
 
-Webhook's payload can be different.
-But for now I try do it by declarative way. And I use ACTIONS to describe it. https://github.com/heartexlabs/label-studio/pull/1156/files#diff-ce7daadc1ac182002d7ea3d42e0a83f25061d208ab81e7fae7472378a455ef44R94 
-Every webhook is run through run_webhook function https://github.com/heartexlabs/label-studio/pull/1156/files#diff-bf91bd7b648d9f117495b4b92cfc8b0399fbf465592318e2d94a0682eeaeed61R13 and as you can see: every payload has action key.
-But of course it's not interesting and def emit_webhooks_for_instance(organization, project, action, instance=None) is mostly used in code to do it. (to be honest only it's used now) https://github.com/heartexlabs/label-studio/pull/1156/files#diff-bf91bd7b648d9f117495b4b92cfc8b0399fbf465592318e2d94a0682eeaeed61R71 
-Project is required field here but it may be None (we have 2 kinds of webhooks: for organization and for project. If project is None it's organization webhook (global)).
-So
-and we serialize instance using ACTIONS metadata.
-Сonsequently:
-Now webhook's payload has: action key, project key (if it's project webhook), and key from ACTIONS with serialized instance (or list).
-In the future we might get new kinds of webhooks so they would not use ACTIONS and would be imperative but now it fits into the declarative model.
+The HTTP POST payloads that Label Studio sends to the configured webhook URLs include the headers that you set up when you [configure the webhook](webhooks.html).
 
-Expected format/content of what is sent from each event
+If the webhook event is in response to a creation or update event, the full details of the created entity are also sent in the payload. See the following event reference tables for additional details. 
 
-When are the events sent? 
-What data is included in each POST to the webhook URL?
+## Task Created
 
+Sent when a task is created in Label Studio.
 
-GitHub Webhook docs list common info and common header info, then event-specific stuff separately:
-https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#webhook-payload-object-common-properties
-Seems like a good idea
-https://docs.github.com/en/developers/webhooks-and-events/events/github-event-types
+### Webhook payload details
 
+| Key | Type | Description |
+| --- | --- | --- | 
+| name | string | Name of the action. In this case, `Task created` | 
+| id | integer | ID of the created task. | 
+| data | | Reference to the data associated with the task. Can be a URL such as `s3://path/to/bucket/image.png` |
+| meta | | If it exists, metadata about the task. |
+| project | integer | Project ID for the task. |
+| created_at | datetime | Date and time of task creation. |
+| updated_at | datetime | Date and time of last update to the task. |
+| is_labeled | boolean | Whether or not the task has been labeled. |
 
+### Example payload
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-```python
-class WebhookAction(models.Model):
-    PROJECT_CREATED = 'PROJECT_CREATED'
-    PROJECT_UPDATED = 'PROJECT_UPDATED'
-    PROJECT_DELETED = 'PROJECT_DELETED'
-
-    TASKS_CREATED = 'TASKS_CREATED'
-    TASKS_DELETED = 'TASKS_DELETED'
-
-    ANNOTATION_CREATED = 'ANNOTATION_CREATED'
-    ANNOTATION_UPDATED = 'ANNOTATION_UPDATED'
-    ANNOTATIONS_DELETED = 'ANNOTATIONS_DELETED'
-
-    ACTIONS = {
-        PROJECT_CREATED: {
-            'name': _('Project created'),
-            'description': _(''),
-            'key': 'project',
-            'many': False,
-            'model': Project,
-            'serializer': ProjectWebhookSerializer,
-            'organization-only': True,
-        },
-        PROJECT_UPDATED: {
-            'name': _('Project updated'),
-            'description': _(''),
-            'key': 'project',
-            'many': False,
-            'model': Project,
-            'serializer': ProjectWebhookSerializer,
-            'organization-only': True,
-        },
-        PROJECT_DELETED: {
-            'name': _('Project deleted'),
-            'description': _(''),
-            'key': 'project',
-            'many': False,
-            'model': Project,
-            'serializer': OnlyIDWebhookSerializer,
-            'organization-only': True,
-        },
-        TASKS_CREATED: {
-            'name': _('Task created'),
-            'description': _(''),
-            'key': 'tasks',
-            'many': True,
-            'model': Task,
-            'serializer': TaskWebhookSerializer,
-            'project-field': 'project',
-        },
-        TASKS_DELETED: {
-            'name': _('Task deleted'),
-            'description': _(''),
-            'key': 'tasks',
-            'many': True,
-            'model': Task,
-            'serializer': OnlyIDWebhookSerializer,
-            'project-field': 'project',
-        },
-        ANNOTATION_CREATED: {
-            'name': _('Annotation created'),
-            'description': _(''),
-            'key': 'annotation',
-            'many': False,
-            'model': Annotation,
-            'serializer': AnnotationWebhookSerializer,
-            'project-field': 'task__project',
-        },
-        ANNOTATION_UPDATED: {
-            'name': _('Annotation updated'),
-            'description': _(''),
-            'key': 'annotation',
-            'many': False,
-            'model': Annotation,
-            'serializer': AnnotationWebhookSerializer,
-            'project-field': 'task__project',
-        },
-        ANNOTATIONS_DELETED: {
-            'name': _('Annotation deleted'),
-            'description': _(''),
-            'key': 'annotations',
-            'many': True,
-            'model': Annotation,
-            'serializer': OnlyIDWebhookSerializer,
-            'project-field': 'task__project',
-        },
-    }
+```json
+{
+    "action": "Task created",
+    "tasks": [
+        {"id": 1, ...},
+        ...
+    ]
+}
 ```
 
+## Task Deleted
 
-```python
-class OnlyIDWebhookSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
+Sent when a task is deleted from Label Studio. 
 
-    class Meta:
-        fields: ('id',)
+### Webhook payload details
 
+| Key | Type | Description |
+| --- | --- | --- | 
+| name | string | Name of the action. In this case, `Task deleted`. | 
+| id | integer | ID of the deleted task. | 
 
-class ProjectWebhookSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Project
-        fields = '__all__'
+### Example payload 
 
-
-class TaskWebhookSerializer(serializers.ModelSerializer):
-    # resolve $undefined$ key in task data, if any
-    def to_representation(self, task):
-        project = task.project
-        data = task.data
-
-        replace_task_data_undefined_with_config_field(data, project)
-        return super().to_representation(task)
-
-    class Meta:
-        model = Task
-        fields = '__all__'
-
-
-class AnnotationWebhookSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Annotation
-        fields = '__all__'
+```json
+{
+    "action": "Task deleted",
+    "tasks": [
+        {"id": 1, ...},
+        ...
+    ]
+}
 ```
 
+## Annotation Created
+Sent when an annotation is created for a task in Label Studio.
+
+### Webhook payload details
+
+| Key | Type | Description |
+| --- | --- | --- | 
+| name | string | Name of the action. In this case, `Annotation created`. | 
+| id | integer | ID of the created annotation. | 
+| result | JSON | JSON format of the annotation created. |
+| task | JSON | The task that the annotation was created for. |
+| completed_by | JSON | Email address of the user that created the annotation. |
+| was_cancelled | boolean | Whether or not the annotation is the result of a skipped task, and an empty annotation. |
+| ground_truth | boolean | Enterprise only. Whether or not the annotation is a ground truth. 
+| created_at | datetime | Date and time that the annotation was created. |
+| updated_at | datetime | Date and time that the annotation was last updated. |
+| prediction | JSON dictionary | Details of the prediction viewed at the time of annotation, if one exists. |
+
+### Example payload
+
+```json
 
 
+```
+
+## Annotation Updated
+
+Sent when an annotation is updated.
+
+### Webhook payload details
+
+| Key | Type | Description |
+| --- | --- | --- | 
+| name | string | Name of the action. In this case, `Annotation created`. | 
+| id | integer | ID of the created annotation. | 
+| result | JSON | JSON format of the annotation created. |
+| task | JSON | The task that the annotation was created for. |
+| completed_by | JSON | Email address of the user that created the annotation. |
+| was_cancelled | boolean | Whether or not the annotation is the result of a skipped task, and an empty annotation. |
+| ground_truth | boolean | Enterprise only. Whether or not the annotation is a ground truth. 
+| created_at | datetime | Date and time that the annotation was created. |
+| updated_at | datetime | Date and time that the annotation was last updated. |
+| prediction | JSON dictionary | Details of the prediction viewed at the time of annotation, if one exists. |
+
+### Example payload
+
+```json
 
 
+```
 
+## Annotation Deleted
+Sent when an annotation is deleted.
 
+### Webhook payload details
 
+| Key | Type | Description |
+| --- | --- | --- | 
+| name | string  | Name of the action. In this case, `Annotation deleted` | 
+| id | integer | ID of the deleted annotation. | 
 
+### Example payload
 
+```json
+{
+    "action": "Annotation deleted",
+    "annotations": [
+        {"id": 1}
+    ]
+}
+```
+
+## Project Created
+
+Sent when a project is created.
+
+### Webhook payload details
+
+| Key | Type | Description |
+| --- | ---  | --- |
+| name | string  | The action that triggered the event. In this case, `Project created`. |
+| project | JSON dictionary | All fields related to the project that was created. | 
+
+### Example payload
+
+```json
+
+```
+
+## Project Updated
+Sent when a project is updated.
+
+### Webhook payload details
+
+| Key | Type | Description |
+| --- | ---  | --- |
+| name | string  | The action that triggered the event. In this case, `Project updated`. |
+| project | JSON dictionary | All fields related to the project that was updated. | 
+
+### Example payload
+
+```json
+
+```
+
+## Project Deleted
+Sent when a project is deleted. 
+
+### Webhook payload details
+
+| Key | Type | Description |
+| --- | --- | --- | 
+| name | string | Name of the action. In this case, `Project deleted`. | 
+| id | integer | ID of the deleted project. | 
+
+### Example payload
+
+```json
+
+```
 
 

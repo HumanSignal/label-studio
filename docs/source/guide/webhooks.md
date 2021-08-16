@@ -42,37 +42,42 @@ Label Studio makes two main types of events available to integrate with webhooks
     <th>Use Case</th>
   </tr>
   <tr>
-    <td>Task Created</td>
+    <td>[Task Created](webhook_reference.html#Task-Created)</td>
     <td>For a specific project, triggers when new tasks are created. One event per task.</td>
     <td>Use to take action in your machine learning pipeline. </td>
   </tr>
   <tr>
-    <td>Annotation Created</td>
+    <td>[Task Deleted](webhook_reference.html#Task-Deleted)</td>
+    <td>For a specific project, triggers when tasks are deleted. One event per deleted task.</td>
+    <td>Use to update a training dataset version. </td>
+  </tr>
+  <tr>
+    <td>[Annotation Created](webhook_reference.html#Annotation-Created)</td>
     <td>For a specific project, triggers when new annotations are created for any tasks. One event per annotation.</td>
     <td>Use to start training in an active learning scenario.</td>
   </tr>
   <tr>
-    <td>Annotation Updated</td>
+    <td>[Annotation Updated](webhook_reference.html#Annotation-Updated)</td>
     <td>For a specific project, triggers when an existing annotation is updated, overwritten, or when a task is skipped.</td>
     <td>Use to prompt model retraining. </td>
   </tr>
   <tr>
-    <td>Annotations Deleted</td>
+    <td>[Annotation Deleted](webhook_reference.html#Annotation-Deleted)</td>
     <td>For a specific project, triggers when an annotation is deleted.</td>
     <td>Use to create a new version of a training dataset. </td>
   </tr>
   <tr>
-    <td>Project Created</td>
+    <td>[Project Created](webhook_reference.html#Project-Created)</td>
     <td>For an organization, triggers when a project is created.</td>
     <td>Use to create a new pipeline for data management.</td>
   </tr>
   <tr>
-    <td>Project Updated</td>
+    <td>[Project Updated](webhook_reference.html#Project-Updated)</td>
     <td>For an organization, triggers when project settings are updated, created, or saved.</td>
     <td>Use to update an existing data management pipeline.</td>
   </tr>
   <tr>
-    <td>Project Deleted</td>
+    <td>[Project Deleted](webhook_reference.html#Project-Deleted)</td>
     <td>For an organization, triggers when a project is deleted.</td>
     <td>Use to remove a data management pipeline. </td>
   </tr>
