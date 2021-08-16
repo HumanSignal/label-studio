@@ -23,7 +23,7 @@ class WebhookAction(models.Model):
     ACTIONS = {
         SOMETHING_HAPPENED: {
             'name': _('Something happened'),
-            'description': _("Something was going ok or not, Nobody knows."),
+            'description': _("A thing happened. We wanted to let you know."),
             'key': 'something',
         },
         ...
