@@ -31,6 +31,8 @@ from projects.serializers import (
 )
 from tasks.models import Task, Annotation, Prediction, TaskLock
 from tasks.serializers import TaskSerializer, TaskWithAnnotationsAndPredictionsAndDraftsSerializer
+from webhooks.utils import api_webhook, api_webhook_for_delete, emit_webhooks_for_instance
+from webhooks.models import WebhookAction
 
 from core.mixins import APIViewVirtualRedirectMixin, APIViewVirtualMethodMixin
 from core.permissions import all_permissions, ViewClassPermission
@@ -142,6 +144,7 @@ class ProjectListAPI(generics.ListCreateAPIView):
     def get(self, request, *args, **kwargs):
         return super(ProjectListAPI, self).get(request, *args, **kwargs)
 
+    @api_webhook(WebhookAction.PROJECT_CREATED)
     def post(self, request, *args, **kwargs):
         return super(ProjectListAPI, self).post(request, *args, **kwargs)
 
@@ -186,9 +189,11 @@ class ProjectAPI(APIViewVirtualRedirectMixin,
     def get(self, request, *args, **kwargs):
         return super(ProjectAPI, self).get(request, *args, **kwargs)
 
+    @api_webhook_for_delete(WebhookAction.PROJECT_DELETED)
     def delete(self, request, *args, **kwargs):
         return super(ProjectAPI, self).delete(request, *args, **kwargs)
 
+    @api_webhook(WebhookAction.PROJECT_UPDATED)
     def patch(self, request, *args, **kwargs):
         project = self.get_object()
         label_config = self.request.data.get('label_config')
@@ -211,10 +216,12 @@ class ProjectAPI(APIViewVirtualRedirectMixin,
             instance.delete()
 
     @swagger_auto_schema(auto_schema=None)
+    @api_webhook(WebhookAction.PROJECT_UPDATED)
     def post(self, request, *args, **kwargs):
         return super(ProjectAPI, self).post(request, *args, **kwargs)
 
     @swagger_auto_schema(auto_schema=None)
+    @api_webhook(WebhookAction.PROJECT_UPDATED)
     def put(self, request, *args, **kwargs):
         return super(ProjectAPI, self).put(request, *args, **kwargs)
 
@@ -334,7 +341,8 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
             # order each task by the count of how many tasks solved in it's cluster
             cluster_num_solved_map = [When(predictions__cluster=k, then=v) for k, v in user_solved_clusters.items()]
 
-            num_tasks_with_current_predictions = task_with_current_predictions.count()  # WARNING! this call doesn't work after consequent annotate
+            # WARNING! this call doesn't work after consequent annotate
+            num_tasks_with_current_predictions = task_with_current_predictions.count()
             if cluster_num_solved_map:
                 task_with_current_predictions = task_with_current_predictions.annotate(
                     cluster_num_solved=Case(*cluster_num_solved_map, default=0, output_field=DecimalField()))
@@ -589,8 +597,10 @@ class TasksListAPI(generics.ListCreateAPIView,
 
     def delete(self, request, *args, **kwargs):
         project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
+        task_ids = list(Task.objects.filter(project=project).values('id'))
         Task.objects.filter(project=project).delete()
-        return Response(status=204)
+        emit_webhooks_for_instance(request.user.active_organization, None, WebhookAction.TASKS_DELETED, task_ids)
+        return Response(data={'tasks': task_ids}, status=204)
 
     def get(self, *args, **kwargs):
         return super(TasksListAPI, self).get(*args, **kwargs)
@@ -606,7 +616,9 @@ class TasksListAPI(generics.ListCreateAPIView,
 
     def perform_create(self, serializer):
         project = get_object_with_check_and_log(self.request, Project, pk=self.kwargs['pk'])
-        serializer.save(project=project)
+        instance = serializer.save(project=project)
+        emit_webhooks_for_instance(self.request.user.active_organization, project, WebhookAction.TASKS_CREATED, [instance])
+
 
 
 class TemplateListAPI(generics.ListAPIView):

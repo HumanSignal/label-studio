@@ -1,0 +1,119 @@
+---
+test_name: crud for webhooks
+marks:
+  - usefixtures:
+      - django_live_url
+      - configured_project
+stages:
+  - id: signup
+    type: ref
+  - name: Get webhook info
+    request:
+      url: "{django_live_url}/api/webhooks/info/"
+      method: GET
+    response:
+      status_code: 200
+  - name: Create organization webhook
+    request:
+      url: "{django_live_url}/api/webhooks/"
+      method: POST
+      json:
+        url: "http://127.0.0.1:6666/webhook"
+        headers:
+          Autorization: "Token 66666666666666666666666"
+          Security: "123123123123123"
+    response:
+      status_code: 201
+      save:
+        json:
+          webhook_id: id
+  - name: Get organization webhook
+    request:
+      url: "{django_live_url}/api/webhooks/{webhook_id}/"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        id: !int "{webhook_id}"
+        project: null
+        actions: !anylist
+        created_at: !anystr
+        updated_at: !anystr
+        headers: !anydict
+        send_payload: true
+        send_for_all_actions: true
+        organization: !anyint
+        is_active: true
+        url: "http://127.0.0.1:6666/webhook"
+  - name: Get webhook list
+    request:
+      url: "{django_live_url}/api/webhooks/"
+      method: GET
+    response:
+      status_code: 200
+  - name: Update organization webhook
+    request:
+      url: "{django_live_url}/api/webhooks/{webhook_id}/"
+      method: PATCH
+      json:
+        actions:
+          - ANNOTATION_CREATED
+          - ANNOTATION_UPDATED
+          - ANNOTATIONS_DELETED
+        send_for_all_actions: false
+        send_payload: false
+    response:
+      status_code: 200
+  - name: Second update organization webhook
+    request:
+      url: "{django_live_url}/api/webhooks/{webhook_id}/"
+      method: PATCH
+      json:
+        actions:
+          - TASKS_CREATED
+          - ANNOTATION_UPDATED
+        headers:
+          Autorization: "token 123456789"
+    response:
+      status_code: 200
+  - name: Delete organization webhook
+    request:
+      url: "{django_live_url}/api/webhooks/{webhook_id}/"
+      method: DELETE
+    response:
+      status_code: 204
+  - name: Create project webhook
+    request:
+      url: "{django_live_url}/api/webhooks/"
+      method: POST
+      json:
+        url: "http://127.0.0.1:6666/webhook/proj/"
+        project: "{configured_project.id}"
+        headers:
+          Autorization: "Token 66666666666666666666666"
+          Security: "123123123123123"
+    response:
+      status_code: 201
+      save:
+        json:
+          webhook_id: id
+  - name: Try to update project field in webhook without changes
+    request:
+      url: "{django_live_url}/api/webhooks/{webhook_id}/"
+      method: PATCH
+      json:
+        project: null
+    response:
+      status_code: 200
+      json:
+        id: !int "{webhook_id}"
+        project: !int "{configured_project.id}"
+        actions: !anylist
+        created_at: !anystr
+        updated_at: !anystr
+        headers: !anydict
+        send_payload: true
+        send_for_all_actions: true
+        organization: !int "{configured_project.organization.id}"
+        is_active: true
+        url: "http://127.0.0.1:6666/webhook/proj/"
