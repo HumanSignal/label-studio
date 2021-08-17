@@ -2461,6 +2461,9 @@ input.ls-input[type=radio] {
 .ls-wizard .ls-configure__preview-error h2 {
   font-size: 16px;
 }
+.ls-wizard .ls-configure__preview .ls-editor > .ls-common {
+  flex: 1;
+}
 div[class^=App_menu]>div {
   width: 100%;
 }
@@ -2913,7 +2916,7 @@ body {
   background: rgba(0,0,0,0.03);
   border: 1px rgba(0,0,0,0.05) solid;
   margin-bottom: -40px;
-  margin-left: -41px;
+  margin-left: -42px;
   padding-left: 40px;
   padding-right: 40px;
   display: flex;
@@ -3069,6 +3072,7 @@ body {
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  margin-bottom: 32px;
 }
 .ls-webhook-payload {
   background: #fafafa;
