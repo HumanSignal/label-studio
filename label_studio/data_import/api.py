@@ -181,6 +181,7 @@ class ImportAPI(generics.CreateAPIView):
             # Immediately create project tasks and update project states and counters
             tasks, serializer = self._save(parsed_data)
             task_count = len(tasks)
+            tasks_ids = [t['id'] for t in tasks]
             annotation_count = len(serializer.db_annotations)
             prediction_count = len(serializer.db_predictions)
             # Update tasks states if there are related settings in project
@@ -199,6 +200,7 @@ class ImportAPI(generics.CreateAPIView):
         else:
             # Do nothing - just output file upload ids for further use
             task_count = len(parsed_data)
+            tasks_ids = [t['id'] for t in parsed_data]
             annotation_count = None
             prediction_count = None
 
@@ -206,13 +208,14 @@ class ImportAPI(generics.CreateAPIView):
 
         return Response({
             'task_count': task_count,
+            'tasks_ids': tasks_ids,
             'annotation_count': annotation_count,
             'prediction_count': prediction_count,
             'duration': duration,
             'file_upload_ids': file_upload_ids,
             'could_be_tasks_list': could_be_tasks_lists,
             'found_formats': found_formats,
-            'data_columns': data_columns
+            'data_columns': data_columns,
         }, status=status.HTTP_201_CREATED)
 
 
@@ -241,7 +244,8 @@ class ReImportAPI(ImportAPI):
                 'duration': 0,
                 'file_upload_ids': [],
                 'found_formats': {},
-                'data_columns': []
+                'data_columns': [],
+                'tasks_ids': []
             }, status=status.HTTP_204_NO_CONTENT)
 
         tasks, found_formats, data_columns = FileUpload.load_tasks_from_uploaded_files(
@@ -273,7 +277,8 @@ class ReImportAPI(ImportAPI):
             'duration': duration,
             'file_upload_ids': file_upload_ids,
             'found_formats': found_formats,
-            'data_columns': data_columns
+            'data_columns': data_columns,
+            'tasks_ids': [t['id'] for t in tasks]
         }, status=status.HTTP_201_CREATED)
 
     @swagger_auto_schema(
