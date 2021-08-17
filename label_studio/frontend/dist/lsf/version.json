@@ -1,6 +1,6 @@
 {
-  "message": "Adjust Webpack settings",
-  "commit": "6082c430592424ee47f049eec46a26f1bc9e2817",
+  "message": "Fix relations initial loading (#237)",
+  "commit": "c07dd9b72503fe81638f4cbc20cdc80d8da526d9",
   "branch": "master",
-  "date": "2021-08-11T09:11:10Z"
+  "date": "2021-08-17T11:05:02Z"
 }
