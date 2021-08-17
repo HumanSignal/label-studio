@@ -1,5 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+import os
 import time
 import logging
 import drf_yasg.openapi as openapi
@@ -389,6 +390,8 @@ class UploadedFileResponse(generics.RetrieveAPIView):
         filename = kwargs['filename']
         file = settings.UPLOAD_DIR + ('/' if not settings.UPLOAD_DIR.endswith('/') else '') + filename
         logger.debug(f'Fetch uploaded file by user {request.user} => {file}')
-        file_upload = FileUpload.objects.get(file=file)
-
-        return RangedFileResponse(request, open(file_upload.file.path, mode='rb'))
+        file_upload = FileUpload.objects.filter(file=file).last()
+        if os.path.exists(file_upload.file.path):
+            return RangedFileResponse(request, open(file_upload.file.path, mode='rb'))
+        else:
+            return Response(status=status.HTTP_404_NOT_FOUND)
