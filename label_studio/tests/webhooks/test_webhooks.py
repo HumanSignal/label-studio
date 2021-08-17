@@ -65,19 +65,19 @@ def test_emit_webhooks(setup_project_dialog, organization_webhook):
 @pytest.mark.django_db
 def test_emit_webhooks_for_instance(setup_project_dialog, organization_webhook):
     webhook = organization_webhook
-    project_titles = [f'Projects {i}' for i in range(1, 10)]
-    projects = [Project.objects.create(title=title) for title in project_titles]
+    project_title = f'Projects 1'
+    project = Project.objects.create(title=project_title)
     with requests_mock.Mocker(real_http=True) as m:
         m.register_uri('POST', webhook.url)
         emit_webhooks_for_instance(
-            webhook.organization, webhook.project, WebhookAction.PROJECT_CREATED, instance=projects
+            webhook.organization, webhook.project, WebhookAction.PROJECT_CREATED, instance=project
         )
     assert len(m.request_history) == 1
     assert m.request_history[0].method == 'POST'
     data = m.request_history[0].json()
     assert 'action' in data
-    assert 'projects' in data
-    assert set(project_titles) == set([project['title'] for project in data['projects']])
+    assert 'project' in data
+    assert project_title == data['project']['title']
 
 
 @pytest.mark.django_db
@@ -117,7 +117,7 @@ def test_webhooks_for_projects(configured_project, business_client, organization
     assert response.status_code == 200
     assert len(m.request_history) == 1
     assert m.request_history[0].json()['action'] == WebhookAction.PROJECT_UPDATED
-    assert m.request_history[0].json()['projects'][0]['title'] == 'Test title'
+    assert m.request_history[0].json()['project']['title'] == 'Test title'
 
     # PROJECT_DELETED
     with requests_mock.Mocker(real_http=True) as m:
@@ -128,7 +128,7 @@ def test_webhooks_for_projects(configured_project, business_client, organization
     assert response.status_code == 204
     assert len(m.request_history) == 1
     assert m.request_history[0].json()['action'] == WebhookAction.PROJECT_DELETED
-    assert m.request_history[0].json()['projects'][0]['id'] == project_id
+    assert m.request_history[0].json()['project']['id'] == project_id
 
 
 @pytest.mark.django_db

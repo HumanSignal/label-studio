@@ -24,7 +24,7 @@ from tasks.serializers import (
     TaskSerializer, AnnotationSerializer, TaskSimpleSerializer, PredictionSerializer,
     TaskWithAnnotationsAndPredictionsAndDraftsSerializer, AnnotationDraftSerializer, PredictionQuerySerializer)
 from projects.models import Project
-from webhooks.utils import api_webhook, api_webhook_for_delete
+from webhooks.utils import api_webhook, api_webhook_for_delete, emit_webhooks_for_instance
 from webhooks.models import WebhookAction
 
 logger = logging.getLogger(__name__)
@@ -58,9 +58,12 @@ class TaskListAPI(generics.ListCreateAPIView):
             context['project'] = generics.get_object_or_404(Project, pk=project_id)
         return context
 
-    @api_webhook(WebhookAction.TASKS_CREATED)
-    def post(self, request, *args, **kwargs):
-        return super(TaskListAPI, self).post(request, *args, **kwargs)
+    def perform_create(self, serializer):
+        project_id = self.request.data.get('project')
+        generics.get_object_or_404(Project, pk=project_id)
+        project = generics.get_object_or_404(Project, pk=project_id)
+        instance = serializer.save(project=project)
+        emit_webhooks_for_instance(self.request.user.active_organization, project, WebhookAction.TASKS_CREATED, [instance])
 
 
 @method_decorator(name='get', decorator=swagger_auto_schema(

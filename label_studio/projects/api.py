@@ -606,7 +606,6 @@ class TasksListAPI(generics.ListCreateAPIView,
     def get(self, *args, **kwargs):
         return super(TasksListAPI, self).get(*args, **kwargs)
 
-    @api_webhook(WebhookAction.TASKS_CREATED)
     @swagger_auto_schema(auto_schema=None)
     def post(self, *args, **kwargs):
         return super(TasksListAPI, self).post(*args, **kwargs)
@@ -618,7 +617,9 @@ class TasksListAPI(generics.ListCreateAPIView,
 
     def perform_create(self, serializer):
         project = get_object_with_check_and_log(self.request, Project, pk=self.kwargs['pk'])
-        serializer.save(project=project)
+        instance = serializer.save(project=project)
+        emit_webhooks_for_instance(self.request.user.active_organization, project, WebhookAction.TASKS_CREATED, [instance])
+
 
 
 class TemplateListAPI(generics.ListAPIView):
