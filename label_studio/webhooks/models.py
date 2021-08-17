@@ -37,20 +37,33 @@ class Webhook(models.Model):
         'projects.Project', null=True, on_delete=models.CASCADE, related_name='webhooks', default=None
     )
 
-    url = models.URLField(_('URL of webhook'), max_length=2048)
+    url = models.URLField(_('URL of webhook'), max_length=2048, help_text=_('URL of webhook'))
 
-    send_payload = models.BooleanField(_("does webhook send the payload"), default=True)
-
-    send_for_all_actions = models.BooleanField(_("Use webhook for all actions"), default=True)
-
-    headers = models.JSONField(
-        _("request extra headers of webhook"), validators=[JSONSchemaValidator(HEADERS_SCHEMA)], default=dict
+    send_payload = models.BooleanField(
+        _("does webhook send the payload"), default=True, help_text=('If value is False send only action')
     )
 
-    is_active = models.BooleanField(_("is webhook active"), default=True)
+    send_for_all_actions = models.BooleanField(
+        _("Use webhook for all actions"),
+        default=True,
+        help_text=('If value is False - used only for actions from WebhookAction'),
+    )
 
-    created_at = models.DateTimeField(_('created at'), auto_now_add=True)
-    updated_at = models.DateTimeField(_('updated at'), auto_now=True)
+    headers = models.JSONField(
+        _("request extra headers of webhook"),
+        validators=[JSONSchemaValidator(HEADERS_SCHEMA)],
+        default=dict,
+        help_text=('Key Value Json of headers'),
+    )
+
+    is_active = models.BooleanField(
+        _("is webhook active"),
+        default=True,
+        help_text=('If value is False the webhook is disabled'),
+    )
+
+    created_at = models.DateTimeField(_('created at'), auto_now_add=True, help_text=_('Creation time'))
+    updated_at = models.DateTimeField(_('updated at'), auto_now=True, help_text=_('Last update time'))
 
     def get_actions(self):
         return WebhookAction.objects.filter(webhook=self).values_list('action', flat=True)
@@ -173,6 +186,7 @@ class WebhookAction(models.Model):
         choices=[[key, value['name']] for key, value in ACTIONS.items()],
         max_length=128,
         db_index=True,
+        help_text=_('Action value')
     )
 
     class Meta:
