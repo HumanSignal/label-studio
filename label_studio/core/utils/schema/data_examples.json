@@ -8,6 +8,7 @@
     "AudioPlus": "<HOSTNAME>/static/samples/game.wav",
     "Header": "Task header",
     "Paragraphs":  [{"author": "Alice", "text": "Hi, Bob."}, {"author": "Bob", "text": "Hello, Alice!"}, {"author": "Alice", "text": "What's up?"}, {"author": "Bob", "text": "Good. Ciao!"}, {"author": "Alice", "text": "Bye, Bob."}],
+    "ParagraphsUrl": "<HOSTNAME>/static/samples/paragraphs.json",
     "Table": {"Card number": 18799210, "First name": "Max", "Last name":  "Nobel"},
     "$videoHack": "<video src='<HOSTNAME>/static/samples/opossum_snow.mp4' width=100% controls>",
     "Video": "<HOSTNAME>/static/samples/opossum_snow.mp4",
