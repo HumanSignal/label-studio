@@ -92,7 +92,6 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         return Task.objects.filter(project__organization=self.request.user.active_organization)
 
-
     def get_serializer_class(self):
         # GET => task + annotations + predictions + drafts
         if self.request.method == 'GET':
