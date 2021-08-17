@@ -121,7 +121,7 @@ class WebhookAction(models.Model):
             'many': False,
             'model': Project,
             'serializer': ProjectWebhookSerializer,
-            'organization-only': True,
+            'project-field': '__self__',
         },
         PROJECT_DELETED: {
             'name': _('Project deleted'),

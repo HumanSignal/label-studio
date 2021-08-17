@@ -170,6 +170,8 @@ def api_webhook_for_delete(action):
 
 
 def get_nested_field(value, field):
+    if field == '__self__':
+        return value
     fields = field.split('__')
     for fld in fields:
         value = getattr(value, fld)
