@@ -97,7 +97,7 @@ def custom_exception_handler(exc, context):
     if response is not None:
         response_data['status_code'] = response.status_code
 
-        if 'detail' in response.data and isinstance(response.data['detail'], ErrorDetail):
+        if hasattr(response, 'data') and 'detail' in response.data and isinstance(response.data['detail'], ErrorDetail):
             response_data['detail'] = response.data['detail']
             response.data = response_data
         # move validation errors to separate namespace
