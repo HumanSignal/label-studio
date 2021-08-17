@@ -1,6 +1,6 @@
 ---
 title: Set up webhooks in Label Studio
-short: Webhooks Setup
+short: Webhook Setup
 type: guide
 order: 650
 meta_title: Configure Webhooks in Label Studio
