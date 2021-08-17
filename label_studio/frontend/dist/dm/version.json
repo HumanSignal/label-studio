@@ -1,6 +1,6 @@
 {
-  "message": "Adjust Webpack settings",
-  "commit": "efd5286fa212cc573e15c5091179f9956346d4a3",
+  "message": "Merge pull request #9 from heartexlabs/feature/regex-filter\n\n[ext] Add regex filter support",
+  "commit": "e67fb3ab5bcabfb663a4e010503c83ecb3d2ed44",
   "branch": "master",
-  "date": "2021-08-11T09:11:22Z"
+  "date": "2021-08-17T13:41:09Z"
 }
