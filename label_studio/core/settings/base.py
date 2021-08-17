@@ -100,16 +100,16 @@ LOGGING = {
     },
     'handlers': {
         'console_raw': {
-            'level': get_env('LOG_LEVEL', 'DEBUG'),
+            'level': get_env('LOG_LEVEL', 'WARNING'),
             'class': 'logging.StreamHandler',
         },
         'console': {
-            'level': get_env('LOG_LEVEL', 'DEBUG'),
+            'level': get_env('LOG_LEVEL', 'WARNING'),
             'class': 'logging.StreamHandler',
             'formatter': 'standard'
         },
         'rq_console': {
-            'level': 'DEBUG',
+            'level': 'WARNING',
             'class': 'rq.utils.ColorizingStreamHandler',
             'formatter': 'rq_console',
             'exclude': ['%(asctime)s'],
@@ -117,7 +117,7 @@ LOGGING = {
     },
     'root': {
         'handlers': ['console'],
-        'level': get_env('LOG_LEVEL', 'DEBUG'),
+        'level': get_env('LOG_LEVEL', 'WARNING'),
     }
 }
 

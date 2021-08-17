@@ -10,7 +10,7 @@ MIDDLEWARE.append('core.middleware.UpdateLastActivityMiddleware')
 
 ADD_DEFAULT_ML_BACKENDS = False
 
-LOGGING['root']['level'] = get_env('LOG_LEVEL', 'DEBUG')
+LOGGING['root']['level'] = get_env('LOG_LEVEL', 'WARNING')
 
 DEBUG = get_bool_env('DEBUG', False)
 
