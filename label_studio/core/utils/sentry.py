@@ -8,10 +8,12 @@ def event_processor(event, hint):
     if last.get('type') in [
         # 'Http404', 'NotAuthenticated', 'AuthenticationFailed', 'NotFound', 'XMLSyntaxError',
         # 'FileUpload.DoesNotExist',
-        'Forbidden', 'KeyboardInterrupt',
-        'LabelStudioErrorSentryIgnored', 'LabelStudioAPIExceptionSentryIgnored',
-        'LabelStudioValidationErrorSentryIgnored'
+        'Forbidden', 'KeyboardInterrupt'
     ]:
+        return None
+
+    # sentry ignored factory class
+    if 'SentryIgnored' in last.get('type'):
         return None
 
     if last.get('type') == 'OperationalError':

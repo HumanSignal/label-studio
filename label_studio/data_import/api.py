@@ -384,7 +384,7 @@ class UploadedFileResponse(generics.RetrieveAPIView):
         filename = kwargs['filename']
         file = settings.UPLOAD_DIR + ('/' if not settings.UPLOAD_DIR.endswith('/') else '') + filename
         logger.debug(f'Fetch uploaded file by user {request.user} => {file}')
-        file_upload = FileUpload.objects.get(file=file)
+        file_upload = FileUpload.objects.filter(file=file).last()
         if os.path.exists(file_upload.file.path):
             return RangedFileResponse(request, open(file_upload.file.path, mode='rb'))
         else:
