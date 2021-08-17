@@ -95,3 +95,96 @@ stages:
         ]
       }
       status_code: 200
+
+
+  - name: setup_views_with_regex
+    request:
+      method: POST
+      url: '{django_live_url}/api/dm/views/?project={project_pk}'
+      json: {
+        "data": {
+          "filters": {
+            "conjunction": "and",
+            "items": [
+            {
+              "filter": "filter:tasks:data.other",
+              "operator": "regex",
+              "type": "String",
+              "value": "o.*"
+            }
+            ]
+          },
+          "ordering": [
+            "tasks:data.text"
+          ]
+        },
+        "project": "{project_pk}"
+      }
+    response:
+      save:
+        json:
+          view: "@"
+      status_code: 201
+
+  - name: get_tasks_with_regex
+    request:
+      method: GET
+      url: '{django_live_url}/api/dm/views/{view.id}/tasks'
+    response:
+      json: {
+        "total_annotations": 0,
+        "total_predictions": 0,
+        "total": 1,
+        "tasks": [
+        {
+          "data": {
+            "other": "o1"
+          }
+        }
+        ]
+      }
+      status_code: 200
+
+
+  - name: setup_views_with_wrong_regex
+    request:
+      method: POST
+      url: '{django_live_url}/api/dm/views/?project={project_pk}'
+      json: {
+        "data": {
+          "filters": {
+            "conjunction": "and",
+            "items": [
+            {
+              "filter": "filter:tasks:data.other",
+              "operator": "regex",
+              "type": "String",
+              "value": "*"
+            }
+            ]
+          },
+          "ordering": [
+            "tasks:data.text"
+          ]
+        },
+        "project": "{project_pk}"
+      }
+    response:
+      save:
+        json:
+          view: "@"
+      status_code: 201
+
+  - name: get_tasks_with_wrong_regex
+    request:
+      method: GET
+      url: '{django_live_url}/api/dm/views/{view.id}/tasks'
+    response:
+      json: {
+        "total_annotations": 0,
+        "total_predictions": 0,
+        "total": 0,
+        "tasks": [
+        ]
+      }
+      status_code: 200

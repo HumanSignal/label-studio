@@ -33,6 +33,7 @@ operators = {
     "empty": "__isnull",
     "contains": "__icontains",
     "not_contains": "__icontains",
+    "regex": "__regex"
 }
 
 
@@ -177,6 +178,14 @@ def apply_filters(queryset, filters):
                 )
             filter_expression.add(q, conjunction)
             continue
+
+        # regex pattern check
+        elif _filter.operator == 'regex':
+            try:
+                re.compile(pattern=str(_filter.value))
+            except Exception as e:
+                logger.info('Incorrect regex for filter: %s: %s', _filter.value, str(e))
+                return queryset.none()
 
         # append operator
         field_name = f"{clean_field_name}{operators.get(_filter.operator, '')}"
