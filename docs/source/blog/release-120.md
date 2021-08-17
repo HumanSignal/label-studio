@@ -15,6 +15,6 @@ Webhooks allow you to automatically make changes based on actions happening in L
 - Notify annotators about a new labeling project.
 - Start training a machine learning model after a certain number of tasks have been annotated.
 
-And more! Install or upgrade Label Studio and [start using webhooks](webhooks.html) today!
+And more! Install or upgrade Label Studio and [start using webhooks](/guide/webhooks.html) today!
 
 This release of Label Studio also includes the same [fixes and features in version 1.1.1](https://github.com/heartexlabs/label-studio/releases/tag/v1.1.1).
