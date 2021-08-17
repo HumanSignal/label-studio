@@ -229,7 +229,7 @@ class ProjectAPI(APIViewVirtualRedirectMixin,
     this task.
     """,
     responses={200: TaskWithAnnotationsAndPredictionsAndDraftsSerializer()}
-    )) # leaving this method decorator info in case we put it back in swagger API docs
+    ))  # leaving this method decorator info in case we put it back in swagger API docs
 class ProjectNextTaskAPI(generics.RetrieveAPIView):
 
     permission_required = all_permissions.tasks_view
@@ -591,7 +591,6 @@ class TasksListAPI(generics.ListCreateAPIView,
         project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
         Task.objects.filter(project=project).delete()
         return Response(status=204)
-
 
     def get(self, *args, **kwargs):
         return super(TasksListAPI, self).get(*args, **kwargs)
