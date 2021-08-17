@@ -4,10 +4,10 @@
   "description": "",
   "main": "get-build.js",
   "scripts": {
-    "start": "webpack --watch",
+    "start": "npx webpack --watch",
     "test": "CSS_PREFIX='ls-' jest",
-    "build": "webpack",
-    "build:production": "NODE_ENV=production webpack",
+    "build": "npx webpack",
+    "build:production": "NODE_ENV=production npx webpack",
     "download:all": "npm run download:editor && npm run download:dm && npm run build",
     "download:editor": "npm run download -- lsf",
     "download:dm": "npm run download -- dm",
