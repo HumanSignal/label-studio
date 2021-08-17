@@ -1,6 +1,6 @@
 {
-  "message": "Don't close QuickView by Enter",
-  "commit": "d12a691d1e941768c3067ccb15abe5498f8a453b",
+  "message": "Merge pull request #9 from heartexlabs/feature/regex-filter\n\n[ext] Add regex filter support",
+  "commit": "e67fb3ab5bcabfb663a4e010503c83ecb3d2ed44",
   "branch": "master",
-  "date": "2021-06-30T16:06:22Z"
+  "date": "2021-08-17T13:41:09Z"
 }

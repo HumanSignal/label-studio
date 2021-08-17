@@ -12,7 +12,7 @@ Relations tag, create relations labels
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| [choice] | <code>single</code> \| <code>multiple</code> | <code>single</code> | configure if you can select just one or multiple labels |
+| [choice] | <code>single</code> \| <code>multiple</code> | <code>single</code> | Configure whether you can select one or multiple labels |
 
 ### Example
 ```html

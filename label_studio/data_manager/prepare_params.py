@@ -6,15 +6,15 @@ from pydantic import BaseModel
 
 
 class FilterIn(BaseModel):
-    min: Union[int, float, str]
-    max: Union[int, float, str]
+    min: Union[float, int, str]
+    max: Union[float, int, str]
 
 
 class Filter(BaseModel):
     filter: str
     operator: str
     type: str
-    value: Union[str, int, float, bool, FilterIn]
+    value: Union[str, float, int, bool, FilterIn]
 
 
 class ConjunctionEnum(Enum):

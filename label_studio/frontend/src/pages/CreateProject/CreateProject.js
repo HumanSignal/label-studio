@@ -114,7 +114,7 @@ export const CreateProject = ({ onClose }) => {
   }, [project]);
 
   return (
-    <Modal onHide={() => history.push("/projects")} fullscreen visible bare closeOnClickOutside={false}>
+    <Modal onHide={onDelete} fullscreen visible bare closeOnClickOutside={false}>
       <div className={rootClass}>
         <Modal.Header>
           <h1>Create Project</h1>
