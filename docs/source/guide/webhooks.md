@@ -42,46 +42,53 @@ Label Studio makes two main types of events available to integrate with webhooks
     <th>Use Case</th>
   </tr>
   <tr>
-    <td>[Task Created](webhook_reference.html#Task-Created)</td>
+    <td><a href="webhook_reference.html#Task-Created">Task Created</a></td>
     <td>For a specific project, triggers when new tasks are created. One event per task.</td>
     <td>Use to take action in your machine learning pipeline. </td>
   </tr>
   <tr>
-    <td>[Task Deleted](webhook_reference.html#Task-Deleted)</td>
+    <td><a href="webhook_reference.html#Task-Deleted">Task Deleted</a></td>
     <td>For a specific project, triggers when tasks are deleted. One event per deleted task.</td>
     <td>Use to update a training dataset version. </td>
   </tr>
   <tr>
-    <td>[Annotation Created](webhook_reference.html#Annotation-Created)</td>
+    <td><a href="webhook_reference.html#Annotation-Created">Annotation Created</a></td>
     <td>For a specific project, triggers when new annotations are created for any tasks. One event per annotation.</td>
     <td>Use to start training in an active learning scenario.</td>
   </tr>
   <tr>
-    <td>[Annotation Updated](webhook_reference.html#Annotation-Updated)</td>
+    <td><a href="webhook_reference.html#Annotation-Updated">Annotation Updated</a></td>
     <td>For a specific project, triggers when an existing annotation is updated, overwritten, or when a task is skipped.</td>
     <td>Use to prompt model retraining. </td>
   </tr>
   <tr>
-    <td>[Annotation Deleted](webhook_reference.html#Annotation-Deleted)</td>
+    <td><a href="webhook_reference.html#Annotation-Deleted">Annotation Deleted</a></td>
     <td>For a specific project, triggers when an annotation is deleted.</td>
     <td>Use to create a new version of a training dataset. </td>
   </tr>
   <tr>
-    <td>[Project Created](webhook_reference.html#Project-Created)</td>
-    <td>For an organization, triggers when a project is created.</td>
+    <td><a href="webhook_reference.html#Project-Created">Project Created</a></td>
+    <td>For an organization, triggers when a project is created. You must <a href="webhooks.html#Enable-organization-level-webhooks">enable organization-level webhooks</a> to send this event.</td>
     <td>Use to create a new pipeline for data management.</td>
   </tr>
   <tr>
-    <td>[Project Updated](webhook_reference.html#Project-Updated)</td>
-    <td>For an organization, triggers when project settings are updated, created, or saved.</td>
+    <td><a href="webhook_reference.html#Project-Updated">Project Updated</a></td>
+    <td>Triggers when project settings are updated, created, or saved.</td>
     <td>Use to update an existing data management pipeline.</td>
   </tr>
   <tr>
-    <td>[Project Deleted](webhook_reference.html#Project-Deleted)</td>
-    <td>For an organization, triggers when a project is deleted.</td>
+    <td><a href="webhook_reference.html#Project-Deleted">Project Deleted</a></td>
+    <td>For an organization, triggers when a project is deleted. You must <a href="webhooks.html#Enable-organization-level-webhooks">enable organization-level webhooks</a> to send this event.</td>
     <td>Use to remove a data management pipeline. </td>
   </tr>
 </table>
+
+### Enable organization-level webhooks
+
+To use the organization-level webhooks that trigger events for each project, you must [set an environment variable](start.html#Set-environment-variables).
+```shell
+LABEL_STUDIO_ALLOW_ORGANIZATION_WEBHOOKS=true
+```
 
 ## How to integrate with webhooks
 
@@ -106,8 +113,8 @@ Add a webhook URL to Label Studio. The webhook URL must be set up to accept HTTP
 4. In the **Payload URL** field, provide the URL to send event payloads to. For example, `https://www.example.com/webhook`.
 5. (Optional) Toggle the **Is Active** option to deactivate the webhook until it is ready to use. Otherwise, the webhook becomes active as soon as you save it and events are sent to the URL. 
 6. (Optional) Add any headers required by the webhook URL. Specify the header name and the value. You can use headers to authenticate a request to your webhook URL. You can't add more than 10 headers. For example, `Authorization` and `Basic bGFiZWxzdHVkaW86ZXhhbXBsZQ==`
-7. Select whether to send a payload with the event. For example, choose to send the payload for `Annotation created` events to update the correct pipeline based on the project ID sent in the payload.  
-8. Select whether to send an event for all actions in Label Studio supported by webhooks, or specific events. For example, select the `Annotation created` event. 
+7. (Optional) Select whether to send a payload with the event. By default, payloads are sent. For example, choose to send the payload for `Annotation created` events to update the correct pipeline based on the project ID sent in the payload.  
+8. (Optional) Select whether to send an event for all actions in Label Studio supported by webhooks, or specific events. By default, events are sent for all actions. For example, select the `Annotation created` event. 
 9. Save the webhook.
 
 ### Add a webhook using the Label Studio API
@@ -116,27 +123,11 @@ Make a POST request to the [Create a webhook](/api#tag/Webhooks/) endpoint to ad
 
 ## Troubleshoot a webhook connection
 
-Webhook connections time out after 1 second. 
+Webhook connections time out after 1 second. You can adjust the timeout by setting an environment variable, `WEBHOOK_TIMEOUT`. 
 
-If the webhook URL is inaccessible by Label Studio, you can see this in a traceback in the logs. For example:
-```
-[2021-08-12 16:39:30,180] [root::run_webhook::32] [ERROR] HTTPConnectionPool(host='localhost', port=8888): Max retries exceeded with url: / (Caused by NewConnectio$Error('<urllib3.connection.HTTPConnection object at 0x7ff849ba1d90>: Failed to establish a new connection: [Errno 111] Connection refused'))
-Traceback (most recent call last):                                
-  File "/home/ch/work/label-studio/venv/lib/python3.8/site-packages/urllib3/connection.py", line 169, in _new_conn
-    conn = connection.create_connection(
-  File "/home/ch/work/label-studio/venv/lib/python3.8/site-packages/urllib3/util/connection.py", line 96, in create_connection
-    raise err                                                                              
-  File "/home/ch/work/label-studio/venv/lib/python3.8/site-packages/urllib3/util/connection.py", line 86, in create_connection
-    sock.connect(sa)                                                                                   
-ConnectionRefusedError: [Errno 111] Connection refused
-```
+If the webhook URL is inaccessible by Label Studio, you can see this in a traceback in the logs. 
 
-Label Studio does not retry webhook connections that fail. You can see successful webhook deliveries in the logs in DEBUG mode. For example:
-```
-[2021-08-12 17:02:34,703] [root::run_webhook::24] [DEBUG] Run webhook 1 for action ANNOTATION_UPDATED
-[2021-08-12 17:02:34,704] [urllib3.connectionpool::_new_conn::227] [DEBUG] Starting new HTTP connection (1): localhost:8888
-[2021-08-12 17:02:34,706] [urllib3.connectionpool::_make_request::452] [DEBUG] http://localhost:8888 "POST / HTTP/1.1" 200 2
-```
+Label Studio does not retry webhook connections that fail. You can see successful webhook deliveries in the logs in DEBUG mode. 
 
 
 

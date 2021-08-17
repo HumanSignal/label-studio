@@ -32,8 +32,8 @@ The webhook payload includes the name of the action and some additional task dat
 | --- | --- | --- | 
 | name | string | Name of the action. In this case, `Task created` | 
 | id | integer | ID of the created task. | 
-| data | | Reference to the data associated with the task. Can be a URL such as `s3://path/to/bucket/image.png` |
-| meta | | If it exists, metadata about the task. |
+| data | string | Reference to the data associated with the task. Can be a URL such as `s3://path/to/bucket/image.png` |
+| meta | JSON dictionary | If it exists, metadata about the task. |
 | project | integer | Project ID for the task. |
 | created_at | datetime | Date and time of task creation. |
 | updated_at | datetime | Date and time of last update to the task. |
@@ -68,7 +68,7 @@ Sent when a task is deleted from Label Studio. See how to [set up a webhook for 
 {
     "action": "Task deleted",
     "tasks": [
-        {"id": 1, ...},
+        {"id": 1},
         ...
     ]
 }
