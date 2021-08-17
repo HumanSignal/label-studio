@@ -1,5 +1,6 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
+import os
 import time
 import logging
 import drf_yasg.openapi as openapi
@@ -22,6 +23,9 @@ from tasks.models import Task
 from .uploader import load_tasks
 from .serializers import ImportApiSerializer, FileUploadSerializer
 from .models import FileUpload
+
+from webhooks.utils import emit_webhooks_for_instance
+from webhooks.models import WebhookAction
 
 logger = logging.getLogger(__name__)
 
@@ -165,7 +169,10 @@ class ImportAPI(generics.CreateAPIView):
     def _save(self, tasks):
         serializer = self.get_serializer(data=tasks, many=True)
         serializer.is_valid(raise_exception=True)
-        return serializer.save(project_id=self.kwargs['pk']), serializer
+        task_instances = serializer.save(project_id=self.kwargs['pk'])
+        project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
+        emit_webhooks_for_instance(self.request.user.active_organization, project, WebhookAction.TASKS_CREATED, task_instances)
+        return task_instances, serializer
 
     def create(self, request, *args, **kwargs):
         start = time.time()
@@ -228,10 +235,22 @@ class ReImportAPI(ImportAPI):
     def create(self, request, *args, **kwargs):
         start = time.time()
         files_as_tasks_list = bool_from_request(request.data, 'files_as_tasks_list', True)
+        file_upload_ids = self.request.data.get('file_upload_ids')
 
         # check project permissions
         project = generics.get_object_or_404(Project.objects.for_user(self.request.user), pk=self.kwargs['pk'])
-        file_upload_ids = self.request.data.get('file_upload_ids')
+        
+        if not file_upload_ids:
+            return Response({
+                'task_count': 0,
+                'annotation_count': 0,
+                'prediction_count': 0,
+                'duration': 0,
+                'file_upload_ids': [],
+                'found_formats': {},
+                'data_columns': []
+            }, status=status.HTTP_204_NO_CONTENT)
+
         tasks, found_formats, data_columns = FileUpload.load_tasks_from_uploaded_files(
             project, file_upload_ids,  files_as_tasks_list=files_as_tasks_list)
 
@@ -326,6 +345,7 @@ class FileUploadListAPI(generics.mixins.ListModelMixin,
             raise ValueError('"file_upload_ids" parameter must be a list of integers')
         return Response({'deleted': deleted}, status=status.HTTP_200_OK)
 
+
 @method_decorator(name='get', decorator=swagger_auto_schema(
         tags=['Import'],
         operation_summary='Get file upload',
@@ -370,6 +390,8 @@ class UploadedFileResponse(generics.RetrieveAPIView):
         filename = kwargs['filename']
         file = settings.UPLOAD_DIR + ('/' if not settings.UPLOAD_DIR.endswith('/') else '') + filename
         logger.debug(f'Fetch uploaded file by user {request.user} => {file}')
-        file_upload = FileUpload.objects.get(file=file)
-
-        return RangedFileResponse(request, open(file_upload.file.path, mode='rb'))
+        file_upload = FileUpload.objects.filter(file=file).last()
+        if os.path.exists(file_upload.file.path):
+            return RangedFileResponse(request, open(file_upload.file.path, mode='rb'))
+        else:
+            return Response(status=status.HTTP_404_NOT_FOUND)

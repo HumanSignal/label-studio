@@ -79,7 +79,7 @@ class AnnotationSerializer(DynamicFieldsMixin, ModelSerializer):
         if not isinstance(data, list):
             raise ValidationError('annotation "result" field in annotation must be list')
 
-        return value
+        return data
 
     def get_created_username(self, annotation):
         user = annotation.completed_by
@@ -282,6 +282,10 @@ class TaskSerializerBulk(serializers.ListSerializer):
                          overlap=project.maximum_annotations,
                          file_upload_id=task.get('file_upload_id'))
                 db_tasks.append(t)
+
+            # deprecated meta warning
+            if 'meta' in task:
+                logger.warning('You task data has field "meta" which is deprecated and it will be removed in future')
 
             if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
                 self.db_tasks = []

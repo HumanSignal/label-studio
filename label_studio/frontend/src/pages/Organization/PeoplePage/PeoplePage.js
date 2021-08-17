@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { LsPlus } from "../../assets/icons";
-import { Button } from "../../components";
-import { Description } from "../../components/Description/Description";
-import { Input } from "../../components/Form";
-import { modal } from "../../components/Modal/Modal";
-import { Space } from "../../components/Space/Space";
-import { useAPI } from "../../providers/ApiProvider";
-import { useConfig } from "../../providers/ConfigProvider";
-import { Block, Elem } from "../../utils/bem";
-import { copyText } from "../../utils/helpers";
+import { LsPlus } from "../../../assets/icons";
+import { Button } from "../../../components";
+import { Description } from "../../../components/Description/Description";
+import { Input } from "../../../components/Form";
+import { modal } from "../../../components/Modal/Modal";
+import { Space } from "../../../components/Space/Space";
+import { useAPI } from "../../../providers/ApiProvider";
+import { useConfig } from "../../../providers/ConfigProvider";
+import { Block, Elem } from "../../../utils/bem";
+import { copyText } from "../../../utils/helpers";
 import "./PeopleInvitation.styl";
 import { PeopleList } from "./PeopleList";
 import "./PeoplePage.styl";
@@ -138,4 +138,4 @@ export const PeoplePage = () => {
 };
 
 PeoplePage.title = "People";
-PeoplePage.path = "/people";
+PeoplePage.path = "/";

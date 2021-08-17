@@ -13,13 +13,13 @@ only one label.
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| name | <code>string</code> |  | name of the element |
-| toName | <code>string</code> |  | name of the image to label |
-| [opacity] | <code>float</code> | <code>0.6</code> | opacity of rectangle |
-| [fillColor] | <code>string</code> |  | rectangle fill color, default is transparent |
-| [strokeColor] | <code>string</code> | <code>&quot;#f48a42&quot;</code> | stroke color |
-| [strokeWidth] | <code>number</code> | <code>1</code> | width of the stroke |
-| [canRotate] | <code>boolean</code> | <code>true</code> | show or hide rotation handle |
+| name | <code>string</code> |  | Name of the element |
+| toName | <code>string</code> |  | Name of the image to label |
+| [opacity] | <code>float</code> | <code>0.6</code> | Opacity of rectangle |
+| [fillColor] | <code>string</code> |  | Rectangle fill color |
+| [strokeColor] | <code>string</code> | <code>&quot;#f48a42&quot;</code> | Stroke color |
+| [strokeWidth] | <code>number</code> | <code>1</code> | Width of the stroke |
+| [canRotate] | <code>boolean</code> | <code>true</code> | Show or hide rotation control |
 
 ### Example
 ```html

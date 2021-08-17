@@ -8,11 +8,16 @@ export const SidebarMenu = ({children, menu, path, menuItems}) => {
 
   return (
     <div className={rootClass}>
-      <div className={rootClass.elem('navigation')}>
-        <Menu>
-          {menuItems ? Menu.Builder(path, menuItems) : menu}
-        </Menu>
-      </div>
+      {
+        menuItems && menuItems.length > 1 ?
+          (<div className={rootClass.elem('navigation')}>
+            <Menu>
+              {menuItems ? Menu.Builder(path, menuItems) : menu}
+            </Menu>
+          </div>)
+          :
+          null
+      }
       <div className={rootClass.elem('content')}>
         {children}
       </div>

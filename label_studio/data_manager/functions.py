@@ -12,7 +12,6 @@ from data_manager.models import View
 from tasks.models import Task
 
 
-DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 TASKS = 'tasks:'
 logger = logging.getLogger(__name__)
 

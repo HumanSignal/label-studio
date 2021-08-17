@@ -24,6 +24,8 @@ from tasks.serializers import (
     TaskSerializer, AnnotationSerializer, TaskSimpleSerializer, PredictionSerializer,
     TaskWithAnnotationsAndPredictionsAndDraftsSerializer, AnnotationDraftSerializer, PredictionQuerySerializer)
 from projects.models import Project
+from webhooks.utils import api_webhook, api_webhook_for_delete, emit_webhooks_for_instance
+from webhooks.models import WebhookAction
 
 logger = logging.getLogger(__name__)
 
@@ -36,23 +38,14 @@ logger = logging.getLogger(__name__)
 class TaskListAPI(generics.ListCreateAPIView):
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     queryset = Task.objects.all()
-    filterset_fields = ['project']
     permission_required = ViewClassPermission(
         GET=all_permissions.tasks_view,
         POST=all_permissions.tasks_create,
     )
     serializer_class = TaskSerializer
 
-    def get_queryset(self):
-        pk = int_from_request(self.request.GET, 'project', 0) or int_from_request(self.request.data, 'project', 0)
-        if not pk:
-            raise ValueError('Project is not set')
-
-        project = get_object_with_check_and_log(self.request, Project, pk=pk)
-        if not project.has_permission(self.request.user):
-            raise DRFPermissionDenied('No project access')
-
-        return Task.objects.filter(project__organization=self.request.user.active_organization)
+    def filter_queryset(self, queryset):
+        return queryset.filter(project__organization=self.request.user.active_organization)
 
     @swagger_auto_schema(auto_schema=None)
     def get(self, request, *args, **kwargs):
@@ -65,8 +58,12 @@ class TaskListAPI(generics.ListCreateAPIView):
             context['project'] = generics.get_object_or_404(Project, pk=project_id)
         return context
 
-    def post(self, request, *args, **kwargs):
-        return super(TaskListAPI, self).post(request, *args, **kwargs)
+    def perform_create(self, serializer):
+        project_id = self.request.data.get('project')
+        generics.get_object_or_404(Project, pk=project_id)
+        project = generics.get_object_or_404(Project, pk=project_id)
+        instance = serializer.save(project=project)
+        emit_webhooks_for_instance(self.request.user.active_organization, project, WebhookAction.TASKS_CREATED, [instance])
 
 
 @method_decorator(name='get', decorator=swagger_auto_schema(
@@ -101,7 +98,6 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         return Task.objects.filter(project__organization=self.request.user.active_organization)
 
-
     def get_serializer_class(self):
         # GET => task + annotations + predictions + drafts
         if self.request.method == 'GET':
@@ -132,6 +128,7 @@ class TaskAPI(generics.RetrieveUpdateDestroyAPIView):
     def patch(self, request, *args, **kwargs):
         return super(TaskAPI, self).patch(request, *args, **kwargs)
 
+    @swagger_auto_schema(tags=['Tasks'])
     def delete(self, request, *args, **kwargs):
         return super(TaskAPI, self).delete(request, *args, **kwargs)
 
@@ -185,13 +182,16 @@ class AnnotationAPI(generics.RetrieveUpdateDestroyAPIView):
     def get(self, request, *args, **kwargs):
         return super(AnnotationAPI, self).get(request, *args, **kwargs)
 
+    @api_webhook(WebhookAction.ANNOTATION_UPDATED)
     @swagger_auto_schema(auto_schema=None)
     def put(self, request, *args, **kwargs):
         return super(AnnotationAPI, self).put(request, *args, **kwargs)
 
+    @api_webhook(WebhookAction.ANNOTATION_UPDATED)
     def patch(self, request, *args, **kwargs):
         return super(AnnotationAPI, self).patch(request, *args, **kwargs)
 
+    @api_webhook_for_delete(WebhookAction.ANNOTATIONS_DELETED)
     def delete(self, request, *args, **kwargs):
         return super(AnnotationAPI, self).delete(request, *args, **kwargs)
 
@@ -234,6 +234,7 @@ class AnnotationsListAPI(generics.ListCreateAPIView):
     def get(self, request, *args, **kwargs):
         return super(AnnotationsListAPI, self).get(request, *args, **kwargs)
 
+    @api_webhook(WebhookAction.ANNOTATION_CREATED)
     def post(self, request, *args, **kwargs):
         return super(AnnotationsListAPI, self).post(request, *args, **kwargs)
 
@@ -245,9 +246,6 @@ class AnnotationsListAPI(generics.ListCreateAPIView):
         task = get_object_with_check_and_log(self.request, Task, pk=self.kwargs['pk'])
         # annotator has write access only to annotations and it can't be checked it after serializer.save()
         user = self.request.user
-        # Release task if it has been taken at work (it should be taken by the same user, or it makes sentry error
-        logger.debug(f'User={user} releases task={task}')
-        task.release_lock(user)
 
         # updates history
         update_id = self.request.user.id
@@ -281,6 +279,10 @@ class AnnotationsListAPI(generics.ListCreateAPIView):
         logger.debug(f'Save activity for user={self.request.user}')
         self.request.user.activity_at = timezone.now()
         self.request.user.save()
+
+        # Release task if it has been taken at work (it should be taken by the same user, or it makes sentry error
+        logger.debug(f'User={user} releases task={task}')
+        task.release_lock(user)
 
         # if annotation created from draft - remove this draft
         draft_id = self.request.data.get('draft_id')
