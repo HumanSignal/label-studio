@@ -9,7 +9,7 @@ meta_description: Release notes and information about Label Studio version 1.2.0
 
 The latest version of Label Studio introduces webhooks, an oft-requested feature. Now you can subscribe to events such as annotation created, task created, or project created, and trigger changes in your machine learning model pipelines.
 
-<br/><img src="/images/release-120/120-webhooks.jpg" alt="Diagram showing selecting webhook payload in Label Studio and processing the event payload and starting model training in your own pipeline" class="gif-border" width="800px" height="425px" />
+<br/><img src="/images/release-120/120-webhooks.jpg" alt="Diagram showing selecting webhook payload in Label Studio and processing the event payload and starting model training in your own pipeline" class="gif-border" width="800px" height="318px" />
 
 Webhooks allow you to automatically make changes based on actions happening in Label Studio. Take advantage of the new webhook events to:
 - Trigger updates to versioned datasets in Pachyderm or DVC.
