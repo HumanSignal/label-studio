@@ -92,13 +92,45 @@ app:
 #          - studio.yourdomain.com
 ```
 
-Copy these into a new file and save it as `lse-values.yaml`. 
-
-Adjust the included defaults to reflect your environment. For the full list of configurable options, see the [values.yaml](values.yaml):
-
-```yaml
+Adjust the included defaults to reflect your environment and copy these into a new file and save it as `lse-values.yaml`. 
 
 
+<br/>
+{% details <b>Click to expand the full list of configurable options</b> %}
+
+If you have a more complex environment, you can customize your own YAML file of values to pass to Label Studio Enterprise using this example. 
+
+{% codeblock lang:yaml %}
+
+
+# Default values for Label Studio Enterprise
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# https://labelstud.io/guide/install_enterprise.html#Start-using-Docker-Compose
+
+global:
+  # Image pull secret to use for registry authentication.
+  # Alternatively, you can specify the value as an array of strings.
+  imagePullSecrets: []
+
+  image:
+    repository: heartexlabs/label-studio-enterprise
+    pullPolicy: IfNotPresent
+    tag: ""
+
+  djangoConfig:
+    db: "default"
+    settings_module: "htx.settings.label_studio"
+
+  # [Enterprise Only] This value refers to a Kubernetes secret that you have
+  # created that contains your enterprise license.
+  enterpriseLicense:
+    # The name of the Kubernetes secret that holds the enterprise license. The
+    # secret must be in the same namespace that Label Studio Enterprise is installed into.
+    secretName: ""
+    # The key within the Kubernetes secret that holds the enterprise license.
+    secretKey: "license"
 
   pgConfig:
     host: ""
@@ -109,7 +141,7 @@ Adjust the included defaults to reflect your environment. For the full list of c
       secretName: ""
       secretKey: ""
 
-  # Redis location e.g. redis://[:password]@localhost:6379/1
+  # Redis location, for example redis://[:password]@localhost:6379/1
   redisConfig:
     host: ""
     password:
@@ -161,19 +193,19 @@ app:
   #   beta.kubernetes.io/arch: amd64
   nodeSelector: { }
 
-  # Extra annotations to attach to the rqworker pods
+  # Extra k8s annotations to attach to the rqworker pods
   # This can either be YAML or a YAML-formatted multi-line templated string map
   # of the annotations to apply to the rqworker pods
   annotations: { }
 
-  # Extra labels to attach to the lse app
-  # This should be a YAML map of the labels to apply to the lse app
+  # Extra k8s labels to attach to Label Studio Enterprise.
+  # Provide a YAML map of k8s labels.
   extraLabels: { }
 
   affinity: { }
 
   # Toleration Settings for rqworker pods
-  # This should be either a multi-line string or YAML matching the Toleration array
+  # Provide either a multi-line string or YAML matching the Toleration array
   # in a PodSpec.
   tolerations: []
 
@@ -215,7 +247,7 @@ app:
 
   ingress:
     enabled: true
-    # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
+    # For Kubernetes >= 1.18 you should specify the ingress-controller using the field ingressClassName
     # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
     className: ""
     annotations: { }
@@ -233,16 +265,16 @@ app:
     #    hosts:
     #      - app.heartex.local
 
-  # Definition of the serviceAccount used to run LSE app.
+  # Definition of the serviceAccount used to run Label Studio Enterprise
   serviceAccount:
-    # Specifies whether a service account should be created
+    # Specifies whether to create a service account
     create: true
     # The name of the service account to use.
     # If not set and create is true, a name is generated using the fullname template
     name: ""
-    # Extra annotations for the serviceAccount definition. This can either be
+    # Extra k8s annotations for the serviceAccount definition. This can either be
     # YAML or a YAML-formatted multi-line templated string map of the
-    # annotations to apply to the serviceAccount.
+    # k8s annotations to apply to the serviceAccount.
     annotations: {}
 
 rqworker:
@@ -287,19 +319,19 @@ rqworker:
   #   beta.kubernetes.io/arch: amd64
   nodeSelector: { }
 
-  # Extra annotations to attach to the rqworker pods
+  # Extra k8s annotations to attach to the rqworker pods
   # This can either be YAML or a YAML-formatted multi-line templated string map
-  # of the annotations to apply to the rqworker pods
+  # of the k8s annotations to apply to the rqworker pods
   annotations: { }
 
-  # Extra labels to attach to the rqworker
+  # Extra k8s labels to attach to the rqworker
   # This should be a YAML map of the labels to apply to the rqworker
   extraLabels: { }
 
   affinity: { }
 
   # Toleration Settings for rqworker pods
-  # This should be either a multi-line string or YAML matching the Toleration array
+  # Provide either a multi-line string or YAML matching the Toleration array
   # in a PodSpec.
   tolerations: []
 
@@ -332,18 +364,22 @@ rqworker:
     # Number of seconds after which the probe times out.
     timeoutSeconds: 3
 
-  # Definition of the serviceAccount used to run LSE rqworker.
+  # Definition of the serviceAccount used to run rqworker for Label Studio Enterprise
   serviceAccount:
-    # Specifies whether a service account should be created
+    # Specifies whether to create a service account
     create: true
     # The name of the service account to use.
     # If not set and create is true, a name is generated using the fullname template
     name: ""
-    # Extra annotations for the serviceAccount definition. This can either be
+    # Extra k8s annotations for the serviceAccount definition. This can either be
     # YAML or a YAML-formatted multi-line templated string map of the
     # annotations to apply to the serviceAccount.
     annotations: { }
-```
+    
+{% endcodeblock %}
+    
+{% enddetails %}
+<br/>
 
 ## Install Label Studio Enterprise using Helm on a Kubernetes cluster
 
