@@ -19,10 +19,10 @@ To install Label Studio Community Edition, see <a href="install.html">Install an
 
 - Kubernetes and kubectl version 1.17 or higher
 - Helm version 3.6.3 or higher
-- Redis version 6.0.5 or higher or PostgreSQL version 11.9 or higher
+- Redis version 6.0.5 or higher
+- PostgreSQL version 11.9 or higher
 
 This chart has been tested and confirmed to work with the [NGINX Ingress Controller](https://www.nginx.com/products/nginx-ingress-controller/) and [cert-manager](https://cert-manager.io/docs/).
-
 
 Your Kubernetes cluster can be self-hosted or installed somewhere such as Amazon EKS. See the Amazon tutorial on how to [Deploy a Kubernetes Application with Amazon Elastic Container Service for Kubernetes](https://aws.amazon.com/getting-started/hands-on/deploy-kubernetes-app-amazon-eks/) for more about deploying an app on Amazon EKS.
 
@@ -49,12 +49,7 @@ Before installing Label Studio Enterprise, prepare the Kubernetes cluster with [
 
 ## Configure the Helm chart for Label Studio Enterprise
 
-To install Label Studio Enterprise using the Helm chart, you must configure specific values for your deployment. Configure these values in a YAML file that you specify when installing using Helm.
-
-
-
-Set up a postgreSQL or Redis database to store relevant Label Studio Enterprise configurations and annotations. 
-
+Install Label Studio Enterprise and set up a PostgreSQL or Redis database to store relevant Label Studio Enterprise configurations and annotations using the Helm chart. You must configure specific values for your deployment in a YAML file that you specify when installing using Helm.
 
 
 A minimal installation of LSE requires the following values:
@@ -62,7 +57,11 @@ A minimal installation of LSE requires the following values:
 ```yaml
 global:
   imagePullSecrets:
+    # Defined with earlier kubectl command
     - name: heartex-pull-key
+  
+  # [Enterprise Only] This value refers to a Kubernetes secret that you 
+  # created that contains your enterprise license.
   enterpriseLicense:
     secretName: "lse-license"
     secretKey: "license"
@@ -86,48 +85,20 @@ global:
 app:
   ingress:
     host: studio.yourdomain.com
-# if you have tls cert uncomment next line
+# if you have a tls cert, uncomment the next section
 #    tls:
 #      - secretName: ssl-cert
 #        hosts:
 #          - studio.yourdomain.com
 ```
 
-
 Copy these into a new file and save it as `lse-values.yaml`. 
 
-Adjust the included defaults to reflect your environment. For the ful list of configurable options, see the [values.yaml](values.yaml):
+Adjust the included defaults to reflect your environment. For the full list of configurable options, see the [values.yaml](values.yaml):
 
 ```yaml
 
-# Default values for lse.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
 
-# https://labelstud.io/guide/install_enterprise.html?from_search=environment%20variables#Start-using-Docker-Compose
-
-global:
-  # Image pull secret to use for registry authentication.
-  # Alternatively, the value may be specified as an array of strings.
-  imagePullSecrets: []
-
-  image:
-    repository: heartexlabs/label-studio-enterprise
-    pullPolicy: IfNotPresent
-    tag: ""
-
-  djangoConfig:
-    db: "default"
-    settings_module: "htx.settings.label_studio"
-
-  # [Enterprise Only] This value refers to a Kubernetes secret that you have
-  # created that contains your enterprise license.
-  enterpriseLicense:
-    # The name of the Kubernetes secret that holds the enterprise license. The
-    # secret must be in the same namespace that LSE is installed into.
-    secretName: ""
-    # The key within the Kubernetes secret that holds the enterprise license.
-    secretKey: "license"
 
   pgConfig:
     host: ""
@@ -138,7 +109,7 @@ global:
       secretName: ""
       secretKey: ""
 
-  # Redis location e.g. rediss://[:password]@localhost:6379/1
+  # Redis location e.g. redis://[:password]@localhost:6379/1
   redisConfig:
     host: ""
     password:
@@ -374,15 +345,14 @@ rqworker:
     annotations: { }
 ```
 
-## Install Label Studio Enterprise using Helm on a Kubernetes Cluster
+## Install Label Studio Enterprise using Helm on a Kubernetes cluster
 
-Run `helm install` with your custom resource definitions  values provided:
+Use Helm to install Label Studio Enterprise on your Kubernetes cluster. Provide your custom reource definitions YAML file. Specify any environment variables that you need to set for your Label Studio Enterprise installation using the `--set` argument with the `helm install` command.
 
+From the command line, run the following:
 ```shell
 helm install lse . -f lse-values.yaml
 ```
-
-Specify any environment variables that you need to set for your Label Studio Enterprise installation using the `--set` argument with the `helm install` command.
 
 After installing, check the status of the Kubernetes pod creation:
 ```shell
@@ -390,18 +360,23 @@ kubectl get pods
 ```
 
 ## Upgrade Label Studio using Helm
-Run `helm upgrade` with your values provided:
+To upgrade Label Studio Enterprise using Helm, do the following.
 
-```console
-$ helm upgrade lse . -f lse-values.yaml
-# OR version upgrade via one line
-$ helm upgrade lse . -f lse-values.yaml --set global.image.tag=new_version
+Run `helm upgrade` with your values YAML file provided:
+```shell
+helm upgrade lse . -f lse-values.yaml
+```
+
+You can also upgrade to the latest version by specifying the latest version in an environment variable:
+```shell
+helm upgrade lse . -f lse-values.yaml --set global.image.tag=<new_version>
 ```
 
 ## Uninstall Label Studio using Helm
 
-Run simple `helm delete`:
+To uninstall Label Studio Enterprise using Helm, delete the configuration.
 
-```console
-$ helm delete lse
+From the command line, run the following:
+```shell
+helm delete lse
 ```
