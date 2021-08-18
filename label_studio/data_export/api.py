@@ -28,16 +28,16 @@ logger = logging.getLogger(__name__)
     operation_summary='Get export formats',
     operation_description='Retrieve the available export formats for the current project.',
     responses={200: openapi.Response(
-                description='Export formats',
-                schema=openapi.Schema(
-                    title='Format list',
-                    description='List of available formats',
-                    type=openapi.TYPE_ARRAY,
-                    items=openapi.Schema(
-                        title="Export format",
-                        type=openapi.TYPE_STRING)
-                             )
-            )}
+        description='Export formats',
+        schema=openapi.Schema(
+            title='Format list',
+            description='List of available formats',
+            type=openapi.TYPE_ARRAY,
+            items=openapi.Schema(
+                title="Export format",
+                type=openapi.TYPE_STRING)
+        )
+    )}
 ))
 class ExportFormatsListAPI(generics.RetrieveAPIView):
     permission_required = all_permissions.projects_view
@@ -56,15 +56,27 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
         openapi.Parameter(name='exportType',
                           type=openapi.TYPE_STRING,
                           in_=openapi.IN_QUERY,
-                          description='Selected export format'),
+                          description='Selected export format (JSON by default)'),
         openapi.Parameter(name='download_all_tasks',
                           type=openapi.TYPE_STRING,
                           in_=openapi.IN_QUERY,
                           description="""
                           If true, download all tasks regardless of status. If false, download only annotated tasks.
                           """
+                          ),
+        openapi.Parameter(name='ids',
+                          type=openapi.TYPE_ARRAY,
+                          items=openapi.Schema(
+                              title='Task ID',
+                              description='Individual task ID',
+                              type=openapi.TYPE_INTEGER
+                          ),
+                          in_=openapi.IN_QUERY,
+                          description="""
+                          To retrieve only subset of tasks, specify the list of target tasks IDs
+                          """
                           )
-        ],
+    ],
     tags=['Export'],
     operation_summary='Export tasks and annotations',
     operation_description="""
@@ -78,16 +90,20 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
         ```bash
         curl -X GET {}/api/projects/{{id}}/export?exportType=JSON&download_all_tasks=true -H \'Authorization: Token abc123\' --output annotations.json'
         ```
-        """.format(settings.HOSTNAME or 'https://localhost:8080',settings.HOSTNAME or 'https://localhost:8080'),
+        To export specific tasks, run the following from the command line:
+        ```bash
+        curl -X GET {}/api/projects/{{id}}/export?ids[]=123\&ids[]=345 -H \'Authorization: Token abc123\' --output annotations.json'
+        ```
+        """.format(settings.HOSTNAME or 'https://localhost:8080', settings.HOSTNAME or 'https://localhost:8080', settings.HOSTNAME or 'https://localhost:8080'),
     responses={200: openapi.Response(
         description='Exported data',
         schema=openapi.Schema(
             title='Export file',
             description='Export file with results',
             type=openapi.TYPE_FILE
-            )
-        )}
-    ))
+        )
+    )}
+))
 class ExportAPI(generics.RetrieveAPIView):
     permission_required = all_permissions.projects_change
 
@@ -96,11 +112,16 @@ class ExportAPI(generics.RetrieveAPIView):
 
     def get(self, request, *args, **kwargs):
         project = self.get_object()
-        export_type = request.GET.get('exportType')
+        export_type = request.GET.get('exportType', 'JSON')
         only_finished = not bool_from_request(request.GET, 'download_all_tasks', False)
+        tasks_ids = request.GET.getlist('ids[]')
 
         logger.debug('Get tasks')
-        query = Task.objects.filter(project=project).select_related('project').prefetch_related('annotations', 'predictions')
+        tasks = Task.objects.filter(project=project)
+        if tasks_ids and len(tasks_ids) > 0:
+            logger.debug(f'Select only subset of {len(tasks_ids)} tasks')
+            tasks = tasks.filter(id__in=tasks_ids)
+        query = tasks.select_related('project').prefetch_related('annotations', 'predictions')
         if only_finished:
             query = query.filter(annotations__isnull=False).distinct()
 
@@ -112,7 +133,8 @@ class ExportAPI(generics.RetrieveAPIView):
             tasks += ExportDataSerializer(query.filter(id__in=_task_ids), many=True).data
         logger.debug('Prepare export files')
 
-        export_stream, content_type, filename = DataExport.generate_export_file(project, tasks, export_type, request.GET)
+        export_stream, content_type, filename = DataExport.generate_export_file(project, tasks, export_type,
+                                                                                request.GET)
 
         response = HttpResponse(File(export_stream), content_type=content_type)
         response['Content-Disposition'] = 'attachment; filename="%s"' % filename
@@ -121,15 +143,15 @@ class ExportAPI(generics.RetrieveAPIView):
 
 
 @method_decorator(name='get', decorator=swagger_auto_schema(
-        tags=['Export'],
-        operation_summary='Export files',
-        operation_description="""
+    tags=['Export'],
+    operation_summary='Export files',
+    operation_description="""
         List of files exported from the Label Studio UI using the Export button on the Data Manager page.
         """,
-        ))
+))
 class ProjectExportFiles(generics.RetrieveAPIView):
     permission_required = all_permissions.projects_change
-    swagger_schema = None # hide export files endpoint from swagger
+    swagger_schema = None  # hide export files endpoint from swagger
 
     def get_queryset(self):
         return Project.objects.filter(organization=self.request.user.active_organization)

@@ -70,4 +70,15 @@ stages:
     url: '{django_live_url}/api/projects/{pk}/export'
   response:
     status_code: 200
-
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{pk}/export?ids[]={task_pk}'
+  response:
+    status_code: 200
+- name: stage
+  request:
+    method: GET
+    url: '{django_live_url}/api/projects/{pk}/export?ids[]=9999999'
+  response:
+    status_code: 200

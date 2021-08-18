@@ -34,7 +34,6 @@ from tasks.serializers import TaskSerializer, TaskWithAnnotationsAndPredictionsA
 from webhooks.utils import api_webhook, api_webhook_for_delete, emit_webhooks_for_instance
 from webhooks.models import WebhookAction
 
-from core.mixins import APIViewVirtualRedirectMixin, APIViewVirtualMethodMixin
 from core.permissions import all_permissions, ViewClassPermission
 from core.utils.common import (
     get_object_with_check_and_log, bool_from_request, paginator, paginator_help)
@@ -165,9 +164,7 @@ class ProjectListAPI(generics.ListCreateAPIView):
         operation_description='Update the project settings for a specific project.',
         request_body=ProjectSerializer
     ))
-class ProjectAPI(APIViewVirtualRedirectMixin,
-                 APIViewVirtualMethodMixin,
-                 generics.RetrieveUpdateDestroyAPIView):
+class ProjectAPI(generics.RetrieveUpdateDestroyAPIView):
 
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     queryset = Project.objects.with_counts()
@@ -214,11 +211,6 @@ class ProjectAPI(APIViewVirtualRedirectMixin,
         # we don't need to relaculate counters if we delete whole project
         with DisableSignals():
             instance.delete()
-
-    @swagger_auto_schema(auto_schema=None)
-    @api_webhook(WebhookAction.PROJECT_UPDATED)
-    def post(self, request, *args, **kwargs):
-        return super(ProjectAPI, self).post(request, *args, **kwargs)
 
     @swagger_auto_schema(auto_schema=None)
     @api_webhook(WebhookAction.PROJECT_UPDATED)
@@ -575,9 +567,7 @@ class ProjectSummaryAPI(generics.RetrieveAPIView):
         """.format(settings.HOSTNAME or 'https://localhost:8080')
     ))
 class TasksListAPI(generics.ListCreateAPIView,
-                   generics.DestroyAPIView,
-                   APIViewVirtualMethodMixin,
-                   APIViewVirtualRedirectMixin):
+                   generics.DestroyAPIView):
 
     parser_classes = (JSONParser, FormParser)
     queryset = Task.objects.all()
