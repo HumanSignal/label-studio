@@ -12,7 +12,6 @@ from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 from django.utils.decorators import method_decorator
 
-from label_studio.core.mixins import APIViewVirtualRedirectMixin, APIViewVirtualMethodMixin
 from label_studio.core.permissions import all_permissions, ViewClassPermission
 from label_studio.core.utils.common import get_object_with_check_and_log
 
@@ -94,9 +93,7 @@ class OrganizationMemberListAPI(generics.ListAPIView):
         operation_summary='Update organization settings',
         operation_description='Update the settings for a specific organization by ID.'
     ))
-class OrganizationAPI(APIViewVirtualRedirectMixin,
-                      APIViewVirtualMethodMixin,
-                      generics.RetrieveUpdateAPIView):
+class OrganizationAPI(generics.RetrieveUpdateAPIView):
 
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     queryset = Organization.objects.all()
