@@ -22,7 +22,7 @@ To install Label Studio Community Edition, see <a href="install.html">Install an
 - Redis version 6.0.5 or higher
 - PostgreSQL version 11.9 or higher
 
-This chart has been tested and confirmed to work with the [NGINX Ingress Controller](https://www.nginx.com/products/nginx-ingress-controller/) and [cert-manager](https://cert-manager.io/docs/).
+This chart has been tested and confirmed to work with the [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/) and [cert-manager](https://cert-manager.io/docs/).
 
 Your Kubernetes cluster can be self-hosted or installed somewhere such as Amazon EKS. See the Amazon tutorial on how to [Deploy a Kubernetes Application with Amazon Elastic Container Service for Kubernetes](https://aws.amazon.com/getting-started/hands-on/deploy-kubernetes-app-amazon-eks/) for more about deploying an app on Amazon EKS.
 
@@ -403,10 +403,6 @@ Run `helm upgrade` with your values YAML file provided:
 helm upgrade lse . -f lse-values.yaml
 ```
 
-You can also upgrade to the latest version by specifying the latest version in an environment variable:
-```shell
-helm upgrade lse . -f lse-values.yaml --set global.image.tag=<new_version>
-```
 
 ## Uninstall Label Studio using Helm
 
