@@ -16,6 +16,26 @@ Audio tag plays a simple audio file
 | value | <code>string</code> | Value of the element |
 | hotkey | <code>string</code> | Hotkey used to play or pause audio |
 
+### Sample Results JSON
+
+| Name | Type | Description |
+| --- | --- | --- |
+| original_length | <code>number</code> | length of the original audio (s) |
+| value | <code>Object</code> |  |
+| value.start | <code>number</code> | start time of the fragment (s) |
+| value.end | <code>number</code> | finish time of the fragment (s) |
+
+### Example JSON```js
+{
+  "original_length": 18,
+  "value": {
+    "start": 3.1,
+    "end": 8.2,
+    "labels": ["Voice"]
+  }
+}
+```
+
 ### Example
 ```html
 <View>

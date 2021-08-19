@@ -23,6 +23,32 @@ KeyPointLabels tag creates labeled keypoints
 | [strokeWidth] | <code>number</code> | <code>1</code> | Width of the stroke |
 | [stokeColor] | <code>string</code> | <code>&quot;#8bad00&quot;</code> | Keypoint stroke color |
 
+### Sample Results JSON
+
+| Name | Type | Description |
+| --- | --- | --- |
+| original_width | <code>number</code> | width of the original image (px) |
+| original_height | <code>number</code> | height of the original image (px) |
+| image_rotation | <code>number</code> | rotation degree of the image (deg) |
+| value | <code>Object</code> |  |
+| value.x | <code>number</code> | x coord in percents of the image size (0-100) |
+| value.y | <code>number</code> | y coord in percents of the image size (0-100) |
+| value.width | <code>number</code> | point size in percents of the image size (0-100) |
+
+### Example JSON```js
+{
+  "original_width": 1920,
+  "original_height": 1280,
+  "image_rotation": 0,
+  "value": {
+    "x": 3.1,
+    "y": 8.2,
+    "width": 2,
+    "keypointlabels": ["Car"]
+  }
+}
+```
+
 ### Example
 ```html
 <View>
