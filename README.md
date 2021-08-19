@@ -23,7 +23,7 @@ Have a custom dataset? You can customize Label Studio to fit your needs. Read an
 
 ## Try out Label Studio
 
-Try out Label Studio in a **[running app](https://app.labelstud.io)**, install it locally, or deploy it in a cloud instance. 
+Install Label Studio locally, or deploy it in a cloud instance. Also you can try [Label Studio Teams](https://app.heartex.com).
 
 - [Install locally with Docker](#install-locally-with-docker)
 - [Run with Docker Compose (Label Studio + Nginx + PostgreSQL)](#run-with-docker-compose)
@@ -33,7 +33,7 @@ Try out Label Studio in a **[running app](https://app.labelstud.io)**, install i
 - [Deploy in a cloud instance](#deploy-in-a-cloud-instance)
 
 ### Install locally with Docker
-Official Label Studio docker image https://hub.docker.com/r/heartexlabs/label-studio and it can be downloaded with `docker pull`. 
+Official Label Studio docker imageis is (here)[https://hub.docker.com/r/heartexlabs/label-studio] and it can be downloaded with `docker pull`. 
 Run Label Studio in a Docker container and access it at `http://localhost:8080`.
 
 
