@@ -36,6 +36,7 @@ Try out Label Studio in a **[running app](https://app.labelstud.io)**, install i
 Run Label Studio in a Docker container and access it at `http://localhost:8080`.
 
 ```bash
+docker pull heartexlabs/label-studio:latest
 docker run -it -p 8080:8080 -v `pwd`/mydata:/label-studio/data heartexlabs/label-studio:latest
 ```
 You can find all the generated assets, including SQLite3 database storage `label_studio.sqlite3` and uploaded files, in the `./mydata` directory.
