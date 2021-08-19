@@ -33,7 +33,9 @@ Try out Label Studio in a **[running app](https://app.labelstud.io)**, install i
 - [Deploy in a cloud instance](#deploy-in-a-cloud-instance)
 
 ### Install locally with Docker
+Official Label Studio docker image https://hub.docker.com/r/heartexlabs/label-studio and it can be downloaded with `docker pull`. 
 Run Label Studio in a Docker container and access it at `http://localhost:8080`.
+
 
 ```bash
 docker pull heartexlabs/label-studio:latest
