@@ -87,7 +87,9 @@ class DataExport(object):
         converter = Converter(
             config=project.get_parsed_config(),
             project_dir=None,
-            upload_dir=os.path.join(settings.MEDIA_ROOT, settings.UPLOAD_DIR))
+            upload_dir=os.path.join(settings.MEDIA_ROOT, settings.UPLOAD_DIR)),
+            download_resources=get_args.get('download_resources', None) or settings.CONVERTER_DOWNLOAD_RESOURCES
+        )
         with get_temp_dir() as tmp_dir:
             converter.convert(input_json, tmp_dir, output_format, is_dir=False)
             files = get_all_files_from_dir(tmp_dir)

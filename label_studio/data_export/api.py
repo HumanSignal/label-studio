@@ -64,6 +64,13 @@ class ExportFormatsListAPI(generics.RetrieveAPIView):
                           If true, download all tasks regardless of status. If false, download only annotated tasks.
                           """
                           ),
+        openapi.Parameter(name='download_resources',
+                          type=openapi.TYPE_BOOLEAN,
+                          in_=openapi.IN_QUERY,
+                          description="""
+                          If true, the converter will download all resource files like images, audio, etc. 
+                          """
+                          ),
         openapi.Parameter(name='ids',
                           type=openapi.TYPE_ARRAY,
                           items=openapi.Schema(
@@ -133,8 +140,9 @@ class ExportAPI(generics.RetrieveAPIView):
             tasks += ExportDataSerializer(query.filter(id__in=_task_ids), many=True).data
         logger.debug('Prepare export files')
 
-        export_stream, content_type, filename = DataExport.generate_export_file(project, tasks, export_type,
-                                                                                request.GET)
+        export_stream, content_type, filename = DataExport.generate_export_file(
+            project, tasks, export_type, request.GET
+        )
 
         response = HttpResponse(File(export_stream), content_type=content_type)
         response['Content-Disposition'] = 'attachment; filename="%s"' % filename
