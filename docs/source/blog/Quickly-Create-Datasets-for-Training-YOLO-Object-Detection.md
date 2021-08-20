@@ -57,7 +57,7 @@ Follow the steps to [install Label Studio](/guide/install.html) on Docker or in 
 
 ### Download a dataset
 
-You can use your own dataset of aerial home images, convert available aerial `SID` image types into `JPG` files, or download public domain images from the web. 
+You can use your own dataset of aerial home images, convert available aerial `SID` image types into `JPG` files, or download public domain images from the web. You can [download the public domain images](https://ibb.co/album/tZZtxh) used in this blog post for demo purposes.
 
 ### Set up the labeling project
 
