@@ -16,7 +16,7 @@ class ProjectWebhookSerializer(serializers.ModelSerializer):
 
     task_number = serializers.IntegerField(read_only=True)
     finished_task_number = serializers.IntegerField(read_only=True)
-    total_annotations_number = serializers.IntegerField(read_only=True)
+    total_predictions_number = serializers.IntegerField(read_only=True)
     total_annotations_number = serializers.IntegerField(read_only=True)
     num_tasks_with_annotations = serializers.IntegerField(read_only=True)
     useful_annotation_number = serializers.IntegerField(read_only=True)
