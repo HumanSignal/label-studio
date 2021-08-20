@@ -13,6 +13,14 @@ class OnlyIDWebhookSerializer(serializers.Serializer):
 
 
 class ProjectWebhookSerializer(serializers.ModelSerializer):
+
+    num_tasks = serializers.IntegerField(read_only=True)
+    num_annotations = serializers.IntegerField(read_only=True)
+    num_labeled_tasks = serializers.IntegerField(read_only=True, source='get_labeled_count')
+
+    def get_labeled_count(self):
+        return self.instance.get_labeled_count()
+
     class Meta:
         model = Project
         fields = '__all__'
