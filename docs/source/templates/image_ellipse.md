@@ -17,6 +17,8 @@ label-studio init image_ellipse_project
 label-studio start image_ellipse_project 
 ```
 
+After starting Label Studio, set up the labeling interface and browse to this template.
+
 ## Config 
 
 ```html

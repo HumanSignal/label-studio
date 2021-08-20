@@ -6,16 +6,18 @@ meta_title: Dialogue Analysis Data Labeling Template
 meta_description: Label Studio Dialogue Analysis Template for machine learning and data science data labeling projects.
 ---
 
-Analyze the chat dialog, classify it and provide your own answer
+Analyze the chat dialog, classify it and provide your own answer.
 
 <img src="/images/screens/dialogue_analysis.png" class="img-template-example" title="Dialog Analysis" />
 
 ## Run
 
 ```bash
-label-studio init --template=dialog_analysis dialog_analysis_project
+label-studio init dialog_analysis_project
 label-studio start dialog_analysis_project 
 ```
+
+After starting Label Studio, set up the labeling interface and browse to this template.
 
 ## Config 
 
