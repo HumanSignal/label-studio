@@ -13,9 +13,11 @@ Named entity recognition for a piece of text. It supports overlapping spans and 
 ## Run
 
 ```bash
-label-studio init --template=named_entity named_entity_project
+label-studio init named_entity_project
 label-studio start named_entity_project 
 ```
+
+After starting Label Studio, set up the labeling interface and browse to this template.
 
 ## Config 
 

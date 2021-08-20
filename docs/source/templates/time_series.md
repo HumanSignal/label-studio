@@ -7,12 +7,16 @@ meta_title: Time Series Data Labeling Template
 meta_description: Label Studio Time Series Data Template for machine learning and data science data labeling projects.
 ---
 
+Label time series data.
+
 ## Run
 
 ```
 label-studio init time_series_project
 label-studio start time_series_project
 ```
+
+After starting Label Studio, set up the labeling interface and browse to this template.
   
 ## Config
   

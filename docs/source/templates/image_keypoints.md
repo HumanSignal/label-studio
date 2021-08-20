@@ -6,16 +6,18 @@ meta_title: Image Keypoints Data Labeling Template
 meta_description: Label Studio Image Keypoints Template for machine learning and data science data labeling projects.
 ---
 
-Key Points labeling for the images
+Key Point labeling for images.
 
 <img src="/images/screens/image_keypoints.png" class="img-template-example" title="Images Key Points" />
 
 ## Run
 
 ```bash
-label-studio init --template=image_keypoints image_keypoints_project
+label-studio init image_keypoints_project
 label-studio start image_keypoints_project 
 ```
+
+After starting Label Studio, set up the labeling interface and browse to this template.
 
 ## Config 
 
