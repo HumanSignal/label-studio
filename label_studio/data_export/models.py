@@ -76,7 +76,7 @@ class DataExport(object):
         return sorted(formats, key=lambda f: f.get('disabled', False))
 
     @staticmethod
-    def generate_export_file(project, tasks, output_format, get_args):
+    def generate_export_file(project, tasks, output_format, download_resources, get_args):
         # prepare for saving
         now = datetime.now()
         data = json.dumps(tasks, ensure_ascii=False)
@@ -84,9 +84,6 @@ class DataExport(object):
         name = 'project-' + str(project.id) + '-at-' + now.strftime('%Y-%m-%d-%H-%M') + f'-{md5[0:8]}'
 
         input_json = DataExport.save_export_files(project, now, get_args, data, md5, name)
-        download_resources = get_args.get('download_resources', None)
-        if download_resources is None:
-            download_resources = settings.CONVERTER_DOWNLOAD_RESOURCES
 
         converter = Converter(
             config=project.get_parsed_config(),
