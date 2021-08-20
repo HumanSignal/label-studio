@@ -2,6 +2,7 @@
 """
 from rest_framework.exceptions import APIException, ValidationError
 from rest_framework import status
+from lxml.etree import XMLSyntaxError
 
 
 class LabelStudioError(Exception):
@@ -36,4 +37,8 @@ class LabelStudioAPIExceptionSentryIgnored(LabelStudioAPIException):
 
 
 class LabelStudioValidationErrorSentryIgnored(ValidationError):
+    pass
+
+
+class LabelStudioXMLSyntaxErrorSentryIgnored(Exception):
     pass

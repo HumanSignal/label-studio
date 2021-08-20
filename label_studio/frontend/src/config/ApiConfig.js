@@ -58,6 +58,14 @@ export const API_CONFIG = {
 
     // Version
     version: '/version',
+
+    // Webhook
+    webhooks: "/webhooks",
+    webhook: "/webhooks/:pk",
+    updateWebhook: "PATCH:/webhooks/:pk",
+    createWebhook: "POST:/webhooks",
+    deleteWebhook: "DELETE:/webhooks/:pk",
+    webhooksInfo: "/webhooks/info",
   },
   alwaysExpectJSON: false,
 };

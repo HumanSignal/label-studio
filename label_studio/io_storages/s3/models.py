@@ -100,13 +100,18 @@ class S3ImportStorage(S3StorageMixin, ImportStorage):
         help_text='Generate presigned URLs')
     presign_ttl = models.PositiveSmallIntegerField(
         _('presign_ttl'), default=1,
-        help_text='Presigned URLs TTL (in minutes)'
-    )
+        help_text='Presigned URLs TTL (in minutes)')
+    recursive_scan = models.BooleanField(
+        _('recursive scan'), default=False,
+        help_text=_('Perform recursive scan over the bucket content'))
 
     def iterkeys(self):
         client, bucket = self.get_client_and_bucket()
         if self.prefix:
-            bucket_iter = bucket.objects.filter(Prefix=self.prefix.rstrip('/') + '/', Delimiter='/').all()
+            list_kwargs = {'Prefix': self.prefix.rstrip('/') + '/'}
+            if not self.recursive_scan:
+                list_kwargs['Delimiter'] = '/'
+            bucket_iter = bucket.objects.filter(**list_kwargs).all()
         else:
             bucket_iter = bucket.objects.all()
         regex = re.compile(str(self.regex_filter)) if self.regex_filter else None
@@ -153,7 +158,7 @@ class S3ImportStorage(S3StorageMixin, ImportStorage):
             uri, storage = get_uri_via_regex(data, prefixes=(url_scheme,))
             if not storage:
                 return
-            resolved_uri = resolve_s3_url(uri, self.get_client(), self.presign)
+            resolved_uri = resolve_s3_url(uri, self.get_client(), self.presign, expires_in=self.presign_ttl * 60)
             return data.replace(uri, resolved_uri)
         except NoCredentialsError:
             logger.warning(f'No AWS credentials specified for {data}')

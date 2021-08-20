@@ -12,7 +12,6 @@ from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 from django.utils.decorators import method_decorator
 
-from label_studio.core.mixins import APIViewVirtualRedirectMixin, APIViewVirtualMethodMixin
 from label_studio.core.permissions import all_permissions, ViewClassPermission
 from label_studio.core.utils.common import get_object_with_check_and_log
 
@@ -33,7 +32,7 @@ logger = logging.getLogger(__name__)
         """
     ))
 class OrganizationListAPI(generics.ListCreateAPIView):
-
+    queryset = Organization.objects.all()
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     permission_required = ViewClassPermission(
         GET=all_permissions.organizations_view,
@@ -49,8 +48,8 @@ class OrganizationListAPI(generics.ListCreateAPIView):
         self.check_object_permissions(self.request, org)
         return org
 
-    def get_queryset(self):
-        return Organization.objects.filter(users=self.request.user).distinct()
+    def filter_queryset(self, queryset):
+        return queryset.filter(users=self.request.user).distinct()
 
     def get(self, request, *args, **kwargs):
         return super(OrganizationListAPI, self).get(request, *args, **kwargs)
@@ -94,9 +93,7 @@ class OrganizationMemberListAPI(generics.ListAPIView):
         operation_summary='Update organization settings',
         operation_description='Update the settings for a specific organization by ID.'
     ))
-class OrganizationAPI(APIViewVirtualRedirectMixin,
-                      APIViewVirtualMethodMixin,
-                      generics.RetrieveUpdateAPIView):
+class OrganizationAPI(generics.RetrieveUpdateAPIView):
 
     parser_classes = (JSONParser, FormParser, MultiPartParser)
     queryset = Organization.objects.all()

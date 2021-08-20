@@ -142,6 +142,10 @@ class MLBackend(models.Model):
             logger.warning(f'Prediction not created for project {self}: {ml_api_result.error_message}')
             return
 
+        if not (isinstance(ml_api_result.response, dict) and 'results' in ml_api_result.response):
+            logger.error(f'ML backend returns an incorrect response, it should be a dict: {ml_api_result.response}')
+            return
+
         responses = ml_api_result.response['results']
 
         if len(responses) == 0:
@@ -162,6 +166,11 @@ class MLBackend(models.Model):
 
         predictions = []
         for task, response in zip(tasks_ser, responses):
+            if 'result' not in response:
+                logger.error(f"ML backend returns an incorrect prediction, it should be a dict with the 'result' field:"
+                             f" {response}")
+                return
+
             predictions.append({
                 'task': task['id'],
                 'result': response['result'],

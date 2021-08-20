@@ -1,8 +1,8 @@
 node_modules
 *.lock
 *.pyc
+*.ipynb
 __pycache__
-
 
 # docs
 __generated__
@@ -19,6 +19,7 @@ env/
 venv/
 .venv
 .vscode
+.autoenv
 # web/static
 
 deploy/license.txt
@@ -50,3 +51,4 @@ label_studio.sqlite3
 tmp
 .DS_Store
 *.sqlite3
+label_studio/core/settings/local.py

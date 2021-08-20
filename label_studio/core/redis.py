@@ -11,7 +11,7 @@ try:
     _redis = get_connection()
     _redis.ping()
 except:
-    logger.warning('Redis is not connected.')
+    logger.debug('Redis is not connected.')
     _redis = None
 
 

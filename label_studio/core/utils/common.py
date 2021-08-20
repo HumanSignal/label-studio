@@ -288,7 +288,7 @@ def start_browser(ls_url, no_browser):
 
     browser_url = ls_url
     threading.Timer(2.5, lambda: webbrowser.open(browser_url)).start()
-    print('Start browser at URL: ' + browser_url)
+    logger.info('Start browser at URL: ' + browser_url)
 
 
 @contextlib.contextmanager
