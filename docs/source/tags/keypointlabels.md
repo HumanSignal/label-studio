@@ -31,11 +31,12 @@ KeyPointLabels tag creates labeled keypoints
 | original_height | <code>number</code> | height of the original image (px) |
 | image_rotation | <code>number</code> | rotation degree of the image (deg) |
 | value | <code>Object</code> |  |
-| value.x | <code>number</code> | x coord in percents of the image size (0-100) |
-| value.y | <code>number</code> | y coord in percents of the image size (0-100) |
-| value.width | <code>number</code> | point size in percents of the image size (0-100) |
+| value.x | <code>number</code> | x coordinate by percentage of the image size (0-100) |
+| value.y | <code>number</code> | y coordinate by percentage of the image size (0-100) |
+| value.width | <code>number</code> | point size by percentage of the image size (0-100) |
 
-### Example JSON```js
+### Example JSON
+```json
 {
   "original_width": 1920,
   "original_height": 1280,

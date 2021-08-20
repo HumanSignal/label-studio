@@ -32,13 +32,14 @@ Used only for Image
 | original_height | <code>number</code> | height of the original image (px) |
 | image_rotation | <code>number</code> | rotation degree of the image (deg) |
 | value | <code>Object</code> |  |
-| value.x | <code>number</code> | x coord of the top left corner before rotation (0-100) |
-| value.y | <code>number</code> | y coord of the top left corner before rotation (0-100) |
+| value.x | <code>number</code> | x coordinate of the top left corner before rotation (0-100) |
+| value.y | <code>number</code> | y coordinate of the top left corner before rotation (0-100) |
 | value.radiusX | <code>number</code> | radius by x axis (0-100) |
 | value.radiusY | <code>number</code> | radius by y axis (0-100) |
 | value.rotation | <code>number</code> | rotation degree (deg) |
 
-### Example JSON```js
+### Example JSON
+```json
 {
   "original_width": 1920,
   "original_height": 1280,

@@ -30,11 +30,12 @@ it expects an array of objects like this: [{ $nameKey: "Author name", $textKey: 
 | value | <code>Object</code> |  |
 | value.start | <code>number</code> | index of paragraph where the region starts |
 | value.end | <code>number</code> | index of paragraph where the region ends (xpath) |
-| value.startOffset | <code>number</code> | offset inside start paragraph |
-| value.endOffset | <code>number</code> | offset inside end paragraph |
-| [value.text] | <code>string</code> | text content of the region, may be missed |
+| value.startOffset | <code>number</code> | offset within start paragraph |
+| value.endOffset | <code>number</code> | offset within end paragraph |
+| [value.text] | <code>string</code> | text content of the region, can be skipped |
 
-### Example JSON```js
+### Example JSON
+```json
 {
   "value": {
     "start": 3,

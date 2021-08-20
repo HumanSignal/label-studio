@@ -26,10 +26,11 @@ Use the BrushLabels tag to create segmented labeling for images.
 | original_height | <code>number</code> | height of the original image (px) |
 | image_rotation | <code>number</code> | rotation degree of the image (deg) |
 | value | <code>Object</code> |  |
-| value.format | <code>&quot;rle&quot;</code> | only RLE is supported for now |
-| value.rle | <code>Array.&lt;number&gt;</code> | RLE encoded image |
+| value.format | <code>&quot;rle&quot;</code> | format of the masks, only RLE is supported for now |
+| value.rle | <code>Array.&lt;number&gt;</code> | RLE-encoded image |
 
-### Example JSON```js
+### Example JSON
+```json
 {
   "original_width": 1920,
   "original_height": 1280,

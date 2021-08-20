@@ -32,9 +32,10 @@ PolygonLabels tag, create labeled polygons
 | original_height | <code>number</code> | height of the original image (px) |
 | image_rotation | <code>number</code> | rotation degree of the image (deg) |
 | value | <code>Object</code> |  |
-| value.points | <code>Array.&lt;Array.&lt;number&gt;&gt;</code> | list of (x, y) coords (0-100) |
+| value.points | <code>Array.&lt;Array.&lt;number&gt;&gt;</code> | list of (x, y) coordinates of the polygon by percentage of the image size (0-100) |
 
-### Example JSON```js
+### Example JSON
+```json
 {
   "original_width": 1920,
   "original_height": 1280,

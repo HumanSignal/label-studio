@@ -29,11 +29,12 @@ In any case every space counts for result offsets.
 | Name | Type | Description |
 | --- | --- | --- |
 | value | <code>Object</code> |  |
-| value.start | <code>string</code> | position of the start of the region |
-| value.end | <code>string</code> | position of the end of the region |
-| [value.text] | <code>string</code> | text content of the region, may be missed |
+| value.start | <code>string</code> | position of the start of the region in characters |
+| value.end | <code>string</code> | position of the end of the region in characters |
+| [value.text] | <code>string</code> | text content of the region, can be skipped |
 
-### Example JSON```js
+### Example JSON
+```json
 {
   "value": {
     "start": 2,

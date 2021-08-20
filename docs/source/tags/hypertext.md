@@ -27,11 +27,12 @@ HyperText tag shows HyperText markup that can be labeled.
 | value | <code>Object</code> |  |
 | value.start | <code>string</code> | xpath of the container where the region starts (xpath) |
 | value.end | <code>string</code> | xpath of the container where the region ends (xpath) |
-| value.startOffset | <code>number</code> | offset inside start container |
-| value.endOffset | <code>number</code> | offset inside end container |
-| [value.text] | <code>string</code> | text content of the region, may be missed |
+| value.startOffset | <code>number</code> | offset within start container |
+| value.endOffset | <code>number</code> | offset within end container |
+| [value.text] | <code>string</code> | text content of the region, can be skipped |
 
-### Example JSON```js
+### Example JSON
+```json
 {
   "value": {
     "start": "/div[1]/p[2]/text()[1]",

@@ -6,7 +6,7 @@ meta_title: Audio Tags for Labeling Audio
 meta_description: Label Studio Audio Tags customize Label Studio for labeling audio for machine learning and data science projects.
 ---
 
-Audio tag plays a simple audio file
+Audio tag plays a simple audio file.
 
 ### Parameters
 
@@ -20,12 +20,13 @@ Audio tag plays a simple audio file
 
 | Name | Type | Description |
 | --- | --- | --- |
-| original_length | <code>number</code> | length of the original audio (s) |
+| original_length | <code>number</code> | length of the original audio (seconds) |
 | value | <code>Object</code> |  |
-| value.start | <code>number</code> | start time of the fragment (s) |
-| value.end | <code>number</code> | finish time of the fragment (s) |
+| value.start | <code>number</code> | start time of the fragment (seconds) |
+| value.end | <code>number</code> | end time of the fragment (seconds) |
 
-### Example JSON```js
+### Example JSON
+```json
 {
   "original_length": 18,
   "value": {
