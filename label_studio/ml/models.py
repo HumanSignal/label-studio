@@ -3,6 +3,7 @@
 import django_rq
 import logging
 from django.db import models, transaction
+
 # Create your models here.
 from django.db.models import F, Count, Q
 from django.utils.translation import gettext_lazy as _
@@ -29,43 +30,61 @@ class MLBackendState(models.TextChoices):
 
 
 class MLBackend(models.Model):
-    """
-    """
+    """ """
 
     state = models.CharField(
         max_length=2,
         choices=MLBackendState.choices,
         default=MLBackendState.DISCONNECTED,
     )
-
+    is_interactive = models.BooleanField(
+        _('is_interactive'),
+        default=False,
+        help_text=("It's used for interactive annotating. "
+                   'If true, model has to return one-length list with results')
+    )
     url = models.TextField(
         _('url'),
-        help_text='URL for the machine learning model server'
+        help_text='URL for the machine learning model server',
     )
     error_message = models.TextField(
-        _('url'), blank=True, null=True,
-        help_text='Error message in error state'
+        _('error_message'),
+        blank=True,
+        null=True,
+        help_text='Error message in error state',
     )
     title = models.TextField(
         _('title'),
         blank=True,
         null=True,
         default='default',
-        help_text='Name of the machine learning backend'
+        help_text='Name of the machine learning backend',
     )
     description = models.TextField(
         _('description'),
         blank=True,
         null=True,
         default='',
-        help_text='Description for the machine learning backend'
+        help_text='Description for the machine learning backend',
     )
     model_version = models.TextField(
-        _('model version'), blank=True, null=True, default='',
-        help_text='Current model version associated with this machine learning backend'
+        _('model version'),
+        blank=True,
+        null=True,
+        default='',
+        help_text='Current model version associated with this machine learning backend',
     )
-
-    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='ml_backends')
+    timeout = models.FloatField(
+        _('timeout'),
+        blank=True,
+        default=100.0,
+        help_text='Responce model timeout',
+    )
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+        related_name='ml_backends',
+    )
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
 
@@ -94,7 +113,7 @@ class MLBackend(models.Model):
 
     @property
     def api(self):
-        return MLApi(url=self.url)
+        return MLApi(url=self.url, timeout=self.timeout)
 
     @property
     def not_ready(self):
@@ -134,6 +153,7 @@ class MLBackend(models.Model):
 
         if isinstance(tasks, list):
             from tasks.models import Task
+
             tasks = Task.objects.filter(id__in=[task.id for task in tasks])
 
         tasks_ser = TaskSimpleSerializer(tasks, many=True).data
@@ -154,8 +174,10 @@ class MLBackend(models.Model):
 
         # ML Backend doesn't support batch of tasks, do it one by one
         elif len(responses) == 1:
-            logger.warning(f"'ML backend '{self.title}' doesn't support batch processing of tasks, "
-                           f"switched to one-by-one task retrieving")
+            logger.warning(
+                f"'ML backend '{self.title}' doesn't support batch processing of tasks, "
+                f"switched to one-by-one task retrieving"
+            )
             for task in tasks:
                 self.predict_one_task(task)
             return
@@ -167,16 +189,20 @@ class MLBackend(models.Model):
         predictions = []
         for task, response in zip(tasks_ser, responses):
             if 'result' not in response:
-                logger.error(f"ML backend returns an incorrect prediction, it should be a dict with the 'result' field:"
-                             f" {response}")
+                logger.error(
+                    f"ML backend returns an incorrect prediction, it should be a dict with the 'result' field:"
+                    f" {response}"
+                )
                 return
 
-            predictions.append({
-                'task': task['id'],
-                'result': response['result'],
-                'score': response.get('score'),
-                'model_version': self.model_version
-            })
+            predictions.append(
+                {
+                    'task': task['id'],
+                    'result': response['result'],
+                    'score': response.get('score'),
+                    'model_version': self.model_version,
+                }
+            )
         with conditional_atomic():
             prediction_ser = PredictionSerializer(data=predictions, many=True)
             prediction_ser.is_valid(raise_exception=True)
@@ -189,8 +215,10 @@ class MLBackend(models.Model):
             return
         if task.predictions.filter(model_version=self.model_version).exists():
             # prediction already exists
-            logger.info(f'Skip creating prediction with ML backend {self} for task {task}: model version '
-                        f'{self.model_version} is up-to-date')
+            logger.info(
+                f'Skip creating prediction with ML backend {self} for task {task}: model version '
+                f'{self.model_version} is up-to-date'
+            )
             return
         ml_api = self.api
 
@@ -215,11 +243,48 @@ class MLBackend(models.Model):
                 task_id=task_id,
                 cluster=prediction_response.get('cluster'),
                 neighbors=prediction_response.get('neighbors'),
-                mislabeling=safe_float(prediction_response.get('mislabeling', 0))
+                mislabeling=safe_float(prediction_response.get('mislabeling', 0)),
             )
             logger.debug(f'Prediction {prediction} created')
 
         return prediction
+
+    def interactive_annotating(self, task, context=None):
+        result = {}
+        if not self.is_interactive:
+            result['errors'] = ["You can't use not interactive model to interactive annotating"]
+            return result
+
+        tasks_ser = TaskSimpleSerializer([task], many=True).data
+        ml_api_result = self.api.make_predictions(
+            tasks=tasks_ser,
+            model_version=self.model_version,
+            project=self.project,
+            context=context,
+        )
+        if ml_api_result.is_error:
+            logger.warning(f'Prediction not created for project {self}: {ml_api_result.error_message}')
+            result['errors'] = [ml_api_result.error_message]
+            return result
+
+        if not (isinstance(ml_api_result.response, dict) and 'results' in ml_api_result.response):
+            logger.warning(f'ML backend returns an incorrect response, it should be a dict: {ml_api_result.response}')
+            result['errors'] = ['incorrect response from ML service']
+            return result
+
+        ml_results = ml_api_result.response.get(
+            'results',
+            [
+                None,
+            ],
+        )
+        if not isinstance(ml_results, list) or len(ml_results) != 1:
+            logger.warning(f'ML backend has to return list with 1 annotation but it returned: {ml_results}')
+            result['errors'] = ['incorrect response from ML service']
+            return result
+
+        result['data'] = ml_results[0]
+        return result
 
 
 class MLBackendPredictionJob(models.Model):
@@ -227,11 +292,11 @@ class MLBackendPredictionJob(models.Model):
     job_id = models.CharField(max_length=128)
     ml_backend = models.ForeignKey(MLBackend, related_name='prediction_jobs', on_delete=models.CASCADE)
     model_version = models.TextField(
-        _('model version'), blank=True, null=True,
-        help_text='Model version this job associated with'
+        _('model version'), blank=True, null=True, help_text='Model version this job associated with'
     )
     batch_size = models.PositiveSmallIntegerField(
-        _('batch size'), default=100, help_text='Number of tasks processed per batch')
+        _('batch size'), default=100, help_text='Number of tasks processed per batch'
+    )
 
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
@@ -242,8 +307,10 @@ class MLBackendTrainJob(models.Model):
     job_id = models.CharField(max_length=128)
     ml_backend = models.ForeignKey(MLBackend, related_name='train_jobs', on_delete=models.CASCADE)
     model_version = models.TextField(
-        _('model version'), blank=True, null=True,
-        help_text='Model version this job is associated with'
+        _('model version'),
+        blank=True,
+        null=True,
+        help_text='Model version this job is associated with',
     )
     created_at = models.DateTimeField(_('created at'), auto_now_add=True)
     updated_at = models.DateTimeField(_('updated at'), auto_now=True)
@@ -258,8 +325,10 @@ class MLBackendTrainJob(models.Model):
         if ml_api_result.is_error:
             if ml_api_result.status_code == 410:
                 return {'job_status': 'removed'}
-            logger.error(f'Training job {self.id}: Can\'t collect training jobs for project {project}: '
-                         f'ML API returns error {ml_api_result.error_message}')
+            logger.error(
+                f'Training job {self.id}: Can\'t collect training jobs for project {project}: '
+                f'ML API returns error {ml_api_result.error_message}'
+            )
             return None
         return ml_api_result.response
 
@@ -288,7 +357,11 @@ def _get_model_version(project, ml_api, curr_logger):
     ml_api_result = ml_api.setup(project)
     if ml_api_result.is_error:
         curr_logger.warning(
-            f'Project {project}: can\'t fetch last model version from {ml_api_result.url}, reason: {ml_api_result.error_message}.')
+            (
+                f'Project {project}: can\'t fetch last model version from {ml_api_result.url}, '
+                f'reason: {ml_api_result.error_message}.'
+            )
+        )
     else:
         if 'model_version' in ml_api_result.response:
             model_version = ml_api_result.response['model_version']
