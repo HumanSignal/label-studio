@@ -29,6 +29,10 @@ class ProjectManager(models.Manager):
     def with_counts(self):
         return self.annotate(
             task_number=Count('tasks', distinct=True),
+            finished_task_number=Count(
+                'tasks', distinct=True,
+                filter=Q(tasks__is_labeled=True)
+            ),
             total_predictions_number=Count('tasks__predictions', distinct=True),
             total_annotations_number=Count(
                 'tasks__annotations__id', distinct=True,
