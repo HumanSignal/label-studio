@@ -21,10 +21,10 @@ from label_studio.projects.models import Project
 from label_studio.projects.serializers import ProjectSerializer
 from label_studio.tasks.models import Task, Annotation
 
-from data_manager.functions import get_all_columns, get_prepared_queryset, evaluate_predictions
-from data_manager.models import View
-from data_manager.serializers import ViewSerializer, DataManagerTaskSerializer, SelectedItemsSerializer
-from data_manager.actions import get_all_actions, perform_action
+from label_studio.data_manager.functions import get_all_columns, get_prepared_queryset, evaluate_predictions
+from label_studio.data_manager.models import View
+from label_studio.data_manager.serializers import ViewSerializer, DataManagerTaskSerializer, SelectedItemsSerializer
+from label_studio.data_manager.actions import get_all_actions, perform_action
 
 
 logger = logging.getLogger(__name__)

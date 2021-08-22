@@ -2,9 +2,9 @@
 """
 from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
-from io_storages.localfiles.models import LocalFilesImportStorage, LocalFilesExportStorage
-from io_storages.localfiles.serializers import LocalFilesImportStorageSerializer, LocalFilesExportStorageSerializer
-from io_storages.api import (
+from label_studio.io_storages.localfiles.models import LocalFilesImportStorage, LocalFilesExportStorage
+from label_studio.io_storages.localfiles.serializers import LocalFilesImportStorageSerializer, LocalFilesExportStorageSerializer
+from label_studio.io_storages.api import (
     ImportStorageListAPI, ImportStorageDetailAPI, ImportStorageSyncAPI, ExportStorageListAPI, ExportStorageDetailAPI,
     ImportStorageValidateAPI, ExportStorageValidateAPI, ImportStorageFormLayoutAPI, ExportStorageFormLayoutAPI
 )

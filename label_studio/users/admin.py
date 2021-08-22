@@ -7,7 +7,7 @@ from django.contrib.auth.models import Group
 
 from label_studio.users.models import User
 from label_studio.projects.models import Project
-from ml.models import MLBackend, MLBackendTrainJob
+from label_studio.ml.models import MLBackend, MLBackendTrainJob
 from label_studio.tasks.models import Task, Annotation
 from label_studio.organizations.models import Organization
 

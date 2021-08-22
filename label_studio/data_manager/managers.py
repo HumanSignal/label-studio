@@ -13,7 +13,7 @@ from django.db.models.functions import Cast
 from django.db.models import FloatField
 from datetime import datetime
 
-from data_manager.prepare_params import ConjunctionEnum
+from label_studio.data_manager.prepare_params import ConjunctionEnum
 from label_studio.core.utils.params import cast_bool_from_str
 
 

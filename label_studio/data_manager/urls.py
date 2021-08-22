@@ -3,9 +3,9 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from data_manager import api, views
+from label_studio.data_manager import api, views
 
-app_name = "data_manager"
+app_name = "label_studio.data_manager"
 router = DefaultRouter()
 router.register(r"views", api.ViewAPI, basename="view")
 

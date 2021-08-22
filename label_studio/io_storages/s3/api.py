@@ -3,9 +3,9 @@
 from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
 
-from io_storages.s3.models import S3ImportStorage, S3ExportStorage
-from io_storages.s3.serializers import S3ImportStorageSerializer, S3ExportStorageSerializer
-from io_storages.api import (
+from label_studio.io_storages.s3.models import S3ImportStorage, S3ExportStorage
+from label_studio.io_storages.s3.serializers import S3ImportStorageSerializer, S3ExportStorageSerializer
+from label_studio.io_storages.api import (
     ImportStorageListAPI, ImportStorageDetailAPI, ImportStorageSyncAPI, ExportStorageListAPI, ExportStorageDetailAPI,
     ImportStorageValidateAPI, ExportStorageValidateAPI, ImportStorageFormLayoutAPI, ExportStorageFormLayoutAPI
 )

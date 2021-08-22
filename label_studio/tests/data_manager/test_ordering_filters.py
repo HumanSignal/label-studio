@@ -5,7 +5,7 @@ import json
 
 from ..utils import make_task, make_annotation, make_prediction, project_id
 from label_studio.projects.models import Project
-from data_manager.models import View
+from label_studio.data_manager.models import View
 from label_studio.data_import.models import FileUpload
 from django.conf import settings
 from django.core.files.base import ContentFile

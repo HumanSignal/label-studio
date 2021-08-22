@@ -1,7 +1,7 @@
-from .s3.api import S3ImportStorageListAPI, S3ExportStorageListAPI
-from .gcs.api import GCSImportStorageListAPI, GCSExportStorageListAPI
-from .azure_blob.api import AzureBlobImportStorageListAPI, AzureBlobExportStorageListAPI
-from .redis.api import RedisImportStorageListAPI, RedisExportStorageListAPI
+from label_studio.io_storages.s3.api import S3ImportStorageListAPI, S3ExportStorageListAPI
+from label_studio.io_storages.gcs.api import GCSImportStorageListAPI, GCSExportStorageListAPI
+from label_studio.io_storages.azure_blob.api import AzureBlobImportStorageListAPI, AzureBlobExportStorageListAPI
+from label_studio.io_storages.redis.api import RedisImportStorageListAPI, RedisExportStorageListAPI
 
 
 def get_storage_list():

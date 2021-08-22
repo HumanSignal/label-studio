@@ -1,9 +1,9 @@
 from django.urls import path, include
 
-from . import api
+from label_studio.webhooks import api
 
 
-app_name = 'webhooks'
+app_name = 'label_studio.webhooks'
 
 _api_urlpatterns = [
     # CRUD

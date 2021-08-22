@@ -5,7 +5,7 @@ import json
 from rest_framework import serializers
 from django.db import transaction
 
-from data_manager.models import View, Filter, FilterGroup
+from label_studio.data_manager.models import View, Filter, FilterGroup
 from label_studio.tasks.models import Task
 from label_studio.tasks.serializers import TaskSerializer, AnnotationSerializer, PredictionSerializer, AnnotationDraftSerializer
 

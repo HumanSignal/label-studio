@@ -1,7 +1,7 @@
 """This file and its contents are licensed under the Apache License 2.0. Please see the included NOTICE for copyright information and LICENSE for a copy of the license.
 """
 from rest_framework import serializers
-from ml.models import MLBackend
+from label_studio.ml.models import MLBackend
 
 
 class MLBackendSerializer(serializers.ModelSerializer):

@@ -150,10 +150,10 @@ INSTALLED_APPS = [
 
     'label_studio.projects',
     'label_studio.tasks',
-    'data_manager',
-    'io_storages',
-    'ml',
-    'webhooks',
+    'label_studio.data_manager',
+    'label_studio.io_storages',
+    'label_studio.ml',
+    'label_studio.webhooks',
 ]
 
 MIDDLEWARE = [

@@ -2,9 +2,9 @@
 """
 from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
-from io_storages.redis.models import RedisImportStorage, RedisExportStorage
-from io_storages.redis.serializers import RedisImportStorageSerializer, RedisExportStorageSerializer
-from io_storages.api import (
+from label_studio.io_storages.redis.models import RedisImportStorage, RedisExportStorage
+from label_studio.io_storages.redis.serializers import RedisImportStorageSerializer, RedisExportStorageSerializer
+from label_studio.io_storages.api import (
     ImportStorageListAPI, ImportStorageDetailAPI, ImportStorageSyncAPI, ExportStorageListAPI, ExportStorageDetailAPI,
     ImportStorageValidateAPI, ExportStorageValidateAPI, ImportStorageFormLayoutAPI, ExportStorageFormLayoutAPI
 )

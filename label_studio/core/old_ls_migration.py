@@ -10,13 +10,13 @@ from label_studio.tasks.models import Task, Annotation, Prediction
 from label_studio.projects.models import Project
 from label_studio.data_import.models import FileUpload
 from label_studio.core.utils.io import get_data_dir
-from data_manager.models import View, FilterGroup, Filter
+from label_studio.data_manager.models import View, FilterGroup, Filter
 from django.core.files.base import File
-from io_storages.gcs.models import GCSImportStorage, GCSExportStorage
-from io_storages.azure_blob.models import AzureBlobImportStorage, AzureBlobExportStorage
-from io_storages.s3.models import S3ImportStorage, S3ExportStorage
-from io_storages.redis.models import RedisImportStorage, RedisExportStorage
-from ml.models import MLBackend
+from label_studio.io_storages.gcs.models import GCSImportStorage, GCSExportStorage
+from label_studio.io_storages.azure_blob.models import AzureBlobImportStorage, AzureBlobExportStorage
+from label_studio.io_storages.s3.models import S3ImportStorage, S3ExportStorage
+from label_studio.io_storages.redis.models import RedisImportStorage, RedisExportStorage
+from label_studio.ml.models import MLBackend
 from label_studio.core.utils.params import get_env
 
 

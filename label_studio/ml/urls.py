@@ -2,9 +2,9 @@
 """
 from django.urls import path, include
 
-from . import api
+from label_studio.ml import api
 
-app_name = 'ml'
+app_name = 'label_studio.ml'
 
 # ML backend CRUD
 _api_urlpatterns = [

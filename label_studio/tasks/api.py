@@ -24,8 +24,8 @@ from label_studio.tasks.serializers import (
     TaskSerializer, AnnotationSerializer, TaskSimpleSerializer, PredictionSerializer,
     TaskWithAnnotationsAndPredictionsAndDraftsSerializer, AnnotationDraftSerializer, PredictionQuerySerializer)
 from label_studio.projects.models import Project
-from webhooks.utils import api_webhook, api_webhook_for_delete, emit_webhooks_for_instance
-from webhooks.models import WebhookAction
+from label_studio.webhooks.utils import api_webhook, api_webhook_for_delete, emit_webhooks_for_instance
+from label_studio.webhooks.models import WebhookAction
 
 logger = logging.getLogger(__name__)
 

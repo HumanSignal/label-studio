@@ -18,8 +18,8 @@ from django.conf import settings
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 
-from io_storages.utils import get_uri_via_regex
-from io_storages.base_models import ImportStorage, ImportStorageLink, ExportStorage, ExportStorageLink
+from label_studio.io_storages.utils import get_uri_via_regex
+from label_studio.io_storages.base_models import ImportStorage, ImportStorageLink, ExportStorage, ExportStorageLink
 from label_studio.tasks.models import Annotation
 
 logger = logging.getLogger(__name__)

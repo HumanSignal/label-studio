@@ -10,7 +10,7 @@ from .utils import project_id
 @pytest.mark.django_db
 def test_custom_exception_handling(business_client, project_id):
     payload = dict(project=project_id, data={"test": 1})
-    with mock.patch('data_manager.api.ViewAPI.create') as m:
+    with mock.patch('label_studio.data_manager.api.ViewAPI.create') as m:
         m.side_effect = Exception('Test')
         response = business_client.post(
             "/api/dm/views/",

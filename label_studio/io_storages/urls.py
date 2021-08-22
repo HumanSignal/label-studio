@@ -2,14 +2,14 @@
 """
 from django.urls import path, include
 
-from .s3.api import *
-from .azure_blob.api import *
-from .gcs.api import *
-from .redis.api import *
-from .localfiles.api import *
-from .all_api import *
+from label_studio.io_storages.s3.api import *
+from label_studio.io_storages.azure_blob.api import *
+from label_studio.io_storages.gcs.api import *
+from label_studio.io_storages.redis.api import *
+from label_studio.io_storages.localfiles.api import *
+from label_studio.io_storages.all_api import *
 
-app_name = 'storages'
+app_name = 'label_studio.storages'
 
 # IO Storages CRUD
 _api_urlpatterns = [

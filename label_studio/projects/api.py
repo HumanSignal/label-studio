@@ -31,8 +31,8 @@ from label_studio.projects.serializers import (
 )
 from label_studio.tasks.models import Task, Annotation, Prediction, TaskLock
 from label_studio.tasks.serializers import TaskSerializer, TaskWithAnnotationsAndPredictionsAndDraftsSerializer
-from webhooks.utils import api_webhook, api_webhook_for_delete, emit_webhooks_for_instance
-from webhooks.models import WebhookAction
+from label_studio.webhooks.utils import api_webhook, api_webhook_for_delete, emit_webhooks_for_instance
+from label_studio.webhooks.models import WebhookAction
 
 from label_studio.core.permissions import all_permissions, ViewClassPermission
 from label_studio.core.utils.common import (
@@ -40,8 +40,8 @@ from label_studio.core.utils.common import (
 from label_studio.core.utils.exceptions import ProjectExistException, LabelStudioDatabaseException
 from label_studio.core.utils.io import find_dir, find_file, read_yaml
 
-from data_manager.functions import get_prepared_queryset
-from data_manager.models import View
+from label_studio.data_manager.functions import get_prepared_queryset
+from label_studio.data_manager.models import View
 
 logger = logging.getLogger(__name__)
 

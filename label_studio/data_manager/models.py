@@ -4,7 +4,7 @@ from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
-from data_manager.prepare_params import PrepareParams
+from label_studio.data_manager.prepare_params import PrepareParams
 
 
 class View(models.Model):

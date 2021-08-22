@@ -6,8 +6,8 @@ from django.conf import settings
 from django.db import models
 from django.db.models import Q
 
-from .models import Webhook, WebhookAction
-from .serializers_for_hooks import ProjectWebhookSerializer
+from label_studio.webhooks.models import Webhook, WebhookAction
+from label_studio.webhooks.serializers_for_hooks import ProjectWebhookSerializer
 
 
 def run_webhook(webhook, action, payload=None):

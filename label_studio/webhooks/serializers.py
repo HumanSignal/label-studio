@@ -1,7 +1,7 @@
 from django.conf import settings
 from rest_framework import serializers
 
-from .models import Webhook, WebhookAction
+from label_studio.webhooks.models import Webhook, WebhookAction
 
 
 class WebhookSerializer(serializers.ModelSerializer):

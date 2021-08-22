@@ -13,7 +13,7 @@ from importlib import import_module
 
 from django.conf import settings
 
-from data_manager.functions import DataManagerException
+from label_studio.data_manager.functions import DataManagerException
 
 logger = logging.getLogger('django')
 

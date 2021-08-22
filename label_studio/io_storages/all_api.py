@@ -10,7 +10,7 @@ from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 
 from label_studio.core.utils.common import load_func
-from .localfiles.api import LocalFilesImportStorageListAPI, LocalFilesExportStorageListAPI
+from label_studio.io_storages.localfiles.api import LocalFilesImportStorageListAPI, LocalFilesExportStorageListAPI
 
 logger = logging.getLogger(__name__)
 # TODO: replace hardcoded apps lists with search over included storage apps

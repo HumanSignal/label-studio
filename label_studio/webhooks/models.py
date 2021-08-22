@@ -8,7 +8,7 @@ import logging
 
 from label_studio.projects.models import Project
 from label_studio.tasks.models import Task, Annotation
-from .serializers_for_hooks import (
+from label_studio.webhooks.serializers_for_hooks import (
     OnlyIDWebhookSerializer,
     ProjectWebhookSerializer,
     TaskWebhookSerializer,

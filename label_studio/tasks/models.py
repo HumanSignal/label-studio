@@ -23,7 +23,7 @@ from model_utils import FieldTracker
 
 from label_studio.core.utils.common import find_first_one_to_one_related_field_by_prefix, string_is_url, load_func
 from label_studio.core.utils.params import get_env
-from data_manager.managers import PreparedTaskManager, TaskManager
+from label_studio.data_manager.managers import PreparedTaskManager, TaskManager
 from label_studio.core.bulk_update_utils import bulk_update
 
 logger = logging.getLogger(__name__)
@@ -162,7 +162,7 @@ class Task(TaskMixin, models.Model):
             return task_data
 
     def _get_storage_by_task_data(self, task_data):
-        from io_storages.models import get_import_storage_by_url
+        from label_studio.io_storages.models import get_import_storage_by_url
 
         for url in task_data.values():
             storage_class = get_import_storage_by_url(url)
@@ -180,7 +180,7 @@ class Task(TaskMixin, models.Model):
         elif get_env('USE_DEFAULT_S3_STORAGE', default=False, is_bool=True):
             # TODO: this is used to access global environment storage settings.
             # We may use more than one and non-default S3 storage (like GCS, Azure)
-            from io_storages.s3.models import S3ImportStorage
+            from label_studio.io_storages.s3.models import S3ImportStorage
             return S3ImportStorage()
 
         storage = self._get_storage_by_task_data(task_data)

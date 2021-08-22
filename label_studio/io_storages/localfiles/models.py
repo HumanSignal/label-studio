@@ -14,13 +14,13 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import ValidationError
 
 from label_studio.core.utils.params import get_env
-from io_storages.base_models import (
+from label_studio.io_storages.base_models import (
       ExportStorage,
       ExportStorageLink,
       ImportStorage,
       ImportStorageLink,
 )
-from io_storages.serializers import StorageAnnotationSerializer
+from label_studio.io_storages.serializers import StorageAnnotationSerializer
 from label_studio.tasks.models import Annotation
 
 logger = logging.getLogger(__name__)

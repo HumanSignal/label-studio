@@ -169,7 +169,7 @@ class ExportStorage(Storage):
             # export task with annotations
             return ExportDataSerializer(annotation.task).data
         else:
-            from io_storages.serializers import StorageAnnotationSerializer
+            from label_studio.io_storages.serializers import StorageAnnotationSerializer
             # deprecated functionality - save only annotation
             return StorageAnnotationSerializer(annotation).data
 

@@ -8,8 +8,8 @@ from django.urls import reverse
 from label_studio.organizations.models import Organization
 from label_studio.projects.models import Project
 
-from webhooks.models import Webhook, WebhookAction
-from webhooks.utils import emit_webhooks, emit_webhooks_for_instance, run_webhook
+from label_studio.webhooks.models import Webhook, WebhookAction
+from label_studio.webhooks.utils import emit_webhooks, emit_webhooks_for_instance, run_webhook
 
 
 @pytest.fixture

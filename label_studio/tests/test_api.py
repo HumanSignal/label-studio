@@ -9,7 +9,7 @@ from rest_framework.test import APIClient
 from .utils import ml_backend_mock
 
 from label_studio.projects.models import Project
-from ml.models import MLBackendTrainJob
+from label_studio.ml.models import MLBackendTrainJob
 from label_studio.tasks.models import Annotation, Task
 
 

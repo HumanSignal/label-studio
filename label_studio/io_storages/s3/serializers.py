@@ -5,8 +5,8 @@ import os
 from rest_framework.exceptions import ValidationError
 from rest_framework import serializers
 from botocore.exceptions import ParamValidationError, ClientError
-from io_storages.serializers import ImportStorageSerializer, ExportStorageSerializer
-from io_storages.s3.models import S3ImportStorage, S3ExportStorage
+from label_studio.io_storages.serializers import ImportStorageSerializer, ExportStorageSerializer
+from label_studio.io_storages.s3.models import S3ImportStorage, S3ExportStorage
 
 
 class S3ImportStorageSerializer(ImportStorageSerializer):

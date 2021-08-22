@@ -2,9 +2,9 @@
 """
 from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
-from io_storages.gcs.models import GCSImportStorage, GCSExportStorage
-from io_storages.gcs.serializers import GCSImportStorageSerializer, GCSExportStorageSerializer
-from io_storages.api import (
+from label_studio.io_storages.gcs.models import GCSImportStorage, GCSExportStorage
+from label_studio.io_storages.gcs.serializers import GCSImportStorageSerializer, GCSExportStorageSerializer
+from label_studio.io_storages.api import (
     ImportStorageListAPI, ImportStorageDetailAPI, ImportStorageSyncAPI, ExportStorageListAPI, ExportStorageDetailAPI,
     ImportStorageValidateAPI, ExportStorageValidateAPI, ImportStorageFormLayoutAPI, ExportStorageFormLayoutAPI
 )

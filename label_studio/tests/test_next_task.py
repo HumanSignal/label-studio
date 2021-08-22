@@ -1257,7 +1257,7 @@ def test_with_bad_annotation_result(business_client):
 
     # create one heavy task with many annotations - it's statistic recalculation should not be done after completing another task  # noqa
     # turn off statistics calculations for now
-    with mock.patch('tasks.models.update_project_summary_annotations_and_is_labeled'):
+    with mock.patch('label_studio.tasks.models.update_project_summary_annotations_and_is_labeled'):
         for i in range(10):
             task = make_task({'data': {'image': f'https://data.s3.amazonaws.com/image/{i}.jpg'}}, project)
             for i in range(num_annotators):

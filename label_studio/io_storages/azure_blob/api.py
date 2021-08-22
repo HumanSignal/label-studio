@@ -2,9 +2,9 @@
 """
 from django.utils.decorators import method_decorator
 from drf_yasg.utils import swagger_auto_schema
-from io_storages.azure_blob.models import AzureBlobImportStorage, AzureBlobExportStorage
-from io_storages.azure_blob.serializers import AzureBlobImportStorageSerializer, AzureBlobExportStorageSerializer
-from io_storages.api import (
+from label_studio.io_storages.azure_blob.models import AzureBlobImportStorage, AzureBlobExportStorage
+from label_studio.io_storages.azure_blob.serializers import AzureBlobImportStorageSerializer, AzureBlobExportStorageSerializer
+from label_studio.io_storages.api import (
     ImportStorageListAPI, ImportStorageDetailAPI, ImportStorageSyncAPI, ExportStorageListAPI, ExportStorageDetailAPI,
     ImportStorageValidateAPI, ExportStorageValidateAPI, ImportStorageFormLayoutAPI, ExportStorageFormLayoutAPI
 )

@@ -3,8 +3,8 @@
 import os
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
-from io_storages.serializers import ImportStorageSerializer, ExportStorageSerializer
-from io_storages.localfiles.models import LocalFilesImportStorage, LocalFilesExportStorage
+from label_studio.io_storages.serializers import ImportStorageSerializer, ExportStorageSerializer
+from label_studio.io_storages.localfiles.models import LocalFilesImportStorage, LocalFilesExportStorage
 
 
 class LocalFilesImportStorageSerializer(ImportStorageSerializer):

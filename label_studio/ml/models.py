@@ -10,7 +10,7 @@ from django_rq import job
 from rq import get_current_job
 
 from label_studio.core.utils.common import safe_float, conditional_atomic
-from ml.api_connector import MLApi
+from label_studio.ml.api_connector import MLApi
 from label_studio.projects.models import Project
 from label_studio.tasks.models import Annotation, Prediction
 from label_studio.tasks.serializers import TaskSerializer, TaskSimpleSerializer, PredictionSerializer

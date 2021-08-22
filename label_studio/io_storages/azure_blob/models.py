@@ -15,9 +15,9 @@ from django.db.models.signals import post_save
 from azure.storage.blob import BlobServiceClient, generate_blob_sas, BlobSasPermissions
 from django.dispatch import receiver
 from label_studio.core.utils.params import get_env
-from io_storages.base_models import ImportStorage, ImportStorageLink, ExportStorage, ExportStorageLink
-from io_storages.utils import get_uri_via_regex
-from io_storages.serializers import StorageAnnotationSerializer
+from label_studio.io_storages.base_models import ImportStorage, ImportStorageLink, ExportStorage, ExportStorageLink
+from label_studio.io_storages.utils import get_uri_via_regex
+from label_studio.io_storages.serializers import StorageAnnotationSerializer
 from label_studio.tasks.models import Annotation
 
 

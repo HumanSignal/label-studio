@@ -14,7 +14,7 @@ from types import SimpleNamespace
 from django.test import Client
 from django.apps import apps
 from label_studio.projects.models import Project
-from ml.models import MLBackend
+from label_studio.ml.models import MLBackend
 from label_studio.tasks.serializers import TaskWithAnnotationsSerializer
 from label_studio.organizations.models import Organization
 from label_studio.users.models import User
@@ -56,7 +56,7 @@ def email_mock():
 
 @contextmanager
 def gcs_client_mock():
-    from io_storages.gcs.models import google_storage
+    from label_studio.io_storages.gcs.models import google_storage
     from collections import namedtuple
 
     File = namedtuple('File', ['name'])
@@ -96,7 +96,7 @@ def gcs_client_mock():
 
 @contextmanager
 def azure_client_mock():
-    from io_storages.azure_blob import models 
+    from label_studio.io_storages.azure_blob import models 
     from collections import namedtuple
 
     File = namedtuple('File', ['name'])
@@ -135,7 +135,7 @@ def azure_client_mock():
 @contextmanager
 def redis_client_mock():
     from fakeredis import FakeRedis
-    from io_storages.redis.models import RedisStorageMixin
+    from label_studio.io_storages.redis.models import RedisStorageMixin
 
     redis = FakeRedis()
     # TODO: add mocked redis data

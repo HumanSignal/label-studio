@@ -24,8 +24,8 @@ from label_studio.data_import.uploader import load_tasks
 from label_studio.data_import.serializers import ImportApiSerializer, FileUploadSerializer
 from label_studio.data_import.models import FileUpload
 
-from webhooks.utils import emit_webhooks_for_instance
-from webhooks.models import WebhookAction
+from label_studio.webhooks.utils import emit_webhooks_for_instance
+from label_studio.webhooks.models import WebhookAction
 
 logger = logging.getLogger(__name__)
 

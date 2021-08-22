@@ -14,7 +14,7 @@ from drf_yasg.utils import swagger_auto_schema
 from label_studio.core.permissions import all_permissions
 from label_studio.core.utils.common import get_object_with_check_and_log
 from label_studio.core.utils.io import read_yaml
-from io_storages.serializers import ImportStorageSerializer, ExportStorageSerializer
+from label_studio.io_storages.serializers import ImportStorageSerializer, ExportStorageSerializer
 from label_studio.projects.models import Project
 
 logger = logging.getLogger(__name__)

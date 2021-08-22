@@ -12,9 +12,9 @@ from django.utils.translation import gettext_lazy as _
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 
-from io_storages.base_models import ImportStorage, ImportStorageLink, ExportStorage, ExportStorageLink
-from io_storages.utils import get_uri_via_regex
-from io_storages.s3.utils import get_client_and_resource, resolve_s3_url
+from label_studio.io_storages.base_models import ImportStorage, ImportStorageLink, ExportStorage, ExportStorageLink
+from label_studio.io_storages.utils import get_uri_via_regex
+from label_studio.io_storages.s3.utils import get_client_and_resource, resolve_s3_url
 from label_studio.tasks.validation import ValidationError as TaskValidationError
 from label_studio.tasks.models import Annotation
 
