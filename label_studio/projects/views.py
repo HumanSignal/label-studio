@@ -15,7 +15,7 @@ from label_studio.core.utils.common import get_object_with_check_and_log
 from label_studio.core.label_config import get_sample_task
 from label_studio.core.utils.common import get_organization_from_request
 
-from organizations.models import Organization
+from label_studio.organizations.models import Organization
 
 logger = logging.getLogger(__name__)
 

@@ -145,7 +145,7 @@ INSTALLED_APPS = [
 
     'label_studio.core',
     'label_studio.users',
-    'organizations',
+    'label_studio.organizations',
     'data_import',
 
     'projects',
@@ -363,18 +363,18 @@ LATEST_VERSION_CHECK = True
 VERSIONS_CHECK_TIME = 0
 ALLOW_ORGANIZATION_WEBHOOKS = get_bool_env('ALLOW_ORGANIZATION_WEBHOOKS', False)
 
-CREATE_ORGANIZATION = 'organizations.functions.create_organization'
+CREATE_ORGANIZATION = 'label_studio.organizations.functions.create_organization'
 GET_OBJECT_WITH_CHECK_AND_LOG = 'label_studio.core.utils.get_object.get_object_with_check_and_log'
-SAVE_USER = 'users.functions.save_user'
-USER_SERIALIZER = 'users.serializers.BaseUserSerializer'
+SAVE_USER = 'label_studio.users.functions.save_user'
+USER_SERIALIZER = 'label_studio.users.serializers.BaseUserSerializer'
 DATA_MANAGER_ANNOTATIONS_MAP = {}
 DATA_MANAGER_ACTIONS = {}
-USER_LOGIN_FORM = 'users.forms.LoginForm'
+USER_LOGIN_FORM = 'label_studio.users.forms.LoginForm'
 PROJECT_MIXIN = 'label_studio.core.mixins.DummyModelMixin'
 TASK_MIXIN = 'label_studio.core.mixins.DummyModelMixin'
 ANNOTATION_MIXIN = 'label_studio.core.mixins.DummyModelMixin'
 ORGANIZATION_MIXIN = 'label_studio.core.mixins.DummyModelMixin'
-USER_MIXIN = 'users.mixins.UserMixin'
+USER_MIXIN = 'label_studio.users.mixins.UserMixin'
 GET_STORAGE_LIST = 'io_storages.functions.get_storage_list'
 
 

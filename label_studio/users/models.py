@@ -12,7 +12,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from rest_framework.authtoken.models import Token
 
-from organizations.models import OrganizationMember, Organization
+from label_studio.organizations.models import OrganizationMember, Organization
 from label_studio.users.functions import hash_upload
 from label_studio.core.utils.common import load_func
 

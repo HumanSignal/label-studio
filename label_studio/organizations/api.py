@@ -15,8 +15,8 @@ from django.utils.decorators import method_decorator
 from label_studio.core.permissions import all_permissions, ViewClassPermission
 from label_studio.core.utils.common import get_object_with_check_and_log
 
-from organizations.models import Organization
-from organizations.serializers import (
+from label_studio.organizations.models import Organization
+from label_studio.organizations.serializers import (
     OrganizationSerializer, OrganizationIdSerializer, OrganizationMemberUserSerializer, OrganizationInviteSerializer
 )
 

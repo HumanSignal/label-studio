@@ -66,7 +66,7 @@ def _get_config(config_path):
 
 def _create_project(title, user, label_config=None, sampling=None, description=None):
     from projects.models import Project
-    from organizations.models import Organization
+    from label_studio.organizations.models import Organization
 
     project = Project.objects.filter(title=title).first()
     if project is not None:
@@ -113,7 +113,7 @@ def _get_user_info(username):
 
 def _create_user(input_args, config):
     from label_studio.users.models import User
-    from organizations.models import Organization
+    from label_studio.organizations.models import Organization
 
     username = input_args.username or config.get('username') or get_env('USERNAME')
     password = input_args.password or config.get('password') or get_env('PASSWORD')

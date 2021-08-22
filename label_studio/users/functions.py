@@ -9,7 +9,7 @@ from django.contrib import auth
 from django.urls import reverse
 from django.core.files.images import get_image_dimensions
 
-from organizations.models import Organization
+from label_studio.organizations.models import Organization
 from label_studio.core.utils.common import load_func
 
 

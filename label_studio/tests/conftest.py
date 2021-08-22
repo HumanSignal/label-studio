@@ -14,7 +14,7 @@ from django.conf import settings
 from projects.models import Project
 from tasks.models import Task
 from label_studio.users.models import User
-from organizations.models import Organization
+from label_studio.organizations.models import Organization
 from types import SimpleNamespace
 
 # if we haven't this package, pytest.ini::env doesn't work

@@ -1,8 +1,8 @@
 import logging
 
 from django.core.management.base import BaseCommand
-from organizations.functions import destroy_organization
-from organizations.models import Organization
+from label_studio.organizations.functions import destroy_organization
+from label_studio.organizations.models import Organization
 
 log = logging.getLogger(__name__)
 

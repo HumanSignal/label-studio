@@ -16,7 +16,7 @@ from django.apps import apps
 from projects.models import Project
 from ml.models import MLBackend
 from tasks.serializers import TaskWithAnnotationsSerializer
-from organizations.models import Organization
+from label_studio.organizations.models import Organization
 from label_studio.users.models import User
 
 try:

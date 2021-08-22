@@ -5,7 +5,7 @@ import ujson as json
 from rest_framework import serializers
 from drf_dynamic_fields import DynamicFieldsMixin
 
-from organizations.models import Organization, OrganizationMember
+from label_studio.organizations.models import Organization, OrganizationMember
 from label_studio.users.serializers import UserSerializer
 from collections import OrderedDict
 

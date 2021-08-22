@@ -5,7 +5,7 @@ import json
 import requests_mock
 import requests
 from django.urls import reverse
-from organizations.models import Organization
+from label_studio.organizations.models import Organization
 from projects.models import Project
 
 from webhooks.models import Webhook, WebhookAction
