@@ -4,7 +4,7 @@ from label_studio.core.label_config import generate_sample_task_without_check
 from drf_dynamic_fields import DynamicFieldsMixin
 from rest_framework import serializers
 from rest_framework.serializers import SerializerMethodField
-from users.serializers import UserSimpleSerializer
+from label_studio.users.serializers import UserSimpleSerializer
 
 from projects.models import Project, ProjectOnboarding, ProjectSummary
 

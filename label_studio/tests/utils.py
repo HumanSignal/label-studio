@@ -17,7 +17,7 @@ from projects.models import Project
 from ml.models import MLBackend
 from tasks.serializers import TaskWithAnnotationsSerializer
 from organizations.models import Organization
-from users.models import User
+from label_studio.users.models import User
 
 try:
     from businesses.models import Business, BillingPlan
@@ -194,7 +194,7 @@ def make_prediction(config, task_id):
 
 
 def make_annotator(config, project, login=False, client=None):
-    from users.models import User
+    from label_studio.users.models import User
 
     user = User.objects.create(**config)
     user.set_password('12345')

@@ -4,8 +4,8 @@
 
 from django.db import migrations, models
 import django.utils.timezone
-import users.functions
-import users.models
+import label_studio.users.functions
+import label_studio.users.models
 
 from rest_framework.authtoken.models import Token
 
@@ -68,7 +68,7 @@ class Migration(migrations.Migration):
                 'db_table': 'htx_user',
             },
             managers=[
-                ('objects', users.models.UserManager()),
+                ('objects', label_studio.users.models.UserManager()),
             ],
         ),
         migrations.RunPython(add_tokens),
@@ -107,6 +107,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='user',
             name='avatar',
-            field=models.ImageField(blank=True, upload_to=users.functions.hash_upload),
+            field=models.ImageField(blank=True, upload_to=label_studio.users.functions.hash_upload),
         ),
     ]

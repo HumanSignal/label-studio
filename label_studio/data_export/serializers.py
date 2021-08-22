@@ -5,7 +5,7 @@ from rest_framework import serializers
 
 from tasks.models import Task, Annotation
 from tasks.serializers import PredictionSerializer
-from users.models import User
+from label_studio.users.models import User
 from label_studio.core.label_config import replace_task_data_undefined_with_config_field
 
 

@@ -30,7 +30,7 @@ class OrganizationMember(models.Model):
 
     @classmethod
     def find_by_user(cls, user_or_user_pk, organization_pk):
-        from users.models import User
+        from label_studio.users.models import User
 
         user_pk = user_or_user_pk.pk if isinstance(user_or_user_pk, User) else user_or_user_pk
         return OrganizationMember.objects.get(user=user_pk, organization=organization_pk)
@@ -130,7 +130,7 @@ class Organization(OrganizationMixin, models.Model):
         return self.created_at.strftime("%d %b %Y %H:%M:%S")
 
     def per_project_invited_users(self):
-        from users.models import User
+        from label_studio.users.models import User
 
         invited_ids = self.projects.values_list('members__user__pk', flat=True).distinct()
         per_project_invited_users = User.objects.filter(pk__in=invited_ids)

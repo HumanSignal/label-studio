@@ -13,7 +13,7 @@ from copy import deepcopy
 from django.conf import settings
 from projects.models import Project
 from tasks.models import Task
-from users.models import User
+from label_studio.users.models import User
 from organizations.models import Organization
 from types import SimpleNamespace
 

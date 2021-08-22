@@ -4,7 +4,7 @@ import os
 from rest_framework import serializers
 
 from io_storages.base_models import ImportStorage, ExportStorage
-from users.models import User
+from label_studio.users.models import User
 from tasks.serializers import AnnotationSerializer, TaskSerializer
 from tasks.models import Task
 

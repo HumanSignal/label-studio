@@ -92,8 +92,8 @@ def _create_project(title, user, label_config=None, sampling=None, description=N
 
 
 def _get_user_info(username):
-    from users.models import User
-    from users.serializers import UserSerializer
+    from label_studio.users.models import User
+    from label_studio.users.serializers import UserSerializer
     if not username:
         username = DEFAULT_USERNAME
 
@@ -112,7 +112,7 @@ def _get_user_info(username):
 
 
 def _create_user(input_args, config):
-    from users.models import User
+    from label_studio.users.models import User
     from organizations.models import Organization
 
     username = input_args.username or config.get('username') or get_env('USERNAME')
@@ -180,7 +180,7 @@ def _init(input_args, config):
 
 
 def _reset_password(input_args):
-    from users.models import User
+    from label_studio.users.models import User
 
     username = input_args.username
     if not username:

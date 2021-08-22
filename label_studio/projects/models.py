@@ -466,7 +466,7 @@ class Project(ProjectMixin, models.Model):
             # TODO: avoid checking team but rather add all project members when creating a project
             return self.team_link.team.members.values_list('user', flat=True)
         else:
-            from users.models import User
+            from label_studio.users.models import User
             # TODO: may want to return all users from organization
             return User.objects.none()
 
@@ -476,7 +476,7 @@ class Project(ProjectMixin, models.Model):
     def annotators(self):
         """ Annotators connected to this project including team members
         """
-        from users.models import User
+        from label_studio.users.models import User
         member_ids = self.get_member_ids()
         team_members = User.objects.filter(id__in=member_ids).order_by('email')
 

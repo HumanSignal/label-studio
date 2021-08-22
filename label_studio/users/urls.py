@@ -7,7 +7,7 @@ from django.urls import path, re_path
 from django.views.static import serve
 from rest_framework import routers
 
-from users import views, api
+from label_studio.users import views, api
 
 router = routers.DefaultRouter()
 router.register(r'users', api.UserAPI, basename='user')

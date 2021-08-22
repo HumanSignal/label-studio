@@ -144,7 +144,7 @@ INSTALLED_APPS = [
     'drf_generators',
 
     'label_studio.core',
-    'users',
+    'label_studio.users',
     'organizations',
     'data_import',
 

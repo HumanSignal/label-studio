@@ -11,7 +11,7 @@ from django.conf import settings
 from requests.adapters import HTTPAdapter
 from label_studio.core.version import get_git_version
 from data_export.serializers import ExportDataSerializer
-from users.models import Token
+from label_studio.users.models import Token
 
 
 version = get_git_version()

@@ -3,7 +3,7 @@
 from rest_framework import serializers
 from django.conf import settings
 
-from .models import User
+from label_studio.users.models import User
 from label_studio.core.utils.common import load_func
 
 

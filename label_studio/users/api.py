@@ -17,9 +17,9 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 
 from label_studio.core.permissions import all_permissions
-from users.models import User
-from users.serializers import UserSerializer
-from users.functions import check_avatar
+from label_studio.users.models import User
+from label_studio.users.serializers import UserSerializer
+from label_studio.users.functions import check_avatar
 
 
 logger = logging.getLogger(__name__)
