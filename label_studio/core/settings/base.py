@@ -146,7 +146,7 @@ INSTALLED_APPS = [
     'label_studio.core',
     'label_studio.users',
     'label_studio.organizations',
-    'data_import',
+    'label_studio.data_import',
 
     'projects',
     'tasks',
@@ -375,7 +375,7 @@ TASK_MIXIN = 'label_studio.core.mixins.DummyModelMixin'
 ANNOTATION_MIXIN = 'label_studio.core.mixins.DummyModelMixin'
 ORGANIZATION_MIXIN = 'label_studio.core.mixins.DummyModelMixin'
 USER_MIXIN = 'label_studio.users.mixins.UserMixin'
-GET_STORAGE_LIST = 'io_storages.functions.get_storage_list'
+GET_STORAGE_LIST = 'label_studio.io_storages.functions.get_storage_list'
 
 
 def project_delete(project):

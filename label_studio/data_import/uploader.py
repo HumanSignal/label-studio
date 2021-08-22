@@ -18,7 +18,7 @@ from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from urllib.request import urlopen
 
-from .models import FileUpload
+from label_studio.data_import.models import FileUpload
 
 logger = logging.getLogger(__name__)
 csv.field_size_limit(131072 * 10)

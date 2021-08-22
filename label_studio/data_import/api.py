@@ -20,9 +20,9 @@ from label_studio.core.permissions import all_permissions, ViewClassPermission
 from label_studio.core.utils.common import bool_from_request, retry_database_locked
 from projects.models import Project
 from tasks.models import Task
-from .uploader import load_tasks
-from .serializers import ImportApiSerializer, FileUploadSerializer
-from .models import FileUpload
+from label_studio.data_import.uploader import load_tasks
+from label_studio.data_import.serializers import ImportApiSerializer, FileUploadSerializer
+from label_studio.data_import.models import FileUpload
 
 from webhooks.utils import emit_webhooks_for_instance
 from webhooks.models import WebhookAction

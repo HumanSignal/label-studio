@@ -8,7 +8,7 @@ import json
 
 from tasks.models import Task, Annotation, Prediction
 from projects.models import Project
-from data_import.models import FileUpload
+from label_studio.data_import.models import FileUpload
 from label_studio.core.utils.io import get_data_dir
 from data_manager.models import View, FilterGroup, Filter
 from django.core.files.base import File

@@ -5,7 +5,7 @@ from rest_framework import serializers
 from tasks.models import Task
 from tasks.serializers import (
     TaskSerializer, AnnotationSerializer, PredictionSerializer, TaskSerializerBulk)
-from .models import FileUpload
+from label_studio.data_import.models import FileUpload
 
 
 class ImportApiSerializer(TaskSerializer):

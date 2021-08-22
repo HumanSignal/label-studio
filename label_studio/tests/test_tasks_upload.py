@@ -248,7 +248,7 @@ def test_url_upload(mocker, setup_project_dialog, tasks, status_code, task_count
     urlopen_return = io.StringIO(json.dumps(tasks))
     urlopen_return.info = info
 
-    with mocker.patch('data_import.uploader.urlopen', return_value=urlopen_return) as m:
+    with mocker.patch('label_studio.data_import.uploader.urlopen', return_value=urlopen_return) as m:
         # m.return_value.info.get = mocker.PropertyMock(return_value=lambda x: 12345)
 
         url = 'http://localhost:8111/test.json'

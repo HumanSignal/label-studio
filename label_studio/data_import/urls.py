@@ -2,10 +2,10 @@
 """
 from django.urls import path, include
 
-from . import api
+from label_studio.data_import import api
 
 
-app_name = 'data_import'
+app_name = 'label_studio.data_import'
 
 _api_urlpatterns = [
     path('file-upload/<int:pk>', api.FileUploadAPI.as_view(), name='file-upload-detail')
