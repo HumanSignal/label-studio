@@ -62,7 +62,7 @@ def save_user(request, next_page, user_form):
     user.active_organization = org
     user.save(update_fields=['active_organization'])
 
-    redirect_url = next_page if next_page else reverse('projects:project-index')
+    redirect_url = next_page if next_page else reverse('label_studio.projects:project-index')
     auth.login(request, user, backend='django.contrib.auth.backends.ModelBackend')
     return redirect(redirect_url)
 

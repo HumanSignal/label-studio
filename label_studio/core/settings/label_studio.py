@@ -6,7 +6,7 @@ DJANGO_DB = get_env('DJANGO_DB', DJANGO_DB_SQLITE)
 DATABASES = {'default': DATABASES_ALL[DJANGO_DB]}
 
 MIDDLEWARE.append('organizations.middleware.DummyGetSessionMiddleware')
-MIDDLEWARE.append('core.middleware.UpdateLastActivityMiddleware')
+MIDDLEWARE.append('label_studio.core.middleware.UpdateLastActivityMiddleware')
 
 ADD_DEFAULT_ML_BACKENDS = False
 

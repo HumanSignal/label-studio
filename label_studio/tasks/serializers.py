@@ -14,8 +14,8 @@ from rest_framework.fields import SkipField
 from rest_framework.settings import api_settings
 
 from label_studio.projects.models import Project
-from tasks.models import Task, Annotation, AnnotationDraft, Prediction
-from tasks.validation import TaskValidator
+from label_studio.tasks.models import Task, Annotation, AnnotationDraft, Prediction
+from label_studio.tasks.validation import TaskValidator
 from label_studio.core.utils.common import get_object_with_check_and_log, retry_database_locked
 from label_studio.core.label_config import replace_task_data_undefined_with_config_field
 from label_studio.users.serializers import UserSerializer

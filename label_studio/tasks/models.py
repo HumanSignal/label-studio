@@ -235,7 +235,7 @@ class Task(TaskMixin, models.Model):
         project.tasks.update(is_labeled=Subquery(results))
 
     def delete_url(self):
-        return reverse('tasks:task-delete', kwargs={'pk': self.pk})
+        return reverse('label_studio.tasks:task-delete', kwargs={'pk': self.pk})
 
     def completion_for_ground_truth(self):
         """ 1 Get ground_truth completion if task has it, else

@@ -2,8 +2,8 @@
 """
 from rest_framework import serializers
 
-from tasks.models import Task
-from tasks.serializers import (
+from label_studio.tasks.models import Task
+from label_studio.tasks.serializers import (
     TaskSerializer, AnnotationSerializer, PredictionSerializer, TaskSerializerBulk)
 from label_studio.data_import.models import FileUpload
 

@@ -12,8 +12,8 @@ from rq import get_current_job
 from label_studio.core.utils.common import safe_float, conditional_atomic
 from ml.api_connector import MLApi
 from label_studio.projects.models import Project
-from tasks.models import Annotation, Prediction
-from tasks.serializers import TaskSerializer, TaskSimpleSerializer, PredictionSerializer
+from label_studio.tasks.models import Annotation, Prediction
+from label_studio.tasks.serializers import TaskSerializer, TaskSimpleSerializer, PredictionSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -133,7 +133,7 @@ class MLBackend(models.Model):
             return
 
         if isinstance(tasks, list):
-            from tasks.models import Task
+            from label_studio.tasks.models import Task
             tasks = Task.objects.filter(id__in=[task.id for task in tasks])
 
         tasks_ser = TaskSimpleSerializer(tasks, many=True).data

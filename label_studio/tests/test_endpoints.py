@@ -5,8 +5,8 @@ import django
 
 from django.urls import get_resolver
 from django.shortcuts import reverse
-from tasks.models import Annotation
-from tasks.models import Task
+from label_studio.tasks.models import Annotation
+from label_studio.tasks.models import Task
 
 
 owner_statuses = {

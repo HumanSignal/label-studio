@@ -4,7 +4,7 @@ from django.urls import include, path
 
 from organizations import api, views
 
-app_name = 'organizations'
+app_name = 'label_studio.organizations'
 
 # TODO: there should be only one patterns list based on API (with api/ prefix removed)
 # Page URLs

@@ -5,8 +5,8 @@ from rest_framework import serializers
 
 from io_storages.base_models import ImportStorage, ExportStorage
 from label_studio.users.models import User
-from tasks.serializers import AnnotationSerializer, TaskSerializer
-from tasks.models import Task
+from label_studio.tasks.serializers import AnnotationSerializer, TaskSerializer
+from label_studio.tasks.models import Task
 
 
 class ImportStorageSerializer(serializers.ModelSerializer):

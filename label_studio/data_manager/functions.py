@@ -9,7 +9,7 @@ from rest_framework.generics import get_object_or_404
 from label_studio.core.utils.common import int_from_request
 from data_manager.prepare_params import PrepareParams
 from data_manager.models import View
-from tasks.models import Task
+from label_studio.tasks.models import Task
 
 
 TASKS = 'tasks:'

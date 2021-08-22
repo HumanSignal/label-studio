@@ -19,7 +19,7 @@ from label_studio.core.permissions import all_permissions, ViewClassPermission
 from label_studio.core.decorators import permission_required
 from label_studio.projects.models import Project
 from label_studio.projects.serializers import ProjectSerializer
-from tasks.models import Task, Annotation
+from label_studio.tasks.models import Task, Annotation
 
 from data_manager.functions import get_all_columns, get_prepared_queryset, evaluate_predictions
 from data_manager.models import View

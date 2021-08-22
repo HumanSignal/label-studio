@@ -6,7 +6,7 @@ import io
 import json
 
 
-from tasks.models import Task, Annotation, Prediction
+from label_studio.tasks.models import Task, Annotation, Prediction
 from label_studio.projects.models import Project
 from label_studio.data_import.models import FileUpload
 from label_studio.core.utils.io import get_data_dir

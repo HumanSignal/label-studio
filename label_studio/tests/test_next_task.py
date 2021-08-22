@@ -11,7 +11,7 @@ from functools import partial
 from django.apps import apps
 from django.db.models import Q
 from label_studio.projects.models import Project
-from tasks.models import Task, Annotation, Prediction
+from label_studio.tasks.models import Task, Annotation, Prediction
 from .utils import (
     ml_backend_mock, make_project, make_task, make_annotator,
     invite_client_to_project, make_annotation, _client_is_annotator

@@ -3,8 +3,8 @@
 from django.conf import settings
 from rest_framework import serializers
 
-from tasks.models import Task, Annotation
-from tasks.serializers import PredictionSerializer
+from label_studio.tasks.models import Task, Annotation
+from label_studio.tasks.serializers import PredictionSerializer
 from label_studio.users.models import User
 from label_studio.core.label_config import replace_task_data_undefined_with_config_field
 

@@ -6,7 +6,7 @@ from django.urls import include, path
 
 from label_studio.projects import api, views
 
-app_name = 'projects'
+app_name = 'label_studio.projects'
 
 # reverse for projects:name
 _urlpatterns = [

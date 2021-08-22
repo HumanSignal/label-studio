@@ -3,9 +3,9 @@
 from django.urls import path, include
 from rest_framework import routers
 
-from . import api
+from label_studio.tasks import api
 
-app_name = 'tasks'
+app_name = 'label_studio.tasks'
 
 router = routers.DefaultRouter()
 router.register(r'predictions', api.PredictionAPI, basename='prediction')

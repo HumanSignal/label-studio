@@ -12,7 +12,7 @@ from moto import mock_s3
 from copy import deepcopy
 from django.conf import settings
 from label_studio.projects.models import Project
-from tasks.models import Task
+from label_studio.tasks.models import Task
 from label_studio.users.models import User
 from label_studio.organizations.models import Organization
 from types import SimpleNamespace

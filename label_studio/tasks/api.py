@@ -18,9 +18,9 @@ from rest_framework.exceptions import PermissionDenied as DRFPermissionDenied
 from label_studio.core.utils.common import get_object_with_check_and_log, DjangoFilterDescriptionInspector
 from label_studio.core.permissions import all_permissions, ViewClassPermission
 
-from tasks.models import Task, Annotation, Prediction, AnnotationDraft
+from label_studio.tasks.models import Task, Annotation, Prediction, AnnotationDraft
 from label_studio.core.utils.common import bool_from_request, int_from_request
-from tasks.serializers import (
+from label_studio.tasks.serializers import (
     TaskSerializer, AnnotationSerializer, TaskSimpleSerializer, PredictionSerializer,
     TaskWithAnnotationsAndPredictionsAndDraftsSerializer, AnnotationDraftSerializer, PredictionQuerySerializer)
 from label_studio.projects.models import Project

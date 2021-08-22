@@ -18,7 +18,7 @@ from label_studio.core.utils.params import get_env
 from io_storages.base_models import ImportStorage, ImportStorageLink, ExportStorage, ExportStorageLink
 from io_storages.utils import get_uri_via_regex
 from io_storages.serializers import StorageAnnotationSerializer
-from tasks.models import Annotation
+from label_studio.tasks.models import Annotation
 
 
 logger = logging.getLogger(__name__)

@@ -212,7 +212,7 @@ def sample_query(q, sample_size):
 
 def get_project(obj):
     from label_studio.projects.models import Project, ProjectSummary
-    from tasks.models import Task, Annotation, AnnotationDraft
+    from label_studio.tasks.models import Task, Annotation, AnnotationDraft
     from io_storages.base_models import ImportStorage
     from data_manager.models import View
 

@@ -9,8 +9,8 @@ from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 from django_rq import job
 
-from tasks.models import Task
-from tasks.serializers import PredictionSerializer, AnnotationSerializer
+from label_studio.tasks.models import Task
+from label_studio.tasks.serializers import PredictionSerializer, AnnotationSerializer
 from data_export.serializers import ExportDataSerializer
 
 

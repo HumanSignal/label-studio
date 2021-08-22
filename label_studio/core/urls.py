@@ -28,7 +28,7 @@ from rest_framework.permissions import AllowAny
 
 from label_studio.core import views
 
-handler500 = 'core.views.custom_500'
+handler500 = 'label_studio.core.views.custom_500'
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -52,13 +52,13 @@ urlpatterns = [
 
 
 
-    re_path(r'^', include('organizations.urls')),
-    re_path(r'^', include('projects.urls')),
-    re_path(r'^', include('data_import.urls')),
+    re_path(r'^', include('label_studio.organizations.urls')),
+    re_path(r'^', include('label_studio.projects.urls')),
+    re_path(r'^', include('label_studio.data_import.urls')),
     re_path(r'^', include('data_manager.urls')),
     re_path(r'^', include('data_export.urls')),
-    re_path(r'^', include('users.urls')),
-    re_path(r'^', include('tasks.urls')),
+    re_path(r'^', include('label_studio.users.urls')),
+    re_path(r'^', include('label_studio.tasks.urls')),
     re_path(r'^', include('io_storages.urls')),
     re_path(r'^', include('ml.urls')),
     re_path(r'^', include('webhooks.urls')),

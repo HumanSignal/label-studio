@@ -110,5 +110,5 @@ from django.urls import reverse
 @pytest.mark.django_db
 def test_validate_label_config(business_client, label_config, status_code):
     r = business_client.post(
-        reverse('projects:api:label-config-validate'), data={'label_config': label_config}, content_type='application/json')
+        reverse('label_studio.projects:api:label-config-validate'), data={'label_config': label_config}, content_type='application/json')
     assert r.status_code == status_code

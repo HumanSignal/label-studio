@@ -11,7 +11,7 @@ from django.core.validators import MinLengthValidator, MaxLengthValidator
 from django.db import transaction, models
 from annoying.fields import AutoOneToOneField
 
-from tasks.models import Task, Prediction, Annotation, Q_task_finished_annotations, bulk_update_stats_project_tasks
+from label_studio.tasks.models import Task, Prediction, Annotation, Q_task_finished_annotations, bulk_update_stats_project_tasks
 from label_studio.core.utils.common import create_hash, sample_query, get_attr_or_item, load_func
 from label_studio.core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
 from label_studio.core.label_config import (
@@ -511,7 +511,7 @@ class Project(ProjectMixin, models.Model):
         return self.tasks.filter(is_labeled=True)
 
     def has_annotations(self):
-        from tasks.models import Annotation  # prevent cycling imports
+        from label_studio.tasks.models import Annotation  # prevent cycling imports
         return Annotation.objects.filter(Q(task__project=self) & Q(ground_truth=False)).count() > 0
 
     # [TODO] this should be a template tag or something like this

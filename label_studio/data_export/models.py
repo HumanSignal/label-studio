@@ -15,7 +15,7 @@ from label_studio_converter import Converter
 from label_studio.core.utils.io import get_temp_dir, read_bytes_stream, get_all_files_from_dir
 from label_studio.core.label_config import parse_config
 from label_studio.core import version
-from tasks.models import Annotation
+from label_studio.tasks.models import Annotation
 # Create your models here.
 
 

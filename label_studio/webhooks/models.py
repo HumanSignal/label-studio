@@ -7,7 +7,7 @@ from django.conf import settings
 import logging
 
 from label_studio.projects.models import Project
-from tasks.models import Task, Annotation
+from label_studio.tasks.models import Task, Annotation
 from .serializers_for_hooks import (
     OnlyIDWebhookSerializer,
     ProjectWebhookSerializer,

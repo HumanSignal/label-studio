@@ -10,7 +10,7 @@ from .utils import ml_backend_mock
 
 from label_studio.projects.models import Project
 from ml.models import MLBackendTrainJob
-from tasks.models import Annotation, Task
+from label_studio.tasks.models import Annotation, Task
 
 
 @pytest.fixture

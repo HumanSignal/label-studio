@@ -16,7 +16,7 @@ from rest_framework.views import APIView
 from label_studio.core.permissions import all_permissions
 from label_studio.core.utils.common import get_object_with_check_and_log, bool_from_request, batch
 from label_studio.projects.models import Project
-from tasks.models import Task
+from label_studio.tasks.models import Task
 from .models import DataExport
 from .serializers import ExportDataSerializer
 

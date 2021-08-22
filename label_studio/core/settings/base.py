@@ -149,7 +149,7 @@ INSTALLED_APPS = [
     'label_studio.data_import',
 
     'label_studio.projects',
-    'tasks',
+    'label_studio.tasks',
     'data_manager',
     'io_storages',
     'ml',

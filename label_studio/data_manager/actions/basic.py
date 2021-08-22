@@ -2,7 +2,7 @@
 """
 from django.db.models import signals
 
-from tasks.models import Annotation, Prediction, update_is_labeled_after_removing_annotation
+from label_studio.tasks.models import Annotation, Prediction, update_is_labeled_after_removing_annotation
 from label_studio.core.utils.common import temporary_disconnect_signal, temporary_disconnect_all_signals
 
 from data_manager.functions import evaluate_predictions

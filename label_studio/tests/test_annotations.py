@@ -7,7 +7,7 @@ import math
 
 from django.apps import apps
 from django.urls import reverse
-from tasks.models import Task, Annotation
+from label_studio.tasks.models import Task, Annotation
 from label_studio.projects.models import Project
 from .utils import invite_client_to_project, _client_is_annotator
 
@@ -159,7 +159,7 @@ def test_accuracy(
 
     for annotation_key, client_key in annotations_sequence:
         r = client[client_key].post(
-            reverse('tasks:api:task-annotations', kwargs={'pk': task_id}), data=annotations[annotation_key])
+            reverse('label_studio.tasks:api:task-annotations', kwargs={'pk': task_id}), data=annotations[annotation_key])
         assert r.status_code == 201
     task = Task.objects.get(id=task_id)
     assert task.is_labeled == is_labeled
@@ -169,23 +169,23 @@ def test_accuracy(
 def test_accuracy_on_delete(business_client, project_with_max_annotations_2, annotations):
     task_id = next(iter(annotations.values()))['task']
     for annotation in annotations.values():
-        business_client.post(reverse('tasks:api:task-annotations', kwargs={'pk': task_id}), data=annotation)
+        business_client.post(reverse('label_studio.tasks:api:task-annotations', kwargs={'pk': task_id}), data=annotation)
 
     task = Task.objects.get(id=task_id)
     assert task.annotations.count() == len(annotations)
     assert task.is_labeled
     annotation_ids = [c.id for c in task.annotations.all()]
-    r = business_client.delete(reverse('tasks:api-annotations:annotation-detail', kwargs={'pk': annotation_ids[0]}))
+    r = business_client.delete(reverse('label_studio.tasks:api-annotations:annotation-detail', kwargs={'pk': annotation_ids[0]}))
     assert r.status_code == 204
     task = Task.objects.get(id=task_id)
     assert task.is_labeled  # project.max_annotations = 2
 
-    r = business_client.delete(reverse('tasks:api-annotations:annotation-detail', kwargs={'pk': annotation_ids[1]}))
+    r = business_client.delete(reverse('label_studio.tasks:api-annotations:annotation-detail', kwargs={'pk': annotation_ids[1]}))
     assert r.status_code == 204
     task = Task.objects.get(id=task_id)
     assert not task.is_labeled
 
-    r = business_client.delete(reverse('tasks:api-annotations:annotation-detail', kwargs={'pk': annotation_ids[2]}))
+    r = business_client.delete(reverse('label_studio.tasks:api-annotations:annotation-detail', kwargs={'pk': annotation_ids[2]}))
     assert r.status_code == 204
     task = Task.objects.get(id=task_id)
     assert not task.is_labeled
@@ -195,7 +195,7 @@ def test_accuracy_on_delete(business_client, project_with_max_annotations_2, ann
 # def test_accuracy_on_delete(business_client, project_with_max_annotations_2, annotations):
 #     task_id = next(iter(annotations.values()))['task']
 #     for annotation in annotations.values():
-#         business_client.post(reverse('tasks:api:task-annotations', kwargs={'pk': task_id}), data=annotation)
+#         business_client.post(reverse('label_studio.tasks:api:task-annotations', kwargs={'pk': task_id}), data=annotation)
 #
 #     task = Task.objects.get(id=task_id)
 #     assert task.annotations.count() == len(annotations)
@@ -203,21 +203,21 @@ def test_accuracy_on_delete(business_client, project_with_max_annotations_2, ann
 #         assert math.fabs(task.accuracy - 1 / 3) < 0.00001
 #     assert task.is_labeled
 #     annotation_ids = [c.id for c in task.annotations.all()]
-#     r = business_client.delete(reverse('tasks:api-annotations:annotation-detail', kwargs={'pk': annotation_ids[0]}))
+#     r = business_client.delete(reverse('label_studio.tasks:api-annotations:annotation-detail', kwargs={'pk': annotation_ids[0]}))
 #     assert r.status_code == 204
 #     task = Task.objects.get(id=task_id)
 #     if apps.is_installed('businesses'):
 #         assert task.accuracy == 0.5
 #     assert task.is_labeled  # project.max_annotations = 2
 #
-#     r = business_client.delete(reverse('tasks:api-annotations:annotation-detail', kwargs={'pk': annotation_ids[1]}))
+#     r = business_client.delete(reverse('label_studio.tasks:api-annotations:annotation-detail', kwargs={'pk': annotation_ids[1]}))
 #     assert r.status_code == 204
 #     task = Task.objects.get(id=task_id)
 #     if apps.is_installed('businesses'):
 #         assert task.accuracy == 1.0
 #     assert not task.is_labeled
 #
-#     r = business_client.delete(reverse('tasks:api-annotations:annotation-detail', kwargs={'pk': annotation_ids[2]}))
+#     r = business_client.delete(reverse('label_studio.tasks:api-annotations:annotation-detail', kwargs={'pk': annotation_ids[2]}))
 #     assert r.status_code == 204
 #     task = Task.objects.get(id=task_id)
 #     if apps.is_installed('businesses'):

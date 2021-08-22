@@ -29,8 +29,8 @@ from label_studio.projects.models import (
 from label_studio.projects.serializers import (
     ProjectSerializer, ProjectLabelConfigSerializer, ProjectSummarySerializer
 )
-from tasks.models import Task, Annotation, Prediction, TaskLock
-from tasks.serializers import TaskSerializer, TaskWithAnnotationsAndPredictionsAndDraftsSerializer
+from label_studio.tasks.models import Task, Annotation, Prediction, TaskLock
+from label_studio.tasks.serializers import TaskSerializer, TaskWithAnnotationsAndPredictionsAndDraftsSerializer
 from webhooks.utils import api_webhook, api_webhook_for_delete, emit_webhooks_for_instance
 from webhooks.models import WebhookAction
 

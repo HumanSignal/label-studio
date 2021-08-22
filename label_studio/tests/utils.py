@@ -15,7 +15,7 @@ from django.test import Client
 from django.apps import apps
 from label_studio.projects.models import Project
 from ml.models import MLBackend
-from tasks.serializers import TaskWithAnnotationsSerializer
+from label_studio.tasks.serializers import TaskWithAnnotationsSerializer
 from label_studio.organizations.models import Organization
 from label_studio.users.models import User
 
@@ -172,7 +172,7 @@ def project_id(business_client):
 
 
 def make_task(config, project):
-    from tasks.models import Task
+    from label_studio.tasks.models import Task
 
     return Task.objects.create(project=project, overlap=project.maximum_annotations, **config)
 
@@ -182,13 +182,13 @@ def create_business(user):
 
 
 def make_annotation(config, task_id):
-    from tasks.models import Annotation
+    from label_studio.tasks.models import Annotation
 
     return Annotation.objects.create(task_id=task_id, **config)
 
 
 def make_prediction(config, task_id):
-    from tasks.models import Prediction
+    from label_studio.tasks.models import Prediction
 
     return Prediction.objects.create(task_id=task_id, **config)
 

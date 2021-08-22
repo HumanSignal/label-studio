@@ -54,7 +54,7 @@ def get_fields_for_annotation(prepare_params):
     :param prepare_params: structure with filters and ordering
     :return: list of field names
     """
-    from tasks.models import Task
+    from label_studio.tasks.models import Task
 
     result = []
     # collect fields from ordering
@@ -279,7 +279,7 @@ class GroupConcat(Aggregate):
 
 
 def annotate_completed_at(queryset):
-    from tasks.models import Annotation
+    from label_studio.tasks.models import Annotation
 
     newest = Annotation.objects.filter(task=OuterRef("pk"), task__is_labeled=True).distinct().order_by("-created_at")
     return queryset.annotate(completed_at=Subquery(newest.values("created_at")[:1]))

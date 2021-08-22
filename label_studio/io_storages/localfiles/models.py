@@ -21,7 +21,7 @@ from io_storages.base_models import (
       ImportStorageLink,
 )
 from io_storages.serializers import StorageAnnotationSerializer
-from tasks.models import Annotation
+from label_studio.tasks.models import Annotation
 
 logger = logging.getLogger(__name__)
 url_scheme = 'https'

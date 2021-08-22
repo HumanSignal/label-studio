@@ -8,7 +8,7 @@ import ujson as json
 
 from rest_framework.authtoken.models import Token
 
-from tasks.models import Task, Annotation, Prediction
+from label_studio.tasks.models import Task, Annotation, Prediction
 from label_studio.projects.models import Project
 
 

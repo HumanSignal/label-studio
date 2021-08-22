@@ -5,8 +5,8 @@ import json
 import copy
 
 from django.db import transaction
-from tasks.models import Task, Annotation, Prediction
-from tasks.serializers import AnnotationSerializer
+from label_studio.tasks.models import Task, Annotation, Prediction
+from label_studio.tasks.serializers import AnnotationSerializer
 from django.apps import apps
 
 

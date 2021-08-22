@@ -98,7 +98,7 @@ def test_webhooks_for_projects(configured_project, business_client, organization
     # PROJECT_CREATED
     with requests_mock.Mocker(real_http=True) as m:
         m.register_uri('POST', webhook.url)
-        response = business_client.post(reverse('projects:api:project-list'))
+        response = business_client.post(reverse('label_studio.projects:api:project-list'))
 
     assert response.status_code == 201
     assert len(m.request_history) == 1
@@ -109,7 +109,7 @@ def test_webhooks_for_projects(configured_project, business_client, organization
     with requests_mock.Mocker(real_http=True) as m:
         m.register_uri('POST', webhook.url)
         response = business_client.patch(
-            reverse('projects:api:project-detail', kwargs={'pk': project_id}),
+            reverse('label_studio.projects:api:project-detail', kwargs={'pk': project_id}),
             data=json.dumps({'title': 'Test title'}),
             content_type="application/json",
         )
@@ -123,7 +123,7 @@ def test_webhooks_for_projects(configured_project, business_client, organization
     with requests_mock.Mocker(real_http=True) as m:
         m.register_uri('POST', webhook.url)
         response = business_client.delete(
-            reverse('projects:api:project-detail', kwargs={'pk': project_id}),
+            reverse('label_studio.projects:api:project-detail', kwargs={'pk': project_id}),
         )
     assert response.status_code == 204
     assert len(m.request_history) == 1
@@ -139,7 +139,7 @@ def test_webhooks_for_tasks(configured_project, business_client, organization_we
     with requests_mock.Mocker(real_http=True) as m:
         m.register_uri('POST', webhook.url)
         response = business_client.post(
-            reverse('tasks:api:task-list'),
+            reverse('label_studio.tasks:api:task-list'),
             data=json.dumps(
                 {
                     'project': configured_project.id,
@@ -158,7 +158,7 @@ def test_webhooks_for_tasks(configured_project, business_client, organization_we
     webhook.delete()
     with requests_mock.Mocker(real_http=True) as m:
         m.register_uri('POST', url)
-        response = business_client.delete(reverse('tasks:api:task-detail', kwargs={'pk': task_id}))
+        response = business_client.delete(reverse('label_studio.tasks:api:task-detail', kwargs={'pk': task_id}))
 
     assert response.status_code == 204
     assert len(m.request_history) == 0

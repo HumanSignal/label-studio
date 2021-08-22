@@ -6,7 +6,7 @@ import json
 
 from label_studio.projects.models import Project
 from ml.models import MLBackend
-from tasks.models import Task, Prediction, Annotation
+from label_studio.tasks.models import Task, Prediction, Annotation
 from .utils import make_project
 from label_studio.core.redis import redis_healthcheck
 
