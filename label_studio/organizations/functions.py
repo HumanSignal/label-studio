@@ -2,7 +2,7 @@ from django.db import transaction
 
 from label_studio.core.utils.disable_signals import DisableSignals
 from label_studio.organizations.models import Organization, OrganizationMember
-from projects.models import Project
+from label_studio.projects.models import Project
 
 
 def create_organization(title, created_by):

@@ -4,7 +4,7 @@ import pytest
 import requests_mock
 import json
 
-from projects.models import Project
+from label_studio.projects.models import Project
 from ml.models import MLBackend
 from tasks.models import Task, Prediction, Annotation
 from .utils import make_project

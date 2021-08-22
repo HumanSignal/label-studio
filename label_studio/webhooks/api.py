@@ -14,7 +14,7 @@ from rest_framework.views import APIView
 
 from .models import Webhook, WebhookAction
 from .serializers import WebhookSerializer, WebhookSerializerForUpdate
-from projects import models as project_models
+from label_studio.projects import models as project_models
 
 
 class WebhookFilterSet(django_filters.FilterSet):

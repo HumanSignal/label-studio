@@ -8,7 +8,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 from .utils import ml_backend_mock
 
-from projects.models import Project
+from label_studio.projects.models import Project
 from ml.models import MLBackendTrainJob
 from tasks.models import Annotation, Task
 

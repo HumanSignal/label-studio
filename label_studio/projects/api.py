@@ -23,10 +23,10 @@ from rest_framework.views import exception_handler
 from label_studio.core.utils.common import conditional_atomic
 from label_studio.core.utils.disable_signals import DisableSignals
 from label_studio.core.label_config import config_essential_data_has_changed
-from projects.models import (
+from label_studio.projects.models import (
     Project, ProjectSummary
 )
-from projects.serializers import (
+from label_studio.projects.serializers import (
     ProjectSerializer, ProjectLabelConfigSerializer, ProjectSummarySerializer
 )
 from tasks.models import Task, Annotation, Prediction, TaskLock

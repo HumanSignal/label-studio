@@ -65,7 +65,7 @@ def _get_config(config_path):
 
 
 def _create_project(title, user, label_config=None, sampling=None, description=None):
-    from projects.models import Project
+    from label_studio.projects.models import Project
     from label_studio.organizations.models import Organization
 
     project = Project.objects.filter(title=title).first()
@@ -164,7 +164,7 @@ def _create_user(input_args, config):
 
 def _init(input_args, config):
     if not _project_exists(input_args.project_name):
-        from projects.models import Project
+        from label_studio.projects.models import Project
         sampling_map = {'sequential': Project.SEQUENCE, 'uniform': Project.UNIFORM,
                         'prediction-score-min': Project.UNCERTAINTY}
         user = _create_user(input_args, config)
@@ -242,7 +242,7 @@ def _get_free_port(port, debug):
 
 
 def _project_exists(project_name):
-    from projects.models import Project
+    from label_studio.projects.models import Project
 
     return Project.objects.filter(title=project_name).exists()
 
@@ -307,7 +307,7 @@ def main():
     # start with migrations from old projects, '.' project_name means 'label-studio start' without project name
     elif input_args.command == 'start' and input_args.project_name != '.':
         from label_studio.core.old_ls_migration import migrate_existing_project
-        from projects.models import Project
+        from label_studio.projects.models import Project
         sampling_map = {'sequential': Project.SEQUENCE, 'uniform': Project.UNIFORM,
                         'prediction-score-min': Project.UNCERTAINTY}
 

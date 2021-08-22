@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib.auth.models import Group
 
 from label_studio.users.models import User
-from projects.models import Project
+from label_studio.projects.models import Project
 from ml.models import MLBackend, MLBackendTrainJob
 from tasks.models import Task, Annotation
 from label_studio.organizations.models import Organization

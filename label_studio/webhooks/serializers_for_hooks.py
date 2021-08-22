@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from projects.models import Project
+from label_studio.projects.models import Project
 from tasks.models import Task, Annotation
 from label_studio.core.label_config import replace_task_data_undefined_with_config_field
 

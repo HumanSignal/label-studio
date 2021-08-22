@@ -6,7 +6,7 @@ from rest_framework import serializers
 from rest_framework.serializers import SerializerMethodField
 from label_studio.users.serializers import UserSimpleSerializer
 
-from projects.models import Project, ProjectOnboarding, ProjectSummary
+from label_studio.projects.models import Project, ProjectOnboarding, ProjectSummary
 
 
 class CreatedByFromContext:

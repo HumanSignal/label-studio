@@ -8,7 +8,7 @@ import math
 from django.apps import apps
 from django.urls import reverse
 from tasks.models import Task, Annotation
-from projects.models import Project
+from label_studio.projects.models import Project
 from .utils import invite_client_to_project, _client_is_annotator
 
 

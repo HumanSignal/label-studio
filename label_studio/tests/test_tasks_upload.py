@@ -9,7 +9,7 @@ import ujson as json
 from rest_framework.authtoken.models import Token
 
 from tasks.models import Task, Annotation, Prediction
-from projects.models import Project
+from label_studio.projects.models import Project
 
 
 def post_data_as_format(setup, format_type, body, archive, multiply_files):

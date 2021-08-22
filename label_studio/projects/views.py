@@ -9,7 +9,7 @@ from django.views.decorators.http import require_http_methods
 from django.contrib.auth.decorators import login_required
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
-from projects.models import Project
+from label_studio.projects.models import Project
 
 from label_studio.core.utils.common import get_object_with_check_and_log
 from label_studio.core.label_config import get_sample_task

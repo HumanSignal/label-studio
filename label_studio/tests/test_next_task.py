@@ -10,7 +10,7 @@ from functools import partial
 
 from django.apps import apps
 from django.db.models import Q
-from projects.models import Project
+from label_studio.projects.models import Project
 from tasks.models import Task, Annotation, Prediction
 from .utils import (
     ml_backend_mock, make_project, make_task, make_annotator,

@@ -11,7 +11,7 @@ from rq import get_current_job
 
 from label_studio.core.utils.common import safe_float, conditional_atomic
 from ml.api_connector import MLApi
-from projects.models import Project
+from label_studio.projects.models import Project
 from tasks.models import Annotation, Prediction
 from tasks.serializers import TaskSerializer, TaskSimpleSerializer, PredictionSerializer
 

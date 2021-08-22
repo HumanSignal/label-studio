@@ -13,7 +13,7 @@ from types import SimpleNamespace
 
 from django.test import Client
 from django.apps import apps
-from projects.models import Project
+from label_studio.projects.models import Project
 from ml.models import MLBackend
 from tasks.serializers import TaskWithAnnotationsSerializer
 from label_studio.organizations.models import Organization

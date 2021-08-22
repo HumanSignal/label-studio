@@ -23,7 +23,7 @@ from label_studio.core.utils.common import bool_from_request, int_from_request
 from tasks.serializers import (
     TaskSerializer, AnnotationSerializer, TaskSimpleSerializer, PredictionSerializer,
     TaskWithAnnotationsAndPredictionsAndDraftsSerializer, AnnotationDraftSerializer, PredictionQuerySerializer)
-from projects.models import Project
+from label_studio.projects.models import Project
 from webhooks.utils import api_webhook, api_webhook_for_delete, emit_webhooks_for_instance
 from webhooks.models import WebhookAction
 

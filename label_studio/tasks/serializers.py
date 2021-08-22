@@ -13,7 +13,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.fields import SkipField
 from rest_framework.settings import api_settings
 
-from projects.models import Project
+from label_studio.projects.models import Project
 from tasks.models import Task, Annotation, AnnotationDraft, Prediction
 from tasks.validation import TaskValidator
 from label_studio.core.utils.common import get_object_with_check_and_log, retry_database_locked

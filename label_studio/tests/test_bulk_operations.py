@@ -5,7 +5,7 @@ import os
 import datetime
 
 from label_studio.users.models import User
-from projects.models import Project
+from label_studio.projects.models import Project
 from label_studio.tests.test_data.gen_tasks_and_annotations import gen_tasks
 
 

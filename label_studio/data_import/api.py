@@ -18,7 +18,7 @@ from ranged_fileresponse import RangedFileResponse
 
 from label_studio.core.permissions import all_permissions, ViewClassPermission
 from label_studio.core.utils.common import bool_from_request, retry_database_locked
-from projects.models import Project
+from label_studio.projects.models import Project
 from tasks.models import Task
 from label_studio.data_import.uploader import load_tasks
 from label_studio.data_import.serializers import ImportApiSerializer, FileUploadSerializer

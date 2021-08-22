@@ -2,7 +2,7 @@
 """
 import logging
 
-from projects.api import ProjectNextTaskAPI
+from label_studio.projects.api import ProjectNextTaskAPI
 
 logger = logging.getLogger(__name__)
 

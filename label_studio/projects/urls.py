@@ -4,7 +4,7 @@ import data_export.api
 from django.shortcuts import redirect
 from django.urls import include, path
 
-from . import api, views
+from label_studio.projects import api, views
 
 app_name = 'projects'
 

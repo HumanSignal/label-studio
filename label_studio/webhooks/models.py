@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 import logging
 
-from projects.models import Project
+from label_studio.projects.models import Project
 from tasks.models import Task, Annotation
 from .serializers_for_hooks import (
     OnlyIDWebhookSerializer,
