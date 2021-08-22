@@ -15,7 +15,7 @@ from django.apps import apps
 from rest_framework.permissions import IsAuthenticated, SAFE_METHODS, BasePermission
 from rest_framework.exceptions import PermissionDenied as DRFPermissionDenied
 
-from core.utils.common import get_object_with_check_and_log
+from label_studio.core.utils.common import get_object_with_check_and_log
 from users.models import User
 logger = logging.getLogger(__name__)
 

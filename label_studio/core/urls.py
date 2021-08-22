@@ -26,7 +26,7 @@ from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 from rest_framework.permissions import AllowAny
 
-from core import views
+from label_studio.core import views
 
 handler500 = 'core.views.custom_500'
 

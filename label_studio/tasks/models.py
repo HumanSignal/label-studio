@@ -21,10 +21,10 @@ from django.dispatch import receiver, Signal
 
 from model_utils import FieldTracker
 
-from core.utils.common import find_first_one_to_one_related_field_by_prefix, string_is_url, load_func
-from core.utils.params import get_env
+from label_studio.core.utils.common import find_first_one_to_one_related_field_by_prefix, string_is_url, load_func
+from label_studio.core.utils.params import get_env
 from data_manager.managers import PreparedTaskManager, TaskManager
-from core.bulk_update_utils import bulk_update
+from label_studio.core.bulk_update_utils import bulk_update
 
 logger = logging.getLogger(__name__)
 

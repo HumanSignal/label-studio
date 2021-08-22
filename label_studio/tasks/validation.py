@@ -6,7 +6,7 @@ import ujson as json
 from urllib.parse import urlparse
 from django.conf import settings
 from rest_framework.exceptions import ValidationError
-from core.label_config import replace_task_data_undefined_with_config_field
+from label_studio.core.label_config import replace_task_data_undefined_with_config_field
 
 
 class SkipField(Exception):

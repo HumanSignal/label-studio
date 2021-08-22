@@ -9,7 +9,7 @@ import json
 from tasks.models import Task, Annotation, Prediction
 from projects.models import Project
 from data_import.models import FileUpload
-from core.utils.io import get_data_dir
+from label_studio.core.utils.io import get_data_dir
 from data_manager.models import View, FilterGroup, Filter
 from django.core.files.base import File
 from io_storages.gcs.models import GCSImportStorage, GCSExportStorage
@@ -17,7 +17,7 @@ from io_storages.azure_blob.models import AzureBlobImportStorage, AzureBlobExpor
 from io_storages.s3.models import S3ImportStorage, S3ExportStorage
 from io_storages.redis.models import RedisImportStorage, RedisExportStorage
 from ml.models import MLBackend
-from core.utils.params import get_env
+from label_studio.core.utils.params import get_env
 
 
 @contextlib.contextmanager

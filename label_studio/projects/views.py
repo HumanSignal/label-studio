@@ -11,9 +11,9 @@ from rest_framework import status
 from rest_framework.exceptions import ValidationError
 from projects.models import Project
 
-from core.utils.common import get_object_with_check_and_log
-from core.label_config import get_sample_task
-from core.utils.common import get_organization_from_request
+from label_studio.core.utils.common import get_object_with_check_and_log
+from label_studio.core.label_config import get_sample_task
+from label_studio.core.utils.common import get_organization_from_request
 
 from organizations.models import Organization
 

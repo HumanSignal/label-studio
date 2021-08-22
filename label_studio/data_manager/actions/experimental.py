@@ -4,7 +4,7 @@ import logging
 
 from copy import copy, deepcopy
 from data_manager.functions import DataManagerException
-from core.utils.common import timestamp_now
+from label_studio.core.utils.common import timestamp_now
 
 logger = logging.getLogger(__name__)
 

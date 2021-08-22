@@ -12,9 +12,9 @@ from copy import deepcopy
 from django.conf import settings
 from django.db import models
 from label_studio_converter import Converter
-from core.utils.io import get_temp_dir, read_bytes_stream, get_all_files_from_dir
-from core.label_config import parse_config
-from core import version
+from label_studio.core.utils.io import get_temp_dir, read_bytes_stream, get_all_files_from_dir
+from label_studio.core.label_config import parse_config
+from label_studio.core import version
 from tasks.models import Annotation
 # Create your models here.
 

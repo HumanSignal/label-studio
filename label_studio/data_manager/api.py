@@ -14,9 +14,9 @@ from drf_yasg.utils import swagger_auto_schema
 from django.db.models import Sum
 from ordered_set import OrderedSet
 
-from core.utils.common import get_object_with_check_and_log, int_from_request, bool_from_request
-from core.permissions import all_permissions, ViewClassPermission
-from core.decorators import permission_required
+from label_studio.core.utils.common import get_object_with_check_and_log, int_from_request, bool_from_request
+from label_studio.core.permissions import all_permissions, ViewClassPermission
+from label_studio.core.decorators import permission_required
 from projects.models import Project
 from projects.serializers import ProjectSerializer
 from tasks.models import Task, Annotation

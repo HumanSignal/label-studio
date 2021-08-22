@@ -1,6 +1,6 @@
 from django.db import transaction
 
-from core.utils.disable_signals import DisableSignals
+from label_studio.core.utils.disable_signals import DisableSignals
 from organizations.models import Organization, OrganizationMember
 from projects.models import Project
 

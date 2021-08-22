@@ -52,12 +52,12 @@ try:
 except (ModuleNotFoundError, ImportError):
     sentry_sdk_loaded = False
 
-from core import version
-from core.utils.exceptions import LabelStudioDatabaseLockedException
+from label_studio.core import version
+from label_studio.core.utils.exceptions import LabelStudioDatabaseLockedException
 
 
 # these functions will be included to another modules, don't remove them
-from core.utils.params import (
+from label_studio.core.utils.params import (
     get_bool_env, bool_from_request, float_from_request, int_from_request
 )
 

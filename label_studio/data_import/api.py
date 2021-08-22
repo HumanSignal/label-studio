@@ -16,8 +16,8 @@ from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from ranged_fileresponse import RangedFileResponse
 
-from core.permissions import all_permissions, ViewClassPermission
-from core.utils.common import bool_from_request, retry_database_locked
+from label_studio.core.permissions import all_permissions, ViewClassPermission
+from label_studio.core.utils.common import bool_from_request, retry_database_locked
 from projects.models import Project
 from tasks.models import Task
 from .uploader import load_tasks

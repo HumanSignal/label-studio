@@ -8,7 +8,7 @@ from projects.models import Project
 from ml.models import MLBackend
 from tasks.models import Task, Prediction, Annotation
 from .utils import make_project
-from core.redis import redis_healthcheck
+from label_studio.core.redis import redis_healthcheck
 
 _project_for_text_choices_onto_A_B_classes = dict(
     title='Test',

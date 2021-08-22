@@ -13,8 +13,8 @@ from rest_framework import status, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.permissions import all_permissions
-from core.utils.common import get_object_with_check_and_log, bool_from_request, batch
+from label_studio.core.permissions import all_permissions
+from label_studio.core.utils.common import get_object_with_check_and_log, bool_from_request, batch
 from projects.models import Project
 from tasks.models import Task
 from .models import DataExport

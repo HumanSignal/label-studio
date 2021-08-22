@@ -20,9 +20,9 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import exception_handler
 
-from core.utils.common import conditional_atomic
-from core.utils.disable_signals import DisableSignals
-from core.label_config import config_essential_data_has_changed
+from label_studio.core.utils.common import conditional_atomic
+from label_studio.core.utils.disable_signals import DisableSignals
+from label_studio.core.label_config import config_essential_data_has_changed
 from projects.models import (
     Project, ProjectSummary
 )
@@ -34,11 +34,11 @@ from tasks.serializers import TaskSerializer, TaskWithAnnotationsAndPredictionsA
 from webhooks.utils import api_webhook, api_webhook_for_delete, emit_webhooks_for_instance
 from webhooks.models import WebhookAction
 
-from core.permissions import all_permissions, ViewClassPermission
-from core.utils.common import (
+from label_studio.core.permissions import all_permissions, ViewClassPermission
+from label_studio.core.utils.common import (
     get_object_with_check_and_log, bool_from_request, paginator, paginator_help)
-from core.utils.exceptions import ProjectExistException, LabelStudioDatabaseException
-from core.utils.io import find_dir, find_file, read_yaml
+from label_studio.core.utils.exceptions import ProjectExistException, LabelStudioDatabaseException
+from label_studio.core.utils.io import find_dir, find_file, read_yaml
 
 from data_manager.functions import get_prepared_queryset
 from data_manager.models import View

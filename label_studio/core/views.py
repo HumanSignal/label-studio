@@ -17,10 +17,10 @@ from django.views.static import serve
 from django.http import JsonResponse
 from wsgiref.util import FileWrapper
 
-from core import utils
-from core.utils.params import get_env
-from core.label_config import generate_time_series_json
-from core.utils.common import collect_versions
+from label_studio.core import utils
+from label_studio.core.utils.params import get_env
+from label_studio.core.label_config import generate_time_series_json
+from label_studio.core.utils.common import collect_versions
 
 logger = logging.getLogger(__name__)
 

@@ -12,9 +12,9 @@ from django.db import transaction, models
 from annoying.fields import AutoOneToOneField
 
 from tasks.models import Task, Prediction, Annotation, Q_task_finished_annotations, bulk_update_stats_project_tasks
-from core.utils.common import create_hash, sample_query, get_attr_or_item, load_func
-from core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
-from core.label_config import (
+from label_studio.core.utils.common import create_hash, sample_query, get_attr_or_item, load_func
+from label_studio.core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
+from label_studio.core.label_config import (
     parse_config, validate_label_config, extract_data_types, get_all_object_tag_names, config_line_stipped,
     get_sample_task, get_all_labels, get_all_control_tag_tuples, get_annotation_tuple
 )

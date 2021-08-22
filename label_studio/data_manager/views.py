@@ -3,8 +3,8 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 
-from core.utils.common import find_editor_files
-from core.version import get_short_version
+from label_studio.core.utils.common import find_editor_files
+from label_studio.core.version import get_short_version
 
 
 @login_required

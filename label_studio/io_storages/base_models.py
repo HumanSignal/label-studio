@@ -14,8 +14,8 @@ from tasks.serializers import PredictionSerializer, AnnotationSerializer
 from data_export.serializers import ExportDataSerializer
 
 
-from core.redis import redis_connected
-from core.utils.common import get_bool_env
+from label_studio.core.redis import redis_connected
+from label_studio.core.utils.common import get_bool_env
 
 
 logger = logging.getLogger(__name__)

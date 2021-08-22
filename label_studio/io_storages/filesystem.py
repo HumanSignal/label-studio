@@ -5,7 +5,7 @@ import os
 import logging
 
 from copy import deepcopy
-from core.utils.io import json_load, delete_dir_content, iter_files, remove_file_or_dir
+from label_studio.core.utils.io import json_load, delete_dir_content, iter_files, remove_file_or_dir
 from .base import BaseStorage, BaseForm, CloudStorage
 
 

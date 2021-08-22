@@ -143,7 +143,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'drf_generators',
 
-    'core',
+    'label_studio.core',
     'users',
     'organizations',
     'data_import',
@@ -162,16 +162,16 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'core.middleware.DisableCSRF',
+    'label_studio.core.middleware.DisableCSRF',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'core.middleware.CommonMiddlewareAppendSlashWithoutRedirect',  # instead of 'CommonMiddleware'
-    'core.middleware.CommonMiddleware',
+    'label_studio.core.middleware.CommonMiddlewareAppendSlashWithoutRedirect',  # instead of 'CommonMiddleware'
+    'label_studio.core.middleware.CommonMiddleware',
     'django_user_agents.middleware.UserAgentMiddleware',
-    'core.middleware.SetSessionUIDMiddleware',
-    'core.middleware.ContextLogMiddleware',
-    'core.middleware.DatabaseIsLockedRetryMiddleware',
+    'label_studio.core.middleware.SetSessionUIDMiddleware',
+    'label_studio.core.middleware.ContextLogMiddleware',
+    'label_studio.core.middleware.DatabaseIsLockedRetryMiddleware',
 ]
 
 REST_FRAMEWORK = {
@@ -181,11 +181,11 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': [
-        'core.api_permissions.HasObjectPermission',
+        'label_studio.core.api_permissions.HasObjectPermission',
         'rest_framework.permissions.IsAuthenticated',
 
     ],
-    'EXCEPTION_HANDLER': 'core.utils.common.custom_exception_handler',
+    'EXCEPTION_HANDLER': 'label_studio.core.utils.common.custom_exception_handler',
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
     ),
@@ -240,7 +240,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'core.context_processors.settings'
+                'label_studio.core.context_processors.settings'
             ],
             'builtins': ['django.templatetags.i18n'],
         },
@@ -269,7 +269,7 @@ SWAGGER_SETTINGS = {
     },
     'APIS_SORTER': 'alpha',
     'SUPPORTED_SUBMIT_METHODS': ['get', 'post', 'put', 'delete', 'patch'],
-    # "DEFAULT_AUTO_SCHEMA_CLASS": "core.utils.CustomAutoSchema",
+    # "DEFAULT_AUTO_SCHEMA_CLASS": "label_studio.core.utils.CustomAutoSchema",
     'OPERATIONS_SORTER': 'alpha'
 }
 
@@ -281,8 +281,8 @@ FRONTEND_SENTRY_DSN = get_env('FRONTEND_SENTRY_DSN', None)
 FRONTEND_SENTRY_RATE = get_env('FRONTEND_SENTRY_RATE', 0.1)
 FRONTEND_SENTRY_ENVIRONMENT = get_env('FRONTEND_SENTRY_ENVIRONMENT', 'stage.opensource')
 
-ROOT_URLCONF = 'core.urls'
-WSGI_APPLICATION = 'core.wsgi.application'
+ROOT_URLCONF = 'label_studio.core.urls'
+WSGI_APPLICATION = 'label_studio.core.wsgi.application'
 GRAPHIQL = True
 
 # Internationalization
@@ -306,7 +306,7 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder'
 )
-STATICFILES_STORAGE = 'core.storage.SkipMissedManifestStaticFilesStorage'
+STATICFILES_STORAGE = 'label_studio.core.storage.SkipMissedManifestStaticFilesStorage'
 
 # Sessions and CSRF
 SESSION_COOKIE_SECURE = bool(int(get_env('SESSION_COOKIE_SECURE', True)))
@@ -364,16 +364,16 @@ VERSIONS_CHECK_TIME = 0
 ALLOW_ORGANIZATION_WEBHOOKS = get_bool_env('ALLOW_ORGANIZATION_WEBHOOKS', False)
 
 CREATE_ORGANIZATION = 'organizations.functions.create_organization'
-GET_OBJECT_WITH_CHECK_AND_LOG = 'core.utils.get_object.get_object_with_check_and_log'
+GET_OBJECT_WITH_CHECK_AND_LOG = 'label_studio.core.utils.get_object.get_object_with_check_and_log'
 SAVE_USER = 'users.functions.save_user'
 USER_SERIALIZER = 'users.serializers.BaseUserSerializer'
 DATA_MANAGER_ANNOTATIONS_MAP = {}
 DATA_MANAGER_ACTIONS = {}
 USER_LOGIN_FORM = 'users.forms.LoginForm'
-PROJECT_MIXIN = 'core.mixins.DummyModelMixin'
-TASK_MIXIN = 'core.mixins.DummyModelMixin'
-ANNOTATION_MIXIN = 'core.mixins.DummyModelMixin'
-ORGANIZATION_MIXIN = 'core.mixins.DummyModelMixin'
+PROJECT_MIXIN = 'label_studio.core.mixins.DummyModelMixin'
+TASK_MIXIN = 'label_studio.core.mixins.DummyModelMixin'
+ANNOTATION_MIXIN = 'label_studio.core.mixins.DummyModelMixin'
+ORGANIZATION_MIXIN = 'label_studio.core.mixins.DummyModelMixin'
 USER_MIXIN = 'users.mixins.UserMixin'
 GET_STORAGE_LIST = 'io_storages.functions.get_storage_list'
 

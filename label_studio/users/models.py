@@ -14,7 +14,7 @@ from rest_framework.authtoken.models import Token
 
 from organizations.models import OrganizationMember, Organization
 from users.functions import hash_upload
-from core.utils.common import load_func
+from label_studio.core.utils.common import load_func
 
 YEAR_START = 1980
 YEAR_CHOICES = []

@@ -9,7 +9,7 @@ import attr
 from django.db.models import Q, F, Count
 from django.conf import settings
 from requests.adapters import HTTPAdapter
-from core.version import get_git_version
+from label_studio.core.version import get_git_version
 from data_export.serializers import ExportDataSerializer
 from users.models import Token
 

@@ -16,7 +16,7 @@ from .utils import (
     ml_backend_mock, make_project, make_task, make_annotator,
     invite_client_to_project, make_annotation, _client_is_annotator
 )
-from core.redis import redis_healthcheck
+from label_studio.core.redis import redis_healthcheck
 
 _project_for_text_choices_onto_A_B_classes = dict(
     title='Test',

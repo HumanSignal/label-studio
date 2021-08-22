@@ -8,7 +8,7 @@ from django.db.models import Q, Count
 
 from django.utils.translation import gettext_lazy as _
 
-from core.utils.common import create_hash, get_object_with_check_and_log, get_organization_from_request, load_func
+from label_studio.core.utils.common import create_hash, get_object_with_check_and_log, get_organization_from_request, load_func
 
 logger = logging.getLogger(__name__)
 

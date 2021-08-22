@@ -11,9 +11,9 @@ from rest_framework.exceptions import NotFound
 from drf_yasg import openapi as openapi
 from drf_yasg.utils import swagger_auto_schema
 
-from core.permissions import all_permissions
-from core.utils.common import get_object_with_check_and_log
-from core.utils.io import read_yaml
+from label_studio.core.permissions import all_permissions
+from label_studio.core.utils.common import get_object_with_check_and_log
+from label_studio.core.utils.io import read_yaml
 from io_storages.serializers import ImportStorageSerializer, ExportStorageSerializer
 from projects.models import Project
 

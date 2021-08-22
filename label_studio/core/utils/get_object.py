@@ -11,7 +11,7 @@ def get_object_with_check_and_log(request, queryset, *filter_args, **filter_kwar
         - activity log payload is created via 'request_permissions_add'
     """
     from rest_framework.generics import get_object_or_404 as get_object_or_404_rest
-    from core.utils.common import get_project, request_permissions_add
+    from label_studio.core.utils.common import get_project, request_permissions_add
 
     obj = get_object_or_404_rest(queryset, *filter_args, **filter_kwargs)
     # check current Project, raise 404 if it's deleted or create activity log payload

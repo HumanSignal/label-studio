@@ -4,7 +4,7 @@ from rest_framework import serializers
 from django.conf import settings
 
 from .models import User
-from core.utils.common import load_func
+from label_studio.core.utils.common import load_func
 
 
 class BaseUserSerializer(serializers.ModelSerializer):

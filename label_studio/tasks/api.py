@@ -15,11 +15,11 @@ from rest_framework import generics, viewsets
 from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied as DRFPermissionDenied
 
-from core.utils.common import get_object_with_check_and_log, DjangoFilterDescriptionInspector
-from core.permissions import all_permissions, ViewClassPermission
+from label_studio.core.utils.common import get_object_with_check_and_log, DjangoFilterDescriptionInspector
+from label_studio.core.permissions import all_permissions, ViewClassPermission
 
 from tasks.models import Task, Annotation, Prediction, AnnotationDraft
-from core.utils.common import bool_from_request, int_from_request
+from label_studio.core.utils.common import bool_from_request, int_from_request
 from tasks.serializers import (
     TaskSerializer, AnnotationSerializer, TaskSimpleSerializer, PredictionSerializer,
     TaskWithAnnotationsAndPredictionsAndDraftsSerializer, AnnotationDraftSerializer, PredictionQuerySerializer)

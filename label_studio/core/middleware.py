@@ -14,7 +14,7 @@ from django.utils import timezone
 from django.utils.http import escape_leading_slashes
 from rest_framework.permissions import SAFE_METHODS
 from rest_framework.response import Response
-from core.utils.contextlog import ContextLog
+from label_studio.core.utils.contextlog import ContextLog
 
 
 class DisableCSRF(MiddlewareMixin):

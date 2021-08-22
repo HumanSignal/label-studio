@@ -16,7 +16,7 @@ from rest_framework.decorators import action
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 
-from core.permissions import all_permissions
+from label_studio.core.permissions import all_permissions
 from users.models import User
 from users.serializers import UserSerializer
 from users.functions import check_avatar

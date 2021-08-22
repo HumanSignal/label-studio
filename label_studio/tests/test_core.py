@@ -3,7 +3,7 @@
 import pytest
 import types
 import sys
-from core.utils.common import bool_from_request, int_from_request
+from label_studio.core.utils.common import bool_from_request, int_from_request
 
 
 @pytest.mark.parametrize('param, result', [

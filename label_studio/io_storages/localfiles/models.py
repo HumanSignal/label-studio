@@ -13,7 +13,7 @@ from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 from rest_framework.exceptions import ValidationError
 
-from core.utils.params import get_env
+from label_studio.core.utils.params import get_env
 from io_storages.base_models import (
       ExportStorage,
       ExportStorageLink,

@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from django_rq import job
 from rq import get_current_job
 
-from core.utils.common import safe_float, conditional_atomic
+from label_studio.core.utils.common import safe_float, conditional_atomic
 from ml.api_connector import MLApi
 from projects.models import Project
 from tasks.models import Annotation, Prediction

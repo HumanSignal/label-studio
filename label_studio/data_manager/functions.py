@@ -6,7 +6,7 @@ from collections import OrderedDict
 from django.conf import settings
 from rest_framework.generics import get_object_or_404
 
-from core.utils.common import int_from_request
+from label_studio.core.utils.common import int_from_request
 from data_manager.prepare_params import PrepareParams
 from data_manager.models import View
 from tasks.models import Task

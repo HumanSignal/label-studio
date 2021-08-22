@@ -10,7 +10,7 @@ from django.urls import reverse
 from django.core.files.images import get_image_dimensions
 
 from organizations.models import Organization
-from core.utils.common import load_func
+from label_studio.core.utils.common import load_func
 
 
 def hash_upload(instance, filename):

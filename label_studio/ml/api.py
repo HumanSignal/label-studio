@@ -11,12 +11,12 @@ from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from core.permissions import all_permissions
-from core.utils.common import get_object_with_check_and_log
+from label_studio.core.permissions import all_permissions
+from label_studio.core.utils.common import get_object_with_check_and_log
 from projects.models import Project
 from ml.serializers import MLBackendSerializer
 from ml.models import MLBackend
-from core.utils.common import bool_from_request
+from label_studio.core.utils.common import bool_from_request
 
 logger = logging.getLogger(__name__)
 
