@@ -20,6 +20,30 @@ HyperText tag shows HyperText markup that can be labeled.
 | [encoding] | <code>none</code> \| <code>base64</code> \| <code>base64unicode</code> |  | How to decode values from encoded strings |
 | [clickableLinks] | <code>boolean</code> | <code>false</code> | Whether to allow opening resources from links in the hypertext markup. |
 
+### Sample Results JSON
+
+| Name | Type | Description |
+| --- | --- | --- |
+| value | <code>Object</code> |  |
+| value.start | <code>string</code> | xpath of the container where the region starts (xpath) |
+| value.end | <code>string</code> | xpath of the container where the region ends (xpath) |
+| value.startOffset | <code>number</code> | offset within start container |
+| value.endOffset | <code>number</code> | offset within end container |
+| [value.text] | <code>string</code> | text content of the region, can be skipped |
+
+### Example JSON
+```json
+{
+  "value": {
+    "start": "/div[1]/p[2]/text()[1]",
+    "end": "/div[1]/p[4]/text()[3]",
+    "startOffset": 2,
+    "endOffset": 81,
+    "hypertextlabels": ["Car"]
+  }
+}
+```
+
 ### Example
 ```html
 <View>
