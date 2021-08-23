@@ -1079,39 +1079,41 @@ You'll use that URL as the webhook URL when you set those up in Label Studio lat
 
 - set up image segmentation project
   
-Create the project
-Name it Bird Identification
-Skip importing data for now
-Select the **Semantic Segmentation with Polygons** template. 
-Update the labels to Beak, Head, Wing, and Body.
-Save the project
-Open the project settings
-Select **Cloud Storage**.
-Click **Add Source Storage**
-Add a title for the storage, for example **Source bird images**
-Specify the bucket name of **showcase-bucket** and a bucket prefix of **bird-images**
-Use a file filter regex of `.*jpg`.
-Specify a region name of `us-east-2` unless you're using a different region to follow along with this blog post.
-SPECIFY AN ACCESS KEY ID AND SECRET ACCESS KEY FOR THE BUCKET? IS THIS REQUIRED AND IF SO, WHICH ONES TO USE? 
-Click **Add Storage**.
-Click **Sync** to sync the images.
+1. Create the project
+2. Name it Bird Identification
+3. Skip importing data for now
+4. Select the **Semantic Segmentation with Polygons** template. 
+5. Update the labels to Beak, Head, Wing, and Body.
+6. Save the project
+   
+
+1. Open the project settings
+2. Select **Cloud Storage**.
+3. Click **Add Source Storage**
+4. Add a title for the storage, for example **Source bird images**
+5. Specify the bucket name of **showcase-bucket** and a bucket prefix of **bird-images**
+6. Use a file filter regex of `.*jpg`.
+7. Specify a region name of `us-east-2` unless you're using a different region to follow along with this blog post.
+8. SPECIFY AN ACCESS KEY ID AND SECRET ACCESS KEY FOR THE BUCKET? IS THIS REQUIRED AND IF SO, WHICH ONES TO USE? 
+9. Click **Add Storage**.
+10. Click **Sync** to sync the images.
 
 As those are syncing, set up the target storage.
-Click **Add Target Storage**
-Add a title for the storage, for example **Annotated birds**
-Specify the bucket name of **showcase-bucket** and a bucket prefix of **annotations**. 
-Specify a region name of `us-east-2` unless you're using a different region to follow along with this blog post.
-SPECIFY AN ACCESS KEY ID AND SECRET ACCESS KEY FOR THE BUCKET? IS THIS REQUIRED AND IF SO, WHICH ONES TO USE? 
-Click **Add Storage**.
+1. Click **Add Target Storage**
+2. Add a title for the storage, for example **Annotated birds**
+3. Specify the bucket name of **showcase-bucket** and a bucket prefix of **annotations**. 
+4. Specify a region name of `us-east-2` unless you're using a different region to follow along with this blog post.
+5. SPECIFY AN ACCESS KEY ID AND SECRET ACCESS KEY FOR THE BUCKET? IS THIS REQUIRED AND IF SO, WHICH ONES TO USE? 
+6. Click **Add Storage**.
 
 
 Add a webhook
-Click **Webhooks**
-Click **Add Webhook**.
-In the **URL** field, paste the AWS gateway URL that was created when you created the AWS gateway. 
-DO YOU NEED TO SPECIFY ANY HEADERS FOR THIS TO WORK? 
-For **Payload**, leave **Send payload** selected, but deselect **Send for all actions**. You only want to send events to the AWS Lambda function when an annotation is created. For **Send Payload for**, select **Annotation created**. 
-Click **Add Webhook** to save your changes.
+1. Click **Webhooks**
+2. Click **Add Webhook**.
+3. In the **URL** field, paste the AWS gateway URL that was created when you created the AWS gateway. 
+4. DO YOU NEED TO SPECIFY ANY HEADERS FOR THIS TO WORK? 
+5. For **Payload**, leave **Send payload** selected, but deselect **Send for all actions**. You only want to send events to the AWS Lambda function when an annotation is created. For **Send Payload for**, select **Annotation created**. 
+6. Click **Add Webhook** to save your changes.
 
 
 ## start annotating data in LS
