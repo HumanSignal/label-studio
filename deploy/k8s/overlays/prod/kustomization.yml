@@ -5,10 +5,8 @@ namespace: labelstudio
 
 namePrefix: labelstudio-
 
-bases:
-  - ../../base/
-
 resources:
+  - ../../base/
   - ingress.yml
 
 patchesStrategicMerge:
