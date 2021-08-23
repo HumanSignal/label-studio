@@ -17,10 +17,6 @@ patchesStrategicMerge:
 commonLabels:
   stage: production
 
-secretGenerator:
-- name: labelstudio
-  env: labelstudio.env
-
 images:
   - name: postgres
     newTag: '11.5'

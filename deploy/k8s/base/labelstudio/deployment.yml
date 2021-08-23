@@ -29,11 +29,6 @@ spec:
               value: postgres
             - name: POSTGRE_USER
               value: postgres
-            - name: POSTGRE_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: labelstudio
-                  key: pg_password
             - name: POSTGRE_PORT
               value: "5432"
             - name: POSTGRE_HOST
