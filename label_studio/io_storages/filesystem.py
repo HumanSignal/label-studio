@@ -251,7 +251,7 @@ class ExternalTasksJSONStorage(CloudStorage):
             self._remove_id_from_keys_map(id)
             self._save_ids()
 
-            logger.debug('Remove id=' + str(id) + ' from label_studio.tasks.json')
+            logger.debug('Remove id=' + str(id) + ' from tasks.json')
             self.data.pop(id, None)
             self._save()
 
@@ -264,8 +264,8 @@ class ExternalTasksJSONStorage(CloudStorage):
                 self._remove_id_from_keys_map(id)
             self._save_ids()
 
-            logger.debug('Remove all data from label_studio.tasks.json')
-            # remove record from label_studio.tasks.json
+            logger.debug('Remove all data from tasks.json')
+            # remove record from tasks.json
             if ids is None:
                 self.data = {}
             else:
