@@ -19,6 +19,6 @@ images:
   - name: postgres
     newTag: '11.5'
   - name: nginx
-    newTag: 'latest'
+    newTag: '1.21'
   - name: heartexlabs/label-studio
-    newTag: '1.0.2'
+    newTag: '1.2.0'
