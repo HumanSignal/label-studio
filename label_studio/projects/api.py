@@ -40,7 +40,7 @@ from core.utils.common import (
 from core.utils.exceptions import ProjectExistException, LabelStudioDatabaseException
 from core.utils.io import find_dir, find_file, read_yaml
 
-from data_manager.functions import get_prepared_queryset
+from data_manager.functions import get_prepared_queryset, is_ordering_enabled
 from data_manager.models import View
 
 logger = logging.getLogger(__name__)
@@ -442,13 +442,15 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
                 if next_task:
                     return self._make_response(next_task, request)
 
-            if project.show_overlap_first:
-                # don't output anything - just filter tasks with overlap
-                logger.debug(f'User={request.user} tries overlap first from {not_solved_tasks_count} tasks')
-                _, not_solved_tasks = self._try_tasks_with_overlap(not_solved_tasks)
+            ordering_enabled = is_ordering_enabled(request, project)
+            if not ordering_enabled:
 
-            # don't use this mode for data manager sorting, because the sorting becomes not obvious
-            if project.sampling != project.SEQUENCE:
+                # show tasks with overlap > 1 first
+                if project.show_overlap_first:
+                    # don't output anything - just filter tasks with overlap
+                    logger.debug(f'User={request.user} tries overlap first from {not_solved_tasks_count} tasks')
+                    _, not_solved_tasks = self._try_tasks_with_overlap(not_solved_tasks)
+
                 # if there any tasks in progress (with maximum number of annotations), randomly sampling from them
                 logger.debug(f'User={request.user} tries depth first from {not_solved_tasks_count} tasks')
                 next_task = self._try_breadth_first(not_solved_tasks)
