@@ -317,7 +317,11 @@ def generate_sample_task_without_check(label_config, mode='upload', secure_mode=
             else:
                 # data is JSON
                 task[value] = generate_time_series_json(time_column, value_columns, time_format)
-
+        elif p.tag == 'HyperText':
+            if only_urls:
+                task[value] = examples['HyperTextUrl']
+            else:
+                task[value] = examples['HyperText']
         else:
             # patch for valueType="url"
             examples['Text'] = examples['TextUrl'] if only_urls else examples['TextRaw']
