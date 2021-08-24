@@ -23,6 +23,30 @@ it expects an array of objects like this: [{ $nameKey: "Author name", $textKey: 
 | [nameKey] | <code>string</code> | <code>&quot;author&quot;</code> | The name key to use |
 | [textKey] | <code>string</code> | <code>&quot;text&quot;</code> | The text key to use |
 
+### Sample Results JSON
+
+| Name | Type | Description |
+| --- | --- | --- |
+| value | <code>Object</code> |  |
+| value.start | <code>number</code> | index of paragraph where the region starts |
+| value.end | <code>number</code> | index of paragraph where the region ends (xpath) |
+| value.startOffset | <code>number</code> | offset within start paragraph |
+| value.endOffset | <code>number</code> | offset within end paragraph |
+| [value.text] | <code>string</code> | text content of the region, can be skipped |
+
+### Example JSON
+```json
+{
+  "value": {
+    "start": 3,
+    "end": 5,
+    "startOffset": 2,
+    "endOffset": 81,
+    "paragraphlabels": ["Car"]
+  }
+}
+```
+
 ### Example
 ```html
 <View>

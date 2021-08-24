@@ -283,6 +283,10 @@ class TaskSerializerBulk(serializers.ListSerializer):
                          file_upload_id=task.get('file_upload_id'))
                 db_tasks.append(t)
 
+            # deprecated meta warning
+            if 'meta' in task:
+                logger.warning('You task data has field "meta" which is deprecated and it will be removed in future')
+
             if settings.DJANGO_DB == settings.DJANGO_DB_SQLITE:
                 self.db_tasks = []
                 try:

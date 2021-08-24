@@ -15,6 +15,8 @@ label-studio init image_segmentation_project
 label-studio start image_segmentation_project
 ```
 
+After starting Label Studio, set up the labeling interface and browse to this template.
+
 ## Config 
 
 ```html

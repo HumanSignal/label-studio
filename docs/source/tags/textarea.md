@@ -12,19 +12,19 @@ TextArea tag shows the textarea for user input
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| name | <code>string</code> |  | name of the element |
-| toName | <code>string</code> |  | name of the element that you want to label if any |
-| value | <code>string</code> |  |  |
-| [label] | <code>string</code> |  | label text |
-| [placeholder] | <code>string</code> |  | placeholder text |
-| [maxSubmissions] | <code>string</code> |  | maximum number of submissions |
-| [editable] | <code>boolean</code> | <code>false</code> | editable textarea results |
-| [transcription] | <code>boolean</code> | <code>false</code> | always show editor |
-| [rows] | <code>number</code> |  | number of rows in the textarea |
-| [required] | <code>boolean</code> | <code>false</code> | validation if textarea is required |
-| [requiredMessage] | <code>string</code> |  | message to show if validation fails |
-| [showSubmitButton] | <code>boolean</code> |  | show submit button or hide it, it's shown by default when rows is more than one (i.e. textarea mode) |
-| [perRegion] | <code>boolean</code> |  | use this tag for region labeling instead of the whole object labeling |
+| name | <code>string</code> |  | Name of the element |
+| toName | <code>string</code> |  | Name of the element that you want to label |
+| value | <code>string</code> |  | Pre-filled value |
+| [label] | <code>string</code> |  | Label text |
+| [placeholder] | <code>string</code> |  | Placeholder text |
+| [maxSubmissions] | <code>string</code> |  | Maximum number of submissions |
+| [editable] | <code>boolean</code> | <code>false</code> | Editable textarea results |
+| [transcription] | <code>boolean</code> | <code>false</code> | If false, always show editor |
+| [rows] | <code>number</code> |  | Number of rows in the textarea |
+| [required] | <code>boolean</code> | <code>false</code> | Validate whether content in textarea is required |
+| [requiredMessage] | <code>string</code> |  | Message to show if validation fails |
+| [showSubmitButton] | <code>boolean</code> |  | Whether to show or hide the submit button. By default it shows when there are more than one rows of text, such as in textarea mode. |
+| [perRegion] | <code>boolean</code> |  | Use this tag to label regions instead of whole objects |
 
 ### Example
 ```html

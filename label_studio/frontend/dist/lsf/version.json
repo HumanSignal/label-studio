@@ -1,6 +1,6 @@
 {
-  "message": "Adjust Webpack settings",
-  "commit": "6082c430592424ee47f049eec46a26f1bc9e2817",
+  "message": "[fix] loading images with relations (#239)",
+  "commit": "c02a287aef3bea907a09196bd2145c7225208efe",
   "branch": "master",
-  "date": "2021-08-11T09:11:10Z"
+  "date": "2021-08-18T07:32:08Z"
 }

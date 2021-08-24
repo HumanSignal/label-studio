@@ -100,16 +100,16 @@ LOGGING = {
     },
     'handlers': {
         'console_raw': {
-            'level': get_env('LOG_LEVEL', 'DEBUG'),
+            'level': get_env('LOG_LEVEL', 'WARNING'),
             'class': 'logging.StreamHandler',
         },
         'console': {
-            'level': get_env('LOG_LEVEL', 'DEBUG'),
+            'level': get_env('LOG_LEVEL', 'WARNING'),
             'class': 'logging.StreamHandler',
             'formatter': 'standard'
         },
         'rq_console': {
-            'level': 'DEBUG',
+            'level': 'WARNING',
             'class': 'rq.utils.ColorizingStreamHandler',
             'formatter': 'rq_console',
             'exclude': ['%(asctime)s'],
@@ -117,7 +117,7 @@ LOGGING = {
     },
     'root': {
         'handlers': ['console'],
-        'level': get_env('LOG_LEVEL', 'DEBUG'),
+        'level': get_env('LOG_LEVEL', 'WARNING'),
     }
 }
 
@@ -152,7 +152,8 @@ INSTALLED_APPS = [
     'tasks',
     'data_manager',
     'io_storages',
-    'ml'
+    'ml',
+    'webhooks',
 ]
 
 MIDDLEWARE = [
@@ -361,6 +362,7 @@ VERSION_EDITION = 'Community Edition'
 LATEST_VERSION_CHECK = True
 VERSIONS_CHECK_TIME = 0
 ALLOW_ORGANIZATION_WEBHOOKS = get_bool_env('ALLOW_ORGANIZATION_WEBHOOKS', False)
+CONVERTER_DOWNLOAD_RESOURCES = get_bool_env('CONVERTER_DOWNLOAD_RESOURCES', True)
 
 CREATE_ORGANIZATION = 'organizations.functions.create_organization'
 GET_OBJECT_WITH_CHECK_AND_LOG = 'core.utils.get_object.get_object_with_check_and_log'
@@ -392,6 +394,8 @@ def collect_versions_dummy(**kwargs):
 PROJECT_DELETE = project_delete
 USER_AUTH = user_auth
 COLLECT_VERSIONS = collect_versions_dummy
+
+WEBHOOK_TIMEOUT = float(get_env('WEBHOOK_TIMEOUT', 1.0))
 
 # fix a problem with Windows mimetypes for JS and PNG
 import mimetypes

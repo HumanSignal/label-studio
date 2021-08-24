@@ -1,11 +1,13 @@
 import React from 'react';
 import { SidebarMenu } from '../../components/SidebarMenu/SidebarMenu';
+import { WebhookPage } from '../WebhookPage/WebhookPage';
 import { DangerZone } from './DangerZone';
 import { GeneralSettings } from './GeneralSettings';
 import { InstructionsSettings } from './InstructionsSettings';
 import { LabelingSettings } from './LabelingSettings';
 import { MachineLearningSettings } from './MachineLearningSettings/MachineLearningSettings';
 import { StorageSettings } from './StorageSettings/StorageSettings';
+
 
 export const MenuLayout = ({children, ...routeProps}) => {
   return (
@@ -16,6 +18,7 @@ export const MenuLayout = ({children, ...routeProps}) => {
         InstructionsSettings,
         MachineLearningSettings,
         StorageSettings,
+        WebhookPage,
         DangerZone,
       ]}
       path={routeProps.match.url}
@@ -35,6 +38,7 @@ export const SettingsPage = {
     LabelingSettings,
     MachineLearningSettings,
     StorageSettings,
+    WebhookPage,
     DangerZone,
   },
 };

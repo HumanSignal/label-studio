@@ -14,7 +14,9 @@ from lxml import etree
 from collections import defaultdict
 from django.conf import settings
 from label_studio.core.utils.io import find_file
-from label_studio.core.utils.exceptions import LabelStudioValidationErrorSentryIgnored
+from label_studio.core.utils.exceptions import (
+    LabelStudioValidationErrorSentryIgnored, LabelStudioXMLSyntaxErrorSentryIgnored
+)
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +65,10 @@ def parse_config(config_string):
             if name in outputs:
                 return name
 
-    xml_tree = etree.fromstring(config_string)
+    try:
+        xml_tree = etree.fromstring(config_string)
+    except etree.XMLSyntaxError as e:
+        raise LabelStudioXMLSyntaxErrorSentryIgnored(str(e))
 
     inputs, outputs, labels = {}, {}, defaultdict(dict)
     for tag in xml_tree.iter():

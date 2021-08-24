@@ -32,6 +32,38 @@ When you import pre-annotations into Label Studio, the `completions` field is no
 ### Changes to the endpoint response
 The endpoint response returns an `annotation_count` field instead of a `completion_count` field. If your script expects a response with this field, update it to expect a response with the new field. 
 
+### If migrated tasks don't display as expected
+Label Studio Enterprise version 2 allows you to upload data before or after you set up the labeling configuration. Because of that, when your data is migrated from version 1 to version 2, some tasks might not display properly. This happens because the data fields for some tasks change from having a reference to the data type of the labeling configuration, such as `image`, to `$undefined$`. 
+
+If this happens to you, update the affected tasks to use `$undefined$` as a key in the task instead of `image`, `text`, and so on.
+
+For example:
+```json
+{'id': 1, 
+  'data': 
+    {'image': "s3://example.png"}, 
+  'meta': {}, 
+  'created_at': '2021-08-09T16:00:03.123456Z', 
+  'updated_at': '2021-08-09T16:00:03.123456Z', 
+  'is_labeled': False, 
+  'overlap': 1, 
+  'project': 2, 
+  'file_upload': None, 
+  'annotations': [], 
+  'predictions': []
+}
+```
+
+Needs to be updated to the following, with the rest of the task data remaining the same:
+```json
+{'id': 1, 
+  'data': 
+    {'$undefined$': "s3://example.png"}, 
+  'meta': {}, 
+...
+}
+```
+
 ## Export data
 
 The export endpoint has changed, and so have the available options for that endpoint and the response parameters.

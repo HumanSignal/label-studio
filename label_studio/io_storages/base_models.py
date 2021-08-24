@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 class Storage(models.Model):
     title = models.CharField(
-        _('title'), null=True, max_length=256,
+        _('title'), null=True, blank=True, max_length=256,
         help_text='Cloud storage title')
     description = models.TextField(
         _('description'), null=True, blank=True,

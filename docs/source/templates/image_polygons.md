@@ -6,16 +6,18 @@ meta_title: Image Polygons Data Labeling Template
 meta_description: Label Studio Image Polygons Template for machine learning and data science data labeling projects.
 ---
 
-Image polygons labeling
+Add polygons to images.
 
 <img src="/images/screens/image_polygons.png" class="img-template-example" title="Images Polygons" />
 
 ## Run
 
 ```bash
-label-studio init --template=image_polygons image_polygons_project
-label-studio start image_polygons_project 
+label-studio init image_polygons_project
+label-studio start image_polygons_project
 ```
+
+After starting Label Studio, set up the labeling interface and browse to this template. 
 
 ## Config 
 

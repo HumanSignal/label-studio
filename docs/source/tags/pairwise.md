@@ -9,8 +9,6 @@ meta_description: Label Studio Pairwise Tags customize Label Studio with pairwis
 Pairwise element. Compare two different objects, works with any label studio object
 
 ### Parameters
-**Params**: <code>string</code> [leftClass=left]  - Class name of the left object
-**Params**: <code>string</code> [rightClass=left] - Class name of the right object
 
 | Param | Type | Description |
 | --- | --- | --- |
