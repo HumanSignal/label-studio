@@ -285,11 +285,12 @@ def generate_sample_task_without_check(label_config, mode='upload', secure_mode=
 
         elif p.tag == 'Paragraphs':
             # Paragraphs special case - replace nameKey/textKey if presented
+            name_key = p.get('nameKey') or p.get('namekey') or 'author'
+            text_key = p.get('textKey') or p.get('textkey') or 'text'
             if only_urls:
-                task[value] = examples['ParagraphsUrl']
+                params = {'nameKey': name_key, 'textKey': text_key}
+                task[value] = examples['ParagraphsUrl'] + urlencode(params)
             else:
-                name_key = p.get('nameKey') or p.get('namekey') or 'author'
-                text_key = p.get('textKey') or p.get('textkey') or 'text'
                 task[value] = []
                 for item in examples[p.tag]:
                     task[value].append({name_key: item['author'], text_key: item['text']})
