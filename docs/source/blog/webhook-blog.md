@@ -156,6 +156,7 @@ From the command line, set up the policy and then create a role that uses this p
 Copy and save this policy as a JSON file and reference it when you apply it to the role. 
 
 {% codeblock lang:json %}
+
 {
   "Version": "2012-10-17",
   "Statement": [
@@ -618,6 +619,7 @@ Copy and save this policy as a JSON file and reference it when you apply it to t
     }
   ]
 }
+
 {% endcodeblock %}
 {% enddetails %}
 <br/>
@@ -652,14 +654,19 @@ Modify the following pipeline definition according to the following
 -- S3://SHOWCASE-SRC-BUCKET/PREFIX_TO_ML_VALIDATION_DATA/ - path to validation data (will be deleted after model training)
 -- S3://SHOWCASE-SRC-BUCKET/PREFIX_TO_ML_VALIDATION_ANNOTATIONS/ - path to validation data annotations (will be deleted after model training)
 -- S3://SHOWCASE-SRC-BUCKET/PREFIX_TO_OUTPUT_FOLDER/ - path to output folder where model files can be found
+- why
+
+
+Let me add an ordinary human sentence here.
 
 <br/>
-{% details <b>Click to expand the pipeline definition</b> %}
 
-Update this example Amazon SageMaker pipeline definition with the S3 bucket prefixes that you chose to use for your setup. 
+{% details <b>Click to expand the pipeline definition</b> %}
+Update this example Amazon SageMaker pipeline definition with the S3 bucket prefixes that you choose to use for your setup. 
 
 {% codeblock lang:json %}
-  {
+
+{
   "Version": "2020-12-01",
   "Metadata": {},
   "Parameters": [
@@ -901,9 +908,11 @@ Update this example Amazon SageMaker pipeline definition with the S3 bucket pref
 }
 
 {% endcodeblock %}
+
 {% enddetails %}
 <br/>
 
+And another one here. 
 SAVE THE PIPELINE DEFINITION as `BirdPipeline.json` AND THEN REFERENCE THE FILE when you create and deploy the pipeline
 
 - Create and deploy the pipeline:
@@ -1137,16 +1146,22 @@ Sagemaker output goes to one of the S3 buckets into a specific folder / prefix
 
 ## What to do with stuff
 
+What do you do with the model output after you finish setting up and configuring this pipeline? How to make this more compelling?? 
+
+
 ## Lessons Learned / Conclusion / Next Steps / Takeaways 
 
-SEO keywords and stuff -- put other pipeline names or other tools that have ML pipelines
 
 
 
 
 
-- Trigger updates to versioned datasets in Pachyderm or DVC.
-- Set up an active learning workflow based on frequently-updated data annotations.
-- Notify annotators about a new labeling project.
-- Start training a machine learning model after a certain number of tasks have been annotated.
-- Model monitoring / evaluation / metrics and stuff
+
+This is just one example of how you can use webhooks in Label Studio to simplify and automate part of your machine learning pipeline. You can also use webhooks to:
+- Monitor model performance against ground truth annotations
+- Notify experts when a new project is ready to be annotated
+- Craft an active learning pipeline
+- Version annotated datasets based on labeling activities
+
+
+
