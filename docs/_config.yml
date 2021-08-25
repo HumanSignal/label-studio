@@ -45,10 +45,14 @@ future: true
 highlight:
   enable: true
   line_number: false
-  tab_replace:
+  tab_replace: "  "
   hljs: true
+  wrap: false
   # auto_detect: true
   # wrap: true
+
+prismjs:
+  enable: false
 
 # Markdown
 ## https://github.com/chjj/marked
