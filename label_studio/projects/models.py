@@ -734,13 +734,13 @@ class ProjectSummary(models.Model):
     def _get_labels(self, result):
         result_type = result.get('type')
         result_value = result['value'].get(result_type)
-        if not result_value or not isinstance(result_value, list):
+        if not result_value or not isinstance(result_value, list) or result_type == 'text':
+            # Non-list values are not labels. TextArea list values (texts) are not labels too.
             return []
         # Labels are stored in list
         labels = []
         for label in result_value:
-            if isinstance(label, str):
-                labels.append(label)
+            labels.append(str(label))
         return labels
 
     def update_created_annotations_and_labels(self, annotations):
