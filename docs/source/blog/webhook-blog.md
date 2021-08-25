@@ -2,7 +2,7 @@
 title: Retrain your Amazon Sagemaker model automatically with Label Studio and Webhooks
 type: blog
 order: 90
-image: /images/webhook-blog/stylized-diagram.png
+image: /images/webhook-blog/sagemaker-illustration.png
 meta_title: 
 meta_description: Use webhooks from open source data labeling software Label Studio to seamlessly integrate your AWS Lambda and Amazon Sagemaker model development pipeline for your machine learning and data science projects.
 ---
@@ -13,6 +13,7 @@ OR Upgrade your SageMaker model training pipeline with Label Studio
 OR Fly through retraining your image segmentation model: An example with Label Studio, webhooks, Amazon AWS Lambda, and Amazon SageMaker
 
 
+<br/><img src="/images/webhook-blog/sagemaker-illustration.png" alt="" class="gif-border" width="800px" height="377px" />
 
 
 You might want to retrain your Amazon SageMaker model to improve its handling of specific corner cases, but you have complex labeling scenarios that mean you can't use the Ground Truth labeling service.  
@@ -38,12 +39,11 @@ WHY WEBHOOKS
 This blog post walks you through an example of using webhooks with Label Studio to trigger specific actions in your existing machine learning pipeline. 
 
 
-<br/><img src="/images/webhook-blog/stylized-diagram.png" alt="" class="gif-border" width="800px" height="" />
 
 
 In this example, train an image segmentation model to recognize birds based on the various parts of birds that might be visible in an image. 
 
-<br/><img src="/images/webhook-blog/detailed-diagram.png" alt="" class="gif-border" width="800px" height="" />
+<br/><img src="/images/webhook-blog/sagemaker-webhooks.png" alt="" class="gif-border" width="800px" height="661px" />
 
 This example covers the following steps:
 1. Adding public domain bird images to Amazon S3 storage.
@@ -75,26 +75,26 @@ Add the bird images to Amazon S3 so that you can annotate them in Label Studio a
 
 1. Make sure that you downloaded the [bird image dataset]() and save the images to a folder called `bird-images`.
 2. From the command line, run the following:
-    ```bash
-    aws s3 mb s3://showcase-bucket
-    ```
+```bash
+aws s3 mb s3://showcase-bucket
+```
 3. Log in to the S3 management console and create folders to function as prefixes for the data. Create the following folders:
    
-    | Folder name | Description | Full URL |
-   | --- | --- | --- |
-   | bird-images | Store the source bird images before annotating. | `s3://showcase-bucket/bird-images/` |
-   | annotations | Store the annotation details for the bird images. | `s3://showcase-bucket/annotations/` |
-   | script | Store the pre-processing script used to transform the data for the Amazon SageMaker pipeline. | `s3://showcase-bucket/script/`
-   | model | Used by SageMaker to store the model output. | `s3://showcase-bucket/model/` |
+| Folder name | Description | Full URL |
+| --- | --- | --- |
+| bird-images | Store the source bird images before annotating. | `s3://showcase-bucket/bird-images/` |
+| annotations | Store the annotation details for the bird images. | `s3://showcase-bucket/annotations/` |
+| script | Store the pre-processing script used to transform the data for the Amazon SageMaker pipeline. | `s3://showcase-bucket/script/`
+| model | Used by SageMaker to store the model output. | `s3://showcase-bucket/model/` |
 
 4. Then, copy the bird image dataset to the correct bucket prefix. From the command line, run the following: 
-    ```bash
-    aws s3 cp --recursive bird-images/ s3://showcase-bucket/bird-images/
-   ```
+```bash
+aws s3 cp --recursive bird-images/ s3://showcase-bucket/bird-images/
+```
 5. Download [the preprocessing script]() from LOCATION and copy it to the correct bucket prefix. From the command line, run the following:
-    ```bash
-    aws s3 cp preprocessing.py s3://showcase-bucket/script/
-   ```
+```bash
+aws s3 cp preprocessing.py s3://showcase-bucket/script/
+```
 
 After you prepare your datasets 
 
