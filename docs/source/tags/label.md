@@ -1,7 +1,7 @@
 ---
 title: Label
 type: tags
-order: 409
+order: 410
 meta_title: Label Tags for Single Label Tags
 meta_description: Label Studio Label Tags customize Label Studio with single label tags for machine learning and data science projects.
 ---

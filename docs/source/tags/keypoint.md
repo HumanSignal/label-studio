@@ -1,7 +1,7 @@
 ---
 title: KeyPoint
 type: tags
-order: 407
+order: 408
 meta_title: Keypoint Tags for Adding Keypoints to Images
 meta_description: Label Studio Keypoint Tags customize Label Studio for adding keypoints to images for machine learning and data science projects.
 ---

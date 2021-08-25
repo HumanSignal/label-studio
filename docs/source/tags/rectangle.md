@@ -1,7 +1,7 @@
 ---
 title: Rectangle
 type: tags
-order: 418
+order: 420
 meta_title: Rectangle Tags for Adding Rectangle Bounding Box to Images
 meta_description: Label Studio Rectangle Tags customize Label Studio for adding rectangle bounding boxes to images for machine learning and data science projects.
 ---
