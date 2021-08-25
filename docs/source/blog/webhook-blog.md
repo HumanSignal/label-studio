@@ -96,9 +96,11 @@ aws s3 cp --recursive bird-images/ s3://showcase-bucket/bird-images/
 aws s3 cp preprocessing.py s3://showcase-bucket/script/
 ```
 
-After you prepare your datasets 
+After you prepare your datasets, deploy the model pipeline in Amazon SageMaker.
 
-## Set up your model in Amazon SageMaker
+## Set up your model pipeline in Amazon SageMaker
+
+
 
 
 
@@ -597,6 +599,12 @@ ROLE_ARN=$(aws iam create-role \
     --output text \
     --query 'Role.Arn')
 ```
+
+
+AmazonSageMakerFullAccess
+AmazonS3FullAccess
+
+arn:aws:iam::aws:policy/AmazonSageMakerFullAccess
 
 NEED TO CHANGE THE POLICY DOCUMENT FOR THIS ROLE TO ONE THAT IS FOR USERS AND HAS A PRINCIPAL
 
