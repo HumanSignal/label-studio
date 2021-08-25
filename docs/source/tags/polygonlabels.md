@@ -1,7 +1,7 @@
 ---
 title: PolygonLabels
 type: tags
-order: 415
+order: 417
 meta_title: Polygon Label Tags for Labeling Polygons in Images
 meta_description: Label Studio Polygon Label Tags customize Label Studio for labeling polygons in images for machine learning and data science projects.
 ---

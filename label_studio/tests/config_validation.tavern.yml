@@ -71,7 +71,7 @@ marks:
 stages:
 - id: signup
   type: ref
-- name: stage
+- name: create project
   request:
     data:
       label_config: ' <View> <Text name="text" value="$text"/> <Choices name="label"
@@ -83,7 +83,7 @@ stages:
       json:
         pk: id
     status_code: 201
-- name: stage
+- name: import task
   request:
     headers:
       content-type: application/json
@@ -93,7 +93,7 @@ stages:
     url: '{django_live_url}/api/projects/{pk}/import'
   response:
     status_code: 201
-- name: stage
+- name: get next task
   request:
     method: GET
     url: '{django_live_url}/api/projects/{pk}/next'
@@ -102,7 +102,7 @@ stages:
       json:
         task_id: id
     status_code: 200
-- name: stage
+- name: submit annotation
   request:
     headers:
       content-type: application/json
@@ -118,13 +118,13 @@ stages:
     url: '{django_live_url}/api/tasks/{task_id}/annotations'
   response:
     status_code: 201
-- name: stage
+- name: get labeling settings page
   request:
     method: GET
     url: '{django_live_url}/projects/{pk}/settings/labeling'
   response:
     status_code: 200
-- name: stage
+- name: change config 1
   request:
     headers:
       content-type: application/json
@@ -142,7 +142,7 @@ stages:
 
           1 (1 annotations)'
     status_code: 400
-- name: stage
+- name: change config 2
   request:
     headers:
       content-type: application/json
@@ -161,7 +161,7 @@ stages:
 
           1 with from_name=label, to_name=text, type=choices'
     status_code: 400
-- name: stage
+- name: change config 3
   request:
     headers:
       content-type: application/json
@@ -173,13 +173,13 @@ stages:
     url: '{django_live_url}/api/projects/{pk}'
   response:
     status_code: 200
-- name: stage
+- name: delete tasks
   request:
     method: DELETE
     url: '{django_live_url}/api/projects/{pk}/tasks'
   response:
     status_code: 204
-- name: stage
+- name: change config success
   request:
     headers:
       content-type: application/json

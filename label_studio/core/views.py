@@ -18,11 +18,15 @@ from django.http import JsonResponse
 from wsgiref.util import FileWrapper
 
 from core import utils
+from core.utils.io import find_file
 from core.utils.params import get_env
 from core.label_config import generate_time_series_json
 from core.utils.common import collect_versions
 
 logger = logging.getLogger(__name__)
+
+
+_PARAGRAPH_SAMPLE = None
 
 
 def main(request):
@@ -124,6 +128,24 @@ def samples_time_series(request):
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
     response['filename'] = filename
     return response
+
+
+def samples_paragraphs(request):
+    """ Generate paragraphs example for preview
+    """
+    global _PARAGRAPH_SAMPLE
+
+    if _PARAGRAPH_SAMPLE is None:
+        with open(find_file('paragraphs.json'), encoding='utf-8') as f:
+            _PARAGRAPH_SAMPLE = json.load(f)
+    name_key = request.GET.get('nameKey', 'author')
+    text_key = request.GET.get('textKey', 'text')
+
+    result = []
+    for line in _PARAGRAPH_SAMPLE:
+        result.append({name_key: line['author'], text_key: line['text']})
+
+    return HttpResponse(json.dumps(result), content_type='application/json')
 
 
 def localfiles_data(request):

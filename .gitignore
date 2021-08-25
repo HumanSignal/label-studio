@@ -43,7 +43,6 @@ archive
 *.idea/*
 .vscode/*
 pyrightconfig.json
-tags
 tags.temp
 mydatabase
 label_studio.sqlite3

@@ -7,6 +7,7 @@ import json
 from django.utils import timezone
 from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
+from django.conf import settings
 from django_rq import job
 
 from tasks.models import Task
@@ -15,7 +16,7 @@ from data_export.serializers import ExportDataSerializer
 
 
 from core.redis import redis_connected
-from core.utils.common import get_bool_env
+from core.utils.common import get_bool_env, load_func
 
 
 logger = logging.getLogger(__name__)
@@ -169,9 +170,9 @@ class ExportStorage(Storage):
             # export task with annotations
             return ExportDataSerializer(annotation.task).data
         else:
-            from io_storages.serializers import StorageAnnotationSerializer
+            serializer_class = load_func(settings.STORAGE_ANNOTATION_SERIALIZER)
             # deprecated functionality - save only annotation
-            return StorageAnnotationSerializer(annotation).data
+            return serializer_class(annotation).data
 
     def save_annotation(self, annotation):
         raise NotImplementedError
