@@ -733,10 +733,11 @@ class ProjectSummary(models.Model):
 
     def _get_labels(self, result):
         result_type = result.get('type')
+        result_value = result['value'].get(result_type)
+        if not result_value or not isinstance(result_value, list):
+            return []
+        # Labels are stored in list
         labels = []
-        result_value = result['value'].get(result_type, [])
-        if not isinstance(result_value, list):
-            result_value = [result_value]
         for label in result_value:
             if isinstance(label, str):
                 labels.append(label)
