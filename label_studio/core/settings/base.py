@@ -378,6 +378,8 @@ ORGANIZATION_MIXIN = 'core.mixins.DummyModelMixin'
 USER_MIXIN = 'users.mixins.UserMixin'
 GET_STORAGE_LIST = 'io_storages.functions.get_storage_list'
 
+STORAGE_ANNOTATION_SERIALIZER = 'io_storages.serializers.StorageAnnotationSerializer'
+
 
 def project_delete(project):
     project.delete()
