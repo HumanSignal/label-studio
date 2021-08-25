@@ -357,7 +357,7 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
             next_task = self._get_random_unlocked(tasks)
         return next_task
 
-    def _make_response(self, next_task, request, use_task_lock=True, t queue=''):
+    def _make_response(self, next_task, request, use_task_lock=True, queue=''):
         """Once next task has chosen, this function triggers inference and prepare the API response"""
         user = request.user
         project = next_task.project
