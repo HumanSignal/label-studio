@@ -719,7 +719,7 @@ class ProjectSummary(models.Model):
 
     def _get_annotation_key(self, result):
         result_type = result.get('type', None)
-        if result_type in ('relation', 'rating', 'pairwise', None):
+        if result_type in ('relation', 'pairwise', None):
             return None
         if 'from_name' not in result or 'to_name' not in result:
             logger.error(
@@ -734,12 +734,13 @@ class ProjectSummary(models.Model):
     def _get_labels(self, result):
         result_type = result.get('type')
         labels = []
-        for label in result['value'].get(result_type, []):
-            if isinstance(label, list):
-                labels.extend(label)
-            else:
+        result_value = result['value'].get(result_type, [])
+        if not isinstance(result_value, list):
+            result_value = [result_value]
+        for label in result_value:
+            if isinstance(label, str):
                 labels.append(label)
-        return [str(l) for l in labels]
+        return labels
 
     def update_created_annotations_and_labels(self, annotations):
         created_annotations = dict(self.created_annotations)
