@@ -137,33 +137,27 @@ Then, attach a role policy that gives the role access to Amazon S3 so that it ca
 aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess --role-name SageMaker-Role
 ```
 
-Then, retrieve the RoleArn of the role that you just created. You need it for the SageMaker pipeline definition. From the command line, run the following:
+Then, retrieve the RoleArn of the role that you just created. From the command line, run the following:
 ```bash
 echo $ROLE_ARN
 ```
+You need this RoleArn for the SageMaker pipeline definition. Copy the output and save it somewhere secure. 
+
 
 ### Create a SageMaker pipeline
 
 In Amazon SageMaker, create a model training pipeline for the ResNet50 model, using the source images and annotations created in Label Studio and stored in Amazon S3.
 
-<br/>
+Update this example Amazon SageMaker pipeline definition with the RoleArn of the SageMaker role that you set up in previous steps. Replace the `$SageMakerRoleArn` with the actual RoleArn value. 
 
-{% details <b>Click to expand the pipeline definition</b> %}
-Update this example Amazon SageMaker pipeline definition with the RoleArn of the SageMaker role that you set up in previous steps. $SageMakerRoleArn
-
-{% codeblock lang:json %}
-
+```json
 {
 	"PipelineName": "WebhookShowcase",
 	"PipelineDisplayName": "WebhookShowcase",
 	"RoleArn": "$SageMakerRoleArn",
 	"PipelineDefinition": "{\"Version\": \"2020-12-01\", \"Metadata\": {}, \"Parameters\": [{\"Name\": \"ProcessingInstanceType\", \"Type\": \"String\", \"DefaultValue\": \"ml.m5.xlarge\"}, {\"Name\": \"ProcessingInstanceCount\", \"Type\": \"Integer\", \"DefaultValue\": 1}, {\"Name\": \"TrainingInstanceType\", \"Type\": \"String\", \"DefaultValue\": \"ml.m5.xlarge\"}, {\"Name\": \"ModelApprovalStatus\", \"Type\": \"String\", \"DefaultValue\": \"PendingManualApproval\"}], \"PipelineExperimentConfig\": {\"ExperimentName\": {\"Get\": \"Execution.PipelineName\"}, \"TrialName\": {\"Get\": \"Execution.PipelineExecutionId\"}}, \"Steps\": [{\"Name\": \"ProcessingStepWebhook\", \"Type\": \"Processing\", \"Arguments\": {\"ProcessingResources\": {\"ClusterConfig\": {\"InstanceType\": \"ml.m5.xlarge\", \"InstanceCount\": 1, \"VolumeSizeInGB\": 30}}, \"AppSpecification\": {\"ImageUri\": \"257758044811.dkr.ecr.us-east-2.amazonaws.com/sagemaker-scikit-learn:0.20.0-cpu-py3\", \"ContainerArguments\": [\"--train-test-split-ratio\", \"20\"], \"ContainerEntrypoint\": [\"python3\", \"/opt/ml/processing/input/code/aws-preprocessing.py\"]}, \"RoleArn\": \"ROLE_FOR_SAGEMAKER_PIPELINE\", \"ProcessingInputs\": [{\"InputName\": \"input-1\", \"AppManaged\": false, \"S3Input\": {\"S3Uri\": \"S3://showcase-bucket/annotations/\", \"LocalPath\": \"/opt/ml/processing/input/raw\", \"S3DataType\": \"S3Prefix\", \"S3InputMode\": \"File\", \"S3DataDistributionType\": \"FullyReplicated\", \"S3CompressionType\": \"None\"}}, {\"InputName\": \"input-2\", \"AppManaged\": false, \"S3Input\": {\"S3Uri\": \"S3://showcase-bucket/bird-images/\", \"LocalPath\": \"/opt/ml/processing/input/train\", \"S3DataType\": \"S3Prefix\", \"S3InputMode\": \"File\", \"S3DataDistributionType\": \"FullyReplicated\", \"S3CompressionType\": \"None\"}}, {\"InputName\": \"code\", \"AppManaged\": false, \"S3Input\": {\"S3Uri\": \"s3://showcase-bucket/script/aws-preprocessing.py\", \"LocalPath\": \"/opt/ml/processing/input/code\", \"S3DataType\": \"S3Prefix\", \"S3InputMode\": \"File\", \"S3DataDistributionType\": \"FullyReplicated\", \"S3CompressionType\": \"None\"}}], \"ProcessingOutputConfig\": {\"Outputs\": [{\"OutputName\": \"train_1\", \"AppManaged\": false, \"S3Output\": {\"S3Uri\": \"S3://showcase-bucket/temp/train\", \"LocalPath\": \"/opt/ml/processing/output/train_1\", \"S3UploadMode\": \"EndOfJob\"}}, {\"OutputName\": \"train_1_annotation\", \"AppManaged\": false, \"S3Output\": {\"S3Uri\": \"S3://showcase-bucket/temp/train_annotation\", \"LocalPath\": \"/opt/ml/processing/output/train_1_annotation\", \"S3UploadMode\": \"EndOfJob\"}}, {\"OutputName\": \"val_annotation\", \"AppManaged\": false, \"S3Output\": {\"S3Uri\": \"S3://showcase-bucket/temp/validation_annotation\", \"LocalPath\": \"/opt/ml/processing/output/validation_annotation\", \"S3UploadMode\": \"EndOfJob\"}}, {\"OutputName\": \"val_data\", \"AppManaged\": false, \"S3Output\": {\"S3Uri\": \"S3://showcase-bucket/temp/validation\", \"LocalPath\": \"/opt/ml/processing/output/validation\", \"S3UploadMode\": \"EndOfJob\"}}]}}}, {\"Name\": \"ImageSegmentationTrain\", \"Type\": \"Training\", \"Arguments\": {\"AlgorithmSpecification\": {\"TrainingInputMode\": \"File\", \"TrainingImage\": \"825641698319.dkr.ecr.us-east-2.amazonaws.com/semantic-segmentation:1\"}, \"OutputDataConfig\": {\"S3OutputPath\": \"S3://showcase-bucket/output/\"}, \"StoppingCondition\": {\"MaxRuntimeInSeconds\": 36000}, \"ResourceConfig\": {\"InstanceCount\": 1, \"InstanceType\": \"ml.p3.2xlarge\", \"VolumeSizeInGB\": 100}, \"RoleArn\": \"ROLE_FOR_SAGEMAKER_PIPELINE\", \"InputDataConfig\": [{\"DataSource\": {\"S3DataSource\": {\"S3DataType\": \"S3Prefix\", \"S3Uri\": \"S3://showcase-bucket/temp/train\", \"S3DataDistributionType\": \"FullyReplicated\"}}, \"ContentType\": \"application/x-image\", \"ChannelName\": \"train\"}, {\"DataSource\": {\"S3DataSource\": {\"S3DataType\": \"S3Prefix\", \"S3Uri\": \"S3://showcase-bucket/temp/validation\", \"S3DataDistributionType\": \"FullyReplicated\"}}, \"ContentType\": \"application/x-image\", \"ChannelName\": \"validation\"}, {\"DataSource\": {\"S3DataSource\": {\"S3DataType\": \"S3Prefix\", \"S3Uri\": \"S3://showcase-bucket/temp/train_annotation\", \"S3DataDistributionType\": \"FullyReplicated\"}}, \"ContentType\": \"application/x-image\", \"ChannelName\": \"train_annotation\"}, {\"DataSource\": {\"S3DataSource\": {\"S3DataType\": \"S3Prefix\", \"S3Uri\": \"S3://showcase-bucket/temp/validation_annotation\", \"S3DataDistributionType\": \"FullyReplicated\"}}, \"ContentType\": \"application/x-image\", \"ChannelName\": \"validation_annotation\"}], \"HyperParameters\": {\"backbone\": \"resnet-50\", \"algorithm\": \"fcn\", \"use_pretrained_model\": \"True\", \"num_classes\": \"4\", \"epochs\": \"10\", \"learning_rate\": \"0.0001\", \"optimizer\": \"rmsprop\", \"lr_scheduler\": \"poly\", \"mini_batch_size\": \"2\", \"validation_mini_batch_size\": \"2\"}, \"ProfilerRuleConfigurations\": [{\"RuleConfigurationName\": \"ProfilerReport-1629795191\", \"RuleEvaluatorImage\": \"915447279597.dkr.ecr.us-east-2.amazonaws.com/sagemaker-debugger-rules:latest\", \"RuleParameters\": {\"rule_to_invoke\": \"ProfilerReport\"}}], \"ProfilerConfig\": {\"S3OutputPath\": \"S3://showcase-bucket/output/\"}}, \"DependsOn\": [\"ProcessingStepWebhook\"]}, {\"Name\": \"CleanupStepWebhook\", \"Type\": \"Processing\", \"Arguments\": {\"ProcessingResources\": {\"ClusterConfig\": {\"InstanceType\": \"ml.m5.xlarge\", \"InstanceCount\": 1, \"VolumeSizeInGB\": 30}}, \"AppSpecification\": {\"ImageUri\": \"257758044811.dkr.ecr.us-east-2.amazonaws.com/sagemaker-scikit-learn:0.20.0-cpu-py3\", \"ContainerArguments\": [\"--s3_validation_annotation_path\", \"S3://showcase-bucket/temp/validation_annotation\", \"--s3_validation_path\", \"S3://showcase-bucket/temp/validation\", \"--s3_train_annotation_path\", \"S3://showcase-bucket/temp/train_annotation\", \"--s3_train_path\", \"S3://showcase-bucket/temp/train\"], \"ContainerEntrypoint\": [\"python3\", \"/opt/ml/processing/input/code/aws-cleanup.py\"]}, \"RoleArn\": \"ROLE_FOR_SAGEMAKER_PIPELINE\", \"ProcessingInputs\": [{\"InputName\": \"code\", \"AppManaged\": false, \"S3Input\": {\"S3Uri\": \"s3://label-studio-testdata/preprocessing/aws-cleanup.py\", \"LocalPath\": \"/opt/ml/processing/input/code\", \"S3DataType\": \"S3Prefix\", \"S3InputMode\": \"File\", \"S3DataDistributionType\": \"FullyReplicated\", \"S3CompressionType\": \"None\"}}]}, \"DependsOn\": [\"ImageSegmentationTrain\"]}]}"
 } 
-
-{% endcodeblock %}
-
-{% enddetails %}
-<br/>
+```
 
 Save the pipeline definition and details as `BirdPipeline.json` and then reference the file when you create and deploy the pipeline: 
 
@@ -270,23 +264,19 @@ Then, create the function in AWS Lambda. From the command line, run the followin
 aws lambda create-function --function-name LsCustomWebhook --role $ROLE_ARN --runtime python3.8 --handler LsCustomWebhook.lambda_handler --zip-file fileb://LsCustomWebhook.zip
 ```
 
-After the function is created, you see JSON results that contain the FunctionArn of `arn:aws:lambda:us-east-2:USERID:function:LsCustomWebhook` and the role ARN used by the function, `arn:aws:iam::USERID:role/LsCustomWebhookC`
+After the function is created, you see JSON results that contain the FunctionArn of `arn:aws:lambda:us-east-2:USERID:function:LsCustomWebhook` and the role ARN used by the function, `arn:aws:iam::USERID:role/LsCustomWebhookC`.
 
-<!-- this is apparently unnecessary?
-Update the function to specify the endpoint of the Sagemaker model. 
-From the command line, run the following:
+Update the function to specify the endpoint of the Sagemaker model. WHEREDOESTHEENDPOINTCOMEFROM From the command line, run the following:
 ```bash
 aws lambda update-function-configuration --function-name LsCustomWebhook --environment Variables='{ENDPOINT_NAME="< SageMaker Endpoint Name >"}'
 ```
----> 
 
 Store the ARN of the Lambda function so that the webhook function script can reference it. From the command line, run the following:
 ```bash
 LAMBDAARN=$(aws lambda list-functions --query "Functions[?FunctionName==\`LsCustomWebhook\`].FunctionArn" --output text) 
 ```
 
-After you set up and configure the AWS Lambda function, set up the Amazon API Gateway to permit access between AWS Lambda and Label Studio. 
-
+After you set up and configure the AWS Lambda function, set up the Amazon API Gateway to permit access between AWS Lambda and Label Studio.
 
 ## Set up the Amazon API Gateway 
 
@@ -354,21 +344,15 @@ echo https://$GATEWAY_ID.execute-api.${REGION}.amazonaws.com/prod/LcWebHook
 ```
 Save the output somewhere secure. 
 
+Now that you've finished setting up the Amazon AWS services for your pipeline configuration, it's time to start preparing to annotate some bird images.
+
 ## Set up Label Studio for data annotation
 
+To start annotating bird images, set up an image segmentation project and connect the S3 bucket with the bird images to Label Studio. You must already have [Label Studio installed](install.html) on AWS or locally using Docker. 
 
+### Set up an image segmentation project
 
-
-
-
-- set up image segmentation project
-  
-1. Create the project
-2. Name it Bird Identification
-3. Skip importing data for now
-4. Select the **Semantic Segmentation with Polygons** template. 
-5. Update the labels to Beak, Head, Wing, and Body.
-6. Save the project
+INSERTWORDS
 
 SageMaker Model expects 4 classes 
 - Beak
@@ -376,43 +360,63 @@ SageMaker Model expects 4 classes
 - Head
 - Body
 
-   
 
-1. Open the project settings
-2. Select **Cloud Storage**.
-3. Click **Add Source Storage**
-4. Add a title for the storage, for example **Source bird images**
-5. Specify the bucket name of **showcase-bucket** and a bucket prefix of **bird-images**
-6. Use a file filter regex of `.*jpg`.
-7. Specify a region name of `us-east-2` unless you're using a different region to follow along with this blog post.
-8. SPECIFY AN ACCESS KEY ID AND SECRET ACCESS KEY FOR THE BUCKET? 
-9. Click **Add Storage**.
-10. Click **Sync** to sync the images.
+1. In the Label Studio UI, click **Create** to create a project. 
+2. Add a project name of **Bird Segmentation**.
+3. Skip importing data for now, because the data is stored in S3.
+4. On the **Labeling Setup** page, select the **Semantic Segmentation with Polygons** template.
+5. Remove the existing labels `Airplane` and `Car` and replace them with:
+```text
+Beak
+Head
+Wing
+Body
+```
+6. Save the project.
 
-As those are syncing, set up the target storage.
-1. Click **Add Target Storage**
-2. Add a title for the storage, for example **Annotated birds**
-3. Specify the bucket name of **showcase-bucket** and a bucket prefix of **annotations**. 
-4. Specify a region name of `us-east-2` unless you're using a different region to follow along with this blog post.
-5. SPECIFY AN ACCESS KEY ID AND SECRET ACCESS KEY FOR THE BUCKET? 
+### Connect the S3 bucket to Label Studio
+
+In order to retrieve the source images of birds for annotating, and to save the annotations somewhere that the SageMaker pipeline can easily retrieve them from, connect the S3 bucket to Label Studio. 
+
+<br/><img src="/images/webhook-blog/screenshotOfCloudStorage.png" alt="" class="gif-border" width="800px" height="" />
+
+1. In the Label Studio UI, click **Settings** to open the project settings.
+2. Click **Cloud Storage**.
+3. Click **Add Source Storage**.
+4. Specify a title for the storage. For example, **Source bird images**.
+5. Specify a bucket name of **showcase-bucket** and a bucket prefix of **bird-images**. 
+6. Specify a file filter regex of `.*jpg` so that Label Studio retrieves only images with that file extension from the S3 bucket prefix. 
+7. Specify a region name of `us-east-2`, unless you're using a different region to follow along with this blog post.
+8. Specify the Access Key ID, Secret Access Key, and Session Token for a user with access to S3 buckets. You can use the credentials of the user account that you used to create the S3 bucket.
+9. Select the option to **Treat every bucket object as a source file**. 
+10. Click **Add Storage**.
+11. Click **Sync** to sync the images.
+
+<br/><img src="/images/webhook-blog/ScreenshotOfDataManager.png" alt="" class="gif-border" width="800px" height="" />
+
+As the images sync to Label Studio using pre-signed URLs, set up the target storage to store annotations. 
+1. In the Label Studio Cloud Storage Settings, click **Add Target Storage**.
+2. Specify a title for the storage. For example, **Annotated birds**.
+3. Specify a bucket name of **showcase-bucket** and a bucket prefix of **annotations**. 
+4. Specify a region name of `us-east-2`, unless you're using a different region to follow along with this blog post.
+8. Specify the Access Key ID, Secret Access Key, and Session Token for a user with access to S3 buckets. You can use the credentials of the user account that you used to create the S3 bucket.
 6. Click **Add Storage**.
 
-<br/><img src="/images/webhook-blog/stylized-diagram.png" alt="" class="gif-border" width="800px" height="" />
+### Set up the webhook URL and events
 
+Set up the webhook URL so that you can send ANNOTATION_CREATED events from Label Studio to the Lambda function using the Amazon API Gateway so that you can trigger the SageMaker pipeline.  
 
-
-Add a webhook
-1. Click **Webhooks**
+1. In the Label Studio project settings, click **Webhooks**
 2. Click **Add Webhook**.
-3. In the **URL** field, paste the AWS API gateway URL that was created when you created the AWS API gateway. `https://$GATEWAY_ID.execute-api.${REGION}.amazonaws.com/prod/LcWebHook`
-5. For **Payload**, leave **Send payload** selected, but deselect **Send for all actions**. You only want to send events to the AWS Lambda function when an annotation is created. For **Send Payload for**, select **Annotation created**. 
-6. Click **Add Webhook** to save your changes.
+3. In the **URL** field, paste the Amazon API Gateway URL created when you set up the AWS API gateway. For example, `https://$GATEWAY_ID.execute-api.${REGION}.amazonaws.com/prod/LcWebHook`.
+4. Skip the **Headers** section, unless you set up authorization for the API Gateway configuration. 
+5. For the **Payload** section, leave **Send payload** selected, but deselect **Send for all actions**. 
+6. For **Send Payload for**, select **Annotation created**. You only want to send events to the AWS Lambda function when an annotation is created.
+6. Click **Add Webhook** to save your webhook.
 
-<br/><img src="/images/webhook-blog/stylized-diagram.png" alt="" class="gif-border" width="800px" height="" />
+<br/><img src="/images/webhook-blog/ScreenshotOfWebhookSetup.png" alt="" class="gif-border" width="800px" height="" />
 
-
-
-## start annotating data in LS
+## Start annotating data in Label Studio
 
 After you set up the project, you can start labeling! 
 
@@ -424,13 +428,13 @@ start labeling!
 Label at least 16 bird images to trigger the pipeline for training / retraining. 
 
 
-<br/><img src="/images/webhook-blog/stylized-diagram.png" alt="" class="gif-border" width="800px" height="" />
+<br/><img src="/images/webhook-blog/ScreenshotOfLabeledBird.png" alt="" class="gif-border" width="800px" height="" />
 
 
-<br/><img src="/images/webhook-blog/stylized-diagram.png" alt="" class="gif-border" width="800px" height="" />
+<br/><img src="/images/webhook-blog/ScreenshotOfLabeledBird2.png" alt="" class="gif-border" width="800px" height="" />
 
 
-<br/><img src="/images/webhook-blog/stylized-diagram.png" alt="" class="gif-border" width="800px" height="" />
+<br/><img src="/images/webhook-blog/GifOfLabeledBird.gif" alt="" class="gif-border" width="800px" height="" />
 
 
 
