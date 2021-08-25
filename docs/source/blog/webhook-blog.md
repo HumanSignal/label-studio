@@ -112,517 +112,39 @@ After you prepare your datasets, deploy the model pipeline in Amazon SageMaker.
 
 Set up an IAM policy for SageMaker. 
 
-From the command line, set up the policy and then create a role that uses this policy: 
-
-<br/>
-
-{% details <b>Click to expand the role policy for the Amazon SageMaker pipeline</b> %}
-
-Copy and save this policy as a JSON file and reference it when you apply it to the role. 
-
-{% codeblock lang:json %}
-
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "sagemaker:*"
-      ],
-      "NotResource": [
-        "arn:aws:sagemaker:*:*:domain/*",
-        "arn:aws:sagemaker:*:*:user-profile/*",
-        "arn:aws:sagemaker:*:*:app/*",
-        "arn:aws:sagemaker:*:*:flow-definition/*"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "sagemaker:CreatePresignedDomainUrl",
-        "sagemaker:DescribeDomain",
-        "sagemaker:ListDomains",
-        "sagemaker:DescribeUserProfile",
-        "sagemaker:ListUserProfiles",
-        "sagemaker:*App",
-        "sagemaker:ListApps"
-      ],
-      "Resource": "*"
-    },
-    {
-      "Effect": "Allow",
-      "Action": "sagemaker:*",
-      "Resource": [
-        "arn:aws:sagemaker:*:*:flow-definition/*"
-      ],
-      "Condition": {
-        "StringEqualsIfExists": {
-          "sagemaker:WorkteamType": [
-            "private-crowd",
-            "vendor-crowd"
-          ]
-        }
-      }
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "application-autoscaling:DeleteScalingPolicy",
-        "application-autoscaling:DeleteScheduledAction",
-        "application-autoscaling:DeregisterScalableTarget",
-        "application-autoscaling:DescribeScalableTargets",
-        "application-autoscaling:DescribeScalingActivities",
-        "application-autoscaling:DescribeScalingPolicies",
-        "application-autoscaling:DescribeScheduledActions",
-        "application-autoscaling:PutScalingPolicy",
-        "application-autoscaling:PutScheduledAction",
-        "application-autoscaling:RegisterScalableTarget",
-        "aws-marketplace:ViewSubscriptions",
-        "cloudformation:GetTemplateSummary",
-        "cloudwatch:DeleteAlarms",
-        "cloudwatch:DescribeAlarms",
-        "cloudwatch:GetMetricData",
-        "cloudwatch:GetMetricStatistics",
-        "cloudwatch:ListMetrics",
-        "cloudwatch:PutMetricAlarm",
-        "cloudwatch:PutMetricData",
-        "codecommit:BatchGetRepositories",
-        "codecommit:CreateRepository",
-        "codecommit:GetRepository",
-        "codecommit:List*",
-        "cognito-idp:AdminAddUserToGroup",
-        "cognito-idp:AdminCreateUser",
-        "cognito-idp:AdminDeleteUser",
-        "cognito-idp:AdminDisableUser",
-        "cognito-idp:AdminEnableUser",
-        "cognito-idp:AdminRemoveUserFromGroup",
-        "cognito-idp:CreateGroup",
-        "cognito-idp:CreateUserPool",
-        "cognito-idp:CreateUserPoolClient",
-        "cognito-idp:CreateUserPoolDomain",
-        "cognito-idp:DescribeUserPool",
-        "cognito-idp:DescribeUserPoolClient",
-        "cognito-idp:List*",
-        "cognito-idp:UpdateUserPool",
-        "cognito-idp:UpdateUserPoolClient",
-        "ec2:CreateNetworkInterface",
-        "ec2:CreateNetworkInterfacePermission",
-        "ec2:CreateVpcEndpoint",
-        "ec2:DeleteNetworkInterface",
-        "ec2:DeleteNetworkInterfacePermission",
-        "ec2:DescribeDhcpOptions",
-        "ec2:DescribeNetworkInterfaces",
-        "ec2:DescribeRouteTables",
-        "ec2:DescribeSecurityGroups",
-        "ec2:DescribeSubnets",
-        "ec2:DescribeVpcEndpoints",
-        "ec2:DescribeVpcs",
-        "ecr:BatchCheckLayerAvailability",
-        "ecr:BatchGetImage",
-        "ecr:CreateRepository",
-        "ecr:Describe*",
-        "ecr:GetAuthorizationToken",
-        "ecr:GetDownloadUrlForLayer",
-        "ecr:StartImageScan",
-        "elastic-inference:Connect",
-        "elasticfilesystem:DescribeFileSystems",
-        "elasticfilesystem:DescribeMountTargets",
-        "fsx:DescribeFileSystems",
-        "glue:CreateJob",
-        "glue:DeleteJob",
-        "glue:GetJob*",
-        "glue:GetTable*",
-        "glue:GetWorkflowRun",
-        "glue:ResetJobBookmark",
-        "glue:StartJobRun",
-        "glue:StartWorkflowRun",
-        "glue:UpdateJob",
-        "groundtruthlabeling:*",
-        "iam:ListRoles",
-        "kms:DescribeKey",
-        "kms:ListAliases",
-        "lambda:ListFunctions",
-        "logs:CreateLogDelivery",
-        "logs:CreateLogGroup",
-        "logs:CreateLogStream",
-        "logs:DeleteLogDelivery",
-        "logs:Describe*",
-        "logs:GetLogDelivery",
-        "logs:GetLogEvents",
-        "logs:ListLogDeliveries",
-        "logs:PutLogEvents",
-        "logs:PutResourcePolicy",
-        "logs:UpdateLogDelivery",
-        "robomaker:CreateSimulationApplication",
-        "robomaker:DescribeSimulationApplication",
-        "robomaker:DeleteSimulationApplication",
-        "robomaker:CreateSimulationJob",
-        "robomaker:DescribeSimulationJob",
-        "robomaker:CancelSimulationJob",
-        "secretsmanager:ListSecrets",
-        "servicecatalog:Describe*",
-        "servicecatalog:List*",
-        "servicecatalog:ScanProvisionedProducts",
-        "servicecatalog:SearchProducts",
-        "servicecatalog:SearchProvisionedProducts",
-        "sns:ListTopics",
-        "tag:GetResources"
-      ],
-      "Resource": "*"
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "ecr:SetRepositoryPolicy",
-        "ecr:CompleteLayerUpload",
-        "ecr:BatchDeleteImage",
-        "ecr:UploadLayerPart",
-        "ecr:DeleteRepositoryPolicy",
-        "ecr:InitiateLayerUpload",
-        "ecr:DeleteRepository",
-        "ecr:PutImage"
-      ],
-      "Resource": [
-        "arn:aws:ecr:*:*:repository/*sagemaker*"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "codecommit:GitPull",
-        "codecommit:GitPush"
-      ],
-      "Resource": [
-        "arn:aws:codecommit:*:*:*sagemaker*",
-        "arn:aws:codecommit:*:*:*SageMaker*",
-        "arn:aws:codecommit:*:*:*Sagemaker*"
-      ]
-    },
-    {
-      "Action": [
-        "codebuild:BatchGetBuilds",
-        "codebuild:StartBuild"
-      ],
-      "Resource": [
-        "arn:aws:codebuild:*:*:project/sagemaker*",
-        "arn:aws:codebuild:*:*:build/*"
-      ],
-      "Effect": "Allow"
-    },
-    {
-      "Action": [
-        "states:DescribeExecution",
-        "states:GetExecutionHistory",
-        "states:StartExecution",
-        "states:StopExecution",
-        "states:UpdateStateMachine"
-      ],
-      "Resource": [
-        "arn:aws:states:*:*:statemachine:*sagemaker*",
-        "arn:aws:states:*:*:execution:*sagemaker*:*"
-      ],
-      "Effect": "Allow"
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "secretsmanager:DescribeSecret",
-        "secretsmanager:GetSecretValue",
-        "secretsmanager:CreateSecret"
-      ],
-      "Resource": [
-        "arn:aws:secretsmanager:*:*:secret:AmazonSageMaker-*"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "secretsmanager:DescribeSecret",
-        "secretsmanager:GetSecretValue"
-      ],
-      "Resource": "*",
-      "Condition": {
-        "StringEquals": {
-          "secretsmanager:ResourceTag/SageMaker": "true"
-        }
-      }
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "servicecatalog:ProvisionProduct"
-      ],
-      "Resource": "*"
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "servicecatalog:TerminateProvisionedProduct",
-        "servicecatalog:UpdateProvisionedProduct"
-      ],
-      "Resource": "*",
-      "Condition": {
-        "StringEquals": {
-          "servicecatalog:userLevel": "self"
-        }
-      }
-    },
-    {
-      "Effect": "Allow",
-      "Action": "s3:*",
-      "Resource": "*"
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "s3:GetObject"
-      ],
-      "Resource": "*",
-      "Condition": {
-        "StringEqualsIgnoreCase": {
-          "s3:ExistingObjectTag/SageMaker": "true"
-        }
-      }
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "s3:GetObject"
-      ],
-      "Resource": "*",
-      "Condition": {
-        "StringEquals": {
-          "s3:ExistingObjectTag/servicecatalog:provisioning": "true"
-        }
-      }
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "s3:CreateBucket",
-        "s3:GetBucketLocation",
-        "s3:ListBucket",
-        "s3:ListAllMyBuckets",
-        "s3:GetBucketCors",
-        "s3:PutBucketCors"
-      ],
-      "Resource": "*"
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "s3:GetBucketAcl",
-        "s3:PutObjectAcl"
-      ],
-      "Resource": [
-        "arn:aws:s3:::*SageMaker*",
-        "arn:aws:s3:::*Sagemaker*",
-        "arn:aws:s3:::*sagemaker*"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "lambda:InvokeFunction"
-      ],
-      "Resource": [
-        "arn:aws:lambda:*:*:function:*SageMaker*",
-        "arn:aws:lambda:*:*:function:*sagemaker*",
-        "arn:aws:lambda:*:*:function:*Sagemaker*",
-        "arn:aws:lambda:*:*:function:*LabelingFunction*"
-      ]
-    },
-    {
-      "Action": "iam:CreateServiceLinkedRole",
-      "Effect": "Allow",
-      "Resource": "arn:aws:iam::*:role/aws-service-role/sagemaker.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_SageMakerEndpoint",
-      "Condition": {
-        "StringLike": {
-          "iam:AWSServiceName": "sagemaker.application-autoscaling.amazonaws.com"
-        }
-      }
-    },
-    {
-      "Effect": "Allow",
-      "Action": "iam:CreateServiceLinkedRole",
-      "Resource": "*",
-      "Condition": {
-        "StringEquals": {
-          "iam:AWSServiceName": "robomaker.amazonaws.com"
-        }
-      }
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "sns:Subscribe",
-        "sns:CreateTopic"
-      ],
-      "Resource": [
-        "arn:aws:sns:*:*:*SageMaker*",
-        "arn:aws:sns:*:*:*Sagemaker*",
-        "arn:aws:sns:*:*:*sagemaker*"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "iam:PassRole"
-      ],
-      "Resource": "arn:aws:iam::*:role/*AmazonSageMaker*",
-      "Condition": {
-        "StringEquals": {
-          "iam:PassedToService": [
-            "glue.amazonaws.com",
-            "robomaker.amazonaws.com",
-            "states.amazonaws.com"
-          ]
-        }
-      }
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "iam:PassRole"
-      ],
-      "Resource": "arn:aws:iam::*:role/*",
-      "Condition": {
-        "StringEquals": {
-          "iam:PassedToService": "sagemaker.amazonaws.com"
-        }
-      }
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "athena:ListDataCatalogs",
-        "athena:ListDatabases",
-        "athena:ListTableMetadata",
-        "athena:GetQueryExecution",
-        "athena:GetQueryResults",
-        "athena:StartQueryExecution",
-        "athena:StopQueryExecution"
-      ],
-      "Resource": [
-        "*"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "glue:CreateTable"
-      ],
-      "Resource": [
-        "arn:aws:glue:*:*:table/*/sagemaker_tmp_*",
-        "arn:aws:glue:*:*:table/sagemaker_featurestore/*",
-        "arn:aws:glue:*:*:catalog",
-        "arn:aws:glue:*:*:database/*"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "glue:DeleteTable"
-      ],
-      "Resource": [
-        "arn:aws:glue:*:*:table/*/sagemaker_tmp_*",
-        "arn:aws:glue:*:*:catalog",
-        "arn:aws:glue:*:*:database/*"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "glue:GetDatabases",
-        "glue:GetTable",
-        "glue:GetTables"
-      ],
-      "Resource": [
-        "arn:aws:glue:*:*:table/*",
-        "arn:aws:glue:*:*:catalog",
-        "arn:aws:glue:*:*:database/*"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "glue:CreateDatabase",
-        "glue:GetDatabase"
-      ],
-      "Resource": [
-        "arn:aws:glue:*:*:catalog",
-        "arn:aws:glue:*:*:database/sagemaker_featurestore",
-        "arn:aws:glue:*:*:database/sagemaker_processing",
-        "arn:aws:glue:*:*:database/default",
-        "arn:aws:glue:*:*:database/sagemaker_data_wrangler"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "redshift-data:ExecuteStatement",
-        "redshift-data:DescribeStatement",
-        "redshift-data:CancelStatement",
-        "redshift-data:GetStatementResult",
-        "redshift-data:ListSchemas",
-        "redshift-data:ListTables"
-      ],
-      "Resource": [
-        "*"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "redshift:GetClusterCredentials"
-      ],
-      "Resource": [
-        "arn:aws:redshift:*:*:dbuser:*/sagemaker_access*",
-        "arn:aws:redshift:*:*:dbname:*"
-      ]
-    }
-  ]
-}
-
-{% endcodeblock %}
-{% enddetails %}
-<br/>
+From the command line, create a role to manage the SageMaker pipeline:
 
 
+NEED TO CHANGE THE POLICY DOCUMENT FOR THIS ROLE TO ONE THAT IS FOR USERS AND HAS A PRINCIPAL
 
 From the command line, run the following:
 ```bash
 ROLE_ARN=$(aws iam create-role \
     --role-name SageMaker-Role \
-    --assume-role-policy-document file://sage_policy.json \
+    --assume-role-policy-document file://AHHHSOMETING.json \
     --output text \
     --query 'Role.Arn')
 ```
 
-
-AmazonSageMakerFullAccess
-AmazonS3FullAccess
-
-arn:aws:iam::aws:policy/AmazonSageMakerFullAccess
-
-NEED TO CHANGE THE POLICY DOCUMENT FOR THIS ROLE TO ONE THAT IS FOR USERS AND HAS A PRINCIPAL
-
-Then, apply a role policy to the role that you created: 
+Then, apply a role policy to the role that you created that grants the role full access to Amazon SageMaker: 
 ```bash
-aws iam put-role-policy --role-name SageMaker-Role --policy-name SM-Pipeline --policy-document file://sage_policy.json
+aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/AmazonSageMakerFullAccess --role-name SageMaker-Role
 ```
 
-Then, retrieve the RoleArn of the role that you just created:
+Then, attach a role policy that gives the role access to Amazon S3 so that it can retrieve the tasks and annotations from the S3 buckets and store the model output accordingly:
+
+```bash
+aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/AmazonS3FullAccess --role-name SageMaker-Role
+```
+
+Then, retrieve the RoleArn of the role that you just created. You need it for the SageMaker pipeline definition. From the command line, run the following:
 ```bash
 echo $ROLE_ARN
 ```
 
-
 ### Create a SageMaker pipeline
 
-WORDS ABOUT SAGEMAKER PIPELINE
-
+In Amazon SageMaker, create a model training pipeline for the ResNet50 model, using the source images and annotations created in Label Studio and stored in Amazon S3.
 
 <br/>
 
@@ -656,24 +178,23 @@ After creating the pipeline, you see the PipelineArn:
 }
 ```
 
+After creating and deploying the Amazon SageMaker pipeline, set up the AWS Lambda function that is going to manage the Label Studio webhook information and trigger the model training pipeline in SageMaker. 
 
-CREATE AN ENDPOINT FOR THE MODEL???
+## Set up an AWS Lambda function 
 
-## Set up AWS Lambda function 
+You can use AWS Lambda to run code. In this example, use it to process the webhook event payload from Label Studio and send a model training request to your Amazon SageMaker pipeline. 
 
-- here's what the lambda function does
-  > lambda function counts the number of annotations created and prompts retraining after 16 annotations have been completed (a "ready to train" checkpoint of sorts)
-- here's why to do that (????)
+Before you can set up the AWS Lambda function itself, prepare a user role with the appropriate permissions policies to run the code and interact with Amazon SageMaker. 
 
-make decisions
-- set up a checkpoint of number of annotations after which to start retraining the model
-  (here's why to pick this number, and how long it will take to retrain the model with that number)
+### Set up IAM policies 
 
-Set up the IAM policy to allow the AWS function to interact with Label Studio (RIGHT???)
-
-From the command line, create a role with the necessary permissions to allow the AWS Lambda function to interact with Label Studio:
+Specify the policy needed by a role to process the webhook from Label Studio and run the Lambda function. From the command line, run the following:
 ```bash
 ASSUME_POLICY=$(echo -n '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"Service":"lambda.amazonaws.com"},"Action":"sts:AssumeRole"}]}')
+```
+
+Then, create a role with that policy. From the command line, run the following:
+```bash
 ROLE_ARN=$(aws iam create-role \
     --role-name LsCustomWebhook \
     --assume-role-policy-document "$ASSUME_POLICY" \
@@ -681,17 +202,17 @@ ROLE_ARN=$(aws iam create-role \
     --query 'Role.Arn')
 ```
 
-Then attach the policy to the role that will be running the Lambda function: 
+Then attach a policy to that role to give it additional access to run Lambda functions. From the command line, run the following: 
 ```bash
 aws iam attach-role-policy --role-name LsCustomWebhook --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 ```
 
-Define the policy needed to allow the Lambda function to invoke the SageMaker endpoint for the pipeline that you created with your model:
+Define the policy needed to allow the Lambda function to invoke the SageMaker endpoint for the pipeline that you created with your model. From the command line, run the following:
 ```bash
 POLICY=$(echo -n '{"Version":"2012-10-17","Statement":[{"Sid":"VisualEditor0","Effect":"Allow","Action":["sagemaker:StartPipelineExecution","sagemaker:InvokeEndpoint"],"Resource":"*"}]}')
 ```
 
-Create the policy: 
+Create the policy in AWS. From the command line, run the following:  
 ```bash
 POLICY_ARN=$(aws iam create-policy \
     --policy-name AllowSmInvokeEndpoint \
@@ -700,20 +221,20 @@ POLICY_ARN=$(aws iam create-policy \
     --query 'Policy.Arn')
 ```
 
-Attach the policy to the role that runs the lambda function: 
+Attach the policy to the role that runs the AWS Lambda function.  From the command line, run the following: 
 ```bash
 aws iam attach-role-policy --role-name LsCustomWebhook --policy-arn $POLICY_ARN
 ```
 
 ### Set up the Lambda function
 
-First, download, save, and zip up the example AWS Lambda function that does the following:
-- process the label studio ANNOTATION_CREATED event
-- parses the body for the count of annotations created and the project details
+After setting up the IAM role with the necessary permission policies, create and set up the Lambda function. 
 
+This Lambda function is written in Python and counts the number of annotations created in Label Studio, based on the ANNOTATION_CREATED webhook event payload sent from Label Studio. After a "ready to train" checkpoint of 16 annotations is reached, the Lambda function invokes the Amazon SageMaker pipeline and starts the training process. 
 
-update the pipeline name to match the pipeline that you created 
+16 annotations is the minimum number of annotations for ResNet50 model training, but if your dataset is larger than the one used in this example, you might want to update the function to use a greater number of annotations, such as 50 or 100. The number of annotations that you might want to specify for initial training would also be different than this use case, wherein we're retraining a pre-trained model to focus on a specific bird use case. 
 
+Copy and save the following Python code as `LsCustomWebhook.py`: 
 ```python
 import json
 import boto3
@@ -739,101 +260,66 @@ def lambda_handler(event, context):
     }
 ```
 
-For every 16 annotations, the pipeline training begins / is fired
-
-
-From the command line, run the following:
+Compress the Python script into a `zip` folder so that you can create it in AWS Lambda. From the command line, run the following:
 ```bash
 zip LsCustomWebhook.zip LsCustomWebhook.py
 ```
 
-zip LsCustomWebhook2.zip lambda-sm.py
-
-Create the function in AWS Lambda. From the command line, run the following:
+Then, create the function in AWS Lambda. From the command line, run the following:
 ```bash
-aws lambda create-function --function-name LsCustomWebhookCheese --role $ROLE_ARN --runtime python3.8 --handler LsCustomWebhook.lambda_handler --zip-file fileb://LsCustomWebhook2.zip --region us-east-2
+aws lambda create-function --function-name LsCustomWebhook --role $ROLE_ARN --runtime python3.8 --handler LsCustomWebhook.lambda_handler --zip-file fileb://LsCustomWebhook.zip
 ```
 
-SUCCESS RETURNS THE FOLLOWING 
-```json
-{
-    "FunctionName": "LsCustomWebhookChew",
-    "FunctionArn": "arn:aws:lambda:us-east-2:490065312183:function:LsCustomWebhookChew",
-    "Runtime": "python3.8",
-    "Role": "arn:aws:iam::490065312183:role/LsCustomWebhookCheese",
-    "Handler": "LsCustomWebhook.lambda_handler",
-    "CodeSize": 506,
-    "Description": "",
-    "Timeout": 3,
-    "MemorySize": 128,
-    "LastModified": "2021-08-24T18:06:24.750+0000",
-    "CodeSha256": "FjoAGE/xJEndCddHZOQKJxrtdRrT+khJbK//U2ESAV0=",
-    "Version": "$LATEST",
-    "TracingConfig": {
-        "Mode": "PassThrough"
-    },
-    "RevisionId": "76bb8cfd-338e-4623-b73f-97f09455f393",
-    "State": "Active",
-    "LastUpdateStatus": "Successful",
-    "PackageType": "Zip"
-}
+After the function is created, you see JSON results that contain the FunctionArn of `arn:aws:lambda:us-east-2:USERID:function:LsCustomWebhook` and the role ARN used by the function, `arn:aws:iam::USERID:role/LsCustomWebhookC`
 
-
-```
-
-
-Update the function to specify the endpoint of the Sagemaker model.
+<!-- this is apparently unnecessary?
+Update the function to specify the endpoint of the Sagemaker model. 
 From the command line, run the following:
 ```bash
 aws lambda update-function-configuration --function-name LsCustomWebhook --environment Variables='{ENDPOINT_NAME="< SageMaker Endpoint Name >"}'
 ```
+---> 
 
-
-Then, store the ARN of the Lambda function as an environment variable so that the webhook function script can reference it. 
-From the command line, run the following:
+Store the ARN of the Lambda function so that the webhook function script can reference it. From the command line, run the following:
 ```bash
-LAMBDAARN=$(aws lambda list-functions --query "Functions[?FunctionName==\`LsCustomWebhookCheese\`].FunctionArn" --output text) 
+LAMBDAARN=$(aws lambda list-functions --query "Functions[?FunctionName==\`LsCustomWebhook\`].FunctionArn" --output text) 
 ```
 
-## Set up the Amazon API gateway 
-to communicate across all the AWS services and stuff
+After you set up and configure the AWS Lambda function, set up the Amazon API Gateway to permit access between AWS Lambda and Label Studio. 
 
-> If you're using Amazon VPC, you can also use a VPC endpoint instead of the Amazon API gateway
 
-Create an AWS Rest API gateway configuration. Set several environment variables and run several commands from the command line...
+## Set up the Amazon API Gateway 
 
-This example uses us-east-2 as a default region. If you're using a different AWS region, update the `REGION` environment variable to the AWS region that you're using. 
+Set up the Amazon API Gateway to allow the webhook events sent from Label Studio to reach the AWS Lambda function. If you're using an Amazon VPC to host Label Studio, you can use a VPC endpoint instead of the Amazon API gateway, but this example only covers the setup for the API Gateway. 
 
+Set up a number of environment variables, then run some commands using the Amazon API Gateway. 
+
+1. Specify a region. This example uses us-east-2 as a default region. If you're using a different AWS region, update the `REGION` variable to the AWS region that you're using. From the command line, run the following:
 ```bash
 REGION=us-east-2
 ```
-
-Set up an account ID for the gateway
+2. Specify your account ID so that the API Gateway can use it. From the command line, run the following:
 ```bash
 ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 ```
-
-Create an AWS Gateway ID: 
+3. Create an AWS Gateway ID. From the command line, run the following: 
 ```bash
 GATEWAY_ID=$(aws apigateway create-rest-api \
 --name 'LsCustomWebhookGateway' | jq -r .id)
 ```
-
-Create a root ID for the gateway (??):
+4. Get the root ID for the API Gateway. From the command line, run the following:
 ```bash
 GATEWAY_ROOT_ID=$(aws apigateway get-resources \
 --rest-api-id "$GATEWAY_ID" | jq -r '.items[] | select(.path == "/").id')
 ```
-
+5. Create an API Gateway resource ID for AWS Lambda. From the command line, run the following:
 ```bash
 AWS_GATEWAY_LAMBDA_RESOURCE_ID=$(aws apigateway create-resource \
 --rest-api-id "$GATEWAY_ID" \
 --parent-id "$GATEWAY_ROOT_ID" \
 --path-part LcWebHook | jq -r .id)
 ```
-
-Do some other things:
-By default this example does not use authorization for the HTTP request, but you might want to secure your API Gatway configuration. See [Set up method request authorization](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-method-settings-method-request.html#setup-method-request-authorization) in the Amazon API Gateway documentation.
+6. Update the API Gateway with the resource ID for AWS Lambda. By default this example does not use authorization for the HTTP request, but you might want to secure your API Gatway configuration. See [Set up method request authorization](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-method-settings-method-request.html#setup-method-request-authorization) in the Amazon API Gateway documentation. From the command line, run the following:
 ```bash
 aws apigateway put-method \
 --rest-api-id "$GATEWAY_ID" \
@@ -841,9 +327,7 @@ aws apigateway put-method \
 --http-method POST \
 --authorization-type "NONE"
 ```
-
-
-DO SOMETHING ELSE WITH THE API GATEWAY, NOT SURE HOW THIS IS DIFFERENT 
+7. Update the API Gateway with additional details for the Lambda function. From the command line, run the following:
 ```bash
 aws apigateway put-integration \
 --rest-api-id "$GATEWAY_ID" \
@@ -853,58 +337,29 @@ aws apigateway put-integration \
 --integration-http-method POST \
 --uri arn:aws:apigateway:${REGION}:lambda:path/2015-03-31/functions/${LAMBDAARN}/invocations
 ```
-
-output
-```json
-{
-    "type": "AWS",
-    "httpMethod": "POST",
-    "uri": "arn:aws:apigateway:us-east-2:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-2:490065312183:function:LsCustomWebhookCheese/invocations",
-    "passthroughBehavior": "WHEN_NO_MATCH",
-    "timeoutInMillis": 29000,
-    "cacheNamespace": "lz0dor",
-    "cacheKeyParameters": []
-}
-```
-
-After performing the setup, create the Amazon API Gateway: 
+8. After performing the setup, create the Amazon API Gateway: 
 ```bash
 aws apigateway create-deployment --rest-api-id $GATEWAY_ID --stage-name prod
 ```
-
-```json
-{
-    "id": "had51b",
-    "createdDate": "2021-08-24T11:22:18-07:00"
-}
-```
-
-Add some additional permissions to the function to allow the API Gateway to run the lambda function: 
+9. Now that the API Gateway exists, add some additional permissions to the function to allow the API Gateway to run the lambda function. From the command line, run the following: 
 ```bash
 aws lambda add-permission --function-name LsCustomWebhook \
 --statement-id apigateway-get --action lambda:InvokeFunction \
 --principal apigateway.amazonaws.com \
 --source-arn "arn:aws:execute-api:${REGION}:${ACCOUNT_ID}:${GATEWAY_ID}/*/*/*"
 ```
-
-```json
-{
-    "Statement": "{\"Sid\":\"apigateway-get\",\"Effect\":\"Allow\",\"Principal\":{\"Service\":\"apigateway.amazonaws.com\"},\"Action\":\"lambda:InvokeFunction\",\"Resource\":\"arn:aws:lambda:us-east-2:490065312183:function:LsCustomWebhook\",\"Condition\":{\"ArnLike\":{\"AWS:SourceArn\":\"arn:aws:execute-api:us-east-2:490065312183:wru404i3oe/*/*/*\"}}}"
-}
-```
-
-
-
-After you create the gateway, it becomes available at the following URL: `https://$GATEWAY_ID.execute-api.${REGION}.amazonaws.com/prod/LcWebHook`
-
-run the following:
+10. After you create the gateway, it becomes available at the following URL: `https://$GATEWAY_ID.execute-api.${REGION}.amazonaws.com/prod/LcWebHook`. Send webhook event payloads from Label Studio to this endpoint. To get your URL, from the command line, run the following:
 ```bash
 echo https://$GATEWAY_ID.execute-api.${REGION}.amazonaws.com/prod/LcWebHook
 ```
+Save the output somewhere secure. 
 
-You'll use that URL as the webhook URL when you set those up in Label Studio later.
+## Set up Label Studio for data annotation
 
-## set up label studio
+
+
+
+
 
 - set up image segmentation project
   
