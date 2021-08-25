@@ -357,7 +357,7 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
             next_task = self._get_random_unlocked(tasks)
         return next_task
 
-    def _make_response(self, next_task, request, use_task_lock=True):
+    def _make_response(self, next_task, request, use_task_lock=True, t queue=''):
         """Once next task has chosen, this function triggers inference and prepare the API response"""
         user = request.user
         project = next_task.project
@@ -442,20 +442,17 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
                 if next_task:
                     return self._make_response(next_task, request)
 
-            ordering_enabled = is_ordering_enabled(request, project)
-            if not ordering_enabled:
+            # show tasks with overlap > 1 first
+            if project.show_overlap_first:
+                # don't output anything - just filter tasks with overlap
+                logger.debug(f'User={request.user} tries overlap first from {not_solved_tasks_count} tasks')
+                _, not_solved_tasks = self._try_tasks_with_overlap(not_solved_tasks)
 
-                # show tasks with overlap > 1 first
-                if project.show_overlap_first:
-                    # don't output anything - just filter tasks with overlap
-                    logger.debug(f'User={request.user} tries overlap first from {not_solved_tasks_count} tasks')
-                    _, not_solved_tasks = self._try_tasks_with_overlap(not_solved_tasks)
-
-                # if there any tasks in progress (with maximum number of annotations), randomly sampling from them
-                logger.debug(f'User={request.user} tries depth first from {not_solved_tasks_count} tasks')
-                next_task = self._try_breadth_first(not_solved_tasks)
-                if next_task:
-                    return self._make_response(next_task, request)
+            # if there any tasks in progress (with maximum number of annotations), randomly sampling from them
+            logger.debug(f'User={request.user} tries depth first from {not_solved_tasks_count} tasks')
+            next_task = self._try_breadth_first(not_solved_tasks)
+            if next_task:
+                return self._make_response(next_task, request)
 
             if project.sampling == project.UNCERTAINTY:
                 logger.debug(f'User={request.user} tries uncertainty sampling from {not_solved_tasks_count} tasks')
