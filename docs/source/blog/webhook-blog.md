@@ -887,10 +887,7 @@ aws lambda add-permission --function-name LsCustomWebhook \
 
 
 
-After you create the gateway, it becomes available at the following URL:
-```html
-https://$GATEWAY_ID.execute-api.${REGION}.amazonaws.com/prod/LcWebHook
-```
+After you create the gateway, it becomes available at the following URL: `https://$GATEWAY_ID.execute-api.${REGION}.amazonaws.com/prod/LcWebHook`
 
 run the following:
 ```bash
