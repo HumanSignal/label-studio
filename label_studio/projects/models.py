@@ -719,7 +719,7 @@ class ProjectSummary(models.Model):
 
     def _get_annotation_key(self, result):
         result_type = result.get('type', None)
-        if result_type in ('relation', 'rating', 'pairwise', None):
+        if result_type in ('relation', 'pairwise', None):
             return None
         if 'from_name' not in result or 'to_name' not in result:
             logger.error(
@@ -733,13 +733,15 @@ class ProjectSummary(models.Model):
 
     def _get_labels(self, result):
         result_type = result.get('type')
+        result_value = result['value'].get(result_type)
+        if not result_value or not isinstance(result_value, list) or result_type == 'text':
+            # Non-list values are not labels. TextArea list values (texts) are not labels too.
+            return []
+        # Labels are stored in list
         labels = []
-        for label in result['value'].get(result_type, []):
-            if isinstance(label, list):
-                labels.extend(label)
-            else:
-                labels.append(label)
-        return [str(l) for l in labels]
+        for label in result_value:
+            labels.append(str(label))
+        return labels
 
     def update_created_annotations_and_labels(self, annotations):
         created_annotations = dict(self.created_annotations)
