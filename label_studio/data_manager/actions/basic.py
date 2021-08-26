@@ -120,7 +120,7 @@ actions = [
     },
     {
         'entry_point': delete_tasks_annotations,
-        'permission': all_permissions.annotations_delete,
+        'permission': all_permissions.tasks_delete,
         'title': 'Delete annotations',
         'order': 101,
         'dialog': {

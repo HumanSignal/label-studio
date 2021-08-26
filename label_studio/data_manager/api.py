@@ -291,12 +291,6 @@ class ProjectActionsAPI(APIView):
         POST=all_permissions.projects_view,
     )
 
-    @staticmethod
-    def get_user_permissions(request):
-        if request.user.is_authenticated:
-            return all_permissions
-        return []
-
     @swagger_auto_schema(tags=["Data Manager"])
     def get(self, request):
         """
