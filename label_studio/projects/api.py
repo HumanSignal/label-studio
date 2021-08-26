@@ -430,18 +430,18 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
                 next_task = not_solved_tasks.first()
                 if not next_task:
                     raise NotFound('No more tasks found')
-                return self._make_response(next_task, request, use_task_lock=False, queue='manually assigned queue')
+                return self._make_response(next_task, request, use_task_lock=False, queue='Manually assigned queue')
 
             # If current user has already lock one task - return it (without setting the lock again)
             next_task = Task.get_locked_by(user, tasks=not_solved_tasks)
             if next_task:
-                return self._make_response(next_task, request, use_task_lock=False, queue='task is in progress')
+                return self._make_response(next_task, request, use_task_lock=False, queue='Task lock')
 
             if project.show_ground_truth_first:
                 logger.debug(f'User={request.user} tries ground truth from {not_solved_tasks_count} tasks')
                 next_task = self._try_ground_truth(not_solved_tasks, project)
                 if next_task:
-                    return self._make_response(next_task, request, queue='ground truth queue')
+                    return self._make_response(next_task, request, queue='Ground truth queue')
 
             queue_info = ''
 
@@ -450,27 +450,27 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
                 # don't output anything - just filter tasks with overlap
                 logger.debug(f'User={request.user} tries overlap first from {not_solved_tasks_count} tasks')
                 _, not_solved_tasks = self._try_tasks_with_overlap(not_solved_tasks)
-                queue_info += 'show overlap first'
+                queue_info += 'Show overlap first'
 
             # if there any tasks in progress (with maximum number of annotations), randomly sampling from them
             logger.debug(f'User={request.user} tries depth first from {not_solved_tasks_count} tasks')
             next_task = self._try_breadth_first(not_solved_tasks)
             if next_task:
-                queue_info += (' & ' if queue_info else '') + 'breadth first queue'
+                queue_info += (' & ' if queue_info else '') + 'Breadth first queue'
                 return self._make_response(next_task, request, queue=queue_info)
 
             if project.sampling == project.UNCERTAINTY:
-                queue_info += (' & ' if queue_info else '') + 'active learning or random queue'
+                queue_info += (' & ' if queue_info else '') + 'Active learning or random queue'
                 logger.debug(f'User={request.user} tries uncertainty sampling from {not_solved_tasks_count} tasks')
                 next_task = self._try_uncertainty_sampling(not_solved_tasks, project, user_solved_tasks_array)
 
             elif project.sampling == project.UNIFORM:
-                queue_info += (' & ' if queue_info else '') + 'uniform random queue'
+                queue_info += (' & ' if queue_info else '') + 'Uniform random queue'
                 logger.debug(f'User={request.user} tries random sampling from {not_solved_tasks_count} tasks')
                 next_task = self._get_random_unlocked(not_solved_tasks)
 
             elif project.sampling == project.SEQUENCE:
-                queue_info += (' & ' if queue_info else '') + 'sequence from data manager queue'
+                queue_info += (' & ' if queue_info else '') + 'Data manager queue'
                 logger.debug(f'User={request.user} tries sequence sampling from {not_solved_tasks_count} tasks')
                 next_task = self._get_first_unlocked(not_solved_tasks)
 
@@ -478,7 +478,8 @@ class ProjectNextTaskAPI(generics.RetrieveAPIView):
                 return self._make_response(next_task, request, queue=queue_info)
             else:
                 raise NotFound(
-                    f'There are still some tasks to complete for the user={user}, but they seem to be locked by another user.')
+                    f'There are still some tasks to complete for the user={user}, '
+                    f'but they seem to be locked by another user.')
 
 
 @method_decorator(name='post', decorator=swagger_auto_schema(
