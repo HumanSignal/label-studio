@@ -88,7 +88,7 @@ def perform_action(action_id, project, queryset, user, **kwargs):
 
     # check user permissions for this action
     if not check_permissions(user, action):
-        raise DRFPermissionDenied(f'Action is not allowed for the current user: {action[id]}')
+        raise DRFPermissionDenied(f'Action is not allowed for the current user: {action["id"]}')
 
     try:
         result = action['entry_point'](project, queryset, **kwargs)
