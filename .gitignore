@@ -26,6 +26,7 @@ deploy/license.txt
 deploy/logs/
 deploy/redis-data/
 deploy/dockerfiles/postgres-data
+postgres-data
 
 label_studio/core/media
 label_studio/core/downloads
