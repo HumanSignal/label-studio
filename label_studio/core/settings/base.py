@@ -13,9 +13,6 @@ import os
 import re
 import logging
 
-import google.cloud.logging
-from google.auth.exceptions import GoogleAuthError
-
 # for printing messages before main logging config applied
 if not logging.getLogger().hasHandlers():
     logging.basicConfig(level=logging.DEBUG, format='%(message)s')
@@ -126,6 +123,9 @@ LOGGING = {
 
 if get_env('GOOGLE_LOGGING_ENABLED', False):
     try:
+        import google.cloud.logging
+        from google.auth.exceptions import GoogleAuthError
+
         client = google.cloud.logging.Client()
         client.setup_logging()
 
