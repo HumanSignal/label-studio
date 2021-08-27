@@ -2,6 +2,7 @@
 """
 import logging
 
+from django.conf import settings
 from django_filters.rest_framework import DjangoFilterBackend
 from django.utils.decorators import method_decorator
 from rest_framework import viewsets
@@ -301,14 +302,7 @@ class ProjectActionsAPI(APIView):
         pk = int_from_request(request.GET, "project", 1)  # replace 1 to None, it's for debug only
         project = get_object_with_check_and_log(request, Project, pk=pk)
         self.check_object_permissions(request, project)
-
-        params = {
-            'can_delete_tasks': True,
-            'can_manage_annotations': True,
-            'experimental_feature': False
-        }
-
-        return Response(get_all_actions(params))
+        return Response(get_all_actions(request.user))
 
     @swagger_auto_schema(tags=["Data Manager"])
     def post(self, request):
@@ -337,7 +331,7 @@ class ProjectActionsAPI(APIView):
 
         # perform action and return the result dict
         kwargs = {'request': request}  # pass advanced params to actions
-        result = perform_action(action_id, project, queryset, **kwargs)
+        result = perform_action(action_id, project, queryset, request.user, **kwargs)
         code = result.pop('response_code', 200)
 
         return Response(result, status=code)

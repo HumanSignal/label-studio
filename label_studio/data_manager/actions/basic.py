@@ -9,6 +9,10 @@ from data_manager.functions import evaluate_predictions
 
 from webhooks.utils import emit_webhooks_for_instance
 from webhooks.models import WebhookAction
+from core.permissions import AllPermissions
+
+
+all_permissions = AllPermissions()
 
 
 def retrieve_tasks_predictions(project, queryset, **kwargs):
@@ -94,7 +98,7 @@ actions = [
         'entry_point': retrieve_tasks_predictions,
         'title': 'Retrieve predictions',
         'order': 90,
-        'permissions': 'can_manage_annotations',
+        'permission': all_permissions.predictions_any,
         'dialog': {
             'text': 'Send the selected tasks to all ML backends connected to the project.'
                     'This operation might be abruptly interrupted due to a timeout. '
@@ -107,7 +111,7 @@ actions = [
     {
         'entry_point': delete_tasks,
         'title': 'Delete tasks', 'order': 100,
-        'permissions': 'can_delete_tasks',
+        'permission': all_permissions.tasks_delete,
         'reload': True,
         'dialog': {
             'text': 'You are going to delete the selected tasks. Please confirm your action.',
@@ -116,9 +120,9 @@ actions = [
     },
     {
         'entry_point': delete_tasks_annotations,
+        'permission': all_permissions.tasks_delete,
         'title': 'Delete annotations',
         'order': 101,
-        'permissions': 'can_manage_annotations',
         'dialog': {
             'text': 'You are going to delete all annotations from the selected tasks. Please confirm your action.',
             'type': 'confirm'
@@ -126,9 +130,9 @@ actions = [
     },
     {
         'entry_point': delete_tasks_predictions,
+        'permission': all_permissions.predictions_any,
         'title': 'Delete predictions',
         'order': 102,
-        'permissions': 'can_manage_annotations',
         'dialog': {
             'text': 'You are going to delete all predictions from the selected tasks. Please confirm your action.',
             'type': 'confirm'
