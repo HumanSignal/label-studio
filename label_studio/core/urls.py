@@ -71,6 +71,7 @@ urlpatterns = [
 
     re_path(r'health/', views.health, name="health"),
     re_path(r'metrics/', views.metrics, name="metrics"),
+    re_path(r'trigger500/', views.TriggerAPIError.as_view(), name="metrics"),
 
     re_path(r'samples/time-series.csv', views.samples_time_series, name="static_time_series"),
     re_path(r'samples/paragraphs.json', views.samples_paragraphs, name="samples_paragraphs"),

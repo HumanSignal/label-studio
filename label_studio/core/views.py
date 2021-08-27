@@ -16,6 +16,7 @@ from django.template import loader
 from django.views.static import serve
 from django.http import JsonResponse
 from wsgiref.util import FileWrapper
+from rest_framework.views import APIView
 
 from core import utils
 from core.utils.io import find_file
@@ -79,6 +80,15 @@ def health(request):
 def metrics(request):
     """ Empty page for metrics evaluation """
     return HttpResponse('')
+
+
+class TriggerAPIError(APIView):
+    """ 500 response for testing """
+    authentication_classes = ()
+    permission_classes = ()
+
+    def get(self, request):
+        raise Exception('test')
 
 
 def editor_files(request):
